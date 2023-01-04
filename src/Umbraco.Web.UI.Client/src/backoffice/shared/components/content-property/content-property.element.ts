@@ -55,7 +55,7 @@ export class UmbContentPropertyElement extends UmbLitElement {
 	private _observeDataType() {
 		if (!this._dataTypeStore || !this._property) return;
 
-		this.observe<ManifestTypes>(
+		this.observe(
 			this._dataTypeStore.getByKey(this._property.dataTypeKey).pipe(
 				switchMap((dataType) => {
 					if (!dataType?.propertyEditorUIAlias) return EMPTY;

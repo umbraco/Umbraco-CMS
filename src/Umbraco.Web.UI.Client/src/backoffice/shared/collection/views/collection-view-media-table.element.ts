@@ -28,12 +28,12 @@ export class UmbCollectionViewMediaTableElement extends UmbLitElement {
 	private _observeCollectionContext() {
 		if (!this._collectionContext) return;
 
-		this.observe<Array<MediaDetails>>(this._collectionContext.data, (nodes) => {
-			this._mediaItems = nodes || undefined;
+		this.observe(this._collectionContext.data, (nodes) => {
+			this._mediaItems = nodes;
 		});
 
-		this.observe<Array<string>>(this._collectionContext.selection, (selection) => {
-			this._selection = selection || undefined;
+		this.observe(this._collectionContext.selection, (selection) => {
+			this._selection = selection;
 		});
 	}
 

@@ -59,7 +59,7 @@ export class UmbSectionElement extends UmbLitElement {
 	private _observeTrees() {
 		if (!this._sectionContext) return;
 
-		this.observe<ManifestTree[]>(
+		this.observe(
 			this._sectionContext?.data.pipe(
 				switchMap((section) => {
 					if (!section) return EMPTY;
@@ -71,13 +71,13 @@ export class UmbSectionElement extends UmbLitElement {
 				})
 			),
 			(trees) => {
-				this._trees = trees || undefined;
+				this._trees = trees;
 				this._createTreeRoutes();
 			}
 		);
 
-		this.observe<ManifestWorkspace[]>(umbExtensionsRegistry?.extensionsOfType('workspace'), (workspaceExtensions) => {
-			this._workspaces = workspaceExtensions || undefined;
+		this.observe(umbExtensionsRegistry.extensionsOfType('workspace'), (workspaceExtensions) => {
+			this._workspaces = workspaceExtensions;
 			this._createTreeRoutes();
 		});
 	}
@@ -117,7 +117,7 @@ export class UmbSectionElement extends UmbLitElement {
 	private _observeViews() {
 		if (!this._sectionContext) return;
 
-		this.observe<ManifestSectionView[]>(
+		this.observe(
 			this._sectionContext.data.pipe(
 				switchMap((section) => {
 					if (!section) return EMPTY;

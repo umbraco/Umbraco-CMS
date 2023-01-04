@@ -87,7 +87,7 @@ export class UmbBackofficeHeaderSections extends UmbLitElement {
 	private _observeSections() {
 		if (!this._sectionStore) return;
 
-		this.observe<ManifestSection[]>(this._sectionStore?.getAllowed(), (allowedSections) => {
+		this.observe(this._sectionStore.getAllowed(), (allowedSections) => {
 			this._sections = allowedSections;
 			this._visibleSections = this._sections;
 		});
@@ -96,7 +96,7 @@ export class UmbBackofficeHeaderSections extends UmbLitElement {
 	private _observeCurrentSection() {
 		if (!this._sectionStore) return;
 
-		this.observe<string>(this._sectionStore.currentAlias, (currentSectionAlias) => {
+		this.observe(this._sectionStore.currentAlias, (currentSectionAlias) => {
 			this._currentSectionAlias = currentSectionAlias;
 		});
 	}

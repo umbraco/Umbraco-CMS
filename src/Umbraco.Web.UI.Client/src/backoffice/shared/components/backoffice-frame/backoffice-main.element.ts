@@ -50,7 +50,7 @@ export class UmbBackofficeMain extends UmbLitElement {
 	private async _observeSections() {
 		if (!this._sectionStore) return;
 
-		this.observe<ManifestSection[]>(this._sectionStore?.getAllowed(), (sections) => {
+		this.observe(this._sectionStore.getAllowed(), (sections) => {
 			this._sections = sections;
 			if (!sections) return;
 			this._createRoutes();
