@@ -3,7 +3,6 @@ import { css, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { distinctUntilChanged } from 'rxjs';
 import { UmbWorkspaceDataTypeContext } from '../../workspace-data-type.context';
-import type { UmbDataTypeStoreItemType } from '../../../data-type.store';
 import type { DataTypeDetails } from '@umbraco-cms/models';
 import { UmbLitElement } from '@umbraco-cms/element';
 
@@ -28,7 +27,7 @@ export class UmbWorkspaceViewDataTypeInfoElement extends UmbLitElement {
 	private _observeDataType() {
 		if (!this._workspaceContext) return;
 
-		this.observe<UmbDataTypeStoreItemType>(this._workspaceContext.data.pipe(distinctUntilChanged()), (dataType) => {
+		this.observe(this._workspaceContext.data.pipe(distinctUntilChanged()), (dataType) => {
 			if(!dataType) return;
 			
 			// TODO: handle if model is not of the type wanted.
