@@ -58,9 +58,9 @@ public class SqlLocalDbDatabaseProviderMetadata : IDatabaseProviderMetadata
         {
             DataSource = @"(localdb)\MSSQLLocalDB",
             AttachDBFilename = @$"{ConnectionStrings.DataDirectoryPlaceholder}\{databaseModel.DatabaseName}.mdf",
-            IntegratedSecurity = true
+            IntegratedSecurity = true,
         };
 
-        return builder.ConnectionString;
+        return builder.ConnectionString + ";TrustServerCertificate=True";
     }
 }
