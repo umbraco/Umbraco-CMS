@@ -11,7 +11,7 @@ import {
 	UmbTableConfig,
 	UmbTableOrderedEvent,
 } from '../../../../../../shared/components/table/table.element';
-import type { UserDetails, UserGroupDetails, UserGroupEntity } from '@umbraco-cms/models';
+import type { UserDetails, UserGroupEntity } from '@umbraco-cms/models';
 
 import './column-layouts/name/user-table-name-column-layout.element';
 import './column-layouts/status/user-table-status-column-layout.element';
@@ -87,7 +87,7 @@ export class UmbWorkspaceViewUsersTableElement extends UmbLitElement {
 
 	private _observeUsers() {
 		if (!this._usersContext) return;
-		this.observe<Array<UserDetails>>(this._usersContext.users, (users) => {
+		this.observe(this._usersContext.users, (users) => {
 			this._users = users;
 			this._createTableItems(this._users);
 		});
@@ -103,7 +103,7 @@ export class UmbWorkspaceViewUsersTableElement extends UmbLitElement {
 
 	private _observeUserGroups() {
 		if (!this._userGroupStore) return;
-		this.observe<Array<UserGroupDetails>>(this._userGroupStore.getAll(), (userGroups) => {
+		this.observe(this._userGroupStore.getAll(), (userGroups) => {
 			this._userGroups = userGroups;
 			this._createTableItems(this._users);
 		});

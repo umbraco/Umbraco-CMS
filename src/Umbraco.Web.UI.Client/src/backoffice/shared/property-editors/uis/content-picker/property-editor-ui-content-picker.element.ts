@@ -59,8 +59,8 @@ export class UmbPropertyEditorUIContentPickerElement extends UmbLitElement {
 	private _observePickedDocuments() {
 		if (!this._documentStore) return;
 		// TODO: consider changing this to the list data endpoint when it is available
-		this.observe<FolderTreeItem[]>(this._documentStore.getTreeItems(this.value), (items) => {
-			this._items = items || undefined;
+		this.observe(this._documentStore.getTreeItems(this.value), (items) => {
+			this._items = items;
 		});
 	}
 

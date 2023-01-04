@@ -50,7 +50,7 @@ export class UmbSectionViewUsersElement extends UmbLitElement {
 		// TODO: consider this context name, is it to broad?
 		this.provideContext('umbUsersContext', this);
 
-		this.observe<ManifestWorkspace[]>(umbExtensionsRegistry?.extensionsOfType('workspace'), (workspaceExtensions) => {
+		this.observe(umbExtensionsRegistry?.extensionsOfType('workspace'), (workspaceExtensions) => {
 			this._workspaces = workspaceExtensions;
 			this._createRoutes();
 		});
@@ -92,11 +92,11 @@ export class UmbSectionViewUsersElement extends UmbLitElement {
 		if (!this._userStore) return;
 
 		if (this._search.getValue()) {
-			this.observe<Array<UserDetails>>(this._userStore.getByName(this._search.getValue()), (users) =>
+			this.observe(this._userStore.getByName(this._search.getValue()), (users) =>
 				this._users.next(users)
 			);
 		} else {
-			this.observe<Array<UserDetails>>(this._userStore.getAll(), (users) => this._users.next(users));
+			this.observe(this._userStore.getAll(), (users) => this._users.next(users));
 		}
 	}
 

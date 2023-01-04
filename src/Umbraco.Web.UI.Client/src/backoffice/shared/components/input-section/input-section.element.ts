@@ -57,6 +57,7 @@ export class UmbInputPickerSectionElement extends UmbInputListBase {
 
 	selectionUpdated() {
 		this._observeSections();
+		// TODO: Use proper event class:
 		this.dispatchEvent(new CustomEvent('change', { bubbles: true, composed: true }));
 	}
 

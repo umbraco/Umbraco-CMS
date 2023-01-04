@@ -47,12 +47,12 @@ export class UmbWorkspaceViewUsersSelectionElement extends UmbLitElement {
 
 	private _observeSelection() {
 		if (!this._usersContext) return;
-		this.observe<Array<string>>(this._usersContext.selection, (selection) => (this._selection = selection));
+		this.observe(this._usersContext.selection, (selection) => (this._selection = selection));
 	}
 
 	private _observeTotalUsers() {
 		if (!this._userStore) return;
-		this.observe<number>(this._userStore.totalUsers, (totalUsers) => (this._totalUsers = totalUsers));
+		this.observe(this._userStore.totalUsers, (totalUsers) => (this._totalUsers = totalUsers));
 	}
 
 	private _handleClearSelection() {

@@ -18,7 +18,7 @@ export class UmbCurrentUserHeaderApp extends UmbLitElement {
 	];
 
 	@state()
-	private _currentUser?: UserDetails | null;
+	private _currentUser?: UserDetails;
 
 	private _currentUserStore?: UmbCurrentUserStore;
 	private _modalService?: UmbModalService;
@@ -35,7 +35,7 @@ export class UmbCurrentUserHeaderApp extends UmbLitElement {
 	private async _observeCurrentUser() {
 		if (!this._currentUserStore) return;
 
-		this.observe<UserDetails>(this._currentUserStore.currentUser, (currentUser) => {
+		this.observe(this._currentUserStore.currentUser, (currentUser) => {
 			this._currentUser = currentUser;
 		});
 	}

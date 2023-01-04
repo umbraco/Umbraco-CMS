@@ -23,7 +23,7 @@ export class UmbUserGroupTableSectionsColumnLayoutElement extends UmbObserverMix
 	}
 
 	private observeSectionNames() {
-		this.observe<Array<ManifestSection>>(umbExtensionsRegistry.extensionsOfType('section'), (sections) => {
+		this.observe(umbExtensionsRegistry.extensionsOfType('section'), (sections) => {
 			this._sectionsNames = sections.filter((x) => this.value.includes(x.alias)).map((x) => x.meta.label || x.name);
 		});
 	}

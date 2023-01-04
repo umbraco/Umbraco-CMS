@@ -65,14 +65,14 @@ export class UmbWorkspaceViewUsersGridElement extends UmbLitElement {
 
 	private _observeUsers() {
 		if (!this._usersContext) return;
-		this.observe<Array<UserDetails>>(this._usersContext.users, (users) => {
+		this.observe(this._usersContext.users, (users) => {
 			this._users = users;
 		});
 	}
 
 	private _observeUserGroups() {
 		if (!this._userGroupStore) return;
-		this.observe<Array<UserGroupDetails>>(
+		this.observe(
 			this._userGroupStore.getAll(),
 			(userGroups) => (this._userGroups = userGroups)
 		);
@@ -80,7 +80,7 @@ export class UmbWorkspaceViewUsersGridElement extends UmbLitElement {
 
 	private _observeSelection() {
 		if (!this._usersContext) return;
-		this.observe<Array<string>>(this._usersContext.selection, (selection) => (this._selection = selection));
+		this.observe(this._usersContext.selection, (selection) => (this._selection = selection));
 	}
 
 	private _isSelected(key: string) {

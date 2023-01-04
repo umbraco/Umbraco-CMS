@@ -2,7 +2,7 @@ import { html } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { ifDefined } from 'lit-html/directives/if-defined.js';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
-import type { ManifestTypes, PropertyEditorConfigDefaultData, PropertyEditorConfigProperty } from '@umbraco-cms/models';
+import type { PropertyEditorConfigDefaultData, PropertyEditorConfigProperty } from '@umbraco-cms/models';
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
 
 import '../../../components/entity-property/entity-property.element';
@@ -58,7 +58,7 @@ export class UmbPropertyEditorConfigElement extends UmbLitElement {
 	private _observePropertyEditorUIConfig() {
 		if (!this._propertyEditorUIAlias) return;
 
-		this.observe<ManifestTypes>(umbExtensionsRegistry.getByAlias(this.propertyEditorUIAlias), (manifest) => {
+		this.observe(umbExtensionsRegistry.getByAlias(this.propertyEditorUIAlias), (manifest) => {
 			if (manifest?.type === 'propertyEditorUI') {
 				this._observePropertyEditorModelConfig(manifest.meta.propertyEditorModel);
 				this._propertyEditorUIConfigProperties = manifest?.meta.config?.properties || [];
@@ -72,7 +72,7 @@ export class UmbPropertyEditorConfigElement extends UmbLitElement {
 	private _observePropertyEditorModelConfig(propertyEditorModelAlias?: string) {
 		if (!propertyEditorModelAlias) return;
 
-		this.observe<ManifestTypes>(umbExtensionsRegistry.getByAlias(propertyEditorModelAlias), (manifest) => {
+		this.observe(umbExtensionsRegistry.getByAlias(propertyEditorModelAlias), (manifest) => {
 			if (manifest?.type === 'propertyEditorModel') {
 				this._propertyEditorModelConfigProperties = manifest?.meta.config?.properties || [];
 				this._propertyEditorModelConfigDefaultData = manifest?.meta.config?.defaultData || [];
