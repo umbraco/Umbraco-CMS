@@ -4,8 +4,8 @@ import { customElement, state } from 'lit/decorators.js';
 import { IRoute } from 'router-slot';
 import { UUIPopoverElement } from '@umbraco-ui/uui';
 
-import { UmbLitElement } from '@umbraco-cms/element';
 import type { UmbSectionViewUsersElement } from './section-view-users.element';
+import { UmbLitElement } from '@umbraco-cms/element';	
 import { UmbModalService } from 'src/core/modal';
 
 import './list-view-layouts/table/workspace-view-users-table.element';
