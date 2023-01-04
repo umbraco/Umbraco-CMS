@@ -4,10 +4,9 @@ import { customElement } from 'lit/decorators.js';
 import { UmbModalService } from '../../../../../core/modal';
 import { UmbDocumentStore } from '../../document.store';
 import UmbTreeItemActionElement from '../../../../shared/components/tree/action/tree-item-action.element';
-import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 
 @customElement('umb-tree-action-document-delete')
-export default class UmbTreeActionDocumentDeleteElement extends UmbContextConsumerMixin(UmbTreeItemActionElement) {
+export default class UmbTreeActionDocumentDeleteElement extends UmbTreeItemActionElement {
 	static styles = [UUITextStyles, css``];
 
 	private _modalService?: UmbModalService;
