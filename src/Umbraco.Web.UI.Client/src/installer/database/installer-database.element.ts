@@ -232,25 +232,27 @@ export class UmbInstallerDatabaseElement extends UmbLitElement {
 		}
 
 		this._installerContext?.nextStep();
-		this._installerContext
-			.requestInstall()
-			.then(() => this._handleFulfilled())
-			.catch((error: unknown) => this._handleRejected(error));
+
+		const { data, error } = await tryExecuteAndNotify(
+			this,
+			InstallResource.postInstallSetup({ requestBody: this._installerContext?.getData() })
+		);
+		if (data) {
+			this._handleFulfilled();
+		} else if (error) {
+			this._handleRejected(error);
+		}
 	};
 
 	private _handleFulfilled() {
+		// TODO: The post install will probably return a user in the future, so we have to set that context somewhere to let the client know that it is authenticated
 		console.warn('TODO: Set up real authentication');
 		sessionStorage.setItem('is-authenticated', 'true');
 		history.replaceState(null, '', '/content');
 	}
 
-	private _handleRejected(e: unknown) {
-		if (e instanceof ApiError) {
-			const error = e.body as ProblemDetails;
-			if (e.status === 400) {
-				this._installerContext?.setInstallStatus(error);
-			}
-		}
+	private _handleRejected(e: ProblemDetails) {
+		this._installerContext?.setInstallStatus(e);
 		this._installerContext?.nextStep();
 	}
 
