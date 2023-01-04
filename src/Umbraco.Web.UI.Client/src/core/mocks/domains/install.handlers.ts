@@ -72,7 +72,7 @@ export const handlers = [
 		);
 	}),
 
-	rest.post(umbracoPath('/install/validateDatabase'), async (req, res, ctx) => {
+	rest.post(umbracoPath('/install/validate-database'), async (req, res, ctx) => {
 		const body = await req.json<DatabaseInstall>();
 
 		if (body.name === 'validate') {

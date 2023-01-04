@@ -1,12 +1,14 @@
+import { css, html } from 'lit';
+import { customElement, state } from 'lit/decorators.js';
+import { unsafeHTML } from 'lit/directives/unsafe-html.js';
 import { UUIButtonState } from '@umbraco-ui/uui';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
-import { css, html, LitElement } from 'lit';
-import { unsafeHTML } from 'lit/directives/unsafe-html.js';
-import { customElement, state } from 'lit/decorators.js';
-import { ApiError, ProblemDetails, Telemetry, TelemetryLevel, TelemetryResource } from '@umbraco-cms/backend-api';
+import { Telemetry, TelemetryLevel, TelemetryResource } from '@umbraco-cms/backend-api';
+import { UmbLitElement } from '@umbraco-cms/element';
+import { tryExecuteAndNotify } from '@umbraco-cms/resources';
 
 @customElement('umb-dashboard-telemetry')
-export class UmbDashboardTelemetryElement extends LitElement {
+export class UmbDashboardTelemetryElement extends UmbLitElement {
 	static styles = [
 		UUITextStyles,
 		css`
@@ -38,46 +40,32 @@ export class UmbDashboardTelemetryElement extends LitElement {
 	}
 
 	private async _setup() {
-		try {
-			const consentLevels = await TelemetryResource.getTelemetry({skip: 0, take: 3});
-			this._telemetryLevels = consentLevels.items ?? [];
-		} catch (e) {
-			if (e instanceof ApiError) {
-				const error = e.body as ProblemDetails;
-				this._errorMessage = error.detail;
-			}
-		}
+		const telemetryLevels = await tryExecuteAndNotify(this, TelemetryResource.getTelemetry({ skip: 0, take: 3 }));
+		this._telemetryLevels = telemetryLevels.data?.items ?? [];
 
-		try {
-			const consentSetting = await TelemetryResource.getTelemetryLevel();
-			this._telemetryFormData = consentSetting.telemetryLevel ?? TelemetryLevel.BASIC;
-		} catch (e) {
-			if (e instanceof ApiError) {
-				const error = e.body as ProblemDetails;
-				this._errorMessage = error.detail;
-			}
-		}
+		const telemetryLevel = await tryExecuteAndNotify(this, TelemetryResource.getTelemetryLevel());
+		this._telemetryFormData = telemetryLevel.data?.telemetryLevel ?? TelemetryLevel.BASIC;
 	}
 
 	private _handleSubmit = async (e: CustomEvent<SubmitEvent>) => {
 		e.stopPropagation();
+
 		this._buttonState = 'waiting';
-		try {
-			await TelemetryResource.postTelemetryLevel({
+
+		const { error } = await tryExecuteAndNotify(
+			this,
+			TelemetryResource.postTelemetryLevel({
 				requestBody: { telemetryLevel: this._telemetryFormData },
-			});
-			this._buttonState = 'success';
-		} catch (e) {
+			})
+		);
+
+		if (error) {
 			this._buttonState = 'failed';
-			if (e instanceof ApiError) {
-				const error = e.body as ProblemDetails;
-				if (e.status === 400) {
-					this._errorMessage = error.detail || 'Unknown error, please try again';
-				}
-			} else {
-				this._errorMessage = 'Unknown error, please try again';
-			}
+			this._errorMessage = error.detail;
+			return;
 		}
+
+		this._buttonState = 'success';
 	};
 
 	private _handleChange(e: InputEvent) {
@@ -146,7 +134,12 @@ export class UmbDashboardTelemetryElement extends LitElement {
 						will be fully anonymized.
 					</p>
 					${this._renderSettingSlider()}
-					<uui-button look="primary" color="positive" label="Save telemetry settings" @click="${this._handleSubmit}" .state=${this._buttonState}>
+					<uui-button
+						look="primary"
+						color="positive"
+						label="Save telemetry settings"
+						@click="${this._handleSubmit}"
+						.state=${this._buttonState}>
 						Save
 					</uui-button>
 				</div>

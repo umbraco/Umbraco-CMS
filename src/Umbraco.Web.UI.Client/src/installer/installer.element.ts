@@ -1,8 +1,7 @@
-import { css, CSSResultGroup, html, LitElement } from 'lit';
+import { css, CSSResultGroup, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { UmbInstallerContext } from './installer.context';
-import { UmbObserverMixin } from '@umbraco-cms/observable-api';
-import { UmbContextProviderMixin } from '@umbraco-cms/context-api';
+import { UmbLitElement } from '@umbraco-cms/element';
 
 import './consent/installer-consent.element';
 import './database/installer-database.element';
@@ -12,7 +11,7 @@ import './shared/layout/installer-layout.element';
 import './user/installer-user.element';
 
 @customElement('umb-installer')
-export class UmbInstallerElement extends UmbContextProviderMixin(UmbObserverMixin(LitElement)) {
+export class UmbInstallerElement extends UmbLitElement {
 	static styles: CSSResultGroup = [css``];
 
 	@state()
@@ -31,8 +30,16 @@ export class UmbInstallerElement extends UmbContextProviderMixin(UmbObserverMixi
 	}
 
 	private _observeCurrentStep() {
-		this.observe<number>(this._umbInstallerContext.currentStepChanges(), (step) => {
-			this.step = step;
+		this.observe(this._umbInstallerContext.currentStepChanges(), (step) => {
+			if (step) {
+				this.step = step;
+			}
+		});
+
+		this.observe(this._umbInstallerContext.installStatusChanges(), (error) => {
+			if (error) {
+				this.step = 5;
+			}
 		});
 	}
 

@@ -1,12 +1,9 @@
 import { UUIButtonElement } from '@umbraco-ui/uui';
-import { css, CSSResultGroup, html, LitElement, nothing } from 'lit';
+import { css, CSSResultGroup, html, nothing } from 'lit';
 import { customElement, property, query, state } from 'lit/decorators.js';
 
 import { UmbInstallerContext } from '../installer.context';
-import { UmbObserverMixin } from '@umbraco-cms/observable-api';
-import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 import {
-	ApiError,
 	DatabaseInstall,
 	DatabaseSettings,
 	Install,
@@ -14,9 +11,11 @@ import {
 	InstallSettings,
 	ProblemDetails,
 } from '@umbraco-cms/backend-api';
+import { UmbLitElement } from '@umbraco-cms/element';
+import { tryExecute } from '@umbraco-cms/resources';
 
 @customElement('umb-installer-database')
-export class UmbInstallerDatabaseElement extends UmbContextConsumerMixin(UmbObserverMixin(LitElement)) {
+export class UmbInstallerDatabaseElement extends UmbLitElement {
 	static styles: CSSResultGroup = [
 		css`
 			:host,
@@ -88,7 +87,7 @@ export class UmbInstallerDatabaseElement extends UmbContextConsumerMixin(UmbObse
 	public databaseFormData!: DatabaseInstall;
 
 	@state()
-	private _options: { name: string; value: string; selected?: boolean }[] = [];
+	private _options: Option[] = [];
 
 	@state()
 	private _databases: DatabaseSettings[] = [];
@@ -115,17 +114,20 @@ export class UmbInstallerDatabaseElement extends UmbContextConsumerMixin(UmbObse
 		if (!this._installerContext) return;
 
 		this.observe<InstallSettings>(this._installerContext.settings, (settings) => {
-			this._databases = settings.databases ?? [];
+			this._databases = settings?.databases ?? [];
 
 			// If there is an isConfigured database in the databases array then we can skip the database selection step
 			// and just use that.
 			this._preConfiguredDatabase = this._databases.find((x) => x.isConfigured);
 			if (!this._preConfiguredDatabase) {
-				this._options = this._databases.map((x, i) => ({
-					name: x.displayName ?? 'Unknown database',
-					value: x.id!,
-					selected: i === 0,
-				}));
+				this._options = this._databases
+					.filter((x) => !!x.id)
+					.map((x, i) => ({
+						name: x.displayName ?? 'Unknown database',
+						// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+						value: x.id!,
+						selected: i === 0,
+					}));
 			}
 		});
 	}
@@ -134,8 +136,8 @@ export class UmbInstallerDatabaseElement extends UmbContextConsumerMixin(UmbObse
 		if (!this._installerContext) return;
 
 		this.observe<Install>(this._installerContext.data, (data) => {
-			this.databaseFormData = data.database ?? {};
-			this._options.forEach((x, i) => (x.selected = data.database?.id === x.value || i === 0));
+			this.databaseFormData = data?.database ?? ({} as DatabaseInstall);
+			this._options.forEach((x, i) => (x.selected = data?.database?.id === x.value || i === 0));
 		});
 	}
 
@@ -190,27 +192,23 @@ export class UmbInstallerDatabaseElement extends UmbContextConsumerMixin(UmbObse
 			}
 
 			if (selectedDatabase.requiresConnectionTest) {
-				try {
-					const databaseDetails: DatabaseInstall = {
-						id,
-						username,
-						password,
-						server,
-						useIntegratedAuthentication,
-						name,
-						connectionString,
-						providerName: selectedDatabase.providerName,
-					};
+				const databaseDetails: DatabaseInstall = {
+					id,
+					username,
+					password,
+					server,
+					useIntegratedAuthentication,
+					name,
+					connectionString,
+					providerName: selectedDatabase.providerName,
+				};
 
-					await InstallResource.postInstallValidateDatabase({ requestBody: databaseDetails });
-				} catch (e) {
-					if (e instanceof ApiError) {
-						const error = e.body as ProblemDetails;
-						console.warn('Database validation failed', error.detail);
-						this._validationErrorMessage = error.detail ?? 'Could not verify database connection';
-					} else {
-						this._validationErrorMessage = 'A server error happened when trying to validate the database';
-					}
+				const { error } = await tryExecute(
+					InstallResource.postInstallValidateDatabase({ requestBody: databaseDetails })
+				);
+
+				if (error) {
+					this._validationErrorMessage = `The server could not validate the database connection. Details: ${error.detail}`;
 					this._installButton.state = 'failed';
 					return;
 				}
@@ -228,30 +226,31 @@ export class UmbInstallerDatabaseElement extends UmbContextConsumerMixin(UmbObse
 				providerName: selectedDatabase.providerName,
 			};
 
-			this._installerContext?.appendData({ database });
+			this._installerContext.appendData({ database });
 		}
 
-		this._installerContext?.nextStep();
-		this._installerContext
-			.requestInstall()
-			.then(() => this._handleFulfilled())
-			.catch((error: unknown) => this._handleRejected(error));
+		this._installerContext.nextStep();
+
+		const { error } = await tryExecute(
+			InstallResource.postInstallSetup({ requestBody: this._installerContext.getData() })
+		);
+
+		if (error) {
+			this._handleRejected(error);
+		} else {
+			this._handleFulfilled();
+		}
 	};
 
 	private _handleFulfilled() {
+		// TODO: The post install will probably return a user in the future, so we have to set that context somewhere to let the client know that it is authenticated
 		console.warn('TODO: Set up real authentication');
 		sessionStorage.setItem('is-authenticated', 'true');
 		history.replaceState(null, '', '/content');
 	}
 
-	private _handleRejected(e: unknown) {
-		if (e instanceof ApiError) {
-			const error = e.body as ProblemDetails;
-			if (e.status === 400) {
-				this._installerContext?.setInstallStatus(error);
-			}
-		}
-		this._installerContext?.nextStep();
+	private _handleRejected(e: ProblemDetails) {
+		this._installerContext?.setInstallStatus(e);
 	}
 
 	private _onBack() {
