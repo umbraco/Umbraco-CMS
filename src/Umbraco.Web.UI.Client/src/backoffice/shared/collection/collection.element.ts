@@ -48,7 +48,7 @@ export class UmbCollectionElement extends UmbLitElement {
 		this._observeCollectionViews();
 	}
 
-	private _collectionViewUnsubscribe?: UmbObserverController;
+	private _collectionViewUnsubscribe?: UmbObserverController<Array<ManifestCollectionView>>;
 
 	constructor() {
 		super();
@@ -62,14 +62,14 @@ export class UmbCollectionElement extends UmbLitElement {
 	private _observeCollectionContext() {
 		if (!this._collectionContext) return;
 
-		this.observe<Array<string>>(this._collectionContext.selection, (selection) => {
+		this.observe(this._collectionContext.selection, (selection) => {
 			this._selection = selection;
 		});
 	}
 
 	private _observeCollectionViews() {
 		this._collectionViewUnsubscribe?.destroy();
-		this._collectionViewUnsubscribe = this.observe<Array<ManifestCollectionView>>(
+		this._collectionViewUnsubscribe = this.observe(
 			// TODO: could we make some helper methods for this scenario:
 			umbExtensionsRegistry?.extensionsOfType('collectionView').pipe(
 				map((extensions) => {
