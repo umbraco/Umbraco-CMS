@@ -1,7 +1,7 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
-import { ProfilingResource, ProfilingStatus } from '@umbraco-cms/backend-api';
+import { ProfilingResource } from '@umbraco-cms/backend-api';
 import { tryExecuteAndNotify } from 'src/core/resources/tryExecuteAndNotify.method';
 import { UmbLitElement } from '@umbraco-cms/element';
 

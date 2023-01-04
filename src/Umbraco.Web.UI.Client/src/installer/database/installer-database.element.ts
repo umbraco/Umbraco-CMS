@@ -4,13 +4,13 @@ import { customElement, property, query, state } from 'lit/decorators.js';
 
 import { UmbInstallerContext } from '../installer.context';
 import {
-	ApiError,
 	DatabaseInstall,
 	DatabaseSettings,
 	InstallResource,
 	ProblemDetails,
 } from '@umbraco-cms/backend-api';
 import { UmbLitElement } from '@umbraco-cms/element';
+import { tryExecuteAndNotify } from '@umbraco-cms/resources';
 
 @customElement('umb-installer-database')
 export class UmbInstallerDatabaseElement extends UmbLitElement {
@@ -85,7 +85,7 @@ export class UmbInstallerDatabaseElement extends UmbLitElement {
 	public databaseFormData!: DatabaseInstall;
 
 	@state()
-	private _options: { name: string; value: string; selected?: boolean }[] = [];
+	private _options: Option[] = [];
 
 	@state()
 	private _databases: DatabaseSettings[] = [];
@@ -112,17 +112,20 @@ export class UmbInstallerDatabaseElement extends UmbLitElement {
 		if (!this._installerContext) return;
 
 		this.observe(this._installerContext.settings, (settings) => {
-			this._databases = settings.databases ?? [];
+			this._databases = settings?.databases ?? [];
 
 			// If there is an isConfigured database in the databases array then we can skip the database selection step
 			// and just use that.
 			this._preConfiguredDatabase = this._databases.find((x) => x.isConfigured);
 			if (!this._preConfiguredDatabase) {
-				this._options = this._databases.map((x, i) => ({
-					name: x.displayName ?? 'Unknown database',
-					value: x.id!, // TODO: re visit this !
-					selected: i === 0,
-				}));
+				this._options = this._databases
+					.filter((x) => !!x.id)
+					.map((x, i) => ({
+						name: x.displayName ?? 'Unknown database',
+						// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+						value: x.id!,
+						selected: i === 0,
+					}));
 			}
 		});
 	}
@@ -131,8 +134,8 @@ export class UmbInstallerDatabaseElement extends UmbLitElement {
 		if (!this._installerContext) return;
 
 		this.observe(this._installerContext.data, (data) => {
-			this.databaseFormData = data.database ?? {};
-			this._options.forEach((x, i) => (x.selected = data.database?.id === x.value || i === 0));
+			this.databaseFormData = data?.database ?? ({} as DatabaseInstall);
+			this._options.forEach((x, i) => (x.selected = data?.database?.id === x.value || i === 0));
 		});
 	}
 
@@ -187,27 +190,24 @@ export class UmbInstallerDatabaseElement extends UmbLitElement {
 			}
 
 			if (selectedDatabase.requiresConnectionTest) {
-				try {
-					const databaseDetails: DatabaseInstall = {
-						id,
-						username,
-						password,
-						server,
-						useIntegratedAuthentication,
-						name,
-						connectionString,
-						providerName: selectedDatabase.providerName,
-					};
+				const databaseDetails: DatabaseInstall = {
+					id,
+					username,
+					password,
+					server,
+					useIntegratedAuthentication,
+					name,
+					connectionString,
+					providerName: selectedDatabase.providerName,
+				};
 
-					await InstallResource.postInstallValidateDatabase({ requestBody: databaseDetails });
-				} catch (e) {
-					if (e instanceof ApiError) {
-						const error = e.body as ProblemDetails;
-						console.warn('Database validation failed', error.detail);
-						this._validationErrorMessage = error.detail ?? 'Could not verify database connection';
-					} else {
-						this._validationErrorMessage = 'A server error happened when trying to validate the database';
-					}
+				const { error } = await tryExecuteAndNotify(
+					this,
+					InstallResource.postInstallValidateDatabase({ requestBody: databaseDetails })
+				);
+
+				if (error) {
+					this._validationErrorMessage = error.detail;
 					this._installButton.state = 'failed';
 					return;
 				}
@@ -229,25 +229,27 @@ export class UmbInstallerDatabaseElement extends UmbLitElement {
 		}
 
 		this._installerContext?.nextStep();
-		this._installerContext
-			.requestInstall()
-			.then(() => this._handleFulfilled())
-			.catch((error: unknown) => this._handleRejected(error));
+
+		const { data, error } = await tryExecuteAndNotify(
+			this,
+			InstallResource.postInstallSetup({ requestBody: this._installerContext?.getData() })
+		);
+		if (data) {
+			this._handleFulfilled();
+		} else if (error) {
+			this._handleRejected(error);
+		}
 	};
 
 	private _handleFulfilled() {
+		// TODO: The post install will probably return a user in the future, so we have to set that context somewhere to let the client know that it is authenticated
 		console.warn('TODO: Set up real authentication');
 		sessionStorage.setItem('is-authenticated', 'true');
 		history.replaceState(null, '', '/content');
 	}
 
-	private _handleRejected(e: unknown) {
-		if (e instanceof ApiError) {
-			const error = e.body as ProblemDetails;
-			if (e.status === 400) {
-				this._installerContext?.setInstallStatus(error);
-			}
-		}
+	private _handleRejected(e: ProblemDetails) {
+		this._installerContext?.setInstallStatus(e);
 		this._installerContext?.nextStep();
 	}
 

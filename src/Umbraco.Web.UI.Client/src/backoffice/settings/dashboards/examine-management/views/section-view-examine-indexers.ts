@@ -5,13 +5,12 @@ import { customElement, property, state } from 'lit/decorators.js';
 import { UUIButtonState } from '@umbraco-ui/uui-button';
 
 import { UmbModalService } from '../../../../../core/modal';
-import { UmbNotificationService } from '../../../../../core/notification';
-import { UmbNotificationDefaultData } from '../../../../../core/notification/layouts/default';
 
 import './section-view-examine-searchers';
 
-import { ApiError, Index, IndexerResource, ProblemDetails } from '@umbraco-cms/backend-api';
+import { Index, IndexerResource } from '@umbraco-cms/backend-api';
 import { UmbLitElement } from '@umbraco-cms/element';
+import { tryExecuteAndNotify } from '@umbraco-cms/resources';
 
 @customElement('umb-dashboard-examine-index')
 export class UmbDashboardExamineIndexElement extends UmbLitElement {
@@ -93,30 +92,24 @@ export class UmbDashboardExamineIndexElement extends UmbLitElement {
 	@state()
 	private _loading = true;
 
-	private _notificationService?: UmbNotificationService;
 	private _modalService?: UmbModalService;
 
 	constructor() {
 		super();
 
-		this.consumeAllContexts(['umbNotificationService', 'umbModalService'], (instances) => {
-			this._notificationService = instances['umbNotificationService'];
+		this.consumeAllContexts(['umbModalService'], (instances) => {
 			this._modalService = instances['umbModalService'];
 		});
 	}
 
 	private async _getIndexData() {
-		try {
-			this._indexData = await IndexerResource.getIndexerByIndexName({ indexName: this.indexName });
-			if (!this._indexData?.isHealthy) {
-				this._buttonState = 'waiting';
-			}
-		} catch (e) {
-			if (e instanceof ApiError) {
-				const error = e as ProblemDetails;
-				const data: UmbNotificationDefaultData = { message: error.message ?? 'Could not fetch index' };
-				this._notificationService?.peek('danger', { data });
-			}
+		const { data } = await tryExecuteAndNotify(
+			this,
+			IndexerResource.getIndexerByIndexName({ indexName: this.indexName })
+		);
+		this._indexData = data;
+		if (!this._indexData?.isHealthy) {
+			this._buttonState = 'waiting';
 		}
 		this._loading = false;
 	}
@@ -144,18 +137,17 @@ export class UmbDashboardExamineIndexElement extends UmbLitElement {
 	}
 	private async _rebuild() {
 		this._buttonState = 'waiting';
-		try {
-			await IndexerResource.postIndexerByIndexNameRebuild({ indexName: this.indexName });
-			this._buttonState = 'success';
-			await this._getIndexData();
-		} catch (e) {
+		const { error } = await tryExecuteAndNotify(
+			this,
+			IndexerResource.postIndexerByIndexNameRebuild({ indexName: this.indexName })
+		);
+		if (error) {
 			this._buttonState = 'failed';
-			if (e instanceof ApiError) {
-				const error = e as ProblemDetails;
-				const data: UmbNotificationDefaultData = { message: error.message ?? 'Rebuild error' };
-				this._notificationService?.peek('danger', { data });
-			}
+			return;
 		}
+
+		this._buttonState = 'success';
+		await this._getIndexData();
 	}
 
 	render() {

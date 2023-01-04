@@ -1,26 +1,26 @@
 import './core/css/custom-properties.css';
+
+// TODO: remove these imports when they are part of UUI
+import '@umbraco-ui/uui-color-swatch';
+import '@umbraco-ui/uui-color-swatches';
 import '@umbraco-ui/uui-modal';
 import '@umbraco-ui/uui-modal-container';
 import '@umbraco-ui/uui-modal-dialog';
 import '@umbraco-ui/uui-modal-sidebar';
-import '@umbraco-ui/uui-color-swatch';
-import '@umbraco-ui/uui-color-swatches';
-import 'router-slot';
 import 'element-internals-polyfill';
+import 'router-slot';
+import './auth';
 
-// TODO: remove these imports when they are part of UUI
 import type { Guard, IRoute } from 'router-slot/model';
 
 import { UUIIconRegistryEssential } from '@umbraco-ui/uui';
 import { css, html } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 
-import { UmbIconStore } from '@umbraco-cms/stores/icon/icon.store';
+import { UmbLitElement } from './core/element/lit-element.element';
+import { tryExecuteAndNotify } from './core/resources/tryExecuteAndNotify.method';
 import { OpenAPI, RuntimeLevel, ServerResource } from '@umbraco-cms/backend-api';
-
-import './auth';
-// eslint-disable-next-line import/order
-import { UmbLitElement } from '@umbraco-cms/element';
+import { UmbIconStore } from '@umbraco-cms/stores/icon/icon.store';
 
 @customElement('umb-app')
 export class UmbApp extends UmbLitElement {
@@ -96,14 +96,8 @@ export class UmbApp extends UmbLitElement {
 	}
 
 	private async _setInitStatus() {
-		try {
-			const serverStatus = await ServerResource.getServerStatus();
-			if (serverStatus.serverStatus) {
-				this._runtimeLevel = serverStatus.serverStatus;
-			}
-		} catch (error) {
-			console.log(error);
-		}
+		const { data } = await tryExecuteAndNotify(this, ServerResource.getServerStatus());
+		this._runtimeLevel = data?.serverStatus ?? RuntimeLevel.UNKNOWN;
 	}
 
 	private _redirect() {

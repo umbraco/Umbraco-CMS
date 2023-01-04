@@ -3,10 +3,10 @@ import { css, html, nothing } from 'lit';
 import { customElement, state, query, property } from 'lit/decorators.js';
 
 import { UmbModalService } from '../../../../../core/modal';
-import { UmbNotificationService } from '../../../../../core/notification';
-import { UmbNotificationDefaultData } from '../../../../../core/notification/layouts/default';
 
-import { ApiError, ProblemDetails, SearchResult, SearcherResource, Field } from '@umbraco-cms/backend-api';
+import { UmbLitElement } from '@umbraco-cms/element';
+import { SearchResult, SearcherResource, Field } from '@umbraco-cms/backend-api';
+import { tryExecuteAndNotify } from '@umbraco-cms/resources';
 
 import './modal-views/fields-viewer.element';
 import './modal-views/fields-settings.element';
@@ -102,7 +102,6 @@ export class UmbDashboardExamineSearcherElement extends UmbLitElement {
 		`,
 	];
 
-	private _notificationService?: UmbNotificationService;
 	private _modalService?: UmbModalService;
 
 	@property()
@@ -122,15 +121,13 @@ export class UmbDashboardExamineSearcherElement extends UmbLitElement {
 
 	constructor() {
 		super();
-		this.consumeAllContexts(['umbNotificationService', 'umbModalService'], (instances) => {
-			this._notificationService = instances['umbNotificationService'];
-			this._modalService = instances['umbModalService'];
+		this.consumeContext('umbModalService', (instance) => {
+			this._modalService = instance;
 		});
 	}
 
 	private _onNameClick() {
-		const data: UmbNotificationDefaultData = { message: 'TODO: Open workspace for this' }; // TODO
-		this._notificationService?.peek('warning', { data });
+		alert('TODO: Open workspace for ' + this.searcherName);
 	}
 
 	private _onKeyPress(e: KeyboardEvent) {
@@ -140,22 +137,19 @@ export class UmbDashboardExamineSearcherElement extends UmbLitElement {
 	private async _onSearch() {
 		if (!this._searchInput.value.length) return;
 		this._searchLoading = true;
-		try {
-			const res = await SearcherResource.getSearcherBySearcherNameQuery({
+
+		const { data } = await tryExecuteAndNotify(
+			this,
+			SearcherResource.getSearcherBySearcherNameQuery({
 				searcherName: this.searcherName,
 				term: this._searchInput.value,
 				take: 100,
 				skip: 0,
-			});
-			this._searchResults = res.items;
-			this._updateFieldFilter();
-		} catch (e) {
-			if (e instanceof ApiError) {
-				const error = e as ProblemDetails;
-				const data: UmbNotificationDefaultData = { message: error.message ?? 'Could not fetch search results' };
-				this._notificationService?.peek('danger', { data });
-			}
-		}
+			})
+		);
+
+		this._searchResults = data?.items ?? [];
+		this._updateFieldFilter();
 		this._searchLoading = false;
 	}
 
