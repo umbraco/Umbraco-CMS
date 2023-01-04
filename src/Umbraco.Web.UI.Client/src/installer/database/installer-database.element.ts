@@ -1,10 +1,8 @@
 import { UUIButtonElement } from '@umbraco-ui/uui';
-import { css, CSSResultGroup, html, LitElement, nothing } from 'lit';
+import { css, CSSResultGroup, html, nothing } from 'lit';
 import { customElement, property, query, state } from 'lit/decorators.js';
 
 import { UmbInstallerContext } from '../installer.context';
-import { UmbObserverMixin } from '@umbraco-cms/observable-api';
-import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 import {
 	ApiError,
 	DatabaseInstall,
@@ -14,9 +12,10 @@ import {
 	InstallSettings,
 	ProblemDetails,
 } from '@umbraco-cms/backend-api';
+import { UmbLitElement } from '@umbraco-cms/element';
 
 @customElement('umb-installer-database')
-export class UmbInstallerDatabaseElement extends UmbContextConsumerMixin(UmbObserverMixin(LitElement)) {
+export class UmbInstallerDatabaseElement extends UmbLitElement {
 	static styles: CSSResultGroup = [
 		css`
 			:host,
@@ -123,7 +122,7 @@ export class UmbInstallerDatabaseElement extends UmbContextConsumerMixin(UmbObse
 			if (!this._preConfiguredDatabase) {
 				this._options = this._databases.map((x, i) => ({
 					name: x.displayName ?? 'Unknown database',
-					value: x.id!,
+					value: x.id!, // TODO: re visit this !
 					selected: i === 0,
 				}));
 			}
