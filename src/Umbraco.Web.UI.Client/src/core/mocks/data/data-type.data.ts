@@ -148,6 +148,19 @@ export const data: Array<DataTypeDetails> = [
 		propertyEditorUIAlias: 'Umb.PropertyEditorUI.TreePicker',
 		data: [],
 	},
+	{
+		name: 'Date Picker',
+		type: 'data-type',
+		icon: 'umb:autofill',
+		hasChildren: false,
+		key: 'dt-12',
+		isContainer: false,
+		parentKey: null,
+		isFolder: false,
+		propertyEditorModelAlias: 'Umbraco.DateTime',
+		propertyEditorUIAlias: 'Umb.PropertyEditorUI.DatePicker',
+		data: [],
+	},
 ];
 
 // Temp mocked database

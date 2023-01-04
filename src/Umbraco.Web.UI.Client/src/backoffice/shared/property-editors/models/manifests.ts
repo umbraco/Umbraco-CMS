@@ -4,6 +4,7 @@ import { manifest as contentPicker } from './Umbraco.ContentPicker';
 import { manifest as json } from './Umbraco.JSON';
 import { manifest as multiUrlPicker } from './Umbraco.MultiUrlPicker';
 import { manifest as multiNodeTreePicker } from './Umbraco.MultiNodeTreePicker';
+import { manifest as dateTime } from './Umbraco.DateTime';
 
 import type { ManifestPropertyEditorModel } from '@umbraco-cms/models';
 
@@ -11,15 +12,10 @@ export const manifests: Array<ManifestPropertyEditorModel> = [
 	colorPicker,
 	eyeDropper,
 	contentPicker,
+	dateTime,
 	json,
 	multiUrlPicker,
 	multiNodeTreePicker,
-	{
-		type: 'propertyEditorModel',
-		name: 'Date/Time',
-		alias: 'Umbraco.DateTime',
-		meta: {},
-	},
 	{
 		type: 'propertyEditorModel',
 		name: 'Decimal',

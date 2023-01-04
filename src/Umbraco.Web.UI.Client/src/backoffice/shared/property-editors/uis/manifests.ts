@@ -1,20 +1,22 @@
-import { manifest as ColorPicker } from './color-picker/manifests';
-import { manifest as ContentPicker } from './content-picker/manifests';
-import { manifest as EyeDropper } from './eye-dropper/manifests';
-import { manifest as TreePicker } from './tree-picker/manifests';
-import { manifest as TreePickerStartNode } from './tree-picker-start-node/manifests';
-import { manifest as MultiUrlPicker } from './multi-url-picker/manifests';
-import { manifest as OverlaySize } from './overlay-size/manifests';
+import { manifest as colorPicker } from './color-picker/manifests';
+import { manifest as contentPicker } from './content-picker/manifests';
+import { manifest as datePicker } from './date-picker/manifests';
+import { manifest as eyeDropper } from './eye-dropper/manifests';
+import { manifest as multiUrlPicker } from './multi-url-picker/manifests';
+import { manifest as overlaySize } from './overlay-size/manifests';
+import { manifest as treePicker } from './tree-picker/manifests';
+import { manifest as treePickerStartNode } from './tree-picker-start-node/manifests';
 import type { ManifestPropertyEditorUI } from '@umbraco-cms/models';
 
 export const manifests: Array<ManifestPropertyEditorUI> = [
-	ColorPicker,
-	ContentPicker,
-	EyeDropper,
-	TreePicker,
-	TreePickerStartNode,
-	MultiUrlPicker,
-	OverlaySize,
+	colorPicker,
+	contentPicker,
+	datePicker,
+	eyeDropper,
+	multiUrlPicker,
+	overlaySize,
+	treePicker,
+	treePickerStartNode,
 	{
 		type: 'propertyEditorUI',
 		alias: 'Umb.PropertyEditorUI.BlockList',
