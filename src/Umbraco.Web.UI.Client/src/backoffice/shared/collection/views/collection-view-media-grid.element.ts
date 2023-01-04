@@ -1,14 +1,13 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css';
-import { css, html, LitElement } from 'lit';
+import { css, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { repeat } from 'lit/directives/repeat.js';
 import type { UmbCollectionContext } from '../collection.context';
 import type { MediaDetails } from '@umbraco-cms/models';
-import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
-import { UmbObserverMixin } from '@umbraco-cms/observable-api';
+import { UmbLitElement } from 'src/core/element/lit-element.element';
 
 @customElement('umb-collection-view-media-grid')
-export class UmbCollectionViewsMediaGridElement extends UmbContextConsumerMixin(UmbObserverMixin(LitElement)) {
+export class UmbCollectionViewsMediaGridElement extends UmbLitElement {
 	static styles = [
 		UUITextStyles,
 		css`
@@ -66,19 +65,19 @@ export class UmbCollectionViewsMediaGridElement extends UmbContextConsumerMixin(
 	];
 
 	@state()
-	private _mediaItems: Array<MediaDetails> = [];
+	private _mediaItems?: Array<MediaDetails>;
 
 	@state()
-	private _selection: Array<string> = [];
+	private _selection?: Array<string>;
 
 	private _collectionContext?: UmbCollectionContext<MediaDetails>;
 
 	constructor() {
 		super();
-		document.addEventListener('dragenter', (e) => {
+		document.addEventListener('dragenter', () => {
 			this.toggleAttribute('dragging', true);
 		});
-		document.addEventListener('dragleave', (e) => {
+		document.addEventListener('dragleave', () => {
 			this.toggleAttribute('dragging', false);
 		});
 		document.addEventListener('drop', (e) => {
@@ -96,11 +95,11 @@ export class UmbCollectionViewsMediaGridElement extends UmbContextConsumerMixin(
 		if (!this._collectionContext) return;
 
 		this.observe<Array<MediaDetails>>(this._collectionContext.data, (mediaItems) => {
-			this._mediaItems = mediaItems.sort((a, b) => (a.hasChildren === b.hasChildren ? 0 : a ? -1 : 1));
+			this._mediaItems = mediaItems?.sort((a, b) => (a.hasChildren === b.hasChildren ? 0 : a ? -1 : 1));
 		});
 
 		this.observe<Array<string>>(this._collectionContext.selection, (selection) => {
-			this._selection = selection;
+			this._selection = selection || undefined;
 		});
 	}
 
@@ -118,7 +117,7 @@ export class UmbCollectionViewsMediaGridElement extends UmbContextConsumerMixin(
 	}
 
 	private _isSelected(mediaItem: MediaDetails) {
-		return this._selection.includes(mediaItem.key);
+		return this._selection?.includes(mediaItem.key);
 	}
 
 	private _renderMediaItem(item: MediaDetails) {
@@ -126,7 +125,7 @@ export class UmbCollectionViewsMediaGridElement extends UmbContextConsumerMixin(
 		//TODO: fix the file extension when media items have a file extension.
 		return html`<uui-card-media
 			selectable
-			?select-only=${this._selection.length > 0}
+			?select-only=${this._selection && this._selection.length > 0}
 			?selected=${this._isSelected(item)}
 			@open=${() => this._handleOpenItem(item)}
 			@selected=${() => this._handleSelect(item)}
@@ -145,11 +144,11 @@ export class UmbCollectionViewsMediaGridElement extends UmbContextConsumerMixin(
 				label="Drop files here"
 				accept=""></uui-file-dropzone>
 			<div id="media-files">
-				${repeat(
+				${this._mediaItems ? repeat(
 					this._mediaItems,
 					(file, index) => file.key + index,
 					(file) => this._renderMediaItem(file)
-				)}
+				) : ''}
 			</div>
 		`;
 	}
