@@ -12,10 +12,10 @@ import type { UmbUserStore } from 'src/backoffice/users/users/user.store';
 import 'src/auth/components/input-user/input-user.element';
 import 'src/backoffice/shared/components/input-section/input-section.element';
 import { UmbLitElement } from 'src/core/element/lit-element.element';
-import { UmbEntityWorkspaceElement } from 'src/backoffice/shared/components/workspace/workspace-entity/workspace-entity.interface';
+import { UmbWorkspaceEntityElement } from 'src/backoffice/shared/components/workspace-entity-element.interface';
 
 @customElement('umb-user-group-workspace')
-export class UmbUserGroupWorkspaceElement extends UmbLitElement implements UmbEntityWorkspaceElement {
+export class UmbUserGroupWorkspaceElement extends UmbLitElement implements UmbWorkspaceEntityElement {
 	static styles = [
 		UUITextStyles,
 		css`
@@ -387,13 +387,13 @@ export class UmbUserGroupWorkspaceElement extends UmbLitElement implements UmbEn
 		if (!this._userGroup) return nothing;
 
 		return html`
-			<umb-workspace-entity alias="Umb.Workspace.UserGroup">
+			<umb-workspace-layout alias="Umb.Workspace.UserGroup">
 				<uui-input id="name" slot="header" .value=${this._userGroup.name} @input="${this._handleInput}"></uui-input>
 				<div id="main">
 					<div id="left-column">${this.renderLeftColumn()}</div>
 					<div id="right-column">${this.renderRightColumn()}</div>
 				</div>
-			</umb-workspace-entity>
+			</umb-workspace-layout>
 		`;
 	}
 }

@@ -3,10 +3,10 @@ import { css, html } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { UmbWorkspaceDocumentContext } from './document-workspace.context';
 import { UmbLitElement } from 'src/core/element/lit-element.element';
-import { UmbEntityWorkspaceElement } from 'src/backoffice/shared/components/workspace/workspace-entity/workspace-entity.interface';
+import { UmbWorkspaceEntityElement } from 'src/backoffice/shared/components/workspace-entity-element.interface';
 
 @customElement('umb-document-workspace')
-export class UmbDocumentWorkspaceElement extends UmbLitElement implements UmbEntityWorkspaceElement {
+export class UmbDocumentWorkspaceElement extends UmbLitElement implements UmbWorkspaceEntityElement {
 	static styles = [
 		UUITextStyles,
 		css`

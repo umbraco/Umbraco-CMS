@@ -2,7 +2,7 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html, LitElement } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 
-import '../../../shared/components/workspace/workspace-entity/workspace-entity.element';
+import '../../../shared/components/workspace/workspace-layout/workspace-layout.element';
 
 @customElement('umb-member-type-workspace')
 export class UmbMemberTypeWorkspaceElement extends LitElement {
@@ -21,7 +21,7 @@ export class UmbMemberTypeWorkspaceElement extends LitElement {
 	id!: string;
 
 	render() {
-		return html` <umb-workspace-entity alias="Umb.Workspace.MemberType">Member Type Workspace</umb-workspace-entity> `;
+		return html` <umb-workspace-layout alias="Umb.Workspace.MemberType">Member Type Workspace</umb-workspace-layout> `;
 	}
 }
 

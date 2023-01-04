@@ -8,7 +8,7 @@ import { UmbObserverMixin } from '@umbraco-cms/observable-api';
 import { UmbContextConsumerMixin, UmbContextProviderMixin } from '@umbraco-cms/context-api';
 import type { DocumentDetails, MediaDetails } from '@umbraco-cms/models';
 
-import '../workspace-entity/workspace-entity.element';
+import '../workspace-layout/workspace-layout.element';
 
 // Lazy load
 // TODO: Make this dynamic, use load-extensions method to loop over extensions for this node.
@@ -153,7 +153,7 @@ export class UmbWorkspaceContentElement extends UmbContextProviderMixin(
 
 	render() {
 		return html`
-			<umb-workspace-entity alias=${this.alias}>
+			<umb-workspace-layout alias=${this.alias}>
 				<div id="header" slot="header">
 					<uui-input id="name-input" .value=${this._content?.name} @input="${this._handleInput}">
 						<!-- Implement Variant Selector -->
@@ -187,7 +187,7 @@ export class UmbWorkspaceContentElement extends UmbContextProviderMixin(
 				</div>
 
 				<div id="footer" slot="footer">Breadcrumbs</div>
-			</umb-workspace-entity>
+			</umb-workspace-layout>
 		`;
 	}
 }

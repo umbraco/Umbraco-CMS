@@ -16,12 +16,12 @@ import { UmbModalService } from 'src/core/modal';
 
 import 'src/auth/components/input-user-group/input-user-group.element';
 import '../../../shared/property-editors/uis/content-picker/property-editor-ui-content-picker.element';
-import '../../../shared/components/workspace/workspace-entity/workspace-entity.element';
+import '../../../shared/components/workspace/workspace-layout/workspace-layout.element';
 import { UmbLitElement } from 'src/core/element/lit-element.element';
-import { UmbEntityWorkspaceElement } from 'src/backoffice/shared/components/workspace/workspace-entity/workspace-entity.interface';
+import { UmbWorkspaceEntityElement } from 'src/backoffice/shared/components/workspace-entity-element.interface';
 
 @customElement('umb-user-workspace')
-export class UmbUserWorkspaceElement extends UmbLitElement implements UmbEntityWorkspaceElement {
+export class UmbUserWorkspaceElement extends UmbLitElement implements UmbWorkspaceEntityElement {
 	static styles = [
 		UUITextStyles,
 		css`
@@ -349,13 +349,13 @@ export class UmbUserWorkspaceElement extends UmbLitElement implements UmbEntityW
 		if (!this._user) return html`User not found`;
 
 		return html`
-			<umb-workspace-entity alias="Umb.Workspace.User">
+			<umb-workspace-layout alias="Umb.Workspace.User">
 				<uui-input id="name" slot="name" .value=${this._userName} @input="${this._handleInput}"></uui-input>
 				<div id="main">
 					<div id="left-column">${this._renderLeftColumn()}</div>
 					<div id="right-column">${this._renderRightColumn()}</div>
 				</div>
-			</umb-workspace-entity>
+			</umb-workspace-layout>
 		`;
 	}
 }

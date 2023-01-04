@@ -24,7 +24,7 @@ export class UmbExtensionRootWorkspaceElement extends UmbContextConsumerMixin(Um
 
 	render() {
 		return html`
-			<umb-workspace-entity headline="Extensions" alias="Umb.Workspace.ExtensionRoot">
+			<umb-workspace-layout headline="Extensions" alias="Umb.Workspace.ExtensionRoot">
 				<uui-box>
 					<p>List of currently loaded extensions</p>
 					<uui-table>
@@ -53,7 +53,7 @@ export class UmbExtensionRootWorkspaceElement extends UmbContextConsumerMixin(Um
 						)}
 					</uui-table>
 				</uui-box>
-			</umb-workspace-entity>
+			</umb-workspace-layout>
 		`;
 	}
 }
