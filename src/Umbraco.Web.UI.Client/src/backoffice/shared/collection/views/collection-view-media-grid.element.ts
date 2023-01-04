@@ -94,12 +94,12 @@ export class UmbCollectionViewsMediaGridElement extends UmbLitElement {
 	private _observeCollectionContext() {
 		if (!this._collectionContext) return;
 
-		this.observe<Array<MediaDetails>>(this._collectionContext.data, (mediaItems) => {
-			this._mediaItems = mediaItems?.sort((a, b) => (a.hasChildren === b.hasChildren ? 0 : a ? -1 : 1));
+		this.observe(this._collectionContext.data, (mediaItems) => {
+			this._mediaItems = mediaItems.sort((a, b) => (a.hasChildren === b.hasChildren ? 0 : a ? -1 : 1));
 		});
 
-		this.observe<Array<string>>(this._collectionContext.selection, (selection) => {
-			this._selection = selection || undefined;
+		this.observe(this._collectionContext.selection, (selection) => {
+			this._selection = selection;
 		});
 	}
 
