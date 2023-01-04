@@ -40,11 +40,11 @@ export class UmbResourceController extends UmbController {
 		});
 	}
 
-	hostConnected() {
-		this.hostConnected();
+	hostConnected(): void {
+		// Do nothing
 	}
 
-	hostDisconnected() {
+	hostDisconnected(): void {
 		this.cancel();
 	}
 
