@@ -88,7 +88,7 @@ export class UmbInstallerDatabaseElement extends UmbLitElement {
 	public databaseFormData!: DatabaseInstall;
 
 	@state()
-	private _options: { name: string; value: string; selected?: boolean }[] = [];
+	private _options: Option[] = [];
 
 	@state()
 	private _databases: DatabaseSettings[] = [];
@@ -121,11 +121,14 @@ export class UmbInstallerDatabaseElement extends UmbLitElement {
 			// and just use that.
 			this._preConfiguredDatabase = this._databases.find((x) => x.isConfigured);
 			if (!this._preConfiguredDatabase) {
-				this._options = this._databases.map((x, i) => ({
-					name: x.displayName ?? 'Unknown database',
-					value: x.id!,
-					selected: i === 0,
-				}));
+				this._options = this._databases
+					.filter((x) => !!x.id)
+					.map((x, i) => ({
+						name: x.displayName ?? 'Unknown database',
+						// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+						value: x.id!,
+						selected: i === 0,
+					}));
 			}
 		});
 	}
