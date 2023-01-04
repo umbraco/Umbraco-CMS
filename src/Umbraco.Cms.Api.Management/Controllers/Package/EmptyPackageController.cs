@@ -24,6 +24,6 @@ public class EmptyPackageController : PackageControllerBase
     [ProducesResponseType(typeof(PackageDefinitionViewModel), StatusCodes.Status200OK)]
     public async Task<ActionResult<PackageDefinitionViewModel>> Empty()
     {
-        return await Task.FromResult(_umbracoMapper.Map<PackageDefinitionViewModel>(new PackageDefinition())!);
+        return await Task.FromResult(Ok(_umbracoMapper.Map<PackageDefinitionViewModel>(new PackageDefinition())));
     }
 }

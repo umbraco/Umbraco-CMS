@@ -37,6 +37,6 @@ public class AllCreatedPackageController : CreatedPackageControllerBase
             .Skip(skip)
             .Take(take);
 
-        return await Task.FromResult(_umbracoMapper.Map<PagedViewModel<PackageDefinitionViewModel>>(createdPackages)!);
+        return await Task.FromResult(Ok(_umbracoMapper.Map<PagedViewModel<PackageDefinitionViewModel>>(createdPackages)));
     }
 }

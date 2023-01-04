@@ -36,6 +36,6 @@ public class ByKeyCreatedPackageController : CreatedPackageControllerBase
             return NotFound();
         }
 
-        return await Task.FromResult(_umbracoMapper.Map<PackageDefinitionViewModel>(package)!);
+        return await Task.FromResult(Ok(_umbracoMapper.Map<PackageDefinitionViewModel>(package)));
     }
 }
