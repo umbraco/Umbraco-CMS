@@ -1,13 +1,12 @@
-import { css, html, LitElement } from 'lit';
+import { css, html } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, state } from 'lit/decorators.js';
 import { UmbSectionViewUsersElement } from './section-view-users.element';
-import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
-import { UmbObserverMixin } from '@umbraco-cms/observable-api';
 import { UmbUserStore } from 'src/backoffice/users/users/user.store';
+import { UmbLitElement } from '@umbraco-cms/element';
 
 @customElement('umb-workspace-view-users-selection')
-export class UmbWorkspaceViewUsersSelectionElement extends UmbContextConsumerMixin(UmbObserverMixin(LitElement)) {
+export class UmbWorkspaceViewUsersSelectionElement extends UmbLitElement {
 	static styles = [
 		UUITextStyles,
 		css`
