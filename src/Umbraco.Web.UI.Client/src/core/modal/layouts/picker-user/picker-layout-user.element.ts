@@ -3,12 +3,10 @@ import { css, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { UmbModalLayoutPickerBase } from '../modal-layout-picker-base';
 import type { UserDetails } from '@umbraco-cms/models';
-import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
-import { UmbObserverMixin } from '@umbraco-cms/observable-api';
 import { UmbUserStore } from 'src/backoffice/users/users/user.store';
 
 @customElement('umb-picker-layout-user')
-export class UmbPickerLayoutUserElement extends UmbContextConsumerMixin(UmbObserverMixin(UmbModalLayoutPickerBase)) {
+export class UmbPickerLayoutUserElement extends UmbModalLayoutPickerBase {
 	static styles = [
 		UUITextStyles,
 		css`
