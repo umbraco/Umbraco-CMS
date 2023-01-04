@@ -59,7 +59,7 @@ export class UmbWorkspaceViewDataTypeEditElement extends UmbLitElement {
 			return;
 		}
 
-		this.observe<UmbDataTypeStoreItemType>(this._workspaceContext.data, (dataType) => {
+		this.observe(this._workspaceContext.data, (dataType) => {
 			if (!dataType) return;
 
 			// TODO: handle if model is not of the type wanted.
@@ -78,7 +78,7 @@ export class UmbWorkspaceViewDataTypeEditElement extends UmbLitElement {
 	private _observePropertyEditorUI(propertyEditorUIAlias: string | null) {
 		if (!propertyEditorUIAlias) return;
 
-		this.observe<ManifestPropertyEditorUI>(
+		this.observe(
 			umbExtensionsRegistry.getByAlias<ManifestPropertyEditorUI>(propertyEditorUIAlias),
 			(propertyEditorUI) => {
 				this._propertyEditorUIName = propertyEditorUI?.meta.label ?? propertyEditorUI?.name ?? '';
