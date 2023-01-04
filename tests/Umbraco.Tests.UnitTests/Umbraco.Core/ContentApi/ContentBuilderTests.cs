@@ -36,7 +36,7 @@ public class ContentBuilderTests : ContentApiTests
             .Setup(p => p.GetUrl(It.IsAny<IPublishedContent>(), It.IsAny<UrlMode>(), It.IsAny<string?>(), It.IsAny<Uri?>()))
             .Returns((IPublishedContent content, UrlMode mode, string? culture, Uri? current) => $"url:{content.UrlSegment}");
 
-        var builder = new ApiContentBuilder(new PropertyMapper(), new ContentNameProvider(), publishedUrlProvider.Object);
+        var builder = new ApiContentBuilder(new PropertyMapper(), new PublishedContentNameProvider(), publishedUrlProvider.Object);
         var result = builder.Build(content.Object);
 
         Assert.NotNull(result);
@@ -61,7 +61,7 @@ public class ContentBuilderTests : ContentApiTests
         content.SetupGet(c => c.Name).Returns("The page");
         content.SetupGet(c => c.ContentType).Returns(contentType.Object);
 
-        var customNameProvider = new Mock<IContentNameProvider>();
+        var customNameProvider = new Mock<IPublishedContentNameProvider>();
         customNameProvider.Setup(n => n.GetName(content.Object)).Returns($"Custom name for: {content.Object.Name}");
 
         var builder = new ApiContentBuilder(new PropertyMapper(), customNameProvider.Object, Mock.Of<IPublishedUrlProvider>());
@@ -92,7 +92,7 @@ public class ContentBuilderTests : ContentApiTests
             .Setup(p => p.GetMediaUrl(It.IsAny<IPublishedContent>(), It.IsAny<UrlMode>(), It.IsAny<string?>(), It.IsAny<string?>(), It.IsAny<Uri?>()))
             .Returns((IPublishedContent content, UrlMode mode, string? culture, string? propertyAlias, Uri? current) => $"media-url:{content.UrlSegment}");
 
-        var builder = new ApiContentBuilder(new PropertyMapper(), new ContentNameProvider(), publishedUrlProvider.Object);
+        var builder = new ApiContentBuilder(new PropertyMapper(), new PublishedContentNameProvider(), publishedUrlProvider.Object);
         var result = builder.Build(media.Object);
 
         Assert.NotNull(result);

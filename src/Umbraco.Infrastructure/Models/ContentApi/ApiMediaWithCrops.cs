@@ -2,14 +2,37 @@ using Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 
 namespace Umbraco.Cms.Core.Models.ContentApi;
 
-public class ApiMediaWithCrops : ApiMedia
+public class ApiMediaWithCrops : IApiMedia
 {
-    public ApiMediaWithCrops(Guid id, string name, string mediaType, string url, string? extension, int? width, int? height, IDictionary<string, object?> properties)
-        : base(id, name, mediaType, url, extension, width, height, properties)
+    private readonly IApiMedia _inner;
+
+    public ApiMediaWithCrops(
+        IApiMedia inner,
+        ImageCropperValue.ImageCropperFocalPoint? focalPoint,
+        IEnumerable<ImageCropperValue.ImageCropperCrop>? crops)
     {
+        _inner = inner;
+        FocalPoint = focalPoint;
+        Crops = crops;
     }
 
-    public ImageCropperValue.ImageCropperFocalPoint? FocalPoint { get; set; }
+    public Guid Id => _inner.Id;
 
-    public IEnumerable<ImageCropperValue.ImageCropperCrop>? Crops { get; set; }
+    public string Name => _inner.Name;
+
+    public string MediaType => _inner.MediaType;
+
+    public string Url => _inner.Url;
+
+    public string? Extension => _inner.Extension;
+
+    public int? Width => _inner.Width;
+
+    public int? Height => _inner.Height;
+
+    public IDictionary<string, object?> Properties => _inner.Properties;
+
+    public ImageCropperValue.ImageCropperFocalPoint? FocalPoint { get; }
+
+    public IEnumerable<ImageCropperValue.ImageCropperCrop>? Crops { get; }
 }

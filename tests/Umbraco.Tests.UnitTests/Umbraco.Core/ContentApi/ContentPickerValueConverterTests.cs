@@ -13,11 +13,11 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.ContentApi;
 [TestFixture]
 public class ContentPickerValueConverterTests : PropertyValueConverterTests
 {
-    private ContentPickerValueConverter CreateValueConverter(bool shouldExpand, IContentNameProvider? nameProvider = null)
+    private ContentPickerValueConverter CreateValueConverter(bool shouldExpand, IPublishedContentNameProvider? nameProvider = null)
     {
         var expansionStrategy = new Mock<IOutputExpansionStrategy>();
         expansionStrategy.Setup(e => e.ShouldExpand(It.IsAny<IPublishedPropertyType>())).Returns(shouldExpand);
-        return new ContentPickerValueConverter(PublishedSnapshotAccessor, expansionStrategy.Object, new ApiContentBuilder(new PropertyMapper(), nameProvider ?? new ContentNameProvider(), PublishedUrlProvider));
+        return new ContentPickerValueConverter(PublishedSnapshotAccessor, expansionStrategy.Object, new ApiContentBuilder(new PropertyMapper(), nameProvider ?? new PublishedContentNameProvider(), PublishedUrlProvider));
     }
 
     [Test]
@@ -49,7 +49,7 @@ public class ContentPickerValueConverterTests : PropertyValueConverterTests
         var publishedPropertyType = new Mock<IPublishedPropertyType>();
         publishedPropertyType.SetupGet(p => p.Alias).Returns("test");
 
-        var customNameProvider = new Mock<IContentNameProvider>();
+        var customNameProvider = new Mock<IPublishedContentNameProvider>();
         customNameProvider.Setup(n => n.GetName(PublishedContent)).Returns($"Custom name for: {PublishedContent.Name}");
 
         var valueConverter = CreateValueConverter(false, customNameProvider.Object);

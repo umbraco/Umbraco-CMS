@@ -19,7 +19,7 @@ public class MediaPickerWithCropsValueConverter : PropertyValueConverterBase, IC
     private readonly IPublishedSnapshotAccessor _publishedSnapshotAccessor;
     private readonly IPublishedUrlProvider _publishedUrlProvider;
     private readonly IPublishedValueFallback _publishedValueFallback;
-    private readonly IContentNameProvider _contentNameProvider;
+    private readonly IApiMediaBuilder _apiMediaBuilder;
 
     [Obsolete("Use constructor that takes all parameters, scheduled for removal in V14")]
     public MediaPickerWithCropsValueConverter(
@@ -32,7 +32,7 @@ public class MediaPickerWithCropsValueConverter : PropertyValueConverterBase, IC
             publishedUrlProvider,
             publishedValueFallback,
             jsonSerializer,
-            StaticServiceProvider.Instance.GetRequiredService<IContentNameProvider>()
+            StaticServiceProvider.Instance.GetRequiredService<IApiMediaBuilder>()
         )
     {
     }
@@ -42,14 +42,14 @@ public class MediaPickerWithCropsValueConverter : PropertyValueConverterBase, IC
         IPublishedUrlProvider publishedUrlProvider,
         IPublishedValueFallback publishedValueFallback,
         IJsonSerializer jsonSerializer,
-        IContentNameProvider contentNameProvider)
+        IApiMediaBuilder apiMediaBuilder)
     {
         _publishedSnapshotAccessor = publishedSnapshotAccessor ??
                                      throw new ArgumentNullException(nameof(publishedSnapshotAccessor));
         _publishedUrlProvider = publishedUrlProvider;
         _publishedValueFallback = publishedValueFallback;
         _jsonSerializer = jsonSerializer;
-        _contentNameProvider = contentNameProvider;
+        _apiMediaBuilder = apiMediaBuilder;
     }
 
     public override bool IsConverter(IPublishedPropertyType propertyType) =>
@@ -128,24 +128,8 @@ public class MediaPickerWithCropsValueConverter : PropertyValueConverterBase, IC
 
         ApiMediaWithCrops ToApiMedia(MediaWithCrops media)
         {
-            var customProperties = media
-                .Properties
-                .Where(p => p.Alias.StartsWith("umbraco") == false)
-                .ToDictionary(p => p.Alias, p => p.GetContentApiValue());
-
-            return new ApiMediaWithCrops(
-                media.Content.Key,
-                _contentNameProvider.GetName(media.Content),
-                media.ContentType.Alias,
-                media.LocalCrops.Src ?? string.Empty,
-                media.Value<string>(_publishedValueFallback, Constants.Conventions.Media.Extension),
-                media.Value<int?>(_publishedValueFallback, Constants.Conventions.Media.Width),
-                media.Value<int?>(_publishedValueFallback, Constants.Conventions.Media.Height),
-                customProperties)
-            {
-                FocalPoint = media.LocalCrops.FocalPoint,
-                Crops = media.LocalCrops.Crops
-            };
+            IApiMedia inner = _apiMediaBuilder.Build(media.Content);
+            return new ApiMediaWithCrops(inner, media.LocalCrops.FocalPoint, media.LocalCrops.Crops);
         }
 
         // NOTE: eventually we might implement this explicitly instead of piggybacking on the default object conversion. however, this only happens once per cache rebuild,

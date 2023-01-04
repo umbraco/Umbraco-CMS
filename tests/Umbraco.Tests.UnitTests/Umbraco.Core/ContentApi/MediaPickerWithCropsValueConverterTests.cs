@@ -1,6 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
@@ -16,6 +13,22 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.ContentApi;
 [TestFixture]
 public class MediaPickerWithCropsValueConverterTests : PropertyValueConverterTests
 {
+    private MediaPickerWithCropsValueConverter MediaPickerWithCropsValueConverter()
+    {
+        var serializer = new JsonNetSerializer();
+        var publishedValueFallback = Mock.Of<IPublishedValueFallback>();
+        return new MediaPickerWithCropsValueConverter(
+            PublishedSnapshotAccessor,
+            PublishedUrlProvider,
+            publishedValueFallback,
+            serializer,
+            new ApiMediaBuilder(
+                new PropertyMapper(),
+                new PublishedContentNameProvider(),
+                PublishedUrlProvider,
+                publishedValueFallback));
+    }
+
     [Test]
     public void MediaPickerWithCropsValueConverter_InSingleMode_ConvertsValueToCollectionOfApiMedia()
     {
@@ -24,7 +37,7 @@ public class MediaPickerWithCropsValueConverterTests : PropertyValueConverterTes
 
         var serializer = new JsonNetSerializer();
 
-        var valueConverter = new MediaPickerWithCropsValueConverter(PublishedSnapshotAccessor, PublishedUrlProvider, Mock.Of<IPublishedValueFallback>(), serializer, new ContentNameProvider());
+        var valueConverter = MediaPickerWithCropsValueConverter();
         Assert.AreEqual(typeof(IEnumerable<ApiMediaWithCrops>), valueConverter.GetContentApiPropertyValueType(publishedPropertyType));
 
         var inter = serializer.Serialize(new[]
@@ -80,7 +93,7 @@ public class MediaPickerWithCropsValueConverterTests : PropertyValueConverterTes
 
         var serializer = new JsonNetSerializer();
 
-        var valueConverter = new MediaPickerWithCropsValueConverter(PublishedSnapshotAccessor, PublishedUrlProvider, Mock.Of<IPublishedValueFallback>(), serializer, new ContentNameProvider());
+        var valueConverter = MediaPickerWithCropsValueConverter();
         Assert.AreEqual(typeof(IEnumerable<ApiMediaWithCrops>), valueConverter.GetContentApiPropertyValueType(publishedPropertyType));
 
         var inter = serializer.Serialize(new[]
@@ -174,7 +187,7 @@ public class MediaPickerWithCropsValueConverterTests : PropertyValueConverterTes
 
         var serializer = new JsonNetSerializer();
 
-        var valueConverter = new MediaPickerWithCropsValueConverter(PublishedSnapshotAccessor, PublishedUrlProvider, Mock.Of<IPublishedValueFallback>(), serializer, new ContentNameProvider());
+        var valueConverter = MediaPickerWithCropsValueConverter();
 
         var result = valueConverter.ConvertIntermediateToContentApiObject(Mock.Of<IPublishedElement>(), publishedPropertyType, PropertyCacheLevel.Element, inter, false) as IEnumerable<ApiMediaWithCrops>;
         Assert.NotNull(result);
@@ -191,7 +204,7 @@ public class MediaPickerWithCropsValueConverterTests : PropertyValueConverterTes
 
         var serializer = new JsonNetSerializer();
 
-        var valueConverter = new MediaPickerWithCropsValueConverter(PublishedSnapshotAccessor, PublishedUrlProvider, Mock.Of<IPublishedValueFallback>(), serializer, new ContentNameProvider());
+        var valueConverter = MediaPickerWithCropsValueConverter();
 
         var result = valueConverter.ConvertIntermediateToContentApiObject(Mock.Of<IPublishedElement>(), publishedPropertyType, PropertyCacheLevel.Element, inter, false) as IEnumerable<ApiMediaWithCrops>;
         Assert.NotNull(result);

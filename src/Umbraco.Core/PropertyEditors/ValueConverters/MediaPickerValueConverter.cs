@@ -21,9 +21,7 @@ public class MediaPickerValueConverter : PropertyValueConverterBase, IContentApi
     private const string ImageTypeAlias = "image";
 
     private readonly IPublishedSnapshotAccessor _publishedSnapshotAccessor;
-    private readonly IPublishedUrlProvider _publishedUrlProvider;
-    private readonly IPublishedValueFallback _publishedValueFallback;
-    private readonly IContentNameProvider _contentNameProvider;
+    private readonly IApiMediaBuilder _apiMediaBuilder;
 
     [Obsolete("Use constructor that takes all parameters, scheduled for removal in V14")]
     public MediaPickerValueConverter(
@@ -32,9 +30,7 @@ public class MediaPickerValueConverter : PropertyValueConverterBase, IContentApi
         : this(
             publishedSnapshotAccessor,
             publishedModelFactory,
-            StaticServiceProvider.Instance.GetRequiredService<IPublishedUrlProvider>(),
-            StaticServiceProvider.Instance.GetRequiredService<IPublishedValueFallback>(),
-            StaticServiceProvider.Instance.GetRequiredService<IContentNameProvider>())
+            StaticServiceProvider.Instance.GetRequiredService<IApiMediaBuilder>())
     {
     }
 
@@ -43,15 +39,11 @@ public class MediaPickerValueConverter : PropertyValueConverterBase, IContentApi
         // annoyingly not even ActivatorUtilitiesConstructor can fix ambiguous constructor exceptions.
         // we need to keep this unused parameter, at least until the other constructor is removed
         IPublishedModelFactory publishedModelFactory,
-        IPublishedUrlProvider publishedUrlProvider,
-        IPublishedValueFallback publishedValueFallback,
-        IContentNameProvider contentNameProvider)
+        IApiMediaBuilder apiMediaBuilder)
     {
         _publishedSnapshotAccessor = publishedSnapshotAccessor ??
                                      throw new ArgumentNullException(nameof(publishedSnapshotAccessor));
-        _publishedUrlProvider = publishedUrlProvider;
-        _publishedValueFallback = publishedValueFallback;
-        _contentNameProvider = contentNameProvider;
+        _apiMediaBuilder = apiMediaBuilder;
     }
 
     public override bool IsConverter(IPublishedPropertyType propertyType) =>
@@ -129,35 +121,23 @@ public class MediaPickerValueConverter : PropertyValueConverterBase, IContentApi
         return source;
     }
 
-    public Type GetContentApiPropertyValueType(IPublishedPropertyType propertyType) => typeof(IEnumerable<ApiMedia>);
+    public Type GetContentApiPropertyValueType(IPublishedPropertyType propertyType) => typeof(IEnumerable<IApiMedia>);
 
     public object? ConvertIntermediateToContentApiObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview)
     {
         var isMultiple = IsMultipleDataType(propertyType.DataType);
-
-        ApiMedia ToApiMedia(IPublishedContent media)
-        {
-            var customProperties = media
-                .Properties
-                .Where(p => p.Alias.StartsWith("umbraco") == false)
-                .ToDictionary(p => p.Alias, p => p.GetContentApiValue());
-
-            return new ApiMedia(media.Key,
-                _contentNameProvider.GetName(media),
-                media.ContentType.Alias, _publishedUrlProvider.GetMediaUrl(media, UrlMode.Relative), media.Value<string>(_publishedValueFallback, Constants.Conventions.Media.Extension), media.Value<int?>(_publishedValueFallback, Constants.Conventions.Media.Width), media.Value<int?>(_publishedValueFallback, Constants.Conventions.Media.Height), customProperties);
-        }
 
         // NOTE: eventually we might implement this explicitly instead of piggybacking on the default object conversion. however, this only happens once per cache rebuild,
         // and the performance gain from an explicit implementation is negligible, so... at least for the time being this will do just fine.
         var converted = ConvertIntermediateToObject(owner, propertyType, referenceCacheLevel, inter, preview);
         if (isMultiple && converted is IEnumerable<IPublishedContent> items)
         {
-            return items.Select(ToApiMedia).ToArray();
+            return items.Select(_apiMediaBuilder.Build).ToArray();
         }
 
         if (isMultiple == false && converted is IPublishedContent item)
         {
-            return new[] { ToApiMedia(item) };
+            return new[] { _apiMediaBuilder.Build(item) };
         }
 
         return Array.Empty<ApiMedia>();

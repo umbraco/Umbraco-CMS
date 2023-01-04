@@ -1,6 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
@@ -21,7 +18,7 @@ public class MediaPickerValueConverterTests : PropertyValueConverterTests
         var publishedPropertyType = SetupMediaPropertyType(false);
         var valueConverter = CreateMediaPickerValueConverter();
 
-        Assert.AreEqual(typeof(IEnumerable<ApiMedia>), valueConverter.GetContentApiPropertyValueType(publishedPropertyType));
+        Assert.AreEqual(typeof(IEnumerable<IApiMedia>), valueConverter.GetContentApiPropertyValueType(publishedPropertyType));
     }
 
     [Test]
@@ -32,7 +29,7 @@ public class MediaPickerValueConverterTests : PropertyValueConverterTests
 
         var inter = new[] {new GuidUdi(Constants.UdiEntityType.MediaType, PublishedMedia.Key)};
 
-        var result = valueConverter.ConvertIntermediateToContentApiObject(Mock.Of<IPublishedElement>(), publishedPropertyType, PropertyCacheLevel.Element, inter, false) as IEnumerable<ApiMedia>;
+        var result = valueConverter.ConvertIntermediateToContentApiObject(Mock.Of<IPublishedElement>(), publishedPropertyType, PropertyCacheLevel.Element, inter, false) as IEnumerable<IApiMedia>;
 
         Assert.NotNull(result);
         Assert.AreEqual(1, result.Count());
@@ -48,7 +45,7 @@ public class MediaPickerValueConverterTests : PropertyValueConverterTests
         var publishedPropertyType = SetupMediaPropertyType(true);
         var valueConverter = CreateMediaPickerValueConverter();
 
-        Assert.AreEqual(typeof(IEnumerable<ApiMedia>), valueConverter.GetContentApiPropertyValueType(publishedPropertyType));
+        Assert.AreEqual(typeof(IEnumerable<IApiMedia>), valueConverter.GetContentApiPropertyValueType(publishedPropertyType));
     }
 
     [Test]
@@ -68,7 +65,7 @@ public class MediaPickerValueConverterTests : PropertyValueConverterTests
 
         var inter = new[] { new GuidUdi(Constants.UdiEntityType.MediaType, PublishedMedia.Key), new GuidUdi(Constants.UdiEntityType.MediaType, otherMediaKey) };
 
-        var result = valueConverter.ConvertIntermediateToContentApiObject(Mock.Of<IPublishedElement>(), publishedPropertyType, PropertyCacheLevel.Element, inter, false) as IEnumerable<ApiMedia>;
+        var result = valueConverter.ConvertIntermediateToContentApiObject(Mock.Of<IPublishedElement>(), publishedPropertyType, PropertyCacheLevel.Element, inter, false) as IEnumerable<IApiMedia>;
 
         Assert.NotNull(result);
         Assert.AreEqual(2, result.Count());
@@ -98,7 +95,9 @@ public class MediaPickerValueConverterTests : PropertyValueConverterTests
     private MediaPickerValueConverter CreateMediaPickerValueConverter() => new(
         PublishedSnapshotAccessor,
         Mock.Of<IPublishedModelFactory>(),
-        PublishedUrlProvider,
-        Mock.Of<IPublishedValueFallback>(),
-        new ContentNameProvider());
+        new ApiMediaBuilder(
+            new PropertyMapper(),
+            new PublishedContentNameProvider(),
+            PublishedUrlProvider,
+            Mock.Of<IPublishedValueFallback>()));
 }

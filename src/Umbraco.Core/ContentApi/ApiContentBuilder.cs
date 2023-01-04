@@ -7,19 +7,19 @@ namespace Umbraco.Cms.Core.ContentApi;
 public class ApiContentBuilder : IApiContentBuilder
 {
     private readonly IPropertyMapper _propertyMapper;
-    private readonly IContentNameProvider _nameProvider;
+    private readonly IPublishedContentNameProvider _publishedContentNameProvider;
     private readonly IPublishedUrlProvider _publishedUrlProvider;
 
-    public ApiContentBuilder(IPropertyMapper propertyMapper, IContentNameProvider nameProvider, IPublishedUrlProvider publishedUrlProvider)
+    public ApiContentBuilder(IPropertyMapper propertyMapper, IPublishedContentNameProvider publishedContentNameProvider, IPublishedUrlProvider publishedUrlProvider)
     {
         _propertyMapper = propertyMapper;
-        _nameProvider = nameProvider;
+        _publishedContentNameProvider = publishedContentNameProvider;
         _publishedUrlProvider = publishedUrlProvider;
     }
 
     public IApiContent Build(IPublishedContent content, bool expand = true) => new ApiContent(
         content.Key,
-        _nameProvider.GetName(content),
+        _publishedContentNameProvider.GetName(content),
         content.ContentType.Alias,
         Url(content),
         expand ? _propertyMapper.Map(content) : new Dictionary<string, object?>());

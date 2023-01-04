@@ -225,7 +225,8 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.AddSingleton<IPropertyMapper, PropertyMapper>();
         builder.Services.AddSingleton<IApiElementBuilder, ApiElementBuilder>();
         builder.Services.AddSingleton<IApiContentBuilder, ApiContentBuilder>();
-        builder.Services.AddSingleton<IContentNameProvider, ContentNameProvider>();
+        builder.Services.AddSingleton<IApiMediaBuilder, ApiMediaBuilder>();
+        builder.Services.AddSingleton<IPublishedContentNameProvider, PublishedContentNameProvider>();
         builder.Services.AddSingleton<IOutputExpansionStrategy, DefaultOutputExpansionStrategy>();
 
         return builder;

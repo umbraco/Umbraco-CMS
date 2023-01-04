@@ -23,7 +23,7 @@ public class MultiUrlPickerValueConverter : PropertyValueConverterBase, IContent
     private readonly IProfilingLogger _proflog;
     private readonly IPublishedSnapshotAccessor _publishedSnapshotAccessor;
     private readonly IPublishedUrlProvider _publishedUrlProvider;
-    private readonly IContentNameProvider _contentNameProvider;
+    private readonly IPublishedContentNameProvider _publishedContentNameProvider;
 
     [Obsolete("Use constructor that takes all parameters, scheduled for removal in V14")]
     public MultiUrlPickerValueConverter(
@@ -38,7 +38,7 @@ public class MultiUrlPickerValueConverter : PropertyValueConverterBase, IContent
             jsonSerializer,
             umbracoContextAccessor,
             publishedUrlProvider,
-            StaticServiceProvider.Instance.GetRequiredService<IContentNameProvider>())
+            StaticServiceProvider.Instance.GetRequiredService<IPublishedContentNameProvider>())
     {
     }
 
@@ -48,14 +48,14 @@ public class MultiUrlPickerValueConverter : PropertyValueConverterBase, IContent
         IJsonSerializer jsonSerializer,
         IUmbracoContextAccessor umbracoContextAccessor,
         IPublishedUrlProvider publishedUrlProvider,
-        IContentNameProvider contentNameProvider)
+        IPublishedContentNameProvider publishedContentNameProvider)
     {
         _publishedSnapshotAccessor = publishedSnapshotAccessor ??
                                      throw new ArgumentNullException(nameof(publishedSnapshotAccessor));
         _proflog = proflog ?? throw new ArgumentNullException(nameof(proflog));
         _jsonSerializer = jsonSerializer;
         _publishedUrlProvider = publishedUrlProvider;
-        _contentNameProvider = contentNameProvider;
+        _publishedContentNameProvider = publishedContentNameProvider;
     }
 
     public override bool IsConverter(IPublishedPropertyType propertyType) =>
@@ -177,7 +177,7 @@ public class MultiUrlPickerValueConverter : PropertyValueConverterBase, IContent
                 ? null
                 : new ApiLink(
                     $"{url}{item.QueryString}",
-                    item.Name ?? (content != null ? _contentNameProvider.GetName(content) : null),
+                    item.Name ?? (content != null ? _publishedContentNameProvider.GetName(content) : null),
                     item.Target,
                     content?.Key,
                     content?.ContentType.Alias,
