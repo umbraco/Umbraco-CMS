@@ -81,7 +81,7 @@ export class UmbUserWorkspaceElement extends UmbLitElement {
 	];
 
 	@state()
-	private _currentUser?: UserDetails | null;
+	private _currentUser?: UserDetails;
 
 	private _currentUserStore?: UmbCurrentUserStore;
 	private _modalService?: UmbModalService;
@@ -101,7 +101,7 @@ export class UmbUserWorkspaceElement extends UmbLitElement {
 	private _workspaceContext?: UmbWorkspaceUserContext;
 
 	@state()
-	private _user?: UserDetails | null;
+	private _user?: UserDetails;
 
 	@state()
 	private _userName = '';
@@ -127,7 +127,7 @@ export class UmbUserWorkspaceElement extends UmbLitElement {
 		if (!this._currentUserStore) return;
 
 		// TODO: do not have static current user service, we need to make a ContextAPI for this.
-		this.observe<UserDetails>(this._currentUserStore.currentUser, (currentUser) => {
+		this.observe(this._currentUserStore.currentUser, (currentUser) => {
 			this._currentUser = currentUser;
 		});
 	}
@@ -135,8 +135,7 @@ export class UmbUserWorkspaceElement extends UmbLitElement {
 	private async _observeUser() {
 		if (!this._workspaceContext) return;
 
-		this.observe<UserDetails>(this._workspaceContext.data.pipe(distinctUntilChanged()), (user) => {
-			if (!user) return;
+		this.observe(this._workspaceContext.data.pipe(distinctUntilChanged()), (user) => {
 			this._user = user;
 			if (user.name !== this._userName) {
 				this._userName = user.name;
