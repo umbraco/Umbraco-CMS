@@ -1,6 +1,6 @@
 import { defineElement } from '@umbraco-ui/uui-base/lib/registration';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
-import { css, html, LitElement } from 'lit';
+import { css, html } from 'lit';
 
 import { UmbModalService } from '../core/modal';
 import { UmbNotificationService } from '../core/notification';
