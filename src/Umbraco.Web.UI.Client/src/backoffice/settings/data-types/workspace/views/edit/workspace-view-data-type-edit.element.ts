@@ -1,18 +1,18 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
-import { css, html, LitElement, nothing } from 'lit';
+import { css, html, nothing } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { UmbModalService } from '../../../../../../core/modal';
 import { UmbWorkspaceDataTypeContext } from '../../workspace-data-type.context';
-import { UmbObserverMixin } from '@umbraco-cms/observable-api';
-import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
-import type { ManifestPropertyEditorUI, DataTypeDetails } from '@umbraco-cms/models';
+import { UmbDataTypeStoreItemType } from '../../../data-type.store';
+import type { DataTypeDetails, ManifestPropertyEditorUI } from '@umbraco-cms/models';
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
 
 import '../../../../../shared/property-editors/shared/property-editor-config/property-editor-config.element';
 import '../../../../../shared/components/ref-property-editor-ui/ref-property-editor-ui.element';
+import { UmbLitElement } from 'src/core/element/lit-element.element';
 
 @customElement('umb-workspace-view-data-type-edit')
-export class UmbWorkspaceViewDataTypeEditElement extends UmbContextConsumerMixin(UmbObserverMixin(LitElement)) {
+export class UmbWorkspaceViewDataTypeEditElement extends UmbLitElement {
 	static styles = [
 		UUITextStyles,
 		css`
@@ -55,12 +55,15 @@ export class UmbWorkspaceViewDataTypeEditElement extends UmbContextConsumerMixin
 	}
 
 	private _observeDataType() {
-		if (!this._workspaceContext) return;
+		if (!this._workspaceContext) {
+			return;
+		}
 
-		this.observe<DataTypeDetails>(this._workspaceContext.data, (dataType) => {
-			this._dataType = dataType;
+		this.observe<UmbDataTypeStoreItemType>(this._workspaceContext.data, (dataType) => {
+			if (!dataType) return;
 
-			if (!this._dataType) return;
+			// TODO: handle if model is not of the type wanted.
+			this._dataType = dataType as DataTypeDetails;
 
 			if (this._dataType.propertyEditorUIAlias !== this._propertyEditorUIAlias) {
 				this._observePropertyEditorUI(this._dataType.propertyEditorUIAlias);
