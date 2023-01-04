@@ -35,17 +35,6 @@ export class UmbWorkspaceViewCollectionElement extends UmbLitElement {
 		});
 	}
 
-	connectedCallback(): void {
-		super.connectedCallback();
-		// TODO: avoid this connection, our own approach on Lit-Controller could be handling this case.
-		this._collectionContext?.connectedCallback();
-	}
-	disconnectedCallback(): void {
-		super.connectedCallback();
-		// TODO: avoid this connection, our own approach on Lit-Controller could be handling this case.
-		this._collectionContext?.disconnectedCallback();
-	}
-
 	protected _provideWorkspace() {
 		if (this._workspaceContext?.entityKey != null) {
 			this._collectionContext = new UmbCollectionContext(
@@ -53,7 +42,6 @@ export class UmbWorkspaceViewCollectionElement extends UmbLitElement {
 				this._workspaceContext.entityKey,
 				this._workspaceContext.getStore().storeAlias
 			);
-			this._collectionContext.connectedCallback();
 			this.provideContext('umbCollectionContext', this._collectionContext);
 		}
 	}
