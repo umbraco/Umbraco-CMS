@@ -9,6 +9,7 @@ import { manifest as treePickerStartNode } from './tree-picker-start-node/manife
 import { manifests as textBoxes } from './text-box/manifests';
 import { manifest as dropdown } from './dropdown/manifests';
 import { manifest as multipleTextString } from './multiple-text-string/manifests';
+import { manifest as textArea } from './textarea/manifests';
 
 import type { ManifestPropertyEditorUI } from '@umbraco-cms/models';
 
@@ -24,6 +25,7 @@ export const manifests: Array<ManifestPropertyEditorUI> = [
 	treePickerStartNode,
 	dropdown,
 	multipleTextString,
+	textArea,
 	{
 		type: 'propertyEditorUI',
 		alias: 'Umb.PropertyEditorUI.BlockList',
@@ -58,28 +60,6 @@ export const manifests: Array<ManifestPropertyEditorUI> = [
 			icon: 'umb:bulleted-list',
 			group: 'lists',
 			propertyEditorModel: 'Umbraco.CheckBoxList',
-		},
-	},
-	{
-		type: 'propertyEditorUI',
-		alias: 'Umb.PropertyEditorUI.Textarea',
-		name: 'Textarea Property Editor UI',
-		loader: () => import('./textarea/property-editor-ui-textarea.element'),
-		meta: {
-			label: 'Textarea',
-			icon: 'umb:edit',
-			group: 'common',
-			propertyEditorModel: 'Umbraco.TextArea',
-			config: {
-				properties: [
-					{
-						alias: 'rows',
-						label: 'Number of rows',
-						description: 'If empty - 10 rows would be set as the default value',
-						propertyEditorUI: 'Umb.PropertyEditorUI.Number',
-					},
-				],
-			},
 		},
 	},
 	{

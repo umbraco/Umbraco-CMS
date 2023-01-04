@@ -213,6 +213,19 @@ export const data: Array<DataTypeDetails> = [
 		propertyEditorUIAlias: 'Umb.PropertyEditorUI.Dropdown',
 		data: [],
 	},
+	{
+		name: 'Text Area',
+		type: 'data-type',
+		icon: 'umb:autofill',
+		hasChildren: false,
+		key: 'dt-17',
+		isContainer: false,
+		parentKey: null,
+		isFolder: false,
+		propertyEditorModelAlias: 'Umbraco.TextArea',
+		propertyEditorUIAlias: 'Umb.PropertyEditorUI.TextArea',
+		data: [],
+	},
 ];
 
 // Temp mocked database

@@ -9,6 +9,7 @@ import { manifest as emailAddress } from './Umbraco.EmailAddress';
 import { manifest as dropdownFlexible } from './Umbraco.Dropdown.Flexible';
 import { manifest as textBox } from './Umbraco.TextBox';
 import { manifest as multipleTextString } from './Umbraco.MultipleTextString';
+import { manifest as textArea } from './Umbraco.TextArea';
 
 import type { ManifestPropertyEditorModel } from '@umbraco-cms/models';
 
@@ -24,6 +25,7 @@ export const manifests: Array<ManifestPropertyEditorModel> = [
 	dropdownFlexible,
 	textBox,
 	multipleTextString,
+	textArea,
 	{
 		type: 'propertyEditorModel',
 		name: 'Decimal',
@@ -53,23 +55,6 @@ export const manifests: Array<ManifestPropertyEditorModel> = [
 		name: 'Tags',
 		alias: 'Umbraco.Tags',
 		meta: {},
-	},
-	{
-		type: 'propertyEditorModel',
-		name: 'Textarea',
-		alias: 'Umbraco.TextArea',
-		meta: {
-			config: {
-				properties: [
-					{
-						alias: 'maxChars',
-						label: 'Maximum allowed characters',
-						description: 'If empty - no character limit',
-						propertyEditorUI: 'Umb.PropertyEditorUI.Number',
-					},
-				],
-			},
-		},
 	},
 	{
 		type: 'propertyEditorModel',
