@@ -1,14 +1,14 @@
-import { html, LitElement, css, nothing } from 'lit';
+import { html, css, nothing } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { IRoute, IRoutingInfo, path } from 'router-slot';
 
 import { UmbDashboardExamineIndexElement } from './views/section-view-examine-indexers';
 import { UmbDashboardExamineSearcherElement } from './views/section-view-examine-searchers';
 
-import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
+import { UmbLitElement } from 'src/core/element/lit-element.element';
 
 @customElement('umb-dashboard-examine-management')
-export class UmbDashboardExamineManagementElement extends UmbContextConsumerMixin(LitElement) {
+export class UmbDashboardExamineManagementElement extends UmbLitElement {
 	static styles = [
 		css`
 			a {
