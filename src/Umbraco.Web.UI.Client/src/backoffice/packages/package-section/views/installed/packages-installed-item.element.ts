@@ -7,7 +7,7 @@ import { createExtensionElement } from '@umbraco-cms/extensions-api';
 
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
 import type { ManifestPackageView } from '@umbraco-cms/models';
-import { UmbLitElement } from 'src/core/element/lit-element.element';
+import { UmbLitElement } from '@umbraco-cms/element';
 
 @customElement('umb-packages-installed-item')
 export class UmbPackagesInstalledItem extends UmbLitElement {

@@ -5,7 +5,7 @@ import { ifDefined } from 'lit-html/directives/if-defined.js';
 import type { UmbModalService } from 'src/core/modal';
 import { UmbDocumentStore } from 'src/backoffice/documents/documents/document.store';
 import { FolderTreeItem } from '@umbraco-cms/backend-api';
-import { UmbLitElement } from 'src/core/element/lit-element.element';
+import { UmbLitElement } from '@umbraco-cms/element';
 
 // TODO: rename to Document Picker
 @customElement('umb-property-editor-ui-content-picker')

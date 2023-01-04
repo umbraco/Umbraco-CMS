@@ -6,7 +6,7 @@ import type { ManifestTypes, PropertyEditorConfigDefaultData, PropertyEditorConf
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
 
 import '../../../components/entity-property/entity-property.element';
-import { UmbLitElement } from 'src/core/element/lit-element.element';
+import { UmbLitElement } from '@umbraco-cms/element';
 
 /**
  *  @element umb-property-editor-config

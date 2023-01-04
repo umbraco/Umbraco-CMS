@@ -7,7 +7,7 @@ import { UmbSectionContext } from '../section.context';
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
 
 import '../../tree/tree-extension.element';
-import { UmbLitElement } from 'src/core/element/lit-element.element';
+import { UmbLitElement } from '@umbraco-cms/element';
 
 @customElement('umb-section-trees')
 export class UmbSectionTreesElement extends UmbLitElement {

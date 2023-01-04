@@ -6,7 +6,7 @@ import { UmbTreeContextBase } from './tree.context';
 import type { ManifestTree } from '@umbraco-cms/models';
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
 import { UmbDataStore } from '@umbraco-cms/stores/store';
-import { UmbLitElement } from 'src/core/element/lit-element.element';
+import { UmbLitElement } from '@umbraco-cms/element';
 
 @customElement('umb-tree')
 export class UmbTreeElement extends UmbLitElement {

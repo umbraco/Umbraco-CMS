@@ -10,7 +10,7 @@ import { ApiError, ProblemDetails, SearchResult, SearcherResource, Field } from 
 
 import './modal-views/fields-viewer.element';
 import './modal-views/fields-settings.element';
-import { UmbLitElement } from 'src/core/element/lit-element.element';
+import { UmbLitElement } from '@umbraco-cms/element';
 
 interface ExposedSearchResultField {
 	name?: string | null;

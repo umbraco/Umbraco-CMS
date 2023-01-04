@@ -5,7 +5,7 @@ import { EMPTY, map, of, Subscription, switchMap } from 'rxjs';
 import { UmbSectionContext } from '../section.context';
 import type { ManifestSectionView } from '@umbraco-cms/models';
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
-import { UmbLitElement } from 'src/core/element/lit-element.element';
+import { UmbLitElement } from '@umbraco-cms/element';
 
 @customElement('umb-section-views')
 export class UmbSectionViewsElement extends UmbLitElement {

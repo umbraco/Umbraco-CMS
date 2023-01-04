@@ -8,7 +8,7 @@ import { UmbNotificationService } from '../../../../core/notification';
 import { UmbNotificationDefaultData } from '../../../../core/notification/layouts/default';
 
 import { ApiError, ProblemDetails, PublishedCacheResource } from '@umbraco-cms/backend-api';
-import { UmbLitElement } from 'src/core/element/lit-element.element';
+import { UmbLitElement } from '@umbraco-cms/element';
 
 @customElement('umb-dashboard-published-status')
 export class UmbDashboardPublishedStatusElement extends UmbLitElement {

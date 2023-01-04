@@ -10,7 +10,7 @@ import type { ManifestWithMeta, ManifestWorkspaceView, ManifestWorkspaceViewColl
 
 import '../../body-layout/body-layout.element';
 import '../../extension-slot/extension-slot.element';
-import { UmbLitElement } from 'src/core/element/lit-element.element';
+import { UmbLitElement } from '@umbraco-cms/element';
 
 /**
  * @element umb-workspace-entity

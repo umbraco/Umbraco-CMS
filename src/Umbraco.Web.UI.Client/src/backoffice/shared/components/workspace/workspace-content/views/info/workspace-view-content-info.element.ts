@@ -4,7 +4,7 @@ import { customElement, state } from 'lit/decorators.js';
 import { distinctUntilChanged } from 'rxjs';
 import type { UmbWorkspaceNodeContext } from '../../../workspace-context/workspace-node.context';
 import type { DocumentDetails, MediaDetails } from '@umbraco-cms/models';
-import { UmbLitElement } from 'src/core/element/lit-element.element';
+import { UmbLitElement } from '@umbraco-cms/element';
 
 @customElement('umb-workspace-view-content-info')
 export class UmbWorkspaceViewContentInfoElement extends UmbLitElement {

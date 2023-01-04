@@ -8,7 +8,7 @@ import './error/installer-error.element';
 import './installing/installer-installing.element';
 import './shared/layout/installer-layout.element';
 import './user/installer-user.element';
-import { UmbLitElement } from 'src/core/element/lit-element.element';
+import { UmbLitElement } from '@umbraco-cms/element';
 
 @customElement('umb-installer')
 export class UmbInstallerElement extends UmbLitElement {

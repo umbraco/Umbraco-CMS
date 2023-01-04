@@ -9,7 +9,7 @@ import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
 
 import '../../../../../shared/property-editors/shared/property-editor-config/property-editor-config.element';
 import '../../../../../shared/components/ref-property-editor-ui/ref-property-editor-ui.element';
-import { UmbLitElement } from 'src/core/element/lit-element.element';
+import { UmbLitElement } from '@umbraco-cms/element';
 
 @customElement('umb-workspace-view-data-type-edit')
 export class UmbWorkspaceViewDataTypeEditElement extends UmbLitElement {

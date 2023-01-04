@@ -3,7 +3,7 @@ import { UmbSectionContext } from '../../section/section.context';
 import { UmbTreeContextMenuPageService } from '../context-menu/tree-context-menu-page.service';
 import { UmbTreeContextMenuService } from '../context-menu/tree-context-menu.service';
 import type { Entity, ManifestTreeItemAction, ManifestTree } from '@umbraco-cms/models';
-import { UmbLitElement } from 'src/core/element/lit-element.element';
+import { UmbLitElement } from '@umbraco-cms/element';
 
 export type ActionPageEntity = {
 	key: string;

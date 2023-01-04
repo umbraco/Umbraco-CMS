@@ -13,7 +13,7 @@ import '../workspace-entity/workspace-entity.element';
 import './views/edit/workspace-view-content-edit.element';
 import './views/info/workspace-view-content-info.element';
 import type { UmbNodeStoreBase } from '@umbraco-cms/stores/store';
-import { UmbLitElement } from 'src/core/element/lit-element.element';
+import { UmbLitElement } from '@umbraco-cms/element';
 
 type ContentTypeTypes = DocumentDetails | MediaDetails;
 

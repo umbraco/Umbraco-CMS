@@ -3,7 +3,7 @@ import { css, nothing, PropertyValueMap } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { BehaviorSubject, Observable } from 'rxjs';
 import UmbTreeItemActionElement, { ActionPageEntity } from '../action/tree-item-action.element';
-import { UmbLitElement } from 'src/core/element/lit-element.element';
+import { UmbLitElement } from '@umbraco-cms/element';
 
 @customElement('umb-tree-context-menu-page-service')
 export class UmbTreeContextMenuPageService extends UmbLitElement {

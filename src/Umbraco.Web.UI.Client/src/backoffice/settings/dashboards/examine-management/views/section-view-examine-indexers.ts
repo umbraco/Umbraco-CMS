@@ -11,7 +11,7 @@ import { UmbNotificationDefaultData } from '../../../../../core/notification/lay
 import './section-view-examine-searchers';
 
 import { ApiError, Index, IndexerResource, ProblemDetails } from '@umbraco-cms/backend-api';
-import { UmbLitElement } from 'src/core/element/lit-element.element';
+import { UmbLitElement } from '@umbraco-cms/element';
 
 @customElement('umb-dashboard-examine-index')
 export class UmbDashboardExamineIndexElement extends UmbLitElement {

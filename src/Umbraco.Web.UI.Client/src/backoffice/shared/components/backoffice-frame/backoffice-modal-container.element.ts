@@ -3,7 +3,7 @@ import { css, CSSResultGroup, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { repeat } from 'lit/directives/repeat.js';
 import { UmbModalHandler, UmbModalService } from '../../../../core/modal';
-import { UmbLitElement } from 'src/core/element/lit-element.element';
+import { UmbLitElement } from '@umbraco-cms/element';
 
 @customElement('umb-backoffice-modal-container')
 export class UmbBackofficeModalContainer extends UmbLitElement {

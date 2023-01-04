@@ -9,7 +9,7 @@ import type { ContentProperty, ManifestTypes } from '@umbraco-cms/models';
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
 
 import '../entity-property/entity-property.element';
-import { UmbLitElement } from 'src/core/element/lit-element.element';
+import { UmbLitElement } from '@umbraco-cms/element';
 
 @customElement('umb-content-property')
 export class UmbContentPropertyElement extends UmbLitElement {

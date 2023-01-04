@@ -12,7 +12,7 @@ import type {
 	ManifestWithMeta,
 } from '@umbraco-cms/models';
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
-import { UmbLitElement } from 'src/core/element/lit-element.element';
+import { UmbLitElement } from '@umbraco-cms/element';
 
 @customElement('umb-section-dashboards')
 export class UmbSectionDashboardsElement extends UmbLitElement {

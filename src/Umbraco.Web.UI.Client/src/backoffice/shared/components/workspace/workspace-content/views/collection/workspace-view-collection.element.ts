@@ -8,7 +8,7 @@ import { UmbMediaStore, UmbMediaStoreItemType } from 'src/backoffice/media/media
 
 import 'src/backoffice/shared/components/content-property/content-property.element';
 import 'src/backoffice/shared/collection/dashboards/dashboard-collection.element';
-import { UmbLitElement } from 'src/core/element/lit-element.element';
+import { UmbLitElement } from '@umbraco-cms/element';
 
 @customElement('umb-workspace-view-collection')
 export class UmbWorkspaceViewCollectionElement extends UmbLitElement {

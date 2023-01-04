@@ -4,7 +4,7 @@ import { customElement, state } from 'lit/decorators.js';
 import { UmbCurrentUserStore } from './current-user.store';
 import type { UserDetails } from '@umbraco-cms/models';
 import { UmbModalService } from 'src/core/modal';
-import { UmbLitElement } from 'src/core/element/lit-element.element';
+import { UmbLitElement } from '@umbraco-cms/element';
 
 @customElement('umb-current-user-header-app')
 export class UmbCurrentUserHeaderApp extends UmbLitElement {

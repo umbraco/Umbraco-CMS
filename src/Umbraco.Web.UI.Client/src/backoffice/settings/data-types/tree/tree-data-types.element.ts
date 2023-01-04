@@ -5,7 +5,7 @@ import type { ManifestTreeItemAction } from '@umbraco-cms/models';
 
 import '../../../shared/components/tree/navigator/tree-navigator.element';
 import { UmbDataTypeStore } from 'src/backoffice/settings/data-types/data-type.store';
-import { UmbLitElement } from 'src/core/element/lit-element.element';
+import { UmbLitElement } from '@umbraco-cms/element';
 
 @customElement('umb-tree-data-types')
 export class UmbTreeDataTypesElement extends UmbLitElement {

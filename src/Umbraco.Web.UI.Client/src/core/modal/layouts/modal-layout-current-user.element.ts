@@ -8,7 +8,7 @@ import {
 	UmbCurrentUserHistoryItem,
 } from 'src/backoffice/users/current-user/current-user-history.store';
 import { UmbCurrentUserStore } from 'src/backoffice/users/current-user/current-user.store';
-import { UmbLitElement } from 'src/core/element/lit-element.element';
+import { UmbLitElement } from '@umbraco-cms/element';
 
 @customElement('umb-modal-layout-current-user')
 export class UmbModalLayoutCurrentUserElement extends UmbLitElement {

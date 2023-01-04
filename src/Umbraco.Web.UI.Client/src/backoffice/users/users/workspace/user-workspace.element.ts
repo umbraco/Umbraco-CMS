@@ -17,7 +17,7 @@ import { UmbModalService } from 'src/core/modal';
 import 'src/auth/components/input-user-group/input-user-group.element';
 import '../../../shared/property-editors/uis/content-picker/property-editor-ui-content-picker.element';
 import '../../../shared/components/workspace/workspace-entity/workspace-entity.element';
-import { UmbLitElement } from 'src/core/element/lit-element.element';
+import { UmbLitElement } from '@umbraco-cms/element';
 
 @customElement('umb-user-workspace')
 export class UmbUserWorkspaceElement extends UmbLitElement {

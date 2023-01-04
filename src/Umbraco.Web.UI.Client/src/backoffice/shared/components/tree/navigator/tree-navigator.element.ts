@@ -9,7 +9,7 @@ import type { Entity, ManifestSection, ManifestTree } from '@umbraco-cms/models'
 import { UmbTreeDataStore } from '@umbraco-cms/stores/store';
 
 import '../tree-item.element';
-import { UmbLitElement } from 'src/core/element/lit-element.element';
+import { UmbLitElement } from '@umbraco-cms/element';
 
 @customElement('umb-tree-navigator')
 export class UmbTreeNavigator extends UmbLitElement {

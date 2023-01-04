@@ -3,7 +3,7 @@ import { customElement, property } from 'lit/decorators.js';
 import type { UmbNotificationDefaultData } from '../../../../core/notification/layouts/default';
 import type { UmbNotificationService } from '../../../../core/notification';
 import type { UmbPropertyAction } from '../shared/property-action/property-action.model';
-import { UmbLitElement } from 'src/core/element/lit-element.element';
+import { UmbLitElement } from '@umbraco-cms/element';
 
 @customElement('umb-property-action-copy')
 export class UmbPropertyActionCopyElement extends UmbLitElement implements UmbPropertyAction {

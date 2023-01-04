@@ -10,7 +10,7 @@ import type { UmbTreeContextBase } from './tree.context';
 import { UmbTreeContextMenuService } from './context-menu/tree-context-menu.service';
 import type { Entity, ManifestSection } from '@umbraco-cms/models';
 import { UmbTreeDataStore } from '@umbraco-cms/stores/store';
-import { UmbLitElement } from 'src/core/element/lit-element.element';
+import { UmbLitElement } from '@umbraco-cms/element';
 
 @customElement('umb-tree-item')
 export class UmbTreeItem extends UmbLitElement {

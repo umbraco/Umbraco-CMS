@@ -4,7 +4,7 @@ import { customElement } from 'lit/decorators.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
 import type { UmbCollectionContext } from '../collection.context';
 import type { ManifestCollectionBulkAction } from '@umbraco-cms/models';
-import { UmbLitElement } from 'src/core/element/lit-element.element';
+import { UmbLitElement } from '@umbraco-cms/element';
 
 @customElement('umb-collection-bulk-action-media-delete')
 export class UmbCollectionBulkActionDeleteElement extends UmbLitElement {

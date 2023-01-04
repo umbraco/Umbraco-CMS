@@ -6,7 +6,7 @@ import { customElement, state } from 'lit/decorators.js';
 import { UmbNotificationService } from '../../../../core/notification';
 import { UmbNotificationDefaultData } from '../../../../core/notification/layouts/default';
 import { ApiError, ModelsBuilder, ModelsBuilderResource, ModelsMode, ProblemDetails } from '@umbraco-cms/backend-api';
-import { UmbLitElement } from 'src/core/element/lit-element.element';
+import { UmbLitElement } from '@umbraco-cms/element';
 
 @customElement('umb-dashboard-models-builder')
 export class UmbDashboardModelsBuilderElement extends UmbLitElement {

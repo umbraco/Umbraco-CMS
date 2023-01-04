@@ -9,7 +9,7 @@ import type { ManifestPropertyEditorUI, ManifestTypes } from '@umbraco-cms/model
 import '../../property-actions/shared/property-action-menu/property-action-menu.element';
 import 'src/backoffice/shared/components/workspace/workspace-property-layout/workspace-property-layout.element';
 import { UmbObserverController } from 'src/core/observable-api/observer.controller';
-import { UmbLitElement } from 'src/core/element/lit-element.element';
+import { UmbLitElement } from '@umbraco-cms/element';
 
 /**
  *  @element umb-entity-property

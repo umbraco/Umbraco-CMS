@@ -8,7 +8,7 @@ import { UmbModalService, UmbModalType } from '../../../../core/modal';
 import '../../../../core/modal/layouts/picker-section/picker-layout-section.element';
 import '../../../../core/modal/layouts/picker-user-group/picker-layout-user-group.element';
 import '../../../../core/modal/layouts/picker-user/picker-layout-user.element';
-import { UmbLitElement } from 'src/core/element/lit-element.element';
+import { UmbLitElement } from '@umbraco-cms/element';
 
 /** TODO: Make use of UUI FORM Mixin, to make it easily take part of a form. */
 export class UmbInputListBase extends UmbLitElement {

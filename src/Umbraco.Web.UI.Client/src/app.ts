@@ -20,7 +20,7 @@ import { OpenAPI, RuntimeLevel, ServerResource } from '@umbraco-cms/backend-api'
 
 import './auth';
 // eslint-disable-next-line import/order
-import { UmbLitElement } from './core/element/lit-element.element';
+import { UmbLitElement } from '@umbraco-cms/element';
 
 @customElement('umb-app')
 export class UmbApp extends UmbLitElement {

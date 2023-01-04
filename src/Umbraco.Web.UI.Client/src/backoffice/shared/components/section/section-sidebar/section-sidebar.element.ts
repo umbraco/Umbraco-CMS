@@ -5,7 +5,7 @@ import { UmbSectionContext } from '../section.context';
 import type { ManifestSection } from '@umbraco-cms/models';
 
 import '../../tree/context-menu/tree-context-menu.service';
-import { UmbLitElement } from 'src/core/element/lit-element.element';
+import { UmbLitElement } from '@umbraco-cms/element';
 
 @customElement('umb-section-sidebar')
 export class UmbSectionSidebarElement extends UmbLitElement {

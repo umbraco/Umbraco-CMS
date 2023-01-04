@@ -3,7 +3,7 @@ import { customElement, state } from 'lit/decorators.js';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import type { UUIButtonState } from '@umbraco-ui/uui';
 import type { UmbWorkspaceNodeContext } from '../../workspace-context/workspace-node.context';
-import { UmbLitElement } from 'src/core/element/lit-element.element';
+import { UmbLitElement } from '@umbraco-cms/element';
 import type { ManifestWorkspaceAction } from '@umbraco-cms/models';
 
 @customElement('umb-workspace-action-node-save')

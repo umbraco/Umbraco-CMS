@@ -31,7 +31,7 @@ import './users';
 import './packages';
 import './search';
 import './shared';
-import { UmbLitElement } from 'src/core/element/lit-element.element';
+import { UmbLitElement } from '@umbraco-cms/element';
 
 @defineElement('umb-backoffice')
 export class UmbBackofficeElement extends UmbLitElement {

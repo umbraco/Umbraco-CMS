@@ -5,7 +5,7 @@ import { distinctUntilChanged } from 'rxjs';
 import { UmbWorkspaceDataTypeContext } from '../../workspace-data-type.context';
 import type { UmbDataTypeStoreItemType } from '../../../data-type.store';
 import type { DataTypeDetails } from '@umbraco-cms/models';
-import { UmbLitElement } from 'src/core/element/lit-element.element';
+import { UmbLitElement } from '@umbraco-cms/element';
 
 @customElement('umb-workspace-view-data-type-info')
 export class UmbWorkspaceViewDataTypeInfoElement extends UmbLitElement {

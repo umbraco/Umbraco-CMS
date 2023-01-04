@@ -2,7 +2,7 @@ import { html } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { UmbPropertyActionMenuContext } from '../shared/property-action-menu/property-action-menu.context';
 import { UmbPropertyAction } from '../shared/property-action/property-action.model';
-import { UmbLitElement } from 'src/core/element/lit-element.element';
+import { UmbLitElement } from '@umbraco-cms/element';
 
 @customElement('umb-property-action-clear')
 export class UmbPropertyActionClearElement extends UmbLitElement implements UmbPropertyAction {
