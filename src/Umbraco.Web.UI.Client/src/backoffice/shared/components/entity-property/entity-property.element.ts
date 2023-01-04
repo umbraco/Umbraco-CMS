@@ -121,7 +121,7 @@ export class UmbEntityPropertyElement extends UmbLitElement {
 	// TODO: How to get proper default value?
 	private _propertyContext = new UmbWorkspacePropertyContext<string>("");
 
-	private propertyEditorUIObserver?: UmbObserverController;
+	private propertyEditorUIObserver?: UmbObserverController<ManifestTypes>;
 
 
 	constructor() {
@@ -135,7 +135,7 @@ export class UmbEntityPropertyElement extends UmbLitElement {
 
 	private _observePropertyEditorUI() {
 		this.propertyEditorUIObserver?.destroy();
-		this.propertyEditorUIObserver = new UmbObserverController<ManifestTypes>(this, umbExtensionsRegistry.getByAlias(this.propertyEditorUIAlias), (manifest) => {
+		this.propertyEditorUIObserver = new UmbObserverController(this, umbExtensionsRegistry.getByAlias(this.propertyEditorUIAlias), (manifest) => {
 			if (manifest?.type === 'propertyEditorUI') {
 				this._gotData(manifest);
 			}
