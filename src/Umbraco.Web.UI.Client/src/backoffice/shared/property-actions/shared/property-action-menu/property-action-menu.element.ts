@@ -65,7 +65,7 @@ export class UmbPropertyActionMenuElement extends UmbLitElement {
 	}
 
 	private _observePropertyActions() {
-		this.observe<ManifestPropertyAction[]>(
+		this.observe(
 			umbExtensionsRegistry
 				.extensionsOfType('propertyAction')
 				.pipe(
@@ -98,7 +98,7 @@ export class UmbPropertyActionMenuElement extends UmbLitElement {
 
 	render() {
 		return html`
-			${this._actions?.length > 0
+			${this._actions.length > 0
 				? html`
 						<uui-popover id="popover" placement="bottom-start" .open=${this._open} @close="${this._handleClose}">
 							<uui-button
