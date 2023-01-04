@@ -1,3 +1,5 @@
+using Umbraco.Cms.Api.Content.DependencyInjection;
+
 namespace Umbraco.Cms.Web.UI
 {
     public class Startup
@@ -32,6 +34,7 @@ namespace Umbraco.Cms.Web.UI
             services.AddUmbraco(_env, _config)
                 .AddBackOffice()
                 .AddWebsite()
+                .AddContentApi()
                 .AddComposers()
                 .Build();
         }

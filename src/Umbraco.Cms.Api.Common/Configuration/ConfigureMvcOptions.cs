@@ -14,6 +14,12 @@ public class ConfigureMvcOptions : IConfigureOptions<MvcOptions>
 
     public void Configure(MvcOptions options)
     {
+        // these MVC options may be applied more than once; let's make sure we only execute once.
+        if (options.Conventions.Any(convention => convention is UmbracoBackofficeToken))
+        {
+            return;
+        }
+
         // Replace the BackOfficeToken in routes.
 
         var backofficePath = _globalSettings.Value.UmbracoPath.TrimStart(Constants.CharArrays.TildeForwardSlash);
