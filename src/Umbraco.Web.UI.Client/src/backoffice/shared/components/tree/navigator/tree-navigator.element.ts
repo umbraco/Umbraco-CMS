@@ -5,7 +5,7 @@ import { customElement, property, state } from 'lit/decorators.js';
 import { ifDefined } from 'lit-html/directives/if-defined.js';
 import { UmbSectionContext } from '../../section/section.context';
 import { UmbTreeContext } from '../tree.context';
-import type { Entity, ManifestSection, ManifestTree } from '@umbraco-cms/models';
+import type { Entity, ManifestTree } from '@umbraco-cms/models';
 import { UmbTreeDataStore } from '@umbraco-cms/stores/store';
 
 import '../tree-item.element';
@@ -87,7 +87,7 @@ export class UmbTreeNavigator extends UmbLitElement {
 	private _observeSection() {
 		if (!this._sectionContext) return;
 
-		this.observe<ManifestSection>(this._sectionContext?.data, (section) => {
+		this.observe(this._sectionContext?.data, (section) => {
 			this._href = this._constructPath(section.meta.pathname, this._tree?.meta.rootNodeEntityType);
 		});
 	}

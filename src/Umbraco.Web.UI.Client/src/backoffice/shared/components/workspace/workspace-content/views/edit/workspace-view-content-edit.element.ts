@@ -40,13 +40,11 @@ export class UmbWorkspaceViewContentEditElement extends UmbLitElement {
 	private _observeContent() {
 		if (!this._workspaceContext) return;
 
-		this.observe<DocumentDetails | MediaDetails | null>(
+		this.observe(
 			this._workspaceContext.data.pipe(distinctUntilChanged()),
 			(content) => {
-				if(content) {
-					this._properties = content.properties;
-					this._data = content.data;
-				}
+				this._properties = content.properties;
+				this._data = content.data;
 			}
 		);
 	}

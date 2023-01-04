@@ -69,7 +69,7 @@ export class UmbWorkspaceEntity extends UmbLitElement {
 	public alias = '';
 
 	@state()
-	private _workspaceViews?: Array<ManifestWorkspaceView | ManifestWorkspaceViewCollection>;
+	private _workspaceViews: Array<ManifestWorkspaceView | ManifestWorkspaceViewCollection> = [];
 
 	@state()
 	private _currentView = '';
@@ -89,7 +89,7 @@ export class UmbWorkspaceEntity extends UmbLitElement {
 	}
 
 	private _observeWorkspaceViews() {
-		this.observe<ManifestWorkspaceView[]>(
+		this.observe(
 			umbExtensionsRegistry
 				.extensionsOfTypes<ManifestWorkspaceView>(['workspaceView', 'workspaceViewCollection'])
 				.pipe(
@@ -98,7 +98,7 @@ export class UmbWorkspaceEntity extends UmbLitElement {
 					)
 				),
 			(workspaceViews) => {
-				this._workspaceViews = workspaceViews || undefined;
+				this._workspaceViews = workspaceViews;
 				this._createRoutes();
 			}
 		);
@@ -108,7 +108,7 @@ export class UmbWorkspaceEntity extends UmbLitElement {
 		
 		this._routes = [];
 
-		if (this._workspaceViews && this._workspaceViews.length > 0) {
+		if (this._workspaceViews.length > 0) {
 
 			this._routes = this._workspaceViews.map((view) => {
 				return {
@@ -135,7 +135,7 @@ export class UmbWorkspaceEntity extends UmbLitElement {
 
 			this._routes.push({
 				path: '**',
-				redirectTo: `view/${this._workspaceViews?.[0].meta.pathname}`,
+				redirectTo: `view/${this._workspaceViews[0].meta.pathname}`,
 			});
 
 			this.requestUpdate();
@@ -155,7 +155,7 @@ export class UmbWorkspaceEntity extends UmbLitElement {
 
 	private _renderTabs() {
 		return html`
-			${this._workspaceViews?.length > 0
+			${this._workspaceViews.length > 0
 				? html`
 						<uui-tab-group slot="tabs">
 							${this._workspaceViews.map(

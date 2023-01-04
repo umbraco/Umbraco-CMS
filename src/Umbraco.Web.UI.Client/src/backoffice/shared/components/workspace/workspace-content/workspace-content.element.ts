@@ -85,7 +85,7 @@ export class UmbWorkspaceContentElement extends UmbLitElement {
 	private async _observeWorkspace() {
 		if (!this._workspaceContext) return;
 
-		this.observe<ContentTypeTypes>(this._workspaceContext.data.pipe(distinctUntilChanged()), (data) => {
+		this.observe(this._workspaceContext.data.pipe(distinctUntilChanged()), (data) => {
 			this._content = data;
 		});
 	}

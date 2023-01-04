@@ -36,8 +36,8 @@ export class UmbWorkspaceViewContentInfoElement extends UmbLitElement {
 	private _observeContent() {
 		if (!this._workspaceContext) return;
 
-		this.observe<DocumentDetails | MediaDetails>(this._workspaceContext.data.pipe(distinctUntilChanged()), (node) => {
-			this._nodeName = node?.name as string || '';
+		this.observe(this._workspaceContext.data.pipe(distinctUntilChanged()), (node) => {
+			this._nodeName = node.name as string;
 		});
 	}
 
