@@ -1,17 +1,16 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
-import { css, html, LitElement, nothing } from 'lit';
+import { css, html, nothing } from 'lit';
 import { customElement, state, query, property } from 'lit/decorators.js';
 
 import { UmbModalService } from '../../../../../core/modal';
 import { UmbNotificationService } from '../../../../../core/notification';
 import { UmbNotificationDefaultData } from '../../../../../core/notification/layouts/default';
 
-import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
-
 import { ApiError, ProblemDetails, SearchResult, SearcherResource, Field } from '@umbraco-cms/backend-api';
 
 import './modal-views/fields-viewer.element';
 import './modal-views/fields-settings.element';
+import { UmbLitElement } from 'src/core/element/lit-element.element';
 
 interface ExposedSearchResultField {
 	name?: string | null;
@@ -19,7 +18,7 @@ interface ExposedSearchResultField {
 }
 
 @customElement('umb-dashboard-examine-searcher')
-export class UmbDashboardExamineSearcherElement extends UmbContextConsumerMixin(LitElement) {
+export class UmbDashboardExamineSearcherElement extends UmbLitElement {
 	static styles = [
 		UUITextStyles,
 		css`
