@@ -84,7 +84,7 @@ export const data: Array<DataTypeDetails> = [
 		data: [],
 	},
 	{
-		name: 'Umbraco.ColorPicker',
+		name: 'Color Picker',
 		type: 'data-type',
 		icon: 'umb:autofill',
 		hasChildren: false,
@@ -97,7 +97,7 @@ export const data: Array<DataTypeDetails> = [
 		data: [],
 	},
 	{
-		name: 'Umbraco.ContentPicker',
+		name: 'Content Picker',
 		type: 'data-type',
 		icon: 'umb:autofill',
 		hasChildren: false,
@@ -110,7 +110,7 @@ export const data: Array<DataTypeDetails> = [
 		data: [],
 	},
 	{
-		name: 'Umbraco.ColorPicker.EyeDropper',
+		name: 'Eye Dropper',
 		type: 'data-type',
 		icon: 'umb:autofill',
 		hasChildren: false,
@@ -120,6 +120,19 @@ export const data: Array<DataTypeDetails> = [
 		isFolder: false,
 		propertyEditorModelAlias: 'Umbraco.ColorPicker.EyeDropper',
 		propertyEditorUIAlias: 'Umb.PropertyEditorUI.EyeDropper',
+		data: [],
+	},
+	{
+		name: 'Multi URL Picker',
+		type: 'data-type',
+		icon: 'umb:autofill',
+		hasChildren: false,
+		key: 'dt-10',
+		isContainer: false,
+		parentKey: null,
+		isFolder: false,
+		propertyEditorModelAlias: 'Umbraco.MultiUrlPicker',
+		propertyEditorUIAlias: 'Umb.PropertyEditorUI.MultiUrlPicker',
 		data: [],
 	},
 ];

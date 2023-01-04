@@ -2,6 +2,8 @@ import { manifest as ColorPicker } from './color-picker/manifests';
 import { manifest as ContentPicker } from './content-picker/manifests';
 import { manifest as EyeDropper } from './eye-dropper/manifests';
 import { manifest as TreePicker } from './tree-picker/manifests';
+import { manifest as MultiUrlPicker } from './multi-url-picker/manifests';
+import { manifest as OverlaySize } from './overlay-size/manifests';
 import type { ManifestPropertyEditorUI } from '@umbraco-cms/models';
 
 export const manifests: Array<ManifestPropertyEditorUI> = [
@@ -9,6 +11,8 @@ export const manifests: Array<ManifestPropertyEditorUI> = [
 	ContentPicker,
 	EyeDropper,
 	TreePicker,
+	MultiUrlPicker,
+	OverlaySize,
 	{
 		type: 'propertyEditorUI',
 		alias: 'Umb.PropertyEditorUI.BlockList',

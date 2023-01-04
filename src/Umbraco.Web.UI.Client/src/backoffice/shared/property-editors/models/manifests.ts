@@ -2,6 +2,7 @@ import { manifest as colorPicker } from './Umbraco.ColorPicker';
 import { manifest as eyeDropper } from './Umbraco.ColorPicker.EyeDropper';
 import { manifest as contentPicker } from './Umbraco.ContentPicker';
 import { manifest as json } from './Umbraco.JSON';
+import { manifest as multiUrlPicker } from './Umbraco.MultiUrlPicker';
 
 import type { ManifestPropertyEditorModel } from '@umbraco-cms/models';
 
@@ -10,6 +11,7 @@ export const manifests: Array<ManifestPropertyEditorModel> = [
 	eyeDropper,
 	contentPicker,
 	json,
+	multiUrlPicker,
 	{
 		type: 'propertyEditorModel',
 		name: 'Multi URL Picker',
