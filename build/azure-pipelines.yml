@@ -372,7 +372,7 @@ stages:
               Umbraco__CMS__Global__InstallMissingDatabase: true
               UmbracoDatabaseServer: (LocalDB)\MSSQLLocalDB
               UmbracoDatabaseName: Playwright
-              ConnectionStrings__umbracoDbDSN: Server=$(UmbracoDatabaseServer);Database=$(UmbracoDatabaseName);Integrated Security=true;
+              ConnectionStrings__umbracoDbDSN: Server=$(UmbracoDatabaseServer);Database=$(UmbracoDatabaseName);Integrated Security=true;TrustServerCertificate=True;
               ConnectionStrings__umbracoDbDSN_ProviderName: Microsoft.Data.SqlClient;
               # Custom Umbraco settings
               Umbraco__CMS__Global__VersionCheckPeriod: 0
