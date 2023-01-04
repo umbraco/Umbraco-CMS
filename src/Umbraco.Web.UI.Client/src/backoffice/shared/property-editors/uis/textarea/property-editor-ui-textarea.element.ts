@@ -1,12 +1,11 @@
-import { css, html, LitElement } from 'lit';
+import { css, html } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, property } from 'lit/decorators.js';
-import { UmbControllerHostMixin } from 'src/core/controller/controller-host.mixin';
-import { UmbContextConsumerController } from 'src/core/context-api/consume/context-consumer.controller';
 import { UmbWorkspacePropertyContext } from 'src/backoffice/shared/components/entity-property/workspace-property.context';
+import { UmbLitElement } from 'src/core/element/lit-element.element';
 
 @customElement('umb-property-editor-ui-textarea')
-export class UmbPropertyEditorUITextareaElement extends UmbControllerHostMixin(LitElement) {
+export class UmbPropertyEditorUITextareaElement extends UmbLitElement {
 	static styles = [
 		UUITextStyles,
 		css`
@@ -27,7 +26,7 @@ export class UmbPropertyEditorUITextareaElement extends UmbControllerHostMixin(L
 	constructor() {
 		super();
 
-		new UmbContextConsumerController(this, 'umbPropertyContext', (instance) => {
+		this.consumeContext('umbPropertyContext', (instance) => {
 			this.propertyContext = instance;
 		});
 	}

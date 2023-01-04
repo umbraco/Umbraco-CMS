@@ -1,30 +1,29 @@
-import { css, html, LitElement } from 'lit';
+import { css, html } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, property, state } from 'lit/decorators.js';
 import { ifDefined } from 'lit-html/directives/if-defined.js';
 import { UUIMenuItemEvent } from '@umbraco-ui/uui';
-import { map } from 'rxjs';
+import { map, Observable } from 'rxjs';
 import { repeat } from 'lit/directives/repeat.js';
 import { UmbSectionContext } from '../section/section.context';
 import type { UmbTreeContextBase } from './tree.context';
 import { UmbTreeContextMenuService } from './context-menu/tree-context-menu.service';
 import type { Entity, ManifestSection } from '@umbraco-cms/models';
-import { UmbObserverMixin } from '@umbraco-cms/observable-api';
-import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 import { UmbTreeDataStore } from '@umbraco-cms/stores/store';
+import { UmbLitElement } from 'src/core/element/lit-element.element';
 
 @customElement('umb-tree-item')
-export class UmbTreeItem extends UmbContextConsumerMixin(UmbObserverMixin(LitElement)) {
+export class UmbTreeItem extends UmbLitElement {
 	static styles = [UUITextStyles, css``];
 
 	@property({ type: Object, attribute: false })
 	treeItem!: Entity;
 
 	@state()
-	private _childItems: Entity[] = [];
+	private _childItems?: Entity[];
 
 	@state()
-	private _href? = '';
+	private _href?:string;
 
 	@state()
 	private _loading = false;
@@ -88,7 +87,7 @@ export class UmbTreeItem extends UmbContextConsumerMixin(UmbObserverMixin(LitEle
 		if (!this._sectionContext) return;
 
 		this.observe<ManifestSection>(this._sectionContext?.data, (section) => {
-			this._href = this._constructPath(section.meta.pathname, this.treeItem.type, this.treeItem.key);
+			this._href = this._constructPath(section?.meta.pathname || '', this.treeItem.type, this.treeItem.key);
 		});
 	}
 
@@ -96,7 +95,7 @@ export class UmbTreeItem extends UmbContextConsumerMixin(UmbObserverMixin(LitEle
 		if (!this._treeContext) return;
 
 		this.observe<boolean>(this._treeContext.selectable, (value) => {
-			this._selectable = value;
+			this._selectable = value || false;
 		});
 	}
 
@@ -106,7 +105,7 @@ export class UmbTreeItem extends UmbContextConsumerMixin(UmbObserverMixin(LitEle
 		this.observe<boolean>(
 			this._treeContext.selection.pipe(map((keys) => keys?.includes(this.treeItem.key))),
 			(isSelected) => {
-				this._selected = isSelected;
+				this._selected = isSelected || false;
 			}
 		);
 	}
@@ -115,7 +114,7 @@ export class UmbTreeItem extends UmbContextConsumerMixin(UmbObserverMixin(LitEle
 		if (!this._sectionContext) return;
 
 		this.observe<Entity>(this._sectionContext?.activeTreeItem, (treeItem) => {
-			this._isActive = treeItem.key === this.treeItem.key;
+			this._isActive = treeItem?.key === this.treeItem.key;
 		});
 	}
 
@@ -126,7 +125,7 @@ export class UmbTreeItem extends UmbContextConsumerMixin(UmbObserverMixin(LitEle
 
 	private _onShowChildren(event: UUIMenuItemEvent) {
 		event.stopPropagation();
-		if (this._childItems.length > 0) return;
+		if (this._childItems && this._childItems.length > 0) return;
 		this._observeChildren();
 	}
 
@@ -135,20 +134,20 @@ export class UmbTreeItem extends UmbContextConsumerMixin(UmbObserverMixin(LitEle
 
 		this._loading = true;
 
-		this.observe<Entity[]>(this._store.getTreeItemChildren(this.treeItem.key), (childItems) => {
-			if (childItems?.length === 0) return;
-			this._childItems = childItems;
+		// TODO: we should do something about these types, stop having our own version of Entity.
+		this.observe<Entity[]>(this._store.getTreeItemChildren(this.treeItem.key) as Observable<Entity[]>, (childItems) => {
+			this._childItems = childItems || undefined;
 			this._loading = false;
 		});
 	}
 
 	private _renderChildItems() {
 		return html`
-			${repeat(
+			${this._childItems ? repeat(
 				this._childItems,
 				(item) => item.key,
 				(item) => html`<umb-tree-item .treeItem=${item}></umb-tree-item>`
-			)}
+			) : ''}
 		`;
 	}
 

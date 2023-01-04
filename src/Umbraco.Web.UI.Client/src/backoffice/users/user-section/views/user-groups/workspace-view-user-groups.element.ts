@@ -1,5 +1,5 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css';
-import { css, html, LitElement } from 'lit';
+import { css, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import {
 	UmbTableColumn,
@@ -10,16 +10,15 @@ import {
 	UmbTableOrderedEvent,
 	UmbTableSelectedEvent,
 } from 'src/backoffice/shared/components/table';
-import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 import type { UserGroupDetails } from '@umbraco-cms/models';
 
 import './user-group-table-name-column-layout.element';
 import './user-group-table-sections-column-layout.element';
-import { UmbObserverMixin } from '@umbraco-cms/observable-api';
 import { UmbUserGroupStore } from 'src/backoffice/users/user-groups/user-group.store';
+import { UmbLitElement } from 'src/core/element/lit-element.element';
 
 @customElement('umb-workspace-view-user-groups')
-export class UmbWorkspaceViewUserGroupsElement extends UmbContextConsumerMixin(UmbObserverMixin(LitElement)) {
+export class UmbWorkspaceViewUserGroupsElement extends UmbLitElement {
 	static styles = [
 		UUITextStyles,
 		css`
@@ -81,7 +80,7 @@ export class UmbWorkspaceViewUserGroupsElement extends UmbContextConsumerMixin(U
 	private _observeUserGroups() {
 		if (!this._userGroupStore) return;
 
-		this.observe<UserGroupDetails[]>(this._userGroupStore.getAll(), (userGroups) => {
+		this.observe(this._userGroupStore.getAll(), (userGroups) => {
 			this._userGroups = userGroups;
 			this._createTableItems(this._userGroups);
 		});

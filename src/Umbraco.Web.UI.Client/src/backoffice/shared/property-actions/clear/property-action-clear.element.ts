@@ -1,11 +1,11 @@
-import { html, LitElement } from 'lit';
+import { html } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { UmbPropertyActionMenuContext } from '../shared/property-action-menu/property-action-menu.context';
 import { UmbPropertyAction } from '../shared/property-action/property-action.model';
-import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
+import { UmbLitElement } from 'src/core/element/lit-element.element';
 
 @customElement('umb-property-action-clear')
-export class UmbPropertyActionClearElement extends UmbContextConsumerMixin(LitElement) implements UmbPropertyAction {
+export class UmbPropertyActionClearElement extends UmbLitElement implements UmbPropertyAction {
 	@property()
 	value = '';
 

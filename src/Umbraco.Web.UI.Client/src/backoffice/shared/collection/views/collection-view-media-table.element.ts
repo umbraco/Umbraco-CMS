@@ -1,20 +1,19 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css';
-import { css, html, LitElement } from 'lit';
+import { css, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import type { UmbCollectionContext } from '../collection.context';
-import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 import type { MediaDetails } from '@umbraco-cms/models';
-import { UmbObserverMixin } from '@umbraco-cms/observable-api';
+import { UmbLitElement } from 'src/core/element/lit-element.element';
 
 @customElement('umb-collection-view-media-table')
-export class UmbCollectionViewMediaTableElement extends UmbContextConsumerMixin(UmbObserverMixin(LitElement)) {
+export class UmbCollectionViewMediaTableElement extends UmbLitElement {
 	static styles = [UUITextStyles, css``];
 
 	@state()
-	private _mediaItems: Array<MediaDetails> = [];
+	private _mediaItems?: Array<MediaDetails>;
 
 	@state()
-	private _selection: Array<string> = [];
+	private _selection?: Array<string>;
 
 	private _collectionContext?: UmbCollectionContext<MediaDetails>;
 
@@ -30,11 +29,11 @@ export class UmbCollectionViewMediaTableElement extends UmbContextConsumerMixin(
 		if (!this._collectionContext) return;
 
 		this.observe<Array<MediaDetails>>(this._collectionContext.data, (nodes) => {
-			this._mediaItems = nodes;
+			this._mediaItems = nodes || undefined;
 		});
 
 		this.observe<Array<string>>(this._collectionContext.selection, (selection) => {
-			this._selection = selection;
+			this._selection = selection || undefined;
 		});
 	}
 
@@ -43,8 +42,8 @@ export class UmbCollectionViewMediaTableElement extends UmbContextConsumerMixin(
 			<div>
 				<h3>Selected Media Items:</h3>
 				<ul>
-					${this._selection.map((key) => {
-						const mediaItem = this._mediaItems.find((item) => item.key === key);
+					${this._selection?.map((key) => {
+						const mediaItem = this._mediaItems?.find((item) => item.key === key);
 						return html`<li>${mediaItem?.name}</li>`;
 					})}
 				</ul>

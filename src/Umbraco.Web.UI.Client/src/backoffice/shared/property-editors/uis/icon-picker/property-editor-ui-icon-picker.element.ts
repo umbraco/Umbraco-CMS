@@ -1,14 +1,14 @@
-import { html, LitElement } from 'lit';
+import { html } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, property } from 'lit/decorators.js';
 import type { UmbModalService } from 'src/core/modal';
-import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
+import { UmbLitElement } from 'src/core/element/lit-element.element';
 
 /**
  * @element umb-property-editor-ui-icon-picker
  */
 @customElement('umb-property-editor-ui-icon-picker')
-export class UmbPropertyEditorUIIconPickerElement extends UmbContextConsumerMixin(LitElement) {
+export class UmbPropertyEditorUIIconPickerElement extends UmbLitElement {
 	static styles = [UUITextStyles];
 
 	@property()

@@ -1,15 +1,14 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
-import { css, html, LitElement } from 'lit';
+import { css, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { UmbSectionContext } from '../section.context';
-import { UmbObserverMixin } from '@umbraco-cms/observable-api';
 import type { ManifestSection } from '@umbraco-cms/models';
-import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 
 import '../../tree/context-menu/tree-context-menu.service';
+import { UmbLitElement } from 'src/core/element/lit-element.element';
 
 @customElement('umb-section-sidebar')
-export class UmbSectionSidebarElement extends UmbContextConsumerMixin(UmbObserverMixin(LitElement)) {
+export class UmbSectionSidebarElement extends UmbLitElement {
 	static styles = [
 		UUITextStyles,
 		css`
@@ -50,8 +49,10 @@ export class UmbSectionSidebarElement extends UmbContextConsumerMixin(UmbObserve
 		if (!this._sectionContext) return;
 
 		this.observe<ManifestSection>(this._sectionContext.data, (section) => {
-			this._sectionLabel = section.meta.label || section.name;
-			this._sectionPathname = section.meta.pathname;
+			if(section) {
+				this._sectionLabel = section.meta.label || section.name;
+				this._sectionPathname = section.meta.pathname;
+			}
 		});
 	}
 

@@ -1,21 +1,20 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
-import { html, LitElement } from 'lit';
+import { html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { map, switchMap, EMPTY, of } from 'rxjs';
 
 import { UmbSectionContext } from '../section.context';
-import { UmbObserverMixin } from '@umbraco-cms/observable-api';
-import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
 
 import '../../tree/tree-extension.element';
+import { UmbLitElement } from 'src/core/element/lit-element.element';
 
 @customElement('umb-section-trees')
-export class UmbSectionTreesElement extends UmbContextConsumerMixin(UmbObserverMixin(LitElement)) {
+export class UmbSectionTreesElement extends UmbLitElement {
 	static styles = [UUITextStyles];
 
 	@state()
-	private _treeAliases: Array<string> = [];
+	private _treeAliases?: Array<string>;
 
 	private _sectionContext?: UmbSectionContext;
 
@@ -48,13 +47,13 @@ export class UmbSectionTreesElement extends UmbContextConsumerMixin(UmbObserverM
 				})
 			),
 			(treeAliases) => {
-				this._treeAliases = treeAliases;
+				this._treeAliases = treeAliases || undefined;
 			}
 		);
 	}
 
 	render() {
-		return html`${this._treeAliases.map((treeAlias) => html`<umb-tree alias="${treeAlias}"></umb-tree>`)} `;
+		return html`${this._treeAliases?.map((treeAlias) => html`<umb-tree alias="${treeAlias}"></umb-tree>`)} `;
 	}
 }
 

@@ -1,16 +1,15 @@
-import { css, html, LitElement } from 'lit';
+import { css, html } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, state } from 'lit/decorators.js';
 import { distinctUntilChanged } from 'rxjs';
 import type { UmbWorkspaceNodeContext } from '../../../workspace-context/workspace-node.context';
-import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
-import { UmbObserverMixin } from '@umbraco-cms/observable-api';
 import type { ContentProperty, ContentPropertyData, DocumentDetails, MediaDetails } from '@umbraco-cms/models';
 
 import '../../../../content-property/content-property.element';
+import { UmbLitElement } from 'src/core/element/lit-element.element';
 
 @customElement('umb-workspace-view-content-edit')
-export class UmbWorkspaceViewContentEditElement extends UmbContextConsumerMixin(UmbObserverMixin(LitElement)) {
+export class UmbWorkspaceViewContentEditElement extends UmbLitElement {
 	static styles = [
 		UUITextStyles,
 		css`
@@ -27,7 +26,7 @@ export class UmbWorkspaceViewContentEditElement extends UmbContextConsumerMixin(
 	@state()
 	_data: ContentPropertyData[] = [];
 
-	private _workspaceContext?: UmbWorkspaceNodeContext;
+	private _workspaceContext?: UmbWorkspaceNodeContext<DocumentDetails | MediaDetails>;
 
 	constructor() {
 		super();
@@ -41,11 +40,13 @@ export class UmbWorkspaceViewContentEditElement extends UmbContextConsumerMixin(
 	private _observeContent() {
 		if (!this._workspaceContext) return;
 
-		this.observe<DocumentDetails | MediaDetails>(
+		this.observe<DocumentDetails | MediaDetails | null>(
 			this._workspaceContext.data.pipe(distinctUntilChanged()),
 			(content) => {
-				this._properties = content.properties;
-				this._data = content.data;
+				if(content) {
+					this._properties = content.properties;
+					this._data = content.data;
+				}
 			}
 		);
 	}

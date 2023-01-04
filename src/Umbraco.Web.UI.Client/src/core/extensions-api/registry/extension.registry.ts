@@ -104,9 +104,9 @@ export class UmbExtensionRegistry {
 		);
 	}
 
-	extensionsOfTypes(types: string[]): Observable<Array<ManifestTypes>> {
+	extensionsOfTypes<ExtensionType = ManifestTypes>(types: string[]): Observable<Array<ExtensionType>> {
 		return this.extensions.pipe(
 			map((exts) => exts.filter((ext) => (types.indexOf(ext.type) !== -1)).sort((a, b) => (b.weight || 0) - (a.weight || 0)))
-		);
+		) as Observable<Array<ExtensionType>>;
 	}
 }

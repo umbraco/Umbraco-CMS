@@ -1,15 +1,14 @@
-import { css, html, LitElement } from 'lit';
+import { css, html } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, state } from 'lit/decorators.js';
 import { map } from 'rxjs';
 import { UmbSectionContext } from '../../section/section.context';
-import { UmbObserverMixin } from '@umbraco-cms/observable-api';
-import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 import type { Entity, ManifestTreeItemAction, ManifestTree } from '@umbraco-cms/models';
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
+import { UmbLitElement } from 'src/core/element/lit-element.element';
 
 @customElement('umb-tree-context-menu-page-action-list')
-export class UmbTreeContextMenuPageActionListElement extends UmbContextConsumerMixin(UmbObserverMixin(LitElement)) {
+export class UmbTreeContextMenuPageActionListElement extends UmbLitElement {
 	static styles = [
 		UUITextStyles,
 		css`
@@ -29,7 +28,7 @@ export class UmbTreeContextMenuPageActionListElement extends UmbContextConsumerM
 	];
 
 	@state()
-	private _actions: Array<ManifestTreeItemAction> = [];
+	private _actions?: Array<ManifestTreeItemAction>;
 
 	@state()
 	private _activeTree?: ManifestTree;
@@ -58,7 +57,7 @@ export class UmbTreeContextMenuPageActionListElement extends UmbContextConsumerM
 				.extensionsOfType('treeItemAction')
 				.pipe(map((actions) => actions.filter((action) => action.meta.trees.includes(this._activeTree?.alias || '')))),
 			(actions) => {
-				this._actions = actions;
+				this._actions = actions || undefined;
 			}
 		);
 	}
@@ -67,7 +66,7 @@ export class UmbTreeContextMenuPageActionListElement extends UmbContextConsumerM
 		if (!this._sectionContext) return;
 
 		this.observe(this._sectionContext.activeTree, (tree) => {
-			this._activeTree = tree;
+			this._activeTree = tree || undefined;
 		});
 	}
 
@@ -75,12 +74,12 @@ export class UmbTreeContextMenuPageActionListElement extends UmbContextConsumerM
 		if (!this._sectionContext) return;
 
 		this.observe(this._sectionContext.activeTreeItem, (treeItem) => {
-			this._activeTreeItem = treeItem;
+			this._activeTreeItem = treeItem || undefined;
 		});
 	}
 
 	private _renderActions() {
-		return this._actions.map((action) => {
+		return this._actions?.map((action) => {
 			return html`<umb-tree-item-action-extension .treeAction=${action}></umb-tree-item-action-extension> `;
 		});
 	}
