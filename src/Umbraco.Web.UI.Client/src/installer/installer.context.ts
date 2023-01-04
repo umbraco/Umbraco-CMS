@@ -72,8 +72,8 @@ export class UmbInstallerContext {
 	 * @memberof UmbInstallerContext
 	 */
 	public reset(): void {
-		this._currentStep.next(1);
 		this._installStatus.next(null);
+		this._currentStep.next(1);
 	}
 
 	/**
@@ -117,6 +117,7 @@ export class UmbInstallerContext {
 			this._settings.next(data);
 		} else if (error) {
 			console.error(error.detail, error);
+			this._installStatus.next(error);
 		}
 	}
 }
