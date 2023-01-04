@@ -12,8 +12,8 @@ import {
 	InstallSettings,
 	ProblemDetails,
 } from '@umbraco-cms/backend-api';
+import { UmbLitElement } from '@umbraco-cms/element';
 import { tryExecuteAndNotify } from '@umbraco-cms/resources';
-import { UmbLitElement } from 'src/core/element/lit-element.element';
 
 @customElement('umb-installer-database')
 export class UmbInstallerDatabaseElement extends UmbLitElement {
