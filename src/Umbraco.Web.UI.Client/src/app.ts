@@ -1,3 +1,5 @@
+import './core/css/custom-properties.css';
+
 // TODO: remove these imports when they are part of UUI
 import '@umbraco-ui/uui-color-swatch';
 import '@umbraco-ui/uui-color-swatches';
@@ -7,7 +9,6 @@ import '@umbraco-ui/uui-modal-dialog';
 import '@umbraco-ui/uui-modal-sidebar';
 import 'element-internals-polyfill';
 import 'router-slot';
-import './core/css/custom-properties.css';
 import './auth';
 
 import type { Guard, IRoute } from 'router-slot/model';
