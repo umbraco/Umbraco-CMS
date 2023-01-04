@@ -114,7 +114,6 @@ export class UmbWorkspaceEntity extends UmbContextConsumerMixin(UmbObserverMixin
 					path: `view/${view.meta.pathname}`,
 					component: () => {
 						if (view.type === 'workspaceViewCollection') {
-							console.log('!!!!!workspaceViewCollection');
 							return import(
 								'src/backoffice/shared/components/workspace/workspace-content/views/collection/workspace-view-collection.element'
 							);
