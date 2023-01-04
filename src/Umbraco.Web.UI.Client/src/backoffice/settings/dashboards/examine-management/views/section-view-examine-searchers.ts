@@ -126,6 +126,7 @@ export class UmbDashboardExamineSearcherElement extends UmbLitElement {
 	}
 
 	private _onNameClick() {
+		// TODO: 
 		alert('TODO: Open workspace for ' + this.searcherName);
 	}
 
