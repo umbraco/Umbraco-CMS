@@ -1,7 +1,6 @@
 import { html, LitElement } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
-import type { ManifestSection } from '@umbraco-cms/models';
 import { UmbObserverMixin } from '@umbraco-cms/observable-api';
 import { UmbTableItem } from 'src/backoffice/shared/components/table';
 
