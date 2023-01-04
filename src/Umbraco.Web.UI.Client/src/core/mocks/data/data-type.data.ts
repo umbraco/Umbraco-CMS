@@ -135,6 +135,19 @@ export const data: Array<DataTypeDetails> = [
 		propertyEditorUIAlias: 'Umb.PropertyEditorUI.MultiUrlPicker',
 		data: [],
 	},
+	{
+		name: 'Multi Node Tree Picker',
+		type: 'data-type',
+		icon: 'umb:autofill',
+		hasChildren: false,
+		key: 'dt-11',
+		isContainer: false,
+		parentKey: null,
+		isFolder: false,
+		propertyEditorModelAlias: 'Umbraco.MultiNodeTreePicker',
+		propertyEditorUIAlias: 'Umb.PropertyEditorUI.TreePicker',
+		data: [],
+	},
 ];
 
 // Temp mocked database
