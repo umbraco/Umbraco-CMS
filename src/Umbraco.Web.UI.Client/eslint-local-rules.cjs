@@ -8,7 +8,7 @@ module.exports = {
 	/** @type {import('eslint').Rule.RuleModule} */
 	'bad-type-import': {
 		meta: {
-			type: 'suggestion',
+			type: 'problem',
 			docs: {
 				description: 'Ensures the use of the `import type` operator from the `src/core/models/index.ts` file.',
 				category: 'Best Practices',
