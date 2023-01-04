@@ -1,17 +1,17 @@
 import { UUIButtonState } from '@umbraco-ui/uui';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
-import { css, html, LitElement } from 'lit';
+import { css, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 
 import { UmbModalService } from '../../../../core/modal';
 import { UmbNotificationService } from '../../../../core/notification';
 import { UmbNotificationDefaultData } from '../../../../core/notification/layouts/default';
 
-import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 import { ApiError, ProblemDetails, PublishedCacheResource } from '@umbraco-cms/backend-api';
+import { UmbLitElement } from 'src/core/element/lit-element.element';
 
 @customElement('umb-dashboard-published-status')
-export class UmbDashboardPublishedStatusElement extends UmbContextConsumerMixin(LitElement) {
+export class UmbDashboardPublishedStatusElement extends UmbLitElement {
 	static styles = [
 		UUITextStyles,
 		css`
