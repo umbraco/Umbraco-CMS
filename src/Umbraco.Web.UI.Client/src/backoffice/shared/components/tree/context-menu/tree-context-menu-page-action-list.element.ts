@@ -52,7 +52,7 @@ export class UmbTreeContextMenuPageActionListElement extends UmbLitElement {
 	private _observeTreeItemActions() {
 		if (!this._sectionContext) return;
 
-		this.observe<ManifestTreeItemAction[]>(
+		this.observe(
 			umbExtensionsRegistry
 				.extensionsOfType('treeItemAction')
 				.pipe(map((actions) => actions.filter((action) => action.meta.trees.includes(this._activeTree?.alias || '')))),

@@ -72,7 +72,7 @@ export class UmbSectionDashboardsElement extends UmbLitElement {
 	private _observeSectionContext() {
 		if (!this._sectionContext) return;
 
-		this.observe<ManifestSection>(this._sectionContext.data.pipe(first()), (section) => {
+		this.observe(this._sectionContext.data.pipe(first()), (section) => {
 			if(section) {
 				this._currentSectionAlias = section.alias;
 				this._currentSectionPathname = section.meta.pathname;
@@ -84,7 +84,7 @@ export class UmbSectionDashboardsElement extends UmbLitElement {
 	private _observeDashboards() {
 		if (!this._currentSectionAlias) return;
 
-		this.observe<(ManifestDashboard | ManifestDashboardCollection)[]>(
+		this.observe(
 			umbExtensionsRegistry
 				?.extensionsOfTypes<(ManifestDashboard | ManifestDashboardCollection)>(['dashboard', 'dashboardCollection'])
 				.pipe(

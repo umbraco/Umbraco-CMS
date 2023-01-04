@@ -30,19 +30,19 @@ export class UmbSectionTreesElement extends UmbLitElement {
 	private _observeTrees() {
 		if (!this._sectionContext) return;
 
-		this.observe<string[]>(
+		this.observe(
 			this._sectionContext?.data.pipe(
 				switchMap((section) => {
 					if (!section) return EMPTY;
 
 					return (
 						umbExtensionsRegistry
-							?.extensionsOfType('tree')
+							.extensionsOfType('tree')
 							.pipe(
 								map((trees) =>
 									trees.filter((tree) => tree.meta.sections.includes(section.alias)).map((tree) => tree.alias)
 								)
-							) ?? of([])
+							)
 					);
 				})
 			),

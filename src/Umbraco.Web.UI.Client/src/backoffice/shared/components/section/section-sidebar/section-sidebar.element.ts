@@ -48,11 +48,9 @@ export class UmbSectionSidebarElement extends UmbLitElement {
 	private _observeSectionContext() {
 		if (!this._sectionContext) return;
 
-		this.observe<ManifestSection>(this._sectionContext.data, (section) => {
-			if(section) {
-				this._sectionLabel = section.meta.label || section.name;
-				this._sectionPathname = section.meta.pathname;
-			}
+		this.observe(this._sectionContext.data, (section) => {
+			this._sectionLabel = section.meta.label || section.name;
+			this._sectionPathname = section.meta.pathname;
 		});
 	}
 

@@ -8,7 +8,7 @@ import { repeat } from 'lit/directives/repeat.js';
 import { UmbSectionContext } from '../section/section.context';
 import type { UmbTreeContextBase } from './tree.context';
 import { UmbTreeContextMenuService } from './context-menu/tree-context-menu.service';
-import type { Entity, ManifestSection } from '@umbraco-cms/models';
+import type { Entity } from '@umbraco-cms/models';
 import { UmbTreeDataStore } from '@umbraco-cms/stores/store';
 import { UmbLitElement } from '@umbraco-cms/element';
 
@@ -86,7 +86,7 @@ export class UmbTreeItem extends UmbLitElement {
 	private _observeSection() {
 		if (!this._sectionContext) return;
 
-		this.observe<ManifestSection>(this._sectionContext?.data, (section) => {
+		this.observe(this._sectionContext?.data, (section) => {
 			this._href = this._constructPath(section?.meta.pathname || '', this.treeItem.type, this.treeItem.key);
 		});
 	}
@@ -94,7 +94,7 @@ export class UmbTreeItem extends UmbLitElement {
 	private _observeSelectable() {
 		if (!this._treeContext) return;
 
-		this.observe<boolean>(this._treeContext.selectable, (value) => {
+		this.observe(this._treeContext.selectable, (value) => {
 			this._selectable = value || false;
 		});
 	}
@@ -102,7 +102,7 @@ export class UmbTreeItem extends UmbLitElement {
 	private _observeIsSelected() {
 		if (!this._treeContext) return;
 
-		this.observe<boolean>(
+		this.observe(
 			this._treeContext.selection.pipe(map((keys) => keys?.includes(this.treeItem.key))),
 			(isSelected) => {
 				this._selected = isSelected || false;
@@ -113,7 +113,7 @@ export class UmbTreeItem extends UmbLitElement {
 	private _observeActiveTreeItem() {
 		if (!this._sectionContext) return;
 
-		this.observe<Entity>(this._sectionContext?.activeTreeItem, (treeItem) => {
+		this.observe(this._sectionContext?.activeTreeItem, (treeItem) => {
 			this._isActive = treeItem?.key === this.treeItem.key;
 		});
 	}
@@ -135,8 +135,8 @@ export class UmbTreeItem extends UmbLitElement {
 		this._loading = true;
 
 		// TODO: we should do something about these types, stop having our own version of Entity.
-		this.observe<Entity[]>(this._store.getTreeItemChildren(this.treeItem.key) as Observable<Entity[]>, (childItems) => {
-			this._childItems = childItems || undefined;
+		this.observe(this._store.getTreeItemChildren(this.treeItem.key) as Observable<Entity[]>, (childItems) => {
+			this._childItems = childItems;
 			this._loading = false;
 		});
 	}
