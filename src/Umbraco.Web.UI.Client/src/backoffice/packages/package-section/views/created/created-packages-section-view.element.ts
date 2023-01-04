@@ -5,7 +5,7 @@ import { UmbObserverMixin } from '@umbraco-cms/observable-api';
 import type { ManifestWorkspace } from '@umbraco-cms/models';
 import { createExtensionElement } from '@umbraco-cms/extensions-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
-import { UmbWorkspaceElement } from 'src/backoffice/shared/components/workspace/workspace-element.interface';
+import { UmbEntityWorkspaceElement } from 'src/backoffice/shared/components/workspace/workspace-entity/workspace-entity.interface';
 
 @customElement('umb-created-packages-section-view')
 export class UmbCreatedPackagesSectionViewElement extends UmbObserverMixin(LitElement) {
@@ -36,7 +36,7 @@ export class UmbCreatedPackagesSectionViewElement extends UmbObserverMixin(LitEl
 			routes.push({
 				path: `${workspace.meta.entityType}/:key`,
 				component: () => createExtensionElement(workspace),
-				setup: (component: Promise<UmbWorkspaceElement>, info: IRoutingInfo) => {
+				setup: (component: Promise<UmbEntityWorkspaceElement>, info: IRoutingInfo) => {
 					component.then((el) => {
 						el.entityKey = info.match.params.key;
 					});

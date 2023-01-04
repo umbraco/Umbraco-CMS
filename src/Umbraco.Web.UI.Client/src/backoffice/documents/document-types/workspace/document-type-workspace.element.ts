@@ -8,10 +8,10 @@ import { UmbWorkspaceDocumentTypeContext } from './document-type-workspace.conte
 import type { DocumentTypeDetails } from '@umbraco-cms/models';
 import { UmbModalService } from 'src/core/modal';
 import { UmbLitElement } from 'src/core/element/lit-element.element';
-import { UmbWorkspaceElement } from 'src/backoffice/shared/components/workspace/workspace-element.interface';
+import { UmbEntityWorkspaceElement } from 'src/backoffice/shared/components/workspace/workspace-entity/workspace-entity.interface';
 
 @customElement('umb-document-type-workspace')
-export class UmbDocumentTypeWorkspaceElement extends UmbLitElement implements UmbWorkspaceElement {
+export class UmbDocumentTypeWorkspaceElement extends UmbLitElement implements UmbEntityWorkspaceElement {
 	static styles = [
 		UUITextStyles,
 		css`

@@ -12,10 +12,10 @@ import type { UmbUserStore } from 'src/backoffice/users/users/user.store';
 import 'src/auth/components/input-user/input-user.element';
 import 'src/backoffice/shared/components/input-section/input-section.element';
 import { UmbLitElement } from 'src/core/element/lit-element.element';
-import { UmbWorkspaceElement } from 'src/backoffice/shared/components/workspace/workspace-element.interface';
+import { UmbEntityWorkspaceElement } from 'src/backoffice/shared/components/workspace/workspace-entity/workspace-entity.interface';
 
 @customElement('umb-user-group-workspace')
-export class UmbUserGroupWorkspaceElement extends UmbLitElement implements UmbWorkspaceElement {
+export class UmbUserGroupWorkspaceElement extends UmbLitElement implements UmbEntityWorkspaceElement {
 	static styles = [
 		UUITextStyles,
 		css`
