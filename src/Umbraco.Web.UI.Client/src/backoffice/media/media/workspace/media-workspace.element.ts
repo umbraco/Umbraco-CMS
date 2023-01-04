@@ -5,7 +5,7 @@ import { UmbWorkspaceMediaContext } from './media-workspace.context';
 import { UmbLitElement } from 'src/core/element/lit-element.element';
 
 @customElement('umb-media-workspace')
-export class UmbMediaWorkspaceElement extends UmbLitElement {
+export class UmbMediaWorkspaceElement extends UmbLitElement implements UmbWorkspaceElement {
 	static styles = [
 		UUITextStyles,
 		css`

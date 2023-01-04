@@ -5,7 +5,7 @@ import { UmbWorkspaceDocumentContext } from './document-workspace.context';
 import { UmbLitElement } from 'src/core/element/lit-element.element';
 
 @customElement('umb-document-workspace')
-export class UmbDocumentWorkspaceElement extends UmbLitElement {
+export class UmbDocumentWorkspaceElement extends UmbLitElement implements UmbWorkspaceElement {
 	static styles = [
 		UUITextStyles,
 		css`

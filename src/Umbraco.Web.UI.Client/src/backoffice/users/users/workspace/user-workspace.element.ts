@@ -18,9 +18,10 @@ import 'src/auth/components/input-user-group/input-user-group.element';
 import '../../../shared/property-editors/uis/content-picker/property-editor-ui-content-picker.element';
 import '../../../shared/components/workspace/workspace-entity/workspace-entity.element';
 import { UmbLitElement } from 'src/core/element/lit-element.element';
+import { UmbWorkspaceElement } from 'src/backoffice/shared/components/workspace/workspace-element.interface';
 
 @customElement('umb-user-workspace')
-export class UmbUserWorkspaceElement extends UmbLitElement {
+export class UmbUserWorkspaceElement extends UmbLitElement implements UmbWorkspaceElement {
 	static styles = [
 		UUITextStyles,
 		css`

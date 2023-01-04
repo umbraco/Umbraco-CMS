@@ -12,6 +12,7 @@ import type { ManifestTree, ManifestSectionView, ManifestWorkspace } from '@umbr
 import './section-trees/section-trees.element.ts';
 import './section-views/section-views.element.ts';
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
+import { UmbWorkspaceElement } from '../workspace/workspace-element.interface';
 
 @customElement('umb-section')
 export class UmbSectionElement extends UmbContextConsumerMixin(UmbObserverMixin(LitElement)) {
@@ -96,9 +97,9 @@ export class UmbSectionElement extends UmbContextConsumerMixin(UmbObserverMixin(
 			routes.push({
 				path: `${workspace.meta.entityType}/:key`,
 				component: () => createExtensionElement(workspace),
-				setup: (component: Promise<HTMLElement>, info: IRoutingInfo) => {
-					component.then((el: HTMLElement) => {
-						(el as any).entityKey = info.match.params.key;
+				setup: (component: Promise<UmbWorkspaceElement>, info: IRoutingInfo) => {
+					component.then((el) => {
+						el.entityKey = info.match.params.key;
 					});
 				},
 			});
