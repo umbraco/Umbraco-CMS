@@ -16,7 +16,7 @@ export class UmbInstalledPackagesSectionViewElement extends UmbObserverMixin(Lit
 	constructor() {
 		super();
 
-		this.observe<ManifestWorkspace[]>(umbExtensionsRegistry?.extensionsOfType('workspace'), (workspaceExtensions) => {
+		this.observe(umbExtensionsRegistry?.extensionsOfType('workspace'), (workspaceExtensions) => {
 			this._workspaces = workspaceExtensions;
 			this._createRoutes();
 		});
