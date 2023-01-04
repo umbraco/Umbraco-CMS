@@ -1,4 +1,4 @@
-import { css, html, LitElement } from 'lit';
+import { css, html } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, state } from 'lit/decorators.js';
 import type { UmbSectionViewUsersElement } from '../../section-view-users.element';
@@ -11,16 +11,15 @@ import {
 	UmbTableConfig,
 	UmbTableOrderedEvent,
 } from '../../../../../../shared/components/table/table.element';
-import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 import type { UserDetails, UserGroupDetails, UserGroupEntity } from '@umbraco-cms/models';
-import { UmbObserverMixin } from '@umbraco-cms/observable-api';
 
 import './column-layouts/name/user-table-name-column-layout.element';
 import './column-layouts/status/user-table-status-column-layout.element';
 import { UmbUserGroupStore } from 'src/backoffice/users/user-groups/user-group.store';
+import { UmbLitElement } from '@umbraco-cms/element';
 
 @customElement('umb-workspace-view-users-table')
-export class UmbWorkspaceViewUsersTableElement extends UmbContextConsumerMixin(UmbObserverMixin(LitElement)) {
+export class UmbWorkspaceViewUsersTableElement extends UmbLitElement {
 	static styles = [
 		UUITextStyles,
 		css`
