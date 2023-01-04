@@ -1,5 +1,6 @@
 import { BehaviorSubject, Observable, ReplaySubject } from 'rxjs';
 import { Install, InstallResource, InstallSettings, ProblemDetails, TelemetryLevel } from '@umbraco-cms/backend-api';
+import { tryExecute } from '@umbraco-cms/resources';
 
 /**
  * Context API for the installer
@@ -71,8 +72,8 @@ export class UmbInstallerContext {
 	 * @memberof UmbInstallerContext
 	 */
 	public reset(): void {
-		this._currentStep.next(1);
 		this._installStatus.next(null);
+		this._currentStep.next(1);
 	}
 
 	/**
@@ -96,17 +97,6 @@ export class UmbInstallerContext {
 	}
 
 	/**
-	 * Post the installation data to the API
-	 * @public
-	 * @return {*}
-	 * @memberof UmbInstallerContext
-	 */
-	public requestInstall() {
-		// TODO: The post install will probably return a user in the future, so we have to set that context somewhere to let the client know that it is authenticated
-		return InstallResource.postInstallSetup({ requestBody: this.getData() });
-	}
-
-	/**
 	 * Set the install status
 	 * @public
 	 * @param {(ProblemDetails | null)} status
@@ -121,9 +111,13 @@ export class UmbInstallerContext {
 	 * @private
 	 * @memberof UmbInstallerContext
 	 */
-	private _loadInstallerSettings() {
-		InstallResource.getInstallSettings().then((installSettings) => {
-			this._settings.next(installSettings);
-		});
+	private async _loadInstallerSettings() {
+		const { data, error } = await tryExecute(InstallResource.getInstallSettings());
+		if (data) {
+			this._settings.next(data);
+		} else if (error) {
+			console.error(error.detail, error);
+			this._installStatus.next(error);
+		}
 	}
 }
