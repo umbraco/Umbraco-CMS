@@ -115,7 +115,7 @@ export class UmbModalLayoutPropertyEditorUIPickerElement extends UmbLitElement {
 	private _usePropertyEditorUIs() {
 		if (!this.data) return;
 
-		this.observe<ManifestPropertyEditorUI[]>(
+		this.observe(
 			umbExtensionsRegistry.extensionsOfType('propertyEditorUI'),
 			(propertyEditorUIs) => {
 				this._propertyEditorUIs = propertyEditorUIs;

@@ -113,7 +113,7 @@ export class UmbInstallerDatabaseElement extends UmbLitElement {
 	private _observeInstallerSettings() {
 		if (!this._installerContext) return;
 
-		this.observe<InstallSettings>(this._installerContext.settings, (settings) => {
+		this.observe(this._installerContext.settings, (settings) => {
 			this._databases = settings.databases ?? [];
 
 			// If there is an isConfigured database in the databases array then we can skip the database selection step
@@ -132,7 +132,7 @@ export class UmbInstallerDatabaseElement extends UmbLitElement {
 	private _observeInstallerData() {
 		if (!this._installerContext) return;
 
-		this.observe<Install>(this._installerContext.data, (data) => {
+		this.observe(this._installerContext.data, (data) => {
 			this.databaseFormData = data.database ?? {};
 			this._options.forEach((x, i) => (x.selected = data.database?.id === x.value || i === 0));
 		});

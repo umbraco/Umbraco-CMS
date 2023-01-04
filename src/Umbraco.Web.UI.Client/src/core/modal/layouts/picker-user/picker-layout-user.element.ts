@@ -73,7 +73,7 @@ export class UmbPickerLayoutUserElement extends UmbModalLayoutPickerBase {
 
 	private _observeUsers() {
 		if (!this._userStore) return;
-		this.observe<Array<UserDetails>>(this._userStore.getAll(), (users) => (this._users = users));
+		this.observe(this._userStore.getAll(), (users) => (this._users = users));
 	}
 
 	render() {

@@ -30,7 +30,7 @@ export class UmbInstallerElement extends UmbLitElement {
 	}
 
 	private _observeCurrentStep() {
-		this.observe<number>(this._umbInstallerContext.currentStepChanges(), (step) => {
+		this.observe(this._umbInstallerContext.currentStepChanges(), (step) => {
 			this.step = step;
 		});
 	}

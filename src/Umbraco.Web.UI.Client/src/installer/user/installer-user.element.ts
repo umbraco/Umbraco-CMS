@@ -74,7 +74,7 @@ export class UmbInstallerUserElement extends UmbLitElement {
 	private _observeInstallerData() {
 		if (!this._installerContext) return;
 
-		this.observe<Install>(this._installerContext.data, ({ user }) => {
+		this.observe(this._installerContext.data, ({ user }) => {
 			this._userFormData = {
 				name: user.name,
 				password: user.password,
