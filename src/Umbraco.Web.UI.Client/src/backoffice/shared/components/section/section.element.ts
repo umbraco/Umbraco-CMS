@@ -83,6 +83,7 @@ export class UmbSectionElement extends UmbLitElement {
 	}
 
 	private _createTreeRoutes() {
+		console.log("_createTreeRoutes")
 		const routes: any[] = [
 			{
 				path: 'dashboard',
@@ -136,8 +137,10 @@ export class UmbSectionElement extends UmbLitElement {
 				})
 			),
 			(views) => {
-				this._views = views || undefined;
-				this._createViewRoutes();
+				if(views.length > 0) {
+					this._views = views;
+					this._createViewRoutes();
+				}
 			}
 		);
 	}
