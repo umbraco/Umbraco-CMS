@@ -6,6 +6,10 @@ import { manifest as multiUrlPicker } from './multi-url-picker/manifests';
 import { manifest as overlaySize } from './overlay-size/manifests';
 import { manifest as treePicker } from './tree-picker/manifests';
 import { manifest as treePickerStartNode } from './tree-picker-start-node/manifests';
+import { manifests as textBoxes } from './text-box/manifests';
+import { manifest as dropdown } from './dropdown/manifests';
+import { manifest as multipleTextString } from './multiple-text-string/manifests';
+
 import type { ManifestPropertyEditorUI } from '@umbraco-cms/models';
 
 export const manifests: Array<ManifestPropertyEditorUI> = [
@@ -15,8 +19,11 @@ export const manifests: Array<ManifestPropertyEditorUI> = [
 	eyeDropper,
 	multiUrlPicker,
 	overlaySize,
+	...textBoxes,
 	treePicker,
 	treePickerStartNode,
+	dropdown,
+	multipleTextString,
 	{
 		type: 'propertyEditorUI',
 		alias: 'Umb.PropertyEditorUI.BlockList',
@@ -51,18 +58,6 @@ export const manifests: Array<ManifestPropertyEditorUI> = [
 			icon: 'umb:bulleted-list',
 			group: 'lists',
 			propertyEditorModel: 'Umbraco.CheckBoxList',
-		},
-	},
-	{
-		type: 'propertyEditorUI',
-		alias: 'Umb.PropertyEditorUI.TextBox',
-		name: 'Text Property Editor UI',
-		loader: () => import('./text-box/property-editor-ui-text-box.element'),
-		meta: {
-			label: 'Text',
-			icon: 'umb:edit',
-			group: 'common',
-			propertyEditorModel: 'Umbraco.TextBox',
 		},
 	},
 	{

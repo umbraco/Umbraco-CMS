@@ -5,6 +5,10 @@ import { manifest as json } from './Umbraco.JSON';
 import { manifest as multiUrlPicker } from './Umbraco.MultiUrlPicker';
 import { manifest as multiNodeTreePicker } from './Umbraco.MultiNodeTreePicker';
 import { manifest as dateTime } from './Umbraco.DateTime';
+import { manifest as emailAddress } from './Umbraco.EmailAddress';
+import { manifest as dropdownFlexible } from './Umbraco.Dropdown.Flexible';
+import { manifest as textBox } from './Umbraco.TextBox';
+import { manifest as multipleTextString } from './Umbraco.MultipleTextString';
 
 import type { ManifestPropertyEditorModel } from '@umbraco-cms/models';
 
@@ -13,19 +17,17 @@ export const manifests: Array<ManifestPropertyEditorModel> = [
 	eyeDropper,
 	contentPicker,
 	dateTime,
+	emailAddress,
 	json,
 	multiUrlPicker,
 	multiNodeTreePicker,
+	dropdownFlexible,
+	textBox,
+	multipleTextString,
 	{
 		type: 'propertyEditorModel',
 		name: 'Decimal',
 		alias: 'Umbraco.Decimal',
-		meta: {},
-	},
-	{
-		type: 'propertyEditorModel',
-		name: 'Email address',
-		alias: 'Umbraco.EmailAddress',
 		meta: {},
 	},
 	{
@@ -64,29 +66,6 @@ export const manifests: Array<ManifestPropertyEditorModel> = [
 						label: 'Maximum allowed characters',
 						description: 'If empty - no character limit',
 						propertyEditorUI: 'Umb.PropertyEditorUI.Number',
-					},
-				],
-			},
-		},
-	},
-	{
-		type: 'propertyEditorModel',
-		name: 'Textbox',
-		alias: 'Umbraco.TextBox',
-		meta: {
-			config: {
-				properties: [
-					{
-						alias: 'maxChars',
-						label: 'Maximum allowed characters',
-						description: 'If empty, 512 character limit',
-						propertyEditorUI: 'Umb.PropertyEditorUI.Number',
-					},
-				],
-				defaultData: [
-					{
-						alias: 'maxChars',
-						value: 512,
 					},
 				],
 			},
@@ -148,12 +127,6 @@ export const manifests: Array<ManifestPropertyEditorModel> = [
 	},
 	{
 		type: 'propertyEditorModel',
-		name: 'Dropdown',
-		alias: 'Umbraco.DropDown.Flexible',
-		meta: {},
-	},
-	{
-		type: 'propertyEditorModel',
 		name: 'List view',
 		alias: 'Umbraco.ListView',
 		meta: {},
@@ -162,12 +135,6 @@ export const manifests: Array<ManifestPropertyEditorModel> = [
 		type: 'propertyEditorModel',
 		name: 'Radio button list',
 		alias: 'Umbraco.RadioButtonList',
-		meta: {},
-	},
-	{
-		type: 'propertyEditorModel',
-		name: 'Repeatable textstrings',
-		alias: 'Umbraco.MultipleTextstring',
 		meta: {},
 	},
 	{
