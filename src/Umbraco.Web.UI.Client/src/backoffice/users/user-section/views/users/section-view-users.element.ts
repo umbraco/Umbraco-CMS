@@ -48,6 +48,7 @@ export class UmbSectionViewUsersElement extends UmbLitElement {
 			this._observeUsers();
 		});
 		// TODO: consider this context name, is it to broad?
+		// TODO: Stop using it self as a context api.
 		this.provideContext('umbUsersContext', this);
 
 		this.observe(umbExtensionsRegistry?.extensionsOfType('workspace'), (workspaceExtensions) => {
