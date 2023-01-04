@@ -22,7 +22,7 @@ export class UmbInstallerErrorElement extends UmbLitElement {
 			}
 
 			#error-message {
-				color: var(--uui-color-error, red);
+				color: var(--uui-color-danger, red);
 			}
 		`,
 	];

@@ -33,6 +33,12 @@ export class UmbInstallerElement extends UmbLitElement {
 		this.observe(this._umbInstallerContext.currentStepChanges(), (step) => {
 			this.step = step;
 		});
+
+		this.observe(this._umbInstallerContext.installStatusChanges(), (error) => {
+			if (error) {
+				this.step = 5;
+			}
+		});
 	}
 
 	private _renderSection() {

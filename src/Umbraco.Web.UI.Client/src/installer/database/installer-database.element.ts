@@ -10,7 +10,7 @@ import {
 	ProblemDetails,
 } from '@umbraco-cms/backend-api';
 import { UmbLitElement } from '@umbraco-cms/element';
-import { tryExecuteAndNotify } from '@umbraco-cms/resources';
+import { tryExecute } from '@umbraco-cms/resources';
 
 @customElement('umb-installer-database')
 export class UmbInstallerDatabaseElement extends UmbLitElement {
@@ -201,13 +201,12 @@ export class UmbInstallerDatabaseElement extends UmbLitElement {
 					providerName: selectedDatabase.providerName,
 				};
 
-				const { error } = await tryExecuteAndNotify(
-					this,
+				const { error } = await tryExecute(
 					InstallResource.postInstallValidateDatabase({ requestBody: databaseDetails })
 				);
 
 				if (error) {
-					this._validationErrorMessage = error.detail;
+					this._validationErrorMessage = `The server could not validate the database connection. Details: ${error.detail}`;
 					this._installButton.state = 'failed';
 					return;
 				}
@@ -225,19 +224,19 @@ export class UmbInstallerDatabaseElement extends UmbLitElement {
 				providerName: selectedDatabase.providerName,
 			};
 
-			this._installerContext?.appendData({ database });
+			this._installerContext.appendData({ database });
 		}
 
-		this._installerContext?.nextStep();
+		this._installerContext.nextStep();
 
-		const { data, error } = await tryExecuteAndNotify(
-			this,
-			InstallResource.postInstallSetup({ requestBody: this._installerContext?.getData() })
+		const { error } = await tryExecute(
+			InstallResource.postInstallSetup({ requestBody: this._installerContext.getData() })
 		);
-		if (data) {
-			this._handleFulfilled();
-		} else if (error) {
+
+		if (error) {
 			this._handleRejected(error);
+		} else {
+			this._handleFulfilled();
 		}
 	};
 
@@ -250,7 +249,6 @@ export class UmbInstallerDatabaseElement extends UmbLitElement {
 
 	private _handleRejected(e: ProblemDetails) {
 		this._installerContext?.setInstallStatus(e);
-		this._installerContext?.nextStep();
 	}
 
 	private _onBack() {
