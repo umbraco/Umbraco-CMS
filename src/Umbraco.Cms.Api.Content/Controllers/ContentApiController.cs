@@ -1,20 +1,19 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Common.Builders;
+using Umbraco.Cms.Api.Common.Filters;
 using Umbraco.Cms.Api.Common.ViewModels.Pagination;
-using Umbraco.Cms.Api.Content.Filters;
 using Umbraco.Cms.Api.Content.Routing;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.ContentApi;
 using Umbraco.Cms.Core.Models.ContentApi;
-using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PublishedCache;
-using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Content.Controllers;
 
-[ContentApiJsonConfiguration]
 [VersionedContentApiRoute("query")]
 [ApiVersion("1.0")]
+[JsonOptionsName(Constants.JsonOptionsNames.ContentApi)]
 public class ContentApiController : Controller
 {
     private readonly IPublishedSnapshotAccessor _publishedSnapshotAccessor;
