@@ -51,7 +51,7 @@ module.exports = {
 				// If methods called on *Resource classes are not already wrapped with `await tryExecuteAndNotify()`, then we should suggest to wrap them.
 				CallExpression: function (node) {
 					if (node.callee.type === 'MemberExpression' && node.callee.object.type === 'Identifier' && node.callee.object.name.endsWith('Resource') && node.callee.property.type === 'Identifier' && node.callee.property.name !== 'constructor') {
-						const hasTryExecuteAndNotify = node.parent && node.parent.callee && node.parent.callee.name === 'tryExecuteAndNotify';
+						const hasTryExecuteAndNotify = node.parent && node.parent.callee && (node.parent.callee.name === 'tryExecute' || node.parent.callee.name === 'tryExecuteAndNotify');
 						if (!hasTryExecuteAndNotify) {
 							context.report({
 								node,
