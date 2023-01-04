@@ -56,12 +56,12 @@ export class UmbCollectionSelectionActionsElement extends UmbLitElement {
 		if (!this._collectionContext) return;
 
 		// TODO: Make sure it only updates on length change.
-		this.observe<Array<MediaDetails>>(this._collectionContext.data, (mediaItems) => {
-			this._nodesLength = mediaItems?.length || 0;
+		this.observe(this._collectionContext.data, (mediaItems) => {
+			this._nodesLength = mediaItems.length;
 		});
 
-		this.observe<Array<string>>(this._collectionContext.selection, (selection) => {
-			this._selectionLength = selection?.length || 0;
+		this.observe(this._collectionContext.selection, (selection) => {
+			this._selectionLength = selection.length;
 		});
 	}
 

@@ -16,7 +16,7 @@ export class UmbExtensionRootWorkspaceElement extends UmbLitElement {
 	}
 
 	private _observeExtensions() {
-		this.observe<Array<ManifestTypes>>(umbExtensionsRegistry.extensions, (extensions) => {
+		this.observe(umbExtensionsRegistry.extensions, (extensions) => {
 			this._extensions = extensions || undefined;
 		});
 	}
