@@ -72,16 +72,17 @@ export class UmbTreeElement extends UmbLitElement {
 			(tree => {
 				this._tree = tree;
 				if(tree) {
-					if (this._tree?.alias === tree.alias) return;
+					this._provideTreeContext();
+					this._provideStore();
 				}
-				this._provideTreeContext();
-				this._provideStore();
 			}
 		));
 	}
 
 	private _provideTreeContext() {
 		if (!this._tree || this._treeContext) return;
+
+		// TODO: if a new tree comes around, which is different, then we should clean up and re provide.
 
 		this._treeContext = new UmbTreeContextBase(this._tree);
 		this._treeContext.setSelectable(this.selectable);
