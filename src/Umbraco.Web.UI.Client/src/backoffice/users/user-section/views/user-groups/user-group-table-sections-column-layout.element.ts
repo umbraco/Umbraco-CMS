@@ -1,11 +1,11 @@
-import { html, LitElement } from 'lit';
+import { html } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
-import { UmbObserverMixin } from '@umbraco-cms/observable-api';
 import { UmbTableItem } from 'src/backoffice/shared/components/table';
+import { UmbLitElement } from '@umbraco-cms/element';
 
 @customElement('umb-user-group-table-sections-column-layout')
-export class UmbUserGroupTableSectionsColumnLayoutElement extends UmbObserverMixin(LitElement) {
+export class UmbUserGroupTableSectionsColumnLayoutElement extends UmbLitElement {
 	@property({ type: Object, attribute: false })
 	item!: UmbTableItem;
 
