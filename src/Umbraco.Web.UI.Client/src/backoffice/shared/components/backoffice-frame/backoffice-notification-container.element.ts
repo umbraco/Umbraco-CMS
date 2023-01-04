@@ -39,8 +39,8 @@ export class UmbBackofficeNotificationContainer extends UmbLitElement {
 	private _observeNotifications() {
 		if (!this._notificationService) return;
 
-		this.observe<UmbNotificationHandler[]>(this._notificationService.notifications, (notifications) => {
-			this._notifications = notifications || undefined;
+		this.observe(this._notificationService.notifications, (notifications) => {
+			this._notifications = notifications;
 		});
 	}
 

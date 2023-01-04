@@ -81,7 +81,7 @@ export class UmbExtensionRegistry {
 	extensionsOfType(type: 'headerApp'): Observable<Array<ManifestHeaderApp>>;
 	extensionsOfType(type: 'section'): Observable<Array<ManifestSection>>;
 	extensionsOfType(type: 'sectionView'): Observable<Array<ManifestSectionView>>;
-	extensionsOfType(type: 'tree'): Observable<Array<ManifestTree>>;
+	extensionsOfType<T = ManifestTree>(type: 'tree'): Observable<Array<T>>;
 	extensionsOfType(type: 'workspace'): Observable<Array<ManifestWorkspace>>;
 	extensionsOfType(type: 'treeItemAction'): Observable<Array<ManifestTreeItemAction>>;
 	extensionsOfType(type: 'dashboard'): Observable<Array<ManifestDashboard>>;

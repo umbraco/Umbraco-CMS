@@ -56,6 +56,7 @@ export class UmbPickerUserElement extends UmbObserverMixin(UmbInputListBase) {
 	private _observeUser() {
 		if (!this._userStore) return;
 
+		// TODO: Fix type mismatch:
 		this.observe<Array<UserEntity>>(this._userStore.getByKeys(this.value), (users) => {
 			this._users = users;
 		});

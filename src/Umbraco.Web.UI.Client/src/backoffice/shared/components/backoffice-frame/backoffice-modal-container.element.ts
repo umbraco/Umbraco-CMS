@@ -33,8 +33,8 @@ export class UmbBackofficeModalContainer extends UmbLitElement {
 	private _observeModals() {
 		if (!this._modalService) return;
 
-		this.observe<UmbModalHandler[]>(this._modalService.modals, (modals) => {
-			this._modals = modals || undefined;
+		this.observe(this._modalService.modals, (modals) => {
+			this._modals = modals;
 		});
 	}
 

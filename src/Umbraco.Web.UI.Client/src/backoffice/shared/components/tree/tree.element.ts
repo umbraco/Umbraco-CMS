@@ -7,6 +7,7 @@ import type { ManifestTree } from '@umbraco-cms/models';
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
 import { UmbDataStore } from '@umbraco-cms/stores/store';
 import { UmbLitElement } from '@umbraco-cms/element';
+import { UmbContextProviderController } from 'src/core/context-api/provide/context-provider.controller';
 
 @customElement('umb-tree')
 export class UmbTreeElement extends UmbLitElement {
@@ -54,6 +55,7 @@ export class UmbTreeElement extends UmbLitElement {
 	private _tree?: ManifestTree;
 
 	private _treeContext?: UmbTreeContextBase;
+	private _treeContextProvider?: UmbContextProviderController;
 
 	connectedCallback(): void {
 		super.connectedCallback();
@@ -63,21 +65,19 @@ export class UmbTreeElement extends UmbLitElement {
 	private _observeTree() {
 		if (!this.alias) return;
 
-		this.observe<ManifestTree>(
+		this.observe(
 			umbExtensionsRegistry
 				.extensionsOfType('tree')
 				.pipe(map((trees) => trees.find((tree) => tree.alias === this.alias))),
-			(tree) => {
-				if (this._tree?.alias === tree.alias) return;
-
+			(tree => {
 				this._tree = tree;
-				this._provideTreeContext();
-
-				if (this._tree.meta.storeContextAlias) {
-					this._provideStore();
+				if(tree) {
+					if (this._tree?.alias === tree.alias) return;
 				}
+				this._provideTreeContext();
+				this._provideStore();
 			}
-		);
+		));
 	}
 
 	private _provideTreeContext() {
@@ -86,11 +86,13 @@ export class UmbTreeElement extends UmbLitElement {
 		this._treeContext = new UmbTreeContextBase(this._tree);
 		this._treeContext.setSelectable(this.selectable);
 		this._treeContext.setSelection(this.selection);
-
+		
 		this.provideContext('umbTreeContext', this._treeContext);
 	}
 
 	private _provideStore() {
+		// TODO: Clean up store, if already existing.
+
 		if (!this._tree?.meta.storeContextAlias) return;
 
 		this.consumeContext(this._tree.meta.storeContextAlias, (store: UmbDataStore<unknown>) =>

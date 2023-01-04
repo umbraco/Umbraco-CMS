@@ -18,15 +18,15 @@ export class UmbSectionContext {
 	public readonly data = this._data.asObservable();
 
 	// TODO: what is the best context to put this in?
-	private _activeTree = new ReplaySubject<ManifestTree>(1);
+	private _activeTree = new ReplaySubject<ManifestTree | undefined>(1);
 	public readonly activeTree = this._activeTree.asObservable();
 
 	// TODO: what is the best context to put this in?
-	private _activeTreeItem = new ReplaySubject<Entity>(1);
+	private _activeTreeItem = new ReplaySubject<Entity | undefined>(1);
 	public readonly activeTreeItem = this._activeTreeItem.asObservable();
 
 	// TODO: what is the best context to put this in?
-	private _activeView = new ReplaySubject<ManifestSectionView>(1);
+	private _activeView = new ReplaySubject<ManifestSectionView | undefined>(1);
 	public readonly activeView = this._activeView.asObservable();
 
 	constructor(section: ManifestSection) {
