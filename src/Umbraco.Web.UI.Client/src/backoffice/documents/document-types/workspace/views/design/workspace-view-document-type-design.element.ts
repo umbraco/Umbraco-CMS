@@ -27,7 +27,7 @@ export class UmbWorkspaceViewDocumentTypeDesignElement extends UmbLitElement {
 	private _observeDocumentType() {
 		if (!this._workspaceContext) return;
 
-		this.observe<UmbDocumentTypeStoreItemType>(this._workspaceContext.data.pipe(distinctUntilChanged()), (documentType) => {
+		this.observe(this._workspaceContext.data.pipe(distinctUntilChanged()), (documentType) => {
 			this._documentType = documentType;
 		});
 	}
