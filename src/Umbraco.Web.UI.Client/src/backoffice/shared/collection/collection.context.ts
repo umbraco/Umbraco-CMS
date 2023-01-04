@@ -9,6 +9,7 @@ export class UmbCollectionContext<
 	DataType extends ContentTreeItem,
 	StoreType extends UmbTreeDataStore<DataType> = UmbTreeDataStore<DataType>
 > {
+	
 	private _host: UmbControllerHostInterface;
 	private _entityKey: string | null;
 
