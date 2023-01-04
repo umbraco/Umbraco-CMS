@@ -1,6 +1,9 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
+import type { DataType } from '../models/DataType';
+import type { DataTypeCreateModel } from '../models/DataTypeCreateModel';
+import type { DataTypeUpdateModel } from '../models/DataTypeUpdateModel';
 import type { FolderTreeItem } from '../models/FolderTreeItem';
 import type { PagedFolderTreeItem } from '../models/PagedFolderTreeItem';
 
@@ -9,6 +12,72 @@ import { OpenAPI } from '../core/OpenAPI';
 import { request as __request } from '../core/request';
 
 export class DataTypeResource {
+
+    /**
+     * @returns DataType Success
+     * @throws ApiError
+     */
+    public static postDataType({
+        requestBody,
+    }: {
+        requestBody?: DataTypeCreateModel,
+    }): CancelablePromise<DataType> {
+        return __request(OpenAPI, {
+            method: 'POST',
+            url: '/umbraco/management/api/v1/data-type',
+            body: requestBody,
+            mediaType: 'application/json',
+            errors: {
+                404: `Not Found`,
+            },
+        });
+    }
+
+    /**
+     * @returns DataType Success
+     * @throws ApiError
+     */
+    public static getDataTypeByKey({
+        key,
+    }: {
+        key: string,
+    }): CancelablePromise<DataType> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/umbraco/management/api/v1/data-type/{key}',
+            path: {
+                'key': key,
+            },
+            errors: {
+                404: `Not Found`,
+            },
+        });
+    }
+
+    /**
+     * @returns DataType Success
+     * @throws ApiError
+     */
+    public static putDataTypeByKey({
+        key,
+        requestBody,
+    }: {
+        key: string,
+        requestBody?: DataTypeUpdateModel,
+    }): CancelablePromise<DataType> {
+        return __request(OpenAPI, {
+            method: 'PUT',
+            url: '/umbraco/management/api/v1/data-type/{key}',
+            path: {
+                'key': key,
+            },
+            body: requestBody,
+            mediaType: 'application/json',
+            errors: {
+                404: `Not Found`,
+            },
+        });
+    }
 
     /**
      * @returns PagedFolderTreeItem Success
