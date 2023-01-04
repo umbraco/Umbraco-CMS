@@ -7,9 +7,7 @@ import {
 	ApiError,
 	DatabaseInstall,
 	DatabaseSettings,
-	Install,
 	InstallResource,
-	InstallSettings,
 	ProblemDetails,
 } from '@umbraco-cms/backend-api';
 import { UmbLitElement } from '@umbraco-cms/element';

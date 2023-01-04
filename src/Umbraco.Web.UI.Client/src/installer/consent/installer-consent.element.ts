@@ -3,7 +3,7 @@ import { customElement, state } from 'lit/decorators.js';
 import { unsafeHTML } from 'lit/directives/unsafe-html.js';
 
 import { UmbInstallerContext } from '../installer.context';
-import { ConsentLevel, Install, InstallSettings, Telemetry, TelemetryLevel } from '@umbraco-cms/backend-api';
+import { ConsentLevel, Telemetry, TelemetryLevel } from '@umbraco-cms/backend-api';
 import { UmbLitElement } from '@umbraco-cms/element';
 
 @customElement('umb-installer-consent')
