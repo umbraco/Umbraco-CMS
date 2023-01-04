@@ -4,13 +4,12 @@ import { customElement, state, query, property } from 'lit/decorators.js';
 
 import { UmbModalService } from '../../../../../core/modal';
 
-import { UmbLitElement } from '@umbraco-cms/element';
 import { SearchResult, SearcherResource, Field } from '@umbraco-cms/backend-api';
+import { UmbLitElement } from '@umbraco-cms/element';
 import { tryExecuteAndNotify } from '@umbraco-cms/resources';
 
 import './modal-views/fields-viewer.element';
 import './modal-views/fields-settings.element';
-import { UmbLitElement } from '@umbraco-cms/element';
 
 interface ExposedSearchResultField {
 	name?: string | null;
