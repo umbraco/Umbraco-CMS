@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Mvc.Formatters;
 using Microsoft.Extensions.Logging;
 
-namespace Umbraco.Cms.Api.Management.Json;
+namespace Umbraco.Cms.Api.Common.Json;
 
 public class NamedSystemTextJsonInputFormatter : SystemTextJsonInputFormatter
 {

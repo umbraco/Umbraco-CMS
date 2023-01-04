@@ -1,7 +1,7 @@
 ﻿using System.Text.Json;
 using Microsoft.AspNetCore.Mvc.Formatters;
 
-namespace Umbraco.Cms.Api.Management.Json;
+namespace Umbraco.Cms.Api.Common.Json;
 
 public class NamedSystemTextJsonOutputFormatter : SystemTextJsonOutputFormatter
 {
