@@ -6,7 +6,6 @@ using Umbraco.Cms.Core.Models.ContentApi;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PropertyEditors.ContentApi;
 using Umbraco.Cms.Core.PublishedCache;
-using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Web;
 using Umbraco.Cms.Web.Common.DependencyInjection;
@@ -29,8 +28,9 @@ public class MultiNodeTreePickerValueConverter : PropertyValueConverterBase, ICo
     private readonly IMemberService _memberService;
     private readonly IPublishedSnapshotAccessor _publishedSnapshotAccessor;
     private readonly IUmbracoContextAccessor _umbracoContextAccessor;
-    private readonly IPublishedUrlProvider _publishedUrlProvider;
-    private readonly IContentNameProvider _contentNameProvider;
+    private readonly IApiContentBuilder _apiContentBuilder;
+    private readonly IApiMediaBuilder _apiMediaBuilder;
+    private readonly IOutputExpansionStrategy _outputExpansionStrategy;
 
     [Obsolete("Use constructor that takes all parameters, scheduled for removal in V14")]
     public MultiNodeTreePickerValueConverter(
@@ -41,8 +41,9 @@ public class MultiNodeTreePickerValueConverter : PropertyValueConverterBase, ICo
             publishedSnapshotAccessor,
             umbracoContextAccessor,
             memberService,
-            StaticServiceProvider.Instance.GetRequiredService<IPublishedUrlProvider>(),
-            StaticServiceProvider.Instance.GetRequiredService<IContentNameProvider>())
+            StaticServiceProvider.Instance.GetRequiredService<IApiContentBuilder>(),
+            StaticServiceProvider.Instance.GetRequiredService<IApiMediaBuilder>(),
+            StaticServiceProvider.Instance.GetRequiredService<IOutputExpansionStrategy>())
     {
     }
 
@@ -50,15 +51,17 @@ public class MultiNodeTreePickerValueConverter : PropertyValueConverterBase, ICo
         IPublishedSnapshotAccessor publishedSnapshotAccessor,
         IUmbracoContextAccessor umbracoContextAccessor,
         IMemberService memberService,
-        IPublishedUrlProvider publishedUrlProvider,
-        IContentNameProvider contentNameProvider)
+        IApiContentBuilder apiContentBuilder,
+        IApiMediaBuilder apiMediaBuilder,
+        IOutputExpansionStrategy outputExpansionStrategy)
     {
         _publishedSnapshotAccessor = publishedSnapshotAccessor ??
                                      throw new ArgumentNullException(nameof(publishedSnapshotAccessor));
         _umbracoContextAccessor = umbracoContextAccessor;
         _memberService = memberService;
-        _publishedUrlProvider = publishedUrlProvider;
-        _contentNameProvider = contentNameProvider;
+        _apiContentBuilder = apiContentBuilder;
+        _apiMediaBuilder = apiMediaBuilder;
+        _outputExpansionStrategy = outputExpansionStrategy;
     }
 
     public override bool IsConverter(IPublishedPropertyType propertyType) =>
@@ -182,11 +185,18 @@ public class MultiNodeTreePickerValueConverter : PropertyValueConverterBase, ICo
         return source;
     }
 
-    public Type GetContentApiPropertyValueType(IPublishedPropertyType propertyType) => typeof(IEnumerable<ApiLink>);
+    public Type GetContentApiPropertyValueType(IPublishedPropertyType propertyType)
+        => GetEntityType(propertyType) switch
+        {
+            Constants.UdiEntityType.Media => typeof(IEnumerable<IApiMedia>),
+            Constants.UdiEntityType.Member => typeof(string), // unsupported
+            _ => typeof(IEnumerable<IApiContent>)
+        };
+
 
     public object? ConvertIntermediateToContentApiObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview)
     {
-        IEnumerable<ApiLink> DefaultValue() => Array.Empty<ApiLink>();
+        IEnumerable<IApiContent> DefaultValue() => Array.Empty<IApiContent>();
 
         if (inter is not IEnumerable<Udi> udis)
         {
@@ -194,32 +204,35 @@ public class MultiNodeTreePickerValueConverter : PropertyValueConverterBase, ICo
         }
 
         IPublishedSnapshot publishedSnapshot = _publishedSnapshotAccessor.GetRequiredPublishedSnapshot();
-        IEnumerable<IPublishedContent> items = udis.OfType<GuidUdi>().Select(udi => udi.EntityType switch
+
+        var entityType = GetEntityType(propertyType);
+        GuidUdi[] entityTypeUdis = udis.Where(udi => udi.EntityType == entityType).OfType<GuidUdi>().ToArray();
+        return entityType switch
         {
-            Constants.UdiEntityType.Document => publishedSnapshot.Content?.GetById(udi.Guid),
-            Constants.UdiEntityType.Media => publishedSnapshot.Media?.GetById(udi.Guid),
-            _ => null
-        }).WhereNotNull().ToArray();
-
-        if (items.Any() == false)
-        {
-            return DefaultValue();
-        }
-
-        ApiLink ToLink(IPublishedContent item) =>
-            new ApiLink(
-                item.Url(_publishedUrlProvider, mode: UrlMode.Relative),
-                _contentNameProvider.GetName(item),
-                null,
-                item.Key,
-                item.ContentType.Alias,
-                item.ItemType == PublishedItemType.Media ? LinkType.Media : LinkType.Content);
-
-        return items.Select(ToLink);
+            Constants.UdiEntityType.Document => entityTypeUdis.Select(udi =>
+            {
+                IPublishedContent? content = publishedSnapshot.Content?.GetById(udi.Guid);
+                return content != null
+                    ? _apiContentBuilder.Build(content, _outputExpansionStrategy.ShouldExpand(propertyType))
+                    : null;
+            }).WhereNotNull().ToArray(),
+            Constants.UdiEntityType.Media => entityTypeUdis.Select(udi =>
+            {
+                IPublishedContent? media = publishedSnapshot.Media?.GetById(udi.Guid);
+                return media != null
+                    ? _apiMediaBuilder.Build(media)
+                    : null;
+            }).WhereNotNull().ToArray(),
+            Constants.UdiEntityType.Member => "(unsupported)",
+            _ => DefaultValue()
+        };
     }
 
     private static bool IsSingleNodePicker(IPublishedPropertyType propertyType) =>
         propertyType.DataType.ConfigurationAs<MultiNodePickerConfiguration>()?.MaxNumber == 1;
+
+    private static string GetEntityType(IPublishedPropertyType propertyType) =>
+        propertyType.DataType.ConfigurationAs<MultiNodePickerConfiguration>()?.TreeSource?.ObjectType ?? Constants.UdiEntityType.Document;
 
     /// <summary>
     ///     Attempt to get an IPublishedContent instance based on ID and content type
