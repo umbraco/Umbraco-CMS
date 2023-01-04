@@ -53,7 +53,7 @@ export class UmbInputPickerUserGroupElement extends UmbObserverMixin(UmbInputLis
 
 	private _observeUserGroups() {
 		if (this.value.length > 0 && this._userGroupStore) {
-			this.observe<Array<UserGroupEntity>>(
+			this.observe(
 				this._userGroupStore.getByKeys(this.value),
 				(userGroups) => (this._userGroups = userGroups)
 			);
