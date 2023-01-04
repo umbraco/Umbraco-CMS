@@ -1,5 +1,5 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
-import { css, html, LitElement, nothing } from 'lit';
+import { css, html, nothing } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 
 import { UUIButtonState } from '@umbraco-ui/uui-button';
@@ -8,13 +8,13 @@ import { UmbModalService } from '../../../../../core/modal';
 import { UmbNotificationService } from '../../../../../core/notification';
 import { UmbNotificationDefaultData } from '../../../../../core/notification/layouts/default';
 
-import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 import './section-view-examine-searchers';
 
 import { ApiError, Index, IndexerResource, ProblemDetails } from '@umbraco-cms/backend-api';
+import { UmbLitElement } from 'src/core/element/lit-element.element';
 
 @customElement('umb-dashboard-examine-index')
-export class UmbDashboardExamineIndexElement extends UmbContextConsumerMixin(LitElement) {
+export class UmbDashboardExamineIndexElement extends UmbLitElement {
 	static styles = [
 		UUITextStyles,
 		css`
