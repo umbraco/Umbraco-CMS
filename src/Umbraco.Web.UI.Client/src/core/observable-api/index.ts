@@ -1,1 +1,2 @@
-export * from './observer.mixin';
+export * from './observer.controller';
+export * from './observer';
