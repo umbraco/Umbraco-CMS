@@ -13,7 +13,7 @@ export class UmbCollectionContext<
 	private _entityKey: string | null;
 
 	private _store?: StoreType;
-	protected _dataObserver?: UmbObserverController;
+	protected _dataObserver?: UmbObserverController<DataType[]>;
 
 	private _data: BehaviorSubject<Array<DataType>> = new BehaviorSubject(<Array<DataType>>[]);
 	public readonly data: Observable<Array<DataType>> = this._data.asObservable();

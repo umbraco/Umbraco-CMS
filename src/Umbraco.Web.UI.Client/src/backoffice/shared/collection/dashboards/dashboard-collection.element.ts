@@ -39,14 +39,6 @@ export class UmbDashboardCollectionElement extends UmbLitElement {
 			this._collectionContext = new UmbCollectionContext(this, null, manifestMeta.storeAlias);
 			this.provideContext('umbCollectionContext', this._collectionContext);
 		}
-
-		// TODO: avoid this connection, our own approach on Lit-Controller could be handling this case.
-		this._collectionContext?.connectedCallback();
-	}
-	disconnectedCallback(): void {
-		super.connectedCallback();
-		// TODO: avoid this connection, our own approach on Lit-Controller could be handling this case.
-		this._collectionContext?.disconnectedCallback();
 	}
 
 	render() {
