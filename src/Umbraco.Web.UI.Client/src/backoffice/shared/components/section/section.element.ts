@@ -83,7 +83,6 @@ export class UmbSectionElement extends UmbLitElement {
 	}
 
 	private _createTreeRoutes() {
-		console.log("_createTreeRoutes")
 		const routes: any[] = [
 			{
 				path: 'dashboard',
