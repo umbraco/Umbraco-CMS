@@ -92,7 +92,7 @@
 		"@web/dev-server-import-maps": "^0.0.7",
 		"@web/test-runner": "^0.15.0",
 		"@web/test-runner-playwright": "^0.9.0",
-		"babel-loader": "^9.1.0",
+		"babel-loader": "^9.1.2",
 		"eslint": "^8.31.0",
 		"eslint-config-prettier": "^8.6.0",
 		"eslint-import-resolver-typescript": "^3.5.2",
