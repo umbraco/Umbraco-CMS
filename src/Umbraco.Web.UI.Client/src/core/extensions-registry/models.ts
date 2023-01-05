@@ -59,27 +59,12 @@ export type ManifestTypes =
 	| ManifestCollectionBulkAction
 	| ManifestCollectionView;
 
-export type ManifestStandardTypes =
-	| 'headerApp'
-	| 'section'
-	| 'sectionView'
-	| 'tree'
-	| 'workspace'
-	| 'workspaceAction'
-	| 'workspaceView'
-	| 'workspaceViewCollection'
-	| 'treeItemAction'
-	| 'propertyEditorUI'
-	| 'propertyEditorModel'
-	| 'dashboard'
-	| 'dashboardCollection'
-	| 'userDashboard'
-	| 'propertyAction'
-	| 'packageView'
-	| 'entrypoint'
-	| 'externalLoginProvider'
-	| 'collectionBulkAction'
-	| 'collectionView';
+
+export type ManifestStandardTypes = ManifestTypes['type'];
+
+export type AliasManifestTypeMap = {
+	[Manifest in ManifestTypes as Manifest['type']]: Manifest;
+};
 
 export type ManifestElementType =
 	| ManifestSection
@@ -97,6 +82,8 @@ export type ManifestElementType =
 	| ManifestExternalLoginProvider
 	| ManifestCollectionBulkAction
 	| ManifestCollectionView;
+
+
 
 export interface ManifestBase {
 	type: string;
