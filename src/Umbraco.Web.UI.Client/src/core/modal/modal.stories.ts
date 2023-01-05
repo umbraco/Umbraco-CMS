@@ -1,10 +1,9 @@
 import { Meta, Story } from '@storybook/web-components';
-import { LitElement } from 'lit';
 import { html } from 'lit-html';
 import { customElement, property, state } from 'lit/decorators.js';
 
 import { UmbModalService } from '.';
-import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
+import { UmbLitElement } from '@umbraco-cms/element';
 
 export default {
 	title: 'API/Modals',
@@ -18,7 +17,7 @@ export default {
 } as Meta;
 
 @customElement('story-modal-service-example')
-export class StoryModalServiceExampleElement extends UmbContextConsumerMixin(LitElement) {
+export class StoryModalServiceExampleElement extends UmbLitElement {
 	@property()
 	modalLayout = 'confirm';
 

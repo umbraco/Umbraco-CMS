@@ -1,10 +1,10 @@
 import { Observable, Subscription } from 'rxjs';
 
-export class UmbObserver<T = unknown | null> {
+export class UmbObserver<T> {
 
 	#subscription!: Subscription;
 	
-	constructor(source: Observable<T | null>, callback: (_value: T | null) => void) {
+	constructor(source: Observable<T>, callback: (_value: T) => void) {
 
 		// TODO: can be transferred to something using alias?
 		/*

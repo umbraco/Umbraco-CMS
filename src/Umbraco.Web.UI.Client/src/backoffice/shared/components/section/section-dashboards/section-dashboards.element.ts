@@ -1,12 +1,10 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
-import { css, html, LitElement, nothing } from 'lit';
+import { css, html, nothing } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { IRoutingInfo } from 'router-slot';
 import { first, map } from 'rxjs';
 import { UmbSectionContext } from '../section.context';
-import { UmbObserverMixin } from '@umbraco-cms/observable-api';
 import { createExtensionElement } from '@umbraco-cms/extensions-api';
-import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 import type {
 	ManifestDashboard,
 	ManifestDashboardCollection,
@@ -14,9 +12,10 @@ import type {
 	ManifestWithMeta,
 } from '@umbraco-cms/models';
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
+import { UmbLitElement } from '@umbraco-cms/element';
 
 @customElement('umb-section-dashboards')
-export class UmbSectionDashboardsElement extends UmbContextConsumerMixin(UmbObserverMixin(LitElement)) {
+export class UmbSectionDashboardsElement extends UmbLitElement {
 	static styles = [
 		UUITextStyles,
 		css`
@@ -47,7 +46,7 @@ export class UmbSectionDashboardsElement extends UmbContextConsumerMixin(UmbObse
 	];
 
 	@state()
-	private _dashboards: Array<ManifestDashboard | ManifestDashboardCollection> = [];
+	private _dashboards?: Array<ManifestDashboard | ManifestDashboardCollection>;
 
 	@state()
 	private _currentDashboardPathname = '';
@@ -73,19 +72,21 @@ export class UmbSectionDashboardsElement extends UmbContextConsumerMixin(UmbObse
 	private _observeSectionContext() {
 		if (!this._sectionContext) return;
 
-		this.observe<ManifestSection>(this._sectionContext.data.pipe(first()), (section) => {
-			this._currentSectionAlias = section.alias;
-			this._currentSectionPathname = section.meta.pathname;
-			this._observeDashboards();
+		this.observe(this._sectionContext.data.pipe(first()), (section) => {
+			if(section) {
+				this._currentSectionAlias = section.alias;
+				this._currentSectionPathname = section.meta.pathname;
+				this._observeDashboards();
+			}
 		});
 	}
 
 	private _observeDashboards() {
 		if (!this._currentSectionAlias) return;
 
-		this.observe<ManifestDashboard[]>(
+		this.observe(
 			umbExtensionsRegistry
-				?.extensionsOfTypes(['dashboard', 'dashboardCollection'])
+				?.extensionsOfTypes<(ManifestDashboard | ManifestDashboardCollection)>(['dashboard', 'dashboardCollection'])
 				.pipe(
 					map((extensions) =>
 						extensions.filter((extension) =>
@@ -94,8 +95,7 @@ export class UmbSectionDashboardsElement extends UmbContextConsumerMixin(UmbObse
 					)
 				),
 			(dashboards) => {
-				if (dashboards?.length === 0) return;
-				this._dashboards = dashboards;
+				this._dashboards = dashboards || undefined;
 				this._createRoutes();
 			}
 		);
@@ -104,35 +104,38 @@ export class UmbSectionDashboardsElement extends UmbContextConsumerMixin(UmbObse
 	private _createRoutes() {
 		this._routes = [];
 
-		this._routes = this._dashboards.map((dashboard) => {
-			return {
-				path: `${dashboard.meta.pathname}`,
-				component: () => {
-					if (dashboard.type === 'dashboardCollection') {
-						return import('src/backoffice/shared/collection/dashboards/dashboard-collection.element');
-					}
-					return createExtensionElement(dashboard);
-				},
-				setup: (component: Promise<HTMLElement> | HTMLElement, info: IRoutingInfo) => {
-					this._currentDashboardPathname = info.match.route.path;
-					// When its using import, we get an element, when using createExtensionElement we get a Promise.
-					(component as any).manifest = dashboard;
-					if ((component as any).then) {
-						(component as any).then((el: any) => (el.manifest = dashboard));
-					}
-				},
-			};
-		});
+		if(this._dashboards) {
+			this._routes = this._dashboards.map((dashboard) => {
+				return {
+					path: `${dashboard.meta.pathname}`,
+					component: () => {
+						if (dashboard.type === 'dashboardCollection') {
+							return import('src/backoffice/shared/collection/dashboards/dashboard-collection.element');
+						}
+						return createExtensionElement(dashboard);
+					},
+					setup: (component: Promise<HTMLElement> | HTMLElement, info: IRoutingInfo) => {
+						this._currentDashboardPathname = info.match.route.path;
+						// When its using import, we get an element, when using createExtensionElement we get a Promise.
+						// TODO: this is a bit hacky, can we do it in a more appropriate way
+						(component as any).manifest = dashboard;
+						if ((component as any).then) {
+							(component as any).then((el: any) => (el.manifest = dashboard));
+						}
+					},
+				};
+			});
 
-		this._routes.push({
-			path: '**',
-			redirectTo: this._dashboards?.[0]?.meta.pathname,
-		});
+			this._routes.push({
+				path: '**',
+				redirectTo: this._dashboards?.[0]?.meta.pathname,
+			});
+		}
 	}
 
 	private _renderNavigation() {
 		return html`
-			${this._dashboards?.length > 1
+			${this._dashboards && this._dashboards.length > 1
 				? html`
 						<uui-tab-group id="tabs">
 							${this._dashboards.map(

@@ -1,15 +1,14 @@
-import { html, LitElement } from 'lit';
+import { html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
-import { UmbObserverMixin } from '@umbraco-cms/observable-api';
 import { isManifestElementNameType } from '@umbraco-cms/extensions-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
-import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 import type { ManifestTypes } from '@umbraco-cms/models';
+import { UmbLitElement } from '@umbraco-cms/element';
 
 @customElement('umb-extension-root-workspace')
-export class UmbExtensionRootWorkspaceElement extends UmbContextConsumerMixin(UmbObserverMixin(LitElement)) {
+export class UmbExtensionRootWorkspaceElement extends UmbLitElement {
 	@state()
-	private _extensions: Array<ManifestTypes> = [];
+	private _extensions?: Array<ManifestTypes> = undefined;
 
 	connectedCallback(): void {
 		super.connectedCallback();
@@ -17,8 +16,8 @@ export class UmbExtensionRootWorkspaceElement extends UmbContextConsumerMixin(Um
 	}
 
 	private _observeExtensions() {
-		this.observe<Array<ManifestTypes>>(umbExtensionsRegistry.extensions, (extensions) => {
-			this._extensions = [...extensions];
+		this.observe(umbExtensionsRegistry.extensions, (extensions) => {
+			this._extensions = extensions || undefined;
 		});
 	}
 
@@ -35,7 +34,7 @@ export class UmbExtensionRootWorkspaceElement extends UmbContextConsumerMixin(Um
 							<uui-table-head-cell>Actions</uui-table-head-cell>
 						</uui-table-head>
 
-						${this._extensions.map(
+						${this._extensions?.map(
 							(extension) => html`
 								<uui-table-row>
 									<uui-table-cell>${extension.type}</uui-table-cell>

@@ -1,13 +1,13 @@
-import { html, LitElement } from 'lit';
+import { html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { IRoute, IRoutingInfo } from 'router-slot';
-import { UmbObserverMixin } from '@umbraco-cms/observable-api';
 import type { ManifestWorkspace } from '@umbraco-cms/models';
 import { createExtensionElement } from '@umbraco-cms/extensions-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
+import { UmbLitElement } from '@umbraco-cms/element';
 
 @customElement('umb-created-packages-section-view')
-export class UmbCreatedPackagesSectionViewElement extends UmbObserverMixin(LitElement) {
+export class UmbCreatedPackagesSectionViewElement extends UmbLitElement {
 	@state()
 	private _routes: IRoute[] = [];
 
@@ -16,7 +16,7 @@ export class UmbCreatedPackagesSectionViewElement extends UmbObserverMixin(LitEl
 	constructor() {
 		super();
 
-		this.observe<ManifestWorkspace[]>(umbExtensionsRegistry?.extensionsOfType('workspace'), (workspaceExtensions) => {
+		this.observe(umbExtensionsRegistry?.extensionsOfType('workspace'), (workspaceExtensions) => {
 			this._workspaces = workspaceExtensions;
 			this._createRoutes();
 		});

@@ -7,7 +7,7 @@ import { UmbDocumentTypeStoreItemType } from '../document-type.store';
 import { UmbWorkspaceDocumentTypeContext } from './document-type-workspace.context';
 import type { DocumentTypeDetails } from '@umbraco-cms/models';
 import { UmbModalService } from 'src/core/modal';
-import { UmbLitElement } from 'src/core/element/lit-element.element';
+import { UmbLitElement } from '@umbraco-cms/element';
 
 @customElement('umb-document-type-workspace')
 export class UmbDocumentTypeWorkspaceElement extends UmbLitElement {
@@ -59,7 +59,7 @@ export class UmbDocumentTypeWorkspaceElement extends UmbLitElement {
 	private _workspaceContext?: UmbWorkspaceDocumentTypeContext;
 
 	@state()
-	private _documentType?: DocumentTypeDetails | null;
+	private _documentType?: DocumentTypeDetails;
 
 	private _modalService?: UmbModalService;
 
@@ -82,9 +82,9 @@ export class UmbDocumentTypeWorkspaceElement extends UmbLitElement {
 	private async _observeWorkspace() {
 		if (!this._workspaceContext) return;
 
-		this.observe<UmbDocumentTypeStoreItemType>(this._workspaceContext.data.pipe(distinctUntilChanged()), (data) => {
+		this.observe(this._workspaceContext.data.pipe(distinctUntilChanged()), (data) => {
 			// TODO: make method to identify if data is of type DocumentTypeDetails
-			this._documentType = (data as DocumentTypeDetails | null);
+			this._documentType = (data as DocumentTypeDetails);
 		});
 	}
 

@@ -1,4 +1,4 @@
-import { html, LitElement, nothing } from 'lit';
+import { html, nothing } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { firstValueFrom, map } from 'rxjs';
 
@@ -6,11 +6,11 @@ import type { UmbModalService } from '../../../../../core/modal';
 import { createExtensionElement } from '@umbraco-cms/extensions-api';
 
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
-import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 import type { ManifestPackageView } from '@umbraco-cms/models';
+import { UmbLitElement } from '@umbraco-cms/element';
 
 @customElement('umb-packages-installed-item')
-export class UmbPackagesInstalledItem extends UmbContextConsumerMixin(LitElement) {
+export class UmbPackagesInstalledItem extends UmbLitElement {
 	@property({ type: Object })
 	package!: any; // TODO: Use real type
 

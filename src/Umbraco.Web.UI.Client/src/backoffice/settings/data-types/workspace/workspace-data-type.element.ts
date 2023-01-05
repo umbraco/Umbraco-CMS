@@ -3,10 +3,8 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { distinctUntilChanged } from 'rxjs';
-import type { UmbDataTypeStoreItemType } from '../data-type.store';
 import { UmbWorkspaceDataTypeContext } from './workspace-data-type.context';
-import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
-import { UmbLitElement } from 'src/core/element/lit-element.element';
+import { UmbLitElement } from '@umbraco-cms/element';
 
 /**
  *  @element umb-workspace-data-type
@@ -62,7 +60,7 @@ export class UmbWorkspaceDataTypeElement extends UmbLitElement {
 	private _observeWorkspace() {
 		if (!this._workspaceContext) return;
 
-		this.observe<UmbDataTypeStoreItemType>(this._workspaceContext.data.pipe(distinctUntilChanged()), (dataType) => {
+		this.observe(this._workspaceContext.data.pipe(distinctUntilChanged()), (dataType) => {
 			if (dataType && dataType.name !== this._dataTypeName) {
 				this._dataTypeName = dataType.name ?? '';
 			}

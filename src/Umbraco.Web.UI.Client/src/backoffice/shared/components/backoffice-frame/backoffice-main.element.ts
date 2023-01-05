@@ -1,18 +1,17 @@
 import { defineElement } from '@umbraco-ui/uui-base/lib/registration';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
-import { css, html, LitElement } from 'lit';
+import { css, html } from 'lit';
 import { state } from 'lit/decorators.js';
 import { IRoutingInfo } from 'router-slot';
 import { UmbSectionStore } from '../section/section.store';
 import { UmbSectionContext } from '../section/section.context';
-import { UmbObserverMixin } from '@umbraco-cms/observable-api';
 import { createExtensionElement } from '@umbraco-cms/extensions-api';
-import { UmbContextConsumerMixin, UmbContextProviderMixin } from '@umbraco-cms/context-api';
 import type { ManifestSection } from '@umbraco-cms/models';
 import { UmbSectionElement } from 'src/backoffice/shared/components/section/section.element';
+import { UmbLitElement } from '@umbraco-cms/element';
 
 @defineElement('umb-backoffice-main')
-export class UmbBackofficeMain extends UmbContextProviderMixin(UmbContextConsumerMixin(UmbObserverMixin(LitElement))) {
+export class UmbBackofficeMain extends UmbLitElement {
 	static styles = [
 		UUITextStyles,
 		css`
@@ -51,7 +50,7 @@ export class UmbBackofficeMain extends UmbContextProviderMixin(UmbContextConsume
 	private async _observeSections() {
 		if (!this._sectionStore) return;
 
-		this.observe<ManifestSection[]>(this._sectionStore?.getAllowed(), (sections) => {
+		this.observe(this._sectionStore.getAllowed(), (sections) => {
 			this._sections = sections;
 			if (!sections) return;
 			this._createRoutes();

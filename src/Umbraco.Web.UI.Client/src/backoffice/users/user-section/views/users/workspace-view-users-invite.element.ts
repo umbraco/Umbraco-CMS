@@ -2,14 +2,13 @@ import { css, html, nothing } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, query, state } from 'lit/decorators.js';
 import { UmbInputPickerUserGroupElement } from 'src/auth/components/input-user-group/input-user-group.element';
-import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 import type { UserDetails } from '@umbraco-cms/models';
 import { UmbModalLayoutElement } from 'src/core/modal';
 import { UmbUserStore } from 'src/backoffice/users/users/user.store';
 
 export type UsersViewType = 'list' | 'grid';
 @customElement('umb-workspace-view-users-invite')
-export class UmbWorkspaceViewUsersInviteElement extends UmbContextConsumerMixin(UmbModalLayoutElement) {
+export class UmbWorkspaceViewUsersInviteElement extends UmbModalLayoutElement {
 	static styles = [
 		UUITextStyles,
 		css`
