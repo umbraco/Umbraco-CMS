@@ -11,7 +11,7 @@ const tree: ManifestTree = {
 		label: 'Member Groups',
 		icon: 'umb:folder',
 		sections: ['Umb.Section.Members'],
-		storeContextAlias: 'umbMemberGroupStore',
+		storeAlias: 'umbMemberGroupStore',
 	},
 };
 

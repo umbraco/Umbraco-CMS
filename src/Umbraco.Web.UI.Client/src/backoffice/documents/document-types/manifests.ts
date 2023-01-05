@@ -10,7 +10,7 @@ const tree: ManifestTree = {
 		label: 'Document Types',
 		icon: 'umb:folder',
 		sections: ['Umb.Section.Settings'],
-		storeContextAlias: 'umbDocumentTypeStore',
+		storeAlias: 'umbDocumentTypeStore',
 	},
 };
 

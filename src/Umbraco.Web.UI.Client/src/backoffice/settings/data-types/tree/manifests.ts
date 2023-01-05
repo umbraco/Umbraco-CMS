@@ -9,7 +9,7 @@ const tree: ManifestTree = {
 		label: 'Data Types',
 		icon: 'umb:folder',
 		sections: ['Umb.Section.Settings'],
-		storeContextAlias: 'umbDataTypeStore',
+		storeAlias: 'umbDataTypeStore',
 	},
 };
 
