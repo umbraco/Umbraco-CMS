@@ -2,7 +2,7 @@ import { css, html } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement } from 'lit/decorators.js';
 import { ifDefined } from 'lit-html/directives/if-defined.js';
-import type { UmbWorkspaceNodeContext } from '../../../workspace-context/workspace-node.context';
+import type { UmbWorkspaceContentContext } from '../../workspace-content.context';
 import { UmbCollectionContext } from 'src/backoffice/shared/collection/collection.context';
 import { UmbMediaStore, UmbMediaStoreItemType } from 'src/backoffice/media/media/media.store';
 
@@ -22,7 +22,7 @@ export class UmbWorkspaceViewCollectionElement extends UmbLitElement {
 		`,
 	];
 
-	private _workspaceContext?: UmbWorkspaceNodeContext;
+	private _workspaceContext?: UmbWorkspaceContentContext;
 
 	private _collectionContext?: UmbCollectionContext<UmbMediaStoreItemType, UmbMediaStore>;
 

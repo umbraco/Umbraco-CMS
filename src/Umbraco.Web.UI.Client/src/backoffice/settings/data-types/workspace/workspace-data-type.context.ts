@@ -1,4 +1,4 @@
-import { UmbWorkspaceNodeContext } from '../../../shared/components/workspace/workspace-context/workspace-node.context';
+import { UmbWorkspaceContentContext } from '../../../shared/components/workspace/workspace-content/workspace-content.context';
 import type { UmbDataTypeStore, UmbDataTypeStoreItemType } from 'src/backoffice/settings/data-types/data-type.store';
 import type { DataTypeDetails } from '@umbraco-cms/models';
 import { UmbControllerHostInterface } from 'src/core/controller/controller-host.mixin';
@@ -15,7 +15,7 @@ const DefaultDataTypeData = {
 	data: [],
 } as UmbDataTypeStoreItemType;
 
-export class UmbWorkspaceDataTypeContext extends UmbWorkspaceNodeContext<UmbDataTypeStoreItemType, UmbDataTypeStore> {
+export class UmbWorkspaceDataTypeContext extends UmbWorkspaceContentContext<UmbDataTypeStoreItemType, UmbDataTypeStore> {
 	constructor(host: UmbControllerHostInterface, entityKey: string) {
 		super(host, DefaultDataTypeData, 'umbDataTypeStore', entityKey, 'dataType');
 	}

@@ -2,7 +2,7 @@ import { nothing } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { map } from 'rxjs';
 import { repeat } from 'lit/directives/repeat.js';
-import { ManifestTypes, umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
+import { ManifestBase, ManifestTypes, umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
 import { createExtensionElement } from '@umbraco-cms/extensions-api';
 import { isManifestElementableType } from 'src/core/extensions-api/is-manifest-elementable-type.function';
 import { UmbLitElement } from '@umbraco-cms/element';
@@ -27,17 +27,8 @@ export class UmbExtensionSlotElement extends UmbLitElement {
     public type= "";
 
 	@property({ type: Object, attribute: false })
-    public filter: (manifest:ManifestTypes) => boolean = () => true;
-
-    constructor() {
-        super();
-
-		/*
-		this.extensionManager = new ExtensionManager(this, (x) => {x.meta.entityType === this.entityType}, (extensionManifests) => {
-			this._createElement(extensionManifests[0]);
-		});
-		*/
-	}
+    public filter: (manifest: any) => boolean = () => true;
+    
 
     connectedCallback(): void {
         super.connectedCallback();

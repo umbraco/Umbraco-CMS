@@ -3,6 +3,7 @@ import { css, html, nothing } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { map, switchMap, EMPTY, of } from 'rxjs';
 import { IRoutingInfo } from 'router-slot';
+import type { UmbWorkspaceEntityElement } from '../workspace/workspace-entity-element.interface';
 import { UmbSectionContext } from './section.context';
 import { createExtensionElement } from '@umbraco-cms/extensions-api';
 import type { ManifestTree, ManifestSectionView, ManifestWorkspace } from '@umbraco-cms/models';
@@ -95,9 +96,9 @@ export class UmbSectionElement extends UmbLitElement {
 			routes.push({
 				path: `${workspace.meta.entityType}/:key`,
 				component: () => createExtensionElement(workspace),
-				setup: (component: Promise<HTMLElement>, info: IRoutingInfo) => {
-					component.then((el: HTMLElement) => {
-						(el as any).entityKey = info.match.params.key;
+				setup: (component: Promise<UmbWorkspaceEntityElement>, info: IRoutingInfo) => {
+					component.then((el) => {
+						el.entityKey = info.match.params.key;
 					});
 				},
 			});

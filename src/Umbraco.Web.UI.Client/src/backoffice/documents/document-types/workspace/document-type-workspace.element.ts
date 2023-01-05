@@ -3,14 +3,14 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { distinctUntilChanged } from 'rxjs';
-import { UmbDocumentTypeStoreItemType } from '../document-type.store';
 import { UmbWorkspaceDocumentTypeContext } from './document-type-workspace.context';
 import type { DocumentTypeDetails } from '@umbraco-cms/models';
 import { UmbModalService } from 'src/core/modal';
 import { UmbLitElement } from '@umbraco-cms/element';
+import type { UmbWorkspaceEntityElement } from 'src/backoffice/shared/components/workspace/workspace-entity-element.interface';
 
 @customElement('umb-document-type-workspace')
-export class UmbDocumentTypeWorkspaceElement extends UmbLitElement {
+export class UmbDocumentTypeWorkspaceElement extends UmbLitElement implements UmbWorkspaceEntityElement {
 	static styles = [
 		UUITextStyles,
 		css`
@@ -111,7 +111,7 @@ export class UmbDocumentTypeWorkspaceElement extends UmbLitElement {
 
 	render() {
 		return html`
-			<umb-workspace-entity alias="Umb.Workspace.DocumentType">
+			<umb-workspace-layout alias="Umb.Workspace.DocumentType">
 				<div id="header" slot="header">
 					<uui-button id="icon" @click=${this._handleIconClick} compact>
 						<uui-icon
@@ -125,7 +125,7 @@ export class UmbDocumentTypeWorkspaceElement extends UmbLitElement {
 				</div>
 
 				<div slot="footer">Keyboard Shortcuts</div>
-			</umb-workspace-entity>
+			</umb-workspace-layout>
 		`;
 	}
 }

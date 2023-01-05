@@ -2,7 +2,7 @@ import { css, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import type { UUIButtonState } from '@umbraco-ui/uui';
-import type { UmbWorkspaceNodeContext } from '../../workspace-context/workspace-node.context';
+import type { UmbWorkspaceContentContext } from '../../workspace-content/workspace-content.context';
 import { UmbLitElement } from '@umbraco-cms/element';
 import type { ManifestWorkspaceAction } from '@umbraco-cms/models';
 
@@ -14,7 +14,7 @@ export class UmbWorkspaceActionNodeSaveElement extends UmbLitElement {
 	@state()
 	private _saveButtonState?: UUIButtonState;
 
-	private _workspaceContext?: UmbWorkspaceNodeContext;
+	private _workspaceContext?: UmbWorkspaceContentContext;
 
 	public manifest?: ManifestWorkspaceAction;
 

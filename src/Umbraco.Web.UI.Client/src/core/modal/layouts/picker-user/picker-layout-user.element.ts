@@ -78,7 +78,7 @@ export class UmbPickerLayoutUserElement extends UmbModalLayoutPickerBase {
 
 	render() {
 		return html`
-			<umb-workspace-entity headline="Select users">
+			<umb-workspace-layout headline="Select users">
 				<uui-box>
 					<uui-input label="search"></uui-input>
 					<hr />
@@ -100,7 +100,7 @@ export class UmbPickerLayoutUserElement extends UmbModalLayoutPickerBase {
 					<uui-button label="Close" @click=${this._close}></uui-button>
 					<uui-button label="Submit" look="primary" color="positive" @click=${this._submit}></uui-button>
 				</div>
-			</umb-workspace-entity>
+			</umb-workspace-layout>
 		`;
 	}
 }
