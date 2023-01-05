@@ -137,12 +137,12 @@ export class UmbEntityPropertyElement extends UmbLitElement {
 		this.propertyEditorUIObserver?.destroy();
 		this.propertyEditorUIObserver = new UmbObserverController(this, umbExtensionsRegistry.getByAlias(this.propertyEditorUIAlias), (manifest) => {
 			if (manifest?.type === 'propertyEditorUI') {
-				this._gotData(manifest);
+				this._gotEditor(manifest);
 			}
 		});
 	}
 
-	private _gotData(propertyEditorUIManifest?: ManifestPropertyEditorUI) {
+	private _gotEditor(propertyEditorUIManifest?: ManifestPropertyEditorUI) {
 		if (!propertyEditorUIManifest) {
 			// TODO: if dataTypeKey didn't exist in store, we should do some nice UI.
 			return;
