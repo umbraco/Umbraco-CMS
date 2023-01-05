@@ -1,11 +1,13 @@
 import { manifest as ColorPicker } from './color-picker/manifests';
 import { manifest as ContentPicker } from './content-picker/manifests';
+import { manifest as EyeDropper } from './eye-dropper/manifests';
 import { manifest as TreePicker } from './tree-picker/manifests';
 import type { ManifestPropertyEditorUI } from '@umbraco-cms/models';
 
 export const manifests: Array<ManifestPropertyEditorUI> = [
 	ColorPicker,
 	ContentPicker,
+	EyeDropper,
 	TreePicker,
 	{
 		type: 'propertyEditorUI',
