@@ -8,7 +8,7 @@ import {
 	UmbCurrentUserHistoryItem,
 } from 'src/backoffice/users/current-user/current-user-history.store';
 import { UmbCurrentUserStore } from 'src/backoffice/users/current-user/current-user.store';
-import { UmbLitElement } from 'src/core/element/lit-element.element';
+import { UmbLitElement } from '@umbraco-cms/element';
 
 @customElement('umb-modal-layout-current-user')
 export class UmbModalLayoutCurrentUserElement extends UmbLitElement {
@@ -78,7 +78,7 @@ export class UmbModalLayoutCurrentUserElement extends UmbLitElement {
 	modalHandler?: UmbModalHandler;
 
 	@state()
-	private _currentUser?: UserDetails | null;
+	private _currentUser?: UserDetails;
 
 	@state()
 	private _history: Array<UmbCurrentUserHistoryItem> = [];
@@ -102,16 +102,14 @@ export class UmbModalLayoutCurrentUserElement extends UmbLitElement {
 	private async _observeCurrentUser() {
 		if (!this._currentUserStore) return;
 
-		this.observe<UserDetails>(this._currentUserStore.currentUser, (currentUser) => {
+		this.observe(this._currentUserStore.currentUser, (currentUser) => {
 			this._currentUser = currentUser;
 		});
 	}
 	private async _observeHistory() {
 		if (this._currentUserHistoryStore) {
-			this.observe<Array<UmbCurrentUserHistoryItem>>(this._currentUserHistoryStore.getLatestHistory(), (history) => {
-				if(history) {
-					this._history = history;
-				}
+			this.observe(this._currentUserHistoryStore.getLatestHistory(), (history) => {
+				this._history = history;
 			});
 		}
 	}

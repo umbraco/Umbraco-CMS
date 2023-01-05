@@ -3,13 +3,13 @@ import '../context-api/provide/context-provider.element';
 import './layouts/default';
 
 import { Meta, Story } from '@storybook/web-components';
-import { html, LitElement } from 'lit';
+import { html } from 'lit';
 import { customElement } from 'lit/decorators.js';
-
-import { UmbContextConsumerMixin } from '../context-api';
 
 import type { UmbNotificationDefaultData } from './layouts/default';
 import { UmbNotificationColor, UmbNotificationOptions, UmbNotificationService } from '.';
+import { UmbLitElement } from '@umbraco-cms/element';
+
 export default {
 	title: 'API/Notifications/Overview',
 	component: 'ucp-notification-layout-default',
@@ -22,7 +22,7 @@ export default {
 } as Meta;
 
 @customElement('story-notification-default-example')
-export class StoryNotificationDefaultExampleElement extends UmbContextConsumerMixin(LitElement) {
+export class StoryNotificationDefaultExampleElement extends UmbLitElement {
 	private _notificationService?: UmbNotificationService;
 
 	connectedCallback(): void {

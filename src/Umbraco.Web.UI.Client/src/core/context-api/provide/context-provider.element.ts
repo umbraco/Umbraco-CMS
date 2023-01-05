@@ -1,10 +1,9 @@
-import { html, LitElement } from 'lit';
+import { html } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
-
-import { UmbContextProviderMixin } from './context-provider.mixin';
+import { UmbLitElement } from '@umbraco-cms/element';
 
 @customElement('umb-context-provider')
-export class UmbContextProviderElement extends UmbContextProviderMixin(LitElement) {
+export class UmbContextProviderElement extends UmbLitElement {
 	/**
 	 * The value to provide to the context.
 	 * @required

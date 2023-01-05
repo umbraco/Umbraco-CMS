@@ -3,12 +3,11 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { distinctUntilChanged } from 'rxjs';
-import { UmbDocumentTypeStoreItemType } from '../document-type.store';
 import { UmbWorkspaceDocumentTypeContext } from './document-type-workspace.context';
 import type { DocumentTypeDetails } from '@umbraco-cms/models';
 import { UmbModalService } from 'src/core/modal';
-import { UmbLitElement } from 'src/core/element/lit-element.element';
-import { UmbWorkspaceEntityElement } from 'src/backoffice/shared/components/workspace-entity-element.interface';
+import { UmbLitElement } from '@umbraco-cms/element';
+import type { UmbWorkspaceEntityElement } from 'src/backoffice/shared/components/workspace-entity-element.interface';
 
 @customElement('umb-document-type-workspace')
 export class UmbDocumentTypeWorkspaceElement extends UmbLitElement implements UmbWorkspaceEntityElement {
@@ -60,7 +59,7 @@ export class UmbDocumentTypeWorkspaceElement extends UmbLitElement implements Um
 	private _workspaceContext?: UmbWorkspaceDocumentTypeContext;
 
 	@state()
-	private _documentType?: DocumentTypeDetails | null;
+	private _documentType?: DocumentTypeDetails;
 
 	private _modalService?: UmbModalService;
 
@@ -83,9 +82,9 @@ export class UmbDocumentTypeWorkspaceElement extends UmbLitElement implements Um
 	private async _observeWorkspace() {
 		if (!this._workspaceContext) return;
 
-		this.observe<UmbDocumentTypeStoreItemType>(this._workspaceContext.data.pipe(distinctUntilChanged()), (data) => {
+		this.observe(this._workspaceContext.data.pipe(distinctUntilChanged()), (data) => {
 			// TODO: make method to identify if data is of type DocumentTypeDetails
-			this._documentType = (data as DocumentTypeDetails | null);
+			this._documentType = (data as DocumentTypeDetails);
 		});
 	}
 

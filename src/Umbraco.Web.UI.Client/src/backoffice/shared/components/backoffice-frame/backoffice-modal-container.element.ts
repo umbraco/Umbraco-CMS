@@ -1,13 +1,12 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
-import { css, CSSResultGroup, html, LitElement } from 'lit';
+import { css, CSSResultGroup, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { repeat } from 'lit/directives/repeat.js';
 import { UmbModalHandler, UmbModalService } from '../../../../core/modal';
-import { UmbObserverMixin } from '@umbraco-cms/observable-api';
-import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
+import { UmbLitElement } from '@umbraco-cms/element';
 
 @customElement('umb-backoffice-modal-container')
-export class UmbBackofficeModalContainer extends UmbContextConsumerMixin(UmbObserverMixin(LitElement)) {
+export class UmbBackofficeModalContainer extends UmbLitElement {
 	static styles: CSSResultGroup = [
 		UUITextStyles,
 		css`
@@ -18,7 +17,7 @@ export class UmbBackofficeModalContainer extends UmbContextConsumerMixin(UmbObse
 	];
 
 	@state()
-	private _modals: UmbModalHandler[] = [];
+	private _modals?: UmbModalHandler[];
 
 	private _modalService?: UmbModalService;
 
@@ -34,7 +33,7 @@ export class UmbBackofficeModalContainer extends UmbContextConsumerMixin(UmbObse
 	private _observeModals() {
 		if (!this._modalService) return;
 
-		this.observe<UmbModalHandler[]>(this._modalService.modals, (modals) => {
+		this.observe(this._modalService.modals, (modals) => {
 			this._modals = modals;
 		});
 	}
@@ -42,7 +41,7 @@ export class UmbBackofficeModalContainer extends UmbContextConsumerMixin(UmbObse
 	render() {
 		return html`
 			<uui-modal-container>
-				${repeat(this._modals, (modalHandler) => html`${modalHandler.element}`)}
+				${this._modals ? repeat(this._modals, (modalHandler) => html`${modalHandler.element}`) : ''}
 			</uui-modal-container>
 		`;
 	}

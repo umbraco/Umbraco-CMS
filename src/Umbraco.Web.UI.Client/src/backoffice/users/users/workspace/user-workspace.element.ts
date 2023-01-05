@@ -17,11 +17,11 @@ import { UmbModalService } from 'src/core/modal';
 import 'src/auth/components/input-user-group/input-user-group.element';
 import '../../../shared/property-editors/uis/content-picker/property-editor-ui-content-picker.element';
 import '../../../shared/components/workspace/workspace-layout/workspace-layout.element';
-import { UmbLitElement } from 'src/core/element/lit-element.element';
-import { UmbWorkspaceEntityElement } from 'src/backoffice/shared/components/workspace-entity-element.interface';
+import { UmbLitElement } from '@umbraco-cms/element';
+import type { UmbWorkspaceEntityElement } from 'src/backoffice/shared/components/workspace-entity-element.interface';
 
 @customElement('umb-user-workspace')
-export class UmbUserWorkspaceElement extends UmbLitElement implements UmbWorkspaceEntityElement {
+export class UmbUserWorkspaceElement extends UmbLitElement implements UmbWorkspaceEntityElement{
 	static styles = [
 		UUITextStyles,
 		css`
@@ -82,7 +82,7 @@ export class UmbUserWorkspaceElement extends UmbLitElement implements UmbWorkspa
 	];
 
 	@state()
-	private _currentUser?: UserDetails | null;
+	private _currentUser?: UserDetails;
 
 	private _currentUserStore?: UmbCurrentUserStore;
 	private _modalService?: UmbModalService;
@@ -102,7 +102,7 @@ export class UmbUserWorkspaceElement extends UmbLitElement implements UmbWorkspa
 	private _workspaceContext?: UmbWorkspaceUserContext;
 
 	@state()
-	private _user?: UserDetails | null;
+	private _user?: UserDetails;
 
 	@state()
 	private _userName = '';
@@ -128,7 +128,7 @@ export class UmbUserWorkspaceElement extends UmbLitElement implements UmbWorkspa
 		if (!this._currentUserStore) return;
 
 		// TODO: do not have static current user service, we need to make a ContextAPI for this.
-		this.observe<UserDetails>(this._currentUserStore.currentUser, (currentUser) => {
+		this.observe(this._currentUserStore.currentUser, (currentUser) => {
 			this._currentUser = currentUser;
 		});
 	}
@@ -136,8 +136,7 @@ export class UmbUserWorkspaceElement extends UmbLitElement implements UmbWorkspa
 	private async _observeUser() {
 		if (!this._workspaceContext) return;
 
-		this.observe<UserDetails>(this._workspaceContext.data.pipe(distinctUntilChanged()), (user) => {
-			if (!user) return;
+		this.observe(this._workspaceContext.data.pipe(distinctUntilChanged()), (user) => {
 			this._user = user;
 			if (user.name !== this._userName) {
 				this._userName = user.name;

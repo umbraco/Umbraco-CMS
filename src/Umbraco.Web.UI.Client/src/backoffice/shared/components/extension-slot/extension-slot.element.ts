@@ -1,11 +1,11 @@
-import { LitElement, nothing } from 'lit';
+import { nothing } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { map } from 'rxjs';
 import { repeat } from 'lit/directives/repeat.js';
 import { ManifestTypes, umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
-import { UmbObserverMixin } from '@umbraco-cms/observable-api';
-import { createExtensionElement, isManifestElementNameType } from '@umbraco-cms/extensions-api';
+import { createExtensionElement } from '@umbraco-cms/extensions-api';
 import { isManifestElementableType } from 'src/core/extensions-api/is-manifest-elementable-type.function';
+import { UmbLitElement } from '@umbraco-cms/element';
 
 type InitializedExtensionItem = {alias: string, weight: number, component: HTMLElement|null}
 
@@ -15,10 +15,10 @@ type InitializedExtensionItem = {alias: string, weight: number, component: HTMLE
  * @slot default - slot for inserting additional things into this slot.
  * @export
  * @class UmbExtensionSlot
- * @extends {UmbObserverMixin(LitElement)}
+ * @extends {UmbLitElement}
  */
 @customElement('umb-extension-slot')
-export class UmbExtensionSlotElement extends UmbObserverMixin(LitElement) {
+export class UmbExtensionSlotElement extends UmbLitElement {
 
     @state()
     private _extensions:InitializedExtensionItem[] = [];

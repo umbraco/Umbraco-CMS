@@ -1,11 +1,9 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
-import { css, html, LitElement, nothing } from 'lit';
+import { css, html, nothing } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { UUIInputElement, UUIInputEvent } from '@umbraco-ui/uui';
 import { distinctUntilChanged } from 'rxjs';
 import type { UmbWorkspaceNodeContext } from '../workspace-context/workspace-node.context';
-import { UmbObserverMixin } from '@umbraco-cms/observable-api';
-import { UmbContextConsumerMixin, UmbContextProviderMixin } from '@umbraco-cms/context-api';
 import type { DocumentDetails, MediaDetails } from '@umbraco-cms/models';
 
 import '../workspace-layout/workspace-layout.element';
@@ -15,13 +13,12 @@ import '../workspace-layout/workspace-layout.element';
 import './views/edit/workspace-view-content-edit.element';
 import './views/info/workspace-view-content-info.element';
 import type { UmbNodeStoreBase } from '@umbraco-cms/stores/store';
+import { UmbLitElement } from '@umbraco-cms/element';
 
 type ContentTypeTypes = DocumentDetails | MediaDetails;
 
 @customElement('umb-workspace-content')
-export class UmbWorkspaceContentElement extends UmbContextProviderMixin(
-	UmbContextConsumerMixin(UmbObserverMixin(LitElement))
-) {
+export class UmbWorkspaceContentElement extends UmbLitElement {
 	static styles = [
 		UUITextStyles,
 		css`
@@ -88,7 +85,7 @@ export class UmbWorkspaceContentElement extends UmbContextProviderMixin(
 	private async _observeWorkspace() {
 		if (!this._workspaceContext) return;
 
-		this.observe<ContentTypeTypes>(this._workspaceContext.data.pipe(distinctUntilChanged()), (data) => {
+		this.observe(this._workspaceContext.data.pipe(distinctUntilChanged()), (data) => {
 			this._content = data;
 		});
 	}

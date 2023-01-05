@@ -1,12 +1,11 @@
-import { html, LitElement } from 'lit';
+import { html } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
-import type { ManifestSection } from '@umbraco-cms/models';
-import { UmbObserverMixin } from '@umbraco-cms/observable-api';
 import { UmbTableItem } from 'src/backoffice/shared/components/table';
+import { UmbLitElement } from '@umbraco-cms/element';
 
 @customElement('umb-user-group-table-sections-column-layout')
-export class UmbUserGroupTableSectionsColumnLayoutElement extends UmbObserverMixin(LitElement) {
+export class UmbUserGroupTableSectionsColumnLayoutElement extends UmbLitElement {
 	@property({ type: Object, attribute: false })
 	item!: UmbTableItem;
 
@@ -23,7 +22,7 @@ export class UmbUserGroupTableSectionsColumnLayoutElement extends UmbObserverMix
 	}
 
 	private observeSectionNames() {
-		this.observe<Array<ManifestSection>>(umbExtensionsRegistry.extensionsOfType('section'), (sections) => {
+		this.observe(umbExtensionsRegistry.extensionsOfType('section'), (sections) => {
 			this._sectionsNames = sections.filter((x) => this.value.includes(x.alias)).map((x) => x.meta.label || x.name);
 		});
 	}

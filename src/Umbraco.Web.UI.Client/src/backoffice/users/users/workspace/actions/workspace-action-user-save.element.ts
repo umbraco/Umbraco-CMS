@@ -1,12 +1,12 @@
-import { css, html, LitElement } from 'lit';
+import { css, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import type { UUIButtonState } from '@umbraco-ui/uui';
 import { UmbWorkspaceUserContext } from '../user-workspace.context';
-import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
+import { UmbLitElement } from '@umbraco-cms/element';
 
 @customElement('umb-workspace-action-user-save')
-export class UmbWorkspaceActionUserSaveElement extends UmbContextConsumerMixin(LitElement) {
+export class UmbWorkspaceActionUserSaveElement extends UmbLitElement {
 	static styles = [UUITextStyles, css``];
 
 	@state()

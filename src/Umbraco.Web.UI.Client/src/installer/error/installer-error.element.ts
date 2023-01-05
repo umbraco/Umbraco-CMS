@@ -1,14 +1,12 @@
-import { css, CSSResultGroup, html, LitElement, nothing } from 'lit';
+import { css, CSSResultGroup, html, nothing } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 
 import { UmbInstallerContext } from '../installer.context';
 import { ProblemDetails } from '@umbraco-cms/backend-api';
-import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
-import { UmbObserverMixin } from '@umbraco-cms/observable-api';
-
+import { UmbLitElement } from '@umbraco-cms/element';
 
 @customElement('umb-installer-error')
-export class UmbInstallerErrorElement extends UmbContextConsumerMixin(UmbObserverMixin(LitElement)) {
+export class UmbInstallerErrorElement extends UmbLitElement {
 	static styles: CSSResultGroup = [
 		css`
 			:host,
@@ -23,7 +21,7 @@ export class UmbInstallerErrorElement extends UmbContextConsumerMixin(UmbObserve
 			}
 
 			#error-message {
-				color: var(--uui-color-danger, red);
+				color: var(--uui-color-danger, #d42054);
 			}
 		`,
 	];

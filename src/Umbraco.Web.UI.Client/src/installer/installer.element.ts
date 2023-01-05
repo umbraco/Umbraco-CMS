@@ -31,9 +31,7 @@ export class UmbInstallerElement extends UmbLitElement {
 
 	private _observeCurrentStep() {
 		this.observe(this._umbInstallerContext.currentStepChanges(), (step) => {
-			if (step) {
-				this.step = step;
-			}
+			this.step = step;
 		});
 
 		this.observe(this._umbInstallerContext.installStatusChanges(), (error) => {

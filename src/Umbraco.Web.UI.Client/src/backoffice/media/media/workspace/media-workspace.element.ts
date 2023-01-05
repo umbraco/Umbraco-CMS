@@ -2,11 +2,10 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { UmbWorkspaceMediaContext } from './media-workspace.context';
-import { UmbLitElement } from 'src/core/element/lit-element.element';
-import { UmbWorkspaceEntityElement } from 'src/backoffice/shared/components/workspace-entity-element.interface';
+import { UmbLitElement } from '@umbraco-cms/element';
 
 @customElement('umb-media-workspace')
-export class UmbMediaWorkspaceElement extends UmbLitElement implements UmbWorkspaceEntityElement {
+export class UmbMediaWorkspaceElement extends UmbLitElement {
 	static styles = [
 		UUITextStyles,
 		css`
