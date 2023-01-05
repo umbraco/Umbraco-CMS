@@ -11,7 +11,7 @@ import type { UmbUserStore } from 'src/backoffice/users/users/user.store';
 
 import 'src/auth/components/input-user/input-user.element';
 import 'src/backoffice/shared/components/input-section/input-section.element';
-import { UmbLitElement } from 'src/core/element/lit-element.element';
+import { UmbLitElement } from '@umbraco-cms/element';
 
 @customElement('umb-user-group-workspace')
 export class UmbUserGroupWorkspaceElement extends UmbLitElement {
@@ -248,8 +248,7 @@ export class UmbUserGroupWorkspaceElement extends UmbLitElement {
 	private _observeUserGroup() {
 		if (!this._workspaceContext) return;
 
-		this.observe<UserGroupDetails>(this._workspaceContext.data.pipe(distinctUntilChanged()), (userGroup) => {
-			if (!this._userGroup) return;
+		this.observe(this._workspaceContext.data.pipe(distinctUntilChanged()), (userGroup) => {
 			this._userGroup = userGroup;
 		});
 	}
@@ -259,9 +258,9 @@ export class UmbUserGroupWorkspaceElement extends UmbLitElement {
 
 		// TODO: Create method to only get users from this userGroup
 		// TODO: Find a better way to only call this once at the start
-		this.observe<Array<UserDetails>>(this._userStore.getAll(), (users) => {
+		this.observe(this._userStore.getAll(), (users) => {
 			// TODO: handle if there is no users.
-			if (!this._userKeys && users && users.length > 0) {
+			if (!this._userKeys && users.length > 0) {
 				this._userKeys = users.filter((user) => user.userGroups.includes(this.entityKey)).map((user) => user.key);
 				this._updateProperty('users', this._userKeys);
 			}

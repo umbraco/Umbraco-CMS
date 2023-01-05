@@ -1,14 +1,13 @@
-import { css, CSSResultGroup, html, LitElement } from 'lit';
+import { css, CSSResultGroup, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { unsafeHTML } from 'lit/directives/unsafe-html.js';
 
 import { UmbInstallerContext } from '../installer.context';
-import { UmbObserverMixin } from '@umbraco-cms/observable-api';
-import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
-import { ConsentLevel, Install, InstallSettings, Telemetry, TelemetryLevel } from '@umbraco-cms/backend-api';
+import { ConsentLevel, Telemetry, TelemetryLevel } from '@umbraco-cms/backend-api';
+import { UmbLitElement } from '@umbraco-cms/element';
 
 @customElement('umb-installer-consent')
-export class UmbInstallerConsentElement extends UmbContextConsumerMixin(UmbObserverMixin(LitElement)) {
+export class UmbInstallerConsentElement extends UmbLitElement {
 	static styles: CSSResultGroup = [
 		css`
 			:host,
@@ -66,7 +65,7 @@ export class UmbInstallerConsentElement extends UmbContextConsumerMixin(UmbObser
 	private _observeInstallerSettings() {
 		if (!this._installerContext) return;
 
-		this.observe<InstallSettings>(this._installerContext.settings, (settings) => {
+		this.observe(this._installerContext.settings, (settings) => {
 			this._telemetryLevels = settings.user?.consentLevels ?? [];
 		});
 	}
@@ -74,7 +73,7 @@ export class UmbInstallerConsentElement extends UmbContextConsumerMixin(UmbObser
 	private _observeInstallerData() {
 		if (!this._installerContext) return;
 
-		this.observe<Install>(this._installerContext.data, (data) => {
+		this.observe(this._installerContext.data, (data) => {
 			this._telemetryFormData = data.telemetryLevel;
 		});
 	}

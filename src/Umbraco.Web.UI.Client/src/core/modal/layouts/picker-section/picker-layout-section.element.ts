@@ -2,13 +2,11 @@ import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { UmbModalLayoutPickerBase } from '../modal-layout-picker-base';
-import { UmbObserverMixin } from '@umbraco-cms/observable-api';
-import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
 import type { ManifestSection } from '@umbraco-cms/models';
 
 @customElement('umb-picker-layout-section')
-export class UmbPickerLayoutSectionElement extends UmbContextConsumerMixin(UmbObserverMixin(UmbModalLayoutPickerBase)) {
+export class UmbPickerLayoutSectionElement extends UmbModalLayoutPickerBase {
 	static styles = [
 		UUITextStyles,
 		css`

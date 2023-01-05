@@ -1,16 +1,13 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
-import { css, CSSResultGroup, html, LitElement } from 'lit';
+import { css, CSSResultGroup, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { when } from 'lit/directives/when.js';
 import { UmbSectionStore } from '../section/section.store';
-import { UmbObserverMixin } from '@umbraco-cms/observable-api';
-import { UmbContextConsumerMixin, UmbContextProviderMixin } from '@umbraco-cms/context-api';
 import type { ManifestSection } from '@umbraco-cms/models';
+import { UmbLitElement } from '@umbraco-cms/element';
 
 @customElement('umb-backoffice-header-sections')
-export class UmbBackofficeHeaderSections extends UmbContextProviderMixin(
-	UmbContextConsumerMixin(UmbObserverMixin(LitElement))
-) {
+export class UmbBackofficeHeaderSections extends UmbLitElement {
 	static styles: CSSResultGroup = [
 		UUITextStyles,
 		css`
@@ -90,7 +87,7 @@ export class UmbBackofficeHeaderSections extends UmbContextProviderMixin(
 	private _observeSections() {
 		if (!this._sectionStore) return;
 
-		this.observe<ManifestSection[]>(this._sectionStore?.getAllowed(), (allowedSections) => {
+		this.observe(this._sectionStore.getAllowed(), (allowedSections) => {
 			this._sections = allowedSections;
 			this._visibleSections = this._sections;
 		});
@@ -99,7 +96,7 @@ export class UmbBackofficeHeaderSections extends UmbContextProviderMixin(
 	private _observeCurrentSection() {
 		if (!this._sectionStore) return;
 
-		this.observe<string>(this._sectionStore.currentAlias, (currentSectionAlias) => {
+		this.observe(this._sectionStore.currentAlias, (currentSectionAlias) => {
 			this._currentSectionAlias = currentSectionAlias;
 		});
 	}

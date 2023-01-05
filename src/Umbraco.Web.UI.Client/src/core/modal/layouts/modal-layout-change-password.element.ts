@@ -1,16 +1,15 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
-import { css, CSSResultGroup, html, LitElement, nothing } from 'lit';
+import { css, CSSResultGroup, html, nothing } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { UmbModalHandler } from '..';
-import { UmbObserverMixin } from '@umbraco-cms/observable-api';
-import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
+import { UmbLitElement } from '@umbraco-cms/element';
 
 export interface UmbModalChangePasswordData {
 	requireOldPassword: boolean;
 }
 
 @customElement('umb-modal-layout-change-password')
-export class UmbModalLayoutChangePasswordElement extends UmbContextConsumerMixin(UmbObserverMixin(LitElement)) {
+export class UmbModalLayoutChangePasswordElement extends UmbLitElement {
 	static styles: CSSResultGroup = [
 		UUITextStyles,
 		css`

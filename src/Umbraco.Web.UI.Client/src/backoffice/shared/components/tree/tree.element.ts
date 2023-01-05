@@ -1,16 +1,16 @@
-import { html, LitElement } from 'lit';
+import { html } from 'lit';
 import { when } from 'lit-html/directives/when.js';
 import { customElement, property, state } from 'lit/decorators.js';
 import { map } from 'rxjs';
 import { UmbTreeContextBase } from './tree.context';
-import { UmbObserverMixin } from '@umbraco-cms/observable-api';
-import { UmbContextConsumerMixin, UmbContextProviderMixin } from '@umbraco-cms/context-api';
 import type { ManifestTree } from '@umbraco-cms/models';
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
 import { UmbDataStore } from '@umbraco-cms/stores/store';
+import { UmbLitElement } from '@umbraco-cms/element';
+import { UmbContextProviderController } from 'src/core/context-api/provide/context-provider.controller';
 
 @customElement('umb-tree')
-export class UmbTreeElement extends UmbContextProviderMixin(UmbContextConsumerMixin(UmbObserverMixin(LitElement))) {
+export class UmbTreeElement extends UmbLitElement {
 	private _alias = '';
 	@property({ type: String, reflect: true })
 	get alias() {
@@ -55,6 +55,7 @@ export class UmbTreeElement extends UmbContextProviderMixin(UmbContextConsumerMi
 	private _tree?: ManifestTree;
 
 	private _treeContext?: UmbTreeContextBase;
+	private _treeContextProvider?: UmbContextProviderController;
 
 	connectedCallback(): void {
 		super.connectedCallback();
@@ -64,34 +65,35 @@ export class UmbTreeElement extends UmbContextProviderMixin(UmbContextConsumerMi
 	private _observeTree() {
 		if (!this.alias) return;
 
-		this.observe<ManifestTree>(
+		this.observe(
 			umbExtensionsRegistry
 				.extensionsOfType('tree')
 				.pipe(map((trees) => trees.find((tree) => tree.alias === this.alias))),
-			(tree) => {
-				if (this._tree?.alias === tree.alias) return;
-
+			(tree => {
 				this._tree = tree;
-				this._provideTreeContext();
-
-				if (this._tree.meta.storeContextAlias) {
+				if(tree) {
+					this._provideTreeContext();
 					this._provideStore();
 				}
 			}
-		);
+		));
 	}
 
 	private _provideTreeContext() {
 		if (!this._tree || this._treeContext) return;
 
+		// TODO: if a new tree comes around, which is different, then we should clean up and re provide.
+
 		this._treeContext = new UmbTreeContextBase(this._tree);
 		this._treeContext.setSelectable(this.selectable);
 		this._treeContext.setSelection(this.selection);
-
+		
 		this.provideContext('umbTreeContext', this._treeContext);
 	}
 
 	private _provideStore() {
+		// TODO: Clean up store, if already existing.
+
 		if (!this._tree?.meta.storeContextAlias) return;
 
 		this.consumeContext(this._tree.meta.storeContextAlias, (store: UmbDataStore<unknown>) =>

@@ -4,8 +4,8 @@ import { customElement, state, query, property } from 'lit/decorators.js';
 
 import { UmbModalService } from '../../../../../core/modal';
 
-import { UmbLitElement } from '@umbraco-cms/element';
 import { SearchResult, SearcherResource, Field } from '@umbraco-cms/backend-api';
+import { UmbLitElement } from '@umbraco-cms/element';
 import { tryExecuteAndNotify } from '@umbraco-cms/resources';
 
 import './modal-views/fields-viewer.element';
@@ -120,12 +120,13 @@ export class UmbDashboardExamineSearcherElement extends UmbLitElement {
 
 	constructor() {
 		super();
-		this.consumeAllContexts(['umbModalService'], (instances) => {
-			this._modalService = instances['umbModalService'];
+		this.consumeContext('umbModalService', (instance) => {
+			this._modalService = instance;
 		});
 	}
 
 	private _onNameClick() {
+		// TODO: 
 		alert('TODO: Open workspace for ' + this.searcherName);
 	}
 
