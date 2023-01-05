@@ -1,9 +1,8 @@
 import { BehaviorSubject, map, Observable } from 'rxjs';
 import type {
 	ManifestTypes,
-	AliasManifestTypeMap as ManifestTypeMap,
-	ManifestBase,
-	ManifestCustom,
+	ManifestTypeMap,
+	ManifestBase
 } from '../../models';
 import { hasDefaultExport } from '../has-default-export.function';
 import { loadExtension } from '../load-extension.function';

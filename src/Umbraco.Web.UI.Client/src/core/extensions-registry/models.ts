@@ -61,7 +61,7 @@ export type ManifestTypes =
 
 export type ManifestStandardTypes = ManifestTypes['type'];
 
-export type AliasManifestTypeMap = {
+export type ManifestTypeMap = {
 	[Manifest in ManifestTypes as Manifest['type']]: Manifest;
 };
 
