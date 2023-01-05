@@ -7,7 +7,7 @@ import { UmbWorkspaceDocumentTypeContext } from './document-type-workspace.conte
 import type { DocumentTypeDetails } from '@umbraco-cms/models';
 import { UmbModalService } from 'src/core/modal';
 import { UmbLitElement } from '@umbraco-cms/element';
-import type { UmbWorkspaceEntityElement } from 'src/backoffice/shared/components/workspace-entity-element.interface';
+import type { UmbWorkspaceEntityElement } from 'src/backoffice/shared/components/workspace/workspace-entity-element.interface';
 
 @customElement('umb-document-type-workspace')
 export class UmbDocumentTypeWorkspaceElement extends UmbLitElement implements UmbWorkspaceEntityElement {

@@ -12,7 +12,7 @@ import type { UmbUserStore } from 'src/backoffice/users/users/user.store';
 import 'src/auth/components/input-user/input-user.element';
 import 'src/backoffice/shared/components/input-section/input-section.element';
 import { UmbLitElement } from '@umbraco-cms/element';
-import { UmbWorkspaceEntityElement } from 'src/backoffice/shared/components/workspace-entity-element.interface';
+import { UmbWorkspaceEntityElement } from 'src/backoffice/shared/components/workspace/workspace-entity-element.interface';
 
 @customElement('umb-user-group-workspace')
 export class UmbUserGroupWorkspaceElement extends UmbLitElement implements UmbWorkspaceEntityElement {

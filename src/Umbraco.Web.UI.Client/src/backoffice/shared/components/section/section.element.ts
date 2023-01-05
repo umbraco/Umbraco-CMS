@@ -3,7 +3,7 @@ import { css, html, nothing } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { map, switchMap, EMPTY, of } from 'rxjs';
 import { IRoutingInfo } from 'router-slot';
-import type { UmbWorkspaceEntityElement } from '../workspace-entity-element.interface';
+import type { UmbWorkspaceEntityElement } from '../workspace/workspace-entity-element.interface';
 import { UmbSectionContext } from './section.context';
 import { createExtensionElement } from '@umbraco-cms/extensions-api';
 import type { ManifestTree, ManifestSectionView, ManifestWorkspace } from '@umbraco-cms/models';

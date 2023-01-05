@@ -18,7 +18,7 @@ import 'src/auth/components/input-user-group/input-user-group.element';
 import '../../../shared/property-editors/uis/content-picker/property-editor-ui-content-picker.element';
 import '../../../shared/components/workspace/workspace-layout/workspace-layout.element';
 import { UmbLitElement } from '@umbraco-cms/element';
-import type { UmbWorkspaceEntityElement } from 'src/backoffice/shared/components/workspace-entity-element.interface';
+import type { UmbWorkspaceEntityElement } from 'src/backoffice/shared/components/workspace/workspace-entity-element.interface';
 
 @customElement('umb-user-workspace')
 export class UmbUserWorkspaceElement extends UmbLitElement implements UmbWorkspaceEntityElement{
