@@ -2,8 +2,8 @@ import { rest } from 'msw';
 
 import { umbracoPath } from '@umbraco-cms/utils';
 
-type ManifestsResponse = Record<string, any>
-type ManifestsPackagesInstalledResponse = ManifestsResponse
+type ManifestsResponse = Record<string, any>;
+type ManifestsPackagesInstalledResponse = ManifestsResponse;
 
 export const manifestDevelopmentHandler = rest.get(umbracoPath('/manifests'), (_req, res, ctx) => {
 	return res(
@@ -33,7 +33,7 @@ export const manifestDevelopmentHandler = rest.get(umbracoPath('/manifests'), (_
 						label: 'My Custom Property',
 						icon: 'document',
 						group: 'Common',
-						propertyEditor: 'Umbraco.Custom',
+						propertyEditorModel: 'Umbraco.JSON',
 					},
 				},
 				{

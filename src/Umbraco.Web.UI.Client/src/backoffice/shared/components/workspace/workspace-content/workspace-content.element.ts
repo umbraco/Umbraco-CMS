@@ -3,10 +3,10 @@ import { css, html, nothing } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { UUIInputElement, UUIInputEvent } from '@umbraco-ui/uui';
 import { distinctUntilChanged } from 'rxjs';
-import type { UmbWorkspaceNodeContext } from '../workspace-context/workspace-node.context';
+import type { UmbWorkspaceContentContext } from './workspace-content.context';
 import type { DocumentDetails, MediaDetails } from '@umbraco-cms/models';
 
-import '../workspace-entity/workspace-entity.element';
+import '../workspace-layout/workspace-layout.element';
 
 // Lazy load
 // TODO: Make this dynamic, use load-extensions method to loop over extensions for this node.
@@ -17,6 +17,12 @@ import { UmbLitElement } from '@umbraco-cms/element';
 
 type ContentTypeTypes = DocumentDetails | MediaDetails;
 
+/**
+ * TODO: IMPORTANT TODO: Get rid of the content workspace. Instead we aim to get separate components that can be composed by each workspace.
+ * Example. Document Workspace would use a Variant-component(variant component would talk directly to the workspace-context)
+ * As well breadcrumbs etc.
+ * 
+ */
 @customElement('umb-workspace-content')
 export class UmbWorkspaceContentElement extends UmbLitElement {
 	static styles = [
@@ -69,7 +75,7 @@ export class UmbWorkspaceContentElement extends UmbLitElement {
 	@state()
 	_content?: ContentTypeTypes;
 
-	private _workspaceContext?: UmbWorkspaceNodeContext<ContentTypeTypes, UmbNodeStoreBase<ContentTypeTypes>>;
+	private _workspaceContext?: UmbWorkspaceContentContext<ContentTypeTypes, UmbNodeStoreBase<ContentTypeTypes>>;
 
 	constructor() {
 		super();
@@ -150,7 +156,7 @@ export class UmbWorkspaceContentElement extends UmbLitElement {
 
 	render() {
 		return html`
-			<umb-workspace-entity alias=${this.alias}>
+			<umb-workspace-layout alias=${this.alias}>
 				<div id="header" slot="header">
 					<uui-input id="name-input" .value=${this._content?.name} @input="${this._handleInput}">
 						<!-- Implement Variant Selector -->
@@ -184,7 +190,7 @@ export class UmbWorkspaceContentElement extends UmbLitElement {
 				</div>
 
 				<div id="footer" slot="footer">Breadcrumbs</div>
-			</umb-workspace-entity>
+			</umb-workspace-layout>
 		`;
 	}
 }

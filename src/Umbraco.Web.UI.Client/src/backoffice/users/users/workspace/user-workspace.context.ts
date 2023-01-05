@@ -1,4 +1,4 @@
-import { UmbWorkspaceNodeContext } from '../../../shared/components/workspace/workspace-context/workspace-node.context';
+import { UmbWorkspaceContentContext } from '../../../shared/components/workspace/workspace-content/workspace-content.context';
 import type { UmbUserStore, UmbUserStoreItemType } from 'src/backoffice/users/users/user.store';
 import { UmbControllerHostInterface } from 'src/core/controller/controller-host.mixin';
 
@@ -20,7 +20,7 @@ const DefaultDataTypeData = {
 	mediaStartNodes: [],
 } as UmbUserStoreItemType;
 
-export class UmbWorkspaceUserContext extends UmbWorkspaceNodeContext<UmbUserStoreItemType, UmbUserStore> {
+export class UmbWorkspaceUserContext extends UmbWorkspaceContentContext<UmbUserStoreItemType, UmbUserStore> {
 	constructor(host: UmbControllerHostInterface, entityKey: string) {
 		super(host, DefaultDataTypeData, 'umbUserStore', entityKey, 'user');
 	}

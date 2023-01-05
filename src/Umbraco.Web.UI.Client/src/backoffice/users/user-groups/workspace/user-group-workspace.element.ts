@@ -5,16 +5,18 @@ import { customElement, property, state } from 'lit/decorators.js';
 import { repeat } from 'lit/directives/repeat.js';
 import { distinctUntilChanged } from 'rxjs';
 import { UmbWorkspaceUserGroupContext } from './user-group-workspace.context';
-import type { ManifestWorkspaceAction, UserDetails, UserGroupDetails } from '@umbraco-cms/models';
+import type { ManifestWorkspaceAction, UserGroupDetails } from '@umbraco-cms/models';
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
 import type { UmbUserStore } from 'src/backoffice/users/users/user.store';
 
 import 'src/auth/components/input-user/input-user.element';
 import 'src/backoffice/shared/components/input-section/input-section.element';
 import { UmbLitElement } from '@umbraco-cms/element';
+import { UmbWorkspaceEntityElement } from 'src/backoffice/shared/components/workspace/workspace-entity-element.interface';
 
 @customElement('umb-user-group-workspace')
-export class UmbUserGroupWorkspaceElement extends UmbLitElement {
+export class UmbUserGroupWorkspaceElement extends UmbLitElement implements UmbWorkspaceEntityElement {
+
 	static styles = [
 		UUITextStyles,
 		css`
@@ -385,13 +387,13 @@ export class UmbUserGroupWorkspaceElement extends UmbLitElement {
 		if (!this._userGroup) return nothing;
 
 		return html`
-			<umb-workspace-entity alias="Umb.Workspace.UserGroup">
+			<umb-workspace-layout alias="Umb.Workspace.UserGroup">
 				<uui-input id="name" slot="header" .value=${this._userGroup.name} @input="${this._handleInput}"></uui-input>
 				<div id="main">
 					<div id="left-column">${this.renderLeftColumn()}</div>
 					<div id="right-column">${this.renderRightColumn()}</div>
 				</div>
-			</umb-workspace-entity>
+			</umb-workspace-layout>
 		`;
 	}
 }

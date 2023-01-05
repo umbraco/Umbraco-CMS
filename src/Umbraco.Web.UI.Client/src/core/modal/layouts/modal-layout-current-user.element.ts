@@ -19,7 +19,7 @@ export class UmbModalLayoutCurrentUserElement extends UmbLitElement {
 				display: block;
 			}
 			:host,
-			umb-workspace-entity {
+			umb-workspace-layout {
 				width: 100%;
 				height: 100%;
 			}
@@ -159,7 +159,7 @@ export class UmbModalLayoutCurrentUserElement extends UmbLitElement {
 
 	render() {
 		return html`
-			<umb-workspace-entity headline="${this._currentUser?.name || ''}">
+			<umb-workspace-layout headline="${this._currentUser?.name || ''}">
 				<div id="main">
 					<uui-box>
 						<b slot="headline">Your profile</b>
@@ -184,7 +184,7 @@ export class UmbModalLayoutCurrentUserElement extends UmbLitElement {
 					<uui-button @click=${this._close} look="secondary">Close</uui-button>
 					<uui-button @click=${this._logout} look="primary" color="danger">Logout</uui-button>
 				</div>
-			</umb-workspace-entity>
+			</umb-workspace-layout>
 		`;
 	}
 }

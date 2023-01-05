@@ -1,24 +1,15 @@
+import { manifest as colorPicker } from './Umbraco.ColorPicker';
+import { manifest as eyeDropper } from './Umbraco.ColorPicker.EyeDropper';
+import { manifest as contentPicker } from './Umbraco.ContentPicker';
+import { manifest as json } from './Umbraco.JSON';
+
 import type { ManifestPropertyEditorModel } from '@umbraco-cms/models';
 
 export const manifests: Array<ManifestPropertyEditorModel> = [
-	{
-		type: 'propertyEditorModel',
-		name: 'Color Picker',
-		alias: 'Umbraco.ColorPicker',
-		meta: {},
-	},
-	{
-		type: 'propertyEditorModel',
-		name: 'Content Picker',
-		alias: 'Umbraco.ContentPicker',
-		meta: {},
-	},
-	{
-		type: 'propertyEditorModel',
-		name: 'Eye Dropper Color Picker',
-		alias: 'Umbraco.ColorPicker.EyeDropper',
-		meta: {},
-	},
+	colorPicker,
+	eyeDropper,
+	contentPicker,
+	json,
 	{
 		type: 'propertyEditorModel',
 		name: 'Multi URL Picker',
@@ -207,12 +198,6 @@ export const manifests: Array<ManifestPropertyEditorModel> = [
 		type: 'propertyEditorModel',
 		name: 'Media Picker',
 		alias: 'Umbraco.MediaPicker3',
-		meta: {},
-	},
-	{
-		type: 'propertyEditorModel',
-		name: 'Custom Property Editor',
-		alias: 'Umbraco.Custom',
 		meta: {},
 	},
 	{

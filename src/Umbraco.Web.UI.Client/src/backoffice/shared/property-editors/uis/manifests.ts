@@ -1,6 +1,14 @@
+import { manifest as ColorPicker } from './color-picker/manifests';
+import { manifest as ContentPicker } from './content-picker/manifests';
+import { manifest as EyeDropper } from './eye-dropper/manifests';
+import { manifest as TreePicker } from './tree-picker/manifests';
 import type { ManifestPropertyEditorUI } from '@umbraco-cms/models';
 
 export const manifests: Array<ManifestPropertyEditorUI> = [
+	ColorPicker,
+	ContentPicker,
+	EyeDropper,
+	TreePicker,
 	{
 		type: 'propertyEditorUI',
 		alias: 'Umb.PropertyEditorUI.BlockList',
@@ -9,7 +17,7 @@ export const manifests: Array<ManifestPropertyEditorUI> = [
 		meta: {
 			label: 'Block List',
 			icon: 'umb:thumbnail-list',
-			group: 'Lists',
+			group: 'lists',
 			propertyEditorModel: 'Umbraco.BlockList',
 		},
 	},
@@ -21,7 +29,7 @@ export const manifests: Array<ManifestPropertyEditorUI> = [
 		meta: {
 			label: 'Toggle',
 			icon: 'umb:checkbox',
-			group: 'Common',
+			group: 'common',
 			propertyEditorModel: 'Umbraco.TrueFalse',
 		},
 	},
@@ -33,7 +41,7 @@ export const manifests: Array<ManifestPropertyEditorUI> = [
 		meta: {
 			label: 'Checkbox List',
 			icon: 'umb:bulleted-list',
-			group: 'Lists',
+			group: 'lists',
 			propertyEditorModel: 'Umbraco.CheckBoxList',
 		},
 	},
@@ -45,7 +53,7 @@ export const manifests: Array<ManifestPropertyEditorUI> = [
 		meta: {
 			label: 'Text',
 			icon: 'umb:edit',
-			group: 'Common',
+			group: 'common',
 			propertyEditorModel: 'Umbraco.TextBox',
 		},
 	},
@@ -57,7 +65,7 @@ export const manifests: Array<ManifestPropertyEditorUI> = [
 		meta: {
 			label: 'Textarea',
 			icon: 'umb:edit',
-			group: 'Common',
+			group: 'common',
 			propertyEditorModel: 'Umbraco.TextArea',
 			config: {
 				properties: [
@@ -79,20 +87,8 @@ export const manifests: Array<ManifestPropertyEditorUI> = [
 		meta: {
 			label: 'Number',
 			icon: 'umb:autofill',
-			group: 'Common',
+			group: 'common',
 			propertyEditorModel: 'Umbraco.Integer',
-		},
-	},
-	{
-		type: 'propertyEditorUI',
-		alias: 'Umb.PropertyEditorUI.ContentPicker',
-		name: 'Content Picker Property Editor UI',
-		loader: () => import('./content-picker/property-editor-ui-content-picker.element'),
-		meta: {
-			label: 'Content Picker',
-			propertyEditorModel: 'Umbraco.ContentPicker',
-			icon: 'umb:document',
-			group: 'Common',
 		},
 	},
 	{
@@ -104,7 +100,7 @@ export const manifests: Array<ManifestPropertyEditorUI> = [
 			label: 'Icon Picker',
 			propertyEditorModel: 'Umbraco.IconPicker',
 			icon: 'umb:document',
-			group: 'Common',
+			group: 'common',
 		},
 	},
 ];

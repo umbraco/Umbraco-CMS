@@ -23,7 +23,7 @@ export class UmbExtensionRootWorkspaceElement extends UmbLitElement {
 
 	render() {
 		return html`
-			<umb-workspace-entity headline="Extensions" alias="Umb.Workspace.ExtensionRoot">
+			<umb-workspace-layout headline="Extensions" alias="Umb.Workspace.ExtensionRoot">
 				<uui-box>
 					<p>List of currently loaded extensions</p>
 					<uui-table>
@@ -52,7 +52,7 @@ export class UmbExtensionRootWorkspaceElement extends UmbLitElement {
 						)}
 					</uui-table>
 				</uui-box>
-			</umb-workspace-entity>
+			</umb-workspace-layout>
 		`;
 	}
 }

@@ -1,4 +1,4 @@
-import { UmbWorkspaceNodeContext } from '../../../shared/components/workspace/workspace-context/workspace-node.context';
+import { UmbWorkspaceContentContext } from '../../../shared/components/workspace/workspace-content/workspace-content.context';
 import {
 	UmbDocumentTypeStore,
 	UmbDocumentTypeStoreItemType,
@@ -16,7 +16,7 @@ const DefaultDocumentTypeData = {
 	properties: [],
 } as UmbDocumentTypeStoreItemType;
 
-export class UmbWorkspaceDocumentTypeContext extends UmbWorkspaceNodeContext<
+export class UmbWorkspaceDocumentTypeContext extends UmbWorkspaceContentContext<
 	UmbDocumentTypeStoreItemType,
 	UmbDocumentTypeStore
 > {
