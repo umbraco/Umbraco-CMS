@@ -35,4 +35,19 @@ export class UmbWorkspaceDocumentContext extends UmbWorkspaceContentContext<UmbD
 	constructor(host: UmbControllerHostInterface, entityKey: string) {
 		super(host, DefaultDocumentData, 'umbDocumentStore', entityKey, 'document');
 	}
+
+
+
+	/*
+	concept notes:
+
+	public saveAndPublish() {
+		
+	}
+
+	public saveAndPreview() {
+		
+	}
+	*/
+
 }
