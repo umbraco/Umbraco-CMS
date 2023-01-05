@@ -1,14 +1,31 @@
-import { manifest as ColorPicker } from './color-picker/manifests';
-import { manifest as ContentPicker } from './content-picker/manifests';
-import { manifest as EyeDropper } from './eye-dropper/manifests';
-import { manifest as TreePicker } from './tree-picker/manifests';
+import { manifest as colorPicker } from './color-picker/manifests';
+import { manifest as contentPicker } from './content-picker/manifests';
+import { manifest as datePicker } from './date-picker/manifests';
+import { manifest as eyeDropper } from './eye-dropper/manifests';
+import { manifest as multiUrlPicker } from './multi-url-picker/manifests';
+import { manifest as overlaySize } from './overlay-size/manifests';
+import { manifest as treePicker } from './tree-picker/manifests';
+import { manifest as treePickerStartNode } from './tree-picker-start-node/manifests';
+import { manifests as textBoxes } from './text-box/manifests';
+import { manifest as dropdown } from './dropdown/manifests';
+import { manifest as multipleTextString } from './multiple-text-string/manifests';
+import { manifest as textArea } from './textarea/manifests';
+
 import type { ManifestPropertyEditorUI } from '@umbraco-cms/models';
 
 export const manifests: Array<ManifestPropertyEditorUI> = [
-	ColorPicker,
-	ContentPicker,
-	EyeDropper,
-	TreePicker,
+	colorPicker,
+	contentPicker,
+	datePicker,
+	eyeDropper,
+	multiUrlPicker,
+	overlaySize,
+	...textBoxes,
+	treePicker,
+	treePickerStartNode,
+	dropdown,
+	multipleTextString,
+	textArea,
 	{
 		type: 'propertyEditorUI',
 		alias: 'Umb.PropertyEditorUI.BlockList',
@@ -43,40 +60,6 @@ export const manifests: Array<ManifestPropertyEditorUI> = [
 			icon: 'umb:bulleted-list',
 			group: 'lists',
 			propertyEditorModel: 'Umbraco.CheckBoxList',
-		},
-	},
-	{
-		type: 'propertyEditorUI',
-		alias: 'Umb.PropertyEditorUI.TextBox',
-		name: 'Text Property Editor UI',
-		loader: () => import('./text-box/property-editor-ui-text-box.element'),
-		meta: {
-			label: 'Text',
-			icon: 'umb:edit',
-			group: 'common',
-			propertyEditorModel: 'Umbraco.TextBox',
-		},
-	},
-	{
-		type: 'propertyEditorUI',
-		alias: 'Umb.PropertyEditorUI.Textarea',
-		name: 'Textarea Property Editor UI',
-		loader: () => import('./textarea/property-editor-ui-textarea.element'),
-		meta: {
-			label: 'Textarea',
-			icon: 'umb:edit',
-			group: 'common',
-			propertyEditorModel: 'Umbraco.TextArea',
-			config: {
-				properties: [
-					{
-						alias: 'rows',
-						label: 'Number of rows',
-						description: 'If empty - 10 rows would be set as the default value',
-						propertyEditorUI: 'Umb.PropertyEditorUI.Number',
-					},
-				],
-			},
 		},
 	},
 	{
