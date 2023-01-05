@@ -1,30 +1,16 @@
 import { BehaviorSubject, map, Observable } from 'rxjs';
 import type {
 	ManifestTypes,
-	ManifestDashboard,
-	ManifestWorkspaceView,
-	ManifestEntrypoint,
-	ManifestPropertyAction,
-	ManifestPropertyEditorUI,
-	ManifestPropertyEditorModel,
-	ManifestSection,
-	ManifestSectionView,
-	ManifestTree,
-	ManifestTreeItemAction,
-	ManifestWorkspace,
-	ManifestWorkspaceAction,
-	ManifestCustom,
-	ManifestPackageView,
-	ManifestExternalLoginProvider,
-	ManifestHeaderApp,
-	ManifestCollectionView,
-	ManifestCollectionBulkAction,
+	ManifestTypeMap,
+	ManifestBase
 } from '../../models';
 import { hasDefaultExport } from '../has-default-export.function';
 import { loadExtension } from '../load-extension.function';
 
+type SpecificManifestTypeOrManifestBase<T extends keyof ManifestTypeMap | string> = T extends keyof ManifestTypeMap ? ManifestTypeMap[T] : ManifestBase;
+
 export class UmbExtensionRegistry {
-	private _extensions = new BehaviorSubject<Array<ManifestTypes>>([]);
+	private _extensions = new BehaviorSubject<Array<ManifestBase>>([]);
 	public readonly extensions = this._extensions.asObservable();
 
 	register(manifest: ManifestTypes & { loader?: () => Promise<object | HTMLElement> }): void {
@@ -70,41 +56,25 @@ export class UmbExtensionRegistry {
 	}
 
 
-	getByAlias<T = ManifestTypes>(alias: string): Observable<T | null> {
+	getByAlias(alias: string) {
 		// TODO: make pipes prettier/simpler/reuseable
-		return this.extensions.pipe(map((dataTypes) => dataTypes.find((extension) => extension.alias === alias) || null)) as Observable<T | null>;
+		return this.extensions.pipe(map((dataTypes) => dataTypes.find((extension) => extension.alias === alias) || null));
+	}
+
+	getByTypeAndAlias<Key extends keyof ManifestTypeMap>(type: Key, alias: string) {
+		return this.extensionsOfType(type).pipe(map((extensions) => extensions.find((extension) => extension.alias === alias) || null));
 	}
 
 	// TODO: implement unregister of extension
 
-	// Typings concept, need to put all core types to get a good array return type for the provided type...
-	extensionsOfType(type: 'headerApp'): Observable<Array<ManifestHeaderApp>>;
-	extensionsOfType(type: 'section'): Observable<Array<ManifestSection>>;
-	extensionsOfType(type: 'sectionView'): Observable<Array<ManifestSectionView>>;
-	extensionsOfType<T = ManifestTree>(type: 'tree'): Observable<Array<T>>;
-	extensionsOfType(type: 'workspace'): Observable<Array<ManifestWorkspace>>;
-	extensionsOfType(type: 'treeItemAction'): Observable<Array<ManifestTreeItemAction>>;
-	extensionsOfType(type: 'dashboard'): Observable<Array<ManifestDashboard>>;
-	extensionsOfType(type: 'dashboardCollection'): Observable<Array<ManifestDashboard>>;
-	extensionsOfType(type: 'workspaceView'): Observable<Array<ManifestWorkspaceView>>;
-	extensionsOfType(type: 'workspaceAction'): Observable<Array<ManifestWorkspaceAction>>;
-	extensionsOfType(type: 'propertyEditorUI'): Observable<Array<ManifestPropertyEditorUI>>;
-	extensionsOfType(type: 'propertyEditorModel'): Observable<Array<ManifestPropertyEditorModel>>;
-	extensionsOfType(type: 'propertyAction'): Observable<Array<ManifestPropertyAction>>;
-	extensionsOfType(type: 'packageView'): Observable<Array<ManifestPackageView>>;
-	extensionsOfType(type: 'entrypoint'): Observable<Array<ManifestEntrypoint>>;
-	extensionsOfType(type: 'custom'): Observable<Array<ManifestCustom>>;
-	extensionsOfType(type: 'externalLoginProvider'): Observable<Array<ManifestExternalLoginProvider>>;
-	extensionsOfType(type: 'collectionView'): Observable<Array<ManifestCollectionView>>;
-	extensionsOfType(type: 'collectionBulkAction'): Observable<Array<ManifestCollectionBulkAction>>;
-	extensionsOfType<T extends ManifestTypes>(type: string): Observable<Array<T>>;
-	extensionsOfType(type: string): Observable<Array<ManifestTypes>> {
+
+	extensionsOfType<Key extends keyof ManifestTypeMap | string, T = SpecificManifestTypeOrManifestBase<Key>>(type: Key) {
 		return this.extensions.pipe(
 			map((exts) => exts.filter((ext) => ext.type === type).sort((a, b) => (b.weight || 0) - (a.weight || 0)))
-		);
+		) as Observable<Array<T>>;
 	}
 
-	extensionsOfTypes<ExtensionType = ManifestTypes>(types: string[]): Observable<Array<ExtensionType>> {
+	extensionsOfTypes<ExtensionType = ManifestBase>(types: string[]): Observable<Array<ExtensionType>> {
 		return this.extensions.pipe(
 			map((exts) => exts.filter((ext) => (types.indexOf(ext.type) !== -1)).sort((a, b) => (b.weight || 0) - (a.weight || 0)))
 		) as Observable<Array<ExtensionType>>;

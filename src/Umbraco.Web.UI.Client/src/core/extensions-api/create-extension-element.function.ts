@@ -1,9 +1,9 @@
-import type { ManifestElementType } from '../models';
+import type { ManifestElement } from '../models';
 import { hasDefaultExport } from './has-default-export.function';
 import { isManifestElementNameType } from './is-manifest-element-name-type.function';
 import { loadExtension } from './load-extension.function';
 
-export async function createExtensionElement(manifest: ManifestElementType): Promise<HTMLElement | undefined> {
+export async function createExtensionElement(manifest: ManifestElement): Promise<HTMLElement | undefined> {
 	
 	//TODO: Write tests for these extension options:
 	const js = await loadExtension(manifest);
