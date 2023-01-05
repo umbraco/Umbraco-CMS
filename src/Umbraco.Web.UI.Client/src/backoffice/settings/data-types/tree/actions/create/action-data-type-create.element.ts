@@ -12,16 +12,16 @@ export default class UmbTreeActionDataTypeCreateElement extends UmbTreeItemActio
 		return `section/settings/${this._activeTreeItem?.type}/create/${this._activeTreeItem?.key || 'root'}`;
 	}
 
-	// TODO: change to href. This is a temporary solution to get the link to work. For some reason query params gets removed when using href.
 	private _handleLabelClick() {
 		if (!this._treeContextMenuService) return;
-		const href = this._constructUrl();
-		history.pushState(null, '', href);
 		this._treeContextMenuService.close();
 	}
 
 	render() {
-		return html`<uui-menu-item label=${this.treeAction?.meta.label ?? ''} @click-label="${this._handleLabelClick}">
+		return html`<uui-menu-item
+			label=${this.treeAction?.meta.label ?? ''}
+			@click-label="${this._handleLabelClick}"
+			href="${this._constructUrl()}">
 			<uui-icon slot="icon" name=${this.treeAction?.meta.icon ?? ''}></uui-icon>
 		</uui-menu-item>`;
 	}
