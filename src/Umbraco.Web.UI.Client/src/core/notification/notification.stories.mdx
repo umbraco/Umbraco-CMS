@@ -20,10 +20,10 @@ The UmbNotification service can be used to open notifications.
 
 ```ts
 import { html, LitElement } from 'lit';
-import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
+import { UmbLitElement } from '@umbraco-cms/element';
 import type { UmbNotificationService } from './core/services/notification';
 
-class MyElement extends UmbContextConsumerMixin(LitElement) {
+class MyElement extends UmbLitElement {
 	private _notificationService?: UmbNotificationService;
 
 	constructor() {
@@ -44,10 +44,10 @@ A notification is opened by calling one of the helper methods on the UmbNotifica
 ```ts
 import { html, LitElement } from 'lit';
 import { state } from 'lit/decorators.js';
-import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
+import { UmbLitElement } from '@umbraco-cms/element';
 import type { UmbNotificationService, UmbNotificationDefaultData } from './core/services/notification';
 
-class MyElement extends UmbContextConsumerMixin(LitElement) {
+class MyElement extends UmbLitElement {
 	private _notificationService?: UmbNotificationService;
 
 	constructor() {

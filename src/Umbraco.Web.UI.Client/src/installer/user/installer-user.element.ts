@@ -1,13 +1,11 @@
-import { css, CSSResultGroup, html, LitElement } from 'lit';
+import { css, CSSResultGroup, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { UmbInstallerContext } from '../installer.context';
-import { Install } from '@umbraco-cms/backend-api';
-import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
-import { UmbObserverMixin } from '@umbraco-cms/observable-api';
+import { UmbLitElement } from '@umbraco-cms/element';
 
 
 @customElement('umb-installer-user')
-export class UmbInstallerUserElement extends UmbContextConsumerMixin(UmbObserverMixin(LitElement)) {
+export class UmbInstallerUserElement extends UmbLitElement {
 	static styles: CSSResultGroup = [
 		css`
 			:host,
@@ -75,7 +73,7 @@ export class UmbInstallerUserElement extends UmbContextConsumerMixin(UmbObserver
 	private _observeInstallerData() {
 		if (!this._installerContext) return;
 
-		this.observe<Install>(this._installerContext.data, ({ user }) => {
+		this.observe(this._installerContext.data, ({ user }) => {
 			this._userFormData = {
 				name: user.name,
 				password: user.password,

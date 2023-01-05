@@ -1,32 +1,31 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
-import { css, html, LitElement, nothing } from 'lit';
+import { css, html, nothing } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { IRoutingInfo, RouterSlot } from 'router-slot';
 import { map } from 'rxjs';
 
-import { UmbObserverMixin } from '@umbraco-cms/observable-api';
 import { createExtensionElement } from '@umbraco-cms/extensions-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
-import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
-import type { ManifestWithMeta, ManifestWorkspaceView, ManifestWorkspaceViewCollection } from '@umbraco-cms/models';
+import type { ManifestWorkspaceAction, ManifestWorkspaceView, ManifestWorkspaceViewCollection } from '@umbraco-cms/models';
 
 import '../../body-layout/body-layout.element';
 import '../../extension-slot/extension-slot.element';
+import { UmbLitElement } from '@umbraco-cms/element';
 
 /**
- * @element umb-workspace-entity
+ * @element umb-workspace-layout
  * @description
- * @slot icon - Slot for rendering the entity icon
- * @slot name - Slot for rendering the entity name
- * @slot footer - Slot for rendering the entity footer
- * @slot actions - Slot for rendering the entity actions
+ * @slot icon - Slot for rendering the icon
+ * @slot name - Slot for rendering the name
+ * @slot footer - Slot for rendering the workspace footer
+ * @slot actions - Slot for rendering the workspace actions
  * @slot default - slot for main content
  * @export
- * @class UmbWorkspaceEntity
- * @extends {UmbContextConsumerMixin(LitElement)}
+ * @class UmbWorkspaceLayout
+ * @extends {UmbLitElement}
  */
-@customElement('umb-workspace-entity')
-export class UmbWorkspaceEntity extends UmbContextConsumerMixin(UmbObserverMixin(LitElement)) {
+@customElement('umb-workspace-layout')
+export class UmbWorkspaceLayout extends UmbLitElement {
 	static styles = [
 		UUITextStyles,
 		css`
@@ -56,6 +55,9 @@ export class UmbWorkspaceEntity extends UmbContextConsumerMixin(UmbObserverMixin
 		`,
 	];
 
+	@property()
+	public headline = '';
+
 	/**
 	 * Alias of the workspace. The Layout will render the workspace views that are registered for this workspace alias.
 	 * @public
@@ -63,9 +65,6 @@ export class UmbWorkspaceEntity extends UmbContextConsumerMixin(UmbObserverMixin
 	 * @attr
 	 * @default ''
 	 */
-	@property()
-	public headline = '';
-
 	@property()
 	public alias = '';
 
@@ -90,12 +89,12 @@ export class UmbWorkspaceEntity extends UmbContextConsumerMixin(UmbObserverMixin
 	}
 
 	private _observeWorkspaceViews() {
-		this.observe<ManifestWorkspaceView[]>(
+		this.observe(
 			umbExtensionsRegistry
-				.extensionsOfTypes(['workspaceView', 'workspaceViewCollection'])
+				.extensionsOfTypes<ManifestWorkspaceView>(['workspaceView', 'workspaceViewCollection'])
 				.pipe(
 					map((extensions) =>
-						extensions.filter((extension) => (extension as ManifestWithMeta).meta.workspaces.includes(this.alias))
+						extensions.filter((extension) => (extension).meta.workspaces.includes(this.alias))
 					)
 				),
 			(workspaceViews) => {
@@ -106,15 +105,16 @@ export class UmbWorkspaceEntity extends UmbContextConsumerMixin(UmbObserverMixin
 	}
 
 	private async _createRoutes() {
+		
+		this._routes = [];
+
 		if (this._workspaceViews.length > 0) {
-			this._routes = [];
 
 			this._routes = this._workspaceViews.map((view) => {
 				return {
 					path: `view/${view.meta.pathname}`,
 					component: () => {
 						if (view.type === 'workspaceViewCollection') {
-							console.log('!!!!!workspaceViewCollection');
 							return import(
 								'src/backoffice/shared/components/workspace/workspace-content/views/collection/workspace-view-collection.element'
 							);
@@ -134,7 +134,7 @@ export class UmbWorkspaceEntity extends UmbContextConsumerMixin(UmbObserverMixin
 
 			this._routes.push({
 				path: '**',
-				redirectTo: `view/${this._workspaceViews?.[0].meta.pathname}`,
+				redirectTo: `view/${this._workspaceViews[0].meta.pathname}`,
 			});
 
 			this.requestUpdate();
@@ -154,7 +154,7 @@ export class UmbWorkspaceEntity extends UmbContextConsumerMixin(UmbObserverMixin
 
 	private _renderTabs() {
 		return html`
-			${this._workspaceViews?.length > 0
+			${this._workspaceViews.length > 0
 				? html`
 						<uui-tab-group slot="tabs">
 							${this._workspaceViews.map(
@@ -187,7 +187,7 @@ export class UmbWorkspaceEntity extends UmbContextConsumerMixin(UmbObserverMixin
 				<umb-extension-slot
 					slot="actions"
 					type="workspaceAction"
-					.filter=${(extension: any) => extension.meta.workspaces.includes(this.alias)}></umb-extension-slot>
+					.filter=${(extension: ManifestWorkspaceAction) => extension.meta.workspaces.includes(this.alias)}></umb-extension-slot>
 				<slot name="actions" slot="actions"></slot>
 			</umb-body-layout>
 		`;
@@ -196,6 +196,6 @@ export class UmbWorkspaceEntity extends UmbContextConsumerMixin(UmbObserverMixin
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-workspace-entity': UmbWorkspaceEntity;
+		'umb-workspace-layout': UmbWorkspaceLayout;
 	}
 }

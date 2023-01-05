@@ -1,14 +1,13 @@
-import { css, html, LitElement } from 'lit';
+import { css, html } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, state } from 'lit/decorators.js';
 import { distinctUntilChanged } from 'rxjs';
-import type { UmbWorkspaceNodeContext } from '../../../workspace-context/workspace-node.context';
-import { UmbObserverMixin } from '@umbraco-cms/observable-api';
-import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
+import type { UmbWorkspaceContentContext } from '../../workspace-content.context';
 import type { DocumentDetails, MediaDetails } from '@umbraco-cms/models';
+import { UmbLitElement } from '@umbraco-cms/element';
 
 @customElement('umb-workspace-view-content-info')
-export class UmbWorkspaceViewContentInfoElement extends UmbContextConsumerMixin(UmbObserverMixin(LitElement)) {
+export class UmbWorkspaceViewContentInfoElement extends UmbLitElement {
 	static styles = [
 		UUITextStyles,
 		css`
@@ -22,7 +21,7 @@ export class UmbWorkspaceViewContentInfoElement extends UmbContextConsumerMixin(
 	@state()
 	private _nodeName = '';
 
-	private _workspaceContext?: UmbWorkspaceNodeContext;
+	private _workspaceContext?: UmbWorkspaceContentContext<DocumentDetails | MediaDetails>;
 
 	constructor() {
 		super();
@@ -37,7 +36,7 @@ export class UmbWorkspaceViewContentInfoElement extends UmbContextConsumerMixin(
 	private _observeContent() {
 		if (!this._workspaceContext) return;
 
-		this.observe<DocumentDetails | MediaDetails>(this._workspaceContext.data.pipe(distinctUntilChanged()), (node) => {
+		this.observe(this._workspaceContext.data.pipe(distinctUntilChanged()), (node) => {
 			this._nodeName = node.name as string;
 		});
 	}

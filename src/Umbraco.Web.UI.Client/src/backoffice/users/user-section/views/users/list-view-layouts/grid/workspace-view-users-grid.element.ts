@@ -1,17 +1,16 @@
-import { css, html, LitElement, nothing } from 'lit';
+import { css, html, nothing } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, state } from 'lit/decorators.js';
 import { repeat } from 'lit/directives/repeat.js';
 import { ifDefined } from 'lit-html/directives/if-defined.js';
 import type { UmbSectionViewUsersElement } from '../../section-view-users.element';
 import { getTagLookAndColor } from '../../../../../../../auth/utils';
-import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 import type { UserDetails, UserEntity, UserGroupDetails, UserGroupEntity } from '@umbraco-cms/models';
-import { UmbObserverMixin } from '@umbraco-cms/observable-api';
 import { UmbUserGroupStore } from 'src/backoffice/users/user-groups/user-group.store';
+import { UmbLitElement } from '@umbraco-cms/element';
 
 @customElement('umb-workspace-view-users-grid')
-export class UmbWorkspaceViewUsersGridElement extends UmbContextConsumerMixin(UmbObserverMixin(LitElement)) {
+export class UmbWorkspaceViewUsersGridElement extends UmbLitElement {
 	static styles = [
 		UUITextStyles,
 		css`
@@ -66,14 +65,14 @@ export class UmbWorkspaceViewUsersGridElement extends UmbContextConsumerMixin(Um
 
 	private _observeUsers() {
 		if (!this._usersContext) return;
-		this.observe<Array<UserDetails>>(this._usersContext.users, (users) => {
+		this.observe(this._usersContext.users, (users) => {
 			this._users = users;
 		});
 	}
 
 	private _observeUserGroups() {
 		if (!this._userGroupStore) return;
-		this.observe<Array<UserGroupDetails>>(
+		this.observe(
 			this._userGroupStore.getAll(),
 			(userGroups) => (this._userGroups = userGroups)
 		);
@@ -81,7 +80,7 @@ export class UmbWorkspaceViewUsersGridElement extends UmbContextConsumerMixin(Um
 
 	private _observeSelection() {
 		if (!this._usersContext) return;
-		this.observe<Array<string>>(this._usersContext.selection, (selection) => (this._selection = selection));
+		this.observe(this._usersContext.selection, (selection) => (this._selection = selection));
 	}
 
 	private _isSelected(key: string) {

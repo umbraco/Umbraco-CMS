@@ -2,13 +2,11 @@ import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { UmbModalLayoutPickerBase } from '../modal-layout-picker-base';
-import { UmbObserverMixin } from '@umbraco-cms/observable-api';
-import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
 import type { ManifestSection } from '@umbraco-cms/models';
 
 @customElement('umb-picker-layout-section')
-export class UmbPickerLayoutSectionElement extends UmbContextConsumerMixin(UmbObserverMixin(UmbModalLayoutPickerBase)) {
+export class UmbPickerLayoutSectionElement extends UmbModalLayoutPickerBase {
 	static styles = [
 		UUITextStyles,
 		css`
@@ -67,7 +65,7 @@ export class UmbPickerLayoutSectionElement extends UmbContextConsumerMixin(UmbOb
 
 	render() {
 		return html`
-			<umb-workspace-entity headline="Select sections">
+			<umb-workspace-layout headline="Select sections">
 				<uui-box>
 					<uui-input label="search"></uui-input>
 					<hr />
@@ -88,7 +86,7 @@ export class UmbPickerLayoutSectionElement extends UmbContextConsumerMixin(UmbOb
 					<uui-button label="Close" @click=${this._close}></uui-button>
 					<uui-button label="Submit" look="primary" color="positive" @click=${this._submit}></uui-button>
 				</div>
-			</umb-workspace-entity>
+			</umb-workspace-layout>
 		`;
 	}
 }

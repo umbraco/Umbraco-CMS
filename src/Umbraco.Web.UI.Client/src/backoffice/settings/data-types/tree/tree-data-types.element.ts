@@ -1,14 +1,14 @@
-import { html, LitElement } from 'lit';
+import { html } from 'lit';
 import { customElement } from 'lit/decorators.js';
-import { UmbContextConsumerMixin, UmbContextProviderMixin } from '@umbraco-cms/context-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
 import type { ManifestTreeItemAction } from '@umbraco-cms/models';
 
 import '../../../shared/components/tree/navigator/tree-navigator.element';
 import { UmbDataTypeStore } from 'src/backoffice/settings/data-types/data-type.store';
+import { UmbLitElement } from '@umbraco-cms/element';
 
 @customElement('umb-tree-data-types')
-export class UmbTreeDataTypesElement extends UmbContextProviderMixin(UmbContextConsumerMixin(LitElement)) {
+export class UmbTreeDataTypesElement extends UmbLitElement {
 	constructor() {
 		super();
 

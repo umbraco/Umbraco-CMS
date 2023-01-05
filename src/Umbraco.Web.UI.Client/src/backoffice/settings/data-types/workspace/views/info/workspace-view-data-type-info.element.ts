@@ -1,14 +1,13 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
-import { css, html, LitElement } from 'lit';
+import { css, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { distinctUntilChanged } from 'rxjs';
 import { UmbWorkspaceDataTypeContext } from '../../workspace-data-type.context';
 import type { DataTypeDetails } from '@umbraco-cms/models';
-import { UmbObserverMixin } from '@umbraco-cms/observable-api';
-import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
+import { UmbLitElement } from '@umbraco-cms/element';
 
 @customElement('umb-workspace-view-data-type-info')
-export class UmbWorkspaceViewDataTypeInfoElement extends UmbContextConsumerMixin(UmbObserverMixin(LitElement)) {
+export class UmbWorkspaceViewDataTypeInfoElement extends UmbLitElement {
 	static styles = [UUITextStyles, css``];
 
 	@state()
@@ -28,8 +27,12 @@ export class UmbWorkspaceViewDataTypeInfoElement extends UmbContextConsumerMixin
 	private _observeDataType() {
 		if (!this._workspaceContext) return;
 
-		this.observe<DataTypeDetails>(this._workspaceContext.data.pipe(distinctUntilChanged()), (dataType) => {
-			this._dataType = dataType;
+		this.observe(this._workspaceContext.data.pipe(distinctUntilChanged()), (dataType) => {
+			if(!dataType) return;
+			
+			// TODO: handle if model is not of the type wanted.
+			// TODO: Make method to identify wether data is of type DataTypeDetails
+			this._dataType = (dataType as DataTypeDetails);
 		});
 	}
 

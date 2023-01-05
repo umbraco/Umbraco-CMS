@@ -1,5 +1,5 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css';
-import { css, html, LitElement, nothing } from 'lit';
+import { css, html, nothing } from 'lit';
 import { customElement, state, property } from 'lit/decorators.js';
 import { map } from 'rxjs';
 import './collection-selection-actions.element';
@@ -7,12 +7,12 @@ import './collection-toolbar.element';
 import type { UmbCollectionContext } from './collection.context';
 import { createExtensionElement } from '@umbraco-cms/extensions-api';
 import type { ManifestCollectionView, MediaDetails } from '@umbraco-cms/models';
-import { UmbObserverMixin } from '@umbraco-cms/observable-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
-import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
+import { UmbLitElement } from '@umbraco-cms/element';
+import type { UmbObserverController } from 'src/core/observable-api/observer.controller';
 
 @customElement('umb-collection')
-export class UmbCollectionElement extends UmbContextConsumerMixin(UmbObserverMixin(LitElement)) {
+export class UmbCollectionElement extends UmbLitElement {
 	static styles = [
 		UUITextStyles,
 		css`
@@ -34,7 +34,7 @@ export class UmbCollectionElement extends UmbContextConsumerMixin(UmbObserverMix
 	private _routes: Array<any> = [];
 
 	@state()
-	private _selection: Array<string> = [];
+	private _selection?: Array<string> | null;
 
 	private _collectionContext?: UmbCollectionContext<MediaDetails>;
 
@@ -48,7 +48,7 @@ export class UmbCollectionElement extends UmbContextConsumerMixin(UmbObserverMix
 		this._observeCollectionViews();
 	}
 
-	private _collectionViewUnsubscribe?: () => void;
+	private _collectionViewUnsubscribe?: UmbObserverController<Array<ManifestCollectionView>>;
 
 	constructor() {
 		super();
@@ -62,35 +62,37 @@ export class UmbCollectionElement extends UmbContextConsumerMixin(UmbObserverMix
 	private _observeCollectionContext() {
 		if (!this._collectionContext) return;
 
-		this.observe<Array<string>>(this._collectionContext.selection, (selection) => {
+		this.observe(this._collectionContext.selection, (selection) => {
 			this._selection = selection;
 		});
 	}
 
 	private _observeCollectionViews() {
-		this._collectionViewUnsubscribe?.();
-		this._collectionViewUnsubscribe = this.observe<Array<ManifestCollectionView>>(
+		this._collectionViewUnsubscribe?.destroy();
+		this._collectionViewUnsubscribe = this.observe(
+			// TODO: could we make some helper methods for this scenario:
 			umbExtensionsRegistry?.extensionsOfType('collectionView').pipe(
 				map((extensions) => {
 					return extensions.filter((extension) => extension.meta.entityType === this._entityType);
 				})
 			),
 			(views) => {
-				if (views?.length === 0) return;
 				this._createRoutes(views);
 			}
 		);
 	}
 
-	private _createRoutes(views: ManifestCollectionView[]) {
+	private _createRoutes(views: ManifestCollectionView[] | null) {
 		this._routes = [];
 
-		this._routes = views.map((view) => {
-			return {
-				path: `${view.meta.pathName}`,
-				component: () => createExtensionElement(view),
-			};
-		});
+		if(views) {
+			this._routes = views.map((view) => {
+				return {
+					path: `${view.meta.pathName}`,
+					component: () => createExtensionElement(view),
+				};
+			});
+		}
 
 		this._routes.push({
 			path: '**',
@@ -103,7 +105,7 @@ export class UmbCollectionElement extends UmbContextConsumerMixin(UmbObserverMix
 			<umb-body-layout no-header-background>
 				<umb-collection-toolbar slot="header"></umb-collection-toolbar>
 				<router-slot id="router-slot" .routes="${this._routes}"></router-slot>
-				${this._selection.length > 0
+				${this._selection && this._selection.length > 0
 					? html`<umb-collection-selection-actions slot="footer"></umb-collection-selection-actions>`
 					: nothing}
 			</umb-body-layout>

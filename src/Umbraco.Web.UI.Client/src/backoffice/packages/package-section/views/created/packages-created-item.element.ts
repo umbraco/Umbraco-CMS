@@ -1,9 +1,8 @@
 import { html, LitElement } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
-import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 
 @customElement('umb-packages-created-item')
-export class UmbPackagesCreatedItem extends UmbContextConsumerMixin(LitElement) {
+export class UmbPackagesCreatedItem extends LitElement {
 	@property({ type: Object })
 	package!: any;
 

@@ -1,24 +1,21 @@
-import { css, html, LitElement } from 'lit';
+import { css, html } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, state } from 'lit/decorators.js';
 import { BehaviorSubject, Observable } from 'rxjs';
 import type { IRoute, IRoutingInfo } from 'router-slot';
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
-import { UmbContextConsumerMixin, UmbContextProviderMixin } from '@umbraco-cms/context-api';
 
 import './list-view-layouts/table/workspace-view-users-table.element';
 import './list-view-layouts/grid/workspace-view-users-grid.element';
 import './workspace-view-users-selection.element';
 import './workspace-view-users-invite.element';
 import type { ManifestWorkspace, UserDetails } from '@umbraco-cms/models';
-import { UmbObserverMixin } from '@umbraco-cms/observable-api';
 import { UmbUserStore } from 'src/backoffice/users/users/user.store';
 import { createExtensionElement } from '@umbraco-cms/extensions-api';
+import { UmbLitElement } from '@umbraco-cms/element';
 
 @customElement('umb-section-view-users')
-export class UmbSectionViewUsersElement extends UmbContextProviderMixin(
-	UmbContextConsumerMixin(UmbObserverMixin(LitElement))
-) {
+export class UmbSectionViewUsersElement extends UmbLitElement {
 	static styles = [
 		UUITextStyles,
 		css`
@@ -51,9 +48,10 @@ export class UmbSectionViewUsersElement extends UmbContextProviderMixin(
 			this._observeUsers();
 		});
 		// TODO: consider this context name, is it to broad?
+		// TODO: Stop using it self as a context api.
 		this.provideContext('umbUsersContext', this);
 
-		this.observe<ManifestWorkspace[]>(umbExtensionsRegistry?.extensionsOfType('workspace'), (workspaceExtensions) => {
+		this.observe(umbExtensionsRegistry?.extensionsOfType('workspace'), (workspaceExtensions) => {
 			this._workspaces = workspaceExtensions;
 			this._createRoutes();
 		});
@@ -95,11 +93,11 @@ export class UmbSectionViewUsersElement extends UmbContextProviderMixin(
 		if (!this._userStore) return;
 
 		if (this._search.getValue()) {
-			this.observe<Array<UserDetails>>(this._userStore.getByName(this._search.getValue()), (users) =>
+			this.observe(this._userStore.getByName(this._search.getValue()), (users) =>
 				this._users.next(users)
 			);
 		} else {
-			this.observe<Array<UserDetails>>(this._userStore.getAll(), (users) => this._users.next(users));
+			this.observe(this._userStore.getAll(), (users) => this._users.next(users));
 		}
 	}
 

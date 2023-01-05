@@ -1,14 +1,11 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
-import { css, html, LitElement } from 'lit';
+import { css, html } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { UmbWorkspaceDocumentContext } from './document-workspace.context';
-import { UmbContextConsumerMixin, UmbContextProviderMixin } from '@umbraco-cms/context-api';
-import { UmbObserverMixin } from '@umbraco-cms/observable-api';
+import { UmbLitElement } from '@umbraco-cms/element';
 
 @customElement('umb-document-workspace')
-export class UmbDocumentWorkspaceElement extends UmbObserverMixin(
-	UmbContextConsumerMixin(UmbContextProviderMixin(LitElement))
-) {
+export class UmbDocumentWorkspaceElement extends UmbLitElement {
 	static styles = [
 		UUITextStyles,
 		css`
@@ -32,16 +29,6 @@ export class UmbDocumentWorkspaceElement extends UmbObserverMixin(
 
 	private _workspaceContext?: UmbWorkspaceDocumentContext;
 
-	connectedCallback(): void {
-		super.connectedCallback();
-		// TODO: avoid this connection, our own approach on Lit-Controller could be handling this case.
-		this._workspaceContext?.connectedCallback();
-	}
-	disconnectedCallback(): void {
-		super.connectedCallback();
-		// TODO: avoid this connection, our own approach on Lit-Controller could be handling this case.
-		this._workspaceContext?.disconnectedCallback();
-	}
 
 	protected _provideWorkspace() {
 		if (this._entityKey) {

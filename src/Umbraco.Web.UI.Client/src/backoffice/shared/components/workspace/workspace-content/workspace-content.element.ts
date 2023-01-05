@@ -1,27 +1,30 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
-import { css, html, LitElement, nothing } from 'lit';
+import { css, html, nothing } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { UUIInputElement, UUIInputEvent } from '@umbraco-ui/uui';
 import { distinctUntilChanged } from 'rxjs';
-import type { UmbWorkspaceNodeContext } from '../workspace-context/workspace-node.context';
-import { UmbObserverMixin } from '@umbraco-cms/observable-api';
-import { UmbContextConsumerMixin, UmbContextProviderMixin } from '@umbraco-cms/context-api';
+import type { UmbWorkspaceContentContext } from './workspace-content.context';
 import type { DocumentDetails, MediaDetails } from '@umbraco-cms/models';
 
-import '../workspace-entity/workspace-entity.element';
+import '../workspace-layout/workspace-layout.element';
 
 // Lazy load
 // TODO: Make this dynamic, use load-extensions method to loop over extensions for this node.
 import './views/edit/workspace-view-content-edit.element';
 import './views/info/workspace-view-content-info.element';
 import type { UmbNodeStoreBase } from '@umbraco-cms/stores/store';
+import { UmbLitElement } from '@umbraco-cms/element';
 
 type ContentTypeTypes = DocumentDetails | MediaDetails;
 
+/**
+ * TODO: IMPORTANT TODO: Get rid of the content workspace. Instead we aim to get separate components that can be composed by each workspace.
+ * Example. Document Workspace would use a Variant-component(variant component would talk directly to the workspace-context)
+ * As well breadcrumbs etc.
+ * 
+ */
 @customElement('umb-workspace-content')
-export class UmbWorkspaceContentElement extends UmbContextProviderMixin(
-	UmbContextConsumerMixin(UmbObserverMixin(LitElement))
-) {
+export class UmbWorkspaceContentElement extends UmbLitElement {
 	static styles = [
 		UUITextStyles,
 		css`
@@ -72,7 +75,7 @@ export class UmbWorkspaceContentElement extends UmbContextProviderMixin(
 	@state()
 	_content?: ContentTypeTypes;
 
-	private _workspaceContext?: UmbWorkspaceNodeContext<ContentTypeTypes, UmbNodeStoreBase<ContentTypeTypes>>;
+	private _workspaceContext?: UmbWorkspaceContentContext<ContentTypeTypes, UmbNodeStoreBase<ContentTypeTypes>>;
 
 	constructor() {
 		super();
@@ -88,7 +91,7 @@ export class UmbWorkspaceContentElement extends UmbContextProviderMixin(
 	private async _observeWorkspace() {
 		if (!this._workspaceContext) return;
 
-		this.observe<ContentTypeTypes>(this._workspaceContext.data.pipe(distinctUntilChanged()), (data) => {
+		this.observe(this._workspaceContext.data.pipe(distinctUntilChanged()), (data) => {
 			this._content = data;
 		});
 	}
@@ -153,7 +156,7 @@ export class UmbWorkspaceContentElement extends UmbContextProviderMixin(
 
 	render() {
 		return html`
-			<umb-workspace-entity alias=${this.alias}>
+			<umb-workspace-layout alias=${this.alias}>
 				<div id="header" slot="header">
 					<uui-input id="name-input" .value=${this._content?.name} @input="${this._handleInput}">
 						<!-- Implement Variant Selector -->
@@ -187,7 +190,7 @@ export class UmbWorkspaceContentElement extends UmbContextProviderMixin(
 				</div>
 
 				<div id="footer" slot="footer">Breadcrumbs</div>
-			</umb-workspace-entity>
+			</umb-workspace-layout>
 		`;
 	}
 }

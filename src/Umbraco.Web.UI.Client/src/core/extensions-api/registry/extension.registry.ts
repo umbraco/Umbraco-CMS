@@ -69,10 +69,10 @@ export class UmbExtensionRegistry {
 		return values.some((ext) => ext.alias === alias);
 	}
 
-	getByAlias<T extends ManifestTypes>(alias: string): Observable<T | null>;
-	getByAlias(alias: string) {
+
+	getByAlias<T = ManifestTypes>(alias: string): Observable<T | null> {
 		// TODO: make pipes prettier/simpler/reuseable
-		return this.extensions.pipe(map((dataTypes) => dataTypes.find((extension) => extension.alias === alias) || null));
+		return this.extensions.pipe(map((dataTypes) => dataTypes.find((extension) => extension.alias === alias) || null)) as Observable<T | null>;
 	}
 
 	// TODO: implement unregister of extension
@@ -81,7 +81,7 @@ export class UmbExtensionRegistry {
 	extensionsOfType(type: 'headerApp'): Observable<Array<ManifestHeaderApp>>;
 	extensionsOfType(type: 'section'): Observable<Array<ManifestSection>>;
 	extensionsOfType(type: 'sectionView'): Observable<Array<ManifestSectionView>>;
-	extensionsOfType(type: 'tree'): Observable<Array<ManifestTree>>;
+	extensionsOfType<T = ManifestTree>(type: 'tree'): Observable<Array<T>>;
 	extensionsOfType(type: 'workspace'): Observable<Array<ManifestWorkspace>>;
 	extensionsOfType(type: 'treeItemAction'): Observable<Array<ManifestTreeItemAction>>;
 	extensionsOfType(type: 'dashboard'): Observable<Array<ManifestDashboard>>;
@@ -104,9 +104,9 @@ export class UmbExtensionRegistry {
 		);
 	}
 
-	extensionsOfTypes(types: string[]): Observable<Array<ManifestTypes>> {
+	extensionsOfTypes<ExtensionType = ManifestTypes>(types: string[]): Observable<Array<ExtensionType>> {
 		return this.extensions.pipe(
 			map((exts) => exts.filter((ext) => (types.indexOf(ext.type) !== -1)).sort((a, b) => (b.weight || 0) - (a.weight || 0)))
-		);
+		) as Observable<Array<ExtensionType>>;
 	}
 }

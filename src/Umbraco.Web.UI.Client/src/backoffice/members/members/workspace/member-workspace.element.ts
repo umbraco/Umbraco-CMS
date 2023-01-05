@@ -19,7 +19,7 @@ export class UmbMemberWorkspaceElement extends LitElement {
 	id!: string;
 
 	render() {
-		return html` <umb-workspace-entity alias="Umb.Workspace.Member">Member Workspace</umb-workspace-entity> `;
+		return html` <umb-workspace-layout alias="Umb.Workspace.Member">Member Workspace</umb-workspace-layout> `;
 	}
 }
 
