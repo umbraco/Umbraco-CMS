@@ -6,6 +6,7 @@ import type { UmbWorkspaceContentContext } from './workspace-content.context';
 import type { DocumentDetails, MediaDetails } from '@umbraco-cms/models';
 
 import '../workspace-layout/workspace-layout.element';
+import '../../variant-selector/variant-selector.element';
 
 // Lazy load
 // TODO: Make this dynamic, use load-extensions method to loop over extensions for this node.
