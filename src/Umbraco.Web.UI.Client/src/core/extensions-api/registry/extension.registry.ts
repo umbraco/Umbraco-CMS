@@ -1,14 +1,14 @@
 import { BehaviorSubject, map, Observable } from 'rxjs';
 import type {
 	ManifestTypes,
-	AliasManifestTypeMap,
+	AliasManifestTypeMap as ManifestTypeMap,
 	ManifestBase,
 	ManifestCustom,
 } from '../../models';
 import { hasDefaultExport } from '../has-default-export.function';
 import { loadExtension } from '../load-extension.function';
 
-type SpecificManifestTypeOrManifestBase<T extends keyof AliasManifestTypeMap | string> = T extends keyof AliasManifestTypeMap ? AliasManifestTypeMap[T] : ManifestBase;
+type SpecificManifestTypeOrManifestBase<T extends keyof ManifestTypeMap | string> = T extends keyof ManifestTypeMap ? ManifestTypeMap[T] : ManifestBase;
 
 export class UmbExtensionRegistry {
 	private _extensions = new BehaviorSubject<Array<ManifestBase>>([]);
@@ -62,14 +62,14 @@ export class UmbExtensionRegistry {
 		return this.extensions.pipe(map((dataTypes) => dataTypes.find((extension) => extension.alias === alias) || null));
 	}
 
-	getByTypeAndAlias<Key extends keyof AliasManifestTypeMap>(type: Key, alias: string) {
+	getByTypeAndAlias<Key extends keyof ManifestTypeMap>(type: Key, alias: string) {
 		return this.extensionsOfType(type).pipe(map((extensions) => extensions.find((extension) => extension.alias === alias) || null));
 	}
 
 	// TODO: implement unregister of extension
 
 
-	extensionsOfType<Key extends keyof AliasManifestTypeMap | string, T = SpecificManifestTypeOrManifestBase<Key>>(type: Key) {
+	extensionsOfType<Key extends keyof ManifestTypeMap | string, T = SpecificManifestTypeOrManifestBase<Key>>(type: Key) {
 		return this.extensions.pipe(
 			map((exts) => exts.filter((ext) => ext.type === type).sort((a, b) => (b.weight || 0) - (a.weight || 0)))
 		) as Observable<Array<T>>;
