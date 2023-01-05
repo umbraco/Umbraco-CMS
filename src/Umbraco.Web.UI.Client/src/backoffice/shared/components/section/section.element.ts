@@ -98,7 +98,7 @@ export class UmbSectionElement extends UmbLitElement {
 				component: () => createExtensionElement(workspace),
 				setup: (component: Promise<UmbWorkspaceEntityElement>, info: IRoutingInfo) => {
 					component.then((el) => {
-						(el as any).entityKey = info.match.params.key;
+						el.entityKey = info.match.params.key;
 					});
 				},
 			});
