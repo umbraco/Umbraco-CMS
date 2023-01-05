@@ -1,7 +1,5 @@
 import type { ManifestTree, ManifestTreeItemAction } from '@umbraco-cms/models';
 
-const treeAlias = 'Umb.Tree.Documents';
-
 const tree: ManifestTree = {
 	type: 'tree',
 	alias: 'Umb.Tree.DataTypes',
