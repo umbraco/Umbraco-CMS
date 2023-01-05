@@ -19,6 +19,7 @@ import type {
 	ManifestHeaderApp,
 	ManifestCollectionView,
 	ManifestCollectionBulkAction,
+	AliasManifestTypeMap,
 } from '../../models';
 import { hasDefaultExport } from '../has-default-export.function';
 import { loadExtension } from '../load-extension.function';
@@ -75,8 +76,8 @@ export class UmbExtensionRegistry {
 		return this.extensions.pipe(map((dataTypes) => dataTypes.find((extension) => extension.alias === alias) || null));
 	}
 
-	getByTypeAndAlias(type: string, alias: string) {
-		return this.extensionsOfType(type).pipe(map((extensions) => extensions.find((extension) => extension.alias === alias) || null));
+	getByTypeAndAlias<Key extends keyof AliasManifestTypeMap>(type: Key, alias: string) {
+		return this.extensionsOfType<AliasManifestTypeMap[Key]>(type).pipe(map((extensions) => extensions.find((extension) => extension.alias === alias) || null));
 	}
 
 	// TODO: implement unregister of extension
