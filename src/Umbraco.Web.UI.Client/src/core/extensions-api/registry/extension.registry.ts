@@ -20,12 +20,13 @@ import type {
 	ManifestCollectionView,
 	ManifestCollectionBulkAction,
 	AliasManifestTypeMap,
+	ManifestBase,
 } from '../../models';
 import { hasDefaultExport } from '../has-default-export.function';
 import { loadExtension } from '../load-extension.function';
 
 export class UmbExtensionRegistry {
-	private _extensions = new BehaviorSubject<Array<ManifestTypes>>([]);
+	private _extensions = new BehaviorSubject<Array<ManifestBase>>([]);
 	public readonly extensions = this._extensions.asObservable();
 
 	register(manifest: ManifestTypes & { loader?: () => Promise<object | HTMLElement> }): void {
@@ -103,13 +104,13 @@ export class UmbExtensionRegistry {
 	extensionsOfType(type: 'collectionView'): Observable<Array<ManifestCollectionView>>;
 	extensionsOfType(type: 'collectionBulkAction'): Observable<Array<ManifestCollectionBulkAction>>;
 	extensionsOfType<T extends ManifestTypes>(type: string): Observable<Array<T>>;
-	extensionsOfType(type: string): Observable<Array<ManifestTypes>> {
+	extensionsOfType(type: string): Observable<Array<ManifestBase>> {
 		return this.extensions.pipe(
 			map((exts) => exts.filter((ext) => ext.type === type).sort((a, b) => (b.weight || 0) - (a.weight || 0)))
 		);
 	}
 
-	extensionsOfTypes<ExtensionType = ManifestTypes>(types: string[]): Observable<Array<ExtensionType>> {
+	extensionsOfTypes<ExtensionType = ManifestBase>(types: string[]): Observable<Array<ExtensionType>> {
 		return this.extensions.pipe(
 			map((exts) => exts.filter((ext) => (types.indexOf(ext.type) !== -1)).sort((a, b) => (b.weight || 0) - (a.weight || 0)))
 		) as Observable<Array<ExtensionType>>;

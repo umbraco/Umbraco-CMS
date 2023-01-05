@@ -59,7 +59,6 @@ export type ManifestTypes =
 	| ManifestCollectionBulkAction
 	| ManifestCollectionView;
 
-
 export type ManifestStandardTypes = ManifestTypes['type'];
 
 export type AliasManifestTypeMap = {

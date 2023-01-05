@@ -79,12 +79,12 @@ export class UmbWorkspaceViewDataTypeEditElement extends UmbLitElement {
 		if (!propertyEditorUIAlias) return;
 
 		this.observe(
-			umbExtensionsRegistry.getByAlias<ManifestPropertyEditorUI>(propertyEditorUIAlias),
+			umbExtensionsRegistry.getByTypeAndAlias('propertyEditorUI', propertyEditorUIAlias),
 			(propertyEditorUI) => {
 				this._propertyEditorUIName = propertyEditorUI?.meta.label ?? propertyEditorUI?.name ?? '';
 				this._propertyEditorUIAlias = propertyEditorUI?.alias ?? '';
-				this._propertyEditorUIIcon = propertyEditorUI?.meta?.icon ?? '';
-				this._propertyEditorModelAlias = propertyEditorUI?.meta?.propertyEditorModel ?? '';
+				this._propertyEditorUIIcon = propertyEditorUI?.meta.icon ?? '';
+				this._propertyEditorModelAlias = propertyEditorUI?.meta.propertyEditorModel ?? '';
 
 				this._workspaceContext?.update({ propertyEditorModelAlias: this._propertyEditorModelAlias });
 			}
