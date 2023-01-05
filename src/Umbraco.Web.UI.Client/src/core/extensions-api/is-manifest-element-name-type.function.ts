@@ -1,7 +1,7 @@
-import type { ManifestElementType, ManifestElementWithElementName } from '../models';
+import type { ManifestElement, ManifestElementWithElementName } from '../models';
 
 export function isManifestElementNameType(manifest: unknown): manifest is ManifestElementWithElementName {
 	return (
-		typeof manifest === 'object' && manifest !== null && (manifest as ManifestElementType).elementName !== undefined
+		typeof manifest === 'object' && manifest !== null && (manifest as ManifestElement).elementName !== undefined
 	);
 }
