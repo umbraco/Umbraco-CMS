@@ -101,8 +101,7 @@ export class UmbSectionElement extends UmbLitElement {
 					component: () => createExtensionElement(workspace),
 					setup: (component: Promise<UmbWorkspaceEntityElement>) => {
 						component.then((el) => {
-							el.parentEntityKey = null;
-							el.isNew = true;
+							el.create = null;
 						});
 					},
 				},
@@ -111,8 +110,7 @@ export class UmbSectionElement extends UmbLitElement {
 					component: () => createExtensionElement(workspace),
 					setup: (component: Promise<UmbWorkspaceEntityElement>, info: IRoutingInfo) => {
 						component.then((el) => {
-							el.parentEntityKey = info.match.params.parentKey;
-							el.isNew = true;
+							el.create = info.match.params.parentKey;
 						});
 					},
 				},

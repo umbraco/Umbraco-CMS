@@ -19,8 +19,8 @@ export class UmbWorkspaceDataTypeContext extends UmbWorkspaceContentContext<
 	UmbDataTypeStoreItemType,
 	UmbDataTypeStore
 > {
-	constructor(host: UmbControllerHostInterface, entityKey: string) {
-		super(host, DefaultDataTypeData, 'umbDataTypeStore', entityKey, 'dataType');
+	constructor(host: UmbControllerHostInterface) {
+		super(host, DefaultDataTypeData, 'umbDataTypeStore', 'dataType');
 	}
 
 	public setPropertyValue(propertyAlias: string, value: any) {

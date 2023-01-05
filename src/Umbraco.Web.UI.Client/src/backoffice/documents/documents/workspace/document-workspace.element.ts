@@ -5,7 +5,7 @@ import { UmbWorkspaceDocumentContext } from './document-workspace.context';
 import { UmbLitElement } from '@umbraco-cms/element';
 
 @customElement('umb-document-workspace')
-export class UmbDocumentWorkspaceElement extends UmbLitElement {
+export class UmbDocumentWorkspaceElement extends UmbLitElement implements UmbWorkspaceEntityElement {
 	static styles = [
 		UUITextStyles,
 		css`
@@ -24,17 +24,23 @@ export class UmbDocumentWorkspaceElement extends UmbLitElement {
 	}
 	public set entityKey(value: string) {
 		this._entityKey = value;
-		this._provideWorkspace();
+		if (this._entityKey) {
+			this._workspaceContext?.load(this._entityKey);
+		}
+	}
+
+	@property()
+	public set create(parentKey: string | null) {
+		this._workspaceContext?.create(parentKey);
 	}
 
 	private _workspaceContext?: UmbWorkspaceDocumentContext;
 
 
-	protected _provideWorkspace() {
-		if (this._entityKey) {
-			this._workspaceContext = new UmbWorkspaceDocumentContext(this, this._entityKey);
-			this.provideContext('umbWorkspaceContext', this._workspaceContext);
-		}
+	constructor() {
+		super();
+		this._workspaceContext = new UmbWorkspaceDocumentContext(this);
+		this.provideContext('umbWorkspaceContext', this._workspaceContext);
 	}
 
 	render() {

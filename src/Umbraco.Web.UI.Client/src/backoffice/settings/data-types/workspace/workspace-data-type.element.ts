@@ -36,30 +36,17 @@ export class UmbWorkspaceDataTypeElement extends UmbLitElement {
 	}
 	public set entityKey(value: string) {
 		this._entityKey = value;
-		this._provideWorkspace();
+		if (this._entityKey) {
+			this._workspaceContext?.load(this._entityKey);
+		}
 	}
 
-	private _isNew!: boolean;
 	@property()
-	public get isNew(): boolean {
-		return this._isNew;
-	}
-	public set isNew(value: boolean) {
-		this._isNew = value;
-		this._createDataType();
+	public set create(parentKey: string | null) {
+		this._workspaceContext?.create(parentKey);
 	}
 
-	private _parentEntityKey: string | null = null;
-	@property()
-	public get parentEntityKey(): string | null {
-		return this._parentEntityKey;
-	}
-	public set parentEntityKey(value: string | null) {
-		this._parentEntityKey = value;
-		this._createDataType();
-	}
-
-	private _workspaceContext?: UmbWorkspaceDataTypeContext;
+	private _workspaceContext: UmbWorkspaceDataTypeContext = new UmbWorkspaceDataTypeContext(this);
 
 	@state()
 	private _dataTypeName = '';
@@ -67,21 +54,7 @@ export class UmbWorkspaceDataTypeElement extends UmbLitElement {
 	constructor() {
 		super();
 		this.addEventListener('property-value-change', this._onPropertyValueChange);
-	}
-
-	private _createDataType() {
-		this._workspaceContext = new UmbWorkspaceDataTypeContext(this, this._entityKey);
-	}
-
-	protected _provideWorkspace() {
-		this._workspaceContext = new UmbWorkspaceDataTypeContext(this, this._entityKey);
 		this.provideContext('umbWorkspaceContext', this._workspaceContext);
-		this._observeWorkspace();
-	}
-
-	private _observeWorkspace() {
-		if (!this._workspaceContext) return;
-
 		this.observe(this._workspaceContext.data.pipe(distinctUntilChanged()), (dataType) => {
 			if (dataType && dataType.name !== this._dataTypeName) {
 				this._dataTypeName = dataType.name ?? '';
