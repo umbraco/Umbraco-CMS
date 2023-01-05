@@ -1,11 +1,9 @@
-import { LitElement } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { UmbSectionContext } from '../../section/section.context';
 import { UmbTreeContextMenuPageService } from '../context-menu/tree-context-menu-page.service';
 import { UmbTreeContextMenuService } from '../context-menu/tree-context-menu.service';
-import { UmbObserverMixin } from '@umbraco-cms/observable-api';
-import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 import type { Entity, ManifestTreeItemAction, ManifestTree } from '@umbraco-cms/models';
+import { UmbLitElement } from '@umbraco-cms/element';
 
 export type ActionPageEntity = {
 	key: string;
@@ -13,7 +11,7 @@ export type ActionPageEntity = {
 };
 
 @customElement('umb-tree-item-action')
-export default class UmbTreeItemActionElement extends UmbContextConsumerMixin(UmbObserverMixin(LitElement)) {
+export default class UmbTreeItemActionElement extends UmbLitElement {
 	@property({ attribute: false })
 	public treeAction?: ManifestTreeItemAction;
 
@@ -49,7 +47,7 @@ export default class UmbTreeItemActionElement extends UmbContextConsumerMixin(Um
 	private _observeEntity() {
 		if (!this._actionPageService) return;
 
-		this.observe<ActionPageEntity>(this._actionPageService.entity, (entity) => {
+		this.observe(this._actionPageService.entity, (entity) => {
 			this._entity = entity;
 		});
 	}
@@ -57,7 +55,7 @@ export default class UmbTreeItemActionElement extends UmbContextConsumerMixin(Um
 	private _observeActiveTree() {
 		if (!this._sectionContext) return;
 
-		this.observe<ManifestTree>(this._sectionContext.activeTree, (tree) => {
+		this.observe(this._sectionContext.activeTree, (tree) => {
 			this._activeTree = tree;
 		});
 	}
@@ -65,7 +63,7 @@ export default class UmbTreeItemActionElement extends UmbContextConsumerMixin(Um
 	private _observeActiveTreeItem() {
 		if (!this._sectionContext) return;
 
-		this.observe<Entity>(this._sectionContext.activeTreeItem, (treeItem) => {
+		this.observe(this._sectionContext.activeTreeItem, (treeItem) => {
 			this._activeTreeItem = treeItem;
 		});
 	}

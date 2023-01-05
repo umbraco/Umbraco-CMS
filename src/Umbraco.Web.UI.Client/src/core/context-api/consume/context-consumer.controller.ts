@@ -4,11 +4,17 @@ import type { UmbControllerInterface } from 'src/core/controller/controller.inte
 import { UmbControllerHostInterface } from 'src/core/controller/controller-host.mixin';
 
 
-export class UmbContextConsumerController extends UmbContextConsumer implements UmbControllerInterface {
+export class UmbContextConsumerController extends UmbContextConsumer<UmbControllerHostInterface> implements UmbControllerInterface {
    
     constructor(host:UmbControllerHostInterface, contextAlias: string, callback: UmbContextCallback) {
         super(host, contextAlias, callback);
         host.addController(this);
     }
+
+    public destroy() {
+		if (this.host) {
+			this.host.removeController(this);
+		}
+	}
 
 }

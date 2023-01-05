@@ -1,15 +1,13 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
-import { css, html, LitElement, nothing } from 'lit';
+import { css, html, nothing } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 
-import { UmbNotificationService } from '../../../../../core/notification';
-import { UmbNotificationDefaultData } from '../../../../../core/notification/layouts/default';
-
-import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
-import { ApiError, ProblemDetails, Searcher, Index, IndexerResource, SearcherResource } from '@umbraco-cms/backend-api';
+import { Index, IndexerResource, Searcher, SearcherResource } from '@umbraco-cms/backend-api';
+import { UmbLitElement } from '@umbraco-cms/element';
+import { tryExecuteAndNotify } from '@umbraco-cms/resources';
 
 @customElement('umb-dashboard-examine-overview')
-export class UmbDashboardExamineOverviewElement extends UmbContextConsumerMixin(LitElement) {
+export class UmbDashboardExamineOverviewElement extends UmbLitElement {
 	static styles = [
 		UUITextStyles,
 		css`
@@ -65,16 +63,6 @@ export class UmbDashboardExamineOverviewElement extends UmbContextConsumerMixin(
 	@state()
 	private _loadingSearchers = false;
 
-	private _notificationService?: UmbNotificationService;
-
-	constructor() {
-		super();
-
-		this.consumeAllContexts(['umbNotificationService'], (instances) => {
-			this._notificationService = instances['umbNotificationService'];
-		});
-	}
-
 	connectedCallback() {
 		super.connectedCallback();
 		this._getIndexers();
@@ -83,31 +71,15 @@ export class UmbDashboardExamineOverviewElement extends UmbContextConsumerMixin(
 
 	private async _getIndexers() {
 		this._loadingIndexers = true;
-		try {
-			const indexers = await IndexerResource.getIndexer({ take: 9999, skip: 0 });
-			this._indexers = indexers.items;
-		} catch (e) {
-			if (e instanceof ApiError) {
-				const error = e as ProblemDetails;
-				const data: UmbNotificationDefaultData = { message: error.message ?? 'Could not fetch indexers' };
-				this._notificationService?.peek('danger', { data });
-			}
-		}
+		const { data } = await tryExecuteAndNotify(this, IndexerResource.getIndexer({ take: 9999, skip: 0 }));
+		this._indexers = data?.items ?? [];
 		this._loadingIndexers = false;
 	}
 
 	private async _getSearchers() {
 		this._loadingSearchers = true;
-		try {
-			const searchers = await SearcherResource.getSearcher({ take: 9999, skip: 0 });
-			this._searchers = searchers.items;
-		} catch (e) {
-			if (e instanceof ApiError) {
-				const error = e as ProblemDetails;
-				const data: UmbNotificationDefaultData = { message: error.message ?? 'Could not fetch searchers' };
-				this._notificationService?.peek('danger', { data });
-			}
-		}
+		const { data } = await tryExecuteAndNotify(this, SearcherResource.getSearcher({ take: 9999, skip: 0 }));
+		this._searchers = data?.items ?? [];
 		this._loadingSearchers = false;
 	}
 

@@ -1,14 +1,13 @@
-import { css, html, LitElement } from 'lit';
+import { css, html } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, property, state } from 'lit/decorators.js';
 import { repeat } from 'lit/directives/repeat.js';
 import { groupBy } from 'lodash';
 import type { UUIInputEvent } from '@umbraco-ui/uui';
 import type { UmbModalHandler } from '../../modal-handler';
-import { UmbObserverMixin } from '@umbraco-cms/observable-api';
-import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 import type { ManifestPropertyEditorUI } from '@umbraco-cms/models';
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
+import { UmbLitElement } from '@umbraco-cms/element';
 
 export interface UmbModalPropertyEditorUIPickerData {
 	selection?: Array<string>;
@@ -21,7 +20,7 @@ interface GroupedPropertyEditorUIs {
 
 // TODO: make use of UmbPickerLayoutBase
 @customElement('umb-modal-layout-property-editor-ui-picker')
-export class UmbModalLayoutPropertyEditorUIPickerElement extends UmbContextConsumerMixin(UmbObserverMixin(LitElement)) {
+export class UmbModalLayoutPropertyEditorUIPickerElement extends UmbLitElement {
 	static styles = [
 		UUITextStyles,
 		css`
@@ -116,7 +115,7 @@ export class UmbModalLayoutPropertyEditorUIPickerElement extends UmbContextConsu
 	private _usePropertyEditorUIs() {
 		if (!this.data) return;
 
-		this.observe<ManifestPropertyEditorUI[]>(
+		this.observe(
 			umbExtensionsRegistry.extensionsOfType('propertyEditorUI'),
 			(propertyEditorUIs) => {
 				this._propertyEditorUIs = propertyEditorUIs;
@@ -158,13 +157,13 @@ export class UmbModalLayoutPropertyEditorUIPickerElement extends UmbContextConsu
 
 	render() {
 		return html`
-			<umb-workspace-entity headline="Select Property Editor UI">
+			<umb-workspace-layout headline="Select Property Editor UI">
 				<uui-box> ${this._renderFilter()} ${this._renderGrid()} </uui-box>
 				<div slot="actions">
 					<uui-button label="Close" @click=${this._close}></uui-button>
 					<uui-button label="${this._submitLabel}" look="primary" color="positive" @click=${this._submit}></uui-button>
 				</div>
-			</umb-workspace-entity>
+			</umb-workspace-layout>
 		`;
 	}
 

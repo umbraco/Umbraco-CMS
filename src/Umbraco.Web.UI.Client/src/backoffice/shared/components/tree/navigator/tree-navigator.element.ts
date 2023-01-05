@@ -1,19 +1,19 @@
-import { css, html, LitElement } from 'lit';
+import { css, html } from 'lit';
 import { repeat } from 'lit/directives/repeat.js';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, property, state } from 'lit/decorators.js';
 import { ifDefined } from 'lit-html/directives/if-defined.js';
 import { UmbSectionContext } from '../../section/section.context';
 import { UmbTreeContext } from '../tree.context';
-import { UmbObserverMixin } from '@umbraco-cms/observable-api';
-import { UmbContextConsumerMixin, UmbContextProviderMixin } from '@umbraco-cms/context-api';
-import type { Entity, ManifestSection, ManifestTree } from '@umbraco-cms/models';
+import type { Entity, ManifestTree } from '@umbraco-cms/models';
 import { UmbTreeDataStore } from '@umbraco-cms/stores/store';
 
 import '../tree-item.element';
+import { UmbLitElement } from '@umbraco-cms/element';
+import { DocumentTreeItem } from '@umbraco-cms/backend-api';
 
 @customElement('umb-tree-navigator')
-export class UmbTreeNavigator extends UmbContextConsumerMixin(UmbContextProviderMixin(UmbObserverMixin(LitElement))) {
+export class UmbTreeNavigator extends UmbLitElement {
 	static styles = [UUITextStyles, css``];
 
 	private _storeContextAlias = '';
@@ -31,7 +31,7 @@ export class UmbTreeNavigator extends UmbContextConsumerMixin(UmbContextProvider
 	private _loading = true;
 
 	@state()
-	private _items: Entity[] = [];
+	private _items: DocumentTreeItem[] = [];
 
 	@state()
 	private _tree?: ManifestTree;
@@ -39,7 +39,7 @@ export class UmbTreeNavigator extends UmbContextConsumerMixin(UmbContextProvider
 	@state()
 	private _href?: string;
 
-	private _store?: UmbTreeDataStore<unknown>;
+	private _store?: UmbTreeDataStore<DocumentTreeItem>;
 	private _sectionContext?: UmbSectionContext;
 
 	constructor() {
@@ -77,7 +77,7 @@ export class UmbTreeNavigator extends UmbContextConsumerMixin(UmbContextProvider
 
 		this._loading = true;
 
-		this.observe<Entity[]>(this._store.getTreeRoot(), (rootItems) => {
+		this.observe(this._store.getTreeRoot(), (rootItems) => {
 			if (rootItems?.length === 0) return;
 			this._items = rootItems;
 			this._loading = false;
@@ -87,7 +87,7 @@ export class UmbTreeNavigator extends UmbContextConsumerMixin(UmbContextProvider
 	private _observeSection() {
 		if (!this._sectionContext) return;
 
-		this.observe<ManifestSection>(this._sectionContext?.data, (section) => {
+		this.observe(this._sectionContext?.data, (section) => {
 			this._href = this._constructPath(section.meta.pathname, this._tree?.meta.rootNodeEntityType);
 		});
 	}
@@ -110,11 +110,12 @@ export class UmbTreeNavigator extends UmbContextConsumerMixin(UmbContextProvider
 	}
 
 	private _renderRootItems() {
+		// TODO: Fix Type Mismatch ` as Entity` in this template:
 		return html`
 			${repeat(
 				this._items,
 				(item) => item.key,
-				(item) => html`<umb-tree-item .treeItem=${item} .loading=${this._loading}></umb-tree-item>`
+				(item) => html`<umb-tree-item .treeItem=${item as Entity} .loading=${this._loading}></umb-tree-item>`
 			)}
 		`;
 	}
