@@ -41,11 +41,11 @@ export class UmbVariantSelectorElement extends UmbLitElement {
 		`,
 	];
 
-	// TODO: is this used for anything?
+	// TODO: not jet used:
 	@property()
 	alias!: string;
 
-	// TODO: use a NodeDetails type here:
+	// TODO: use a more specific type here:
 	@state()
 	_content?: ContentTypeTypes;
 
