@@ -3,6 +3,7 @@ import type {
 	ManifestTypes,
 	AliasManifestTypeMap,
 	ManifestBase,
+	ManifestCustom,
 } from '../../models';
 import { hasDefaultExport } from '../has-default-export.function';
 import { loadExtension } from '../load-extension.function';
