@@ -2,7 +2,7 @@
 <language alias="he" intName="Hebrew (Israel)" localName="Hebrew" lcid="" culture="he-IL">
   <creator>
     <name>The Umbraco community</name>
-    <link>https://our.umbraco.com/documentation/Extending-Umbraco/Language-Files</link>
+    <link>https://docs.umbraco.com/umbraco-cms/extending/language-files</link>
   </creator>
   <area alias="actions">
     <key alias="assigndomain">נהל שמות מתחם</key>
@@ -589,7 +589,6 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="removeLink">הסר קישור</key>
   </area>
   <area alias="rollback">
-    <key alias="currentVersion">גירסה עדכנית</key>
     <key alias="diffHelp"><![CDATA[להלן ההבדלים בין הגירסא הנוכחית לבין הגרסא שנבחרה. <br />טקסט <del>אדום</del> לא יוצג בגרסא שנבחרה, טקסט <ins>ירוק</ins> מייצט טקסט שנוסף.]]></key>
     <key alias="documentRolledBack">המסמך שוחזר בהצלחה</key>
     <key alias="htmlHelp">להלן הגרסא שנבחרה כHTML, אם הינך לצפות בשינויים בין שתי הגרסאות בו זמנית, בחר ב diff</key>

@@ -2,7 +2,7 @@
 <language alias="ja" intName="Japanese" localName="日本語" lcid="17" culture="ja-JP">
   <creator>
     <name>The Umbraco community</name>
-    <link>https://our.umbraco.com/documentation/Extending-Umbraco/Language-Files</link>
+    <link>https://docs.umbraco.com/umbraco-cms/extending/language-files</link>
   </creator>
   <area alias="actions">
     <key alias="assigndomain">ドメインの割り当て</key>
@@ -730,7 +730,6 @@ Runwayをインストールして作られた新しいウェブサイトがど�
     <key alias="reset">リセット</key>
   </area>
   <area alias="rollback">
-    <key alias="currentVersion">現在の版</key>
     <key alias="diffHelp"><![CDATA[現在の版と選択した以前の版との比較を表示します。<br /><del>赤</del> の文字列は以前の版にはない部分で、<ins>緑の文字列は以前の版にのみある部分です。</ins>]]></key>
     <key alias="documentRolledBack">ドキュメントは以前の版に戻りました</key>
     <key alias="htmlHelp">選択した版をhtmlで表示します。２つの版の比較を表示したいときは、Diff を選択してください。</key>

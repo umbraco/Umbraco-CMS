@@ -72,7 +72,6 @@
 
         const unsubscribe = [];
         const vm = this;
-
         vm.invalidAmount = false;
         vm.areaConfig = null;
         vm.locallyAvailableBlockTypes = 0;

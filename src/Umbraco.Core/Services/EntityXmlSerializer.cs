@@ -213,7 +213,7 @@ internal class EntityXmlSerializer : IEntityXmlSerializer
         xml.Add(new XAttribute("Id", dataType.EditorAlias));
         xml.Add(new XAttribute("Definition", dataType.Key));
         xml.Add(new XAttribute("DatabaseType", dataType.DatabaseType.ToString()));
-        xml.Add(new XAttribute("Configuration", _configurationEditorJsonSerializer.Serialize(dataType.Configuration)));
+        xml.Add(new XAttribute("Configuration", _configurationEditorJsonSerializer.Serialize(dataType.ConfigurationObject)));
 
         var folderNames = string.Empty;
         var folderKeys = string.Empty;

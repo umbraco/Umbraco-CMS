@@ -1,6 +1,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.PropertyEditors;
@@ -8,7 +9,6 @@ using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Migrations.PostMigrations;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
-using Umbraco.Cms.Web.Common.DependencyInjection;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_8_0_0;
@@ -58,7 +58,7 @@ public class DropDownPropertyEditorsMigration : PropertyEditorsMigrationBase
 
         foreach (DataTypeDto dataType in dataTypes)
         {
-            ValueListConfiguration config;
+            ValueListConfiguration config = new ValueListConfiguration();
 
             if (!dataType.Configuration.IsNullOrWhiteSpace())
             {
@@ -70,9 +70,10 @@ public class DropDownPropertyEditorsMigration : PropertyEditorsMigrationBase
 
                 try
                 {
-                    config = (ValueListConfiguration)configurationEditor.FromDatabase(
-                        dataType.Configuration,
-                        _configurationEditorJsonSerializer);
+                    // this migration is obsolete, no reason to refactor this code
+                    // config = (ValueListConfiguration)configurationEditor.FromDatabase(
+                    //     dataType.Configuration,
+                    //     _configurationEditorJsonSerializer);
                 }
                 catch (Exception ex)
                 {
@@ -136,8 +137,9 @@ public class DropDownPropertyEditorsMigration : PropertyEditorsMigrationBase
         dataType.DbType = ValueStorageType.Nvarchar.ToString();
         dataType.EditorAlias = Constants.PropertyEditors.Aliases.DropDownListFlexible;
 
-        var flexConfig = new DropDownFlexibleConfiguration { Items = config.Items, Multiple = isMultiple };
-        dataType.Configuration = ConfigurationEditor.ToDatabase(flexConfig, _configurationEditorJsonSerializer);
+        // this migration is obsolete, no reason to refactor this code
+        // var flexConfig = new DropDownFlexibleConfiguration { Items = config.Items, Multiple = isMultiple };
+        // dataType.Configuration = ConfigurationEditor.ToDatabase(flexConfig, _configurationEditorJsonSerializer);
 
         Database.Update(dataType);
     }
