@@ -1,12 +1,11 @@
-import { css, html, LitElement, nothing } from 'lit';
+import { css, html, nothing } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, state } from 'lit/decorators.js';
 import { IRoute } from 'router-slot';
 import { UUIPopoverElement } from '@umbraco-ui/uui';
 
 import type { UmbSectionViewUsersElement } from './section-view-users.element';
-import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
-import { UmbObserverMixin } from '@umbraco-cms/observable-api';
+import { UmbLitElement } from '@umbraco-cms/element';	
 import { UmbModalService } from 'src/core/modal';
 
 import './list-view-layouts/table/workspace-view-users-table.element';
@@ -17,7 +16,7 @@ import './workspace-view-users-create.element';
 
 export type UsersViewType = 'list' | 'grid';
 @customElement('umb-workspace-view-users-overview')
-export class UmbWorkspaceViewUsersOverviewElement extends UmbContextConsumerMixin(UmbObserverMixin(LitElement)) {
+export class UmbWorkspaceViewUsersOverviewElement extends UmbLitElement {
 	static styles = [
 		UUITextStyles,
 		css`
@@ -122,7 +121,7 @@ export class UmbWorkspaceViewUsersOverviewElement extends UmbContextConsumerMixi
 
 	private _observeSelection() {
 		if (!this._usersContext) return;
-		this.observe<Array<string>>(this._usersContext.selection, (selection) => (this._selection = selection));
+		this.observe(this._usersContext.selection, (selection) => (this._selection = selection));
 	}
 
 	private _toggleViewType() {

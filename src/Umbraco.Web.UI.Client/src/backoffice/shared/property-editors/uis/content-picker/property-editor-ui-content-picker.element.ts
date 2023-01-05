@@ -1,16 +1,15 @@
-import { css, html, LitElement, nothing } from 'lit';
+import { css, html, nothing } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, property, state } from 'lit/decorators.js';
 import { ifDefined } from 'lit-html/directives/if-defined.js';
 import type { UmbModalService } from 'src/core/modal';
-import { UmbObserverMixin } from '@umbraco-cms/observable-api';
-import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 import { UmbDocumentStore } from 'src/backoffice/documents/documents/document.store';
 import { FolderTreeItem } from '@umbraco-cms/backend-api';
+import { UmbLitElement } from '@umbraco-cms/element';
 
 // TODO: rename to Document Picker
 @customElement('umb-property-editor-ui-content-picker')
-export class UmbPropertyEditorUIContentPickerElement extends UmbContextConsumerMixin(UmbObserverMixin(LitElement)) {
+export class UmbPropertyEditorUIContentPickerElement extends UmbLitElement {
 	static styles = [
 		UUITextStyles,
 		css`
@@ -42,7 +41,7 @@ export class UmbPropertyEditorUIContentPickerElement extends UmbContextConsumerM
 	public config = [];
 
 	@state()
-	private _items: Array<FolderTreeItem> = [];
+	private _items?: Array<FolderTreeItem>;
 
 	private _modalService?: UmbModalService;
 	private _documentStore?: UmbDocumentStore;
@@ -60,7 +59,7 @@ export class UmbPropertyEditorUIContentPickerElement extends UmbContextConsumerM
 	private _observePickedDocuments() {
 		if (!this._documentStore) return;
 		// TODO: consider changing this to the list data endpoint when it is available
-		this.observe<FolderTreeItem[]>(this._documentStore.getTreeItems(this.value), (items) => {
+		this.observe(this._documentStore.getTreeItems(this.value), (items) => {
 			this._items = items;
 		});
 	}
@@ -109,7 +108,7 @@ export class UmbPropertyEditorUIContentPickerElement extends UmbContextConsumerM
 	}
 
 	render() {
-		return html`${this._items.map((item) => this._renderItem(item))}
+		return html`${this._items?.map((item) => this._renderItem(item))}
 			<uui-button id="add-button" look="placeholder" @click=${this._openPicker} label="open">Add</uui-button>`;
 	}
 }

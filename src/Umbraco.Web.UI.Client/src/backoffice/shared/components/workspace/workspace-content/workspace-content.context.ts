@@ -1,32 +1,33 @@
 import { UmbNotificationService } from '../../../../../core/notification';
 import { UmbNotificationDefaultData } from '../../../../../core/notification/layouts/default';
-import { UmbWorkspaceWithStoreContext } from './workspace-with-store.context';
+import { UmbWorkspaceWithStoreContext } from '../workspace-context/workspace-with-store.context';
 import { UmbNodeStoreBase } from '@umbraco-cms/stores/store';
 import { ContentTreeItem } from '@umbraco-cms/backend-api';
-import { UmbContextConsumer } from '@umbraco-cms/context-api';
+import { UmbControllerHostInterface } from 'src/core/controller/controller-host.mixin';
+import { UmbContextConsumerController } from 'src/core/context-api/consume/context-consumer.controller';
 
 // TODO: Consider if its right to have this many class-inheritance of WorkspaceContext
-export class UmbWorkspaceNodeContext<
+export class UmbWorkspaceContentContext<
 	ContentTypeType extends ContentTreeItem = ContentTreeItem,
 	StoreType extends UmbNodeStoreBase<ContentTypeType> = UmbNodeStoreBase<ContentTypeType>
 > extends UmbWorkspaceWithStoreContext<ContentTypeType, StoreType> {
+
 	protected _notificationService?: UmbNotificationService;
-	protected _notificationConsumer!: UmbContextConsumer;
 
 	public entityKey: string;
 	public entityType: string;
 
 	constructor(
-		target: HTMLElement,
+		host: UmbControllerHostInterface,
 		defaultData: ContentTypeType,
 		storeAlias: string,
 		entityKey: string,
 		entityType: string
 	) {
-		super(target, defaultData, storeAlias);
+		super(host, defaultData, storeAlias);
 
-		this._notificationConsumer = new UmbContextConsumer(
-			this._target,
+		new UmbContextConsumerController(
+			host,
 			'umbNotificationService',
 			(_instance: UmbNotificationService) => {
 				this._notificationService = _instance;
@@ -37,18 +38,8 @@ export class UmbWorkspaceNodeContext<
 		this.entityType = entityType;
 	}
 
-	connectedCallback() {
-		super.connectedCallback();
-		this._notificationConsumer.hostConnected();
-	}
-
-	disconnectedCallback() {
-		super.connectedCallback();
-		this._notificationConsumer.hostDisconnected();
-	}
-
 	protected _onStoreSubscription(): void {
-		this._dataObserver = this._store.getByKey(this.entityKey).subscribe((content) => {
+		this._store.getByKey(this.entityKey).subscribe((content) => {
 			if (!content) return; // TODO: Handle nicely if there is no content data.
 			this.update(content as any);
 		});

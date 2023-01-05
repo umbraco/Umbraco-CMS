@@ -1,20 +1,19 @@
-import { html, LitElement } from 'lit';
+import { html } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { ifDefined } from 'lit-html/directives/if-defined.js';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
-import { UmbObserverMixin } from '@umbraco-cms/observable-api';
-import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
-import type { ManifestTypes, PropertyEditorConfigDefaultData, PropertyEditorConfigProperty } from '@umbraco-cms/models';
+import type { PropertyEditorConfigDefaultData, PropertyEditorConfigProperty } from '@umbraco-cms/models';
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
 
 import '../../../components/entity-property/entity-property.element';
+import { UmbLitElement } from '@umbraco-cms/element';
 
 /**
  *  @element umb-property-editor-config
  *  @description - Element for displaying the configuration for a Property Editor based on a Property Editor UI Alias and a Property Editor Model alias.
  */
 @customElement('umb-property-editor-config')
-export class UmbPropertyEditorConfigElement extends UmbContextConsumerMixin(UmbObserverMixin(LitElement)) {
+export class UmbPropertyEditorConfigElement extends UmbLitElement {
 	static styles = [UUITextStyles];
 
 	/**
@@ -59,7 +58,7 @@ export class UmbPropertyEditorConfigElement extends UmbContextConsumerMixin(UmbO
 	private _observePropertyEditorUIConfig() {
 		if (!this._propertyEditorUIAlias) return;
 
-		this.observe<ManifestTypes>(umbExtensionsRegistry.getByAlias(this.propertyEditorUIAlias), (manifest) => {
+		this.observe(umbExtensionsRegistry.getByAlias(this.propertyEditorUIAlias), (manifest) => {
 			if (manifest?.type === 'propertyEditorUI') {
 				this._observePropertyEditorModelConfig(manifest.meta.propertyEditorModel);
 				this._propertyEditorUIConfigProperties = manifest?.meta.config?.properties || [];
@@ -73,7 +72,7 @@ export class UmbPropertyEditorConfigElement extends UmbContextConsumerMixin(UmbO
 	private _observePropertyEditorModelConfig(propertyEditorModelAlias?: string) {
 		if (!propertyEditorModelAlias) return;
 
-		this.observe<ManifestTypes>(umbExtensionsRegistry.getByAlias(propertyEditorModelAlias), (manifest) => {
+		this.observe(umbExtensionsRegistry.getByAlias(propertyEditorModelAlias), (manifest) => {
 			if (manifest?.type === 'propertyEditorModel') {
 				this._propertyEditorModelConfigProperties = manifest?.meta.config?.properties || [];
 				this._propertyEditorModelConfigDefaultData = manifest?.meta.config?.defaultData || [];

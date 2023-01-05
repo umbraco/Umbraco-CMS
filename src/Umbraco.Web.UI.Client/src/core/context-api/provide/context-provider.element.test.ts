@@ -1,12 +1,10 @@
 import { expect, fixture, html } from '@open-wc/testing';
-import { LitElement } from 'lit';
 import { customElement } from 'lit/decorators.js';
-
-import { UmbContextConsumerMixin } from '../consume/context-consumer.mixin';
 import { UmbContextProviderElement } from './context-provider.element';
+import { UmbLitElement } from '@umbraco-cms/element';
 
 @customElement('umb-context-test')
-export class ContextTestElement extends UmbContextConsumerMixin(LitElement) {
+export class ContextTestElement extends UmbLitElement {
 	public value: string | null = null;
 	constructor() {
 		super();

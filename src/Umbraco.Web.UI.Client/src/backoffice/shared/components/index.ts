@@ -8,7 +8,7 @@ import './content-property/content-property.element';
 import './table/table.element';
 import './code-block/code-block.element';
 import './extension-slot/extension-slot.element';
-import './workspace/workspace-entity/workspace-entity.element';
+import './workspace/workspace-layout/workspace-layout.element';
 import './section/section-main/section-main.element';
 import './section/section-sidebar/section-sidebar.element';
 import './section/section.element';

@@ -1,17 +1,16 @@
 import { UUIButtonState } from '@umbraco-ui/uui';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
-import { css, html, LitElement } from 'lit';
+import { css, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 
 import { UmbModalService } from '../../../../core/modal';
-import { UmbNotificationService } from '../../../../core/notification';
-import { UmbNotificationDefaultData } from '../../../../core/notification/layouts/default';
 
-import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
-import { ApiError, ProblemDetails, PublishedCacheResource } from '@umbraco-cms/backend-api';
+import { PublishedCacheResource } from '@umbraco-cms/backend-api';
+import { tryExecuteAndNotify } from '@umbraco-cms/resources';
+import { UmbLitElement } from '@umbraco-cms/element';
 
 @customElement('umb-dashboard-published-status')
-export class UmbDashboardPublishedStatusElement extends UmbContextConsumerMixin(LitElement) {
+export class UmbDashboardPublishedStatusElement extends UmbLitElement {
 	static styles = [
 		UUITextStyles,
 		css`
@@ -39,14 +38,12 @@ export class UmbDashboardPublishedStatusElement extends UmbContextConsumerMixin(
 	@state()
 	private _buttonStateCollect: UUIButtonState = undefined;
 
-	private _notificationService?: UmbNotificationService;
 	private _modalService?: UmbModalService;
 
 	constructor() {
 		super();
 
-		this.consumeAllContexts(['umbNotificationService', 'umbModalService'], (instances) => {
-			this._notificationService = instances['umbNotificationService'];
+		this.consumeAllContexts(['umbModalService'], (instances) => {
 			this._modalService = instances['umbModalService'];
 		});
 	}
@@ -57,19 +54,13 @@ export class UmbDashboardPublishedStatusElement extends UmbContextConsumerMixin(
 	}
 
 	// Refresh
-
 	private async _getPublishedStatus() {
-		try {
-			const data = await PublishedCacheResource.getPublishedCacheStatus();
+		const { data } = await tryExecuteAndNotify(this, PublishedCacheResource.getPublishedCacheStatus());
+		if (data) {
 			this._publishedStatusText = data;
-		} catch (e) {
-			if (e instanceof ApiError) {
-				const error = e.body as ProblemDetails;
-				const data: UmbNotificationDefaultData = { message: error.detail ?? 'Something went wrong' };
-				this._notificationService?.peek('danger', { data });
-			}
 		}
 	}
+
 	private async _onRefreshCacheHandler() {
 		this._buttonState = 'waiting';
 		await this._getPublishedStatus();
@@ -80,19 +71,14 @@ export class UmbDashboardPublishedStatusElement extends UmbContextConsumerMixin(
 	private async _reloadMemoryCache() {
 		this._buttonStateReload = 'waiting';
 		this._buttonState = 'waiting';
-		try {
-			await PublishedCacheResource.postPublishedCacheReload();
+		const { error } = await tryExecuteAndNotify(this, PublishedCacheResource.postPublishedCacheReload());
+		if (error) {
+			this._buttonStateReload = 'failed';
+			this._buttonState = 'failed';
+		} else {
 			this._buttonStateReload = 'success';
 			this._getPublishedStatus();
 			this._buttonState = 'success';
-		} catch (e) {
-			this._buttonStateReload = 'failed';
-			this._buttonState = 'failed';
-			if (e instanceof ApiError) {
-				const error = e.body as ProblemDetails;
-				const data: UmbNotificationDefaultData = { message: error.detail ?? 'Something went wrong' };
-				this._notificationService?.peek('danger', { data });
-			}
 		}
 	}
 	private async _onReloadCacheHandler() {
@@ -102,7 +88,7 @@ export class UmbDashboardPublishedStatusElement extends UmbContextConsumerMixin(
 			color: 'danger',
 			confirmLabel: 'Continue',
 		});
-		modalHandler?.onClose().then(({ confirmed }: any) => {
+		modalHandler?.onClose().then(({ confirmed }) => {
 			if (confirmed) this._reloadMemoryCache();
 		});
 	}
@@ -110,18 +96,14 @@ export class UmbDashboardPublishedStatusElement extends UmbContextConsumerMixin(
 	// Rebuild
 	private async _rebuildDatabaseCache() {
 		this._buttonStateRebuild = 'waiting';
-		try {
-			await PublishedCacheResource.postPublishedCacheRebuild();
-			this._buttonStateRebuild = 'success';
-		} catch (e) {
+		const { error } = await tryExecuteAndNotify(this, PublishedCacheResource.postPublishedCacheRebuild());
+		if (error) {
 			this._buttonStateRebuild = 'failed';
-			if (e instanceof ApiError) {
-				const error = e.body as ProblemDetails;
-				const data: UmbNotificationDefaultData = { message: error.detail ?? 'Something went wrong' };
-				this._notificationService?.peek('danger', { data });
-			}
+		} else {
+			this._buttonStateRebuild = 'success';
 		}
 	}
+
 	private async _onRebuildCacheHandler() {
 		const modalHandler = this._modalService?.confirm({
 			headline: 'Rebuild',
@@ -129,25 +111,21 @@ export class UmbDashboardPublishedStatusElement extends UmbContextConsumerMixin(
 			color: 'danger',
 			confirmLabel: 'Continue',
 		});
-		modalHandler?.onClose().then(({ confirmed }: any) => {
+		modalHandler?.onClose().then(({ confirmed }) => {
 			if (confirmed) this._rebuildDatabaseCache();
 		});
 	}
 
 	//Collect
 	private async _cacheCollect() {
-		try {
-			await PublishedCacheResource.postPublishedCacheCollect();
-			this._buttonStateCollect = 'success';
-		} catch (e) {
+		const { error } = await tryExecuteAndNotify(this, PublishedCacheResource.postPublishedCacheCollect());
+		if (error) {
 			this._buttonStateCollect = 'failed';
-			if (e instanceof ApiError) {
-				const error = e.body as ProblemDetails;
-				const data: UmbNotificationDefaultData = { message: error.data.detail ?? 'Something went wrong' };
-				this._notificationService?.peek('danger', { data });
-			}
+		} else {
+			this._buttonStateCollect = 'success';
 		}
 	}
+
 	private async _onSnapshotCacheHandler() {
 		this._buttonStateCollect = 'waiting';
 		await this._cacheCollect();

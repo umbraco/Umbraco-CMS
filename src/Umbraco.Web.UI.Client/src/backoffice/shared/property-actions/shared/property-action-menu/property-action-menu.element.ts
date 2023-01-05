@@ -1,19 +1,16 @@
-import { css, CSSResultGroup, html, LitElement } from 'lit';
+import { css, CSSResultGroup, html } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { map } from 'rxjs';
 import { UUITextStyles } from '@umbraco-ui/uui';
 import { UmbPropertyActionMenuContext } from './property-action-menu.context';
-import { UmbObserverMixin } from '@umbraco-cms/observable-api';
-import { UmbContextProviderMixin, UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 import type { ManifestPropertyAction } from '@umbraco-cms/models';
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
 
 import '../property-action/property-action.element';
+import { UmbLitElement } from '@umbraco-cms/element';
 
 @customElement('umb-property-action-menu')
-export class UmbPropertyActionMenuElement extends UmbContextProviderMixin(
-	UmbContextConsumerMixin(UmbObserverMixin(LitElement))
-) {
+export class UmbPropertyActionMenuElement extends UmbLitElement {
 	static styles: CSSResultGroup = [
 		UUITextStyles,
 		css`
@@ -68,7 +65,7 @@ export class UmbPropertyActionMenuElement extends UmbContextProviderMixin(
 	}
 
 	private _observePropertyActions() {
-		this.observe<ManifestPropertyAction[]>(
+		this.observe(
 			umbExtensionsRegistry
 				.extensionsOfType('propertyAction')
 				.pipe(
@@ -85,7 +82,7 @@ export class UmbPropertyActionMenuElement extends UmbContextProviderMixin(
 	}
 
 	private _observePropertyActionMenuOpenState() {
-		this.observe<boolean>(this._propertyActionMenuContext.isOpen, (value) => {
+		this.observe(this._propertyActionMenuContext.isOpen, (value) => {
 			this._open = value;
 		});
 	}
@@ -101,7 +98,7 @@ export class UmbPropertyActionMenuElement extends UmbContextProviderMixin(
 
 	render() {
 		return html`
-			${this._actions?.length > 0
+			${this._actions.length > 0
 				? html`
 						<uui-popover id="popover" placement="bottom-start" .open=${this._open} @close="${this._handleClose}">
 							<uui-button

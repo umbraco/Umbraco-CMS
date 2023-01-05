@@ -1,8 +1,9 @@
-import { UmbWorkspaceNodeContext } from '../../../shared/components/workspace/workspace-context/workspace-node.context';
+import { UmbWorkspaceContentContext } from '../../../shared/components/workspace/workspace-content/workspace-content.context';
 import {
 	UmbDocumentTypeStore,
 	UmbDocumentTypeStoreItemType,
 } from 'src/backoffice/documents/document-types/document-type.store';
+import { UmbControllerHostInterface } from 'src/core/controller/controller-host.mixin';
 
 const DefaultDocumentTypeData = {
 	key: '',
@@ -15,11 +16,11 @@ const DefaultDocumentTypeData = {
 	properties: [],
 } as UmbDocumentTypeStoreItemType;
 
-export class UmbWorkspaceDocumentTypeContext extends UmbWorkspaceNodeContext<
+export class UmbWorkspaceDocumentTypeContext extends UmbWorkspaceContentContext<
 	UmbDocumentTypeStoreItemType,
 	UmbDocumentTypeStore
 > {
-	constructor(target: HTMLElement, entityKey: string) {
-		super(target, DefaultDocumentTypeData, 'umbDocumentTypeStore', entityKey, 'documentType');
+	constructor(host: UmbControllerHostInterface, entityKey: string) {
+		super(host, DefaultDocumentTypeData, 'umbDocumentTypeStore', entityKey, 'documentType');
 	}
 }

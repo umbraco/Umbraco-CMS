@@ -1,5 +1,5 @@
 import { UUIInputElement, UUIInputEvent } from '@umbraco-ui/uui';
-import { css, html, LitElement, nothing, TemplateResult } from 'lit';
+import { css, html, nothing, TemplateResult } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, property, state } from 'lit/decorators.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
@@ -10,20 +10,18 @@ import { getTagLookAndColor } from '../../../../auth/utils';
 
 import { UmbCurrentUserStore } from '../../current-user/current-user.store';
 import { UmbWorkspaceUserContext } from './user-workspace.context';
-import { UmbContextProviderMixin, UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 import type { UserDetails } from '@umbraco-cms/models';
 
 import { UmbModalService } from 'src/core/modal';
-import { UmbObserverMixin } from '@umbraco-cms/observable-api';
 
 import 'src/auth/components/input-user-group/input-user-group.element';
 import '../../../shared/property-editors/uis/content-picker/property-editor-ui-content-picker.element';
-import '../../../shared/components/workspace/workspace-entity/workspace-entity.element';
+import '../../../shared/components/workspace/workspace-layout/workspace-layout.element';
+import { UmbLitElement } from '@umbraco-cms/element';
+import type { UmbWorkspaceEntityElement } from 'src/backoffice/shared/components/workspace/workspace-entity-element.interface';
 
 @customElement('umb-user-workspace')
-export class UmbUserWorkspaceElement extends UmbContextProviderMixin(
-	UmbContextConsumerMixin(UmbObserverMixin(LitElement))
-) {
+export class UmbUserWorkspaceElement extends UmbLitElement implements UmbWorkspaceEntityElement{
 	static styles = [
 		UUITextStyles,
 		css`
@@ -84,7 +82,7 @@ export class UmbUserWorkspaceElement extends UmbContextProviderMixin(
 	];
 
 	@state()
-	private _currentUser?: UserDetails | null;
+	private _currentUser?: UserDetails;
 
 	private _currentUserStore?: UmbCurrentUserStore;
 	private _modalService?: UmbModalService;
@@ -104,7 +102,7 @@ export class UmbUserWorkspaceElement extends UmbContextProviderMixin(
 	private _workspaceContext?: UmbWorkspaceUserContext;
 
 	@state()
-	private _user?: UserDetails | null;
+	private _user?: UserDetails;
 
 	@state()
 	private _userName = '';
@@ -116,17 +114,6 @@ export class UmbUserWorkspaceElement extends UmbContextProviderMixin(
 			this._currentUserStore = store;
 			this._observeCurrentUser();
 		});
-	}
-
-	connectedCallback(): void {
-		super.connectedCallback();
-		// TODO: avoid this connection, our own approach on Lit-Controller could be handling this case.
-		this._workspaceContext?.connectedCallback();
-	}
-	disconnectedCallback(): void {
-		super.connectedCallback();
-		// TODO: avoid this connection, our own approach on Lit-Controller could be handling this case.
-		this._workspaceContext?.disconnectedCallback();
 	}
 
 	protected _provideWorkspace() {
@@ -141,7 +128,7 @@ export class UmbUserWorkspaceElement extends UmbContextProviderMixin(
 		if (!this._currentUserStore) return;
 
 		// TODO: do not have static current user service, we need to make a ContextAPI for this.
-		this.observe<UserDetails>(this._currentUserStore.currentUser, (currentUser) => {
+		this.observe(this._currentUserStore.currentUser, (currentUser) => {
 			this._currentUser = currentUser;
 		});
 	}
@@ -149,8 +136,7 @@ export class UmbUserWorkspaceElement extends UmbContextProviderMixin(
 	private async _observeUser() {
 		if (!this._workspaceContext) return;
 
-		this.observe<UserDetails>(this._workspaceContext.data.pipe(distinctUntilChanged()), (user) => {
-			if (!user) return;
+		this.observe(this._workspaceContext.data.pipe(distinctUntilChanged()), (user) => {
 			this._user = user;
 			if (user.name !== this._userName) {
 				this._userName = user.name;
@@ -362,13 +348,13 @@ export class UmbUserWorkspaceElement extends UmbContextProviderMixin(
 		if (!this._user) return html`User not found`;
 
 		return html`
-			<umb-workspace-entity alias="Umb.Workspace.User">
+			<umb-workspace-layout alias="Umb.Workspace.User">
 				<uui-input id="name" slot="name" .value=${this._userName} @input="${this._handleInput}"></uui-input>
 				<div id="main">
 					<div id="left-column">${this._renderLeftColumn()}</div>
 					<div id="right-column">${this._renderRightColumn()}</div>
 				</div>
-			</umb-workspace-entity>
+			</umb-workspace-layout>
 		`;
 	}
 }

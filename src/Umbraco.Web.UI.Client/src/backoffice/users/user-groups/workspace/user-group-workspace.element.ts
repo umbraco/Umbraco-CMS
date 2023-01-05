@@ -1,23 +1,22 @@
 import { UUIInputElement, UUIInputEvent } from '@umbraco-ui/uui';
 import { UUITextStyles } from '@umbraco-ui/uui-css';
-import { css, html, LitElement, nothing } from 'lit';
+import { css, html, nothing } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { repeat } from 'lit/directives/repeat.js';
 import { distinctUntilChanged } from 'rxjs';
 import { UmbWorkspaceUserGroupContext } from './user-group-workspace.context';
-import { UmbObserverMixin } from '@umbraco-cms/observable-api';
-import { UmbContextConsumerMixin, UmbContextProviderMixin } from '@umbraco-cms/context-api';
-import type { ManifestWorkspaceAction, UserDetails, UserGroupDetails } from '@umbraco-cms/models';
+import type { ManifestWorkspaceAction, UserGroupDetails } from '@umbraco-cms/models';
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
-import { UmbUserStore } from 'src/backoffice/users/users/user.store';
+import type { UmbUserStore } from 'src/backoffice/users/users/user.store';
 
 import 'src/auth/components/input-user/input-user.element';
 import 'src/backoffice/shared/components/input-section/input-section.element';
+import { UmbLitElement } from '@umbraco-cms/element';
+import { UmbWorkspaceEntityElement } from 'src/backoffice/shared/components/workspace/workspace-entity-element.interface';
 
 @customElement('umb-user-group-workspace')
-export class UmbUserGroupWorkspaceElement extends UmbContextProviderMixin(
-	UmbContextConsumerMixin(UmbObserverMixin(LitElement))
-) {
+export class UmbUserGroupWorkspaceElement extends UmbLitElement implements UmbWorkspaceEntityElement {
+
 	static styles = [
 		UUITextStyles,
 		css`
@@ -217,17 +216,6 @@ export class UmbUserGroupWorkspaceElement extends UmbContextProviderMixin(
 		});
 	}
 
-	connectedCallback(): void {
-		super.connectedCallback();
-		// TODO: avoid this connection, our own approach on Lit-Controller could be handling this case.
-		this._workspaceContext?.connectedCallback();
-	}
-	disconnectedCallback(): void {
-		super.connectedCallback();
-		// TODO: avoid this connection, our own approach on Lit-Controller could be handling this case.
-		this._workspaceContext?.disconnectedCallback();
-	}
-
 	protected _provideWorkspace() {
 		if (this._entityKey) {
 			this._workspaceContext = new UmbWorkspaceUserGroupContext(this, this._entityKey);
@@ -262,8 +250,7 @@ export class UmbUserGroupWorkspaceElement extends UmbContextProviderMixin(
 	private _observeUserGroup() {
 		if (!this._workspaceContext) return;
 
-		this.observe<UserGroupDetails>(this._workspaceContext.data.pipe(distinctUntilChanged()), (userGroup) => {
-			if (!this._userGroup) return;
+		this.observe(this._workspaceContext.data.pipe(distinctUntilChanged()), (userGroup) => {
 			this._userGroup = userGroup;
 		});
 	}
@@ -273,7 +260,8 @@ export class UmbUserGroupWorkspaceElement extends UmbContextProviderMixin(
 
 		// TODO: Create method to only get users from this userGroup
 		// TODO: Find a better way to only call this once at the start
-		this.observe(this._userStore.getAll(), (users: Array<UserDetails>) => {
+		this.observe(this._userStore.getAll(), (users) => {
+			// TODO: handle if there is no users.
 			if (!this._userKeys && users.length > 0) {
 				this._userKeys = users.filter((user) => user.userGroups.includes(this.entityKey)).map((user) => user.key);
 				this._updateProperty('users', this._userKeys);
@@ -399,13 +387,13 @@ export class UmbUserGroupWorkspaceElement extends UmbContextProviderMixin(
 		if (!this._userGroup) return nothing;
 
 		return html`
-			<umb-workspace-entity alias="Umb.Workspace.UserGroup">
+			<umb-workspace-layout alias="Umb.Workspace.UserGroup">
 				<uui-input id="name" slot="header" .value=${this._userGroup.name} @input="${this._handleInput}"></uui-input>
 				<div id="main">
 					<div id="left-column">${this.renderLeftColumn()}</div>
 					<div id="right-column">${this.renderRightColumn()}</div>
 				</div>
-			</umb-workspace-entity>
+			</umb-workspace-layout>
 		`;
 	}
 }

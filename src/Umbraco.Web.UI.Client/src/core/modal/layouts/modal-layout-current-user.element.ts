@@ -1,18 +1,17 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
-import { css, CSSResultGroup, html, LitElement, nothing } from 'lit';
+import { css, CSSResultGroup, html, nothing } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { UmbModalHandler, UmbModalService } from '..';
 import type { UserDetails } from '@umbraco-cms/models';
-import { UmbObserverMixin } from '@umbraco-cms/observable-api';
-import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 import {
 	UmbCurrentUserHistoryStore,
 	UmbCurrentUserHistoryItem,
 } from 'src/backoffice/users/current-user/current-user-history.store';
 import { UmbCurrentUserStore } from 'src/backoffice/users/current-user/current-user.store';
+import { UmbLitElement } from '@umbraco-cms/element';
 
 @customElement('umb-modal-layout-current-user')
-export class UmbModalLayoutCurrentUserElement extends UmbContextConsumerMixin(UmbObserverMixin(LitElement)) {
+export class UmbModalLayoutCurrentUserElement extends UmbLitElement {
 	static styles: CSSResultGroup = [
 		UUITextStyles,
 		css`
@@ -20,7 +19,7 @@ export class UmbModalLayoutCurrentUserElement extends UmbContextConsumerMixin(Um
 				display: block;
 			}
 			:host,
-			umb-workspace-entity {
+			umb-workspace-layout {
 				width: 100%;
 				height: 100%;
 			}
@@ -103,13 +102,13 @@ export class UmbModalLayoutCurrentUserElement extends UmbContextConsumerMixin(Um
 	private async _observeCurrentUser() {
 		if (!this._currentUserStore) return;
 
-		this.observe<UserDetails>(this._currentUserStore.currentUser, (currentUser) => {
+		this.observe(this._currentUserStore.currentUser, (currentUser) => {
 			this._currentUser = currentUser;
 		});
 	}
 	private async _observeHistory() {
 		if (this._currentUserHistoryStore) {
-			this.observe<Array<UmbCurrentUserHistoryItem>>(this._currentUserHistoryStore.getLatestHistory(), (history) => {
+			this.observe(this._currentUserHistoryStore.getLatestHistory(), (history) => {
 				this._history = history;
 			});
 		}
@@ -160,7 +159,7 @@ export class UmbModalLayoutCurrentUserElement extends UmbContextConsumerMixin(Um
 
 	render() {
 		return html`
-			<umb-workspace-entity headline="${this._currentUser?.name || ''}">
+			<umb-workspace-layout headline="${this._currentUser?.name || ''}">
 				<div id="main">
 					<uui-box>
 						<b slot="headline">Your profile</b>
@@ -185,7 +184,7 @@ export class UmbModalLayoutCurrentUserElement extends UmbContextConsumerMixin(Um
 					<uui-button @click=${this._close} look="secondary">Close</uui-button>
 					<uui-button @click=${this._logout} look="primary" color="danger">Logout</uui-button>
 				</div>
-			</umb-workspace-entity>
+			</umb-workspace-layout>
 		`;
 	}
 }
