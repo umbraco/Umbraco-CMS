@@ -10,5 +10,5 @@ export interface MetaTree {
 	icon: string;
 	sections: Array<string>;
 	rootNodeEntityType?: string;
-	storeContextAlias?: string;
+	storeAlias?: string;
 }

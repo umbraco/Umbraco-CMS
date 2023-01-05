@@ -9,7 +9,7 @@ const tree: ManifestTree = {
 		label: 'Media Types',
 		icon: 'umb:folder',
 		sections: ['Umb.Section.Settings'],
-		storeContextAlias: 'umbMediaTypeStore',
+		storeAlias: 'umbMediaTypeStore',
 	},
 };
 

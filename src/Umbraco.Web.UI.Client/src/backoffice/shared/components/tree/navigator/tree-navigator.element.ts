@@ -3,27 +3,27 @@ import { repeat } from 'lit/directives/repeat.js';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, property, state } from 'lit/decorators.js';
 import { ifDefined } from 'lit-html/directives/if-defined.js';
+import { UmbLitElement } from '@umbraco-cms/element';
 import { UmbSectionContext } from '../../section/section.context';
 import { UmbTreeContext } from '../tree.context';
 import type { Entity, ManifestTree } from '@umbraco-cms/models';
 import { UmbTreeDataStore } from '@umbraco-cms/stores/store';
+import { DocumentTreeItem } from '@umbraco-cms/backend-api';
 
 import '../tree-item.element';
-import { UmbLitElement } from '@umbraco-cms/element';
-import { DocumentTreeItem } from '@umbraco-cms/backend-api';
 
 @customElement('umb-tree-navigator')
 export class UmbTreeNavigator extends UmbLitElement {
 	static styles = [UUITextStyles, css``];
 
-	private _storeContextAlias = '';
+	private _storeAlias = '';
 	@property({ attribute: 'store-context-alias' })
-	public get storeContextAlias() {
-		return this._storeContextAlias;
+	public get storeAlias() {
+		return this._storeAlias;
 	}
 
-	public set storeContextAlias(value) {
-		this._storeContextAlias = value;
+	public set storeAlias(value) {
+		this._storeAlias = value;
 		this._provideStoreContext();
 	}
 
@@ -60,9 +60,9 @@ export class UmbTreeNavigator extends UmbLitElement {
 	}
 
 	private _provideStoreContext() {
-		if (!this._storeContextAlias) return;
+		if (!this._storeAlias) return;
 
-		this.consumeContext(this._storeContextAlias, (store) => {
+		this.consumeContext(this._storeAlias, (store) => {
 			this._store = store;
 			this.provideContext('umbStore', store);
 		});
