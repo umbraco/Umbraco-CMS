@@ -39,6 +39,26 @@ export class DictionaryResource {
     }
 
     /**
+     * @returns CreatedResult Created
+     * @throws ApiError
+     */
+    public static postDictionary({
+        requestBody,
+    }: {
+        requestBody?: DictionaryItem,
+    }): CancelablePromise<CreatedResult> {
+        return __request(OpenAPI, {
+            method: 'POST',
+            url: '/umbraco/management/api/v1/dictionary',
+            body: requestBody,
+            mediaType: 'application/json',
+            errors: {
+                400: `Bad Request`,
+            },
+        });
+    }
+
+    /**
      * @returns ContentResult Success
      * @throws ApiError
      */
@@ -101,26 +121,6 @@ export class DictionaryResource {
             },
             errors: {
                 404: `Not Found`,
-            },
-        });
-    }
-
-    /**
-     * @returns CreatedResult Created
-     * @throws ApiError
-     */
-    public static postDictionaryCreate({
-        requestBody,
-    }: {
-        requestBody?: DictionaryItem,
-    }): CancelablePromise<CreatedResult> {
-        return __request(OpenAPI, {
-            method: 'POST',
-            url: '/umbraco/management/api/v1/dictionary/create',
-            body: requestBody,
-            mediaType: 'application/json',
-            errors: {
-                400: `Bad Request`,
             },
         });
     }
