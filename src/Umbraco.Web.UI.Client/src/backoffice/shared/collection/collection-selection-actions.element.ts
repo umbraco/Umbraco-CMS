@@ -1,13 +1,12 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css';
-import { css, html, LitElement, nothing } from 'lit';
+import { css, html, nothing } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import type { UmbCollectionContext } from './collection.context';
-import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 import type { MediaDetails } from '@umbraco-cms/models';
-import { UmbObserverMixin } from '@umbraco-cms/observable-api';
+import { UmbLitElement } from '@umbraco-cms/element';
 
 @customElement('umb-collection-selection-actions')
-export class UmbCollectionSelectionActionsElement extends UmbContextConsumerMixin(UmbObserverMixin(LitElement)) {
+export class UmbCollectionSelectionActionsElement extends UmbLitElement {
 	static styles = [
 		UUITextStyles,
 		css`
@@ -57,11 +56,11 @@ export class UmbCollectionSelectionActionsElement extends UmbContextConsumerMixi
 		if (!this._collectionContext) return;
 
 		// TODO: Make sure it only updates on length change.
-		this.observe<Array<MediaDetails>>(this._collectionContext.data, (mediaItems) => {
+		this.observe(this._collectionContext.data, (mediaItems) => {
 			this._nodesLength = mediaItems.length;
 		});
 
-		this.observe<Array<string>>(this._collectionContext.selection, (selection) => {
+		this.observe(this._collectionContext.selection, (selection) => {
 			this._selectionLength = selection.length;
 		});
 	}

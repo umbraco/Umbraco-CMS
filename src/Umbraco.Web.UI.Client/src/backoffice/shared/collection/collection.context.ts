@@ -1,21 +1,23 @@
-import { BehaviorSubject, Observable, Subscription } from 'rxjs';
+import { BehaviorSubject, Observable } from 'rxjs';
 import { ContentTreeItem } from '@umbraco-cms/backend-api';
-import { UmbContextConsumer } from '@umbraco-cms/context-api';
 import { UmbTreeDataStore } from '@umbraco-cms/stores/store';
+import { UmbControllerHostInterface } from 'src/core/controller/controller-host.mixin';
+import { UmbContextConsumerController } from 'src/core/context-api/consume/context-consumer.controller';
+import { UmbObserverController } from 'src/core/observable-api/observer.controller';
 
 export class UmbCollectionContext<
 	DataType extends ContentTreeItem,
 	StoreType extends UmbTreeDataStore<DataType> = UmbTreeDataStore<DataType>
 > {
-	private _target: HTMLElement;
+	
+	private _host: UmbControllerHostInterface;
 	private _entityKey: string | null;
 
-	protected _storeConsumer!: UmbContextConsumer;
 	private _store?: StoreType;
+	protected _dataObserver?: UmbObserverController<DataType[]>;
 
 	private _data: BehaviorSubject<Array<DataType>> = new BehaviorSubject(<Array<DataType>>[]);
 	public readonly data: Observable<Array<DataType>> = this._data.asObservable();
-	protected _dataObserver?: Subscription;
 
 	private _selection: BehaviorSubject<Array<string>> = new BehaviorSubject(<Array<string>>[]);
 	public readonly selection: Observable<Array<string>> = this._selection.asObservable();
@@ -26,11 +28,11 @@ export class UmbCollectionContext<
 	public readonly search: Observable<string> = this._search.asObservable();
 	*/
 
-	constructor(target: HTMLElement, entityKey: string | null, storeAlias: string) {
-		this._target = target;
+	constructor(host: UmbControllerHostInterface, entityKey: string | null, storeAlias: string) {
+		this._host = host;
 		this._entityKey = entityKey;
 
-		this._storeConsumer = new UmbContextConsumer(this._target, storeAlias, (_instance: StoreType) => {
+		new UmbContextConsumerController(this._host, storeAlias, (_instance: StoreType) => {
 			this._store = _instance;
 			if (!this._store) {
 				// TODO: if we keep the type assumption of _store existing, then we should here make sure to break the application in a good way.
@@ -38,14 +40,6 @@ export class UmbCollectionContext<
 			}
 			this._onStoreSubscription();
 		});
-	}
-
-	connectedCallback() {
-		this._storeConsumer.hostConnected();
-	}
-
-	disconnectedCallback() {
-		this._storeConsumer.hostDisconnected();
 	}
 
 	public getData() {
@@ -63,13 +57,19 @@ export class UmbCollectionContext<
 			return;
 		}
 
+		this._dataObserver?.destroy();
+
 		if (this._entityKey) {
-			this._dataObserver = this._store.getTreeItemChildren(this._entityKey).subscribe((nodes) => {
-				this._data.next(nodes);
+			this._dataObserver = new UmbObserverController(this._host, this._store.getTreeItemChildren(this._entityKey), (nodes) => {
+				if(nodes) {
+					this._data.next(nodes);
+				}
 			});
 		} else {
-			this._dataObserver = this._store.getTreeRoot().subscribe((nodes) => {
-				this._data.next(nodes);
+			this._dataObserver = new UmbObserverController(this._host, this._store.getTreeRoot(), (nodes) => {
+				if(nodes) {
+					this._data.next(nodes);
+				}
 			});
 		}
 	}

@@ -1,15 +1,15 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css';
-import { css, html, LitElement, nothing } from 'lit';
+import { css, html, nothing } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { map } from 'rxjs';
 import { TooltipMenuItem } from '../components/tooltip-menu';
 import '../components/tooltip-menu/tooltip-menu.element';
-import { UmbObserverMixin } from '@umbraco-cms/observable-api';
 import type { ManifestCollectionView } from '@umbraco-cms/models';
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
+import { UmbLitElement } from '@umbraco-cms/element';
 
 @customElement('umb-collection-toolbar')
-export class UmbCollectionToolbarElement extends UmbObserverMixin(LitElement) {
+export class UmbCollectionToolbarElement extends UmbLitElement {
 	static styles = [
 		UUITextStyles,
 		css`
@@ -71,15 +71,13 @@ export class UmbCollectionToolbarElement extends UmbObserverMixin(LitElement) {
 	}
 
 	private _observeCollectionViews() {
-		this.observe<Array<ManifestCollectionView>>(
-			umbExtensionsRegistry?.extensionsOfType('collectionView').pipe(
+		this.observe<ManifestCollectionView[]>(
+			umbExtensionsRegistry.extensionsOfType('collectionView').pipe(
 				map((extensions) => {
 					return extensions.filter((extension) => extension.meta.entityType === 'media');
 				})
 			),
 			(layouts) => {
-				console.log('layouts', layouts);
-				if (layouts?.length === 0) return;
 				this._layouts = layouts;
 
 				if (!this._currentLayout) {

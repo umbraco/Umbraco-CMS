@@ -1,17 +1,16 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
-import { css, html, LitElement, nothing } from 'lit';
+import { css, html, nothing } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { IRoutingInfo, RouterSlot } from 'router-slot';
 import { map } from 'rxjs';
 
-import { UmbObserverMixin } from '@umbraco-cms/observable-api';
 import { createExtensionElement } from '@umbraco-cms/extensions-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
-import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 import type { ManifestWithMeta, ManifestWorkspaceView, ManifestWorkspaceViewCollection } from '@umbraco-cms/models';
 
 import '../../body-layout/body-layout.element';
 import '../../extension-slot/extension-slot.element';
+import { UmbLitElement } from '@umbraco-cms/element';
 
 /**
  * @element umb-workspace-entity
@@ -23,10 +22,10 @@ import '../../extension-slot/extension-slot.element';
  * @slot default - slot for main content
  * @export
  * @class UmbWorkspaceEntity
- * @extends {UmbContextConsumerMixin(LitElement)}
+ * @extends {UmbLitElement}
  */
 @customElement('umb-workspace-entity')
-export class UmbWorkspaceEntity extends UmbContextConsumerMixin(UmbObserverMixin(LitElement)) {
+export class UmbWorkspaceEntity extends UmbLitElement {
 	static styles = [
 		UUITextStyles,
 		css`
@@ -90,9 +89,9 @@ export class UmbWorkspaceEntity extends UmbContextConsumerMixin(UmbObserverMixin
 	}
 
 	private _observeWorkspaceViews() {
-		this.observe<ManifestWorkspaceView[]>(
+		this.observe(
 			umbExtensionsRegistry
-				.extensionsOfTypes(['workspaceView', 'workspaceViewCollection'])
+				.extensionsOfTypes<ManifestWorkspaceView>(['workspaceView', 'workspaceViewCollection'])
 				.pipe(
 					map((extensions) =>
 						extensions.filter((extension) => (extension as ManifestWithMeta).meta.workspaces.includes(this.alias))
@@ -106,8 +105,10 @@ export class UmbWorkspaceEntity extends UmbContextConsumerMixin(UmbObserverMixin
 	}
 
 	private async _createRoutes() {
+		
+		this._routes = [];
+
 		if (this._workspaceViews.length > 0) {
-			this._routes = [];
 
 			this._routes = this._workspaceViews.map((view) => {
 				return {
@@ -134,7 +135,7 @@ export class UmbWorkspaceEntity extends UmbContextConsumerMixin(UmbObserverMixin
 
 			this._routes.push({
 				path: '**',
-				redirectTo: `view/${this._workspaceViews?.[0].meta.pathname}`,
+				redirectTo: `view/${this._workspaceViews[0].meta.pathname}`,
 			});
 
 			this.requestUpdate();
@@ -154,7 +155,7 @@ export class UmbWorkspaceEntity extends UmbContextConsumerMixin(UmbObserverMixin
 
 	private _renderTabs() {
 		return html`
-			${this._workspaceViews?.length > 0
+			${this._workspaceViews.length > 0
 				? html`
 						<uui-tab-group slot="tabs">
 							${this._workspaceViews.map(
