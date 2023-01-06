@@ -110,7 +110,7 @@ export class UmbPropertyElement extends UmbLitElement {
 	 * @public
 	 * @type {object}
 	 * @attr
-	 * @default ''
+	 * @default undefined
 	 */
 	@property({ type: Object, attribute: false })
 	public set value(value: object | string) {
