@@ -19,8 +19,6 @@ namespace Umbraco.Cms.Web.UI
             _config = config ?? throw new ArgumentNullException(nameof(config));
         }
 
-        // TEST COMMIT
-
         /// <summary>
         /// Configures the services.
         /// </summary>
