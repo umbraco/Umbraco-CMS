@@ -1,13 +1,14 @@
 import { html } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { map } from 'rxjs';
+import { repeat } from 'lit-html/directives/repeat.js';
 import { UmbTreeContextBase } from './tree.context';
-import type { ManifestTree } from '@umbraco-cms/models';
+import type { Entity, ManifestTree } from '@umbraco-cms/models';
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
-import { UmbDataStore } from '@umbraco-cms/stores/store';
+import { UmbTreeDataStore } from '@umbraco-cms/stores/store';
 import { UmbLitElement } from '@umbraco-cms/element';
 
-import './navigator/tree-navigator.element';
+import './tree-item.element';
 import './context-menu/tree-context-menu-page-action-list.element';
 import './context-menu/tree-context-menu-page.service';
 import './context-menu/tree-context-menu.service';
@@ -58,7 +59,14 @@ export class UmbTreeElement extends UmbLitElement {
 	@state()
 	private _tree?: ManifestTree;
 
+	@state()
+	private _items: Entity[] = [];
+
+	@state()
+	private _loading = true;
+
 	private _treeContext?: UmbTreeContextBase;
+	private _store?: UmbTreeDataStore<Entity>;
 
 	connectedCallback(): void {
 		super.connectedCallback();
@@ -77,6 +85,7 @@ export class UmbTreeElement extends UmbLitElement {
 				if (tree) {
 					this._provideTreeContext();
 					this._provideStore();
+					this._observeTreeRoot();
 				}
 			}
 		);
@@ -99,9 +108,10 @@ export class UmbTreeElement extends UmbLitElement {
 
 		if (!this._tree?.meta.storeAlias) return;
 
-		this.consumeContext(this._tree.meta.storeAlias, (store: UmbDataStore<unknown>) =>
-			this.provideContext('umbStore', store)
-		);
+		this.consumeContext(this._tree.meta.storeAlias, (store: UmbTreeDataStore<Entity>) => {
+			this._store = store;
+			this.provideContext('umbStore', store);
+		});
 	}
 
 	private _observeSelection() {
@@ -114,8 +124,34 @@ export class UmbTreeElement extends UmbLitElement {
 		});
 	}
 
+	private _observeTreeRoot() {
+		if (!this._store?.getTreeRoot) return;
+
+		this._loading = true;
+
+		this.observe(this._store.getTreeRoot(), (rootItems) => {
+			if (rootItems?.length === 0) return;
+			this._items = rootItems;
+			this._loading = false;
+		});
+	}
+
 	render() {
-		return html`<umb-tree-navigator></umb-tree-navigator>`;
+		// TODO: Fix Type Mismatch ` as Entity` in this template:
+		return html`
+			${repeat(
+				this._items,
+				(item) => item.key,
+				(item) =>
+					html`<umb-tree-item
+						.key=${item.key}
+						.label=${item.name}
+						.icon=${item.icon}
+						.entityType=${item.type}
+						.hasChildren=${item.hasChildren}
+						.loading=${this._loading}></umb-tree-item>`
+			)}
+		`;
 	}
 }
 
