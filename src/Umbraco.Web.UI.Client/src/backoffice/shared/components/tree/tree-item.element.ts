@@ -194,6 +194,7 @@ export class UmbTreeItem extends UmbLitElement {
 						<uui-symbol-more></uui-symbol-more>
 					</uui-button>
 				</uui-action-bar>
+				<slot></slot>
 			</uui-menu-item>
 		`;
 	}
