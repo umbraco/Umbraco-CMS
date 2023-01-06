@@ -2,11 +2,9 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html } from 'lit';
 import { ifDefined } from 'lit-html/directives/if-defined.js';
 import { customElement, property, state } from 'lit/decorators.js';
-import { EMPTY, of, switchMap } from 'rxjs';
 
 import { UmbDataTypeStore } from '../../../settings/data-types/data-type.store';
-import type { ContentProperty, ManifestTypes } from '@umbraco-cms/models';
-import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
+import type { ContentProperty } from '@umbraco-cms/models';
 
 import '../entity-property/entity-property.element';
 import { UmbLitElement } from '@umbraco-cms/element';
@@ -33,7 +31,7 @@ export class UmbContentPropertyElement extends UmbLitElement {
 	}
 
 	@property()
-	value?: string;
+	value?: object;
 
 	@state()
 	private _propertyEditorUIAlias?: string;
@@ -56,17 +54,10 @@ export class UmbContentPropertyElement extends UmbLitElement {
 		if (!this._dataTypeStore || !this._property) return;
 
 		this.observe(
-			this._dataTypeStore.getByKey(this._property.dataTypeKey).pipe(
-				switchMap((dataType) => {
-					if (!dataType?.propertyEditorUIAlias) return EMPTY;
-					this._dataTypeData = dataType.data;
-					return umbExtensionsRegistry.getByAlias(dataType.propertyEditorUIAlias) ?? of(null);
-				})
-			),
-			(manifest) => {
-				if (manifest?.type === 'propertyEditorUI') {
-					this._propertyEditorUIAlias = manifest.alias;
-				}
+			this._dataTypeStore.getByKey(this._property.dataTypeKey),
+			(dataType) => {
+				this._dataTypeData = dataType?.data;
+				this._propertyEditorUIAlias = dataType?.propertyEditorUIAlias || undefined;
 			}
 		);
 	}

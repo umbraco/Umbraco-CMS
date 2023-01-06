@@ -1,7 +1,7 @@
 import { css, html } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, property } from 'lit/decorators.js';
-import { UmbWorkspacePropertyContext } from 'src/backoffice/shared/components/entity-property/workspace-property.context';
+import type { UmbWorkspacePropertyContext } from 'src/backoffice/shared/components/entity-property/workspace-property.context';
 import { UmbLitElement } from '@umbraco-cms/element';
 
 @customElement('umb-property-editor-ui-textarea')
@@ -26,8 +26,11 @@ export class UmbPropertyEditorUITextareaElement extends UmbLitElement {
 	constructor() {
 		super();
 
-		this.consumeContext('umbPropertyContext', (instance) => {
+		this.consumeContext('umbPropertyContext', (instance: UmbWorkspacePropertyContext<string>) => {
 			this.propertyContext = instance;
+			this.observe(this.propertyContext.value, (value) => {
+				console.log("Context says value changed", value)
+			});
 		});
 	}
 
@@ -40,7 +43,8 @@ export class UmbPropertyEditorUITextareaElement extends UmbLitElement {
 		return html`
 			<uui-textarea .value=${this.value} @input=${this.onInput}></uui-textarea>
 			${this.config?.map((property: any) => html`<div>${property.alias}: ${property.value}</div>`)}
-			<button @click=${() => this.propertyContext?.resetValue()}>Reset</button>`;
+			<button @click=${() => this.propertyContext?.resetValue()}>Reset</button>
+			<button @click=${() => this.propertyContext?.setLabel('random' + Math.random()*10)}>Label change</button>`;
 	}
 }
 

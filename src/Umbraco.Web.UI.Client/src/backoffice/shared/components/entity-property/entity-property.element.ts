@@ -1,10 +1,11 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
-import { css, html, PropertyValueMap } from 'lit';
+import { css, html } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
+import { ifDefined } from 'lit-html/directives/if-defined.js';
 import { UmbWorkspacePropertyContext } from './workspace-property.context';
 import { createExtensionElement } from '@umbraco-cms/extensions-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
-import type { ManifestPropertyEditorUI, ManifestTypes } from '@umbraco-cms/models';
+import type { DataTypePropertyData, ManifestPropertyEditorUI, ManifestTypes } from '@umbraco-cms/models';
 
 import '../../property-actions/shared/property-action-menu/property-action-menu.element';
 import 'src/backoffice/shared/components/workspace/workspace-property-layout/workspace-property-layout.element';
@@ -48,6 +49,12 @@ export class UmbEntityPropertyElement extends UmbLitElement {
 		`,
 	];
 
+	@state()
+	private _label?:string;
+
+	@state()
+	private _description?:string;
+
 	/**
 	 * Label. Name of the property
 	 * @type {string}
@@ -55,7 +62,9 @@ export class UmbEntityPropertyElement extends UmbLitElement {
 	 * @default ''
 	 */
 	@property({ type: String })
-	public label = '';
+	public set label(label: string) {
+		this._propertyContext.setLabel(label);
+	}
 
 	/**
 	 * Description: render a description underneath the label.
@@ -64,7 +73,9 @@ export class UmbEntityPropertyElement extends UmbLitElement {
 	 * @default ''
 	 */
 	@property({ type: String })
-	public description = '';
+	public set description(description: string) {
+		this._propertyContext.setDescription(description);
+	}
 
 	/**
 	 * Alias
@@ -74,7 +85,9 @@ export class UmbEntityPropertyElement extends UmbLitElement {
 	 * @default ''
 	 */
 	@property({ type: String })
-	public alias = '';
+	public set alias(alias: string) {
+		this._propertyContext.setAlias(alias);
+	}
 
 	/**
 	 * Property Editor UI Alias. Render the Property Editor UI registered for this alias.
@@ -101,7 +114,9 @@ export class UmbEntityPropertyElement extends UmbLitElement {
 	 * @default ''
 	 */
 	@property({ type: Object, attribute: false })
-	public value?: any;
+	public set value(value: object) {
+		this._propertyContext.setValue(value);
+	}
 
 	/**
 	 * Config. Configuration to pass to the Property Editor UI. This is also the configuration data stored on the Data Type.
@@ -111,15 +126,16 @@ export class UmbEntityPropertyElement extends UmbLitElement {
 	 * @default ''
 	 */
 	@property({ type: Object, attribute: false })
-	public config?: any;
+	public set config(value: DataTypePropertyData[]) {
+		this._propertyContext.setConfig(value);
+	}
 
 	// TODO: make interface for UMBPropertyEditorElement
 	@state()
 	private _element?: { value?: any; config?: any } & HTMLElement; // TODO: invent interface for propertyEditorUI.
 
 
-	// TODO: How to get proper default value?
-	private _propertyContext = new UmbWorkspacePropertyContext<string>("");
+	private _propertyContext = new UmbWorkspacePropertyContext(this);
 
 	private propertyEditorUIObserver?: UmbObserverController<ManifestTypes>;
 
@@ -127,66 +143,73 @@ export class UmbEntityPropertyElement extends UmbLitElement {
 	constructor() {
 		super();
 
-		this.provideContext('umbPropertyContext',  this._propertyContext);
-		
-		this._observePropertyEditorUI();
+
+		this.observe(this._propertyContext.label, (label) => {
+			console.log("_propertyContext replied with label", label)
+			this._label = label;
+		});
+		this.observe(this._propertyContext.label, (description) => {
+			this._description = description;
+		});
+
+		// TODO: move event to context. maybe rename to property-editor-value-change.
 		this.addEventListener('property-editor-change', this._onPropertyEditorChange as any as EventListener);
+
+
 	}
 
 	private _observePropertyEditorUI() {
 		this.propertyEditorUIObserver?.destroy();
 		this.propertyEditorUIObserver = this.observe(umbExtensionsRegistry.getByTypeAndAlias('propertyEditorUI', this.propertyEditorUIAlias), (manifest) => {
-			this._gotEditor(manifest);
+			this._gotEditorUI(manifest);
 		});
 	}
 
-	private _gotEditor(propertyEditorUIManifest?: ManifestPropertyEditorUI | null) {
-		if (!propertyEditorUIManifest) {
-			// TODO: if dataTypeKey didn't exist in store, we should do some nice UI.
+	private _gotEditorUI(manifest?: ManifestPropertyEditorUI | null) {
+		if (!manifest) {
+			// TODO: if propertyEditorUIAlias didn't exist in store, we should do some nice fail UI.
 			return;
 		}
 
-		createExtensionElement(propertyEditorUIManifest)
+		createExtensionElement(manifest)
 			.then((el) => {
 				const oldValue = this._element;
 				this._element = el;
 
-				if (this._element) {
-					this._element.value = this.value; // Be aware its duplicated code
-					this._element.config = this.config; // Be aware its duplicated code
-				}
+				this.observe(this._propertyContext.value, (value) => {
+					if(this._element) {
+						this._element.value = value;
+					}
+				});
+				this.observe(this._propertyContext.config, (config) => {
+					if(this._element) {
+						this._element.config = config;
+					}
+				});
+
 				this.requestUpdate('element', oldValue);
+				
 			})
 			.catch(() => {
 				// TODO: loading JS failed so we should do some nice UI. (This does only happen if extension has a js prop, otherwise we concluded that no source was needed resolved the load.)
 			});
 	}
 
+
+
 	private _onPropertyEditorChange = (e: CustomEvent) => {
 		const target = e.composedPath()[0] as any;
 		this.value = target.value;
+
+		// TODO: update context.
+
 		this.dispatchEvent(new CustomEvent('property-value-change', { bubbles: true, composed: true }));
 		e.stopPropagation();
 	};
 
-	/** Lit does not currently handle dynamic tag names, therefor we are doing some manual rendering */
-	// TODO: Refactor into a base class for dynamic-tag element? we will be using this a lot for extensions.
-	// This could potentially hook into Lit and parse all properties defined in the specific class on to the dynamic-element. (see static elementProperties: PropertyDeclarationMap;)
-	willUpdate(changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>) {
-		super.willUpdate(changedProperties);
-
-		if (changedProperties.has('value') && this._element) {
-			this._element.value = this.value; // Be aware its duplicated code
-		}
-
-		if (changedProperties.has('config') && this._element) {
-			this._element.config = this.config; // Be aware its duplicated code
-		}
-	}
-
 	render() {
 		return html`
-			<umb-workspace-property-layout id="layout" label="${this.label}" description="${this.description}">
+			<umb-workspace-property-layout id="layout" label="${ifDefined(this._label)}" description="${ifDefined(this._description)}">
 				${this._renderPropertyActionMenu()}
 				<div slot="editor">${this._element}</div>
 			</umb-workspace-property-layout>
@@ -198,7 +221,7 @@ export class UmbEntityPropertyElement extends UmbLitElement {
 			? html`<umb-property-action-menu
 					slot="property-action-menu"
 					id="property-action-menu"
-					.propertyEditorUIAlias="${this.propertyEditorUIAlias}"
+					.propertyEditorUIAlias="${this._propertyEditorUIAlias}"
 					.value="${this.value}"></umb-property-action-menu>`
 			: ''}`;
 	}
