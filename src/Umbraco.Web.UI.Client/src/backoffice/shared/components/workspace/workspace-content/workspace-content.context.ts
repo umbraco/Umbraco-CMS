@@ -1,7 +1,7 @@
 import { v4 as uuidv4 } from 'uuid';
+import { BehaviorSubject, Observable } from 'rxjs';
 import { UmbNotificationService } from '../../../../../core/notification';
 import { UmbNotificationDefaultData } from '../../../../../core/notification/layouts/default';
-import { UmbWorkspaceContext } from '../workspace-context/workspace.context';
 import { UmbNodeStoreBase } from '@umbraco-cms/stores/store';
 import { UmbControllerHostInterface } from 'src/core/controller/controller-host.mixin';
 import { UmbContextConsumerController } from 'src/core/context-api/consume/context-consumer.controller';
@@ -14,7 +14,14 @@ import type { ContentDetails } from '@umbraco-cms/models';
 export class UmbWorkspaceContentContext<
 	ContentTypeType extends ContentDetails = ContentDetails,
 	StoreType extends UmbNodeStoreBase<ContentTypeType> = UmbNodeStoreBase<ContentTypeType>
-> extends UmbWorkspaceContext<ContentTypeType> {
+> {
+
+	protected _host: UmbControllerHostInterface;
+
+	// TODO: figure out how fine grained we want to make our observables.
+	// TODO: add interface
+	protected _data!:BehaviorSubject<ContentTypeType>;
+	public readonly data: Observable<ContentTypeType>;
 
 	protected _notificationService?: UmbNotificationService;
 
@@ -32,8 +39,10 @@ export class UmbWorkspaceContentContext<
 		storeAlias: string,
 		entityType: string
 	) {
-		super(host, defaultData);
 
+		this._host = host;
+		this._data = new BehaviorSubject<ContentTypeType>(defaultData);
+		this.data = this._data.asObservable();
 		this.entityType = entityType;
 
 		host.addEventListener('property-value-change', this._onPropertyValueChange);
@@ -57,6 +66,14 @@ export class UmbWorkspaceContentContext<
 			// TODO: first provide when we have umbNotificationService as well.
 			new UmbContextProviderController(this._host, 'umbWorkspaceContext', this);
 		});
+	}
+
+
+	public getData() {
+		return this._data.getValue();
+	}
+	public update(data: Partial<ContentTypeType>) {
+		this._data.next({ ...this.getData(), ...data });
 	}
 
 	load(entityKey: string) {
@@ -136,5 +153,13 @@ export class UmbWorkspaceContentContext<
 				const data: UmbNotificationDefaultData = { message: 'Failed to save Document' };
 				this._notificationService?.peek('danger', { data });
 			});
+	}
+
+
+
+	// TODO: how can we make sure to call this.
+	public destroy(): void {
+		this._host.removeEventListener('property-value-change', this._onPropertyValueChange);
+		this._data.unsubscribe();
 	}
 }
