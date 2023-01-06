@@ -1,5 +1,4 @@
 import { html } from 'lit';
-import { when } from 'lit-html/directives/when.js';
 import { customElement, property, state } from 'lit/decorators.js';
 import { map } from 'rxjs';
 import { UmbTreeContextBase } from './tree.context';
@@ -7,7 +6,12 @@ import type { ManifestTree } from '@umbraco-cms/models';
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
 import { UmbDataStore } from '@umbraco-cms/stores/store';
 import { UmbLitElement } from '@umbraco-cms/element';
-import { UmbContextProviderController } from 'src/core/context-api/provide/context-provider.controller';
+
+import './navigator/tree-navigator.element';
+import './context-menu/tree-context-menu-page-action-list.element';
+import './context-menu/tree-context-menu-page.service';
+import './context-menu/tree-context-menu.service';
+import './action/tree-item-action-extension.element';
 
 @customElement('umb-tree')
 export class UmbTreeElement extends UmbLitElement {
@@ -55,7 +59,6 @@ export class UmbTreeElement extends UmbLitElement {
 	private _tree?: ManifestTree;
 
 	private _treeContext?: UmbTreeContextBase;
-	private _treeContextProvider?: UmbContextProviderController;
 
 	connectedCallback(): void {
 		super.connectedCallback();
@@ -112,7 +115,7 @@ export class UmbTreeElement extends UmbLitElement {
 	}
 
 	render() {
-		return html`${when(this._tree, () => html`<umb-tree-extension .tree=${this._tree}></umb-tree-extension>`)}`;
+		return html`<umb-tree-navigator></umb-tree-navigator>`;
 	}
 }
 
