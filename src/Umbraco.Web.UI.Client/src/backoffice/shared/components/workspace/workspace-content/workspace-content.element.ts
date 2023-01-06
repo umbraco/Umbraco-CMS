@@ -1,9 +1,6 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html } from 'lit';
-import { customElement, property, state } from 'lit/decorators.js';
-import { distinctUntilChanged } from 'rxjs';
-import type { UmbWorkspaceContentContext } from './workspace-content.context';
-import type { DocumentDetails, MediaDetails } from '@umbraco-cms/models';
+import { customElement, property } from 'lit/decorators.js';
 
 import '../workspace-layout/workspace-layout.element';
 import '../../variant-selector/variant-selector.element';
@@ -12,10 +9,7 @@ import '../../variant-selector/variant-selector.element';
 // TODO: Make this dynamic, use load-extensions method to loop over extensions for this node.
 import './views/edit/workspace-view-content-edit.element';
 import './views/info/workspace-view-content-info.element';
-import type { UmbNodeStoreBase } from '@umbraco-cms/stores/store';
 import { UmbLitElement } from '@umbraco-cms/element';
-
-type ContentTypeTypes = DocumentDetails | MediaDetails;
 
 /**
  * TODO: IMPORTANT TODO: Get rid of the content workspace. Instead we aim to get separate components that can be composed by each workspace.
