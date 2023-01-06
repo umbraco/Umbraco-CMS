@@ -103,8 +103,6 @@ export class UmbWorkspacePropertyContext<ValueType> {
 	}
 
 	public resetValue() {
-		console.log("property context reset")
-		
 		this.update({value: null});
 	}
 
