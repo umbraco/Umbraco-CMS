@@ -156,7 +156,6 @@ export class UmbPropertyElement extends UmbLitElement {
 			this._description = description;
 		});
 
-		// TODO: move event to context. maybe rename to property-editor-value-change.
 		this.addEventListener('property-editor-value-change', this._onPropertyEditorChange as any as EventListener);
 
 
@@ -206,8 +205,8 @@ export class UmbPropertyElement extends UmbLitElement {
 		this.value = target.value;
 
 		//TODO: Property-Context: Figure out the requirements for this. Cause currently the alias-prop(getter) is required, but its not obvious.
+		// Could it make more sense to parse this on as part of the event? alias?, value?
 		
-		// TODO: Confusing with the little detail of the event name that changed here..
 		this.dispatchEvent(new CustomEvent('property-value-change', { bubbles: true, composed: true }));
 		e.stopPropagation();
 	};
