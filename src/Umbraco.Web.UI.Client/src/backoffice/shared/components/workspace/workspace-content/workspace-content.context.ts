@@ -98,8 +98,6 @@ export class UmbWorkspaceContentContext<
 	private _onPropertyValueChange = (e: Event) => {
 		const target = e.composedPath()[0] as any;
 
-		console.log("_onPropertyValueChange context", target.alias, target);
-
 		const property = this.getData().data.find((x) => x.alias === target.alias);
 		if (property) {
 			this._setPropertyValue(property.alias, target.value);
@@ -112,8 +110,6 @@ export class UmbWorkspaceContentContext<
 	};
 
 	private _setPropertyValue(alias: string, value: unknown) {
-
-		console.log("about to change prop", this.getData());
 		const newDataSet = this.getData().data.map((entry) => {
 			if (entry.alias === alias) {
 				return {alias: alias, value: value};
@@ -122,9 +118,7 @@ export class UmbWorkspaceContentContext<
 		});
 
 
-		const part = {data: newDataSet};
-		console.log("result", part)
-		this.update(part as Partial<ContentTypeType>);
+		this.update({data: newDataSet} as Partial<ContentTypeType>);
 	}
 
 	public save(): Promise<void> {
