@@ -19,6 +19,7 @@ import type {
 	ManifestHeaderApp,
 	ManifestCollectionView,
 	ManifestCollectionBulkAction,
+	ManifestSidebarMenuItem,
 } from '../../models';
 import { hasDefaultExport } from '../has-default-export.function';
 import { loadExtension } from '../load-extension.function';
@@ -44,10 +45,11 @@ export class UmbExtensionRegistry {
 				if (hasDefaultExport(js)) {
 					new js.default();
 				} else {
-					console.error(`Extension with alias '${manifest.alias}' of type 'entrypoint' must have a default export of its JavaScript module.`)
+					console.error(
+						`Extension with alias '${manifest.alias}' of type 'entrypoint' must have a default export of its JavaScript module.`
+					);
 				}
 			});
-			
 		}
 	}
 
@@ -69,10 +71,11 @@ export class UmbExtensionRegistry {
 		return values.some((ext) => ext.alias === alias);
 	}
 
-
 	getByAlias<T = ManifestTypes>(alias: string): Observable<T | null> {
 		// TODO: make pipes prettier/simpler/reuseable
-		return this.extensions.pipe(map((dataTypes) => dataTypes.find((extension) => extension.alias === alias) || null)) as Observable<T | null>;
+		return this.extensions.pipe(
+			map((dataTypes) => dataTypes.find((extension) => extension.alias === alias) || null)
+		) as Observable<T | null>;
 	}
 
 	// TODO: implement unregister of extension
@@ -97,6 +100,7 @@ export class UmbExtensionRegistry {
 	extensionsOfType(type: 'externalLoginProvider'): Observable<Array<ManifestExternalLoginProvider>>;
 	extensionsOfType(type: 'collectionView'): Observable<Array<ManifestCollectionView>>;
 	extensionsOfType(type: 'collectionBulkAction'): Observable<Array<ManifestCollectionBulkAction>>;
+	extensionsOfType(type: 'sidebarMenuItem'): Observable<Array<ManifestSidebarMenuItem>>;
 	extensionsOfType<T extends ManifestTypes>(type: string): Observable<Array<T>>;
 	extensionsOfType(type: string): Observable<Array<ManifestTypes>> {
 		return this.extensions.pipe(
@@ -106,7 +110,9 @@ export class UmbExtensionRegistry {
 
 	extensionsOfTypes<ExtensionType = ManifestTypes>(types: string[]): Observable<Array<ExtensionType>> {
 		return this.extensions.pipe(
-			map((exts) => exts.filter((ext) => (types.indexOf(ext.type) !== -1)).sort((a, b) => (b.weight || 0) - (a.weight || 0)))
+			map((exts) =>
+				exts.filter((ext) => types.indexOf(ext.type) !== -1).sort((a, b) => (b.weight || 0) - (a.weight || 0))
+			)
 		) as Observable<Array<ExtensionType>>;
 	}
 }
