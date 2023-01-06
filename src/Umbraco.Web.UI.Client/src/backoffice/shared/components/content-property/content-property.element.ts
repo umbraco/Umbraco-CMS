@@ -6,7 +6,7 @@ import { customElement, property, state } from 'lit/decorators.js';
 import { UmbDataTypeStore } from '../../../settings/data-types/data-type.store';
 import type { ContentProperty } from '@umbraco-cms/models';
 
-import '../property/entity-property.element';
+import '../property/property.element';
 import { UmbLitElement } from '@umbraco-cms/element';
 
 @customElement('umb-content-property')

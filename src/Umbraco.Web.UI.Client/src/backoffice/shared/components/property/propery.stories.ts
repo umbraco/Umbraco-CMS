@@ -1,8 +1,8 @@
 import { Meta, Story } from '@storybook/web-components';
 import { html } from 'lit-html';
 
-import type { UmbPropertyElement } from './entity-property.element';
-import './entity-property.element';
+import type { UmbPropertyElement } from './property.element';
+import './property.element';
 
 export default {
 	title: 'Components/Entity Property',

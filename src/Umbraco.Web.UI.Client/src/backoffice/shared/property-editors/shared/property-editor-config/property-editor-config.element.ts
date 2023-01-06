@@ -5,7 +5,7 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import type { PropertyEditorConfigDefaultData, PropertyEditorConfigProperty } from '@umbraco-cms/models';
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
 
-import '../../../components/property/entity-property.element';
+import '../../../components/property/property.element';
 import { UmbLitElement } from '@umbraco-cms/element';
 
 /**
