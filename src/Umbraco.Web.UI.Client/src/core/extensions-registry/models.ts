@@ -16,6 +16,7 @@ import type { ManifestPackageView } from './package-view.models';
 import type { ManifestExternalLoginProvider } from './external-login-provider.models';
 import type { ManifestCollectionBulkAction } from './collection-bulk-action.models';
 import type { ManifestCollectionView } from './collection-view.models';
+import type { ManifestSidebarMenuItem } from './sidebar-menu-item.models';
 
 export * from './header-app.models';
 export * from './section.models';
@@ -35,6 +36,7 @@ export * from './package-view.models';
 export * from './external-login-provider.models';
 export * from './collection-bulk-action.models';
 export * from './collection-view.models';
+export * from './sidebar-menu-item.models';
 
 export type ManifestTypes =
 	| ManifestHeaderApp
@@ -57,7 +59,8 @@ export type ManifestTypes =
 	| ManifestEntrypoint
 	| ManifestCustom
 	| ManifestCollectionBulkAction
-	| ManifestCollectionView;
+	| ManifestCollectionView
+	| ManifestSidebarMenuItem;
 
 export type ManifestStandardTypes =
 	| 'headerApp'
@@ -79,7 +82,8 @@ export type ManifestStandardTypes =
 	| 'entrypoint'
 	| 'externalLoginProvider'
 	| 'collectionBulkAction'
-	| 'collectionView';
+	| 'collectionView'
+	| 'sidebarMenuItem';
 
 export type ManifestElementType =
 	| ManifestSection
