@@ -33,7 +33,7 @@ public class ExecuteTemplateQueryController : TemplateQueryControllerBase
         _contentTypeService = contentTypeService;
     }
 
-    [HttpPost]
+    [HttpPost("execute")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(TemplateQueryResultViewModel), StatusCodes.Status200OK)]
     public async Task<ActionResult<TemplateQueryResultViewModel>> Execute(TemplateQueryExecuteModel query)

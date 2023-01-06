@@ -12,7 +12,7 @@ public class SettingsTemplateQueryController : TemplateQueryControllerBase
     public SettingsTemplateQueryController(IContentTypeService contentTypeService)
         => _contentTypeService = contentTypeService;
 
-    [HttpGet]
+    [HttpGet("settings")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(TemplateQuerySettingsViewModel), StatusCodes.Status200OK)]
     public async Task<ActionResult<TemplateQuerySettingsViewModel>> Settings()
