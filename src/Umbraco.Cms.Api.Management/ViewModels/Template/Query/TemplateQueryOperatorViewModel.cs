@@ -6,5 +6,5 @@ public class TemplateQueryOperatorViewModel
 {
     public required Operator Operator { get; init; }
 
-    public required IEnumerable<string> AppliesTo { get; init; }
+    public required IEnumerable<TemplateQueryPropertyType> ApplicableTypes { get; init; }
 }

@@ -4,5 +4,5 @@ public class TemplateQueryPropertyViewModel
 {
     public required string Alias { get; init; }
 
-    public required string? Type { get; init; }
+    public required TemplateQueryPropertyType Type { get; init; }
 }

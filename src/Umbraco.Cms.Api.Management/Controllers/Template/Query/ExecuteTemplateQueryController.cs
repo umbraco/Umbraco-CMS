@@ -120,6 +120,15 @@ public class ExecuteTemplateQueryController : TemplateQueryControllerBase
         {
             var propertyTypeByAlias = GetProperties().ToDictionary(p => p.Alias, p => p.Type);
 
+            string PropertyModelType(TemplateQueryPropertyType templateQueryPropertyType)
+                => templateQueryPropertyType switch
+                {
+                    TemplateQueryPropertyType.Integer => "int",
+                    TemplateQueryPropertyType.String => "string",
+                    TemplateQueryPropertyType.DateTime => "datetime",
+                    _ => throw new ArgumentOutOfRangeException(nameof(templateQueryPropertyType))
+                };
+
             IEnumerable<QueryCondition> conditions = model.Filters
                 .Where(f => f.ConstraintValue.IsNullOrWhiteSpace() == false && propertyTypeByAlias.ContainsKey(f.PropertyAlias))
                 .Select(f => new QueryCondition
@@ -127,7 +136,7 @@ public class ExecuteTemplateQueryController : TemplateQueryControllerBase
                     Property = new PropertyModel
                     {
                         Alias = f.PropertyAlias,
-                        Type = propertyTypeByAlias[f.PropertyAlias]
+                        Type = PropertyModelType(propertyTypeByAlias[f.PropertyAlias])
                     },
                     ConstraintValue = f.ConstraintValue,
                     Term = new OperatorTerm { Operator = f.Operator }
