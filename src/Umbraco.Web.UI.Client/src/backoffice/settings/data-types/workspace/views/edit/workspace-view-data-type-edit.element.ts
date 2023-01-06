@@ -4,7 +4,7 @@ import { customElement, state } from 'lit/decorators.js';
 import { UmbLitElement } from '@umbraco-cms/element';
 import { UmbModalService } from '../../../../../../core/modal';
 import { UmbWorkspaceDataTypeContext } from '../../workspace-data-type.context';
-import type { DataTypeDetails, ManifestPropertyEditorUI } from '@umbraco-cms/models';
+import type { DataTypeDetails } from '@umbraco-cms/models';
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
 
 import '../../../../../shared/property-editors/shared/property-editor-config/property-editor-config.element';
@@ -78,15 +78,15 @@ export class UmbWorkspaceViewDataTypeEditElement extends UmbLitElement {
 		if (!propertyEditorUIAlias) return;
 
 		this.observe(
-			umbExtensionsRegistry.getByAlias<ManifestPropertyEditorUI>(propertyEditorUIAlias),
+			umbExtensionsRegistry.getByTypeAndAlias('propertyEditorUI', propertyEditorUIAlias),
 			(propertyEditorUI) => {
 				// TODO: show error. We have stored a PropertyEditorUIAlias and can't find the PropertyEditorUI in the registry.
 				if (!propertyEditorUI) return;
 
 				this._propertyEditorUIName = propertyEditorUI?.meta.label ?? propertyEditorUI?.name ?? '';
 				this._propertyEditorUIAlias = propertyEditorUI?.alias ?? '';
-				this._propertyEditorUIIcon = propertyEditorUI?.meta?.icon ?? '';
-				this._propertyEditorModelAlias = propertyEditorUI?.meta?.propertyEditorModel ?? '';
+				this._propertyEditorUIIcon = propertyEditorUI?.meta.icon ?? '';
+				this._propertyEditorModelAlias = propertyEditorUI?.meta.propertyEditorModel ?? '';
 
 				this._workspaceContext?.update({ propertyEditorModelAlias: this._propertyEditorModelAlias });
 			}

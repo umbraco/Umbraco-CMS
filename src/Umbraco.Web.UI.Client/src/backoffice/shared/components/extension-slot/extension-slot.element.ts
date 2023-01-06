@@ -2,7 +2,7 @@ import { nothing } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { map } from 'rxjs';
 import { repeat } from 'lit/directives/repeat.js';
-import { ManifestTypes, umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
+import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
 import { createExtensionElement } from '@umbraco-cms/extensions-api';
 import { isManifestElementableType } from 'src/core/extensions-api/is-manifest-elementable-type.function';
 import { UmbLitElement } from '@umbraco-cms/element';
@@ -39,7 +39,7 @@ export class UmbExtensionSlotElement extends UmbLitElement {
 	private _observeExtensions() {
 		this.observe(
 			umbExtensionsRegistry?.extensionsOfType(this.type).pipe(map((extensions) => extensions.filter(this.filter))),
-			async (extensions: ManifestTypes[]) => {
+			async (extensions) => {
 				const oldLength = this._extensions.length;
 				this._extensions = this._extensions.filter((current) =>
 					extensions.find((incoming) => incoming.alias === current.alias)
@@ -48,7 +48,7 @@ export class UmbExtensionSlotElement extends UmbLitElement {
 					this.requestUpdate('_extensions');
 				}
 
-				extensions.forEach(async (extension: ManifestTypes) => {
+				extensions.forEach(async (extension) => {
 					const hasExt = this._extensions.find((x) => x.alias === extension.alias);
 					if (!hasExt) {
 						const extensionObject: InitializedExtensionItem = {

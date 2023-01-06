@@ -39,6 +39,7 @@ export * from './collection-view.models';
 export * from './sidebar-menu-item.models';
 
 export type ManifestTypes =
+	| ManifestCustom
 	| ManifestHeaderApp
 	| ManifestSection
 	| ManifestSectionView
@@ -57,50 +58,15 @@ export type ManifestTypes =
 	| ManifestPackageView
 	| ManifestExternalLoginProvider
 	| ManifestEntrypoint
-	| ManifestCustom
 	| ManifestCollectionBulkAction
 	| ManifestCollectionView
 	| ManifestSidebarMenuItem;
 
-export type ManifestStandardTypes =
-	| 'headerApp'
-	| 'section'
-	| 'sectionView'
-	| 'tree'
-	| 'workspace'
-	| 'workspaceAction'
-	| 'workspaceView'
-	| 'workspaceViewCollection'
-	| 'treeItemAction'
-	| 'propertyEditorUI'
-	| 'propertyEditorModel'
-	| 'dashboard'
-	| 'dashboardCollection'
-	| 'userDashboard'
-	| 'propertyAction'
-	| 'packageView'
-	| 'entrypoint'
-	| 'externalLoginProvider'
-	| 'collectionBulkAction'
-	| 'collectionView'
-	| 'sidebarMenuItem';
+export type ManifestStandardTypes = ManifestTypes['type'];
 
-export type ManifestElementType =
-	| ManifestSection
-	| ManifestSectionView
-	| ManifestTree
-	| ManifestTreeItemAction
-	| ManifestWorkspace
-	| ManifestWorkspaceView
-	| ManifestPropertyAction
-	| ManifestPropertyEditorUI
-	| ManifestDashboard
-	| ManifestUserDashboard
-	| ManifestWorkspaceAction
-	| ManifestPackageView
-	| ManifestExternalLoginProvider
-	| ManifestCollectionBulkAction
-	| ManifestCollectionView;
+export type ManifestTypeMap = {
+	[Manifest in ManifestTypes as Manifest['type']]: Manifest;
+};
 
 export interface ManifestBase {
 	type: string;
