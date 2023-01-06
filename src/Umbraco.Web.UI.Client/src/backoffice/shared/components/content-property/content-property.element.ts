@@ -68,8 +68,8 @@ export class UmbContentPropertyElement extends UmbLitElement {
 			description=${ifDefined(this.property?.description)}
 			alias="${ifDefined(this.property?.alias)}"
 			property-editor-ui-alias="${ifDefined(this._propertyEditorUIAlias)}"
-			.value="${this.value}"
-			.config="${this._dataTypeData}"></umb-property>`;
+			.value=${this.value}
+			.config=${this._dataTypeData}></umb-property>`;
 	}
 }
 

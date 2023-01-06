@@ -111,15 +111,15 @@ export class UmbPropertyElement extends UmbLitElement {
 	/**
 	 * Property Editor UI Alias. Render the Property Editor UI registered for this alias.
 	 * @public
-	 * @type {object | string}
+	 * @type {unknown}
 	 * @attr
 	 * @default undefined
 	 */
-	@property({ attribute: false })
+	@property({attribute: false })
 	public get value() {
-		return this._propertyContext.getValue() as any;
+		return this._propertyContext.getValue();
 	}
-	public set value(value: object | string) {
+	public set value(value) {
 		this._propertyContext.setValue(value);
 	}
 
