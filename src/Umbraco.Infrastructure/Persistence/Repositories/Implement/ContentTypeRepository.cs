@@ -183,7 +183,6 @@ internal class ContentTypeRepository : ContentTypeRepositoryBase<IContentType>, 
         l.Add("DELETE FROM cmsDocumentType WHERE contentTypeNodeId = @id");
         l.Add("DELETE FROM cmsContentType WHERE nodeId = @id");
         l.Add("DELETE FROM umbracoNode WHERE id = @id");
-
         return l;
     }
 
