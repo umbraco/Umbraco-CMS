@@ -87,6 +87,7 @@ public class UmbracoPlan : MigrationPlan
         To<UseNvarcharInsteadOfNText>("{888A0D5D-51E4-4C7E-AA0A-01306523C7FB}");
 
         // To 13.0.0
+        To<AddPropertyEditorUiAliasColumn>("{419827A0-4FCE-464B-A8F3-247C6092AF55}");
         To<MigrateDataTypeConfigurations>("{5F15A1CC-353D-4889-8C7E-F303B4766196}");
     }
 }

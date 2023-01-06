@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using System.Runtime.Serialization;
 using Umbraco.Cms.Core.Serialization;
 
@@ -74,4 +75,11 @@ public interface IConfigurationEditor
     IDictionary<string, object> FromDatabase(
         string? configuration,
         IConfigurationEditorJsonSerializer configurationEditorJsonSerializer);
+
+    /// <summary>
+    ///     Performs validation of configuration data.
+    /// </summary>
+    /// <param name="configuration">The configuration data to validate.</param>
+    /// <returns>One or more <see cref="ValidationResult"/> if the configuration data is invalid, an empty collection otherwise.</returns>
+    IEnumerable<ValidationResult> Validate(IDictionary<string, object> configuration);
 }
