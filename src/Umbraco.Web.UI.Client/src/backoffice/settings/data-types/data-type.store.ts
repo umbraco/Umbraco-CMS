@@ -17,6 +17,7 @@ export type UmbDataTypeStoreItemType = DataTypeDetails | FolderTreeItem;
  * @description - Data Store for Data Types
  */
 export class UmbDataTypeStore extends UmbDataStoreBase<UmbDataTypeStoreItemType> {
+	
 	public readonly storeAlias = 'umbDataTypeStore';
 
 	/**

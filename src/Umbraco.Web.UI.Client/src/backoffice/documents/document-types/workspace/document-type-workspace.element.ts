@@ -53,10 +53,17 @@ export class UmbDocumentTypeWorkspaceElement extends UmbLitElement implements Um
 	}
 	public set entityKey(value: string) {
 		this._entityKey = value;
-		this._provideWorkspace();
+		if (this._entityKey) {
+			this._workspaceContext?.load(this._entityKey);
+		}
 	}
 
-	private _workspaceContext?: UmbWorkspaceDocumentTypeContext;
+	@property()
+	public set create(parentKey: string | null) {
+		this._workspaceContext?.create(parentKey);
+	}
+
+	private _workspaceContext: UmbWorkspaceDocumentTypeContext = new UmbWorkspaceDocumentTypeContext(this);
 
 	@state()
 	private _documentType?: DocumentTypeDetails;
@@ -69,18 +76,6 @@ export class UmbDocumentTypeWorkspaceElement extends UmbLitElement implements Um
 		this.consumeContext('umbModalService', (instance) => {
 			this._modalService = instance;
 		});
-	}
-
-	protected _provideWorkspace() {
-		if (this._entityKey) {
-			this._workspaceContext = new UmbWorkspaceDocumentTypeContext(this, this._entityKey);
-			this.provideContext('umbWorkspaceContext', this._workspaceContext);
-			this._observeWorkspace();
-		}
-	}
-
-	private async _observeWorkspace() {
-		if (!this._workspaceContext) return;
 
 		this.observe(this._workspaceContext.data.pipe(distinctUntilChanged()), (data) => {
 			// TODO: make method to identify if data is of type DocumentTypeDetails
