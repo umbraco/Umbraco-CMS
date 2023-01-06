@@ -69,11 +69,11 @@ public class ExecuteTemplateQueryController : TemplateQueryControllerBase
 
         IEnumerable<IPublishedContent> contentQuery = GetRootContentQuery(model, rootContent, queryExpression);
 
-        contentQuery = ApplyFiltering(model, contentQuery, queryExpression);
+        contentQuery = ApplyFiltering(model.Filters, contentQuery, queryExpression);
 
-        contentQuery = ApplySorting(model, contentQuery, queryExpression);
+        contentQuery = ApplySorting(model.Sort, contentQuery, queryExpression);
 
-        contentQuery = ApplyPaging(model, contentQuery, queryExpression);
+        contentQuery = ApplyPaging(model.Take, contentQuery, queryExpression);
 
         return contentQuery;
     }
@@ -114,45 +114,11 @@ public class ExecuteTemplateQueryController : TemplateQueryControllerBase
             : rootContent.Children(_variationContextAccessor);
     }
 
-    private IEnumerable<IPublishedContent> ApplyFiltering(TemplateQueryExecuteModel model, IEnumerable<IPublishedContent> contentQuery, StringBuilder queryExpression)
+    private IEnumerable<IPublishedContent> ApplyFiltering(IEnumerable<TemplateQueryExecuteFilterModel>? filters, IEnumerable<IPublishedContent> contentQuery, StringBuilder queryExpression)
     {
-        if (model.Filters is not null)
+        if (filters is not null)
         {
-            var propertyTypeByAlias = GetProperties().ToDictionary(p => p.Alias, p => p.Type);
-
-            string PropertyModelType(TemplateQueryPropertyType templateQueryPropertyType)
-                => templateQueryPropertyType switch
-                {
-                    TemplateQueryPropertyType.Integer => "int",
-                    TemplateQueryPropertyType.String => "string",
-                    TemplateQueryPropertyType.DateTime => "datetime",
-                    _ => throw new ArgumentOutOfRangeException(nameof(templateQueryPropertyType))
-                };
-
-            IEnumerable<QueryCondition> conditions = model.Filters
-                .Where(f => f.ConstraintValue.IsNullOrWhiteSpace() == false && propertyTypeByAlias.ContainsKey(f.PropertyAlias))
-                .Select(f => new QueryCondition
-                {
-                    Property = new PropertyModel
-                    {
-                        Alias = f.PropertyAlias,
-                        Type = PropertyModelType(propertyTypeByAlias[f.PropertyAlias])
-                    },
-                    ConstraintValue = f.ConstraintValue,
-                    Term = new OperatorTerm { Operator = f.Operator }
-                });
-
-            // apply filters
-            foreach (QueryCondition condition in conditions)
-            {
-                //x is passed in as the parameter alias for the linq where statement clause
-                Expression<Func<IPublishedContent, bool>> operation = condition.BuildCondition<IPublishedContent>("x");
-
-                //for review - this uses a tonized query rather then the normal linq query.
-                contentQuery = contentQuery.Where(operation.Compile());
-                queryExpression.Append(_indent);
-                queryExpression.Append($".Where({operation})");
-            }
+            contentQuery = ApplyFilters(filters, contentQuery, queryExpression);
         }
 
         contentQuery = contentQuery.Where(x => x.IsVisible(_publishedValueFallback));
@@ -162,44 +128,95 @@ public class ExecuteTemplateQueryController : TemplateQueryControllerBase
         return contentQuery;
     }
 
-    private IEnumerable<IPublishedContent> ApplySorting(TemplateQueryExecuteModel model, IEnumerable<IPublishedContent> contentQuery, StringBuilder queryExpression)
+    private IEnumerable<IPublishedContent> ApplyFilters(IEnumerable<TemplateQueryExecuteFilterModel> filters, IEnumerable<IPublishedContent> contentQuery, StringBuilder queryExpression)
     {
-        if (model.Sort != null && model.Sort.PropertyAlias.IsNullOrWhiteSpace() == false)
-        {
-            var ascending = model.Sort.Direction == "ascending";
-            contentQuery = model.Sort.PropertyAlias.ToLowerInvariant() switch
+        var propertyTypeByAlias = GetProperties().ToDictionary(p => p.Alias, p => p.Type);
+
+        string PropertyModelType(TemplateQueryPropertyType templateQueryPropertyType)
+            => templateQueryPropertyType switch
             {
-                "id" => ascending
-                    ? contentQuery.OrderBy(content => content.Id)
-                    : contentQuery.OrderByDescending(content => content.Id),
-                "createDate" => ascending
-                    ? contentQuery.OrderBy(content => content.CreateDate)
-                    : contentQuery.OrderByDescending(content => content.CreateDate),
-                "publishDate" => ascending
-                    ? contentQuery.OrderBy(content => content.UpdateDate)
-                    : contentQuery.OrderByDescending(content => content.UpdateDate),
-                _ => ascending
-                    ? contentQuery.OrderBy(content => content.Name)
-                    : contentQuery.OrderByDescending(content => content.Name),
+                TemplateQueryPropertyType.Integer => "int",
+                TemplateQueryPropertyType.String => "string",
+                TemplateQueryPropertyType.DateTime => "datetime",
+                _ => throw new ArgumentOutOfRangeException(nameof(templateQueryPropertyType))
             };
 
+        IEnumerable<QueryCondition> conditions = filters
+            .Where(f => f.ConstraintValue.IsNullOrWhiteSpace() == false && propertyTypeByAlias.ContainsKey(f.PropertyAlias))
+            .Select(f => new QueryCondition
+            {
+                Property = new PropertyModel
+                {
+                    Alias = f.PropertyAlias,
+                    Type = PropertyModelType(propertyTypeByAlias[f.PropertyAlias])
+                },
+                ConstraintValue = f.ConstraintValue,
+                Term = new OperatorTerm { Operator = f.Operator }
+            });
+
+        // apply filters
+        foreach (QueryCondition condition in conditions)
+        {
+            //x is passed in as the parameter alias for the linq where statement clause
+            Expression<Func<IPublishedContent, bool>> operation = condition.BuildCondition<IPublishedContent>("x");
+
+            //for review - this uses a tonized query rather then the normal linq query.
+            contentQuery = contentQuery.Where(operation.Compile());
             queryExpression.Append(_indent);
-            queryExpression.Append(ascending
-                ? $".OrderBy(x => x.{model.Sort.PropertyAlias})"
-                : $".OrderByDescending(x => x.{model.Sort.PropertyAlias})");
+            queryExpression.Append($".Where({operation})");
         }
 
         return contentQuery;
     }
 
-    private IEnumerable<IPublishedContent> ApplyPaging(TemplateQueryExecuteModel model, IEnumerable<IPublishedContent> contentQuery, StringBuilder queryExpression)
+    private IEnumerable<IPublishedContent> ApplySorting(TemplateQueryExecuteSortModel? sorting, IEnumerable<IPublishedContent> contentQuery, StringBuilder queryExpression)
     {
-        if (model.Take > 0)
+        if (string.IsNullOrWhiteSpace(sorting?.PropertyAlias))
         {
-            contentQuery = contentQuery.Take(model.Take);
-            queryExpression.Append(_indent);
-            queryExpression.Append($".Take({model.Take})");
+            return contentQuery;
         }
+
+        var ascending = sorting.Direction == "ascending";
+
+        int SortById(IPublishedContent content) => content.Id;
+        DateTime SortByCreateDate(IPublishedContent content) => content.CreateDate;
+        DateTime SortByPublishDate(IPublishedContent content) => content.UpdateDate;
+        string SortByName(IPublishedContent content) => content.Name;
+
+        contentQuery = sorting.PropertyAlias.ToLowerInvariant() switch
+        {
+            "id" => ascending
+                ? contentQuery.OrderBy(SortById)
+                : contentQuery.OrderByDescending(SortById),
+            "createDate" => ascending
+                ? contentQuery.OrderBy(SortByCreateDate)
+                : contentQuery.OrderByDescending(SortByCreateDate),
+            "publishDate" => ascending
+                ? contentQuery.OrderBy(SortByPublishDate)
+                : contentQuery.OrderByDescending(SortByPublishDate),
+            _ => ascending
+                ? contentQuery.OrderBy(SortByName)
+                : contentQuery.OrderByDescending(SortByName),
+        };
+
+        queryExpression.Append(_indent);
+        queryExpression.Append(ascending
+            ? $".OrderBy(x => x.{sorting.PropertyAlias})"
+            : $".OrderByDescending(x => x.{sorting.PropertyAlias})");
+
+        return contentQuery;
+    }
+
+    private IEnumerable<IPublishedContent> ApplyPaging(int take, IEnumerable<IPublishedContent> contentQuery, StringBuilder queryExpression)
+    {
+        if (take <= 0)
+        {
+            return contentQuery;
+        }
+
+        contentQuery = contentQuery.Take(take);
+        queryExpression.Append(_indent);
+        queryExpression.Append($".Take({take})");
 
         return contentQuery;
     }
