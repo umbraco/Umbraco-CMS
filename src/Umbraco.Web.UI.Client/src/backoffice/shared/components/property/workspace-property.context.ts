@@ -81,6 +81,9 @@ export class UmbWorkspacePropertyContext<ValueType> {
 	public setAlias(alias: WorkspacePropertyData<ValueType>['alias']) {
 		this.update({alias: alias});
 	}
+	public getAlias() {
+		return this._data.getValue().alias;
+	}
 	public setLabel(label: WorkspacePropertyData<ValueType>['label']) {
 		this.update({label: label});
 	}
@@ -89,6 +92,9 @@ export class UmbWorkspacePropertyContext<ValueType> {
 	}
 	public setValue(value: WorkspacePropertyData<ValueType>['value']) {
 		this.update({value: value});
+	}
+	public getValue() {
+		return this._data.getValue().value;
 	}
 	public setConfig(config: WorkspacePropertyData<ValueType>['config']) {
 		this.update({config: config});

@@ -31,7 +31,7 @@ export class UmbContentPropertyElement extends UmbLitElement {
 	}
 
 	@property()
-	value?: object;
+	value?: object | string;
 
 	@state()
 	private _propertyEditorUIAlias?: string;

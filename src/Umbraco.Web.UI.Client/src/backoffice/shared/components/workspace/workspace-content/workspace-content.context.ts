@@ -3,16 +3,16 @@ import { UmbNotificationService } from '../../../../../core/notification';
 import { UmbNotificationDefaultData } from '../../../../../core/notification/layouts/default';
 import { UmbWorkspaceContext } from '../workspace-context/workspace.context';
 import { UmbNodeStoreBase } from '@umbraco-cms/stores/store';
-import { ContentTreeItem } from '@umbraco-cms/backend-api';
 import { UmbControllerHostInterface } from 'src/core/controller/controller-host.mixin';
 import { UmbContextConsumerController } from 'src/core/context-api/consume/context-consumer.controller';
 import { UmbObserverController } from '@umbraco-cms/observable-api';
 import { UmbContextProviderController } from 'src/core/context-api/provide/context-provider.controller';
+import type { ContentDetails } from '@umbraco-cms/models';
 
 // TODO: Consider if its right to have this many class-inheritance of WorkspaceContext
 // TODO: Could we extract this code into a 'Manager' of its own, which will be instantiated by the concrete Workspace Context. This will be more transparent and 'reuseable'
 export class UmbWorkspaceContentContext<
-	ContentTypeType extends ContentTreeItem = ContentTreeItem,
+	ContentTypeType extends ContentDetails = ContentDetails,
 	StoreType extends UmbNodeStoreBase<ContentTypeType> = UmbNodeStoreBase<ContentTypeType>
 > extends UmbWorkspaceContext<ContentTypeType> {
 
@@ -34,6 +34,10 @@ export class UmbWorkspaceContentContext<
 	) {
 		super(host, defaultData);
 
+		this.entityType = entityType;
+
+		host.addEventListener('property-value-change', this._onPropertyValueChange);
+
 		new UmbContextConsumerController(
 			host,
 			'umbNotificationService',
@@ -42,15 +46,13 @@ export class UmbWorkspaceContentContext<
 			}
 		);
 
-		this.entityType = entityType;
-
 		new UmbContextConsumerController(host, storeAlias, (_instance: StoreType) => {
 			this._store = _instance;
 			if (!this._store) {
 				// TODO: make sure to break the application in a good way.
 				return;
 			}
-			this._readyToLoad();
+			this._observeStore();
 
 			// TODO: first provide when we have umbNotificationService as well.
 			new UmbContextProviderController(this._host, 'umbWorkspaceContext', this);
@@ -60,7 +62,7 @@ export class UmbWorkspaceContentContext<
 	load(entityKey: string) {
 		this.#isNew = false;
 		this.entityKey = entityKey;
-		this._readyToLoad();
+		this._observeStore();
 	}
 
 	create(parentKey: string | null) {
@@ -69,7 +71,7 @@ export class UmbWorkspaceContentContext<
 		console.log("I'm new, and I will be created under ", parentKey)
 	}
 
-	protected _readyToLoad(): void {
+	protected _observeStore(): void {
 		if(!this._store || !this.entityKey) {
 			return;
 		}
@@ -86,6 +88,43 @@ export class UmbWorkspaceContentContext<
 
 	public getStore() {
 		return this._store;
+	}
+
+
+
+
+	
+	//TODO: Property-Context: I would like ot investigate how this would work as methods. That do require that a property-context gets the workspace context. But this connection would be more safe.
+	private _onPropertyValueChange = (e: Event) => {
+		const target = e.composedPath()[0] as any;
+
+		console.log("_onPropertyValueChange context", target.alias, target);
+
+		const property = this.getData().data.find((x) => x.alias === target.alias);
+		if (property) {
+			this._setPropertyValue(property.alias, target.value);
+		} else {
+			console.error('property was not found', target.alias);
+		}
+
+		// We need to stop the event, so it does not bubble up to parent workspace contexts.
+		e.stopPropagation();
+	};
+
+	private _setPropertyValue(alias: string, value: unknown) {
+
+		console.log("about to change prop", this.getData());
+		const newDataSet = this.getData().data.map((entry) => {
+			if (entry.alias === alias) {
+				return {alias: alias, value: value};
+			}
+			return entry;
+		});
+
+
+		const part = {data: newDataSet};
+		console.log("result", part)
+		this.update(part as Partial<ContentTypeType>);
 	}
 
 	public save(): Promise<void> {

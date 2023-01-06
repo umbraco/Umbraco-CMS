@@ -8,6 +8,7 @@ import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
 
 import '../property-action/property-action.element';
 import { UmbLitElement } from '@umbraco-cms/element';
+import { UmbObserverController } from '@umbraco-cms/observable-api';
 
 @customElement('umb-property-action-menu')
 export class UmbPropertyActionMenuElement extends UmbLitElement {
@@ -40,12 +41,18 @@ export class UmbPropertyActionMenuElement extends UmbLitElement {
 		`,
 	];
 
-	@property()
-	public propertyEditorUIAlias = '';
+
 
 	// TODO: we need to investigate context api vs values props and events
 	@property()
 	public value?: string;
+
+	@property()
+	set propertyEditorUIAlias(alias: string) {
+		this._observeActions(alias);
+	}
+
+	private _actionsObserver?: UmbObserverController<ManifestPropertyAction[]>;
 
 	@state()
 	private _actions: Array<ManifestPropertyAction> = [];
@@ -55,22 +62,25 @@ export class UmbPropertyActionMenuElement extends UmbLitElement {
 
 	private _propertyActionMenuContext = new UmbPropertyActionMenuContext(this);
 
-	connectedCallback(): void {
-		super.connectedCallback();
+	constructor() {
+		super();
 
-		this._observePropertyActions();
-		this._observePropertyActionMenuOpenState();
+		this.observe(this._propertyActionMenuContext.isOpen, (value) => {
+			this._open = value;
+		});
 	}
 
-	private _observePropertyActions() {
-		this.observe(
+	private _observeActions(alias: string) {
+		this._actionsObserver?.destroy();
+		this._actionsObserver = this.observe(
 			umbExtensionsRegistry
 				.extensionsOfType('propertyAction')
 				.pipe(
-					map((propertyActions) =>
-						propertyActions.filter((propertyAction) =>
-							propertyAction.meta.propertyEditors.includes(this.propertyEditorUIAlias)
+					map((propertyActions) => {
+						return propertyActions.filter((propertyAction) =>
+							propertyAction.meta.propertyEditors.includes(alias)
 						)
+					}
 					)
 				),
 			(manifests) => {
@@ -79,23 +89,17 @@ export class UmbPropertyActionMenuElement extends UmbLitElement {
 		);
 	}
 
-	private _observePropertyActionMenuOpenState() {
-		this.observe(this._propertyActionMenuContext.isOpen, (value) => {
-			this._open = value;
-		});
-	}
-
 	private _toggleMenu() {
-		this._open ? this._propertyActionMenuContext.close() : this._propertyActionMenuContext.open();
+		this._propertyActionMenuContext.toggle();
 	}
 
 	private _handleClose(event: CustomEvent) {
-		this._open = false;
+		this._propertyActionMenuContext.close();
 		event.stopPropagation();
 	}
 
 	render() {
-		if (this._actions.length > 0) {
+		return (this._actions.length > 0) ?
 			html`
 				<uui-popover id="popover" placement="bottom-start" .open=${this._open} @close="${this._handleClose}">
 					<uui-button
@@ -116,8 +120,7 @@ export class UmbPropertyActionMenuElement extends UmbLitElement {
 						)}
 					</div>
 				</uui-popover>
-			`;
-		}
-		return '';
+			`
+			: '';
 	}
 }

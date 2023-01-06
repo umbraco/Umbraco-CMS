@@ -29,7 +29,7 @@ export class UmbPropertyActionClearElement extends UmbLitElement implements UmbP
 	private _clearValue() {
 		// TODO: how do we want to update the value? Testing an event based approach. We need to test an api based approach too.
 		this.value = '';
-		this.dispatchEvent(new CustomEvent('property-editor-change', { bubbles: true, composed: true }));
+		this.dispatchEvent(new CustomEvent('property-editor-value-change', { bubbles: true, composed: true }));
 	}
 
 	render() {

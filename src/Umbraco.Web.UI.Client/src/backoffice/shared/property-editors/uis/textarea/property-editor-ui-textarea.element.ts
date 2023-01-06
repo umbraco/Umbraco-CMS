@@ -36,7 +36,7 @@ export class UmbPropertyEditorUITextareaElement extends UmbLitElement {
 
 	private onInput(e: InputEvent) {
 		this.value = (e.target as HTMLInputElement).value;
-		this.dispatchEvent(new CustomEvent('property-editor-change', { bubbles: true, composed: true }));
+		this.dispatchEvent(new CustomEvent('property-editor-value-change', { bubbles: true, composed: true }));
 	}
 
 	render() {

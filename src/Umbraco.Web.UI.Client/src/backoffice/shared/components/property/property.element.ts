@@ -84,6 +84,9 @@ export class UmbPropertyElement extends UmbLitElement {
 	 * @default ''
 	 */
 	@property({ type: String })
+	public get alias(): string {
+		return this._propertyContext.getAlias() || '';
+	}
 	public set alias(alias: string) {
 		this._propertyContext.setAlias(alias);
 	}
@@ -108,11 +111,14 @@ export class UmbPropertyElement extends UmbLitElement {
 	/**
 	 * Property Editor UI Alias. Render the Property Editor UI registered for this alias.
 	 * @public
-	 * @type {object}
+	 * @type {object | string}
 	 * @attr
 	 * @default undefined
 	 */
-	@property({ type: Object, attribute: false })
+	@property({ attribute: false })
+	public get value() {
+		return this._propertyContext.getValue() as any;
+	}
 	public set value(value: object | string) {
 		this._propertyContext.setValue(value);
 	}
@@ -144,7 +150,6 @@ export class UmbPropertyElement extends UmbLitElement {
 
 
 		this.observe(this._propertyContext.label, (label) => {
-			console.log("_propertyContext replied with label", label)
 			this._label = label;
 		});
 		this.observe(this._propertyContext.label, (description) => {
@@ -152,7 +157,7 @@ export class UmbPropertyElement extends UmbLitElement {
 		});
 
 		// TODO: move event to context. maybe rename to property-editor-value-change.
-		this.addEventListener('property-editor-change', this._onPropertyEditorChange as any as EventListener);
+		this.addEventListener('property-editor-value-change', this._onPropertyEditorChange as any as EventListener);
 
 
 	}
@@ -200,9 +205,9 @@ export class UmbPropertyElement extends UmbLitElement {
 		const target = e.composedPath()[0] as any;
 		this.value = target.value;
 
-		// TODO: update context.
 		//TODO: Property-Context: Figure out the requirements for this. Cause currently the alias-prop(getter) is required, but its not obvious.
-
+		
+		// TODO: Confusing with the little detail of the event name that changed here..
 		this.dispatchEvent(new CustomEvent('property-value-change', { bubbles: true, composed: true }));
 		e.stopPropagation();
 	};
