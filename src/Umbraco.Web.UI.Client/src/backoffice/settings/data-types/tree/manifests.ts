@@ -5,6 +5,7 @@ const tree: ManifestTree = {
 	alias: 'Umb.Tree.DataTypes',
 	name: 'Data Types Tree',
 	weight: 100,
+	loader: () => import('./data-type-tree.element'),
 	meta: {
 		label: 'Data Types',
 		icon: 'umb:folder',
