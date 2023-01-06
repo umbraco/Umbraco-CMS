@@ -95,30 +95,29 @@ export class UmbPropertyActionMenuElement extends UmbLitElement {
 	}
 
 	render() {
-		return html`
-			${this._actions.length > 0
-				? html`
-						<uui-popover id="popover" placement="bottom-start" .open=${this._open} @close="${this._handleClose}">
-							<uui-button
-								id="popover-trigger"
-								slot="trigger"
-								look="secondary"
-								label="More"
-								@click="${this._toggleMenu}"
-								compact>
-								<uui-symbol-more id="more-symbol"></uui-symbol-more>
-							</uui-button>
+		if (this._actions.length > 0) {
+			html`
+				<uui-popover id="popover" placement="bottom-start" .open=${this._open} @close="${this._handleClose}">
+					<uui-button
+						id="popover-trigger"
+						slot="trigger"
+						look="secondary"
+						label="More"
+						@click="${this._toggleMenu}"
+						compact>
+						<uui-symbol-more id="more-symbol"></uui-symbol-more>
+					</uui-button>
 
-							<div slot="popover" id="dropdown">
-								${this._actions.map(
-									(action) => html`
-										<umb-property-action .propertyAction=${action} .value="${this.value}"></umb-property-action>
-									`
-								)}
-							</div>
-						</uui-popover>
-				  `
-				: ''}
-		`;
+					<div slot="popover" id="dropdown">
+						${this._actions.map(
+							(action) => html`
+								<umb-property-action .propertyAction=${action} .value="${this.value}"></umb-property-action>
+							`
+						)}
+					</div>
+				</uui-popover>
+			`;
+		}
+		return '';
 	}
 }
