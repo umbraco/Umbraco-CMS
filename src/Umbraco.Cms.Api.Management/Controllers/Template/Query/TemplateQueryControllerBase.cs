@@ -1,16 +1,12 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Umbraco.Cms.Api.Management.Routing;
+﻿using Umbraco.Cms.Api.Management.Routing;
 using Umbraco.Cms.Api.Management.ViewModels.Template.Query;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models.TemplateQuery;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Template.Query;
 
-[ApiController]
 [VersionedApiBackOfficeRoute($"{Constants.UdiEntityType.Template}/query")]
-[ApiExplorerSettings(GroupName = nameof(Constants.UdiEntityType.Template))]
-[ApiVersion("1.0")]
-public abstract class TemplateQueryControllerBase : ManagementApiControllerBase
+public abstract class TemplateQueryControllerBase : TemplateControllerBase
 {
     protected IEnumerable<TemplateQueryOperatorViewModel> GetOperators() => new TemplateQueryOperatorViewModel[]
     {
