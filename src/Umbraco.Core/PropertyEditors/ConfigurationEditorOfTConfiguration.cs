@@ -58,6 +58,12 @@ public abstract class ConfigurationEditor<TConfiguration> : ConfigurationEditor
         }
     }
 
+    protected TConfiguration? AsConfigurationObject(IDictionary<string, object> configuration,
+        IConfigurationEditorJsonSerializer configurationEditorJsonSerializer) =>
+        ToConfigurationObject(configuration, configurationEditorJsonSerializer) is TConfiguration configurationObject
+            ? configurationObject
+            : default;
+
     /// <summary>
     ///     Discovers fields from configuration properties marked with the field attribute.
     /// </summary>

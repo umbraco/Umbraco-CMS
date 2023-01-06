@@ -19,6 +19,11 @@ public interface IDataType : IUmbracoEntity, IRememberBeingDirty
     string EditorAlias { get; }
 
     /// <summary>
+    ///     Gets the property editor UI alias.
+    /// </summary>
+    string? EditorUiAlias { get; set; }
+
+    /// <summary>
     ///     Gets or sets the database type for the data type values.
     /// </summary>
     /// <remarks>

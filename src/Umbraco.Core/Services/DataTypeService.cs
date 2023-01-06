@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.DependencyInjection;
@@ -14,7 +15,6 @@ using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Extensions;
-using static System.Formats.Asn1.AsnWriter;
 
 namespace Umbraco.Cms.Core.Services.Implement
 {
@@ -610,6 +610,18 @@ namespace Umbraco.Cms.Core.Services.Implement
         {
             using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete:true);
             return _dataTypeRepository.FindUsages(id);
+        }
+
+        /// <inheritdoc />
+        public IEnumerable<ValidationResult> ValidateConfigurationData(IDataType dataType)
+        {
+            IConfigurationEditor? configurationEditor = dataType.Editor?.GetConfigurationEditor();
+            return configurationEditor == null
+                ? new[]
+                {
+                    new ValidationResult($"Data type with editor alias {dataType.EditorAlias} does not have a configuration editor")
+                }
+                : configurationEditor.Validate(dataType.ConfigurationData);
         }
 
         private void Audit(AuditType type, int userId, int objectId)
