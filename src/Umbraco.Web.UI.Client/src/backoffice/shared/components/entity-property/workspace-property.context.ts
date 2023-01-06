@@ -26,7 +26,7 @@ export function CreateObservablePart<T, R> (
 	return source$.pipe(
 	  map(mappingFunction),
 	  distinctUntilChanged(memoizationFunction || defaultMemoization),
-	  shareReplay(1) // TODO: investigate what happens if this was removed.
+	  shareReplay(1) // TODO: investigate what happens if this was removed. (its suppose to only give the first subscriber the current value, but i want to test this)
 	)
 }
 
