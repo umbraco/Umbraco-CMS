@@ -45,14 +45,15 @@ export class UmbWorkspacePropertyContext<ValueType> {
 
 	//private _host: UmbControllerHostInterface;
 
-	private _data: UniqueBehaviorSubject<WorkspacePropertyData<ValueType>>;
+	private _providerController: UmbContextProviderController;
 
-	public readonly alias: Observable<WorkspacePropertyData<ValueType>['alias']>;
-	public readonly label: Observable<WorkspacePropertyData<ValueType>['label']>;
-	public readonly description: Observable<WorkspacePropertyData<ValueType>['description']>;
-	public readonly value: Observable<WorkspacePropertyData<ValueType>['value']>;
-	public readonly config: Observable<WorkspacePropertyData<ValueType>['config']>;
+	private _data: UniqueBehaviorSubject<WorkspacePropertyData<ValueType>> = new UniqueBehaviorSubject({} as WorkspacePropertyData<ValueType>);
 
+	public readonly alias = CreateObservablePart(this._data, data => data.alias);
+	public readonly label = CreateObservablePart(this._data, data => data.label);
+	public readonly description = CreateObservablePart(this._data, data => data.description);
+	public readonly value = CreateObservablePart(this._data, data => data.value);
+	public readonly config = CreateObservablePart(this._data, data => data.config);
 
 	constructor(host:UmbControllerHostInterface) {
 
@@ -62,16 +63,7 @@ export class UmbWorkspacePropertyContext<ValueType> {
 		// Ensuring the property editor value-property is updated...
 		// How about consuming a workspace context? When received maybe assuming these will fit or test if it likes to accept this property..
 
-		this._data = new UniqueBehaviorSubject({} as WorkspacePropertyData<ValueType>);
-
-		this.alias = CreateObservablePart(this._data, data => data.alias);
-		this.label = CreateObservablePart(this._data, data => data.label);
-		this.description = CreateObservablePart(this._data, data => data.description);
-		this.value = CreateObservablePart(this._data, data => data.value);
-		this.config = CreateObservablePart(this._data, data => data.config);
-
-
-		new UmbContextProviderController(host, 'umbPropertyContext', this);
+		this._providerController = new UmbContextProviderController(host, 'umbPropertyContext', this);
 	
 	}
 
@@ -109,6 +101,7 @@ export class UmbWorkspacePropertyContext<ValueType> {
 	// TODO: how can we make sure to call this.
 	public destroy(): void {
 		this._data.unsubscribe();
+		this._providerController.destroy(); // This would also be handled by the controller host, but if someone wanted to replace/remove this context without the host being destroyed. Then we have clean up out selfs here.
 	}
 
 }
