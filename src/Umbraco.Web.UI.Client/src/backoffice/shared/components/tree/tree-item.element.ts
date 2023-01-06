@@ -16,8 +16,20 @@ import { UmbLitElement } from '@umbraco-cms/element';
 export class UmbTreeItem extends UmbLitElement {
 	static styles = [UUITextStyles, css``];
 
-	@property({ type: Object, attribute: false })
-	treeItem!: Entity;
+	@property({ type: String })
+	key = '';
+
+	@property({ type: String })
+	label = '';
+
+	@property({ type: String })
+	icon = '';
+
+	@property({ type: String })
+	entityType = '';
+
+	@property({ type: Boolean, attribute: 'has-children' })
+	hasChildren = false;
 
 	@state()
 	private _childItems?: Entity[];
@@ -75,19 +87,19 @@ export class UmbTreeItem extends UmbLitElement {
 
 	private _handleSelectedItem(event: Event) {
 		event.stopPropagation();
-		this._treeContext?.select(this.treeItem.key);
+		this._treeContext?.select(this.key);
 	}
 
 	private _handleDeselectedItem(event: Event) {
 		event.stopPropagation();
-		this._treeContext?.deselect(this.treeItem.key);
+		this._treeContext?.deselect(this.key);
 	}
 
 	private _observeSection() {
 		if (!this._sectionContext) return;
 
 		this.observe(this._sectionContext?.data, (section) => {
-			this._href = this._constructPath(section?.meta.pathname || '', this.treeItem.type, this.treeItem.key);
+			this._href = this._constructPath(section?.meta.pathname || '', this.entityType, this.key);
 		});
 	}
 
@@ -102,7 +114,7 @@ export class UmbTreeItem extends UmbLitElement {
 	private _observeIsSelected() {
 		if (!this._treeContext) return;
 
-		this.observe(this._treeContext.selection.pipe(map((keys) => keys?.includes(this.treeItem.key))), (isSelected) => {
+		this.observe(this._treeContext.selection.pipe(map((keys) => keys?.includes(this.key))), (isSelected) => {
 			this._selected = isSelected || false;
 		});
 	}
@@ -110,8 +122,8 @@ export class UmbTreeItem extends UmbLitElement {
 	private _observeActiveTreeItem() {
 		if (!this._sectionContext) return;
 
-		this.observe(this._sectionContext?.activeTreeItem, (treeItem) => {
-			this._isActive = treeItem?.key === this.treeItem.key;
+		this.observe(this._sectionContext?.activeTreeItemKey, (key) => {
+			this._isActive = this.key === key;
 		});
 	}
 
@@ -132,7 +144,7 @@ export class UmbTreeItem extends UmbLitElement {
 		this._loading = true;
 
 		// TODO: we should do something about these types, stop having our own version of Entity.
-		this.observe(this._store.getTreeItemChildren(this.treeItem.key) as Observable<Entity[]>, (childItems) => {
+		this.observe(this._store.getTreeItemChildren(this.key) as Observable<Entity[]>, (childItems) => {
 			this._childItems = childItems;
 			this._loading = false;
 		});
@@ -144,18 +156,24 @@ export class UmbTreeItem extends UmbLitElement {
 				? repeat(
 						this._childItems,
 						(item) => item.key,
-						(item) => html`<umb-tree-item .treeItem=${item}></umb-tree-item>`
+						(item) =>
+							html`<umb-tree-item
+								.key=${item.key}
+								.label=${item.name}
+								.icon=${item.icon}
+								.entityType=${item.type}
+								.hasChildren=${item.hasChildren}></umb-tree-item>`
 				  )
 				: ''}
 		`;
 	}
 
 	private _openActions() {
-		if (!this._treeContext || !this._sectionContext || !this.treeItem) return;
+		if (!this._treeContext || !this._sectionContext) return;
 
 		this._sectionContext?.setActiveTree(this._treeContext?.tree);
-		this._sectionContext?.setActiveTreeItem(this.treeItem);
-		this._treeContextMenuService?.open({ name: this.treeItem.name, key: this.treeItem.key });
+		this._sectionContext?.setActiveTreeItemKey(this.key);
+		this._treeContextMenuService?.open({ name: this.label, key: this.key });
 	}
 
 	render() {
@@ -165,12 +183,12 @@ export class UmbTreeItem extends UmbLitElement {
 				?selectable=${this._selectable}
 				?selected=${this._selected}
 				.loading=${this._loading}
-				.hasChildren=${this.treeItem.hasChildren}
-				label="${this.treeItem.name}"
+				.hasChildren=${this.hasChildren}
+				label="${this.label}"
 				href="${ifDefined(this._href)}"
 				?active=${this._isActive}>
 				${this._renderChildItems()}
-				<uui-icon slot="icon" name="${this.treeItem.icon}"></uui-icon>
+				<uui-icon slot="icon" name="${this.icon}"></uui-icon>
 				<uui-action-bar slot="actions">
 					<uui-button @click=${this._openActions} label="Open actions menu">
 						<uui-symbol-more></uui-symbol-more>

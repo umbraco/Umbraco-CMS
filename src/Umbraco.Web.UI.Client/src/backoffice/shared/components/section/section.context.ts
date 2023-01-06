@@ -22,8 +22,8 @@ export class UmbSectionContext {
 	public readonly activeTree = this._activeTree.asObservable();
 
 	// TODO: what is the best context to put this in?
-	private _activeTreeItem = new ReplaySubject<Entity | undefined>(1);
-	public readonly activeTreeItem = this._activeTreeItem.asObservable();
+	private _activeTreeItemKey = new ReplaySubject<string | undefined>(1);
+	public readonly activeTreeItemKey = this._activeTreeItemKey.asObservable();
 
 	// TODO: what is the best context to put this in?
 	private _activeView = new ReplaySubject<ManifestSectionView | undefined>(1);
@@ -47,8 +47,8 @@ export class UmbSectionContext {
 		this._activeTree.next(tree);
 	}
 
-	public setActiveTreeItem(treeItem: Entity) {
-		this._activeTreeItem.next(treeItem);
+	public setActiveTreeItemKey(key: string) {
+		this._activeTreeItemKey.next(key);
 	}
 
 	public setActiveView(view: ManifestSectionView) {

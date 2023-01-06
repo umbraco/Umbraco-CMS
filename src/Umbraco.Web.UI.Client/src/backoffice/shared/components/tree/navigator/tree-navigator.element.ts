@@ -5,7 +5,6 @@ import { customElement, state } from 'lit/decorators.js';
 import { UmbLitElement } from '@umbraco-cms/element';
 import type { Entity } from '@umbraco-cms/models';
 import { UmbTreeDataStore } from '@umbraco-cms/stores/store';
-import { DocumentTreeItem } from '@umbraco-cms/backend-api';
 
 import '../tree-item.element';
 
@@ -17,9 +16,9 @@ export class UmbTreeNavigator extends UmbLitElement {
 	private _loading = true;
 
 	@state()
-	private _items: DocumentTreeItem[] = [];
+	private _items: Entity[] = [];
 
-	private _store?: UmbTreeDataStore<DocumentTreeItem>;
+	private _store?: UmbTreeDataStore<any>;
 
 	constructor() {
 		super();
@@ -52,7 +51,14 @@ export class UmbTreeNavigator extends UmbLitElement {
 			${repeat(
 				this._items,
 				(item) => item.key,
-				(item) => html`<umb-tree-item .treeItem=${item as Entity} .loading=${this._loading}></umb-tree-item>`
+				(item) =>
+					html`<umb-tree-item
+						.key=${item.key}
+						.label=${item.name}
+						.icon=${item.icon}
+						.entityType=${item.type}
+						.hasChildren=${item.hasChildren}
+						.loading=${this._loading}></umb-tree-item>`
 			)}
 		`;
 	}

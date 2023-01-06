@@ -73,7 +73,7 @@ export class UmbTreeContextMenuPageActionListElement extends UmbLitElement {
 	private _observeActiveTreeItem() {
 		if (!this._sectionContext) return;
 
-		this.observe(this._sectionContext.activeTreeItem, (treeItem) => {
+		this.observe(this._sectionContext.activeTreeItemKey, (treeItem) => {
 			this._activeTreeItem = treeItem || undefined;
 		});
 	}
