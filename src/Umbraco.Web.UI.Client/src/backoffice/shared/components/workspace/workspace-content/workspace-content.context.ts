@@ -41,6 +41,9 @@ export class UmbWorkspaceContentContext<
 	) {
 
 		this._host = host;
+
+		//TODO: Use the UniqueBehaviorSubject, and separate observables for each part?
+
 		this._data = new BehaviorSubject<ContentTypeType>(defaultData);
 		this.data = this._data.asObservable();
 		this.entityType = entityType;

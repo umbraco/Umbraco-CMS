@@ -40,11 +40,22 @@ export class UmbWorkspaceViewContentEditElement extends UmbLitElement {
 	private _observeContent() {
 		if (!this._workspaceContext) return;
 
+		/*
+		TODO: Property-Context: This observer gets all changes, We need to fix this. it should be simpler.
+		It should look at length and aliases? as long as they are identical nothing should change. 
+		As they would update them selfs?
+
+		Should use a Observable for this._workspaceContext.properties
+		*/
 		this.observe(
 			this._workspaceContext.data.pipe(distinctUntilChanged()),
 			(content) => {
 				this._properties = content.properties;
 				this._data = content.data;
+				/*
+				Maybe we should not give the value, but the umb-content-property should get the context and observe its own data.
+				This would become a more specific Observer therefor better performance?.. Note to self: Debate with Mads how he sees this perspective.
+				*/
 			}
 		);
 	}
