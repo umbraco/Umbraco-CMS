@@ -18,8 +18,7 @@ function defaultMemoization(previousValue: any, currentValue: any): boolean {
   }
   return previousValue === currentValue;
 }
-//TODO: Property-Context: rename this method.
-export function select$<T, R> (
+export function CreateObservablePart<T, R> (
 	source$: Observable<T>,
 	mappingFunction: MappingFunction<T, R>,
 	memoizationFunction?: MemoizationFunction<R>
@@ -65,11 +64,11 @@ export class UmbWorkspacePropertyContext<ValueType> {
 
 		this._data = new UniqueBehaviorSubject({} as WorkspacePropertyData<ValueType>);
 
-		this.alias = select$(this._data, data => data.alias);
-		this.label = select$(this._data, data => data.label);
-		this.description = select$(this._data, data => data.description);
-		this.value = select$(this._data, data => data.value);
-		this.config = select$(this._data, data => data.config);
+		this.alias = CreateObservablePart(this._data, data => data.alias);
+		this.label = CreateObservablePart(this._data, data => data.label);
+		this.description = CreateObservablePart(this._data, data => data.description);
+		this.value = CreateObservablePart(this._data, data => data.value);
+		this.config = CreateObservablePart(this._data, data => data.config);
 
 
 		new UmbContextProviderController(host, 'umbPropertyContext', this);
