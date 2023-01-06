@@ -194,10 +194,17 @@ export class UmbUserGroupWorkspaceElement extends UmbLitElement implements UmbWo
 	}
 	public set entityKey(value: string) {
 		this._entityKey = value;
-		this._provideWorkspace();
+		if (this._entityKey) {
+			this._workspaceContext.load(this._entityKey);
+		}
 	}
 
-	private _workspaceContext?: UmbWorkspaceUserGroupContext;
+	@property()
+	public set create(parentKey: string | null) {
+		this._workspaceContext.create(parentKey);
+	}
+
+	private _workspaceContext: UmbWorkspaceUserGroupContext = new UmbWorkspaceUserGroupContext(this);
 
 	@state()
 	private _userGroup?: UserGroupDetails | null;
@@ -214,15 +221,10 @@ export class UmbUserGroupWorkspaceElement extends UmbLitElement implements UmbWo
 			this._userStore = instance;
 			this._observeUsers();
 		});
-	}
 
-	protected _provideWorkspace() {
-		if (this._entityKey) {
-			this._workspaceContext = new UmbWorkspaceUserGroupContext(this, this._entityKey);
-			this.provideContext('umbWorkspaceContext', this._workspaceContext);
-
-			this._observeUserGroup();
-		}
+		this.observe(this._workspaceContext.data.pipe(distinctUntilChanged()), (userGroup) => {
+			this._userGroup = userGroup;
+		});
 	}
 
 	private _registerWorkspaceActions() {
@@ -244,14 +246,6 @@ export class UmbUserGroupWorkspaceElement extends UmbLitElement implements UmbWo
 		manifests.forEach((manifest) => {
 			if (umbExtensionsRegistry.isRegistered(manifest.alias)) return;
 			umbExtensionsRegistry.register(manifest);
-		});
-	}
-
-	private _observeUserGroup() {
-		if (!this._workspaceContext) return;
-
-		this.observe(this._workspaceContext.data.pipe(distinctUntilChanged()), (userGroup) => {
-			this._userGroup = userGroup;
 		});
 	}
 

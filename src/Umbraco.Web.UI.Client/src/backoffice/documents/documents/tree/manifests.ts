@@ -11,7 +11,7 @@ const tree: ManifestTree = {
 		label: 'Documents',
 		icon: 'umb:folder',
 		sections: ['Umb.Section.Content'],
-		storeContextAlias: 'umbDocumentStore',
+		storeAlias: 'umbDocumentStore',
 	},
 };
 

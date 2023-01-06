@@ -40,7 +40,7 @@ export class UmbWorkspaceViewCollectionElement extends UmbLitElement {
 			this._collectionContext = new UmbCollectionContext(
 				this,
 				this._workspaceContext.entityKey,
-				this._workspaceContext.getStore().storeAlias
+				this._workspaceContext.getStore()?.storeAlias || '' // The store is available when the context is available.
 			);
 			this.provideContext('umbCollectionContext', this._collectionContext);
 		}

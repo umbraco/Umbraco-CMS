@@ -69,14 +69,14 @@ export class UmbTreeElement extends UmbLitElement {
 			umbExtensionsRegistry
 				.extensionsOfType('tree')
 				.pipe(map((trees) => trees.find((tree) => tree.alias === this.alias))),
-			(tree => {
+			(tree) => {
 				this._tree = tree;
-				if(tree) {
+				if (tree) {
 					this._provideTreeContext();
 					this._provideStore();
 				}
 			}
-		));
+		);
 	}
 
 	private _provideTreeContext() {
@@ -87,16 +87,16 @@ export class UmbTreeElement extends UmbLitElement {
 		this._treeContext = new UmbTreeContextBase(this._tree);
 		this._treeContext.setSelectable(this.selectable);
 		this._treeContext.setSelection(this.selection);
-		
+
 		this.provideContext('umbTreeContext', this._treeContext);
 	}
 
 	private _provideStore() {
 		// TODO: Clean up store, if already existing.
 
-		if (!this._tree?.meta.storeContextAlias) return;
+		if (!this._tree?.meta.storeAlias) return;
 
-		this.consumeContext(this._tree.meta.storeContextAlias, (store: UmbDataStore<unknown>) =>
+		this.consumeContext(this._tree.meta.storeAlias, (store: UmbDataStore<unknown>) =>
 			this.provideContext('umbStore', store)
 		);
 	}

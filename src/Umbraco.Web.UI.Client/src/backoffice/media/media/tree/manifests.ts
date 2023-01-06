@@ -11,7 +11,7 @@ const tree: ManifestTree = {
 		label: 'Media',
 		icon: 'umb:folder',
 		sections: ['Umb.Section.Media'],
-		storeContextAlias: 'umbMediaStore',
+		storeAlias: 'umbMediaStore',
 	},
 };
 

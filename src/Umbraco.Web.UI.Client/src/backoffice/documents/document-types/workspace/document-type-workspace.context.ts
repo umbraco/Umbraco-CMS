@@ -20,7 +20,7 @@ export class UmbWorkspaceDocumentTypeContext extends UmbWorkspaceContentContext<
 	UmbDocumentTypeStoreItemType,
 	UmbDocumentTypeStore
 > {
-	constructor(host: UmbControllerHostInterface, entityKey: string) {
-		super(host, DefaultDocumentTypeData, 'umbDocumentTypeStore', entityKey, 'documentType');
+	constructor(host: UmbControllerHostInterface) {
+		super(host, DefaultDocumentTypeData, 'umbDocumentTypeStore', 'documentType');
 	}
 }

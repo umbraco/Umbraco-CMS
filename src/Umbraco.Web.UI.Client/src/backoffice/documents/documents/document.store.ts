@@ -9,6 +9,9 @@ const isDocumentDetails = (document: DocumentDetails | DocumentTreeItem): docume
 
 export type UmbDocumentStoreItemType = DocumentDetails | DocumentTreeItem;
 
+// TODO: research how we write names of global consts.
+export const STORE_ALIAS = 'umbDocumentStore';
+
 /**
  * @export
  * @class UmbDocumentStore
@@ -16,7 +19,7 @@ export type UmbDocumentStoreItemType = DocumentDetails | DocumentTreeItem;
  * @description - Data Store for Documents
  */
 export class UmbDocumentStore extends UmbNodeStoreBase<UmbDocumentStoreItemType> {
-	public readonly storeAlias = 'umbDocumentStore';
+	public readonly storeAlias = STORE_ALIAS;
 
 	getByKey(key: string): Observable<DocumentDetails | null> {
 		// TODO: use backend cli when available.

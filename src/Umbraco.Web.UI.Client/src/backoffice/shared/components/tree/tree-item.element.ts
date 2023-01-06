@@ -23,7 +23,7 @@ export class UmbTreeItem extends UmbLitElement {
 	private _childItems?: Entity[];
 
 	@state()
-	private _href?:string;
+	private _href?: string;
 
 	@state()
 	private _loading = false;
@@ -102,12 +102,9 @@ export class UmbTreeItem extends UmbLitElement {
 	private _observeIsSelected() {
 		if (!this._treeContext) return;
 
-		this.observe(
-			this._treeContext.selection.pipe(map((keys) => keys?.includes(this.treeItem.key))),
-			(isSelected) => {
-				this._selected = isSelected || false;
-			}
-		);
+		this.observe(this._treeContext.selection.pipe(map((keys) => keys?.includes(this.treeItem.key))), (isSelected) => {
+			this._selected = isSelected || false;
+		});
 	}
 
 	private _observeActiveTreeItem() {
@@ -120,7 +117,7 @@ export class UmbTreeItem extends UmbLitElement {
 
 	// TODO: how do we handle this?
 	private _constructPath(sectionPathname: string, type: string, key: string) {
-		return type ? `section/${sectionPathname}/${type}/${key}` : undefined;
+		return type ? `section/${sectionPathname}/${type}/edit/${key}` : undefined;
 	}
 
 	private _onShowChildren(event: UUIMenuItemEvent) {
@@ -143,11 +140,13 @@ export class UmbTreeItem extends UmbLitElement {
 
 	private _renderChildItems() {
 		return html`
-			${this._childItems ? repeat(
-				this._childItems,
-				(item) => item.key,
-				(item) => html`<umb-tree-item .treeItem=${item}></umb-tree-item>`
-			) : ''}
+			${this._childItems
+				? repeat(
+						this._childItems,
+						(item) => item.key,
+						(item) => html`<umb-tree-item .treeItem=${item}></umb-tree-item>`
+				  )
+				: ''}
 		`;
 	}
 

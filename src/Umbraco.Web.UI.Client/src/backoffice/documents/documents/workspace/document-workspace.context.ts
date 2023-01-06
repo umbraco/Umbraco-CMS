@@ -1,4 +1,5 @@
 import { UmbWorkspaceContentContext } from '../../../shared/components/workspace/workspace-content/workspace-content.context';
+import { STORE_ALIAS } from 'src/backoffice/documents/documents/document.store';
 import type { UmbDocumentStore, UmbDocumentStoreItemType } from 'src/backoffice/documents/documents/document.store';
 import { UmbControllerHostInterface } from 'src/core/controller/controller-host.mixin';
 
@@ -32,8 +33,8 @@ const DefaultDocumentData = {
 } as UmbDocumentStoreItemType;
 
 export class UmbWorkspaceDocumentContext extends UmbWorkspaceContentContext<UmbDocumentStoreItemType, UmbDocumentStore> {
-	constructor(host: UmbControllerHostInterface, entityKey: string) {
-		super(host, DefaultDocumentData, 'umbDocumentStore', entityKey, 'document');
+	constructor(host: UmbControllerHostInterface) {
+		super(host, DefaultDocumentData, STORE_ALIAS, 'document');
 	}
 
 

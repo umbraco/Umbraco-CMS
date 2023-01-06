@@ -18,7 +18,7 @@ export class UmbWorkspaceUserGroupContext extends UmbWorkspaceContentContext<
 	UmbUserGroupStoreItemType,
 	UmbUserGroupStore
 > {
-	constructor(host: UmbControllerHostInterface, entityKey: string) {
-		super(host, DefaultDataTypeData, 'umbUserStore', entityKey, 'userGroup');
+	constructor(host: UmbControllerHostInterface) {
+		super(host, DefaultDataTypeData, 'umbUserStore', 'userGroup');
 	}
 }

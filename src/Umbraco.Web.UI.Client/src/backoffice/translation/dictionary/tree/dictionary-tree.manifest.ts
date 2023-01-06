@@ -11,7 +11,7 @@ const tree: ManifestTree = {
 		label: 'Dictionary',
 		icon: 'umb:folder',
 		sections: ['Umb.Section.Translation'],
-		storeContextAlias: 'umbDictionaryStore',
+		storeAlias: 'umbDictionaryStore',
 	},
 };
 
