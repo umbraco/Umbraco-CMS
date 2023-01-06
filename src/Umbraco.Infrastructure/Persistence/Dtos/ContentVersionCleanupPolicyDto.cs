@@ -14,7 +14,7 @@ internal class ContentVersionCleanupPolicyDto
 
     [Column("contentTypeId")]
     [PrimaryKeyColumn]
-    [ForeignKey(typeof(ContentTypeDto), Column = "nodeId", OnDelete = Rule.Cascade)]
+    [ForeignKey(typeof(ContentTypeDto), Column = "nodeId")]
     public int ContentTypeId { get; set; }
 
     [Column("preventCleanup")]
