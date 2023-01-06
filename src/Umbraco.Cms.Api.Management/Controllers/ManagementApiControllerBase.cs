@@ -1,6 +1,6 @@
 ﻿using System.Linq.Expressions;
 using Microsoft.AspNetCore.Mvc;
-using Umbraco.Cms.Api.Management.Filters;
+using Umbraco.Cms.Api.Common.Filters;
 using Umbraco.Cms.Core.Security;
 using Umbraco.New.Cms.Core;
 

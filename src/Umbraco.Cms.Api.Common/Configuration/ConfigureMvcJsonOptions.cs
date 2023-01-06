@@ -1,9 +1,9 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Umbraco.Cms.Api.Management.Json;
+using Umbraco.Cms.Api.Common.Json;
 
-namespace Umbraco.Cms.Api.Management.Configuration;
+namespace Umbraco.Cms.Api.Common.Configuration;
 
 public class ConfigureMvcJsonOptions : IConfigureOptions<MvcOptions>
 {
