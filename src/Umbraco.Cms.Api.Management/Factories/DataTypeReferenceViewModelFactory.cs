@@ -24,8 +24,6 @@ public class DataTypeReferenceViewModelFactory : IDataTypeReferenceViewModelFact
 
     public IEnumerable<DataTypeReferenceViewModel> CreateDataTypeReferenceViewModels(IReadOnlyDictionary<Udi, IEnumerable<string>> dataTypeUsages)
     {
-        var result = new List<DataTypeReferenceViewModel>();
-
         var getContentTypesByObjectType = new Dictionary<string, Func<IEnumerable<Guid>, IEnumerable<IContentTypeBase>>>
         {
             { UmbracoObjectTypes.DocumentType.GetUdiType(), keys => _contentTypeService.GetAll(keys) },
@@ -44,26 +42,23 @@ public class DataTypeReferenceViewModelFactory : IDataTypeReferenceViewModelFact
 
             IContentTypeBase[] contentTypes = getContentTypes(propertyAliasesByGuid.Keys).ToArray();
 
-            result.AddRange(
-                contentTypes.Select(contentType =>
+            foreach (IContentTypeBase contentType in contentTypes)
+            {
+                IEnumerable<string> propertyAliases = propertyAliasesByGuid[contentType.Key];
+                yield return new DataTypeReferenceViewModel
                 {
-                    IEnumerable<string> propertyAliases = propertyAliasesByGuid[contentType.Key];
-                    return new DataTypeReferenceViewModel
-                    {
-                        Key = contentType.Key,
-                        Type = usagesByEntityType.Key,
-                        Properties = contentType
-                            .PropertyTypes
-                            .Where(propertyType => propertyAliases.InvariantContains(propertyType.Alias))
-                            .Select(propertyType => new DataTypePropertyReferenceViewModel
-                            {
-                                Name = propertyType.Name,
-                                Alias = propertyType.Alias
-                            })
-                    };
-                }));
+                    Key = contentType.Key,
+                    Type = usagesByEntityType.Key,
+                    Properties = contentType
+                        .PropertyTypes
+                        .Where(propertyType => propertyAliases.InvariantContains(propertyType.Alias))
+                        .Select(propertyType => new DataTypePropertyReferenceViewModel
+                        {
+                            Name = propertyType.Name,
+                            Alias = propertyType.Alias
+                        })
+                };
+            }
         }
-
-        return result;
     }
 }
