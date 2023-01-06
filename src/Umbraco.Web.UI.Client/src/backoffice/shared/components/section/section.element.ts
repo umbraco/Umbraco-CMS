@@ -6,12 +6,12 @@ import { IRoutingInfo } from 'router-slot';
 import type { UmbWorkspaceEntityElement } from '../workspace/workspace-entity-element.interface';
 import { UmbSectionContext } from './section.context';
 import { createExtensionElement } from '@umbraco-cms/extensions-api';
-import type { ManifestTree, ManifestSectionView, ManifestWorkspace } from '@umbraco-cms/models';
+import type { ManifestSectionView, ManifestWorkspace, ManifestSidebarMenuItem } from '@umbraco-cms/models';
+import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
+import { UmbLitElement } from '@umbraco-cms/element';
 
 import './section-trees/section-trees.element.ts';
 import './section-views/section-views.element.ts';
-import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
-import { UmbLitElement } from '@umbraco-cms/element';
 
 @customElement('umb-section')
 export class UmbSectionElement extends UmbLitElement {
@@ -36,7 +36,7 @@ export class UmbSectionElement extends UmbLitElement {
 	private _routes: Array<any> = [];
 
 	@state()
-	private _trees?: Array<ManifestTree>;
+	private _menuItems?: Array<ManifestSidebarMenuItem>;
 
 	private _workspaces?: Array<ManifestWorkspace>;
 
@@ -52,12 +52,12 @@ export class UmbSectionElement extends UmbLitElement {
 			this._sectionContext = instance;
 
 			// TODO: currently they don't corporate, as they overwrite each other...
-			this._observeTrees();
+			this._observeMenuItems();
 			this._observeViews();
 		});
 	}
 
-	private _observeTrees() {
+	private _observeMenuItems() {
 		if (!this._sectionContext) return;
 
 		this.observe(
@@ -66,24 +66,26 @@ export class UmbSectionElement extends UmbLitElement {
 					if (!section) return EMPTY;
 					return (
 						umbExtensionsRegistry
-							?.extensionsOfType('tree')
-							.pipe(map((trees) => trees.filter((tree) => tree.meta.sections.includes(section.alias)))) ?? of([])
+							?.extensionsOfType('sidebarMenuItem')
+							.pipe(
+								map((manifests) => manifests.filter((manifest) => manifest.meta.sections.includes(section.alias)))
+							) ?? of([])
 					);
 				})
 			),
-			(trees) => {
-				this._trees = trees;
-				this._createTreeRoutes();
+			(manifests) => {
+				this._menuItems = manifests;
+				this._createMenuRoutes();
 			}
 		);
 
 		this.observe(umbExtensionsRegistry.extensionsOfType('workspace'), (workspaceExtensions) => {
 			this._workspaces = workspaceExtensions;
-			this._createTreeRoutes();
+			this._createMenuRoutes();
 		});
 	}
 
-	private _createTreeRoutes() {
+	private _createMenuRoutes() {
 		// TODO: find a way to make this reuseable across:
 		const workspaceRoutes = this._workspaces?.map((workspace: ManifestWorkspace) => {
 			return [
@@ -186,7 +188,7 @@ export class UmbSectionElement extends UmbLitElement {
 
 	render() {
 		return html`
-			${this._trees && this._trees.length > 0
+			${this._menuItems && this._menuItems.length > 0
 				? html`
 						<umb-section-sidebar>
 							<umb-section-trees></umb-section-trees>

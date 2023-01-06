@@ -2,7 +2,7 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { UmbSectionContext } from '../section.context';
-import { ManifestTree } from '@umbraco-cms/extensions-registry';
+import { ManifestSidebarMenuItem } from '@umbraco-cms/extensions-registry';
 import { UmbLitElement } from '@umbraco-cms/element';
 
 import './sidebar-menu-item.element.ts';
@@ -35,8 +35,8 @@ export class UmbSectionTreesElement extends UmbLitElement {
 
 	render() {
 		return html` <umb-extension-slot
-			type="tree"
-			.filter=${(trees: ManifestTree) => trees.meta.sections.includes(this._currentSectionAlias || '')}
+			type="sidebarMenuItem"
+			.filter=${(items: ManifestSidebarMenuItem) => items.meta.sections.includes(this._currentSectionAlias || '')}
 			default-element="umb-sidebar-menu-item"></umb-extension-slot>`;
 	}
 }
