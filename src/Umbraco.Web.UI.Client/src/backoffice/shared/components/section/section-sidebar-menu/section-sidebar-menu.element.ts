@@ -7,8 +7,8 @@ import { UmbLitElement } from '@umbraco-cms/element';
 
 import './sidebar-menu-item.element.ts';
 
-@customElement('umb-section-trees')
-export class UmbSectionTreesElement extends UmbLitElement {
+@customElement('umb-section-sidebar-menu')
+export class UmbSectionSidebarMenuElement extends UmbLitElement {
 	static styles = [UUITextStyles];
 
 	@state()
@@ -41,10 +41,10 @@ export class UmbSectionTreesElement extends UmbLitElement {
 	}
 }
 
-export default UmbSectionTreesElement;
+export default UmbSectionSidebarMenuElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-section-trees': UmbSectionTreesElement;
+		'umb-section-sidebar-menu': UmbSectionSidebarMenuElement;
 	}
 }

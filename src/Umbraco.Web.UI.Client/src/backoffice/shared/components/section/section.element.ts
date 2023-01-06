@@ -10,7 +10,7 @@ import type { ManifestSectionView, ManifestWorkspace, ManifestSidebarMenuItem } 
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
 import { UmbLitElement } from '@umbraco-cms/element';
 
-import './section-trees/section-trees.element.ts';
+import './section-sidebar-menu/section-sidebar-menu.element.ts';
 import './section-views/section-views.element.ts';
 
 @customElement('umb-section')
@@ -191,7 +191,7 @@ export class UmbSectionElement extends UmbLitElement {
 			${this._menuItems && this._menuItems.length > 0
 				? html`
 						<umb-section-sidebar>
-							<umb-section-trees></umb-section-trees>
+							<umb-section-sidebar-menu></umb-section-sidebar-menu>
 						</umb-section-sidebar>
 				  `
 				: nothing}
