@@ -202,6 +202,7 @@ export class UmbEntityPropertyElement extends UmbLitElement {
 		this.value = target.value;
 
 		// TODO: update context.
+		//TODO: Property-Context: Figure out the requirements for this. Cause currently the alias-prop(getter) is required, but its not obvious.
 
 		this.dispatchEvent(new CustomEvent('property-value-change', { bubbles: true, composed: true }));
 		e.stopPropagation();

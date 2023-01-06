@@ -29,7 +29,7 @@ export class UmbPropertyEditorUITextareaElement extends UmbLitElement {
 		this.consumeContext('umbPropertyContext', (instance: UmbWorkspacePropertyContext<string>) => {
 			this.propertyContext = instance;
 			this.observe(this.propertyContext.value, (value) => {
-				console.log("Context says value changed", value)
+				console.log("Context says value changed", value);
 			});
 		});
 	}

@@ -77,6 +77,8 @@ export class UmbWorkspaceContentElement extends UmbLitElement {
 	private _onPropertyValueChange = (e: Event) => {
 		const target = e.composedPath()[0] as any;
 
+		console.log("_onPropertyValueChange", target.alias, target);
+
 		// TODO: Set value.
 		const property = this._content?.properties.find((x) => x.alias === target.alias);
 		if (property) {
