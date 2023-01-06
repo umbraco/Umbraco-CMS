@@ -1,7 +1,7 @@
+import { v4 as uuidv4 } from 'uuid';
 import { css, html } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
-import { customElement, property } from 'lit/decorators.js';
-import { ifDefined } from 'lit-html/directives/if-defined.js';
+import { customElement, property, state } from 'lit/decorators.js';
 import { UmbLitElement } from '@umbraco-cms/element';
 import type { ManifestTree } from '@umbraco-cms/models';
 
@@ -9,13 +9,35 @@ import type { ManifestTree } from '@umbraco-cms/models';
 export class UmbSidebarMenuItem extends UmbLitElement {
 	static styles = [UUITextStyles, css``];
 
+	private _key = uuidv4();
+
+	_manifest?: ManifestTree;
 	@property({ type: Object, attribute: false })
-	public manifest?: ManifestTree;
+	public get manifest(): ManifestTree | undefined {
+		return this._manifest;
+	}
+	public set manifest(value: ManifestTree | undefined) {
+		const oldVal = this._manifest;
+		this._manifest = value;
+		this.requestUpdate('manifest', oldVal);
+
+		if (value) {
+			this._treeItem = {
+				key: this._key,
+				name: value.meta.label ?? value.name,
+				icon: value.meta.icon,
+				type: value.meta.rootNodeEntityType,
+				hasChildren: false,
+				parentKey: null,
+			};
+		}
+	}
+
+	@state()
+	private _treeItem: Entity;
 
 	render() {
-		return html`<uui-menu-item label="${ifDefined(this.manifest?.meta.label)}">
-			<uui-icon slot="icon" name="${ifDefined(this.manifest?.meta.icon)}"></uui-icon>
-		</uui-menu-item> `;
+		return html`<umb-tree-item .treeItem=${this._treeItem}></umb-tree-item>`;
 	}
 }
 
