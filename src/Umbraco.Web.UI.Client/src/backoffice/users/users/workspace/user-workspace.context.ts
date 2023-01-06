@@ -21,7 +21,7 @@ const DefaultDataTypeData = {
 } as UmbUserStoreItemType;
 
 export class UmbWorkspaceUserContext extends UmbWorkspaceContentContext<UmbUserStoreItemType, UmbUserStore> {
-	constructor(host: UmbControllerHostInterface, entityKey: string) {
-		super(host, DefaultDataTypeData, 'umbUserStore', entityKey, 'user');
+	constructor(host: UmbControllerHostInterface) {
+		super(host, DefaultDataTypeData, 'umbUserStore', 'user');
 	}
 }

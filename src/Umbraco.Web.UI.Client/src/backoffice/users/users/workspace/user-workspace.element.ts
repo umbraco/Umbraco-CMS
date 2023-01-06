@@ -96,10 +96,17 @@ export class UmbUserWorkspaceElement extends UmbLitElement implements UmbWorkspa
 	}
 	public set entityKey(value: string) {
 		this._entityKey = value;
-		this._provideWorkspace();
+		if (this._entityKey) {
+			this._workspaceContext.load(this._entityKey);
+		}
 	}
 
-	private _workspaceContext?: UmbWorkspaceUserContext;
+	@property()
+	public set create(parentKey: string | null) {
+		this._workspaceContext.create(parentKey);
+	}
+
+	private _workspaceContext: UmbWorkspaceUserContext = new UmbWorkspaceUserContext(this);
 
 	@state()
 	private _user?: UserDetails;
@@ -114,14 +121,13 @@ export class UmbUserWorkspaceElement extends UmbLitElement implements UmbWorkspa
 			this._currentUserStore = store;
 			this._observeCurrentUser();
 		});
-	}
 
-	protected _provideWorkspace() {
-		if (this._entityKey) {
-			this._workspaceContext = new UmbWorkspaceUserContext(this, this._entityKey);
-			this.provideContext('umbWorkspaceContext', this._workspaceContext);
-			this._observeUser();
-		}
+		this.observe(this._workspaceContext.data.pipe(distinctUntilChanged()), (user) => {
+			this._user = user;
+			if (user.name !== this._userName) {
+				this._userName = user.name;
+			}
+		});
 	}
 
 	private async _observeCurrentUser() {
@@ -133,32 +139,21 @@ export class UmbUserWorkspaceElement extends UmbLitElement implements UmbWorkspa
 		});
 	}
 
-	private async _observeUser() {
-		if (!this._workspaceContext) return;
-
-		this.observe(this._workspaceContext.data.pipe(distinctUntilChanged()), (user) => {
-			this._user = user;
-			if (user.name !== this._userName) {
-				this._userName = user.name;
-			}
-		});
-	}
-
 	private _updateUserStatus() {
 		if (!this._user || !this._workspaceContext) return;
 
 		const isDisabled = this._user.status === 'disabled';
 		// TODO: make sure we use store /workspace right, maybe move function to workspace, or store reference to store?
 		isDisabled
-			? this._workspaceContext.getStore().enableUsers([this._user.key])
-			: this._workspaceContext.getStore().disableUsers([this._user.key]);
+			? this._workspaceContext.getStore()?.enableUsers([this._user.key])
+			: this._workspaceContext.getStore()?.disableUsers([this._user.key]);
 	}
 
 	private _deleteUser() {
 		if (!this._user || !this._workspaceContext) return;
 
 		// TODO: make sure we use store /workspace right, maybe move function to workspace, or store reference to store?
-		this._workspaceContext.getStore().deleteUsers([this._user.key]);
+		this._workspaceContext.getStore()?.deleteUsers([this._user.key]);
 
 		history.pushState(null, '', 'section/users/view/users/overview');
 	}
