@@ -25,12 +25,27 @@ public class TemplateController : BackOfficeNotificationsController
     private readonly IShortStringHelper _shortStringHelper;
     private readonly IUmbracoMapper _umbracoMapper;
 
+    public TemplateController(
+        IFileService fileService,
+        IUmbracoMapper umbracoMapper,
+        IShortStringHelper shortStringHelper,
+        IDefaultViewContentProvider defaultViewContentProvider)
+        : this(
+            StaticServiceProvider.Instance.GetRequiredService<ITemplateService>(),
+            umbracoMapper,
+            shortStringHelper,
+            defaultViewContentProvider,
+            fileService)
+    {
+    }
+
     [ActivatorUtilitiesConstructor]
     public TemplateController(
         ITemplateService templateService,
         IUmbracoMapper umbracoMapper,
         IShortStringHelper shortStringHelper,
-        IDefaultViewContentProvider defaultViewContentProvider)
+        IDefaultViewContentProvider defaultViewContentProvider,
+        IFileService fileService)
     {
         _templateService = templateService ?? throw new ArgumentNullException(nameof(templateService));
         _umbracoMapper = umbracoMapper ?? throw new ArgumentNullException(nameof(umbracoMapper));
