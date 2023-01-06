@@ -53,15 +53,13 @@ export class UmbPropertyActionMenuElement extends UmbLitElement {
 	@state()
 	private _open = false;
 
-	private _propertyActionMenuContext = new UmbPropertyActionMenuContext();
+	private _propertyActionMenuContext = new UmbPropertyActionMenuContext(this);
 
 	connectedCallback(): void {
 		super.connectedCallback();
 
 		this._observePropertyActions();
 		this._observePropertyActionMenuOpenState();
-
-		this.provideContext('umbPropertyActionMenu', this._propertyActionMenuContext);
 	}
 
 	private _observePropertyActions() {
