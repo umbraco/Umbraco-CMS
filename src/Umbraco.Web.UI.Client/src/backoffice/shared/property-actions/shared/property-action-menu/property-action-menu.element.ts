@@ -75,8 +75,8 @@ export class UmbPropertyActionMenuElement extends UmbLitElement {
 						)
 					)
 				),
-			(propertyActionManifests) => {
-				this._actions = propertyActionManifests;
+			(manifests) => {
+				this._actions = manifests;
 			}
 		);
 	}
