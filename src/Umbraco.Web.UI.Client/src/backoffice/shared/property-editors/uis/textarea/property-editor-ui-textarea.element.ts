@@ -1,7 +1,7 @@
 import { css, html } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, property } from 'lit/decorators.js';
-import type { UmbWorkspacePropertyContext } from 'src/backoffice/shared/components/entity-property/workspace-property.context';
+import type { UmbWorkspacePropertyContext } from 'src/backoffice/shared/components/property/workspace-property.context';
 import { UmbLitElement } from '@umbraco-cms/element';
 
 @customElement('umb-property-editor-ui-textarea')

@@ -13,14 +13,13 @@ import { UmbObserverController } from 'src/core/observable-api/observer.controll
 import { UmbLitElement } from '@umbraco-cms/element';
 
 /**
- *  @element umb-entity-property
+ *  @element umb-property
  *  @description - Component for displaying a entity property. The Element will render a Property Editor based on the Property Editor UI alias passed to the element.
  *  The element will also render all Property Actions related to the Property Editor.
  */
 
-// TODO: get rid of the other mixins:
-@customElement('umb-entity-property')
-export class UmbEntityPropertyElement extends UmbLitElement {
+@customElement('umb-property')
+export class UmbPropertyElement extends UmbLitElement {
 	static styles = [
 		UUITextStyles,
 		css`
@@ -230,6 +229,6 @@ export class UmbEntityPropertyElement extends UmbLitElement {
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-entity-property': UmbEntityPropertyElement;
+		'umb-property': UmbPropertyElement;
 	}
 }
