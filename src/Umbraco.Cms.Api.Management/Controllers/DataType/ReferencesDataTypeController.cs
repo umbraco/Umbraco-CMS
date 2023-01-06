@@ -23,7 +23,7 @@ public class ReferencesDataTypeController : DataTypeControllerBase
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(DataTypeReferenceViewModel[]), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<ActionResult<DataTypeViewModel>> References(Guid key)
+    public async Task<ActionResult<DataTypeReferenceViewModel[]>> References(Guid key)
     {
         IDataType? dataType = _dataTypeService.GetDataType(key);
         if (dataType == null)
