@@ -44,7 +44,7 @@ export type WorkspacePropertyData<ValueType> = {
 	config?: DataTypeDetails['data'];// This could potentially then come from hardcoded JS object and not the DataType store.
 };
 
-export class UmbWorkspacePropertyContext<ValueType> {
+export class UmbWorkspacePropertyContext<ValueType = unknown> {
 
 
 	private _providerController: UmbContextProviderController;

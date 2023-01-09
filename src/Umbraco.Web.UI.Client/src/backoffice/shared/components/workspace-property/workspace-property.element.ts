@@ -159,7 +159,7 @@ export class UmbWorkspacePropertyElement extends UmbLitElement {
 
 	private _observePropertyEditorUI() {
 		this.propertyEditorUIObserver?.destroy();
-		this.propertyEditorUIObserver = this.observe(umbExtensionsRegistry.getByTypeAndAlias('propertyEditorUI', this.propertyEditorUIAlias), (manifest) => {
+		this.propertyEditorUIObserver = this.observe(umbExtensionsRegistry.getByTypeAndAlias('propertyEditorUI', this._propertyEditorUIAlias), (manifest) => {
 			this._gotEditorUI(manifest);
 		});
 	}
@@ -205,7 +205,7 @@ export class UmbWorkspacePropertyElement extends UmbLitElement {
 	}
 
 	private _renderPropertyActionMenu() {
-		return html`${this.propertyEditorUIAlias
+		return html`${this._propertyEditorUIAlias
 			? html`<umb-property-action-menu
 					slot="property-action-menu"
 					id="property-action-menu"
