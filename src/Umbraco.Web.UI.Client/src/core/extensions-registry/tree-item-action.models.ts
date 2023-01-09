@@ -6,7 +6,7 @@ export interface ManifestTreeItemAction extends ManifestElement {
 }
 
 export interface MetaTreeItemAction {
-	trees: Array<string>;
+	entityType: string;
 	label: string;
 	icon: string;
 }

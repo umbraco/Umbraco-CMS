@@ -6,9 +6,6 @@ const tree: ManifestTree = {
 	name: 'Data Types Tree',
 	weight: 100,
 	meta: {
-		label: 'Data Types',
-		icon: 'umb:folder',
-		sections: ['Umb.Section.Settings'],
 		storeAlias: 'umbDataTypeStore',
 	},
 };
@@ -21,7 +18,7 @@ const treeItemActions: Array<ManifestTreeItemAction> = [
 		loader: () => import('./actions/create/action-data-type-create.element'),
 		weight: 200,
 		meta: {
-			trees: ['Umb.Tree.DataTypes'],
+			entityType: 'data-type',
 			label: 'Create',
 			icon: 'umb:add',
 		},
@@ -33,7 +30,7 @@ const treeItemActions: Array<ManifestTreeItemAction> = [
 		loader: () => import('./actions/delete/action-data-type-delete.element'),
 		weight: 100,
 		meta: {
-			trees: ['Umb.Tree.DataTypes'],
+			entityType: 'data-type',
 			label: 'Delete',
 			icon: 'umb:delete',
 		},
