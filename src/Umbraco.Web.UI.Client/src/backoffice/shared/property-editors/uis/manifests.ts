@@ -46,18 +46,6 @@ export const manifests: Array<ManifestPropertyEditorUI> = [
 	},
 	{
 		type: 'propertyEditorUI',
-		alias: 'Umb.PropertyEditorUI.Toggle',
-		name: 'Toggle Property Editor UI',
-		loader: () => import('./toggle/property-editor-ui-toggle.element'),
-		meta: {
-			label: 'Toggle',
-			icon: 'umb:checkbox',
-			group: 'common',
-			propertyEditorModel: 'Umbraco.TrueFalse',
-		},
-	},
-	{
-		type: 'propertyEditorUI',
 		alias: 'Umb.PropertyEditorUI.CheckboxList',
 		name: 'Checkbox List Property Editor UI',
 		loader: () => import('./checkbox-list/property-editor-ui-checkbox-list.element'),
