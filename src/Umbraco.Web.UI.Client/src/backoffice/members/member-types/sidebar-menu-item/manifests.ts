@@ -10,7 +10,6 @@ const sidebarMenuItem: ManifestSidebarMenuItem = {
 		label: 'Member Types',
 		icon: 'umb:folder',
 		sections: ['Umb.Section.Members'],
-		entityType: 'member-type',
 	},
 };
 

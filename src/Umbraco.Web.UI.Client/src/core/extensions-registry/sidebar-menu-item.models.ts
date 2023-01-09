@@ -9,5 +9,5 @@ export interface MetaSidebarMenuItem {
 	label: string;
 	icon: string;
 	sections: Array<string>;
-	entityType: string;
+	entityType?: string;
 }

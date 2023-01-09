@@ -22,7 +22,6 @@ export class UmbMediaTypesSidebarMenuItemElement extends UmbLitElement {
 		return html`<umb-tree-item
 			label="Media Types"
 			icon="umb:folder"
-			entity-type="media-type"
 			@show-children=${this._onShowChildren}
 			@hide-children=${this._onHideChildren}
 			has-children>

@@ -10,7 +10,6 @@ const sidebarMenuItem: ManifestSidebarMenuItem = {
 		label: 'Media Types',
 		icon: 'umb:folder',
 		sections: ['Umb.Section.Settings'],
-		entityType: 'media-type',
 	},
 };
 

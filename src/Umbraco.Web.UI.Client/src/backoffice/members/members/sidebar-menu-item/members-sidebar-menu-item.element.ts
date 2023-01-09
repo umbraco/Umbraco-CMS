@@ -22,7 +22,6 @@ export class UmbMembersSidebarMenuItemElement extends UmbLitElement {
 		return html`<umb-tree-item
 			label="Members"
 			icon="umb:folder"
-			entity-type="member"
 			@show-children=${this._onShowChildren}
 			@hide-children=${this._onHideChildren}>
 			${this._renderTree ? html`<umb-tree alias="Umb.Tree.Members"></umb-tree>` : nothing}

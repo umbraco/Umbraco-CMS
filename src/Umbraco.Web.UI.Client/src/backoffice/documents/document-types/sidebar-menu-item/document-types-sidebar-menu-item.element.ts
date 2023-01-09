@@ -22,7 +22,6 @@ export class UmbDocumentTypesSidebarMenuItemElement extends UmbLitElement {
 		return html`<umb-tree-item
 			label="Document Types"
 			icon="umb:folder"
-			entity-type="document-type"
 			@show-children=${this._onShowChildren}
 			@hide-children=${this._onHideChildren}
 			has-children>

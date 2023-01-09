@@ -10,7 +10,6 @@ const sidebarMenuItem: ManifestSidebarMenuItem = {
 		label: 'Documents',
 		icon: 'umb:folder',
 		sections: ['Umb.Section.Content'],
-		entityType: 'document',
 	},
 };
 
