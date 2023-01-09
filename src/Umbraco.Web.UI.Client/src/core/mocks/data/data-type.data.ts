@@ -239,6 +239,19 @@ export const data: Array<DataTypeDetails> = [
 		propertyEditorUIAlias: 'Umb.PropertyEditorUI.Toggle',
 		data: [],
 	},
+	{
+		name: 'Tags',
+		type: 'data-type',
+		icon: 'umb:autofill',
+		hasChildren: false,
+		key: 'dt-tags',
+		isContainer: false,
+		parentKey: null,
+		isFolder: false,
+		propertyEditorModelAlias: 'Umbraco.Tags',
+		propertyEditorUIAlias: 'Umb.PropertyEditorUI.Tags',
+		data: [],
+	},
 ];
 
 // Temp mocked database

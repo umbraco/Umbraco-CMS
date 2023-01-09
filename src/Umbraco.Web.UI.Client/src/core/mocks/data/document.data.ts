@@ -90,6 +90,12 @@ export const data: Array<DocumentDetails> = [
 				description: '',
 				dataTypeKey: 'dt-toggle',
 			},
+			{
+				alias: 'tags',
+				label: 'Tags',
+				description: '',
+				dataTypeKey: 'dt-tags',
+			},
 		],
 		data: [],
 		variants: [],
