@@ -79,6 +79,31 @@ public class PartialMigrationsTests : UmbracoIntegrationTest
         });
     }
 
+    [Test]
+    public void StateIsOnlySavedIfAMigrationSucceeds()
+    {
+        var plan = new MigrationPlan("test")
+            .From(string.Empty)
+            .To<ErrorMigration>("a")
+            .To<CreateTableMigration>("b");
+
+        var upgrader = new Upgrader(plan);
+        var result = upgrader.Execute(MigrationPlanExecutor, ScopeProvider, KeyValueService);
+
+        Assert.Multiple(() =>
+        {
+            Assert.IsFalse(result.Successful);
+            Assert.IsNotNull(result.Exception);
+            Assert.IsInstanceOf<PanicException>(result.Exception);
+            Assert.IsEmpty(result.CompletedTransitions);
+            Assert.AreEqual(string.Empty, result.InitialState);
+            Assert.AreEqual(string.Empty, result.FinalState);
+
+            using var scope = ScopeProvider.CreateCoreScope();
+            Assert.IsNull(KeyValueService.GetValue(upgrader.StateValueKey));
+        });
+    }
+
     private bool ColumnExists(string tableName, string columnName, IScope scope) =>
         scope.Database.SqlContext.SqlSyntax.GetColumnsInSchema(scope.Database)
             .Any(x => x.TableName.Equals(tableName) && x.ColumnName.Equals(columnName));
