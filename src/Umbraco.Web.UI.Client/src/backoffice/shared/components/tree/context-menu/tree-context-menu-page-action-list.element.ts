@@ -55,7 +55,7 @@ export class UmbTreeContextMenuPageActionListElement extends UmbLitElement {
 		this.observe(
 			umbExtensionsRegistry
 				.extensionsOfType('treeItemAction')
-				.pipe(map((actions) => actions.filter((action) => action.meta.trees.includes(this._activeTree?.alias || '')))),
+				.pipe(map((actions) => actions.filter((action) => action.meta.entityType === this._activeTreeItem?.type))),
 			(actions) => {
 				this._actions = actions || undefined;
 			}

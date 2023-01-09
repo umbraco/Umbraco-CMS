@@ -19,7 +19,7 @@ const treeItemActions: Array<ManifestTreeItemAction> = [
 		loader: () => import('./actions/action-document-create.element'),
 		weight: 100,
 		meta: {
-			trees: [treeAlias],
+			entityType: 'document',
 			label: 'Create',
 			icon: 'add',
 		},
@@ -31,7 +31,7 @@ const treeItemActions: Array<ManifestTreeItemAction> = [
 		loader: () => import('./actions/action-document-delete.element'),
 		weight: 100,
 		meta: {
-			trees: [treeAlias],
+			entityType: 'document',
 			label: 'Delete',
 			icon: 'delete',
 		},
@@ -43,7 +43,7 @@ const treeItemActions: Array<ManifestTreeItemAction> = [
 		loader: () => import('./actions/action-document-paged.element'),
 		weight: 100,
 		meta: {
-			trees: [treeAlias],
+			entityType: 'document',
 			label: 'Paged',
 			icon: 'favorite',
 		},

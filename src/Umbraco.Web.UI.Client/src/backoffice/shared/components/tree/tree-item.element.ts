@@ -1,4 +1,4 @@
-import { css, html } from 'lit';
+import { css, html, nothing } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, property, state } from 'lit/decorators.js';
 import { ifDefined } from 'lit-html/directives/if-defined.js';
@@ -10,6 +10,7 @@ import { UmbTreeContextMenuService } from './context-menu/tree-context-menu.serv
 import type { Entity } from '@umbraco-cms/models';
 import { UmbTreeDataStore } from '@umbraco-cms/stores/store';
 import { UmbLitElement } from '@umbraco-cms/element';
+import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
 
 @customElement('umb-tree-item')
 export class UmbTreeItem extends UmbLitElement {
@@ -27,8 +28,17 @@ export class UmbTreeItem extends UmbLitElement {
 	@property({ type: String })
 	icon = '';
 
+	private _entityType = '';
 	@property({ type: String })
-	entityType = '';
+	get entityType() {
+		return this._entityType;
+	}
+	set entityType(newVal) {
+		const oldVal = this._entityType;
+		this._entityType = newVal;
+		this.requestUpdate('entityType', oldVal);
+		this._observeTreeItemActions();
+	}
 
 	@property({ type: Boolean, attribute: 'has-children' })
 	hasChildren = false;
@@ -50,6 +60,9 @@ export class UmbTreeItem extends UmbLitElement {
 
 	@state()
 	private _isActive = false;
+
+	@state()
+	private _hasActions = false;
 
 	private _treeContext?: UmbTreeContextBase;
 	private _store?: UmbTreeDataStore<unknown>;
@@ -129,6 +142,17 @@ export class UmbTreeItem extends UmbLitElement {
 		});
 	}
 
+	private _observeTreeItemActions() {
+		this.observe(
+			umbExtensionsRegistry
+				.extensionsOfType('treeItemAction')
+				.pipe(map((actions) => actions.filter((action) => action.meta.entityType === this._entityType))),
+			(actions) => {
+				this._hasActions = actions.length > 0;
+			}
+		);
+	}
+
 	// TODO: how do we handle this?
 	private _constructPath(sectionPathname: string, type: string, key: string) {
 		return type ? `section/${sectionPathname}/${type}/edit/${key}` : undefined;
@@ -150,24 +174,6 @@ export class UmbTreeItem extends UmbLitElement {
 			this._childItems = childItems;
 			this._loading = false;
 		});
-	}
-
-	private _renderChildItems() {
-		return html`
-			${this._childItems
-				? repeat(
-						this._childItems,
-						(item) => item.key,
-						(item) =>
-							html`<umb-tree-item
-								.key=${item.key}
-								.label=${item.name}
-								.icon=${item.icon}
-								.entityType=${item.type}
-								.hasChildren=${item.hasChildren}></umb-tree-item>`
-				  )
-				: ''}
-		`;
 	}
 
 	private _openActions() {
@@ -199,13 +205,41 @@ export class UmbTreeItem extends UmbLitElement {
 				?active=${this._isActive}>
 				${this._renderChildItems()}
 				<uui-icon slot="icon" name="${this.icon}"></uui-icon>
-				<uui-action-bar slot="actions">
-					<uui-button @click=${this._openActions} label="Open actions menu">
-						<uui-symbol-more></uui-symbol-more>
-					</uui-button>
-				</uui-action-bar>
+				${this._renderActions()}
 				<slot></slot>
 			</uui-menu-item>
+		`;
+	}
+
+	private _renderChildItems() {
+		return html`
+			${this._childItems
+				? repeat(
+						this._childItems,
+						(item) => item.key,
+						(item) =>
+							html`<umb-tree-item
+								.key=${item.key}
+								.label=${item.name}
+								.icon=${item.icon}
+								.entityType=${item.type}
+								.hasChildren=${item.hasChildren}></umb-tree-item>`
+				  )
+				: ''}
+		`;
+	}
+
+	private _renderActions() {
+		return html`
+			${this._hasActions
+				? html`
+						<uui-action-bar slot="actions">
+							<uui-button @click=${this._openActions} label="Open actions menu">
+								<uui-symbol-more></uui-symbol-more>
+							</uui-button>
+						</uui-action-bar>
+				  `
+				: nothing}
 		`;
 	}
 }
