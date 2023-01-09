@@ -15,7 +15,6 @@ internal class ContentVersionCleanupPolicyDto
     [Column("contentTypeId")]
     [PrimaryKeyColumn(AutoIncrement = false)]
     [ForeignKey(typeof(ContentTypeDto), Column = "nodeId")]
-
     public int ContentTypeId { get; set; }
 
     [Column("preventCleanup")]
