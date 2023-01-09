@@ -11,7 +11,7 @@ using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
 
-namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure;
+namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Migrations;
 
 // These tests depend on the key-value table, so we need a schema to run these tests.
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
