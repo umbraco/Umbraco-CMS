@@ -68,10 +68,11 @@ public class MigrateDataTypeConfigurations : MigrationBase
             }
         }
 
-        if (refreshCache)
-        {
-            Context.AddPostMigration<RebuildPublishedSnapshot>();
-        }
+        // FIXME: Use notification handler to clear cache.
+        // if (refreshCache)
+        // {
+        //     Context.AddPostMigration<RebuildPublishedSnapshot>();
+        // }
     }
 
     // convert the stored keys "minimum" and "maximum" to the expected keys "min" and "max for multiple textstrings
