@@ -2,13 +2,13 @@ import type { ManifestPropertyEditorUI } from '@umbraco-cms/models';
 
 export const manifest: ManifestPropertyEditorUI = {
 	type: 'propertyEditorUI',
-	alias: 'Umb.PropertyEditorUI.RadioButtonList',
-	name: 'Radio Button List Property Editor UI',
-	loader: () => import('./property-editor-ui-radio-button-list.element'),
+	alias: 'Umb.PropertyEditorUI.CheckboxList',
+	name: 'Checkbox List Property Editor UI',
+	loader: () => import('./property-editor-ui-checkbox-list.element'),
 	meta: {
-		label: 'Radio Button List',
-		propertyEditorModel: 'Umbraco.RadioButtonList',
-		icon: 'umb:target',
+		label: 'Checkbox List',
+		propertyEditorModel: 'Umbraco.CheckboxList',
+		icon: 'umb:bulleted-list',
 		group: 'lists',
 		config: {
 			properties: [

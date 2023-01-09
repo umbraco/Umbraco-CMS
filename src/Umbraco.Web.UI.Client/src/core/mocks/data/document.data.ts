@@ -108,6 +108,12 @@ export const data: Array<DocumentDetails> = [
 				description: '',
 				dataTypeKey: 'dt-radioButtonList',
 			},
+			{
+				alias: 'checkboxList',
+				label: 'Checkbox List',
+				description: '',
+				dataTypeKey: 'dt-checkboxList',
+			},
 		],
 		data: [],
 		variants: [],

@@ -15,6 +15,7 @@ import { manifest as toggle } from './toggle/manifests';
 import { manifest as tags } from './tags/manifests';
 import { manifest as markdownEditor } from './markdown-editor/manifests';
 import { manifest as radioButtonList } from './radio-button-list/manifests';
+import { manifest as checkboxList } from './checkbox-list/manifests';
 
 import type { ManifestPropertyEditorUI } from '@umbraco-cms/models';
 
@@ -36,6 +37,7 @@ export const manifests: Array<ManifestPropertyEditorUI> = [
 	tags,
 	markdownEditor,
 	radioButtonList,
+	checkboxList,
 	{
 		type: 'propertyEditorUI',
 		alias: 'Umb.PropertyEditorUI.BlockList',
@@ -46,18 +48,6 @@ export const manifests: Array<ManifestPropertyEditorUI> = [
 			icon: 'umb:thumbnail-list',
 			group: 'lists',
 			propertyEditorModel: 'Umbraco.BlockList',
-		},
-	},
-	{
-		type: 'propertyEditorUI',
-		alias: 'Umb.PropertyEditorUI.CheckboxList',
-		name: 'Checkbox List Property Editor UI',
-		loader: () => import('./checkbox-list/property-editor-ui-checkbox-list.element'),
-		meta: {
-			label: 'Checkbox List',
-			icon: 'umb:bulleted-list',
-			group: 'lists',
-			propertyEditorModel: 'Umbraco.CheckBoxList',
 		},
 	},
 	{

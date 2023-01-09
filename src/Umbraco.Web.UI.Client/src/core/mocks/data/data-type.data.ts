@@ -278,6 +278,19 @@ export const data: Array<DataTypeDetails> = [
 		propertyEditorUIAlias: 'Umb.PropertyEditorUI.RadioButtonList',
 		data: [],
 	},
+	{
+		name: 'Checkbox List',
+		type: 'data-type',
+		icon: 'umb:autofill',
+		hasChildren: false,
+		key: 'dt-checkboxList',
+		isContainer: false,
+		parentKey: null,
+		isFolder: false,
+		propertyEditorModelAlias: 'Umbraco.CheckboxList',
+		propertyEditorUIAlias: 'Umb.PropertyEditorUI.CheckboxList',
+		data: [],
+	},
 ];
 
 // Temp mocked database
