@@ -16,7 +16,7 @@ export const manifests: Array<ManifestPropertyAction> = [
 		name: 'Clear Property Action',
 		loader: () => import('./clear/property-action-clear.element'),
 		meta: {
-			propertyEditors: ['Umb.PropertyEditorUI.TextArea'],
+			propertyEditors: ['Umb.PropertyEditorUI.TextBox'],
 		},
 	},
 ];
