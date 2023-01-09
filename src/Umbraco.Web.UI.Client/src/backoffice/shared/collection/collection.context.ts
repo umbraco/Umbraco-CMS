@@ -24,8 +24,8 @@ export class UmbCollectionContext<
 
 	/*
 	TODO:
-	private _search: BehaviorSubject<string> = new BehaviorSubject('');
-	public readonly search: Observable<string> = this._search.asObservable();
+	private _search = new UniqueBehaviorSubject('');
+	public readonly search = this._search.asObservable();
 	*/
 
 	constructor(host: UmbControllerHostInterface, entityKey: string | null, storeAlias: string) {
