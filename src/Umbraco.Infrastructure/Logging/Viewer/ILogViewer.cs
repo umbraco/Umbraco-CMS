@@ -19,7 +19,7 @@ public interface ILogViewer
     /// <summary>
     ///     Deletes a saved search to chosen data source and returns the remaining searches
     /// </summary>
-    IReadOnlyList<SavedLogSearch> DeleteSavedSearch(string name);
+    IReadOnlyList<SavedLogSearch> DeleteSavedSearch(string name) => DeleteSavedSearch(name, string.Empty);
 
     [Obsolete("Use the overload that only takes a 'name' parameter instead. This will be removed in Umbraco 14.")]
     IReadOnlyList<SavedLogSearch> DeleteSavedSearch(string name, string query);
