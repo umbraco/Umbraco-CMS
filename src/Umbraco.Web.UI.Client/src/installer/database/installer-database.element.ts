@@ -117,7 +117,12 @@ export class UmbInstallerDatabaseElement extends UmbLitElement {
 			// If there is an isConfigured database in the databases array then we can skip the database selection step
 			// and just use that.
 			this._preConfiguredDatabase = this._databases.find((x) => x.isConfigured);
-			if (!this._preConfiguredDatabase) {
+			if (this._preConfiguredDatabase) {
+				this._setDatabase({
+					id: this._preConfiguredDatabase.id!,
+					providerName: this._preConfiguredDatabase.providerName!,
+				});
+			} else {
 				this._options = this._databases
 					.filter((x) => !!x.id)
 					.map((x, i) => ({
@@ -153,6 +158,10 @@ export class UmbInstallerDatabaseElement extends UmbLitElement {
 			...value,
 		};
 
+		this._setDatabase(database);
+	}
+
+	private _setDatabase(database: DatabaseInstall) {
 		this._installerContext?.appendData({ database });
 	}
 

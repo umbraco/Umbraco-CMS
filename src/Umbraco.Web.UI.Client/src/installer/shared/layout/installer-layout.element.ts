@@ -11,7 +11,7 @@ export class UmbInstallerLayoutElement extends LitElement {
 				background-position: 50%;
 				background-repeat: no-repeat;
 				background-size: cover;
-				background-image: url('/installer.jpg');
+				background-image: url('installer.jpg');
 				width: 100vw;
 				height: 100vh;
 			}
@@ -53,7 +53,7 @@ export class UmbInstallerLayoutElement extends LitElement {
 			<div id="background" aria-hidden="true"></div>
 
 			<div id="logo" aria-hidden="true">
-				<img src="/umbraco_logo_white.svg" alt="Umbraco" />
+				<img src="umbraco_logo_white.svg" alt="Umbraco" />
 			</div>
 
 			<main id="container">
