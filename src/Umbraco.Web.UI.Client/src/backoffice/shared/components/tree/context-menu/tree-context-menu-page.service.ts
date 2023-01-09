@@ -5,6 +5,7 @@ import { BehaviorSubject, Observable } from 'rxjs';
 import UmbTreeItemActionElement, { ActionPageEntity } from '../action/tree-item-action.element';
 import { UmbLitElement } from '@umbraco-cms/element';
 
+// TODO: Refactor this, its not a service and the data should be handled by a context api.
 @customElement('umb-tree-context-menu-page-service')
 export class UmbTreeContextMenuPageService extends UmbLitElement {
 	static styles = [UUITextStyles, css``];
