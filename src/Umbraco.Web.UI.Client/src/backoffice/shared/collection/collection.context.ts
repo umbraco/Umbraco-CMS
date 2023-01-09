@@ -3,7 +3,7 @@ import { UmbTreeDataStore } from '@umbraco-cms/stores/store';
 import { UmbControllerHostInterface } from 'src/core/controller/controller-host.mixin';
 import { UmbContextConsumerController } from 'src/core/context-api/consume/context-consumer.controller';
 import { UmbObserverController } from 'src/core/observable-api/observer.controller';
-import { CreateObservablePart, UniqueBehaviorSubject } from 'src/core/observable-api/unique-behavior-subject';
+import { UniqueBehaviorSubject } from 'src/core/observable-api/unique-behavior-subject';
 
 export class UmbCollectionContext<
 	DataType extends ContentTreeItem,
@@ -17,10 +17,10 @@ export class UmbCollectionContext<
 	protected _dataObserver?: UmbObserverController<DataType[]>;
 
 	#data = new UniqueBehaviorSubject(<Array<DataType>>[]);
-	public readonly data = CreateObservablePart(this.#data, x => x);
+	public readonly data = this.#data.asObservable();
 
 	#selection = new UniqueBehaviorSubject(<Array<string>>[]);
-	public readonly selection = CreateObservablePart(this.#selection, x => x);
+	public readonly selection = this.#selection.asObservable();
 
 	/*
 	TODO:
