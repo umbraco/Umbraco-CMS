@@ -7,6 +7,7 @@ import type { ContentProperty, ContentPropertyData, DocumentDetails, MediaDetail
 
 import '../../../../content-property/content-property.element';
 import { UmbLitElement } from '@umbraco-cms/element';
+import { repeat } from 'lit/directives/repeat.js';
 
 @customElement('umb-workspace-view-content-edit')
 export class UmbWorkspaceViewContentEditElement extends UmbLitElement {
@@ -63,12 +64,14 @@ export class UmbWorkspaceViewContentEditElement extends UmbLitElement {
 	render() {
 		return html`
 			<uui-box>
-				${this._properties?.map(
-					(property: ContentProperty) => html`
-						<umb-content-property
+				${repeat(
+					this._properties,
+					(property) => property.alias,
+					(property) => 
+						html`<umb-content-property
 							.property=${property}
 							.value=${this._data.find((data) => data.alias === property.alias)?.value}></umb-content-property>
-					`
+						`
 				)}
 			</uui-box>
 		`;
