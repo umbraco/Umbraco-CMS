@@ -149,8 +149,13 @@ export class UmbWorkspacePropertyElement extends UmbLitElement {
 		// TODO: maybe this would be called change.
 		this.addEventListener('change', this._onPropertyEditorChange as any as EventListener);
 
-
 	}
+
+	private _onPropertyEditorChange = (e: CustomEvent) => {
+		const target = e.composedPath()[0] as any;
+
+		this.value = target.value;// Sets value in context.
+	};
 
 	private _observePropertyEditorUI() {
 		this.propertyEditorUIObserver?.destroy();
@@ -188,16 +193,7 @@ export class UmbWorkspacePropertyElement extends UmbLitElement {
 				// TODO: loading JS failed so we should do some nice UI. (This does only happen if extension has a js prop, otherwise we concluded that no source was needed resolved the load.)
 			});
 	}
-
-
-
-	private _onPropertyEditorChange = (e: CustomEvent) => {
-		const target = e.composedPath()[0] as any;
-
-		this.value = target.value;// Sets value in context.
-
-		console.log("property Context got `change` event from element with value of ", this.value);
-	};
+	
 
 	render() {
 		return html`
