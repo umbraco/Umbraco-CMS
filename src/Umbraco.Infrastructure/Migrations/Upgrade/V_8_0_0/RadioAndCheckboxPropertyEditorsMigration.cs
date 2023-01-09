@@ -60,7 +60,7 @@ public class RadioAndCheckboxPropertyEditorsMigration : PropertyEditorsMigration
 
         foreach (DataTypeDto dataType in dataTypes)
         {
-            ValueListConfiguration config;
+            ValueListConfiguration config = new ValueListConfiguration();
 
             if (dataType.Configuration.IsNullOrWhiteSpace())
             {
@@ -75,9 +75,10 @@ public class RadioAndCheckboxPropertyEditorsMigration : PropertyEditorsMigration
 
             try
             {
-                config = (ValueListConfiguration)configurationEditor.FromDatabase(
-                    dataType.Configuration,
-                    _configurationEditorJsonSerializer);
+                // this migration is obsolete, no reason to refactor this code
+                // config = (ValueListConfiguration)configurationEditor.FromDatabase(
+                //     dataType.Configuration,
+                //     _configurationEditorJsonSerializer);
             }
             catch (Exception ex)
             {

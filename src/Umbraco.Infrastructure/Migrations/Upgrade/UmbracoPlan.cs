@@ -3,6 +3,7 @@ using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_10_0_0;
 using Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_10_2_0;
 using Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_12_0_0;
+using Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_13_0_0;
 
 namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade;
 
@@ -84,5 +85,9 @@ public class UmbracoPlan : MigrationPlan
 
         // To 12.0.0
         To<UseNvarcharInsteadOfNText>("{888A0D5D-51E4-4C7E-AA0A-01306523C7FB}");
+
+        // To 13.0.0
+        To<AddPropertyEditorUiAliasColumn>("{419827A0-4FCE-464B-A8F3-247C6092AF55}");
+        To<MigrateDataTypeConfigurations>("{5F15A1CC-353D-4889-8C7E-F303B4766196}");
     }
 }

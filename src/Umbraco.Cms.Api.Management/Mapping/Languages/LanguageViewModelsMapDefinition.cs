@@ -1,4 +1,4 @@
-﻿using NPoco.FluentMappings;
+using NPoco.FluentMappings;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Api.Management.ViewModels.Language;
@@ -50,16 +50,6 @@ public class LanguageViewModelsMapDefinition : IMapDefinition
 
     private static void Map(PagedModel<ILanguage> source, PagedViewModel<LanguageViewModel> target, MapperContext context)
     {
-        if (target is null)
-        {
-            throw new ArgumentNullException(nameof(target));
-        }
-
-        if (target is not PagedViewModel<LanguageViewModel> list)
-        {
-            throw new NotSupportedException($"{nameof(target)} must be a List<Language>.");
-        }
-
         List<LanguageViewModel> temp = context.MapEnumerable<ILanguage, LanguageViewModel>(source.Items);
 
         // Put the default language first in the list & then sort rest by a-z
@@ -74,7 +64,7 @@ public class LanguageViewModelsMapDefinition : IMapDefinition
             languages.AddRange(temp.Where(x => x != defaultLang).OrderBy(x => x.Name));
         }
 
-        list.Items = languages;
-        list.Total = source.Total;
+        target.Items = languages;
+        target.Total = source.Total;
     }
 }

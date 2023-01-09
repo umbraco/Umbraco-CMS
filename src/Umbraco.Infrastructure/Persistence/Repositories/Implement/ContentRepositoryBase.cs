@@ -311,7 +311,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                     continue; // not implementing IDataValueTags, continue
                 }
 
-                object? configuration = DataTypeService.GetDataType(property.PropertyType.DataTypeId)?.Configuration;
+                object? configuration = DataTypeService.GetDataType(property.PropertyType.DataTypeId)?.ConfigurationObject;
 
                 if (property.PropertyType.VariesByCulture())
                 {

@@ -25,27 +25,27 @@ public class LabelConfigurationEditor : ConfigurationEditor<LabelConfiguration>
     {
     }
 
-    /// <inheritdoc />
-    public override LabelConfiguration FromConfigurationEditor(
-        IDictionary<string, object?>? editorValues,
-        LabelConfiguration? configuration)
+    public override IDictionary<string, object> FromConfigurationEditor(IDictionary<string, object> configuration)
     {
-        var newConfiguration = new LabelConfiguration();
+        // default value
+        var valueType = new LabelConfiguration().ValueType;
 
         // get the value type
         // not simply deserializing Json because we want to validate the valueType
-        if (editorValues is not null && editorValues.TryGetValue(
-                                         Constants.PropertyEditors.ConfigurationKeys.DataValueType,
-                                         out var valueTypeObj)
-                                     && valueTypeObj is string stringValue)
+        if (configuration.TryGetValue(
+                Constants.PropertyEditors.ConfigurationKeys.DataValueType,
+                out var valueTypeObj)
+            && valueTypeObj is string stringValue)
         {
             // validate
             if (!string.IsNullOrWhiteSpace(stringValue) && ValueTypes.IsValue(stringValue))
             {
-                newConfiguration.ValueType = stringValue;
+                valueType = stringValue;
             }
         }
 
-        return newConfiguration;
+        configuration[Constants.PropertyEditors.ConfigurationKeys.DataValueType] = valueType;
+
+        return base.FromConfigurationEditor(configuration);
     }
 }

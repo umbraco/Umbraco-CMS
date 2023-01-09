@@ -1,7 +1,9 @@
 ﻿using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Api.Management.Mapping.Culture;
+using Umbraco.Cms.Api.Management.Mapping.DataType;
 using Umbraco.Cms.Api.Management.Mapping.Dictionary;
+using Umbraco.Cms.Api.Management.Mapping.HealthCheck;
 using Umbraco.Cms.Api.Management.Mapping.Installer;
 using Umbraco.Cms.Api.Management.Mapping.Languages;
 using Umbraco.Cms.Api.Management.Mapping.Relation;
@@ -21,7 +23,10 @@ public static class MappingBuilderExtensions
             .Add<RelationViewModelsMapDefinition>()
             .Add<LanguageViewModelsMapDefinition>()
             .Add<InstallerViewModelsMapDefinition>()
-            .Add<CultureViewModelMapDefinition>();
+            .Add<CultureViewModelMapDefinition>()
+            .Add<HealthCheckViewModelsMapDefinition>()
+            .Add<CultureViewModelMapDefinition>()
+            .Add<DataTypeViewModelMapDefinition>();
 
         return builder;
     }
