@@ -24,7 +24,7 @@ public class LogViewerConfig : ILogViewerConfig
         return result;
     }
 
-    public IReadOnlyList<SavedLogSearch> AddSavedSearch(string? name, string? query)
+    public IReadOnlyList<SavedLogSearch> AddSavedSearch(string name, string query)
     {
         using IScope scope = _scopeProvider.CreateScope(autoComplete: true);
         _logViewerQueryRepository.Save(new LogViewerQuery(name, query));
@@ -32,10 +32,14 @@ public class LogViewerConfig : ILogViewerConfig
         return GetSavedSearches();
     }
 
-    public IReadOnlyList<SavedLogSearch> DeleteSavedSearch(string? name, string? query)
+    [Obsolete("Use the overload that only takes a 'name' parameter instead. This will be removed in Umbraco 14.")]
+    public IReadOnlyList<SavedLogSearch> DeleteSavedSearch(string name, string query) => DeleteSavedSearch(name);
+
+    public IReadOnlyList<SavedLogSearch> DeleteSavedSearch(string name)
     {
         using IScope scope = _scopeProvider.CreateScope(autoComplete: true);
-        ILogViewerQuery? item = name is null ? null : _logViewerQueryRepository.GetByName(name);
+        ILogViewerQuery? item = _logViewerQueryRepository.GetByName(name);
+
         if (item is not null)
         {
             _logViewerQueryRepository.Delete(item);

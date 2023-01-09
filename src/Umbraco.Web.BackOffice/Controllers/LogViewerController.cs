@@ -137,7 +137,7 @@ public class LogViewerController : BackOfficeNotificationsController
 
     [HttpPost]
     public IEnumerable<SavedLogSearch> DeleteSavedSearch(SavedLogSearch item) =>
-        _logViewer.DeleteSavedSearch(item.Name, item.Query);
+        _logViewer.DeleteSavedSearch(item.Name);
 
     [HttpGet]
     public ReadOnlyDictionary<string, LogEventLevel?> GetLogLevels() => _logLevelLoader.GetLogLevelsFromSinks();
