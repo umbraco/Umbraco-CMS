@@ -265,6 +265,19 @@ export const data: Array<DataTypeDetails> = [
 		propertyEditorUIAlias: 'Umb.PropertyEditorUI.MarkdownEditor',
 		data: [],
 	},
+	{
+		name: 'Radio Button List',
+		type: 'data-type',
+		icon: 'umb:autofill',
+		hasChildren: false,
+		key: 'dt-radioButtonList',
+		isContainer: false,
+		parentKey: null,
+		isFolder: false,
+		propertyEditorModelAlias: 'Umbraco.RadioButtonList',
+		propertyEditorUIAlias: 'Umb.PropertyEditorUI.RadioButtonList',
+		data: [],
+	},
 ];
 
 // Temp mocked database

@@ -1,0 +1,24 @@
+import type { ManifestPropertyEditorUI } from '@umbraco-cms/models';
+
+export const manifest: ManifestPropertyEditorUI = {
+	type: 'propertyEditorUI',
+	alias: 'Umb.PropertyEditorUI.RadioButtonList',
+	name: 'RadioButtonList Property Editor UI',
+	loader: () => import('./property-editor-ui-radio-button-list.element'),
+	meta: {
+		label: 'Radio Button List',
+		propertyEditorModel: 'Umbraco.RadioButtonList',
+		icon: 'umb:target',
+		group: 'lists',
+		config: {
+			properties: [
+				{
+					alias: 'options',
+					label: 'Add option',
+					description: 'Add, remove or sort options for the list.',
+					propertyEditorUI: 'Umb.PropertyEditorUI.MultipleTextString',
+				},
+			],
+		},
+	},
+};

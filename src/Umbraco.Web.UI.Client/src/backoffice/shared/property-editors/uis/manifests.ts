@@ -14,6 +14,7 @@ import { manifest as slider } from './slider/manifests';
 import { manifest as toggle } from './toggle/manifests';
 import { manifest as tags } from './tags/manifests';
 import { manifest as markdownEditor } from './markdown-editor/manifests';
+import { manifest as radioButtonList } from './radio-button-list/manifests';
 
 import type { ManifestPropertyEditorUI } from '@umbraco-cms/models';
 
@@ -34,6 +35,7 @@ export const manifests: Array<ManifestPropertyEditorUI> = [
 	toggle,
 	tags,
 	markdownEditor,
+	radioButtonList,
 	{
 		type: 'propertyEditorUI',
 		alias: 'Umb.PropertyEditorUI.BlockList',

@@ -14,6 +14,7 @@ import { manifest as slider } from './Umbraco.Slider';
 import { manifest as trueFalse } from './Umbraco.TrueFalse';
 import { manifest as tags } from './Umbraco.Tags';
 import { manifest as markdownEditor } from './Umbraco.MarkdownEditor';
+import { manifest as radioButtonList } from './Umbraco.RadioButtonList';
 
 import type { ManifestPropertyEditorModel } from '@umbraco-cms/models';
 
@@ -34,6 +35,7 @@ export const manifests: Array<ManifestPropertyEditorModel> = [
 	trueFalse,
 	tags,
 	markdownEditor,
+	radioButtonList,
 	{
 		type: 'propertyEditorModel',
 		name: 'Decimal',
@@ -98,12 +100,6 @@ export const manifests: Array<ManifestPropertyEditorModel> = [
 		type: 'propertyEditorModel',
 		name: 'List view',
 		alias: 'Umbraco.ListView',
-		meta: {},
-	},
-	{
-		type: 'propertyEditorModel',
-		name: 'Radio button list',
-		alias: 'Umbraco.RadioButtonList',
 		meta: {},
 	},
 	{

@@ -102,6 +102,12 @@ export const data: Array<DocumentDetails> = [
 				description: '',
 				dataTypeKey: 'dt-markdownEditor',
 			},
+			{
+				alias: 'radioButtonList',
+				label: 'Radio Button List',
+				description: '',
+				dataTypeKey: 'dt-radioButtonList',
+			},
 		],
 		data: [],
 		variants: [],
