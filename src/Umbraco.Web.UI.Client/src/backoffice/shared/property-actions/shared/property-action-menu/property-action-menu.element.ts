@@ -69,7 +69,10 @@ export class UmbPropertyActionMenuElement extends UmbLitElement {
 			this._open = value;
 		});
 
-		this.addEventListener('close', this._propertyActionMenuContext.close);
+		this.addEventListener('close', (e) => {
+			this._propertyActionMenuContext.close();
+			e.stopPropagation();
+		});
 	}
 
 	private _observeActions(alias: string) {
