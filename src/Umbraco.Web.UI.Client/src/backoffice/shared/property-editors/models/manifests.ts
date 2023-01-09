@@ -11,6 +11,7 @@ import { manifest as textBox } from './Umbraco.TextBox';
 import { manifest as multipleTextString } from './Umbraco.MultipleTextString';
 import { manifest as textArea } from './Umbraco.TextArea';
 import { manifest as slider } from './Umbraco.Slider';
+import { manifest as trueFalse } from './Umbraco.TrueFalse';
 
 import type { ManifestPropertyEditorModel } from '@umbraco-cms/models';
 
@@ -28,6 +29,7 @@ export const manifests: Array<ManifestPropertyEditorModel> = [
 	multipleTextString,
 	textArea,
 	slider,
+	trueFalse,
 	{
 		type: 'propertyEditorModel',
 		name: 'Decimal',
@@ -50,12 +52,6 @@ export const manifests: Array<ManifestPropertyEditorModel> = [
 		type: 'propertyEditorModel',
 		name: 'Tags',
 		alias: 'Umbraco.Tags',
-		meta: {},
-	},
-	{
-		type: 'propertyEditorModel',
-		name: 'Toggle',
-		alias: 'Umbraco.TrueFalse',
 		meta: {},
 	},
 	{

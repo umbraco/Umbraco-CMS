@@ -226,6 +226,19 @@ export const data: Array<DataTypeDetails> = [
 		propertyEditorUIAlias: 'Umb.PropertyEditorUI.Slider',
 		data: [],
 	},
+	{
+		name: 'Toggle',
+		type: 'data-type',
+		icon: 'umb:autofill',
+		hasChildren: false,
+		key: 'dt-toggle',
+		isContainer: false,
+		parentKey: null,
+		isFolder: false,
+		propertyEditorModelAlias: 'Umbraco.TrueFalse',
+		propertyEditorUIAlias: 'Umb.PropertyEditorUI.Toggle',
+		data: [],
+	},
 ];
 
 // Temp mocked database

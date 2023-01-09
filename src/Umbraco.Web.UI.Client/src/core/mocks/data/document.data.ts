@@ -84,6 +84,12 @@ export const data: Array<DocumentDetails> = [
 				description: '',
 				dataTypeKey: 'dt-slider',
 			},
+			{
+				alias: 'toggle',
+				label: 'Toggle',
+				description: '',
+				dataTypeKey: 'dt-toggle',
+			},
 		],
 		data: [],
 		variants: [],
