@@ -1,9 +1,9 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, nothing, PropertyValueMap } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
-import { BehaviorSubject, Observable } from 'rxjs';
 import UmbTreeItemActionElement, { ActionPageEntity } from '../action/tree-item-action.element';
 import { UmbLitElement } from '@umbraco-cms/element';
+import { UniqueBehaviorSubject } from 'src/core/observable-api/unique-behavior-subject';
 
 // TODO: Refactor this, its not a service and the data should be handled by a context api.
 @customElement('umb-tree-context-menu-page-service')
@@ -13,8 +13,8 @@ export class UmbTreeContextMenuPageService extends UmbLitElement {
 	@property({ type: Object })
 	public actionEntity: ActionPageEntity = { key: '', name: '' };
 
-	private _entity: BehaviorSubject<ActionPageEntity> = new BehaviorSubject({ key: '', name: '' });
-	public readonly entity: Observable<ActionPageEntity> = this._entity.asObservable();
+	#entity = new UniqueBehaviorSubject({ key: '', name: '' } as ActionPageEntity);
+	public readonly entity = this.#entity.asObservable();
 
 	@state()
 	private _pages: Array<HTMLElement> = [];
@@ -29,7 +29,7 @@ export class UmbTreeContextMenuPageService extends UmbLitElement {
 		super.updated(_changedProperties);
 
 		if (_changedProperties.has('actionEntity')) {
-			this._entity.next(this.actionEntity);
+			this.#entity.next(this.actionEntity);
 			//TODO: Move back to first page
 			this.openFreshPage('umb-tree-context-menu-page-action-list');
 		}
