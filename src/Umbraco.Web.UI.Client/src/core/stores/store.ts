@@ -40,6 +40,8 @@ export abstract class UmbDataStoreBase<T extends UmbDataStoreIdentifiers> implem
 		this._items.next(remainingItems);
 	}
 
+
+
 	/**
 	 * @description - Update the store with new items. Existing items are updated, new items are added. Existing items are matched by the compareKey.
 	 * @param {Array<T>} items
@@ -47,27 +49,17 @@ export abstract class UmbDataStoreBase<T extends UmbDataStoreIdentifiers> implem
 	 * @memberof UmbDataStoreBase
 	 */
 	public updateItems(items: Array<T>, compareKey: keyof T = 'key'): void {
-		const storedItems = [...this._items.getValue()];
-
-		items.forEach((item) => {
-			const index = storedItems.map((storedItem) => storedItem[compareKey]).indexOf(item[compareKey]);
-
-			// If the node is in the store, update it
-			if (index !== -1) {
-				const storedItem = storedItems[index];
-
-				for (const [key] of Object.entries(item)) {
-					// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-					//@ts-ignore
-					storedItem[key] = item[key];
-				}
+		const newData = [...this._items.getValue()];
+		items.forEach((newItem) => {
+			const storedItemIndex = newData.findIndex((item) => item[compareKey] === newItem[compareKey]);
+			if(storedItemIndex !== -1) {
+				newData[storedItemIndex] = newItem;
 			} else {
-				// If the node is not in the store, add it
-				storedItems.push(item);
+				newData.push(newItem);
 			}
 		});
 
-		this._items.next([...storedItems]);
+		this._items.next(newData);
 	}
 }
 
