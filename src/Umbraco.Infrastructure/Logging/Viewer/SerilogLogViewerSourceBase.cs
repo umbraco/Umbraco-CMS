@@ -24,11 +24,15 @@ public abstract class SerilogLogViewerSourceBase : ILogViewer
     public virtual IReadOnlyList<SavedLogSearch> GetSavedSearches()
         => _logViewerConfig.GetSavedSearches();
 
-    public virtual IReadOnlyList<SavedLogSearch> AddSavedSearch(string? name, string? query)
+    public virtual IReadOnlyList<SavedLogSearch> AddSavedSearch(string name, string query)
         => _logViewerConfig.AddSavedSearch(name, query);
 
-    public virtual IReadOnlyList<SavedLogSearch> DeleteSavedSearch(string? name, string? query)
-        => _logViewerConfig.DeleteSavedSearch(name, query);
+    [Obsolete("Use the overload that only takes a 'name' parameter instead. This will be removed in Umbraco 14.")]
+    public virtual IReadOnlyList<SavedLogSearch> DeleteSavedSearch(string name, string query)
+        => DeleteSavedSearch(name);
+
+    public virtual IReadOnlyList<SavedLogSearch> DeleteSavedSearch(string name)
+        => _logViewerConfig.DeleteSavedSearch(name);
 
     public int GetNumberOfErrors(LogTimePeriod logTimePeriod)
     {
