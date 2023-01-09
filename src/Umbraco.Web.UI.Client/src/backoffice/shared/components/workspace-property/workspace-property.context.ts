@@ -1,8 +1,7 @@
-import { distinctUntilChanged, map, Observable, shareReplay } from "rxjs";
 import { UmbWorkspaceContentContext } from "../workspace/workspace-content/workspace-content.context";
 import type { DataTypeDetails } from "@umbraco-cms/models";
 import { UmbControllerHostInterface } from "src/core/controller/controller-host.mixin";
-import { naiveObjectComparison, UniqueBehaviorSubject } from "src/core/observable-api/unique-behavior-subject";
+import { CreateObservablePart, UniqueBehaviorSubject } from "src/core/observable-api/unique-behavior-subject";
 import { UmbContextProviderController } from "src/core/context-api/provide/context-provider.controller";
 import { UmbContextConsumerController } from "src/core/context-api/consume/context-consumer.controller";
 
@@ -10,27 +9,7 @@ import { UmbContextConsumerController } from "src/core/context-api/consume/conte
 
 
 
-//TODO: Property-Context: move these methods out:
-type MappingFunction<T, R> = (mappable: T) => R;
-type MemoizationFunction<R> = (previousResult: R, currentResult: R) => boolean;
 
-function defaultMemoization(previousValue: any, currentValue: any): boolean {
-  if (typeof previousValue === 'object' && typeof currentValue === 'object') {
-    return naiveObjectComparison(previousValue, currentValue);
-  }
-  return previousValue === currentValue;
-}
-export function CreateObservablePart<T, R> (
-	source$: Observable<T>,
-	mappingFunction: MappingFunction<T, R>,
-	memoizationFunction?: MemoizationFunction<R>
-): Observable<R> {
-	return source$.pipe(
-	  map(mappingFunction),
-	  distinctUntilChanged(memoizationFunction || defaultMemoization),
-	  shareReplay(1)
-	)
-}
 
 
 
