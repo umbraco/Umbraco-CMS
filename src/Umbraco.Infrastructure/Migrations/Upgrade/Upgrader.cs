@@ -56,10 +56,18 @@ public class Upgrader
 
         ExecutedMigrationPlan result = migrationPlanExecutor.Execute(Plan, initialState);
 
-        // This should never happen, but if it does, we can't save it in the database.
-        if (string.IsNullOrWhiteSpace(result.FinalState))
+        if (string.IsNullOrWhiteSpace(result.FinalState) || result.FinalState == result.InitialState)
         {
-            throw new InvalidOperationException("Plan execution returned an invalid null or empty state.");
+            // This should never happen, if the final state comes back as null or equal to the initial state
+            // it means that no transitions was successful, which means it cannot be a successful migration
+            if (result.Successful)
+            {
+                throw new InvalidOperationException("Plan execution returned an invalid null or empty state.");
+            }
+
+            // Otherwise it just means that our migration failed on the first step, which is fine.
+            // We will skip saving the state since we it's still the same
+            return result;
         }
 
         // We always save the final state of the migration plan, this is because a partial success is possible
