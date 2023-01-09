@@ -10,7 +10,7 @@ namespace Umbraco.Cms.Core.Models;
 public class PublicAccessEntry : EntityBase
 {
     private readonly List<Guid> _removedRules = new();
-    private readonly EventClearingObservableCollection<PublicAccessRule> _ruleCollection;
+    private EventClearingObservableCollection<PublicAccessRule> _ruleCollection;
     private int _loginNodeId;
     private int _noAccessNodeId;
     private int _protectedNodeId;
@@ -144,11 +144,13 @@ public class PublicAccessEntry : EntityBase
 
         var cloneEntity = (PublicAccessEntry)clone;
 
-        if (cloneEntity._ruleCollection != null)
-        {
-            cloneEntity._ruleCollection.ClearCollectionChangedEvents(); // clear this event handler if any
-            cloneEntity._ruleCollection.CollectionChanged +=
-                cloneEntity.RuleCollection_CollectionChanged; // re-assign correct event handler
-        }
+        // clear this event handler if any
+        cloneEntity._ruleCollection.ClearCollectionChangedEvents();
+
+        // clone the rule collection explicitly
+        cloneEntity._ruleCollection = (EventClearingObservableCollection<PublicAccessRule>)_ruleCollection.DeepClone();
+
+        // re-assign correct event handler
+        cloneEntity._ruleCollection.CollectionChanged += cloneEntity.RuleCollection_CollectionChanged;
     }
 }

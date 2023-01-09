@@ -14,7 +14,8 @@ namespace Umbraco.Cms.Core.PropertyEditors;
     "Dropdown",
     "dropdownFlexible",
     Group = Constants.PropertyEditors.Groups.Lists,
-    Icon = "icon-indent")]
+    Icon = "icon-indent",
+    ValueEditorIsReusable = true)]
 public class DropDownFlexiblePropertyEditor : DataEditor
 {
     private readonly IEditorConfigurationParser _editorConfigurationParser;

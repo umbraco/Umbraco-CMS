@@ -18,7 +18,8 @@ namespace Umbraco.Cms.Core.PropertyEditors;
     "Date/Time",
     "datepicker",
     ValueType = ValueTypes.DateTime,
-    Icon = "icon-time")]
+    Icon = "icon-time",
+    ValueEditorIsReusable = true)]
 public class DateTimePropertyEditor : DataEditor
 {
     private readonly IEditorConfigurationParser _editorConfigurationParser;

@@ -1,0 +1,27 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <Title>Umbraco CMS - Management API</Title>
+    <Description>Contains the presentation layer for the Umbraco CMS Management API.</Description>
+    <IsPackable>false</IsPackable>
+    <EnablePackageValidation>false</EnablePackageValidation>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="JsonPatch.Net" Version="2.0.4" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Versioning" Version="5.0.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Versioning.ApiExplorer" Version="5.0.0" />
+    <PackageReference Include="NSwag.AspNetCore" Version="13.16.1" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <ProjectReference Include="..\Umbraco.Infrastructure\Umbraco.Infrastructure.csproj" />
+    <ProjectReference Include="..\Umbraco.New.Cms.Core\Umbraco.New.Cms.Core.csproj" />
+    <ProjectReference Include="..\Umbraco.New.Cms.Infrastructure\Umbraco.New.Cms.Infrastructure.csproj" />
+    <ProjectReference Include="..\Umbraco.New.Cms.Web.Common\Umbraco.New.Cms.Web.Common.csproj" />
+    <ProjectReference Include="..\Umbraco.Web.Common\Umbraco.Web.Common.csproj" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <EmbeddedResource Include="OpenApi.json" />
+  </ItemGroup>
+</Project>

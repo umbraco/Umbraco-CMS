@@ -34,7 +34,8 @@ public class PublishedSnapshotCacheStatusController : UmbracoAuthorizedApiContro
     [HttpPost]
     public string RebuildDbCache()
     {
-        _publishedSnapshotService.Rebuild();
+        //Rebuild All
+        _publishedSnapshotService.RebuildAll();
         return _publishedSnapshotStatus.GetStatus();
     }
 

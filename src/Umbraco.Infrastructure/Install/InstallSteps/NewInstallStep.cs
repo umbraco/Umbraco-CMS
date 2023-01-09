@@ -29,6 +29,7 @@ namespace Umbraco.Cms.Infrastructure.Install.InstallSteps
     /// error, etc... and the end-user refreshes the installer then we cannot show the user screen because they've already entered that information so instead we'll
     /// display a simple continue installation view.
     /// </remarks>
+    [Obsolete("Will be replace with a new step with the new backoffice")]
     [InstallSetupStep(InstallationType.NewInstall, "User", 20, "")]
     public class NewInstallStep : InstallSetupStep<UserModel>
     {

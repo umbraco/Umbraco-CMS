@@ -65,6 +65,7 @@ public class ImageSharpImageUrlGenerator : IImageUrlGenerator
         }
 
         var queryString = new Dictionary<string, string?>();
+        Dictionary<string, StringValues> furtherOptions = QueryHelpers.ParseQuery(options.FurtherOptions);
 
         if (options.Crop is CropCoordinates crop)
         {
@@ -95,13 +96,18 @@ public class ImageSharpImageUrlGenerator : IImageUrlGenerator
         {
             queryString.Add(ResizeWebProcessor.Height, height.ToString(CultureInfo.InvariantCulture));
         }
+        
+        if (furtherOptions.Remove(FormatWebProcessor.Format, out StringValues format))
+        {
+            queryString.Add(FormatWebProcessor.Format, format.ToString());
+        }
 
         if (options.Quality is int quality)
         {
             queryString.Add(QualityWebProcessor.Quality, quality.ToString(CultureInfo.InvariantCulture));
         }
 
-        foreach (KeyValuePair<string, StringValues> kvp in QueryHelpers.ParseQuery(options.FurtherOptions))
+        foreach (KeyValuePair<string, StringValues> kvp in furtherOptions)
         {
             queryString.Add(kvp.Key, kvp.Value);
         }

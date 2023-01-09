@@ -9,8 +9,6 @@ public class IOHelperLinux : IOHelper
     {
     }
 
-    public override bool IsPathFullyQualified(string path) => Path.IsPathRooted(path);
-
     public override bool PathStartsWith(string path, string root, params char[] separators)
     {
         // either it is identical to root,

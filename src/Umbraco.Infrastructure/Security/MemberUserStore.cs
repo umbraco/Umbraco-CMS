@@ -794,6 +794,7 @@ public class MemberUserStore : UmbracoUserStore<MemberIdentityUser, UmbracoIdent
 
         if (identityUser.IsPropertyDirty(nameof(MemberIdentityUser.Roles)))
         {
+            anythingChanged = true;
             updateRoles = true;
         }
 
