@@ -10,6 +10,7 @@ import { manifests as textBoxes } from './text-box/manifests';
 import { manifest as dropdown } from './dropdown/manifests';
 import { manifest as multipleTextString } from './multiple-text-string/manifests';
 import { manifest as textArea } from './textarea/manifests';
+import { manifest as slider } from './slider/manifests';
 
 import type { ManifestPropertyEditorUI } from '@umbraco-cms/models';
 
@@ -26,6 +27,7 @@ export const manifests: Array<ManifestPropertyEditorUI> = [
 	dropdown,
 	multipleTextString,
 	textArea,
+	slider,
 	{
 		type: 'propertyEditorUI',
 		alias: 'Umb.PropertyEditorUI.BlockList',

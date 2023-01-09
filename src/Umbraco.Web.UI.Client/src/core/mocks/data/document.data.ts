@@ -78,6 +78,12 @@ export const data: Array<DocumentDetails> = [
 				description: '',
 				dataTypeKey: 'dt-textArea',
 			},
+			{
+				alias: 'slider',
+				label: 'Slider',
+				description: '',
+				dataTypeKey: 'dt-slider',
+			},
 		],
 		data: [],
 		variants: [],

@@ -213,6 +213,19 @@ export const data: Array<DataTypeDetails> = [
 		propertyEditorUIAlias: 'Umb.PropertyEditorUI.TextArea',
 		data: [],
 	},
+	{
+		name: 'Slider',
+		type: 'data-type',
+		icon: 'umb:autofill',
+		hasChildren: false,
+		key: 'dt-slider',
+		isContainer: false,
+		parentKey: null,
+		isFolder: false,
+		propertyEditorModelAlias: 'Umbraco.Slider',
+		propertyEditorUIAlias: 'Umb.PropertyEditorUI.Slider',
+		data: [],
+	},
 ];
 
 // Temp mocked database
