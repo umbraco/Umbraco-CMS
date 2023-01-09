@@ -21,7 +21,7 @@ public class ByKeyDataTypeController : DataTypeControllerBase
     [HttpGet("{key:guid}")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(DataTypeViewModel), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(NotFoundResult), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<DataTypeViewModel>> ByKey(Guid key)
     {
         IDataType? dataType = _dataTypeService.GetDataType(key);

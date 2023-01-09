@@ -128,6 +128,7 @@ public class DataTypeMapDefinition : IMapDefinition
     {
         target.DatabaseType = MapDatabaseType(source);
         target.Editor = _propertyEditors[source.EditorAlias];
+        target.EditorUiAlias = null;
         target.Id = Convert.ToInt32(source.Id);
         target.Name = source.Name;
         target.ParentId = source.ParentId;

@@ -1,10 +1,9 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Management.ViewModels.DataType;
-using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
-using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 
@@ -27,7 +26,7 @@ public class UpdateDataTypeController : DataTypeControllerBase
     [MapToApiVersion("1.0")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<ActionResult<DataTypeViewModel>> Update(Guid key, DataTypeUpdateModel dataTypeViewModel)
+    public async Task<ActionResult> Update(Guid key, DataTypeUpdateModel dataTypeViewModel)
     {
         IDataType? current = _dataTypeService.GetDataType(key);
         if (current == null)
@@ -37,9 +36,12 @@ public class UpdateDataTypeController : DataTypeControllerBase
 
         IDataType updated = _umbracoMapper.Map(dataTypeViewModel, current);
 
-        IUser? currentUser = _backOfficeSecurityAccessor.BackOfficeSecurity?.CurrentUser;
-        _dataTypeService.Save(updated, currentUser?.Id ?? Constants.Security.SuperUserId);
+        ProblemDetails? validationIssues = Save(updated, _dataTypeService, _backOfficeSecurityAccessor);
+        if (validationIssues != null)
+        {
+            return BadRequest(validationIssues);
+        }
 
-        return await Task.FromResult(Ok(_umbracoMapper.Map<DataTypeViewModel>(updated)));
+        return await Task.FromResult(Ok());
     }
 }

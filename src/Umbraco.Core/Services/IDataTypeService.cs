@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using Umbraco.Cms.Core.Models;
 
 namespace Umbraco.Cms.Core.Services;
@@ -16,7 +17,7 @@ public interface IDataTypeService : IService
     IReadOnlyDictionary<Udi, IEnumerable<string>> GetReferences(int id);
 
     Attempt<OperationResult<OperationResultType, EntityContainer>?> CreateContainer(int parentId, Guid key, string name, int userId = Constants.Security.SuperUserId);
-    
+
     Attempt<OperationResult?> SaveContainer(EntityContainer container, int userId = Constants.Security.SuperUserId);
 
     EntityContainer? GetContainer(int containerId);
@@ -115,4 +116,10 @@ public interface IDataTypeService : IService
     /// <exception cref="NotImplementedException"></exception>
     Attempt<OperationResult<MoveOperationStatusType, IDataType>?> Copy(IDataType copying, int containerId, int userId = Constants.Security.SuperUserId) => throw new NotImplementedException();
 
+    /// <summary>
+    /// Performs validation for the configuration data of a given data type.
+    /// </summary>
+    /// <param name="dataType">The data type whose configuration to validate.</param>
+    /// <returns>One or more <see cref="ValidationResult"/> if the configuration data is invalid, an empty collection otherwise.</returns>
+    IEnumerable<ValidationResult> ValidateConfigurationData(IDataType dataType);
 }

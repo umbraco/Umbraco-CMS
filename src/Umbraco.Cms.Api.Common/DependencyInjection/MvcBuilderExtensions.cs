@@ -2,9 +2,9 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Umbraco.Cms.Api.Management.Configuration;
+using Umbraco.Cms.Api.Common.Configuration;
 
-namespace Umbraco.Cms.Api.Management.DependencyInjection;
+namespace Umbraco.Cms.Api.Common.DependencyInjection;
 
 public static class MvcBuilderExtensions
 {
