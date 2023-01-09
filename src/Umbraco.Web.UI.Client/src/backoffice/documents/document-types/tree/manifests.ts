@@ -2,9 +2,8 @@ import type { ManifestTree, ManifestTreeItemAction } from '@umbraco-cms/models';
 
 const tree: ManifestTree = {
 	type: 'tree',
-	alias: 'Umb.Tree.DocumentType',
+	alias: 'Umb.Tree.DocumentTypes',
 	name: 'Document Types Tree',
-	weight: 400,
 	meta: {
 		storeAlias: 'umbDocumentTypeStore',
 	},

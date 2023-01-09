@@ -2,7 +2,6 @@ import { css, html } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, property, state } from 'lit/decorators.js';
 import { ifDefined } from 'lit-html/directives/if-defined.js';
-import { UUIMenuItemEvent } from '@umbraco-ui/uui';
 import { map, Observable } from 'rxjs';
 import { repeat } from 'lit/directives/repeat.js';
 import { UmbSectionContext } from '../section/section.context';
@@ -132,8 +131,8 @@ export class UmbTreeItem extends UmbLitElement {
 		return type ? `section/${sectionPathname}/${type}/edit/${key}` : undefined;
 	}
 
-	private _onShowChildren(event: UUIMenuItemEvent) {
-		event.stopPropagation();
+	// TODO: do we want to catch and emit a backoffice event here?
+	private _onShowChildren() {
 		if (this._childItems && this._childItems.length > 0) return;
 		this._observeChildren();
 	}

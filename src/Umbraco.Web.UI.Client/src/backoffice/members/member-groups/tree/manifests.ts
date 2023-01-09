@@ -6,11 +6,7 @@ const tree: ManifestTree = {
 	type: 'tree',
 	alias: treeAlias,
 	name: 'Member Groups Tree',
-	weight: 1,
 	meta: {
-		label: 'Member Groups',
-		icon: 'umb:folder',
-		sections: ['Umb.Section.Members'],
 		storeAlias: 'umbMemberGroupStore',
 	},
 };
