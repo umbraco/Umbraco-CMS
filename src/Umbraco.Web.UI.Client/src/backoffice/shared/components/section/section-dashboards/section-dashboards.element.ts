@@ -72,7 +72,7 @@ export class UmbSectionDashboardsElement extends UmbLitElement {
 	private _observeSectionContext() {
 		if (!this._sectionContext) return;
 
-		this.observe(this._sectionContext.data.pipe(first()), (section) => {
+		this.observe(this._sectionContext.manifest.pipe(first()), (section) => {
 			if(section) {
 				this._currentSectionAlias = section.alias;
 				this._currentSectionPathname = section.meta.pathname;

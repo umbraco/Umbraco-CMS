@@ -81,10 +81,10 @@ export abstract class UmbNodeStoreBase<T extends UmbDataStoreIdentifiers> extend
 	/**
 	 * @description - Request data by key. The data is added to the store and is returned as an Observable.
 	 * @param {string} key
-	 * @return {*}  {(Observable<T | null>)}
+	 * @return {*}  {(Observable<unknown>)}
 	 * @memberof UmbDataStoreBase
 	 */
-	abstract getByKey(key: string): Observable<T | null>;
+	abstract getByKey(key: string): Observable<unknown>;
 
 	/**
 	 * @description - Save data.
