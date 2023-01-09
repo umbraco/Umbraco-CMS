@@ -84,9 +84,6 @@ export class UmbPropertyElement extends UmbLitElement {
 	 * @default ''
 	 */
 	@property({ type: String })
-	public get alias(): string {
-		return this._propertyContext.getAlias() || '';
-	}
 	public set alias(alias: string) {
 		this._propertyContext.setAlias(alias);
 	}
@@ -100,9 +97,6 @@ export class UmbPropertyElement extends UmbLitElement {
 	 */
 	private _propertyEditorUIAlias = '';
 	@property({ type: String, attribute: 'property-editor-ui-alias' })
-	public get propertyEditorUIAlias(): string {
-		return this._propertyEditorUIAlias;
-	}
 	public set propertyEditorUIAlias(value: string) {
 		this._propertyEditorUIAlias = value;
 		this._observePropertyEditorUI();
@@ -116,10 +110,7 @@ export class UmbPropertyElement extends UmbLitElement {
 	 * @default undefined
 	 */
 	@property({attribute: false })
-	public get value() {
-		return this._propertyContext.getValue();
-	}
-	public set value(value) {
+	public set value(value: unknown) {
 		this._propertyContext.setValue(value);
 	}
 
@@ -148,7 +139,6 @@ export class UmbPropertyElement extends UmbLitElement {
 	constructor() {
 		super();
 
-
 		this.observe(this._propertyContext.label, (label) => {
 			this._label = label;
 		});
@@ -156,7 +146,8 @@ export class UmbPropertyElement extends UmbLitElement {
 			this._description = description;
 		});
 
-		this.addEventListener('property-editor-value-change', this._onPropertyEditorChange as any as EventListener);
+		// TODO: maybe this would be called change.
+		this.addEventListener('change', this._onPropertyEditorChange as any as EventListener);
 
 
 	}
@@ -202,13 +193,10 @@ export class UmbPropertyElement extends UmbLitElement {
 
 	private _onPropertyEditorChange = (e: CustomEvent) => {
 		const target = e.composedPath()[0] as any;
-		this.value = target.value;
 
-		//TODO: Property-Context: Figure out the requirements for this. Cause currently the alias-prop(getter) is required, but its not obvious.
-		// Could it make more sense to parse this on as part of the event? alias?, value?
-		
-		this.dispatchEvent(new CustomEvent('property-value-change', { bubbles: true, composed: true }));
-		e.stopPropagation();
+		this.value = target.value;// Sets value in context.
+
+		console.log("property Context got `change` event from element with value of ", this.value);
 	};
 
 	render() {

@@ -31,7 +31,11 @@ export class UniqueBehaviorSubject<T> extends BehaviorSubject<T> {
     next(newData: T): void {
         const frozenData = deepFreeze(newData);
         if (!naiveObjectComparison(frozenData, this.getValue())) {
-        super.next(frozenData);
+            super.next(frozenData);
         }
     }
+
+    update(data: Partial<T>) {
+		this.next({ ...this.getValue(), ...data });
+	}
 }

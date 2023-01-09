@@ -48,8 +48,6 @@ export class UmbWorkspaceContentContext<
 		this.data = this._data.asObservable();
 		this.entityType = entityType;
 
-		host.addEventListener('property-value-change', this._onPropertyValueChange);
-
 		new UmbContextConsumerController(
 			host,
 			'umbNotificationService',
@@ -114,22 +112,7 @@ export class UmbWorkspaceContentContext<
 
 
 	
-	//TODO: Property-Context: I would like ot investigate how this would work as methods. That do require that a property-context gets the workspace context. But this connection would be more safe.
-	private _onPropertyValueChange = (e: Event) => {
-		const target = e.composedPath()[0] as any;
-
-		const property = this.getData().data.find((x) => x.alias === target.alias);
-		if (property) {
-			this._setPropertyValue(property.alias, target.value);
-		} else {
-			console.error('property was not found', target.alias);
-		}
-
-		// We need to stop the event, so it does not bubble up to parent workspace contexts.
-		e.stopPropagation();
-	};
-
-	private _setPropertyValue(alias: string, value: unknown) {
+	public setPropertyValue(alias: string, value: unknown) {
 		const newDataSet = this.getData().data.map((entry) => {
 			if (entry.alias === alias) {
 				return {alias: alias, value: value};
@@ -162,7 +145,6 @@ export class UmbWorkspaceContentContext<
 
 	// TODO: how can we make sure to call this.
 	public destroy(): void {
-		this._host.removeEventListener('property-value-change', this._onPropertyValueChange);
 		this._data.unsubscribe();
 	}
 }

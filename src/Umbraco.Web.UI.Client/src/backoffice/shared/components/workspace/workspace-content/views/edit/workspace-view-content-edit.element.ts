@@ -2,12 +2,12 @@ import { css, html } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, state } from 'lit/decorators.js';
 import { distinctUntilChanged } from 'rxjs';
+import { repeat } from 'lit/directives/repeat.js';
 import type { UmbWorkspaceContentContext } from '../../workspace-content.context';
 import type { ContentProperty, ContentPropertyData, DocumentDetails, MediaDetails } from '@umbraco-cms/models';
 
 import '../../../../content-property/content-property.element';
 import { UmbLitElement } from '@umbraco-cms/element';
-import { repeat } from 'lit/directives/repeat.js';
 
 @customElement('umb-workspace-view-content-edit')
 export class UmbWorkspaceViewContentEditElement extends UmbLitElement {

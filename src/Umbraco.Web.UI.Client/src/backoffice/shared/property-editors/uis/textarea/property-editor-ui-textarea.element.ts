@@ -28,15 +28,12 @@ export class UmbPropertyEditorUITextareaElement extends UmbLitElement {
 
 		this.consumeContext('umbPropertyContext', (instance: UmbWorkspacePropertyContext<string>) => {
 			this.propertyContext = instance;
-			this.observe(this.propertyContext.value, (value) => {
-				console.log("Context says value changed", value);
-			});
 		});
 	}
 
 	private onInput(e: InputEvent) {
 		this.value = (e.target as HTMLInputElement).value;
-		this.dispatchEvent(new CustomEvent('property-editor-value-change', { bubbles: true, composed: true }));
+		this.dispatchEvent(new CustomEvent('change', { bubbles: true, composed: true }));
 	}
 
 	render() {

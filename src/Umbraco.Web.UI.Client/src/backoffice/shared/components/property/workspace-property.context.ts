@@ -1,8 +1,10 @@
 import { distinctUntilChanged, map, Observable, shareReplay } from "rxjs";
+import { UmbWorkspaceContentContext } from "../workspace/workspace-content/workspace-content.context";
 import type { DataTypeDetails } from "@umbraco-cms/models";
 import { UmbControllerHostInterface } from "src/core/controller/controller-host.mixin";
 import { naiveObjectComparison, UniqueBehaviorSubject } from "src/core/observable-api/unique-behavior-subject";
 import { UmbContextProviderController } from "src/core/context-api/provide/context-provider.controller";
+import { UmbContextConsumerController } from "src/core/context-api/consume/context-consumer.controller";
 
 
 
@@ -26,9 +28,10 @@ export function CreateObservablePart<T, R> (
 	return source$.pipe(
 	  map(mappingFunction),
 	  distinctUntilChanged(memoizationFunction || defaultMemoization),
-	  shareReplay(1) // TODO: investigate what happens if this was removed. (its suppose to only give the first subscriber the current value, but i want to test this)
+	  shareReplay(1)
 	)
 }
+
 
 
 
@@ -43,7 +46,6 @@ export type WorkspacePropertyData<ValueType> = {
 
 export class UmbWorkspacePropertyContext<ValueType> {
 
-	//private _host: UmbControllerHostInterface;
 
 	private _providerController: UmbContextProviderController;
 
@@ -55,53 +57,46 @@ export class UmbWorkspacePropertyContext<ValueType> {
 	public readonly value = CreateObservablePart(this._data, data => data.value);
 	public readonly config = CreateObservablePart(this._data, data => data.config);
 
+	private _workspaceContext?: UmbWorkspaceContentContext;
+
+
 	constructor(host:UmbControllerHostInterface) {
 
-		//this._host = host;
-
-		// TODO: How do we connect this value with parent context?
-		// Ensuring the property editor value-property is updated...
-		// How about consuming a workspace context? When received maybe assuming these will fit or test if it likes to accept this property..
+		new UmbContextConsumerController(host, 'umbWorkspaceContext', (workspaceContext) => {
+			this._workspaceContext = workspaceContext;
+		});
 
 		this._providerController = new UmbContextProviderController(host, 'umbPropertyContext', this);
+
 	
 	}
-
-	/*public getData() {
-		return this._data.getValue();
-	}*/
-
-
-
-	public update(data: Partial<WorkspacePropertyData<ValueType>>) {
-		this._data.next({ ...this._data.getValue(), ...data });
-	}
-
 	
 	public setAlias(alias: WorkspacePropertyData<ValueType>['alias']) {
-		this.update({alias: alias});
-	}
-	public getAlias() {
-		return this._data.getValue().alias;
+		this._data.update({alias: alias});
 	}
 	public setLabel(label: WorkspacePropertyData<ValueType>['label']) {
-		this.update({label: label});
+		this._data.update({label: label});
 	}
 	public setDescription(description: WorkspacePropertyData<ValueType>['description']) {
-		this.update({description: description});
+		this._data.update({description: description});
 	}
 	public setValue(value: WorkspacePropertyData<ValueType>['value']) {
-		this.update({value: value});
-	}
-	public getValue() {
-		return this._data.getValue().value;
+
+		if(value === this._data.getValue().value) return;
+
+		this._data.update({value: value});
+
+		const alias = this._data.getValue().alias;
+		if(alias) {
+			this._workspaceContext?.setPropertyValue(alias, value);
+		}
 	}
 	public setConfig(config: WorkspacePropertyData<ValueType>['config']) {
-		this.update({config: config});
+		this._data.update({config: config});
 	}
 
 	public resetValue() {
-		this.update({value: null});
+		this.setValue(null);
 	}
 
 	// TODO: how can we make sure to call this.
