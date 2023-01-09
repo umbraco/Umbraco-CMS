@@ -1,7 +1,6 @@
 import { css, html } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, state } from 'lit/decorators.js';
-import { BehaviorSubject, Observable } from 'rxjs';
 import type { IRoute, IRoutingInfo } from 'router-slot';
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
 
@@ -13,6 +12,7 @@ import type { ManifestWorkspace, UserDetails } from '@umbraco-cms/models';
 import { UmbUserStore } from 'src/backoffice/users/users/user.store';
 import { createExtensionElement } from '@umbraco-cms/extensions-api';
 import { UmbLitElement } from '@umbraco-cms/element';
+import { UniqueBehaviorSubject } from 'src/core/observable-api/unique-behavior-subject';
 
 @customElement('umb-section-view-users')
 export class UmbSectionViewUsersElement extends UmbLitElement {
@@ -29,16 +29,20 @@ export class UmbSectionViewUsersElement extends UmbLitElement {
 	private _routes: IRoute[] = [];
 
 	private _workspaces: Array<ManifestWorkspace> = [];
+
+
+	// TODO: This must be turned into context api: Maybe its a Collection View (SectionView Collection View)?
 	private _userStore?: UmbUserStore;
 
-	private _selection: BehaviorSubject<Array<string>> = new BehaviorSubject(<Array<string>>[]);
-	public readonly selection: Observable<Array<string>> = this._selection.asObservable();
+	#selection = new UniqueBehaviorSubject(<Array<string>>[]);
+	public readonly selection = this.#selection.asObservable();
 
-	private _users: BehaviorSubject<Array<UserDetails>> = new BehaviorSubject(<Array<UserDetails>>[]);
-	public readonly users: Observable<Array<UserDetails>> = this._users.asObservable();
+	#users = new UniqueBehaviorSubject(<Array<UserDetails>>[]);
+	public readonly users = this.#users.asObservable();
 
-	private _search: BehaviorSubject<string> = new BehaviorSubject('');
-	public readonly search: Observable<string> = this._search.asObservable();
+	#search = new UniqueBehaviorSubject('');
+	public readonly search = this.#search.asObservable();
+
 
 	constructor() {
 		super();
@@ -92,38 +96,38 @@ export class UmbSectionViewUsersElement extends UmbLitElement {
 	private _observeUsers() {
 		if (!this._userStore) return;
 
-		if (this._search.getValue()) {
-			this.observe(this._userStore.getByName(this._search.getValue()), (users) =>
-				this._users.next(users)
+		if (this.#search.getValue()) {
+			this.observe(this._userStore.getByName(this.#search.getValue()), (users) =>
+				this.#users.next(users)
 			);
 		} else {
-			this.observe(this._userStore.getAll(), (users) => this._users.next(users));
+			this.observe(this._userStore.getAll(), (users) => this.#users.next(users));
 		}
 	}
 
-	public setSearch(value: string) {
-		if (!value) value = '';
-
-		this._search.next(value);
+	public setSearch(value?: string) {
+		this.#search.next(value || '');
 		this._observeUsers();
 		this.requestUpdate('search');
 	}
 
 	public setSelection(value: Array<string>) {
 		if (!value) return;
-		this._selection.next(value);
+		this.#selection.next(value);
 		this.requestUpdate('selection');
 	}
 
 	public select(key: string) {
-		const selection = this._selection.getValue();
-		this._selection.next([...selection, key]);
+		const oldSelection = this.#selection.getValue();
+		if(oldSelection.indexOf(key) !== -1) return;
+
+		this.#selection.next([...oldSelection, key]);
 		this.requestUpdate('selection');
 	}
 
 	public deselect(key: string) {
-		const selection = this._selection.getValue();
-		this._selection.next(selection.filter((k) => k !== key));
+		const selection = this.#selection.getValue();
+		this.#selection.next(selection.filter((k) => k !== key));
 		this.requestUpdate('selection');
 	}
 
