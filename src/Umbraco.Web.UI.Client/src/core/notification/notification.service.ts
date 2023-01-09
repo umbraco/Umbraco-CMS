@@ -1,4 +1,4 @@
-import { BehaviorSubject, Observable } from 'rxjs';
+import { UniqueBehaviorSubject } from '../observable-api/unique-behavior-subject';
 import { UmbNotificationHandler } from '.';
 
 export type UmbNotificationData = any;
@@ -18,10 +18,8 @@ export interface UmbNotificationOptions<UmbNotificationData> {
 export type UmbNotificationColor = '' | 'default' | 'positive' | 'warning' | 'danger';
 
 export class UmbNotificationService {
-	private _notifications: BehaviorSubject<Array<UmbNotificationHandler>> = new BehaviorSubject(
-		<Array<UmbNotificationHandler>>[]
-	);
-	public readonly notifications: Observable<Array<UmbNotificationHandler>> = this._notifications.asObservable();
+	private _notifications = new UniqueBehaviorSubject(<Array<UmbNotificationHandler>>[]);
+	public readonly notifications = this._notifications.asObservable();
 
 	/**
 	 * @private
