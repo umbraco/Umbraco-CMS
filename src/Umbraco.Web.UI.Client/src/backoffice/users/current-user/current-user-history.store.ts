@@ -9,6 +9,7 @@ export type UmbCurrentUserHistoryItem = {
 };
 
 export class UmbCurrentUserHistoryStore {
+	
 	#history = new UniqueBehaviorSubject(
 		<Array<UmbCurrentUserHistoryItem>>[]
 	);

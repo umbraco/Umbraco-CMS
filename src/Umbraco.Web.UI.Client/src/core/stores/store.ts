@@ -1,4 +1,5 @@
-import { BehaviorSubject, Observable } from 'rxjs';
+import type { Observable } from 'rxjs';
+import { UniqueBehaviorSubject } from '../observable-api/unique-behavior-subject';
 
 export interface UmbDataStoreIdentifiers {
 	key?: string;
@@ -26,8 +27,8 @@ export interface UmbTreeDataStore<T> extends UmbDataStore<T> {
 export abstract class UmbDataStoreBase<T extends UmbDataStoreIdentifiers> implements UmbDataStore<T> {
 	public abstract readonly storeAlias: string;
 
-	protected _items: BehaviorSubject<Array<T>> = new BehaviorSubject(<Array<T>>[]);
-	public readonly items: Observable<Array<T>> = this._items.asObservable();
+	protected _items = new UniqueBehaviorSubject(<Array<T>>[]);
+	public readonly items = this._items.asObservable();
 
 	/**
 	 * @description - Delete items from the store.
