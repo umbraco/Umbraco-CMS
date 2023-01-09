@@ -19,6 +19,9 @@ export class UmbTreeItem extends UmbLitElement {
 	key = '';
 
 	@property({ type: String })
+	parentKey: string | null = null;
+
+	@property({ type: String })
 	label = '';
 
 	@property({ type: String })
@@ -121,8 +124,8 @@ export class UmbTreeItem extends UmbLitElement {
 	private _observeActiveTreeItem() {
 		if (!this._sectionContext) return;
 
-		this.observe(this._sectionContext?.activeTreeItemKey, (key) => {
-			this._isActive = this.key === key;
+		this.observe(this._sectionContext?.activeTreeItem, (treeItem) => {
+			this._isActive = this.key === treeItem?.key;
 		});
 	}
 
@@ -171,7 +174,15 @@ export class UmbTreeItem extends UmbLitElement {
 		if (!this._treeContext || !this._sectionContext) return;
 
 		this._sectionContext?.setActiveTree(this._treeContext?.tree);
-		this._sectionContext?.setActiveTreeItemKey(this.key);
+
+		this._sectionContext?.setActiveTreeItem({
+			key: this.key,
+			name: this.label,
+			icon: this.icon,
+			type: this.entityType,
+			hasChildren: this.hasChildren,
+			parentKey: this.parentKey,
+		});
 		this._treeContextMenuService?.open({ name: this.label, key: this.key });
 	}
 
