@@ -6,12 +6,12 @@ import { IRoutingInfo } from 'router-slot';
 import type { UmbWorkspaceEntityElement } from '../workspace/workspace-entity-element.interface';
 import { UmbSectionContext } from './section.context';
 import { createExtensionElement } from '@umbraco-cms/extensions-api';
-import type { ManifestTree, ManifestSectionView, ManifestWorkspace } from '@umbraco-cms/models';
-
-import './section-trees/section-trees.element.ts';
-import './section-views/section-views.element.ts';
+import type { ManifestSectionView, ManifestWorkspace, ManifestSidebarMenuItem } from '@umbraco-cms/models';
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
 import { UmbLitElement } from '@umbraco-cms/element';
+
+import './section-sidebar-menu/section-sidebar-menu.element.ts';
+import './section-views/section-views.element.ts';
 
 @customElement('umb-section')
 export class UmbSectionElement extends UmbLitElement {
@@ -36,7 +36,7 @@ export class UmbSectionElement extends UmbLitElement {
 	private _routes: Array<any> = [];
 
 	@state()
-	private _trees?: Array<ManifestTree>;
+	private _menuItems?: Array<ManifestSidebarMenuItem>;
 
 	private _workspaces?: Array<ManifestWorkspace>;
 
@@ -52,12 +52,12 @@ export class UmbSectionElement extends UmbLitElement {
 			this._sectionContext = instance;
 
 			// TODO: currently they don't corporate, as they overwrite each other...
-			this._observeTrees();
+			this._observeMenuItems();
 			this._observeViews();
 		});
 	}
 
-	private _observeTrees() {
+	private _observeMenuItems() {
 		if (!this._sectionContext) return;
 
 		this.observe(
@@ -66,53 +66,74 @@ export class UmbSectionElement extends UmbLitElement {
 					if (!section) return EMPTY;
 					return (
 						umbExtensionsRegistry
-							?.extensionsOfType('tree')
-							.pipe(map((trees) => trees.filter((tree) => tree.meta.sections.includes(section.alias)))) ?? of([])
+							?.extensionsOfType('sidebarMenuItem')
+							.pipe(
+								map((manifests) => manifests.filter((manifest) => manifest.meta.sections.includes(section.alias)))
+							) ?? of([])
 					);
 				})
 			),
-			(trees) => {
-				this._trees = trees;
-				this._createTreeRoutes();
+			(manifests) => {
+				this._menuItems = manifests;
+				this._createMenuRoutes();
 			}
 		);
 
 		this.observe(umbExtensionsRegistry.extensionsOfType('workspace'), (workspaceExtensions) => {
 			this._workspaces = workspaceExtensions;
-			this._createTreeRoutes();
+			this._createMenuRoutes();
 		});
 	}
 
-	private _createTreeRoutes() {
-		const routes: any[] = [
+	private _createMenuRoutes() {
+		// TODO: find a way to make this reuseable across:
+		const workspaceRoutes = this._workspaces?.map((workspace: ManifestWorkspace) => {
+			return [
+				{
+					path: `${workspace.meta.entityType}/edit/:key`,
+					component: () => createExtensionElement(workspace),
+					setup: (component: Promise<UmbWorkspaceEntityElement>, info: IRoutingInfo) => {
+						component.then((el) => {
+							el.entityKey = info.match.params.key;
+						});
+					},
+				},
+				{
+					path: `${workspace.meta.entityType}/create/root`,
+					component: () => createExtensionElement(workspace),
+					setup: (component: Promise<UmbWorkspaceEntityElement>) => {
+						component.then((el) => {
+							el.create = null;
+						});
+					},
+				},
+				{
+					path: `${workspace.meta.entityType}/create/:parentKey`,
+					component: () => createExtensionElement(workspace),
+					setup: (component: Promise<UmbWorkspaceEntityElement>, info: IRoutingInfo) => {
+						component.then((el) => {
+							el.create = info.match.params.parentKey;
+						});
+					},
+				},
+				{
+					path: workspace.meta.entityType,
+					component: () => createExtensionElement(workspace),
+				},
+			];
+		});
+
+		this._routes = [
 			{
 				path: 'dashboard',
 				component: () => import('./section-dashboards/section-dashboards.element'),
 			},
+			...(workspaceRoutes?.flat() || []),
+			{
+				path: '**',
+				redirectTo: 'dashboard',
+			},
 		];
-
-		// TODO: find a way to make this reuseable across:
-		this._workspaces?.map((workspace: ManifestWorkspace) => {
-			routes.push({
-				path: `${workspace.meta.entityType}/:key`,
-				component: () => createExtensionElement(workspace),
-				setup: (component: Promise<UmbWorkspaceEntityElement>, info: IRoutingInfo) => {
-					component.then((el) => {
-						el.entityKey = info.match.params.key;
-					});
-				},
-			});
-			routes.push({
-				path: workspace.meta.entityType,
-				component: () => createExtensionElement(workspace),
-			});
-		});
-
-		routes.push({
-			path: '**',
-			redirectTo: 'dashboard',
-		});
-		this._routes = routes;
 	}
 
 	private _observeViews() {
@@ -137,7 +158,7 @@ export class UmbSectionElement extends UmbLitElement {
 				})
 			),
 			(views) => {
-				if(views.length > 0) {
+				if (views.length > 0) {
 					this._views = views;
 					this._createViewRoutes();
 				}
@@ -157,7 +178,7 @@ export class UmbSectionElement extends UmbLitElement {
 				};
 			}) ?? [];
 
-		if(this._views && this._views.length > 0) {
+		if (this._views && this._views.length > 0) {
 			this._routes.push({
 				path: '**',
 				redirectTo: 'view/' + this._views?.[0]?.meta.pathname,
@@ -167,17 +188,15 @@ export class UmbSectionElement extends UmbLitElement {
 
 	render() {
 		return html`
-			${this._trees && this._trees.length > 0
+			${this._menuItems && this._menuItems.length > 0
 				? html`
-					<umb-section-sidebar>
-						<umb-section-trees></umb-section-trees>
-					</umb-section-sidebar>
+						<umb-section-sidebar>
+							<umb-section-sidebar-menu></umb-section-sidebar-menu>
+						</umb-section-sidebar>
 				  `
 				: nothing}
 			<umb-section-main>
-				${this._views && this._views.length > 0
-					? html`<umb-section-views></umb-section-views>`
-					: nothing}
+				${this._views && this._views.length > 0 ? html`<umb-section-views></umb-section-views>` : nothing}
 				${this._routes && this._routes.length > 0
 					? html`<router-slot id="router-slot" .routes="${this._routes}"></router-slot>`
 					: nothing}

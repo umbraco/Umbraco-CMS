@@ -32,7 +32,7 @@ const DefaultMediaData = {
 } as UmbMediaStoreItemType;
 
 export class UmbWorkspaceMediaContext extends UmbWorkspaceContentContext<UmbMediaStoreItemType, UmbMediaStore> {
-	constructor(host: UmbControllerHostInterface, entityKey: string) {
-		super(host, DefaultMediaData, 'umbMediaStore', entityKey, 'media');
+	constructor(host: UmbControllerHostInterface) {
+		super(host, DefaultMediaData, 'umbMediaStore', 'media');
 	}
 }

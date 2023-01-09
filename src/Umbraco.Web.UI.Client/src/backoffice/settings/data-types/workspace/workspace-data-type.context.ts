@@ -7,7 +7,7 @@ const DefaultDataTypeData = {
 	key: '',
 	name: '',
 	icon: '',
-	type: 'dataType',
+	type: 'data-type',
 	hasChildren: false,
 	parentKey: '',
 	propertyEditorModelAlias: '',
@@ -15,9 +15,12 @@ const DefaultDataTypeData = {
 	data: [],
 } as UmbDataTypeStoreItemType;
 
-export class UmbWorkspaceDataTypeContext extends UmbWorkspaceContentContext<UmbDataTypeStoreItemType, UmbDataTypeStore> {
-	constructor(host: UmbControllerHostInterface, entityKey: string) {
-		super(host, DefaultDataTypeData, 'umbDataTypeStore', entityKey, 'dataType');
+export class UmbWorkspaceDataTypeContext extends UmbWorkspaceContentContext<
+	UmbDataTypeStoreItemType,
+	UmbDataTypeStore
+> {
+	constructor(host: UmbControllerHostInterface) {
+		super(host, DefaultDataTypeData, 'umbDataTypeStore', 'dataType');
 	}
 
 	public setPropertyValue(propertyAlias: string, value: any) {

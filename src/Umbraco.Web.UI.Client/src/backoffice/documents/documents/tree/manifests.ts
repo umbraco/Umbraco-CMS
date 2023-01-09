@@ -6,12 +6,8 @@ const tree: ManifestTree = {
 	type: 'tree',
 	alias: treeAlias,
 	name: 'Documents Tree',
-	weight: 100,
 	meta: {
-		label: 'Documents',
-		icon: 'umb:folder',
-		sections: ['Umb.Section.Content'],
-		storeContextAlias: 'umbDocumentStore',
+		storeAlias: 'umbDocumentStore',
 	},
 };
 
@@ -23,7 +19,7 @@ const treeItemActions: Array<ManifestTreeItemAction> = [
 		loader: () => import('./actions/action-document-create.element'),
 		weight: 100,
 		meta: {
-			trees: [treeAlias],
+			entityType: 'document',
 			label: 'Create',
 			icon: 'add',
 		},
@@ -35,7 +31,7 @@ const treeItemActions: Array<ManifestTreeItemAction> = [
 		loader: () => import('./actions/action-document-delete.element'),
 		weight: 100,
 		meta: {
-			trees: [treeAlias],
+			entityType: 'document',
 			label: 'Delete',
 			icon: 'delete',
 		},
@@ -47,7 +43,7 @@ const treeItemActions: Array<ManifestTreeItemAction> = [
 		loader: () => import('./actions/action-document-paged.element'),
 		weight: 100,
 		meta: {
-			trees: [treeAlias],
+			entityType: 'document',
 			label: 'Paged',
 			icon: 'favorite',
 		},

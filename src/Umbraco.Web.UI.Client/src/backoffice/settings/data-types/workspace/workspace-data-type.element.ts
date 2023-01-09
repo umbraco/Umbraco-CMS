@@ -36,10 +36,17 @@ export class UmbWorkspaceDataTypeElement extends UmbLitElement {
 	}
 	public set entityKey(value: string) {
 		this._entityKey = value;
-		this._provideWorkspace();
+		if (this._entityKey) {
+			this._workspaceContext.load(this._entityKey);
+		}
 	}
 
-	private _workspaceContext?: UmbWorkspaceDataTypeContext;
+	@property()
+	public set create(parentKey: string | null) {
+		this._workspaceContext.create(parentKey);
+	}
+
+	private _workspaceContext: UmbWorkspaceDataTypeContext = new UmbWorkspaceDataTypeContext(this);
 
 	@state()
 	private _dataTypeName = '';
@@ -47,19 +54,7 @@ export class UmbWorkspaceDataTypeElement extends UmbLitElement {
 	constructor() {
 		super();
 		this.addEventListener('property-value-change', this._onPropertyValueChange);
-	}
-
-	protected _provideWorkspace() {
-		if (this._entityKey) {
-			this._workspaceContext = new UmbWorkspaceDataTypeContext(this, this._entityKey);
-			this.provideContext('umbWorkspaceContext', this._workspaceContext);
-			this._observeWorkspace();
-		}
-	}
-
-	private _observeWorkspace() {
-		if (!this._workspaceContext) return;
-
+		this.provideContext('umbWorkspaceContext', this._workspaceContext);
 		this.observe(this._workspaceContext.data.pipe(distinctUntilChanged()), (dataType) => {
 			if (dataType && dataType.name !== this._dataTypeName) {
 				this._dataTypeName = dataType.name ?? '';
@@ -69,7 +64,7 @@ export class UmbWorkspaceDataTypeElement extends UmbLitElement {
 
 	private _onPropertyValueChange = (e: Event) => {
 		const target = e.composedPath()[0] as any;
-		this._workspaceContext?.setPropertyValue(target?.alias, target?.value);
+		this._workspaceContext.setPropertyValue(target?.alias, target?.value);
 	};
 
 	// TODO. find a way where we don't have to do this for all Workspaces.
@@ -78,7 +73,7 @@ export class UmbWorkspaceDataTypeElement extends UmbLitElement {
 			const target = event.composedPath()[0] as UUIInputElement;
 
 			if (typeof target?.value === 'string') {
-				this._workspaceContext?.update({ name: target.value });
+				this._workspaceContext.update({ name: target.value });
 			}
 		}
 	}
