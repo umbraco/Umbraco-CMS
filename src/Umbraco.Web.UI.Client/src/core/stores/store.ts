@@ -43,7 +43,7 @@ export abstract class UmbDataStoreBase<T extends UmbDataStoreIdentifiers> implem
 
 
 	/**
-	 * @description - Update the store with new items. Existing items are updated, new items are added. Existing items are matched by the compareKey.
+	 * @description - Update the store with new items. Existing items are updated, new items are added, old are kept. Items are matched by the compareKey.
 	 * @param {Array<T>} items
 	 * @param {keyof T} [compareKey='key']
 	 * @memberof UmbDataStoreBase
