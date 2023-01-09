@@ -6,7 +6,7 @@ import { customElement, property, state } from 'lit/decorators.js';
 import { UmbDataTypeStore } from '../../../settings/data-types/data-type.store';
 import type { ContentProperty } from '@umbraco-cms/models';
 
-import '../property/property.element';
+import '../workspace-property/workspace-property.element';
 import { UmbLitElement } from '@umbraco-cms/element';
 
 @customElement('umb-content-property')
@@ -63,13 +63,13 @@ export class UmbContentPropertyElement extends UmbLitElement {
 	}
 
 	render() {
-		return html`<umb-property
+		return html`<umb-workspace-property
 			label=${ifDefined(this.property?.label)}
 			description=${ifDefined(this.property?.description)}
 			alias="${ifDefined(this.property?.alias)}"
 			property-editor-ui-alias="${ifDefined(this._propertyEditorUIAlias)}"
 			.value=${this.value}
-			.config=${this._dataTypeData}></umb-property>`;
+			.config=${this._dataTypeData}></umb-workspace-property>`;
 	}
 }
 

@@ -5,7 +5,7 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import type { PropertyEditorConfigDefaultData, PropertyEditorConfigProperty } from '@umbraco-cms/models';
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
 
-import '../../../components/property/property.element';
+import '../../../components/workspace-property/workspace-property.element';
 import { UmbLitElement } from '@umbraco-cms/element';
 
 /**
@@ -104,12 +104,12 @@ export class UmbPropertyEditorConfigElement extends UmbLitElement {
 				? html`
 						${this._properties?.map(
 							(property) => html`
-								<umb-property
+								<umb-workspace-property
 									label="${property.label}"
 									description="${ifDefined(property.description)}"
 									alias="${property.alias}"
 									property-editor-ui-alias="${property.propertyEditorUI}"
-									.value=${this._getValue(property)}></umb-property>
+									.value=${this._getValue(property)}></umb-workspace-property>
 							`
 						)}
 				  `

@@ -13,13 +13,13 @@ import { UmbObserverController } from 'src/core/observable-api/observer.controll
 import { UmbLitElement } from '@umbraco-cms/element';
 
 /**
- *  @element umb-property
+ *  @element umb-workspace-property
  *  @description - Component for displaying a entity property. The Element will render a Property Editor based on the Property Editor UI alias passed to the element.
  *  The element will also render all Property Actions related to the Property Editor.
  */
 
-@customElement('umb-property')
-export class UmbPropertyElement extends UmbLitElement {
+@customElement('umb-workspace-property')
+export class UmbWorkspacePropertyElement extends UmbLitElement {
 	static styles = [
 		UUITextStyles,
 		css`
@@ -221,6 +221,6 @@ export class UmbPropertyElement extends UmbLitElement {
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-property': UmbPropertyElement;
+		'umb-workspace-property': UmbWorkspacePropertyElement;
 	}
 }
