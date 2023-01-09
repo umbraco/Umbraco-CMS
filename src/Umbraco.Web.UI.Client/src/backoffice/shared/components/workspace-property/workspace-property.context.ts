@@ -96,7 +96,7 @@ export class UmbWorkspacePropertyContext<ValueType = unknown> {
 	}
 
 	public resetValue() {
-		this.setValue(null);
+		this.setValue(null);// TODO: Consider if this can be configured/provided from Property Editor or DataType Configuration or even locally specified in DocumentType.
 	}
 
 	// TODO: how can we make sure to call this.

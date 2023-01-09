@@ -37,10 +37,10 @@ export class UmbPropertyActionClearElement extends UmbLitElement implements UmbP
 
 	private _clearValue() {
 		// TODO: how do we want to update the value? Testing an event based approach. We need to test an api based approach too.
-		//this.value = '';
+		//this.value = '';// This is though bad as it assumes we are dealing with a string. So wouldn't work as a generalized element.
 		//this.dispatchEvent(new CustomEvent('change', { bubbles: true, composed: true }));
 		// Or you can do this:
-		this._propertyContext?.resetValue('');
+		this._propertyContext?.resetValue();// This resets value to what the property wants.
 	}
 
 	render() {
