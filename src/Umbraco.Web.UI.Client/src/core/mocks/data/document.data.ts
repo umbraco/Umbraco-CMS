@@ -96,6 +96,12 @@ export const data: Array<DocumentDetails> = [
 				description: '',
 				dataTypeKey: 'dt-tags',
 			},
+			{
+				alias: 'markdownEditor',
+				label: 'MarkdownEditor',
+				description: '',
+				dataTypeKey: 'dt-markdownEditor',
+			},
 		],
 		data: [],
 		variants: [],

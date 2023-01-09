@@ -13,6 +13,7 @@ import { manifest as textArea } from './Umbraco.TextArea';
 import { manifest as slider } from './Umbraco.Slider';
 import { manifest as trueFalse } from './Umbraco.TrueFalse';
 import { manifest as tags } from './Umbraco.Tags';
+import { manifest as markdownEditor } from './Umbraco.MarkdownEditor';
 
 import type { ManifestPropertyEditorModel } from '@umbraco-cms/models';
 
@@ -32,6 +33,7 @@ export const manifests: Array<ManifestPropertyEditorModel> = [
 	slider,
 	trueFalse,
 	tags,
+	markdownEditor,
 	{
 		type: 'propertyEditorModel',
 		name: 'Decimal',
@@ -48,12 +50,6 @@ export const manifests: Array<ManifestPropertyEditorModel> = [
 		type: 'propertyEditorModel',
 		name: 'Numeric',
 		alias: 'Umbraco.Integer',
-		meta: {},
-	},
-	{
-		type: 'propertyEditorModel',
-		name: 'Markdown editor',
-		alias: 'Umbraco.MarkdownEditor',
 		meta: {},
 	},
 	{

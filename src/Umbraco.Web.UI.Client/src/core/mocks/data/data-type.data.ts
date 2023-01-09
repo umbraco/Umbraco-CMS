@@ -252,6 +252,19 @@ export const data: Array<DataTypeDetails> = [
 		propertyEditorUIAlias: 'Umb.PropertyEditorUI.Tags',
 		data: [],
 	},
+	{
+		name: 'Markdown Editor',
+		type: 'data-type',
+		icon: 'umb:autofill',
+		hasChildren: false,
+		key: 'dt-markdownEditor',
+		isContainer: false,
+		parentKey: null,
+		isFolder: false,
+		propertyEditorModelAlias: 'Umbraco.MarkdownEditor',
+		propertyEditorUIAlias: 'Umb.PropertyEditorUI.MarkdownEditor',
+		data: [],
+	},
 ];
 
 // Temp mocked database
