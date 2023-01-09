@@ -24,11 +24,10 @@ export interface Entity {
 	parentKey: string | null;
 }
 
-export interface ContentDetails {
-	key: string; // TODO: Remove this when the backend is fixed
+export interface ContentDetails extends ContentTreeItem {
 	isTrashed: boolean; // TODO: remove only temp part of refactor
 	properties: Array<ContentProperty>;
-	data: Array<ContentPropertyData>;
+	//data: Array<ContentPropertyData>;
 	//layout?: any; // TODO: define layout type - make it non-optional
 }
 
@@ -103,7 +102,7 @@ export interface ContentPropertyData {
 }
 
 // Documents
-export interface DocumentDetails extends DocumentTreeItem, ContentDetails {
+export interface DocumentDetails extends DocumentTreeItem {
 	key: string; // TODO: Remove this when the backend is fixed
 	isTrashed: boolean; // TODO: remove only temp part of refactor
 	properties: Array<ContentProperty>;

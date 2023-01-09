@@ -1,7 +1,8 @@
 import { UmbWorkspaceContentContext } from '../../../shared/components/workspace/workspace-content/workspace-content.context';
-import { STORE_ALIAS } from 'src/backoffice/documents/documents/document.store';
+import { isDocumentDetails, STORE_ALIAS } from 'src/backoffice/documents/documents/document.store';
 import type { UmbDocumentStore, UmbDocumentStoreItemType } from 'src/backoffice/documents/documents/document.store';
 import { UmbControllerHostInterface } from 'src/core/controller/controller-host.mixin';
+import type { DocumentDetails } from '@umbraco-cms/models';
 
 const DefaultDocumentData = {
 	key: '',
@@ -37,7 +38,22 @@ export class UmbWorkspaceDocumentContext extends UmbWorkspaceContentContext<UmbD
 		super(host, DefaultDocumentData, STORE_ALIAS, 'document');
 	}
 
+	public setPropertyValue(alias: string, value: unknown) {
+		const data = this.getData();
+		// TODO: make sure to check that we have a details model:
+		// TODO: make a Method to cast
+		if(isDocumentDetails(data)) {
+			const newDataSet = (data as DocumentDetails).data.map((entry) => {
+				if (entry.alias === alias) {
+					return {alias: alias, value: value};
+				}
+				return entry;
+			});
 
+
+			this.update({data: newDataSet} as Partial<UmbDocumentStoreItemType>);
+		}
+	}
 
 	/*
 	concept notes:

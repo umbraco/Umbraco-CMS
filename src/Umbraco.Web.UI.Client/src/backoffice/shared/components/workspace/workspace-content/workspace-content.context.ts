@@ -7,12 +7,12 @@ import { UmbControllerHostInterface } from 'src/core/controller/controller-host.
 import { UmbContextConsumerController } from 'src/core/context-api/consume/context-consumer.controller';
 import { UmbObserverController } from '@umbraco-cms/observable-api';
 import { UmbContextProviderController } from 'src/core/context-api/provide/context-provider.controller';
-import type { ContentDetails } from '@umbraco-cms/models';
+import { EntityTreeItem } from '@umbraco-cms/backend-api';
 
 // TODO: Consider if its right to have this many class-inheritance of WorkspaceContext
 // TODO: Could we extract this code into a 'Manager' of its own, which will be instantiated by the concrete Workspace Context. This will be more transparent and 'reuseable'
-export class UmbWorkspaceContentContext<
-	ContentTypeType extends ContentDetails = ContentDetails,
+export abstract class UmbWorkspaceContentContext<
+	ContentTypeType extends EntityTreeItem = EntityTreeItem,
 	StoreType extends UmbNodeStoreBase<ContentTypeType> = UmbNodeStoreBase<ContentTypeType>
 > {
 
@@ -108,21 +108,8 @@ export class UmbWorkspaceContentContext<
 		return this._store;
 	}
 
+	abstract setPropertyValue(alias: string, value: unknown):void;
 
-
-
-	
-	public setPropertyValue(alias: string, value: unknown) {
-		const newDataSet = this.getData().data.map((entry) => {
-			if (entry.alias === alias) {
-				return {alias: alias, value: value};
-			}
-			return entry;
-		});
-
-
-		this.update({data: newDataSet} as Partial<ContentTypeType>);
-	}
 
 	public save(): Promise<void> {
 		if(!this._store) {

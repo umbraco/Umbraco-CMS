@@ -23,4 +23,9 @@ export class UmbWorkspaceDocumentTypeContext extends UmbWorkspaceContentContext<
 	constructor(host: UmbControllerHostInterface) {
 		super(host, DefaultDocumentTypeData, 'umbDocumentTypeStore', 'documentType');
 	}
+
+
+	public setPropertyValue(alias: string, value: unknown) {
+		throw new Error("setPropertyValue is not implemented for UmbWorkspaceDocumentTypeContext")
+	}
 }

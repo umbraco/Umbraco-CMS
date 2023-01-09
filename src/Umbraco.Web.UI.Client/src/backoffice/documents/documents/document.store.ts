@@ -3,7 +3,7 @@ import { UmbNodeStoreBase } from '../../../core/stores/store';
 import type { DocumentDetails } from '@umbraco-cms/models';
 import { ApiError, DocumentResource, DocumentTreeItem, FolderTreeItem, ProblemDetails } from '@umbraco-cms/backend-api';
 
-const isDocumentDetails = (document: DocumentDetails | DocumentTreeItem): document is DocumentDetails => {
+export const isDocumentDetails = (document: DocumentDetails | DocumentTreeItem): document is DocumentDetails => {
 	return (document as DocumentDetails).data !== undefined;
 };
 

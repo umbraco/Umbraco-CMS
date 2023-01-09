@@ -35,4 +35,8 @@ export class UmbWorkspaceMediaContext extends UmbWorkspaceContentContext<UmbMedi
 	constructor(host: UmbControllerHostInterface) {
 		super(host, DefaultMediaData, 'umbMediaStore', 'media');
 	}
+
+	public setPropertyValue(alias: string, value: unknown) {
+		throw new Error("setPropertyValue is not implemented for UmbWorkspaceMediaContext")
+	}
 }

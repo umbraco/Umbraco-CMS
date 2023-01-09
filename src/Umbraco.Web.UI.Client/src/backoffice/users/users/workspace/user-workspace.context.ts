@@ -24,4 +24,8 @@ export class UmbWorkspaceUserContext extends UmbWorkspaceContentContext<UmbUserS
 	constructor(host: UmbControllerHostInterface) {
 		super(host, DefaultDataTypeData, 'umbUserStore', 'user');
 	}
+
+	public setPropertyValue(alias: string, value: unknown) {
+		throw new Error("setPropertyValue is not implemented for UmbWorkspaceUserContext")
+	}
 }
