@@ -87,7 +87,7 @@ public interface IPublishedContent : IPublishedElement
     ///         have a non-empty content name.
     ///     </para>
     ///     <para>Does not contain the invariant culture.</para>
-    ///     // fixme?
+    ///     // TODO?
     /// </remarks>
     IReadOnlyDictionary<string, PublishedCultureInfo> Cultures { get; }
 
