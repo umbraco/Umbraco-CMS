@@ -334,7 +334,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Install
 
                 // upgrade
                 var upgrader = new Upgrader(plan);
-                ExecutedMigrationPlan result= upgrader.Execute(_migrationPlanExecutor, _scopeProvider, _keyValueService);
+                ExecutedMigrationPlan result = upgrader.Execute(_migrationPlanExecutor, _scopeProvider, _keyValueService);
 
                 _aggregator.Publish(new UmbracoPlanExecutedNotification { ExecutedPlan = result });
 

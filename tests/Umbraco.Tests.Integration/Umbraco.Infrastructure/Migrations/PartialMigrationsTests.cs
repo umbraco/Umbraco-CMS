@@ -1,9 +1,14 @@
-﻿using NPoco;
+﻿using Microsoft.Extensions.DependencyInjection;
+using NPoco;
 using NUnit.Framework;
+using Umbraco.Cms.Core.Configuration;
+using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Exceptions;
 using Umbraco.Cms.Core.Migrations;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Migrations;
+using Umbraco.Cms.Infrastructure.Migrations.Install;
+using Umbraco.Cms.Infrastructure.Migrations.Notifications;
 using Umbraco.Cms.Infrastructure.Migrations.Upgrade;
 using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Infrastructure.Persistence.DatabaseAnnotations;
@@ -26,7 +31,14 @@ public class PartialMigrationsTests : UmbracoIntegrationTest
     private IKeyValueService KeyValueService => GetRequiredService<IKeyValueService>();
 
     [TearDown]
-    public void ResetMigration() => ErrorMigration.ShouldExplode = true;
+    public void ResetMigration()
+    {
+        ErrorMigration.ShouldExplode = true;
+        UmbracoPlanExecutedTestNotificationHandler.HandleNotification = null;
+    }
+
+    protected override void ConfigureTestServices(IServiceCollection services)
+        => services.AddNotificationHandler<UmbracoPlanExecutedNotification, UmbracoPlanExecutedTestNotificationHandler>();
 
     [Test]
     public void CanRerunPartiallyCompletedMigration()
@@ -104,6 +116,33 @@ public class PartialMigrationsTests : UmbracoIntegrationTest
         });
     }
 
+    [Test]
+    public void UmbracoPlanExecutedNotificationIsPublishedWhenPartialSuccess()
+    {
+        var notificationPublished = false;
+
+        UmbracoPlanExecutedTestNotificationHandler.HandleNotification += notification =>
+        {
+            notificationPublished = true;
+            Assert.Multiple(() =>
+            {
+                var executedPlan = notification.ExecutedPlan;
+
+                Assert.IsFalse(executedPlan.Successful);
+                Assert.IsNotNull(executedPlan.Exception);
+                Assert.IsInstanceOf<PanicException>(executedPlan.Exception);
+                Assert.AreEqual("a", executedPlan.FinalState);
+                Assert.AreEqual(1, executedPlan.CompletedTransitions);
+            });
+        };
+
+        // We have to use the DatabaseBuilder otherwise the notification isn't published
+        var databaseBuilder = GetRequiredService<DatabaseBuilder>();
+        databaseBuilder.UpgradeSchemaAndData(new TestUmbracoPlan(null!));
+
+        Assert.IsTrue(notificationPublished);
+    }
+
     private bool ColumnExists(string tableName, string columnName, IScope scope) =>
         scope.Database.SqlContext.SqlSyntax.GetColumnsInSchema(scope.Database)
             .Any(x => x.TableName.Equals(tableName) && x.ColumnName.Equals(columnName));
@@ -158,4 +197,29 @@ public class TestDto
     [Column("id")]
     [PrimaryKeyColumn(Name = "PK_testTable")]
     public int Id { get; set; }
+}
+
+public class UmbracoPlanExecutedTestNotificationHandler : INotificationHandler<UmbracoPlanExecutedNotification>
+{
+    public static Action<UmbracoPlanExecutedNotification>? HandleNotification { get; set; } = null;
+
+    public void Handle(UmbracoPlanExecutedNotification notification) => HandleNotification?.Invoke(notification);
+}
+
+
+public class TestUmbracoPlan : UmbracoPlan
+{
+    public TestUmbracoPlan(IUmbracoVersion umbracoVersion) : base(umbracoVersion)
+    {
+    }
+
+    public override string InitialState => string.Empty;
+
+    protected new void DefinePlan()
+    {
+        From(InitialState);
+        To<CreateTableMigration>("a");
+        To<ErrorMigration>("b");
+        To<AddColumnMigration>("c");
+    }
 }
