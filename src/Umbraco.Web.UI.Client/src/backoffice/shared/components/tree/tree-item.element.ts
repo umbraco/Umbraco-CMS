@@ -143,6 +143,8 @@ export class UmbTreeItem extends UmbLitElement {
 	}
 
 	private _observeTreeItemActions() {
+		// TODO: Stop previous observation, currently we can do this from the UmbElementMixin as its a new subscription when Actions or entityType has changed.
+		// Solution: store the current observation controller and if it existing then destroy it.
 		this.observe(
 			umbExtensionsRegistry
 				.extensionsOfType('treeItemAction')
