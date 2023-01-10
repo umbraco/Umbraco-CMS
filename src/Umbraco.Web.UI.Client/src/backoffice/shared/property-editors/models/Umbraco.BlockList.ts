@@ -11,7 +11,7 @@ export const manifest: ManifestPropertyEditorModel = {
 					alias: 'blocks',
 					label: 'Available Blocks',
 					description: 'Define the available blocks.',
-					propertyEditorUI: 'Umb.PropertyEditorUI.BlockConfiguration',
+					propertyEditorUI: 'Umb.PropertyEditorUI.BlockList.BlockConfiguration',
 				},
 				{
 					alias: 'validationLimit',
