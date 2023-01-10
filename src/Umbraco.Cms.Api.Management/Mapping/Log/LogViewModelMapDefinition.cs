@@ -13,7 +13,13 @@ public class LogViewModelMapDefinition : IMapDefinition
     {
         mapper.Define<LogLevelCounts, LogLevelCountsViewModel>((source, context) => new LogLevelCountsViewModel(), Map);
         mapper.Define<KeyValuePair<string, LogEventLevel?>, LoggerViewModel>((source, context) => new LoggerViewModel() { Name = string.Empty }, Map);
-        mapper.Define<SavedLogSearch, SavedLogSearchViewModel>((source, context) => new SavedLogSearchViewModel(), Map);
+        mapper.Define<SavedLogSearch, SavedLogSearchViewModel>(
+            (source, context) => new SavedLogSearchViewModel()
+            {
+                Name = string.Empty,
+                Query = string.Empty
+            },
+            Map);
         mapper.Define<LogTemplate, LogTemplateViewModel>((source, context) => new LogTemplateViewModel(), Map);
         mapper.Define<LogMessage, LogMessageViewModel>((source, context) => new LogMessageViewModel(), Map);
         mapper.Define<IEnumerable<KeyValuePair<string, LogEventLevel?>>, PagedViewModel<LoggerViewModel>>((source, context) => new PagedViewModel<LoggerViewModel>(), Map);
