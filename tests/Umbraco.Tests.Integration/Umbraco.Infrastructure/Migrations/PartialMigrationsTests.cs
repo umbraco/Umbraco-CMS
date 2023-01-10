@@ -117,9 +117,12 @@ public class PartialMigrationsTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public void UmbracoPlanExecutedNotificationIsPublishedWhenPartialSuccess()
+    [TestCase(true)]
+    [TestCase(false)]
+    public void UmbracoPlanExecutedNotificationIsAlwaysPublished(bool shouldSucceed)
     {
         var notificationPublished = false;
+        ErrorMigration.ShouldExplode = shouldSucceed is false;
 
         UmbracoPlanExecutedTestNotificationHandler.HandleNotification += notification =>
         {
@@ -128,11 +131,21 @@ public class PartialMigrationsTests : UmbracoIntegrationTest
             {
                 var executedPlan = notification.ExecutedPlan;
 
-                Assert.IsFalse(executedPlan.Successful);
-                Assert.IsNotNull(executedPlan.Exception);
-                Assert.IsInstanceOf<PanicException>(executedPlan.Exception);
-                Assert.AreEqual("a", executedPlan.FinalState);
-                Assert.AreEqual(1, executedPlan.CompletedTransitions.Count);
+                if (shouldSucceed)
+                {
+                    Assert.IsTrue(executedPlan.Successful);
+                    Assert.IsNull(executedPlan.Exception);
+                    Assert.AreEqual("c", executedPlan.FinalState);
+                    Assert.AreEqual(3, executedPlan.CompletedTransitions.Count);
+                }
+                else
+                {
+                    Assert.IsFalse(executedPlan.Successful);
+                    Assert.IsNotNull(executedPlan.Exception);
+                    Assert.IsInstanceOf<PanicException>(executedPlan.Exception);
+                    Assert.AreEqual("a", executedPlan.FinalState);
+                    Assert.AreEqual(1, executedPlan.CompletedTransitions.Count);
+                }
             });
         };
 
