@@ -304,6 +304,19 @@ export const data: Array<DataTypeDetails> = [
 		propertyEditorUIAlias: 'Umb.PropertyEditorUI.BlockList',
 		data: [],
 	},
+	{
+		name: 'Media Picker',
+		type: 'data-type',
+		icon: 'umb:autofill',
+		hasChildren: false,
+		key: 'dt-mediaPicker',
+		isContainer: false,
+		parentKey: null,
+		isFolder: false,
+		propertyEditorModelAlias: 'Umbraco.MediaPicker3',
+		propertyEditorUIAlias: 'Umb.PropertyEditorUI.MediaPicker',
+		data: [],
+	},
 ];
 
 // Temp mocked database

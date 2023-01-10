@@ -17,6 +17,7 @@ import { manifest as markdownEditor } from './Umbraco.MarkdownEditor';
 import { manifest as radioButtonList } from './Umbraco.RadioButtonList';
 import { manifest as blockList } from './Umbraco.BlockList';
 import { manifest as checkboxList } from './Umbraco.CheckboxList';
+import { manifest as mediaPicker } from './Umbraco.MediaPicker3';
 
 import type { ManifestPropertyEditorModel } from '@umbraco-cms/models';
 
@@ -40,6 +41,7 @@ export const manifests: Array<ManifestPropertyEditorModel> = [
 	radioButtonList,
 	checkboxList,
 	blockList,
+	mediaPicker,
 	{
 		type: 'propertyEditorModel',
 		name: 'Decimal',
@@ -104,12 +106,6 @@ export const manifests: Array<ManifestPropertyEditorModel> = [
 		type: 'propertyEditorModel',
 		name: 'Image Cropper',
 		alias: 'Umbraco.ImageCropper',
-		meta: {},
-	},
-	{
-		type: 'propertyEditorModel',
-		name: 'Media Picker',
-		alias: 'Umbraco.MediaPicker3',
 		meta: {},
 	},
 	{

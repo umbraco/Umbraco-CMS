@@ -19,6 +19,7 @@ import { manifest as checkboxList } from './checkbox-list/manifests';
 import { manifest as blockList } from './block-list/manifests';
 import { manifest as numberRange } from './number-range/manifests';
 import { manifest as blockListBlockConfiguration } from './block-list-block-configuration/manifests';
+import { manifest as mediaPicker } from './media-picker/manifests';
 
 import type { ManifestPropertyEditorUI } from '@umbraco-cms/models';
 
@@ -44,6 +45,7 @@ export const manifests: Array<ManifestPropertyEditorUI> = [
 	blockList,
 	numberRange,
 	blockListBlockConfiguration,
+	mediaPicker,
 	{
 		type: 'propertyEditorUI',
 		alias: 'Umb.PropertyEditorUI.Number',
