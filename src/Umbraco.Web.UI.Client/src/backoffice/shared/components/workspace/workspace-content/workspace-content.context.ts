@@ -8,12 +8,11 @@ import { UmbContextConsumerController } from 'src/core/context-api/consume/conte
 import { UmbObserverController } from '@umbraco-cms/observable-api';
 import { UmbContextProviderController } from 'src/core/context-api/provide/context-provider.controller';
 import { EntityTreeItem } from '@umbraco-cms/backend-api';
-import { ContentDetails } from '@umbraco-cms/models';
 
 // TODO: Consider if its right to have this many class-inheritance of WorkspaceContext
 // TODO: Could we extract this code into a 'Manager' of its own, which will be instantiated by the concrete Workspace Context. This will be more transparent and 'reuseable'
 export abstract class UmbWorkspaceContentContext<
-	ContentTypeType extends ContentDetails = ContentDetails,
+	ContentTypeType extends EntityTreeItem = EntityTreeItem,
 	StoreType extends UmbNodeStoreBase<ContentTypeType> = UmbNodeStoreBase<ContentTypeType>
 > {
 
