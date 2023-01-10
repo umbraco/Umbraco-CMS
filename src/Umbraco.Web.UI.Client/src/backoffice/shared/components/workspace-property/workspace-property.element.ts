@@ -136,6 +136,9 @@ export class UmbWorkspacePropertyElement extends UmbLitElement {
 
 	private propertyEditorUIObserver?: UmbObserverController<ManifestTypes>;
 
+	private _valueObserver?: UmbObserverController<unknown>;
+	private _configObserver?: UmbObserverController<unknown>;
+
 
 	constructor() {
 		super();
@@ -147,15 +150,13 @@ export class UmbWorkspacePropertyElement extends UmbLitElement {
 			this._description = description;
 		});
 
-		// TODO: maybe this would be called change.
-		this.addEventListener('change', this._onPropertyEditorChange as any as EventListener);
-
 	}
 
 	private _onPropertyEditorChange = (e: CustomEvent) => {
 		const target = e.composedPath()[0] as any;
 
 		this.value = target.value;// Sets value in context.
+		e.stopPropagation();
 	};
 
 	private _observePropertyEditorUI() {
@@ -174,27 +175,37 @@ export class UmbWorkspacePropertyElement extends UmbLitElement {
 		createExtensionElement(manifest)
 			.then((el) => {
 				const oldValue = this._element;
+
+				oldValue?.removeEventListener('change', this._onPropertyEditorChange as any as EventListener);
+
 				this._element = el;
 
-				this.observe(this._propertyContext.value, (value) => {
-					if(this._element) {
-						this._element.value = value;
-					}
-				});
-				this.observe(this._propertyContext.config, (config) => {
-					if(this._element) {
-						this._element.config = config;
-					}
-				});
+				this._valueObserver?.destroy();
+				this._configObserver?.destroy();
+
+				if(this._element) {
+					this._element.addEventListener('change', this._onPropertyEditorChange as any as EventListener);
+
+					this._valueObserver = this.observe(this._propertyContext.value, (value) => {
+						if(this._element) {
+							this._element.value = value;
+						}
+					});
+					this._configObserver = this.observe(this._propertyContext.config, (config) => {
+						if(this._element) {
+							this._element.config = config;
+						}
+					});
+				}
 
 				this.requestUpdate('element', oldValue);
-				
+
 			})
 			.catch(() => {
 				// TODO: loading JS failed so we should do some nice UI. (This does only happen if extension has a js prop, otherwise we concluded that no source was needed resolved the load.)
 			});
 	}
-	
+
 
 	render() {
 		return html`

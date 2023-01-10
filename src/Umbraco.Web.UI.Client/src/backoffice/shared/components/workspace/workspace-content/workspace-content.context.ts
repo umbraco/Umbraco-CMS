@@ -99,7 +99,7 @@ export abstract class UmbWorkspaceContentContext<
 
 		if(!this.#isNew) {
 			this._storeSubscription?.destroy();
-			this._storeSubscription = new UmbObserverController(this._host, this._store.getByKey(this.entityKey), 
+			this._storeSubscription = new UmbObserverController(this._host, this._store.getByKey(this.entityKey),
 			(content) => {
 				if (!content) return; // TODO: Handle nicely if there is no content data.
 				this.update(content as any);
