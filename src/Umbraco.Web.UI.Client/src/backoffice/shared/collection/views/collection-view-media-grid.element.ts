@@ -95,7 +95,7 @@ export class UmbCollectionViewsMediaGridElement extends UmbLitElement {
 		if (!this._collectionContext) return;
 
 		this.observe(this._collectionContext.data, (mediaItems) => {
-			this._mediaItems = mediaItems.sort((a, b) => (a.hasChildren === b.hasChildren ? 0 : a ? -1 : 1));
+			this._mediaItems = [...mediaItems].sort((a, b) => (a.hasChildren === b.hasChildren ? 0 : a ? -1 : 1));
 		});
 
 		this.observe(this._collectionContext.selection, (selection) => {
