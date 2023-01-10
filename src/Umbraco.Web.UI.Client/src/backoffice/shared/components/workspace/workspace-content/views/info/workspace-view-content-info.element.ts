@@ -1,7 +1,6 @@
 import { css, html } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, state } from 'lit/decorators.js';
-import { distinctUntilChanged } from 'rxjs';
 import type { UmbWorkspaceContentContext } from '../../workspace-content.context';
 import type { DocumentDetails, MediaDetails } from '@umbraco-cms/models';
 import { UmbLitElement } from '@umbraco-cms/element';
@@ -36,8 +35,8 @@ export class UmbWorkspaceViewContentInfoElement extends UmbLitElement {
 	private _observeContent() {
 		if (!this._workspaceContext) return;
 
-		this.observe(this._workspaceContext.data.pipe(distinctUntilChanged()), (node) => {
-			this._nodeName = node.name as string;
+		this.observe(this._workspaceContext.name, (name) => {
+			this._nodeName = name || '';
 		});
 	}
 
