@@ -330,6 +330,19 @@ export const data: Array<DataTypeDetails> = [
 		propertyEditorUIAlias: 'Umb.PropertyEditorUI.ImageCropper',
 		data: [],
 	},
+	{
+		name: 'Upload Field',
+		type: 'data-type',
+		icon: 'umb:autofill',
+		hasChildren: false,
+		key: 'dt-uploadField',
+		isContainer: false,
+		parentKey: null,
+		isFolder: false,
+		propertyEditorModelAlias: 'Umbraco.UploadField',
+		propertyEditorUIAlias: 'Umb.PropertyEditorUI.UploadField',
+		data: [],
+	},
 ];
 
 // Temp mocked database

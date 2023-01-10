@@ -19,6 +19,7 @@ import { manifest as blockList } from './Umbraco.BlockList';
 import { manifest as checkboxList } from './Umbraco.CheckboxList';
 import { manifest as mediaPicker } from './Umbraco.MediaPicker3';
 import { manifest as imageCropper } from './Umbraco.ImageCropper';
+import { manifest as uploadField } from './Umbraco.UploadField';
 
 import type { ManifestPropertyEditorModel } from '@umbraco-cms/models';
 
@@ -44,6 +45,7 @@ export const manifests: Array<ManifestPropertyEditorModel> = [
 	blockList,
 	mediaPicker,
 	imageCropper,
+	uploadField,
 	{
 		type: 'propertyEditorModel',
 		name: 'Decimal',
@@ -96,18 +98,6 @@ export const manifests: Array<ManifestPropertyEditorModel> = [
 		type: 'propertyEditorModel',
 		name: 'List view',
 		alias: 'Umbraco.ListView',
-		meta: {},
-	},
-	{
-		type: 'propertyEditorModel',
-		name: 'File upload',
-		alias: 'Umbraco.UploadField',
-		meta: {},
-	},
-	{
-		type: 'propertyEditorModel',
-		name: 'Image Cropper',
-		alias: 'Umbraco.ImageCropper',
 		meta: {},
 	},
 	{

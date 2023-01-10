@@ -22,6 +22,7 @@ import { manifest as blockListBlockConfiguration } from './block-list-block-conf
 import { manifest as mediaPicker } from './media-picker/manifests';
 import { manifest as imageCropsConfiguration } from './image-crops-configuration/manifests';
 import { manifest as imageCropper } from './image-cropper/manifests';
+import { manifest as uploadField } from './upload-field/manifests';
 
 import type { ManifestPropertyEditorUI } from '@umbraco-cms/models';
 
@@ -50,6 +51,7 @@ export const manifests: Array<ManifestPropertyEditorUI> = [
 	mediaPicker,
 	imageCropsConfiguration,
 	imageCropper,
+	uploadField,
 	{
 		type: 'propertyEditorUI',
 		alias: 'Umb.PropertyEditorUI.Number',

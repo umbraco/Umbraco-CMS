@@ -132,6 +132,12 @@ export const data: Array<DocumentDetails> = [
 				description: '',
 				dataTypeKey: 'dt-imageCropper',
 			},
+			{
+				alias: 'uploadField',
+				label: 'Upload Field',
+				description: '',
+				dataTypeKey: 'dt-uploadField',
+			},
 		],
 		data: [],
 		variants: [],
