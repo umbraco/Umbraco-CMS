@@ -73,9 +73,9 @@ export class UmbContentPropertyElement extends UmbLitElement {
 
 	render() {
 		return html`<umb-workspace-property
-			label=${ifDefined(this.property?.label)}
-			description=${ifDefined(this.property?.description)}
-			alias="${ifDefined(this.property?.alias)}"
+			alias=${ifDefined(this._property?.alias)}
+			label=${ifDefined(this._property?.label)}
+			description=${ifDefined(this._property?.description)}
 			property-editor-ui-alias="${ifDefined(this._propertyEditorUIAlias)}"
 			.value=${this.value}
 			.config=${this._dataTypeData}></umb-workspace-property>`;
