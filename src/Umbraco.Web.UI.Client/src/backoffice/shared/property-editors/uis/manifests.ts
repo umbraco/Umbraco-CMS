@@ -18,6 +18,7 @@ import { manifest as radioButtonList } from './radio-button-list/manifests';
 import { manifest as checkboxList } from './checkbox-list/manifests';
 import { manifest as blockList } from './block-list/manifests';
 import { manifest as numberRange } from './number-range/manifests';
+import { manifest as blockConfiguration } from './block-configuration/manifests';
 
 import type { ManifestPropertyEditorUI } from '@umbraco-cms/models';
 
@@ -42,6 +43,7 @@ export const manifests: Array<ManifestPropertyEditorUI> = [
 	checkboxList,
 	blockList,
 	numberRange,
+	blockConfiguration,
 	{
 		type: 'propertyEditorUI',
 		alias: 'Umb.PropertyEditorUI.Number',
