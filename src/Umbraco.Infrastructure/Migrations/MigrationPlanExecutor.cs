@@ -115,8 +115,8 @@ public class MigrationPlanExecutor : IMigrationPlanExecutor
 
             _logger.LogInformation("At {OrigState}", nextState);
 
-            // throw a raw exception here: this should never happen as the plan has
-            // been validated - this is just a paranoid safety test
+            // this should never happen as the plan has been validated - this is just a paranoid safety test
+            // If it does something is wrong and we'll fail the execution and return an error.
             if (plan.Transitions.TryGetValue(nextState, out transition) is false)
             {
                 return new ExecutedMigrationPlan
@@ -161,7 +161,9 @@ public class MigrationPlanExecutor : IMigrationPlanExecutor
         using ICoreScope scope = _scopeProvider.CreateCoreScope();
         using (scope.Notifications.Suppress())
         {
-            var context = new MigrationContext(plan, _scopeAccessor.AmbientScope?.Database,
+            var context = new MigrationContext(
+                plan,
+                _scopeAccessor.AmbientScope?.Database,
                 _loggerFactory.CreateLogger<MigrationContext>());
 
             RunMigration(migrationType, context);
@@ -174,6 +176,7 @@ public class MigrationPlanExecutor : IMigrationPlanExecutor
     {
         MigrationBase migration = _migrationBuilder.Build(migrationType, context);
         migration.Run();
+
         // If the migration requires clearing the cache set the flag, this will automatically only happen if it succeeds
         // Otherwise it'll error out before and return.
         if (migration.RebuildCache)
