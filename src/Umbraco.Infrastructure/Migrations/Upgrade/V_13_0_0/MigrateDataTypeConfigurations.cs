@@ -32,7 +32,6 @@ public class MigrateDataTypeConfigurations : MigrationBase
 
         List<DataTypeDto> dataTypeDtos = Database.Fetch<DataTypeDto>(sql);
 
-        var refreshCache = false;
         foreach (DataTypeDto dataTypeDto in dataTypeDtos)
         {
             Dictionary<string, object> configurationData = dataTypeDto.Configuration.IsNullOrWhiteSpace()
@@ -64,15 +63,9 @@ public class MigrateDataTypeConfigurations : MigrationBase
             {
                 dataTypeDto.Configuration = serializer.Serialize(configurationData);
                 Database.Update(dataTypeDto);
-                refreshCache = true;
+                RebuildCache = true;
             }
         }
-
-        // FIXME: Use notification handler to clear cache.
-        // if (refreshCache)
-        // {
-        //     Context.AddPostMigration<RebuildPublishedSnapshot>();
-        // }
     }
 
     // convert the stored keys "minimum" and "maximum" to the expected keys "min" and "max for multiple textstrings
