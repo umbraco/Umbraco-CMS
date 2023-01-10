@@ -20,6 +20,7 @@ import { manifest as blockList } from './block-list/manifests';
 import { manifest as numberRange } from './number-range/manifests';
 import { manifest as blockListBlockConfiguration } from './block-list-block-configuration/manifests';
 import { manifest as mediaPicker } from './media-picker/manifests';
+import { manifest as imageCropsConfiguration } from './image-crops-configuration/manifests';
 
 import type { ManifestPropertyEditorUI } from '@umbraco-cms/models';
 
@@ -46,6 +47,7 @@ export const manifests: Array<ManifestPropertyEditorUI> = [
 	numberRange,
 	blockListBlockConfiguration,
 	mediaPicker,
+	imageCropsConfiguration,
 	{
 		type: 'propertyEditorUI',
 		alias: 'Umb.PropertyEditorUI.Number',
