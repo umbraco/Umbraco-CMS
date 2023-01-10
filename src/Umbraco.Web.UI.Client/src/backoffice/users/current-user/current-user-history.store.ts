@@ -9,7 +9,7 @@ export type UmbCurrentUserHistoryItem = {
 };
 
 export class UmbCurrentUserHistoryStore {
-	
+
 	#history = new UniqueBehaviorSubject(
 		<Array<UmbCurrentUserHistoryItem>>[]
 	);
@@ -40,11 +40,6 @@ export class UmbCurrentUserHistoryStore {
 		// This prevents duplicate entries in the history array.
 		if (!lastItem || lastItem.path !== historyItem.path) {
 			this.#history.next([...this.#history.getValue(), historyItem]);
-		} else {
-			//Update existing item
-			const newHistory = this.#history.getValue();
-			newHistory[history.length - 1] = historyItem;
-			this.#history.next(newHistory);
 		}
 	}
 
