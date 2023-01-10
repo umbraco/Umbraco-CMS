@@ -138,6 +138,12 @@ export const data: Array<DocumentDetails> = [
 				description: '',
 				dataTypeKey: 'dt-uploadField',
 			},
+			{
+				alias: 'blockGrid',
+				label: 'Block Grid',
+				description: '',
+				dataTypeKey: 'dt-blockGrid',
+			},
 		],
 		data: [],
 		variants: [],

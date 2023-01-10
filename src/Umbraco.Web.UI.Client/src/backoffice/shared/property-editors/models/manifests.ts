@@ -20,6 +20,7 @@ import { manifest as checkboxList } from './Umbraco.CheckboxList';
 import { manifest as mediaPicker } from './Umbraco.MediaPicker3';
 import { manifest as imageCropper } from './Umbraco.ImageCropper';
 import { manifest as uploadField } from './Umbraco.UploadField';
+import { manifest as blockGrid } from './Umbraco.BlockGrid';
 
 import type { ManifestPropertyEditorModel } from '@umbraco-cms/models';
 
@@ -46,6 +47,7 @@ export const manifests: Array<ManifestPropertyEditorModel> = [
 	mediaPicker,
 	imageCropper,
 	uploadField,
+	blockGrid,
 	{
 		type: 'propertyEditorModel',
 		name: 'Decimal',
@@ -86,12 +88,6 @@ export const manifests: Array<ManifestPropertyEditorModel> = [
 		type: 'propertyEditorModel',
 		name: 'User Picker',
 		alias: 'Umbraco.UserPicker',
-		meta: {},
-	},
-	{
-		type: 'propertyEditorModel',
-		name: 'Block Grid',
-		alias: 'Umbraco.BlockGrid',
 		meta: {},
 	},
 	{

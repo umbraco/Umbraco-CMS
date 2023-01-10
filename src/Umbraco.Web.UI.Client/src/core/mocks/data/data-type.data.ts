@@ -343,6 +343,19 @@ export const data: Array<DataTypeDetails> = [
 		propertyEditorUIAlias: 'Umb.PropertyEditorUI.UploadField',
 		data: [],
 	},
+	{
+		name: 'Block Grid',
+		type: 'data-type',
+		icon: 'umb:autofill',
+		hasChildren: false,
+		key: 'dt-blockGrid',
+		isContainer: false,
+		parentKey: null,
+		isFolder: false,
+		propertyEditorModelAlias: 'Umbraco.BlockGrid',
+		propertyEditorUIAlias: 'Umb.PropertyEditorUI.BlockGrid',
+		data: [],
+	},
 ];
 
 // Temp mocked database
