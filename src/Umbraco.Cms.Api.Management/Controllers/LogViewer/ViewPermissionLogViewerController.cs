@@ -1,13 +1,12 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Umbraco.Cms.Api.Management.Controllers.LogViewer;
 using Umbraco.Cms.Core.Logging.Viewer;
 
-namespace Umbraco.Cms.Api.Management.Controllers.Log;
+namespace Umbraco.Cms.Api.Management.Controllers.LogViewer;
 
-public class ViewPermissionLogController : LogControllerBase
+public class ViewPermissionLogViewerController : LogViewerControllerBase
 {
-    public ViewPermissionLogController(ILogViewer logViewer)
+    public ViewPermissionLogViewerController(ILogViewer logViewer)
         : base(logViewer)
     {
     }

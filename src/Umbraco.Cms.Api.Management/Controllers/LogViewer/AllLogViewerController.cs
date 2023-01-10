@@ -1,21 +1,20 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Common.ViewModels.Pagination;
-using Umbraco.Cms.Api.Management.Controllers.LogViewer;
-using Umbraco.Cms.Api.Management.ViewModels.Log;
+using Umbraco.Cms.Api.Management.ViewModels.LogViewer;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Logging.Viewer;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Extensions;
 
-namespace Umbraco.Cms.Api.Management.Controllers.Log;
+namespace Umbraco.Cms.Api.Management.Controllers.LogViewer;
 
-public class AllLogController : LogControllerBase
+public class AllLogViewerController : LogViewerControllerBase
 {
     private readonly ILogViewer _logViewer;
     private readonly IUmbracoMapper _umbracoMapper;
 
-    public AllLogController(ILogViewer logViewer, IUmbracoMapper umbracoMapper)
+    public AllLogViewerController(ILogViewer logViewer, IUmbracoMapper umbracoMapper)
         : base(logViewer)
     {
         _logViewer = logViewer;
@@ -35,7 +34,7 @@ public class AllLogController : LogControllerBase
     /// <param name="startDate">The start date for the date range (can be null).</param>
     /// <param name="endDate">The end date for the date range (can be null).</param>
     /// <returns>The paged result of logs from the given time period.</returns>
-    [HttpGet]
+    [HttpGet("log")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedViewModel<LogMessageViewModel>), StatusCodes.Status200OK)]
     public async Task<ActionResult<PagedViewModel<LogMessageViewModel>>> All(

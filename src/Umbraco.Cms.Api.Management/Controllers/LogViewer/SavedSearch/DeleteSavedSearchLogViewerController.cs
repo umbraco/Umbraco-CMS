@@ -2,13 +2,13 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Core.Logging.Viewer;
 
-namespace Umbraco.Cms.Api.Management.Controllers.Log.SavedQuery;
+namespace Umbraco.Cms.Api.Management.Controllers.LogViewer.SavedSearch;
 
-public class DeleteSavedQueryLogController : SavedQueryLogControllerBase
+public class DeleteSavedSearchLogViewerController : SavedSearchLogViewerControllerBase
 {
     private readonly ILogViewer _logViewer;
 
-    public DeleteSavedQueryLogController(ILogViewer logViewer)
+    public DeleteSavedSearchLogViewerController(ILogViewer logViewer)
         : base(logViewer) => _logViewer = logViewer;
 
     /// <summary>

@@ -1,6 +1,6 @@
 using Serilog.Events;
 
-namespace Umbraco.Cms.Api.Management.ViewModels.Log;
+namespace Umbraco.Cms.Api.Management.ViewModels.LogViewer;
 
 public class LoggerViewModel
 {

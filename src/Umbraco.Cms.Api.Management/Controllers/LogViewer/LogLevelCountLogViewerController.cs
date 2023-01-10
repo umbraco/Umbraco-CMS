@@ -1,18 +1,17 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Umbraco.Cms.Api.Management.Controllers.LogViewer;
-using Umbraco.Cms.Api.Management.ViewModels.Log;
+using Umbraco.Cms.Api.Management.ViewModels.LogViewer;
 using Umbraco.Cms.Core.Logging.Viewer;
 using Umbraco.Cms.Core.Mapping;
 
-namespace Umbraco.Cms.Api.Management.Controllers.Log;
+namespace Umbraco.Cms.Api.Management.Controllers.LogViewer;
 
-public class EventLevelCountLogController : LogControllerBase
+public class LogLevelCountLogViewerController : LogViewerControllerBase
 {
     private readonly ILogViewer _logViewer;
     private readonly IUmbracoMapper _umbracoMapper;
 
-    public EventLevelCountLogController(ILogViewer logViewer, IUmbracoMapper umbracoMapper)
+    public LogLevelCountLogViewerController(ILogViewer logViewer, IUmbracoMapper umbracoMapper)
         : base(logViewer)
     {
         _logViewer = logViewer;

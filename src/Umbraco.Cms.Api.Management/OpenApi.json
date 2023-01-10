@@ -2081,12 +2081,149 @@
         }
       }
     },
-    "/umbraco/management/api/v1/log": {
+    "/umbraco/management/api/v1/log-viewer/error/count": {
       "get": {
         "tags": [
-          "Log"
+          "Log Viewer"
         ],
-        "operationId": "GetLog",
+        "operationId": "GetLogViewerErrorCount",
+        "parameters": [
+          {
+            "name": "startDate",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "endDate",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "integer",
+                  "format": "int32"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/umbraco/management/api/v1/log-viewer/level": {
+      "get": {
+        "tags": [
+          "Log Viewer"
+        ],
+        "operationId": "GetLogViewerLevel",
+        "parameters": [
+          {
+            "name": "skip",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 0
+            }
+          },
+          {
+            "name": "take",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 100
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedLogger"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/umbraco/management/api/v1/log-viewer/level/count": {
+      "get": {
+        "tags": [
+          "Log Viewer"
+        ],
+        "operationId": "GetLogViewerLevelCount",
+        "parameters": [
+          {
+            "name": "startDate",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "endDate",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LogLevelCounts"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/umbraco/management/api/v1/log-viewer/log": {
+      "get": {
+        "tags": [
+          "Log Viewer"
+        ],
+        "operationId": "GetLogViewerLog",
         "parameters": [
           {
             "name": "skip",
@@ -2162,149 +2299,12 @@
         }
       }
     },
-    "/umbraco/management/api/v1/log/error/count": {
+    "/umbraco/management/api/v1/log-viewer/message-template": {
       "get": {
         "tags": [
-          "Log"
+          "Log Viewer"
         ],
-        "operationId": "GetLogErrorCount",
-        "parameters": [
-          {
-            "name": "startDate",
-            "in": "query",
-            "schema": {
-              "type": "string",
-              "format": "date-time"
-            }
-          },
-          {
-            "name": "endDate",
-            "in": "query",
-            "schema": {
-              "type": "string",
-              "format": "date-time"
-            }
-          }
-        ],
-        "responses": {
-          "400": {
-            "description": "Bad Request",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          },
-          "200": {
-            "description": "Success",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "integer",
-                  "format": "int32"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/umbraco/management/api/v1/log/level": {
-      "get": {
-        "tags": [
-          "Log"
-        ],
-        "operationId": "GetLogLevel",
-        "parameters": [
-          {
-            "name": "skip",
-            "in": "query",
-            "schema": {
-              "type": "integer",
-              "format": "int32",
-              "default": 0
-            }
-          },
-          {
-            "name": "take",
-            "in": "query",
-            "schema": {
-              "type": "integer",
-              "format": "int32",
-              "default": 100
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Success",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PagedLogger"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/umbraco/management/api/v1/log/level/count": {
-      "get": {
-        "tags": [
-          "Log"
-        ],
-        "operationId": "GetLogLevelCount",
-        "parameters": [
-          {
-            "name": "startDate",
-            "in": "query",
-            "schema": {
-              "type": "string",
-              "format": "date-time"
-            }
-          },
-          {
-            "name": "endDate",
-            "in": "query",
-            "schema": {
-              "type": "string",
-              "format": "date-time"
-            }
-          }
-        ],
-        "responses": {
-          "400": {
-            "description": "Bad Request",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          },
-          "200": {
-            "description": "Success",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/LogLevelCounts"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/umbraco/management/api/v1/log/message-template": {
-      "get": {
-        "tags": [
-          "Log"
-        ],
-        "operationId": "GetLogMessageTemplate",
+        "operationId": "GetLogViewerMessageTemplate",
         "parameters": [
           {
             "name": "skip",
@@ -2365,12 +2365,12 @@
         }
       }
     },
-    "/umbraco/management/api/v1/log/saved-query": {
+    "/umbraco/management/api/v1/log-viewer/saved-search": {
       "get": {
         "tags": [
-          "Log"
+          "Log Viewer"
         ],
-        "operationId": "GetLogSavedQuery",
+        "operationId": "GetLogViewerSavedSearch",
         "parameters": [
           {
             "name": "skip",
@@ -2406,9 +2406,9 @@
       },
       "post": {
         "tags": [
-          "Log"
+          "Log Viewer"
         ],
-        "operationId": "PostLogSavedQuery",
+        "operationId": "PostLogViewerSavedSearch",
         "requestBody": {
           "content": {
             "application/json": {
@@ -2435,12 +2435,12 @@
         }
       }
     },
-    "/umbraco/management/api/v1/log/saved-query/{name}": {
+    "/umbraco/management/api/v1/log-viewer/saved-search/{name}": {
       "get": {
         "tags": [
-          "Log"
+          "Log Viewer"
         ],
-        "operationId": "GetLogSavedQueryByName",
+        "operationId": "GetLogViewerSavedSearchByName",
         "parameters": [
           {
             "name": "name",
@@ -2476,9 +2476,9 @@
       },
       "delete": {
         "tags": [
-          "Log"
+          "Log Viewer"
         ],
-        "operationId": "DeleteLogSavedQueryByName",
+        "operationId": "DeleteLogViewerSavedSearchByName",
         "parameters": [
           {
             "name": "name",
@@ -2506,12 +2506,12 @@
         }
       }
     },
-    "/umbraco/management/api/v1/log/view-permission": {
+    "/umbraco/management/api/v1/log-viewer/view-permission": {
       "get": {
         "tags": [
-          "Log"
+          "Log Viewer"
         ],
-        "operationId": "GetLogViewPermission",
+        "operationId": "GetLogViewerViewPermission",
         "parameters": [
           {
             "name": "startDate",

@@ -1,15 +1,14 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Umbraco.Cms.Api.Management.Controllers.LogViewer;
 using Umbraco.Cms.Core.Logging.Viewer;
 
-namespace Umbraco.Cms.Api.Management.Controllers.Log;
+namespace Umbraco.Cms.Api.Management.Controllers.LogViewer;
 
-public class ErrorCountLogController : LogControllerBase
+public class ErrorCountLogViewerController : LogViewerControllerBase
 {
     private readonly ILogViewer _logViewer;
 
-    public ErrorCountLogController(ILogViewer logViewer)
+    public ErrorCountLogViewerController(ILogViewer logViewer)
         : base(logViewer) => _logViewer = logViewer;
 
     /// <summary>

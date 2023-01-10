@@ -2,19 +2,18 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Serilog.Events;
 using Umbraco.Cms.Api.Common.ViewModels.Pagination;
-using Umbraco.Cms.Api.Management.Controllers.LogViewer;
-using Umbraco.Cms.Api.Management.ViewModels.Log;
+using Umbraco.Cms.Api.Management.ViewModels.LogViewer;
 using Umbraco.Cms.Core.Logging.Viewer;
 using Umbraco.Cms.Core.Mapping;
 
-namespace Umbraco.Cms.Api.Management.Controllers.Log;
+namespace Umbraco.Cms.Api.Management.Controllers.LogViewer;
 
-public class AllEventLevelLogController : LogControllerBase
+public class AllSinkLevelLogViewerController : LogViewerControllerBase
 {
     private readonly ILogLevelLoader _logLevelLoader;
     private readonly IUmbracoMapper _umbracoMapper;
 
-    public AllEventLevelLogController(ILogLevelLoader logLevelLoader, ILogViewer logViewer, IUmbracoMapper umbracoMapper)
+    public AllSinkLevelLogViewerController(ILogLevelLoader logLevelLoader, ILogViewer logViewer, IUmbracoMapper umbracoMapper)
         : base(logViewer)
     {
         _logLevelLoader = logLevelLoader;

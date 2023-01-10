@@ -1,22 +1,22 @@
 using System.Data;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Umbraco.Cms.Api.Management.ViewModels.Log;
+using Umbraco.Cms.Api.Management.ViewModels.LogViewer;
 using Umbraco.Cms.Core.Logging.Viewer;
 
-namespace Umbraco.Cms.Api.Management.Controllers.Log.SavedQuery;
+namespace Umbraco.Cms.Api.Management.Controllers.LogViewer.SavedSearch;
 
-public class CreateSavedQueryLogController : SavedQueryLogControllerBase
+public class CreateSavedSearchLogViewerController : SavedSearchLogViewerControllerBase
 {
     private readonly ILogViewer _logViewer;
 
-    public CreateSavedQueryLogController(ILogViewer logViewer)
+    public CreateSavedSearchLogViewerController(ILogViewer logViewer)
         : base(logViewer) => _logViewer = logViewer;
 
     /// <summary>
     ///     Creates a saved log search.
     /// </summary>
-    /// <param name="savedSearch">The query to be saved.</param>
+    /// <param name="savedSearch">The log search to be saved.</param>
     /// <returns>The name of the saved log search after the creation.</returns>
     [HttpPost]
     [MapToApiVersion("1.0")]
@@ -32,7 +32,7 @@ public class CreateSavedQueryLogController : SavedQueryLogControllerBase
         {
             var invalidModelProblem = new ProblemDetails
             {
-                Title = "Duplicate query name",
+                Title = "Duplicate log search name",
                 Detail = ex.Message,
                 Status = StatusCodes.Status400BadRequest,
                 Type = "Error",
@@ -42,6 +42,6 @@ public class CreateSavedQueryLogController : SavedQueryLogControllerBase
         }
 
         // FIXME: (elit0451) Make use of the extension method of CreatedAtAction
-        return await Task.FromResult(Created($"management/api/v1/log/saved-query/{savedSearch.Name}", null));
+        return await Task.FromResult(Created($"management/api/v1/log-viewer/saved-search/{savedSearch.Name}", null));
     }
 }

@@ -1,4 +1,4 @@
-namespace Umbraco.Cms.Api.Management.ViewModels.Log;
+namespace Umbraco.Cms.Api.Management.ViewModels.LogViewer;
 
 public class SavedLogSearchViewModel
 {

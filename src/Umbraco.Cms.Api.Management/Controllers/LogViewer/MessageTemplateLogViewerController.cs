@@ -1,19 +1,18 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Common.ViewModels.Pagination;
-using Umbraco.Cms.Api.Management.Controllers.LogViewer;
-using Umbraco.Cms.Api.Management.ViewModels.Log;
+using Umbraco.Cms.Api.Management.ViewModels.LogViewer;
 using Umbraco.Cms.Core.Logging.Viewer;
 using Umbraco.Cms.Core.Mapping;
 
-namespace Umbraco.Cms.Api.Management.Controllers.Log;
+namespace Umbraco.Cms.Api.Management.Controllers.LogViewer;
 
-public class MessageTemplateLogController : LogControllerBase
+public class MessageTemplateLogViewerController : LogViewerControllerBase
 {
     private readonly ILogViewer _logViewer;
     private readonly IUmbracoMapper _umbracoMapper;
 
-    public MessageTemplateLogController(ILogViewer logViewer, IUmbracoMapper umbracoMapper)
+    public MessageTemplateLogViewerController(ILogViewer logViewer, IUmbracoMapper umbracoMapper)
         : base(logViewer)
     {
         _logViewer = logViewer;

@@ -1,18 +1,18 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Common.ViewModels.Pagination;
-using Umbraco.Cms.Api.Management.ViewModels.Log;
+using Umbraco.Cms.Api.Management.ViewModels.LogViewer;
 using Umbraco.Cms.Core.Logging.Viewer;
 using Umbraco.Cms.Core.Mapping;
 
-namespace Umbraco.Cms.Api.Management.Controllers.Log.SavedQuery;
+namespace Umbraco.Cms.Api.Management.Controllers.LogViewer.SavedSearch;
 
-public class AllSavedQueryLogController : SavedQueryLogControllerBase
+public class AllSavedSearchLogViewerController : SavedSearchLogViewerControllerBase
 {
     private readonly ILogViewer _logViewer;
     private readonly IUmbracoMapper _umbracoMapper;
 
-    public AllSavedQueryLogController(ILogViewer logViewer, IUmbracoMapper umbracoMapper)
+    public AllSavedSearchLogViewerController(ILogViewer logViewer, IUmbracoMapper umbracoMapper)
         : base(logViewer)
     {
         _logViewer = logViewer;
@@ -28,7 +28,7 @@ public class AllSavedQueryLogController : SavedQueryLogControllerBase
     [HttpGet]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedViewModel<SavedLogSearchViewModel>), StatusCodes.Status200OK)]
-    public async Task<ActionResult<PagedViewModel<SavedLogSearchViewModel>>> AllSavedQueries(int skip = 0, int take = 100)
+    public async Task<ActionResult<PagedViewModel<SavedLogSearchViewModel>>> AllSavedSearches(int skip = 0, int take = 100)
     {
         IEnumerable<SavedLogSearch> savedSearches = _logViewer
             .GetSavedSearches()

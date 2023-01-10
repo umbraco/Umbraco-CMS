@@ -5,14 +5,14 @@ using Umbraco.Cms.Core.Logging.Viewer;
 namespace Umbraco.Cms.Api.Management.Controllers.LogViewer;
 
 [ApiController]
-[VersionedApiBackOfficeRoute("log")]
-[ApiExplorerSettings(GroupName = "Log")]
+[VersionedApiBackOfficeRoute("log-viewer")]
+[ApiExplorerSettings(GroupName = "Log Viewer")]
 [ApiVersion("1.0")]
-public abstract class LogControllerBase : ManagementApiControllerBase
+public abstract class LogViewerControllerBase : ManagementApiControllerBase
 {
     private readonly ILogViewer _logViewer;
 
-    protected LogControllerBase(ILogViewer logViewer)
+    protected LogViewerControllerBase(ILogViewer logViewer)
     {
         _logViewer = logViewer;
     }

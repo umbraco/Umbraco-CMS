@@ -1,13 +1,13 @@
 using System.Text.Json;
 using Serilog.Events;
 using Umbraco.Cms.Api.Common.ViewModels.Pagination;
-using Umbraco.Cms.Api.Management.ViewModels.Log;
+using Umbraco.Cms.Api.Management.ViewModels.LogViewer;
 using Umbraco.Cms.Core.Logging.Viewer;
 using Umbraco.Cms.Core.Mapping;
 
-namespace Umbraco.Cms.Api.Management.Mapping.Log;
+namespace Umbraco.Cms.Api.Management.Mapping.LogViewer;
 
-public class LogViewModelMapDefinition : IMapDefinition
+public class LogViewerViewModelMapDefinition : IMapDefinition
 {
     public void DefineMaps(IUmbracoMapper mapper)
     {
