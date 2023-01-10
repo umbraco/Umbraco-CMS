@@ -17,11 +17,11 @@ public class CreateSavedQueryLogController : SavedQueryLogControllerBase
     ///     Creates a saved log search.
     /// </summary>
     /// <param name="savedSearch">The query to be saved.</param>
-    /// <returns>The result of the creation.</returns>
+    /// <returns>The name of the saved log search after the creation.</returns>
     [HttpPost]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status201Created)]
     public async Task<IActionResult> Create(SavedLogSearchViewModel savedSearch)
     {
         try
@@ -41,6 +41,7 @@ public class CreateSavedQueryLogController : SavedQueryLogControllerBase
             return await Task.FromResult(BadRequest(invalidModelProblem));
         }
 
-        return await Task.FromResult(Ok());
+        // FIXME: Make use of the extension method of CreatedAtAction
+        return await Task.FromResult(Created($"management/api/v1/log/saved-query/{savedSearch.Name}", null));
     }
 }
