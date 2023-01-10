@@ -21,7 +21,7 @@ export class UmbPropertyEditorUITextBoxElement extends LitElement {
 
 	private onInput(e: InputEvent) {
 		this.value = (e.target as HTMLInputElement).value;
-		this.dispatchEvent(new CustomEvent('property-value-change', { bubbles: true, composed: true }));
+		this.dispatchEvent(new CustomEvent('property-value-change'));
 	}
 
 	render() {

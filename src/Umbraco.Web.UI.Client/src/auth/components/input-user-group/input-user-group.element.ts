@@ -63,7 +63,7 @@ export class UmbInputPickerUserGroupElement extends UmbInputListBase {
 
 	selectionUpdated() {
 		this._observeUserGroups();
-		this.dispatchEvent(new CustomEvent('property-value-change', { bubbles: true, composed: true }));
+		this.dispatchEvent(new CustomEvent('change', { bubbles: true, composed: true }));
 	}
 
 	private _renderUserGroupList() {
