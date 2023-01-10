@@ -22,18 +22,14 @@ public class DeleteSavedQueryLogController : SavedQueryLogControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<IActionResult> Delete(string name)
     {
-        // We need to get the count of all saved searches before trying to delete,
-        // so we can compare the results since DeleteSavedSearch() does not
-        // indicate whether the deletion was successful.
-        int countBeforeDeletion = _logViewer.GetSavedSearches().Count;
+        SavedLogSearch? savedSearch = _logViewer.GetSavedSearchByName(name);
 
-        IReadOnlyList<SavedLogSearch> modifiedSearches = _logViewer.DeleteSavedSearch(name, null);
-
-        // A saved query with that name does not exist
-        if (countBeforeDeletion == modifiedSearches.Count)
+        if (savedSearch is null)
         {
             return await Task.FromResult(NotFound());
         }
+
+        _logViewer.DeleteSavedSearch(name);
 
         return await Task.FromResult(Ok());
     }
