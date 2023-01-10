@@ -2357,7 +2357,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PagedSavedLogSearch"
+                  "$ref": "#/components/schemas/PagedLogTemplate"
                 }
               }
             }
@@ -2429,13 +2429,51 @@
               }
             }
           },
-          "200": {
-            "description": "Success"
+          "201": {
+            "description": "Created"
           }
         }
       }
     },
     "/umbraco/management/api/v1/log/saved-query/{name}": {
+      "get": {
+        "tags": [
+          "Log"
+        ],
+        "operationId": "GetLogSavedQueryByName",
+        "parameters": [
+          {
+            "name": "name",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotFoundResult"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SavedLogSearch"
+                }
+              }
+            }
+          }
+        }
+      },
       "delete": {
         "tags": [
           "Log"
@@ -6437,6 +6475,20 @@
         },
         "additionalProperties": false
       },
+      "LogTemplate": {
+        "type": "object",
+        "properties": {
+          "messageTemplate": {
+            "type": "string",
+            "nullable": true
+          },
+          "count": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "additionalProperties": false
+      },
       "Logger": {
         "type": "object",
         "properties": {
@@ -7256,6 +7308,26 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/LogMessage"
+            }
+          }
+        },
+        "additionalProperties": false
+      },
+      "PagedLogTemplate": {
+        "required": [
+          "items",
+          "total"
+        ],
+        "type": "object",
+        "properties": {
+          "total": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/LogTemplate"
             }
           }
         },
