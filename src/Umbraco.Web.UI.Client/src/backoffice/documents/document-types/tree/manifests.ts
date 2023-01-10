@@ -2,14 +2,10 @@ import type { ManifestTree, ManifestTreeItemAction } from '@umbraco-cms/models';
 
 const tree: ManifestTree = {
 	type: 'tree',
-	alias: 'Umb.Tree.DocumentBlueprint',
-	name: 'Document Blueprints Tree',
-	weight: 400,
+	alias: 'Umb.Tree.DocumentTypes',
+	name: 'Document Types Tree',
 	meta: {
-		label: 'Document Blueprints',
-		icon: 'umb:blueprint',
-		sections: ['Umb.Section.Settings'],
-		rootNodeEntityType: 'document-blueprint-root',
+		storeAlias: 'umbDocumentTypeStore',
 	},
 };
 

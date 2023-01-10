@@ -63,7 +63,7 @@ export class UmbBackofficeMain extends UmbLitElement {
 			return {
 				path: this._routePrefix + section.meta.pathname,
 				component: () => this._getSectionElement(section),
-				setup: this._onRouteSetup,
+				setup: this._onRouteSetup, // TODO: sometimes we can end up in a state where this callback doesn't get called. It could look like a bug in the router-slot.
 			};
 		});
 

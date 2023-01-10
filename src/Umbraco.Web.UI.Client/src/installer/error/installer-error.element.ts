@@ -57,14 +57,17 @@ export class UmbInstallerErrorElement extends UmbLitElement {
 
 	private _renderError(error: ProblemDetails) {
 		return html`
-			<p id="error-message" data-test="error-message">${error.detail ?? 'Unknown error'}</p>
-			<hr />
+			<p>Description: ${error.title}</p>
 			${error.errors ? this._renderErrors(error.errors) : nothing}
+			<hr />
+			<h3>Details:</h3>
+			<p id="error-message" data-test="error-message">${error.detail ?? 'Unknown error'}</p>
 		`;
 	}
 
 	private _renderErrors(errors: Record<string, unknown>) {
 		return html`
+			<h3>Errors:</h3>
 			<ul>
 				${Object.keys(errors).map((key) => html` <li>${key}: ${(errors[key] as string[]).join(', ')}</li> `)}
 			</ul>
@@ -75,8 +78,7 @@ export class UmbInstallerErrorElement extends UmbLitElement {
 		return html` <div id="container" class="uui-text" data-test="installer-error">
 			<uui-form>
 				<form id="installer-form" @submit="${this._handleSubmit}">
-					<h1 class="uui-h3">Installing Umbraco</h1>
-					<h2>Something went wrong</h2>
+					<h2>Something went wrong:</h2>
 					${this._error ? this._renderError(this._error) : nothing}
 					<div id="buttons">
 						<uui-button

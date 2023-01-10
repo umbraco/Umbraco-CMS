@@ -47,8 +47,8 @@ export class UmbSectionContext {
 		this._activeTree.next(tree);
 	}
 
-	public setActiveTreeItem(treeItem: Entity) {
-		this._activeTreeItem.next(treeItem);
+	public setActiveTreeItem(item: Entity) {
+		this._activeTreeItem.next(item);
 	}
 
 	public setActiveView(view: ManifestSectionView) {
