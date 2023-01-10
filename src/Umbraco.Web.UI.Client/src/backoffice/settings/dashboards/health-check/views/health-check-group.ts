@@ -59,7 +59,7 @@ export class UmbDashboardHealthCheckGroupElement extends UmbLitElement {
 				vertical-align: middle;
 			}
 
-			.data div:not(:first-child) {
+			.data .result-wrapper:not(:first-child) {
 				padding-top: var(--uui-size-space-5);
 				margin-top: var(--uui-size-space-5);
 				border-top: 1px solid var(--uui-color-divider-standalone);
@@ -72,19 +72,29 @@ export class UmbDashboardHealthCheckGroupElement extends UmbLitElement {
 				margin-block-start: 1em;
 			}
 
-			.action {
-				padding: var(---uui-size-space-4);
+			.action-wrapper {
+				margin-top: var(--uui-size-space-4);
 				display: flex;
-				background-color: #eee;
-				align-items: center;
+				flex-direction: column;
+				gap: var(--uui-size-space-4);
 			}
 
-			.action > * {
-				flex: 1;
+			.action {
+				width: 100%;
+				display: flex;
+				gap: var(--uui-size-space-4);
+				background-color: #eee;
+				align-items: center;
 			}
 			.action uui-button {
 				margin: 0;
 				padding: 0;
+				flex-shrink: 1;
+			}
+
+			.no-description {
+				color: var(--uui-color-border-emphasis);
+				font-style: italic;
 			}
 		`,
 	];
@@ -153,13 +163,7 @@ export class UmbDashboardHealthCheckGroupElement extends UmbLitElement {
 					return html`<div class="result-wrapper">
 						<p>${this.renderIcon(result.resultType)} ${result.message}</p>
 						${result.readMoreLink ? html`<uui-button color="default" look="primary">Read more</uui-button>` : nothing}
-						<div class="action-wrapper">
-							${result.actions
-								? this.renderActions(result.actions)
-								: this.renderActions([
-										{ name: 'button label', description: 'What the button will do', alias: 'methodname??' },
-								  ])}
-						</div>
+						${result.actions ? this.renderActions(result.actions) : nothing}
 					</div>`;
 				})}
 			</div>
@@ -181,11 +185,17 @@ export class UmbDashboardHealthCheckGroupElement extends UmbLitElement {
 		}
 	}
 
-	private renderActions(action: HealthCheckAction[]) {
-		if (action[0].name)
-			return html`<div class="action">
-				<uui-button look="primary" color="positive" label="${action[0].name}">${action[0].name}</uui-button>
-				<p>${action[0].description}</p>
+	private renderActions(actions: HealthCheckAction[]) {
+		if (actions.length)
+			return html` <div class="action-wrapper">
+				${actions.map((action) => {
+					return html` <div class="action">
+						<uui-button look="primary" color="positive" label="${action.name || 'action'}">
+							${action.name || 'Action'}
+						</uui-button>
+						<p>${action.description || html`<span class="no-description">This action has no description</span>`}</p>
+					</div>`;
+				})}
 			</div>`;
 		else return nothing;
 	}
