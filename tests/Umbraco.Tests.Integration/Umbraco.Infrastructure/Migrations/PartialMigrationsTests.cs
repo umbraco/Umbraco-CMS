@@ -117,6 +117,23 @@ public class PartialMigrationsTests : UmbracoIntegrationTest
     }
 
     [Test]
+    public void ScopesAreCreatedIfNecessary()
+    {
+        // The migrations have assert to esnure scopes
+        var plan = new MigrationPlan("test")
+            .From(string.Empty)
+            .To<AsserScopeScopedTestMigration>("a")
+            .To<AssertScopeUnscopedTestMigration>("b");
+
+        var upgrader = new Upgrader(plan);
+        var result = upgrader.Execute(MigrationPlanExecutor, ScopeProvider, KeyValueService);
+
+        Assert.IsTrue(result.Successful);
+        Assert.AreEqual(2, result.CompletedTransitions.Count);
+        Assert.AreEqual("b", result.FinalState);
+    }
+
+    [Test]
     [TestCase(true)]
     [TestCase(false)]
     public void UmbracoPlanExecutedNotificationIsAlwaysPublished(bool shouldSucceed)
@@ -202,6 +219,54 @@ public class AddColumnMigration : MigrationBase
         .OnTable(PartialMigrationsTests.TableName)
         .AsString()
         .Do();
+}
+
+public class AssertScopeUnscopedTestMigration : UnscopedMigrationBase
+{
+    private readonly IScopeProvider _scopeProvider;
+    private readonly IScopeAccessor _scopeAccessor;
+
+    public AssertScopeUnscopedTestMigration(
+        IMigrationContext context,
+        IScopeProvider scopeProvider,
+        IScopeAccessor scopeAccessor) : base(context)
+    {
+        _scopeProvider = scopeProvider;
+        _scopeAccessor = scopeAccessor;
+    }
+
+    protected override void Migrate()
+    {
+        // Since this is a scopeless migration both ambient scope and the parent scope should be null
+        Assert.IsNull(_scopeAccessor.AmbientScope);
+
+        using var scope = _scopeProvider.CreateScope();
+        Assert.IsNull(((Scope)scope).ParentScope);
+    }
+}
+
+public class AsserScopeScopedTestMigration : MigrationBase
+{
+    private readonly IScopeProvider _scopeProvider;
+    private readonly IScopeAccessor _scopeAccessor;
+
+    public AsserScopeScopedTestMigration(
+        IMigrationContext context,
+        IScopeProvider scopeProvider,
+        IScopeAccessor scopeAccessor) : base(context)
+    {
+        _scopeProvider = scopeProvider;
+        _scopeAccessor = scopeAccessor;
+    }
+
+    protected override void Migrate()
+    {
+        Assert.IsNotNull(_scopeAccessor.AmbientScope);
+
+        using var scope = _scopeProvider.CreateScope();
+
+        Assert.IsNotNull(((Scope)scope).ParentScope);
+    }
 }
 
 [TableName(PartialMigrationsTests.TableName)]
