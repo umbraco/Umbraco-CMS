@@ -1,23 +1,29 @@
 import './core/css/custom-properties.css';
+
+// TODO: remove these imports when they are part of UUI
+import '@umbraco-ui/uui-color-swatch';
+import '@umbraco-ui/uui-color-swatches';
 import '@umbraco-ui/uui-modal';
 import '@umbraco-ui/uui-modal-container';
 import '@umbraco-ui/uui-modal-dialog';
 import '@umbraco-ui/uui-modal-sidebar';
-import 'router-slot';
 import 'element-internals-polyfill';
+import 'router-slot';
+import './auth';
 
-// TODO: remove these imports when they are part of UUI
 import type { Guard, IRoute } from 'router-slot/model';
 
 import { UUIIconRegistryEssential } from '@umbraco-ui/uui';
-import { css, html, LitElement } from 'lit';
-import {customElement, property, state} from 'lit/decorators.js';
+import { css, html } from 'lit';
+import { customElement, property, state } from 'lit/decorators.js';
 
+import { UmbLitElement } from './core/element/lit-element.element';
+import { tryExecuteAndNotify } from './core/resources/tryExecuteAndNotify.method';
 import { OpenAPI, RuntimeLevel, ServerResource } from '@umbraco-cms/backend-api';
-import { UmbContextProviderMixin } from '@umbraco-cms/context-api';
+import { UmbIconStore } from '@umbraco-cms/stores/icon/icon.store';
 
 @customElement('umb-app')
-export class UmbApp extends UmbContextProviderMixin(LitElement) {
+export class UmbApp extends UmbLitElement {
 	static styles = css`
 		:host {
 			overflow: hidden;
@@ -56,11 +62,15 @@ export class UmbApp extends UmbContextProviderMixin(LitElement) {
 		},
 	];
 
+	private _umbIconRegistry = new UmbIconStore();
+
 	private _iconRegistry = new UUIIconRegistryEssential();
 	private _runtimeLevel = RuntimeLevel.UNKNOWN;
 
 	constructor() {
 		super();
+
+		this._umbIconRegistry.attach(this);
 
 		this._setup();
 	}
@@ -68,7 +78,10 @@ export class UmbApp extends UmbContextProviderMixin(LitElement) {
 	async connectedCallback() {
 		super.connectedCallback();
 
-		OpenAPI.BASE = import.meta.env.VITE_UMBRACO_USE_MSW === 'on' ? '' : this.umbracoUrl ?? import.meta.env.VITE_UMBRACO_API_URL ?? '';
+		OpenAPI.BASE =
+			import.meta.env.VITE_UMBRACO_USE_MSW === 'on'
+				? ''
+				: this.umbracoUrl ?? import.meta.env.VITE_UMBRACO_API_URL ?? '';
 		OpenAPI.WITH_CREDENTIALS = true;
 
 		this.provideContext('UMBRACOBASE', OpenAPI.BASE);
@@ -83,14 +96,8 @@ export class UmbApp extends UmbContextProviderMixin(LitElement) {
 	}
 
 	private async _setInitStatus() {
-		try {
-			const serverStatus = await ServerResource.getServerStatus();
-			if (serverStatus.serverStatus) {
-				this._runtimeLevel = serverStatus.serverStatus;
-			}
-		} catch (error) {
-			console.log(error);
-		}
+		const { data } = await tryExecuteAndNotify(this, ServerResource.getServerStatus());
+		this._runtimeLevel = data?.serverStatus ?? RuntimeLevel.UNKNOWN;
 	}
 
 	private _redirect() {

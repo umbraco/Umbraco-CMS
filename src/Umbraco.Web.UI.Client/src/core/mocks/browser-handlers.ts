@@ -12,18 +12,12 @@ import { handlers as userGroupsHandlers } from './domains/user-groups.handlers';
 import { handlers as examineManagementHandlers } from './domains/examine-management.handlers';
 import { handlers as modelsBuilderHandlers } from './domains/modelsbuilder.handlers';
 import { handlers as profilingHandlers } from './domains/performance-profiling.handlers';
-
 import { handlers as documentHandlers } from './domains/document.handlers';
 import { handlers as mediaHandlers } from './domains/media.handlers';
-
-// treeHandlers
-import { handlers as treeDocumentHandlers } from './domains/tree-document.handlers';
-import { handlers as treeMediaHandlers } from './domains/tree-media.handlers';
-import { handlers as treeDataTypeHandlers } from './domains/tree-data-type.handlers';
-import { handlers as treeDocumentTypeHandlers } from './domains/tree-document-type.handlers';
-import { handlers as treeMediaTypeHandlers } from './domains/tree-media-type.handlers';
-import { handlers as treeMemberTypeHandlers } from './domains/tree-member-type.handlers';
-import { handlers as treeMemberGroupHandlers } from './domains/tree-member-group.handlers';
+import { handlers as dictionaryHandlers } from './domains/dictionary.handlers';
+import { handlers as mediaTypeHandlers } from './domains/media-type.handlers';
+import { handlers as memberGroupHandlers } from './domains/member-group.handlers';
+import { handlers as memberTypeHandlers } from './domains/member-type.handlers';
 
 const handlers = [
 	serverHandlers.serverVersionHandler,
@@ -39,16 +33,13 @@ const handlers = [
 	...publishedStatusHandlers,
 	...usersHandlers,
 	...userGroupsHandlers,
-	...treeDocumentHandlers,
-	...treeMediaHandlers,
-	...treeDataTypeHandlers,
-	...treeDocumentTypeHandlers,
-	...treeMediaTypeHandlers,
-	...treeMemberTypeHandlers,
-	...treeMemberGroupHandlers,
+	...mediaTypeHandlers,
+	...memberGroupHandlers,
+	...memberTypeHandlers,
 	...examineManagementHandlers,
 	...modelsBuilderHandlers,
 	...profilingHandlers,
+	...dictionaryHandlers,
 ];
 
 switch (import.meta.env.VITE_UMBRACO_INSTALL_STATUS) {

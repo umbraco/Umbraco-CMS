@@ -33,7 +33,8 @@
 				"no-var": "error",
 				"import/no-unresolved": "error",
 				"import/order": "warn",
-				"local-rules/bad-type-import": "error"
+				"local-rules/bad-type-import": "error",
+				"local-rules/no-direct-api-import": "warn"
 			},
 			"settings": {
 				"import/parsers": {
