@@ -55,6 +55,19 @@ const dashboards: Array<ManifestDashboard> = [
 	},
 	{
 		type: 'dashboard',
+		alias: 'Umb.Dashboard.HealthCheck',
+		name: 'Health Check',
+		elementName: 'umb-dashboard-health-check',
+		loader: () => import('./health-check/dashboard-health-check.element'),
+		weight: 102,
+		meta: {
+			label: 'Health Check',
+			sections: ['Umb.Section.Settings'],
+			pathname: 'health-check',
+		},
+	},
+	{
+		type: 'dashboard',
 		alias: 'Umb.Dashboard.Profiling',
 		name: 'Profiling',
 		elementName: 'umb-dashboard-performance-profiling',

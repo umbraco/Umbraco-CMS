@@ -1,12 +1,13 @@
-import { html, LitElement, css, nothing } from 'lit';
+import { html, css, nothing } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { IRoute, IRoutingInfo, path } from 'router-slot';
 
+import { UmbLitElement } from '@umbraco-cms/element';
 import { UmbDashboardHealthCheckGroupElement } from './views/health-check-group';
-import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
+import { UmbDashboardHealthCheckOverviewElement } from './views/health-check-overview';
 
 @customElement('umb-dashboard-health-check')
-export class UmbDashboardHealthCheckElement extends UmbContextConsumerMixin(LitElement) {
+export class UmbDashboardHealthCheckElement extends UmbLitElement {
 	static styles = [
 		css`
 			a {
@@ -46,12 +47,12 @@ export class UmbDashboardHealthCheckElement extends UmbContextConsumerMixin(LitE
 	}
 
 	private get backbutton(): boolean {
-		return this._currentPath == '/section/settings/dashboard/healthcheck/' || !this._currentPath ? false : true;
+		return this._currentPath == '/section/settings/dashboard/health-check/' || !this._currentPath ? false : true;
 	}
 
 	render() {
 		return html` ${this.backbutton
-				? html` <a href="/section/settings/dashboard/healthcheck"> &larr; Back to overview </a> `
+				? html` <a href="/section/settings/dashboard/health-check"> &larr; Back to overview </a> `
 				: nothing}
 			<router-slot @changestate="${this._onRouteChange}" .routes=${this._routes}></router-slot>`;
 	}

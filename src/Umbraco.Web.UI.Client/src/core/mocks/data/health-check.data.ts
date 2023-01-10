@@ -1,43 +1,19 @@
 import { html } from 'lit';
 
-export interface PagedHealthCheck {
-	total: number;
-	items: HealthCheckGroup[];
+import {
+	HealthCheck,
+	HealthCheckGroup,
+	HealthCheckGroupWithResult,
+	HealthCheckWithResult,
+	HealthCheckResult,
+	StatusResultType,
+} from '@umbraco-cms/backend-api';
+
+export function getGroupByName(name: string) {
+	return healthGroups.find((group) => group.name == name);
 }
 
-export interface HealthCheckGroup {
-	name?: string;
-	checks?: HealthCheckGroupCheck[];
-}
-
-export interface HealthCheckGroupCheck {
-	key?: string;
-	name?: string;
-	description?: string;
-	results?: CheckResult[];
-}
-
-export interface CheckResult {
-	message?: string;
-	resultType?: HealthResult;
-	action?: CheckResultAction[];
-	readMoreLink?: string;
-}
-
-export interface CheckResultAction {
-	key?: string;
-	alias?: string;
-	name?: string;
-	description?: string;
-	valueRequired?: boolean;
-	providedValue?: string;
-	providedValueValidation?: string;
-	providedValueValidationRegex?: string;
-}
-
-export type HealthResult = 'Success' | 'Warning' | 'Error' | 'Info';
-
-export const healthGroups: HealthCheckGroup[] = [
+export const healthGroups: HealthCheckGroupWithResult[] = [
 	{
 		name: 'Configuration',
 		checks: [
@@ -50,7 +26,7 @@ export const healthGroups: HealthCheckGroup[] = [
 					{
 						message: `MacroErrors are set to 'Throw' which will prevent some or all pages in your site from loading
 						completely if there are any errors in macros. Rectifying this will set the value to 'Inline'. `,
-						resultType: 'Error',
+						resultType: StatusResultType.ERROR,
 						readMoreLink: 'https://umbra.co/healthchecks-macro-errors',
 					},
 				],
@@ -63,7 +39,7 @@ export const healthGroups: HealthCheckGroup[] = [
 				results: [
 					{
 						message: `Notification email is still set to the default value of <strong>your@email.here</strong>.`,
-						resultType: 'Error',
+						resultType: StatusResultType.ERROR,
 						readMoreLink: 'https://umbra.co/healthchecks-notification-email',
 					},
 				],
@@ -81,9 +57,9 @@ export const healthGroups: HealthCheckGroup[] = [
 				results: [
 					{
 						message: `All document paths are valid`,
-						resultType: 'Success',
+						resultType: StatusResultType.SUCCESS,
 					},
-					{ message: `All media paths are valid`, resultType: 'Success' },
+					{ message: `All media paths are valid`, resultType: StatusResultType.SUCCESS },
 				],
 			},
 		],
@@ -101,7 +77,7 @@ export const healthGroups: HealthCheckGroup[] = [
 					{
 						message: `Debug compilation mode is currently enabled. It is recommended to disable this setting before
 						go live.`,
-						resultType: 'Error',
+						resultType: StatusResultType.ERROR,
 						readMoreLink: 'https://umbra.co/healthchecks-compilation-debug',
 					},
 				],
@@ -119,19 +95,19 @@ export const healthGroups: HealthCheckGroup[] = [
 				results: [
 					{
 						message: `Folder creation`,
-						resultType: 'Success',
+						resultType: StatusResultType.SUCCESS,
 					},
 					{
 						message: `File writing for packages`,
-						resultType: 'Success',
+						resultType: StatusResultType.SUCCESS,
 					},
 					{
 						message: `File writing`,
-						resultType: 'Success',
+						resultType: StatusResultType.SUCCESS,
 					},
 					{
 						message: `Media folder creation`,
-						resultType: 'Success',
+						resultType: StatusResultType.SUCCESS,
 					},
 				],
 			},
@@ -148,7 +124,7 @@ export const healthGroups: HealthCheckGroup[] = [
 				results: [
 					{
 						message: `The appSetting 'Umbraco:CMS:WebRouting:UmbracoApplicationUrl' is not set`,
-						resultType: 'Warning',
+						resultType: StatusResultType.WARNING,
 						readMoreLink: 'https://umbra.co/healthchecks-umbraco-application-url',
 					},
 				],
@@ -163,7 +139,7 @@ export const healthGroups: HealthCheckGroup[] = [
 					{
 						message: `Error pinging the URL https://localhost:44361 - 'The SSL connection could not be established,
 						see inner exception.'`,
-						resultType: 'Error',
+						resultType: StatusResultType.ERROR,
 						readMoreLink: 'https://umbra.co/healthchecks-click-jacking',
 					},
 				],
@@ -177,7 +153,7 @@ export const healthGroups: HealthCheckGroup[] = [
 					{
 						message: `Error pinging the URL https://localhost:44361 - 'The SSL connection could not be established,
 						see inner exception.'`,
-						resultType: 'Error',
+						resultType: StatusResultType.ERROR,
 						readMoreLink: 'https://umbra.co/healthchecks-no-sniff',
 					},
 				],
@@ -192,7 +168,7 @@ export const healthGroups: HealthCheckGroup[] = [
 					{
 						message: `Error pinging the URL https://localhost:44361 - 'The SSL connection could not be established,
 						see inner exception.'`,
-						resultType: 'Error',
+						resultType: StatusResultType.ERROR,
 						readMoreLink: 'https://umbra.co/healthchecks-hsts',
 					},
 				],
@@ -207,7 +183,7 @@ export const healthGroups: HealthCheckGroup[] = [
 					{
 						message: `Error pinging the URL https://localhost:44361 - 'The SSL connection could not be established,
 						see inner exception.'`,
-						resultType: 'Error',
+						resultType: StatusResultType.ERROR,
 						readMoreLink: 'https://umbra.co/healthchecks-xss-protection',
 					},
 				],
@@ -222,7 +198,7 @@ export const healthGroups: HealthCheckGroup[] = [
 					{
 						message: `Error pinging the URL https://localhost:44361 - 'The SSL connection could not be established,
 						see inner exception.'`,
-						resultType: 'Warning',
+						resultType: StatusResultType.WARNING,
 						readMoreLink: 'https://umbra.co/healthchecks-excessive-headers',
 					},
 				],
@@ -236,18 +212,18 @@ export const healthGroups: HealthCheckGroup[] = [
 				results: [
 					{
 						message: `You are currently viewing the site using HTTPS scheme`,
-						resultType: 'Success',
+						resultType: StatusResultType.SUCCESS,
 					},
 					{
 						message: `The appSetting 'Umbraco:CMS:Global:UseHttps' is set to 'False' in your appSettings.json file,
 						your cookies are not marked as secure.`,
-						resultType: 'Error',
+						resultType: StatusResultType.ERROR,
 						readMoreLink: 'https://umbra.co/healthchecks-https-config',
 					},
 					{
 						message: `Error pinging the URL https://localhost:44361/ - 'The SSL connection could not be established,
 						see inner exception.'"`,
-						resultType: 'Error',
+						resultType: StatusResultType.ERROR,
 						readMoreLink: 'https://umbra.co/healthchecks-https-request',
 					},
 				],
@@ -266,14 +242,14 @@ export const healthGroups: HealthCheckGroup[] = [
 					{
 						message: `The 'Umbraco:CMS:Global:Smtp' configuration could not be found.`,
 						readMoreLink: 'https://umbra.co/healthchecks-smtp',
-						resultType: 'Error',
+						resultType: StatusResultType.ERROR,
 					},
 				],
 			},
 		],
 	},
 ];
-export const healthGroups2: HealthCheckGroup[] = [
+export const healthGroupsWithoutResult: HealthCheckGroup[] = [
 	{
 		name: 'Configuration',
 		checks: [
