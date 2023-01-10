@@ -60,22 +60,9 @@ export class UmbSectionElement extends UmbLitElement {
 	private _observeMenuItems() {
 		if (!this._sectionContext) return;
 
-		this.observe(
-			this._sectionContext?.data.pipe(
-				switchMap((section) => {
-					if (!section) return EMPTY;
-					return (
-						umbExtensionsRegistry
-							?.extensionsOfType('sidebarMenuItem')
-							.pipe(
-								map((manifests) => manifests.filter((manifest) => manifest.meta.sections.includes(section.alias)))
-							) ?? of([])
-					);
-				})
-			),
-			(manifests) => {
-				this._menuItems = manifests;
-				this._createMenuRoutes();
+		this.observe(this._sectionContext?.manifest,
+			(section) => {
+				this._observeSidebarMenuItem(section?.alias);
 			}
 		);
 
@@ -83,6 +70,25 @@ export class UmbSectionElement extends UmbLitElement {
 			this._workspaces = workspaceExtensions;
 			this._createMenuRoutes();
 		});
+	}
+
+	private _observeSidebarMenuItem(sectionAlias?:string) {
+		if(sectionAlias) {
+			this.observe(
+				umbExtensionsRegistry
+				?.extensionsOfType('sidebarMenuItem')
+				.pipe(
+					map((manifests) => manifests.filter((manifest) => manifest.meta.sections.includes(sectionAlias)))
+				),
+				(manifests) => {
+					this._menuItems = manifests;
+					this._createMenuRoutes();
+				}
+			);
+		} else {
+			this._menuItems = undefined;
+			this._createMenuRoutes();
+		}
 	}
 
 	private _createMenuRoutes() {
@@ -140,7 +146,7 @@ export class UmbSectionElement extends UmbLitElement {
 		if (!this._sectionContext) return;
 
 		this.observe(
-			this._sectionContext.data.pipe(
+			this._sectionContext.manifest.pipe(
 				switchMap((section) => {
 					if (!section) return EMPTY;
 

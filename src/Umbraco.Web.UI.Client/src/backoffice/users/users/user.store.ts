@@ -1,6 +1,7 @@
-import { BehaviorSubject, map, Observable } from 'rxjs';
+import { map, Observable } from 'rxjs';
 import { UmbDataStoreBase } from '../../../core/stores/store';
 import type { UserDetails } from '@umbraco-cms/models';
+import { UniqueBehaviorSubject } from 'src/core/observable-api/unique-behavior-subject';
 
 export type UmbUserStoreItemType = UserDetails;
 
@@ -13,8 +14,8 @@ export type UmbUserStoreItemType = UserDetails;
 export class UmbUserStore extends UmbDataStoreBase<UmbUserStoreItemType> {
 	public readonly storeAlias = 'umbUserStore';
 
-	private _totalUsers: BehaviorSubject<number> = new BehaviorSubject(0);
-	public readonly totalUsers: Observable<number> = this._totalUsers.asObservable();
+	#totalUsers = new UniqueBehaviorSubject(0);
+	public readonly totalUsers = this.#totalUsers.asObservable();
 
 	getAll(): Observable<Array<UmbUserStoreItemType>> {
 		// TODO: use Fetcher API.
@@ -22,7 +23,7 @@ export class UmbUserStore extends UmbDataStoreBase<UmbUserStoreItemType> {
 		fetch(`/umbraco/backoffice/users/list/items`)
 			.then((res) => res.json())
 			.then((data) => {
-				this._totalUsers.next(data.total);
+				this.#totalUsers.next(data.total);
 				this.updateItems(data.items);
 			});
 

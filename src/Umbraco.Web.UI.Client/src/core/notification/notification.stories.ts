@@ -77,8 +77,8 @@ Default.parameters = {
 			code: `
 const options: UmbNotificationOptions<UmbNotificationDefaultData> = {
   data: {
-    headline: 'Headline',
-    message: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit'
+	headline: 'Headline',
+	message: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit'
   }
 };
 

@@ -1,4 +1,4 @@
-import { BehaviorSubject, map, Observable } from 'rxjs';
+import { CreateObservablePart, UniqueBehaviorSubject } from 'src/core/observable-api/unique-behavior-subject';
 
 export type UmbModelType = 'dialog' | 'sidebar';
 
@@ -9,10 +9,14 @@ export type UmbCurrentUserHistoryItem = {
 };
 
 export class UmbCurrentUserHistoryStore {
-	private _history: BehaviorSubject<Array<UmbCurrentUserHistoryItem>> = new BehaviorSubject(
+	
+	#history = new UniqueBehaviorSubject(
 		<Array<UmbCurrentUserHistoryItem>>[]
 	);
-	public readonly history: Observable<Array<UmbCurrentUserHistoryItem>> = this._history.asObservable();
+
+	public readonly history = this.#history.asObservable();
+	public readonly latestHistory = CreateObservablePart(this.#history, historyItems => historyItems.slice(-10));
+
 
 	constructor() {
 		if (!('navigation' in window)) return;
@@ -23,14 +27,6 @@ export class UmbCurrentUserHistoryStore {
 		});
 	}
 
-	public getLatestHistory(): Observable<Array<UmbCurrentUserHistoryItem>> {
-		return this._history.pipe(
-			map((historyItem) => {
-				return historyItem.slice(-10);
-			})
-		);
-	}
-
 	/**
 	 * Pushes a new history item to the history array
 	 * @public
@@ -38,17 +34,17 @@ export class UmbCurrentUserHistoryStore {
 	 * @memberof UmbHistoryService
 	 */
 	public push(historyItem: UmbCurrentUserHistoryItem): void {
-		const history = this._history.getValue();
+		const history = this.#history.getValue();
 		const lastItem = history[history.length - 1];
 
 		// This prevents duplicate entries in the history array.
 		if (!lastItem || lastItem.path !== historyItem.path) {
-			this._history.next([...this._history.getValue(), historyItem]);
+			this.#history.next([...this.#history.getValue(), historyItem]);
 		} else {
 			//Update existing item
-			const newHistory = this._history.getValue();
+			const newHistory = this.#history.getValue();
 			newHistory[history.length - 1] = historyItem;
-			this._history.next(newHistory);
+			this.#history.next(newHistory);
 		}
 	}
 
@@ -58,6 +54,6 @@ export class UmbCurrentUserHistoryStore {
 	 * @memberof UmbHistoryService
 	 */
 	public clear() {
-		this._history.next([]);
+		this.#history.next([]);
 	}
 }

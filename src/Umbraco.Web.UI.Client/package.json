@@ -42,6 +42,7 @@
 		"generate:api": "openapi --input https://raw.githubusercontent.com/umbraco/Umbraco-CMS/v13/dev/src/Umbraco.Cms.Api.Management/OpenApi.json --output src/core/backend-api --postfix Resource --useOptions",
 		"generate:api-dev": "openapi --input http://localhost:9000/umbraco/swagger/v1/swagger.json --output src/core/backend-api --postfix Resource --useOptions",
 		"storybook": "npm run wc-analyze && start-storybook -p 6006",
+		"storybook:build": "npm run wc-analyze && build-storybook",
 		"build-storybook": "npm run wc-analyze && build-storybook",
 		"generate:icons": "node ./devops/icons/index.js",
 		"wc-analyze": "wca **/*.element.ts --outFile custom-elements.json",

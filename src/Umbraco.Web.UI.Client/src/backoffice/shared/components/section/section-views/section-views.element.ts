@@ -62,7 +62,7 @@ export class UmbSectionViewsElement extends UmbLitElement {
 
 		this._viewsSubscription?.unsubscribe();
 
-		this._viewsSubscription = this._sectionContext?.data
+		this._viewsSubscription = this._sectionContext?.manifest
 			.pipe(
 				switchMap((section) => {
 					if (!section) return EMPTY;

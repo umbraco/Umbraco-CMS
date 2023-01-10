@@ -121,23 +121,23 @@ export const data: Array<DocumentDetails> = [
 		],
 		variants: [{ name: 'fake data' }],
 		/*
-    // Concept for node layout, separation of design from config and data.
-    layout: [
-      {
-        type: 'group',
-        children: [
-          {
-            type: 'property',
-            alias: 'myHeadline'
-          },
-          {
-            type: 'property',
-            alias: 'myDescription'
-          }
-        ]
-      }
-    ],
-    */
+	// Concept for node layout, separation of design from config and data.
+	layout: [
+	  {
+		type: 'group',
+		children: [
+		  {
+			type: 'property',
+			alias: 'myHeadline'
+		  },
+		  {
+			type: 'property',
+			alias: 'myDescription'
+		  }
+		]
+	  }
+	],
+	*/
 	},
 	{
 		name: 'Document 2',

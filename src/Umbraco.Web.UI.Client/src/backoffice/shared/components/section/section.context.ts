@@ -1,46 +1,37 @@
-import { BehaviorSubject, ReplaySubject } from 'rxjs';
+import { BehaviorSubject } from 'rxjs';
 import type { Entity, ManifestSection, ManifestSectionView, ManifestTree } from '@umbraco-cms/models';
+import { UniqueBehaviorSubject } from 'src/core/observable-api/unique-behavior-subject';
 
 export class UmbSectionContext {
-	// TODO: figure out how fine grained we want to make our observables.
-	private _data = new BehaviorSubject<ManifestSection>({
-		type: 'section',
-		alias: '',
-		name: '',
-		js: '',
-		elementName: '',
-		weight: 0,
-		meta: {
-			label: '',
-			pathname: '',
-		},
-	});
-	public readonly data = this._data.asObservable();
+
+
+	#manifest;
+	public readonly manifest;
 
 	// TODO: what is the best context to put this in?
-	private _activeTree = new ReplaySubject<ManifestTree | undefined>(1);
+	private _activeTree = new BehaviorSubject<ManifestTree | undefined>(undefined);
 	public readonly activeTree = this._activeTree.asObservable();
 
 	// TODO: what is the best context to put this in?
-	private _activeTreeItem = new ReplaySubject<Entity | undefined>(1);
+	private _activeTreeItem = new UniqueBehaviorSubject<Entity | undefined>(undefined);
 	public readonly activeTreeItem = this._activeTreeItem.asObservable();
 
 	// TODO: what is the best context to put this in?
-	private _activeView = new ReplaySubject<ManifestSectionView | undefined>(1);
+	private _activeView = new BehaviorSubject<ManifestSectionView | undefined>(undefined);
 	public readonly activeView = this._activeView.asObservable();
 
-	constructor(section: ManifestSection) {
-		if (!section) return;
-		this._data.next(section);
+	constructor(sectionManifest: ManifestSection) {
+		this.#manifest = new UniqueBehaviorSubject<ManifestSection>(sectionManifest);
+		this.manifest = this.#manifest.asObservable();
 	}
 
-	// TODO: figure out how we want to update data
-	public update(data: Partial<ManifestSection>) {
-		this._data.next({ ...this._data.getValue(), ...data });
+
+	public setManifest(data: ManifestSection) {
+		this.#manifest.next({ ...data });
 	}
 
 	public getData() {
-		return this._data.getValue();
+		return this.#manifest.getValue();
 	}
 
 	public setActiveTree(tree: ManifestTree) {

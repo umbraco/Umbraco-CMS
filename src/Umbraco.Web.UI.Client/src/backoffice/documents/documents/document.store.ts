@@ -125,7 +125,7 @@ export class UmbDocumentStore extends UmbNodeStoreBase<UmbDocumentStoreItemType>
 	}
 
 	getTreeItems(keys: Array<string>): Observable<Array<FolderTreeItem>> {
-		if (keys.length > 0) {
+		if (keys?.length > 0) {
 			DocumentResource.getTreeDocumentItem({
 				key: keys,
 			}).then(
