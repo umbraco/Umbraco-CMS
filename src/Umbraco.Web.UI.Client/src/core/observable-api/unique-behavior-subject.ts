@@ -28,38 +28,40 @@ type MappingFunction<T, R> = (mappable: T) => R;
 type MemoizationFunction<R> = (previousResult: R, currentResult: R) => boolean;
 
 function defaultMemoization(previousValue: any, currentValue: any): boolean {
-  if (typeof previousValue === 'object' && typeof currentValue === 'object') {
-    return naiveObjectComparison(previousValue, currentValue);
-  }
-  return previousValue === currentValue;
+if (typeof previousValue === 'object' && typeof currentValue === 'object') {
+  return naiveObjectComparison(previousValue, currentValue);
+}
+return previousValue === currentValue;
 }
 export function CreateObservablePart<T, R> (
-	source$: Observable<T>,
-	mappingFunction: MappingFunction<T, R>,
-	memoizationFunction?: MemoizationFunction<R>
+source$: Observable<T>,
+mappingFunction: MappingFunction<T, R>,
+memoizationFunction?: MemoizationFunction<R>
 ): Observable<R> {
-	return source$.pipe(
-	  map(mappingFunction),
-	  distinctUntilChanged(memoizationFunction || defaultMemoization),
-	  shareReplay(1)
-	)
+return source$.pipe(
+map(mappingFunction),
+distinctUntilChanged(memoizationFunction || defaultMemoization),
+shareReplay(1)
+)
 }
 
 
-
+// TODO: Write JSDocs
+// TODO: Write comments about what it is and how it works.
 export class UniqueBehaviorSubject<T> extends BehaviorSubject<T> {
-    constructor(initialData: T) {
-        super(deepFreeze(initialData));
-    }
+constructor(initialData: T) {
 
-    next(newData: T): void {
-        const frozenData = deepFreeze(newData);
-        if (!naiveObjectComparison(frozenData, this.getValue())) {
-            super.next(frozenData);
-        }
-    }
+super(deepFreeze(initialData));
+}
 
-    update(data: Partial<T>) {
-		this.next({ ...this.getValue(), ...data });
-	}
+next(newData: T): void {
+const frozenData = deepFreeze(newData);
+if (!naiveObjectComparison(frozenData, this.getValue())) {
+super.next(frozenData);
+}
+}
+
+update(data: Partial<T>) {
+this.next({ ...this.getValue(), ...data });
+}
 }
