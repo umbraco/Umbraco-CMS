@@ -4,7 +4,7 @@ import { searchResultMockData, getIndexByName, PagedIndexers } from '../data/exa
 import { getGroupByName, healthGroups, healthGroupsWithoutResult } from '../data/health-check.data';
 
 import { umbracoPath } from '@umbraco-cms/utils';
-import { HealthCheckGroup, PagedHealthCheckGroup } from '@umbraco-cms/backend-api';
+import { HealthCheckGroup, PagedHealthCheckGroup, StatusResultType } from '@umbraco-cms/backend-api';
 
 export const handlers = [
 	rest.get(umbracoPath('/health-check-group'), (_req, res, ctx) => {
@@ -33,6 +33,100 @@ export const handlers = [
 		return res(
 			// Respond with a 200 status code
 			ctx.status(200)
+		);
+	}),
+
+	rest.get(umbracoPath('/health-check/security'), (_req, res, ctx) => {
+		return res(
+			ctx.status(200),
+			ctx.json<any>([
+				{
+					alias: 'applicationUrlConfiguration',
+					results: [
+						{
+							message: `The appSetting 'Umbraco:CMS:WebRouting:UmbracoApplicationUrl' is not set`,
+							resultType: StatusResultType.WARNING,
+							readMoreLink: 'https://umbra.co/healthchecks-umbraco-application-url',
+						},
+					],
+				},
+				{
+					alias: 'clickJackingProtection',
+					results: [
+						{
+							message: `Error pinging the URL https://localhost:44361 - 'The SSL connection could not be established,
+						see inner exception.'`,
+							resultType: StatusResultType.ERROR,
+							readMoreLink: 'https://umbra.co/healthchecks-click-jacking',
+						},
+					],
+				},
+				{
+					alias: 'contentSniffingProtection',
+					results: [
+						{
+							message: `Error pinging the URL https://localhost:44361 - 'The SSL connection could not be established,
+						see inner exception.'`,
+							resultType: StatusResultType.ERROR,
+							readMoreLink: 'https://umbra.co/healthchecks-no-sniff',
+						},
+					],
+				},
+				{
+					alias: 'cookieHijackingProtection',
+					results: [
+						{
+							message: `Error pinging the URL https://localhost:44361 - 'The SSL connection could not be established,
+						see inner exception.'`,
+							resultType: StatusResultType.ERROR,
+							readMoreLink: 'https://umbra.co/healthchecks-hsts',
+						},
+					],
+				},
+				{
+					alias: 'crossSiteProtection',
+					results: [
+						{
+							message: `Error pinging the URL https://localhost:44361 - 'The SSL connection could not be established,
+						see inner exception.'`,
+							resultType: StatusResultType.ERROR,
+							readMoreLink: 'https://umbra.co/healthchecks-xss-protection',
+						},
+					],
+				},
+				{
+					alias: 'excessiveHeaders',
+					results: [
+						{
+							message: `Error pinging the URL https://localhost:44361 - 'The SSL connection could not be established,
+						see inner exception.'`,
+							resultType: StatusResultType.WARNING,
+							readMoreLink: 'https://umbra.co/healthchecks-excessive-headers',
+						},
+					],
+				},
+				{
+					alias: 'HttpsConfiguration',
+					results: [
+						{
+							message: `You are currently viewing the site using HTTPS scheme`,
+							resultType: StatusResultType.SUCCESS,
+						},
+						{
+							message: `The appSetting 'Umbraco:CMS:Global:UseHttps' is set to 'False' in your appSettings.json file,
+						your cookies are not marked as secure.`,
+							resultType: StatusResultType.ERROR,
+							readMoreLink: 'https://umbra.co/healthchecks-https-config',
+						},
+						{
+							message: `Error pinging the URL https://localhost:44361/ - 'The SSL connection could not be established,
+						see inner exception.'"`,
+							resultType: StatusResultType.ERROR,
+							readMoreLink: 'https://umbra.co/healthchecks-https-request',
+						},
+					],
+				},
+			])
 		);
 	}),
 ];

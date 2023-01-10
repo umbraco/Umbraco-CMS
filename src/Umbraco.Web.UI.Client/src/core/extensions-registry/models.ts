@@ -16,6 +16,7 @@ import type { ManifestPackageView } from './package-view.models';
 import type { ManifestExternalLoginProvider } from './external-login-provider.models';
 import type { ManifestCollectionBulkAction } from './collection-bulk-action.models';
 import type { ManifestCollectionView } from './collection-view.models';
+import type { ManifestHealthCheck } from './health-check.models';
 
 export * from './header-app.models';
 export * from './section.models';
@@ -35,6 +36,7 @@ export * from './package-view.models';
 export * from './external-login-provider.models';
 export * from './collection-bulk-action.models';
 export * from './collection-view.models';
+export * from './health-check.models';
 
 export type ManifestTypes =
 	| ManifestCustom
@@ -57,15 +59,14 @@ export type ManifestTypes =
 	| ManifestExternalLoginProvider
 	| ManifestEntrypoint
 	| ManifestCollectionBulkAction
-	| ManifestCollectionView;
+	| ManifestCollectionView
+	| ManifestHealthCheck;
 
 export type ManifestStandardTypes = ManifestTypes['type'];
 
 export type ManifestTypeMap = {
 	[Manifest in ManifestTypes as Manifest['type']]: Manifest;
 };
-
-
 
 export interface ManifestBase {
 	type: string;

@@ -10,6 +10,8 @@ import { tryExecuteAndNotify } from '@umbraco-cms/resources';
 
 import { HealthCheckGroup, HealthCheckGroupWithResult, HealthCheckResource } from '@umbraco-cms/backend-api';
 
+import '../health-check-group2.element';
+
 @customElement('umb-dashboard-health-check-overview')
 export class UmbDashboardHealthCheckOverviewElement extends UmbLitElement {
 	static styles = [
@@ -138,6 +140,8 @@ export class UmbDashboardHealthCheckOverviewElement extends UmbLitElement {
 					})}
 				</div>
 			</uui-box>
+			<br />
+			<umb-extension-slot type="healthCheck" default-element="umb-health-check-group2"></umb-extension-slot>
 		`;
 	}
 
