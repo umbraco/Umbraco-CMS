@@ -15,6 +15,7 @@ public class TemplateService : RepositoryService, ITemplateService
     private readonly IShortStringHelper _shortStringHelper;
     private readonly ITemplateRepository _templateRepository;
     private readonly IAuditRepository _auditRepository;
+    private readonly ITemplateContentParserService _templateContentParserService;
 
     public TemplateService(
         ICoreScopeProvider provider,
@@ -22,16 +23,18 @@ public class TemplateService : RepositoryService, ITemplateService
         IEventMessagesFactory eventMessagesFactory,
         IShortStringHelper shortStringHelper,
         ITemplateRepository templateRepository,
-        IAuditRepository auditRepository)
+        IAuditRepository auditRepository,
+        ITemplateContentParserService templateContentParserService)
         : base(provider, loggerFactory, eventMessagesFactory)
     {
         _shortStringHelper = shortStringHelper;
         _templateRepository = templateRepository;
         _auditRepository = auditRepository;
+        _templateContentParserService = templateContentParserService;
     }
 
     /// <inheritdoc />
-    public Attempt<OperationResult<OperationResultType, ITemplate>?> CreateTemplateForContentType(
+    public async Task<Attempt<OperationResult<OperationResultType, ITemplate>?>> CreateTemplateForContentTypeAsync(
         string contentTypeAlias, string? contentTypeName, int userId = Constants.Security.SuperUserId)
     {
         var template = new Template(_shortStringHelper, contentTypeName,
@@ -75,18 +78,17 @@ public class TemplateService : RepositoryService, ITemplateService
             scope.Complete();
         }
 
-        return OperationResult.Attempt.Succeed<OperationResultType, ITemplate>(
+        return await Task.FromResult(OperationResult.Attempt.Succeed<OperationResultType, ITemplate>(
             OperationResultType.Success,
             eventMessages,
-            template);
+            template));
     }
 
     /// <inheritdoc />
-    public ITemplate CreateTemplateWithIdentity(
+    public async Task<ITemplate?> CreateTemplateWithIdentityAsync(
         string? name,
         string? alias,
         string? content,
-        ITemplate? masterTemplate = null,
         int userId = Constants.Security.SuperUserId)
     {
         if (name == null)
@@ -104,6 +106,8 @@ public class TemplateService : RepositoryService, ITemplateService
             throw new ArgumentOutOfRangeException(nameof(name), "Name cannot be more than 255 characters in length.");
         }
 
+        ITemplate? masterTemplate = await GetMasterTemplate(content);
+
         // file might already be on disk, if so grab the content to avoid overwriting
         var template = new Template(_shortStringHelper, name, alias) { Content = GetViewContent(alias) ?? content };
 
@@ -112,68 +116,68 @@ public class TemplateService : RepositoryService, ITemplateService
             template.SetMasterTemplate(masterTemplate);
         }
 
-        SaveTemplate(template, userId);
-
-        return template;
+        return await SaveTemplateAsync(template, userId)
+            ? template
+            : null;
     }
 
     /// <inheritdoc />
-    public IEnumerable<ITemplate> GetTemplates(params string[] aliases)
+    public async Task<IEnumerable<ITemplate>> GetTemplatesAsync(params string[] aliases)
     {
         using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
         {
-            return _templateRepository.GetAll(aliases).OrderBy(x => x.Name);
+            return await Task.FromResult(_templateRepository.GetAll(aliases).OrderBy(x => x.Name));
         }
     }
 
     /// <inheritdoc />
-    public IEnumerable<ITemplate> GetTemplates(int masterTemplateId)
+    public async Task<IEnumerable<ITemplate>> GetTemplatesAsync(int masterTemplateId)
     {
         using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
         {
-            return _templateRepository.GetChildren(masterTemplateId).OrderBy(x => x.Name);
+            return await Task.FromResult(_templateRepository.GetChildren(masterTemplateId).OrderBy(x => x.Name));
         }
     }
 
     /// <inheritdoc />
-    public ITemplate? GetTemplate(string? alias)
+    public async Task<ITemplate?> GetTemplateAsync(string? alias)
     {
         using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
         {
-            return _templateRepository.Get(alias);
+            return await Task.FromResult(_templateRepository.Get(alias));
         }
     }
 
     /// <inheritdoc />
-    public ITemplate? GetTemplate(int id)
+    public async Task<ITemplate?> GetTemplateAsync(int id)
     {
         using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
         {
-            return _templateRepository.Get(id);
+            return await Task.FromResult(_templateRepository.Get(id));
         }
     }
 
     /// <inheritdoc />
-    public ITemplate? GetTemplate(Guid id)
+    public async Task<ITemplate?> GetTemplateAsync(Guid id)
     {
         using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
         {
             IQuery<ITemplate>? query = Query<ITemplate>().Where(x => x.Key == id);
-            return _templateRepository.Get(query)?.SingleOrDefault();
+            return await Task.FromResult(_templateRepository.Get(query)?.SingleOrDefault());
         }
     }
 
     /// <inheritdoc />
-    public IEnumerable<ITemplate> GetTemplateDescendants(int masterTemplateId)
+    public async Task<IEnumerable<ITemplate>> GetTemplateDescendantsAsync(int masterTemplateId)
     {
         using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
         {
-            return _templateRepository.GetDescendants(masterTemplateId);
+            return await Task.FromResult(_templateRepository.GetDescendants(masterTemplateId));
         }
     }
 
     /// <inheritdoc />
-    public void SaveTemplate(ITemplate template, int userId = Constants.Security.SuperUserId)
+    public async Task<bool> SaveTemplateAsync(ITemplate template, int userId = Constants.Security.SuperUserId)
     {
         if (template == null)
         {
@@ -188,12 +192,15 @@ public class TemplateService : RepositoryService, ITemplateService
 
         using (ICoreScope scope = ScopeProvider.CreateCoreScope())
         {
+            ITemplate? masterTemplate = await GetMasterTemplate(template.Content);
+            await SetMasterTemplateAsync(template, masterTemplate);
+
             EventMessages eventMessages = EventMessagesFactory.Get();
             var savingNotification = new TemplateSavingNotification(template, eventMessages);
             if (scope.Notifications.PublishCancelable(savingNotification))
             {
                 scope.Complete();
-                return;
+                return false;
             }
 
             _templateRepository.Save(template);
@@ -203,11 +210,12 @@ public class TemplateService : RepositoryService, ITemplateService
 
             Audit(AuditType.Save, userId, template.Id, UmbracoObjectTypes.Template.GetName());
             scope.Complete();
+            return true;
         }
     }
 
     /// <inheritdoc />
-    public void SaveTemplate(IEnumerable<ITemplate> templates, int userId = Constants.Security.SuperUserId)
+    public async Task<bool> SaveTemplateAsync(IEnumerable<ITemplate> templates, int userId = Constants.Security.SuperUserId)
     {
         ITemplate[] templatesA = templates.ToArray();
         using (ICoreScope scope = ScopeProvider.CreateCoreScope())
@@ -217,7 +225,7 @@ public class TemplateService : RepositoryService, ITemplateService
             if (scope.Notifications.PublishCancelable(savingNotification))
             {
                 scope.Complete();
-                return;
+                return false;
             }
 
             foreach (ITemplate template in templatesA)
@@ -230,88 +238,82 @@ public class TemplateService : RepositoryService, ITemplateService
 
             Audit(AuditType.Save, userId, -1, UmbracoObjectTypes.Template.GetName());
             scope.Complete();
+            return await Task.FromResult(true);
         }
     }
 
     /// <inheritdoc />
-    public void DeleteTemplate(string alias, int userId = Constants.Security.SuperUserId)
-    {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope())
-        {
-            ITemplate? template = _templateRepository.Get(alias);
-            if (template == null)
-            {
-                scope.Complete();
-                return;
-            }
-
-            EventMessages eventMessages = EventMessagesFactory.Get();
-            var deletingNotification = new TemplateDeletingNotification(template, eventMessages);
-            if (scope.Notifications.PublishCancelable(deletingNotification))
-            {
-                scope.Complete();
-                return;
-            }
-
-            _templateRepository.Delete(template);
-
-            scope.Notifications.Publish(
-                new TemplateDeletedNotification(template, eventMessages).WithStateFrom(deletingNotification));
-
-            Audit(AuditType.Delete, userId, template.Id, UmbracoObjectTypes.Template.GetName());
-            scope.Complete();
-        }
-    }
+    public async Task<bool> DeleteTemplateAsync(string alias, int userId = Constants.Security.SuperUserId)
+        => await DeleteTemplateAsync(() => Task.FromResult(_templateRepository.Get(alias)), userId);
 
     /// <inheritdoc />
-    public Stream GetTemplateFileContentStream(string filepath)
+    public async Task<bool> DeleteTemplateAsync(Guid key, int userId = Constants.Security.SuperUserId)
+        => await DeleteTemplateAsync(async () => await GetTemplateAsync(key), userId);
+
+    /// <inheritdoc />
+    public async Task<Stream> GetTemplateFileContentStreamAsync(string filepath)
     {
         using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
         {
-            return _templateRepository.GetFileContentStream(filepath);
+            return await Task.FromResult(_templateRepository.GetFileContentStream(filepath));
         }
     }
 
     /// <inheritdoc />
-    public void SetTemplateFileContent(string filepath, Stream content)
+    public async Task SetTemplateFileContentAsync(string filepath, Stream content)
     {
         using (ICoreScope scope = ScopeProvider.CreateCoreScope())
         {
             _templateRepository.SetFileContent(filepath, content);
             scope.Complete();
+            await Task.CompletedTask;
         }
     }
 
     /// <inheritdoc />
-    public long GetTemplateFileSize(string filepath)
+    public async Task<long> GetTemplateFileSizeAsync(string filepath)
     {
         using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
         {
-            return _templateRepository.GetFileSize(filepath);
+            return await Task.FromResult(_templateRepository.GetFileSize(filepath));
         }
     }
 
-    /// <inheritdoc />
-    public void SetMasterTemplate(ITemplate template, string? masterTemplateAlias)
+    private async Task<ITemplate?> GetMasterTemplate(string? content)
     {
-        if (template.MasterTemplateAlias == masterTemplateAlias)
+        var masterTemplateAlias = _templateContentParserService.MasterTemplateAlias(content);
+        ITemplate? masterTemplate = masterTemplateAlias.IsNullOrWhiteSpace()
+            ? null
+            : await GetTemplateAsync(masterTemplateAlias);
+
+        if (masterTemplateAlias.IsNullOrWhiteSpace() == false && masterTemplate == null)
+        {
+            throw new ArgumentException($"Could not find master template with alias: {masterTemplateAlias}", content);
+        }
+
+        return masterTemplate;
+    }
+
+    /// <inheritdoc />
+    private async Task SetMasterTemplateAsync(ITemplate template, ITemplate? masterTemplate)
+    {
+        if (template.MasterTemplateAlias == masterTemplate?.Alias)
         {
             return;
         }
 
-        if (string.IsNullOrEmpty(masterTemplateAlias) == false)
+        if (masterTemplate != null)
         {
-            ITemplate? master = GetTemplate(masterTemplateAlias);
-            if (master == null || master.Id == template.Id)
+            if (masterTemplate.Id == template.Id)
             {
                 template.SetMasterTemplate(null);
             }
             else
             {
-                template.SetMasterTemplate(master);
+                template.SetMasterTemplate(masterTemplate);
 
                 //After updating the master - ensure we update the path property if it has any children already assigned
-                IEnumerable<ITemplate> templateHasChildren = GetTemplateDescendants(template.Id);
+                IEnumerable<ITemplate> templateHasChildren = await GetTemplateDescendantsAsync(template.Id);
 
                 foreach (ITemplate childTemplate in templateHasChildren)
                 {
@@ -331,10 +333,10 @@ public class TemplateService : RepositoryService, ITemplateService
 
                     //As we are updating the template to be a child of a master
                     //Set the path to the master's path + its current template id + the current child path substring
-                    childTemplate.Path = master.Path + "," + template.Id + "," + childTemplatePath;
+                    childTemplate.Path = masterTemplate.Path + "," + template.Id + "," + childTemplatePath;
 
                     //Save the children with the updated path
-                    SaveTemplate(childTemplate);
+                    await SaveTemplateAsync(childTemplate);
                 }
             }
         }
@@ -367,4 +369,34 @@ public class TemplateService : RepositoryService, ITemplateService
 
     private void Audit(AuditType type, int userId, int objectId, string? entityType) =>
         _auditRepository.Save(new AuditItem(objectId, type, userId, entityType));
+
+    private async Task<bool> DeleteTemplateAsync(Func<Task<ITemplate?>> getTemplate, int userId)
+    {
+        using (ICoreScope scope = ScopeProvider.CreateCoreScope())
+        {
+            ITemplate? template = await getTemplate();
+            if (template == null)
+            {
+                scope.Complete();
+                return true;
+            }
+
+            EventMessages eventMessages = EventMessagesFactory.Get();
+            var deletingNotification = new TemplateDeletingNotification(template, eventMessages);
+            if (scope.Notifications.PublishCancelable(deletingNotification))
+            {
+                scope.Complete();
+                return false;
+            }
+
+            _templateRepository.Delete(template);
+
+            scope.Notifications.Publish(
+                new TemplateDeletedNotification(template, eventMessages).WithStateFrom(deletingNotification));
+
+            Audit(AuditType.Delete, userId, template.Id, UmbracoObjectTypes.Template.GetName());
+            scope.Complete();
+            return await Task.FromResult(true);
+        }
+    }
 }

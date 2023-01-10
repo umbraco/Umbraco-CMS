@@ -30,24 +30,14 @@ public class CreateTemplateController : TemplateControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult> Create(TemplateCreateModel createModel)
     {
-        var masterTemplateAlias = _templateContentParserService.MasterTemplateAlias(createModel.Content);
-        ITemplate? masterTemplate = null;
-        if (masterTemplateAlias.IsNullOrWhiteSpace() == false)
-        {
-            masterTemplate = _templateService.GetTemplate(masterTemplateAlias);
-            if (masterTemplate == null)
-            {
-                return NotFound($"Could not find a master template with alias {masterTemplateAlias}");
-            }
-        }
-
-        ITemplate template = _templateService.CreateTemplateWithIdentity(
+        ITemplate? template = await _templateService.CreateTemplateWithIdentityAsync(
             createModel.Name,
             createModel.Alias,
             createModel.Content,
-            masterTemplate,
             CurrentUserId(_backOfficeSecurityAccessor));
 
-        return await Task.FromResult(CreatedAtAction<ByKeyTemplateController>(controller => nameof(controller.ByKey), template.Key));
+        return template == null
+            ? NotFound()
+            : CreatedAtAction<ByKeyTemplateController>(controller => nameof(controller.ByKey), template.Key);
     }
 }

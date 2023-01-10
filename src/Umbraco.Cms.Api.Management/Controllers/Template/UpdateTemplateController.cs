@@ -13,18 +13,15 @@ public class UpdateTemplateController : TemplateControllerBase
     private readonly ITemplateService _templateService;
     private readonly IUmbracoMapper _umbracoMapper;
     private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
-    private readonly ITemplateContentParserService _templateContentParserService;
 
     public UpdateTemplateController(
         ITemplateService templateService,
         IUmbracoMapper umbracoMapper,
-        IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
-        ITemplateContentParserService templateContentParserService)
+        IBackOfficeSecurityAccessor backOfficeSecurityAccessor)
     {
         _templateService = templateService;
         _umbracoMapper = umbracoMapper;
         _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
-        _templateContentParserService = templateContentParserService;
     }
 
     [HttpPut("{key:guid}")]
@@ -33,18 +30,15 @@ public class UpdateTemplateController : TemplateControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult> Update(Guid key, TemplateUpdateModel updateModel)
     {
-        ITemplate? template = _templateService.GetTemplate(key);
+        ITemplate? template = await _templateService.GetTemplateAsync(key);
         if (template == null)
         {
             return NotFound();
         }
 
         template = _umbracoMapper.Map(updateModel, template);
+        await _templateService.SaveTemplateAsync(template, CurrentUserId(_backOfficeSecurityAccessor));
 
-        var masterTemplateAlias = _templateContentParserService.MasterTemplateAlias(updateModel.Content);
-        _templateService.SetMasterTemplate(template, masterTemplateAlias);
-        _templateService.SaveTemplate(template, CurrentUserId(_backOfficeSecurityAccessor));
-
-        return await Task.FromResult(Ok());
+        return Ok();
     }
 }

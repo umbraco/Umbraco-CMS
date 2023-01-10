@@ -8,55 +8,49 @@ public interface ITemplateService : IService
     ///     Gets a list of all <see cref="ITemplate" /> objects
     /// </summary>
     /// <returns>An enumerable list of <see cref="ITemplate" /> objects</returns>
-    IEnumerable<ITemplate> GetTemplates(params string[] aliases);
+    Task<IEnumerable<ITemplate>> GetTemplatesAsync(params string[] aliases);
 
     /// <summary>
     ///     Gets a list of all <see cref="ITemplate" /> objects
     /// </summary>
     /// <returns>An enumerable list of <see cref="ITemplate" /> objects</returns>
-    IEnumerable<ITemplate> GetTemplates(int masterTemplateId);
+    Task<IEnumerable<ITemplate>> GetTemplatesAsync(int masterTemplateId);
 
     /// <summary>
     ///     Gets a <see cref="ITemplate" /> object by its alias.
     /// </summary>
     /// <param name="alias">The alias of the template.</param>
     /// <returns>The <see cref="ITemplate" /> object matching the alias, or null.</returns>
-    ITemplate? GetTemplate(string? alias);
+    Task<ITemplate?> GetTemplateAsync(string? alias);
 
     /// <summary>
     ///     Gets a <see cref="ITemplate" /> object by its identifier.
     /// </summary>
     /// <param name="id">The identifier of the template.</param>
     /// <returns>The <see cref="ITemplate" /> object matching the identifier, or null.</returns>
-    ITemplate? GetTemplate(int id);
+    Task<ITemplate?> GetTemplateAsync(int id);
 
     /// <summary>
     ///     Gets a <see cref="ITemplate" /> object by its guid identifier.
     /// </summary>
     /// <param name="id">The guid identifier of the template.</param>
     /// <returns>The <see cref="ITemplate" /> object matching the identifier, or null.</returns>
-    ITemplate? GetTemplate(Guid id);
+    Task<ITemplate?> GetTemplateAsync(Guid id);
 
     /// <summary>
     ///     Gets the template descendants
     /// </summary>
     /// <param name="masterTemplateId"></param>
     /// <returns></returns>
-    IEnumerable<ITemplate> GetTemplateDescendants(int masterTemplateId);
+    Task<IEnumerable<ITemplate>> GetTemplateDescendantsAsync(int masterTemplateId);
 
     /// <summary>
     ///     Saves a <see cref="ITemplate" />
     /// </summary>
     /// <param name="template"><see cref="ITemplate" /> to save</param>
     /// <param name="userId">Optional id of the user saving the template</param>
-    void SaveTemplate(ITemplate template, int userId = Constants.Security.SuperUserId);
-
-    /// <summary>
-    ///     Sets the master template of a <see cref="ITemplate" />
-    /// </summary>
-    /// <param name="template"><see cref="ITemplate" /> to set master template for.</param>
-    /// <param name="userId">The alias of the master template, or null if the template should not have a master template.</param>
-    void SetMasterTemplate(ITemplate template, string? masterTemplateAlias);
+    /// <returns>True if the template was saved, false otherwise.</returns>
+    Task<bool> SaveTemplateAsync(ITemplate template, int userId = Constants.Security.SuperUserId);
 
     /// <summary>
     ///     Creates a template for a content type
@@ -67,45 +61,55 @@ public interface ITemplateService : IService
     /// <returns>
     ///     The template created
     /// </returns>
-    Attempt<OperationResult<OperationResultType, ITemplate>?> CreateTemplateForContentType(
+    Task<Attempt<OperationResult<OperationResultType, ITemplate>?>> CreateTemplateForContentTypeAsync(
         string contentTypeAlias,
         string? contentTypeName,
         int userId = Constants.Security.SuperUserId);
 
-    ITemplate CreateTemplateWithIdentity(string? name, string? alias, string? content, ITemplate? masterTemplate = null, int userId = Constants.Security.SuperUserId);
+    Task<ITemplate?> CreateTemplateWithIdentityAsync(string? name, string? alias, string? content, int userId = Constants.Security.SuperUserId);
 
     /// <summary>
     ///     Deletes a template by its alias
     /// </summary>
     /// <param name="alias">Alias of the <see cref="ITemplate" /> to delete</param>
     /// <param name="userId">Optional id of the user deleting the template</param>
-    void DeleteTemplate(string alias, int userId = Constants.Security.SuperUserId);
+    /// <returns>True if the template was deleted, false otherwise</returns>
+    Task<bool> DeleteTemplateAsync(string alias, int userId = Constants.Security.SuperUserId);
+
+    /// <summary>
+    ///     Deletes a template by its key
+    /// </summary>
+    /// <param name="key">Key of the <see cref="ITemplate" /> to delete</param>
+    /// <param name="userId">Optional id of the user deleting the template</param>
+    /// <returns>True if the template was deleted, false otherwise</returns>
+    Task<bool> DeleteTemplateAsync(Guid key, int userId = Constants.Security.SuperUserId);
 
     /// <summary>
     ///     Saves a collection of <see cref="Template" /> objects
     /// </summary>
     /// <param name="templates">List of <see cref="Template" /> to save</param>
     /// <param name="userId">Optional id of the user</param>
-    void SaveTemplate(IEnumerable<ITemplate> templates, int userId = Constants.Security.SuperUserId);
+    /// <returns>True if the templates were saved, false otherwise</returns>
+    Task<bool> SaveTemplateAsync(IEnumerable<ITemplate> templates, int userId = Constants.Security.SuperUserId);
 
     /// <summary>
     ///     Gets the content of a template as a stream.
     /// </summary>
     /// <param name="filepath">The filesystem path to the template.</param>
     /// <returns>The content of the template.</returns>
-    Stream GetTemplateFileContentStream(string filepath);
+    Task<Stream> GetTemplateFileContentStreamAsync(string filepath);
 
     /// <summary>
     ///     Sets the content of a template.
     /// </summary>
     /// <param name="filepath">The filesystem path to the template.</param>
     /// <param name="content">The content of the template.</param>
-    void SetTemplateFileContent(string filepath, Stream content);
+    Task SetTemplateFileContentAsync(string filepath, Stream content);
 
     /// <summary>
     ///     Gets the size of a template.
     /// </summary>
     /// <param name="filepath">The filesystem path to the template.</param>
     /// <returns>The size of the template.</returns>
-    long GetTemplateFileSize(string filepath);
+    Task<long> GetTemplateFileSizeAsync(string filepath);
 }

@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 
@@ -22,14 +21,7 @@ public class DeleteTemplateController : TemplateControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult> Delete(Guid key)
-    {
-        ITemplate? template = _templateService.GetTemplate(key);
-        if (template == null)
-        {
-            return NotFound();
-        }
-
-        _templateService.DeleteTemplate(template.Alias, CurrentUserId(_backOfficeSecurityAccessor));
-        return await Task.FromResult(Ok());
-    }
+        => await _templateService.DeleteTemplateAsync(key, CurrentUserId(_backOfficeSecurityAccessor))
+            ? Ok()
+            : NotFound();
 }

@@ -61,7 +61,7 @@ public class TemplateController : BackOfficeNotificationsController
         /// <returns></returns>
         public TemplateDisplay? GetByAlias(string alias)
         {
-            ITemplate? template = _templateService.GetTemplate(alias);
+            ITemplate? template = _templateService.GetTemplateAsync(alias).GetAwaiter().GetResult();
         return template == null ? null : _umbracoMapper.Map<ITemplate, TemplateDisplay>(template);
     }
 
@@ -69,7 +69,7 @@ public class TemplateController : BackOfficeNotificationsController
     ///     Get all templates
     /// </summary>
     /// <returns></returns>
-    public IEnumerable<EntityBasic>? GetAll() => _templateService.GetTemplates()
+    public IEnumerable<EntityBasic>? GetAll() => _templateService.GetTemplatesAsync().GetAwaiter().GetResult()
         ?.Select(_umbracoMapper.Map<ITemplate, EntityBasic>).WhereNotNull();
 
     /// <summary>
@@ -79,7 +79,7 @@ public class TemplateController : BackOfficeNotificationsController
     /// <returns></returns>
     public ActionResult<TemplateDisplay?> GetById(int id)
     {
-        ITemplate? template = _templateService.GetTemplate(id);
+        ITemplate? template = _templateService.GetTemplateAsync(id).GetAwaiter().GetResult();
         if (template == null)
         {
             return NotFound();
@@ -96,7 +96,7 @@ public class TemplateController : BackOfficeNotificationsController
     /// <returns></returns>
     public ActionResult<TemplateDisplay?> GetById(Guid id)
     {
-        ITemplate? template = _templateService.GetTemplate(id);
+        ITemplate? template = _templateService.GetTemplateAsync(id).GetAwaiter().GetResult();
         if (template == null)
         {
             return NotFound();
@@ -118,7 +118,7 @@ public class TemplateController : BackOfficeNotificationsController
             return NotFound();
         }
 
-        ITemplate? template = _templateService.GetTemplate(guidUdi.Guid);
+        ITemplate? template = _templateService.GetTemplateAsync(guidUdi.Guid).GetAwaiter().GetResult();
         if (template == null)
         {
             return NotFound();
@@ -136,13 +136,13 @@ public class TemplateController : BackOfficeNotificationsController
     [HttpPost]
     public IActionResult DeleteById(int id)
     {
-        ITemplate? template = _templateService.GetTemplate(id);
+        ITemplate? template = _templateService.GetTemplateAsync(id).GetAwaiter().GetResult();
         if (template == null)
         {
             return NotFound();
         }
 
-        _templateService.DeleteTemplate(template.Alias);
+        _templateService.DeleteTemplateAsync(template.Alias).GetAwaiter().GetResult();
         return Ok();
     }
 
@@ -156,7 +156,7 @@ public class TemplateController : BackOfficeNotificationsController
 
         if (id > 0)
         {
-            ITemplate? master = _templateService.GetTemplate(id);
+            ITemplate? master = _templateService.GetTemplateAsync(id).GetAwaiter().GetResult();
             if (master != null)
             {
                 dt.SetMasterTemplate(master);
@@ -190,7 +190,7 @@ public class TemplateController : BackOfficeNotificationsController
         if (display.Id > 0)
         {
             // update
-            ITemplate? template = _templateService.GetTemplate(display.Id);
+            ITemplate? template = _templateService.GetTemplateAsync(display.Id).GetAwaiter().GetResult();
             if (template == null)
             {
                 return NotFound();
@@ -200,13 +200,11 @@ public class TemplateController : BackOfficeNotificationsController
 
             _umbracoMapper.Map(display, template);
 
-            _templateService.SetMasterTemplate(template, display.MasterTemplateAlias);
-
-            _templateService.SaveTemplate(template);
+            _templateService.SaveTemplateAsync(template).GetAwaiter().GetResult();
 
             if (changeAlias)
             {
-                template = _templateService.GetTemplate(template.Id);
+                template = _templateService.GetTemplateAsync(template.Id).GetAwaiter().GetResult();
             }
 
             _umbracoMapper.Map(template, display);
@@ -217,7 +215,7 @@ public class TemplateController : BackOfficeNotificationsController
             ITemplate? master = null;
             if (string.IsNullOrEmpty(display.MasterTemplateAlias) == false)
             {
-                master = _templateService.GetTemplate(display.MasterTemplateAlias);
+                master = _templateService.GetTemplateAsync(display.MasterTemplateAlias).GetAwaiter().GetResult();
                 if (master == null)
                 {
                     return NotFound();
@@ -226,8 +224,13 @@ public class TemplateController : BackOfficeNotificationsController
 
             // we need to pass the template name as alias to keep the template file casing consistent with templates created with content
             // - see comment in FileService.CreateTemplateForContentType for additional details
-            ITemplate template =
-                _templateService.CreateTemplateWithIdentity(display.Name, display.Name, display.Content, master);
+            ITemplate? template =
+                _templateService.CreateTemplateWithIdentityAsync(display.Name, display.Name, display.Content).GetAwaiter().GetResult();
+            if (template == null)
+            {
+                return NotFound();
+            }
+
             _umbracoMapper.Map(template, display);
         }
 
