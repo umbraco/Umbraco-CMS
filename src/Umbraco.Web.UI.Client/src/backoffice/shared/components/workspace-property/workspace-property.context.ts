@@ -15,6 +15,7 @@ import { UmbContextConsumerController } from "src/core/context-api/consume/conte
 
 
 
+// If we get this from the server then we can consider using TypeScripts Partial<> around the model from the Management-API.
 export type WorkspacePropertyData<ValueType> = {
 	alias?: string;
 	label?: string;
@@ -28,7 +29,7 @@ export class UmbWorkspacePropertyContext<ValueType = unknown> {
 
 	private _providerController: UmbContextProviderController;
 
-	private _data: UniqueBehaviorSubject<WorkspacePropertyData<ValueType>> = new UniqueBehaviorSubject({} as WorkspacePropertyData<ValueType>);
+	private _data = new UniqueBehaviorSubject<WorkspacePropertyData<ValueType>>({});
 
 	public readonly alias = CreateObservablePart(this._data, data => data.alias);
 	public readonly label = CreateObservablePart(this._data, data => data.label);
@@ -47,9 +48,9 @@ export class UmbWorkspacePropertyContext<ValueType = unknown> {
 
 		this._providerController = new UmbContextProviderController(host, 'umbPropertyContext', this);
 
-	
+
 	}
-	
+
 	public setAlias(alias: WorkspacePropertyData<ValueType>['alias']) {
 		this._data.update({alias: alias});
 	}
