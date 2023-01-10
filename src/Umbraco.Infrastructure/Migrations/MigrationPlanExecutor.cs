@@ -9,6 +9,27 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Migrations;
 
+/*
+ * This is what runs our migration plans.
+ * It's important to note that this was altered to allow for partial migration completions.
+ * Thee need for the became apparent when we added support for SQLite.
+ * The main issue being how SQLites handles altering the schema.
+ * Long story short, SQLite doesn't support altering columns,
+ * or adding non-nullable columns with non-trivial types, for instance GUIDs.
+ *
+ * The recommended workaround for this is to add a new table, migrate the data, and delete the old one,
+ * however this causes issues with foreign keys. The recommended approach for this is to disable foreign keys entirely
+ * when doing the migration. However, foreign keys MUST be disabled outside a transaction.
+ * This was impossible with our previous migration system since it ALWAYS ran all migrations in a single transaction
+ * meaning that the transaction will always have been started when your migration is run, so you can't disable FKs.
+ *
+ * To now support this the UnscopedMigrationBase was added, which allows you to create a migration with no transaction.
+ * But this requires each migration to run in its own scope,
+ * meaning we can't roll back the entire plan, but only a single migration.
+ *
+ * Hence the need for partial migration completions.
+ */
+
 public class MigrationPlanExecutor : IMigrationPlanExecutor
 {
     private readonly ILogger<MigrationPlanExecutor> _logger;
