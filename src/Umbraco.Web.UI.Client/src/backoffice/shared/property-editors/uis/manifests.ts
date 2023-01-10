@@ -16,6 +16,7 @@ import { manifest as tags } from './tags/manifests';
 import { manifest as markdownEditor } from './markdown-editor/manifests';
 import { manifest as radioButtonList } from './radio-button-list/manifests';
 import { manifest as checkboxList } from './checkbox-list/manifests';
+import { manifest as blockList } from './block-list/manifests';
 
 import type { ManifestPropertyEditorUI } from '@umbraco-cms/models';
 
@@ -38,18 +39,7 @@ export const manifests: Array<ManifestPropertyEditorUI> = [
 	markdownEditor,
 	radioButtonList,
 	checkboxList,
-	{
-		type: 'propertyEditorUI',
-		alias: 'Umb.PropertyEditorUI.BlockList',
-		name: 'Block List Property Editor UI',
-		loader: () => import('./block-list/property-editor-ui-block-list.element'),
-		meta: {
-			label: 'Block List',
-			icon: 'umb:thumbnail-list',
-			group: 'lists',
-			propertyEditorModel: 'Umbraco.BlockList',
-		},
-	},
+	blockList,
 	{
 		type: 'propertyEditorUI',
 		alias: 'Umb.PropertyEditorUI.Number',

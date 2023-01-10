@@ -291,6 +291,19 @@ export const data: Array<DataTypeDetails> = [
 		propertyEditorUIAlias: 'Umb.PropertyEditorUI.CheckboxList',
 		data: [],
 	},
+	{
+		name: 'Block List',
+		type: 'data-type',
+		icon: 'umb:autofill',
+		hasChildren: false,
+		key: 'dt-blockList',
+		isContainer: false,
+		parentKey: null,
+		isFolder: false,
+		propertyEditorModelAlias: 'Umbraco.BlockList',
+		propertyEditorUIAlias: 'Umb.PropertyEditorUI.BlockList',
+		data: [],
+	},
 ];
 
 // Temp mocked database
