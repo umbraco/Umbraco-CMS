@@ -317,6 +317,19 @@ export const data: Array<DataTypeDetails> = [
 		propertyEditorUIAlias: 'Umb.PropertyEditorUI.MediaPicker',
 		data: [],
 	},
+	{
+		name: 'Image Cropper',
+		type: 'data-type',
+		icon: 'umb:autofill',
+		hasChildren: false,
+		key: 'dt-imageCropper',
+		isContainer: false,
+		parentKey: null,
+		isFolder: false,
+		propertyEditorModelAlias: 'Umbraco.ImageCropper',
+		propertyEditorUIAlias: 'Umb.PropertyEditorUI.ImageCropper',
+		data: [],
+	},
 ];
 
 // Temp mocked database

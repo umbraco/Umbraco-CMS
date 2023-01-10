@@ -120,6 +120,18 @@ export const data: Array<DocumentDetails> = [
 				description: '',
 				dataTypeKey: 'dt-blockList',
 			},
+			{
+				alias: 'mediaPicker',
+				label: 'Media Picker',
+				description: '',
+				dataTypeKey: 'dt-mediaPicker',
+			},
+			{
+				alias: 'imageCropper',
+				label: 'Image Cropper',
+				description: '',
+				dataTypeKey: 'dt-imageCropper',
+			},
 		],
 		data: [],
 		variants: [],
