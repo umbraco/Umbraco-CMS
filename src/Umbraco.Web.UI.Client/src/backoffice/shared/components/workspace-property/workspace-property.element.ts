@@ -98,6 +98,7 @@ export class UmbWorkspacePropertyElement extends UmbLitElement {
 	private _propertyEditorUIAlias = '';
 	@property({ type: String, attribute: 'property-editor-ui-alias' })
 	public set propertyEditorUIAlias(value: string) {
+		if(this._propertyEditorUIAlias === value) return;
 		this._propertyEditorUIAlias = value;
 		this._observePropertyEditorUI();
 	}
