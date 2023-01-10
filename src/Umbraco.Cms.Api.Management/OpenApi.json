@@ -7610,20 +7610,9 @@
             "type": "string",
             "nullable": true
           },
-          "masterTemplateAlias": {
-            "type": "string",
-            "nullable": true
-          },
           "key": {
             "type": "string",
             "format": "uuid"
-          },
-          "isMasterTemplate": {
-            "type": "boolean"
-          },
-          "virtualPath": {
-            "type": "string",
-            "nullable": true
           }
         },
         "additionalProperties": false
@@ -7640,10 +7629,6 @@
             "nullable": true
           },
           "content": {
-            "type": "string",
-            "nullable": true
-          },
-          "masterTemplateAlias": {
             "type": "string",
             "nullable": true
           }
@@ -7836,10 +7821,6 @@
             "nullable": true
           },
           "content": {
-            "type": "string",
-            "nullable": true
-          },
-          "masterTemplateAlias": {
             "type": "string",
             "nullable": true
           }
