@@ -2,6 +2,7 @@ import { css, html } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, state } from 'lit/decorators.js';
 import { distinctUntilChanged } from 'rxjs';
+import { repeat } from 'lit/directives/repeat.js';
 import type { UmbWorkspaceContentContext } from '../../workspace-content.context';
 import type { ContentProperty, ContentPropertyData, DocumentDetails, MediaDetails } from '@umbraco-cms/models';
 
@@ -40,11 +41,22 @@ export class UmbWorkspaceViewContentEditElement extends UmbLitElement {
 	private _observeContent() {
 		if (!this._workspaceContext) return;
 
+		/*
+		TODO: Property-Context: This observer gets all changes, We need to fix this. it should be simpler.
+		It should look at length and aliases? as long as they are identical nothing should change. 
+		As they would update them selfs?
+
+		Should use a Observable for this._workspaceContext.properties
+		*/
 		this.observe(
 			this._workspaceContext.data.pipe(distinctUntilChanged()),
 			(content) => {
 				this._properties = content.properties;
 				this._data = content.data;
+				/*
+				Maybe we should not give the value, but the umb-content-property should get the context and observe its own data.
+				This would become a more specific Observer therefor better performance?.. Note to self: Debate with Mads how he sees this perspective.
+				*/
 			}
 		);
 	}
@@ -52,12 +64,14 @@ export class UmbWorkspaceViewContentEditElement extends UmbLitElement {
 	render() {
 		return html`
 			<uui-box>
-				${this._properties?.map(
-					(property: ContentProperty) => html`
-						<umb-content-property
+				${repeat(
+					this._properties,
+					(property) => property.alias,
+					(property) => 
+						html`<umb-content-property
 							.property=${property}
 							.value=${this._data.find((data) => data.alias === property.alias)?.value}></umb-content-property>
-					`
+						`
 				)}
 			</uui-box>
 		`;
