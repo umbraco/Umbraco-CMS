@@ -4,56 +4,12 @@ import { customElement, property, state } from 'lit/decorators.js';
 import type { ManifestHealthCheck } from '@umbraco-cms/models';
 import { StatusResultType } from '@umbraco-cms/backend-api';
 
-@customElement('umb-security-health-check')
-export class UmbSecurityHealthCheckElement extends LitElement {
+@customElement('umb-health-check-group-two')
+export class UmbSecurityHealthCheckGroupTwoElement extends LitElement {
 	static styles = [UUITextStyles, css``];
 
 	@property({ type: Object })
 	manifest?: ManifestHealthCheck;
-
-	@state()
-	security = [
-		{
-			alias: 'applicationUrlConfiguration',
-			name: 'Application URL Configuration',
-			description: 'Checks if the Umbraco application URL is configured for your site.',
-		},
-		{
-			alias: 'clickJackingProtection',
-			name: 'Click-Jacking Protection',
-			description:
-				'Checks if your site is allowed to be IFRAMEd by another site and thus would be susceptible to click-jacking.',
-		},
-		{
-			alias: 'contentSniffingProtection',
-			name: 'Content/MIME Sniffing Protection',
-			description: 'Checks that your site contains a header used to protect against MIME sniffing vulnerabilities.',
-		},
-		{
-			alias: 'cookieHijackingProtection',
-			name: 'Cookie hijacking and protocol downgrade attacks Protection (Strict-Transport-Security Header (HSTS))',
-			description:
-				'Checks if your site, when running with HTTPS, contains the Strict-Transport-Security Header (HSTS).',
-		},
-		{
-			alias: 'crossSiteProtection',
-			name: 'Cross-site scripting Protection (X-XSS-Protection header)',
-			description:
-				'This header enables the Cross-site scripting (XSS) filter in your browser. It checks for the presence of the X-XSS-Protection-header.',
-		},
-		{
-			alias: 'excessiveHeaders',
-			name: 'Excessive Headers',
-			description:
-				'Checks to see if your site is revealing information in its headers that gives away unnecessary details about the technology used to build and host it.',
-		},
-		{
-			alias: 'HttpsConfiguration',
-			name: 'HTTPS Configuration',
-			description:
-				'Checks if your site is configured to work over HTTPS and if the Umbraco related configuration for that is correct.',
-		},
-	];
 
 	@state()
 	private _checkResponse? = [];
@@ -86,7 +42,7 @@ export class UmbSecurityHealthCheckElement extends LitElement {
 					<uui-button color="positive" look="primary" @click="${this.checkGroup}"> Check group </uui-button>
 				</div>
 				<div class="checks-wrapper">
-					${this.security.map((check) => {
+					${this.manifest?.meta.checks.map((check) => {
 						return html`<uui-box headline="${check.name || '?'}">
 							<p>${check.description}</p>
 							${this.renderCheckResults(check.alias)}
@@ -127,9 +83,9 @@ export class UmbSecurityHealthCheckElement extends LitElement {
 	}
 }
 
-export default UmbSecurityHealthCheckElement;
+export default UmbSecurityHealthCheckGroupTwoElement;
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-security-health-check': UmbSecurityHealthCheckElement;
+		'umb-health-check-group-two': UmbSecurityHealthCheckGroupTwoElement;
 	}
 }
