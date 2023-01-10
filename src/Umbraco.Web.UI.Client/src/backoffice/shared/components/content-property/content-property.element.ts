@@ -4,10 +4,11 @@ import { ifDefined } from 'lit-html/directives/if-defined.js';
 import { customElement, property, state } from 'lit/decorators.js';
 
 import { UmbDataTypeStore } from '../../../settings/data-types/data-type.store';
-import type { ContentProperty } from '@umbraco-cms/models';
+import type { ContentProperty, DataTypeDetails } from '@umbraco-cms/models';
 
 import '../workspace-property/workspace-property.element';
 import { UmbLitElement } from '@umbraco-cms/element';
+import { UmbObserverController } from '@umbraco-cms/observable-api';
 
 @customElement('umb-content-property')
 export class UmbContentPropertyElement extends UmbLitElement {
@@ -20,14 +21,18 @@ export class UmbContentPropertyElement extends UmbLitElement {
 		`,
 	];
 
+	// TODO: Consider if we just need to get the DataType Key?..
 	private _property?: ContentProperty;
 	@property({ type: Object, attribute: false })
 	public get property(): ContentProperty | undefined {
 		return this._property;
 	}
 	public set property(value: ContentProperty | undefined) {
+		const oldProperty = this._property;
 		this._property = value;
-		this._observeDataType();
+		if(this._property?.dataTypeKey !== oldProperty?.dataTypeKey) {
+			this._observeDataType(this._property?.dataTypeKey);
+		}
 	}
 
 	@property()
@@ -40,26 +45,30 @@ export class UmbContentPropertyElement extends UmbLitElement {
 	private _dataTypeData?: any;
 
 	private _dataTypeStore?: UmbDataTypeStore;
+	private _dataTypeObserver?: UmbObserverController<DataTypeDetails | null>;
 
 	constructor() {
 		super();
 
 		this.consumeContext('umbDataTypeStore', (instance) => {
 			this._dataTypeStore = instance;
-			this._observeDataType();
+			this._observeDataType(this._property?.dataTypeKey);
 		});
 	}
 
-	private _observeDataType() {
-		if (!this._dataTypeStore || !this._property) return;
+	private _observeDataType(dataTypeKey?: string) {
+		if (!this._dataTypeStore) return;
 
-		this.observe(
-			this._dataTypeStore.getByKey(this._property.dataTypeKey),
-			(dataType) => {
-				this._dataTypeData = dataType?.data;
-				this._propertyEditorUIAlias = dataType?.propertyEditorUIAlias || undefined;
-			}
-		);
+		this._dataTypeObserver?.destroy();
+		if(dataTypeKey) {
+			this._dataTypeObserver = this.observe(
+				this._dataTypeStore.getByKey(dataTypeKey),
+				(dataType) => {
+					this._dataTypeData = dataType?.data;
+					this._propertyEditorUIAlias = dataType?.propertyEditorUIAlias || undefined;
+				}
+			);
+		}
 	}
 
 	render() {
