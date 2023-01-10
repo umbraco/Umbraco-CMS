@@ -13,12 +13,18 @@ public class UpdateTemplateController : TemplateControllerBase
     private readonly ITemplateService _templateService;
     private readonly IUmbracoMapper _umbracoMapper;
     private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
+    private readonly ITemplateContentParserService _templateContentParserService;
 
-    public UpdateTemplateController(ITemplateService templateService, IUmbracoMapper umbracoMapper, IBackOfficeSecurityAccessor backOfficeSecurityAccessor)
+    public UpdateTemplateController(
+        ITemplateService templateService,
+        IUmbracoMapper umbracoMapper,
+        IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
+        ITemplateContentParserService templateContentParserService)
     {
         _templateService = templateService;
         _umbracoMapper = umbracoMapper;
         _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
+        _templateContentParserService = templateContentParserService;
     }
 
     [HttpPut("{key:guid}")]
@@ -35,7 +41,8 @@ public class UpdateTemplateController : TemplateControllerBase
 
         template = _umbracoMapper.Map(updateModel, template);
 
-        _templateService.SetMasterTemplate(template, updateModel.MasterTemplateAlias);
+        var masterTemplateAlias = _templateContentParserService.MasterTemplateAlias(updateModel.Content);
+        _templateService.SetMasterTemplate(template, masterTemplateAlias);
         _templateService.SaveTemplate(template, CurrentUserId(_backOfficeSecurityAccessor));
 
         return await Task.FromResult(Ok());

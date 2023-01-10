@@ -7,6 +7,4 @@ public class TemplateModelBase
     public string Alias { get; set; } = string.Empty;
 
     public string? Content { get; set; }
-
-    public string? MasterTemplateAlias { get; set; }
 }

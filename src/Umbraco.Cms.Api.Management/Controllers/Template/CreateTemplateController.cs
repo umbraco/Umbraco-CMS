@@ -12,11 +12,16 @@ public class CreateTemplateController : TemplateControllerBase
 {
     private readonly ITemplateService _templateService;
     private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
+    private readonly ITemplateContentParserService _templateContentParserService;
 
-    public CreateTemplateController(ITemplateService templateService, IBackOfficeSecurityAccessor backOfficeSecurityAccessor)
+    public CreateTemplateController(
+        ITemplateService templateService,
+        IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
+        ITemplateContentParserService templateContentParserService)
     {
         _templateService = templateService;
         _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
+        _templateContentParserService = templateContentParserService;
     }
 
     [HttpPost]
@@ -25,13 +30,14 @@ public class CreateTemplateController : TemplateControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult> Create(TemplateCreateModel createModel)
     {
+        var masterTemplateAlias = _templateContentParserService.MasterTemplateAlias(createModel.Content);
         ITemplate? masterTemplate = null;
-        if (createModel.MasterTemplateAlias.IsNullOrWhiteSpace() == false)
+        if (masterTemplateAlias.IsNullOrWhiteSpace() == false)
         {
-            masterTemplate = _templateService.GetTemplate(createModel.MasterTemplateAlias);
+            masterTemplate = _templateService.GetTemplate(masterTemplateAlias);
             if (masterTemplate == null)
             {
-                return NotFound($"Could not find a master template with alias {createModel.MasterTemplateAlias}");
+                return NotFound($"Could not find a master template with alias {masterTemplateAlias}");
             }
         }
 

@@ -361,7 +361,7 @@ public class TemplateService : RepositoryService, ITemplateService
 
         using (var view = new StreamReader(fs))
         {
-            return view.ReadToEnd().Trim();
+            return view.ReadToEnd().Trim().NullOrWhiteSpaceAsNull();
         }
     }
 

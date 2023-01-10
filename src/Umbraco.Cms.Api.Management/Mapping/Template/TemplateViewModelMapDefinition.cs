@@ -25,9 +25,6 @@ public class TemplateViewModelMapDefinition : IMapDefinition
         target.Name = source.Name ?? string.Empty;
         target.Alias = source.Alias;
         target.Content = source.Content;
-        target.VirtualPath = source.VirtualPath;
-        target.IsMasterTemplate = source.IsMasterTemplate;
-        target.MasterTemplateAlias = source.MasterTemplateAlias;
     }
 
     // Umbraco.Code.MapAll -Id -Key -CreateDate -UpdateDate -DeleteDate
