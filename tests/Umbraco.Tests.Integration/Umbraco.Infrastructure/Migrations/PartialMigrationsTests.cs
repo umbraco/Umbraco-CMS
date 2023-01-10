@@ -132,13 +132,14 @@ public class PartialMigrationsTests : UmbracoIntegrationTest
                 Assert.IsNotNull(executedPlan.Exception);
                 Assert.IsInstanceOf<PanicException>(executedPlan.Exception);
                 Assert.AreEqual("a", executedPlan.FinalState);
-                Assert.AreEqual(1, executedPlan.CompletedTransitions);
+                Assert.AreEqual(1, executedPlan.CompletedTransitions.Count);
             });
         };
 
         // We have to use the DatabaseBuilder otherwise the notification isn't published
         var databaseBuilder = GetRequiredService<DatabaseBuilder>();
-        databaseBuilder.UpgradeSchemaAndData(new TestUmbracoPlan(null!));
+        var plan = new TestUmbracoPlan(null!);
+        databaseBuilder.UpgradeSchemaAndData(plan);
 
         Assert.IsTrue(notificationPublished);
     }
@@ -201,12 +202,16 @@ public class TestDto
 
 public class UmbracoPlanExecutedTestNotificationHandler : INotificationHandler<UmbracoPlanExecutedNotification>
 {
-    public static Action<UmbracoPlanExecutedNotification>? HandleNotification { get; set; } = null;
+    public static Action<UmbracoPlanExecutedNotification>? HandleNotification { get; set; }
 
     public void Handle(UmbracoPlanExecutedNotification notification) => HandleNotification?.Invoke(notification);
 }
 
 
+/// <summary>
+/// This is a fake UmbracoPlan used for testing of the DatabaseBuilder, this overrides everything to be of type
+/// UmbracoPlan but behave like a normal migration plan.
+/// </summary>
 public class TestUmbracoPlan : UmbracoPlan
 {
     public TestUmbracoPlan(IUmbracoVersion umbracoVersion) : base(umbracoVersion)
@@ -215,7 +220,9 @@ public class TestUmbracoPlan : UmbracoPlan
 
     public override string InitialState => string.Empty;
 
-    protected new void DefinePlan()
+    public override bool IgnoreCurrentState => true;
+
+    protected override void DefinePlan()
     {
         From(InitialState);
         To<CreateTableMigration>("a");
