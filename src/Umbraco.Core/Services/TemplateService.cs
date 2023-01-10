@@ -106,15 +106,8 @@ public class TemplateService : RepositoryService, ITemplateService
             throw new ArgumentOutOfRangeException(nameof(name), "Name cannot be more than 255 characters in length.");
         }
 
-        ITemplate? masterTemplate = await GetMasterTemplate(content);
-
         // file might already be on disk, if so grab the content to avoid overwriting
         var template = new Template(_shortStringHelper, name, alias) { Content = GetViewContent(alias) ?? content };
-
-        if (masterTemplate != null)
-        {
-            template.SetMasterTemplate(masterTemplate);
-        }
 
         return await SaveTemplateAsync(template, userId)
             ? template
@@ -313,30 +306,33 @@ public class TemplateService : RepositoryService, ITemplateService
                 template.SetMasterTemplate(masterTemplate);
 
                 //After updating the master - ensure we update the path property if it has any children already assigned
-                IEnumerable<ITemplate> templateHasChildren = await GetTemplateDescendantsAsync(template.Id);
-
-                foreach (ITemplate childTemplate in templateHasChildren)
+                if (template.Id > 0)
                 {
-                    //template ID to find
-                    var templateIdInPath = "," + template.Id + ",";
+                    IEnumerable<ITemplate> templateHasChildren = await GetTemplateDescendantsAsync(template.Id);
 
-                    if (string.IsNullOrEmpty(childTemplate.Path))
+                    foreach (ITemplate childTemplate in templateHasChildren)
                     {
-                        continue;
+                        //template ID to find
+                        var templateIdInPath = "," + template.Id + ",";
+
+                        if (string.IsNullOrEmpty(childTemplate.Path))
+                        {
+                            continue;
+                        }
+
+                        //Find position in current comma separate string path (so we get the correct children path)
+                        var positionInPath = childTemplate.Path.IndexOf(templateIdInPath) + templateIdInPath.Length;
+
+                        //Get the substring of the child & any children (descendants it may have too)
+                        var childTemplatePath = childTemplate.Path.Substring(positionInPath);
+
+                        //As we are updating the template to be a child of a master
+                        //Set the path to the master's path + its current template id + the current child path substring
+                        childTemplate.Path = masterTemplate.Path + "," + template.Id + "," + childTemplatePath;
+
+                        //Save the children with the updated path
+                        await SaveTemplateAsync(childTemplate);
                     }
-
-                    //Find position in current comma separate string path (so we get the correct children path)
-                    var positionInPath = childTemplate.Path.IndexOf(templateIdInPath) + templateIdInPath.Length;
-
-                    //Get the substring of the child & any children (descendants it may have too)
-                    var childTemplatePath = childTemplate.Path.Substring(positionInPath);
-
-                    //As we are updating the template to be a child of a master
-                    //Set the path to the master's path + its current template id + the current child path substring
-                    childTemplate.Path = masterTemplate.Path + "," + template.Id + "," + childTemplatePath;
-
-                    //Save the children with the updated path
-                    await SaveTemplateAsync(childTemplate);
                 }
             }
         }
