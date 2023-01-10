@@ -17,7 +17,7 @@ export class UmbSectionContext {
 	public readonly activeTreeItem = this._activeTreeItem.asObservable();
 
 	// TODO: what is the best context to put this in?
-	private _activeView = new UniqueBehaviorSubject<ManifestSectionView | undefined>(undefined);
+	private _activeView = new BehaviorSubject<ManifestSectionView | undefined>(undefined);
 	public readonly activeView = this._activeView.asObservable();
 
 	constructor(sectionManifest: ManifestSection) {
