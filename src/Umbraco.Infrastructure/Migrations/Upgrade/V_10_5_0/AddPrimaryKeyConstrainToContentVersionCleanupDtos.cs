@@ -13,7 +13,9 @@ public class AddPrimaryKeyConstrainToContentVersionCleanupDtos : MigrationBase
         IEnumerable<ContentVersionCleanupPolicyDto> contentVersionCleanupPolicyDtos =
             Database
                 .Fetch<ContentVersionCleanupPolicyDto>()
+                .OrderByDescending(x => x.Updated)
                 .DistinctBy(x => x.ContentTypeId);
+
         if (TableExists(ContentVersionCleanupPolicyDto.TableName))
         {
             Delete.Table(ContentVersionCleanupPolicyDto.TableName).Do();
