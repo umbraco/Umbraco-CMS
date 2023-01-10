@@ -1,8 +1,11 @@
 using Microsoft.Extensions.Logging;
+using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Migrations;
+using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Infrastructure.Scoping;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Migrations;
 
@@ -12,38 +15,58 @@ public class MigrationPlanExecutor : IMigrationPlanExecutor
     private readonly ILoggerFactory _loggerFactory;
     private readonly IMigrationBuilder _migrationBuilder;
     private readonly IUmbracoDatabaseFactory _databaseFactory;
+    private readonly IPublishedSnapshotService _publishedSnapshotService;
+    private readonly DistributedCache _distributedCache;
     private readonly IScopeAccessor _scopeAccessor;
     private readonly ICoreScopeProvider _scopeProvider;
+    private bool _rebuildCache;
 
     public MigrationPlanExecutor(
         ICoreScopeProvider scopeProvider,
         IScopeAccessor scopeAccessor,
         ILoggerFactory loggerFactory,
         IMigrationBuilder migrationBuilder,
-        IUmbracoDatabaseFactory databaseFactory)
+        IUmbracoDatabaseFactory databaseFactory,
+        IPublishedSnapshotService publishedSnapshotService,
+        DistributedCache distributedCache)
     {
         _scopeProvider = scopeProvider;
         _scopeAccessor = scopeAccessor;
         _loggerFactory = loggerFactory;
         _migrationBuilder = migrationBuilder;
         _databaseFactory = databaseFactory;
+        _publishedSnapshotService = publishedSnapshotService;
+        _distributedCache = distributedCache;
         _logger = _loggerFactory.CreateLogger<MigrationPlanExecutor>();
     }
 
     /// <summary>
     ///     Executes the plan.
     /// </summary>
-    /// <param name="scope">A scope.</param>
+    /// <param name="plan">The migration plan to be executes.</param>
     /// <param name="fromState">The state to start execution at.</param>
-    /// <param name="migrationBuilder">A migration builder.</param>
-    /// <param name="logger">A logger.</param>
-    /// <param name="loggerFactory"></param>
-    /// <returns>The final state.</returns>
-    /// <remarks>The plan executes within the scope, which must then be completed.</remarks>
+    /// <returns>ExecutedMigrationPlan containing information about the plan execution, such as completion state and the steps that ran.</returns>
+    /// <remarks>
+    /// <para>Each migration in the plan, may or may not run in a scope depending on the type of plan.</para>
+    /// <para>A plan can complete partially, the changes of each completed migration will be saved.</para>
+    /// </remarks>
     public ExecutedMigrationPlan Execute(MigrationPlan plan, string fromState)
     {
         plan.Validate();
 
+        ExecutedMigrationPlan result = RunMigrationPlan(plan, fromState);
+
+        // If any completed migration requires us to rebuild cache we'll do that.
+        if (_rebuildCache)
+        {
+            RebuildCache();
+        }
+
+        return result;
+    }
+
+    private ExecutedMigrationPlan RunMigrationPlan(MigrationPlan plan, string fromState)
+    {
         _logger.LogInformation("Starting '{MigrationName}'...", plan.Name);
         var nextState = fromState;
 
@@ -73,6 +96,7 @@ public class MigrationPlanExecutor : IMigrationPlanExecutor
             }
             catch (Exception exception)
             {
+                _logger.LogError("Plan failed at step {TargetState}", transition.TargetState);
                 // We have to always return something, so whatever running this has a chance to save the state we got to.
                 return new ExecutedMigrationPlan
                 {
@@ -125,10 +149,7 @@ public class MigrationPlanExecutor : IMigrationPlanExecutor
         using IUmbracoDatabase database = _databaseFactory.CreateDatabase();
         var context = new MigrationContext(plan, database, _loggerFactory.CreateLogger<MigrationContext>());
 
-        MigrationBase migration = _migrationBuilder.Build(migrationType, context);
-
-        // We run the migration with no scope or suppressed notifications, it's up to the migrations themselves to handle this.
-        migration.Run();
+        RunMigration(migrationType, context);
     }
 
     private void RunScopedMigration(Type migrationType, MigrationPlan plan)
@@ -140,12 +161,30 @@ public class MigrationPlanExecutor : IMigrationPlanExecutor
         using ICoreScope scope = _scopeProvider.CreateCoreScope();
         using (scope.Notifications.Suppress())
         {
-            var context = new MigrationContext(plan, _scopeAccessor.AmbientScope?.Database, _loggerFactory.CreateLogger<MigrationContext>());
-            MigrationBase migration = _migrationBuilder.Build(migrationType, context);
+            var context = new MigrationContext(plan, _scopeAccessor.AmbientScope?.Database,
+                _loggerFactory.CreateLogger<MigrationContext>());
 
-            migration.Run();
+            RunMigration(migrationType, context);
 
             scope.Complete();
         }
+    }
+
+    private void RunMigration(Type migrationType, MigrationContext context)
+    {
+        MigrationBase migration = _migrationBuilder.Build(migrationType, context);
+        migration.Run();
+        // If the migration requires clearing the cache set the flag, this will automatically only happen if it succeeds
+        // Otherwise it'll error out before and return.
+        if (migration.RebuildCache)
+        {
+            _rebuildCache = true;
+        }
+    }
+
+    private void RebuildCache()
+    {
+        _publishedSnapshotService.RebuildAll();
+        _distributedCache.RefreshAllPublishedSnapshot();
     }
 }
