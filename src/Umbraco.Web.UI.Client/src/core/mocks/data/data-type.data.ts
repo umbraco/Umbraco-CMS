@@ -32,7 +32,7 @@ export const data: Array<DataTypeDetails> = [
 		parentKey: null,
 		isFolder: false,
 		propertyEditorModelAlias: 'Umbraco.TextArea',
-		propertyEditorUIAlias: 'Umb.PropertyEditorUI.Textarea',
+		propertyEditorUIAlias: 'Umb.PropertyEditorUI.TextArea',
 		data: [
 			{
 				alias: 'maxChars',

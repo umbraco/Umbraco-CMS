@@ -90,7 +90,7 @@ export class UmbPropertyEditorUIContentPickerElement extends UmbLitElement {
 	private _setValue(newValue: Array<string>) {
 		this.value = newValue;
 		this._observePickedDocuments();
-		this.dispatchEvent(new CustomEvent('property-editor-change', { bubbles: true, composed: true }));
+		this.dispatchEvent(new CustomEvent('property-value-change'));
 	}
 
 	private _renderItem(item: FolderTreeItem) {

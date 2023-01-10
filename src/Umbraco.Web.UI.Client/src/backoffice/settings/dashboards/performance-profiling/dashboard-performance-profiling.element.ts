@@ -30,8 +30,8 @@ export class UmbDashboardPerformanceProfilingElement extends UmbLitElement {
 	@state()
 	private _profilingPerformance = false;
 
-	connectedCallback(): void {
-		super.connectedCallback();
+	constructor() {
+		super();
 		this._getProfilingStatus();
 		this._profilingPerformance = localStorage.getItem('profilingPerformance') === 'true';
 	}

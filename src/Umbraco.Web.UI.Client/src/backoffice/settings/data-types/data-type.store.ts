@@ -10,6 +10,11 @@ const isDataTypeDetails = (dataType: DataTypeDetails | FolderTreeItem): dataType
 // TODO: can we make is easy to reuse store methods across different stores?
 
 export type UmbDataTypeStoreItemType = DataTypeDetails | FolderTreeItem;
+
+// TODO: research how we write names of global consts.
+export const STORE_ALIAS = 'umbDataTypeStore';
+
+
 /**
  * @export
  * @class UmbDataTypesStore
@@ -18,7 +23,7 @@ export type UmbDataTypeStoreItemType = DataTypeDetails | FolderTreeItem;
  */
 export class UmbDataTypeStore extends UmbDataStoreBase<UmbDataTypeStoreItemType> {
 	
-	public readonly storeAlias = 'umbDataTypeStore';
+	public readonly storeAlias = STORE_ALIAS;
 
 	/**
 	 * @description - Request a Data Type by key. The Data Type is added to the store and is returned as an Observable.
