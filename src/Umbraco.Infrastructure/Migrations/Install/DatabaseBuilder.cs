@@ -341,7 +341,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Install
                 // The migration may have failed, it this is the case, we throw the exception now that we've taken care of business.
                 if (result.Successful is false && result.Exception is not null)
                 {
-                    throw result.Exception;
+                    return HandleInstallException(result.Exception);
                 }
 
                 var message = "<p>Upgrade completed!</p>";
