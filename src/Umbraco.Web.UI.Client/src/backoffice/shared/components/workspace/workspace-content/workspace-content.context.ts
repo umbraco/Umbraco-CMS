@@ -1,5 +1,4 @@
 import { v4 as uuidv4 } from 'uuid';
-import { Observable } from 'rxjs';
 import { UmbNotificationService } from '../../../../../core/notification';
 import { UmbNotificationDefaultData } from '../../../../../core/notification/layouts/default';
 import { UmbNodeStoreBase } from '@umbraco-cms/stores/store';
@@ -47,7 +46,7 @@ export abstract class UmbWorkspaceContentContext<
 		this._data = new UniqueBehaviorSubject<ContentTypeType>(defaultData);
 		this.data = this._data.asObservable();
 		this.name = CreateObservablePart(this._data, data => data.name);
-		
+
 
 		this.entityType = entityType;
 
