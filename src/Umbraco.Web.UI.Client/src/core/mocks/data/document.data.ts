@@ -114,6 +114,12 @@ export const data: Array<DocumentDetails> = [
 				description: '',
 				dataTypeKey: 'dt-checkboxList',
 			},
+			{
+				alias: 'blockList',
+				label: 'Block List',
+				description: '',
+				dataTypeKey: 'dt-blockList',
+			},
 		],
 		data: [],
 		variants: [],
