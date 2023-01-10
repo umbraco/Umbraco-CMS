@@ -181,7 +181,7 @@ public class PartialMigrationsTests : UmbracoIntegrationTest
 
 
 // This is just some basic migrations to test the migration plans...
-public class ErrorMigration : MigrationBase
+internal class ErrorMigration : MigrationBase
 {
     // Used to determine if an exception should be thrown, used to test re-running migrations
     public static bool ShouldExplode { get; set; } = true;
@@ -199,7 +199,7 @@ public class ErrorMigration : MigrationBase
     }
 }
 
-public class CreateTableMigration : MigrationBase
+internal class CreateTableMigration : MigrationBase
 {
     public CreateTableMigration(IMigrationContext context) : base(context)
     {
@@ -208,7 +208,7 @@ public class CreateTableMigration : MigrationBase
     protected override void Migrate() => Create.Table<TestDto>().Do();
 }
 
-public class AddColumnMigration : MigrationBase
+internal class AddColumnMigration : MigrationBase
 {
     public AddColumnMigration(IMigrationContext context) : base(context)
     {
@@ -221,7 +221,7 @@ public class AddColumnMigration : MigrationBase
         .Do();
 }
 
-public class AssertScopeUnscopedTestMigration : UnscopedMigrationBase
+internal class AssertScopeUnscopedTestMigration : UnscopedMigrationBase
 {
     private readonly IScopeProvider _scopeProvider;
     private readonly IScopeAccessor _scopeAccessor;
@@ -245,7 +245,7 @@ public class AssertScopeUnscopedTestMigration : UnscopedMigrationBase
     }
 }
 
-public class AsserScopeScopedTestMigration : MigrationBase
+internal class AsserScopeScopedTestMigration : MigrationBase
 {
     private readonly IScopeProvider _scopeProvider;
     private readonly IScopeAccessor _scopeAccessor;
@@ -271,14 +271,14 @@ public class AsserScopeScopedTestMigration : MigrationBase
 
 [TableName(PartialMigrationsTests.TableName)]
 [PrimaryKey("id", AutoIncrement = true)]
-public class TestDto
+internal class TestDto
 {
     [Column("id")]
     [PrimaryKeyColumn(Name = "PK_testTable")]
     public int Id { get; set; }
 }
 
-public class UmbracoPlanExecutedTestNotificationHandler : INotificationHandler<UmbracoPlanExecutedNotification>
+internal class UmbracoPlanExecutedTestNotificationHandler : INotificationHandler<UmbracoPlanExecutedNotification>
 {
     public static Action<UmbracoPlanExecutedNotification>? HandleNotification { get; set; }
 
@@ -290,7 +290,7 @@ public class UmbracoPlanExecutedTestNotificationHandler : INotificationHandler<U
 /// This is a fake UmbracoPlan used for testing of the DatabaseBuilder, this overrides everything to be of type
 /// UmbracoPlan but behave like a normal migration plan.
 /// </summary>
-public class TestUmbracoPlan : UmbracoPlan
+internal class TestUmbracoPlan : UmbracoPlan
 {
     public TestUmbracoPlan(IUmbracoVersion umbracoVersion) : base(umbracoVersion)
     {
