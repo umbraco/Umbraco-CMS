@@ -10,4 +10,6 @@ public interface ILogViewerConfig
     IReadOnlyList<SavedLogSearch> DeleteSavedSearch(string name, string query);
 
     IReadOnlyList<SavedLogSearch> DeleteSavedSearch(string name) => DeleteSavedSearch(name, string.Empty);
+
+    SavedLogSearch? GetSavedSearchByName(string name);
 }

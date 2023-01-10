@@ -48,4 +48,21 @@ public class LogViewerConfig : ILogViewerConfig
         // Return the updated object - so we can instantly reset the entire array from the API response
         return GetSavedSearches();
     }
+
+    public SavedLogSearch? GetSavedSearchByName(string name)
+    {
+        using IScope scope = _scopeProvider.CreateScope(autoComplete: true);
+        ILogViewerQuery? item = _logViewerQueryRepository.GetByName(name);
+
+        if (item is not null)
+        {
+            return new SavedLogSearch()
+            {
+                Name = item.Name,
+                Query = item.Query
+            };
+        }
+
+        return null;
+    }
 }
