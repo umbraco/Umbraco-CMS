@@ -1,4 +1,4 @@
-import { css, html, nothing, PropertyValueMap } from 'lit';
+import { css, html, nothing } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, property, state } from 'lit/decorators.js';
 import { ifDefined } from 'lit-html/directives/if-defined.js';
@@ -20,15 +20,22 @@ export class UmbInputDocumentPickerElement extends FormControlMixin(UmbLitElemen
 		`,
 	];
 
-	private _value: Array<string> = [];
-
-	@property({ type: Array })
-	public get value(): Array<string> {
-		return this._value;
+	private _pickedKeysArray: Array<string> = [];
+	private get _pickedKeys(): Array<string> {
+		return this._pickedKeysArray;
 	}
-	public set value(value: Array<string>) {
-		this._value = value;
+	private set _pickedKeys(keys: Array<string>) {
+		this._pickedKeysArray = keys;
+		this._value = keys.join(',');
 		this._observePickedDocuments();
+	}
+
+	@property({ type: String })
+	public set value(keysString: string) {
+		if(keysString !== this._value) {
+			super.value = keysString;
+			this._pickedKeys = keysString.split(/[ ,]+/);
+		}
 	}
 
 	@property({ type: Array, attribute: false })
@@ -64,15 +71,16 @@ export class UmbInputDocumentPickerElement extends FormControlMixin(UmbLitElemen
 		if (!this._documentStore) return;
 
 		// TODO: consider changing this to the list data endpoint when it is available
-		this._pickedItemsObserver = this.observe(this._documentStore.getTreeItems(this.value), (items) => {
+		this._pickedItemsObserver = this.observe(this._documentStore.getTreeItems(this._pickedKeysArray), (items) => {
 			this._items = items;
 		});
 	}
 
 	private _openPicker() {
-		const modalHandler = this._modalService?.contentPicker({ multiple: true, selection: this.value });
+		// We send a shallow copy(good enough as its just an array of keys) of our this._pickedKeysArray, as we don't want the modal to manipulate our data:
+		const modalHandler = this._modalService?.contentPicker({ multiple: true, selection: [...this._pickedKeysArray] });
 		modalHandler?.onClose().then(({ selection }: any) => {
-			this._setValue([...selection]);
+			this._setValue(selection);
 		});
 	}
 
@@ -86,14 +94,14 @@ export class UmbInputDocumentPickerElement extends FormControlMixin(UmbLitElemen
 
 		modalHandler?.onClose().then(({ confirmed }) => {
 			if (confirmed) {
-				const newValue = this.value.filter((value) => value !== item.key);
+				const newValue = this._pickedKeys.filter((value) => value !== item.key);
 				this._setValue(newValue);
 			}
 		});
 	}
 
 	private _setValue(newValue: Array<string>) {
-		this.value = newValue;
+		this._pickedKeys = newValue;
 		this.dispatchEvent(new CustomEvent('change', { bubbles: true, composed: true }));
 	}
 
