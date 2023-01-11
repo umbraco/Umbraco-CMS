@@ -113,6 +113,7 @@ export abstract class UmbWorkspaceContentContext<
 	abstract setPropertyValue(alias: string, value: unknown):void;
 
 
+	// TODO: consider turning this into an abstract so each context implement this them selfs.
 	public save(): Promise<void> {
 		if(!this._store) {
 			// TODO: more beautiful error:
