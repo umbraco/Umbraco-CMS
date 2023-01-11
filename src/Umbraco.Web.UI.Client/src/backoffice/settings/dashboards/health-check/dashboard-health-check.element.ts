@@ -1,10 +1,10 @@
 import { html, css, nothing } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { IRoute, IRoutingInfo, path } from 'router-slot';
-
-import { UmbLitElement } from '@umbraco-cms/element';
 import { UmbDashboardHealthCheckGroupElement } from './views/health-check-group';
-import { UmbDashboardHealthCheckOverviewElement } from './views/health-check-overview';
+import { UmbLitElement } from '@umbraco-cms/element';
+import { ManifestHealthCheck, umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
+import { UmbHealthCheckDashboardContext } from './health-check-dashboard.context';
 
 @customElement('umb-dashboard-health-check')
 export class UmbDashboardHealthCheckElement extends UmbLitElement {
@@ -26,7 +26,7 @@ export class UmbDashboardHealthCheckElement extends UmbLitElement {
 			component: () => import('./views/health-check-group'),
 			setup: (component: HTMLElement, info: IRoutingInfo) => {
 				const element = component as UmbDashboardHealthCheckGroupElement;
-				element.groupName = info.match.params.groupName;
+				element.groupName = decodeURI(info.match.params.groupName);
 				this.group = info.match.params.groupName;
 			},
 		},
@@ -42,8 +42,21 @@ export class UmbDashboardHealthCheckElement extends UmbLitElement {
 	@state()
 	private _currentPath?: string;
 
+	private _healthCheckManifests: ManifestHealthCheck[] = [];
+
 	private _onRouteChange() {
 		this._currentPath = path();
+	}
+
+	connectedCallback(): void {
+		super.connectedCallback();
+		umbExtensionsRegistry.extensionsOfType('healthCheck').subscribe((healthChecks) => {
+			this._healthCheckManifests = healthChecks;
+			this.provideContext(
+				'umbHealthCheckDashboard',
+				new UmbHealthCheckDashboardContext(this, this._healthCheckManifests)
+			);
+		});
 	}
 
 	private get backbutton(): boolean {

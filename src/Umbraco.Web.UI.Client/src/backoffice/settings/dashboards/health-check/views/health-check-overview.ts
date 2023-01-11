@@ -13,6 +13,7 @@ import { ManifestHealthCheck, umbExtensionsRegistry } from '@umbraco-cms/extensi
 import { HealthCheckGroup, HealthCheckGroupWithResult, HealthCheckResource } from '@umbraco-cms/backend-api';
 
 import '../health-check-overview-group.element';
+import { UmbHealthCheckDashboardContext } from '../health-check-dashboard.context';
 
 @customElement('umb-dashboard-health-check-overview')
 export class UmbDashboardHealthCheckOverviewElement extends UmbLitElement {
@@ -89,10 +90,13 @@ export class UmbDashboardHealthCheckOverviewElement extends UmbLitElement {
 
 	private _healthCheckManifests: ManifestHealthCheck[] = [];
 
+	private _healthCheckDashboardContext?: UmbHealthCheckDashboardContext;
+
 	constructor() {
 		super();
-		this.consumeAllContexts(['umbNotificationService', 'umbModalService'], (instances) => {
+		this.consumeAllContexts(['umbNotificationService', 'umbModalService', 'umbHealthCheckDashboard'], (instances) => {
 			this._modalService = instances['umbModalService'];
+			this._healthCheckDashboardContext = instances['umbHealthCheckDashboard'];
 		});
 	}
 
@@ -104,20 +108,7 @@ export class UmbDashboardHealthCheckOverviewElement extends UmbLitElement {
 	}
 
 	private async _onHealthCheckHandler() {
-		/*this._groups?.forEach((group) => {
-			group.name ? this._getGroup(group.name) : nothing;
-		});*/
-		this._healthCheckManifests.forEach((group) => {
-			const api = new group.meta.api(this);
-			api.checkGroup(group.meta.label);
-		});
-	}
-
-	private async _getGroup(name: string) {
-		this._buttonState = 'waiting';
-		await new Promise((resolve) => setTimeout(resolve, (Math.random() + 1) * 1000)); // simulate a delay of 1-2 seconds
-		const { data } = await tryExecuteAndNotify(this, HealthCheckResource.getHealthCheckGroupByName({ name }));
-		console.log(data);
+		this._healthCheckDashboardContext?.checkAll();
 	}
 
 	render() {
