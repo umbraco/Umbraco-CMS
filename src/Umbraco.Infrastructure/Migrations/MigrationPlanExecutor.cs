@@ -47,8 +47,7 @@ public class MigrationPlanExecutor : IMigrationPlanExecutor
             migrationBuilder,
             StaticServiceProvider.Instance.GetRequiredService<IUmbracoDatabaseFactory>(),
             StaticServiceProvider.Instance.GetRequiredService<IPublishedSnapshotService>(),
-            StaticServiceProvider.Instance.GetRequiredService<DistributedCache>()
-            )
+            StaticServiceProvider.Instance.GetRequiredService<DistributedCache>())
     {
     }
 
