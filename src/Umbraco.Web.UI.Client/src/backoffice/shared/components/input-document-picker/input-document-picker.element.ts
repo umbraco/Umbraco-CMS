@@ -20,21 +20,21 @@ export class UmbInputDocumentPickerElement extends FormControlMixin(UmbLitElemen
 		`,
 	];
 
-	private _pickedKeysArray: Array<string> = [];
-	private get _pickedKeys(): Array<string> {
-		return this._pickedKeysArray;
+	private _selectedKeys: Array<string> = [];
+	public get selectedKeys(): Array<string> {
+		return this._selectedKeys;
 	}
-	private set _pickedKeys(keys: Array<string>) {
-		this._pickedKeysArray = keys;
-		this._value = keys.join(',');
+	public set selectedKeys(keys: Array<string>) {
+		console.log("selectedKeys", keys);
+		this._selectedKeys = keys;
+		super.value = keys.join(',');
 		this._observePickedDocuments();
 	}
 
-	@property({ type: String })
+	@property()
 	public set value(keysString: string) {
 		if(keysString !== this._value) {
-			super.value = keysString;
-			this._pickedKeys = keysString.split(/[ ,]+/);
+			this.selectedKeys = keysString.split(/[ ,]+/);
 		}
 	}
 
@@ -71,16 +71,16 @@ export class UmbInputDocumentPickerElement extends FormControlMixin(UmbLitElemen
 		if (!this._documentStore) return;
 
 		// TODO: consider changing this to the list data endpoint when it is available
-		this._pickedItemsObserver = this.observe(this._documentStore.getTreeItems(this._pickedKeysArray), (items) => {
+		this._pickedItemsObserver = this.observe(this._documentStore.getTreeItems(this._selectedKeys), (items) => {
 			this._items = items;
 		});
 	}
 
 	private _openPicker() {
-		// We send a shallow copy(good enough as its just an array of keys) of our this._pickedKeysArray, as we don't want the modal to manipulate our data:
-		const modalHandler = this._modalService?.contentPicker({ multiple: true, selection: [...this._pickedKeysArray] });
+		// We send a shallow copy(good enough as its just an array of keys) of our this._selectedKeys, as we don't want the modal to manipulate our data:
+		const modalHandler = this._modalService?.contentPicker({ multiple: true, selection: [...this._selectedKeys] });
 		modalHandler?.onClose().then(({ selection }: any) => {
-			this._setValue(selection);
+			this._setSelection(selection);
 		});
 	}
 
@@ -94,14 +94,14 @@ export class UmbInputDocumentPickerElement extends FormControlMixin(UmbLitElemen
 
 		modalHandler?.onClose().then(({ confirmed }) => {
 			if (confirmed) {
-				const newValue = this._pickedKeys.filter((value) => value !== item.key);
-				this._setValue(newValue);
+				const newSelection = this._selectedKeys.filter((value) => value !== item.key);
+				this._setSelection(newSelection);
 			}
 		});
 	}
 
-	private _setValue(newValue: Array<string>) {
-		this._pickedKeys = newValue;
+	private _setSelection(newSelection: Array<string>) {
+		this.selectedKeys = newSelection;
 		this.dispatchEvent(new CustomEvent('change', { bubbles: true, composed: true }));
 	}
 

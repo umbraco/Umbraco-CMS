@@ -1,5 +1,5 @@
 import { html } from 'lit';
-import { customElement, property } from 'lit/decorators.js';
+import { customElement, property, state } from 'lit/decorators.js';
 import { ChangeEvent } from 'react';
 import { UmbLitElement } from '@umbraco-cms/element';
 // eslint-disable-next-line import/no-named-as-default
@@ -18,23 +18,30 @@ export class UmbPropertyEditorUIContentPickerElement extends UmbLitElement {
 	];
 	*/
 
+	private _value: Array<string> = [];
 
 	@property({ type: Array })
-	private value: Array<string> = [];
+	public get value(): Array<string> {
+		return this._value;
+	}
+	public set value(value: Array<string>) {
+		console.log("property editor got value", value)
+			this._value = value || [];
+	}
 
 	// TODO: Use config for something.
 	@property({ type: Array, attribute: false })
 	public config = [];
 
 	private _onChange(event: ChangeEvent) {
-		this.value = (event.target as UmbInputDocumentPickerElement).value;
+		this.value = (event.target as UmbInputDocumentPickerElement).selectedKeys;
 		this.dispatchEvent(new CustomEvent('property-value-change'));
 	}
 
 
 	render() {
 		return html`
-			<umb-input-document-picker @change=${this._onChange} .value=${this.value}>Add</umb-input-document-picker>
+			<umb-input-document-picker @change=${this._onChange} .selectedKeys=${this._value}>Add</umb-input-document-picker>
 		`;
 	}
 
