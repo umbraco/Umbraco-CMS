@@ -30,13 +30,15 @@ export function naiveObjectComparison(objOne: any, objTwo: any): boolean {
 
 /**
  * @export
- * @method CreateObservablePart
+ * @method appendToFrozenArray
  * @param {Observable<T>} source - RxJS Subject to use for this Observable.
  * @param {(mappable: T) => R} mappingFunction - Method to return the part for this Observable to return.
  * @param {(previousResult: R, currentResult: R) => boolean} [memoizationFunction] - Method to Compare if the data has changed. Should return true when data is different.
  * @description - Creates a RxJS Observable from RxJS Subject.
- * @example <caption>Example create a Observable for part of the data Subject.</caption>
- * public readonly myPart = CreateObservablePart(this._data, (data) => data.myPart);
+ * @example <caption>Example append new entry for a UniqueBehaviorSubject which is an array. Where the key is unique and the item will be updated if matched with existing.</caption>
+ * const entry = {key: 'myKey', value: 'myValue'};
+ * const newDataSet = appendToFrozenArray(mySubject.getValue(), entry, x => x.key === key);
+ * mySubject.next(newDataSet);
  */
 export function appendToFrozenArray<T>(data: T[], entry: T, uniqueMethod?: (entry: T) => boolean): T[] {
 	const unFrozenDataSet = [...data];

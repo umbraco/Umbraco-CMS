@@ -30,7 +30,6 @@ export class UmbWorkspaceDataTypeContext extends UmbWorkspaceContentContext<
 
 		const entry = {alias: alias, value: value};
 
-		// TODO: Can we move this into a method of its own?
 		const newDataSet = appendToFrozenArray((this._data.getValue() as DataTypeDetails).data, entry, x => x.alias === alias);
 
 		this.update({data: newDataSet});
