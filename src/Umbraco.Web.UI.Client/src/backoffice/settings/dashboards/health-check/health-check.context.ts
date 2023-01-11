@@ -6,6 +6,11 @@ export class UmbHealthCheckContext {
 	constructor(host: any) {
 		this.host = host;
 	}
+
+	hej() {
+		console.log('hej');
+	}
+
 	async checkGroup(name: string) {
 		const response = await HealthCheckResource.getHealthCheckGroupByName({ name });
 

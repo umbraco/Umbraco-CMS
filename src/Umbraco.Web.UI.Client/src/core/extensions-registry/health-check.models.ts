@@ -7,7 +7,7 @@ export interface ManifestHealthCheck extends ManifestElement {
 
 export interface MetaHealthCheck {
 	label: string;
-	checks: HealthCheck[];
+	api: any;
 }
 
 export interface HealthCheck {

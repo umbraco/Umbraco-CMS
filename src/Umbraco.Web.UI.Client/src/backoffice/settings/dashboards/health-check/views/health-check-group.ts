@@ -109,7 +109,7 @@ export class UmbDashboardHealthCheckGroupElement extends UmbLitElement {
 	@state()
 	private _group?: HealthCheckGroupWithResult;
 
-	private _healthCheckContext = new UmbHealthCheckContext(this);
+	private _healthCheckContext?: UmbHealthCheckContext;
 
 	@state()
 	private _checks?: HealthCheckWithResult[] | null;
@@ -117,19 +117,26 @@ export class UmbDashboardHealthCheckGroupElement extends UmbLitElement {
 	@state()
 	private _keyResults?: any;
 
+	constructor() {
+		super();
+		this.consumeContext('umbHealthCheck', (instance) => {
+			this._healthCheckContext = instance;
+		});
+	}
+
 	connectedCallback(): void {
 		super.connectedCallback();
 		this._getGroup(decodeURI(this.groupName));
 	}
 
 	private async _getGroup(name: string) {
-		this._checks = await this._healthCheckContext.getGroupChecks(name);
+		this._checks = await this._healthCheckContext?.getGroupChecks(name);
 		this._group = { name: this.groupName, checks: this._checks };
 	}
 
 	private async _buttonHandler() {
 		this._buttonState = 'waiting';
-		this._keyResults = await this._healthCheckContext.checkGroup(decodeURI(this.groupName));
+		this._keyResults = await this._healthCheckContext?.checkGroup(decodeURI(this.groupName));
 		this._buttonState = 'success';
 	}
 

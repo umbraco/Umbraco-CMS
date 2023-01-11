@@ -8,6 +8,8 @@ import { UmbModalService } from '../../../../../core/modal';
 import { UmbLitElement } from '@umbraco-cms/element';
 import { tryExecuteAndNotify } from '@umbraco-cms/resources';
 
+import { ManifestHealthCheck, umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
+
 import { HealthCheckGroup, HealthCheckGroupWithResult, HealthCheckResource } from '@umbraco-cms/backend-api';
 
 import '../health-check-overview-group.element';
@@ -85,6 +87,8 @@ export class UmbDashboardHealthCheckOverviewElement extends UmbLitElement {
 
 	private _modalService?: UmbModalService;
 
+	private _healthCheckManifests: ManifestHealthCheck[] = [];
+
 	constructor() {
 		super();
 		this.consumeAllContexts(['umbNotificationService', 'umbModalService'], (instances) => {
@@ -92,9 +96,20 @@ export class UmbDashboardHealthCheckOverviewElement extends UmbLitElement {
 		});
 	}
 
+	connectedCallback(): void {
+		super.connectedCallback();
+		umbExtensionsRegistry.extensionsOfType('healthCheck').subscribe((healthChecks) => {
+			this._healthCheckManifests = healthChecks;
+		});
+	}
+
 	private async _onHealthCheckHandler() {
-		this._groups?.forEach((group) => {
+		/*this._groups?.forEach((group) => {
 			group.name ? this._getGroup(group.name) : nothing;
+		});*/
+		this._healthCheckManifests.forEach((group) => {
+			const api = new group.meta.api(this);
+			api.checkGroup(group.meta.label);
 		});
 	}
 
