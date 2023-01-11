@@ -282,7 +282,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Install
                         throw new Exception("Umbraco is already configured!");
 
                     var creator = _databaseSchemaCreatorFactory.Create(database);
-                    creator.InitializeDatabaseSchema();
+                    creator.InitializeDatabaseSchema().GetAwaiter().GetResult();
 
                     message = message + "<p>Installation completed!</p>";
 
