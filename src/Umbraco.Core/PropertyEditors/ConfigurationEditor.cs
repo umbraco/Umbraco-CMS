@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using System.Runtime.Serialization;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Extensions;
@@ -78,6 +79,9 @@ public class ConfigurationEditor : IConfigurationEditor
         string? configuration,
         IConfigurationEditorJsonSerializer configurationEditorJsonSerializer)
         => configuration.IsNullOrWhiteSpace() ? new Dictionary<string, object>() : configurationEditorJsonSerializer.Deserialize<Dictionary<string, object>>(configuration) ?? new Dictionary<string, object>();
+
+    /// <inheritdoc />
+    public virtual IEnumerable<ValidationResult> Validate(IDictionary<string, object> configuration) => Array.Empty<ValidationResult>();
 
     /// <summary>
     ///     Gets a field by its property name.

@@ -46,6 +46,7 @@ public class DataTypeViewModelMapDefinition : IMapDefinition
         target.ParentKey = _dataTypeService.GetContainer(source.ParentId)?.Key;
         target.Name = source.Name ?? string.Empty;
         target.PropertyEditorAlias = source.EditorAlias;
+        target.PropertyEditorUiAlias = source.EditorUiAlias;
 
         IConfigurationEditor? configurationEditor = source.Editor?.GetConfigurationEditor();
         IDictionary<string, object> configuration = configurationEditor?.ToConfigurationEditor(source.ConfigurationData)
@@ -67,6 +68,7 @@ public class DataTypeViewModelMapDefinition : IMapDefinition
 
         target.Name = source.Name;
         target.Editor = editor;
+        target.EditorUiAlias = source.PropertyEditorUiAlias;
         target.DatabaseType = GetEditorValueStorageType(editor);
         target.ConfigurationData = MapConfigurationData(source, editor);
     }
@@ -80,6 +82,7 @@ public class DataTypeViewModelMapDefinition : IMapDefinition
         target.Name = source.Name;
         target.ParentId = MapParentId(source.ParentKey);
         target.Editor = editor;
+        target.EditorUiAlias = source.PropertyEditorUiAlias;
         target.DatabaseType = GetEditorValueStorageType(editor);
         target.ConfigurationData = MapConfigurationData(source, editor);
     }

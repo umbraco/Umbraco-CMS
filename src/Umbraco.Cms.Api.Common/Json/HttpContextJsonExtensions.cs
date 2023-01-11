@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
-using Umbraco.Cms.Api.Management.Filters;
+using Umbraco.Cms.Api.Common.Filters;
 
-namespace Umbraco.Cms.Api.Management.Json;
+namespace Umbraco.Cms.Api.Common.Json;
 
 public static class HttpContextJsonExtensions
 {

@@ -2,7 +2,7 @@
 using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
 
-namespace Umbraco.Cms.Api.Management.Json;
+namespace Umbraco.Cms.Infrastructure.Serialization;
 
 public class JsonObjectConverter : JsonConverter<object>
 {

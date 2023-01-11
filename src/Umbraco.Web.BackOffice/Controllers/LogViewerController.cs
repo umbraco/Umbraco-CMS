@@ -129,14 +129,14 @@ public class LogViewerController : BackOfficeNotificationsController
     }
 
     [HttpGet]
-    public IEnumerable<SavedLogSearch>? GetSavedSearches() => _logViewer.GetSavedSearches();
+    public IEnumerable<SavedLogSearch> GetSavedSearches() => _logViewer.GetSavedSearches();
 
     [HttpPost]
-    public IEnumerable<SavedLogSearch>? PostSavedSearch(SavedLogSearch item) =>
+    public IEnumerable<SavedLogSearch> PostSavedSearch(SavedLogSearch item) =>
         _logViewer.AddSavedSearch(item.Name, item.Query);
 
     [HttpPost]
-    public IEnumerable<SavedLogSearch>? DeleteSavedSearch(SavedLogSearch item) =>
+    public IEnumerable<SavedLogSearch> DeleteSavedSearch(SavedLogSearch item) =>
         _logViewer.DeleteSavedSearch(item.Name, item.Query);
 
     [HttpGet]

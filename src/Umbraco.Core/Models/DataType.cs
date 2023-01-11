@@ -60,6 +60,10 @@ public class DataType : TreeEntityBase, IDataType
 
     /// <inheritdoc />
     [DataMember]
+    public string? EditorUiAlias { get; set; }
+
+    /// <inheritdoc />
+    [DataMember]
     public ValueStorageType DatabaseType
     {
         get => _databaseType;

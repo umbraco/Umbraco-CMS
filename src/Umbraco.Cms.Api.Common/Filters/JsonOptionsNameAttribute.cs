@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Api.Management.Filters;
+﻿namespace Umbraco.Cms.Api.Common.Filters;
 
 [AttributeUsage(AttributeTargets.Class)]
 public class JsonOptionsNameAttribute : Attribute
