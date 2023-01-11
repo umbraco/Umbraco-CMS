@@ -33,10 +33,15 @@ export class UmbPropertyEditorUIContentPickerElement extends UmbLitElement {
 	@property({ type: Array, attribute: false })
 	public config = [];
 
+
 	private _onChange(event: ChangeEvent) {
 		this.value = (event.target as UmbInputDocumentPickerElement).selectedKeys;
 		this.dispatchEvent(new CustomEvent('property-value-change'));
 	}
+
+
+
+	// TODO: Implement mandatory?
 
 
 	render() {
