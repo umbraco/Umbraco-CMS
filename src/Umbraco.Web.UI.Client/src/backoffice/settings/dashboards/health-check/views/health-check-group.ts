@@ -15,6 +15,7 @@ import {
 
 import { UmbLitElement } from '@umbraco-cms/element';
 import { tryExecuteAndNotify } from '@umbraco-cms/resources';
+import { UmbHealthCheckContext } from '../health-check.context';
 
 @customElement('umb-dashboard-health-check-group')
 export class UmbDashboardHealthCheckGroupElement extends UmbLitElement {
@@ -108,9 +109,13 @@ export class UmbDashboardHealthCheckGroupElement extends UmbLitElement {
 	@state()
 	private _group?: HealthCheckGroupWithResult;
 
-	constructor() {
-		super();
-	}
+	private _healthCheckContext = new UmbHealthCheckContext(this);
+
+	@state()
+	private _checks?: HealthCheckWithResult[] | null;
+
+	@state()
+	private _keyResults?: any;
 
 	connectedCallback(): void {
 		super.connectedCallback();
@@ -118,18 +123,13 @@ export class UmbDashboardHealthCheckGroupElement extends UmbLitElement {
 	}
 
 	private async _getGroup(name: string) {
-		const { data } = await tryExecuteAndNotify(this, HealthCheckResource.getHealthCheckGroupByName({ name }));
-		if (data) this._group = data;
+		this._checks = await this._healthCheckContext.getGroupChecks(name);
+		this._group = { name: this.groupName, checks: this._checks };
 	}
 
 	private async _buttonHandler() {
 		this._buttonState = 'waiting';
-		this._getChecks(decodeURI(this.groupName));
-	}
-	private async _getChecks(name: string) {
-		await new Promise((resolve) => setTimeout(resolve, (Math.random() + 1) * 1000));
-		const { data } = await tryExecuteAndNotify(this, HealthCheckResource.getHealthCheckGroupByName({ name }));
-		if (data) this._group = data;
+		this._keyResults = await this._healthCheckContext.checkGroup(decodeURI(this.groupName));
 		this._buttonState = 'success';
 	}
 
@@ -147,7 +147,7 @@ export class UmbDashboardHealthCheckGroupElement extends UmbLitElement {
 						${this._group.checks?.map((check) => {
 							return html`<uui-box headline="${check.name || '?'}">
 								<p>${check.description}</p>
-								${check.results ? this.renderCheckResults(check.results) : nothing}
+								${check.key ? this.renderCheckResults(check.key) : nothing}
 							</uui-box>`;
 						})}
 					</div>
@@ -156,14 +156,14 @@ export class UmbDashboardHealthCheckGroupElement extends UmbLitElement {
 		} else return nothing;
 	}
 
-	renderCheckResults(results: HealthCheckResult[]) {
+	renderCheckResults(key: string) {
+		const checkResults = this._keyResults?.find((result: any) => result.key === key);
 		return html`<uui-icon-registry-essential>
 			<div class="data">
-				${results.map((result) => {
+				${checkResults?.results.map((result: any) => {
 					return html`<div class="result-wrapper">
 						<p>${this.renderIcon(result.resultType)} ${result.message}</p>
 						${result.readMoreLink ? html`<uui-button color="default" look="primary">Read more</uui-button>` : nothing}
-						${result.actions ? this.renderActions(result.actions) : nothing}
 					</div>`;
 				})}
 			</div>

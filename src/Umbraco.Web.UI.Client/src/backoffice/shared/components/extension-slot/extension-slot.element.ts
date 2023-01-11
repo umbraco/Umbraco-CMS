@@ -58,7 +58,7 @@ export class UmbExtensionSlotElement extends UmbLitElement {
 						};
 						this._extensions.push(extensionObject);
 						let component;
-						if (extension.type === 'healthCheck') debugger;
+
 						if (isManifestElementableType(extension)) {
 							component = await createExtensionElement(extension);
 						} else {

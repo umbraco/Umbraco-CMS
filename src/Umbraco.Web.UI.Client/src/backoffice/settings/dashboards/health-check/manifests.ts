@@ -1,5 +1,30 @@
+import { HealthCheckGroup, HealthCheckResource } from '@umbraco-cms/backend-api';
 import type { ManifestHealthCheck } from '@umbraco-cms/models';
 
+const _getAllGroups = async () => {
+	const response = await HealthCheckResource.getHealthCheckGroup({ skip: 0, take: 9999 });
+	return response.items;
+};
+const groups: HealthCheckGroup[] = await _getAllGroups();
+
+const _createManifests = (groups: HealthCheckGroup[]) => {
+	return groups.map((group) => {
+		return {
+			type: 'healthCheck',
+			alias: `Umb.HealthCheck.${group.name}`,
+			name: `${group.name} Health Check`,
+			weight: 500,
+			meta: {
+				label: group.name,
+				checks: [],
+			},
+		};
+	});
+};
+
+const healthChecks = _createManifests(groups);
+
+/*
 const healthchecks: Array<ManifestHealthCheck> = [
 	{
 		type: 'healthCheck',
@@ -76,6 +101,6 @@ const healthchecks: Array<ManifestHealthCheck> = [
 			],
 		},
 	},
-];
+];*/
 
-export const manifests = [...healthchecks];
+export const manifests = [...healthChecks];

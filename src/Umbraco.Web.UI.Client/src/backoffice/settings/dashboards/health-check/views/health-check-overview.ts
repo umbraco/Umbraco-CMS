@@ -10,7 +10,7 @@ import { tryExecuteAndNotify } from '@umbraco-cms/resources';
 
 import { HealthCheckGroup, HealthCheckGroupWithResult, HealthCheckResource } from '@umbraco-cms/backend-api';
 
-import '../health-check-group-two.element';
+import '../health-check-overview-group.element';
 
 @customElement('umb-dashboard-health-check-overview')
 export class UmbDashboardHealthCheckOverviewElement extends UmbLitElement {
@@ -92,18 +92,6 @@ export class UmbDashboardHealthCheckOverviewElement extends UmbLitElement {
 		});
 	}
 
-	connectedCallback() {
-		super.connectedCallback();
-		this._getAllGroups();
-	}
-
-	private async _getAllGroups() {
-		const { data } = await tryExecuteAndNotify(this, HealthCheckResource.getHealthCheckGroup({ skip: 0, take: 9999 }));
-		if (data) {
-			this._groups = data.items;
-		}
-	}
-
 	private async _onHealthCheckHandler() {
 		this._groups?.forEach((group) => {
 			group.name ? this._getGroup(group.name) : nothing;
@@ -130,18 +118,9 @@ export class UmbDashboardHealthCheckOverviewElement extends UmbLitElement {
 						Check all groups
 					</uui-button>
 				</div>
-				<div class="group-wrapper">
-					${this._groups?.map((group) => {
-						if (group.name)
-							return html` <a href="${window.location.href + '/' + group.name}">
-								<uui-box class="group-box"> ${group.name} ${this.renderChecks(group.name)} </uui-box>
-							</a>`;
-						else return nothing;
-					})}
-				</div>
+				<!--//TODO: i want to wrap my extension container in a grid wrapper -->
+				<umb-extension-slot type="healthCheck" default-element="umb-health-check-overview-group"></umb-extension-slot>
 			</uui-box>
-			<br />
-			<umb-extension-slot type="healthCheck" default-element="umb-health-check-group-two"></umb-extension-slot>
 		`;
 	}
 
