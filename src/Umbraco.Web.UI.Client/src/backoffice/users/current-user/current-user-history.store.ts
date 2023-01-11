@@ -1,4 +1,4 @@
-import { CreateObservablePart, UniqueBehaviorSubject } from 'src/core/observable-api/unique-behavior-subject';
+import { createObservablePart, UniqueBehaviorSubject } from 'src/core/observable-api/unique-behavior-subject';
 
 export type UmbModelType = 'dialog' | 'sidebar';
 
@@ -15,7 +15,7 @@ export class UmbCurrentUserHistoryStore {
 	);
 
 	public readonly history = this.#history.asObservable();
-	public readonly latestHistory = CreateObservablePart(this.#history, historyItems => historyItems.slice(-10));
+	public readonly latestHistory = createObservablePart(this.#history, historyItems => historyItems.slice(-10));
 
 
 	constructor() {

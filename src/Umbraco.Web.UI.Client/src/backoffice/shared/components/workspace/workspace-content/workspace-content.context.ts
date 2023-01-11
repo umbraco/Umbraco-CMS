@@ -7,7 +7,7 @@ import { UmbContextConsumerController } from 'src/core/context-api/consume/conte
 import { UmbObserverController } from '@umbraco-cms/observable-api';
 import { UmbContextProviderController } from 'src/core/context-api/provide/context-provider.controller';
 import { EntityTreeItem } from '@umbraco-cms/backend-api';
-import { CreateObservablePart, UniqueBehaviorSubject } from 'src/core/observable-api/unique-behavior-subject';
+import { createObservablePart, UniqueBehaviorSubject } from 'src/core/observable-api/unique-behavior-subject';
 
 // TODO: Consider if its right to have this many class-inheritance of WorkspaceContext
 // TODO: Could we extract this code into a 'Manager' of its own, which will be instantiated by the concrete Workspace Context. This will be more transparent and 'reuseable'
@@ -45,7 +45,7 @@ export abstract class UmbWorkspaceContentContext<
 
 		this._data = new UniqueBehaviorSubject<ContentTypeType>(defaultData);
 		this.data = this._data.asObservable();
-		this.name = CreateObservablePart(this._data, data => data.name);
+		this.name = createObservablePart(this._data, data => data.name);
 
 
 		this.entityType = entityType;
