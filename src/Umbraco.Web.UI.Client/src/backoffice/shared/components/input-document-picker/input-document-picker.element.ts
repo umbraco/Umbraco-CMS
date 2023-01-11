@@ -63,7 +63,6 @@ export class UmbInputDocumentPickerElement extends FormControlMixin(UmbLitElemen
 		return this._selectedKeys;
 	}
 	public set selectedKeys(keys: Array<string>) {
-		console.log("selectedKeys", keys);
 		this._selectedKeys = keys;
 		super.value = keys.join(',');
 		this._observePickedDocuments();
@@ -86,16 +85,17 @@ export class UmbInputDocumentPickerElement extends FormControlMixin(UmbLitElemen
 	constructor() {
 		super();
 
-    this.addValidator(
-      'rangeUnderflow',
-      () => this.minMessage,
-      () => !!this.min && (this._value as string).length < this.min
-    );
-    this.addValidator(
-      'rangeOverflow',
-      () => this.maxMessage,
-      () => !!this.max && (this._value as string).length > this.max
-    );
+		// TODO: Figure out why validator does not work. + Look into implementing the Validation message UUI part.
+		this.addValidator(
+			'rangeUnderflow',
+			() => this.minMessage,
+			() => !!this.min && this._selectedKeys.length < this.min
+		);
+		this.addValidator(
+			'rangeOverflow',
+			() => this.maxMessage,
+			() => !!this.max && this._selectedKeys.length > this.max
+		);
 
 		this.consumeContext('umbDocumentStore', (instance) => {
 			this._documentStore = instance
@@ -108,7 +108,7 @@ export class UmbInputDocumentPickerElement extends FormControlMixin(UmbLitElemen
 	}
 
   protected getFormElement() {
-    return this;
+    return undefined;
   }
 
 	private _observePickedDocuments() {

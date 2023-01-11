@@ -1,11 +1,10 @@
 import { html } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { UmbLitElement } from '@umbraco-cms/element';
-// eslint-disable-next-line import/no-named-as-default
 import type { UmbInputDocumentPickerElement } from 'src/backoffice/shared/components/input-document-picker/input-document-picker.element';
 import 'src/backoffice/shared/components/input-document-picker/input-document-picker.element';
+import type { DataTypePropertyData } from '@umbraco-cms/models';
 
-// TODO: rename to Document Picker
 @customElement('umb-property-editor-ui-document-picker')
 export class UmbPropertyEditorUIContentPickerElement extends UmbLitElement {
 	/*
@@ -30,7 +29,19 @@ export class UmbPropertyEditorUIContentPickerElement extends UmbLitElement {
 
 	// TODO: Use config for something.
 	@property({ type: Array, attribute: false })
-	public config = [];
+
+	public set config(config: Array<DataTypePropertyData>) {
+		const validationLimit = config.find(x => x.alias === 'validationLimit');
+
+		console.log("got config", validationLimit)
+		this._limitMin = (validationLimit?.value as any).min;
+		this._limitMax = (validationLimit?.value as any).max;
+	}
+
+	@state()
+	private _limitMin?:number;
+	@state()
+	private _limitMax?:number;
 
 
 	private _onChange(event: CustomEvent) {
@@ -45,7 +56,12 @@ export class UmbPropertyEditorUIContentPickerElement extends UmbLitElement {
 
 	render() {
 		return html`
-			<umb-input-document-picker @change=${this._onChange} .selectedKeys=${this._value}>Add</umb-input-document-picker>
+			<umb-input-document-picker
+				@change=${this._onChange}
+				.selectedKeys=${this._value}
+				.min=${this._limitMin}
+				.max=${this._limitMax}
+			>Add</umb-input-document-picker>
 		`;
 	}
 
