@@ -2,6 +2,7 @@ import { UmbWorkspaceContentContext } from '../../../shared/components/workspace
 import type { UmbDataTypeStore, UmbDataTypeStoreItemType } from 'src/backoffice/settings/data-types/data-type.store';
 import type { DataTypeDetails } from '@umbraco-cms/models';
 import { UmbControllerHostInterface } from 'src/core/controller/controller-host.mixin';
+import { appendToFrozenArray } from 'src/core/observable-api/unique-behavior-subject';
 
 const DefaultDataTypeData = {
 	key: '',
@@ -26,18 +27,11 @@ export class UmbWorkspaceDataTypeContext extends UmbWorkspaceContentContext<
 	public setPropertyValue(alias: string, value: unknown) {
 
 		// TODO: make sure to check that we have a details model? otherwise fail? 8This can be relevant if we use the same context for tree actions?
-		const data = this._data.getValue();
 
 		const entry = {alias: alias, value: value};
 
 		// TODO: Can we move this into a method of its own?
-		const newDataSet = [...(data as DataTypeDetails).data];
-		const indexToReplace = newDataSet.findIndex(x => x.alias === alias);
-		if(indexToReplace !== -1) {
-			newDataSet[indexToReplace] = entry;
-		} else {
-			newDataSet.push(entry);
-		}
+		const newDataSet = appendToFrozenArray((this._data.getValue() as DataTypeDetails).data, entry, x => x.alias === alias);
 
 		this.update({data: newDataSet});
 	}

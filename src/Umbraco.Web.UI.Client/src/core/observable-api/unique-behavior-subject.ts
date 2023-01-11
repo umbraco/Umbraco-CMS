@@ -27,6 +27,35 @@ export function naiveObjectComparison(objOne: any, objTwo: any): boolean {
 
 
 
+
+/**
+ * @export
+ * @method CreateObservablePart
+ * @param {Observable<T>} source - RxJS Subject to use for this Observable.
+ * @param {(mappable: T) => R} mappingFunction - Method to return the part for this Observable to return.
+ * @param {(previousResult: R, currentResult: R) => boolean} [memoizationFunction] - Method to Compare if the data has changed. Should return true when data is different.
+ * @description - Creates a RxJS Observable from RxJS Subject.
+ * @example <caption>Example create a Observable for part of the data Subject.</caption>
+ * public readonly myPart = CreateObservablePart(this._data, (data) => data.myPart);
+ */
+export function appendToFrozenArray<T>(data: T[], entry: T, uniqueMethod?: (entry: T) => boolean): T[] {
+	const unFrozenDataSet = [...data];
+	if(uniqueMethod) {
+		const indexToReplace = unFrozenDataSet.findIndex(uniqueMethod);
+		if(indexToReplace !== -1) {
+			unFrozenDataSet[indexToReplace] = entry;
+		} else {
+			unFrozenDataSet.push(entry);
+		}
+	} else {
+		unFrozenDataSet.push(entry);
+	}
+	return unFrozenDataSet;
+}
+
+
+
+
 type MappingFunction<T, R> = (mappable: T) => R;
 type MemoizationFunction<R> = (previousResult: R, currentResult: R) => boolean;
 
