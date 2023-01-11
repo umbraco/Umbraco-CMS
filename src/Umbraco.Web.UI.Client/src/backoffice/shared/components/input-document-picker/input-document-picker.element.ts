@@ -1,7 +1,8 @@
-import { css, html, nothing } from 'lit';
+import { css, html, nothing, PropertyValueMap } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, property, state } from 'lit/decorators.js';
 import { ifDefined } from 'lit-html/directives/if-defined.js';
+import { FormControlMixin } from '@umbraco-ui/uui-base/lib/mixins';
 import type { UmbModalService } from 'src/core/modal';
 import type { FolderTreeItem } from '@umbraco-cms/backend-api';
 import { UmbLitElement } from '@umbraco-cms/element';
@@ -9,7 +10,7 @@ import type { UmbObserverController } from '@umbraco-cms/observable-api';
 import type { UmbDocumentStore } from 'src/backoffice/documents/documents/document.store';
 
 @customElement('umb-input-document-picker')
-export class UmbInputDocumentPickerElement extends UmbLitElement {
+export class UmbInputDocumentPickerElement extends FormControlMixin(UmbLitElement) {
 	static styles = [
 		UUITextStyles,
 		css`
@@ -53,6 +54,10 @@ export class UmbInputDocumentPickerElement extends UmbLitElement {
 
 	}
 
+  protected getFormElement() {
+    return this;
+  }
+
 	private _observePickedDocuments() {
 		this._pickedItemsObserver?.destroy();
 
@@ -91,7 +96,6 @@ export class UmbInputDocumentPickerElement extends UmbLitElement {
 		this.value = newValue;
 		this.dispatchEvent(new CustomEvent('change', { bubbles: true, composed: true }));
 	}
-
 
 	render() {
 		return html`
