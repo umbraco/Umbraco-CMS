@@ -76,9 +76,6 @@ export class UmbInputDocumentPickerElement extends FormControlMixin(UmbLitElemen
 		}
 	}
 
-	@property({ type: Array, attribute: false })
-	public config = [];
-
 	@state()
 	private _items?: Array<FolderTreeItem>;
 

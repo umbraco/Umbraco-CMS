@@ -18,6 +18,12 @@ export const manifest: ManifestPropertyEditorUI = {
 					description: 'Opens the node in a dialog',
 					propertyEditorUI: 'Umb.PropertyEditorUI.Toggle',
 				},
+				{
+					alias: 'validationLimit',
+					label: 'Amount of Documents',
+					description: 'Require a certain amount of documents',
+					propertyEditorUI: 'Umb.PropertyEditorUI.NumberRange',
+				},
 			],
 		},
 	},

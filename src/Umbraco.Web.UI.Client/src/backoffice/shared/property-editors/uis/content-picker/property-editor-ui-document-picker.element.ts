@@ -1,6 +1,5 @@
 import { html } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
-import { ChangeEvent } from 'react';
 import { UmbLitElement } from '@umbraco-cms/element';
 // eslint-disable-next-line import/no-named-as-default
 import type { UmbInputDocumentPickerElement } from 'src/backoffice/shared/components/input-document-picker/input-document-picker.element';
@@ -34,7 +33,7 @@ export class UmbPropertyEditorUIContentPickerElement extends UmbLitElement {
 	public config = [];
 
 
-	private _onChange(event: ChangeEvent) {
+	private _onChange(event: CustomEvent) {
 		this.value = (event.target as UmbInputDocumentPickerElement).selectedKeys;
 		this.dispatchEvent(new CustomEvent('property-value-change'));
 	}
