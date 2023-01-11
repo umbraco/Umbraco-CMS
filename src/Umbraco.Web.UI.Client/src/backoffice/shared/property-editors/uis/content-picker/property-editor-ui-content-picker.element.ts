@@ -108,6 +108,12 @@ export class UmbPropertyEditorUIContentPickerElement extends UmbLitElement {
 		this.dispatchEvent(new CustomEvent('property-value-change'));
 	}
 
+
+	render() {
+		return html`${this._items?.map((item) => this._renderItem(item))}
+			<uui-button id="add-button" look="placeholder" @click=${this._openPicker} label="open">Add</uui-button>`;
+	}
+
 	private _renderItem(item: FolderTreeItem) {
 		// TODO: remove when we have a way to handle trashed items
 		const tempItem = item as FolderTreeItem & { isTrashed: boolean };
@@ -122,10 +128,6 @@ export class UmbPropertyEditorUIContentPickerElement extends UmbLitElement {
 		`;
 	}
 
-	render() {
-		return html`${this._items?.map((item) => this._renderItem(item))}
-			<uui-button id="add-button" look="placeholder" @click=${this._openPicker} label="open">Add</uui-button>`;
-	}
 }
 
 export default UmbPropertyEditorUIContentPickerElement;
