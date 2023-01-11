@@ -6,6 +6,7 @@ import type { UmbModalService } from 'src/core/modal';
 import { UmbDocumentStore } from 'src/backoffice/documents/documents/document.store';
 import { FolderTreeItem } from '@umbraco-cms/backend-api';
 import { UmbLitElement } from '@umbraco-cms/element';
+import { UmbObserverController } from '@umbraco-cms/observable-api';
 
 // TODO: rename to Document Picker
 @customElement('umb-property-editor-ui-content-picker')
@@ -34,8 +35,16 @@ export class UmbPropertyEditorUIContentPickerElement extends UmbLitElement {
 		`,
 	];
 
+	private _value: Array<string> = [];
+
 	@property({ type: Array })
-	public value: Array<string> = [];
+	public get value(): Array<string> {
+		return this._value;
+	}
+	public set value(value: Array<string>) {
+		this._value = value;
+		this._observePickedDocuments();
+	}
 
 	@property({ type: Array, attribute: false })
 	public config = [];
@@ -45,21 +54,28 @@ export class UmbPropertyEditorUIContentPickerElement extends UmbLitElement {
 
 	private _modalService?: UmbModalService;
 	private _documentStore?: UmbDocumentStore;
+	private _pickedItemsObserver?: UmbObserverController<FolderTreeItem>;
 
 	constructor() {
 		super();
 
-		this.consumeAllContexts(['umbDocumentStore', 'umbModalService'], (instances) => {
-			this._documentStore = instances['umbDocumentStore'];
-			this._modalService = instances['umbModalService'];
+		this.consumeContext('umbDocumentStore', (instance) => {
+			this._documentStore = instance
 			this._observePickedDocuments();
 		});
+		this.consumeContext('umbModalService', (instance) => {
+			this._modalService = instance;
+		});
+
 	}
 
 	private _observePickedDocuments() {
+		this._pickedItemsObserver?.destroy();
+
 		if (!this._documentStore) return;
+
 		// TODO: consider changing this to the list data endpoint when it is available
-		this.observe(this._documentStore.getTreeItems(this.value), (items) => {
+		this._pickedItemsObserver = this.observe(this._documentStore.getTreeItems(this.value), (items) => {
 			this._items = items;
 		});
 	}
@@ -89,7 +105,6 @@ export class UmbPropertyEditorUIContentPickerElement extends UmbLitElement {
 
 	private _setValue(newValue: Array<string>) {
 		this.value = newValue;
-		this._observePickedDocuments();
 		this.dispatchEvent(new CustomEvent('property-value-change'));
 	}
 
