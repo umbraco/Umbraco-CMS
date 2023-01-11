@@ -1,24 +1,27 @@
 import { BehaviorSubject, distinctUntilChanged, map, Observable, shareReplay } from "rxjs";
 
 
+// TODO: Should this handle array as well?
 function deepFreeze<T>(inObj: T): T {
-    Object.freeze(inObj);
+	if(typeof inObj === 'object') {
+		Object.freeze(inObj);
 
-    Object.getOwnPropertyNames(inObj).forEach(function (prop) {
-      // eslint-disable-next-line no-prototype-builtins
-      if ((inObj as any).hasOwnProperty(prop)
-        && (inObj as any)[prop] != null
-        && typeof (inObj as any)[prop] === 'object'
-        && !Object.isFrozen((inObj as any)[prop])) {
-          deepFreeze((inObj as any)[prop]);
-        }
-    });
-    return inObj;
+		Object.getOwnPropertyNames(inObj)?.forEach(function (prop) {
+			// eslint-disable-next-line no-prototype-builtins
+			if ((inObj as any).hasOwnProperty(prop)
+				&& (inObj as any)[prop] != null
+				&& typeof (inObj as any)[prop] === 'object'
+				&& !Object.isFrozen((inObj as any)[prop])) {
+					deepFreeze((inObj as any)[prop]);
+				}
+		});
+	}
+	return inObj;
 }
 
 
 export function naiveObjectComparison(objOne: any, objTwo: any): boolean {
-    return JSON.stringify(objOne) === JSON.stringify(objTwo);
+	return JSON.stringify(objOne) === JSON.stringify(objTwo);
 }
 
 
@@ -28,10 +31,10 @@ type MappingFunction<T, R> = (mappable: T) => R;
 type MemoizationFunction<R> = (previousResult: R, currentResult: R) => boolean;
 
 function defaultMemoization(previousValue: any, currentValue: any): boolean {
-  if (typeof previousValue === 'object' && typeof currentValue === 'object') {
-    return naiveObjectComparison(previousValue, currentValue);
-  }
-  return previousValue === currentValue;
+	if (typeof previousValue === 'object' && typeof currentValue === 'object') {
+	return naiveObjectComparison(previousValue, currentValue);
+	}
+	return previousValue === currentValue;
 }
 
 /**
@@ -45,15 +48,15 @@ function defaultMemoization(previousValue: any, currentValue: any): boolean {
  * public readonly myPart = CreateObservablePart(this._data, (data) => data.myPart);
  */
 export function CreateObservablePart<T, R> (
-  source$: Observable<T>,
-    mappingFunction: MappingFunction<T, R>,
-    memoizationFunction?: MemoizationFunction<R>
-  ): Observable<R> {
-  return source$.pipe(
-    map(mappingFunction),
-    distinctUntilChanged(memoizationFunction || defaultMemoization),
-    shareReplay(1)
-  )
+	source$: Observable<T>,
+		mappingFunction: MappingFunction<T, R>,
+		memoizationFunction?: MemoizationFunction<R>
+	): Observable<R> {
+	return source$.pipe(
+		map(mappingFunction),
+		distinctUntilChanged(memoizationFunction || defaultMemoization),
+		shareReplay(1)
+	)
 }
 
 
@@ -65,24 +68,24 @@ export function CreateObservablePart<T, R> (
  * Additionally the Subject ensures the data is unique, not updating any Observes unless there is an actual change of the content.
  */
 export class UniqueBehaviorSubject<T> extends BehaviorSubject<T> {
-  constructor(initialData: T) {
-    super(deepFreeze(initialData));
-  }
+	constructor(initialData: T) {
+		super(deepFreeze(initialData));
+	}
 
-  next(newData: T): void {
-    const frozenData = deepFreeze(newData);
+	next(newData: T): void {
+		const frozenData = deepFreeze(newData);
 		// Only update data if its different than current data.
-    if (!naiveObjectComparison(frozenData, this.getValue())) {
-      super.next(frozenData);
-    }
-  }
+		if (!naiveObjectComparison(frozenData, this.getValue())) {
+			super.next(frozenData);
+		}
+	}
 
 	/**
 	 * Partial update data set, only works for Objects.
 	 * TODO: consider moving this into a specific class for Objects?
 	 * Consider doing similar for Array?
 	 */
-  update(data: Partial<T>) {
-    this.next({ ...this.getValue(), ...data });
-  }
+	update(data: Partial<T>) {
+		this.next({ ...this.getValue(), ...data });
+	}
 }

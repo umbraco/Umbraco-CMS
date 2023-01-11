@@ -2,7 +2,7 @@ import type { HTMLElementConstructor } from '../models';
 import { UmbControllerInterface } from './controller.interface';
 
 export declare class UmbControllerHostInterface extends HTMLElement {
-    //#controllers:UmbController[];
+	//#controllers:UmbController[];
 	//#attached:boolean;
 	hasController(controller:UmbControllerInterface): boolean;
 	getControllers(filterMethod: (ctrl: UmbControllerInterface) => boolean): UmbControllerInterface[];
@@ -31,7 +31,7 @@ export const UmbControllerHostMixin = <T extends HTMLElementConstructor>(superCl
 		hasController(ctrl: UmbControllerInterface): boolean {
 			return (this.#controllers.indexOf(ctrl) !== -1);
 		}
-	
+
 		/**
 		 * Retrieve controllers matching a filter of this element.
 		 * @param {method} filterMethod
@@ -46,9 +46,9 @@ export const UmbControllerHostMixin = <T extends HTMLElementConstructor>(superCl
 		 */
 		addController(ctrl: UmbControllerInterface): void {
 			this.#controllers.push(ctrl);
-            if(this.#attached) {
-                ctrl.hostConnected();
-            }
+			if(this.#attached) {
+				ctrl.hostConnected();
+			}
 		}
 
 		/**

@@ -1,5 +1,6 @@
-import { BehaviorSubject, Observable } from 'rxjs';
+import type { Observable } from 'rxjs';
 import type { ManifestTree } from '@umbraco-cms/models';
+import { UniqueBehaviorSubject } from 'src/core/observable-api/unique-behavior-subject';
 
 export interface UmbTreeContext {
 	tree: ManifestTree;
@@ -13,32 +14,35 @@ export interface UmbTreeContext {
 export class UmbTreeContextBase implements UmbTreeContext {
 	public tree: ManifestTree;
 
-	private _selectable: BehaviorSubject<boolean> = new BehaviorSubject(false);
-	public readonly selectable: Observable<boolean> = this._selectable.asObservable();
+	#selectable = new UniqueBehaviorSubject(false);
+	public readonly selectable = this.#selectable.asObservable();
 
-	private _selection: BehaviorSubject<Array<string>> = new BehaviorSubject(<Array<string>>[]);
-	public readonly selection: Observable<Array<string>> = this._selection.asObservable();
+	#selection = new UniqueBehaviorSubject(<Array<string>>[]);
+	public readonly selection = this.#selection.asObservable();
 
 	constructor(tree: ManifestTree) {
 		this.tree = tree;
 	}
 
 	public setSelectable(value: boolean) {
-		this._selectable.next(value);
+		this.#selectable.next(value);
 	}
 
 	public setSelection(value: Array<string>) {
 		if (!value) return;
-		this._selection.next(value);
+		this.#selection.next(value);
 	}
 
 	public select(key: string) {
-		const selection = [...this._selection.getValue(), key];
-		this._selection.next(selection);
+		const oldSelection = this.#selection.getValue();
+		if(oldSelection.indexOf(key) !== -1) return;
+
+		const selection = [...oldSelection, key];
+		this.#selection.next(selection);
 	}
 
 	public deselect(key: string) {
-		const selection = this._selection.getValue();
-		this._selection.next(selection.filter((x) => x !== key));
+		const selection = this.#selection.getValue();
+		this.#selection.next(selection.filter((x) => x !== key));
 	}
 }

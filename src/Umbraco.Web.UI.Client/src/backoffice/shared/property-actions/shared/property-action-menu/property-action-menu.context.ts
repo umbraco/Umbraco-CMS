@@ -1,23 +1,23 @@
-import { BehaviorSubject } from 'rxjs';
 import { UmbContextProviderController } from 'src/core/context-api/provide/context-provider.controller';
 import type { UmbControllerHostInterface } from 'src/core/controller/controller-host.mixin';
+import { UniqueBehaviorSubject } from 'src/core/observable-api/unique-behavior-subject';
 
 export class UmbPropertyActionMenuContext {
 
-	private _isOpen = new BehaviorSubject(false);
-	public readonly isOpen = this._isOpen.asObservable();
+	#isOpen = new UniqueBehaviorSubject(false);
+	public readonly isOpen = this.#isOpen.asObservable();
 
 	constructor(host: UmbControllerHostInterface) {
 		new UmbContextProviderController(host, 'umbPropertyActionMenu', this);
 	}
 
 	toggle() {
-		this._isOpen.next(!this._isOpen.getValue());
+		this.#isOpen.next(!this.#isOpen.getValue());
 	}
 	open() {
-		this._isOpen.next(true);
+		this.#isOpen.next(true);
 	}
 	close() {
-		this._isOpen.next(false);
+		this.#isOpen.next(false);
 	}
 }

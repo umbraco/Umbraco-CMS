@@ -42,7 +42,7 @@ export const UmbElementMixin = <T extends HTMLElementConstructor>(superClass: T)
 		provideContext(alias: string, instance: unknown): UmbContextProviderController {
 			return new UmbContextProviderController(this, alias, instance);
 		}
-        
+
 		/**
 		 * @description Setup a subscription for a context. The callback is called when the context is resolved.
 		 * @param {string} alias
@@ -62,11 +62,11 @@ export const UmbElementMixin = <T extends HTMLElementConstructor>(superClass: T)
 		 */
 		consumeAllContexts(_contextAliases: Array<string>, callback: (_instances: ResolvedContexts) => void) {
 			let resolvedAmount = 0;
-			const controllers = _contextAliases.map((alias) => 
+			const controllers = _contextAliases.map((alias) =>
 				new UmbContextConsumerController(this, alias, () => {
-					
+
 					resolvedAmount++;
-                    
+
 					if (resolvedAmount === _contextAliases.length) {
 
 						const result: ResolvedContexts = {};

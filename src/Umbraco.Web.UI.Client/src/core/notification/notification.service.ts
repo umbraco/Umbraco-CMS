@@ -1,4 +1,4 @@
-import { BehaviorSubject, Observable } from 'rxjs';
+import { BehaviorSubject } from 'rxjs';
 import { UmbNotificationHandler } from '.';
 
 export type UmbNotificationData = any;
@@ -18,10 +18,10 @@ export interface UmbNotificationOptions<UmbNotificationData> {
 export type UmbNotificationColor = '' | 'default' | 'positive' | 'warning' | 'danger';
 
 export class UmbNotificationService {
-	private _notifications: BehaviorSubject<Array<UmbNotificationHandler>> = new BehaviorSubject(
-		<Array<UmbNotificationHandler>>[]
-	);
-	public readonly notifications: Observable<Array<UmbNotificationHandler>> = this._notifications.asObservable();
+
+	// Notice this cannot use UniqueBehaviorSubject as it holds a HTML Element. which cannot be Serialized to JSON (it has some circular references)
+	private _notifications = new BehaviorSubject(<Array<UmbNotificationHandler>>[]);
+	public readonly notifications = this._notifications.asObservable();
 
 	/**
 	 * @private

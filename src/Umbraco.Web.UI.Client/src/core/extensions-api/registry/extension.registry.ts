@@ -8,6 +8,8 @@ type SpecificManifestTypeOrManifestBase<T extends keyof ManifestTypeMap | string
 	: ManifestBase;
 
 export class UmbExtensionRegistry {
+
+	// TODO: Use UniqueBehaviorSubject, as we don't want someone to edit data of extensions.
 	private _extensions = new BehaviorSubject<Array<ManifestBase>>([]);
 	public readonly extensions = this._extensions.asObservable();
 

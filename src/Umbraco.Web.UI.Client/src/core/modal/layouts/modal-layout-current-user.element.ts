@@ -108,7 +108,7 @@ export class UmbModalLayoutCurrentUserElement extends UmbLitElement {
 	}
 	private async _observeHistory() {
 		if (this._currentUserHistoryStore) {
-			this.observe(this._currentUserHistoryStore.getLatestHistory(), (history) => {
+			this.observe(this._currentUserHistoryStore.latestHistory, (history) => {
 				this._history = history;
 			});
 		}

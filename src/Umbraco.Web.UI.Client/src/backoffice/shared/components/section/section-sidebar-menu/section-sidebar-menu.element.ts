@@ -28,7 +28,7 @@ export class UmbSectionSidebarMenuElement extends UmbLitElement {
 	private _observeCurrentSection() {
 		if (!this._sectionContext) return;
 
-		this.observe(this._sectionContext?.data, (section) => {
+		this.observe(this._sectionContext?.manifest, (section) => {
 			this._currentSectionAlias = section.alias;
 		});
 	}
