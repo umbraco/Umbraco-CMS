@@ -23,13 +23,22 @@ export class UmbWorkspaceDataTypeContext extends UmbWorkspaceContentContext<
 		super(host, DefaultDataTypeData, 'umbDataTypeStore', 'dataType');
 	}
 
-	public setPropertyValue(propertyAlias: string, value: any) {
-		// TODO: what if this is a tree item?
-		const data = this._data.getValue();
-		const property = (data as DataTypeDetails).data?.find((p) => p.alias === propertyAlias);
-		if (!property) return;
+	public setPropertyValue(alias: string, value: unknown) {
 
-		property.value = value;
-		this._data.next({ ...data });
+		// TODO: make sure to check that we have a details model? otherwise fail? 8This can be relevant if we use the same context for tree actions?
+		const data = this._data.getValue();
+
+		const entry = {alias: alias, value: value};
+
+		// TODO: Can we move this into a method of its own?
+		const newDataSet = [...(data as DataTypeDetails).data];
+		const indexToReplace = newDataSet.findIndex(x => x.alias === alias);
+		if(indexToReplace !== -1) {
+			newDataSet[indexToReplace] = entry;
+		} else {
+			newDataSet.push(entry);
+		}
+
+		this.update({data: newDataSet});
 	}
 }
