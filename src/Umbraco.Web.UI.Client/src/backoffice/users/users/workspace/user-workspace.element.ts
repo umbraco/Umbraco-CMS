@@ -15,7 +15,7 @@ import type { UserDetails } from '@umbraco-cms/models';
 import { UmbModalService } from 'src/core/modal';
 
 import 'src/auth/components/input-user-group/input-user-group.element';
-import '../../../shared/property-editors/uis/content-picker/property-editor-ui-content-picker.element';
+import '../../../shared/property-editors/uis/content-picker/property-editor-ui-document-picker.element';
 import '../../../shared/components/workspace/workspace-layout/workspace-layout.element';
 import { UmbLitElement } from '@umbraco-cms/element';
 import type { UmbWorkspaceEntityElement } from 'src/backoffice/shared/components/workspace/workspace-entity-element.interface';
@@ -257,10 +257,10 @@ export class UmbUserWorkspaceElement extends UmbLitElement implements UmbWorkspa
 					<umb-workspace-property-layout
 						label="Content start node"
 						description="Limit the content tree to specific start nodes">
-						<umb-property-editor-ui-content-picker
+						<umb-property-editor-ui-document-picker
 							.value=${this._user.contentStartNodes}
 							@property-editor-change=${(e: any) => this._updateProperty('contentStartNodes', e.target.value)}
-							slot="editor"></umb-property-editor-ui-content-picker>
+							slot="editor"></umb-property-editor-ui-document-picker>
 					</umb-workspace-property-layout>
 					<umb-workspace-property-layout
 						label="Media start nodes"
