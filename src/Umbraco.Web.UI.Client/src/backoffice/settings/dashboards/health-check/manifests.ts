@@ -1,6 +1,6 @@
+import { UmbHealthCheckContext } from './health-check.context';
 import { HealthCheckGroup, HealthCheckResource } from '@umbraco-cms/backend-api';
 import type { ManifestHealthCheck } from '@umbraco-cms/models';
-import { UmbHealthCheckContext } from './health-check.context';
 
 const _getAllGroups = async () => {
 	const response = await HealthCheckResource.getHealthCheckGroup({ skip: 0, take: 9999 });

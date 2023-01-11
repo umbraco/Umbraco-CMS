@@ -5,6 +5,7 @@ import { UmbHealthCheckContext } from './health-check.context';
 import type { ManifestHealthCheck } from '@umbraco-cms/models';
 import { StatusResultType } from '@umbraco-cms/backend-api';
 import { UmbLitElement } from '@umbraco-cms/element';
+import { UmbHealthCheckDashboardContext } from './health-check-dashboard.context';
 
 @customElement('umb-health-check-overview-group')
 export class UmbHealthCheckOverviewGroupElement extends UmbLitElement {
@@ -50,12 +51,39 @@ export class UmbHealthCheckOverviewGroupElement extends UmbLitElement {
 	@state()
 	private _checkResponse? = [];
 
-	private _healthCheckContext?: UmbHealthCheckContext;
+	private _healthCheckContext?: UmbHealthCheckDashboardContext;
+
+	private _api?: UmbHealthCheckContext;
+
+	@state()
+	private _keyResults?: any = [];
+
+	constructor() {
+		super();
+
+		this.consumeContext('umbHealthCheckDashboard', (instance) => {
+			this._healthCheckContext = instance;
+			if (!this._healthCheckContext || !this.manifest?.meta.label) return;
+			this._api = this._healthCheckContext?.apis.get(this.manifest?.meta.label);
+
+			this._api?.results.subscribe((results) => {
+				this._keyResults = results;
+			});
+		});
+	}
 
 	render() {
 		return html`<a href="${window.location.href + '/' + this.manifest?.meta.label}">
-			<uui-box class="group-box"> ${this.manifest?.meta.label} </uui-box>
+			<uui-box class="group-box"> ${this.manifest?.meta.label} ${this._renderStatus()} </uui-box>
 		</a> `;
+	}
+
+	_renderStatus() {
+		return html`${this._keyResults.map((item: any) => html`<div>${this._renderCheckResults(item.results)}</div>`)}`;
+	}
+
+	_renderCheckResults(results: any) {
+		return html`${results.map((result: any) => html`<div>${result.resultType}</div>`)}`;
 	}
 }
 

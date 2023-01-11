@@ -2,20 +2,16 @@ import { UUIButtonState } from '@umbraco-ui/uui';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html, nothing } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
+
+import { UmbHealthCheckContext } from '../health-check.context';
+import { UmbHealthCheckDashboardContext } from '../health-check-dashboard.context';
 import {
-	HealthCheck,
 	HealthCheckAction,
-	HealthCheckGroup,
 	HealthCheckGroupWithResult,
-	HealthCheckResource,
-	HealthCheckResult,
 	HealthCheckWithResult,
 	StatusResultType,
 } from '@umbraco-cms/backend-api';
-
 import { UmbLitElement } from '@umbraco-cms/element';
-import { tryExecuteAndNotify } from '@umbraco-cms/resources';
-import { UmbHealthCheckContext } from '../health-check.context';
 
 @customElement('umb-dashboard-health-check-group')
 export class UmbDashboardHealthCheckGroupElement extends UmbLitElement {
@@ -109,7 +105,7 @@ export class UmbDashboardHealthCheckGroupElement extends UmbLitElement {
 	@state()
 	private _group?: HealthCheckGroupWithResult;
 
-	private _healthCheckContext?: UmbHealthCheckContext;
+	private _healthCheckContext?: UmbHealthCheckDashboardContext;
 
 	@state()
 	private _checks?: HealthCheckWithResult[] | null;
@@ -117,26 +113,31 @@ export class UmbDashboardHealthCheckGroupElement extends UmbLitElement {
 	@state()
 	private _keyResults?: any;
 
+	private _api?: UmbHealthCheckContext;
+
 	constructor() {
 		super();
-		this.consumeContext('umbHealthCheck', (instance) => {
+		this.consumeContext('umbHealthCheckDashboard', (instance) => {
 			this._healthCheckContext = instance;
+
+			this._api = this._healthCheckContext?.apis.get(this.groupName);
+
+			this._api?.getGroupChecks(this.groupName);
+
+			this._api?.checks.subscribe((checks) => {
+				this._checks = checks;
+				this._group = { name: this.groupName, checks: this._checks };
+			});
+
+			this._api?.results.subscribe((results) => {
+				this._keyResults = results;
+			});
 		});
-	}
-
-	connectedCallback(): void {
-		super.connectedCallback();
-		this._getGroup(decodeURI(this.groupName));
-	}
-
-	private async _getGroup(name: string) {
-		this._checks = await this._healthCheckContext?.getGroupChecks(name);
-		this._group = { name: this.groupName, checks: this._checks };
 	}
 
 	private async _buttonHandler() {
 		this._buttonState = 'waiting';
-		this._keyResults = await this._healthCheckContext?.checkGroup(decodeURI(this.groupName));
+		this._api?.checkGroup(this.groupName);
 		this._buttonState = 'success';
 	}
 
