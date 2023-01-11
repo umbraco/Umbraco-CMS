@@ -3,15 +3,15 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { distinctUntilChanged } from 'rxjs';
-import { UmbWorkspaceDataTypeContext } from './workspace-data-type.context';
+import { UmbWorkspaceDataTypeContext } from './data-type-workspace.context';
 import { UmbLitElement } from '@umbraco-cms/element';
 
 /**
- *  @element umb-workspace-data-type
+ *  @element umb-data-type-workspace
  *  @description - Element for displaying a Data Type Workspace
  */
-@customElement('umb-workspace-data-type')
-export class UmbWorkspaceDataTypeElement extends UmbLitElement {
+@customElement('umb-data-type-workspace')
+export class UmbDataTypeWorkspaceElement extends UmbLitElement {
 	static styles = [
 		UUITextStyles,
 		css`
@@ -85,6 +85,6 @@ export default UmbWorkspaceDataTypeElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-workspace-data-type': UmbWorkspaceDataTypeElement;
+		'umb-data-type-workspace': UmbWorkspaceDataTypeElement;
 	}
 }
