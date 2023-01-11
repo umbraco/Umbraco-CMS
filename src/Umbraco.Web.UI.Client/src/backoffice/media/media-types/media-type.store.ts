@@ -1,7 +1,8 @@
 import { map, Observable } from 'rxjs';
 import { UmbNodeStoreBase } from '../../../core/stores/store';
-import { MediaTypeResource, ApiError, ProblemDetails, FolderTreeItem } from '@umbraco-cms/backend-api';
+import { MediaTypeResource, FolderTreeItem } from '@umbraco-cms/backend-api';
 import type { MediaTypeDetails } from '@umbraco-cms/models';
+import { tryExecuteAndNotify } from '@umbraco-cms/resources';
 
 export type UmbMediaTypeStoreItemType = MediaTypeDetails | FolderTreeItem;
 /**
@@ -60,39 +61,26 @@ export class UmbMediaTypeStore extends UmbNodeStoreBase<UmbMediaTypeStoreItemTyp
 	}
 
 	getTreeRoot(): Observable<Array<FolderTreeItem>> {
-		MediaTypeResource.getTreeMediaTypeRoot({}).then(
-			(res) => {
-				this.updateItems(res.items);
-			},
-			(e) => {
-				if (e instanceof ApiError) {
-					const error = e.body as ProblemDetails;
-					if (e.status === 400) {
-						console.log(error.detail);
-					}
-				}
+		tryExecuteAndNotify(this.host, MediaTypeResource.getTreeMediaTypeRoot({})).then(({ data }) => {
+			if (data) {
+				this.updateItems(data.items);
 			}
-		);
+		});
 
 		return this.items.pipe(map((items) => items.filter((item) => item.parentKey === null)));
 	}
 
 	getTreeItemChildren(key: string): Observable<Array<FolderTreeItem>> {
-		MediaTypeResource.getTreeMediaTypeChildren({
-			parentKey: key,
-		}).then(
-			(res) => {
-				this.updateItems(res.items);
-			},
-			(e) => {
-				if (e instanceof ApiError) {
-					const error = e.body as ProblemDetails;
-					if (e.status === 400) {
-						console.log(error.detail);
-					}
-				}
+		tryExecuteAndNotify(
+			this.host,
+			MediaTypeResource.getTreeMediaTypeChildren({
+				parentKey: key,
+			})
+		).then(({ data }) => {
+			if (data) {
+				this.updateItems(data.items);
 			}
-		);
+		});
 
 		return this.items.pipe(map((items) => items.filter((item) => item.parentKey === key)));
 	}
