@@ -7,8 +7,8 @@ import { UmbWorkspaceDataTypeContext } from './data-type-workspace.context';
 import { UmbLitElement } from '@umbraco-cms/element';
 
 /**
- *  @element umb-data-type-workspace
- *  @description - Element for displaying a Data Type Workspace
+ * @element umb-data-type-workspace
+ * @description - Element for displaying a Data Type Workspace
  */
 @customElement('umb-data-type-workspace')
 export class UmbDataTypeWorkspaceElement extends UmbLitElement {
@@ -81,10 +81,10 @@ export class UmbDataTypeWorkspaceElement extends UmbLitElement {
 	}
 }
 
-export default UmbWorkspaceDataTypeElement;
+export default UmbDataTypeWorkspaceElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-data-type-workspace': UmbWorkspaceDataTypeElement;
+		'umb-data-type-workspace': UmbDataTypeWorkspaceElement;
 	}
 }
