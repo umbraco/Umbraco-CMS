@@ -32,8 +32,9 @@ export class UmbSectionDashboardsElement extends UmbLitElement {
 			}
 
 			#scroll-container {
-				width: 100%;
+				flex: 1;
 				height: 100%;
+				padding: var(--uui-size-space-6) var(--uui-size-space-5);
 			}
 
 			#router-slot {
@@ -73,7 +74,7 @@ export class UmbSectionDashboardsElement extends UmbLitElement {
 		if (!this._sectionContext) return;
 
 		this.observe(this._sectionContext.data.pipe(first()), (section) => {
-			if(section) {
+			if (section) {
 				this._currentSectionAlias = section.alias;
 				this._currentSectionPathname = section.meta.pathname;
 				this._observeDashboards();
@@ -86,7 +87,7 @@ export class UmbSectionDashboardsElement extends UmbLitElement {
 
 		this.observe(
 			umbExtensionsRegistry
-				?.extensionsOfTypes<(ManifestDashboard | ManifestDashboardCollection)>(['dashboard', 'dashboardCollection'])
+				?.extensionsOfTypes<ManifestDashboard | ManifestDashboardCollection>(['dashboard', 'dashboardCollection'])
 				.pipe(
 					map((extensions) =>
 						extensions.filter((extension) =>
@@ -104,7 +105,7 @@ export class UmbSectionDashboardsElement extends UmbLitElement {
 	private _createRoutes() {
 		this._routes = [];
 
-		if(this._dashboards) {
+		if (this._dashboards) {
 			this._routes = this._dashboards.map((dashboard) => {
 				return {
 					path: `${dashboard.meta.pathname}`,
