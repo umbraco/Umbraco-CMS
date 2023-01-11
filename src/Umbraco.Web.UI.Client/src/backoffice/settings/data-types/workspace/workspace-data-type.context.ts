@@ -27,7 +27,6 @@ export class UmbWorkspaceDataTypeContext extends UmbWorkspaceContentContext<
 	public setPropertyValue(alias: string, value: unknown) {
 
 		// TODO: make sure to check that we have a details model? otherwise fail? 8This can be relevant if we use the same context for tree actions?
-
 		const entry = {alias: alias, value: value};
 
 		const newDataSet = appendToFrozenArray((this._data.getValue() as DataTypeDetails).data, entry, x => x.alias === alias);
