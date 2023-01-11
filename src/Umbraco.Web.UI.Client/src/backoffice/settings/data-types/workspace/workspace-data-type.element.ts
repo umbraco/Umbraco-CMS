@@ -53,7 +53,6 @@ export class UmbWorkspaceDataTypeElement extends UmbLitElement {
 
 	constructor() {
 		super();
-		this.addEventListener('property-value-change', this._onPropertyValueChange);
 		this.provideContext('umbWorkspaceContext', this._workspaceContext);
 		this.observe(this._workspaceContext.data.pipe(distinctUntilChanged()), (dataType) => {
 			if (dataType && dataType.name !== this._dataTypeName) {
@@ -61,11 +60,6 @@ export class UmbWorkspaceDataTypeElement extends UmbLitElement {
 			}
 		});
 	}
-
-	private _onPropertyValueChange = (e: Event) => {
-		const target = e.composedPath()[0] as any;
-		this._workspaceContext.setPropertyValue(target?.alias, target?.value);
-	};
 
 	// TODO. find a way where we don't have to do this for all Workspaces.
 	private _handleInput(event: UUIInputEvent) {
