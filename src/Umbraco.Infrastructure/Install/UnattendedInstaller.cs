@@ -59,38 +59,64 @@ public class UnattendedInstaller : INotificationAsyncHandler<RuntimeUnattendedIn
         }
 
 
+        _logger.LogInformation("Starting unattended install.");
+
         _runtimeState.DetermineRuntimeLevel();
         if (_runtimeState.Reason == RuntimeLevelReason.InstallMissingDatabase)
         {
+            _logger.LogInformation("Creating missing database");
             _databaseBuilder.CreateDatabase();
         }
 
-        try
+        if (TryConnect() is false)
         {
-            if (_databaseBuilder.IsUmbracoInstalled())
-            {
-                return Task.CompletedTask;
-            }
-
-            _logger.LogInformation("Starting unattended install.");
-            _databaseBuilder.CreateSchemaAndData();
-            _logger.LogInformation("Unattended install completed.");
+            return Task.CompletedTask;
         }
-        catch (Exception ex)
+
+        if (_databaseBuilder.IsUmbracoInstalled())
         {
-            _logger.LogInformation(ex, "Error during unattended install.");
-
-            var innerException = new UnattendedInstallException(
-                "The database configuration failed."
-                + "\n Please check log file for additional information (can be found in '/Umbraco/Data/Logs/')",
-                ex);
-
-            _runtimeState.Configure(RuntimeLevel.BootFailed, RuntimeLevelReason.BootFailedOnException, innerException);
+            return Task.CompletedTask;
         }
+
+        _databaseBuilder.CreateSchemaAndData();
+        _logger.LogInformation("Unattended install completed.");
 
         _eventAggregator.Publish(new UnattendedInstallNotification());
 
 
         return Task.CompletedTask;
+    }
+
+    private bool TryConnect()
+    {
+        // This might seem wierd, but we need to try and connect to the database.
+        // This is because in the case of localdb after we have created the database
+        // The database is inaccessible for a few seconds
+        try
+        {
+            bool connect;
+            for (var i = 0;;)
+            {
+                connect = _databaseFactory.CanConnect;
+                if (connect || ++i == 5)
+                {
+                    break;
+                }
+
+                _logger.LogDebug("Could not immediately connect to database, trying again.");
+
+                Thread.Sleep(1000);
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogInformation(ex, "Error during unattended install.");
+
+            var innerException = new UnattendedInstallException("Unattended installation failed.", ex);
+            _runtimeState.Configure(RuntimeLevel.BootFailed, RuntimeLevelReason.BootFailedOnException, innerException);
+            return false;
+        }
+
+        return true;
     }
 }
