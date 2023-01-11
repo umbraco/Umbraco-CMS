@@ -1,4 +1,4 @@
-import { nothing } from 'lit';
+import { nothing, TemplateResult } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { map } from 'rxjs';
 import { repeat } from 'lit/directives/repeat.js';
@@ -30,6 +30,9 @@ export class UmbExtensionSlotElement extends UmbLitElement {
 
 	@property({ type: String, attribute: 'default-element' })
 	public defaultElement = '';
+
+	@property()
+	public renderMethod: (manifest: InitializedExtensionItem) => TemplateResult<1> | HTMLElement | null = (manifest) => manifest.component;
 
 	connectedCallback(): void {
 		super.connectedCallback();
@@ -87,7 +90,7 @@ export class UmbExtensionSlotElement extends UmbLitElement {
 		return repeat(
 			this._extensions,
 			(ext) => ext.alias,
-			(ext) => ext.component || nothing
+			(ext) => this.renderMethod(ext) || nothing
 		);
 	}
 }
