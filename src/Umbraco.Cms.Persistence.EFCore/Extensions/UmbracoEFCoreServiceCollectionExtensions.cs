@@ -36,18 +36,14 @@ public static class UmbracoEFCoreServiceCollectionExtensions
     private static void DefaultOptionsAction(DbContextOptionsBuilder options, IConfiguration configuration)
     {
         string? connectionString = configuration.GetUmbracoConnectionString("umbracoDbDSN", out string? providerName);
-        StaticApplicationLogging.Logger.LogCritical("Connectionstring;;;;;;; " + connectionString);
-        StaticApplicationLogging.Logger.LogCritical("LOGGING CONNECTIONGSTRING PROVIDER NAME;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; " + providerName);
         if (!connectionString.IsNullOrWhiteSpace())
         {
-            StaticApplicationLogging.Logger.LogCritical("MADE IT INSIDE LMAO :)");
             if (providerName == "Microsoft.Data.Sqlite")
             {
                 options.UseSqlite(connectionString!);
             }
             else if (providerName == "Microsoft.Data.SqlClient")
             {
-                StaticApplicationLogging.Logger.LogCritical("SETTINGS USE SQL SERVER");
                 options.UseSqlServer(connectionString!);
             }
         }
