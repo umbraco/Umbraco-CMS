@@ -20,6 +20,7 @@ import { UmbDocumentBlueprintStore } from './documents/document-blueprints/docum
 
 import { UmbSectionStore } from './shared/components/section/section.store';
 import { UmbDataTypeStore } from './settings/data-types/data-type.store';
+import { UmbLitElement } from '@umbraco-cms/element';
 
 // Domains
 import './settings';
@@ -31,7 +32,6 @@ import './users';
 import './packages';
 import './search';
 import './shared';
-import { UmbLitElement } from '@umbraco-cms/element';
 
 @defineElement('umb-backoffice')
 export class UmbBackofficeElement extends UmbLitElement {
@@ -53,23 +53,24 @@ export class UmbBackofficeElement extends UmbLitElement {
 	constructor() {
 		super();
 
+		this.provideContext('umbModalService', new UmbModalService());
+		this.provideContext('umbNotificationService', new UmbNotificationService());
+
 		// TODO: find a way this is possible outside this element. It needs to be possible to register stores in extensions
 		this.provideContext('umbCurrentUserStore', new UmbCurrentUserStore());
-		this.provideContext('umbDocumentStore', new UmbDocumentStore());
-		this.provideContext('umbMediaStore', new UmbMediaStore());
-		this.provideContext('umbDataTypeStore', new UmbDataTypeStore());
-		this.provideContext('umbDocumentTypeStore', new UmbDocumentTypeStore());
-		this.provideContext('umbMediaTypeStore', new UmbMediaTypeStore());
-		this.provideContext('umbMemberTypeStore', new UmbMemberTypeStore());
-		this.provideContext('umbUserStore', new UmbUserStore());
-		this.provideContext('umbUserGroupStore', new UmbUserGroupStore());
-		this.provideContext('umbMemberGroupStore', new UmbMemberGroupStore());
-		this.provideContext('umbNotificationService', new UmbNotificationService());
-		this.provideContext('umbModalService', new UmbModalService());
+		this.provideContext('umbDocumentStore', new UmbDocumentStore(this));
+		this.provideContext('umbMediaStore', new UmbMediaStore(this));
+		this.provideContext('umbDataTypeStore', new UmbDataTypeStore(this));
+		this.provideContext('umbDocumentTypeStore', new UmbDocumentTypeStore(this));
+		this.provideContext('umbMediaTypeStore', new UmbMediaTypeStore(this));
+		this.provideContext('umbMemberTypeStore', new UmbMemberTypeStore(this));
+		this.provideContext('umbUserStore', new UmbUserStore(this));
+		this.provideContext('umbUserGroupStore', new UmbUserGroupStore(this));
+		this.provideContext('umbMemberGroupStore', new UmbMemberGroupStore(this));
 		this.provideContext('umbSectionStore', new UmbSectionStore());
 		this.provideContext('umbCurrentUserHistoryStore', new UmbCurrentUserHistoryStore());
-		this.provideContext('umbDictionaryStore', new UmbDictionaryStore());
-		this.provideContext('umbDocumentBlueprintStore', new UmbDocumentBlueprintStore());
+		this.provideContext('umbDictionaryStore', new UmbDictionaryStore(this));
+		this.provideContext('umbDocumentBlueprintStore', new UmbDocumentBlueprintStore(this));
 	}
 
 	render() {
