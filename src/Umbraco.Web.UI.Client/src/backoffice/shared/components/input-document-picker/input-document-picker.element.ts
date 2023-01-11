@@ -20,6 +20,44 @@ export class UmbInputDocumentPickerElement extends FormControlMixin(UmbLitElemen
 		`,
 	];
 
+
+  /**
+   * This is a minimum amount of selected items in this input.
+   * @type {number}
+   * @attr
+   * @default undefined
+   */
+  @property({ type: Number })
+  min?: number;
+
+  /**
+   * Min validation message.
+   * @type {boolean}
+   * @attr
+   * @default
+   */
+  @property({ type: String, attribute: 'min-message' })
+  minMessage = 'This field need more items';
+
+	/**
+   * This is a maximum amount of selected items in this input.
+   * @type {number}
+   * @attr
+   * @default undefined
+   */
+  @property({ type: Number })
+  max?: number;
+
+  /**
+   * Max validation message.
+   * @type {boolean}
+   * @attr
+   * @default
+   */
+  @property({ type: String, attribute: 'min-message' })
+  maxMessage = 'This field exceeds the allowed amount of items';
+
+
 	private _selectedKeys: Array<string> = [];
 	public get selectedKeys(): Array<string> {
 		return this._selectedKeys;
@@ -50,6 +88,17 @@ export class UmbInputDocumentPickerElement extends FormControlMixin(UmbLitElemen
 
 	constructor() {
 		super();
+
+    this.addValidator(
+      'rangeUnderflow',
+      () => this.minMessage,
+      () => !!this.min && (this._value as string).length < this.min
+    );
+    this.addValidator(
+      'rangeOverflow',
+      () => this.maxMessage,
+      () => !!this.max && (this._value as string).length > this.max
+    );
 
 		this.consumeContext('umbDocumentStore', (instance) => {
 			this._documentStore = instance
