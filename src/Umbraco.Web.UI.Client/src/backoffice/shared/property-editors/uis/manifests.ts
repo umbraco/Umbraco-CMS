@@ -10,7 +10,23 @@ import { manifests as textBoxes } from './text-box/manifests';
 import { manifest as dropdown } from './dropdown/manifests';
 import { manifest as multipleTextString } from './multiple-text-string/manifests';
 import { manifest as textArea } from './textarea/manifests';
-
+import { manifest as slider } from './slider/manifests';
+import { manifest as toggle } from './toggle/manifests';
+import { manifest as tags } from './tags/manifests';
+import { manifest as markdownEditor } from './markdown-editor/manifests';
+import { manifest as radioButtonList } from './radio-button-list/manifests';
+import { manifest as checkboxList } from './checkbox-list/manifests';
+import { manifest as blockList } from './block-list/manifests';
+import { manifest as numberRange } from './number-range/manifests';
+import { manifest as blockListBlockConfiguration } from './block-list-block-configuration/manifests';
+import { manifest as mediaPicker } from './media-picker/manifests';
+import { manifest as imageCropsConfiguration } from './image-crops-configuration/manifests';
+import { manifest as imageCropper } from './image-cropper/manifests';
+import { manifest as uploadField } from './upload-field/manifests';
+import { manifest as blockGrid } from './block-grid/manifests';
+import { manifest as blockGridBlockConfiguration } from './block-grid-block-configuration/manifests';
+import { manifest as blockGridGroupConfiguration } from './block-grid-group-configuration/manifests';
+import { manifest as blockGridStylesheetPicker } from './block-grid-stylesheet-picker/manifests';
 import type { ManifestPropertyEditorUI } from '@umbraco-cms/models';
 
 export const manifests: Array<ManifestPropertyEditorUI> = [
@@ -26,42 +42,23 @@ export const manifests: Array<ManifestPropertyEditorUI> = [
 	dropdown,
 	multipleTextString,
 	textArea,
-	{
-		type: 'propertyEditorUI',
-		alias: 'Umb.PropertyEditorUI.BlockList',
-		name: 'Block List Property Editor UI',
-		loader: () => import('./block-list/property-editor-ui-block-list.element'),
-		meta: {
-			label: 'Block List',
-			icon: 'umb:thumbnail-list',
-			group: 'lists',
-			propertyEditorModel: 'Umbraco.BlockList',
-		},
-	},
-	{
-		type: 'propertyEditorUI',
-		alias: 'Umb.PropertyEditorUI.Toggle',
-		name: 'Toggle Property Editor UI',
-		loader: () => import('./toggle/property-editor-ui-toggle.element'),
-		meta: {
-			label: 'Toggle',
-			icon: 'umb:checkbox',
-			group: 'common',
-			propertyEditorModel: 'Umbraco.TrueFalse',
-		},
-	},
-	{
-		type: 'propertyEditorUI',
-		alias: 'Umb.PropertyEditorUI.CheckboxList',
-		name: 'Checkbox List Property Editor UI',
-		loader: () => import('./checkbox-list/property-editor-ui-checkbox-list.element'),
-		meta: {
-			label: 'Checkbox List',
-			icon: 'umb:bulleted-list',
-			group: 'lists',
-			propertyEditorModel: 'Umbraco.CheckBoxList',
-		},
-	},
+	slider,
+	toggle,
+	tags,
+	markdownEditor,
+	radioButtonList,
+	checkboxList,
+	blockList,
+	numberRange,
+	blockListBlockConfiguration,
+	mediaPicker,
+	imageCropsConfiguration,
+	imageCropper,
+	uploadField,
+	blockGrid,
+	blockGridBlockConfiguration,
+	blockGridGroupConfiguration,
+	blockGridStylesheetPicker,
 	{
 		type: 'propertyEditorUI',
 		alias: 'Umb.PropertyEditorUI.Number',
