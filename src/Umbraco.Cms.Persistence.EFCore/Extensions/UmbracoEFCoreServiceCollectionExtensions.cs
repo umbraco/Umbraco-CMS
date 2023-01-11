@@ -1,6 +1,8 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Persistence;
 using Umbraco.Cms.Infrastructure.Migrations.Install;
 using Umbraco.Cms.Persistence.EFCore;
@@ -34,6 +36,7 @@ public static class UmbracoEFCoreServiceCollectionExtensions
     private static void DefaultOptionsAction(DbContextOptionsBuilder options, IConfiguration configuration)
     {
         string? connectionString = configuration.GetUmbracoConnectionString("umbracoDbDSN", out string? providerName);
+        StaticApplicationLogging.Logger.LogCritical("LOGGING CONNECTIONGSTRING PROVIDER NAME;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; " + providerName);
         if (!connectionString.IsNullOrWhiteSpace())
         {
             if (providerName == "Microsoft.Data.Sqlite")
