@@ -1,4 +1,5 @@
-import { nothing, TemplateResult } from 'lit';
+import { nothing } from 'lit';
+import type { TemplateResult } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { map } from 'rxjs';
 import { repeat } from 'lit/directives/repeat.js';
