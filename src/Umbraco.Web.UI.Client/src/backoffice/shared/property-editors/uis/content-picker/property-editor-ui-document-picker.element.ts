@@ -1,14 +1,10 @@
-import { css, html, nothing } from 'lit';
-import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
-import { customElement, property, state } from 'lit/decorators.js';
-import { ifDefined } from 'lit-html/directives/if-defined.js';
-import type { UmbModalService } from 'src/core/modal';
-import { UmbDocumentStore } from 'src/backoffice/documents/documents/document.store';
-import { FolderTreeItem } from '@umbraco-cms/backend-api';
-import { UmbLitElement } from '@umbraco-cms/element';
-import { UmbObserverController } from '@umbraco-cms/observable-api';
+import { html } from 'lit';
+import { customElement, property } from 'lit/decorators.js';
 import { ChangeEvent } from 'react';
-import UmbInputDocumentPickerElement from 'src/backoffice/shared/components/input-document-picker/input-document-picker.element';
+import { UmbLitElement } from '@umbraco-cms/element';
+// eslint-disable-next-line import/no-named-as-default
+import type { UmbInputDocumentPickerElement } from 'src/backoffice/shared/components/input-document-picker/input-document-picker.element';
+import 'src/backoffice/shared/components/input-document-picker/input-document-picker.element';
 
 // TODO: rename to Document Picker
 @customElement('umb-property-editor-ui-document-picker')
