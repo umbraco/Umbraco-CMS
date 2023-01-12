@@ -55,7 +55,7 @@
 		"npm": ">=8.0.0 < 9"
 	},
 	"dependencies": {
-		"@umbraco-ui/uui": "^1.0.2",
+		"@umbraco-ui/uui": "^1.1.0",
 		"@umbraco-ui/uui-color-swatch": "file:umbraco-ui-uui-color-swatch-0.0.0.tgz",
 		"@umbraco-ui/uui-color-swatches": "file:umbraco-ui-uui-color-swatches-2.0.0.tgz",
 		"@umbraco-ui/uui-css": "^1.0.0",
