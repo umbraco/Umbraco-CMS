@@ -50,7 +50,6 @@ export const UmbControllerHostMixin = <T extends HTMLElementConstructor>(superCl
 			if(ctrl.unique) {
 				this.#controllers.forEach(x => {
 					if(x.unique === ctrl.unique) {
-						debugger;
 						this.removeController(x);
 					}
 				});
