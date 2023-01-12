@@ -13,7 +13,7 @@ public class SqliteTestDatabaseConfiguration : ITestDatabaseConfiguration
     private TestHelper _testHelper = new();
     private string s_filesPath;
 
-    public SqliteTestDatabaseConfiguration(IOptionsMonitor<ConnectionStrings> connectionStrings, IUmbracoDatabaseFactory databaseFactory)
+    public SqliteTestDatabaseConfiguration()
     {
         _key = Guid.NewGuid();
         s_filesPath = Path.Combine(_testHelper.WorkingDirectory, "databases");
@@ -43,7 +43,7 @@ public class SqliteTestDatabaseConfiguration : ITestDatabaseConfiguration
         return connectionStrings;
     }
 
-    public string GetDbKey() => throw new NotImplementedException();
+    public string Key => _key.ToString();
 
     public void Teardown(string key) => TryDeleteFile(GetAbsolutePath(key));
 

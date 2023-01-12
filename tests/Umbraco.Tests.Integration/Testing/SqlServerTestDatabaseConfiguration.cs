@@ -40,7 +40,7 @@ public class SqlServerTestDatabaseConfiguration : ITestDatabaseConfiguration
         };
     }
 
-    public string GetDbKey() => _key.ToString();
+    public string Key => _key.ToString();
 
     private void CreateDatabase()
     {

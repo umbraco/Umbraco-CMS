@@ -11,5 +11,5 @@ public interface ITestDatabaseConfiguration
 
     void Teardown(string key);
 
-    string GetDbKey();
+    string Key { get; }
 }

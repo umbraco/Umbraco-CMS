@@ -9,14 +9,10 @@ namespace Umbraco.Cms.Tests.Integration.Testing;
 
 public class UmbracoTestDatabaseFactory
 {
-    private readonly IUmbracoDatabaseFactory _umbracoDatabaseFactory;
-    private readonly IOptionsMonitor<ConnectionStrings> _connectionStrings;
     private readonly IConfiguration _configuration;
 
-    public UmbracoTestDatabaseFactory(IUmbracoDatabaseFactory umbracoDatabaseFactory, IOptionsMonitor<ConnectionStrings> connectionStrings, IConfiguration configuration)
+    public UmbracoTestDatabaseFactory(IConfiguration configuration)
     {
-        _umbracoDatabaseFactory = umbracoDatabaseFactory;
-        _connectionStrings = connectionStrings;
         _configuration = configuration;
     }
 
@@ -27,9 +23,9 @@ public class UmbracoTestDatabaseFactory
         switch (databaseType)
         {
             case TestDatabaseSettings.TestDatabaseType.Sqlite:
-                return new SqliteTestDatabaseConfiguration(_connectionStrings, _umbracoDatabaseFactory);
+                return new SqliteTestDatabaseConfiguration();
             case TestDatabaseSettings.TestDatabaseType.LocalDb:
-                return new LocalDbTestDatabaseConfiguration(new LocalDb(), _umbracoDatabaseFactory, _connectionStrings);
+                return new LocalDbTestDatabaseConfiguration(new LocalDb());
             case TestDatabaseSettings.TestDatabaseType.SqlServer:
                 return new SqlServerTestDatabaseConfiguration(_configuration.GetValue<string>("Tests:Database:SQLServerMasterConnectionString"));
         }

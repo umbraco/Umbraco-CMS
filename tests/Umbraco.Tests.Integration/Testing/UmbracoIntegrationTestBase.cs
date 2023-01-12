@@ -167,7 +167,7 @@ public abstract class UmbracoIntegrationTestBase
                 connectionStrings.CurrentValue.ProviderName = s_connectionStrings.ProviderName;
 
                 databaseFactory.Configure(s_connectionStrings);
-                _fixtureTeardown.Add(() => newSchemaPerTestDb.Teardown(newSchemaPerTestDb.GetDbKey()));
+                _fixtureTeardown.Add(() => newSchemaPerTestDb.Teardown(newSchemaPerTestDb.Key));
                 // AddOnTestTearDown(() => newSchemaPerTestDb.Teardown());
                 CreateDatabaseWithSchema(databaseFactory, databaseSchemaCreatorFactory);
                 databaseDataCreator.SeedDataAsync().GetAwaiter().GetResult();
@@ -185,7 +185,7 @@ public abstract class UmbracoIntegrationTestBase
                 connectionStrings.CurrentValue.ProviderName = s_connectionStrings.ProviderName;
 
                 databaseFactory.Configure(s_connectionStrings);
-                _fixtureTeardown.Add(() => newEmptyPerTestDatabase.Teardown(newEmptyPerTestDatabase.GetDbKey()));
+                _fixtureTeardown.Add(() => newEmptyPerTestDatabase.Teardown(newEmptyPerTestDatabase.Key));
 
 
                 CreateDatabaseWithoutSchema(databaseFactory, databaseSchemaCreatorFactory);
@@ -206,7 +206,7 @@ public abstract class UmbracoIntegrationTestBase
                     connectionStrings.CurrentValue.ProviderName = s_connectionStrings.ProviderName;
 
                     databaseFactory.Configure(s_connectionStrings);
-                    _fixtureTeardown.Add(() => newSchemaPerFixtureDb.Teardown(newSchemaPerFixtureDb.GetDbKey()));
+                    _fixtureTeardown.Add(() => newSchemaPerFixtureDb.Teardown(newSchemaPerFixtureDb.Key));
 
 
                     CreateDatabaseWithSchema(databaseFactory, databaseSchemaCreatorFactory);
@@ -233,7 +233,7 @@ public abstract class UmbracoIntegrationTestBase
                     connectionStrings.CurrentValue.ProviderName = s_connectionStrings.ProviderName;
 
                     databaseFactory.Configure(s_connectionStrings);
-                    _fixtureTeardown.Add(() => newEmptyPerFixtureDb.Teardown(newEmptyPerFixtureDb.GetDbKey()));
+                    _fixtureTeardown.Add(() => newEmptyPerFixtureDb.Teardown(newEmptyPerFixtureDb.Key));
 
                     CreateDatabaseWithoutSchema(databaseFactory, databaseSchemaCreatorFactory);
                 }

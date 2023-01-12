@@ -14,17 +14,17 @@ namespace Umbraco.Cms.Tests.Integration.Testing;
 /// </summary>
 public class LocalDbTestDatabaseConfiguration : ITestDatabaseConfiguration
 {
-    public const string InstanceName = "UmbracoIntegrationTest";
-    public string _key = Guid.NewGuid().ToString();
+    private const string InstanceName = "UmbracoIntegrationTest";
+    private readonly string _key = Guid.NewGuid().ToString();
     private static LocalDb.Instance s_localDbInstance;
     private static string s_filesPath;
     private readonly LocalDb _localDb;
-    private TestHelper _testHelper = new ();
+    private readonly TestHelper _testHelper = new();
 
     private readonly TestDatabaseSettings _settings;
 
     // It's internal because `Umbraco.Core.Persistence.LocalDb` is internal
-    internal LocalDbTestDatabaseConfiguration(LocalDb localDb, IUmbracoDatabaseFactory databaseFactory, IOptionsMonitor<ConnectionStrings> connectionStrings)
+    internal LocalDbTestDatabaseConfiguration(LocalDb localDb)
     {
         _localDb = localDb;
 
@@ -63,7 +63,7 @@ public class LocalDbTestDatabaseConfiguration : ITestDatabaseConfiguration
         return connectionStrings;
     }
 
-    public string GetDbKey() => _key;
+    public string Key => _key;
 
     public void Teardown(string key)
     {
