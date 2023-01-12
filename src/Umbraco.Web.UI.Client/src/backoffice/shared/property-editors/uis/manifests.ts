@@ -25,6 +25,7 @@ import { manifests as blockGrid } from './block-grid/manifests';
 import { manifest as orderDirection } from './order-direction/manifests';
 import { manifests as collectionView } from './collection-view/manifests';
 import { manifests as tinyMCE } from './tiny-mce/manifests';
+import { manifest as iconPicker } from './icon-picker/manifests';
 import type { ManifestPropertyEditorUI } from '@umbraco-cms/models';
 
 export const manifests: Array<ManifestPropertyEditorUI> = [
@@ -49,6 +50,7 @@ export const manifests: Array<ManifestPropertyEditorUI> = [
 	imageCropper,
 	uploadField,
 	orderDirection,
+	iconPicker,
 	...textBoxes,
 	...treePicker,
 	...blockList,
@@ -65,18 +67,6 @@ export const manifests: Array<ManifestPropertyEditorUI> = [
 			icon: 'umb:autofill',
 			group: 'common',
 			propertyEditorModel: 'Umbraco.Integer',
-		},
-	},
-	{
-		type: 'propertyEditorUI',
-		alias: 'Umb.PropertyEditorUI.IconPicker',
-		name: 'Icon Picker Property Editor UI',
-		loader: () => import('./icon-picker/property-editor-ui-icon-picker.element'),
-		meta: {
-			label: 'Icon Picker',
-			propertyEditorModel: 'Umbraco.IconPicker',
-			icon: 'umb:document',
-			group: 'common',
 		},
 	},
 ];
