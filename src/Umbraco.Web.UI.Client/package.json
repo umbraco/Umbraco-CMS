@@ -96,7 +96,7 @@
 		"babel-loader": "^9.1.2",
 		"eslint": "^8.31.0",
 		"eslint-config-prettier": "^8.6.0",
-		"eslint-import-resolver-typescript": "^3.5.2",
+		"eslint-import-resolver-typescript": "^3.5.3",
 		"eslint-plugin-import": "^2.26.0",
 		"eslint-plugin-lit": "^1.7.2",
 		"eslint-plugin-lit-a11y": "^2.3.0",
@@ -111,7 +111,7 @@
 		"prettier": "2.8.2",
 		"tiny-glob": "^0.2.9",
 		"typescript": "^4.9.4",
-		"vite": "^3.2.4",
+		"vite": "^4.0.4",
 		"vite-plugin-static-copy": "^0.13.0",
 		"vite-tsconfig-paths": "^4.0.3",
 		"web-component-analyzer": "^2.0.0-next.4"
