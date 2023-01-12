@@ -21,6 +21,8 @@ import { manifest as mediaPicker } from './Umbraco.MediaPicker3';
 import { manifest as imageCropper } from './Umbraco.ImageCropper';
 import { manifest as uploadField } from './Umbraco.UploadField';
 import { manifest as blockGrid } from './Umbraco.BlockGrid';
+import { manifest as tinyMCE } from './Umbraco.TinyMCE';
+import { manifest as listView } from './Umbraco.ListView';
 
 import type { ManifestPropertyEditorModel } from '@umbraco-cms/models';
 
@@ -48,6 +50,8 @@ export const manifests: Array<ManifestPropertyEditorModel> = [
 	imageCropper,
 	uploadField,
 	blockGrid,
+	tinyMCE,
+	listView,
 	{
 		type: 'propertyEditorModel',
 		name: 'Decimal',
@@ -68,12 +72,6 @@ export const manifests: Array<ManifestPropertyEditorModel> = [
 	},
 	{
 		type: 'propertyEditorModel',
-		name: 'Rich Text Editor',
-		alias: 'Umbraco.TinyMCE',
-		meta: {},
-	},
-	{
-		type: 'propertyEditorModel',
 		name: 'Member Group Picker',
 		alias: 'Umbraco.MemberGroupPicker',
 		meta: {},
@@ -88,12 +86,6 @@ export const manifests: Array<ManifestPropertyEditorModel> = [
 		type: 'propertyEditorModel',
 		name: 'User Picker',
 		alias: 'Umbraco.UserPicker',
-		meta: {},
-	},
-	{
-		type: 'propertyEditorModel',
-		name: 'List view',
-		alias: 'Umbraco.ListView',
 		meta: {},
 	},
 	{

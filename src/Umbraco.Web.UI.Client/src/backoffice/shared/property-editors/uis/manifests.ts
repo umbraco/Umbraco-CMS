@@ -24,6 +24,7 @@ import { manifest as uploadField } from './upload-field/manifests';
 import { manifests as blockGrid } from './block-grid/manifests';
 import { manifest as orderDirection } from './order-direction/manifests';
 import { manifests as collectionView } from './collection-view/manifests';
+import { manifests as tinyMCE } from './tiny-mce/manifests';
 import type { ManifestPropertyEditorUI } from '@umbraco-cms/models';
 
 export const manifests: Array<ManifestPropertyEditorUI> = [
@@ -33,8 +34,6 @@ export const manifests: Array<ManifestPropertyEditorUI> = [
 	eyeDropper,
 	multiUrlPicker,
 	overlaySize,
-	...textBoxes,
-	...treePicker,
 	dropdown,
 	multipleTextString,
 	textArea,
@@ -44,15 +43,18 @@ export const manifests: Array<ManifestPropertyEditorUI> = [
 	markdownEditor,
 	radioButtonList,
 	checkboxList,
-	...blockList,
 	numberRange,
 	mediaPicker,
 	imageCropsConfiguration,
 	imageCropper,
 	uploadField,
-	...blockGrid,
 	orderDirection,
+	...textBoxes,
+	...treePicker,
+	...blockList,
+	...blockGrid,
 	...collectionView,
+	...tinyMCE,
 	{
 		type: 'propertyEditorUI',
 		alias: 'Umb.PropertyEditorUI.Number',

@@ -421,6 +421,19 @@ export const data: Array<DataTypeDetails> = [
 		propertyEditorUIAlias: 'Umb.PropertyEditorUI.OverlaySize',
 		data: [],
 	},
+	{
+		name: 'Rich Text Editor',
+		type: 'data-type',
+		icon: 'umb:autofill',
+		hasChildren: false,
+		key: 'dt-richTextEditor',
+		isContainer: false,
+		parentKey: null,
+		isFolder: false,
+		propertyEditorModelAlias: 'Umbraco.TinyMCE',
+		propertyEditorUIAlias: 'Umb.PropertyEditorUI.TinyMCE',
+		data: [],
+	},
 ];
 
 // Temp mocked database
