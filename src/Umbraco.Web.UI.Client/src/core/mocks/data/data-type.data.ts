@@ -356,6 +356,19 @@ export const data: Array<DataTypeDetails> = [
 		propertyEditorUIAlias: 'Umb.PropertyEditorUI.BlockGrid',
 		data: [],
 	},
+	{
+		name: 'Collection View',
+		type: 'data-type',
+		icon: 'umb:autofill',
+		hasChildren: false,
+		key: 'dt-collectionView',
+		isContainer: false,
+		parentKey: null,
+		isFolder: false,
+		propertyEditorModelAlias: 'Umbraco.ListView',
+		propertyEditorUIAlias: 'Umb.PropertyEditorUI.CollectionView',
+		data: [],
+	},
 ];
 
 // Temp mocked database
