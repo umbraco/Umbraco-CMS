@@ -80,7 +80,7 @@ public static class UmbracoBuilderExtensions
         builder.Services.AddUnique<IDatabaseSchemaCreatorFactory, EFDatabaseSchemaCreatorFactory>();
         builder.Services.AddUnique<IDatabaseDataCreator, EFCoreDatabaseDataCreator>();
         builder.Services.AddSingleton<UmbracoDbContextFactory>();
-        builder.Services.AddSingleton<UmbracoTestDatabaseFactory>();
+        builder.Services.AddSingleton<UmbracoTestDatabaseConfigurationFactory>();
 
         return builder;
     }

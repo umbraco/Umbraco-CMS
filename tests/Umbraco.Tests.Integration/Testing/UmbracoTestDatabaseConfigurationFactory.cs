@@ -7,11 +7,11 @@ using Umbraco.Cms.Persistence.SqlServer;
 
 namespace Umbraco.Cms.Tests.Integration.Testing;
 
-public class UmbracoTestDatabaseFactory
+public class UmbracoTestDatabaseConfigurationFactory
 {
     private readonly IConfiguration _configuration;
 
-    public UmbracoTestDatabaseFactory(IConfiguration configuration)
+    public UmbracoTestDatabaseConfigurationFactory(IConfiguration configuration)
     {
         _configuration = configuration;
     }

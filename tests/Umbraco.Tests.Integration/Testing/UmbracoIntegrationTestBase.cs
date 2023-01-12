@@ -121,7 +121,7 @@ public abstract class UmbracoIntegrationTestBase
         var connectionStrings = serviceProvider.GetRequiredService<IOptionsMonitor<ConnectionStrings>>();
         var databaseSchemaCreatorFactory = serviceProvider.GetRequiredService<IDatabaseSchemaCreatorFactory>();
         var databaseDataCreator = serviceProvider.GetRequiredService<IDatabaseDataCreator>();
-        var testDatabaseFactory = serviceProvider.GetRequiredService<UmbracoTestDatabaseFactory>();
+        var testDatabaseFactory = serviceProvider.GetRequiredService<UmbracoTestDatabaseConfigurationFactory>();
 
         // This will create a db, install the schema and ensure the app is configured to run
         SetupTestDatabase(connectionStrings, umbracoDatabaseFactory, state, databaseSchemaCreatorFactory, databaseDataCreator, testDatabaseFactory);
@@ -133,7 +133,7 @@ public abstract class UmbracoIntegrationTestBase
         IRuntimeState runtimeState,
         IDatabaseSchemaCreatorFactory databaseSchemaCreatorFactory,
         IDatabaseDataCreator databaseDataCreator,
-        UmbracoTestDatabaseFactory testDatabaseFactory)
+        UmbracoTestDatabaseConfigurationFactory testDatabaseConfigurationFactory)
     {
         if (TestOptions.Database == UmbracoTestOptions.Database.None)
         {
@@ -144,7 +144,7 @@ public abstract class UmbracoIntegrationTestBase
         {
             case UmbracoTestOptions.Database.NewSchemaPerTest:
 
-                ConfigureDatabase(testDatabaseFactory, connectionStrings, databaseFactory);
+                ConfigureDatabase(testDatabaseConfigurationFactory, connectionStrings, databaseFactory);
 
                 CreateDatabaseWithSchema(databaseFactory, databaseSchemaCreatorFactory);
                 databaseDataCreator.SeedDataAsync().GetAwaiter().GetResult();
@@ -156,7 +156,7 @@ public abstract class UmbracoIntegrationTestBase
                 break;
             case UmbracoTestOptions.Database.NewEmptyPerTest:
 
-                ConfigureDatabase(testDatabaseFactory, connectionStrings, databaseFactory);
+                ConfigureDatabase(testDatabaseConfigurationFactory, connectionStrings, databaseFactory);
 
                 CreateDatabaseWithoutSchema(databaseFactory, databaseSchemaCreatorFactory);
                 runtimeState.DetermineRuntimeLevel();
@@ -170,7 +170,7 @@ public abstract class UmbracoIntegrationTestBase
                 if (_firstTestInFixture)
                 {
                     // New DB + Schema
-                    ConfigureDatabase(testDatabaseFactory, connectionStrings, databaseFactory);
+                    ConfigureDatabase(testDatabaseConfigurationFactory, connectionStrings, databaseFactory);
 
                     CreateDatabaseWithSchema(databaseFactory, databaseSchemaCreatorFactory);
                     databaseDataCreator.SeedDataAsync().GetAwaiter().GetResult();
@@ -190,7 +190,7 @@ public abstract class UmbracoIntegrationTestBase
                 // and it would be the same as NewSchemaPerTest even if it didn't block
                 if (_firstTestInFixture)
                 {
-                    ConfigureDatabase(testDatabaseFactory, connectionStrings, databaseFactory);
+                    ConfigureDatabase(testDatabaseConfigurationFactory, connectionStrings, databaseFactory);
 
                     CreateDatabaseWithoutSchema(databaseFactory, databaseSchemaCreatorFactory);
                 }
@@ -224,9 +224,9 @@ public abstract class UmbracoIntegrationTestBase
         BaseTestDatabase.CompleteTransaction();
     }
 
-    private void ConfigureDatabase(UmbracoTestDatabaseFactory testDatabaseFactory, IOptionsMonitor<ConnectionStrings> connectionStrings, IUmbracoDatabaseFactory databaseFactory)
+    private void ConfigureDatabase(UmbracoTestDatabaseConfigurationFactory testDatabaseConfigurationFactory, IOptionsMonitor<ConnectionStrings> connectionStrings, IUmbracoDatabaseFactory databaseFactory)
     {
-        var newSchemaPerTestDb = testDatabaseFactory.CreateTestDatabaseConfiguration();
+        var newSchemaPerTestDb = testDatabaseConfigurationFactory.CreateTestDatabaseConfiguration();
         s_connectionStrings = newSchemaPerTestDb.InitializeConfiguration();
         connectionStrings.CurrentValue.ConnectionString = s_connectionStrings.ConnectionString;
         connectionStrings.CurrentValue.ProviderName = s_connectionStrings.ProviderName;
