@@ -45,6 +45,17 @@ export const UmbControllerHostMixin = <T extends HTMLElementConstructor>(superCl
 		 * @param {UmbControllerInterface} ctrl
 		 */
 		addController(ctrl: UmbControllerInterface): void {
+
+			// Check if there is one already with same unique
+			if(ctrl.unique) {
+				this.#controllers.forEach(x => {
+					if(x.unique === ctrl.unique) {
+						debugger;
+						this.removeController(x);
+					}
+				});
+			}
+
 			this.#controllers.push(ctrl);
 			if(this.#attached) {
 				ctrl.hostConnected();
