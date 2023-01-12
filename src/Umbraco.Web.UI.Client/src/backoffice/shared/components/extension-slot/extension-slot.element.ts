@@ -9,7 +9,7 @@ import { createExtensionElement } from '@umbraco-cms/extensions-api';
 import { isManifestElementableType } from 'src/core/extensions-api/is-manifest-elementable-type.function';
 import { UmbLitElement } from '@umbraco-cms/element';
 
-type InitializedExtensionItem = { alias: string; weight: number; component: HTMLElement | null };
+export type InitializedExtension = { alias: string; weight: number; component: HTMLElement | null };
 
 /**
  * @element umb-extension-slot
@@ -29,7 +29,7 @@ export class UmbExtensionSlotElement extends UmbLitElement {
 	`;
 
 	@state()
-	private _extensions: InitializedExtensionItem[] = [];
+	private _extensions: InitializedExtension[] = [];
 
 	@property({ type: String })
 	public type = '';
@@ -41,7 +41,7 @@ export class UmbExtensionSlotElement extends UmbLitElement {
 	public defaultElement = '';
 
 	@property()
-	public renderMethod: (manifest: InitializedExtensionItem) => TemplateResult<1> | HTMLElement | null = (manifest) => manifest.component;
+	public renderMethod: (manifest: InitializedExtension) => TemplateResult<1 | 2> | HTMLElement | null = (manifest) => manifest.component;
 
 	connectedCallback(): void {
 		super.connectedCallback();
@@ -63,7 +63,7 @@ export class UmbExtensionSlotElement extends UmbLitElement {
 				extensions.forEach(async (extension) => {
 					const hasExt = this._extensions.find((x) => x.alias === extension.alias);
 					if (!hasExt) {
-						const extensionObject: InitializedExtensionItem = {
+						const extensionObject: InitializedExtension = {
 							alias: extension.alias,
 							weight: (extension as any).weight || 0,
 							component: null,
