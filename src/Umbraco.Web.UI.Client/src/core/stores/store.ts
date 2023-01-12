@@ -1,4 +1,5 @@
 import type { Observable } from 'rxjs';
+import { UmbControllerHostInterface } from '../controller/controller-host.mixin';
 import { UniqueBehaviorSubject } from '../observable-api/unique-behavior-subject';
 
 export interface UmbDataStoreIdentifiers {
@@ -30,6 +31,12 @@ export abstract class UmbDataStoreBase<T extends UmbDataStoreIdentifiers> implem
 	protected _items = new UniqueBehaviorSubject(<Array<T>>[]);
 	public readonly items = this._items.asObservable();
 
+	protected host: UmbControllerHostInterface;
+
+	constructor(host: UmbControllerHostInterface) {
+		this.host = host;
+	}
+
 	/**
 	 * @description - Delete items from the store.
 	 * @param {Array<string>} keys
@@ -39,8 +46,6 @@ export abstract class UmbDataStoreBase<T extends UmbDataStoreIdentifiers> implem
 		const remainingItems = this._items.getValue().filter((item) => item.key && keys.includes(item.key) === false);
 		this._items.next(remainingItems);
 	}
-
-
 
 	/**
 	 * @description - Update the store with new items. Existing items are updated, new items are added, old are kept. Items are matched by the compareKey.
@@ -52,7 +57,7 @@ export abstract class UmbDataStoreBase<T extends UmbDataStoreIdentifiers> implem
 		const newData = [...this._items.getValue()];
 		items.forEach((newItem) => {
 			const storedItemIndex = newData.findIndex((item) => item[compareKey] === newItem[compareKey]);
-			if(storedItemIndex !== -1) {
+			if (storedItemIndex !== -1) {
 				newData[storedItemIndex] = newItem;
 			} else {
 				newData.push(newItem);

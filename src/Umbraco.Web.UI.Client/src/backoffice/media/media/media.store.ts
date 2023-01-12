@@ -1,7 +1,8 @@
 import { map, Observable } from 'rxjs';
 import { UmbDataStoreBase } from '../../../core/stores/store';
 import type { MediaDetails } from '@umbraco-cms/models';
-import { ApiError, ContentTreeItem, MediaResource, ProblemDetails } from '@umbraco-cms/backend-api';
+import { ContentTreeItem, MediaResource } from '@umbraco-cms/backend-api';
+import { tryExecuteAndNotify } from '@umbraco-cms/resources';
 
 const isMediaDetails = (media: UmbMediaStoreItemType): media is MediaDetails => {
 	return (media as MediaDetails).data !== undefined;
@@ -75,19 +76,11 @@ export class UmbMediaStore extends UmbDataStoreBase<UmbMediaStoreItemType> {
 	}
 
 	getTreeRoot(): Observable<Array<ContentTreeItem>> {
-		MediaResource.getTreeMediaRoot({}).then(
-			(res) => {
-				this.updateItems(res.items);
-			},
-			(e) => {
-				if (e instanceof ApiError) {
-					const error = e.body as ProblemDetails;
-					if (e.status === 400) {
-						console.log(error.detail);
-					}
-				}
+		tryExecuteAndNotify(this.host, MediaResource.getTreeMediaRoot({})).then(({ data }) => {
+			if (data) {
+				this.updateItems(data.items);
 			}
-		);
+		});
 
 		// TODO: how do we handle trashed items?
 		// TODO: remove ignore when we know how to handle trashed items.
@@ -97,21 +90,16 @@ export class UmbMediaStore extends UmbDataStoreBase<UmbMediaStoreItemType> {
 	}
 
 	getTreeItemChildren(key: string): Observable<Array<ContentTreeItem>> {
-		MediaResource.getTreeMediaChildren({
-			parentKey: key,
-		}).then(
-			(res) => {
-				this.updateItems(res.items);
-			},
-			(e) => {
-				if (e instanceof ApiError) {
-					const error = e.body as ProblemDetails;
-					if (e.status === 400) {
-						console.log(error.detail);
-					}
-				}
+		tryExecuteAndNotify(
+			this.host,
+			MediaResource.getTreeMediaChildren({
+				parentKey: key,
+			})
+		).then(({ data }) => {
+			if (data) {
+				this.updateItems(data.items);
 			}
-		);
+		});
 
 		// TODO: how do we handle trashed items?
 		// TODO: remove ignore when we know how to handle trashed items.
