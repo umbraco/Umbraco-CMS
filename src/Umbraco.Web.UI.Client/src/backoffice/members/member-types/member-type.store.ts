@@ -1,7 +1,8 @@
 import { map, Observable } from 'rxjs';
 import { UmbDataStoreBase } from '../../../core/stores/store';
-import { MemberTypeResource, ApiError, EntityTreeItem, ProblemDetails } from '@umbraco-cms/backend-api';
+import { MemberTypeResource, EntityTreeItem } from '@umbraco-cms/backend-api';
 import type { MemberTypeDetails } from '@umbraco-cms/models';
+import { tryExecuteAndNotify } from '@umbraco-cms/resources';
 
 export type UmbMemberTypeStoreItemType = MemberTypeDetails | EntityTreeItem;
 
@@ -23,19 +24,11 @@ export class UmbMemberTypeStore extends UmbDataStoreBase<UmbMemberTypeStoreItemT
 	}
 
 	getTreeRoot(): Observable<Array<EntityTreeItem>> {
-		MemberTypeResource.getTreeMemberTypeRoot({}).then(
-			(res) => {
-				this.updateItems(res.items);
-			},
-			(e) => {
-				if (e instanceof ApiError) {
-					const error = e.body as ProblemDetails;
-					if (e.status === 400) {
-						console.log(error.detail);
-					}
-				}
+		tryExecuteAndNotify(this.host, MemberTypeResource.getTreeMemberTypeRoot({})).then(({ data }) => {
+			if (data) {
+				this.updateItems(data.items);
 			}
-		);
+		});
 
 		return this.items.pipe(map((items) => items.filter((item) => item.parentKey === null)));
 	}

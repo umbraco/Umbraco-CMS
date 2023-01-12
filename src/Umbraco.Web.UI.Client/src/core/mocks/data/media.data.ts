@@ -19,7 +19,7 @@ export const data: Array<MediaDetails> = [
 				alias: 'myMediaHeadline',
 				label: 'Media Headline',
 				description: 'Text string property',
-				dataTypeKey: 'dt-1',
+				dataTypeKey: 'dt-textBox',
 			},
 		],
 		data: [
@@ -45,7 +45,7 @@ export const data: Array<MediaDetails> = [
 				alias: 'myMediaDescription',
 				label: 'Description',
 				description: 'Textarea property',
-				dataTypeKey: 'dt-2',
+				dataTypeKey: 'dt-textArea',
 			},
 		],
 		data: [
@@ -85,7 +85,7 @@ export const data: Array<MediaDetails> = [
 				alias: 'myMediaDescription',
 				label: 'Description',
 				description: 'Textarea property',
-				dataTypeKey: 'dt-2',
+				dataTypeKey: 'dt-textArea',
 			},
 		],
 		data: [

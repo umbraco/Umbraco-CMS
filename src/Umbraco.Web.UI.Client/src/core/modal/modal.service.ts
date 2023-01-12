@@ -5,7 +5,7 @@ import './layouts/property-editor-ui-picker/modal-layout-property-editor-ui-pick
 import './layouts/modal-layout-current-user.element';
 
 import { UUIModalSidebarSize } from '@umbraco-ui/uui-modal-sidebar';
-import { UniqueBehaviorSubject } from '../observable-api/unique-behavior-subject';
+import { BehaviorSubject } from 'rxjs';
 import { UmbModalChangePasswordData } from './layouts/modal-layout-change-password.element';
 import type { UmbModalIconPickerData } from './layouts/icon-picker/modal-layout-icon-picker.element';
 
@@ -27,7 +27,7 @@ export interface UmbModalOptions<UmbModalData> {
 // TODO: Should this be called UmbModalContext ? as we don't have 'services' as a term.
 export class UmbModalService {
 
-	#modals = new UniqueBehaviorSubject(<Array<UmbModalHandler>>[]);
+	#modals = new BehaviorSubject(<Array<UmbModalHandler>>[]);
 	public readonly modals = this.#modals.asObservable();
 
 	/**
