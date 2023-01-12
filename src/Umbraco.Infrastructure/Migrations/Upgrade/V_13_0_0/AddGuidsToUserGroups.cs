@@ -1,5 +1,4 @@
-﻿using System.Data.Common;
-using NPoco;
+﻿using NPoco;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Infrastructure.Persistence.DatabaseAnnotations;
 using Umbraco.Cms.Infrastructure.Persistence.DatabaseModelDefinitions;
@@ -56,10 +55,12 @@ public class AddGuidsToUserGroups : UnscopedMigrationBase
         // instead of using CompleteTransaction since this will end the connection.
         ScopeDatabase(scope);
         Database.Execute("COMMIT;");
+
+        // We don't have to worry about re-enabling this since it happens automatically.
         Database.Execute("PRAGMA foreign_keys=off;");
         Database.Execute("BEGIN TRANSACTION;");
 
-        // Now that keys are disabled we'll start the transaction and do our migration
+        // Now that keys are disabled and we have a transaction we'll do our migration
         MigrateColumnSqlite();
         scope.Complete();
     }
