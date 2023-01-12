@@ -20,7 +20,7 @@ const workspaceViews: Array<ManifestWorkspaceView> = [
 		weight: 200,
 		meta: {
 			workspaces: ['Umb.Workspace.Document'],
-			label: 'Info',
+			label: 'Content',
 			pathname: 'content',
 			icon: 'document',
 		},
