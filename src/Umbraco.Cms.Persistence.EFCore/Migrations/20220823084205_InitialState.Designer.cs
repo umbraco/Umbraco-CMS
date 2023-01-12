@@ -1608,7 +1608,8 @@ namespace Umbraco.Cms.Persistence.EFCore.Migrations
                     b.Property<string>("Text")
                         .HasMaxLength(255)
                         .HasColumnType("TEXT")
-                        .HasColumnName("text");
+                        .HasColumnName("text")
+                        .UseCollation("NOCASE");;
 
                     b.Property<bool?>("Trashed")
                         .IsRequired()

@@ -1604,83 +1604,85 @@ namespace Umbraco.Cms.Persistence.EFCore.Migrations
                 });
 
             modelBuilder.Entity("Umbraco.Cms.Persistence.EFCore.Entities.UmbracoNode", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasColumnName("id");
+            {
+                b.Property<int>("Id")
+                    .ValueGeneratedOnAdd()
+                    .HasColumnType("int")
+                    .HasColumnName("id");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<DateTime>("CreateDate")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime")
-                        .HasColumnName("createDate")
-                        .HasDefaultValueSql("DATE()");
+                b.Property<DateTime>("CreateDate")
+                    .ValueGeneratedOnAdd()
+                    .HasColumnType("datetime")
+                    .HasColumnName("createDate")
+                    .HasDefaultValueSql("DATE()");
 
-                    b.Property<int>("Level")
-                        .HasColumnType("int")
-                        .HasColumnName("level");
+                b.Property<int>("Level")
+                    .HasColumnType("int")
+                    .HasColumnName("level");
 
-                    b.Property<Guid?>("NodeObjectType")
-                        .HasColumnType("uniqueidentifier")
-                        .HasColumnName("nodeObjectType");
+                b.Property<Guid?>("NodeObjectType")
+                    .HasColumnType("uniqueidentifier")
+                    .HasColumnName("nodeObjectType");
 
-                    b.Property<int?>("NodeUser")
-                        .HasColumnType("int")
-                        .HasColumnName("nodeUser");
+                b.Property<int?>("NodeUser")
+                    .HasColumnType("int")
+                    .HasColumnName("nodeUser");
 
-                    b.Property<int>("ParentId")
-                        .HasColumnType("int")
-                        .HasColumnName("parentId");
+                b.Property<int>("ParentId")
+                    .HasColumnType("int")
+                    .HasColumnName("parentId");
 
-                    b.Property<string>("Path")
-                        .IsRequired()
-                        .HasMaxLength(150)
-                        .HasColumnType("nvarchar(150)")
-                        .HasColumnName("path");
+                b.Property<string>("Path")
+                    .IsRequired()
+                    .HasMaxLength(150)
+                    .HasColumnType("nvarchar(150)")
+                    .HasColumnName("path");
 
-                    b.Property<int>("SortOrder")
-                        .HasColumnType("int")
-                        .HasColumnName("sortOrder");
+                b.Property<int>("SortOrder")
+                    .HasColumnType("int")
+                    .HasColumnName("sortOrder");
 
-                    b.Property<string>("Text")
-                        .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)")
-                        .HasColumnName("text");
+                b.Property<string>("Text")
+                    .HasMaxLength(255)
+                    .HasColumnType("nvarchar(255)")
+                    .HasColumnName("text")
+                    .UseCollation("NOCASE");
 
-                    b.Property<bool?>("Trashed")
-                        .IsRequired()
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bit")
-                        .HasColumnName("trashed")
-                        .HasDefaultValueSql("'0'");
+                b.Property<bool?>("Trashed")
+                    .IsRequired()
+                    .ValueGeneratedOnAdd()
+                    .HasColumnType("bit")
+                    .HasColumnName("trashed")
+                    .HasDefaultValueSql("'0'");
 
-                    b.Property<Guid>("UniqueId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier")
-                        .HasColumnName("uniqueId")
-                        .HasDefaultValueSql("NEWID()");
+                b.Property<Guid>("UniqueId")
+                    .ValueGeneratedOnAdd()
+                    .HasColumnType("uniqueidentifier")
+                    .HasColumnName("uniqueId")
+                    .HasDefaultValueSql("NEWID()");
 
-                    b.HasKey("Id");
+                b.HasKey("Id");
 
-                    b.HasIndex("NodeUser");
+                b.HasIndex("NodeUser");
 
-                    b.HasIndex(new[] { "Level", "ParentId", "SortOrder", "NodeObjectType", "Trashed" }, "IX_umbracoNode_Level");
+                b.HasIndex(new[] {"Level", "ParentId", "SortOrder", "NodeObjectType", "Trashed"},
+                    "IX_umbracoNode_Level");
 
-                    b.HasIndex(new[] { "NodeObjectType", "Trashed" }, "IX_umbracoNode_ObjectType");
+                b.HasIndex(new[] {"NodeObjectType", "Trashed"}, "IX_umbracoNode_ObjectType");
 
-                    b.HasIndex(new[] { "ParentId" }, "IX_umbracoNode_ParentId");
+                b.HasIndex(new[] {"ParentId"}, "IX_umbracoNode_ParentId");
 
-                    b.HasIndex(new[] { "Path" }, "IX_umbracoNode_Path");
+                b.HasIndex(new[] {"Path"}, "IX_umbracoNode_Path");
 
-                    b.HasIndex(new[] { "Trashed" }, "IX_umbracoNode_Trashed");
+                b.HasIndex(new[] {"Trashed"}, "IX_umbracoNode_Trashed");
 
-                    b.HasIndex(new[] { "UniqueId" }, "IX_umbracoNode_UniqueId")
-                        .IsUnique();
+                b.HasIndex(new[] {"UniqueId"}, "IX_umbracoNode_UniqueId")
+                    .IsUnique();
 
-                    b.ToTable("umbracoNode", (string)null);
-                });
+                b.ToTable("umbracoNode", (string)null);
+            });
 
             modelBuilder.Entity("Umbraco.Cms.Persistence.EFCore.Entities.UmbracoPropertyDatum", b =>
                 {

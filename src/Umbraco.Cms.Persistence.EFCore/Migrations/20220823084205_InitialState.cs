@@ -425,7 +425,7 @@ namespace Umbraco.Cms.Persistence.EFCore.Migrations
                     sortOrder = table.Column<int>(type: "INTEGER", nullable: false),
                     trashed = table.Column<bool>(type: "INTEGER", nullable: false, defaultValueSql: "'0'"),
                     nodeUser = table.Column<int>(type: "INTEGER", nullable: true),
-                    text = table.Column<string>(type: "TEXT", maxLength: 255, nullable: true),
+                    text = table.Column<string>(type: "TEXT", maxLength: 255, nullable: true, collation: "NOCASE"),
                     nodeObjectType = table.Column<Guid>(type: "TEXT", nullable: true),
                     createDate = table.Column<DateTime>(type: "datetime", nullable: false, defaultValueSql: "DATE()")
                 },
