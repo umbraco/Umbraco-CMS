@@ -14,7 +14,7 @@ public class RegisterModelBuilder : MemberModelBuilderBase
     private string? _memberTypeAlias;
     private string? _redirectUrl;
     private bool _usernameIsEmail;
-    private bool _automaticLogIn;
+    private bool _automaticLogIn = true;
 
     public RegisterModelBuilder(IMemberTypeService memberTypeService, IShortStringHelper shortStringHelper)
         : base(memberTypeService, shortStringHelper)
