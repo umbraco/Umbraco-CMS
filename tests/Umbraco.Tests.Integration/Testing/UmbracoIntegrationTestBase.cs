@@ -24,13 +24,9 @@ namespace Umbraco.Cms.Tests.Integration.Testing;
 [NonParallelizable]
 public abstract class UmbracoIntegrationTestBase
 {
-    private static readonly object s_dbLocker = new();
-    protected static ITestDatabaseConfiguration? s_dbInstance;
-    protected static TestDbMeta s_fixtureDbMeta;
     protected static ConnectionStrings s_connectionStrings;
     private static int s_testCount = 1;
     private readonly List<Action> _fixtureTeardown = new();
-    private readonly Queue<Action> _testTeardown = new();
 
     private bool _firstTestInFixture = true;
 
@@ -43,10 +39,6 @@ public abstract class UmbracoIntegrationTestBase
         TestOptionAttributeBase.GetTestOptions<UmbracoTestAttribute>();
 
     protected TestHelper TestHelper { get; } = new();
-
-    private void AddOnTestTearDown(Action tearDown) => _testTeardown.Enqueue(tearDown);
-
-    private void AddOnFixtureTearDown(Action tearDown) => _fixtureTeardown.Add(tearDown);
 
     [SetUp]
     public void SetUp_Logging() =>
@@ -69,23 +61,11 @@ public abstract class UmbracoIntegrationTestBase
         // });
         //
         // bw.RunWorkerAsync();
-        
+
         Parallel.ForEach(_fixtureTeardown, a =>
         {
             a();
         });
-    }
-
-
-    [TearDown]
-    public void TearDown()
-    {
-        _firstTestInFixture = false;
-
-        while (_testTeardown.TryDequeue(out var a))
-        {
-            a();
-        }
     }
 
     protected ILoggerFactory CreateLoggerFactory()
