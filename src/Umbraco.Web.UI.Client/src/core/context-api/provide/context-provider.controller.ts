@@ -5,6 +5,10 @@ import { UmbControllerHostInterface } from 'src/core/controller/controller-host.
 
 export class UmbContextProviderController extends UmbContextProvider<UmbControllerHostInterface> implements UmbControllerInterface {
 
+	public get unique() {
+		return this._contextAlias;
+	}
+
 	constructor(host:UmbControllerHostInterface, contextAlias: string, instance: unknown) {
 		super(host, contextAlias, instance);
 

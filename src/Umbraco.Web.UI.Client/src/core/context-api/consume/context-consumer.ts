@@ -23,7 +23,7 @@ export class UmbContextConsumer<HostType extends EventTarget = EventTarget> {
 	 * @param {UmbContextCallback} _callback
 	 * @memberof UmbContextConsumer
 	 */
-	constructor(protected host: HostType, private _contextAlias: string, private _callback: UmbContextCallback) {}
+	constructor(protected host: HostType, protected _contextAlias: string, private _callback: UmbContextCallback) {}
 
 
 	private _onResponse = (instance: unknown) => {

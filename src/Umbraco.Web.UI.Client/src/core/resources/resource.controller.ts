@@ -7,12 +7,13 @@ import { UmbNotificationOptions, UmbNotificationService } from 'src/core/notific
 import { UmbNotificationDefaultData } from 'src/core/notification/layouts/default';
 
 export class UmbResourceController extends UmbController {
+
 	#promise: Promise<any>;
 
 	#notificationService?: UmbNotificationService;
 
-	constructor(host: UmbControllerHostInterface, promise: Promise<any>) {
-		super(host);
+	constructor(host: UmbControllerHostInterface, promise: Promise<any>, alias?: string) {
+		super(host, alias);
 
 		this.#promise = promise;
 
