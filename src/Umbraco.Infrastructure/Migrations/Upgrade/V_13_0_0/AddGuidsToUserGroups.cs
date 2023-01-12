@@ -1,57 +1,70 @@
 ﻿using NPoco;
 using Umbraco.Cms.Core;
-using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Infrastructure.Persistence.DatabaseAnnotations;
 using Umbraco.Cms.Infrastructure.Persistence.DatabaseModelDefinitions;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
+using Umbraco.Cms.Infrastructure.Scoping;
 
 namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_13_0_0;
 
-public class AddGuidsToUserGroups : MigrationBase
+public class AddGuidsToUserGroups : UnscopedMigrationBase
 {
+    private readonly IScopeProvider _scopeProvider;
     private const string OldTableName = $"{Constants.DatabaseSchema.Tables.UserGroup}UmbracoThirteenZeroGuid";
 
-    public AddGuidsToUserGroups(IMigrationContext context) : base(context)
+    public AddGuidsToUserGroups(IMigrationContext context, IScopeProvider scopeProvider) : base(context)
     {
+        _scopeProvider = scopeProvider;
     }
 
     protected override void Migrate()
     {
-        var columns = SqlSyntax.GetColumnsInSchema(Context.Database).ToList();
-
         // SQL server can simply add the column, but for SQLite this won't work,
         // so we'll have to create a new table and copy over data.
         if (DatabaseType != DatabaseType.SQLite)
         {
-            AddColumnIfNotExists<UserGroupDto>(columns, "uniqueId");
+            MigrateSqlServer();
+            return;
         }
 
-        // This is really ugly, but we have to disable foreign keys to be able to drop the table.
-        // However, this MUST be done outside a transaction, which is quite problematic,
-        // This means we have to manually commit the transaction, to then disable FKs, and then start a new transaction.
-        Database.Execute("COMMIT;");
-        Database.Execute("PRAGMA foreign_keys=off;");
-        Database.Execute("BEGIN TRANSACTION;");
+        MigrateSqlite();
+    }
 
+    private void MigrateSqlServer()
+    {
+        using IScope scope = _scopeProvider.CreateScope();
+        using IDisposable notificationSuppression = scope.Notifications.Suppress();
+        var columns = SqlSyntax.GetColumnsInSchema(Context.Database).ToList();
+        AddColumnIfNotExists<UserGroupDto>(columns, "uniqueId");
+        scope.Complete();
+    }
+
+    private void MigrateSqlite()
+    {
+        // Since you cannot alter columns, we have to copy the data over and delete the old table.
+        // However we cannot do this due to foreign keys, so temporarily disable these keys while migrating.
+        Database.Execute("PRAGMA foreign_keys=off;");
 
         try
         {
-            MigrateColumnSqlite();
+            using (IScope scope = _scopeProvider.CreateScope())
+            {
+                using (IDisposable notificationSuppression = scope.Notifications.Suppress())
+                {
+                    // Now that keys are disabled we'll start the transaction and do our migration
+                    MigrateColumnSqlite();
+                    scope.Complete();
+                }
+            }
         }
-        catch
+        catch (Exception)
         {
-            // Something went wrong, so we want to roll back, but more importantly, we still want to enable foreign keys
-            // And start a new transaction for good measure (since scope expects this).
-            Database.Execute("ROLLBACK;");
+            // Something went wrong, we have to make sure that we re-enable foreign keys before we return
             Database.Execute("PRAGMA foreign_keys=on;");
-            Database.Execute("BEGIN TRANSACTION;");
             throw;
         }
 
-        // No error, we good, commit and enable foreign keys
-        Database.Execute("COMMIT;");
         Database.Execute("PRAGMA foreign_keys=on;");
-        Database.Execute("BEGIN TRANSACTION;");
     }
 
     private void MigrateColumnSqlite()
