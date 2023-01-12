@@ -4,7 +4,7 @@ import { manifest as layoutConfiguration } from './config/layout-configuration/m
 import { manifest as orderBy } from './config/order-by/manifests';
 import type { ManifestPropertyEditorUI } from '@umbraco-cms/models';
 
-export const manifest: ManifestPropertyEditorUI = {
+const manifest: ManifestPropertyEditorUI = {
 	type: 'propertyEditorUI',
 	alias: 'Umb.PropertyEditorUI.CollectionView',
 	name: 'Collection View Property Editor UI',
