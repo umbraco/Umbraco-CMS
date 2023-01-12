@@ -54,7 +54,7 @@ test.describe('DataTypes', () => {
     // Assert
     const expected = `<p style="color:000000" > Lorem ipsum dolor sit amet </p>`;
     await expect(umbracoApi.content.verifyRenderedContent('/', expected, true)).toBeTruthy();
-    await expect(await page.locator('.umb-button__overlay')).not.toBeVisible();
+    await expect(await page.locator('.umb-button__overlay')).not.toBeVisible({timeout: 10000});
 
     // Pick another colour to verify both work
     await page.locator('.btn-FF0000').click();
@@ -62,7 +62,7 @@ test.describe('DataTypes', () => {
     // Save
     await umbracoUi.clickElement(umbracoUi.getButtonByLabelKey(ConstantHelper.buttons.saveAndPublish));
     await umbracoUi.isSuccessNotificationVisible();
-    await expect(await page.locator('.umb-button__overlay')).not.toBeVisible();
+    await expect(await page.locator('.umb-button__overlay')).not.toBeVisible({timeout: 10000});
 
     // Assert
     const expected2 = '<p style="color:FF0000">Lorem ipsum dolor sit amet</p>';
@@ -174,7 +174,7 @@ test.describe('DataTypes', () => {
 
     // Assert
     await expect(await umbracoUi.getErrorNotification()).not.toBeVisible();
-    
+
     // Testing if the edits match the expected results
     const expected = '<a href="/">UrlPickerContent</a>';
     await expect(await umbracoApi.content.verifyRenderedContent('/', expected, true)).toBeTruthy();

@@ -4,14 +4,15 @@ using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Exceptions;
 using Umbraco.Cms.Core.Packaging;
+using Umbraco.Cms.Core.Persistence;
 using Umbraco.Cms.Core.Persistence;
 using Umbraco.Cms.Core.Semver;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Migrations.Upgrade;
 using Umbraco.Cms.Infrastructure.Persistence;
-using Umbraco.Cms.Web.Common.DependencyInjection;
 
 namespace Umbraco.Cms.Infrastructure.Runtime;
 
@@ -32,7 +33,18 @@ public class RuntimeState : IRuntimeState
     private readonly IConflictingRouteService _conflictingRouteService = null!;
     private readonly IEnumerable<IDatabaseProviderMetadata> _databaseProviderMetadata = null!;
     private readonly IRuntimeModeValidationService _runtimeModeValidationService = null!;
-    private readonly IDatabaseInfo _databaseInfo;
+    private readonly IDatabaseInfo _databaseInfo = null!;
+
+    /// <summary>
+    /// The initial <see cref="RuntimeState"/>
+    /// </summary>
+    public static RuntimeState Booting() => new RuntimeState() { Level = RuntimeLevel.Boot };
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="RuntimeState" /> class.
+    /// </summary>
+    private RuntimeState()
+    { }
 
     /// <summary>
     /// Initializes a new instance of the <see cref="RuntimeState" /> class.
@@ -60,6 +72,72 @@ public class RuntimeState : IRuntimeState
         _runtimeModeValidationService = runtimeModeValidationService;
         _databaseInfo = databaseInfo;
     }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="RuntimeState" /> class.
+    /// </summary>
+    [Obsolete("Use ctor with all params. This will be removed in Umbraco 12.")]
+    public RuntimeState(
+        IOptions<GlobalSettings> globalSettings,
+        IOptions<UnattendedSettings> unattendedSettings,
+        IUmbracoVersion umbracoVersion,
+        IUmbracoDatabaseFactory databaseFactory,
+        ILogger<RuntimeState> logger,
+        PendingPackageMigrations packageMigrationState,
+        IConflictingRouteService conflictingRouteService,
+        IEnumerable<IDatabaseProviderMetadata> databaseProviderMetadata)
+        : this(
+            globalSettings,
+            unattendedSettings,
+            umbracoVersion,
+            databaseFactory,
+            logger,
+            packageMigrationState,
+            conflictingRouteService,
+            databaseProviderMetadata,
+            StaticServiceProvider.Instance.GetRequiredService<IRuntimeModeValidationService>())
+    { }
+
+    [Obsolete("Use ctor with all params. This will be removed in Umbraco 12.")]
+    public RuntimeState(
+        IOptions<GlobalSettings> globalSettings,
+        IOptions<UnattendedSettings> unattendedSettings,
+        IUmbracoVersion umbracoVersion,
+        IUmbracoDatabaseFactory databaseFactory,
+        ILogger<RuntimeState> logger,
+        PendingPackageMigrations packageMigrationState,
+        IConflictingRouteService conflictingRouteService)
+        : this(
+            globalSettings,
+            unattendedSettings,
+            umbracoVersion,
+            databaseFactory,
+            logger,
+            packageMigrationState,
+            StaticServiceProvider.Instance.GetRequiredService<IConflictingRouteService>(),
+            StaticServiceProvider.Instance.GetServices<IDatabaseProviderMetadata>())
+    { }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="RuntimeState" /> class.
+    /// </summary>
+    [Obsolete("Use ctor with all params. This will be removed in Umbraco 12.")]
+    public RuntimeState(
+        IOptions<GlobalSettings> globalSettings,
+        IOptions<UnattendedSettings> unattendedSettings,
+        IUmbracoVersion umbracoVersion,
+        IUmbracoDatabaseFactory databaseFactory,
+        ILogger<RuntimeState> logger,
+        PendingPackageMigrations packageMigrationState)
+        : this(
+            globalSettings,
+            unattendedSettings,
+            umbracoVersion,
+            databaseFactory,
+            logger,
+            packageMigrationState,
+            StaticServiceProvider.Instance.GetRequiredService<IConflictingRouteService>())
+    { }
 
     /// <inheritdoc />
     public Version Version => _umbracoVersion.Version;
