@@ -9,16 +9,12 @@ namespace Umbraco.Cms.Tests.Integration.Testing;
 
 public class SqliteTestDatabaseConfiguration : ITestDatabaseConfiguration
 {
-    private readonly IOptionsMonitor<ConnectionStrings> _connectionStrings;
-    private readonly IUmbracoDatabaseFactory _databaseFactory;
     private Guid? _key;
     private TestHelper _testHelper = new();
     private string s_filesPath;
 
     public SqliteTestDatabaseConfiguration(IOptionsMonitor<ConnectionStrings> connectionStrings, IUmbracoDatabaseFactory databaseFactory)
     {
-        _connectionStrings = connectionStrings;
-        _databaseFactory = databaseFactory;
         _key = Guid.NewGuid();
         s_filesPath = Path.Combine(_testHelper.WorkingDirectory, "databases");
 
@@ -52,10 +48,13 @@ public class SqliteTestDatabaseConfiguration : ITestDatabaseConfiguration
     public void Teardown(string key) => TryDeleteFile(GetAbsolutePath(key));
 
     private string GetAbsolutePath() => Path.Combine(s_filesPath, _key.ToString());
+
     private string GetAbsolutePath(string key) => Path.Combine(s_filesPath, key);
 
     private void TryDeleteFile(string filePath)
     {
+        // This can sometimes fail if a thread is hanging and Sqlite file is therefore in use
+        // which is why we need retry logic that swallows the exceptions.
         const int maxRetries = 5;
         var retries = 0;
         var retry = true;

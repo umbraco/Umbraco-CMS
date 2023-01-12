@@ -19,8 +19,6 @@ public class LocalDbTestDatabaseConfiguration : ITestDatabaseConfiguration
     private static LocalDb.Instance s_localDbInstance;
     private static string s_filesPath;
     private readonly LocalDb _localDb;
-    private readonly IUmbracoDatabaseFactory _databaseFactory;
-    private readonly IOptionsMonitor<ConnectionStrings> _connectionStrings;
     private TestHelper _testHelper = new ();
 
     private readonly TestDatabaseSettings _settings;
@@ -29,8 +27,7 @@ public class LocalDbTestDatabaseConfiguration : ITestDatabaseConfiguration
     internal LocalDbTestDatabaseConfiguration(LocalDb localDb, IUmbracoDatabaseFactory databaseFactory, IOptionsMonitor<ConnectionStrings> connectionStrings)
     {
         _localDb = localDb;
-        _databaseFactory = databaseFactory;
-        _connectionStrings = connectionStrings;
+
         s_filesPath = Path.Combine(_testHelper.WorkingDirectory, "databases");
 
         if (!Directory.Exists(s_filesPath))
