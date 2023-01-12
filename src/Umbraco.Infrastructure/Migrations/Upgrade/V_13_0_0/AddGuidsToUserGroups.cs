@@ -50,7 +50,7 @@ public class AddGuidsToUserGroups : UnscopedMigrationBase
         // But since you cannot alter columns, we have to copy the data over and delete the old table.
         // However we cannot do this due to foreign keys, so temporarily disable these keys while migrating.
         // This leads to an interesting chicken and egg issue, we have to do this before a transaction
-        // but in the same connection, since foreign keys will default to on next time we start open a connection
+        // but in the same connection, since foreign keys will default to ON next time we open a connection
         // This means we have to just execute the DB command to end the transaction,
         // instead of using CompleteTransaction since this will end the connection.
         ScopeDatabase(scope);
