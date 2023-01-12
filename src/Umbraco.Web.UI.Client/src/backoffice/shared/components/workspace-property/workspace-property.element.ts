@@ -146,7 +146,7 @@ export class UmbWorkspacePropertyElement extends UmbLitElement {
 		this.observe(this._propertyContext.label, (label) => {
 			this._label = label;
 		});
-		this.observe(this._propertyContext.label, (description) => {
+		this.observe(this._propertyContext.description, (description) => {
 			this._description = description;
 		});
 
