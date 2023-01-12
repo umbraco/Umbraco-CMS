@@ -2,7 +2,7 @@ import { expect, fixture, html } from '@open-wc/testing';
 import { ManifestDashboard, umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
 import { defaultA11yConfig } from '@umbraco-cms/test-utils';
 import { customElement } from 'lit/decorators.js';
-import { UmbExtensionSlotElement } from './extension-slot.element';
+import { InitializedExtension, UmbExtensionSlotElement } from './extension-slot.element';
 
 @customElement('test-extension-slot-manifest-element')
 class MyExtensionSlotManifestElement extends HTMLElement {
@@ -47,7 +47,7 @@ describe('UmbExtensionSlotElement', () => {
 
 
 
-	describe('rendering methods', () => {
+	describe('rendering', () => {
 
 		beforeEach(async () => {
 
@@ -60,7 +60,7 @@ describe('UmbExtensionSlotElement', () => {
 					sections: ['test'],
 					pathname: 'test/test'
 				}
-			})
+			});
 
 		});
 
@@ -76,21 +76,21 @@ describe('UmbExtensionSlotElement', () => {
 
 			expect(element.firstChild).to.be.instanceOf(MyExtensionSlotManifestElement);
 		});
+
+		it('use the render method', async () => {
+
+			element = await fixture(
+				html`
+					<umb-extension-slot
+						type='dashboard'
+						.filter=${(x: ManifestDashboard) => x.alias === 'unit-test-ext-slot-element-manifest'}
+						.renderMethod=${(manifest: InitializedExtension) => html`<bla>${manifest.component}</bla>`}>
+						</umb-extension-slot>`
+			);
+
+			expect(element.firstChild?.nodeName).to.be.equal('bla');
+			expect(element.firstChild?.firstChild).to.be.instanceOf(MyExtensionSlotManifestElement);
+		});
 	});
-
-
-/*
-	public myExtensionWrapperMethod = (component: HTMLElement) => {
-		return html`<bla>${component}</bla>`;
-	};
-
-	render() {
-		return html`
-			<umb-extension-slot id="apps" type="headerApp" .renderMethod=${this.myExtensionWrapperMethod}>
-			</umb-extension-slot>
-		`;
-	}
-	*/
-
 
 });
