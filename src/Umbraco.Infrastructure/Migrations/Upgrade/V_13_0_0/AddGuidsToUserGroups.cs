@@ -1,4 +1,5 @@
-﻿using NPoco;
+﻿using System.Data.Common;
+using NPoco;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Infrastructure.Persistence.DatabaseAnnotations;
 using Umbraco.Cms.Infrastructure.Persistence.DatabaseModelDefinitions;
@@ -41,16 +42,25 @@ public class AddGuidsToUserGroups : UnscopedMigrationBase
 
     private void MigrateSqlite()
     {
-        // Since you cannot alter columns, we have to copy the data over and delete the old table.
-        // However we cannot do this due to foreign keys, so temporarily disable these keys while migrating.
-        Database.Execute("PRAGMA foreign_keys=off;");
-
         try
         {
             using (IScope scope = _scopeProvider.CreateScope())
             {
                 using (IDisposable notificationSuppression = scope.Notifications.Suppress())
                 {
+                    // This isn't pretty,
+                    // But since you cannot alter columns, we have to copy the data over and delete the old table.
+                    // However we cannot do this due to foreign keys, so temporarily disable these keys while migrating.
+                    // This leads to an interesting chicken and egg issue, we have to do this before a transaction
+                    // but in the same connection, since foreign keys will default to on next time we start open a connection
+                    // This means we have to just execute the DB command to end the transaction,
+                    // instead of using CompleteTransaction since this will end the connection.
+                    ScopeDatabase(scope);
+                    Database.CompleteTransaction();
+                    Database.Execute("COMMIT;");
+                    Database.Execute("PRAGMA foreign_keys=off;");
+                    Database.Execute("BEGIN TRANSACTION;");
+                    var uOn = Database.ExecuteScalar<int>("PRAGMA foreign_keys;");
                     // Now that keys are disabled we'll start the transaction and do our migration
                     MigrateColumnSqlite();
                     scope.Complete();
