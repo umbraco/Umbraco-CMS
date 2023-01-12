@@ -4,8 +4,7 @@ import { manifest as datePicker } from './date-picker/manifests';
 import { manifest as eyeDropper } from './eye-dropper/manifests';
 import { manifest as multiUrlPicker } from './multi-url-picker/manifests';
 import { manifest as overlaySize } from './overlay-size/manifests';
-import { manifest as treePicker } from './tree-picker/manifests';
-import { manifest as treePickerStartNode } from './tree-picker-start-node/manifests';
+import { manifests as treePicker } from './tree-picker/manifests';
 import { manifests as textBoxes } from './text-box/manifests';
 import { manifest as dropdown } from './dropdown/manifests';
 import { manifest as multipleTextString } from './multiple-text-string/manifests';
@@ -35,8 +34,7 @@ export const manifests: Array<ManifestPropertyEditorUI> = [
 	multiUrlPicker,
 	overlaySize,
 	...textBoxes,
-	treePicker,
-	treePickerStartNode,
+	...treePicker,
 	dropdown,
 	multipleTextString,
 	textArea,
