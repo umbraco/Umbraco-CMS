@@ -1,6 +1,7 @@
 import { nothing } from 'lit';
 import type { TemplateResult } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
+import { css } from 'lit';
 import { map } from 'rxjs';
 import { repeat } from 'lit/directives/repeat.js';
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
@@ -20,6 +21,13 @@ type InitializedExtensionItem = { alias: string; weight: number; component: HTML
  */
 @customElement('umb-extension-slot')
 export class UmbExtensionSlotElement extends UmbLitElement {
+
+	static styles = css`
+		:host {
+			display: contents;
+		}
+	`;
+
 	@state()
 	private _extensions: InitializedExtensionItem[] = [];
 
