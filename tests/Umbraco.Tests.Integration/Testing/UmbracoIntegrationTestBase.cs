@@ -48,6 +48,12 @@ public abstract class UmbracoIntegrationTestBase
     public void TearDown_Logging() =>
         TestContext.Progress.Write($"  {TestContext.CurrentContext.Result.Outcome.Status}");
 
+    [TearDown]
+    public void TearDown()
+    {
+        _firstTestInFixture = false;
+    }
+
     [OneTimeTearDown]
     public void FixtureTearDown()
     {
