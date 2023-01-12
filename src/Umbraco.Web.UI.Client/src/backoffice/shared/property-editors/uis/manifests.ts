@@ -23,10 +23,7 @@ import { manifest as mediaPicker } from './media-picker/manifests';
 import { manifest as imageCropsConfiguration } from './image-crops-configuration/manifests';
 import { manifest as imageCropper } from './image-cropper/manifests';
 import { manifest as uploadField } from './upload-field/manifests';
-import { manifest as blockGrid } from './block-grid/manifests';
-import { manifest as blockGridBlockConfiguration } from './block-grid-block-configuration/manifests';
-import { manifest as blockGridGroupConfiguration } from './block-grid-group-configuration/manifests';
-import { manifest as blockGridStylesheetPicker } from './block-grid-stylesheet-picker/manifests';
+import { manifests as blockGrid } from './block-grid/manifests';
 import { manifest as orderDirection } from './order-direction/manifests';
 import { manifests as collectionView } from './collection-view/manifests';
 import type { ManifestPropertyEditorUI } from '@umbraco-cms/models';
@@ -57,10 +54,7 @@ export const manifests: Array<ManifestPropertyEditorUI> = [
 	imageCropsConfiguration,
 	imageCropper,
 	uploadField,
-	blockGrid,
-	blockGridBlockConfiguration,
-	blockGridGroupConfiguration,
-	blockGridStylesheetPicker,
+	...blockGrid,
 	orderDirection,
 	...collectionView,
 	{
