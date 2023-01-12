@@ -1,6 +1,7 @@
 import { map, Observable } from 'rxjs';
 import { UmbDataStoreBase } from '../../../core/stores/store';
-import { ApiError, DictionaryResource, EntityTreeItem, ProblemDetails } from '@umbraco-cms/backend-api';
+import { DictionaryResource, EntityTreeItem } from '@umbraco-cms/backend-api';
+import { tryExecuteAndNotify } from '@umbraco-cms/resources';
 
 /**
  * @export
@@ -17,19 +18,11 @@ export class UmbDictionaryStore extends UmbDataStoreBase<EntityTreeItem> {
 	 * @memberof UmbDictionaryStore
 	 */
 	getTreeRoot(): Observable<Array<EntityTreeItem>> {
-		DictionaryResource.getTreeDictionaryRoot({}).then(
-			(res) => {
-				this.updateItems(res.items);
-			},
-			(e) => {
-				if (e instanceof ApiError) {
-					const error = e.body as ProblemDetails;
-					if (e.status === 400) {
-						console.log(error.detail);
-					}
-				}
+		tryExecuteAndNotify(this.host, DictionaryResource.getTreeDictionaryRoot({})).then(({ data }) => {
+			if (data) {
+				this.updateItems(data.items);
 			}
-		);
+		});
 
 		return this.items.pipe(map((items) => items.filter((item) => item.parentKey === null)));
 	}
@@ -41,21 +34,16 @@ export class UmbDictionaryStore extends UmbDataStoreBase<EntityTreeItem> {
 	 * @memberof UmbDataTypesStore
 	 */
 	getTreeItemChildren(key: string): Observable<Array<EntityTreeItem>> {
-		DictionaryResource.getTreeDictionaryChildren({
-			parentKey: key,
-		}).then(
-			(res) => {
-				this.updateItems(res.items);
-			},
-			(e) => {
-				if (e instanceof ApiError) {
-					const error = e.body as ProblemDetails;
-					if (e.status === 400) {
-						console.log(error.detail);
-					}
-				}
+		tryExecuteAndNotify(
+			this.host,
+			DictionaryResource.getTreeDictionaryChildren({
+				parentKey: key,
+			})
+		).then(({ data }) => {
+			if (data) {
+				this.updateItems(data.items);
 			}
-		);
+		});
 
 		return this.items.pipe(map((items) => items.filter((item) => item.parentKey === key)));
 	}
