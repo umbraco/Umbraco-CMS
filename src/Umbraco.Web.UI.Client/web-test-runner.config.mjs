@@ -11,6 +11,7 @@ export default {
 			inject: {
 				importMap: {
 					imports: {
+						'src/': './src/',
 						'@umbraco-cms/models': './src/core/models/index.ts',
 						'@umbraco-cms/backend-api': './src/core/backend-api/index.ts',
 						'@umbraco-cms/context-api': './src/core/context-api/index.ts',
