@@ -41,6 +41,7 @@ export class UmbSectionDashboardsElement extends UmbLitElement {
 				height: 100%;
 				box-sizing: border-box;
 				display: block;
+				padding:var(--uui-size-5);
 			}
 		`,
 	];
