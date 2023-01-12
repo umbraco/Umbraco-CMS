@@ -133,26 +133,20 @@ public abstract class UmbracoIntegrationTestBase
     protected void UseTestDatabase(IServiceProvider serviceProvider)
     {
         var state = serviceProvider.GetRequiredService<IRuntimeState>();
-        var testDatabaseFactoryProvider = serviceProvider.GetRequiredService<TestUmbracoDatabaseFactoryProvider>();
         var umbracoDatabaseFactory = serviceProvider.GetRequiredService<IUmbracoDatabaseFactory>();
-        var loggerFactory = serviceProvider.GetRequiredService<ILoggerFactory>();
-        var umbracoDbContextFactory = serviceProvider.GetRequiredService<UmbracoDbContextFactory>();
         var connectionStrings = serviceProvider.GetRequiredService<IOptionsMonitor<ConnectionStrings>>();
         var databaseSchemaCreatorFactory = serviceProvider.GetRequiredService<IDatabaseSchemaCreatorFactory>();
         var databaseDataCreator = serviceProvider.GetRequiredService<IDatabaseDataCreator>();
         var testDatabaseFactory = serviceProvider.GetRequiredService<UmbracoTestDatabaseFactory>();
 
         // This will create a db, install the schema and ensure the app is configured to run
-        SetupTestDatabase(testDatabaseFactoryProvider, connectionStrings, umbracoDatabaseFactory, loggerFactory, state, umbracoDbContextFactory, databaseSchemaCreatorFactory, databaseDataCreator, testDatabaseFactory);
+        SetupTestDatabase(connectionStrings, umbracoDatabaseFactory, state, databaseSchemaCreatorFactory, databaseDataCreator, testDatabaseFactory);
     }
 
     private void SetupTestDatabase(
-        TestUmbracoDatabaseFactoryProvider testUmbracoDatabaseFactoryProvider,
         IOptionsMonitor<ConnectionStrings> connectionStrings,
         IUmbracoDatabaseFactory databaseFactory,
-        ILoggerFactory loggerFactory,
         IRuntimeState runtimeState,
-        UmbracoDbContextFactory umbracoDbContextFactory, 
         IDatabaseSchemaCreatorFactory databaseSchemaCreatorFactory,
         IDatabaseDataCreator databaseDataCreator,
         UmbracoTestDatabaseFactory testDatabaseFactory)
@@ -271,58 +265,6 @@ public abstract class UmbracoIntegrationTestBase
         BaseTestDatabase.BeginTransaction();
         databaseSchemaCreatorFactory.Create(BaseTestDatabase);
         BaseTestDatabase.CompleteTransaction();
-    }
-
-    private void CreateDatabase(IUmbracoDatabaseFactory databaseFactory, IOptionsMonitor<ConnectionStrings> connectionStrings)
-    {
-        string? projectDirectory = Directory.GetParent(Environment.CurrentDirectory)?.Parent?.Parent?.FullName;
-        string tempFolder = @"TEMP\databases";
-        var tempFolderPath = Path.Combine(projectDirectory!, tempFolder);
-        var absoluteDbPath = Path.Combine(tempFolderPath, Guid.NewGuid().ToString());
-    
-        switch (TestOptions.Database)
-        {
-            case UmbracoTestOptions.Database.NewSchemaPerTest:
-                AddOnTestTearDown(() => TryDeleteFile(absoluteDbPath));
-                break;
-            case UmbracoTestOptions.Database.NewEmptyPerTest:
-                AddOnTestTearDown(() => TryDeleteFile(absoluteDbPath));
-                break;
-            case UmbracoTestOptions.Database.NewSchemaPerFixture:
-                if (_firstTestInFixture)
-                {
-                    AddOnFixtureTearDown(() => TryDeleteFile(absoluteDbPath));
-                }
-    
-                break;
-            case UmbracoTestOptions.Database.NewEmptyPerFixture:
-                if (_firstTestInFixture)
-                {
-                    AddOnFixtureTearDown(() => TryDeleteFile(absoluteDbPath));
-                }
-    
-                break;
-        }
-    
-        var builder = new SqliteConnectionStringBuilder
-        {
-            DataSource = $"{absoluteDbPath}",
-            Mode = SqliteOpenMode.ReadWriteCreate,
-            ForeignKeys = true,
-            Pooling = false, // When pooling true, files kept open after connections closed, bad for cleanup.
-            Cache = SqliteCacheMode.Shared,
-        };
-    
-        s_connectionStrings = new ConnectionStrings
-        {
-            ConnectionString = builder.ConnectionString,
-            ProviderName = "Microsoft.Data.Sqlite",
-        };
-    
-        connectionStrings.CurrentValue.ConnectionString = s_connectionStrings.ConnectionString;
-        connectionStrings.CurrentValue.ProviderName = s_connectionStrings.ProviderName;
-    
-        databaseFactory.Configure(s_connectionStrings);
     }
 
     private void TryDeleteFile(string filePath)
