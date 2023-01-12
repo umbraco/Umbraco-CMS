@@ -55,7 +55,6 @@ public class AddGuidsToUserGroups : UnscopedMigrationBase
         // This means we have to just execute the DB command to end the transaction,
         // instead of using CompleteTransaction since this will end the connection.
         ScopeDatabase(scope);
-        Database.CompleteTransaction();
         Database.Execute("COMMIT;");
         Database.Execute("PRAGMA foreign_keys=off;");
         Database.Execute("BEGIN TRANSACTION;");
