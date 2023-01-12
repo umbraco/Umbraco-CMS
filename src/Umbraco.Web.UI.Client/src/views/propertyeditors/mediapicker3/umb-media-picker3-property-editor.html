@@ -100,7 +100,7 @@
             </div>
 
             <button ng-if="vm.loading !== true && ((vm.singleMode === true && vm.model.value.length === 0) || vm.singleMode !== true)"
-                    id="{{vm.model.alias}}"
+                    id="button_{{vm.model.alias}}"
                     type="button"
                     class="btn-reset umb-media-card-grid__create-button umb-outline"
                     ng-disabled="!vm.allowAddMedia"
