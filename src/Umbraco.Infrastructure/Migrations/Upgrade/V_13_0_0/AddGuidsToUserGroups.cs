@@ -35,6 +35,8 @@ public class AddGuidsToUserGroups : UnscopedMigrationBase
     {
         using IScope scope = _scopeProvider.CreateScope();
         using IDisposable notificationSuppression = scope.Notifications.Suppress();
+        ScopeDatabase(scope);
+
         var columns = SqlSyntax.GetColumnsInSchema(Context.Database).ToList();
         AddColumnIfNotExists<UserGroupDto>(columns, "uniqueId");
         scope.Complete();
