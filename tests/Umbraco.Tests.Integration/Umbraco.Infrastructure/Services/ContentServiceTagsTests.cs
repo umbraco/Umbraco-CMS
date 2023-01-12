@@ -45,6 +45,9 @@ public class ContentServiceTagsTests : UmbracoIntegrationTest
 
     private IJsonSerializer Serializer => GetRequiredService<IJsonSerializer>();
 
+    private IConfigurationEditorJsonSerializer ConfigurationEditorJsonSerializer =>
+        GetRequiredService<IConfigurationEditorJsonSerializer>();
+
     public PropertyEditorCollection PropertyEditorCollection => GetRequiredService<PropertyEditorCollection>();
 
     [Test]
@@ -392,6 +395,9 @@ public class ContentServiceTagsTests : UmbracoIntegrationTest
     [Test]
     public void TagsCanBecomeInvariantByPropertyTypeAndBackToVariant()
     {
+        var frValue = new string[] { "hello", "world", "some", "tags", "plus" };
+        var enValue = new string[] { "hello", "world", "another", "one" };
+
         var language = new LanguageBuilder()
             .WithCultureInfo("fr-FR")
             .Build();
@@ -409,9 +415,9 @@ public class ContentServiceTagsTests : UmbracoIntegrationTest
         content1.SetCultureName("name-fr", "fr-FR");
         content1.SetCultureName("name-en", "en-US");
         content1.AssignTags(PropertyEditorCollection, DataTypeService, Serializer, "tags",
-            new[] { "hello", "world", "some", "tags", "plus" }, culture: "fr-FR");
+            frValue, culture: "fr-FR");
         content1.AssignTags(PropertyEditorCollection, DataTypeService, Serializer, "tags",
-            new[] { "hello", "world", "another", "one" }, culture: "en-US");
+            enValue, culture: "en-US");
         ContentService.SaveAndPublish(content1);
 
         propertyType.Variations = ContentVariation.Nothing;
@@ -421,7 +427,8 @@ public class ContentServiceTagsTests : UmbracoIntegrationTest
         propertyType.Variations = ContentVariation.Culture;
         ContentTypeService.Save(contentType);
 
-        // TODO: Assert results
+        Assert.AreEqual(frValue, Serializer.Deserialize<string[]>(content1.GetValue<string>("tags", "fr-FR")));
+        Assert.AreEqual(enValue, Serializer.Deserialize<string[]>(content1.GetValue<string>("tags", "en-US")));
     }
 
     [Test]
@@ -636,7 +643,10 @@ public class ContentServiceTagsTests : UmbracoIntegrationTest
         // Arrange
         // set configuration
         var dataType = DataTypeService.GetDataType(1041);
-        dataType.Configuration = new TagConfiguration { Group = "test", StorageType = TagsStorageType.Csv };
+        dataType.ConfigurationData = dataType.Editor!.GetConfigurationEditor()
+            .FromConfigurationObject(
+                new TagConfiguration { Group = "test", StorageType = TagsStorageType.Csv },
+                ConfigurationEditorJsonSerializer);
 
         // updating the data type with the new configuration
         DataTypeService.Save(dataType);
@@ -831,7 +841,10 @@ public class ContentServiceTagsTests : UmbracoIntegrationTest
         // Arrange
         // set configuration
         var dataType = DataTypeService.GetDataType(1041);
-        dataType.Configuration = new TagConfiguration { Group = "test", StorageType = TagsStorageType.Csv };
+        dataType.ConfigurationData = dataType.Editor!.GetConfigurationEditor()
+            .FromConfigurationObject(
+                new TagConfiguration { Group = "test", StorageType = TagsStorageType.Csv },
+                ConfigurationEditorJsonSerializer);
 
         // updating the data type with the new configuration
         DataTypeService.Save(dataType);
@@ -847,7 +860,7 @@ public class ContentServiceTagsTests : UmbracoIntegrationTest
 
         IContent content = ContentBuilder.CreateSimpleContent(contentType, "Tagged content");
         content.AssignTags(PropertyEditorCollection, DataTypeService, Serializer, "tags",
-            new[] { "hello,world,tags", "new"});
+            new[] { "hello,world,tags", "new" });
 
         ContentService.SaveAndPublish(content);
 
@@ -866,7 +879,15 @@ public class ContentServiceTagsTests : UmbracoIntegrationTest
         // Arrange
         // set configuration
         var dataType = DataTypeService.GetDataType(1041);
-        dataType.Configuration = new TagConfiguration { Group = "test", StorageType = TagsStorageType.Json };
+        dataType.ConfigurationData = dataType.Editor!.GetConfigurationEditor()
+            .FromConfigurationObject(
+                new TagConfiguration { Group = "test", StorageType = TagsStorageType.Json },
+                ConfigurationEditorJsonSerializer);
+
+        var configuration = dataType.ConfigurationObject as TagConfiguration;
+        Assert.NotNull(configuration);
+        Assert.AreEqual("test", configuration.Group);
+        Assert.AreEqual(TagsStorageType.Json, configuration.StorageType);
 
         // updating the data type with the new configuration
         DataTypeService.Save(dataType);
@@ -882,7 +903,7 @@ public class ContentServiceTagsTests : UmbracoIntegrationTest
 
         IContent content = ContentBuilder.CreateSimpleContent(contentType, "Tagged content");
         content.AssignTags(PropertyEditorCollection, DataTypeService, Serializer, "tags",
-            new[] { "hello,world,tags", "new"});
+            new[] { "hello,world,tags", "new" });
 
         ContentService.SaveAndPublish(content);
 

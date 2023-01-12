@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.AspNetCore.Mvc.Routing;
 using Microsoft.AspNetCore.Routing;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core;
@@ -13,6 +14,7 @@ using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Web;
+using Umbraco.Cms.Web.Common.DependencyInjection;
 using Umbraco.Cms.Web.Common.Routing;
 using Umbraco.Cms.Web.Common.Security;
 using Umbraco.Cms.Web.Website.Controllers;
@@ -46,8 +48,9 @@ public class UmbracoRouteValueTransformer : DynamicRouteValueTransformer
     private readonly IUmbracoRouteValuesFactory _routeValuesFactory;
     private readonly IRuntimeState _runtime;
     private readonly IUmbracoContextAccessor _umbracoContextAccessor;
+    private readonly IUmbracoVirtualPageRoute _umbracoVirtualPageRoute;
 
-    [Obsolete("Please use constructor that does not take IOptions<GlobalSettings>, IHostingEnvironment & IEventAggregator instead")]
+    [Obsolete("Please use constructor that is not obsolete, instead of this. This will be removed in Umbraco 13.")]
     public UmbracoRouteValueTransformer(
         ILogger<UmbracoRouteValueTransformer> logger,
         IUmbracoContextAccessor umbracoContextAccessor,
@@ -61,9 +64,25 @@ public class UmbracoRouteValueTransformer : DynamicRouteValueTransformer
         IControllerActionSearcher controllerActionSearcher,
         IEventAggregator eventAggregator,
         IPublicAccessRequestHandler publicAccessRequestHandler)
-    : this(logger, umbracoContextAccessor, publishedRouter, runtime, routeValuesFactory, routableDocumentFilter, dataProtectionProvider, controllerActionSearcher, publicAccessRequestHandler)
+    : this(logger, umbracoContextAccessor, publishedRouter, runtime, routeValuesFactory, routableDocumentFilter, dataProtectionProvider, controllerActionSearcher, publicAccessRequestHandler, StaticServiceProvider.Instance.GetRequiredService<IUmbracoVirtualPageRoute>())
     {
     }
+
+    [Obsolete("Please use constructor that is not obsolete, instead of this. This will be removed in Umbraco 13.")]
+    public UmbracoRouteValueTransformer(
+        ILogger<UmbracoRouteValueTransformer> logger,
+        IUmbracoContextAccessor umbracoContextAccessor,
+        IPublishedRouter publishedRouter,
+        IRuntimeState runtime,
+        IUmbracoRouteValuesFactory routeValuesFactory,
+        IRoutableDocumentFilter routableDocumentFilter,
+        IDataProtectionProvider dataProtectionProvider,
+        IControllerActionSearcher controllerActionSearcher,
+        IPublicAccessRequestHandler publicAccessRequestHandler)
+        : this(logger, umbracoContextAccessor, publishedRouter, runtime, routeValuesFactory, routableDocumentFilter, dataProtectionProvider, controllerActionSearcher, publicAccessRequestHandler, StaticServiceProvider.Instance.GetRequiredService<IUmbracoVirtualPageRoute>())
+    {
+    }
+
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="UmbracoRouteValueTransformer" /> class.
@@ -77,7 +96,8 @@ public class UmbracoRouteValueTransformer : DynamicRouteValueTransformer
         IRoutableDocumentFilter routableDocumentFilter,
         IDataProtectionProvider dataProtectionProvider,
         IControllerActionSearcher controllerActionSearcher,
-        IPublicAccessRequestHandler publicAccessRequestHandler)
+        IPublicAccessRequestHandler publicAccessRequestHandler,
+        IUmbracoVirtualPageRoute umbracoVirtualPageRoute)
     {
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         _umbracoContextAccessor =
@@ -90,15 +110,27 @@ public class UmbracoRouteValueTransformer : DynamicRouteValueTransformer
         _dataProtectionProvider = dataProtectionProvider;
         _controllerActionSearcher = controllerActionSearcher;
         _publicAccessRequestHandler = publicAccessRequestHandler;
+        _umbracoVirtualPageRoute = umbracoVirtualPageRoute;
     }
 
     /// <inheritdoc />
     public override async ValueTask<RouteValueDictionary> TransformAsync(
         HttpContext httpContext, RouteValueDictionary values)
     {
-        // If we aren't running, then we have nothing to route
-        if (_runtime.Level != RuntimeLevel.Run)
+        // If we aren't running, then we have nothing to route. We allow the frontend to continue while in upgrade mode.
+        if (_runtime.Level != RuntimeLevel.Run && _runtime.Level != RuntimeLevel.Upgrade)
         {
+            if (_runtime.Level == RuntimeLevel.Install)
+            {
+                return new RouteValueDictionary()
+                {
+                    //TODO figure out constants
+                    [ControllerToken] = "Install",
+                    [ActionToken] = "Index",
+                    [AreaToken] = Constants.Web.Mvc.InstallArea,
+                };
+            }
+
             return null!;
         }
 
@@ -147,6 +179,10 @@ public class UmbracoRouteValueTransformer : DynamicRouteValueTransformer
         PostedDataProxyInfo? postedInfo = GetFormInfo(httpContext, values);
         if (postedInfo != null)
         {
+            // Ensure the virtual page content and route values are setup when submitting to a surface controller
+            // If we don't do this, the virtual page controller never gets called after the surface controller completes
+            await _umbracoVirtualPageRoute.SetupVirtualPageRoute(httpContext);
+
             return HandlePostedValues(postedInfo, httpContext);
         }
 
@@ -159,6 +195,7 @@ public class UmbracoRouteValueTransformer : DynamicRouteValueTransformer
             // our default 404 page but we cannot return route values now because
             // it's possible that a developer is handling dynamic routes too.
             // Our 404 page will be handled with the NotFoundSelectorPolicy
+
             return null!;
         }
 

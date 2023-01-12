@@ -108,3 +108,5 @@ preserve.belle
 /tests/Umbraco.Tests.Integration/appsettings-schema.json
 /tests/Umbraco.Tests.Integration/appsettings-schema.*.json
 /src/Umbraco.Cms/appsettings-schema.json
+playwright-report
+trace.zip

@@ -4,5 +4,5 @@ namespace Umbraco.Cms.Core.Migrations;
 
 public interface IMigrationPlanExecutor
 {
-    string Execute(MigrationPlan plan, string fromState);
+    ExecutedMigrationPlan Execute(MigrationPlan plan, string fromState);
 }

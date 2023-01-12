@@ -1271,8 +1271,7 @@ namespace Umbraco.Cms.Infrastructure.Packaging
                     var configurationAttributeValue = dataTypeElement.Attribute("Configuration")?.Value;
                     if (!string.IsNullOrWhiteSpace(configurationAttributeValue))
                     {
-                        dataType.Configuration = editor.GetConfigurationEditor()
-                            .FromDatabase(configurationAttributeValue, _serializer);
+                        dataType.ConfigurationData = editor.GetConfigurationEditor().FromDatabase(configurationAttributeValue, _serializer);
                     }
 
                     dataTypes.Add(dataType);

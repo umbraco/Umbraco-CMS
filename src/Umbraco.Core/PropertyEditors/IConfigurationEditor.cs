@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using System.Runtime.Serialization;
 using Umbraco.Cms.Core.Serialization;
 
@@ -17,72 +18,68 @@ public interface IConfigurationEditor
     /// <summary>
     ///     Gets the default configuration.
     /// </summary>
-    /// <remarks>
-    ///     <para>
-    ///         For basic configuration editors, this will be a dictionary of key/values. For advanced editors
-    ///         which inherit from <see cref="ConfigurationEditor{TConfiguration}" />, this will be the dictionary
-    ///         equivalent of an actual configuration object (ie an instance of <c>TConfiguration</c>, obtained
-    ///         via <see cref="ToConfigurationEditor" />.
-    ///     </para>
-    /// </remarks>
     [DataMember(Name = "defaultConfig")]
     IDictionary<string, object> DefaultConfiguration { get; }
 
     /// <summary>
-    ///     Gets the default configuration object.
+    ///     Converts the configuration data to values for the configuration editor.
     /// </summary>
-    /// <remarks>
-    ///     <para>
-    ///         For basic configuration editors, this will be <see cref="DefaultConfiguration" />, ie a
-    ///         dictionary of key/values. For advanced editors which inherit from
-    ///         <see cref="ConfigurationEditor{TConfiguration}" />,
-    ///         this will be an actual configuration object (ie an instance of <c>TConfiguration</c>.
-    ///     </para>
-    /// </remarks>
-    object? DefaultConfigurationObject { get; }
+    /// <param name="configuration">The configuration data.</param>
+    IDictionary<string, object> ToConfigurationEditor(IDictionary<string, object> configuration);
 
     /// <summary>
-    ///     Determines whether a configuration object is of the type expected by the configuration editor.
-    /// </summary>
-    bool IsConfiguration(object obj);
-
-    // notes
-    // ToConfigurationEditor returns a dictionary, and FromConfigurationEditor accepts a dictionary.
-    // this is due to the way our front-end editors work, see DataTypeController.PostSave
-    // and DataTypeConfigurationFieldDisplayResolver - we are not going to change it now.
-
-    /// <summary>
-    ///     Converts the serialized database value into the actual configuration object.
+    ///     Converts values from the configuration editor to configuration data.
     /// </summary>
     /// <remarks>
-    ///     Converting the configuration object to the serialized database value is
-    ///     achieved by simply serializing the configuration. See <see cref="ConfigurationEditor.ToDatabase" />.
+    /// Consider this the reverse of <see cref="ToConfigurationEditor"/>.
     /// </remarks>
-    object FromDatabase(
-        string? configurationJson,
+    /// <param name="configuration">Values from the configuration editor.</param>
+    IDictionary<string, object> FromConfigurationEditor(IDictionary<string, object> configuration);
+
+    /// <summary>
+    ///     Converts the configuration data to values for the value editor.
+    /// </summary>
+    /// <param name="configuration">The configuration data.</param>
+    IDictionary<string, object> ToValueEditor(IDictionary<string, object> configuration);
+
+    /// <summary>
+    ///     Creates a configuration object from the configuration data.
+    /// </summary>
+    /// <param name="configuration">The configuration data.</param>
+    /// <param name="configurationEditorJsonSerializer">The configuration serializer.</param>
+    object ToConfigurationObject(
+        IDictionary<string, object> configuration,
         IConfigurationEditorJsonSerializer configurationEditorJsonSerializer);
 
     /// <summary>
-    ///     Converts the values posted by the configuration editor into the actual configuration object.
+    ///     Creates configuration data from a configuration object.
     /// </summary>
-    /// <param name="editorValues">The values posted by the configuration editor.</param>
-    /// <param name="configuration">The current configuration object.</param>
-    object? FromConfigurationEditor(IDictionary<string, object?>? editorValues, object? configuration);
+    /// <param name="configuration">The configuration object.</param>
+    /// <param name="configurationEditorJsonSerializer">The configuration serializer.</param>
+    IDictionary<string, object> FromConfigurationObject(
+        object configuration,
+        IConfigurationEditorJsonSerializer configurationEditorJsonSerializer);
 
     /// <summary>
-    ///     Converts the configuration object to values for the configuration editor.
+    ///     Converts configuration data into a serialized database value.
     /// </summary>
-    /// <param name="configuration">The configuration.</param>
-    [Obsolete("The value type parameter of the dictionary will be made nullable in V11, use ToConfigurationEditorNullable.")]
-    IDictionary<string, object> ToConfigurationEditor(object? configuration);
-
-    // TODO: Obsolete in V11.
-    IDictionary<string, object?> ToConfigurationEditorNullable(object? configuration) =>
-        ToConfigurationEditor(configuration)!;
+    string ToDatabase(
+        IDictionary<string, object> configuration,
+        IConfigurationEditorJsonSerializer configurationEditorJsonSerializer);
 
     /// <summary>
-    ///     Converts the configuration object to values for the value editor.
+    ///     Converts a serialized database value into configuration data.
     /// </summary>
-    /// <param name="configuration">The configuration.</param>
-    IDictionary<string, object>? ToValueEditor(object? configuration);
+    /// <param name="configuration">The serialized database value (JSON format).</param>
+    /// <param name="configurationEditorJsonSerializer">The configuration serializer.</param>
+    IDictionary<string, object> FromDatabase(
+        string? configuration,
+        IConfigurationEditorJsonSerializer configurationEditorJsonSerializer);
+
+    /// <summary>
+    ///     Performs validation of configuration data.
+    /// </summary>
+    /// <param name="configuration">The configuration data to validate.</param>
+    /// <returns>One or more <see cref="ValidationResult"/> if the configuration data is invalid, an empty collection otherwise.</returns>
+    IEnumerable<ValidationResult> Validate(IDictionary<string, object> configuration);
 }

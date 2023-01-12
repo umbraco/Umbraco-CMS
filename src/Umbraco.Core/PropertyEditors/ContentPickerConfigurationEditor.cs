@@ -17,17 +17,17 @@ internal class ContentPickerConfigurationEditor : ConfigurationEditor<ContentPic
         Field(nameof(ContentPickerConfiguration.StartNodeId))
             .Config = new Dictionary<string, object> { { "idType", "udi" } };
 
-    public override IDictionary<string, object> ToValueEditor(object? configuration)
+    public override IDictionary<string, object> ToValueEditor(IDictionary<string, object> configuration)
     {
         // get the configuration fields
-        IDictionary<string, object> d = base.ToValueEditor(configuration);
+        IDictionary<string, object> config = base.ToValueEditor(configuration);
 
         // add extra fields
         // not part of ContentPickerConfiguration but used to configure the UI editor
-        d["showEditButton"] = false;
-        d["showPathOnHover"] = false;
-        d["idType"] = "udi";
+        config["showEditButton"] = false;
+        config["showPathOnHover"] = false;
+        config["idType"] = "udi";
 
-        return d;
+        return config;
     }
 }

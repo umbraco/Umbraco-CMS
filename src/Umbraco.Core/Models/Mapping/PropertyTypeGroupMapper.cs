@@ -255,7 +255,7 @@ public class PropertyTypeGroupMapper<TPropertyType>
             }
 
             IDictionary<string, object>? config = propertyEditor is null || dataType is null ? new Dictionary<string, object>()
-                : dataType.Editor?.GetConfigurationEditor().ToConfigurationEditor(dataType.Configuration);
+                : dataType.Editor?.GetConfigurationEditor().ToConfigurationEditor(dataType.ConfigurationData);
 
             mappedProperties.Add(new TPropertyType
             {

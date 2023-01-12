@@ -41,25 +41,43 @@ public class NestedContentTests
 
         var dataType1 = new DataType(editor, serializer)
         {
-            Id = 1,
-            Configuration = new NestedContentConfiguration
-            {
-                MinItems = 1,
-                MaxItems = 1,
-                ContentTypes = new[] { new NestedContentConfiguration.ContentType { Alias = "contentN1" } },
-            },
+            Id = 1
         };
+        dataType1.ConfigurationData = dataType1.Editor!.GetConfigurationEditor()
+            .FromConfigurationObject(
+                new NestedContentConfiguration
+                {
+                    MinItems = 1,
+                    MaxItems = 1,
+                    ContentTypes = new[] { new NestedContentConfiguration.ContentType { Alias = "contentN1" } },
+                },
+                serializer);
+        var configuration = dataType1.ConfigurationObject as NestedContentConfiguration;
+        Assert.NotNull(configuration);
+        Assert.AreEqual(1, configuration.MinItems);
+        Assert.AreEqual(1, configuration.MaxItems);
+        Assert.AreEqual(1, configuration.ContentTypes!.Length);
+        Assert.AreEqual("contentN1", configuration.ContentTypes.First().Alias);
 
         var dataType2 = new DataType(editor, serializer)
         {
-            Id = 2,
-            Configuration = new NestedContentConfiguration
-            {
-                MinItems = 1,
-                MaxItems = 99,
-                ContentTypes = new[] { new NestedContentConfiguration.ContentType { Alias = "contentN1" } },
-            },
+            Id = 2
         };
+        dataType2.ConfigurationData = dataType2.Editor!.GetConfigurationEditor()
+            .FromConfigurationObject(
+                new NestedContentConfiguration
+                {
+                    MinItems = 1,
+                    MaxItems = 99,
+                    ContentTypes = new[] { new NestedContentConfiguration.ContentType { Alias = "contentN1" } },
+                },
+                serializer);
+        configuration = dataType2.ConfigurationObject as NestedContentConfiguration;
+        Assert.NotNull(configuration);
+        Assert.AreEqual(1, configuration.MinItems);
+        Assert.AreEqual(99, configuration.MaxItems);
+        Assert.AreEqual(1, configuration.ContentTypes!.Length);
+        Assert.AreEqual("contentN1", configuration.ContentTypes.First().Alias);
 
         var dataType3 =
             new DataType(
