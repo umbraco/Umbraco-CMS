@@ -95,7 +95,8 @@ public class RuntimeState : IRuntimeState
             packageMigrationState,
             conflictingRouteService,
             databaseProviderMetadata,
-            StaticServiceProvider.Instance.GetRequiredService<IRuntimeModeValidationService>())
+            StaticServiceProvider.Instance.GetRequiredService<IRuntimeModeValidationService>(),
+            StaticServiceProvider.Instance.GetRequiredService<IDatabaseInfo>())
     { }
 
     [Obsolete("Use ctor with all params. This will be removed in Umbraco 12.")]
