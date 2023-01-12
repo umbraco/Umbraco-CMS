@@ -6,6 +6,10 @@ import { UmbControllerHostInterface } from 'src/core/controller/controller-host.
 
 export class UmbContextConsumerController extends UmbContextConsumer<UmbControllerHostInterface> implements UmbControllerInterface {
 
+	public get unique() {
+		return this._contextAlias;
+	}
+
 	constructor(host:UmbControllerHostInterface, contextAlias: string, callback: UmbContextCallback) {
 		super(host, contextAlias, callback);
 		host.addController(this);
