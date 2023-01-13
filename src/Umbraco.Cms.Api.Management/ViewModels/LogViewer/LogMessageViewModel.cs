@@ -1,4 +1,4 @@
-using Serilog.Events;
+using LogLevel = Umbraco.Cms.Core.Logging.LogLevel;
 
 namespace Umbraco.Cms.Api.Management.ViewModels.LogViewer;
 
@@ -12,7 +12,7 @@ public class LogMessageViewModel
     /// <summary>
     ///     Gets or sets the level of the event.
     /// </summary>
-    public LogEventLevel Level { get; set; }
+    public LogLevel Level { get; set; }
 
     /// <summary>
     ///     Gets or sets the message template describing the log event (can be null).
