@@ -10,7 +10,6 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_13_0_0;
 public class AddGuidsToUserGroups : UnscopedMigrationBase
 {
     private readonly IScopeProvider _scopeProvider;
-    private const string OldTableName = $"{Constants.DatabaseSchema.Tables.UserGroup}UmbracoThirteenZeroGuid";
 
     public AddGuidsToUserGroups(IMigrationContext context, IScopeProvider scopeProvider) : base(context)
     {
@@ -67,30 +66,6 @@ public class AddGuidsToUserGroups : UnscopedMigrationBase
 
     private void MigrateColumnSqlite()
     {
-        // Rename the table to something that's unlikely to conflict with custom tables
-        Rename
-            .Table(Constants.DatabaseSchema.Tables.UserGroup)
-            .To(OldTableName)
-            .Do();
-
-        // GetDefinedIndexes returns indexes as a tuple (TableName, IndexName, ColumnName, IsUnique)
-        IEnumerable<string> indexNames = SqlSyntax.GetDefinedIndexes(Database)
-            .Where(x => x.Item1 == OldTableName)
-            .Select(x => x.Item2);
-
-        // We have to delete the existing indexes to be able to recreate the table since that also creates the indexes.
-        foreach (var indexName in indexNames)
-        {
-            Delete
-                .Index(indexName)
-                .OnTable(OldTableName)
-                .Do();
-        }
-
-        // Now we can create the table again with all the right columns and then migrate the data
-        Create.Table<UserGroupDto>().Do();
-
-        // SQLite doesn't really seem to support defaulting to a random GUID, so we'll have to fetch all and then re-save.
         IEnumerable<UserGroupDto> groups = Database.Fetch<OldUserGroupDto>().Select(x => new UserGroupDto
         {
             Id = x.Id,
@@ -108,17 +83,21 @@ public class AddGuidsToUserGroups : UnscopedMigrationBase
             UserGroup2LanguageDtos = x.UserGroup2LanguageDtos
         });
 
+        // I realize that this may seem a bit drastic,
+        // however, since SQLite cannot generate GUIDS we have to load all the user groups into memory to generate it
+        // So instead of going through the trouble of creating a new table, copying over data, and then deleting
+        // We can just drop the table directly and re-create it to add the new column.
+        Delete.Table(Constants.DatabaseSchema.Tables.UserGroup).Do();
+        Create.Table<UserGroupDto>().Do();
+
         // We have to insert one at a time to be able to not auto increment id
         foreach (UserGroupDto group in groups)
         {
             Database.Insert(Constants.DatabaseSchema.Tables.UserGroup, "id", false, group);
         }
-
-        // Finally we can remove the old table.
-        Delete.Table(OldTableName).Do();
     }
 
-    [TableName(OldTableName)]
+    [TableName(Constants.DatabaseSchema.Tables.UserGroup)]
     [PrimaryKey("id")]
     [ExplicitColumns]
     private class OldUserGroupDto
