@@ -23,7 +23,6 @@ export class UmbPropertyEditorUIContentPickerElement extends UmbLitElement {
 		return this._value;
 	}
 	public set value(value: Array<string>) {
-		console.log("property editor got value", value)
 			this._value = value || [];
 	}
 
