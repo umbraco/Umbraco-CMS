@@ -5,8 +5,7 @@ import { css } from 'lit';
 import { map } from 'rxjs';
 import { repeat } from 'lit/directives/repeat.js';
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
-import { createExtensionElement } from '@umbraco-cms/extensions-api';
-import { isManifestElementableType } from 'src/core/extensions-api/is-manifest-elementable-type.function';
+import { createExtensionElement, isManifestElementableType } from '@umbraco-cms/extensions-api';
 import { UmbLitElement } from '@umbraco-cms/element';
 
 export type InitializedExtension = { alias: string; weight: number; component: HTMLElement | null };

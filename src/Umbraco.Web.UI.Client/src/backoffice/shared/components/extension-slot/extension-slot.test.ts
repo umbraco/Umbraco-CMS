@@ -9,6 +9,10 @@ class MyExtensionSlotManifestElement extends HTMLElement {
 
 }
 
+function sleep(ms: number) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
 describe('UmbExtensionSlotElement', () => {
 
 
@@ -74,7 +78,9 @@ describe('UmbExtensionSlotElement', () => {
 				html`<umb-extension-slot type='dashboard' .filter=${(x: ManifestDashboard) => x.alias === 'unit-test-ext-slot-element-manifest'}></umb-extension-slot>`
 			);
 
-			expect(element.firstChild).to.be.instanceOf(MyExtensionSlotManifestElement);
+      await sleep(0);
+
+			expect(element.shadowRoot!.firstElementChild).to.be.instanceOf(MyExtensionSlotManifestElement);
 		});
 
 		it('use the render method', async () => {
@@ -88,8 +94,10 @@ describe('UmbExtensionSlotElement', () => {
 						</umb-extension-slot>`
 			);
 
-			expect(element.firstChild?.nodeName).to.be.equal('bla');
-			expect(element.firstChild?.firstChild).to.be.instanceOf(MyExtensionSlotManifestElement);
+      await sleep(0);
+
+			expect(element.shadowRoot!.firstElementChild?.nodeName).to.be.equal('BLA');
+			expect(element.shadowRoot!.firstElementChild?.firstElementChild).to.be.instanceOf(MyExtensionSlotManifestElement);
 		});
 	});
 
