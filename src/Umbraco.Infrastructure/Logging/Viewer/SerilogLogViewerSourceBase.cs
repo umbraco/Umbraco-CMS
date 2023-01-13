@@ -3,6 +3,7 @@ using Serilog;
 using Serilog.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Extensions;
+using Umbraco.New.Cms.Core.Models;
 
 namespace Umbraco.Cms.Core.Logging.Viewer;
 
@@ -119,6 +120,64 @@ public abstract class SerilogLogViewerSourceBase : ILogViewer
             });
 
         return new PagedResult<LogMessage>(totalRecords, pageNumber, pageSize) { Items = logMessages };
+    }
+
+    public PagedModel<LogMessage> GetLogsAsPagedModel(
+        LogTimePeriod logTimePeriod,
+        int skip,
+        int take,
+        Direction orderDirection = Direction.Descending,
+        string? filterExpression = null,
+        string[]? logLevels = null)
+    {
+        var expression = new ExpressionFilter(filterExpression);
+        IReadOnlyList<LogEvent> filteredLogs = GetLogs(logTimePeriod, expression, 0, int.MaxValue);
+
+        // This is user used the checkbox UI to toggle which log levels they wish to see
+        // If an empty array or null - its implied all levels to be viewed
+        if (logLevels?.Length > 0)
+        {
+            var logsAfterLevelFilters = new List<LogEvent>();
+            var validLogType = true;
+            foreach (var level in logLevels)
+            {
+                // Check if level string is part of the LogEventLevel enum
+                if (Enum.IsDefined(typeof(LogEventLevel), level))
+                {
+                    validLogType = true;
+                    logsAfterLevelFilters.AddRange(filteredLogs.Where(x =>
+                        string.Equals(x.Level.ToString(), level, StringComparison.InvariantCultureIgnoreCase)));
+                }
+                else
+                {
+                    validLogType = false;
+                }
+            }
+
+            if (validLogType)
+            {
+                filteredLogs = logsAfterLevelFilters;
+            }
+        }
+
+        long totalRecords = filteredLogs.Count;
+
+        // Order By, Skip, Take & Select
+        IEnumerable<LogMessage> logMessages = filteredLogs
+            .OrderBy(l => l.Timestamp, orderDirection)
+            .Skip(skip)
+            .Take(take)
+            .Select(x => new LogMessage
+            {
+                Timestamp = x.Timestamp,
+                Level = x.Level,
+                MessageTemplateText = x.MessageTemplate.Text,
+                Exception = x.Exception?.ToString(),
+                Properties = x.Properties,
+                RenderedMessage = x.RenderMessage(),
+            });
+
+        return new PagedModel<LogMessage>(logMessages.Count(), logMessages);
     }
 
     /// <summary>

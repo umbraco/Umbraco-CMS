@@ -1,4 +1,5 @@
 using Umbraco.Cms.Core.Models;
+using Umbraco.New.Cms.Core.Models;
 
 namespace Umbraco.Cms.Core.Logging.Viewer;
 
@@ -54,6 +55,14 @@ public interface ILogViewer
         LogTimePeriod logTimePeriod,
         int pageNumber = 1,
         int pageSize = 100,
+        Direction orderDirection = Direction.Descending,
+        string? filterExpression = null,
+        string[]? logLevels = null);
+
+    PagedModel<LogMessage> GetLogsAsPagedModel(
+        LogTimePeriod logTimePeriod,
+        int skip,
+        int take,
         Direction orderDirection = Direction.Descending,
         string? filterExpression = null,
         string[]? logLevels = null);
