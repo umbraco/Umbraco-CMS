@@ -87,9 +87,9 @@ export class UmbCollectionViewMediaTableElement extends UmbLitElement {
 		});
 	}
 
-	private _createTableItems(mediaItems: Array<MediaDetails>) {
-		// TODO: I guess the type error below will go away when we get an entity based MediaDetails model instead of tree based.
-		// @ts-ignore // TODO: Remove ts-ignore when Media type gets fixed.
+	private _createTableItems(mediaItems: Array<any>) {
+		// TODO: this should use the MediaDetails type, but for now that results in type errors.
+		// TODO: I guess the type error will go away when we get an entity based MediaDetails model instead of tree based.
 		this._tableItems = mediaItems.map((item) => {
 			return {
 				key: item.key,
