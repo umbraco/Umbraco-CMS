@@ -219,9 +219,6 @@ public abstract class UmbracoIntegrationTestBase
     private void CreateDatabaseWithoutSchema(IUmbracoDatabaseFactory umbracoDatabaseFactory, IDatabaseSchemaCreatorFactory databaseSchemaCreatorFactory)
     {
         BaseTestDatabase = umbracoDatabaseFactory.CreateDatabase();
-        BaseTestDatabase.BeginTransaction();
-        databaseSchemaCreatorFactory.Create(BaseTestDatabase);
-        BaseTestDatabase.CompleteTransaction();
     }
 
     private void ConfigureDatabase(UmbracoTestDatabaseConfigurationFactory testDatabaseConfigurationFactory, IOptionsMonitor<ConnectionStrings> connectionStrings, IUmbracoDatabaseFactory databaseFactory)
