@@ -5,6 +5,7 @@ import { importMapsPlugin } from '@web/dev-server-import-maps';
 export default {
 	nodeResolve: true,
 	files: 'src/**/*.test.ts',
+	browserStartTimeout: 4000,
 	plugins: [
 		esbuildPlugin({ ts: true, target: 'auto', json: true }),
 		importMapsPlugin({
