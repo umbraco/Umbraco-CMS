@@ -64,7 +64,7 @@
 		"@umbraco-ui/uui-modal-dialog": "file:umbraco-ui-uui-modal-dialog-0.0.0.tgz",
 		"@umbraco-ui/uui-modal-sidebar": "file:umbraco-ui-uui-modal-sidebar-0.0.0.tgz",
 		"element-internals-polyfill": "^1.1.18",
-		"lit": "^2.6.0",
+		"lit": "^2.6.1",
 		"lodash": "^4.17.21",
 		"router-slot": "^1.5.5",
 		"rxjs": "^7.8.0",
