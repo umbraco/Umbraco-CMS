@@ -48,8 +48,6 @@ export class UmbPropertyEditorUIContentPickerElement extends UmbLitElement {
 
 
 	// TODO: Implement mandatory?
-
-
 	render() {
 		return html`
 			<umb-input-document-picker
