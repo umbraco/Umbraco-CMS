@@ -26,9 +26,7 @@ export class UmbPropertyEditorUIContentPickerElement extends UmbLitElement {
 			this._value = value || [];
 	}
 
-	// TODO: Use config for something.
 	@property({ type: Array, attribute: false })
-
 	public set config(config: Array<DataTypePropertyData>) {
 		const validationLimit = config.find(x => x.alias === 'validationLimit');
 
