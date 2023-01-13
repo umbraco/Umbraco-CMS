@@ -2081,55 +2081,6 @@
         }
       }
     },
-    "/umbraco/management/api/v1/log-viewer/error/count": {
-      "get": {
-        "tags": [
-          "Log Viewer"
-        ],
-        "operationId": "GetLogViewerErrorCount",
-        "parameters": [
-          {
-            "name": "startDate",
-            "in": "query",
-            "schema": {
-              "type": "string",
-              "format": "date-time"
-            }
-          },
-          {
-            "name": "endDate",
-            "in": "query",
-            "schema": {
-              "type": "string",
-              "format": "date-time"
-            }
-          }
-        ],
-        "responses": {
-          "400": {
-            "description": "Bad Request",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          },
-          "200": {
-            "description": "Success",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "integer",
-                  "format": "int32"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
     "/umbraco/management/api/v1/log-viewer/level": {
       "get": {
         "tags": [
@@ -2170,7 +2121,7 @@
         }
       }
     },
-    "/umbraco/management/api/v1/log-viewer/level/count": {
+    "/umbraco/management/api/v1/log-viewer/level-count": {
       "get": {
         "tags": [
           "Log Viewer"
@@ -2247,8 +2198,7 @@
             "name": "orderDirection",
             "in": "query",
             "schema": {
-              "type": "string",
-              "default": "Descending"
+              "$ref": "#/components/schemas/Direction"
             }
           },
           {
@@ -5573,6 +5523,14 @@
         },
         "additionalProperties": false
       },
+      "Direction": {
+        "enum": [
+          "Ascending",
+          "Descending"
+        ],
+        "type": "integer",
+        "format": "int32"
+      },
       "DocumentBlueprintTreeItem": {
         "type": "object",
         "properties": {
@@ -6391,7 +6349,7 @@
         "type": "integer",
         "format": "int32"
       },
-      "LogEventLevel": {
+      "LogLevel": {
         "enum": [
           "Verbose",
           "Debug",
@@ -6437,7 +6395,7 @@
             "format": "date-time"
           },
           "level": {
-            "$ref": "#/components/schemas/LogEventLevel"
+            "$ref": "#/components/schemas/LogLevel"
           },
           "messageTemplate": {
             "type": "string",
@@ -6497,7 +6455,7 @@
             "nullable": true
           },
           "level": {
-            "$ref": "#/components/schemas/LogEventLevel"
+            "$ref": "#/components/schemas/LogLevel"
           }
         },
         "additionalProperties": false
