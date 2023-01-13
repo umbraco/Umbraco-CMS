@@ -14,7 +14,7 @@ import type { UserDetails } from '@umbraco-cms/models';
 
 import { UmbModalService } from 'src/core/modal';
 
-import 'src/auth/components/input-user-group/input-user-group.element';
+import '../../../../auth/components/input-user-group/input-user-group.element';
 import '../../../shared/property-editors/uis/content-picker/property-editor-ui-document-picker.element';
 import '../../../shared/components/workspace/workspace-layout/workspace-layout.element';
 import { UmbLitElement } from '@umbraco-cms/element';

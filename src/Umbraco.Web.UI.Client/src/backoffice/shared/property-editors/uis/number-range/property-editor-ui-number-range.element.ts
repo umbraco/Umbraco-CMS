@@ -1,8 +1,8 @@
 import { html, LitElement } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, property, state } from 'lit/decorators.js';
-import type {UmbInputNumberRangeElement} from 'src/backoffice/shared/components/input-number-range/input-number-range.element';
-import 'src/backoffice/shared/components/input-number-range/input-number-range.element';
+import type {UmbInputNumberRangeElement} from '../../../../shared/components/input-number-range/input-number-range.element';
+import '../../../../shared/components/input-number-range/input-number-range.element';
 
 type ValueType = {
 	min?: number;
