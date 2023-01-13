@@ -93,17 +93,20 @@ export class UmbCollectionViewMediaTableElement extends UmbLitElement {
 				],
 			};
 		});
-		console.log('NAME??', this._tableColumns);
 	}
 
-	private _handleSelected(event: UmbTableSelectedEvent) {
+	private _handleSelect(event: UmbTableSelectedEvent) {
 		event.stopPropagation();
-		console.log('HANDLE SELECT');
+		const table = event.target as UmbTableElement;
+		const selection = table.selection;
+		this._collectionContext?.setSelection(selection);
 	}
 
-	private _handleDeselected(event: UmbTableDeselectedEvent) {
+	private _handleDeselect(event: UmbTableDeselectedEvent) {
 		event.stopPropagation();
-		console.log('HANDLE DESELECT');
+		const table = event.target as UmbTableElement;
+		const selection = table.selection;
+		this._collectionContext?.setSelection(selection);
 	}
 
 	private _handleOrdering(event: UmbTableOrderedEvent) {
@@ -120,8 +123,8 @@ export class UmbCollectionViewMediaTableElement extends UmbLitElement {
 				.columns=${this._tableColumns}
 				.items=${this._tableItems}
 				.selection=${this._selection}
-				@selected="${this._handleSelected}"
-				@deselected="${this._handleDeselected}"
+				@selected="${this._handleSelect}"
+				@deselected="${this._handleDeselect}"
 				@ordered="${this._handleOrdering}"></umb-table>
 		`;
 	}
