@@ -24,6 +24,8 @@ import { manifest as blockGrid } from './Umbraco.BlockGrid';
 import { manifest as tinyMCE } from './Umbraco.TinyMCE';
 import { manifest as listView } from './Umbraco.ListView';
 import { manifest as label } from './Umbraco.Label';
+import { manifest as integer } from './Umbraco.Integer';
+import { manifest as decimal } from './Umbraco.Decimal';
 
 import type { ManifestPropertyEditorModel } from '@umbraco-cms/models';
 
@@ -54,24 +56,8 @@ export const manifests: Array<ManifestPropertyEditorModel> = [
 	tinyMCE,
 	listView,
 	label,
-	{
-		type: 'propertyEditorModel',
-		name: 'Decimal',
-		alias: 'Umbraco.Decimal',
-		meta: {},
-	},
-	{
-		type: 'propertyEditorModel',
-		name: 'Label',
-		alias: 'Umbraco.Label',
-		meta: {},
-	},
-	{
-		type: 'propertyEditorModel',
-		name: 'Numeric',
-		alias: 'Umbraco.Integer',
-		meta: {},
-	},
+	integer,
+	decimal,
 	{
 		type: 'propertyEditorModel',
 		name: 'Member Group Picker',

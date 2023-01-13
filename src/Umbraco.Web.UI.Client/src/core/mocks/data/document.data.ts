@@ -174,6 +174,18 @@ export const data: Array<DocumentDetails> = [
 				description: '',
 				dataTypeKey: 'dt-label',
 			},
+			{
+				alias: 'integer',
+				label: 'Integer',
+				description: '',
+				dataTypeKey: 'dt-integer',
+			},
+			{
+				alias: 'decimal',
+				label: 'Decimal',
+				description: '',
+				dataTypeKey: 'dt-decimal',
+			},
 		],
 		data: [],
 		variants: [],

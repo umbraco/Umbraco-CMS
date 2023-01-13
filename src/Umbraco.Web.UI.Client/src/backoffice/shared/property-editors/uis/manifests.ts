@@ -28,6 +28,7 @@ import { manifests as tinyMCE } from './tiny-mce/manifests';
 import { manifest as iconPicker } from './icon-picker/manifests';
 import { manifest as label } from './label/manifests';
 import { manifest as valueType } from './value-type/manifests';
+import { manifests as numbers } from './number/manifests';
 import type { ManifestPropertyEditorUI } from '@umbraco-cms/models';
 
 export const manifests: Array<ManifestPropertyEditorUI> = [
@@ -54,6 +55,7 @@ export const manifests: Array<ManifestPropertyEditorUI> = [
 	iconPicker,
 	label,
 	valueType,
+	...numbers,
 	...textBoxes,
 	...treePicker,
 	...blockList,

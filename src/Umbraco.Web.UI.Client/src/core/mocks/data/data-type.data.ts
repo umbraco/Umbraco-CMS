@@ -447,6 +447,32 @@ export const data: Array<DataTypeDetails> = [
 		propertyEditorUIAlias: 'Umb.PropertyEditorUI.Label',
 		data: [],
 	},
+	{
+		name: 'Integer',
+		type: 'data-type',
+		icon: 'umb:autofill',
+		hasChildren: false,
+		key: 'dt-integer',
+		isContainer: false,
+		parentKey: null,
+		isFolder: false,
+		propertyEditorModelAlias: 'Umbraco.Integer',
+		propertyEditorUIAlias: 'Umb.PropertyEditorUI.Integer',
+		data: [],
+	},
+	{
+		name: 'Decimal',
+		type: 'data-type',
+		icon: 'umb:autofill',
+		hasChildren: false,
+		key: 'dt-decimal',
+		isContainer: false,
+		parentKey: null,
+		isFolder: false,
+		propertyEditorModelAlias: 'Umbraco.Decimal',
+		propertyEditorUIAlias: 'Umb.PropertyEditorUI.Decimal',
+		data: [],
+	},
 ];
 
 // Temp mocked database
