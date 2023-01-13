@@ -11,7 +11,7 @@ import { manifest as multipleTextString } from './multiple-text-string/manifests
 import { manifest as textArea } from './textarea/manifests';
 import { manifest as slider } from './slider/manifests';
 import { manifest as toggle } from './toggle/manifests';
-import { manifest as tags } from './tags/manifests';
+import { manifests as tags } from './tags/manifests';
 import { manifest as markdownEditor } from './markdown-editor/manifests';
 import { manifest as radioButtonList } from './radio-button-list/manifests';
 import { manifest as checkboxList } from './checkbox-list/manifests';
@@ -42,7 +42,6 @@ export const manifests: Array<ManifestPropertyEditorUI> = [
 	textArea,
 	slider,
 	toggle,
-	tags,
 	markdownEditor,
 	radioButtonList,
 	checkboxList,
@@ -61,6 +60,7 @@ export const manifests: Array<ManifestPropertyEditorUI> = [
 	...blockGrid,
 	...collectionView,
 	...tinyMCE,
+	...tags,
 	{
 		type: 'propertyEditorUI',
 		alias: 'Umb.PropertyEditorUI.Number',
