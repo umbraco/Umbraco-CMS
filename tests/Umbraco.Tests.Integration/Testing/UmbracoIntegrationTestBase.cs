@@ -29,7 +29,6 @@ public abstract class UmbracoIntegrationTestBase
     private readonly List<Action> _fixtureTeardown = new();
 
     private bool _firstTestInFixture = true;
-    private TestDatabaseFactory _testDatabaseFactory;
 
     protected IUmbracoDatabase BaseTestDatabase { get; set; }
     protected Dictionary<string, string> InMemoryConfiguration { get; } = new();
@@ -123,13 +122,6 @@ public abstract class UmbracoIntegrationTestBase
         var databaseSchemaCreatorFactory = serviceProvider.GetRequiredService<IDatabaseSchemaCreatorFactory>();
         var databaseDataCreator = serviceProvider.GetRequiredService<IDatabaseDataCreator>();
         var testDatabaseFactory = serviceProvider.GetRequiredService<UmbracoTestDatabaseConfigurationFactory>();
-        
-        var testDatabaseFactoryProvider = serviceProvider.GetRequiredService<TestUmbracoDatabaseFactoryProvider>();
-
-        if (_testDatabaseFactory is null)
-        {
-            _testDatabaseFactory = new TestDatabaseFactory(testDatabaseFactoryProvider, databaseSchemaCreatorFactory, databaseDataCreator, connectionStrings);
-        }
 
         // This will create a db, install the schema and ensure the app is configured to run
         SetupTestDatabase(connectionStrings, umbracoDatabaseFactory, state, databaseSchemaCreatorFactory, databaseDataCreator, testDatabaseFactory);
@@ -152,13 +144,10 @@ public abstract class UmbracoIntegrationTestBase
         {
             case UmbracoTestOptions.Database.NewSchemaPerTest:
 
-                var umbracoMeta = _testDatabaseFactory.InitializeWithSchema();
-                s_connectionStrings = umbracoMeta.ConnectionStrings;
-                _fixtureTeardown.Add(() => _testDatabaseFactory.Teardown(umbracoMeta.Key));
-                connectionStrings.CurrentValue.ConnectionString = s_connectionStrings.ConnectionString;
-                connectionStrings.CurrentValue.ProviderName = s_connectionStrings.ProviderName;
-                databaseFactory.Configure(s_connectionStrings);
-                BaseTestDatabase = databaseFactory.CreateDatabase();
+                ConfigureDatabase(testDatabaseConfigurationFactory, connectionStrings, databaseFactory);
+
+                CreateDatabaseWithSchema(databaseFactory, databaseSchemaCreatorFactory);
+                databaseDataCreator.SeedDataAsync().GetAwaiter().GetResult();
 
                 runtimeState.DetermineRuntimeLevel();
 
