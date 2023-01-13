@@ -1,6 +1,6 @@
 import { UmbWorkspaceContentContext } from '../../../shared/components/workspace/workspace-content/workspace-content.context';
-import { isDocumentDetails, STORE_ALIAS as DOCUMENT_STORE_ALIAS } from 'src/backoffice/documents/documents/document.store';
-import type { UmbDocumentStore, UmbDocumentStoreItemType } from 'src/backoffice/documents/documents/document.store';
+import { isDocumentDetails, STORE_ALIAS as DOCUMENT_STORE_ALIAS } from '../../../documents/documents/document.store';
+import type { UmbDocumentStore, UmbDocumentStoreItemType } from '../../../documents/documents/document.store';
 import type { UmbControllerHostInterface } from 'src/core/controller/controller-host.mixin';
 import type { DocumentDetails } from '@umbraco-cms/models';
 import { appendToFrozenArray } from '@umbraco-cms/observable-api';
