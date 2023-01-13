@@ -47,6 +47,14 @@ export class UmbCollectionViewMediaTableElement extends UmbLitElement {
 			name: 'Name',
 			alias: 'mediaName',
 		},
+		{
+			name: 'Last edited',
+			alias: 'mediaLastEdited',
+		},
+		{
+			name: 'Created by',
+			alias: 'mediaCreatedBy',
+		},
 	];
 
 	@state()
@@ -89,6 +97,14 @@ export class UmbCollectionViewMediaTableElement extends UmbLitElement {
 					{
 						columnAlias: 'mediaName',
 						value: item.name || 'Untitled',
+					},
+					{
+						columnAlias: 'mediaLastEdited',
+						value: 'not implemented',
+					},
+					{
+						columnAlias: 'mediaCreatedBy',
+						value: 'not implemented',
 					},
 				],
 			};
