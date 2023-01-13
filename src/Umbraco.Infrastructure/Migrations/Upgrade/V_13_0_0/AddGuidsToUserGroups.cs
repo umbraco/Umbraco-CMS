@@ -9,6 +9,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_13_0_0;
 
 public class AddGuidsToUserGroups : UnscopedMigrationBase
 {
+    private const string NewColumnName = "uniqueId";
     private readonly IScopeProvider _scopeProvider;
 
     public AddGuidsToUserGroups(IMigrationContext context, IScopeProvider scopeProvider) : base(context)
@@ -36,7 +37,7 @@ public class AddGuidsToUserGroups : UnscopedMigrationBase
         ScopeDatabase(scope);
 
         var columns = SqlSyntax.GetColumnsInSchema(Context.Database).ToList();
-        AddColumnIfNotExists<UserGroupDto>(columns, "uniqueId");
+        AddColumnIfNotExists<UserGroupDto>(columns, NewColumnName);
         scope.Complete();
     }
 
@@ -44,6 +45,13 @@ public class AddGuidsToUserGroups : UnscopedMigrationBase
     {
         using IScope scope = _scopeProvider.CreateScope();
         using IDisposable notificationSuppression = scope.Notifications.Suppress();
+        ScopeDatabase(scope);
+
+        // If the new column already exists we'll do nothing.
+        if (ColumnExists(Constants.DatabaseSchema.Tables.UserGroup, NewColumnName))
+        {
+            return;
+        }
 
         // This isn't pretty,
         // But since you cannot alter columns, we have to copy the data over and delete the old table.
@@ -52,7 +60,6 @@ public class AddGuidsToUserGroups : UnscopedMigrationBase
         // but in the same connection, since foreign keys will default to ON next time we open a connection
         // This means we have to just execute the DB command to end the transaction,
         // instead of using CompleteTransaction since this will end the connection.
-        ScopeDatabase(scope);
         Database.Execute("COMMIT;");
 
         // We don't have to worry about re-enabling this since it happens automatically.
