@@ -5,14 +5,12 @@ import { importMapsPlugin } from '@web/dev-server-import-maps';
 export default {
 	nodeResolve: true,
 	files: 'src/**/*.test.ts',
-	browserStartTimeout: 4000,
 	plugins: [
 		esbuildPlugin({ ts: true, target: 'auto', json: true }),
 		importMapsPlugin({
 			inject: {
 				importMap: {
 					imports: {
-						'src/': './src/',
 						'@umbraco-cms/models': './src/core/models/index.ts',
 						'@umbraco-cms/backend-api': './src/core/backend-api/index.ts',
 						'@umbraco-cms/context-api': './src/core/context-api/index.ts',
