@@ -1,7 +1,7 @@
 import { map, Observable } from 'rxjs';
 import { UmbDataStoreBase } from '../../../core/stores/store';
 import type { UserDetails } from '@umbraco-cms/models';
-import { UniqueBehaviorSubject } from 'src/core/observable-api/unique-behavior-subject';
+import { UniqueBehaviorSubject } from '@umbraco-cms/observable-api';
 
 export type UmbUserStoreItemType = UserDetails;
 

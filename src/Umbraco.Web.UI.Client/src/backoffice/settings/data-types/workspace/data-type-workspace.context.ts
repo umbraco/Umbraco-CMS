@@ -2,7 +2,7 @@ import { UmbWorkspaceContentContext } from '../../../shared/components/workspace
 import type { UmbDataTypeStore, UmbDataTypeStoreItemType } from 'src/backoffice/settings/data-types/data-type.store';
 import type { DataTypeDetails } from '@umbraco-cms/models';
 import { UmbControllerHostInterface } from 'src/core/controller/controller-host.mixin';
-import { appendToFrozenArray } from 'src/core/observable-api/unique-behavior-subject';
+import { appendToFrozenArray } from '@umbraco-cms/observable-api';
 
 const DefaultDataTypeData = {
 	key: '',

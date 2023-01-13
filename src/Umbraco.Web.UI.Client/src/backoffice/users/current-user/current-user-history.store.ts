@@ -1,4 +1,4 @@
-import { createObservablePart, UniqueBehaviorSubject } from 'src/core/observable-api/unique-behavior-subject';
+import { createObservablePart, UniqueBehaviorSubject } from '@umbraco-cms/observable-api';
 
 export type UmbModelType = 'dialog' | 'sidebar';
 
