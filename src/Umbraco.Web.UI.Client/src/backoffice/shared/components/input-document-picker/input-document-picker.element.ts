@@ -85,7 +85,6 @@ export class UmbInputDocumentPickerElement extends FormControlMixin(UmbLitElemen
 	constructor() {
 		super();
 
-		// TODO: Figure out why validator does not work. + Look into implementing the Validation message UUI part.
 		this.addValidator(
 			'rangeUnderflow',
 			() => this.minMessage,
