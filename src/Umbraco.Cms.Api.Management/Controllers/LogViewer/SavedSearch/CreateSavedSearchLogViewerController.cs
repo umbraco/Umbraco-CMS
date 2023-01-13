@@ -1,17 +1,15 @@
-using System.Data;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Management.ViewModels.LogViewer;
-using Umbraco.Cms.Core.Logging.Viewer;
+using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Api.Management.Controllers.LogViewer.SavedSearch;
 
 public class CreateSavedSearchLogViewerController : SavedSearchLogViewerControllerBase
 {
-    private readonly ILogViewer _logViewer;
+    private readonly ILogViewerService _logViewerService;
 
-    public CreateSavedSearchLogViewerController(ILogViewer logViewer)
-        : base(logViewer) => _logViewer = logViewer;
+    public CreateSavedSearchLogViewerController(ILogViewerService logViewerService) => _logViewerService = logViewerService;
 
     /// <summary>
     ///     Creates a saved log search.
@@ -24,16 +22,14 @@ public class CreateSavedSearchLogViewerController : SavedSearchLogViewerControll
     [ProducesResponseType(StatusCodes.Status201Created)]
     public async Task<IActionResult> Create(SavedLogSearchViewModel savedSearch)
     {
-        try
-        {
-            _logViewer.AddSavedSearch(savedSearch.Name, savedSearch.Query);
-        }
-        catch (DuplicateNameException ex)
+        bool isSuccessful = await _logViewerService.AddSavedLogQueryAsync(savedSearch.Name, savedSearch.Query);
+
+        if (isSuccessful == false)
         {
             var invalidModelProblem = new ProblemDetails
             {
                 Title = "Duplicate log search name",
-                Detail = ex.Message,
+                Detail = $"""Log search with name "{savedSearch.Name}" already exists""",
                 Status = StatusCodes.Status400BadRequest,
                 Type = "Error",
             };

@@ -1,20 +1,20 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Management.ViewModels.LogViewer;
-using Umbraco.Cms.Core.Logging.Viewer;
 using Umbraco.Cms.Core.Mapping;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Api.Management.Controllers.LogViewer.SavedSearch;
 
 public class ByNameSavedSearchLogViewerController : SavedSearchLogViewerControllerBase
 {
-    private readonly ILogViewer _logViewer;
+    private readonly ILogViewerService _logViewerService;
     private readonly IUmbracoMapper _umbracoMapper;
 
-    public ByNameSavedSearchLogViewerController(ILogViewer logViewer, IUmbracoMapper umbracoMapper)
-        : base(logViewer)
+    public ByNameSavedSearchLogViewerController(ILogViewerService logViewerService, IUmbracoMapper umbracoMapper)
     {
-        _logViewer = logViewer;
+        _logViewerService = logViewerService;
         _umbracoMapper = umbracoMapper;
     }
 
@@ -29,13 +29,13 @@ public class ByNameSavedSearchLogViewerController : SavedSearchLogViewerControll
     [ProducesResponseType(typeof(SavedLogSearchViewModel), StatusCodes.Status200OK)]
     public async Task<ActionResult<SavedLogSearchViewModel>> ByName(string name)
     {
-        SavedLogSearch? savedSearch = _logViewer.GetSavedSearchByName(name);
+        ILogViewerQuery? savedLogQuery = await _logViewerService.GetSavedLogQueryByNameAsync(name);
 
-        if (savedSearch is null)
+        if (savedLogQuery is null)
         {
             return await Task.FromResult(NotFound());
         }
 
-        return await Task.FromResult(Ok(_umbracoMapper.Map<SavedLogSearchViewModel>(savedSearch)));
+        return await Task.FromResult(Ok(_umbracoMapper.Map<SavedLogSearchViewModel>(savedLogQuery)));
     }
 }

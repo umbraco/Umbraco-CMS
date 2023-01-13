@@ -1,22 +1,21 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Serilog.Events;
 using Umbraco.Cms.Api.Common.ViewModels.Pagination;
 using Umbraco.Cms.Api.Management.ViewModels.LogViewer;
-using Umbraco.Cms.Core.Logging.Viewer;
+using Umbraco.Cms.Core.Logging;
 using Umbraco.Cms.Core.Mapping;
+using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Api.Management.Controllers.LogViewer;
 
 public class AllSinkLevelLogViewerController : LogViewerControllerBase
 {
-    private readonly ILogLevelLoader _logLevelLoader;
+    private readonly ILogViewerService _logViewerService;
     private readonly IUmbracoMapper _umbracoMapper;
 
-    public AllSinkLevelLogViewerController(ILogLevelLoader logLevelLoader, ILogViewer logViewer, IUmbracoMapper umbracoMapper)
-        : base(logViewer)
+    public AllSinkLevelLogViewerController(ILogViewerService logViewerService, IUmbracoMapper umbracoMapper)
     {
-        _logLevelLoader = logLevelLoader;
+        _logViewerService = logViewerService;
         _umbracoMapper = umbracoMapper;
     }
 
@@ -31,7 +30,7 @@ public class AllSinkLevelLogViewerController : LogViewerControllerBase
     [ProducesResponseType(typeof(PagedViewModel<LoggerViewModel>), StatusCodes.Status200OK)]
     public async Task<ActionResult<PagedViewModel<LoggerViewModel>>> AllLogLevels(int skip = 0, int take = 100)
     {
-        IEnumerable<KeyValuePair<string, LogEventLevel?>> logLevels = _logLevelLoader
+        IEnumerable<KeyValuePair<string, LogLevel>> logLevels = _logViewerService
             .GetLogLevelsFromSinks()
             .Skip(skip)
             .Take(take);

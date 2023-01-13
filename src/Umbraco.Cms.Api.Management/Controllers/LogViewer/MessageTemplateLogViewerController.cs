@@ -3,19 +3,20 @@ using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Common.ViewModels.Pagination;
 using Umbraco.Cms.Api.Management.ViewModels.LogViewer;
 using Umbraco.Cms.Core.Logging.Viewer;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Mapping;
+using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Api.Management.Controllers.LogViewer;
 
 public class MessageTemplateLogViewerController : LogViewerControllerBase
 {
-    private readonly ILogViewer _logViewer;
+    private readonly ILogViewerService _logViewerService;
     private readonly IUmbracoMapper _umbracoMapper;
 
-    public MessageTemplateLogViewerController(ILogViewer logViewer, IUmbracoMapper umbracoMapper)
-        : base(logViewer)
+    public MessageTemplateLogViewerController(ILogViewerService logViewerService, IUmbracoMapper umbracoMapper)
     {
-        _logViewer = logViewer;
+        _logViewerService = logViewerService;
         _umbracoMapper = umbracoMapper;
     }
 
@@ -37,16 +38,16 @@ public class MessageTemplateLogViewerController : LogViewerControllerBase
         DateTime? startDate = null,
         DateTime? endDate = null)
     {
-        LogTimePeriod logTimePeriod = GetTimePeriod(startDate, endDate);
+        Attempt<IEnumerable<LogTemplate>> messageTemplatesAttempt = _logViewerService.GetMessageTemplates(startDate, endDate);
 
         // We will need to stop the request if trying to do this on a 1GB file
-        if (CanViewLogs(logTimePeriod) == false)
+        if (messageTemplatesAttempt.Success == false)
         {
             return await Task.FromResult(ValidationProblem("Unable to view logs, due to their size"));
         }
 
-        IEnumerable<LogTemplate> messageTemplates = _logViewer
-            .GetMessageTemplates(logTimePeriod)
+        IEnumerable<LogTemplate> messageTemplates = messageTemplatesAttempt
+            .Result!
             .Skip(skip)
             .Take(take);
 

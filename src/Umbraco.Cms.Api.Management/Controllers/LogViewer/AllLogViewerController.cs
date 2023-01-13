@@ -5,19 +5,19 @@ using Umbraco.Cms.Api.Management.ViewModels.LogViewer;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Logging.Viewer;
 using Umbraco.Cms.Core.Mapping;
-using Umbraco.Extensions;
+using Umbraco.Cms.Core.Services;
+using Umbraco.New.Cms.Core.Models;
 
 namespace Umbraco.Cms.Api.Management.Controllers.LogViewer;
 
 public class AllLogViewerController : LogViewerControllerBase
 {
-    private readonly ILogViewer _logViewer;
+    private readonly ILogViewerService _logViewerService;
     private readonly IUmbracoMapper _umbracoMapper;
 
-    public AllLogViewerController(ILogViewer logViewer, IUmbracoMapper umbracoMapper)
-        : base(logViewer)
+    public AllLogViewerController(ILogViewerService logViewerService, IUmbracoMapper umbracoMapper)
     {
-        _logViewer = logViewer;
+        _logViewerService = logViewerService;
         _umbracoMapper = umbracoMapper;
     }
 
@@ -37,38 +37,24 @@ public class AllLogViewerController : LogViewerControllerBase
     [HttpGet("log")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedViewModel<LogMessageViewModel>), StatusCodes.Status200OK)]
-    public async Task<ActionResult<PagedViewModel<LogMessageViewModel>>> All(
+    public async Task<ActionResult<PagedViewModel<LogMessageViewModel>>> AllLogs(
         int skip = 0,
         int take = 100,
-        string orderDirection = "Descending",
+        Direction orderDirection = Direction.Descending,
         string? filterExpression = null,
         [FromQuery(Name = "logLevel")] string[]? logLevels = null,
         DateTime? startDate = null,
         DateTime? endDate = null)
     {
-        IEnumerable<LogMessage> result = Enumerable.Empty<LogMessage>();
-        Direction direction = orderDirection.InvariantEquals("Descending") ? Direction.Descending : Direction.Ascending;
-
-        LogTimePeriod logTimePeriod = GetTimePeriod(startDate, endDate);
+        Attempt<PagedModel<ILogEntry>> logsAttempt = _logViewerService.GetPagedLogs(startDate, endDate, skip, take,
+            orderDirection, filterExpression, logLevels);
 
         // We will need to stop the request if trying to do this on a 1GB file
-        if (CanViewLogs(logTimePeriod) == false)
+        if (logsAttempt.Success == false)
         {
             return await Task.FromResult(ValidationProblem("Unable to view logs, due to their size"));
         }
 
-        // Passing the take value as the pageSize and keeping the pageNumber as default so we can get all elements
-        IEnumerable<LogMessage>? logs = _logViewer
-            .GetLogs(logTimePeriod, filterExpression: filterExpression, pageSize: take, orderDirection: direction, logLevels: logLevels)
-            .Items;
-
-        if (logs is not null)
-        {
-            result = logs
-                .Skip(skip)
-                .Take(take);
-        }
-
-        return await Task.FromResult(Ok(_umbracoMapper.Map<PagedViewModel<LogMessageViewModel>>(result)));
+        return await Task.FromResult(Ok(_umbracoMapper.Map<PagedViewModel<LogMessageViewModel>>(logsAttempt.Result)));
     }
 }

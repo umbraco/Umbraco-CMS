@@ -1,15 +1,14 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Umbraco.Cms.Core.Logging.Viewer;
+using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Api.Management.Controllers.LogViewer.SavedSearch;
 
 public class DeleteSavedSearchLogViewerController : SavedSearchLogViewerControllerBase
 {
-    private readonly ILogViewer _logViewer;
+    private readonly ILogViewerService _logViewerService;
 
-    public DeleteSavedSearchLogViewerController(ILogViewer logViewer)
-        : base(logViewer) => _logViewer = logViewer;
+    public DeleteSavedSearchLogViewerController(ILogViewerService logViewerService) => _logViewerService = logViewerService;
 
     /// <summary>
     ///     Deletes a saved log search with a given name.
@@ -22,14 +21,12 @@ public class DeleteSavedSearchLogViewerController : SavedSearchLogViewerControll
     [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<IActionResult> Delete(string name)
     {
-        SavedLogSearch? savedSearch = _logViewer.GetSavedSearchByName(name);
+        bool isSuccessful = await _logViewerService.DeleteSavedLogQueryAsync(name);
 
-        if (savedSearch is null)
+        if (isSuccessful == false)
         {
             return await Task.FromResult(NotFound());
         }
-
-        _logViewer.DeleteSavedSearch(name);
 
         return await Task.FromResult(Ok());
     }
