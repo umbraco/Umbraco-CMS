@@ -1,5 +1,5 @@
 import { UmbContextProviderController } from 'src/core/context-api/provide/context-provider.controller';
-import type { UmbControllerHostInterface } from 'src/core/controller/controller-host.mixin';
+import type { UmbControllerHostInterface } from '@umbraco-cms/controller';
 import { UniqueBehaviorSubject } from '@umbraco-cms/observable-api';
 
 export class UmbPropertyActionMenuContext {
