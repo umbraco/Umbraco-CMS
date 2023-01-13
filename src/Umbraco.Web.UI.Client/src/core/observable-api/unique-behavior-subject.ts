@@ -40,10 +40,10 @@ export function naiveObjectComparison(objOne: any, objTwo: any): boolean {
  * const newDataSet = appendToFrozenArray(mySubject.getValue(), entry, x => x.key === key);
  * mySubject.next(newDataSet);
  */
-export function appendToFrozenArray<T>(data: T[], entry: T, uniqueMethod?: (entry: T) => boolean): T[] {
+export function appendToFrozenArray<T>(data: T[], entry: T, uniqueMethod?: (existingEntry: T, newEntry: T) => boolean): T[] {
 	const unFrozenDataSet = [...data];
 	if(uniqueMethod) {
-		const indexToReplace = unFrozenDataSet.findIndex(uniqueMethod);
+		const indexToReplace = unFrozenDataSet.findIndex((x) => uniqueMethod(x, entry));
 		if(indexToReplace !== -1) {
 			unFrozenDataSet[indexToReplace] = entry;
 		} else {
