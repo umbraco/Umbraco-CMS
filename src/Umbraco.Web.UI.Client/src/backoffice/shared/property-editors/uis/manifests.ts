@@ -26,6 +26,8 @@ import { manifest as orderDirection } from './order-direction/manifests';
 import { manifests as collectionView } from './collection-view/manifests';
 import { manifests as tinyMCE } from './tiny-mce/manifests';
 import { manifest as iconPicker } from './icon-picker/manifests';
+import { manifest as label } from './label/manifests';
+import { manifest as valueType } from './value-type/manifests';
 import type { ManifestPropertyEditorUI } from '@umbraco-cms/models';
 
 export const manifests: Array<ManifestPropertyEditorUI> = [
@@ -51,6 +53,8 @@ export const manifests: Array<ManifestPropertyEditorUI> = [
 	uploadField,
 	orderDirection,
 	iconPicker,
+	label,
+	valueType,
 	...textBoxes,
 	...treePicker,
 	...blockList,

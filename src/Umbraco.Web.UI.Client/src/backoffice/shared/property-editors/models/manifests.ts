@@ -23,6 +23,7 @@ import { manifest as uploadField } from './Umbraco.UploadField';
 import { manifest as blockGrid } from './Umbraco.BlockGrid';
 import { manifest as tinyMCE } from './Umbraco.TinyMCE';
 import { manifest as listView } from './Umbraco.ListView';
+import { manifest as label } from './Umbraco.Label';
 
 import type { ManifestPropertyEditorModel } from '@umbraco-cms/models';
 
@@ -52,6 +53,7 @@ export const manifests: Array<ManifestPropertyEditorModel> = [
 	blockGrid,
 	tinyMCE,
 	listView,
+	label,
 	{
 		type: 'propertyEditorModel',
 		name: 'Decimal',

@@ -434,6 +434,19 @@ export const data: Array<DataTypeDetails> = [
 		propertyEditorUIAlias: 'Umb.PropertyEditorUI.TinyMCE',
 		data: [],
 	},
+	{
+		name: 'Label',
+		type: 'data-type',
+		icon: 'umb:autofill',
+		hasChildren: false,
+		key: 'dt-label',
+		isContainer: false,
+		parentKey: null,
+		isFolder: false,
+		propertyEditorModelAlias: 'Umbraco.Label',
+		propertyEditorUIAlias: 'Umb.PropertyEditorUI.Label',
+		data: [],
+	},
 ];
 
 // Temp mocked database

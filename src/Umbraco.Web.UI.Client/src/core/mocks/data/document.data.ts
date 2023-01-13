@@ -168,6 +168,12 @@ export const data: Array<DocumentDetails> = [
 				description: '',
 				dataTypeKey: 'dt-overlaySize',
 			},
+			{
+				alias: 'label',
+				label: 'Label',
+				description: '',
+				dataTypeKey: 'dt-label',
+			},
 		],
 		data: [],
 		variants: [],
