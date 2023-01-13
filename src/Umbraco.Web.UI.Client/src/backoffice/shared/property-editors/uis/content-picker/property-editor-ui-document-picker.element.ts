@@ -33,7 +33,6 @@ export class UmbPropertyEditorUIContentPickerElement extends UmbLitElement {
 	public set config(config: Array<DataTypePropertyData>) {
 		const validationLimit = config.find(x => x.alias === 'validationLimit');
 
-		console.log("got config", validationLimit)
 		this._limitMin = (validationLimit?.value as any).min;
 		this._limitMax = (validationLimit?.value as any).max;
 	}
