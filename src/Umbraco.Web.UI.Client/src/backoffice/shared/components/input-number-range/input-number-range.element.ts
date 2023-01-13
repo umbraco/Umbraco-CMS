@@ -18,6 +18,12 @@ export class UmbInputNumberRangeElement extends FormControlMixin(UmbLitElement) 
 		`,
 	];
 
+	@property({type: String, attribute:'min-label'})
+	minLabel = "Low value"
+
+	@property({type: String, attribute:'max-label'})
+	maxLabel = "High value"
+
 	@state()
 	private _minValue?: number;
 	@property()
@@ -77,7 +83,7 @@ export class UmbInputNumberRangeElement extends FormControlMixin(UmbLitElement) 
 
 
 	render() {
-		return html`<uui-input type="number" .value=${this._minValue} @input=${this._onMinInput}></uui-input> – <uui-input type="number" .value=${this._maxValue} @input=${this._onMaxInput}></uui-input>`;
+		return html`<uui-input type="number" .value=${this._minValue} @input=${this._onMinInput} label=${this.minLabel}></uui-input> – <uui-input type="number" .value=${this._maxValue} @input=${this._onMaxInput} label=${this.maxLabel}></uui-input>`;
 	}
 
 }
