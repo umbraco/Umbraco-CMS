@@ -2214,7 +2214,7 @@
             "schema": {
               "type": "array",
               "items": {
-                "type": "string"
+                "$ref": "#/components/schemas/LogLevel"
               }
             }
           },
@@ -5001,8 +5001,7 @@
           "HasThis",
           "ExplicitThis"
         ],
-        "type": "integer",
-        "format": "int32"
+        "type": "string"
       },
       "ConsentLevel": {
         "type": "object",
@@ -5203,8 +5202,7 @@
           "warning",
           "alert"
         ],
-        "type": "integer",
-        "format": "int32"
+        "type": "string"
       },
       "ContentResult": {
         "type": "object",
@@ -5762,8 +5760,7 @@
           "Ascending",
           "Descending"
         ],
-        "type": "integer",
-        "format": "int32"
+        "type": "string"
       },
       "DocumentBlueprintTreeItem": {
         "type": "object",
@@ -5934,8 +5931,7 @@
           "RTSpecialName",
           "ReservedMask"
         ],
-        "type": "integer",
-        "format": "int32"
+        "type": "string"
       },
       "EventInfo": {
         "type": "object",
@@ -6039,8 +6035,7 @@
           "HasDefault",
           "ReservedMask"
         ],
-        "type": "integer",
-        "format": "int32"
+        "type": "string"
       },
       "FieldInfo": {
         "type": "object",
@@ -6270,8 +6265,7 @@
           "DefaultConstructorConstraint",
           "SpecialConstraintMask"
         ],
-        "type": "integer",
-        "format": "int32"
+        "type": "string"
       },
       "HealthCheck": {
         "type": "object",
@@ -6580,8 +6574,7 @@
           "Explicit",
           "Auto"
         ],
-        "type": "integer",
-        "format": "int32"
+        "type": "string"
       },
       "LogLevel": {
         "enum": [
@@ -6592,8 +6585,7 @@
           "Error",
           "Fatal"
         ],
-        "type": "integer",
-        "format": "int32"
+        "type": "string"
       },
       "LogLevelCounts": {
         "type": "object",
@@ -6746,8 +6738,7 @@
           "NestedType",
           "All"
         ],
-        "type": "integer",
-        "format": "int32"
+        "type": "string"
       },
       "MethodAttributes": {
         "enum": [
@@ -6776,8 +6767,7 @@
           "RequireSecObject",
           "ReservedMask"
         ],
-        "type": "integer",
-        "format": "int32"
+        "type": "string"
       },
       "MethodBase": {
         "type": "object",
@@ -6931,8 +6921,7 @@
           "InternalCall",
           "MaxMethodImplVal"
         ],
-        "type": "integer",
-        "format": "int32"
+        "type": "string"
       },
       "MethodInfo": {
         "type": "object",
@@ -7112,8 +7101,7 @@
           "SourceCodeManual",
           "SourceCodeAuto"
         ],
-        "type": "integer",
-        "format": "int32"
+        "type": "string"
       },
       "Module": {
         "type": "object",
@@ -7194,8 +7182,7 @@
           "Success",
           "Warning"
         ],
-        "type": "integer",
-        "format": "int32"
+        "type": "string"
       },
       "OkResult": {
         "type": "object",
@@ -7218,8 +7205,7 @@
           "GreaterThan",
           "GreaterThanEqualTo"
         ],
-        "type": "integer",
-        "format": "int32"
+        "type": "string"
       },
       "OutOfDateStatus": {
         "type": "object",
@@ -7236,8 +7222,7 @@
           "Current",
           "Unknown"
         ],
-        "type": "integer",
-        "format": "int32"
+        "type": "string"
       },
       "PagedContentTreeItem": {
         "required": [
@@ -7733,8 +7718,7 @@
           "Reserved4",
           "ReservedMask"
         ],
-        "type": "integer",
-        "format": "int32"
+        "type": "string"
       },
       "ParameterInfo": {
         "type": "object",
@@ -7853,8 +7837,7 @@
           "Reserved4",
           "ReservedMask"
         ],
-        "type": "integer",
-        "format": "int32"
+        "type": "string"
       },
       "PropertyInfo": {
         "type": "object",
@@ -7958,8 +7941,7 @@
           "Enabled",
           "Disabled"
         ],
-        "type": "integer",
-        "format": "int32"
+        "type": "string"
       },
       "RedirectUrl": {
         "type": "object",
@@ -8091,8 +8073,7 @@
           "Run",
           "BootFailed"
         ],
-        "type": "integer",
-        "format": "int32"
+        "type": "string"
       },
       "RuntimeMethodHandle": {
         "type": "object",
@@ -8168,8 +8149,7 @@
           "Level1",
           "Level2"
         ],
-        "type": "integer",
-        "format": "int32"
+        "type": "string"
       },
       "ServerStatus": {
         "type": "object",
@@ -8187,8 +8167,7 @@
           "Error",
           "Info"
         ],
-        "type": "integer",
-        "format": "int32"
+        "type": "string"
       },
       "StructLayoutAttribute": {
         "type": "object",
@@ -8218,8 +8197,7 @@
           "Basic",
           "Detailed"
         ],
-        "type": "integer",
-        "format": "int32"
+        "type": "string"
       },
       "Template": {
         "type": "object",
@@ -8356,8 +8334,7 @@
           "DateTime",
           "Integer"
         ],
-        "type": "integer",
-        "format": "int32"
+        "type": "string"
       },
       "TemplateQueryResult": {
         "type": "object",
@@ -8780,8 +8757,7 @@
           "BeforeFieldInit",
           "CustomFormatMask"
         ],
-        "type": "integer",
-        "format": "int32"
+        "type": "string"
       },
       "TypeInfo": {
         "type": "object",
