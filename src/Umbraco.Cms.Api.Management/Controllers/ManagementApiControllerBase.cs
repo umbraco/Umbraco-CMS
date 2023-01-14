@@ -1,4 +1,4 @@
-﻿using System.Linq.Expressions;
+using System.Linq.Expressions;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Common.Filters;
 using Umbraco.Cms.Core.Security;
@@ -20,6 +20,19 @@ public class ManagementApiControllerBase : Controller
         var actionName = constantExpression.Value?.ToString() ?? throw new ArgumentException("Expression does not have a value.");
 
         return base.CreatedAtAction(actionName, controllerName, new { key = key }, null);
+    }
+
+    protected CreatedAtActionResult CreatedAtAction<T>(Expression<Func<T, string>> action, string name)
+    {
+        if (action.Body is not ConstantExpression constantExpression)
+        {
+            throw new ArgumentException("Expression must be a constant expression.");
+        }
+
+        var controllerName = ManagementApiRegexes.ControllerTypeToNameRegex().Replace(typeof(T).Name, string.Empty);
+        var actionName = constantExpression.Value?.ToString() ?? throw new ArgumentException("Expression does not have a value.");
+
+        return base.CreatedAtAction(actionName, controllerName, new { name = name }, null);
     }
 
     protected static int CurrentUserId(IBackOfficeSecurityAccessor backOfficeSecurityAccessor)

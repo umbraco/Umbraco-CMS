@@ -37,7 +37,6 @@ public class CreateSavedSearchLogViewerController : SavedSearchLogViewerControll
             return await Task.FromResult(BadRequest(invalidModelProblem));
         }
 
-        // FIXME: (elit0451) Make use of the extension method of CreatedAtAction
-        return await Task.FromResult(Created($"management/api/v1/log-viewer/saved-search/{savedSearch.Name}", null));
+        return await Task.FromResult(CreatedAtAction<ByNameSavedSearchLogViewerController>(controller => nameof(controller.ByName), savedSearch.Name));
     }
 }
