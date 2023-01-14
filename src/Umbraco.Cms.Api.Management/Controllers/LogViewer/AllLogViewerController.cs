@@ -7,6 +7,7 @@ using Umbraco.Cms.Core.Logging.Viewer;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Services;
 using Umbraco.New.Cms.Core.Models;
+using LogLevel = Umbraco.Cms.Core.Logging.LogLevel;
 
 namespace Umbraco.Cms.Api.Management.Controllers.LogViewer;
 
@@ -22,18 +23,18 @@ public class AllLogViewerController : LogViewerControllerBase
     }
 
     /// <summary>
-    ///     Gets a paginated grouped list of all logs for a specific date range.
+    ///     Gets a paginated list of all logs for a specific date range.
     /// </summary>
     /// <param name="skip">The amount of items to skip.</param>
     /// <param name="take">The amount of items to take.</param>
     /// <param name="orderDirection">
     ///     By default this will be ordered descending (newest items first).
     /// </param>
-    /// <param name="filterExpression">The query expression to filter on.</param>
-    /// <param name="logLevels">The log levels for which to retrieve the log messages.</param>
+    /// <param name="filterExpression">The query expression to filter on (can be null).</param>
+    /// <param name="logLevels">The log levels for which to retrieve the log messages (can be null).</param>
     /// <param name="startDate">The start date for the date range (can be null).</param>
     /// <param name="endDate">The end date for the date range (can be null).</param>
-    /// <returns>The paged result of logs from the given time period.</returns>
+    /// <returns>The paged result of the logs from the given time period.</returns>
     [HttpGet("log")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedViewModel<LogMessageViewModel>), StatusCodes.Status200OK)]
@@ -42,12 +43,14 @@ public class AllLogViewerController : LogViewerControllerBase
         int take = 100,
         Direction orderDirection = Direction.Descending,
         string? filterExpression = null,
-        [FromQuery(Name = "logLevel")] string[]? logLevels = null,
+        [FromQuery(Name = "logLevel")] LogLevel[]? logLevels = null,
         DateTime? startDate = null,
         DateTime? endDate = null)
     {
+        var levels = logLevels?.Select(l => l.ToString()).ToArray();
+
         Attempt<PagedModel<ILogEntry>> logsAttempt = _logViewerService.GetPagedLogs(startDate, endDate, skip, take,
-            orderDirection, filterExpression, logLevels);
+            orderDirection, filterExpression, levels);
 
         // We will need to stop the request if trying to do this on a 1GB file
         if (logsAttempt.Success == false)

@@ -175,6 +175,7 @@ public class ManagementApiComposer : IComposer
             .AddJsonOptions(options =>
             {
                 // any generic JSON options go here
+                options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()); // Needed for Swagger, so that enums are displayed as strings
             })
             .AddJsonOptions(Umbraco.New.Cms.Core.Constants.JsonOptionsNames.BackOffice, options =>
             {
