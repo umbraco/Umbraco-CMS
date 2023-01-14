@@ -4288,6 +4288,240 @@
         }
       }
     },
+    "/umbraco/management/api/v1/template": {
+      "post": {
+        "tags": [
+          "Template"
+        ],
+        "operationId": "PostTemplate",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TemplateCreateModel"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/umbraco/management/api/v1/template/{key}": {
+      "get": {
+        "tags": [
+          "Template"
+        ],
+        "operationId": "GetTemplateByKey",
+        "parameters": [
+          {
+            "name": "key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Template"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Template"
+        ],
+        "operationId": "DeleteTemplateByKey",
+        "parameters": [
+          {
+            "name": "key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Template"
+        ],
+        "operationId": "PutTemplateByKey",
+        "parameters": [
+          {
+            "name": "key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TemplateUpdateModel"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/umbraco/management/api/v1/template/query/execute": {
+      "post": {
+        "tags": [
+          "Template"
+        ],
+        "operationId": "PostTemplateQueryExecute",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TemplateQueryExecuteModel"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TemplateQueryResult"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/umbraco/management/api/v1/template/query/settings": {
+      "get": {
+        "tags": [
+          "Template"
+        ],
+        "operationId": "GetTemplateQuerySettings",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TemplateQuerySettings"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/umbraco/management/api/v1/template/scaffold": {
+      "get": {
+        "tags": [
+          "Template"
+        ],
+        "operationId": "GetTemplateScaffold",
+        "parameters": [
+          {
+            "name": "masterTemplateAlias",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TemplateScaffold"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/umbraco/management/api/v1/tree/template/children": {
       "get": {
         "tags": [
@@ -6973,6 +7207,20 @@
         },
         "additionalProperties": false
       },
+      "Operator": {
+        "enum": [
+          "Equals",
+          "NotEquals",
+          "Contains",
+          "NotContains",
+          "LessThan",
+          "LessThanEqualTo",
+          "GreaterThan",
+          "GreaterThanEqualTo"
+        ],
+        "type": "integer",
+        "format": "int32"
+      },
       "OutOfDateStatus": {
         "type": "object",
         "properties": {
@@ -7972,6 +8220,238 @@
         ],
         "type": "integer",
         "format": "int32"
+      },
+      "Template": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "nullable": true
+          },
+          "alias": {
+            "type": "string",
+            "nullable": true
+          },
+          "content": {
+            "type": "string",
+            "nullable": true
+          },
+          "key": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        "additionalProperties": false
+      },
+      "TemplateCreateModel": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "nullable": true
+          },
+          "alias": {
+            "type": "string",
+            "nullable": true
+          },
+          "content": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "TemplateQueryExecuteFilterModel": {
+        "type": "object",
+        "properties": {
+          "propertyAlias": {
+            "type": "string",
+            "nullable": true
+          },
+          "constraintValue": {
+            "type": "string",
+            "nullable": true
+          },
+          "operator": {
+            "$ref": "#/components/schemas/Operator"
+          }
+        },
+        "additionalProperties": false
+      },
+      "TemplateQueryExecuteModel": {
+        "type": "object",
+        "properties": {
+          "rootContentKey": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          },
+          "contentTypeAlias": {
+            "type": "string",
+            "nullable": true
+          },
+          "filters": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TemplateQueryExecuteFilterModel"
+            },
+            "nullable": true
+          },
+          "sort": {
+            "$ref": "#/components/schemas/TemplateQueryExecuteSortModel"
+          },
+          "take": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "additionalProperties": false
+      },
+      "TemplateQueryExecuteSortModel": {
+        "type": "object",
+        "properties": {
+          "propertyAlias": {
+            "type": "string",
+            "nullable": true
+          },
+          "direction": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "TemplateQueryOperator": {
+        "type": "object",
+        "properties": {
+          "operator": {
+            "$ref": "#/components/schemas/Operator"
+          },
+          "applicableTypes": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TemplateQueryPropertyType"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "TemplateQueryProperty": {
+        "type": "object",
+        "properties": {
+          "alias": {
+            "type": "string",
+            "nullable": true
+          },
+          "type": {
+            "$ref": "#/components/schemas/TemplateQueryPropertyType"
+          }
+        },
+        "additionalProperties": false
+      },
+      "TemplateQueryPropertyType": {
+        "enum": [
+          "String",
+          "DateTime",
+          "Integer"
+        ],
+        "type": "integer",
+        "format": "int32"
+      },
+      "TemplateQueryResult": {
+        "type": "object",
+        "properties": {
+          "queryExpression": {
+            "type": "string",
+            "nullable": true
+          },
+          "sampleResults": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TemplateQueryResultItem"
+            },
+            "nullable": true
+          },
+          "resultCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "executionTime": {
+            "type": "integer",
+            "format": "int64"
+          }
+        },
+        "additionalProperties": false
+      },
+      "TemplateQueryResultItem": {
+        "type": "object",
+        "properties": {
+          "icon": {
+            "type": "string",
+            "nullable": true
+          },
+          "name": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "TemplateQuerySettings": {
+        "type": "object",
+        "properties": {
+          "contentTypeAliases": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "nullable": true
+          },
+          "properties": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TemplateQueryProperty"
+            },
+            "nullable": true
+          },
+          "operators": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TemplateQueryOperator"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "TemplateScaffold": {
+        "type": "object",
+        "properties": {
+          "content": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "TemplateUpdateModel": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "nullable": true
+          },
+          "alias": {
+            "type": "string",
+            "nullable": true
+          },
+          "content": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
       },
       "Type": {
         "type": "object",

@@ -7,6 +7,7 @@ using Umbraco.Cms.Api.Management.Mapping.HealthCheck;
 using Umbraco.Cms.Api.Management.Mapping.Installer;
 using Umbraco.Cms.Api.Management.Mapping.Languages;
 using Umbraco.Cms.Api.Management.Mapping.Relation;
+using Umbraco.Cms.Api.Management.Mapping.Template;
 using Umbraco.Cms.Api.Management.Mapping.TrackedReferences;
 using Umbraco.New.Cms.Infrastructure.Persistence.Mappers;
 using Umbraco.Cms.Api.Management.Mapping.LogViewer;
@@ -28,6 +29,7 @@ public static class MappingBuilderExtensions
             .Add<HealthCheckViewModelsMapDefinition>()
             .Add<CultureViewModelMapDefinition>()
             .Add<DataTypeViewModelMapDefinition>()
+            .Add<TemplateViewModelMapDefinition>()
             .Add<LogViewerViewModelMapDefinition>();
 
         return builder;
