@@ -131,7 +131,7 @@ public class LogViewerService : ILogViewerService
 
     public ReadOnlyDictionary<string, LogLevel> GetLogLevelsFromSinks()
     {
-        var configuredLogLevels = _logLevelLoader.GetLogLevelsFromSinks();
+        ReadOnlyDictionary<string, LogEventLevel?> configuredLogLevels = _logLevelLoader.GetLogLevelsFromSinks();
 
         return configuredLogLevels.ToDictionary(logLevel => logLevel.Key, logLevel => Enum.Parse<LogLevel>(logLevel.Value!.ToString()!)).AsReadOnly();
     }
@@ -141,7 +141,7 @@ public class LogViewerService : ILogViewerService
     /// </summary>
     public LogLevel GetGlobalMinLogLevel()
     {
-        var serilogLogLevel = _logLevelLoader.GetGlobalMinLogLevel();
+        LogEventLevel? serilogLogLevel = _logLevelLoader.GetGlobalMinLogLevel();
 
         return Enum.Parse<LogLevel>(serilogLogLevel!.ToString()!);
     }

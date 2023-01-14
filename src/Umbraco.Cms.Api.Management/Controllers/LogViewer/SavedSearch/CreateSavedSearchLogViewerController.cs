@@ -15,7 +15,7 @@ public class CreateSavedSearchLogViewerController : SavedSearchLogViewerControll
     ///     Creates a saved log search.
     /// </summary>
     /// <param name="savedSearch">The log search to be saved.</param>
-    /// <returns>The name of the saved log search after the creation.</returns>
+    /// <returns>The location of the saved log search after the creation.</returns>
     [HttpPost]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]

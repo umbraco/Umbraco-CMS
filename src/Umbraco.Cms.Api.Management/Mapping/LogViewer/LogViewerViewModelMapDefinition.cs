@@ -1,5 +1,3 @@
-using System.Text.Json;
-using Serilog.Events;
 using Umbraco.Cms.Api.Common.ViewModels.Pagination;
 using Umbraco.Cms.Api.Management.ViewModels.LogViewer;
 using Umbraco.Cms.Core.Logging;
@@ -109,39 +107,5 @@ public class LogViewerViewModelMapDefinition : IMapDefinition
     {
         target.Items = context.MapEnumerable<ILogEntry, LogMessageViewModel>(source.Items);
         target.Total = source.Total;
-    }
-
-    // TODO: to be moved in the service instead
-    private static IEnumerable<LogMessagePropertyViewModel> MapLogMessageProperties(IReadOnlyDictionary<string, LogEventPropertyValue>? properties)
-    {
-        var result = new List<LogMessagePropertyViewModel>();
-
-        if (properties is not null)
-        {
-            foreach (KeyValuePair<string, LogEventPropertyValue> property in properties)
-            {
-                string? value;
-
-                if (property.Value is ScalarValue scalarValue)
-                {
-                    value = scalarValue.Value?.ToString();
-                }
-                else
-                {
-                    // When polymorphism is implemented, this should be changed
-                    value = JsonSerializer.Serialize(property.Value as object);
-                }
-
-                var logMessageProperty = new LogMessagePropertyViewModel()
-                {
-                    Name = property.Key,
-                    Value = value
-                };
-
-                result.Add(logMessageProperty);
-            }
-        }
-
-        return result;
     }
 }
