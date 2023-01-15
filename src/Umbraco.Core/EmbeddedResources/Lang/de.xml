@@ -2331,4 +2331,59 @@
     <key alias="selectAllLogLevelFilters">Wählen Sie Alle</key>
     <key alias="deselectAllLogLevelFilters">Alle abwählen</key>
   </area>
+  <area alias="formsDashboard">
+    <key alias="formsHeadline">Umbraco Forms</key>
+    <key alias="formsDescription">Erstellen Sie Formulare mithilfe einer intuitiven Benutzeroberfläche. Von einfachen Kontaktformularen
+      die Email verschicken bis hin zu komplexen Fragebögen die mit einem CRM System verbunden sind. Ihre Kunden werden es lieben!
+    </key>
+  </area>
+  <area alias="contentTemplatesDashboard">
+    <key alias="whatHeadline">Was sind Inhaltsvorlagen?</key>
+    <key alias="whatDescription">Inhaltsvorlagen sind vordefinierte Inhalte die ausgewählt werden können 
+      wenn Sie einen neuen Inhaltsknoten anlegen wollen.
+    </key>
+    <key alias="createHeadline">Wie erstelle ich eine Inhaltsvorlage?</key>
+    <key alias="createDescription">
+      <![CDATA[
+            <p>Es gibt zwei Möglichkeiten eine Inhaltsvorlage zu erstellen:</p>
+            <ul>
+                <li>Rechtsklicken Sie einen Inhaltsknoten und wählen Sie "Inhaltsvorlage erstellen" aus.</li>
+                <li>Rechtsklicken Sie den Inhaltsvorlagen-Baum und wählen Sie den Dokumententypen aus für den Sie eine Vorlage erstellen wollen.</li>
+            </ul>
+            <p>Wenn Sie einen Namen vergen haben können Reakteure diese als Vorlage für neue Seiten benutzen.</p>
+        ]]>
+    </key>
+    <key alias="manageHeadline">Wie verwalte ich eine Inhaltsvorlage?</key>
+    <key alias="manageDescription">Sie können Inhaltsvorlagen bearbeiten und löschen in dem Sie im Inhaltsvorlage-Baum die gewünschte
+      Vorlage auswählen. Außerdem können Sie auch direkt den Dokumenttypen bearbeiten oder löschen auf dem die Vorlage basiert
+    </key>
+  </area>
+  <area alias="preview">
+    <key alias="endLabel">Beenden</key>
+    <key alias="endTitle">Vorschau beenden</key>
+    <key alias="openWebsiteLabel">Website Vorschau</key>
+    <key alias="openWebsiteTitle">Website in Vorschaumodus öffnen</key>
+    <key alias="returnToPreviewHeadline">Websitevorschau anzeigen?</key>
+    <key alias="returnToPreviewDescription">Sie haben den Vorschaumodus beendet, wollen Sie ihn erneut öffnen um
+      gespeicherte Version der Website anzusehen?
+    </key>
+    <key alias="returnToPreviewAcceptButton">Vorschau der letzten Version anzeigen</key>
+    <key alias="returnToPreviewDeclineButton">Veröffentlichte Version anzeigen</key>
+    <key alias="viewPublishedContentHeadline">Veröffentlichte Version anzeigen?</key>
+    <key alias="viewPublishedContentDescription">Sie befinden sich im Vorschaumodus, wollen Sie ihn verlassen um die letzte
+      veröffentlichte Version ihrer Website zu sehen?
+    </key>
+    <key alias="viewPublishedContentAcceptButton">Veröffentlichte Version anzeigen</key>
+    <key alias="viewPublishedContentDeclineButton">Im Vorschaumodus bleiben</key>
+  </area>
+  <area alias="permissions">
+    <key alias="FolderCreation">Ornder erstellen</key>
+    <key alias="FileWritingForPackages">Dateien durch Packages erstellen lassen</key>
+    <key alias="FileWriting">Dateien schreiben</key>
+    <key alias="MediaFolderCreation">Medien Ordner stellen</key>
+  </area>  
+  <area alias="treeSearch">
+    <key alias="searchResult">Element zurückgegeben</key>
+    <key alias="searchResults">Elemente zurückgegeben</key>
+  </area>
 </language>
