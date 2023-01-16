@@ -10,6 +10,8 @@ import {
 	UmbTableSelectedEvent,
 } from 'src/backoffice/shared/components/table';
 
+import '../language/language-workspace.element';
+
 @customElement('umb-language-root-workspace')
 export class UmbLanguageRootWorkspaceElement extends LitElement {
 	static styles = [
@@ -32,7 +34,39 @@ export class UmbLanguageRootWorkspaceElement extends LitElement {
 	];
 
 	@state()
-	private _languages: Array<Language> = [];
+	private _languages: Array<Language> = [
+		{
+			id: 1,
+			name: 'English',
+			isoCode: 'en',
+			isDefault: true,
+			isMandatory: true,
+		},
+		{
+			id: 2,
+			name: 'Danish',
+			isoCode: 'da',
+			isDefault: false,
+			isMandatory: false,
+			fallbackLanguageId: 1,
+		},
+		{
+			id: 3,
+			name: 'German',
+			isoCode: 'de',
+			isDefault: false,
+			isMandatory: false,
+			fallbackLanguageId: 1,
+		},
+		{
+			id: 4,
+			name: 'French',
+			isoCode: 'fr',
+			isDefault: false,
+			isMandatory: false,
+			fallbackLanguageId: 1,
+		},
+	];
 
 	@state()
 	private _tableConfig: UmbTableConfig = {
@@ -66,9 +100,6 @@ export class UmbLanguageRootWorkspaceElement extends LitElement {
 	@state()
 	private _tableItems: Array<UmbTableItem> = [];
 
-	/**
-	 *
-	 */
 	constructor() {
 		super();
 
@@ -99,7 +130,7 @@ export class UmbLanguageRootWorkspaceElement extends LitElement {
 					},
 					{
 						columnAlias: 'fallBackLanguage',
-						value: language.fallbackLanguageId,
+						value: languages.find((x) => x.id === language.fallbackLanguageId)?.name,
 					},
 				],
 			};
@@ -107,6 +138,7 @@ export class UmbLanguageRootWorkspaceElement extends LitElement {
 	}
 
 	render() {
+		return html`<umb-language-workspace></umb-language-workspace>`;
 		return html`
 			<umb-body-layout no-header-background>
 				<uui-button id="add-language" slot="header" label="Add language" look="outline" color="default"></uui-button>
