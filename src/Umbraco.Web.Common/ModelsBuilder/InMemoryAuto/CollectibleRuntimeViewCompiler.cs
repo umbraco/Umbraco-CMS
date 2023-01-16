@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using System.Reflection;
 using System.Text;
+using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc.Razor.Compilation;
 using Microsoft.AspNetCore.Razor.Hosting;
 using Microsoft.AspNetCore.Razor.Language;
@@ -375,13 +376,33 @@ internal class CollectibleRuntimeViewCompiler : IViewCompiler
                 pdbStream,
                 options: _compilationOptionsProvider.EmitOptions);
 
-            if (!result.Success)
+            if (result.Success is false)
             {
-                throw CompilationExceptionFactory.Create(
+                UmbracoCompilationException compilationException = CompilationExceptionFactory.Create(
                     codeDocument,
                     generatedCode,
                     assemblyName,
                     result.Diagnostics);
+
+                foreach (CompilationFailure? compilationFailure in compilationException.CompilationFailures ?? Enumerable.Empty<CompilationFailure>())
+                {
+                    if (compilationFailure?.Messages is null)
+                    {
+                        continue;
+                    }
+
+                    foreach (DiagnosticMessage? message in compilationFailure.Messages)
+                    {
+                        if (message?.FormattedMessage is null)
+                        {
+                            continue;
+                        }
+
+                        _logger.LogError(compilationException, "Compilation error occured with message: {ErrorMessage}", message.FormattedMessage);
+                    }
+                }
+
+                throw compilationException;
             }
 
             assemblyStream.Seek(0, SeekOrigin.Begin);
