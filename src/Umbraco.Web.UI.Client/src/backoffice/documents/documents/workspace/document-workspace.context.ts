@@ -1,8 +1,9 @@
 import { UmbWorkspaceContentContext } from '../../../shared/components/workspace/workspace-content/workspace-content.context';
-import { isDocumentDetails, STORE_ALIAS as DOCUMENT_STORE_ALIAS } from 'src/backoffice/documents/documents/document.store';
-import type { UmbDocumentStore, UmbDocumentStoreItemType } from 'src/backoffice/documents/documents/document.store';
-import { UmbControllerHostInterface } from 'src/core/controller/controller-host.mixin';
+import { STORE_ALIAS as DOCUMENT_STORE_ALIAS } from '../../../documents/documents/document.store';
+import type { UmbDocumentStore, UmbDocumentStoreItemType } from '../../../documents/documents/document.store';
+import type { UmbControllerHostInterface } from '@umbraco-cms/controller';
 import type { DocumentDetails } from '@umbraco-cms/models';
+import { appendToFrozenArray } from '@umbraco-cms/observable-api';
 
 const DefaultDocumentData = {
 	key: '',
@@ -39,31 +40,25 @@ export class UmbWorkspaceDocumentContext extends UmbWorkspaceContentContext<UmbD
 	}
 
 	public setPropertyValue(alias: string, value: unknown) {
-		const data = this.getData();
-		// TODO: make sure to check that we have a details model:
-		// TODO: make a Method to cast
-		if(isDocumentDetails(data)) {
-			const newDataSet = (data as DocumentDetails).data.map((entry) => {
-				if (entry.alias === alias) {
-					return {alias: alias, value: value};
-				}
-				return entry;
-			});
 
+		// TODO: make sure to check that we have a details model? otherwise fail? 8This can be relevant if we use the same context for tree actions?
+		//if(isDocumentDetails(data)) { ... }
+		const entry = {alias: alias, value: value};
 
-			this.update({data: newDataSet} as Partial<UmbDocumentStoreItemType>);
-		}
+		const newDataSet = appendToFrozenArray((this._data.getValue() as DocumentDetails).data, entry, x => x.alias === alias);
+
+		this.update({data: newDataSet});
 	}
 
 	/*
 	concept notes:
 
 	public saveAndPublish() {
-		
+
 	}
 
 	public saveAndPreview() {
-		
+
 	}
 	*/
 

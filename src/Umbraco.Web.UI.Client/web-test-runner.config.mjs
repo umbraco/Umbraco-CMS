@@ -11,16 +11,17 @@ export default {
 			inject: {
 				importMap: {
 					imports: {
+						'src/': './src/',
 						'@umbraco-cms/models': './src/core/models/index.ts',
 						'@umbraco-cms/backend-api': './src/core/backend-api/index.ts',
 						'@umbraco-cms/context-api': './src/core/context-api/index.ts',
+						'@umbraco-cms/controller': './src/core/controller/index.ts',
 						'@umbraco-cms/element': './src/core/element/index.ts',
 						'@umbraco-cms/extensions-api': './src/core/extensions-api/index.ts',
 						'@umbraco-cms/observable-api': './src/core/observable-api/index.ts',
 						'@umbraco-cms/utils': './src/core/utils/index.ts',
 						'@umbraco-cms/test-utils': './src/core/test-utils/index.ts',
 						'@umbraco-cms/resources': './src/core/resources/index.ts',
-						'@umbraco-cms/services': './src/core/services',
 						'@umbraco-cms/extensions-registry': './src/core/extensions-registry/index.ts',
 					},
 				},

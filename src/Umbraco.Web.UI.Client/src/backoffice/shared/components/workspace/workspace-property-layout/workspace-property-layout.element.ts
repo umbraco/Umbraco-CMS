@@ -59,7 +59,9 @@ export class UmbWorkspacePropertyLayoutElement extends LitElement {
 				<p>${this.description}</p>
 			</div>
 			<div>
-				<slot name="editor"></slot>
+				<uui-form-validation-message>
+					<slot name="editor"></slot>
+				</uui-form-validation-message>
 			</div>
 		`;
 	}

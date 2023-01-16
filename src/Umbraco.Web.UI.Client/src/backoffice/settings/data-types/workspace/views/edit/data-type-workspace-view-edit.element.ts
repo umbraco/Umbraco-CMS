@@ -1,17 +1,17 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html, nothing } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
-import { UmbLitElement } from '@umbraco-cms/element';
 import { UmbModalService } from '../../../../../../core/modal';
-import { UmbWorkspaceDataTypeContext } from '../../workspace-data-type.context';
+import { UmbWorkspaceDataTypeContext } from '../../data-type-workspace.context';
+import { UmbLitElement } from '@umbraco-cms/element';
 import type { DataTypeDetails } from '@umbraco-cms/models';
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
 
 import '../../../../../shared/property-editors/shared/property-editor-config/property-editor-config.element';
 import '../../../../../shared/components/ref-property-editor-ui/ref-property-editor-ui.element';
 
-@customElement('umb-workspace-view-data-type-edit')
-export class UmbWorkspaceViewDataTypeEditElement extends UmbLitElement {
+@customElement('umb-data-type-workspace-view-edit')
+export class UmbDataTypeWorkspaceViewEditElement extends UmbLitElement {
 	static styles = [
 		UUITextStyles,
 		css`
@@ -164,10 +164,10 @@ export class UmbWorkspaceViewDataTypeEditElement extends UmbLitElement {
 	}
 }
 
-export default UmbWorkspaceViewDataTypeEditElement;
+export default UmbDataTypeWorkspaceViewEditElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-workspace-view-data-type-edit': UmbWorkspaceViewDataTypeEditElement;
+		'umb-data-type-workspace-view-edit': UmbDataTypeWorkspaceViewEditElement;
 	}
 }
