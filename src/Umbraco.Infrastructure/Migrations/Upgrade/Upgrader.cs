@@ -54,7 +54,7 @@ public class Upgrader
 
         var initialState = GetInitialState(scopeProvider, keyValueService);
 
-        ExecutedMigrationPlan result = migrationPlanExecutor.Execute(Plan, initialState);
+        ExecutedMigrationPlan result = migrationPlanExecutor.ExecutePlan(Plan, initialState);
 
         if (string.IsNullOrWhiteSpace(result.FinalState) || result.FinalState == result.InitialState)
         {

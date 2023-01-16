@@ -89,7 +89,7 @@ public class MigrationPlanTests
             var sourceState = kvs.GetValue("Umbraco.Tests.MigrationPlan") ?? string.Empty;
 
             // execute plan
-            var result = executor.Execute(plan, sourceState);
+            var result = executor.ExecutePlan(plan, sourceState);
             state = result.FinalState;
 
             // save new state
