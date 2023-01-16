@@ -3,6 +3,7 @@ import { manifests as dashboardManifests } from './dashboards/manifests';
 import { manifests as dataTypeManifests } from './data-types/manifests';
 import { manifests as extensionManifests } from './extensions/manifests';
 import { manifests as languageManifests } from './languages/manifests';
+import { manifests as logviewerManifests } from './logviewer/manifests';
 
 import { ManifestTypes, umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
 
@@ -18,5 +19,6 @@ registerExtensions([
 	...dashboardManifests,
 	...dataTypeManifests,
 	...extensionManifests,
-	...languageManifests
+	...languageManifests,
+	...logviewerManifests
 ]);
