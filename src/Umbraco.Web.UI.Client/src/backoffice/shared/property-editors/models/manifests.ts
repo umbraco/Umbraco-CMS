@@ -26,6 +26,9 @@ import { manifest as listView } from './Umbraco.ListView';
 import { manifest as label } from './Umbraco.Label';
 import { manifest as integer } from './Umbraco.Integer';
 import { manifest as decimal } from './Umbraco.Decimal';
+import { manifest as userPicker } from './Umbraco.UserPicker';
+import { manifest as memberPicker } from './Umbraco.MemberPicker';
+import { manifest as memberGroupPicker } from './Umbraco.MemberGroupPicker';
 
 import type { ManifestPropertyEditorModel } from '@umbraco-cms/models';
 
@@ -58,24 +61,9 @@ export const manifests: Array<ManifestPropertyEditorModel> = [
 	label,
 	integer,
 	decimal,
-	{
-		type: 'propertyEditorModel',
-		name: 'Member Group Picker',
-		alias: 'Umbraco.MemberGroupPicker',
-		meta: {},
-	},
-	{
-		type: 'propertyEditorModel',
-		name: 'Member Picker',
-		alias: 'Umbraco.MemberPicker',
-		meta: {},
-	},
-	{
-		type: 'propertyEditorModel',
-		name: 'User Picker',
-		alias: 'Umbraco.UserPicker',
-		meta: {},
-	},
+	userPicker,
+	memberPicker,
+	memberGroupPicker,
 	{
 		type: 'propertyEditorModel',
 		name: 'Icon Picker',

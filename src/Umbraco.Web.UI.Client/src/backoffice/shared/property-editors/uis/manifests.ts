@@ -29,6 +29,9 @@ import { manifest as iconPicker } from './icon-picker/manifests';
 import { manifest as label } from './label/manifests';
 import { manifest as valueType } from './value-type/manifests';
 import { manifests as numbers } from './number/manifests';
+import { manifest as userPicker } from './user-picker/manifests';
+import { manifest as memberPicker } from './member-picker/manifests';
+import { manifest as memberGroupPicker } from './member-group-picker/manifests';
 import type { ManifestPropertyEditorUI } from '@umbraco-cms/models';
 
 export const manifests: Array<ManifestPropertyEditorUI> = [
@@ -55,6 +58,9 @@ export const manifests: Array<ManifestPropertyEditorUI> = [
 	iconPicker,
 	label,
 	valueType,
+	userPicker,
+	memberPicker,
+	memberGroupPicker,
 	...numbers,
 	...textBoxes,
 	...treePicker,
