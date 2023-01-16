@@ -2,11 +2,11 @@ import type { ManifestPropertyEditorUI } from '@umbraco-cms/models';
 
 export const manifest: ManifestPropertyEditorUI = {
 	type: 'propertyEditorUI',
-	alias: 'Umb.PropertyEditorUI.ContentPicker',
-	name: 'Content Picker Property Editor UI',
+	alias: 'Umb.PropertyEditorUI.DocumentPicker',
+	name: 'Document Picker Property Editor UI',
 	loader: () => import('./property-editor-ui-document-picker.element'),
 	meta: {
-		label: 'Content Picker',
+		label: 'Document Picker',
 		propertyEditorModel: 'Umbraco.ContentPicker',
 		icon: 'umb:document',
 		group: 'common',
