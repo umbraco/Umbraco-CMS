@@ -71,12 +71,13 @@ export const data: Array<DataTypeDetails> = [
 		parentKey: null,
 		isFolder: false,
 		propertyEditorModelAlias: 'Umbraco.ContentPicker',
-		propertyEditorUIAlias: 'Umb.PropertyEditorUI.ContentPicker',
+		propertyEditorUIAlias: 'Umb.PropertyEditorUI.DocumentPicker',
 		data: [
 			{
 				alias: 'validationLimit',
-				value: {min: 2, max:4},
-			}],
+				value: { min: 2, max: 4 },
+			},
+		],
 	},
 	{
 		name: 'Eye Dropper',
