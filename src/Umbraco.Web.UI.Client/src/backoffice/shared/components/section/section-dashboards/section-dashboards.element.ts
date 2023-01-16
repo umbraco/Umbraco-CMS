@@ -39,7 +39,6 @@ export class UmbSectionDashboardsElement extends UmbLitElement {
 
 			#router-slot {
 				width: 100%;
-				height: 100%;
 				box-sizing: border-box;
 				display: block;
 			}

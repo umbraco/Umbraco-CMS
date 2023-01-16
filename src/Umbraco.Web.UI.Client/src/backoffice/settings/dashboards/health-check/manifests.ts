@@ -12,7 +12,7 @@ const _createManifests = (groups: HealthCheckGroup[]): Array<ManifestHealthCheck
 	return groups.map((group) => {
 		return {
 			type: 'healthCheck',
-			alias: `Umb.HealthCheck.${group.name}`,
+			alias: `Umb.HealthCheck.${group.name?.replace(/\s+/g, '') || ''}`,
 			name: `${group.name} Health Check`,
 			weight: 500,
 			meta: {

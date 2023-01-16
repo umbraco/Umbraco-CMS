@@ -18,8 +18,8 @@ export class UmbDashboardHealthCheckGroupElement extends UmbLitElement {
 	static styles = [
 		UUITextStyles,
 		css`
-			uui-box + uui-box {
-				margin-top: var(--uui-size-space-5);
+			uui-box {
+				margin-bottom: var(--uui-size-space-5);
 			}
 
 			uui-box p:first-child {
@@ -32,7 +32,7 @@ export class UmbDashboardHealthCheckGroupElement extends UmbLitElement {
 				margin-inline: -5px;
 			}
 
-			.flex {
+			.header {
 				display: flex;
 				justify-content: space-between;
 				align-items: center;
@@ -53,7 +53,7 @@ export class UmbDashboardHealthCheckGroupElement extends UmbLitElement {
 			}
 
 			p uui-icon {
-				vertical-align: middle;
+				vertical-align: sub;
 			}
 
 			.data .result-wrapper:not(:first-child) {
@@ -144,22 +144,25 @@ export class UmbDashboardHealthCheckGroupElement extends UmbLitElement {
 	render() {
 		if (this._group) {
 			return html`
-				<uui-box>
-					<div slot="headline" class="flex">
-						<span>${this._group.name}</span>
-						<uui-button color="positive" look="primary" .state="${this._buttonState}" @click="${this._buttonHandler}">
-							Get checks
-						</uui-button>
-					</div>
-					<div class="checks-wrapper">
-						${this._group.checks?.map((check) => {
-							return html`<uui-box headline="${check.name || '?'}">
-								<p>${check.description}</p>
-								${check.key ? this.renderCheckResults(check.key) : nothing}
-							</uui-box>`;
-						})}
-					</div>
-				</uui-box>
+				<div class="header">
+					<h2>${this._group.name}</h2>
+					<uui-button
+						label="Get checks"
+						color="positive"
+						look="primary"
+						.state="${this._buttonState}"
+						@click="${this._buttonHandler}">
+						Get checks
+					</uui-button>
+				</div>
+				<div class="checks-wrapper">
+					${this._group.checks?.map((check) => {
+						return html`<uui-box headline="${check.name || '?'}">
+							<p>${check.description}</p>
+							${check.key ? this.renderCheckResults(check.key) : nothing}
+						</uui-box>`;
+					})}
+				</div>
 			`;
 		} else return nothing;
 	}
@@ -171,7 +174,17 @@ export class UmbDashboardHealthCheckGroupElement extends UmbLitElement {
 				${checkResults?.results.map((result: any) => {
 					return html`<div class="result-wrapper">
 						<p>${this.renderIcon(result.resultType)} ${result.message}</p>
-						${result.readMoreLink ? html`<uui-button color="default" look="primary">Read more</uui-button>` : nothing}
+						${result.readMoreLink
+							? html`<uui-button
+									label="Read more"
+									color="default"
+									look="primary"
+									target="_blank"
+									href="${result.readMoreLink}">
+									Read more
+									<uui-icon name="umb:out"></uui-icon>
+							  </uui-button>`
+							: nothing}
 					</div>`;
 				})}
 			</div>

@@ -78,13 +78,7 @@ export class UmbDashboardHealthCheckOverviewElement extends UmbLitElement {
 	private _buttonState: UUIButtonState;
 
 	@state()
-	private _groups?: HealthCheckGroup[];
-
-	@state()
 	private _groupWithResults: HealthCheckGroupWithResult[] = [];
-
-	@state()
-	private _nameOfGroups!: string[];
 
 	private _modalService?: UmbModalService;
 
@@ -117,6 +111,7 @@ export class UmbDashboardHealthCheckOverviewElement extends UmbLitElement {
 				<div slot="headline" class="flex">
 					Health Check
 					<uui-button
+						label="Check all groups"
 						color="positive"
 						look="primary"
 						.state="${this._buttonState}"
@@ -133,76 +128,10 @@ export class UmbDashboardHealthCheckOverviewElement extends UmbLitElement {
 	private renderChecks(name: string) {
 		if (this._groupWithResults.length) {
 			const group = this._groupWithResults?.find((group) => group.name == name);
-			console.log('found:', group);
+			//console.log('found:', group);
 			return html`${name}`;
 		} else return nothing;
 	}
-
-	/**				<div class="group-wrapper">
-					${this._healthGroups.map((group) => {
-						if (group.name)
-							return html` <a href="${this.urlGenerator(group.name)}">
-								<uui-box class="group-box"> ${group.name} ${this.renderChecks(group)} </uui-box>
-							</a>`;
-						else return nothing;
-					})}
-				</div> */
-	/*
-	private renderChecks(group: HealthCheckGroup) {
-		if (this._showChecks && group.checks) {
-			const checksOfGroup = this.getChecksInGroup(group.checks);
-			return html` <br />
-				<uui-icon-registry-essential>
-					${checksOfGroup.success ? this.renderTags('Success', checksOfGroup.success) : ''}
-					${checksOfGroup.warning ? this.renderTags('Warning', checksOfGroup.warning) : ''}
-					${checksOfGroup.error ? this.renderTags('Error', checksOfGroup.error) : ''}
-				</uui-icon-registry-essential>`;
-		} else return nothing;
-	}*/
-
-	/*
-	private getChecksInGroup(groupChecks: HealthCheckGroupCheck[]) {
-		const result = { success: 0, warning: 0, error: 0, info: 0 };
-
-		groupChecks.forEach((data) => {
-			data.results?.forEach((check) => {
-				switch (check.resultType) {
-					case 'Success':
-						result.success += 1;
-						break;
-					case 'Warning':
-						result.warning += 1;
-						break;
-					case 'Error':
-						result.error += 1;
-						break;
-					case 'Info':
-						result.info += 1;
-						break;
-					default:
-						break;
-				}
-			});
-		});
-		return result;
-	}
-	*/
-	/*
-	private renderTags(type: HealthResult, amount: number) {
-		switch (type) {
-			case 'Success':
-				return html`<uui-tag color="positive" look="secondary"><uui-icon name="check"></uui-icon>${amount}</uui-tag>`;
-			case 'Warning':
-				return html`<uui-tag color="warning" look="secondary"><uui-icon name="alert"></uui-icon>${amount}</uui-tag>`;
-			case 'Error':
-				return html`<uui-tag color="danger" look="secondary"><uui-icon name="remove"></uui-icon>${amount}</uui-tag>`;
-			case 'Info':
-				return html`<uui-tag color="default" look="secondary"><uui-icon name="info"></uui-icon>${amount}</uui-tag>`;
-			default:
-				return html``;
-		}
-	}
-	*/
 }
 
 export default UmbDashboardHealthCheckOverviewElement;

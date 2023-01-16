@@ -15,7 +15,6 @@ export class UmbDashboardHealthCheckElement extends UmbLitElement {
 				text-decoration: none;
 				cursor: pointer;
 				display: inline-block;
-				margin-bottom: var(--uui-size-space-5);
 			}
 		`,
 	];
