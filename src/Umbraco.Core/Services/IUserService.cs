@@ -269,6 +269,9 @@ public interface IUserService : IMembershipUserService
     /// </returns>
     IUserGroup? GetUserGroupById(int id);
 
+    // TODO: Add docstring
+    IUserGroup? GetUserGroupByKey(Guid key);
+
     /// <summary>
     ///     Saves a UserGroup
     /// </summary>

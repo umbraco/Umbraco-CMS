@@ -944,6 +944,15 @@ internal class UserService : RepositoryService, IUserService
         }
     }
 
+    public IUserGroup? GetUserGroupByKey(Guid key)
+    {
+        using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+
+        IQuery<IUserGroup> query = Query<IUserGroup>().Where(x => x.Key == key);
+        IEnumerable<IUserGroup> groups = _userGroupRepository.Get(query);
+        return groups.FirstOrDefault();
+    }
+
     /// <summary>
     ///     Saves a UserGroup
     /// </summary>
