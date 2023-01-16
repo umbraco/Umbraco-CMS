@@ -2,9 +2,9 @@ import { html, css, nothing } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { IRoute, IRoutingInfo, path } from 'router-slot';
 import { UmbDashboardHealthCheckGroupElement } from './views/health-check-group';
+import { UmbHealthCheckDashboardContext } from './health-check-dashboard.context';
 import { UmbLitElement } from '@umbraco-cms/element';
 import { ManifestHealthCheck, umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
-import { UmbHealthCheckDashboardContext } from './health-check-dashboard.context';
 
 @customElement('umb-dashboard-health-check')
 export class UmbDashboardHealthCheckElement extends UmbLitElement {
