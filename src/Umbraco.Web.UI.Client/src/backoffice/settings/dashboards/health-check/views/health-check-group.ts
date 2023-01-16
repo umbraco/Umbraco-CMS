@@ -8,10 +8,12 @@ import { UmbHealthCheckDashboardContext } from '../health-check-dashboard.contex
 import {
 	HealthCheckAction,
 	HealthCheckGroupWithResult,
+	HealthCheckResource,
 	HealthCheckWithResult,
 	StatusResultType,
 } from '@umbraco-cms/backend-api';
 import { UmbLitElement } from '@umbraco-cms/element';
+import { tryExecuteAndNotify } from '@umbraco-cms/resources';
 
 @customElement('umb-dashboard-health-check-group')
 export class UmbDashboardHealthCheckGroupElement extends UmbLitElement {
@@ -113,6 +115,9 @@ export class UmbDashboardHealthCheckGroupElement extends UmbLitElement {
 	@state()
 	private _keyResults?: any;
 
+	@state()
+	private _actionButtonStates?: [{ key: string; state: UUIButtonState }];
+
 	private _api?: UmbHealthCheckContext;
 
 	constructor() {
@@ -139,6 +144,10 @@ export class UmbDashboardHealthCheckGroupElement extends UmbLitElement {
 		this._buttonState = 'waiting';
 		this._api?.checkGroup(this.groupName);
 		this._buttonState = 'success';
+	}
+
+	private async _onActionClick(action: HealthCheckAction) {
+		await tryExecuteAndNotify(this, HealthCheckResource.postHealthCheckExecuteAction({ requestBody: action }));
 	}
 
 	render() {
@@ -185,6 +194,7 @@ export class UmbDashboardHealthCheckGroupElement extends UmbLitElement {
 									<uui-icon name="umb:out"></uui-icon>
 							  </uui-button>`
 							: nothing}
+						${result.actions ? this.renderActions(result.actions) : nothing}
 					</div>`;
 				})}
 			</div>
@@ -211,7 +221,11 @@ export class UmbDashboardHealthCheckGroupElement extends UmbLitElement {
 			return html` <div class="action-wrapper">
 				${actions.map((action) => {
 					return html` <div class="action">
-						<uui-button look="primary" color="positive" label="${action.name || 'action'}">
+						<uui-button
+							look="primary"
+							color="positive"
+							label="${action.name || 'action'}"
+							@click="${() => this._onActionClick(action)}">
 							${action.name || 'Action'}
 						</uui-button>
 						<p>${action.description || html`<span class="no-description">This action has no description</span>`}</p>

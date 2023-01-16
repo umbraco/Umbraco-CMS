@@ -7,6 +7,7 @@ import {
 	HealthCheckWithResult,
 	HealthCheckResult,
 	StatusResultType,
+	HealthCheckAction,
 } from '@umbraco-cms/backend-api';
 
 export function getGroupByName(name: string) {
@@ -28,6 +29,14 @@ export const healthGroups: HealthCheckGroupWithResult[] = [
 						completely if there are any errors in macros. Rectifying this will set the value to 'Inline'. `,
 						resultType: StatusResultType.ERROR,
 						readMoreLink: 'https://umbra.co/healthchecks-macro-errors',
+						actions: [
+							{
+								healthCheckKey: 'key123',
+								name: 'Action name',
+								alias: 'Action alias',
+								description: 'Action description',
+							},
+						],
 					},
 				],
 			},
