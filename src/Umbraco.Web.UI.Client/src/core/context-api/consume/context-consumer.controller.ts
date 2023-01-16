@@ -1,7 +1,7 @@
 import { UmbContextConsumer } from './context-consumer';
 import { UmbContextCallback } from './context-request.event';
 import type { UmbControllerInterface } from 'src/core/controller/controller.interface';
-import { UmbControllerHostInterface } from 'src/core/controller/controller-host.mixin';
+import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 
 
 export class UmbContextConsumerController extends UmbContextConsumer<UmbControllerHostInterface> implements UmbControllerInterface {

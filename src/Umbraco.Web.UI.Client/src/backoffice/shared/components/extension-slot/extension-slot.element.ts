@@ -1,13 +1,14 @@
 import { nothing } from 'lit';
+import type { TemplateResult } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
+import { css } from 'lit';
 import { map } from 'rxjs';
 import { repeat } from 'lit/directives/repeat.js';
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
-import { createExtensionElement } from '@umbraco-cms/extensions-api';
-import { isManifestElementableType } from 'src/core/extensions-api/is-manifest-elementable-type.function';
+import { createExtensionElement, isManifestElementableType } from '@umbraco-cms/extensions-api';
 import { UmbLitElement } from '@umbraco-cms/element';
 
-type InitializedExtensionItem = { alias: string; weight: number; component: HTMLElement | null };
+export type InitializedExtension = { alias: string; weight: number; component: HTMLElement | null };
 
 /**
  * @element umb-extension-slot
@@ -19,8 +20,15 @@ type InitializedExtensionItem = { alias: string; weight: number; component: HTML
  */
 @customElement('umb-extension-slot')
 export class UmbExtensionSlotElement extends UmbLitElement {
+
+	static styles = css`
+		:host {
+			display: contents;
+		}
+	`;
+
 	@state()
-	private _extensions: InitializedExtensionItem[] = [];
+	private _extensions: InitializedExtension[] = [];
 
 	@property({ type: String })
 	public type = '';
@@ -30,6 +38,9 @@ export class UmbExtensionSlotElement extends UmbLitElement {
 
 	@property({ type: String, attribute: 'default-element' })
 	public defaultElement = '';
+
+	@property()
+	public renderMethod: (manifest: InitializedExtension) => TemplateResult<1 | 2> | HTMLElement | null = (manifest) => manifest.component;
 
 	connectedCallback(): void {
 		super.connectedCallback();
@@ -51,7 +62,7 @@ export class UmbExtensionSlotElement extends UmbLitElement {
 				extensions.forEach(async (extension) => {
 					const hasExt = this._extensions.find((x) => x.alias === extension.alias);
 					if (!hasExt) {
-						const extensionObject: InitializedExtensionItem = {
+						const extensionObject: InitializedExtension = {
 							alias: extension.alias,
 							weight: (extension as any).weight || 0,
 							component: null,
@@ -87,7 +98,7 @@ export class UmbExtensionSlotElement extends UmbLitElement {
 		return repeat(
 			this._extensions,
 			(ext) => ext.alias,
-			(ext) => ext.component || nothing
+			(ext) => this.renderMethod(ext) || nothing
 		);
 	}
 }

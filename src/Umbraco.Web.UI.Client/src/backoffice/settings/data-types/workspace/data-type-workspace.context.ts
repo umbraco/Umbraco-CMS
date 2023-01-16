@@ -1,7 +1,8 @@
 import { UmbWorkspaceContentContext } from '../../../shared/components/workspace/workspace-content/workspace-content.context';
 import type { UmbDataTypeStore, UmbDataTypeStoreItemType } from 'src/backoffice/settings/data-types/data-type.store';
 import type { DataTypeDetails } from '@umbraco-cms/models';
-import { UmbControllerHostInterface } from 'src/core/controller/controller-host.mixin';
+import { UmbControllerHostInterface } from '@umbraco-cms/controller';
+import { appendToFrozenArray } from '@umbraco-cms/observable-api';
 
 const DefaultDataTypeData = {
 	key: '',
@@ -23,13 +24,13 @@ export class UmbWorkspaceDataTypeContext extends UmbWorkspaceContentContext<
 		super(host, DefaultDataTypeData, 'umbDataTypeStore', 'dataType');
 	}
 
-	public setPropertyValue(propertyAlias: string, value: any) {
-		// TODO: what if this is a tree item?
-		const data = this._data.getValue();
-		const property = (data as DataTypeDetails).data?.find((p) => p.alias === propertyAlias);
-		if (!property) return;
+	public setPropertyValue(alias: string, value: unknown) {
 
-		property.value = value;
-		this._data.next({ ...data });
+		// TODO: make sure to check that we have a details model? otherwise fail? 8This can be relevant if we use the same context for tree actions?
+		const entry = {alias: alias, value: value};
+
+		const newDataSet = appendToFrozenArray((this._data.getValue() as DataTypeDetails).data, entry, x => x.alias === alias);
+
+		this.update({data: newDataSet});
 	}
 }
