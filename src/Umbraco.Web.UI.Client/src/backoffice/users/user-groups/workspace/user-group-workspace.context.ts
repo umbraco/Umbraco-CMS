@@ -21,4 +21,9 @@ export class UmbWorkspaceUserGroupContext extends UmbWorkspaceContentContext<
 	constructor(host: UmbControllerHostInterface) {
 		super(host, DefaultDataTypeData, 'umbUserStore', 'userGroup');
 	}
+
+
+	public setPropertyValue(alias: string, value: unknown) {
+		throw new Error("setPropertyValue is not implemented for UmbWorkspaceUserGroupContext")
+	}
 }

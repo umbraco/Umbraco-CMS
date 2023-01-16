@@ -1,9 +1,9 @@
-import { BehaviorSubject, Observable } from 'rxjs';
 import { ContentTreeItem } from '@umbraco-cms/backend-api';
 import { UmbTreeDataStore } from '@umbraco-cms/stores/store';
 import { UmbControllerHostInterface } from 'src/core/controller/controller-host.mixin';
 import { UmbContextConsumerController } from 'src/core/context-api/consume/context-consumer.controller';
 import { UmbObserverController } from 'src/core/observable-api/observer.controller';
+import { UniqueBehaviorSubject } from 'src/core/observable-api/unique-behavior-subject';
 
 export class UmbCollectionContext<
 	DataType extends ContentTreeItem,
@@ -16,16 +16,16 @@ export class UmbCollectionContext<
 	private _store?: StoreType;
 	protected _dataObserver?: UmbObserverController<DataType[]>;
 
-	private _data: BehaviorSubject<Array<DataType>> = new BehaviorSubject(<Array<DataType>>[]);
-	public readonly data: Observable<Array<DataType>> = this._data.asObservable();
+	#data = new UniqueBehaviorSubject(<Array<DataType>>[]);
+	public readonly data = this.#data.asObservable();
 
-	private _selection: BehaviorSubject<Array<string>> = new BehaviorSubject(<Array<string>>[]);
-	public readonly selection: Observable<Array<string>> = this._selection.asObservable();
+	#selection = new UniqueBehaviorSubject(<Array<string>>[]);
+	public readonly selection = this.#selection.asObservable();
 
 	/*
 	TODO:
-	private _search: BehaviorSubject<string> = new BehaviorSubject('');
-	public readonly search: Observable<string> = this._search.asObservable();
+	private _search = new UniqueBehaviorSubject('');
+	public readonly search = this._search.asObservable();
 	*/
 
 	constructor(host: UmbControllerHostInterface, entityKey: string | null, storeAlias: string) {
@@ -42,9 +42,11 @@ export class UmbCollectionContext<
 		});
 	}
 
+	/*
 	public getData() {
-		return this._data.getValue();
+		return this.#data.getValue();
 	}
+	*/
 
 	/*
 	public update(data: Partial<DataType>) {
@@ -62,13 +64,13 @@ export class UmbCollectionContext<
 		if (this._entityKey) {
 			this._dataObserver = new UmbObserverController(this._host, this._store.getTreeItemChildren(this._entityKey), (nodes) => {
 				if(nodes) {
-					this._data.next(nodes);
+					this.#data.next(nodes);
 				}
 			});
 		} else {
 			this._dataObserver = new UmbObserverController(this._host, this._store.getTreeRoot(), (nodes) => {
 				if(nodes) {
-					this._data.next(nodes);
+					this.#data.next(nodes);
 				}
 			});
 		}
@@ -85,25 +87,25 @@ export class UmbCollectionContext<
 
 	public setSelection(value: Array<string>) {
 		if (!value) return;
-		this._selection.next(value);
+		this.#selection.next(value);
 	}
 
 	public clearSelection() {
-		this._selection.next([]);
+		this.#selection.next([]);
 	}
 
 	public select(key: string) {
-		const selection = this._selection.getValue();
-		this._selection.next([...selection, key]);
+		const selection = this.#selection.getValue();
+		this.#selection.next([...selection, key]);
 	}
 
 	public deselect(key: string) {
-		const selection = this._selection.getValue();
-		this._selection.next(selection.filter((k) => k !== key));
+		const selection = this.#selection.getValue();
+		this.#selection.next(selection.filter((k) => k !== key));
 	}
 
 	// TODO: how can we make sure to call this.
 	public destroy(): void {
-		this._data.unsubscribe();
+		this.#data.unsubscribe();
 	}
 }

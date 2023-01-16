@@ -3,16 +3,8 @@ import { Observable, Subscription } from 'rxjs';
 export class UmbObserver<T> {
 
 	#subscription!: Subscription;
-	
-	constructor(source: Observable<T>, callback: (_value: T) => void) {
 
-		// TODO: can be transferred to something using alias?
-		/*
-		if (this._subscriptions.has(source)) {
-			const subscription = this._subscriptions.get(source);
-			subscription?.unsubscribe();
-		}
-		*/
+	constructor(source: Observable<T>, callback: (_value: T) => void) {
 
 		this.#subscription = source.subscribe((value) => callback(value));
 	}

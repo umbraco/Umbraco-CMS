@@ -74,28 +74,41 @@ export class UmbCollectionViewsMediaGridElement extends UmbLitElement {
 
 	constructor() {
 		super();
-		document.addEventListener('dragenter', () => {
-			this.toggleAttribute('dragging', true);
-		});
-		document.addEventListener('dragleave', () => {
-			this.toggleAttribute('dragging', false);
-		});
-		document.addEventListener('drop', (e) => {
-			e.preventDefault();
-			this.toggleAttribute('dragging', false);
-		});
+		document.addEventListener('dragenter', this._handleDragEnter.bind(this));
+		document.addEventListener('dragleave', this._handleDragLeave.bind(this));
+		document.addEventListener('drop', this._handleDrop.bind(this));
 		this.consumeContext('umbCollectionContext', (instance) => {
-			console.log("umbCollectionContext", instance)
+			console.log('umbCollectionContext', instance);
 			this._collectionContext = instance;
 			this._observeCollectionContext();
 		});
+	}
+
+	disconnectedCallback(): void {
+		super.disconnectedCallback();
+		document.removeEventListener('dragenter', this._handleDragEnter.bind(this));
+		document.removeEventListener('dragleave', this._handleDragLeave.bind(this));
+		document.removeEventListener('drop', this._handleDrop.bind(this));
+	}
+
+	private _handleDragEnter() {
+		this.toggleAttribute('dragging', true);
+	}
+
+	private _handleDragLeave() {
+		this.toggleAttribute('dragging', false);
+	}
+
+	private _handleDrop(e: DragEvent) {
+		e.preventDefault();
+		this.toggleAttribute('dragging', false);
 	}
 
 	private _observeCollectionContext() {
 		if (!this._collectionContext) return;
 
 		this.observe(this._collectionContext.data, (mediaItems) => {
-			this._mediaItems = mediaItems.sort((a, b) => (a.hasChildren === b.hasChildren ? 0 : a ? -1 : 1));
+			this._mediaItems = [...mediaItems].sort((a, b) => (a.hasChildren === b.hasChildren ? 0 : a ? -1 : 1));
 		});
 
 		this.observe(this._collectionContext.selection, (selection) => {
@@ -144,11 +157,13 @@ export class UmbCollectionViewsMediaGridElement extends UmbLitElement {
 				label="Drop files here"
 				accept=""></uui-file-dropzone>
 			<div id="media-files">
-				${this._mediaItems ? repeat(
-					this._mediaItems,
-					(file, index) => file.key + index,
-					(file) => this._renderMediaItem(file)
-				) : ''}
+				${this._mediaItems
+					? repeat(
+							this._mediaItems,
+							(file, index) => file.key + index,
+							(file) => this._renderMediaItem(file)
+					  )
+					: ''}
 			</div>
 		`;
 	}

@@ -1,9 +1,10 @@
 import { map, Observable } from 'rxjs';
 import { UmbDataStoreBase } from '../../../core/stores/store';
-import { ApiError, DocumentTypeResource, DocumentTypeTreeItem, ProblemDetails } from '@umbraco-cms/backend-api';
+import { DocumentTypeResource, DocumentTypeTreeItem } from '@umbraco-cms/backend-api';
 import type { DocumentTypeDetails } from '@umbraco-cms/models';
+import { tryExecuteAndNotify } from '@umbraco-cms/resources';
 
-const isDocumentTypeDetails = (
+export const isDocumentTypeDetails = (
 	documentType: DocumentTypeDetails | DocumentTypeTreeItem
 ): documentType is DocumentTypeDetails => {
 	return (documentType as DocumentTypeDetails).properties !== undefined;
@@ -57,39 +58,26 @@ export class UmbDocumentTypeStore extends UmbDataStoreBase<UmbDocumentTypeStoreI
 	}
 
 	getTreeRoot(): Observable<Array<DocumentTypeTreeItem>> {
-		DocumentTypeResource.getTreeDocumentTypeRoot({}).then(
-			(res) => {
-				this.updateItems(res.items);
-			},
-			(e) => {
-				if (e instanceof ApiError) {
-					const error = e.body as ProblemDetails;
-					if (e.status === 400) {
-						console.log(error.detail);
-					}
-				}
+		tryExecuteAndNotify(this.host, DocumentTypeResource.getTreeDocumentTypeRoot({})).then(({ data }) => {
+			if (data) {
+				this.updateItems(data.items);
 			}
-		);
+		});
 
 		return this.items.pipe(map((items) => items.filter((item) => item.parentKey === null)));
 	}
 
 	getTreeItemChildren(key: string): Observable<Array<DocumentTypeTreeItem>> {
-		DocumentTypeResource.getTreeDocumentTypeChildren({
-			parentKey: key,
-		}).then(
-			(res) => {
-				this.updateItems(res.items);
-			},
-			(e) => {
-				if (e instanceof ApiError) {
-					const error = e.body as ProblemDetails;
-					if (e.status === 400) {
-						console.log(error.detail);
-					}
-				}
+		tryExecuteAndNotify(
+			this.host,
+			DocumentTypeResource.getTreeDocumentTypeChildren({
+				parentKey: key,
+			})
+		).then(({ data }) => {
+			if (data) {
+				this.updateItems(data.items);
 			}
-		);
+		});
 
 		return this.items.pipe(map((items) => items.filter((item) => item.parentKey === key)));
 	}

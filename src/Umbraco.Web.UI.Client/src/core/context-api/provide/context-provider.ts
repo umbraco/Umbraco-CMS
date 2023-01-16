@@ -9,8 +9,8 @@ export class UmbContextProvider<HostType extends EventTarget = EventTarget > {
 
 	protected host: HostType;
 
-	private _contextAlias: string;
-	private _instance: unknown;
+	protected _contextAlias: string;
+	#instance: unknown;
 
 	/**
 	 * Creates an instance of UmbContextProvider.
@@ -22,7 +22,7 @@ export class UmbContextProvider<HostType extends EventTarget = EventTarget > {
 	constructor(host: HostType, contextAlias: string, instance: unknown) {
 		this.host = host;
 		this._contextAlias = contextAlias;
-		this._instance = instance;
+		this.#instance = instance;
 	}
 
 	/**
@@ -51,6 +51,6 @@ export class UmbContextProvider<HostType extends EventTarget = EventTarget > {
 		if (event.contextAlias !== this._contextAlias) return;
 
 		event.stopPropagation();
-		event.callback(this._instance);
+		event.callback(this.#instance);
 	};
 }

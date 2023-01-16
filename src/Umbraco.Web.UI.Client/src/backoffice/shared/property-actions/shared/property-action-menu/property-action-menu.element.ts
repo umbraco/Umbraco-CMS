@@ -8,6 +8,7 @@ import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
 
 import '../property-action/property-action.element';
 import { UmbLitElement } from '@umbraco-cms/element';
+import { UmbObserverController } from '@umbraco-cms/observable-api';
 
 @customElement('umb-property-action-menu')
 export class UmbPropertyActionMenuElement extends UmbLitElement {
@@ -40,12 +41,18 @@ export class UmbPropertyActionMenuElement extends UmbLitElement {
 		`,
 	];
 
-	@property()
-	public propertyEditorUIAlias = '';
+
 
 	// TODO: we need to investigate context api vs values props and events
 	@property()
 	public value?: string;
+
+	@property()
+	set propertyEditorUIAlias(alias: string) {
+		this._observeActions(alias);
+	}
+
+	private _actionsObserver?: UmbObserverController<ManifestPropertyAction[]>;
 
 	@state()
 	private _actions: Array<ManifestPropertyAction> = [];
@@ -53,74 +60,72 @@ export class UmbPropertyActionMenuElement extends UmbLitElement {
 	@state()
 	private _open = false;
 
-	private _propertyActionMenuContext = new UmbPropertyActionMenuContext();
+	private _propertyActionMenuContext = new UmbPropertyActionMenuContext(this);
 
-	connectedCallback(): void {
-		super.connectedCallback();
+	constructor() {
+		super();
 
-		this._observePropertyActions();
-		this._observePropertyActionMenuOpenState();
+		this.observe(this._propertyActionMenuContext.isOpen, (value) => {
+			this._open = value;
+		});
 
-		this.provideContext('umbPropertyActionMenu', this._propertyActionMenuContext);
+		this.addEventListener('close', (e) => {
+			this._propertyActionMenuContext.close();
+			e.stopPropagation();
+		});
 	}
 
-	private _observePropertyActions() {
-		this.observe(
+	private _observeActions(alias: string) {
+		this._actionsObserver?.destroy();
+		this._actionsObserver = this.observe(
 			umbExtensionsRegistry
 				.extensionsOfType('propertyAction')
 				.pipe(
-					map((propertyActions) =>
-						propertyActions.filter((propertyAction) =>
-							propertyAction.meta.propertyEditors.includes(this.propertyEditorUIAlias)
+					map((propertyActions) => {
+						return propertyActions.filter((propertyAction) =>
+							propertyAction.meta.propertyEditors.includes(alias)
 						)
+					}
 					)
 				),
-			(propertyActionManifests) => {
-				this._actions = propertyActionManifests;
+			(manifests) => {
+				this._actions = manifests;
 			}
 		);
 	}
 
-	private _observePropertyActionMenuOpenState() {
-		this.observe(this._propertyActionMenuContext.isOpen, (value) => {
-			this._open = value;
-		});
-	}
-
 	private _toggleMenu() {
-		this._open ? this._propertyActionMenuContext.close() : this._propertyActionMenuContext.open();
+		this._propertyActionMenuContext.toggle();
 	}
 
 	private _handleClose(event: CustomEvent) {
-		this._open = false;
+		this._propertyActionMenuContext.close();
 		event.stopPropagation();
 	}
 
 	render() {
-		return html`
-			${this._actions.length > 0
-				? html`
-						<uui-popover id="popover" placement="bottom-start" .open=${this._open} @close="${this._handleClose}">
-							<uui-button
-								id="popover-trigger"
-								slot="trigger"
-								look="secondary"
-								label="More"
-								@click="${this._toggleMenu}"
-								compact>
-								<uui-symbol-more id="more-symbol"></uui-symbol-more>
-							</uui-button>
+		return (this._actions.length > 0) ?
+			html`
+				<uui-popover id="popover" placement="bottom-start" .open=${this._open} @close="${this._handleClose}">
+					<uui-button
+						id="popover-trigger"
+						slot="trigger"
+						look="secondary"
+						label="More"
+						@click="${this._toggleMenu}"
+						compact>
+						<uui-symbol-more id="more-symbol"></uui-symbol-more>
+					</uui-button>
 
-							<div slot="popover" id="dropdown">
-								${this._actions.map(
-									(action) => html`
-										<umb-property-action .propertyAction=${action} .value="${this.value}"></umb-property-action>
-									`
-								)}
-							</div>
-						</uui-popover>
-				  `
-				: ''}
-		`;
+					<div slot="popover" id="dropdown">
+						${this._actions.map(
+							(action) => html`
+								<umb-property-action .propertyAction=${action} .value="${this.value}"></umb-property-action>
+							`
+						)}
+					</div>
+				</uui-popover>
+			`
+			: '';
 	}
 }

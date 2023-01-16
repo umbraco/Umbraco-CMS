@@ -1,9 +1,10 @@
 import { map, Observable } from 'rxjs';
 import { UmbNodeStoreBase } from '../../../core/stores/store';
 import type { DocumentDetails } from '@umbraco-cms/models';
-import { ApiError, DocumentResource, DocumentTreeItem, FolderTreeItem, ProblemDetails } from '@umbraco-cms/backend-api';
+import { DocumentResource, DocumentTreeItem, FolderTreeItem } from '@umbraco-cms/backend-api';
+import { tryExecuteAndNotify } from '@umbraco-cms/resources';
 
-const isDocumentDetails = (document: DocumentDetails | DocumentTreeItem): document is DocumentDetails => {
+export const isDocumentDetails = (document: DocumentDetails | DocumentTreeItem): document is DocumentDetails => {
 	return (document as DocumentDetails).data !== undefined;
 };
 
@@ -79,19 +80,11 @@ export class UmbDocumentStore extends UmbNodeStoreBase<UmbDocumentStoreItemType>
 	}
 
 	getTreeRoot(): Observable<Array<DocumentTreeItem>> {
-		DocumentResource.getTreeDocumentRoot({}).then(
-			(res) => {
-				this.updateItems(res.items);
-			},
-			(e) => {
-				if (e instanceof ApiError) {
-					const error = e.body as ProblemDetails;
-					if (e.status === 400) {
-						console.log(error.detail);
-					}
-				}
+		tryExecuteAndNotify(this.host, DocumentResource.getTreeDocumentRoot({})).then(({ data }) => {
+			if (data) {
+				this.updateItems(data.items);
 			}
-		);
+		});
 
 		// TODO: how do we handle trashed items?
 		// TODO: remove ignore when we know how to handle trashed items.
@@ -101,21 +94,16 @@ export class UmbDocumentStore extends UmbNodeStoreBase<UmbDocumentStoreItemType>
 	}
 
 	getTreeItemChildren(key: string): Observable<Array<FolderTreeItem>> {
-		DocumentResource.getTreeDocumentChildren({
-			parentKey: key,
-		}).then(
-			(res) => {
-				this.updateItems(res.items);
-			},
-			(e) => {
-				if (e instanceof ApiError) {
-					const error = e.body as ProblemDetails;
-					if (e.status === 400) {
-						console.log(error.detail);
-					}
-				}
+		tryExecuteAndNotify(
+			this.host,
+			DocumentResource.getTreeDocumentChildren({
+				parentKey: key,
+			})
+		).then(({ data }) => {
+			if (data) {
+				this.updateItems(data.items);
 			}
-		);
+		});
 
 		// TODO: how do we handle trashed items?
 		// TODO: remove ignore when we know how to handle trashed items.
@@ -125,22 +113,17 @@ export class UmbDocumentStore extends UmbNodeStoreBase<UmbDocumentStoreItemType>
 	}
 
 	getTreeItems(keys: Array<string>): Observable<Array<FolderTreeItem>> {
-		if (keys.length > 0) {
-			DocumentResource.getTreeDocumentItem({
-				key: keys,
-			}).then(
-				(items) => {
-					this.updateItems(items);
-				},
-				(e) => {
-					if (e instanceof ApiError) {
-						const error = e.body as ProblemDetails;
-						if (e.status === 400) {
-							console.log(error.detail);
-						}
-					}
+		if (keys?.length > 0) {
+			tryExecuteAndNotify(
+				this.host,
+				DocumentResource.getTreeDocumentItem({
+					key: keys,
+				})
+			).then(({ data }) => {
+				if (data) {
+					this.updateItems(data);
 				}
-			);
+			});
 		}
 
 		return this.items.pipe(map((items) => items.filter((item) => keys.includes(item.key ?? ''))));

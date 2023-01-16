@@ -1,4 +1,6 @@
-import { BehaviorSubject, Observable } from 'rxjs';
+import type { Observable } from 'rxjs';
+import { UmbControllerHostInterface } from '../controller/controller-host.mixin';
+import { UniqueBehaviorSubject } from '../observable-api/unique-behavior-subject';
 
 export interface UmbDataStoreIdentifiers {
 	key?: string;
@@ -26,8 +28,14 @@ export interface UmbTreeDataStore<T> extends UmbDataStore<T> {
 export abstract class UmbDataStoreBase<T extends UmbDataStoreIdentifiers> implements UmbDataStore<T> {
 	public abstract readonly storeAlias: string;
 
-	protected _items: BehaviorSubject<Array<T>> = new BehaviorSubject(<Array<T>>[]);
-	public readonly items: Observable<Array<T>> = this._items.asObservable();
+	protected _items = new UniqueBehaviorSubject(<Array<T>>[]);
+	public readonly items = this._items.asObservable();
+
+	protected host: UmbControllerHostInterface;
+
+	constructor(host: UmbControllerHostInterface) {
+		this.host = host;
+	}
 
 	/**
 	 * @description - Delete items from the store.
@@ -40,33 +48,23 @@ export abstract class UmbDataStoreBase<T extends UmbDataStoreIdentifiers> implem
 	}
 
 	/**
-	 * @description - Update the store with new items. Existing items are updated, new items are added. Existing items are matched by the compareKey.
+	 * @description - Update the store with new items. Existing items are updated, new items are added, old are kept. Items are matched by the compareKey.
 	 * @param {Array<T>} items
 	 * @param {keyof T} [compareKey='key']
 	 * @memberof UmbDataStoreBase
 	 */
 	public updateItems(items: Array<T>, compareKey: keyof T = 'key'): void {
-		const storedItems = [...this._items.getValue()];
-
-		items.forEach((item) => {
-			const index = storedItems.map((storedItem) => storedItem[compareKey]).indexOf(item[compareKey]);
-
-			// If the node is in the store, update it
-			if (index !== -1) {
-				const storedItem = storedItems[index];
-
-				for (const [key] of Object.entries(item)) {
-					// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-					//@ts-ignore
-					storedItem[key] = item[key];
-				}
+		const newData = [...this._items.getValue()];
+		items.forEach((newItem) => {
+			const storedItemIndex = newData.findIndex((item) => item[compareKey] === newItem[compareKey]);
+			if (storedItemIndex !== -1) {
+				newData[storedItemIndex] = newItem;
 			} else {
-				// If the node is not in the store, add it
-				storedItems.push(item);
+				newData.push(newItem);
 			}
 		});
 
-		this._items.next([...storedItems]);
+		this._items.next(newData);
 	}
 }
 
@@ -81,10 +79,10 @@ export abstract class UmbNodeStoreBase<T extends UmbDataStoreIdentifiers> extend
 	/**
 	 * @description - Request data by key. The data is added to the store and is returned as an Observable.
 	 * @param {string} key
-	 * @return {*}  {(Observable<T | null>)}
+	 * @return {*}  {(Observable<unknown>)}
 	 * @memberof UmbDataStoreBase
 	 */
-	abstract getByKey(key: string): Observable<T | null>;
+	abstract getByKey(key: string): Observable<unknown>;
 
 	/**
 	 * @description - Save data.

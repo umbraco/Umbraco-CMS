@@ -6,16 +6,16 @@ describe('UmbPropertyEditorUIEyeDropperElement', () => {
   let element: UmbPropertyEditorUIEyeDropperElement;
 
   beforeEach(async () => {
-    element = await fixture(
-      html` <umb-property-editor-ui-eye-dropper></umb-property-editor-ui-eye-dropper> `
-    );
+	element = await fixture(
+	  html` <umb-property-editor-ui-eye-dropper></umb-property-editor-ui-eye-dropper> `
+	);
   });
 
   it('is defined with its own instance', () => {
-    expect(element).to.be.instanceOf(UmbPropertyEditorUIEyeDropperElement);
+	expect(element).to.be.instanceOf(UmbPropertyEditorUIEyeDropperElement);
   });
 
   it('passes the a11y audit', async () => {
-    await expect(element).shadowDom.to.be.accessible(defaultA11yConfig);
+	await expect(element).shadowDom.to.be.accessible(defaultA11yConfig);
   });
 });

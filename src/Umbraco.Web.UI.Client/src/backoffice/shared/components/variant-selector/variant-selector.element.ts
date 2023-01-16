@@ -93,34 +93,34 @@ export class UmbVariantSelectorElement extends UmbLitElement {
 
 	render() {
 		return html`
-            <uui-input id="name-input" .value=${this._content?.name} @input="${this._handleInput}">
-                <!-- Implement Variant Selector -->
-                ${this._content && this._content.variants?.length > 0
-                    ? html`
-                            <div slot="append">
-                                <uui-button id="variant-selector-toggle" @click=${this._toggleVariantSelector}>
-                                    English (United States)
-                                    <uui-caret></uui-caret>
-                                </uui-button>
-                            </div>
-                        `
-                    : nothing}
-            </uui-input>
+			<uui-input id="name-input" .value=${this._content?.name} @input="${this._handleInput}">
+				<!-- Implement Variant Selector -->
+				${this._content && this._content.variants?.length > 0
+					? html`
+							<div slot="append">
+								<uui-button id="variant-selector-toggle" @click=${this._toggleVariantSelector}>
+									English (United States)
+									<uui-caret></uui-caret>
+								</uui-button>
+							</div>
+						`
+					: nothing}
+			</uui-input>
 
-            ${this._content && this._content.variants?.length > 0
-                ? html`
-                        <uui-popover id="variant-selector-popover" .open=${this._variantSelectorIsOpen} @close=${this._close}>
-                            <div id="variant-selector-dropdown" slot="popover">
-                                <uui-scroll-container>
-                                    <ul>
-                                        <li>Implement variants</li>
-                                    </ul>
-                                </uui-scroll-container>
-                            </div>
-                        </uui-popover>
-                    `
-                : nothing}
-        </div>
+			${this._content && this._content.variants?.length > 0
+				? html`
+						<uui-popover id="variant-selector-popover" .open=${this._variantSelectorIsOpen} @close=${this._close}>
+							<div id="variant-selector-dropdown" slot="popover">
+								<uui-scroll-container>
+									<ul>
+										<li>Implement variants</li>
+									</ul>
+								</uui-scroll-container>
+							</div>
+						</uui-popover>
+					`
+				: nothing}
+		</div>
 		`;
 	}
 }

@@ -5,7 +5,7 @@ import './layouts/property-editor-ui-picker/modal-layout-property-editor-ui-pick
 import './layouts/modal-layout-current-user.element';
 
 import { UUIModalSidebarSize } from '@umbraco-ui/uui-modal-sidebar';
-import { BehaviorSubject, Observable } from 'rxjs';
+import { BehaviorSubject } from 'rxjs';
 import { UmbModalChangePasswordData } from './layouts/modal-layout-change-password.element';
 import type { UmbModalIconPickerData } from './layouts/icon-picker/modal-layout-icon-picker.element';
 
@@ -24,9 +24,11 @@ export interface UmbModalOptions<UmbModalData> {
 	data?: UmbModalData;
 }
 
+// TODO: Should this be called UmbModalContext ? as we don't have 'services' as a term.
 export class UmbModalService {
-	private _modals: BehaviorSubject<Array<UmbModalHandler>> = new BehaviorSubject(<Array<UmbModalHandler>>[]);
-	public readonly modals: Observable<Array<UmbModalHandler>> = this._modals.asObservable();
+
+	#modals = new BehaviorSubject(<Array<UmbModalHandler>>[]);
+	public readonly modals = this.#modals.asObservable();
 
 	/**
 	 * Opens a Confirm modal
@@ -105,7 +107,7 @@ export class UmbModalService {
 
 		modalHandler.element.addEventListener('close-end', () => this._handleCloseEnd(modalHandler));
 
-		this._modals.next([...this._modals.getValue(), modalHandler]);
+		this.#modals.next([...this.#modals.getValue(), modalHandler]);
 		return modalHandler;
 	}
 
@@ -116,7 +118,7 @@ export class UmbModalService {
 	 * @memberof UmbModalService
 	 */
 	private _close(key: string) {
-		this._modals.next(this._modals.getValue().filter((modal) => modal.key !== key));
+		this.#modals.next(this.#modals.getValue().filter((modal) => modal.key !== key));
 	}
 
 	/**

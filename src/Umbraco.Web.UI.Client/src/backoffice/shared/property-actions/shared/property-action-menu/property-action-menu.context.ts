@@ -1,14 +1,23 @@
-import { Observable, ReplaySubject } from 'rxjs';
+import { UmbContextProviderController } from 'src/core/context-api/provide/context-provider.controller';
+import type { UmbControllerHostInterface } from 'src/core/controller/controller-host.mixin';
+import { UniqueBehaviorSubject } from 'src/core/observable-api/unique-behavior-subject';
 
 export class UmbPropertyActionMenuContext {
-	private _isOpen: ReplaySubject<boolean> = new ReplaySubject(1);
-	public readonly isOpen: Observable<boolean> = this._isOpen.asObservable();
 
-	open() {
-		this._isOpen.next(true);
+	#isOpen = new UniqueBehaviorSubject(false);
+	public readonly isOpen = this.#isOpen.asObservable();
+
+	constructor(host: UmbControllerHostInterface) {
+		new UmbContextProviderController(host, 'umbPropertyActionMenu', this);
 	}
 
+	toggle() {
+		this.#isOpen.next(!this.#isOpen.getValue());
+	}
+	open() {
+		this.#isOpen.next(true);
+	}
 	close() {
-		this._isOpen.next(false);
+		this.#isOpen.next(false);
 	}
 }

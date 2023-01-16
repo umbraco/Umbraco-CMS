@@ -1,8 +1,9 @@
 import { css, html } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, property } from 'lit/decorators.js';
-import { UmbWorkspacePropertyContext } from 'src/backoffice/shared/components/entity-property/workspace-property.context';
+import type { UmbWorkspacePropertyContext } from 'src/backoffice/shared/components/workspace-property/workspace-property.context';
 import { UmbLitElement } from '@umbraco-cms/element';
+import { UUITextareaElement } from '@umbraco-ui/uui';
 
 @customElement('umb-property-editor-ui-textarea')
 export class UmbPropertyEditorUITextareaElement extends UmbLitElement {
@@ -26,21 +27,19 @@ export class UmbPropertyEditorUITextareaElement extends UmbLitElement {
 	constructor() {
 		super();
 
-		this.consumeContext('umbPropertyContext', (instance) => {
+		this.consumeContext('umbPropertyContext', (instance: UmbWorkspacePropertyContext<string>) => {
 			this.propertyContext = instance;
 		});
 	}
 
 	private onInput(e: InputEvent) {
-		this.value = (e.target as HTMLInputElement).value;
-		this.dispatchEvent(new CustomEvent('property-editor-change', { bubbles: true, composed: true }));
+		this.value = (e.target as UUITextareaElement).value as string;
+		this.dispatchEvent(new CustomEvent('property-value-change'));
 	}
 
 	render() {
 		return html`
-			<uui-textarea .value=${this.value} @input=${this.onInput}></uui-textarea>
-			${this.config?.map((property: any) => html`<div>${property.alias}: ${property.value}</div>`)}
-			<button @click=${() => this.propertyContext?.resetValue()}>Reset</button>`;
+			<uui-textarea .value=${this.value} @input=${this.onInput}></uui-textarea>`;
 	}
 }
 

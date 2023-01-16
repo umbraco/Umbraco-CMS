@@ -1,7 +1,8 @@
 import { map, Observable } from 'rxjs';
 import { UmbDataStoreBase } from '../../../core/stores/store';
 import type { DataTypeDetails } from '@umbraco-cms/models';
-import { ApiError, DataTypeResource, FolderTreeItem, ProblemDetails } from '@umbraco-cms/backend-api';
+import { DataTypeResource, FolderTreeItem } from '@umbraco-cms/backend-api';
+import { tryExecuteAndNotify } from '@umbraco-cms/resources';
 
 const isDataTypeDetails = (dataType: DataTypeDetails | FolderTreeItem): dataType is DataTypeDetails => {
 	return (dataType as DataTypeDetails).data !== undefined;
@@ -10,6 +11,10 @@ const isDataTypeDetails = (dataType: DataTypeDetails | FolderTreeItem): dataType
 // TODO: can we make is easy to reuse store methods across different stores?
 
 export type UmbDataTypeStoreItemType = DataTypeDetails | FolderTreeItem;
+
+// TODO: research how we write names of global consts.
+export const STORE_ALIAS = 'umbDataTypeStore';
+
 /**
  * @export
  * @class UmbDataTypesStore
@@ -17,8 +22,7 @@ export type UmbDataTypeStoreItemType = DataTypeDetails | FolderTreeItem;
  * @description - Data Store for Data Types
  */
 export class UmbDataTypeStore extends UmbDataStoreBase<UmbDataTypeStoreItemType> {
-	
-	public readonly storeAlias = 'umbDataTypeStore';
+	public readonly storeAlias = STORE_ALIAS;
 
 	/**
 	 * @description - Request a Data Type by key. The Data Type is added to the store and is returned as an Observable.
@@ -90,19 +94,11 @@ export class UmbDataTypeStore extends UmbDataStoreBase<UmbDataTypeStoreItemType>
 	 * @memberof UmbDataTypesStore
 	 */
 	getTreeRoot(): Observable<Array<FolderTreeItem>> {
-		DataTypeResource.getTreeDataTypeRoot({}).then(
-			(res) => {
-				this.updateItems(res.items);
-			},
-			(e) => {
-				if (e instanceof ApiError) {
-					const error = e.body as ProblemDetails;
-					if (e.status === 400) {
-						console.log(error.detail);
-					}
-				}
+		tryExecuteAndNotify(this.host, DataTypeResource.getTreeDataTypeRoot({})).then(({ data }) => {
+			if (data) {
+				this.updateItems(data.items);
 			}
-		);
+		});
 
 		return this.items.pipe(map((items) => items.filter((item) => item.parentKey === null)));
 	}
@@ -114,21 +110,16 @@ export class UmbDataTypeStore extends UmbDataStoreBase<UmbDataTypeStoreItemType>
 	 * @memberof UmbDataTypesStore
 	 */
 	getTreeItemChildren(key: string): Observable<Array<FolderTreeItem>> {
-		DataTypeResource.getTreeDataTypeChildren({
-			parentKey: key,
-		}).then(
-			(res) => {
-				this.updateItems(res.items);
-			},
-			(e) => {
-				if (e instanceof ApiError) {
-					const error = e.body as ProblemDetails;
-					if (e.status === 400) {
-						console.log(error.detail);
-					}
-				}
+		tryExecuteAndNotify(
+			this.host,
+			DataTypeResource.getTreeDataTypeChildren({
+				parentKey: key,
+			})
+		).then(({ data }) => {
+			if (data) {
+				this.updateItems(data.items);
 			}
-		);
+		});
 
 		return this.items.pipe(map((items) => items.filter((item) => item.parentKey === key)));
 	}

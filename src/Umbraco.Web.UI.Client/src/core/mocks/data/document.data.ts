@@ -78,6 +78,72 @@ export const data: Array<DocumentDetails> = [
 				description: '',
 				dataTypeKey: 'dt-textArea',
 			},
+			{
+				alias: 'slider',
+				label: 'Slider',
+				description: '',
+				dataTypeKey: 'dt-slider',
+			},
+			{
+				alias: 'toggle',
+				label: 'Toggle',
+				description: '',
+				dataTypeKey: 'dt-toggle',
+			},
+			{
+				alias: 'tags',
+				label: 'Tags',
+				description: '',
+				dataTypeKey: 'dt-tags',
+			},
+			{
+				alias: 'markdownEditor',
+				label: 'MarkdownEditor',
+				description: '',
+				dataTypeKey: 'dt-markdownEditor',
+			},
+			{
+				alias: 'radioButtonList',
+				label: 'Radio Button List',
+				description: '',
+				dataTypeKey: 'dt-radioButtonList',
+			},
+			{
+				alias: 'checkboxList',
+				label: 'Checkbox List',
+				description: '',
+				dataTypeKey: 'dt-checkboxList',
+			},
+			{
+				alias: 'blockList',
+				label: 'Block List',
+				description: '',
+				dataTypeKey: 'dt-blockList',
+			},
+			{
+				alias: 'mediaPicker',
+				label: 'Media Picker',
+				description: '',
+				dataTypeKey: 'dt-mediaPicker',
+			},
+			{
+				alias: 'imageCropper',
+				label: 'Image Cropper',
+				description: '',
+				dataTypeKey: 'dt-imageCropper',
+			},
+			{
+				alias: 'uploadField',
+				label: 'Upload Field',
+				description: '',
+				dataTypeKey: 'dt-uploadField',
+			},
+			{
+				alias: 'blockGrid',
+				label: 'Block Grid',
+				description: '',
+				dataTypeKey: 'dt-blockGrid',
+			},
 		],
 		data: [],
 		variants: [],
@@ -100,13 +166,13 @@ export const data: Array<DocumentDetails> = [
 				alias: 'myHeadline',
 				label: 'Headline',
 				description: 'Text string property',
-				dataTypeKey: 'dt-1',
+				dataTypeKey: 'dt-textBox',
 			},
 			{
 				alias: 'myDescription',
 				label: 'Description',
 				description: 'Textarea property',
-				dataTypeKey: 'dt-2',
+				dataTypeKey: 'dt-textArea',
 			},
 		],
 		data: [
@@ -121,23 +187,23 @@ export const data: Array<DocumentDetails> = [
 		],
 		variants: [{ name: 'fake data' }],
 		/*
-    // Concept for node layout, separation of design from config and data.
-    layout: [
-      {
-        type: 'group',
-        children: [
-          {
-            type: 'property',
-            alias: 'myHeadline'
-          },
-          {
-            type: 'property',
-            alias: 'myDescription'
-          }
-        ]
-      }
-    ],
-    */
+	// Concept for node layout, separation of design from config and data.
+	layout: [
+	  {
+		type: 'group',
+		children: [
+		  {
+			type: 'property',
+			alias: 'myHeadline'
+		  },
+		  {
+			type: 'property',
+			alias: 'myDescription'
+		  }
+		]
+	  }
+	],
+	*/
 	},
 	{
 		name: 'Document 2',
@@ -157,25 +223,25 @@ export const data: Array<DocumentDetails> = [
 				alias: 'myHeadline',
 				label: 'Text string label',
 				description: 'this is a text string property',
-				dataTypeKey: 'dt-1',
+				dataTypeKey: 'dt-textBox',
 			},
 			{
 				alias: 'myDescription',
 				label: 'Textarea label',
 				description: 'This is the a textarea property',
-				dataTypeKey: 'dt-2',
+				dataTypeKey: 'dt-textArea',
 			},
 			{
 				alias: 'myExternalEditor',
 				label: 'My JS Property Editor',
 				description: 'This is the a external property',
-				dataTypeKey: 'dt-3',
+				dataTypeKey: 'dt-custom',
 			},
 			{
 				alias: 'myContentPicker',
 				label: 'Content Picker',
 				description: 'This is a content picker',
-				dataTypeKey: 'dt-5',
+				dataTypeKey: 'dt-contentPicker',
 			},
 		],
 		data: [
@@ -221,7 +287,7 @@ export const data: Array<DocumentDetails> = [
 				alias: 'myDescription',
 				label: 'Description',
 				description: 'Textarea property',
-				dataTypeKey: 'dt-2',
+				dataTypeKey: 'dt-textArea',
 			},
 		],
 		data: [
@@ -250,7 +316,7 @@ export const data: Array<DocumentDetails> = [
 				alias: 'myDescription',
 				label: 'Description',
 				description: 'Textarea property',
-				dataTypeKey: 'dt-2',
+				dataTypeKey: 'dt-textArea',
 			},
 		],
 		data: [],

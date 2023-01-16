@@ -1,5 +1,6 @@
 export interface UmbControllerInterface {
-    hostConnected(): void;
-    hostDisconnected(): void;
-    destroy(): void;
+	get unique(): string | undefined;
+	hostConnected(): void;
+	hostDisconnected(): void;
+	destroy(): void;
 }
