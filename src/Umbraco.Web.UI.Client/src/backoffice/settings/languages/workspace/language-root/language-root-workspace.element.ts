@@ -11,6 +11,7 @@ import {
 } from 'src/backoffice/shared/components/table';
 
 import '../language/language-workspace.element';
+import './language-root-table-delete-column-layout.element';
 
 @customElement('umb-language-root-workspace')
 export class UmbLanguageRootWorkspaceElement extends LitElement {
@@ -95,6 +96,11 @@ export class UmbLanguageRootWorkspaceElement extends LitElement {
 			name: 'Fall back language',
 			alias: 'fallBackLanguage',
 		},
+		{
+			name: '',
+			alias: 'delete',
+			elementName: 'umb-language-root-table-delete-column-layout',
+		},
 	];
 
 	@state()
@@ -132,18 +138,22 @@ export class UmbLanguageRootWorkspaceElement extends LitElement {
 						columnAlias: 'fallBackLanguage',
 						value: languages.find((x) => x.id === language.fallbackLanguageId)?.name,
 					},
+					{
+						columnAlias: 'delete',
+						value: {
+							show: !language.isDefault,
+						},
+					},
 				],
 			};
 		});
 	}
 
 	render() {
-		return html`<umb-language-workspace></umb-language-workspace>`;
+		// return html`<umb-language-workspace></umb-language-workspace>`;
 		return html`
 			<umb-body-layout no-header-background>
 				<uui-button id="add-language" slot="header" label="Add language" look="outline" color="default"></uui-button>
-				<!-- <div slot="header" id="toolbar">
-				</div> -->
 				<umb-table .config=${this._tableConfig} .columns=${this._tableColumns} .items=${this._tableItems}></umb-table>
 			</umb-body-layout>
 		`;
