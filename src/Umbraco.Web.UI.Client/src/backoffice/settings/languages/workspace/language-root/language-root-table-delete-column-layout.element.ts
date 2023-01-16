@@ -12,7 +12,7 @@ export class UmbLanguageRootTableDeleteColumnLayoutElement extends LitElement {
 	render() {
 		if (!this.value.show) return nothing;
 
-		return html`<uui-button color="danger" look="primary" compact label="delete"></uui-button>`;
+		return html`<uui-button color="danger" look="default" compact label="delete"></uui-button>`;
 	}
 }
 
