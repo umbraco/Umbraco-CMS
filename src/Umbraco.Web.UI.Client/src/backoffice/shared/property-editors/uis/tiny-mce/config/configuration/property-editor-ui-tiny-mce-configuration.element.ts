@@ -1,12 +1,13 @@
-import { html, LitElement } from 'lit';
+import { html } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, property } from 'lit/decorators.js';
+import { UmbLitElement } from '@umbraco-cms/element';
 
 /**
  * @element umb-property-editor-ui-tiny-mce-configuration
  */
 @customElement('umb-property-editor-ui-tiny-mce-configuration')
-export class UmbPropertyEditorUITinyMceConfigurationElement extends LitElement {
+export class UmbPropertyEditorUITinyMceConfigurationElement extends UmbLitElement {
 	static styles = [UUITextStyles];
 
 	@property()

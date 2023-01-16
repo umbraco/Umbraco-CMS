@@ -1,12 +1,13 @@
-import { html, LitElement } from 'lit';
+import { html } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, property } from 'lit/decorators.js';
+import { UmbLitElement } from '@umbraco-cms/element';
 
 /**
  * @element umb-property-editor-ui-tags
  */
 @customElement('umb-property-editor-ui-tags')
-export class UmbPropertyEditorUITagsElement extends LitElement {
+export class UmbPropertyEditorUITagsElement extends UmbLitElement {
 	static styles = [UUITextStyles];
 
 	@property()

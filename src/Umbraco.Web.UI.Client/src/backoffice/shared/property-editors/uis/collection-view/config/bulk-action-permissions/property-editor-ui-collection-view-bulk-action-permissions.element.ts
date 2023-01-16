@@ -1,12 +1,13 @@
-import { html, LitElement } from 'lit';
-import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
+import { html } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
+import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
+import { UmbLitElement } from '@umbraco-cms/element';
 
 /**
  * @element umb-property-editor-ui-collection-view-bulk-action-permissions
  */
 @customElement('umb-property-editor-ui-collection-view-bulk-action-permissions')
-export class UmbPropertyEditorUICollectionViewBulkActionPermissionsElement extends LitElement {
+export class UmbPropertyEditorUICollectionViewBulkActionPermissionsElement extends UmbLitElement {
 	static styles = [UUITextStyles];
 
 	@property()

@@ -1,12 +1,13 @@
-import { html, LitElement } from 'lit';
+import { html } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, property } from 'lit/decorators.js';
+import { UmbLitElement } from '@umbraco-cms/element';
 
 /**
  * @element umb-property-editor-ui-upload-field
  */
 @customElement('umb-property-editor-ui-upload-field')
-export class UmbPropertyEditorUIUploadFieldElement extends LitElement {
+export class UmbPropertyEditorUIUploadFieldElement extends UmbLitElement {
 	static styles = [UUITextStyles];
 
 	@property()
