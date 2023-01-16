@@ -27,6 +27,37 @@ export function naiveObjectComparison(objOne: any, objTwo: any): boolean {
 
 
 
+
+/**
+ * @export
+ * @method appendToFrozenArray
+ * @param {Observable<T>} source - RxJS Subject to use for this Observable.
+ * @param {(mappable: T) => R} mappingFunction - Method to return the part for this Observable to return.
+ * @param {(previousResult: R, currentResult: R) => boolean} [memoizationFunction] - Method to Compare if the data has changed. Should return true when data is different.
+ * @description - Creates a RxJS Observable from RxJS Subject.
+ * @example <caption>Example append new entry for a UniqueBehaviorSubject which is an array. Where the key is unique and the item will be updated if matched with existing.</caption>
+ * const entry = {key: 'myKey', value: 'myValue'};
+ * const newDataSet = appendToFrozenArray(mySubject.getValue(), entry, x => x.key === key);
+ * mySubject.next(newDataSet);
+ */
+export function appendToFrozenArray<T>(data: T[], entry: T, uniqueMethod?: (entry: T) => boolean): T[] {
+	const unFrozenDataSet = [...data];
+	if(uniqueMethod) {
+		const indexToReplace = unFrozenDataSet.findIndex(uniqueMethod);
+		if(indexToReplace !== -1) {
+			unFrozenDataSet[indexToReplace] = entry;
+		} else {
+			unFrozenDataSet.push(entry);
+		}
+	} else {
+		unFrozenDataSet.push(entry);
+	}
+	return unFrozenDataSet;
+}
+
+
+
+
 type MappingFunction<T, R> = (mappable: T) => R;
 type MemoizationFunction<R> = (previousResult: R, currentResult: R) => boolean;
 
@@ -39,7 +70,7 @@ function defaultMemoization(previousValue: any, currentValue: any): boolean {
 
 /**
  * @export
- * @method CreateObservablePart
+ * @method createObservablePart
  * @param {Observable<T>} source - RxJS Subject to use for this Observable.
  * @param {(mappable: T) => R} mappingFunction - Method to return the part for this Observable to return.
  * @param {(previousResult: R, currentResult: R) => boolean} [memoizationFunction] - Method to Compare if the data has changed. Should return true when data is different.
@@ -47,7 +78,7 @@ function defaultMemoization(previousValue: any, currentValue: any): boolean {
  * @example <caption>Example create a Observable for part of the data Subject.</caption>
  * public readonly myPart = CreateObservablePart(this._data, (data) => data.myPart);
  */
-export function CreateObservablePart<T, R> (
+export function createObservablePart<T, R> (
 	source$: Observable<T>,
 		mappingFunction: MappingFunction<T, R>,
 		memoizationFunction?: MemoizationFunction<R>
