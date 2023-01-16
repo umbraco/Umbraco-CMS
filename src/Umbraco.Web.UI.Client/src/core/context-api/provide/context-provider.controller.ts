@@ -1,6 +1,6 @@
 import { UmbContextProvider } from './context-provider';
 import type { UmbControllerInterface } from 'src/core/controller/controller.interface';
-import { UmbControllerHostInterface } from 'src/core/controller/controller-host.mixin';
+import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 
 
 export class UmbContextProviderController extends UmbContextProvider<UmbControllerHostInterface> implements UmbControllerInterface {

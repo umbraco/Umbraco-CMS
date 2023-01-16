@@ -23,7 +23,7 @@ export const data: Array<DataTypeDetails> = [
 		],
 	},
 	{
-		name: 'Textarea',
+		name: 'Text Area',
 		type: 'data-type',
 		icon: 'umb:autofill',
 		hasChildren: false,
@@ -33,16 +33,7 @@ export const data: Array<DataTypeDetails> = [
 		isFolder: false,
 		propertyEditorModelAlias: 'Umbraco.TextArea',
 		propertyEditorUIAlias: 'Umb.PropertyEditorUI.TextArea',
-		data: [
-			{
-				alias: 'maxChars',
-				value: 500,
-			},
-			{
-				alias: 'rows',
-				value: 25,
-			},
-		],
+		data: [],
 	},
 	{
 		name: 'My JS Property Editor',
@@ -80,8 +71,13 @@ export const data: Array<DataTypeDetails> = [
 		parentKey: null,
 		isFolder: false,
 		propertyEditorModelAlias: 'Umbraco.ContentPicker',
-		propertyEditorUIAlias: 'Umb.PropertyEditorUI.ContentPicker',
-		data: [],
+		propertyEditorUIAlias: 'Umb.PropertyEditorUI.DocumentPicker',
+		data: [
+			{
+				alias: 'validationLimit',
+				value: { min: 2, max: 4 },
+			},
+		],
 	},
 	{
 		name: 'Eye Dropper',

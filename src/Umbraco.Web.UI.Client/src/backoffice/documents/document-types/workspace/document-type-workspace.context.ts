@@ -3,7 +3,7 @@ import {
 	UmbDocumentTypeStore,
 	UmbDocumentTypeStoreItemType,
 } from 'src/backoffice/documents/document-types/document-type.store';
-import { UmbControllerHostInterface } from 'src/core/controller/controller-host.mixin';
+import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 
 const DefaultDocumentTypeData = {
 	key: '',
