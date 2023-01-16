@@ -1,7 +1,7 @@
 import { UmbWorkspaceContentContext } from "../workspace/workspace-content/workspace-content.context";
 import type { DataTypeDetails } from "@umbraco-cms/models";
 import { UmbControllerHostInterface } from "src/core/controller/controller-host.mixin";
-import { CreateObservablePart, UniqueBehaviorSubject } from "src/core/observable-api/unique-behavior-subject";
+import { createObservablePart, UniqueBehaviorSubject } from "src/core/observable-api/unique-behavior-subject";
 import { UmbContextProviderController } from "src/core/context-api/provide/context-provider.controller";
 import { UmbContextConsumerController } from "src/core/context-api/consume/context-consumer.controller";
 
@@ -31,11 +31,11 @@ export class UmbWorkspacePropertyContext<ValueType = unknown> {
 
 	private _data = new UniqueBehaviorSubject<WorkspacePropertyData<ValueType>>({});
 
-	public readonly alias = CreateObservablePart(this._data, data => data.alias);
-	public readonly label = CreateObservablePart(this._data, data => data.label);
-	public readonly description = CreateObservablePart(this._data, data => data.description);
-	public readonly value = CreateObservablePart(this._data, data => data.value);
-	public readonly config = CreateObservablePart(this._data, data => data.config);
+	public readonly alias = createObservablePart(this._data, data => data.alias);
+	public readonly label = createObservablePart(this._data, data => data.label);
+	public readonly description = createObservablePart(this._data, data => data.description);
+	public readonly value = createObservablePart(this._data, data => data.value);
+	public readonly config = createObservablePart(this._data, data => data.config);
 
 	private _workspaceContext?: UmbWorkspaceContentContext;
 
@@ -62,7 +62,7 @@ export class UmbWorkspacePropertyContext<ValueType = unknown> {
 	}
 	public setValue(value: WorkspacePropertyData<ValueType>['value']) {
 
-		if(value === this._data.getValue().value) return;
+		// Note: Do not try to compare new / old value, as it can of any type. We trust the UniqueBehaviorSubject in doing such.
 
 		this._data.update({value: value});
 

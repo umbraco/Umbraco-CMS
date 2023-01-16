@@ -3,15 +3,15 @@ import { html } from 'lit-html';
 
 //import { data } from '../../../../../core/mocks/data/data-type.data';
 
-import type { UmbWorkspaceViewDataTypeEditElement } from './workspace-view-data-type-edit.element';
+import type { UmbDataTypeWorkspaceViewEditElement } from './data-type-workspace-view-edit.element';
 
-import './workspace-view-data-type-edit.element';
+import './data-type-workspace-view-edit.element';
 //import { UmbWorkspaceDataTypeContext } from '../../workspace-data-type.context';
 
 export default {
 	title: 'Workspaces/Data Type/Views/Edit',
-	component: 'umb-workspace-view-data-type-edit',
-	id: 'umb-workspace-view-data-type-edit',
+	component: 'umb-data-type-workspace-view-edit',
+	id: 'umb-data-type-workspace-view-edit',
 	decorators: [
 		(story) => {
 			return html`TODO: make use of mocked workspace context??`;
@@ -22,6 +22,6 @@ export default {
 	],
 } as Meta;
 
-export const AAAOverview: Story<UmbWorkspaceViewDataTypeEditElement> = () =>
-	html` <umb-workspace-view-data-type-edit></umb-workspace-view-data-type-edit>`;
+export const AAAOverview: Story<UmbDataTypeWorkspaceViewEditElement> = () =>
+	html` <umb-data-type-workspace-view-edit></umb-data-type-workspace-view-edit>`;
 AAAOverview.storyName = 'Overview';

@@ -9,8 +9,8 @@ import type { ManifestWorkspaceAction, UserGroupDetails } from '@umbraco-cms/mod
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
 import type { UmbUserStore } from 'src/backoffice/users/users/user.store';
 
-import 'src/auth/components/input-user/input-user.element';
-import 'src/backoffice/shared/components/input-section/input-section.element';
+import '../../../../auth/components/input-user/input-user.element';
+import '../../../../backoffice/shared/components/input-section/input-section.element';
 import { UmbLitElement } from '@umbraco-cms/element';
 import { UmbWorkspaceEntityElement } from 'src/backoffice/shared/components/workspace/workspace-entity-element.interface';
 

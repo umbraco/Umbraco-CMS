@@ -1,5 +1,5 @@
 import { manifest as colorPicker } from './color-picker/manifests';
-import { manifest as contentPicker } from './content-picker/manifests';
+import { manifest as documentPicker } from './document-picker/manifests';
 import { manifest as datePicker } from './date-picker/manifests';
 import { manifest as eyeDropper } from './eye-dropper/manifests';
 import { manifest as multiUrlPicker } from './multi-url-picker/manifests';
@@ -31,7 +31,7 @@ import type { ManifestPropertyEditorUI } from '@umbraco-cms/models';
 
 export const manifests: Array<ManifestPropertyEditorUI> = [
 	colorPicker,
-	contentPicker,
+	documentPicker,
 	datePicker,
 	eyeDropper,
 	multiUrlPicker,

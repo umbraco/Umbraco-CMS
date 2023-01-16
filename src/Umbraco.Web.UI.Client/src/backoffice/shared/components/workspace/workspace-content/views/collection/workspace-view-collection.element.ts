@@ -6,8 +6,8 @@ import type { UmbWorkspaceContentContext } from '../../workspace-content.context
 import { UmbCollectionContext } from 'src/backoffice/shared/collection/collection.context';
 import { UmbMediaStore, UmbMediaStoreItemType } from 'src/backoffice/media/media/media.store';
 
-import 'src/backoffice/shared/components/content-property/content-property.element';
-import 'src/backoffice/shared/collection/dashboards/dashboard-collection.element';
+import '../../../../../../shared/components/content-property/content-property.element';
+import '../../../../../../shared/collection/dashboards/dashboard-collection.element';
 import { UmbLitElement } from '@umbraco-cms/element';
 
 @customElement('umb-workspace-view-collection')
