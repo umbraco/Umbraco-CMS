@@ -31,20 +31,15 @@ public class Upgrader
     public virtual string StateValueKey => Constants.Conventions.Migrations.KeyValuePrefix + Name;
 
     /// <summary>
-        /// Executes.
-        /// </summary>
-        /// <param name="scopeProvider">A scope provider.</param>
-        /// <param name="keyValueService">A key-value service.</param>
-        [Obsolete("Please use the Execute method that accepts an Umbraco.Cms.Core.Scoping.ICoreScopeProvider instead.")]
-        public ExecutedMigrationPlan Execute(IMigrationPlanExecutor migrationPlanExecutor, IScopeProvider scopeProvider, IKeyValueService keyValueService)
-            => Execute(migrationPlanExecutor, (ICoreScopeProvider)scopeProvider, keyValueService);
-
-        /// <summary>
     ///     Executes.
     /// </summary>
+    /// <param name="migrationPlanExecutor"></param>
     /// <param name="scopeProvider">A scope provider.</param>
     /// <param name="keyValueService">A key-value service.</param>
-    public ExecutedMigrationPlan Execute(IMigrationPlanExecutor migrationPlanExecutor, ICoreScopeProvider scopeProvider,
+    /// <param name="aggregator"></param>
+    public ExecutedMigrationPlan Execute(
+        IMigrationPlanExecutor migrationPlanExecutor,
+        ICoreScopeProvider scopeProvider,
         IKeyValueService keyValueService)
     {
         if (scopeProvider == null)
@@ -57,38 +52,49 @@ public class Upgrader
             throw new ArgumentNullException(nameof(keyValueService));
         }
 
-        using (ICoreScope scope = scopeProvider.CreateCoreScope())
+        var initialState = GetInitialState(scopeProvider, keyValueService);
+
+        ExecutedMigrationPlan result = migrationPlanExecutor.ExecutePlan(Plan, initialState);
+
+        if (string.IsNullOrWhiteSpace(result.FinalState) || result.FinalState == result.InitialState)
         {
-            // read current state
-            var currentState = keyValueService.GetValue(StateValueKey);
-            var forceState = false;
-
-            if (currentState == null || Plan.IgnoreCurrentState)
-            {
-                currentState = Plan.InitialState;
-                forceState = true;
-            }
-
-            // execute plan
-            var state = migrationPlanExecutor.ExecutePlan(Plan, currentState).FinalState;
-            if (string.IsNullOrWhiteSpace(state))
+            // This should never happen, if the final state comes back as null or equal to the initial state
+            // it means that no transitions was successful, which means it cannot be a successful migration
+            if (result.Successful)
             {
                 throw new InvalidOperationException("Plan execution returned an invalid null or empty state.");
             }
 
-            // save new state
-            if (forceState)
-            {
-                keyValueService.SetValue(StateValueKey, state);
-            }
-            else if (currentState != state)
-            {
-                keyValueService.SetValue(StateValueKey, currentState, state);
-            }
-
-            scope.Complete();
-
-            return new ExecutedMigrationPlan(Plan, currentState, state);
+            // Otherwise it just means that our migration failed on the first step, which is fine.
+            // We will skip saving the state since we it's still the same
+            return result;
         }
+
+        // We always save the final state of the migration plan, this is because a partial success is possible
+        // So we still want to save the place we got to in the database-
+        SetState(result.FinalState, scopeProvider, keyValueService);
+
+        return result;
+    }
+
+    private string GetInitialState(ICoreScopeProvider scopeProvider, IKeyValueService keyValueService)
+    {
+        using ICoreScope scope = scopeProvider.CreateCoreScope();
+        var currentState = keyValueService.GetValue(StateValueKey);
+        scope.Complete();
+
+        if (currentState is null || Plan.IgnoreCurrentState)
+        {
+            return Plan.InitialState;
+        }
+
+        return currentState;
+    }
+
+    private void SetState(string state, ICoreScopeProvider scopeProvider, IKeyValueService keyValueService)
+    {
+        using ICoreScope scope = scopeProvider.CreateCoreScope();
+        keyValueService.SetValue(StateValueKey, state);
+        scope.Complete();
     }
 }
