@@ -116,7 +116,7 @@ public class UserEditorAuthorizationHelperTests
     {
         var currentUser = Mock.Of<IUser>(user => user.Groups == new[]
         {
-            new ReadOnlyUserGroup(1, "CurrentUser", "icon-user", null, null, groupAlias, new int[0], new string[0], new string[0], true),
+            new ReadOnlyUserGroup(1, Guid.NewGuid(),  "CurrentUser", "icon-user", null, null, groupAlias, new int[0], new string[0], new string[0], true),
         });
         IUser savingUser = null; // This means it is a new created user
 
