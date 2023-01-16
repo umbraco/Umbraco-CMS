@@ -384,23 +384,7 @@ internal class CollectibleRuntimeViewCompiler : IViewCompiler
                     assemblyName,
                     result.Diagnostics);
 
-                foreach (CompilationFailure? compilationFailure in compilationException.CompilationFailures ?? Enumerable.Empty<CompilationFailure>())
-                {
-                    if (compilationFailure?.Messages is null)
-                    {
-                        continue;
-                    }
-
-                    foreach (DiagnosticMessage? message in compilationFailure.Messages)
-                    {
-                        if (message?.FormattedMessage is null)
-                        {
-                            continue;
-                        }
-
-                        _logger.LogError(compilationException, "Compilation error occured with message: {ErrorMessage}", message.FormattedMessage);
-                    }
-                }
+                LogCompilationFailure(compilationException);
 
                 throw compilationException;
             }
@@ -411,6 +395,27 @@ internal class CollectibleRuntimeViewCompiler : IViewCompiler
             Assembly assembly = _loadContextManager.LoadCollectibleAssemblyFromStream(assemblyStream, pdbStream);
 
             return assembly;
+        }
+    }
+
+    private void LogCompilationFailure(UmbracoCompilationException compilationException)
+    {
+        foreach (CompilationFailure? compilationFailure in compilationException.CompilationFailures ?? Enumerable.Empty<CompilationFailure>())
+        {
+            if (compilationFailure?.Messages is null)
+            {
+                continue;
+            }
+
+            foreach (DiagnosticMessage? message in compilationFailure.Messages)
+            {
+                if (message?.FormattedMessage is null)
+                {
+                    continue;
+                }
+
+                _logger.LogError(compilationException, "Compilation error occured with message: {ErrorMessage}", message.FormattedMessage);
+            }
         }
     }
 
