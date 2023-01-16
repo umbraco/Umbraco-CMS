@@ -24,6 +24,14 @@ export class UmbLanguageWorkspaceElement extends LitElement {
 				border: none;
 				border-bottom: 1px solid var(--uui-color-divider);
 			}
+			#default-language-warning {
+				background-color: var(--uui-color-warning);
+				color: var(--uui-color-warning-contrast);
+				padding: var(--uui-size-space-4) var(--uui-size-space-5);
+				border: 1px solid var(--uui-color-warning-standalone);
+				margin-top: var(--uui-size-space-4);
+				border-radius: var(--uui-border-radius);
+			}
 		`,
 	];
 
@@ -66,6 +74,9 @@ export class UmbLanguageWorkspaceElement extends LitElement {
 									<div>Properties on this language have to be filled out before the node can be published.</div>
 								</div>
 							</uui-toggle>
+							<div id="default-language-warning">
+								Switching default language may result in default content missing.
+							</div>
 						</div>
 					</umb-workspace-property-layout>
 					<umb-workspace-property-layout
