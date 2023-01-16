@@ -1,19 +1,14 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
-import { css, html, LitElement, nothing } from 'lit';
+import { css, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
-
 import { UUIButtonState } from '@umbraco-ui/uui';
-import { UmbModalService } from '../../../../../core/modal';
 
+import { UmbHealthCheckDashboardContext } from '../health-check-dashboard.context';
 import { UmbLitElement } from '@umbraco-cms/element';
-import { tryExecuteAndNotify } from '@umbraco-cms/resources';
 
 import { ManifestHealthCheck, umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
 
-import { HealthCheckGroup, HealthCheckGroupWithResult, HealthCheckResource } from '@umbraco-cms/backend-api';
-
-import '../health-check-overview-group.element';
-import { UmbHealthCheckDashboardContext } from '../health-check-dashboard.context';
+import '../health-check-group-box-overview.element';
 
 @customElement('umb-dashboard-health-check-overview')
 export class UmbDashboardHealthCheckOverviewElement extends UmbLitElement {
@@ -77,11 +72,6 @@ export class UmbDashboardHealthCheckOverviewElement extends UmbLitElement {
 	@state()
 	private _buttonState: UUIButtonState;
 
-	@state()
-	private _groupWithResults: HealthCheckGroupWithResult[] = [];
-
-	private _modalService?: UmbModalService;
-
 	private _healthCheckManifests: ManifestHealthCheck[] = [];
 
 	private _healthCheckDashboardContext?: UmbHealthCheckDashboardContext;
@@ -89,7 +79,6 @@ export class UmbDashboardHealthCheckOverviewElement extends UmbLitElement {
 	constructor() {
 		super();
 		this.consumeAllContexts(['umbNotificationService', 'umbModalService', 'umbHealthCheckDashboard'], (instances) => {
-			this._modalService = instances['umbModalService'];
 			this._healthCheckDashboardContext = instances['umbHealthCheckDashboard'];
 		});
 	}
@@ -120,17 +109,11 @@ export class UmbDashboardHealthCheckOverviewElement extends UmbLitElement {
 					</uui-button>
 				</div>
 				<!--//TODO: i want to wrap my extension container in a grid wrapper -->
-				<umb-extension-slot type="healthCheck" default-element="umb-health-check-overview-group"></umb-extension-slot>
+				<umb-extension-slot
+					type="healthCheck"
+					default-element="umb-health-check-group-box-overview"></umb-extension-slot>
 			</uui-box>
 		`;
-	}
-
-	private renderChecks(name: string) {
-		if (this._groupWithResults.length) {
-			const group = this._groupWithResults?.find((group) => group.name == name);
-			//console.log('found:', group);
-			return html`${name}`;
-		} else return nothing;
 	}
 }
 

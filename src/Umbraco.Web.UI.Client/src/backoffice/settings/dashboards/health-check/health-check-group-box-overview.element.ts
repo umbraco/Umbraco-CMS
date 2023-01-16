@@ -6,11 +6,10 @@ import type { ManifestHealthCheck } from '@umbraco-cms/models';
 import { StatusResultType } from '@umbraco-cms/backend-api';
 import { UmbLitElement } from '@umbraco-cms/element';
 import { UmbHealthCheckDashboardContext } from './health-check-dashboard.context';
-import { result } from 'lodash';
 import { ensureSlash, path } from 'router-slot';
 
-@customElement('umb-health-check-overview-group')
-export class UmbHealthCheckOverviewGroupElement extends UmbLitElement {
+@customElement('umb-health-check-group-box-overview')
+export class UmbHealthCheckGroupBoxOverviewElement extends UmbLitElement {
 	static styles = [
 		UUITextStyles,
 		css`
@@ -54,15 +53,12 @@ export class UmbHealthCheckOverviewGroupElement extends UmbLitElement {
 	@property({ type: Object })
 	manifest?: ManifestHealthCheck;
 
-	@state()
-	private _checkResponse? = [];
-
 	private _healthCheckContext?: UmbHealthCheckDashboardContext;
 
 	private _api?: UmbHealthCheckContext;
 
 	@state()
-	private _results?: any = [];
+	private _tagResults?: any = [];
 
 	@state()
 	private _keyResults?: any = [];
@@ -94,8 +90,8 @@ export class UmbHealthCheckOverviewGroupElement extends UmbLitElement {
 				res.push(result.resultType);
 			});
 		});
-		this._results = res;
-		return html`<div>${this._renderCheckResults(this.filterResults(this._results))}</div>`;
+		this._tagResults = res;
+		return html`<div>${this._renderCheckResults(this.filterResults(this._tagResults))}</div>`;
 	}
 
 	_renderCheckResults(resultObject: any) {
@@ -135,16 +131,16 @@ export class UmbHealthCheckOverviewGroupElement extends UmbLitElement {
 
 		results.forEach((result: any) => {
 			switch (result) {
-				case 'Success':
+				case StatusResultType.SUCCESS:
 					tags.success += 1;
 					break;
-				case 'Warning':
+				case StatusResultType.WARNING:
 					tags.warning += 1;
 					break;
-				case 'Error':
+				case StatusResultType.ERROR:
 					tags.error += 1;
 					break;
-				case 'Info':
+				case StatusResultType.INFO:
 					tags.info += 1;
 					break;
 				default:
@@ -155,9 +151,9 @@ export class UmbHealthCheckOverviewGroupElement extends UmbLitElement {
 	}
 }
 
-export default UmbHealthCheckOverviewGroupElement;
+export default UmbHealthCheckGroupBoxOverviewElement;
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-health-check-overview-group': UmbHealthCheckOverviewGroupElement;
+		'umb-health-check--group-box-overview': UmbHealthCheckGroupBoxOverviewElement;
 	}
 }
