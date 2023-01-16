@@ -12,7 +12,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations;
 /*
  * This is what runs our migration plans.
  * It's important to note that this was altered to allow for partial migration completions.
- * Thee need for the became apparent when we added support for SQLite.
+ * The need for this became apparent when we added support for SQLite.
  * The main issue being how SQLites handles altering the schema.
  * Long story short, SQLite doesn't support altering columns,
  * or adding non-nullable columns with non-trivial types, for instance GUIDs.
