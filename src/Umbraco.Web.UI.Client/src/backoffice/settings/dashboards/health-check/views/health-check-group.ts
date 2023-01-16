@@ -56,10 +56,6 @@ export class UmbDashboardHealthCheckGroupElement extends UmbLitElement {
 				cursor: pointer;
 			}
 
-			p uui-icon {
-				vertical-align: sub;
-			}
-
 			.data .result-wrapper:not(:first-child) {
 				padding-top: var(--uui-size-space-5);
 				margin-top: var(--uui-size-space-5);
@@ -72,30 +68,15 @@ export class UmbDashboardHealthCheckGroupElement extends UmbLitElement {
 			.data uui-button {
 				margin-block-start: 1em;
 			}
-
-			.action-wrapper {
-				margin-top: var(--uui-size-space-4);
+			.description {
 				display: flex;
-				flex-direction: column;
-				gap: var(--uui-size-space-4);
+			}
+			.description span {
+				width: 36px;
 			}
 
-			.action {
-				width: 100%;
-				display: flex;
-				gap: var(--uui-size-space-4);
-				background-color: #eee;
-				align-items: center;
-			}
-			.action uui-button {
-				margin: 0;
-				padding: 0;
-				flex-shrink: 1;
-			}
-
-			.no-description {
-				color: var(--uui-color-border-emphasis);
-				font-style: italic;
+			uui-icon {
+				vertical-align: sub;
 			}
 		`,
 	];
@@ -184,7 +165,12 @@ export class UmbDashboardHealthCheckGroupElement extends UmbLitElement {
 			<div class="data">
 				${checkResults?.results.map((result: any) => {
 					return html`<div class="result-wrapper">
-						<p>${this.renderIcon(result.resultType)} ${result.message}</p>
+						<div class="description">
+							<span>${this.renderIcon(result.resultType)}</span>
+							<p>${result.message}</p>
+						</div>
+
+						${result.actions ? this.renderActions(result.actions) : nothing}
 						${result.readMoreLink
 							? html`<uui-button
 									label="Read more"
@@ -196,7 +182,6 @@ export class UmbDashboardHealthCheckGroupElement extends UmbLitElement {
 									<uui-icon name="umb:out"></uui-icon>
 							  </uui-button>`
 							: nothing}
-						${result.actions ? this.renderActions(result.actions) : nothing}
 					</div>`;
 				})}
 			</div>

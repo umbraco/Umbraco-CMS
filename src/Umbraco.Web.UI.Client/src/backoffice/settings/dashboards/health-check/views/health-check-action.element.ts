@@ -4,15 +4,7 @@ import { css, html, nothing } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
 
-import { UmbHealthCheckContext } from '../health-check.context';
-import { UmbHealthCheckDashboardContext } from '../health-check-dashboard.context';
-import {
-	HealthCheckAction,
-	HealthCheckGroupWithResult,
-	HealthCheckResource,
-	HealthCheckWithResult,
-	StatusResultType,
-} from '@umbraco-cms/backend-api';
+import { HealthCheckAction, HealthCheckResource } from '@umbraco-cms/backend-api';
 import { UmbLitElement } from '@umbraco-cms/element';
 import { tryExecuteAndNotify } from '@umbraco-cms/resources';
 
@@ -21,22 +13,42 @@ export class UmbDashboardHealthCheckActionElement extends UmbLitElement {
 	static styles = [
 		UUITextStyles,
 		css`
-			.action {
-				width: 100%;
-				display: flex;
-				gap: var(--uui-size-space-4);
+			:host {
+				margin: var(--uui-size-space-4) 0;
+				display: block;
+				border-radius: var(--uui-border-radius);
 				background-color: #eee;
-				align-items: center;
 			}
-			.action uui-button {
+			form {
 				margin: 0;
 				padding: 0;
+			}
+
+			p {
+				padding-top: 0;
+				margin-top: 0;
+			}
+
+			.action {
+				padding: 20px 25px;
+				width: 100%;
+			}
+
+			.action uui-label {
+				display: block;
+			}
+
+			.action uui-button {
 				flex-shrink: 1;
 			}
 
 			.no-description {
 				color: var(--uui-color-border-emphasis);
 				font-style: italic;
+			}
+
+			.required-value {
+				margin: 0 0 var(--uui-size-space-4);
 			}
 		`,
 	];
@@ -66,10 +78,10 @@ export class UmbDashboardHealthCheckActionElement extends UmbLitElement {
 
 	render() {
 		return html` <div class="action">
+			<p>${this.action.description || html`<span class="no-description">This action has no description</span>`}</p>
 			<uui-form>
 				<form @submit=${(e: SubmitEvent) => this._onActionClick(e)}>
 					${this._renderValueRequired()}
-					<br />
 					<uui-button
 						type="submit"
 						look="primary"
@@ -80,7 +92,6 @@ export class UmbDashboardHealthCheckActionElement extends UmbLitElement {
 					</uui-button>
 				</form>
 			</uui-form>
-			<p>${this.action.description || html`<span class="no-description">This action has no description</span>`}</p>
 		</div>`;
 	}
 
@@ -88,29 +99,41 @@ export class UmbDashboardHealthCheckActionElement extends UmbLitElement {
 		if (this.action.valueRequired) {
 			switch (this.action.providedValueValidation) {
 				case 'email':
-					return html`<uui-input
-						type="email"
-						@input=${(e: any) => (this.action.providedValue = e.target.value)}
-						placeholder="Value"
-						.value=${this.action.providedValue ?? ''}
-						required></uui-input>`;
+					return html` <div class="required-value">
+						<uui-label for="action">Set new value:</uui-label>
+						<uui-input
+							id="action"
+							type="email"
+							@input=${(e: any) => (this.action.providedValue = e.target.value)}
+							placeholder="Value"
+							.value=${this.action.providedValue ?? ''}
+							required></uui-input>
+					</div>`;
 
 				case 'regex':
-					return html`<uui-input
-						type="text"
-						pattern="${ifDefined(this.action.providedValueValidationRegex ?? undefined)}"
-						@input=${(e: any) => (this.action.providedValue = e.target.value)}
-						placeholder="Value"
-						.value=${this.action.providedValue ?? ''}
-						required></uui-input>`;
+					return html`<div class="required-value">
+						<uui-label for="action">Set new value:</uui-label>
+						<uui-input
+							id="action"
+							type="text"
+							pattern="${ifDefined(this.action.providedValueValidationRegex ?? undefined)}"
+							@input=${(e: any) => (this.action.providedValue = e.target.value)}
+							placeholder="Value"
+							.value=${this.action.providedValue ?? ''}
+							required></uui-input>
+					</div>`;
 
 				default:
-					return html`<uui-input
-						type="text"
-						@input=${(e: any) => (this.action.providedValue = e.target.value)}
-						placeholder="Value"
-						.value=${this.action.providedValue ?? ''}
-						required></uui-input>`;
+					return html`<div class="required-value">
+						<uui-label for="action">Set new value:</uui-label>
+						<uui-input
+							id="action"
+							type="text"
+							@input=${(e: any) => (this.action.providedValue = e.target.value)}
+							placeholder="Value"
+							.value=${this.action.providedValue ?? ''}
+							required></uui-input>
+					</div>`;
 			}
 		}
 
