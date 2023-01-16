@@ -7,15 +7,6 @@ import type { DataTypePropertyData } from '@umbraco-cms/models';
 
 @customElement('umb-property-editor-ui-document-picker')
 export class UmbPropertyEditorUIContentPickerElement extends UmbLitElement {
-	/*
-	static styles = [
-		UUITextStyles,
-		css`
-
-		`,
-	];
-	*/
-
 	private _value: Array<string> = [];
 
 	@property({ type: Array })
