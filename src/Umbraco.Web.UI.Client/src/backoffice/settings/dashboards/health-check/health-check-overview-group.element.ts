@@ -88,11 +88,13 @@ export class UmbHealthCheckOverviewGroupElement extends UmbLitElement {
 	}
 
 	_renderStatus() {
+		const res: any = [];
 		this._keyResults.forEach((item: any) => {
 			item.results.forEach((result: any) => {
-				this._results.push(result.resultType);
+				res.push(result.resultType);
 			});
 		});
+		this._results = res;
 		return html`<div>${this._renderCheckResults(this.filterResults(this._results))}</div>`;
 	}
 
