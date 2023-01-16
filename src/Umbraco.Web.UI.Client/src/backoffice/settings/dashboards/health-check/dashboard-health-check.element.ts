@@ -26,7 +26,6 @@ export class UmbDashboardHealthCheckElement extends UmbLitElement {
 			setup: (component: HTMLElement, info: IRoutingInfo) => {
 				const element = component as UmbDashboardHealthCheckGroupElement;
 				element.groupName = decodeURI(info.match.params.groupName);
-				this.group = info.match.params.groupName;
 			},
 		},
 		{
@@ -34,9 +33,6 @@ export class UmbDashboardHealthCheckElement extends UmbLitElement {
 			component: () => import('./views/health-check-overview'),
 		},
 	];
-
-	@state()
-	private group?: string;
 
 	@state()
 	private _currentPath?: string;

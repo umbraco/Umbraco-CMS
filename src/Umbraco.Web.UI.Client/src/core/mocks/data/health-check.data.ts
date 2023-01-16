@@ -35,6 +35,7 @@ export const healthGroups: HealthCheckGroupWithResult[] = [
 								name: 'Action name',
 								alias: 'Action alias',
 								description: 'Action description',
+								valueRequired: true,
 							},
 						],
 					},

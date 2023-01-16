@@ -11,9 +11,11 @@ import {
 	HealthCheckResource,
 	HealthCheckWithResult,
 	StatusResultType,
+	HealthCheckResult,
 } from '@umbraco-cms/backend-api';
 import { UmbLitElement } from '@umbraco-cms/element';
 import { tryExecuteAndNotify } from '@umbraco-cms/resources';
+import './health-check-action.element';
 
 @customElement('umb-dashboard-health-check-group')
 export class UmbDashboardHealthCheckGroupElement extends UmbLitElement {
@@ -146,8 +148,8 @@ export class UmbDashboardHealthCheckGroupElement extends UmbLitElement {
 		this._buttonState = 'success';
 	}
 
-	private async _onActionClick(action: HealthCheckAction) {
-		await tryExecuteAndNotify(this, HealthCheckResource.postHealthCheckExecuteAction({ requestBody: action }));
+	private _onActionClick(action: HealthCheckAction) {
+		return tryExecuteAndNotify(this, HealthCheckResource.postHealthCheckExecuteAction({ requestBody: action }));
 	}
 
 	render() {
@@ -219,18 +221,12 @@ export class UmbDashboardHealthCheckGroupElement extends UmbLitElement {
 	private renderActions(actions: HealthCheckAction[]) {
 		if (actions.length)
 			return html` <div class="action-wrapper">
-				${actions.map((action) => {
-					return html` <div class="action">
-						<uui-button
-							look="primary"
-							color="positive"
-							label="${action.name || 'action'}"
-							@click="${() => this._onActionClick(action)}">
-							${action.name || 'Action'}
-						</uui-button>
-						<p>${action.description || html`<span class="no-description">This action has no description</span>`}</p>
-					</div>`;
-				})}
+				${actions.map(
+					(action) =>
+						html`<umb-dashboard-health-check-action
+							.action=${action}
+							@action-executed=${() => this._buttonHandler()}></umb-dashboard-health-check-action>`
+				)}
 			</div>`;
 		else return nothing;
 	}
