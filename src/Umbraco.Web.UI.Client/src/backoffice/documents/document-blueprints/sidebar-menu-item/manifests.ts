@@ -4,7 +4,7 @@ const sidebarMenuItem: ManifestSidebarMenuItem = {
 	type: 'sidebarMenuItem',
 	alias: 'Umb.SidebarMenuItem.DocumentBlueprints',
 	name: 'Document Blueprints Sidebar Menu Item',
-	weight: 400,
+	weight: 90,
 	meta: {
 		label: 'Document Blueprints',
 		icon: 'umb:blueprint',
