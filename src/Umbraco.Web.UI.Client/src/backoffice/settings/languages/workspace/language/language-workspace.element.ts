@@ -31,7 +31,7 @@ export class UmbLanguageWorkspaceElement extends LitElement {
 	language: Language = {
 		id: 1,
 		name: 'English',
-		isoCode: 'en',
+		isoCode: 'en-us',
 		isDefault: true,
 		isMandatory: true,
 	};
@@ -44,19 +44,21 @@ export class UmbLanguageWorkspaceElement extends LitElement {
 			<div id="main">
 				<uui-box>
 					<umb-workspace-property-layout label="Language">
-						<uui-input slot="editor"></uui-input>
+						<uui-input .value=${this.language.name} slot="editor"></uui-input>
 					</umb-workspace-property-layout>
 					<umb-workspace-property-layout label="ISO Code">
-						<uui-input slot="editor"></uui-input>
+						<div slot="editor">
+							${this.language.isoCode}
+						</div>
 					</umb-workspace-property-layout>
 					<umb-workspace-property-layout label="Settings">
 						<div slot="editor">
-							<uui-toggle>
+							<uui-toggle ?checked=${this.language.isDefault || false}>
 								<div>
 									<b>Default language</b>
 									<div>An Umbraco site can only have one default language set.</div>
 								</div>
-							</uui-toggle>
+							</uui-toggle ?checked=${this.language.isMandatory || false}>
 							<hr />
 							<uui-toggle>
 								<div>
