@@ -4,7 +4,7 @@ const workspace: ManifestWorkspace = {
 	type: 'workspace',
 	alias: 'Umb.Workspace.DataType',
 	name: 'Data Type Workspace',
-	loader: () => import('./workspace-data-type.element'),
+	loader: () => import('./data-type-workspace.element'),
 	meta: {
 		entityType: 'data-type',
 	},
@@ -15,7 +15,7 @@ const workspaceViews: Array<ManifestWorkspaceView> = [
 		type: 'workspaceView',
 		alias: 'Umb.WorkspaceView.DataType.Edit',
 		name: 'Data Type Workspace Edit View',
-		loader: () => import('./views/edit/workspace-view-data-type-edit.element'),
+		loader: () => import('./views/edit/data-type-workspace-view-edit.element'),
 		weight: 90,
 		meta: {
 			workspaces: ['Umb.Workspace.DataType'],
