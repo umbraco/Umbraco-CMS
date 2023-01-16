@@ -3,4 +3,6 @@
 public class ContentTreeItemViewModel : EntityTreeItemViewModel
 {
     public bool NoAccess { get; set; }
+
+    public bool IsTrashed { get; set; }
 }
