@@ -2,7 +2,7 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, CSSResultGroup, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { when } from 'lit/directives/when.js';
-import { UmbSectionStore } from '../section/section.store';
+import { UmbSectionStore, UMB_SECTION_STORE_CONTEXT_ALIAS } from '../section/section.store';
 import type { ManifestSection } from '@umbraco-cms/models';
 import { UmbLitElement } from '@umbraco-cms/element';
 
@@ -54,7 +54,7 @@ export class UmbBackofficeHeaderSections extends UmbLitElement {
 	constructor() {
 		super();
 
-		this.consumeContext('umbSectionStore', (sectionStore: UmbSectionStore) => {
+		this.consumeContext(UMB_SECTION_STORE_CONTEXT_ALIAS, (sectionStore) => {
 			this._sectionStore = sectionStore;
 			this._observeSections();
 			this._observeCurrentSection();

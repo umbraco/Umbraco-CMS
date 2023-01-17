@@ -3,7 +3,7 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html } from 'lit';
 import { state } from 'lit/decorators.js';
 import { IRoutingInfo } from 'router-slot';
-import { UmbSectionStore } from '../section/section.store';
+import { UmbSectionStore, UMB_SECTION_STORE_CONTEXT_ALIAS } from '../section/section.store';
 import { UmbSectionContext } from '../section/section.context';
 import { createExtensionElement } from '@umbraco-cms/extensions-api';
 import type { ManifestSection } from '@umbraco-cms/models';
@@ -41,7 +41,7 @@ export class UmbBackofficeMain extends UmbLitElement {
 	constructor() {
 		super();
 
-		this.consumeContext('umbSectionStore', (_instance: UmbSectionStore) => {
+		this.consumeContext(UMB_SECTION_STORE_CONTEXT_ALIAS, (_instance) => {
 			this._sectionStore = _instance;
 			this._observeSections();
 		});

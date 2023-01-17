@@ -21,7 +21,7 @@ import { UmbMemberGroupStore, UMB_MEMBER_GROUP_STORE_CONTEXT_ALIAS } from './mem
 import { UmbDictionaryStore } from './translation/dictionary/dictionary.store';
 import { UmbDocumentBlueprintStore } from './documents/document-blueprints/document-blueprint.store';
 
-import { UmbSectionStore } from './shared/components/section/section.store';
+import { UmbSectionStore, UMB_SECTION_STORE_CONTEXT_ALIAS } from './shared/components/section/section.store';
 import { UmbDataTypeStore, UMB_DATA_TYPE_STORE_CONTEXT_ALIAS } from './settings/data-types/data-type.store';
 import { UmbLitElement } from '@umbraco-cms/element';
 
@@ -70,7 +70,7 @@ export class UmbBackofficeElement extends UmbLitElement {
 		this.provideContext(UMB_USER_STORE_CONTEXT_ALIAS, new UmbUserStore(this));
 		this.provideContext(UMB_USER_GROUP_STORE_CONTEXT_ALIAS, new UmbUserGroupStore(this));
 		this.provideContext(UMB_MEMBER_GROUP_STORE_CONTEXT_ALIAS, new UmbMemberGroupStore(this));
-		this.provideContext('umbSectionStore', new UmbSectionStore());
+		this.provideContext(UMB_SECTION_STORE_CONTEXT_ALIAS, new UmbSectionStore());
 		this.provideContext('umbCurrentUserHistoryStore', new UmbCurrentUserHistoryStore());
 		this.provideContext('umbDictionaryStore', new UmbDictionaryStore(this));
 		this.provideContext('umbDocumentBlueprintStore', new UmbDocumentBlueprintStore(this));

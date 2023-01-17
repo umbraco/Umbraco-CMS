@@ -1,5 +1,6 @@
 import { Observable, ReplaySubject } from 'rxjs';
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
+import { UmbContextAlias } from '@umbraco-cms/context-api';
 
 // TODO: maybe this should be named something else than store?
 export class UmbSectionStore {
@@ -20,3 +21,5 @@ export class UmbSectionStore {
 		this._currentAlias.next(alias);
 	}
 }
+
+export const UMB_SECTION_STORE_CONTEXT_ALIAS = new UmbContextAlias<UmbSectionStore>(UmbSectionStore.name);
