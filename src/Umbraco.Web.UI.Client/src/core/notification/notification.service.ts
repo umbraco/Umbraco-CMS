@@ -1,6 +1,6 @@
 import { BehaviorSubject } from 'rxjs';
 import { UmbNotificationHandler } from '.';
-import { ContextAlias } from '@umbraco-cms/context-api';
+import { UmbContextAlias } from '@umbraco-cms/context-api';
 
 export type UmbNotificationData = any;
 
@@ -86,6 +86,6 @@ export class UmbNotificationService {
 	}
 }
 
-export const UMB_NOTIFICATION_SERVICE_CONTEXT_ALIAS = new ContextAlias<UmbNotificationService>(
+export const UMB_NOTIFICATION_SERVICE_CONTEXT_ALIAS = new UmbContextAlias<UmbNotificationService>(
 	UmbNotificationService.name
 );

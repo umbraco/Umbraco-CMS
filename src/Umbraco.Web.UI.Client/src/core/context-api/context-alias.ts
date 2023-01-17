@@ -1,4 +1,4 @@
-export class ContextAlias<T = unknown> {
+export class UmbContextAlias<T = unknown> {
 	/**
 	 * @param _desc   Description for the token,
 	 *                used only for debugging purposes,
@@ -9,11 +9,11 @@ export class ContextAlias<T = unknown> {
 	/**
 	 * @internal
 	 */
-	get multi(): ContextAlias<Array<T>> {
-		return this as ContextAlias<Array<T>>;
+	get multi(): UmbContextAlias<Array<T>> {
+		return this as UmbContextAlias<Array<T>>;
 	}
 
 	toString(): string {
-		return `${ContextAlias.name} ${this._desc}`;
+		return `${UmbContextAlias.name} ${this._desc}`;
 	}
 }

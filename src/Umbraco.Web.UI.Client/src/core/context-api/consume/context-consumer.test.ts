@@ -1,5 +1,5 @@
 import { expect, oneEvent } from '@open-wc/testing';
-import { ContextAlias } from '../context-token';
+import { UmbContextAlias } from '../context-alias';
 import { UmbContextProvider } from '../provide/context-provider';
 import { UmbContextConsumer } from './context-consumer';
 import { UmbContextRequestEventImplementation, umbContextRequestEventType } from './context-request.event';
@@ -56,7 +56,7 @@ describe('UmbContextConsumer', () => {
 	});
 
 	it('works with ContextAlias', (done) => {
-		const CONTEXT_ALIAS = new ContextAlias<MyClass>(testContextAlias);
+		const CONTEXT_ALIAS = new UmbContextAlias<MyClass>(testContextAlias);
 		const provider = new UmbContextProvider(document.body, CONTEXT_ALIAS, new MyClass());
 		provider.hostConnected();
 

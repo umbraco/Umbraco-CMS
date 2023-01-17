@@ -6,6 +6,7 @@ import './layouts/modal-layout-current-user.element';
 
 import { UUIModalSidebarSize } from '@umbraco-ui/uui-modal-sidebar';
 import { BehaviorSubject } from 'rxjs';
+import { UmbContextAlias } from '../context-api/context-alias';
 import { UmbModalChangePasswordData } from './layouts/modal-layout-change-password.element';
 import type { UmbModalIconPickerData } from './layouts/icon-picker/modal-layout-icon-picker.element';
 
@@ -15,7 +16,6 @@ import type { UmbModalConfirmData } from './layouts/confirm/modal-layout-confirm
 import type { UmbModalContentPickerData } from './layouts/content-picker/modal-layout-content-picker.element';
 import type { UmbModalPropertyEditorUIPickerData } from './layouts/property-editor-ui-picker/modal-layout-property-editor-ui-picker.element';
 import { UmbModalHandler } from '.';
-import { ContextAlias } from '../context-api/context-token';
 
 export type UmbModalType = 'dialog' | 'sidebar';
 
@@ -133,4 +133,4 @@ export class UmbModalService {
 	}
 }
 
-export const UMB_MODAL_SERVICE_CONTEXT_ALIAS = new ContextAlias<UmbModalService>(UmbModalService.name);
+export const UMB_MODAL_SERVICE_CONTEXT_ALIAS = new UmbContextAlias<UmbModalService>(UmbModalService.name);

@@ -1,4 +1,4 @@
-import { ContextAlias } from '../context-token';
+import { UmbContextAlias } from '../context-alias';
 import { isUmbContextProvideEventType, umbContextProvideEventType } from '../provide/context-provide.event';
 import { UmbContextRequestEventImplementation, UmbContextCallback } from './context-request.event';
 
@@ -25,7 +25,7 @@ export class UmbContextConsumer<HostType extends EventTarget = EventTarget, T = 
 	 */
 	constructor(
 		protected host: HostType,
-		protected _contextAlias: string | ContextAlias<T>,
+		protected _contextAlias: string | UmbContextAlias<T>,
 		private _callback: UmbContextCallback<T>
 	) {}
 
