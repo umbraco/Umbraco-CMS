@@ -401,18 +401,16 @@ internal class CollectibleRuntimeViewCompiler : IViewCompiler
 
     private void LogCompilationFailure(UmbracoCompilationException compilationException)
     {
-        IEnumerable<DiagnosticMessage?>? diagnosticMessages = compilationException.CompilationFailures?
+        IEnumerable<string>? messages = compilationException.CompilationFailures?
             .WhereNotNull()
-            .SelectMany(x => x.Messages!);
+            .SelectMany(x => x.Messages!)
+            .WhereNotNull()
+            .Select(x => x.FormattedMessage)
+            .WhereNotNull();
 
-        foreach (DiagnosticMessage? diagnosticMessage in diagnosticMessages ?? Enumerable.Empty<DiagnosticMessage>())
+        foreach (var message in messages ?? Enumerable.Empty<string>())
         {
-            if (diagnosticMessage?.FormattedMessage is null)
-            {
-                continue;
-            }
-
-            _logger.LogError(compilationException, "Compilation error occured with message: {ErrorMessage}", diagnosticMessage.FormattedMessage);
+            _logger.LogError(compilationException, "Compilation error occured with message: {ErrorMessage}", message);
         }
     }
 
