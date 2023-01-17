@@ -1,5 +1,6 @@
 import { Language, LanguageResource } from '@umbraco-cms/backend-api';
 import { UmbLitElement } from '@umbraco-cms/element';
+import { LanguageDetails } from '@umbraco-cms/models';
 import { tryExecuteAndNotify } from '@umbraco-cms/resources';
 import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, html, LitElement } from 'lit';
@@ -37,7 +38,7 @@ export class UmbLanguageRootWorkspaceElement extends UmbLitElement {
 	];
 
 	@state()
-	private _languages: Array<Language> = [
+	private _languages: Array<LanguageDetails> = [
 		{
 			id: 1,
 			name: 'English',
@@ -114,10 +115,11 @@ export class UmbLanguageRootWorkspaceElement extends UmbLitElement {
 		this._getLanguageData();
 	}
 
+	//TODO: Move this code to the language store
 	private async _getLanguageData() {
 		const { data } = await tryExecuteAndNotify(this, LanguageResource.getLanguage({ skip: 0, take: 10 }));
 		if (data) {
-			this._languages = data.items;
+			this._languages = data.items as Array<LanguageDetails>;
 			this._createTableItems(this._languages);
 			console.log('LANGS', this._languages);
 		}

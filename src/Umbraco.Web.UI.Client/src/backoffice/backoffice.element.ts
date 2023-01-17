@@ -32,6 +32,7 @@ import './users';
 import './packages';
 import './search';
 import './shared';
+import { UmbLanguageStore } from './settings/languages/language.store';
 
 @defineElement('umb-backoffice')
 export class UmbBackofficeElement extends UmbLitElement {
@@ -71,6 +72,7 @@ export class UmbBackofficeElement extends UmbLitElement {
 		this.provideContext('umbCurrentUserHistoryStore', new UmbCurrentUserHistoryStore());
 		this.provideContext('umbDictionaryStore', new UmbDictionaryStore(this));
 		this.provideContext('umbDocumentBlueprintStore', new UmbDocumentBlueprintStore(this));
+		this.provideContext('umbLanguageStore', new UmbLanguageStore(this));
 	}
 
 	render() {

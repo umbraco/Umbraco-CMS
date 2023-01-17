@@ -5,6 +5,7 @@ import {
 	DocumentTypeTreeItem,
 	EntityTreeItem,
 	FolderTreeItem,
+	Language,
 } from '@umbraco-cms/backend-api';
 
 // Extension Manifests
@@ -148,4 +149,9 @@ export interface DocumentBlueprintDetails {
 	data: Array<any>;
 	icon: string;
 	documentTypeKey: string;
+}
+
+//TODO temp model until backend changes Language to use key.
+export interface LanguageDetails extends Language {
+	key: string;
 }

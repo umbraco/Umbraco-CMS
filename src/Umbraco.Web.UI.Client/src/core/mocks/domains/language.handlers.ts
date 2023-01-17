@@ -18,4 +18,13 @@ export const handlers = [
 
 		return res(ctx.status(200), ctx.json(response));
 	}),
+
+	rest.get('/umbraco/management/api/v1/language/:key', (req, res, ctx) => {
+		const key = req.params.key as string;
+		if (!key) return;
+
+		const item = umbLanguagesData.getByKey(key);
+
+		return res(ctx.status(200), ctx.json(item));
+	}),
 ];

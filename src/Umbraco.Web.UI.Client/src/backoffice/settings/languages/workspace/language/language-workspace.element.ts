@@ -1,10 +1,13 @@
 import { Language } from '@umbraco-cms/backend-api';
+import { UmbLitElement } from '@umbraco-cms/element';
+import { LanguageDetails } from '@umbraco-cms/models';
 import { UUITextStyles } from '@umbraco-ui/uui-css';
-import { css, html, LitElement } from 'lit';
+import { css, html, LitElement, nothing } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
+import { UmbWorkspaceLanguageContext } from './language-workspace.context';
 
 @customElement('umb-language-workspace')
-export class UmbLanguageWorkspaceElement extends LitElement {
+export class UmbLanguageWorkspaceElement extends UmbLitElement {
 	static styles = [
 		UUITextStyles,
 		css`
@@ -36,15 +39,37 @@ export class UmbLanguageWorkspaceElement extends LitElement {
 	];
 
 	@property()
-	language: Language = {
-		id: 1,
-		name: 'English',
-		isoCode: 'en-us',
-		isDefault: true,
-		isMandatory: true,
-	};
+	language?: LanguageDetails;
+
+	private _entityKey!: string;
+	@property()
+	public get entityKey(): string {
+		return this._entityKey;
+	}
+	public set entityKey(value: string) {
+		this._entityKey = value;
+		if (this._entityKey && !this._languageWorkspaceContext) {
+			this.provideLanguageWorkspaceContext();
+		}
+	}
+
+	private _languageWorkspaceContext?: UmbWorkspaceLanguageContext;
+
+	constructor() {
+		super();
+	}
+
+	public provideLanguageWorkspaceContext() {
+		this._languageWorkspaceContext = new UmbWorkspaceLanguageContext(this, this._entityKey);
+		this.provideContext('umbWorkspaceContext', this._languageWorkspaceContext);
+		this._languageWorkspaceContext.data.subscribe((language) => {
+			this.language = language;
+		});
+	}
 
 	render() {
+		if (!this.language) return nothing;
+
 		return html`<umb-body-layout>
 			<div id="header" slot="header">
 				<uui-input .value=${this.language.name}></uui-input>
