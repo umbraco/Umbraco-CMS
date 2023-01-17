@@ -3,7 +3,7 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, state } from 'lit/decorators.js';
 import { distinctUntilChanged } from 'rxjs';
 import { repeat } from 'lit/directives/repeat.js';
-import type { UmbWorkspaceContentContext } from '../../workspace-content.context';
+import { UmbWorkspaceContentContext } from '../../workspace-content.context';
 import type { ContentProperty, ContentPropertyData, DocumentDetails, MediaDetails } from '@umbraco-cms/models';
 
 import '../../../../content-property/content-property.element';
@@ -32,10 +32,14 @@ export class UmbWorkspaceViewContentEditElement extends UmbLitElement {
 	constructor() {
 		super();
 
-		this.consumeContext('umbWorkspaceContext', (workspaceContext) => {
-			this._workspaceContext = workspaceContext;
-			this._observeContent();
-		});
+		// TODO: Figure out how to get the magic string for the workspace context.
+		this.consumeContext<UmbWorkspaceContentContext<DocumentDetails | MediaDetails>>(
+			'umbWorkspaceContext',
+			(workspaceContext) => {
+				this._workspaceContext = workspaceContext;
+				this._observeContent();
+			}
+		);
 	}
 
 	private _observeContent() {
@@ -43,22 +47,19 @@ export class UmbWorkspaceViewContentEditElement extends UmbLitElement {
 
 		/*
 		TODO: Property-Context: This observer gets all changes, We need to fix this. it should be simpler.
-		It should look at length and aliases? as long as they are identical nothing should change. 
+		It should look at length and aliases? as long as they are identical nothing should change.
 		As they would update them selfs?
 
 		Should use a Observable for this._workspaceContext.properties
 		*/
-		this.observe(
-			this._workspaceContext.data.pipe(distinctUntilChanged()),
-			(content) => {
-				this._properties = content.properties;
-				this._data = content.data;
-				/*
+		this.observe(this._workspaceContext.data.pipe(distinctUntilChanged()), (content) => {
+			this._properties = content.properties;
+			this._data = content.data;
+			/*
 				Maybe we should not give the value, but the umb-content-property should get the context and observe its own data.
 				This would become a more specific Observer therefor better performance?.. Note to self: Debate with Mads how he sees this perspective.
 				*/
-			}
-		);
+		});
 	}
 
 	render() {
@@ -67,11 +68,10 @@ export class UmbWorkspaceViewContentEditElement extends UmbLitElement {
 				${repeat(
 					this._properties,
 					(property) => property.alias,
-					(property) => 
+					(property) =>
 						html`<umb-content-property
 							.property=${property}
-							.value=${this._data.find((data) => data.alias === property.alias)?.value}></umb-content-property>
-						`
+							.value=${this._data.find((data) => data.alias === property.alias)?.value}></umb-content-property> `
 				)}
 			</uui-box>
 		`;

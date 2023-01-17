@@ -2,13 +2,12 @@ import { css, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import type { UUIButtonState } from '@umbraco-ui/uui';
-import type { UmbWorkspaceContentContext } from '../../workspace-content/workspace-content.context';
+import { UmbWorkspaceContentContext } from '../../workspace-content/workspace-content.context';
 import { UmbLitElement } from '@umbraco-cms/element';
 import type { ManifestWorkspaceAction } from '@umbraco-cms/models';
 
 @customElement('umb-workspace-action-node-save')
 export class UmbWorkspaceActionNodeSaveElement extends UmbLitElement {
-	
 	static styles = [UUITextStyles, css``];
 
 	@state()
@@ -21,21 +20,24 @@ export class UmbWorkspaceActionNodeSaveElement extends UmbLitElement {
 	constructor() {
 		super();
 
-		this.consumeContext('umbWorkspaceContext', (instance) => {
-				this._workspaceContext = instance;
-			}
-		);
+		// TODO: Figure out how to get the magic string for the workspace context.
+		this.consumeContext<UmbWorkspaceContentContext>('umbWorkspaceContext', (instance) => {
+			this._workspaceContext = instance;
+		});
 	}
 
 	private async _onSave() {
 		if (!this._workspaceContext) return;
 
 		this._saveButtonState = 'waiting';
-		await this._workspaceContext.save().then(() => {
-			this._saveButtonState = 'success';
-		}).catch(() => {
-			this._saveButtonState = 'failed';
-		})
+		await this._workspaceContext
+			.save()
+			.then(() => {
+				this._saveButtonState = 'success';
+			})
+			.catch(() => {
+				this._saveButtonState = 'failed';
+			});
 	}
 
 	render() {

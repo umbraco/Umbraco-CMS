@@ -2,7 +2,7 @@ import { css, html } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement } from 'lit/decorators.js';
 import { ifDefined } from 'lit-html/directives/if-defined.js';
-import type { UmbWorkspaceContentContext } from '../../workspace-content.context';
+import { UmbWorkspaceContentContext } from '../../workspace-content.context';
 import {
 	UmbCollectionContext,
 	UMB_COLLECTION_CONTEXT_ALIAS,
@@ -32,7 +32,8 @@ export class UmbWorkspaceViewCollectionElement extends UmbLitElement {
 	constructor() {
 		super();
 
-		this.consumeContext('umbWorkspaceContext', (nodeContext) => {
+		// TODO: Figure out how to get the magic string for the workspace context.
+		this.consumeContext<UmbWorkspaceContentContext>('umbWorkspaceContext', (nodeContext) => {
 			this._workspaceContext = nodeContext;
 			this._provideWorkspace();
 		});
