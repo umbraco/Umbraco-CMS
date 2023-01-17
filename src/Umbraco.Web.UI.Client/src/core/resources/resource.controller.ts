@@ -2,12 +2,15 @@
 import { UmbController } from '../controller/controller.class';
 import { UmbControllerHostInterface } from '../controller/controller-host.mixin';
 import { UmbContextConsumerController } from '../context-api/consume/context-consumer.controller';
+import {
+	UmbNotificationOptions,
+	UmbNotificationService,
+	UmbNotificationDefaultData,
+	UMB_NOTIFICATION_SERVICE_CONTEXT_ALIAS,
+} from '../notification';
 import { ApiError, CancelablePromise, ProblemDetails } from '@umbraco-cms/backend-api';
-import { UmbNotificationOptions, UmbNotificationService } from 'src/core/notification';
-import { UmbNotificationDefaultData } from 'src/core/notification/layouts/default';
 
 export class UmbResourceController extends UmbController {
-
 	#promise: Promise<any>;
 
 	#notificationService?: UmbNotificationService;
@@ -17,7 +20,7 @@ export class UmbResourceController extends UmbController {
 
 		this.#promise = promise;
 
-		new UmbContextConsumerController(host, 'umbNotificationService', (_instance: UmbNotificationService) => {
+		new UmbContextConsumerController(host, UMB_NOTIFICATION_SERVICE_CONTEXT_ALIAS, (_instance) => {
 			this.#notificationService = _instance;
 		});
 	}

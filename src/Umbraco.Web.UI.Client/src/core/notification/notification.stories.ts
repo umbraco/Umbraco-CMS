@@ -7,7 +7,12 @@ import { html } from 'lit';
 import { customElement } from 'lit/decorators.js';
 
 import type { UmbNotificationDefaultData } from './layouts/default';
-import { UmbNotificationColor, UmbNotificationOptions, UmbNotificationService } from '.';
+import {
+	UmbNotificationColor,
+	UmbNotificationOptions,
+	UmbNotificationService,
+	UMB_NOTIFICATION_SERVICE_CONTEXT_ALIAS,
+} from '.';
 import { UmbLitElement } from '@umbraco-cms/element';
 
 export default {
@@ -28,7 +33,7 @@ export class StoryNotificationDefaultExampleElement extends UmbLitElement {
 	connectedCallback(): void {
 		super.connectedCallback();
 
-		this.consumeContext('umbNotificationService', (notificationService) => {
+		this.consumeContext(UMB_NOTIFICATION_SERVICE_CONTEXT_ALIAS, (notificationService) => {
 			this._notificationService = notificationService;
 		});
 	}

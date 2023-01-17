@@ -4,7 +4,7 @@ import { customElement, query, state } from 'lit/decorators.js';
 import { UUIInputPasswordElement } from '@umbraco-ui/uui';
 import { UmbInputPickerUserGroupElement } from 'src/auth/components/input-user-group/input-user-group.element';
 import type { UserDetails } from '@umbraco-cms/models';
-import { UmbNotificationService } from 'src/core/notification';
+import { UmbNotificationService, UMB_NOTIFICATION_SERVICE_CONTEXT_ALIAS } from 'src/core/notification';
 import { UmbNotificationDefaultData } from 'src/core/notification/layouts/default';
 import { UmbModalLayoutElement } from 'src/core/modal';
 import { UmbUserStore } from 'src/backoffice/users/users/user.store';
@@ -63,9 +63,12 @@ export class UmbWorkspaceViewUsersCreateElement extends UmbModalLayoutElement {
 	connectedCallback(): void {
 		super.connectedCallback();
 
-		this.consumeAllContexts(['umbUserStore', 'umbNotificationService'], (instances) => {
+		this.consumeContext(UMB_NOTIFICATION_SERVICE_CONTEXT_ALIAS, (_instance) => {
+			this._notificationService = _instance;
+		});
+
+		this.consumeAllContexts(['umbUserStore'], (instances) => {
 			this._userStore = instances['umbUserStore'];
-			this._notificationService = instances['umbNotificationService'];
 		});
 	}
 
