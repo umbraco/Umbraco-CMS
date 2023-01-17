@@ -6,7 +6,7 @@ export abstract class UmbController implements UmbControllerInterface {
 
 	private _alias?: string;
 	public get unique() {
-		return this._alias ?? UmbController.name;
+		return this._alias;
 	}
 
 	constructor(host: UmbControllerHostInterface, alias?: string) {
