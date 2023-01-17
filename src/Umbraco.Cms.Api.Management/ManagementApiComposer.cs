@@ -25,7 +25,6 @@ public class ManagementApiComposer : IComposer
             .AddNewInstaller()
             .AddUpgrader()
             .AddSearchManagement()
-            .AddFactories()
             .AddTrees()
             .AddFactories()
             .AddServices()
