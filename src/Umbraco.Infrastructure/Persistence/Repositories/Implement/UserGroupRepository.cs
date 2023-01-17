@@ -343,6 +343,15 @@ public class UserGroupRepository : EntityRepositoryBase<int, IUserGroup>, IUserG
         sql.OrderBy<UserGroupDto>(x => x.Id); // required for references
 
         List<UserGroupDto>? dtos = Database.FetchOneToMany<UserGroupDto>(x => x.UserGroup2AppDtos, sql);
+
+        IDictionary<int, List<UserGroup2LanguageDto>> userGroups2Languages = GetAllUserGroupLanguageGrouped();
+
+        foreach (UserGroupDto dto in dtos)
+        {
+            userGroups2Languages.TryGetValue(dto.Id, out List<UserGroup2LanguageDto>? userGroup2LanguageDtos);
+            dto.UserGroup2LanguageDtos = userGroup2LanguageDtos ?? new();
+        }
+
         return dtos.Select(x => UserGroupFactory.BuildEntity(_shortStringHelper, x));
     }
 
@@ -446,7 +455,7 @@ public class UserGroupRepository : EntityRepositoryBase<int, IUserGroup>, IUserG
         Database.Update(userGroupDto);
 
         PersistAllowedSections(entity);
-            PersistAllowedLanguages(entity);
+        PersistAllowedLanguages(entity);
 
         entity.ResetDirtyProperties();
     }
