@@ -67,8 +67,8 @@ export class UmbWorkspaceViewUsersCreateElement extends UmbModalLayoutElement {
 			this._notificationService = _instance;
 		});
 
-		this.consumeAllContexts(['umbUserStore'], (instances) => {
-			this._userStore = instances['umbUserStore'];
+		this.consumeContext<UmbUserStore>('umbUserStore', (_instance) => {
+			this._userStore = _instance;
 		});
 	}
 

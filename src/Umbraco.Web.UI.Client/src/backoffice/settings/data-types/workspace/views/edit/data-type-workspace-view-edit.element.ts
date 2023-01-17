@@ -50,8 +50,9 @@ export class UmbDataTypeWorkspaceViewEditElement extends UmbLitElement {
 			this._modalService = _instance;
 		});
 
-		this.consumeAllContexts(['umbWorkspaceContext'], (result) => {
-			this._workspaceContext = result['umbWorkspaceContext'];
+		// TODO: Figure out if this is the best way to consume a context or if it could be strongly typed using UmbContextAlias
+		this.consumeContext<UmbWorkspaceDataTypeContext>('umbWorkspaceContext', (_instance) => {
+			this._workspaceContext = _instance;
 			this._observeDataType();
 		});
 	}

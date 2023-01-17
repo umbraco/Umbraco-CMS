@@ -76,11 +76,14 @@ export class UmbWorkspaceViewUsersTableElement extends UmbLitElement {
 	constructor() {
 		super();
 
-		this.consumeAllContexts(['umbUserGroupStore', 'umbUsersContext'], (instances) => {
-			this._userGroupStore = instances['umbUserGroupStore'];
-			this._usersContext = instances['umbUsersContext'];
-			this._observeUsers();
+		this.consumeContext<UmbUserGroupStore>('umbUserGroupStore', (instance) => {
+			this._userGroupStore = instance;
 			this._observeUserGroups();
+		});
+
+		this.consumeContext<UmbSectionViewUsersElement>('umbUsersContext', (_instance) => {
+			this._usersContext = _instance;
+			this._observeUsers();
 			this._observeSelection();
 		});
 	}

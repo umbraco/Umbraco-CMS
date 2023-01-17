@@ -94,9 +94,13 @@ export class UmbModalLayoutCurrentUserElement extends UmbLitElement {
 			this._modalService = _instance;
 		});
 
-		this.consumeAllContexts(['umbCurrentUserStore', 'umbCurrentUserHistoryStore'], (instances) => {
-			this._currentUserStore = instances['umbCurrentUserStore'];
-			this._currentUserHistoryStore = instances['umbCurrentUserHistoryStore'];
+		this.consumeContext<UmbCurrentUserStore>('umbCurrentUserStore', (_instance) => {
+			this._currentUserStore = _instance;
+			this._observeCurrentUser();
+		});
+
+		this.consumeContext<UmbCurrentUserHistoryStore>('umbCurrentUserHistoryStore', (_instance) => {
+			this._currentUserHistoryStore = _instance;
 			this._observeHistory();
 		});
 

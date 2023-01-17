@@ -30,7 +30,6 @@ export class UmbSectionViewUsersElement extends UmbLitElement {
 
 	private _workspaces: Array<ManifestWorkspace> = [];
 
-
 	// TODO: This must be turned into context api: Maybe its a Collection View (SectionView Collection View)?
 	private _userStore?: UmbUserStore;
 
@@ -43,14 +42,14 @@ export class UmbSectionViewUsersElement extends UmbLitElement {
 	#search = new UniqueBehaviorSubject('');
 	public readonly search = this.#search.asObservable();
 
-
 	constructor() {
 		super();
 
-		this.consumeAllContexts(['umbUserStore', 'umbUserGroupStore', 'umbUsersContext'], (instances) => {
-			this._userStore = instances['umbUserStore'];
+		this.consumeContext<UmbUserStore>('umbUserStore', (_instance) => {
+			this._userStore = _instance;
 			this._observeUsers();
 		});
+
 		// TODO: consider this context name, is it to broad?
 		// TODO: Stop using it self as a context api.
 		this.provideContext('umbUsersContext', this);
@@ -97,9 +96,7 @@ export class UmbSectionViewUsersElement extends UmbLitElement {
 		if (!this._userStore) return;
 
 		if (this.#search.getValue()) {
-			this.observe(this._userStore.getByName(this.#search.getValue()), (users) =>
-				this.#users.next(users)
-			);
+			this.observe(this._userStore.getByName(this.#search.getValue()), (users) => this.#users.next(users));
 		} else {
 			this.observe(this._userStore.getAll(), (users) => this.#users.next(users));
 		}
@@ -119,7 +116,7 @@ export class UmbSectionViewUsersElement extends UmbLitElement {
 
 	public select(key: string) {
 		const oldSelection = this.#selection.getValue();
-		if(oldSelection.indexOf(key) !== -1) return;
+		if (oldSelection.indexOf(key) !== -1) return;
 
 		this.#selection.next([...oldSelection, key]);
 		this.requestUpdate('selection');

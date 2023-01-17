@@ -30,8 +30,8 @@ export class UmbCurrentUserHeaderApp extends UmbLitElement {
 			this._modalService = _instance;
 		});
 
-		this.consumeAllContexts(['umbCurrentUserStore'], (instances) => {
-			this._currentUserStore = instances['umbCurrentUserStore'];
+		this.consumeContext<UmbCurrentUserStore>('umbCurrentUserStore', (_instance) => {
+			this._currentUserStore = _instance;
 			this._observeCurrentUser();
 		});
 	}
