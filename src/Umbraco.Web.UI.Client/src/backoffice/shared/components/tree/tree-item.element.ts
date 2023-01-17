@@ -6,7 +6,10 @@ import { map, Observable } from 'rxjs';
 import { repeat } from 'lit/directives/repeat.js';
 import { UmbSectionContext, UMB_SECTION_CONTEXT_ALIAS } from '../section/section.context';
 import type { UmbTreeContextBase } from './tree.context';
-import { UmbTreeContextMenuService } from './context-menu/tree-context-menu.service';
+import {
+	UmbTreeContextMenuService,
+	UMB_TREE_CONTEXT_MENU_SERVICE_CONTEXT_ALIAS,
+} from './context-menu/tree-context-menu.service';
 import type { Entity } from '@umbraco-cms/models';
 import { UmbTreeDataStore } from '@umbraco-cms/stores/store';
 import { UmbLitElement } from '@umbraco-cms/element';
@@ -88,7 +91,7 @@ export class UmbTreeItem extends UmbLitElement {
 			this._observeActiveTreeItem();
 		});
 
-		this.consumeContext('umbTreeContextMenuService', (treeContextMenuService: UmbTreeContextMenuService) => {
+		this.consumeContext(UMB_TREE_CONTEXT_MENU_SERVICE_CONTEXT_ALIAS, (treeContextMenuService) => {
 			this._treeContextMenuService = treeContextMenuService;
 		});
 	}

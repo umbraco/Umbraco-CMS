@@ -1,7 +1,13 @@
 import { customElement, property, state } from 'lit/decorators.js';
 import { UmbSectionContext, UMB_SECTION_CONTEXT_ALIAS } from '../../section/section.context';
-import { UmbTreeContextMenuPageService } from '../context-menu/tree-context-menu-page.service';
-import { UmbTreeContextMenuService } from '../context-menu/tree-context-menu.service';
+import {
+	UmbTreeContextMenuPageService,
+	UMB_TREE_CONTEXT_MENU_PAGE_SERVICE_CONTEXT_ALIAS,
+} from '../context-menu/tree-context-menu-page.service';
+import {
+	UmbTreeContextMenuService,
+	UMB_TREE_CONTEXT_MENU_SERVICE_CONTEXT_ALIAS,
+} from '../context-menu/tree-context-menu.service';
 import type { Entity, ManifestTreeItemAction, ManifestTree } from '@umbraco-cms/models';
 import { UmbLitElement } from '@umbraco-cms/element';
 
@@ -34,11 +40,11 @@ export default class UmbTreeItemActionElement extends UmbLitElement {
 			this._observeActiveTreeItem();
 		});
 
-		this.consumeContext('umbTreeContextMenuService', (treeContextMenuService: UmbTreeContextMenuService) => {
+		this.consumeContext(UMB_TREE_CONTEXT_MENU_SERVICE_CONTEXT_ALIAS, (treeContextMenuService) => {
 			this._treeContextMenuService = treeContextMenuService;
 		});
 
-		this.consumeContext('umbTreeContextMenuPageService', (actionPageService: UmbTreeContextMenuPageService) => {
+		this.consumeContext(UMB_TREE_CONTEXT_MENU_PAGE_SERVICE_CONTEXT_ALIAS, (actionPageService) => {
 			this._actionPageService = actionPageService;
 			this._observeEntity();
 		});
