@@ -4,10 +4,9 @@ import { UmbControllerInterface } from './controller.interface';
 export abstract class UmbController implements UmbControllerInterface {
 	protected host?: UmbControllerHostInterface;
 
-
 	private _alias?: string;
 	public get unique() {
-		return this._alias;
+		return this._alias ?? UmbController.name;
 	}
 
 	constructor(host: UmbControllerHostInterface, alias?: string) {
