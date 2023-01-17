@@ -3,7 +3,7 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html } from 'lit';
 
 import { UmbModalService } from '../core/modal';
-import { UmbNotificationService } from '../core/notification';
+import { UmbNotificationService, UMB_NOTIFICATION_SERVICE_CONTEXT_ALIAS } from '../core/notification';
 import { UmbUserStore } from './users/users/user.store';
 import { UmbUserGroupStore } from './users/user-groups/user-group.store';
 import { UmbCurrentUserStore } from './users/current-user/current-user.store';
@@ -54,7 +54,7 @@ export class UmbBackofficeElement extends UmbLitElement {
 		super();
 
 		this.provideContext('umbModalService', new UmbModalService());
-		this.provideContext('umbNotificationService', new UmbNotificationService());
+		this.provideContext(UMB_NOTIFICATION_SERVICE_CONTEXT_ALIAS, new UmbNotificationService());
 
 		// TODO: find a way this is possible outside this element. It needs to be possible to register stores in extensions
 		this.provideContext('umbCurrentUserStore', new UmbCurrentUserStore());
