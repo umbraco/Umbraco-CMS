@@ -14,6 +14,7 @@ using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Primitives;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Web.Common.ModelsBuilder.InMemoryAuto;
 
@@ -400,22 +401,18 @@ internal class CollectibleRuntimeViewCompiler : IViewCompiler
 
     private void LogCompilationFailure(UmbracoCompilationException compilationException)
     {
-        foreach (CompilationFailure? compilationFailure in compilationException.CompilationFailures ?? Enumerable.Empty<CompilationFailure>())
+        IEnumerable<DiagnosticMessage?>? diagnosticMessages = compilationException.CompilationFailures?
+            .WhereNotNull()
+            .SelectMany(x => x.Messages!);
+
+        foreach (DiagnosticMessage? diagnosticMessage in diagnosticMessages ?? Enumerable.Empty<DiagnosticMessage>())
         {
-            if (compilationFailure?.Messages is null)
+            if (diagnosticMessage?.FormattedMessage is null)
             {
                 continue;
             }
 
-            foreach (DiagnosticMessage? message in compilationFailure.Messages)
-            {
-                if (message?.FormattedMessage is null)
-                {
-                    continue;
-                }
-
-                _logger.LogError(compilationException, "Compilation error occured with message: {ErrorMessage}", message.FormattedMessage);
-            }
+            _logger.LogError(compilationException, "Compilation error occured with message: {ErrorMessage}", diagnosticMessage.FormattedMessage);
         }
     }
 
