@@ -33,8 +33,7 @@
 			"@umbraco-cms/resources": ["src/core/resources"],
 			"@umbraco-cms/components/*": ["src/backoffice/components/*"],
 			"@umbraco-cms/stores/*": ["src/core/stores/*"],
-			"@umbraco-cms/sections/*": ["src/backoffice/sections/*"],
-			"@umbraco-cms/controllers": ["src/core/controller"]
+			"@umbraco-cms/sections/*": ["src/backoffice/sections/*"]
 		}
 	},
 	"include": ["src/**/*.ts", "e2e/**/*.ts"],
