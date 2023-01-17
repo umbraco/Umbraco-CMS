@@ -58,17 +58,4 @@ describe('UmbContextProvider', () => {
 		});
 		localConsumer.hostConnected();
 	});
-
-	it('works with ContextAlias', (done) => {
-		const CONTEXT_ALIAS = new UmbContextAlias<MyClass>(MyClass.name);
-		const provider = new UmbContextProvider(document.body, CONTEXT_ALIAS, new MyClass());
-		provider.hostConnected();
-
-		const localConsumer = new UmbContextConsumer(document.body, CONTEXT_ALIAS, (_instance: MyClass) => {
-			expect(_instance.prop).to.eq('value from provider');
-			localConsumer.hostDisconnected();
-			done();
-		});
-		localConsumer.hostConnected();
-	});
 });

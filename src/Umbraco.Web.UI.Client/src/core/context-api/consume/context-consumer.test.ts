@@ -1,5 +1,4 @@
 import { expect, oneEvent } from '@open-wc/testing';
-import { UmbContextAlias } from '../context-alias';
 import { UmbContextProvider } from '../provide/context-provider';
 import { UmbContextConsumer } from './context-consumer';
 import { UmbContextRequestEventImplementation, umbContextRequestEventType } from './context-request.event';
@@ -47,23 +46,6 @@ describe('UmbContextConsumer', () => {
 		document.body.appendChild(element);
 
 		const localConsumer = new UmbContextConsumer(element, testContextAlias, (_instance: MyClass) => {
-			expect(_instance.prop).to.eq('value from provider');
-			done();
-		});
-		localConsumer.hostConnected();
-
-		provider.hostDisconnected();
-	});
-
-	it('works with ContextAlias', (done) => {
-		const CONTEXT_ALIAS = new UmbContextAlias<MyClass>(testContextAlias);
-		const provider = new UmbContextProvider(document.body, CONTEXT_ALIAS, new MyClass());
-		provider.hostConnected();
-
-		const element = document.createElement('div');
-		document.body.appendChild(element);
-
-		const localConsumer = new UmbContextConsumer(element, CONTEXT_ALIAS, (_instance) => {
 			expect(_instance.prop).to.eq('value from provider');
 			done();
 		});
