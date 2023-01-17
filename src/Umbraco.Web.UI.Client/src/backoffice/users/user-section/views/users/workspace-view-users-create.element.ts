@@ -7,7 +7,7 @@ import type { UserDetails } from '@umbraco-cms/models';
 import { UmbNotificationService, UMB_NOTIFICATION_SERVICE_CONTEXT_ALIAS } from 'src/core/notification';
 import { UmbNotificationDefaultData } from 'src/core/notification/layouts/default';
 import { UmbModalLayoutElement } from 'src/core/modal';
-import { UmbUserStore } from 'src/backoffice/users/users/user.store';
+import { UmbUserStore, UMB_USER_STORE_CONTEXT_ALIAS } from 'src/backoffice/users/users/user.store';
 
 export type UsersViewType = 'list' | 'grid';
 @customElement('umb-workspace-view-users-create')
@@ -67,7 +67,7 @@ export class UmbWorkspaceViewUsersCreateElement extends UmbModalLayoutElement {
 			this._notificationService = _instance;
 		});
 
-		this.consumeContext<UmbUserStore>('umbUserStore', (_instance) => {
+		this.consumeContext(UMB_USER_STORE_CONTEXT_ALIAS, (_instance) => {
 			this._userStore = _instance;
 		});
 	}

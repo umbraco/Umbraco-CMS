@@ -4,7 +4,7 @@ import { customElement, query, state } from 'lit/decorators.js';
 import { UmbInputPickerUserGroupElement } from 'src/auth/components/input-user-group/input-user-group.element';
 import type { UserDetails } from '@umbraco-cms/models';
 import { UmbModalLayoutElement } from 'src/core/modal';
-import { UmbUserStore } from 'src/backoffice/users/users/user.store';
+import { UmbUserStore, UMB_USER_STORE_CONTEXT_ALIAS } from 'src/backoffice/users/users/user.store';
 
 export type UsersViewType = 'list' | 'grid';
 @customElement('umb-workspace-view-users-invite')
@@ -58,7 +58,7 @@ export class UmbWorkspaceViewUsersInviteElement extends UmbModalLayoutElement {
 	connectedCallback(): void {
 		super.connectedCallback();
 
-		this.consumeContext('umbUserStore', (usersContext: UmbUserStore) => {
+		this.consumeContext(UMB_USER_STORE_CONTEXT_ALIAS, (usersContext) => {
 			this._userStore = usersContext;
 		});
 	}

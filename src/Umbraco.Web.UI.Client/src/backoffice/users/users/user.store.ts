@@ -2,8 +2,11 @@ import { map, Observable } from 'rxjs';
 import { UmbDataStoreBase } from '../../../core/stores/store';
 import type { UserDetails } from '@umbraco-cms/models';
 import { UniqueBehaviorSubject } from '@umbraco-cms/observable-api';
+import { UmbContextAlias } from '@umbraco-cms/context-api';
 
 export type UmbUserStoreItemType = UserDetails;
+
+export const STORE_ALIAS = 'umbUserStore';
 
 /**
  * @export
@@ -12,7 +15,7 @@ export type UmbUserStoreItemType = UserDetails;
  * @description - Data Store for Users
  */
 export class UmbUserStore extends UmbDataStoreBase<UmbUserStoreItemType> {
-	public readonly storeAlias = 'umbUserStore';
+	public readonly storeAlias = STORE_ALIAS;
 
 	#totalUsers = new UniqueBehaviorSubject(0);
 	public readonly totalUsers = this.#totalUsers.asObservable();
@@ -276,3 +279,5 @@ export class UmbUserStore extends UmbDataStoreBase<UmbUserStoreItemType> {
 	// 	this.requestUpdate('users');
 	// }
 }
+
+export const UMB_USER_STORE_CONTEXT_ALIAS = new UmbContextAlias<UmbUserStore>(STORE_ALIAS);
