@@ -6,7 +6,10 @@ import { ifDefined } from 'lit-html/directives/if-defined.js';
 import type { UmbSectionViewUsersElement } from '../../section-view-users.element';
 import { getTagLookAndColor } from '../../../../../../../auth/utils';
 import type { UserDetails, UserEntity, UserGroupEntity } from '@umbraco-cms/models';
-import { UmbUserGroupStore } from 'src/backoffice/users/user-groups/user-group.store';
+import {
+	UmbUserGroupStore,
+	UMB_USER_GROUP_STORE_CONTEXT_ALIAS,
+} from 'src/backoffice/users/user-groups/user-group.store';
 import { UmbLitElement } from '@umbraco-cms/element';
 
 @customElement('umb-workspace-view-users-grid')
@@ -54,7 +57,7 @@ export class UmbWorkspaceViewUsersGridElement extends UmbLitElement {
 	constructor() {
 		super();
 
-		this.consumeContext<UmbUserGroupStore>('umbUserGroupStore', (instance) => {
+		this.consumeContext(UMB_USER_GROUP_STORE_CONTEXT_ALIAS, (instance) => {
 			this._userGroupStore = instance;
 			this._observeUserGroups();
 		});

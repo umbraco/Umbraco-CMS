@@ -5,7 +5,7 @@ import { css, html } from 'lit';
 import { UmbModalService, UMB_MODAL_SERVICE_CONTEXT_ALIAS } from '../core/modal';
 import { UmbNotificationService, UMB_NOTIFICATION_SERVICE_CONTEXT_ALIAS } from '../core/notification';
 import { UmbUserStore, UMB_USER_STORE_CONTEXT_ALIAS } from './users/users/user.store';
-import { UmbUserGroupStore } from './users/user-groups/user-group.store';
+import { UmbUserGroupStore, UMB_USER_GROUP_STORE_CONTEXT_ALIAS } from './users/user-groups/user-group.store';
 import { UmbCurrentUserStore, UMB_CURRENT_USER_STORE_CONTEXT_ALIAS } from './users/current-user/current-user.store';
 import { UmbCurrentUserHistoryStore } from './users/current-user/current-user-history.store';
 
@@ -68,7 +68,7 @@ export class UmbBackofficeElement extends UmbLitElement {
 		this.provideContext(UMB_MEDIA_TYPE_STORE_CONTEXT_ALIAS, new UmbMediaTypeStore(this));
 		this.provideContext(UMB_MEMBER_TYPE_STORE_CONTEXT_ALIAS, new UmbMemberTypeStore(this));
 		this.provideContext(UMB_USER_STORE_CONTEXT_ALIAS, new UmbUserStore(this));
-		this.provideContext('umbUserGroupStore', new UmbUserGroupStore(this));
+		this.provideContext(UMB_USER_GROUP_STORE_CONTEXT_ALIAS, new UmbUserGroupStore(this));
 		this.provideContext('umbMemberGroupStore', new UmbMemberGroupStore(this));
 		this.provideContext('umbSectionStore', new UmbSectionStore());
 		this.provideContext('umbCurrentUserHistoryStore', new UmbCurrentUserHistoryStore());
