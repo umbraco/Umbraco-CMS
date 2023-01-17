@@ -1,5 +1,5 @@
 import { customElement, property, state } from 'lit/decorators.js';
-import { UmbSectionContext } from '../../section/section.context';
+import { UmbSectionContext, UMB_SECTION_CONTEXT_ALIAS } from '../../section/section.context';
 import { UmbTreeContextMenuPageService } from '../context-menu/tree-context-menu-page.service';
 import { UmbTreeContextMenuService } from '../context-menu/tree-context-menu.service';
 import type { Entity, ManifestTreeItemAction, ManifestTree } from '@umbraco-cms/models';
@@ -28,7 +28,7 @@ export default class UmbTreeItemActionElement extends UmbLitElement {
 	connectedCallback() {
 		super.connectedCallback();
 
-		this.consumeContext('umbSectionContext', (sectionContext) => {
+		this.consumeContext(UMB_SECTION_CONTEXT_ALIAS, (sectionContext) => {
 			this._sectionContext = sectionContext;
 			this._observeActiveTree();
 			this._observeActiveTreeItem();

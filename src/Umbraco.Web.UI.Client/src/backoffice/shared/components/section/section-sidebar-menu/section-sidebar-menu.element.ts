@@ -1,7 +1,7 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
-import { UmbSectionContext } from '../section.context';
+import { UmbSectionContext, UMB_SECTION_CONTEXT_ALIAS } from '../section.context';
 import { ManifestSidebarMenuItem } from '@umbraco-cms/extensions-registry';
 import { UmbLitElement } from '@umbraco-cms/element';
 
@@ -19,7 +19,7 @@ export class UmbSectionSidebarMenuElement extends UmbLitElement {
 	constructor() {
 		super();
 
-		this.consumeContext('umbSectionContext', (instance) => {
+		this.consumeContext(UMB_SECTION_CONTEXT_ALIAS, (instance) => {
 			this._sectionContext = instance;
 			this._observeCurrentSection();
 		});
