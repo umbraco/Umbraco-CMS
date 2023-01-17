@@ -35,6 +35,9 @@ public class UserGroupViewModelFactory : IUserGroupViewModelFactory
 
     }
 
+    public IEnumerable<UserGroupViewModel> CreateMultiple(IEnumerable<IUserGroup> userGroups) =>
+        userGroups.Select(Create);
+
     private Guid? GetKeyFromId(int? id)
     {
         if (id is null)
