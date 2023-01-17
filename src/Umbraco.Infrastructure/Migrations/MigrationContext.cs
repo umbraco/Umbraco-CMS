@@ -43,7 +43,7 @@ internal class MigrationContext : IMigrationContext
     public bool BuildingExpression { get; set; }
 
     /// <inheritdoc />
-    [Obsolete("This will be removed in the V13, and replaced with a RebuildCache flag on the MigrationBase")]
+    [Obsolete("This will be removed in the V13, and replaced with a RebuildCache flag on the MigrationBase, and a UmbracoPlanExecutedNotification.")]
     public void AddPostMigration<TMigration>()
         where TMigration : MigrationBase =>
 
