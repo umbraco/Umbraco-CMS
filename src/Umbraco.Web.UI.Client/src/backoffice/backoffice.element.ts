@@ -19,7 +19,7 @@ import { UmbDictionaryStore } from './translation/dictionary/dictionary.store';
 import { UmbDocumentBlueprintStore } from './documents/document-blueprints/document-blueprint.store';
 
 import { UmbSectionStore } from './shared/components/section/section.store';
-import { UmbDataTypeStore } from './settings/data-types/data-type.store';
+import { UmbDataTypeStore, UMB_DATA_TYPE_STORE_CONTEXT_ALIAS } from './settings/data-types/data-type.store';
 import { UmbLitElement } from '@umbraco-cms/element';
 
 // Domains
@@ -60,7 +60,7 @@ export class UmbBackofficeElement extends UmbLitElement {
 		this.provideContext(UMB_CURRENT_USER_STORE_CONTEXT_ALIAS, new UmbCurrentUserStore());
 		this.provideContext(UMB_DOCUMENT_STORE_CONTEXT_ALIAS, new UmbDocumentStore(this));
 		this.provideContext(UMB_MEDIA_STORE_CONTEXT_ALIAS, new UmbMediaStore(this));
-		this.provideContext('umbDataTypeStore', new UmbDataTypeStore(this));
+		this.provideContext(UMB_DATA_TYPE_STORE_CONTEXT_ALIAS, new UmbDataTypeStore(this));
 		this.provideContext('umbDocumentTypeStore', new UmbDocumentTypeStore(this));
 		this.provideContext('umbMediaTypeStore', new UmbMediaTypeStore(this));
 		this.provideContext('umbMemberTypeStore', new UmbMemberTypeStore(this));

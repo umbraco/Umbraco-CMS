@@ -3,6 +3,7 @@ import { UmbDataStoreBase } from '../../../core/stores/store';
 import type { DataTypeDetails } from '@umbraco-cms/models';
 import { DataTypeResource, FolderTreeItem } from '@umbraco-cms/backend-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/resources';
+import { UmbContextAlias } from '@umbraco-cms/context-api';
 
 const isDataTypeDetails = (dataType: DataTypeDetails | FolderTreeItem): dataType is DataTypeDetails => {
 	return (dataType as DataTypeDetails).data !== undefined;
@@ -124,3 +125,5 @@ export class UmbDataTypeStore extends UmbDataStoreBase<UmbDataTypeStoreItemType>
 		return this.items.pipe(map((items) => items.filter((item) => item.parentKey === key)));
 	}
 }
+
+export const UMB_DATA_TYPE_STORE_CONTEXT_ALIAS = new UmbContextAlias<UmbDataTypeStore>(STORE_ALIAS);

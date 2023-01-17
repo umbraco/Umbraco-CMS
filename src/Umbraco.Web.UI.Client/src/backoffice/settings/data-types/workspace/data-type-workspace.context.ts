@@ -1,5 +1,9 @@
 import { UmbWorkspaceContentContext } from '../../../shared/components/workspace/workspace-content/workspace-content.context';
-import type { UmbDataTypeStore, UmbDataTypeStoreItemType } from 'src/backoffice/settings/data-types/data-type.store';
+import {
+	UmbDataTypeStore,
+	UmbDataTypeStoreItemType,
+	UMB_DATA_TYPE_STORE_CONTEXT_ALIAS,
+} from 'src/backoffice/settings/data-types/data-type.store';
 import type { DataTypeDetails } from '@umbraco-cms/models';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 import { appendToFrozenArray } from '@umbraco-cms/observable-api';
@@ -21,16 +25,19 @@ export class UmbWorkspaceDataTypeContext extends UmbWorkspaceContentContext<
 	UmbDataTypeStore
 > {
 	constructor(host: UmbControllerHostInterface) {
-		super(host, DefaultDataTypeData, 'umbDataTypeStore', 'dataType');
+		super(host, DefaultDataTypeData, UMB_DATA_TYPE_STORE_CONTEXT_ALIAS.toString(), 'dataType');
 	}
 
 	public setPropertyValue(alias: string, value: unknown) {
-
 		// TODO: make sure to check that we have a details model? otherwise fail? 8This can be relevant if we use the same context for tree actions?
-		const entry = {alias: alias, value: value};
+		const entry = { alias: alias, value: value };
 
-		const newDataSet = appendToFrozenArray((this._data.getValue() as DataTypeDetails).data, entry, x => x.alias === alias);
+		const newDataSet = appendToFrozenArray(
+			(this._data.getValue() as DataTypeDetails).data,
+			entry,
+			(x) => x.alias === alias
+		);
 
-		this.update({data: newDataSet});
+		this.update({ data: newDataSet });
 	}
 }

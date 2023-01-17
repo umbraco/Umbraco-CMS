@@ -2,7 +2,7 @@ import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, html } from 'lit';
 import { customElement } from 'lit/decorators.js';
 import { UmbModalService, UMB_MODAL_SERVICE_CONTEXT_ALIAS } from '../../../../../../core/modal';
-import { UmbDataTypeStore } from '../../../data-type.store';
+import { UmbDataTypeStore, UMB_DATA_TYPE_STORE_CONTEXT_ALIAS } from '../../../data-type.store';
 import UmbTreeItemActionElement from '../../../../../shared/components/tree/action/tree-item-action.element';
 
 @customElement('umb-tree-action-data-type-delete')
@@ -19,7 +19,7 @@ export default class UmbTreeActionDataTypeDeleteElement extends UmbTreeItemActio
 			this._modalService = modalService;
 		});
 
-		this.consumeContext('umbDataTypeStore', (dataTypeStore: UmbDataTypeStore) => {
+		this.consumeContext(UMB_DATA_TYPE_STORE_CONTEXT_ALIAS, (dataTypeStore) => {
 			this._dataTypeStore = dataTypeStore;
 		});
 	}
