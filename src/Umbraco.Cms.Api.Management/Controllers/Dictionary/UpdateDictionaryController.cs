@@ -1,75 +1,55 @@
-﻿using System.Net.Mime;
-using System.Text;
-using System.Text.Json;
-using Json.Patch;
-using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Umbraco.Cms.Core.Mapping;
+using Umbraco.Cms.Api.Management.Factories;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Cms.Api.Management.Serialization;
-using Umbraco.Cms.Api.Management.Services;
 using Umbraco.Cms.Api.Management.ViewModels.Dictionary;
-using Umbraco.Cms.Api.Management.ViewModels.JsonPatch;
-using Umbraco.New.Cms.Core.Factories;
+using Umbraco.Cms.Core.Security;
+using IDictionaryService = Umbraco.Cms.Api.Management.Services.Dictionary.IDictionaryService;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Dictionary;
 
 public class UpdateDictionaryController : DictionaryControllerBase
 {
     private readonly ILocalizationService _localizationService;
-    private readonly IUmbracoMapper _umbracoMapper;
-    private readonly IDictionaryService _dictionaryService;
+    private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
     private readonly IDictionaryFactory _dictionaryFactory;
-    private readonly IJsonPatchService _jsonPatchService;
-    private readonly ISystemTextJsonSerializer _systemTextJsonSerializer;
+    private readonly IDictionaryService _dictionaryService;
 
     public UpdateDictionaryController(
         ILocalizationService localizationService,
-        IUmbracoMapper umbracoMapper,
-        IDictionaryService dictionaryService,
+        IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
         IDictionaryFactory dictionaryFactory,
-        IJsonPatchService jsonPatchService,
-        ISystemTextJsonSerializer systemTextJsonSerializer)
+        IDictionaryService dictionaryService)
     {
         _localizationService = localizationService;
-        _umbracoMapper = umbracoMapper;
-        _dictionaryService = dictionaryService;
+        _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
         _dictionaryFactory = dictionaryFactory;
-        _jsonPatchService = jsonPatchService;
-        _systemTextJsonSerializer = systemTextJsonSerializer;
+        _dictionaryService = dictionaryService;
     }
 
-    [HttpPatch("{id:Guid}")]
+    [HttpPut("{key:Guid}")]
     [MapToApiVersion("1.0")]
-    [ProducesResponseType(typeof(ContentResult), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(NotFoundResult), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> Update(Guid id, JsonPatchViewModel[] updateViewModel)
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status409Conflict)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> Update(Guid key, DictionaryItemUpdateModel dictionaryItemUpdateModel)
     {
-        IDictionaryItem? dictionaryItem = _localizationService.GetDictionaryItemById(id);
-
-        if (dictionaryItem is null)
+        IDictionaryItem? current = _localizationService.GetDictionaryItemById(key);
+        if (current is null)
         {
             return NotFound();
         }
 
-        DictionaryViewModel dictionaryToPatch = _umbracoMapper.Map<DictionaryViewModel>(dictionaryItem)!;
-
-        PatchResult? result = _jsonPatchService.Patch(updateViewModel, dictionaryToPatch);
-
-        if (result?.Result is null)
+        ProblemDetails? collision = _dictionaryService.DetectNamingCollision(dictionaryItemUpdateModel.Name, current);
+        if (collision != null)
         {
-            throw new JsonException("Could not patch the JsonPatchViewModel");
+            return Conflict(collision);
         }
 
-        DictionaryViewModel? updatedDictionaryItem = _systemTextJsonSerializer.Deserialize<DictionaryViewModel>(result.Result.ToJsonString());
-        if (updatedDictionaryItem is null)
-        {
-            throw new JsonException("Could not serialize from PatchResult to DictionaryViewModel");
-        }
+        IDictionaryItem updated = _dictionaryFactory.MapDictionaryItemUpdate(current, dictionaryItemUpdateModel);
+        _localizationService.Save(updated, CurrentUserId(_backOfficeSecurityAccessor));
 
-        IDictionaryItem dictionaryToSave = _dictionaryFactory.CreateDictionaryItem(updatedDictionaryItem!);
-        _localizationService.Save(dictionaryToSave);
-        return await Task.FromResult(Content(_dictionaryService.CalculatePath(dictionaryToSave.ParentId, dictionaryToSave.Id), MediaTypeNames.Text.Plain, Encoding.UTF8));
+        return await Task.FromResult(Ok());
     }
 }

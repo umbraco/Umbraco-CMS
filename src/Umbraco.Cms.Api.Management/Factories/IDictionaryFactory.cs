@@ -1,13 +1,16 @@
-﻿using Umbraco.Cms.Core.Models;
-using Umbraco.Cms.Api.Management.Models;
+﻿using Umbraco.Cms.Api.Management.Models;
 using Umbraco.Cms.Api.Management.ViewModels.Dictionary;
+using Umbraco.Cms.Core.Models;
 
-namespace Umbraco.New.Cms.Core.Factories;
+namespace Umbraco.Cms.Api.Management.Factories;
 
 public interface IDictionaryFactory
 {
-    IDictionaryItem CreateDictionaryItem(DictionaryViewModel dictionaryViewModel);
-    DictionaryViewModel CreateDictionaryViewModel(IDictionaryItem dictionaryItem);
+    IDictionaryItem MapDictionaryItemUpdate(IDictionaryItem current, DictionaryItemUpdateModel dictionaryItemUpdateModel);
+
+    IDictionaryItem MapDictionaryItemCreate(DictionaryItemCreateModel dictionaryItemUpdateModel);
+
+    DictionaryItemViewModel CreateDictionaryItemViewModel(IDictionaryItem dictionaryItem);
 
     DictionaryImportViewModel CreateDictionaryImportViewModel(FormFileUploadResult formFileUploadResult);
 }

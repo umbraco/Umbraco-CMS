@@ -1,90 +1,48 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
-using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Api.Management.Factories;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Api.Management.ViewModels.Dictionary;
-using Umbraco.Extensions;
+using IDictionaryService = Umbraco.Cms.Api.Management.Services.Dictionary.IDictionaryService;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Dictionary;
 
 public class CreateDictionaryController : DictionaryControllerBase
 {
     private readonly ILocalizationService _localizationService;
-    private readonly ILocalizedTextService _localizedTextService;
-    private readonly GlobalSettings _globalSettings;
-    private readonly IBackOfficeSecurityAccessor _backofficeSecurityAccessor;
-    private readonly ILogger<CreateDictionaryController> _logger;
+    private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
+    private readonly IDictionaryFactory _dictionaryFactory;
+    private readonly IDictionaryService _dictionaryService;
 
     public CreateDictionaryController(
         ILocalizationService localizationService,
-        ILocalizedTextService localizedTextService,
-        IOptionsSnapshot<GlobalSettings> globalSettings,
-        IBackOfficeSecurityAccessor backofficeSecurityAccessor,
-        ILogger<CreateDictionaryController> logger)
+        IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
+        IDictionaryFactory dictionaryFactory,
+        IDictionaryService dictionaryService)
     {
         _localizationService = localizationService;
-        _localizedTextService = localizedTextService;
-        _globalSettings = globalSettings.Value;
-        _backofficeSecurityAccessor = backofficeSecurityAccessor;
-        _logger = logger;
+        _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
+        _dictionaryFactory = dictionaryFactory;
+        _dictionaryService = dictionaryService;
     }
 
-    /// <summary>
-    ///     Creates a new dictionary item
-    /// </summary>
-    /// <param name="dictionaryViewModel">The viewmodel to pass to the action</param>
-    /// <returns>
-    ///     The <see cref="HttpResponseMessage" />.
-    /// </returns>
     [HttpPost]
     [MapToApiVersion("1.0")]
-    [ProducesResponseType(typeof(CreatedResult), StatusCodes.Status201Created)]
-    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-    public async Task<ActionResult<int>> Create(DictionaryItemViewModel dictionaryViewModel)
+    [ProducesResponseType(StatusCodes.Status201Created)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status409Conflict)]
+    public async Task<ActionResult<int>> Create(DictionaryItemCreateModel dictionaryItemCreateModel)
     {
-        if (string.IsNullOrEmpty(dictionaryViewModel.Key.ToString()))
+        ProblemDetails? collision = _dictionaryService.DetectNamingCollision(dictionaryItemCreateModel.Name);
+        if (collision != null)
         {
-            return ValidationProblem("Key can not be empty."); // TODO: translate
+            return Conflict(collision);
         }
 
-        if (_localizationService.DictionaryItemExists(dictionaryViewModel.Key.ToString()))
-        {
-            var message = _localizedTextService.Localize(
-                "dictionaryItem",
-                "changeKeyError",
-                _backofficeSecurityAccessor.BackOfficeSecurity?.CurrentUser?.GetUserCulture(_localizedTextService, _globalSettings),
-                new Dictionary<string, string?>
-                {
-                    { "0", dictionaryViewModel.Key.ToString() },
-                });
-            return await Task.FromResult(ValidationProblem(message));
-        }
+        IDictionaryItem created = _dictionaryFactory.MapDictionaryItemCreate(dictionaryItemCreateModel);
+        _localizationService.Save(created, CurrentUserId(_backOfficeSecurityAccessor));
 
-        try
-        {
-            Guid? parentGuid = null;
-
-            if (dictionaryViewModel.ParentId.HasValue)
-            {
-                parentGuid = dictionaryViewModel.ParentId;
-            }
-
-            IDictionaryItem item = _localizationService.CreateDictionaryItemWithIdentity(
-                dictionaryViewModel.Key.ToString(),
-                parentGuid,
-                string.Empty);
-
-
-            return await Task.FromResult(Created($"api/v1.0/dictionary/{item.Key}", item.Key));
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error creating dictionary with {Name} under {ParentId}", dictionaryViewModel.Key, dictionaryViewModel.ParentId);
-            return await Task.FromResult(ValidationProblem("Error creating dictionary item"));
-        }
+        return await Task.FromResult(CreatedAtAction<ByKeyDictionaryController>(controller => nameof(controller.ByKey), created.Key));
     }
 }
