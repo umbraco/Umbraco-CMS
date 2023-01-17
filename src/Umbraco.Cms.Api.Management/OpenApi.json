@@ -4844,6 +4844,9 @@
           },
           "noAccess": {
             "type": "boolean"
+          },
+          "isTrashed": {
+            "type": "boolean"
           }
         },
         "additionalProperties": false
@@ -5420,6 +5423,9 @@
             "nullable": true
           },
           "noAccess": {
+            "type": "boolean"
+          },
+          "isTrashed": {
             "type": "boolean"
           },
           "isProtected": {
