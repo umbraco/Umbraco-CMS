@@ -8,7 +8,7 @@ export class ContextTestElement extends UmbLitElement {
 	public value: string | null = null;
 	constructor() {
 		super();
-		this.consumeContext('test-context', (value) => {
+		this.consumeContext<string>('test-context', (value) => {
 			this.value = value;
 		});
 	}
