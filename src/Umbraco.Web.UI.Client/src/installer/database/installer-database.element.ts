@@ -2,13 +2,8 @@ import { UUIButtonElement } from '@umbraco-ui/uui';
 import { css, CSSResultGroup, html, nothing } from 'lit';
 import { customElement, property, query, state } from 'lit/decorators.js';
 
-import { UmbInstallerContext } from '../installer.context';
-import {
-	DatabaseInstall,
-	DatabaseSettings,
-	InstallResource,
-	ProblemDetails,
-} from '@umbraco-cms/backend-api';
+import { UmbInstallerContext, UMB_INSTALLER_CONTEXT_ALIAS } from '../installer.context';
+import { DatabaseInstall, DatabaseSettings, InstallResource, ProblemDetails } from '@umbraco-cms/backend-api';
 import { UmbLitElement } from '@umbraco-cms/element';
 import { tryExecute } from '@umbraco-cms/resources';
 
@@ -101,7 +96,7 @@ export class UmbInstallerDatabaseElement extends UmbLitElement {
 	constructor() {
 		super();
 
-		this.consumeContext('umbInstallerContext', (installerContext: UmbInstallerContext) => {
+		this.consumeContext(UMB_INSTALLER_CONTEXT_ALIAS, (installerContext) => {
 			this._installerContext = installerContext;
 			this._observeInstallerSettings();
 			this._observeInstallerData();
