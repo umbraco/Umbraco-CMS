@@ -2,15 +2,15 @@ import { ContextAlias } from '../context-token';
 
 export const umbContextRequestEventType = 'umb:context-request';
 
-export type UmbContextCallback<T = unknown> = (instance: T) => void;
+export type UmbContextCallback<T> = (instance: T) => void;
 
 /**
  * @export
  * @interface UmbContextRequestEvent
  */
-export interface UmbContextRequestEvent extends Event {
-	readonly contextAlias: string | ContextAlias;
-	readonly callback: UmbContextCallback;
+export interface UmbContextRequestEvent<T = unknown> extends Event {
+	readonly contextAlias: string | ContextAlias<T>;
+	readonly callback: UmbContextCallback<T>;
 }
 
 /**
@@ -19,10 +19,10 @@ export interface UmbContextRequestEvent extends Event {
  * @extends {Event}
  * @implements {UmbContextRequestEvent}
  */
-export class UmbContextRequestEventImplementation extends Event implements UmbContextRequestEvent {
+export class UmbContextRequestEventImplementation<T = unknown> extends Event implements UmbContextRequestEvent<T> {
 	public constructor(
-		public readonly contextAlias: string | ContextAlias,
-		public readonly callback: UmbContextCallback
+		public readonly contextAlias: string | ContextAlias<T>,
+		public readonly callback: UmbContextCallback<T>
 	) {
 		super(umbContextRequestEventType, { bubbles: true, composed: true, cancelable: true });
 	}

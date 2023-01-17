@@ -7,8 +7,8 @@ import { UmbContextRequestEventImplementation, UmbContextCallback } from './cont
  * @class UmbContextConsumer
  */
 export class UmbContextConsumer<HostType extends EventTarget = EventTarget, T = unknown> {
-	private _instance?: unknown;
-	get instance(): unknown | undefined {
+	private _instance?: T;
+	get instance() {
 		return this._instance;
 	}
 
@@ -25,11 +25,11 @@ export class UmbContextConsumer<HostType extends EventTarget = EventTarget, T = 
 	 */
 	constructor(
 		protected host: HostType,
-		protected _contextAlias: string | ContextAlias,
+		protected _contextAlias: string | ContextAlias<T>,
 		private _callback: UmbContextCallback<T>
 	) {}
 
-	private _onResponse = (instance: any) => {
+	private _onResponse = (instance: T) => {
 		this._instance = instance;
 		this._callback(instance);
 	};

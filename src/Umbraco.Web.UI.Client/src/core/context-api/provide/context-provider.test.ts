@@ -1,6 +1,7 @@
 import { expect } from '@open-wc/testing';
 import { UmbContextConsumer } from '../consume/context-consumer';
 import { UmbContextRequestEventImplementation } from '../consume/context-request.event';
+import { ContextAlias } from '../context-token';
 import { UmbContextProvider } from './context-provider';
 
 class MyClass {
@@ -54,6 +55,19 @@ describe('UmbContextProvider', () => {
 			expect(_instance.prop).to.eq('value from provider');
 			done();
 			localConsumer.hostDisconnected();
+		});
+		localConsumer.hostConnected();
+	});
+
+	it('works with ContextAlias', (done) => {
+		const CONTEXT_ALIAS = new ContextAlias<MyClass>(MyClass.name);
+		const provider = new UmbContextProvider(document.body, CONTEXT_ALIAS, new MyClass());
+		provider.hostConnected();
+
+		const localConsumer = new UmbContextConsumer(document.body, CONTEXT_ALIAS, (_instance: MyClass) => {
+			expect(_instance.prop).to.eq('value from provider');
+			localConsumer.hostDisconnected();
+			done();
 		});
 		localConsumer.hostConnected();
 	});
