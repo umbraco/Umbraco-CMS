@@ -1,4 +1,4 @@
-import { ContextToken } from '../injectionToken';
+import { ContextToken } from '../context-token';
 
 export const umbContextRequestEventType = 'umb:context-request';
 

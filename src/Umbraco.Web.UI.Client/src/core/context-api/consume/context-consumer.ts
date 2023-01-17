@@ -1,4 +1,4 @@
-import { ContextToken } from '../injectionToken';
+import { ContextToken } from '../context-token';
 import { isUmbContextProvideEventType, umbContextProvideEventType } from '../provide/context-provide.event';
 import { UmbContextRequestEventImplementation, UmbContextCallback } from './context-request.event';
 
