@@ -2,7 +2,7 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html, nothing } from 'lit';
 import { customElement, state, query, property } from 'lit/decorators.js';
 
-import { UmbModalService } from '../../../../../core/modal';
+import { UmbModalService, UMB_MODAL_SERVICE_CONTEXT_ALIAS } from '../../../../../core/modal';
 
 import { SearchResult, SearcherResource, Field } from '@umbraco-cms/backend-api';
 import { UmbLitElement } from '@umbraco-cms/element';
@@ -120,13 +120,13 @@ export class UmbDashboardExamineSearcherElement extends UmbLitElement {
 
 	constructor() {
 		super();
-		this.consumeContext('umbModalService', (instance) => {
+		this.consumeContext(UMB_MODAL_SERVICE_CONTEXT_ALIAS, (instance) => {
 			this._modalService = instance;
 		});
 	}
 
 	private _onNameClick() {
-		// TODO: 
+		// TODO:
 		alert('TODO: Open workspace for ' + this.searcherName);
 	}
 

@@ -2,7 +2,7 @@ import { html } from 'lit';
 import { property } from 'lit/decorators.js';
 import { UUIModalSidebarSize } from '@umbraco-ui/uui-modal-sidebar';
 import { UmbPickerData } from '../../../../core/modal/layouts/modal-layout-picker-base';
-import { UmbModalService, UmbModalType } from '../../../../core/modal';
+import { UmbModalService, UmbModalType, UMB_MODAL_SERVICE_CONTEXT_ALIAS } from '../../../../core/modal';
 
 //TODO: These should probably be imported dynamically.
 import '../../../../core/modal/layouts/picker-section/picker-layout-section.element';
@@ -12,7 +12,6 @@ import { UmbLitElement } from '@umbraco-cms/element';
 
 /** TODO: Make use of UUI FORM Mixin, to make it easily take part of a form. */
 export class UmbInputListBase extends UmbLitElement {
-	
 	@property({ type: Array })
 	public value: Array<string> = [];
 
@@ -30,7 +29,7 @@ export class UmbInputListBase extends UmbLitElement {
 
 	constructor() {
 		super();
-		this.consumeContext('umbModalService', (modalService: UmbModalService) => {
+		this.consumeContext(UMB_MODAL_SERVICE_CONTEXT_ALIAS, (modalService) => {
 			this._modalService = modalService;
 		});
 	}

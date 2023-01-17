@@ -5,7 +5,7 @@ import { customElement, property, state } from 'lit/decorators.js';
 import { distinctUntilChanged } from 'rxjs';
 import { UmbWorkspaceDocumentTypeContext } from './document-type-workspace.context';
 import type { DocumentTypeDetails } from '@umbraco-cms/models';
-import { UmbModalService } from 'src/core/modal';
+import { UmbModalService, UMB_MODAL_SERVICE_CONTEXT_ALIAS } from 'src/core/modal';
 import { UmbLitElement } from '@umbraco-cms/element';
 import type { UmbWorkspaceEntityElement } from 'src/backoffice/shared/components/workspace/workspace-entity-element.interface';
 
@@ -73,13 +73,13 @@ export class UmbDocumentTypeWorkspaceElement extends UmbLitElement implements Um
 	constructor() {
 		super();
 
-		this.consumeContext('umbModalService', (instance) => {
+		this.consumeContext(UMB_MODAL_SERVICE_CONTEXT_ALIAS, (instance) => {
 			this._modalService = instance;
 		});
 
 		this.observe(this._workspaceContext.data.pipe(distinctUntilChanged()), (data) => {
 			// TODO: make method to identify if data is of type DocumentTypeDetails
-			this._documentType = (data as DocumentTypeDetails);
+			this._documentType = data as DocumentTypeDetails;
 		});
 	}
 
