@@ -63,6 +63,7 @@ internal static class ManagementApiBuilderExtensions
             swaggerGenOptions.DocumentFilter<MimeTypeDocumentFilter>();
             swaggerGenOptions.SchemaFilter<EnumSchemaFilter>();
             swaggerGenOptions.CustomSchemaIds(SchemaIdGenerator.Generate);
+            swaggerGenOptions.SupportNonNullableReferenceTypes();
         });
 
         return builder;
