@@ -1,4 +1,6 @@
-import { Language } from '@umbraco-cms/backend-api';
+import { Language, LanguageResource } from '@umbraco-cms/backend-api';
+import { UmbLitElement } from '@umbraco-cms/element';
+import { tryExecuteAndNotify } from '@umbraco-cms/resources';
 import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, html, LitElement } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
@@ -14,7 +16,7 @@ import '../language/language-workspace.element';
 import './language-root-table-delete-column-layout.element';
 
 @customElement('umb-language-root-workspace')
-export class UmbLanguageRootWorkspaceElement extends LitElement {
+export class UmbLanguageRootWorkspaceElement extends UmbLitElement {
 	static styles = [
 		UUITextStyles,
 		css`
@@ -109,13 +111,22 @@ export class UmbLanguageRootWorkspaceElement extends LitElement {
 	constructor() {
 		super();
 
-		this._createTableItems(this._languages);
+		this._getLanguageData();
+	}
+
+	private async _getLanguageData() {
+		const { data } = await tryExecuteAndNotify(this, LanguageResource.getLanguage({ skip: 0, take: 10 }));
+		if (data) {
+			this._languages = data.items;
+			this._createTableItems(this._languages);
+			console.log('LANGS', this._languages);
+		}
 	}
 
 	private _createTableItems(languages: Array<Language>) {
 		this._tableItems = languages.map((language) => {
 			return {
-				key: language.id,
+				key: language.id?.toString() ?? '',
 				icon: 'umb:globe',
 				data: [
 					{
