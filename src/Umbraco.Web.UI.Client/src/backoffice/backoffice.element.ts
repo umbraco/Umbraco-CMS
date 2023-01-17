@@ -9,7 +9,10 @@ import { UmbUserGroupStore } from './users/user-groups/user-group.store';
 import { UmbCurrentUserStore, UMB_CURRENT_USER_STORE_CONTEXT_ALIAS } from './users/current-user/current-user.store';
 import { UmbCurrentUserHistoryStore } from './users/current-user/current-user-history.store';
 
-import { UmbDocumentTypeStore } from './documents/document-types/document-type.store';
+import {
+	UmbDocumentTypeStore,
+	UMB_DOCUMENT_TYPE_STORE_CONTEXT_ALIAS,
+} from './documents/document-types/document-type.store';
 import { UmbMediaTypeStore } from './media/media-types/media-type.store';
 import { UmbMemberTypeStore } from './members/member-types/member-type.store';
 import { UmbDocumentStore, UMB_DOCUMENT_STORE_CONTEXT_ALIAS } from './documents/documents/document.store';
@@ -61,7 +64,7 @@ export class UmbBackofficeElement extends UmbLitElement {
 		this.provideContext(UMB_DOCUMENT_STORE_CONTEXT_ALIAS, new UmbDocumentStore(this));
 		this.provideContext(UMB_MEDIA_STORE_CONTEXT_ALIAS, new UmbMediaStore(this));
 		this.provideContext(UMB_DATA_TYPE_STORE_CONTEXT_ALIAS, new UmbDataTypeStore(this));
-		this.provideContext('umbDocumentTypeStore', new UmbDocumentTypeStore(this));
+		this.provideContext(UMB_DOCUMENT_TYPE_STORE_CONTEXT_ALIAS, new UmbDocumentTypeStore(this));
 		this.provideContext('umbMediaTypeStore', new UmbMediaTypeStore(this));
 		this.provideContext('umbMemberTypeStore', new UmbMemberTypeStore(this));
 		this.provideContext('umbUserStore', new UmbUserStore(this));
