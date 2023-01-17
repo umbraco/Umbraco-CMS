@@ -4,10 +4,12 @@ import { umbLanguagesData } from '../data/languages.data';
 // TODO: add schema
 export const handlers = [
 	rest.get('/umbraco/management/api/v1/language', (req, res, ctx) => {
-		const skip = Number.parseInt(req.url.searchParams.get('skip') ?? '0');
-		const take = Number.parseInt(req.url.searchParams.get('take') ?? '100');
+		const skip = req.url.searchParams.get('skip');
+		const skipNumber = skip ? Number.parseInt(skip) : undefined;
+		const take = req.url.searchParams.get('take');
+		const takeNumber = take ? Number.parseInt(take) : undefined;
 
-		const items = umbLanguagesData.getAll(skip, take);
+		const items = umbLanguagesData.getAll(skipNumber, takeNumber);
 
 		const response = {
 			total: items.length,

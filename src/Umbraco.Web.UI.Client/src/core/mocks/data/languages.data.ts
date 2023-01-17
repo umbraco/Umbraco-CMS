@@ -7,8 +7,9 @@ class UmbLanguagesData extends UmbData<Language> {
 		super(data);
 	}
 
+	// skip can be number or null
 	getAll(skip = 0, take = this.data.length): Array<Language> {
-		return this.data.splice(skip || 0, take || this.data.length);
+		return this.data.splice(skip, take);
 	}
 }
 
