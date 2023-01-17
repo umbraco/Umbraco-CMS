@@ -1,7 +1,7 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, CSSResultGroup, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
-import { UmbCurrentUserStore } from './current-user.store';
+import { UmbCurrentUserStore, UMB_CURRENT_USER_STORE_CONTEXT_ALIAS } from './current-user.store';
 import type { UserDetails } from '@umbraco-cms/models';
 import { UmbModalService, UMB_MODAL_SERVICE_CONTEXT_ALIAS } from 'src/core/modal';
 import { UmbLitElement } from '@umbraco-cms/element';
@@ -30,7 +30,7 @@ export class UmbCurrentUserHeaderApp extends UmbLitElement {
 			this._modalService = _instance;
 		});
 
-		this.consumeContext<UmbCurrentUserStore>('umbCurrentUserStore', (_instance) => {
+		this.consumeContext(UMB_CURRENT_USER_STORE_CONTEXT_ALIAS, (_instance) => {
 			this._currentUserStore = _instance;
 			this._observeCurrentUser();
 		});

@@ -7,7 +7,10 @@ import {
 	UmbCurrentUserHistoryStore,
 	UmbCurrentUserHistoryItem,
 } from 'src/backoffice/users/current-user/current-user-history.store';
-import { UmbCurrentUserStore } from 'src/backoffice/users/current-user/current-user.store';
+import {
+	UmbCurrentUserStore,
+	UMB_CURRENT_USER_STORE_CONTEXT_ALIAS,
+} from 'src/backoffice/users/current-user/current-user.store';
 import { UmbLitElement } from '@umbraco-cms/element';
 
 @customElement('umb-modal-layout-current-user')
@@ -94,7 +97,7 @@ export class UmbModalLayoutCurrentUserElement extends UmbLitElement {
 			this._modalService = _instance;
 		});
 
-		this.consumeContext<UmbCurrentUserStore>('umbCurrentUserStore', (_instance) => {
+		this.consumeContext(UMB_CURRENT_USER_STORE_CONTEXT_ALIAS, (_instance) => {
 			this._currentUserStore = _instance;
 			this._observeCurrentUser();
 		});

@@ -8,7 +8,7 @@ import { repeat } from 'lit/directives/repeat.js';
 import { distinctUntilChanged } from 'rxjs';
 import { getTagLookAndColor } from '../../../../auth/utils';
 
-import { UmbCurrentUserStore } from '../../current-user/current-user.store';
+import { UmbCurrentUserStore, UMB_CURRENT_USER_STORE_CONTEXT_ALIAS } from '../../current-user/current-user.store';
 import { UmbWorkspaceUserContext } from './user-workspace.context';
 import type { UserDetails } from '@umbraco-cms/models';
 
@@ -117,7 +117,7 @@ export class UmbUserWorkspaceElement extends UmbLitElement implements UmbWorkspa
 	constructor() {
 		super();
 
-		this.consumeContext('umbCurrentUserStore', (store) => {
+		this.consumeContext(UMB_CURRENT_USER_STORE_CONTEXT_ALIAS, (store) => {
 			this._currentUserStore = store;
 			this._observeCurrentUser();
 		});

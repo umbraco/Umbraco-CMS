@@ -6,7 +6,7 @@ import { UmbModalService, UMB_MODAL_SERVICE_CONTEXT_ALIAS } from '../core/modal'
 import { UmbNotificationService, UMB_NOTIFICATION_SERVICE_CONTEXT_ALIAS } from '../core/notification';
 import { UmbUserStore } from './users/users/user.store';
 import { UmbUserGroupStore } from './users/user-groups/user-group.store';
-import { UmbCurrentUserStore } from './users/current-user/current-user.store';
+import { UmbCurrentUserStore, UMB_CURRENT_USER_STORE_CONTEXT_ALIAS } from './users/current-user/current-user.store';
 import { UmbCurrentUserHistoryStore } from './users/current-user/current-user-history.store';
 
 import { UmbDocumentTypeStore } from './documents/document-types/document-type.store';
@@ -57,7 +57,7 @@ export class UmbBackofficeElement extends UmbLitElement {
 		this.provideContext(UMB_NOTIFICATION_SERVICE_CONTEXT_ALIAS, new UmbNotificationService());
 
 		// TODO: find a way this is possible outside this element. It needs to be possible to register stores in extensions
-		this.provideContext('umbCurrentUserStore', new UmbCurrentUserStore());
+		this.provideContext(UMB_CURRENT_USER_STORE_CONTEXT_ALIAS, new UmbCurrentUserStore());
 		this.provideContext('umbDocumentStore', new UmbDocumentStore(this));
 		this.provideContext('umbMediaStore', new UmbMediaStore(this));
 		this.provideContext('umbDataTypeStore', new UmbDataTypeStore(this));
