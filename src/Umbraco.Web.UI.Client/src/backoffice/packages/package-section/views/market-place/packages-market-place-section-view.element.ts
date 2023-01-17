@@ -22,7 +22,7 @@ export class UmbPackagesMarketPlaceSectionViewElement extends LitElement {
 	// TODO: This URL comes from the server
 	// Was previously found in 'Umbraco.Sys.ServerVariables.umbracoUrls.marketplaceUrl'
 	@property()
-	marketplaceUrl: string = 'https://marketplace.umbraco.com/?umbversion=11.1.0&style=backoffice';
+	marketplaceUrl = 'https://marketplace.umbraco.com/?umbversion=11.1.0&style=backoffice';
 
 	render() {
 		return html`
