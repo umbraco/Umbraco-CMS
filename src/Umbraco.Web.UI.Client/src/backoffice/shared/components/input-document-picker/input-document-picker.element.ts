@@ -7,7 +7,7 @@ import { UmbModalService, UMB_MODAL_SERVICE_CONTEXT_ALIAS } from 'src/core/modal
 import type { FolderTreeItem } from '@umbraco-cms/backend-api';
 import { UmbLitElement } from '@umbraco-cms/element';
 import type { UmbObserverController } from '@umbraco-cms/observable-api';
-import type { UmbDocumentStore } from 'src/backoffice/documents/documents/document.store';
+import { UmbDocumentStore, UMB_DOCUMENT_STORE_CONTEXT_ALIAS } from 'src/backoffice/documents/documents/document.store';
 
 @customElement('umb-input-document-picker')
 export class UmbInputDocumentPickerElement extends FormControlMixin(UmbLitElement) {
@@ -94,7 +94,7 @@ export class UmbInputDocumentPickerElement extends FormControlMixin(UmbLitElemen
 			() => !!this.max && this._selectedKeys.length > this.max
 		);
 
-		this.consumeContext('umbDocumentStore', (instance: UmbDocumentStore) => {
+		this.consumeContext(UMB_DOCUMENT_STORE_CONTEXT_ALIAS, (instance) => {
 			this._documentStore = instance;
 			this._observePickedDocuments();
 		});
