@@ -12,7 +12,8 @@ export class UmbContextConsumer<HostType extends EventTarget = EventTarget, T = 
 		return this._instance;
 	}
 
-	get consumerAlias() {
+	private _contextAlias: string;
+	get consumerAlias(): string {
 		return this._contextAlias;
 	}
 
@@ -25,9 +26,11 @@ export class UmbContextConsumer<HostType extends EventTarget = EventTarget, T = 
 	 */
 	constructor(
 		protected host: HostType,
-		protected _contextAlias: string | UmbContextAlias<T>,
+		_contextAlias: string | UmbContextAlias<T>,
 		private _callback: UmbContextCallback<T>
-	) {}
+	) {
+		this._contextAlias = _contextAlias.toString();
+	}
 
 	private _onResponse = (instance: T) => {
 		this._instance = instance;

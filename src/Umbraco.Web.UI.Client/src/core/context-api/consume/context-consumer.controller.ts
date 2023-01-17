@@ -9,7 +9,7 @@ export class UmbContextConsumerController<T = unknown>
 	implements UmbControllerInterface
 {
 	public get unique() {
-		return this._contextAlias.toString();
+		return this.consumerAlias;
 	}
 
 	constructor(

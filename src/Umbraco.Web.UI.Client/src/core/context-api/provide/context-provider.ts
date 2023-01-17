@@ -9,7 +9,7 @@ import { UmbContextProvideEventImplementation } from './context-provide.event';
 export class UmbContextProvider<HostType extends EventTarget = EventTarget> {
 	protected host: HostType;
 
-	protected _contextAlias: string | UmbContextAlias;
+	protected _contextAlias: string;
 	#instance: unknown;
 
 	/**
@@ -21,7 +21,7 @@ export class UmbContextProvider<HostType extends EventTarget = EventTarget> {
 	 */
 	constructor(host: HostType, contextAlias: string | UmbContextAlias, instance: unknown) {
 		this.host = host;
-		this._contextAlias = contextAlias;
+		this._contextAlias = contextAlias.toString();
 		this.#instance = instance;
 	}
 
