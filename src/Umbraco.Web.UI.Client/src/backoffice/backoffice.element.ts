@@ -17,7 +17,7 @@ import { UmbMediaTypeStore, UMB_MEDIA_TYPE_STORE_CONTEXT_ALIAS } from './media/m
 import { UmbMemberTypeStore, UMB_MEMBER_TYPE_STORE_CONTEXT_ALIAS } from './members/member-types/member-type.store';
 import { UmbDocumentStore, UMB_DOCUMENT_STORE_CONTEXT_ALIAS } from './documents/documents/document.store';
 import { UmbMediaStore, UMB_MEDIA_STORE_CONTEXT_ALIAS } from './media/media/media.store';
-import { UmbMemberGroupStore } from './members/member-groups/member-group.store';
+import { UmbMemberGroupStore, UMB_MEMBER_GROUP_STORE_CONTEXT_ALIAS } from './members/member-groups/member-group.store';
 import { UmbDictionaryStore } from './translation/dictionary/dictionary.store';
 import { UmbDocumentBlueprintStore } from './documents/document-blueprints/document-blueprint.store';
 
@@ -69,7 +69,7 @@ export class UmbBackofficeElement extends UmbLitElement {
 		this.provideContext(UMB_MEMBER_TYPE_STORE_CONTEXT_ALIAS, new UmbMemberTypeStore(this));
 		this.provideContext(UMB_USER_STORE_CONTEXT_ALIAS, new UmbUserStore(this));
 		this.provideContext(UMB_USER_GROUP_STORE_CONTEXT_ALIAS, new UmbUserGroupStore(this));
-		this.provideContext('umbMemberGroupStore', new UmbMemberGroupStore(this));
+		this.provideContext(UMB_MEMBER_GROUP_STORE_CONTEXT_ALIAS, new UmbMemberGroupStore(this));
 		this.provideContext('umbSectionStore', new UmbSectionStore());
 		this.provideContext('umbCurrentUserHistoryStore', new UmbCurrentUserHistoryStore());
 		this.provideContext('umbDictionaryStore', new UmbDictionaryStore(this));
