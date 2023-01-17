@@ -13,7 +13,7 @@ import {
 	UmbDocumentTypeStore,
 	UMB_DOCUMENT_TYPE_STORE_CONTEXT_ALIAS,
 } from './documents/document-types/document-type.store';
-import { UmbMediaTypeStore } from './media/media-types/media-type.store';
+import { UmbMediaTypeStore, UMB_MEDIA_TYPE_STORE_CONTEXT_ALIAS } from './media/media-types/media-type.store';
 import { UmbMemberTypeStore } from './members/member-types/member-type.store';
 import { UmbDocumentStore, UMB_DOCUMENT_STORE_CONTEXT_ALIAS } from './documents/documents/document.store';
 import { UmbMediaStore, UMB_MEDIA_STORE_CONTEXT_ALIAS } from './media/media/media.store';
@@ -65,7 +65,7 @@ export class UmbBackofficeElement extends UmbLitElement {
 		this.provideContext(UMB_MEDIA_STORE_CONTEXT_ALIAS, new UmbMediaStore(this));
 		this.provideContext(UMB_DATA_TYPE_STORE_CONTEXT_ALIAS, new UmbDataTypeStore(this));
 		this.provideContext(UMB_DOCUMENT_TYPE_STORE_CONTEXT_ALIAS, new UmbDocumentTypeStore(this));
-		this.provideContext('umbMediaTypeStore', new UmbMediaTypeStore(this));
+		this.provideContext(UMB_MEDIA_TYPE_STORE_CONTEXT_ALIAS, new UmbMediaTypeStore(this));
 		this.provideContext('umbMemberTypeStore', new UmbMemberTypeStore(this));
 		this.provideContext('umbUserStore', new UmbUserStore(this));
 		this.provideContext('umbUserGroupStore', new UmbUserGroupStore(this));

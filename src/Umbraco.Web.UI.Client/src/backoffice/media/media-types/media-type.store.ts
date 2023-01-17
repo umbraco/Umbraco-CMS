@@ -3,8 +3,12 @@ import { UmbNodeStoreBase } from '../../../core/stores/store';
 import { MediaTypeResource, FolderTreeItem } from '@umbraco-cms/backend-api';
 import type { MediaTypeDetails } from '@umbraco-cms/models';
 import { tryExecuteAndNotify } from '@umbraco-cms/resources';
+import { UmbContextAlias } from '@umbraco-cms/context-api';
 
 export type UmbMediaTypeStoreItemType = MediaTypeDetails | FolderTreeItem;
+
+export const STORE_ALIAS = 'umbMediaTypeStore';
+
 /**
  * @export
  * @class UmbMediaTypeStore
@@ -12,7 +16,7 @@ export type UmbMediaTypeStoreItemType = MediaTypeDetails | FolderTreeItem;
  * @description - Data Store for Media Types
  */
 export class UmbMediaTypeStore extends UmbNodeStoreBase<UmbMediaTypeStoreItemType> {
-	public readonly storeAlias = 'umbMediaTypeStore';
+	public readonly storeAlias = STORE_ALIAS;
 
 	/**
 	 * @description - Request a Data Type by key. The Data Type is added to the store and is returned as an Observable.
@@ -85,3 +89,5 @@ export class UmbMediaTypeStore extends UmbNodeStoreBase<UmbMediaTypeStoreItemTyp
 		return this.items.pipe(map((items) => items.filter((item) => item.parentKey === key)));
 	}
 }
+
+export const UMB_MEDIA_TYPE_STORE_CONTEXT_ALIAS = new UmbContextAlias<UmbMediaTypeStore>(STORE_ALIAS);
