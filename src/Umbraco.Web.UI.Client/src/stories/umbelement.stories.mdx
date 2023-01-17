@@ -1,0 +1,30 @@
+import { Meta } from '@storybook/addon-docs';
+
+<Meta title="Guides/Umbraco Element" parameters={{ previewTabs: { canvas: { hidden: true } } }} />
+
+# Umbraco Element
+
+This element can be used as the base of any Element.
+Do this if you need to Observe Data, Consume or Provide a Context API or use a Resource.
+The Element implements the Controller Host and provides a few shortcut methods for initializing some Controllers.
+
+The methods are (*note this can be out of date, we need to look into how we can ensure this Doc originates from code.*)
+
+````
+observe<T>(source: Observable<T>, callback: (_value: T) => void, unique?: string): UmbObserverController<T>
+
+provideContext(alias: string, instance: unknown): UmbContextProviderController
+
+consumeContext(alias: string, callback: UmbContextCallback): UmbContextConsumerController
+
+consumeAllContexts(_contextAliases: Array<string>, callback: (_instances: ResolvedContexts) => void)
+````
+
+Use these for an smooth consumption, like this request for a Context API.
+
+````
+this.consumeContext('requestThisContextAlias', (context) => {
+	// Notice this is a subscription, as context might change or a new one appears.
+	console.log("I've got the context", context);
+});
+````

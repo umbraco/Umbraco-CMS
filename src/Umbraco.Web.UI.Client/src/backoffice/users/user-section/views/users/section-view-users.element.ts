@@ -12,7 +12,7 @@ import type { ManifestWorkspace, UserDetails } from '@umbraco-cms/models';
 import { UmbUserStore } from 'src/backoffice/users/users/user.store';
 import { createExtensionElement } from '@umbraco-cms/extensions-api';
 import { UmbLitElement } from '@umbraco-cms/element';
-import { UniqueBehaviorSubject } from 'src/core/observable-api/unique-behavior-subject';
+import { UniqueBehaviorSubject } from '@umbraco-cms/observable-api';
 
 @customElement('umb-section-view-users')
 export class UmbSectionViewUsersElement extends UmbLitElement {

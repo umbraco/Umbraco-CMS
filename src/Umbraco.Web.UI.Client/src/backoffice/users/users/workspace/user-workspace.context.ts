@@ -1,6 +1,6 @@
 import { UmbWorkspaceContentContext } from '../../../shared/components/workspace/workspace-content/workspace-content.context';
 import type { UmbUserStore, UmbUserStoreItemType } from 'src/backoffice/users/users/user.store';
-import { UmbControllerHostInterface } from 'src/core/controller/controller-host.mixin';
+import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 
 const DefaultDataTypeData = {
 	key: '',

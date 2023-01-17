@@ -3,15 +3,15 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { distinctUntilChanged } from 'rxjs';
-import { UmbWorkspaceDataTypeContext } from './workspace-data-type.context';
+import { UmbWorkspaceDataTypeContext } from './data-type-workspace.context';
 import { UmbLitElement } from '@umbraco-cms/element';
 
 /**
- *  @element umb-workspace-data-type
- *  @description - Element for displaying a Data Type Workspace
+ * @element umb-data-type-workspace
+ * @description - Element for displaying a Data Type Workspace
  */
-@customElement('umb-workspace-data-type')
-export class UmbWorkspaceDataTypeElement extends UmbLitElement {
+@customElement('umb-data-type-workspace')
+export class UmbDataTypeWorkspaceElement extends UmbLitElement {
 	static styles = [
 		UUITextStyles,
 		css`
@@ -53,7 +53,6 @@ export class UmbWorkspaceDataTypeElement extends UmbLitElement {
 
 	constructor() {
 		super();
-		this.addEventListener('property-value-change', this._onPropertyValueChange);
 		this.provideContext('umbWorkspaceContext', this._workspaceContext);
 		this.observe(this._workspaceContext.data.pipe(distinctUntilChanged()), (dataType) => {
 			if (dataType && dataType.name !== this._dataTypeName) {
@@ -61,11 +60,6 @@ export class UmbWorkspaceDataTypeElement extends UmbLitElement {
 			}
 		});
 	}
-
-	private _onPropertyValueChange = (e: Event) => {
-		const target = e.composedPath()[0] as any;
-		this._workspaceContext.setPropertyValue(target?.alias, target?.value);
-	};
 
 	// TODO. find a way where we don't have to do this for all Workspaces.
 	private _handleInput(event: UUIInputEvent) {
@@ -87,10 +81,10 @@ export class UmbWorkspaceDataTypeElement extends UmbLitElement {
 	}
 }
 
-export default UmbWorkspaceDataTypeElement;
+export default UmbDataTypeWorkspaceElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-workspace-data-type': UmbWorkspaceDataTypeElement;
+		'umb-data-type-workspace': UmbDataTypeWorkspaceElement;
 	}
 }
