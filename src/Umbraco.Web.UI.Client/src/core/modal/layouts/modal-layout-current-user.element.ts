@@ -6,6 +6,7 @@ import type { UserDetails } from '@umbraco-cms/models';
 import {
 	UmbCurrentUserHistoryStore,
 	UmbCurrentUserHistoryItem,
+	UMB_CURRENT_USER_HISTORY_STORE_CONTEXT_ALIAS,
 } from 'src/backoffice/users/current-user/current-user-history.store';
 import {
 	UmbCurrentUserStore,
@@ -102,7 +103,7 @@ export class UmbModalLayoutCurrentUserElement extends UmbLitElement {
 			this._observeCurrentUser();
 		});
 
-		this.consumeContext<UmbCurrentUserHistoryStore>('umbCurrentUserHistoryStore', (_instance) => {
+		this.consumeContext(UMB_CURRENT_USER_HISTORY_STORE_CONTEXT_ALIAS, (_instance) => {
 			this._currentUserHistoryStore = _instance;
 			this._observeHistory();
 		});

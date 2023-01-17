@@ -7,7 +7,10 @@ import { UmbNotificationService, UMB_NOTIFICATION_SERVICE_CONTEXT_ALIAS } from '
 import { UmbUserStore, UMB_USER_STORE_CONTEXT_ALIAS } from './users/users/user.store';
 import { UmbUserGroupStore, UMB_USER_GROUP_STORE_CONTEXT_ALIAS } from './users/user-groups/user-group.store';
 import { UmbCurrentUserStore, UMB_CURRENT_USER_STORE_CONTEXT_ALIAS } from './users/current-user/current-user.store';
-import { UmbCurrentUserHistoryStore } from './users/current-user/current-user-history.store';
+import {
+	UmbCurrentUserHistoryStore,
+	UMB_CURRENT_USER_HISTORY_STORE_CONTEXT_ALIAS,
+} from './users/current-user/current-user-history.store';
 
 import {
 	UmbDocumentTypeStore,
@@ -71,7 +74,7 @@ export class UmbBackofficeElement extends UmbLitElement {
 		this.provideContext(UMB_USER_GROUP_STORE_CONTEXT_ALIAS, new UmbUserGroupStore(this));
 		this.provideContext(UMB_MEMBER_GROUP_STORE_CONTEXT_ALIAS, new UmbMemberGroupStore(this));
 		this.provideContext(UMB_SECTION_STORE_CONTEXT_ALIAS, new UmbSectionStore());
-		this.provideContext('umbCurrentUserHistoryStore', new UmbCurrentUserHistoryStore());
+		this.provideContext(UMB_CURRENT_USER_HISTORY_STORE_CONTEXT_ALIAS, new UmbCurrentUserHistoryStore());
 		this.provideContext('umbDictionaryStore', new UmbDictionaryStore(this));
 		this.provideContext('umbDocumentBlueprintStore', new UmbDocumentBlueprintStore(this));
 	}
