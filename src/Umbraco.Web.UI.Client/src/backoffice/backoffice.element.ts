@@ -22,7 +22,10 @@ import { UmbDocumentStore, UMB_DOCUMENT_STORE_CONTEXT_ALIAS } from './documents/
 import { UmbMediaStore, UMB_MEDIA_STORE_CONTEXT_ALIAS } from './media/media/media.store';
 import { UmbMemberGroupStore, UMB_MEMBER_GROUP_STORE_CONTEXT_ALIAS } from './members/member-groups/member-group.store';
 import { UmbDictionaryStore, UMB_DICTIONARY_STORE_CONTEXT_ALIAS } from './translation/dictionary/dictionary.store';
-import { UmbDocumentBlueprintStore } from './documents/document-blueprints/document-blueprint.store';
+import {
+	UmbDocumentBlueprintStore,
+	UMB_DOCUMENT_BLULEPRINT_STORE_CONTEXT_ALIAS,
+} from './documents/document-blueprints/document-blueprint.store';
 
 import { UmbSectionStore, UMB_SECTION_STORE_CONTEXT_ALIAS } from './shared/components/section/section.store';
 import { UmbDataTypeStore, UMB_DATA_TYPE_STORE_CONTEXT_ALIAS } from './settings/data-types/data-type.store';
@@ -76,7 +79,7 @@ export class UmbBackofficeElement extends UmbLitElement {
 		this.provideContext(UMB_SECTION_STORE_CONTEXT_ALIAS, new UmbSectionStore());
 		this.provideContext(UMB_CURRENT_USER_HISTORY_STORE_CONTEXT_ALIAS, new UmbCurrentUserHistoryStore());
 		this.provideContext(UMB_DICTIONARY_STORE_CONTEXT_ALIAS, new UmbDictionaryStore(this));
-		this.provideContext('umbDocumentBlueprintStore', new UmbDocumentBlueprintStore(this));
+		this.provideContext(UMB_DOCUMENT_BLULEPRINT_STORE_CONTEXT_ALIAS, new UmbDocumentBlueprintStore(this));
 	}
 
 	render() {
