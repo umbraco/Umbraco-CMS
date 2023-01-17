@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Umbraco.Cms.Api.Management.Factories;
 using Umbraco.Cms.Api.Management.ViewModels.UserGroups;
-using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Services;
 
@@ -11,17 +11,14 @@ namespace Umbraco.Cms.Api.Management.Controllers.UserGroups;
 public class ByKeyUserGroupController : UserGroupsControllerBase
 {
     private readonly IUserService _userService;
-    private readonly IContentService _contentService;
-    private readonly IMediaService _mediaService;
+    private readonly IUserGroupViewModelFactory _userGroupViewModelFactory;
 
     public ByKeyUserGroupController(
         IUserService userService,
-        IContentService contentService,
-        IMediaService mediaService)
+        IUserGroupViewModelFactory userGroupViewModelFactory)
     {
         _userService = userService;
-        _contentService = contentService;
-        _mediaService = mediaService;
+        _userGroupViewModelFactory = userGroupViewModelFactory;
     }
 
     [HttpGet("{key:guid}")]
@@ -37,27 +34,6 @@ public class ByKeyUserGroupController : UserGroupsControllerBase
             return NotFound();
         }
 
-        IContent? contentStartNode = userGroup.StartContentId is not null
-            ? _contentService.GetById(userGroup.StartContentId.Value)
-            : null;
-
-        IMedia? mediaStartNode = userGroup.StartMediaId is not null
-            ? _mediaService.GetById(userGroup.StartMediaId.Value)
-            : null;
-
-        var viewModel = new UserGroupViewModel
-        {
-            Name = userGroup.Name,
-            Key = userGroup.Key,
-            ContentStartNodeKey = contentStartNode?.Key,
-            MediaStartNodeKey = mediaStartNode?.Key,
-            Icon = userGroup.Icon,
-            Languages = userGroup.AllowedLanguages,
-            HasAccessToAllLanguages = userGroup.HasAccessToAllLanguages,
-            Permissions = new[] {"ad", "hoc", "strings", "from", "save"},
-            Sections = userGroup.AllowedSections
-        };
-
-        return viewModel;
+        return _userGroupViewModelFactory.Create(userGroup);
     }
 }
