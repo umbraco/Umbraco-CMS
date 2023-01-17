@@ -4471,7 +4471,6 @@
             "items": {
               "$ref": "#/components/schemas/TypeInfo"
             },
-            "nullable": true,
             "readOnly": true
           },
           "exportedTypes": {
@@ -4479,7 +4478,6 @@
             "items": {
               "$ref": "#/components/schemas/Type"
             },
-            "nullable": true,
             "readOnly": true
           },
           "codeBase": {
@@ -4498,7 +4496,6 @@
           },
           "imageRuntimeVersion": {
             "type": "string",
-            "nullable": true,
             "readOnly": true
           },
           "isDynamic": {
@@ -4507,7 +4504,6 @@
           },
           "location": {
             "type": "string",
-            "nullable": true,
             "readOnly": true
           },
           "reflectionOnly": {
@@ -4527,12 +4523,10 @@
             "items": {
               "$ref": "#/components/schemas/CustomAttributeData"
             },
-            "nullable": true,
             "readOnly": true
           },
           "escapedCodeBase": {
             "type": "string",
-            "nullable": true,
             "readOnly": true,
             "deprecated": true
           },
@@ -4544,7 +4538,6 @@
             "items": {
               "$ref": "#/components/schemas/Module"
             },
-            "nullable": true,
             "readOnly": true
           },
           "globalAssemblyCache": {
@@ -4598,8 +4591,7 @@
             "$ref": "#/components/schemas/TelemetryLevel"
           },
           "description": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           }
         },
         "additionalProperties": false
@@ -4609,7 +4601,6 @@
         "properties": {
           "name": {
             "type": "string",
-            "nullable": true,
             "readOnly": true
           },
           "declaringType": {
@@ -4626,7 +4617,6 @@
             "items": {
               "$ref": "#/components/schemas/CustomAttributeData"
             },
-            "nullable": true,
             "readOnly": true
           },
           "isCollectible": {
@@ -4816,16 +4806,13 @@
         "type": "object",
         "properties": {
           "name": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "type": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "icon": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "hasChildren": {
             "type": "boolean"
@@ -4858,15 +4845,13 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/IOutputFormatter"
-            },
-            "nullable": true
+            }
           },
           "contentTypes": {
             "type": "array",
             "items": {
               "type": "string"
-            },
-            "nullable": true
+            }
           },
           "declaredType": {
             "$ref": "#/components/schemas/Type"
@@ -4877,8 +4862,7 @@
             "nullable": true
           },
           "location": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           }
         },
         "additionalProperties": false
@@ -4887,12 +4871,10 @@
         "type": "object",
         "properties": {
           "name": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "englishName": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           }
         },
         "additionalProperties": false
@@ -4911,7 +4893,6 @@
             "items": {
               "$ref": "#/components/schemas/CustomAttributeTypedArgument"
             },
-            "nullable": true,
             "readOnly": true
           },
           "namedArguments": {
@@ -4919,7 +4900,6 @@
             "items": {
               "$ref": "#/components/schemas/CustomAttributeNamedArgument"
             },
-            "nullable": true,
             "readOnly": true
           }
         },
@@ -4936,7 +4916,6 @@
           },
           "memberName": {
             "type": "string",
-            "nullable": true,
             "readOnly": true
           },
           "isField": {
@@ -4962,12 +4941,10 @@
         "type": "object",
         "properties": {
           "name": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "propertyEditorAlias": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "propertyEditorUiAlias": {
             "type": "string",
@@ -4977,8 +4954,7 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/DataTypeProperty"
-            },
-            "nullable": true
+            }
           },
           "key": {
             "type": "string",
@@ -4996,12 +4972,10 @@
         "type": "object",
         "properties": {
           "name": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "propertyEditorAlias": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "propertyEditorUiAlias": {
             "type": "string",
@@ -5011,8 +4985,7 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/DataTypeProperty"
-            },
-            "nullable": true
+            }
           },
           "parentKey": {
             "type": "string",
@@ -5026,8 +4999,7 @@
         "type": "object",
         "properties": {
           "alias": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "value": {
             "nullable": true
@@ -5039,12 +5011,10 @@
         "type": "object",
         "properties": {
           "name": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "alias": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           }
         },
         "additionalProperties": false
@@ -5057,15 +5027,13 @@
             "format": "uuid"
           },
           "type": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "properties": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/DataTypePropertyReference"
-            },
-            "nullable": true
+            }
           }
         },
         "additionalProperties": false
@@ -5074,12 +5042,10 @@
         "type": "object",
         "properties": {
           "name": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "propertyEditorAlias": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "propertyEditorUiAlias": {
             "type": "string",
@@ -5089,8 +5055,7 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/DataTypeProperty"
-            },
-            "nullable": true
+            }
           }
         },
         "additionalProperties": false
@@ -5148,16 +5113,13 @@
             "format": "int32"
           },
           "displayName": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "defaultDatabaseName": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "providerName": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "isConfigured": {
             "type": "boolean"
@@ -5166,8 +5128,7 @@
             "type": "boolean"
           },
           "serverPlaceholder": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "requiresCredentials": {
             "type": "boolean"
@@ -5196,22 +5157,19 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/DictionaryTranslation"
-            },
-            "nullable": true
+            }
           },
           "contentApps": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/ContentApp"
-            },
-            "nullable": true
+            }
           },
           "notifications": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/BackOfficeNotification"
             },
-            "nullable": true,
             "readOnly": true
           },
           "name": {
@@ -5223,8 +5181,7 @@
             "format": "uuid"
           },
           "path": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           }
         },
         "additionalProperties": false
@@ -5236,8 +5193,7 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/DictionaryItemsImport"
-            },
-            "nullable": true
+            }
           },
           "tempFileName": {
             "type": "string",
@@ -5295,7 +5251,6 @@
             "items": {
               "$ref": "#/components/schemas/DictionaryTranslationOverview"
             },
-            "nullable": true,
             "readOnly": true
           }
         },
@@ -5321,8 +5276,7 @@
             "nullable": true
           },
           "translation": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "languageId": {
             "type": "integer",
@@ -5348,16 +5302,13 @@
         "type": "object",
         "properties": {
           "name": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "type": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "icon": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "hasChildren": {
             "type": "boolean"
@@ -5379,8 +5330,7 @@
             "format": "uuid"
           },
           "documentTypeAlias": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "documentTypeName": {
             "type": "string",
@@ -5393,16 +5343,13 @@
         "type": "object",
         "properties": {
           "name": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "type": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "icon": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "hasChildren": {
             "type": "boolean"
@@ -5438,16 +5385,13 @@
         "type": "object",
         "properties": {
           "name": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "type": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "icon": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "hasChildren": {
             "type": "boolean"
@@ -5477,16 +5421,13 @@
         "type": "object",
         "properties": {
           "name": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "type": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "icon": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "hasChildren": {
             "type": "boolean"
@@ -5521,7 +5462,6 @@
         "properties": {
           "name": {
             "type": "string",
-            "nullable": true,
             "readOnly": true
           },
           "declaringType": {
@@ -5538,7 +5478,6 @@
             "items": {
               "$ref": "#/components/schemas/CustomAttributeData"
             },
-            "nullable": true,
             "readOnly": true
           },
           "isCollectible": {
@@ -5583,15 +5522,13 @@
         "type": "object",
         "properties": {
           "name": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "values": {
             "type": "array",
             "items": {
               "type": "string"
-            },
-            "nullable": true
+            }
           }
         },
         "additionalProperties": false
@@ -5626,7 +5563,6 @@
         "properties": {
           "name": {
             "type": "string",
-            "nullable": true,
             "readOnly": true
           },
           "declaringType": {
@@ -5643,7 +5579,6 @@
             "items": {
               "$ref": "#/components/schemas/CustomAttributeData"
             },
-            "nullable": true,
             "readOnly": true
           },
           "isCollectible": {
@@ -5734,23 +5669,19 @@
         "type": "object",
         "properties": {
           "name": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "type": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "icon": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "hasChildren": {
             "type": "boolean"
           },
           "path": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "isFolder": {
             "type": "boolean"
@@ -5762,8 +5693,7 @@
         "type": "object",
         "properties": {
           "name": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "key": {
             "type": "string",
@@ -5781,8 +5711,7 @@
         "type": "object",
         "properties": {
           "name": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "parentKey": {
             "type": "string",
@@ -5796,16 +5725,13 @@
         "type": "object",
         "properties": {
           "name": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "type": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "icon": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "hasChildren": {
             "type": "boolean"
@@ -5832,8 +5758,7 @@
         "type": "object",
         "properties": {
           "name": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           }
         },
         "additionalProperties": false
@@ -5860,8 +5785,7 @@
             "format": "uuid"
           },
           "name": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "description": {
             "type": "string",
@@ -5918,8 +5842,7 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/HealthCheck"
-            },
-            "nullable": true
+            }
           }
         },
         "additionalProperties": false
@@ -5935,8 +5858,7 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/HealthCheckWithResult"
-            },
-            "nullable": true
+            }
           }
         },
         "additionalProperties": false
@@ -5945,8 +5867,7 @@
         "type": "object",
         "properties": {
           "message": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "resultType": {
             "$ref": "#/components/schemas/StatusResultType"
@@ -5973,8 +5894,7 @@
             "format": "uuid"
           },
           "name": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "description": {
             "type": "string",
@@ -6046,8 +5966,7 @@
             "type": "boolean"
           },
           "searcherName": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "documentCount": {
             "type": "integer",
@@ -6094,8 +6013,7 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/DatabaseSettings"
-            },
-            "nullable": true
+            }
           }
         },
         "additionalProperties": false
@@ -6108,16 +6026,12 @@
         "type": "object",
         "properties": {
           "op": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "path": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
-          "value": {
-            "nullable": true
-          }
+          "value": { }
         },
         "additionalProperties": false
       },
@@ -6170,7 +6084,6 @@
           },
           "name": {
             "type": "string",
-            "nullable": true,
             "readOnly": true
           },
           "declaringType": {
@@ -6187,7 +6100,6 @@
             "items": {
               "$ref": "#/components/schemas/CustomAttributeData"
             },
-            "nullable": true,
             "readOnly": true
           },
           "isCollectible": {
@@ -6255,7 +6167,6 @@
           },
           "name": {
             "type": "string",
-            "nullable": true,
             "readOnly": true
           },
           "declaringType": {
@@ -6272,7 +6183,6 @@
             "items": {
               "$ref": "#/components/schemas/CustomAttributeData"
             },
-            "nullable": true,
             "readOnly": true
           },
           "isCollectible": {
@@ -6407,7 +6317,6 @@
         "properties": {
           "name": {
             "type": "string",
-            "nullable": true,
             "readOnly": true
           },
           "declaringType": {
@@ -6424,7 +6333,6 @@
             "items": {
               "$ref": "#/components/schemas/CustomAttributeData"
             },
-            "nullable": true,
             "readOnly": true
           },
           "isCollectible": {
@@ -6591,12 +6499,10 @@
           },
           "fullyQualifiedName": {
             "type": "string",
-            "nullable": true,
             "readOnly": true
           },
           "name": {
             "type": "string",
-            "nullable": true,
             "readOnly": true
           },
           "mdStreamVersion": {
@@ -6611,7 +6517,6 @@
           },
           "scopeName": {
             "type": "string",
-            "nullable": true,
             "readOnly": true
           },
           "moduleHandle": {
@@ -6622,7 +6527,6 @@
             "items": {
               "$ref": "#/components/schemas/CustomAttributeData"
             },
-            "nullable": true,
             "readOnly": true
           },
           "metadataToken": {
@@ -7183,7 +7087,6 @@
             "items": {
               "$ref": "#/components/schemas/CustomAttributeData"
             },
-            "nullable": true,
             "readOnly": true
           },
           "metadataToken": {
@@ -7249,7 +7152,6 @@
         "properties": {
           "name": {
             "type": "string",
-            "nullable": true,
             "readOnly": true
           },
           "declaringType": {
@@ -7266,7 +7168,6 @@
             "items": {
               "$ref": "#/components/schemas/CustomAttributeData"
             },
-            "nullable": true,
             "readOnly": true
           },
           "isCollectible": {
@@ -7316,16 +7217,13 @@
             "format": "uuid"
           },
           "name": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "type": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "icon": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "hasChildren": {
             "type": "boolean"
@@ -7357,12 +7255,10 @@
             "format": "uuid"
           },
           "originalUrl": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "destinationUrl": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "created": {
             "type": "string",
@@ -7504,8 +7400,7 @@
         "type": "object",
         "properties": {
           "id": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "score": {
             "type": "number",
@@ -7520,8 +7415,7 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/Field"
-            },
-            "nullable": true
+            }
           }
         },
         "additionalProperties": false
@@ -7530,8 +7424,7 @@
         "type": "object",
         "properties": {
           "name": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           }
         },
         "additionalProperties": false
@@ -7568,7 +7461,6 @@
         "type": "object",
         "properties": {
           "typeId": {
-            "nullable": true,
             "readOnly": true
           },
           "value": {
@@ -7599,12 +7491,10 @@
         "type": "object",
         "properties": {
           "name": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "alias": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "content": {
             "type": "string",
@@ -7621,12 +7511,10 @@
         "type": "object",
         "properties": {
           "name": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "alias": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "content": {
             "type": "string",
@@ -7639,12 +7527,10 @@
         "type": "object",
         "properties": {
           "propertyAlias": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "constraintValue": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "operator": {
             "$ref": "#/components/schemas/Operator"
@@ -7685,8 +7571,7 @@
         "type": "object",
         "properties": {
           "propertyAlias": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "direction": {
             "type": "string",
@@ -7705,8 +7590,7 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/TemplateQueryPropertyType"
-            },
-            "nullable": true
+            }
           }
         },
         "additionalProperties": false
@@ -7715,8 +7599,7 @@
         "type": "object",
         "properties": {
           "alias": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "type": {
             "$ref": "#/components/schemas/TemplateQueryPropertyType"
@@ -7737,15 +7620,13 @@
         "type": "object",
         "properties": {
           "queryExpression": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "sampleResults": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/TemplateQueryResultItem"
-            },
-            "nullable": true
+            }
           },
           "resultCount": {
             "type": "integer",
@@ -7762,12 +7643,10 @@
         "type": "object",
         "properties": {
           "icon": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "name": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           }
         },
         "additionalProperties": false
@@ -7779,22 +7658,19 @@
             "type": "array",
             "items": {
               "type": "string"
-            },
-            "nullable": true
+            }
           },
           "properties": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/TemplateQueryProperty"
-            },
-            "nullable": true
+            }
           },
           "operators": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/TemplateQueryOperator"
-            },
-            "nullable": true
+            }
           }
         },
         "additionalProperties": false
@@ -7803,8 +7679,7 @@
         "type": "object",
         "properties": {
           "content": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           }
         },
         "additionalProperties": false
@@ -7813,12 +7688,10 @@
         "type": "object",
         "properties": {
           "name": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "alias": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "content": {
             "type": "string",
@@ -7832,7 +7705,6 @@
         "properties": {
           "name": {
             "type": "string",
-            "nullable": true,
             "readOnly": true
           },
           "customAttributes": {
@@ -7840,7 +7712,6 @@
             "items": {
               "$ref": "#/components/schemas/CustomAttributeData"
             },
-            "nullable": true,
             "readOnly": true
           },
           "isCollectible": {
@@ -7957,7 +7828,6 @@
             "items": {
               "$ref": "#/components/schemas/Type"
             },
-            "nullable": true,
             "readOnly": true
           },
           "genericParameterPosition": {
@@ -8162,7 +8032,6 @@
         "properties": {
           "name": {
             "type": "string",
-            "nullable": true,
             "readOnly": true
           },
           "customAttributes": {
@@ -8170,7 +8039,6 @@
             "items": {
               "$ref": "#/components/schemas/CustomAttributeData"
             },
-            "nullable": true,
             "readOnly": true
           },
           "isCollectible": {
@@ -8287,7 +8155,6 @@
             "items": {
               "$ref": "#/components/schemas/Type"
             },
-            "nullable": true,
             "readOnly": true
           },
           "genericParameterPosition": {
@@ -8451,7 +8318,6 @@
             "items": {
               "$ref": "#/components/schemas/Type"
             },
-            "nullable": true,
             "readOnly": true
           },
           "declaredConstructors": {
@@ -8459,7 +8325,6 @@
             "items": {
               "$ref": "#/components/schemas/ConstructorInfo"
             },
-            "nullable": true,
             "readOnly": true
           },
           "declaredEvents": {
@@ -8467,7 +8332,6 @@
             "items": {
               "$ref": "#/components/schemas/EventInfo"
             },
-            "nullable": true,
             "readOnly": true
           },
           "declaredFields": {
@@ -8475,7 +8339,6 @@
             "items": {
               "$ref": "#/components/schemas/FieldInfo"
             },
-            "nullable": true,
             "readOnly": true
           },
           "declaredMembers": {
@@ -8483,7 +8346,6 @@
             "items": {
               "$ref": "#/components/schemas/MemberInfo"
             },
-            "nullable": true,
             "readOnly": true
           },
           "declaredMethods": {
@@ -8491,7 +8353,6 @@
             "items": {
               "$ref": "#/components/schemas/MethodInfo"
             },
-            "nullable": true,
             "readOnly": true
           },
           "declaredNestedTypes": {
@@ -8499,7 +8360,6 @@
             "items": {
               "$ref": "#/components/schemas/TypeInfo"
             },
-            "nullable": true,
             "readOnly": true
           },
           "declaredProperties": {
@@ -8507,7 +8367,6 @@
             "items": {
               "$ref": "#/components/schemas/PropertyInfo"
             },
-            "nullable": true,
             "readOnly": true
           },
           "implementedInterfaces": {
@@ -8515,7 +8374,6 @@
             "items": {
               "$ref": "#/components/schemas/Type"
             },
-            "nullable": true,
             "readOnly": true
           }
         },
@@ -8525,24 +8383,19 @@
         "type": "object",
         "properties": {
           "currentState": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "newState": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "newVersion": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "oldVersion": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "reportUrl": {
             "type": "string",
-            "nullable": true,
             "readOnly": true
           }
         },
@@ -8592,8 +8445,7 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/ConsentLevel"
-            },
-            "nullable": true
+            }
           }
         },
         "additionalProperties": false
@@ -8602,8 +8454,7 @@
         "type": "object",
         "properties": {
           "version": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           }
         },
         "additionalProperties": false
