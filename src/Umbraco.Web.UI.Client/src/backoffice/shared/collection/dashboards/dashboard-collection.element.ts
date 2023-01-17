@@ -4,7 +4,10 @@ import { customElement, state } from 'lit/decorators.js';
 import '../collection.element';
 import { ifDefined } from 'lit-html/directives/if-defined.js';
 import { UmbMediaStore, UmbMediaStoreItemType } from 'src/backoffice/media/media/media.store';
-import { UmbCollectionContext } from 'src/backoffice/shared/collection/collection.context';
+import {
+	UmbCollectionContext,
+	UMB_COLLECTION_CONTEXT_ALIAS,
+} from 'src/backoffice/shared/collection/collection.context';
 import type { ManifestDashboardCollection } from '@umbraco-cms/models';
 import { UmbLitElement } from '@umbraco-cms/element';
 
@@ -37,7 +40,7 @@ export class UmbDashboardCollectionElement extends UmbLitElement {
 			const manifestMeta = this.manifest.meta as any;
 			this._entityType = manifestMeta.entityType as string;
 			this._collectionContext = new UmbCollectionContext(this, null, manifestMeta.storeAlias);
-			this.provideContext('umbCollectionContext', this._collectionContext);
+			this.provideContext(UMB_COLLECTION_CONTEXT_ALIAS, this._collectionContext);
 		}
 	}
 

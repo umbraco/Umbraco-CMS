@@ -4,7 +4,7 @@ import { customElement, state, property } from 'lit/decorators.js';
 import { map } from 'rxjs';
 import './collection-selection-actions.element';
 import './collection-toolbar.element';
-import type { UmbCollectionContext } from './collection.context';
+import { UmbCollectionContext, UMB_COLLECTION_CONTEXT_ALIAS } from './collection.context';
 import { createExtensionElement } from '@umbraco-cms/extensions-api';
 import type { ManifestCollectionView, MediaDetails } from '@umbraco-cms/models';
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
@@ -53,7 +53,7 @@ export class UmbCollectionElement extends UmbLitElement {
 	constructor() {
 		super();
 
-		this.consumeContext('umbCollectionContext', (instance) => {
+		this.consumeContext(UMB_COLLECTION_CONTEXT_ALIAS, (instance) => {
 			this._collectionContext = instance;
 			this._observeCollectionContext();
 		});
@@ -85,7 +85,7 @@ export class UmbCollectionElement extends UmbLitElement {
 	private _createRoutes(views: ManifestCollectionView[] | null) {
 		this._routes = [];
 
-		if(views) {
+		if (views) {
 			this._routes = views.map((view) => {
 				return {
 					path: `${view.meta.pathName}`,

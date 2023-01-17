@@ -3,7 +3,10 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement } from 'lit/decorators.js';
 import { ifDefined } from 'lit-html/directives/if-defined.js';
 import type { UmbWorkspaceContentContext } from '../../workspace-content.context';
-import { UmbCollectionContext } from 'src/backoffice/shared/collection/collection.context';
+import {
+	UmbCollectionContext,
+	UMB_COLLECTION_CONTEXT_ALIAS,
+} from 'src/backoffice/shared/collection/collection.context';
 import { UmbMediaStore, UmbMediaStoreItemType } from 'src/backoffice/media/media/media.store';
 
 import '../../../../../../shared/components/content-property/content-property.element';
@@ -42,7 +45,7 @@ export class UmbWorkspaceViewCollectionElement extends UmbLitElement {
 				this._workspaceContext.entityKey,
 				this._workspaceContext.getStore()?.storeAlias || '' // The store is available when the context is available.
 			);
-			this.provideContext('umbCollectionContext', this._collectionContext);
+			this.provideContext(UMB_COLLECTION_CONTEXT_ALIAS, this._collectionContext);
 		}
 	}
 

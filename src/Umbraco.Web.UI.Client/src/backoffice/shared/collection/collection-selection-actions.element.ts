@@ -1,7 +1,7 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, html, nothing } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
-import type { UmbCollectionContext } from './collection.context';
+import { UmbCollectionContext, UMB_COLLECTION_CONTEXT_ALIAS } from './collection.context';
 import type { MediaDetails } from '@umbraco-cms/models';
 import { UmbLitElement } from '@umbraco-cms/element';
 
@@ -36,7 +36,7 @@ export class UmbCollectionSelectionActionsElement extends UmbLitElement {
 
 	constructor() {
 		super();
-		this.consumeContext('umbCollectionContext', (instance) => {
+		this.consumeContext(UMB_COLLECTION_CONTEXT_ALIAS, (instance) => {
 			this._collectionContext = instance;
 			this._observeCollectionContext();
 		});
