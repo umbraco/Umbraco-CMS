@@ -1,4 +1,4 @@
-export class ContextToken<T = unknown> {
+export class ContextAlias<T = unknown> {
 	/**
 	 * @param _desc   Description for the token,
 	 *                used only for debugging purposes,
@@ -9,11 +9,11 @@ export class ContextToken<T = unknown> {
 	/**
 	 * @internal
 	 */
-	get multi(): ContextToken<Array<T>> {
-		return this as ContextToken<Array<T>>;
+	get multi(): ContextAlias<Array<T>> {
+		return this as ContextAlias<Array<T>>;
 	}
 
 	toString(): string {
-		return `${ContextToken.name} ${this._desc}`;
+		return `${ContextAlias.name} ${this._desc}`;
 	}
 }
