@@ -6,7 +6,7 @@ import { UmbContextRequestEventImplementation, UmbContextCallback } from './cont
  * @export
  * @class UmbContextConsumer
  */
-export class UmbContextConsumer<ContextType, HostType extends EventTarget = EventTarget> {
+export class UmbContextConsumer<HostType extends EventTarget = EventTarget, T = unknown> {
 	private _instance?: unknown;
 	get instance(): unknown | undefined {
 		return this._instance;
@@ -25,11 +25,11 @@ export class UmbContextConsumer<ContextType, HostType extends EventTarget = Even
 	 */
 	constructor(
 		protected host: HostType,
-		protected _contextAlias: string | ContextToken<ContextType>,
-		private _callback: UmbContextCallback<ContextType>
+		protected _contextAlias: string | ContextToken,
+		private _callback: UmbContextCallback<T>
 	) {}
 
-	private _onResponse = (instance: ContextType) => {
+	private _onResponse = (instance: any) => {
 		this._instance = instance;
 		this._callback(instance);
 	};

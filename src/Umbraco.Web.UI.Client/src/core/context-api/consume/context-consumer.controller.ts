@@ -2,14 +2,14 @@ import { ContextToken } from '../context-token';
 import { UmbContextConsumer } from './context-consumer';
 import { UmbContextCallback } from './context-request.event';
 
-import type { UmbControllerHostInterface, UmbControllerInterface } from '@umbraco-cms/controllers';
+import type { UmbControllerHostInterface, UmbControllerInterface } from '@umbraco-cms/controller';
 
-export class UmbContextConsumerController<T>
-	extends UmbContextConsumer<T, UmbControllerHostInterface>
-	implements UmbControllerInterface<T>
+export class UmbContextConsumerController<T = unknown>
+	extends UmbContextConsumer<UmbControllerHostInterface, T>
+	implements UmbControllerInterface
 {
 	public get unique() {
-		return this._contextAlias;
+		return this._contextAlias?.toString();
 	}
 
 	constructor(

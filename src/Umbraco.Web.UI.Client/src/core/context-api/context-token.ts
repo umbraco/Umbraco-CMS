@@ -1,4 +1,4 @@
-export class ContextToken<T> {
+export class ContextToken<T = unknown> {
 	/**
 	 * @param _desc   Description for the token,
 	 *                used only for debugging purposes,
