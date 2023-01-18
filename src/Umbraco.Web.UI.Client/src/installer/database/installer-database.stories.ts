@@ -41,7 +41,7 @@ Step3DatabasePreconfigured.parameters = {
 									providerName: 'Microsoft.Data.SQLite',
 									isConfigured: true,
 									requiresServer: false,
-									serverPlaceholder: null,
+									serverPlaceholder: undefined,
 									requiresCredentials: false,
 									supportsIntegratedAuthentication: false,
 									requiresConnectionTest: false,
