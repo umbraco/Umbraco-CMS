@@ -453,6 +453,7 @@ public class UserGroupRepository : EntityRepositoryBase<int, IUserGroup>, IUserG
 
         PersistAllowedSections(entity);
         PersistAllowedLanguages(entity);
+        PersistPermissions(entity);
 
         entity.ResetDirtyProperties();
     }
@@ -467,6 +468,7 @@ public class UserGroupRepository : EntityRepositoryBase<int, IUserGroup>, IUserG
 
         PersistAllowedSections(entity);
         PersistAllowedLanguages(entity);
+        PersistPermissions(entity);
 
         entity.ResetDirtyProperties();
     }
@@ -503,6 +505,17 @@ public class UserGroupRepository : EntityRepositoryBase<int, IUserGroup>, IUserG
             };
 
             Database.Insert(dto);
+        }
+    }
+
+    private void PersistPermissions(IUserGroup userGroup)
+    {
+        Database.Delete<UserGroup2PermissionDto>(userGroup.Id);
+
+        foreach (var permission in userGroup.PermissionNames)
+        {
+            var permissionDto = new UserGroup2PermissionDto { UserGroupId = userGroup.Id, Permission = permission, };
+            Database.Insert(permissionDto);
         }
     }
 
