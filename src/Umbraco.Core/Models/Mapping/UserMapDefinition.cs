@@ -135,6 +135,7 @@ public class UserMapDefinition : IMapDefinition
         target.Permissions = source.DefaultPermissions;
         target.Key = source.Key;
         target.HasAccessToAllLanguages = source.HasAccessToAllLanguages;
+        target.PermissionNames = source.Permissions ?? Enumerable.Empty<string>();
 
         var id = GetIntId(source.Id);
         if (id > 0)

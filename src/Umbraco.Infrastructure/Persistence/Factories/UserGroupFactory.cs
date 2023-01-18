@@ -27,6 +27,7 @@ internal static class UserGroupFactory
             userGroup.UpdateDate = dto.UpdateDate;
             userGroup.StartContentId = dto.StartContentId;
             userGroup.StartMediaId = dto.StartMediaId;
+            userGroup.PermissionNames = dto.UserGroup2PermissionDtos.Select(x => x.Permission);
             userGroup.HasAccessToAllLanguages = dto.HasAccessToAllLanguages;
             if (dto.UserGroup2AppDtos != null)
             {

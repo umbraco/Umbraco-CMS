@@ -30,7 +30,7 @@ public class UserGroupViewModelFactory : IUserGroupViewModelFactory
             Icon = userGroup.Icon,
             Languages = userGroup.AllowedLanguages,
             HasAccessToAllLanguages = userGroup.HasAccessToAllLanguages,
-            Permissions = Array.Empty<string>(), // TODO: populate this
+            Permissions = userGroup.PermissionNames,
             Sections = userGroup.AllowedSections, // TODO: Map to appropriate section names.
         };
 

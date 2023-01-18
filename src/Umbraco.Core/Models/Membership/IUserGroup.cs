@@ -35,6 +35,16 @@ public interface IUserGroup : IEntity, IRememberBeingDirty
     /// </remarks>
     IEnumerable<string>? Permissions { get; set; }
 
+    /// <summary>
+    /// The set of permissions provided by the frontend.
+    /// </summary>
+    /// <remarks>
+    /// By default the server has no concept of what these strings mean, we simple store them and return them to the UI.
+    /// FIXME: For now this is named PermissionNames since Permissions already exists, but is subject to change in the future
+    /// when we know more about how we want to handle permissions, potentially those will be migrated in the these "soft" permissions.
+    /// </remarks>
+    IEnumerable<string> PermissionNames { get; set; }
+
     IEnumerable<string> AllowedSections { get; }
 
     void RemoveAllowedSection(string sectionAlias);
