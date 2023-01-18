@@ -27,7 +27,6 @@ describe('ContextAlias', () => {
 		document.body.appendChild(element);
 
 		const localConsumer = new UmbContextConsumer(element, contextAlias, (_instance) => {
-			console.log('got instance', _instance);
 			expect(_instance).to.be.instanceOf(MyClass);
 			expect(_instance.prop).to.eq('value from provider');
 			done();
