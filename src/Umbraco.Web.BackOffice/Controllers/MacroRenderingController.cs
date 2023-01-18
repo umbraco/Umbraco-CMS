@@ -127,7 +127,7 @@ public class MacroRenderingController : UmbracoAuthorizedJsonController
         // Since a Macro might contain thing thats related to the culture of the "IPublishedContent" (ie Dictionary keys) we want
         // to set the current culture to the culture related to the content item. This is hacky but it works.
 
-        // fixme
+        // TODO:
         // in a 1:1 situation we do not handle the language being edited
         // so the macro renders in the wrong language
 
