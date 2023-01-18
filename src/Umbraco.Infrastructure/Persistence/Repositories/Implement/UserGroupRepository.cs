@@ -436,6 +436,7 @@ public class UserGroupRepository : EntityRepositoryBase<int, IUserGroup>, IUserG
             "DELETE FROM umbracoUserGroup2App WHERE userGroupId = @id",
             "DELETE FROM umbracoUserGroup2Node WHERE userGroupId = @id",
             "DELETE FROM umbracoUserGroup2NodePermission WHERE userGroupId = @id",
+            "DELETE FROM umbracoUserGroup2Permission WHERE userGroupId = @id",
             "DELETE FROM umbracoUserGroup WHERE id = @id",
         };
         return list;
