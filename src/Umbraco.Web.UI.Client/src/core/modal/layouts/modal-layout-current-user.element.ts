@@ -2,16 +2,16 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, CSSResultGroup, html, nothing } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { UmbModalHandler, UmbModalService, UMB_MODAL_SERVICE_CONTEXT_ALIAS } from '..';
-import type { UserDetails } from '@umbraco-cms/models';
 import {
 	UmbCurrentUserHistoryStore,
 	UmbCurrentUserHistoryItem,
 	UMB_CURRENT_USER_HISTORY_STORE_CONTEXT_ALIAS,
-} from 'src/backoffice/users/current-user/current-user-history.store';
+} from '../../../backoffice/users/current-user/current-user-history.store';
 import {
 	UmbCurrentUserStore,
 	UMB_CURRENT_USER_STORE_CONTEXT_ALIAS,
-} from 'src/backoffice/users/current-user/current-user.store';
+} from '../../../backoffice/users/current-user/current-user.store';
+import type { UserDetails } from '@umbraco-cms/models';
 import { UmbLitElement } from '@umbraco-cms/element';
 
 @customElement('umb-modal-layout-current-user')
