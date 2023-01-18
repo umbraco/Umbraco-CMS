@@ -16,6 +16,7 @@ public class UmbracoRequestPaths
     private readonly string _appPath;
     private readonly string _backOfficeMvcPath;
     private readonly string _backOfficePath;
+    private readonly string _managementApiPath;
     private readonly List<string> _defaultUmbPaths;
     private readonly string _installPath;
     private readonly string _mvcArea;
@@ -46,6 +47,7 @@ public class UmbracoRequestPaths
         _previewMvcPath = "/" + _mvcArea + "/Preview/";
         _surfaceMvcPath = "/" + _mvcArea + "/Surface/";
         _apiMvcPath = "/" + _mvcArea + "/Api/";
+        _managementApiPath = "/" + _mvcArea + "/management/api/";
         _installPath = hostingEnvironment.ToAbsolute(Constants.SystemDirectories.Install);
         _umbracoRequestPathsOptions = umbracoRequestPathsOptions;
     }
@@ -98,7 +100,8 @@ public class UmbracoRequestPaths
 
         // check for special back office paths
         if (urlPath.InvariantStartsWith(_backOfficeMvcPath)
-            || urlPath.InvariantStartsWith(_previewMvcPath))
+            || urlPath.InvariantStartsWith(_previewMvcPath)
+            || urlPath.InvariantStartsWith(_managementApiPath))
         {
             return true;
         }
