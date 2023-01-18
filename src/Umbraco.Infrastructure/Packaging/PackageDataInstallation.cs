@@ -1423,7 +1423,7 @@ namespace Umbraco.Cms.Infrastructure.Packaging
                 dictionaryItem = CreateNewDictionaryItem(key, itemName!, dictionaryItemElement, languages, parentId);
             }
 
-            _localizationService.Save(dictionaryItem, userId);
+            _localizationService.Update(dictionaryItem, userId);
             items.Add(dictionaryItem);
 
             items.AddRange(ImportDictionaryItems(dictionaryItemElement.Elements("DictionaryItem"), languages,

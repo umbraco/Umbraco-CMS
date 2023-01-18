@@ -38,37 +38,23 @@ public class DictionaryFactory : IDictionaryFactory
         return dictionaryViewModel;
     }
 
-    public IDictionaryItem MapDictionaryItemUpdate(IDictionaryItem current, DictionaryItemUpdateModel dictionaryItemUpdateModel)
+    public IDictionaryItem MapUpdateModelToDictionaryItem(Guid key, DictionaryItemUpdateModel dictionaryItemUpdateModel)
     {
-        IDictionaryItem updated = _umbracoMapper.Map(dictionaryItemUpdateModel, current);
+        IDictionaryItem updated = _umbracoMapper.Map<IDictionaryItem>(dictionaryItemUpdateModel)!;
+        updated.Key = key;
 
         MapTranslations(updated, dictionaryItemUpdateModel.Translations);
 
         return updated;
     }
 
-    public IDictionaryItem MapDictionaryItemCreate(DictionaryItemCreateModel dictionaryItemUpdateModel)
+    public IEnumerable<IDictionaryTranslation> MapTranslations(IEnumerable<DictionaryItemTranslationModel> translationModels)
     {
-        IDictionaryItem created = _umbracoMapper.Map<IDictionaryItem>(dictionaryItemUpdateModel)!;
+        var temporaryDictionaryItem = new DictionaryItem(Guid.NewGuid().ToString());
 
-        MapTranslations(created, dictionaryItemUpdateModel.Translations);
+        MapTranslations(temporaryDictionaryItem, translationModels);
 
-        return created;
-    }
-
-    private void MapTranslations(IDictionaryItem dictionaryItem, IEnumerable<DictionaryItemTranslationModel> translationModels)
-    {
-        var languagesByIsoCode = _localizationService
-            .GetAllLanguages()
-            .ToDictionary(l => l.IsoCode);
-        DictionaryItemTranslationModel[] validTranslations = translationModels
-            .Where(translation => languagesByIsoCode.ContainsKey(translation.IsoCode))
-            .ToArray();
-
-        foreach (DictionaryItemTranslationModel translationModel in validTranslations)
-        {
-            _localizationService.AddOrUpdateDictionaryValue(dictionaryItem, languagesByIsoCode[translationModel.IsoCode], translationModel.Translation);
-        }
+        return temporaryDictionaryItem.Translations;
     }
 
     public DictionaryImportViewModel CreateDictionaryImportViewModel(FormFileUploadResult formFileUploadResult)
@@ -100,5 +86,20 @@ public class DictionaryFactory : IDictionaryFactory
         }
 
         return model;
+    }
+
+    private void MapTranslations(IDictionaryItem dictionaryItem, IEnumerable<DictionaryItemTranslationModel> translationModels)
+    {
+        var languagesByIsoCode = _localizationService
+            .GetAllLanguages()
+            .ToDictionary(l => l.IsoCode);
+        DictionaryItemTranslationModel[] validTranslations = translationModels
+            .Where(translation => languagesByIsoCode.ContainsKey(translation.IsoCode))
+            .ToArray();
+
+        foreach (DictionaryItemTranslationModel translationModel in validTranslations)
+        {
+            _localizationService.AddOrUpdateDictionaryValue(dictionaryItem, languagesByIsoCode[translationModel.IsoCode], translationModel.Translation);
+        }
     }
 }

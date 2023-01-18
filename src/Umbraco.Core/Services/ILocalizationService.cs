@@ -1,4 +1,5 @@
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.New.Cms.Core.Models;
 
 namespace Umbraco.Cms.Core.Services;
@@ -30,7 +31,22 @@ public interface ILocalizationService : IService
     /// <param name="parentId"></param>
     /// <param name="defaultValue"></param>
     /// <returns></returns>
+    [Obsolete("Please use CreateDictionaryItemWithIdentity that returns an Attempt. Will be removed in V15")]
     IDictionaryItem CreateDictionaryItemWithIdentity(string key, Guid? parentId, string? defaultValue = null);
+
+    /// <summary>
+    ///     Creates and saves a new dictionary item and assigns translations to all applicable languages if specified
+    /// </summary>
+    /// <param name="key"></param>
+    /// <param name="parentId"></param>
+    /// <param name="translations"></param>
+    /// <param name="userId">Optional id of the user saving the dictionary item</param>
+    /// <returns></returns>
+    Attempt<IDictionaryItem?, DictionaryItemOperationStatus> Create(
+        string key,
+        Guid? parentId,
+        IEnumerable<IDictionaryTranslation>? translations = null,
+        int userId = Constants.Security.SuperUserId);
 
     /// <summary>
     ///     Gets a <see cref="IDictionaryItem" /> by its <see cref="int" /> id
@@ -109,7 +125,15 @@ public interface ILocalizationService : IService
     /// </summary>
     /// <param name="dictionaryItem"><see cref="IDictionaryItem" /> to save</param>
     /// <param name="userId">Optional id of the user saving the dictionary item</param>
+    [Obsolete("Please use Update. Will be removed in V15")]
     void Save(IDictionaryItem dictionaryItem, int userId = Constants.Security.SuperUserId);
+
+    /// <summary>
+    ///     Updates an existing <see cref="IDictionaryItem" /> object
+    /// </summary>
+    /// <param name="dictionaryItem"><see cref="IDictionaryItem" /> to update</param>
+    /// <param name="userId">Optional id of the user saving the dictionary item</param>
+    Attempt<IDictionaryItem, DictionaryItemOperationStatus> Update(IDictionaryItem dictionaryItem, int userId = Constants.Security.SuperUserId);
 
     /// <summary>
     ///     Deletes a <see cref="IDictionaryItem" /> object and its related translations

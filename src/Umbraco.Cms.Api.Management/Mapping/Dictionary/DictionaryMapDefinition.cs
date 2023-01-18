@@ -5,11 +5,11 @@ using Umbraco.Cms.Api.Management.ViewModels.Dictionary;
 
 namespace Umbraco.Cms.Api.Management.Mapping.Dictionary;
 
-public class DictionaryViewModelMapDefinition : IMapDefinition
+public class DictionaryMapDefinition : IMapDefinition
 {
     private readonly ILocalizationService _localizationService;
 
-    public DictionaryViewModelMapDefinition(ILocalizationService localizationService) => _localizationService = localizationService;
+    public DictionaryMapDefinition(ILocalizationService localizationService) => _localizationService = localizationService;
 
     public void DefineMaps(IUmbracoMapper mapper)
     {

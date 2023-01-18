@@ -18,7 +18,7 @@ public static class MappingBuilderExtensions
     internal static IUmbracoBuilder AddMappers(this IUmbracoBuilder builder)
     {
         builder.WithCollectionBuilder<MapDefinitionCollectionBuilder>()
-            .Add<DictionaryViewModelMapDefinition>()
+            .Add<DictionaryMapDefinition>()
             .Add<TrackedReferenceViewModelsMapDefinition>()
             .Add<RelationModelMapDefinition>()
             .Add<RelationViewModelsMapDefinition>()

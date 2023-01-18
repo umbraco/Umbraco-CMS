@@ -2,5 +2,4 @@
 
 public class DictionaryItemUpdateModel : DictionaryItemModelBase
 {
-    public Guid Key { get; set; }
 }
