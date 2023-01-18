@@ -12,6 +12,7 @@ import {
 	UmbTableItem,
 	UmbTableSelectedEvent,
 } from 'src/backoffice/shared/components/table';
+import { UmbLanguageStore } from '../../language.store';
 
 import '../language/language-workspace.element';
 import './language-root-table-delete-column-layout.element';
@@ -109,20 +110,22 @@ export class UmbLanguageRootWorkspaceElement extends UmbLitElement {
 	@state()
 	private _tableItems: Array<UmbTableItem> = [];
 
+	private _languageStore?: UmbLanguageStore;
+
 	constructor() {
 		super();
 
-		this._getLanguageData();
+		this.consumeContext('umbLanguageStore', (instance) => {
+			this._languageStore = instance;
+			this._observeLanguages();
+		});
 	}
 
-	//TODO: Move this code to the language store
-	private async _getLanguageData() {
-		const { data } = await tryExecuteAndNotify(this, LanguageResource.getLanguage({ skip: 0, take: 10 }));
-		if (data) {
-			this._languages = data.items as Array<LanguageDetails>;
-			this._createTableItems(this._languages);
-			console.log('LANGS', this._languages);
-		}
+	private _observeLanguages() {
+		this._languageStore?.getAll().subscribe((languages) => {
+			this._languages = languages;
+			this._createTableItems(languages);
+		});
 	}
 
 	private _createTableItems(languages: Array<Language>) {
