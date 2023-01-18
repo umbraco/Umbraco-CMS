@@ -2,7 +2,7 @@ import { css, html } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, property, state } from 'lit/decorators.js';
 import { repeat } from 'lit/directives/repeat.js';
-import { groupBy } from 'lodash';
+import { groupBy } from 'lodash-es';
 import type { UUIInputEvent } from '@umbraco-ui/uui';
 import type { UmbModalHandler } from '../../modal-handler';
 import type { ManifestPropertyEditorUI } from '@umbraco-cms/models';
@@ -115,13 +115,10 @@ export class UmbModalLayoutPropertyEditorUIPickerElement extends UmbLitElement {
 	private _usePropertyEditorUIs() {
 		if (!this.data) return;
 
-		this.observe(
-			umbExtensionsRegistry.extensionsOfType('propertyEditorUI'),
-			(propertyEditorUIs) => {
-				this._propertyEditorUIs = propertyEditorUIs;
-				this._groupedPropertyEditorUIs = groupBy(propertyEditorUIs, 'meta.group');
-			}
-		);
+		this.observe(umbExtensionsRegistry.extensionsOfType('propertyEditorUI'), (propertyEditorUIs) => {
+			this._propertyEditorUIs = propertyEditorUIs;
+			this._groupedPropertyEditorUIs = groupBy(propertyEditorUIs, 'meta.group');
+		});
 	}
 
 	private _handleClick(propertyEditorUI: ManifestPropertyEditorUI) {
