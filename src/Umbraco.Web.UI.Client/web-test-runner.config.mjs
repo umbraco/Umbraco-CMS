@@ -39,7 +39,8 @@ export default {
 	testRunnerHtml: (testFramework) =>
 		`<html>
 			<head>
-				<link rel="stylesheet" href="/src/core/css/custom-properties.css">
+			  <!-- TODO: Figure out why uui-css.css cannot be loaded in the test runner -->
+				<!-- <link rel="stylesheet" href="/src/core/css/custom-properties.css"> -->
 			</head>
       <body>
         <script type="module" src="${testFramework}"></script>
