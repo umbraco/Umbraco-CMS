@@ -3,6 +3,7 @@ using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Strings;
 
 namespace Umbraco.Cms.Api.Management.Factories;
 
@@ -10,8 +11,13 @@ namespace Umbraco.Cms.Api.Management.Factories;
 public class UserGroupViewModelFactory : IUserGroupViewModelFactory
 {
     private readonly IEntityService _entityService;
+    private readonly IShortStringHelper _shortStringHelper;
 
-    public UserGroupViewModelFactory(IEntityService entityService) => _entityService = entityService;
+    public UserGroupViewModelFactory(IEntityService entityService, IShortStringHelper shortStringHelper)
+    {
+        _entityService = entityService;
+        _shortStringHelper = shortStringHelper;
+    }
 
     /// <inheritdoc />
     public UserGroupViewModel Create(IUserGroup userGroup)
@@ -23,7 +29,7 @@ public class UserGroupViewModelFactory : IUserGroupViewModelFactory
 
         return new UserGroupViewModel
         {
-            Name = userGroup.Name,
+            Name = userGroup.Name ?? string.Empty,
             Key = userGroup.Key,
             ContentStartNodeKey = contentStartNodeKey,
             MediaStartNodeKey = mediaStartNodeKey,
@@ -39,6 +45,36 @@ public class UserGroupViewModelFactory : IUserGroupViewModelFactory
     public IEnumerable<UserGroupViewModel> CreateMultiple(IEnumerable<IUserGroup> userGroups) =>
         userGroups.Select(Create);
 
+    // TODO: Should we split this class out? Maybe rename it?
+    public IUserGroup Create(UserGroupSaveModel saveModel)
+    {
+        int? contentStartNodeId = GetIdFromKey(saveModel.ContentStartNodeKey, UmbracoObjectTypes.Document);
+        int? mediaStartNodeId = GetIdFromKey(saveModel.MediaStartNodeKey, UmbracoObjectTypes.Media);
+
+        var group = new UserGroup(_shortStringHelper)
+        {
+            Name = saveModel.Name,
+            Alias = saveModel.Name,
+            Icon = saveModel.Icon,
+            HasAccessToAllLanguages = saveModel.HasAccessToAllLanguages,
+            PermissionNames = saveModel.Permissions,
+            StartContentId = contentStartNodeId,
+            StartMediaId = mediaStartNodeId,
+        };
+
+        foreach (var section in saveModel.Sections)
+        {
+            group.AddAllowedSection(section);
+        }
+
+        foreach (var language in saveModel.Languages)
+        {
+            group.AddAllowedLanguage(language);
+        }
+
+        return group;
+    }
+
     private Guid? GetKeyFromId(int? id, UmbracoObjectTypes objectType)
     {
         if (id is null)
@@ -47,6 +83,23 @@ public class UserGroupViewModelFactory : IUserGroupViewModelFactory
         }
 
         Attempt<Guid> attempt = _entityService.GetKey(id.Value, objectType);
+        if (attempt.Success is false)
+        {
+            return null;
+        }
+
+        return attempt.Result;
+    }
+
+    private int? GetIdFromKey(Guid? key, UmbracoObjectTypes objectType)
+    {
+        if (key is null)
+        {
+            return null;
+        }
+
+        Attempt<int> attempt = _entityService.GetId(key.Value, objectType);
+
         if (attempt.Success is false)
         {
             return null;

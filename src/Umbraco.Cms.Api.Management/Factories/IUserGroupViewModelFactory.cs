@@ -21,4 +21,11 @@ public interface IUserGroupViewModelFactory
     /// <param name="userGroups"></param>
     /// <returns></returns>
     IEnumerable<UserGroupViewModel> CreateMultiple(IEnumerable<IUserGroup> userGroups);
+
+    /// <summary>
+    /// Creates an <see cref="IUserGroup"/> based on a <see cref="UserGroupSaveModel"/>
+    /// </summary>
+    /// <param name="saveModel"></param>
+    /// <returns></returns>
+    IUserGroup Create(UserGroupSaveModel saveModel);
 }

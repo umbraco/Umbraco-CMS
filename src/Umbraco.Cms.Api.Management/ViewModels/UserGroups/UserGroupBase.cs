@@ -13,7 +13,7 @@ public class UserGroupBase
     /// <summary>
     /// The name of the user groups
     /// </summary>
-    public string? Name { get; init; }
+    public required string Name { get; init; }
 
     /// <summary>
     /// The Icon for the user group
