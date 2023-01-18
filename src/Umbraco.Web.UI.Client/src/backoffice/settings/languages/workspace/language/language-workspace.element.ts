@@ -72,6 +72,11 @@ export class UmbLanguageWorkspaceElement extends UmbLitElement {
 
 		return html`<umb-body-layout>
 			<div id="header" slot="header">
+				<a href="/section/settings/language-root">
+					<uui-button compact>
+						<uui-icon name="umb:arrow-left"></uui-icon>
+					</uui-button>
+				</a>
 				<uui-input .value=${this.language.name}></uui-input>
 			</div>
 			<div id="main">
