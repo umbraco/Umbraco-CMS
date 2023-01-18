@@ -5,11 +5,8 @@ import { repeat } from 'lit/directives/repeat.js';
 import { ifDefined } from 'lit-html/directives/if-defined.js';
 import type { UmbSectionViewUsersElement } from '../../section-view-users.element';
 import { getTagLookAndColor } from '../../../../../../../auth/utils';
+import { UmbUserGroupStore, UMB_USER_GROUP_STORE_CONTEXT_ALIAS } from '../../../../../user-groups/user-group.store';
 import type { UserDetails, UserEntity, UserGroupEntity } from '@umbraco-cms/models';
-import {
-	UmbUserGroupStore,
-	UMB_USER_GROUP_STORE_CONTEXT_ALIAS,
-} from 'src/backoffice/users/user-groups/user-group.store';
 import { UmbLitElement } from '@umbraco-cms/element';
 
 @customElement('umb-workspace-view-users-grid')
