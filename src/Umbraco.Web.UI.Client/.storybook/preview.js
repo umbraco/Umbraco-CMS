@@ -1,3 +1,6 @@
+import '../src/core/css/custom-properties.css';
+import '@umbraco-ui/uui-css/dist/uui-css.css';
+
 import '@umbraco-ui/uui';
 import '@umbraco-ui/uui-modal';
 import '@umbraco-ui/uui-modal-container';
@@ -22,7 +25,6 @@ import { UmbModalService } from '../src/core/modal';
 import { umbExtensionsRegistry } from '../src/core/extensions-registry';
 
 import '../src/core/context-api/provide/context-provider.element';
-import '../src/core/css/custom-properties.css';
 import '../src/backoffice/shared/components/backoffice-frame/backoffice-modal-container.element';
 import '../src/backoffice/shared/components/code-block/code-block.element';
 

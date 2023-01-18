@@ -39,8 +39,13 @@ export default {
 	testRunnerHtml: (testFramework) =>
 		`<html>
 			<head>
-			  <!-- TODO: Figure out why uui-css.css cannot be loaded in the test runner -->
-				<!-- <link rel="stylesheet" href="/src/core/css/custom-properties.css"> -->
+				<meta charset="UTF-8" />
+				<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+				<link rel="icon" type="image/svg+xml" href="public/favicon.svg" />
+				<title>Umbraco</title>
+				<base href="/" />
+				<link rel="stylesheet" href="node_modules/@umbraco-ui/uui-css/dist/uui-css.css">
+				<link rel="stylesheet" href="src/core/css/custom-properties.css">
 			</head>
       <body>
         <script type="module" src="${testFramework}"></script>
