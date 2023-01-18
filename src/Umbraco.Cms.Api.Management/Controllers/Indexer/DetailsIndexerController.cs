@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Management.Factories;
-using Umbraco.Cms.Api.Management.ViewModels.Search;
+using Umbraco.Cms.Api.Management.ViewModels.Indexer;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Indexer;
 

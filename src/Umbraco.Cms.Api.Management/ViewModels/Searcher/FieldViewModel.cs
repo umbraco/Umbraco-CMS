@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Api.Management.ViewModels.Search;
+﻿namespace Umbraco.Cms.Api.Management.ViewModels.Searcher;
 
 public class FieldViewModel
 {
