@@ -43,7 +43,10 @@ public class UmbracoPlan : MigrationPlan
     /// <summary>
     ///     Defines the plan.
     /// </summary>
-    protected void DefinePlan()
+    /// <remarks>
+    /// This is virtual for testing purposes.
+    /// </remarks>
+    protected virtual void DefinePlan()
     {
         // MODIFYING THE PLAN
         //

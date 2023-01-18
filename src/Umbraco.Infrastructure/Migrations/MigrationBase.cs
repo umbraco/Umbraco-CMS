@@ -86,6 +86,11 @@ public abstract partial class MigrationBase : IDiscoverable
     public IUpdateBuilder Update => BeginBuild(new UpdateBuilder(Context));
 
     /// <summary>
+    /// If this is set to true, the published cache will be rebuild upon successful completion of the migration.
+    /// </summary>
+    public bool RebuildCache { get; set; }
+
+    /// <summary>
     ///     Runs the migration.
     /// </summary>
     public void Run()

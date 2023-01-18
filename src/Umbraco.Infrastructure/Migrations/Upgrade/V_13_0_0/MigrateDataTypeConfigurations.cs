@@ -32,7 +32,6 @@ public class MigrateDataTypeConfigurations : MigrationBase
 
         List<DataTypeDto> dataTypeDtos = Database.Fetch<DataTypeDto>(sql);
 
-        var refreshCache = false;
         foreach (DataTypeDto dataTypeDto in dataTypeDtos)
         {
             Dictionary<string, object> configurationData = dataTypeDto.Configuration.IsNullOrWhiteSpace()
@@ -64,13 +63,8 @@ public class MigrateDataTypeConfigurations : MigrationBase
             {
                 dataTypeDto.Configuration = serializer.Serialize(configurationData);
                 Database.Update(dataTypeDto);
-                refreshCache = true;
+                RebuildCache = true;
             }
-        }
-
-        if (refreshCache)
-        {
-            Context.AddPostMigration<RebuildPublishedSnapshot>();
         }
     }
 

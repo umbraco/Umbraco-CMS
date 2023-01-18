@@ -45,6 +45,7 @@ public class MediaTreeControllerBase : UserStartNodeTreeControllerBase<ContentTr
         if (entity is IMediaEntitySlim mediaEntitySlim)
         {
             viewModel.Icon = mediaEntitySlim.ContentTypeIcon ?? viewModel.Icon;
+            viewModel.IsTrashed = entity.Trashed;
         }
 
         return viewModel;
