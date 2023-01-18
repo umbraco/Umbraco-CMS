@@ -4,7 +4,7 @@ const sidebarMenuItem: ManifestSidebarMenuItem = {
 	type: 'sidebarMenuItem',
 	alias: 'Umb.SidebarMenuItem.DataTypes',
 	name: 'Data Types Sidebar Menu Item',
-	weight: 400,
+	weight: 40,
 	loader: () => import('./data-types-sidebar-menu-item.element'),
 	meta: {
 		label: 'Data Types',

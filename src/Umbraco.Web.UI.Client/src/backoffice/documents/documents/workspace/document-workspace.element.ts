@@ -36,7 +36,7 @@ export class UmbDocumentWorkspaceElement extends UmbLitElement implements UmbWor
 	}
 
 	private _workspaceContext: UmbWorkspaceDocumentContext = new UmbWorkspaceDocumentContext(this);
-	
+
 	render() {
 		return html`<umb-workspace-content alias="Umb.Workspace.Document"></umb-workspace-content>`;
 	}

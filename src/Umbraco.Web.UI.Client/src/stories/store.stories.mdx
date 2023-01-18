@@ -1,0 +1,32 @@
+import { Meta } from '@storybook/addon-docs';
+
+<Meta title="Guides/Context API" parameters={{ previewTabs: { canvas: { hidden: true } } }} />
+
+# Store
+
+
+A store is the link between a Resource and a implementation, mostly taken form as a Context.
+Generally a Store will be holding one or more RxJS Subjects, each Subject is made available for Subscription via a RxJS Observable.
+
+### A Simple Store:
+
+````
+class MyProductStore {
+
+	protected _products = new UniqueBehaviorSubject(<Array<T>>[]);
+	public readonly products = this._items.asObservable();
+
+	protected host: UmbControllerHostInterface;
+	constructor(host: UmbControllerHostInterface) {
+		this.host = host;
+	}
+
+	getByKey(key: string): Observable<MyProductDataModel | null> {
+		tryExecuteAndNotify(this.host, productResource.getByKey({key})).then(({ data }) => {
+			if (data) {
+				this._products.update(data.items);
+			}
+		});
+	}
+}
+````
