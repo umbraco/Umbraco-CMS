@@ -6,7 +6,7 @@ namespace Umbraco.Cms.Api.Management.Factories;
 
 public interface IDictionaryFactory
 {
-    IDictionaryItem MapUpdateModelToDictionaryItem(Guid key, DictionaryItemUpdateModel dictionaryItemUpdateModel);
+    IDictionaryItem MapUpdateModelToDictionaryItem(IDictionaryItem current, DictionaryItemUpdateModel dictionaryItemUpdateModel);
 
     IEnumerable<IDictionaryTranslation> MapTranslations(IEnumerable<DictionaryItemTranslationModel> translationModels);
 

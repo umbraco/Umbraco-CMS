@@ -514,20 +514,24 @@ public class LocalizationServiceTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public void Update_DictionaryItem_By_Key_Resolves_Id_From_Existing_DictionaryItem()
+    public void Cannot_Update_Non_Existant_DictionaryItem()
+    {
+        var result = LocalizationService.Update(new DictionaryItem("NoSuchItemKey"));
+        Assert.False(result.Success);
+        Assert.AreEqual(DictionaryItemOperationStatus.ItemNotFound, result.Status);
+    }
+
+    [Test]
+    public void Cannot_Update_DictionaryItem_With_Empty_Id()
     {
         var item = LocalizationService.GetDictionaryItemByKey("Child");
         Assert.IsNotNull(item);
 
         item = new DictionaryItem(item.ParentId, item.ItemKey) { Key = item.Key, Translations = item.Translations };
-        item.Translations.First().Value += " UPDATED";
 
         var result = LocalizationService.Update(item);
-        Assert.True(result.Success);
-
-        item = LocalizationService.GetDictionaryItemByKey("Child");
-        Assert.IsNotNull(item);
-        Assert.True(item.Translations.First().Value.EndsWith(" UPDATED"));
+        Assert.False(result.Success);
+        Assert.AreEqual(DictionaryItemOperationStatus.ItemNotFound, result.Status);
     }
 
     public void CreateTestData()

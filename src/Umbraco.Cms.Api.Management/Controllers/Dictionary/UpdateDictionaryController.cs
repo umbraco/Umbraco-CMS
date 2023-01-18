@@ -33,7 +33,13 @@ public class UpdateDictionaryController : DictionaryControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Update(Guid key, DictionaryItemUpdateModel dictionaryItemUpdateModel)
     {
-        IDictionaryItem updated = _dictionaryFactory.MapUpdateModelToDictionaryItem(key, dictionaryItemUpdateModel);
+        IDictionaryItem? current = _localizationService.GetDictionaryItemById(key);
+        if (current == null)
+        {
+            return NotFound();
+        }
+
+        IDictionaryItem updated = _dictionaryFactory.MapUpdateModelToDictionaryItem(current, dictionaryItemUpdateModel);
 
         Attempt<IDictionaryItem, DictionaryItemOperationStatus> result = _localizationService.Update(updated, CurrentUserId(_backOfficeSecurityAccessor));
 

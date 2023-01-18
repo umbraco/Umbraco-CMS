@@ -38,10 +38,9 @@ public class DictionaryFactory : IDictionaryFactory
         return dictionaryViewModel;
     }
 
-    public IDictionaryItem MapUpdateModelToDictionaryItem(Guid key, DictionaryItemUpdateModel dictionaryItemUpdateModel)
+    public IDictionaryItem MapUpdateModelToDictionaryItem(IDictionaryItem current, DictionaryItemUpdateModel dictionaryItemUpdateModel)
     {
-        IDictionaryItem updated = _umbracoMapper.Map<IDictionaryItem>(dictionaryItemUpdateModel)!;
-        updated.Key = key;
+        IDictionaryItem updated = _umbracoMapper.Map(dictionaryItemUpdateModel, current);
 
         MapTranslations(updated, dictionaryItemUpdateModel.Translations);
 

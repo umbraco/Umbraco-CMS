@@ -364,8 +364,7 @@ internal class LocalizationService : RepositoryService, ILocalizationService
         using (ICoreScope scope = ScopeProvider.CreateCoreScope())
         {
             // is there an item to update?
-            IDictionaryItem? currentDictionaryItem = _dictionaryRepository.Get(dictionaryItem.Key);
-            if (currentDictionaryItem == null)
+            if (_dictionaryRepository.Exists(dictionaryItem.Id) == false)
             {
                 return Attempt.FailWithStatus(DictionaryItemOperationStatus.ItemNotFound, dictionaryItem);
             }
@@ -375,9 +374,6 @@ internal class LocalizationService : RepositoryService, ILocalizationService
             {
                 return Attempt.FailWithStatus(DictionaryItemOperationStatus.DuplicateItemKey, dictionaryItem);
             }
-
-            // ensure the correct DB ID is assigned to the dictionary item before processing and saving it
-            dictionaryItem.Id = currentDictionaryItem.Id;
 
             EventMessages eventMessages = EventMessagesFactory.Get();
             var savingNotification = new DictionaryItemSavingNotification(dictionaryItem, eventMessages);
