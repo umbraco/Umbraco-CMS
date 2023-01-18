@@ -22,7 +22,7 @@ class UmbLanguagesData extends UmbData<LanguageDetails> {
 export const data: Array<LanguageDetails> = [
 	{
 		id: 1,
-		key: '1234',
+		key: uuidv4(),
 		name: 'English',
 		isoCode: 'en',
 		isDefault: true,

@@ -16,6 +16,7 @@ import { UmbLanguageStore } from '../../language.store';
 
 import '../language/language-workspace.element';
 import './language-root-table-delete-column-layout.element';
+import './language-root-table-name-column-layout.element';
 
 @customElement('umb-language-root-workspace')
 export class UmbLanguageRootWorkspaceElement extends UmbLitElement {
@@ -39,39 +40,7 @@ export class UmbLanguageRootWorkspaceElement extends UmbLitElement {
 	];
 
 	@state()
-	private _languages: Array<LanguageDetails> = [
-		{
-			id: 1,
-			name: 'English',
-			isoCode: 'en',
-			isDefault: true,
-			isMandatory: true,
-		},
-		{
-			id: 2,
-			name: 'Danish',
-			isoCode: 'da',
-			isDefault: false,
-			isMandatory: false,
-			fallbackLanguageId: 1,
-		},
-		{
-			id: 3,
-			name: 'German',
-			isoCode: 'de',
-			isDefault: false,
-			isMandatory: false,
-			fallbackLanguageId: 1,
-		},
-		{
-			id: 4,
-			name: 'French',
-			isoCode: 'fr',
-			isDefault: false,
-			isMandatory: false,
-			fallbackLanguageId: 1,
-		},
-	];
+	private _languages: Array<LanguageDetails> = [];
 
 	@state()
 	private _tableConfig: UmbTableConfig = {
@@ -83,6 +52,7 @@ export class UmbLanguageRootWorkspaceElement extends UmbLitElement {
 		{
 			name: 'Language',
 			alias: 'languageName',
+			elementName: 'umb-language-root-table-name-column-layout',
 		},
 		{
 			name: 'ISO Code',
@@ -128,7 +98,7 @@ export class UmbLanguageRootWorkspaceElement extends UmbLitElement {
 		});
 	}
 
-	private _createTableItems(languages: Array<Language>) {
+	private _createTableItems(languages: Array<LanguageDetails>) {
 		this._tableItems = languages.map((language) => {
 			return {
 				key: language.id?.toString() ?? '',
@@ -136,7 +106,10 @@ export class UmbLanguageRootWorkspaceElement extends UmbLitElement {
 				data: [
 					{
 						columnAlias: 'languageName',
-						value: language.name,
+						value: {
+							name: language.name,
+							key: language.key,
+						},
 					},
 					{
 						columnAlias: 'isoCode',
@@ -166,7 +139,6 @@ export class UmbLanguageRootWorkspaceElement extends UmbLitElement {
 	}
 
 	render() {
-		// return html`<umb-language-workspace></umb-language-workspace>`;
 		return html`
 			<umb-body-layout no-header-background>
 				<uui-button id="add-language" slot="header" label="Add language" look="outline" color="default"></uui-button>
