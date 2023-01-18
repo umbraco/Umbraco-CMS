@@ -22,13 +22,20 @@ public class ManagementApiComposer : IComposer
         IServiceCollection services = builder.Services;
 
         builder
+            .AddJson()
             .AddNewInstaller()
             .AddUpgrader()
             .AddSearchManagement()
             .AddTrees()
-            .AddFactories()
-            .AddServices()
-            .AddMappers()
+            .AddLanguages()
+            .AddDictionary()
+            .AddFileUpload()
+            .AddHealthCheck()
+            .AddModelsBuilder()
+            .AddRedirectUrl()
+            .AddTrackedReferences()
+            .AddDataTypes()
+            .AddTemplates()
             .AddBackOfficeAuthentication()
             .AddApiVersioning()
             .AddSwaggerGen();
