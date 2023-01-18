@@ -7,7 +7,6 @@ namespace Umbraco.Cms.Infrastructure.Migrations;
 /// </summary>
 public class MigrationPlan
 {
-    private readonly List<Type> _postMigrationTypes = new();
     private readonly Dictionary<string, Transition?> _transitions = new(StringComparer.InvariantCultureIgnoreCase);
     private string? _finalState;
 
@@ -44,8 +43,6 @@ public class MigrationPlan
     ///     Gets the transitions.
     /// </summary>
     public IReadOnlyDictionary<string, Transition?> Transitions => _transitions;
-
-    public IReadOnlyList<Type> PostMigrationTypes => _postMigrationTypes;
 
     /// <summary>
     ///     Gets the name of the plan.
@@ -290,20 +287,6 @@ public class MigrationPlan
             state = transition?.TargetState;
         }
 
-        return this;
-    }
-
-    /// <summary>
-    ///     Adds a post-migration to the plan.
-    /// </summary>
-    public virtual MigrationPlan AddPostMigration<TMigration>()
-        where TMigration : MigrationBase
-    {
-        // TODO: Post migrations are obsolete/irrelevant. Notifications should be used instead.
-        // The only place we use this is to clear cookies in the installer which could be done
-        // via notification. Then we can clean up all the code related to post migrations which is
-        // not insignificant.
-        _postMigrationTypes.Add(typeof(TMigration));
         return this;
     }
 
