@@ -7,6 +7,6 @@ import type { ConsentLevel } from './ConsentLevel';
 export type UserSettings = {
     minCharLength?: number;
     minNonAlphaNumericLength?: number;
-    consentLevels?: Array<ConsentLevel> | null;
+    consentLevels?: Array<ConsentLevel>;
 };
 

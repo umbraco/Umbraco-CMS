@@ -5,9 +5,9 @@
 import type { Field } from './Field';
 
 export type SearchResult = {
-    id?: string | null;
+    id?: string;
     score?: number;
     readonly fieldCount?: number;
-    fields?: Array<Field> | null;
+    fields?: Array<Field>;
 };
 

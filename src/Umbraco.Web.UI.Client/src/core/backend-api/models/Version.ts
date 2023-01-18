@@ -3,6 +3,6 @@
 /* eslint-disable */
 
 export type Version = {
-    version?: string | null;
+    version?: string;
 };
 

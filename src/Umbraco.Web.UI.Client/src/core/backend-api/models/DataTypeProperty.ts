@@ -3,7 +3,7 @@
 /* eslint-disable */
 
 export type DataTypeProperty = {
-    alias?: string | null;
+    alias?: string;
     value?: any;
 };
 
