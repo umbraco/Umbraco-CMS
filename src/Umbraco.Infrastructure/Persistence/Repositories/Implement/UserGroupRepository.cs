@@ -510,7 +510,7 @@ public class UserGroupRepository : EntityRepositoryBase<int, IUserGroup>, IUserG
 
     private void PersistPermissions(IUserGroup userGroup)
     {
-        Database.Delete<UserGroup2PermissionDto>(userGroup.Id);
+        Database.Delete<UserGroup2PermissionDto>("WHERE UserGroupId = @UserGroupId", new { UserGroupId = userGroup.Id });
 
         foreach (var permission in userGroup.PermissionNames)
         {
