@@ -3,9 +3,9 @@
 /* eslint-disable */
 
 export type EntityTreeItem = {
-    name?: string | null;
-    type?: string | null;
-    icon?: string | null;
+    name?: string;
+    type?: string;
+    icon?: string;
     hasChildren?: boolean;
     key?: string;
     isContainer?: boolean;

@@ -7,6 +7,6 @@ import type { UserSettings } from './UserSettings';
 
 export type InstallSettings = {
     user?: UserSettings;
-    databases?: Array<DatabaseSettings> | null;
+    databases?: Array<DatabaseSettings>;
 };
 

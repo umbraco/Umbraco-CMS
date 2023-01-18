@@ -5,12 +5,12 @@
 export type DatabaseSettings = {
     id?: string;
     sortOrder?: number;
-    displayName?: string | null;
-    defaultDatabaseName?: string | null;
-    providerName?: string | null;
+    displayName?: string;
+    defaultDatabaseName?: string;
+    providerName?: string;
     isConfigured?: boolean;
     requiresServer?: boolean;
-    serverPlaceholder?: string | null;
+    serverPlaceholder?: string;
     requiresCredentials?: boolean;
     supportsIntegratedAuthentication?: boolean;
     requiresConnectionTest?: boolean;
