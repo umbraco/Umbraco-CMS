@@ -35,6 +35,7 @@ export class UmbLanguageRootWorkspaceElement extends UmbLitElement {
 			}
 			#add-language {
 				margin-left: var(--uui-size-space-6);
+				text-decoration: none;
 			}
 		`,
 	];
@@ -141,7 +142,9 @@ export class UmbLanguageRootWorkspaceElement extends UmbLitElement {
 	render() {
 		return html`
 			<umb-body-layout no-header-background>
-				<uui-button id="add-language" slot="header" label="Add language" look="outline" color="default"></uui-button>
+				<a id="add-language" slot="header" href="section/settings/language/edit/new">
+					<uui-button label="Add language" look="outline" color="default"></uui-button>
+				</a>
 				<umb-table .config=${this._tableConfig} .columns=${this._tableColumns} .items=${this._tableItems}></umb-table>
 			</umb-body-layout>
 		`;
