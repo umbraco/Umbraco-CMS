@@ -14,7 +14,7 @@ const isDataTypeDetails = (dataType: DataTypeDetails | FolderTreeItem): dataType
 export type UmbDataTypeStoreItemType = DataTypeDetails | FolderTreeItem;
 
 // TODO: research how we write names of global consts.
-export const STORE_ALIAS = 'umbDataTypeStore';
+export const STORE_ALIAS = 'UmbDataTypeStore';
 
 /**
  * @export

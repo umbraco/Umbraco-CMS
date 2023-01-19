@@ -6,7 +6,7 @@ import { UmbContextToken } from '@umbraco-cms/context-api';
 
 export type UmbUserStoreItemType = UserDetails;
 
-export const STORE_ALIAS = 'umbUserStore';
+export const STORE_ALIAS = 'UmbUserStore';
 
 /**
  * @export

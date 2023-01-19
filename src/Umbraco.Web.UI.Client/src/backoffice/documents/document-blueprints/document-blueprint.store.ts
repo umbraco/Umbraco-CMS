@@ -6,7 +6,7 @@ import { UmbContextToken } from '@umbraco-cms/context-api';
 
 export type UmbDocumentStoreItemType = DocumentBlueprintDetails | DocumentBlueprintTreeItem;
 
-export const STORE_ALIAS = 'umbDocumentBlueprintStore';
+export const STORE_ALIAS = 'UmbDocumentBlueprintStore';
 
 const isDocumentBlueprintDetails = (
 	documentBlueprint: DocumentBlueprintDetails | DocumentBlueprintTreeItem

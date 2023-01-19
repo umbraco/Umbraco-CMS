@@ -13,7 +13,7 @@ export const isDocumentTypeDetails = (
 
 export type UmbDocumentTypeStoreItemType = DocumentTypeDetails | DocumentTypeTreeItem;
 
-export const STORE_ALIAS = 'umbDocumentTypeStore';
+export const STORE_ALIAS = 'UmbDocumentTypeStore';
 
 /**
  * @export

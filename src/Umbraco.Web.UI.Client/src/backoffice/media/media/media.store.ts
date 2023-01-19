@@ -12,7 +12,7 @@ const isMediaDetails = (media: UmbMediaStoreItemType): media is MediaDetails => 
 // TODO: stop using ContentTreeItem.
 export type UmbMediaStoreItemType = MediaDetails | ContentTreeItem;
 
-export const STORE_ALIAS = 'umbMediaStore';
+export const STORE_ALIAS = 'UmbMediaStore';
 
 /**
  * @export

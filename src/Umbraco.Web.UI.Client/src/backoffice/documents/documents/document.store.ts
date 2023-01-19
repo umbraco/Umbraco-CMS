@@ -12,7 +12,7 @@ export const isDocumentDetails = (document: DocumentDetails | DocumentTreeItem):
 export type UmbDocumentStoreItemType = DocumentDetails | DocumentTreeItem;
 
 // TODO: research how we write names of global consts.
-export const STORE_ALIAS = 'umbDocumentStore';
+export const STORE_ALIAS = 'UmbDocumentStore';
 
 /**
  * @export

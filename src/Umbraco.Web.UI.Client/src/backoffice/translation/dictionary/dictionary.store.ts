@@ -4,7 +4,7 @@ import { DictionaryResource, EntityTreeItem } from '@umbraco-cms/backend-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/resources';
 import { UmbContextToken } from '@umbraco-cms/context-api';
 
-export const STORE_ALIAS = 'umbDictionaryStore';
+export const STORE_ALIAS = 'UmbDictionaryStore';
 
 /**
  * @export

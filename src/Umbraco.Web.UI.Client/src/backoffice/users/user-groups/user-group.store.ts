@@ -6,7 +6,7 @@ import { UmbContextToken } from '@umbraco-cms/context-api';
 // TODO: get rid of this type addition & { ... }:
 export type UmbUserGroupStoreItemType = UserGroupDetails & { users?: Array<string> };
 
-export const STORE_ALIAS = 'umbUserGroupStore';
+export const STORE_ALIAS = 'UmbUserGroupStore';
 
 /**
  * @export

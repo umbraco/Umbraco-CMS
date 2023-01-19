@@ -7,7 +7,7 @@ import { UmbContextToken } from '@umbraco-cms/context-api';
 
 export type UmbMemberGroupStoreItemType = MemberGroupDetails | EntityTreeItem;
 
-export const STORE_ALIAS = 'umbMemberGroupStore';
+export const STORE_ALIAS = 'UmbMemberGroupStore';
 
 /**
  * @export

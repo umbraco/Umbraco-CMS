@@ -7,7 +7,7 @@ import { UmbContextToken } from '@umbraco-cms/context-api';
 
 export type UmbMediaTypeStoreItemType = MediaTypeDetails | FolderTreeItem;
 
-export const STORE_ALIAS = 'umbMediaTypeStore';
+export const STORE_ALIAS = 'UmbMediaTypeStore';
 
 /**
  * @export
