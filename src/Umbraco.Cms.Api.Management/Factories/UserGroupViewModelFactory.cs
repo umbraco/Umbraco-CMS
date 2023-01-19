@@ -1,4 +1,5 @@
-﻿using Umbraco.Cms.Api.Management.ViewModels.UserGroups;
+﻿using Umbraco.Cms.Api.Management.Mapping;
+using Umbraco.Cms.Api.Management.ViewModels.UserGroups;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Membership;
@@ -37,7 +38,7 @@ public class UserGroupViewModelFactory : IUserGroupViewModelFactory
             Languages = userGroup.AllowedLanguages,
             HasAccessToAllLanguages = userGroup.HasAccessToAllLanguages,
             Permissions = userGroup.PermissionNames,
-            Sections = userGroup.AllowedSections, // TODO: Map to appropriate section names.
+            Sections = userGroup.AllowedSections.Select(SectionMapper.GetName),
         };
 
     }
@@ -64,7 +65,7 @@ public class UserGroupViewModelFactory : IUserGroupViewModelFactory
 
         foreach (var section in saveModel.Sections)
         {
-            group.AddAllowedSection(section);
+            group.AddAllowedSection(SectionMapper.GetAlias(section));
         }
 
         foreach (var language in saveModel.Languages)
