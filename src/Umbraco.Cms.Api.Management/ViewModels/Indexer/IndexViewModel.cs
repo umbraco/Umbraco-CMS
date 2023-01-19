@@ -1,16 +1,13 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Umbraco.Cms.Api.Management.ViewModels.Search;
+namespace Umbraco.Cms.Api.Management.ViewModels.Indexer;
 
 public class IndexViewModel
 {
     [Required]
     public string Name { get; init; } = null!;
 
-    public string? HealthStatus { get; init; }
-
-    [Required]
-    public bool IsHealthy => HealthStatus == "Healthy";
+    public HealthStatus HealthStatus { get; init; }
 
     [Required]
     public bool CanRebuild { get; init; }

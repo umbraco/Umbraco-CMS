@@ -815,7 +815,7 @@
         ],
         "operationId": "PostDictionaryUpload",
         "requestBody": {
-          "content": { }
+          "content": {}
         },
         "responses": {
           "200": {
@@ -1216,22 +1216,22 @@
           }
         ],
         "responses": {
-          "401": {
-            "description": "Unauthorized",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          },
           "200": {
             "description": "Success",
             "content": {
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/PagedRecycleBinItem"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
                 }
               }
             }
@@ -1266,22 +1266,22 @@
           }
         ],
         "responses": {
-          "401": {
-            "description": "Unauthorized",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          },
           "200": {
             "description": "Success",
             "content": {
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/PagedRecycleBinItem"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
                 }
               }
             }
@@ -1515,22 +1515,22 @@
           }
         ],
         "responses": {
-          "404": {
-            "description": "Not Found",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/NotFoundResult"
-                }
-              }
-            }
-          },
           "200": {
             "description": "Success",
             "content": {
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/HealthCheckGroupWithResult"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotFoundResult"
                 }
               }
             }
@@ -1554,22 +1554,22 @@
           }
         },
         "responses": {
-          "400": {
-            "description": "Bad Request",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          },
           "200": {
             "description": "Success",
             "content": {
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/HealthCheckResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
                 }
               }
             }
@@ -1624,22 +1624,22 @@
           }
         ],
         "responses": {
-          "400": {
-            "description": "Bad Request",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          },
           "200": {
             "description": "Success",
             "content": {
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/PagedHelpPage"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
                 }
               }
             }
@@ -1702,22 +1702,22 @@
           }
         ],
         "responses": {
-          "400": {
-            "description": "Bad Request",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          },
           "200": {
             "description": "Success",
             "content": {
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/Index"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
                 }
               }
             }
@@ -1742,22 +1742,22 @@
           }
         ],
         "responses": {
-          "400": {
-            "description": "Bad Request",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          },
           "200": {
             "description": "Success",
             "content": {
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/OkResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
                 }
               }
             }
@@ -1772,6 +1772,16 @@
         ],
         "operationId": "GetInstallSettings",
         "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InstallSettings"
+                }
+              }
+            }
+          },
           "400": {
             "description": "Bad Request",
             "content": {
@@ -1788,16 +1798,6 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          },
-          "200": {
-            "description": "Success",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/InstallSettings"
                 }
               }
             }
@@ -1821,6 +1821,9 @@
           }
         },
         "responses": {
+          "200": {
+            "description": "Success"
+          },
           "400": {
             "description": "Bad Request",
             "content": {
@@ -1840,9 +1843,6 @@
                 }
               }
             }
-          },
-          "200": {
-            "description": "Success"
           }
         }
       }
@@ -1863,6 +1863,9 @@
           }
         },
         "responses": {
+          "200": {
+            "description": "Success"
+          },
           "400": {
             "description": "Bad Request",
             "content": {
@@ -1872,9 +1875,6 @@
                 }
               }
             }
-          },
-          "200": {
-            "description": "Success"
           }
         }
       }
@@ -1895,6 +1895,9 @@
           }
         },
         "responses": {
+          "201": {
+            "description": "Created"
+          },
           "400": {
             "description": "Bad Request",
             "content": {
@@ -1904,9 +1907,6 @@
                 }
               }
             }
-          },
-          "201": {
-            "description": "Created"
           }
         }
       },
@@ -1965,22 +1965,22 @@
           }
         ],
         "responses": {
-          "404": {
-            "description": "Not Found",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/NotFoundResult"
-                }
-              }
-            }
-          },
           "200": {
             "description": "Success",
             "content": {
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/Language"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotFoundResult"
                 }
               }
             }
@@ -2004,6 +2004,9 @@
           }
         ],
         "responses": {
+          "200": {
+            "description": "Success"
+          },
           "400": {
             "description": "Bad Request",
             "content": {
@@ -2023,9 +2026,6 @@
                 }
               }
             }
-          },
-          "200": {
-            "description": "Success"
           }
         }
       },
@@ -2055,15 +2055,8 @@
           }
         },
         "responses": {
-          "404": {
-            "description": "Not Found",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/NotFoundResult"
-                }
-              }
-            }
+          "200": {
+            "description": "Success"
           },
           "400": {
             "description": "Bad Request",
@@ -2075,8 +2068,15 @@
               }
             }
           },
-          "200": {
-            "description": "Success"
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotFoundResult"
+                }
+              }
+            }
           }
         }
       }
@@ -2256,22 +2256,22 @@
           }
         ],
         "responses": {
-          "401": {
-            "description": "Unauthorized",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          },
           "200": {
             "description": "Success",
             "content": {
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/PagedRecycleBinItem"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
                 }
               }
             }
@@ -2306,22 +2306,22 @@
           }
         ],
         "responses": {
-          "401": {
-            "description": "Unauthorized",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          },
           "200": {
             "description": "Success",
             "content": {
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/PagedRecycleBinItem"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
                 }
               }
             }
@@ -2932,22 +2932,22 @@
           }
         ],
         "responses": {
-          "400": {
-            "description": "Bad Request",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          },
           "200": {
             "description": "Success",
             "content": {
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/PagedRedirectUrl"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
                 }
               }
             }
@@ -3490,22 +3490,22 @@
         ],
         "operationId": "GetServerStatus",
         "responses": {
-          "400": {
-            "description": "Bad Request",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          },
           "200": {
             "description": "Success",
             "content": {
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ServerStatus"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
                 }
               }
             }
@@ -3520,22 +3520,22 @@
         ],
         "operationId": "GetServerVersion",
         "responses": {
-          "400": {
-            "description": "Bad Request",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          },
           "200": {
             "description": "Success",
             "content": {
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/Version"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
                 }
               }
             }
@@ -3859,6 +3859,9 @@
           }
         },
         "responses": {
+          "200": {
+            "description": "Success"
+          },
           "400": {
             "description": "Bad Request",
             "content": {
@@ -3868,9 +3871,240 @@
                 }
               }
             }
+          }
+        }
+      }
+    },
+    "/umbraco/management/api/v1/template": {
+      "post": {
+        "tags": [
+          "Template"
+        ],
+        "operationId": "PostTemplate",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TemplateCreateModel"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
           },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/umbraco/management/api/v1/template/{key}": {
+      "get": {
+        "tags": [
+          "Template"
+        ],
+        "operationId": "GetTemplateByKey",
+        "parameters": [
+          {
+            "name": "key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Template"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Template"
+        ],
+        "operationId": "DeleteTemplateByKey",
+        "parameters": [
+          {
+            "name": "key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
           "200": {
             "description": "Success"
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Template"
+        ],
+        "operationId": "PutTemplateByKey",
+        "parameters": [
+          {
+            "name": "key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TemplateUpdateModel"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/umbraco/management/api/v1/template/query/execute": {
+      "post": {
+        "tags": [
+          "Template"
+        ],
+        "operationId": "PostTemplateQueryExecute",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TemplateQueryExecuteModel"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TemplateQueryResult"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/umbraco/management/api/v1/template/query/settings": {
+      "get": {
+        "tags": [
+          "Template"
+        ],
+        "operationId": "GetTemplateQuerySettings",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TemplateQuerySettings"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/umbraco/management/api/v1/template/scaffold": {
+      "get": {
+        "tags": [
+          "Template"
+        ],
+        "operationId": "GetTemplateScaffold",
+        "parameters": [
+          {
+            "name": "masterTemplateAlias",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TemplateScaffold"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
           }
         }
       }
@@ -4237,7 +4471,6 @@
             "items": {
               "$ref": "#/components/schemas/TypeInfo"
             },
-            "nullable": true,
             "readOnly": true
           },
           "exportedTypes": {
@@ -4245,7 +4478,6 @@
             "items": {
               "$ref": "#/components/schemas/Type"
             },
-            "nullable": true,
             "readOnly": true
           },
           "codeBase": {
@@ -4264,7 +4496,6 @@
           },
           "imageRuntimeVersion": {
             "type": "string",
-            "nullable": true,
             "readOnly": true
           },
           "isDynamic": {
@@ -4273,7 +4504,6 @@
           },
           "location": {
             "type": "string",
-            "nullable": true,
             "readOnly": true
           },
           "reflectionOnly": {
@@ -4293,12 +4523,10 @@
             "items": {
               "$ref": "#/components/schemas/CustomAttributeData"
             },
-            "nullable": true,
             "readOnly": true
           },
           "escapedCodeBase": {
             "type": "string",
-            "nullable": true,
             "readOnly": true,
             "deprecated": true
           },
@@ -4310,7 +4538,6 @@
             "items": {
               "$ref": "#/components/schemas/Module"
             },
-            "nullable": true,
             "readOnly": true
           },
           "globalAssemblyCache": {
@@ -4364,8 +4591,7 @@
             "$ref": "#/components/schemas/TelemetryLevel"
           },
           "description": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           }
         },
         "additionalProperties": false
@@ -4375,7 +4601,6 @@
         "properties": {
           "name": {
             "type": "string",
-            "nullable": true,
             "readOnly": true
           },
           "declaringType": {
@@ -4392,7 +4617,6 @@
             "items": {
               "$ref": "#/components/schemas/CustomAttributeData"
             },
-            "nullable": true,
             "readOnly": true
           },
           "isCollectible": {
@@ -4582,16 +4806,13 @@
         "type": "object",
         "properties": {
           "name": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "type": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "icon": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "hasChildren": {
             "type": "boolean"
@@ -4610,6 +4831,9 @@
           },
           "noAccess": {
             "type": "boolean"
+          },
+          "isTrashed": {
+            "type": "boolean"
           }
         },
         "additionalProperties": false
@@ -4624,15 +4848,13 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/IOutputFormatter"
-            },
-            "nullable": true
+            }
           },
           "contentTypes": {
             "type": "array",
             "items": {
               "type": "string"
-            },
-            "nullable": true
+            }
           },
           "declaredType": {
             "$ref": "#/components/schemas/Type"
@@ -4643,8 +4865,7 @@
             "nullable": true
           },
           "location": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           }
         },
         "additionalProperties": false
@@ -4653,12 +4874,10 @@
         "type": "object",
         "properties": {
           "name": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "englishName": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           }
         },
         "additionalProperties": false
@@ -4677,7 +4896,6 @@
             "items": {
               "$ref": "#/components/schemas/CustomAttributeTypedArgument"
             },
-            "nullable": true,
             "readOnly": true
           },
           "namedArguments": {
@@ -4685,7 +4903,6 @@
             "items": {
               "$ref": "#/components/schemas/CustomAttributeNamedArgument"
             },
-            "nullable": true,
             "readOnly": true
           }
         },
@@ -4702,7 +4919,6 @@
           },
           "memberName": {
             "type": "string",
-            "nullable": true,
             "readOnly": true
           },
           "isField": {
@@ -4728,12 +4944,10 @@
         "type": "object",
         "properties": {
           "name": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "propertyEditorAlias": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "propertyEditorUiAlias": {
             "type": "string",
@@ -4743,8 +4957,7 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/DataTypeProperty"
-            },
-            "nullable": true
+            }
           },
           "key": {
             "type": "string",
@@ -4762,12 +4975,10 @@
         "type": "object",
         "properties": {
           "name": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "propertyEditorAlias": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "propertyEditorUiAlias": {
             "type": "string",
@@ -4777,8 +4988,7 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/DataTypeProperty"
-            },
-            "nullable": true
+            }
           },
           "parentKey": {
             "type": "string",
@@ -4792,8 +5002,7 @@
         "type": "object",
         "properties": {
           "alias": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "value": {
             "nullable": true
@@ -4805,12 +5014,10 @@
         "type": "object",
         "properties": {
           "name": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "alias": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           }
         },
         "additionalProperties": false
@@ -4823,15 +5030,13 @@
             "format": "uuid"
           },
           "type": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "properties": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/DataTypePropertyReference"
-            },
-            "nullable": true
+            }
           }
         },
         "additionalProperties": false
@@ -4840,12 +5045,10 @@
         "type": "object",
         "properties": {
           "name": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "propertyEditorAlias": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "propertyEditorUiAlias": {
             "type": "string",
@@ -4855,8 +5058,7 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/DataTypeProperty"
-            },
-            "nullable": true
+            }
           }
         },
         "additionalProperties": false
@@ -4914,16 +5116,13 @@
             "format": "int32"
           },
           "displayName": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "defaultDatabaseName": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "providerName": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "isConfigured": {
             "type": "boolean"
@@ -4932,8 +5131,7 @@
             "type": "boolean"
           },
           "serverPlaceholder": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "requiresCredentials": {
             "type": "boolean"
@@ -4962,22 +5160,19 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/DictionaryTranslation"
-            },
-            "nullable": true
+            }
           },
           "contentApps": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/ContentApp"
-            },
-            "nullable": true
+            }
           },
           "notifications": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/BackOfficeNotification"
             },
-            "nullable": true,
             "readOnly": true
           },
           "name": {
@@ -4989,8 +5184,7 @@
             "format": "uuid"
           },
           "path": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           }
         },
         "additionalProperties": false
@@ -5002,8 +5196,7 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/DictionaryItemsImport"
-            },
-            "nullable": true
+            }
           },
           "tempFileName": {
             "type": "string",
@@ -5061,7 +5254,6 @@
             "items": {
               "$ref": "#/components/schemas/DictionaryTranslationOverview"
             },
-            "nullable": true,
             "readOnly": true
           }
         },
@@ -5087,8 +5279,7 @@
             "nullable": true
           },
           "translation": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "languageId": {
             "type": "integer",
@@ -5114,16 +5305,13 @@
         "type": "object",
         "properties": {
           "name": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "type": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "icon": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "hasChildren": {
             "type": "boolean"
@@ -5145,8 +5333,7 @@
             "format": "uuid"
           },
           "documentTypeAlias": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "documentTypeName": {
             "type": "string",
@@ -5159,16 +5346,13 @@
         "type": "object",
         "properties": {
           "name": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "type": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "icon": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "hasChildren": {
             "type": "boolean"
@@ -5188,6 +5372,9 @@
           "noAccess": {
             "type": "boolean"
           },
+          "isTrashed": {
+            "type": "boolean"
+          },
           "isProtected": {
             "type": "boolean"
           },
@@ -5204,16 +5391,13 @@
         "type": "object",
         "properties": {
           "name": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "type": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "icon": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "hasChildren": {
             "type": "boolean"
@@ -5243,16 +5427,13 @@
         "type": "object",
         "properties": {
           "name": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "type": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "icon": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "hasChildren": {
             "type": "boolean"
@@ -5287,7 +5468,6 @@
         "properties": {
           "name": {
             "type": "string",
-            "nullable": true,
             "readOnly": true
           },
           "declaringType": {
@@ -5304,7 +5484,6 @@
             "items": {
               "$ref": "#/components/schemas/CustomAttributeData"
             },
-            "nullable": true,
             "readOnly": true
           },
           "isCollectible": {
@@ -5349,15 +5528,13 @@
         "type": "object",
         "properties": {
           "name": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "values": {
             "type": "array",
             "items": {
               "type": "string"
-            },
-            "nullable": true
+            }
           }
         },
         "additionalProperties": false
@@ -5392,7 +5569,6 @@
         "properties": {
           "name": {
             "type": "string",
-            "nullable": true,
             "readOnly": true
           },
           "declaringType": {
@@ -5409,7 +5585,6 @@
             "items": {
               "$ref": "#/components/schemas/CustomAttributeData"
             },
-            "nullable": true,
             "readOnly": true
           },
           "isCollectible": {
@@ -5500,23 +5675,19 @@
         "type": "object",
         "properties": {
           "name": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "type": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "icon": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "hasChildren": {
             "type": "boolean"
           },
           "path": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "isFolder": {
             "type": "boolean"
@@ -5528,8 +5699,7 @@
         "type": "object",
         "properties": {
           "name": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "key": {
             "type": "string",
@@ -5547,8 +5717,7 @@
         "type": "object",
         "properties": {
           "name": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "parentKey": {
             "type": "string",
@@ -5562,16 +5731,13 @@
         "type": "object",
         "properties": {
           "name": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "type": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "icon": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "hasChildren": {
             "type": "boolean"
@@ -5598,8 +5764,7 @@
         "type": "object",
         "properties": {
           "name": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           }
         },
         "additionalProperties": false
@@ -5626,8 +5791,7 @@
             "format": "uuid"
           },
           "name": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "description": {
             "type": "string",
@@ -5684,8 +5848,7 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/HealthCheck"
-            },
-            "nullable": true
+            }
           }
         },
         "additionalProperties": false
@@ -5701,8 +5864,7 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/HealthCheckWithResult"
-            },
-            "nullable": true
+            }
           }
         },
         "additionalProperties": false
@@ -5711,8 +5873,7 @@
         "type": "object",
         "properties": {
           "message": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "resultType": {
             "$ref": "#/components/schemas/StatusResultType"
@@ -5739,8 +5900,7 @@
             "format": "uuid"
           },
           "name": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "description": {
             "type": "string",
@@ -5755,6 +5915,15 @@
           }
         },
         "additionalProperties": false
+      },
+      "HealthStatus": {
+        "enum": [
+          "Healthy",
+          "Unhealthy",
+          "Rebuilding"
+        ],
+        "type": "integer",
+        "format": "int32"
       },
       "HelpPage": {
         "type": "object",
@@ -5791,7 +5960,6 @@
           "canRebuild",
           "documentCount",
           "fieldCount",
-          "isHealthy",
           "name"
         ],
         "type": "object",
@@ -5801,19 +5969,13 @@
             "type": "string"
           },
           "healthStatus": {
-            "type": "string",
-            "nullable": true
-          },
-          "isHealthy": {
-            "type": "boolean",
-            "readOnly": true
+            "$ref": "#/components/schemas/HealthStatus"
           },
           "canRebuild": {
             "type": "boolean"
           },
           "searcherName": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "documentCount": {
             "type": "integer",
@@ -5825,7 +5987,7 @@
           },
           "providerProperties": {
             "type": "object",
-            "additionalProperties": { },
+            "additionalProperties": {},
             "nullable": true
           }
         },
@@ -5860,8 +6022,7 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/DatabaseSettings"
-            },
-            "nullable": true
+            }
           }
         },
         "additionalProperties": false
@@ -5874,16 +6035,12 @@
         "type": "object",
         "properties": {
           "op": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "path": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
-          "value": {
-            "nullable": true
-          }
+          "value": { }
         },
         "additionalProperties": false
       },
@@ -5936,7 +6093,6 @@
           },
           "name": {
             "type": "string",
-            "nullable": true,
             "readOnly": true
           },
           "declaringType": {
@@ -5953,7 +6109,6 @@
             "items": {
               "$ref": "#/components/schemas/CustomAttributeData"
             },
-            "nullable": true,
             "readOnly": true
           },
           "isCollectible": {
@@ -6021,7 +6176,6 @@
           },
           "name": {
             "type": "string",
-            "nullable": true,
             "readOnly": true
           },
           "declaringType": {
@@ -6038,7 +6192,6 @@
             "items": {
               "$ref": "#/components/schemas/CustomAttributeData"
             },
-            "nullable": true,
             "readOnly": true
           },
           "isCollectible": {
@@ -6173,7 +6326,6 @@
         "properties": {
           "name": {
             "type": "string",
-            "nullable": true,
             "readOnly": true
           },
           "declaringType": {
@@ -6190,7 +6342,6 @@
             "items": {
               "$ref": "#/components/schemas/CustomAttributeData"
             },
-            "nullable": true,
             "readOnly": true
           },
           "isCollectible": {
@@ -6357,12 +6508,10 @@
           },
           "fullyQualifiedName": {
             "type": "string",
-            "nullable": true,
             "readOnly": true
           },
           "name": {
             "type": "string",
-            "nullable": true,
             "readOnly": true
           },
           "mdStreamVersion": {
@@ -6377,7 +6526,6 @@
           },
           "scopeName": {
             "type": "string",
-            "nullable": true,
             "readOnly": true
           },
           "moduleHandle": {
@@ -6388,7 +6536,6 @@
             "items": {
               "$ref": "#/components/schemas/CustomAttributeData"
             },
-            "nullable": true,
             "readOnly": true
           },
           "metadataToken": {
@@ -6440,6 +6587,20 @@
           }
         },
         "additionalProperties": false
+      },
+      "Operator": {
+        "enum": [
+          "Equals",
+          "NotEquals",
+          "Contains",
+          "NotContains",
+          "LessThan",
+          "LessThanEqualTo",
+          "GreaterThan",
+          "GreaterThanEqualTo"
+        ],
+        "type": "integer",
+        "format": "int32"
       },
       "OutOfDateStatus": {
         "type": "object",
@@ -6935,7 +7096,6 @@
             "items": {
               "$ref": "#/components/schemas/CustomAttributeData"
             },
-            "nullable": true,
             "readOnly": true
           },
           "metadataToken": {
@@ -6971,7 +7131,7 @@
             "nullable": true
           }
         },
-        "additionalProperties": { }
+        "additionalProperties": {}
       },
       "ProfilingStatus": {
         "type": "object",
@@ -7001,7 +7161,6 @@
         "properties": {
           "name": {
             "type": "string",
-            "nullable": true,
             "readOnly": true
           },
           "declaringType": {
@@ -7018,7 +7177,6 @@
             "items": {
               "$ref": "#/components/schemas/CustomAttributeData"
             },
-            "nullable": true,
             "readOnly": true
           },
           "isCollectible": {
@@ -7068,16 +7226,13 @@
             "format": "uuid"
           },
           "name": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "type": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "icon": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "hasChildren": {
             "type": "boolean"
@@ -7109,12 +7264,10 @@
             "format": "uuid"
           },
           "originalUrl": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "destinationUrl": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "created": {
             "type": "string",
@@ -7256,8 +7409,7 @@
         "type": "object",
         "properties": {
           "id": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "score": {
             "type": "number",
@@ -7272,8 +7424,7 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/Field"
-            },
-            "nullable": true
+            }
           }
         },
         "additionalProperties": false
@@ -7282,8 +7433,7 @@
         "type": "object",
         "properties": {
           "name": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           }
         },
         "additionalProperties": false
@@ -7320,7 +7470,6 @@
         "type": "object",
         "properties": {
           "typeId": {
-            "nullable": true,
             "readOnly": true
           },
           "value": {
@@ -7347,12 +7496,224 @@
         "type": "integer",
         "format": "int32"
       },
+      "Template": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "alias": {
+            "type": "string"
+          },
+          "content": {
+            "type": "string",
+            "nullable": true
+          },
+          "key": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        "additionalProperties": false
+      },
+      "TemplateCreateModel": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "alias": {
+            "type": "string"
+          },
+          "content": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "TemplateQueryExecuteFilterModel": {
+        "type": "object",
+        "properties": {
+          "propertyAlias": {
+            "type": "string"
+          },
+          "constraintValue": {
+            "type": "string"
+          },
+          "operator": {
+            "$ref": "#/components/schemas/Operator"
+          }
+        },
+        "additionalProperties": false
+      },
+      "TemplateQueryExecuteModel": {
+        "type": "object",
+        "properties": {
+          "rootContentKey": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          },
+          "contentTypeAlias": {
+            "type": "string",
+            "nullable": true
+          },
+          "filters": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TemplateQueryExecuteFilterModel"
+            },
+            "nullable": true
+          },
+          "sort": {
+            "$ref": "#/components/schemas/TemplateQueryExecuteSortModel"
+          },
+          "take": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "additionalProperties": false
+      },
+      "TemplateQueryExecuteSortModel": {
+        "type": "object",
+        "properties": {
+          "propertyAlias": {
+            "type": "string"
+          },
+          "direction": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "TemplateQueryOperator": {
+        "type": "object",
+        "properties": {
+          "operator": {
+            "$ref": "#/components/schemas/Operator"
+          },
+          "applicableTypes": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TemplateQueryPropertyType"
+            }
+          }
+        },
+        "additionalProperties": false
+      },
+      "TemplateQueryProperty": {
+        "type": "object",
+        "properties": {
+          "alias": {
+            "type": "string"
+          },
+          "type": {
+            "$ref": "#/components/schemas/TemplateQueryPropertyType"
+          }
+        },
+        "additionalProperties": false
+      },
+      "TemplateQueryPropertyType": {
+        "enum": [
+          "String",
+          "DateTime",
+          "Integer"
+        ],
+        "type": "integer",
+        "format": "int32"
+      },
+      "TemplateQueryResult": {
+        "type": "object",
+        "properties": {
+          "queryExpression": {
+            "type": "string"
+          },
+          "sampleResults": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TemplateQueryResultItem"
+            }
+          },
+          "resultCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "executionTime": {
+            "type": "integer",
+            "format": "int64"
+          }
+        },
+        "additionalProperties": false
+      },
+      "TemplateQueryResultItem": {
+        "type": "object",
+        "properties": {
+          "icon": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "TemplateQuerySettings": {
+        "type": "object",
+        "properties": {
+          "contentTypeAliases": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "properties": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TemplateQueryProperty"
+            }
+          },
+          "operators": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TemplateQueryOperator"
+            }
+          }
+        },
+        "additionalProperties": false
+      },
+      "TemplateScaffold": {
+        "type": "object",
+        "properties": {
+          "content": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "TemplateUpdateModel": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "alias": {
+            "type": "string"
+          },
+          "content": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
       "Type": {
         "type": "object",
         "properties": {
           "name": {
             "type": "string",
-            "nullable": true,
             "readOnly": true
           },
           "customAttributes": {
@@ -7360,7 +7721,6 @@
             "items": {
               "$ref": "#/components/schemas/CustomAttributeData"
             },
-            "nullable": true,
             "readOnly": true
           },
           "isCollectible": {
@@ -7477,7 +7837,6 @@
             "items": {
               "$ref": "#/components/schemas/Type"
             },
-            "nullable": true,
             "readOnly": true
           },
           "genericParameterPosition": {
@@ -7682,7 +8041,6 @@
         "properties": {
           "name": {
             "type": "string",
-            "nullable": true,
             "readOnly": true
           },
           "customAttributes": {
@@ -7690,7 +8048,6 @@
             "items": {
               "$ref": "#/components/schemas/CustomAttributeData"
             },
-            "nullable": true,
             "readOnly": true
           },
           "isCollectible": {
@@ -7807,7 +8164,6 @@
             "items": {
               "$ref": "#/components/schemas/Type"
             },
-            "nullable": true,
             "readOnly": true
           },
           "genericParameterPosition": {
@@ -7971,7 +8327,6 @@
             "items": {
               "$ref": "#/components/schemas/Type"
             },
-            "nullable": true,
             "readOnly": true
           },
           "declaredConstructors": {
@@ -7979,7 +8334,6 @@
             "items": {
               "$ref": "#/components/schemas/ConstructorInfo"
             },
-            "nullable": true,
             "readOnly": true
           },
           "declaredEvents": {
@@ -7987,7 +8341,6 @@
             "items": {
               "$ref": "#/components/schemas/EventInfo"
             },
-            "nullable": true,
             "readOnly": true
           },
           "declaredFields": {
@@ -7995,7 +8348,6 @@
             "items": {
               "$ref": "#/components/schemas/FieldInfo"
             },
-            "nullable": true,
             "readOnly": true
           },
           "declaredMembers": {
@@ -8003,7 +8355,6 @@
             "items": {
               "$ref": "#/components/schemas/MemberInfo"
             },
-            "nullable": true,
             "readOnly": true
           },
           "declaredMethods": {
@@ -8011,7 +8362,6 @@
             "items": {
               "$ref": "#/components/schemas/MethodInfo"
             },
-            "nullable": true,
             "readOnly": true
           },
           "declaredNestedTypes": {
@@ -8019,7 +8369,6 @@
             "items": {
               "$ref": "#/components/schemas/TypeInfo"
             },
-            "nullable": true,
             "readOnly": true
           },
           "declaredProperties": {
@@ -8027,7 +8376,6 @@
             "items": {
               "$ref": "#/components/schemas/PropertyInfo"
             },
-            "nullable": true,
             "readOnly": true
           },
           "implementedInterfaces": {
@@ -8035,7 +8383,6 @@
             "items": {
               "$ref": "#/components/schemas/Type"
             },
-            "nullable": true,
             "readOnly": true
           }
         },
@@ -8045,24 +8392,19 @@
         "type": "object",
         "properties": {
           "currentState": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "newState": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "newVersion": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "oldVersion": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "reportUrl": {
             "type": "string",
-            "nullable": true,
             "readOnly": true
           }
         },
@@ -8112,8 +8454,7 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/ConsentLevel"
-            },
-            "nullable": true
+            }
           }
         },
         "additionalProperties": false
@@ -8122,8 +8463,7 @@
         "type": "object",
         "properties": {
           "version": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           }
         },
         "additionalProperties": false
@@ -8137,7 +8477,7 @@
           "authorizationCode": {
             "authorizationUrl": "/umbraco/management/api/v1.0/security/back-office/authorize",
             "tokenUrl": "/umbraco/management/api/v1.0/security/back-office/token",
-            "scopes": { }
+            "scopes": {}
           }
         }
       }
@@ -8145,7 +8485,7 @@
   },
   "security": [
     {
-      "OAuth": [ ]
+      "OAuth": []
     }
   ]
 }
