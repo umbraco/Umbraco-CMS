@@ -70,7 +70,7 @@ public class Upgrader
             }
 
             // execute plan
-            var state = migrationPlanExecutor.Execute(Plan, currentState);
+            var state = migrationPlanExecutor.ExecutePlan(Plan, currentState).FinalState;
             if (string.IsNullOrWhiteSpace(state))
             {
                 throw new InvalidOperationException("Plan execution returned an invalid null or empty state.");

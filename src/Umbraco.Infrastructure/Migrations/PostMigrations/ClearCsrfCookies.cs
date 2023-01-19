@@ -6,6 +6,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.PostMigrations;
 /// <summary>
 ///     Clears Csrf tokens.
 /// </summary>
+[Obsolete("Removed in the V13, and replaced with a notification handler")]
 public class ClearCsrfCookies : MigrationBase
 {
     private readonly ICookieManager _cookieManager;

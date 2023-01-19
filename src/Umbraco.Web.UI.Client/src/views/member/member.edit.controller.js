@@ -33,6 +33,7 @@ function MemberEditController($scope, $routeParams, $location, $http, $q, appSta
     $scope.page.nameLocked = false;
     $scope.page.saveButtonState = "init";
     $scope.page.exportButton = "init";
+    $scope.page.hideActionsMenu = infiniteMode ? true : false;
 
     //build a path to sync the tree with
     function buildTreePath(data) {
