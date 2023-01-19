@@ -9,7 +9,7 @@ using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Core.Services;
 
-internal class DictionaryItemService : RepositoryService, IDictionaryItemService
+internal sealed class DictionaryItemService : RepositoryService, IDictionaryItemService
 {
     private readonly IDictionaryRepository _dictionaryRepository;
     private readonly IAuditRepository _auditRepository;

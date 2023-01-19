@@ -10,7 +10,7 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Services;
 
-internal class LanguageService : RepositoryService, ILanguageService
+internal sealed class LanguageService : RepositoryService, ILanguageService
 {
     private readonly ILanguageRepository _languageRepository;
     private readonly IAuditRepository _auditRepository;
