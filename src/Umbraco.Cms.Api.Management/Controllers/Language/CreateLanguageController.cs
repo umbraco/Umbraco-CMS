@@ -1,61 +1,50 @@
-﻿using System.Globalization;
-using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Umbraco.Cms.Core.Mapping;
-using Umbraco.Cms.Core.Models;
-using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Api.Management.Factories;
 using Umbraco.Cms.Api.Management.ViewModels.Language;
-using Umbraco.New.Cms.Core.Services.Installer;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Security;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Language;
 
 public class CreateLanguageController : LanguageControllerBase
 {
-    private readonly ILanguageService _languageService;
-    private readonly IUmbracoMapper _umbracoMapper;
+    private readonly ILanguageFactory _languageFactory;
     private readonly ILocalizationService _localizationService;
+    private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
 
-    public CreateLanguageController(ILanguageService languageService, IUmbracoMapper umbracoMapper, ILocalizationService localizationService)
+    public CreateLanguageController(
+        ILanguageFactory languageFactory,
+        ILocalizationService localizationService,
+        IBackOfficeSecurityAccessor backOfficeSecurityAccessor)
     {
-        _languageService = languageService;
-        _umbracoMapper = umbracoMapper;
+        _languageFactory = languageFactory;
         _localizationService = localizationService;
+        _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
     }
 
-    /// <summary>
-    ///     Creates or saves a language
-    /// </summary>
     [HttpPost]
     [MapToApiVersion("1.0")]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status201Created)]
-    // TODO: This needs to be an authorized endpoint.
-    public async Task<ActionResult> Create(LanguageViewModel language)
+    public async Task<IActionResult> Create(LanguageCreateModel languageCreateModel)
     {
-        if (_languageService.LanguageAlreadyExists(language.Id, language.IsoCode))
+        ILanguage created = _languageFactory.MapCreateModelToLanguage(languageCreateModel);
+
+        Attempt<ILanguage, LanguageOperationStatus> result = _localizationService.Create(created, CurrentUserId(_backOfficeSecurityAccessor));
+
+        if (result.Success)
         {
-            // Someone is trying to create a language that already exist
-            ModelState.AddModelError("IsoCode", "The language " + language.IsoCode + " already exists");
-            return ValidationProblem(ModelState);
+            return await Task.FromResult(
+                CreatedAtAction<ByIsoCodeLanguageController>(
+                    controller => nameof(controller.ByIsoCode),
+                    new { isoCode = result.Result.IsoCode }));
         }
 
-        // Creating a new lang...
-        CultureInfo culture;
-        try
-        {
-            culture = CultureInfo.GetCultureInfo(language.IsoCode);
-        }
-        catch (CultureNotFoundException)
-        {
-            ModelState.AddModelError("IsoCode", "No Culture found with name " + language.IsoCode);
-            return ValidationProblem(ModelState);
-        }
-
-        language.Name ??= culture.EnglishName;
-
-        ILanguage newLang = _umbracoMapper.Map<ILanguage>(language)!;
-
-        _localizationService.Save(newLang);
-        return await Task.FromResult(Created($"api/v1.0/language/{newLang.Id}", null));
+        return LanguageOperationStatusResult(result.Status);
     }
 }

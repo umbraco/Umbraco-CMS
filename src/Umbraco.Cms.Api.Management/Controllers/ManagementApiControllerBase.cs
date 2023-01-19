@@ -10,6 +10,9 @@ namespace Umbraco.Cms.Api.Management.Controllers;
 public class ManagementApiControllerBase : Controller
 {
     protected CreatedAtActionResult CreatedAtAction<T>(Expression<Func<T, string>> action, Guid key)
+        => CreatedAtAction(action, new { key = key });
+
+    protected CreatedAtActionResult CreatedAtAction<T>(Expression<Func<T, string>> action, object routeValues)
     {
         if (action.Body is not ConstantExpression constantExpression)
         {
@@ -19,7 +22,7 @@ public class ManagementApiControllerBase : Controller
         var controllerName = ManagementApiRegexes.ControllerTypeToNameRegex().Replace(typeof(T).Name, string.Empty);
         var actionName = constantExpression.Value?.ToString() ?? throw new ArgumentException("Expression does not have a value.");
 
-        return base.CreatedAtAction(actionName, controllerName, new { key = key }, null);
+        return base.CreatedAtAction(actionName, controllerName, routeValues, null);
     }
 
     protected static int CurrentUserId(IBackOfficeSecurityAccessor backOfficeSecurityAccessor)

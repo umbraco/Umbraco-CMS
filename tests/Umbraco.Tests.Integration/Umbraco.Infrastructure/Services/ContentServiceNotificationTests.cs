@@ -69,7 +69,7 @@ public class ContentServiceNotificationTests : UmbracoIntegrationTest
     [Test]
     public void Saving_Culture()
     {
-        LocalizationService.Save(new Language("fr-FR", "French (France)"));
+        LocalizationService.Create(new Language("fr-FR", "French (France)"));
 
         _contentType.Variations = ContentVariation.Culture;
         foreach (var propertyType in _contentType.PropertyTypes)
@@ -180,7 +180,7 @@ public class ContentServiceNotificationTests : UmbracoIntegrationTest
     [Test]
     public void Publishing_Culture()
     {
-        LocalizationService.Save(new Language("fr-FR", "French (France)"));
+        LocalizationService.Create(new Language("fr-FR", "French (France)"));
 
         _contentType.Variations = ContentVariation.Culture;
         foreach (var propertyType in _contentType.PropertyTypes)
@@ -340,7 +340,7 @@ public class ContentServiceNotificationTests : UmbracoIntegrationTest
     [Test]
     public void Unpublishing_Culture()
     {
-        LocalizationService.Save(new Language("fr-FR", "French (France)"));
+        LocalizationService.Create(new Language("fr-FR", "French (France)"));
 
         _contentType.Variations = ContentVariation.Culture;
         foreach (var propertyType in _contentType.PropertyTypes)

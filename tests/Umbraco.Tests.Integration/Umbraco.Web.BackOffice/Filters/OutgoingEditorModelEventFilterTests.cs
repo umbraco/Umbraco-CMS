@@ -94,8 +94,8 @@ public class OutgoingEditorModelEventFilterTests : UmbracoTestServerTestBase
             .WithIsDefault(false)
             .Build();
 
-        localizationService.Save(dkLang);
-        localizationService.Save(sweLang);
+        localizationService.Create(dkLang);
+        localizationService.Create(sweLang);
 
         var content = new ContentBuilder()
             .WithoutIdentity()

@@ -265,7 +265,7 @@ public class ContentTypeServiceVariantsTests : UmbracoIntegrationTest
         var nlContentName = "Content nl-NL";
         var nlCulture = "nl-NL";
 
-        LocalizationService.Save(new Language(nlCulture, "Dutch (Netherlands)"));
+        LocalizationService.Create(new Language(nlCulture, "Dutch (Netherlands)"));
 
         var includeCultureNames = contentType.Variations.HasFlag(ContentVariation.Culture);
 
@@ -633,9 +633,9 @@ public class ContentTypeServiceVariantsTests : UmbracoIntegrationTest
         var globalSettings = new GlobalSettings();
 
         var languageEn = new Language("en", "English") { IsDefault = true };
-        LocalizationService.Save(languageEn);
+        LocalizationService.Create(languageEn);
         var languageFr = new Language("fr", "French");
-        LocalizationService.Save(languageFr);
+        LocalizationService.Create(languageFr);
 
         var contentType = CreateContentType(ContentVariation.Nothing);
 
@@ -1279,9 +1279,9 @@ public class ContentTypeServiceVariantsTests : UmbracoIntegrationTest
     private void CreateFrenchAndEnglishLangs()
     {
         var languageEn = new Language("en", "English") { IsDefault = true };
-        LocalizationService.Save(languageEn);
+        LocalizationService.Create(languageEn);
         var languageFr = new Language("fr", "French");
-        LocalizationService.Save(languageFr);
+        LocalizationService.Create(languageFr);
     }
 
     private IContentType CreateContentType(ContentVariation variance, string alias = "contentType") =>

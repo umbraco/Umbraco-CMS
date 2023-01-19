@@ -1,66 +1,53 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Umbraco.Cms.Core.Mapping;
-using Umbraco.Cms.Core.Models;
-using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Api.Management.Factories;
 using Umbraco.Cms.Api.Management.ViewModels.Language;
-using Umbraco.New.Cms.Core.Services.Installer;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Security;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Language;
 
 public class UpdateLanguageController : LanguageControllerBase
 {
-    private readonly ILanguageService _languageService;
-    private readonly IUmbracoMapper _umbracoMapper;
+    private readonly ILanguageFactory _languageFactory;
     private readonly ILocalizationService _localizationService;
+    private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
 
-    public UpdateLanguageController(ILanguageService languageService, IUmbracoMapper umbracoMapper, ILocalizationService localizationService)
+    public UpdateLanguageController(
+        ILanguageFactory languageFactory,
+        ILocalizationService localizationService,
+        IBackOfficeSecurityAccessor backOfficeSecurityAccessor)
     {
-        _languageService = languageService;
-        _umbracoMapper = umbracoMapper;
+        _languageFactory = languageFactory;
         _localizationService = localizationService;
+        _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
     }
 
-    /// <summary>
-    ///     Updates a language
-    /// </summary>
-    [HttpPut("{id:int}")]
+    [HttpPut("{isoCode}")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(NotFoundResult), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    // TODO: This needs to be an authorized endpoint.
-    public async Task<ActionResult> Update(int id, LanguageViewModel language)
+    public async Task<IActionResult> Update(string isoCode, LanguageUpdateModel languageUpdateModel)
     {
-        ILanguage? existingById = _localizationService.GetLanguageById(id);
-        if (existingById is null)
+        ILanguage? current = _localizationService.GetLanguageByIsoCode(isoCode);
+        if (current is null)
         {
-            return await Task.FromResult(NotFound());
+            return NotFound();
         }
 
-        // note that the service will prevent the default language from being "un-defaulted"
-        // but does not hurt to test here - though the UI should prevent it too
-        if (existingById.IsDefault && !language.IsDefault)
+        ILanguage updated = _languageFactory.MapUpdateModelToLanguage(current, languageUpdateModel);
+
+        Attempt<ILanguage, LanguageOperationStatus> result = _localizationService.Update(updated, CurrentUserId(_backOfficeSecurityAccessor));
+
+        if (result.Success)
         {
-            ModelState.AddModelError("IsDefault", "Cannot un-default the default language.");
-            return await Task.FromResult(ValidationProblem(ModelState));
+            return await Task.FromResult(Ok());
         }
 
-        existingById = _umbracoMapper.Map(language, existingById);
-
-        if (!_languageService.CanUseLanguagesFallbackLanguage(existingById))
-        {
-            ModelState.AddModelError("FallbackLanguage", "The selected fall back language does not exist.");
-            return await Task.FromResult(ValidationProblem(ModelState));
-        }
-
-        if (!_languageService.CanGetProperFallbackLanguage(existingById))
-        {
-            ModelState.AddModelError("FallbackLanguage", $"The selected fall back language {_localizationService.GetLanguageById(existingById.FallbackLanguageId!.Value)} would create a circular path.");
-            return await Task.FromResult(ValidationProblem(ModelState));
-        }
-
-        _localizationService.Save(existingById);
-        return await Task.FromResult(Ok());
+        return LanguageOperationStatusResult(result.Status);
     }
 }

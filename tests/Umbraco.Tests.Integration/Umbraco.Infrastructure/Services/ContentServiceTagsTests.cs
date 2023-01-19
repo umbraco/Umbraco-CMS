@@ -95,7 +95,7 @@ public class ContentServiceTagsTests : UmbracoIntegrationTest
         var language = new LanguageBuilder()
             .WithCultureInfo("fr-FR")
             .Build();
-        LocalizationService.Save(language); // en-US is already there
+        LocalizationService.Create(language); // en-US is already there
 
         var template = TemplateBuilder.CreateTextPageTemplate();
         FileService.SaveTemplate(template);
@@ -229,7 +229,7 @@ public class ContentServiceTagsTests : UmbracoIntegrationTest
         var language = new LanguageBuilder()
             .WithCultureInfo("fr-FR")
             .Build();
-        LocalizationService.Save(language); // en-US is already there
+        LocalizationService.Create(language); // en-US is already there
 
         var enId = LocalizationService.GetLanguageIdByIsoCode("en-US").Value;
 
@@ -290,7 +290,7 @@ public class ContentServiceTagsTests : UmbracoIntegrationTest
         var language = new LanguageBuilder()
             .WithCultureInfo("fr-FR")
             .Build();
-        LocalizationService.Save(language); // en-US is already there
+        LocalizationService.Create(language); // en-US is already there
 
         var enId = LocalizationService.GetLanguageIdByIsoCode("en-US").Value;
 
@@ -337,7 +337,7 @@ public class ContentServiceTagsTests : UmbracoIntegrationTest
         var language = new LanguageBuilder()
             .WithCultureInfo("fr-FR")
             .Build();
-        LocalizationService.Save(language); // en-US is already there
+        LocalizationService.Create(language); // en-US is already there
 
         var enId = LocalizationService.GetLanguageIdByIsoCode("en-US").Value;
 
@@ -401,7 +401,7 @@ public class ContentServiceTagsTests : UmbracoIntegrationTest
         var language = new LanguageBuilder()
             .WithCultureInfo("fr-FR")
             .Build();
-        LocalizationService.Save(language); // en-US is already there
+        LocalizationService.Create(language); // en-US is already there
 
         var template = TemplateBuilder.CreateTextPageTemplate();
         FileService.SaveTemplate(template);

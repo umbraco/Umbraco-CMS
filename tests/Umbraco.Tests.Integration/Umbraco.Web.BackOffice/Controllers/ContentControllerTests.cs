@@ -35,7 +35,7 @@ public class ContentControllerTests : UmbracoTestServerTestBase
         var localizationService = GetRequiredService<ILocalizationService>();
 
         // Add another language
-        localizationService.Save(new LanguageBuilder()
+        localizationService.Create(new LanguageBuilder()
             .WithCultureInfo(DkIso)
             .WithIsDefault(false)
             .Build());
@@ -91,7 +91,7 @@ public class ContentControllerTests : UmbracoTestServerTestBase
         var localizationService = GetRequiredService<ILocalizationService>();
 
         // Add another language
-        localizationService.Save(new LanguageBuilder()
+        localizationService.Create(new LanguageBuilder()
             .WithCultureInfo(DkIso)
             .WithIsDefault(false)
             .Build());
@@ -159,7 +159,7 @@ public class ContentControllerTests : UmbracoTestServerTestBase
         var localizationService = GetRequiredService<ILocalizationService>();
 
         // Add another language
-        localizationService.Save(new LanguageBuilder()
+        localizationService.Create(new LanguageBuilder()
             .WithCultureInfo(DkIso)
             .WithIsDefault(false)
             .Build());
@@ -222,7 +222,7 @@ public class ContentControllerTests : UmbracoTestServerTestBase
         var localizationService = GetRequiredService<ILocalizationService>();
 
         // Add another language
-        localizationService.Save(new LanguageBuilder()
+        localizationService.Create(new LanguageBuilder()
             .WithCultureInfo(DkIso)
             .WithIsDefault(false)
             .Build());
@@ -281,7 +281,7 @@ public class ContentControllerTests : UmbracoTestServerTestBase
         var localizationService = GetRequiredService<ILocalizationService>();
 
         // Add another language
-        localizationService.Save(new LanguageBuilder()
+        localizationService.Create(new LanguageBuilder()
             .WithCultureInfo(DkIso)
             .WithIsDefault(false)
             .Build());
@@ -343,7 +343,7 @@ public class ContentControllerTests : UmbracoTestServerTestBase
         var localizationService = GetRequiredService<ILocalizationService>();
 
         // Add another language
-        localizationService.Save(new LanguageBuilder()
+        localizationService.Create(new LanguageBuilder()
             .WithCultureInfo(DkIso)
             .WithIsDefault(false)
             .Build());
@@ -403,7 +403,7 @@ public class ContentControllerTests : UmbracoTestServerTestBase
     public async Task PostSave_Validates_Domains_Exist()
     {
         var localizationService = GetRequiredService<ILocalizationService>();
-        localizationService.Save(new LanguageBuilder()
+        localizationService.Create(new LanguageBuilder()
             .WithCultureInfo(DkIso)
             .WithIsDefault(false)
             .Build());
@@ -452,12 +452,12 @@ public class ContentControllerTests : UmbracoTestServerTestBase
         var sweIso = "sv-SE";
         var localizationService = GetRequiredService<ILocalizationService>();
         //Create 2 new languages
-        localizationService.Save(new LanguageBuilder()
+        localizationService.Create(new LanguageBuilder()
             .WithCultureInfo(DkIso)
             .WithIsDefault(false)
             .Build());
 
-        localizationService.Save(new LanguageBuilder()
+        localizationService.Create(new LanguageBuilder()
             .WithCultureInfo(sweIso)
             .WithIsDefault(false)
             .Build());
@@ -537,7 +537,7 @@ public class ContentControllerTests : UmbracoTestServerTestBase
     public async Task PostSave_Validates_All_Cultures_Has_Domains()
     {
         var localizationService = GetRequiredService<ILocalizationService>();
-        localizationService.Save(new LanguageBuilder()
+        localizationService.Create(new LanguageBuilder()
             .WithCultureInfo(DkIso)
             .WithIsDefault(false)
             .Build());
@@ -593,7 +593,7 @@ public class ContentControllerTests : UmbracoTestServerTestBase
     public async Task PostSave_Checks_Ancestors_For_Domains()
     {
         var localizationService = GetRequiredService<ILocalizationService>();
-        localizationService.Save(new LanguageBuilder()
+        localizationService.Create(new LanguageBuilder()
             .WithCultureInfo(DkIso)
             .WithIsDefault(false)
             .Build());

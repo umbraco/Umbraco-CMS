@@ -374,15 +374,15 @@ public class LanguageRepositoryTest : UmbracoIntegrationTest
         //Id 1 is en-US - when Umbraco is installed
 
         var languageDK = new Language("da-DK", "Danish (Denmark)");
-        localizationService.Save(languageDK); //Id 2
+        localizationService.Create(languageDK); //Id 2
 
         var languageSE = new Language("sv-SE", "Swedish (Sweden)");
-        localizationService.Save(languageSE); //Id 3
+        localizationService.Create(languageSE); //Id 3
 
         var languageDE = new Language("de-DE", "German (Germany)");
-        localizationService.Save(languageDE); //Id 4
+        localizationService.Create(languageDE); //Id 4
 
         var languagePT = new Language("pt-PT", "Portuguese (Portugal)");
-        localizationService.Save(languagePT); //Id 5
+        localizationService.Create(languagePT); //Id 5
     }
 }

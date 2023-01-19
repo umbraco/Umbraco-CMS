@@ -134,8 +134,8 @@ public class TelemetryProviderTests : UmbracoIntegrationTest
         var langTwo = _languageBuilder.WithCultureInfo("da-DK").Build();
         var langThree = _languageBuilder.WithCultureInfo("se-SV").Build();
 
-        LocalizationService.Save(langTwo);
-        LocalizationService.Save(langThree);
+        LocalizationService.Create(langTwo);
+        LocalizationService.Create(langThree);
 
         IEnumerable<UsageInformation> result = null;
 

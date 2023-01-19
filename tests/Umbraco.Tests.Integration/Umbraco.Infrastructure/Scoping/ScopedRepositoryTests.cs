@@ -145,7 +145,7 @@ public class ScopedRepositoryTests : UmbracoIntegrationTest
         var globalCache = AppCaches.IsolatedCaches.GetOrCreate(typeof(ILanguage));
 
         ILanguage lang = new Language("fr-FR", "French (France)");
-        service.Save(lang);
+        service.Create(lang);
 
         // global cache has been flushed, reload
         var globalFullCached = (IEnumerable<ILanguage>)globalCache.Get(GetCacheTypeKey<ILanguage>(), () => null);
@@ -173,7 +173,7 @@ public class ScopedRepositoryTests : UmbracoIntegrationTest
 
             // Use IsMandatory of isocode to ensure publishedContent cache is not also rebuild
             lang.IsMandatory = true;
-            service.Save(lang);
+            service.Update(lang);
 
             // scoped cache has been flushed, reload
             var scopeFullCached = (IEnumerable<ILanguage>)scopedCache.Get(GetCacheTypeKey<ILanguage>(), () => null);
@@ -238,7 +238,7 @@ public class ScopedRepositoryTests : UmbracoIntegrationTest
         var globalCache = AppCaches.IsolatedCaches.GetOrCreate(typeof(IDictionaryItem));
 
         var lang = new Language("fr-FR", "French (France)");
-        service.Save(lang);
+        service.Create(lang);
 
         var item = (IDictionaryItem)new DictionaryItem("item-key");
         item.Translations = new IDictionaryTranslation[] { new DictionaryTranslation(lang.Id, "item-value") };

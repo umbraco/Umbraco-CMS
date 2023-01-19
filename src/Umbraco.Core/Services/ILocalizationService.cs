@@ -1,4 +1,5 @@
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.New.Cms.Core.Models;
 
 namespace Umbraco.Cms.Core.Services;
@@ -180,14 +181,29 @@ public interface ILocalizationService : IService
     /// </summary>
     /// <param name="language"><see cref="ILanguage" /> to save</param>
     /// <param name="userId">Optional id of the user saving the language</param>
+    [Obsolete("Please use Create or Update depending on use case. Will be removed in V15")]
     void Save(ILanguage language, int userId = Constants.Security.SuperUserId);
+
+    /// <summary>
+    ///     Updates an existing <see cref="ILanguage" /> object
+    /// </summary>
+    /// <param name="language"><see cref="ILanguage" /> to update</param>
+    /// <param name="userId">Optional id of the user saving the language</param>
+    Attempt<ILanguage, LanguageOperationStatus> Update(ILanguage language, int userId = Constants.Security.SuperUserId);
+
+    /// <summary>
+    ///     Creates a new <see cref="ILanguage" /> object
+    /// </summary>
+    /// <param name="language"><see cref="ILanguage" /> to create</param>
+    /// <param name="userId">Optional id of the user creating the language</param>
+    Attempt<ILanguage, LanguageOperationStatus> Create(ILanguage language, int userId = Constants.Security.SuperUserId);
 
     /// <summary>
     ///     Deletes a <see cref="ILanguage" /> by removing it and its usages from the db
     /// </summary>
     /// <param name="language"><see cref="ILanguage" /> to delete</param>
     /// <param name="userId">Optional id of the user deleting the language</param>
-    void Delete(ILanguage language, int userId = Constants.Security.SuperUserId);
+    Attempt<ILanguage, LanguageOperationStatus> Delete(ILanguage language, int userId = Constants.Security.SuperUserId);
 
     /// <summary>
     ///     Gets the full dictionary key map.

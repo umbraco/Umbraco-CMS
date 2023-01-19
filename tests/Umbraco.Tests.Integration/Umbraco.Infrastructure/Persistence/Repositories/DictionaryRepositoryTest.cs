@@ -320,7 +320,7 @@ public class DictionaryRepositoryTest : UmbracoIntegrationTest
             var repository = CreateRepository();
 
             var languageNo = new Language("nb-NO", "Norwegian Bokmål (Norway)");
-            localizationService.Save(languageNo);
+            localizationService.Create(languageNo);
 
             // Act
             var item = repository.Get(1);
@@ -402,7 +402,7 @@ public class DictionaryRepositoryTest : UmbracoIntegrationTest
         var language = localizationService.GetLanguageByIsoCode("en-US");
 
         var languageDK = new Language("da-DK", "Danish (Denmark)");
-        localizationService.Save(languageDK); //Id 2
+        localizationService.Create(languageDK); //Id 2
 
         var readMore = new DictionaryItem("Read More");
         var translations = new List<IDictionaryTranslation>

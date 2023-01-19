@@ -200,8 +200,8 @@ public class ContentServiceTests : UmbracoIntegrationTestWithContent
             .WithCultureInfo("fr-FR")
             .Build();
 
-        LocalizationService.Save(langFr);
-        LocalizationService.Save(langUk);
+        LocalizationService.Create(langFr);
+        LocalizationService.Create(langUk);
 
         var ctInvariant = ContentTypeBuilder.CreateBasicContentType("invariantPage");
         ContentTypeService.Save(ctInvariant);
@@ -848,8 +848,8 @@ public class ContentServiceTests : UmbracoIntegrationTestWithContent
             .WithCultureInfo("fr-FR")
             .Build();
 
-        LocalizationService.Save(langFr);
-        LocalizationService.Save(langUk);
+        LocalizationService.Create(langFr);
+        LocalizationService.Create(langUk);
 
         var contentType = ContentTypeBuilder.CreateBasicContentType();
         contentType.Variations = ContentVariation.Culture;
@@ -952,8 +952,8 @@ public class ContentServiceTests : UmbracoIntegrationTestWithContent
             .WithCultureInfo("fr-FR")
             .Build();
 
-        LocalizationService.Save(langFr);
-        LocalizationService.Save(langGb);
+        LocalizationService.Create(langFr);
+        LocalizationService.Create(langGb);
 
         var contentType = ContentTypeBuilder.CreateMetaContentType();
         contentType.Variations = ContentVariation.Culture;
@@ -1030,8 +1030,8 @@ public class ContentServiceTests : UmbracoIntegrationTestWithContent
             .WithCultureInfo("fr-FR")
             .Build();
 
-        LocalizationService.Save(langFr);
-        LocalizationService.Save(langGb);
+        LocalizationService.Create(langFr);
+        LocalizationService.Create(langGb);
 
         var contentType = ContentTypeBuilder.CreateBasicContentType();
         contentType.Variations = ContentVariation.Culture;
@@ -1220,8 +1220,8 @@ public class ContentServiceTests : UmbracoIntegrationTestWithContent
         var langDa = new LanguageBuilder()
             .WithCultureInfo("da")
             .Build();
-        LocalizationService.Save(langFr);
-        LocalizationService.Save(langDa);
+        LocalizationService.Create(langFr);
+        LocalizationService.Create(langDa);
 
         var ct = ContentTypeBuilder.CreateBasicContentType();
         ct.Variations = ContentVariation.Culture;
@@ -2325,8 +2325,8 @@ public class ContentServiceTests : UmbracoIntegrationTestWithContent
         var langDa = new LanguageBuilder()
             .WithCultureInfo("da")
             .Build();
-        LocalizationService.Save(langFr);
-        LocalizationService.Save(langDa);
+        LocalizationService.Create(langFr);
+        LocalizationService.Create(langDa);
 
         var template = TemplateBuilder.CreateTextPageTemplate();
         FileService.SaveTemplate(template);
@@ -2850,8 +2850,8 @@ public class ContentServiceTests : UmbracoIntegrationTestWithContent
             .WithCultureInfo("fr-FR")
             .Build();
 
-        languageService.Save(langFr);
-        languageService.Save(langUk);
+        languageService.Create(langFr);
+        languageService.Create(langUk);
 
         var contentTypeService = ContentTypeService;
 
@@ -2891,8 +2891,8 @@ public class ContentServiceTests : UmbracoIntegrationTestWithContent
             .WithCultureInfo("fr-FR")
             .Build();
 
-        languageService.Save(langFr);
-        languageService.Save(langUk);
+        languageService.Create(langFr);
+        languageService.Create(langUk);
 
         var contentTypeService = ContentTypeService;
 
@@ -2937,9 +2937,9 @@ public class ContentServiceTests : UmbracoIntegrationTestWithContent
             .WithCultureInfo("da-DK")
             .Build();
 
-        languageService.Save(langFr);
-        languageService.Save(langUk);
-        languageService.Save(langDa);
+        languageService.Create(langFr);
+        languageService.Create(langUk);
+        languageService.Create(langDa);
 
         var contentTypeService = ContentTypeService;
 
@@ -3071,9 +3071,9 @@ public class ContentServiceTests : UmbracoIntegrationTestWithContent
             .WithCultureInfo("de-DE")
             .Build();
 
-        languageService.Save(langFr);
-        languageService.Save(langUk);
-        languageService.Save(langDe);
+        languageService.Create(langFr);
+        languageService.Create(langUk);
+        languageService.Create(langDe);
 
         var contentTypeService = ContentTypeService;
 
@@ -3486,8 +3486,8 @@ public class ContentServiceTests : UmbracoIntegrationTestWithContent
         langFr = (Language)new LanguageBuilder()
             .WithCultureInfo("fr-FR")
             .Build();
-        LocalizationService.Save(langFr);
-        LocalizationService.Save(langUk);
+        LocalizationService.Create(langFr);
+        LocalizationService.Create(langUk);
 
         contentType = ContentTypeBuilder.CreateBasicContentType();
         contentType.Variations = ContentVariation.Culture;

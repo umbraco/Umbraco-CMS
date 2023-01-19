@@ -93,12 +93,12 @@ public class EntityXmlSerializerTests : UmbracoIntegrationTest
             .WithCultureInfo("nb-NO")
             .WithCultureName("Norwegian Bokmål (Norway)")
             .Build();
-        localizationService.Save(languageNbNo);
+        localizationService.Create(languageNbNo);
 
         var languageEnGb = new LanguageBuilder()
             .WithCultureInfo("en-GB")
             .Build();
-        localizationService.Save(languageEnGb);
+        localizationService.Create(languageEnGb);
 
         var newPackageXml = XElement.Parse(ImportResources.Dictionary_Package);
         var languageItemsElement = newPackageXml.Elements("Languages").First();
@@ -299,12 +299,12 @@ public class EntityXmlSerializerTests : UmbracoIntegrationTest
             .WithCultureInfo("nb-NO")
             .WithCultureName("Norwegian")
             .Build();
-        localizationService.Save(languageNbNo);
+        localizationService.Create(languageNbNo);
 
         var languageEnGb = new LanguageBuilder()
             .WithCultureInfo("en-GB")
             .Build();
-        localizationService.Save(languageEnGb);
+        localizationService.Create(languageEnGb);
 
         var parentItem = new DictionaryItem("Parent") { Key = Guid.Parse("28f2e02a-8c66-4fcd-85e3-8524d551c0d3") };
         var parentTranslations = new List<IDictionaryTranslation>

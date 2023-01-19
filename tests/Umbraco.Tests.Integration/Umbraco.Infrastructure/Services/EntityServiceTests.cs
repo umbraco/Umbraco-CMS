@@ -31,15 +31,15 @@ public class EntityServiceTests : UmbracoIntegrationTest
         {
             _langFr = new Language("fr-FR", "French (France)");
             _langEs = new Language("es-ES", "Spanish (Spain)");
-            LocalizationService.Save(_langFr);
-            LocalizationService.Save(_langEs);
+            LocalizationService.Create(_langFr);
+            LocalizationService.Create(_langEs);
         }
 
         CreateTestData();
     }
 
-    private Language _langFr;
-    private Language _langEs;
+    private Language? _langFr;
+    private Language? _langEs;
 
     private ILocalizationService LocalizationService => GetRequiredService<ILocalizationService>();
 

@@ -443,11 +443,11 @@ public class ContentServicePublishBranchTests : UmbracoIntegrationTest
     private void CreateTypes(out IContentType iContentType, out IContentType vContentType)
     {
         var langDe = new Language("de", "German") { IsDefault = true };
-        LocalizationService.Save(langDe);
+        LocalizationService.Create(langDe);
         var langRu = new Language("ru", "Russian");
-        LocalizationService.Save(langRu);
+        LocalizationService.Create(langRu);
         var langEs = new Language("es", "Spanish");
-        LocalizationService.Save(langEs);
+        LocalizationService.Create(langEs);
 
         iContentType = new ContentType(ShortStringHelper, -1)
         {

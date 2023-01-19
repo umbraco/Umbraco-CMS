@@ -8,6 +8,7 @@ using System.Linq;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Builders.Extensions;
@@ -210,11 +211,12 @@ public class LocalizationServiceTests : UmbracoIntegrationTest
         var languageNbNo = new LanguageBuilder()
             .WithCultureInfo("nb-NO")
             .Build();
-        LocalizationService.Save(languageNbNo, 0);
+        LocalizationService.Create(languageNbNo, 0);
         Assert.That(languageNbNo.HasIdentity, Is.True);
         var languageId = languageNbNo.Id;
 
-        LocalizationService.Delete(languageNbNo);
+        var result = LocalizationService.Delete(languageNbNo);
+        Assert.IsTrue(result.Success);
 
         var language = LocalizationService.GetLanguageById(languageId);
         Assert.Null(language);
@@ -228,10 +230,11 @@ public class LocalizationServiceTests : UmbracoIntegrationTest
             .WithCultureInfo("nb-NO")
             .WithFallbackLanguageId(languageDaDk.Id)
             .Build();
-        LocalizationService.Save(languageNbNo, 0);
+        LocalizationService.Create(languageNbNo, 0);
         var languageId = languageDaDk.Id;
 
-        LocalizationService.Delete(languageDaDk);
+        var result = LocalizationService.Delete(languageDaDk);
+        Assert.IsTrue(result.Success);
 
         var language = LocalizationService.GetLanguageById(languageId);
         Assert.Null(language);
@@ -371,7 +374,7 @@ public class LocalizationServiceTests : UmbracoIntegrationTest
             .Build();
 
         // Act
-        LocalizationService.Save(languageEnAu);
+        LocalizationService.Create(languageEnAu);
         var result = LocalizationService.GetLanguageByIsoCode(isoCode);
 
         // Assert
@@ -387,7 +390,7 @@ public class LocalizationServiceTests : UmbracoIntegrationTest
             .Build();
 
         // Act
-        LocalizationService.Save(languageEnAu);
+        LocalizationService.Create(languageEnAu);
         var result = LocalizationService.GetLanguageById(languageEnAu.Id);
 
         // Assert
@@ -401,7 +404,7 @@ public class LocalizationServiceTests : UmbracoIntegrationTest
             .WithCultureInfo("en-AU")
             .WithIsDefault(true)
             .Build();
-        LocalizationService.Save(languageEnAu);
+        LocalizationService.Create(languageEnAu);
         var result = LocalizationService.GetLanguageById(languageEnAu.Id);
 
         Assert.IsTrue(result.IsDefault);
@@ -410,7 +413,7 @@ public class LocalizationServiceTests : UmbracoIntegrationTest
             .WithCultureInfo("en-NZ")
             .WithIsDefault(true)
             .Build();
-        LocalizationService.Save(languageEnNz);
+        LocalizationService.Create(languageEnNz);
         var result2 = LocalizationService.GetLanguageById(languageEnNz.Id);
 
         // re-get
@@ -427,14 +430,220 @@ public class LocalizationServiceTests : UmbracoIntegrationTest
         var languageEnAu = new LanguageBuilder()
             .WithCultureInfo(isoCode)
             .Build();
-        LocalizationService.Save(languageEnAu);
+        LocalizationService.Create(languageEnAu);
 
         // Act
-        LocalizationService.Delete(languageEnAu);
-        var result = LocalizationService.GetLanguageByIsoCode(isoCode);
+        var result = LocalizationService.Delete(languageEnAu);
+        Assert.IsTrue(result.Success);
 
         // Assert
-        Assert.Null(result);
+        Assert.IsNull(LocalizationService.GetLanguageByIsoCode(isoCode));
+    }
+
+    [Test]
+    public void Can_Update_Existing_Language()
+    {
+        ILanguage languageDaDk = LocalizationService.GetLanguageByIsoCode("da-DK")!;
+        Assert.IsFalse(languageDaDk.IsMandatory);
+        languageDaDk.IsMandatory = true;
+        languageDaDk.IsoCode = "da";
+        languageDaDk.CultureName = "New Culture Name For da-DK";
+
+        var result = LocalizationService.Update(languageDaDk);
+        Assert.IsTrue(result.Success);
+        Assert.AreEqual(LanguageOperationStatus.Success, result.Status);
+
+        // re-get
+        languageDaDk = LocalizationService.GetLanguageById(languageDaDk.Id)!;
+        Assert.IsTrue(languageDaDk.IsMandatory);
+        Assert.AreEqual("da", languageDaDk.IsoCode);
+        Assert.AreEqual("New Culture Name For da-DK", languageDaDk.CultureName);
+    }
+
+    [Test]
+    public void Can_Change_Default_Language_By_Update()
+    {
+        var defaultLanguageId = LocalizationService.GetDefaultLanguageId();
+        Assert.IsNotNull(defaultLanguageId);
+
+        ILanguage languageDaDk = LocalizationService.GetLanguageByIsoCode("da-DK")!;
+        Assert.IsFalse(languageDaDk.IsDefault);
+        Assert.AreNotEqual(defaultLanguageId.Value, languageDaDk.Id);
+
+        languageDaDk.IsDefault = true;
+        var result = LocalizationService.Update(languageDaDk);
+        Assert.IsTrue(result.Success);
+
+        // re-get
+        var previousDefaultLanguage = LocalizationService.GetLanguageById(defaultLanguageId.Value)!;
+        Assert.IsFalse(previousDefaultLanguage.IsDefault);
+        languageDaDk = LocalizationService.GetLanguageById(languageDaDk.Id)!;
+        Assert.IsTrue(languageDaDk.IsDefault);
+    }
+
+    [Test]
+    public void Cannot_Create_Language_With_Invalid_IsoCode()
+    {
+        var invalidLanguage = new Language("no-such-iso-code", "Invalid ISO code");
+
+        var result = LocalizationService.Create(invalidLanguage);
+        Assert.IsFalse(result.Success);
+        Assert.AreEqual(LanguageOperationStatus.InvalidIsoCode, result.Status);
+    }
+
+    [Test]
+    public void Cannot_Create_Duplicate_Languages()
+    {
+        var isoCode = "en-AU";
+        var languageEnAu = new LanguageBuilder()
+            .WithCultureInfo(isoCode)
+            .Build();
+        var result = LocalizationService.Create(languageEnAu);
+        Assert.IsTrue(result.Success);
+
+        var duplicateLanguageEnAu = new LanguageBuilder()
+            .WithCultureInfo(isoCode)
+            .Build();
+        result = LocalizationService.Create(duplicateLanguageEnAu);
+        Assert.IsFalse(result.Success);
+        Assert.AreEqual(LanguageOperationStatus.DuplicateIsoCode, result.Status);
+    }
+
+    [Test]
+    public void Cannot_Create_Language_With_NonExisting_Fallback_Language()
+    {
+        var isoCode = "en-AU";
+        var languageEnAu = new LanguageBuilder()
+            .WithCultureInfo(isoCode)
+            .WithFallbackLanguageId(123456789)
+            .Build();
+        var result = LocalizationService.Create(languageEnAu);
+        Assert.IsFalse(result.Success);
+        Assert.AreEqual(LanguageOperationStatus.InvalidFallback, result.Status);
+    }
+
+    [Test]
+    public void Cannot_Update_Non_Existing_Language()
+    {
+        ILanguage language = new Language("da", "Danish");
+        var result = LocalizationService.Update(language);
+        Assert.IsFalse(result.Success);
+        Assert.AreEqual(LanguageOperationStatus.NotFound, result.Status);
+    }
+
+    [Test]
+    public void Cannot_Undefault_Default_Language_By_Update()
+    {
+        var defaultLanguageId = LocalizationService.GetDefaultLanguageId();
+        Assert.IsNotNull(defaultLanguageId);
+        var defaultLanguage = LocalizationService.GetLanguageById(defaultLanguageId.Value);
+        Assert.IsNotNull(defaultLanguage);
+        Assert.IsTrue(defaultLanguage.IsDefault);
+
+        defaultLanguage.IsDefault = false;
+        var result = LocalizationService.Update(defaultLanguage);
+        Assert.IsFalse(result.Success);
+        Assert.AreEqual(LanguageOperationStatus.MissingDefault, result.Status);
+
+        // re-get
+        defaultLanguage = LocalizationService.GetLanguageById(defaultLanguageId.Value)!;
+        Assert.IsTrue(defaultLanguage.IsDefault);
+        Assert.AreEqual(defaultLanguage.Id, LocalizationService.GetDefaultLanguageId()!);
+    }
+
+    [Test]
+    public void Cannot_Update_Language_With_NonExisting_Fallback_Language()
+    {
+        ILanguage languageDaDk = LocalizationService.GetLanguageByIsoCode("da-DK")!;
+        Assert.IsNull(languageDaDk.FallbackLanguageId);
+
+        languageDaDk.FallbackLanguageId = 123456789;
+        var result = LocalizationService.Update(languageDaDk);
+        Assert.IsFalse(result.Success);
+        Assert.AreEqual(LanguageOperationStatus.InvalidFallback, result.Status);
+    }
+
+    [Test]
+    public void Cannot_Create_Direct_Cyclic_Fallback_Language()
+    {
+        ILanguage languageDaDk = LocalizationService.GetLanguageByIsoCode("da-DK")!;
+        ILanguage languageEnGb = LocalizationService.GetLanguageByIsoCode("en-GB")!;
+        Assert.IsNull(languageDaDk.FallbackLanguageId);
+        Assert.IsNull(languageEnGb.FallbackLanguageId);
+
+        languageDaDk.FallbackLanguageId = languageEnGb.Id;
+        var result = LocalizationService.Update(languageDaDk);
+        Assert.IsTrue(result.Success);
+
+        languageEnGb.FallbackLanguageId = languageDaDk.Id;
+        result = LocalizationService.Update(languageEnGb);
+        Assert.IsFalse(result.Success);
+        Assert.AreEqual(LanguageOperationStatus.InvalidFallback, result.Status);
+    }
+
+    [Test]
+    public void Cannot_Create_Implicit_Cyclic_Fallback_Language()
+    {
+        ILanguage languageEnUs = LocalizationService.GetLanguageByIsoCode("en-US")!;
+        ILanguage languageEnGb = LocalizationService.GetLanguageByIsoCode("en-GB")!;
+        ILanguage languageDaDk = LocalizationService.GetLanguageByIsoCode("da-DK")!;
+        Assert.IsNull(languageEnUs.FallbackLanguageId);
+        Assert.IsNull(languageEnGb.FallbackLanguageId);
+        Assert.IsNull(languageDaDk.FallbackLanguageId);
+
+        languageEnGb.FallbackLanguageId = languageEnUs.Id;
+        var result = LocalizationService.Update(languageEnGb);
+        Assert.IsTrue(result.Success);
+
+        languageDaDk.FallbackLanguageId = languageEnGb.Id;
+        result = LocalizationService.Update(languageDaDk);
+        Assert.IsTrue(result.Success);
+
+        languageEnUs.FallbackLanguageId = languageDaDk.Id;
+        result = LocalizationService.Update(languageEnUs);
+        Assert.IsFalse(result.Success);
+        Assert.AreEqual(LanguageOperationStatus.InvalidFallback, result.Status);
+
+        // re-get
+        languageEnUs = LocalizationService.GetLanguageById(languageEnUs.Id)!;
+        languageEnGb = LocalizationService.GetLanguageById(languageEnGb.Id)!;
+        languageDaDk = LocalizationService.GetLanguageById(languageDaDk.Id)!;
+
+        Assert.AreEqual(languageEnUs.Id, languageEnGb.FallbackLanguageId);
+        Assert.AreEqual(languageEnGb.Id, languageDaDk.FallbackLanguageId);
+        Assert.IsNull(languageEnUs.FallbackLanguageId);
+    }
+
+    [Test]
+    public void Cannot_Delete_Default_Language()
+    {
+        var languageNbNo = new LanguageBuilder()
+            .WithCultureInfo("nb-NO")
+            .WithIsDefault(true)
+            .Build();
+        var result = LocalizationService.Create(languageNbNo);
+        Assert.IsTrue(result.Success);
+
+        result = LocalizationService.Delete(languageNbNo);
+        Assert.IsFalse(result.Success);
+        Assert.AreEqual(LanguageOperationStatus.MissingDefault, result.Status);
+
+        // re-get
+        languageNbNo = LocalizationService.GetLanguageByIsoCode("nb-NO");
+        Assert.NotNull(languageNbNo);
+        Assert.IsTrue(languageNbNo.IsDefault);
+    }
+
+    [Test]
+    public void Cannot_Delete_NonExisting_Language()
+    {
+        var languageNbNo = new LanguageBuilder()
+            .WithCultureInfo("nb-NO")
+            .Build();
+
+        var result = LocalizationService.Delete(languageNbNo);
+        Assert.IsFalse(result.Success);
+        Assert.AreEqual(LanguageOperationStatus.NotFound, result.Status);
     }
 
     public void CreateTestData()
@@ -446,8 +655,11 @@ public class LocalizationServiceTests : UmbracoIntegrationTest
             .WithCultureInfo("en-GB")
             .Build();
 
-        LocalizationService.Save(languageDaDk, 0);
-        LocalizationService.Save(languageEnGb, 0);
+        var result = LocalizationService.Create(languageDaDk, 0);
+        Assert.IsTrue(result.Success);
+        result = LocalizationService.Create(languageEnGb, 0);
+        Assert.IsTrue(result.Success);
+
         _danishLangId = languageDaDk.Id;
         _englishLangId = languageEnGb.Id;
 

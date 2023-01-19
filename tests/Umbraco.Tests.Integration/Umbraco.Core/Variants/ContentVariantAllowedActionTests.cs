@@ -28,7 +28,7 @@ public class ContentVariantAllowedActionTests : UmbracoTestServerTestBase
     public void SetUpTestDate()
     {
         var dk = new Language(DkIso, "Danish");
-        LocalizationService.Save(dk);
+        LocalizationService.Create(dk);
     }
 
     [Test]

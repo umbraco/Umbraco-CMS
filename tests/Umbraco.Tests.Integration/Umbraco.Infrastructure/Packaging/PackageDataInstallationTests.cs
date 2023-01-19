@@ -852,8 +852,8 @@ public class PackageDataInstallationTests : UmbracoIntegrationTestWithContent
     {
         var norwegian = new Language("nb-NO", "Norwegian Bokmål (Norway)");
         var english = new Language("en-GB", "English (United Kingdom)");
-        LocalizationService.Save(norwegian, 0);
-        LocalizationService.Save(english, 0);
+        LocalizationService.Create(norwegian, 0);
+        LocalizationService.Create(english, 0);
     }
 
     private void AssertDictionaryItem(string dictionaryItemName, string expectedValue, string cultureCode)
