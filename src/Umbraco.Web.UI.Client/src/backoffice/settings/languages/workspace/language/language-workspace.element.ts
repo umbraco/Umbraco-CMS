@@ -5,6 +5,7 @@ import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, html, LitElement, nothing } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { UmbWorkspaceLanguageContext } from './language-workspace.context';
+import 'src/backoffice/shared/components/workspace/actions/save/workspace-action-node-save.element.ts';
 
 @customElement('umb-language-workspace')
 export class UmbLanguageWorkspaceElement extends UmbLitElement {
@@ -70,57 +71,18 @@ export class UmbLanguageWorkspaceElement extends UmbLitElement {
 	render() {
 		if (!this.language) return nothing;
 
-		return html`<umb-body-layout>
-			<div id="header" slot="header">
-				<a href="/section/settings/language-root">
-					<uui-button compact>
-						<uui-icon name="umb:arrow-left"></uui-icon>
-					</uui-button>
-				</a>
-				<uui-input .value=${this.language.name}></uui-input>
-			</div>
-			<div id="main">
-				<uui-box>
-					<umb-workspace-property-layout label="Language">
-						<uui-input .value=${this.language.name} slot="editor"></uui-input>
-					</umb-workspace-property-layout>
-					<umb-workspace-property-layout label="ISO Code">
-						<div slot="editor">
-							${this.language.isoCode}
-						</div>
-					</umb-workspace-property-layout>
-					<umb-workspace-property-layout label="Settings">
-						<div slot="editor">
-							<uui-toggle ?checked=${this.language.isDefault || false}>
-								<div>
-									<b>Default language</b>
-									<div>An Umbraco site can only have one default language set.</div>
-								</div>
-							</uui-toggle ?checked=${this.language.isMandatory || false}>
-							<hr />
-							<uui-toggle>
-								<div>
-									<b>Mandatory language</b>
-									<div>Properties on this language have to be filled out before the node can be published.</div>
-								</div>
-							</uui-toggle>
-							<div id="default-language-warning">
-								Switching default language may result in default content missing.
-							</div>
-						</div>
-					</umb-workspace-property-layout>
-					<umb-workspace-property-layout
-						label="Fall back language"
-						description="To allow multi-lingual content to fall back to another language if not present in the requested language, select it here.">
-						<uui-combobox slot="editor">
-							<uui-combobox-list>
-								<uui-combobox-list-option value="">No fall back language</uui-combobox-list-option>
-							</uui-combobox-list>
-						</uui-combobox>
-					</umb-workspace-property-layout>
-				</uui-box>
-			</div>
-		</umb-body-layout>`;
+		return html`
+			<umb-workspace-layout alias="Umb.Workspace.Language">
+				<div id="header" slot="header">
+					<a href="/section/settings/language-root">
+						<uui-button compact>
+							<uui-icon name="umb:arrow-left"></uui-icon>
+						</uui-button>
+					</a>
+					<uui-input .value=${this.language.name}></uui-input>
+				</div>
+			</umb-workspace-layout>
+		`;
 	}
 }
 
