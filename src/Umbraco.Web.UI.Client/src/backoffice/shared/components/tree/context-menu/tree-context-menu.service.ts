@@ -3,7 +3,7 @@ import { css, html, nothing } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { ActionPageEntity } from '../action/tree-item-action.element';
 import { UmbLitElement } from '@umbraco-cms/element';
-import { UmbContextAlias } from '@umbraco-cms/context-api';
+import { UmbContextToken } from '@umbraco-cms/context-api';
 
 @customElement('umb-tree-context-menu-service')
 export class UmbTreeContextMenuService extends UmbLitElement {
@@ -93,7 +93,7 @@ export class UmbTreeContextMenuService extends UmbLitElement {
 	}
 }
 
-export const UMB_TREE_CONTEXT_MENU_SERVICE_CONTEXT_ALIAS = new UmbContextAlias<UmbTreeContextMenuService>(
+export const UMB_TREE_CONTEXT_MENU_SERVICE_CONTEXT_ALIAS = new UmbContextToken<UmbTreeContextMenuService>(
 	UmbTreeContextMenuService.name
 );
 

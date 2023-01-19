@@ -1,7 +1,7 @@
 import { map, Observable } from 'rxjs';
 import { UmbDataStoreBase } from '../../../core/stores/store';
 import type { UserGroupDetails, UserGroupEntity } from '@umbraco-cms/models';
-import { UmbContextAlias } from '@umbraco-cms/context-api';
+import { UmbContextToken } from '@umbraco-cms/context-api';
 
 // TODO: get rid of this type addition & { ... }:
 export type UmbUserGroupStoreItemType = UserGroupDetails & { users?: Array<string> };
@@ -87,4 +87,4 @@ export class UmbUserGroupStore extends UmbDataStoreBase<UmbUserGroupStoreItemTyp
 	}
 }
 
-export const UMB_USER_GROUP_STORE_CONTEXT_ALIAS = new UmbContextAlias<UmbUserGroupStore>(STORE_ALIAS);
+export const UMB_USER_GROUP_STORE_CONTEXT_ALIAS = new UmbContextToken<UmbUserGroupStore>(STORE_ALIAS);

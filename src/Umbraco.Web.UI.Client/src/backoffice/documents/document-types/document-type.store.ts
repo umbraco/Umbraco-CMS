@@ -3,7 +3,7 @@ import { UmbDataStoreBase } from '../../../core/stores/store';
 import { DocumentTypeResource, DocumentTypeTreeItem } from '@umbraco-cms/backend-api';
 import type { DocumentTypeDetails } from '@umbraco-cms/models';
 import { tryExecuteAndNotify } from '@umbraco-cms/resources';
-import { UmbContextAlias } from '@umbraco-cms/context-api';
+import { UmbContextToken } from '@umbraco-cms/context-api';
 
 export const isDocumentTypeDetails = (
 	documentType: DocumentTypeDetails | DocumentTypeTreeItem
@@ -86,4 +86,4 @@ export class UmbDocumentTypeStore extends UmbDataStoreBase<UmbDocumentTypeStoreI
 	}
 }
 
-export const UMB_DOCUMENT_TYPE_STORE_CONTEXT_ALIAS = new UmbContextAlias<UmbDocumentTypeStore>(STORE_ALIAS);
+export const UMB_DOCUMENT_TYPE_STORE_CONTEXT_ALIAS = new UmbContextToken<UmbDocumentTypeStore>(STORE_ALIAS);

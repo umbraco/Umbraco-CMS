@@ -2,7 +2,7 @@ import { map, Observable } from 'rxjs';
 import { UmbDataStoreBase } from '../../../core/stores/store';
 import type { UserDetails } from '@umbraco-cms/models';
 import { UniqueBehaviorSubject } from '@umbraco-cms/observable-api';
-import { UmbContextAlias } from '@umbraco-cms/context-api';
+import { UmbContextToken } from '@umbraco-cms/context-api';
 
 export type UmbUserStoreItemType = UserDetails;
 
@@ -280,4 +280,4 @@ export class UmbUserStore extends UmbDataStoreBase<UmbUserStoreItemType> {
 	// }
 }
 
-export const UMB_USER_STORE_CONTEXT_ALIAS = new UmbContextAlias<UmbUserStore>(STORE_ALIAS);
+export const UMB_USER_STORE_CONTEXT_ALIAS = new UmbContextToken<UmbUserStore>(STORE_ALIAS);

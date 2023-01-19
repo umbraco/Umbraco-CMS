@@ -1,4 +1,4 @@
-import { UmbContextAlias } from '@umbraco-cms/context-api';
+import { UmbContextToken } from '@umbraco-cms/context-api';
 import { createObservablePart, UniqueBehaviorSubject } from '@umbraco-cms/observable-api';
 
 export type UmbModelType = 'dialog' | 'sidebar';
@@ -50,6 +50,6 @@ export class UmbCurrentUserHistoryStore {
 	}
 }
 
-export const UMB_CURRENT_USER_HISTORY_STORE_CONTEXT_ALIAS = new UmbContextAlias<UmbCurrentUserHistoryStore>(
+export const UMB_CURRENT_USER_HISTORY_STORE_CONTEXT_ALIAS = new UmbContextToken<UmbCurrentUserHistoryStore>(
 	UmbCurrentUserHistoryStore.name
 );

@@ -2,7 +2,7 @@ import { map, Observable } from 'rxjs';
 import { UmbNodeStoreBase } from '../../../core/stores/store';
 import type { DocumentBlueprintDetails, DocumentDetails } from '@umbraco-cms/models';
 import { DocumentBlueprintTreeItem } from '@umbraco-cms/backend-api';
-import { UmbContextAlias } from '@umbraco-cms/context-api';
+import { UmbContextToken } from '@umbraco-cms/context-api';
 
 export type UmbDocumentStoreItemType = DocumentBlueprintDetails | DocumentBlueprintTreeItem;
 
@@ -41,4 +41,4 @@ export class UmbDocumentBlueprintStore extends UmbNodeStoreBase<UmbDocumentStore
 	}
 }
 
-export const UMB_DOCUMENT_BLULEPRINT_STORE_CONTEXT_ALIAS = new UmbContextAlias<UmbDocumentBlueprintStore>(STORE_ALIAS);
+export const UMB_DOCUMENT_BLULEPRINT_STORE_CONTEXT_ALIAS = new UmbContextToken<UmbDocumentBlueprintStore>(STORE_ALIAS);

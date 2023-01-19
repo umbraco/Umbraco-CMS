@@ -1,7 +1,7 @@
 import { expect } from '@open-wc/testing';
 import { UmbContextConsumer } from '../consume/context-consumer';
 import { UmbContextRequestEventImplementation } from '../consume/context-request.event';
-import { UmbContextAlias } from '../context-alias';
+import { UmbContextToken } from '../context-token';
 import { UmbContextProvider } from './context-provider';
 
 class MyClass {

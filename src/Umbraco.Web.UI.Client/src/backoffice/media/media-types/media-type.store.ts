@@ -3,7 +3,7 @@ import { UmbNodeStoreBase } from '../../../core/stores/store';
 import { MediaTypeResource, FolderTreeItem } from '@umbraco-cms/backend-api';
 import type { MediaTypeDetails } from '@umbraco-cms/models';
 import { tryExecuteAndNotify } from '@umbraco-cms/resources';
-import { UmbContextAlias } from '@umbraco-cms/context-api';
+import { UmbContextToken } from '@umbraco-cms/context-api';
 
 export type UmbMediaTypeStoreItemType = MediaTypeDetails | FolderTreeItem;
 
@@ -90,4 +90,4 @@ export class UmbMediaTypeStore extends UmbNodeStoreBase<UmbMediaTypeStoreItemTyp
 	}
 }
 
-export const UMB_MEDIA_TYPE_STORE_CONTEXT_ALIAS = new UmbContextAlias<UmbMediaTypeStore>(STORE_ALIAS);
+export const UMB_MEDIA_TYPE_STORE_CONTEXT_ALIAS = new UmbContextToken<UmbMediaTypeStore>(STORE_ALIAS);

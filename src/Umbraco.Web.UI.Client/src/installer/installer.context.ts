@@ -1,7 +1,7 @@
 import { BehaviorSubject, Observable, ReplaySubject } from 'rxjs';
 import { Install, InstallResource, InstallSettings, ProblemDetails, TelemetryLevel } from '@umbraco-cms/backend-api';
 import { tryExecute } from '@umbraco-cms/resources';
-import { UmbContextAlias } from '@umbraco-cms/context-api';
+import { UmbContextToken } from '@umbraco-cms/context-api';
 
 /**
  * Context API for the installer
@@ -123,4 +123,4 @@ export class UmbInstallerContext {
 	}
 }
 
-export const UMB_INSTALLER_CONTEXT_ALIAS = new UmbContextAlias<UmbInstallerContext>(UmbInstallerContext.name);
+export const UMB_INSTALLER_CONTEXT_ALIAS = new UmbContextToken<UmbInstallerContext>(UmbInstallerContext.name);

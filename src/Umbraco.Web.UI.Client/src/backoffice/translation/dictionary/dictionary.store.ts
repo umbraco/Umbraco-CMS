@@ -2,7 +2,7 @@ import { map, Observable } from 'rxjs';
 import { UmbDataStoreBase } from '../../../core/stores/store';
 import { DictionaryResource, EntityTreeItem } from '@umbraco-cms/backend-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/resources';
-import { UmbContextAlias } from '@umbraco-cms/context-api';
+import { UmbContextToken } from '@umbraco-cms/context-api';
 
 export const STORE_ALIAS = 'umbDictionaryStore';
 
@@ -52,4 +52,4 @@ export class UmbDictionaryStore extends UmbDataStoreBase<EntityTreeItem> {
 	}
 }
 
-export const UMB_DICTIONARY_STORE_CONTEXT_ALIAS = new UmbContextAlias<UmbDictionaryStore>(STORE_ALIAS);
+export const UMB_DICTIONARY_STORE_CONTEXT_ALIAS = new UmbContextToken<UmbDictionaryStore>(STORE_ALIAS);

@@ -4,7 +4,7 @@ import type { HTMLElementConstructor } from '../models';
 
 import { UmbControllerHostInterface, UmbControllerHostMixin } from '@umbraco-cms/controller';
 import {
-	UmbContextAlias,
+	UmbContextToken,
 	UmbContextCallback,
 	UmbContextConsumerController,
 	UmbContextProviderController,
@@ -18,9 +18,9 @@ interface ResolvedContexts {
 
 export declare class UmbElementMixinInterface extends UmbControllerHostInterface {
 	observe<T>(source: Observable<T>, callback: (_value: T) => void, unique?: string): UmbObserverController<T>;
-	provideContext<R = unknown>(alias: string | UmbContextAlias<R>, instance: R): UmbContextProviderController<R>;
+	provideContext<R = unknown>(alias: string | UmbContextToken<R>, instance: R): UmbContextProviderController<R>;
 	consumeContext<R = unknown>(
-		alias: string | UmbContextAlias<R>,
+		alias: string | UmbContextToken<R>,
 		callback: UmbContextCallback<R>
 	): UmbContextConsumerController<R>;
 	consumeAllContexts(contextAliases: string[], callback: (_instances: ResolvedContexts) => void): void;
@@ -46,7 +46,7 @@ export const UmbElementMixin = <T extends HTMLElementConstructor>(superClass: T)
 		 * @return {UmbContextProviderController} Reference to a Context Provider Controller instance
 		 * @memberof UmbElementMixin
 		 */
-		provideContext<R = unknown>(alias: string | UmbContextAlias<R>, instance: R): UmbContextProviderController<R> {
+		provideContext<R = unknown>(alias: string | UmbContextToken<R>, instance: R): UmbContextProviderController<R> {
 			return new UmbContextProviderController(this, alias, instance);
 		}
 
@@ -58,7 +58,7 @@ export const UmbElementMixin = <T extends HTMLElementConstructor>(superClass: T)
 		 * @memberof UmbElementMixin
 		 */
 		consumeContext<R = unknown>(
-			alias: string | UmbContextAlias<R>,
+			alias: string | UmbContextToken<R>,
 			callback: UmbContextCallback<R>
 		): UmbContextConsumerController<R> {
 			return new UmbContextConsumerController(this, alias, callback);

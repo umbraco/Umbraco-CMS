@@ -3,7 +3,7 @@ import { UmbNodeStoreBase } from '../../../core/stores/store';
 import { EntityTreeItem, MemberGroupResource } from '@umbraco-cms/backend-api';
 import type { MemberGroupDetails } from '@umbraco-cms/models';
 import { tryExecuteAndNotify } from '@umbraco-cms/resources';
-import { UmbContextAlias } from '@umbraco-cms/context-api';
+import { UmbContextToken } from '@umbraco-cms/context-api';
 
 export type UmbMemberGroupStoreItemType = MemberGroupDetails | EntityTreeItem;
 
@@ -37,4 +37,4 @@ export class UmbMemberGroupStore extends UmbNodeStoreBase<UmbMemberGroupStoreIte
 	}
 }
 
-export const UMB_MEMBER_GROUP_STORE_CONTEXT_ALIAS = new UmbContextAlias<UmbMemberGroupStore>(STORE_ALIAS);
+export const UMB_MEMBER_GROUP_STORE_CONTEXT_ALIAS = new UmbContextToken<UmbMemberGroupStore>(STORE_ALIAS);

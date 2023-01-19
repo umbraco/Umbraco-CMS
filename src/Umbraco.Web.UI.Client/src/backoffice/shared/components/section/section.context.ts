@@ -1,7 +1,7 @@
 import { BehaviorSubject } from 'rxjs';
 import type { Entity, ManifestSection, ManifestSectionView, ManifestTree } from '@umbraco-cms/models';
 import { UniqueBehaviorSubject } from '@umbraco-cms/observable-api';
-import { UmbContextAlias } from '@umbraco-cms/context-api';
+import { UmbContextToken } from '@umbraco-cms/context-api';
 
 export class UmbSectionContext {
 	#manifest;
@@ -45,4 +45,4 @@ export class UmbSectionContext {
 	}
 }
 
-export const UMB_SECTION_CONTEXT_ALIAS = new UmbContextAlias<UmbSectionContext>(UmbSectionContext.name);
+export const UMB_SECTION_CONTEXT_ALIAS = new UmbContextToken<UmbSectionContext>(UmbSectionContext.name);

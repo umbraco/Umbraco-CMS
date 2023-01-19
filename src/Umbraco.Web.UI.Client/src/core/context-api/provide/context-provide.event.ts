@@ -1,4 +1,4 @@
-import { UmbContextAlias } from '../context-alias';
+import { UmbContextToken } from '../context-token';
 
 export const umbContextProvideEventType = 'umb:context-provide';
 
@@ -7,7 +7,7 @@ export const umbContextProvideEventType = 'umb:context-provide';
  * @interface UmbContextProvideEvent
  */
 export interface UmbContextProvideEvent extends Event {
-	readonly contextAlias: string | UmbContextAlias;
+	readonly contextAlias: string | UmbContextToken;
 }
 
 /**
@@ -17,7 +17,7 @@ export interface UmbContextProvideEvent extends Event {
  * @implements {UmbContextProvideEvent}
  */
 export class UmbContextProvideEventImplementation extends Event implements UmbContextProvideEvent {
-	public constructor(public readonly contextAlias: string | UmbContextAlias) {
+	public constructor(public readonly contextAlias: string | UmbContextToken) {
 		super(umbContextProvideEventType, { bubbles: true, composed: true });
 	}
 }

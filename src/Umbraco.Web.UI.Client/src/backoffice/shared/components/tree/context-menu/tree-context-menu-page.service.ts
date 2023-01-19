@@ -5,7 +5,7 @@ import UmbTreeItemActionElement, { ActionPageEntity } from '../action/tree-item-
 import { UmbTreeContextMenuService } from './tree-context-menu.service';
 import { UmbLitElement } from '@umbraco-cms/element';
 import { UniqueBehaviorSubject } from '@umbraco-cms/observable-api';
-import { UmbContextAlias } from '@umbraco-cms/context-api';
+import { UmbContextToken } from '@umbraco-cms/context-api';
 
 // TODO: Refactor this, its not a service and the data should be handled by a context api.
 @customElement('umb-tree-context-menu-page-service')
@@ -66,7 +66,7 @@ export class UmbTreeContextMenuPageService extends UmbLitElement {
 	}
 }
 
-export const UMB_TREE_CONTEXT_MENU_PAGE_SERVICE_CONTEXT_ALIAS = new UmbContextAlias<UmbTreeContextMenuPageService>(
+export const UMB_TREE_CONTEXT_MENU_PAGE_SERVICE_CONTEXT_ALIAS = new UmbContextToken<UmbTreeContextMenuPageService>(
 	UmbTreeContextMenuService.name
 );
 

@@ -1,4 +1,4 @@
-export class UmbContextAlias<T = unknown> {
+export class UmbContextToken<T = unknown> {
 	/**
 	 * @param alias   Unique identifier for the token,
 	 * @param _desc   Description for the token,
@@ -10,8 +10,8 @@ export class UmbContextAlias<T = unknown> {
 	/**
 	 * @internal
 	 */
-	get multi(): UmbContextAlias<Array<T>> {
-		return this as UmbContextAlias<Array<T>>;
+	get multi(): UmbContextToken<Array<T>> {
+		return this as UmbContextToken<Array<T>>;
 	}
 
 	/**

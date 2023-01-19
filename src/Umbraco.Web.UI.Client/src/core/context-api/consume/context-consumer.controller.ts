@@ -1,4 +1,4 @@
-import { UmbContextAlias } from '../context-alias';
+import { UmbContextToken } from '../context-token';
 import { UmbContextConsumer } from './context-consumer';
 import { UmbContextCallback } from './context-request.event';
 
@@ -14,7 +14,7 @@ export class UmbContextConsumerController<T = unknown>
 
 	constructor(
 		host: UmbControllerHostInterface,
-		contextAlias: string | UmbContextAlias<T>,
+		contextAlias: string | UmbContextToken<T>,
 		callback: UmbContextCallback<T>
 	) {
 		super(host, contextAlias, callback);

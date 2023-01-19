@@ -1,6 +1,6 @@
 import { expect } from '@open-wc/testing';
 import { UmbContextConsumer } from './consume/context-consumer';
-import { UmbContextAlias } from './context-alias';
+import { UmbContextToken } from './context-token';
 import { UmbContextProvider } from './provide/context-provider';
 
 const testContextAlias = 'my-test-context';
@@ -10,7 +10,7 @@ class MyClass {
 }
 
 describe('ContextAlias', () => {
-	const contextAlias = new UmbContextAlias<MyClass>(testContextAlias);
+	const contextAlias = new UmbContextToken<MyClass>(testContextAlias);
 	const typedProvider = new UmbContextProvider(document.body, contextAlias, new MyClass());
 	typedProvider.hostConnected();
 

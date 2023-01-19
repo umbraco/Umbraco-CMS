@@ -1,7 +1,7 @@
 import { ContentTreeItem } from '@umbraco-cms/backend-api';
 import { UmbTreeDataStore } from '@umbraco-cms/stores/store';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
-import { UmbContextAlias, UmbContextConsumerController } from '@umbraco-cms/context-api';
+import { UmbContextToken, UmbContextConsumerController } from '@umbraco-cms/context-api';
 import { UniqueBehaviorSubject, UmbObserverController } from '@umbraco-cms/observable-api';
 export class UmbCollectionContext<
 	DataType extends ContentTreeItem,
@@ -111,6 +111,6 @@ export class UmbCollectionContext<
 	}
 }
 
-export const UMB_COLLECTION_CONTEXT_ALIAS = new UmbContextAlias<UmbCollectionContext<any, any>>(
+export const UMB_COLLECTION_CONTEXT_ALIAS = new UmbContextToken<UmbCollectionContext<any, any>>(
 	UmbCollectionContext.name
 );

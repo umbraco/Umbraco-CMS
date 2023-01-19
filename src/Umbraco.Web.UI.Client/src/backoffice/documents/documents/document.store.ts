@@ -3,7 +3,7 @@ import { UmbNodeStoreBase } from '../../../core/stores/store';
 import type { DocumentDetails } from '@umbraco-cms/models';
 import { DocumentResource, DocumentTreeItem, FolderTreeItem } from '@umbraco-cms/backend-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/resources';
-import { UmbContextAlias } from '@umbraco-cms/context-api';
+import { UmbContextToken } from '@umbraco-cms/context-api';
 
 export const isDocumentDetails = (document: DocumentDetails | DocumentTreeItem): document is DocumentDetails => {
 	return (document as DocumentDetails).data !== undefined;
@@ -131,4 +131,4 @@ export class UmbDocumentStore extends UmbNodeStoreBase<UmbDocumentStoreItemType>
 	}
 }
 
-export const UMB_DOCUMENT_STORE_CONTEXT_ALIAS = new UmbContextAlias<UmbDocumentStore>(STORE_ALIAS);
+export const UMB_DOCUMENT_STORE_CONTEXT_ALIAS = new UmbContextToken<UmbDocumentStore>(STORE_ALIAS);

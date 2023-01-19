@@ -15,7 +15,7 @@ import type { UmbModalConfirmData } from './layouts/confirm/modal-layout-confirm
 import type { UmbModalContentPickerData } from './layouts/content-picker/modal-layout-content-picker.element';
 import type { UmbModalPropertyEditorUIPickerData } from './layouts/property-editor-ui-picker/modal-layout-property-editor-ui-picker.element';
 import { UmbModalHandler } from './modal-handler';
-import { UmbContextAlias } from '@umbraco-cms/context-api';
+import { UmbContextToken } from '@umbraco-cms/context-api';
 
 export type UmbModalType = 'dialog' | 'sidebar';
 
@@ -133,4 +133,4 @@ export class UmbModalService {
 	}
 }
 
-export const UMB_MODAL_SERVICE_CONTEXT_ALIAS = new UmbContextAlias<UmbModalService>(UmbModalService.name);
+export const UMB_MODAL_SERVICE_CONTEXT_ALIAS = new UmbContextToken<UmbModalService>(UmbModalService.name);

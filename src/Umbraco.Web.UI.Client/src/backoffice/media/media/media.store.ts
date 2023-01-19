@@ -3,7 +3,7 @@ import { UmbDataStoreBase } from '../../../core/stores/store';
 import type { MediaDetails } from '@umbraco-cms/models';
 import { ContentTreeItem, MediaResource } from '@umbraco-cms/backend-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/resources';
-import { UmbContextAlias } from '@umbraco-cms/context-api';
+import { UmbContextToken } from '@umbraco-cms/context-api';
 
 const isMediaDetails = (media: UmbMediaStoreItemType): media is MediaDetails => {
 	return (media as MediaDetails).data !== undefined;
@@ -112,4 +112,4 @@ export class UmbMediaStore extends UmbDataStoreBase<UmbMediaStoreItemType> {
 	}
 }
 
-export const UMB_MEDIA_STORE_CONTEXT_ALIAS = new UmbContextAlias<UmbMediaStore>(STORE_ALIAS);
+export const UMB_MEDIA_STORE_CONTEXT_ALIAS = new UmbContextToken<UmbMediaStore>(STORE_ALIAS);
