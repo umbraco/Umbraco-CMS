@@ -36,6 +36,7 @@ public class ManagementApiComposer : IComposer
             .AddTrackedReferences()
             .AddDataTypes()
             .AddTemplates()
+            .AddUserGroups()
             .AddBackOfficeAuthentication()
             .AddApiVersioning()
             .AddSwaggerGen();
