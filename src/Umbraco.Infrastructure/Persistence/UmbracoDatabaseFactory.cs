@@ -173,7 +173,7 @@ public class UmbracoDatabaseFactory : DisposableObjectSlim, IUmbracoDatabaseFact
 
         lock (_lock)
         {
-            if (Volatile.Read(ref _initialized))
+            if (_umbracoConnectionString is null && Volatile.Read(ref _initialized))
             {
                 throw new InvalidOperationException("Already initialized.");
             }
