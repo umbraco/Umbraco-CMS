@@ -6,6 +6,7 @@ import { css, html, LitElement, nothing } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { UmbWorkspaceLanguageContext } from './language-workspace.context';
 import 'src/backoffice/shared/components/workspace/actions/save/workspace-action-node-save.element.ts';
+import { UUIInputElement, UUIInputEvent } from '@umbraco-ui/uui';
 
 @customElement('umb-language-workspace')
 export class UmbLanguageWorkspaceElement extends UmbLitElement {
@@ -18,23 +19,8 @@ export class UmbLanguageWorkspaceElement extends UmbLitElement {
 				gap: var(--uui-size-space-4);
 				width: 100%;
 			}
-			#main {
-				padding: var(--uui-size-space-6);
-			}
 			uui-input {
 				width: 100%;
-			}
-			hr {
-				border: none;
-				border-bottom: 1px solid var(--uui-color-divider);
-			}
-			#default-language-warning {
-				background-color: var(--uui-color-warning);
-				color: var(--uui-color-warning-contrast);
-				padding: var(--uui-size-space-4) var(--uui-size-space-5);
-				border: 1px solid var(--uui-color-warning-standalone);
-				margin-top: var(--uui-size-space-4);
-				border-radius: var(--uui-border-radius);
 			}
 		`,
 	];
@@ -56,16 +42,22 @@ export class UmbLanguageWorkspaceElement extends UmbLitElement {
 
 	private _languageWorkspaceContext?: UmbWorkspaceLanguageContext;
 
-	constructor() {
-		super();
-	}
-
 	public provideLanguageWorkspaceContext() {
 		this._languageWorkspaceContext = new UmbWorkspaceLanguageContext(this, this._entityKey);
 		this.provideContext('umbWorkspaceContext', this._languageWorkspaceContext);
 		this._languageWorkspaceContext.data.subscribe((language) => {
 			this.language = language;
 		});
+	}
+
+	private _handleInput(event: UUIInputEvent) {
+		if (event instanceof UUIInputEvent) {
+			const target = event.composedPath()[0] as UUIInputElement;
+
+			if (typeof target?.value === 'string') {
+				this._languageWorkspaceContext?.update({ name: target.value });
+			}
+		}
 	}
 
 	render() {
@@ -79,7 +71,7 @@ export class UmbLanguageWorkspaceElement extends UmbLitElement {
 							<uui-icon name="umb:arrow-left"></uui-icon>
 						</uui-button>
 					</a>
-					<uui-input .value=${this.language.name}></uui-input>
+					<uui-input .value=${this.language.name} @input="${this._handleInput}"></uui-input>
 				</div>
 			</umb-workspace-layout>
 		`;

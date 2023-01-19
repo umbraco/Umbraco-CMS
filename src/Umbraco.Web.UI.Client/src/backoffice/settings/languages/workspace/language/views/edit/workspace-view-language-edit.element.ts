@@ -1,5 +1,6 @@
 import { UmbLitElement } from '@umbraco-cms/element';
 import { LanguageDetails } from '@umbraco-cms/models';
+import { UUIBooleanInputEvent, UUIInputElement, UUIInputEvent, UUIToggleElement } from '@umbraco-ui/uui';
 import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, html, LitElement, nothing } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
@@ -7,7 +8,26 @@ import { UmbWorkspaceLanguageContext } from '../../language-workspace.context';
 
 @customElement('umb-workspace-view-language-edit')
 export class UmbWorkspaceViewLanguageEditElement extends UmbLitElement {
-	static styles = [UUITextStyles, css``];
+	static styles = [
+		UUITextStyles,
+		css`
+			uui-input {
+				width: 100%;
+			}
+			hr {
+				border: none;
+				border-bottom: 1px solid var(--uui-color-divider);
+			}
+			#default-language-warning {
+				background-color: var(--uui-color-warning);
+				color: var(--uui-color-warning-contrast);
+				padding: var(--uui-size-space-4) var(--uui-size-space-5);
+				border: 1px solid var(--uui-color-warning-standalone);
+				margin-top: var(--uui-size-space-4);
+				border-radius: var(--uui-border-radius);
+			}
+		`,
+	];
 
 	@property()
 	language?: LanguageDetails;
@@ -20,11 +40,28 @@ export class UmbWorkspaceViewLanguageEditElement extends UmbLitElement {
 		this.consumeContext('umbWorkspaceContext', (instance) => {
 			this._languageWorkspaceContext = instance;
 
-			console.log('languagae', instance);
+			if (!this._languageWorkspaceContext) return;
+
 			this._languageWorkspaceContext.data.subscribe((language) => {
 				this.language = language;
 			});
 		});
+	}
+
+	private _handleDefaultChange(event: any) {
+		if (event instanceof UUIBooleanInputEvent) {
+			const target = event.composedPath()[0] as UUIToggleElement;
+
+			this._languageWorkspaceContext?.update({ isDefault: target.checked });
+		}
+	}
+
+	private _handleMandatoryChange(event: any) {
+		if (event instanceof UUIBooleanInputEvent) {
+			const target = event.composedPath()[0] as UUIToggleElement;
+
+			this._languageWorkspaceContext?.update({ isMandatory: target.checked });
+		}
 	}
 
 	render() {
@@ -40,14 +77,14 @@ export class UmbWorkspaceViewLanguageEditElement extends UmbLitElement {
 				</umb-workspace-property-layout>
 				<umb-workspace-property-layout label="Settings">
 					<div slot="editor">
-						<uui-toggle ?checked=${this.language.isDefault || false}>
+						<uui-toggle ?checked=${this.language.isDefault || false} @change=${this._handleDefaultChange}>
 							<div>
 								<b>Default language</b>
 								<div>An Umbraco site can only have one default language set.</div>
 							</div>
 						</uui-toggle>
 						<hr />
-						<uui-toggle ?checked=${this.language.isMandatory || false}>
+						<uui-toggle ?checked=${this.language.isMandatory || false} @change=${this._handleMandatoryChange}>
 							<div>
 								<b>Mandatory language</b>
 								<div>Properties on this language have to be filled out before the node can be published.</div>

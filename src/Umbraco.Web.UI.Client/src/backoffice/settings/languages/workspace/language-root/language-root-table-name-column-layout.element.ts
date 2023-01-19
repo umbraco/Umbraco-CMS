@@ -10,7 +10,6 @@ export class UmbLanguageRootTableNameColumnLayoutElement extends LitElement {
 	value!: any;
 
 	render() {
-		console.log('this.value', this.value);
 		if (!this.value) return nothing;
 
 		return html`<a href=${'section/settings/language/edit/' + this.value.key}>${this.value.name}</a>`;

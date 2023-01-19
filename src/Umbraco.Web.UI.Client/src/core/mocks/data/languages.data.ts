@@ -17,12 +17,49 @@ class UmbLanguagesData extends UmbData<LanguageDetails> {
 	getByKey(key: string) {
 		return this.data.find((item) => item.key === key);
 	}
+
+	save(saveItems: Array<LanguageDetails>) {
+		saveItems.forEach((saveItem) => {
+			const foundIndex = this.data.findIndex((item) => item.key === saveItem.key);
+			if (foundIndex !== -1) {
+				// update
+				this.data[foundIndex] = saveItem;
+				this.updateData(saveItem);
+			} else {
+				// new
+				this.data.push(saveItem);
+			}
+		});
+
+		return saveItems;
+	}
+
+	updateData(updateItem: LanguageDetails) {
+		const itemIndex = this.data.findIndex((item) => item.key === updateItem.key);
+		const item = this.data[itemIndex];
+		if (!item) return;
+
+		const itemKeys = Object.keys(item);
+		const newItem = {};
+
+		for (const [key] of Object.entries(updateItem)) {
+			if (itemKeys.indexOf(key) !== -1) {
+				// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+				// @ts-ignore
+				newItem[key] = updateItem[key];
+			}
+		}
+
+		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+		// @ts-ignore
+		this.data[itemIndex] = newItem;
+	}
 }
 
 export const data: Array<LanguageDetails> = [
 	{
 		id: 1,
-		key: uuidv4(),
+		key: 'asdail12h3k1h23k12h3',
 		name: 'English',
 		isoCode: 'en',
 		isDefault: true,
@@ -30,7 +67,7 @@ export const data: Array<LanguageDetails> = [
 	},
 	{
 		id: 2,
-		key: uuidv4(),
+		key: 'kajshdkjashdkuahwdu',
 		name: 'Danish',
 		isoCode: 'da',
 		isDefault: false,
@@ -39,7 +76,7 @@ export const data: Array<LanguageDetails> = [
 	},
 	{
 		id: 3,
-		key: uuidv4(),
+		key: 'k12n3kj12h3123n9812h3',
 		name: 'German',
 		isoCode: 'de',
 		isDefault: false,
@@ -48,7 +85,7 @@ export const data: Array<LanguageDetails> = [
 	},
 	{
 		id: 4,
-		key: uuidv4(),
+		key: '1kl2n31231iuqshdiuashd',
 		name: 'French',
 		isoCode: 'fr',
 		isDefault: false,

@@ -1,3 +1,4 @@
+import { LanguageDetails } from '@umbraco-cms/models';
 import { rest } from 'msw';
 import { umbLanguagesData } from '../data/languages.data';
 
@@ -26,5 +27,15 @@ export const handlers = [
 		const item = umbLanguagesData.getByKey(key);
 
 		return res(ctx.status(200), ctx.json(item));
+	}),
+
+	rest.post<LanguageDetails>('/umbraco/management/api/v1/language', async (req, res, ctx) => {
+		const data = await req.json();
+
+		if (!data) return;
+
+		const saved = umbLanguagesData.save([data]);
+
+		return res(ctx.status(200), ctx.json(saved[0]));
 	}),
 ];

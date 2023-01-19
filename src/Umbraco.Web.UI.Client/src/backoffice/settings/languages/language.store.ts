@@ -1,7 +1,7 @@
 import { map, Observable } from 'rxjs';
 import { UmbDataStoreBase } from '../../../core/stores/store';
 import type { DataTypeDetails, LanguageDetails } from '@umbraco-cms/models';
-import { DataTypeResource, FolderTreeItem, LanguageResource } from '@umbraco-cms/backend-api';
+import { DataTypeResource, FolderTreeItem, Language, LanguageResource } from '@umbraco-cms/backend-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/resources';
 
 export type UmbLanguageStoreItemType = LanguageDetails;
@@ -45,7 +45,11 @@ export class UmbLanguageStore extends UmbDataStoreBase<UmbLanguageStoreItemType>
 		return this.items;
 	}
 
-	save(): Promise<void> {
-		return new Promise((resolve, reject) => '');
+	async save(language: LanguageDetails): Promise<void> {
+		LanguageResource.postLanguage({ requestBody: language }).then((data) => {
+			if (data) {
+				this.updateItems([data]);
+			}
+		});
 	}
 }

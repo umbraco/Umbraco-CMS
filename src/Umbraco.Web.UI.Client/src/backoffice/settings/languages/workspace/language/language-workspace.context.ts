@@ -6,6 +6,7 @@ import { UmbLanguageStore, UmbLanguageStoreItemType } from '../../language.store
 import { UniqueBehaviorSubject } from 'src/core/observable-api/unique-behavior-subject';
 import { UmbContextConsumerController } from 'src/core/context-api/consume/context-consumer.controller';
 import { UmbObserverController } from '@umbraco-cms/observable-api';
+import { UmbNotificationDefaultData } from 'src/core/notification/layouts/default';
 
 const DefaultLanguageData: UmbLanguageStoreItemType = {
 	id: 0,
@@ -61,5 +62,14 @@ export class UmbWorkspaceLanguageContext {
 	}
 	public update(data: Partial<LanguageDetails>) {
 		this._data.next({ ...this.getData(), ...data });
+	}
+
+	public save(): Promise<void> {
+		if (!this._store) {
+			// TODO: more beautiful error:
+			console.error('Could not save cause workspace context has no store.');
+			return Promise.resolve();
+		}
+		return this._store.save(this.getData());
 	}
 }
