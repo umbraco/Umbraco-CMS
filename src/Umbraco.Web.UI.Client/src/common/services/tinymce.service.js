@@ -777,28 +777,6 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
       editor.ui.registry.addButton('umbmacro', {
         icon: 'preferences',
         tooltip: 'Insert macro',
-        onSetup: function (buttonApi) {
-          /**
-           * Check if the macro is currently selected and toggle the menu button
-           */
-          function onNodeChanged(evt) {
-
-            //set our macro button active when on a node of class umb-macro-holder
-            activeMacroElement = getRealMacroElem(evt.element);
-
-            //set the button active/inactive
-            buttonApi.setEnabled(activeMacroElement === null);
-          }
-
-          //set onNodeChanged event listener
-          editor.on('NodeChange', onNodeChanged);
-
-          return function () {
-            //remove the event listener
-            editor.off('NodeChange', onNodeChanged);
-          }
-
-        },
 
         /** The insert macro button click event handler */
         onAction: function () {
