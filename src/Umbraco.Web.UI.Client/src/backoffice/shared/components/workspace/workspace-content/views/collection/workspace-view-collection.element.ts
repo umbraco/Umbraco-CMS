@@ -5,7 +5,7 @@ import { ifDefined } from 'lit-html/directives/if-defined.js';
 import { UmbWorkspaceContentContext } from '../../workspace-content.context';
 import {
 	UmbCollectionContext,
-	UMB_COLLECTION_CONTEXT_ALIAS,
+	UMB_COLLECTION_CONTEXT_TOKEN,
 } from 'src/backoffice/shared/collection/collection.context';
 import { UmbMediaStore, UmbMediaStoreItemType } from 'src/backoffice/media/media/media.store';
 
@@ -46,7 +46,7 @@ export class UmbWorkspaceViewCollectionElement extends UmbLitElement {
 				this._workspaceContext.entityKey,
 				this._workspaceContext.getStore()?.storeAlias || '' // The store is available when the context is available.
 			);
-			this.provideContext(UMB_COLLECTION_CONTEXT_ALIAS, this._collectionContext);
+			this.provideContext(UMB_COLLECTION_CONTEXT_TOKEN, this._collectionContext);
 		}
 	}
 

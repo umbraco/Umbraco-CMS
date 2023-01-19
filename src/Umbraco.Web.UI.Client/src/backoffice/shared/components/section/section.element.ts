@@ -4,7 +4,7 @@ import { customElement, state } from 'lit/decorators.js';
 import { map, switchMap, EMPTY, of } from 'rxjs';
 import { IRoutingInfo } from 'router-slot';
 import type { UmbWorkspaceEntityElement } from '../workspace/workspace-entity-element.interface';
-import { UmbSectionContext, UMB_SECTION_CONTEXT_ALIAS } from './section.context';
+import { UmbSectionContext, UMB_SECTION_CONTEXT_TOKEN } from './section.context';
 import { createExtensionElement } from '@umbraco-cms/extensions-api';
 import type { ManifestSectionView, ManifestWorkspace, ManifestSidebarMenuItem } from '@umbraco-cms/models';
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
@@ -48,7 +48,7 @@ export class UmbSectionElement extends UmbLitElement {
 	constructor() {
 		super();
 
-		this.consumeContext(UMB_SECTION_CONTEXT_ALIAS, (instance) => {
+		this.consumeContext(UMB_SECTION_CONTEXT_TOKEN, (instance) => {
 			this._sectionContext = instance;
 
 			// TODO: currently they don't corporate, as they overwrite each other...

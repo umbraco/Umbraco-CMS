@@ -2,7 +2,7 @@ import { UmbWorkspaceContentContext } from '../../../shared/components/workspace
 import {
 	UmbDataTypeStore,
 	UmbDataTypeStoreItemType,
-	UMB_DATA_TYPE_STORE_CONTEXT_ALIAS,
+	UMB_DATA_TYPE_STORE_CONTEXT_TOKEN,
 } from 'src/backoffice/settings/data-types/data-type.store';
 import type { DataTypeDetails } from '@umbraco-cms/models';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
@@ -25,7 +25,7 @@ export class UmbWorkspaceDataTypeContext extends UmbWorkspaceContentContext<
 	UmbDataTypeStore
 > {
 	constructor(host: UmbControllerHostInterface) {
-		super(host, DefaultDataTypeData, UMB_DATA_TYPE_STORE_CONTEXT_ALIAS.toString(), 'dataType');
+		super(host, DefaultDataTypeData, UMB_DATA_TYPE_STORE_CONTEXT_TOKEN.toString(), 'dataType');
 	}
 
 	public setPropertyValue(alias: string, value: unknown) {

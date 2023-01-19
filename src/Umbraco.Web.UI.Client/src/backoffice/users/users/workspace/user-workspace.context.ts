@@ -2,7 +2,7 @@ import { UmbWorkspaceContentContext } from '../../../shared/components/workspace
 import {
 	UmbUserStore,
 	UmbUserStoreItemType,
-	UMB_USER_STORE_CONTEXT_ALIAS,
+	UMB_USER_STORE_CONTEXT_TOKEN,
 } from 'src/backoffice/users/users/user.store';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 
@@ -26,7 +26,7 @@ const DefaultDataTypeData = {
 
 export class UmbWorkspaceUserContext extends UmbWorkspaceContentContext<UmbUserStoreItemType, UmbUserStore> {
 	constructor(host: UmbControllerHostInterface) {
-		super(host, DefaultDataTypeData, UMB_USER_STORE_CONTEXT_ALIAS.toString(), 'user');
+		super(host, DefaultDataTypeData, UMB_USER_STORE_CONTEXT_TOKEN.toString(), 'user');
 	}
 
 	public setPropertyValue(alias: string, value: unknown) {

@@ -1,8 +1,8 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, html } from 'lit';
 import { customElement } from 'lit/decorators.js';
-import { UmbModalService, UMB_MODAL_SERVICE_CONTEXT_ALIAS } from '../../../../../core/modal';
-import { UmbDocumentStore, UMB_DOCUMENT_STORE_CONTEXT_ALIAS } from '../../document.store';
+import { UmbModalService, UMB_MODAL_SERVICE_CONTEXT_TOKEN } from '../../../../../core/modal';
+import { UmbDocumentStore, UMB_DOCUMENT_STORE_CONTEXT_TOKEN } from '../../document.store';
 import UmbTreeItemActionElement from '../../../../shared/components/tree/action/tree-item-action.element';
 
 @customElement('umb-tree-action-document-delete')
@@ -15,11 +15,11 @@ export default class UmbTreeActionDocumentDeleteElement extends UmbTreeItemActio
 	connectedCallback(): void {
 		super.connectedCallback();
 
-		this.consumeContext(UMB_MODAL_SERVICE_CONTEXT_ALIAS, (modalService) => {
+		this.consumeContext(UMB_MODAL_SERVICE_CONTEXT_TOKEN, (modalService) => {
 			this._modalService = modalService;
 		});
 
-		this.consumeContext(UMB_DOCUMENT_STORE_CONTEXT_ALIAS, (documentStore) => {
+		this.consumeContext(UMB_DOCUMENT_STORE_CONTEXT_TOKEN, (documentStore) => {
 			this._documentStore = documentStore;
 		});
 	}

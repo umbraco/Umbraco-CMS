@@ -2,7 +2,7 @@ import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, html } from 'lit';
 import { customElement } from 'lit/decorators.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
-import { UmbCollectionContext, UMB_COLLECTION_CONTEXT_ALIAS } from '../collection.context';
+import { UmbCollectionContext, UMB_COLLECTION_CONTEXT_TOKEN } from '../collection.context';
 import type { ManifestCollectionBulkAction } from '@umbraco-cms/models';
 import { UmbLitElement } from '@umbraco-cms/element';
 
@@ -18,7 +18,7 @@ export class UmbCollectionBulkActionDeleteElement extends UmbLitElement {
 	constructor() {
 		super();
 
-		this.consumeContext(UMB_COLLECTION_CONTEXT_ALIAS, (context) => {
+		this.consumeContext(UMB_COLLECTION_CONTEXT_TOKEN, (context) => {
 			this._collectionContext = context;
 		});
 	}

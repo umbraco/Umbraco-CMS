@@ -6,7 +6,7 @@ import {
 	UmbNotificationOptions,
 	UmbNotificationService,
 	UmbNotificationDefaultData,
-	UMB_NOTIFICATION_SERVICE_CONTEXT_ALIAS,
+	UMB_NOTIFICATION_SERVICE_CONTEXT_TOKEN,
 } from '../notification';
 import { ApiError, CancelablePromise, ProblemDetails } from '@umbraco-cms/backend-api';
 
@@ -20,7 +20,7 @@ export class UmbResourceController extends UmbController {
 
 		this.#promise = promise;
 
-		new UmbContextConsumerController(host, UMB_NOTIFICATION_SERVICE_CONTEXT_ALIAS, (_instance) => {
+		new UmbContextConsumerController(host, UMB_NOTIFICATION_SERVICE_CONTEXT_TOKEN, (_instance) => {
 			this.#notificationService = _instance;
 		});
 	}

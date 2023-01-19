@@ -1,7 +1,7 @@
 import { css, CSSResultGroup, html, nothing } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 
-import { UmbInstallerContext, UMB_INSTALLER_CONTEXT_ALIAS } from '../installer.context';
+import { UmbInstallerContext, UMB_INSTALLER_CONTEXT_TOKEN } from '../installer.context';
 import { ProblemDetails } from '@umbraco-cms/backend-api';
 import { UmbLitElement } from '@umbraco-cms/element';
 
@@ -34,7 +34,7 @@ export class UmbInstallerErrorElement extends UmbLitElement {
 	connectedCallback() {
 		super.connectedCallback();
 
-		this.consumeContext(UMB_INSTALLER_CONTEXT_ALIAS, (installerContext) => {
+		this.consumeContext(UMB_INSTALLER_CONTEXT_TOKEN, (installerContext) => {
 			this._installerContext = installerContext;
 			this._observeInstallStatus();
 		});

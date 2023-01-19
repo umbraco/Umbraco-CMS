@@ -22,4 +22,4 @@ export class UmbSectionStore {
 	}
 }
 
-export const UMB_SECTION_STORE_CONTEXT_ALIAS = new UmbContextToken<UmbSectionStore>(UmbSectionStore.name);
+export const UMB_SECTION_STORE_CONTEXT_TOKEN = new UmbContextToken<UmbSectionStore>(UmbSectionStore.name);

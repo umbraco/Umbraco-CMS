@@ -3,7 +3,7 @@ import { css, html } from 'lit';
 import { ifDefined } from 'lit-html/directives/if-defined.js';
 import { customElement, property, state } from 'lit/decorators.js';
 
-import { UmbDataTypeStore, UMB_DATA_TYPE_STORE_CONTEXT_ALIAS } from '../../../settings/data-types/data-type.store';
+import { UmbDataTypeStore, UMB_DATA_TYPE_STORE_CONTEXT_TOKEN } from '../../../settings/data-types/data-type.store';
 import type { ContentProperty, DataTypeDetails } from '@umbraco-cms/models';
 
 import '../workspace-property/workspace-property.element';
@@ -50,7 +50,7 @@ export class UmbContentPropertyElement extends UmbLitElement {
 	constructor() {
 		super();
 
-		this.consumeContext(UMB_DATA_TYPE_STORE_CONTEXT_ALIAS, (instance) => {
+		this.consumeContext(UMB_DATA_TYPE_STORE_CONTEXT_TOKEN, (instance) => {
 			this._dataTypeStore = instance;
 			this._observeDataType(this._property?.dataTypeKey);
 		});

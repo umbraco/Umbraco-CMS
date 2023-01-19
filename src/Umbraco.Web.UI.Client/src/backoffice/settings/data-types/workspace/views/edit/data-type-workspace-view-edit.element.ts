@@ -1,7 +1,7 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html, nothing } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
-import { UmbModalService, UMB_MODAL_SERVICE_CONTEXT_ALIAS } from '../../../../../../core/modal';
+import { UmbModalService, UMB_MODAL_SERVICE_CONTEXT_TOKEN } from '../../../../../../core/modal';
 import { UmbWorkspaceDataTypeContext } from '../../data-type-workspace.context';
 import { UmbLitElement } from '@umbraco-cms/element';
 import type { DataTypeDetails } from '@umbraco-cms/models';
@@ -46,7 +46,7 @@ export class UmbDataTypeWorkspaceViewEditElement extends UmbLitElement {
 	constructor() {
 		super();
 
-		this.consumeContext(UMB_MODAL_SERVICE_CONTEXT_ALIAS, (_instance) => {
+		this.consumeContext(UMB_MODAL_SERVICE_CONTEXT_TOKEN, (_instance) => {
 			this._modalService = _instance;
 		});
 

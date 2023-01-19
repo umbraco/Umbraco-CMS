@@ -87,4 +87,4 @@ export class UmbUserGroupStore extends UmbDataStoreBase<UmbUserGroupStoreItemTyp
 	}
 }
 
-export const UMB_USER_GROUP_STORE_CONTEXT_ALIAS = new UmbContextToken<UmbUserGroupStore>(STORE_ALIAS);
+export const UMB_USER_GROUP_STORE_CONTEXT_TOKEN = new UmbContextToken<UmbUserGroupStore>(STORE_ALIAS);

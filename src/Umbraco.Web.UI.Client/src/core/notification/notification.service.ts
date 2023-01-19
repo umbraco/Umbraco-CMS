@@ -86,6 +86,6 @@ export class UmbNotificationService {
 	}
 }
 
-export const UMB_NOTIFICATION_SERVICE_CONTEXT_ALIAS = new UmbContextToken<UmbNotificationService>(
+export const UMB_NOTIFICATION_SERVICE_CONTEXT_TOKEN = new UmbContextToken<UmbNotificationService>(
 	UmbNotificationService.name
 );

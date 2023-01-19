@@ -133,4 +133,4 @@ export class UmbModalService {
 	}
 }
 
-export const UMB_MODAL_SERVICE_CONTEXT_ALIAS = new UmbContextToken<UmbModalService>(UmbModalService.name);
+export const UMB_MODAL_SERVICE_CONTEXT_TOKEN = new UmbContextToken<UmbModalService>(UmbModalService.name);

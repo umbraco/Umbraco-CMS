@@ -1,6 +1,6 @@
 import { css, CSSResultGroup, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
-import { UmbInstallerContext, UMB_INSTALLER_CONTEXT_ALIAS } from '../installer.context';
+import { UmbInstallerContext, UMB_INSTALLER_CONTEXT_TOKEN } from '../installer.context';
 import { UmbLitElement } from '@umbraco-cms/element';
 
 @customElement('umb-installer-user')
@@ -63,7 +63,7 @@ export class UmbInstallerUserElement extends UmbLitElement {
 	constructor() {
 		super();
 
-		this.consumeContext(UMB_INSTALLER_CONTEXT_ALIAS, (installerContext) => {
+		this.consumeContext(UMB_INSTALLER_CONTEXT_TOKEN, (installerContext) => {
 			this._installerContext = installerContext;
 			this._observeInstallerData();
 		});

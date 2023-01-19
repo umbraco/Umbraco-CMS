@@ -1,8 +1,8 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, html } from 'lit';
 import { customElement } from 'lit/decorators.js';
-import { UmbModalService, UMB_MODAL_SERVICE_CONTEXT_ALIAS } from '../../../../../../core/modal';
-import { UmbDataTypeStore, UMB_DATA_TYPE_STORE_CONTEXT_ALIAS } from '../../../data-type.store';
+import { UmbModalService, UMB_MODAL_SERVICE_CONTEXT_TOKEN } from '../../../../../../core/modal';
+import { UmbDataTypeStore, UMB_DATA_TYPE_STORE_CONTEXT_TOKEN } from '../../../data-type.store';
 import UmbTreeItemActionElement from '../../../../../shared/components/tree/action/tree-item-action.element';
 
 @customElement('umb-tree-action-data-type-delete')
@@ -15,11 +15,11 @@ export default class UmbTreeActionDataTypeDeleteElement extends UmbTreeItemActio
 	connectedCallback(): void {
 		super.connectedCallback();
 
-		this.consumeContext(UMB_MODAL_SERVICE_CONTEXT_ALIAS, (modalService) => {
+		this.consumeContext(UMB_MODAL_SERVICE_CONTEXT_TOKEN, (modalService) => {
 			this._modalService = modalService;
 		});
 
-		this.consumeContext(UMB_DATA_TYPE_STORE_CONTEXT_ALIAS, (dataTypeStore) => {
+		this.consumeContext(UMB_DATA_TYPE_STORE_CONTEXT_TOKEN, (dataTypeStore) => {
 			this._dataTypeStore = dataTypeStore;
 		});
 	}

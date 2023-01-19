@@ -41,4 +41,4 @@ export class UmbDocumentBlueprintStore extends UmbNodeStoreBase<UmbDocumentStore
 	}
 }
 
-export const UMB_DOCUMENT_BLULEPRINT_STORE_CONTEXT_ALIAS = new UmbContextToken<UmbDocumentBlueprintStore>(STORE_ALIAS);
+export const UMB_DOCUMENT_BLUEPRINT_STORE_CONTEXT_TOKEN = new UmbContextToken<UmbDocumentBlueprintStore>(STORE_ALIAS);

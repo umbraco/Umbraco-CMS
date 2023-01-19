@@ -28,4 +28,4 @@ export class UmbCurrentUserStore {
 	}
 }
 
-export const UMB_CURRENT_USER_STORE_CONTEXT_ALIAS = new UmbContextToken<UmbCurrentUserStore>(UmbCurrentUserStore.name);
+export const UMB_CURRENT_USER_STORE_CONTEXT_TOKEN = new UmbContextToken<UmbCurrentUserStore>(UmbCurrentUserStore.name);

@@ -111,6 +111,6 @@ export class UmbCollectionContext<
 	}
 }
 
-export const UMB_COLLECTION_CONTEXT_ALIAS = new UmbContextToken<UmbCollectionContext<any, any>>(
+export const UMB_COLLECTION_CONTEXT_TOKEN = new UmbContextToken<UmbCollectionContext<any, any>>(
 	UmbCollectionContext.name
 );

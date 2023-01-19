@@ -1,7 +1,7 @@
 import { Meta, Story } from '@storybook/web-components';
 import { html } from 'lit-html';
 import { manifests } from '../../../../documents/section.manifests';
-import { UmbSectionContext, UMB_SECTION_CONTEXT_ALIAS } from '../section.context';
+import { UmbSectionContext, UMB_SECTION_CONTEXT_TOKEN } from '../section.context';
 import type { UmbSectionDashboardsElement } from './section-dashboards.element';
 import type { ManifestSection } from '@umbraco-cms/models';
 import './section-dashboards.element';
@@ -15,7 +15,7 @@ export default {
 	decorators: [
 		(story) =>
 			html` <umb-context-provider
-				key=${UMB_SECTION_CONTEXT_ALIAS.toString()}
+				key=${UMB_SECTION_CONTEXT_TOKEN.toString()}
 				.value=${new UmbSectionContext(contentSectionManifest)}>
 				${story()}
 			</umb-context-provider>`,

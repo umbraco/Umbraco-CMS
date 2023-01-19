@@ -4,11 +4,11 @@ import { customElement, property, state } from 'lit/decorators.js';
 import { ifDefined } from 'lit-html/directives/if-defined.js';
 import { map, Observable } from 'rxjs';
 import { repeat } from 'lit/directives/repeat.js';
-import { UmbSectionContext, UMB_SECTION_CONTEXT_ALIAS } from '../section/section.context';
+import { UmbSectionContext, UMB_SECTION_CONTEXT_TOKEN } from '../section/section.context';
 import type { UmbTreeContextBase } from './tree.context';
 import {
 	UmbTreeContextMenuService,
-	UMB_TREE_CONTEXT_MENU_SERVICE_CONTEXT_ALIAS,
+	UMB_TREE_CONTEXT_MENU_SERVICE_CONTEXT_TOKEN,
 } from './context-menu/tree-context-menu.service';
 import type { Entity } from '@umbraco-cms/models';
 import { UmbTreeDataStore } from '@umbraco-cms/stores/store';
@@ -85,13 +85,13 @@ export class UmbTreeItem extends UmbLitElement {
 			this._store = store;
 		});
 
-		this.consumeContext(UMB_SECTION_CONTEXT_ALIAS, (sectionContext) => {
+		this.consumeContext(UMB_SECTION_CONTEXT_TOKEN, (sectionContext) => {
 			this._sectionContext = sectionContext;
 			this._observeSection();
 			this._observeActiveTreeItem();
 		});
 
-		this.consumeContext(UMB_TREE_CONTEXT_MENU_SERVICE_CONTEXT_ALIAS, (treeContextMenuService) => {
+		this.consumeContext(UMB_TREE_CONTEXT_MENU_SERVICE_CONTEXT_TOKEN, (treeContextMenuService) => {
 			this._treeContextMenuService = treeContextMenuService;
 		});
 	}

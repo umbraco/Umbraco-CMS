@@ -2,7 +2,7 @@ import { css, html } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, state } from 'lit/decorators.js';
 import { map } from 'rxjs';
-import { UmbSectionContext, UMB_SECTION_CONTEXT_ALIAS } from '../../section/section.context';
+import { UmbSectionContext, UMB_SECTION_CONTEXT_TOKEN } from '../../section/section.context';
 import type { Entity, ManifestTreeItemAction, ManifestTree } from '@umbraco-cms/models';
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
 import { UmbLitElement } from '@umbraco-cms/element';
@@ -41,7 +41,7 @@ export class UmbTreeContextMenuPageActionListElement extends UmbLitElement {
 	constructor() {
 		super();
 
-		this.consumeContext(UMB_SECTION_CONTEXT_ALIAS, (sectionContext) => {
+		this.consumeContext(UMB_SECTION_CONTEXT_TOKEN, (sectionContext) => {
 			this._sectionContext = sectionContext;
 			this._observeActiveTree();
 			this._observeActiveTreeItem();

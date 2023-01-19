@@ -123,4 +123,4 @@ export class UmbInstallerContext {
 	}
 }
 
-export const UMB_INSTALLER_CONTEXT_ALIAS = new UmbContextToken<UmbInstallerContext>(UmbInstallerContext.name);
+export const UMB_INSTALLER_CONTEXT_TOKEN = new UmbContextToken<UmbInstallerContext>(UmbInstallerContext.name);

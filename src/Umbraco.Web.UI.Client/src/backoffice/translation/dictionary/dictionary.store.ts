@@ -52,4 +52,4 @@ export class UmbDictionaryStore extends UmbDataStoreBase<EntityTreeItem> {
 	}
 }
 
-export const UMB_DICTIONARY_STORE_CONTEXT_ALIAS = new UmbContextToken<UmbDictionaryStore>(STORE_ALIAS);
+export const UMB_DICTIONARY_STORE_CONTEXT_TOKEN = new UmbContextToken<UmbDictionaryStore>(STORE_ALIAS);

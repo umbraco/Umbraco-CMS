@@ -37,4 +37,4 @@ export class UmbMemberGroupStore extends UmbNodeStoreBase<UmbMemberGroupStoreIte
 	}
 }
 
-export const UMB_MEMBER_GROUP_STORE_CONTEXT_ALIAS = new UmbContextToken<UmbMemberGroupStore>(STORE_ALIAS);
+export const UMB_MEMBER_GROUP_STORE_CONTEXT_TOKEN = new UmbContextToken<UmbMemberGroupStore>(STORE_ALIAS);

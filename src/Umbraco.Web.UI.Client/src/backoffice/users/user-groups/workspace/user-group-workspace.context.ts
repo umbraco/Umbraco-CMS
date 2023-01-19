@@ -1,5 +1,5 @@
 import { UmbWorkspaceContentContext } from '../../../shared/components/workspace/workspace-content/workspace-content.context';
-import { UMB_USER_STORE_CONTEXT_ALIAS } from '../../users/user.store';
+import { UMB_USER_STORE_CONTEXT_TOKEN } from '../../users/user.store';
 import type { UmbUserGroupStore, UmbUserGroupStoreItemType } from 'src/backoffice/users/user-groups/user-group.store';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 
@@ -20,7 +20,7 @@ export class UmbWorkspaceUserGroupContext extends UmbWorkspaceContentContext<
 	UmbUserGroupStore
 > {
 	constructor(host: UmbControllerHostInterface) {
-		super(host, DefaultDataTypeData, UMB_USER_STORE_CONTEXT_ALIAS.toString(), 'userGroup');
+		super(host, DefaultDataTypeData, UMB_USER_STORE_CONTEXT_TOKEN.toString(), 'userGroup');
 	}
 
 	public setPropertyValue(alias: string, value: unknown) {

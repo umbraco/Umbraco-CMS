@@ -11,7 +11,7 @@ import {
 	UmbNotificationColor,
 	UmbNotificationOptions,
 	UmbNotificationService,
-	UMB_NOTIFICATION_SERVICE_CONTEXT_ALIAS,
+	UMB_NOTIFICATION_SERVICE_CONTEXT_TOKEN,
 } from '.';
 import { UmbLitElement } from '@umbraco-cms/element';
 
@@ -33,7 +33,7 @@ export class StoryNotificationDefaultExampleElement extends UmbLitElement {
 	connectedCallback(): void {
 		super.connectedCallback();
 
-		this.consumeContext(UMB_NOTIFICATION_SERVICE_CONTEXT_ALIAS, (notificationService) => {
+		this.consumeContext(UMB_NOTIFICATION_SERVICE_CONTEXT_TOKEN, (notificationService) => {
 			this._notificationService = notificationService;
 		});
 	}

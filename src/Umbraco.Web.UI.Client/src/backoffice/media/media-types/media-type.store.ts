@@ -90,4 +90,4 @@ export class UmbMediaTypeStore extends UmbNodeStoreBase<UmbMediaTypeStoreItemTyp
 	}
 }
 
-export const UMB_MEDIA_TYPE_STORE_CONTEXT_ALIAS = new UmbContextToken<UmbMediaTypeStore>(STORE_ALIAS);
+export const UMB_MEDIA_TYPE_STORE_CONTEXT_TOKEN = new UmbContextToken<UmbMediaTypeStore>(STORE_ALIAS);

@@ -131,4 +131,4 @@ export class UmbDocumentStore extends UmbNodeStoreBase<UmbDocumentStoreItemType>
 	}
 }
 
-export const UMB_DOCUMENT_STORE_CONTEXT_ALIAS = new UmbContextToken<UmbDocumentStore>(STORE_ALIAS);
+export const UMB_DOCUMENT_STORE_CONTEXT_TOKEN = new UmbContextToken<UmbDocumentStore>(STORE_ALIAS);

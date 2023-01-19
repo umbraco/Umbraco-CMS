@@ -37,4 +37,4 @@ export class UmbMemberTypeStore extends UmbDataStoreBase<UmbMemberTypeStoreItemT
 	}
 }
 
-export const UMB_MEMBER_TYPE_STORE_CONTEXT_ALIAS = new UmbContextToken<UmbMemberTypeStore>(STORE_ALIAS);
+export const UMB_MEMBER_TYPE_STORE_CONTEXT_TOKEN = new UmbContextToken<UmbMemberTypeStore>(STORE_ALIAS);

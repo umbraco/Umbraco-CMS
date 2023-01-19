@@ -5,7 +5,7 @@ import { repeat } from 'lit/directives/repeat.js';
 import { ifDefined } from 'lit-html/directives/if-defined.js';
 import type { UmbSectionViewUsersElement } from '../../section-view-users.element';
 import { getTagLookAndColor } from '../../../../../../../auth/utils';
-import { UmbUserGroupStore, UMB_USER_GROUP_STORE_CONTEXT_ALIAS } from '../../../../../user-groups/user-group.store';
+import { UmbUserGroupStore, UMB_USER_GROUP_STORE_CONTEXT_TOKEN } from '../../../../../user-groups/user-group.store';
 import type { UserDetails, UserEntity, UserGroupEntity } from '@umbraco-cms/models';
 import { UmbLitElement } from '@umbraco-cms/element';
 
@@ -54,7 +54,7 @@ export class UmbWorkspaceViewUsersGridElement extends UmbLitElement {
 	constructor() {
 		super();
 
-		this.consumeContext(UMB_USER_GROUP_STORE_CONTEXT_ALIAS, (instance) => {
+		this.consumeContext(UMB_USER_GROUP_STORE_CONTEXT_TOKEN, (instance) => {
 			this._userGroupStore = instance;
 			this._observeUserGroups();
 		});

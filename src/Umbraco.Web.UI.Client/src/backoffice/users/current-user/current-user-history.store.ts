@@ -50,6 +50,6 @@ export class UmbCurrentUserHistoryStore {
 	}
 }
 
-export const UMB_CURRENT_USER_HISTORY_STORE_CONTEXT_ALIAS = new UmbContextToken<UmbCurrentUserHistoryStore>(
+export const UMB_CURRENT_USER_HISTORY_STORE_CONTEXT_TOKEN = new UmbContextToken<UmbCurrentUserHistoryStore>(
 	UmbCurrentUserHistoryStore.name
 );

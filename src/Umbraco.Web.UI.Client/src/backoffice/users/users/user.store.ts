@@ -280,4 +280,4 @@ export class UmbUserStore extends UmbDataStoreBase<UmbUserStoreItemType> {
 	// }
 }
 
-export const UMB_USER_STORE_CONTEXT_ALIAS = new UmbContextToken<UmbUserStore>(STORE_ALIAS);
+export const UMB_USER_STORE_CONTEXT_TOKEN = new UmbContextToken<UmbUserStore>(STORE_ALIAS);

@@ -5,7 +5,7 @@ import { UmbModalLayoutPickerBase } from '../modal-layout-picker-base';
 import type { UserGroupDetails } from '@umbraco-cms/models';
 import {
 	UmbUserGroupStore,
-	UMB_USER_GROUP_STORE_CONTEXT_ALIAS,
+	UMB_USER_GROUP_STORE_CONTEXT_TOKEN,
 } from 'src/backoffice/users/user-groups/user-group.store';
 
 @customElement('umb-picker-layout-user-group')
@@ -63,7 +63,7 @@ export class UmbPickerLayoutUserGroupElement extends UmbModalLayoutPickerBase {
 
 	connectedCallback(): void {
 		super.connectedCallback();
-		this.consumeContext(UMB_USER_GROUP_STORE_CONTEXT_ALIAS, (userGroupStore) => {
+		this.consumeContext(UMB_USER_GROUP_STORE_CONTEXT_TOKEN, (userGroupStore) => {
 			this._userGroupStore = userGroupStore;
 			this._observeUserGroups();
 		});

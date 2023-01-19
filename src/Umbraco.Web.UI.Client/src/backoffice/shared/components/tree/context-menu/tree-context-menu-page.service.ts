@@ -23,7 +23,7 @@ export class UmbTreeContextMenuPageService extends UmbLitElement {
 
 	connectedCallback() {
 		super.connectedCallback();
-		this.provideContext(UMB_TREE_CONTEXT_MENU_PAGE_SERVICE_CONTEXT_ALIAS, this);
+		this.provideContext(UMB_TREE_CONTEXT_MENU_PAGE_SERVICE_CONTEXT_TOKEN, this);
 		this.openFreshPage('umb-tree-context-menu-page-action-list');
 	}
 
@@ -66,7 +66,7 @@ export class UmbTreeContextMenuPageService extends UmbLitElement {
 	}
 }
 
-export const UMB_TREE_CONTEXT_MENU_PAGE_SERVICE_CONTEXT_ALIAS = new UmbContextToken<UmbTreeContextMenuPageService>(
+export const UMB_TREE_CONTEXT_MENU_PAGE_SERVICE_CONTEXT_TOKEN = new UmbContextToken<UmbTreeContextMenuPageService>(
 	UmbTreeContextMenuService.name
 );
 

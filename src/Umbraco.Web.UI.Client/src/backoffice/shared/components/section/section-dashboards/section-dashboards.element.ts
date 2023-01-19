@@ -3,7 +3,7 @@ import { css, html, nothing } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { IRoutingInfo } from 'router-slot';
 import { first, map } from 'rxjs';
-import { UmbSectionContext, UMB_SECTION_CONTEXT_ALIAS } from '../section.context';
+import { UmbSectionContext, UMB_SECTION_CONTEXT_TOKEN } from '../section.context';
 import { createExtensionElement } from '@umbraco-cms/extensions-api';
 import type {
 	ManifestDashboard,
@@ -63,7 +63,7 @@ export class UmbSectionDashboardsElement extends UmbLitElement {
 	constructor() {
 		super();
 
-		this.consumeContext(UMB_SECTION_CONTEXT_ALIAS, (context) => {
+		this.consumeContext(UMB_SECTION_CONTEXT_TOKEN, (context) => {
 			this._sectionContext = context;
 			this._observeSectionContext();
 		});

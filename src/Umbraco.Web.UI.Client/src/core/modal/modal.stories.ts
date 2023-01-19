@@ -2,7 +2,7 @@ import { Meta, Story } from '@storybook/web-components';
 import { html } from 'lit-html';
 import { customElement, property, state } from 'lit/decorators.js';
 
-import { UmbModalService, UMB_MODAL_SERVICE_CONTEXT_ALIAS } from '.';
+import { UmbModalService, UMB_MODAL_SERVICE_CONTEXT_TOKEN } from '.';
 import { UmbLitElement } from '@umbraco-cms/element';
 
 export default {
@@ -28,7 +28,7 @@ export class StoryModalServiceExampleElement extends UmbLitElement {
 
 	constructor() {
 		super();
-		this.consumeContext(UMB_MODAL_SERVICE_CONTEXT_ALIAS, (modalService) => {
+		this.consumeContext(UMB_MODAL_SERVICE_CONTEXT_TOKEN, (modalService) => {
 			this._modalService = modalService;
 		});
 	}

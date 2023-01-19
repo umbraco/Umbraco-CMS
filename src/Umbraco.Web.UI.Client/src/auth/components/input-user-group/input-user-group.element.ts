@@ -5,7 +5,7 @@ import { UmbInputListBase } from '../../../backoffice/shared/components/input-li
 import type { UserGroupEntity } from '@umbraco-cms/models';
 import {
 	UmbUserGroupStore,
-	UMB_USER_GROUP_STORE_CONTEXT_ALIAS,
+	UMB_USER_GROUP_STORE_CONTEXT_TOKEN,
 } from 'src/backoffice/users/user-groups/user-group.store';
 
 @customElement('umb-input-user-group')
@@ -47,7 +47,7 @@ export class UmbInputPickerUserGroupElement extends UmbInputListBase {
 	connectedCallback(): void {
 		super.connectedCallback();
 		this.pickerLayout = 'umb-picker-layout-user-group';
-		this.consumeContext(UMB_USER_GROUP_STORE_CONTEXT_ALIAS, (usersContext) => {
+		this.consumeContext(UMB_USER_GROUP_STORE_CONTEXT_TOKEN, (usersContext) => {
 			this._userGroupStore = usersContext;
 			this._observeUserGroups();
 		});
