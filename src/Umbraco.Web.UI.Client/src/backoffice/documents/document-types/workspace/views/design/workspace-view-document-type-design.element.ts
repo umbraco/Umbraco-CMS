@@ -18,7 +18,7 @@ export class UmbWorkspaceViewDocumentTypeDesignElement extends UmbLitElement {
 	constructor() {
 		super();
 
-		// TODO: Figure out if this is the best way to consume the context or if it can be strongly typed with an UmbContextAlias
+		// TODO: Figure out if this is the best way to consume the context or if it can be strongly typed with an UmbContextToken
 		this.consumeContext<UmbWorkspaceDocumentTypeContext>('umbWorkspaceContext', (documentTypeContext) => {
 			this._workspaceContext = documentTypeContext;
 			this._observeDocumentType();

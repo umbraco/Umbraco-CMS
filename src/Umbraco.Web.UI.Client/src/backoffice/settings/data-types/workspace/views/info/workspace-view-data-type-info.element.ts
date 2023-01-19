@@ -18,7 +18,7 @@ export class UmbWorkspaceViewDataTypeInfoElement extends UmbLitElement {
 	constructor() {
 		super();
 
-		// TODO: Figure out if this is the best way to consume the context or if it can be strongly typed with an UmbContextAlias
+		// TODO: Figure out if this is the best way to consume the context or if it can be strongly typed with an UmbContextToken
 		this.consumeContext<UmbWorkspaceDataTypeContext>('umbWorkspaceContext', (dataTypeContext) => {
 			this._workspaceContext = dataTypeContext;
 			this._observeDataType();

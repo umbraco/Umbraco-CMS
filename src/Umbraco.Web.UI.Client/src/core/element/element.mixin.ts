@@ -69,7 +69,7 @@ export const UmbElementMixin = <T extends HTMLElementConstructor>(superClass: T)
 		 * @param {string} aliases
 		 * @param {method} callback Callback method called when all contexts are resolved.
 		 * @memberof UmbElementMixin
-		 * @deprecated it should not be necessary to consume multiple contexts at once, use consumeContext instead with an UmbContextAlias
+		 * @deprecated it should not be necessary to consume multiple contexts at once, use consumeContext instead with an UmbContextToken
 		 */
 		consumeAllContexts(_contextAliases: Array<string>, callback: (_instances: ResolvedContexts) => void) {
 			let resolvedAmount = 0;

@@ -13,9 +13,9 @@ The methods are (_note this can be out of date, we need to look into how we can 
 ```
 observe<T>(source: Observable<T>, callback: (_value: T) => void, unique?: string): UmbObserverController<T>
 
-provideContext<R = unknown>(alias: string | UmbContextAlias<R>, instance: R): UmbContextProviderController<R>
+provideContext<R = unknown>(alias: string | UmbContextToken<R>, instance: R): UmbContextProviderController<R>
 
-consumeContext<R = unknown>(alias: string | UmbContextAlias<R>, callback: UmbContextCallback<R>): UmbContextConsumerController<R>
+consumeContext<R = unknown>(alias: string | UmbContextToken<R>, callback: UmbContextCallback<R>): UmbContextConsumerController<R>
 ```
 
 Use these for an smooth consumption, like this request for a Context API using a simple string context, where the callback value is unknown
@@ -27,10 +27,10 @@ this.consumeContext('requestThisContextAlias', (context) => {
 });
 ```
 
-Or use the UmbContextAlias type to define the type of the context, like this
+Or use the UmbContextToken type to define the type of the context, like this
 
 ```
-const contextAlias = new UmbContextAlias<SomeType>('description of context for debugging purposes');
+const contextAlias = new UmbContextToken<SomeType>('description of context for debugging purposes');
 
 this.consumeContext(contextAlias, (context) => {
 	// Notice this is a subscription, as context might change or a new one appears, but the value is strongly typed
