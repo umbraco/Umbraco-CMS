@@ -41,8 +41,7 @@ public class UserGroupBase
     /// This can be overwritten by a different user group if a user is a member of multiple groups
     /// </remarks>
     /// </summary>
-    // TODO: Rename to DocumentStartNodeKey?
-    public Guid? ContentStartNodeKey { get; init; }
+    public Guid? DocumentStartNodeKey { get; init; }
 
     /// <summary>
     /// The Key of the media that should act as root node for the user group

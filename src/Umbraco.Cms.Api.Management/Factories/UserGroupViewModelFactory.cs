@@ -32,7 +32,7 @@ public class UserGroupViewModelFactory : IUserGroupViewModelFactory
         {
             Name = userGroup.Name ?? string.Empty,
             Key = userGroup.Key,
-            ContentStartNodeKey = contentStartNodeKey,
+            DocumentStartNodeKey = contentStartNodeKey,
             MediaStartNodeKey = mediaStartNodeKey,
             Icon = userGroup.Icon,
             Languages = userGroup.AllowedLanguages,
@@ -49,7 +49,7 @@ public class UserGroupViewModelFactory : IUserGroupViewModelFactory
     // TODO: Should we split this class out? Maybe rename it?
     public IUserGroup Create(UserGroupSaveModel saveModel)
     {
-        int? contentStartNodeId = GetIdFromKey(saveModel.ContentStartNodeKey, UmbracoObjectTypes.Document);
+        int? contentStartNodeId = GetIdFromKey(saveModel.DocumentStartNodeKey, UmbracoObjectTypes.Document);
         int? mediaStartNodeId = GetIdFromKey(saveModel.MediaStartNodeKey, UmbracoObjectTypes.Media);
 
         var group = new UserGroup(_shortStringHelper)
