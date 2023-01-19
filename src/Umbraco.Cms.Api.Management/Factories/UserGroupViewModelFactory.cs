@@ -76,6 +76,30 @@ public class UserGroupViewModelFactory : IUserGroupViewModelFactory
         return group;
     }
 
+    public IUserGroup Update(IUserGroup current, UserGroupUpdateModel update)
+    {
+        current.Name = update.Name;
+        current.Icon = update.Icon;
+        current.HasAccessToAllLanguages = update.HasAccessToAllLanguages;
+        current.StartContentId = GetIdFromKey(update.DocumentStartNodeKey, UmbracoObjectTypes.Document);
+        current.StartMediaId = GetIdFromKey(update.DocumentStartNodeKey, UmbracoObjectTypes.Media);
+        current.PermissionNames = update.Permissions;
+
+        current.ClearAllowedLanguages();
+        foreach (var languageId in update.Languages)
+        {
+            current.AddAllowedLanguage(languageId);
+        }
+
+        current.ClearAllowedSections();
+        foreach (var sectionName in update.Sections)
+        {
+            current.AddAllowedSection(SectionMapper.GetAlias(sectionName));
+        }
+
+        return current;
+    }
+
     private Guid? GetKeyFromId(int? id, UmbracoObjectTypes objectType)
     {
         if (id is null)

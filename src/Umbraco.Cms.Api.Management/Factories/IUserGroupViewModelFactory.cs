@@ -28,4 +28,12 @@ public interface IUserGroupViewModelFactory
     /// <param name="saveModel"></param>
     /// <returns></returns>
     IUserGroup Create(UserGroupSaveModel saveModel);
+
+    /// <summary>
+    /// Converts the values of an update model to fit with the existing backoffice implementations, and maps it to an existing user group.
+    /// </summary>
+    /// <param name="current">Existing user group to map to.</param>
+    /// <param name="update">Update model containing the new values.</param>
+    /// <returns>The updated user group.</returns>
+    IUserGroup Update(IUserGroup current, UserGroupUpdateModel update);
 }
