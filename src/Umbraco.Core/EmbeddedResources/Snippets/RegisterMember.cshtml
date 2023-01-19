@@ -18,6 +18,9 @@
         // Set to true if you want the member editable properties shown.
         // It will only displays properties marked as "Member can edit" on the "Info" tab of the Member Type.
         .WithCustomProperties(false)
+        // By default the member will be logged in automatically after registration.
+        // Set this to false if the member should not be logged in automatically.
+        .WithAutomaticLogIn(true)
         .Build();
 
     var success = TempData["FormSuccess"] != null;
@@ -39,7 +42,8 @@ else
             new {
                 MemberTypeAlias = registerModel.MemberTypeAlias,
                 UsernameIsEmail = registerModel.UsernameIsEmail,
-                RedirectUrl = registerModel.RedirectUrl
+                RedirectUrl = registerModel.RedirectUrl,
+                AutomaticLogIn = registerModel.AutomaticLogIn
             }))
     {
         <h2>Create a new account.</h2>
