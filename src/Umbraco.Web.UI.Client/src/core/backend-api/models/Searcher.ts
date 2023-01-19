@@ -3,6 +3,6 @@
 /* eslint-disable */
 
 export type Searcher = {
-    name?: string | null;
+    name?: string;
 };
 

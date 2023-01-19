@@ -6,6 +6,6 @@ import type { HealthCheck } from './HealthCheck';
 
 export type HealthCheckGroup = {
     name?: string | null;
-    checks?: Array<HealthCheck> | null;
+    checks?: Array<HealthCheck>;
 };
 

@@ -1,4 +1,4 @@
-import { Index, PagedIndex, SearchResult } from '@umbraco-cms/backend-api';
+import { HealthStatus, Index, PagedIndex, SearchResult } from '@umbraco-cms/backend-api';
 
 export function getIndexByName(indexName: string) {
 	return Indexers.find((index) => {
@@ -15,8 +15,7 @@ export const Indexers: Index[] = [
 	{
 		name: 'ExternalIndex',
 		canRebuild: true,
-		healthStatus: 'Healthy',
-		isHealthy: true,
+		healthStatus: HealthStatus.HEALTHY,
 		documentCount: 0,
 		fieldCount: 0,
 		providerProperties: {
@@ -35,8 +34,7 @@ export const Indexers: Index[] = [
 	{
 		name: 'InternalIndex',
 		canRebuild: true,
-		healthStatus: 'Healthy',
-		isHealthy: true,
+		healthStatus: HealthStatus.HEALTHY,
 		documentCount: 0,
 		fieldCount: 0,
 		providerProperties: {
@@ -55,8 +53,7 @@ export const Indexers: Index[] = [
 	{
 		name: 'MemberIndex',
 		canRebuild: true,
-		healthStatus: 'Healthy',
-		isHealthy: true,
+		healthStatus: HealthStatus.HEALTHY,
 		fieldCount: 0,
 		documentCount: 0,
 		providerProperties: {

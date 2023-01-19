@@ -2,7 +2,7 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html, nothing } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 
-import { Index, IndexerResource, Searcher, SearcherResource } from '@umbraco-cms/backend-api';
+import { HealthStatus, Index, IndexerResource, Searcher, SearcherResource } from '@umbraco-cms/backend-api';
 import { UmbLitElement } from '@umbraco-cms/element';
 import { tryExecuteAndNotify } from '@umbraco-cms/resources';
 
@@ -111,10 +111,11 @@ export class UmbDashboardExamineOverviewElement extends UmbLitElement {
 					<uui-table-row>
 						<uui-table-cell style="width:0px">
 							<uui-icon-essentials>
-								<uui-icon
-									style="vertical-align: top"
-									name=${index.isHealthy ? `check` : `wrong`}
-									class=${index.isHealthy ? 'positive' : 'danger'}>
+							${
+								index.healthStatus === HealthStatus.UNHEALTHY
+									? html`<uui-icon name="wrong" class="danger"></uui-icon>`
+									: html`<uui-icon name="check" class="positive"></uui-icon>`
+							}
 								</uui-icon>
 							</uui-icon-essentials>
 						</uui-table-cell>

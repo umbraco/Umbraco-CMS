@@ -8,13 +8,13 @@ import type { ModuleHandle } from './ModuleHandle';
 
 export type Module = {
     assembly?: Assembly;
-    readonly fullyQualifiedName?: string | null;
-    readonly name?: string | null;
+    readonly fullyQualifiedName?: string;
+    readonly name?: string;
     readonly mdStreamVersion?: number;
     readonly moduleVersionId?: string;
-    readonly scopeName?: string | null;
+    readonly scopeName?: string;
     moduleHandle?: ModuleHandle;
-    readonly customAttributes?: Array<CustomAttributeData> | null;
+    readonly customAttributes?: Array<CustomAttributeData>;
     readonly metadataToken?: number;
 };
 

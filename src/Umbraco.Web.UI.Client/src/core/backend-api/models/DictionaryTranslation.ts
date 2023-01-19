@@ -7,7 +7,7 @@ export type DictionaryTranslation = {
     key?: string;
     displayName?: string | null;
     isoCode?: string | null;
-    translation?: string | null;
+    translation?: string;
     languageId?: number;
 };
 
