@@ -726,7 +726,6 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
     createInsertMacro: function (editor, callback) {
 
       let self = this;
-      let activeMacroElement = null; //track an active macro element
 
       /** Adds custom rules for the macro plugin and custom serialization */
       editor.on('preInit', function (args) {
@@ -755,11 +754,17 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
       });
 
       /**
-       * Because the macro gets wrapped in a P tag because of the way 'enter' works, this
+       * Because the macro got wrapped in a P tag because of the way 'enter' works in older versions of Umbraco, this
        * method will return the macro element if not wrapped in a p, or the p if the macro
        * element is the only one inside of it even if we are deep inside an element inside the macro
        */
-      function getRealMacroElem(element) {
+      function getRealMacroElem() {
+        // Ask the editor for the currently selected element
+        const element = editor.selection.getNode();
+        if (!element) {
+          return null;
+        }
+
         var e = $(element).closest(".umb-macro-holder");
         if (e.length > 0) {
           if (e.get(0).parentNode.nodeName === "P") {
@@ -777,32 +782,9 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
       editor.ui.registry.addButton('umbmacro', {
         icon: 'preferences',
         tooltip: 'Insert macro',
-        onSetup: function (buttonApi) {
-          /**
-           * Check if the macro is currently selected and toggle the menu button
-           */
-          function onNodeChanged(evt) {
-
-            //set our macro button active when on a node of class umb-macro-holder
-            activeMacroElement = getRealMacroElem(evt.element);
-
-            //set the button active/inactive
-            buttonApi.setEnabled(activeMacroElement === null);
-          }
-
-          //set onNodeChanged event listener
-          editor.on('NodeChange', onNodeChanged);
-
-          return function () {
-            //remove the event listener
-            editor.off('NodeChange', onNodeChanged);
-          }
-
-        },
 
         /** The insert macro button click event handler */
         onAction: function () {
-
           var dialogData = {
             //flag for use in rte so we only show macros flagged for the editor
             richTextEditor: true
@@ -810,6 +792,7 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
 
           //when we click we could have a macro already selected and in that case we'll want to edit the current parameters
           //so we'll need to extract them and submit them to the dialog.
+          const activeMacroElement = getRealMacroElem();
           if (activeMacroElement) {
             //we have a macro selected so we'll need to parse it's alias and parameters
             var contents = $(activeMacroElement).contents();
@@ -823,7 +806,7 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
             var parsed = macroService.parseMacroSyntax(syntax);
             dialogData = {
               macroData: parsed,
-              activeMacroElement: activeMacroElement //pass the active element along so we can retrieve it later
+              activeMacroElement //pass the active element along so we can retrieve it later
             };
           }
 
