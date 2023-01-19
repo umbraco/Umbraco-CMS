@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Infrastructure.Scoping;
+using Umbraco.Cms.Infrastructure.Scoping;
 
 namespace Umbraco.Cms.Infrastructure.Migrations;
 

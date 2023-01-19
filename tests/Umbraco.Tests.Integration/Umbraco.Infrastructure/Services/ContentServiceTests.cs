@@ -2789,13 +2789,13 @@ public class ContentServiceTests : UmbracoIntegrationTestWithContent
         Assert.IsFalse(content.Published);
         Assert.IsTrue(content.Edited);
 
-        // FIXME: depending on 1 line in ContentBaseFactory.BuildEntity
+        // TODO: depending on 1 line in ContentBaseFactory.BuildEntity
         // the published infos can be gone or not
         // if gone, it's not consistent with above
         Assert.AreEqual(vpk, ((Content)content).VersionId);
         Assert.AreEqual(ppk, ((Content)content).PublishedVersionId); // still there
 
-        // FIXME: depending on 1 line in ContentRepository.MapDtoToContent
+        // TODO: depending on 1 line in ContentRepository.MapDtoToContent
         // the published values can be null or not
         // if null, it's not consistent with above
         // Assert.IsNull(content.GetValue("title", published:  true));
@@ -2811,7 +2811,7 @@ public class ContentServiceTests : UmbracoIntegrationTestWithContent
         //
         // ContentService.SaveAndPublish(content);
 
-        // FIXME: what shall we do of all this?
+        // TODO: what shall we do of all this?
         /*
         // this basically republishes a content
         // what if it never was published?
@@ -2822,11 +2822,11 @@ public class ContentServiceTests : UmbracoIntegrationTestWithContent
         Assert.IsTrue(content.Published);
         Assert.IsFalse(content.Edited);
 
-        // FIXME: should it be 2 or 3
+        // TODO: should it be 2 or 3
         versions = ContentService.GetVersions(content.Id);
         Assert.AreEqual(2, versions.Count());
 
-        // FIXME: now test rollbacks
+        // TODO: now test rollbacks
         var version = ContentService.GetByVersion(content.Id); // test that it gets a version - should be GetVersion
         var previousVersion = ContentService.GetVersions(content.Id).Skip(1).FirstOrDefault(); // need an optimized way to do this
         content.CopyValues(version); // copies the edited value - always
@@ -2871,7 +2871,7 @@ public class ContentServiceTests : UmbracoIntegrationTestWithContent
         // the name will be set to the default culture variant name
         Assert.AreEqual("name-us", content.Name);
 
-        // FIXME: should we always sync the invariant name even on update? see EnsureInvariantNameValues
+        // TODO: should we always sync the invariant name even on update? see EnsureInvariantNameValues
         ////updating the default culture variant name should also update the invariant name so they stay in sync
         // content.SetName("name-us-2", langUk.IsoCode);
         // ContentService.Save(content);
@@ -3083,7 +3083,7 @@ public class ContentServiceTests : UmbracoIntegrationTestWithContent
             ValueStorageType.Nvarchar, "prop")
         { Variations = ContentVariation.Culture });
 
-        // FIXME: add test w/ an invariant prop
+        // TODO: add test w/ an invariant prop
         ContentTypeService.Save(contentType);
 
         var content = ContentService.Create("Home US", Constants.System.Root, "umbTextpage");

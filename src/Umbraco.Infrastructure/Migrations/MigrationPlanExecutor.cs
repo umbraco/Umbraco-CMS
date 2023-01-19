@@ -12,7 +12,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations;
 /*
  * This is what runs our migration plans.
  * It's important to note that this was altered to allow for partial migration completions.
- * Thee need for the became apparent when we added support for SQLite.
+ * The need for this became apparent when we added support for SQLite.
  * The main issue being how SQLites handles altering the schema.
  * Long story short, SQLite doesn't support altering columns,
  * or adding non-nullable columns with non-trivial types, for instance GUIDs.
@@ -71,7 +71,7 @@ public class MigrationPlanExecutor : IMigrationPlanExecutor
     /// <para>Each migration in the plan, may or may not run in a scope depending on the type of plan.</para>
     /// <para>A plan can complete partially, the changes of each completed migration will be saved.</para>
     /// </remarks>
-    public ExecutedMigrationPlan Execute(MigrationPlan plan, string fromState)
+    public ExecutedMigrationPlan ExecutePlan(MigrationPlan plan, string fromState)
     {
         plan.Validate();
 

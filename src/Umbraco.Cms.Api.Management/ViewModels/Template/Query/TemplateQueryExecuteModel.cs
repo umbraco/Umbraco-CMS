@@ -1,0 +1,15 @@
+﻿namespace Umbraco.Cms.Api.Management.ViewModels.Template.Query;
+
+public class TemplateQueryExecuteModel
+{
+    public Guid? RootContentKey { get; set; }
+
+    public string? ContentTypeAlias { get; set; }
+
+    public IEnumerable<TemplateQueryExecuteFilterModel>? Filters { get; set; }
+
+    public TemplateQueryExecuteSortModel? Sort { get; set; }
+
+    public int Take { get; set; }
+
+}
