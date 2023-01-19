@@ -45,7 +45,7 @@ public class UserGroupSave : EntityBasic, IValidatableObject
     /// FIXME: Permissions already exists in the form of "DefaultPermissions", but is subject to change in the future
     /// when we know more about how we want to handle permissions, potentially those will be migrated in the these "soft" permissions.
     /// </remarks>
-    public IEnumerable<string>? Permissions { get; set; }
+    public ISet<string>? Permissions { get; set; }
 
     /// <summary>
     ///     The list of letters (permission codes) to assign as the default for the user group

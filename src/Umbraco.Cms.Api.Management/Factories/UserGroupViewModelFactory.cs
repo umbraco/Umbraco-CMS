@@ -41,7 +41,6 @@ public class UserGroupViewModelFactory : IUserGroupViewModelFactory
             Permissions = userGroup.PermissionNames,
             Sections = userGroup.AllowedSections.Select(SectionMapper.GetName),
         };
-
     }
 
     public IEnumerable<UserGroupViewModel> CreateMultiple(IEnumerable<IUserGroup> userGroups) =>

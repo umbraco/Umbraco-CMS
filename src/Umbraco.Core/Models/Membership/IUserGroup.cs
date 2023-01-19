@@ -1,3 +1,4 @@
+using System.Collections;
 using Umbraco.Cms.Core.Models.Entities;
 
 namespace Umbraco.Cms.Core.Models.Membership;
@@ -47,7 +48,7 @@ public interface IUserGroup : IEntity, IRememberBeingDirty
     /// FIXME: For now this is named PermissionNames since Permissions already exists, but is subject to change in the future
     /// when we know more about how we want to handle permissions, potentially those will be migrated in the these "soft" permissions.
     /// </remarks>
-    IEnumerable<string> PermissionNames { get; set; }
+    ISet<string> PermissionNames { get; set; }
 
     IEnumerable<string> AllowedSections { get; }
 

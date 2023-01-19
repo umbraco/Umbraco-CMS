@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Runtime.Serialization;
 using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Strings;
@@ -24,7 +25,7 @@ public class UserGroup : EntityBase, IUserGroup, IReadOnlyUserGroup
     private string _name;
     private bool _hasAccessToAllLanguages;
     private IEnumerable<string>? _permissions;
-    private IEnumerable<string> _permissionNames = Enumerable.Empty<string>();
+    private ISet<string> _permissionNames = new HashSet<string>();
     private List<string> _sectionCollection;
     private List<int> _languageCollection;
     private int? _startContentId;
@@ -126,7 +127,7 @@ public class UserGroup : EntityBase, IUserGroup, IReadOnlyUserGroup
     }
 
     /// <inheritdoc />
-    public IEnumerable<string> PermissionNames
+    public ISet<string> PermissionNames
     {
         get => _permissionNames;
         set => SetPropertyValueAndDetectChanges(value, ref _permissionNames!, nameof(PermissionNames), _stringEnumerableComparer);

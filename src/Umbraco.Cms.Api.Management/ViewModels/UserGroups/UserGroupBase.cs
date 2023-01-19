@@ -54,5 +54,5 @@ public class UserGroupBase
     /// <summary>
     /// Ad-hoc list of permissions provided, and maintained by the front-end. The server has no concept of what these mean.
     /// </summary>
-    public required IEnumerable<string> Permissions { get; init; }
+    public required ISet<string> Permissions { get; init; }
 }
