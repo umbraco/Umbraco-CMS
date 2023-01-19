@@ -107,9 +107,7 @@
 
       vm.saveButtonState = "busy";
 
-      var preValues = dataTypeHelper.createPreValueProps(vm.dataType.preValues);
-
-      dataTypeResource.save(vm.dataType, preValues, $scope.model.create).then(
+      dataTypeResource.save(vm.dataType, vm.dataType.preValues, $scope.model.create).then(
         function(newDataType) {
           $scope.model.dataType = newDataType;
 
