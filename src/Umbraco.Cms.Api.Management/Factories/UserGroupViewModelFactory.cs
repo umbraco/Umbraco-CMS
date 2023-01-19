@@ -5,6 +5,7 @@ using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Factories;
 
@@ -51,11 +52,12 @@ public class UserGroupViewModelFactory : IUserGroupViewModelFactory
     {
         int? contentStartNodeId = GetIdFromKey(saveModel.DocumentStartNodeKey, UmbracoObjectTypes.Document);
         int? mediaStartNodeId = GetIdFromKey(saveModel.MediaStartNodeKey, UmbracoObjectTypes.Media);
+        var cleanedName = saveModel.Name.CleanForXss('[', ']', '(', ')', ':');
 
         var group = new UserGroup(_shortStringHelper)
         {
-            Name = saveModel.Name,
-            Alias = saveModel.Name,
+            Name = cleanedName,
+            Alias = cleanedName,
             Icon = saveModel.Icon,
             HasAccessToAllLanguages = saveModel.HasAccessToAllLanguages,
             PermissionNames = saveModel.Permissions,
@@ -78,7 +80,7 @@ public class UserGroupViewModelFactory : IUserGroupViewModelFactory
 
     public IUserGroup Update(IUserGroup current, UserGroupUpdateModel update)
     {
-        current.Name = update.Name;
+        current.Name = update.Name.CleanForXss('[', ']', '(', ')', ':');
         current.Icon = update.Icon;
         current.HasAccessToAllLanguages = update.HasAccessToAllLanguages;
         current.StartContentId = GetIdFromKey(update.DocumentStartNodeKey, UmbracoObjectTypes.Document);
