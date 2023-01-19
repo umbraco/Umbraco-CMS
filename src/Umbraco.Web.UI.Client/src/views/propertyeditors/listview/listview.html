@@ -4,9 +4,9 @@
 
    </div>
 
-   <div class="row-fluid" ng-switch-when="false">
+   <div class="row-fluid umb-listview__container" ng-switch-when="false">
 
-       <umb-editor-sub-header ng-class="{'--state-selection':(selection.length > 0)}">
+       <umb-editor-sub-header ng-if="(selection.length == 0)">
 
            <umb-editor-sub-header-content-left>
 
@@ -88,30 +88,12 @@
 
                </umb-editor-sub-header-section>
 
-               <umb-editor-sub-header-section ng-show="(selection.length > 0)">
-                   <umb-button
-                       type="button"
-                       label="Clear selection"
-                       label-key="buttons_clearSelection"
-                       button-style="white"
-                       action="clearSelection()"
-                       disabled="actionInProgress">
-                   </umb-button>
-               </umb-editor-sub-header-section>
-
-               <umb-editor-sub-header-section ng-show="(selection.length > 0)">
-                   <strong ng-show="!actionInProgress">{{ selectedItemsCount() }} <localize key="general_of">of</localize> {{ listViewResultSet.items.length }} <localize key="general_selected">selected</localize></strong>
-                   <strong ng-show="actionInProgress" ng-bind="bulkStatus"></strong>
-
-                   <umb-loader position="bottom" ng-show="actionInProgress"></umb-loader>
-               </umb-editor-sub-header-section>
-
            </umb-editor-sub-header-content-left>
 
 
            <umb-editor-sub-header-content-right>
 
-               <umb-editor-sub-header-section ng-show="(selection.length == 0)">
+               <umb-editor-sub-header-section>
 
                    <umb-layout-selector
                        ng-show="options.layout.layouts"
@@ -122,81 +104,12 @@
 
                </umb-editor-sub-header-section>
 
-               <umb-editor-sub-header-section ng-show="(selection.length == 0)">
+               <umb-editor-sub-header-section>
 
                     <umb-mini-search model="options.filter" on-search="makeSearch()" on-start-typing="onSearchStartTyping()">
                     </umb-mini-search>
 
                </umb-editor-sub-header-section>
-
-               <umb-editor-sub-header-section ng-show="(selection.length > 0)">
-
-                   <umb-button
-                       ng-if="options.allowBulkPublish && (buttonPermissions == null || buttonPermissions.canPublish)"
-                       style="margin-right: 5px;"
-                       type="button"
-                       button-style="white"
-                       label-key="actions_publish"
-                       icon="icon-globe"
-                       action="publish()"
-                       disabled="actionInProgress"
-                       size="xs"
-                       add-ellipsis="true">
-                   </umb-button>
-
-                   <umb-button
-                       ng-if="options.allowBulkUnpublish && (buttonPermissions == null || buttonPermissions.canUnpublish)"
-                       style="margin-right: 5px;"
-                       type="button"
-                       button-style="white"
-                       label-key="actions_unpublish"
-                       icon="icon-block"
-                       action="unpublish()"
-                       disabled="actionInProgress"
-                       size="xs"
-                       add-ellipsis="true">
-                   </umb-button>
-
-                   <umb-button
-                       ng-if="options.allowBulkCopy && (buttonPermissions == null || buttonPermissions.canCopy)"
-                       style="margin-right: 5px;"
-                       type="button"
-                       button-style="white"
-                       label-key="actions_copy"
-                       icon="icon-documents"
-                       action="copy()"
-                       disabled="actionInProgress"
-                       size="xs"
-                       add-ellipsis="true">
-                   </umb-button>
-
-                   <umb-button
-                       ng-if="options.allowBulkMove && (buttonPermissions == null || buttonPermissions.canMove)"
-                       style="margin-right: 5px;"
-                       type="button"
-                       button-style="white"
-                       label-key="actions_move"
-                       icon="icon-enter"
-                       action="move()"
-                       disabled="actionInProgress"
-                       size="xs"
-                       add-ellipsis="true">
-                   </umb-button>
-
-                   <umb-button
-                       ng-if="options.allowBulkDelete && (buttonPermissions == null || buttonPermissions.canDelete)"
-                       type="button"
-                       button-style="white"
-                       label-key="actions_delete"
-                       icon="icon-trash"
-                       action="delete(selection.length, listViewResultSet.items.length)"
-                       disabled="actionInProgress"
-                       size="xs"
-                       add-ellipsis="true">
-                   </umb-button>
-
-               </umb-editor-sub-header-section>
-
            </umb-editor-sub-header-content-right>
 
        </umb-editor-sub-header>
@@ -215,6 +128,64 @@
       <umb-load-indicator ng-show="!viewLoaded"></umb-load-indicator>
 
       <div ng-if="viewLoaded && viewLoadedError" class="umb-alert umb-alert--warning">{{viewLoadedError}}</div>
+
+      <umb-editor-sub-header class="--state-selection" ng-if="(selection.length > 0)">
+
+        <umb-editor-sub-header-content-left>
+
+            <umb-editor-sub-header-section>
+                <umb-button type="button" label="Clear selection" label-key="buttons_clearSelection" button-style="white"
+                  action="clearSelection()" disabled="actionInProgress">
+                </umb-button>
+            </umb-editor-sub-header-section>
+
+            <umb-editor-sub-header-section>
+                <strong ng-show="!actionInProgress">{{ selectedItemsCount() }}
+                  <localize key="general_of">of</localize> {{
+                  listViewResultSet.items.length }}
+                  <localize key="general_selected">selected</localize>
+                </strong>
+                <strong ng-show="actionInProgress" ng-bind="bulkStatus"></strong>
+                <umb-loader position="bottom" ng-show="actionInProgress"></umb-loader>
+            </umb-editor-sub-header-section>
+
+        </umb-editor-sub-header-content-left>
+
+
+        <umb-editor-sub-header-content-right>
+
+          <umb-editor-sub-header-section>
+            <umb-button ng-if="options.allowBulkPublish && (buttonPermissions == null || buttonPermissions.canPublish)"
+              style="margin-right: 5px" type="button" button-style="white" label-key="actions_publish" icon="icon-globe"
+              action="publish()" disabled="actionInProgress" size="xs" add-ellipsis="true">
+            </umb-button>
+
+            <umb-button
+              ng-if="options.allowBulkUnpublish && (buttonPermissions == null || buttonPermissions.canUnpublish)"
+              style="margin-right: 5px" type="button" button-style="white" label-key="actions_unpublish" icon="icon-block"
+              action="unpublish()" disabled="actionInProgress" size="xs" add-ellipsis="true">
+            </umb-button>
+
+            <umb-button ng-if="options.allowBulkCopy && (buttonPermissions == null || buttonPermissions.canCopy)"
+              style="margin-right: 5px" type="button" button-style="white" label-key="actions_copy" icon="icon-documents"
+              action="copy()" disabled="actionInProgress" size="xs" add-ellipsis="true">
+            </umb-button>
+
+            <umb-button ng-if="options.allowBulkMove && (buttonPermissions == null || buttonPermissions.canMove)"
+              style="margin-right: 5px" type="button" button-style="white" label-key="actions_move" icon="icon-enter"
+              action="move()" disabled="actionInProgress" size="xs" add-ellipsis="true">
+            </umb-button>
+
+            <umb-button ng-if="options.allowBulkDelete && (buttonPermissions == null || buttonPermissions.canDelete)"
+              type="button" button-style="white" label-key="actions_delete" icon="icon-trash"
+              action="delete(selection.length, listViewResultSet.items.length)" disabled="actionInProgress" size="xs"
+              add-ellipsis="true">
+            </umb-button>
+          </umb-editor-sub-header-section>
+
+        </umb-editor-sub-header-content-right>
+
+      </umb-editor-sub-header>
 
       <div class="flex justify-center">
           <umb-pagination

@@ -99,7 +99,7 @@ public class ContentIndexPopulator : IndexPopulator<IUmbracoContentIndex>
         {
             content = _contentService.GetPagedDescendants(contentParentId, pageIndex, pageSize, out _).ToArray();
 
-            var valueSets = _contentValueSetBuilder.GetValueSets(content).ToList();
+            var valueSets = _contentValueSetBuilder.GetValueSets(content).ToArray();
 
             // ReSharper disable once PossibleMultipleEnumeration
             foreach (IIndex index in indexes)
@@ -145,7 +145,7 @@ public class ContentIndexPopulator : IndexPopulator<IUmbracoContentIndex>
                 }
             }
 
-            var valueSets = _contentValueSetBuilder.GetValueSets(indexableContent.ToArray()).ToList();
+            var valueSets = _contentValueSetBuilder.GetValueSets(indexableContent.ToArray()).ToArray();
 
             foreach (IIndex index in indexes)
             {
