@@ -1,10 +1,8 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
+using System.Runtime.InteropServices;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
@@ -485,10 +483,19 @@ public class LocalizationServiceTests : UmbracoIntegrationTest
     public void Cannot_Create_Language_With_Invalid_IsoCode()
     {
         var invalidLanguage = new Language("no-such-iso-code", "Invalid ISO code");
-
         var result = LocalizationService.Create(invalidLanguage);
-        Assert.IsFalse(result.Success);
-        Assert.AreEqual(LanguageOperationStatus.InvalidIsoCode, result.Status);
+
+        // MacOS + Linux allows resolving CultureInfo from any ISO code - Windows does not
+        // see e.g. https://github.com/dotnet/runtime/issues/16457#issuecomment-418827420
+        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows) == false)
+        {
+            Assert.IsTrue(result.Success);
+        }
+        else
+        {
+            Assert.IsFalse(result.Success);
+            Assert.AreEqual(LanguageOperationStatus.InvalidIsoCode, result.Status);
+        }
     }
 
     [Test]
