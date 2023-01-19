@@ -2,7 +2,7 @@ import { css, html } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, state } from 'lit/decorators.js';
 import { UmbSectionViewUsersElement } from './section-view-users.element';
-import { UmbUserStore } from 'src/backoffice/users/users/user.store';
+import { UmbUserStore, UMB_USER_STORE_CONTEXT_TOKEN } from 'src/backoffice/users/users/user.store';
 import { UmbLitElement } from '@umbraco-cms/element';
 
 @customElement('umb-workspace-view-users-selection')
@@ -39,7 +39,7 @@ export class UmbWorkspaceViewUsersSelectionElement extends UmbLitElement {
 			this._observeSelection();
 		});
 
-		this.consumeContext('umbUserStore', (userStore: UmbUserStore) => {
+		this.consumeContext(UMB_USER_STORE_CONTEXT_TOKEN, (userStore) => {
 			this._userStore = userStore;
 			this._observeTotalUsers();
 		});

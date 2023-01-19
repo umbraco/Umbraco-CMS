@@ -1,10 +1,9 @@
 import { BehaviorSubject } from 'rxjs';
 import type { Entity, ManifestSection, ManifestSectionView, ManifestTree } from '@umbraco-cms/models';
 import { UniqueBehaviorSubject } from '@umbraco-cms/observable-api';
+import { UmbContextToken } from '@umbraco-cms/context-api';
 
 export class UmbSectionContext {
-
-
 	#manifest;
 	public readonly manifest;
 
@@ -24,7 +23,6 @@ export class UmbSectionContext {
 		this.#manifest = new UniqueBehaviorSubject<ManifestSection>(sectionManifest);
 		this.manifest = this.#manifest.asObservable();
 	}
-
 
 	public setManifest(data: ManifestSection) {
 		this.#manifest.next({ ...data });
@@ -46,3 +44,5 @@ export class UmbSectionContext {
 		this._activeView.next(view);
 	}
 }
+
+export const UMB_SECTION_CONTEXT_TOKEN = new UmbContextToken<UmbSectionContext>(UmbSectionContext.name);

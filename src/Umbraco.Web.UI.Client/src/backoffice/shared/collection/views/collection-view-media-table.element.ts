@@ -1,7 +1,7 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
-import type { UmbCollectionContext } from '../collection.context';
+import { UmbCollectionContext, UMB_COLLECTION_CONTEXT_TOKEN } from '../collection.context';
 import type { MediaDetails } from '@umbraco-cms/models';
 import { UmbLitElement } from '@umbraco-cms/element';
 import {
@@ -60,7 +60,7 @@ export class UmbCollectionViewMediaTableElement extends UmbLitElement {
 
 	constructor() {
 		super();
-		this.consumeContext('umbCollectionContext', (instance) => {
+		this.consumeContext(UMB_COLLECTION_CONTEXT_TOKEN, (instance) => {
 			this._collectionContext = instance;
 			this._observeCollectionContext();
 		});

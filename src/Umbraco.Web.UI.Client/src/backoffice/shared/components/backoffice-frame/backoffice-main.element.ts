@@ -3,8 +3,8 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html } from 'lit';
 import { state } from 'lit/decorators.js';
 import { IRoutingInfo } from 'router-slot';
-import { UmbSectionStore } from '../section/section.store';
-import { UmbSectionContext } from '../section/section.context';
+import { UmbSectionStore, UMB_SECTION_STORE_CONTEXT_TOKEN } from '../section/section.store';
+import { UmbSectionContext, UMB_SECTION_CONTEXT_TOKEN } from '../section/section.context';
 import { createExtensionElement } from '@umbraco-cms/extensions-api';
 import type { ManifestSection } from '@umbraco-cms/models';
 import { UmbSectionElement } from 'src/backoffice/shared/components/section/section.element';
@@ -41,7 +41,7 @@ export class UmbBackofficeMain extends UmbLitElement {
 	constructor() {
 		super();
 
-		this.consumeContext('umbSectionStore', (_instance: UmbSectionStore) => {
+		this.consumeContext(UMB_SECTION_STORE_CONTEXT_TOKEN, (_instance) => {
 			this._sectionStore = _instance;
 			this._observeSections();
 		});
@@ -93,7 +93,7 @@ export class UmbBackofficeMain extends UmbLitElement {
 	private _provideSectionContext(section: ManifestSection) {
 		if (!this._sectionContext) {
 			this._sectionContext = new UmbSectionContext(section);
-			this.provideContext('umbSectionContext', this._sectionContext);
+			this.provideContext(UMB_SECTION_CONTEXT_TOKEN, this._sectionContext);
 		} else {
 			this._sectionContext.setManifest(section);
 		}

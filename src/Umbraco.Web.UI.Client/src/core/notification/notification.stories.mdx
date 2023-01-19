@@ -21,7 +21,7 @@ The UmbNotification service can be used to open notifications.
 ```ts
 import { html, LitElement } from 'lit';
 import { UmbLitElement } from '@umbraco-cms/element';
-import type { UmbNotificationService } from './core/services/notification';
+import type { UmbNotificationService, UMB_NOTIFICATION_SERVICE_CONTEXT_ALIAS } from './core/services/notification';
 
 class MyElement extends UmbLitElement {
 	private _notificationService?: UmbNotificationService;
@@ -29,7 +29,7 @@ class MyElement extends UmbLitElement {
 	constructor() {
 		super();
 
-		this.consumeContext('umbNotificationService', (notificationService) => {
+		this.consumeContext(UMB_NOTIFICATION_SERVICE_CONTEXT_ALIAS, (notificationService) => {
 			this._notificationService = notificationService;
 			// notificationService is now ready to be used
 		});
@@ -45,7 +45,11 @@ A notification is opened by calling one of the helper methods on the UmbNotifica
 import { html, LitElement } from 'lit';
 import { state } from 'lit/decorators.js';
 import { UmbLitElement } from '@umbraco-cms/element';
-import type { UmbNotificationService, UmbNotificationDefaultData } from './core/services/notification';
+import type {
+	UmbNotificationService,
+	UmbNotificationDefaultData,
+	UMB_NOTIFICATION_SERVICE_CONTEXT_ALIAS,
+} from './core/services/notification';
 
 class MyElement extends UmbLitElement {
 	private _notificationService?: UmbNotificationService;
@@ -53,7 +57,7 @@ class MyElement extends UmbLitElement {
 	constructor() {
 		super();
 
-		this.consumeContext('umbNotificationService', (notificationService) => {
+		this.consumeContext(UMB_NOTIFICATION_SERVICE_CONTEXT_ALIAS, (notificationService) => {
 			this._notificationService = notificationService;
 			// notificationService is now ready to be used
 		});
@@ -122,7 +126,11 @@ export class UmbNotificationLayoutCustom extends LitElement {
 ```ts
 import { html, LitElement } from 'lit';
 import { UmbContextInjectMixin } from '@umbraco-cms/context-api';
-import type { UmbNotificationService, UmbNotificationOptions } from './core/services/notification';
+import type {
+	UmbNotificationService,
+	UmbNotificationOptions,
+	UMB_NOTIFICATION_SERVICE_CONTEXT_ALIAS,
+} from './core/services/notification';
 import type { UmbNotificationCustomData } from './custom-notification-layout';
 
 class MyElement extends LitElement {
@@ -131,7 +139,7 @@ class MyElement extends LitElement {
 	constructor() {
 		super();
 
-		this.consumeContext('umbNotificationService', (notificationService) => {
+		this.consumeContext(UMB_NOTIFICATION_SERVICE_CONTEXT_ALIAS, (notificationService) => {
 			this._notificationService = notificationService;
 			// notificationService is now ready to be used
 		});
