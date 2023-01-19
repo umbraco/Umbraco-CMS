@@ -82,7 +82,7 @@ public class UserGroupViewModelFactory : IUserGroupViewModelFactory
         current.Icon = update.Icon;
         current.HasAccessToAllLanguages = update.HasAccessToAllLanguages;
         current.StartContentId = GetIdFromKey(update.DocumentStartNodeKey, UmbracoObjectTypes.Document);
-        current.StartMediaId = GetIdFromKey(update.DocumentStartNodeKey, UmbracoObjectTypes.Media);
+        current.StartMediaId = GetIdFromKey(update.MediaStartNodeKey, UmbracoObjectTypes.Media);
         current.PermissionNames = update.Permissions;
 
         current.ClearAllowedLanguages();
