@@ -46,10 +46,23 @@ export class UmbLanguageStore extends UmbDataStoreBase<UmbLanguageStoreItemType>
 	}
 
 	async save(language: LanguageDetails): Promise<void> {
-		LanguageResource.postLanguage({ requestBody: language }).then((data) => {
-			if (data) {
-				this.updateItems([data]);
-			}
-		});
+		console.log('Save', language);
+
+		if (language.id && language.key) {
+			console.log('PUT', language);
+
+			LanguageResource.putLanguageById({ id: language.id, requestBody: language }).then((data) => {
+				if (data) {
+					this.updateItems([data]);
+				}
+			});
+		} else {
+			console.log('POST', language);
+			LanguageResource.postLanguage({ requestBody: language }).then((data) => {
+				if (data) {
+					this.updateItems([data]);
+				}
+			});
+		}
 	}
 }

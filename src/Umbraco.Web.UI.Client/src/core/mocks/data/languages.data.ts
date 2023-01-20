@@ -26,7 +26,6 @@ class UmbLanguagesData extends UmbData<LanguageDetails> {
 				this.data[foundIndex] = saveItem;
 				this.updateData(saveItem);
 			} else {
-				// new
 				this.data.push(saveItem);
 			}
 		});
