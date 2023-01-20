@@ -3,7 +3,7 @@
 /* eslint-disable */
 
 export type Culture = {
-    name?: string | null;
-    englishName?: string | null;
+    name?: string;
+    englishName?: string;
 };
 

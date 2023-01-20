@@ -1,5 +1,7 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css';
-import { css, html, LitElement, nothing } from 'lit';
+import { css, html, LitElement } from 'lit';
+import { ifDefined } from 'lit-html/directives/if-defined.js';
+import { when } from 'lit-html/directives/when.js';
 import { customElement, property, state } from 'lit/decorators.js';
 import { repeat } from 'lit/directives/repeat.js';
 
@@ -22,6 +24,7 @@ export interface UmbTableColumn {
 
 export interface UmbTableConfig {
 	allowSelection: boolean;
+	hideIcon?: boolean;
 }
 
 export class UmbTableSelectedEvent extends Event {
@@ -77,16 +80,16 @@ export class UmbTableElement extends LitElement {
 				display: none;
 			}
 
-			uui-table-row:focus uui-icon,
-			uui-table-row:focus-within uui-icon,
-			uui-table-row:hover uui-icon,
+			uui-table-row[selectable]:focus uui-icon,
+			uui-table-row[selectable]:focus-within uui-icon,
+			uui-table-row[selectable]:hover uui-icon,
 			uui-table-row[select-only] uui-icon {
 				display: none;
 			}
 
-			uui-table-row:focus uui-checkbox,
-			uui-table-row:focus-within uui-checkbox,
-			uui-table-row:hover uui-checkbox,
+			uui-table-row[selectable]:focus uui-checkbox,
+			uui-table-row[selectable]:focus-within uui-checkbox,
+			uui-table-row[selectable]:hover uui-checkbox,
 			uui-table-row[select-only] uui-checkbox {
 				display: inline-block;
 			}
@@ -137,6 +140,7 @@ export class UmbTableElement extends LitElement {
 	@property({ type: Object, attribute: false })
 	public config: UmbTableConfig = {
 		allowSelection: false,
+		hideIcon: false,
 	};
 
 	/**
@@ -201,18 +205,10 @@ export class UmbTableElement extends LitElement {
 	}
 
 	render() {
-		return html` <uui-table class="uui-text">
+		return html`<uui-table class="uui-text">
 			<uui-table-column style="width: 60px;"></uui-table-column>
 			<uui-table-head>
-				<uui-table-head-cell style="--uui-table-cell-padding: 0">
-					<uui-checkbox
-						label="Select All"
-						style="padding: var(--uui-size-4) var(--uui-size-5);"
-						@change="${this._handleAllRowsCheckboxChange}"
-						?checked="${this.selection.length === this.items.length}">
-					</uui-checkbox>
-				</uui-table-head-cell>
-				${this.columns.map((column) => this._renderHeaderCell(column))}
+				${this._renderHeaderCheckboxCell()} ${this.columns.map((column) => this._renderHeaderCell(column))}
 			</uui-table-head>
 			${repeat(this.items, (item) => item.key, this._renderRow)}
 		</uui-table>`;
@@ -231,28 +227,52 @@ export class UmbTableElement extends LitElement {
 		`;
 	}
 
+	private _renderHeaderCheckboxCell() {
+		if (this.config.hideIcon && !this.config.allowSelection) return;
+
+		return html` <uui-table-head-cell style="--uui-table-cell-padding: 0">
+			${when(
+				this.config.allowSelection,
+				() => html` <uui-checkbox
+					label="Select All"
+					style="padding: var(--uui-size-4) var(--uui-size-5);"
+					@change="${this._handleAllRowsCheckboxChange}"
+					?checked="${this.selection.length === this.items.length}">
+				</uui-checkbox>`
+			)}
+		</uui-table-head-cell>`;
+	}
+
 	private _renderRow = (item: UmbTableItem) => {
 		return html`<uui-table-row
-			?selectable="${this.config.allowSelection && this._selectionMode}"
+			?selectable="${this.config.allowSelection}"
 			?select-only=${this._selectionMode}
 			?selected=${this._isSelected(item.key)}
 			@selected=${() => this._selectRow(item.key)}
 			@unselected=${() => this._deselectRow(item.key)}>
-			<uui-table-cell>
-				${item.icon ? html`<uui-icon name=${item.icon}></uui-icon>` : nothing}
-				<uui-checkbox
+			${this._renderRowCheckboxCell(item)} ${this.columns.map((column) => this._renderRowCell(column, item))}
+		</uui-table-row>`;
+	};
+
+	private _renderRowCheckboxCell(item: UmbTableItem) {
+		if (this.config.hideIcon && !this.config.allowSelection) return;
+
+		return html`<uui-table-cell>
+			${when(!this.config.hideIcon, () => html`<uui-icon name=${ifDefined(item.icon)}></uui-icon>`)}
+			${when(
+				this.config.allowSelection,
+				() => html` <uui-checkbox
 					label="Select Row"
 					@click=${(e: PointerEvent) => e.stopPropagation()}
 					@change=${(event: Event) => this._handleRowCheckboxChange(event, item)}
 					?checked="${this._isSelected(item.key)}">
-				</uui-checkbox>
-			</uui-table-cell>
-			${this.columns.map((column) => this._renderRowCell(column, item))}
-		</uui-table-row>`;
-	};
+				</uui-checkbox>`
+			)}
+		</uui-table-cell>`;
+	}
 
 	private _renderRowCell(column: UmbTableColumn, item: UmbTableItem) {
-		return html`<uui-table-cell style="--uui-table-cell-padding: 0"
+		return html`<uui-table-cell
 			>${this._renderCellContent(column, item)}</uui-table-cell
 			>
 		</uui-table-cell>`;

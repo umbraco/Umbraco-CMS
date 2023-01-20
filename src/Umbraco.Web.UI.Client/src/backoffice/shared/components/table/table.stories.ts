@@ -72,6 +72,7 @@ const items: Array<UmbTableItem> = [
 
 const config: UmbTableConfig = {
 	allowSelection: true,
+	hideIcon: false,
 };
 
 export const AAAOverview: Story<UmbTableElement> = () =>

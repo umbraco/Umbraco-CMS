@@ -3,6 +3,7 @@ import { UmbDataStoreBase } from '../../../core/stores/store';
 import type { MediaDetails } from '@umbraco-cms/models';
 import { ContentTreeItem, MediaResource } from '@umbraco-cms/backend-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/resources';
+import { UmbContextToken } from '@umbraco-cms/context-api';
 
 const isMediaDetails = (media: UmbMediaStoreItemType): media is MediaDetails => {
 	return (media as MediaDetails).data !== undefined;
@@ -11,6 +12,8 @@ const isMediaDetails = (media: UmbMediaStoreItemType): media is MediaDetails => 
 // TODO: stop using ContentTreeItem.
 export type UmbMediaStoreItemType = MediaDetails | ContentTreeItem;
 
+export const STORE_ALIAS = 'UmbMediaStore';
+
 /**
  * @export
  * @class UmbMediaStore
@@ -18,7 +21,7 @@ export type UmbMediaStoreItemType = MediaDetails | ContentTreeItem;
  * @description - Data Store for Media
  */
 export class UmbMediaStore extends UmbDataStoreBase<UmbMediaStoreItemType> {
-	public readonly storeAlias = 'umbMediaStore';
+	public readonly storeAlias = STORE_ALIAS;
 
 	getByKey(key: string): Observable<MediaDetails | null> {
 		// fetch from server and update store
@@ -108,3 +111,5 @@ export class UmbMediaStore extends UmbDataStoreBase<UmbMediaStoreItemType> {
 		return this.items.pipe(map((items) => items.filter((item) => item.parentKey === key && !item.isTrashed)));
 	}
 }
+
+export const UMB_MEDIA_STORE_CONTEXT_TOKEN = new UmbContextToken<UmbMediaStore>(STORE_ALIAS);

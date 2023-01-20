@@ -1,3 +1,4 @@
+import { STORE_ALIAS } from '../document-type.store';
 import type { ManifestTree, ManifestTreeItemAction } from '@umbraco-cms/models';
 
 const tree: ManifestTree = {
@@ -5,7 +6,7 @@ const tree: ManifestTree = {
 	alias: 'Umb.Tree.DocumentTypes',
 	name: 'Document Types Tree',
 	meta: {
-		storeAlias: 'umbDocumentTypeStore',
+		storeAlias: STORE_ALIAS,
 	},
 };
 

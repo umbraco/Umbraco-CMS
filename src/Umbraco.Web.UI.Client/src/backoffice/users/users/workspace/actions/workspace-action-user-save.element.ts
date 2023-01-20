@@ -17,7 +17,8 @@ export class UmbWorkspaceActionUserSaveElement extends UmbLitElement {
 	constructor() {
 		super();
 
-		this.consumeContext('umbWorkspaceContext', (instance) => {
+		// TODO: Figure out how to get the magic string for the workspace context.
+		this.consumeContext<UmbWorkspaceUserContext>('umbWorkspaceContext', (instance) => {
 			this._workspaceContext = instance;
 		});
 	}

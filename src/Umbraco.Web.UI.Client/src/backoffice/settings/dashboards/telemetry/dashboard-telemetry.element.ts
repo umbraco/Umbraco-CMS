@@ -32,11 +32,7 @@ export class UmbDashboardTelemetryElement extends UmbLitElement {
 
 	constructor() {
 		super();
-	}
-
-	async connectedCallback() {
-		super.connectedCallback();
-		await this._setup();
+		this._setup();
 	}
 
 	private async _setup() {

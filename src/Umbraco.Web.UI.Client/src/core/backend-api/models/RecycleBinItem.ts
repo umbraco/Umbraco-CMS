@@ -4,9 +4,9 @@
 
 export type RecycleBinItem = {
     key?: string;
-    name?: string | null;
-    type?: string | null;
-    icon?: string | null;
+    name?: string;
+    type?: string;
+    icon?: string;
     hasChildren?: boolean;
     isContainer?: boolean;
     parentKey?: string | null;

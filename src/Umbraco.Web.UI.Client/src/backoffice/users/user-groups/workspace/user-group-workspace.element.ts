@@ -7,7 +7,7 @@ import { distinctUntilChanged } from 'rxjs';
 import { UmbWorkspaceUserGroupContext } from './user-group-workspace.context';
 import type { ManifestWorkspaceAction, UserGroupDetails } from '@umbraco-cms/models';
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
-import type { UmbUserStore } from 'src/backoffice/users/users/user.store';
+import { UmbUserStore, UMB_USER_STORE_CONTEXT_TOKEN } from 'src/backoffice/users/users/user.store';
 
 import '../../../../auth/components/input-user/input-user.element';
 import '../../../../backoffice/shared/components/input-section/input-section.element';
@@ -16,7 +16,6 @@ import { UmbWorkspaceEntityElement } from 'src/backoffice/shared/components/work
 
 @customElement('umb-user-group-workspace')
 export class UmbUserGroupWorkspaceElement extends UmbLitElement implements UmbWorkspaceEntityElement {
-
 	static styles = [
 		UUITextStyles,
 		css`
@@ -217,7 +216,7 @@ export class UmbUserGroupWorkspaceElement extends UmbLitElement implements UmbWo
 
 		this._registerWorkspaceActions();
 
-		this.consumeContext('umbUserStore', (instance) => {
+		this.consumeContext(UMB_USER_STORE_CONTEXT_TOKEN, (instance) => {
 			this._userStore = instance;
 			this._observeUsers();
 		});
@@ -233,8 +232,7 @@ export class UmbUserGroupWorkspaceElement extends UmbLitElement implements UmbWo
 				type: 'workspaceAction',
 				alias: 'Umb.WorkspaceAction.UserGroup.Save',
 				name: 'Save User Group Workspace Action',
-				loader: () =>
-					import('../../../shared/components/workspace/actions/save/workspace-action-node-save.element'),
+				loader: () => import('../../../shared/components/workspace/actions/save/workspace-action-node-save.element'),
 				meta: {
 					workspaces: ['Umb.Workspace.UserGroup'],
 					look: 'primary',

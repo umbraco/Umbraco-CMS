@@ -1,5 +1,9 @@
 import { UmbWorkspaceContentContext } from '../../../shared/components/workspace/workspace-content/workspace-content.context';
-import type { UmbUserStore, UmbUserStoreItemType } from 'src/backoffice/users/users/user.store';
+import {
+	UmbUserStore,
+	UmbUserStoreItemType,
+	UMB_USER_STORE_CONTEXT_TOKEN,
+} from 'src/backoffice/users/users/user.store';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 
 const DefaultDataTypeData = {
@@ -22,10 +26,10 @@ const DefaultDataTypeData = {
 
 export class UmbWorkspaceUserContext extends UmbWorkspaceContentContext<UmbUserStoreItemType, UmbUserStore> {
 	constructor(host: UmbControllerHostInterface) {
-		super(host, DefaultDataTypeData, 'umbUserStore', 'user');
+		super(host, DefaultDataTypeData, UMB_USER_STORE_CONTEXT_TOKEN.toString(), 'user');
 	}
 
 	public setPropertyValue(alias: string, value: unknown) {
-		throw new Error("setPropertyValue is not implemented for UmbWorkspaceUserContext")
+		throw new Error('setPropertyValue is not implemented for UmbWorkspaceUserContext');
 	}
 }

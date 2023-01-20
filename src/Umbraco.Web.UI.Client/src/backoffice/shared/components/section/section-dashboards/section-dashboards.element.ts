@@ -3,7 +3,7 @@ import { css, html, nothing } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { IRoutingInfo } from 'router-slot';
 import { first, map } from 'rxjs';
-import { UmbSectionContext } from '../section.context';
+import { UmbSectionContext, UMB_SECTION_CONTEXT_TOKEN } from '../section.context';
 import { createExtensionElement } from '@umbraco-cms/extensions-api';
 import type {
 	ManifestDashboard,
@@ -64,7 +64,7 @@ export class UmbSectionDashboardsElement extends UmbLitElement {
 	constructor() {
 		super();
 
-		this.consumeContext('umbSectionContext', (context: UmbSectionContext) => {
+		this.consumeContext(UMB_SECTION_CONTEXT_TOKEN, (context) => {
 			this._sectionContext = context;
 			this._observeSectionContext();
 		});
@@ -74,7 +74,7 @@ export class UmbSectionDashboardsElement extends UmbLitElement {
 		if (!this._sectionContext) return;
 
 		this.observe(this._sectionContext.manifest.pipe(first()), (section) => {
-			if(section) {
+			if (section) {
 				this._currentSectionAlias = section.alias;
 				this._currentSectionPathname = section.meta.pathname;
 				this._observeDashboards();
@@ -87,7 +87,7 @@ export class UmbSectionDashboardsElement extends UmbLitElement {
 
 		this.observe(
 			umbExtensionsRegistry
-				?.extensionsOfTypes<(ManifestDashboard | ManifestDashboardCollection)>(['dashboard', 'dashboardCollection'])
+				?.extensionsOfTypes<ManifestDashboard | ManifestDashboardCollection>(['dashboard', 'dashboardCollection'])
 				.pipe(
 					map((extensions) =>
 						extensions.filter((extension) =>
@@ -105,7 +105,7 @@ export class UmbSectionDashboardsElement extends UmbLitElement {
 	private _createRoutes() {
 		this._routes = [];
 
-		if(this._dashboards) {
+		if (this._dashboards) {
 			this._routes = this._dashboards.map((dashboard) => {
 				return {
 					path: `${dashboard.meta.pathname}`,

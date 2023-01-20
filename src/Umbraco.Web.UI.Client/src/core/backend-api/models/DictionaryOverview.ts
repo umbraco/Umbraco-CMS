@@ -8,6 +8,6 @@ export type DictionaryOverview = {
     name?: string | null;
     key?: string;
     level?: number;
-    readonly translations?: Array<DictionaryTranslationOverview> | null;
+    readonly translations?: Array<DictionaryTranslationOverview>;
 };
 
