@@ -44,8 +44,8 @@ describe('UniqueObjectBehaviorSubject', () => {
 			}
 		});
 
-		subject.append({key: 'change_this_first_should_not_trigger_update'});
-		subject.append({another: 'myNewValue'});
+		subject.update({key: 'change_this_first_should_not_trigger_update'});
+		subject.update({another: 'myNewValue'});
 
 	});
 

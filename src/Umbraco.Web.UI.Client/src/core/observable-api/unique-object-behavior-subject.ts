@@ -20,7 +20,7 @@ export class UniqueObjectBehaviorSubject<T> extends UniqueBehaviorSubject<T> {
 	 * const mySubject = new UniqueObjectBehaviorSubject(data)
 	 * mySubject.append({value: 'myNewValue'})
 	 */
-	append(partialData: Partial<T>) {
+	update(partialData: Partial<T>) {
 		this.next({ ...this.getValue(), ...partialData });
 	}
 }
