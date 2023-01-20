@@ -8,6 +8,7 @@ using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Web.Common.Attributes;
 using Umbraco.Cms.Web.Common.Authorization;
@@ -61,7 +62,7 @@ public class TemplateController : BackOfficeNotificationsController
         /// <returns></returns>
         public TemplateDisplay? GetByAlias(string alias)
         {
-            ITemplate? template = _templateService.GetTemplateAsync(alias).GetAwaiter().GetResult();
+            ITemplate? template = _templateService.GetAsync(alias).GetAwaiter().GetResult();
         return template == null ? null : _umbracoMapper.Map<ITemplate, TemplateDisplay>(template);
     }
 
@@ -69,7 +70,7 @@ public class TemplateController : BackOfficeNotificationsController
     ///     Get all templates
     /// </summary>
     /// <returns></returns>
-    public IEnumerable<EntityBasic>? GetAll() => _templateService.GetTemplatesAsync().GetAwaiter().GetResult()
+    public IEnumerable<EntityBasic>? GetAll() => _templateService.GetAllAsync().GetAwaiter().GetResult()
         ?.Select(_umbracoMapper.Map<ITemplate, EntityBasic>).WhereNotNull();
 
     /// <summary>
@@ -79,7 +80,7 @@ public class TemplateController : BackOfficeNotificationsController
     /// <returns></returns>
     public ActionResult<TemplateDisplay?> GetById(int id)
     {
-        ITemplate? template = _templateService.GetTemplateAsync(id).GetAwaiter().GetResult();
+        ITemplate? template = _templateService.GetAsync(id).GetAwaiter().GetResult();
         if (template == null)
         {
             return NotFound();
@@ -96,7 +97,7 @@ public class TemplateController : BackOfficeNotificationsController
     /// <returns></returns>
     public ActionResult<TemplateDisplay?> GetById(Guid id)
     {
-        ITemplate? template = _templateService.GetTemplateAsync(id).GetAwaiter().GetResult();
+        ITemplate? template = _templateService.GetAsync(id).GetAwaiter().GetResult();
         if (template == null)
         {
             return NotFound();
@@ -118,7 +119,7 @@ public class TemplateController : BackOfficeNotificationsController
             return NotFound();
         }
 
-        ITemplate? template = _templateService.GetTemplateAsync(guidUdi.Guid).GetAwaiter().GetResult();
+        ITemplate? template = _templateService.GetAsync(guidUdi.Guid).GetAwaiter().GetResult();
         if (template == null)
         {
             return NotFound();
@@ -136,13 +137,13 @@ public class TemplateController : BackOfficeNotificationsController
     [HttpPost]
     public IActionResult DeleteById(int id)
     {
-        ITemplate? template = _templateService.GetTemplateAsync(id).GetAwaiter().GetResult();
+        ITemplate? template = _templateService.GetAsync(id).GetAwaiter().GetResult();
         if (template == null)
         {
             return NotFound();
         }
 
-        _templateService.DeleteTemplateAsync(template.Alias).GetAwaiter().GetResult();
+        _templateService.DeleteAsync(template.Alias).GetAwaiter().GetResult();
         return Ok();
     }
 
@@ -156,7 +157,7 @@ public class TemplateController : BackOfficeNotificationsController
 
         if (id > 0)
         {
-            ITemplate? master = _templateService.GetTemplateAsync(id).GetAwaiter().GetResult();
+            ITemplate? master = _templateService.GetAsync(id).GetAwaiter().GetResult();
             if (master != null)
             {
                 dt.SetMasterTemplate(master);
@@ -190,7 +191,7 @@ public class TemplateController : BackOfficeNotificationsController
         if (display.Id > 0)
         {
             // update
-            ITemplate? template = _templateService.GetTemplateAsync(display.Id).GetAwaiter().GetResult();
+            ITemplate? template = _templateService.GetAsync(display.Id).GetAwaiter().GetResult();
             if (template == null)
             {
                 return NotFound();
@@ -200,11 +201,11 @@ public class TemplateController : BackOfficeNotificationsController
 
             _umbracoMapper.Map(display, template);
 
-            _templateService.SaveTemplateAsync(template).GetAwaiter().GetResult();
+            _templateService.UpdateAsync(template).GetAwaiter().GetResult();
 
             if (changeAlias)
             {
-                template = _templateService.GetTemplateAsync(template.Id).GetAwaiter().GetResult();
+                template = _templateService.GetAsync(template.Id).GetAwaiter().GetResult();
             }
 
             _umbracoMapper.Map(template, display);
@@ -215,7 +216,7 @@ public class TemplateController : BackOfficeNotificationsController
             ITemplate? master = null;
             if (string.IsNullOrEmpty(display.MasterTemplateAlias) == false)
             {
-                master = _templateService.GetTemplateAsync(display.MasterTemplateAlias).GetAwaiter().GetResult();
+                master = _templateService.GetAsync(display.MasterTemplateAlias).GetAwaiter().GetResult();
                 if (master == null)
                 {
                     return NotFound();
@@ -224,14 +225,14 @@ public class TemplateController : BackOfficeNotificationsController
 
             // we need to pass the template name as alias to keep the template file casing consistent with templates created with content
             // - see comment in FileService.CreateTemplateForContentType for additional details
-            ITemplate? template =
-                _templateService.CreateTemplateWithIdentityAsync(display.Name, display.Name, display.Content).GetAwaiter().GetResult();
-            if (template == null)
+            Attempt<ITemplate, TemplateOperationStatus> result =
+                _templateService.CreateAsync(display.Name!, display.Name!, display.Content).GetAwaiter().GetResult();
+            if (result.Success == false)
             {
                 return NotFound();
             }
 
-            _umbracoMapper.Map(template, display);
+            _umbracoMapper.Map(result.Result, display);
         }
 
         return display;

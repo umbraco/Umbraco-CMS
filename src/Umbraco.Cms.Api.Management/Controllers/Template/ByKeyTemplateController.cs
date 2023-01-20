@@ -24,7 +24,7 @@ public class ByKeyTemplateController : TemplateControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<TemplateViewModel>> ByKey(Guid key)
     {
-        ITemplate? template = await _templateService.GetTemplateAsync(key);
+        ITemplate? template = await _templateService.GetAsync(key);
         return template == null
             ? NotFound()
             : Ok(_umbracoMapper.Map<TemplateViewModel>(template));
