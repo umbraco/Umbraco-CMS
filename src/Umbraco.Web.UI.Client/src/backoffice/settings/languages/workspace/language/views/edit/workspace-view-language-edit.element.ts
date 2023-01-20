@@ -5,6 +5,7 @@ import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, html, nothing } from 'lit';
 import { repeat } from 'lit-html/directives/repeat.js';
 import { customElement, property, state } from 'lit/decorators.js';
+import { UmbLanguageStore } from 'src/backoffice/settings/languages/language.store';
 import { umbLanguagesData } from 'src/core/mocks/data/languages.data';
 import { UmbWorkspaceLanguageContext } from '../../language-workspace.context';
 
@@ -35,43 +36,7 @@ export class UmbWorkspaceViewLanguageEditElement extends UmbLitElement {
 	language?: LanguageDetails;
 
 	@state()
-	private _languages: LanguageDetails[] = [
-		{
-			id: 1,
-			key: 'asdail12h3k1h23k12h3',
-			name: 'English',
-			isoCode: 'en',
-			isDefault: true,
-			isMandatory: true,
-		},
-		{
-			id: 2,
-			key: 'kajshdkjashdkuahwdu',
-			name: 'Danish',
-			isoCode: 'da',
-			isDefault: false,
-			isMandatory: false,
-			fallbackLanguageId: 1,
-		},
-		{
-			id: 3,
-			key: 'k12n3kj12h3123n9812h3',
-			name: 'German',
-			isoCode: 'de',
-			isDefault: false,
-			isMandatory: false,
-			fallbackLanguageId: 1,
-		},
-		{
-			id: 4,
-			key: '1kl2n31231iuqshdiuashd',
-			name: 'French',
-			isoCode: 'fr',
-			isDefault: false,
-			isMandatory: false,
-			fallbackLanguageId: 1,
-		},
-	]; //TODO: This is temporary, we need to get the available languages from the API.
+	private _languages: LanguageDetails[] = [];
 
 	@state()
 	private _search = '';
@@ -88,6 +53,16 @@ export class UmbWorkspaceViewLanguageEditElement extends UmbLitElement {
 
 			this._languageWorkspaceContext.data.subscribe((language) => {
 				this.language = language;
+			});
+		});
+
+		this.consumeContext('umbLanguageStore', (instance: UmbLanguageStore) => {
+			if (!instance) return;
+
+			console.log('instance', instance);
+
+			instance.getAll().subscribe((languages: Array<LanguageDetails>) => {
+				this._languages = languages;
 			});
 		});
 	}
@@ -134,6 +109,20 @@ export class UmbWorkspaceViewLanguageEditElement extends UmbLitElement {
 		});
 	}
 
+	private _renderDefaultLanguageWarning() {
+		const originalIsDefault = this._languages.find(
+			(language) => language.isoCode === this.language?.isoCode
+		)?.isDefault;
+
+		console.log(this._languages, this.language?.isDefault);
+
+		if (originalIsDefault === this.language?.isDefault) return nothing;
+
+		return html`<div id="default-language-warning">
+			Switching default language may result in default content missing.
+		</div>`;
+	}
+
 	render() {
 		if (!this.language) return nothing;
 
@@ -175,7 +164,7 @@ export class UmbWorkspaceViewLanguageEditElement extends UmbLitElement {
 								<div>Properties on this language have to be filled out before the node can be published.</div>
 							</div>
 						</uui-toggle>
-						<div id="default-language-warning">Switching default language may result in default content missing.</div>
+						${this._renderDefaultLanguageWarning()}
 					</div>
 				</umb-workspace-property-layout>
 				<umb-workspace-property-layout
