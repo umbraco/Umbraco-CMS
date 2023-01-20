@@ -110,13 +110,4 @@ export class UniqueBehaviorSubject<T> extends BehaviorSubject<T> {
 			super.next(frozenData);
 		}
 	}
-
-	/**
-	 * Partial update data set, only works for Objects.
-	 * TODO: consider moving this into a specific class for Objects?
-	 * Consider doing similar for Array?
-	 */
-	update(data: Partial<T>) {
-		this.next({ ...this.getValue(), ...data });
-	}
 }
