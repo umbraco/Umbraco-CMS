@@ -22,7 +22,7 @@
 		"paths": {
 			"@umbraco-cms/models": ["src/core/models"],
 			"@umbraco-cms/backend-api": ["libs/backend-api"],
-			"@umbraco-cms/context-api": ["src/core/context-api"],
+			"@umbraco-cms/context-api": ["libs/context-api"],
 			"@umbraco-cms/controller": ["libs/controller"],
 			"@umbraco-cms/element": ["src/core/element"],
 			"@umbraco-cms/extensions-api": ["src/core/extensions-api"],
