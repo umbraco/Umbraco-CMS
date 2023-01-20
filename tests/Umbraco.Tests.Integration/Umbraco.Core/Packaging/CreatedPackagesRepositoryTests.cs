@@ -168,16 +168,11 @@ public class CreatedPackagesRepositoryTests : UmbracoIntegrationTest
     [Test]
     public void GivenNestedDictionaryItems_WhenPackageExported_ThenTheXmlIsNested()
     {
-        var parent = new DictionaryItem("Parent") { Key = Guid.NewGuid() };
-        LocalizationService.Save(parent);
-        var child1 = new DictionaryItem(parent.Key, "Child1") { Key = Guid.NewGuid() };
-        LocalizationService.Save(child1);
-        var child2 = new DictionaryItem(child1.Key, "Child2") { Key = Guid.NewGuid() };
-        LocalizationService.Save(child2);
-        var child3 = new DictionaryItem(child2.Key, "Child3") { Key = Guid.NewGuid() };
-        LocalizationService.Save(child3);
-        var child4 = new DictionaryItem(child3.Key, "Child4") { Key = Guid.NewGuid() };
-        LocalizationService.Save(child4);
+        var parent = LocalizationService.Create("Parent", null).Result!;
+        var child1 = LocalizationService.Create("Child1", parent.Key).Result!;
+        var child2 = LocalizationService.Create("Child2", child1.Key).Result!;
+        var child3 = LocalizationService.Create("Child3", child2.Key).Result!;
+        var child4 = LocalizationService.Create("Child4", child3.Key).Result!;
 
         var def = new PackageDefinition
         {

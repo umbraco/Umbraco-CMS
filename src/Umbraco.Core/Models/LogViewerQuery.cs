@@ -7,26 +7,26 @@ namespace Umbraco.Cms.Core.Models;
 [DataContract(IsReference = true)]
 public class LogViewerQuery : EntityBase, ILogViewerQuery
 {
-    private string? _name;
-    private string? _query;
+    private string _name = string.Empty;
+    private string _query = string.Empty;
 
-    public LogViewerQuery(string? name, string? query)
+    public LogViewerQuery(string name, string query)
     {
         Name = name;
-        _query = query;
+        Query = query;
     }
 
     [DataMember]
-    public string? Name
+    public string Name
     {
         get => _name;
-        set => SetPropertyValueAndDetectChanges(value, ref _name, nameof(Name));
+        set => SetPropertyValueAndDetectChanges(value, ref _name!, nameof(Name));
     }
 
     [DataMember]
-    public string? Query
+    public string Query
     {
         get => _query;
-        set => SetPropertyValueAndDetectChanges(value, ref _query, nameof(Query));
+        set => SetPropertyValueAndDetectChanges(value, ref _query!, nameof(Query));
     }
 }

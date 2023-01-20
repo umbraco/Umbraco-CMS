@@ -404,20 +404,14 @@ public class DictionaryRepositoryTest : UmbracoIntegrationTest
         var languageDK = new Language("da-DK", "Danish (Denmark)");
         localizationService.Create(languageDK); //Id 2
 
-        var readMore = new DictionaryItem("Read More");
-        var translations = new List<IDictionaryTranslation>
+        localizationService.Create("Read More", null, new List<IDictionaryTranslation>
         {
             new DictionaryTranslation(language, "Read More"), new DictionaryTranslation(languageDK, "Læs mere")
-        };
-        readMore.Translations = translations;
-        localizationService.Save(readMore); // Id 1
+        }); // Id 1
 
-        var article = new DictionaryItem("Article");
-        var translations2 = new List<IDictionaryTranslation>
+        localizationService.Create("Article", null, new List<IDictionaryTranslation>
         {
             new DictionaryTranslation(language, "Article"), new DictionaryTranslation(languageDK, "Artikel")
-        };
-        article.Translations = translations2;
-        localizationService.Save(article); // Id 2
+        }); // Id 2
     }
 }

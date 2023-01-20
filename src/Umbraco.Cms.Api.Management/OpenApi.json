@@ -556,18 +556,21 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/DictionaryItem"
+                "$ref": "#/components/schemas/DictionaryItemCreateModel"
               }
             }
           }
         },
         "responses": {
           "201": {
-            "description": "Created",
+            "description": "Created"
+          },
+          "404": {
+            "description": "Not Found",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/CreatedResult"
+                  "$ref": "#/components/schemas/ProblemDetails"
                 }
               }
             }
@@ -581,56 +584,13 @@
                 }
               }
             }
-          }
-        }
-      }
-    },
-    "/umbraco/management/api/v1/dictionary/{id}": {
-      "patch": {
-        "tags": [
-          "Dictionary"
-        ],
-        "operationId": "PatchDictionaryById",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "array",
-                "items": {
-                  "$ref": "#/components/schemas/JsonPatch"
-                }
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Success",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ContentResult"
-                }
-              }
-            }
           },
-          "404": {
-            "description": "Not Found",
+          "409": {
+            "description": "Conflict",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/NotFoundResult"
+                  "$ref": "#/components/schemas/ProblemDetails"
                 }
               }
             }
@@ -661,7 +621,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Dictionary"
+                  "$ref": "#/components/schemas/DictionaryItem"
                 }
               }
             }
@@ -671,7 +631,58 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/NotFoundResult"
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Dictionary"
+        ],
+        "operationId": "PutDictionaryByKey",
+        "parameters": [
+          {
+            "name": "key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DictionaryItemUpdateModel"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
                 }
               }
             }
@@ -703,7 +714,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/NotFoundResult"
+                  "$ref": "#/components/schemas/ProblemDetails"
                 }
               }
             }
@@ -1880,6 +1891,36 @@
       }
     },
     "/umbraco/management/api/v1/language": {
+      "post": {
+        "tags": [
+          "Language"
+        ],
+        "operationId": "PostLanguage",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Language"
+              }
+            }
+          }
+        },
+        "responses": {
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "201": {
+            "description": "Created"
+          }
+        }
+      },
       "get": {
         "tags": [
           "Language"
@@ -1891,8 +1932,7 @@
             "in": "query",
             "schema": {
               "type": "integer",
-              "format": "int32",
-              "default": 0
+              "format": "int32"
             }
           },
           {
@@ -1900,8 +1940,7 @@
             "in": "query",
             "schema": {
               "type": "integer",
-              "format": "int32",
-              "default": 100
+              "format": "int32"
             }
           }
         ],
@@ -1917,61 +1956,22 @@
             }
           }
         }
-      },
-      "post": {
-        "tags": [
-          "Language"
-        ],
-        "operationId": "PostLanguage",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/LanguageCreateModel"
-              }
-            }
-          }
-        },
-        "responses": {
-          "404": {
-            "description": "Not Found",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Bad Request",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          },
-          "201": {
-            "description": "Created"
-          }
-        }
       }
     },
-    "/umbraco/management/api/v1/language/{isoCode}": {
+    "/umbraco/management/api/v1/language/{id}": {
       "get": {
         "tags": [
           "Language"
         ],
-        "operationId": "GetLanguageByIsoCode",
+        "operationId": "GetLanguageById",
         "parameters": [
           {
-            "name": "isoCode",
+            "name": "id",
             "in": "path",
             "required": true,
             "schema": {
-              "type": "string"
+              "type": "integer",
+              "format": "int32"
             }
           }
         ],
@@ -1981,7 +1981,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
+                  "$ref": "#/components/schemas/NotFoundResult"
                 }
               }
             }
@@ -2002,14 +2002,15 @@
         "tags": [
           "Language"
         ],
-        "operationId": "DeleteLanguageByIsoCode",
+        "operationId": "DeleteLanguageById",
         "parameters": [
           {
-            "name": "isoCode",
+            "name": "id",
             "in": "path",
             "required": true,
             "schema": {
-              "type": "string"
+              "type": "integer",
+              "format": "int32"
             }
           }
         ],
@@ -2043,14 +2044,15 @@
         "tags": [
           "Language"
         ],
-        "operationId": "PutLanguageByIsoCode",
+        "operationId": "PutLanguageById",
         "parameters": [
           {
-            "name": "isoCode",
+            "name": "id",
             "in": "path",
             "required": true,
             "schema": {
-              "type": "string"
+              "type": "integer",
+              "format": "int32"
             }
           }
         ],
@@ -2058,7 +2060,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/LanguageUpdateModel"
+                "$ref": "#/components/schemas/Language"
               }
             }
           }
@@ -4565,23 +4567,6 @@
         },
         "additionalProperties": false
       },
-      "BackOfficeNotification": {
-        "type": "object",
-        "properties": {
-          "header": {
-            "type": "string",
-            "nullable": true
-          },
-          "message": {
-            "type": "string",
-            "nullable": true
-          },
-          "notificationType": {
-            "$ref": "#/components/schemas/NotificationStyle"
-          }
-        },
-        "additionalProperties": false
-      },
       "CallingConventions": {
         "enum": [
           "Standard",
@@ -4734,63 +4719,6 @@
           }
         },
         "additionalProperties": false
-      },
-      "ContentApp": {
-        "type": "object",
-        "properties": {
-          "name": {
-            "type": "string",
-            "nullable": true
-          },
-          "alias": {
-            "type": "string",
-            "nullable": true
-          },
-          "weight": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "icon": {
-            "type": "string",
-            "nullable": true
-          },
-          "view": {
-            "type": "string",
-            "nullable": true
-          },
-          "viewModel": {
-            "nullable": true
-          },
-          "active": {
-            "type": "boolean"
-          },
-          "badge": {
-            "$ref": "#/components/schemas/ContentAppBadge"
-          }
-        },
-        "additionalProperties": false
-      },
-      "ContentAppBadge": {
-        "type": "object",
-        "properties": {
-          "count": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "type": {
-            "$ref": "#/components/schemas/ContentAppBadgeType"
-          }
-        },
-        "additionalProperties": false
-      },
-      "ContentAppBadgeType": {
-        "enum": [
-          "default",
-          "warning",
-          "alert"
-        ],
-        "type": "integer",
-        "format": "int32"
       },
       "ContentResult": {
         "type": "object",
@@ -5154,50 +5082,6 @@
         },
         "additionalProperties": false
       },
-      "Dictionary": {
-        "required": [
-          "name"
-        ],
-        "type": "object",
-        "properties": {
-          "parentId": {
-            "type": "string",
-            "format": "uuid",
-            "nullable": true
-          },
-          "translations": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/DictionaryTranslation"
-            }
-          },
-          "contentApps": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/ContentApp"
-            }
-          },
-          "notifications": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/BackOfficeNotification"
-            },
-            "readOnly": true
-          },
-          "name": {
-            "minLength": 1,
-            "type": "string"
-          },
-          "key": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "path": {
-            "type": "string"
-          }
-        },
-        "additionalProperties": false
-      },
       "DictionaryImport": {
         "type": "object",
         "properties": {
@@ -5217,14 +5101,65 @@
       "DictionaryItem": {
         "type": "object",
         "properties": {
-          "parentId": {
-            "type": "string",
-            "format": "uuid",
-            "nullable": true
+          "name": {
+            "type": "string"
+          },
+          "translations": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DictionaryItemTranslationModel"
+            }
           },
           "key": {
             "type": "string",
             "format": "uuid"
+          }
+        },
+        "additionalProperties": false
+      },
+      "DictionaryItemCreateModel": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "translations": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DictionaryItemTranslationModel"
+            }
+          },
+          "parentKey": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "DictionaryItemTranslationModel": {
+        "type": "object",
+        "properties": {
+          "isoCode": {
+            "type": "string"
+          },
+          "translation": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "DictionaryItemUpdateModel": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "translations": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DictionaryItemTranslationModel"
+            }
           }
         },
         "additionalProperties": false
@@ -5264,35 +5199,6 @@
               "$ref": "#/components/schemas/DictionaryTranslationOverview"
             },
             "readOnly": true
-          }
-        },
-        "additionalProperties": false
-      },
-      "DictionaryTranslation": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "key": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "displayName": {
-            "type": "string",
-            "nullable": true
-          },
-          "isoCode": {
-            "type": "string",
-            "nullable": true
-          },
-          "translation": {
-            "type": "string"
-          },
-          "languageId": {
-            "type": "integer",
-            "format": "int32"
           }
         },
         "additionalProperties": false
@@ -6040,77 +5946,33 @@
         "type": "object",
         "additionalProperties": false
       },
-      "JsonPatch": {
-        "type": "object",
-        "properties": {
-          "op": {
-            "type": "string"
-          },
-          "path": {
-            "type": "string"
-          },
-          "value": { }
-        },
-        "additionalProperties": false
-      },
       "Language": {
+        "required": [
+          "isoCode"
+        ],
         "type": "object",
         "properties": {
-          "name": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "isoCode": {
+            "minLength": 1,
             "type": "string"
           },
-          "isDefault": {
-            "type": "boolean"
-          },
-          "isMandatory": {
-            "type": "boolean"
-          },
-          "fallbackIsoCode": {
+          "name": {
             "type": "string",
             "nullable": true
           },
-          "isoCode": {
-            "type": "string"
-          }
-        },
-        "additionalProperties": false
-      },
-      "LanguageCreateModel": {
-        "type": "object",
-        "properties": {
-          "name": {
-            "type": "string"
-          },
           "isDefault": {
             "type": "boolean"
           },
           "isMandatory": {
             "type": "boolean"
           },
-          "fallbackIsoCode": {
-            "type": "string",
-            "nullable": true
-          },
-          "isoCode": {
-            "type": "string"
-          }
-        },
-        "additionalProperties": false
-      },
-      "LanguageUpdateModel": {
-        "type": "object",
-        "properties": {
-          "name": {
-            "type": "string"
-          },
-          "isDefault": {
-            "type": "boolean"
-          },
-          "isMandatory": {
-            "type": "boolean"
-          },
-          "fallbackIsoCode": {
-            "type": "string",
+          "fallbackLanguageId": {
+            "type": "integer",
+            "format": "int32",
             "nullable": true
           }
         },
@@ -6606,17 +6468,6 @@
           }
         },
         "additionalProperties": false
-      },
-      "NotificationStyle": {
-        "enum": [
-          "Save",
-          "Info",
-          "Error",
-          "Success",
-          "Warning"
-        ],
-        "type": "integer",
-        "format": "int32"
       },
       "OkResult": {
         "type": "object",

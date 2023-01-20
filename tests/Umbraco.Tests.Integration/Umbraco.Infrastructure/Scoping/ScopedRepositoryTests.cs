@@ -240,9 +240,10 @@ public class ScopedRepositoryTests : UmbracoIntegrationTest
         var lang = new Language("fr-FR", "French (France)");
         service.Create(lang);
 
-        var item = (IDictionaryItem)new DictionaryItem("item-key");
-        item.Translations = new IDictionaryTranslation[] { new DictionaryTranslation(lang.Id, "item-value") };
-        service.Save(item);
+        var item = service.Create(
+            "item-key",
+            null,
+            new IDictionaryTranslation[] { new DictionaryTranslation(lang.Id, "item-value") }).Result!;
 
         // Refresh the cache manually because we can't unbind
         service.GetDictionaryItemById(item.Id);
@@ -266,7 +267,7 @@ public class ScopedRepositoryTests : UmbracoIntegrationTest
             Assert.AreNotSame(globalCache, scopedCache);
 
             item.ItemKey = "item-changed";
-            service.Save(item);
+            service.Update(item);
 
             // scoped cache contains the "new" entity
             var scopeCached = (IDictionaryItem)scopedCache.Get(GetCacheIdKey<IDictionaryItem>(item.Id), () => null);

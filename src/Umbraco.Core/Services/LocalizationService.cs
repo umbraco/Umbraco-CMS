@@ -84,7 +84,27 @@ internal class LocalizationService : RepositoryService, ILocalizationService
     /// <param name="parentId"></param>
     /// <param name="defaultValue"></param>
     /// <returns></returns>
+    [Obsolete("Please use Create. Will be removed in V15")]
     public IDictionaryItem CreateDictionaryItemWithIdentity(string key, Guid? parentId, string? defaultValue = null)
+    {
+        IEnumerable<IDictionaryTranslation> translations = defaultValue.IsNullOrWhiteSpace()
+            ? Array.Empty<IDictionaryTranslation>()
+            : GetAllLanguages()
+                .Select(language => new DictionaryTranslation(language, defaultValue!))
+                .ToArray();
+
+        Attempt<IDictionaryItem?, DictionaryItemOperationStatus> result = Create(key, parentId, translations);
+        return result.Success
+            ? result.Result!
+            : throw new ArgumentException($"Could not create a dictionary item with key: {key} under parent: {parentId}");
+    }
+
+    /// <inheritdoc/>
+    public Attempt<IDictionaryItem?, DictionaryItemOperationStatus> Create(
+        string key,
+        Guid? parentId,
+        IEnumerable<IDictionaryTranslation>? translations = null,
+        int userId = Constants.Security.SuperUserId)
     {
         using (ICoreScope scope = ScopeProvider.CreateCoreScope())
         {
@@ -94,20 +114,23 @@ internal class LocalizationService : RepositoryService, ILocalizationService
                 IDictionaryItem? parent = GetDictionaryItemById(parentId.Value);
                 if (parent == null)
                 {
-                    throw new ArgumentException($"No parent dictionary item was found with id {parentId.Value}.");
+                    return Attempt.FailWithStatus<IDictionaryItem?, DictionaryItemOperationStatus>(DictionaryItemOperationStatus.ParentNotFound, null);
                 }
             }
 
             var item = new DictionaryItem(parentId, key);
 
-            if (defaultValue.IsNullOrWhiteSpace() == false)
+            // do we have an item key collision (item keys must be unique)?
+            if (HasItemKeyCollision(item))
             {
-                IEnumerable<ILanguage> langs = GetAllLanguages();
-                var translations = langs.Select(language => new DictionaryTranslation(language, defaultValue!))
-                    .Cast<IDictionaryTranslation>()
-                    .ToList();
+                return Attempt.FailWithStatus<IDictionaryItem?, DictionaryItemOperationStatus>(DictionaryItemOperationStatus.DuplicateItemKey, null);
+            }
 
-                item.Translations = translations;
+            IDictionaryTranslation[] translationsAsArray = translations?.ToArray() ?? Array.Empty<IDictionaryTranslation>();
+            if (translationsAsArray.Any())
+            {
+                var allLanguageIds = GetAllLanguages().Select(language => language.Id).ToArray();
+                item.Translations = translationsAsArray.Where(translation => allLanguageIds.Contains(translation.LanguageId)).ToArray();
             }
 
             EventMessages eventMessages = EventMessagesFactory.Get();
@@ -116,7 +139,7 @@ internal class LocalizationService : RepositoryService, ILocalizationService
             if (scope.Notifications.PublishCancelable(savingNotification))
             {
                 scope.Complete();
-                return item;
+                return Attempt.FailWithStatus<IDictionaryItem?, DictionaryItemOperationStatus>(DictionaryItemOperationStatus.CancelledByNotification, item);
             }
 
             _dictionaryRepository.Save(item);
@@ -127,9 +150,10 @@ internal class LocalizationService : RepositoryService, ILocalizationService
             scope.Notifications.Publish(
                 new DictionaryItemSavedNotification(item, eventMessages).WithStateFrom(savingNotification));
 
+            Audit(AuditType.New, "Create DictionaryItem", userId, item.Id, "DictionaryItem");
             scope.Complete();
 
-            return item;
+            return Attempt.SucceedWithStatus<IDictionaryItem?, DictionaryItemOperationStatus>(DictionaryItemOperationStatus.Success, item);
         }
     }
 
@@ -311,6 +335,7 @@ internal class LocalizationService : RepositoryService, ILocalizationService
     /// </summary>
     /// <param name="dictionaryItem"><see cref="IDictionaryItem" /> to save</param>
     /// <param name="userId">Optional id of the user saving the dictionary item</param>
+    [Obsolete("Please use Update. Will be removed in V15")]
     public void Save(IDictionaryItem dictionaryItem, int userId = Constants.Security.SuperUserId)
     {
         using (ICoreScope scope = ScopeProvider.CreateCoreScope())
@@ -336,22 +361,72 @@ internal class LocalizationService : RepositoryService, ILocalizationService
         }
     }
 
+    /// <inheritdoc />
+    public Attempt<IDictionaryItem, DictionaryItemOperationStatus> Update(IDictionaryItem dictionaryItem, int userId = Constants.Security.SuperUserId)
+    {
+        using (ICoreScope scope = ScopeProvider.CreateCoreScope())
+        {
+            // is there an item to update?
+            if (_dictionaryRepository.Exists(dictionaryItem.Id) == false)
+            {
+                return Attempt.FailWithStatus(DictionaryItemOperationStatus.ItemNotFound, dictionaryItem);
+            }
+
+            // do we have an item key collision (item keys must be unique)?
+            if (HasItemKeyCollision(dictionaryItem))
+            {
+                return Attempt.FailWithStatus(DictionaryItemOperationStatus.DuplicateItemKey, dictionaryItem);
+            }
+
+            EventMessages eventMessages = EventMessagesFactory.Get();
+            var savingNotification = new DictionaryItemSavingNotification(dictionaryItem, eventMessages);
+            if (scope.Notifications.PublishCancelable(savingNotification))
+            {
+                scope.Complete();
+                return Attempt.FailWithStatus(DictionaryItemOperationStatus.CancelledByNotification, dictionaryItem);
+            }
+
+            _dictionaryRepository.Save(dictionaryItem);
+
+            // ensure the lazy Language callback is assigned
+            EnsureDictionaryItemLanguageCallback(dictionaryItem);
+            scope.Notifications.Publish(
+                new DictionaryItemSavedNotification(dictionaryItem, eventMessages).WithStateFrom(savingNotification));
+
+            Audit(AuditType.Save, "Update DictionaryItem", userId, dictionaryItem.Id, "DictionaryItem");
+            scope.Complete();
+
+            return Attempt.SucceedWithStatus(DictionaryItemOperationStatus.Success, dictionaryItem);
+        }
+    }
+
     /// <summary>
     ///     Deletes a <see cref="IDictionaryItem" /> object and its related translations
     ///     as well as its children.
     /// </summary>
     /// <param name="dictionaryItem"><see cref="IDictionaryItem" /> to delete</param>
     /// <param name="userId">Optional id of the user deleting the dictionary item</param>
+    [Obsolete("Please use the Delete method that takes an ID and returns an Attempt. Will be removed in V15")]
     public void Delete(IDictionaryItem dictionaryItem, int userId = Constants.Security.SuperUserId)
+        => Delete(dictionaryItem.Key, userId);
+
+    /// <inheritdoc />
+    public Attempt<IDictionaryItem?, DictionaryItemOperationStatus> Delete(Guid id, int userId = Constants.Security.SuperUserId)
     {
         using (ICoreScope scope = ScopeProvider.CreateCoreScope())
         {
+            IDictionaryItem? dictionaryItem = _dictionaryRepository.Get(id);
+            if (dictionaryItem == null)
+            {
+                return Attempt.FailWithStatus<IDictionaryItem?, DictionaryItemOperationStatus>(DictionaryItemOperationStatus.ItemNotFound, null);
+            }
+
             EventMessages eventMessages = EventMessagesFactory.Get();
             var deletingNotification = new DictionaryItemDeletingNotification(dictionaryItem, eventMessages);
             if (scope.Notifications.PublishCancelable(deletingNotification))
             {
                 scope.Complete();
-                return;
+                return Attempt.FailWithStatus<IDictionaryItem?, DictionaryItemOperationStatus>(DictionaryItemOperationStatus.CancelledByNotification, dictionaryItem);
             }
 
             _dictionaryRepository.Delete(dictionaryItem);
@@ -362,6 +437,7 @@ internal class LocalizationService : RepositoryService, ILocalizationService
             Audit(AuditType.Delete, "Delete DictionaryItem", userId, dictionaryItem.Id, "DictionaryItem");
 
             scope.Complete();
+            return Attempt.SucceedWithStatus<IDictionaryItem?, DictionaryItemOperationStatus>(DictionaryItemOperationStatus.Success, dictionaryItem);
         }
     }
 
@@ -703,5 +779,11 @@ internal class LocalizationService : RepositoryService, ILocalizationService
                 trans.GetLanguage = GetLanguageById;
             }
         }
+    }
+
+    private bool HasItemKeyCollision(IDictionaryItem dictionaryItem)
+    {
+        IDictionaryItem? itemKeyCollision = _dictionaryRepository.Get(dictionaryItem.ItemKey);
+        return itemKeyCollision != null && itemKeyCollision.Key != dictionaryItem.Key;
     }
 }

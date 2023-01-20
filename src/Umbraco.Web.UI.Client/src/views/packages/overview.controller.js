@@ -88,7 +88,7 @@
     }
 
     function setPageName() {
-      localizationService.localize("sections_marketplace").then(function (data) {
+      localizationService.localize("sections_packages").then(function (data) {
         vm.page.name = data;
       })
     }
