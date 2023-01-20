@@ -5,7 +5,8 @@ import { UmbNodeStoreBase } from '@umbraco-cms/stores/store';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 import { UmbContextConsumerController, UmbContextProviderController } from '@umbraco-cms/context-api';
 import { EntityTreeItem } from '@umbraco-cms/backend-api';
-import { createObservablePart, UniqueBehaviorSubject, UmbObserverController } from '@umbraco-cms/observable-api';
+import { UniqueBehaviorSubject, UmbObserverController } from '@umbraco-cms/observable-api';
+import { createObservablePart } from 'src/core/observable-api/create-observable-part.method';
 
 // TODO: Consider if its right to have this many class-inheritance of WorkspaceContext
 // TODO: Could we extract this code into a 'Manager' of its own, which will be instantiated by the concrete Workspace Context. This will be more transparent and 'reuseable'
