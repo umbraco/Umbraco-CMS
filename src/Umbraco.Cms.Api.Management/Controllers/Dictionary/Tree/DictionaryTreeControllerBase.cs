@@ -32,6 +32,7 @@ public class DictionaryTreeControllerBase : EntityTreeControllerBase<EntityTreeI
             Name = dictionaryItem.ItemKey,
             Key = dictionaryItem.Key,
             Type = Constants.UdiEntityType.DictionaryItem,
+            // FIXME - do not hardcode HasChildren to false for all dictionary items
             HasChildren = false,
             IsContainer = LocalizationService.GetDictionaryItemChildren(dictionaryItem.Key).Any(),
             ParentKey = parentKey
