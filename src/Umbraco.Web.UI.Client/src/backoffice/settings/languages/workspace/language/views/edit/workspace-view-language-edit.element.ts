@@ -3,10 +3,10 @@ import { LanguageDetails } from '@umbraco-cms/models';
 import { UUIBooleanInputEvent, UUIComboboxElement, UUIComboboxEvent, UUIToggleElement } from '@umbraco-ui/uui';
 import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, html, nothing } from 'lit';
-import { repeat } from 'lit-html/directives/repeat.js';
+import { repeat } from 'lit/directives/repeat.js';
 import { customElement, property, state } from 'lit/decorators.js';
+import { ifDefined } from 'lit/directives/if-defined.js';
 import { UmbLanguageStore } from 'src/backoffice/settings/languages/language.store';
-import { umbLanguagesData } from 'src/core/mocks/data/languages.data';
 import { UmbWorkspaceLanguageContext } from '../../language-workspace.context';
 
 @customElement('umb-workspace-view-language-edit')
@@ -82,6 +82,11 @@ export class UmbWorkspaceViewLanguageEditElement extends UmbLitElement {
 		}
 	}
 
+	private _handleSearchChange(event: any) {
+		const target = event.composedPath()[0] as UUIComboboxElement;
+		this._search = target.search;
+	}
+
 	private _handleDefaultChange(event: any) {
 		if (event instanceof UUIBooleanInputEvent) {
 			const target = event.composedPath()[0] as UUIToggleElement;
@@ -98,15 +103,27 @@ export class UmbWorkspaceViewLanguageEditElement extends UmbLitElement {
 		}
 	}
 
-	private _handleSearchChange(event: any) {
-		const target = event.composedPath()[0] as UUIComboboxElement;
-		this._search = target.search;
+	private _handleFallbackChange(event: any) {
+		if (event instanceof UUIComboboxEvent) {
+			const target = event.composedPath()[0] as UUIComboboxElement;
+			this._languageWorkspaceContext?.update({ fallbackLanguageId: Number.parseInt(target.value.toString()) });
+		}
 	}
 
 	private get _filteredLanguages() {
 		return this._languages.filter((language) => {
 			return language.name?.toLowerCase().includes(this._search.toLowerCase());
 		});
+	}
+
+	private get _fallbackLanguages() {
+		return this._languages.filter((language) => {
+			return language.isoCode !== this.language?.isoCode;
+		});
+	}
+
+	private get _fallbackLanguage() {
+		return this._fallbackLanguages.find((language) => language.id === this.language?.fallbackLanguageId);
 	}
 
 	private _renderDefaultLanguageWarning() {
@@ -170,9 +187,19 @@ export class UmbWorkspaceViewLanguageEditElement extends UmbLitElement {
 				<umb-workspace-property-layout
 					label="Fall back language"
 					description="To allow multi-lingual content to fall back to another language if not present in the requested language, select it here.">
-					<uui-combobox slot="editor">
+					<uui-combobox
+						slot="editor"
+						value=${ifDefined(this._fallbackLanguage?.id)}
+						@change=${this._handleFallbackChange}>
 						<uui-combobox-list>
-							<uui-combobox-list-option value="">No fall back language</uui-combobox-list-option>
+							${repeat(
+								this._fallbackLanguages,
+								(language) => language.isoCode,
+								(language) =>
+									html`
+										<uui-combobox-list-option value=${language.id ?? 0}>${language.name}</uui-combobox-list-option>
+									`
+							)}
 						</uui-combobox-list>
 					</uui-combobox>
 				</umb-workspace-property-layout>
