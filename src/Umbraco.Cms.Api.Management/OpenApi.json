@@ -638,6 +638,48 @@
           }
         }
       },
+      "delete": {
+        "tags": [
+          "Dictionary"
+        ],
+        "operationId": "DeleteDictionaryByKey",
+        "parameters": [
+          {
+            "name": "key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      },
       "put": {
         "tags": [
           "Dictionary"
@@ -676,38 +718,6 @@
                 }
               }
             }
-          },
-          "404": {
-            "description": "Not Found",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          }
-        }
-      },
-      "delete": {
-        "tags": [
-          "Dictionary"
-        ],
-        "operationId": "DeleteDictionaryByKey",
-        "parameters": [
-          {
-            "name": "key",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Success"
           },
           "404": {
             "description": "Not Found",
@@ -1891,36 +1901,6 @@
       }
     },
     "/umbraco/management/api/v1/language": {
-      "post": {
-        "tags": [
-          "Language"
-        ],
-        "operationId": "PostLanguage",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/Language"
-              }
-            }
-          }
-        },
-        "responses": {
-          "400": {
-            "description": "Bad Request",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          },
-          "201": {
-            "description": "Created"
-          }
-        }
-      },
       "get": {
         "tags": [
           "Language"
@@ -1932,7 +1912,8 @@
             "in": "query",
             "schema": {
               "type": "integer",
-              "format": "int32"
+              "format": "int32",
+              "default": 0
             }
           },
           {
@@ -1940,7 +1921,8 @@
             "in": "query",
             "schema": {
               "type": "integer",
-              "format": "int32"
+              "format": "int32",
+              "default": 100
             }
           }
         ],
@@ -1956,22 +1938,61 @@
             }
           }
         }
+      },
+      "post": {
+        "tags": [
+          "Language"
+        ],
+        "operationId": "PostLanguage",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LanguageCreateModel"
+              }
+            }
+          }
+        },
+        "responses": {
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "201": {
+            "description": "Created"
+          }
+        }
       }
     },
-    "/umbraco/management/api/v1/language/{id}": {
+    "/umbraco/management/api/v1/language/{isoCode}": {
       "get": {
         "tags": [
           "Language"
         ],
-        "operationId": "GetLanguageById",
+        "operationId": "GetLanguageByIsoCode",
         "parameters": [
           {
-            "name": "id",
+            "name": "isoCode",
             "in": "path",
             "required": true,
             "schema": {
-              "type": "integer",
-              "format": "int32"
+              "type": "string"
             }
           }
         ],
@@ -1981,7 +2002,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/NotFoundResult"
+                  "$ref": "#/components/schemas/ProblemDetails"
                 }
               }
             }
@@ -2002,15 +2023,14 @@
         "tags": [
           "Language"
         ],
-        "operationId": "DeleteLanguageById",
+        "operationId": "DeleteLanguageByIsoCode",
         "parameters": [
           {
-            "name": "id",
+            "name": "isoCode",
             "in": "path",
             "required": true,
             "schema": {
-              "type": "integer",
-              "format": "int32"
+              "type": "string"
             }
           }
         ],
@@ -2044,15 +2064,14 @@
         "tags": [
           "Language"
         ],
-        "operationId": "PutLanguageById",
+        "operationId": "PutLanguageByIsoCode",
         "parameters": [
           {
-            "name": "id",
+            "name": "isoCode",
             "in": "path",
             "required": true,
             "schema": {
-              "type": "integer",
-              "format": "int32"
+              "type": "string"
             }
           }
         ],
@@ -2060,7 +2079,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/Language"
+                "$ref": "#/components/schemas/LanguageUpdateModel"
               }
             }
           }
@@ -5947,22 +5966,10 @@
         "additionalProperties": false
       },
       "Language": {
-        "required": [
-          "isoCode"
-        ],
         "type": "object",
         "properties": {
-          "id": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "isoCode": {
-            "minLength": 1,
-            "type": "string"
-          },
           "name": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "isDefault": {
             "type": "boolean"
@@ -5970,9 +5977,52 @@
           "isMandatory": {
             "type": "boolean"
           },
-          "fallbackLanguageId": {
-            "type": "integer",
-            "format": "int32",
+          "fallbackIsoCode": {
+            "type": "string",
+            "nullable": true
+          },
+          "isoCode": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "LanguageCreateModel": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "isDefault": {
+            "type": "boolean"
+          },
+          "isMandatory": {
+            "type": "boolean"
+          },
+          "fallbackIsoCode": {
+            "type": "string",
+            "nullable": true
+          },
+          "isoCode": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "LanguageUpdateModel": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "isDefault": {
+            "type": "boolean"
+          },
+          "isMandatory": {
+            "type": "boolean"
+          },
+          "fallbackIsoCode": {
+            "type": "string",
             "nullable": true
           }
         },

@@ -783,15 +783,15 @@ public class LocalizationServiceTests : UmbracoIntegrationTest
             .WithCultureInfo("en-GB")
             .Build();
 
-        var result = LocalizationService.Create(languageDaDk, 0);
-        Assert.IsTrue(result.Success);
-        result = LocalizationService.Create(languageEnGb, 0);
-        Assert.IsTrue(result.Success);
+        var languageResult = LocalizationService.Create(languageDaDk, 0);
+        Assert.IsTrue(languageResult.Success);
+        languageResult = LocalizationService.Create(languageEnGb, 0);
+        Assert.IsTrue(languageResult.Success);
 
         _danishLangId = languageDaDk.Id;
         _englishLangId = languageEnGb.Id;
 
-        var result = LocalizationService.Create(
+        var dictionaryResult = LocalizationService.Create(
             "Parent",
             null,
             new List<IDictionaryTranslation>
@@ -799,13 +799,13 @@ public class LocalizationServiceTests : UmbracoIntegrationTest
                 new DictionaryTranslation(languageEnGb, "ParentValue"),
                 new DictionaryTranslation(languageDaDk, "ForældreVærdi")
             });
-        Assert.True(result.Success);
-        IDictionaryItem parentItem = result.Result!;
+        Assert.True(dictionaryResult.Success);
+        IDictionaryItem parentItem = dictionaryResult.Result!;
 
         _parentItemGuidId = parentItem.Key;
         _parentItemIntId = parentItem.Id;
 
-        result = LocalizationService.Create(
+        dictionaryResult = LocalizationService.Create(
             "Child",
             parentItem.Key,
             new List<IDictionaryTranslation>
@@ -813,8 +813,8 @@ public class LocalizationServiceTests : UmbracoIntegrationTest
                 new DictionaryTranslation(languageEnGb, "ChildValue"),
                 new DictionaryTranslation(languageDaDk, "BørnVærdi")
             });
-        Assert.True(result.Success);
-        IDictionaryItem childItem = result.Result!;
+        Assert.True(dictionaryResult.Success);
+        IDictionaryItem childItem = dictionaryResult.Result!;
 
         _childItemGuidId = childItem.Key;
         _childItemIntId = childItem.Id;
