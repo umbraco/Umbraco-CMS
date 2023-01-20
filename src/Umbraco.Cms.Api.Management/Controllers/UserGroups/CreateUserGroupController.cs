@@ -32,11 +32,12 @@ public class CreateUserGroupController : UserGroupsControllerBase
     [ProducesResponseType(StatusCodes.Status201Created)]
     public async Task<IActionResult> Create(UserGroupSaveModel userGroupSaveModel)
     {
-        IUser? currentUser = _backOfficeSecurityAccessor.BackOfficeSecurity?.CurrentUser;
-        if (currentUser is null)
-        {
-            return UserGroupOperationStatusResult(UserGroupOperationStatus.MissingUser);
-        }
+        // FIXME: Comment this in when auth is in place and we can get a currently logged in user.
+        // IUser? currentUser = _backOfficeSecurityAccessor.BackOfficeSecurity?.CurrentUser;
+        // if (currentUser is null)
+        // {
+        //     return UserGroupOperationStatusResult(UserGroupOperationStatus.MissingUser);
+        // }
 
         IUserGroup group = _userGroupViewModelFactory.Create(userGroupSaveModel);
 
