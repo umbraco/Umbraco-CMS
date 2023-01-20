@@ -1,9 +1,11 @@
-import { css, html, LitElement } from 'lit';
+import { css, html } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, property, state } from 'lit/decorators.js';
 import { repeat } from 'lit/directives/repeat.js';
 import { UUIInputElement, UUIInputEvent } from '@umbraco-ui/uui-input';
 import { UmbPropertyValueChangeEvent } from '../..';
+import { UmbLitElement } from '@umbraco-cms/element';
+import { UmbModalService, UMB_MODAL_SERVICE_CONTEXT_TOKEN } from 'src/core/modal';
 
 export type MultipleTextStringConfigData = Array<{
 	alias: 'minNumber' | 'maxNumber';
@@ -20,7 +22,7 @@ export interface MultipleTextStringValueItem {
  * @element umb-property-editor-ui-multiple-text-string
  */
 @customElement('umb-property-editor-ui-multiple-text-string')
-export class UmbPropertyEditorUIMultipleTextStringElement extends LitElement {
+export class UmbPropertyEditorUIMultipleTextStringElement extends UmbLitElement {
 	static styles = [
 		UUITextStyles,
 		css`
@@ -64,25 +66,54 @@ export class UmbPropertyEditorUIMultipleTextStringElement extends LitElement {
 	@state()
 	private _limitMax?: number;
 
+	private _modalService?: UmbModalService;
+
+	constructor() {
+		super();
+
+		this.consumeContext(UMB_MODAL_SERVICE_CONTEXT_TOKEN, (modalService) => {
+			this._modalService = modalService;
+		});
+	}
+
 	private _onAdd() {
 		this._value = [...this._value, { value: '' }];
 		this.dispatchEvent(new UmbPropertyValueChangeEvent());
-		this._focusNewItem();
+		this.#focusNewItem();
 	}
 
-	private _onInput(event: UUIInputEvent) {
-		const target = event.target as UUIInputElement;
+	#onDelete(index: number) {
+		const item = this._value[index];
+
+		const modalHandler = this._modalService?.confirm({
+			headline: `Delete ${item.value || 'item'}`,
+			content: 'Are you sure you want to delete this item?',
+			color: 'danger',
+			confirmLabel: 'Delete',
+		});
+
+		modalHandler?.onClose().then(({ confirmed }: any) => {
+			if (confirmed) this.#deleteItem(index);
+		});
+	}
+
+	#onInput(event: UUIInputEvent, currentIndex: number) {
+		const target = event.currentTarget as UUIInputElement;
 		const value = target.value as string;
-		const valueIndex = Number(target.dataset.valueIndex);
-		this._value = this._value.map((item, index) => (index === valueIndex ? { value } : item));
+		this._value = this._value.map((item, index) => (index === currentIndex ? { value } : item));
 		this.dispatchEvent(new UmbPropertyValueChangeEvent());
 	}
 
-	private async _focusNewItem() {
+	async #focusNewItem() {
 		await this.updateComplete;
 		const inputs = this.shadowRoot?.querySelectorAll('uui-input') as NodeListOf<UUIInputElement>;
 		const lastInput = inputs[inputs.length - 1];
 		lastInput.focus();
+	}
+
+	#deleteItem(itemIndex: number) {
+		this._value = this._value.filter((item, index) => index !== itemIndex);
+		this.dispatchEvent(new UmbPropertyValueChangeEvent());
 	}
 
 	render() {
@@ -106,9 +137,13 @@ export class UmbPropertyEditorUIMultipleTextStringElement extends LitElement {
 			<uui-input
 				id="text-field"
 				value="${item.value}"
-				data-value-index="${index}"
-				@input="${this._onInput}"></uui-input>
-			<uui-button label="Hello" look="primary" color="danger" compact>
+				@input="${(event: UUIInputEvent) => this.#onInput(event, index)}"></uui-input>
+			<uui-button
+				label="Delete ${item.value}"
+				look="primary"
+				color="danger"
+				@click="${() => this.#onDelete(index)}"
+				compact>
 				<uui-icon name="umb:trash"></uui-icon>
 			</uui-button>
 		</div>`;
