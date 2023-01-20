@@ -122,9 +122,7 @@ export class UmbLanguageRootWorkspaceElement extends UmbLitElement {
 					},
 					{
 						columnAlias: 'delete',
-						value: {
-							show: !language.isDefault,
-						},
+						value: language,
 					},
 				],
 			};
