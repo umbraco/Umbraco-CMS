@@ -1,5 +1,6 @@
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Persistence.Querying;
+using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Core.Services;
 
@@ -281,6 +282,14 @@ public interface IUserService : IMembershipUserService
     ///     than all users will be removed from this group and only these users will be added
     /// </param>
     void Save(IUserGroup userGroup, int[]? userIds = null);
+
+    /// <summary>
+    /// Persists a new user group.
+    /// </summary>
+    /// <param name="userGroup">The user group to create.</param>
+    /// <param name="performingUserId">The ID of the user responsible for creating the group.</param>
+    /// <returns>An attempt indicating if the operation was a success as well as a more detailed <see cref="UserGroupOperationStatus"/>.</returns>
+    Attempt<IUserGroup, UserGroupOperationStatus> Create(IUserGroup userGroup, int performingUserId, int[]? groupMembersUserId = null);
 
     /// <summary>
     ///     Deletes a UserGroup

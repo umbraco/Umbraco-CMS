@@ -11,7 +11,9 @@ using Umbraco.Cms.Core.Persistence;
 using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Scoping;
+using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Extensions;
+using UserProfile = Umbraco.Cms.Core.Models.Membership.UserProfile;
 
 namespace Umbraco.Cms.Core.Services;
 
@@ -25,6 +27,7 @@ internal class UserService : RepositoryService, IUserService
     private readonly ILogger<UserService> _logger;
     private readonly IRuntimeState _runtimeState;
     private readonly IUserGroupRepository _userGroupRepository;
+    private readonly IUserGroupAuthorizationService _userGroupAuthorizationService;
     private readonly IUserRepository _userRepository;
 
     public UserService(
@@ -34,12 +37,14 @@ internal class UserService : RepositoryService, IUserService
         IRuntimeState runtimeState,
         IUserRepository userRepository,
         IUserGroupRepository userGroupRepository,
-        IOptions<GlobalSettings> globalSettings)
+        IOptions<GlobalSettings> globalSettings,
+        IUserGroupAuthorizationService userGroupAuthorizationService)
         : base(provider, loggerFactory, eventMessagesFactory)
     {
         _runtimeState = runtimeState;
         _userRepository = userRepository;
         _userGroupRepository = userGroupRepository;
+        _userGroupAuthorizationService = userGroupAuthorizationService;
         _globalSettings = globalSettings.Value;
         _logger = loggerFactory.CreateLogger<UserService>();
     }
@@ -974,7 +979,7 @@ internal class UserService : RepositoryService, IUserService
         using (ICoreScope scope = ScopeProvider.CreateCoreScope())
         {
             // we need to figure out which users have been added / removed, for audit purposes
-            var empty = new IUser[0];
+            IUser[] empty = Array.Empty<IUser>();
             IUser[] addedUsers = empty;
             IUser[] removedUsers = empty;
 
@@ -1021,6 +1026,107 @@ internal class UserService : RepositoryService, IUserService
 
             scope.Complete();
         }
+    }
+
+    /// <inheritdoc/>
+    public Attempt<IUserGroup, UserGroupOperationStatus> Create(IUserGroup userGroup, int performingUserId, int[]? groupMembersUserId = null)
+    {
+        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+
+        IUser? performingUser = GetUserById(performingUserId);
+        if (performingUser is null)
+        {
+            return Attempt.FailWithStatus(UserGroupOperationStatus.MissingUser, userGroup);
+        }
+
+        if (IsNewUserGroup(userGroup) is false)
+        {
+            return Attempt.FailWithStatus(UserGroupOperationStatus.AlreadyExists, userGroup);
+        }
+
+        if (UserGroupHasUniqueAlias(userGroup) is false)
+        {
+            return Attempt.FailWithStatus(UserGroupOperationStatus.DuplicateAlias, userGroup);
+        }
+
+        Attempt<UserGroupOperationStatus> authorizeSectionChanges =
+            _userGroupAuthorizationService.AuthorizeSectionAccess(performingUser, userGroup);
+        if (authorizeSectionChanges.Success is false)
+        {
+            return Attempt.FailWithStatus(authorizeSectionChanges.Result, userGroup);
+        }
+
+        Attempt<UserGroupOperationStatus> authorizeContentNodeChanges =
+            _userGroupAuthorizationService.AuthorizeStartNodeChanges(performingUser, userGroup);
+        if (authorizeSectionChanges.Success is false)
+        {
+            return Attempt.FailWithStatus(authorizeContentNodeChanges.Result, userGroup);
+        }
+
+        EventMessages eventMessages = EventMessagesFactory.Get();
+        var savingNotification = new UserGroupSavingNotification(userGroup, eventMessages);
+        if (scope.Notifications.PublishCancelable(savingNotification))
+        {
+            scope.Complete();
+            return Attempt.FailWithStatus(UserGroupOperationStatus.CancelledByNotification, userGroup);
+        }
+
+        int[] checkedGroupMembers = EnsureNonAdminUserIsInSavedUserGroup(performingUser, groupMembersUserId ?? Enumerable.Empty<int>()).ToArray();
+        IEnumerable<IUser> usersToAdd = GetUsersById(checkedGroupMembers);
+
+        // Since this is a brand new creation we don't have to be worried about what users were added and removed
+        // simply put all members that are requested to be in the group will be "added"
+        var userGroupWithUsers = new UserGroupWithUsers(userGroup, usersToAdd.ToArray(), Array.Empty<IUser>());
+        var savingUserGroupWithUsersNotification = new UserGroupWithUsersSavingNotification(userGroupWithUsers, eventMessages);
+        if (scope.Notifications.PublishCancelable(savingUserGroupWithUsersNotification))
+        {
+            scope.Complete();
+            return Attempt.FailWithStatus(UserGroupOperationStatus.CancelledByNotification, userGroup);
+        }
+
+        _userGroupRepository.AddOrUpdateGroupWithUsers(userGroup, checkedGroupMembers);
+
+        scope.Complete();
+        return Attempt.SucceedWithStatus(UserGroupOperationStatus.Success, userGroup);
+    }
+
+    private bool IsNewUserGroup(IUserGroup userGroup)
+    {
+        if (userGroup.Id != 0)
+        {
+            return false;
+        }
+
+        return GetUserGroupByKey(userGroup.Key) is null;
+    }
+
+    private bool UserGroupHasUniqueAlias(IUserGroup userGroup)
+    {
+        if (_userGroupRepository.Get(userGroup.Alias) is not null)
+        {
+            return false;
+        }
+
+        return true;
+    }
+
+    /// <summary>
+    /// Ensures that the user creating the user group is either an admin, or in the group itself.
+    /// </summary>
+    /// <remarks>
+    /// This is to ensure that the user can access the group they themselves created at a later point and modify it.
+    /// </remarks>
+    private IEnumerable<int> EnsureNonAdminUserIsInSavedUserGroup(IUser performingUser, IEnumerable<int> groupMembersUserIds)
+    {
+        var userIds = groupMembersUserIds.ToList();
+
+        // If the performing user is and admin we don't care, they can access the group later regardless
+        if (performingUser.IsAdmin() is false && userIds.Contains(performingUser.Id) is false)
+        {
+            userIds.Add(performingUser.Id);
+        }
+
+        return userIds;
     }
 
     /// <summary>
