@@ -279,6 +279,7 @@ namespace Umbraco.Cms.Core.DependencyInjection
             Services.AddUnique<IKeyValueService, KeyValueService>();
             Services.AddUnique<IPublicAccessService, PublicAccessService>();
             Services.AddUnique<IContentVersionService, ContentVersionService>();
+            Services.AddTransient<IUserGroupAuthorizationService, UserGroupAuthorizationService>();
             Services.AddUnique<IUserService, UserService>();
             Services.AddUnique<ILocalizationService, LocalizationService>();
             Services.AddUnique<IMacroService, MacroService>();
