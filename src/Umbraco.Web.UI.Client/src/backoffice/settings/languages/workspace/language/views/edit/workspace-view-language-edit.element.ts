@@ -73,6 +73,9 @@ export class UmbWorkspaceViewLanguageEditElement extends UmbLitElement {
 		},
 	]; //TODO: This is temporary, we need to get the available languages from the API.
 
+	@state()
+	private _search = '';
+
 	private _languageWorkspaceContext?: UmbWorkspaceLanguageContext;
 
 	constructor() {
@@ -120,16 +123,31 @@ export class UmbWorkspaceViewLanguageEditElement extends UmbLitElement {
 		}
 	}
 
+	private _handleSearchChange(event: any) {
+		const target = event.composedPath()[0] as UUIComboboxElement;
+		this._search = target.search;
+	}
+
+	private get _filteredLanguages() {
+		return this._languages.filter((language) => {
+			return language.name?.toLowerCase().includes(this._search.toLowerCase());
+		});
+	}
+
 	render() {
 		if (!this.language) return nothing;
 
 		return html`
 			<uui-box>
 				<umb-workspace-property-layout label="Language">
-					<uui-combobox slot="editor" value=${this.language.isoCode} @change=${this._handleLanguageChange}>
+					<uui-combobox
+						slot="editor"
+						value=${this.language.isoCode}
+						@change=${this._handleLanguageChange}
+						@search=${this._handleSearchChange}>
 						<uui-combobox-list>
 							${repeat(
-								this._languages,
+								this._filteredLanguages,
 								(language) => language.isoCode,
 								(language) =>
 									html`
