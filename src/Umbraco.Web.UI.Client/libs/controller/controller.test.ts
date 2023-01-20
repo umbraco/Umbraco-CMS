@@ -1,16 +1,14 @@
 import { expect } from '@open-wc/testing';
 import { customElement } from 'lit/decorators.js';
-import { UmbContextProviderController } from '../context-api/provide/context-provider.controller';
 import { UmbControllerHostInterface, UmbControllerHostMixin } from './controller-host.mixin';
+import { UmbContextProviderController } from '@umbraco-cms/context-api';
 
 class MyClass {
 	prop = 'value from provider';
 }
 
 @customElement('test-my-controller-host')
-class MyHostElement extends UmbControllerHostMixin(HTMLElement) {
-
-}
+export class MyHostElement extends UmbControllerHostMixin(HTMLElement) {}
 
 describe('UmbContextProvider', () => {
 	type NewType = UmbControllerHostInterface;
@@ -22,10 +20,8 @@ describe('UmbContextProvider', () => {
 		hostElement = document.createElement('test-my-controller-host') as UmbControllerHostInterface;
 	});
 
-
 	describe('Destroyed controllers is gone from host', () => {
 		it('has a host property', () => {
-
 			const ctrl = new UmbContextProviderController(hostElement, 'my-test-context', contextInstance);
 
 			expect(hostElement.hasController(ctrl)).to.be.true;
@@ -38,7 +34,6 @@ describe('UmbContextProvider', () => {
 
 	describe('Unique controllers replace each other', () => {
 		it('has a host property', () => {
-
 			const firstCtrl = new UmbContextProviderController(hostElement, 'my-test-context', contextInstance);
 			const secondCtrl = new UmbContextProviderController(hostElement, 'my-test-context', contextInstance);
 
@@ -46,5 +41,4 @@ describe('UmbContextProvider', () => {
 			expect(hostElement.hasController(secondCtrl)).to.be.true;
 		});
 	});
-
 });

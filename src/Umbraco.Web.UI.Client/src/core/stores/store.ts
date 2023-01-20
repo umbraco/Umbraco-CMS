@@ -1,6 +1,6 @@
 import type { Observable } from 'rxjs';
-import { UmbControllerHostInterface } from '../controller/controller-host.mixin';
 import { UniqueBehaviorSubject } from '../observable-api/unique-behavior-subject';
+import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 
 export interface UmbDataStoreIdentifiers {
 	key?: string;

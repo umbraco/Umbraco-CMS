@@ -1,17 +1,14 @@
 import { Observable } from 'rxjs';
 import { UmbObserver } from './observer';
-import type { UmbControllerInterface } from 'src/core/controller/controller.interface';
-import { UmbControllerHostInterface } from '@umbraco-cms/controller';
-
+import { UmbControllerInterface, UmbControllerHostInterface } from '@umbraco-cms/controller';
 
 export class UmbObserverController<T> extends UmbObserver<T> implements UmbControllerInterface {
-
 	_alias?: string;
 	public get unique() {
 		return this._alias;
 	}
 
-	constructor(host:UmbControllerHostInterface, source: Observable<T>, callback: (_value: T) => void, alias?: string) {
+	constructor(host: UmbControllerHostInterface, source: Observable<T>, callback: (_value: T) => void, alias?: string) {
 		super(source, callback);
 		this._alias = alias;
 
@@ -29,6 +26,4 @@ export class UmbObserverController<T> extends UmbObserver<T> implements UmbContr
 	hostConnected() {
 		return;
 	}
-
-
 }

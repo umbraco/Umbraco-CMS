@@ -23,7 +23,7 @@
 			"@umbraco-cms/models": ["src/core/models"],
 			"@umbraco-cms/backend-api": ["libs/backend-api"],
 			"@umbraco-cms/context-api": ["src/core/context-api"],
-			"@umbraco-cms/controller": ["src/core/controller"],
+			"@umbraco-cms/controller": ["libs/controller"],
 			"@umbraco-cms/element": ["src/core/element"],
 			"@umbraco-cms/extensions-api": ["src/core/extensions-api"],
 			"@umbraco-cms/extensions-registry": ["src/core/extensions-registry"],

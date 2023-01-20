@@ -1,13 +1,13 @@
-import type { HTMLElementConstructor } from '../models';
+import type { HTMLElementConstructor } from '../../src/core/models';
 import { UmbControllerInterface } from './controller.interface';
 
 export declare class UmbControllerHostInterface extends HTMLElement {
 	//#controllers:UmbController[];
 	//#attached:boolean;
-	hasController(controller:UmbControllerInterface): boolean;
+	hasController(controller: UmbControllerInterface): boolean;
 	getControllers(filterMethod: (ctrl: UmbControllerInterface) => boolean): UmbControllerInterface[];
-	addController(controller:UmbControllerInterface): void;
-	removeController(controller:UmbControllerInterface): void;
+	addController(controller: UmbControllerInterface): void;
+	removeController(controller: UmbControllerInterface): void;
 }
 
 /**
@@ -19,7 +19,6 @@ export declare class UmbControllerHostInterface extends HTMLElement {
  */
 export const UmbControllerHostMixin = <T extends HTMLElementConstructor>(superClass: T) => {
 	class UmbContextConsumerClass extends superClass {
-
 		#controllers: UmbControllerInterface[] = [];
 
 		#attached = false;
@@ -29,7 +28,7 @@ export const UmbControllerHostMixin = <T extends HTMLElementConstructor>(superCl
 		 * @param {UmbControllerInterface} ctrl
 		 */
 		hasController(ctrl: UmbControllerInterface): boolean {
-			return (this.#controllers.indexOf(ctrl) !== -1);
+			return this.#controllers.indexOf(ctrl) !== -1;
 		}
 
 		/**
@@ -45,18 +44,17 @@ export const UmbControllerHostMixin = <T extends HTMLElementConstructor>(superCl
 		 * @param {UmbControllerInterface} ctrl
 		 */
 		addController(ctrl: UmbControllerInterface): void {
-
 			// Check if there is one already with same unique
-			if(ctrl.unique) {
-				this.#controllers.forEach(x => {
-					if(x.unique === ctrl.unique) {
+			if (ctrl.unique) {
+				this.#controllers.forEach((x) => {
+					if (x.unique === ctrl.unique) {
 						this.removeController(x);
 					}
 				});
 			}
 
 			this.#controllers.push(ctrl);
-			if(this.#attached) {
+			if (this.#attached) {
 				ctrl.hostConnected();
 			}
 		}
@@ -68,9 +66,9 @@ export const UmbControllerHostMixin = <T extends HTMLElementConstructor>(superCl
 		 */
 		removeController(ctrl: UmbControllerInterface): void {
 			const index = this.#controllers.indexOf(ctrl);
-			if(index !== -1) {
+			if (index !== -1) {
 				this.#controllers.splice(index, 1);
-				if(this.#attached) {
+				if (this.#attached) {
 					ctrl.hostDisconnected();
 				}
 				ctrl.destroy();
@@ -83,8 +81,8 @@ export const UmbControllerHostMixin = <T extends HTMLElementConstructor>(superCl
 		 * @param {string} unique
 		 */
 		removeControllerByAlias(unique: string): void {
-			this.#controllers.forEach(x => {
-				if(x.unique === unique) {
+			this.#controllers.forEach((x) => {
+				if (x.unique === unique) {
 					this.removeController(x);
 				}
 			});

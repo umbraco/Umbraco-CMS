@@ -1,7 +1,4 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { UmbController } from '../../src/core/controller/controller.class';
-import { UmbControllerHostInterface } from '../../src/core/controller/controller-host.mixin';
-import { UmbContextConsumerController } from '../../src/core/context-api/consume/context-consumer.controller';
 import {
 	UmbNotificationOptions,
 	UmbNotificationService,
@@ -9,6 +6,8 @@ import {
 	UMB_NOTIFICATION_SERVICE_CONTEXT_TOKEN,
 } from '../../src/core/notification';
 import { ApiError, CancelablePromise, ProblemDetails } from '@umbraco-cms/backend-api';
+import { UmbController, UmbControllerHostInterface } from '@umbraco-cms/controller';
+import { UmbContextConsumerController } from '@umbraco-cms/context-api';
 
 export class UmbResourceController extends UmbController {
 	#promise: Promise<any>;

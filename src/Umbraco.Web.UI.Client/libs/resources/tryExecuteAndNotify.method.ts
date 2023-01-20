@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { UmbControllerHostInterface } from '../../src/core/controller/controller-host.mixin';
+import { UmbNotificationOptions } from '../../src/core/notification';
 import { UmbResourceController } from './resource.controller';
-import { UmbNotificationOptions } from 'src/core/notification';
+import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 
 export function tryExecuteAndNotify<T>(
 	host: UmbControllerHostInterface,
