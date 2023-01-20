@@ -1,0 +1,14 @@
+{
+	"name": "@umbraco-cms/backend-api",
+	"version": "0.0.0",
+	"description": "",
+	"main": "index.js",
+	"module": "index.js",
+	"type": "module",
+	"scripts": {
+		"build": "rollup -c",
+		"test": "echo \"Error: no test specified\" && exit 1"
+	},
+	"author": "Umbraco HQ",
+	"license": "MIT"
+}
