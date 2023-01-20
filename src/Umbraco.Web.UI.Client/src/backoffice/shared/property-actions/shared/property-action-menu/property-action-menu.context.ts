@@ -1,9 +1,8 @@
-import { UmbContextProviderController } from 'src/core/context-api/provide/context-provider.controller';
+import { UmbContextProviderController } from '@umbraco-cms/context-api';
 import type { UmbControllerHostInterface } from '@umbraco-cms/controller';
 import { UniqueBehaviorSubject } from '@umbraco-cms/observable-api';
 
 export class UmbPropertyActionMenuContext {
-
 	#isOpen = new UniqueBehaviorSubject(false);
 	public readonly isOpen = this.#isOpen.asObservable();
 
