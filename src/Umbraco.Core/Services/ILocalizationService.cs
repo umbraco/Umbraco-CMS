@@ -203,7 +203,15 @@ public interface ILocalizationService : IService
     /// </summary>
     /// <param name="language"><see cref="ILanguage" /> to delete</param>
     /// <param name="userId">Optional id of the user deleting the language</param>
-    Attempt<ILanguage, LanguageOperationStatus> Delete(ILanguage language, int userId = Constants.Security.SuperUserId);
+    [Obsolete("Please use the Delete method that takes an ISO code and returns an Attempt. Will be removed in V15")]
+    void Delete(ILanguage language, int userId = Constants.Security.SuperUserId);
+
+    /// <summary>
+    ///     Deletes a <see cref="ILanguage" /> by removing it and its usages from the db
+    /// </summary>
+    /// <param name="isoCode">The ISO code of the <see cref="ILanguage" /> to delete</param>
+    /// <param name="userId">Optional id of the user deleting the language</param>
+    Attempt<ILanguage?, LanguageOperationStatus> Delete(string isoCode, int userId = Constants.Security.SuperUserId);
 
     /// <summary>
     ///     Gets the full dictionary key map.

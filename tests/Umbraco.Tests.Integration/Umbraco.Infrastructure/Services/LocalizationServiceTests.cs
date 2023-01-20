@@ -213,7 +213,7 @@ public class LocalizationServiceTests : UmbracoIntegrationTest
         Assert.That(languageNbNo.HasIdentity, Is.True);
         var languageId = languageNbNo.Id;
 
-        var result = LocalizationService.Delete(languageNbNo);
+        var result = LocalizationService.Delete(languageNbNo.IsoCode);
         Assert.IsTrue(result.Success);
 
         var language = LocalizationService.GetLanguageById(languageId);
@@ -231,7 +231,7 @@ public class LocalizationServiceTests : UmbracoIntegrationTest
         LocalizationService.Create(languageNbNo, 0);
         var languageId = languageDaDk.Id;
 
-        var result = LocalizationService.Delete(languageDaDk);
+        var result = LocalizationService.Delete(languageDaDk.IsoCode);
         Assert.IsTrue(result.Success);
 
         var language = LocalizationService.GetLanguageById(languageId);
@@ -431,7 +431,7 @@ public class LocalizationServiceTests : UmbracoIntegrationTest
         LocalizationService.Create(languageEnAu);
 
         // Act
-        var result = LocalizationService.Delete(languageEnAu);
+        var result = LocalizationService.Delete(languageEnAu.IsoCode);
         Assert.IsTrue(result.Success);
 
         // Assert
@@ -631,7 +631,7 @@ public class LocalizationServiceTests : UmbracoIntegrationTest
         var result = LocalizationService.Create(languageNbNo);
         Assert.IsTrue(result.Success);
 
-        result = LocalizationService.Delete(languageNbNo);
+        result = LocalizationService.Delete(languageNbNo.IsoCode);
         Assert.IsFalse(result.Success);
         Assert.AreEqual(LanguageOperationStatus.MissingDefault, result.Status);
 
@@ -648,7 +648,7 @@ public class LocalizationServiceTests : UmbracoIntegrationTest
             .WithCultureInfo("nb-NO")
             .Build();
 
-        var result = LocalizationService.Delete(languageNbNo);
+        var result = LocalizationService.Delete(languageNbNo.IsoCode);
         Assert.IsFalse(result.Success);
         Assert.AreEqual(LanguageOperationStatus.NotFound, result.Status);
     }

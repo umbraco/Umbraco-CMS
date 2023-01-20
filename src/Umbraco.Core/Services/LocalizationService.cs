@@ -453,6 +453,7 @@ internal class LocalizationService : RepositoryService, ILocalizationService
     /// </summary>
     /// <param name="language"><see cref="ILanguage" /> to save</param>
     /// <param name="userId">Optional id of the user saving the language</param>
+    [Obsolete("Please use Create or Update depending on use case. Will be removed in V15")]
     public void Save(ILanguage language, int userId = Constants.Security.SuperUserId)
     {
         Attempt<ILanguage, LanguageOperationStatus> result = language.Id > 0
@@ -578,22 +579,27 @@ internal class LocalizationService : RepositoryService, ILocalizationService
     /// </summary>
     /// <param name="language"><see cref="ILanguage" /> to delete</param>
     /// <param name="userId">Optional id of the user deleting the language</param>
-    public Attempt<ILanguage, LanguageOperationStatus> Delete(ILanguage language, int userId = Constants.Security.SuperUserId)
+    [Obsolete("Please use the Delete method that takes an ISO code and returns an Attempt. Will be removed in V15")]
+    public void Delete(ILanguage language, int userId = Constants.Security.SuperUserId)
+        => Delete(language.IsoCode, userId);
+
+    /// <inheritdoc />
+    public Attempt<ILanguage?, LanguageOperationStatus> Delete(string isoCode, int userId = Constants.Security.SuperUserId)
     {
         using (ICoreScope scope = ScopeProvider.CreateCoreScope())
         {
             // write-lock languages to guard against race conds when dealing with default language
             scope.WriteLock(Constants.Locks.Languages);
 
-            ILanguage? currentLanguage = _languageRepository.Get(language.Id);
-            if (currentLanguage == null)
+            ILanguage? language = _languageRepository.GetByIsoCode(isoCode);
+            if (language == null)
             {
-                return Attempt.FailWithStatus(LanguageOperationStatus.NotFound, language);
+                return Attempt.FailWithStatus<ILanguage?, LanguageOperationStatus>(LanguageOperationStatus.NotFound, null);
             }
 
-            if (currentLanguage.IsDefault)
+            if (language.IsDefault)
             {
-                return Attempt.FailWithStatus(LanguageOperationStatus.MissingDefault, language);
+                return Attempt.FailWithStatus<ILanguage?, LanguageOperationStatus>(LanguageOperationStatus.MissingDefault, language);
             }
 
             EventMessages eventMessages = EventMessagesFactory.Get();
@@ -601,7 +607,7 @@ internal class LocalizationService : RepositoryService, ILocalizationService
             if (scope.Notifications.PublishCancelable(deletingLanguageNotification))
             {
                 scope.Complete();
-                return Attempt.FailWithStatus(LanguageOperationStatus.CancelledByNotification, language);
+                return Attempt.FailWithStatus<ILanguage?, LanguageOperationStatus>(LanguageOperationStatus.CancelledByNotification, language);
             }
 
             // NOTE: Other than the fall-back language, there aren't any other constraints in the db, so possible references aren't deleted
@@ -612,7 +618,7 @@ internal class LocalizationService : RepositoryService, ILocalizationService
 
             Audit(AuditType.Delete, "Delete Language", userId, language.Id, UmbracoObjectTypes.Language.GetName());
             scope.Complete();
-            return Attempt.SucceedWithStatus(LanguageOperationStatus.Success, language);
+            return Attempt.SucceedWithStatus<ILanguage?, LanguageOperationStatus>(LanguageOperationStatus.Success, language);
         }
     }
 
