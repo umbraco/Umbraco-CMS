@@ -4,7 +4,7 @@ import { importMapsPlugin } from '@web/dev-server-import-maps';
 
 export default {
 	nodeResolve: true,
-	files: 'src/**/*.test.ts',
+	files: ['src/**/*.test.ts', 'libs/**/*.test.ts'],
 	plugins: [
 		esbuildPlugin({ ts: true, target: 'auto', json: true }),
 		importMapsPlugin({
@@ -22,7 +22,7 @@ export default {
 						'@umbraco-cms/observable-api': './src/core/observable-api/index.ts',
 						'@umbraco-cms/utils': './src/core/utils/index.ts',
 						'@umbraco-cms/test-utils': './src/core/test-utils/index.ts',
-						'@umbraco-cms/resources': './src/core/resources/index.ts'
+						'@umbraco-cms/resources': './libs/resources/index.ts'
 					},
 				},
 			},
