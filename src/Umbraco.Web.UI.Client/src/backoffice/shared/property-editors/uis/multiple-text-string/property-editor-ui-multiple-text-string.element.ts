@@ -3,6 +3,7 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, property, state } from 'lit/decorators.js';
 import { repeat } from 'lit/directives/repeat.js';
 import { UUIInputElement, UUIInputEvent } from '@umbraco-ui/uui-input';
+import { UmbPropertyValueChangeEvent } from '../..';
 
 export type MultipleTextStringConfigData = Array<{
 	alias: 'minNumber' | 'maxNumber';
@@ -65,16 +66,15 @@ export class UmbPropertyEditorUIMultipleTextStringElement extends LitElement {
 
 	private _onAdd() {
 		this._value = [...this._value, { value: '' }];
-		this.dispatchEvent(new CustomEvent('property-value-change'));
+		this.dispatchEvent(new UmbPropertyValueChangeEvent());
 	}
 
 	private _onInput(event: UUIInputEvent) {
 		const target = event.target as UUIInputElement;
 		const value = target.value as string;
 		const valueIndex = Number(target.dataset.valueIndex);
-
-		this._value[valueIndex] = { value };
-		this.dispatchEvent(new CustomEvent('property-value-change'));
+		this._value = this._value.map((item, index) => (index === valueIndex ? { value } : item));
+		this.dispatchEvent(new UmbPropertyValueChangeEvent());
 	}
 
 	render() {
