@@ -59,8 +59,6 @@ export class UmbWorkspaceViewLanguageEditElement extends UmbLitElement {
 		this.consumeContext('umbLanguageStore', (instance: UmbLanguageStore) => {
 			if (!instance) return;
 
-			console.log('instance', instance);
-
 			instance.getAll().subscribe((languages: Array<LanguageDetails>) => {
 				this._languages = languages;
 			});
@@ -130,8 +128,6 @@ export class UmbWorkspaceViewLanguageEditElement extends UmbLitElement {
 		const originalIsDefault = this._languages.find(
 			(language) => language.isoCode === this.language?.isoCode
 		)?.isDefault;
-
-		console.log(this._languages, this.language?.isDefault);
 
 		if (originalIsDefault === this.language?.isDefault) return nothing;
 
