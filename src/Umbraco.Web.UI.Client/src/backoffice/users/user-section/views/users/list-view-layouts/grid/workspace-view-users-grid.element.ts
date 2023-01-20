@@ -5,8 +5,8 @@ import { repeat } from 'lit/directives/repeat.js';
 import { ifDefined } from 'lit-html/directives/if-defined.js';
 import type { UmbSectionViewUsersElement } from '../../section-view-users.element';
 import { getTagLookAndColor } from '../../../../../../../auth/utils';
-import type { UserDetails, UserEntity, UserGroupDetails, UserGroupEntity } from '@umbraco-cms/models';
-import { UmbUserGroupStore } from 'src/backoffice/users/user-groups/user-group.store';
+import { UmbUserGroupStore, UMB_USER_GROUP_STORE_CONTEXT_TOKEN } from '../../../../../user-groups/user-group.store';
+import type { UserDetails, UserEntity, UserGroupEntity } from '@umbraco-cms/models';
 import { UmbLitElement } from '@umbraco-cms/element';
 
 @customElement('umb-workspace-view-users-grid')
@@ -54,11 +54,14 @@ export class UmbWorkspaceViewUsersGridElement extends UmbLitElement {
 	constructor() {
 		super();
 
-		this.consumeAllContexts(['umbUserGroupStore', 'umbUsersContext'], (instances) => {
-			this._userGroupStore = instances['umbUserGroupStore'];
-			this._usersContext = instances['umbUsersContext'];
-			this._observeUsers();
+		this.consumeContext(UMB_USER_GROUP_STORE_CONTEXT_TOKEN, (instance) => {
+			this._userGroupStore = instance;
 			this._observeUserGroups();
+		});
+
+		this.consumeContext<UmbSectionViewUsersElement>('umbUsersContext', (_instance) => {
+			this._usersContext = _instance;
+			this._observeUsers();
 			this._observeSelection();
 		});
 	}
@@ -72,10 +75,7 @@ export class UmbWorkspaceViewUsersGridElement extends UmbLitElement {
 
 	private _observeUserGroups() {
 		if (!this._userGroupStore) return;
-		this.observe(
-			this._userGroupStore.getAll(),
-			(userGroups) => (this._userGroups = userGroups)
-		);
+		this.observe(this._userGroupStore.getAll(), (userGroups) => (this._userGroups = userGroups));
 	}
 
 	private _observeSelection() {

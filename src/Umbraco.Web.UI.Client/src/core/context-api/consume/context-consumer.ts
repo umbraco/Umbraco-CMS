@@ -1,3 +1,4 @@
+import { UmbContextToken } from '../context-token';
 import { isUmbContextProvideEventType, umbContextProvideEventType } from '../provide/context-provide.event';
 import { UmbContextRequestEventImplementation, UmbContextCallback } from './context-request.event';
 
@@ -5,14 +6,14 @@ import { UmbContextRequestEventImplementation, UmbContextCallback } from './cont
  * @export
  * @class UmbContextConsumer
  */
-export class UmbContextConsumer<HostType extends EventTarget = EventTarget> {
-
-	private _instance?: unknown;
-	get instance(): unknown | undefined {
+export class UmbContextConsumer<HostType extends EventTarget = EventTarget, T = unknown> {
+	private _instance?: T;
+	get instance() {
 		return this._instance;
 	}
 
-	get consumerAlias() {
+	private _contextAlias: string;
+	get consumerAlias(): string {
 		return this._contextAlias;
 	}
 
@@ -23,13 +24,18 @@ export class UmbContextConsumer<HostType extends EventTarget = EventTarget> {
 	 * @param {UmbContextCallback} _callback
 	 * @memberof UmbContextConsumer
 	 */
-	constructor(protected host: HostType, protected _contextAlias: string, private _callback: UmbContextCallback) {}
+	constructor(
+		protected host: HostType,
+		_contextAlias: string | UmbContextToken<T>,
+		private _callback: UmbContextCallback<T>
+	) {
+		this._contextAlias = _contextAlias.toString();
+	}
 
-
-	private _onResponse = (instance: unknown) => {
+	private _onResponse = (instance: T) => {
 		this._instance = instance;
 		this._callback(instance);
-	}
+	};
 
 	/**
 	 * @memberof UmbContextConsumer

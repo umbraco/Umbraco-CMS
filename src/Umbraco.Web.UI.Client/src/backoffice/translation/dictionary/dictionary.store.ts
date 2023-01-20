@@ -2,6 +2,9 @@ import { map, Observable } from 'rxjs';
 import { UmbDataStoreBase } from '../../../core/stores/store';
 import { DictionaryResource, EntityTreeItem } from '@umbraco-cms/backend-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/resources';
+import { UmbContextToken } from '@umbraco-cms/context-api';
+
+export const STORE_ALIAS = 'UmbDictionaryStore';
 
 /**
  * @export
@@ -10,7 +13,7 @@ import { tryExecuteAndNotify } from '@umbraco-cms/resources';
  * @description - Data Store for Dictionary Items.
  */
 export class UmbDictionaryStore extends UmbDataStoreBase<EntityTreeItem> {
-	public readonly storeAlias = 'umbDictionaryStore';
+	public readonly storeAlias = STORE_ALIAS;
 
 	/**
 	 * @description - Get the root of the tree.
@@ -48,3 +51,5 @@ export class UmbDictionaryStore extends UmbDataStoreBase<EntityTreeItem> {
 		return this.items.pipe(map((items) => items.filter((item) => item.parentKey === key)));
 	}
 }
+
+export const UMB_DICTIONARY_STORE_CONTEXT_TOKEN = new UmbContextToken<UmbDictionaryStore>(STORE_ALIAS);

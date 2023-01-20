@@ -1,16 +1,22 @@
+import { UmbContextToken } from '../context-token';
 import { UmbContextConsumer } from './context-consumer';
 import { UmbContextCallback } from './context-request.event';
-import type { UmbControllerInterface } from 'src/core/controller/controller.interface';
-import { UmbControllerHostInterface } from 'src/core/controller/controller-host.mixin';
 
+import type { UmbControllerHostInterface, UmbControllerInterface } from '@umbraco-cms/controller';
 
-export class UmbContextConsumerController extends UmbContextConsumer<UmbControllerHostInterface> implements UmbControllerInterface {
-
+export class UmbContextConsumerController<T = unknown>
+	extends UmbContextConsumer<UmbControllerHostInterface, T>
+	implements UmbControllerInterface
+{
 	public get unique() {
-		return this._contextAlias;
+		return undefined;
 	}
 
-	constructor(host:UmbControllerHostInterface, contextAlias: string, callback: UmbContextCallback) {
+	constructor(
+		host: UmbControllerHostInterface,
+		contextAlias: string | UmbContextToken<T>,
+		callback: UmbContextCallback<T>
+	) {
 		super(host, contextAlias, callback);
 		host.addController(this);
 	}
@@ -20,5 +26,4 @@ export class UmbContextConsumerController extends UmbContextConsumer<UmbControll
 			this.host.removeController(this);
 		}
 	}
-
 }

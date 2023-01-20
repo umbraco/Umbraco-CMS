@@ -2,7 +2,7 @@ import { html, nothing } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { firstValueFrom, map } from 'rxjs';
 
-import type { UmbModalService } from '../../../../../core/modal';
+import { UmbModalService, UMB_MODAL_SERVICE_CONTEXT_TOKEN } from '../../../../../core/modal';
 import { createExtensionElement } from '@umbraco-cms/extensions-api';
 
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
@@ -22,7 +22,7 @@ export class UmbPackagesInstalledItem extends UmbLitElement {
 	constructor() {
 		super();
 
-		this.consumeContext('umbModalService', (modalService: UmbModalService) => {
+		this.consumeContext(UMB_MODAL_SERVICE_CONTEXT_TOKEN, (modalService) => {
 			this._umbModalService = modalService;
 		});
 	}

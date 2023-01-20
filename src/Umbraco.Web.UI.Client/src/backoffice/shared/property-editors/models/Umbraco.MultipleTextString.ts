@@ -8,13 +8,13 @@ export const manifest: ManifestPropertyEditorModel = {
 		config: {
 			properties: [
 				{
-					alias: 'minNumber',
+					alias: 'min',
 					label: 'Minimum',
 					description: 'Enter the minimum amount of text boxes to be displayed',
 					propertyEditorUI: 'Umb.PropertyEditorUI.Number',
 				},
 				{
-					alias: 'maxNumber',
+					alias: 'max',
 					label: 'Maximum',
 					description: 'Enter the maximum amount of text boxes to be displayed, enter 0 for unlimited',
 					propertyEditorUI: 'Umb.PropertyEditorUI.Number',
@@ -22,11 +22,11 @@ export const manifest: ManifestPropertyEditorModel = {
 			],
 			defaultData: [
 				{
-					alias: 'minNumber',
+					alias: 'min',
 					value: 0,
 				},
 				{
-					alias: 'maxNumber',
+					alias: 'max',
 					value: 0,
 				},
 			],

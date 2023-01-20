@@ -1,6 +1,6 @@
 import type { Observable } from 'rxjs';
 import type { ManifestTree } from '@umbraco-cms/models';
-import { UniqueBehaviorSubject } from 'src/core/observable-api/unique-behavior-subject';
+import { UniqueBehaviorSubject } from '@umbraco-cms/observable-api';
 
 export interface UmbTreeContext {
 	tree: ManifestTree;

@@ -17,7 +17,7 @@ export const manifest: ManifestPropertyEditorModel = {
 					alias: 'storageType',
 					label: 'Storage Type',
 					description: '',
-					propertyEditorUI: 'Umb.PropertyEditorUI.Dropdown',
+					propertyEditorUI: 'Umb.PropertyEditorUI.Tags.StorageType',
 				},
 			],
 			defaultData: [

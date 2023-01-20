@@ -1,6 +1,7 @@
 import { UmbWorkspaceContentContext } from '../../../shared/components/workspace/workspace-content/workspace-content.context';
+import { UMB_USER_STORE_CONTEXT_TOKEN } from '../../users/user.store';
 import type { UmbUserGroupStore, UmbUserGroupStoreItemType } from 'src/backoffice/users/user-groups/user-group.store';
-import { UmbControllerHostInterface } from 'src/core/controller/controller-host.mixin';
+import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 
 const DefaultDataTypeData = {
 	key: '',
@@ -19,11 +20,10 @@ export class UmbWorkspaceUserGroupContext extends UmbWorkspaceContentContext<
 	UmbUserGroupStore
 > {
 	constructor(host: UmbControllerHostInterface) {
-		super(host, DefaultDataTypeData, 'umbUserStore', 'userGroup');
+		super(host, DefaultDataTypeData, UMB_USER_STORE_CONTEXT_TOKEN.toString(), 'userGroup');
 	}
 
-
 	public setPropertyValue(alias: string, value: unknown) {
-		throw new Error("setPropertyValue is not implemented for UmbWorkspaceUserGroupContext")
+		throw new Error('setPropertyValue is not implemented for UmbWorkspaceUserGroupContext');
 	}
 }

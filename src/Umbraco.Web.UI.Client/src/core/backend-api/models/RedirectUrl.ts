@@ -4,8 +4,8 @@
 
 export type RedirectUrl = {
     key?: string;
-    originalUrl?: string | null;
-    destinationUrl?: string | null;
+    originalUrl?: string;
+    destinationUrl?: string;
     created?: string;
     contentKey?: string;
     culture?: string | null;

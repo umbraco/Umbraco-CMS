@@ -8,7 +8,7 @@ import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
 import type { DataTypePropertyData, ManifestPropertyEditorUI, ManifestTypes } from '@umbraco-cms/models';
 
 import '../../property-actions/shared/property-action-menu/property-action-menu.element';
-import 'src/backoffice/shared/components/workspace/workspace-property-layout/workspace-property-layout.element';
+import '../../../../backoffice/shared/components/workspace/workspace-property-layout/workspace-property-layout.element';
 import { UmbObserverController } from 'src/core/observable-api/observer.controller';
 import { UmbLitElement } from '@umbraco-cms/element';
 

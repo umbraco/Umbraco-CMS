@@ -3,8 +3,11 @@ import { UmbDataStoreBase } from '../../../core/stores/store';
 import { MemberTypeResource, EntityTreeItem } from '@umbraco-cms/backend-api';
 import type { MemberTypeDetails } from '@umbraco-cms/models';
 import { tryExecuteAndNotify } from '@umbraco-cms/resources';
+import { UmbContextToken } from '@umbraco-cms/context-api';
 
 export type UmbMemberTypeStoreItemType = MemberTypeDetails | EntityTreeItem;
+
+export const STORE_ALIAS = 'UmbMemberTypeStore';
 
 /**
  * @export
@@ -13,7 +16,7 @@ export type UmbMemberTypeStoreItemType = MemberTypeDetails | EntityTreeItem;
  * @description - Data Store for Member Types
  */
 export class UmbMemberTypeStore extends UmbDataStoreBase<UmbMemberTypeStoreItemType> {
-	public readonly storeAlias = 'umbMemberTypeStore';
+	public readonly storeAlias = STORE_ALIAS;
 
 	getByKey(key: string): Observable<UmbMemberTypeStoreItemType | null> {
 		return null as any;
@@ -33,3 +36,5 @@ export class UmbMemberTypeStore extends UmbDataStoreBase<UmbMemberTypeStoreItemT
 		return this.items.pipe(map((items) => items.filter((item) => item.parentKey === null)));
 	}
 }
+
+export const UMB_MEMBER_TYPE_STORE_CONTEXT_TOKEN = new UmbContextToken<UmbMemberTypeStore>(STORE_ALIAS);

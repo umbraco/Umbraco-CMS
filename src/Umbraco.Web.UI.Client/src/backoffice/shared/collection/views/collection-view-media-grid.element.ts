@@ -2,7 +2,7 @@ import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { repeat } from 'lit/directives/repeat.js';
-import type { UmbCollectionContext } from '../collection.context';
+import { UmbCollectionContext, UMB_COLLECTION_CONTEXT_TOKEN } from '../collection.context';
 import type { MediaDetails } from '@umbraco-cms/models';
 import { UmbLitElement } from '@umbraco-cms/element';
 
@@ -77,8 +77,7 @@ export class UmbCollectionViewsMediaGridElement extends UmbLitElement {
 		document.addEventListener('dragenter', this._handleDragEnter.bind(this));
 		document.addEventListener('dragleave', this._handleDragLeave.bind(this));
 		document.addEventListener('drop', this._handleDrop.bind(this));
-		this.consumeContext('umbCollectionContext', (instance) => {
-			console.log('umbCollectionContext', instance);
+		this.consumeContext(UMB_COLLECTION_CONTEXT_TOKEN, (instance) => {
 			this._collectionContext = instance;
 			this._observeCollectionContext();
 		});

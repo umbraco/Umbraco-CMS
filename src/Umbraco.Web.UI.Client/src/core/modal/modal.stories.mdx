@@ -25,12 +25,12 @@ The UmbModal service can be used to open modals.
 ```ts
 import { html, LitElement } from 'lit';
 import { UmbLitElement } from '@umbraco-cms/element';
-import type { UmbModalService } from './core/services/modal';
+import { UmbModalService, UMB_MODAL_SERVICE_CONTEXT_ALIAS } from './core/services/modal';
 class MyElement extends UmbLitElement {
 	private _modalService_?: UmbModalService;
 	constructor() {
 		super();
-		this.consumeContext('umbModalService', (modalService: UmbModalService) => {
+		this.consumeContext(UMB_MODAL_SERVICE_CONTEXT_ALIAS, (modalService) => {
 			this._modalService = modalService;
 			// modalService is now ready to be used.
 		});
@@ -45,13 +45,13 @@ A modal is opened by calling one of the helper methods on the UmbModalService. T
 ```ts
 import { html, LitElement } from 'lit';
 import { UmbLitElement } from '@umbraco-cms/element';
-import type { UmbModalService } from './core/services/modal';
+import { UmbModalService, UMB_MODAL_SERVICE_CONTEXT_ALIAS } from './core/services/modal';
 class MyElement extends UmbLitElement {
 	private _modalService?: UmbModalService;
 	constructor() {
 		super();
-		this.consumeContext('umbModalService', (modalService) => {
-			this._modalService = modalService.;
+		this.consumeContext(UMB_MODAL_SERVICE_CONTEXT_ALIAS, (modalService) => {
+			this._modalService = modalService;
 			// modalService is now ready to be used
 		});
 	}

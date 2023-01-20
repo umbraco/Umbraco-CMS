@@ -3,11 +3,11 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, property, state } from 'lit/decorators.js';
 import { ifDefined } from 'lit-html/directives/if-defined.js';
 import { FormControlMixin } from '@umbraco-ui/uui-base/lib/mixins';
-import type { UmbModalService } from 'src/core/modal';
+import { UmbModalService, UMB_MODAL_SERVICE_CONTEXT_TOKEN } from 'src/core/modal';
 import type { FolderTreeItem } from '@umbraco-cms/backend-api';
 import { UmbLitElement } from '@umbraco-cms/element';
 import type { UmbObserverController } from '@umbraco-cms/observable-api';
-import type { UmbDocumentStore } from 'src/backoffice/documents/documents/document.store';
+import { UmbDocumentStore, UMB_DOCUMENT_STORE_CONTEXT_TOKEN } from 'src/backoffice/documents/documents/document.store';
 
 @customElement('umb-input-document-picker')
 export class UmbInputDocumentPickerElement extends FormControlMixin(UmbLitElement) {
@@ -20,43 +20,41 @@ export class UmbInputDocumentPickerElement extends FormControlMixin(UmbLitElemen
 		`,
 	];
 
-
-  /**
-   * This is a minimum amount of selected items in this input.
-   * @type {number}
-   * @attr
-   * @default undefined
-   */
-  @property({ type: Number })
-  min?: number;
-
-  /**
-   * Min validation message.
-   * @type {boolean}
-   * @attr
-   * @default
-   */
-  @property({ type: String, attribute: 'min-message' })
-  minMessage = 'This field need more items';
+	/**
+	 * This is a minimum amount of selected items in this input.
+	 * @type {number}
+	 * @attr
+	 * @default undefined
+	 */
+	@property({ type: Number })
+	min?: number;
 
 	/**
-   * This is a maximum amount of selected items in this input.
-   * @type {number}
-   * @attr
-   * @default undefined
-   */
-  @property({ type: Number })
-  max?: number;
+	 * Min validation message.
+	 * @type {boolean}
+	 * @attr
+	 * @default
+	 */
+	@property({ type: String, attribute: 'min-message' })
+	minMessage = 'This field need more items';
 
-  /**
-   * Max validation message.
-   * @type {boolean}
-   * @attr
-   * @default
-   */
-  @property({ type: String, attribute: 'min-message' })
-  maxMessage = 'This field exceeds the allowed amount of items';
+	/**
+	 * This is a maximum amount of selected items in this input.
+	 * @type {number}
+	 * @attr
+	 * @default undefined
+	 */
+	@property({ type: Number })
+	max?: number;
 
+	/**
+	 * Max validation message.
+	 * @type {boolean}
+	 * @attr
+	 * @default
+	 */
+	@property({ type: String, attribute: 'min-message' })
+	maxMessage = 'This field exceeds the allowed amount of items';
 
 	private _selectedKeys: Array<string> = [];
 	public get selectedKeys(): Array<string> {
@@ -70,7 +68,7 @@ export class UmbInputDocumentPickerElement extends FormControlMixin(UmbLitElemen
 
 	@property()
 	public set value(keysString: string) {
-		if(keysString !== this._value) {
+		if (keysString !== this._value) {
 			this.selectedKeys = keysString.split(/[ ,]+/);
 		}
 	}
@@ -85,7 +83,6 @@ export class UmbInputDocumentPickerElement extends FormControlMixin(UmbLitElemen
 	constructor() {
 		super();
 
-		// TODO: Figure out why validator does not work. + Look into implementing the Validation message UUI part.
 		this.addValidator(
 			'rangeUnderflow',
 			() => this.minMessage,
@@ -97,19 +94,18 @@ export class UmbInputDocumentPickerElement extends FormControlMixin(UmbLitElemen
 			() => !!this.max && this._selectedKeys.length > this.max
 		);
 
-		this.consumeContext('umbDocumentStore', (instance) => {
-			this._documentStore = instance
+		this.consumeContext(UMB_DOCUMENT_STORE_CONTEXT_TOKEN, (instance) => {
+			this._documentStore = instance;
 			this._observePickedDocuments();
 		});
-		this.consumeContext('umbModalService', (instance) => {
+		this.consumeContext(UMB_MODAL_SERVICE_CONTEXT_TOKEN, (instance) => {
 			this._modalService = instance;
 		});
-
 	}
 
-  protected getFormElement() {
-    return undefined;
-  }
+	protected getFormElement() {
+		return undefined;
+	}
 
 	private _observePickedDocuments() {
 		this._pickedItemsObserver?.destroy();
@@ -159,7 +155,6 @@ export class UmbInputDocumentPickerElement extends FormControlMixin(UmbLitElemen
 	}
 
 	private _renderItem(item: FolderTreeItem) {
-
 		// TODO: remove when we have a way to handle trashed items
 		const tempItem = item as FolderTreeItem & { isTrashed: boolean };
 
@@ -167,12 +162,11 @@ export class UmbInputDocumentPickerElement extends FormControlMixin(UmbLitElemen
 			<uui-ref-node name=${ifDefined(item.name === null ? undefined : item.name)} detail=${ifDefined(item.key)}>
 				${tempItem.isTrashed ? html` <uui-tag size="s" slot="tag" color="danger">Trashed</uui-tag> ` : nothing}
 				<uui-action-bar slot="actions">
-					<uui-button @click=${() => this._removeItem(item)}>Remove</uui-button>
+					<uui-button @click=${() => this._removeItem(item)} label="Remove document ${item.name}">Remove</uui-button>
 				</uui-action-bar>
 			</uui-ref-node>
 		`;
 	}
-
 }
 
 export default UmbInputDocumentPickerElement;

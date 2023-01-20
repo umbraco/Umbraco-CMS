@@ -13,11 +13,11 @@ import type { Type } from './Type';
 
 export type MethodBase = {
     memberType?: MemberTypes;
-    readonly name?: string | null;
+    readonly name?: string;
     declaringType?: Type;
     reflectedType?: Type;
     module?: Module;
-    readonly customAttributes?: Array<CustomAttributeData> | null;
+    readonly customAttributes?: Array<CustomAttributeData>;
     readonly isCollectible?: boolean;
     readonly metadataToken?: number;
     attributes?: MethodAttributes;
