@@ -40,13 +40,13 @@ export class UmbPropertyEditorUIMultipleTextStringElement extends UmbLitElement 
 	#onChange(event: UmbChangeEvent) {
 		event.stopPropagation();
 		const target = event.currentTarget as UmbInputMultipleTextStringElement;
-		this.value = target.value;
+		this.value = target.items;
 		this.dispatchEvent(new UmbPropertyValueChangeEvent());
 	}
 
 	render() {
 		return html`<umb-input-multiple-text-string
-			.value="${this.value}"
+			.items="${this.value}"
 			min="${ifDefined(this._limitMin)}"
 			max="${ifDefined(this._limitMax)}"
 			@change=${this.#onChange}></umb-input-multiple-text-string>`;
