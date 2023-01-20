@@ -87,7 +87,7 @@ public class AddGuidsToUserGroups : UnscopedMigrationBase
             StartContentId = x.StartContentId,
             StartMediaId = x.StartMediaId,
             UserGroup2AppDtos = x.UserGroup2AppDtos,
-            UserGroup2LanguageDtos = x.UserGroup2LanguageDtos
+            UserGroup2LanguageDtos = x.UserGroup2LanguageDtos,
         });
 
         // I realize that this may seem a bit drastic,

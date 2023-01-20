@@ -14,6 +14,6 @@ public class UserGroup2PermissionDto
     public int UserGroupId { get; set; }
 
     [Column("permission")]
-    [Length(500)]
+    [SpecialDbType(SpecialDbTypes.NVARCHARMAX)]
     public required string Permission { get; set; }
 }
