@@ -20,7 +20,7 @@ export const manifest: ManifestPropertyEditorModel = {
 					propertyEditorUI: 'Umb.PropertyEditorUI.Number',
 				},
 				{
-					alias: 'stepSize',
+					alias: 'step',
 					label: 'Step size',
 					description: 'Enter the intervals amount between each step of number to be entered',
 					propertyEditorUI: 'Umb.PropertyEditorUI.Number',
