@@ -1,6 +1,7 @@
+import { manifest as startNode } from './config/start-node/manifests';
 import type { ManifestPropertyEditorUI } from '@umbraco-cms/models';
 
-export const manifest: ManifestPropertyEditorUI = {
+const manifest: ManifestPropertyEditorUI = {
 	type: 'propertyEditorUI',
 	alias: 'Umb.PropertyEditorUI.TreePicker',
 	name: 'Tree Picker Property Editor UI',
@@ -34,3 +35,7 @@ export const manifest: ManifestPropertyEditorUI = {
 		},
 	},
 };
+
+const config: Array<ManifestPropertyEditorUI> = [startNode];
+
+export const manifests = [manifest, ...config];

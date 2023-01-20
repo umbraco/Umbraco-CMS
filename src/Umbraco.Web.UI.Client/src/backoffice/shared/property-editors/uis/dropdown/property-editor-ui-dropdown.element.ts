@@ -1,12 +1,13 @@
-import { html, LitElement } from 'lit';
-import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
+import { html } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
+import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
+import { UmbLitElement } from '@umbraco-cms/element';
 
 /**
  * @element umb-property-editor-ui-dropdown
  */
 @customElement('umb-property-editor-ui-dropdown')
-export class UmbPropertyEditorUIDropdownElement extends LitElement {
+export class UmbPropertyEditorUIDropdownElement extends UmbLitElement {
 	static styles = [UUITextStyles];
 
 	@property()

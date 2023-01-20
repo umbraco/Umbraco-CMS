@@ -45,7 +45,7 @@ export const manifests: Array<ManifestPropertyEditorUI> = [
 				defaultData: [
 					{
 						alias: 'inputType',
-						value: 'text',
+						value: 'email',
 					},
 				],
 			},
