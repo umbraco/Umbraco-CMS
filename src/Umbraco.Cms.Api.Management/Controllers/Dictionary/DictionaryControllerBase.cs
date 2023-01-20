@@ -20,8 +20,8 @@ public abstract class DictionaryControllerBase : ManagementApiControllerBase
                 .WithTitle("Duplicate dictionary item name detected")
                 .WithDetail("Another dictionary item exists with the same name. Dictionary item names must be unique.")
                 .Build()),
-            DictionaryItemOperationStatus.ItemNotFound => NotFound(),
-            DictionaryItemOperationStatus.ParentNotFound => NotFound(),
+            DictionaryItemOperationStatus.ItemNotFound => NotFound("The dictionary item could not be found"),
+            DictionaryItemOperationStatus.ParentNotFound => NotFound("The dictionary item parent could not be found"),
             DictionaryItemOperationStatus.CancelledByNotification => BadRequest(new ProblemDetailsBuilder()
                 .WithTitle("Cancelled by notification")
                 .WithDetail("A notification handler prevented the dictionary item operation.")

@@ -18,7 +18,7 @@ public class ByKeyDictionaryController : DictionaryControllerBase
         _dictionaryFactory = dictionaryFactory;
     }
 
-    [HttpGet("{key:guid}")]
+    [HttpGet($"{{{nameof(key)}:guid}}")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(DictionaryItemViewModel), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]

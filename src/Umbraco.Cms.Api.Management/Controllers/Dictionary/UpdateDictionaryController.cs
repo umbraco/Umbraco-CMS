@@ -26,7 +26,7 @@ public class UpdateDictionaryController : DictionaryControllerBase
         _dictionaryFactory = dictionaryFactory;
     }
 
-    [HttpPut("{key:Guid}")]
+    [HttpPut($"{{{nameof(key)}:guid}}")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
