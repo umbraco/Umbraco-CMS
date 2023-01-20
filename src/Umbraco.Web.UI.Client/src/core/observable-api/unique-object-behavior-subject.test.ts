@@ -1,5 +1,5 @@
 import { expect } from '@open-wc/testing';
-import { createObservablePart } from './unique-behavior-subject';
+import { createObservablePart } from "./create-observable-part.method";
 import { UniqueObjectBehaviorSubject } from './unique-object-behavior-subject';
 
 describe('UniqueObjectBehaviorSubject', () => {
