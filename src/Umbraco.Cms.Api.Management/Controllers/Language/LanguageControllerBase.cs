@@ -19,7 +19,7 @@ public abstract class LanguageControllerBase : ManagementApiControllerBase
                 .WithTitle("Invalid fallback language")
                 .WithDetail("The fallback language could not be applied. This may be caused if the fallback language causes cyclic fallbacks.")
                 .Build()),
-            LanguageOperationStatus.NotFound => NotFound(),
+            LanguageOperationStatus.NotFound => NotFound("The language could not be found"),
             LanguageOperationStatus.MissingDefault => BadRequest(new ProblemDetailsBuilder()
                 .WithTitle("No default language")
                 .WithDetail("The attempted operation would result in having no default language defined. This is not allowed.")

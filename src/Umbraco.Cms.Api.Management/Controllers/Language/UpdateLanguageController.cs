@@ -26,7 +26,7 @@ public class UpdateLanguageController : LanguageControllerBase
         _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
     }
 
-    [HttpPut("{isoCode}")]
+    [HttpPut($"{{{nameof(isoCode)}}}")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(NotFoundResult), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]

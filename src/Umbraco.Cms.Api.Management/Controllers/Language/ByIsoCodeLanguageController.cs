@@ -18,7 +18,7 @@ public class ByIsoCodeLanguageController : LanguageControllerBase
         _languageFactory = languageFactory;
     }
 
-    [HttpGet("{isoCode}")]
+    [HttpGet($"{{{nameof(isoCode)}}}")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(LanguageViewModel), StatusCodes.Status200OK)]
