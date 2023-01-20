@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { UmbControllerHostInterface } from '../controller/controller-host.mixin';
+import { UmbControllerHostInterface } from '../../src/core/controller/controller-host.mixin';
 import { UmbResourceController } from './resource.controller';
 import { UmbNotificationOptions } from 'src/core/notification';
 

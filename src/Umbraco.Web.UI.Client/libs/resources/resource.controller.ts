@@ -1,13 +1,13 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { UmbController } from '../controller/controller.class';
-import { UmbControllerHostInterface } from '../controller/controller-host.mixin';
-import { UmbContextConsumerController } from '../context-api/consume/context-consumer.controller';
+import { UmbController } from '../../src/core/controller/controller.class';
+import { UmbControllerHostInterface } from '../../src/core/controller/controller-host.mixin';
+import { UmbContextConsumerController } from '../../src/core/context-api/consume/context-consumer.controller';
 import {
 	UmbNotificationOptions,
 	UmbNotificationService,
 	UmbNotificationDefaultData,
 	UMB_NOTIFICATION_SERVICE_CONTEXT_TOKEN,
-} from '../notification';
+} from '../../src/core/notification';
 import { ApiError, CancelablePromise, ProblemDetails } from '@umbraco-cms/backend-api';
 
 export class UmbResourceController extends UmbController {

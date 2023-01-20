@@ -19,7 +19,7 @@ import { css, html } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 
 import { UmbLitElement } from './core/element/lit-element.element';
-import { tryExecuteAndNotify } from './core/resources/tryExecuteAndNotify.method';
+import { tryExecuteAndNotify } from '@umbraco-cms/resources';
 import { OpenAPI, RuntimeLevel, ServerResource } from '@umbraco-cms/backend-api';
 import { UmbIconStore } from '@umbraco-cms/stores/icon/icon.store';
 
