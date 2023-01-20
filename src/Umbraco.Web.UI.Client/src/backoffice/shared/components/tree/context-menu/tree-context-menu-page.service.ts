@@ -2,8 +2,10 @@ import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, nothing, PropertyValueMap } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import UmbTreeItemActionElement, { ActionPageEntity } from '../action/tree-item-action.element';
+import { UmbTreeContextMenuService } from './tree-context-menu.service';
 import { UmbLitElement } from '@umbraco-cms/element';
 import { UniqueBehaviorSubject } from '@umbraco-cms/observable-api';
+import { UmbContextToken } from '@umbraco-cms/context-api';
 
 // TODO: Refactor this, its not a service and the data should be handled by a context api.
 @customElement('umb-tree-context-menu-page-service')
@@ -21,7 +23,7 @@ export class UmbTreeContextMenuPageService extends UmbLitElement {
 
 	connectedCallback() {
 		super.connectedCallback();
-		this.provideContext('umbTreeContextMenuPageService', this);
+		this.provideContext(UMB_TREE_CONTEXT_MENU_PAGE_SERVICE_CONTEXT_TOKEN, this);
 		this.openFreshPage('umb-tree-context-menu-page-action-list');
 	}
 
@@ -63,6 +65,10 @@ export class UmbTreeContextMenuPageService extends UmbLitElement {
 		return this._renderTopPage();
 	}
 }
+
+export const UMB_TREE_CONTEXT_MENU_PAGE_SERVICE_CONTEXT_TOKEN = new UmbContextToken<UmbTreeContextMenuPageService>(
+	UmbTreeContextMenuService.name
+);
 
 declare global {
 	interface HTMLElementTagNameMap {

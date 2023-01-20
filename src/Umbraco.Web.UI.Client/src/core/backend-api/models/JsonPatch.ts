@@ -3,8 +3,8 @@
 /* eslint-disable */
 
 export type JsonPatch = {
-    op?: string | null;
-    path?: string | null;
+    op?: string;
+    path?: string;
     value?: any;
 };
 

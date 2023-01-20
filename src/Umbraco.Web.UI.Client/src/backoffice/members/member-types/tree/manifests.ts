@@ -1,3 +1,4 @@
+import { STORE_ALIAS } from '../member-type.store';
 import type { ManifestTree, ManifestTreeItemAction } from '@umbraco-cms/models';
 
 const treeAlias = 'Umb.Tree.MemberTypes';
@@ -7,7 +8,7 @@ const tree: ManifestTree = {
 	alias: treeAlias,
 	name: 'Member Types Tree',
 	meta: {
-		storeAlias: 'umbMemberTypeStore',
+		storeAlias: STORE_ALIAS,
 	},
 };
 

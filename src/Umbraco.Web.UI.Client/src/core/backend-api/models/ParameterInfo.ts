@@ -21,7 +21,7 @@ export type ParameterInfo = {
     readonly defaultValue?: any;
     readonly rawDefaultValue?: any;
     readonly hasDefaultValue?: boolean;
-    readonly customAttributes?: Array<CustomAttributeData> | null;
+    readonly customAttributes?: Array<CustomAttributeData>;
     readonly metadataToken?: number;
 };
 

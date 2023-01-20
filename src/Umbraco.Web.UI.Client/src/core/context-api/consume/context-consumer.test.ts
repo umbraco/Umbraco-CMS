@@ -45,7 +45,7 @@ describe('UmbContextConsumer', () => {
 		const element = document.createElement('div');
 		document.body.appendChild(element);
 
-		const localConsumer = new UmbContextConsumer(element, testContextAlias, (_instance) => {
+		const localConsumer = new UmbContextConsumer(element, testContextAlias, (_instance: MyClass) => {
 			expect(_instance.prop).to.eq('value from provider');
 			done();
 		});

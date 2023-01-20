@@ -1,13 +1,17 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, CSSResultGroup, html, nothing } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
-import { UmbModalHandler, UmbModalService } from '..';
-import type { UserDetails } from '@umbraco-cms/models';
+import { UmbModalHandler, UmbModalService, UMB_MODAL_SERVICE_CONTEXT_TOKEN } from '..';
 import {
 	UmbCurrentUserHistoryStore,
 	UmbCurrentUserHistoryItem,
-} from 'src/backoffice/users/current-user/current-user-history.store';
-import { UmbCurrentUserStore } from 'src/backoffice/users/current-user/current-user.store';
+	UMB_CURRENT_USER_HISTORY_STORE_CONTEXT_TOKEN,
+} from '../../../backoffice/users/current-user/current-user-history.store';
+import {
+	UmbCurrentUserStore,
+	UMB_CURRENT_USER_STORE_CONTEXT_TOKEN,
+} from '../../../backoffice/users/current-user/current-user.store';
+import type { UserDetails } from '@umbraco-cms/models';
 import { UmbLitElement } from '@umbraco-cms/element';
 
 @customElement('umb-modal-layout-current-user')
@@ -89,10 +93,18 @@ export class UmbModalLayoutCurrentUserElement extends UmbLitElement {
 
 	constructor() {
 		super();
-		this.consumeAllContexts(['umbModalService', 'umbCurrentUserStore', 'umbCurrentUserHistoryStore'], (instances) => {
-			this._modalService = instances['umbModalService'];
-			this._currentUserStore = instances['umbCurrentUserStore'];
-			this._currentUserHistoryStore = instances['umbCurrentUserHistoryStore'];
+
+		this.consumeContext(UMB_MODAL_SERVICE_CONTEXT_TOKEN, (_instance) => {
+			this._modalService = _instance;
+		});
+
+		this.consumeContext(UMB_CURRENT_USER_STORE_CONTEXT_TOKEN, (_instance) => {
+			this._currentUserStore = _instance;
+			this._observeCurrentUser();
+		});
+
+		this.consumeContext(UMB_CURRENT_USER_HISTORY_STORE_CONTEXT_TOKEN, (_instance) => {
+			this._currentUserHistoryStore = _instance;
 			this._observeHistory();
 		});
 

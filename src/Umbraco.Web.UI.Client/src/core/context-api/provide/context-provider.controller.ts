@@ -1,15 +1,16 @@
+import { UmbContextToken } from '../context-token';
 import { UmbContextProvider } from './context-provider';
-import type { UmbControllerInterface } from 'src/core/controller/controller.interface';
-import { UmbControllerHostInterface } from '@umbraco-cms/controller';
+import type { UmbControllerHostInterface, UmbControllerInterface } from '@umbraco-cms/controller';
 
-
-export class UmbContextProviderController extends UmbContextProvider<UmbControllerHostInterface> implements UmbControllerInterface {
-
+export class UmbContextProviderController<T = unknown>
+	extends UmbContextProvider<UmbControllerHostInterface>
+	implements UmbControllerInterface
+{
 	public get unique() {
-		return this._contextAlias;
+		return this._contextAlias.toString();
 	}
 
-	constructor(host:UmbControllerHostInterface, contextAlias: string, instance: unknown) {
+	constructor(host: UmbControllerHostInterface, contextAlias: string | UmbContextToken<T>, instance: T) {
 		super(host, contextAlias, instance);
 
 		// TODO: What if this API is already provided with this alias? maybe handle this in the controller:
@@ -23,5 +24,4 @@ export class UmbContextProviderController extends UmbContextProvider<UmbControll
 			this.host.removeController(this);
 		}
 	}
-
 }

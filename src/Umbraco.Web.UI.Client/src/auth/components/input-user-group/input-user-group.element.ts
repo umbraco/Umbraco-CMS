@@ -3,7 +3,10 @@ import { css, html, nothing } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { UmbInputListBase } from '../../../backoffice/shared/components/input-list-base/input-list-base';
 import type { UserGroupEntity } from '@umbraco-cms/models';
-import { UmbUserGroupStore } from 'src/backoffice/users/user-groups/user-group.store';
+import {
+	UmbUserGroupStore,
+	UMB_USER_GROUP_STORE_CONTEXT_TOKEN,
+} from 'src/backoffice/users/user-groups/user-group.store';
 
 @customElement('umb-input-user-group')
 export class UmbInputPickerUserGroupElement extends UmbInputListBase {
@@ -44,7 +47,7 @@ export class UmbInputPickerUserGroupElement extends UmbInputListBase {
 	connectedCallback(): void {
 		super.connectedCallback();
 		this.pickerLayout = 'umb-picker-layout-user-group';
-		this.consumeContext('umbUserGroupStore', (usersContext: UmbUserGroupStore) => {
+		this.consumeContext(UMB_USER_GROUP_STORE_CONTEXT_TOKEN, (usersContext) => {
 			this._userGroupStore = usersContext;
 			this._observeUserGroups();
 		});
@@ -52,10 +55,7 @@ export class UmbInputPickerUserGroupElement extends UmbInputListBase {
 
 	private _observeUserGroups() {
 		if (this.value.length > 0 && this._userGroupStore) {
-			this.observe(
-				this._userGroupStore.getByKeys(this.value),
-				(userGroups) => (this._userGroups = userGroups)
-			);
+			this.observe(this._userGroupStore.getByKeys(this.value), (userGroups) => (this._userGroups = userGroups));
 		} else {
 			this._userGroups = [];
 		}

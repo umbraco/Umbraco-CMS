@@ -8,11 +8,11 @@ import type { DictionaryTranslation } from './DictionaryTranslation';
 
 export type Dictionary = {
     parentId?: string | null;
-    translations?: Array<DictionaryTranslation> | null;
-    contentApps?: Array<ContentApp> | null;
-    readonly notifications?: Array<BackOfficeNotification> | null;
+    translations?: Array<DictionaryTranslation>;
+    contentApps?: Array<ContentApp>;
+    readonly notifications?: Array<BackOfficeNotification>;
     name: string;
     key?: string;
-    path?: string | null;
+    path?: string;
 };
 

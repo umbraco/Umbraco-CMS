@@ -1,12 +1,12 @@
 import { umbContextRequestEventType, isUmbContextRequestEvent } from '../consume/context-request.event';
+import { UmbContextToken } from '../context-token';
 import { UmbContextProvideEventImplementation } from './context-provide.event';
 
 /**
  * @export
  * @class UmbContextProvider
  */
-export class UmbContextProvider<HostType extends EventTarget = EventTarget > {
-
+export class UmbContextProvider<HostType extends EventTarget = EventTarget> {
 	protected host: HostType;
 
 	protected _contextAlias: string;
@@ -19,9 +19,9 @@ export class UmbContextProvider<HostType extends EventTarget = EventTarget > {
 	 * @param {*} instance
 	 * @memberof UmbContextProvider
 	 */
-	constructor(host: HostType, contextAlias: string, instance: unknown) {
+	constructor(host: HostType, contextAlias: string | UmbContextToken, instance: unknown) {
 		this.host = host;
-		this._contextAlias = contextAlias;
+		this._contextAlias = contextAlias.toString();
 		this.#instance = instance;
 	}
 
