@@ -653,6 +653,18 @@ public class LocalizationServiceTests : UmbracoIntegrationTest
         Assert.AreEqual(LanguageOperationStatus.NotFound, result.Status);
     }
 
+    [Test]
+    public void Cannot_Create_Language_With_Reused_Language_Model()
+    {
+        var languageDaDk = LocalizationService.GetLanguageByIsoCode("da-DK");
+        Assert.NotNull(languageDaDk);
+        languageDaDk.IsoCode = "nb-NO";
+
+        var result = LocalizationService.Create(languageDaDk);
+        Assert.IsFalse(result.Success);
+        Assert.AreEqual(LanguageOperationStatus.InvalidId, result.Status);
+    }
+
     public void CreateTestData()
     {
         var languageDaDk = new LanguageBuilder()

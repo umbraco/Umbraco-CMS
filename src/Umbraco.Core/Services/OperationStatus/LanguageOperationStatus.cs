@@ -8,5 +8,6 @@ public enum LanguageOperationStatus
     NotFound,
     MissingDefault,
     DuplicateIsoCode,
-    InvalidIsoCode
+    InvalidIsoCode,
+    InvalidId
 }

@@ -470,15 +470,20 @@ internal class LocalizationService : RepositoryService, ILocalizationService
     /// <inheritdoc />
     public Attempt<ILanguage, LanguageOperationStatus> Create(ILanguage language, int userId = Constants.Security.SuperUserId)
     {
+        if (language.Id != 0)
+        {
+            return Attempt.FailWithStatus(LanguageOperationStatus.InvalidId, language);
+        }
+
+        if (HasValidIsoCode(language) == false)
+        {
+            return Attempt.FailWithStatus(LanguageOperationStatus.InvalidIsoCode, language);
+        }
+
         using (ICoreScope scope = ScopeProvider.CreateCoreScope())
         {
             // write-lock languages to guard against race conds when dealing with default language
             scope.WriteLock(Constants.Locks.Languages);
-
-            if (HasValidIsoCode(language) == false)
-            {
-                return Attempt.FailWithStatus(LanguageOperationStatus.InvalidIsoCode, language);
-            }
 
             // ensure no duplicates by ISO code
             if (_languageRepository.GetByIsoCode(language.IsoCode) != null)
@@ -516,15 +521,15 @@ internal class LocalizationService : RepositoryService, ILocalizationService
     /// <inheritdoc />
     public Attempt<ILanguage, LanguageOperationStatus> Update(ILanguage language, int userId = Constants.Security.SuperUserId)
     {
+        if (HasValidIsoCode(language) == false)
+        {
+            return Attempt.FailWithStatus(LanguageOperationStatus.InvalidIsoCode, language);
+        }
+
         using (ICoreScope scope = ScopeProvider.CreateCoreScope())
         {
             // write-lock languages to guard against race conds when dealing with default language
             scope.WriteLock(Constants.Locks.Languages);
-
-            if (HasValidIsoCode(language) == false)
-            {
-                return Attempt.FailWithStatus(LanguageOperationStatus.InvalidIsoCode, language);
-            }
 
             ILanguage? currentLanguage = _languageRepository.Get(language.Id);
             if (currentLanguage == null)
