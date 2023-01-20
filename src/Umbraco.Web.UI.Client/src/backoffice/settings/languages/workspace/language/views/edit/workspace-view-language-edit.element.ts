@@ -1,9 +1,11 @@
 import { UmbLitElement } from '@umbraco-cms/element';
 import { LanguageDetails } from '@umbraco-cms/models';
-import { UUIBooleanInputEvent, UUIToggleElement } from '@umbraco-ui/uui';
+import { UUIBooleanInputEvent, UUIComboboxElement, UUIComboboxEvent, UUIToggleElement } from '@umbraco-ui/uui';
 import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, html, nothing } from 'lit';
-import { customElement, property } from 'lit/decorators.js';
+import { repeat } from 'lit-html/directives/repeat.js';
+import { customElement, property, state } from 'lit/decorators.js';
+import { umbLanguagesData } from 'src/core/mocks/data/languages.data';
 import { UmbWorkspaceLanguageContext } from '../../language-workspace.context';
 
 @customElement('umb-workspace-view-language-edit')
@@ -11,7 +13,7 @@ export class UmbWorkspaceViewLanguageEditElement extends UmbLitElement {
 	static styles = [
 		UUITextStyles,
 		css`
-			uui-input {
+			uui-combobox {
 				width: 100%;
 			}
 			hr {
@@ -32,6 +34,45 @@ export class UmbWorkspaceViewLanguageEditElement extends UmbLitElement {
 	@property()
 	language?: LanguageDetails;
 
+	@state()
+	private _languages: LanguageDetails[] = [
+		{
+			id: 1,
+			key: 'asdail12h3k1h23k12h3',
+			name: 'English',
+			isoCode: 'en',
+			isDefault: true,
+			isMandatory: true,
+		},
+		{
+			id: 2,
+			key: 'kajshdkjashdkuahwdu',
+			name: 'Danish',
+			isoCode: 'da',
+			isDefault: false,
+			isMandatory: false,
+			fallbackLanguageId: 1,
+		},
+		{
+			id: 3,
+			key: 'k12n3kj12h3123n9812h3',
+			name: 'German',
+			isoCode: 'de',
+			isDefault: false,
+			isMandatory: false,
+			fallbackLanguageId: 1,
+		},
+		{
+			id: 4,
+			key: '1kl2n31231iuqshdiuashd',
+			name: 'French',
+			isoCode: 'fr',
+			isDefault: false,
+			isMandatory: false,
+			fallbackLanguageId: 1,
+		},
+	]; //TODO: This is temporary, we need to get the available languages from the API.
+
 	private _languageWorkspaceContext?: UmbWorkspaceLanguageContext;
 
 	constructor() {
@@ -46,6 +87,21 @@ export class UmbWorkspaceViewLanguageEditElement extends UmbLitElement {
 				this.language = language;
 			});
 		});
+	}
+
+	private _handleLanguageChange(event: any) {
+		if (event instanceof UUIComboboxEvent) {
+			const target = event.composedPath()[0] as UUIComboboxElement;
+			this._languageWorkspaceContext?.update({ isoCode: target.value.toString() });
+
+			// If the language name is not set, we set it to the name of the selected language.
+			if (!this.language?.name) {
+				const language = this._languages.find((language) => language.isoCode === target.value.toString());
+				if (language) {
+					this._languageWorkspaceContext?.update({ name: language.name });
+				}
+			}
+		}
 	}
 
 	private _handleDefaultChange(event: any) {
@@ -70,7 +126,18 @@ export class UmbWorkspaceViewLanguageEditElement extends UmbLitElement {
 		return html`
 			<uui-box>
 				<umb-workspace-property-layout label="Language">
-					<uui-input .value=${this.language.name} slot="editor"></uui-input>
+					<uui-combobox slot="editor" value=${this.language.isoCode} @change=${this._handleLanguageChange}>
+						<uui-combobox-list>
+							${repeat(
+								this._languages,
+								(language) => language.isoCode,
+								(language) =>
+									html`
+										<uui-combobox-list-option value=${language.isoCode}>${language.name}</uui-combobox-list-option>
+									`
+							)}
+						</uui-combobox-list>
+					</uui-combobox>
 				</umb-workspace-property-layout>
 				<umb-workspace-property-layout label="ISO Code">
 					<div slot="editor">${this.language.isoCode}</div>
