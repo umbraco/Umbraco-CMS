@@ -3,10 +3,10 @@
 /* eslint-disable */
 
 export type UpgradeSettings = {
-    currentState?: string | null;
-    newState?: string | null;
-    newVersion?: string | null;
-    oldVersion?: string | null;
-    readonly reportUrl?: string | null;
+    currentState?: string;
+    newState?: string;
+    newVersion?: string;
+    oldVersion?: string;
+    readonly reportUrl?: string;
 };
 

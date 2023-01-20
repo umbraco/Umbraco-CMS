@@ -1,3 +1,4 @@
+import { STORE_ALIAS } from '../media-type.store';
 import type { ManifestTree, ManifestTreeItemAction } from '@umbraco-cms/models';
 
 const tree: ManifestTree = {
@@ -5,7 +6,7 @@ const tree: ManifestTree = {
 	alias: 'Umb.Tree.MediaTypes',
 	name: 'Media Types Tree',
 	meta: {
-		storeAlias: 'umbMediaTypeStore',
+		storeAlias: STORE_ALIAS,
 	},
 };
 

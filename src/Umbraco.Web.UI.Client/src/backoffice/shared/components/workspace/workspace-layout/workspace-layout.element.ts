@@ -46,6 +46,7 @@ export class UmbWorkspaceLayout extends UmbLitElement {
 			}
 			router-slot {
 				height: 100%;
+				flex:0;
 			}
 
 			umb-extension-slot[slot='actions'] {

@@ -14,8 +14,8 @@ import type { StructLayoutAttribute } from './StructLayoutAttribute';
 import type { TypeAttributes } from './TypeAttributes';
 
 export type Type = {
-    readonly name?: string | null;
-    readonly customAttributes?: Array<CustomAttributeData> | null;
+    readonly name?: string;
+    readonly customAttributes?: Array<CustomAttributeData>;
     readonly isCollectible?: boolean;
     readonly metadataToken?: number;
     readonly isInterface?: boolean;
@@ -44,7 +44,7 @@ export type Type = {
     readonly isVariableBoundArray?: boolean;
     readonly isByRefLike?: boolean;
     readonly hasElementType?: boolean;
-    readonly genericTypeArguments?: Array<Type> | null;
+    readonly genericTypeArguments?: Array<Type>;
     readonly genericParameterPosition?: number;
     genericParameterAttributes?: GenericParameterAttributes;
     attributes?: TypeAttributes;

@@ -10,11 +10,11 @@ import type { RuntimeFieldHandle } from './RuntimeFieldHandle';
 import type { Type } from './Type';
 
 export type FieldInfo = {
-    readonly name?: string | null;
+    readonly name?: string;
     declaringType?: Type;
     reflectedType?: Type;
     module?: Module;
-    readonly customAttributes?: Array<CustomAttributeData> | null;
+    readonly customAttributes?: Array<CustomAttributeData>;
     readonly isCollectible?: boolean;
     readonly metadataToken?: number;
     memberType?: MemberTypes;

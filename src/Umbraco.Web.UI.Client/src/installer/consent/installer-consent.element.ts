@@ -2,7 +2,7 @@ import { css, CSSResultGroup, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { unsafeHTML } from 'lit/directives/unsafe-html.js';
 
-import { UmbInstallerContext } from '../installer.context';
+import { UmbInstallerContext, UMB_INSTALLER_CONTEXT_TOKEN } from '../installer.context';
 import { ConsentLevel, Telemetry, TelemetryLevel } from '@umbraco-cms/backend-api';
 import { UmbLitElement } from '@umbraco-cms/element';
 
@@ -55,7 +55,7 @@ export class UmbInstallerConsentElement extends UmbLitElement {
 	constructor() {
 		super();
 
-		this.consumeContext('umbInstallerContext', (installerContext: UmbInstallerContext) => {
+		this.consumeContext(UMB_INSTALLER_CONTEXT_TOKEN, (installerContext) => {
 			this._installerContext = installerContext;
 			this._observeInstallerSettings();
 			this._observeInstallerData();

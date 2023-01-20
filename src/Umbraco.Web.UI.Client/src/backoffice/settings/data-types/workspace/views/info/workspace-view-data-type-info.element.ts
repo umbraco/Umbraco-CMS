@@ -2,7 +2,7 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { distinctUntilChanged } from 'rxjs';
-import { UmbWorkspaceDataTypeContext } from '../../workspace-data-type.context';
+import { UmbWorkspaceDataTypeContext } from '../../data-type-workspace.context';
 import type { DataTypeDetails } from '@umbraco-cms/models';
 import { UmbLitElement } from '@umbraco-cms/element';
 
@@ -18,7 +18,8 @@ export class UmbWorkspaceViewDataTypeInfoElement extends UmbLitElement {
 	constructor() {
 		super();
 
-		this.consumeContext('umbWorkspaceContext', (dataTypeContext) => {
+		// TODO: Figure out if this is the best way to consume the context or if it can be strongly typed with an UmbContextToken
+		this.consumeContext<UmbWorkspaceDataTypeContext>('umbWorkspaceContext', (dataTypeContext) => {
 			this._workspaceContext = dataTypeContext;
 			this._observeDataType();
 		});
@@ -28,11 +29,11 @@ export class UmbWorkspaceViewDataTypeInfoElement extends UmbLitElement {
 		if (!this._workspaceContext) return;
 
 		this.observe(this._workspaceContext.data.pipe(distinctUntilChanged()), (dataType) => {
-			if(!dataType) return;
-			
+			if (!dataType) return;
+
 			// TODO: handle if model is not of the type wanted.
 			// TODO: Make method to identify wether data is of type DataTypeDetails
-			this._dataType = (dataType as DataTypeDetails);
+			this._dataType = dataType as DataTypeDetails;
 		});
 	}
 
@@ -46,13 +47,11 @@ export class UmbWorkspaceViewDataTypeInfoElement extends UmbLitElement {
 				<umb-workspace-property-layout label="Key">
 					<div slot="editor">${this._dataType?.key}</div>
 				</umb-workspace-property-layout>
-				<umb-workspace-property-layout
-					label="Property Editor Alias">
+				<umb-workspace-property-layout label="Property Editor Alias">
 					<div slot="editor">${this._dataType?.propertyEditorModelAlias}</div>
 				</umb-workspace-property-layout>
 
-				<umb-workspace-property-layout
-					label="Property Editor UI Alias">
+				<umb-workspace-property-layout label="Property Editor UI Alias">
 					<div slot="editor">${this._dataType?.propertyEditorUIAlias}</div>
 				</umb-workspace-property-layout>
 			</uui-box>

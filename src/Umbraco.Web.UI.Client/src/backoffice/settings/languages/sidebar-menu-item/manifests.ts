@@ -4,7 +4,7 @@ const sidebarMenuItem: ManifestSidebarMenuItem = {
 	type: 'sidebarMenuItem',
 	alias: 'Umb.SidebarMenuItem.Languages',
 	name: 'Languages Sidebar Menu Item',
-	weight: 400,
+	weight: 80,
 	meta: {
 		label: 'Languages',
 		icon: 'umb:globe',

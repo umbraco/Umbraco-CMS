@@ -1,4 +1,4 @@
-import 'src/backoffice/shared/components/backoffice-frame/backoffice-notification-container.element';
+import '../../backoffice/shared/components/backoffice-frame/backoffice-notification-container.element';
 import '../context-api/provide/context-provider.element';
 import './layouts/default';
 
@@ -7,7 +7,12 @@ import { html } from 'lit';
 import { customElement } from 'lit/decorators.js';
 
 import type { UmbNotificationDefaultData } from './layouts/default';
-import { UmbNotificationColor, UmbNotificationOptions, UmbNotificationService } from '.';
+import {
+	UmbNotificationColor,
+	UmbNotificationOptions,
+	UmbNotificationService,
+	UMB_NOTIFICATION_SERVICE_CONTEXT_TOKEN,
+} from '.';
 import { UmbLitElement } from '@umbraco-cms/element';
 
 export default {
@@ -28,7 +33,7 @@ export class StoryNotificationDefaultExampleElement extends UmbLitElement {
 	connectedCallback(): void {
 		super.connectedCallback();
 
-		this.consumeContext('umbNotificationService', (notificationService) => {
+		this.consumeContext(UMB_NOTIFICATION_SERVICE_CONTEXT_TOKEN, (notificationService) => {
 			this._notificationService = notificationService;
 		});
 	}

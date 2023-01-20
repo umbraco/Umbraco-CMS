@@ -20,8 +20,8 @@ import type { Type } from './Type';
 import type { TypeAttributes } from './TypeAttributes';
 
 export type TypeInfo = {
-    readonly name?: string | null;
-    readonly customAttributes?: Array<CustomAttributeData> | null;
+    readonly name?: string;
+    readonly customAttributes?: Array<CustomAttributeData>;
     readonly isCollectible?: boolean;
     readonly metadataToken?: number;
     readonly isInterface?: boolean;
@@ -50,7 +50,7 @@ export type TypeInfo = {
     readonly isVariableBoundArray?: boolean;
     readonly isByRefLike?: boolean;
     readonly hasElementType?: boolean;
-    readonly genericTypeArguments?: Array<Type> | null;
+    readonly genericTypeArguments?: Array<Type>;
     readonly genericParameterPosition?: number;
     genericParameterAttributes?: GenericParameterAttributes;
     attributes?: TypeAttributes;
@@ -91,14 +91,14 @@ export type TypeInfo = {
     readonly isSerializable?: boolean;
     readonly containsGenericParameters?: boolean;
     readonly isVisible?: boolean;
-    readonly genericTypeParameters?: Array<Type> | null;
-    readonly declaredConstructors?: Array<ConstructorInfo> | null;
-    readonly declaredEvents?: Array<EventInfo> | null;
-    readonly declaredFields?: Array<FieldInfo> | null;
-    readonly declaredMembers?: Array<MemberInfo> | null;
-    readonly declaredMethods?: Array<MethodInfo> | null;
-    readonly declaredNestedTypes?: Array<TypeInfo> | null;
-    readonly declaredProperties?: Array<PropertyInfo> | null;
-    readonly implementedInterfaces?: Array<Type> | null;
+    readonly genericTypeParameters?: Array<Type>;
+    readonly declaredConstructors?: Array<ConstructorInfo>;
+    readonly declaredEvents?: Array<EventInfo>;
+    readonly declaredFields?: Array<FieldInfo>;
+    readonly declaredMembers?: Array<MemberInfo>;
+    readonly declaredMethods?: Array<MethodInfo>;
+    readonly declaredNestedTypes?: Array<TypeInfo>;
+    readonly declaredProperties?: Array<PropertyInfo>;
+    readonly implementedInterfaces?: Array<Type>;
 };
 
