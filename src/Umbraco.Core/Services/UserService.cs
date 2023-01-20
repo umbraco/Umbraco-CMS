@@ -1039,28 +1039,16 @@ internal class UserService : RepositoryService, IUserService
             return Attempt.FailWithStatus(UserGroupOperationStatus.MissingUser, userGroup);
         }
 
-        if (IsNewUserGroup(userGroup) is false)
+        Attempt<IUserGroup, UserGroupOperationStatus> validationAttempt = ValidateUserGroupCreation(userGroup);
+        if (validationAttempt.Success is false)
         {
-            return Attempt.FailWithStatus(UserGroupOperationStatus.AlreadyExists, userGroup);
+            return validationAttempt;
         }
 
-        if (UserGroupHasUniqueAlias(userGroup) is false)
+        Attempt<IUserGroup, UserGroupOperationStatus> authorizationAttempt = AuthorizeUserGroupCreation(performingUser, userGroup);
+        if (authorizationAttempt.Success is false)
         {
-            return Attempt.FailWithStatus(UserGroupOperationStatus.DuplicateAlias, userGroup);
-        }
-
-        Attempt<UserGroupOperationStatus> authorizeSectionChanges =
-            _userGroupAuthorizationService.AuthorizeSectionAccess(performingUser, userGroup);
-        if (authorizeSectionChanges.Success is false)
-        {
-            return Attempt.FailWithStatus(authorizeSectionChanges.Result, userGroup);
-        }
-
-        Attempt<UserGroupOperationStatus> authorizeContentNodeChanges =
-            _userGroupAuthorizationService.AuthorizeStartNodeChanges(performingUser, userGroup);
-        if (authorizeSectionChanges.Success is false)
-        {
-            return Attempt.FailWithStatus(authorizeContentNodeChanges.Result, userGroup);
+            return authorizationAttempt;
         }
 
         EventMessages eventMessages = EventMessagesFactory.Get();
@@ -1088,6 +1076,34 @@ internal class UserService : RepositoryService, IUserService
 
         scope.Complete();
         return Attempt.SucceedWithStatus(UserGroupOperationStatus.Success, userGroup);
+    }
+
+    private Attempt<IUserGroup, UserGroupOperationStatus> ValidateUserGroupCreation(IUserGroup userGroup)
+    {
+        if (IsNewUserGroup(userGroup) is false)
+        {
+            return Attempt.FailWithStatus(UserGroupOperationStatus.AlreadyExists, userGroup);
+        }
+
+        return UserGroupHasUniqueAlias(userGroup) is false
+            ? Attempt.FailWithStatus(UserGroupOperationStatus.DuplicateAlias, userGroup)
+            : Attempt.SucceedWithStatus(UserGroupOperationStatus.Success, userGroup);
+    }
+
+    private Attempt<IUserGroup, UserGroupOperationStatus> AuthorizeUserGroupCreation(IUser performingUser, IUserGroup userGroup)
+    {
+        Attempt<UserGroupOperationStatus> authorizeSectionChanges =
+            _userGroupAuthorizationService.AuthorizeSectionAccess(performingUser, userGroup);
+        if (authorizeSectionChanges.Success is false)
+        {
+            return Attempt.FailWithStatus(authorizeSectionChanges.Result, userGroup);
+        }
+
+        Attempt<UserGroupOperationStatus> authorizeContentNodeChanges =
+            _userGroupAuthorizationService.AuthorizeStartNodeChanges(performingUser, userGroup);
+        return authorizeSectionChanges.Success is false
+            ? Attempt.FailWithStatus(authorizeContentNodeChanges.Result, userGroup)
+            : Attempt.SucceedWithStatus(UserGroupOperationStatus.Success, userGroup);
     }
 
     private bool IsNewUserGroup(IUserGroup userGroup)
