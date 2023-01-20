@@ -31,7 +31,7 @@ public interface ILocalizationService : IService
     /// <param name="parentId"></param>
     /// <param name="defaultValue"></param>
     /// <returns></returns>
-    [Obsolete("Please use CreateDictionaryItemWithIdentity that returns an Attempt. Will be removed in V15")]
+    [Obsolete("Please use Create. Will be removed in V15")]
     IDictionaryItem CreateDictionaryItemWithIdentity(string key, Guid? parentId, string? defaultValue = null);
 
     /// <summary>
@@ -141,7 +141,16 @@ public interface ILocalizationService : IService
     /// </summary>
     /// <param name="dictionaryItem"><see cref="IDictionaryItem" /> to delete</param>
     /// <param name="userId">Optional id of the user deleting the dictionary item</param>
+    [Obsolete("Please use the Delete method that takes an ID and returns an Attempt. Will be removed in V15")]
     void Delete(IDictionaryItem dictionaryItem, int userId = Constants.Security.SuperUserId);
+
+    /// <summary>
+    ///     Deletes a <see cref="IDictionaryItem" /> object and its related translations
+    ///     as well as its children.
+    /// </summary>
+    /// <param name="id">The ID of the <see cref="IDictionaryItem" /> to delete</param>
+    /// <param name="userId">Optional id of the user deleting the dictionary item</param>
+    Attempt<IDictionaryItem?, DictionaryItemOperationStatus> Delete(Guid id, int userId = Constants.Security.SuperUserId);
 
     /// <summary>
     ///     Gets a <see cref="ILanguage" /> by its id

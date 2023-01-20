@@ -83,6 +83,7 @@ internal class LocalizationService : RepositoryService, ILocalizationService
     /// <param name="parentId"></param>
     /// <param name="defaultValue"></param>
     /// <returns></returns>
+    [Obsolete("Please use Create. Will be removed in V15")]
     public IDictionaryItem CreateDictionaryItemWithIdentity(string key, Guid? parentId, string? defaultValue = null)
     {
         IEnumerable<IDictionaryTranslation> translations = defaultValue.IsNullOrWhiteSpace()
@@ -333,6 +334,7 @@ internal class LocalizationService : RepositoryService, ILocalizationService
     /// </summary>
     /// <param name="dictionaryItem"><see cref="IDictionaryItem" /> to save</param>
     /// <param name="userId">Optional id of the user saving the dictionary item</param>
+    [Obsolete("Please use Update. Will be removed in V15")]
     public void Save(IDictionaryItem dictionaryItem, int userId = Constants.Security.SuperUserId)
     {
         using (ICoreScope scope = ScopeProvider.CreateCoreScope())
@@ -403,16 +405,27 @@ internal class LocalizationService : RepositoryService, ILocalizationService
     /// </summary>
     /// <param name="dictionaryItem"><see cref="IDictionaryItem" /> to delete</param>
     /// <param name="userId">Optional id of the user deleting the dictionary item</param>
+    [Obsolete("Please use the Delete method that takes an ID and returns an Attempt. Will be removed in V15")]
     public void Delete(IDictionaryItem dictionaryItem, int userId = Constants.Security.SuperUserId)
+        => Delete(dictionaryItem.Key, userId);
+
+    /// <inheritdoc />
+    public Attempt<IDictionaryItem?, DictionaryItemOperationStatus> Delete(Guid id, int userId = Constants.Security.SuperUserId)
     {
         using (ICoreScope scope = ScopeProvider.CreateCoreScope())
         {
+            IDictionaryItem? dictionaryItem = _dictionaryRepository.Get(id);
+            if (dictionaryItem == null)
+            {
+                return Attempt.FailWithStatus<IDictionaryItem?, DictionaryItemOperationStatus>(DictionaryItemOperationStatus.ItemNotFound, null);
+            }
+
             EventMessages eventMessages = EventMessagesFactory.Get();
             var deletingNotification = new DictionaryItemDeletingNotification(dictionaryItem, eventMessages);
             if (scope.Notifications.PublishCancelable(deletingNotification))
             {
                 scope.Complete();
-                return;
+                return Attempt.FailWithStatus<IDictionaryItem?, DictionaryItemOperationStatus>(DictionaryItemOperationStatus.CancelledByNotification, dictionaryItem);
             }
 
             _dictionaryRepository.Delete(dictionaryItem);
@@ -423,6 +436,7 @@ internal class LocalizationService : RepositoryService, ILocalizationService
             Audit(AuditType.Delete, "Delete DictionaryItem", userId, dictionaryItem.Id, "DictionaryItem");
 
             scope.Complete();
+            return Attempt.SucceedWithStatus<IDictionaryItem?, DictionaryItemOperationStatus>(DictionaryItemOperationStatus.Success, dictionaryItem);
         }
     }
 

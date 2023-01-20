@@ -357,7 +357,9 @@ public class LocalizationServiceTests : UmbracoIntegrationTest
         var item = LocalizationService.GetDictionaryItemByKey("Child");
         Assert.NotNull(item);
 
-        LocalizationService.Delete(item);
+        var result = LocalizationService.Delete(item.Key);
+        Assert.IsTrue(result.Success);
+        Assert.AreEqual(DictionaryItemOperationStatus.Success, result.Status);
 
         var deletedItem = LocalizationService.GetDictionaryItemByKey("Child");
         Assert.Null(deletedItem);
@@ -531,6 +533,14 @@ public class LocalizationServiceTests : UmbracoIntegrationTest
 
         var result = LocalizationService.Update(item);
         Assert.False(result.Success);
+        Assert.AreEqual(DictionaryItemOperationStatus.ItemNotFound, result.Status);
+    }
+
+    [Test]
+    public void Cannot_Delete_Non_Existant_DictionaryItem()
+    {
+        var result = LocalizationService.Delete(Guid.NewGuid());
+        Assert.IsFalse(result.Success);
         Assert.AreEqual(DictionaryItemOperationStatus.ItemNotFound, result.Status);
     }
 
