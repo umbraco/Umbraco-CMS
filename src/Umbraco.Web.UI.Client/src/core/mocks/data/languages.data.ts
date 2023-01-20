@@ -1,6 +1,4 @@
-import { Language } from '@umbraco-cms/backend-api';
 import { UmbData } from './data';
-import { v4 as uuidv4 } from 'uuid';
 import { LanguageDetails } from '@umbraco-cms/models';
 
 // Temp mocked database

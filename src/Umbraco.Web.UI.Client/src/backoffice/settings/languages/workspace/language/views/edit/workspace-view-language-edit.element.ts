@@ -1,8 +1,8 @@
 import { UmbLitElement } from '@umbraco-cms/element';
 import { LanguageDetails } from '@umbraco-cms/models';
-import { UUIBooleanInputEvent, UUIInputElement, UUIInputEvent, UUIToggleElement } from '@umbraco-ui/uui';
+import { UUIBooleanInputEvent, UUIToggleElement } from '@umbraco-ui/uui';
 import { UUITextStyles } from '@umbraco-ui/uui-css';
-import { css, html, LitElement, nothing } from 'lit';
+import { css, html, nothing } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { UmbWorkspaceLanguageContext } from '../../language-workspace.context';
 

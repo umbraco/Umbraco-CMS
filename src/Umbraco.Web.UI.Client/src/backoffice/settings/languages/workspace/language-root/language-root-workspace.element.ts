@@ -1,17 +1,9 @@
-import { Language, LanguageResource } from '@umbraco-cms/backend-api';
 import { UmbLitElement } from '@umbraco-cms/element';
 import { LanguageDetails } from '@umbraco-cms/models';
-import { tryExecuteAndNotify } from '@umbraco-cms/resources';
 import { UUITextStyles } from '@umbraco-ui/uui-css';
-import { css, html, LitElement } from 'lit';
+import { css, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
-import {
-	UmbTableColumn,
-	UmbTableConfig,
-	UmbTableElement,
-	UmbTableItem,
-	UmbTableSelectedEvent,
-} from 'src/backoffice/shared/components/table';
+import { UmbTableColumn, UmbTableConfig, UmbTableItem } from 'src/backoffice/shared/components/table';
 import { UmbLanguageStore } from '../../language.store';
 
 import '../language/language-workspace.element';
