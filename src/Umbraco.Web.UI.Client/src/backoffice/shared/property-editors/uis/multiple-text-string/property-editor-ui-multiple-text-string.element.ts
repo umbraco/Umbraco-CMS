@@ -67,6 +67,7 @@ export class UmbPropertyEditorUIMultipleTextStringElement extends LitElement {
 	private _onAdd() {
 		this._value = [...this._value, { value: '' }];
 		this.dispatchEvent(new UmbPropertyValueChangeEvent());
+		this._focusNewItem();
 	}
 
 	private _onInput(event: UUIInputEvent) {
@@ -75,6 +76,13 @@ export class UmbPropertyEditorUIMultipleTextStringElement extends LitElement {
 		const valueIndex = Number(target.dataset.valueIndex);
 		this._value = this._value.map((item, index) => (index === valueIndex ? { value } : item));
 		this.dispatchEvent(new UmbPropertyValueChangeEvent());
+	}
+
+	private async _focusNewItem() {
+		await this.updateComplete;
+		const inputs = this.shadowRoot?.querySelectorAll('uui-input') as NodeListOf<UUIInputElement>;
+		const lastInput = inputs[inputs.length - 1];
+		lastInput.focus();
 	}
 
 	render() {
