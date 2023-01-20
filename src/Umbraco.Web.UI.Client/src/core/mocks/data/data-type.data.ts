@@ -155,7 +155,16 @@ export const data: Array<DataTypeDetails> = [
 		isFolder: false,
 		propertyEditorModelAlias: 'Umbraco.MultipleTextString',
 		propertyEditorUIAlias: 'Umb.PropertyEditorUI.MultipleTextString',
-		data: [],
+		data: [
+			{
+				alias: 'minNumber',
+				value: 2,
+			},
+			{
+				alias: 'maxNumber',
+				value: 4,
+			},
+		],
 	},
 	{
 		name: 'Dropdown',
