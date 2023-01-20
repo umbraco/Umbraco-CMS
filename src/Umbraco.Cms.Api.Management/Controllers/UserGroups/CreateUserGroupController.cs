@@ -40,12 +40,9 @@ public class CreateUserGroupController : UserGroupsControllerBase
 
         IUserGroup group = _userGroupViewModelFactory.Create(userGroupSaveModel);
 
-        Attempt<IUserGroup, UserGroupOperationStatus> result = _userService.Create(group, currentUser.Id);
-        if (result.Success)
-        {
-            CreatedAtAction<ByKeyUserGroupController>(controller => nameof(controller.ByKey), group.Key);
-        }
-
-        return UserGroupOperationStatusResult(result.Status);
+        Attempt<IUserGroup, UserGroupOperationStatus> result = _userService.Create(group, /*currentUser.Id*/ -1);
+        return result.Success
+            ? CreatedAtAction<ByKeyUserGroupController>(controller => nameof(controller.ByKey), group.Key)
+            : UserGroupOperationStatusResult(result.Status);
     }
 }
