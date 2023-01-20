@@ -13,7 +13,7 @@ export default {
 					imports: {
 						'src/': './src/',
 						'@umbraco-cms/models': './src/core/models/index.ts',
-						'@umbraco-cms/backend-api': './src/core/backend-api/index.ts',
+						'@umbraco-cms/backend-api': './libs/backend-api/index.ts',
 						'@umbraco-cms/context-api': './src/core/context-api/index.ts',
 						'@umbraco-cms/controller': './src/core/controller/index.ts',
 						'@umbraco-cms/element': './src/core/element/index.ts',
