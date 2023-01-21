@@ -1,5 +1,5 @@
 import { expect } from '@open-wc/testing';
-import { createObservablePart } from "./create-observable-part.method";
+import { createObservablePart } from '@umbraco-cms/observable-api';
 import { UniqueArrayBehaviorSubject } from './unique-array-behavior-subject';
 
 describe('UniqueArrayBehaviorSubject', () => {

@@ -1,6 +1,6 @@
 import { expect } from '@open-wc/testing';
 import { UniqueBehaviorSubject } from './unique-behavior-subject';
-import { createObservablePart } from "./create-observable-part.method";
+import { createObservablePart } from '@umbraco-cms/observable-api';
 
 describe('UniqueBehaviorSubject', () => {
 

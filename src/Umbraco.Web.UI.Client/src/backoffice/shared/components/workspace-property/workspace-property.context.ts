@@ -1,7 +1,7 @@
 import { UmbWorkspaceContentContext } from '../workspace/workspace-content/workspace-content.context';
 import type { DataTypeDetails } from '@umbraco-cms/models';
 import { UmbControllerHostInterface } from 'src/core/controller/controller-host.mixin';
-import { createObservablePart } from "src/core/observable-api/create-observable-part.method";
+import { createObservablePart } from '@umbraco-cms/observable-api';
 import { UmbContextProviderController } from 'src/core/context-api/provide/context-provider.controller';
 import { UmbContextConsumerController } from 'src/core/context-api/consume/context-consumer.controller';
 import { UniqueObjectBehaviorSubject } from 'src/core/observable-api/unique-object-behavior-subject';
