@@ -16,7 +16,7 @@ export class UmbThemeService {
 	]);
 	public readonly themes = this.#themes.asObservable();
 
-	#theme = new BehaviorSubject('light');
+	#theme = new BehaviorSubject('dark');
 	public readonly theme = this.#theme.asObservable();
 
 	#styleElement: HTMLStyleElement;
@@ -24,6 +24,7 @@ export class UmbThemeService {
 	constructor() {
 		this.addTheme({ name: 'dark', css: _darkTheme.cssText });
 		this.#styleElement = document.createElement('style');
+		this.changeTheme(this.#theme.value);
 
 		document.documentElement.insertAdjacentElement('beforeend', this.#styleElement);
 	}
