@@ -30,7 +30,8 @@ import {
 } from './documents/document-blueprints/document-blueprint.store';
 
 import { UmbSectionStore, UMB_SECTION_STORE_CONTEXT_TOKEN } from './shared/components/section/section.store';
-import { UmbDataTypeStore, UMB_DATA_TYPE_STORE_CONTEXT_TOKEN } from './settings/data-types/data-type.store';
+import { UmbDataTypeDetailStore } from './settings/data-types/data-type.detail.store';
+import { UmbDataTypeTreeStore } from './settings/data-types/data-type.tree.store';
 import { UmbLitElement } from '@umbraco-cms/element';
 
 // Domains
@@ -74,12 +75,13 @@ export class UmbBackofficeElement extends UmbLitElement {
 		new UmbDocumentTreeStore(this);
 		new UmbMediaDetailStore(this);
 		new UmbMediaTreeStore(this);
+		new UmbDataTypeDetailStore(this);
+		new UmbDataTypeTreeStore(this);
+		new UmbUserStore(this);
 
-		this.provideContext(UMB_DATA_TYPE_STORE_CONTEXT_TOKEN, new UmbDataTypeStore(this));
 		this.provideContext(UMB_DOCUMENT_TYPE_STORE_CONTEXT_TOKEN, new UmbDocumentTypeStore(this));
 		this.provideContext(UMB_MEDIA_TYPE_STORE_CONTEXT_TOKEN, new UmbMediaTypeStore(this));
 		this.provideContext(UMB_MEMBER_TYPE_STORE_CONTEXT_TOKEN, new UmbMemberTypeStore(this));
-		this.provideContext(UMB_USER_STORE_CONTEXT_TOKEN, new UmbUserStore(this));
 		this.provideContext(UMB_USER_GROUP_STORE_CONTEXT_TOKEN, new UmbUserGroupStore(this));
 		this.provideContext(UMB_MEMBER_GROUP_STORE_CONTEXT_TOKEN, new UmbMemberGroupStore(this));
 		this.provideContext(UMB_SECTION_STORE_CONTEXT_TOKEN, new UmbSectionStore());

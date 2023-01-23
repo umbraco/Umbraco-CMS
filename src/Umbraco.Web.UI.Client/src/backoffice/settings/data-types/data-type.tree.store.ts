@@ -6,23 +6,23 @@ import { UmbStoreBase } from '@umbraco-cms/stores/store-base';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 
 
-export const UMB_DOCUMENT_TREE_STORE_CONTEXT_TOKEN = new UmbContextToken<UmbDocumentTreeStore>('UmbDocumentTreeStore');
+export const UMB_DATA_TYPE_TREE_STORE_CONTEXT_TOKEN = new UmbContextToken<UmbDataTypeTreeStore>('UmbDataTypeTreeStore');
 
 
 /**
  * @export
- * @class UmbDocumentStore
- * @extends {UmbStoreBase<DocumentTree>}
+ * @class UmbDataTypeTreeStore
+ * @extends {UmbStoreBase}
  * @description - Tree Data Store for Data Types
  */
-export class UmbDocumentTreeStore extends UmbStoreBase {
+export class UmbDataTypeTreeStore extends UmbStoreBase {
 
 
 	private _data = new UniqueArrayBehaviorSubject<DocumentTreeItem>([], (x) => x.key);
 
 
 	constructor(host: UmbControllerHostInterface) {
-		super(host, UMB_DOCUMENT_TREE_STORE_CONTEXT_TOKEN.toString());
+		super(host, UMB_DATA_TYPE_TREE_STORE_CONTEXT_TOKEN.toString());
 	}
 
 	// TODO: How can we avoid having this in both stores?
