@@ -7,11 +7,12 @@ import {
 	UmbCollectionContext,
 	UMB_COLLECTION_CONTEXT_TOKEN,
 } from 'src/backoffice/shared/collection/collection.context';
-import { UmbMediaStore, UmbMediaStoreItemType } from 'src/backoffice/media/media/media.store';
+import { UmbMediaDetailStore } from 'src/backoffice/media/media/media.detail.store';
 
 import '../../../../../../shared/components/content-property/content-property.element';
 import '../../../../../../shared/collection/dashboards/dashboard-collection.element';
 import { UmbLitElement } from '@umbraco-cms/element';
+import type { MediaDetails } from '@umbraco-cms/models';
 
 @customElement('umb-workspace-view-collection')
 export class UmbWorkspaceViewCollectionElement extends UmbLitElement {
@@ -27,7 +28,7 @@ export class UmbWorkspaceViewCollectionElement extends UmbLitElement {
 
 	private _workspaceContext?: UmbWorkspaceContentContext;
 
-	private _collectionContext?: UmbCollectionContext<UmbMediaStoreItemType, UmbMediaStore>;
+	private _collectionContext?: UmbCollectionContext<MediaDetails, UmbMediaDetailStore>;
 
 	constructor() {
 		super();

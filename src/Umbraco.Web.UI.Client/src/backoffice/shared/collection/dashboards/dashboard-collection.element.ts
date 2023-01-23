@@ -3,12 +3,12 @@ import { css, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import '../collection.element';
 import { ifDefined } from 'lit-html/directives/if-defined.js';
-import { UmbMediaStore, UmbMediaStoreItemType } from 'src/backoffice/media/media/media.store';
+import { UmbMediaDetailStore } from 'src/backoffice/media/media/media.detail.store';
 import {
 	UmbCollectionContext,
 	UMB_COLLECTION_CONTEXT_TOKEN,
 } from 'src/backoffice/shared/collection/collection.context';
-import type { ManifestDashboardCollection } from '@umbraco-cms/models';
+import type { ManifestDashboardCollection, MediaDetails } from '@umbraco-cms/models';
 import { UmbLitElement } from '@umbraco-cms/element';
 
 @customElement('umb-dashboard-collection')
@@ -26,7 +26,7 @@ export class UmbDashboardCollectionElement extends UmbLitElement {
 		`,
 	];
 
-	private _collectionContext?: UmbCollectionContext<UmbMediaStoreItemType, UmbMediaStore>;
+	private _collectionContext?: UmbCollectionContext<MediaDetails, UmbMediaDetailStore>;
 
 	public manifest!: ManifestDashboardCollection;
 
