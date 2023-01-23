@@ -13,7 +13,4 @@ public interface ILogViewerConfig
 
     [Obsolete("Use ILogViewerService.DeleteSavedLogQueryAsync instead. Scheduled for removal in Umbraco 15.")]
     IReadOnlyList<SavedLogSearch> DeleteSavedSearch(string name) => DeleteSavedSearch(name, string.Empty);
-
-    [Obsolete("Use ILogViewerService.GetSavedLogQueryByNameAsync instead. Scheduled for removal in Umbraco 15.")]
-    SavedLogSearch? GetSavedSearchByName(string name);
 }

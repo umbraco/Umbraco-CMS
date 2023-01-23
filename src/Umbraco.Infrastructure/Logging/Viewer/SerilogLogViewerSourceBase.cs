@@ -39,10 +39,6 @@ public abstract class SerilogLogViewerSourceBase : ILogViewer
     public virtual IReadOnlyList<SavedLogSearch> DeleteSavedSearch(string name)
         => _logViewerConfig.DeleteSavedSearch(name);
 
-    [Obsolete("Use ILogViewerService.GetSavedLogQueryByNameAsync instead. Scheduled for removal in Umbraco 15.")]
-    public virtual SavedLogSearch? GetSavedSearchByName(string name)
-        => _logViewerConfig.GetSavedSearchByName(name);
-
     public int GetNumberOfErrors(LogTimePeriod logTimePeriod)
     {
         var errorCounter = new ErrorCounterFilter();

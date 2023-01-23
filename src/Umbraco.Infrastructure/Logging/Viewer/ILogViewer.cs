@@ -29,12 +29,6 @@ public interface ILogViewer
     IReadOnlyList<SavedLogSearch> DeleteSavedSearch(string name, string query);
 
     /// <summary>
-    ///     Gets a saved log search by its name.
-    /// </summary>
-    [Obsolete("Use ILogViewerService.GetSavedLogQueryByNameAsync instead. Scheduled for removal in Umbraco 15.")]
-    SavedLogSearch? GetSavedSearchByName(string name);
-
-    /// <summary>
     ///     A count of number of errors
     ///     By counting Warnings with Exceptions, Errors &amp; Fatal messages
     /// </summary>
