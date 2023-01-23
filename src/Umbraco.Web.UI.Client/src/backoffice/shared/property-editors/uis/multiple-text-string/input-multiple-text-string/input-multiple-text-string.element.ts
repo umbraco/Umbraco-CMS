@@ -138,7 +138,7 @@ export class UmbInputMultipleTextStringElement extends FormControlMixin(UmbLitEl
 		const target = event.currentTarget as UUIInputElement;
 		const value = target.value as string;
 		this._items = this._items.map((item, index) => (index === currentIndex ? { value } : item));
-		this.dispatchEvent(new CustomEvent('change', { bubbles: true, composed: false, cancelable: false }));
+		this.dispatchEvent(new UmbChangeEvent());
 	}
 
 	async #focusNewItem() {
@@ -150,7 +150,7 @@ export class UmbInputMultipleTextStringElement extends FormControlMixin(UmbLitEl
 
 	#deleteItem(itemIndex: number) {
 		this._items = this._items.filter((item, index) => index !== itemIndex);
-		this.dispatchEvent(new CustomEvent('change', { bubbles: true, composed: false, cancelable: false }));
+		this.dispatchEvent(new UmbChangeEvent());
 	}
 
 	protected getFormElement() {
