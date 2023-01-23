@@ -1,4 +1,3 @@
-import { Observable } from 'rxjs';
 import type { DocumentDetails } from '@umbraco-cms/models';
 import { UmbContextToken } from '@umbraco-cms/context-api';
 import { createObservablePart, UniqueArrayBehaviorSubject } from '@umbraco-cms/observable-api';
@@ -26,7 +25,7 @@ export class UmbDocumentDetailStore extends UmbStoreBase implements UmbContentSt
 		super(host, UMB_DOCUMENT_DETAIL_STORE_CONTEXT_TOKEN.toString());
 	}
 
-	getByKey(key: string): Observable<DocumentDetails | undefined> {
+	getByKey(key: string) {
 		// TODO: use backend cli when available.
 		fetch(`/umbraco/management/api/v1/document/details/${key}`)
 			.then((res) => res.json())
@@ -40,7 +39,7 @@ export class UmbDocumentDetailStore extends UmbStoreBase implements UmbContentSt
 	}
 
 	// TODO: make sure UI somehow can follow the status of this action.
-	save(data: DocumentDetails[]): Promise<void> {
+	save(data: DocumentDetails[]) {
 		// fetch from server and update store
 		// TODO: use Fetcher API.
 		let body: string;

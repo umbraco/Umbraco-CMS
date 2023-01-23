@@ -40,7 +40,7 @@ export class UmbDocumentTreeStore extends UmbStoreBase {
 		this._data.append(data);
 	}
 
-	getTreeRoot(): Observable<Array<DocumentTreeItem>> {
+	getTreeRoot() {
 		tryExecuteAndNotify(this._host, DocumentResource.getTreeDocumentRoot({})).then(({ data }) => {
 			if (data) {
 				// TODO: how do we handle if an item has been removed during this session(like in another tab or by another user)?
@@ -53,7 +53,7 @@ export class UmbDocumentTreeStore extends UmbStoreBase {
 		return createObservablePart(this._data, (items) => items.filter((item) => item.parentKey === null && !item.isTrashed));
 	}
 
-	getTreeItemChildren(key: string): Observable<Array<DocumentTreeItem>> {
+	getTreeItemChildren(key: string) {
 		tryExecuteAndNotify(
 			this._host,
 			DocumentResource.getTreeDocumentChildren({
@@ -71,7 +71,7 @@ export class UmbDocumentTreeStore extends UmbStoreBase {
 		return createObservablePart(this._data, (items) => items.filter((item) => item.parentKey === key && !item.isTrashed));
 	}
 
-	getTreeItems(keys: Array<string>): Observable<Array<DocumentTreeItem>> {
+	getTreeItems(keys: Array<string>) {
 		if (keys?.length > 0) {
 			tryExecuteAndNotify(
 				this._host,
