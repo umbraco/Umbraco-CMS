@@ -2,7 +2,7 @@
 	"name": "@umbraco-cms/backend-api",
 	"version": "0.0.0",
 	"description": "",
-	"module": "index.js",
+	"module": "dist/index.js",
 	"type": "module",
 	"files": [
 		"dist"
