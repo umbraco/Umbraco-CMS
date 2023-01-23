@@ -22,7 +22,7 @@ import { UmbMediaDetailStore } from './media/media/media.detail.store';
 import { UmbMediaTreeStore } from './media/media/media.tree.store';
 import { UmbMemberTypeDetailStore } from './members/member-types/member-type.detail.store';
 import { UmbMemberTypeTreeStore } from './members/member-types/member-type.tree.store';
-import { UmbMemberGroupStore, UMB_MEMBER_GROUP_STORE_CONTEXT_TOKEN } from './members/member-groups/member-group.store';
+import { UmbMemberGroupStore, UMB_MEMBER_GROUP_STORE_CONTEXT_TOKEN } from './members/member-groups/member-group.details.store';
 import { UmbDictionaryStore, UMB_DICTIONARY_STORE_CONTEXT_TOKEN } from './translation/dictionary/dictionary.store';
 import {
 	UmbDocumentBlueprintStore,

@@ -7,7 +7,7 @@ import { UmbStoreBase } from '@umbraco-cms/stores/store-base';
 // TODO: get rid of this type addition & { ... }:
 export type UmbUserGroupStoreItemType = UserGroupDetails & { users?: Array<string> };
 
-export const UMB_USER_GROUP_STORE_CONTEXT_TOKEN = new UmbContextToken<UmbUserStore>('UmbUserGroupStore');
+export const UMB_USER_GROUP_STORE_CONTEXT_TOKEN = new UmbContextToken<UmbUserGroupStore>('UmbUserGroupStore');
 
 /**
  * @export

@@ -1,4 +1,4 @@
-import { STORE_ALIAS } from '../member-group.store';
+import { STORE_ALIAS } from '../member-group.details.store';
 import type { ManifestTree, ManifestTreeItemAction } from '@umbraco-cms/models';
 
 const treeAlias = 'Umb.Tree.MemberGroups';
