@@ -67,7 +67,7 @@ export class UmbPropertyEditorUIMultipleTextStringElement extends UmbLitElement 
 			max="${ifDefined(this._limitMax)}"
 			@change=${this.#onChange}
 			?disabled=${this.disabled}
-			?readonly${this.readonly}></umb-input-multiple-text-string>`;
+			?readonly=${this.readonly}></umb-input-multiple-text-string>`;
 	}
 }
 
