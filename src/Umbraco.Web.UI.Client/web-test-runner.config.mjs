@@ -21,6 +21,7 @@ export default {
 						'@umbraco-cms/extensions-registry': './libs/extensions-registry/index.ts',
 						'@umbraco-cms/notification': './libs/notification/index.ts',
 						'@umbraco-cms/observable-api': './libs/observable-api/index.ts',
+						'@umbraco-cms/store': './libs/store/index.ts',
 						'@umbraco-cms/utils': './src/core/utils/index.ts',
 						'@umbraco-cms/test-utils': './src/core/test-utils/index.ts',
 						'@umbraco-cms/resources': './libs/resources/index.ts'

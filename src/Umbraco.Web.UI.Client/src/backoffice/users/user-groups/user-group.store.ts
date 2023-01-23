@@ -1,5 +1,5 @@
 import { map, Observable } from 'rxjs';
-import { UmbDataStoreBase } from '../../../core/stores/store';
+import { UmbDataStoreBase } from '@umbraco-cms/store';
 import type { UserGroupDetails, UserGroupEntity } from '@umbraco-cms/models';
 import { UmbContextToken } from '@umbraco-cms/context-api';
 

@@ -1,5 +1,5 @@
 import { map, Observable } from 'rxjs';
-import { UmbNodeStoreBase } from '../../../core/stores/store';
+import { UmbNodeStoreBase } from '@umbraco-cms/store';
 import type { DocumentBlueprintDetails, DocumentDetails } from '@umbraco-cms/models';
 import { DocumentBlueprintTreeItem } from '@umbraco-cms/backend-api';
 import { UmbContextToken } from '@umbraco-cms/context-api';

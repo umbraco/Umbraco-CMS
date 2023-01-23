@@ -1,5 +1,5 @@
 import { map, Observable } from 'rxjs';
-import { UmbNodeStoreBase } from '../../../core/stores/store';
+import { UmbNodeStoreBase } from '@umbraco-cms/store';
 import type { DocumentDetails } from '@umbraco-cms/models';
 import { DocumentResource, DocumentTreeItem, FolderTreeItem } from '@umbraco-cms/backend-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/resources';
@@ -32,7 +32,7 @@ export class UmbDocumentStore extends UmbNodeStoreBase<UmbDocumentStoreItemType>
 				this.updateItems(data);
 			});
 
-			/*
+		/*
 		return this.items.pipe(
 			map(
 				(documents) =>
@@ -41,8 +41,10 @@ export class UmbDocumentStore extends UmbNodeStoreBase<UmbDocumentStoreItemType>
 		);
 		*/
 
-		return createObservablePart(this.items, (documents) =>
-			(documents.find((document) => document.key === key && isDocumentDetails(document)) as DocumentDetails)
+		return createObservablePart(
+			this.items,
+			(documents) =>
+				documents.find((document) => document.key === key && isDocumentDetails(document)) as DocumentDetails
 		);
 	}
 

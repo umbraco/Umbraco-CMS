@@ -1,5 +1,5 @@
 import { map, Observable } from 'rxjs';
-import { UmbDataStoreBase } from '../../../core/stores/store';
+import { UmbDataStoreBase } from '@umbraco-cms/store';
 import type { DataTypeDetails } from '@umbraco-cms/models';
 import { DataTypeResource, FolderTreeItem } from '@umbraco-cms/backend-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/resources';

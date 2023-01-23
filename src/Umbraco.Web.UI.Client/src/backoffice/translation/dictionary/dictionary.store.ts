@@ -1,5 +1,5 @@
 import { map, Observable } from 'rxjs';
-import { UmbDataStoreBase } from '../../../core/stores/store';
+import { UmbDataStoreBase } from '@umbraco-cms/store';
 import { DictionaryResource, EntityTreeItem } from '@umbraco-cms/backend-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/resources';
 import { UmbContextToken } from '@umbraco-cms/context-api';

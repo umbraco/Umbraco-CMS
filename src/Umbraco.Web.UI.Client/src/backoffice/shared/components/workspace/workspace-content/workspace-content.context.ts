@@ -5,7 +5,7 @@ import {
 	UmbNotificationService,
 	UMB_NOTIFICATION_SERVICE_CONTEXT_TOKEN,
 } from '@umbraco-cms/notification';
-import { UmbNodeStoreBase } from '@umbraco-cms/stores/store';
+import { UmbNodeStoreBase } from '@umbraco-cms/store';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 import { UmbContextConsumerController, UmbContextProviderController } from '@umbraco-cms/context-api';
 import { EntityTreeItem } from '@umbraco-cms/backend-api';

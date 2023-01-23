@@ -21,7 +21,7 @@ import { customElement, property, state } from 'lit/decorators.js';
 import { UmbLitElement } from '@umbraco-cms/element';
 import { tryExecuteAndNotify } from '@umbraco-cms/resources';
 import { OpenAPI, RuntimeLevel, ServerResource } from '@umbraco-cms/backend-api';
-import { UmbIconStore } from '@umbraco-cms/stores/icon/icon.store';
+import { UmbIconStore } from '@umbraco-cms/store';
 
 @customElement('umb-app')
 export class UmbApp extends UmbLitElement {
