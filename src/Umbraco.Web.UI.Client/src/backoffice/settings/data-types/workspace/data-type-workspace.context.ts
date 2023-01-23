@@ -1,9 +1,6 @@
 import { UmbWorkspaceContentContext } from '../../../shared/components/workspace/workspace-content/workspace-content.context';
-import {
-	UmbDataTypeStore,
-	UmbDataTypeStoreItemType,
-	UMB_DATA_TYPE_STORE_CONTEXT_TOKEN,
-} from 'src/backoffice/settings/data-types/data-type.store';
+import { UMB_DATA_TYPE_DETAIL_STORE_CONTEXT_TOKEN} from '../../../settings/data-types/data-type.detail.store';
+import type {	UmbDataTypeDetailStore} from '../../../settings/data-types/data-type.detail.store';
 import type { DataTypeDetails, DataTypePropertyData } from '@umbraco-cms/models';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 import { appendToFrozenArray } from '@umbraco-cms/observable-api';
@@ -18,14 +15,14 @@ const DefaultDataTypeData = {
 	propertyEditorModelAlias: '',
 	propertyEditorUIAlias: '',
 	data: [],
-} as UmbDataTypeStoreItemType;
+} as DataTypeDetails;
 
 export class UmbWorkspaceDataTypeContext extends UmbWorkspaceContentContext<
-	UmbDataTypeStoreItemType,
-	UmbDataTypeStore
+	DataTypeDetails,
+	UmbDataTypeDetailStore
 > {
 	constructor(host: UmbControllerHostInterface) {
-		super(host, DefaultDataTypeData, UMB_DATA_TYPE_STORE_CONTEXT_TOKEN.toString(), 'dataType');
+		super(host, DefaultDataTypeData, UMB_DATA_TYPE_DETAIL_STORE_CONTEXT_TOKEN.toString(), 'dataType');
 	}
 
 	public setPropertyValue(alias: string, value: unknown) {

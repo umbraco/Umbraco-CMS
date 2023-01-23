@@ -2,7 +2,8 @@ import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, html } from 'lit';
 import { customElement } from 'lit/decorators.js';
 import { UmbModalService, UMB_MODAL_SERVICE_CONTEXT_TOKEN } from '../../../../../../core/modal';
-import { UmbDataTypeStore, UMB_DATA_TYPE_STORE_CONTEXT_TOKEN } from '../../../data-type.store';
+import { UMB_DATA_TYPE_DETAIL_STORE_CONTEXT_TOKEN } from '../../../data-type.detail.store';
+import type { UmbDataTypeDetailStore } from '../../../data-type.detail.store';
 import UmbTreeItemActionElement from '../../../../../shared/components/tree/action/tree-item-action.element';
 
 @customElement('umb-tree-action-data-type-delete')
@@ -10,7 +11,7 @@ export default class UmbTreeActionDataTypeDeleteElement extends UmbTreeItemActio
 	static styles = [UUITextStyles, css``];
 
 	private _modalService?: UmbModalService;
-	private _dataTypeStore?: UmbDataTypeStore;
+	private _dataTypeStore?: UmbDataTypeDetailStore;
 
 	connectedCallback(): void {
 		super.connectedCallback();
@@ -19,7 +20,7 @@ export default class UmbTreeActionDataTypeDeleteElement extends UmbTreeItemActio
 			this._modalService = modalService;
 		});
 
-		this.consumeContext(UMB_DATA_TYPE_STORE_CONTEXT_TOKEN, (dataTypeStore) => {
+		this.consumeContext(UMB_DATA_TYPE_DETAIL_STORE_CONTEXT_TOKEN, (dataTypeStore) => {
 			this._dataTypeStore = dataTypeStore;
 		});
 	}
