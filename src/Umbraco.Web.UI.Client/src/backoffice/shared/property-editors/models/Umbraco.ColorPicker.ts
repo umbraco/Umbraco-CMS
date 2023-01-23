@@ -15,7 +15,7 @@ export const manifest: ManifestPropertyEditorModel = {
 					propertyEditorUI: 'Umb.PropertyEditorUI.Toggle',
 				},
 				{
-					alias: 'colors',
+					alias: 'items',
 					label: 'Colors',
 					description: 'Add, remove or sort colors',
 					propertyEditorUI: 'Umb.PropertyEditorUI.ColorPicker',

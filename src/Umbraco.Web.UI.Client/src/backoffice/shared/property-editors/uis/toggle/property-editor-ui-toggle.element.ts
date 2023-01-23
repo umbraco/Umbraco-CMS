@@ -1,12 +1,13 @@
-import { html, LitElement } from 'lit';
+import { html } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, property } from 'lit/decorators.js';
+import { UmbLitElement } from '@umbraco-cms/element';
 
 /**
  * @element umb-property-editor-ui-toggle
  */
 @customElement('umb-property-editor-ui-toggle')
-export class UmbPropertyEditorUIToggleElement extends LitElement {
+export class UmbPropertyEditorUIToggleElement extends UmbLitElement {
 	static styles = [UUITextStyles];
 
 	@property()
