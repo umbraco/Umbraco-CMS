@@ -1,4 +1,4 @@
-import { STORE_ALIAS } from '../document.store';
+import { STORE_ALIAS } from '../document.detail.store';
 import type { ManifestTree, ManifestTreeItemAction } from '@umbraco-cms/models';
 
 const treeAlias = 'Umb.Tree.Documents';

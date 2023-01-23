@@ -49,6 +49,7 @@ export class UniqueArrayBehaviorSubject<T> extends UniqueBehaviorSubject<T[]> {
 	 * ]);
 	 */
 	append(entries: T[]) {
+		// TODO: stop calling appendOne for each but make sure to handle this in one.
 		entries.forEach(x => this.appendOne(x))
 	}
 }

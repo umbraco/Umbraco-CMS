@@ -18,7 +18,7 @@ import {
 } from './documents/document-types/document-type.store';
 import { UmbMediaTypeStore, UMB_MEDIA_TYPE_STORE_CONTEXT_TOKEN } from './media/media-types/media-type.store';
 import { UmbMemberTypeStore, UMB_MEMBER_TYPE_STORE_CONTEXT_TOKEN } from './members/member-types/member-type.store';
-import { UmbDocumentStore, UMB_DOCUMENT_STORE_CONTEXT_TOKEN } from './documents/documents/document.store';
+import { UmbDocumentStore, UMB_DOCUMENT_DETAIL_STORE_CONTEXT_TOKEN } from './documents/documents/document.detail.store';
 import { UmbMediaStore, UMB_MEDIA_STORE_CONTEXT_TOKEN } from './media/media/media.store';
 import { UmbMemberGroupStore, UMB_MEMBER_GROUP_STORE_CONTEXT_TOKEN } from './members/member-groups/member-group.store';
 import { UmbDictionaryStore, UMB_DICTIONARY_STORE_CONTEXT_TOKEN } from './translation/dictionary/dictionary.store';
@@ -67,7 +67,9 @@ export class UmbBackofficeElement extends UmbLitElement {
 
 		// TODO: find a way this is possible outside this element. It needs to be possible to register stores in extensions
 		this.provideContext(UMB_CURRENT_USER_STORE_CONTEXT_TOKEN, new UmbCurrentUserStore());
-		this.provideContext(UMB_DOCUMENT_STORE_CONTEXT_TOKEN, new UmbDocumentStore(this));
+
+		new UmbDocumentStore(this);
+
 		this.provideContext(UMB_MEDIA_STORE_CONTEXT_TOKEN, new UmbMediaStore(this));
 		this.provideContext(UMB_DATA_TYPE_STORE_CONTEXT_TOKEN, new UmbDataTypeStore(this));
 		this.provideContext(UMB_DOCUMENT_TYPE_STORE_CONTEXT_TOKEN, new UmbDocumentTypeStore(this));

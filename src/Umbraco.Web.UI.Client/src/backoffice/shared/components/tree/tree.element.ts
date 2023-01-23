@@ -5,7 +5,7 @@ import { repeat } from 'lit-html/directives/repeat.js';
 import { UmbTreeContextBase } from './tree.context';
 import type { Entity, ManifestTree } from '@umbraco-cms/models';
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
-import { UmbTreeDataStore } from '@umbraco-cms/stores/store';
+import { UmbTreeStore } from '@umbraco-cms/stores/store';
 import { UmbLitElement } from '@umbraco-cms/element';
 
 import './tree-item.element';
@@ -66,7 +66,7 @@ export class UmbTreeElement extends UmbLitElement {
 	private _loading = true;
 
 	private _treeContext?: UmbTreeContextBase;
-	private _store?: UmbTreeDataStore<Entity>;
+	private _store?: UmbTreeStore<Entity>;
 
 	connectedCallback(): void {
 		super.connectedCallback();
@@ -108,7 +108,7 @@ export class UmbTreeElement extends UmbLitElement {
 
 		if (!this._tree?.meta.storeAlias) return;
 
-		this.consumeContext(this._tree.meta.storeAlias, (store: UmbTreeDataStore<Entity>) => {
+		this.consumeContext(this._tree.meta.storeAlias, (store: UmbTreeStore<Entity>) => {
 			this._store = store;
 			this.provideContext('umbStore', store);
 		});

@@ -7,7 +7,8 @@ import { UmbModalService, UMB_MODAL_SERVICE_CONTEXT_TOKEN } from 'src/core/modal
 import type { FolderTreeItem } from '@umbraco-cms/backend-api';
 import { UmbLitElement } from '@umbraco-cms/element';
 import type { UmbObserverController } from '@umbraco-cms/observable-api';
-import { UmbDocumentStore, UMB_DOCUMENT_STORE_CONTEXT_TOKEN } from 'src/backoffice/documents/documents/document.store';
+import type { UmbDocumentDetailStore } from 'src/backoffice/documents/documents/document.detail.store';
+import { UMB_DOCUMENT_DETAIL_STORE_CONTEXT_TOKEN } from 'src/backoffice/documents/documents/document.detail.store';
 
 @customElement('umb-input-document-picker')
 export class UmbInputDocumentPickerElement extends FormControlMixin(UmbLitElement) {
@@ -77,7 +78,7 @@ export class UmbInputDocumentPickerElement extends FormControlMixin(UmbLitElemen
 	private _items?: Array<FolderTreeItem>;
 
 	private _modalService?: UmbModalService;
-	private _documentStore?: UmbDocumentStore;
+	private _documentStore?: UmbDocumentDetailStore;
 	private _pickedItemsObserver?: UmbObserverController<FolderTreeItem>;
 
 	constructor() {
@@ -94,7 +95,7 @@ export class UmbInputDocumentPickerElement extends FormControlMixin(UmbLitElemen
 			() => !!this.max && this._selectedKeys.length > this.max
 		);
 
-		this.consumeContext(UMB_DOCUMENT_STORE_CONTEXT_TOKEN, (instance) => {
+		this.consumeContext(UMB_DOCUMENT_DETAIL_STORE_CONTEXT_TOKEN, (instance) => {
 			this._documentStore = instance;
 			this._observePickedDocuments();
 		});
