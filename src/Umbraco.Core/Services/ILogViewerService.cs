@@ -6,7 +6,6 @@ using Umbraco.New.Cms.Core.Models;
 
 namespace Umbraco.Cms.Core.Services;
 
-// Add documentation
 public interface ILogViewerService : IService
 {
     /// <summary>
@@ -22,7 +21,7 @@ public interface ILogViewerService : IService
     /// </param>
     /// <param name="filterExpression">The query expression to filter on.</param>
     /// <param name="logLevels">The log levels for which to retrieve the log messages.</param>
-    Attempt<PagedModel<ILogEntry>> GetPagedLogs(
+    Task<Attempt<PagedModel<ILogEntry>>> GetPagedLogsAsync(
         DateTime? startDate,
         DateTime? endDate,
         int skip,
@@ -30,8 +29,6 @@ public interface ILogViewerService : IService
         Direction orderDirection = Direction.Descending,
         string? filterExpression = null,
         string[]? logLevels = null);
-
-    #region Saved Log Search
 
     /// <summary>
     ///     Get all saved log queries from your chosen data source.
@@ -57,8 +54,6 @@ public interface ILogViewerService : IService
     /// <param name="name">The name of the saved log search.</param>
     Task<bool> DeleteSavedLogQueryAsync(string name);
 
-    #endregion
-
     /// <summary>
     ///     Returns a value indicating whether the log files for the given time
     ///     period are not too large to view (more than 1GB).
@@ -75,7 +70,7 @@ public interface ILogViewerService : IService
     /// </summary>
     /// <param name="startDate">The start date for the date range.</param>
     /// <param name="endDate">The end date for the date range.</param>
-    Attempt<LogLevelCounts> GetLogLevelCounts(DateTime? startDate, DateTime? endDate);
+    Task<Attempt<LogLevelCounts>> GetLogLevelCountsAsync(DateTime? startDate, DateTime? endDate);
 
     /// <summary>
     ///     Returns a list of all unique message templates and their counts.
@@ -84,7 +79,7 @@ public interface ILogViewerService : IService
     /// </summary>
     /// <param name="startDate">The start date for the date range.</param>
     /// <param name="endDate">The end date for the date range.</param>
-    Attempt<IEnumerable<LogTemplate>> GetMessageTemplates(DateTime? startDate, DateTime? endDate);
+    Task<Attempt<IEnumerable<LogTemplate>>> GetMessageTemplatesAsync(DateTime? startDate, DateTime? endDate);
 
     /// <summary>
     ///     Get the log level values of the global minimum and the UmbracoFile one from the config file.

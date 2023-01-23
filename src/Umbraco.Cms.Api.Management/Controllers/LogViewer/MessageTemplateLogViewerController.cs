@@ -38,12 +38,12 @@ public class MessageTemplateLogViewerController : LogViewerControllerBase
         DateTime? startDate = null,
         DateTime? endDate = null)
     {
-        Attempt<IEnumerable<LogTemplate>> messageTemplatesAttempt = _logViewerService.GetMessageTemplates(startDate, endDate);
+        Attempt<IEnumerable<LogTemplate>> messageTemplatesAttempt = await _logViewerService.GetMessageTemplatesAsync(startDate, endDate);
 
         // We will need to stop the request if trying to do this on a 1GB file
         if (messageTemplatesAttempt.Success == false)
         {
-            return await Task.FromResult(ValidationProblem("Unable to view logs, due to their size"));
+            return ValidationProblem("Unable to view logs, due to their size");
         }
 
         IEnumerable<LogTemplate> messageTemplates = messageTemplatesAttempt
@@ -51,6 +51,6 @@ public class MessageTemplateLogViewerController : LogViewerControllerBase
             .Skip(skip)
             .Take(take);
 
-        return await Task.FromResult(Ok(_umbracoMapper.Map<PagedViewModel<LogTemplateViewModel>>(messageTemplates)));
+        return Ok(_umbracoMapper.Map<PagedViewModel<LogTemplateViewModel>>(messageTemplates));
     }
 }

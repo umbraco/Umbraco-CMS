@@ -49,15 +49,15 @@ public class AllLogViewerController : LogViewerControllerBase
     {
         var levels = logLevels?.Select(l => l.ToString()).ToArray();
 
-        Attempt<PagedModel<ILogEntry>> logsAttempt = _logViewerService.GetPagedLogs(startDate, endDate, skip, take,
-            orderDirection, filterExpression, levels);
+        Attempt<PagedModel<ILogEntry>> logsAttempt =
+            await _logViewerService.GetPagedLogsAsync(startDate, endDate, skip, take, orderDirection, filterExpression, levels);
 
         // We will need to stop the request if trying to do this on a 1GB file
         if (logsAttempt.Success == false)
         {
-            return await Task.FromResult(ValidationProblem("Unable to view logs, due to their size"));
+            return ValidationProblem("Unable to view logs, due to their size");
         }
 
-        return await Task.FromResult(Ok(_umbracoMapper.Map<PagedViewModel<LogMessageViewModel>>(logsAttempt.Result)));
+        return Ok(_umbracoMapper.Map<PagedViewModel<LogMessageViewModel>>(logsAttempt.Result));
     }
 }

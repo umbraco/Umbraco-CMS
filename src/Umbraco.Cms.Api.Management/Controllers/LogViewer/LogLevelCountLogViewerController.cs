@@ -31,14 +31,14 @@ public class LogLevelCountLogViewerController : LogViewerControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<ActionResult<LogLevelCountsViewModel>> LogLevelCounts(DateTime? startDate = null, DateTime? endDate = null)
     {
-        Attempt<LogLevelCounts> logLevelCountsAttempt = _logViewerService.GetLogLevelCounts(startDate, endDate);
+        Attempt<LogLevelCounts> logLevelCountsAttempt = await _logViewerService.GetLogLevelCountsAsync(startDate, endDate);
 
         // We will need to stop the request if trying to do this on a 1GB file
         if (logLevelCountsAttempt.Success == false)
         {
-            return await Task.FromResult(ValidationProblem("Unable to view logs, due to their size"));
+            return ValidationProblem("Unable to view logs, due to their size");
         }
 
-        return await Task.FromResult(Ok(_umbracoMapper.Map<LogLevelCountsViewModel>(logLevelCountsAttempt.Result)));
+        return Ok(_umbracoMapper.Map<LogLevelCountsViewModel>(logLevelCountsAttempt.Result));
     }
 }
