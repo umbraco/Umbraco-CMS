@@ -4,6 +4,7 @@ import { customElement, property } from 'lit/decorators.js';
 import { UmbLanguageStore, UMB_LANGUAGE_STORE_CONTEXT_TOKEN } from '../../language.store';
 import type { LanguageDetails } from '@umbraco-cms/models';
 import { UmbLitElement } from '@umbraco-cms/element';
+import { UmbModalService, UMB_MODAL_SERVICE_CONTEXT_TOKEN } from 'src/core/modal';
 
 @customElement('umb-language-root-table-delete-column-layout')
 export class UmbLanguageRootTableDeleteColumnLayoutElement extends UmbLitElement {
@@ -13,17 +14,41 @@ export class UmbLanguageRootTableDeleteColumnLayoutElement extends UmbLitElement
 	value!: LanguageDetails;
 
 	private _languageStore?: UmbLanguageStore;
+	private _modalService?: UmbModalService;
 
 	constructor() {
 		super();
 		this.consumeContext(UMB_LANGUAGE_STORE_CONTEXT_TOKEN, (instance) => {
 			this._languageStore = instance;
 		});
+
+		this.consumeContext(UMB_MODAL_SERVICE_CONTEXT_TOKEN, (instance) => {
+			this._modalService = instance;
+		});
 	}
 
-	private _handleDelete() {
+	private _handleDelete(event: MouseEvent) {
+		event.stopImmediatePropagation();
 		if (!this._languageStore) return;
-		this._languageStore.deleteItems([this.value.key]);
+
+		const modalHandler = this._modalService?.confirm({
+			headline: 'Delete language',
+			content: html`
+				<div
+					style="padding: var(--uui-size-space-4); background-color: var(--uui-color-danger); color: var(--uui-color-danger-contrast); border: 1px solid var(--uui-color-danger-standalone); border-radius: var(--uui-border-radius)">
+					this will delete language <b>${this.value.name}</b>.
+				</div>
+				Are you sure you want to delete?
+			`,
+			color: 'danger',
+			confirmLabel: 'Delete',
+		});
+
+		modalHandler?.onClose().then(({ confirmed }: any) => {
+			if (confirmed) {
+				this._languageStore?.deleteItems([this.value.key]);
+			}
+		});
 	}
 
 	render() {
