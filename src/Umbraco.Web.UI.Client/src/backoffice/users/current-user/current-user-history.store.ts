@@ -1,5 +1,6 @@
 import { UmbContextToken } from '@umbraco-cms/context-api';
-import { createObservablePart, UniqueBehaviorSubject } from '@umbraco-cms/observable-api';
+import {  UniqueBehaviorSubject } from '@umbraco-cms/observable-api';
+import { createObservablePart } from '@umbraco-cms/observable-api';
 
 export type UmbModelType = 'dialog' | 'sidebar';
 

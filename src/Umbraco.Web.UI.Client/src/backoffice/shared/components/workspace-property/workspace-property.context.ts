@@ -1,9 +1,10 @@
 import { UmbWorkspaceContentContext } from '../workspace/workspace-content/workspace-content.context';
 import type { DataTypeDetails } from '@umbraco-cms/models';
 import { UmbControllerHostInterface } from 'src/core/controller/controller-host.mixin';
-import { createObservablePart, UniqueBehaviorSubject } from 'src/core/observable-api/unique-behavior-subject';
+import { createObservablePart } from '@umbraco-cms/observable-api';
 import { UmbContextProviderController } from 'src/core/context-api/provide/context-provider.controller';
 import { UmbContextConsumerController } from 'src/core/context-api/consume/context-consumer.controller';
+import { UniqueObjectBehaviorSubject } from 'src/core/observable-api/unique-object-behavior-subject';
 
 // If we get this from the server then we can consider using TypeScripts Partial<> around the model from the Management-API.
 export type WorkspacePropertyData<ValueType> = {
@@ -17,7 +18,7 @@ export type WorkspacePropertyData<ValueType> = {
 export class UmbWorkspacePropertyContext<ValueType = unknown> {
 	private _providerController: UmbContextProviderController;
 
-	private _data = new UniqueBehaviorSubject<WorkspacePropertyData<ValueType>>({});
+	private _data = new UniqueObjectBehaviorSubject<WorkspacePropertyData<ValueType>>({});
 
 	public readonly alias = createObservablePart(this._data, (data) => data.alias);
 	public readonly label = createObservablePart(this._data, (data) => data.label);

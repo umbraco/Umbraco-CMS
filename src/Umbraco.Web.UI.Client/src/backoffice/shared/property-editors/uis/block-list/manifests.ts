@@ -1,6 +1,7 @@
+import { manifest as blockConfiguration } from './config/block-configuration/manifests';
 import type { ManifestPropertyEditorUI } from '@umbraco-cms/models';
 
-export const manifest: ManifestPropertyEditorUI = {
+const manifest: ManifestPropertyEditorUI = {
 	type: 'propertyEditorUI',
 	alias: 'Umb.PropertyEditorUI.BlockList',
 	name: 'Block List Property Editor UI',
@@ -27,6 +28,12 @@ export const manifest: ManifestPropertyEditorUI = {
 					propertyEditorUI: 'Umb.PropertyEditorUI.Toggle',
 				},
 				{
+					alias: 'useInlineEditingAsDefault',
+					label: 'Inline editing mode',
+					description: 'Use the inline editor as the default block view.',
+					propertyEditorUI: 'Umb.PropertyEditorUI.Toggle',
+				},
+				{
 					alias: 'maxPropertyWidth',
 					label: 'Property editor width',
 					description: 'Optional CSS override, example: 800px or 100%',
@@ -36,3 +43,7 @@ export const manifest: ManifestPropertyEditorUI = {
 		},
 	},
 };
+
+const config = [blockConfiguration];
+
+export const manifests = [manifest, ...config];

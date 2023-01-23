@@ -1,11 +1,11 @@
 import { html } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { ifDefined } from 'lit-html/directives/if-defined.js';
-import { UmbChangeEvent } from 'src/core/events/change.event';
 import { UmbPropertyValueChangeEvent } from '../..';
 import UmbInputMultipleTextStringElement, {
 	MultipleTextStringValue,
 } from './input-multiple-text-string/input-multiple-text-string.element';
+import { UmbChangeEvent } from 'src/core/events/change.event';
 import { UmbLitElement } from '@umbraco-cms/element';
 
 import './input-multiple-text-string/input-multiple-text-string.element';
@@ -20,8 +20,6 @@ export type MultipleTextStringConfigData = Array<{
  */
 @customElement('umb-property-editor-ui-multiple-text-string')
 export class UmbPropertyEditorUIMultipleTextStringElement extends UmbLitElement {
-	static styles = [];
-
 	@property({ type: Array })
 	public value: MultipleTextStringValue = [];
 

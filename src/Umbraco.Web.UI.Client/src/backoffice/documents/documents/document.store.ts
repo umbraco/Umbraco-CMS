@@ -4,6 +4,7 @@ import type { DocumentDetails } from '@umbraco-cms/models';
 import { DocumentResource, DocumentTreeItem, FolderTreeItem } from '@umbraco-cms/backend-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/resources';
 import { UmbContextToken } from '@umbraco-cms/context-api';
+import { createObservablePart } from '@umbraco-cms/observable-api';
 
 export const isDocumentDetails = (document: DocumentDetails | DocumentTreeItem): document is DocumentDetails => {
 	return (document as DocumentDetails).data !== undefined;
@@ -23,7 +24,7 @@ export const STORE_ALIAS = 'UmbDocumentStore';
 export class UmbDocumentStore extends UmbNodeStoreBase<UmbDocumentStoreItemType> {
 	public readonly storeAlias = STORE_ALIAS;
 
-	getByKey(key: string): Observable<DocumentDetails | null> {
+	getByKey(key: string): Observable<DocumentDetails | undefined> {
 		// TODO: use backend cli when available.
 		fetch(`/umbraco/management/api/v1/document/details/${key}`)
 			.then((res) => res.json())
@@ -31,11 +32,17 @@ export class UmbDocumentStore extends UmbNodeStoreBase<UmbDocumentStoreItemType>
 				this.updateItems(data);
 			});
 
+			/*
 		return this.items.pipe(
 			map(
 				(documents) =>
 					(documents.find((document) => document.key === key && isDocumentDetails(document)) as DocumentDetails) || null
 			)
+		);
+		*/
+
+		return createObservablePart(this.items, (documents) =>
+			(documents.find((document) => document.key === key && isDocumentDetails(document)) as DocumentDetails)
 		);
 	}
 

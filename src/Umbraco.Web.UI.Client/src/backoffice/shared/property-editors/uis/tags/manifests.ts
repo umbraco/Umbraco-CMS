@@ -1,6 +1,7 @@
+import { manifest as storageType } from './config/storage-type/manifests';
 import type { ManifestPropertyEditorUI } from '@umbraco-cms/models';
 
-export const manifest: ManifestPropertyEditorUI = {
+const manifest: ManifestPropertyEditorUI = {
 	type: 'propertyEditorUI',
 	alias: 'Umb.PropertyEditorUI.Tags',
 	name: 'Tags Property Editor UI',
@@ -12,3 +13,7 @@ export const manifest: ManifestPropertyEditorUI = {
 		group: 'common',
 	},
 };
+
+const config: Array<ManifestPropertyEditorUI> = [storageType];
+
+export const manifests = [manifest, ...config];

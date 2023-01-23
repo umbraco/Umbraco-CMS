@@ -13,7 +13,7 @@ export const manifest: ManifestPropertyEditorUI = {
 		config: {
 			properties: [
 				{
-					alias: 'options',
+					alias: 'items',
 					label: 'Add option',
 					description: 'Add, remove or sort options for the list.',
 					propertyEditorUI: 'Umb.PropertyEditorUI.MultipleTextString',
