@@ -1,9 +1,9 @@
 import { map, Observable } from 'rxjs';
-import { UmbDataStoreBase } from '../../../core/stores/store';
 import type { DataTypeDetails } from '@umbraco-cms/models';
 import { DataTypeResource, FolderTreeItem } from '@umbraco-cms/backend-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/resources';
 import { UmbContextToken } from '@umbraco-cms/context-api';
+import { UmbStoreBase } from '@umbraco-cms/stores/store-base';
 
 const isDataTypeDetails = (dataType: DataTypeDetails | FolderTreeItem): dataType is DataTypeDetails => {
 	return (dataType as DataTypeDetails).data !== undefined;
@@ -22,7 +22,8 @@ export const STORE_ALIAS = 'UmbDataTypeStore';
  * @extends {UmbDataStoreBase<DataTypeDetails | FolderTreeItem>}
  * @description - Data Store for Data Types
  */
-export class UmbDataTypeStore extends UmbDataStoreBase<UmbDataTypeStoreItemType> {
+export class UmbDataTypeStore extends UmbStoreBase {
+
 	public readonly storeAlias = STORE_ALIAS;
 
 	/**

@@ -1,6 +1,6 @@
 import { UmbWorkspaceContentContext } from '../../../shared/components/workspace/workspace-content/workspace-content.context';
-import { DOCUMENT_DETAIl_STORE_ALIAS } from '../document.detail.store';
-import type { UmbDocumentDetailStore, UmbDocumentStoreItemType } from '../document.detail.store';
+import { DOCUMENT_DETAIL_STORE_ALIAS } from '../document.detail.store';
+import type { UmbDocumentDetailStore } from '../document.detail.store';
 import type { UmbControllerHostInterface } from '@umbraco-cms/controller';
 import type { DocumentDetails } from '@umbraco-cms/models';
 import { appendToFrozenArray } from '@umbraco-cms/observable-api';
@@ -32,11 +32,11 @@ const DefaultDocumentData = {
 			name: '',
 		},
 	],
-} as UmbDocumentStoreItemType;
+} as DocumentDetails;
 
-export class UmbWorkspaceDocumentContext extends UmbWorkspaceContentContext<UmbDocumentStoreItemType, UmbDocumentStore> {
+export class UmbWorkspaceDocumentContext extends UmbWorkspaceContentContext<DocumentDetails, UmbDocumentDetailStore> {
 	constructor(host: UmbControllerHostInterface) {
-		super(host, DefaultDocumentData, DOCUMENT_DETAIl_STORE_ALIAS, 'document');
+		super(host, DefaultDocumentData, DOCUMENT_DETAIL_STORE_ALIAS, 'document');
 	}
 
 	public setPropertyValue(alias: string, value: unknown) {

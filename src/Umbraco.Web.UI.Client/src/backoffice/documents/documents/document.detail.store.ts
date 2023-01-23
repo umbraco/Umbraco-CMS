@@ -19,7 +19,7 @@ export const UMB_DOCUMENT_DETAIL_STORE_CONTEXT_TOKEN = new UmbContextToken<UmbDo
 export class UmbDocumentDetailStore extends UmbStoreBase implements UmbContentStore<DocumentDetails> {
 
 
-	private _data = new UniqueArrayBehaviorSubject<DocumentDetails>([], (a, b) => a.key === b.key);
+	private _data = new UniqueArrayBehaviorSubject<DocumentDetails>([], (x) => x.key);
 
 
 	constructor(host: UmbControllerHostInterface) {
