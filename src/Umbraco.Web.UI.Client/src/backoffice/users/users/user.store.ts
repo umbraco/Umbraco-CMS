@@ -11,7 +11,7 @@ export const STORE_ALIAS = 'UmbUserStore';
 /**
  * @export
  * @class UmbUserStore
- * @extends {UmbDataStoreBase<UserDetails>}
+ * @extends {UmbStoreBase}
  * @description - Data Store for Users
  */
 
@@ -212,7 +212,7 @@ export class UmbUserStore extends UmbStoreBase {
 			const json = await res.json();
 			this.#users.append(json);
 		} catch (error) {
-			console.error('Save Data Type error', error);
+			console.error('Save user error', error);
 		}
 	}
 
