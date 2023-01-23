@@ -27,11 +27,8 @@ public class DeleteTemplateController : TemplateControllerBase
     public async Task<IActionResult> Delete(Guid key)
     {
         Attempt<ITemplate?, TemplateOperationStatus> result = await _templateService.DeleteAsync(key, CurrentUserId(_backOfficeSecurityAccessor));
-        if (result.Success)
-        {
-            return Ok();
-        }
-
-        return TemplateOperationStatusResult(result.Status);
+        return result.Success
+            ? Ok()
+            : TemplateOperationStatusResult(result.Status);
     }
 }

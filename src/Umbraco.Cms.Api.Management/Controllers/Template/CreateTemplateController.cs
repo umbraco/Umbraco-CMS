@@ -35,11 +35,8 @@ public class CreateTemplateController : TemplateControllerBase
             createModel.Content,
             CurrentUserId(_backOfficeSecurityAccessor));
 
-        if (result.Success)
-        {
-            return CreatedAtAction<ByKeyTemplateController>(controller => nameof(controller.ByKey), result.Result.Key);
-        }
-
-        return TemplateOperationStatusResult(result.Status);
+        return result.Success
+            ? CreatedAtAction<ByKeyTemplateController>(controller => nameof(controller.ByKey), result.Result.Key)
+            : TemplateOperationStatusResult(result.Status);
     }
 }

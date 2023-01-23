@@ -43,11 +43,8 @@ public class UpdateTemplateController : TemplateControllerBase
 
         Attempt<ITemplate, TemplateOperationStatus> result = await _templateService.UpdateAsync(template, CurrentUserId(_backOfficeSecurityAccessor));
 
-        if (result.Success)
-        {
-            return Ok();
-        }
-
-        return TemplateOperationStatusResult(result.Status);
+        return result.Success ?
+            Ok()
+            : TemplateOperationStatusResult(result.Status);
     }
 }
