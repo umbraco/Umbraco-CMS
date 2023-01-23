@@ -20,7 +20,7 @@
 		"resolveJsonModule": true,
 		"baseUrl": ".",
 		"paths": {
-			"@umbraco-cms/models": ["src/core/models"],
+			"@umbraco-cms/models": ["libs/models"],
 			"@umbraco-cms/backend-api": ["libs/backend-api"],
 			"@umbraco-cms/context-api": ["libs/context-api"],
 			"@umbraco-cms/controller": ["libs/controller"],

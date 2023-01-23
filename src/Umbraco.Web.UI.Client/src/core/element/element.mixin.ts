@@ -1,6 +1,6 @@
 import { Observable } from 'rxjs';
 
-import type { HTMLElementConstructor } from '../models';
+import type { HTMLElementConstructor } from '@umbraco-cms/models';
 
 import { UmbControllerHostInterface, UmbControllerHostMixin } from '@umbraco-cms/controller';
 import {
