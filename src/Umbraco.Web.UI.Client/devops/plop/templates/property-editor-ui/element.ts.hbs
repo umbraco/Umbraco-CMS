@@ -1,13 +1,30 @@
-import { html } from 'lit'; import { customElement, property } from 'lit/decorators.js'; import { UUITextStyles } from
-'@umbraco-ui/uui-css/lib'; import { UmbLitElement } from '@umbraco-cms/context-api'; /** * @element
-{{extensionTagName extensionType name}}
-*/ @customElement('{{extensionTagName extensionType name}}') export class
-{{className extensionType name}}
-extends UmbLitElement { static styles = [UUITextStyles]; @property() value = ''; @property({ type: Array, attribute:
-false }) public config = []; render() { return html`<div>{{extensionTagName extensionType name}}</div>`; } } export
-default
-{{className extensionType name}}; declare global { interface HTMLElementTagNameMap { '{{extensionTagName
-	extensionType
-	name
-}}':
-{{className extensionType name}}; } }
+import { html } from 'lit';
+import { customElement, property } from 'lit/decorators.js';
+import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
+import { UmbLitElement } from '@umbraco-cms/context-api';
+
+/**
+ * @element {{ extensionTagName extensionType name }}
+ */
+@customElement('{{ extensionTagName extensionType name }}')
+export class {{className extensionType name }} extends UmbLitElement {
+	static styles = [UUITextStyles];
+
+	@property()
+	value = '';
+
+	@property({ type: Array, attribute: false })
+	public config = [];
+
+	render() {
+		return html`<div>{{ extensionTagName extensionType name }}</div>`;
+	}
+}
+
+export default {{className extensionType name}};
+
+declare global {
+	interface HTMLElementTagNameMap {
+		'{{extensionTagName extensionType name }}': {{className extensionType name}};
+	}
+}
