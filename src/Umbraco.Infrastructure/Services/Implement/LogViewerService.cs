@@ -30,7 +30,8 @@ public class LogViewerService : ILogViewerService
         _provider = provider;
     }
 
-    public Attempt<PagedModel<ILogEntry>> GetPagedLogs(
+    /// <inheritdoc/>
+    public async Task<Attempt<PagedModel<ILogEntry>>> GetPagedLogsAsync(
         DateTime? startDate,
         DateTime? endDate,
         int skip,
@@ -54,18 +55,21 @@ public class LogViewerService : ILogViewerService
         return Attempt<PagedModel<ILogEntry>>.Succeed(logEntries);
     }
 
+    /// <inheritdoc/>
     public async Task<IReadOnlyList<ILogViewerQuery>> GetSavedLogQueriesAsync()
     {
         using ICoreScope scope = _provider.CreateCoreScope(autoComplete: true);
         return await Task.FromResult(_logViewerQueryRepository.GetMany().ToList());
     }
 
+    /// <inheritdoc/>
     public async Task<ILogViewerQuery?> GetSavedLogQueryByNameAsync(string name)
     {
         using ICoreScope scope = _provider.CreateCoreScope(autoComplete: true);
         return await Task.FromResult(_logViewerQueryRepository.GetByName(name));
     }
 
+    /// <inheritdoc/>
     public async Task<bool> AddSavedLogQueryAsync(string name, string query)
     {
         ILogViewerQuery? logViewerQuery = await GetSavedLogQueryByNameAsync(name);
@@ -81,6 +85,7 @@ public class LogViewerService : ILogViewerService
         return true;
     }
 
+    /// <inheritdoc/>
     public async Task<bool> DeleteSavedLogQueryAsync(string name)
     {
         ILogViewerQuery? logViewerQuery = await GetSavedLogQueryByNameAsync(name);
@@ -96,6 +101,7 @@ public class LogViewerService : ILogViewerService
         return true;
     }
 
+    /// <inheritdoc/>
     public async Task<bool> CanViewLogsAsync(DateTime? startDate, DateTime? endDate)
     {
         LogTimePeriod logTimePeriod = GetTimePeriod(startDate, endDate);
@@ -103,7 +109,8 @@ public class LogViewerService : ILogViewerService
         return await Task.FromResult(CanViewLogs(logTimePeriod));
     }
 
-    public Attempt<LogLevelCounts> GetLogLevelCounts(DateTime? startDate, DateTime? endDate)
+    /// <inheritdoc/>
+    public async Task<Attempt<LogLevelCounts>> GetLogLevelCountsAsync(DateTime? startDate, DateTime? endDate)
     {
         LogTimePeriod logTimePeriod = GetTimePeriod(startDate, endDate);
 
@@ -116,7 +123,8 @@ public class LogViewerService : ILogViewerService
         return Attempt<LogLevelCounts>.Succeed(_logViewer.GetLogLevelCounts(logTimePeriod));
     }
 
-    public Attempt<IEnumerable<LogTemplate>> GetMessageTemplates(DateTime? startDate, DateTime? endDate)
+    /// <inheritdoc/>
+    public async Task<Attempt<IEnumerable<LogTemplate>>> GetMessageTemplatesAsync(DateTime? startDate, DateTime? endDate)
     {
         LogTimePeriod logTimePeriod = GetTimePeriod(startDate, endDate);
 
@@ -129,6 +137,7 @@ public class LogViewerService : ILogViewerService
         return Attempt<IEnumerable<LogTemplate>>.Succeed(_logViewer.GetMessageTemplates(logTimePeriod));
     }
 
+    /// <inheritdoc/>
     public ReadOnlyDictionary<string, LogLevel> GetLogLevelsFromSinks()
     {
         ReadOnlyDictionary<string, LogEventLevel?> configuredLogLevels = _logLevelLoader.GetLogLevelsFromSinks();
@@ -136,9 +145,7 @@ public class LogViewerService : ILogViewerService
         return configuredLogLevels.ToDictionary(logLevel => logLevel.Key, logLevel => Enum.Parse<LogLevel>(logLevel.Value!.ToString()!)).AsReadOnly();
     }
 
-    /// <summary>
-    ///     Get the minimum log level value from the config file.
-    /// </summary>
+    /// <inheritdoc/>
     public LogLevel GetGlobalMinLogLevel()
     {
         LogEventLevel? serilogLogLevel = _logLevelLoader.GetGlobalMinLogLevel();
