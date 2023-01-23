@@ -41,6 +41,7 @@ import './users';
 import './packages';
 import './search';
 import './shared';
+import { UmbThemeService, UMB_THEME_SERVICE_CONTEXT_TOKEN } from 'src/core/theme/theme.service';
 
 @defineElement('umb-backoffice')
 export class UmbBackofficeElement extends UmbLitElement {
@@ -80,6 +81,7 @@ export class UmbBackofficeElement extends UmbLitElement {
 		this.provideContext(UMB_CURRENT_USER_HISTORY_STORE_CONTEXT_TOKEN, new UmbCurrentUserHistoryStore());
 		this.provideContext(UMB_DICTIONARY_STORE_CONTEXT_TOKEN, new UmbDictionaryStore(this));
 		this.provideContext(UMB_DOCUMENT_BLUEPRINT_STORE_CONTEXT_TOKEN, new UmbDocumentBlueprintStore(this));
+		this.provideContext(UMB_THEME_SERVICE_CONTEXT_TOKEN, new UmbThemeService());
 	}
 
 	render() {
