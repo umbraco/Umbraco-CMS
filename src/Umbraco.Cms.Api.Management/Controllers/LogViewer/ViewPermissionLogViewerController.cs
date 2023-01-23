@@ -21,6 +21,6 @@ public class ViewPermissionLogViewerController : LogViewerControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<ActionResult<bool>> CanViewLogs(DateTime? startDate = null, DateTime? endDate = null)
     {
-        return await Task.FromResult(Ok(_logViewerService.CanViewLogsAsync(startDate, endDate)));
+        return await Task.FromResult(Ok(_logViewerService.CanViewLogsAsync(startDate, endDate).Result));
     }
 }
