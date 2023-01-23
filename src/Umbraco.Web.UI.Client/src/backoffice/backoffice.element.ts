@@ -5,7 +5,7 @@ import { css, html } from 'lit';
 import { UmbModalService, UMB_MODAL_SERVICE_CONTEXT_TOKEN } from '../core/modal';
 import { UmbNotificationService, UMB_NOTIFICATION_SERVICE_CONTEXT_TOKEN } from '../core/notification';
 import { UmbUserStore } from './users/users/user.store';
-import { UmbUserGroupStore, UMB_USER_GROUP_STORE_CONTEXT_TOKEN } from './users/user-groups/user-group.store';
+import { UmbUserGroupStore } from './users/user-groups/user-group.store';
 import { UmbCurrentUserStore, UMB_CURRENT_USER_STORE_CONTEXT_TOKEN } from './users/current-user/current-user.store';
 import {
 	UmbCurrentUserHistoryStore,
@@ -84,8 +84,8 @@ export class UmbBackofficeElement extends UmbLitElement {
 		new UmbDocumentTypeTreeStore(this);
 		new UmbMemberTypeDetailStore(this);
 		new UmbMemberTypeTreeStore(this);
+		new UmbUserGroupStore(this);
 
-		this.provideContext(UMB_USER_GROUP_STORE_CONTEXT_TOKEN, new UmbUserGroupStore(this));
 		this.provideContext(UMB_MEMBER_GROUP_STORE_CONTEXT_TOKEN, new UmbMemberGroupStore(this));
 		this.provideContext(UMB_SECTION_STORE_CONTEXT_TOKEN, new UmbSectionStore());
 		this.provideContext(UMB_CURRENT_USER_HISTORY_STORE_CONTEXT_TOKEN, new UmbCurrentUserHistoryStore());
