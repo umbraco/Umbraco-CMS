@@ -8,7 +8,6 @@ import { createExtensionElement } from '@umbraco-cms/extensions-api';
 import type {
 	ManifestDashboard,
 	ManifestDashboardCollection,
-	ManifestSection,
 	ManifestWithMeta,
 } from '@umbraco-cms/models';
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
@@ -23,7 +22,6 @@ export class UmbSectionDashboardsElement extends UmbLitElement {
 				display: flex;
 				flex-direction: column;
 				height: 100%;
-				width: 100%;
 			}
 
 			#tabs {
@@ -32,12 +30,10 @@ export class UmbSectionDashboardsElement extends UmbLitElement {
 			}
 
 			#scroll-container {
-				width: 100%;
-				height: 100%;
+				flex:1;
 			}
 
 			#router-slot {
-				width: 100%;
 				box-sizing: border-box;
 				display: block;
 				padding:var(--uui-size-5);
