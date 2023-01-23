@@ -168,14 +168,17 @@ export class UmbInputMultipleTextStringElement extends FormControlMixin(UmbLitEl
 				this._items,
 				(item, index) => index,
 				(item, index) =>
-					html` <umb-input-multiple-text-string-item
-						value=${item.value}
-						@input=${(event: UmbInputEvent) => this.#onInput(event, index)}
-						@delete="${(event: UmbDeleteEvent) => this.#deleteItem(event, index)}"
-						?disabled=${this.disabled}
-						?readonly=${this.readonly}
-						required
-						required-message="Item ${index + 1} is missing a value"></umb-input-multiple-text-string-item>`
+					html` <uui-form-validation-message>
+						<umb-input-multiple-text-string-item
+							value=${item.value}
+							name="test[]"
+							@input=${(event: UmbInputEvent) => this.#onInput(event, index)}
+							@delete="${(event: UmbDeleteEvent) => this.#deleteItem(event, index)}"
+							?disabled=${this.disabled}
+							?readonly=${this.readonly}
+							required
+							required-message="Item ${index + 1} is missing a value"></umb-input-multiple-text-string-item>
+					</uui-form-validation-message>`
 			)}
 		`;
 	}

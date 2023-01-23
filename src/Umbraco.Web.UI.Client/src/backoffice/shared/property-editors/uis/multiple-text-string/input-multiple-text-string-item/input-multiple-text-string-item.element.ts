@@ -21,10 +21,21 @@ export class UmbInputMultipleTextStringItemElement extends FormControlMixin(UmbL
 				align-items: center;
 				margin-bottom: var(--uui-size-space-3);
 				gap: var(--uui-size-space-3);
+				border: 1px solid transparent;
+			}
+
+			:host(:not([pristine]):invalid),
+      /* polyfill support */
+      :host(:not([pristine])[internals-invalid]) {
+				border-color: var(--uui-color-danger);
+			}
+
+			#validation-message {
+				flex: 1;
 			}
 
 			#input {
-				flex: 1;
+				width: 100%;
 			}
 		`,
 	];
@@ -108,14 +119,18 @@ export class UmbInputMultipleTextStringItemElement extends FormControlMixin(UmbL
 	render() {
 		return html`
 			${this.disabled || this.readonly ? nothing : html`<uui-icon name="umb:navigation"></uui-icon>`}
-			<uui-input
-				id="input"
-				value="${this.value}"
-				@input="${this.#onInput}"
-				@change="${this.#onChange}"
-				?disabled=${this.disabled}
-				?readonly=${this.readonly}
-				?required="${this.required}"></uui-input>
+			<uui-form-validation-message id="validation-message">
+				<uui-input
+					id="input"
+					label="Value"
+					value="${this.value}"
+					@input="${this.#onInput}"
+					@change="${this.#onChange}"
+					?disabled=${this.disabled}
+					?readonly=${this.readonly}
+					?required="${this.required}"
+					required-message="Value is missing"></uui-input>
+			</uui-form-validation-message>
 
 			${this.readonly
 				? nothing
