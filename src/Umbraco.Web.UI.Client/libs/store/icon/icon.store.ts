@@ -33,9 +33,15 @@ export class UmbIconStore extends UUIIconRegistry {
 
 		const icon = this.provideIcon(iconName);
 
-		import(/* @vite-ignore */ `${this.#baseValue}${iconManifest.path}`).then((iconModule) => {
-			icon.svg = iconModule.default;
-		});
+		const iconPath = `${this.#baseValue}${iconManifest.path}`;
+
+		import(/* @vite-ignore */ iconPath)
+			.then((iconModule) => {
+				icon.svg = iconModule.default;
+			})
+			.catch((err) => {
+				console.error(`Failed to load icon ${iconName} on path ${iconPath}`, err.message);
+			});
 
 		return true;
 	}
