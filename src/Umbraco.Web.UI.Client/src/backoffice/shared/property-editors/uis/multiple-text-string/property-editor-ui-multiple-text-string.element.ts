@@ -32,13 +32,22 @@ export class UmbPropertyEditorUIMultipleTextStringElement extends UmbLitElement 
 	}
 
 	/**
-	 * Disables the input
+	 * Disables the Multiple Text String Property Editor UI
 	 * @type {boolean}
 	 * @attr
 	 * @default false
 	 */
 	@property({ type: Boolean, reflect: true })
 	disabled = false;
+
+	/**
+	 * Makes the Multiple Text String Property Editor UI readonly
+	 * @type {boolean}
+	 * @attr
+	 * @default false
+	 */
+	@property({ type: Boolean, reflect: true })
+	readonly = false;
 
 	@state()
 	private _limitMin?: number;
@@ -59,7 +68,8 @@ export class UmbPropertyEditorUIMultipleTextStringElement extends UmbLitElement 
 			min="${ifDefined(this._limitMin)}"
 			max="${ifDefined(this._limitMax)}"
 			@change=${this.#onChange}
-			?disabled=${this.disabled}></umb-input-multiple-text-string>`;
+			?disabled=${this.disabled}
+			?readonly${this.readonly}></umb-input-multiple-text-string>`;
 	}
 }
 

@@ -84,6 +84,15 @@ export class UmbInputMultipleTextStringElement extends FormControlMixin(UmbLitEl
 	@property({ type: Boolean, reflect: true })
 	disabled = false;
 
+	/**
+	 * Makes the input readonly
+	 * @type {boolean}
+	 * @attr
+	 * @default false
+	 */
+	@property({ type: Boolean, reflect: true })
+	readonly = false;
+
 	private _modalService?: UmbModalService;
 
 	constructor() {
@@ -169,13 +178,15 @@ export class UmbInputMultipleTextStringElement extends FormControlMixin(UmbLitEl
 	render() {
 		return html`
 			${this._renderItems()}
-			<uui-button
-				id="action"
-				label="Add"
-				look="placeholder"
-				color="default"
-				@click="${this.#onAdd}"
-				?disabled=${this.disabled}></uui-button>
+			${this.readonly
+				? nothing
+				: html`<uui-button
+						id="action"
+						label="Add"
+						look="placeholder"
+						color="default"
+						@click="${this.#onAdd}"
+						?disabled=${this.disabled}></uui-button>`}
 		`;
 	}
 
@@ -191,21 +202,25 @@ export class UmbInputMultipleTextStringElement extends FormControlMixin(UmbLitEl
 
 	private _renderItem(item: MultipleTextStringValueItem, index: number) {
 		return html`<div class="item">
-			${this.disabled ? nothing : html`<uui-icon name="umb:navigation"></uui-icon>`}
+			${this.disabled || this.readonly ? nothing : html`<uui-icon name="umb:navigation"></uui-icon>`}
 			<uui-input
 				id="text-field"
 				value="${item.value}"
 				@input="${(event: UUIInputEvent) => this.#onInput(event, index)}"
-				?disabled=${this.disabled}></uui-input>
-			<uui-button
-				label="Delete ${item.value}"
-				look="primary"
-				color="danger"
-				@click="${() => this.#onDelete(index)}"
 				?disabled=${this.disabled}
-				compact>
-				<uui-icon name="umb:trash"></uui-icon>
-			</uui-button>
+				?readonly=${this.readonly}></uui-input>
+
+			${this.readonly
+				? nothing
+				: html`<uui-button
+						label="Delete ${item.value}"
+						look="primary"
+						color="danger"
+						@click="${() => this.#onDelete(index)}"
+						?disabled=${this.disabled}
+						compact>
+						<uui-icon name="umb:trash"></uui-icon>
+				  </uui-button>`}
 		</div>`;
 	}
 }
