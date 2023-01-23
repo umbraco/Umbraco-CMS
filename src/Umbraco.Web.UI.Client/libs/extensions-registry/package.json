@@ -1,5 +1,5 @@
 {
-	"name": "@umbraco-cms/controller",
+	"name": "@umbraco-cms/extensions-registry",
 	"version": "0.0.0",
 	"description": "",
 	"module": "index.js",
