@@ -5,12 +5,12 @@ import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 import { UmbContextConsumerController, UmbContextProviderController } from '@umbraco-cms/context-api';
 import { UniqueBehaviorSubject, UmbObserverController, createObservablePart } from '@umbraco-cms/observable-api';
 import { UmbContentStore } from '@umbraco-cms/stores/store';
-import type { ContentDetails } from '@umbraco-cms/models';
+import type { ContentTreeItem } from '@umbraco-cms/backend-api';
 
 // TODO: Consider if its right to have this many class-inheritance of WorkspaceContext
 // TODO: Could we extract this code into a 'Manager' of its own, which will be instantiated by the concrete Workspace Context. This will be more transparent and 'reuseable'
 export abstract class UmbWorkspaceContentContext<
-	ContentTypeType extends ContentDetails = ContentDetails,
+	ContentTypeType extends ContentTreeItem = ContentTreeItem,
 	StoreType extends UmbContentStore<ContentTypeType> = UmbContentStore<ContentTypeType>
 > {
 	protected _host: UmbControllerHostInterface;
