@@ -2477,12 +2477,12 @@
         }
       }
     },
-    "/umbraco/management/api/v1/log-viewer/view-permission": {
+    "/umbraco/management/api/v1/log-viewer/validate-logs-size": {
       "get": {
         "tags": [
           "Log Viewer"
         ],
-        "operationId": "GetLogViewerViewPermission",
+        "operationId": "GetLogViewerValidateLogsSize",
         "parameters": [
           {
             "name": "startDate",
