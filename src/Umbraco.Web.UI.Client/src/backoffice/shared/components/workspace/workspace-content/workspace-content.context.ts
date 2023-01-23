@@ -119,7 +119,7 @@ export abstract class UmbWorkspaceContentContext<
 			});
 	}
 
-	// TODO: how can we make sure to call this.
+	// TODO: how can we make sure to call this, we might need to turn this thing into a ContextProvider(extending) for it to call destroy?
 	public destroy(): void {
 		this._data.unsubscribe();
 	}
