@@ -35,7 +35,7 @@ export default class UmbTreeActionDataTypeDeleteElement extends UmbTreeItemActio
 
 		modalHandler?.onClose().then(({ confirmed }: any) => {
 			if (confirmed && this._treeContextMenuService && this._dataTypeStore && this._activeTreeItem) {
-				this._dataTypeStore?.deleteItems([this._activeTreeItem.key]);
+				this._dataTypeStore?.delete([this._activeTreeItem.key]);
 				this._treeContextMenuService.close();
 			}
 		});

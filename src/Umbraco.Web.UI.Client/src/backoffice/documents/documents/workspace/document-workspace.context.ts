@@ -1,5 +1,5 @@
 import { UmbWorkspaceContentContext } from '../../../shared/components/workspace/workspace-content/workspace-content.context';
-import { DOCUMENT_DETAIL_STORE_ALIAS } from '../document.detail.store';
+import { UMB_DOCUMENT_DETAIL_STORE_CONTEXT_TOKEN } from '../document.detail.store';
 import type { UmbDocumentDetailStore } from '../document.detail.store';
 import type { UmbControllerHostInterface } from '@umbraco-cms/controller';
 import type { DocumentDetails } from '@umbraco-cms/models';
@@ -36,7 +36,7 @@ const DefaultDocumentData = {
 
 export class UmbWorkspaceDocumentContext extends UmbWorkspaceContentContext<DocumentDetails, UmbDocumentDetailStore> {
 	constructor(host: UmbControllerHostInterface) {
-		super(host, DefaultDocumentData, DOCUMENT_DETAIL_STORE_ALIAS, 'document');
+		super(host, DefaultDocumentData, UMB_DOCUMENT_DETAIL_STORE_CONTEXT_TOKEN.toString(), 'document');
 	}
 
 	public setPropertyValue(alias: string, value: unknown) {
