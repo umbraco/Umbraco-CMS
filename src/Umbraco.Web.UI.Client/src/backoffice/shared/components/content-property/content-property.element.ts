@@ -7,7 +7,7 @@ import { UmbDataTypeStore, UMB_DATA_TYPE_STORE_CONTEXT_TOKEN } from '../../../se
 import type { ContentProperty, DataTypeDetails } from '@umbraco-cms/models';
 
 import '../workspace-property/workspace-property.element';
-import { UmbLitElement } from '@umbraco-cms/element';
+import { UmbLitElement } from '@umbraco-cms/context-api';
 import { UmbObserverController } from '@umbraco-cms/observable-api';
 
 @customElement('umb-content-property')

@@ -19,7 +19,7 @@ import {
 	UmbUserGroupStore,
 	UMB_USER_GROUP_STORE_CONTEXT_TOKEN,
 } from 'src/backoffice/users/user-groups/user-group.store';
-import { UmbLitElement } from '@umbraco-cms/element';
+import { UmbLitElement } from '@umbraco-cms/context-api';
 
 @customElement('umb-workspace-view-users-table')
 export class UmbWorkspaceViewUsersTableElement extends UmbLitElement {

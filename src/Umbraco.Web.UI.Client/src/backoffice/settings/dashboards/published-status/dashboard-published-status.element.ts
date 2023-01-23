@@ -7,7 +7,7 @@ import { UmbModalService, UMB_MODAL_SERVICE_CONTEXT_TOKEN } from '../../../../co
 
 import { PublishedCacheResource } from '@umbraco-cms/backend-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/resources';
-import { UmbLitElement } from '@umbraco-cms/element';
+import { UmbLitElement } from '@umbraco-cms/context-api';
 
 @customElement('umb-dashboard-published-status')
 export class UmbDashboardPublishedStatusElement extends UmbLitElement {

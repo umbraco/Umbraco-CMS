@@ -7,7 +7,7 @@ import type { ManifestPropertyAction } from '@umbraco-cms/models';
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
 
 import '../property-action/property-action.element';
-import { UmbLitElement } from '@umbraco-cms/element';
+import { UmbLitElement } from '@umbraco-cms/context-api';
 import { UmbObserverController } from '@umbraco-cms/observable-api';
 
 @customElement('umb-property-action-menu')
@@ -40,8 +40,6 @@ export class UmbPropertyActionMenuElement extends UmbLitElement {
 			}
 		`,
 	];
-
-
 
 	// TODO: we need to investigate context api vs values props and events
 	@property()
@@ -78,16 +76,11 @@ export class UmbPropertyActionMenuElement extends UmbLitElement {
 	private _observeActions(alias: string) {
 		this._actionsObserver?.destroy();
 		this._actionsObserver = this.observe(
-			umbExtensionsRegistry
-				.extensionsOfType('propertyAction')
-				.pipe(
-					map((propertyActions) => {
-						return propertyActions.filter((propertyAction) =>
-							propertyAction.meta.propertyEditors.includes(alias)
-						)
-					}
-					)
-				),
+			umbExtensionsRegistry.extensionsOfType('propertyAction').pipe(
+				map((propertyActions) => {
+					return propertyActions.filter((propertyAction) => propertyAction.meta.propertyEditors.includes(alias));
+				})
+			),
 			(manifests) => {
 				this._actions = manifests;
 			}
@@ -104,28 +97,28 @@ export class UmbPropertyActionMenuElement extends UmbLitElement {
 	}
 
 	render() {
-		return (this._actions.length > 0) ?
-			html`
-				<uui-popover id="popover" placement="bottom-start" .open=${this._open} @close="${this._handleClose}">
-					<uui-button
-						id="popover-trigger"
-						slot="trigger"
-						look="secondary"
-						label="More"
-						@click="${this._toggleMenu}"
-						compact>
-						<uui-symbol-more id="more-symbol"></uui-symbol-more>
-					</uui-button>
+		return this._actions.length > 0
+			? html`
+					<uui-popover id="popover" placement="bottom-start" .open=${this._open} @close="${this._handleClose}">
+						<uui-button
+							id="popover-trigger"
+							slot="trigger"
+							look="secondary"
+							label="More"
+							@click="${this._toggleMenu}"
+							compact>
+							<uui-symbol-more id="more-symbol"></uui-symbol-more>
+						</uui-button>
 
-					<div slot="popover" id="dropdown">
-						${this._actions.map(
-							(action) => html`
-								<umb-property-action .propertyAction=${action} .value="${this.value}"></umb-property-action>
-							`
-						)}
-					</div>
-				</uui-popover>
-			`
+						<div slot="popover" id="dropdown">
+							${this._actions.map(
+								(action) => html`
+									<umb-property-action .propertyAction=${action} .value="${this.value}"></umb-property-action>
+								`
+							)}
+						</div>
+					</uui-popover>
+			  `
 			: '';
 	}
 }

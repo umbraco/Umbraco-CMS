@@ -4,7 +4,7 @@ import { customElement, property, query, state } from 'lit/decorators.js';
 
 import { UmbInstallerContext, UMB_INSTALLER_CONTEXT_TOKEN } from '../installer.context';
 import { DatabaseInstall, DatabaseSettings, InstallResource, ProblemDetails } from '@umbraco-cms/backend-api';
-import { UmbLitElement } from '@umbraco-cms/element';
+import { UmbLitElement } from '@umbraco-cms/context-api';
 import { tryExecute } from '@umbraco-cms/resources';
 
 @customElement('umb-installer-database')

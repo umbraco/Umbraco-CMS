@@ -6,7 +6,7 @@ import { UmbTreeContextBase } from './tree.context';
 import type { Entity, ManifestTree } from '@umbraco-cms/models';
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
 import { UmbTreeDataStore } from '@umbraco-cms/store';
-import { UmbLitElement } from '@umbraco-cms/element';
+import { UmbLitElement } from '@umbraco-cms/context-api';
 
 import './tree-item.element';
 import './context-menu/tree-context-menu-page-action-list.element';

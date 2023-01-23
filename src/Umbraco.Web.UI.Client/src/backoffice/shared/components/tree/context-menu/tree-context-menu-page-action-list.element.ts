@@ -5,7 +5,7 @@ import { map } from 'rxjs';
 import { UmbSectionContext, UMB_SECTION_CONTEXT_TOKEN } from '../../section/section.context';
 import type { Entity, ManifestTreeItemAction, ManifestTree } from '@umbraco-cms/models';
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
-import { UmbLitElement } from '@umbraco-cms/element';
+import { UmbLitElement } from '@umbraco-cms/context-api';
 
 @customElement('umb-tree-context-menu-page-action-list')
 export class UmbTreeContextMenuPageActionListElement extends UmbLitElement {

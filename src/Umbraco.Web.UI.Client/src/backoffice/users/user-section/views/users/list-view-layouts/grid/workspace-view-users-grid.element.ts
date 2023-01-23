@@ -7,7 +7,7 @@ import type { UmbSectionViewUsersElement } from '../../section-view-users.elemen
 import { getTagLookAndColor } from '../../../../../../../auth/utils';
 import { UmbUserGroupStore, UMB_USER_GROUP_STORE_CONTEXT_TOKEN } from '../../../../../user-groups/user-group.store';
 import type { UserDetails, UserEntity, UserGroupEntity } from '@umbraco-cms/models';
-import { UmbLitElement } from '@umbraco-cms/element';
+import { UmbLitElement } from '@umbraco-cms/context-api';
 
 @customElement('umb-workspace-view-users-grid')
 export class UmbWorkspaceViewUsersGridElement extends UmbLitElement {

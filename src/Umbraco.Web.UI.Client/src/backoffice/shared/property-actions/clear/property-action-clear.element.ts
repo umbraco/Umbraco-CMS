@@ -3,11 +3,10 @@ import { customElement, property } from 'lit/decorators.js';
 //import type { UmbPropertyActionMenuContext } from '../shared/property-action-menu/property-action-menu.context';
 import { UmbPropertyAction } from '../shared/property-action/property-action.model';
 import type { UmbWorkspacePropertyContext } from '../../components/workspace-property/workspace-property.context';
-import { UmbLitElement } from '@umbraco-cms/element';
+import { UmbLitElement } from '@umbraco-cms/context-api';
 
 @customElement('umb-property-action-clear')
 export class UmbPropertyActionClearElement extends UmbLitElement implements UmbPropertyAction {
-
 	@property()
 	value = '';
 
@@ -40,7 +39,7 @@ export class UmbPropertyActionClearElement extends UmbLitElement implements UmbP
 		//this.value = '';// This is though bad as it assumes we are dealing with a string. So wouldn't work as a generalized element.
 		//this.dispatchEvent(new CustomEvent('property-value-change'));
 		// Or you can do this:
-		this._propertyContext?.resetValue();// This resets value to what the property wants.
+		this._propertyContext?.resetValue(); // This resets value to what the property wants.
 	}
 
 	render() {

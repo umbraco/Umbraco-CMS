@@ -4,7 +4,7 @@ import { unsafeHTML } from 'lit/directives/unsafe-html.js';
 
 import { UmbInstallerContext, UMB_INSTALLER_CONTEXT_TOKEN } from '../installer.context';
 import { ConsentLevel, Telemetry, TelemetryLevel } from '@umbraco-cms/backend-api';
-import { UmbLitElement } from '@umbraco-cms/element';
+import { UmbLitElement } from '@umbraco-cms/context-api';
 
 @customElement('umb-installer-consent')
 export class UmbInstallerConsentElement extends UmbLitElement {

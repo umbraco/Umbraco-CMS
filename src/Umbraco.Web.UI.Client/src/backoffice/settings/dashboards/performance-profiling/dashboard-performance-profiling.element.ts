@@ -3,7 +3,7 @@ import { css, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { ProfilingResource } from '@umbraco-cms/backend-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/resources';
-import { UmbLitElement } from '@umbraco-cms/element';
+import { UmbLitElement } from '@umbraco-cms/context-api';
 
 @customElement('umb-dashboard-performance-profiling')
 export class UmbDashboardPerformanceProfilingElement extends UmbLitElement {

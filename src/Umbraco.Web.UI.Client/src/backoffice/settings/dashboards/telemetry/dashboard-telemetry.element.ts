@@ -4,7 +4,7 @@ import { unsafeHTML } from 'lit/directives/unsafe-html.js';
 import { UUIButtonState } from '@umbraco-ui/uui';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { Telemetry, TelemetryLevel, TelemetryResource } from '@umbraco-cms/backend-api';
-import { UmbLitElement } from '@umbraco-cms/element';
+import { UmbLitElement } from '@umbraco-cms/context-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/resources';
 
 @customElement('umb-dashboard-telemetry')

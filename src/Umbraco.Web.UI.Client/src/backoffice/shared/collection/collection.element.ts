@@ -8,7 +8,7 @@ import { UmbCollectionContext, UMB_COLLECTION_CONTEXT_TOKEN } from './collection
 import { createExtensionElement } from '@umbraco-cms/extensions-api';
 import type { ManifestCollectionView, MediaDetails } from '@umbraco-cms/models';
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
-import { UmbLitElement } from '@umbraco-cms/element';
+import { UmbLitElement } from '@umbraco-cms/context-api';
 import type { UmbObserverController } from '@umbraco-cms/observable-api';
 
 @customElement('umb-collection')

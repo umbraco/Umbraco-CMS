@@ -12,7 +12,7 @@ import {
 	UMB_CURRENT_USER_STORE_CONTEXT_TOKEN,
 } from '../../../backoffice/users/current-user/current-user.store';
 import type { UserDetails } from '@umbraco-cms/models';
-import { UmbLitElement } from '@umbraco-cms/element';
+import { UmbLitElement } from '@umbraco-cms/context-api';
 
 @customElement('umb-modal-layout-current-user')
 export class UmbModalLayoutCurrentUserElement extends UmbLitElement {

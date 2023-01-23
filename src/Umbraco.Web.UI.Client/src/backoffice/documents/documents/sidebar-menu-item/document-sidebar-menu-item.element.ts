@@ -1,6 +1,6 @@
 import { html } from 'lit';
 import { customElement } from 'lit/decorators.js';
-import { UmbLitElement } from '@umbraco-cms/element';
+import { UmbLitElement } from '@umbraco-cms/context-api';
 
 @customElement('umb-document-sidebar-menu-item')
 export class UmbDocumentSidebarMenuItemElement extends UmbLitElement {

@@ -9,7 +9,7 @@ import {
 	UMB_COLLECTION_CONTEXT_TOKEN,
 } from 'src/backoffice/shared/collection/collection.context';
 import type { ManifestDashboardCollection } from '@umbraco-cms/models';
-import { UmbLitElement } from '@umbraco-cms/element';
+import { UmbLitElement } from '@umbraco-cms/context-api';
 
 @customElement('umb-dashboard-collection')
 export class UmbDashboardCollectionElement extends UmbLitElement {

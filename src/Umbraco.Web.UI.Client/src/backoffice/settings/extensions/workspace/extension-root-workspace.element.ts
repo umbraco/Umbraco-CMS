@@ -3,7 +3,7 @@ import { customElement, state } from 'lit/decorators.js';
 import { isManifestElementNameType } from '@umbraco-cms/extensions-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
 import type { ManifestBase } from '@umbraco-cms/models';
-import { UmbLitElement } from '@umbraco-cms/element';
+import { UmbLitElement } from '@umbraco-cms/context-api';
 
 @customElement('umb-extension-root-workspace')
 export class UmbExtensionRootWorkspaceElement extends UmbLitElement {

@@ -6,11 +6,15 @@ import { map } from 'rxjs';
 
 import { createExtensionElement } from '@umbraco-cms/extensions-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
-import type { ManifestWorkspaceAction, ManifestWorkspaceView, ManifestWorkspaceViewCollection } from '@umbraco-cms/models';
+import type {
+	ManifestWorkspaceAction,
+	ManifestWorkspaceView,
+	ManifestWorkspaceViewCollection,
+} from '@umbraco-cms/models';
 
 import '../../body-layout/body-layout.element';
 import '../../extension-slot/extension-slot.element';
-import { UmbLitElement } from '@umbraco-cms/element';
+import { UmbLitElement } from '@umbraco-cms/context-api';
 
 /**
  * @element umb-workspace-layout
@@ -46,7 +50,7 @@ export class UmbWorkspaceLayout extends UmbLitElement {
 			}
 			router-slot {
 				height: 100%;
-				flex:0;
+				flex: 0;
 			}
 
 			umb-extension-slot[slot='actions'] {
@@ -93,11 +97,7 @@ export class UmbWorkspaceLayout extends UmbLitElement {
 		this.observe(
 			umbExtensionsRegistry
 				.extensionsOfTypes<ManifestWorkspaceView>(['workspaceView', 'workspaceViewCollection'])
-				.pipe(
-					map((extensions) =>
-						extensions.filter((extension) => (extension).meta.workspaces.includes(this.alias))
-					)
-				),
+				.pipe(map((extensions) => extensions.filter((extension) => extension.meta.workspaces.includes(this.alias)))),
 			(workspaceViews) => {
 				this._workspaceViews = workspaceViews;
 				this._createRoutes();
@@ -106,11 +106,9 @@ export class UmbWorkspaceLayout extends UmbLitElement {
 	}
 
 	private async _createRoutes() {
-		
 		this._routes = [];
 
 		if (this._workspaceViews.length > 0) {
-
 			this._routes = this._workspaceViews.map((view) => {
 				return {
 					path: `view/${view.meta.pathname}`,
@@ -188,7 +186,8 @@ export class UmbWorkspaceLayout extends UmbLitElement {
 				<umb-extension-slot
 					slot="actions"
 					type="workspaceAction"
-					.filter=${(extension: ManifestWorkspaceAction) => extension.meta.workspaces.includes(this.alias)}></umb-extension-slot>
+					.filter=${(extension: ManifestWorkspaceAction) =>
+						extension.meta.workspaces.includes(this.alias)}></umb-extension-slot>
 				<slot name="actions" slot="actions"></slot>
 			</umb-body-layout>
 		`;

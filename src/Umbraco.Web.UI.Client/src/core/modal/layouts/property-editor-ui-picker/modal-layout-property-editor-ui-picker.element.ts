@@ -7,7 +7,7 @@ import type { UUIInputEvent } from '@umbraco-ui/uui';
 import type { UmbModalHandler } from '../../modal-handler';
 import type { ManifestPropertyEditorUI } from '@umbraco-cms/models';
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
-import { UmbLitElement } from '@umbraco-cms/element';
+import { UmbLitElement } from '@umbraco-cms/context-api';
 
 export interface UmbModalPropertyEditorUIPickerData {
 	selection?: Array<string>;

@@ -7,7 +7,7 @@ import type { UmbWorkspaceContentContext } from '../workspace/workspace-content/
 import type { DocumentDetails, MediaDetails } from '@umbraco-cms/models';
 
 import type { UmbNodeStoreBase } from '@umbraco-cms/store';
-import { UmbLitElement } from '@umbraco-cms/element';
+import { UmbLitElement } from '@umbraco-cms/context-api';
 
 type ContentTypeTypes = DocumentDetails | MediaDetails;
 

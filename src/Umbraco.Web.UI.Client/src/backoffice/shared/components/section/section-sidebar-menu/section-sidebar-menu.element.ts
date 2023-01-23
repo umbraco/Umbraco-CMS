@@ -3,7 +3,7 @@ import { html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { UmbSectionContext, UMB_SECTION_CONTEXT_TOKEN } from '../section.context';
 import { ManifestSidebarMenuItem } from '@umbraco-cms/extensions-registry';
-import { UmbLitElement } from '@umbraco-cms/element';
+import { UmbLitElement } from '@umbraco-cms/context-api';
 
 import './sidebar-menu-item.element.ts';
 

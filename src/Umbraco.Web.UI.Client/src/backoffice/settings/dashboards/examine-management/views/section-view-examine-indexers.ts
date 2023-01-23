@@ -9,7 +9,7 @@ import { UmbModalService, UMB_MODAL_SERVICE_CONTEXT_TOKEN } from '../../../../..
 import './section-view-examine-searchers';
 
 import { HealthStatus, Index, IndexerResource } from '@umbraco-cms/backend-api';
-import { UmbLitElement } from '@umbraco-cms/element';
+import { UmbLitElement } from '@umbraco-cms/context-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/resources';
 
 @customElement('umb-dashboard-examine-index')

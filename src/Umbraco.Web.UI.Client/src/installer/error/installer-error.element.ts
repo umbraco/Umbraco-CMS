@@ -3,7 +3,7 @@ import { customElement, state } from 'lit/decorators.js';
 
 import { UmbInstallerContext, UMB_INSTALLER_CONTEXT_TOKEN } from '../installer.context';
 import { ProblemDetails } from '@umbraco-cms/backend-api';
-import { UmbLitElement } from '@umbraco-cms/element';
+import { UmbLitElement } from '@umbraco-cms/context-api';
 
 @customElement('umb-installer-error')
 export class UmbInstallerErrorElement extends UmbLitElement {

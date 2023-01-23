@@ -1,6 +1,6 @@
 import { html, nothing } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
-import { UmbLitElement } from '@umbraco-cms/element';
+import { UmbLitElement } from '@umbraco-cms/context-api';
 
 @customElement('umb-media-types-sidebar-menu-item')
 export class UmbMediaTypesSidebarMenuItemElement extends UmbLitElement {

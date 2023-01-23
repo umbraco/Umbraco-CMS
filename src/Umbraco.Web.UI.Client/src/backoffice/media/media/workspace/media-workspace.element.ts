@@ -2,7 +2,7 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { UmbWorkspaceMediaContext } from './media-workspace.context';
-import { UmbLitElement } from '@umbraco-cms/element';
+import { UmbLitElement } from '@umbraco-cms/context-api';
 
 @customElement('umb-media-workspace')
 export class UmbMediaWorkspaceElement extends UmbLitElement {
@@ -35,7 +35,6 @@ export class UmbMediaWorkspaceElement extends UmbLitElement {
 	}
 
 	private _workspaceContext: UmbWorkspaceMediaContext = new UmbWorkspaceMediaContext(this);
-
 
 	render() {
 		return html`<umb-workspace-content alias="Umb.Workspace.Media"></umb-workspace-content>`;

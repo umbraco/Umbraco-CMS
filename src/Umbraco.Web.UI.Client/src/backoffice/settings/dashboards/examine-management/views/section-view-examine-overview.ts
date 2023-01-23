@@ -3,7 +3,7 @@ import { css, html, nothing } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 
 import { HealthStatus, Index, IndexerResource, Searcher, SearcherResource } from '@umbraco-cms/backend-api';
-import { UmbLitElement } from '@umbraco-cms/element';
+import { UmbLitElement } from '@umbraco-cms/context-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/resources';
 
 @customElement('umb-dashboard-examine-overview')

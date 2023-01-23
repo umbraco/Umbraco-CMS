@@ -18,7 +18,7 @@ import { UUIIconRegistryEssential } from '@umbraco-ui/uui';
 import { css, html } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 
-import { UmbLitElement } from '@umbraco-cms/element';
+import { UmbLitElement } from '@umbraco-cms/context-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/resources';
 import { OpenAPI, RuntimeLevel, ServerResource } from '@umbraco-cms/backend-api';
 import { UmbIconStore } from '@umbraco-cms/store';

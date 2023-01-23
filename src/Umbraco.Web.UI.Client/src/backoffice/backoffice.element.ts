@@ -29,7 +29,7 @@ import {
 import { UmbSectionStore, UMB_SECTION_STORE_CONTEXT_TOKEN } from './shared/components/section/section.store';
 import { UmbDataTypeStore, UMB_DATA_TYPE_STORE_CONTEXT_TOKEN } from './settings/data-types/data-type.store';
 import { UmbNotificationService, UMB_NOTIFICATION_SERVICE_CONTEXT_TOKEN } from '@umbraco-cms/notification';
-import { UmbLitElement } from '@umbraco-cms/element';
+import { UmbLitElement } from '@umbraco-cms/context-api';
 
 // Domains
 import './settings';

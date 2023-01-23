@@ -4,7 +4,7 @@ import { IRoute, IRoutingInfo } from 'router-slot';
 import type { ManifestWorkspace } from '@umbraco-cms/models';
 import { createExtensionElement } from '@umbraco-cms/extensions-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
-import { UmbLitElement } from '@umbraco-cms/element';
+import { UmbLitElement } from '@umbraco-cms/context-api';
 
 @customElement('umb-installed-packages-section-view')
 export class UmbInstalledPackagesSectionViewElement extends UmbLitElement {

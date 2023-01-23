@@ -3,7 +3,7 @@ import { css, html, nothing } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { UmbCollectionContext, UMB_COLLECTION_CONTEXT_TOKEN } from './collection.context';
 import type { MediaDetails } from '@umbraco-cms/models';
-import { UmbLitElement } from '@umbraco-cms/element';
+import { UmbLitElement } from '@umbraco-cms/context-api';
 
 @customElement('umb-collection-selection-actions')
 export class UmbCollectionSelectionActionsElement extends UmbLitElement {

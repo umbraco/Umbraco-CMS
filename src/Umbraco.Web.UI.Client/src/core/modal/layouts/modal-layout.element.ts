@@ -1,6 +1,6 @@
 import { customElement, property } from 'lit/decorators.js';
 import { UmbModalHandler } from '..';
-import { UmbLitElement } from '@umbraco-cms/element';
+import { UmbLitElement } from '@umbraco-cms/context-api';
 
 @customElement('umb-modal-layout')
 export class UmbModalLayoutElement<UmbModalData = void> extends UmbLitElement {

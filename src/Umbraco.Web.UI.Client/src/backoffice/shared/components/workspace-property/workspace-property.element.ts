@@ -10,7 +10,7 @@ import type { DataTypePropertyData, ManifestPropertyEditorUI, ManifestTypes } fr
 import '../../property-actions/shared/property-action-menu/property-action-menu.element';
 import '../../../../backoffice/shared/components/workspace/workspace-property-layout/workspace-property-layout.element';
 import { UmbObserverController } from '@umbraco-cms/observable-api';
-import { UmbLitElement } from '@umbraco-cms/element';
+import { UmbLitElement } from '@umbraco-cms/context-api';
 
 /**
  *  @element umb-workspace-property

@@ -13,7 +13,7 @@ import {
 	UmbNotificationService,
 	UMB_NOTIFICATION_SERVICE_CONTEXT_TOKEN,
 } from '.';
-import { UmbLitElement } from '@umbraco-cms/element';
+import { UmbLitElement } from '@umbraco-cms/context-api';
 
 export default {
 	title: 'API/Notifications/Overview',

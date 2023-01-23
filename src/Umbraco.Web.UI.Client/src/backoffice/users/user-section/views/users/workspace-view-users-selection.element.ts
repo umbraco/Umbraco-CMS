@@ -3,7 +3,7 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, state } from 'lit/decorators.js';
 import { UmbSectionViewUsersElement } from './section-view-users.element';
 import { UmbUserStore, UMB_USER_STORE_CONTEXT_TOKEN } from 'src/backoffice/users/users/user.store';
-import { UmbLitElement } from '@umbraco-cms/element';
+import { UmbLitElement } from '@umbraco-cms/context-api';
 
 @customElement('umb-workspace-view-users-selection')
 export class UmbWorkspaceViewUsersSelectionElement extends UmbLitElement {

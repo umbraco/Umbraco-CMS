@@ -5,7 +5,7 @@ import { html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { UpgradeResource, UpgradeSettings } from '@umbraco-cms/backend-api';
 import { tryExecute } from '@umbraco-cms/resources';
-import { UmbLitElement } from '@umbraco-cms/element';
+import { UmbLitElement } from '@umbraco-cms/context-api';
 
 /**
  * @element umb-upgrader
