@@ -8,7 +8,7 @@
 		"dist"
 	],
 	"scripts": {
-		"build": "tsc && rollup -c",
+		"build": "rollup -c",
 		"test": "echo \"Error: no test specified\" && exit 1"
 	},
 	"dependencies": {
