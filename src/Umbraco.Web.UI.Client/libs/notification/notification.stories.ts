@@ -1,5 +1,5 @@
-import '../../backoffice/shared/components/backoffice-frame/backoffice-notification-container.element';
-import '../../../libs/context-api/provide/context-provider.element';
+import '../../src/backoffice/shared/components/backoffice-frame/backoffice-notification-container.element';
+import '../context-api/provide/context-provider.element';
 import './layouts/default';
 
 import { Meta, Story } from '@storybook/web-components';

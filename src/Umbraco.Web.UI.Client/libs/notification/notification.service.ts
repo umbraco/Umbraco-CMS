@@ -1,6 +1,6 @@
 import { BehaviorSubject } from 'rxjs';
-import { UmbNotificationHandler } from '.';
 import { UmbContextToken } from '@umbraco-cms/context-api';
+import { UmbNotificationHandler } from './notification-handler';
 
 export type UmbNotificationData = any;
 

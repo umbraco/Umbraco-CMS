@@ -4,7 +4,7 @@ import {
 	UmbNotificationService,
 	UmbNotificationDefaultData,
 	UMB_NOTIFICATION_SERVICE_CONTEXT_TOKEN,
-} from '../../src/core/notification';
+} from '@umbraco-cms/notification';
 import { ApiError, CancelablePromise, ProblemDetails } from '@umbraco-cms/backend-api';
 import { UmbController, UmbControllerHostInterface } from '@umbraco-cms/controller';
 import { UmbContextConsumerController } from '@umbraco-cms/context-api';
