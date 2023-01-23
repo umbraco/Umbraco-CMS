@@ -556,18 +556,21 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/DictionaryItem"
+                "$ref": "#/components/schemas/DictionaryItemCreateModel"
               }
             }
           }
         },
         "responses": {
           "201": {
-            "description": "Created",
+            "description": "Created"
+          },
+          "404": {
+            "description": "Not Found",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/CreatedResult"
+                  "$ref": "#/components/schemas/ProblemDetails"
                 }
               }
             }
@@ -581,56 +584,13 @@
                 }
               }
             }
-          }
-        }
-      }
-    },
-    "/umbraco/management/api/v1/dictionary/{id}": {
-      "patch": {
-        "tags": [
-          "Dictionary"
-        ],
-        "operationId": "PatchDictionaryById",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "array",
-                "items": {
-                  "$ref": "#/components/schemas/JsonPatch"
-                }
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Success",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ContentResult"
-                }
-              }
-            }
           },
-          "404": {
-            "description": "Not Found",
+          "409": {
+            "description": "Conflict",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/NotFoundResult"
+                  "$ref": "#/components/schemas/ProblemDetails"
                 }
               }
             }
@@ -661,7 +621,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Dictionary"
+                  "$ref": "#/components/schemas/DictionaryItem"
                 }
               }
             }
@@ -671,7 +631,58 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/NotFoundResult"
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Dictionary"
+        ],
+        "operationId": "PutDictionaryByKey",
+        "parameters": [
+          {
+            "name": "key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DictionaryItemUpdateModel"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
                 }
               }
             }
@@ -703,7 +714,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/NotFoundResult"
+                  "$ref": "#/components/schemas/ProblemDetails"
                 }
               }
             }
@@ -815,7 +826,7 @@
         ],
         "operationId": "PostDictionaryUpload",
         "requestBody": {
-          "content": {}
+          "content": { }
         },
         "responses": {
           "200": {
@@ -2077,419 +2088,6 @@
           },
           "200": {
             "description": "Success"
-          }
-        }
-      }
-    },
-    "/umbraco/management/api/v1/log-viewer/level": {
-      "get": {
-        "tags": [
-          "Log Viewer"
-        ],
-        "operationId": "GetLogViewerLevel",
-        "parameters": [
-          {
-            "name": "skip",
-            "in": "query",
-            "schema": {
-              "type": "integer",
-              "format": "int32",
-              "default": 0
-            }
-          },
-          {
-            "name": "take",
-            "in": "query",
-            "schema": {
-              "type": "integer",
-              "format": "int32",
-              "default": 100
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Success",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PagedLogger"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/umbraco/management/api/v1/log-viewer/level-count": {
-      "get": {
-        "tags": [
-          "Log Viewer"
-        ],
-        "operationId": "GetLogViewerLevelCount",
-        "parameters": [
-          {
-            "name": "startDate",
-            "in": "query",
-            "schema": {
-              "type": "string",
-              "format": "date-time"
-            }
-          },
-          {
-            "name": "endDate",
-            "in": "query",
-            "schema": {
-              "type": "string",
-              "format": "date-time"
-            }
-          }
-        ],
-        "responses": {
-          "400": {
-            "description": "Bad Request",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          },
-          "200": {
-            "description": "Success",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/LogLevelCounts"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/umbraco/management/api/v1/log-viewer/log": {
-      "get": {
-        "tags": [
-          "Log Viewer"
-        ],
-        "operationId": "GetLogViewerLog",
-        "parameters": [
-          {
-            "name": "skip",
-            "in": "query",
-            "schema": {
-              "type": "integer",
-              "format": "int32",
-              "default": 0
-            }
-          },
-          {
-            "name": "take",
-            "in": "query",
-            "schema": {
-              "type": "integer",
-              "format": "int32",
-              "default": 100
-            }
-          },
-          {
-            "name": "orderDirection",
-            "in": "query",
-            "schema": {
-              "$ref": "#/components/schemas/Direction"
-            }
-          },
-          {
-            "name": "filterExpression",
-            "in": "query",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "logLevel",
-            "in": "query",
-            "schema": {
-              "type": "array",
-              "items": {
-                "$ref": "#/components/schemas/LogLevel"
-              }
-            }
-          },
-          {
-            "name": "startDate",
-            "in": "query",
-            "schema": {
-              "type": "string",
-              "format": "date-time"
-            }
-          },
-          {
-            "name": "endDate",
-            "in": "query",
-            "schema": {
-              "type": "string",
-              "format": "date-time"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Success",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PagedLogMessage"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/umbraco/management/api/v1/log-viewer/message-template": {
-      "get": {
-        "tags": [
-          "Log Viewer"
-        ],
-        "operationId": "GetLogViewerMessageTemplate",
-        "parameters": [
-          {
-            "name": "skip",
-            "in": "query",
-            "schema": {
-              "type": "integer",
-              "format": "int32",
-              "default": 0
-            }
-          },
-          {
-            "name": "take",
-            "in": "query",
-            "schema": {
-              "type": "integer",
-              "format": "int32",
-              "default": 100
-            }
-          },
-          {
-            "name": "startDate",
-            "in": "query",
-            "schema": {
-              "type": "string",
-              "format": "date-time"
-            }
-          },
-          {
-            "name": "endDate",
-            "in": "query",
-            "schema": {
-              "type": "string",
-              "format": "date-time"
-            }
-          }
-        ],
-        "responses": {
-          "400": {
-            "description": "Bad Request",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          },
-          "200": {
-            "description": "Success",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PagedLogTemplate"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/umbraco/management/api/v1/log-viewer/saved-search": {
-      "get": {
-        "tags": [
-          "Log Viewer"
-        ],
-        "operationId": "GetLogViewerSavedSearch",
-        "parameters": [
-          {
-            "name": "skip",
-            "in": "query",
-            "schema": {
-              "type": "integer",
-              "format": "int32",
-              "default": 0
-            }
-          },
-          {
-            "name": "take",
-            "in": "query",
-            "schema": {
-              "type": "integer",
-              "format": "int32",
-              "default": 100
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Success",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PagedSavedLogSearch"
-                }
-              }
-            }
-          }
-        }
-      },
-      "post": {
-        "tags": [
-          "Log Viewer"
-        ],
-        "operationId": "PostLogViewerSavedSearch",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/SavedLogSearch"
-              }
-            }
-          }
-        },
-        "responses": {
-          "400": {
-            "description": "Bad Request",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          },
-          "201": {
-            "description": "Created"
-          }
-        }
-      }
-    },
-    "/umbraco/management/api/v1/log-viewer/saved-search/{name}": {
-      "get": {
-        "tags": [
-          "Log Viewer"
-        ],
-        "operationId": "GetLogViewerSavedSearchByName",
-        "parameters": [
-          {
-            "name": "name",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "404": {
-            "description": "Not Found",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/NotFoundResult"
-                }
-              }
-            }
-          },
-          "200": {
-            "description": "Success",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/SavedLogSearch"
-                }
-              }
-            }
-          }
-        }
-      },
-      "delete": {
-        "tags": [
-          "Log Viewer"
-        ],
-        "operationId": "DeleteLogViewerSavedSearchByName",
-        "parameters": [
-          {
-            "name": "name",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "404": {
-            "description": "Not Found",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/NotFoundResult"
-                }
-              }
-            }
-          },
-          "200": {
-            "description": "Success"
-          }
-        }
-      }
-    },
-    "/umbraco/management/api/v1/log-viewer/view-permission": {
-      "get": {
-        "tags": [
-          "Log Viewer"
-        ],
-        "operationId": "GetLogViewerViewPermission",
-        "parameters": [
-          {
-            "name": "startDate",
-            "in": "query",
-            "schema": {
-              "type": "string",
-              "format": "date-time"
-            }
-          },
-          {
-            "name": "endDate",
-            "in": "query",
-            "schema": {
-              "type": "string",
-              "format": "date-time"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Success",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "boolean"
-                }
-              }
-            }
           }
         }
       }
@@ -4884,7 +4482,6 @@
             "items": {
               "$ref": "#/components/schemas/TypeInfo"
             },
-            "nullable": true,
             "readOnly": true
           },
           "exportedTypes": {
@@ -4892,7 +4489,6 @@
             "items": {
               "$ref": "#/components/schemas/Type"
             },
-            "nullable": true,
             "readOnly": true
           },
           "codeBase": {
@@ -4911,7 +4507,6 @@
           },
           "imageRuntimeVersion": {
             "type": "string",
-            "nullable": true,
             "readOnly": true
           },
           "isDynamic": {
@@ -4920,7 +4515,6 @@
           },
           "location": {
             "type": "string",
-            "nullable": true,
             "readOnly": true
           },
           "reflectionOnly": {
@@ -4940,12 +4534,10 @@
             "items": {
               "$ref": "#/components/schemas/CustomAttributeData"
             },
-            "nullable": true,
             "readOnly": true
           },
           "escapedCodeBase": {
             "type": "string",
-            "nullable": true,
             "readOnly": true,
             "deprecated": true
           },
@@ -4957,7 +4549,6 @@
             "items": {
               "$ref": "#/components/schemas/Module"
             },
-            "nullable": true,
             "readOnly": true
           },
           "globalAssemblyCache": {
@@ -4976,23 +4567,6 @@
         },
         "additionalProperties": false
       },
-      "BackOfficeNotification": {
-        "type": "object",
-        "properties": {
-          "header": {
-            "type": "string",
-            "nullable": true
-          },
-          "message": {
-            "type": "string",
-            "nullable": true
-          },
-          "notificationType": {
-            "$ref": "#/components/schemas/NotificationStyle"
-          }
-        },
-        "additionalProperties": false
-      },
       "CallingConventions": {
         "enum": [
           "Standard",
@@ -5001,7 +4575,8 @@
           "HasThis",
           "ExplicitThis"
         ],
-        "type": "string"
+        "type": "integer",
+        "format": "int32"
       },
       "ConsentLevel": {
         "type": "object",
@@ -5010,8 +4585,7 @@
             "$ref": "#/components/schemas/TelemetryLevel"
           },
           "description": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           }
         },
         "additionalProperties": false
@@ -5021,7 +4595,6 @@
         "properties": {
           "name": {
             "type": "string",
-            "nullable": true,
             "readOnly": true
           },
           "declaringType": {
@@ -5038,7 +4611,6 @@
             "items": {
               "$ref": "#/components/schemas/CustomAttributeData"
             },
-            "nullable": true,
             "readOnly": true
           },
           "isCollectible": {
@@ -5148,62 +4720,6 @@
         },
         "additionalProperties": false
       },
-      "ContentApp": {
-        "type": "object",
-        "properties": {
-          "name": {
-            "type": "string",
-            "nullable": true
-          },
-          "alias": {
-            "type": "string",
-            "nullable": true
-          },
-          "weight": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "icon": {
-            "type": "string",
-            "nullable": true
-          },
-          "view": {
-            "type": "string",
-            "nullable": true
-          },
-          "viewModel": {
-            "nullable": true
-          },
-          "active": {
-            "type": "boolean"
-          },
-          "badge": {
-            "$ref": "#/components/schemas/ContentAppBadge"
-          }
-        },
-        "additionalProperties": false
-      },
-      "ContentAppBadge": {
-        "type": "object",
-        "properties": {
-          "count": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "type": {
-            "$ref": "#/components/schemas/ContentAppBadgeType"
-          }
-        },
-        "additionalProperties": false
-      },
-      "ContentAppBadgeType": {
-        "enum": [
-          "default",
-          "warning",
-          "alert"
-        ],
-        "type": "string"
-      },
       "ContentResult": {
         "type": "object",
         "properties": {
@@ -5227,16 +4743,13 @@
         "type": "object",
         "properties": {
           "name": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "type": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "icon": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "hasChildren": {
             "type": "boolean"
@@ -5255,6 +4768,9 @@
           },
           "noAccess": {
             "type": "boolean"
+          },
+          "isTrashed": {
+            "type": "boolean"
           }
         },
         "additionalProperties": false
@@ -5269,15 +4785,13 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/IOutputFormatter"
-            },
-            "nullable": true
+            }
           },
           "contentTypes": {
             "type": "array",
             "items": {
               "type": "string"
-            },
-            "nullable": true
+            }
           },
           "declaredType": {
             "$ref": "#/components/schemas/Type"
@@ -5288,8 +4802,7 @@
             "nullable": true
           },
           "location": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           }
         },
         "additionalProperties": false
@@ -5298,12 +4811,10 @@
         "type": "object",
         "properties": {
           "name": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "englishName": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           }
         },
         "additionalProperties": false
@@ -5322,7 +4833,6 @@
             "items": {
               "$ref": "#/components/schemas/CustomAttributeTypedArgument"
             },
-            "nullable": true,
             "readOnly": true
           },
           "namedArguments": {
@@ -5330,7 +4840,6 @@
             "items": {
               "$ref": "#/components/schemas/CustomAttributeNamedArgument"
             },
-            "nullable": true,
             "readOnly": true
           }
         },
@@ -5347,7 +4856,6 @@
           },
           "memberName": {
             "type": "string",
-            "nullable": true,
             "readOnly": true
           },
           "isField": {
@@ -5373,12 +4881,10 @@
         "type": "object",
         "properties": {
           "name": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "propertyEditorAlias": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "propertyEditorUiAlias": {
             "type": "string",
@@ -5388,8 +4894,7 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/DataTypeProperty"
-            },
-            "nullable": true
+            }
           },
           "key": {
             "type": "string",
@@ -5407,12 +4912,10 @@
         "type": "object",
         "properties": {
           "name": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "propertyEditorAlias": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "propertyEditorUiAlias": {
             "type": "string",
@@ -5422,8 +4925,7 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/DataTypeProperty"
-            },
-            "nullable": true
+            }
           },
           "parentKey": {
             "type": "string",
@@ -5437,8 +4939,7 @@
         "type": "object",
         "properties": {
           "alias": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "value": {
             "nullable": true
@@ -5450,12 +4951,10 @@
         "type": "object",
         "properties": {
           "name": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "alias": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           }
         },
         "additionalProperties": false
@@ -5468,15 +4967,13 @@
             "format": "uuid"
           },
           "type": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "properties": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/DataTypePropertyReference"
-            },
-            "nullable": true
+            }
           }
         },
         "additionalProperties": false
@@ -5485,12 +4982,10 @@
         "type": "object",
         "properties": {
           "name": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "propertyEditorAlias": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "propertyEditorUiAlias": {
             "type": "string",
@@ -5500,8 +4995,7 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/DataTypeProperty"
-            },
-            "nullable": true
+            }
           }
         },
         "additionalProperties": false
@@ -5559,16 +5053,13 @@
             "format": "int32"
           },
           "displayName": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "defaultDatabaseName": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "providerName": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "isConfigured": {
             "type": "boolean"
@@ -5577,8 +5068,7 @@
             "type": "boolean"
           },
           "serverPlaceholder": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "requiresCredentials": {
             "type": "boolean"
@@ -5592,54 +5082,6 @@
         },
         "additionalProperties": false
       },
-      "Dictionary": {
-        "required": [
-          "name"
-        ],
-        "type": "object",
-        "properties": {
-          "parentId": {
-            "type": "string",
-            "format": "uuid",
-            "nullable": true
-          },
-          "translations": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/DictionaryTranslation"
-            },
-            "nullable": true
-          },
-          "contentApps": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/ContentApp"
-            },
-            "nullable": true
-          },
-          "notifications": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/BackOfficeNotification"
-            },
-            "nullable": true,
-            "readOnly": true
-          },
-          "name": {
-            "minLength": 1,
-            "type": "string"
-          },
-          "key": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "path": {
-            "type": "string",
-            "nullable": true
-          }
-        },
-        "additionalProperties": false
-      },
       "DictionaryImport": {
         "type": "object",
         "properties": {
@@ -5647,8 +5089,7 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/DictionaryItemsImport"
-            },
-            "nullable": true
+            }
           },
           "tempFileName": {
             "type": "string",
@@ -5660,14 +5101,65 @@
       "DictionaryItem": {
         "type": "object",
         "properties": {
-          "parentId": {
-            "type": "string",
-            "format": "uuid",
-            "nullable": true
+          "name": {
+            "type": "string"
+          },
+          "translations": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DictionaryItemTranslationModel"
+            }
           },
           "key": {
             "type": "string",
             "format": "uuid"
+          }
+        },
+        "additionalProperties": false
+      },
+      "DictionaryItemCreateModel": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "translations": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DictionaryItemTranslationModel"
+            }
+          },
+          "parentKey": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "DictionaryItemTranslationModel": {
+        "type": "object",
+        "properties": {
+          "isoCode": {
+            "type": "string"
+          },
+          "translation": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "DictionaryItemUpdateModel": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "translations": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DictionaryItemTranslationModel"
+            }
           }
         },
         "additionalProperties": false
@@ -5706,38 +5198,7 @@
             "items": {
               "$ref": "#/components/schemas/DictionaryTranslationOverview"
             },
-            "nullable": true,
             "readOnly": true
-          }
-        },
-        "additionalProperties": false
-      },
-      "DictionaryTranslation": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "key": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "displayName": {
-            "type": "string",
-            "nullable": true
-          },
-          "isoCode": {
-            "type": "string",
-            "nullable": true
-          },
-          "translation": {
-            "type": "string",
-            "nullable": true
-          },
-          "languageId": {
-            "type": "integer",
-            "format": "int32"
           }
         },
         "additionalProperties": false
@@ -5755,27 +5216,17 @@
         },
         "additionalProperties": false
       },
-      "Direction": {
-        "enum": [
-          "Ascending",
-          "Descending"
-        ],
-        "type": "string"
-      },
       "DocumentBlueprintTreeItem": {
         "type": "object",
         "properties": {
           "name": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "type": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "icon": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "hasChildren": {
             "type": "boolean"
@@ -5797,8 +5248,7 @@
             "format": "uuid"
           },
           "documentTypeAlias": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "documentTypeName": {
             "type": "string",
@@ -5811,16 +5261,13 @@
         "type": "object",
         "properties": {
           "name": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "type": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "icon": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "hasChildren": {
             "type": "boolean"
@@ -5840,6 +5287,9 @@
           "noAccess": {
             "type": "boolean"
           },
+          "isTrashed": {
+            "type": "boolean"
+          },
           "isProtected": {
             "type": "boolean"
           },
@@ -5856,16 +5306,13 @@
         "type": "object",
         "properties": {
           "name": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "type": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "icon": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "hasChildren": {
             "type": "boolean"
@@ -5895,16 +5342,13 @@
         "type": "object",
         "properties": {
           "name": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "type": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "icon": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "hasChildren": {
             "type": "boolean"
@@ -5931,14 +5375,14 @@
           "RTSpecialName",
           "ReservedMask"
         ],
-        "type": "string"
+        "type": "integer",
+        "format": "int32"
       },
       "EventInfo": {
         "type": "object",
         "properties": {
           "name": {
             "type": "string",
-            "nullable": true,
             "readOnly": true
           },
           "declaringType": {
@@ -5955,7 +5399,6 @@
             "items": {
               "$ref": "#/components/schemas/CustomAttributeData"
             },
-            "nullable": true,
             "readOnly": true
           },
           "isCollectible": {
@@ -6000,15 +5443,13 @@
         "type": "object",
         "properties": {
           "name": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "values": {
             "type": "array",
             "items": {
               "type": "string"
-            },
-            "nullable": true
+            }
           }
         },
         "additionalProperties": false
@@ -6035,14 +5476,14 @@
           "HasDefault",
           "ReservedMask"
         ],
-        "type": "string"
+        "type": "integer",
+        "format": "int32"
       },
       "FieldInfo": {
         "type": "object",
         "properties": {
           "name": {
             "type": "string",
-            "nullable": true,
             "readOnly": true
           },
           "declaringType": {
@@ -6059,7 +5500,6 @@
             "items": {
               "$ref": "#/components/schemas/CustomAttributeData"
             },
-            "nullable": true,
             "readOnly": true
           },
           "isCollectible": {
@@ -6150,23 +5590,19 @@
         "type": "object",
         "properties": {
           "name": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "type": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "icon": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "hasChildren": {
             "type": "boolean"
           },
           "path": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "isFolder": {
             "type": "boolean"
@@ -6178,8 +5614,7 @@
         "type": "object",
         "properties": {
           "name": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "key": {
             "type": "string",
@@ -6197,8 +5632,7 @@
         "type": "object",
         "properties": {
           "name": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "parentKey": {
             "type": "string",
@@ -6212,16 +5646,13 @@
         "type": "object",
         "properties": {
           "name": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "type": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "icon": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "hasChildren": {
             "type": "boolean"
@@ -6248,8 +5679,7 @@
         "type": "object",
         "properties": {
           "name": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           }
         },
         "additionalProperties": false
@@ -6265,7 +5695,8 @@
           "DefaultConstructorConstraint",
           "SpecialConstraintMask"
         ],
-        "type": "string"
+        "type": "integer",
+        "format": "int32"
       },
       "HealthCheck": {
         "type": "object",
@@ -6275,8 +5706,7 @@
             "format": "uuid"
           },
           "name": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "description": {
             "type": "string",
@@ -6333,8 +5763,7 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/HealthCheck"
-            },
-            "nullable": true
+            }
           }
         },
         "additionalProperties": false
@@ -6350,8 +5779,7 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/HealthCheckWithResult"
-            },
-            "nullable": true
+            }
           }
         },
         "additionalProperties": false
@@ -6360,8 +5788,7 @@
         "type": "object",
         "properties": {
           "message": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "resultType": {
             "$ref": "#/components/schemas/StatusResultType"
@@ -6388,8 +5815,7 @@
             "format": "uuid"
           },
           "name": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "description": {
             "type": "string",
@@ -6404,6 +5830,15 @@
           }
         },
         "additionalProperties": false
+      },
+      "HealthStatus": {
+        "enum": [
+          "Healthy",
+          "Unhealthy",
+          "Rebuilding"
+        ],
+        "type": "integer",
+        "format": "int32"
       },
       "HelpPage": {
         "type": "object",
@@ -6440,7 +5875,6 @@
           "canRebuild",
           "documentCount",
           "fieldCount",
-          "isHealthy",
           "name"
         ],
         "type": "object",
@@ -6450,19 +5884,13 @@
             "type": "string"
           },
           "healthStatus": {
-            "type": "string",
-            "nullable": true
-          },
-          "isHealthy": {
-            "type": "boolean",
-            "readOnly": true
+            "$ref": "#/components/schemas/HealthStatus"
           },
           "canRebuild": {
             "type": "boolean"
           },
           "searcherName": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "documentCount": {
             "type": "integer",
@@ -6474,7 +5902,7 @@
           },
           "providerProperties": {
             "type": "object",
-            "additionalProperties": {},
+            "additionalProperties": { },
             "nullable": true
           }
         },
@@ -6509,31 +5937,13 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/DatabaseSettings"
-            },
-            "nullable": true
+            }
           }
         },
         "additionalProperties": false
       },
       "IntPtr": {
         "type": "object",
-        "additionalProperties": false
-      },
-      "JsonPatch": {
-        "type": "object",
-        "properties": {
-          "op": {
-            "type": "string",
-            "nullable": true
-          },
-          "path": {
-            "type": "string",
-            "nullable": true
-          },
-          "value": {
-            "nullable": true
-          }
-        },
         "additionalProperties": false
       },
       "Language": {
@@ -6574,117 +5984,8 @@
           "Explicit",
           "Auto"
         ],
-        "type": "string"
-      },
-      "LogLevel": {
-        "enum": [
-          "Verbose",
-          "Debug",
-          "Information",
-          "Warning",
-          "Error",
-          "Fatal"
-        ],
-        "type": "string"
-      },
-      "LogLevelCounts": {
-        "type": "object",
-        "properties": {
-          "information": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "debug": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "warning": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "error": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "fatal": {
-            "type": "integer",
-            "format": "int32"
-          }
-        },
-        "additionalProperties": false
-      },
-      "LogMessage": {
-        "type": "object",
-        "properties": {
-          "timestamp": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "level": {
-            "$ref": "#/components/schemas/LogLevel"
-          },
-          "messageTemplate": {
-            "type": "string",
-            "nullable": true
-          },
-          "renderedMessage": {
-            "type": "string",
-            "nullable": true
-          },
-          "properties": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/LogMessageProperty"
-            },
-            "nullable": true
-          },
-          "exception": {
-            "type": "string",
-            "nullable": true
-          }
-        },
-        "additionalProperties": false
-      },
-      "LogMessageProperty": {
-        "type": "object",
-        "properties": {
-          "name": {
-            "type": "string",
-            "nullable": true
-          },
-          "value": {
-            "type": "string",
-            "nullable": true
-          }
-        },
-        "additionalProperties": false
-      },
-      "LogTemplate": {
-        "type": "object",
-        "properties": {
-          "messageTemplate": {
-            "type": "string",
-            "nullable": true
-          },
-          "count": {
-            "type": "integer",
-            "format": "int32"
-          }
-        },
-        "additionalProperties": false
-      },
-      "Logger": {
-        "type": "object",
-        "properties": {
-          "name": {
-            "type": "string",
-            "nullable": true
-          },
-          "level": {
-            "$ref": "#/components/schemas/LogLevel"
-          }
-        },
-        "additionalProperties": false
+        "type": "integer",
+        "format": "int32"
       },
       "MemberInfo": {
         "type": "object",
@@ -6694,7 +5995,6 @@
           },
           "name": {
             "type": "string",
-            "nullable": true,
             "readOnly": true
           },
           "declaringType": {
@@ -6711,7 +6011,6 @@
             "items": {
               "$ref": "#/components/schemas/CustomAttributeData"
             },
-            "nullable": true,
             "readOnly": true
           },
           "isCollectible": {
@@ -6738,7 +6037,8 @@
           "NestedType",
           "All"
         ],
-        "type": "string"
+        "type": "integer",
+        "format": "int32"
       },
       "MethodAttributes": {
         "enum": [
@@ -6767,7 +6067,8 @@
           "RequireSecObject",
           "ReservedMask"
         ],
-        "type": "string"
+        "type": "integer",
+        "format": "int32"
       },
       "MethodBase": {
         "type": "object",
@@ -6777,7 +6078,6 @@
           },
           "name": {
             "type": "string",
-            "nullable": true,
             "readOnly": true
           },
           "declaringType": {
@@ -6794,7 +6094,6 @@
             "items": {
               "$ref": "#/components/schemas/CustomAttributeData"
             },
-            "nullable": true,
             "readOnly": true
           },
           "isCollectible": {
@@ -6921,14 +6220,14 @@
           "InternalCall",
           "MaxMethodImplVal"
         ],
-        "type": "string"
+        "type": "integer",
+        "format": "int32"
       },
       "MethodInfo": {
         "type": "object",
         "properties": {
           "name": {
             "type": "string",
-            "nullable": true,
             "readOnly": true
           },
           "declaringType": {
@@ -6945,7 +6244,6 @@
             "items": {
               "$ref": "#/components/schemas/CustomAttributeData"
             },
-            "nullable": true,
             "readOnly": true
           },
           "isCollectible": {
@@ -7101,7 +6399,8 @@
           "SourceCodeManual",
           "SourceCodeAuto"
         ],
-        "type": "string"
+        "type": "integer",
+        "format": "int32"
       },
       "Module": {
         "type": "object",
@@ -7111,12 +6410,10 @@
           },
           "fullyQualifiedName": {
             "type": "string",
-            "nullable": true,
             "readOnly": true
           },
           "name": {
             "type": "string",
-            "nullable": true,
             "readOnly": true
           },
           "mdStreamVersion": {
@@ -7131,7 +6428,6 @@
           },
           "scopeName": {
             "type": "string",
-            "nullable": true,
             "readOnly": true
           },
           "moduleHandle": {
@@ -7142,7 +6438,6 @@
             "items": {
               "$ref": "#/components/schemas/CustomAttributeData"
             },
-            "nullable": true,
             "readOnly": true
           },
           "metadataToken": {
@@ -7174,16 +6469,6 @@
         },
         "additionalProperties": false
       },
-      "NotificationStyle": {
-        "enum": [
-          "Save",
-          "Info",
-          "Error",
-          "Success",
-          "Warning"
-        ],
-        "type": "string"
-      },
       "OkResult": {
         "type": "object",
         "properties": {
@@ -7205,7 +6490,8 @@
           "GreaterThan",
           "GreaterThanEqualTo"
         ],
-        "type": "string"
+        "type": "integer",
+        "format": "int32"
       },
       "OutOfDateStatus": {
         "type": "object",
@@ -7222,7 +6508,8 @@
           "Current",
           "Unknown"
         ],
-        "type": "string"
+        "type": "integer",
+        "format": "int32"
       },
       "PagedContentTreeItem": {
         "required": [
@@ -7484,66 +6771,6 @@
         },
         "additionalProperties": false
       },
-      "PagedLogMessage": {
-        "required": [
-          "items",
-          "total"
-        ],
-        "type": "object",
-        "properties": {
-          "total": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "items": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/LogMessage"
-            }
-          }
-        },
-        "additionalProperties": false
-      },
-      "PagedLogTemplate": {
-        "required": [
-          "items",
-          "total"
-        ],
-        "type": "object",
-        "properties": {
-          "total": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "items": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/LogTemplate"
-            }
-          }
-        },
-        "additionalProperties": false
-      },
-      "PagedLogger": {
-        "required": [
-          "items",
-          "total"
-        ],
-        "type": "object",
-        "properties": {
-          "total": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "items": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/Logger"
-            }
-          }
-        },
-        "additionalProperties": false
-      },
       "PagedRecycleBinItem": {
         "required": [
           "items",
@@ -7624,26 +6851,6 @@
         },
         "additionalProperties": false
       },
-      "PagedSavedLogSearch": {
-        "required": [
-          "items",
-          "total"
-        ],
-        "type": "object",
-        "properties": {
-          "total": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "items": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/SavedLogSearch"
-            }
-          }
-        },
-        "additionalProperties": false
-      },
       "PagedSearchResult": {
         "required": [
           "items",
@@ -7718,7 +6925,8 @@
           "Reserved4",
           "ReservedMask"
         ],
-        "type": "string"
+        "type": "integer",
+        "format": "int32"
       },
       "ParameterInfo": {
         "type": "object",
@@ -7779,7 +6987,6 @@
             "items": {
               "$ref": "#/components/schemas/CustomAttributeData"
             },
-            "nullable": true,
             "readOnly": true
           },
           "metadataToken": {
@@ -7815,7 +7022,7 @@
             "nullable": true
           }
         },
-        "additionalProperties": {}
+        "additionalProperties": { }
       },
       "ProfilingStatus": {
         "type": "object",
@@ -7837,14 +7044,14 @@
           "Reserved4",
           "ReservedMask"
         ],
-        "type": "string"
+        "type": "integer",
+        "format": "int32"
       },
       "PropertyInfo": {
         "type": "object",
         "properties": {
           "name": {
             "type": "string",
-            "nullable": true,
             "readOnly": true
           },
           "declaringType": {
@@ -7861,7 +7068,6 @@
             "items": {
               "$ref": "#/components/schemas/CustomAttributeData"
             },
-            "nullable": true,
             "readOnly": true
           },
           "isCollectible": {
@@ -7911,16 +7117,13 @@
             "format": "uuid"
           },
           "name": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "type": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "icon": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "hasChildren": {
             "type": "boolean"
@@ -7941,7 +7144,8 @@
           "Enabled",
           "Disabled"
         ],
-        "type": "string"
+        "type": "integer",
+        "format": "int32"
       },
       "RedirectUrl": {
         "type": "object",
@@ -7951,12 +7155,10 @@
             "format": "uuid"
           },
           "originalUrl": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "destinationUrl": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "created": {
             "type": "string",
@@ -8073,7 +7275,8 @@
           "Run",
           "BootFailed"
         ],
-        "type": "string"
+        "type": "integer",
+        "format": "int32"
       },
       "RuntimeMethodHandle": {
         "type": "object",
@@ -8093,26 +7296,11 @@
         },
         "additionalProperties": false
       },
-      "SavedLogSearch": {
-        "type": "object",
-        "properties": {
-          "name": {
-            "type": "string",
-            "nullable": true
-          },
-          "query": {
-            "type": "string",
-            "nullable": true
-          }
-        },
-        "additionalProperties": false
-      },
       "SearchResult": {
         "type": "object",
         "properties": {
           "id": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "score": {
             "type": "number",
@@ -8127,8 +7315,7 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/Field"
-            },
-            "nullable": true
+            }
           }
         },
         "additionalProperties": false
@@ -8137,8 +7324,7 @@
         "type": "object",
         "properties": {
           "name": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           }
         },
         "additionalProperties": false
@@ -8149,7 +7335,8 @@
           "Level1",
           "Level2"
         ],
-        "type": "string"
+        "type": "integer",
+        "format": "int32"
       },
       "ServerStatus": {
         "type": "object",
@@ -8167,13 +7354,13 @@
           "Error",
           "Info"
         ],
-        "type": "string"
+        "type": "integer",
+        "format": "int32"
       },
       "StructLayoutAttribute": {
         "type": "object",
         "properties": {
           "typeId": {
-            "nullable": true,
             "readOnly": true
           },
           "value": {
@@ -8197,18 +7384,17 @@
           "Basic",
           "Detailed"
         ],
-        "type": "string"
+        "type": "integer",
+        "format": "int32"
       },
       "Template": {
         "type": "object",
         "properties": {
           "name": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "alias": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "content": {
             "type": "string",
@@ -8225,12 +7411,10 @@
         "type": "object",
         "properties": {
           "name": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "alias": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "content": {
             "type": "string",
@@ -8243,12 +7427,10 @@
         "type": "object",
         "properties": {
           "propertyAlias": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "constraintValue": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "operator": {
             "$ref": "#/components/schemas/Operator"
@@ -8289,8 +7471,7 @@
         "type": "object",
         "properties": {
           "propertyAlias": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "direction": {
             "type": "string",
@@ -8309,8 +7490,7 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/TemplateQueryPropertyType"
-            },
-            "nullable": true
+            }
           }
         },
         "additionalProperties": false
@@ -8319,8 +7499,7 @@
         "type": "object",
         "properties": {
           "alias": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "type": {
             "$ref": "#/components/schemas/TemplateQueryPropertyType"
@@ -8334,21 +7513,20 @@
           "DateTime",
           "Integer"
         ],
-        "type": "string"
+        "type": "integer",
+        "format": "int32"
       },
       "TemplateQueryResult": {
         "type": "object",
         "properties": {
           "queryExpression": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "sampleResults": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/TemplateQueryResultItem"
-            },
-            "nullable": true
+            }
           },
           "resultCount": {
             "type": "integer",
@@ -8365,12 +7543,10 @@
         "type": "object",
         "properties": {
           "icon": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "name": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           }
         },
         "additionalProperties": false
@@ -8382,22 +7558,19 @@
             "type": "array",
             "items": {
               "type": "string"
-            },
-            "nullable": true
+            }
           },
           "properties": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/TemplateQueryProperty"
-            },
-            "nullable": true
+            }
           },
           "operators": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/TemplateQueryOperator"
-            },
-            "nullable": true
+            }
           }
         },
         "additionalProperties": false
@@ -8406,8 +7579,7 @@
         "type": "object",
         "properties": {
           "content": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           }
         },
         "additionalProperties": false
@@ -8416,12 +7588,10 @@
         "type": "object",
         "properties": {
           "name": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "alias": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "content": {
             "type": "string",
@@ -8435,7 +7605,6 @@
         "properties": {
           "name": {
             "type": "string",
-            "nullable": true,
             "readOnly": true
           },
           "customAttributes": {
@@ -8443,7 +7612,6 @@
             "items": {
               "$ref": "#/components/schemas/CustomAttributeData"
             },
-            "nullable": true,
             "readOnly": true
           },
           "isCollectible": {
@@ -8560,7 +7728,6 @@
             "items": {
               "$ref": "#/components/schemas/Type"
             },
-            "nullable": true,
             "readOnly": true
           },
           "genericParameterPosition": {
@@ -8757,14 +7924,14 @@
           "BeforeFieldInit",
           "CustomFormatMask"
         ],
-        "type": "string"
+        "type": "integer",
+        "format": "int32"
       },
       "TypeInfo": {
         "type": "object",
         "properties": {
           "name": {
             "type": "string",
-            "nullable": true,
             "readOnly": true
           },
           "customAttributes": {
@@ -8772,7 +7939,6 @@
             "items": {
               "$ref": "#/components/schemas/CustomAttributeData"
             },
-            "nullable": true,
             "readOnly": true
           },
           "isCollectible": {
@@ -8889,7 +8055,6 @@
             "items": {
               "$ref": "#/components/schemas/Type"
             },
-            "nullable": true,
             "readOnly": true
           },
           "genericParameterPosition": {
@@ -9053,7 +8218,6 @@
             "items": {
               "$ref": "#/components/schemas/Type"
             },
-            "nullable": true,
             "readOnly": true
           },
           "declaredConstructors": {
@@ -9061,7 +8225,6 @@
             "items": {
               "$ref": "#/components/schemas/ConstructorInfo"
             },
-            "nullable": true,
             "readOnly": true
           },
           "declaredEvents": {
@@ -9069,7 +8232,6 @@
             "items": {
               "$ref": "#/components/schemas/EventInfo"
             },
-            "nullable": true,
             "readOnly": true
           },
           "declaredFields": {
@@ -9077,7 +8239,6 @@
             "items": {
               "$ref": "#/components/schemas/FieldInfo"
             },
-            "nullable": true,
             "readOnly": true
           },
           "declaredMembers": {
@@ -9085,7 +8246,6 @@
             "items": {
               "$ref": "#/components/schemas/MemberInfo"
             },
-            "nullable": true,
             "readOnly": true
           },
           "declaredMethods": {
@@ -9093,7 +8253,6 @@
             "items": {
               "$ref": "#/components/schemas/MethodInfo"
             },
-            "nullable": true,
             "readOnly": true
           },
           "declaredNestedTypes": {
@@ -9101,7 +8260,6 @@
             "items": {
               "$ref": "#/components/schemas/TypeInfo"
             },
-            "nullable": true,
             "readOnly": true
           },
           "declaredProperties": {
@@ -9109,7 +8267,6 @@
             "items": {
               "$ref": "#/components/schemas/PropertyInfo"
             },
-            "nullable": true,
             "readOnly": true
           },
           "implementedInterfaces": {
@@ -9117,7 +8274,6 @@
             "items": {
               "$ref": "#/components/schemas/Type"
             },
-            "nullable": true,
             "readOnly": true
           }
         },
@@ -9127,24 +8283,19 @@
         "type": "object",
         "properties": {
           "currentState": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "newState": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "newVersion": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "oldVersion": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "reportUrl": {
             "type": "string",
-            "nullable": true,
             "readOnly": true
           }
         },
@@ -9194,8 +8345,7 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/ConsentLevel"
-            },
-            "nullable": true
+            }
           }
         },
         "additionalProperties": false
@@ -9204,8 +8354,7 @@
         "type": "object",
         "properties": {
           "version": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           }
         },
         "additionalProperties": false
@@ -9219,7 +8368,7 @@
           "authorizationCode": {
             "authorizationUrl": "/umbraco/management/api/v1.0/security/back-office/authorize",
             "tokenUrl": "/umbraco/management/api/v1.0/security/back-office/token",
-            "scopes": {}
+            "scopes": { }
           }
         }
       }
@@ -9227,7 +8376,7 @@
   },
   "security": [
     {
-      "OAuth": []
+      "OAuth": [ ]
     }
   ]
 }

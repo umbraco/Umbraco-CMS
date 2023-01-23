@@ -423,7 +423,7 @@ public class ContentServiceTagsTests : UmbracoIntegrationTest
         propertyType.Variations = ContentVariation.Nothing;
         ContentTypeService.Save(contentType);
 
-        // FIXME: This throws due to index violations
+        // TODO: This throws due to index violations
         propertyType.Variations = ContentVariation.Culture;
         ContentTypeService.Save(contentType);
 
@@ -555,7 +555,7 @@ public class ContentServiceTagsTests : UmbracoIntegrationTest
         tags = TagService.GetTagsForEntity(content1.Id);
         Assert.AreEqual(5, tags.Count());
 
-        // FIXME: tag & tree issue
+        // TODO: tag & tree issue
         // when we publish, we 'just' publish the top one and not the ones below = fails
         // what we should do is... NOT clear tags when unpublishing or trashing or...
         // and just update the tag service to NOT return anything related to trashed or
@@ -620,7 +620,7 @@ public class ContentServiceTagsTests : UmbracoIntegrationTest
         var tags = TagService.GetTagsForEntity(content1.Id);
         Assert.AreEqual(0, tags.Count());
 
-        // FIXME: tag & tree issue
+        // TODO: tag & tree issue
         // when we (un)publish, we 'just' publish the top one and not the ones below = fails
         // see similar note above
         tags = TagService.GetTagsForEntity(content2.Id);

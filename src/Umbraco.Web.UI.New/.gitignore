@@ -1,0 +1,12 @@
+umbraco/[Dd]ata/
+umbraco/[Ll]ogs/
+umbraco/[Mm]odels/
+Views/
+!Views/Partials/blocklist/
+!Views/Partials/grid/
+!Views/_ViewImports.cshtml
+appsettings.json
+appsettings.Development.json
+appsettings.Local.json
+appsettings-schema.json
+appsettings-schema.*.json
