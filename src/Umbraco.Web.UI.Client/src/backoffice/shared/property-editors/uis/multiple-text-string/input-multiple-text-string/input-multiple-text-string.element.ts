@@ -132,11 +132,11 @@ export class UmbInputMultipleTextStringElement extends FormControlMixin(UmbLitEl
 
 	async #focusNewItem() {
 		await this.updateComplete;
-		const inputs = this.shadowRoot?.querySelectorAll(
+		const items = this.shadowRoot?.querySelectorAll(
 			'umb-input-multiple-text-string-item'
 		) as NodeListOf<UmbInputMultipleTextStringItemElement>;
-		const lastInput = inputs[inputs.length - 1];
-		lastInput.focus();
+		const newItem = items[items.length - 1];
+		newItem.focus();
 	}
 
 	#deleteItem(event: UmbDeleteEvent, itemIndex: number) {
