@@ -48,7 +48,7 @@ export class UmbInputMultipleTextStringItemElement extends FormControlMixin(UmbL
 	readonly = false;
 
 	/**
-	 * Makes the input required
+	 * Makes the input mandatory
 	 * @type {boolean}
 	 * @attr
 	 * @default false
@@ -71,7 +71,7 @@ export class UmbInputMultipleTextStringItemElement extends FormControlMixin(UmbL
 
 	#onDelete() {
 		const modalHandler = this._modalService?.confirm({
-			headline: `Delete ${this._value || 'item'}`,
+			headline: `Delete ${this.value || 'item'}`,
 			content: 'Are you sure you want to delete this item?',
 			color: 'danger',
 			confirmLabel: 'Delete',
@@ -85,14 +85,14 @@ export class UmbInputMultipleTextStringItemElement extends FormControlMixin(UmbL
 	#onInput(event: UUIInputEvent) {
 		event.stopPropagation();
 		const target = event.currentTarget as UUIInputElement;
-		this._value = target.value as string;
+		this.value = target.value as string;
 		this.dispatchEvent(new UmbInputEvent());
 	}
 
 	#onChange(event: UUIInputEvent) {
 		event.stopPropagation();
 		const target = event.currentTarget as UUIInputElement;
-		this._value = target.value as string;
+		this.value = target.value as string;
 		this.dispatchEvent(new UmbChangeEvent());
 	}
 
@@ -110,16 +110,17 @@ export class UmbInputMultipleTextStringItemElement extends FormControlMixin(UmbL
 			${this.disabled || this.readonly ? nothing : html`<uui-icon name="umb:navigation"></uui-icon>`}
 			<uui-input
 				id="input"
-				value="${this._value}"
+				value="${this.value}"
 				@input="${this.#onInput}"
 				@change="${this.#onChange}"
 				?disabled=${this.disabled}
-				?readonly=${this.readonly}></uui-input>
+				?readonly=${this.readonly}
+				?required="${this.required}"></uui-input>
 
 			${this.readonly
 				? nothing
 				: html`<uui-button
-						label="Delete ${this._value}"
+						label="Delete ${this.value}"
 						look="primary"
 						color="danger"
 						@click="${this.#onDelete}"

@@ -47,6 +47,15 @@ export class UmbPropertyEditorUIMultipleTextStringElement extends UmbLitElement 
 	@property({ type: Boolean, reflect: true })
 	readonly = false;
 
+	/**
+	 * Makes the Multiple Text String Property Editor UI mandatory
+	 * @type {boolean}
+	 * @attr
+	 * @default false
+	 */
+	@property({ type: Boolean, reflect: true })
+	required = false;
+
 	@state()
 	private _limitMin?: number;
 
@@ -67,7 +76,8 @@ export class UmbPropertyEditorUIMultipleTextStringElement extends UmbLitElement 
 			max="${ifDefined(this._limitMax)}"
 			@change=${this.#onChange}
 			?disabled=${this.disabled}
-			?readonly=${this.readonly}></umb-input-multiple-text-string>`;
+			?readonly=${this.readonly}
+			?required=${this.required}></umb-input-multiple-text-string>`;
 	}
 }
 

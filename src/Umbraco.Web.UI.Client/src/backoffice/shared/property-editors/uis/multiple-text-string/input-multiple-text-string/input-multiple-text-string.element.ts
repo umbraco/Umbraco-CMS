@@ -84,6 +84,15 @@ export class UmbInputMultipleTextStringElement extends FormControlMixin(UmbLitEl
 	@property({ type: Boolean, reflect: true })
 	readonly = false;
 
+	/**
+	 * Makes the input mandatory
+	 * @type {boolean}
+	 * @attr
+	 * @default false
+	 */
+	@property({ type: Boolean, reflect: true })
+	required = false;
+
 	constructor() {
 		super();
 
@@ -150,8 +159,29 @@ export class UmbInputMultipleTextStringElement extends FormControlMixin(UmbLitEl
 	}
 
 	render() {
+		return html` ${this.#renderItems()} ${this.#renderAddButton()} `;
+	}
+
+	#renderItems() {
 		return html`
-			${this._renderItems()}
+			${repeat(
+				this._items,
+				(item, index) => index,
+				(item, index) =>
+					html` <umb-input-multiple-text-string-item
+						value=${item.value}
+						@input=${(event: UmbInputEvent) => this.#onInput(event, index)}
+						@delete="${(event: UmbDeleteEvent) => this.#deleteItem(event, index)}"
+						?disabled=${this.disabled}
+						?readonly=${this.readonly}
+						required
+						required-message="Item ${index + 1} is missing a value"></umb-input-multiple-text-string-item>`
+			)}
+		`;
+	}
+
+	#renderAddButton() {
+		return html`
 			${this.disabled || this.readonly
 				? nothing
 				: html`<uui-button
@@ -161,22 +191,6 @@ export class UmbInputMultipleTextStringElement extends FormControlMixin(UmbLitEl
 						color="default"
 						@click="${this.#onAdd}"
 						?disabled=${this.disabled}></uui-button>`}
-		`;
-	}
-
-	private _renderItems() {
-		return html`
-			${repeat(
-				this._items,
-				(item, index) => index,
-				(item, index) =>
-					html`<umb-input-multiple-text-string-item
-						value=${item.value}
-						@input=${(event: UmbInputEvent) => this.#onInput(event, index)}
-						@delete="${(event: UmbDeleteEvent) => this.#deleteItem(event, index)}"
-						?disabled=${this.disabled}
-						?readonly=${this.readonly}></umb-input-multiple-text-string-item>`
-			)}
 		`;
 	}
 }
