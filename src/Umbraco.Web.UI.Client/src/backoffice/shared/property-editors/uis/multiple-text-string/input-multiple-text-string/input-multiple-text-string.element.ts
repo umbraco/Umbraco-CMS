@@ -3,10 +3,14 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, property, state } from 'lit/decorators.js';
 import { repeat } from 'lit/directives/repeat.js';
 import { FormControlMixin } from '@umbraco-ui/uui-base/lib/mixins';
-import { UUIInputElement, UUIInputEvent } from '@umbraco-ui/uui-input';
+import UmbInputMultipleTextStringItemElement from '../input-multiple-text-string-item/input-multiple-text-string-item.element';
 import { UmbLitElement } from '@umbraco-cms/element';
 import { UmbModalService, UMB_MODAL_SERVICE_CONTEXT_TOKEN } from 'src/core/modal';
 import { UmbChangeEvent } from 'src/core/events/change.event';
+import { UmbDeleteEvent } from 'src/core/events/delete.event';
+
+import '../input-multiple-text-string-item/input-multiple-text-string-item.element';
+import { UmbInputEvent } from 'src/core/events/input.event';
 
 export type MultipleTextStringValue = Array<MultipleTextStringValueItem>;
 
@@ -22,17 +26,6 @@ export class UmbInputMultipleTextStringElement extends FormControlMixin(UmbLitEl
 	static styles = [
 		UUITextStyles,
 		css`
-			.item {
-				display: flex;
-				align-items: center;
-				margin-bottom: var(--uui-size-space-3);
-				gap: var(--uui-size-space-3);
-			}
-
-			.item #text-field {
-				flex: 1;
-			}
-
 			#action {
 				display: block;
 			}
@@ -93,8 +86,6 @@ export class UmbInputMultipleTextStringElement extends FormControlMixin(UmbLitEl
 	@property({ type: Boolean, reflect: true })
 	readonly = false;
 
-	private _modalService?: UmbModalService;
-
 	constructor() {
 		super();
 
@@ -108,10 +99,6 @@ export class UmbInputMultipleTextStringElement extends FormControlMixin(UmbLitEl
 			() => this.maxMessage,
 			() => !!this.max && this._items.length > this.max
 		);
-
-		this.consumeContext(UMB_MODAL_SERVICE_CONTEXT_TOKEN, (modalService) => {
-			this._modalService = modalService;
-		});
 	}
 
 	@state()
@@ -137,23 +124,9 @@ export class UmbInputMultipleTextStringElement extends FormControlMixin(UmbLitEl
 		this.#focusNewItem();
 	}
 
-	#onDelete(index: number) {
-		const item = this._items[index];
-
-		const modalHandler = this._modalService?.confirm({
-			headline: `Delete ${item.value || 'item'}`,
-			content: 'Are you sure you want to delete this item?',
-			color: 'danger',
-			confirmLabel: 'Delete',
-		});
-
-		modalHandler?.onClose().then(({ confirmed }: any) => {
-			if (confirmed) this.#deleteItem(index);
-		});
-	}
-
-	#onInput(event: UUIInputEvent, currentIndex: number) {
-		const target = event.currentTarget as UUIInputElement;
+	#onInput(event: UmbInputEvent, currentIndex: number) {
+		event.stopPropagation();
+		const target = event.currentTarget as UmbInputMultipleTextStringItemElement;
 		const value = target.value as string;
 		this._items = this._items.map((item, index) => (index === currentIndex ? { value } : item));
 		this.dispatchEvent(new UmbChangeEvent());
@@ -161,12 +134,15 @@ export class UmbInputMultipleTextStringElement extends FormControlMixin(UmbLitEl
 
 	async #focusNewItem() {
 		await this.updateComplete;
-		const inputs = this.shadowRoot?.querySelectorAll('uui-input') as NodeListOf<UUIInputElement>;
+		const inputs = this.shadowRoot?.querySelectorAll(
+			'umb-input-multiple-text-string-item'
+		) as NodeListOf<UmbInputMultipleTextStringItemElement>;
 		const lastInput = inputs[inputs.length - 1];
 		lastInput.focus();
 	}
 
-	#deleteItem(itemIndex: number) {
+	#deleteItem(event: UmbDeleteEvent, itemIndex: number) {
+		event.stopPropagation();
 		this._items = this._items.filter((item, index) => index !== itemIndex);
 		this.dispatchEvent(new UmbChangeEvent());
 	}
@@ -195,33 +171,15 @@ export class UmbInputMultipleTextStringElement extends FormControlMixin(UmbLitEl
 			${repeat(
 				this._items,
 				(item, index) => index,
-				(item, index) => html`${this._renderItem(item, index)}`
+				(item, index) =>
+					html`<umb-input-multiple-text-string-item
+						value=${item.value}
+						@input=${(event: UmbInputEvent) => this.#onInput(event, index)}
+						@delete="${(event: UmbDeleteEvent) => this.#deleteItem(event, index)}"
+						?disabled=${this.disabled}
+						?readonly=${this.readonly}></umb-input-multiple-text-string-item>`
 			)}
 		`;
-	}
-
-	private _renderItem(item: MultipleTextStringValueItem, index: number) {
-		return html`<div class="item">
-			${this.disabled || this.readonly ? nothing : html`<uui-icon name="umb:navigation"></uui-icon>`}
-			<uui-input
-				id="text-field"
-				value="${item.value}"
-				@input="${(event: UUIInputEvent) => this.#onInput(event, index)}"
-				?disabled=${this.disabled}
-				?readonly=${this.readonly}></uui-input>
-
-			${this.readonly
-				? nothing
-				: html`<uui-button
-						label="Delete ${item.value}"
-						look="primary"
-						color="danger"
-						@click="${() => this.#onDelete(index)}"
-						?disabled=${this.disabled}
-						compact>
-						<uui-icon name="umb:trash"></uui-icon>
-				  </uui-button>`}
-		</div>`;
 	}
 }
 
