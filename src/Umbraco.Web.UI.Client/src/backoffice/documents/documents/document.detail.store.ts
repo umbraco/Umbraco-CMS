@@ -12,7 +12,7 @@ export const UMB_DOCUMENT_DETAIL_STORE_CONTEXT_TOKEN = new UmbContextToken<UmbDo
 /**
  * @export
  * @class UmbDocumentStore
- * @extends {UmbStoreBase<DocumentDetails>}
+ * @extends {UmbStoreBase}
  * @description - Data Store for Documents
  */
 export class UmbDocumentDetailStore extends UmbStoreBase implements UmbContentStore<DocumentDetails> {

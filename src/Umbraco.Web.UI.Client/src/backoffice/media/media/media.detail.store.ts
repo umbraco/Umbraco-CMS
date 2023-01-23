@@ -12,7 +12,7 @@ export const UMB_MEDIA_DETAIL_STORE_CONTEXT_TOKEN = new UmbContextToken<UmbMedia
 /**
  * @export
  * @class UmbMediaStore
- * @extends {UmbStoreBase<DocumentDetails>}
+ * @extends {UmbStoreBase}
  * @description - Data Store for Media
  */
 export class UmbMediaDetailStore extends UmbStoreBase implements UmbContentStore<MediaDetails> {

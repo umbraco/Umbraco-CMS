@@ -1,4 +1,3 @@
-import type { Observable } from 'rxjs';
 import { DocumentResource, DocumentTreeItem } from '@umbraco-cms/backend-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/resources';
 import { UmbContextToken } from '@umbraco-cms/context-api';
@@ -13,7 +12,7 @@ export const UMB_DOCUMENT_TREE_STORE_CONTEXT_TOKEN = new UmbContextToken<UmbDocu
 /**
  * @export
  * @class UmbDocumentStore
- * @extends {UmbStoreBase<DocumentTree>}
+ * @extends {UmbStoreBase}
  * @description - Data Store for Documents
  */
 export class UmbDocumentTreeStore extends UmbStoreBase {

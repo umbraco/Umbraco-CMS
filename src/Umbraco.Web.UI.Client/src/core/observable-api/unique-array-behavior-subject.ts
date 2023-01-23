@@ -28,16 +28,19 @@ export class UniqueArrayBehaviorSubject<T> extends UniqueBehaviorSubject<T[]> {
 	 * 	{ key: 2, value: 'bar'}
 	 * ];
 	 * const mySubject = new UniqueArrayBehaviorSubject(data, (x) => x.key);
-	 * mySubject.remove(1);
+	 * mySubject.remove([1]);
 	 */
-	remove(unique: unknown) {
+	remove(uniques: unknown[]) {
 		const unFrozenDataSet = [...this.getValue()];
 		if (this._getUnique) {
-			unFrozenDataSet.filter(x => {
-				// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-				// @ts-ignore
-				return this._getUnique(x) !== unique;
-			});
+			uniques.forEach( unique =>
+				unFrozenDataSet.filter(x => {
+					// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+					// @ts-ignore
+					return this._getUnique(x) !== unique;
+				})
+			);
+
 			this.next(unFrozenDataSet);
 		}
 	}
