@@ -1,10 +1,9 @@
-import { UmbLitElement } from '@umbraco-cms/element';
-import { LanguageDetails } from '@umbraco-cms/models';
 import { UUITextStyles } from '@umbraco-ui/uui-css';
-import { css, html, LitElement, nothing } from 'lit';
+import { css, html, nothing } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
-import { UmbLanguageStore } from '../../language.store';
-import { UmbWorkspaceLanguageContext } from '../language/language-workspace.context';
+import { UmbLanguageStore, UMB_LANGUAGE_STORE_CONTEXT_TOKEN } from '../../language.store';
+import type { LanguageDetails } from '@umbraco-cms/models';
+import { UmbLitElement } from '@umbraco-cms/element';
 
 @customElement('umb-language-root-table-delete-column-layout')
 export class UmbLanguageRootTableDeleteColumnLayoutElement extends UmbLitElement {
@@ -17,7 +16,7 @@ export class UmbLanguageRootTableDeleteColumnLayoutElement extends UmbLitElement
 
 	constructor() {
 		super();
-		this.consumeContext('umbLanguageStore', (instance) => {
+		this.consumeContext(UMB_LANGUAGE_STORE_CONTEXT_TOKEN, (instance) => {
 			this._languageStore = instance;
 		});
 	}

@@ -29,6 +29,7 @@ import {
 
 import { UmbSectionStore, UMB_SECTION_STORE_CONTEXT_TOKEN } from './shared/components/section/section.store';
 import { UmbDataTypeStore, UMB_DATA_TYPE_STORE_CONTEXT_TOKEN } from './settings/data-types/data-type.store';
+import { UmbLanguageStore, UMB_LANGUAGE_STORE_CONTEXT_TOKEN } from './settings/languages/language.store';
 import { UmbLitElement } from '@umbraco-cms/element';
 
 // Domains
@@ -41,7 +42,6 @@ import './users';
 import './packages';
 import './search';
 import './shared';
-import { UmbLanguageStore } from './settings/languages/language.store';
 
 @defineElement('umb-backoffice')
 export class UmbBackofficeElement extends UmbLitElement {
@@ -81,7 +81,7 @@ export class UmbBackofficeElement extends UmbLitElement {
 		this.provideContext(UMB_CURRENT_USER_HISTORY_STORE_CONTEXT_TOKEN, new UmbCurrentUserHistoryStore());
 		this.provideContext(UMB_DICTIONARY_STORE_CONTEXT_TOKEN, new UmbDictionaryStore(this));
 		this.provideContext(UMB_DOCUMENT_BLUEPRINT_STORE_CONTEXT_TOKEN, new UmbDocumentBlueprintStore(this));
-		this.provideContext('umbLanguageStore', new UmbLanguageStore(this));
+		this.provideContext(UMB_LANGUAGE_STORE_CONTEXT_TOKEN, new UmbLanguageStore(this));
 	}
 
 	render() {

@@ -1,6 +1,6 @@
+import { UmbLanguageStore, UmbLanguageStoreItemType } from '../../language.store';
 import type { LanguageDetails } from '@umbraco-cms/models';
 import { UmbControllerHostInterface } from 'src/core/controller/controller-host.mixin';
-import { UmbLanguageStore, UmbLanguageStoreItemType } from '../../language.store';
 import { UniqueBehaviorSubject } from 'src/core/observable-api/unique-behavior-subject';
 import { UmbContextConsumerController } from 'src/core/context-api/consume/context-consumer.controller';
 import { UmbObserverController } from '@umbraco-cms/observable-api';
@@ -50,7 +50,7 @@ export class UmbWorkspaceLanguageContext {
 		this._storeObserver?.destroy();
 		this._storeObserver = new UmbObserverController(this.host, this._store.getByKey(this._entityKey), (content) => {
 			if (!content) return; // TODO: Handle nicely if there is no content data.
-			this.update(content as any);
+			this.update(content);
 		});
 	}
 

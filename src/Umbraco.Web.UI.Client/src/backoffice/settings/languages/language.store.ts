@@ -1,8 +1,9 @@
 import { map, Observable } from 'rxjs';
 import { UmbDataStoreBase } from '../../../core/stores/store';
-import type { DataTypeDetails, LanguageDetails } from '@umbraco-cms/models';
-import { DataTypeResource, FolderTreeItem, Language, LanguageResource } from '@umbraco-cms/backend-api';
+import type { LanguageDetails } from '@umbraco-cms/models';
+import { LanguageResource } from '@umbraco-cms/backend-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/resources';
+import { UmbContextToken } from '@umbraco-cms/context-api';
 
 export type UmbLanguageStoreItemType = LanguageDetails;
 
@@ -46,23 +47,22 @@ export class UmbLanguageStore extends UmbDataStoreBase<UmbLanguageStoreItemType>
 	}
 
 	async save(language: LanguageDetails): Promise<void> {
-		console.log('Save', language);
-
 		if (language.id && language.key) {
-			console.log('PUT', language);
-
-			LanguageResource.putLanguageById({ id: language.id, requestBody: language }).then((data) => {
-				if (data) {
-					this.updateItems([data]);
+			tryExecuteAndNotify(this.host, LanguageResource.putLanguageById({ id: language.id, requestBody: language })).then(
+				(data) => {
+					if (data) {
+						this.updateItems([data.data]);
+					}
 				}
-			});
+			);
 		} else {
-			console.log('POST', language);
-			LanguageResource.postLanguage({ requestBody: language }).then((data) => {
+			tryExecuteAndNotify(this.host, LanguageResource.postLanguage({ requestBody: language })).then((data) => {
 				if (data) {
-					this.updateItems([data]);
+					this.updateItems([data.data]);
 				}
 			});
 		}
 	}
 }
+
+export const UMB_LANGUAGE_STORE_CONTEXT_TOKEN = new UmbContextToken<UmbLanguageStore>(STORE_ALIAS);

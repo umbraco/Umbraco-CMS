@@ -1,10 +1,10 @@
-import { UmbLitElement } from '@umbraco-cms/element';
-import { LanguageDetails } from '@umbraco-cms/models';
 import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
+import { UmbLanguageStore, UMB_LANGUAGE_STORE_CONTEXT_TOKEN } from '../../language.store';
+import type { LanguageDetails } from '@umbraco-cms/models';
 import { UmbTableColumn, UmbTableConfig, UmbTableItem } from 'src/backoffice/shared/components/table';
-import { UmbLanguageStore } from '../../language.store';
+import { UmbLitElement } from '@umbraco-cms/element';
 
 import '../language/language-workspace.element';
 import './language-root-table-delete-column-layout.element';
@@ -31,9 +31,6 @@ export class UmbLanguageRootWorkspaceElement extends UmbLitElement {
 			}
 		`,
 	];
-
-	@state()
-	private _languages: Array<LanguageDetails> = [];
 
 	@state()
 	private _tableConfig: UmbTableConfig = {
@@ -78,7 +75,7 @@ export class UmbLanguageRootWorkspaceElement extends UmbLitElement {
 	constructor() {
 		super();
 
-		this.consumeContext('umbLanguageStore', (instance) => {
+		this.consumeContext(UMB_LANGUAGE_STORE_CONTEXT_TOKEN, (instance) => {
 			this._languageStore = instance;
 			this._observeLanguages();
 		});
@@ -86,7 +83,6 @@ export class UmbLanguageRootWorkspaceElement extends UmbLitElement {
 
 	private _observeLanguages() {
 		this._languageStore?.getAll().subscribe((languages) => {
-			this._languages = languages;
 			this._createTableItems(languages);
 		});
 	}

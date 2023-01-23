@@ -1,13 +1,11 @@
-import { UmbLitElement } from '@umbraco-cms/element';
-import { LanguageDetails } from '@umbraco-cms/models';
 import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, html, nothing } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
-import { UmbWorkspaceLanguageContext } from './language-workspace.context';
-import 'src/backoffice/shared/components/workspace/actions/save/workspace-action-node-save.element.ts';
 import { UUIInputElement, UUIInputEvent } from '@umbraco-ui/uui';
-
+import { UmbWorkspaceLanguageContext } from './language-workspace.context';
 import { UmbLitElement } from '@umbraco-cms/element';
+import type { LanguageDetails } from '@umbraco-cms/models';
+import 'src/backoffice/shared/components/workspace/actions/save/workspace-action-node-save.element.ts';
 
 @customElement('umb-language-workspace')
 export class UmbLanguageWorkspaceElement extends UmbLitElement {

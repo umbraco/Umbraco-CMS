@@ -1,13 +1,13 @@
-import { UmbLitElement } from '@umbraco-cms/element';
-import { LanguageDetails } from '@umbraco-cms/models';
 import { UUIBooleanInputEvent, UUIComboboxElement, UUIComboboxEvent, UUIToggleElement } from '@umbraco-ui/uui';
 import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, html, nothing } from 'lit';
 import { repeat } from 'lit/directives/repeat.js';
 import { customElement, property, state } from 'lit/decorators.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
-import { UmbLanguageStore } from 'src/backoffice/settings/languages/language.store';
 import { UmbWorkspaceLanguageContext } from '../../language-workspace.context';
+import type { LanguageDetails } from '@umbraco-cms/models';
+import { UmbLanguageStore } from 'src/backoffice/settings/languages/language.store';
+import { UmbLitElement } from '@umbraco-cms/element';
 
 @customElement('umb-workspace-view-language-edit')
 export class UmbWorkspaceViewLanguageEditElement extends UmbLitElement {
@@ -46,7 +46,7 @@ export class UmbWorkspaceViewLanguageEditElement extends UmbLitElement {
 	constructor() {
 		super();
 
-		this.consumeContext('umbWorkspaceContext', (instance) => {
+		this.consumeContext<UmbWorkspaceLanguageContext>('umbWorkspaceContext', (instance) => {
 			this._languageWorkspaceContext = instance;
 
 			if (!this._languageWorkspaceContext) return;
@@ -65,7 +65,7 @@ export class UmbWorkspaceViewLanguageEditElement extends UmbLitElement {
 		});
 	}
 
-	private _handleLanguageChange(event: any) {
+	private _handleLanguageChange(event: Event) {
 		if (event instanceof UUIComboboxEvent) {
 			const target = event.composedPath()[0] as UUIComboboxElement;
 			this._languageWorkspaceContext?.update({ isoCode: target.value.toString() });
@@ -80,12 +80,12 @@ export class UmbWorkspaceViewLanguageEditElement extends UmbLitElement {
 		}
 	}
 
-	private _handleSearchChange(event: any) {
+	private _handleSearchChange(event: Event) {
 		const target = event.composedPath()[0] as UUIComboboxElement;
 		this._search = target.search;
 	}
 
-	private _handleDefaultChange(event: any) {
+	private _handleDefaultChange(event: UUIBooleanInputEvent) {
 		if (event instanceof UUIBooleanInputEvent) {
 			const target = event.composedPath()[0] as UUIToggleElement;
 
@@ -93,7 +93,7 @@ export class UmbWorkspaceViewLanguageEditElement extends UmbLitElement {
 		}
 	}
 
-	private _handleMandatoryChange(event: any) {
+	private _handleMandatoryChange(event: UUIBooleanInputEvent) {
 		if (event instanceof UUIBooleanInputEvent) {
 			const target = event.composedPath()[0] as UUIToggleElement;
 
@@ -101,7 +101,7 @@ export class UmbWorkspaceViewLanguageEditElement extends UmbLitElement {
 		}
 	}
 
-	private _handleFallbackChange(event: any) {
+	private _handleFallbackChange(event: UUIComboboxEvent) {
 		if (event instanceof UUIComboboxEvent) {
 			const target = event.composedPath()[0] as UUIComboboxElement;
 			this._languageWorkspaceContext?.update({ fallbackLanguageId: Number.parseInt(target.value.toString()) });
