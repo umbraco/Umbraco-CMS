@@ -13,7 +13,7 @@ export const UMB_MEMBER_TYPE_TREE_STORE_CONTEXT_TOKEN = new UmbContextToken<UmbM
  * @export
  * @class UmbMemberTypeTreeStore
  * @extends {UmbStoreBase}
- * @description - Tree Data Store for Data Types
+ * @description - Tree Data Store for Member Types
  */
 export class UmbMemberTypeTreeStore extends UmbStoreBase {
 

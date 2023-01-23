@@ -4,7 +4,7 @@ import { css, html } from 'lit';
 
 import { UmbModalService, UMB_MODAL_SERVICE_CONTEXT_TOKEN } from '../core/modal';
 import { UmbNotificationService, UMB_NOTIFICATION_SERVICE_CONTEXT_TOKEN } from '../core/notification';
-import { UmbUserStore, UMB_USER_STORE_CONTEXT_TOKEN } from './users/users/user.store';
+import { UmbUserStore } from './users/users/user.store';
 import { UmbUserGroupStore, UMB_USER_GROUP_STORE_CONTEXT_TOKEN } from './users/user-groups/user-group.store';
 import { UmbCurrentUserStore, UMB_CURRENT_USER_STORE_CONTEXT_TOKEN } from './users/current-user/current-user.store';
 import {
@@ -16,11 +16,12 @@ import {UmbDocumentTypeDetailStore} from './documents/document-types/document-ty
 import {UmbDocumentTypeTreeStore} from './documents/document-types/document-type.tree.store';
 import { UmbMediaTypeDetailStore } from './media/media-types/media-type.detail.store';
 import { UmbMediaTypeTreeStore } from './media/media-types/media-type.tree.store';
-import { UmbMemberTypeStore, UMB_MEMBER_TYPE_STORE_CONTEXT_TOKEN } from './members/member-types/member-type.store';
 import { UmbDocumentDetailStore } from './documents/documents/document.detail.store';
 import { UmbDocumentTreeStore } from './documents/documents/document.tree.store';
 import { UmbMediaDetailStore } from './media/media/media.detail.store';
 import { UmbMediaTreeStore } from './media/media/media.tree.store';
+import { UmbMemberTypeDetailStore } from './members/member-types/member-type.detail.store';
+import { UmbMemberTypeTreeStore } from './members/member-types/member-type.tree.store';
 import { UmbMemberGroupStore, UMB_MEMBER_GROUP_STORE_CONTEXT_TOKEN } from './members/member-groups/member-group.store';
 import { UmbDictionaryStore, UMB_DICTIONARY_STORE_CONTEXT_TOKEN } from './translation/dictionary/dictionary.store';
 import {
@@ -79,10 +80,11 @@ export class UmbBackofficeElement extends UmbLitElement {
 		new UmbUserStore(this);
 		new UmbMediaTypeDetailStore(this);
 		new UmbMediaTypeTreeStore(this);
-		new UmbMediaTypeDetailStore(this);
-		new UmbMediaTypeTreeStore(this);
+		new UmbDocumentTypeDetailStore(this);
+		new UmbDocumentTypeTreeStore(this);
+		new UmbMemberTypeDetailStore(this);
+		new UmbMemberTypeTreeStore(this);
 
-		this.provideContext(UMB_MEMBER_TYPE_STORE_CONTEXT_TOKEN, new UmbMemberTypeStore(this));
 		this.provideContext(UMB_USER_GROUP_STORE_CONTEXT_TOKEN, new UmbUserGroupStore(this));
 		this.provideContext(UMB_MEMBER_GROUP_STORE_CONTEXT_TOKEN, new UmbMemberGroupStore(this));
 		this.provideContext(UMB_SECTION_STORE_CONTEXT_TOKEN, new UmbSectionStore());
