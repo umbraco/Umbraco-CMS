@@ -8,7 +8,7 @@ import {
 } from '@umbraco-cms/backend-api';
 
 // Extension Manifests
-export * from '../extensions-registry/models';
+export * from '../../../libs/extensions-registry/models';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type HTMLElementConstructor<T = HTMLElement> = new (...args: any[]) => T;

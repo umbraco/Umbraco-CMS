@@ -18,7 +18,7 @@ export default {
 						'@umbraco-cms/controller': './libs/controller/index.ts',
 						'@umbraco-cms/element': './src/core/element/index.ts',
 						'@umbraco-cms/extensions-api': './src/core/extensions-api/index.ts',
-						'@umbraco-cms/extensions-registry': './src/core/extensions-registry/index.ts',
+						'@umbraco-cms/extensions-registry': './libs/extensions-registry/index.ts',
 						'@umbraco-cms/observable-api': './libs/observable-api/index.ts',
 						'@umbraco-cms/utils': './src/core/utils/index.ts',
 						'@umbraco-cms/test-utils': './src/core/test-utils/index.ts',
