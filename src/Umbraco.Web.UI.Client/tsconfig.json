@@ -25,7 +25,7 @@
 			"@umbraco-cms/context-api": ["libs/context-api"],
 			"@umbraco-cms/controller": ["libs/controller"],
 			"@umbraco-cms/element": ["src/core/element"],
-			"@umbraco-cms/extensions-api": ["src/core/extensions-api"],
+			"@umbraco-cms/extensions-api": ["libs/extensions-api"],
 			"@umbraco-cms/extensions-registry": ["libs/extensions-registry"],
 			"@umbraco-cms/observable-api": ["libs/observable-api"],
 			"@umbraco-cms/utils": ["src/core/utils"],
