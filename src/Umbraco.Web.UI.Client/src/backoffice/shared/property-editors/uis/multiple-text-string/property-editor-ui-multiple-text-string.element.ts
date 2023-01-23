@@ -31,6 +31,15 @@ export class UmbPropertyEditorUIMultipleTextStringElement extends UmbLitElement 
 		this._limitMax = config.find((x) => x.alias === 'maxNumber')?.value;
 	}
 
+	/**
+	 * Disables the input
+	 * @type {boolean}
+	 * @attr
+	 * @default false
+	 */
+	@property({ type: Boolean, reflect: true })
+	disabled = false;
+
 	@state()
 	private _limitMin?: number;
 
@@ -49,7 +58,8 @@ export class UmbPropertyEditorUIMultipleTextStringElement extends UmbLitElement 
 			.items="${this.value}"
 			min="${ifDefined(this._limitMin)}"
 			max="${ifDefined(this._limitMax)}"
-			@change=${this.#onChange}></umb-input-multiple-text-string>`;
+			@change=${this.#onChange}
+			?disabled=${this.disabled}></umb-input-multiple-text-string>`;
 	}
 }
 

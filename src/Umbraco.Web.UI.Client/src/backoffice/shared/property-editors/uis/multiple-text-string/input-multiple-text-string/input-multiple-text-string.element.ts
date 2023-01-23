@@ -1,4 +1,4 @@
-import { css, html } from 'lit';
+import { css, html, nothing } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, property, state } from 'lit/decorators.js';
 import { repeat } from 'lit/directives/repeat.js';
@@ -74,6 +74,15 @@ export class UmbInputMultipleTextStringElement extends FormControlMixin(UmbLitEl
 	 */
 	@property({ type: String, attribute: 'min-message' })
 	maxMessage = 'This field exceeds the allowed amount of items';
+
+	/**
+	 * Disables the input
+	 * @type {boolean}
+	 * @attr
+	 * @default false
+	 */
+	@property({ type: Boolean, reflect: true })
+	disabled = false;
 
 	private _modalService?: UmbModalService;
 
@@ -160,7 +169,13 @@ export class UmbInputMultipleTextStringElement extends FormControlMixin(UmbLitEl
 	render() {
 		return html`
 			${this._renderItems()}
-			<uui-button id="action" label="Add" look="placeholder" color="default" @click="${this.#onAdd}"></uui-button>
+			<uui-button
+				id="action"
+				label="Add"
+				look="placeholder"
+				color="default"
+				@click="${this.#onAdd}"
+				?disabled=${this.disabled}></uui-button>
 		`;
 	}
 
@@ -176,16 +191,18 @@ export class UmbInputMultipleTextStringElement extends FormControlMixin(UmbLitEl
 
 	private _renderItem(item: MultipleTextStringValueItem, index: number) {
 		return html`<div class="item">
-			<uui-icon name="umb:navigation"></uui-icon>
+			${this.disabled ? nothing : html`<uui-icon name="umb:navigation"></uui-icon>`}
 			<uui-input
 				id="text-field"
 				value="${item.value}"
-				@input="${(event: UUIInputEvent) => this.#onInput(event, index)}"></uui-input>
+				@input="${(event: UUIInputEvent) => this.#onInput(event, index)}"
+				?disabled=${this.disabled}></uui-input>
 			<uui-button
 				label="Delete ${item.value}"
 				look="primary"
 				color="danger"
 				@click="${() => this.#onDelete(index)}"
+				?disabled=${this.disabled}
 				compact>
 				<uui-icon name="umb:trash"></uui-icon>
 			</uui-button>
