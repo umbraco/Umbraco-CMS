@@ -1,4 +1,3 @@
-import type { UserStatus } from '../../auth/utils';
 import {
 	ContentTreeItem,
 	DocumentTreeItem,
@@ -8,7 +7,7 @@ import {
 } from '@umbraco-cms/backend-api';
 
 // Extension Manifests
-export * from '../../../libs/extensions-registry/models';
+export * from '@umbraco-cms/extensions-registry';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type HTMLElementConstructor<T = HTMLElement> = new (...args: any[]) => T;
@@ -35,6 +34,7 @@ export interface UserEntity extends Entity {
 	type: 'user';
 }
 
+export type UserStatus = 'enabled' | 'inactive' | 'invited' | 'disabled';
 export interface UserDetails extends UserEntity {
 	email: string;
 	status: UserStatus;
