@@ -36,7 +36,7 @@ export class UmbLanguageRootTableDeleteColumnLayoutElement extends UmbLitElement
 			content: html`
 				<div
 					style="padding: var(--uui-size-space-4); background-color: var(--uui-color-danger); color: var(--uui-color-danger-contrast); border: 1px solid var(--uui-color-danger-standalone); border-radius: var(--uui-border-radius)">
-					this will delete language <b>${this.value.name}</b>.
+					This will delete language <b>${this.value.name}</b>.
 				</div>
 				Are you sure you want to delete?
 			`,
@@ -44,7 +44,7 @@ export class UmbLanguageRootTableDeleteColumnLayoutElement extends UmbLitElement
 			confirmLabel: 'Delete',
 		});
 
-		modalHandler?.onClose().then(({ confirmed }: any) => {
+		modalHandler?.onClose().then(({ confirmed }) => {
 			if (confirmed) {
 				this._languageStore?.deleteItems([this.value.key]);
 			}
