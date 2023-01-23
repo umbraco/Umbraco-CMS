@@ -3,10 +3,11 @@ import type { UserDetails } from '@umbraco-cms/models';
 import { createObservablePart, UniqueArrayBehaviorSubject } from '@umbraco-cms/observable-api';
 import { UmbContextToken } from '@umbraco-cms/context-api';
 import { UmbStoreBase } from '@umbraco-cms/stores/store-base';
+import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 
 export type UmbUserStoreItemType = UserDetails;
 
-export const STORE_ALIAS = 'UmbUserStore';
+export const UMB_USER_STORE_CONTEXT_TOKEN = new UmbContextToken<UmbUserStore>('UmbUserStore');
 
 /**
  * @export
@@ -14,14 +15,20 @@ export const STORE_ALIAS = 'UmbUserStore';
  * @extends {UmbStoreBase}
  * @description - Data Store for Users
  */
-
 export class UmbUserStore extends UmbStoreBase {
+
 
 	#users = new UniqueArrayBehaviorSubject<UserDetails>([], x => x.key);
 	public users = this.#users.asObservable();
 
 	#totalUsers = new BehaviorSubject(0);
 	public readonly totalUsers = this.#totalUsers.asObservable();
+
+
+	constructor(host: UmbControllerHostInterface) {
+		super(host, UMB_USER_STORE_CONTEXT_TOKEN.toString());
+	}
+
 
 	getAll() {
 		// TODO: use Fetcher API.
@@ -51,7 +58,7 @@ export class UmbUserStore extends UmbStoreBase {
 				this.#users.appendOne(data);
 			});
 
-		return createObservablePart(this.#users, (users: Array<UmbUserStoreItemType>) => users.find((user: UmbUserStoreItemType) => user.key === key) || null);
+		return createObservablePart(this.#users, (users: Array<UmbUserStoreItemType>) => users.find((user: UmbUserStoreItemType) => user.key === key));
 	}
 
 
@@ -281,5 +288,3 @@ export class UmbUserStore extends UmbStoreBase {
 	// 	this.requestUpdate('users');
 	// }
 }
-
-export const UMB_USER_STORE_CONTEXT_TOKEN = new UmbContextToken<UmbUserStore>(STORE_ALIAS);
