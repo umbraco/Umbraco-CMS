@@ -5,9 +5,7 @@ import { repeat } from 'lit/directives/repeat.js';
 import { FormControlMixin } from '@umbraco-ui/uui-base/lib/mixins';
 import UmbInputMultipleTextStringItemElement from '../input-multiple-text-string-item/input-multiple-text-string-item.element';
 import { UmbLitElement } from '@umbraco-cms/element';
-import { UmbModalService, UMB_MODAL_SERVICE_CONTEXT_TOKEN } from 'src/core/modal';
-import { UmbChangeEvent } from 'src/core/events/change.event';
-import { UmbDeleteEvent } from 'src/core/events/delete.event';
+import { UmbChangeEvent, UmbDeleteEvent } from 'src/core/events';
 
 import '../input-multiple-text-string-item/input-multiple-text-string-item.element';
 import { UmbInputEvent } from 'src/core/events/input.event';

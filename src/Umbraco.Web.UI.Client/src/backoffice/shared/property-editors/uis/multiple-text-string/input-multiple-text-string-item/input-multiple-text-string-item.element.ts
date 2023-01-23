@@ -6,10 +6,7 @@ import { UUIInputEvent } from '@umbraco-ui/uui-input';
 import { UUIInputElement } from '@umbraco-ui/uui';
 import { UmbLitElement } from '@umbraco-cms/element';
 import { UmbModalService, UMB_MODAL_SERVICE_CONTEXT_TOKEN } from 'src/core/modal';
-import { UmbChangeEvent } from 'src/core/events/change.event';
-import { UmbDeleteEvent } from 'src/core/events/delete.event';
-import { UmbInputEvent } from 'src/core/events/input.event';
-import { elementUpdated } from '@open-wc/testing';
+import { UmbChangeEvent, UmbInputEvent, UmbDeleteEvent } from 'src/core/events';
 
 /**
  * @element umb-input-multiple-text-string-item
