@@ -31,7 +31,7 @@ export interface UmbContentStore<T> extends UmbDataStore {
 	 * @description - Save data.
 	 * @param {object} data
 	 * @return {*}  {(Promise<void>)}
-	 * @memberof UmbNodeStoreBase
+	 * @memberof UmbContentStore
 	 */
 	save(data: T[]): Promise<void>;
 }
