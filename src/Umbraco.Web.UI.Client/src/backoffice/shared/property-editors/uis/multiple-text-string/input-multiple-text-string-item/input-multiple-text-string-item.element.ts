@@ -19,7 +19,7 @@ export class UmbInputMultipleTextStringItemElement extends FormControlMixin(UmbL
 			:host {
 				display: flex;
 				align-items: center;
-				margin-bottom: var(--uui-size-space-3);
+				padding: var(--uui-size-space-3);
 				gap: var(--uui-size-space-3);
 				border: 1px solid transparent;
 			}
