@@ -1,11 +1,10 @@
-import { map, Observable } from 'rxjs';
+import { Observable } from 'rxjs';
 import type { DocumentDetails } from '@umbraco-cms/models';
-import { DocumentResource, DocumentTreeItem, FolderTreeItem } from '@umbraco-cms/backend-api';
-import { tryExecuteAndNotify } from '@umbraco-cms/resources';
 import { UmbContextToken } from '@umbraco-cms/context-api';
 import { createObservablePart, UniqueArrayBehaviorSubject } from '@umbraco-cms/observable-api';
 import { UmbStoreBase } from '@umbraco-cms/stores/store-base';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
+import { UmbContentStore } from '@umbraco-cms/stores/store';
 
 
 export const UMB_DOCUMENT_DETAIL_STORE_CONTEXT_TOKEN = new UmbContextToken<UmbDocumentDetailStore>('UmbDocumentDetailStore');
@@ -17,7 +16,7 @@ export const UMB_DOCUMENT_DETAIL_STORE_CONTEXT_TOKEN = new UmbContextToken<UmbDo
  * @extends {UmbStoreBase<DocumentDetails>}
  * @description - Data Store for Documents
  */
-export class UmbDocumentDetailStore extends UmbStoreBase {
+export class UmbDocumentDetailStore extends UmbStoreBase implements UmbContentStore<DocumentDetails> {
 
 
 	private _data = new UniqueArrayBehaviorSubject<DocumentDetails>([], (a, b) => a.key === b.key);

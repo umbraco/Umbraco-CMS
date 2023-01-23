@@ -4,7 +4,7 @@ import {
 	UmbDataTypeStoreItemType,
 	UMB_DATA_TYPE_STORE_CONTEXT_TOKEN,
 } from 'src/backoffice/settings/data-types/data-type.store';
-import type { DataTypeDetails } from '@umbraco-cms/models';
+import type { DataTypeDetails, DataTypePropertyData } from '@umbraco-cms/models';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 import { appendToFrozenArray } from '@umbraco-cms/observable-api';
 
@@ -35,7 +35,7 @@ export class UmbWorkspaceDataTypeContext extends UmbWorkspaceContentContext<
 		const newDataSet = appendToFrozenArray(
 			(this._data.getValue() as DataTypeDetails).data,
 			entry,
-			(x) => x.alias === alias
+			(x: DataTypePropertyData) => x.alias
 		);
 
 		this.update({ data: newDataSet });

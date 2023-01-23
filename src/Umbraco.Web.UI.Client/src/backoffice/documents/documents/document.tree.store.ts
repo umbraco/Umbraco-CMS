@@ -19,7 +19,7 @@ export const UMB_DOCUMENT_TREE_STORE_CONTEXT_TOKEN = new UmbContextToken<UmbDocu
 export class UmbDocumentTreeStore extends UmbStoreBase {
 
 
-	private _data = new UniqueArrayBehaviorSubject<DocumentTreeItem>([], (a, b) => a.key === b.key);
+	private _data = new UniqueArrayBehaviorSubject<DocumentTreeItem>([], (x) => x.key);
 
 
 	constructor(host: UmbControllerHostInterface) {
@@ -37,17 +37,17 @@ export class UmbDocumentTreeStore extends UmbStoreBase {
 			},
 		});
 		const data = await res.json();
-		this._data.next(data);
+		this._data.append(data);
 	}
 
 	getTreeRoot(): Observable<Array<DocumentTreeItem>> {
 		tryExecuteAndNotify(this._host, DocumentResource.getTreeDocumentRoot({})).then(({ data }) => {
 			if (data) {
+				// TODO: how do we handle if an item has been removed during this session(like in another tab or by another user)?
 				this._data.append(data.items);
 			}
 		});
 
-		// TODO: how do we handle if an item has been removed during this session(like in another tab or by another user)?
 		// TODO: how do we handle trashed items?
 		// TODO: remove ignore when we know how to handle trashed items.
 		return createObservablePart(this._data, (items) => items.filter((item) => item.parentKey === null && !item.isTrashed));
@@ -61,11 +61,11 @@ export class UmbDocumentTreeStore extends UmbStoreBase {
 			})
 		).then(({ data }) => {
 			if (data) {
+				// TODO: how do we handle if an item has been removed during this session(like in another tab or by another user)?
 				this._data.append(data.items);
 			}
 		});
 
-		// TODO: how do we handle if an item has been removed during this session(like in another tab or by another user)?
 		// TODO: how do we handle trashed items?
 		// TODO: remove ignore when we know how to handle trashed items.
 		return createObservablePart(this._data, (items) => items.filter((item) => item.parentKey === key && !item.isTrashed));
