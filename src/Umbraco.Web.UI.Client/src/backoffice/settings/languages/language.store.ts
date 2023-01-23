@@ -49,16 +49,16 @@ export class UmbLanguageStore extends UmbDataStoreBase<UmbLanguageStoreItemType>
 	async save(language: LanguageDetails): Promise<void> {
 		if (language.id && language.key) {
 			tryExecuteAndNotify(this.host, LanguageResource.putLanguageById({ id: language.id, requestBody: language })).then(
-				(data) => {
-					if (data) {
-						this.updateItems([data.data]);
+				(response) => {
+					if (response.data) {
+						this.updateItems([response.data]);
 					}
 				}
 			);
 		} else {
-			tryExecuteAndNotify(this.host, LanguageResource.postLanguage({ requestBody: language })).then((data) => {
-				if (data) {
-					this.updateItems([data.data]);
+			tryExecuteAndNotify(this.host, LanguageResource.postLanguage({ requestBody: language })).then((response) => {
+				if (response.data) {
+					this.updateItems([response.data]);
 				}
 			});
 		}
