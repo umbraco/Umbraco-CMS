@@ -12,6 +12,7 @@ dist
 dist-ssr
 types
 *.local
+*.tgz
 
 ## testing
 /coverage/
