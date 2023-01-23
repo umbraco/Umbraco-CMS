@@ -1,6 +1,6 @@
 import { BehaviorSubject } from 'rxjs';
-import { UmbContextToken } from '@umbraco-cms/context-api';
 import { css } from 'lit';
+import { UmbContextToken } from '@umbraco-cms/context-api';
 
 export interface UmbTheme {
 	name: string;
