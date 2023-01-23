@@ -178,7 +178,7 @@ export class UmbInputMultipleTextStringElement extends FormControlMixin(UmbLitEl
 	render() {
 		return html`
 			${this._renderItems()}
-			${this.readonly
+			${this.disabled || this.readonly
 				? nothing
 				: html`<uui-button
 						id="action"
