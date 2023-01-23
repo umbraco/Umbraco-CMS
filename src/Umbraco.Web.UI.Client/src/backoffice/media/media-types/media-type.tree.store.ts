@@ -1,20 +1,20 @@
-import {  FolderTreeItem, MediaTypeResource } from '@umbraco-cms/backend-api';
+import { FolderTreeItem, MediaTypeResource } from '@umbraco-cms/backend-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/resources';
 import { UmbContextToken } from '@umbraco-cms/context-api';
 import { createObservablePart, UniqueArrayBehaviorSubject } from '@umbraco-cms/observable-api';
 import { UmbStoreBase } from '@umbraco-cms/stores/store-base';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 
-export const UMB_DATA_TYPE_TREE_STORE_CONTEXT_TOKEN = new UmbContextToken<UmbDataTypeTreeStore>('UmbDataTypeTreeStore');
+export const UMB_DATA_TYPE_TREE_STORE_CONTEXT_TOKEN = new UmbContextToken<UmbMediaTypeTreeStore>('UmbMediaTypeTreeStore');
 
 
 /**
  * @export
- * @class UmbDataTypeTreeStore
+ * @class UmbMediaTypeTreeStore
  * @extends {UmbStoreBase}
- * @description - Tree Data Store for Data Types
+ * @description - Tree Data Store for Media Types
  */
-export class UmbDataTypeTreeStore extends UmbStoreBase {
+export class UmbMediaTypeTreeStore extends UmbStoreBase {
 
 
 	#data = new UniqueArrayBehaviorSubject<FolderTreeItem>([], (x) => x.key);

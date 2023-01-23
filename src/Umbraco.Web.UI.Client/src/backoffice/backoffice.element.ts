@@ -12,10 +12,8 @@ import {
 	UMB_CURRENT_USER_HISTORY_STORE_CONTEXT_TOKEN,
 } from './users/current-user/current-user-history.store';
 
-import {
-	UmbDocumentTypeStore,
-	UMB_DOCUMENT_TYPE_STORE_CONTEXT_TOKEN,
-} from './documents/document-types/document-type.store';
+import {UmbDocumentTypeDetailStore} from './documents/document-types/document-type.detail.store';
+import {UmbDocumentTypeTreeStore} from './documents/document-types/document-type.tree.store';
 import { UmbMediaTypeDetailStore } from './media/media-types/media-type.detail.store';
 import { UmbMediaTypeTreeStore } from './media/media-types/media-type.tree.store';
 import { UmbMemberTypeStore, UMB_MEMBER_TYPE_STORE_CONTEXT_TOKEN } from './members/member-types/member-type.store';
@@ -81,8 +79,9 @@ export class UmbBackofficeElement extends UmbLitElement {
 		new UmbUserStore(this);
 		new UmbMediaTypeDetailStore(this);
 		new UmbMediaTypeTreeStore(this);
+		new UmbMediaTypeDetailStore(this);
+		new UmbMediaTypeTreeStore(this);
 
-		this.provideContext(UMB_DOCUMENT_TYPE_STORE_CONTEXT_TOKEN, new UmbDocumentTypeStore(this));
 		this.provideContext(UMB_MEMBER_TYPE_STORE_CONTEXT_TOKEN, new UmbMemberTypeStore(this));
 		this.provideContext(UMB_USER_GROUP_STORE_CONTEXT_TOKEN, new UmbUserGroupStore(this));
 		this.provideContext(UMB_MEMBER_GROUP_STORE_CONTEXT_TOKEN, new UmbMemberGroupStore(this));
