@@ -1,38 +1,39 @@
-import type { DataTypeDetails } from '@umbraco-cms/models';
+import type { DocumentBlueprintDetails } from '@umbraco-cms/models';
 import { UmbContextToken } from '@umbraco-cms/context-api';
 import { createObservablePart, UniqueArrayBehaviorSubject } from '@umbraco-cms/observable-api';
 import { UmbStoreBase } from '@umbraco-cms/stores/store-base';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 
 
-export const UMB_DATA_TYPE_DETAIL_STORE_CONTEXT_TOKEN = new UmbContextToken<UmbDataTypeDetailStore>('UmbDataTypeDetailStore');
+export const UMB_DocumentBlueprint_DETAIL_STORE_CONTEXT_TOKEN = new UmbContextToken<UmbDocumentBlueprintDetailStore>('UmbDocumentBlueprintDetailStore');
 
 
 /**
  * @export
- * @class UmbDataTypeDetailStore
+ * @class UmbDocumentBlueprintDetailStore
  * @extends {UmbStoreBase}
- * @description - Details Data Store for Data Types
+ * @description - Details Data Store for Document Blueprints
  */
-export class UmbDataTypeDetailStore extends UmbStoreBase {
+export class UmbDocumentBlueprintDetailStore extends UmbStoreBase {
 
 
-	#data = new UniqueArrayBehaviorSubject<DataTypeDetails>([], (x) => x.key);
+	// TODO: use the right type:
+	#data = new UniqueArrayBehaviorSubject<DocumentBlueprintDetails>([], (x) => x.key);
 
 
 	constructor(host: UmbControllerHostInterface) {
-		super(host, UMB_DATA_TYPE_DETAIL_STORE_CONTEXT_TOKEN.toString());
+		super(host, UMB_DocumentBlueprint_DETAIL_STORE_CONTEXT_TOKEN.toString());
 	}
 
 	/**
 	 * @description - Request a Data Type by key. The Data Type is added to the store and is returned as an Observable.
 	 * @param {string} key
-	 * @return {*}  {(Observable<DataTypeDetails | undefined>)}
-	 * @memberof UmbDataTypesStore
+	 * @return {*}  {(Observable<DocumentBlueprintDetails | undefined>)}
+	 * @memberof UmbDocumentBlueprintDetailStore
 	 */
 	getByKey(key: string) {
 		// TODO: use backend cli when available.
-		fetch(`/umbraco/management/api/v1/document/data-type/${key}`)
+		fetch(`/umbraco/management/api/v1/document/document-blueprint/${key}`)
 			.then((res) => res.json())
 			.then((data) => {
 				this.#data.append(data);
@@ -45,12 +46,12 @@ export class UmbDataTypeDetailStore extends UmbStoreBase {
 
 	// TODO: make sure UI somehow can follow the status of this action.
 	/**
-	 * @description - Save a Data Type.
-	 * @param {Array<DataTypeDetails>} dataTypes
-	 * @memberof UmbDataTypesStore
+	 * @description - Save a DocumentBlueprint.
+	 * @param {Array<DocumentBlueprintDetails>} Dictionaries
+	 * @memberof UmbDocumentBlueprintDetailStore
 	 * @return {*}  {Promise<void>}
 	 */
-	save(data: DataTypeDetails[]) {
+	save(data: DocumentBlueprintDetails[]) {
 		// fetch from server and update store
 		// TODO: use Fetcher API.
 		let body: string;
@@ -63,7 +64,7 @@ export class UmbDataTypeDetailStore extends UmbStoreBase {
 		}
 
 		// TODO: use backend cli when available.
-		return fetch('/umbraco/management/api/v1/data-type/save', {
+		return fetch('/umbraco/management/api/v1/document-blueprint/save', {
 			method: 'POST',
 			body: body,
 			headers: {
@@ -71,7 +72,7 @@ export class UmbDataTypeDetailStore extends UmbStoreBase {
 			},
 		})
 			.then((res) => res.json())
-			.then((data: Array<DataTypeDetails>) => {
+			.then((data: Array<DocumentBlueprintDetails>) => {
 				this.#data.append(data);
 			});
 	}
@@ -80,12 +81,12 @@ export class UmbDataTypeDetailStore extends UmbStoreBase {
 	/**
 	 * @description - Delete a Data Type.
 	 * @param {string[]} keys
-	 * @memberof UmbDataTypesStore
+	 * @memberof UmbDocumentBlueprintDetailStore
 	 * @return {*}  {Promise<void>}
 	 */
 	async delete(keys: string[]) {
 		// TODO: use backend cli when available.
-		await fetch('/umbraco/backoffice/data-type/delete', {
+		await fetch('/umbraco/backoffice/document-blueprint/delete', {
 			method: 'POST',
 			body: JSON.stringify(keys),
 			headers: {

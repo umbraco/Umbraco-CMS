@@ -18,7 +18,7 @@ export const UMB_DATA_TYPE_TREE_STORE_CONTEXT_TOKEN = new UmbContextToken<UmbDat
 export class UmbDataTypeTreeStore extends UmbStoreBase {
 
 
-	private _data = new UniqueArrayBehaviorSubject<DocumentTreeItem>([], (x) => x.key);
+	#data = new UniqueArrayBehaviorSubject<DocumentTreeItem>([], (x) => x.key);
 
 
 	constructor(host: UmbControllerHostInterface) {
@@ -42,20 +42,20 @@ export class UmbDataTypeTreeStore extends UmbStoreBase {
 			},
 		});
 
-		this._data.remove(keys);
+		this.#data.remove(keys);
 	}
 
 	getTreeRoot() {
 		tryExecuteAndNotify(this._host, DataTypeResource.getTreeDataTypeRoot({})).then(({ data }) => {
 			if (data) {
 				// TODO: how do we handle if an item has been removed during this session(like in another tab or by another user)?
-				this._data.append(data.items);
+				this.#data.append(data.items);
 			}
 		});
 
 		// TODO: how do we handle trashed items?
 		// TODO: remove ignore when we know how to handle trashed items.
-		return createObservablePart(this._data, (items) => items.filter((item) => item.parentKey === null && !item.isTrashed));
+		return createObservablePart(this.#data, (items) => items.filter((item) => item.parentKey === null && !item.isTrashed));
 	}
 
 	getTreeItemChildren(key: string) {
@@ -67,13 +67,13 @@ export class UmbDataTypeTreeStore extends UmbStoreBase {
 		).then(({ data }) => {
 			if (data) {
 				// TODO: how do we handle if an item has been removed during this session(like in another tab or by another user)?
-				this._data.append(data.items);
+				this.#data.append(data.items);
 			}
 		});
 
 		// TODO: how do we handle trashed items?
 		// TODO: remove ignore when we know how to handle trashed items.
-		return createObservablePart(this._data, (items) => items.filter((item) => item.parentKey === key && !item.isTrashed));
+		return createObservablePart(this.#data, (items) => items.filter((item) => item.parentKey === key && !item.isTrashed));
 	}
 
 	getTreeItems(keys: Array<string>) {
@@ -86,11 +86,11 @@ export class UmbDataTypeTreeStore extends UmbStoreBase {
 			).then(({ data }) => {
 				if (data) {
 					// TODO: how do we handle if an item has been removed during this session(like in another tab or by another user)?
-					this._data.append(data);
+					this.#data.append(data);
 				}
 			});
 		}
 
-		return createObservablePart(this._data, (items) => items.filter((item) => keys.includes(item.key ?? '')));
+		return createObservablePart(this.#data, (items) => items.filter((item) => keys.includes(item.key ?? '')));
 	}
 }

@@ -18,7 +18,7 @@ export const UMB_DOCUMENT_TYPE_TREE_STORE_CONTEXT_TOKEN = new UmbContextToken<Um
 export class UmbDocumentTypeTreeStore extends UmbStoreBase {
 
 
-	private _data = new UniqueArrayBehaviorSubject<DocumentTreeItem>([], (x) => x.key);
+	#data = new UniqueArrayBehaviorSubject<DocumentTreeItem>([], (x) => x.key);
 
 
 	constructor(host: UmbControllerHostInterface) {
@@ -42,19 +42,19 @@ export class UmbDocumentTypeTreeStore extends UmbStoreBase {
 			},
 		});
 
-		this._data.remove(keys);
+		this.#data.remove(keys);
 	}
 
 	getTreeRoot() {
 		tryExecuteAndNotify(this._host, DocumentTypeResource.getTreeDocumentTypeRoot({})).then(({ data }) => {
 			if (data) {
 				// TODO: how do we handle if an item has been removed during this session(like in another tab or by another user)?
-				this._data.append(data.items);
+				this.#data.append(data.items);
 			}
 		});
 
 		// TODO: remove ignore when we know how to handle trashed items.
-		return createObservablePart(this._data, (items) => items.filter((item) => item.parentKey === null));
+		return createObservablePart(this.#data, (items) => items.filter((item) => item.parentKey === null));
 	}
 
 	getTreeItemChildren(key: string) {
@@ -66,12 +66,12 @@ export class UmbDocumentTypeTreeStore extends UmbStoreBase {
 		).then(({ data }) => {
 			if (data) {
 				// TODO: how do we handle if an item has been removed during this session(like in another tab or by another user)?
-				this._data.append(data.items);
+				this.#data.append(data.items);
 			}
 		});
 
 		// TODO: remove ignore when we know how to handle trashed items.
-		return createObservablePart(this._data, (items) => items.filter((item) => item.parentKey === key));
+		return createObservablePart(this.#data, (items) => items.filter((item) => item.parentKey === key));
 	}
 
 	getTreeItems(keys: Array<string>) {
@@ -84,11 +84,11 @@ export class UmbDocumentTypeTreeStore extends UmbStoreBase {
 			).then(({ data }) => {
 				if (data) {
 					// TODO: how do we handle if an item has been removed during this session(like in another tab or by another user)?
-					this._data.append(data);
+					this.#data.append(data);
 				}
 			});
 		}
 
-		return createObservablePart(this._data, (items) => items.filter((item) => keys.includes(item.key ?? '')));
+		return createObservablePart(this.#data, (items) => items.filter((item) => keys.includes(item.key ?? '')));
 	}
 }

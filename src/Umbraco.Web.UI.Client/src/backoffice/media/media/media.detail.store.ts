@@ -18,7 +18,7 @@ export const UMB_MEDIA_DETAIL_STORE_CONTEXT_TOKEN = new UmbContextToken<UmbMedia
 export class UmbMediaDetailStore extends UmbStoreBase implements UmbContentStore<MediaDetails> {
 
 
-	private _data = new UniqueArrayBehaviorSubject<DocumentDetails>([], (x) => x.key);
+	#data = new UniqueArrayBehaviorSubject<DocumentDetails>([], (x) => x.key);
 
 
 	constructor(host: UmbControllerHostInterface) {
@@ -30,10 +30,10 @@ export class UmbMediaDetailStore extends UmbStoreBase implements UmbContentStore
 		fetch(`/umbraco/management/api/v1/media/details/${key}`)
 			.then((res) => res.json())
 			.then((data) => {
-				this._data.append(data);
+				this.#data.append(data);
 			});
 
-		return createObservablePart(this._data, (documents) =>
+		return createObservablePart(this.#data, (documents) =>
 			documents.find((document) => document.key === key)
 		);
 	}
@@ -61,7 +61,7 @@ export class UmbMediaDetailStore extends UmbStoreBase implements UmbContentStore
 		})
 			.then((res) => res.json())
 			.then((data: Array<MediaDetails>) => {
-				this._data.append(data);
+				this.#data.append(data);
 			});
 	}
 
@@ -77,6 +77,6 @@ export class UmbMediaDetailStore extends UmbStoreBase implements UmbContentStore
 			},
 		});
 		const data = await res.json();
-		this._data.append(data);
+		this.#data.append(data);
 	}
 }

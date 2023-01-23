@@ -1,5 +1,4 @@
-import type { Observable } from 'rxjs';
-import { MediaResource, ContentTreeItem } from '@umbraco-cms/backend-api';
+import { DocumentBlueprintResource, DocumentTreeItem } from '@umbraco-cms/backend-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/resources';
 import { UmbContextToken } from '@umbraco-cms/context-api';
 import { createObservablePart, UniqueArrayBehaviorSubject } from '@umbraco-cms/observable-api';
@@ -7,45 +6,47 @@ import { UmbStoreBase } from '@umbraco-cms/stores/store-base';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 
 
-export const UMB_MEDIA_TREE_STORE_CONTEXT_TOKEN = new UmbContextToken<UmbMediaTreeStore>('UmbMediaTreeStore');
+export const UMB_DocumentBlueprint_TREE_STORE_CONTEXT_TOKEN = new UmbContextToken<UmbDocumentBlueprintTreeStore>('UmbDocumentBlueprintTreeStore');
 
-// TODO: Stop using ContentTreeItem
-type MediaTreeItem = ContentTreeItem;
 
 /**
  * @export
- * @class UmbMediaTreeStore
+ * @class UmbDocumentBlueprintTreeStore
  * @extends {UmbStoreBase}
- * @description - Data Store for Media
+ * @description - Tree Data Store for Document Blueprints
  */
-export class UmbMediaTreeStore extends UmbStoreBase {
+export class UmbDocumentBlueprintTreeStore extends UmbStoreBase {
 
 
-
-	#data = new UniqueArrayBehaviorSubject<MediaTreeItem>([], (x) => x.key);
+	#data = new UniqueArrayBehaviorSubject<DocumentTreeItem>([], (x) => x.key);
 
 
 	constructor(host: UmbControllerHostInterface) {
-		super(host, UMB_MEDIA_TREE_STORE_CONTEXT_TOKEN.toString());
+		super(host, UMB_DocumentBlueprint_TREE_STORE_CONTEXT_TOKEN.toString());
 	}
 
-	// TODO: how do we handle trashed items?
-	// TODO: How do we make trash available on details and tree store?
-	async trash(keys: Array<string>) {
+	// TODO: How can we avoid having this in both stores?
+	/**
+	 * @description - Delete a Document Blueprint Type.
+	 * @param {string[]} keys
+	 * @memberof UmbDocumentBlueprintsStore
+	 * @return {*}  {Promise<void>}
+	 */
+	async delete(keys: string[]) {
 		// TODO: use backend cli when available.
-		const res = await fetch('/umbraco/management/api/v1/media/trash', {
+		await fetch('/umbraco/backoffice/data-type/delete', {
 			method: 'POST',
 			body: JSON.stringify(keys),
 			headers: {
 				'Content-Type': 'application/json',
 			},
 		});
-		const data = await res.json();
-		this.#data.append(data);
+
+		this.#data.remove(keys);
 	}
 
-	getTreeRoot(): Observable<Array<MediaTreeItem>> {
-		tryExecuteAndNotify(this._host, MediaResource.getTreeMediaRoot({})).then(({ data }) => {
+	getTreeRoot() {
+		tryExecuteAndNotify(this._host, DocumentBlueprintResource.getTreeDocumentBlueprintRoot({})).then(({ data }) => {
 			if (data) {
 				// TODO: how do we handle if an item has been removed during this session(like in another tab or by another user)?
 				this.#data.append(data.items);
@@ -57,10 +58,11 @@ export class UmbMediaTreeStore extends UmbStoreBase {
 		return createObservablePart(this.#data, (items) => items.filter((item) => item.parentKey === null && !item.isTrashed));
 	}
 
-	getTreeItemChildren(key: string): Observable<Array<MediaTreeItem>> {
+	getTreeItemChildren(key: string) {
+		/*
 		tryExecuteAndNotify(
 			this._host,
-			MediaResource.getTreeMediaChildren({
+			DocumentBlueprintResource.getTreeDocumentBlueprintChildren({
 				parentKey: key,
 			})
 		).then(({ data }) => {
@@ -69,17 +71,18 @@ export class UmbMediaTreeStore extends UmbStoreBase {
 				this.#data.append(data.items);
 			}
 		});
+		*/
 
 		// TODO: how do we handle trashed items?
 		// TODO: remove ignore when we know how to handle trashed items.
 		return createObservablePart(this.#data, (items) => items.filter((item) => item.parentKey === key && !item.isTrashed));
 	}
 
-	getTreeItems(keys: Array<string>): Observable<Array<MediaTreeItem>> {
+	getTreeItems(keys: Array<string>) {
 		if (keys?.length > 0) {
 			tryExecuteAndNotify(
 				this._host,
-				MediaResource.getTreeMediaItem({
+				DocumentBlueprintResource.getTreeDocumentBlueprintItem({
 					key: keys,
 				})
 			).then(({ data }) => {

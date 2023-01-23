@@ -23,11 +23,10 @@ import { UmbMediaTreeStore } from './media/media/media.tree.store';
 import { UmbMemberTypeDetailStore } from './members/member-types/member-type.detail.store';
 import { UmbMemberTypeTreeStore } from './members/member-types/member-type.tree.store';
 import { UmbMemberGroupStore } from './members/member-groups/member-group.details.store';
-import { UmbDictionaryStore, UMB_DICTIONARY_STORE_CONTEXT_TOKEN } from './translation/dictionary/dictionary.store';
-import {
-	UmbDocumentBlueprintStore,
-	UMB_DOCUMENT_BLUEPRINT_STORE_CONTEXT_TOKEN,
-} from './documents/document-blueprints/document-blueprint.store';
+import { UmbDictionaryDetailStore } from './translation/dictionary/dictionary.detail.store';
+import { UmbDictionaryTreeStore } from './translation/dictionary/dictionary.tree.store';
+import { UmbDocumentBlueprintDetailStore } from './documents/document-blueprints/document-blueprint.detail.store';
+import { UmbDocumentBlueprintTreeStore } from './documents/document-blueprints/document-blueprint.tree.store';
 
 import { UmbSectionStore, UMB_SECTION_STORE_CONTEXT_TOKEN } from './shared/components/section/section.store';
 import { UmbDataTypeDetailStore } from './settings/data-types/data-type.detail.store';
@@ -86,11 +85,13 @@ export class UmbBackofficeElement extends UmbLitElement {
 		new UmbMemberTypeTreeStore(this);
 		new UmbUserGroupStore(this);
 		new UmbMemberGroupStore(this);
+		new UmbDictionaryDetailStore(this);
+		new UmbDictionaryTreeStore(this);
+		new UmbDocumentBlueprintDetailStore(this);
+		new UmbDocumentBlueprintTreeStore(this);
 
 		this.provideContext(UMB_SECTION_STORE_CONTEXT_TOKEN, new UmbSectionStore());
 		this.provideContext(UMB_CURRENT_USER_HISTORY_STORE_CONTEXT_TOKEN, new UmbCurrentUserHistoryStore());
-		this.provideContext(UMB_DICTIONARY_STORE_CONTEXT_TOKEN, new UmbDictionaryStore(this));
-		this.provideContext(UMB_DOCUMENT_BLUEPRINT_STORE_CONTEXT_TOKEN, new UmbDocumentBlueprintStore(this));
 	}
 
 	render() {
