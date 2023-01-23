@@ -25,7 +25,22 @@ export const data: Array<DocumentDetails> = [
 				dataTypeKey: 'dt-multipleTextString',
 			},
 		],
-		data: [],
+		data: [
+			{
+				alias: 'multipleTextString',
+				value: [
+					{
+						value: 'Value 1',
+					},
+					{
+						value: 'Value 2',
+					},
+					{
+						value: 'Value 3',
+					},
+				],
+			},
+		],
 		variants: [],
 	},
 	{
