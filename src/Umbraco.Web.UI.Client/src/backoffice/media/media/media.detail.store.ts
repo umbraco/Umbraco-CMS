@@ -1,5 +1,5 @@
 import { Observable } from 'rxjs';
-import type { DocumentDetails } from '@umbraco-cms/models';
+import type { DocumentDetails, MediaDetails } from '@umbraco-cms/models';
 import { UmbContextToken } from '@umbraco-cms/context-api';
 import { createObservablePart, UniqueArrayBehaviorSubject } from '@umbraco-cms/observable-api';
 import { UmbStoreBase } from '@umbraco-cms/stores/store-base';
@@ -7,28 +7,28 @@ import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 import { UmbContentStore } from '@umbraco-cms/stores/store';
 
 
-export const UMB_DOCUMENT_DETAIL_STORE_CONTEXT_TOKEN = new UmbContextToken<UmbDocumentDetailStore>('UmbDocumentDetailStore');
+export const UMB_MEDIA_DETAIL_STORE_CONTEXT_TOKEN = new UmbContextToken<UmbMediaDetailStore>('UmbDocumentDetailStore');
 
 
 /**
  * @export
- * @class UmbDocumentStore
+ * @class UmbMediaStore
  * @extends {UmbStoreBase<DocumentDetails>}
- * @description - Data Store for Documents
+ * @description - Data Store for Media
  */
-export class UmbDocumentDetailStore extends UmbStoreBase implements UmbContentStore<DocumentDetails> {
+export class UmbMediaDetailStore extends UmbStoreBase implements UmbContentStore<MediaDetails> {
 
 
 	private _data = new UniqueArrayBehaviorSubject<DocumentDetails>([], (x) => x.key);
 
 
 	constructor(host: UmbControllerHostInterface) {
-		super(host, UMB_DOCUMENT_DETAIL_STORE_CONTEXT_TOKEN.toString());
+		super(host, UMB_MEDIA_DETAIL_STORE_CONTEXT_TOKEN.toString());
 	}
 
-	getByKey(key: string): Observable<DocumentDetails | undefined> {
+	getByKey(key: string): Observable<MediaDetails | undefined> {
 		// TODO: use backend cli when available.
-		fetch(`/umbraco/management/api/v1/document/details/${key}`)
+		fetch(`/umbraco/management/api/v1/media/details/${key}`)
 			.then((res) => res.json())
 			.then((data) => {
 				this._data.append(data);
@@ -40,7 +40,7 @@ export class UmbDocumentDetailStore extends UmbStoreBase implements UmbContentSt
 	}
 
 	// TODO: make sure UI somehow can follow the status of this action.
-	save(data: DocumentDetails[]): Promise<void> {
+	save(data: MediaDetails[]): Promise<void> {
 		// fetch from server and update store
 		// TODO: use Fetcher API.
 		let body: string;
@@ -53,7 +53,7 @@ export class UmbDocumentDetailStore extends UmbStoreBase implements UmbContentSt
 		}
 
 		// TODO: use backend cli when available.
-		return fetch('/umbraco/management/api/v1/document/save', {
+		return fetch('/umbraco/management/api/v1/media/save', {
 			method: 'POST',
 			body: body,
 			headers: {
@@ -61,15 +61,16 @@ export class UmbDocumentDetailStore extends UmbStoreBase implements UmbContentSt
 			},
 		})
 			.then((res) => res.json())
-			.then((data: Array<DocumentDetails>) => {
+			.then((data: Array<MediaDetails>) => {
 				this._data.append(data);
 			});
 	}
 
 	// TODO: how do we handle trashed items?
+	// TODO: How do we make trash available on details and tree store?
 	async trash(keys: Array<string>) {
 		// TODO: use backend cli when available.
-		const res = await fetch('/umbraco/management/api/v1/document/trash', {
+		const res = await fetch('/umbraco/management/api/v1/media/trash', {
 			method: 'POST',
 			body: JSON.stringify(keys),
 			headers: {

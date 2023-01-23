@@ -1,5 +1,5 @@
 import type { Observable } from 'rxjs';
-import { DocumentResource, DocumentTreeItem } from '@umbraco-cms/backend-api';
+import { MediaResource, ContentTreeItem } from '@umbraco-cms/backend-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/resources';
 import { UmbContextToken } from '@umbraco-cms/context-api';
 import { createObservablePart, UniqueArrayBehaviorSubject } from '@umbraco-cms/observable-api';
@@ -7,29 +7,33 @@ import { UmbStoreBase } from '@umbraco-cms/stores/store-base';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 
 
-export const UMB_DOCUMENT_TREE_STORE_CONTEXT_TOKEN = new UmbContextToken<UmbDocumentTreeStore>('UmbDocumentTreeStore');
+export const UMB_MEDIA_TREE_STORE_CONTEXT_TOKEN = new UmbContextToken<UmbMediaTreeStore>('UmbMediaTreeStore');
 
+// TODO: Stop using ContentTreeItem
+type MediaTreeItem = ContentTreeItem;
 
 /**
  * @export
- * @class UmbDocumentStore
- * @extends {UmbStoreBase<DocumentTree>}
- * @description - Data Store for Documents
+ * @class UmbMediaTreeStore
+ * @extends {UmbStoreBase<MediaTree>}
+ * @description - Data Store for Media
  */
-export class UmbDocumentTreeStore extends UmbStoreBase {
+export class UmbMediaTreeStore extends UmbStoreBase {
 
 
-	private _data = new UniqueArrayBehaviorSubject<DocumentTreeItem>([], (x) => x.key);
+
+	private _data = new UniqueArrayBehaviorSubject<MediaTreeItem>([], (x) => x.key);
 
 
 	constructor(host: UmbControllerHostInterface) {
-		super(host, UMB_DOCUMENT_TREE_STORE_CONTEXT_TOKEN.toString());
+		super(host, UMB_MEDIA_TREE_STORE_CONTEXT_TOKEN.toString());
 	}
 
 	// TODO: how do we handle trashed items?
+	// TODO: How do we make trash available on details and tree store?
 	async trash(keys: Array<string>) {
 		// TODO: use backend cli when available.
-		const res = await fetch('/umbraco/management/api/v1/document/trash', {
+		const res = await fetch('/umbraco/management/api/v1/media/trash', {
 			method: 'POST',
 			body: JSON.stringify(keys),
 			headers: {
@@ -40,8 +44,8 @@ export class UmbDocumentTreeStore extends UmbStoreBase {
 		this._data.append(data);
 	}
 
-	getTreeRoot(): Observable<Array<DocumentTreeItem>> {
-		tryExecuteAndNotify(this._host, DocumentResource.getTreeDocumentRoot({})).then(({ data }) => {
+	getTreeRoot(): Observable<Array<MediaTreeItem>> {
+		tryExecuteAndNotify(this._host, MediaResource.getTreeMediaRoot({})).then(({ data }) => {
 			if (data) {
 				// TODO: how do we handle if an item has been removed during this session(like in another tab or by another user)?
 				this._data.append(data.items);
@@ -53,10 +57,10 @@ export class UmbDocumentTreeStore extends UmbStoreBase {
 		return createObservablePart(this._data, (items) => items.filter((item) => item.parentKey === null && !item.isTrashed));
 	}
 
-	getTreeItemChildren(key: string): Observable<Array<DocumentTreeItem>> {
+	getTreeItemChildren(key: string): Observable<Array<MediaTreeItem>> {
 		tryExecuteAndNotify(
 			this._host,
-			DocumentResource.getTreeDocumentChildren({
+			MediaResource.getTreeMediaChildren({
 				parentKey: key,
 			})
 		).then(({ data }) => {
@@ -71,11 +75,11 @@ export class UmbDocumentTreeStore extends UmbStoreBase {
 		return createObservablePart(this._data, (items) => items.filter((item) => item.parentKey === key && !item.isTrashed));
 	}
 
-	getTreeItems(keys: Array<string>): Observable<Array<DocumentTreeItem>> {
+	getTreeItems(keys: Array<string>): Observable<Array<MediaTreeItem>> {
 		if (keys?.length > 0) {
 			tryExecuteAndNotify(
 				this._host,
-				DocumentResource.getTreeDocumentItem({
+				MediaResource.getTreeMediaItem({
 					key: keys,
 				})
 			).then(({ data }) => {
