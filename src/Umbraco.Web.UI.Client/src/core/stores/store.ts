@@ -1,5 +1,5 @@
 import type { Observable } from 'rxjs';
-import { UniqueBehaviorSubject } from '../observable-api/unique-behavior-subject';
+import { UniqueBehaviorSubject } from '@umbraco-cms/observable-api';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 
 export interface UmbDataStoreIdentifiers {
