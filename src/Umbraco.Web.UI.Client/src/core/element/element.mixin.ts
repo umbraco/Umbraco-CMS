@@ -1,10 +1,15 @@
 import { Observable } from 'rxjs';
-import { UmbContextConsumerController } from '../context-api/consume/context-consumer.controller';
-import { UmbContextCallback } from '../context-api/consume/context-request.event';
-import { UmbContextProviderController } from '../context-api/provide/context-provider.controller';
-import { UmbControllerHostInterface, UmbControllerHostMixin } from '../controller/controller-host.mixin';
+
 import type { HTMLElementConstructor } from '../models';
-import { UmbObserverController } from '../observable-api/observer.controller';
+
+import { UmbControllerHostInterface, UmbControllerHostMixin } from '@umbraco-cms/controller';
+import {
+	UmbContextToken,
+	UmbContextCallback,
+	UmbContextConsumerController,
+	UmbContextProviderController,
+} from '@umbraco-cms/context-api';
+import { UmbObserverController } from '@umbraco-cms/observable-api';
 
 // TODO: can we use this aliases to generate the key of this type
 interface ResolvedContexts {
@@ -13,14 +18,16 @@ interface ResolvedContexts {
 
 export declare class UmbElementMixinInterface extends UmbControllerHostInterface {
 	observe<T>(source: Observable<T>, callback: (_value: T) => void, unique?: string): UmbObserverController<T>;
-	provideContext(alias: string, instance: unknown): UmbContextProviderController;
-	consumeContext(alias: string, callback: UmbContextCallback): UmbContextConsumerController;
+	provideContext<R = unknown>(alias: string | UmbContextToken<R>, instance: R): UmbContextProviderController<R>;
+	consumeContext<R = unknown>(
+		alias: string | UmbContextToken<R>,
+		callback: UmbContextCallback<R>
+	): UmbContextConsumerController<R>;
 	consumeAllContexts(contextAliases: string[], callback: (_instances: ResolvedContexts) => void): void;
 }
 
 export const UmbElementMixin = <T extends HTMLElementConstructor>(superClass: T) => {
-	class UmbElementMixinClass extends UmbControllerHostMixin(superClass) {
-
+	class UmbElementMixinClass extends UmbControllerHostMixin(superClass) implements UmbElementMixinInterface {
 		/**
 		 * @description Observe a RxJS source of choice.
 		 * @param {Observable<T>} source RxJS source
@@ -39,7 +46,7 @@ export const UmbElementMixin = <T extends HTMLElementConstructor>(superClass: T)
 		 * @return {UmbContextProviderController} Reference to a Context Provider Controller instance
 		 * @memberof UmbElementMixin
 		 */
-		provideContext(alias: string, instance: unknown): UmbContextProviderController {
+		provideContext<R = unknown>(alias: string | UmbContextToken<R>, instance: R): UmbContextProviderController<R> {
 			return new UmbContextProviderController(this, alias, instance);
 		}
 
@@ -50,7 +57,10 @@ export const UmbElementMixin = <T extends HTMLElementConstructor>(superClass: T)
 		 * @return {UmbContextConsumerController} Reference to a Context Consumer Controller instance
 		 * @memberof UmbElementMixin
 		 */
-		consumeContext(alias: string, callback: UmbContextCallback): UmbContextConsumerController {
+		consumeContext<R = unknown>(
+			alias: string | UmbContextToken<R>,
+			callback: UmbContextCallback<R>
+		): UmbContextConsumerController<R> {
 			return new UmbContextConsumerController(this, alias, callback);
 		}
 
@@ -59,29 +69,27 @@ export const UmbElementMixin = <T extends HTMLElementConstructor>(superClass: T)
 		 * @param {string} aliases
 		 * @param {method} callback Callback method called when all contexts are resolved.
 		 * @memberof UmbElementMixin
+		 * @deprecated it should not be necessary to consume multiple contexts at once, use consumeContext instead with an UmbContextToken
 		 */
 		consumeAllContexts(_contextAliases: Array<string>, callback: (_instances: ResolvedContexts) => void) {
 			let resolvedAmount = 0;
-			const controllers = _contextAliases.map((alias) =>
-				new UmbContextConsumerController(this, alias, () => {
+			const controllers = _contextAliases.map(
+				(alias) =>
+					new UmbContextConsumerController(this, alias, () => {
+						resolvedAmount++;
 
-					resolvedAmount++;
+						if (resolvedAmount === _contextAliases.length) {
+							const result: ResolvedContexts = {};
 
-					if (resolvedAmount === _contextAliases.length) {
+							controllers.forEach((contextCtrl: UmbContextConsumerController) => {
+								result[contextCtrl.consumerAlias?.toString()] = contextCtrl.instance;
+							});
 
-						const result: ResolvedContexts = {};
-
-						controllers.forEach((contextCtrl: UmbContextConsumerController) => {
-							result[contextCtrl.consumerAlias] = contextCtrl.instance;
-						});
-
-						callback(result);
-					}
-				})
+							callback(result);
+						}
+					})
 			);
 		}
-
-
 	}
 
 	return UmbElementMixinClass as unknown as HTMLElementConstructor<UmbElementMixinInterface> & T;

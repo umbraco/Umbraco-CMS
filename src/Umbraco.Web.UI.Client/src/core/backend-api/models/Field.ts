@@ -3,7 +3,7 @@
 /* eslint-disable */
 
 export type Field = {
-    name?: string | null;
-    values?: Array<string> | null;
+    name?: string;
+    values?: Array<string>;
 };
 

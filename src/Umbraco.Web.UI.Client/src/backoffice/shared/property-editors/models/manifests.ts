@@ -21,6 +21,14 @@ import { manifest as mediaPicker } from './Umbraco.MediaPicker3';
 import { manifest as imageCropper } from './Umbraco.ImageCropper';
 import { manifest as uploadField } from './Umbraco.UploadField';
 import { manifest as blockGrid } from './Umbraco.BlockGrid';
+import { manifest as tinyMCE } from './Umbraco.TinyMCE';
+import { manifest as listView } from './Umbraco.ListView';
+import { manifest as label } from './Umbraco.Label';
+import { manifest as integer } from './Umbraco.Integer';
+import { manifest as decimal } from './Umbraco.Decimal';
+import { manifest as userPicker } from './Umbraco.UserPicker';
+import { manifest as memberPicker } from './Umbraco.MemberPicker';
+import { manifest as memberGroupPicker } from './Umbraco.MemberGroupPicker';
 
 import type { ManifestPropertyEditorModel } from '@umbraco-cms/models';
 
@@ -48,54 +56,14 @@ export const manifests: Array<ManifestPropertyEditorModel> = [
 	imageCropper,
 	uploadField,
 	blockGrid,
-	{
-		type: 'propertyEditorModel',
-		name: 'Decimal',
-		alias: 'Umbraco.Decimal',
-		meta: {},
-	},
-	{
-		type: 'propertyEditorModel',
-		name: 'Label',
-		alias: 'Umbraco.Label',
-		meta: {},
-	},
-	{
-		type: 'propertyEditorModel',
-		name: 'Numeric',
-		alias: 'Umbraco.Integer',
-		meta: {},
-	},
-	{
-		type: 'propertyEditorModel',
-		name: 'Rich Text Editor',
-		alias: 'Umbraco.TinyMCE',
-		meta: {},
-	},
-	{
-		type: 'propertyEditorModel',
-		name: 'Member Group Picker',
-		alias: 'Umbraco.MemberGroupPicker',
-		meta: {},
-	},
-	{
-		type: 'propertyEditorModel',
-		name: 'Member Picker',
-		alias: 'Umbraco.MemberPicker',
-		meta: {},
-	},
-	{
-		type: 'propertyEditorModel',
-		name: 'User Picker',
-		alias: 'Umbraco.UserPicker',
-		meta: {},
-	},
-	{
-		type: 'propertyEditorModel',
-		name: 'List view',
-		alias: 'Umbraco.ListView',
-		meta: {},
-	},
+	tinyMCE,
+	listView,
+	label,
+	integer,
+	decimal,
+	userPicker,
+	memberPicker,
+	memberGroupPicker,
 	{
 		type: 'propertyEditorModel',
 		name: 'Icon Picker',

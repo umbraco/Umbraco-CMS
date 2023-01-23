@@ -2,24 +2,33 @@ import { defineElement } from '@umbraco-ui/uui-base/lib/registration';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html } from 'lit';
 
-import { UmbModalService } from '../core/modal';
-import { UmbNotificationService } from '../core/notification';
-import { UmbUserStore } from './users/users/user.store';
-import { UmbUserGroupStore } from './users/user-groups/user-group.store';
-import { UmbCurrentUserStore } from './users/current-user/current-user.store';
-import { UmbCurrentUserHistoryStore } from './users/current-user/current-user-history.store';
+import { UmbModalService, UMB_MODAL_SERVICE_CONTEXT_TOKEN } from '../core/modal';
+import { UmbNotificationService, UMB_NOTIFICATION_SERVICE_CONTEXT_TOKEN } from '../core/notification';
+import { UmbUserStore, UMB_USER_STORE_CONTEXT_TOKEN } from './users/users/user.store';
+import { UmbUserGroupStore, UMB_USER_GROUP_STORE_CONTEXT_TOKEN } from './users/user-groups/user-group.store';
+import { UmbCurrentUserStore, UMB_CURRENT_USER_STORE_CONTEXT_TOKEN } from './users/current-user/current-user.store';
+import {
+	UmbCurrentUserHistoryStore,
+	UMB_CURRENT_USER_HISTORY_STORE_CONTEXT_TOKEN,
+} from './users/current-user/current-user-history.store';
 
-import { UmbDocumentTypeStore } from './documents/document-types/document-type.store';
-import { UmbMediaTypeStore } from './media/media-types/media-type.store';
-import { UmbMemberTypeStore } from './members/member-types/member-type.store';
-import { UmbDocumentStore } from './documents/documents/document.store';
-import { UmbMediaStore } from './media/media/media.store';
-import { UmbMemberGroupStore } from './members/member-groups/member-group.store';
-import { UmbDictionaryStore } from './translation/dictionary/dictionary.store';
-import { UmbDocumentBlueprintStore } from './documents/document-blueprints/document-blueprint.store';
+import {
+	UmbDocumentTypeStore,
+	UMB_DOCUMENT_TYPE_STORE_CONTEXT_TOKEN,
+} from './documents/document-types/document-type.store';
+import { UmbMediaTypeStore, UMB_MEDIA_TYPE_STORE_CONTEXT_TOKEN } from './media/media-types/media-type.store';
+import { UmbMemberTypeStore, UMB_MEMBER_TYPE_STORE_CONTEXT_TOKEN } from './members/member-types/member-type.store';
+import { UmbDocumentStore, UMB_DOCUMENT_STORE_CONTEXT_TOKEN } from './documents/documents/document.store';
+import { UmbMediaStore, UMB_MEDIA_STORE_CONTEXT_TOKEN } from './media/media/media.store';
+import { UmbMemberGroupStore, UMB_MEMBER_GROUP_STORE_CONTEXT_TOKEN } from './members/member-groups/member-group.store';
+import { UmbDictionaryStore, UMB_DICTIONARY_STORE_CONTEXT_TOKEN } from './translation/dictionary/dictionary.store';
+import {
+	UmbDocumentBlueprintStore,
+	UMB_DOCUMENT_BLUEPRINT_STORE_CONTEXT_TOKEN,
+} from './documents/document-blueprints/document-blueprint.store';
 
-import { UmbSectionStore } from './shared/components/section/section.store';
-import { UmbDataTypeStore } from './settings/data-types/data-type.store';
+import { UmbSectionStore, UMB_SECTION_STORE_CONTEXT_TOKEN } from './shared/components/section/section.store';
+import { UmbDataTypeStore, UMB_DATA_TYPE_STORE_CONTEXT_TOKEN } from './settings/data-types/data-type.store';
 import { UmbLitElement } from '@umbraco-cms/element';
 
 // Domains
@@ -54,24 +63,24 @@ export class UmbBackofficeElement extends UmbLitElement {
 	constructor() {
 		super();
 
-		this.provideContext('umbModalService', new UmbModalService());
-		this.provideContext('umbNotificationService', new UmbNotificationService());
+		this.provideContext(UMB_MODAL_SERVICE_CONTEXT_TOKEN, new UmbModalService());
+		this.provideContext(UMB_NOTIFICATION_SERVICE_CONTEXT_TOKEN, new UmbNotificationService());
 
 		// TODO: find a way this is possible outside this element. It needs to be possible to register stores in extensions
-		this.provideContext('umbCurrentUserStore', new UmbCurrentUserStore());
-		this.provideContext('umbDocumentStore', new UmbDocumentStore(this));
-		this.provideContext('umbMediaStore', new UmbMediaStore(this));
-		this.provideContext('umbDataTypeStore', new UmbDataTypeStore(this));
-		this.provideContext('umbDocumentTypeStore', new UmbDocumentTypeStore(this));
-		this.provideContext('umbMediaTypeStore', new UmbMediaTypeStore(this));
-		this.provideContext('umbMemberTypeStore', new UmbMemberTypeStore(this));
-		this.provideContext('umbUserStore', new UmbUserStore(this));
-		this.provideContext('umbUserGroupStore', new UmbUserGroupStore(this));
-		this.provideContext('umbMemberGroupStore', new UmbMemberGroupStore(this));
-		this.provideContext('umbSectionStore', new UmbSectionStore());
-		this.provideContext('umbCurrentUserHistoryStore', new UmbCurrentUserHistoryStore());
-		this.provideContext('umbDictionaryStore', new UmbDictionaryStore(this));
-		this.provideContext('umbDocumentBlueprintStore', new UmbDocumentBlueprintStore(this));
+		this.provideContext(UMB_CURRENT_USER_STORE_CONTEXT_TOKEN, new UmbCurrentUserStore());
+		this.provideContext(UMB_DOCUMENT_STORE_CONTEXT_TOKEN, new UmbDocumentStore(this));
+		this.provideContext(UMB_MEDIA_STORE_CONTEXT_TOKEN, new UmbMediaStore(this));
+		this.provideContext(UMB_DATA_TYPE_STORE_CONTEXT_TOKEN, new UmbDataTypeStore(this));
+		this.provideContext(UMB_DOCUMENT_TYPE_STORE_CONTEXT_TOKEN, new UmbDocumentTypeStore(this));
+		this.provideContext(UMB_MEDIA_TYPE_STORE_CONTEXT_TOKEN, new UmbMediaTypeStore(this));
+		this.provideContext(UMB_MEMBER_TYPE_STORE_CONTEXT_TOKEN, new UmbMemberTypeStore(this));
+		this.provideContext(UMB_USER_STORE_CONTEXT_TOKEN, new UmbUserStore(this));
+		this.provideContext(UMB_USER_GROUP_STORE_CONTEXT_TOKEN, new UmbUserGroupStore(this));
+		this.provideContext(UMB_MEMBER_GROUP_STORE_CONTEXT_TOKEN, new UmbMemberGroupStore(this));
+		this.provideContext(UMB_SECTION_STORE_CONTEXT_TOKEN, new UmbSectionStore());
+		this.provideContext(UMB_CURRENT_USER_HISTORY_STORE_CONTEXT_TOKEN, new UmbCurrentUserHistoryStore());
+		this.provideContext(UMB_DICTIONARY_STORE_CONTEXT_TOKEN, new UmbDictionaryStore(this));
+		this.provideContext(UMB_DOCUMENT_BLUEPRINT_STORE_CONTEXT_TOKEN, new UmbDocumentBlueprintStore(this));
 		this.provideContext('umbLanguageStore', new UmbLanguageStore(this));
 	}
 

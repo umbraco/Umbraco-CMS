@@ -3,6 +3,7 @@ import { css, html, nothing } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { ActionPageEntity } from '../action/tree-item-action.element';
 import { UmbLitElement } from '@umbraco-cms/element';
+import { UmbContextToken } from '@umbraco-cms/context-api';
 
 @customElement('umb-tree-context-menu-service')
 export class UmbTreeContextMenuService extends UmbLitElement {
@@ -56,7 +57,7 @@ export class UmbTreeContextMenuService extends UmbLitElement {
 
 	connectedCallback() {
 		super.connectedCallback();
-		this.provideContext('umbTreeContextMenuService', this);
+		this.provideContext(UMB_TREE_CONTEXT_MENU_SERVICE_CONTEXT_TOKEN, this);
 	}
 
 	public open(entity: ActionPageEntity) {
@@ -91,6 +92,10 @@ export class UmbTreeContextMenuService extends UmbLitElement {
 		`;
 	}
 }
+
+export const UMB_TREE_CONTEXT_MENU_SERVICE_CONTEXT_TOKEN = new UmbContextToken<UmbTreeContextMenuService>(
+	UmbTreeContextMenuService.name
+);
 
 declare global {
 	interface HTMLElementTagNameMap {

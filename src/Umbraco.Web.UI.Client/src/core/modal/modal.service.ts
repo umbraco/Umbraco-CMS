@@ -14,7 +14,8 @@ import './layouts/icon-picker/modal-layout-icon-picker.element';
 import type { UmbModalConfirmData } from './layouts/confirm/modal-layout-confirm.element';
 import type { UmbModalContentPickerData } from './layouts/content-picker/modal-layout-content-picker.element';
 import type { UmbModalPropertyEditorUIPickerData } from './layouts/property-editor-ui-picker/modal-layout-property-editor-ui-picker.element';
-import { UmbModalHandler } from '.';
+import { UmbModalHandler } from './modal-handler';
+import { UmbContextToken } from '@umbraco-cms/context-api';
 
 export type UmbModalType = 'dialog' | 'sidebar';
 
@@ -26,7 +27,6 @@ export interface UmbModalOptions<UmbModalData> {
 
 // TODO: Should this be called UmbModalContext ? as we don't have 'services' as a term.
 export class UmbModalService {
-
 	#modals = new BehaviorSubject(<Array<UmbModalHandler>>[]);
 	public readonly modals = this.#modals.asObservable();
 
@@ -132,3 +132,5 @@ export class UmbModalService {
 		this._close(modalHandler.key);
 	}
 }
+
+export const UMB_MODAL_SERVICE_CONTEXT_TOKEN = new UmbContextToken<UmbModalService>(UmbModalService.name);

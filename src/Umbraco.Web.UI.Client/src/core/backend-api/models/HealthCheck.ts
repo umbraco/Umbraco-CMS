@@ -4,7 +4,7 @@
 
 export type HealthCheck = {
     key?: string;
-    name?: string | null;
+    name?: string;
     description?: string | null;
 };
 

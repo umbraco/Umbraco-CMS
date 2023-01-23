@@ -3,7 +3,10 @@ import { css, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { UmbModalLayoutPickerBase } from '../modal-layout-picker-base';
 import type { UserGroupDetails } from '@umbraco-cms/models';
-import { UmbUserGroupStore } from 'src/backoffice/users/user-groups/user-group.store';
+import {
+	UmbUserGroupStore,
+	UMB_USER_GROUP_STORE_CONTEXT_TOKEN,
+} from 'src/backoffice/users/user-groups/user-group.store';
 
 @customElement('umb-picker-layout-user-group')
 export class UmbPickerLayoutUserGroupElement extends UmbModalLayoutPickerBase {
@@ -60,7 +63,7 @@ export class UmbPickerLayoutUserGroupElement extends UmbModalLayoutPickerBase {
 
 	connectedCallback(): void {
 		super.connectedCallback();
-		this.consumeContext('umbUserGroupStore', (userGroupStore: UmbUserGroupStore) => {
+		this.consumeContext(UMB_USER_GROUP_STORE_CONTEXT_TOKEN, (userGroupStore) => {
 			this._userGroupStore = userGroupStore;
 			this._observeUserGroups();
 		});
@@ -68,10 +71,7 @@ export class UmbPickerLayoutUserGroupElement extends UmbModalLayoutPickerBase {
 
 	private _observeUserGroups() {
 		if (!this._userGroupStore) return;
-		this.observe(
-			this._userGroupStore.getAll(),
-			(userGroups) => (this._userGroups = userGroups)
-		);
+		this.observe(this._userGroupStore.getAll(), (userGroups) => (this._userGroups = userGroups));
 	}
 
 	render() {

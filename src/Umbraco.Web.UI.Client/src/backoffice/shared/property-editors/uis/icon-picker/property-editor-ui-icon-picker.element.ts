@@ -1,7 +1,7 @@
 import { html } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, property } from 'lit/decorators.js';
-import type { UmbModalService } from 'src/core/modal';
+import { UmbModalService, UMB_MODAL_SERVICE_CONTEXT_TOKEN } from '../../../../../core/modal';
 import { UmbLitElement } from '@umbraco-cms/element';
 
 /**
@@ -21,7 +21,7 @@ export class UmbPropertyEditorUIIconPickerElement extends UmbLitElement {
 
 	constructor() {
 		super();
-		this.consumeContext('umbModalService', (modalService: UmbModalService) => {
+		this.consumeContext(UMB_MODAL_SERVICE_CONTEXT_TOKEN, (modalService) => {
 			this._modalService = modalService;
 		});
 	}

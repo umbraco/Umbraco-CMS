@@ -15,7 +15,10 @@ import type { UserDetails, UserGroupEntity } from '@umbraco-cms/models';
 
 import './column-layouts/name/user-table-name-column-layout.element';
 import './column-layouts/status/user-table-status-column-layout.element';
-import { UmbUserGroupStore } from 'src/backoffice/users/user-groups/user-group.store';
+import {
+	UmbUserGroupStore,
+	UMB_USER_GROUP_STORE_CONTEXT_TOKEN,
+} from 'src/backoffice/users/user-groups/user-group.store';
 import { UmbLitElement } from '@umbraco-cms/element';
 
 @customElement('umb-workspace-view-users-table')
@@ -76,11 +79,14 @@ export class UmbWorkspaceViewUsersTableElement extends UmbLitElement {
 	constructor() {
 		super();
 
-		this.consumeAllContexts(['umbUserGroupStore', 'umbUsersContext'], (instances) => {
-			this._userGroupStore = instances['umbUserGroupStore'];
-			this._usersContext = instances['umbUsersContext'];
-			this._observeUsers();
+		this.consumeContext(UMB_USER_GROUP_STORE_CONTEXT_TOKEN, (instance) => {
+			this._userGroupStore = instance;
 			this._observeUserGroups();
+		});
+
+		this.consumeContext<UmbSectionViewUsersElement>('umbUsersContext', (_instance) => {
+			this._usersContext = _instance;
+			this._observeUsers();
 			this._observeSelection();
 		});
 	}

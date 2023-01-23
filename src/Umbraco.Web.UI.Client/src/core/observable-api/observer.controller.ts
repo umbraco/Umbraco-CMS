@@ -1,7 +1,7 @@
 import { Observable } from 'rxjs';
 import { UmbObserver } from './observer';
 import type { UmbControllerInterface } from 'src/core/controller/controller.interface';
-import { UmbControllerHostInterface } from 'src/core/controller/controller-host.mixin';
+import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 
 
 export class UmbObserverController<T> extends UmbObserver<T> implements UmbControllerInterface {

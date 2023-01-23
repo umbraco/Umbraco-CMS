@@ -2,6 +2,7 @@ import { BehaviorSubject, Observable } from 'rxjs';
 import { umbUsersData } from '../../../core/mocks/data/users.data';
 import type { UserDetails } from '@umbraco-cms/models';
 import { umbracoPath } from '@umbraco-cms/utils';
+import { UmbContextToken } from '@umbraco-cms/context-api';
 
 export class UmbCurrentUserStore {
 	private _currentUser = new BehaviorSubject<UserDetails>(umbUsersData.getAll()[0]); //TODO: Temp solution to set the first user as the current logged in user
@@ -26,3 +27,5 @@ export class UmbCurrentUserStore {
 		return this._currentUser.getValue()?.userGroups.includes(adminUserGroupKey);
 	}
 }
+
+export const UMB_CURRENT_USER_STORE_CONTEXT_TOKEN = new UmbContextToken<UmbCurrentUserStore>(UmbCurrentUserStore.name);

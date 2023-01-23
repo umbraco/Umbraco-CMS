@@ -18,7 +18,7 @@ export const manifest: ManifestPropertyEditorUI = {
 					propertyEditorUI: 'Umb.PropertyEditorUI.Toggle',
 				},
 				{
-					alias: 'options',
+					alias: 'items',
 					label: 'Add options',
 					propertyEditorUI: 'Umb.PropertyEditorUI.MultipleTextString',
 				},

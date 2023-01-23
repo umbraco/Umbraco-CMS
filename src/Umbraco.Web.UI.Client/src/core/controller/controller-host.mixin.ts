@@ -63,6 +63,7 @@ export const UmbControllerHostMixin = <T extends HTMLElementConstructor>(superCl
 
 		/**
 		 * Remove a controller from this element.
+		 * Notice this will also destroy the controller.
 		 * @param {UmbControllerInterface} ctrl
 		 */
 		removeController(ctrl: UmbControllerInterface): void {
@@ -74,6 +75,19 @@ export const UmbControllerHostMixin = <T extends HTMLElementConstructor>(superCl
 				}
 				ctrl.destroy();
 			}
+		}
+
+		/**
+		 * Remove a controller from this element by its alias.
+		 * Notice this will also destroy the controller.
+		 * @param {string} unique
+		 */
+		removeControllerByAlias(unique: string): void {
+			this.#controllers.forEach(x => {
+				if(x.unique === unique) {
+					this.removeController(x);
+				}
+			});
 		}
 
 		connectedCallback() {

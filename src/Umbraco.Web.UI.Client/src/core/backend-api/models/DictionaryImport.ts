@@ -5,7 +5,7 @@
 import type { DictionaryItemsImport } from './DictionaryItemsImport';
 
 export type DictionaryImport = {
-    dictionaryItems?: Array<DictionaryItemsImport> | null;
+    dictionaryItems?: Array<DictionaryItemsImport>;
     tempFileName?: string | null;
 };
 

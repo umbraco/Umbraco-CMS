@@ -1,64 +1,74 @@
 import { manifest as colorPicker } from './color-picker/manifests';
-import { manifest as contentPicker } from './content-picker/manifests';
+import { manifest as documentPicker } from './document-picker/manifests';
 import { manifest as datePicker } from './date-picker/manifests';
 import { manifest as eyeDropper } from './eye-dropper/manifests';
 import { manifest as multiUrlPicker } from './multi-url-picker/manifests';
 import { manifest as overlaySize } from './overlay-size/manifests';
-import { manifest as treePicker } from './tree-picker/manifests';
-import { manifest as treePickerStartNode } from './tree-picker-start-node/manifests';
+import { manifests as treePicker } from './tree-picker/manifests';
 import { manifests as textBoxes } from './text-box/manifests';
 import { manifest as dropdown } from './dropdown/manifests';
 import { manifest as multipleTextString } from './multiple-text-string/manifests';
 import { manifest as textArea } from './textarea/manifests';
 import { manifest as slider } from './slider/manifests';
 import { manifest as toggle } from './toggle/manifests';
-import { manifest as tags } from './tags/manifests';
+import { manifests as tags } from './tags/manifests';
 import { manifest as markdownEditor } from './markdown-editor/manifests';
 import { manifest as radioButtonList } from './radio-button-list/manifests';
 import { manifest as checkboxList } from './checkbox-list/manifests';
-import { manifest as blockList } from './block-list/manifests';
+import { manifests as blockList } from './block-list/manifests';
 import { manifest as numberRange } from './number-range/manifests';
-import { manifest as blockListBlockConfiguration } from './block-list-block-configuration/manifests';
 import { manifest as mediaPicker } from './media-picker/manifests';
 import { manifest as imageCropsConfiguration } from './image-crops-configuration/manifests';
 import { manifest as imageCropper } from './image-cropper/manifests';
 import { manifest as uploadField } from './upload-field/manifests';
-import { manifest as blockGrid } from './block-grid/manifests';
-import { manifest as blockGridBlockConfiguration } from './block-grid-block-configuration/manifests';
-import { manifest as blockGridGroupConfiguration } from './block-grid-group-configuration/manifests';
-import { manifest as blockGridStylesheetPicker } from './block-grid-stylesheet-picker/manifests';
+import { manifests as blockGrid } from './block-grid/manifests';
+import { manifest as orderDirection } from './order-direction/manifests';
+import { manifests as collectionView } from './collection-view/manifests';
+import { manifests as tinyMCE } from './tiny-mce/manifests';
+import { manifest as iconPicker } from './icon-picker/manifests';
+import { manifest as label } from './label/manifests';
+import { manifest as valueType } from './value-type/manifests';
+import { manifests as numbers } from './number/manifests';
+import { manifest as userPicker } from './user-picker/manifests';
+import { manifest as memberPicker } from './member-picker/manifests';
+import { manifest as memberGroupPicker } from './member-group-picker/manifests';
 import type { ManifestPropertyEditorUI } from '@umbraco-cms/models';
 
 export const manifests: Array<ManifestPropertyEditorUI> = [
 	colorPicker,
-	contentPicker,
+	documentPicker,
 	datePicker,
 	eyeDropper,
 	multiUrlPicker,
 	overlaySize,
-	...textBoxes,
-	treePicker,
-	treePickerStartNode,
 	dropdown,
 	multipleTextString,
 	textArea,
 	slider,
 	toggle,
-	tags,
 	markdownEditor,
 	radioButtonList,
 	checkboxList,
-	blockList,
 	numberRange,
-	blockListBlockConfiguration,
 	mediaPicker,
 	imageCropsConfiguration,
 	imageCropper,
 	uploadField,
-	blockGrid,
-	blockGridBlockConfiguration,
-	blockGridGroupConfiguration,
-	blockGridStylesheetPicker,
+	orderDirection,
+	iconPicker,
+	label,
+	valueType,
+	userPicker,
+	memberPicker,
+	memberGroupPicker,
+	...numbers,
+	...textBoxes,
+	...treePicker,
+	...blockList,
+	...blockGrid,
+	...collectionView,
+	...tinyMCE,
+	...tags,
 	{
 		type: 'propertyEditorUI',
 		alias: 'Umb.PropertyEditorUI.Number',
@@ -69,18 +79,6 @@ export const manifests: Array<ManifestPropertyEditorUI> = [
 			icon: 'umb:autofill',
 			group: 'common',
 			propertyEditorModel: 'Umbraco.Integer',
-		},
-	},
-	{
-		type: 'propertyEditorUI',
-		alias: 'Umb.PropertyEditorUI.IconPicker',
-		name: 'Icon Picker Property Editor UI',
-		loader: () => import('./icon-picker/property-editor-ui-icon-picker.element'),
-		meta: {
-			label: 'Icon Picker',
-			propertyEditorModel: 'Umbraco.IconPicker',
-			icon: 'umb:document',
-			group: 'common',
 		},
 	},
 ];
