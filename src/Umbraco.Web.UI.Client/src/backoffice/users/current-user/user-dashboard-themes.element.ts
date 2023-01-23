@@ -3,6 +3,7 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, state } from 'lit/decorators.js';
 import { UmbLitElement } from '@umbraco-cms/element';
 import { UmbThemeService, UMB_THEME_SERVICE_CONTEXT_TOKEN } from 'src/core/theme/theme.service';
+import { UUISelectEvent } from '@umbraco-ui/uui';
 
 @customElement('umb-user-dashboard-test')
 export class UmbUserDashboardTestElement extends UmbLitElement {
@@ -15,12 +16,9 @@ export class UmbUserDashboardTestElement extends UmbLitElement {
 				gap: var(--uui-size-space-4);
 				padding: var(--uui-size-space-5);
 				border: 1px solid var(--uui-color-border);
-				background: var(--uui-color-positive);
-				color: var(--uui-color-positive-contrast);
+				background: var(--uui-color-surface);
+				color: var(--uui-color-text);
 				border-radius: var(--uui-border-radius);
-			}
-			p {
-				margin: 0;
 			}
 		`,
 	];
@@ -30,6 +28,9 @@ export class UmbUserDashboardTestElement extends UmbLitElement {
 	@state()
 	private _theme = '';
 
+	@state()
+	private _themes: Array<string> = [];
+
 	constructor() {
 		super();
 		this.consumeContext(UMB_THEME_SERVICE_CONTEXT_TOKEN, (instance) => {
@@ -37,20 +38,32 @@ export class UmbUserDashboardTestElement extends UmbLitElement {
 			instance.theme.subscribe((theme) => {
 				this._theme = theme;
 			});
+			instance.themes.subscribe((themes) => {
+				this._themes = themes.map((t) => t.name);
+			});
 		});
 	}
 
-	private _toggleTheme() {
+	private _handleThemeChange(event: UUISelectEvent) {
 		if (!this.#themeService) return;
-		console.log('toggle', this._theme);
 
-		this.#themeService.changeTheme(this._theme !== 'dark' ? 'dark' : 'light');
+		const theme = event.target.value.toString();
+
+		this.#themeService.changeTheme(theme);
+	}
+
+	get options() {
+		return this._themes.map((t) => ({ name: t, value: t, selected: t === this._theme }));
 	}
 
 	render() {
 		return html`
-			<b>Dark theme toggle</b>
-			<uui-button @click=${this._toggleTheme}>Toggle</uui-button>
+			<b>Select Theme</b>
+			<uui-select
+				label="theme select"
+				@change=${this._handleThemeChange}
+				.value=${this._theme}
+				.options=${this.options}></uui-select>
 		`;
 	}
 }

@@ -48,21 +48,21 @@ export const UMB_THEME_SERVICE_CONTEXT_TOKEN = new UmbContextToken<UmbThemeServi
 
 const _darkTheme = css`
 	:root {
-		--uui-color-selected: #4e78cc;
-		--uui-color-selected-emphasis: #4e78cc;
-		--uui-color-selected-standalone: #4e78cc;
-		--uui-color-selected-contrast: #fff;
-		--uui-color-current: #4e78cc;
-		--uui-color-current-emphasis: #4e78cc;
-		--uui-color-current-standalone: #4e78cc;
+		--uui-color-selected: #316dca;
+		--uui-color-selected-emphasis: #3e79d0;
+		--uui-color-selected-standalone: #5b8dd7;
+		--uui-color-selected-contrast: #eeeeef;
+		--uui-color-current: #316dca;
+		--uui-color-current-emphasis: #3e79d0;
+		--uui-color-current-standalone: #5b8dd7;
 		--uui-color-current-contrast: #f000;
-		--uui-color-disabled: purple;
-		--uui-color-disabled-standalone: purple;
+		--uui-color-disabled: #434c56;
+		--uui-color-disabled-standalone: #545d68;
 		--uui-color-disabled-contrast: #fcfcfc4d;
 		--uui-color-header-surface: #21262e;
-		--uui-color-header-contrast: #ffffffcc;
-		--uui-color-header-contrast-emphasis: #fff;
-		--uui-color-focus: #4e78cc;
+		--uui-color-header-contrast: #eeeeef;
+		--uui-color-header-contrast-emphasis: #eeeeef;
+		--uui-color-focus: #316dca;
 		--uui-color-surface: #2d333b;
 		--uui-color-surface-alt: #373e47;
 		--uui-color-surface-emphasis: #434c56;
