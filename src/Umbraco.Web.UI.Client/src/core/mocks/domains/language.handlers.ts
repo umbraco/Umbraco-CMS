@@ -1,7 +1,7 @@
-import { LanguageDetails } from '@umbraco-cms/models';
 import { rest } from 'msw';
-import { umbLanguagesData } from '../data/languages.data';
 import { v4 as uuidv4 } from 'uuid';
+import { umbLanguagesData } from '../data/languages.data';
+import type { LanguageDetails } from '@umbraco-cms/models';
 
 // TODO: add schema
 export const handlers = [
@@ -23,6 +23,8 @@ export const handlers = [
 
 	rest.get('/umbraco/management/api/v1/language/:key', (req, res, ctx) => {
 		const key = req.params.key as string;
+
+		console.log('key', key, umbLanguagesData);
 
 		if (!key) return;
 

@@ -33,7 +33,7 @@ export class UmbLanguageStore extends UmbDataStoreBase<UmbLanguageStoreItemType>
 				this.updateItems([data]);
 			});
 
-		return this.items.pipe(map((dataTypes) => dataTypes.find((dataType) => dataType.key === key) || null));
+		return this.items.pipe(map((languages) => languages.find((language) => language.key === key) || null));
 	}
 
 	getAll(): Observable<Array<LanguageDetails>> {

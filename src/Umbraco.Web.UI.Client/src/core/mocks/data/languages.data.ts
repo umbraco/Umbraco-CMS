@@ -1,5 +1,5 @@
 import { UmbData } from './data';
-import { LanguageDetails } from '@umbraco-cms/models';
+import type { LanguageDetails } from '@umbraco-cms/models';
 
 // Temp mocked database
 class UmbLanguagesData extends UmbData<LanguageDetails> {
@@ -9,7 +9,7 @@ class UmbLanguagesData extends UmbData<LanguageDetails> {
 
 	// skip can be number or null
 	getAll(skip = 0, take = this.data.length): Array<LanguageDetails> {
-		return this.data.splice(skip, take);
+		return this.data.slice(skip, take);
 	}
 
 	getByKey(key: string) {
@@ -53,7 +53,7 @@ class UmbLanguagesData extends UmbData<LanguageDetails> {
 	}
 }
 
-export const data: Array<LanguageDetails> = [
+export const MockData: Array<LanguageDetails> = [
 	{
 		id: 1,
 		key: 'asdail12h3k1h23k12h3',
@@ -91,4 +91,4 @@ export const data: Array<LanguageDetails> = [
 	},
 ];
 
-export const umbLanguagesData = new UmbLanguagesData(data);
+export const umbLanguagesData = new UmbLanguagesData(MockData);

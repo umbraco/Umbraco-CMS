@@ -14,6 +14,10 @@ export class UmbWorkspaceViewLanguageEditElement extends UmbLitElement {
 	static styles = [
 		UUITextStyles,
 		css`
+			:host {
+				display: block;
+				padding: var(--uui-size-space-6);
+			}
 			uui-combobox {
 				width: 100%;
 			}
