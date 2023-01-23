@@ -22,7 +22,7 @@ import { UmbMediaDetailStore } from './media/media/media.detail.store';
 import { UmbMediaTreeStore } from './media/media/media.tree.store';
 import { UmbMemberTypeDetailStore } from './members/member-types/member-type.detail.store';
 import { UmbMemberTypeTreeStore } from './members/member-types/member-type.tree.store';
-import { UmbMemberGroupStore, UMB_MEMBER_GROUP_STORE_CONTEXT_TOKEN } from './members/member-groups/member-group.details.store';
+import { UmbMemberGroupStore } from './members/member-groups/member-group.details.store';
 import { UmbDictionaryStore, UMB_DICTIONARY_STORE_CONTEXT_TOKEN } from './translation/dictionary/dictionary.store';
 import {
 	UmbDocumentBlueprintStore,
@@ -85,8 +85,8 @@ export class UmbBackofficeElement extends UmbLitElement {
 		new UmbMemberTypeDetailStore(this);
 		new UmbMemberTypeTreeStore(this);
 		new UmbUserGroupStore(this);
+		new UmbMemberGroupStore(this);
 
-		this.provideContext(UMB_MEMBER_GROUP_STORE_CONTEXT_TOKEN, new UmbMemberGroupStore(this));
 		this.provideContext(UMB_SECTION_STORE_CONTEXT_TOKEN, new UmbSectionStore());
 		this.provideContext(UMB_CURRENT_USER_HISTORY_STORE_CONTEXT_TOKEN, new UmbCurrentUserHistoryStore());
 		this.provideContext(UMB_DICTIONARY_STORE_CONTEXT_TOKEN, new UmbDictionaryStore(this));
