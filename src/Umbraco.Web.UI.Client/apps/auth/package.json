@@ -6,11 +6,18 @@
 		"name": "Umbraco HQ",
 		"email": "backoffice@umbraco.com"
 	},
+	"type": "module",
+	"main": "dist/main.js",
+	"module": "dist/main.js",
+	"files": [
+		"dist"
+	],
 	"scripts": {
 		"dev": "vite",
-		"build": "vite build",
-		"build:production": "vite build --mode production",
+		"build": "tsc && vite build",
+		"build:production": "tsc && vite build --mode production",
 		"preview": "vite preview",
-		"test": "web-test-runner \"test/**/*.test.ts\" --node-resolve"
+		"test": "web-test-runner \"test/**/*.test.ts\" --node-resolve",
+		"test:e2e": "npx playwright test"
 	}
 }
