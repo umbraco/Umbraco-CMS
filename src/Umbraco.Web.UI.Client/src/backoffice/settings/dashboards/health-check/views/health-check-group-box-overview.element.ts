@@ -66,7 +66,7 @@ export class UmbHealthCheckGroupBoxOverviewElement extends UmbLitElement {
 	constructor() {
 		super();
 
-		this.consumeContext('umbHealthCheckDashboard', (instance) => {
+		this.consumeContext<UmbHealthCheckDashboardContext>('umbHealthCheckDashboard', (instance) => {
 			this._healthCheckContext = instance;
 			if (!this._healthCheckContext || !this.manifest?.meta.label) return;
 			this._api = this._healthCheckContext?.apis.get(this.manifest?.meta.label);
