@@ -1,6 +1,6 @@
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
 import { UmbContextToken } from '@umbraco-cms/context-api';
-import { StringState } from 'libs/observable-api/string-state';
+import { StringState } from '@umbraco-cms/observable-api';
 
 export class UmbBackofficeContext {
 

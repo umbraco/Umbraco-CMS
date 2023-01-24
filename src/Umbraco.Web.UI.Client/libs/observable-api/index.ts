@@ -1,5 +1,7 @@
 export * from './observer.controller';
 export * from './observer';
+export * from './number-state';
+export * from './string-state';
 export * from './deep-state';
 export * from './array-state';
 export * from './object-state';

@@ -1,9 +1,8 @@
-import { Observable, ReplaySubject } from 'rxjs';
+import { Observable } from 'rxjs';
 import { Install, InstallResource, InstallSettings, ProblemDetails, TelemetryLevel } from '@umbraco-cms/backend-api';
 import { tryExecute } from '@umbraco-cms/resources';
 import { UmbContextToken } from '@umbraco-cms/context-api';
-import { NumberState } from 'libs/observable-api/number-state';
-import { ObjectState } from '@umbraco-cms/observable-api';
+import { ObjectState, NumberState } from '@umbraco-cms/observable-api';
 
 /**
  * Context API for the installer

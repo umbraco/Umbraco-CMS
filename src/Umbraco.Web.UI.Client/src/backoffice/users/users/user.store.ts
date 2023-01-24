@@ -1,9 +1,8 @@
 import type { UserDetails } from '@umbraco-cms/models';
-import { createObservablePart, ArrayState } from '@umbraco-cms/observable-api';
+import { createObservablePart, ArrayState, NumberState } from '@umbraco-cms/observable-api';
 import { UmbContextToken } from '@umbraco-cms/context-api';
 import { UmbStoreBase } from '@umbraco-cms/store';
 import type { UmbControllerHostInterface } from '@umbraco-cms/controller';
-import { NumberState } from 'libs/observable-api/number-state';
 
 export type UmbUserStoreItemType = UserDetails;
 
