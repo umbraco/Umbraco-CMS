@@ -1,10 +1,9 @@
-import { css, html } from 'lit';
+import { css, html, LitElement } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement } from 'lit/decorators.js';
-import { UmbLitElement } from '@umbraco-cms/element';
 
 @customElement('umb-external-login-provider-test')
-export class UmbExternalLoginProviderTestElement extends UmbLitElement {
+export class UmbExternalLoginProviderTestElement extends LitElement {
 	static styles = [
 		UUITextStyles,
 		css`
