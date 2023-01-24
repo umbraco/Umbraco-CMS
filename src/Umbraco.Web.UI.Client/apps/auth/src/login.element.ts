@@ -44,7 +44,7 @@ export default class UmbLogin extends LitElement {
 
 		try {
 			this._loggingIn = false;
-			alert('go back to the backoffice');
+			window.postMessage({ type: 'login', username, persist }, '*');
 		} catch (error) {
 			console.log(error);
 			this._loggingIn = false;
