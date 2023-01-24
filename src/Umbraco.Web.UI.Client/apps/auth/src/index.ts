@@ -1,6 +1,7 @@
+import { ManifestTypes, umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
 import { manifests as externalLoginProviders } from './external-login-providers/manifests';
 
-import { ManifestTypes, umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
+import './login.element';
 
 const registerExtensions = (manifests: Array<ManifestTypes>) => {
 	manifests.forEach((manifest) => {
@@ -9,6 +10,4 @@ const registerExtensions = (manifests: Array<ManifestTypes>) => {
 	});
 };
 
-registerExtensions([
-	...externalLoginProviders,
-]);
+registerExtensions([...externalLoginProviders]);

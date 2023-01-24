@@ -1,10 +1,9 @@
-import '../auth-layout.element';
-
 import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, CSSResultGroup, html, LitElement } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
-import { query } from 'router-slot';
+
+import './auth-layout.element';
 
 @customElement('umb-login')
 export default class UmbLogin extends LitElement {
@@ -45,12 +44,7 @@ export default class UmbLogin extends LitElement {
 
 		try {
 			this._loggingIn = false;
-			let { redirectTo } = query();
-			if (!redirectTo) {
-				redirectTo = 'section';
-			}
-			sessionStorage.setItem('is-authenticated', 'true');
-			history.pushState(null, '', redirectTo);
+			alert('go back to the backoffice');
 		} catch (error) {
 			console.log(error);
 			this._loggingIn = false;

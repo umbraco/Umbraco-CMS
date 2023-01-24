@@ -1,0 +1,16 @@
+{
+	"name": "umbraco-backoffice-auth",
+	"version": "0.0.0",
+	"license": "MIT",
+	"author": {
+		"name": "Umbraco HQ",
+		"email": "backoffice@umbraco.com"
+	},
+	"scripts": {
+		"dev": "vite",
+		"build": "vite build",
+		"build:production": "vite build --mode production",
+		"preview": "vite preview",
+		"test": "web-test-runner \"test/**/*.test.ts\" --node-resolve"
+	}
+}

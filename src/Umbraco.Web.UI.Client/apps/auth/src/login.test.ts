@@ -1,6 +1,6 @@
 import { expect, fixture, html } from '@open-wc/testing';
-import UmbLogin from './login.element';
 import { defaultA11yConfig } from '@umbraco-cms/test-utils';
+import UmbLogin from './login.element';
 
 describe('UmbLogin', () => {
 	let element: UmbLogin;
