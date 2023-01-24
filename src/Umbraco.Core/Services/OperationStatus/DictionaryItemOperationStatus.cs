@@ -7,5 +7,6 @@ public enum DictionaryItemOperationStatus
     DuplicateItemKey,
     ItemNotFound,
     ParentNotFound,
-    InvalidId
+    InvalidId,
+    DuplicateKey
 }

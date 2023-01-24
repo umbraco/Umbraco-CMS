@@ -233,6 +233,28 @@ public class DictionaryItemServiceTests : UmbracoIntegrationTest
     }
 
     [Test]
+    public async Task Can_Create_DictionaryItem_With_Explicit_Key()
+    {
+        var english = await LanguageService.GetAsync("en-US");
+        // the package install needs to be able to create dictionary items with explicit keys
+        var key = Guid.NewGuid();
+
+        var result = await DictionaryItemService.CreateAsync(
+            new DictionaryItem("Testing123")
+            {
+                Key = key,
+                Translations = new List<IDictionaryTranslation> { new DictionaryTranslation(english, "Hello world") }
+            });
+        Assert.True(result.Success);
+        Assert.AreEqual(key, result.Result.Key);
+
+        // re-get
+        var item = await DictionaryItemService.GetAsync(result.Result!.Key);
+        Assert.NotNull(item);
+        Assert.AreEqual(key, item.Key);
+    }
+
+    [Test]
     public async Task Can_Add_Translation_To_Existing_Dictionary_Item()
     {
         var english = await LanguageService.GetAsync("en-US");
@@ -310,7 +332,7 @@ public class DictionaryItemServiceTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public async Task Cannot_Add_Duplicate_DictionaryItem_Key()
+    public async Task Cannot_Add_Duplicate_DictionaryItem_ItemKey()
     {
         var item = await DictionaryItemService.GetAsync("Child");
         Assert.IsNotNull(item);
@@ -379,6 +401,38 @@ public class DictionaryItemServiceTests : UmbracoIntegrationTest
         var result = await DictionaryItemService.DeleteAsync(Guid.NewGuid());
         Assert.IsFalse(result.Success);
         Assert.AreEqual(DictionaryItemOperationStatus.ItemNotFound, result.Status);
+    }
+
+    [Test]
+    public async Task Cannot_Create_DictionaryItem_With_Duplicate_Key()
+    {
+        var english = await LanguageService.GetAsync("en-US");
+        var key = Guid.NewGuid();
+
+        var result = await DictionaryItemService.CreateAsync(
+            new DictionaryItem("Testing123")
+            {
+                Key = key,
+                Translations = new List<IDictionaryTranslation> { new DictionaryTranslation(english, "Hello world") }
+            });
+        Assert.True(result.Success);
+
+        result = await DictionaryItemService.CreateAsync(
+            new DictionaryItem("Testing456")
+            {
+                Key = key,
+                Translations = new List<IDictionaryTranslation> { new DictionaryTranslation(english, "Hello world") }
+            });
+        Assert.False(result.Success);
+        Assert.AreEqual(DictionaryItemOperationStatus.DuplicateKey, result.Status);
+
+        // re-get
+        var item = await DictionaryItemService.GetAsync("Testing123");
+        Assert.NotNull(item);
+        Assert.AreEqual(key, item.Key);
+
+        item = await DictionaryItemService.GetAsync("Testing456");
+        Assert.Null(item);
     }
 
     private async Task CreateTestData()

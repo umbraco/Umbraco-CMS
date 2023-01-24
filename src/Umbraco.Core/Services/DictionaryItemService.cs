@@ -162,6 +162,11 @@ internal class DictionaryItemService : RepositoryService, IDictionaryItemService
 
         using (ICoreScope scope = ScopeProvider.CreateCoreScope())
         {
+            if (_dictionaryRepository.Get(dictionaryItem.Key) != null)
+            {
+                return Attempt.FailWithStatus(DictionaryItemOperationStatus.DuplicateKey, dictionaryItem);
+            }
+
             // validate the parent
             Guid? parentId = dictionaryItem.ParentId;
             if (parentId.HasValue && parentId.Value != Guid.Empty)
