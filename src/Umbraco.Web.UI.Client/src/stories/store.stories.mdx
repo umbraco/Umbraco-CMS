@@ -13,7 +13,7 @@ Generally a Store will be holding one or more RxJS Subjects, each Subject is mad
 ````
 class MyProductStore {
 
-	protected _products = new ArrayState(<Array<T>>[]);
+	protected _products = new ArrayState(<Array<MyProductType>>[]);
 	public readonly products = this._items.asObservable();
 
 	protected host: UmbControllerHostInterface;
@@ -21,10 +21,10 @@ class MyProductStore {
 		this.host = host;
 	}
 
-	getByKey(key: string): Observable<MyProductDataModel | null> {
-		tryExecuteAndNotify(this.host, productResource.getByKey({key})).then(({ data }) => {
+	getByKey(key: string) {
+		tryExecuteAndNotify(this.host, ProductResource.getByKey({key})).then(({ data }) => {
 			if (data) {
-				this._products.update(data.items);
+				this._products.append(data.items);
 			}
 		});
 	}
