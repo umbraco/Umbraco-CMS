@@ -2178,14 +2178,7 @@
             }
           },
           "200": {
-            "description": "Success",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/LogLevelCounts"
-                }
-              }
-            }
+            "description": "Success"
           }
         }
       }
@@ -2502,15 +2495,18 @@
           }
         ],
         "responses": {
-          "200": {
-            "description": "Success",
+          "400": {
+            "description": "Bad Request",
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "boolean"
+                  "$ref": "#/components/schemas/ProblemDetails"
                 }
               }
             }
+          },
+          "200": {
+            "description": "Success"
           }
         }
       }
@@ -6429,32 +6425,6 @@
         ],
         "type": "integer",
         "format": "int32"
-      },
-      "LogLevelCounts": {
-        "type": "object",
-        "properties": {
-          "information": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "debug": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "warning": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "error": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "fatal": {
-            "type": "integer",
-            "format": "int32"
-          }
-        },
-        "additionalProperties": false
       },
       "LogMessage": {
         "type": "object",
