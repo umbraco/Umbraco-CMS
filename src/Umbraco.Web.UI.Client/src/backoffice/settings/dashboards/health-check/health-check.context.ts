@@ -1,7 +1,7 @@
 import { BehaviorSubject, Observable } from 'rxjs';
 import { HealthCheckResource, HealthCheckWithResult } from '@umbraco-cms/backend-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/resources';
-import { UmbControllerHostInterface } from 'src/core/controller/controller-host.mixin';
+import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 
 export class UmbHealthCheckContext {
 	private _checks: BehaviorSubject<Array<any>> = new BehaviorSubject(<Array<any>>[]);
