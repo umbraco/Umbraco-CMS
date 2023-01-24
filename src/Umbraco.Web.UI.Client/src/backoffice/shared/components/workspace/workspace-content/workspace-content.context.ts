@@ -1,12 +1,14 @@
 import { v4 as uuidv4 } from 'uuid';
-import { UmbNotificationService, UMB_NOTIFICATION_SERVICE_CONTEXT_TOKEN } from '../../../../../core/notification';
-import { UmbNotificationDefaultData } from '../../../../../core/notification/layouts/default';
-import { UmbNodeStoreBase } from '@umbraco-cms/stores/store';
+import { UniqueBehaviorSubject, UmbObserverController, createObservablePart } from '@umbraco-cms/observable-api';
+import {
+	UmbNotificationDefaultData,
+	UmbNotificationService,
+	UMB_NOTIFICATION_SERVICE_CONTEXT_TOKEN,
+} from '@umbraco-cms/notification';
+import { UmbNodeStoreBase } from '@umbraco-cms/store';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 import { UmbContextConsumerController, UmbContextProviderController } from '@umbraco-cms/context-api';
 import { EntityTreeItem } from '@umbraco-cms/backend-api';
-import { UniqueBehaviorSubject, UmbObserverController } from '@umbraco-cms/observable-api';
-import { createObservablePart } from '@umbraco-cms/observable-api';
 
 // TODO: Consider if its right to have this many class-inheritance of WorkspaceContext
 // TODO: Could we extract this code into a 'Manager' of its own, which will be instantiated by the concrete Workspace Context. This will be more transparent and 'reuseable'

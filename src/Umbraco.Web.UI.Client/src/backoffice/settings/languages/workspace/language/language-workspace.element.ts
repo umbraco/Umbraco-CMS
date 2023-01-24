@@ -1,6 +1,6 @@
 import { html } from 'lit';
 import { customElement } from 'lit/decorators.js';
-import { UMB_NOTIFICATION_SERVICE_CONTEXT_TOKEN } from 'src/core/notification';
+import { UMB_NOTIFICATION_SERVICE_CONTEXT_TOKEN } from '@umbraco-cms/notification';
 
 import { UmbLitElement } from '@umbraco-cms/element';
 

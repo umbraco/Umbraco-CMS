@@ -1,8 +1,8 @@
 import { map, Observable } from 'rxjs';
-import { UmbDataStoreBase } from '../../../core/stores/store';
 import type { UserDetails } from '@umbraco-cms/models';
 import { UniqueBehaviorSubject } from '@umbraco-cms/observable-api';
 import { UmbContextToken } from '@umbraco-cms/context-api';
+import { UmbDataStoreBase } from '@umbraco-cms/store';
 
 export type UmbUserStoreItemType = UserDetails;
 

@@ -1,5 +1,5 @@
 import { map, Observable } from 'rxjs';
-import { UmbNodeStoreBase } from '../../../core/stores/store';
+import { UmbNodeStoreBase } from '@umbraco-cms/store';
 import { MediaTypeResource, FolderTreeItem } from '@umbraco-cms/backend-api';
 import type { MediaTypeDetails } from '@umbraco-cms/models';
 import { tryExecuteAndNotify } from '@umbraco-cms/resources';

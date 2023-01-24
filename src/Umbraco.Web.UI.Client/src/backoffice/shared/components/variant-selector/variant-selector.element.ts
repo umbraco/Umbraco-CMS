@@ -6,7 +6,7 @@ import { distinctUntilChanged } from 'rxjs';
 import type { UmbWorkspaceContentContext } from '../workspace/workspace-content/workspace-content.context';
 import type { DocumentDetails, MediaDetails } from '@umbraco-cms/models';
 
-import type { UmbNodeStoreBase } from '@umbraco-cms/stores/store';
+import type { UmbNodeStoreBase } from '@umbraco-cms/store';
 import { UmbLitElement } from '@umbraco-cms/element';
 
 type ContentTypeTypes = DocumentDetails | MediaDetails;

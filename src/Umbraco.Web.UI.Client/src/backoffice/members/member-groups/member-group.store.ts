@@ -1,5 +1,5 @@
 import { map, Observable } from 'rxjs';
-import { UmbNodeStoreBase } from '../../../core/stores/store';
+import { UmbNodeStoreBase } from '@umbraco-cms/store';
 import { EntityTreeItem, MemberGroupResource } from '@umbraco-cms/backend-api';
 import type { MemberGroupDetails } from '@umbraco-cms/models';
 import { tryExecuteAndNotify } from '@umbraco-cms/resources';
