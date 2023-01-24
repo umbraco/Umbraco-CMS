@@ -1,11 +1,11 @@
 import { Meta } from '@storybook/addon-docs';
 
-<Meta title="Guides/Context API" parameters={{ previewTabs: { canvas: { hidden: true } } }} />
+<Meta title="Guides/Store" parameters={{ previewTabs: { canvas: { hidden: true } } }} />
 
 # Store
 
 
-A store is the link between a Resource and a implementation, mostly taken form as a Context.
+A store is the link between a Resource and a data implementation. A store is mainly taken form as a Context, In other words we will have to Consume the Context(Store) to get the Store.
 Generally a Store will be holding one or more RxJS Subjects, each Subject is made available for Subscription via a RxJS Observable.
 
 ### A Simple Store:
@@ -13,20 +13,154 @@ Generally a Store will be holding one or more RxJS Subjects, each Subject is mad
 ````
 class MyProductStore {
 
-	protected _products = new ArrayState(<Array<MyProductType>>[]);
-	public readonly products = this._items.asObservable();
+	#products = new ArrayState(<Array<MyProductType>>[], (product) => product.key);
+
+	public readonly products = this.#products.asObservable();
 
 	protected host: UmbControllerHostInterface;
 	constructor(host: UmbControllerHostInterface) {
 		this.host = host;
+
+		// The Store provides it self as a Context-API.
+		new UmbContextProviderController(_host, 'MyStoreContextAlias', this);
 	}
 
-	getByKey(key: string) {
-		tryExecuteAndNotify(this.host, ProductResource.getByKey({key})).then(({ data }) => {
-			if (data) {
-				this._products.append(data.items);
-			}
+}
+````
+
+In this example we created a ArrayState, A State which is specific to Arrays.
+This holds the data for one or more Observables to convey for outsiders.
+
+This example shows how to use the store:
+
+````
+class MyImplementation extends UmbLitElement {
+
+	private _myProductStore?: MyProductStore;
+
+	constructor() {
+		super();
+
+		// Notice the consume callback is triggered initially and everytime the Context is changed.
+		this.consume('MyStoreContextAlias', (context) => {
+			this._myProductStore = context;
+
+			this._observeAllProducts();
 		});
 	}
+
+
+	private _observeAllProducts() {
+		if (!this._myProductStore) return;
+
+		// Notice this callback will be triggered initially and each time the products change:
+		this.observe(this._myProductStore.products, (products) => {
+			console.log("The data of all products is:", products);
+		});
+	}
+
+}
+````
+
+
+
+
+### A bit more meaningful Store:
+
+Here we added a method that returns an Observable that is specific to the requested product.
+
+````
+class MyProductStore {
+
+	...
+
+	getByKey(key: string) {
+
+		// Request data via a Resource to then take part of this state when recieved.
+		tryExecuteAndNotify(this.host, ProductResource.getByKey({key})).then(({ data }) => {
+			if (data) {
+				this.#products.append(data.items);
+			}
+		});
+
+		// Return a Observable part, to listen for this specific product and the future changes of it.
+		return createObservablePart(this.#data, (documents) =>
+			documents.find((document) => document.key === key)
+		);
+	}
+}
+````
+
+
+An example using this method:
+
+````
+class MyImplementation extends UmbLitElement {
+
+	private _myProductStore?: MyProductStore;
+
+	constructor() {
+		super();
+
+		// Notice the consume callback is triggered initially and everytime the Context is changed.
+		this.consume('MyStoreContextAlias', (context) => {
+			this._myProductStore = context;
+
+			this._observeASpecificProduct();
+		});
+	}
+
+	private _observeASpecificProduct() {
+		if (!this._myProductStore) return;
+
+		// Notice this callback will be triggered initially and each time the specific product change:
+		this.observe(this._myProductStore.getByKey('1234'), (product) => {
+			console.log("The data of product `1234`` is:", product);
+		});
+	}
+
+}
+````
+
+
+
+### Create many Observables:
+
+A Store must hold different Observables some very general and others specific. All in perspective of what types of observes we like to accommodate.
+
+This example give some inspiration to how fine grained this can become:
+
+````
+class MyProductStore {
+
+	#products = new ArrayState(<Array<MyProductType>>[]);
+
+	public readonly products = this.#products.asObservable();
+	public readonly amountOfProducts = createObservablePart(this.#products, (products) => products.length);
+	public readonly topTenRatedProducts = createObservablePart(this.#products, (products) => products.sort((a, b) => b.rating - a.rating).slice(0, 10));
+
+	...
+
+}
+````
+
+An observer of an Observable will only be triggered if the specific part of that data has changed.
+With this we can make a high performant application, only triggering the parts that needs to update when data is changed.
+
+
+
+
+### Ensure unique data:
+
+For incoming data to replace existing data, we need to clarify what makes a entry of the array unique.
+In the examples of this guide each product has a key, and we have clarified this to the State by giving it the little method `(product) => product.key` as part of the its creation:
+
+````
+class MyProductStore {
+
+	#products = new ArrayState(<Array<MyProductType>>[], (product) => product.key);
+
+	...
+
 }
 ````
