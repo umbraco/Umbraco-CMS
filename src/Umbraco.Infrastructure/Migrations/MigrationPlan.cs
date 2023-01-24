@@ -45,6 +45,7 @@ public class MigrationPlan
     /// </summary>
     public IReadOnlyDictionary<string, Transition?> Transitions => _transitions;
 
+    [Obsolete("This will be removed in the V13, and replaced with a RebuildCache flag on the MigrationBase")]
     public IReadOnlyList<Type> PostMigrationTypes => _postMigrationTypes;
 
     /// <summary>
@@ -296,6 +297,7 @@ public class MigrationPlan
     /// <summary>
     ///     Adds a post-migration to the plan.
     /// </summary>
+    [Obsolete("This will be removed in the V13, and replaced with a RebuildCache flag on the MigrationBase")]
     public virtual MigrationPlan AddPostMigration<TMigration>()
         where TMigration : MigrationBase
     {

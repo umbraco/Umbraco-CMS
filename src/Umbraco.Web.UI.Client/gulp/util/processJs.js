@@ -13,11 +13,11 @@ var rename = require('gulp-rename');
 var _ = require('lodash');
 
 module.exports = function (files, out) {
-    
+
     _.forEach(config.roots, function(root){
         console.log("JS: ", files, " -> ", root + config.targets.js + out)
     })
-    
+
     var task = gulp.src(files);
 
     // check for js errors
@@ -25,10 +25,13 @@ module.exports = function (files, out) {
       warnIgnored: true,
       quiet: true
     }));
-    // outputs the lint results to the console
-    task = task.pipe(eslint.format());
-    // fail after all errors have been discovered
-    task = task.pipe(eslint.failAfterError());
+
+    if (config.compile.current.lint === true) {
+      // outputs the lint results to the console
+      task = task.pipe(eslint.format());
+      // fail after all errors have been discovered
+      task = task.pipe(eslint.failAfterError());
+    }
 
     // sort files in stream by path or any custom sort comparator
     task = task.pipe(babel())
@@ -38,7 +41,7 @@ module.exports = function (files, out) {
     if(config.compile.current.embedtemplates === true) {
         task = task.pipe(embedTemplates({ basePath: "./src/", minimize: { loose: true } }));
     }
-    
+
     task = task.pipe(concat(out)).pipe(wrap('(function(){\n%= body %\n})();'))
 
     // NOTE: if you change something here, you probably also need to change it in the js task
@@ -64,7 +67,7 @@ module.exports = function (files, out) {
     _.forEach(config.roots, function(root){
         task = task.pipe(gulp.dest(root + config.targets.js));
     })
-        
+
 
 
     return task;

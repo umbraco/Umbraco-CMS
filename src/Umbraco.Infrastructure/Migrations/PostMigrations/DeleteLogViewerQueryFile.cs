@@ -6,6 +6,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.PostMigrations;
 /// <summary>
 ///     Deletes the old file that saved log queries
 /// </summary>
+[Obsolete("This will be removed in the V13")]
 public class DeleteLogViewerQueryFile : MigrationBase
 {
     private readonly IHostingEnvironment _hostingEnvironment;
@@ -26,5 +27,6 @@ public class DeleteLogViewerQueryFile : MigrationBase
         // {
         //     File.Delete(logViewerQueryFile);
         // }
+        // }Rebuild
     }
 }

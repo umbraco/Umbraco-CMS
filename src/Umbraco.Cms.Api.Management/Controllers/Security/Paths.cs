@@ -4,9 +4,9 @@ public static class Paths
 {
     public const string BackOfficeApiEndpointTemplate = "security/back-office";
 
-    public static string BackOfficeApiAuthorizationEndpoint = BackOfficeApiEndpointPath($"{BackOfficeApiEndpointTemplate}/authorize");
+    public static readonly string BackOfficeApiAuthorizationEndpoint = BackOfficeApiEndpointPath($"{BackOfficeApiEndpointTemplate}/authorize");
 
-    public static string BackOfficeApiTokenEndpoint = BackOfficeApiEndpointPath($"{BackOfficeApiEndpointTemplate}/token");
+    public static readonly string BackOfficeApiTokenEndpoint = BackOfficeApiEndpointPath($"{BackOfficeApiEndpointTemplate}/token");
 
     private static string BackOfficeApiEndpointPath(string relativePath) => $"/umbraco/management/api/v1.0/{relativePath}";
 }

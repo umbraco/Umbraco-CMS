@@ -31,7 +31,7 @@
 
         <div class="umb-block-list__actions" ng-if="vm.loading !== true && !vm.singleBlockMode">
             <button
-                    id="{{vm.model.alias}}"
+                    id="button_{{vm.model.alias}}"
                     type="button"
                     class="btn-reset umb-block-list__create-button umb-outline"
                     ng-disabled="vm.availableBlockTypes.length === 0 || vm.readonly"
