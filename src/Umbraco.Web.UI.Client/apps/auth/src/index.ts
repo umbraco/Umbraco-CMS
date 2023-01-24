@@ -5,6 +5,7 @@ import { manifests as externalLoginProviders } from './external-login-providers/
 import '@umbraco-ui/uui';
 import '@umbraco-ui/uui-css';
 import './login.element';
+import 'element-internals-polyfill';
 
 const registerExtensions = (manifests: Array<ManifestTypes>) => {
 	manifests.forEach((manifest) => {
