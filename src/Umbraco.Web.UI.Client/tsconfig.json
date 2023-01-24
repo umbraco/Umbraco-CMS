@@ -37,7 +37,7 @@
 			"@umbraco-cms/sections/*": ["src/backoffice/sections/*"]
 		}
 	},
-	"include": ["src/**/*.ts", "libs/**/*.ts", "e2e/**/*.ts"],
+	"include": ["src/**/*.ts", "apps/**/*.ts", "libs/**/*.ts", "e2e/**/*.ts"],
 	"references": [
 		{
 			"path": "./tsconfig.node.json"
