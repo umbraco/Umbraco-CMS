@@ -2,8 +2,6 @@ import { rest } from 'msw';
 import { umbracoPath } from '@umbraco-cms/utils';
 import { PagedRedirectUrl, RedirectUrl, RedirectStatus, RedirectUrlStatus } from '@umbraco-cms/backend-api';
 
-const UrlTracker: RedirectUrlStatus = { status: RedirectStatus.ENABLED, userIsAdmin: true };
-
 export const handlers = [
 	rest.get(umbracoPath('/redirect-management'), (_req, res, ctx) => {
 		return res(ctx.status(200), ctx.json<PagedRedirectUrl>(PagedRedirectUrlData));
@@ -36,6 +34,10 @@ export const handlers = [
 		return res(ctx.status(200), ctx.json<any>(UrlTracker.status));
 	}),
 ];
+
+// Mock Data
+
+const UrlTracker: RedirectUrlStatus = { status: RedirectStatus.ENABLED, userIsAdmin: true };
 
 const _getRedirectUrlByKey = (key: string) => {
 	const PagedResult: PagedRedirectUrl = {

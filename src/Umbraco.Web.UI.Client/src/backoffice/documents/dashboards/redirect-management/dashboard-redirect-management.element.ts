@@ -99,8 +99,7 @@ export class UmbDashboardRedirectManagementElement extends UmbLitElement {
 
 	private async _getTrackerStatus() {
 		const { data } = await tryExecuteAndNotify(this, RedirectManagementResource.getRedirectManagementStatus());
-		//console.log(data);
-		//if (data?.status) this._trackerStatus = data.status;
+		if (data && data.status) data.status === RedirectStatus.ENABLED ? true : false;
 	}
 
 	private async _setup() {
