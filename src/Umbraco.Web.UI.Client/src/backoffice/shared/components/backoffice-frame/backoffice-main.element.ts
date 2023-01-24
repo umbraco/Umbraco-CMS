@@ -5,9 +5,9 @@ import { state } from 'lit/decorators.js';
 import { IRoutingInfo } from 'router-slot';
 import { UmbSectionStore, UMB_SECTION_STORE_CONTEXT_TOKEN } from '../section/section.store';
 import { UmbSectionContext, UMB_SECTION_CONTEXT_TOKEN } from '../section/section.context';
+import { UmbSectionElement } from '../section/section.element';
 import { createExtensionElement } from '@umbraco-cms/extensions-api';
 import type { ManifestSection } from '@umbraco-cms/models';
-import { UmbSectionElement } from 'src/backoffice/shared/components/section/section.element';
 import { UmbLitElement } from '@umbraco-cms/element';
 
 @defineElement('umb-backoffice-main')
