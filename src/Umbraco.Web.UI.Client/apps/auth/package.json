@@ -16,8 +16,6 @@
 		"dev": "vite",
 		"build": "tsc && vite build",
 		"build:production": "tsc && vite build --mode production",
-		"preview": "vite preview",
-		"test": "web-test-runner \"test/**/*.test.ts\" --node-resolve",
-		"test:e2e": "npx playwright test"
+		"preview": "vite preview"
 	}
 }
