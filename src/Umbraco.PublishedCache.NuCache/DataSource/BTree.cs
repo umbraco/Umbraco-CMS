@@ -22,11 +22,6 @@ public class BTree
             // default is 4096, min 2^9 = 512, max 2^16 = 64K
             FileBlockSize = GetBlockSize(settings),
 
-            // Since .NET 5, we can use the fastest cross-platform Storage Performance Mode.
-            // This is safer but a bit slower then what was used in Umbraco 8 (LogFileInCache (Windows only)).
-            // But much faster than what was used in Umbraco 9 (CommitToDisk), Especially on Linux for some reason..
-            StoragePerformance = StoragePerformance.CommitToCache,
-
             // other options?
         };
 
