@@ -1,0 +1,137 @@
+import { rest } from 'msw';
+import { umbracoPath } from '@umbraco-cms/utils';
+import { PagedRedirectUrl, RedirectUrl, RedirectStatus, RedirectUrlStatus } from '@umbraco-cms/backend-api';
+
+const UrlTracker: RedirectUrlStatus = { status: RedirectStatus.ENABLED, userIsAdmin: true };
+
+export const handlers = [
+	rest.get(umbracoPath('/redirect-management'), (_req, res, ctx) => {
+		return res(ctx.status(200), ctx.json<PagedRedirectUrl>(PagedRedirectUrlData));
+	}),
+
+	rest.get(umbracoPath('/redirect-management/:key'), async (_req, res, ctx) => {
+		const key = _req.params.key as string;
+		if (!key) return res(ctx.status(404));
+
+		const PagedRedirectUrlObject = _getRedirectUrlByKey(key);
+
+		return res(ctx.status(200), ctx.json<PagedRedirectUrl>(PagedRedirectUrlObject));
+	}),
+
+	rest.delete(umbracoPath('/redirect-management/:key'), async (_req, res, ctx) => {
+		const key = _req.params.key as string;
+		if (!key) return res(ctx.status(404));
+
+		const PagedRedirectUrlObject = _deleteRedirectUrlByKey(key);
+
+		return res(ctx.status(200), ctx.json<any>(PagedRedirectUrlObject));
+	}),
+
+	rest.get(umbracoPath('/redirect-management/status'), (_req, res, ctx) => {
+		return res(ctx.status(200), ctx.json<RedirectUrlStatus>(UrlTracker));
+	}),
+
+	rest.post(umbracoPath('redirect-management/status'), async (_req, res, ctx) => {
+		UrlTracker.status = UrlTracker.status === RedirectStatus.ENABLED ? RedirectStatus.DISABLED : RedirectStatus.ENABLED;
+		return res(ctx.status(200), ctx.json<any>(UrlTracker.status));
+	}),
+];
+
+const _getRedirectUrlByKey = (key: string) => {
+	const PagedResult: PagedRedirectUrl = {
+		total: 0,
+		items: [],
+	};
+	RedirectUrlData.forEach((data) => {
+		if (data.key?.includes(key)) {
+			PagedResult.items.push(data);
+			PagedResult.total++;
+		}
+	});
+	return PagedResult;
+};
+
+const _deleteRedirectUrlByKey = (key: string) => {
+	const index = RedirectUrlData.findIndex((data) => data.contentKey === key);
+	if (index > -1) RedirectUrlData.splice(index, 1);
+	const PagedResult: PagedRedirectUrl = {
+		items: RedirectUrlData,
+		total: RedirectUrlData.length,
+	};
+	return PagedResult;
+};
+
+const RedirectUrlData: RedirectUrl[] = [
+	{
+		culture: 'DA-dk',
+		created: '2022-12-05T13:59:43.6827244',
+		destinationUrl: 'kitty.com',
+		originalUrl: 'kitty.dk',
+		contentKey: '7191c911-6747-4824-849e-5208e2b31d9f2',
+	},
+	{
+		created: '2022-13-05T13:59:43.6827244',
+		destinationUrl: 'umbraco.com',
+		originalUrl: 'umbraco.dk',
+		contentKey: '7191c911-6747-4824-849e-5208e2b31d9f',
+	},
+	{
+		created: '2022-12-05T13:59:43.6827244',
+		destinationUrl: 'uui.umbraco.com',
+		originalUrl: 'uui.umbraco.dk',
+		contentKey: '7191c911-6747-4824-849e-5208e2b31d9f23',
+	},
+	{
+		created: '2022-13-05T13:59:43.6827244',
+		destinationUrl: 'umbracoffee.com',
+		originalUrl: 'umbracoffee.dk',
+		contentKey: '7191c911-6747-4824-849e-5208e2b31d9fdsaa',
+	},
+	{
+		created: '2022-12-05T13:59:43.6827244',
+		destinationUrl: 'section/settings',
+		originalUrl: 'section/settings/123',
+		contentKey: '7191c911-6747-4824-849e-5208e2b31d9f2e23',
+	},
+	{
+		created: '2022-13-05T13:59:43.6827244',
+		destinationUrl: 'dxp.com',
+		originalUrl: 'dxp.dk',
+		contentKey: '7191c911-6747-4824-849e-5208e2b31d9fsafsfd',
+	},
+	{
+		created: '2022-12-05T13:59:43.6827244',
+		destinationUrl: 'google.com',
+		originalUrl: 'google.dk',
+		contentKey: '7191c911-6747-4824-849e-5208e2b31d9f2cxza',
+	},
+	{
+		created: '2022-13-05T13:59:43.6827244',
+		destinationUrl: 'unicorns.com',
+		originalUrl: 'unicorns.dk',
+		contentKey: '7191c911-6747-4824-849e-5208e2b31d9fweds',
+	},
+	{
+		created: '2022-12-05T13:59:43.6827244',
+		destinationUrl: 'h5yr.com',
+		originalUrl: 'h5yr.dk',
+		contentKey: '7191c911-6747-4824-849e-5208e2b31ddsfsdsfadsfdx9f2',
+	},
+	{
+		created: '2022-13-05T13:59:43.6827244',
+		destinationUrl: 'our.umbraco.com',
+		originalUrl: 'our.umbraco.dk',
+		contentKey: '7191c911-6747-4824-849e-52dsacx08e2b31d9dsafdsff',
+	},
+	{
+		created: '2022-13-05T13:59:43.6827244',
+		destinationUrl: 'your.umbraco.com',
+		originalUrl: 'your.umbraco.dk',
+		contentKey: '7191c911-6747-4824-849e-52dsacx08e2b31d9fsda',
+	},
+];
+
+const PagedRedirectUrlData: PagedRedirectUrl = {
+	total: RedirectUrlData.length,
+	items: RedirectUrlData,
+};
