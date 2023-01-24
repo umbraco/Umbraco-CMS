@@ -10,12 +10,12 @@ namespace Umbraco.Cms.Api.Management.Controllers.Language;
 
 public class DeleteLanguageController : LanguageControllerBase
 {
-    private readonly ILocalizationService _localizationService;
+    private readonly ILanguageService _languageService;
     private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
 
-    public DeleteLanguageController(ILocalizationService localizationService, IBackOfficeSecurityAccessor backOfficeSecurityAccessor)
+    public DeleteLanguageController(ILanguageService languageService, IBackOfficeSecurityAccessor backOfficeSecurityAccessor)
     {
-        _localizationService = localizationService;
+        _languageService = languageService;
         _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
     }
 
@@ -26,13 +26,10 @@ public class DeleteLanguageController : LanguageControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<IActionResult> Delete(string isoCode)
     {
-        Attempt<ILanguage?, LanguageOperationStatus> result = _localizationService.Delete(isoCode, CurrentUserId(_backOfficeSecurityAccessor));
+        Attempt<ILanguage?, LanguageOperationStatus> result = await _languageService.DeleteAsync(isoCode, CurrentUserId(_backOfficeSecurityAccessor));
 
-        if (result.Success)
-        {
-            return await Task.FromResult(Ok());
-        }
-
-        return LanguageOperationStatusResult(result.Status);
+        return result.Success
+            ? Ok()
+            : LanguageOperationStatusResult(result.Status);
     }
 }

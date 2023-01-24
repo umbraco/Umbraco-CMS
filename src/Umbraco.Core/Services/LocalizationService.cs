@@ -1,8 +1,8 @@
-﻿using System.Globalization;
+﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
-using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services.OperationStatus;
@@ -14,12 +14,16 @@ namespace Umbraco.Cms.Core.Services;
 ///     Represents the Localization Service, which is an easy access to operations involving <see cref="Language" /> and
 ///     <see cref="DictionaryItem" />
 /// </summary>
+[Obsolete("Please use ILanguageService and IDictionaryItemService for localization. Will be removed in V15.")]
 internal class LocalizationService : RepositoryService, ILocalizationService
 {
     private readonly IAuditRepository _auditRepository;
     private readonly IDictionaryRepository _dictionaryRepository;
     private readonly ILanguageRepository _languageRepository;
+    private readonly ILanguageService _languageService;
+    private readonly IDictionaryItemService _dictionaryItemService;
 
+    [Obsolete("Please use constructor with language and dictionary services. Will be removed in V15")]
     public LocalizationService(
         ICoreScopeProvider provider,
         ILoggerFactory loggerFactory,
@@ -27,11 +31,35 @@ internal class LocalizationService : RepositoryService, ILocalizationService
         IDictionaryRepository dictionaryRepository,
         IAuditRepository auditRepository,
         ILanguageRepository languageRepository)
+        : this(
+            provider,
+            loggerFactory,
+            eventMessagesFactory,
+            dictionaryRepository,
+            auditRepository,
+            languageRepository,
+            StaticServiceProvider.Instance.GetRequiredService<ILanguageService>(),
+            StaticServiceProvider.Instance.GetRequiredService<IDictionaryItemService>())
+    {
+    }
+
+    [Obsolete("Please use ILanguageService and IDictionaryItemService for localization. Will be removed in V15.")]
+    public LocalizationService(
+        ICoreScopeProvider provider,
+        ILoggerFactory loggerFactory,
+        IEventMessagesFactory eventMessagesFactory,
+        IDictionaryRepository dictionaryRepository,
+        IAuditRepository auditRepository,
+        ILanguageRepository languageRepository,
+        ILanguageService languageService,
+        IDictionaryItemService dictionaryItemService)
         : base(provider, loggerFactory, eventMessagesFactory)
     {
         _dictionaryRepository = dictionaryRepository;
         _auditRepository = auditRepository;
         _languageRepository = languageRepository;
+        _languageService = languageService;
+        _dictionaryItemService = dictionaryItemService;
     }
 
     /// <summary>
@@ -44,6 +72,7 @@ internal class LocalizationService : RepositoryService, ILocalizationService
     /// <remarks>
     ///     This does not save the item, that needs to be done explicitly
     /// </remarks>
+    [Obsolete("Please use IDictionaryItemService for dictionary item operations. Will be removed in V15.")]
     public void AddOrUpdateDictionaryValue(IDictionaryItem item, ILanguage? language, string value)
     {
         if (item == null)
@@ -56,25 +85,7 @@ internal class LocalizationService : RepositoryService, ILocalizationService
             throw new ArgumentNullException(nameof(language));
         }
 
-        IDictionaryTranslation? existing = item.Translations?.FirstOrDefault(x => x.Language?.Id == language.Id);
-        if (existing != null)
-        {
-            existing.Value = value;
-        }
-        else
-        {
-            if (item.Translations is not null)
-            {
-                item.Translations = new List<IDictionaryTranslation>(item.Translations)
-                {
-                    new DictionaryTranslation(language, value),
-                };
-            }
-            else
-            {
-                item.Translations = new List<IDictionaryTranslation> { new DictionaryTranslation(language, value) };
-            }
-        }
+        item.AddOrUpdateDictionaryValue(language, value);
     }
 
     /// <summary>
@@ -84,7 +95,7 @@ internal class LocalizationService : RepositoryService, ILocalizationService
     /// <param name="parentId"></param>
     /// <param name="defaultValue"></param>
     /// <returns></returns>
-    [Obsolete("Please use Create. Will be removed in V15")]
+    [Obsolete("Please use IDictionaryItemService for dictionary item operations. Will be removed in V15.")]
     public IDictionaryItem CreateDictionaryItemWithIdentity(string key, Guid? parentId, string? defaultValue = null)
     {
         IEnumerable<IDictionaryTranslation> translations = defaultValue.IsNullOrWhiteSpace()
@@ -93,68 +104,14 @@ internal class LocalizationService : RepositoryService, ILocalizationService
                 .Select(language => new DictionaryTranslation(language, defaultValue!))
                 .ToArray();
 
-        Attempt<IDictionaryItem?, DictionaryItemOperationStatus> result = Create(key, parentId, translations);
-        return result.Success
-            ? result.Result!
+        Attempt<IDictionaryItem, DictionaryItemOperationStatus> result = _dictionaryItemService
+            .CreateAsync(new DictionaryItem(parentId, key) { Translations = translations })
+            .GetAwaiter()
+            .GetResult();
+        // mimic old service behavior
+        return result.Success || result.Status == DictionaryItemOperationStatus.CancelledByNotification
+            ? result.Result
             : throw new ArgumentException($"Could not create a dictionary item with key: {key} under parent: {parentId}");
-    }
-
-    /// <inheritdoc/>
-    public Attempt<IDictionaryItem?, DictionaryItemOperationStatus> Create(
-        string key,
-        Guid? parentId,
-        IEnumerable<IDictionaryTranslation>? translations = null,
-        int userId = Constants.Security.SuperUserId)
-    {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope())
-        {
-            // validate the parent
-            if (parentId.HasValue && parentId.Value != Guid.Empty)
-            {
-                IDictionaryItem? parent = GetDictionaryItemById(parentId.Value);
-                if (parent == null)
-                {
-                    return Attempt.FailWithStatus<IDictionaryItem?, DictionaryItemOperationStatus>(DictionaryItemOperationStatus.ParentNotFound, null);
-                }
-            }
-
-            var item = new DictionaryItem(parentId, key);
-
-            // do we have an item key collision (item keys must be unique)?
-            if (HasItemKeyCollision(item))
-            {
-                return Attempt.FailWithStatus<IDictionaryItem?, DictionaryItemOperationStatus>(DictionaryItemOperationStatus.DuplicateItemKey, null);
-            }
-
-            IDictionaryTranslation[] translationsAsArray = translations?.ToArray() ?? Array.Empty<IDictionaryTranslation>();
-            if (translationsAsArray.Any())
-            {
-                var allLanguageIds = GetAllLanguages().Select(language => language.Id).ToArray();
-                item.Translations = translationsAsArray.Where(translation => allLanguageIds.Contains(translation.LanguageId)).ToArray();
-            }
-
-            EventMessages eventMessages = EventMessagesFactory.Get();
-            var savingNotification = new DictionaryItemSavingNotification(item, eventMessages);
-
-            if (scope.Notifications.PublishCancelable(savingNotification))
-            {
-                scope.Complete();
-                return Attempt.FailWithStatus<IDictionaryItem?, DictionaryItemOperationStatus>(DictionaryItemOperationStatus.CancelledByNotification, item);
-            }
-
-            _dictionaryRepository.Save(item);
-
-            // ensure the lazy Language callback is assigned
-            EnsureDictionaryItemLanguageCallback(item);
-
-            scope.Notifications.Publish(
-                new DictionaryItemSavedNotification(item, eventMessages).WithStateFrom(savingNotification));
-
-            Audit(AuditType.New, "Create DictionaryItem", userId, item.Id, "DictionaryItem");
-            scope.Complete();
-
-            return Attempt.SucceedWithStatus<IDictionaryItem?, DictionaryItemOperationStatus>(DictionaryItemOperationStatus.Success, item);
-        }
     }
 
     /// <summary>
@@ -164,6 +121,7 @@ internal class LocalizationService : RepositoryService, ILocalizationService
     /// <returns>
     ///     <see cref="IDictionaryItem" />
     /// </returns>
+    [Obsolete("Please use IDictionaryItemService for dictionary item operations. Will be removed in V15.")]
     public IDictionaryItem? GetDictionaryItemById(int id)
     {
         using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
@@ -183,17 +141,9 @@ internal class LocalizationService : RepositoryService, ILocalizationService
     /// <returns>
     ///     <see cref="DictionaryItem" />
     /// </returns>
+    [Obsolete("Please use IDictionaryItemService for dictionary item operations. Will be removed in V15.")]
     public IDictionaryItem? GetDictionaryItemById(Guid id)
-    {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
-        {
-            IDictionaryItem? item = _dictionaryRepository.Get(id);
-
-            // ensure the lazy Language callback is assigned
-            EnsureDictionaryItemLanguageCallback(item);
-            return item;
-        }
-    }
+        => _dictionaryItemService.GetAsync(id).GetAwaiter().GetResult();
 
     /// <summary>
     ///     Gets a collection <see cref="IDictionaryItem" /> by their <see cref="Guid" /> ids
@@ -202,21 +152,9 @@ internal class LocalizationService : RepositoryService, ILocalizationService
     /// <returns>
     ///     A collection of <see cref="IDictionaryItem" />
     /// </returns>
+    [Obsolete("Please use IDictionaryItemService for dictionary item operations. Will be removed in V15.")]
     public IEnumerable<IDictionaryItem> GetDictionaryItemsByIds(params Guid[] ids)
-    {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
-        {
-            IEnumerable<IDictionaryItem> items = _dictionaryRepository.GetMany(ids).ToArray();
-
-            // ensure the lazy Language callback is assigned
-            foreach (IDictionaryItem item in items)
-            {
-                EnsureDictionaryItemLanguageCallback(item);
-            }
-
-            return items;
-        }
-    }
+        => _dictionaryItemService.GetManyAsync(ids).GetAwaiter().GetResult();
 
     /// <summary>
     ///     Gets a <see cref="IDictionaryItem" /> by its key
@@ -225,17 +163,9 @@ internal class LocalizationService : RepositoryService, ILocalizationService
     /// <returns>
     ///     <see cref="IDictionaryItem" />
     /// </returns>
+    [Obsolete("Please use IDictionaryItemService for dictionary item operations. Will be removed in V15.")]
     public IDictionaryItem? GetDictionaryItemByKey(string key)
-    {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
-        {
-            IDictionaryItem? item = _dictionaryRepository.Get(key);
-
-            // ensure the lazy Language callback is assigned
-            EnsureDictionaryItemLanguageCallback(item);
-            return item;
-        }
-    }
+        => _dictionaryItemService.GetAsync(key).GetAwaiter().GetResult();
 
     /// <summary>
     ///     Gets a collection of <see cref="IDictionaryItem" /> by their keys
@@ -244,159 +174,60 @@ internal class LocalizationService : RepositoryService, ILocalizationService
     /// <returns>
     ///     A collection of <see cref="IDictionaryItem" />
     /// </returns>
+    [Obsolete("Please use IDictionaryItemService for dictionary item operations. Will be removed in V15.")]
     public IEnumerable<IDictionaryItem> GetDictionaryItemsByKeys(params string[] keys)
-    {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
-        {
-            IEnumerable<IDictionaryItem> items = _dictionaryRepository.GetManyByKeys(keys).ToArray();
+        => _dictionaryItemService.GetManyAsync(keys).GetAwaiter().GetResult();
 
-            // ensure the lazy Language callback is assigned
-            foreach (IDictionaryItem item in items)
-            {
-                EnsureDictionaryItemLanguageCallback(item);
-            }
-            return items;
-        }
-    }
-
-        /// <summary>
-        /// Gets a list of children for a <see cref="IDictionaryItem"/>
-        /// </summary>
-        /// <param name="parentId">Id of the parent</param>
-        /// <returns>An enumerable list of <see cref="IDictionaryItem"/> objects</returns>
-        public IEnumerable<IDictionaryItem> GetDictionaryItemChildren(Guid parentId)
-        {
-            using (var scope = ScopeProvider.CreateCoreScope(autoComplete: true))
-            {
-                var query = Query<IDictionaryItem>().Where(x => x.ParentId == parentId);
-                var items = _dictionaryRepository.Get(query).ToArray();
-                //ensure the lazy Language callback is assigned
-                foreach (var item in items)
-                    EnsureDictionaryItemLanguageCallback(item);
-
-            return items;
-        }
-    }
+    /// <summary>
+    /// Gets a list of children for a <see cref="IDictionaryItem"/>
+    /// </summary>
+    /// <param name="parentId">Id of the parent</param>
+    /// <returns>An enumerable list of <see cref="IDictionaryItem"/> objects</returns>
+    [Obsolete("Please use IDictionaryItemService for dictionary item operations. Will be removed in V15.")]
+    public IEnumerable<IDictionaryItem> GetDictionaryItemChildren(Guid parentId)
+        => _dictionaryItemService.GetChildrenAsync(parentId).GetAwaiter().GetResult();
 
     /// <summary>
     ///     Gets a list of descendants for a <see cref="IDictionaryItem" />
     /// </summary>
     /// <param name="parentId">Id of the parent, null will return all dictionary items</param>
     /// <returns>An enumerable list of <see cref="IDictionaryItem" /> objects</returns>
+    [Obsolete("Please use IDictionaryItemService for dictionary item operations. Will be removed in V15.")]
     public IEnumerable<IDictionaryItem> GetDictionaryItemDescendants(Guid? parentId)
-    {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
-        {
-            IDictionaryItem[] items = _dictionaryRepository.GetDictionaryItemDescendants(parentId).ToArray();
+        => _dictionaryItemService.GetDescendantsAsync(parentId).GetAwaiter().GetResult();
 
-            // ensure the lazy Language callback is assigned
-            foreach (IDictionaryItem item in items)
-            {
-                EnsureDictionaryItemLanguageCallback(item);
-            }
-
-            return items;
-        }
-    }
-
-        /// <summary>
-        /// Gets the root/top <see cref="IDictionaryItem"/> objects
-        /// </summary>
-        /// <returns>An enumerable list of <see cref="IDictionaryItem"/> objects</returns>
-        public IEnumerable<IDictionaryItem> GetRootDictionaryItems()
-        {
-            using (var scope = ScopeProvider.CreateCoreScope(autoComplete: true))
-            {
-                var query = Query<IDictionaryItem>().Where(x => x.ParentId == null);
-                var items = _dictionaryRepository.Get(query).ToArray();
-                //ensure the lazy Language callback is assigned
-                foreach (var item in items)
-                    EnsureDictionaryItemLanguageCallback(item);
-                return items;
-            }
-        }
+    /// <summary>
+    /// Gets the root/top <see cref="IDictionaryItem"/> objects
+    /// </summary>
+    /// <returns>An enumerable list of <see cref="IDictionaryItem"/> objects</returns>
+    [Obsolete("Please use IDictionaryItemService for dictionary item operations. Will be removed in V15.")]
+    public IEnumerable<IDictionaryItem> GetRootDictionaryItems()
+        => _dictionaryItemService.GetAtRootAsync().GetAwaiter().GetResult();
 
     /// <summary>
     ///     Checks if a <see cref="IDictionaryItem" /> with given key exists
     /// </summary>
     /// <param name="key">Key of the <see cref="IDictionaryItem" /></param>
     /// <returns>True if a <see cref="IDictionaryItem" /> exists, otherwise false</returns>
+    [Obsolete("Please use IDictionaryItemService for dictionary item operations. Will be removed in V15.")]
     public bool DictionaryItemExists(string key)
-    {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
-        {
-            IDictionaryItem? item = _dictionaryRepository.Get(key);
-            return item != null;
-        }
-    }
+        => _dictionaryItemService.ExistsAsync(key).GetAwaiter().GetResult();
 
     /// <summary>
     ///     Saves a <see cref="IDictionaryItem" /> object
     /// </summary>
     /// <param name="dictionaryItem"><see cref="IDictionaryItem" /> to save</param>
     /// <param name="userId">Optional id of the user saving the dictionary item</param>
-    [Obsolete("Please use Update. Will be removed in V15")]
+    [Obsolete("Please use IDictionaryItemService for dictionary item operations. Will be removed in V15.")]
     public void Save(IDictionaryItem dictionaryItem, int userId = Constants.Security.SuperUserId)
     {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope())
+        if (dictionaryItem.Id > 0)
         {
-            EventMessages eventMessages = EventMessagesFactory.Get();
-            var savingNotification = new DictionaryItemSavingNotification(dictionaryItem, eventMessages);
-            if (scope.Notifications.PublishCancelable(savingNotification))
-            {
-                scope.Complete();
-                return;
-            }
-
-            _dictionaryRepository.Save(dictionaryItem);
-
-            // ensure the lazy Language callback is assigned
-            // ensure the lazy Language callback is assigned
-            EnsureDictionaryItemLanguageCallback(dictionaryItem);
-            scope.Notifications.Publish(
-                new DictionaryItemSavedNotification(dictionaryItem, eventMessages).WithStateFrom(savingNotification));
-
-            Audit(AuditType.Save, "Save DictionaryItem", userId, dictionaryItem.Id, "DictionaryItem");
-            scope.Complete();
+            _dictionaryItemService.UpdateAsync(dictionaryItem, userId).GetAwaiter().GetResult();
         }
-    }
-
-    /// <inheritdoc />
-    public Attempt<IDictionaryItem, DictionaryItemOperationStatus> Update(IDictionaryItem dictionaryItem, int userId = Constants.Security.SuperUserId)
-    {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope())
+        else
         {
-            // is there an item to update?
-            if (_dictionaryRepository.Exists(dictionaryItem.Id) == false)
-            {
-                return Attempt.FailWithStatus(DictionaryItemOperationStatus.ItemNotFound, dictionaryItem);
-            }
-
-            // do we have an item key collision (item keys must be unique)?
-            if (HasItemKeyCollision(dictionaryItem))
-            {
-                return Attempt.FailWithStatus(DictionaryItemOperationStatus.DuplicateItemKey, dictionaryItem);
-            }
-
-            EventMessages eventMessages = EventMessagesFactory.Get();
-            var savingNotification = new DictionaryItemSavingNotification(dictionaryItem, eventMessages);
-            if (scope.Notifications.PublishCancelable(savingNotification))
-            {
-                scope.Complete();
-                return Attempt.FailWithStatus(DictionaryItemOperationStatus.CancelledByNotification, dictionaryItem);
-            }
-
-            _dictionaryRepository.Save(dictionaryItem);
-
-            // ensure the lazy Language callback is assigned
-            EnsureDictionaryItemLanguageCallback(dictionaryItem);
-            scope.Notifications.Publish(
-                new DictionaryItemSavedNotification(dictionaryItem, eventMessages).WithStateFrom(savingNotification));
-
-            Audit(AuditType.Save, "Update DictionaryItem", userId, dictionaryItem.Id, "DictionaryItem");
-            scope.Complete();
-
-            return Attempt.SucceedWithStatus(DictionaryItemOperationStatus.Success, dictionaryItem);
+            _dictionaryItemService.CreateAsync(dictionaryItem, userId).GetAwaiter().GetResult();
         }
     }
 
@@ -406,40 +237,9 @@ internal class LocalizationService : RepositoryService, ILocalizationService
     /// </summary>
     /// <param name="dictionaryItem"><see cref="IDictionaryItem" /> to delete</param>
     /// <param name="userId">Optional id of the user deleting the dictionary item</param>
-    [Obsolete("Please use the Delete method that takes an ID and returns an Attempt. Will be removed in V15")]
+    [Obsolete("Please use IDictionaryItemService for dictionary item operations. Will be removed in V15.")]
     public void Delete(IDictionaryItem dictionaryItem, int userId = Constants.Security.SuperUserId)
-        => Delete(dictionaryItem.Key, userId);
-
-    /// <inheritdoc />
-    public Attempt<IDictionaryItem?, DictionaryItemOperationStatus> Delete(Guid id, int userId = Constants.Security.SuperUserId)
-    {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope())
-        {
-            IDictionaryItem? dictionaryItem = _dictionaryRepository.Get(id);
-            if (dictionaryItem == null)
-            {
-                return Attempt.FailWithStatus<IDictionaryItem?, DictionaryItemOperationStatus>(DictionaryItemOperationStatus.ItemNotFound, null);
-            }
-
-            EventMessages eventMessages = EventMessagesFactory.Get();
-            var deletingNotification = new DictionaryItemDeletingNotification(dictionaryItem, eventMessages);
-            if (scope.Notifications.PublishCancelable(deletingNotification))
-            {
-                scope.Complete();
-                return Attempt.FailWithStatus<IDictionaryItem?, DictionaryItemOperationStatus>(DictionaryItemOperationStatus.CancelledByNotification, dictionaryItem);
-            }
-
-            _dictionaryRepository.Delete(dictionaryItem);
-            scope.Notifications.Publish(
-                new DictionaryItemDeletedNotification(dictionaryItem, eventMessages)
-                    .WithStateFrom(deletingNotification));
-
-            Audit(AuditType.Delete, "Delete DictionaryItem", userId, dictionaryItem.Id, "DictionaryItem");
-
-            scope.Complete();
-            return Attempt.SucceedWithStatus<IDictionaryItem?, DictionaryItemOperationStatus>(DictionaryItemOperationStatus.Success, dictionaryItem);
-        }
-    }
+        => _dictionaryItemService.DeleteAsync(dictionaryItem.Key, userId).GetAwaiter().GetResult();
 
     /// <summary>
     ///     Gets a <see cref="Language" /> by its id
@@ -448,6 +248,7 @@ internal class LocalizationService : RepositoryService, ILocalizationService
     /// <returns>
     ///     <see cref="Language" />
     /// </returns>
+    [Obsolete("Please use ILanguageService for language operations. Will be removed in V15.")]
     public ILanguage? GetLanguageById(int id)
     {
         using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
@@ -463,29 +264,20 @@ internal class LocalizationService : RepositoryService, ILocalizationService
     /// <returns>
     ///     <see cref="Language" />
     /// </returns>
+    [Obsolete("Please use ILanguageService for language operations. Will be removed in V15.")]
     public ILanguage? GetLanguageByIsoCode(string? isoCode)
     {
-        if (isoCode is null)
-        {
-            return null;
-        }
-
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
-        {
-            return _languageRepository.GetByIsoCode(isoCode);
-        }
+        ArgumentException.ThrowIfNullOrEmpty(isoCode);
+        return _languageService.GetAsync(isoCode).GetAwaiter().GetResult();
     }
 
     /// <inheritdoc />
+    [Obsolete("Please use ILanguageService for language operations. Will be removed in V15.")]
     public int? GetLanguageIdByIsoCode(string isoCode)
-    {
-        using (ScopeProvider.CreateCoreScope(autoComplete: true))
-        {
-            return _languageRepository.GetIdByIsoCode(isoCode);
-        }
-    }
+        => _languageService.GetAsync(isoCode).GetAwaiter().GetResult()?.Id;
 
     /// <inheritdoc />
+    [Obsolete("Please use ILanguageService for language operations. Will be removed in V15.")]
     public string? GetLanguageIsoCodeById(int id)
     {
         using (ScopeProvider.CreateCoreScope(autoComplete: true))
@@ -495,15 +287,12 @@ internal class LocalizationService : RepositoryService, ILocalizationService
     }
 
     /// <inheritdoc />
+    [Obsolete("Please use ILanguageService for language operations. Will be removed in V15.")]
     public string GetDefaultLanguageIsoCode()
-    {
-        using (ScopeProvider.CreateCoreScope(autoComplete: true))
-        {
-            return _languageRepository.GetDefaultIsoCode();
-        }
-    }
+        => _languageService.GetDefaultIsoCodeAsync().GetAwaiter().GetResult();
 
     /// <inheritdoc />
+    [Obsolete("Please use ILanguageService for language operations. Will be removed in V15.")]
     public int? GetDefaultLanguageId()
     {
         using (ScopeProvider.CreateCoreScope(autoComplete: true))
@@ -516,25 +305,21 @@ internal class LocalizationService : RepositoryService, ILocalizationService
     ///     Gets all available languages
     /// </summary>
     /// <returns>An enumerable list of <see cref="ILanguage" /> objects</returns>
+    [Obsolete("Please use ILanguageService for language operations. Will be removed in V15.")]
     public IEnumerable<ILanguage> GetAllLanguages()
-    {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
-        {
-            return _languageRepository.GetMany();
-        }
-    }
+        => _languageService.GetAllAsync().GetAwaiter().GetResult();
 
     /// <summary>
     ///     Saves a <see cref="ILanguage" /> object
     /// </summary>
     /// <param name="language"><see cref="ILanguage" /> to save</param>
     /// <param name="userId">Optional id of the user saving the language</param>
-    [Obsolete("Please use Create or Update depending on use case. Will be removed in V15")]
+    [Obsolete("Please use ILanguageService for language operations. Will be removed in V15.")]
     public void Save(ILanguage language, int userId = Constants.Security.SuperUserId)
     {
         Attempt<ILanguage, LanguageOperationStatus> result = language.Id > 0
-            ? Update(language, userId)
-            : Create(language, userId);
+            ? _languageService.UpdateAsync(language, userId).GetAwaiter().GetResult()
+            : _languageService.CreateAsync(language, userId).GetAwaiter().GetResult();
 
         // mimic old Save behavior
         if (result.Status == LanguageOperationStatus.InvalidFallback)
@@ -543,166 +328,16 @@ internal class LocalizationService : RepositoryService, ILocalizationService
         }
     }
 
-    /// <inheritdoc />
-    public Attempt<ILanguage, LanguageOperationStatus> Create(ILanguage language, int userId = Constants.Security.SuperUserId)
-    {
-        if (language.Id != 0)
-        {
-            return Attempt.FailWithStatus(LanguageOperationStatus.InvalidId, language);
-        }
-
-        if (HasValidIsoCode(language) == false)
-        {
-            return Attempt.FailWithStatus(LanguageOperationStatus.InvalidIsoCode, language);
-        }
-
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope())
-        {
-            // write-lock languages to guard against race conds when dealing with default language
-            scope.WriteLock(Constants.Locks.Languages);
-
-            // ensure no duplicates by ISO code
-            if (_languageRepository.GetByIsoCode(language.IsoCode) != null)
-            {
-                return Attempt.FailWithStatus(LanguageOperationStatus.DuplicateIsoCode, language);
-            }
-
-            // ensure valid fallback language (note: new languages cannot create cycles, no need to check for that)
-            if (language.FallbackLanguageId.HasValue && _languageRepository.Exists(language.FallbackLanguageId.Value) == false)
-            {
-                return Attempt.FailWithStatus(LanguageOperationStatus.InvalidFallback, language);
-            }
-
-            EventMessages eventMessages = EventMessagesFactory.Get();
-            var savingNotification = new LanguageSavingNotification(language, eventMessages);
-            if (scope.Notifications.PublishCancelable(savingNotification))
-            {
-                scope.Complete();
-                return Attempt.FailWithStatus(LanguageOperationStatus.CancelledByNotification, language);
-            }
-
-            // explicitly ensure a new language is created in case of model reuse
-            language.Id = 0;
-            _languageRepository.Save(language);
-            scope.Notifications.Publish(
-                new LanguageSavedNotification(language, eventMessages).WithStateFrom(savingNotification));
-
-            Audit(AuditType.New, "Create Language", userId, language.Id, UmbracoObjectTypes.Language.GetName());
-
-            scope.Complete();
-            return Attempt.SucceedWithStatus(LanguageOperationStatus.Success, language);
-        }
-    }
-
-    /// <inheritdoc />
-    public Attempt<ILanguage, LanguageOperationStatus> Update(ILanguage language, int userId = Constants.Security.SuperUserId)
-    {
-        if (HasValidIsoCode(language) == false)
-        {
-            return Attempt.FailWithStatus(LanguageOperationStatus.InvalidIsoCode, language);
-        }
-
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope())
-        {
-            // write-lock languages to guard against race conds when dealing with default language
-            scope.WriteLock(Constants.Locks.Languages);
-
-            ILanguage? currentLanguage = _languageRepository.Get(language.Id);
-            if (currentLanguage == null)
-            {
-                return Attempt.FailWithStatus(LanguageOperationStatus.NotFound, language);
-            }
-
-            // ensure we don't un-default the default language
-            if (currentLanguage.IsDefault && !language.IsDefault)
-            {
-                return Attempt.FailWithStatus(LanguageOperationStatus.MissingDefault, language);
-            }
-
-            // look for cycles - within write-lock
-            if (language.FallbackLanguageId.HasValue)
-            {
-                var languages = _languageRepository.GetMany().ToDictionary(x => x.Id, x => x);
-                if (!languages.ContainsKey(language.FallbackLanguageId.Value))
-                {
-                    return Attempt.FailWithStatus(LanguageOperationStatus.InvalidFallback, language);
-                }
-
-                if (CreatesCycle(language, languages))
-                {
-                    // explicitly logging this because it may not be obvious, specially with implicit cyclic fallbacks
-                    LoggerFactory.CreateLogger<LocalizationService>().Log(LogLevel.Error, $"Cannot save language {language.IsoCode} with fallback {languages[language.FallbackLanguageId.Value].IsoCode} as it would create a fallback cycle.");
-                    return Attempt.FailWithStatus(LanguageOperationStatus.InvalidFallback, language);
-                }
-            }
-
-            EventMessages eventMessages = EventMessagesFactory.Get();
-            var savingNotification = new LanguageSavingNotification(language, eventMessages);
-            if (scope.Notifications.PublishCancelable(savingNotification))
-            {
-                scope.Complete();
-                return Attempt.FailWithStatus(LanguageOperationStatus.CancelledByNotification, language);
-            }
-
-            _languageRepository.Save(language);
-            scope.Notifications.Publish(
-                new LanguageSavedNotification(language, eventMessages).WithStateFrom(savingNotification));
-
-            Audit(AuditType.Save, "Update Language", userId, language.Id, UmbracoObjectTypes.Language.GetName());
-
-            scope.Complete();
-            return Attempt.SucceedWithStatus(LanguageOperationStatus.Success, language);
-        }
-    }
-
     /// <summary>
     ///     Deletes a <see cref="ILanguage" /> by removing it (but not its usages) from the db
     /// </summary>
     /// <param name="language"><see cref="ILanguage" /> to delete</param>
     /// <param name="userId">Optional id of the user deleting the language</param>
-    [Obsolete("Please use the Delete method that takes an ISO code and returns an Attempt. Will be removed in V15")]
+    [Obsolete("Please use ILanguageService for language operations. Will be removed in V15.")]
     public void Delete(ILanguage language, int userId = Constants.Security.SuperUserId)
-        => Delete(language.IsoCode, userId);
+        => _languageService.DeleteAsync(language.IsoCode, userId).GetAwaiter().GetResult();
 
-    /// <inheritdoc />
-    public Attempt<ILanguage?, LanguageOperationStatus> Delete(string isoCode, int userId = Constants.Security.SuperUserId)
-    {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope())
-        {
-            // write-lock languages to guard against race conds when dealing with default language
-            scope.WriteLock(Constants.Locks.Languages);
-
-            ILanguage? language = _languageRepository.GetByIsoCode(isoCode);
-            if (language == null)
-            {
-                return Attempt.FailWithStatus<ILanguage?, LanguageOperationStatus>(LanguageOperationStatus.NotFound, null);
-            }
-
-            if (language.IsDefault)
-            {
-                return Attempt.FailWithStatus<ILanguage?, LanguageOperationStatus>(LanguageOperationStatus.MissingDefault, language);
-            }
-
-            EventMessages eventMessages = EventMessagesFactory.Get();
-            var deletingLanguageNotification = new LanguageDeletingNotification(language, eventMessages);
-            if (scope.Notifications.PublishCancelable(deletingLanguageNotification))
-            {
-                scope.Complete();
-                return Attempt.FailWithStatus<ILanguage?, LanguageOperationStatus>(LanguageOperationStatus.CancelledByNotification, language);
-            }
-
-            // NOTE: Other than the fall-back language, there aren't any other constraints in the db, so possible references aren't deleted
-            _languageRepository.Delete(language);
-
-            scope.Notifications.Publish(
-                new LanguageDeletedNotification(language, eventMessages).WithStateFrom(deletingLanguageNotification));
-
-            Audit(AuditType.Delete, "Delete Language", userId, language.Id, UmbracoObjectTypes.Language.GetName());
-            scope.Complete();
-            return Attempt.SucceedWithStatus<ILanguage?, LanguageOperationStatus>(LanguageOperationStatus.Success, language);
-        }
-    }
-
+    [Obsolete("Please use IDictionaryItemService for dictionary item operations. Will be removed in V15.")]
     public Dictionary<string, Guid> GetDictionaryItemKeyMap()
     {
         using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
@@ -710,49 +345,6 @@ internal class LocalizationService : RepositoryService, ILocalizationService
             return _dictionaryRepository.GetDictionaryItemKeyMap();
         }
     }
-
-    private bool CreatesCycle(ILanguage language, IDictionary<int, ILanguage> languages)
-    {
-        // a new language is not referenced yet, so cannot be part of a cycle
-        if (!language.HasIdentity)
-        {
-            return false;
-        }
-
-        var id = language.FallbackLanguageId;
-
-        // assuming languages does not already contains a cycle, this must end
-        while (true)
-        {
-            if (!id.HasValue)
-            {
-                return false; // no fallback means no cycle
-            }
-
-            if (id.Value == language.Id)
-            {
-                return true; // back to language = cycle!
-            }
-
-            id = languages[id.Value].FallbackLanguageId; // else keep chaining
-        }
-    }
-
-    private static bool HasValidIsoCode(ILanguage language)
-    {
-        try
-        {
-            var culture = CultureInfo.GetCultureInfo(language.IsoCode);
-            return true;
-        }
-        catch (CultureNotFoundException)
-        {
-            return false;
-        }
-    }
-
-    private void Audit(AuditType type, string message, int userId, int objectId, string? entityType) =>
-        _auditRepository.Save(new AuditItem(objectId, type, userId, entityType, message));
 
     /// <summary>
     ///     This is here to take care of a hack - the DictionaryTranslation model contains an ILanguage reference which we
@@ -779,11 +371,5 @@ internal class LocalizationService : RepositoryService, ILocalizationService
                 trans.GetLanguage = GetLanguageById;
             }
         }
-    }
-
-    private bool HasItemKeyCollision(IDictionaryItem dictionaryItem)
-    {
-        IDictionaryItem? itemKeyCollision = _dictionaryRepository.Get(dictionaryItem.ItemKey);
-        return itemKeyCollision != null && itemKeyCollision.Key != dictionaryItem.Key;
     }
 }

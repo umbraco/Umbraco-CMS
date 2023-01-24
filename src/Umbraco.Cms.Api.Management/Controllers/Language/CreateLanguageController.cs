@@ -13,16 +13,16 @@ namespace Umbraco.Cms.Api.Management.Controllers.Language;
 public class CreateLanguageController : LanguageControllerBase
 {
     private readonly ILanguageFactory _languageFactory;
-    private readonly ILocalizationService _localizationService;
+    private readonly ILanguageService _languageService;
     private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
 
     public CreateLanguageController(
         ILanguageFactory languageFactory,
-        ILocalizationService localizationService,
+        ILanguageService languageService,
         IBackOfficeSecurityAccessor backOfficeSecurityAccessor)
     {
         _languageFactory = languageFactory;
-        _localizationService = localizationService;
+        _languageService = languageService;
         _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
     }
 
@@ -35,16 +35,10 @@ public class CreateLanguageController : LanguageControllerBase
     {
         ILanguage created = _languageFactory.MapCreateModelToLanguage(languageCreateModel);
 
-        Attempt<ILanguage, LanguageOperationStatus> result = _localizationService.Create(created, CurrentUserId(_backOfficeSecurityAccessor));
+        Attempt<ILanguage, LanguageOperationStatus> result = await _languageService.CreateAsync(created, CurrentUserId(_backOfficeSecurityAccessor));
 
-        if (result.Success)
-        {
-            return await Task.FromResult(
-                CreatedAtAction<ByIsoCodeLanguageController>(
-                    controller => nameof(controller.ByIsoCode),
-                    new { isoCode = result.Result.IsoCode }));
-        }
-
-        return LanguageOperationStatusResult(result.Status);
+        return result.Success
+            ? CreatedAtAction<ByIsoCodeLanguageController>(controller => nameof(controller.ByIsoCode), new { isoCode = result.Result.IsoCode })
+            : LanguageOperationStatusResult(result.Status);
     }
 }

@@ -6,5 +6,6 @@ public enum DictionaryItemOperationStatus
     CancelledByNotification,
     DuplicateItemKey,
     ItemNotFound,
-    ParentNotFound
+    ParentNotFound,
+    InvalidId
 }

@@ -10,12 +10,12 @@ namespace Umbraco.Cms.Api.Management.Controllers.Dictionary;
 
 public class DeleteDictionaryController : DictionaryControllerBase
 {
-    private readonly ILocalizationService _localizationService;
+    private readonly IDictionaryItemService _dictionaryItemService;
     private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
 
-    public DeleteDictionaryController(ILocalizationService localizationService, IBackOfficeSecurityAccessor backOfficeSecurityAccessor)
+    public DeleteDictionaryController(IDictionaryItemService dictionaryItemService, IBackOfficeSecurityAccessor backOfficeSecurityAccessor)
     {
-        _localizationService = localizationService;
+        _dictionaryItemService = dictionaryItemService;
         _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
     }
 
@@ -26,12 +26,10 @@ public class DeleteDictionaryController : DictionaryControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Delete(Guid key)
     {
-        Attempt<IDictionaryItem?, DictionaryItemOperationStatus> result = _localizationService.Delete(key, CurrentUserId(_backOfficeSecurityAccessor));
-        if (result.Success)
-        {
-            return await Task.FromResult(Ok());
-        }
+        Attempt<IDictionaryItem?, DictionaryItemOperationStatus> result = await _dictionaryItemService.DeleteAsync(key, CurrentUserId(_backOfficeSecurityAccessor));
 
-        return DictionaryItemOperationStatusResult(result.Status);
+        return result.Success
+            ? Ok()
+            : DictionaryItemOperationStatusResult(result.Status);
     }
 }

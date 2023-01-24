@@ -367,22 +367,22 @@ public class LanguageRepositoryTest : UmbracoIntegrationTest
 
     private LanguageRepository CreateRepository(IScopeProvider provider) => new((IScopeAccessor)provider, AppCaches.Disabled, LoggerFactory.CreateLogger<LanguageRepository>());
 
-    private void CreateTestData()
+    private async Task CreateTestData()
     {
-        var localizationService = GetRequiredService<ILocalizationService>();
+        var languageService = GetRequiredService<ILanguageService>();
 
         //Id 1 is en-US - when Umbraco is installed
 
         var languageDK = new Language("da-DK", "Danish (Denmark)");
-        localizationService.Create(languageDK); //Id 2
+        await languageService.CreateAsync(languageDK); //Id 2
 
         var languageSE = new Language("sv-SE", "Swedish (Sweden)");
-        localizationService.Create(languageSE); //Id 3
+        await languageService.CreateAsync(languageSE); //Id 3
 
         var languageDE = new Language("de-DE", "German (Germany)");
-        localizationService.Create(languageDE); //Id 4
+        await languageService.CreateAsync(languageDE); //Id 4
 
         var languagePT = new Language("pt-PT", "Portuguese (Portugal)");
-        localizationService.Create(languagePT); //Id 5
+        await languageService.CreateAsync(languagePT); //Id 5
     }
 }

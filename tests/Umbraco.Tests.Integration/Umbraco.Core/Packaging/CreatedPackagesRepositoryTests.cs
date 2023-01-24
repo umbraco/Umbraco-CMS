@@ -47,6 +47,8 @@ public class CreatedPackagesRepositoryTests : UmbracoIntegrationTest
 
     private IMacroService MacroService => GetRequiredService<IMacroService>();
 
+    private IDictionaryItemService DictionaryItemService => GetRequiredService<IDictionaryItemService>();
+
     private ILocalizationService LocalizationService => GetRequiredService<ILocalizationService>();
 
     private IEntityXmlSerializer EntityXmlSerializer => GetRequiredService<IEntityXmlSerializer>();
@@ -166,13 +168,13 @@ public class CreatedPackagesRepositoryTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public void GivenNestedDictionaryItems_WhenPackageExported_ThenTheXmlIsNested()
+    public async Task GivenNestedDictionaryItems_WhenPackageExported_ThenTheXmlIsNested()
     {
-        var parent = LocalizationService.Create("Parent", null).Result!;
-        var child1 = LocalizationService.Create("Child1", parent.Key).Result!;
-        var child2 = LocalizationService.Create("Child2", child1.Key).Result!;
-        var child3 = LocalizationService.Create("Child3", child2.Key).Result!;
-        var child4 = LocalizationService.Create("Child4", child3.Key).Result!;
+        var parent = (await DictionaryItemService.CreateAsync(new DictionaryItem("Parent"))).Result;
+        var child1 = (await DictionaryItemService.CreateAsync(new DictionaryItem(parent.Key, "Child1"))).Result;
+        var child2 = (await DictionaryItemService.CreateAsync(new DictionaryItem(child1.Key, "Child2"))).Result;
+        var child3 = (await DictionaryItemService.CreateAsync(new DictionaryItem(child2.Key, "Child3"))).Result;
+        var child4 = (await DictionaryItemService.CreateAsync(new DictionaryItem(child3.Key, "Child4"))).Result;
 
         var def = new PackageDefinition
         {

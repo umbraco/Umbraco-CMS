@@ -1515,7 +1515,7 @@ namespace Umbraco.Cms.Infrastructure.Packaging
                 var cultureName = languageElement.AttributeValue<string>("FriendlyName") ?? isoCode;
 
                 var langauge = new Language(isoCode, cultureName);
-                _localizationService.Create(langauge, userId);
+                _localizationService.Save(langauge, userId);
 
                 list.Add(langauge);
             }

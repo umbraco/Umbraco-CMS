@@ -13,16 +13,16 @@ namespace Umbraco.Cms.Api.Management.Controllers.Language;
 public class UpdateLanguageController : LanguageControllerBase
 {
     private readonly ILanguageFactory _languageFactory;
-    private readonly ILocalizationService _localizationService;
+    private readonly ILanguageService _languageService;
     private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
 
     public UpdateLanguageController(
         ILanguageFactory languageFactory,
-        ILocalizationService localizationService,
+        ILanguageService languageService,
         IBackOfficeSecurityAccessor backOfficeSecurityAccessor)
     {
         _languageFactory = languageFactory;
-        _localizationService = localizationService;
+        _languageService = languageService;
         _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
     }
 
@@ -33,7 +33,7 @@ public class UpdateLanguageController : LanguageControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<IActionResult> Update(string isoCode, LanguageUpdateModel languageUpdateModel)
     {
-        ILanguage? current = _localizationService.GetLanguageByIsoCode(isoCode);
+        ILanguage? current = await _languageService.GetAsync(isoCode);
         if (current is null)
         {
             return NotFound();
@@ -41,13 +41,10 @@ public class UpdateLanguageController : LanguageControllerBase
 
         ILanguage updated = _languageFactory.MapUpdateModelToLanguage(current, languageUpdateModel);
 
-        Attempt<ILanguage, LanguageOperationStatus> result = _localizationService.Update(updated, CurrentUserId(_backOfficeSecurityAccessor));
+        Attempt<ILanguage, LanguageOperationStatus> result = await _languageService.UpdateAsync(updated, CurrentUserId(_backOfficeSecurityAccessor));
 
-        if (result.Success)
-        {
-            return await Task.FromResult(Ok());
-        }
-
-        return LanguageOperationStatusResult(result.Status);
+        return result.Success
+            ? Ok()
+            : LanguageOperationStatusResult(result.Status);
     }
 }

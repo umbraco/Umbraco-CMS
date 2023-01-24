@@ -9,12 +9,12 @@ namespace Umbraco.Cms.Api.Management.Controllers.Language;
 
 public class ByIsoCodeLanguageController : LanguageControllerBase
 {
-    private readonly ILocalizationService _localizationService;
+    private readonly ILanguageService _languageService;
     private readonly ILanguageFactory _languageFactory;
 
-    public ByIsoCodeLanguageController(ILocalizationService localizationService, ILanguageFactory languageFactory)
+    public ByIsoCodeLanguageController(ILanguageService languageService, ILanguageFactory languageFactory)
     {
-        _localizationService = localizationService;
+        _languageService = languageService;
         _languageFactory = languageFactory;
     }
 
@@ -24,12 +24,12 @@ public class ByIsoCodeLanguageController : LanguageControllerBase
     [ProducesResponseType(typeof(LanguageViewModel), StatusCodes.Status200OK)]
     public async Task<ActionResult<LanguageViewModel>> ByIsoCode(string isoCode)
     {
-        ILanguage? language = _localizationService.GetLanguageByIsoCode(isoCode);
+        ILanguage? language = await _languageService.GetAsync(isoCode);
         if (language == null)
         {
             return NotFound();
         }
 
-        return await Task.FromResult(Ok(_languageFactory.CreateLanguageViewModel(language)));
+        return Ok(_languageFactory.CreateLanguageViewModel(language));
     }
 }
