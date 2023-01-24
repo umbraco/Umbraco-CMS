@@ -4,7 +4,7 @@ import type {
 	ManifestWorkspaceView,
 	ManifestWorkspaceViewCollection,
 } from '@umbraco-cms/models';
-import { STORE_ALIAS } from '../media.store';
+import { UMB_MEDIA_DETAIL_STORE_CONTEXT_TOKEN } from '../media.detail.store';
 
 const workspace: ManifestWorkspace = {
 	type: 'workspace',
@@ -59,7 +59,7 @@ const workspaceViewCollections: Array<ManifestWorkspaceViewCollection> = [
 			pathname: 'collection',
 			icon: 'umb:grid',
 			entityType: 'media',
-			storeAlias: STORE_ALIAS,
+			storeAlias: UMB_MEDIA_DETAIL_STORE_CONTEXT_TOKEN.toString(),
 		},
 	},
 ];

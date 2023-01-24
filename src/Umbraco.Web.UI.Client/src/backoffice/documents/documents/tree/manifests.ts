@@ -1,4 +1,4 @@
-import { STORE_ALIAS } from '../document.store';
+import { UMB_DOCUMENT_DETAIL_STORE_CONTEXT_TOKEN } from '../document.detail.store';
 import type { ManifestTree, ManifestTreeItemAction } from '@umbraco-cms/models';
 
 const treeAlias = 'Umb.Tree.Documents';
@@ -8,7 +8,7 @@ const tree: ManifestTree = {
 	alias: treeAlias,
 	name: 'Documents Tree',
 	meta: {
-		storeAlias: STORE_ALIAS,
+		storeAlias: UMB_DOCUMENT_DETAIL_STORE_CONTEXT_TOKEN.toString(),
 	},
 };
 

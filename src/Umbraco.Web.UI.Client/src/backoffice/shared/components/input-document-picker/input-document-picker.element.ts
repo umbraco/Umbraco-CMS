@@ -3,10 +3,11 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, property, state } from 'lit/decorators.js';
 import { ifDefined } from 'lit-html/directives/if-defined.js';
 import { FormControlMixin } from '@umbraco-ui/uui-base/lib/mixins';
-import { UmbDocumentStore, UMB_DOCUMENT_STORE_CONTEXT_TOKEN } from '../../../documents/documents/document.store';
 import { UmbModalService, UMB_MODAL_SERVICE_CONTEXT_TOKEN } from '../../../../core/modal';
-import type { FolderTreeItem } from '@umbraco-cms/backend-api';
+import { UMB_DOCUMENT_TREE_STORE_CONTEXT_TOKEN } from '../../../../backoffice/documents/documents/document.tree.store';
+import type { UmbDocumentTreeStore } from '../../../../backoffice/documents/documents/document.tree.store';
 import { UmbLitElement } from '@umbraco-cms/element';
+import type { DocumentTreeItem, FolderTreeItem } from '@umbraco-cms/backend-api';
 import type { UmbObserverController } from '@umbraco-cms/observable-api';
 
 @customElement('umb-input-document-picker')
@@ -74,10 +75,10 @@ export class UmbInputDocumentPickerElement extends FormControlMixin(UmbLitElemen
 	}
 
 	@state()
-	private _items?: Array<FolderTreeItem>;
+	private _items?: Array<DocumentTreeItem>;
 
 	private _modalService?: UmbModalService;
-	private _documentStore?: UmbDocumentStore;
+	private _documentStore?: UmbDocumentTreeStore;
 	private _pickedItemsObserver?: UmbObserverController<FolderTreeItem>;
 
 	constructor() {
@@ -94,7 +95,7 @@ export class UmbInputDocumentPickerElement extends FormControlMixin(UmbLitElemen
 			() => !!this.max && this._selectedKeys.length > this.max
 		);
 
-		this.consumeContext(UMB_DOCUMENT_STORE_CONTEXT_TOKEN, (instance) => {
+		this.consumeContext(UMB_DOCUMENT_TREE_STORE_CONTEXT_TOKEN, (instance) => {
 			this._documentStore = instance;
 			this._observePickedDocuments();
 		});
