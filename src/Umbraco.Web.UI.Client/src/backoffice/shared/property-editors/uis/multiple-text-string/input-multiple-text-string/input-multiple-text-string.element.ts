@@ -137,6 +137,7 @@ export class UmbInputMultipleTextStringElement extends FormControlMixin(UmbLitEl
 
 	#onAdd() {
 		this._items = [...this._items, { value: '' }];
+		this.pristine = false;
 		this.dispatchEvent(new UmbChangeEvent());
 		this.#focusNewItem();
 	}
@@ -161,6 +162,7 @@ export class UmbInputMultipleTextStringElement extends FormControlMixin(UmbLitEl
 	#deleteItem(event: UmbDeleteEvent, itemIndex: number) {
 		event.stopPropagation();
 		this._items = this._items.filter((item, index) => index !== itemIndex);
+		this.pristine = false;
 		this.dispatchEvent(new UmbChangeEvent());
 	}
 
