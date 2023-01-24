@@ -8,7 +8,7 @@ import { UmbLitElement } from '@umbraco-cms/element';
 
 import { ManifestHealthCheck, umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
 
-import '../health-check-group-box-overview.element';
+import './health-check-group-box-overview.element';
 
 @customElement('umb-dashboard-health-check-overview')
 export class UmbDashboardHealthCheckOverviewElement extends UmbLitElement {
@@ -108,7 +108,7 @@ export class UmbDashboardHealthCheckOverviewElement extends UmbLitElement {
 						Check all groups
 					</uui-button>
 				</div>
-				<!--//TODO: i want to wrap my extension container in a grid wrapper -->
+				<!--//TODO:  wrap extension container in a grid wrapper -->
 				<umb-extension-slot
 					type="healthCheck"
 					default-element="umb-health-check-group-box-overview"></umb-extension-slot>

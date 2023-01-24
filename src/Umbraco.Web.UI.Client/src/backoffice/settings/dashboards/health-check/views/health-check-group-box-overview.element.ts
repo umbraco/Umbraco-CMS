@@ -1,11 +1,11 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html, nothing } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
-import { UmbHealthCheckContext } from './health-check.context';
+import { UmbHealthCheckContext } from '../health-check.context';
 import type { ManifestHealthCheck } from '@umbraco-cms/models';
 import { StatusResultType } from '@umbraco-cms/backend-api';
 import { UmbLitElement } from '@umbraco-cms/element';
-import { UmbHealthCheckDashboardContext } from './health-check-dashboard.context';
+import { UmbHealthCheckDashboardContext } from '../health-check-dashboard.context';
 import { ensureSlash, path } from 'router-slot';
 
 @customElement('umb-health-check-group-box-overview')

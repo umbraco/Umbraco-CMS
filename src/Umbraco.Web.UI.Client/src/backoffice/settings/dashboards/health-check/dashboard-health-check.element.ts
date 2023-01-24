@@ -1,7 +1,7 @@
 import { html, css, nothing } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { IRoute, IRoutingInfo, path } from 'router-slot';
-import { UmbDashboardHealthCheckGroupElement } from './views/health-check-group';
+import { UmbDashboardHealthCheckGroupElement } from './views/health-check-group.element';
 import { UmbHealthCheckDashboardContext } from './health-check-dashboard.context';
 import { UmbLitElement } from '@umbraco-cms/element';
 import { ManifestHealthCheck, umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
@@ -22,7 +22,7 @@ export class UmbDashboardHealthCheckElement extends UmbLitElement {
 	private _routes: IRoute[] = [
 		{
 			path: `/:groupName`,
-			component: () => import('./views/health-check-group'),
+			component: () => import('./views/health-check-group.element'),
 			setup: (component: HTMLElement, info: IRoutingInfo) => {
 				const element = component as UmbDashboardHealthCheckGroupElement;
 				element.groupName = decodeURI(info.match.params.groupName);
@@ -30,7 +30,7 @@ export class UmbDashboardHealthCheckElement extends UmbLitElement {
 		},
 		{
 			path: ``,
-			component: () => import('./views/health-check-overview'),
+			component: () => import('./views/health-check-overview.element'),
 		},
 	];
 

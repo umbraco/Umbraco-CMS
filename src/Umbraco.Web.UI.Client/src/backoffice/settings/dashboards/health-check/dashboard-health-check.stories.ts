@@ -1,11 +1,11 @@
 import { Meta, Story } from '@storybook/web-components';
 import { html } from 'lit-html';
 
-import type { UmbDashboardHealthCheckOverviewElement } from './views/health-check-overview';
-import './views//health-check-overview';
+import type { UmbDashboardHealthCheckOverviewElement } from './views/health-check-overview.element';
+import './views/health-check-overview.element';
 
-import type { UmbDashboardHealthCheckGroupElement } from './views/health-check-group';
-import './views/health-check-group';
+import type { UmbDashboardHealthCheckGroupElement } from './views/health-check-group.element';
+import './views/health-check-group.element';
 
 export default {
 	title: 'Dashboards/Health Check',
