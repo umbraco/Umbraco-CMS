@@ -1,17 +1,17 @@
-import { UniqueBehaviorSubject } from "./unique-behavior-subject";
+import { DeepState } from "./deep-state";
 import { appendToFrozenArray } from "./append-to-frozen-array.method";
 
 /**
  * @export
- * @class UniqueObjectBehaviorSubject
- * @extends {UniqueBehaviorSubject<T>}
- * @description - A RxJS UniqueObjectBehaviorSubject which deepFreezes the object-data to ensure its not manipulated from any implementations.
+ * @class ArrayState
+ * @extends {DeepState<T>}
+ * @description - A RxJS BehaviorSubject which deepFreezes the object-data to ensure its not manipulated from any implementations.
  * Additionally the Subject ensures the data is unique, not updating any Observes unless there is an actual change of the content.
  *
- * The UniqueObjectBehaviorSubject provides methods to append data when the data is an Object.
+ * The ArrayState provides methods to append data when the data is an Object.
  */
 
-export class UniqueArrayBehaviorSubject<T> extends UniqueBehaviorSubject<T[]> {
+export class ArrayState<T> extends DeepState<T[]> {
 
 
 	constructor(initialData: T[], private _getUnique?: (entry: T) => unknown) {
@@ -27,7 +27,7 @@ export class UniqueArrayBehaviorSubject<T> extends UniqueBehaviorSubject<T[]> {
 	 * 	{ key: 1, value: 'foo'},
 	 * 	{ key: 2, value: 'bar'}
 	 * ];
-	 * const mySubject = new UniqueArrayBehaviorSubject(data, (x) => x.key);
+	 * const mySubject = new ArrayState(data, (x) => x.key);
 	 * mySubject.remove([1]);
 	 */
 	remove(uniques: unknown[]) {
@@ -54,7 +54,7 @@ export class UniqueArrayBehaviorSubject<T> extends UniqueBehaviorSubject<T[]> {
 	 * 	{ key: 1, value: 'foo'},
 	 * 	{ key: 2, value: 'bar'}
 	 * ];
-	 * const mySubject = new UniqueArrayBehaviorSubject(data);
+	 * const mySubject = new ArrayState(data);
 	 * mySubject.append({ key: 1, value: 'replaced-foo'});
 	 */
 	appendOne(entry: T) {
@@ -70,7 +70,7 @@ export class UniqueArrayBehaviorSubject<T> extends UniqueBehaviorSubject<T[]> {
 	 * 	{ key: 1, value: 'foo'},
 	 * 	{ key: 2, value: 'bar'}
 	 * ];
-	 * const mySubject = new UniqueArrayBehaviorSubject(data);
+	 * const mySubject = new ArrayState(data);
 	 * mySubject.append([
 	 * 	{ key: 1, value: 'replaced-foo'},
 	 * 	{ key: 3, value: 'another-bla'}

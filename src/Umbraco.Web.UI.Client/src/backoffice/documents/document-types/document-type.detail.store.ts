@@ -1,6 +1,6 @@
 import type { DocumentTypeDetails } from '@umbraco-cms/models';
 import { UmbContextToken } from '@umbraco-cms/context-api';
-import { createObservablePart, UniqueArrayBehaviorSubject } from '@umbraco-cms/observable-api';
+import { createObservablePart, ArrayState } from '@umbraco-cms/observable-api';
 import { UmbStoreBase } from '@umbraco-cms/store';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 
@@ -17,7 +17,7 @@ export const UMB_DOCUMENT_TYPE_DETAIL_STORE_CONTEXT_TOKEN = new UmbContextToken<
 export class UmbDocumentTypeDetailStore extends UmbStoreBase {
 
 
-	#data = new UniqueArrayBehaviorSubject<DocumentTypeDetails>([], (x) => x.key);
+	#data = new ArrayState<DocumentTypeDetails>([], (x) => x.key);
 
 
 	constructor(host: UmbControllerHostInterface) {
@@ -32,7 +32,7 @@ export class UmbDocumentTypeDetailStore extends UmbStoreBase {
 	 */
 	getByKey(key: string) {
 		// TODO: use backend cli when available.
-		fetch(`/umbraco/management/api/v1/document/document-type/${key}`)
+		fetch(`/umbraco/management/api/v1/document-type/details/${key}`)
 			.then((res) => res.json())
 			.then((data) => {
 				this.#data.append(data);

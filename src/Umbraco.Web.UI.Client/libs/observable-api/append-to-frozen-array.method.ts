@@ -5,7 +5,7 @@
  * @param {(mappable: T) => R} mappingFunction - Method to return the part for this Observable to return.
  * @param {(previousResult: R, currentResult: R) => boolean} [memoizationFunction] - Method to Compare if the data has changed. Should return true when data is different.
  * @description - Creates a RxJS Observable from RxJS Subject.
- * @example <caption>Example append new entry for a UniqueBehaviorSubject which is an array. Where the key is unique and the item will be updated if matched with existing.</caption>
+ * @example <caption>Example append new entry for a ArrayState or a part of DeepState/ObjectState it which is an array. Where the key is unique and the item will be updated if matched with existing.</caption>
  * const entry = {key: 'myKey', value: 'myValue'};
  * const newDataSet = appendToFrozenArray(mySubject.getValue(), entry, x => x.key === key);
  * mySubject.next(newDataSet);

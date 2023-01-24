@@ -13,7 +13,7 @@ Generally a Store will be holding one or more RxJS Subjects, each Subject is mad
 ````
 class MyProductStore {
 
-	protected _products = new UniqueBehaviorSubject(<Array<T>>[]);
+	protected _products = new ArrayState(<Array<T>>[]);
 	public readonly products = this._items.asObservable();
 
 	protected host: UmbControllerHostInterface;

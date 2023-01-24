@@ -37,6 +37,8 @@ const DefaultDocumentData = {
 export class UmbWorkspaceDocumentContext extends UmbWorkspaceContentContext<DocumentDetails, UmbDocumentDetailStore> {
 	constructor(host: UmbControllerHostInterface) {
 		super(host, DefaultDocumentData, UMB_DOCUMENT_DETAIL_STORE_CONTEXT_TOKEN.toString(), 'document');
+
+		console.log("UMB_DOCUMENT_DETAIL_STORE_CONTEXT_TOKEN", UMB_DOCUMENT_DETAIL_STORE_CONTEXT_TOKEN.toString())
 	}
 
 	public setPropertyValue(alias: string, value: unknown) {

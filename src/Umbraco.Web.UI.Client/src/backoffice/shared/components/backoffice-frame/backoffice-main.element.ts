@@ -3,9 +3,9 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html } from 'lit';
 import { state } from 'lit/decorators.js';
 import { IRoutingInfo } from 'router-slot';
-import { UmbSectionStore, UMB_SECTION_STORE_CONTEXT_TOKEN } from '../section/section.store';
 import { UmbSectionContext, UMB_SECTION_CONTEXT_TOKEN } from '../section/section.context';
 import { UmbSectionElement } from '../section/section.element';
+import { UmbBackofficeContext, UMB_BACKOFFICE_CONTEXT_TOKEN } from './backoffice.context';
 import { createExtensionElement } from '@umbraco-cms/extensions-api';
 import type { ManifestSection } from '@umbraco-cms/models';
 import { UmbLitElement } from '@umbraco-cms/element';
@@ -35,29 +35,31 @@ export class UmbBackofficeMain extends UmbLitElement {
 	private _sections: Array<ManifestSection> = [];
 
 	private _routePrefix = 'section/';
+	private _backofficeContext?: UmbBackofficeContext;
 	private _sectionContext?: UmbSectionContext;
-	private _sectionStore?: UmbSectionStore;
 
 	constructor() {
 		super();
 
-		this.consumeContext(UMB_SECTION_STORE_CONTEXT_TOKEN, (_instance) => {
-			this._sectionStore = _instance;
-			this._observeSections();
+		this.consumeContext(UMB_BACKOFFICE_CONTEXT_TOKEN, (_instance) => {
+			this._backofficeContext = _instance;
+			this._observeBackoffice();
 		});
+
 	}
 
-	private async _observeSections() {
-		if (!this._sectionStore) return;
-
-		this.observe(this._sectionStore.getAllowed(), (sections) => {
-			this._sections = sections;
-			if (!sections) return;
-			this._createRoutes();
-		});
+	private async _observeBackoffice() {
+		if(this._backofficeContext) {
+			this.observe(this._backofficeContext.getAllowedSections(), (sections) => {
+				this._sections = sections;
+				this._createRoutes();
+			}, 'observeAllowedSections');
+		}
 	}
 
 	private _createRoutes() {
+		if (!this._sections) return;
+
 		this._routes = [];
 		this._routes = this._sections.map((section) => {
 			return {
@@ -86,7 +88,7 @@ export class UmbBackofficeMain extends UmbLitElement {
 		const currentPath = info.match.route.path;
 		const section = this._sections.find((s) => this._routePrefix + s.meta.pathname === currentPath);
 		if (!section) return;
-		this._sectionStore?.setCurrent(section.alias);
+		this._backofficeContext?.setActiveSectionAlias(section.alias);
 		this._provideSectionContext(section);
 	};
 

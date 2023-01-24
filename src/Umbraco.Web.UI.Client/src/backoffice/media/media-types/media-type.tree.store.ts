@@ -1,7 +1,7 @@
 import { FolderTreeItem, MediaTypeResource } from '@umbraco-cms/backend-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/resources';
 import { UmbContextToken } from '@umbraco-cms/context-api';
-import { createObservablePart, UniqueArrayBehaviorSubject } from '@umbraco-cms/observable-api';
+import { createObservablePart, ArrayState } from '@umbraco-cms/observable-api';
 import { UmbStoreBase } from '@umbraco-cms/store';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 
@@ -17,7 +17,7 @@ export const UMB_DATA_TYPE_TREE_STORE_CONTEXT_TOKEN = new UmbContextToken<UmbMed
 export class UmbMediaTypeTreeStore extends UmbStoreBase {
 
 
-	#data = new UniqueArrayBehaviorSubject<FolderTreeItem>([], (x) => x.key);
+	#data = new ArrayState<FolderTreeItem>([], (x) => x.key);
 
 
 	constructor(host: UmbControllerHostInterface) {

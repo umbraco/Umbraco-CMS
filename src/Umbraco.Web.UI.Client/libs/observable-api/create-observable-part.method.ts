@@ -1,5 +1,5 @@
 import { distinctUntilChanged, map, Observable, shareReplay } from "rxjs";
-import { MappingFunction, MemoizationFunction, defaultMemoization } from "./unique-behavior-subject";
+import { MappingFunction, MemoizationFunction, defaultMemoization } from "./deep-state";
 
 /**
  * @export
@@ -12,7 +12,7 @@ import { MappingFunction, MemoizationFunction, defaultMemoization } from "./uniq
  * public readonly myPart = CreateObservablePart(this._data, (data) => data.myPart);
  */
 
-export function createObservablePart<T, R>(
+export function createObservablePart<R, T>(
 	source$: Observable<T>,
 	mappingFunction: MappingFunction<T, R>,
 	memoizationFunction?: MemoizationFunction<R>

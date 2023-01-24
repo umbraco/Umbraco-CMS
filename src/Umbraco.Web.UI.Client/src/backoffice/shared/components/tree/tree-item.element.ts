@@ -116,8 +116,8 @@ export class UmbTreeItem extends UmbLitElement {
 	private _observeSection() {
 		if (!this._sectionContext) return;
 
-		this.observe(this._sectionContext?.manifest, (section) => {
-			this._href = this._constructPath(section?.meta.pathname || '', this.entityType, this.key);
+		this.observe(this._sectionContext?.pathname, (pathname) => {
+			this._href = this._constructPath(pathname || '', this.entityType, this.key);
 		});
 	}
 
@@ -184,7 +184,8 @@ export class UmbTreeItem extends UmbLitElement {
 	private _openActions() {
 		if (!this._treeContext || !this._sectionContext) return;
 
-		this._sectionContext?.setActiveTree(this._treeContext?.tree);
+		// This is out-commented as it was not used. only kept if someone need this later:
+		//this._sectionContext?.setActiveTree(this._treeContext?.tree);
 
 		this._sectionContext?.setActiveTreeItem({
 			key: this.key,
