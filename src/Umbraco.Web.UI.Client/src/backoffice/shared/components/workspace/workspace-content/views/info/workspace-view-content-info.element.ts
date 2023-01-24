@@ -3,7 +3,7 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, state } from 'lit/decorators.js';
 import type { UmbWorkspaceContentContext } from '../../workspace-content.context';
 import type { DocumentDetails, MediaDetails } from '@umbraco-cms/models';
-import { UmbLitElement } from '@umbraco-cms/context-api';
+import { UmbLitElement } from '@umbraco-cms/element';
 
 @customElement('umb-workspace-view-content-info')
 export class UmbWorkspaceViewContentInfoElement extends UmbLitElement {

@@ -4,7 +4,7 @@ import { customElement, state } from 'lit/decorators.js';
 import { distinctUntilChanged } from 'rxjs';
 import { UmbWorkspaceDocumentTypeContext } from '../../document-type-workspace.context';
 import type { UmbDocumentTypeStoreItemType } from '../../../document-type.store';
-import { UmbLitElement } from '@umbraco-cms/context-api';
+import { UmbLitElement } from '@umbraco-cms/element';
 
 @customElement('umb-workspace-view-document-type-design')
 export class UmbWorkspaceViewDocumentTypeDesignElement extends UmbLitElement {

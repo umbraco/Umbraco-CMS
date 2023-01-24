@@ -2,7 +2,7 @@ import { html } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
 import { UmbTableItem } from 'src/backoffice/shared/components/table';
-import { UmbLitElement } from '@umbraco-cms/context-api';
+import { UmbLitElement } from '@umbraco-cms/element';
 
 @customElement('umb-user-group-table-sections-column-layout')
 export class UmbUserGroupTableSectionsColumnLayoutElement extends UmbLitElement {

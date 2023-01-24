@@ -11,7 +11,7 @@ import { UmbMediaStore, UmbMediaStoreItemType } from 'src/backoffice/media/media
 
 import '../../../../../../shared/components/content-property/content-property.element';
 import '../../../../../../shared/collection/dashboards/dashboard-collection.element';
-import { UmbLitElement } from '@umbraco-cms/context-api';
+import { UmbLitElement } from '@umbraco-cms/element';
 
 @customElement('umb-workspace-view-collection')
 export class UmbWorkspaceViewCollectionElement extends UmbLitElement {

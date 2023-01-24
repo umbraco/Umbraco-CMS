@@ -18,7 +18,7 @@ import {
 	UmbUserGroupStore,
 	UMB_USER_GROUP_STORE_CONTEXT_TOKEN,
 } from 'src/backoffice/users/user-groups/user-group.store';
-import { UmbLitElement } from '@umbraco-cms/context-api';
+import { UmbLitElement } from '@umbraco-cms/element';
 
 @customElement('umb-workspace-view-user-groups')
 export class UmbWorkspaceViewUserGroupsElement extends UmbLitElement {

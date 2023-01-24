@@ -24,6 +24,7 @@
 			"@umbraco-cms/backend-api": ["libs/backend-api"],
 			"@umbraco-cms/context-api": ["libs/context-api"],
 			"@umbraco-cms/controller": ["libs/controller"],
+			"@umbraco-cms/element": ["libs/element"],
 			"@umbraco-cms/extensions-api": ["libs/extensions-api"],
 			"@umbraco-cms/extensions-registry": ["libs/extensions-registry"],
 			"@umbraco-cms/notification": ["libs/notification"],

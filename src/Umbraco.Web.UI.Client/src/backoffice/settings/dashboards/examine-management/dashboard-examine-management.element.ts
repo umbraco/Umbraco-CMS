@@ -5,7 +5,7 @@ import { IRoute, IRoutingInfo, path } from 'router-slot';
 import { UmbDashboardExamineIndexElement } from './views/section-view-examine-indexers';
 import { UmbDashboardExamineSearcherElement } from './views/section-view-examine-searchers';
 
-import { UmbLitElement } from '@umbraco-cms/context-api';
+import { UmbLitElement } from '@umbraco-cms/element';
 
 @customElement('umb-dashboard-examine-management')
 export class UmbDashboardExamineManagementElement extends UmbLitElement {
@@ -60,7 +60,7 @@ export class UmbDashboardExamineManagementElement extends UmbLitElement {
 	}
 
 	private get backbutton(): boolean {
-		return !this._currentPath?.endsWith('examine-management/');
+		return !(this._currentPath?.endsWith('examine-management/'));
 	}
 
 	render() {

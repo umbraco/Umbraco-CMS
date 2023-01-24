@@ -9,7 +9,7 @@ import {
 	UMB_TREE_CONTEXT_MENU_SERVICE_CONTEXT_TOKEN,
 } from '../context-menu/tree-context-menu.service';
 import type { Entity, ManifestTreeItemAction, ManifestTree } from '@umbraco-cms/models';
-import { UmbLitElement } from '@umbraco-cms/context-api';
+import { UmbLitElement } from '@umbraco-cms/element';
 
 export type ActionPageEntity = {
 	key: string;

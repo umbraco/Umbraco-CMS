@@ -1,7 +1,7 @@
 import { expect, fixture, html } from '@open-wc/testing';
 import { customElement } from 'lit/decorators.js';
 import { UmbContextProviderElement } from './context-provider.element';
-import { UmbLitElement } from '@umbraco-cms/context-api';
+import { UmbLitElement } from '@umbraco-cms/element';
 
 @customElement('umb-context-test')
 export class ContextTestElement extends UmbLitElement {

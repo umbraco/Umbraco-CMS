@@ -1,11 +1,14 @@
 import { Observable } from 'rxjs';
 
-import type { UmbContextToken } from '../context-token';
-import { UmbContextProviderController } from '../provide/context-provider.controller';
-import type { UmbContextCallback } from '../consume/context-request.event';
-import { UmbContextConsumerController } from '../consume/context-consumer.controller';
 import type { HTMLElementConstructor } from '@umbraco-cms/models';
+
 import { UmbControllerHostInterface, UmbControllerHostMixin } from '@umbraco-cms/controller';
+import {
+	UmbContextToken,
+	UmbContextCallback,
+	UmbContextConsumerController,
+	UmbContextProviderController,
+} from '@umbraco-cms/context-api';
 import { UmbObserverController } from '@umbraco-cms/observable-api';
 
 // TODO: can we use this aliases to generate the key of this type

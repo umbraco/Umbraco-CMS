@@ -11,7 +11,7 @@ import './workspace-view-users-invite.element';
 import type { ManifestWorkspace, UserDetails } from '@umbraco-cms/models';
 import { UmbUserStore, UMB_USER_STORE_CONTEXT_TOKEN } from 'src/backoffice/users/users/user.store';
 import { createExtensionElement } from '@umbraco-cms/extensions-api';
-import { UmbLitElement } from '@umbraco-cms/context-api';
+import { UmbLitElement } from '@umbraco-cms/element';
 import { UniqueBehaviorSubject } from '@umbraco-cms/observable-api';
 
 @customElement('umb-section-view-users')

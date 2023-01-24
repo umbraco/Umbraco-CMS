@@ -14,7 +14,7 @@ import { setCustomElements } from '@storybook/web-components';
 import customElementManifests from '../custom-elements.json';
 import { STORE_ALIAS as dataTypeAlias, UmbDataTypeStore } from '../src/backoffice/settings/data-types/data-type.store';
 import { UmbDocumentTypeStore } from '../src/backoffice/documents/document-types/document-type.store';
-import { UmbIconStore } from '../libs/store/icon/icon.store';
+import { UmbIconStore } from '../src/core/stores/icon/icon.store';
 import { onUnhandledRequest } from '../src/core/mocks/browser';
 import { handlers } from '../src/core/mocks/browser-handlers';
 import { LitElement } from 'lit';
@@ -22,9 +22,9 @@ import { UmbModalService } from '../src/core/modal';
 
 // TODO: Fix storybook manifest registrations.
 
-import { umbExtensionsRegistry } from '../libs/extensions-registry';
+import { umbExtensionsRegistry } from '../src/core/extensions-registry';
 
-import '../libs/context-api/provide/context-provider.element';
+import '../src/core/context-api/provide/context-provider.element';
 import '../src/backoffice/shared/components/backoffice-frame/backoffice-modal-container.element';
 import '../src/backoffice/shared/components/code-block/code-block.element';
 

@@ -2,7 +2,7 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, CSSResultGroup, html, nothing } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { UmbModalHandler } from '..';
-import { UmbLitElement } from '@umbraco-cms/context-api';
+import { UmbLitElement } from '@umbraco-cms/element';
 
 export interface UmbModalChangePasswordData {
 	requireOldPassword: boolean;

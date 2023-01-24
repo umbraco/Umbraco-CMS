@@ -4,7 +4,7 @@ import { customElement, state } from 'lit/decorators.js';
 import { distinctUntilChanged } from 'rxjs';
 import { UmbWorkspaceDataTypeContext } from '../../data-type-workspace.context';
 import type { DataTypeDetails } from '@umbraco-cms/models';
-import { UmbLitElement } from '@umbraco-cms/context-api';
+import { UmbLitElement } from '@umbraco-cms/element';
 
 @customElement('umb-workspace-view-data-type-info')
 export class UmbWorkspaceViewDataTypeInfoElement extends UmbLitElement {

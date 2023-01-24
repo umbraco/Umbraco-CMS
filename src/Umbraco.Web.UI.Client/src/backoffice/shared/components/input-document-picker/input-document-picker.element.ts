@@ -5,7 +5,7 @@ import { ifDefined } from 'lit-html/directives/if-defined.js';
 import { FormControlMixin } from '@umbraco-ui/uui-base/lib/mixins';
 import { UmbModalService, UMB_MODAL_SERVICE_CONTEXT_TOKEN } from 'src/core/modal';
 import type { FolderTreeItem } from '@umbraco-cms/backend-api';
-import { UmbLitElement } from '@umbraco-cms/context-api';
+import { UmbLitElement } from '@umbraco-cms/element';
 import type { UmbObserverController } from '@umbraco-cms/observable-api';
 import { UmbDocumentStore, UMB_DOCUMENT_STORE_CONTEXT_TOKEN } from 'src/backoffice/documents/documents/document.store';
 

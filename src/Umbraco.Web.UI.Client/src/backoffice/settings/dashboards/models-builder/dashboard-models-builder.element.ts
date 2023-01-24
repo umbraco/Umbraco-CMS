@@ -4,7 +4,7 @@ import { css, html, nothing } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 
 import { ModelsBuilder, ModelsBuilderResource, ModelsMode } from '@umbraco-cms/backend-api';
-import { UmbLitElement } from '@umbraco-cms/context-api';
+import { UmbLitElement } from '@umbraco-cms/element';
 import { tryExecuteAndNotify } from '@umbraco-cms/resources';
 
 @customElement('umb-dashboard-models-builder')

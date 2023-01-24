@@ -2,7 +2,7 @@ import { html } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, property, state } from 'lit/decorators.js';
 import type { UmbInputNumberRangeElement } from '../../../../shared/components/input-number-range/input-number-range.element';
-import { UmbLitElement } from '@umbraco-cms/context-api';
+import { UmbLitElement } from '@umbraco-cms/element';
 import '../../../../shared/components/input-number-range/input-number-range.element';
 
 type ValueType = {

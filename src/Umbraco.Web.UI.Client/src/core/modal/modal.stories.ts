@@ -3,7 +3,7 @@ import { html } from 'lit-html';
 import { customElement, property, state } from 'lit/decorators.js';
 
 import { UmbModalService, UMB_MODAL_SERVICE_CONTEXT_TOKEN } from '.';
-import { UmbLitElement } from '@umbraco-cms/context-api';
+import { UmbLitElement } from '@umbraco-cms/element';
 
 export default {
 	title: 'API/Modals',

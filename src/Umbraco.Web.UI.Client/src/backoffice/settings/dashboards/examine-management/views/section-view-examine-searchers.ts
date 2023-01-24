@@ -5,7 +5,7 @@ import { customElement, state, query, property } from 'lit/decorators.js';
 import { UmbModalService, UMB_MODAL_SERVICE_CONTEXT_TOKEN } from '../../../../../core/modal';
 
 import { SearchResult, SearcherResource, Field } from '@umbraco-cms/backend-api';
-import { UmbLitElement } from '@umbraco-cms/context-api';
+import { UmbLitElement } from '@umbraco-cms/element';
 import { tryExecuteAndNotify } from '@umbraco-cms/resources';
 
 import './modal-views/fields-viewer.element';

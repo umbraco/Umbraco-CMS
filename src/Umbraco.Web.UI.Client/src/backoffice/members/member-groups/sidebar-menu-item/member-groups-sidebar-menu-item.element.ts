@@ -1,6 +1,6 @@
 import { html, nothing } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
-import { UmbLitElement } from '@umbraco-cms/context-api';
+import { UmbLitElement } from '@umbraco-cms/element';
 
 @customElement('umb-member-groups-sidebar-menu-item')
 export class UmbMemberGroupsSidebarMenuItemElement extends UmbLitElement {

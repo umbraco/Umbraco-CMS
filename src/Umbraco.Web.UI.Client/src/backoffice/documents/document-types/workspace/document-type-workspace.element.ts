@@ -6,7 +6,7 @@ import { distinctUntilChanged } from 'rxjs';
 import { UmbWorkspaceDocumentTypeContext } from './document-type-workspace.context';
 import type { DocumentTypeDetails } from '@umbraco-cms/models';
 import { UmbModalService, UMB_MODAL_SERVICE_CONTEXT_TOKEN } from 'src/core/modal';
-import { UmbLitElement } from '@umbraco-cms/context-api';
+import { UmbLitElement } from '@umbraco-cms/element';
 import type { UmbWorkspaceEntityElement } from 'src/backoffice/shared/components/workspace/workspace-entity-element.interface';
 
 @customElement('umb-document-type-workspace')

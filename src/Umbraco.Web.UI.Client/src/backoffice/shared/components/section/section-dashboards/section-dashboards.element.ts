@@ -12,7 +12,7 @@ import type {
 	ManifestWithMeta,
 } from '@umbraco-cms/models';
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
-import { UmbLitElement } from '@umbraco-cms/context-api';
+import { UmbLitElement } from '@umbraco-cms/element';
 
 @customElement('umb-section-dashboards')
 export class UmbSectionDashboardsElement extends UmbLitElement {
@@ -41,7 +41,7 @@ export class UmbSectionDashboardsElement extends UmbLitElement {
 				height: 100%;
 				box-sizing: border-box;
 				display: block;
-				padding: var(--uui-size-5);
+				padding:var(--uui-size-5);
 			}
 		`,
 	];

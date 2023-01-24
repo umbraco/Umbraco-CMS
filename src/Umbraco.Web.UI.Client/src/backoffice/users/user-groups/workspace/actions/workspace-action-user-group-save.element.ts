@@ -3,7 +3,7 @@ import { customElement, state } from 'lit/decorators.js';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import type { UUIButtonState } from '@umbraco-ui/uui';
 import { UmbWorkspaceUserContext } from '../../../users/workspace/user-workspace.context';
-import { UmbLitElement } from '@umbraco-cms/context-api';
+import { UmbLitElement } from '@umbraco-cms/element';
 
 @customElement('umb-workspace-action-user-group-save')
 export class UmbWorkspaceActionUserGroupSaveElement extends UmbLitElement {

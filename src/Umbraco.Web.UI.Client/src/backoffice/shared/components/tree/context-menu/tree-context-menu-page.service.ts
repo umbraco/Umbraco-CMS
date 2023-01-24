@@ -3,7 +3,7 @@ import { css, nothing, PropertyValueMap } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import UmbTreeItemActionElement, { ActionPageEntity } from '../action/tree-item-action.element';
 import { UmbTreeContextMenuService } from './tree-context-menu.service';
-import { UmbLitElement } from '@umbraco-cms/context-api';
+import { UmbLitElement } from '@umbraco-cms/element';
 import { UniqueBehaviorSubject } from '@umbraco-cms/observable-api';
 import { UmbContextToken } from '@umbraco-cms/context-api';
 

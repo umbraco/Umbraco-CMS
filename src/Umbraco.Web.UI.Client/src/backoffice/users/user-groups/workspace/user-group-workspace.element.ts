@@ -11,7 +11,7 @@ import { UmbUserStore, UMB_USER_STORE_CONTEXT_TOKEN } from 'src/backoffice/users
 
 import '../../../../auth/components/input-user/input-user.element';
 import '../../../../backoffice/shared/components/input-section/input-section.element';
-import { UmbLitElement } from '@umbraco-cms/context-api';
+import { UmbLitElement } from '@umbraco-cms/element';
 import { UmbWorkspaceEntityElement } from 'src/backoffice/shared/components/workspace/workspace-entity-element.interface';
 
 @customElement('umb-user-group-workspace')

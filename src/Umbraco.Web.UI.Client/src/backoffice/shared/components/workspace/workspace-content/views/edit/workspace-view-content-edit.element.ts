@@ -7,7 +7,7 @@ import { UmbWorkspaceContentContext } from '../../workspace-content.context';
 import type { ContentProperty, ContentPropertyData, DocumentDetails, MediaDetails } from '@umbraco-cms/models';
 
 import '../../../../content-property/content-property.element';
-import { UmbLitElement } from '@umbraco-cms/context-api';
+import { UmbLitElement } from '@umbraco-cms/element';
 
 @customElement('umb-workspace-view-content-edit')
 export class UmbWorkspaceViewContentEditElement extends UmbLitElement {

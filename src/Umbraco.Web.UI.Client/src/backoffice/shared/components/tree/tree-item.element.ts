@@ -12,7 +12,7 @@ import {
 } from './context-menu/tree-context-menu.service';
 import type { Entity } from '@umbraco-cms/models';
 import type { UmbTreeDataStore } from '@umbraco-cms/store';
-import { UmbLitElement } from '@umbraco-cms/context-api';
+import { UmbLitElement } from '@umbraco-cms/element';
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
 
 @customElement('umb-tree-item')

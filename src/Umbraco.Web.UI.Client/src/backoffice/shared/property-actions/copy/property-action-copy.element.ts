@@ -6,7 +6,7 @@ import {
 	UmbNotificationService,
 	UMB_NOTIFICATION_SERVICE_CONTEXT_TOKEN,
 } from '@umbraco-cms/notification';
-import { UmbLitElement } from '@umbraco-cms/context-api';
+import { UmbLitElement } from '@umbraco-cms/element';
 
 @customElement('umb-property-action-copy')
 export class UmbPropertyActionCopyElement extends UmbLitElement implements UmbPropertyAction {

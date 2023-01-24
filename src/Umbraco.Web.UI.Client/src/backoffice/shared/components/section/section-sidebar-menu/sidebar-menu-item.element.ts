@@ -2,7 +2,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { css, html } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, property } from 'lit/decorators.js';
-import { UmbLitElement } from '@umbraco-cms/context-api';
+import { UmbLitElement } from '@umbraco-cms/element';
 import type { ManifestSidebarMenuItem } from '@umbraco-cms/models';
 
 @customElement('umb-sidebar-menu-item')

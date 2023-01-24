@@ -6,4 +6,3 @@ export * from './provide/context-provider';
 export * from './provide/context-provide.event';
 export * from './provide/context-provider.element';
 export * from './context-token';
-export * from './element';
