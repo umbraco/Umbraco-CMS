@@ -1,9 +1,9 @@
 import { UmbContextProviderController } from '@umbraco-cms/context-api';
 import type { UmbControllerHostInterface } from '@umbraco-cms/controller';
-import { UniqueBehaviorSubject } from '@umbraco-cms/observable-api';
+import { DeepState } from '@umbraco-cms/observable-api';
 
 export class UmbPropertyActionMenuContext {
-	#isOpen = new UniqueBehaviorSubject(false);
+	#isOpen = new DeepState(false);
 	public readonly isOpen = this.#isOpen.asObservable();
 
 	constructor(host: UmbControllerHostInterface) {

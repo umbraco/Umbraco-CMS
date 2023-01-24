@@ -1,6 +1,6 @@
 import type { DocumentDetails } from '@umbraco-cms/models';
 import { UmbContextToken } from '@umbraco-cms/context-api';
-import { createObservablePart, UniqueArrayBehaviorSubject } from '@umbraco-cms/observable-api';
+import { createObservablePart, ArrayState } from '@umbraco-cms/observable-api';
 import { UmbStoreBase, UmbContentStore } from '@umbraco-cms/store';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 
@@ -17,7 +17,7 @@ export const UMB_DOCUMENT_DETAIL_STORE_CONTEXT_TOKEN = new UmbContextToken<UmbDo
 export class UmbDocumentDetailStore extends UmbStoreBase implements UmbContentStore<DocumentDetails> {
 
 
-	private _data = new UniqueArrayBehaviorSubject<DocumentDetails>([], (x) => x.key);
+	private _data = new ArrayState<DocumentDetails>([], (x) => x.key);
 
 
 	constructor(host: UmbControllerHostInterface) {

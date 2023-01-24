@@ -1,6 +1,6 @@
 import type { DataTypeDetails } from '@umbraco-cms/models';
 import { UmbContextToken } from '@umbraco-cms/context-api';
-import { createObservablePart, UniqueArrayBehaviorSubject } from '@umbraco-cms/observable-api';
+import { createObservablePart, ArrayState } from '@umbraco-cms/observable-api';
 import { UmbStoreBase } from '@umbraco-cms/store';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 
@@ -17,7 +17,7 @@ export const UMB_DATA_TYPE_DETAIL_STORE_CONTEXT_TOKEN = new UmbContextToken<UmbD
 export class UmbDataTypeDetailStore extends UmbStoreBase {
 
 
-	#data = new UniqueArrayBehaviorSubject<DataTypeDetails>([], (x) => x.key);
+	#data = new ArrayState<DataTypeDetails>([], (x) => x.key);
 
 
 	constructor(host: UmbControllerHostInterface) {

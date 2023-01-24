@@ -1,5 +1,5 @@
 import { distinctUntilChanged, map, Observable, shareReplay } from "rxjs";
-import { MappingFunction, MemoizationFunction, defaultMemoization } from "./unique-behavior-subject";
+import { MappingFunction, MemoizationFunction, defaultMemoization } from "./deep-state";
 
 /**
  * @export

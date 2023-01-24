@@ -2,7 +2,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { UmbNotificationService, UMB_NOTIFICATION_SERVICE_CONTEXT_TOKEN, UmbNotificationDefaultData } from '@umbraco-cms/notification';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 import { UmbContextConsumerController, UmbContextProviderController } from '@umbraco-cms/context-api';
-import { UniqueBehaviorSubject, UmbObserverController, createObservablePart } from '@umbraco-cms/observable-api';
+import { DeepState, UmbObserverController, createObservablePart } from '@umbraco-cms/observable-api';
 import { UmbContentStore } from '@umbraco-cms/store';
 import type { ContentTreeItem } from '@umbraco-cms/backend-api';
 
@@ -33,7 +33,7 @@ export abstract class UmbWorkspaceContentContext<
 	constructor(host: UmbControllerHostInterface, defaultData: ContentTypeType, storeAlias: string, entityType: string) {
 		this._host = host;
 
-		this._data = new UniqueBehaviorSubject<ContentTypeType>(defaultData);
+		this._data = new DeepState<ContentTypeType>(defaultData);
 		this.data = this._data.asObservable();
 		this.name = createObservablePart(this._data, (data) => data.name);
 

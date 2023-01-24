@@ -1,6 +1,6 @@
 import { BehaviorSubject } from 'rxjs';
 import type { UserDetails } from '@umbraco-cms/models';
-import { createObservablePart, UniqueArrayBehaviorSubject } from '@umbraco-cms/observable-api';
+import { createObservablePart, ArrayState } from '@umbraco-cms/observable-api';
 import { UmbContextToken } from '@umbraco-cms/context-api';
 import { UmbStoreBase } from '@umbraco-cms/store';
 import type { UmbControllerHostInterface } from '@umbraco-cms/controller';
@@ -18,7 +18,7 @@ export const UMB_USER_STORE_CONTEXT_TOKEN = new UmbContextToken<UmbUserStore>('U
 export class UmbUserStore extends UmbStoreBase {
 
 
-	#users = new UniqueArrayBehaviorSubject<UserDetails>([], x => x.key);
+	#users = new ArrayState<UserDetails>([], x => x.key);
 	public users = this.#users.asObservable();
 
 	#totalUsers = new BehaviorSubject(0);
