@@ -3,7 +3,7 @@ import { BehaviorSubject } from "rxjs";
 
 // TODO: Should this handle array as well?
 function deepFreeze<T>(inObj: T): T {
-	if(inObj && typeof inObj === 'object') {
+	if(inObj != null && typeof inObj === 'object') {
 		Object.freeze(inObj);
 
 		Object.getOwnPropertyNames(inObj)?.forEach(function (prop) {
