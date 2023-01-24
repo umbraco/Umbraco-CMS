@@ -10,7 +10,6 @@ import '@umbraco-ui/uui-modal-dialog';
 import '@umbraco-ui/uui-modal-sidebar';
 import 'element-internals-polyfill';
 import 'router-slot';
-import './auth';
 
 import type { Guard, IRoute } from 'router-slot/model';
 
@@ -42,11 +41,7 @@ export class UmbApp extends UmbLitElement {
 	private umbracoUrl?: string;
 
 	@state()
-	private _routes: IRoute[] = [
-		{
-			path: 'login',
-			component: () => import('./auth/login/login.element'),
-		},
+	private _routes: IRoute<any>[] = [
 		{
 			path: 'install',
 			component: () => import('./installer/installer.element'),
