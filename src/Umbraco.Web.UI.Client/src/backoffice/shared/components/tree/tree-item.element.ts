@@ -11,7 +11,7 @@ import {
 	UMB_TREE_CONTEXT_MENU_SERVICE_CONTEXT_TOKEN,
 } from './context-menu/tree-context-menu.service';
 import type { Entity } from '@umbraco-cms/models';
-import { UmbTreeDataStore } from '@umbraco-cms/stores/store';
+import type { UmbTreeStore } from '@umbraco-cms/store';
 import { UmbLitElement } from '@umbraco-cms/element';
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
 
@@ -68,7 +68,7 @@ export class UmbTreeItem extends UmbLitElement {
 	private _hasActions = false;
 
 	private _treeContext?: UmbTreeContextBase;
-	private _store?: UmbTreeDataStore<unknown>;
+	private _store?: UmbTreeStore<unknown>;
 	private _sectionContext?: UmbSectionContext;
 	private _treeContextMenuService?: UmbTreeContextMenuService;
 
@@ -81,7 +81,7 @@ export class UmbTreeItem extends UmbLitElement {
 			this._observeIsSelected();
 		});
 
-		this.consumeContext('umbStore', (store: UmbTreeDataStore<unknown>) => {
+		this.consumeContext('umbStore', (store: UmbTreeStore<unknown>) => {
 			this._store = store;
 		});
 
