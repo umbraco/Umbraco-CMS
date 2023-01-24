@@ -4,11 +4,10 @@ import { customElement, property, state } from 'lit/decorators.js';
 import { repeat } from 'lit/directives/repeat.js';
 import { FormControlMixin } from '@umbraco-ui/uui-base/lib/mixins';
 import UmbInputMultipleTextStringItemElement from '../input-multiple-text-string-item/input-multiple-text-string-item.element';
+import { UmbInputEvent, UmbChangeEvent, UmbDeleteEvent } from '../../../../../../core/events';
 import { UmbLitElement } from '@umbraco-cms/element';
-import { UmbChangeEvent, UmbDeleteEvent } from 'src/core/events';
 
 import '../input-multiple-text-string-item/input-multiple-text-string-item.element';
-import { UmbInputEvent } from 'src/core/events/input.event';
 
 export type MultipleTextStringValue = Array<MultipleTextStringValueItem>;
 
