@@ -30,7 +30,6 @@ import { UmbDictionaryTreeStore } from './translation/dictionary/dictionary.tree
 import { UmbDocumentBlueprintDetailStore } from './documents/document-blueprints/document-blueprint.detail.store';
 import { UmbDocumentBlueprintTreeStore } from './documents/document-blueprints/document-blueprint.tree.store';
 
-import { UmbSectionStore, UMB_SECTION_STORE_CONTEXT_TOKEN } from './shared/components/section/section.store';
 import { UmbDataTypeDetailStore } from './settings/data-types/data-type.detail.store';
 import { UmbDataTypeTreeStore } from './settings/data-types/data-type.tree.store';
 
@@ -92,7 +91,6 @@ export class UmbBackofficeElement extends UmbLitElement {
 		new UmbDocumentBlueprintDetailStore(this);
 		new UmbDocumentBlueprintTreeStore(this);
 
-		this.provideContext(UMB_SECTION_STORE_CONTEXT_TOKEN, new UmbSectionStore());
 		this.provideContext(UMB_CURRENT_USER_HISTORY_STORE_CONTEXT_TOKEN, new UmbCurrentUserHistoryStore());
 	}
 

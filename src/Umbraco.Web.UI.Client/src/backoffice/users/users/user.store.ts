@@ -1,9 +1,9 @@
-import { BehaviorSubject } from 'rxjs';
 import type { UserDetails } from '@umbraco-cms/models';
 import { createObservablePart, ArrayState } from '@umbraco-cms/observable-api';
 import { UmbContextToken } from '@umbraco-cms/context-api';
 import { UmbStoreBase } from '@umbraco-cms/store';
 import type { UmbControllerHostInterface } from '@umbraco-cms/controller';
+import { NumberState } from 'libs/observable-api/number-state';
 
 export type UmbUserStoreItemType = UserDetails;
 
@@ -21,7 +21,7 @@ export class UmbUserStore extends UmbStoreBase {
 	#users = new ArrayState<UserDetails>([], x => x.key);
 	public users = this.#users.asObservable();
 
-	#totalUsers = new BehaviorSubject(0);
+	#totalUsers = new NumberState(0);
 	public readonly totalUsers = this.#totalUsers.asObservable();
 
 

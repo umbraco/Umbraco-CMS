@@ -1,7 +1,9 @@
-import { BehaviorSubject, Observable, ReplaySubject } from 'rxjs';
+import { Observable, ReplaySubject } from 'rxjs';
 import { Install, InstallResource, InstallSettings, ProblemDetails, TelemetryLevel } from '@umbraco-cms/backend-api';
 import { tryExecute } from '@umbraco-cms/resources';
 import { UmbContextToken } from '@umbraco-cms/context-api';
+import { NumberState } from 'libs/observable-api/number-state';
+import { ObjectState } from '@umbraco-cms/observable-api';
 
 /**
  * Context API for the installer
@@ -9,20 +11,20 @@ import { UmbContextToken } from '@umbraco-cms/context-api';
  * @class UmbInstallerContext
  */
 export class UmbInstallerContext {
-	private _data = new BehaviorSubject<Install>({
+	private _data = new ObjectState<Install>({
 		user: { name: '', email: '', password: '', subscribeToNewsletter: false },
 		database: { id: '', providerName: '' },
 		telemetryLevel: TelemetryLevel.BASIC,
 	});
 	public readonly data = this._data.asObservable();
 
-	private _currentStep = new BehaviorSubject<number>(1);
+	private _currentStep = new NumberState<number>(1);
 	public readonly currentStep = this._currentStep.asObservable();
 
-	private _settings = new ReplaySubject<InstallSettings>();
+	private _settings = new ObjectState<InstallSettings | undefined>(undefined);
 	public readonly settings = this._settings.asObservable();
 
-	private _installStatus = new ReplaySubject<ProblemDetails | null>(1);
+	private _installStatus = new ObjectState<ProblemDetails | null>(null);
 	public readonly installStatus = this._installStatus.asObservable();
 
 	constructor() {

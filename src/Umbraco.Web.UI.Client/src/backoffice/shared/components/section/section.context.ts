@@ -1,15 +1,16 @@
-import { BehaviorSubject } from 'rxjs';
 import type { Entity, ManifestSection, ManifestSectionView } from '@umbraco-cms/models';
+import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
 import { ObjectState } from '@umbraco-cms/observable-api';
 import { UmbContextToken } from '@umbraco-cms/context-api';
+import { StringState } from 'libs/observable-api/string-state';
 
 export type ActiveTreeItemType = Entity | undefined;
 
 export class UmbSectionContext {
 
-	#manifestAlias = new BehaviorSubject<string | undefined>(undefined);
-	#manifestPathname = new BehaviorSubject<string | undefined>(undefined);
-	#manifestLabel = new BehaviorSubject<string | undefined>(undefined);
+	#manifestAlias = new StringState<string | undefined>(undefined);
+	#manifestPathname = new StringState<string | undefined>(undefined);
+	#manifestLabel = new StringState<string | undefined>(undefined);
 	public readonly alias = this.#manifestAlias.asObservable();
 	public readonly pathname = this.#manifestPathname.asObservable();
 	public readonly label = this.#manifestLabel.asObservable();
@@ -25,11 +26,20 @@ export class UmbSectionContext {
 	public readonly activeTreeItem = this.#activeTreeItem.asObservable();
 
 	// TODO: what is the best context to put this in?
-	#activeViewPathname = new BehaviorSubject<string | undefined>(undefined);
+	#activeViewPathname = new StringState(undefined);
 	public readonly activeViewPathname = this.#activeViewPathname.asObservable();
 
 	constructor(manifest: ManifestSection) {
 		this.setManifest(manifest);
+	}
+
+	public getAllowed() {
+		// TODO: implemented allowed filtering
+		/*
+		const { data } = await getUserSections({});
+		this._allowedSection = data.sections;
+		*/
+		return umbExtensionsRegistry.extensionsOfType('section');
 	}
 
 	public setManifest(manifest?: ManifestSection) {

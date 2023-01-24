@@ -21,7 +21,7 @@ export class UmbCollectionContext<
 
 	/*
 	TODO:
-	private _search = new UniqueBehaviorSubject('');
+	private _search = new StringState('');
 	public readonly search = this._search.asObservable();
 	*/
 

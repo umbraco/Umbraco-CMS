@@ -45,7 +45,7 @@ export class UmbWorkspacePropertyContext<ValueType = unknown> {
 		this._data.update({ description: description });
 	}
 	public setValue(value: WorkspacePropertyData<ValueType>['value']) {
-		// Note: Do not try to compare new / old value, as it can of any type. We trust the UniqueBehaviorSubject in doing such.
+		// Note: Do not try to compare new / old value, as it can of any type. We trust the ObjectState in doing such.
 
 		this._data.update({ value: value });
 

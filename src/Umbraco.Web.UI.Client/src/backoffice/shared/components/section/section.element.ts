@@ -44,6 +44,7 @@ export class UmbSectionElement extends UmbLitElement {
 	private _views?: Array<ManifestSectionView>;
 
 	private _sectionContext?: UmbSectionContext;
+	private _sectionAlias?: string;
 
 	constructor() {
 		super();
@@ -138,32 +139,23 @@ export class UmbSectionElement extends UmbLitElement {
 		];
 	}
 
-	private _observeViews() {
+
+
+	private _observeSection() {
 		if (!this._sectionContext) return;
 
 		this.observe(
-			this._sectionContext.alias.pipe(
-				switchMap((section) => {
-					if (!section) return EMPTY;
+			this._sectionContext.alias, (alias) => {
+				this._sectionAlias = alias;
+				this._observeViews();
+			}
+		);
+	}
 
-					return (
-						umbExtensionsRegistry
-							?.extensionsOfType('sectionView')
-							.pipe(
-								map((views) =>
-									views
-										.filter((view) => view.meta.sections.includes(section.alias))
-										.sort((a, b) => b.meta.weight - a.meta.weight)
-								)
-							) ?? of([])
-					);
-				})
-			),
-			(views) => {
-				if (views.length > 0) {
-					this._views = views;
-					this._createViewRoutes();
-				}
+	private _observeViews() {
+		this.observe(umbExtensionsRegistry?.extensionsOfType('sectionView'), (views) => {
+				this._views = views.filter((view) => this._sectionAlias ? view.meta.sections.includes(this._sectionAlias) : false).sort((a, b) => b.meta.weight - a.meta.weight)
+				this._createViewRoutes();
 			}
 		);
 	}
