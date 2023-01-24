@@ -169,13 +169,13 @@ export class UmbDashboardHealthCheckGroupElement extends UmbLitElement {
 
 	private renderIcon(type?: StatusResultType) {
 		switch (type) {
-			case 'Success':
+			case StatusResultType.SUCCESS:
 				return html`<uui-icon style="color: var(--uui-color-positive);" name="check"></uui-icon>`;
-			case 'Warning':
+			case StatusResultType.WARNING:
 				return html`<uui-icon style="color: var(--uui-color-warning);" name="alert"></uui-icon>`;
-			case 'Error':
+			case StatusResultType.ERROR:
 				return html`<uui-icon style="color: var(--uui-color-danger);" name="remove"></uui-icon>`;
-			case 'Info':
+			case StatusResultType.INFO:
 				return html`<uui-icon style="color:black;" name="info"></uui-icon>`;
 			default:
 				return nothing;
