@@ -84,17 +84,19 @@ export class UmbInputMultipleTextStringElement extends FormControlMixin(UmbLitEl
 	@property({ type: Boolean, reflect: true })
 	readonly = false;
 
-	/**
-	 * Makes the input mandatory
-	 * @type {boolean}
-	 * @attr
-	 * @default false
-	 */
-	@property({ type: Boolean, reflect: true })
-	required = false;
-
 	constructor() {
 		super();
+
+		// TODO: we need a way to overwrite the missing value validator. Se we can validate on other properties than value
+		/*
+		this.removeValidator('valueMissing');
+
+		this.addValidator(
+			'valueMissing',
+			() => this.requiredMessage,
+			() => this.items.length > 0
+		);
+		*/
 
 		this.addValidator(
 			'rangeUnderflow',
@@ -116,14 +118,22 @@ export class UmbInputMultipleTextStringElement extends FormControlMixin(UmbLitEl
 		return this._items;
 	}
 	public set items(items: MultipleTextStringValue) {
+		// TODO: when we have a way to overwrite the missing value validator we can remove this
+		this.value = items.length > 0 ? 'some value' : '';
 		this._items = items || [];
 	}
 
+	// TODO: Some inputs might not have a value that is either FormDataEntryValue or FormData.
+	//  How do we handle this?
+	/*
 	@property()
-	public set value(itemsString: string) {
-		// TODO: implement value setter and getter
-		throw new Error('Not implemented');
+	public get value() {
+		throw new Error(`${this} does not support to get the value directly. Use items instead.`);
 	}
+	public set value(value: FormDataEntryValue | FormData) {
+		throw new Error(`${this} does not support to set the value directly. Use items instead.`);
+	}
+	*/
 
 	#onAdd() {
 		this._items = [...this._items, { value: '' }];
@@ -168,17 +178,15 @@ export class UmbInputMultipleTextStringElement extends FormControlMixin(UmbLitEl
 				this._items,
 				(item, index) => index,
 				(item, index) =>
-					html` <uui-form-validation-message>
-						<umb-input-multiple-text-string-item
-							value=${item.value}
-							name="test[]"
-							@input=${(event: UmbInputEvent) => this.#onInput(event, index)}
-							@delete="${(event: UmbDeleteEvent) => this.#deleteItem(event, index)}"
-							?disabled=${this.disabled}
-							?readonly=${this.readonly}
-							required
-							required-message="Item ${index + 1} is missing a value"></umb-input-multiple-text-string-item>
-					</uui-form-validation-message>`
+					html` <umb-input-multiple-text-string-item
+						value=${item.value}
+						name="item-${index}"
+						@input=${(event: UmbInputEvent) => this.#onInput(event, index)}
+						@delete="${(event: UmbDeleteEvent) => this.#deleteItem(event, index)}"
+						?disabled=${this.disabled}
+						?readonly=${this.readonly}
+						required
+						required-message="Item ${index + 1} is missing a value"></umb-input-multiple-text-string-item>`
 			)}
 		`;
 	}

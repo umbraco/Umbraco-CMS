@@ -19,15 +19,8 @@ export class UmbInputMultipleTextStringItemElement extends FormControlMixin(UmbL
 			:host {
 				display: flex;
 				align-items: center;
-				padding: var(--uui-size-space-3);
+				margin-bottom: var(--uui-size-space-3);
 				gap: var(--uui-size-space-3);
-				border: 1px solid transparent;
-			}
-
-			:host(:not([pristine]):invalid),
-      /* polyfill support */
-      :host(:not([pristine])[internals-invalid]) {
-				border-color: var(--uui-color-danger);
 			}
 
 			#validation-message {
@@ -58,15 +51,6 @@ export class UmbInputMultipleTextStringItemElement extends FormControlMixin(UmbL
 	@property({ type: Boolean, reflect: true })
 	readonly = false;
 
-	/**
-	 * Makes the input mandatory
-	 * @type {boolean}
-	 * @attr
-	 * @default false
-	 */
-	@property({ type: Boolean, reflect: true })
-	required = false;
-
 	@query('#input')
 	protected _input?: UUIInputElement;
 
@@ -89,7 +73,9 @@ export class UmbInputMultipleTextStringItemElement extends FormControlMixin(UmbL
 		});
 
 		modalHandler?.onClose().then(({ confirmed }: any) => {
-			if (confirmed) this.dispatchEvent(new UmbDeleteEvent());
+			if (confirmed) {
+				this.dispatchEvent(new UmbDeleteEvent());
+			}
 		});
 	}
 
@@ -107,6 +93,16 @@ export class UmbInputMultipleTextStringItemElement extends FormControlMixin(UmbL
 		this.dispatchEvent(new UmbChangeEvent());
 	}
 
+	// Prevent valid events from bubbling outside the message element
+	#onValid(event: any) {
+		event.stopPropagation();
+	}
+
+	// Prevent invalid events from bubbling outside the message element
+	#onInvalid(event: any) {
+		event.stopPropagation();
+	}
+
 	public async focus() {
 		await this.updateComplete;
 		this._input?.focus();
@@ -119,7 +115,7 @@ export class UmbInputMultipleTextStringItemElement extends FormControlMixin(UmbL
 	render() {
 		return html`
 			${this.disabled || this.readonly ? nothing : html`<uui-icon name="umb:navigation"></uui-icon>`}
-			<uui-form-validation-message id="validation-message">
+			<uui-form-validation-message id="validation-message" @invalid=${this.#onInvalid} @valid=${this.#onValid}>
 				<uui-input
 					id="input"
 					label="Value"
@@ -128,7 +124,7 @@ export class UmbInputMultipleTextStringItemElement extends FormControlMixin(UmbL
 					@change="${this.#onChange}"
 					?disabled=${this.disabled}
 					?readonly=${this.readonly}
-					?required="${this.required}"
+					required="${this.required}"
 					required-message="Value is missing"></uui-input>
 			</uui-form-validation-message>
 
