@@ -35,11 +35,11 @@ export class UmbSectionViewsElement extends UmbLitElement {
 	private _routerFolder = '';
 
 	@state()
-	private _activeView?: ManifestSectionView;
+	private _activeViewPathname?: ManifestSectionView;
 
 	private _sectionContext?: UmbSectionContext;
 	private _viewsSubscription?: Subscription;
-	private _activeViewSubscription?: Subscription;
+	private _activeViewPathnameSubscription?: Subscription;
 
 	constructor() {
 		super();
@@ -86,17 +86,17 @@ export class UmbSectionViewsElement extends UmbLitElement {
 	}
 
 	private _observeActiveView() {
-		this._activeViewSubscription?.unsubscribe();
+		this._activeViewPathnameSubscription?.unsubscribe();
 
-		this._activeViewSubscription = this._sectionContext?.activeView.subscribe((view) => {
-			this._activeView = view;
+		this._activeViewPathnameSubscription = this._sectionContext?.activeViewPathname.subscribe((pathname) => {
+			this._activeViewPathname = pathName;
 		});
 	}
 
 	disconnectedCallback(): void {
 		super.disconnectedCallback();
 		this._viewsSubscription?.unsubscribe();
-		this._activeViewSubscription?.unsubscribe();
+		this._activeViewPathnameSubscription?.unsubscribe();
 	}
 
 	render() {
@@ -113,7 +113,7 @@ export class UmbSectionViewsElement extends UmbLitElement {
 									<uui-tab
 										.label="${view.meta.label || view.name}"
 										href="${this._routerFolder}/view/${view.meta.pathname}"
-										?active="${this._activeView?.meta?.pathname.includes(view.meta.pathname)}">
+										?active="${this._activeViewPathname.includes(view.meta.pathname)}">
 										<uui-icon slot="icon" name=${view.meta.icon}></uui-icon>
 										${view.meta.label || view.name}
 									</uui-tab>

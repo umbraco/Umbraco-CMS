@@ -184,7 +184,8 @@ export class UmbTreeItem extends UmbLitElement {
 	private _openActions() {
 		if (!this._treeContext || !this._sectionContext) return;
 
-		this._sectionContext?.setActiveTree(this._treeContext?.tree);
+		// This is out-commented as it was not used. only kept if someone need this later:
+		//this._sectionContext?.setActiveTree(this._treeContext?.tree);
 
 		this._sectionContext?.setActiveTreeItem({
 			key: this.key,

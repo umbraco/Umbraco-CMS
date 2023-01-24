@@ -1,5 +1,5 @@
 import { customElement, property, state } from 'lit/decorators.js';
-import { UmbSectionContext, UMB_SECTION_CONTEXT_TOKEN } from '../../section/section.context';
+import { ActiveTreeItemType, UmbSectionContext, UMB_SECTION_CONTEXT_TOKEN } from '../../section/section.context';
 import {
 	UmbTreeContextMenuPageService,
 	UMB_TREE_CONTEXT_MENU_PAGE_SERVICE_CONTEXT_TOKEN,
@@ -8,7 +8,7 @@ import {
 	UmbTreeContextMenuService,
 	UMB_TREE_CONTEXT_MENU_SERVICE_CONTEXT_TOKEN,
 } from '../context-menu/tree-context-menu.service';
-import type { Entity, ManifestTreeItemAction, ManifestTree } from '@umbraco-cms/models';
+import type { ManifestTreeItemAction } from '@umbraco-cms/models';
 import { UmbLitElement } from '@umbraco-cms/element';
 
 export type ActionPageEntity = {
@@ -24,8 +24,8 @@ export default class UmbTreeItemActionElement extends UmbLitElement {
 	@state()
 	protected _entity: ActionPageEntity = { name: '', key: '' };
 
-	protected _activeTree?: ManifestTree;
-	protected _activeTreeItem?: Entity;
+	//protected _activeTree?: ManifestTree;
+	protected _activeTreeItem?: ActiveTreeItemType;
 
 	protected _sectionContext?: UmbSectionContext;
 	protected _treeContextMenuService?: UmbTreeContextMenuService;
@@ -61,9 +61,11 @@ export default class UmbTreeItemActionElement extends UmbLitElement {
 	private _observeActiveTree() {
 		if (!this._sectionContext) return;
 
+		/*
 		this.observe(this._sectionContext.activeTree, (tree) => {
 			this._activeTree = tree;
 		});
+		*/
 	}
 
 	private _observeActiveTreeItem() {
