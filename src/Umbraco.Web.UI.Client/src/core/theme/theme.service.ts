@@ -25,13 +25,15 @@ export class UmbThemeService {
 		this.addTheme({ name: 'dark', css: _darkTheme.cssText });
 		this.addTheme({ name: 'high-contrast', css: _hightContrastTheme.cssText });
 		this.#styleElement = document.createElement('style');
-		this.changeTheme(this.#theme.value);
+		const storedTheme = localStorage.getItem('umb-theme');
+		this.changeTheme(storedTheme ?? this.#theme.value);
 
 		document.documentElement.insertAdjacentElement('beforeend', this.#styleElement);
 	}
 
 	public changeTheme(theme: string) {
 		this.#theme.next(theme);
+		localStorage.setItem('umb-theme', theme);
 
 		const themeCss = this.#themes.value.find((t) => t.name === theme)?.css;
 
