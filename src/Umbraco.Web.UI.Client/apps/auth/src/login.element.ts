@@ -45,6 +45,7 @@ export default class UmbLogin extends LitElement {
 		try {
 			this._loggingIn = false;
 			window.postMessage({ type: 'login', username, persist }, '*');
+			console.log('login');
 		} catch (error) {
 			console.log(error);
 			this._loggingIn = false;
