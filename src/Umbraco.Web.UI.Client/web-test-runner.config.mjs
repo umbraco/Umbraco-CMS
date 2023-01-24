@@ -14,7 +14,7 @@ export default {
 						'src/': './src/',
 						'@umbraco-cms/models': './libs/models/index.ts',
 						'@umbraco-cms/backend-api': './libs/backend-api/index.ts',
-						'@umbraco-cms/context-api': './src/core/context-api/index.ts',
+						'@umbraco-cms/context-api': './libs/context-api/index.ts',
 						'@umbraco-cms/controller': './libs/controller/index.ts',
 						'@umbraco-cms/element': './libs/element/index.ts',
 						'@umbraco-cms/extensions-api': './libs/extensions-api/index.ts',
