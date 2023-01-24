@@ -12,6 +12,8 @@ using LogLevel = Umbraco.Cms.Core.Logging.LogLevel;
 
 namespace Umbraco.Cms.Core.Services.Implement;
 
+// FIXME: Get rid of ILogViewer and ILogLevelLoader dependencies (as they are obsolete)
+// and fix the implementation of the methods using it
 public class LogViewerService : ILogViewerService
 {
     private readonly ILogViewerQueryRepository _logViewerQueryRepository;
