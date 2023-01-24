@@ -5,7 +5,7 @@ import { customElement, property, state } from 'lit/decorators.js';
 
 import {  UMB_DATA_TYPE_DETAIL_STORE_CONTEXT_TOKEN } from '../../../settings/data-types/data-type.detail.store';
 import type { UmbDataTypeDetailStore } from '../../../settings/data-types/data-type.detail.store';
-import type { ContentProperty, DataTypeDetails } from '@umbraco-cms/models';
+import type { ContentProperty, DataTypeDetails, DataTypePropertyData } from '@umbraco-cms/models';
 
 import '../workspace-property/workspace-property.element';
 import { UmbLitElement } from '@umbraco-cms/element';
@@ -43,7 +43,7 @@ export class UmbContentPropertyElement extends UmbLitElement {
 	private _propertyEditorUIAlias?: string;
 
 	@state()
-	private _dataTypeData?: any;
+	private _dataTypeData: DataTypePropertyData[] = [];
 
 	private _dataTypeStore?: UmbDataTypeDetailStore;
 	private _dataTypeObserver?: UmbObserverController<DataTypeDetails | null>;
@@ -63,7 +63,7 @@ export class UmbContentPropertyElement extends UmbLitElement {
 		this._dataTypeObserver?.destroy();
 		if (dataTypeKey) {
 			this._dataTypeObserver = this.observe(this._dataTypeStore.getByKey(dataTypeKey), (dataType) => {
-				this._dataTypeData = dataType?.data;
+				this._dataTypeData = dataType?.data || [];
 				this._propertyEditorUIAlias = dataType?.propertyEditorUIAlias || undefined;
 			});
 		}
