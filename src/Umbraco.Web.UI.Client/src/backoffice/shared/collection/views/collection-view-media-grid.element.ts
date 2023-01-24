@@ -136,6 +136,7 @@ export class UmbCollectionViewsMediaGridElement extends UmbLitElement {
 		if(mediaItem.key) {
 			return this._selection?.includes(mediaItem.key);
 		}
+		return false;
 	}
 
 	private _renderMediaItem(item: MediaTreeItem) {
