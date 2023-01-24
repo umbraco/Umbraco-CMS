@@ -11,10 +11,11 @@ import { html } from 'lit-html';
 import { initialize, mswDecorator } from 'msw-storybook-addon';
 import { setCustomElements } from '@storybook/web-components';
 
-import customElementManifests from '../custom-elements.json';
 import { UMB_DATA_TYPE_DETAIL_STORE_CONTEXT_TOKEN, UmbDataTypeDetailStore } from '../src/backoffice/settings/data-types/data-type.detail.store';
 import { UMB_DOCUMENT_TYPE_DETAIL_STORE_CONTEXT_TOKEN, UmbDocumentTypeDetailStore } from '../src/backoffice/documents/document-types/document-type.detail.store';
-import { UmbIconStore } from '../src/core/stores/icon/icon.store';
+
+import customElementManifests from '../custom-elements.json';
+import { UmbIconStore } from '../libs/store/icon/icon.store';
 import { onUnhandledRequest } from '../src/core/mocks/browser';
 import { handlers } from '../src/core/mocks/browser-handlers';
 import { LitElement } from 'lit';
@@ -22,9 +23,10 @@ import { UmbModalService } from '../src/core/modal';
 
 // TODO: Fix storybook manifest registrations.
 
-import { umbExtensionsRegistry } from '../src/core/extensions-registry';
+import { umbExtensionsRegistry } from '../libs/extensions-registry';
 
-import '../src/core/context-api/provide/context-provider.element';
+import '../src/backoffice/shared/components/backoffice-frame/backoffice-notification-container.element';
+import '../libs/element/context-provider.element';
 import '../src/backoffice/shared/components/backoffice-frame/backoffice-modal-container.element';
 import '../src/backoffice/shared/components/code-block/code-block.element';
 

@@ -1,6 +1,5 @@
+import type { UserStatus } from '@umbraco-cms/models';
 import { InterfaceColor, InterfaceLook } from '@umbraco-ui/uui-base/lib/types';
-
-export type UserStatus = 'enabled' | 'inactive' | 'invited' | 'disabled';
 
 export const getTagLookAndColor = (status: UserStatus): { look: InterfaceLook; color: InterfaceColor } => {
 	switch ((status || '').toLowerCase()) {

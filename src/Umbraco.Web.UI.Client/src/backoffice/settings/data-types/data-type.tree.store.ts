@@ -2,7 +2,7 @@ import { DataTypeResource, DocumentTreeItem } from '@umbraco-cms/backend-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/resources';
 import { UmbContextToken } from '@umbraco-cms/context-api';
 import { createObservablePart, UniqueArrayBehaviorSubject } from '@umbraco-cms/observable-api';
-import { UmbStoreBase } from '@umbraco-cms/stores/store-base';
+import { UmbStoreBase } from '@umbraco-cms/store';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 
 

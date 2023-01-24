@@ -6,7 +6,7 @@ import {
 	UmbNotificationHandler,
 	UmbNotificationService,
 	UMB_NOTIFICATION_SERVICE_CONTEXT_TOKEN,
-} from '../../../../core/notification';
+} from '@umbraco-cms/notification';
 import { UmbLitElement } from '@umbraco-cms/element';
 
 @customElement('umb-backoffice-notification-container')

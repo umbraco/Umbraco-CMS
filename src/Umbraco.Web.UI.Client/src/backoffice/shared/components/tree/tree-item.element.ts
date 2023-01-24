@@ -11,7 +11,7 @@ import {
 	UMB_TREE_CONTEXT_MENU_SERVICE_CONTEXT_TOKEN,
 } from './context-menu/tree-context-menu.service';
 import type { Entity } from '@umbraco-cms/models';
-import { UmbTreeStore } from '@umbraco-cms/stores/store';
+import type { UmbTreeStore } from '@umbraco-cms/store';
 import { UmbLitElement } from '@umbraco-cms/element';
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
 

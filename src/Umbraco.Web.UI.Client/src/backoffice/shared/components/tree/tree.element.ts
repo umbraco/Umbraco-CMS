@@ -5,7 +5,7 @@ import { repeat } from 'lit-html/directives/repeat.js';
 import { UmbTreeContextBase } from './tree.context';
 import type { Entity, ManifestTree } from '@umbraco-cms/models';
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
-import { UmbTreeStore } from '@umbraco-cms/stores/store';
+import { UmbTreeStore } from '@umbraco-cms/store';
 import { UmbLitElement } from '@umbraco-cms/element';
 
 import './tree-item.element';

@@ -1,10 +1,9 @@
 import { v4 as uuidv4 } from 'uuid';
-import { UmbNotificationService, UMB_NOTIFICATION_SERVICE_CONTEXT_TOKEN } from '../../../../../core/notification';
-import { UmbNotificationDefaultData } from '../../../../../core/notification/layouts/default';
+import { UmbNotificationService, UMB_NOTIFICATION_SERVICE_CONTEXT_TOKEN, UmbNotificationDefaultData } from '@umbraco-cms/notification';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 import { UmbContextConsumerController, UmbContextProviderController } from '@umbraco-cms/context-api';
 import { UniqueBehaviorSubject, UmbObserverController, createObservablePart } from '@umbraco-cms/observable-api';
-import { UmbContentStore } from '@umbraco-cms/stores/store';
+import { UmbContentStore } from '@umbraco-cms/store';
 import type { ContentTreeItem } from '@umbraco-cms/backend-api';
 
 // TODO: Consider if its right to have this many class-inheritance of WorkspaceContext

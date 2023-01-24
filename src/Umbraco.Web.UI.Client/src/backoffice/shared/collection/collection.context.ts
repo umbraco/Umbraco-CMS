@@ -1,5 +1,5 @@
 import { ContentTreeItem } from '@umbraco-cms/backend-api';
-import { UmbTreeStore } from '@umbraco-cms/stores/store';
+import { UmbTreeStore } from '@umbraco-cms/store';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 import { UmbContextToken, UmbContextConsumerController } from '@umbraco-cms/context-api';
 import { UniqueBehaviorSubject, UmbObserverController } from '@umbraco-cms/observable-api';

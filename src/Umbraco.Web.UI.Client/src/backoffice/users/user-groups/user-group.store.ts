@@ -2,7 +2,7 @@ import type { UserGroupDetails } from '@umbraco-cms/models';
 import { UmbContextToken } from '@umbraco-cms/context-api';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 import { createObservablePart, UniqueArrayBehaviorSubject } from '@umbraco-cms/observable-api';
-import { UmbStoreBase } from '@umbraco-cms/stores/store-base';
+import { UmbStoreBase } from '@umbraco-cms/store';
 
 // TODO: get rid of this type addition & { ... }:
 export type UmbUserGroupStoreItemType = UserGroupDetails & { users?: Array<string> };

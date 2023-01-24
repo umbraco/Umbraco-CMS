@@ -3,7 +3,7 @@ import type { MemberGroupDetails } from '@umbraco-cms/models';
 import { UmbContextToken } from '@umbraco-cms/context-api';
 import { UniqueArrayBehaviorSubject } from '@umbraco-cms/observable-api';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
-import { UmbStoreBase } from '@umbraco-cms/stores/store-base';
+import { UmbStoreBase } from '@umbraco-cms/store';
 
 export const UMB_MEMBER_GROUP_STORE_CONTEXT_TOKEN = new UmbContextToken<UmbMemberGroupStore>('UmbMemberGroupStore');
 
