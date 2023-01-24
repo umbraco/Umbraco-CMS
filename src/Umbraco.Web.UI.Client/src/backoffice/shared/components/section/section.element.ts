@@ -60,8 +60,8 @@ export class UmbSectionElement extends UmbLitElement {
 	private _observeMenuItems() {
 		if (!this._sectionContext) return;
 
-		this.observe(this._sectionContext?.manifest, (section) => {
-			this._observeSidebarMenuItem(section?.alias);
+		this.observe(this._sectionContext?.alias, (alias) => {
+			this._observeSidebarMenuItem(alias);
 		});
 
 		this.observe(umbExtensionsRegistry.extensionsOfType('workspace'), (workspaceExtensions) => {
@@ -142,7 +142,7 @@ export class UmbSectionElement extends UmbLitElement {
 		if (!this._sectionContext) return;
 
 		this.observe(
-			this._sectionContext.manifest.pipe(
+			this._sectionContext.alias.pipe(
 				switchMap((section) => {
 					if (!section) return EMPTY;
 

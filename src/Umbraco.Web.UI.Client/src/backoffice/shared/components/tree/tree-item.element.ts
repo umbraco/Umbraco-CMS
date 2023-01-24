@@ -116,8 +116,8 @@ export class UmbTreeItem extends UmbLitElement {
 	private _observeSection() {
 		if (!this._sectionContext) return;
 
-		this.observe(this._sectionContext?.manifest, (section) => {
-			this._href = this._constructPath(section?.meta.pathname || '', this.entityType, this.key);
+		this.observe(this._sectionContext?.pathname, (pathname) => {
+			this._href = this._constructPath(pathname || '', this.entityType, this.key);
 		});
 	}
 

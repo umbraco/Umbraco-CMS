@@ -7,8 +7,12 @@ export type ActiveTreeItemType = Entity | undefined;
 
 export class UmbSectionContext {
 
-	#manifest;
-	public readonly manifest;
+	#manifestAlias = new BehaviorSubject<string | undefined>(undefined);
+	#manifestPathname = new BehaviorSubject<string | undefined>(undefined);
+	#manifestLabel = new BehaviorSubject<string | undefined>(undefined);
+	public readonly alias = this.#manifestAlias.asObservable();
+	public readonly pathname = this.#manifestPathname.asObservable();
+	public readonly label = this.#manifestLabel.asObservable();
 
 	/*
 	This was not used anywhere
@@ -17,24 +21,21 @@ export class UmbSectionContext {
 	*/
 
 	// TODO: what is the best context to put this in?
-	#activeTreeItem = new UniqueObjectBehaviorSubject<ActiveTreeItemType>(undefined);
+	#activeTreeItem = new UniqueObjectBehaviorSubject<ActiveTreeItemType | undefined>(undefined);
 	public readonly activeTreeItem = this.#activeTreeItem.asObservable();
 
 	// TODO: what is the best context to put this in?
 	#activeViewPathname = new BehaviorSubject<string | undefined>(undefined);
 	public readonly activeViewPathname = this.#activeViewPathname.asObservable();
 
-	constructor(sectionManifest: ManifestSection) {
-		this.#manifest = new BehaviorSubject<ManifestSection>(sectionManifest);
-		this.manifest = this.#manifest.asObservable();
+	constructor(manifest: ManifestSection) {
+		this.setManifest(manifest);
 	}
 
-	public setManifest(data: ManifestSection) {
-		this.#manifest.next({ ...data });
-	}
-
-	public getData() {
-		return this.#manifest.getValue();
+	public setManifest(manifest?: ManifestSection) {
+		this.#manifestAlias.next(manifest?.alias);
+		this.#manifestPathname.next(manifest?.meta?.pathname);
+		this.#manifestLabel.next(manifest ? (manifest.meta?.label || manifest.name) : undefined);
 	}
 
 	/*
@@ -44,12 +45,12 @@ export class UmbSectionContext {
 	}
 	*/
 
-	public setActiveTreeItem(item: ActiveTreeItemType) {
+	public setActiveTreeItem(item?: ActiveTreeItemType) {
 		this.#activeTreeItem.next(item);
 	}
 
-	public setActiveView(view: ManifestSectionView) {
-		this.#activeViewPathname.next(view.meta.pathname);
+	public setActiveView(view?: ManifestSectionView) {
+		this.#activeViewPathname.next(view?.meta.pathname);
 	}
 }
 

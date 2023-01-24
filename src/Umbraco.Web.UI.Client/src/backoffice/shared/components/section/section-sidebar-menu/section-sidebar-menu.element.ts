@@ -28,8 +28,8 @@ export class UmbSectionSidebarMenuElement extends UmbLitElement {
 	private _observeCurrentSection() {
 		if (!this._sectionContext) return;
 
-		this.observe(this._sectionContext?.manifest, (section) => {
-			this._currentSectionAlias = section.alias;
+		this.observe(this._sectionContext?.alias, (alias) => {
+			this._currentSectionAlias = alias;
 		});
 	}
 
