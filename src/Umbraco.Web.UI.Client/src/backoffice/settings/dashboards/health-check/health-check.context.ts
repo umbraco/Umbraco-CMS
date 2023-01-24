@@ -16,6 +16,8 @@ export class UmbHealthCheckContext {
 		this.host = host;
 	}
 
+	//TODO: Is this how we want to it?
+
 	async getGroupChecks(name: string) {
 		const { data } = await tryExecuteAndNotify(this.host, HealthCheckResource.getHealthCheckGroupByName({ name }));
 
