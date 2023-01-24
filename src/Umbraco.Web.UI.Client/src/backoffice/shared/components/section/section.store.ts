@@ -1,5 +1,5 @@
 import { Observable, ReplaySubject } from 'rxjs';
-import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
+import { umbExtensionsRegistry } from '@umbraco-cms/extensions-api';
 import { UmbContextToken } from '@umbraco-cms/context-api';
 
 // TODO: maybe this should be named something else than store?

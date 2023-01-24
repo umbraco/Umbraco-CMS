@@ -6,7 +6,7 @@ import { repeat } from 'lit/directives/repeat.js';
 import { distinctUntilChanged } from 'rxjs';
 import { UmbWorkspaceUserGroupContext } from './user-group-workspace.context';
 import type { ManifestWorkspaceAction, UserGroupDetails } from '@umbraco-cms/models';
-import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
+import { umbExtensionsRegistry } from '@umbraco-cms/extensions-api';
 import { UmbUserStore, UMB_USER_STORE_CONTEXT_TOKEN } from 'src/backoffice/users/users/user.store';
 
 import '../../../../auth/components/input-user/input-user.element';

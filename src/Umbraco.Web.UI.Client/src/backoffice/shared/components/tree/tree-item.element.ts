@@ -13,7 +13,7 @@ import {
 import type { Entity } from '@umbraco-cms/models';
 import type { UmbTreeDataStore } from '@umbraco-cms/store';
 import { UmbLitElement } from '@umbraco-cms/element';
-import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
+import { umbExtensionsRegistry } from '@umbraco-cms/extensions-api';
 
 @customElement('umb-tree-item')
 export class UmbTreeItem extends UmbLitElement {
