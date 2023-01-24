@@ -1,6 +1,6 @@
 import type { DictionaryDetails } from '@umbraco-cms/models';
 import { UmbContextToken } from '@umbraco-cms/context-api';
-import { createObservablePart, UniqueArrayBehaviorSubject } from '@umbraco-cms/observable-api';
+import { createObservablePart, ArrayState } from '@umbraco-cms/observable-api';
 import { UmbStoreBase } from '@umbraco-cms/store';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 import { EntityTreeItem } from '@umbraco-cms/backend-api';
@@ -19,7 +19,7 @@ export class UmbDictionaryDetailStore extends UmbStoreBase {
 
 
 	// TODO: use the right type:
-	#data = new UniqueArrayBehaviorSubject<EntityTreeItem>([], (x) => x.key);
+	#data = new ArrayState<EntityTreeItem>([], (x) => x.key);
 
 
 	constructor(host: UmbControllerHostInterface) {
@@ -34,7 +34,7 @@ export class UmbDictionaryDetailStore extends UmbStoreBase {
 	 */
 	getByKey(key: string) {
 		// TODO: use backend cli when available.
-		fetch(`/umbraco/management/api/v1/document/dictionary/${key}`)
+		fetch(`/umbraco/management/api/v1/dictionary/details/${key}`)
 			.then((res) => res.json())
 			.then((data) => {
 				this.#data.append(data);

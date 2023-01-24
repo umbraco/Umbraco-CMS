@@ -1,13 +1,13 @@
 import { expect } from '@open-wc/testing';
-import { UniqueArrayBehaviorSubject } from './unique-array-behavior-subject';
+import { ArrayState } from './array-state';
 import { createObservablePart } from '@umbraco-cms/observable-api';
 
-describe('UniqueArrayBehaviorSubject', () => {
+describe('ArrayState', () => {
 
 	type ObjectType = {key: string, another: string};
 	type ArrayType = ObjectType[];
 
-	let subject: UniqueArrayBehaviorSubject<ObjectType>;
+	let subject: ArrayState<ObjectType>;
 	let initialData: ArrayType;
 
 	beforeEach(() => {
@@ -16,7 +16,7 @@ describe('UniqueArrayBehaviorSubject', () => {
 			{key: '2', another: 'myValue2'},
 			{key: '3', another: 'myValue3'}
 		];
-		subject = new UniqueArrayBehaviorSubject(initialData, x => x.key);
+		subject = new ArrayState(initialData, x => x.key);
 	});
 
 

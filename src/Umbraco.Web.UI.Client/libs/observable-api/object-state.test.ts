@@ -1,17 +1,17 @@
 import { expect } from '@open-wc/testing';
-import { UniqueObjectBehaviorSubject } from './unique-object-behavior-subject';
+import { ObjectState } from './object-state';
 import { createObservablePart } from '@umbraco-cms/observable-api';
 
-describe('UniqueObjectBehaviorSubject', () => {
+describe('ObjectState', () => {
 
 	type ObjectType = {key: string, another: string};
 
-	let subject: UniqueObjectBehaviorSubject<ObjectType>;
+	let subject: ObjectState<ObjectType>;
 	let initialData: ObjectType;
 
 	beforeEach(() => {
 		initialData = {key: 'some', another: 'myValue'};
-		subject = new UniqueObjectBehaviorSubject(initialData);
+		subject = new ObjectState(initialData);
 	});
 
 

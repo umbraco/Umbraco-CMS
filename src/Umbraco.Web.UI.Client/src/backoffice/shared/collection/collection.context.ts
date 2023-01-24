@@ -2,7 +2,7 @@ import { ContentTreeItem } from '@umbraco-cms/backend-api';
 import { UmbTreeStore } from '@umbraco-cms/store';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 import { UmbContextToken, UmbContextConsumerController } from '@umbraco-cms/context-api';
-import { UniqueBehaviorSubject, UmbObserverController } from '@umbraco-cms/observable-api';
+import { DeepState, UmbObserverController } from '@umbraco-cms/observable-api';
 export class UmbCollectionContext<
 	DataType extends ContentTreeItem,
 	StoreType extends UmbTreeStore<DataType> = UmbTreeStore<DataType>
@@ -13,15 +13,15 @@ export class UmbCollectionContext<
 	private _store?: StoreType;
 	protected _dataObserver?: UmbObserverController<DataType[]>;
 
-	#data = new UniqueBehaviorSubject(<Array<DataType>>[]);
+	#data = new DeepState(<Array<DataType>>[]);
 	public readonly data = this.#data.asObservable();
 
-	#selection = new UniqueBehaviorSubject(<Array<string>>[]);
+	#selection = new DeepState(<Array<string>>[]);
 	public readonly selection = this.#selection.asObservable();
 
 	/*
 	TODO:
-	private _search = new UniqueBehaviorSubject('');
+	private _search = new StringState('');
 	public readonly search = this._search.asObservable();
 	*/
 
