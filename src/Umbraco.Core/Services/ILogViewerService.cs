@@ -2,6 +2,7 @@ using System.Collections.ObjectModel;
 using Umbraco.Cms.Core.Logging;
 using Umbraco.Cms.Core.Logging.Viewer;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.New.Cms.Core.Models;
 
 namespace Umbraco.Cms.Core.Services;
@@ -21,7 +22,7 @@ public interface ILogViewerService : IService
     /// </param>
     /// <param name="filterExpression">The query expression to filter on.</param>
     /// <param name="logLevels">The log levels for which to retrieve the log messages.</param>
-    Task<Attempt<PagedModel<ILogEntry>>> GetPagedLogsAsync(
+    Task<Attempt<PagedModel<ILogEntry>?, LogViewerOperationStatus>> GetPagedLogsAsync(
         DateTime? startDate,
         DateTime? endDate,
         int skip,
@@ -46,13 +47,13 @@ public interface ILogViewerService : IService
     /// </summary>
     /// <param name="name">The name of the new saved log query.</param>
     /// <param name="query">The query of the new saved log query.</param>
-    Task<bool> AddSavedLogQueryAsync(string name, string query);
+    Task<Attempt<ILogViewerQuery?, LogViewerOperationStatus>> AddSavedLogQueryAsync(string name, string query);
 
     /// <summary>
     ///     Deletes a saved log query to your chosen data source.
     /// </summary>
     /// <param name="name">The name of the saved log search.</param>
-    Task<bool> DeleteSavedLogQueryAsync(string name);
+    Task<Attempt<ILogViewerQuery?, LogViewerOperationStatus>> DeleteSavedLogQueryAsync(string name);
 
     /// <summary>
     ///     Returns a value indicating whether the log files for the given time
@@ -61,7 +62,7 @@ public interface ILogViewerService : IService
     /// <param name="startDate">The start date for the date range.</param>
     /// <param name="endDate">The end date for the date range.</param>
     /// <returns>The value whether or not you are able to view the logs.</returns>
-    Task<bool> CanViewLogsAsync(DateTime? startDate, DateTime? endDate);
+    Task<Attempt<bool, LogViewerOperationStatus>> CanViewLogsAsync(DateTime? startDate, DateTime? endDate);
 
     /// <summary>
     ///     Returns a number of the different log level entries.
@@ -70,7 +71,7 @@ public interface ILogViewerService : IService
     /// </summary>
     /// <param name="startDate">The start date for the date range.</param>
     /// <param name="endDate">The end date for the date range.</param>
-    Task<Attempt<LogLevelCounts>> GetLogLevelCountsAsync(DateTime? startDate, DateTime? endDate);
+    Task<Attempt<LogLevelCounts?, LogViewerOperationStatus>> GetLogLevelCountsAsync(DateTime? startDate, DateTime? endDate);
 
     /// <summary>
     ///     Returns a list of all unique message templates and their counts.
@@ -79,7 +80,7 @@ public interface ILogViewerService : IService
     /// </summary>
     /// <param name="startDate">The start date for the date range.</param>
     /// <param name="endDate">The end date for the date range.</param>
-    Task<Attempt<IEnumerable<LogTemplate>>> GetMessageTemplatesAsync(DateTime? startDate, DateTime? endDate);
+    Task<Attempt<IEnumerable<LogTemplate>, LogViewerOperationStatus>> GetMessageTemplatesAsync(DateTime? startDate, DateTime? endDate);
 
     /// <summary>
     ///     Get the log level values of the global minimum and the UmbracoFile one from the config file.

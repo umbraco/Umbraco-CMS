@@ -5,6 +5,7 @@ using Umbraco.Cms.Core.Logging.Viewer;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Scoping;
+using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Extensions;
 using Umbraco.New.Cms.Core.Models;
 using LogLevel = Umbraco.Cms.Core.Logging.LogLevel;
@@ -31,7 +32,7 @@ public class LogViewerService : ILogViewerService
     }
 
     /// <inheritdoc/>
-    public async Task<Attempt<PagedModel<ILogEntry>>> GetPagedLogsAsync(
+    public async Task<Attempt<PagedModel<ILogEntry>?, LogViewerOperationStatus>> GetPagedLogsAsync(
         DateTime? startDate,
         DateTime? endDate,
         int skip,
@@ -45,14 +46,19 @@ public class LogViewerService : ILogViewerService
         // We will need to stop the request if trying to do this on a 1GB file
         if (CanViewLogs(logTimePeriod) == false)
         {
-            return Attempt<PagedModel<ILogEntry>>.Fail();
+            return Attempt.FailWithStatus<PagedModel<ILogEntry>?, LogViewerOperationStatus>(
+                LogViewerOperationStatus.CancelledByLogsSizeValidation,
+                null);
         }
 
-        PagedModel<LogMessage> logMessages = _logViewer.GetLogsAsPagedModel(logTimePeriod, skip, take, orderDirection, filterExpression, logLevels);
+        PagedModel<LogMessage> logMessages =
+            _logViewer.GetLogsAsPagedModel(logTimePeriod, skip, take, orderDirection, filterExpression, logLevels);
 
         var logEntries = new PagedModel<ILogEntry>(logMessages.Total, logMessages.Items.Select(x => ToLogEntry(x)));
 
-        return Attempt<PagedModel<ILogEntry>>.Succeed(logEntries);
+        return Attempt.SucceedWithStatus<PagedModel<ILogEntry>?, LogViewerOperationStatus>(
+            LogViewerOperationStatus.Success,
+            logEntries);
     }
 
     /// <inheritdoc/>
@@ -70,71 +76,87 @@ public class LogViewerService : ILogViewerService
     }
 
     /// <inheritdoc/>
-    public async Task<bool> AddSavedLogQueryAsync(string name, string query)
+    public async Task<Attempt<ILogViewerQuery?, LogViewerOperationStatus>> AddSavedLogQueryAsync(string name, string query)
     {
         ILogViewerQuery? logViewerQuery = await GetSavedLogQueryByNameAsync(name);
 
         if (logViewerQuery is not null)
         {
-            return false;
+            return Attempt.FailWithStatus<ILogViewerQuery?, LogViewerOperationStatus>(LogViewerOperationStatus.DuplicateLogSearch, null);
         }
 
-        using ICoreScope scope = _provider.CreateCoreScope(autoComplete: true);
-        _logViewerQueryRepository.Save(new LogViewerQuery(name, query));
+        logViewerQuery = new LogViewerQuery(name, query);
 
-        return true;
+        using ICoreScope scope = _provider.CreateCoreScope(autoComplete: true);
+        _logViewerQueryRepository.Save(logViewerQuery);
+
+        return Attempt.SucceedWithStatus<ILogViewerQuery?, LogViewerOperationStatus>(LogViewerOperationStatus.Success, logViewerQuery);
     }
 
     /// <inheritdoc/>
-    public async Task<bool> DeleteSavedLogQueryAsync(string name)
+    public async Task<Attempt<ILogViewerQuery?, LogViewerOperationStatus>> DeleteSavedLogQueryAsync(string name)
     {
         ILogViewerQuery? logViewerQuery = await GetSavedLogQueryByNameAsync(name);
 
         if (logViewerQuery is null)
         {
-            return false;
+            return Attempt.FailWithStatus<ILogViewerQuery?, LogViewerOperationStatus>(LogViewerOperationStatus.NotFoundLogSearch, null);
         }
 
         using ICoreScope scope = _provider.CreateCoreScope(autoComplete: true);
         _logViewerQueryRepository.Delete(logViewerQuery);
 
-        return true;
+        return Attempt.SucceedWithStatus<ILogViewerQuery?, LogViewerOperationStatus>(LogViewerOperationStatus.Success, logViewerQuery);
     }
 
     /// <inheritdoc/>
-    public async Task<bool> CanViewLogsAsync(DateTime? startDate, DateTime? endDate)
+    public async Task<Attempt<bool, LogViewerOperationStatus>> CanViewLogsAsync(DateTime? startDate, DateTime? endDate)
     {
         LogTimePeriod logTimePeriod = GetTimePeriod(startDate, endDate);
+        bool isAllowed = CanViewLogs(logTimePeriod);
 
-        return await Task.FromResult(CanViewLogs(logTimePeriod));
+        if (isAllowed == false)
+        {
+            return Attempt.FailWithStatus(LogViewerOperationStatus.CancelledByLogsSizeValidation, isAllowed);
+        }
+
+        return Attempt.SucceedWithStatus(LogViewerOperationStatus.Success, isAllowed);
     }
 
     /// <inheritdoc/>
-    public async Task<Attempt<LogLevelCounts>> GetLogLevelCountsAsync(DateTime? startDate, DateTime? endDate)
+    public async Task<Attempt<LogLevelCounts?, LogViewerOperationStatus>> GetLogLevelCountsAsync(DateTime? startDate, DateTime? endDate)
     {
         LogTimePeriod logTimePeriod = GetTimePeriod(startDate, endDate);
 
         // We will need to stop the request if trying to do this on a 1GB file
         if (CanViewLogs(logTimePeriod) == false)
         {
-            return Attempt<LogLevelCounts>.Fail();
+            return Attempt.FailWithStatus<LogLevelCounts?, LogViewerOperationStatus>(
+                LogViewerOperationStatus.CancelledByLogsSizeValidation,
+                null);
         }
 
-        return Attempt<LogLevelCounts>.Succeed(_logViewer.GetLogLevelCounts(logTimePeriod));
+        return Attempt.SucceedWithStatus<LogLevelCounts?, LogViewerOperationStatus>(
+            LogViewerOperationStatus.Success,
+            _logViewer.GetLogLevelCounts(logTimePeriod));
     }
 
     /// <inheritdoc/>
-    public async Task<Attempt<IEnumerable<LogTemplate>>> GetMessageTemplatesAsync(DateTime? startDate, DateTime? endDate)
+    public async Task<Attempt<IEnumerable<LogTemplate>, LogViewerOperationStatus>> GetMessageTemplatesAsync(DateTime? startDate, DateTime? endDate)
     {
         LogTimePeriod logTimePeriod = GetTimePeriod(startDate, endDate);
 
         // We will need to stop the request if trying to do this on a 1GB file
         if (CanViewLogs(logTimePeriod) == false)
         {
-            return Attempt<IEnumerable<LogTemplate>>.Fail();
+            return Attempt.FailWithStatus(
+                LogViewerOperationStatus.CancelledByLogsSizeValidation,
+                Enumerable.Empty<LogTemplate>());
         }
 
-        return Attempt<IEnumerable<LogTemplate>>.Succeed(_logViewer.GetMessageTemplates(logTimePeriod));
+        return Attempt.SucceedWithStatus(
+            LogViewerOperationStatus.Success,
+            _logViewer.GetMessageTemplates(logTimePeriod));
     }
 
     /// <inheritdoc/>
