@@ -11,10 +11,10 @@ export class UmbWorkspaceViewContentInfoElement extends UmbLitElement {
 		UUITextStyles,
 		css`
 			:host {
-				display:block;
+				display: block;
 				margin: var(--uui-size-layout-1);
 			}
-		`
+		`,
 	];
 
 	@state()
@@ -25,12 +25,15 @@ export class UmbWorkspaceViewContentInfoElement extends UmbLitElement {
 	constructor() {
 		super();
 
-		this.consumeContext('umbWorkspaceContext', (nodeContext) => {
-			this._workspaceContext = nodeContext;
-			this._observeContent();
-		});
+		// TODO: Figure out how to get the magic string for the workspace context.
+		this.consumeContext<UmbWorkspaceContentContext<DocumentDetails | MediaDetails>>(
+			'umbWorkspaceContext',
+			(nodeContext) => {
+				this._workspaceContext = nodeContext;
+				this._observeContent();
+			}
+		);
 	}
-
 
 	private _observeContent() {
 		if (!this._workspaceContext) return;

@@ -1,7 +1,6 @@
-import { nothing } from 'lit';
+import { css, nothing } from 'lit';
 import type { TemplateResult } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
-import { css } from 'lit';
 import { map } from 'rxjs';
 import { repeat } from 'lit/directives/repeat.js';
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
@@ -20,7 +19,6 @@ export type InitializedExtension = { alias: string; weight: number; component: H
  */
 @customElement('umb-extension-slot')
 export class UmbExtensionSlotElement extends UmbLitElement {
-
 	static styles = css`
 		:host {
 			display: contents;
@@ -40,7 +38,8 @@ export class UmbExtensionSlotElement extends UmbLitElement {
 	public defaultElement = '';
 
 	@property()
-	public renderMethod: (manifest: InitializedExtension) => TemplateResult<1 | 2> | HTMLElement | null = (manifest) => manifest.component;
+	public renderMethod: (manifest: InitializedExtension) => TemplateResult<1 | 2> | HTMLElement | null = (manifest) =>
+		manifest.component;
 
 	connectedCallback(): void {
 		super.connectedCallback();

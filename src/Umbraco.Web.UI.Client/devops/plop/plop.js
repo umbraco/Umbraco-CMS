@@ -1,5 +1,4 @@
-import lodash from 'lodash';
-const { kebabCase, camelCase, startCase } = lodash;
+import { kebabCase, camelCase, startCase } from 'lodash-es';
 const pascalCase = (str) => startCase(str).replace(/ /g, '');
 
 const tagNamePrefix = 'umb-';

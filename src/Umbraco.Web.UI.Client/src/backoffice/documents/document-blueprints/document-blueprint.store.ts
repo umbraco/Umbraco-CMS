@@ -1,9 +1,12 @@
 import { map, Observable } from 'rxjs';
-import { UmbNodeStoreBase } from '../../../core/stores/store';
+import { UmbNodeStoreBase } from '@umbraco-cms/store';
 import type { DocumentBlueprintDetails, DocumentDetails } from '@umbraco-cms/models';
 import { DocumentBlueprintTreeItem } from '@umbraco-cms/backend-api';
+import { UmbContextToken } from '@umbraco-cms/context-api';
 
 export type UmbDocumentStoreItemType = DocumentBlueprintDetails | DocumentBlueprintTreeItem;
+
+export const STORE_ALIAS = 'UmbDocumentBlueprintStore';
 
 const isDocumentBlueprintDetails = (
 	documentBlueprint: DocumentBlueprintDetails | DocumentBlueprintTreeItem
@@ -18,7 +21,7 @@ const isDocumentBlueprintDetails = (
  * @description - Data Store for Documents
  */
 export class UmbDocumentBlueprintStore extends UmbNodeStoreBase<UmbDocumentStoreItemType> {
-	public readonly storeAlias = 'umbDocumentBlueprintStore';
+	public readonly storeAlias = STORE_ALIAS;
 
 	getByKey(key: string): Observable<DocumentDetails | null> {
 		// TODO: implement call to end point
@@ -37,3 +40,5 @@ export class UmbDocumentBlueprintStore extends UmbNodeStoreBase<UmbDocumentStore
 		return;
 	}
 }
+
+export const UMB_DOCUMENT_BLUEPRINT_STORE_CONTEXT_TOKEN = new UmbContextToken<UmbDocumentBlueprintStore>(STORE_ALIAS);

@@ -6,7 +6,7 @@ import { distinctUntilChanged } from 'rxjs';
 import type { UmbWorkspaceContentContext } from '../workspace/workspace-content/workspace-content.context';
 import type { DocumentDetails, MediaDetails } from '@umbraco-cms/models';
 
-import type { UmbNodeStoreBase } from '@umbraco-cms/stores/store';
+import type { UmbNodeStoreBase } from '@umbraco-cms/store';
 import { UmbLitElement } from '@umbraco-cms/element';
 
 type ContentTypeTypes = DocumentDetails | MediaDetails;
@@ -54,10 +54,14 @@ export class UmbVariantSelectorElement extends UmbLitElement {
 	constructor() {
 		super();
 
-		this.consumeContext('umbWorkspaceContext', (instance) => {
-			this._workspaceContext = instance;
-			this._observeWorkspace();
-		});
+		// TODO: Figure out how to get the magic string for the workspace context.
+		this.consumeContext<UmbWorkspaceContentContext<ContentTypeTypes, UmbNodeStoreBase<ContentTypeTypes>>>(
+			'umbWorkspaceContext',
+			(instance) => {
+				this._workspaceContext = instance;
+				this._observeWorkspace();
+			}
+		);
 	}
 
 	private async _observeWorkspace() {
@@ -67,7 +71,6 @@ export class UmbVariantSelectorElement extends UmbLitElement {
 			this._content = data;
 		});
 	}
-
 
 	// TODO. find a way where we don't have to do this for all workspaces.
 	private _handleInput(event: UUIInputEvent) {
@@ -95,31 +98,35 @@ export class UmbVariantSelectorElement extends UmbLitElement {
 		return html`
 			<uui-input id="name-input" .value=${this._content?.name} @input="${this._handleInput}">
 				<!-- Implement Variant Selector -->
-				${this._content && this._content.variants?.length > 0
-					? html`
-							<div slot="append">
-								<uui-button id="variant-selector-toggle" @click=${this._toggleVariantSelector}>
-									English (United States)
-									<uui-caret></uui-caret>
-								</uui-button>
-							</div>
-						`
-					: nothing}
+				${
+					this._content && this._content.variants?.length > 0
+						? html`
+								<div slot="append">
+									<uui-button id="variant-selector-toggle" @click=${this._toggleVariantSelector}>
+										English (United States)
+										<uui-caret></uui-caret>
+									</uui-button>
+								</div>
+						  `
+						: nothing
+				}
 			</uui-input>
 
-			${this._content && this._content.variants?.length > 0
-				? html`
-						<uui-popover id="variant-selector-popover" .open=${this._variantSelectorIsOpen} @close=${this._close}>
-							<div id="variant-selector-dropdown" slot="popover">
-								<uui-scroll-container>
-									<ul>
-										<li>Implement variants</li>
-									</ul>
-								</uui-scroll-container>
-							</div>
-						</uui-popover>
-					`
-				: nothing}
+			${
+				this._content && this._content.variants?.length > 0
+					? html`
+							<uui-popover id="variant-selector-popover" .open=${this._variantSelectorIsOpen} @close=${this._close}>
+								<div id="variant-selector-dropdown" slot="popover">
+									<uui-scroll-container>
+										<ul>
+											<li>Implement variants</li>
+										</ul>
+									</uui-scroll-container>
+								</div>
+							</uui-popover>
+					  `
+					: nothing
+			}
 		</div>
 		`;
 	}

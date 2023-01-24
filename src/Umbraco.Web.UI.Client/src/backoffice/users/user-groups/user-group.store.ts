@@ -1,9 +1,12 @@
 import { map, Observable } from 'rxjs';
-import { UmbDataStoreBase } from '../../../core/stores/store';
+import { UmbDataStoreBase } from '@umbraco-cms/store';
 import type { UserGroupDetails, UserGroupEntity } from '@umbraco-cms/models';
+import { UmbContextToken } from '@umbraco-cms/context-api';
 
 // TODO: get rid of this type addition & { ... }:
 export type UmbUserGroupStoreItemType = UserGroupDetails & { users?: Array<string> };
+
+export const STORE_ALIAS = 'UmbUserGroupStore';
 
 /**
  * @export
@@ -12,7 +15,7 @@ export type UmbUserGroupStoreItemType = UserGroupDetails & { users?: Array<strin
  * @description - Data Store for Users
  */
 export class UmbUserGroupStore extends UmbDataStoreBase<UmbUserGroupStoreItemType> {
-	public readonly storeAlias = 'umbUserGroupStore';
+	public readonly storeAlias = STORE_ALIAS;
 
 	getAll(): Observable<Array<UmbUserGroupStoreItemType>> {
 		// TODO: use Fetcher API.
@@ -83,3 +86,5 @@ export class UmbUserGroupStore extends UmbDataStoreBase<UmbUserGroupStoreItemTyp
 		}
 	}
 }
+
+export const UMB_USER_GROUP_STORE_CONTEXT_TOKEN = new UmbContextToken<UmbUserGroupStore>(STORE_ALIAS);

@@ -1,6 +1,6 @@
 import { css, CSSResultGroup, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
-import { UmbInstallerContext } from './installer.context';
+import { UmbInstallerContext, UMB_INSTALLER_CONTEXT_TOKEN } from './installer.context';
 import { UmbLitElement } from '@umbraco-cms/element';
 
 import './consent/installer-consent.element';
@@ -21,7 +21,7 @@ export class UmbInstallerElement extends UmbLitElement {
 
 	constructor() {
 		super();
-		this.provideContext('umbInstallerContext', this._umbInstallerContext);
+		this.provideContext(UMB_INSTALLER_CONTEXT_TOKEN, this._umbInstallerContext);
 	}
 
 	connectedCallback(): void {

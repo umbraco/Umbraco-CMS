@@ -1,8 +1,9 @@
 import { map, Observable } from 'rxjs';
-import { UmbDataStoreBase } from '../../../core/stores/store';
+import { UmbDataStoreBase } from '@umbraco-cms/store';
 import type { DataTypeDetails } from '@umbraco-cms/models';
 import { DataTypeResource, FolderTreeItem } from '@umbraco-cms/backend-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/resources';
+import { UmbContextToken } from '@umbraco-cms/context-api';
 
 const isDataTypeDetails = (dataType: DataTypeDetails | FolderTreeItem): dataType is DataTypeDetails => {
 	return (dataType as DataTypeDetails).data !== undefined;
@@ -13,7 +14,7 @@ const isDataTypeDetails = (dataType: DataTypeDetails | FolderTreeItem): dataType
 export type UmbDataTypeStoreItemType = DataTypeDetails | FolderTreeItem;
 
 // TODO: research how we write names of global consts.
-export const STORE_ALIAS = 'umbDataTypeStore';
+export const STORE_ALIAS = 'UmbDataTypeStore';
 
 /**
  * @export
@@ -124,3 +125,5 @@ export class UmbDataTypeStore extends UmbDataStoreBase<UmbDataTypeStoreItemType>
 		return this.items.pipe(map((items) => items.filter((item) => item.parentKey === key)));
 	}
 }
+
+export const UMB_DATA_TYPE_STORE_CONTEXT_TOKEN = new UmbContextToken<UmbDataTypeStore>(STORE_ALIAS);

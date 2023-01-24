@@ -2,7 +2,11 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, CSSResultGroup, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { repeat } from 'lit/directives/repeat.js';
-import type { UmbNotificationHandler, UmbNotificationService } from '../../../../core/notification';
+import {
+	UmbNotificationHandler,
+	UmbNotificationService,
+	UMB_NOTIFICATION_SERVICE_CONTEXT_TOKEN,
+} from '@umbraco-cms/notification';
 import { UmbLitElement } from '@umbraco-cms/element';
 
 @customElement('umb-backoffice-notification-container')
@@ -30,7 +34,7 @@ export class UmbBackofficeNotificationContainer extends UmbLitElement {
 	constructor() {
 		super();
 
-		this.consumeContext('umbNotificationService', (notificationService: UmbNotificationService) => {
+		this.consumeContext(UMB_NOTIFICATION_SERVICE_CONTEXT_TOKEN, (notificationService) => {
 			this._notificationService = notificationService;
 			this._observeNotifications();
 		});
@@ -47,11 +51,13 @@ export class UmbBackofficeNotificationContainer extends UmbLitElement {
 	render() {
 		return html`
 			<uui-toast-notification-container bottom-up id="notifications">
-				${this._notifications ? repeat(
-					this._notifications,
-					(notification: UmbNotificationHandler) => notification.key,
-					(notification) => html`${notification.element}`
-				) : ''}
+				${this._notifications
+					? repeat(
+							this._notifications,
+							(notification: UmbNotificationHandler) => notification.key,
+							(notification) => html`${notification.element}`
+					  )
+					: ''}
 			</uui-toast-notification-container>
 		`;
 	}

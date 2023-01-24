@@ -1,8 +1,9 @@
 import { map, Observable } from 'rxjs';
-import { UmbDataStoreBase } from '../../../core/stores/store';
+import { UmbDataStoreBase } from '@umbraco-cms/store';
 import { DocumentTypeResource, DocumentTypeTreeItem } from '@umbraco-cms/backend-api';
 import type { DocumentTypeDetails } from '@umbraco-cms/models';
 import { tryExecuteAndNotify } from '@umbraco-cms/resources';
+import { UmbContextToken } from '@umbraco-cms/context-api';
 
 export const isDocumentTypeDetails = (
 	documentType: DocumentTypeDetails | DocumentTypeTreeItem
@@ -12,6 +13,8 @@ export const isDocumentTypeDetails = (
 
 export type UmbDocumentTypeStoreItemType = DocumentTypeDetails | DocumentTypeTreeItem;
 
+export const STORE_ALIAS = 'UmbDocumentTypeStore';
+
 /**
  * @export
  * @class UmbDocumentTypeStore
@@ -19,7 +22,7 @@ export type UmbDocumentTypeStoreItemType = DocumentTypeDetails | DocumentTypeTre
  * @description - Data Store for Document Types
  */
 export class UmbDocumentTypeStore extends UmbDataStoreBase<UmbDocumentTypeStoreItemType> {
-	public readonly storeAlias = 'umbDocumentTypeStore';
+	public readonly storeAlias = STORE_ALIAS;
 
 	getByKey(key: string): Observable<DocumentTypeDetails | null> {
 		// TODO: use Fetcher API.
@@ -82,3 +85,5 @@ export class UmbDocumentTypeStore extends UmbDataStoreBase<UmbDocumentTypeStoreI
 		return this.items.pipe(map((items) => items.filter((item) => item.parentKey === key)));
 	}
 }
+
+export const UMB_DOCUMENT_TYPE_STORE_CONTEXT_TOKEN = new UmbContextToken<UmbDocumentTypeStore>(STORE_ALIAS);

@@ -3,11 +3,11 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, property, state } from 'lit/decorators.js';
 import { ifDefined } from 'lit-html/directives/if-defined.js';
 import { FormControlMixin } from '@umbraco-ui/uui-base/lib/mixins';
-import type { UmbModalService } from 'src/core/modal';
+import { UmbDocumentStore, UMB_DOCUMENT_STORE_CONTEXT_TOKEN } from '../../../documents/documents/document.store';
+import { UmbModalService, UMB_MODAL_SERVICE_CONTEXT_TOKEN } from '../../../../core/modal';
 import type { FolderTreeItem } from '@umbraco-cms/backend-api';
 import { UmbLitElement } from '@umbraco-cms/element';
 import type { UmbObserverController } from '@umbraco-cms/observable-api';
-import type { UmbDocumentStore } from 'src/backoffice/documents/documents/document.store';
 
 @customElement('umb-input-document-picker')
 export class UmbInputDocumentPickerElement extends FormControlMixin(UmbLitElement) {
@@ -94,11 +94,11 @@ export class UmbInputDocumentPickerElement extends FormControlMixin(UmbLitElemen
 			() => !!this.max && this._selectedKeys.length > this.max
 		);
 
-		this.consumeContext('umbDocumentStore', (instance) => {
+		this.consumeContext(UMB_DOCUMENT_STORE_CONTEXT_TOKEN, (instance) => {
 			this._documentStore = instance;
 			this._observePickedDocuments();
 		});
-		this.consumeContext('umbModalService', (instance) => {
+		this.consumeContext(UMB_MODAL_SERVICE_CONTEXT_TOKEN, (instance) => {
 			this._modalService = instance;
 		});
 	}

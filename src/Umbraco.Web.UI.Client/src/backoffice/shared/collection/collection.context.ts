@@ -1,13 +1,12 @@
 import { ContentTreeItem } from '@umbraco-cms/backend-api';
-import { UmbTreeDataStore } from '@umbraco-cms/stores/store';
+import { UmbTreeDataStore } from '@umbraco-cms/store';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
-import { UmbContextConsumerController } from '@umbraco-cms/context-api';
+import { UmbContextToken, UmbContextConsumerController } from '@umbraco-cms/context-api';
 import { UniqueBehaviorSubject, UmbObserverController } from '@umbraco-cms/observable-api';
 export class UmbCollectionContext<
 	DataType extends ContentTreeItem,
 	StoreType extends UmbTreeDataStore<DataType> = UmbTreeDataStore<DataType>
 > {
-
 	private _host: UmbControllerHostInterface;
 	private _entityKey: string | null;
 
@@ -60,14 +59,18 @@ export class UmbCollectionContext<
 		this._dataObserver?.destroy();
 
 		if (this._entityKey) {
-			this._dataObserver = new UmbObserverController(this._host, this._store.getTreeItemChildren(this._entityKey), (nodes) => {
-				if(nodes) {
-					this.#data.next(nodes);
+			this._dataObserver = new UmbObserverController(
+				this._host,
+				this._store.getTreeItemChildren(this._entityKey),
+				(nodes) => {
+					if (nodes) {
+						this.#data.next(nodes);
+					}
 				}
-			});
+			);
 		} else {
 			this._dataObserver = new UmbObserverController(this._host, this._store.getTreeRoot(), (nodes) => {
-				if(nodes) {
+				if (nodes) {
 					this.#data.next(nodes);
 				}
 			});
@@ -107,3 +110,7 @@ export class UmbCollectionContext<
 		this.#data.unsubscribe();
 	}
 }
+
+export const UMB_COLLECTION_CONTEXT_TOKEN = new UmbContextToken<UmbCollectionContext<any, any>>(
+	UmbCollectionContext.name
+);

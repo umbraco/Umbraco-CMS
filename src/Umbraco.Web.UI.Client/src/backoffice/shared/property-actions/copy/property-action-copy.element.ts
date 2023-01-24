@@ -1,13 +1,15 @@
 import { html } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
-import type { UmbNotificationDefaultData } from '../../../../core/notification/layouts/default';
-import type { UmbNotificationService } from '../../../../core/notification';
 import type { UmbPropertyAction } from '../shared/property-action/property-action.model';
+import {
+	UmbNotificationDefaultData,
+	UmbNotificationService,
+	UMB_NOTIFICATION_SERVICE_CONTEXT_TOKEN,
+} from '@umbraco-cms/notification';
 import { UmbLitElement } from '@umbraco-cms/element';
 
 @customElement('umb-property-action-copy')
 export class UmbPropertyActionCopyElement extends UmbLitElement implements UmbPropertyAction {
-	
 	@property()
 	value = '';
 
@@ -21,7 +23,7 @@ export class UmbPropertyActionCopyElement extends UmbLitElement implements UmbPr
 			console.log('PROPERTY', property);
 		});
 
-		this.consumeContext('umbNotificationService', (notificationService: UmbNotificationService) => {
+		this.consumeContext(UMB_NOTIFICATION_SERVICE_CONTEXT_TOKEN, (notificationService) => {
 			this._notificationService = notificationService;
 		});
 	}

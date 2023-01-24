@@ -5,8 +5,8 @@ import { IRoute } from 'router-slot';
 import { UUIPopoverElement } from '@umbraco-ui/uui';
 
 import type { UmbSectionViewUsersElement } from './section-view-users.element';
-import { UmbLitElement } from '@umbraco-cms/element';	
-import { UmbModalService } from 'src/core/modal';
+import { UmbLitElement } from '@umbraco-cms/element';
+import { UmbModalService, UMB_MODAL_SERVICE_CONTEXT_TOKEN } from 'src/core/modal';
 
 import './list-view-layouts/table/workspace-view-users-table.element';
 import './list-view-layouts/grid/workspace-view-users-grid.element';
@@ -114,7 +114,7 @@ export class UmbWorkspaceViewUsersOverviewElement extends UmbLitElement {
 			this._observeSelection();
 		});
 
-		this.consumeContext('umbModalService', (modalService: UmbModalService) => {
+		this.consumeContext(UMB_MODAL_SERVICE_CONTEXT_TOKEN, (modalService) => {
 			this._modalService = modalService;
 		});
 	}

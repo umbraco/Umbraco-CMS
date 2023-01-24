@@ -4,7 +4,7 @@ import { importMapsPlugin } from '@web/dev-server-import-maps';
 
 export default {
 	nodeResolve: true,
-	files: 'src/**/*.test.ts',
+	files: ['src/**/*.test.ts', 'libs/**/*.test.ts'],
 	plugins: [
 		esbuildPlugin({ ts: true, target: 'auto', json: true }),
 		importMapsPlugin({
@@ -12,17 +12,19 @@ export default {
 				importMap: {
 					imports: {
 						'src/': './src/',
-						'@umbraco-cms/models': './src/core/models/index.ts',
-						'@umbraco-cms/backend-api': './src/core/backend-api/index.ts',
-						'@umbraco-cms/context-api': './src/core/context-api/index.ts',
-						'@umbraco-cms/controller': './src/core/controller/index.ts',
-						'@umbraco-cms/element': './src/core/element/index.ts',
-						'@umbraco-cms/extensions-api': './src/core/extensions-api/index.ts',
-						'@umbraco-cms/observable-api': './src/core/observable-api/index.ts',
+						'@umbraco-cms/models': './libs/models/index.ts',
+						'@umbraco-cms/backend-api': './libs/backend-api/index.ts',
+						'@umbraco-cms/context-api': './libs/context-api/index.ts',
+						'@umbraco-cms/controller': './libs/controller/index.ts',
+						'@umbraco-cms/element': './libs/element/index.ts',
+						'@umbraco-cms/extensions-api': './libs/extensions-api/index.ts',
+						'@umbraco-cms/extensions-registry': './libs/extensions-registry/index.ts',
+						'@umbraco-cms/notification': './libs/notification/index.ts',
+						'@umbraco-cms/observable-api': './libs/observable-api/index.ts',
+						'@umbraco-cms/store': './libs/store/index.ts',
 						'@umbraco-cms/utils': './src/core/utils/index.ts',
 						'@umbraco-cms/test-utils': './src/core/test-utils/index.ts',
-						'@umbraco-cms/resources': './src/core/resources/index.ts',
-						'@umbraco-cms/extensions-registry': './src/core/extensions-registry/index.ts',
+						'@umbraco-cms/resources': './libs/resources/index.ts'
 					},
 				},
 			},
@@ -39,7 +41,13 @@ export default {
 	testRunnerHtml: (testFramework) =>
 		`<html>
 			<head>
-				<link rel="stylesheet" href="/src/core/css/custom-properties.css">
+				<meta charset="UTF-8" />
+				<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+				<link rel="icon" type="image/svg+xml" href="public/favicon.svg" />
+				<title>Umbraco</title>
+				<base href="/" />
+				<link rel="stylesheet" href="node_modules/@umbraco-ui/uui-css/dist/uui-css.css">
+				<link rel="stylesheet" href="src/core/css/custom-properties.css">
 			</head>
       <body>
         <script type="module" src="${testFramework}"></script>
