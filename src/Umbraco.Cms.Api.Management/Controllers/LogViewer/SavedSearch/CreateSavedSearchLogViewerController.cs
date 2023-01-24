@@ -1,7 +1,10 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Management.ViewModels.LogViewer;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Api.Management.Controllers.LogViewer.SavedSearch;
 
@@ -22,21 +25,15 @@ public class CreateSavedSearchLogViewerController : SavedSearchLogViewerControll
     [ProducesResponseType(StatusCodes.Status201Created)]
     public async Task<IActionResult> Create(SavedLogSearchViewModel savedSearch)
     {
-        bool isSuccessful = await _logViewerService.AddSavedLogQueryAsync(savedSearch.Name, savedSearch.Query);
+        Attempt<ILogViewerQuery?, LogViewerOperationStatus> result =
+            await _logViewerService.AddSavedLogQueryAsync(savedSearch.Name, savedSearch.Query);
 
-        if (isSuccessful == false)
+        if (result.Success)
         {
-            var invalidModelProblem = new ProblemDetails
-            {
-                Title = "Duplicate log search name",
-                Detail = $"""Log search with name "{savedSearch.Name}" already exists""",
-                Status = StatusCodes.Status400BadRequest,
-                Type = "Error",
-            };
-
-            return await Task.FromResult(BadRequest(invalidModelProblem));
+            return CreatedAtAction<ByNameSavedSearchLogViewerController>(
+                    controller => nameof(controller.ByName), savedSearch.Name);
         }
 
-        return await Task.FromResult(CreatedAtAction<ByNameSavedSearchLogViewerController>(controller => nameof(controller.ByName), savedSearch.Name));
+        return LogViewerOperationStatusResult(result.Status);
     }
 }

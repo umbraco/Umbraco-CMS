@@ -6,6 +6,7 @@ using Umbraco.Cms.Core.Logging.Viewer;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Api.Management.Controllers.LogViewer;
 
@@ -32,25 +33,24 @@ public class MessageTemplateLogViewerController : LogViewerControllerBase
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(PagedViewModel<LogTemplateViewModel>), StatusCodes.Status200OK)]
-    public async Task<ActionResult<PagedViewModel<LogTemplateViewModel>>> AllMessageTemplates(
+    public async Task<IActionResult> AllMessageTemplates(
         int skip = 0,
         int take = 100,
         DateTime? startDate = null,
         DateTime? endDate = null)
     {
-        Attempt<IEnumerable<LogTemplate>> messageTemplatesAttempt = await _logViewerService.GetMessageTemplatesAsync(startDate, endDate);
+        Attempt<IEnumerable<LogTemplate>, LogViewerOperationStatus> messageTemplatesAttempt = await _logViewerService.GetMessageTemplatesAsync(startDate, endDate);
 
-        // We will need to stop the request if trying to do this on a 1GB file
-        if (messageTemplatesAttempt.Success == false)
+        if (messageTemplatesAttempt.Success)
         {
-            return ValidationProblem("Unable to view logs, due to their size");
+            IEnumerable<LogTemplate> messageTemplates = messageTemplatesAttempt
+                .Result
+                .Skip(skip)
+                .Take(take);
+
+            return Ok(_umbracoMapper.Map<PagedViewModel<LogTemplateViewModel>>(messageTemplates));
         }
 
-        IEnumerable<LogTemplate> messageTemplates = messageTemplatesAttempt
-            .Result!
-            .Skip(skip)
-            .Take(take);
-
-        return Ok(_umbracoMapper.Map<PagedViewModel<LogTemplateViewModel>>(messageTemplates));
+        return LogViewerOperationStatusResult(messageTemplatesAttempt.Status);
     }
 }

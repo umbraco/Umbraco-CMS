@@ -5,6 +5,7 @@ using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Logging.Viewer;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Api.Management.Controllers.LogViewer;
 
@@ -29,16 +30,16 @@ public class LogLevelCountLogViewerController : LogViewerControllerBase
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    public async Task<ActionResult<LogLevelCountsViewModel>> LogLevelCounts(DateTime? startDate = null, DateTime? endDate = null)
+    public async Task<IActionResult> LogLevelCounts(DateTime? startDate = null, DateTime? endDate = null)
     {
-        Attempt<LogLevelCounts> logLevelCountsAttempt = await _logViewerService.GetLogLevelCountsAsync(startDate, endDate);
+        Attempt<LogLevelCounts?, LogViewerOperationStatus> logLevelCountsAttempt =
+            await _logViewerService.GetLogLevelCountsAsync(startDate, endDate);
 
-        // We will need to stop the request if trying to do this on a 1GB file
-        if (logLevelCountsAttempt.Success == false)
+        if (logLevelCountsAttempt.Success)
         {
-            return ValidationProblem("Unable to view logs, due to their size");
+            return Ok(_umbracoMapper.Map<LogLevelCountsViewModel>(logLevelCountsAttempt.Result));
         }
 
-        return Ok(_umbracoMapper.Map<LogLevelCountsViewModel>(logLevelCountsAttempt.Result));
+        return LogViewerOperationStatusResult(logLevelCountsAttempt.Status);
     }
 }

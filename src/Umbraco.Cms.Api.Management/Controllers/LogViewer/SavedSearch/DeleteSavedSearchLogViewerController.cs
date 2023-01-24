@@ -1,6 +1,9 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Api.Management.Controllers.LogViewer.SavedSearch;
 
@@ -21,13 +24,13 @@ public class DeleteSavedSearchLogViewerController : SavedSearchLogViewerControll
     [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<IActionResult> Delete(string name)
     {
-        bool isSuccessful = await _logViewerService.DeleteSavedLogQueryAsync(name);
+        Attempt<ILogViewerQuery?, LogViewerOperationStatus> result = await _logViewerService.DeleteSavedLogQueryAsync(name);
 
-        if (isSuccessful == false)
+        if (result.Success)
         {
-            return await Task.FromResult(NotFound());
+            return Ok();
         }
 
-        return await Task.FromResult(Ok());
+        return LogViewerOperationStatusResult(result.Status);
     }
 }

@@ -1,6 +1,8 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Api.Management.Controllers.LogViewer;
 
@@ -18,9 +20,17 @@ public class ValidateLogFileSizeLogViewerController : LogViewerControllerBase
     /// <returns>The boolean result.</returns>
     [HttpGet("validate-logs-size")]
     [MapToApiVersion("1.0")]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    public async Task<ActionResult<bool>> CanViewLogs(DateTime? startDate = null, DateTime? endDate = null)
+    public async Task<IActionResult> CanViewLogs(DateTime? startDate = null, DateTime? endDate = null)
     {
-        return await Task.FromResult(Ok(_logViewerService.CanViewLogsAsync(startDate, endDate).Result));
+        Attempt<bool, LogViewerOperationStatus> result = await _logViewerService.CanViewLogsAsync(startDate, endDate);
+
+        if (result.Success)
+        {
+            return Ok();
+        }
+
+        return LogViewerOperationStatusResult(result.Status);
     }
 }

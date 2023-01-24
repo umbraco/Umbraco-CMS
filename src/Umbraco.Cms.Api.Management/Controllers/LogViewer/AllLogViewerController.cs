@@ -6,6 +6,7 @@ using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Logging.Viewer;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.New.Cms.Core.Models;
 using LogLevel = Umbraco.Cms.Core.Logging.LogLevel;
 
@@ -38,7 +39,7 @@ public class AllLogViewerController : LogViewerControllerBase
     [HttpGet("log")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedViewModel<LogMessageViewModel>), StatusCodes.Status200OK)]
-    public async Task<ActionResult<PagedViewModel<LogMessageViewModel>>> AllLogs(
+    public async Task<IActionResult> AllLogs(
         int skip = 0,
         int take = 100,
         Direction orderDirection = Direction.Descending,
@@ -49,15 +50,14 @@ public class AllLogViewerController : LogViewerControllerBase
     {
         var levels = logLevels?.Select(l => l.ToString()).ToArray();
 
-        Attempt<PagedModel<ILogEntry>> logsAttempt =
+        Attempt<PagedModel<ILogEntry>?, LogViewerOperationStatus> logsAttempt =
             await _logViewerService.GetPagedLogsAsync(startDate, endDate, skip, take, orderDirection, filterExpression, levels);
 
-        // We will need to stop the request if trying to do this on a 1GB file
-        if (logsAttempt.Success == false)
+        if (logsAttempt.Success)
         {
-            return ValidationProblem("Unable to view logs, due to their size");
+            return Ok(_umbracoMapper.Map<PagedViewModel<LogMessageViewModel>>(logsAttempt.Result));
         }
 
-        return Ok(_umbracoMapper.Map<PagedViewModel<LogMessageViewModel>>(logsAttempt.Result));
+        return LogViewerOperationStatusResult(logsAttempt.Status);
     }
 }

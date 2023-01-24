@@ -32,6 +32,6 @@ public class AllSavedSearchLogViewerController : SavedSearchLogViewerControllerB
     {
         IReadOnlyList<ILogViewerQuery> savedLogQueries = await _logViewerService.GetSavedLogQueriesAsync();
 
-        return await Task.FromResult(Ok(_umbracoMapper.Map<PagedViewModel<SavedLogSearchViewModel>>(savedLogQueries.Skip(skip).Take(take))));
+        return Ok(_umbracoMapper.Map<PagedViewModel<SavedLogSearchViewModel>>(savedLogQueries.Skip(skip).Take(take)));
     }
 }

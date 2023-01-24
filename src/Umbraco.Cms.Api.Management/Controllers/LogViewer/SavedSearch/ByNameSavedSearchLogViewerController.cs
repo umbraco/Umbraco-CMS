@@ -33,9 +33,9 @@ public class ByNameSavedSearchLogViewerController : SavedSearchLogViewerControll
 
         if (savedLogQuery is null)
         {
-            return await Task.FromResult(NotFound());
+            return NotFound();
         }
 
-        return await Task.FromResult(Ok(_umbracoMapper.Map<SavedLogSearchViewModel>(savedLogQuery)));
+        return Ok(_umbracoMapper.Map<SavedLogSearchViewModel>(savedLogQuery));
     }
 }
