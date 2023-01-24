@@ -26,14 +26,8 @@ export class UmbDashboardHealthCheckGroupElement extends UmbLitElement {
 				margin-bottom: var(--uui-size-space-5);
 			}
 
-			uui-box p:first-child {
-				margin-block-start: 0;
-			}
-
-			.group-wrapper {
-				display: flex;
-				flex-wrap: wrap;
-				margin-inline: -5px;
+			p {
+				margin: 0;
 			}
 
 			.header {
@@ -42,36 +36,24 @@ export class UmbDashboardHealthCheckGroupElement extends UmbLitElement {
 				align-items: center;
 			}
 
-			uui-box:first-child p {
-				margin-top: 0;
-			}
-
-			.group-box {
-				flex-basis: 20%;
-				min-width: 150px;
-				max-width: calc(20% - 10px);
-				margin: 5px;
-				text-align: center;
-				font-weight: bold;
-				cursor: pointer;
-			}
-
-			.data .result-wrapper:not(:first-child) {
-				padding-top: var(--uui-size-space-5);
+			.check-results-wrapper {
 				margin-top: var(--uui-size-space-5);
+			}
+
+			.check-results-wrapper .check-result:not(:first-child) {
+				padding-top: var(--uui-size-space-5);
 				border-top: 1px solid var(--uui-color-divider-standalone);
 			}
 
-			.data p {
-				margin: 0;
-			}
-			.data uui-button {
+			.check-results-wrapper uui-button {
 				margin-block-start: 1em;
 			}
-			.description {
+
+			.check-result-description {
 				display: flex;
 			}
-			.description span {
+
+			.check-result-description span {
 				width: 36px;
 			}
 
@@ -97,9 +79,6 @@ export class UmbDashboardHealthCheckGroupElement extends UmbLitElement {
 
 	@state()
 	private _keyResults?: any;
-
-	@state()
-	private _actionButtonStates?: [{ key: string; state: UUIButtonState }];
 
 	private _api?: UmbHealthCheckContext;
 
@@ -162,10 +141,10 @@ export class UmbDashboardHealthCheckGroupElement extends UmbLitElement {
 	renderCheckResults(key: string) {
 		const checkResults = this._keyResults?.find((result: any) => result.key === key);
 		return html`<uui-icon-registry-essential>
-			<div class="data">
+			<div class="check-results-wrapper">
 				${checkResults?.results.map((result: any) => {
-					return html`<div class="result-wrapper">
-						<div class="description">
+					return html`<div class="check-result">
+						<div class="check-result-description">
 							<span>${this.renderIcon(result.resultType)}</span>
 							<p>${result.message}</p>
 						</div>

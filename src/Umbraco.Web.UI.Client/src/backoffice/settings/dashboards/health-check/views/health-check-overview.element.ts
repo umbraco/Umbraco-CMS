@@ -19,49 +19,6 @@ export class UmbDashboardHealthCheckOverviewElement extends UmbLitElement {
 				margin-top: var(--uui-size-space-5);
 			}
 
-			.group-wrapper {
-				display: grid;
-				gap: var(--uui-size-space-4);
-				grid-template-columns: repeat(auto-fit, minmax(250px, auto));
-			}
-
-			.group-box {
-				position: relative;
-			}
-
-			.group-box:hover::after {
-				content: '';
-				width: 100%;
-				height: 100%;
-				position: absolute;
-				top: 0;
-				bottom: 0;
-				left: 0;
-				right: 0;
-				border-radius: var(--uui-border-radius);
-				transition: opacity 100ms ease-out 0s;
-				opacity: 0.33;
-				outline-color: var(--uui-color-selected);
-				outline-width: 4px;
-				outline-style: solid;
-			}
-
-			a {
-				text-align: center;
-				font-weight: bold;
-				cursor: pointer;
-				text-decoration: none;
-				color: var(--uui-color-text);
-			}
-
-			uui-tag {
-				margin-top: 5px;
-			}
-
-			uui-tag uui-icon {
-				padding-right: 10px;
-			}
-
 			.flex {
 				display: flex;
 				justify-content: space-between;
