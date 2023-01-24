@@ -68,7 +68,7 @@ export class UmbCollectionViewsMediaGridElement extends UmbLitElement {
 	private _mediaItems?: Array<MediaTreeItem>;
 
 	@state()
-	private _selection?: Array<string>;
+	private _selection: Array<string> = [];
 
 	private _collectionContext?: UmbCollectionContext<MediaTreeItem>;
 
@@ -134,7 +134,7 @@ export class UmbCollectionViewsMediaGridElement extends UmbLitElement {
 
 	private _isSelected(mediaItem: MediaTreeItem) {
 		if(mediaItem.key) {
-			return this._selection?.includes(mediaItem.key);
+			return this._selection.includes(mediaItem.key);
 		}
 		return false;
 	}
