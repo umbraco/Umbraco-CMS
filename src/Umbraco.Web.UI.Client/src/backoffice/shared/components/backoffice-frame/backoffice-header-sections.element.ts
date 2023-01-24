@@ -2,7 +2,8 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, CSSResultGroup, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { when } from 'lit/directives/when.js';
-import { UmbSectionContext, UMB_SECTION_CONTEXT_TOKEN } from '../section/section.context';
+import { UMB_BACKOFFICE_CONTEXT_TOKEN } from './backoffice.context';
+import type { UmbBackofficeContext } from './backoffice.context';
 import type { ManifestSection } from '@umbraco-cms/models';
 import { UmbLitElement } from '@umbraco-cms/element';
 
@@ -49,13 +50,13 @@ export class UmbBackofficeHeaderSections extends UmbLitElement {
 	@state()
 	private _currentSectionAlias = '';
 
-	private _sectionContext?: UmbSectionContext;
+	private _backofficeContext?: UmbBackofficeContext;
 
 	constructor() {
 		super();
 
-		this.consumeContext(UMB_SECTION_CONTEXT_TOKEN, (sectionStore) => {
-			this._sectionContext = sectionStore;
+		this.consumeContext(UMB_BACKOFFICE_CONTEXT_TOKEN, (backofficeContext) => {
+			this._backofficeContext = backofficeContext;
 			this._observeSections();
 			this._observeCurrentSection();
 		});
@@ -66,8 +67,8 @@ export class UmbBackofficeHeaderSections extends UmbLitElement {
 		this._open = !this._open;
 	}
 
-	private _handleSectionTabClick(sectionManifest: ManifestSection) {
-		this._sectionContext?.setManifest(sectionManifest);
+	private _handleSectionTabClick(alias: string) {
+		this._backofficeContext?.setActiveSectionAlias(alias);
 	}
 
 	private _handleLabelClick() {
@@ -78,18 +79,18 @@ export class UmbBackofficeHeaderSections extends UmbLitElement {
 	}
 
 	private _observeSections() {
-		if (!this._sectionContext) return;
+		if (!this._backofficeContext) return;
 
-		this.observe(this._sectionContext.getAllowed(), (allowedSections) => {
+		this.observe(this._backofficeContext.getAllowedSections(), (allowedSections) => {
 			this._sections = allowedSections;
 			this._visibleSections = this._sections;
 		});
 	}
 
 	private _observeCurrentSection() {
-		if (!this._sectionContext) return;
+		if (!this._backofficeContext) return;
 
-		this.observe(this._sectionContext.alias, (currentSectionAlias) => {
+		this.observe(this._backofficeContext.activeSectionAlias, (currentSectionAlias) => {
 			this._currentSectionAlias = currentSectionAlias || '';
 		});
 	}
@@ -100,7 +101,7 @@ export class UmbBackofficeHeaderSections extends UmbLitElement {
 				${this._visibleSections.map(
 					(section: ManifestSection) => html`
 						<uui-tab
-							@click="${() => this._handleSectionTabClick(section)}"
+							@click="${() => this._handleSectionTabClick(section.alias)}"
 							?active="${this._currentSectionAlias === section.alias}"
 							href="${`section/${section.meta.pathname}`}"
 							label="${section.meta.label || section.name}"

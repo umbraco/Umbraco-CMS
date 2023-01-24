@@ -32,7 +32,7 @@ export class UmbDocumentTypeDetailStore extends UmbStoreBase {
 	 */
 	getByKey(key: string) {
 		// TODO: use backend cli when available.
-		fetch(`/umbraco/management/api/v1/document/document-type/${key}`)
+		fetch(`/umbraco/management/api/v1/document-type/details/${key}`)
 			.then((res) => res.json())
 			.then((data) => {
 				this.#data.append(data);

@@ -10,7 +10,7 @@ import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 export const UMB_MEDIA_TREE_STORE_CONTEXT_TOKEN = new UmbContextToken<UmbMediaTreeStore>('UmbMediaTreeStore');
 
 // TODO: Stop using ContentTreeItem
-type MediaTreeItem = ContentTreeItem;
+export type MediaTreeItem = ContentTreeItem;
 
 /**
  * @export

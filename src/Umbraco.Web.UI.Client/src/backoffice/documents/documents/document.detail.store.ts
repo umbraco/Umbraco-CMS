@@ -25,6 +25,7 @@ export class UmbDocumentDetailStore extends UmbStoreBase implements UmbContentSt
 	}
 
 	getByKey(key: string) {
+		console.log("document getByKey", key)
 		// TODO: use backend cli when available.
 		fetch(`/umbraco/management/api/v1/document/details/${key}`)
 			.then((res) => res.json())

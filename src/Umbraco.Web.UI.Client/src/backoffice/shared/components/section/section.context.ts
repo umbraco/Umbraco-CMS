@@ -1,5 +1,4 @@
 import type { Entity, ManifestSection, ManifestSectionView } from '@umbraco-cms/models';
-import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
 import { ObjectState } from '@umbraco-cms/observable-api';
 import { UmbContextToken } from '@umbraco-cms/context-api';
 import { StringState } from 'libs/observable-api/string-state';
@@ -31,15 +30,6 @@ export class UmbSectionContext {
 
 	constructor(manifest: ManifestSection) {
 		this.setManifest(manifest);
-	}
-
-	public getAllowed() {
-		// TODO: implemented allowed filtering
-		/*
-		const { data } = await getUserSections({});
-		this._allowedSection = data.sections;
-		*/
-		return umbExtensionsRegistry.extensionsOfType('section');
 	}
 
 	public setManifest(manifest?: ManifestSection) {

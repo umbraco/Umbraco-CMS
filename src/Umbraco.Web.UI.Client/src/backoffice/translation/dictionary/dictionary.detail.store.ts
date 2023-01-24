@@ -34,7 +34,7 @@ export class UmbDictionaryDetailStore extends UmbStoreBase {
 	 */
 	getByKey(key: string) {
 		// TODO: use backend cli when available.
-		fetch(`/umbraco/management/api/v1/document/dictionary/${key}`)
+		fetch(`/umbraco/management/api/v1/dictionary/details/${key}`)
 			.then((res) => res.json())
 			.then((data) => {
 				this.#data.append(data);

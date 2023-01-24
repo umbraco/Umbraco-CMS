@@ -5,8 +5,8 @@ import { state } from 'lit/decorators.js';
 import { IRoutingInfo } from 'router-slot';
 import { UmbSectionContext, UMB_SECTION_CONTEXT_TOKEN } from '../section/section.context';
 import { UmbSectionElement } from '../section/section.element';
+import { UmbBackofficeContext, UMB_BACKOFFICE_CONTEXT_TOKEN } from './backoffice.context';
 import { createExtensionElement } from '@umbraco-cms/extensions-api';
-import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
 import type { ManifestSection } from '@umbraco-cms/models';
 import { UmbLitElement } from '@umbraco-cms/element';
 
@@ -35,24 +35,31 @@ export class UmbBackofficeMain extends UmbLitElement {
 	private _sections: Array<ManifestSection> = [];
 
 	private _routePrefix = 'section/';
+	private _backofficeContext?: UmbBackofficeContext;
 	private _sectionContext?: UmbSectionContext;
 
 	constructor() {
 		super();
 
-		this._observeSections();
+		this.consumeContext(UMB_BACKOFFICE_CONTEXT_TOKEN, (_instance) => {
+			this._backofficeContext = _instance;
+			this._observeBackoffice();
+		});
+
 	}
 
-	private async _observeSections() {
-
-		this.observe(umbExtensionsRegistry.extensionsOfType('section'), (sections) => {
-			this._sections = sections;
-			if (!sections) return;
-			this._createRoutes();
-		});
+	private async _observeBackoffice() {
+		if(this._backofficeContext) {
+			this.observe(this._backofficeContext.getAllowedSections(), (sections) => {
+				this._sections = sections;
+				this._createRoutes();
+			}, 'observeAllowedSections');
+		}
 	}
 
 	private _createRoutes() {
+		if (!this._sections) return;
+
 		this._routes = [];
 		this._routes = this._sections.map((section) => {
 			return {
@@ -81,6 +88,7 @@ export class UmbBackofficeMain extends UmbLitElement {
 		const currentPath = info.match.route.path;
 		const section = this._sections.find((s) => this._routePrefix + s.meta.pathname === currentPath);
 		if (!section) return;
+		this._backofficeContext?.setActiveSectionAlias(section.alias);
 		this._provideSectionContext(section);
 	};
 

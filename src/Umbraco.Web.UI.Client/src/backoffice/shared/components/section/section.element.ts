@@ -54,7 +54,7 @@ export class UmbSectionElement extends UmbLitElement {
 
 			// TODO: currently they don't corporate, as they overwrite each other...
 			this._observeMenuItems();
-			this._observeViews();
+			this._observeSection();
 		});
 	}
 
@@ -89,6 +89,8 @@ export class UmbSectionElement extends UmbLitElement {
 	}
 
 	private _createMenuRoutes() {
+
+		console.log("_createMenuRoutes")
 		// TODO: find a way to make this reuseable across:
 		const workspaceRoutes = this._workspaces?.map((workspace: ManifestWorkspace) => {
 			return [
@@ -153,14 +155,23 @@ export class UmbSectionElement extends UmbLitElement {
 	}
 
 	private _observeViews() {
+
 		this.observe(umbExtensionsRegistry?.extensionsOfType('sectionView'), (views) => {
-				this._views = views.filter((view) => this._sectionAlias ? view.meta.sections.includes(this._sectionAlias) : false).sort((a, b) => b.meta.weight - a.meta.weight)
-				this._createViewRoutes();
+				const sectionViews = views.filter((view) => {
+					return this._sectionAlias ? view.meta.sections.includes(this._sectionAlias) : false
+				}).sort((a, b) => b.meta.weight - a.meta.weight);
+				if(sectionViews.length > 0) {
+					this._views = sectionViews;
+					this._createViewRoutes();
+				}
 			}
 		);
 	}
 
 	private _createViewRoutes() {
+
+		console.log("_createViewRoutes")
+
 		this._routes =
 			this._views?.map((view) => {
 				return {

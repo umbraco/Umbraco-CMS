@@ -5,12 +5,12 @@ import { UmbStoreBase, UmbContentStore } from '@umbraco-cms/store';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 
 
-export const UMB_MEDIA_DETAIL_STORE_CONTEXT_TOKEN = new UmbContextToken<UmbMediaDetailStore>('UmbDocumentDetailStore');
+export const UMB_MEDIA_DETAIL_STORE_CONTEXT_TOKEN = new UmbContextToken<UmbMediaDetailStore>('UmbMediaDetailStore');
 
 
 /**
  * @export
- * @class UmbMediaStore
+ * @class UmbMediaDetailStore
  * @extends {UmbStoreBase}
  * @description - Data Store for Media
  */
