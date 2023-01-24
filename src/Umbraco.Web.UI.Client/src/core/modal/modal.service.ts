@@ -3,19 +3,17 @@ import './layouts/confirm/modal-layout-confirm.element';
 import './layouts/content-picker/modal-layout-content-picker.element';
 import './layouts/property-editor-ui-picker/modal-layout-property-editor-ui-picker.element';
 import './layouts/modal-layout-current-user.element';
-
-import { UUIModalSidebarSize } from '@umbraco-ui/uui-modal-sidebar';
-import { UmbModalChangePasswordData } from './layouts/modal-layout-change-password.element';
-import type { UmbModalIconPickerData } from './layouts/icon-picker/modal-layout-icon-picker.element';
-
 import './layouts/icon-picker/modal-layout-icon-picker.element';
 
+import { UUIModalSidebarSize } from '@umbraco-ui/uui-modal-sidebar';
+import { BehaviorSubject } from 'rxjs';
+import { UmbModalChangePasswordData } from './layouts/modal-layout-change-password.element';
+import type { UmbModalIconPickerData } from './layouts/icon-picker/modal-layout-icon-picker.element';
 import type { UmbModalConfirmData } from './layouts/confirm/modal-layout-confirm.element';
 import type { UmbModalContentPickerData } from './layouts/content-picker/modal-layout-content-picker.element';
 import type { UmbModalPropertyEditorUIPickerData } from './layouts/property-editor-ui-picker/modal-layout-property-editor-ui-picker.element';
 import { UmbModalHandler } from './modal-handler';
 import { UmbContextToken } from '@umbraco-cms/context-api';
-import { ArrayState } from '@umbraco-cms/observable-api';
 
 export type UmbModalType = 'dialog' | 'sidebar';
 
@@ -27,8 +25,8 @@ export interface UmbModalOptions<UmbModalData> {
 
 // TODO: Should this be called UmbModalContext ? as we don't have 'services' as a term.
 export class UmbModalService {
-
-	#modals = new ArrayState(<Array<UmbModalHandler>>[]);
+	// Notice this cannot use UniqueBehaviorSubject as it holds a HTML Element. which cannot be Serialized to JSON (it has some circular references)
+	#modals = new BehaviorSubject(<Array<UmbModalHandler>>[]);
 	public readonly modals = this.#modals.asObservable();
 
 	/**
