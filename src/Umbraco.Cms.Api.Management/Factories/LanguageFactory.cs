@@ -7,6 +7,7 @@ namespace Umbraco.Cms.Api.Management.Factories;
 
 public class LanguageFactory : ILanguageFactory
 {
+    // FIXME: use ILanguageService instead of ILocalizationService (pending language refactor to replace fallback language ID with fallback language IsoCode)
     private readonly ILocalizationService _localizationService;
     private readonly IUmbracoMapper _umbracoMapper;
 

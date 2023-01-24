@@ -10,12 +10,12 @@ namespace Umbraco.Cms.Api.Management.Controllers.Language;
 
 public class AllLanguageController : LanguageControllerBase
 {
-    private readonly ILocalizationService _localizationService;
+    private readonly ILanguageService _languageService;
     private readonly ILanguageFactory _languageFactory;
 
-    public AllLanguageController(ILocalizationService localizationService, ILanguageFactory languageFactory)
+    public AllLanguageController(ILanguageService languageService, ILanguageFactory languageFactory)
     {
-        _localizationService = localizationService;
+        _languageService = languageService;
         _languageFactory = languageFactory;
     }
 
@@ -24,7 +24,7 @@ public class AllLanguageController : LanguageControllerBase
     [ProducesResponseType(typeof(PagedViewModel<LanguageViewModel>), StatusCodes.Status200OK)]
     public async Task<ActionResult<PagedViewModel<LanguageViewModel>>> All(int skip = 0, int take = 100)
     {
-        ILanguage[] allLanguages = _localizationService.GetAllLanguages().ToArray();
+        ILanguage[] allLanguages = (await _languageService.GetAllAsync()).ToArray();
         var viewModel = new PagedViewModel<LanguageViewModel>
         {
             Total = allLanguages.Length,

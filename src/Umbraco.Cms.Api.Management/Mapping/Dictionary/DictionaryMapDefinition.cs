@@ -1,16 +1,12 @@
 ﻿using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
-using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Api.Management.ViewModels.Dictionary;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Mapping.Dictionary;
 
 public class DictionaryMapDefinition : IMapDefinition
 {
-    private readonly ILocalizationService _localizationService;
-
-    public DictionaryMapDefinition(ILocalizationService localizationService) => _localizationService = localizationService;
-
     public void DefineMaps(IUmbracoMapper mapper)
     {
         mapper.Define<IDictionaryItem, DictionaryItemViewModel>((_, _) => new DictionaryItemViewModel(), Map);
@@ -49,24 +45,15 @@ public class DictionaryMapDefinition : IMapDefinition
         target.DeleteDate = null;
     }
 
-    // Umbraco.Code.MapAll -Level -Translations
+    // Umbraco.Code.MapAll -Level
     private void Map(IDictionaryItem source, DictionaryOverviewViewModel target, MapperContext context)
     {
         target.Key = source.Key;
         target.Name = source.ItemKey;
-
-        // add all languages and  the translations
-        foreach (ILanguage lang in _localizationService.GetAllLanguages())
-        {
-            var langId = lang.Id;
-            IDictionaryTranslation? translation = source.Translations?.FirstOrDefault(x => x.LanguageId == langId);
-
-            target.Translations.Add(
-                new DictionaryTranslationOverviewViewModel
-                {
-                    DisplayName = lang.CultureName,
-                    HasTranslation = translation != null && string.IsNullOrEmpty(translation.Value) == false,
-                });
-        }
+        target.TranslatedIsoCodes = source
+            .Translations
+            .Where(translation => translation.Value.IsNullOrWhiteSpace() == false && translation.Language != null)
+            .Select(translation => translation.Language!.IsoCode)
+            .ToArray();
     }
 }
