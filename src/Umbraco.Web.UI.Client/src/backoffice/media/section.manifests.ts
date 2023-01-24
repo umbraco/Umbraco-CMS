@@ -1,4 +1,4 @@
-import { STORE_ALIAS } from './media/media.store';
+import { UMB_MEDIA_DETAIL_STORE_CONTEXT_TOKEN } from './media/media.detail.store';
 import type { ManifestDashboardCollection, ManifestSection } from '@umbraco-cms/models';
 
 const sectionAlias = 'Umb.Section.Media';
@@ -25,7 +25,7 @@ const dashboards: Array<ManifestDashboardCollection> = [
 			sections: [sectionAlias],
 			pathname: 'media-management',
 			entityType: 'media',
-			storeAlias: STORE_ALIAS,
+			storeAlias: UMB_MEDIA_DETAIL_STORE_CONTEXT_TOKEN.toString(),
 		},
 	},
 ];

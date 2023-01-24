@@ -1,11 +1,11 @@
 import { ContentTreeItem } from '@umbraco-cms/backend-api';
-import { UmbTreeDataStore } from '@umbraco-cms/store';
+import { UmbTreeStore } from '@umbraco-cms/store';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 import { UmbContextToken, UmbContextConsumerController } from '@umbraco-cms/context-api';
 import { UniqueBehaviorSubject, UmbObserverController } from '@umbraco-cms/observable-api';
 export class UmbCollectionContext<
 	DataType extends ContentTreeItem,
-	StoreType extends UmbTreeDataStore<DataType> = UmbTreeDataStore<DataType>
+	StoreType extends UmbTreeStore<DataType> = UmbTreeStore<DataType>
 > {
 	private _host: UmbControllerHostInterface;
 	private _entityKey: string | null;

@@ -4,3 +4,4 @@ export * from './unique-behavior-subject';
 export * from './unique-array-behavior-subject';
 export * from './unique-object-behavior-subject';
 export * from './create-observable-part.method'
+export * from './append-to-frozen-array.method'

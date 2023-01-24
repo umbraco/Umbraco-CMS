@@ -1,6 +1,6 @@
 import { expect } from '@open-wc/testing';
-import { createObservablePart } from '@umbraco-cms/observable-api';
 import { UniqueArrayBehaviorSubject } from './unique-array-behavior-subject';
+import { createObservablePart } from '@umbraco-cms/observable-api';
 
 describe('UniqueArrayBehaviorSubject', () => {
 
@@ -16,7 +16,7 @@ describe('UniqueArrayBehaviorSubject', () => {
 			{key: '2', another: 'myValue2'},
 			{key: '3', another: 'myValue3'}
 		];
-		subject = new UniqueArrayBehaviorSubject(initialData, (a, b) => a.key === b.key);
+		subject = new UniqueArrayBehaviorSubject(initialData, x => x.key);
 	});
 
 

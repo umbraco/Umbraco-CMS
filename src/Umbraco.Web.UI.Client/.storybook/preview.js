@@ -11,9 +11,10 @@ import { html } from 'lit-html';
 import { initialize, mswDecorator } from 'msw-storybook-addon';
 import { setCustomElements } from '@storybook/web-components';
 
+import { UMB_DATA_TYPE_DETAIL_STORE_CONTEXT_TOKEN, UmbDataTypeDetailStore } from '../src/backoffice/settings/data-types/data-type.detail.store';
+import { UMB_DOCUMENT_TYPE_DETAIL_STORE_CONTEXT_TOKEN, UmbDocumentTypeDetailStore } from '../src/backoffice/documents/document-types/document-type.detail.store';
+
 import customElementManifests from '../custom-elements.json';
-import { STORE_ALIAS as dataTypeAlias, UmbDataTypeStore } from '../src/backoffice/settings/data-types/data-type.store';
-import { UmbDocumentTypeStore } from '../src/backoffice/documents/document-types/document-type.store';
 import { UmbIconStore } from '../libs/store/icon/icon.store';
 import { onUnhandledRequest } from '../src/core/mocks/browser';
 import { handlers } from '../src/core/mocks/browser-handlers';
@@ -54,11 +55,11 @@ customElements.define('umb-storybook', UmbStoryBookElement);
 const storybookProvider = (story) => html` <umb-storybook>${story()}</umb-storybook> `;
 
 const dataTypeStoreProvider = (story) => html`
-	<umb-context-provider key=${dataTypeAlias} .value=${new UmbDataTypeStore()}>${story()}</umb-context-provider>
+	<umb-context-provider key=${UMB_DATA_TYPE_DETAIL_STORE_CONTEXT_TOKEN.toString()} .value=${new UmbDataTypeDetailStore()}>${story()}</umb-context-provider>
 `;
 
 const documentTypeStoreProvider = (story) => html`
-	<umb-context-provider key="umbDocumentTypeStore" .value=${new UmbDocumentTypeStore()}
+	<umb-context-provider key=${UMB_DOCUMENT_TYPE_DETAIL_STORE_CONTEXT_TOKEN.toString()} .value=${new UmbDocumentTypeDetailStore()}
 		>${story()}</umb-context-provider
 	>
 `;

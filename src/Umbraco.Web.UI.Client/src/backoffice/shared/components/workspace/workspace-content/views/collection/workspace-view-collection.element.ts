@@ -3,15 +3,16 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement } from 'lit/decorators.js';
 import { ifDefined } from 'lit-html/directives/if-defined.js';
 import { UmbWorkspaceContentContext } from '../../workspace-content.context';
+import { UmbMediaTreeStore } from '../../../../../../media/media/media.tree.store';
 import {
 	UmbCollectionContext,
 	UMB_COLLECTION_CONTEXT_TOKEN,
-} from 'src/backoffice/shared/collection/collection.context';
-import { UmbMediaStore, UmbMediaStoreItemType } from 'src/backoffice/media/media/media.store';
+} from '../../../../../../shared/collection/collection.context';
 
 import '../../../../../../shared/components/content-property/content-property.element';
 import '../../../../../../shared/collection/dashboards/dashboard-collection.element';
 import { UmbLitElement } from '@umbraco-cms/element';
+import { FolderTreeItem } from '@umbraco-cms/backend-api';
 
 @customElement('umb-workspace-view-collection')
 export class UmbWorkspaceViewCollectionElement extends UmbLitElement {
@@ -27,7 +28,7 @@ export class UmbWorkspaceViewCollectionElement extends UmbLitElement {
 
 	private _workspaceContext?: UmbWorkspaceContentContext;
 
-	private _collectionContext?: UmbCollectionContext<UmbMediaStoreItemType, UmbMediaStore>;
+	private _collectionContext?: UmbCollectionContext<FolderTreeItem, UmbMediaTreeStore>;
 
 	constructor() {
 		super();
