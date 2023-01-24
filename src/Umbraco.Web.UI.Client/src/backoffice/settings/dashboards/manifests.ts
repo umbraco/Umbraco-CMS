@@ -1,4 +1,3 @@
-import { manifests as healthCheckManifests } from './health-check/manifests';
 import type { ManifestDashboard } from '@umbraco-cms/models';
 
 const dashboards: Array<ManifestDashboard> = [
@@ -95,4 +94,4 @@ const dashboards: Array<ManifestDashboard> = [
 	},
 ];
 
-export const manifests = [...dashboards, ...healthCheckManifests];
+export const manifests = [...dashboards];

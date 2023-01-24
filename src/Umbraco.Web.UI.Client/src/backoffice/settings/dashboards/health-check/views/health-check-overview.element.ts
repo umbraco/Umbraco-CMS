@@ -35,8 +35,8 @@ export class UmbDashboardHealthCheckOverviewElement extends UmbLitElement {
 
 	constructor() {
 		super();
-		this.consumeAllContexts(['umbNotificationService', 'umbModalService', 'umbHealthCheckDashboard'], (instances) => {
-			this._healthCheckDashboardContext = instances['umbHealthCheckDashboard'];
+		this.consumeContext('umbHealthCheckDashboard', (instance: UmbHealthCheckDashboardContext) => {
+			this._healthCheckDashboardContext = instance;
 		});
 	}
 

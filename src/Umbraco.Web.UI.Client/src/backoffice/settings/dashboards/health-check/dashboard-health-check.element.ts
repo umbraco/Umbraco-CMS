@@ -3,8 +3,11 @@ import { customElement, state } from 'lit/decorators.js';
 import { IRoute, IRoutingInfo, path } from 'router-slot';
 import { UmbDashboardHealthCheckGroupElement } from './views/health-check-group.element';
 import { UmbHealthCheckDashboardContext } from './health-check-dashboard.context';
+import { UmbHealthCheckContext } from './health-check.context';
 import { UmbLitElement } from '@umbraco-cms/element';
-import { ManifestHealthCheck, umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
+import { ManifestHealthCheck, ManifestTypes, umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
+import { tryExecuteAndNotify } from '@umbraco-cms/resources';
+import { HealthCheckGroup, HealthCheckResource } from '@umbraco-cms/backend-api';
 
 @customElement('umb-dashboard-health-check')
 export class UmbDashboardHealthCheckElement extends UmbLitElement {
@@ -54,8 +57,41 @@ export class UmbDashboardHealthCheckElement extends UmbLitElement {
 		});
 	}
 
+	protected firstUpdated() {
+		this.#registerHealthChecks();
+	}
+
 	private get backbutton(): boolean {
 		return this._currentPath == '/section/settings/dashboard/health-check/' || !this._currentPath ? false : true;
+	}
+
+	#registerHealthChecks = async () => {
+		const { data } = await tryExecuteAndNotify(this, HealthCheckResource.getHealthCheckGroup({ skip: 0, take: 9999 }));
+		if (!data) return;
+		const manifests = this.#createManifests(data.items);
+		this.#register(manifests);
+	};
+
+	#createManifests(groups: HealthCheckGroup[]): Array<ManifestHealthCheck> {
+		return groups.map((group) => {
+			return {
+				type: 'healthCheck',
+				alias: `Umb.HealthCheck.${group.name?.replace(/\s+/g, '') || ''}`,
+				name: `${group.name} Health Check`,
+				weight: 500,
+				meta: {
+					label: group.name || '',
+					api: UmbHealthCheckContext,
+				},
+			};
+		});
+	}
+
+	#register(manifests: Array<ManifestHealthCheck>) {
+		manifests.forEach((manifest) => {
+			if (umbExtensionsRegistry.isRegistered(manifest.alias)) return;
+			umbExtensionsRegistry.register(manifest);
+		});
 	}
 
 	render() {
