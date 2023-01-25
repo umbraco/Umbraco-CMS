@@ -1,10 +1,8 @@
-import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
+import { umbExtensionsRegistry } from '@umbraco-cms/extensions-api';
 import { UmbContextToken } from '@umbraco-cms/context-api';
 import { StringState } from '@umbraco-cms/observable-api';
 
 export class UmbBackofficeContext {
-
-
 	#activeSectionAlias = new StringState(undefined);
 	public readonly activeSectionAlias = this.#activeSectionAlias.asObservable();
 
@@ -17,12 +15,9 @@ export class UmbBackofficeContext {
 		return umbExtensionsRegistry.extensionsOfType('section');
 	}
 
-
 	public setActiveSectionAlias(alias: string) {
 		this.#activeSectionAlias.next(alias);
 	}
-
 }
-
 
 export const UMB_BACKOFFICE_CONTEXT_TOKEN = new UmbContextToken<UmbBackofficeContext>('UmbBackofficeContext');
