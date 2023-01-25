@@ -1,10 +1,22 @@
 import { rest } from 'msw';
+import { toNumber } from 'lodash-es';
 import { umbracoPath } from '@umbraco-cms/utils';
 import { PagedRedirectUrl, RedirectUrl, RedirectStatus, RedirectUrlStatus } from '@umbraco-cms/backend-api';
 
 export const handlers = [
 	rest.get(umbracoPath('/redirect-management'), (_req, res, ctx) => {
-		return res(ctx.status(200), ctx.json<PagedRedirectUrl>(PagedRedirectUrlData));
+		const skip = toNumber(_req.url.searchParams.get('skip'));
+		const take = toNumber(_req.url.searchParams.get('take'));
+
+		const items = PagedRedirectUrlData.items.slice(skip, skip + take);
+
+		const PagedData: PagedRedirectUrl = {
+			total: PagedRedirectUrlData.total,
+			items,
+		};
+
+		console.log(PagedData);
+		return res(ctx.status(200), ctx.json<PagedRedirectUrl>(PagedData));
 	}),
 
 	rest.get(umbracoPath('/redirect-management/:key'), async (_req, res, ctx) => {

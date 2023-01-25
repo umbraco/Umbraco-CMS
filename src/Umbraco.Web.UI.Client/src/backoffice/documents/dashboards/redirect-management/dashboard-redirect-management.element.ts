@@ -1,10 +1,13 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
-import { css, html } from 'lit';
+import { css, html, nothing } from 'lit';
 import { customElement, state, query } from 'lit/decorators.js';
+import { UUIPaginationEvent } from '@umbraco-ui/uui';
 import { UmbModalService, UMB_MODAL_SERVICE_CONTEXT_TOKEN } from '../../../../core/modal';
 import { UmbLitElement } from '@umbraco-cms/element';
 import { RedirectManagementResource, RedirectStatus, RedirectUrl, RedirectUrlStatus } from '@umbraco-cms/backend-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/resources';
+
+const itemsPerPage = 5;
 
 @customElement('umb-dashboard-redirect-management')
 export class UmbDashboardRedirectManagementElement extends UmbLitElement {
@@ -18,9 +21,8 @@ export class UmbDashboardRedirectManagementElement extends UmbLitElement {
 				margin-bottom: 12px;
 			}
 
-			uui-input uui-icon {
-				padding-top: var(--uui-size-space-2);
-				padding-left: var(--uui-size-space-3);
+			.actions uui-icon {
+				transform: translateX(50%);
 			}
 
 			uui-table {
@@ -38,6 +40,10 @@ export class UmbDashboardRedirectManagementElement extends UmbLitElement {
 
 			uui-table uui-icon {
 				vertical-align: sub;
+			}
+			uui-pagination {
+				display: block;
+				margin-top: var(--uui-size-space-5);
 			}
 
 			.trackerDisabled {
@@ -74,12 +80,15 @@ export class UmbDashboardRedirectManagementElement extends UmbLitElement {
 	private _redirectData?: RedirectUrl[];
 
 	@state()
-	private _redirectDataFiltered?: RedirectUrl[];
-
-	@state()
 	private _trackerStatus = true;
 
-	@query('#search')
+	@state()
+	private _currentPage = 1;
+
+	@state()
+	private _total?: number;
+
+	@query('#search-input')
 	private _searchField!: HTMLInputElement;
 
 	private _modalService?: UmbModalService;
@@ -94,21 +103,12 @@ export class UmbDashboardRedirectManagementElement extends UmbLitElement {
 	connectedCallback() {
 		super.connectedCallback();
 		this._getTrackerStatus();
-		this._setup();
+		this._getRedirectData();
 	}
 
 	private async _getTrackerStatus() {
 		const { data } = await tryExecuteAndNotify(this, RedirectManagementResource.getRedirectManagementStatus());
 		if (data && data.status) data.status === RedirectStatus.ENABLED ? true : false;
-	}
-
-	private async _setup() {
-		const { data } = await tryExecuteAndNotify(
-			this,
-			RedirectManagementResource.getRedirectManagement({ take: 9999, skip: 0 })
-		);
-		this._redirectData = data?.items;
-		this._searchHandler();
 	}
 
 	private _removeRedirectHandler(data: RedirectUrl) {
@@ -136,7 +136,7 @@ export class UmbDashboardRedirectManagementElement extends UmbLitElement {
 				this,
 				RedirectManagementResource.deleteRedirectManagementByKey({ key: r.contentKey })
 			);
-			this._setup();
+			this._getRedirectData();
 		}
 	}
 
@@ -151,37 +151,58 @@ export class UmbDashboardRedirectManagementElement extends UmbLitElement {
 			if (confirmed) this._toggleRedirect();
 		});
 	}
+
 	private async _toggleRedirect() {
-		/*//TODO: postRedirectManagementStatus returns 404 for whatever reason...
+		//TODO: postRedirectManagementStatus returns 404 for whatever reason...
+		/*
 		const { data } = await tryExecuteAndNotify(
 			this,
 			RedirectManagementResource.postRedirectManagementStatus({ status: RedirectStatus.ENABLED })
 		);*/
-
 		this._trackerStatus = !this._trackerStatus;
 	}
 
 	private _searchHandler() {
-		this._redirectDataFiltered = this._redirectData?.filter((data) => {
-			return data.originalUrl?.includes(this._searchField.value);
-		});
+		console.log('search');
+	}
+
+	private _onPageChange(event: UUIPaginationEvent) {
+		if (this._currentPage === event.target.current) return;
+		this._currentPage = event.target.current;
+		this._getRedirectData();
+	}
+
+	private async _getRedirectData() {
+		const skip = this._currentPage * itemsPerPage - itemsPerPage;
+		const { data } = await tryExecuteAndNotify(
+			this,
+			RedirectManagementResource.getRedirectManagement({ take: itemsPerPage, skip })
+		);
+		this._total = data?.total;
+		this._redirectData = data?.items;
 	}
 
 	render() {
 		return html`<div class="actions">
 				${this._trackerStatus
-					? html`
-							<uui-input id="search" placeholder="Type to search..." label="Search" @keyup="${this._searchHandler}">
-								<uui-icon slot="prepend" name="umb:search"></uui-icon>
-							</uui-input>
+					? html`<div>
+								<uui-input
+									id="search-input"
+									placeholder="Original URL"
+									label="input for search"
+									@keyup="${this._searchHandler}">
+								</uui-input>
+								<uui-button id="search-button" look="primary" color="positive" label="search">
+									Search<uui-icon name="umb:search"></uui-icon>
+								</uui-button>
+							</div>
 							<uui-button
 								label="Disable URL tracker"
 								look="outline"
 								color="danger"
 								@click="${this._disableRedirectHandler}">
 								Disable URL tracker
-							</uui-button>
-					  `
+							</uui-button> `
 					: html`<uui-button
 							label="Enable URL tracker"
 							look="primary"
@@ -191,19 +212,26 @@ export class UmbDashboardRedirectManagementElement extends UmbLitElement {
 					  </uui-button>`}
 			</div>
 
-			${this._redirectDataFiltered?.length
+			${this._total && this._total > 0
 				? html`<div class="${this._trackerStatus ? 'trackerEnabled' : 'trackerDisabled'}">${this.renderTable()}</div>`
 				: this.renderNoRedirects()} `;
 	}
 
-	renderNoRedirects() {
+	private _renderZeroResults() {
 		return html`<uui-box>
-			<strong slot="header">No redirects have been made</strong>
+			<strong>No redirects matching this search criteria</strong>
+			<p>Double check your search for any error or spelling mistakes.</p>
+		</uui-box>`;
+	}
+
+	private renderNoRedirects() {
+		return html`<uui-box>
+			<strong>No redirects have been made</strong>
 			<p>When a published page gets renamed or moved, a redirect will automatically be made to the new page.</p>
 		</uui-box>`;
 	}
 
-	renderTable() {
+	private renderTable() {
 		return html`<uui-box style="--uui-box-default-padding: 0;">
 				<uui-table>
 					<uui-table-head>
@@ -213,7 +241,7 @@ export class UmbDashboardRedirectManagementElement extends UmbLitElement {
 						<uui-table-head-cell>Redirected To</uui-table-head-cell>
 						<uui-table-head-cell style="width:10%;">Actions</uui-table-head-cell>
 					</uui-table-head>
-					${this._redirectDataFiltered?.map((data) => {
+					${this._redirectData?.map((data) => {
 						return html` <uui-table-row>
 							<uui-table-cell> ${data.culture || '*'} </uui-table-cell>
 							<uui-table-cell>
@@ -241,8 +269,18 @@ export class UmbDashboardRedirectManagementElement extends UmbLitElement {
 						</uui-table-row>`;
 					})}
 				</uui-table>
-			</uui-box></uui-scroll-container
+			</uui-box>
+			${this._renderPagination()}
+			</uui-scroll-container
 		>`;
+	}
+
+	private _renderPagination() {
+		if (this._total && this._total > itemsPerPage) {
+			return html`<uui-pagination
+				total="${Math.ceil(this._total / itemsPerPage)}"
+				@change="${this._onPageChange}"></uui-pagination>`;
+		} else return nothing;
 	}
 }
 
