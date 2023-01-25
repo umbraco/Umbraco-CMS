@@ -39,7 +39,7 @@ export class UmbDashboardCollectionElement extends UmbLitElement {
 		super.connectedCallback();
 
 		if (!this._collectionContext) {
-			const manifestMeta = this.manifest.meta as any;
+			const manifestMeta = this.manifest.meta;
 			this._entityType = manifestMeta.entityType as string;
 			this._collectionContext = new UmbCollectionContext(this, null, manifestMeta.storeAlias);
 			this.provideContext(UMB_COLLECTION_CONTEXT_TOKEN, this._collectionContext);
