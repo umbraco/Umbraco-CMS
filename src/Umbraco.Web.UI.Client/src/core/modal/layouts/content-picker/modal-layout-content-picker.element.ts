@@ -6,6 +6,7 @@ import { UmbModalLayoutElement } from '../modal-layout.element';
 export interface UmbModalContentPickerData {
 	multiple?: boolean;
 	selection: Array<string>;
+	alias?: string;
 }
 
 import { UmbTreeElement } from '../../../../backoffice/shared/components/tree/tree.element';
@@ -51,13 +52,19 @@ export class UmbModalLayoutContentPickerElement extends UmbModalLayoutElement<Um
 	@state()
 	_selection: Array<string> = [];
 
+	@state()
+	_alias = '';
+
 	connectedCallback() {
 		super.connectedCallback();
 		this._selection = this.data?.selection ?? [];
+		this._alias = this.data?.alias ?? 'Umb.Tree.Documents';
 	}
 
 	private _handleSelectionChange(e: CustomEvent) {
 		e.stopPropagation();
+		console.log('Selection change', e);
+
 		const element = e.target as UmbTreeElement;
 		this._selection = element.selection;
 	}
@@ -77,7 +84,7 @@ export class UmbModalLayoutContentPickerElement extends UmbModalLayoutElement<Um
 					<uui-input></uui-input>
 					<hr />
 					<umb-tree
-						alias="Umb.Tree.Documents"
+						alias=${this._alias}
 						@selected=${this._handleSelectionChange}
 						.selection=${this._selection}
 						selectable></umb-tree>

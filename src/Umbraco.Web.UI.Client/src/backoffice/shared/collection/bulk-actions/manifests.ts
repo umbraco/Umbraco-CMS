@@ -13,4 +13,16 @@ export const manifests: Array<ManifestCollectionBulkAction> = [
 			entityType: 'media',
 		},
 	},
+	{
+		type: 'collectionBulkAction',
+		alias: 'Umb.CollectionBulkAction.Move',
+		name: 'Delete',
+		elementName: 'umb-collection-bulk-action-media-move',
+		loader: () => import('./collection-bulk-action-media-move.element'),
+		weight: 100,
+		meta: {
+			label: 'Move',
+			entityType: 'media',
+		},
+	},
 ];
