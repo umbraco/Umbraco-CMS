@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Common.Builders;
 using Umbraco.Cms.Api.Common.Filters;
@@ -11,7 +11,8 @@ using Umbraco.Cms.Core.PublishedCache;
 
 namespace Umbraco.Cms.Api.Content.Controllers;
 
-[VersionedContentApiRoute("query")]
+[VersionedContentApiRoute("test")]
+[ApiExplorerSettings(GroupName = "Content")]
 [ApiVersion("1.0")]
 [JsonOptionsName(Constants.JsonOptionsNames.ContentApi)]
 public class ContentApiController : Controller
