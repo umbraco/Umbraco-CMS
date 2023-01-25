@@ -15,7 +15,7 @@ import type { UmbModalContentPickerData } from './layouts/content-picker/modal-l
 import type { UmbModalPropertyEditorUIPickerData } from './layouts/property-editor-ui-picker/modal-layout-property-editor-ui-picker.element';
 import { UmbModalHandler } from './modal-handler';
 import { UmbContextToken } from '@umbraco-cms/context-api';
-import { ArrayState } from '@umbraco-cms/observable-api';
+import { BehaviorSubject } from 'rxjs';
 
 export type UmbModalType = 'dialog' | 'sidebar';
 
@@ -28,7 +28,8 @@ export interface UmbModalOptions<UmbModalData> {
 // TODO: Should this be called UmbModalContext ? as we don't have 'services' as a term.
 export class UmbModalService {
 
-	#modals = new ArrayState(<Array<UmbModalHandler>>[]);
+	// TODO: Investigate if we can get rid of HTML elements in our store, so we can use one of our states.
+	#modals = new BehaviorSubject(<Array<UmbModalHandler>>[]);
 	public readonly modals = this.#modals.asObservable();
 
 	/**

@@ -40,6 +40,8 @@ export class UmbCurrentUserHeaderApp extends UmbLitElement {
 		if (!this._currentUserStore) return;
 
 		this.observe(this._currentUserStore.currentUser, (currentUser) => {
+
+			console.log("got user", currentUser);
 			this._currentUser = currentUser;
 		});
 	}
