@@ -6,7 +6,8 @@ import { UUIButtonState } from '@umbraco-ui/uui';
 import { UmbHealthCheckDashboardContext } from '../health-check-dashboard.context';
 import { UmbLitElement } from '@umbraco-cms/element';
 
-import { ManifestHealthCheck, umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
+import { ManifestHealthCheck } from '@umbraco-cms/extensions-registry';
+import { umbExtensionsRegistry } from '@umbraco-cms/extensions-api';
 
 import './health-check-group-box-overview.element';
 

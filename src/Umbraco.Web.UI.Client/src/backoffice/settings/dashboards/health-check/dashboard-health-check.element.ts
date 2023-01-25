@@ -5,7 +5,8 @@ import { UmbDashboardHealthCheckGroupElement } from './views/health-check-group.
 import { UmbHealthCheckDashboardContext } from './health-check-dashboard.context';
 import { UmbHealthCheckContext } from './health-check.context';
 import { UmbLitElement } from '@umbraco-cms/element';
-import { ManifestHealthCheck, ManifestTypes, umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
+import { ManifestHealthCheck, ManifestTypes } from '@umbraco-cms/extensions-registry';
+import { umbExtensionsRegistry } from '@umbraco-cms/extensions-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/resources';
 import { HealthCheckGroup, HealthCheckResource } from '@umbraco-cms/backend-api';
 
