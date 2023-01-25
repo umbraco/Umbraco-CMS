@@ -5,7 +5,11 @@ import { IRoutingInfo } from 'router-slot';
 import { first, map } from 'rxjs';
 import { UmbSectionContext, UMB_SECTION_CONTEXT_TOKEN } from '../section.context';
 import { createExtensionElement } from '@umbraco-cms/extensions-api';
-import type { ManifestDashboard, ManifestDashboardCollection, ManifestWithMeta } from '@umbraco-cms/models';
+import type {
+	ManifestDashboard,
+	ManifestDashboardCollection,
+	ManifestWithMeta,
+} from '@umbraco-cms/models';
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-api';
 import { UmbLitElement } from '@umbraco-cms/element';
 
@@ -26,7 +30,7 @@ export class UmbSectionDashboardsElement extends UmbLitElement {
 			}
 
 			#scroll-container {
-				flex: 1;
+				flex:1;
 			}
 
 			#router-slot {
