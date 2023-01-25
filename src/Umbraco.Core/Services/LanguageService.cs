@@ -95,13 +95,6 @@ internal class LanguageService : RepositoryService, ILanguageService
                     return LanguageOperationStatus.DuplicateIsoCode;
                 }
 
-                // ensure valid fallback language (note: new languages cannot create cycles, no need to check for that)
-                if (language.FallbackLanguageId.HasValue &&
-                    _languageRepository.Exists(language.FallbackLanguageId.Value) == false)
-                {
-                    return LanguageOperationStatus.InvalidFallback;
-                }
-
                 return LanguageOperationStatus.Success;
             },
             AuditType.New,
