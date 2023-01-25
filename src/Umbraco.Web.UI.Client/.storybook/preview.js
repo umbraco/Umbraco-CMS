@@ -55,11 +55,11 @@ customElements.define('umb-storybook', UmbStoryBookElement);
 const storybookProvider = (story) => html` <umb-storybook>${story()}</umb-storybook> `;
 
 const dataTypeStoreProvider = (story) => html`
-	<umb-context-provider key=${UMB_DATA_TYPE_DETAIL_STORE_CONTEXT_TOKEN.toString()} .value=${new UmbDataTypeDetailStore()}>${story()}</umb-context-provider>
+	<umb-context-provider key=${UMB_DATA_TYPE_DETAIL_STORE_CONTEXT_TOKEN.toString()} .create=${host => new UmbDataTypeDetailStore(host)}>${story()}</umb-context-provider>
 `;
 
 const documentTypeStoreProvider = (story) => html`
-	<umb-context-provider key=${UMB_DOCUMENT_TYPE_DETAIL_STORE_CONTEXT_TOKEN.toString()} .value=${new UmbDocumentTypeDetailStore()}
+	<umb-context-provider key=${UMB_DOCUMENT_TYPE_DETAIL_STORE_CONTEXT_TOKEN.toString()} .create=${host => new UmbDocumentTypeDetailStore(host)}
 		>${story()}</umb-context-provider
 	>
 `;

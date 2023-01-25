@@ -1,9 +1,18 @@
 import { html } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { UmbLitElement } from './lit-element.element';
+import type { UmbControllerHostInterface } from '@umbraco-cms/controller';
 
 @customElement('umb-context-provider')
 export class UmbContextProviderElement extends UmbLitElement {
+
+	/**
+	 * The value to provide to the context.
+	 * @required
+	 */
+	@property({ type: Object, attribute: false })
+	create?: (host:UmbControllerHostInterface) => unknown;
+
 	/**
 	 * The value to provide to the context.
 	 * @required
@@ -23,7 +32,9 @@ export class UmbContextProviderElement extends UmbLitElement {
 		if (!this.key) {
 			throw new Error('The key property is required.');
 		}
-		if (!this.value) {
+		if (this.create) {
+			this.value = this.create(this);
+		} else if (!this.value) {
 			throw new Error('The value property is required.');
 		}
 		this.provideContext(this.key, this.value);
