@@ -21,7 +21,7 @@ export class UmbCollectionSelectionActionsElement extends UmbLitElement {
 				box-sizing: border-box;
 				justify-content: space-between;
 			}
-			#selection {
+			#selection-info {
 				display: flex;
 				align-items: center;
 				box-sizing: border-box;
