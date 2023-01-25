@@ -12,6 +12,7 @@ export default {
 				importMap: {
 					imports: {
 						'src/': './src/',
+						'@umbraco-cms/css': './libs/css/custom-properties.css',
 						'@umbraco-cms/models': './libs/models/index.ts',
 						'@umbraco-cms/backend-api': './libs/backend-api/index.ts',
 						'@umbraco-cms/context-api': './libs/context-api/index.ts',
