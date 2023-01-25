@@ -5,10 +5,10 @@ import { ifDefined } from 'lit/directives/if-defined.js';
 import { map } from 'rxjs';
 import { repeat } from 'lit-html/directives/repeat.js';
 import { UmbCollectionContext, UMB_COLLECTION_CONTEXT_TOKEN } from '../collection.context';
-import type { ManifestCollectionBulkAction, MediaDetails } from '@umbraco-cms/models';
+import { UmbModalService, UMB_MODAL_SERVICE_CONTEXT_TOKEN } from '../../../../core/modal';
+import { UmbMediaTreeStore, UMB_MEDIA_TREE_STORE_CONTEXT_TOKEN } from '../../../media/media/media.tree.store';
 import { UmbLitElement } from '@umbraco-cms/element';
-import { UmbModalService, UMB_MODAL_SERVICE_CONTEXT_TOKEN } from 'src/core/modal';
-import { UmbMediaStore, UMB_MEDIA_STORE_CONTEXT_TOKEN } from 'src/backoffice/media/media/media.store';
+import type { ManifestCollectionBulkAction, MediaDetails } from '@umbraco-cms/models';
 
 @customElement('umb-collection-bulk-action-media-delete')
 export class UmbCollectionBulkActionDeleteElement extends UmbLitElement {
@@ -20,7 +20,7 @@ export class UmbCollectionBulkActionDeleteElement extends UmbLitElement {
 	public manifest?: ManifestCollectionBulkAction;
 
 	#modalService?: UmbModalService;
-	#mediaStore?: UmbMediaStore;
+	#mediaStore?: UmbMediaTreeStore;
 
 	constructor() {
 		super();
@@ -33,7 +33,7 @@ export class UmbCollectionBulkActionDeleteElement extends UmbLitElement {
 			this.#modalService = instance;
 		});
 
-		this.consumeContext(UMB_MEDIA_STORE_CONTEXT_TOKEN, (instance) => {
+		this.consumeContext(UMB_MEDIA_TREE_STORE_CONTEXT_TOKEN, (instance) => {
 			this.#mediaStore = instance;
 		});
 	}
