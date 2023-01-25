@@ -1,20 +1,16 @@
 import { v4 as uuidv4 } from 'uuid';
-import { UniqueBehaviorSubject, UmbObserverController, createObservablePart } from '@umbraco-cms/observable-api';
-import {
-	UmbNotificationDefaultData,
-	UmbNotificationService,
-	UMB_NOTIFICATION_SERVICE_CONTEXT_TOKEN,
-} from '@umbraco-cms/notification';
-import { UmbNodeStoreBase } from '@umbraco-cms/store';
+import { UmbNotificationService, UMB_NOTIFICATION_SERVICE_CONTEXT_TOKEN, UmbNotificationDefaultData } from '@umbraco-cms/notification';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 import { UmbContextConsumerController, UmbContextProviderController } from '@umbraco-cms/context-api';
-import { EntityTreeItem } from '@umbraco-cms/backend-api';
+import { DeepState, UmbObserverController, createObservablePart } from '@umbraco-cms/observable-api';
+import { UmbContentStore } from '@umbraco-cms/store';
+import type { ContentTreeItem } from '@umbraco-cms/backend-api';
 
 // TODO: Consider if its right to have this many class-inheritance of WorkspaceContext
 // TODO: Could we extract this code into a 'Manager' of its own, which will be instantiated by the concrete Workspace Context. This will be more transparent and 'reuseable'
 export abstract class UmbWorkspaceContentContext<
-	ContentTypeType extends EntityTreeItem = EntityTreeItem,
-	StoreType extends UmbNodeStoreBase<ContentTypeType> = UmbNodeStoreBase<ContentTypeType>
+	ContentTypeType extends ContentTreeItem = ContentTreeItem,
+	StoreType extends UmbContentStore<ContentTypeType> = UmbContentStore<ContentTypeType>
 > {
 	protected _host: UmbControllerHostInterface;
 
@@ -37,7 +33,7 @@ export abstract class UmbWorkspaceContentContext<
 	constructor(host: UmbControllerHostInterface, defaultData: ContentTypeType, storeAlias: string, entityType: string) {
 		this._host = host;
 
-		this._data = new UniqueBehaviorSubject<ContentTypeType>(defaultData);
+		this._data = new DeepState<ContentTypeType>(defaultData);
 		this.data = this._data.asObservable();
 		this.name = createObservablePart(this._data, (data) => data.name);
 
@@ -106,7 +102,7 @@ export abstract class UmbWorkspaceContentContext<
 	// TODO: consider turning this into an abstract so each context implement this them selfs.
 	public save(): Promise<void> {
 		if (!this._store) {
-			// TODO: more beautiful error:
+			// TODO: add a more beautiful error:
 			console.error('Could not save cause workspace context has no store.');
 			return Promise.resolve();
 		}
@@ -122,7 +118,7 @@ export abstract class UmbWorkspaceContentContext<
 			});
 	}
 
-	// TODO: how can we make sure to call this.
+	// TODO: how can we make sure to call this, we might need to turn this thing into a ContextProvider(extending) for it to call destroy?
 	public destroy(): void {
 		this._data.unsubscribe();
 	}

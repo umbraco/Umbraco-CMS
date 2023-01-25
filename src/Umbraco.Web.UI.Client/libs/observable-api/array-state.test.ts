@@ -1,13 +1,13 @@
 import { expect } from '@open-wc/testing';
+import { ArrayState } from './array-state';
 import { createObservablePart } from '@umbraco-cms/observable-api';
-import { UniqueArrayBehaviorSubject } from './unique-array-behavior-subject';
 
-describe('UniqueArrayBehaviorSubject', () => {
+describe('ArrayState', () => {
 
 	type ObjectType = {key: string, another: string};
 	type ArrayType = ObjectType[];
 
-	let subject: UniqueArrayBehaviorSubject<ObjectType>;
+	let subject: ArrayState<ObjectType>;
 	let initialData: ArrayType;
 
 	beforeEach(() => {
@@ -16,7 +16,7 @@ describe('UniqueArrayBehaviorSubject', () => {
 			{key: '2', another: 'myValue2'},
 			{key: '3', another: 'myValue3'}
 		];
-		subject = new UniqueArrayBehaviorSubject(initialData, (a, b) => a.key === b.key);
+		subject = new ArrayState(initialData, x => x.key);
 	});
 
 
@@ -33,12 +33,38 @@ describe('UniqueArrayBehaviorSubject', () => {
 
 	});
 
+	it('remove method, removes the one with the key', (done) => {
+
+		const expectedData = [initialData[0], initialData[2]];
+
+		subject.remove(['2']);
+		const observer = subject.asObservable();
+		observer.subscribe((value) => {
+			expect(JSON.stringify(value)).to.be.equal(JSON.stringify(expectedData));
+			done();
+		});
+
+	});
+
+	it('filter method, removes anything that is not true of the given predicate method', (done) => {
+
+		const expectedData = [initialData[0], initialData[2]];
+
+		subject.filter(x => x.key !== '2');
+		const observer = subject.asObservable();
+		observer.subscribe((value) => {
+			expect(JSON.stringify(value)).to.be.equal(JSON.stringify(expectedData));
+			done();
+		});
+
+	});
+
 	it('add new item via appendOne method.', (done) => {
 
 		const newItem = {key: '4', another: 'myValue4'};
 		subject.appendOne(newItem);
 
-		const expectedData = [...initialData, newItem]
+		const expectedData = [...initialData, newItem];
 
 		const observer = subject.asObservable();
 		observer.subscribe((value) => {

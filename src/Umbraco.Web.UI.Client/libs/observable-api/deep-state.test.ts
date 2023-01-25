@@ -1,17 +1,17 @@
 import { expect } from '@open-wc/testing';
-import { UniqueBehaviorSubject } from './unique-behavior-subject';
+import { DeepState } from './deep-state';
 import { createObservablePart } from '@umbraco-cms/observable-api';
 
-describe('UniqueBehaviorSubject', () => {
+describe('DeepState', () => {
 
 	type ObjectType = {key: string, another: string};
 
-	let subject: UniqueBehaviorSubject<ObjectType>;
+	let subject: DeepState<ObjectType>;
 	let initialData: ObjectType;
 
 	beforeEach(() => {
 		initialData = {key: 'some', another: 'myValue'};
-		subject = new UniqueBehaviorSubject(initialData);
+		subject = new DeepState(initialData);
 	});
 
 

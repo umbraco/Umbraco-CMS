@@ -3,12 +3,13 @@ import { css, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import '../collection.element';
 import { ifDefined } from 'lit-html/directives/if-defined.js';
-import { UmbMediaStore, UmbMediaStoreItemType } from 'src/backoffice/media/media/media.store';
+import { UmbMediaTreeStore } from '../../../media/media/media.tree.store';
 import {
 	UmbCollectionContext,
 	UMB_COLLECTION_CONTEXT_TOKEN,
-} from 'src/backoffice/shared/collection/collection.context';
+} from '../../../shared/collection/collection.context';
 import type { ManifestDashboardCollection } from '@umbraco-cms/models';
+import type { FolderTreeItem } from '@umbraco-cms/backend-api';
 import { UmbLitElement } from '@umbraco-cms/element';
 
 @customElement('umb-dashboard-collection')
@@ -26,7 +27,8 @@ export class UmbDashboardCollectionElement extends UmbLitElement {
 		`,
 	];
 
-	private _collectionContext?: UmbCollectionContext<UmbMediaStoreItemType, UmbMediaStore>;
+	// TODO: Use the right type here:
+	private _collectionContext?: UmbCollectionContext<FolderTreeItem, UmbMediaTreeStore>;
 
 	public manifest!: ManifestDashboardCollection;
 
@@ -37,7 +39,7 @@ export class UmbDashboardCollectionElement extends UmbLitElement {
 		super.connectedCallback();
 
 		if (!this._collectionContext) {
-			const manifestMeta = this.manifest.meta as any;
+			const manifestMeta = this.manifest.meta;
 			this._entityType = manifestMeta.entityType as string;
 			this._collectionContext = new UmbCollectionContext(this, null, manifestMeta.storeAlias);
 			this.provideContext(UMB_COLLECTION_CONTEXT_TOKEN, this._collectionContext);

@@ -1,6 +1,6 @@
 import type { Observable } from 'rxjs';
 import type { ManifestTree } from '@umbraco-cms/models';
-import { UniqueBehaviorSubject } from '@umbraco-cms/observable-api';
+import { DeepState } from '@umbraco-cms/observable-api';
 
 export interface UmbTreeContext {
 	tree: ManifestTree;
@@ -14,10 +14,10 @@ export interface UmbTreeContext {
 export class UmbTreeContextBase implements UmbTreeContext {
 	public tree: ManifestTree;
 
-	#selectable = new UniqueBehaviorSubject(false);
+	#selectable = new DeepState(false);
 	public readonly selectable = this.#selectable.asObservable();
 
-	#selection = new UniqueBehaviorSubject(<Array<string>>[]);
+	#selection = new DeepState(<Array<string>>[]);
 	public readonly selection = this.#selection.asObservable();
 
 	constructor(tree: ManifestTree) {
