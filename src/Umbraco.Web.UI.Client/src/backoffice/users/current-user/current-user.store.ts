@@ -1,5 +1,5 @@
-import type { UserDetails } from '@umbraco-cms/models';
 import { umbracoPath } from '@umbraco-cms/utils';
+import type { UserDetails } from '@umbraco-cms/models';
 import { UmbContextToken } from '@umbraco-cms/context-api';
 import { ObjectState } from '@umbraco-cms/observable-api';
 
