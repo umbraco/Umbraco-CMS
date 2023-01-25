@@ -26,6 +26,9 @@ export class UmbTemplateWorkspaceElement extends UmbLitElement {
 		this._entityKey = value;
 	}
 
+	@property()
+	public create?: string | null;
+
 	@state()
 	private _name?: string | null = '';
 
@@ -39,7 +42,6 @@ export class UmbTemplateWorkspaceElement extends UmbLitElement {
 
 		// make sure the the context has received all dependencies
 		await this.#templateWorkspaceContext.init();
-		this.#templateWorkspaceContext.load(this._entityKey);
 
 		this.observe(this.#templateWorkspaceContext.name, (name) => {
 			this._name = name;
@@ -48,6 +50,13 @@ export class UmbTemplateWorkspaceElement extends UmbLitElement {
 		this.observe(this.#templateWorkspaceContext.content, (content) => {
 			this._content = content;
 		});
+
+		if (!this._entityKey && this.create !== undefined) {
+			this.#templateWorkspaceContext.create(this.create);
+			return;
+		}
+
+		this.#templateWorkspaceContext.load(this._entityKey);
 	}
 
 	render() {

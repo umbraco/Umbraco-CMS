@@ -1,4 +1,3 @@
-import type { DocumentDetails } from '@umbraco-cms/models';
 import { UmbContextToken } from '@umbraco-cms/context-api';
 import { createObservablePart, ArrayState } from '@umbraco-cms/observable-api';
 import { UmbStoreBase } from '@umbraco-cms/store';

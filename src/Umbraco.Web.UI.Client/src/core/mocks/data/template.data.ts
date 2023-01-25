@@ -1,6 +1,6 @@
 import { UmbEntityData } from './entity.data';
 import { createEntityTreeItem } from './utils';
-import { EntityTreeItem, PagedEntityTreeItem, Template } from '@umbraco-cms/backend-api';
+import { EntityTreeItem, PagedEntityTreeItem, Template, TemplateScaffold } from '@umbraco-cms/backend-api';
 
 type TemplateDBItem = Template & EntityTreeItem;
 
@@ -40,6 +40,10 @@ export const data: Array<TemplateDBItem> = [
 	},
 ];
 
+export const createTemplateScaffold = (masterTemplateAlias: string) => {
+	return `Template Scaffold Mock for master template: ${masterTemplateAlias}`;
+};
+
 // Temp mocked database
 // TODO: all properties are optional in the server schema. I don't think this is correct.
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -52,6 +56,12 @@ class UmbTemplateData extends UmbEntityData<TemplateDBItem> {
 	getByKey(key: string): Template | undefined {
 		const item = this.data.find((item) => item.key === key);
 		return item ? createTemplate(item) : undefined;
+	}
+
+	getScaffold(masterTemplateAlias: string): TemplateScaffold {
+		return {
+			content: `Template Scaffold Mock: Layout = ${masterTemplateAlias || null};`,
+		};
 	}
 
 	getTreeRoot(): PagedEntityTreeItem {

@@ -10,6 +10,19 @@ const tree: ManifestTree = {
 	},
 };
 
-const treeItemActions: Array<ManifestTreeItemAction> = [];
+const treeItemActions: Array<ManifestTreeItemAction> = [
+	{
+		type: 'treeItemAction',
+		alias: 'Umb.TreeItemAction.Template.Create',
+		name: 'Create Template Tree Action',
+		loader: () => import('./actions/create/create-template-tree-action.element'),
+		weight: 200,
+		meta: {
+			entityType: 'template',
+			label: 'Create',
+			icon: 'umb:add',
+		},
+	},
+];
 
 export const manifests = [tree, ...treeItemActions];
