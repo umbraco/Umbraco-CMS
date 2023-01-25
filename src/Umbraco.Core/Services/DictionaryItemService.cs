@@ -91,21 +91,7 @@ internal class DictionaryItemService : RepositoryService, IDictionaryItemService
 
     /// <inheritdoc />
     public async Task<IEnumerable<IDictionaryItem>> GetChildrenAsync(Guid parentId)
-    {
-        using (ScopeProvider.CreateCoreScope(autoComplete: true))
-        {
-            IQuery<IDictionaryItem> query = Query<IDictionaryItem>().Where(x => x.ParentId == parentId);
-            IDictionaryItem[] items = _dictionaryRepository.Get(query).ToArray();
-
-            // ensure the lazy Language callback is assigned
-            foreach (IDictionaryItem item in items)
-            {
-                EnsureDictionaryItemLanguageCallback(item);
-            }
-
-            return await Task.FromResult(items);
-        }
-    }
+        => await GetByQueryAsync(Query<IDictionaryItem>().Where(x => x.ParentId == parentId));
 
     /// <inheritdoc />
     public async Task<IEnumerable<IDictionaryItem>> GetDescendantsAsync(Guid? parentId)
@@ -126,21 +112,7 @@ internal class DictionaryItemService : RepositoryService, IDictionaryItemService
 
     /// <inheritdoc/>
     public async Task<IEnumerable<IDictionaryItem>> GetAtRootAsync()
-    {
-        using (ScopeProvider.CreateCoreScope(autoComplete: true))
-        {
-            IQuery<IDictionaryItem> query = Query<IDictionaryItem>().Where(x => x.ParentId == null);
-            IDictionaryItem[] items = _dictionaryRepository.Get(query).ToArray();
-
-            // ensure the lazy Language callback is assigned
-            foreach (IDictionaryItem item in items)
-            {
-                EnsureDictionaryItemLanguageCallback(item);
-            }
-
-            return await Task.FromResult(items);
-        }
-    }
+        => await GetByQueryAsync(Query<IDictionaryItem>().Where(x => x.ParentId == null));
 
     /// <inheritdoc/>
     public async Task<bool> ExistsAsync(string key)
@@ -168,14 +140,9 @@ internal class DictionaryItemService : RepositoryService, IDictionaryItemService
             }
 
             // validate the parent
-            Guid? parentId = dictionaryItem.ParentId;
-            if (parentId.HasValue && parentId.Value != Guid.Empty)
+            if (HasValidParent(dictionaryItem) == false)
             {
-                IDictionaryItem? parent = await GetAsync(parentId.Value);
-                if (parent == null)
-                {
-                    return Attempt.FailWithStatus(DictionaryItemOperationStatus.ParentNotFound, dictionaryItem);
-                }
+                return Attempt.FailWithStatus(DictionaryItemOperationStatus.ParentNotFound, dictionaryItem);
             }
 
             // do we have an item key collision (item keys must be unique)?
@@ -185,12 +152,8 @@ internal class DictionaryItemService : RepositoryService, IDictionaryItemService
             }
 
             // ensure valid languages for all translations
-            IDictionaryTranslation[] translationsAsArray = dictionaryItem.Translations.ToArray();
-            if (translationsAsArray.Any())
-            {
-                var allLanguageIds = (await _languageService.GetAllAsync()).Select(language => language.Id).ToArray();
-                dictionaryItem.Translations = translationsAsArray.Where(translation => allLanguageIds.Contains(translation.LanguageId)).ToArray();
-            }
+            ILanguage[] allLanguages = (await _languageService.GetAllAsync()).ToArray();
+            RemoveInvalidTranslations(dictionaryItem, allLanguages);
 
             EventMessages eventMessages = EventMessagesFactory.Get();
             var savingNotification = new DictionaryItemSavingNotification(dictionaryItem, eventMessages);
@@ -287,6 +250,22 @@ internal class DictionaryItemService : RepositoryService, IDictionaryItemService
         }
     }
 
+    private async Task<IEnumerable<IDictionaryItem>> GetByQueryAsync(IQuery<IDictionaryItem> query)
+    {
+        using (ScopeProvider.CreateCoreScope(autoComplete: true))
+        {
+            IDictionaryItem[] items = _dictionaryRepository.Get(query).ToArray();
+
+            // ensure the lazy Language callback is assigned
+            foreach (IDictionaryItem item in items)
+            {
+                EnsureDictionaryItemLanguageCallback(item);
+            }
+
+            return await Task.FromResult(items);
+        }
+    }
+
     private void Audit(AuditType type, string message, int userId, int objectId, string? entityType) =>
         _auditRepository.Save(new AuditItem(objectId, type, userId, entityType, message));
 
@@ -313,6 +292,21 @@ internal class DictionaryItemService : RepositoryService, IDictionaryItemService
         {
             trans.GetLanguage = GetLanguageById;
         }
+    }
+
+    private bool HasValidParent(IDictionaryItem dictionaryItem)
+        => dictionaryItem.ParentId.HasValue == false || _dictionaryRepository.Get(dictionaryItem.ParentId.Value) != null;
+
+    private void RemoveInvalidTranslations(IDictionaryItem dictionaryItem, IEnumerable<ILanguage> allLanguages)
+    {
+        IDictionaryTranslation[] translationsAsArray = dictionaryItem.Translations.ToArray();
+        if (translationsAsArray.Any() == false)
+        {
+            return;
+        }
+
+        var allLanguageIds = allLanguages.Select(language => language.Id).ToArray();
+        dictionaryItem.Translations = translationsAsArray.Where(translation => allLanguageIds.Contains(translation.LanguageId)).ToArray();
     }
 
     private bool HasItemKeyCollision(IDictionaryItem dictionaryItem)

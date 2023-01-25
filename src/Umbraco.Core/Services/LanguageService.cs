@@ -78,21 +78,10 @@ internal class LanguageService : RepositoryService, ILanguageService
                 return Attempt.FailWithStatus(LanguageOperationStatus.MissingDefault, language);
             }
 
-            // look for cycles - within write-lock
-            if (language.FallbackLanguageId.HasValue)
+            // validate the fallback language - within write-lock (important!)
+            if (HasInvalidFallbackLanguage(language))
             {
-                var languages = _languageRepository.GetMany().ToDictionary(x => x.Id, x => x);
-                if (!languages.ContainsKey(language.FallbackLanguageId.Value))
-                {
-                    return Attempt.FailWithStatus(LanguageOperationStatus.InvalidFallback, language);
-                }
-
-                if (CreatesCycle(language, languages))
-                {
-                    // explicitly logging this because it may not be obvious, specially with implicit cyclic fallbacks
-                    LoggerFactory.CreateLogger<LocalizationService>().Log(LogLevel.Error, $"Cannot save language {language.IsoCode} with fallback {languages[language.FallbackLanguageId.Value].IsoCode} as it would create a fallback cycle.");
-                    return Attempt.FailWithStatus(LanguageOperationStatus.InvalidFallback, language);
-                }
+                return Attempt.FailWithStatus(LanguageOperationStatus.InvalidFallback, language);
             }
 
             EventMessages eventMessages = EventMessagesFactory.Get();
@@ -206,6 +195,35 @@ internal class LanguageService : RepositoryService, ILanguageService
 
     private void Audit(AuditType type, string message, int userId, int objectId, string? entityType) =>
         _auditRepository.Save(new AuditItem(objectId, type, userId, entityType, message));
+
+    private bool HasInvalidFallbackLanguage(ILanguage language)
+    {
+        // no fallback language = valid
+        if (language.FallbackLanguageId.HasValue == false)
+        {
+            return false;
+        }
+
+        // does the fallback language actually exist?
+        var languages = _languageRepository.GetMany().ToDictionary(x => x.Id, x => x);
+        if (languages.ContainsKey(language.FallbackLanguageId.Value) == false)
+        {
+            return true;
+        }
+
+        // does the fallback language create a cycle?
+        if (CreatesCycle(language, languages))
+        {
+            // explicitly logging this because it may not be obvious, specially with implicit cyclic fallbacks
+            LoggerFactory
+                .CreateLogger<LanguageService>()
+                .Log(LogLevel.Error, $"Cannot use language {languages[language.FallbackLanguageId.Value].IsoCode} as fallback for language {language.IsoCode} as this would create a fallback cycle.");
+
+            return true;
+        }
+
+        return false;
+    }
 
     private bool CreatesCycle(ILanguage language, IDictionary<int, ILanguage> languages)
     {
