@@ -5,6 +5,7 @@ using Serilog.Events;
 // ReSharper disable UnusedAutoPropertyAccessor.Global
 namespace Umbraco.Cms.Core.Logging.Viewer;
 
+[Obsolete("Use ILogEntry instead. Scheduled for removal in Umbraco 15.")]
 public class LogMessage
 {
     /// <summary>

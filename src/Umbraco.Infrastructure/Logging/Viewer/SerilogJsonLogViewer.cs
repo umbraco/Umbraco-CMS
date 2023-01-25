@@ -26,6 +26,7 @@ internal class SerilogJsonLogViewer : SerilogLogViewerSourceBase
 
     public override bool CanHandleLargeLogs => false;
 
+    [Obsolete("Use ILogViewerService.CanViewLogsAsync instead. Scheduled for removal in Umbraco 15.")]
     public override bool CheckCanOpenLogs(LogTimePeriod logTimePeriod)
     {
         // Log Directory
