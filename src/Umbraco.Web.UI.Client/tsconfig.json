@@ -20,6 +20,8 @@
 		"resolveJsonModule": true,
 		"baseUrl": ".",
 		"paths": {
+			"@umbraco-cms/css": ["libs/css/custom-properties.css"],
+			"@umbraco-cms/modal": ["src/core/modal"],
 			"@umbraco-cms/models": ["libs/models"],
 			"@umbraco-cms/backend-api": ["libs/backend-api"],
 			"@umbraco-cms/context-api": ["libs/context-api"],
@@ -29,15 +31,15 @@
 			"@umbraco-cms/extensions-registry": ["libs/extensions-registry"],
 			"@umbraco-cms/notification": ["libs/notification"],
 			"@umbraco-cms/observable-api": ["libs/observable-api"],
-			"@umbraco-cms/utils": ["src/core/utils"],
-			"@umbraco-cms/test-utils": ["src/core/test-utils"],
+			"@umbraco-cms/utils": ["libs/utils"],
+			"@umbraco-cms/test-utils": ["libs/test-utils"],
 			"@umbraco-cms/resources": ["libs/resources"],
 			"@umbraco-cms/store": ["libs/store"],
 			"@umbraco-cms/components/*": ["src/backoffice/components/*"],
 			"@umbraco-cms/sections/*": ["src/backoffice/sections/*"]
 		}
 	},
-	"include": ["src/**/*.ts", "libs/**/*.ts", "e2e/**/*.ts"],
+	"include": ["src/**/*.ts", "apps/**/*.ts", "libs/**/*.ts", "e2e/**/*.ts"],
 	"references": [
 		{
 			"path": "./tsconfig.node.json"

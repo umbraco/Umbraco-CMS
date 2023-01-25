@@ -4,7 +4,7 @@ import { customElement, property, state } from 'lit/decorators.js';
 import UmbTreeItemActionElement, { ActionPageEntity } from '../action/tree-item-action.element';
 import { UmbTreeContextMenuService } from './tree-context-menu.service';
 import { UmbLitElement } from '@umbraco-cms/element';
-import { UniqueBehaviorSubject } from '@umbraco-cms/observable-api';
+import { DeepState } from '@umbraco-cms/observable-api';
 import { UmbContextToken } from '@umbraco-cms/context-api';
 
 // TODO: Refactor this, its not a service and the data should be handled by a context api.
@@ -15,7 +15,7 @@ export class UmbTreeContextMenuPageService extends UmbLitElement {
 	@property({ type: Object })
 	public actionEntity: ActionPageEntity = { key: '', name: '' };
 
-	#entity = new UniqueBehaviorSubject({ key: '', name: '' } as ActionPageEntity);
+	#entity = new DeepState({ key: '', name: '' } as ActionPageEntity);
 	public readonly entity = this.#entity.asObservable();
 
 	@state()

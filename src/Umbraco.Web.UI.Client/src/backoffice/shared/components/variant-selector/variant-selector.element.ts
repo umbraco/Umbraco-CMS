@@ -4,12 +4,8 @@ import { customElement, property, state } from 'lit/decorators.js';
 import { UUIInputElement, UUIInputEvent } from '@umbraco-ui/uui';
 import { distinctUntilChanged } from 'rxjs';
 import type { UmbWorkspaceContentContext } from '../workspace/workspace-content/workspace-content.context';
-import type { DocumentDetails, MediaDetails } from '@umbraco-cms/models';
-
-import type { UmbNodeStoreBase } from '@umbraco-cms/store';
 import { UmbLitElement } from '@umbraco-cms/element';
-
-type ContentTypeTypes = DocumentDetails | MediaDetails;
+import type { ContentTreeItem } from '@umbraco-cms/backend-api';
 
 @customElement('umb-variant-selector')
 export class UmbVariantSelectorElement extends UmbLitElement {
@@ -45,17 +41,17 @@ export class UmbVariantSelectorElement extends UmbLitElement {
 	@property()
 	alias!: string;
 
-	// TODO: use a more specific type here:
+	// TODO: use a more specific type here, something with variants.
 	@state()
-	_content?: ContentTypeTypes;
+	_content?: ContentTreeItem;
 
-	private _workspaceContext?: UmbWorkspaceContentContext<ContentTypeTypes, UmbNodeStoreBase<ContentTypeTypes>>;
+	private _workspaceContext?: UmbWorkspaceContentContext;
 
 	constructor() {
 		super();
 
 		// TODO: Figure out how to get the magic string for the workspace context.
-		this.consumeContext<UmbWorkspaceContentContext<ContentTypeTypes, UmbNodeStoreBase<ContentTypeTypes>>>(
+		this.consumeContext<UmbWorkspaceContentContext>(
 			'umbWorkspaceContext',
 			(instance) => {
 				this._workspaceContext = instance;
@@ -99,7 +95,7 @@ export class UmbVariantSelectorElement extends UmbLitElement {
 			<uui-input id="name-input" .value=${this._content?.name} @input="${this._handleInput}">
 				<!-- Implement Variant Selector -->
 				${
-					this._content && this._content.variants?.length > 0
+					this._content && (this._content as any).variants?.length > 0
 						? html`
 								<div slot="append">
 									<uui-button id="variant-selector-toggle" @click=${this._toggleVariantSelector}>
@@ -113,7 +109,7 @@ export class UmbVariantSelectorElement extends UmbLitElement {
 			</uui-input>
 
 			${
-				this._content && this._content.variants?.length > 0
+				this._content && (this._content as any).variants?.length > 0
 					? html`
 							<uui-popover id="variant-selector-popover" .open=${this._variantSelectorIsOpen} @close=${this._close}>
 								<div id="variant-selector-dropdown" slot="popover">

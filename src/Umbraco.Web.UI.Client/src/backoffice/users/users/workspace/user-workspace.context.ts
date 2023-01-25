@@ -3,7 +3,7 @@ import {
 	UmbUserStore,
 	UmbUserStoreItemType,
 	UMB_USER_STORE_CONTEXT_TOKEN,
-} from 'src/backoffice/users/users/user.store';
+} from '../../users/user.store';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 
 const DefaultDataTypeData = {

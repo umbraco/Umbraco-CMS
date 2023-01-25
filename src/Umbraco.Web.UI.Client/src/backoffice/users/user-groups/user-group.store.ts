@@ -1,67 +1,67 @@
-import { map, Observable } from 'rxjs';
-import { UmbDataStoreBase } from '@umbraco-cms/store';
-import type { UserGroupDetails, UserGroupEntity } from '@umbraco-cms/models';
+import type { UserGroupDetails } from '@umbraco-cms/models';
 import { UmbContextToken } from '@umbraco-cms/context-api';
+import { UmbControllerHostInterface } from '@umbraco-cms/controller';
+import { createObservablePart, ArrayState } from '@umbraco-cms/observable-api';
+import { UmbStoreBase } from '@umbraco-cms/store';
 
 // TODO: get rid of this type addition & { ... }:
 export type UmbUserGroupStoreItemType = UserGroupDetails & { users?: Array<string> };
 
-export const STORE_ALIAS = 'UmbUserGroupStore';
+export const UMB_USER_GROUP_STORE_CONTEXT_TOKEN = new UmbContextToken<UmbUserGroupStore>('UmbUserGroupStore');
 
 /**
  * @export
  * @class UmbUserGroupStore
- * @extends {UmbDataStoreBase<UserGroupEntity>}
- * @description - Data Store for Users
+ * @extends {UmbStoreBase}
+ * @description - Data Store for User Groups
  */
-export class UmbUserGroupStore extends UmbDataStoreBase<UmbUserGroupStoreItemType> {
-	public readonly storeAlias = STORE_ALIAS;
+export class UmbUserGroupStore extends UmbStoreBase {
 
-	getAll(): Observable<Array<UmbUserGroupStoreItemType>> {
+
+	#groups = new ArrayState<UmbUserGroupStoreItemType>([], x => x.key);
+	public groups = this.#groups.asObservable();
+
+
+	constructor(host: UmbControllerHostInterface) {
+		super(host, UMB_USER_GROUP_STORE_CONTEXT_TOKEN.toString());
+	}
+
+	getAll() {
 		// TODO: use Fetcher API.
 		// TODO: only fetch if the data type is not in the store?
 		fetch(`/umbraco/backoffice/user-groups/list/items`)
 			.then((res) => res.json())
 			.then((data) => {
-				this.updateItems(data.items);
+				this.#groups.append(data.items);
 			});
 
-		return this.items;
+		return this.groups;
 	}
 
-	getByKey(key: string): Observable<UmbUserGroupStoreItemType | null> {
+	getByKey(key: string) {
 		// TODO: use Fetcher API.
 		// TODO: only fetch if the data type is not in the store?
 		fetch(`/umbraco/backoffice/user-groups/details/${key}`)
 			.then((res) => res.json())
 			.then((data) => {
-				this.updateItems([data]);
+				this.#groups.append([data]);
 			});
 
-		return this.items.pipe(
-			map(
-				(userGroups: Array<UmbUserGroupStoreItemType>) =>
-					userGroups.find((userGroup: UmbUserGroupStoreItemType) => userGroup.key === key) || null
-			)
-		);
+		return createObservablePart(this.groups, (userGroups) => userGroups.find(userGroup => userGroup.key === key));
 	}
 
-	getByKeys(keys: Array<string>): Observable<Array<UserGroupEntity>> {
+	getByKeys(keys: Array<string>) {
 		const params = keys.map((key) => `key=${key}`).join('&');
 		fetch(`/umbraco/backoffice/user-groups/getByKeys?${params}`)
 			.then((res) => res.json())
 			.then((data) => {
-				this.updateItems(data);
+				this.#groups.append(data);
 			});
 
-		return this.items.pipe(
-			map((items: Array<UmbUserGroupStoreItemType>) =>
-				items.filter((node: UmbUserGroupStoreItemType) => keys.includes(node.key))
-			)
-		);
+			return createObservablePart(this.groups, (items) => items.filter(node => keys.includes(node.key)));
 	}
 
-	async save(userGroups: Array<UmbUserGroupStoreItemType>): Promise<void> {
+	async save(userGroups: Array<UmbUserGroupStoreItemType>) {
 		// TODO: use Fetcher API.
 
 		// TODO: implement so user group store updates the
@@ -80,11 +80,9 @@ export class UmbUserGroupStore extends UmbDataStoreBase<UmbUserGroupStoreItemTyp
 				},
 			});
 			const json = await res.json();
-			this.updateItems(json);
+			this.#groups.append(json);
 		} catch (error) {
 			console.error('Save Data Type error', error);
 		}
 	}
 }
-
-export const UMB_USER_GROUP_STORE_CONTEXT_TOKEN = new UmbContextToken<UmbUserGroupStore>(STORE_ALIAS);

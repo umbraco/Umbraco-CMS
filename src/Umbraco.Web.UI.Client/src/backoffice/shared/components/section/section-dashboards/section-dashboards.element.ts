@@ -4,14 +4,8 @@ import { customElement, state } from 'lit/decorators.js';
 import { IRoutingInfo } from 'router-slot';
 import { first, map } from 'rxjs';
 import { UmbSectionContext, UMB_SECTION_CONTEXT_TOKEN } from '../section.context';
-import { createExtensionElement } from '@umbraco-cms/extensions-api';
-import type {
-	ManifestDashboard,
-	ManifestDashboardCollection,
-	ManifestSection,
-	ManifestWithMeta,
-} from '@umbraco-cms/models';
-import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
+import { createExtensionElement, umbExtensionsRegistry } from '@umbraco-cms/extensions-api';
+import type { ManifestDashboard, ManifestDashboardCollection, ManifestWithMeta } from '@umbraco-cms/models';
 import { UmbLitElement } from '@umbraco-cms/element';
 
 @customElement('umb-section-dashboards')
@@ -23,7 +17,6 @@ export class UmbSectionDashboardsElement extends UmbLitElement {
 				display: flex;
 				flex-direction: column;
 				height: 100%;
-				width: 100%;
 			}
 
 			#tabs {
@@ -32,12 +25,10 @@ export class UmbSectionDashboardsElement extends UmbLitElement {
 			}
 
 			#scroll-container {
-				width: 100%;
-				height: 100%;
+				flex: 1;
 			}
 
 			#router-slot {
-				width: 100%;
 				box-sizing: border-box;
 				display: block;
 				padding: var(--uui-size-5);
@@ -57,7 +48,7 @@ export class UmbSectionDashboardsElement extends UmbLitElement {
 	@state()
 	private _currentSectionPathname = '';
 
-	private _currentSectionAlias = '';
+	private _currentSectionAlias?: string;
 	private _sectionContext?: UmbSectionContext;
 
 	constructor() {
@@ -72,12 +63,12 @@ export class UmbSectionDashboardsElement extends UmbLitElement {
 	private _observeSectionContext() {
 		if (!this._sectionContext) return;
 
-		this.observe(this._sectionContext.manifest.pipe(first()), (section) => {
-			if (section) {
-				this._currentSectionAlias = section.alias;
-				this._currentSectionPathname = section.meta.pathname;
-				this._observeDashboards();
-			}
+		this.observe(this._sectionContext.alias.pipe(first()), (alias) => {
+			this._currentSectionAlias = alias;
+			this._observeDashboards();
+		});
+		this.observe(this._sectionContext.pathname.pipe(first()), (pathname) => {
+			this._currentSectionPathname = pathname || '';
 		});
 	}
 

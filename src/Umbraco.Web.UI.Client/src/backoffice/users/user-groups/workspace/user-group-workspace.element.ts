@@ -4,15 +4,15 @@ import { css, html, nothing } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { repeat } from 'lit/directives/repeat.js';
 import { distinctUntilChanged } from 'rxjs';
+import { UmbUserStore, UMB_USER_STORE_CONTEXT_TOKEN } from '../../../users/users/user.store';
+import { UmbWorkspaceEntityElement } from '../../../shared/components/workspace/workspace-entity-element.interface';
 import { UmbWorkspaceUserGroupContext } from './user-group-workspace.context';
 import type { ManifestWorkspaceAction, UserGroupDetails } from '@umbraco-cms/models';
-import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
-import { UmbUserStore, UMB_USER_STORE_CONTEXT_TOKEN } from 'src/backoffice/users/users/user.store';
+import { umbExtensionsRegistry } from '@umbraco-cms/extensions-api';
 
-import '../../../../auth/components/input-user/input-user.element';
-import '../../../../backoffice/shared/components/input-section/input-section.element';
+import '../../../shared/components/input-user/input-user.element';
+import '../../../shared/components/input-section/input-section.element';
 import { UmbLitElement } from '@umbraco-cms/element';
-import { UmbWorkspaceEntityElement } from 'src/backoffice/shared/components/workspace/workspace-entity-element.interface';
 
 @customElement('umb-user-group-workspace')
 export class UmbUserGroupWorkspaceElement extends UmbLitElement implements UmbWorkspaceEntityElement {

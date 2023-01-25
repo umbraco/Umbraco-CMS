@@ -2,7 +2,8 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, CSSResultGroup, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { when } from 'lit/directives/when.js';
-import { UmbSectionStore, UMB_SECTION_STORE_CONTEXT_TOKEN } from '../section/section.store';
+import { UMB_BACKOFFICE_CONTEXT_TOKEN } from './backoffice.context';
+import type { UmbBackofficeContext } from './backoffice.context';
 import type { ManifestSection } from '@umbraco-cms/models';
 import { UmbLitElement } from '@umbraco-cms/element';
 
@@ -49,13 +50,13 @@ export class UmbBackofficeHeaderSections extends UmbLitElement {
 	@state()
 	private _currentSectionAlias = '';
 
-	private _sectionStore?: UmbSectionStore;
+	private _backofficeContext?: UmbBackofficeContext;
 
 	constructor() {
 		super();
 
-		this.consumeContext(UMB_SECTION_STORE_CONTEXT_TOKEN, (sectionStore) => {
-			this._sectionStore = sectionStore;
+		this.consumeContext(UMB_BACKOFFICE_CONTEXT_TOKEN, (backofficeContext) => {
+			this._backofficeContext = backofficeContext;
 			this._observeSections();
 			this._observeCurrentSection();
 		});
@@ -66,15 +67,8 @@ export class UmbBackofficeHeaderSections extends UmbLitElement {
 		this._open = !this._open;
 	}
 
-	private _handleTabClick(e: PointerEvent) {
-		const tab = e.currentTarget as HTMLElement;
-
-		// TODO: we need to be able to prevent the tab from setting the active state
-		if (tab.id === 'moreTab') return;
-
-		if (!tab.dataset.alias) return;
-
-		this._sectionStore?.setCurrent(tab.dataset.alias);
+	private _handleSectionTabClick(alias: string) {
+		this._backofficeContext?.setActiveSectionAlias(alias);
 	}
 
 	private _handleLabelClick() {
@@ -85,19 +79,19 @@ export class UmbBackofficeHeaderSections extends UmbLitElement {
 	}
 
 	private _observeSections() {
-		if (!this._sectionStore) return;
+		if (!this._backofficeContext) return;
 
-		this.observe(this._sectionStore.getAllowed(), (allowedSections) => {
+		this.observe(this._backofficeContext.getAllowedSections(), (allowedSections) => {
 			this._sections = allowedSections;
 			this._visibleSections = this._sections;
 		});
 	}
 
 	private _observeCurrentSection() {
-		if (!this._sectionStore) return;
+		if (!this._backofficeContext) return;
 
-		this.observe(this._sectionStore.currentAlias, (currentSectionAlias) => {
-			this._currentSectionAlias = currentSectionAlias;
+		this.observe(this._backofficeContext.activeSectionAlias, (currentSectionAlias) => {
+			this._currentSectionAlias = currentSectionAlias || '';
 		});
 	}
 
@@ -107,11 +101,11 @@ export class UmbBackofficeHeaderSections extends UmbLitElement {
 				${this._visibleSections.map(
 					(section: ManifestSection) => html`
 						<uui-tab
-							@click="${this._handleTabClick}"
+							@click="${() => this._handleSectionTabClick(section.alias)}"
 							?active="${this._currentSectionAlias === section.alias}"
 							href="${`section/${section.meta.pathname}`}"
 							label="${section.meta.label || section.name}"
-							data-alias="${section.alias}"></uui-tab>
+							></uui-tab>
 					`
 				)}
 				${this._renderExtraSections()}
@@ -123,7 +117,7 @@ export class UmbBackofficeHeaderSections extends UmbLitElement {
 		return when(
 			this._extraSections.length > 0,
 			() => html`
-				<uui-tab id="moreTab" @click="${this._handleTabClick}">
+				<uui-tab id="moreTab">
 					<uui-popover .open=${this._open} placement="bottom-start" @close="${() => (this._open = false)}">
 						<uui-button slot="trigger" look="primary" label="More" @click="${this._handleMore}" compact>
 							<uui-symbol-more></uui-symbol-more>
