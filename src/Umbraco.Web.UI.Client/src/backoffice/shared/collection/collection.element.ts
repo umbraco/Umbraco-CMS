@@ -9,7 +9,7 @@ import { createExtensionElement } from '@umbraco-cms/extensions-api';
 import type { ManifestCollectionView, MediaDetails } from '@umbraco-cms/models';
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
 import { UmbLitElement } from '@umbraco-cms/element';
-import type { UmbObserverController } from 'src/core/observable-api/observer.controller';
+import type { UmbObserverController } from '@umbraco-cms/observable-api';
 
 @customElement('umb-collection')
 export class UmbCollectionElement extends UmbLitElement {

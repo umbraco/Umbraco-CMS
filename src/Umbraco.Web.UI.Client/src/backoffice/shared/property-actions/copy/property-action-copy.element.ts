@@ -1,8 +1,11 @@
 import { html } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
-import type { UmbNotificationDefaultData } from '../../../../core/notification/layouts/default';
-import { UmbNotificationService, UMB_NOTIFICATION_SERVICE_CONTEXT_TOKEN } from '../../../../core/notification';
 import type { UmbPropertyAction } from '../shared/property-action/property-action.model';
+import {
+	UmbNotificationDefaultData,
+	UmbNotificationService,
+	UMB_NOTIFICATION_SERVICE_CONTEXT_TOKEN,
+} from '@umbraco-cms/notification';
 import { UmbLitElement } from '@umbraco-cms/element';
 
 @customElement('umb-property-action-copy')

@@ -1,6 +1,5 @@
 import { UmbContextToken } from '@umbraco-cms/context-api';
-import {  UniqueBehaviorSubject } from '@umbraco-cms/observable-api';
-import { createObservablePart } from '@umbraco-cms/observable-api';
+import { createObservablePart, DeepState } from '@umbraco-cms/observable-api';
 
 export type UmbModelType = 'dialog' | 'sidebar';
 
@@ -11,7 +10,7 @@ export type UmbCurrentUserHistoryItem = {
 };
 
 export class UmbCurrentUserHistoryStore {
-	#history = new UniqueBehaviorSubject(<Array<UmbCurrentUserHistoryItem>>[]);
+	#history = new DeepState(<Array<UmbCurrentUserHistoryItem>>[]);
 
 	public readonly history = this.#history.asObservable();
 	public readonly latestHistory = createObservablePart(this.#history, (historyItems) => historyItems.slice(-10));

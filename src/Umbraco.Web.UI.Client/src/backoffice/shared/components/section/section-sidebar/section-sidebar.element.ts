@@ -2,7 +2,6 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { UmbSectionContext, UMB_SECTION_CONTEXT_TOKEN } from '../section.context';
-import type { ManifestSection } from '@umbraco-cms/models';
 
 import '../../tree/context-menu/tree-context-menu.service';
 import { UmbLitElement } from '@umbraco-cms/element';
@@ -48,9 +47,11 @@ export class UmbSectionSidebarElement extends UmbLitElement {
 	private _observeSectionContext() {
 		if (!this._sectionContext) return;
 
-		this.observe(this._sectionContext.manifest, (section) => {
-			this._sectionLabel = section.meta.label || section.name;
-			this._sectionPathname = section.meta.pathname;
+		this.observe(this._sectionContext.pathname, (pathname) => {
+			this._sectionPathname = pathname || '';
+		});
+		this.observe(this._sectionContext.label, (label) => {
+			this._sectionLabel = label || '';
 		});
 	}
 
