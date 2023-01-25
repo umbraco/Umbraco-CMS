@@ -38,7 +38,7 @@ public class LanguageFactory : ILanguageFactory
 
     public ILanguage MapUpdateModelToLanguage(ILanguage current, LanguageUpdateModel languageUpdateModel)
     {
-        ILanguage updated = _umbracoMapper.Map<ILanguage>(languageUpdateModel)!;
+        ILanguage updated = _umbracoMapper.Map(languageUpdateModel, current);
         updated.FallbackLanguageId = GetFallbackLanguageId(languageUpdateModel);
 
         return updated;
