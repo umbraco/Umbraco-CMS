@@ -1,23 +1,23 @@
 import type { DocumentDetails, MediaDetails } from '@umbraco-cms/models';
 import { UmbContextToken } from '@umbraco-cms/context-api';
-import { createObservablePart, UniqueArrayBehaviorSubject } from '@umbraco-cms/observable-api';
+import { createObservablePart, ArrayState } from '@umbraco-cms/observable-api';
 import { UmbStoreBase, UmbContentStore } from '@umbraco-cms/store';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 
 
-export const UMB_MEDIA_DETAIL_STORE_CONTEXT_TOKEN = new UmbContextToken<UmbMediaDetailStore>('UmbDocumentDetailStore');
+export const UMB_MEDIA_DETAIL_STORE_CONTEXT_TOKEN = new UmbContextToken<UmbMediaDetailStore>('UmbMediaDetailStore');
 
 
 /**
  * @export
- * @class UmbMediaStore
+ * @class UmbMediaDetailStore
  * @extends {UmbStoreBase}
  * @description - Data Store for Media
  */
 export class UmbMediaDetailStore extends UmbStoreBase implements UmbContentStore<MediaDetails> {
 
 
-	#data = new UniqueArrayBehaviorSubject<DocumentDetails>([], (x) => x.key);
+	#data = new ArrayState<DocumentDetails>([], (x) => x.key);
 
 
 	constructor(host: UmbControllerHostInterface) {

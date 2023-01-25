@@ -12,7 +12,7 @@ import type { ManifestWorkspace, UserDetails } from '@umbraco-cms/models';
 import { UmbUserStore, UMB_USER_STORE_CONTEXT_TOKEN } from 'src/backoffice/users/users/user.store';
 import { createExtensionElement } from '@umbraco-cms/extensions-api';
 import { UmbLitElement } from '@umbraco-cms/element';
-import { UniqueBehaviorSubject } from '@umbraco-cms/observable-api';
+import { DeepState } from '@umbraco-cms/observable-api';
 
 @customElement('umb-section-view-users')
 export class UmbSectionViewUsersElement extends UmbLitElement {
@@ -33,13 +33,13 @@ export class UmbSectionViewUsersElement extends UmbLitElement {
 	// TODO: This must be turned into context api: Maybe its a Collection View (SectionView Collection View)?
 	private _userStore?: UmbUserStore;
 
-	#selection = new UniqueBehaviorSubject(<Array<string>>[]);
+	#selection = new DeepState(<Array<string>>[]);
 	public readonly selection = this.#selection.asObservable();
 
-	#users = new UniqueBehaviorSubject(<Array<UserDetails>>[]);
+	#users = new DeepState(<Array<UserDetails>>[]);
 	public readonly users = this.#users.asObservable();
 
-	#search = new UniqueBehaviorSubject('');
+	#search = new DeepState('');
 	public readonly search = this.#search.asObservable();
 
 	constructor() {

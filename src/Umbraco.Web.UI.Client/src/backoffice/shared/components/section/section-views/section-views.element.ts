@@ -1,11 +1,12 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, html, nothing } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
-import { EMPTY, map, of, Subscription, switchMap } from 'rxjs';
+import { map, of } from 'rxjs';
 import { UmbSectionContext, UMB_SECTION_CONTEXT_TOKEN } from '../section.context';
 import type { ManifestSectionView } from '@umbraco-cms/models';
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-api';
 import { UmbLitElement } from '@umbraco-cms/element';
+import { UmbObserverController } from '@umbraco-cms/observable-api';
 
 @customElement('umb-section-views')
 export class UmbSectionViewsElement extends UmbLitElement {
@@ -35,11 +36,10 @@ export class UmbSectionViewsElement extends UmbLitElement {
 	private _routerFolder = '';
 
 	@state()
-	private _activeView?: ManifestSectionView;
+	private _activeViewPathname?: string;
 
 	private _sectionContext?: UmbSectionContext;
-	private _viewsSubscription?: Subscription;
-	private _activeViewSubscription?: Subscription;
+	private _extensionsObserver?: UmbObserverController;
 
 	constructor() {
 		super();
@@ -60,43 +60,35 @@ export class UmbSectionViewsElement extends UmbLitElement {
 	private _observeViews() {
 		if (!this._sectionContext) return;
 
-		this._viewsSubscription?.unsubscribe();
-
-		this._viewsSubscription = this._sectionContext?.manifest
-			.pipe(
-				switchMap((section) => {
-					if (!section) return EMPTY;
-
-					return (
-						umbExtensionsRegistry
-							?.extensionsOfType('sectionView')
-							.pipe(
-								map((views) =>
-									views
-										.filter((view) => view.meta.sections.includes(section.alias))
-										.sort((a, b) => b.meta.weight - a.meta.weight)
-								)
-							) ?? of([])
-					);
-				})
-			)
-			.subscribe((views) => {
-				this._views = views;
-			});
+		this.observe(this._sectionContext.alias, (sectionAlias) => {
+			this._observeExtensions(sectionAlias);
+		}, 'viewsObserver')
+	}
+	private _observeExtensions(sectionAlias?: string) {
+		this._extensionsObserver?.destroy();
+		if(sectionAlias) {
+			this._extensionsObserver = this.observe(
+					umbExtensionsRegistry?.extensionsOfType('sectionView').pipe(
+						map((views) =>
+							views
+								.filter((view) => view.meta.sections.includes(sectionAlias))
+								.sort((a, b) => b.meta.weight - a.meta.weight)
+						)
+					) ?? of([])
+				,
+					(views) => {
+						this._views = views;
+					}
+			);
+		}
 	}
 
 	private _observeActiveView() {
-		this._activeViewSubscription?.unsubscribe();
-
-		this._activeViewSubscription = this._sectionContext?.activeView.subscribe((view) => {
-			this._activeView = view;
-		});
-	}
-
-	disconnectedCallback(): void {
-		super.disconnectedCallback();
-		this._viewsSubscription?.unsubscribe();
-		this._activeViewSubscription?.unsubscribe();
+		if(this._sectionContext) {
+			this.observe(this._sectionContext?.activeViewPathname, (pathname) => {
+				this._activeViewPathname = pathname;
+			}, 'activeViewPathnameObserver');
+		}
 	}
 
 	render() {
@@ -113,7 +105,7 @@ export class UmbSectionViewsElement extends UmbLitElement {
 									<uui-tab
 										.label="${view.meta.label || view.name}"
 										href="${this._routerFolder}/view/${view.meta.pathname}"
-										?active="${this._activeView?.meta?.pathname.includes(view.meta.pathname)}">
+										?active="${this._activeViewPathname?.includes(view.meta.pathname)}">
 										<uui-icon slot="icon" name=${view.meta.icon}></uui-icon>
 										${view.meta.label || view.name}
 									</uui-tab>

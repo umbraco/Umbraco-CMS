@@ -3,7 +3,7 @@ import { BehaviorSubject } from "rxjs";
 
 // TODO: Should this handle array as well?
 function deepFreeze<T>(inObj: T): T {
-	if(typeof inObj === 'object') {
+	if(inObj != null && typeof inObj === 'object') {
 		Object.freeze(inObj);
 
 		Object.getOwnPropertyNames(inObj)?.forEach(function (prop) {
@@ -40,12 +40,12 @@ export function defaultMemoization(previousValue: any, currentValue: any): boole
 
 /**
  * @export
- * @class UniqueBehaviorSubject
+ * @class DeepState
  * @extends {BehaviorSubject<T>}
  * @description - A RxJS BehaviorSubject which deepFreezes the data to ensure its not manipulated from any implementations.
  * Additionally the Subject ensures the data is unique, not updating any Observes unless there is an actual change of the content.
  */
-export class UniqueBehaviorSubject<T> extends BehaviorSubject<T> {
+export class DeepState<T> extends BehaviorSubject<T> {
 	constructor(initialData: T) {
 		super(deepFreeze(initialData));
 	}

@@ -1,6 +1,6 @@
 import type { MemberTypeDetails } from '@umbraco-cms/models';
 import { UmbContextToken } from '@umbraco-cms/context-api';
-import { UniqueArrayBehaviorSubject } from '@umbraco-cms/observable-api';
+import { ArrayState } from '@umbraco-cms/observable-api';
 import { UmbStoreBase } from '@umbraco-cms/store';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 
@@ -17,7 +17,7 @@ export const UMB_MEMBER_TYPE_DETAIL_STORE_CONTEXT_TOKEN = new UmbContextToken<Um
 export class UmbMemberTypeDetailStore extends UmbStoreBase {
 
 
-	#data = new UniqueArrayBehaviorSubject<MemberTypeDetails>([], (x) => x.key);
+	#data = new ArrayState<MemberTypeDetails>([], (x) => x.key);
 
 
 	constructor(host: UmbControllerHostInterface) {

@@ -1,6 +1,6 @@
 import type { DocumentBlueprintDetails } from '@umbraco-cms/models';
 import { UmbContextToken } from '@umbraco-cms/context-api';
-import { createObservablePart, UniqueArrayBehaviorSubject } from '@umbraco-cms/observable-api';
+import { createObservablePart, ArrayState } from '@umbraco-cms/observable-api';
 import { UmbStoreBase } from '@umbraco-cms/store';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 
@@ -18,7 +18,7 @@ export class UmbDocumentBlueprintDetailStore extends UmbStoreBase {
 
 
 	// TODO: use the right type:
-	#data = new UniqueArrayBehaviorSubject<DocumentBlueprintDetails>([], (x) => x.key);
+	#data = new ArrayState<DocumentBlueprintDetails>([], (x) => x.key);
 
 
 	constructor(host: UmbControllerHostInterface) {
@@ -33,7 +33,7 @@ export class UmbDocumentBlueprintDetailStore extends UmbStoreBase {
 	 */
 	getByKey(key: string) {
 		// TODO: use backend cli when available.
-		fetch(`/umbraco/management/api/v1/document/document-blueprint/${key}`)
+		fetch(`/umbraco/management/api/v1/document-blueprint/details/${key}`)
 			.then((res) => res.json())
 			.then((data) => {
 				this.#data.append(data);

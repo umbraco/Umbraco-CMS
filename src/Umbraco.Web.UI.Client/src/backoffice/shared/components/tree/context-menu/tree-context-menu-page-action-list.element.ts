@@ -3,8 +3,8 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, state } from 'lit/decorators.js';
 import { map } from 'rxjs';
 import { UmbSectionContext, UMB_SECTION_CONTEXT_TOKEN } from '../../section/section.context';
-import type { Entity, ManifestTreeItemAction, ManifestTree } from '@umbraco-cms/models';
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-api';
+import type { Entity, ManifestTreeItemAction } from '@umbraco-cms/models';
 import { UmbLitElement } from '@umbraco-cms/element';
 
 @customElement('umb-tree-context-menu-page-action-list')
@@ -31,9 +31,6 @@ export class UmbTreeContextMenuPageActionListElement extends UmbLitElement {
 	private _actions?: Array<ManifestTreeItemAction>;
 
 	@state()
-	private _activeTree?: ManifestTree;
-
-	@state()
 	private _activeTreeItem?: Entity;
 
 	private _sectionContext?: UmbSectionContext;
@@ -43,7 +40,6 @@ export class UmbTreeContextMenuPageActionListElement extends UmbLitElement {
 
 		this.consumeContext(UMB_SECTION_CONTEXT_TOKEN, (sectionContext) => {
 			this._sectionContext = sectionContext;
-			this._observeActiveTree();
 			this._observeActiveTreeItem();
 			this._observeTreeItemActions();
 		});
@@ -60,14 +56,6 @@ export class UmbTreeContextMenuPageActionListElement extends UmbLitElement {
 				this._actions = actions || undefined;
 			}
 		);
-	}
-
-	private _observeActiveTree() {
-		if (!this._sectionContext) return;
-
-		this.observe(this._sectionContext.activeTree, (tree) => {
-			this._activeTree = tree || undefined;
-		});
 	}
 
 	private _observeActiveTreeItem() {
