@@ -18,7 +18,8 @@
             "in": "query",
             "schema": {
               "type": "integer",
-              "format": "int32"
+              "format": "int32",
+              "default": 0
             }
           },
           {
@@ -26,7 +27,8 @@
             "in": "query",
             "schema": {
               "type": "integer",
-              "format": "int32"
+              "format": "int32",
+              "default": 100
             }
           }
         ],
@@ -522,7 +524,8 @@
             "in": "query",
             "schema": {
               "type": "integer",
-              "format": "int32"
+              "format": "int32",
+              "default": 0
             }
           },
           {
@@ -530,7 +533,8 @@
             "in": "query",
             "schema": {
               "type": "integer",
-              "format": "int32"
+              "format": "int32",
+              "default": 100
             }
           }
         ],
@@ -5212,25 +5216,11 @@
             "type": "integer",
             "format": "int32"
           },
-          "translations": {
+          "translatedIsoCodes": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/DictionaryTranslationOverview"
-            },
-            "readOnly": true
-          }
-        },
-        "additionalProperties": false
-      },
-      "DictionaryTranslationOverview": {
-        "type": "object",
-        "properties": {
-          "displayName": {
-            "type": "string",
-            "nullable": true
-          },
-          "hasTranslation": {
-            "type": "boolean"
+              "type": "string"
+            }
           }
         },
         "additionalProperties": false
