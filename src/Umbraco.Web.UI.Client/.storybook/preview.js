@@ -1,5 +1,5 @@
-import '../src/core/css/custom-properties.css';
 import '@umbraco-ui/uui-css/dist/uui-css.css';
+import '../libs/css/custom-properties.css';
 
 import '@umbraco-ui/uui';
 import '@umbraco-ui/uui-modal';

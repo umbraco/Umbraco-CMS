@@ -1,5 +1,5 @@
 import '@umbraco-ui/uui-css/dist/uui-css.css';
-import './core/css/custom-properties.css';
+import '@umbraco-cms/css';
 
 // TODO: remove these imports when they are part of UUI
 import '@umbraco-ui/uui-color-swatch';
