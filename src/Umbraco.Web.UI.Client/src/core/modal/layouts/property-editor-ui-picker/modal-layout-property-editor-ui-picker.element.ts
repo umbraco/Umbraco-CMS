@@ -6,7 +6,7 @@ import { groupBy } from 'lodash-es';
 import type { UUIInputEvent } from '@umbraco-ui/uui';
 import type { UmbModalHandler } from '../../modal-handler';
 import type { ManifestPropertyEditorUI } from '@umbraco-cms/models';
-import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
+import { umbExtensionsRegistry } from '@umbraco-cms/extensions-api';
 import { UmbLitElement } from '@umbraco-cms/element';
 
 export interface UmbModalPropertyEditorUIPickerData {

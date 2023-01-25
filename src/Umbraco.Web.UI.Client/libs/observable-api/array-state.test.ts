@@ -33,12 +33,38 @@ describe('ArrayState', () => {
 
 	});
 
+	it('remove method, removes the one with the key', (done) => {
+
+		const expectedData = [initialData[0], initialData[2]];
+
+		subject.remove(['2']);
+		const observer = subject.asObservable();
+		observer.subscribe((value) => {
+			expect(JSON.stringify(value)).to.be.equal(JSON.stringify(expectedData));
+			done();
+		});
+
+	});
+
+	it('filter method, removes anything that is not true of the given predicate method', (done) => {
+
+		const expectedData = [initialData[0], initialData[2]];
+
+		subject.filter(x => x.key !== '2');
+		const observer = subject.asObservable();
+		observer.subscribe((value) => {
+			expect(JSON.stringify(value)).to.be.equal(JSON.stringify(expectedData));
+			done();
+		});
+
+	});
+
 	it('add new item via appendOne method.', (done) => {
 
 		const newItem = {key: '4', another: 'myValue4'};
 		subject.appendOne(newItem);
 
-		const expectedData = [...initialData, newItem]
+		const expectedData = [...initialData, newItem];
 
 		const observer = subject.asObservable();
 		observer.subscribe((value) => {
