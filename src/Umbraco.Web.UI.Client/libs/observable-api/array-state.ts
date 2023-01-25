@@ -1,5 +1,5 @@
 import { DeepState } from "./deep-state";
-import { appendToFrozenArray } from "./append-to-frozen-array.method";
+import { pushToUniqueArray } from "./push-to-unique-array.method";
 
 /**
  * @export
@@ -28,8 +28,8 @@ export class ArrayState<T> extends DeepState<T[]> {
 	 * 	{ key: 1, value: 'foo'},
 	 * 	{ key: 2, value: 'bar'}
 	 * ];
-	 * const mySubject = new ArrayState(data, (x) => x.key);
-	 * mySubject.remove([1]);
+	 * const myState = new ArrayState(data, (x) => x.key);
+	 * myState.remove([1]);
 	 */
 	remove(uniques: unknown[]) {
 		let next = this.getValue();
@@ -59,8 +59,8 @@ export class ArrayState<T> extends DeepState<T[]> {
 	 * 	{ key: 2, value: 'bar'},
 	 * 	{ key: 3, value: 'poo'}
 	 * ];
-	 * const mySubject = new ArrayState(data, (x) => x.key);
-	 * mySubject.filter((entry) => entry.key !== 1);
+	 * const myState = new ArrayState(data, (x) => x.key);
+	 * myState.filter((entry) => entry.key !== 1);
 	 *
 	 * Result:
 	 *  [
@@ -75,8 +75,8 @@ export class ArrayState<T> extends DeepState<T[]> {
 	}
 
 	/**
-	 * @method append
-	 * @param {Partial<T>} partialData - A object containing some of the data for this Subject.
+	 * @method appendOne
+	 * @param {T} entry - new data to be added in this Subject.
 	 * @returns ArrayState<T>
 	 * @description - Append some new data to this Subject.
 	 * @example <caption>Example append some data.</caption>
@@ -84,11 +84,17 @@ export class ArrayState<T> extends DeepState<T[]> {
 	 * 	{ key: 1, value: 'foo'},
 	 * 	{ key: 2, value: 'bar'}
 	 * ];
-	 * const mySubject = new ArrayState(data);
-	 * mySubject.append({ key: 1, value: 'replaced-foo'});
+	 * const myState = new ArrayState(data);
+	 * myState.append({ key: 1, value: 'replaced-foo'});
 	 */
 	appendOne(entry: T) {
-		this.next(appendToFrozenArray(this.getValue(), entry, this._getUnique))
+		const next = [...this.getValue()];
+		if(this._getUnique) {
+			pushToUniqueArray(next, entry, this._getUnique);
+		} else {
+			next.push(entry);
+		}
+		this.next(next);
 		return this;
 	}
 
@@ -102,21 +108,22 @@ export class ArrayState<T> extends DeepState<T[]> {
 	 * 	{ key: 1, value: 'foo'},
 	 * 	{ key: 2, value: 'bar'}
 	 * ];
-	 * const mySubject = new ArrayState(data);
-	 * mySubject.append([
+	 * const myState = new ArrayState(data);
+	 * myState.append([
 	 * 	{ key: 1, value: 'replaced-foo'},
 	 * 	{ key: 3, value: 'another-bla'}
 	 * ]);
 	 */
 	append(entries: T[]) {
-		// TODO: stop calling appendOne for each but make sure to handle this in one.
-		entries.forEach(x => this.appendOne(x))
-
-		/*
-		const unFrozenDataSet = [...this.getValue()];
-
-		this.next(unFrozenDataSet);
-		*/
+		if(this._getUnique) {
+			const next = [...this.getValue()];
+			entries.forEach(entry => {
+				pushToUniqueArray(next, entry, this._getUnique!);
+			});
+			this.next(next);
+		} else {
+			this.next([...this.getValue(), ...entries]);
+		}
 		return this;
 	}
 }
