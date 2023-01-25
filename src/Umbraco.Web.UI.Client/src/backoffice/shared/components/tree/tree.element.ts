@@ -40,7 +40,12 @@ export class UmbTreeElement extends UmbLitElement {
 		this._treeContext?.setSelectable(newVal);
 
 		if (newVal) {
-			this._observeSelection();
+			requestAnimationFrame(() => {
+				//TODO: This is a hack! Remove requestAnimationFrame when the element gets fixed
+				//TODO: For now this _observeSelection is called before the _treeContext is initialized which results in the observer not being setup
+				//TODO: and selections not updating
+				this._observeSelection();
+			});
 		}
 	}
 
