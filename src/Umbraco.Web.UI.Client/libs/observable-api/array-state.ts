@@ -21,7 +21,7 @@ export class ArrayState<T> extends DeepState<T[]> {
 	/**
 	 * @method append
 	 * @param {unknown} unique - The unique value to remove.
-	 * @returns ArrayState<T>
+	 * @return {ArrayState<T>} Reference to it self.
 	 * @description - Remove some new data of this Subject.
 	 * @example <caption>Example remove entry with key '1'</caption>
 	 * const data = [
@@ -51,7 +51,7 @@ export class ArrayState<T> extends DeepState<T[]> {
 	/**
 	 * @method filter
 	 * @param {unknown} filterMethod - The unique value to remove.
-	 * @returns ArrayState<T>
+	 * @return {ArrayState<T>} Reference to it self.
 	 * @description - Remove some new data of this Subject.
 	 * @example <caption>Example remove entry with key '1'</caption>
 	 * const data = [
@@ -77,7 +77,7 @@ export class ArrayState<T> extends DeepState<T[]> {
 	/**
 	 * @method appendOne
 	 * @param {T} entry - new data to be added in this Subject.
-	 * @returns ArrayState<T>
+	 * @return {ArrayState<T>} Reference to it self.
 	 * @description - Append some new data to this Subject.
 	 * @example <caption>Example append some data.</caption>
 	 * const data = [
@@ -101,7 +101,7 @@ export class ArrayState<T> extends DeepState<T[]> {
 	/**
 	 * @method append
 	 * @param {T[]} entries - A array of new data to be added in this Subject.
-	 * @returns ArrayState<T>
+	 * @return {ArrayState<T>} Reference to it self.
 	 * @description - Append some new data to this Subject, if it compares to existing data it will replace it.
 	 * @example <caption>Example append some data.</caption>
 	 * const data = [
