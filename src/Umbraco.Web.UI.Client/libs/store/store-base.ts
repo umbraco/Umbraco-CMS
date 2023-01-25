@@ -1,11 +1,8 @@
-import { UmbContextProviderController } from "../context-api/provide/context-provider.controller";
-import { UmbControllerHostInterface } from "../controller/controller-host.mixin";
+import { UmbContextProviderController } from '@umbraco-cms/context-api';
+import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 
 export class UmbStoreBase {
-
-
-	constructor (protected _host: UmbControllerHostInterface, public readonly storeAlias: string) {
+	constructor(protected _host: UmbControllerHostInterface, public readonly storeAlias: string) {
 		new UmbContextProviderController(_host, storeAlias, this);
 	}
-
 }

@@ -1,29 +1,23 @@
-import { expect, fixture, html } from '@open-wc/testing';
-import { ManifestDashboard, umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
-import { defaultA11yConfig } from '@umbraco-cms/test-utils';
 import { customElement } from 'lit/decorators.js';
+import { expect, fixture, html } from '@open-wc/testing';
 import { InitializedExtension, UmbExtensionSlotElement } from './extension-slot.element';
+import { umbExtensionsRegistry } from '@umbraco-cms/extensions-api';
+import { ManifestDashboard } from '@umbraco-cms/extensions-registry';
+import { defaultA11yConfig } from '@umbraco-cms/test-utils';
 
 @customElement('test-extension-slot-manifest-element')
-class MyExtensionSlotManifestElement extends HTMLElement {
-
-}
+class MyExtensionSlotManifestElement extends HTMLElement {}
 
 function sleep(ms: number) {
-  return new Promise(resolve => setTimeout(resolve, ms));
+	return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
 describe('UmbExtensionSlotElement', () => {
-
-
-  let element: UmbExtensionSlotElement;
+	let element: UmbExtensionSlotElement;
 
 	describe('general', () => {
-
 		beforeEach(async () => {
-			element = await fixture(
-				html`<umb-extension-slot></umb-extension-slot>`
-			);
+			element = await fixture(html`<umb-extension-slot></umb-extension-slot>`);
 		});
 
 		it('is defined with its own instance', () => {
@@ -49,12 +43,8 @@ describe('UmbExtensionSlotElement', () => {
 		});
 	});
 
-
-
 	describe('rendering', () => {
-
 		beforeEach(async () => {
-
 			umbExtensionsRegistry.register({
 				type: 'dashboard',
 				alias: 'unit-test-ext-slot-element-manifest',
@@ -62,10 +52,9 @@ describe('UmbExtensionSlotElement', () => {
 				elementName: 'test-extension-slot-manifest-element',
 				meta: {
 					sections: ['test'],
-					pathname: 'test/test'
-				}
+					pathname: 'test/test',
+				},
 			});
-
 		});
 
 		afterEach(async () => {
@@ -73,32 +62,30 @@ describe('UmbExtensionSlotElement', () => {
 		});
 
 		it('renders a manifest element', async () => {
-
 			element = await fixture(
-				html`<umb-extension-slot type='dashboard' .filter=${(x: ManifestDashboard) => x.alias === 'unit-test-ext-slot-element-manifest'}></umb-extension-slot>`
+				html`<umb-extension-slot
+					type="dashboard"
+					.filter=${(x: ManifestDashboard) => x.alias === 'unit-test-ext-slot-element-manifest'}></umb-extension-slot>`
 			);
 
-      await sleep(0);
+			await sleep(0);
 
 			expect(element.shadowRoot!.firstElementChild).to.be.instanceOf(MyExtensionSlotManifestElement);
 		});
 
 		it('use the render method', async () => {
-
 			element = await fixture(
-				html`
-					<umb-extension-slot
-						type='dashboard'
-						.filter=${(x: ManifestDashboard) => x.alias === 'unit-test-ext-slot-element-manifest'}
-						.renderMethod=${(manifest: InitializedExtension) => html`<bla>${manifest.component}</bla>`}>
-						</umb-extension-slot>`
+				html` <umb-extension-slot
+					type="dashboard"
+					.filter=${(x: ManifestDashboard) => x.alias === 'unit-test-ext-slot-element-manifest'}
+					.renderMethod=${(manifest: InitializedExtension) => html`<bla>${manifest.component}</bla>`}>
+				</umb-extension-slot>`
 			);
 
-      await sleep(0);
+			await sleep(0);
 
 			expect(element.shadowRoot!.firstElementChild?.nodeName).to.be.equal('BLA');
 			expect(element.shadowRoot!.firstElementChild?.firstElementChild).to.be.instanceOf(MyExtensionSlotManifestElement);
 		});
 	});
-
 });

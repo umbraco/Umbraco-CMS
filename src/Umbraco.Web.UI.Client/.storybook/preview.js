@@ -1,5 +1,5 @@
-import '../src/core/css/custom-properties.css';
 import '@umbraco-ui/uui-css/dist/uui-css.css';
+import '../libs/css/custom-properties.css';
 
 import '@umbraco-ui/uui';
 import '@umbraco-ui/uui-modal';
@@ -23,7 +23,7 @@ import { UmbModalService } from '../src/core/modal';
 
 // TODO: Fix storybook manifest registrations.
 
-import { umbExtensionsRegistry } from '../libs/extensions-registry';
+import { umbExtensionsRegistry } from '../libs/extensions-api';
 
 import '../src/backoffice/shared/components/backoffice-frame/backoffice-notification-container.element';
 import '../libs/element/context-provider.element';
