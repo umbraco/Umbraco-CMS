@@ -4,6 +4,15 @@ import { EntityTreeItem, PagedEntityTreeItem, Template } from '@umbraco-cms/back
 
 type TemplateDBItem = Template & EntityTreeItem;
 
+const createTemplate = (dbItem: TemplateDBItem): Template => {
+	return {
+		key: dbItem.key,
+		name: dbItem.name,
+		alias: dbItem.alias,
+		content: dbItem.content,
+	};
+};
+
 export const data: Array<TemplateDBItem> = [
 	{
 		key: '2bf464b6-3aca-4388-b043-4eb439cc2643',
@@ -38,6 +47,11 @@ export const data: Array<TemplateDBItem> = [
 class UmbTemplateData extends UmbEntityData<TemplateDBItem> {
 	constructor() {
 		super(data);
+	}
+
+	getByKey(key: string): Template | undefined {
+		const item = this.data.find((item) => item.key === key);
+		return item ? createTemplate(item) : undefined;
 	}
 
 	getTreeRoot(): PagedEntityTreeItem {

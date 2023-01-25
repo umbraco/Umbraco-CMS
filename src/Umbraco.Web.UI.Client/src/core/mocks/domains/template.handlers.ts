@@ -24,4 +24,12 @@ export const handlers = [
 
 		return res(ctx.status(200), ctx.json(items));
 	}),
+
+	rest.get(umbracoPath('/template/:key'), (req, res, ctx) => {
+		const key = req.params.key as string;
+		if (!key) return;
+
+		const response = umbTemplateData.getByKey(key);
+		return res(ctx.status(200), ctx.json(response));
+	}),
 ];
