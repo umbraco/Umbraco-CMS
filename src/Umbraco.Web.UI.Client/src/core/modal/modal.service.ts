@@ -5,6 +5,7 @@ import './layouts/property-editor-ui-picker/modal-layout-property-editor-ui-pick
 import './layouts/modal-layout-current-user.element';
 
 import { UUIModalSidebarSize } from '@umbraco-ui/uui-modal-sidebar';
+import { BehaviorSubject } from 'rxjs';
 import { UmbModalChangePasswordData } from './layouts/modal-layout-change-password.element';
 import type { UmbModalIconPickerData } from './layouts/icon-picker/modal-layout-icon-picker.element';
 
@@ -15,7 +16,6 @@ import type { UmbModalContentPickerData } from './layouts/content-picker/modal-l
 import type { UmbModalPropertyEditorUIPickerData } from './layouts/property-editor-ui-picker/modal-layout-property-editor-ui-picker.element';
 import { UmbModalHandler } from './modal-handler';
 import { UmbContextToken } from '@umbraco-cms/context-api';
-import { BehaviorSubject } from 'rxjs';
 
 export type UmbModalType = 'dialog' | 'sidebar';
 
