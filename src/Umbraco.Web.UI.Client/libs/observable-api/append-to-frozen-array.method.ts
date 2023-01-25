@@ -10,11 +10,6 @@
  * const newDataSet = appendToFrozenArray(mySubject.getValue(), entry, x => x.key === key);
  * mySubject.next(newDataSet);
  */
-
-
-
-
-
 export function appendToFrozenArray<T>(data: T[], entry: T, getUniqueMethod?: (entry: T) => unknown): T[] {
 	const unFrozenDataSet = [...data];
 	if (getUniqueMethod) {
