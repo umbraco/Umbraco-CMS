@@ -5,7 +5,7 @@ import type { MediaDetails } from '@umbraco-cms/models';
 
 export const data: Array<MediaDetails> = [
 	{
-		name: 'Media 1',
+		name: 'Flipped Car',
 		type: 'media',
 		icon: 'picture',
 		hasChildren: false,
@@ -31,7 +31,7 @@ export const data: Array<MediaDetails> = [
 		variants: [],
 	},
 	{
-		name: 'Media 2',
+		name: 'Umbracoffee',
 		type: 'media',
 		icon: 'picture',
 		hasChildren: false,
@@ -57,7 +57,7 @@ export const data: Array<MediaDetails> = [
 		variants: [],
 	},
 	{
-		name: 'Media Folder 1',
+		name: 'People',
 		type: 'media',
 		icon: 'folder',
 		hasChildren: true,
@@ -71,13 +71,105 @@ export const data: Array<MediaDetails> = [
 		variants: [],
 	},
 	{
-		name: 'Media 3',
+		name: 'Products',
+		type: 'media',
+		icon: 'folder',
+		hasChildren: true,
+		key: '69461027-8867-45bf-a93b-5224dabfb177',
+		isContainer: true,
+		parentKey: null,
+		noAccess: false,
+		isTrashed: false,
+		properties: [],
+		data: [],
+		variants: [],
+	},
+	{
+		name: 'John Smith',
 		type: 'media',
 		icon: 'picture',
 		hasChildren: false,
 		key: '69431027-8867-45s7-a93b-7uibdabfb177',
 		isContainer: false,
 		parentKey: '69461027-8867-45bf-a93b-72bbdabfb177',
+		noAccess: false,
+		isTrashed: false,
+		properties: [
+			{
+				alias: 'myMediaDescription',
+				label: 'Description',
+				description: 'Textarea property',
+				dataTypeKey: 'dt-textArea',
+			},
+		],
+		data: [
+			{
+				alias: 'myMediaDescription',
+				value: 'Every day, a rabbit in a military costume greets me at the front door',
+			},
+		],
+		variants: [],
+	},
+	{
+		name: 'Jane Doe',
+		type: 'media',
+		icon: 'picture',
+		hasChildren: false,
+		key: '69431027-8867-45s7-a93b-7uibdabf2147',
+		isContainer: false,
+		parentKey: '69461027-8867-45bf-a93b-72bbdabfb177',
+		noAccess: false,
+		isTrashed: false,
+		properties: [
+			{
+				alias: 'myMediaDescription',
+				label: 'Description',
+				description: 'Textarea property',
+				dataTypeKey: 'dt-textArea',
+			},
+		],
+		data: [
+			{
+				alias: 'myMediaDescription',
+				value: 'Every day, a rabbit in a military costume greets me at the front door',
+			},
+		],
+		variants: [],
+	},
+	{
+		name: 'A very nice hat',
+		type: 'media',
+		icon: 'picture',
+		hasChildren: false,
+		key: '694hdj27-8867-45s7-a93b-7uibdabf2147',
+		isContainer: false,
+		parentKey: '69461027-8867-45bf-a93b-5224dabfb177',
+		noAccess: false,
+		isTrashed: false,
+		properties: [
+			{
+				alias: 'myMediaDescription',
+				label: 'Description',
+				description: 'Textarea property',
+				dataTypeKey: 'dt-textArea',
+			},
+		],
+		data: [
+			{
+				alias: 'myMediaDescription',
+				value: 'Every day, a rabbit in a military costume greets me at the front door',
+			},
+		],
+		variants: [],
+	},
+	{
+		name: 'Fancy old chair',
+		type: 'media',
+		icon: 'picture',
+		hasChildren: false,
+		key: '694hdj27-1237-45s7-a93b-7uibdabfas47',
+		isContainer: false,
+		parentKey: '69461027-8867-45bf-a93b-5224dabfb177',
 		noAccess: false,
 		isTrashed: false,
 		properties: [
