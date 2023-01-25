@@ -55,53 +55,27 @@ internal class LanguageService : RepositoryService, ILanguageService
 
     /// <inheritdoc />
     public async Task<Attempt<ILanguage, LanguageOperationStatus>> UpdateAsync(ILanguage language, int userId = Constants.Security.SuperUserId)
-    {
-        if (HasValidIsoCode(language) == false)
-        {
-            return Attempt.FailWithStatus(LanguageOperationStatus.InvalidIsoCode, language);
-        }
-
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope())
-        {
-            // write-lock languages to guard against race conds when dealing with default language
-            scope.WriteLock(Constants.Locks.Languages);
-
-            ILanguage? currentLanguage = _languageRepository.Get(language.Id);
-            if (currentLanguage == null)
+        => await SaveAsync(
+            language,
+            () =>
             {
-                return Attempt.FailWithStatus(LanguageOperationStatus.NotFound, language);
-            }
+                ILanguage? currentLanguage = _languageRepository.Get(language.Id);
+                if (currentLanguage == null)
+                {
+                    return LanguageOperationStatus.NotFound;
+                }
 
-            // ensure we don't un-default the default language
-            if (currentLanguage.IsDefault && !language.IsDefault)
-            {
-                return Attempt.FailWithStatus(LanguageOperationStatus.MissingDefault, language);
-            }
+                // ensure we don't un-default the default language
+                if (currentLanguage.IsDefault && !language.IsDefault)
+                {
+                    return LanguageOperationStatus.MissingDefault;
+                }
 
-            // validate the fallback language - within write-lock (important!)
-            if (HasInvalidFallbackLanguage(language))
-            {
-                return Attempt.FailWithStatus(LanguageOperationStatus.InvalidFallback, language);
-            }
-
-            EventMessages eventMessages = EventMessagesFactory.Get();
-            var savingNotification = new LanguageSavingNotification(language, eventMessages);
-            if (await scope.Notifications.PublishCancelableAsync(savingNotification))
-            {
-                scope.Complete();
-                return Attempt.FailWithStatus(LanguageOperationStatus.CancelledByNotification, language);
-            }
-
-            _languageRepository.Save(language);
-            scope.Notifications.Publish(
-                new LanguageSavedNotification(language, eventMessages).WithStateFrom(savingNotification));
-
-            Audit(AuditType.Save, "Update Language", userId, language.Id, UmbracoObjectTypes.Language.GetName());
-
-            scope.Complete();
-            return await Task.FromResult(Attempt.SucceedWithStatus(LanguageOperationStatus.Success, language));
-        }
-    }
+                return LanguageOperationStatus.Success;
+            },
+            AuditType.Save,
+            "Update Language",
+            userId);
 
     /// <inheritdoc />
     public async Task<Attempt<ILanguage, LanguageOperationStatus>> CreateAsync(ILanguage language, int userId = Constants.Security.SuperUserId)
@@ -111,47 +85,28 @@ internal class LanguageService : RepositoryService, ILanguageService
             return Attempt.FailWithStatus(LanguageOperationStatus.InvalidId, language);
         }
 
-        if (HasValidIsoCode(language) == false)
-        {
-            return Attempt.FailWithStatus(LanguageOperationStatus.InvalidIsoCode, language);
-        }
-
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope())
-        {
-            // write-lock languages to guard against race conds when dealing with default language
-            scope.WriteLock(Constants.Locks.Languages);
-
-            // ensure no duplicates by ISO code
-            if (_languageRepository.GetByIsoCode(language.IsoCode) != null)
+        return await SaveAsync(
+            language,
+            () =>
             {
-                return Attempt.FailWithStatus(LanguageOperationStatus.DuplicateIsoCode, language);
-            }
+                // ensure no duplicates by ISO code
+                if (_languageRepository.GetByIsoCode(language.IsoCode) != null)
+                {
+                    return LanguageOperationStatus.DuplicateIsoCode;
+                }
 
-            // ensure valid fallback language (note: new languages cannot create cycles, no need to check for that)
-            if (language.FallbackLanguageId.HasValue && _languageRepository.Exists(language.FallbackLanguageId.Value) == false)
-            {
-                return Attempt.FailWithStatus(LanguageOperationStatus.InvalidFallback, language);
-            }
+                // ensure valid fallback language (note: new languages cannot create cycles, no need to check for that)
+                if (language.FallbackLanguageId.HasValue &&
+                    _languageRepository.Exists(language.FallbackLanguageId.Value) == false)
+                {
+                    return LanguageOperationStatus.InvalidFallback;
+                }
 
-            EventMessages eventMessages = EventMessagesFactory.Get();
-            var savingNotification = new LanguageSavingNotification(language, eventMessages);
-            if (await scope.Notifications.PublishCancelableAsync(savingNotification))
-            {
-                scope.Complete();
-                return Attempt.FailWithStatus(LanguageOperationStatus.CancelledByNotification, language);
-            }
-
-            // explicitly ensure a new language is created in case of model reuse
-            language.Id = 0;
-            _languageRepository.Save(language);
-            scope.Notifications.Publish(
-                new LanguageSavedNotification(language, eventMessages).WithStateFrom(savingNotification));
-
-            Audit(AuditType.New, "Create Language", userId, language.Id, UmbracoObjectTypes.Language.GetName());
-
-            scope.Complete();
-            return await Task.FromResult(Attempt.SucceedWithStatus(LanguageOperationStatus.Success, language));
-        }
+                return LanguageOperationStatus.Success;
+            },
+            AuditType.New,
+            "Create Language",
+            userId);
     }
 
     /// <inheritdoc />
@@ -190,6 +145,54 @@ internal class LanguageService : RepositoryService, ILanguageService
             Audit(AuditType.Delete, "Delete Language", userId, language.Id, UmbracoObjectTypes.Language.GetName());
             scope.Complete();
             return await Task.FromResult(Attempt.SucceedWithStatus<ILanguage?, LanguageOperationStatus>(LanguageOperationStatus.Success, language));
+        }
+    }
+
+    private async Task<Attempt<ILanguage, LanguageOperationStatus>> SaveAsync(
+        ILanguage language,
+        Func<LanguageOperationStatus> operationValidation,
+        AuditType auditType,
+        string auditMessage,
+        int userId)
+    {
+        if (HasValidIsoCode(language) == false)
+        {
+            return Attempt.FailWithStatus(LanguageOperationStatus.InvalidIsoCode, language);
+        }
+
+        using (ICoreScope scope = ScopeProvider.CreateCoreScope())
+        {
+            // write-lock languages to guard against race conds when dealing with default language
+            scope.WriteLock(Constants.Locks.Languages);
+
+            LanguageOperationStatus status = operationValidation();
+            if (status != LanguageOperationStatus.Success)
+            {
+                return Attempt.FailWithStatus(status, language);
+            }
+
+            // validate the fallback language - within write-lock (important!)
+            if (HasInvalidFallbackLanguage(language))
+            {
+                return Attempt.FailWithStatus(LanguageOperationStatus.InvalidFallback, language);
+            }
+
+            EventMessages eventMessages = EventMessagesFactory.Get();
+            var savingNotification = new LanguageSavingNotification(language, eventMessages);
+            if (await scope.Notifications.PublishCancelableAsync(savingNotification))
+            {
+                scope.Complete();
+                return Attempt.FailWithStatus(LanguageOperationStatus.CancelledByNotification, language);
+            }
+
+            _languageRepository.Save(language);
+            scope.Notifications.Publish(
+                new LanguageSavedNotification(language, eventMessages).WithStateFrom(savingNotification));
+
+            Audit(auditType, auditMessage, userId, language.Id, UmbracoObjectTypes.Language.GetName());
+
+            scope.Complete();
+            return await Task.FromResult(Attempt.SucceedWithStatus(LanguageOperationStatus.Success, language));
         }
     }
 
@@ -257,7 +260,7 @@ internal class LanguageService : RepositoryService, ILanguageService
         try
         {
             var culture = CultureInfo.GetCultureInfo(language.IsoCode);
-            return culture.Name.Equals(language.IsoCode, StringComparison.OrdinalIgnoreCase);
+            return culture.Name == language.IsoCode;
         }
         catch (CultureNotFoundException)
         {

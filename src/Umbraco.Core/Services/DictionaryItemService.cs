@@ -132,92 +132,40 @@ internal class DictionaryItemService : RepositoryService, IDictionaryItemService
             return Attempt.FailWithStatus(DictionaryItemOperationStatus.InvalidId, dictionaryItem);
         }
 
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope())
-        {
-            if (_dictionaryRepository.Get(dictionaryItem.Key) != null)
+        return await SaveAsync(
+            dictionaryItem,
+            () =>
             {
-                return Attempt.FailWithStatus(DictionaryItemOperationStatus.DuplicateKey, dictionaryItem);
-            }
+                if (_dictionaryRepository.Get(dictionaryItem.Key) != null)
+                {
+                    return DictionaryItemOperationStatus.DuplicateKey;
+                }
 
-            // validate the parent
-            if (HasValidParent(dictionaryItem) == false)
-            {
-                return Attempt.FailWithStatus(DictionaryItemOperationStatus.ParentNotFound, dictionaryItem);
-            }
-
-            // do we have an item key collision (item keys must be unique)?
-            if (HasItemKeyCollision(dictionaryItem))
-            {
-                return Attempt.FailWithStatus(DictionaryItemOperationStatus.DuplicateItemKey, dictionaryItem);
-            }
-
-            // ensure valid languages for all translations
-            ILanguage[] allLanguages = (await _languageService.GetAllAsync()).ToArray();
-            RemoveInvalidTranslations(dictionaryItem, allLanguages);
-
-            EventMessages eventMessages = EventMessagesFactory.Get();
-            var savingNotification = new DictionaryItemSavingNotification(dictionaryItem, eventMessages);
-
-            if (await scope.Notifications.PublishCancelableAsync(savingNotification))
-            {
-                scope.Complete();
-                return Attempt.FailWithStatus(DictionaryItemOperationStatus.CancelledByNotification, dictionaryItem);
-            }
-
-            _dictionaryRepository.Save(dictionaryItem);
-
-            // ensure the lazy Language callback is assigned
-            EnsureDictionaryItemLanguageCallback(dictionaryItem);
-
-            scope.Notifications.Publish(new DictionaryItemSavedNotification(dictionaryItem, eventMessages).WithStateFrom(savingNotification));
-
-            Audit(AuditType.New, "Create DictionaryItem", userId, dictionaryItem.Id, "DictionaryItem");
-            scope.Complete();
-
-            return await Task.FromResult(Attempt.SucceedWithStatus(DictionaryItemOperationStatus.Success, dictionaryItem));
-        }
+                return DictionaryItemOperationStatus.Success;
+            },
+            AuditType.New,
+            "Create DictionaryItem",
+            userId);
     }
 
     /// <inheritdoc />
     public async Task<Attempt<IDictionaryItem, DictionaryItemOperationStatus>> UpdateAsync(
-        IDictionaryItem dictionaryItem,
-        int userId = Constants.Security.SuperUserId)
-    {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope())
-        {
-            // is there an item to update?
-            if (_dictionaryRepository.Exists(dictionaryItem.Id) == false)
+        IDictionaryItem dictionaryItem, int userId = Constants.Security.SuperUserId)
+        => await SaveAsync(
+            dictionaryItem,
+            () =>
             {
-                return Attempt.FailWithStatus(DictionaryItemOperationStatus.ItemNotFound, dictionaryItem);
-            }
+                // is there an item to update?
+                if (_dictionaryRepository.Exists(dictionaryItem.Id) == false)
+                {
+                    return DictionaryItemOperationStatus.ItemNotFound;
+                }
 
-            // do we have an item key collision (item keys must be unique)?
-            if (HasItemKeyCollision(dictionaryItem))
-            {
-                return Attempt.FailWithStatus(DictionaryItemOperationStatus.DuplicateItemKey, dictionaryItem);
-            }
-
-            EventMessages eventMessages = EventMessagesFactory.Get();
-            var savingNotification = new DictionaryItemSavingNotification(dictionaryItem, eventMessages);
-            if (await scope.Notifications.PublishCancelableAsync(savingNotification))
-            {
-                scope.Complete();
-                return Attempt.FailWithStatus(DictionaryItemOperationStatus.CancelledByNotification, dictionaryItem);
-            }
-
-            _dictionaryRepository.Save(dictionaryItem);
-
-            // ensure the lazy Language callback is assigned
-            EnsureDictionaryItemLanguageCallback(dictionaryItem);
-            scope.Notifications.Publish(
-                new DictionaryItemSavedNotification(dictionaryItem, eventMessages).WithStateFrom(savingNotification));
-
-            Audit(AuditType.Save, "Update DictionaryItem", userId, dictionaryItem.Id, "DictionaryItem");
-            scope.Complete();
-
-            return await Task.FromResult(Attempt.SucceedWithStatus(DictionaryItemOperationStatus.Success, dictionaryItem));
-        }
-    }
+                return DictionaryItemOperationStatus.Success;
+            },
+            AuditType.Save,
+            "Update DictionaryItem",
+            userId);
 
     /// <inheritdoc />
     public async Task<Attempt<IDictionaryItem?, DictionaryItemOperationStatus>> DeleteAsync(Guid id, int userId = Constants.Security.SuperUserId)
@@ -243,10 +191,63 @@ internal class DictionaryItemService : RepositoryService, IDictionaryItemService
                 new DictionaryItemDeletedNotification(dictionaryItem, eventMessages)
                     .WithStateFrom(deletingNotification));
 
-            Audit(AuditType.Delete, "Delete DictionaryItem", userId, dictionaryItem.Id, "DictionaryItem");
+            Audit(AuditType.Delete, "Delete DictionaryItem", userId, dictionaryItem.Id, nameof(DictionaryItem));
 
             scope.Complete();
             return await Task.FromResult(Attempt.SucceedWithStatus<IDictionaryItem?, DictionaryItemOperationStatus>(DictionaryItemOperationStatus.Success, dictionaryItem));
+        }
+    }
+
+    private async Task<Attempt<IDictionaryItem, DictionaryItemOperationStatus>> SaveAsync(
+        IDictionaryItem dictionaryItem,
+        Func<DictionaryItemOperationStatus> operationValidation,
+        AuditType auditType,
+        string auditMessage,
+        int userId)
+    {
+        using (ICoreScope scope = ScopeProvider.CreateCoreScope())
+        {
+            DictionaryItemOperationStatus status = operationValidation();
+            if (status != DictionaryItemOperationStatus.Success)
+            {
+                return Attempt.FailWithStatus(status, dictionaryItem);
+            }
+
+            // validate the parent
+            if (HasValidParent(dictionaryItem) == false)
+            {
+                return Attempt.FailWithStatus(DictionaryItemOperationStatus.ParentNotFound, dictionaryItem);
+            }
+
+            // do we have an item key collision (item keys must be unique)?
+            if (HasItemKeyCollision(dictionaryItem))
+            {
+                return Attempt.FailWithStatus(DictionaryItemOperationStatus.DuplicateItemKey, dictionaryItem);
+            }
+
+            // ensure valid languages for all translations
+            ILanguage[] allLanguages = (await _languageService.GetAllAsync()).ToArray();
+            RemoveInvalidTranslations(dictionaryItem, allLanguages);
+
+            EventMessages eventMessages = EventMessagesFactory.Get();
+            var savingNotification = new DictionaryItemSavingNotification(dictionaryItem, eventMessages);
+            if (await scope.Notifications.PublishCancelableAsync(savingNotification))
+            {
+                scope.Complete();
+                return Attempt.FailWithStatus(DictionaryItemOperationStatus.CancelledByNotification, dictionaryItem);
+            }
+
+            _dictionaryRepository.Save(dictionaryItem);
+
+            // ensure the lazy Language callback is assigned
+            EnsureDictionaryItemLanguageCallback(dictionaryItem);
+            scope.Notifications.Publish(
+                new DictionaryItemSavedNotification(dictionaryItem, eventMessages).WithStateFrom(savingNotification));
+
+            Audit(auditType, auditMessage, userId, dictionaryItem.Id, nameof(DictionaryItem));
+            scope.Complete();
+
+            return await Task.FromResult(Attempt.SucceedWithStatus(DictionaryItemOperationStatus.Success, dictionaryItem));
         }
     }
 

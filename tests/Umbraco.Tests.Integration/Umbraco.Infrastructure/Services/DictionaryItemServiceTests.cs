@@ -435,6 +435,21 @@ public class DictionaryItemServiceTests : UmbracoIntegrationTest
         Assert.Null(item);
     }
 
+    [Test]
+    public async Task Cannot_Create_DictionaryItem_With_Reused_DictionaryItem_Model()
+    {
+        var childItem = await DictionaryItemService.GetAsync("Child");
+        Assert.NotNull(childItem);
+
+        childItem.ItemKey = "Something";
+        childItem.Translations.First().Value = "Something Edited";
+        childItem.Translations.Last().Value = "Something Also Edited";
+
+        var result = await DictionaryItemService.CreateAsync(childItem);
+        Assert.IsFalse(result.Success);
+        Assert.AreEqual(DictionaryItemOperationStatus.InvalidId, result.Status);
+    }
+
     private async Task CreateTestData()
     {
         var languageDaDk = new LanguageBuilder()
