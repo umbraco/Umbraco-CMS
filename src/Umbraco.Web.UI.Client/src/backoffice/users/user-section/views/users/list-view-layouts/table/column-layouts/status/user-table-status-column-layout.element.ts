@@ -1,6 +1,6 @@
 import { html, LitElement, nothing } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
-import { getTagLookAndColor } from '@umbraco-cms/utils';
+import { getLookAndColorFromUserStatus } from '@umbraco-cms/utils';
 
 @customElement('umb-user-table-status-column-layout')
 export class UmbUserTableStatusColumnLayoutElement extends LitElement {
@@ -11,8 +11,8 @@ export class UmbUserTableStatusColumnLayoutElement extends LitElement {
 		return html`${this.value.status && this.value.status !== 'enabled'
 			? html`<uui-tag
 					size="s"
-					look="${getTagLookAndColor(this.value.status).look}"
-					color="${getTagLookAndColor(this.value.status).color}">
+					look="${getLookAndColorFromUserStatus(this.value.status).look}"
+					color="${getLookAndColorFromUserStatus(this.value.status).color}">
 					${this.value.status}
 			  </uui-tag>`
 			: nothing}`;
