@@ -21,6 +21,7 @@
 		"baseUrl": ".",
 		"paths": {
 			"@umbraco-cms/css": ["libs/css/custom-properties.css"],
+			"@umbraco-cms/modal": ["src/core/modal"],
 			"@umbraco-cms/models": ["libs/models"],
 			"@umbraco-cms/backend-api": ["libs/backend-api"],
 			"@umbraco-cms/context-api": ["libs/context-api"],
