@@ -11,5 +11,11 @@ export default defineConfig({
 		},
 		sourcemap: true,
 	},
+	server: {
+		fs: {
+			// Allow serving files from the global node_modules folder
+			allow: ['.', '../../node_modules'],
+		},
+	},
 	plugins: [viteTSConfigPaths()],
 });
