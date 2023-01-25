@@ -1,5 +1,5 @@
 import { DeepState } from "./deep-state";
-import { appendToFrozenArray } from "./append-to-frozen-array.method";
+import { pushToUniqueArray } from "./push-to-unique-array.method";
 
 /**
  * @export
@@ -21,63 +21,109 @@ export class ArrayState<T> extends DeepState<T[]> {
 	/**
 	 * @method append
 	 * @param {unknown} unique - The unique value to remove.
+	 * @return {ArrayState<T>} Reference to it self.
 	 * @description - Remove some new data of this Subject.
 	 * @example <caption>Example remove entry with key '1'</caption>
 	 * const data = [
 	 * 	{ key: 1, value: 'foo'},
 	 * 	{ key: 2, value: 'bar'}
 	 * ];
-	 * const mySubject = new ArrayState(data, (x) => x.key);
-	 * mySubject.remove([1]);
+	 * const myState = new ArrayState(data, (x) => x.key);
+	 * myState.remove([1]);
 	 */
 	remove(uniques: unknown[]) {
-		const unFrozenDataSet = [...this.getValue()];
+		let next = this.getValue();
 		if (this._getUnique) {
-			uniques.forEach( unique =>
-				unFrozenDataSet.filter(x => {
-					// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-					// @ts-ignore
-					return this._getUnique(x) !== unique;
-				})
+			uniques.forEach( unique => {
+					next = next.filter(x => {
+						// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+						// @ts-ignore
+						return this._getUnique(x) !== unique;
+					})
+				}
 			);
 
-			this.next(unFrozenDataSet);
+			this.next(next);
 		}
+		return this;
 	}
 
 	/**
-	 * @method append
-	 * @param {Partial<T>} partialData - A object containing some of the data for this Subject.
+	 * @method filter
+	 * @param {unknown} filterMethod - The unique value to remove.
+	 * @return {ArrayState<T>} Reference to it self.
+	 * @description - Remove some new data of this Subject.
+	 * @example <caption>Example remove entry with key '1'</caption>
+	 * const data = [
+	 * 	{ key: 1, value: 'foo'},
+	 * 	{ key: 2, value: 'bar'},
+	 * 	{ key: 3, value: 'poo'}
+	 * ];
+	 * const myState = new ArrayState(data, (x) => x.key);
+	 * myState.filter((entry) => entry.key !== 1);
+	 *
+	 * Result:
+	 *  [
+	 * 		{ key: 2, value: 'bar'},
+	 * 		{ key: 3, value: 'poo'}
+	 * ]
+	 *
+	 */
+	filter(predicate: (value: T, index: number, array: T[]) => boolean) {
+		this.next(this.getValue().filter(predicate));
+		return this;
+	}
+
+	/**
+	 * @method appendOne
+	 * @param {T} entry - new data to be added in this Subject.
+	 * @return {ArrayState<T>} Reference to it self.
 	 * @description - Append some new data to this Subject.
 	 * @example <caption>Example append some data.</caption>
 	 * const data = [
 	 * 	{ key: 1, value: 'foo'},
 	 * 	{ key: 2, value: 'bar'}
 	 * ];
-	 * const mySubject = new ArrayState(data);
-	 * mySubject.append({ key: 1, value: 'replaced-foo'});
+	 * const myState = new ArrayState(data);
+	 * myState.append({ key: 1, value: 'replaced-foo'});
 	 */
 	appendOne(entry: T) {
-		this.next(appendToFrozenArray(this.getValue(), entry, this._getUnique))
+		const next = [...this.getValue()];
+		if(this._getUnique) {
+			pushToUniqueArray(next, entry, this._getUnique);
+		} else {
+			next.push(entry);
+		}
+		this.next(next);
+		return this;
 	}
 
 	/**
 	 * @method append
 	 * @param {T[]} entries - A array of new data to be added in this Subject.
+	 * @return {ArrayState<T>} Reference to it self.
 	 * @description - Append some new data to this Subject, if it compares to existing data it will replace it.
 	 * @example <caption>Example append some data.</caption>
 	 * const data = [
 	 * 	{ key: 1, value: 'foo'},
 	 * 	{ key: 2, value: 'bar'}
 	 * ];
-	 * const mySubject = new ArrayState(data);
-	 * mySubject.append([
+	 * const myState = new ArrayState(data);
+	 * myState.append([
 	 * 	{ key: 1, value: 'replaced-foo'},
 	 * 	{ key: 3, value: 'another-bla'}
 	 * ]);
 	 */
 	append(entries: T[]) {
-		// TODO: stop calling appendOne for each but make sure to handle this in one.
-		entries.forEach(x => this.appendOne(x))
+		if(this._getUnique) {
+			const next = [...this.getValue()];
+			entries.forEach(entry => {
+				pushToUniqueArray(next, entry, this._getUnique!);
+			});
+			this.next(next);
+		} else {
+			this.next([...this.getValue(), ...entries]);
+		}
+		return this;
 	}
 }

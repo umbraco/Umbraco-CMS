@@ -46,9 +46,9 @@ export class UmbWorkspaceDocumentContext extends UmbWorkspaceContentContext<Docu
 		// TODO: make sure to check that we have a details model? otherwise fail? 8This can be relevant if we use the same context for tree actions?
 		const entry = {alias: alias, value: value};
 
-		const newDataSet = appendToFrozenArray((this._data.getValue() as DocumentDetails).data, entry, (x: any) => x.alias);
+		const newDataSet = appendToFrozenArray(this._data.getValue().data, entry, x => x.alias);
 
-		this.update({data: newDataSet});
+		this._data.update({data: newDataSet});
 	}
 
 	/*

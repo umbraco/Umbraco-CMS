@@ -25,7 +25,7 @@ export interface UmbModalOptions<UmbModalData> {
 
 // TODO: Should this be called UmbModalContext ? as we don't have 'services' as a term.
 export class UmbModalService {
-	// Notice this cannot use UniqueBehaviorSubject as it holds a HTML Element. which cannot be Serialized to JSON (it has some circular references)
+	// TODO: Investigate if we can get rid of HTML elements in our store, so we can use one of our states.
 	#modals = new BehaviorSubject(<Array<UmbModalHandler>>[]);
 	public readonly modals = this.#modals.asObservable();
 

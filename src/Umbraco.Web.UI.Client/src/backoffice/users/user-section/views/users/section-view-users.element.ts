@@ -2,7 +2,7 @@ import { css, html } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, state } from 'lit/decorators.js';
 import type { IRoute, IRoutingInfo } from 'router-slot';
-import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
+import { umbExtensionsRegistry } from '@umbraco-cms/extensions-api';
 
 import './list-view-layouts/table/workspace-view-users-table.element';
 import './list-view-layouts/grid/workspace-view-users-grid.element';

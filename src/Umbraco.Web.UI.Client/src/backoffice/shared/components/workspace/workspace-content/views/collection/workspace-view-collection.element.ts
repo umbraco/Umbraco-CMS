@@ -13,6 +13,7 @@ import '../../../../../../shared/components/content-property/content-property.el
 import '../../../../../../shared/collection/dashboards/dashboard-collection.element';
 import { UmbLitElement } from '@umbraco-cms/element';
 import { FolderTreeItem } from '@umbraco-cms/backend-api';
+import { ManifestWorkspaceViewCollection } from '@umbraco-cms/extensions-registry';
 
 @customElement('umb-workspace-view-collection')
 export class UmbWorkspaceViewCollectionElement extends UmbLitElement {
@@ -25,6 +26,8 @@ export class UmbWorkspaceViewCollectionElement extends UmbLitElement {
 			}
 		`,
 	];
+
+	public manifest!: ManifestWorkspaceViewCollection;
 
 	private _workspaceContext?: UmbWorkspaceContentContext;
 
@@ -42,10 +45,13 @@ export class UmbWorkspaceViewCollectionElement extends UmbLitElement {
 
 	protected _provideWorkspace() {
 		if (this._workspaceContext?.entityKey != null) {
+
+			const manifestMeta = this.manifest.meta;
+
 			this._collectionContext = new UmbCollectionContext(
 				this,
 				this._workspaceContext.entityKey,
-				this._workspaceContext.getStore()?.storeAlias || '' // The store is available when the context is available.
+				manifestMeta.storeAlias
 			);
 			this.provideContext(UMB_COLLECTION_CONTEXT_TOKEN, this._collectionContext);
 		}

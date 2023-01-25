@@ -5,7 +5,7 @@ import { map } from 'rxjs';
 import { TooltipMenuItem } from '../components/tooltip-menu';
 import '../components/tooltip-menu/tooltip-menu.element';
 import type { ManifestCollectionView } from '@umbraco-cms/models';
-import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
+import { umbExtensionsRegistry } from '@umbraco-cms/extensions-api';
 import { UmbLitElement } from '@umbraco-cms/element';
 
 @customElement('umb-collection-toolbar')

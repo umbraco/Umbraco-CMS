@@ -1,8 +1,7 @@
 import { expect } from '@open-wc/testing';
-import type { UserStatus } from '@umbraco-cms/models';
 import { InterfaceColor, InterfaceLook } from '@umbraco-ui/uui-base/lib/types';
-
-import { getTagLookAndColor } from './utils';
+import { getLookAndColorFromUserStatus } from './utils';
+import type { UserStatus } from '@umbraco-cms/models';
 
 describe('UmbUserExtensions', () => {
 	it('returns correct look and color from a status string', () => {
@@ -14,7 +13,7 @@ describe('UmbUserExtensions', () => {
 		];
 
 		testCases.forEach((testCase) => {
-			const { look, color } = getTagLookAndColor(testCase.status);
+			const { look, color } = getLookAndColorFromUserStatus(testCase.status);
 			expect(look).to.equal(testCase.look);
 			expect(color).to.equal(testCase.color);
 		});
