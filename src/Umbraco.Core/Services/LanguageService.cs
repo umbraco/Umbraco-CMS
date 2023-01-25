@@ -239,7 +239,7 @@ internal class LanguageService : RepositoryService, ILanguageService
         try
         {
             var culture = CultureInfo.GetCultureInfo(language.IsoCode);
-            return culture.Name == language.IsoCode;
+            return culture.Name.Equals(language.IsoCode, StringComparison.OrdinalIgnoreCase);
         }
         catch (CultureNotFoundException)
         {

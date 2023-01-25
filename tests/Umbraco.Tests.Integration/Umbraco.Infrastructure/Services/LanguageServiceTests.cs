@@ -1,5 +1,4 @@
-﻿using System.Runtime.InteropServices;
-using NUnit.Framework;
+﻿using NUnit.Framework;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.OperationStatus;
@@ -201,18 +200,8 @@ public class LanguageServiceTests : UmbracoIntegrationTest
     {
         var invalidLanguage = new Language("no-such-iso-code", "Invalid ISO code");
         var result = await LanguageService.CreateAsync(invalidLanguage);
-
-        // MacOS + Linux allows resolving CultureInfo from any ISO code - Windows does not
-        // see e.g. https://github.com/dotnet/runtime/issues/16457#issuecomment-418827420
-        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows) == false)
-        {
-            Assert.IsTrue(result.Success);
-        }
-        else
-        {
-            Assert.IsFalse(result.Success);
-            Assert.AreEqual(LanguageOperationStatus.InvalidIsoCode, result.Status);
-        }
+        Assert.IsFalse(result.Success);
+        Assert.AreEqual(LanguageOperationStatus.InvalidIsoCode, result.Status);
     }
 
     [Test]
