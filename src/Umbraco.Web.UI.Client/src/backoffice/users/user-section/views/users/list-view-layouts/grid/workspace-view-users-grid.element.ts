@@ -4,8 +4,8 @@ import { customElement, state } from 'lit/decorators.js';
 import { repeat } from 'lit/directives/repeat.js';
 import { ifDefined } from 'lit-html/directives/if-defined.js';
 import type { UmbSectionViewUsersElement } from '../../section-view-users.element';
-import { getTagLookAndColor } from '../../../../../../../auth/utils';
 import { UmbUserGroupStore, UMB_USER_GROUP_STORE_CONTEXT_TOKEN } from '../../../../../user-groups/user-group.store';
+import { getLookAndColorFromUserStatus } from '@umbraco-cms/utils';
 import type { UserDetails, UserEntity, UserGroupEntity } from '@umbraco-cms/models';
 import { UmbLitElement } from '@umbraco-cms/element';
 
@@ -111,7 +111,7 @@ export class UmbWorkspaceViewUsersGridElement extends UmbLitElement {
 	private renderUserCard(user: UserDetails) {
 		if (!this._usersContext) return;
 
-		const statusLook = getTagLookAndColor(user.status);
+		const statusLook = getLookAndColorFromUserStatus(user.status);
 
 		return html`
 			<uui-card-user

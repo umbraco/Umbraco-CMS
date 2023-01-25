@@ -6,7 +6,8 @@ import { manifests as propertyEditorUIManifests } from './property-editors/uis/m
 import { manifests as collectionBulkActionManifests } from './collection/bulk-actions/manifests';
 import { manifests as collectionViewManifests } from './collection/views/manifests';
 
-import { ManifestTypes, umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
+import { umbExtensionsRegistry } from '@umbraco-cms/extensions-api';
+import { ManifestTypes } from '@umbraco-cms/extensions-registry';
 
 const registerExtensions = (manifests: Array<ManifestTypes>) => {
 	manifests.forEach((manifest) => {

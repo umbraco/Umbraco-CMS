@@ -7,7 +7,7 @@ import type { UmbWorkspaceEntityElement } from '../workspace/workspace-entity-el
 import { UmbSectionContext, UMB_SECTION_CONTEXT_TOKEN } from './section.context';
 import { createExtensionElement } from '@umbraco-cms/extensions-api';
 import type { ManifestSectionView, ManifestWorkspace, ManifestSidebarMenuItem } from '@umbraco-cms/models';
-import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
+import { umbExtensionsRegistry } from '@umbraco-cms/extensions-api';
 import { UmbLitElement } from '@umbraco-cms/element';
 
 import './section-sidebar-menu/section-sidebar-menu.element.ts';

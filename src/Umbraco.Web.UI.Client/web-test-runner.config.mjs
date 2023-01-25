@@ -4,7 +4,7 @@ import { importMapsPlugin } from '@web/dev-server-import-maps';
 
 export default {
 	nodeResolve: true,
-	files: ['src/**/*.test.ts', 'libs/**/*.test.ts'],
+	files: ['src/**/*.test.ts', 'apps/**/*.test.ts', 'libs/**/*.test.ts'],
 	plugins: [
 		esbuildPlugin({ ts: true, target: 'auto', json: true }),
 		importMapsPlugin({
@@ -12,6 +12,7 @@ export default {
 				importMap: {
 					imports: {
 						'src/': './src/',
+						'@umbraco-cms/css': './libs/css/custom-properties.css',
 						'@umbraco-cms/models': './libs/models/index.ts',
 						'@umbraco-cms/backend-api': './libs/backend-api/index.ts',
 						'@umbraco-cms/context-api': './libs/context-api/index.ts',
@@ -22,8 +23,8 @@ export default {
 						'@umbraco-cms/notification': './libs/notification/index.ts',
 						'@umbraco-cms/observable-api': './libs/observable-api/index.ts',
 						'@umbraco-cms/store': './libs/store/index.ts',
-						'@umbraco-cms/utils': './src/core/utils/index.ts',
-						'@umbraco-cms/test-utils': './src/core/test-utils/index.ts',
+						'@umbraco-cms/utils': './libs/utils/index.ts',
+						'@umbraco-cms/test-utils': './libs/test-utils/index.ts',
 						'@umbraco-cms/resources': './libs/resources/index.ts'
 					},
 				},
@@ -47,7 +48,7 @@ export default {
 				<title>Umbraco</title>
 				<base href="/" />
 				<link rel="stylesheet" href="node_modules/@umbraco-ui/uui-css/dist/uui-css.css">
-				<link rel="stylesheet" href="src/core/css/custom-properties.css">
+				<link rel="stylesheet" href="libs/css/custom-properties.css">
 			</head>
       <body>
         <script type="module" src="${testFramework}"></script>
