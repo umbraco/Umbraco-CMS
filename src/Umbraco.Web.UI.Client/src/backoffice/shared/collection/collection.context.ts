@@ -2,21 +2,22 @@ import { ContentTreeItem } from '@umbraco-cms/backend-api';
 import { UmbTreeStore } from '@umbraco-cms/store';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 import { UmbContextToken, UmbContextConsumerController } from '@umbraco-cms/context-api';
-import { DeepState, UmbObserverController } from '@umbraco-cms/observable-api';
+import { ArrayState, UmbObserverController } from '@umbraco-cms/observable-api';
 export class UmbCollectionContext<
 	DataType extends ContentTreeItem,
 	StoreType extends UmbTreeStore<DataType> = UmbTreeStore<DataType>
 > {
+
 	private _host: UmbControllerHostInterface;
 	private _entityKey: string | null;
 
 	private _store?: StoreType;
 	protected _dataObserver?: UmbObserverController<DataType[]>;
 
-	#data = new DeepState(<Array<DataType>>[]);
+	#data = new ArrayState(<Array<DataType>>[]);
 	public readonly data = this.#data.asObservable();
 
-	#selection = new DeepState(<Array<string>>[]);
+	#selection = new ArrayState(<Array<string>>[]);
 	public readonly selection = this.#selection.asObservable();
 
 	/*
@@ -96,13 +97,11 @@ export class UmbCollectionContext<
 	}
 
 	public select(key: string) {
-		const selection = this.#selection.getValue();
-		this.#selection.next([...selection, key]);
+		this.#selection.appendOne(key);
 	}
 
 	public deselect(key: string) {
-		const selection = this.#selection.getValue();
-		this.#selection.next(selection.filter((k) => k !== key));
+		this.#selection.filter((k) => k !== key);
 	}
 
 	// TODO: how can we make sure to call this.
