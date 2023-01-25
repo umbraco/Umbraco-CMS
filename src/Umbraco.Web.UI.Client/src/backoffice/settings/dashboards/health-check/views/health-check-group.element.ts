@@ -11,7 +11,6 @@ import {
 	HealthCheckResource,
 	HealthCheckWithResult,
 	StatusResultType,
-	HealthCheckResult,
 } from '@umbraco-cms/backend-api';
 import { UmbLitElement } from '@umbraco-cms/element';
 import { tryExecuteAndNotify } from '@umbraco-cms/resources';

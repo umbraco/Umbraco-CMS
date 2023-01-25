@@ -1,14 +1,4 @@
-import { html } from 'lit';
-
-import {
-	HealthCheck,
-	HealthCheckGroup,
-	HealthCheckGroupWithResult,
-	HealthCheckWithResult,
-	HealthCheckResult,
-	StatusResultType,
-	HealthCheckAction,
-} from '@umbraco-cms/backend-api';
+import { HealthCheckGroup, HealthCheckGroupWithResult, StatusResultType } from '@umbraco-cms/backend-api';
 
 export function getGroupByName(name: string) {
 	return healthGroups.find((group) => group.name == name);

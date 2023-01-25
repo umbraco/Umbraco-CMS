@@ -1,10 +1,9 @@
 import { rest } from 'msw';
-import { searchResultMockData, getIndexByName, PagedIndexers } from '../data/examine.data';
 
-import { getGroupByName, healthGroups, healthGroupsWithoutResult } from '../data/health-check.data';
+import { getGroupByName, healthGroupsWithoutResult } from '../data/health-check.data';
 
+import { HealthCheckGroup, PagedHealthCheckGroup } from '@umbraco-cms/backend-api';
 import { umbracoPath } from '@umbraco-cms/utils';
-import { HealthCheckGroup, PagedHealthCheckGroup, StatusResultType } from '@umbraco-cms/backend-api';
 
 export const handlers = [
 	rest.get(umbracoPath('/health-check-group'), (_req, res, ctx) => {
