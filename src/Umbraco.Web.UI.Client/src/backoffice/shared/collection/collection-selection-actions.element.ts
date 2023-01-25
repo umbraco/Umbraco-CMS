@@ -19,6 +19,13 @@ export class UmbCollectionSelectionActionsElement extends UmbLitElement {
 				color: var(--uui-color-selected-contrast);
 				align-items: center;
 				box-sizing: border-box;
+				justify-content: space-between;
+			}
+			#selection {
+				display: flex;
+				align-items: center;
+				box-sizing: border-box;
+				gap: var(--uui-size-3);
 			}
 		`,
 	];
@@ -72,12 +79,14 @@ export class UmbCollectionSelectionActionsElement extends UmbLitElement {
 	render() {
 		if (this._selectionLength === 0) return nothing;
 
-		return html`<uui-button
-				@click=${this._handleClearSelection}
-				@keydown=${this._handleKeyDown}
-				label="Clear"
-				look="secondary"></uui-button>
-			${this._renderSelectionCount()}
+		return html`<div id="selection-info">
+				<uui-button
+					@click=${this._handleClearSelection}
+					@keydown=${this._handleKeyDown}
+					label="Clear"
+					look="secondary"></uui-button>
+				${this._renderSelectionCount()}
+			</div>
 			<umb-extension-slot
 				type="collectionBulkAction"
 				.filter=${(manifest: any) => manifest.meta.entityType === this.entityType}></umb-extension-slot>`;
