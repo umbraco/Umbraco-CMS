@@ -31,7 +31,7 @@ public class IndexInitializer
     private readonly ILoggerFactory _loggerFactory;
     private readonly MediaUrlGeneratorCollection _mediaUrlGenerators;
     private readonly PropertyEditorCollection _propertyEditors;
-    private readonly IScopeProvider _scopeProvider;
+    private readonly IScopeProvider _scopeProvider; 
     private readonly IShortStringHelper _shortStringHelper;
 
     public IndexInitializer(
