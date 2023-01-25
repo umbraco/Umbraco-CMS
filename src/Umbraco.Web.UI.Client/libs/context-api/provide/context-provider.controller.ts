@@ -20,6 +20,7 @@ export class UmbContextProviderController<T = unknown>
 	}
 
 	public destroy() {
+		super.destroy();
 		if (this.host) {
 			this.host.removeController(this);
 		}
