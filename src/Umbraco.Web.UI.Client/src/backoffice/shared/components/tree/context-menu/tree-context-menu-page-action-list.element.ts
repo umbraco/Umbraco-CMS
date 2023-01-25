@@ -3,8 +3,8 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, state } from 'lit/decorators.js';
 import { map } from 'rxjs';
 import { UmbSectionContext, UMB_SECTION_CONTEXT_TOKEN } from '../../section/section.context';
+import { umbExtensionsRegistry } from '@umbraco-cms/extensions-api';
 import type { Entity, ManifestTreeItemAction } from '@umbraco-cms/models';
-import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
 import { UmbLitElement } from '@umbraco-cms/element';
 
 @customElement('umb-tree-context-menu-page-action-list')

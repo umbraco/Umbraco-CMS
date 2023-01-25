@@ -5,12 +5,8 @@ import { IRoutingInfo } from 'router-slot';
 import { first, map } from 'rxjs';
 import { UmbSectionContext, UMB_SECTION_CONTEXT_TOKEN } from '../section.context';
 import { createExtensionElement } from '@umbraco-cms/extensions-api';
-import type {
-	ManifestDashboard,
-	ManifestDashboardCollection,
-	ManifestWithMeta,
-} from '@umbraco-cms/models';
-import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
+import type { ManifestDashboard, ManifestDashboardCollection, ManifestWithMeta } from '@umbraco-cms/models';
+import { umbExtensionsRegistry } from '@umbraco-cms/extensions-api';
 import { UmbLitElement } from '@umbraco-cms/element';
 
 @customElement('umb-section-dashboards')
@@ -22,7 +18,6 @@ export class UmbSectionDashboardsElement extends UmbLitElement {
 				display: flex;
 				flex-direction: column;
 				height: 100%;
-				width: 100%;
 			}
 
 			#tabs {
@@ -32,15 +27,12 @@ export class UmbSectionDashboardsElement extends UmbLitElement {
 
 			#scroll-container {
 				flex: 1;
-				height: 100%;
-				padding: var(--uui-size-space-6) var(--uui-size-space-5);
 			}
 
 			#router-slot {
-				width: 100%;
 				box-sizing: border-box;
 				display: block;
-				padding:var(--uui-size-5);
+				padding: var(--uui-size-5);
 			}
 		`,
 	];
