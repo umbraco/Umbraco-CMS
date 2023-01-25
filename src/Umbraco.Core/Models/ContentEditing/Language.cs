@@ -22,6 +22,6 @@ public class Language
     [DataMember(Name = "isMandatory")]
     public bool IsMandatory { get; set; }
 
-    [DataMember(Name = "fallbackLanguageId")]
-    public int? FallbackLanguageId { get; set; }
+    [DataMember(Name = "fallbackIsoCode")]
+    public string? FallbackIsoCode { get; set; }
 }

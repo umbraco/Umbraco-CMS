@@ -30,7 +30,7 @@ public class LanguageMapDefinition : IMapDefinition
         target.Name = source.CultureName;
         target.IsDefault = source.IsDefault;
         target.IsMandatory = source.IsMandatory;
-        target.FallbackLanguageId = source.FallbackLanguageId;
+        target.FallbackIsoCode = source.FallbackIsoCode;
     }
 
     private static void Map(IEnumerable<ILanguage> source, IEnumerable<ContentEditing.Language> target, MapperContext context)

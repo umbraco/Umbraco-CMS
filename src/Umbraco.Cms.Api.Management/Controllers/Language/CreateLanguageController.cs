@@ -1,8 +1,8 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Umbraco.Cms.Api.Management.Factories;
 using Umbraco.Cms.Api.Management.ViewModels.Language;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
@@ -12,17 +12,17 @@ namespace Umbraco.Cms.Api.Management.Controllers.Language;
 
 public class CreateLanguageController : LanguageControllerBase
 {
-    private readonly ILanguageFactory _languageFactory;
     private readonly ILanguageService _languageService;
+    private readonly IUmbracoMapper _umbracoMapper;
     private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
 
     public CreateLanguageController(
-        ILanguageFactory languageFactory,
         ILanguageService languageService,
+        IUmbracoMapper umbracoMapper,
         IBackOfficeSecurityAccessor backOfficeSecurityAccessor)
     {
-        _languageFactory = languageFactory;
         _languageService = languageService;
+        _umbracoMapper = umbracoMapper;
         _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
     }
 
@@ -33,7 +33,7 @@ public class CreateLanguageController : LanguageControllerBase
     [ProducesResponseType(StatusCodes.Status201Created)]
     public async Task<IActionResult> Create(LanguageCreateModel languageCreateModel)
     {
-        ILanguage created = _languageFactory.MapCreateModelToLanguage(languageCreateModel);
+        ILanguage created = _umbracoMapper.Map<ILanguage>(languageCreateModel)!;
 
         Attempt<ILanguage, LanguageOperationStatus> result = await _languageService.CreateAsync(created, CurrentUserId(_backOfficeSecurityAccessor));
 

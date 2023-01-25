@@ -13,16 +13,17 @@ public class LanguageViewModelsMapDefinition : IMapDefinition
         mapper.Define<ILanguage, LanguageViewModel>((_, _) => new LanguageViewModel(), Map);
     }
 
-    // Umbraco.Code.MapAll -FallbackIsoCode
+    // Umbraco.Code.MapAll
     private static void Map(ILanguage source, LanguageViewModel target, MapperContext context)
     {
         target.IsoCode = source.IsoCode;
+        target.FallbackIsoCode = source.FallbackIsoCode;
         target.Name = source.CultureName;
         target.IsDefault = source.IsDefault;
         target.IsMandatory = source.IsMandatory;
     }
 
-    // Umbraco.Code.MapAll -Id -FallbackLanguageId -Key
+    // Umbraco.Code.MapAll -Id -Key
     private static void Map(LanguageCreateModel source, ILanguage target, MapperContext context)
     {
         target.CreateDate = default;
@@ -35,9 +36,10 @@ public class LanguageViewModelsMapDefinition : IMapDefinition
         target.IsMandatory = source.IsMandatory;
         target.IsoCode = source.IsoCode;
         target.UpdateDate = default;
+        target.FallbackIsoCode = source.FallbackIsoCode;
     }
 
-    // Umbraco.Code.MapAll -Id -FallbackLanguageId -Key -IsoCode -CreateDate
+    // Umbraco.Code.MapAll -Id -Key -IsoCode -CreateDate
     private static void Map(LanguageUpdateModel source, ILanguage target, MapperContext context)
     {
         if (!string.IsNullOrEmpty(source.Name))
@@ -48,5 +50,6 @@ public class LanguageViewModelsMapDefinition : IMapDefinition
         target.IsDefault = source.IsDefault;
         target.IsMandatory = source.IsMandatory;
         target.UpdateDate = default;
+        target.FallbackIsoCode = source.FallbackIsoCode;
     }
 }

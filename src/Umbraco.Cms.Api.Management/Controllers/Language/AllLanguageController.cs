@@ -1,8 +1,8 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Common.ViewModels.Pagination;
-using Umbraco.Cms.Api.Management.Factories;
 using Umbraco.Cms.Api.Management.ViewModels.Language;
+using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
 
@@ -11,12 +11,12 @@ namespace Umbraco.Cms.Api.Management.Controllers.Language;
 public class AllLanguageController : LanguageControllerBase
 {
     private readonly ILanguageService _languageService;
-    private readonly ILanguageFactory _languageFactory;
+    private readonly IUmbracoMapper _umbracoMapper;
 
-    public AllLanguageController(ILanguageService languageService, ILanguageFactory languageFactory)
+    public AllLanguageController(ILanguageService languageService, IUmbracoMapper umbracoMapper)
     {
         _languageService = languageService;
-        _languageFactory = languageFactory;
+        _umbracoMapper = umbracoMapper;
     }
 
     [HttpGet]
@@ -28,7 +28,7 @@ public class AllLanguageController : LanguageControllerBase
         var viewModel = new PagedViewModel<LanguageViewModel>
         {
             Total = allLanguages.Length,
-            Items = allLanguages.Skip(skip).Take(take).Select(_languageFactory.CreateLanguageViewModel).ToArray()
+            Items = _umbracoMapper.MapEnumerable<ILanguage, LanguageViewModel>(allLanguages.Skip(skip).Take(take))
         };
 
         return await Task.FromResult(Ok(viewModel));

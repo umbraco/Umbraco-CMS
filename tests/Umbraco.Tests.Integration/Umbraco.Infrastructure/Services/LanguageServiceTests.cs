@@ -63,20 +63,47 @@ public class LanguageServiceTests : UmbracoIntegrationTest
     }
 
     [Test]
+    public async Task Can_Create_Language_With_Fallback()
+    {
+        var languageDaDk = await LanguageService.GetAsync("da-DK");
+        Assert.NotNull(languageDaDk);
+        var languageNbNo = new LanguageBuilder()
+            .WithCultureInfo("nb-NO")
+            .WithFallbackLanguageIsoCode(languageDaDk.IsoCode)
+            .Build();
+        var result = await LanguageService.CreateAsync(languageNbNo, 0);
+        Assert.IsTrue(result.Success);
+
+        var language = await LanguageService.GetAsync("nb-NO");
+        Assert.NotNull(language);
+        Assert.AreEqual("da-DK", language.FallbackIsoCode);
+    }
+
+    [Test]
     public async Task Can_Delete_Language_Used_As_Fallback()
     {
         var languageDaDk = await LanguageService.GetAsync("da-DK");
+        Assert.NotNull(languageDaDk);
         var languageNbNo = new LanguageBuilder()
             .WithCultureInfo("nb-NO")
-            .WithFallbackLanguageId(languageDaDk.Id)
+            .WithFallbackLanguageIsoCode(languageDaDk.IsoCode)
             .Build();
-        await LanguageService.CreateAsync(languageNbNo, 0);
-
-        var result = await LanguageService.DeleteAsync("da-DK");
+        var result = await LanguageService.CreateAsync(languageNbNo, 0);
         Assert.IsTrue(result.Success);
 
-        var language = await LanguageService.GetAsync("da-DK");
+        var language = await LanguageService.GetAsync("nb-NO");
+        Assert.NotNull(language);
+        Assert.AreEqual("da-DK", language.FallbackIsoCode);
+
+        result = await LanguageService.DeleteAsync("da-DK");
+        Assert.IsTrue(result.Success);
+
+        language = await LanguageService.GetAsync("da-DK");
         Assert.Null(language);
+
+        language = await LanguageService.GetAsync("nb-NO");
+        Assert.NotNull(language);
+        Assert.Null(language.FallbackIsoCode);
     }
 
     [Test]
@@ -228,7 +255,7 @@ public class LanguageServiceTests : UmbracoIntegrationTest
         var isoCode = "en-AU";
         var languageEnAu = new LanguageBuilder()
             .WithCultureInfo(isoCode)
-            .WithFallbackLanguageId(123456789)
+            .WithFallbackLanguageIsoCode("no-such-ISO-code")
             .Build();
         var result = await LanguageService.CreateAsync(languageEnAu);
         Assert.IsFalse(result.Success);
@@ -271,9 +298,9 @@ public class LanguageServiceTests : UmbracoIntegrationTest
     {
         ILanguage languageDaDk = await LanguageService.GetAsync("da-DK");
         Assert.NotNull(languageDaDk);
-        Assert.IsNull(languageDaDk.FallbackLanguageId);
+        Assert.IsNull(languageDaDk.FallbackIsoCode);
 
-        languageDaDk.FallbackLanguageId = 123456789;
+        languageDaDk.FallbackIsoCode = "no-such-iso-code";
         var result = await LanguageService.UpdateAsync(languageDaDk);
         Assert.IsFalse(result.Success);
         Assert.AreEqual(LanguageOperationStatus.InvalidFallback, result.Status);
@@ -286,14 +313,14 @@ public class LanguageServiceTests : UmbracoIntegrationTest
         ILanguage languageEnGb = await LanguageService.GetAsync("en-GB");
         Assert.NotNull(languageDaDk);
         Assert.NotNull(languageEnGb);
-        Assert.IsNull(languageDaDk.FallbackLanguageId);
-        Assert.IsNull(languageEnGb.FallbackLanguageId);
+        Assert.IsNull(languageDaDk.FallbackIsoCode);
+        Assert.IsNull(languageEnGb.FallbackIsoCode);
 
-        languageDaDk.FallbackLanguageId = languageEnGb.Id;
+        languageDaDk.FallbackIsoCode = languageEnGb.IsoCode;
         var result = await LanguageService.UpdateAsync(languageDaDk);
         Assert.IsTrue(result.Success);
 
-        languageEnGb.FallbackLanguageId = languageDaDk.Id;
+        languageEnGb.FallbackIsoCode = languageDaDk.IsoCode;
         result = await LanguageService.UpdateAsync(languageEnGb);
         Assert.IsFalse(result.Success);
         Assert.AreEqual(LanguageOperationStatus.InvalidFallback, result.Status);
@@ -308,19 +335,19 @@ public class LanguageServiceTests : UmbracoIntegrationTest
         Assert.IsNotNull(languageEnUs);
         Assert.IsNotNull(languageEnGb);
         Assert.IsNotNull(languageDaDk);
-        Assert.IsNull(languageEnUs.FallbackLanguageId);
-        Assert.IsNull(languageEnGb.FallbackLanguageId);
-        Assert.IsNull(languageDaDk.FallbackLanguageId);
+        Assert.IsNull(languageEnUs.FallbackIsoCode);
+        Assert.IsNull(languageEnGb.FallbackIsoCode);
+        Assert.IsNull(languageDaDk.FallbackIsoCode);
 
-        languageEnGb.FallbackLanguageId = languageEnUs.Id;
+        languageEnGb.FallbackIsoCode = languageEnUs.IsoCode;
         var result = await LanguageService.UpdateAsync(languageEnGb);
         Assert.IsTrue(result.Success);
 
-        languageDaDk.FallbackLanguageId = languageEnGb.Id;
+        languageDaDk.FallbackIsoCode = languageEnGb.IsoCode;
         result = await LanguageService.UpdateAsync(languageDaDk);
         Assert.IsTrue(result.Success);
 
-        languageEnUs.FallbackLanguageId = languageDaDk.Id;
+        languageEnUs.FallbackIsoCode = languageDaDk.IsoCode;
         result = await LanguageService.UpdateAsync(languageEnUs);
         Assert.IsFalse(result.Success);
         Assert.AreEqual(LanguageOperationStatus.InvalidFallback, result.Status);
@@ -333,9 +360,9 @@ public class LanguageServiceTests : UmbracoIntegrationTest
         Assert.IsNotNull(languageEnGb);
         Assert.IsNotNull(languageDaDk);
 
-        Assert.AreEqual(languageEnUs.Id, languageEnGb.FallbackLanguageId);
-        Assert.AreEqual(languageEnGb.Id, languageDaDk.FallbackLanguageId);
-        Assert.IsNull(languageEnUs.FallbackLanguageId);
+        Assert.AreEqual(languageEnUs.IsoCode, languageEnGb.FallbackIsoCode);
+        Assert.AreEqual(languageEnGb.IsoCode, languageDaDk.FallbackIsoCode);
+        Assert.IsNull(languageEnUs.FallbackIsoCode);
     }
 
     [Test]

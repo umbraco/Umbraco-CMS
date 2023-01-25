@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Management.Factories;
 using Umbraco.Cms.Api.Management.ViewModels.Language;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
@@ -12,17 +13,17 @@ namespace Umbraco.Cms.Api.Management.Controllers.Language;
 
 public class UpdateLanguageController : LanguageControllerBase
 {
-    private readonly ILanguageFactory _languageFactory;
     private readonly ILanguageService _languageService;
+    private readonly IUmbracoMapper _umbracoMapper;
     private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
 
     public UpdateLanguageController(
-        ILanguageFactory languageFactory,
         ILanguageService languageService,
+        IUmbracoMapper umbracoMapper,
         IBackOfficeSecurityAccessor backOfficeSecurityAccessor)
     {
-        _languageFactory = languageFactory;
         _languageService = languageService;
+        _umbracoMapper = umbracoMapper;
         _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
     }
 
@@ -39,7 +40,7 @@ public class UpdateLanguageController : LanguageControllerBase
             return NotFound();
         }
 
-        ILanguage updated = _languageFactory.MapUpdateModelToLanguage(current, languageUpdateModel);
+        ILanguage updated = _umbracoMapper.Map(languageUpdateModel, current);
 
         Attempt<ILanguage, LanguageOperationStatus> result = await _languageService.UpdateAsync(updated, CurrentUserId(_backOfficeSecurityAccessor));
 

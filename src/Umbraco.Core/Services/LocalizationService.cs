@@ -324,7 +324,7 @@ internal class LocalizationService : RepositoryService, ILocalizationService
         // mimic old Save behavior
         if (result.Status == LanguageOperationStatus.InvalidFallback)
         {
-            throw new InvalidOperationException($"Cannot save language {language.IsoCode} with fallback id={language.FallbackLanguageId}.");
+            throw new InvalidOperationException($"Cannot save language {language.IsoCode} with fallback {language.FallbackIsoCode}.");
         }
     }
 

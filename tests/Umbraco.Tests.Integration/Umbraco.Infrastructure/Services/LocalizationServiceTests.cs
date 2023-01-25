@@ -223,7 +223,7 @@ public class LocalizationServiceTests : UmbracoIntegrationTest
         var languageDaDk = LocalizationService.GetLanguageByIsoCode("da-DK");
         var languageNbNo = new LanguageBuilder()
             .WithCultureInfo("nb-NO")
-            .WithFallbackLanguageId(languageDaDk.Id)
+            .WithFallbackLanguageIsoCode(languageDaDk.IsoCode)
             .Build();
         LocalizationService.Save(languageNbNo, 0);
         var languageId = languageDaDk.Id;

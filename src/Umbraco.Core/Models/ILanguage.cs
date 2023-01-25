@@ -47,7 +47,7 @@ public interface ILanguage : IEntity, IRememberBeingDirty
     bool IsMandatory { get; set; }
 
     /// <summary>
-    ///     Gets or sets the identifier of a fallback language.
+    ///     Gets or sets the ISO code of a fallback language.
     /// </summary>
     /// <remarks>
     ///     <para>
@@ -56,5 +56,5 @@ public interface ILanguage : IEntity, IRememberBeingDirty
     ///     </para>
     /// </remarks>
     [DataMember]
-    int? FallbackLanguageId { get; set; }
+    public string? FallbackIsoCode { get; set; }
 }
