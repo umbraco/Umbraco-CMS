@@ -380,7 +380,13 @@ public class FileService : RepositoryService, IFileService
             throw new InvalidOperationException("Name cannot be more than 255 characters in length.");
         }
 
-        return _templateService.CreateForContentTypeAsync(contentTypeAlias, contentTypeName, userId).GetAwaiter().GetResult();
+        Attempt<ITemplate, TemplateOperationStatus> result = _templateService.CreateForContentTypeAsync(contentTypeAlias, contentTypeName, userId).GetAwaiter().GetResult();
+
+        // mimic old service behavior
+        EventMessages eventMessages = EventMessagesFactory.Get();
+        return result.Success
+            ? OperationResult.Attempt.Succeed(OperationResultType.Success, eventMessages, result.Result)
+            : OperationResult.Attempt.Succeed(OperationResultType.Failed, eventMessages, result.Result);
     }
 
     /// <summary>

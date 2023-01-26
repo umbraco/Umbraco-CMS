@@ -62,7 +62,7 @@ public interface ITemplateService : IService
     /// <returns>
     ///     The template created
     /// </returns>
-    Task<Attempt<OperationResult<OperationResultType, ITemplate>?>> CreateForContentTypeAsync(
+    Task<Attempt<ITemplate, TemplateOperationStatus>> CreateForContentTypeAsync(
         string contentTypeAlias,
         string? contentTypeName,
         int userId = Constants.Security.SuperUserId);

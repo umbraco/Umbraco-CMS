@@ -35,10 +35,10 @@ public class TemplateService : RepositoryService, ITemplateService
     }
 
     /// <inheritdoc />
-    public async Task<Attempt<OperationResult<OperationResultType, ITemplate>?>> CreateForContentTypeAsync(
+    public async Task<Attempt<ITemplate, TemplateOperationStatus>> CreateForContentTypeAsync(
         string contentTypeAlias, string? contentTypeName, int userId = Constants.Security.SuperUserId)
     {
-        var template = new Template(_shortStringHelper, contentTypeName,
+        ITemplate template = new Template(_shortStringHelper, contentTypeName,
 
             // NOTE: We are NOT passing in the content type alias here, we want to use it's name since we don't
             // want to save template file names as camelCase, the Template ctor will clean the alias as
@@ -46,12 +46,12 @@ public class TemplateService : RepositoryService, ITemplateService
             // This fixes: http://issues.umbraco.org/issue/U4-7953
             contentTypeName);
 
-        EventMessages eventMessages = EventMessagesFactory.Get();
-
-        if (contentTypeAlias != null && contentTypeAlias.Length > 255)
+        if (IsValidAlias(template.Alias) == false)
         {
-            throw new InvalidOperationException("Name cannot be more than 255 characters in length.");
+            return Attempt.FailWithStatus(TemplateOperationStatus.InvalidAlias, template);
         }
+
+        EventMessages eventMessages = EventMessagesFactory.Get();
 
         // check that the template hasn't been created on disk before creating the content type
         // if it exists, set the new template content to the existing file content
@@ -67,22 +67,18 @@ public class TemplateService : RepositoryService, ITemplateService
             if (scope.Notifications.PublishCancelable(savingEvent))
             {
                 scope.Complete();
-                return OperationResult.Attempt.Fail<OperationResultType, ITemplate>(
-                    OperationResultType.FailedCancelledByEvent, eventMessages, template);
+                return Attempt.FailWithStatus(TemplateOperationStatus.CancelledByNotification, template);
             }
 
             _templateRepository.Save(template);
             scope.Notifications.Publish(
                 new TemplateSavedNotification(template, eventMessages).WithStateFrom(savingEvent));
 
-            Audit(AuditType.Save, userId, template.Id, UmbracoObjectTypes.Template.GetName());
+            Audit(AuditType.New, userId, template.Id, UmbracoObjectTypes.Template.GetName());
             scope.Complete();
         }
 
-        return await Task.FromResult(OperationResult.Attempt.Succeed<OperationResultType, ITemplate>(
-            OperationResultType.Success,
-            eventMessages,
-            template));
+        return await Task.FromResult(Attempt.SucceedWithStatus(TemplateOperationStatus.Success, template));
     }
 
     /// <inheritdoc />
