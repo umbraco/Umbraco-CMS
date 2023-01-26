@@ -13,12 +13,12 @@ using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Core.PropertyEditors;
-using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Infrastructure.Examine;
 using Umbraco.Cms.Infrastructure.Persistence;
 using Directory = Lucene.Net.Store.Directory;
+using IScopeProvider = Umbraco.Cms.Infrastructure.Scoping.IScopeProvider;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Examine.Lucene.UmbracoExamine;
 
@@ -31,7 +31,7 @@ public class IndexInitializer
     private readonly ILoggerFactory _loggerFactory;
     private readonly MediaUrlGeneratorCollection _mediaUrlGenerators;
     private readonly PropertyEditorCollection _propertyEditors;
-    private readonly IScopeProvider _scopeProvider; 
+    private readonly IScopeProvider _scopeProvider;
     private readonly IShortStringHelper _shortStringHelper;
 
     public IndexInitializer(
