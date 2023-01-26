@@ -7,7 +7,7 @@ export class UmbLanguageRootTableNameColumnLayoutElement extends LitElement {
 	static styles = [UUITextStyles, css``];
 
 	@property({ attribute: false })
-	value!: any;
+  value!: { key: string, name: string };
 
 	render() {
 		if (!this.value) return nothing;
