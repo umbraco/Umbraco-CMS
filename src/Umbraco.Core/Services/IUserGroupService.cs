@@ -56,6 +56,8 @@ public interface IUserGroupService
     /// <returns>An attempt indicating if the operation was a success as well as a more detailed <see cref="UserGroupOperationStatus"/>.</returns>
     Task<Attempt<IUserGroup, UserGroupOperationStatus>> CreateAsync(IUserGroup userGroup, int performingUserId, int[]? groupMembersUserIds = null);
 
+    Task<Attempt<IUserGroup, UserGroupOperationStatus>> UpdateAsync(IUserGroup userGroup, int performingUserId);
+
     /// <summary>
     ///     Deletes a UserGroup
     /// </summary>

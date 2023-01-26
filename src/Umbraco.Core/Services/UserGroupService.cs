@@ -146,6 +146,9 @@ public class UserGroupService : RepositoryService, IUserGroupService
         return Attempt.SucceedWithStatus(UserGroupOperationStatus.Success, userGroup);
     }
 
+    /// <inheritdoc />
+    public Task<Attempt<IUserGroup, UserGroupOperationStatus>> UpdateAsync(IUserGroup userGroup, int performingUserId) => throw new NotImplementedException();
+
 
     private async Task<Attempt<IUserGroup, UserGroupOperationStatus>> ValidateUserGroupCreationAsync(IUserGroup userGroup)
     {
