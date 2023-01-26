@@ -4,7 +4,7 @@
 
 In the high probability that you are porting something from angular JS then here are a few helpful tips for using Lit:
 
-Here is the LIT documentation and playground: [https://lit.dev/](https://lit.dev/)
+Here is the LIT documentation and playground: [https://lit.dev](https://lit.dev)
 
 ### How best to find what needs converting from the old backoffice?
 
@@ -59,7 +59,7 @@ The frontend has an API formatter that takes the OpenAPI schema file and convert
 
 Links for Lit examples and documentation:
 
-* [https://lit.dev/](https://lit.dev/)
+* [https://lit.dev](https://lit.dev)
 * [https://lit.dev/docs/](https://lit.dev/docs/)
 * [https://lit.dev/playground/](https://lit.dev/playground/)
 
@@ -67,13 +67,13 @@ Links for Lit examples and documentation:
 
 **HTML**
 
-The simplest approach is to copy over the HTML from the old backoffice into a new Lit element (check existing elements in the repository, e.g. if you are working with a dashboard, then check other dashboards, etc.). Once the HTML is inside the “render” method, it is often enough to simply replace “&lt;umb-***>” elements with “&lt;uui-***>” and replace a few of the attributes. In general, we try to build as much UI with Umbraco UI Library as possible.
+The simplest approach is to copy over the HTML from the old backoffice into a new Lit element (check existing elements in the repository, e.g. if you are working with a dashboard, then check other dashboards, etc.). Once the HTML is inside the `render` method, it is often enough to simply replace `<umb-***>` elements with `<uui-***>` and replace a few of the attributes. In general, we try to build as much UI with Umbraco UI Library as possible.
 
 **Controller**
 
 The old AngularJS controllers will have to be converted into modern TypeScript and will have to use our new services and stores. We try to abstract as much away as possible, and mostly you will have to make API calls and let the rest of the system handle things like error handling and so on. In the case of this dashboard, we only have a few GET and POST requests. Looking at the new Management API, we find the PublishedCacheResource, which is the new API controller to serve data to the dashboard.
 
-To make the first button work, which simply just requests a new status from the server, we must make a call to PublishedCacheResource.getPublishedCacheStatus(). An additional thing here is to wrap that in a friendly function called “tryExecuteAndNotify”, which is something we make available to developers to automatically handle the responses coming from the server and additionally use the Notifications to notify of any errors:
+To make the first button work, which simply just requests a new status from the server, we must make a call to `PublishedCacheResource.getPublishedCacheStatus()`. An additional thing here is to wrap that in a friendly function called `tryExecuteAndNotify`, which is something we make available to developers to automatically handle the responses coming from the server and additionally use the Notifications to notify of any errors:
 
 ```typescript
 import { tryExecuteAndNotify } from '@umbraco-cms/resources';
@@ -91,7 +91,7 @@ private _getStatus() {
 
 ### State (buttons, etc)
 
-It is a good idea to make buttons indicate a loading state when awaiting an API call. All &lt;uui-button> support the “.state” property, which you can set around API calls:
+It is a good idea to make buttons indicate a loading state when awaiting an API call. All `<uui-button>` support the `.state` property, which you can set around API calls:
 
 ```typescript
 @state()
@@ -110,7 +110,7 @@ private _getStatus() {
 
 ### Add to internal manifests
 
-All items are declared in a manifests.ts file, which is located in each section directory.
+All items are declared in a `manifests.ts` file, which is located in each section directory.
 
 To declare the Published Cache Status Dashboard as a new manifest, we need to add the section as a new json object that would look like this:
 
