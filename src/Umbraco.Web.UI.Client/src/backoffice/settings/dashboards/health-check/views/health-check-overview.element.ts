@@ -3,7 +3,10 @@ import { css, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { UUIButtonState } from '@umbraco-ui/uui';
 
-import { UmbHealthCheckDashboardContext } from '../health-check-dashboard.context';
+import {
+	UmbHealthCheckDashboardContext,
+	UMB_HEALTHCHECK_DASHBOARD_CONTEXT_TOKEN,
+} from '../health-check-dashboard.context';
 import { UmbLitElement } from '@umbraco-cms/element';
 
 import { ManifestHealthCheck } from '@umbraco-cms/extensions-registry';
@@ -30,21 +33,12 @@ export class UmbDashboardHealthCheckOverviewElement extends UmbLitElement {
 	@state()
 	private _buttonState: UUIButtonState;
 
-	private _healthCheckManifests: ManifestHealthCheck[] = [];
-
 	private _healthCheckDashboardContext?: UmbHealthCheckDashboardContext;
 
 	constructor() {
 		super();
-		this.consumeContext('umbHealthCheckDashboard', (instance: UmbHealthCheckDashboardContext) => {
+		this.consumeContext(UMB_HEALTHCHECK_DASHBOARD_CONTEXT_TOKEN, (instance) => {
 			this._healthCheckDashboardContext = instance;
-		});
-	}
-
-	connectedCallback(): void {
-		super.connectedCallback();
-		umbExtensionsRegistry.extensionsOfType('healthCheck').subscribe((healthChecks) => {
-			this._healthCheckManifests = healthChecks;
 		});
 	}
 

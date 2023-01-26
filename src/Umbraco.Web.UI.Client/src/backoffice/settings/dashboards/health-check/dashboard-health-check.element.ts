@@ -31,16 +31,14 @@ export class UmbDashboardHealthCheckElement extends UmbLitElement {
 		},
 	];
 
-	private _healthCheckManifests: ManifestHealthCheck[] = [];
+	private _healthCheckDashboardContext = new UmbHealthCheckDashboardContext(this);
 
-	connectedCallback(): void {
-		super.connectedCallback();
-		umbExtensionsRegistry.extensionsOfType('healthCheck').subscribe((healthChecks) => {
-			this._healthCheckManifests = healthChecks;
-			this.provideContext(
-				UMB_HEALTHCHECK_DASHBOARD_CONTEXT_TOKEN,
-				new UmbHealthCheckDashboardContext(this, this._healthCheckManifests)
-			);
+	constructor() {
+		super();
+		this.provideContext(UMB_HEALTHCHECK_DASHBOARD_CONTEXT_TOKEN, this._healthCheckDashboardContext);
+
+		this.observe(umbExtensionsRegistry.extensionsOfType('healthCheck'), (healthCheckManifests) => {
+			this._healthCheckDashboardContext.manifests = healthCheckManifests;
 		});
 	}
 
