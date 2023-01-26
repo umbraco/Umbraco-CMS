@@ -36,13 +36,13 @@ export class UmbDashboardHealthCheckGroupElement extends UmbLitElement {
 				align-items: center;
 			}
 
-			.check-results-wrapper {
-				margin-top: var(--uui-size-space-5);
+			.check-results-wrapper .check-result {
+				padding-top: var(--uui-size-space-5);
 			}
 
-			.check-results-wrapper .check-result:not(:first-child) {
-				padding-top: var(--uui-size-space-5);
-				border-top: 1px solid var(--uui-color-divider-standalone);
+			.check-results-wrapper .check-result:not(:last-child) {
+				border-bottom: 1px solid var(--uui-color-divider-standalone);
+				padding-bottom: var(--uui-size-space-5);
 			}
 
 			.check-results-wrapper uui-button {
