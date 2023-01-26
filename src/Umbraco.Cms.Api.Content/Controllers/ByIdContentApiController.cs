@@ -9,11 +9,10 @@ namespace Umbraco.Cms.Api.Content.Controllers;
 
 public class ByIdContentApiController : ContentApiControllerBase
 {
-    private readonly IApiContentBuilder _apiContentBuilder;
-
     public ByIdContentApiController(IPublishedSnapshotAccessor publishedSnapshotAccessor, IApiContentBuilder apiContentBuilder)
-        : base(publishedSnapshotAccessor)
-        => _apiContentBuilder = apiContentBuilder;
+        : base(publishedSnapshotAccessor, apiContentBuilder)
+    {
+    }
 
     /// <summary>
     ///     Gets a content item by id.
@@ -24,23 +23,23 @@ public class ByIdContentApiController : ContentApiControllerBase
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(IApiContent), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(typeof(NotFoundResult), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> ById(Guid id)
     {
         IPublishedContentCache? contentCache = GetContentCache();
 
         if (contentCache is null)
         {
-            return await Task.FromResult(BadRequest(ContentCacheNotFoundProblemDetails()));
+            return BadRequest(ContentCacheNotFoundProblemDetails());
         }
 
         IPublishedContent? contentItem = contentCache.GetById(id);
 
         if (contentItem is null)
         {
-            return await Task.FromResult(NotFound());
+            return NotFound();
         }
 
-        return await Task.FromResult(Ok(_apiContentBuilder.Build(contentItem)));
+        return await Task.FromResult(Ok(ApiContentBuilder.Build(contentItem)));
     }
 }

@@ -11,11 +11,10 @@ namespace Umbraco.Cms.Api.Content.Controllers;
 
 public class ByRouteContentApiController : ContentApiControllerBase
 {
-    private readonly IApiContentBuilder _apiContentBuilder;
-
     public ByRouteContentApiController(IPublishedSnapshotAccessor publishedSnapshotAccessor, IApiContentBuilder apiContentBuilder)
-        : base(publishedSnapshotAccessor)
-        => _apiContentBuilder = apiContentBuilder;
+        : base(publishedSnapshotAccessor, apiContentBuilder)
+    {
+    }
 
     /// <summary>
     ///     Gets a content item by route.
@@ -26,25 +25,25 @@ public class ByRouteContentApiController : ContentApiControllerBase
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(IApiContent), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(typeof(NotFoundResult), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> ByRoute(string url)
     {
         IPublishedContentCache? contentCache = GetContentCache();
 
         if (contentCache is null)
         {
-            return await Task.FromResult(BadRequest(ContentCacheNotFoundProblemDetails()));
+            return BadRequest(ContentCacheNotFoundProblemDetails());
         }
 
-        var decodedPath = string.Format("/{0}", WebUtility.UrlDecode(url).TrimStart(Constants.CharArrays.ForwardSlash));
+        var decodedPath = $"/{WebUtility.UrlDecode(url).TrimStart(Constants.CharArrays.ForwardSlash)}";
 
         IPublishedContent? contentItem = contentCache.GetByRoute(decodedPath);
 
         if (contentItem is null)
         {
-            return await Task.FromResult(NotFound());
+            return NotFound();
         }
 
-        return await Task.FromResult(Ok(_apiContentBuilder.Build(contentItem)));
+        return await Task.FromResult(Ok(ApiContentBuilder.Build(contentItem)));
     }
 }

@@ -3,6 +3,7 @@ using Umbraco.Cms.Api.Common.Builders;
 using Umbraco.Cms.Api.Common.Filters;
 using Umbraco.Cms.Api.Content.Routing;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.ContentApi;
 using Umbraco.Cms.Core.PublishedCache;
 
 namespace Umbraco.Cms.Api.Content.Controllers;
@@ -16,8 +17,14 @@ public abstract class ContentApiControllerBase : Controller
 {
     private readonly IPublishedSnapshotAccessor _publishedSnapshotAccessor;
 
-    protected ContentApiControllerBase(IPublishedSnapshotAccessor publishedSnapshotAccessor)
-        => _publishedSnapshotAccessor = publishedSnapshotAccessor;
+    protected IApiContentBuilder ApiContentBuilder { get; }
+
+    protected ContentApiControllerBase(IPublishedSnapshotAccessor publishedSnapshotAccessor, IApiContentBuilder apiContentBuilder)
+    {
+        _publishedSnapshotAccessor = publishedSnapshotAccessor;
+
+        ApiContentBuilder = apiContentBuilder;
+    }
 
     protected IPublishedContentCache? GetContentCache() =>
         _publishedSnapshotAccessor.TryGetPublishedSnapshot(out IPublishedSnapshot? publishedSnapshot)
