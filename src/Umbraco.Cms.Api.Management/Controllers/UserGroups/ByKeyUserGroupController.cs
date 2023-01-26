@@ -10,14 +10,14 @@ namespace Umbraco.Cms.Api.Management.Controllers.UserGroups;
 
 public class ByKeyUserGroupController : UserGroupsControllerBase
 {
-    private readonly IUserService _userService;
+    private readonly IUserGroupService _userGroupService;
     private readonly IUserGroupViewModelFactory _userGroupViewModelFactory;
 
     public ByKeyUserGroupController(
-        IUserService userService,
+        IUserGroupService userGroupService,
         IUserGroupViewModelFactory userGroupViewModelFactory)
     {
-        _userService = userService;
+        _userGroupService = userGroupService;
         _userGroupViewModelFactory = userGroupViewModelFactory;
     }
 
@@ -27,7 +27,7 @@ public class ByKeyUserGroupController : UserGroupsControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<UserGroupViewModel>> ByKey(Guid key)
     {
-        IUserGroup? userGroup = _userService.GetUserGroupByKey(key);
+        IUserGroup? userGroup = await _userGroupService.GetAsync(key);
 
         if (userGroup is null)
         {

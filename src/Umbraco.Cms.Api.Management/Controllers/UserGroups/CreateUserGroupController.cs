@@ -12,16 +12,16 @@ namespace Umbraco.Cms.Api.Management.Controllers.UserGroups;
 
 public class CreateUserGroupController : UserGroupsControllerBase
 {
-    private readonly IUserService _userService;
+    private readonly IUserGroupService _userGroupService;
     private readonly IUserGroupViewModelFactory _userGroupViewModelFactory;
     private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
 
     public CreateUserGroupController(
-        IUserService userService,
+        IUserGroupService userGroupService,
         IUserGroupViewModelFactory userGroupViewModelFactory,
         IBackOfficeSecurityAccessor backOfficeSecurityAccessor)
     {
-        _userService = userService;
+        _userGroupService = userGroupService;
         _userGroupViewModelFactory = userGroupViewModelFactory;
         _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
     }
@@ -41,7 +41,7 @@ public class CreateUserGroupController : UserGroupsControllerBase
 
         IUserGroup group = _userGroupViewModelFactory.Create(userGroupSaveModel);
 
-        Attempt<IUserGroup, UserGroupOperationStatus> result = _userService.Create(group, /*currentUser.Id*/ -1);
+        Attempt<IUserGroup, UserGroupOperationStatus> result = await _userGroupService.CreateAsync(group, /*currentUser.Id*/ -1);
         return result.Success
             ? CreatedAtAction<ByKeyUserGroupController>(controller => nameof(controller.ByKey), group.Key)
             : UserGroupOperationStatusResult(result.Status);

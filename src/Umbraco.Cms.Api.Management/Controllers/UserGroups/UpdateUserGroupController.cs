@@ -2,21 +2,24 @@
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Management.Factories;
 using Umbraco.Cms.Api.Management.ViewModels.UserGroups;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Actions;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Api.Management.Controllers.UserGroups;
 
 public class UpdateUserGroupController : UserGroupsControllerBase
 {
-    private readonly IUserService _userService;
+    private readonly IUserGroupService _userGroupService;
     private readonly IUserGroupViewModelFactory _userGroupViewModelFactory;
 
     public UpdateUserGroupController(
-        IUserService userService,
+        IUserGroupService userGroupService,
         IUserGroupViewModelFactory userGroupViewModelFactory)
     {
-        _userService = userService;
+        _userGroupService = userGroupService;
         _userGroupViewModelFactory = userGroupViewModelFactory;
     }
 
@@ -24,10 +27,10 @@ public class UpdateUserGroupController : UserGroupsControllerBase
     [MapToApiVersion("1.0")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<ActionResult> Update(Guid key, UserGroupUpdateModel dataTypeUpdateModel)
+    public async Task<IActionResult> Update(Guid key, UserGroupUpdateModel dataTypeUpdateModel)
     {
         // TODO: Validation etc...
-        IUserGroup? existingUserGroup = _userService.GetUserGroupByKey(key);
+        IUserGroup? existingUserGroup = await _userGroupService.GetAsync(key);
 
         if (existingUserGroup is null)
         {
@@ -36,7 +39,10 @@ public class UpdateUserGroupController : UserGroupsControllerBase
 
         IUserGroup updated = _userGroupViewModelFactory.Update(existingUserGroup, dataTypeUpdateModel);
 
-        _userService.Save(updated);
-        return await Task.FromResult(Ok());
+        Attempt<IUserGroup, UserGroupOperationStatus> result = await _userGroupService.UpdateAsync(updated, -1);
+
+        return result.Success
+            ? Ok()
+            : UserGroupOperationStatusResult(result.Status);
     }
 }

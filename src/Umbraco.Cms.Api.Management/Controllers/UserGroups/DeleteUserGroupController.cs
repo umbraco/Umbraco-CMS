@@ -1,33 +1,38 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Api.Management.Controllers.UserGroups;
 
 public class DeleteUserGroupController : UserGroupsControllerBase
 {
-    private readonly IUserService _userService;
+    private readonly IUserGroupService _userGroupService;
 
-    public DeleteUserGroupController(IUserService userService)
+    public DeleteUserGroupController(IUserGroupService userGroupService)
     {
-        _userService = userService;
+        _userGroupService = userGroupService;
     }
 
     [HttpDelete("{key:guid}")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<ActionResult> Delete(Guid key)
+    public async Task<IActionResult> Delete(Guid key)
     {
-        IUserGroup? group = _userService.GetUserGroupByKey(key);
+        IUserGroup? group = await _userGroupService.GetAsync(key);
 
         if (group is null)
         {
             return NotFound();
         }
 
-        _userService.DeleteUserGroup(group);
-        return Ok();
+        Attempt<UserGroupOperationStatus> result = await _userGroupService.DeleteAsync(group);
+
+        return result.Success
+            ? Ok()
+            : UserGroupOperationStatusResult(result.Result);
     }
 }
