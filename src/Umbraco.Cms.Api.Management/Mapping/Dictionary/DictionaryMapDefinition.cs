@@ -26,7 +26,7 @@ public class DictionaryMapDefinition : IMapDefinition
     // Umbraco.Code.MapAll
     private void Map(IDictionaryTranslation source, DictionaryItemTranslationModel target, MapperContext context)
     {
-        target.IsoCode = source.Language?.IsoCode ?? throw new ArgumentException("Translation has no language", nameof(source));
+        target.IsoCode = source.IsoCode;
         target.Translation = source.Value;
     }
 
@@ -52,8 +52,8 @@ public class DictionaryMapDefinition : IMapDefinition
         target.Name = source.ItemKey;
         target.TranslatedIsoCodes = source
             .Translations
-            .Where(translation => translation.Value.IsNullOrWhiteSpace() == false && translation.Language != null)
-            .Select(translation => translation.Language!.IsoCode)
+            .Where(translation => translation.Value.IsNullOrWhiteSpace() == false)
+            .Select(translation => translation.IsoCode)
             .ToArray();
     }
 }

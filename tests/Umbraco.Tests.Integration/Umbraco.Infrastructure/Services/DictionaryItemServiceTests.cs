@@ -200,7 +200,7 @@ public class DictionaryItemServiceTests : UmbracoIntegrationTest
         foreach (var language in allLangs)
         {
             Assert.AreEqual($"Translation for: {language.IsoCode}",
-                item.Translations.Single(x => x.Language.CultureName == language.CultureName).Value);
+                item.Translations.Single(x => x.IsoCode == language.IsoCode).Value);
         }
     }
 
@@ -229,7 +229,7 @@ public class DictionaryItemServiceTests : UmbracoIntegrationTest
         Assert.IsFalse(item.ParentId.HasValue);
         Assert.AreEqual("Testing12345", item.ItemKey);
         Assert.AreEqual(1, item.Translations.Count());
-        Assert.AreEqual(firstLanguage.Id, item.Translations.First().LanguageId);
+        Assert.AreEqual(firstLanguage.IsoCode, item.Translations.First().IsoCode);
     }
 
     [Test]

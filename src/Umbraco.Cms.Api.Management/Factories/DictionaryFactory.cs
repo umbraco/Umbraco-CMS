@@ -23,11 +23,11 @@ public class DictionaryFactory : IDictionaryFactory
     {
         DictionaryItemViewModel dictionaryViewModel = _umbracoMapper.Map<DictionaryItemViewModel>(dictionaryItem)!;
 
-        var validLanguageIds = (await _languageService.GetAllAsync())
-            .Select(language => language.Id)
+        var validLanguageIsoCodes = (await _languageService.GetAllAsync())
+            .Select(language => language.IsoCode)
             .ToArray();
         IDictionaryTranslation[] validTranslations = dictionaryItem.Translations
-            .Where(t => validLanguageIds.Contains(t.LanguageId))
+            .Where(t => validLanguageIsoCodes.Contains(t.IsoCode))
             .ToArray();
         dictionaryViewModel.Translations = validTranslations
             .Select(translation => _umbracoMapper.Map<DictionaryItemTranslationModel>(translation))

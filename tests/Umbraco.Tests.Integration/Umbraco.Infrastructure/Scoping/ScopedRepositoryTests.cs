@@ -246,7 +246,7 @@ public class ScopedRepositoryTests : UmbracoIntegrationTest
         var item = (await dictionaryItemService.CreateAsync(
             new DictionaryItem("item-key")
             {
-                Translations = new IDictionaryTranslation[] { new DictionaryTranslation(lang.Id, "item-value") }
+                Translations = new IDictionaryTranslation[] { new DictionaryTranslation(lang, "item-value") }
             })).Result;
 
         // Refresh the keyed cache manually

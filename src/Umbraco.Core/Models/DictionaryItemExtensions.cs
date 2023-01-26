@@ -5,27 +5,25 @@ namespace Umbraco.Extensions;
 public static class DictionaryItemExtensions
 {
     /// <summary>
-    ///     Returns the translation value for the language id, if no translation is found it returns an empty string
+    ///     Returns the translation value for the language ISO code, if no translation is found it returns an empty string
     /// </summary>
     /// <param name="d"></param>
-    /// <param name="languageId"></param>
+    /// <param name="isoCode"></param>
     /// <returns></returns>
-    public static string? GetTranslatedValue(this IDictionaryItem d, int languageId)
+    public static string? GetTranslatedValue(this IDictionaryItem d, string isoCode)
     {
-        IDictionaryTranslation? trans = d.Translations.FirstOrDefault(x => x.LanguageId == languageId);
+        IDictionaryTranslation? trans = d.Translations.FirstOrDefault(x => x.IsoCode == isoCode);
         return trans == null ? string.Empty : trans.Value;
     }
 
     /// <summary>
-    ///     Returns the default translated value based on the default language
+    ///     Returns the translation value for the language, if no translation is found it returns an empty string
     /// </summary>
     /// <param name="d"></param>
+    /// <param name="language"></param>
     /// <returns></returns>
-    public static string? GetDefaultValue(this IDictionaryItem d)
-    {
-        IDictionaryTranslation? defaultTranslation = d.Translations.FirstOrDefault(x => x.Language?.Id == 1);
-        return defaultTranslation == null ? string.Empty : defaultTranslation.Value;
-    }
+    public static string? GetTranslatedValue(this IDictionaryItem d, ILanguage language)
+        => d.GetTranslatedValue(language.IsoCode);
 
     /// <summary>
     ///     Adds or updates a translation for a dictionary item and language
@@ -35,7 +33,7 @@ public static class DictionaryItemExtensions
     /// <param name="value"></param>
     public static void AddOrUpdateDictionaryValue(this IDictionaryItem item, ILanguage language, string value)
     {
-        IDictionaryTranslation? existing = item.Translations?.FirstOrDefault(x => x.Language?.Id == language.Id);
+        IDictionaryTranslation? existing = item.Translations?.FirstOrDefault(x => x.IsoCode.Equals(language.IsoCode));
         if (existing != null)
         {
             existing.Value = value;

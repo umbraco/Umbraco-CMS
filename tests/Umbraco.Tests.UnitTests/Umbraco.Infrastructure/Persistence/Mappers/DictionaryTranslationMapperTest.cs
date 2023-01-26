@@ -22,17 +22,6 @@ public class DictionaryTranslationMapperTest
     }
 
     [Test]
-    public void Can_Map_Language_Property()
-    {
-        // Act
-        var column =
-            new DictionaryTranslationMapper(TestHelper.GetMockSqlContext(), TestHelper.CreateMaps()).Map("Language");
-
-        // Assert
-        Assert.That(column, Is.EqualTo("[cmsLanguageText].[languageId]"));
-    }
-
-    [Test]
     public void Can_Map_Value_Property()
     {
         // Act

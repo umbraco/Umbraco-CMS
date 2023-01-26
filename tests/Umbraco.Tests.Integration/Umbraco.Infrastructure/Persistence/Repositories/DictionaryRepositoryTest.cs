@@ -332,7 +332,7 @@ public class DictionaryRepositoryTest : UmbracoIntegrationTest
             // Assert
             Assert.That(dictionaryItem, Is.Not.Null);
             Assert.That(dictionaryItem.Translations.Count(), Is.EqualTo(3));
-            Assert.That(dictionaryItem.Translations.Single(t => t.LanguageId == languageNo.Id).Value, Is.EqualTo("Les mer"));
+            Assert.That(dictionaryItem.Translations.Single(t => t.IsoCode == languageNo.IsoCode).Value, Is.EqualTo("Les mer"));
         }
     }
 

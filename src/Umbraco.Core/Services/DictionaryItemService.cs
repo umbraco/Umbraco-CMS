@@ -35,9 +35,6 @@ internal class DictionaryItemService : RepositoryService, IDictionaryItemService
         using (ScopeProvider.CreateCoreScope(autoComplete: true))
         {
             IDictionaryItem? item = _dictionaryRepository.Get(id);
-
-            // ensure the lazy Language callback is assigned
-            EnsureDictionaryItemLanguageCallback(item);
             return await Task.FromResult(item);
         }
     }
@@ -48,9 +45,6 @@ internal class DictionaryItemService : RepositoryService, IDictionaryItemService
         using (ScopeProvider.CreateCoreScope(autoComplete: true))
         {
             IDictionaryItem? item = _dictionaryRepository.Get(key);
-
-            // ensure the lazy Language callback is assigned
-            EnsureDictionaryItemLanguageCallback(item);
             return await Task.FromResult(item);
         }
     }
@@ -61,13 +55,6 @@ internal class DictionaryItemService : RepositoryService, IDictionaryItemService
         using (ScopeProvider.CreateCoreScope(autoComplete: true))
         {
             IEnumerable<IDictionaryItem> items = _dictionaryRepository.GetMany(ids).ToArray();
-
-            // ensure the lazy Language callback is assigned
-            foreach (IDictionaryItem item in items)
-            {
-                EnsureDictionaryItemLanguageCallback(item);
-            }
-
             return await Task.FromResult(items);
         }
     }
@@ -78,13 +65,6 @@ internal class DictionaryItemService : RepositoryService, IDictionaryItemService
         using (ScopeProvider.CreateCoreScope(autoComplete: true))
         {
             IEnumerable<IDictionaryItem> items = _dictionaryRepository.GetManyByKeys(keys).ToArray();
-
-            // ensure the lazy Language callback is assigned
-            foreach (IDictionaryItem item in items)
-            {
-                EnsureDictionaryItemLanguageCallback(item);
-            }
-
             return await Task.FromResult(items);
         }
     }
@@ -99,13 +79,6 @@ internal class DictionaryItemService : RepositoryService, IDictionaryItemService
         using (ScopeProvider.CreateCoreScope(autoComplete: true))
         {
             IDictionaryItem[] items = _dictionaryRepository.GetDictionaryItemDescendants(parentId).ToArray();
-
-            // ensure the lazy Language callback is assigned
-            foreach (IDictionaryItem item in items)
-            {
-                EnsureDictionaryItemLanguageCallback(item);
-            }
-
             return await Task.FromResult(items);
         }
     }
@@ -239,8 +212,6 @@ internal class DictionaryItemService : RepositoryService, IDictionaryItemService
 
             _dictionaryRepository.Save(dictionaryItem);
 
-            // ensure the lazy Language callback is assigned
-            EnsureDictionaryItemLanguageCallback(dictionaryItem);
             scope.Notifications.Publish(
                 new DictionaryItemSavedNotification(dictionaryItem, eventMessages).WithStateFrom(savingNotification));
 
@@ -256,44 +227,12 @@ internal class DictionaryItemService : RepositoryService, IDictionaryItemService
         using (ScopeProvider.CreateCoreScope(autoComplete: true))
         {
             IDictionaryItem[] items = _dictionaryRepository.Get(query).ToArray();
-
-            // ensure the lazy Language callback is assigned
-            foreach (IDictionaryItem item in items)
-            {
-                EnsureDictionaryItemLanguageCallback(item);
-            }
-
             return await Task.FromResult(items);
         }
     }
 
     private void Audit(AuditType type, string message, int userId, int objectId, string? entityType) =>
         _auditRepository.Save(new AuditItem(objectId, type, userId, entityType, message));
-
-    /// <summary>
-    ///     This is here to take care of a hack - the DictionaryTranslation model contains an ILanguage reference which we
-    ///     don't want but
-    ///     we cannot remove it because it would be a large breaking change, so we need to make sure it's resolved lazily. This
-    ///     is because
-    ///     if developers have a lot of dictionary items and translations, the caching and cloning size gets much larger
-    ///     because of
-    ///     the large object graphs. So now we don't cache or clone the attached ILanguage
-    /// </summary>
-    private void EnsureDictionaryItemLanguageCallback(IDictionaryItem? d)
-    {
-        if (d is not DictionaryItem item)
-        {
-            return;
-        }
-
-        // TODO: obsolete this!
-        item.GetLanguage = GetLanguageById;
-        IEnumerable<DictionaryTranslation> translations = item.Translations.OfType<DictionaryTranslation>();
-        foreach (DictionaryTranslation trans in translations)
-        {
-            trans.GetLanguage = GetLanguageById;
-        }
-    }
 
     private bool HasValidParent(IDictionaryItem dictionaryItem)
         => dictionaryItem.ParentId.HasValue == false || _dictionaryRepository.Get(dictionaryItem.ParentId.Value) != null;
@@ -306,8 +245,8 @@ internal class DictionaryItemService : RepositoryService, IDictionaryItemService
             return;
         }
 
-        var allLanguageIds = allLanguages.Select(language => language.Id).ToArray();
-        dictionaryItem.Translations = translationsAsArray.Where(translation => allLanguageIds.Contains(translation.LanguageId)).ToArray();
+        var allLanguageIsoCodes = allLanguages.Select(language => language.IsoCode).ToArray();
+        dictionaryItem.Translations = translationsAsArray.Where(translation => allLanguageIsoCodes.Contains(translation.IsoCode)).ToArray();
     }
 
     private bool HasItemKeyCollision(IDictionaryItem dictionaryItem)
@@ -315,6 +254,4 @@ internal class DictionaryItemService : RepositoryService, IDictionaryItemService
         IDictionaryItem? itemKeyCollision = _dictionaryRepository.Get(dictionaryItem.ItemKey);
         return itemKeyCollision != null && itemKeyCollision.Key != dictionaryItem.Key;
     }
-
-    private ILanguage? GetLanguageById(int id) => _languageService.GetAllAsync().GetAwaiter().GetResult().FirstOrDefault(l => l.Id == id);
 }

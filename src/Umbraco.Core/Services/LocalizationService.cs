@@ -126,11 +126,7 @@ internal class LocalizationService : RepositoryService, ILocalizationService
     {
         using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
         {
-            IDictionaryItem? item = _dictionaryRepository.Get(id);
-
-            // ensure the lazy Language callback is assigned
-            EnsureDictionaryItemLanguageCallback(item);
-            return item;
+            return _dictionaryRepository.Get(id);
         }
     }
 
@@ -343,33 +339,6 @@ internal class LocalizationService : RepositoryService, ILocalizationService
         using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
         {
             return _dictionaryRepository.GetDictionaryItemKeyMap();
-        }
-    }
-
-    /// <summary>
-    ///     This is here to take care of a hack - the DictionaryTranslation model contains an ILanguage reference which we
-    ///     don't want but
-    ///     we cannot remove it because it would be a large breaking change, so we need to make sure it's resolved lazily. This
-    ///     is because
-    ///     if developers have a lot of dictionary items and translations, the caching and cloning size gets much larger
-    ///     because of
-    ///     the large object graphs. So now we don't cache or clone the attached ILanguage
-    /// </summary>
-    private void EnsureDictionaryItemLanguageCallback(IDictionaryItem? d)
-    {
-        if (d is not DictionaryItem item)
-        {
-            return;
-        }
-
-        item.GetLanguage = GetLanguageById;
-        IEnumerable<DictionaryTranslation>? translations = item.Translations?.OfType<DictionaryTranslation>();
-        if (translations is not null)
-        {
-            foreach (DictionaryTranslation trans in translations)
-            {
-                trans.GetLanguage = GetLanguageById;
-            }
         }
     }
 }

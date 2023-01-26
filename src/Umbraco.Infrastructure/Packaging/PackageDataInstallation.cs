@@ -1466,7 +1466,7 @@ namespace Umbraco.Cms.Infrastructure.Packaging
 
         private static bool DictionaryValueIsNew(IEnumerable<IDictionaryTranslation> translations,
             XElement valueElement)
-            => translations.All(t => string.Compare(t.Language?.IsoCode,
+            => translations.All(t => string.Compare(t.IsoCode,
                                          valueElement.Attribute("LanguageCultureAlias")?.Value,
                                          StringComparison.InvariantCultureIgnoreCase) !=
                                      0);

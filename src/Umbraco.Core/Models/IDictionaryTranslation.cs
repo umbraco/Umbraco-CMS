@@ -5,13 +5,7 @@ namespace Umbraco.Cms.Core.Models;
 
 public interface IDictionaryTranslation : IEntity, IRememberBeingDirty
 {
-    /// <summary>
-    ///     Gets or sets the <see cref="Language" /> for the translation
-    /// </summary>
-    [DataMember]
-    ILanguage? Language { get; set; }
-
-    int LanguageId { get; }
+    string IsoCode { get; }
 
     /// <summary>
     ///     Gets or sets the translated text
