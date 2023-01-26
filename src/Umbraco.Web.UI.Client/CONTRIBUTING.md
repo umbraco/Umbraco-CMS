@@ -9,7 +9,7 @@ Here is the LIT documentation and playground: [https://lit.dev/](https://lit.dev
 ### How best to find what needs converting from the old backoffice?
 
 1. Navigate to [https://github.com/umbraco/Umbraco-CMS](https://github.com/umbraco/Umbraco-CMS)
-2. Make sure you are on the “v13/dev” branch
+2. Make sure you are on the `v13/dev` branch
 
 ### What is the process of contribution?
 
@@ -23,13 +23,13 @@ Here is the LIT documentation and playground: [https://lit.dev/](https://lit.dev
 
 TBD
 
-### Contributing in general terms
+## Contributing in general terms
 
 A lot of the UI has already been migrated to the new backoffice. Generally speaking, one would find a feature on the projects board, locate the UI in the old backoffice (v11 is fine), convert it to Lit components using the UI library, put the business logic into a store/service, write tests, and make a pull request.
 
 We are also very keen to receive contributions towards **documentation, unit testing, package development, accessibility, and just general testing of the UI.**
 
-### The Management API
+## The Management API
 
 The management API is the colloquial term used to describe the new backoffice API. It is built as a .NET Web API, has a Swagger endpoint (/umbraco/swagger), and outputs an OpenAPI v3 schema, that the frontend consumes.
 
@@ -38,7 +38,7 @@ The frontend has an API formatter that takes the OpenAPI schema file and convert
 ### Caveats
 
 1. There is currently no way to add translations. All texts in the UI are expected to be written in Umbraco’s default language of English.
-2. The backoffice can be run and tested against a real Umbraco instance by cloning down the v13/dev branch, but there are no guarantees about how well it works yet.
+2. The backoffice can be run and tested against a real Umbraco instance by cloning down the `v13/dev` branch, but there are no guarantees about how well it works yet.
 3. Authentication has not been built, so the login page is never shown - HQ is working actively on this.
 
 **Current schema for API:**
@@ -47,7 +47,7 @@ The frontend has an API formatter that takes the OpenAPI schema file and convert
 
 **How to convert it:**
 
-Run “npm run generate:api”
+* Run `npm run generate:api`
 
 ## A contribution example
 
@@ -55,7 +55,7 @@ Run “npm run generate:api”
 
 ![alt_text](images/image1.png "image_tooltip")
 
-#### Boilerplate (example using Lit)
+### Boilerplate (example using Lit)
 
 Links for Lit examples and documentation:
 
@@ -63,7 +63,7 @@ Links for Lit examples and documentation:
 * [https://lit.dev/docs/](https://lit.dev/docs/)
 * [https://lit.dev/playground/](https://lit.dev/playground/)
 
-#### Functionality
+### Functionality
 
 **HTML**
 
@@ -89,7 +89,7 @@ private _getStatus() {
 }
 ```
 
-#### State (buttons, etc)
+### State (buttons, etc)
 
 It is a good idea to make buttons indicate a loading state when awaiting an API call. All &lt;uui-button> support the “.state” property, which you can set around API calls:
 
@@ -106,9 +106,9 @@ private _getStatus() {
 }
 ```
 
-### Making the dashboard visible
+## Making the dashboard visible
 
-#### Add to internal manifests
+### Add to internal manifests
 
 All items are declared in a manifests.ts file, which is located in each section directory.
 
@@ -131,38 +131,36 @@ To declare the Published Cache Status Dashboard as a new manifest, we need to ad
 
 Let’s go through each of these properties…
 
-**<code>Type </code></strong>can be one of the following:
+* Type: can be one of the following:
+  * section - examples include: `Content`, `Media`
+  * dashboard - a view within a section. Examples include: the welcome dashboard
+  * propertyEditorUI
+  * editorView
+  * propertyAction
+  * tree
+  * editor
+  * treeItemAction
 
-* section - examples include: “Content”, “Media”
-* dashboard - a view within a section. Examples include: the welcome dashboard
-* propertyEditorUI
-* editorView
-* propertyAction
-* tree
-* editor
-* treeItemAction
+* Alias: is the unique key used to identify this item.
+* Name: is the human-readable name for this item.
 
-**<code>Alias </code></strong>is the unique key used to identify this item.
-
-**<code>Name </code></strong>is the human-readable name for this item.
-
-ElementName - this is the customElementName declared on the element at the top of the file i.e
+* ElementName: this is the customElementName declared on the element at the top of the file i.e
 
 ```typescript
 @customElement('umb-dashboard-published-status')
 ```
 
-**<code>Loader </code></strong>references a function call to import the file that the element is declared within
+* Loader: references a function call to import the file that the element is declared within
 
-**<code>Meta </code></strong>allows us to reference additional data - in our case we can specify the section that our dashboard will sit within, the pathname that will be displayed in the url and the weight of the section
+* Meta: allows us to reference additional data - in our case we can specify the section that our dashboard will sit within, the pathname that will be displayed in the url and the weight of the section
 
-### API mock handlers
+## API mock handlers
 
-Running the app with “npm run dev”, you will quickly notice the API requests turn into 404 errors. In order to hit the API, we need to add a mock handler to define the endpoints which our dashboard will call. In the case of the Published Cache Status section, we have a number of calls to work through. Let’s start by looking at the call to retrieve the current status of the cache:
+Running the app with `npm run dev`, you will quickly notice the API requests turn into 404 errors. In order to hit the API, we need to add a mock handler to define the endpoints which our dashboard will call. In the case of the Published Cache Status section, we have a number of calls to work through. Let’s start by looking at the call to retrieve the current status of the cache:
 
 ![alt_text](images/image2.png "image_tooltip")
 
-From the existing functionality, we can see that this is a string message that is received as part of a `GET`request from the server.
+From the existing functionality, we can see that this is a string message that is received as part of a `GET` request from the server.
 
 So to define this, we must first add a handler for the Published Status called `published-status.handlers.ts` within the mocks/domains folder. In this file we will have code that looks like the following:
 
@@ -183,11 +181,11 @@ export const handlers = [
 ];
 ```
 
-This is defining the `GET`path that we will call through the resource: `/published-cache/status`
+This is defining the `GET` path that we will call through the resource: `/published-cache/status`
 
-It returns a`200 OK` response and a string value with the current “status” of the published cache for us to use within the element
+It returns a `200 OK` response and a string value with the current “status” of the published cache for us to use within the element
 
-An example `POST`is similar. Let’s take the “Refresh status” button as an example:
+An example `POST` is similar. Let’s take the “Refresh status” button as an example:
 
 ![alt_text](images/image3.png "image_tooltip")
 
@@ -208,7 +206,7 @@ Which is defining a new `POST` endpoint that we can add to the core API fetcher 
 
 This call returns a simple `OK` status code and no other object.
 
-### Storybook stories
+## Storybook stories
 
 We try to make good Storybook stories for new components, which is a nice way to work with a component in an isolated state. Imagine you are working with a dialog on page 3 and have to navigate back to that every time you make a change - this is now eliminated with Storybook as you can just make a story that displays that step. Storybook can only show one component at a time, so it also helps us to isolate view logic into more and smaller components, which in turn are more testable.
 
@@ -216,24 +214,24 @@ In depth: [https://storybook.js.org/docs/web-components/get-started/introduction
 
 Reference: [https://ambitious-stone-0033b3603.1.azurestaticapps.net/](https://ambitious-stone-0033b3603.1.azurestaticapps.net/)
 
-* Locally: npm run storybook
+* Locally: `npm run storybook`
 
 For Umbraco UI stories, please navigate to [https://uui.umbraco.com/](https://uui.umbraco.com/)
 
-### Testing
+## Testing
 
 There are two testing tools on the backoffice: unit testing and end-to-end testing.
 
-#### Unit testing
+### Unit testing
 
 We are using a tool called Web Test Runner which spins up a bunch of browsers using Playwright with the well-known jasmine/chai syntax. It is expected that any new component/element has a test file named “&lt;component>.test.ts”. It will automatically be picked up and there are a set of standard tests we apply to all components, which checks that they are registered correctly and they pass accessibility testing through Axe.
 
 Working with playwright: [https://playwright.dev/docs/intro](https://playwright.dev/docs/intro)
 
-#### End-to-end testing
+### End-to-end testing
 
 This test is being performed by Playwright as well but is running in a mode where Playwright clicks through the browser in different scenarios and reports on those. There are no requirements to add these tests to new components yet, but it is encouraged. The tests are located in a separate app called “backoffice-e2e”.
 
-### Putting it all together
+## Putting it all together
 
 When we are finished with the dashboard we will hopefully have something akin to this [real-world example of the actual dashboard that was migrated](https://github.com/umbraco/Umbraco.CMS.Backoffice/tree/main/src/backoffice/settings/dashboards/published-status).
