@@ -14,12 +14,21 @@ export interface UmbTreeStore<T> extends UmbDataStore {
 	getTreeItemChildren(key: string): Observable<Array<T>>;
 }
 
-export interface UmbContentStore<T> extends UmbDataStore {
+export interface UmbEntityStore<T> extends UmbDataStore {
+
+	/**
+	 * @description - Request scaffold data by entityType and . The data is added to the store and is returned as an Observable.
+	 * @param {string} key
+	 * @return {*}  {T}
+	 * @memberof UmbEntityStore
+	 */
+	getScaffold: (entityType: string, parentKey: string | null) => T;
+
 	/**
 	 * @description - Request data by key. The data is added to the store and is returned as an Observable.
 	 * @param {string} key
 	 * @return {*}  {(Observable<T>)}
-	 * @memberof UmbDataStoreBase
+	 * @memberof UmbEntityStore
 	 */
 	getByKey(key: string): Observable<T | undefined>;
 
@@ -27,7 +36,15 @@ export interface UmbContentStore<T> extends UmbDataStore {
 	 * @description - Save data.
 	 * @param {object} data
 	 * @return {*}  {(Promise<void>)}
-	 * @memberof UmbContentStore
+	 * @memberof UmbEntityStore
 	 */
 	save(data: T[]): Promise<void>;
+}
+
+
+export interface UmbContentStore<T> extends UmbEntityStore<T> {
+
+	// TODO: make something that is specific for UmbContentStore
+	save(data: T[]): Promise<void>;
+
 }

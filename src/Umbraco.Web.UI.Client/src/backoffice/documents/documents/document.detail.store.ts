@@ -38,6 +38,37 @@ export class UmbDocumentDetailStore extends UmbStoreBase implements UmbContentSt
 		);
 	}
 
+	getScaffold(entityType: string, parentKey: string | null) {
+		return {
+			key: '',
+			name: '',
+			icon: '',
+			type: '',
+			hasChildren: false,
+			parentKey: '',
+			isTrashed: false,
+			properties: [
+				{
+					alias: '',
+					label: '',
+					description: '',
+					dataTypeKey: '',
+				},
+			],
+			data: [
+				{
+					alias: '',
+					value: '',
+				},
+			],
+			variants: [
+				{
+					name: '',
+				},
+			],
+		} as DocumentDetails;
+	}
+
 	// TODO: make sure UI somehow can follow the status of this action.
 	save(data: DocumentDetails[]) {
 		// fetch from server and update store

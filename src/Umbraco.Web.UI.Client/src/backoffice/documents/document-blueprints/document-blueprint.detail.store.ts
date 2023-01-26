@@ -44,6 +44,11 @@ export class UmbDocumentBlueprintDetailStore extends UmbStoreBase {
 		);
 	}
 
+	getScaffold(entityType: string, parentKey: string | null) {
+		return {
+		} as DocumentBlueprintDetails;
+	}
+
 	// TODO: make sure UI somehow can follow the status of this action.
 	/**
 	 * @description - Save a DocumentBlueprint.

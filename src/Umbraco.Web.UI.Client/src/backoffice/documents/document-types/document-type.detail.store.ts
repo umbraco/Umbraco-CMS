@@ -24,6 +24,20 @@ export class UmbDocumentTypeDetailStore extends UmbStoreBase {
 		super(host, UMB_DOCUMENT_TYPE_DETAIL_STORE_CONTEXT_TOKEN.toString());
 	}
 
+
+	getScaffold(entityType: string, parentKey: string | null) {
+		return {
+			key: '',
+			name: '',
+			icon: '',
+			type: '',
+			hasChildren: false,
+			parentKey: '',
+			alias: '',
+			properties: [],
+		} as DocumentTypeDetails;
+	}
+
 	/**
 	 * @description - Request a Data Type by key. The Data Type is added to the store and is returned as an Observable.
 	 * @param {string} key

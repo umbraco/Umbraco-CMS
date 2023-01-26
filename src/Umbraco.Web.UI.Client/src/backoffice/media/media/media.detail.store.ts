@@ -17,7 +17,7 @@ export const UMB_MEDIA_DETAIL_STORE_CONTEXT_TOKEN = new UmbContextToken<UmbMedia
 export class UmbMediaDetailStore extends UmbStoreBase implements UmbContentStore<MediaDetails> {
 
 
-	#data = new ArrayState<DocumentDetails>([], (x) => x.key);
+	#data = new ArrayState<MediaDetails>([], (x) => x.key);
 
 
 	constructor(host: UmbControllerHostInterface) {
@@ -35,6 +35,32 @@ export class UmbMediaDetailStore extends UmbStoreBase implements UmbContentStore
 		return createObservablePart(this.#data, (documents) =>
 			documents.find((document) => document.key === key)
 		);
+	}
+
+	getScaffold(entityType: string, parentKey: string | null) {
+		return {
+			key: '',
+			name: '',
+			icon: '',
+			type: '',
+			hasChildren: false,
+			parentKey: '',
+			isTrashed: false,
+			properties: [
+				{
+					alias: '',
+					label: '',
+					description: '',
+					dataTypeKey: '',
+				},
+			],
+			data: [
+				{
+					alias: '',
+					value: '',
+				},
+			]
+		} as MediaDetails;
 	}
 
 	// TODO: make sure UI somehow can follow the status of this action.
