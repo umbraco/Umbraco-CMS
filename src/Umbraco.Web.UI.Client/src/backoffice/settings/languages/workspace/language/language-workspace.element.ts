@@ -5,7 +5,7 @@ import { UUIInputElement, UUIInputEvent } from '@umbraco-ui/uui';
 import { UmbWorkspaceLanguageContext } from './language-workspace.context';
 import { UmbLitElement } from '@umbraco-cms/element';
 import type { LanguageDetails } from '@umbraco-cms/models';
-import 'src/backoffice/shared/components/workspace/actions/save/workspace-action-node-save.element.ts';
+import '../../../../shared/components/workspace/actions/save/workspace-action-node-save.element.ts';
 
 @customElement('umb-language-workspace')
 export class UmbLanguageWorkspaceElement extends UmbLitElement {

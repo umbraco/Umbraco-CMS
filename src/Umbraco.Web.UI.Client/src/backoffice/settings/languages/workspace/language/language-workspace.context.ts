@@ -1,9 +1,8 @@
+import { UmbLanguageStore, UmbLanguageStoreItemType, UMB_LANGUAGE_STORE_CONTEXT_TOKEN } from '../../language.store';
 import type { LanguageDetails } from '@umbraco-cms/models';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
-import { UmbObserverController } from '@umbraco-cms/observable-api';
-import { UmbLanguageStore, UmbLanguageStoreItemType, UMB_LANGUAGE_STORE_CONTEXT_TOKEN } from '../../language.store';
-import { UniqueBehaviorSubject } from 'src/core/observable-api/unique-behavior-subject';
-import { UmbContextConsumerController } from 'src/core/context-api/consume/context-consumer.controller';
+import { UmbObserverController, UniqueBehaviorSubject } from '@umbraco-cms/observable-api';
+import { UmbContextConsumerController } from '@umbraco-cms/context-api';
 
 const DefaultLanguageData: UmbLanguageStoreItemType = {
 	id: 0,

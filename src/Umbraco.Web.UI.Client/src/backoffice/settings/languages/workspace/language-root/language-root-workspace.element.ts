@@ -2,8 +2,8 @@ import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { UmbLanguageStore, UMB_LANGUAGE_STORE_CONTEXT_TOKEN } from '../../language.store';
+import { UmbTableColumn, UmbTableConfig, UmbTableItem } from '../../../../shared/components/table';
 import type { LanguageDetails } from '@umbraco-cms/models';
-import { UmbTableColumn, UmbTableConfig, UmbTableItem } from 'src/backoffice/shared/components/table';
 import { UmbLitElement } from '@umbraco-cms/element';
 
 import '../language/language-workspace.element';

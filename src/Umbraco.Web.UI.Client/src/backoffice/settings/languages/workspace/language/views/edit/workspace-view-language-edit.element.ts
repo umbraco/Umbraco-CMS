@@ -5,8 +5,8 @@ import { repeat } from 'lit/directives/repeat.js';
 import { customElement, property, state } from 'lit/decorators.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
 import { UmbWorkspaceLanguageContext } from '../../language-workspace.context';
+import { UmbLanguageStore } from '../../../../language.store';
 import type { LanguageDetails } from '@umbraco-cms/models';
-import { UmbLanguageStore } from 'src/backoffice/settings/languages/language.store';
 import { UmbLitElement } from '@umbraco-cms/element';
 
 @customElement('umb-workspace-view-language-edit')
