@@ -1,6 +1,6 @@
-import { html, css, nothing } from 'lit';
+import { html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
-import { IRoute, IRoutingInfo, path } from 'router-slot';
+import { IRoute, IRoutingInfo } from 'router-slot';
 import { UmbDashboardHealthCheckGroupElement } from './views/health-check-group.element';
 import { UmbHealthCheckDashboardContext } from './health-check-dashboard.context';
 import { UmbHealthCheckContext } from './health-check.context';
@@ -12,16 +12,6 @@ import { HealthCheckGroup, HealthCheckResource } from '@umbraco-cms/backend-api'
 
 @customElement('umb-dashboard-health-check')
 export class UmbDashboardHealthCheckElement extends UmbLitElement {
-	static styles = [
-		css`
-			a {
-				color: var(--uui-color-text);
-				text-decoration: none;
-				cursor: pointer;
-				display: inline-block;
-			}
-		`,
-	];
 	@state()
 	private _routes: IRoute[] = [
 		{
@@ -38,14 +28,7 @@ export class UmbDashboardHealthCheckElement extends UmbLitElement {
 		},
 	];
 
-	@state()
-	private _currentPath?: string;
-
 	private _healthCheckManifests: ManifestHealthCheck[] = [];
-
-	private _onRouteChange() {
-		this._currentPath = path();
-	}
 
 	connectedCallback(): void {
 		super.connectedCallback();
@@ -60,10 +43,6 @@ export class UmbDashboardHealthCheckElement extends UmbLitElement {
 
 	protected firstUpdated() {
 		this.#registerHealthChecks();
-	}
-
-	private get backbutton(): boolean {
-		return this._currentPath == '/section/settings/dashboard/health-check/' || !this._currentPath ? false : true;
 	}
 
 	#registerHealthChecks = async () => {
@@ -96,10 +75,7 @@ export class UmbDashboardHealthCheckElement extends UmbLitElement {
 	}
 
 	render() {
-		return html` ${this.backbutton
-				? html` <a href="/section/settings/dashboard/health-check"> &larr; Back to overview </a> `
-				: nothing}
-			<router-slot @changestate="${this._onRouteChange}" .routes=${this._routes}></router-slot>`;
+		return html` <router-slot .routes=${this._routes}></router-slot>`;
 	}
 }
 

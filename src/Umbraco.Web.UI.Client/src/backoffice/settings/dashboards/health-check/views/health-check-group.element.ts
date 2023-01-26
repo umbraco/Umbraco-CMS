@@ -113,29 +113,32 @@ export class UmbDashboardHealthCheckGroupElement extends UmbLitElement {
 	}
 
 	render() {
-		if (this._group) {
-			return html`
-				<div class="header">
-					<h2>${this._group.name}</h2>
-					<uui-button
-						label="Perform checks"
-						color="positive"
-						look="primary"
-						.state="${this._buttonState}"
-						@click="${this._buttonHandler}">
-						Perform checks
-					</uui-button>
-				</div>
-				<div class="checks-wrapper">
-					${this._group.checks?.map((check) => {
-						return html`<uui-box headline="${check.name || '?'}">
-							<p>${check.description}</p>
-							${check.key ? this.renderCheckResults(check.key) : nothing}
-						</uui-box>`;
-					})}
-				</div>
-			`;
-		} else return nothing;
+		return html` <a href="/section/settings/dashboard/health-check"> &larr; Back to overview </a>
+			${this._group ? this.#renderGroup() : nothing}`;
+	}
+
+	#renderGroup() {
+		return html`
+			<div class="header">
+				<h2>${this._group?.name}</h2>
+				<uui-button
+					label="Perform checks"
+					color="positive"
+					look="primary"
+					.state="${this._buttonState}"
+					@click="${this._buttonHandler}">
+					Perform checks
+				</uui-button>
+			</div>
+			<div class="checks-wrapper">
+				${this._group?.checks?.map((check) => {
+					return html`<uui-box headline="${check.name || '?'}">
+						<p>${check.description}</p>
+						${check.key ? this.renderCheckResults(check.key) : nothing}
+					</uui-box>`;
+				})}
+			</div>
+		`;
 	}
 
 	renderCheckResults(key: string) {
