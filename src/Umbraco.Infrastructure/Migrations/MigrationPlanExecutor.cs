@@ -1,6 +1,11 @@
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Migrations;
+using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Scoping;
+using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Infrastructure.Scoping;
 
 namespace Umbraco.Cms.Infrastructure.Migrations;
@@ -17,13 +22,33 @@ public class MigrationPlanExecutor : IMigrationPlanExecutor
         ICoreScopeProvider scopeProvider,
         IScopeAccessor scopeAccessor,
         ILoggerFactory loggerFactory,
-        IMigrationBuilder migrationBuilder)
+        IMigrationBuilder migrationBuilder,
+        IUmbracoDatabaseFactory databaseFactory,
+        IPublishedSnapshotService publishedSnapshotService,
+        DistributedCache distributedCache)
     {
         _scopeProvider = scopeProvider;
         _scopeAccessor = scopeAccessor;
         _loggerFactory = loggerFactory;
         _migrationBuilder = migrationBuilder;
         _logger = _loggerFactory.CreateLogger<MigrationPlanExecutor>();
+    }
+
+    [Obsolete("Use constructor with 7 parameters")]
+    public MigrationPlanExecutor(
+        ICoreScopeProvider scopeProvider,
+        IScopeAccessor scopeAccessor,
+        ILoggerFactory loggerFactory,
+        IMigrationBuilder migrationBuilder)
+        : this(
+            scopeProvider,
+            scopeAccessor,
+            loggerFactory,
+            migrationBuilder,
+            StaticServiceProvider.Instance.GetRequiredService<IUmbracoDatabaseFactory>(),
+            StaticServiceProvider.Instance.GetRequiredService<IPublishedSnapshotService>(),
+            StaticServiceProvider.Instance.GetRequiredService<DistributedCache>())
+    {
     }
 
     /// <summary>
@@ -36,6 +61,7 @@ public class MigrationPlanExecutor : IMigrationPlanExecutor
     /// <param name="loggerFactory"></param>
     /// <returns>The final state.</returns>
     /// <remarks>The plan executes within the scope, which must then be completed.</remarks>
+    [Obsolete("This will return an ExecutedMigrationPlan in V13")]
     public string Execute(MigrationPlan plan, string fromState)
     {
         plan.Validate();
