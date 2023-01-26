@@ -1,13 +1,11 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html, nothing } from 'lit';
-import { customElement, state, query } from 'lit/decorators.js';
+import { customElement, state, query, property } from 'lit/decorators.js';
 import { UUIButtonState, UUIPaginationElement, UUIPaginationEvent } from '@umbraco-ui/uui';
 import { UmbModalService, UMB_MODAL_SERVICE_CONTEXT_TOKEN } from '../../../../core/modal';
 import { UmbLitElement } from '@umbraco-cms/element';
 import { RedirectManagementResource, RedirectStatus, RedirectUrl, RedirectUrlStatus } from '@umbraco-cms/backend-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/resources';
-
-const itemsPerPage = 5;
 
 @customElement('umb-dashboard-redirect-management')
 export class UmbDashboardRedirectManagementElement extends UmbLitElement {
@@ -75,6 +73,9 @@ export class UmbDashboardRedirectManagementElement extends UmbLitElement {
 			}
 		`,
 	];
+
+	@property({ type: Number, attribute: 'items-per-page' })
+	itemsPerPage = 5;
 
 	@state()
 	private _redirectData?: RedirectUrl[];
@@ -195,10 +196,10 @@ export class UmbDashboardRedirectManagementElement extends UmbLitElement {
 	}
 
 	private async _getRedirectData() {
-		const skip = this._currentPage * itemsPerPage - itemsPerPage;
+		const skip = this._currentPage * this.itemsPerPage - this.itemsPerPage;
 		const { data } = await tryExecuteAndNotify(
 			this,
-			RedirectManagementResource.getRedirectManagement({ filter: this._filter, take: itemsPerPage, skip })
+			RedirectManagementResource.getRedirectManagement({ filter: this._filter, take: this.itemsPerPage, skip })
 		);
 		if (data) {
 			this._total = data?.total;
@@ -309,7 +310,7 @@ export class UmbDashboardRedirectManagementElement extends UmbLitElement {
 	private _renderPagination() {
 		if (this._total) {
 			return html`<uui-pagination
-				total="${Math.ceil(this._total / itemsPerPage)}"
+				total="${Math.ceil(this._total / this.itemsPerPage)}"
 				@change="${this._onPageChange}"></uui-pagination>`;
 		} else return nothing;
 	}
