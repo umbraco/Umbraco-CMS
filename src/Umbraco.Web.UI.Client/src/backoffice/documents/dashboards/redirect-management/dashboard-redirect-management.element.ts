@@ -99,7 +99,7 @@ export class UmbDashboardRedirectManagementElement extends UmbLitElement {
 	private _searchField!: HTMLInputElement;
 
 	@query('uui-pagination')
-	private _pagination!: UUIPaginationElement;
+	private _pagination?: UUIPaginationElement;
 
 	private _modalService?: UmbModalService;
 
@@ -181,7 +181,7 @@ export class UmbDashboardRedirectManagementElement extends UmbLitElement {
 
 	private async _searchHandler() {
 		this._filter = this._searchField.value;
-		this._pagination.current = 1;
+		if (this._pagination) this._pagination.current = 1;
 		this._currentPage = 1;
 		if (this._filter.length) {
 			this._buttonState = 'waiting';
