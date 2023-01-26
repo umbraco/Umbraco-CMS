@@ -53,7 +53,7 @@ export const handlers = [
 		return res(ctx.status(200), ctx.json<RedirectUrlStatus>(UrlTracker));
 	}),
 
-	rest.post(umbracoPath('redirect-management/status'), async (_req, res, ctx) => {
+	rest.post(umbracoPath('/redirect-management/status'), async (_req, res, ctx) => {
 		UrlTracker.status = UrlTracker.status === RedirectStatus.ENABLED ? RedirectStatus.DISABLED : RedirectStatus.ENABLED;
 		return res(ctx.status(200), ctx.json<any>(UrlTracker.status));
 	}),

@@ -40,7 +40,7 @@ export class UmbDashboardRedirectManagementElement extends UmbLitElement {
 				vertical-align: sub;
 			}
 			uui-pagination {
-				display: block;
+				display: inline-block;
 				margin-top: var(--uui-size-space-5);
 			}
 
@@ -75,7 +75,7 @@ export class UmbDashboardRedirectManagementElement extends UmbLitElement {
 	];
 
 	@property({ type: Number, attribute: 'items-per-page' })
-	itemsPerPage = 5;
+	itemsPerPage = 20;
 
 	@state()
 	private _redirectData?: RedirectUrl[];
@@ -117,8 +117,9 @@ export class UmbDashboardRedirectManagementElement extends UmbLitElement {
 	}
 
 	private async _getTrackerStatus() {
+		//TODO: This resource calls the wrong api
 		const { data } = await tryExecuteAndNotify(this, RedirectManagementResource.getRedirectManagementStatus());
-		if (data && data.status) data.status === RedirectStatus.ENABLED ? true : false;
+		//if (data && data.status) this._trackerStatus = data.status === RedirectStatus.ENABLED ? true : false;
 	}
 
 	private _removeRedirectHandler(data: RedirectUrl) {
@@ -141,15 +142,14 @@ export class UmbDashboardRedirectManagementElement extends UmbLitElement {
 	}
 
 	private async _removeRedirect(r: RedirectUrl) {
-		if (r.key) {
-			const res = await tryExecuteAndNotify(
-				this,
-				RedirectManagementResource.deleteRedirectManagementByKey({ key: r.key })
-			);
-			if (!res.error) {
-				// or just run a this._getRedirectData() again?
-				this.shadowRoot?.getElementById(`redirect-key-${r.key}`)?.remove();
-			}
+		if (!r.key) return;
+		const res = await tryExecuteAndNotify(
+			this,
+			RedirectManagementResource.deleteRedirectManagementByKey({ key: r.key })
+		);
+		if (!res.error) {
+			// or just run a this._getRedirectData() again?
+			this.shadowRoot?.getElementById(`redirect-key-${r.key}`)?.remove();
 		}
 	}
 
@@ -166,12 +166,10 @@ export class UmbDashboardRedirectManagementElement extends UmbLitElement {
 	}
 
 	private async _toggleRedirect() {
-		//TODO: postRedirectManagementStatus returns 404 for whatever reason...
-		/*
 		const { data } = await tryExecuteAndNotify(
 			this,
 			RedirectManagementResource.postRedirectManagementStatus({ status: RedirectStatus.ENABLED })
-		);*/
+		);
 		this._trackerStatus = !this._trackerStatus;
 	}
 
@@ -310,7 +308,7 @@ export class UmbDashboardRedirectManagementElement extends UmbLitElement {
 	}
 
 	private _renderPagination() {
-		if (this._total) {
+		if (this._total && Math.ceil(this._total / this.itemsPerPage) > 1) {
 			return html`<uui-pagination
 				total="${Math.ceil(this._total / this.itemsPerPage)}"
 				@change="${this._onPageChange}"></uui-pagination>`;
