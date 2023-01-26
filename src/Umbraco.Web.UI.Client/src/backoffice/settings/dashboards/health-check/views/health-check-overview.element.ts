@@ -24,6 +24,12 @@ export class UmbDashboardHealthCheckOverviewElement extends UmbLitElement {
 				display: flex;
 				justify-content: space-between;
 			}
+
+			.grid {
+				display: grid;
+				gap: var(--uui-size-space-4);
+				grid-template-columns: repeat(auto-fit, minmax(250px, auto));
+			}
 		`,
 	];
 
@@ -66,10 +72,10 @@ export class UmbDashboardHealthCheckOverviewElement extends UmbLitElement {
 						Perform all checks
 					</uui-button>
 				</div>
-				<!--//TODO:  wrap extension container in a grid wrapper -->
-				<umb-extension-slot
-					type="healthCheck"
-					default-element="umb-health-check-group-box-overview"></umb-extension-slot>
+				<div class="grid">
+					<umb-extension-slot type="healthCheck" default-element="umb-health-check-group-box-overview">
+					</umb-extension-slot>
+				</div>
 			</uui-box>
 		`;
 	}
