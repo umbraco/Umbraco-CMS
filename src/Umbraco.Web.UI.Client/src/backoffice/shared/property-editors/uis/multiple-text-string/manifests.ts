@@ -10,5 +10,6 @@ export const manifest: ManifestPropertyEditorUI = {
 		propertyEditorModel: 'Umbraco.MultipleTextString',
 		icon: 'umb:ordered-list',
 		group: '',
+		supportsReadOnly: true,
 	},
 };
