@@ -1,4 +1,5 @@
 import { BehaviorSubject } from "rxjs";
+import { createObservablePart } from "./create-observable-part.method";
 
 
 // TODO: Should this handle array as well?
@@ -48,6 +49,13 @@ export function defaultMemoization(previousValue: any, currentValue: any): boole
 export class DeepState<T> extends BehaviorSubject<T> {
 	constructor(initialData: T) {
 		super(deepFreeze(initialData));
+	}
+
+	observablePart<ReturnType>(
+		mappingFunction: MappingFunction<T, ReturnType>,
+		memoizationFunction?: MemoizationFunction<ReturnType>
+	) {
+		return createObservablePart(this, mappingFunction, memoizationFunction);
 	}
 
 	next(newData: T): void {
