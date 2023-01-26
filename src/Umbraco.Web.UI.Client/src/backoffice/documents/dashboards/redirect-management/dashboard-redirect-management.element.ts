@@ -79,7 +79,7 @@ export class UmbDashboardRedirectManagementElement extends UmbLitElement {
 	];
 
 	@property({ type: Number, attribute: 'items-per-page' })
-	itemsPerPage = 5;
+	itemsPerPage = 20;
 
 	@state()
 	private _redirectData?: RedirectUrl[];
