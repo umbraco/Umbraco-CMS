@@ -116,8 +116,6 @@ export class UmbCollectionViewsMediaGridElement extends UmbLitElement {
 	}
 
 	private _handleOpenItem(mediaItem: MediaTreeItem) {
-		console.log('MEDIA ITEM', mediaItem);
-
 		//TODO: Fix when we have dynamic routing
 		history.pushState(null, '', 'section/media/media/edit/' + mediaItem.key);
 	}

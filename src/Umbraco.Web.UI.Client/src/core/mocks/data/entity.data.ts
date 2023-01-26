@@ -10,7 +10,7 @@ export class UmbEntityData<T extends Entity> extends UmbData<T> {
 	getByKey(key: string) {
 		return this.data.find((item) => item.key === key);
 	}
-	
+
 	getByKeys(keys: Array<string>) {
 		return this.data.filter((item) => keys.includes(item.key));
 	}
@@ -29,6 +29,25 @@ export class UmbEntityData<T extends Entity> extends UmbData<T> {
 		});
 
 		return saveItems;
+	}
+
+	move(keys: Array<string>, destination: string) {
+		const movedItems: Array<T> = [];
+
+		keys.forEach((key) => {
+			const item = this.getByKey(key);
+			if (!item) return;
+
+			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+			// @ts-ignore
+			item.parentKey = destination;
+			this.updateData(item);
+			movedItems.push(item);
+		});
+
+		console.log('data', this.data, 'movedItems', movedItems, 'destination', destination);
+
+		return movedItems;
 	}
 
 	trash(keys: Array<string>) {

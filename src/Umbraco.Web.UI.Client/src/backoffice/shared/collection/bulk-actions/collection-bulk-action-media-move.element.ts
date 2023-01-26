@@ -9,6 +9,7 @@ import { UmbModalService, UMB_MODAL_SERVICE_CONTEXT_TOKEN } from '../../../../co
 import { UmbMediaTreeStore, UMB_MEDIA_TREE_STORE_CONTEXT_TOKEN } from '../../../media/media/media.tree.store';
 import { UmbLitElement } from '@umbraco-cms/element';
 import type { ManifestCollectionBulkAction, MediaDetails } from '@umbraco-cms/models';
+import { UmbMediaDetailStore } from 'src/backoffice/media/media/media.detail.store';
 
 @customElement('umb-collection-bulk-action-media-move')
 export class UmbCollectionBulkActionMoveElement extends UmbLitElement {
@@ -20,7 +21,7 @@ export class UmbCollectionBulkActionMoveElement extends UmbLitElement {
 	public manifest?: ManifestCollectionBulkAction;
 
 	#modalService?: UmbModalService;
-	#mediaStore?: UmbMediaTreeStore;
+	#mediaTreeStore?: UmbMediaTreeStore;
 
 	constructor() {
 		super();
@@ -34,23 +35,23 @@ export class UmbCollectionBulkActionMoveElement extends UmbLitElement {
 		});
 
 		this.consumeContext(UMB_MEDIA_TREE_STORE_CONTEXT_TOKEN, (instance) => {
-			this.#mediaStore = instance;
+			this.#mediaTreeStore = instance;
 		});
 	}
 
 	#handleClick(event: Event) {
 		const selectionSubscription = this.#collectionContext?.selection.subscribe((selection) => {
-			const dataSubscription = this.#collectionContext?.data
-				.pipe(map((items) => items.filter((item) => selection.includes(item.key))))
-				.subscribe((items: Array<MediaDetails>) => {
-					const modalHandler = this.#modalService?.contentPicker({
-						selection: [],
-						alias: 'Umb.Tree.Media',
-					});
-					modalHandler?.onClose().then((data) => {
-						console.log('data', data);
-					});
-				});
+			const modalHandler = this.#modalService?.contentPicker({
+				selection: [],
+				alias: 'Umb.Tree.Media',
+			});
+			modalHandler?.onClose().then((data) => {
+				if (selection.length > 0) {
+					this.#mediaTreeStore?.move(selection, data.selection[0]);
+				}
+				selectionSubscription?.unsubscribe();
+				this.#collectionContext?.clearSelection();
+			});
 		});
 	}
 
