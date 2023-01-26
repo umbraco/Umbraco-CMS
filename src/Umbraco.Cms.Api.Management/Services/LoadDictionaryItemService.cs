@@ -11,6 +11,7 @@ namespace Umbraco.Cms.Api.Management.Services;
 public class LoadDictionaryItemService : ILoadDictionaryItemService
 {
     private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
+    // FIXME: use IDictionaryItemService instead of ILocalizationService
     private readonly ILocalizationService _localizationService;
     private readonly PackageDataInstallation _packageDataInstallation;
     private readonly ILogger<LoadDictionaryItemService> _logger;
@@ -26,6 +27,8 @@ public class LoadDictionaryItemService : ILoadDictionaryItemService
         _packageDataInstallation = packageDataInstallation;
         _logger = logger;
     }
+
+    // FIXME: use Guid key, not integer ID for parent identification
     public IDictionaryItem Load(string filePath, int? parentId)
     {
         var xmlDocument = new XmlDocument { XmlResolver = null };

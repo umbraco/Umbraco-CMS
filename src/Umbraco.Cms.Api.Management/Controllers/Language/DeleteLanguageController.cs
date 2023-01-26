@@ -1,50 +1,35 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Cms.Api.Common.Builders;
+using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Language;
 
 public class DeleteLanguageController : LanguageControllerBase
 {
-    private readonly ILocalizationService _localizationService;
+    private readonly ILanguageService _languageService;
+    private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
 
-    public DeleteLanguageController(ILocalizationService localizationService) => _localizationService = localizationService;
+    public DeleteLanguageController(ILanguageService languageService, IBackOfficeSecurityAccessor backOfficeSecurityAccessor)
+    {
+        _languageService = languageService;
+        _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
+    }
 
-    /// <summary>
-    ///     Deletes a language with a given ID
-    /// </summary>
-    [HttpDelete("{id:int}")]
+    [HttpDelete($"{{{nameof(isoCode)}}}")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    // TODO: This needs to be an authorized endpoint.
-    public async Task<IActionResult> Delete(int id)
+    public async Task<IActionResult> Delete(string isoCode)
     {
-        ILanguage? language = _localizationService.GetLanguageById(id);
-        if (language == null)
-        {
-            return await Task.FromResult(NotFound());
-        }
+        Attempt<ILanguage?, LanguageOperationStatus> result = await _languageService.DeleteAsync(isoCode, CurrentUserId(_backOfficeSecurityAccessor));
 
-        // the service would not let us do it, but test here nevertheless
-        if (language.IsDefault)
-        {
-            ProblemDetails invalidModelProblem =
-                new ProblemDetailsBuilder()
-                    .WithTitle("Cannot delete default language")
-                    .WithDetail($"Language '{language.IsoCode}' is currently set to 'default' and can not be deleted.")
-                    .Build();
-
-            return BadRequest(invalidModelProblem);
-        }
-
-        // service is happy deleting a language that's fallback for another language,
-        // will just remove it - so no need to check here
-        _localizationService.Delete(language);
-
-        return await Task.FromResult(Ok());
+        return result.Success
+            ? Ok()
+            : LanguageOperationStatusResult(result.Status);
     }
 }

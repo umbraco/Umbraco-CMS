@@ -12,16 +12,16 @@ namespace Umbraco.Cms.Api.Management.Controllers.Dictionary;
 
 public class CreateDictionaryController : DictionaryControllerBase
 {
-    private readonly ILocalizationService _localizationService;
+    private readonly IDictionaryItemService _dictionaryItemService;
     private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
     private readonly IDictionaryFactory _dictionaryFactory;
 
     public CreateDictionaryController(
-        ILocalizationService localizationService,
+        IDictionaryItemService dictionaryItemService,
         IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
         IDictionaryFactory dictionaryFactory)
     {
-        _localizationService = localizationService;
+        _dictionaryItemService = dictionaryItemService;
         _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
         _dictionaryFactory = dictionaryFactory;
     }
@@ -34,19 +34,13 @@ public class CreateDictionaryController : DictionaryControllerBase
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status409Conflict)]
     public async Task<IActionResult> Create(DictionaryItemCreateModel dictionaryItemCreateModel)
     {
-        IEnumerable<IDictionaryTranslation> translations = _dictionaryFactory.MapTranslations(dictionaryItemCreateModel.Translations);
+        IDictionaryItem created = await _dictionaryFactory.MapCreateModelToDictionaryItemAsync(dictionaryItemCreateModel);
 
-        Attempt<IDictionaryItem?, DictionaryItemOperationStatus> result = _localizationService.Create(
-            dictionaryItemCreateModel.Name,
-            dictionaryItemCreateModel.ParentKey,
-            translations,
-            CurrentUserId(_backOfficeSecurityAccessor));
+        Attempt<IDictionaryItem, DictionaryItemOperationStatus> result =
+            await _dictionaryItemService.CreateAsync(created, CurrentUserId(_backOfficeSecurityAccessor));
 
-        if (result.Success)
-        {
-            return await Task.FromResult(CreatedAtAction<ByKeyDictionaryController>(controller => nameof(controller.ByKey), result.Result!.Key));
-        }
-
-        return DictionaryItemOperationStatusResult(result.Status);
+        return result.Success
+            ? CreatedAtAction<ByKeyDictionaryController>(controller => nameof(controller.ByKey), result.Result!.Key)
+            : DictionaryItemOperationStatusResult(result.Status);
     }
 }

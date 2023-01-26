@@ -39,7 +39,7 @@ public class ContentServiceTagsTests : UmbracoIntegrationTest
 
     private IDataTypeService DataTypeService => GetRequiredService<IDataTypeService>();
 
-    private ILocalizationService LocalizationService => GetRequiredService<ILocalizationService>();
+    private ILanguageService LanguageService => GetRequiredService<ILanguageService>();
 
     private IFileService FileService => GetRequiredService<IFileService>();
 
@@ -89,13 +89,12 @@ public class ContentServiceTagsTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public void TagsCanBeVariant()
+    public async Task TagsCanBeVariant()
     {
-        var languageService = LocalizationService;
-        var language = new LanguageBuilder()
+       var language = new LanguageBuilder()
             .WithCultureInfo("fr-FR")
             .Build();
-        LocalizationService.Save(language); // en-US is already there
+        await LanguageService.CreateAsync(language); // en-US is already there
 
         var template = TemplateBuilder.CreateTextPageTemplate();
         FileService.SaveTemplate(template);
@@ -148,9 +147,9 @@ public class ContentServiceTagsTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public void TagsCanBecomeVariant()
+    public async Task TagsCanBecomeVariant()
     {
-        var enId = LocalizationService.GetLanguageIdByIsoCode("en-US").Value;
+        var enId = (await LanguageService.GetAsync("en-US"))!.Id;
 
         var template = TemplateBuilder.CreateTextPageTemplate();
         FileService.SaveTemplate(template);
@@ -224,14 +223,12 @@ public class ContentServiceTagsTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public void TagsCanBecomeInvariant()
+    public async Task TagsCanBecomeInvariant()
     {
         var language = new LanguageBuilder()
             .WithCultureInfo("fr-FR")
             .Build();
-        LocalizationService.Save(language); // en-US is already there
-
-        var enId = LocalizationService.GetLanguageIdByIsoCode("en-US").Value;
+        await LanguageService.CreateAsync(language); // en-US is already there
 
         var template = TemplateBuilder.CreateTextPageTemplate();
         FileService.SaveTemplate(template);
@@ -285,14 +282,12 @@ public class ContentServiceTagsTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public void TagsCanBecomeInvariant2()
+    public async Task TagsCanBecomeInvariant2()
     {
         var language = new LanguageBuilder()
             .WithCultureInfo("fr-FR")
             .Build();
-        LocalizationService.Save(language); // en-US is already there
-
-        var enId = LocalizationService.GetLanguageIdByIsoCode("en-US").Value;
+        await LanguageService.CreateAsync(language); // en-US is already there
 
         var template = TemplateBuilder.CreateTextPageTemplate();
         FileService.SaveTemplate(template);
@@ -332,14 +327,12 @@ public class ContentServiceTagsTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public void TagsCanBecomeInvariantByPropertyType()
+    public async Task TagsCanBecomeInvariantByPropertyType()
     {
         var language = new LanguageBuilder()
             .WithCultureInfo("fr-FR")
             .Build();
-        LocalizationService.Save(language); // en-US is already there
-
-        var enId = LocalizationService.GetLanguageIdByIsoCode("en-US").Value;
+        await LanguageService.CreateAsync(language); // en-US is already there
 
         var template = TemplateBuilder.CreateTextPageTemplate();
         FileService.SaveTemplate(template);
@@ -393,7 +386,7 @@ public class ContentServiceTagsTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public void TagsCanBecomeInvariantByPropertyTypeAndBackToVariant()
+    public async Task TagsCanBecomeInvariantByPropertyTypeAndBackToVariant()
     {
         var frValue = new string[] { "hello", "world", "some", "tags", "plus" };
         var enValue = new string[] { "hello", "world", "another", "one" };
@@ -401,7 +394,7 @@ public class ContentServiceTagsTests : UmbracoIntegrationTest
         var language = new LanguageBuilder()
             .WithCultureInfo("fr-FR")
             .Build();
-        LocalizationService.Save(language); // en-US is already there
+        await LanguageService.CreateAsync(language); // en-US is already there
 
         var template = TemplateBuilder.CreateTextPageTemplate();
         FileService.SaveTemplate(template);

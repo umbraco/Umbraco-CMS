@@ -9,12 +9,12 @@ namespace Umbraco.Cms.Api.Management.Controllers.Dictionary;
 
 public class ByKeyDictionaryController : DictionaryControllerBase
 {
-    private readonly ILocalizationService _localizationService;
+    private readonly IDictionaryItemService _dictionaryItemService;
     private readonly IDictionaryFactory _dictionaryFactory;
 
-    public ByKeyDictionaryController(ILocalizationService localizationService, IDictionaryFactory dictionaryFactory)
+    public ByKeyDictionaryController(IDictionaryItemService dictionaryItemService, IDictionaryFactory dictionaryFactory)
     {
-        _localizationService = localizationService;
+        _dictionaryItemService = dictionaryItemService;
         _dictionaryFactory = dictionaryFactory;
     }
 
@@ -24,12 +24,12 @@ public class ByKeyDictionaryController : DictionaryControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<DictionaryItemViewModel>> ByKey(Guid key)
     {
-        IDictionaryItem? dictionary = _localizationService.GetDictionaryItemById(key);
+        IDictionaryItem? dictionary = await _dictionaryItemService.GetAsync(key);
         if (dictionary == null)
         {
             return NotFound();
         }
 
-        return await Task.FromResult(Ok(_dictionaryFactory.CreateDictionaryItemViewModel(dictionary)));
+        return Ok(await _dictionaryFactory.CreateDictionaryItemViewModelAsync(dictionary));
     }
 }

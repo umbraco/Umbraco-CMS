@@ -53,7 +53,7 @@ public class TelemetryProviderTests : UmbracoIntegrationTest
     private PropertyEditorTelemetryProvider PropertyEditorTelemetryProvider =>
         GetRequiredService<PropertyEditorTelemetryProvider>();
 
-    private ILocalizationService LocalizationService => GetRequiredService<ILocalizationService>();
+    private ILanguageService LanguageService => GetRequiredService<ILanguageService>();
 
     private IUserService UserService => GetRequiredService<IUserService>();
 
@@ -128,14 +128,14 @@ public class TelemetryProviderTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public void Language_Telemetry_Can_Get_Languages()
+    public async Task Language_Telemetry_Can_Get_Languages()
     {
         // Arrange
         var langTwo = _languageBuilder.WithCultureInfo("da-DK").Build();
         var langThree = _languageBuilder.WithCultureInfo("se-SV").Build();
 
-        LocalizationService.Save(langTwo);
-        LocalizationService.Save(langThree);
+        await LanguageService.CreateAsync(langTwo);
+        await LanguageService.CreateAsync(langThree);
 
         IEnumerable<UsageInformation> result = null;
 
