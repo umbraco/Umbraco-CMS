@@ -55,18 +55,20 @@ export class UmbModalLayoutContentPickerElement extends UmbModalLayoutElement<Um
 	@state()
 	_alias = '';
 
+	@state()
+	_multiple = true;
+
 	connectedCallback() {
 		super.connectedCallback();
 		this._selection = this.data?.selection ?? [];
 		this._alias = this.data?.alias ?? 'Umb.Tree.Documents';
+		this._multiple = this.data?.multiple ?? true;
 	}
 
 	private _handleSelectionChange(e: CustomEvent) {
 		e.stopPropagation();
-		console.log('Selection change', e);
-
 		const element = e.target as UmbTreeElement;
-		this._selection = element.selection;
+		this._selection = this._multiple ? element.selection : [element.selection[element.selection.length - 1]];
 	}
 
 	private _submit() {
