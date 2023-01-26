@@ -5,18 +5,31 @@ import { PagedRedirectUrl, RedirectUrl, RedirectStatus, RedirectUrlStatus } from
 
 export const handlers = [
 	rest.get(umbracoPath('/redirect-management'), (_req, res, ctx) => {
+		const filter = _req.url.searchParams.get('filter');
 		const skip = toNumber(_req.url.searchParams.get('skip'));
 		const take = toNumber(_req.url.searchParams.get('take'));
 
-		const items = PagedRedirectUrlData.items.slice(skip, skip + take);
+		console.log('handler file', filter);
+		if (filter) {
+			const filtered: RedirectUrl[] = [];
 
-		const PagedData: PagedRedirectUrl = {
-			total: PagedRedirectUrlData.total,
-			items,
-		};
+			PagedRedirectUrlData.items.forEach((item) => {
+				if (item.originalUrl?.includes(filter)) filtered.push(item);
+			});
+			const filteredPagedData: PagedRedirectUrl = {
+				total: filtered.length,
+				items: filtered.slice(skip, skip + take),
+			};
+			return res(ctx.status(200), ctx.json<PagedRedirectUrl>(filteredPagedData));
+		} else {
+			const items = PagedRedirectUrlData.items.slice(skip, skip + take);
 
-		console.log(PagedData);
-		return res(ctx.status(200), ctx.json<PagedRedirectUrl>(PagedData));
+			const PagedData: PagedRedirectUrl = {
+				total: PagedRedirectUrlData.total,
+				items,
+			};
+			return res(ctx.status(200), ctx.json<PagedRedirectUrl>(PagedData));
+		}
 	}),
 
 	rest.get(umbracoPath('/redirect-management/:key'), async (_req, res, ctx) => {
@@ -66,7 +79,7 @@ const _getRedirectUrlByKey = (key: string) => {
 };
 
 const _deleteRedirectUrlByKey = (key: string) => {
-	const index = RedirectUrlData.findIndex((data) => data.contentKey === key);
+	const index = RedirectUrlData.findIndex((data) => data.key === key);
 	if (index > -1) RedirectUrlData.splice(index, 1);
 	const PagedResult: PagedRedirectUrl = {
 		items: RedirectUrlData,
@@ -77,67 +90,77 @@ const _deleteRedirectUrlByKey = (key: string) => {
 
 const RedirectUrlData: RedirectUrl[] = [
 	{
-		culture: 'DA-dk',
+		key: '1',
 		created: '2022-12-05T13:59:43.6827244',
 		destinationUrl: 'kitty.com',
 		originalUrl: 'kitty.dk',
 		contentKey: '7191c911-6747-4824-849e-5208e2b31d9f2',
 	},
 	{
+		key: '2',
 		created: '2022-13-05T13:59:43.6827244',
 		destinationUrl: 'umbraco.com',
 		originalUrl: 'umbraco.dk',
 		contentKey: '7191c911-6747-4824-849e-5208e2b31d9f',
 	},
 	{
+		key: '3',
 		created: '2022-12-05T13:59:43.6827244',
 		destinationUrl: 'uui.umbraco.com',
 		originalUrl: 'uui.umbraco.dk',
 		contentKey: '7191c911-6747-4824-849e-5208e2b31d9f23',
 	},
 	{
+		key: '4',
 		created: '2022-13-05T13:59:43.6827244',
 		destinationUrl: 'umbracoffee.com',
 		originalUrl: 'umbracoffee.dk',
 		contentKey: '7191c911-6747-4824-849e-5208e2b31d9fdsaa',
 	},
 	{
+		key: '5',
 		created: '2022-12-05T13:59:43.6827244',
 		destinationUrl: 'section/settings',
 		originalUrl: 'section/settings/123',
 		contentKey: '7191c911-6747-4824-849e-5208e2b31d9f2e23',
 	},
 	{
+		key: '6',
 		created: '2022-13-05T13:59:43.6827244',
 		destinationUrl: 'dxp.com',
 		originalUrl: 'dxp.dk',
 		contentKey: '7191c911-6747-4824-849e-5208e2b31d9fsafsfd',
 	},
 	{
+		key: '7',
 		created: '2022-12-05T13:59:43.6827244',
 		destinationUrl: 'google.com',
 		originalUrl: 'google.dk',
 		contentKey: '7191c911-6747-4824-849e-5208e2b31d9f2cxza',
 	},
 	{
+		key: '8',
 		created: '2022-13-05T13:59:43.6827244',
 		destinationUrl: 'unicorns.com',
 		originalUrl: 'unicorns.dk',
 		contentKey: '7191c911-6747-4824-849e-5208e2b31d9fweds',
 	},
 	{
+		key: '9',
 		created: '2022-12-05T13:59:43.6827244',
 		destinationUrl: 'h5yr.com',
 		originalUrl: 'h5yr.dk',
 		contentKey: '7191c911-6747-4824-849e-5208e2b31ddsfsdsfadsfdx9f2',
 	},
 	{
+		key: '10',
 		created: '2022-13-05T13:59:43.6827244',
 		destinationUrl: 'our.umbraco.com',
 		originalUrl: 'our.umbraco.dk',
 		contentKey: '7191c911-6747-4824-849e-52dsacx08e2b31d9dsafdsff',
 	},
 	{
+		key: '11',
 		created: '2022-13-05T13:59:43.6827244',
 		destinationUrl: 'your.umbraco.com',
 		originalUrl: 'your.umbraco.dk',

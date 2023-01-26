@@ -1,7 +1,7 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html, nothing } from 'lit';
 import { customElement, state, query } from 'lit/decorators.js';
-import { UUIPaginationEvent } from '@umbraco-ui/uui';
+import { UUIButtonState, UUIPaginationElement, UUIPaginationEvent } from '@umbraco-ui/uui';
 import { UmbModalService, UMB_MODAL_SERVICE_CONTEXT_TOKEN } from '../../../../core/modal';
 import { UmbLitElement } from '@umbraco-cms/element';
 import { RedirectManagementResource, RedirectStatus, RedirectUrl, RedirectUrlStatus } from '@umbraco-cms/backend-api';
@@ -88,8 +88,17 @@ export class UmbDashboardRedirectManagementElement extends UmbLitElement {
 	@state()
 	private _total?: number;
 
+	@state()
+	private _buttonState: UUIButtonState;
+
+	@state()
+	private _filter?: string;
+
 	@query('#search-input')
 	private _searchField!: HTMLInputElement;
+
+	@query('uui-pagination')
+	private _pagination!: UUIPaginationElement;
 
 	private _modalService?: UmbModalService;
 
@@ -131,12 +140,15 @@ export class UmbDashboardRedirectManagementElement extends UmbLitElement {
 	}
 
 	private async _removeRedirect(r: RedirectUrl) {
-		if (r.contentKey) {
-			const { data } = await tryExecuteAndNotify(
+		if (r.key) {
+			const res = await tryExecuteAndNotify(
 				this,
-				RedirectManagementResource.deleteRedirectManagementByKey({ key: r.contentKey })
+				RedirectManagementResource.deleteRedirectManagementByKey({ key: r.key })
 			);
-			this._getRedirectData();
+			if (!res.error) {
+				// or just run a this._getRedirectData() again?
+				this.shadowRoot?.getElementById(`redirect-key-${r.key}`)?.remove();
+			}
 		}
 	}
 
@@ -162,8 +174,18 @@ export class UmbDashboardRedirectManagementElement extends UmbLitElement {
 		this._trackerStatus = !this._trackerStatus;
 	}
 
-	private _searchHandler() {
-		console.log('search');
+	private _inputHandler(pressed: KeyboardEvent) {
+		if (pressed.key === 'Enter') this._searchHandler();
+	}
+
+	private async _searchHandler() {
+		this._filter = this._searchField.value;
+		this._pagination.current = 1;
+		this._currentPage = 1;
+		if (this._filter.length) {
+			this._buttonState = 'waiting';
+		}
+		this._getRedirectData();
 	}
 
 	private _onPageChange(event: UUIPaginationEvent) {
@@ -176,10 +198,13 @@ export class UmbDashboardRedirectManagementElement extends UmbLitElement {
 		const skip = this._currentPage * itemsPerPage - itemsPerPage;
 		const { data } = await tryExecuteAndNotify(
 			this,
-			RedirectManagementResource.getRedirectManagement({ take: itemsPerPage, skip })
+			RedirectManagementResource.getRedirectManagement({ filter: this._filter, take: itemsPerPage, skip })
 		);
-		this._total = data?.total;
-		this._redirectData = data?.items;
+		if (data) {
+			this._total = data?.total;
+			this._redirectData = data?.items;
+			if (this._filter?.length) this._buttonState = 'success';
+		}
 	}
 
 	render() {
@@ -190,9 +215,15 @@ export class UmbDashboardRedirectManagementElement extends UmbLitElement {
 									id="search-input"
 									placeholder="Original URL"
 									label="input for search"
-									@keyup="${this._searchHandler}">
+									@keypress="${this._inputHandler}">
 								</uui-input>
-								<uui-button id="search-button" look="primary" color="positive" label="search">
+								<uui-button
+									id="search-button"
+									look="primary"
+									color="positive"
+									label="search"
+									.state="${this._buttonState}"
+									@click="${this._searchHandler}">
 									Search<uui-icon name="umb:search"></uui-icon>
 								</uui-button>
 							</div>
@@ -242,7 +273,7 @@ export class UmbDashboardRedirectManagementElement extends UmbLitElement {
 						<uui-table-head-cell style="width:10%;">Actions</uui-table-head-cell>
 					</uui-table-head>
 					${this._redirectData?.map((data) => {
-						return html` <uui-table-row>
+						return html` <uui-table-row id="redirect-key-${data.key}">
 							<uui-table-cell> ${data.culture || '*'} </uui-table-cell>
 							<uui-table-cell>
 								<a href="${data.originalUrl || '#'}" target="_blank"> ${data.originalUrl}</a>
@@ -276,7 +307,7 @@ export class UmbDashboardRedirectManagementElement extends UmbLitElement {
 	}
 
 	private _renderPagination() {
-		if (this._total && this._total > itemsPerPage) {
+		if (this._total) {
 			return html`<uui-pagination
 				total="${Math.ceil(this._total / itemsPerPage)}"
 				@change="${this._onPageChange}"></uui-pagination>`;
