@@ -1,6 +1,7 @@
 import { rest } from 'msw';
 import { umbTemplateData } from '../data/template.data';
 import { umbracoPath } from '@umbraco-cms/utils';
+import { TemplateCreateModel, TemplateUpdateModel } from '@umbraco-cms/backend-api';
 
 // TODO: add schema
 export const handlers = [
@@ -12,6 +13,7 @@ export const handlers = [
 	rest.get(umbracoPath('/tree/template/children'), (req, res, ctx) => {
 		const parentKey = req.url.searchParams.get('parentKey');
 		if (!parentKey) return;
+
 		const response = umbTemplateData.getTreeItemChildren(parentKey);
 		return res(ctx.status(200), ctx.json(response));
 	}),
@@ -21,7 +23,6 @@ export const handlers = [
 		if (!keys) return;
 
 		const items = umbTemplateData.getTreeItem(keys);
-
 		return res(ctx.status(200), ctx.json(items));
 	}),
 
@@ -39,5 +40,22 @@ export const handlers = [
 
 		const response = umbTemplateData.getByKey(key);
 		return res(ctx.status(200), ctx.json(response));
+	}),
+
+	rest.put<TemplateUpdateModel>(umbracoPath('/template/:key'), async (req, res, ctx) => {
+		const key = req.params.key as string;
+		const data = await req.json();
+		if (!key) return;
+
+		umbTemplateData.update(data);
+		return res(ctx.status(200));
+	}),
+
+	rest.post<TemplateCreateModel>(umbracoPath('/template'), async (req, res, ctx) => {
+		const data = await req.json();
+		if (!data) return;
+
+		const created = umbTemplateData.create(data);
+		return res(ctx.status(200), ctx.json(created));
 	}),
 ];

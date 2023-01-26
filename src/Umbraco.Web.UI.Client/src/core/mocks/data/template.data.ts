@@ -1,6 +1,13 @@
+import { v4 as uuid } from 'uuid';
 import { UmbEntityData } from './entity.data';
 import { createEntityTreeItem } from './utils';
-import { EntityTreeItem, PagedEntityTreeItem, Template, TemplateScaffold } from '@umbraco-cms/backend-api';
+import {
+	EntityTreeItem,
+	PagedEntityTreeItem,
+	Template,
+	TemplateCreateModel,
+	TemplateScaffold,
+} from '@umbraco-cms/backend-api';
 
 type TemplateDBItem = Template & EntityTreeItem;
 
@@ -62,6 +69,20 @@ class UmbTemplateData extends UmbEntityData<TemplateDBItem> {
 		return {
 			content: `Template Scaffold Mock: Layout = ${masterTemplateAlias || null};`,
 		};
+	}
+
+	create(templateData: TemplateCreateModel) {
+		const template = {
+			key: uuid(),
+			...templateData,
+		};
+		this.data.push(template);
+		return template;
+	}
+
+	update(template: Template) {
+		this.updateData(template);
+		return template;
 	}
 
 	getTreeRoot(): PagedEntityTreeItem {

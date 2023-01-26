@@ -1,7 +1,7 @@
 import { UmbContextToken } from '@umbraco-cms/context-api';
 import { createObservablePart, ArrayState } from '@umbraco-cms/observable-api';
 import { UmbStoreBase } from '@umbraco-cms/store';
-import { Template, TemplateResource } from '@umbraco-cms/backend-api';
+import { Template, TemplateCreateModel, TemplateResource, TemplateUpdateModel } from '@umbraco-cms/backend-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/resources';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 
@@ -27,6 +27,26 @@ export class UmbTemplateDetailStore extends UmbStoreBase {
 		});
 
 		return createObservablePart(this.#data, (items) => items.find((item) => item.key === key));
+	}
+
+	async save(template: Template) {
+		if (!template.key) return;
+
+		const { error } = await tryExecuteAndNotify(
+			this._host,
+			TemplateResource.putTemplateByKey({ key: template.key, requestBody: template })
+		);
+
+		if (error) throw error;
+
+		this.#data.append([template]);
+	}
+
+	async create(template: TemplateCreateModel) {
+		const { data } = await tryExecuteAndNotify(this._host, TemplateResource.postTemplate({ requestBody: template }));
+		if (data) {
+			this.#data.append([data]);
+		}
 	}
 }
 
