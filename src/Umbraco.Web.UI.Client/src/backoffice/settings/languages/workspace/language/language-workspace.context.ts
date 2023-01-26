@@ -1,9 +1,9 @@
-import { UmbLanguageStore, UmbLanguageStoreItemType } from '../../language.store';
 import type { LanguageDetails } from '@umbraco-cms/models';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
+import { UmbObserverController } from '@umbraco-cms/observable-api';
+import { UmbLanguageStore, UmbLanguageStoreItemType, UMB_LANGUAGE_STORE_CONTEXT_TOKEN } from '../../language.store';
 import { UniqueBehaviorSubject } from 'src/core/observable-api/unique-behavior-subject';
 import { UmbContextConsumerController } from 'src/core/context-api/consume/context-consumer.controller';
-import { UmbObserverController } from '@umbraco-cms/observable-api';
 
 const DefaultLanguageData: UmbLanguageStoreItemType = {
 	id: 0,
@@ -32,12 +32,8 @@ export class UmbWorkspaceLanguageContext {
 		this._data = new UniqueBehaviorSubject<LanguageDetails>(DefaultLanguageData);
 		this.data = this._data.asObservable();
 
-		new UmbContextConsumerController(host, 'umbLanguageStore', (_instance: UmbLanguageStore) => {
+		new UmbContextConsumerController(host, UMB_LANGUAGE_STORE_CONTEXT_TOKEN, (_instance: UmbLanguageStore) => {
 			this._store = _instance;
-			if (!this._store) {
-				// TODO: make sure to break the application in a good way.
-				return;
-			}
 
 			this._observeStore();
 		});
