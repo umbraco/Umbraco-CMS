@@ -2,7 +2,6 @@ import { defineElement } from '@umbraco-ui/uui-base/lib/registration';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html } from 'lit';
 
-
 import { UmbModalService, UMB_MODAL_SERVICE_CONTEXT_TOKEN } from '../core/modal';
 import { UmbUserStore } from './users/users/user.store';
 import { UmbUserGroupStore } from './users/user-groups/user-group.store';
@@ -12,9 +11,12 @@ import {
 	UMB_CURRENT_USER_HISTORY_STORE_CONTEXT_TOKEN,
 } from './users/current-user/current-user-history.store';
 
-import { UmbBackofficeContext, UMB_BACKOFFICE_CONTEXT_TOKEN } from './shared/components/backoffice-frame/backoffice.context';
-import {UmbDocumentTypeDetailStore} from './documents/document-types/document-type.detail.store';
-import {UmbDocumentTypeTreeStore} from './documents/document-types/document-type.tree.store';
+import {
+	UmbBackofficeContext,
+	UMB_BACKOFFICE_CONTEXT_TOKEN,
+} from './shared/components/backoffice-frame/backoffice.context';
+import { UmbDocumentTypeDetailStore } from './documents/document-types/document-type.detail.store';
+import { UmbDocumentTypeTreeStore } from './documents/document-types/document-type.tree.store';
 import { UmbMediaTypeDetailStore } from './media/media-types/media-type.detail.store';
 import { UmbMediaTypeTreeStore } from './media/media-types/media-type.tree.store';
 import { UmbDocumentDetailStore } from './documents/documents/document.detail.store';
@@ -33,7 +35,6 @@ import { UmbDataTypeDetailStore } from './settings/data-types/data-type.detail.s
 import { UmbDataTypeTreeStore } from './settings/data-types/data-type.tree.store';
 import { UmbNotificationService, UMB_NOTIFICATION_SERVICE_CONTEXT_TOKEN } from '@umbraco-cms/notification';
 
-
 // Domains
 import './settings';
 import './documents';
@@ -45,6 +46,7 @@ import './packages';
 import './search';
 import './shared';
 import { UmbLitElement } from '@umbraco-cms/element';
+import { UmbLanguageStore, UMB_LANGUAGE_STORE_CONTEXT_TOKEN } from './settings/languages/language.store';
 
 @defineElement('umb-backoffice')
 export class UmbBackofficeElement extends UmbLitElement {
@@ -91,6 +93,7 @@ export class UmbBackofficeElement extends UmbLitElement {
 		new UmbDictionaryTreeStore(this);
 		new UmbDocumentBlueprintDetailStore(this);
 		new UmbDocumentBlueprintTreeStore(this);
+		new UmbLanguageStore(this);
 
 		this.provideContext(UMB_BACKOFFICE_CONTEXT_TOKEN, new UmbBackofficeContext());
 		this.provideContext(UMB_CURRENT_USER_HISTORY_STORE_CONTEXT_TOKEN, new UmbCurrentUserHistoryStore());

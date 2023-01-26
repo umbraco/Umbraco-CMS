@@ -1,7 +1,7 @@
 import { UmbLanguageStore, UmbLanguageStoreItemType, UMB_LANGUAGE_STORE_CONTEXT_TOKEN } from '../../language.store';
 import type { LanguageDetails } from '@umbraco-cms/models';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
-import { UmbObserverController, UniqueBehaviorSubject } from '@umbraco-cms/observable-api';
+import { ObjectState, UmbObserverController } from '@umbraco-cms/observable-api';
 import { UmbContextConsumerController } from '@umbraco-cms/context-api';
 
 const DefaultLanguageData: UmbLanguageStoreItemType = {
@@ -28,12 +28,11 @@ export class UmbWorkspaceLanguageContext {
 		this.host = host;
 		this._entityKey = entityKey;
 
-		this._data = new UniqueBehaviorSubject<LanguageDetails>(DefaultLanguageData);
+		this._data = new ObjectState<LanguageDetails>(DefaultLanguageData);
 		this.data = this._data.asObservable();
 
 		new UmbContextConsumerController(host, UMB_LANGUAGE_STORE_CONTEXT_TOKEN, (_instance: UmbLanguageStore) => {
 			this._store = _instance;
-
 			this._observeStore();
 		});
 	}
