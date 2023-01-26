@@ -1,6 +1,6 @@
 import { UmbLanguageStore, UmbLanguageStoreItemType } from '../../language.store';
 import type { LanguageDetails } from '@umbraco-cms/models';
-import { UmbControllerHostInterface } from 'src/core/controller/controller-host.mixin';
+import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 import { UniqueBehaviorSubject } from 'src/core/observable-api/unique-behavior-subject';
 import { UmbContextConsumerController } from 'src/core/context-api/consume/context-consumer.controller';
 import { UmbObserverController } from '@umbraco-cms/observable-api';
