@@ -51,7 +51,7 @@ export class DeepState<T> extends BehaviorSubject<T> {
 		super(deepFreeze(initialData));
 	}
 
-	observablePart<ReturnType>(
+	getObservablePart<ReturnType>(
 		mappingFunction: MappingFunction<T, ReturnType>,
 		memoizationFunction?: MemoizationFunction<ReturnType>
 	) {
