@@ -1,8 +1,9 @@
-using Umbraco.Cms.Core.Mapping;
+using System.Globalization;
+using NPoco;
 
 namespace Umbraco.Cms.Persistence.Sqlite.Mappers;
 
-public class SqlitePocoGuidMapper : UmbracoDefaultMapper
+public class SqlitePocoGuidMapper : DefaultMapper
 {
     public override Func<object, object?> GetFromDbConverter(Type destType, Type sourceType)
     {
@@ -25,6 +26,24 @@ public class SqlitePocoGuidMapper : UmbracoDefaultMapper
                 }
 
                 return default(Guid?);
+            };
+        }
+
+        if (destType == typeof(decimal))
+        {
+            return value =>
+            {
+                var result = Convert.ToDecimal(value, CultureInfo.InvariantCulture);
+                return result;
+            };
+        }
+
+        if (destType == typeof(decimal?))
+        {
+            return value =>
+            {
+                var result = Convert.ToDecimal(value, CultureInfo.InvariantCulture);
+                return result;
             };
         }
 
