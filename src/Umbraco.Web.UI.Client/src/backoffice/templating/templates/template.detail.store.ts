@@ -18,35 +18,8 @@ export class UmbTemplateDetailStore extends UmbStoreBase {
 		super(host, UmbTemplateDetailStore.name);
 	}
 
-	getByKey(key: string) {
-		tryExecuteAndNotify(this._host, TemplateResource.getTemplateByKey({ key })).then(({ data }) => {
-			if (data) {
-				// TODO: how do we handle if an item has been removed during this session(like in another tab or by another user)?
-				this.#data.append([data]);
-			}
-		});
-
-		return createObservablePart(this.#data, (items) => items.find((item) => item.key === key));
-	}
-
-	async save(template: Template) {
-		if (!template.key) return;
-
-		const { error } = await tryExecuteAndNotify(
-			this._host,
-			TemplateResource.putTemplateByKey({ key: template.key, requestBody: template })
-		);
-
-		if (error) throw error;
-
+	append(template: Template) {
 		this.#data.append([template]);
-	}
-
-	async create(template: TemplateCreateModel) {
-		const { data } = await tryExecuteAndNotify(this._host, TemplateResource.postTemplate({ requestBody: template }));
-		if (data) {
-			this.#data.append([data]);
-		}
 	}
 }
 

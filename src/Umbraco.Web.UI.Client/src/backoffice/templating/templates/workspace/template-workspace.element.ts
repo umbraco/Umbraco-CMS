@@ -22,14 +22,8 @@ export class UmbTemplateWorkspaceElement extends UmbLitElement {
 		`,
 	];
 
-	private _entityKey!: string;
 	@property()
-	public get entityKey(): string {
-		return this._entityKey;
-	}
-	public set entityKey(value: string) {
-		this._entityKey = value;
-	}
+	public entityKey?: string;
 
 	@property()
 	public create?: string | null;
@@ -40,13 +34,12 @@ export class UmbTemplateWorkspaceElement extends UmbLitElement {
 	@state()
 	private _content?: string | null = '';
 
+	private isNew = false;
+
 	#templateWorkspaceContext = new UmbTemplateWorkspaceContext(this);
 
 	async connectedCallback() {
 		super.connectedCallback();
-
-		// make sure the the context has received all dependencies
-		await this.#templateWorkspaceContext.init();
 
 		this.observe(this.#templateWorkspaceContext.name, (name) => {
 			this._name = name;
@@ -56,12 +49,15 @@ export class UmbTemplateWorkspaceElement extends UmbLitElement {
 			this._content = content;
 		});
 
-		if (!this._entityKey && this.create !== undefined) {
+		if (!this.entityKey && this.create !== undefined) {
+			this.isNew = true;
 			this.#templateWorkspaceContext.createScaffold(this.create);
 			return;
 		}
 
-		this.#templateWorkspaceContext.load(this._entityKey);
+		if (this.entityKey) {
+			this.#templateWorkspaceContext.load(this.entityKey);
+		}
 	}
 
 	// TODO: temp code for testing create and save
@@ -78,13 +74,7 @@ export class UmbTemplateWorkspaceElement extends UmbLitElement {
 	}
 
 	#onSave() {
-		this.#templateWorkspaceContext.update();
-	}
-
-	#onCreate() {
-		if (this.create !== undefined) {
-			this.#templateWorkspaceContext.create();
-		}
+		this.#templateWorkspaceContext.save(this.isNew);
 	}
 
 	render() {
@@ -93,7 +83,6 @@ export class UmbTemplateWorkspaceElement extends UmbLitElement {
 			<uui-input .value=${this._name} @input=${this.#onNameInput}></uui-input>
 			<uui-textarea id="content" .value=${this._content} @input="${this.#onTextareaInput}"></uui-textarea>
 			<uui-button label="Save" look="primary" color="positive" @click=${this.#onSave}></uui-button>
-			<uui-button label="Create" look="primary" color="positive" @click=${this.#onCreate}></uui-button>
 		</umb-workspace-layout>`;
 	}
 }
