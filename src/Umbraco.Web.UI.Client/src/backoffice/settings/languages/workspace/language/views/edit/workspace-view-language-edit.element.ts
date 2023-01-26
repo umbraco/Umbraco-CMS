@@ -5,7 +5,7 @@ import { repeat } from 'lit/directives/repeat.js';
 import { customElement, property, state } from 'lit/decorators.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
 import { UmbWorkspaceLanguageContext } from '../../language-workspace.context';
-import { UmbLanguageStore } from '../../../../language.store';
+import { UmbLanguageStore, UMB_LANGUAGE_STORE_CONTEXT_TOKEN } from '../../../../language.store';
 import type { LanguageDetails } from '@umbraco-cms/models';
 import { UmbLitElement } from '@umbraco-cms/element';
 
@@ -60,7 +60,7 @@ export class UmbWorkspaceViewLanguageEditElement extends UmbLitElement {
 			});
 		});
 
-		this.consumeContext('umbLanguageStore', (instance: UmbLanguageStore) => {
+		this.consumeContext(UMB_LANGUAGE_STORE_CONTEXT_TOKEN, (instance: UmbLanguageStore) => {
 			if (!instance) return;
 
 			instance.getAll().subscribe((languages: Array<LanguageDetails>) => {
