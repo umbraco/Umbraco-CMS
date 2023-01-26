@@ -1,7 +1,10 @@
 using System.Net;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Primitives;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.ContentApi;
 using Umbraco.Cms.Core.Models.ContentApi;
 using Umbraco.Cms.Core.Models.PublishedContent;
@@ -11,22 +14,29 @@ namespace Umbraco.Cms.Api.Content.Controllers;
 
 public class ByRouteContentApiController : ContentApiControllerBase
 {
-    public ByRouteContentApiController(IPublishedSnapshotAccessor publishedSnapshotAccessor, IApiContentBuilder apiContentBuilder)
+    private readonly GlobalSettings _globalSettings;
+
+    public ByRouteContentApiController(
+        IPublishedSnapshotAccessor publishedSnapshotAccessor,
+        IApiContentBuilder apiContentBuilder,
+        IOptions<GlobalSettings> globalSettings)
         : base(publishedSnapshotAccessor, apiContentBuilder)
     {
+        _globalSettings = globalSettings.Value;
     }
 
     /// <summary>
     ///     Gets a content item by route.
     /// </summary>
     /// <param name="url">The path to the content item.</param>
+    /// <param name="startNode">Optional path for the start node of the content item.</param>
     /// <returns>The content item or not found result.</returns>
     [HttpGet("{url}")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(IApiContent), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> ByRoute(string url)
+    public async Task<IActionResult> ByRoute(string url, [FromHeader(Name = "start-node")] string? startNode = null)
     {
         IPublishedContentCache? contentCache = GetContentCache();
 
@@ -35,7 +45,7 @@ public class ByRouteContentApiController : ContentApiControllerBase
             return BadRequest(ContentCacheNotFoundProblemDetails());
         }
 
-        var decodedPath = $"/{WebUtility.UrlDecode(url).TrimStart(Constants.CharArrays.ForwardSlash)}";
+        var decodedPath = ConstructRoute(url, startNode);
 
         IPublishedContent? contentItem = contentCache.GetByRoute(decodedPath);
 
@@ -45,5 +55,23 @@ public class ByRouteContentApiController : ContentApiControllerBase
         }
 
         return await Task.FromResult(Ok(ApiContentBuilder.Build(contentItem)));
+    }
+
+    // Decode the node url and check "start-node" header if the top level node is not hidden
+    private string ConstructRoute(string url, string? startNodePath)
+    {
+        var decodedPath = $"/{WebUtility.UrlDecode(url).TrimStart(Constants.CharArrays.ForwardSlash)}";
+
+        if (_globalSettings.HideTopLevelNodeFromPath == false)
+        {
+            // Construct the path, using the value from "start-node" header
+            if (startNodePath is not null)
+            {
+                var combinedPath = $"/{WebUtility.UrlDecode(startNodePath).TrimStart(Constants.CharArrays.ForwardSlash)}{decodedPath}";
+                return combinedPath;
+            }
+        }
+
+        return decodedPath;
     }
 }
