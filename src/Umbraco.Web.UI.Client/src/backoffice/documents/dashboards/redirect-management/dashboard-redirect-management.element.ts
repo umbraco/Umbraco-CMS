@@ -246,6 +246,8 @@ export class UmbDashboardRedirectManagementElement extends UmbLitElement {
 
 			${this._total && this._total > 0
 				? html`<div class="${this._trackerStatus ? 'trackerEnabled' : 'trackerDisabled'}">${this.renderTable()}</div>`
+				: this._filter?.length
+				? this._renderZeroResults()
 				: this.renderNoRedirects()} `;
 	}
 
