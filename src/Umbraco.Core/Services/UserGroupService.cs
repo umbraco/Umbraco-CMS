@@ -121,7 +121,7 @@ public class UserGroupService : RepositoryService, IUserGroupService
 
         EventMessages eventMessages = EventMessagesFactory.Get();
         var savingNotification = new UserGroupSavingNotification(userGroup, eventMessages);
-        if (scope.Notifications.PublishCancelable(savingNotification))
+        if (await scope.Notifications.PublishCancelableAsync(savingNotification))
         {
             scope.Complete();
             return Attempt.FailWithStatus(UserGroupOperationStatus.CancelledByNotification, userGroup);
@@ -134,7 +134,7 @@ public class UserGroupService : RepositoryService, IUserGroupService
         // simply put all members that are requested to be in the group will be "added"
         var userGroupWithUsers = new UserGroupWithUsers(userGroup, usersToAdd.ToArray(), Array.Empty<IUser>());
         var savingUserGroupWithUsersNotification = new UserGroupWithUsersSavingNotification(userGroupWithUsers, eventMessages);
-        if (scope.Notifications.PublishCancelable(savingUserGroupWithUsersNotification))
+        if (await scope.Notifications.PublishCancelableAsync(savingUserGroupWithUsersNotification))
         {
             scope.Complete();
             return Attempt.FailWithStatus(UserGroupOperationStatus.CancelledByNotification, userGroup);
