@@ -889,6 +889,7 @@ internal class UserService : RepositoryService, IUserService
     /// </summary>
     /// <param name="ids">Optional Ids of UserGroups to retrieve</param>
     /// <returns>An enumerable list of <see cref="IUserGroup" /></returns>
+    [Obsolete("Use IUserGroupService.GetAsync instead, scheduled for removal in V15.")]
     public IEnumerable<IUserGroup> GetAllUserGroups(params int[] ids)
     {
         using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
@@ -897,6 +898,7 @@ internal class UserService : RepositoryService, IUserService
         }
     }
 
+    [Obsolete("Use IUserGroupService.GetAsync instead, scheduled for removal in V15.")]
     public IEnumerable<IUserGroup> GetUserGroupsByAlias(params string[] aliases)
     {
         if (aliases.Length == 0)
@@ -919,6 +921,7 @@ internal class UserService : RepositoryService, IUserService
     /// <returns>
     ///     <see cref="IUserGroup" />
     /// </returns>
+    [Obsolete("Use IUserGroupService.GetAsync instead, scheduled for removal in V15.")]
     public IUserGroup? GetUserGroupByAlias(string alias)
     {
         if (string.IsNullOrWhiteSpace(alias))
@@ -941,21 +944,13 @@ internal class UserService : RepositoryService, IUserService
     /// <returns>
     ///     <see cref="IUserGroup" />
     /// </returns>
+    [Obsolete("Use IUserGroupService.GetAsync instead, scheduled for removal in V15.")]
     public IUserGroup? GetUserGroupById(int id)
     {
         using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
         {
             return _userGroupRepository.Get(id);
         }
-    }
-
-    public IUserGroup? GetUserGroupByKey(Guid key)
-    {
-        using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
-
-        IQuery<IUserGroup> query = Query<IUserGroup>().Where(x => x.Key == key);
-        IEnumerable<IUserGroup> groups = _userGroupRepository.Get(query);
-        return groups.FirstOrDefault();
     }
 
     /// <summary>
@@ -972,6 +967,7 @@ internal class UserService : RepositoryService, IUserService
     /// <c>False</c>
     /// to not raise events
     /// </param>
+    [Obsolete("Use IUserGroupService.CreateAsync and IUserGroupService.UpdateAsync instead, scheduled for removal in V15.")]
     public void Save(IUserGroup userGroup, int[]? userIds = null)
     {
         EventMessages evtMsgs = EventMessagesFactory.Get();
@@ -1028,127 +1024,11 @@ internal class UserService : RepositoryService, IUserService
         }
     }
 
-    /// <inheritdoc/>
-    public Attempt<IUserGroup, UserGroupOperationStatus> Create(IUserGroup userGroup, int performingUserId, int[]? groupMembersUserId = null)
-    {
-        using ICoreScope scope = ScopeProvider.CreateCoreScope();
-
-        IUser? performingUser = GetUserById(performingUserId);
-        if (performingUser is null)
-        {
-            return Attempt.FailWithStatus(UserGroupOperationStatus.MissingUser, userGroup);
-        }
-
-        Attempt<IUserGroup, UserGroupOperationStatus> validationAttempt = ValidateUserGroupCreation(userGroup);
-        if (validationAttempt.Success is false)
-        {
-            return validationAttempt;
-        }
-
-        Attempt<IUserGroup, UserGroupOperationStatus> authorizationAttempt = AuthorizeUserGroupCreation(performingUser, userGroup);
-        if (authorizationAttempt.Success is false)
-        {
-            return authorizationAttempt;
-        }
-
-        EventMessages eventMessages = EventMessagesFactory.Get();
-        var savingNotification = new UserGroupSavingNotification(userGroup, eventMessages);
-        if (scope.Notifications.PublishCancelable(savingNotification))
-        {
-            scope.Complete();
-            return Attempt.FailWithStatus(UserGroupOperationStatus.CancelledByNotification, userGroup);
-        }
-
-        int[] checkedGroupMembers = EnsureNonAdminUserIsInSavedUserGroup(performingUser, groupMembersUserId ?? Enumerable.Empty<int>()).ToArray();
-        IEnumerable<IUser> usersToAdd = GetUsersById(checkedGroupMembers);
-
-        // Since this is a brand new creation we don't have to be worried about what users were added and removed
-        // simply put all members that are requested to be in the group will be "added"
-        var userGroupWithUsers = new UserGroupWithUsers(userGroup, usersToAdd.ToArray(), Array.Empty<IUser>());
-        var savingUserGroupWithUsersNotification = new UserGroupWithUsersSavingNotification(userGroupWithUsers, eventMessages);
-        if (scope.Notifications.PublishCancelable(savingUserGroupWithUsersNotification))
-        {
-            scope.Complete();
-            return Attempt.FailWithStatus(UserGroupOperationStatus.CancelledByNotification, userGroup);
-        }
-
-        _userGroupRepository.AddOrUpdateGroupWithUsers(userGroup, checkedGroupMembers);
-
-        scope.Complete();
-        return Attempt.SucceedWithStatus(UserGroupOperationStatus.Success, userGroup);
-    }
-
-    private Attempt<IUserGroup, UserGroupOperationStatus> ValidateUserGroupCreation(IUserGroup userGroup)
-    {
-        if (IsNewUserGroup(userGroup) is false)
-        {
-            return Attempt.FailWithStatus(UserGroupOperationStatus.AlreadyExists, userGroup);
-        }
-
-        return UserGroupHasUniqueAlias(userGroup) is false
-            ? Attempt.FailWithStatus(UserGroupOperationStatus.DuplicateAlias, userGroup)
-            : Attempt.SucceedWithStatus(UserGroupOperationStatus.Success, userGroup);
-    }
-
-    private Attempt<IUserGroup, UserGroupOperationStatus> AuthorizeUserGroupCreation(IUser performingUser, IUserGroup userGroup)
-    {
-        Attempt<UserGroupOperationStatus> authorizeSectionChanges =
-            _userGroupAuthorizationService.AuthorizeSectionAccess(performingUser, userGroup);
-        if (authorizeSectionChanges.Success is false)
-        {
-            return Attempt.FailWithStatus(authorizeSectionChanges.Result, userGroup);
-        }
-
-        Attempt<UserGroupOperationStatus> authorizeContentNodeChanges =
-            _userGroupAuthorizationService.AuthorizeStartNodeChanges(performingUser, userGroup);
-        return authorizeSectionChanges.Success is false
-            ? Attempt.FailWithStatus(authorizeContentNodeChanges.Result, userGroup)
-            : Attempt.SucceedWithStatus(UserGroupOperationStatus.Success, userGroup);
-    }
-
-    private bool IsNewUserGroup(IUserGroup userGroup)
-    {
-        if (userGroup.Id != 0)
-        {
-            return false;
-        }
-
-        return GetUserGroupByKey(userGroup.Key) is null;
-    }
-
-    private bool UserGroupHasUniqueAlias(IUserGroup userGroup)
-    {
-        if (_userGroupRepository.Get(userGroup.Alias) is not null)
-        {
-            return false;
-        }
-
-        return true;
-    }
-
-    /// <summary>
-    /// Ensures that the user creating the user group is either an admin, or in the group itself.
-    /// </summary>
-    /// <remarks>
-    /// This is to ensure that the user can access the group they themselves created at a later point and modify it.
-    /// </remarks>
-    private IEnumerable<int> EnsureNonAdminUserIsInSavedUserGroup(IUser performingUser, IEnumerable<int> groupMembersUserIds)
-    {
-        var userIds = groupMembersUserIds.ToList();
-
-        // If the performing user is and admin we don't care, they can access the group later regardless
-        if (performingUser.IsAdmin() is false && userIds.Contains(performingUser.Id) is false)
-        {
-            userIds.Add(performingUser.Id);
-        }
-
-        return userIds;
-    }
-
     /// <summary>
     ///     Deletes a UserGroup
     /// </summary>
     /// <param name="userGroup">UserGroup to delete</param>
+    [Obsolete("Use IUserGroupService.DeleteAsync instead, scheduled for removal in V15.")]
     public void DeleteUserGroup(IUserGroup userGroup)
     {
         EventMessages evtMsgs = EventMessagesFactory.Get();

@@ -241,6 +241,7 @@ public interface IUserService : IMembershipUserService
     /// </summary>
     /// <param name="ids">Optional Ids of UserGroups to retrieve</param>
     /// <returns>An enumerable list of <see cref="IUserGroup" /></returns>
+    [Obsolete("Use IUserGroupService.GetAsync instead, scheduled for removal in V15.")]
     IEnumerable<IUserGroup> GetAllUserGroups(params int[] ids);
 
     /// <summary>
@@ -250,6 +251,7 @@ public interface IUserService : IMembershipUserService
     /// <returns>
     ///     <see cref="IUserGroup" />
     /// </returns>
+    [Obsolete("Use IUserGroupService.GetAsync instead, scheduled for removal in V15.")]
     IEnumerable<IUserGroup> GetUserGroupsByAlias(params string[] alias);
 
     /// <summary>
@@ -259,6 +261,7 @@ public interface IUserService : IMembershipUserService
     /// <returns>
     ///     <see cref="IUserGroup" />
     /// </returns>
+    [Obsolete("Use IUserGroupService.GetAsync instead, scheduled for removal in V15.")]
     IUserGroup? GetUserGroupByAlias(string name);
 
     /// <summary>
@@ -268,10 +271,8 @@ public interface IUserService : IMembershipUserService
     /// <returns>
     ///     <see cref="IUserGroup" />
     /// </returns>
+    [Obsolete("Use IUserGroupService.GetAsync instead, scheduled for removal in V15.")]
     IUserGroup? GetUserGroupById(int id);
-
-    // TODO: Add docstring
-    IUserGroup? GetUserGroupByKey(Guid key);
 
     /// <summary>
     ///     Saves a UserGroup
@@ -281,20 +282,14 @@ public interface IUserService : IMembershipUserService
     ///     If null than no changes are made to the users who are assigned to this group, however if a value is passed in
     ///     than all users will be removed from this group and only these users will be added
     /// </param>
+    [Obsolete("Use IUserGroupService.CreateAsync and IUserGroupService.UpdateAsync instead, scheduled for removal in V15.")]
     void Save(IUserGroup userGroup, int[]? userIds = null);
-
-    /// <summary>
-    /// Persists a new user group.
-    /// </summary>
-    /// <param name="userGroup">The user group to create.</param>
-    /// <param name="performingUserId">The ID of the user responsible for creating the group.</param>
-    /// <returns>An attempt indicating if the operation was a success as well as a more detailed <see cref="UserGroupOperationStatus"/>.</returns>
-    Attempt<IUserGroup, UserGroupOperationStatus> Create(IUserGroup userGroup, int performingUserId, int[]? groupMembersUserId = null);
 
     /// <summary>
     ///     Deletes a UserGroup
     /// </summary>
     /// <param name="userGroup">UserGroup to delete</param>
+    [Obsolete("Use IUserGroupService.DeleteAsync instead, scheduled for removal in V15.")]
     void DeleteUserGroup(IUserGroup userGroup);
 
     #endregion
