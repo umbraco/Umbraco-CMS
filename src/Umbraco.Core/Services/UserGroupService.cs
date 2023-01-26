@@ -113,10 +113,10 @@ public class UserGroupService : RepositoryService, IUserGroupService
             return validationAttempt;
         }
 
-        Attempt<IUserGroup, UserGroupOperationStatus> authorizationAttempt = AuthorizeUserGroupCreation(performingUser, userGroup);
+        Attempt<UserGroupOperationStatus> authorizationAttempt = _userGroupAuthorizationService.AuthorizeUserGroupCreation(performingUser, userGroup);
         if (authorizationAttempt.Success is false)
         {
-            return authorizationAttempt;
+            return Attempt.FailWithStatus(authorizationAttempt.Result, userGroup);
         }
 
         EventMessages eventMessages = EventMessagesFactory.Get();
@@ -147,7 +147,19 @@ public class UserGroupService : RepositoryService, IUserGroupService
     }
 
     /// <inheritdoc />
-    public Task<Attempt<IUserGroup, UserGroupOperationStatus>> UpdateAsync(IUserGroup userGroup, int performingUserId) => throw new NotImplementedException();
+    public async Task<Attempt<IUserGroup, UserGroupOperationStatus>> UpdateAsync(IUserGroup userGroup, int performingUserId)
+    {
+        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+
+        IUser? performingUser = _userService.GetUserById(performingUserId);
+        if (performingUser is null)
+        {
+            return Attempt.FailWithStatus(UserGroupOperationStatus.MissingUser, userGroup);
+        }
+
+
+        throw new NotImplementedException();
+    }
 
 
     private async Task<Attempt<IUserGroup, UserGroupOperationStatus>> ValidateUserGroupCreationAsync(IUserGroup userGroup)
@@ -159,22 +171,6 @@ public class UserGroupService : RepositoryService, IUserGroupService
 
         return UserGroupHasUniqueAlias(userGroup) is false
             ? Attempt.FailWithStatus(UserGroupOperationStatus.DuplicateAlias, userGroup)
-            : Attempt.SucceedWithStatus(UserGroupOperationStatus.Success, userGroup);
-    }
-
-    private Attempt<IUserGroup, UserGroupOperationStatus> AuthorizeUserGroupCreation(IUser performingUser, IUserGroup userGroup)
-    {
-        Attempt<UserGroupOperationStatus> authorizeSectionChanges =
-            _userGroupAuthorizationService.AuthorizeSectionAccess(performingUser, userGroup);
-        if (authorizeSectionChanges.Success is false)
-        {
-            return Attempt.FailWithStatus(authorizeSectionChanges.Result, userGroup);
-        }
-
-        Attempt<UserGroupOperationStatus> authorizeContentNodeChanges =
-            _userGroupAuthorizationService.AuthorizeStartNodeChanges(performingUser, userGroup);
-        return authorizeSectionChanges.Success is false
-            ? Attempt.FailWithStatus(authorizeContentNodeChanges.Result, userGroup)
             : Attempt.SucceedWithStatus(UserGroupOperationStatus.Success, userGroup);
     }
 

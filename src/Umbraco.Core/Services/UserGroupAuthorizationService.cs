@@ -25,6 +25,7 @@ public class UserGroupAuthorizationService : IUserGroupAuthorizationService
         _appCaches = appCaches;
     }
 
+    /// <inheritdoc />
     public Attempt<UserGroupOperationStatus> AuthorizeSectionAccess(IUser performingUser, IUserGroup userGroup)
     {
         if (performingUser.IsAdmin())
@@ -38,6 +39,7 @@ public class UserGroupAuthorizationService : IUserGroupAuthorizationService
             : Attempt.Succeed(UserGroupOperationStatus.Success);
     }
 
+    /// <inheritdoc />
     public Attempt<UserGroupOperationStatus> AuthorizeStartNodeChanges(IUser user, IUserGroup userGroup)
     {
         Attempt<UserGroupOperationStatus> authorizeContent = AuthorizeContentStartNode(user, userGroup);
@@ -46,6 +48,39 @@ public class UserGroupAuthorizationService : IUserGroupAuthorizationService
             ? authorizeContent
             : AuthorizeMediaStartNode(user, userGroup);
     }
+
+    /// <inheritdoc />
+    public Attempt<UserGroupOperationStatus> HasAccessToUserSection(IUser user)
+    {
+        if (user.AllowedSections.Contains(Constants.Applications.Users) is false)
+        {
+            return Attempt.Fail(UserGroupOperationStatus.UnauthorizedMissingUserSection);
+        }
+
+        return Attempt.Succeed(UserGroupOperationStatus.Success);
+    }
+
+    public Attempt<UserGroupOperationStatus> AuthorizeUserGroupCreation(IUser performingUser, IUserGroup userGroup)
+    {
+        Attempt<UserGroupOperationStatus> hasSectionAccess = HasAccessToUserSection(performingUser);
+        if (hasSectionAccess.Success is false)
+        {
+            return Attempt.Fail(hasSectionAccess.Result);
+        }
+
+        Attempt<UserGroupOperationStatus> authorizeSectionChanges = AuthorizeSectionAccess(performingUser, userGroup);
+        if (authorizeSectionChanges.Success is false)
+        {
+            return Attempt.Fail(authorizeSectionChanges.Result);
+        }
+
+        Attempt<UserGroupOperationStatus> authorizeContentNodeChanges = AuthorizeStartNodeChanges(performingUser, userGroup);
+        return authorizeSectionChanges.Success is false
+            ? Attempt.Fail(authorizeContentNodeChanges.Result)
+            : Attempt.Succeed(UserGroupOperationStatus.Success);
+    }
+
+    public Attempt<UserGroupOperationStatus> AuthorizeUserGroupUpdate(IUser performingUser, IUserGroup userGroup) => throw new NotImplementedException();
 
     // We explicitly take an IUser here which is non-nullable, since nullability should be handled in caller.
     private Attempt<UserGroupOperationStatus> AuthorizeContentStartNode(IUser user, IUserGroup userGroup)

@@ -7,6 +7,7 @@ public enum UserGroupOperationStatus
     AlreadyExists,
     DuplicateAlias,
     MissingUser,
+    UnauthorizedMissingUserSection,
     UnauthorizedMissingSections,
     UnauthorizedStartNodes,
     CancelledByNotification

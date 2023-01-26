@@ -34,6 +34,10 @@ public class UserGroupsControllerBase : ManagementApiControllerBase
                 .WithTitle("Unauthorized section")
                 .WithDetail("The specified allowed section contained a section the performing user doesn't have access to.")
                 .Build()),
+            UserGroupOperationStatus.UnauthorizedMissingUserSection => Unauthorized(new ProblemDetailsBuilder()
+                .WithTitle("Unauthorized")
+                .WithDetail("The performing user does not have access to the required section")
+                .Build()),
             UserGroupOperationStatus.UnauthorizedStartNodes => Unauthorized(new ProblemDetailsBuilder()
                 .WithTitle("Unauthorized start node")
                 .WithDetail("The specified start nodes contained a start node the performing user doesn't have access to.")
