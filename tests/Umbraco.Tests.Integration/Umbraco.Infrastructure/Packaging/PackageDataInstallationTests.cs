@@ -1,9 +1,6 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Xml.Linq;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
@@ -17,7 +14,6 @@ using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
 using Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services.Importing;
-using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Packaging;
 
@@ -79,6 +75,12 @@ public class PackageDataInstallationTests : UmbracoIntegrationTestWithContent
     private IMediaService MediaService => GetRequiredService<IMediaService>();
 
     private IMediaTypeService MediaTypeService => GetRequiredService<IMediaTypeService>();
+
+    public override void CreateTestData()
+    {
+        DeleteAllTemplateViewFiles();
+        base.CreateTestData();
+    }
 
     [Test]
     public void Can_Import_uBlogsy_ContentTypes_And_Verify_Structure()

@@ -373,7 +373,15 @@ public class FileService : RepositoryService, IFileService
     [Obsolete("Please use ITemplateService for template operations - will be removed in Umbraco 15")]
     public Attempt<OperationResult<OperationResultType, ITemplate>?> CreateTemplateForContentType(
         string contentTypeAlias, string? contentTypeName, int userId = Constants.Security.SuperUserId)
-        => _templateService.CreateForContentTypeAsync(contentTypeAlias, contentTypeName, userId).GetAwaiter().GetResult();
+    {
+        // mimic old service behavior
+        if (contentTypeAlias.Length > 255)
+        {
+            throw new InvalidOperationException("Name cannot be more than 255 characters in length.");
+        }
+
+        return _templateService.CreateForContentTypeAsync(contentTypeAlias, contentTypeName, userId).GetAwaiter().GetResult();
+    }
 
     /// <summary>
     ///     Create a new template, setting the content if a view exists in the filesystem
@@ -392,8 +400,14 @@ public class FileService : RepositoryService, IFileService
         ITemplate? masterTemplate = null,
         int userId = Constants.Security.SuperUserId)
     {
-        ArgumentNullException.ThrowIfNull(name);
-        ArgumentNullException.ThrowIfNull(alias);
+        // mimic old service behavior
+        ArgumentException.ThrowIfNullOrEmpty(name);
+        ArgumentException.ThrowIfNullOrEmpty(alias);
+        if (name.Length > 255)
+        {
+            throw new ArgumentOutOfRangeException(nameof(name), "Name cannot be more than 255 characters in length.");
+        }
+
         Attempt<ITemplate, TemplateOperationStatus> result = _templateService.CreateAsync(name, alias, content, userId).GetAwaiter().GetResult();
         return result.Result;
     }
@@ -457,7 +471,28 @@ public class FileService : RepositoryService, IFileService
     /// <param name="userId"></param>
     [Obsolete("Please use ITemplateService for template operations - will be removed in Umbraco 15")]
     public void SaveTemplate(ITemplate template, int userId = Constants.Security.SuperUserId)
-        => _templateService.UpdateAsync(template, userId).GetAwaiter().GetResult();
+    {
+        // mimic old service behavior
+        if (template == null)
+        {
+            throw new ArgumentNullException(nameof(template));
+        }
+
+        if (string.IsNullOrWhiteSpace(template.Name) || template.Name.Length > 255)
+        {
+            throw new InvalidOperationException(
+                "Name cannot be null, empty, contain only white-space characters or be more than 255 characters in length.");
+        }
+
+        if (template.Id > 0)
+        {
+            _templateService.UpdateAsync(template, userId).GetAwaiter().GetResult();
+        }
+        else
+        {
+            _templateService.CreateAsync(template, userId).GetAwaiter().GetResult();
+        }
+    }
 
     /// <summary>
     ///     Saves a collection of <see cref="Template" /> objects

@@ -91,12 +91,15 @@ public class TemplateService : RepositoryService, ITemplateService
         string alias,
         string? content,
         int userId = Constants.Security.SuperUserId)
+        => await CreateAsync(new Template(_shortStringHelper, name, alias) { Content = content }, userId);
+
+    /// <inheritdoc />
+    public async Task<Attempt<ITemplate, TemplateOperationStatus>> CreateAsync(ITemplate template, int userId = Constants.Security.SuperUserId)
     {
-        ITemplate template = new Template(_shortStringHelper, name, alias);
         try
         {
             // file might already be on disk, if so grab the content to avoid overwriting
-            template.Content = GetViewContent(alias) ?? content;
+            template.Content = GetViewContent(template.Alias) ?? template.Content;
             return await SaveAsync(template, AuditType.New, userId);
         }
         catch (PathTooLongException ex)

@@ -1,14 +1,11 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using System.Linq;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
-using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.OperationStatus;
-using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
 
@@ -21,15 +18,7 @@ public class TemplateServiceTests : UmbracoIntegrationTest
     private ITemplateService TemplateService => GetRequiredService<ITemplateService>();
 
     [SetUp]
-    public void SetUp()
-    {
-        var fileSystems = GetRequiredService<FileSystems>();
-        var viewFileSystem = fileSystems.MvcViewsFileSystem!;
-        foreach (var file in viewFileSystem.GetFiles(string.Empty).ToArray())
-        {
-            viewFileSystem.DeleteFile(file);
-        }
-    }
+    public void SetUp() => DeleteAllTemplateViewFiles();
 
     [Test]
     public async Task Can_Create_Template_Then_Assign_Child()

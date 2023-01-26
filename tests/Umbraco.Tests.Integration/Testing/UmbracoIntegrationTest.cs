@@ -197,4 +197,14 @@ public abstract class UmbracoIntegrationTest : UmbracoIntegrationTestBase
             configBuilder.AddConfiguration(GlobalSetupTeardown.TestConfiguration);
         }
     }
+
+    protected void DeleteAllTemplateViewFiles()
+    {
+        var fileSystems = GetRequiredService<FileSystems>();
+        var viewFileSystem = fileSystems.MvcViewsFileSystem!;
+        foreach (var file in viewFileSystem.GetFiles(string.Empty).ToArray())
+        {
+            viewFileSystem.DeleteFile(file);
+        }
+    }
 }

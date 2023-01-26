@@ -70,12 +70,20 @@ public interface ITemplateService : IService
     /// <summary>
     ///     Creates a new template
     /// </summary>
-    /// <param name="name"></param>
-    /// <param name="alias"></param>
-    /// <param name="content"></param>
-    /// <param name="userId"></param>
+    /// <param name="name">Name of the new template</param>
+    /// <param name="alias">Alias of the template</param>
+    /// <param name="content">View content for the new template</param>
+    /// <param name="userId">Optional id of the user creating the template</param>
     /// <returns></returns>
     Task<Attempt<ITemplate, TemplateOperationStatus>> CreateAsync(string name, string alias, string? content, int userId = Constants.Security.SuperUserId);
+
+    /// <summary>
+    ///     Creates a new template
+    /// </summary>
+    /// <param name="template">The new template</param>
+    /// <param name="userId">Optional id of the user creating the template</param>
+    /// <returns></returns>
+    Task<Attempt<ITemplate, TemplateOperationStatus>> CreateAsync(ITemplate template, int userId = Constants.Security.SuperUserId);
 
     /// <summary>
     ///     Deletes a template by its alias
