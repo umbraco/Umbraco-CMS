@@ -3,7 +3,7 @@ import { css, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { repeat } from 'lit/directives/repeat.js';
 import { UmbCollectionContext, UMB_COLLECTION_CONTEXT_TOKEN } from '../collection.context';
-import type { MediaDetails } from '@umbraco-cms/models';
+import type { MediaTreeItem } from '../../../media/media/media.tree.store';
 import { UmbLitElement } from '@umbraco-cms/element';
 
 @customElement('umb-collection-view-media-grid')
@@ -65,12 +65,12 @@ export class UmbCollectionViewsMediaGridElement extends UmbLitElement {
 	];
 
 	@state()
-	private _mediaItems?: Array<MediaDetails>;
+	private _mediaItems?: Array<MediaTreeItem>;
 
 	@state()
-	private _selection?: Array<string>;
+	private _selection: Array<string> = [];
 
-	private _collectionContext?: UmbCollectionContext<MediaDetails>;
+	private _collectionContext?: UmbCollectionContext<MediaTreeItem>;
 
 	constructor() {
 		super();
@@ -115,24 +115,31 @@ export class UmbCollectionViewsMediaGridElement extends UmbLitElement {
 		});
 	}
 
-	private _handleOpenItem(mediaItem: MediaDetails) {
+	private _handleOpenItem(mediaItem: MediaTreeItem) {
 		//TODO: Fix when we have dynamic routing
 		history.pushState(null, '', 'section/media/media/' + mediaItem.key);
 	}
 
-	private _handleSelect(mediaItem: MediaDetails) {
-		this._collectionContext?.select(mediaItem.key);
+	private _handleSelect(mediaItem: MediaTreeItem) {
+		if(mediaItem.key) {
+			this._collectionContext?.select(mediaItem.key);
+		}
 	}
 
-	private _handleDeselect(mediaItem: MediaDetails) {
-		this._collectionContext?.deselect(mediaItem.key);
+	private _handleDeselect(mediaItem: MediaTreeItem) {
+		if(mediaItem.key) {
+			this._collectionContext?.deselect(mediaItem.key);
+		}
 	}
 
-	private _isSelected(mediaItem: MediaDetails) {
-		return this._selection?.includes(mediaItem.key);
+	private _isSelected(mediaItem: MediaTreeItem) {
+		if(mediaItem.key) {
+			return this._selection.includes(mediaItem.key);
+		}
+		return false;
 	}
 
-	private _renderMediaItem(item: MediaDetails) {
+	private _renderMediaItem(item: MediaTreeItem) {
 		const name = item.name || '';
 		//TODO: fix the file extension when media items have a file extension.
 		return html`<uui-card-media
@@ -159,7 +166,7 @@ export class UmbCollectionViewsMediaGridElement extends UmbLitElement {
 				${this._mediaItems
 					? repeat(
 							this._mediaItems,
-							(file, index) => file.key + index,
+							(file, index) => (file.key || '') + index,
 							(file) => this._renderMediaItem(file)
 					  )
 					: ''}

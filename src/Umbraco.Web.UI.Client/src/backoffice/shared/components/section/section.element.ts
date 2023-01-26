@@ -7,7 +7,7 @@ import type { UmbWorkspaceEntityElement } from '../workspace/workspace-entity-el
 import { UmbSectionContext, UMB_SECTION_CONTEXT_TOKEN } from './section.context';
 import { createExtensionElement } from '@umbraco-cms/extensions-api';
 import type { ManifestSectionView, ManifestWorkspace, ManifestSidebarMenuItem } from '@umbraco-cms/models';
-import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
+import { umbExtensionsRegistry } from '@umbraco-cms/extensions-api';
 import { UmbLitElement } from '@umbraco-cms/element';
 
 import './section-sidebar-menu/section-sidebar-menu.element.ts';
@@ -44,6 +44,7 @@ export class UmbSectionElement extends UmbLitElement {
 	private _views?: Array<ManifestSectionView>;
 
 	private _sectionContext?: UmbSectionContext;
+	private _sectionAlias?: string;
 
 	constructor() {
 		super();
@@ -53,15 +54,15 @@ export class UmbSectionElement extends UmbLitElement {
 
 			// TODO: currently they don't corporate, as they overwrite each other...
 			this._observeMenuItems();
-			this._observeViews();
+			this._observeSection();
 		});
 	}
 
 	private _observeMenuItems() {
 		if (!this._sectionContext) return;
 
-		this.observe(this._sectionContext?.manifest, (section) => {
-			this._observeSidebarMenuItem(section?.alias);
+		this.observe(this._sectionContext?.alias, (alias) => {
+			this._observeSidebarMenuItem(alias);
 		});
 
 		this.observe(umbExtensionsRegistry.extensionsOfType('workspace'), (workspaceExtensions) => {
@@ -88,6 +89,8 @@ export class UmbSectionElement extends UmbLitElement {
 	}
 
 	private _createMenuRoutes() {
+
+		console.log("_createMenuRoutes")
 		// TODO: find a way to make this reuseable across:
 		const workspaceRoutes = this._workspaces?.map((workspace: ManifestWorkspace) => {
 			return [
@@ -138,30 +141,27 @@ export class UmbSectionElement extends UmbLitElement {
 		];
 	}
 
-	private _observeViews() {
+
+
+	private _observeSection() {
 		if (!this._sectionContext) return;
 
 		this.observe(
-			this._sectionContext.manifest.pipe(
-				switchMap((section) => {
-					if (!section) return EMPTY;
+			this._sectionContext.alias, (alias) => {
+				this._sectionAlias = alias;
+				this._observeViews();
+			}
+		);
+	}
 
-					return (
-						umbExtensionsRegistry
-							?.extensionsOfType('sectionView')
-							.pipe(
-								map((views) =>
-									views
-										.filter((view) => view.meta.sections.includes(section.alias))
-										.sort((a, b) => b.meta.weight - a.meta.weight)
-								)
-							) ?? of([])
-					);
-				})
-			),
-			(views) => {
-				if (views.length > 0) {
-					this._views = views;
+	private _observeViews() {
+
+		this.observe(umbExtensionsRegistry?.extensionsOfType('sectionView'), (views) => {
+				const sectionViews = views.filter((view) => {
+					return this._sectionAlias ? view.meta.sections.includes(this._sectionAlias) : false
+				}).sort((a, b) => b.meta.weight - a.meta.weight);
+				if(sectionViews.length > 0) {
+					this._views = sectionViews;
 					this._createViewRoutes();
 				}
 			}
@@ -169,6 +169,9 @@ export class UmbSectionElement extends UmbLitElement {
 	}
 
 	private _createViewRoutes() {
+
+		console.log("_createViewRoutes")
+
 		this._routes =
 			this._views?.map((view) => {
 				return {

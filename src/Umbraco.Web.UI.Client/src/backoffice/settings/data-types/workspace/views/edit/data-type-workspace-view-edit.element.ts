@@ -5,7 +5,7 @@ import { UmbModalService, UMB_MODAL_SERVICE_CONTEXT_TOKEN } from '../../../../..
 import { UmbWorkspaceDataTypeContext } from '../../data-type-workspace.context';
 import { UmbLitElement } from '@umbraco-cms/element';
 import type { DataTypeDetails } from '@umbraco-cms/models';
-import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
+import { umbExtensionsRegistry } from '@umbraco-cms/extensions-api';
 
 import '../../../../../shared/property-editors/shared/property-editor-config/property-editor-config.element';
 import '../../../../../shared/components/ref-property-editor-ui/ref-property-editor-ui.element';

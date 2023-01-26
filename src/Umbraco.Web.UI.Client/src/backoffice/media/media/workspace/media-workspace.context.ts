@@ -1,10 +1,10 @@
 import { UmbWorkspaceContentContext } from '../../../shared/components/workspace/workspace-content/workspace-content.context';
 import {
-	UmbMediaStore,
-	UmbMediaStoreItemType,
-	UMB_MEDIA_STORE_CONTEXT_TOKEN,
-} from 'src/backoffice/media/media/media.store';
+	UmbMediaDetailStore,
+	UMB_MEDIA_DETAIL_STORE_CONTEXT_TOKEN,
+} from 'src/backoffice/media/media/media.detail.store';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
+import type { MediaDetails } from '@umbraco-cms/models';
 
 const DefaultMediaData = {
 	key: '',
@@ -33,11 +33,11 @@ const DefaultMediaData = {
 			name: '',
 		},
 	],
-} as UmbMediaStoreItemType;
+} as MediaDetails;
 
-export class UmbWorkspaceMediaContext extends UmbWorkspaceContentContext<UmbMediaStoreItemType, UmbMediaStore> {
+export class UmbWorkspaceMediaContext extends UmbWorkspaceContentContext<MediaDetails, UmbMediaDetailStore> {
 	constructor(host: UmbControllerHostInterface) {
-		super(host, DefaultMediaData, UMB_MEDIA_STORE_CONTEXT_TOKEN.toString(), 'media');
+		super(host, DefaultMediaData, UMB_MEDIA_DETAIL_STORE_CONTEXT_TOKEN.toString(), 'media');
 	}
 
 	public setPropertyValue(alias: string, value: unknown) {

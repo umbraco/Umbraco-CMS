@@ -5,7 +5,8 @@ import { manifests as extensionManifests } from './extensions/manifests';
 import { manifests as languageManifests } from './languages/manifests';
 import { manifests as logviewerManifests } from './logviewer/manifests';
 
-import { ManifestTypes, umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
+import { umbExtensionsRegistry } from '@umbraco-cms/extensions-api';
+import { ManifestTypes } from '@umbraco-cms/extensions-registry';
 
 const registerExtensions = (manifests: Array<ManifestTypes>) => {
 	manifests.forEach((manifest) => {
@@ -20,5 +21,5 @@ registerExtensions([
 	...dataTypeManifests,
 	...extensionManifests,
 	...languageManifests,
-	...logviewerManifests
+	...logviewerManifests,
 ]);
