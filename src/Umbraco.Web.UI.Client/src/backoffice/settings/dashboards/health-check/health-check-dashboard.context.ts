@@ -1,5 +1,6 @@
 import { UmbHealthCheckContext } from './health-check.context';
 import type { ManifestHealthCheck } from '@umbraco-cms/models';
+import { UmbContextToken } from '@umbraco-cms/context-api';
 
 export class UmbHealthCheckDashboardContext {
 	public manifests: ManifestHealthCheck[] = [];
@@ -21,3 +22,7 @@ export class UmbHealthCheckDashboardContext {
 		}
 	}
 }
+
+export const UMB_HEALTHCHECK_DASHBOARD_CONTEXT_TOKEN = new UmbContextToken<UmbHealthCheckDashboardContext>(
+	UmbHealthCheckDashboardContext.name
+);

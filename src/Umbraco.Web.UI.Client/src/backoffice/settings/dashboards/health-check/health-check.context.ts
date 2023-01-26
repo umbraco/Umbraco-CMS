@@ -2,6 +2,7 @@ import { BehaviorSubject, Observable } from 'rxjs';
 import { HealthCheckResource, HealthCheckWithResult } from '@umbraco-cms/backend-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/resources';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
+import { UmbContextToken } from '@umbraco-cms/context-api';
 
 export class UmbHealthCheckContext {
 	private _checks: BehaviorSubject<Array<any>> = new BehaviorSubject(<Array<any>>[]);
@@ -45,3 +46,5 @@ export class UmbHealthCheckContext {
 		}
 	}
 }
+
+export const UMB_HEALTHCHECK_CONTEXT_TOKEN = new UmbContextToken<UmbHealthCheckContext>(UmbHealthCheckContext.name);

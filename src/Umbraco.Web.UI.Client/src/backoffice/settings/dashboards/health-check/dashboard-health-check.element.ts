@@ -2,7 +2,10 @@ import { html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { IRoute, IRoutingInfo } from 'router-slot';
 import { UmbDashboardHealthCheckGroupElement } from './views/health-check-group.element';
-import { UmbHealthCheckDashboardContext } from './health-check-dashboard.context';
+import {
+	UmbHealthCheckDashboardContext,
+	UMB_HEALTHCHECK_DASHBOARD_CONTEXT_TOKEN,
+} from './health-check-dashboard.context';
 import { UmbHealthCheckContext } from './health-check.context';
 import { UmbLitElement } from '@umbraco-cms/element';
 import { ManifestHealthCheck } from '@umbraco-cms/extensions-registry';
@@ -35,7 +38,7 @@ export class UmbDashboardHealthCheckElement extends UmbLitElement {
 		umbExtensionsRegistry.extensionsOfType('healthCheck').subscribe((healthChecks) => {
 			this._healthCheckManifests = healthChecks;
 			this.provideContext(
-				'umbHealthCheckDashboard',
+				UMB_HEALTHCHECK_DASHBOARD_CONTEXT_TOKEN,
 				new UmbHealthCheckDashboardContext(this, this._healthCheckManifests)
 			);
 		});

@@ -5,7 +5,10 @@ import { customElement, property, state } from 'lit/decorators.js';
 import { unsafeHTML } from 'lit/directives/unsafe-html.js';
 
 import { UmbHealthCheckContext } from '../health-check.context';
-import { UmbHealthCheckDashboardContext } from '../health-check-dashboard.context';
+import {
+	UmbHealthCheckDashboardContext,
+	UMB_HEALTHCHECK_DASHBOARD_CONTEXT_TOKEN,
+} from '../health-check-dashboard.context';
 import {
 	HealthCheckAction,
 	HealthCheckGroupWithResult,
@@ -84,7 +87,7 @@ export class UmbDashboardHealthCheckGroupElement extends UmbLitElement {
 
 	constructor() {
 		super();
-		this.consumeContext<UmbHealthCheckDashboardContext>('umbHealthCheckDashboard', (instance) => {
+		this.consumeContext(UMB_HEALTHCHECK_DASHBOARD_CONTEXT_TOKEN, (instance) => {
 			this._healthCheckContext = instance;
 
 			this._api = this._healthCheckContext?.apis.get(this.groupName);

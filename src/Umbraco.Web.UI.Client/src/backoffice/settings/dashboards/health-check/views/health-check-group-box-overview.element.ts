@@ -1,12 +1,15 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html, nothing } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
+import { ensureSlash, path } from 'router-slot';
 import { UmbHealthCheckContext } from '../health-check.context';
+import {
+	UMB_HEALTHCHECK_DASHBOARD_CONTEXT_TOKEN,
+	UmbHealthCheckDashboardContext,
+} from '../health-check-dashboard.context';
 import type { ManifestHealthCheck } from '@umbraco-cms/models';
 import { StatusResultType } from '@umbraco-cms/backend-api';
 import { UmbLitElement } from '@umbraco-cms/element';
-import { UmbHealthCheckDashboardContext } from '../health-check-dashboard.context';
-import { ensureSlash, path } from 'router-slot';
 
 @customElement('umb-health-check-group-box-overview')
 export class UmbHealthCheckGroupBoxOverviewElement extends UmbLitElement {
@@ -66,7 +69,7 @@ export class UmbHealthCheckGroupBoxOverviewElement extends UmbLitElement {
 	constructor() {
 		super();
 
-		this.consumeContext<UmbHealthCheckDashboardContext>('umbHealthCheckDashboard', (instance) => {
+		this.consumeContext(UMB_HEALTHCHECK_DASHBOARD_CONTEXT_TOKEN, (instance) => {
 			this._healthCheckContext = instance;
 			if (!this._healthCheckContext || !this.manifest?.meta.label) return;
 			this._api = this._healthCheckContext?.apis.get(this.manifest?.meta.label);
