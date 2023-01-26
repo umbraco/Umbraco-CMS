@@ -43,6 +43,7 @@ export class UmbCollectionBulkActionMoveElement extends UmbLitElement {
 		const selectionSubscription = this.#collectionContext?.selection.subscribe((selection) => {
 			const modalHandler = this.#modalService?.contentPicker({
 				selection: [],
+				multiple: false,
 				alias: 'Umb.Tree.Media',
 			});
 			modalHandler?.onClose().then((data) => {
