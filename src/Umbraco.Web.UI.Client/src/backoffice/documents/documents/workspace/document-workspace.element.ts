@@ -1,7 +1,7 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
-import { UmbWorkspaceDocumentContext } from './document-workspace.context';
+import { UmbDocumentWorkspaceContext } from './document-workspace.context';
 import { UmbLitElement } from '@umbraco-cms/element';
 import type { UmbWorkspaceEntityElement } from 'src/backoffice/shared/components/workspace/workspace-entity-element.interface';
 
@@ -35,7 +35,7 @@ export class UmbDocumentWorkspaceElement extends UmbLitElement implements UmbWor
 		this._workspaceContext.create(parentKey);
 	}
 
-	private _workspaceContext: UmbWorkspaceDocumentContext = new UmbWorkspaceDocumentContext(this);
+	private _workspaceContext: UmbDocumentWorkspaceContext = new UmbDocumentWorkspaceContext(this);
 
 	render() {
 		return html`<umb-workspace-content alias="Umb.Workspace.Document"></umb-workspace-content>`;

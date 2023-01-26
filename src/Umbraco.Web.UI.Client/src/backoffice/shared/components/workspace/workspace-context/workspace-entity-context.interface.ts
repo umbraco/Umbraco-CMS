@@ -2,11 +2,12 @@ import { Observable } from "rxjs";
 
 export interface UmbWorkspaceEntityContextInterface<T> {
 
-	readonly data:Observable<T>;
-	readonly name:Observable<string>;
 
-	entityKey?: string;
-	entityType: string;
+	readonly data: Observable<T>;
+	readonly name: Observable<string|undefined>;
+
+	//entityKey?: string;
+	//entityType: string;
 
 
 	getData(): T;
