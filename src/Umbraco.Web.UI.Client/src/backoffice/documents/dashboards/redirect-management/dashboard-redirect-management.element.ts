@@ -41,6 +41,10 @@ export class UmbDashboardRedirectManagementElement extends UmbLitElement {
 			}
 			uui-pagination {
 				display: inline-block;
+			}
+			.pagination {
+				display: flex;
+				justify-content: center;
 				margin-top: var(--uui-size-space-5);
 			}
 
@@ -75,7 +79,7 @@ export class UmbDashboardRedirectManagementElement extends UmbLitElement {
 	];
 
 	@property({ type: Number, attribute: 'items-per-page' })
-	itemsPerPage = 20;
+	itemsPerPage = 5;
 
 	@state()
 	private _redirectData?: RedirectUrl[];
@@ -117,9 +121,8 @@ export class UmbDashboardRedirectManagementElement extends UmbLitElement {
 	}
 
 	private async _getTrackerStatus() {
-		//TODO: This resource calls the wrong api
 		const { data } = await tryExecuteAndNotify(this, RedirectManagementResource.getRedirectManagementStatus());
-		//if (data && data.status) this._trackerStatus = data.status === RedirectStatus.ENABLED ? true : false;
+		if (data && data.status) this._trackerStatus = data.status === RedirectStatus.ENABLED ? true : false;
 	}
 
 	private _removeRedirectHandler(data: RedirectUrl) {
@@ -243,7 +246,9 @@ export class UmbDashboardRedirectManagementElement extends UmbLitElement {
 			</div>
 
 			${this._total && this._total > 0
-				? html`<div class="${this._trackerStatus ? 'trackerEnabled' : 'trackerDisabled'}">${this.renderTable()}</div>`
+				? html`<div class="wrapper ${this._trackerStatus ? 'trackerEnabled' : 'trackerDisabled'}">
+						${this.renderTable()}
+				  </div>`
 				: this._filter?.length
 				? this._renderZeroResults()
 				: this.renderNoRedirects()} `;
@@ -309,9 +314,11 @@ export class UmbDashboardRedirectManagementElement extends UmbLitElement {
 
 	private _renderPagination() {
 		if (this._total && Math.ceil(this._total / this.itemsPerPage) > 1) {
-			return html`<uui-pagination
-				total="${Math.ceil(this._total / this.itemsPerPage)}"
-				@change="${this._onPageChange}"></uui-pagination>`;
+			return html`<div class="pagination">
+				<uui-pagination
+					total="${Math.ceil(this._total / this.itemsPerPage)}"
+					@change="${this._onPageChange}"></uui-pagination>
+			</div>`;
 		} else return nothing;
 	}
 }

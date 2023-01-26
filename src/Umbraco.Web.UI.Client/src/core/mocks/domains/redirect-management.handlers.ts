@@ -1,13 +1,12 @@
 import { rest } from 'msw';
-import { toNumber } from 'lodash-es';
 import { umbracoPath } from '@umbraco-cms/utils';
 import { PagedRedirectUrl, RedirectUrl, RedirectStatus, RedirectUrlStatus } from '@umbraco-cms/backend-api';
 
 export const handlers = [
 	rest.get(umbracoPath('/redirect-management'), (_req, res, ctx) => {
 		const filter = _req.url.searchParams.get('filter');
-		const skip = toNumber(_req.url.searchParams.get('skip'));
-		const take = toNumber(_req.url.searchParams.get('take'));
+		const skip = parseInt(_req.url.searchParams.get('skip') ?? '0', 10);
+		const take = parseInt(_req.url.searchParams.get('take') ?? '20', 10);
 
 		if (filter) {
 			const filtered: RedirectUrl[] = [];
@@ -34,6 +33,7 @@ export const handlers = [
 	rest.get(umbracoPath('/redirect-management/:key'), async (_req, res, ctx) => {
 		const key = _req.params.key as string;
 		if (!key) return res(ctx.status(404));
+		if (key === 'status') return res(ctx.status(200), ctx.json<RedirectUrlStatus>(UrlTracker));
 
 		const PagedRedirectUrlObject = _getRedirectUrlByKey(key);
 
@@ -49,9 +49,9 @@ export const handlers = [
 		return res(ctx.status(200), ctx.json<any>(PagedRedirectUrlObject));
 	}),
 
-	rest.get(umbracoPath('/redirect-management/status'), (_req, res, ctx) => {
+	/*rest.get(umbracoPath('/redirect-management/status'), (_req, res, ctx) => {
 		return res(ctx.status(200), ctx.json<RedirectUrlStatus>(UrlTracker));
-	}),
+	}),*/
 
 	rest.post(umbracoPath('/redirect-management/status'), async (_req, res, ctx) => {
 		UrlTracker.status = UrlTracker.status === RedirectStatus.ENABLED ? RedirectStatus.DISABLED : RedirectStatus.ENABLED;
