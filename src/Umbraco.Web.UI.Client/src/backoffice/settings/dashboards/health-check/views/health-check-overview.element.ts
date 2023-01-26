@@ -58,12 +58,12 @@ export class UmbDashboardHealthCheckOverviewElement extends UmbLitElement {
 				<div slot="headline" class="flex">
 					Health Check
 					<uui-button
-						label="Check all groups"
+						label="Perform all checks"
 						color="positive"
 						look="primary"
 						.state="${this._buttonState}"
 						@click="${this._onHealthCheckHandler}">
-						Check all groups
+						Perform all checks
 					</uui-button>
 				</div>
 				<!--//TODO:  wrap extension container in a grid wrapper -->

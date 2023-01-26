@@ -2,6 +2,7 @@ import { UUIButtonState } from '@umbraco-ui/uui';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html, nothing } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
+import { unsafeHTML } from 'lit/directives/unsafe-html.js';
 
 import { UmbHealthCheckContext } from '../health-check.context';
 import { UmbHealthCheckDashboardContext } from '../health-check-dashboard.context';
@@ -117,12 +118,12 @@ export class UmbDashboardHealthCheckGroupElement extends UmbLitElement {
 				<div class="header">
 					<h2>${this._group.name}</h2>
 					<uui-button
-						label="Get checks"
+						label="Perform checks"
 						color="positive"
 						look="primary"
 						.state="${this._buttonState}"
 						@click="${this._buttonHandler}">
-						Get checks
+						Perform checks
 					</uui-button>
 				</div>
 				<div class="checks-wrapper">
@@ -145,7 +146,7 @@ export class UmbDashboardHealthCheckGroupElement extends UmbLitElement {
 					return html`<div class="check-result">
 						<div class="check-result-description">
 							<span>${this.renderIcon(result.resultType)}</span>
-							<p>${result.message}</p>
+							<p>${unsafeHTML(result.message)}</p>
 						</div>
 
 						${result.actions ? this.renderActions(result.actions) : nothing}
