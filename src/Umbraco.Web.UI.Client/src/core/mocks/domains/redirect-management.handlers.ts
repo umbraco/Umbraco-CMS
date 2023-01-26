@@ -9,7 +9,6 @@ export const handlers = [
 		const skip = toNumber(_req.url.searchParams.get('skip'));
 		const take = toNumber(_req.url.searchParams.get('take'));
 
-		console.log('handler file', filter);
 		if (filter) {
 			const filtered: RedirectUrl[] = [];
 
