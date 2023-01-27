@@ -129,9 +129,12 @@ export class UmbWorkspaceViewLanguageEditElement extends UmbLitElement {
 	}
 
 	private _renderDefaultLanguageWarning() {
-		const originalIsDefault = this._languages.find(
-			(language) => language.isoCode === this.language?.isoCode
-		)?.isDefault;
+		let originalIsDefault = false;
+
+		if (this.language?.isoCode) {
+			originalIsDefault =
+				this._languages.find((language) => language.isoCode === this.language?.isoCode)?.isDefault ?? false;
+		}
 
 		if (originalIsDefault === this.language?.isDefault) return nothing;
 
