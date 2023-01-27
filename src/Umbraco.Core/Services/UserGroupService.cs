@@ -147,7 +147,9 @@ internal sealed class UserGroupService : RepositoryService, IUserGroupService
     }
 
     /// <inheritdoc />
-    public async Task<Attempt<IUserGroup, UserGroupOperationStatus>> UpdateAsync(IUserGroup userGroup, int performingUserId)
+    public async Task<Attempt<IUserGroup, UserGroupOperationStatus>> UpdateAsync(
+        IUserGroup userGroup,
+        int performingUserId)
     {
         using ICoreScope scope = ScopeProvider.CreateCoreScope();
 
@@ -157,8 +159,31 @@ internal sealed class UserGroupService : RepositoryService, IUserGroupService
             return Attempt.FailWithStatus(UserGroupOperationStatus.MissingUser, userGroup);
         }
 
+        Attempt<IUserGroup, UserGroupOperationStatus> validationAttempt = await ValidateUserGroupUpdateAsync(userGroup);
+        if (validationAttempt.Success is false)
+        {
+            return validationAttempt;
+        }
 
-        throw new NotImplementedException();
+        Attempt<UserGroupOperationStatus> authorizationAttempt = _userGroupAuthorizationService.AuthorizeUserGroupUpdate(performingUser, userGroup);
+        if (authorizationAttempt.Success is false)
+        {
+            return Attempt.FailWithStatus(authorizationAttempt.Result, userGroup);
+        }
+
+        EventMessages eventMessages = EventMessagesFactory.Get();
+        var savingNotification = new UserGroupSavingNotification(userGroup, eventMessages);
+        if (await scope.Notifications.PublishCancelableAsync(savingNotification))
+        {
+            scope.Complete();
+            return Attempt.FailWithStatus(UserGroupOperationStatus.CancelledByNotification, userGroup);
+        }
+
+        _userGroupRepository.Save(userGroup);
+        scope.Notifications.Publish(new UserGroupSavedNotification(userGroup, eventMessages).WithStateFrom(savingNotification));
+
+        scope.Complete();
+        return Attempt.SucceedWithStatus(UserGroupOperationStatus.Success, userGroup);
     }
 
 
@@ -174,9 +199,19 @@ internal sealed class UserGroupService : RepositoryService, IUserGroupService
             : Attempt.SucceedWithStatus(UserGroupOperationStatus.Success, userGroup);
     }
 
+    private async Task<Attempt<IUserGroup, UserGroupOperationStatus>> ValidateUserGroupUpdateAsync(IUserGroup userGroup)
+    {
+        if (await IsNewUserGroup(userGroup))
+        {
+            return Attempt.FailWithStatus(UserGroupOperationStatus.NotFound, userGroup);
+        }
+
+        return Attempt.SucceedWithStatus(UserGroupOperationStatus.Success, userGroup);
+    }
+
     private async Task<bool> IsNewUserGroup(IUserGroup userGroup)
     {
-        if (userGroup.Id != 0)
+        if (userGroup.Id != 0 && userGroup.HasIdentity is false)
         {
             return false;
         }

@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Management.Factories;
 using Umbraco.Cms.Api.Management.ViewModels.UserGroups;
 using Umbraco.Cms.Core;
-using Umbraco.Cms.Core.Actions;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.OperationStatus;
@@ -29,7 +28,6 @@ public class UpdateUserGroupController : UserGroupsControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Update(Guid key, UserGroupUpdateModel dataTypeUpdateModel)
     {
-        // TODO: Validation etc...
         IUserGroup? existingUserGroup = await _userGroupService.GetAsync(key);
 
         if (existingUserGroup is null)
