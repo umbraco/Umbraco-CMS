@@ -256,39 +256,52 @@ export class UmbUserGroupWorkspaceElement extends UmbLitElement implements UmbWo
 			// TODO: handle if there is no users.
 			if (!this._userKeys && users.length > 0) {
 				this._userKeys = users.filter((user) => user.userGroups.includes(this.entityKey)).map((user) => user.key);
-				this._updateProperty('users', this._userKeys);
+				//this._updateProperty('users', this._userKeys);
+				// TODO: make a method on the UmbWorkspaceUserGroupContext:
+				//this._workspaceContext.setUsers();
 			}
 		});
 	}
 
 	private _updateUserKeys(userKeys: Array<string>) {
 		this._userKeys = userKeys;
-		this._updateProperty('users', this._userKeys);
+		// TODO: make a method on the UmbWorkspaceUserGroupContext:
+		//this._workspaceContext.setUsers();
 	}
 
-	private _updateProperty(propertyName: string, value: unknown) {
-		this._workspaceContext?.update({ [propertyName]: value });
-	}
 
 	private _updatePermission(permission: { name: string; description: string; value: boolean }) {
 		if (!this._workspaceContext) return;
 
 		const checkValue = this._checkPermission(permission);
-		const selectedPermissions = this._workspaceContext.getData().permissions;
+		//const selectedPermissions = this._workspaceContext.getData().permissions;
+		// TODO: make a method on the UmbWorkspaceUserGroupContext:
+		//const selectedPermissions = this._workspaceContext.getPermissions();
 
+		/*
 		let newPermissions = [];
 		if (checkValue === false) {
 			newPermissions = [...selectedPermissions, permission.name];
 		} else {
 			newPermissions = selectedPermissions.filter((p) => p !== permission.name);
 		}
-		this._updateProperty('permissions', newPermissions);
+		*/
+
+		//this._updateProperty('permissions', newPermissions);
+		// TODO: make a method on the UmbWorkspaceUserGroupContext:
+		//this._workspaceContext.setPermissions();
 	}
 
 	private _checkPermission(permission: { name: string; description: string; value: boolean }) {
 		if (!this._workspaceContext) return false;
 
-		return this._workspaceContext.getData().permissions.includes(permission.name);
+		//return this._workspaceContext.getPermissions().includes(permission.name);
+		return false;
+	}
+
+	private _updateSections(value: string[]) {
+		console.log("To be done");
+		//this._workspaceContext.setSections(value);
 	}
 
 	private renderLeftColumn() {
@@ -300,7 +313,7 @@ export class UmbUserGroupWorkspaceElement extends UmbLitElement implements UmbWo
 					<umb-input-section
 						slot="editor"
 						.value=${this._userGroup.sections}
-						@change=${(e: any) => this._updateProperty('sections', e.target.value)}></umb-input-section>
+						@change=${(e: any) => this._updateSections(e.target.value)}></umb-input-section>
 				</umb-workspace-property-layout>
 				<umb-workspace-property-layout
 					label="Content start node"
@@ -370,7 +383,7 @@ export class UmbUserGroupWorkspaceElement extends UmbLitElement implements UmbWo
 			const target = event.composedPath()[0] as UUIInputElement;
 
 			if (typeof target?.value === 'string') {
-				this._updateProperty('name', target.value);
+				this._workspaceContext.setName(target.value);
 			}
 		}
 	}

@@ -69,7 +69,7 @@ export class UmbDataTypeWorkspaceViewEditElement extends UmbLitElement {
 			this._dataType = dataType as DataTypeDetails;
 
 			if (this._dataType.propertyEditorUIAlias !== this._propertyEditorUIAlias) {
-				this._observePropertyEditorUI(this._dataType.propertyEditorUIAlias);
+				this._observePropertyEditorUI(this._dataType.propertyEditorUIAlias || undefined);
 			}
 
 			if (this._dataType.data !== this._data) {
@@ -78,7 +78,7 @@ export class UmbDataTypeWorkspaceViewEditElement extends UmbLitElement {
 		});
 	}
 
-	private _observePropertyEditorUI(propertyEditorUIAlias: string | null) {
+	private _observePropertyEditorUI(propertyEditorUIAlias?: string) {
 		if (!propertyEditorUIAlias) return;
 
 		this.observe(
@@ -92,7 +92,7 @@ export class UmbDataTypeWorkspaceViewEditElement extends UmbLitElement {
 				this._propertyEditorUIIcon = propertyEditorUI?.meta.icon ?? '';
 				this._propertyEditorModelAlias = propertyEditorUI?.meta.propertyEditorModel ?? '';
 
-				this._workspaceContext?.update({ propertyEditorModelAlias: this._propertyEditorModelAlias });
+				this._workspaceContext?.setPropertyEditorModelAlias(this._propertyEditorModelAlias);
 			}
 		);
 	}
@@ -110,9 +110,9 @@ export class UmbDataTypeWorkspaceViewEditElement extends UmbLitElement {
 		});
 	}
 
-	private _selectPropertyEditorUI(propertyEditorUIAlias: string | null) {
+	private _selectPropertyEditorUI(propertyEditorUIAlias: string | undefined) {
 		if (!this._dataType || this._dataType.propertyEditorUIAlias === propertyEditorUIAlias) return;
-		this._workspaceContext?.update({ propertyEditorUIAlias });
+		this._workspaceContext?.setPropertyEditorUIAlias(propertyEditorUIAlias);
 		this._observePropertyEditorUI(propertyEditorUIAlias);
 	}
 

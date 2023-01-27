@@ -2,8 +2,7 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html, nothing } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { UUIInputElement, UUIInputEvent } from '@umbraco-ui/uui';
-import { distinctUntilChanged } from 'rxjs';
-import type { UmbWorkspaceContentContext } from '../workspace/workspace-content/workspace-content.context';
+import type { UmbWorkspaceEntityContextInterface } from '../workspace/workspace-context/workspace-entity-context.interface';
 import { UmbLitElement } from '@umbraco-cms/element';
 import type { ContentTreeItem } from '@umbraco-cms/backend-api';
 
@@ -45,13 +44,13 @@ export class UmbVariantSelectorElement extends UmbLitElement {
 	@state()
 	_content?: ContentTreeItem;
 
-	private _workspaceContext?: UmbWorkspaceContentContext;
+	private _workspaceContext?: UmbWorkspaceEntityContextInterface<ContentTreeItem>;
 
 	constructor() {
 		super();
 
 		// TODO: Figure out how to get the magic string for the workspace context.
-		this.consumeContext<UmbWorkspaceContentContext>(
+		this.consumeContext<UmbWorkspaceEntityContextInterface<ContentTreeItem>>(
 			'umbWorkspaceContext',
 			(instance) => {
 				this._workspaceContext = instance;
@@ -63,7 +62,7 @@ export class UmbVariantSelectorElement extends UmbLitElement {
 	private async _observeWorkspace() {
 		if (!this._workspaceContext) return;
 
-		this.observe(this._workspaceContext.data.pipe(distinctUntilChanged()), (data) => {
+		this.observe(this._workspaceContext.data, (data) => {
 			this._content = data;
 		});
 	}
@@ -74,7 +73,8 @@ export class UmbVariantSelectorElement extends UmbLitElement {
 			const target = event.composedPath()[0] as UUIInputElement;
 
 			if (typeof target?.value === 'string') {
-				this._workspaceContext?.update({ name: target.value });
+				// TODO: create a setName method on EntityWorkspace:
+				//this._workspaceContext?.update({ name: target.value });
 			}
 		}
 	}

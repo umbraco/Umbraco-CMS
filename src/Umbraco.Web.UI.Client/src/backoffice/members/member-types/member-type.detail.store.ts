@@ -1,7 +1,7 @@
 import type { MemberTypeDetails } from '@umbraco-cms/models';
 import { UmbContextToken } from '@umbraco-cms/context-api';
 import { ArrayState } from '@umbraco-cms/observable-api';
-import { UmbStoreBase } from '@umbraco-cms/store';
+import { UmbEntityDetailStore, UmbStoreBase } from '@umbraco-cms/store';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 
 
@@ -14,7 +14,7 @@ export const UMB_MEMBER_TYPE_DETAIL_STORE_CONTEXT_TOKEN = new UmbContextToken<Um
  * @extends {UmbStoreBase}
  * @description - Details Data Store for Member Types
  */
-export class UmbMemberTypeDetailStore extends UmbStoreBase {
+export class UmbMemberTypeDetailStore extends UmbStoreBase implements UmbEntityDetailStore<MemberTypeDetails> {
 
 
 	#data = new ArrayState<MemberTypeDetails>([], (x) => x.key);
@@ -22,6 +22,11 @@ export class UmbMemberTypeDetailStore extends UmbStoreBase {
 
 	constructor(host: UmbControllerHostInterface) {
 		super(host, UMB_MEMBER_TYPE_DETAIL_STORE_CONTEXT_TOKEN.toString());
+	}
+
+	getScaffold(entityType: string, parentKey: string | null) {
+		return {
+		} as MemberTypeDetails;
 	}
 
 	/**

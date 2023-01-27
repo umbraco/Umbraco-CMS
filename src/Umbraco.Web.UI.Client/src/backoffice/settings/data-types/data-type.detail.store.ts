@@ -1,10 +1,8 @@
 import type { DataTypeDetails } from '@umbraco-cms/models';
 import { UmbContextToken } from '@umbraco-cms/context-api';
 import { createObservablePart, ArrayState } from '@umbraco-cms/observable-api';
-import { UmbStoreBase } from '@umbraco-cms/store';
+import { UmbEntityDetailStore, UmbStoreBase } from '@umbraco-cms/store';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
-import { DataTypeResource } from '@umbraco-cms/backend-api';
-import { tryExecuteAndNotify } from '@umbraco-cms/resources';
 
 
 export const UMB_DATA_TYPE_DETAIL_STORE_CONTEXT_TOKEN = new UmbContextToken<UmbDataTypeDetailStore>('UmbDataTypeDetailStore');
@@ -16,7 +14,7 @@ export const UMB_DATA_TYPE_DETAIL_STORE_CONTEXT_TOKEN = new UmbContextToken<UmbD
  * @extends {UmbStoreBase}
  * @description - Details Data Store for Data Types
  */
-export class UmbDataTypeDetailStore extends UmbStoreBase {
+export class UmbDataTypeDetailStore extends UmbStoreBase implements UmbEntityDetailStore<DataTypeDetails> {
 
 
 	#data = new ArrayState<DataTypeDetails>([], (x) => x.key);
@@ -24,6 +22,21 @@ export class UmbDataTypeDetailStore extends UmbStoreBase {
 
 	constructor(host: UmbControllerHostInterface) {
 		super(host, UMB_DATA_TYPE_DETAIL_STORE_CONTEXT_TOKEN.toString());
+	}
+
+
+	getScaffold(entityType: string, parentKey: string | null) {
+		return {
+			key: '',
+			name: '',
+			icon: '',
+			type: 'data-type',
+			hasChildren: false,
+			parentKey: '',
+			propertyEditorModelAlias: '',
+			propertyEditorUIAlias: '',
+			data: [],
+		} as DataTypeDetails;
 	}
 
 	/**

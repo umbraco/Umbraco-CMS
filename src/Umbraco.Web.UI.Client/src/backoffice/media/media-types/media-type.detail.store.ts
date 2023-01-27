@@ -1,7 +1,7 @@
-import type { DataTypeDetails } from '@umbraco-cms/models';
+import type { DataTypeDetails, MediaTypeDetails } from '@umbraco-cms/models';
 import { UmbContextToken } from '@umbraco-cms/context-api';
 import { ArrayState } from '@umbraco-cms/observable-api';
-import { UmbStoreBase } from '@umbraco-cms/store';
+import { UmbEntityDetailStore, UmbStoreBase } from '@umbraco-cms/store';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 
 
@@ -14,14 +14,20 @@ export const UMB_MEDIA_TYPE_DETAIL_STORE_CONTEXT_TOKEN = new UmbContextToken<Umb
  * @extends {UmbStoreBase}
  * @description - Details Data Store for Media Types
  */
-export class UmbMediaTypeDetailStore extends UmbStoreBase {
+export class UmbMediaTypeDetailStore extends UmbStoreBase implements UmbEntityDetailStore<MediaTypeDetails> {
 
 
-	private _data = new ArrayState<DataTypeDetails>([], (x) => x.key);
+	private _data = new ArrayState<MediaTypeDetails>([], (x) => x.key);
 
 
 	constructor(host: UmbControllerHostInterface) {
 		super(host, UMB_MEDIA_TYPE_DETAIL_STORE_CONTEXT_TOKEN.toString());
+	}
+
+
+	getScaffold(entityType: string, parentKey: string | null) {
+		return {
+		} as MediaTypeDetails;
 	}
 
 	/**
@@ -36,12 +42,12 @@ export class UmbMediaTypeDetailStore extends UmbStoreBase {
 
 	// TODO: make sure UI somehow can follow the status of this action.
 	/**
-	 * @description - Save a Data Type.
-	 * @param {Array<DataTypeDetails>} dataTypes
+	 * @description - Save a Media Type.
+	 * @param {Array<MediaTypeDetails>} mediaTypes
 	 * @memberof UmbMediaTypesStore
 	 * @return {*}  {Promise<void>}
 	 */
-	save(data: DataTypeDetails[]) {
+	save(data: MediaTypeDetails[]) {
 		return null as any;
 	}
 

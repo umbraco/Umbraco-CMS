@@ -1,29 +1,31 @@
-import { UmbWorkspaceContentContext } from '../../../shared/components/workspace/workspace-content/workspace-content.context';
-import {
-	UmbDocumentTypeDetailStore,
-	UMB_DOCUMENT_TYPE_DETAIL_STORE_CONTEXT_TOKEN,
-} from '../document-type.detail.store';
-import { UmbControllerHostInterface } from '@umbraco-cms/controller';
+import { UmbEntityWorkspaceManager } from '../../../shared/components/workspace/workspace-context/entity-manager-controller';
+import { UmbWorkspaceContext } from '../../../shared/components/workspace/workspace-context/workspace-context';
+import { UmbWorkspaceEntityContextInterface } from '../../../shared/components/workspace/workspace-context/workspace-entity-context.interface';
+import { UmbDocumentTypeDetailStore, UMB_DOCUMENT_TYPE_DETAIL_STORE_CONTEXT_TOKEN } from '../document-type.detail.store';
 import type { DocumentTypeDetails } from '@umbraco-cms/models';
 
-const DefaultDocumentTypeData = {
-	key: '',
-	name: '',
-	icon: '',
-	type: '',
-	hasChildren: false,
-	parentKey: '',
-	alias: '',
-	properties: [],
-} as DocumentTypeDetails;
+export class UmbWorkspaceDocumentTypeContext extends UmbWorkspaceContext implements UmbWorkspaceEntityContextInterface<DocumentTypeDetails | undefined> {
 
-export class UmbWorkspaceDocumentTypeContext extends UmbWorkspaceContentContext<
-	DocumentTypeDetails,
-	UmbDocumentTypeDetailStore
-> {
-	constructor(host: UmbControllerHostInterface) {
-		super(host, DefaultDocumentTypeData, UMB_DOCUMENT_TYPE_DETAIL_STORE_CONTEXT_TOKEN.toString(), 'documentType');
+	#manager = new UmbEntityWorkspaceManager(this._host, 'document-type', UMB_DOCUMENT_TYPE_DETAIL_STORE_CONTEXT_TOKEN);
+
+	public readonly data = this.#manager.state.asObservable();
+	public readonly name = this.#manager.state.getObservablePart((state) => state?.name);
+
+
+	setName(name: string) {
+		this.#manager.state.update({name: name})
 	}
+	setIcon(icon: string) {
+		this.#manager.state.update({icon: icon})
+	}
+	getEntityType = this.#manager.getEntityType;
+	getEntityKey = this.#manager.getEntityKey;
+	getStore = this.#manager.getStore;
+	getData = this.#manager.getData;
+	load = this.#manager.load;
+	create = this.#manager.create;
+	save = this.#manager.save;
+	destroy = this.#manager.destroy;
 
 	public setPropertyValue(alias: string, value: unknown) {
 		throw new Error('setPropertyValue is not implemented for UmbWorkspaceDocumentTypeContext');

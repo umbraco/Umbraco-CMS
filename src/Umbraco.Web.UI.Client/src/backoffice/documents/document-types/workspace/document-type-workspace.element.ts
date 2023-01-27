@@ -89,7 +89,7 @@ export class UmbDocumentTypeWorkspaceElement extends UmbLitElement implements Um
 			const target = event.composedPath()[0] as UUIInputElement;
 
 			if (typeof target?.value === 'string') {
-				this._workspaceContext?.update({ name: target.value });
+				this._workspaceContext?.setName(target.value);
 			}
 		}
 	}
@@ -98,7 +98,7 @@ export class UmbDocumentTypeWorkspaceElement extends UmbLitElement implements Um
 		const modalHandler = this._modalService?.iconPicker();
 
 		modalHandler?.onClose().then((saved) => {
-			if (saved) this._workspaceContext?.update({ icon: saved.icon });
+			if (saved) this._workspaceContext?.setIcon(saved.icon);
 			console.log(saved);
 			// TODO save color ALIAS as well
 		});

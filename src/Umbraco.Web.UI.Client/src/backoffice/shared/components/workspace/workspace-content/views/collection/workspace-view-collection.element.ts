@@ -2,7 +2,6 @@ import { css, html } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement } from 'lit/decorators.js';
 import { ifDefined } from 'lit-html/directives/if-defined.js';
-import { UmbWorkspaceContentContext } from '../../workspace-content.context';
 import { UmbMediaTreeStore } from '../../../../../../media/media/media.tree.store';
 import {
 	UmbCollectionContext,
@@ -11,6 +10,7 @@ import {
 
 import '../../../../../../shared/components/content-property/content-property.element';
 import '../../../../../../shared/collection/dashboards/dashboard-collection.element';
+import { UmbWorkspaceEntityContextInterface } from '../../../workspace-context/workspace-entity-context.interface';
 import { UmbLitElement } from '@umbraco-cms/element';
 import { FolderTreeItem } from '@umbraco-cms/backend-api';
 import { ManifestWorkspaceViewCollection } from '@umbraco-cms/extensions-registry';
@@ -29,7 +29,7 @@ export class UmbWorkspaceViewCollectionElement extends UmbLitElement {
 
 	public manifest!: ManifestWorkspaceViewCollection;
 
-	private _workspaceContext?: UmbWorkspaceContentContext;
+	private _workspaceContext?: UmbWorkspaceEntityContextInterface;
 
 	private _collectionContext?: UmbCollectionContext<FolderTreeItem, UmbMediaTreeStore>;
 
@@ -37,20 +37,21 @@ export class UmbWorkspaceViewCollectionElement extends UmbLitElement {
 		super();
 
 		// TODO: Figure out how to get the magic string for the workspace context.
-		this.consumeContext<UmbWorkspaceContentContext>('umbWorkspaceContext', (nodeContext) => {
+		this.consumeContext<UmbWorkspaceEntityContextInterface>('umbWorkspaceContext', (nodeContext) => {
 			this._workspaceContext = nodeContext;
 			this._provideWorkspace();
 		});
 	}
 
 	protected _provideWorkspace() {
-		if (this._workspaceContext?.entityKey != null) {
+		const entityKey = this._workspaceContext?.getEntityKey();
+		if (entityKey != null) {
 
 			const manifestMeta = this.manifest.meta;
 
 			this._collectionContext = new UmbCollectionContext(
 				this,
-				this._workspaceContext.entityKey,
+				entityKey,
 				manifestMeta.storeAlias
 			);
 			this.provideContext(UMB_COLLECTION_CONTEXT_TOKEN, this._collectionContext);
@@ -58,7 +59,7 @@ export class UmbWorkspaceViewCollectionElement extends UmbLitElement {
 	}
 
 	render() {
-		return html`<umb-collection entityType=${ifDefined(this._workspaceContext?.entityType)}></umb-collection>`;
+		return html`<umb-collection entityType=${ifDefined(this._workspaceContext?.getEntityType())}></umb-collection>`;
 	}
 }
 

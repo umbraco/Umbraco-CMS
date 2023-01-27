@@ -123,7 +123,7 @@ export class UmbUserWorkspaceElement extends UmbLitElement implements UmbWorkspa
 
 		this.observe(this._workspaceContext.data.pipe(distinctUntilChanged()), (user) => {
 			this._user = user;
-			if (user.name !== this._userName) {
+			if (user && user.name !== this._userName) {
 				this._userName = user.name;
 			}
 		});

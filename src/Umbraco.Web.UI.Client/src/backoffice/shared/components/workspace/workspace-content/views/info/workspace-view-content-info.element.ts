@@ -1,7 +1,7 @@
 import { css, html } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, state } from 'lit/decorators.js';
-import type { UmbWorkspaceContentContext } from '../../workspace-content.context';
+import { UmbWorkspaceEntityContextInterface } from '../../../workspace-context/workspace-entity-context.interface';
 import type { DocumentDetails, MediaDetails } from '@umbraco-cms/models';
 import { UmbLitElement } from '@umbraco-cms/element';
 
@@ -20,13 +20,13 @@ export class UmbWorkspaceViewContentInfoElement extends UmbLitElement {
 	@state()
 	private _nodeName = '';
 
-	private _workspaceContext?: UmbWorkspaceContentContext<DocumentDetails | MediaDetails>;
+	private _workspaceContext?: UmbWorkspaceEntityContextInterface<DocumentDetails | MediaDetails>;
 
 	constructor() {
 		super();
 
 		// TODO: Figure out how to get the magic string for the workspace context.
-		this.consumeContext<UmbWorkspaceContentContext<DocumentDetails | MediaDetails>>(
+		this.consumeContext<UmbWorkspaceEntityContextInterface<DocumentDetails | MediaDetails>>(
 			'umbWorkspaceContext',
 			(nodeContext) => {
 				this._workspaceContext = nodeContext;

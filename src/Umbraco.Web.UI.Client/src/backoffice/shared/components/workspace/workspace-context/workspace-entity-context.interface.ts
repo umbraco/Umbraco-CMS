@@ -1,6 +1,7 @@
-import { Observable } from "rxjs";
+import type { Observable } from "rxjs";
+import { UmbEntityDetailStore } from "@umbraco-cms/store";
 
-export interface UmbWorkspaceEntityContextInterface<T> {
+export interface UmbWorkspaceEntityContextInterface<T = unknown> {
 
 
 	readonly data: Observable<T>;
@@ -9,6 +10,8 @@ export interface UmbWorkspaceEntityContextInterface<T> {
 	//entityKey?: string;
 	//entityType: string;
 
+	getEntityKey(): string | undefined;
+	getEntityType(): string;
 
 	getData(): T;
 
@@ -16,7 +19,7 @@ export interface UmbWorkspaceEntityContextInterface<T> {
 
 	create(parentKey: string | null): void;
 
-	getStore(): unknown;
+	getStore(): UmbEntityDetailStore<T> | undefined;
 
 	setPropertyValue(alias: string, value: unknown): void;
 

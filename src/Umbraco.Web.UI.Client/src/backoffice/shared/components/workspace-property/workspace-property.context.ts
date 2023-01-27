@@ -1,4 +1,4 @@
-import { UmbWorkspaceContentContext } from '../workspace/workspace-content/workspace-content.context';
+import { UmbWorkspaceEntityContextInterface } from '../workspace/workspace-context/workspace-entity-context.interface';
 import type { DataTypeDetails } from '@umbraco-cms/models';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 import { createObservablePart, ObjectState } from '@umbraco-cms/observable-api';
@@ -24,11 +24,11 @@ export class UmbWorkspacePropertyContext<ValueType = unknown> {
 	public readonly value = createObservablePart(this._data, (data) => data.value);
 	public readonly config = createObservablePart(this._data, (data) => data.config);
 
-	private _workspaceContext?: UmbWorkspaceContentContext;
+	private _workspaceContext?: UmbWorkspaceEntityContextInterface;
 
 	constructor(host: UmbControllerHostInterface) {
 		// TODO: Figure out how to get the magic string in a better way.
-		new UmbContextConsumerController<UmbWorkspaceContentContext>(host, 'umbWorkspaceContext', (workspaceContext) => {
+		new UmbContextConsumerController<UmbWorkspaceEntityContextInterface>(host, 'umbWorkspaceContext', (workspaceContext) => {
 			this._workspaceContext = workspaceContext;
 		});
 
