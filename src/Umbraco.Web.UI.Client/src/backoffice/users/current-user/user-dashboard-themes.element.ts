@@ -38,6 +38,7 @@ export class UmbUserDashboardTestElement extends UmbLitElement {
 			instance.theme.subscribe((theme) => {
 				this._theme = theme;
 			});
+			// TODO: We should get rid of the #themes state and instead use an extension point:
 			instance.themes.subscribe((themes) => {
 				this._themes = themes.map((t) => t.name);
 			});

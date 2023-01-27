@@ -1,6 +1,6 @@
-import { BehaviorSubject } from 'rxjs';
 import { dark, highContrast } from './themes';
 import { UmbContextToken } from '@umbraco-cms/context-api';
+import { ArrayState, StringState } from '@umbraco-cms/observable-api';
 
 export interface UmbTheme {
 	name: string;
@@ -8,7 +8,9 @@ export interface UmbTheme {
 }
 
 export class UmbThemeService {
-	#themes = new BehaviorSubject(<Array<UmbTheme>>[
+
+	// TODO: Turn this into a extension type, get rid of the #themes subject and #themes observable
+	#themes = new ArrayState(<Array<UmbTheme>>[
 		{
 			name: 'Light',
 			css: '',
@@ -16,7 +18,7 @@ export class UmbThemeService {
 	]);
 	public readonly themes = this.#themes.asObservable();
 
-	#theme = new BehaviorSubject('Light');
+	#theme = new StringState('Light');
 	public readonly theme = this.#theme.asObservable();
 
 	#styleElement: HTMLStyleElement;
@@ -37,6 +39,7 @@ export class UmbThemeService {
 		this.#theme.next(theme);
 		localStorage.setItem('umb-theme', theme);
 
+		// TODO: This should come from the extension API:
 		const themeCss = this.#themes.value.find((t) => t.name === theme)?.css;
 
 		if (themeCss !== undefined) {
