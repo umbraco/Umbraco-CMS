@@ -12,6 +12,7 @@ export interface MetaPropertyEditorUI {
 	icon: string;
 	group: string;
 	config?: PropertyEditorConfig;
+	supportsReadOnly?: boolean;
 }
 
 // Model

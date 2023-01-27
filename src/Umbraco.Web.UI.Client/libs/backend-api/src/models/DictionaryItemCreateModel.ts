@@ -4,9 +4,9 @@
 
 import type { DictionaryItemTranslationModel } from './DictionaryItemTranslationModel';
 
-export type DictionaryItem = {
+export type DictionaryItemCreateModel = {
     name?: string;
     translations?: Array<DictionaryItemTranslationModel>;
-    key?: string;
+    parentKey?: string | null;
 };
 

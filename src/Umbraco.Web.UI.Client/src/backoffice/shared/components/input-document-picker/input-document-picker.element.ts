@@ -57,6 +57,7 @@ export class UmbInputDocumentPickerElement extends FormControlMixin(UmbLitElemen
 	@property({ type: String, attribute: 'min-message' })
 	maxMessage = 'This field exceeds the allowed amount of items';
 
+	// TODO: do we need both selectedKeys and value? If we just use value we follow the same pattern as native form controls.
 	private _selectedKeys: Array<string> = [];
 	public get selectedKeys(): Array<string> {
 		return this._selectedKeys;
