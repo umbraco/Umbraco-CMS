@@ -1,12 +1,9 @@
 import { UmbLanguageStore, UmbLanguageStoreItemType, UMB_LANGUAGE_STORE_CONTEXT_TOKEN } from '../../language.store';
-import type { LanguageDetails } from '@umbraco-cms/models';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 import { ObjectState, UmbObserverController } from '@umbraco-cms/observable-api';
 import { UmbContextConsumerController } from '@umbraco-cms/context-api';
 
 const DefaultLanguageData: UmbLanguageStoreItemType = {
-	id: 0,
-	key: '',
 	name: '',
 	isoCode: '',
 	isDefault: false,
@@ -22,13 +19,13 @@ export class UmbWorkspaceLanguageContext {
 	public readonly data;
 
 	private _store: UmbLanguageStore | null = null;
-	protected _storeObserver?: UmbObserverController<LanguageDetails>;
+	protected _storeObserver?: UmbObserverController<UmbLanguageStoreItemType>;
 
 	constructor(host: UmbControllerHostInterface, entityKey: string) {
 		this.host = host;
 		this._entityKey = entityKey;
 
-		this._data = new ObjectState<LanguageDetails>(DefaultLanguageData);
+		this._data = new ObjectState(DefaultLanguageData);
 		this.data = this._data.asObservable();
 
 		new UmbContextConsumerController(host, UMB_LANGUAGE_STORE_CONTEXT_TOKEN, (_instance: UmbLanguageStore) => {
@@ -43,7 +40,7 @@ export class UmbWorkspaceLanguageContext {
 		}
 
 		this._storeObserver?.destroy();
-		this._storeObserver = new UmbObserverController(this.host, this._store.getByKey(this._entityKey), (content) => {
+		this._storeObserver = new UmbObserverController(this.host, this._store.getByIsoCode(this._entityKey), (content) => {
 			if (!content) return; // TODO: Handle nicely if there is no content data.
 			this.update(content);
 		});
@@ -52,7 +49,7 @@ export class UmbWorkspaceLanguageContext {
 	public getData() {
 		return this._data.getValue();
 	}
-	public update(data: Partial<LanguageDetails>) {
+	public update(data: Partial<UmbLanguageStoreItemType>) {
 		this._data.next({ ...this.getData(), ...data });
 	}
 

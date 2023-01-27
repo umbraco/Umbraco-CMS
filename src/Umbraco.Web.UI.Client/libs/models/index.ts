@@ -150,7 +150,3 @@ export interface DocumentBlueprintDetails {
 	icon: string;
 	documentTypeKey: string;
 }
-
-export interface LanguageDetails extends Language {
-	key: string;
-}

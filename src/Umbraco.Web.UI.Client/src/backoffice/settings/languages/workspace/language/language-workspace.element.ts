@@ -2,9 +2,9 @@ import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, html, nothing } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { UUIInputElement, UUIInputEvent } from '@umbraco-ui/uui';
+import { UmbLanguageStoreItemType } from '../../language.store';
 import { UmbWorkspaceLanguageContext } from './language-workspace.context';
 import { UmbLitElement } from '@umbraco-cms/element';
-import type { LanguageDetails } from '@umbraco-cms/models';
 import '../../../../shared/components/workspace/actions/save/workspace-action-node-save.element.ts';
 
 @customElement('umb-language-workspace')
@@ -25,7 +25,7 @@ export class UmbLanguageWorkspaceElement extends UmbLitElement {
 	];
 
 	@property()
-	language?: LanguageDetails;
+	language?: UmbLanguageStoreItemType;
 
 	private _entityKey!: string;
 	@property()

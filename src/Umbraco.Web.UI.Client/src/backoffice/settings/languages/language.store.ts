@@ -1,13 +1,12 @@
 import { Observable } from 'rxjs';
-import { LanguageResource } from '@umbraco-cms/backend-api';
+import { Language, LanguageResource } from '@umbraco-cms/backend-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/resources';
 import { UmbContextToken } from '@umbraco-cms/context-api';
-import type { LanguageDetails } from '@umbraco-cms/models';
 import { UmbStoreBase } from '@umbraco-cms/store';
-import { ArrayState, createObservablePart } from '@umbraco-cms/observable-api';
+import { ArrayState } from '@umbraco-cms/observable-api';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 
-export type UmbLanguageStoreItemType = LanguageDetails;
+export type UmbLanguageStoreItemType = Language;
 export const UMB_LANGUAGE_STORE_CONTEXT_TOKEN = new UmbContextToken<UmbLanguageStore>('umbLanguageStore');
 
 /**
@@ -17,62 +16,59 @@ export const UMB_LANGUAGE_STORE_CONTEXT_TOKEN = new UmbContextToken<UmbLanguageS
  * @description - Data Store for languages
  */
 export class UmbLanguageStore extends UmbStoreBase {
-	#data = new ArrayState<LanguageDetails>([], (x) => x.key);
+	#data = new ArrayState<UmbLanguageStoreItemType>([], (x) => x.isoCode);
 
 	constructor(host: UmbControllerHostInterface) {
 		super(host, UMB_LANGUAGE_STORE_CONTEXT_TOKEN.toString());
 	}
 
-	getByKey(key: string) {
-		// TODO: use backend cli when available.
-		fetch(`/umbraco/management/api/v1/language/${key}`)
-			.then((res) => res.json())
-			.then((data) => {
+	getByIsoCode(isoCode: string) {
+		tryExecuteAndNotify(this._host, LanguageResource.getLanguageByIsoCode({ isoCode })).then(({ data }) => {
+			if (data) {
 				this.#data.appendOne(data);
-			});
+			}
+		});
 
-		return createObservablePart(this.#data, (items) => items.find((item) => item.key === key));
+		return this.#data.getObservablePart((items) => items.find((item) => item.isoCode === isoCode));
 	}
 
-	getAll(): Observable<Array<LanguageDetails>> {
+	getAll(): Observable<Array<UmbLanguageStoreItemType>> {
 		tryExecuteAndNotify(this._host, LanguageResource.getLanguage({ skip: 0, take: 1000 })).then(({ data }) => {
-			if (data) {
-				//TODO: Fix when we have the updated languageResource
-				this.#data.append(data.items as Array<LanguageDetails>);
-			}
+			this.#data.append(data?.items ?? []);
 		});
 
 		return this.#data;
 	}
 
-	async save(language: LanguageDetails): Promise<void> {
-		if (language.id && language.key) {
-			tryExecuteAndNotify(
+	async save(language: UmbLanguageStoreItemType): Promise<void> {
+		if (language.isoCode) {
+			const { data: updatedLanguage } = await tryExecuteAndNotify(
 				this._host,
-				LanguageResource.putLanguageById({ id: language.id, requestBody: language })
-			).then((response) => {
-				if (response.data) {
-					this.#data.appendOne(response.data);
-				}
-			});
+				LanguageResource.putLanguageByIsoCode({ isoCode: language.isoCode, requestBody: language })
+			);
+			if (updatedLanguage) {
+				this.#data.appendOne(updatedLanguage);
+			}
 		} else {
-			tryExecuteAndNotify(this._host, LanguageResource.postLanguage({ requestBody: language })).then((response) => {
-				if (response.data) {
-					this.#data.appendOne(response.data);
-				}
-			});
+			const { data: newLanguage } = await tryExecuteAndNotify(
+				this._host,
+				LanguageResource.postLanguage({ requestBody: language })
+			);
+			if (newLanguage) {
+				this.#data.appendOne(newLanguage);
+			}
 		}
 	}
 
-	async delete(keys: Array<string>) {
-		const res = await fetch('/umbraco/management/api/v1/language', {
-			method: 'DELETE',
-			body: JSON.stringify(keys),
-			headers: {
-				'Content-Type': 'application/json',
-			},
-		});
-		const data = await res.json();
-		this.#data.remove(data);
+	async delete(isoCodes: Array<string>) {
+		const queue = isoCodes.map((isoCode) =>
+			tryExecuteAndNotify(
+				this._host,
+				LanguageResource.deleteLanguageByIsoCode({ isoCode }).then(() => isoCode)
+			)
+		);
+		const results = await Promise.all(queue);
+		const filtered = results.filter((x) => !!x).map((result) => result.data);
+		this.#data.remove(filtered);
 	}
 }
