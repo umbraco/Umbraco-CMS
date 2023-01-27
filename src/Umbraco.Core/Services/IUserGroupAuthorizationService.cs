@@ -5,28 +5,6 @@ namespace Umbraco.Cms.Core.Services;
 
 public interface IUserGroupAuthorizationService
 {
-    /// <summary>
-    /// Authorize that a user is not adding a section to the group that they don't have access to.
-    /// </summary>
-    /// <param name="performingUser">The user performing the action.</param>
-    /// <param name="userGroup">The UserGroup being created or updated.</param>
-    /// <returns>An attempt with an operation status.</returns>
-    Attempt<UserGroupOperationStatus> AuthorizeSectionAccess(IUser performingUser, IUserGroup userGroup);
-
-    /// <summary>
-    /// Authorize that the user is not changing to a start node that they don't have access to.
-    /// </summary>
-    /// <param name="performingUser">The user performing the action.</param>
-    /// <param name="userGroup">The UserGroup being created or updated.</param>
-    /// <returns>An attempt with an operation status.</returns>
-    Attempt<UserGroupOperationStatus> AuthorizeStartNodeChanges(IUser performingUser, IUserGroup userGroup);
-
-    /// <summary>
-    /// Ensures that a user has access to the user section.
-    /// </summary>
-    /// <param name="user">The user performing the action.</param>
-    /// <returns>An attempt with an operation status.</returns>
-    Attempt<UserGroupOperationStatus> HasAccessToUserSection(IUser user);
 
     /// <summary>
     /// Authorizes a user to create a new user group.

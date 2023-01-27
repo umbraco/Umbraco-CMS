@@ -10,5 +10,6 @@ public enum UserGroupOperationStatus
     UnauthorizedMissingUserSection,
     UnauthorizedMissingSections,
     UnauthorizedStartNodes,
+    UnauthorizedMissingUserGroup,
     CancelledByNotification
 }

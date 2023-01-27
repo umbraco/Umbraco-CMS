@@ -26,43 +26,9 @@ public class UserGroupAuthorizationService : IUserGroupAuthorizationService
     }
 
     /// <inheritdoc />
-    public Attempt<UserGroupOperationStatus> AuthorizeSectionAccess(IUser performingUser, IUserGroup userGroup)
-    {
-        if (performingUser.IsAdmin())
-        {
-            return Attempt.Succeed(UserGroupOperationStatus.Success);
-        }
-
-        IEnumerable<string> sectionsMissingAccess = userGroup.AllowedSections.Except(performingUser.AllowedSections).ToArray();
-        return sectionsMissingAccess.Any()
-            ? Attempt.Fail(UserGroupOperationStatus.UnauthorizedMissingSections)
-            : Attempt.Succeed(UserGroupOperationStatus.Success);
-    }
-
-    /// <inheritdoc />
-    public Attempt<UserGroupOperationStatus> AuthorizeStartNodeChanges(IUser user, IUserGroup userGroup)
-    {
-        Attempt<UserGroupOperationStatus> authorizeContent = AuthorizeContentStartNode(user, userGroup);
-
-        return authorizeContent.Success is false
-            ? authorizeContent
-            : AuthorizeMediaStartNode(user, userGroup);
-    }
-
-    /// <inheritdoc />
-    public Attempt<UserGroupOperationStatus> HasAccessToUserSection(IUser user)
-    {
-        if (user.AllowedSections.Contains(Constants.Applications.Users) is false)
-        {
-            return Attempt.Fail(UserGroupOperationStatus.UnauthorizedMissingUserSection);
-        }
-
-        return Attempt.Succeed(UserGroupOperationStatus.Success);
-    }
-
     public Attempt<UserGroupOperationStatus> AuthorizeUserGroupCreation(IUser performingUser, IUserGroup userGroup)
     {
-        Attempt<UserGroupOperationStatus> hasSectionAccess = HasAccessToUserSection(performingUser);
+        Attempt<UserGroupOperationStatus> hasSectionAccess = AuthorizeHasAccessToUserSection(performingUser);
         if (hasSectionAccess.Success is false)
         {
             return Attempt.Fail(hasSectionAccess.Result);
@@ -80,7 +46,93 @@ public class UserGroupAuthorizationService : IUserGroupAuthorizationService
             : Attempt.Succeed(UserGroupOperationStatus.Success);
     }
 
-    public Attempt<UserGroupOperationStatus> AuthorizeUserGroupUpdate(IUser performingUser, IUserGroup userGroup) => throw new NotImplementedException();
+    /// <inheritdoc />
+    public Attempt<UserGroupOperationStatus> AuthorizeUserGroupUpdate(IUser performingUser, IUserGroup userGroup)
+    {
+        Attempt<UserGroupOperationStatus> hasAccessToUserSection = AuthorizeHasAccessToUserSection(performingUser);
+        if (hasAccessToUserSection.Success is false)
+        {
+            return Attempt.Fail(hasAccessToUserSection.Result);
+        }
+
+        Attempt<UserGroupOperationStatus> authorizeSectionAccess = AuthorizeSectionAccess(performingUser, userGroup);
+        if (authorizeSectionAccess.Success is false)
+        {
+            return Attempt.Fail(authorizeSectionAccess.Result);
+        }
+
+        Attempt<UserGroupOperationStatus> authorizeGroupAccess = AuthorizeGroupAccess(performingUser, userGroup);
+        if (authorizeGroupAccess.Success is false)
+        {
+            return Attempt.Fail(authorizeGroupAccess.Result);
+        }
+
+        Attempt<UserGroupOperationStatus> authorizeStartNodeChanges = AuthorizeStartNodeChanges(performingUser, userGroup);
+        if (authorizeSectionAccess.Success is false)
+        {
+            return Attempt.Fail(authorizeStartNodeChanges.Result);
+        }
+
+
+        return Attempt.Succeed(UserGroupOperationStatus.Success);
+    }
+
+    /// <summary>
+    /// Authorize that a user is not adding a section to the group that they don't have access to.
+    /// </summary>
+    /// <param name="performingUser">The user performing the action.</param>
+    /// <param name="userGroup">The UserGroup being created or updated.</param>
+    /// <returns>An attempt with an operation status.</returns>
+    private Attempt<UserGroupOperationStatus> AuthorizeSectionAccess(IUser performingUser, IUserGroup userGroup)
+    {
+        if (performingUser.IsAdmin())
+        {
+            return Attempt.Succeed(UserGroupOperationStatus.Success);
+        }
+
+        IEnumerable<string> sectionsMissingAccess = userGroup.AllowedSections.Except(performingUser.AllowedSections).ToArray();
+        return sectionsMissingAccess.Any()
+            ? Attempt.Fail(UserGroupOperationStatus.UnauthorizedMissingSections)
+            : Attempt.Succeed(UserGroupOperationStatus.Success);
+    }
+
+    /// <summary>
+    /// Authorize that the user is not changing to a start node that they don't have access to.
+    /// </summary>
+    /// <param name="user">The user performing the action.</param>
+    /// <param name="userGroup">The UserGroup being created or updated.</param>
+    /// <returns>An attempt with an operation status.</returns>
+    private Attempt<UserGroupOperationStatus> AuthorizeStartNodeChanges(IUser user, IUserGroup userGroup)
+    {
+        Attempt<UserGroupOperationStatus> authorizeContent = AuthorizeContentStartNode(user, userGroup);
+
+        return authorizeContent.Success is false
+            ? authorizeContent
+            : AuthorizeMediaStartNode(user, userGroup);
+    }
+
+    /// <summary>
+    /// Ensures that a user has access to the user section.
+    /// </summary>
+    /// <param name="user">The user performing the action.</param>
+    /// <returns>An attempt with an operation status.</returns>
+    private Attempt<UserGroupOperationStatus> AuthorizeHasAccessToUserSection(IUser user)
+    {
+        if (user.AllowedSections.Contains(Constants.Applications.Users) is false)
+        {
+            return Attempt.Fail(UserGroupOperationStatus.UnauthorizedMissingUserSection);
+        }
+
+        return Attempt.Succeed(UserGroupOperationStatus.Success);
+    }
+
+    /// <summary>
+    /// Ensures that the performing user is part of the user group.
+    /// </summary>
+    private Attempt<UserGroupOperationStatus> AuthorizeGroupAccess(IUser performingUser, IUserGroup userGroup) =>
+        performingUser.Groups.Any(x => x.Key == userGroup.Key) is false
+            ? Attempt.Fail(UserGroupOperationStatus.UnauthorizedMissingUserGroup)
+            : Attempt.Succeed(UserGroupOperationStatus.Success);
 
     // We explicitly take an IUser here which is non-nullable, since nullability should be handled in caller.
     private Attempt<UserGroupOperationStatus> AuthorizeContentStartNode(IUser user, IUserGroup userGroup)
