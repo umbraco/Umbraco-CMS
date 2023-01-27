@@ -6,7 +6,6 @@ import { map } from 'rxjs';
 import { repeat } from 'lit-html/directives/repeat.js';
 import { UmbCollectionContext, UMB_COLLECTION_CONTEXT_TOKEN } from '../collection.context';
 import { UmbModalService, UMB_MODAL_SERVICE_CONTEXT_TOKEN } from '../../../../core/modal';
-import { UmbMediaTreeStore, UMB_MEDIA_TREE_STORE_CONTEXT_TOKEN } from '../../../media/media/media.tree.store';
 import { UmbLitElement } from '@umbraco-cms/element';
 import type { ManifestCollectionBulkAction, MediaDetails } from '@umbraco-cms/models';
 

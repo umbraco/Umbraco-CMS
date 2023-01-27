@@ -1,55 +1,71 @@
-import { UmbWorkspaceContentContext } from '../../../shared/components/workspace/workspace-content/workspace-content.context';
 import { UMB_DOCUMENT_DETAIL_STORE_CONTEXT_TOKEN } from '../document.detail.store';
-import type { UmbDocumentDetailStore } from '../document.detail.store';
-import type { UmbControllerHostInterface } from '@umbraco-cms/controller';
+import type { UmbWorkspaceEntityContextInterface } from '../../../shared/components/workspace/workspace-context/workspace-entity-context.interface';
+import { UmbWorkspaceContext } from '../../../shared/components/workspace/workspace-context/workspace-context';
+import { UmbEntityWorkspaceManager } from '../../../shared/components/workspace/workspace-context/entity-manager-controller';
 import type { DocumentDetails } from '@umbraco-cms/models';
 import { appendToFrozenArray } from '@umbraco-cms/observable-api';
 
-const DefaultDocumentData = {
-	key: '',
-	name: '',
-	icon: '',
-	type: '',
-	hasChildren: false,
-	parentKey: '',
-	isTrashed: false,
-	properties: [
-		{
-			alias: '',
-			label: '',
-			description: '',
-			dataTypeKey: '',
-		},
-	],
-	data: [
-		{
-			alias: '',
-			value: '',
-		},
-	],
-	variants: [
-		{
-			name: '',
-		},
-	],
-} as DocumentDetails;
+export class UmbDocumentWorkspaceContext extends UmbWorkspaceContext implements UmbWorkspaceEntityContextInterface<DocumentDetails | undefined> {
 
-export class UmbWorkspaceDocumentContext extends UmbWorkspaceContentContext<DocumentDetails, UmbDocumentDetailStore> {
-	constructor(host: UmbControllerHostInterface) {
-		super(host, DefaultDocumentData, UMB_DOCUMENT_DETAIL_STORE_CONTEXT_TOKEN.toString(), 'document');
+	// Repository notes:
+	/*
 
-		console.log("UMB_DOCUMENT_DETAIL_STORE_CONTEXT_TOKEN", UMB_DOCUMENT_DETAIL_STORE_CONTEXT_TOKEN.toString())
+	#draft = new ObjectState<Type | undefined>(undefined);
+
+
+	*/
+
+	// Manager will be removed when we get the Repository:
+	#manager = new UmbEntityWorkspaceManager(this._host, 'document', UMB_DOCUMENT_DETAIL_STORE_CONTEXT_TOKEN);
+
+	public readonly data = this.#manager.state.asObservable();
+	public readonly name = this.#manager.state.getObservablePart((state) => state?.name);
+
+	setName(name: string) {
+		this.#manager.state.update({name: name})
+	}
+	getEntityType = this.#manager.getEntityType;
+	getUnique = this.#manager.getEntityKey;
+	getEntityKey = this.#manager.getEntityKey;
+	getStore = this.#manager.getStore;
+	getData = this.#manager.getData;
+	load = this.#manager.load;
+	create = this.#manager.create;
+	save = this.#manager.save;
+	destroy = this.#manager.destroy;
+
+	/**
+	 * Concept for Repository impl.:
+
+	load(entityKey: string) {
+		this.#repository.load(entityKey).then((data) => {
+			this.#draft.next(data)
+		})
 	}
 
-	public setPropertyValue(alias: string, value: unknown) {
+	create(parentKey: string | undefined) {
+		this.#repository.create(parentKey).then((data) => {
+			this.#draft.next(data)
+		})
+	}
 
-		// TODO: make sure to check that we have a details model? otherwise fail? 8This can be relevant if we use the same context for tree actions?
+	 */
+
+
+	// This could eventually be moved out as well?
+	setPropertyValue(alias: string, value: unknown) {
+
 		const entry = {alias: alias, value: value};
 
-		const newDataSet = appendToFrozenArray(this._data.getValue().data, entry, x => x.alias);
+		const currentData = this.#manager.getData();
+		if (currentData) {
+			const newDataSet = appendToFrozenArray(currentData.data, entry, x => x.alias);
 
-		this._data.update({data: newDataSet});
+			this.#manager.state.update({data: newDataSet});
+		}
 	}
+
+
 
 	/*
 	concept notes:

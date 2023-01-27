@@ -39,6 +39,19 @@ export class UmbDocumentTreeStore extends UmbStoreBase implements UmbTreeStore<D
 		this._data.append(data);
 	}
 
+	async move(keys: Array<string>, destination: string) {
+		// TODO: use backend cli when available.
+		const res = await fetch('/umbraco/management/api/v1/document/move', {
+			method: 'POST',
+			body: JSON.stringify({ keys, destination }),
+			headers: {
+				'Content-Type': 'application/json',
+			},
+		});
+		const data = await res.json();
+		this._data.append(data);
+	}
+
 	getTreeRoot() {
 		tryExecuteAndNotify(this._host, DocumentResource.getTreeDocumentRoot({})).then(({ data }) => {
 			if (data) {
