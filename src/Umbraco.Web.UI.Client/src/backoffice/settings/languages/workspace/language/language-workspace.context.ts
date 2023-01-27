@@ -38,9 +38,10 @@ export class UmbWorkspaceLanguageContext {
 	}
 
 	private _observeStore(): void {
-		if (!this._store) {
+		if (!this._store || this._entityKey === 'new') {
 			return;
 		}
+
 		this._storeObserver?.destroy();
 		this._storeObserver = new UmbObserverController(this.host, this._store.getByKey(this._entityKey), (content) => {
 			if (!content) return; // TODO: Handle nicely if there is no content data.
