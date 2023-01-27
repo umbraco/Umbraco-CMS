@@ -1,8 +1,5 @@
 import { UmbWorkspaceContentContext } from '../../../shared/components/workspace/workspace-content/workspace-content.context';
-import {
-	UmbMediaDetailStore,
-	UMB_MEDIA_DETAIL_STORE_CONTEXT_TOKEN,
-} from 'src/backoffice/media/media/media.detail.store';
+import { UmbMediaDetailStore, UMB_MEDIA_DETAIL_STORE_CONTEXT_TOKEN } from '../../../media/media/media.detail.store';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 import type { MediaDetails } from '@umbraco-cms/models';
 
