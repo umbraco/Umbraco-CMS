@@ -1,12 +1,12 @@
-import { BehaviorSubject, Observable } from 'rxjs';
-import { umbUsersData } from '../../../core/mocks/data/users.data';
-import type { UserDetails } from '@umbraco-cms/models';
 import { umbracoPath } from '@umbraco-cms/utils';
+import type { UserDetails } from '@umbraco-cms/models';
 import { UmbContextToken } from '@umbraco-cms/context-api';
+import { ObjectState } from '@umbraco-cms/observable-api';
 
 export class UmbCurrentUserStore {
-	private _currentUser = new BehaviorSubject<UserDetails>(umbUsersData.getAll()[0]); //TODO: Temp solution to set the first user as the current logged in user
-	public readonly currentUser: Observable<UserDetails> = this._currentUser.asObservable();
+
+	private _currentUser = new ObjectState<UserDetails | undefined>(undefined);
+	public readonly currentUser = this._currentUser.asObservable();
 
 	/**
 	 * logs out the user
@@ -24,7 +24,8 @@ export class UmbCurrentUserStore {
 	public get isAdmin(): boolean {
 		//TODO: Find a way to figure out if current user is in the admin group
 		const adminUserGroupKey = 'c630d49e-4e7b-42ea-b2bc-edc0edacb6b1';
-		return this._currentUser.getValue()?.userGroups.includes(adminUserGroupKey);
+		const currentUser = this._currentUser.getValue();
+		return currentUser ? currentUser.userGroups.includes(adminUserGroupKey) : false;
 	}
 }
 

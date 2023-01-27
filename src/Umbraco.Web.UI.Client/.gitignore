@@ -12,9 +12,10 @@ dist
 dist-ssr
 types
 *.local
+*.tgz
 
 ## testing
-/coverage/
+coverage/
 
 # Editor directories and files
 .vscode/*
@@ -31,9 +32,9 @@ types
 
 # eslint
 .eslintcache
-/test-results/
-/playwright-report/
-/playwright/.cache/
+test-results/
+playwright-report/
+playwright/.cache/
 
 # storybook
 storybook-static/

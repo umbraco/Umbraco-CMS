@@ -1,10 +1,10 @@
 import { UmbWorkspaceContentContext } from '../../../shared/components/workspace/workspace-content/workspace-content.context';
 import {
-	UmbDocumentTypeStore,
-	UmbDocumentTypeStoreItemType,
-	UMB_DOCUMENT_TYPE_STORE_CONTEXT_TOKEN,
-} from 'src/backoffice/documents/document-types/document-type.store';
+	UmbDocumentTypeDetailStore,
+	UMB_DOCUMENT_TYPE_DETAIL_STORE_CONTEXT_TOKEN,
+} from '../document-type.detail.store';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
+import type { DocumentTypeDetails } from '@umbraco-cms/models';
 
 const DefaultDocumentTypeData = {
 	key: '',
@@ -15,14 +15,14 @@ const DefaultDocumentTypeData = {
 	parentKey: '',
 	alias: '',
 	properties: [],
-} as UmbDocumentTypeStoreItemType;
+} as DocumentTypeDetails;
 
 export class UmbWorkspaceDocumentTypeContext extends UmbWorkspaceContentContext<
-	UmbDocumentTypeStoreItemType,
-	UmbDocumentTypeStore
+	DocumentTypeDetails,
+	UmbDocumentTypeDetailStore
 > {
 	constructor(host: UmbControllerHostInterface) {
-		super(host, DefaultDocumentTypeData, UMB_DOCUMENT_TYPE_STORE_CONTEXT_TOKEN.toString(), 'documentType');
+		super(host, DefaultDocumentTypeData, UMB_DOCUMENT_TYPE_DETAIL_STORE_CONTEXT_TOKEN.toString(), 'documentType');
 	}
 
 	public setPropertyValue(alias: string, value: unknown) {

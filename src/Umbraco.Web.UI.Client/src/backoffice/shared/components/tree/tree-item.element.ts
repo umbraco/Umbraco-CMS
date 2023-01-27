@@ -11,9 +11,9 @@ import {
 	UMB_TREE_CONTEXT_MENU_SERVICE_CONTEXT_TOKEN,
 } from './context-menu/tree-context-menu.service';
 import type { Entity } from '@umbraco-cms/models';
-import { UmbTreeDataStore } from '@umbraco-cms/stores/store';
+import type { UmbTreeStore } from '@umbraco-cms/store';
 import { UmbLitElement } from '@umbraco-cms/element';
-import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
+import { umbExtensionsRegistry } from '@umbraco-cms/extensions-api';
 
 @customElement('umb-tree-item')
 export class UmbTreeItem extends UmbLitElement {
@@ -68,7 +68,7 @@ export class UmbTreeItem extends UmbLitElement {
 	private _hasActions = false;
 
 	private _treeContext?: UmbTreeContextBase;
-	private _store?: UmbTreeDataStore<unknown>;
+	private _store?: UmbTreeStore<unknown>;
 	private _sectionContext?: UmbSectionContext;
 	private _treeContextMenuService?: UmbTreeContextMenuService;
 
@@ -81,7 +81,7 @@ export class UmbTreeItem extends UmbLitElement {
 			this._observeIsSelected();
 		});
 
-		this.consumeContext('umbStore', (store: UmbTreeDataStore<unknown>) => {
+		this.consumeContext('umbStore', (store: UmbTreeStore<unknown>) => {
 			this._store = store;
 		});
 
@@ -116,8 +116,8 @@ export class UmbTreeItem extends UmbLitElement {
 	private _observeSection() {
 		if (!this._sectionContext) return;
 
-		this.observe(this._sectionContext?.manifest, (section) => {
-			this._href = this._constructPath(section?.meta.pathname || '', this.entityType, this.key);
+		this.observe(this._sectionContext?.pathname, (pathname) => {
+			this._href = this._constructPath(pathname || '', this.entityType, this.key);
 		});
 	}
 
@@ -184,7 +184,8 @@ export class UmbTreeItem extends UmbLitElement {
 	private _openActions() {
 		if (!this._treeContext || !this._sectionContext) return;
 
-		this._sectionContext?.setActiveTree(this._treeContext?.tree);
+		// This is out-commented as it was not used. only kept if someone need this later:
+		//this._sectionContext?.setActiveTree(this._treeContext?.tree);
 
 		this._sectionContext?.setActiveTreeItem({
 			key: this.key,

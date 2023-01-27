@@ -3,15 +3,15 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, state } from 'lit/decorators.js';
 import { distinctUntilChanged } from 'rxjs';
 import { UmbWorkspaceDocumentTypeContext } from '../../document-type-workspace.context';
-import type { UmbDocumentTypeStoreItemType } from '../../../document-type.store';
 import { UmbLitElement } from '@umbraco-cms/element';
+import type { DocumentTypeDetails } from '@umbraco-cms/models';
 
 @customElement('umb-workspace-view-document-type-design')
 export class UmbWorkspaceViewDocumentTypeDesignElement extends UmbLitElement {
 	static styles = [UUITextStyles, css``];
 
 	@state()
-	_documentType?: UmbDocumentTypeStoreItemType | null;
+	_documentType?: DocumentTypeDetails | null;
 
 	private _workspaceContext?: UmbWorkspaceDocumentTypeContext;
 

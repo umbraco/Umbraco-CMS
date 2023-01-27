@@ -6,19 +6,18 @@ import { ifDefined } from 'lit/directives/if-defined.js';
 import { repeat } from 'lit/directives/repeat.js';
 
 import { distinctUntilChanged } from 'rxjs';
-import { getTagLookAndColor } from '../../../../auth/utils';
 
 import { UmbCurrentUserStore, UMB_CURRENT_USER_STORE_CONTEXT_TOKEN } from '../../current-user/current-user.store';
+import type { UmbModalService } from '../../../../core/modal';
+import type { UmbWorkspaceEntityElement } from '../../../shared/components/workspace/workspace-entity-element.interface';
 import { UmbWorkspaceUserContext } from './user-workspace.context';
+import { getLookAndColorFromUserStatus } from '@umbraco-cms/utils';
 import type { UserDetails } from '@umbraco-cms/models';
 
-import { UmbModalService } from 'src/core/modal';
-
-import '../../../../auth/components/input-user-group/input-user-group.element';
+import '../../../shared/components/input-user-group/input-user-group.element';
 import '../../../shared/property-editors/uis/document-picker/property-editor-ui-document-picker.element';
 import '../../../shared/components/workspace/workspace-layout/workspace-layout.element';
 import { UmbLitElement } from '@umbraco-cms/element';
-import type { UmbWorkspaceEntityElement } from 'src/backoffice/shared/components/workspace/workspace-entity-element.interface';
 
 @customElement('umb-user-workspace')
 export class UmbUserWorkspaceElement extends UmbLitElement implements UmbWorkspaceEntityElement {
@@ -287,7 +286,7 @@ export class UmbUserWorkspaceElement extends UmbLitElement implements UmbWorkspa
 	private _renderRightColumn() {
 		if (!this._user || !this._workspaceContext) return nothing;
 
-		const statusLook = getTagLookAndColor(this._user.status);
+		const statusLook = getLookAndColorFromUserStatus(this._user.status);
 
 		return html` <uui-box>
 			<div id="user-info">

@@ -66,7 +66,7 @@ export class UmbInstallerConsentElement extends UmbLitElement {
 		if (!this._installerContext) return;
 
 		this.observe(this._installerContext.settings, (settings) => {
-			this._telemetryLevels = settings.user?.consentLevels ?? [];
+			this._telemetryLevels = settings?.user?.consentLevels ?? [];
 		});
 	}
 
