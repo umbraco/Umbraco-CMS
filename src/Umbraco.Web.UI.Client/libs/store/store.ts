@@ -10,8 +10,28 @@ export interface UmbDataStore {
 }
 
 export interface UmbTreeStore<T> extends UmbDataStore {
+
 	getTreeRoot(): Observable<Array<T>>;
+
 	getTreeItemChildren(key: string): Observable<Array<T>>;
+
+	// Notice: this might not be right to put here as only some content items has ability to be trashed.
+	/**
+	 * @description - Trash data.
+	 * @param {string[]} keys
+	 * @return {*}  {(Promise<void>)}
+	 * @memberof UmbTreeStore
+	 */
+	trash(keys: string[]): Promise<void>;
+
+	// Notice: this might not be right to put here as only some content items has ability to be moved.
+	/**
+	 * @description - Move data.
+	 * @param {string[]} keys
+	 * @return {*}  {(Promise<void>)}
+	 * @memberof UmbTreeStore
+	 */
+	move(keys: string[], destination: string): Promise<void>;
 }
 
 export interface UmbEntityDetailStore<T> extends UmbDataStore {
