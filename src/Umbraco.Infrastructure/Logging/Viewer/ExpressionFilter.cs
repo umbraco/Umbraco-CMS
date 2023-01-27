@@ -29,7 +29,7 @@ internal class ExpressionFilter : ILogFilter
         // If the expression is one word and doesn't contain a serilog operator then we can perform a like search
         if (!filterExpression.Contains(" ") && !filterExpression.ContainsAny(ExpressionOperators.Select(c => c)))
         {
-            filter = PerformMessageLikeFilter(filterExpression);
+            filter = PerformMessageLikeFilter(filterExpression, customSerilogFunctions);
         }
 
         // check if it's a valid expression
@@ -48,7 +48,7 @@ internal class ExpressionFilter : ILogFilter
             {
                 // 'error' describes a syntax error, where it was unable to compile an expression
                 // Assume the expression was a search string and make a Like filter from that
-                filter = PerformMessageLikeFilter(filterExpression);
+                filter = PerformMessageLikeFilter(filterExpression, customSerilogFunctions);
             }
         }
 
@@ -57,10 +57,10 @@ internal class ExpressionFilter : ILogFilter
 
     public bool TakeLogEvent(LogEvent e) => _filter == null || _filter(e);
 
-    private Func<LogEvent, bool>? PerformMessageLikeFilter(string filterExpression)
+    private Func<LogEvent, bool>? PerformMessageLikeFilter(string filterExpression, SerilogLegacyNameResolver serilogLegacyNameResolver)
     {
         var filterSearch = $"@Message like '%{SerilogExpression.EscapeLikeExpressionContent(filterExpression)}%'";
-        if (SerilogExpression.TryCompile(filterSearch, out CompiledExpression? compiled, out var error))
+        if (SerilogExpression.TryCompile(filterSearch, null, serilogLegacyNameResolver, out CompiledExpression? compiled, out var error))
         {
             // `compiled` is a function that can be executed against `LogEvent`s:
             return evt =>
