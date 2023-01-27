@@ -24,8 +24,6 @@ export const handlers = [
 	rest.get('/umbraco/management/api/v1/language/:key', (req, res, ctx) => {
 		const key = req.params.key as string;
 
-		console.log('key', key, umbLanguagesData);
-
 		if (!key) return;
 
 		const item = umbLanguagesData.getByKey(key);
