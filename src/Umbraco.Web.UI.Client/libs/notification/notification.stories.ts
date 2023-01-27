@@ -4,7 +4,6 @@ import { Meta, Story } from '@storybook/web-components';
 import { html } from 'lit';
 import { customElement } from 'lit/decorators.js';
 
-import { UmbLitElement } from '@umbraco-cms/element';
 import type { UmbNotificationDefaultData } from './layouts/default';
 import {
 	UmbNotificationColor,
@@ -12,6 +11,7 @@ import {
 	UmbNotificationService,
 	UMB_NOTIFICATION_SERVICE_CONTEXT_TOKEN,
 } from '.';
+import { UmbLitElement } from '@umbraco-cms/element';
 
 export default {
 	title: 'API/Notifications/Overview',

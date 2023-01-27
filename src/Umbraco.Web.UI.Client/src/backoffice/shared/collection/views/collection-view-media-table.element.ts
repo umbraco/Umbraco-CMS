@@ -2,8 +2,6 @@ import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { UmbCollectionContext, UMB_COLLECTION_CONTEXT_TOKEN } from '../collection.context';
-import type { MediaDetails } from '@umbraco-cms/models';
-import { UmbLitElement } from '@umbraco-cms/element';
 import {
 	UmbTableColumn,
 	UmbTableConfig,
@@ -13,6 +11,8 @@ import {
 	UmbTableOrderedEvent,
 	UmbTableSelectedEvent,
 } from '../../components/table';
+import type { MediaDetails } from '@umbraco-cms/models';
+import { UmbLitElement } from '@umbraco-cms/element';
 
 @customElement('umb-collection-view-media-table')
 export class UmbCollectionViewMediaTableElement extends UmbLitElement {

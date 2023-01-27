@@ -3,9 +3,8 @@ import { customElement, property, state } from 'lit/decorators.js';
 import { firstValueFrom, map } from 'rxjs';
 
 import { UmbModalService, UMB_MODAL_SERVICE_CONTEXT_TOKEN } from '../../../../../core/modal';
-import { createExtensionElement } from '@umbraco-cms/extensions-api';
+import { createExtensionElement , umbExtensionsRegistry } from '@umbraco-cms/extensions-api';
 
-import { umbExtensionsRegistry } from '@umbraco-cms/extensions-api';
 import type { ManifestPackageView } from '@umbraco-cms/models';
 import { UmbLitElement } from '@umbraco-cms/element';
 

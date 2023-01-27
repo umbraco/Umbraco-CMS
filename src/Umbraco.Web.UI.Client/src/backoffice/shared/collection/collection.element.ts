@@ -5,9 +5,8 @@ import { map } from 'rxjs';
 import './collection-selection-actions.element';
 import './collection-toolbar.element';
 import { UmbCollectionContext, UMB_COLLECTION_CONTEXT_TOKEN } from './collection.context';
-import { createExtensionElement } from '@umbraco-cms/extensions-api';
+import { createExtensionElement , umbExtensionsRegistry } from '@umbraco-cms/extensions-api';
 import type { ManifestCollectionView, MediaDetails } from '@umbraco-cms/models';
-import { umbExtensionsRegistry } from '@umbraco-cms/extensions-api';
 import { UmbLitElement } from '@umbraco-cms/element';
 import type { UmbObserverController } from '@umbraco-cms/observable-api';
 
