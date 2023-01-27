@@ -54,4 +54,14 @@ export const handlers = [
 
 		return res(ctx.status(200), ctx.json(saved[0]));
 	}),
+
+	rest.delete<LanguageDetails>('/umbraco/management/api/v1/language', async (req, res, ctx) => {
+		const data = await req.json();
+
+		if (!data) return;
+
+		const deleted = umbLanguagesData.delete(data);
+
+		return res(ctx.status(200), ctx.json(deleted));
+	}),
 ];

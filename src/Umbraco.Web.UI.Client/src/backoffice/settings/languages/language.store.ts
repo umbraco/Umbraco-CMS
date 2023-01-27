@@ -63,4 +63,16 @@ export class UmbLanguageStore extends UmbStoreBase {
 			});
 		}
 	}
+
+	async delete(keys: Array<string>) {
+		const res = await fetch('/umbraco/management/api/v1/language', {
+			method: 'DELETE',
+			body: JSON.stringify(keys),
+			headers: {
+				'Content-Type': 'application/json',
+			},
+		});
+		const data = await res.json();
+		this.#data.remove(data);
+	}
 }

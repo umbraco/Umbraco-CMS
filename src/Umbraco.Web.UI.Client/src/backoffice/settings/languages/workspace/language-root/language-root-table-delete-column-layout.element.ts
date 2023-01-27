@@ -46,7 +46,7 @@ export class UmbLanguageRootTableDeleteColumnLayoutElement extends UmbLitElement
 
 		modalHandler?.onClose().then(({ confirmed }) => {
 			if (confirmed) {
-				this._languageStore?.deleteItems([this.value.key]);
+				this._languageStore?.delete([this.value.key]);
 			}
 		});
 	}

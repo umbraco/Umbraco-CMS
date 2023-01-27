@@ -31,6 +31,17 @@ class UmbLanguagesData extends UmbData<LanguageDetails> {
 		return saveItems;
 	}
 
+	delete(keys: Array<string>) {
+		keys.forEach((key) => {
+			const foundIndex = this.data.findIndex((item) => item.key === key);
+			if (foundIndex !== -1) {
+				this.data.splice(foundIndex, 1);
+			}
+		});
+
+		return keys;
+	}
+
 	updateData(updateItem: LanguageDetails) {
 		const itemIndex = this.data.findIndex((item) => item.key === updateItem.key);
 		const item = this.data[itemIndex];
