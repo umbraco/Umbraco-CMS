@@ -34,6 +34,9 @@ export class UmbEntityData<T extends Entity> extends UmbData<T> {
 	move(keys: Array<string>, destination: string) {
 		const movedItems: Array<T> = [];
 
+		//Don't do anything if something is moved into itself.
+		if (keys.includes(destination)) return [];
+
 		keys.forEach((key) => {
 			const item = this.getByKey(key);
 			if (!item) return;
