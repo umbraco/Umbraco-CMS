@@ -30,6 +30,12 @@ export class UUICodeBlock extends LitElement {
 				overflow-y: auto;
 				overflow-wrap: anywhere;
 			}
+			pre {
+				max-width: 100%;
+				white-space: pre-line;
+				word-break: break-word;
+				overflow-wrap: break-word;
+			}
 		`,
 	];
 
