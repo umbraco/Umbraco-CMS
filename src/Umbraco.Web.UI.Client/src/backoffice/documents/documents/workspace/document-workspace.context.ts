@@ -7,7 +7,15 @@ import { appendToFrozenArray } from '@umbraco-cms/observable-api';
 
 export class UmbDocumentWorkspaceContext extends UmbWorkspaceContext implements UmbWorkspaceEntityContextInterface<DocumentDetails | undefined> {
 
+	// Repository notes:
+	/*
 
+	#draft = new ObjectState<Type | undefined>(undefined);
+
+
+	*/
+
+	// Manager will be removed when we get the Repository:
 	#manager = new UmbEntityWorkspaceManager(this._host, 'document', UMB_DOCUMENT_DETAIL_STORE_CONTEXT_TOKEN);
 
 	public readonly data = this.#manager.state.asObservable();
@@ -25,6 +33,23 @@ export class UmbDocumentWorkspaceContext extends UmbWorkspaceContext implements 
 	create = this.#manager.create;
 	save = this.#manager.save;
 	destroy = this.#manager.destroy;
+
+	/**
+	 * Concept for Repository impl.:
+
+	load(entityKey: string) {
+		this.#repository.load(entityKey).then((data) => {
+			this.#draft.next(data)
+		})
+	}
+
+	create(parentKey: string | undefined) {
+		this.#repository.create(parentKey).then((data) => {
+			this.#draft.next(data)
+		})
+	}
+
+	 */
 
 
 	// This could eventually be moved out as well?
