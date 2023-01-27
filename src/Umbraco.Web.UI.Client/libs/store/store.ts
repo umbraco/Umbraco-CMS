@@ -44,7 +44,7 @@ export interface UmbEntityDetailStore<T> extends UmbDataStore {
 
 export interface UmbContentStore<T> extends UmbEntityDetailStore<T> {
 
-	// TODO: make something that is specific for UmbContentStore
+	// TODO: make something that is specific for UmbContentStore, or then we should get rid of it. But for now i kept it as we might want this for rollback or other things specific to Content types.
 	save(data: T[]): Promise<void>;
 
 }
