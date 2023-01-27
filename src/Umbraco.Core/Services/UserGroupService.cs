@@ -11,7 +11,7 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Services;
 
-public class UserGroupService : RepositoryService, IUserGroupService
+internal sealed class UserGroupService : RepositoryService, IUserGroupService
 {
     private readonly IUserGroupRepository _userGroupRepository;
     private readonly IUserGroupAuthorizationService _userGroupAuthorizationService;

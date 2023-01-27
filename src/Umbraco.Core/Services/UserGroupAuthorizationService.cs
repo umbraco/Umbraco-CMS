@@ -6,7 +6,7 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Services;
 
-public class UserGroupAuthorizationService : IUserGroupAuthorizationService
+internal sealed class UserGroupAuthorizationService : IUserGroupAuthorizationService
 {
     private readonly IContentService _contentService;
     private readonly IMediaService _mediaService;
