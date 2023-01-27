@@ -22,7 +22,7 @@ export class UmbThemeService {
 	#styleElement: HTMLStyleElement;
 
 	constructor() {
-		//TODO: Figure out how to handle community themes.
+		//TODO: Figure out how to extend this with themes from packages
 		this.addTheme(dark);
 		this.addTheme(highContrast);
 

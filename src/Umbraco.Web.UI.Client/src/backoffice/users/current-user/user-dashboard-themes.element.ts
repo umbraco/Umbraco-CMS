@@ -2,8 +2,8 @@ import { css, html } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, state } from 'lit/decorators.js';
 import { UUISelectEvent } from '@umbraco-ui/uui';
+import { UmbThemeService, UMB_THEME_SERVICE_CONTEXT_TOKEN } from '../../themes/theme.service';
 import { UmbLitElement } from '@umbraco-cms/element';
-import { UmbThemeService, UMB_THEME_SERVICE_CONTEXT_TOKEN } from 'src/core/theme/theme.service';
 
 @customElement('umb-user-dashboard-test')
 export class UmbUserDashboardTestElement extends UmbLitElement {
