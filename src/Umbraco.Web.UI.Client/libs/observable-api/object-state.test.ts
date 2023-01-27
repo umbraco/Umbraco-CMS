@@ -1,6 +1,5 @@
 import { expect } from '@open-wc/testing';
 import { ObjectState } from './object-state';
-import { createObservablePart } from '@umbraco-cms/observable-api';
 
 describe('ObjectState', () => {
 
