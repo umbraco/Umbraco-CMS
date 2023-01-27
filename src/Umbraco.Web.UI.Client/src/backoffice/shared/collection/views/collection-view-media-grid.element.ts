@@ -117,23 +117,23 @@ export class UmbCollectionViewsMediaGridElement extends UmbLitElement {
 
 	private _handleOpenItem(mediaItem: MediaTreeItem) {
 		//TODO: Fix when we have dynamic routing
-		history.pushState(null, '', 'section/media/media/' + mediaItem.key);
+		history.pushState(null, '', 'section/media/media/edit/' + mediaItem.key);
 	}
 
 	private _handleSelect(mediaItem: MediaTreeItem) {
-		if(mediaItem.key) {
+		if (mediaItem.key) {
 			this._collectionContext?.select(mediaItem.key);
 		}
 	}
 
 	private _handleDeselect(mediaItem: MediaTreeItem) {
-		if(mediaItem.key) {
+		if (mediaItem.key) {
 			this._collectionContext?.deselect(mediaItem.key);
 		}
 	}
 
 	private _isSelected(mediaItem: MediaTreeItem) {
-		if(mediaItem.key) {
+		if (mediaItem.key) {
 			return this._selection.includes(mediaItem.key);
 		}
 		return false;

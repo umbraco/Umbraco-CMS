@@ -1,13 +1,12 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html, nothing } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
-import { map, switchMap, EMPTY, of } from 'rxjs';
+import { map } from 'rxjs';
 import { IRoutingInfo } from 'router-slot';
 import type { UmbWorkspaceEntityElement } from '../workspace/workspace-entity-element.interface';
 import { UmbSectionContext, UMB_SECTION_CONTEXT_TOKEN } from './section.context';
-import { createExtensionElement } from '@umbraco-cms/extensions-api';
 import type { ManifestSectionView, ManifestWorkspace, ManifestSidebarMenuItem } from '@umbraco-cms/models';
-import { umbExtensionsRegistry } from '@umbraco-cms/extensions-api';
+import { umbExtensionsRegistry, createExtensionElement } from '@umbraco-cms/extensions-api';
 import { UmbLitElement } from '@umbraco-cms/element';
 
 import './section-sidebar-menu/section-sidebar-menu.element.ts';
@@ -90,7 +89,6 @@ export class UmbSectionElement extends UmbLitElement {
 
 	private _createMenuRoutes() {
 
-		console.log("_createMenuRoutes")
 		// TODO: find a way to make this reuseable across:
 		const workspaceRoutes = this._workspaces?.map((workspace: ManifestWorkspace) => {
 			return [
@@ -99,7 +97,7 @@ export class UmbSectionElement extends UmbLitElement {
 					component: () => createExtensionElement(workspace),
 					setup: (component: Promise<UmbWorkspaceEntityElement>, info: IRoutingInfo) => {
 						component.then((el) => {
-							el.entityKey = info.match.params.key;
+							el.load(info.match.params.key);
 						});
 					},
 				},
@@ -108,7 +106,7 @@ export class UmbSectionElement extends UmbLitElement {
 					component: () => createExtensionElement(workspace),
 					setup: (component: Promise<UmbWorkspaceEntityElement>) => {
 						component.then((el) => {
-							el.create = null;
+							el.create(null);
 						});
 					},
 				},
@@ -117,7 +115,7 @@ export class UmbSectionElement extends UmbLitElement {
 					component: () => createExtensionElement(workspace),
 					setup: (component: Promise<UmbWorkspaceEntityElement>, info: IRoutingInfo) => {
 						component.then((el) => {
-							el.create = info.match.params.parentKey;
+							el.create(info.match.params.parentKey);
 						});
 					},
 				},
@@ -169,8 +167,6 @@ export class UmbSectionElement extends UmbLitElement {
 	}
 
 	private _createViewRoutes() {
-
-		console.log("_createViewRoutes")
 
 		this._routes =
 			this._views?.map((view) => {

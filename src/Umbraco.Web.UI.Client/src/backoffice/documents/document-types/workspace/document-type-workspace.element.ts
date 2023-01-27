@@ -46,22 +46,6 @@ export class UmbDocumentTypeWorkspaceElement extends UmbLitElement implements Um
 		name: 'umb:document-dashed-line',
 	};
 
-	private _entityKey!: string;
-	@property()
-	public get entityKey(): string {
-		return this._entityKey;
-	}
-	public set entityKey(value: string) {
-		this._entityKey = value;
-		if (this._entityKey) {
-			this._workspaceContext?.load(this._entityKey);
-		}
-	}
-
-	@property()
-	public set create(parentKey: string | null) {
-		this._workspaceContext?.create(parentKey);
-	}
 
 	private _workspaceContext: UmbWorkspaceDocumentTypeContext = new UmbWorkspaceDocumentTypeContext(this);
 
@@ -83,13 +67,21 @@ export class UmbDocumentTypeWorkspaceElement extends UmbLitElement implements Um
 		});
 	}
 
+	public load(entityKey: string) {
+		this._workspaceContext.load(entityKey);
+	}
+
+	public create(parentKey: string | null) {
+		this._workspaceContext.create(parentKey);
+	}
+
 	// TODO. find a way where we don't have to do this for all workspaces.
 	private _handleInput(event: UUIInputEvent) {
 		if (event instanceof UUIInputEvent) {
 			const target = event.composedPath()[0] as UUIInputElement;
 
 			if (typeof target?.value === 'string') {
-				this._workspaceContext?.update({ name: target.value });
+				this._workspaceContext?.setName(target.value);
 			}
 		}
 	}
@@ -98,7 +90,7 @@ export class UmbDocumentTypeWorkspaceElement extends UmbLitElement implements Um
 		const modalHandler = this._modalService?.iconPicker();
 
 		modalHandler?.onClose().then((saved) => {
-			if (saved) this._workspaceContext?.update({ icon: saved.icon });
+			if (saved) this._workspaceContext?.setIcon(saved.icon);
 			console.log(saved);
 			// TODO save color ALIAS as well
 		});

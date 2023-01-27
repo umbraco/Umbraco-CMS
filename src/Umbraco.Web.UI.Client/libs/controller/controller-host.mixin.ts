@@ -1,5 +1,5 @@
-import type { HTMLElementConstructor } from '@umbraco-cms/models';
 import { UmbControllerInterface } from './controller.interface';
+import type { HTMLElementConstructor } from '@umbraco-cms/models';
 
 export declare class UmbControllerHostInterface extends HTMLElement {
 	//#controllers:UmbController[];
