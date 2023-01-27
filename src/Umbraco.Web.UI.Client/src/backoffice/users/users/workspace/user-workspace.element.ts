@@ -88,22 +88,6 @@ export class UmbUserWorkspaceElement extends UmbLitElement implements UmbWorkspa
 
 	private _languages = []; //TODO Add languages
 
-	private _entityKey!: string;
-	@property()
-	public get entityKey(): string {
-		return this._entityKey;
-	}
-	public set entityKey(value: string) {
-		this._entityKey = value;
-		if (this._entityKey) {
-			this._workspaceContext.load(this._entityKey);
-		}
-	}
-
-	@property()
-	public set create(parentKey: string | null) {
-		this._workspaceContext.create(parentKey);
-	}
 
 	private _workspaceContext: UmbWorkspaceUserContext = new UmbWorkspaceUserContext(this);
 
@@ -123,10 +107,18 @@ export class UmbUserWorkspaceElement extends UmbLitElement implements UmbWorkspa
 
 		this.observe(this._workspaceContext.data.pipe(distinctUntilChanged()), (user) => {
 			this._user = user;
-			if (user.name !== this._userName) {
+			if (user && user.name !== this._userName) {
 				this._userName = user.name;
 			}
 		});
+	}
+
+	public load(entityKey: string) {
+		this._workspaceContext.load(entityKey);
+	}
+
+	public create(parentKey: string | null) {
+		this._workspaceContext.create(parentKey);
 	}
 
 	private async _observeCurrentUser() {

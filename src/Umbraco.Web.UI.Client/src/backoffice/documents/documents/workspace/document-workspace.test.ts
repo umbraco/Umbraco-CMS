@@ -18,12 +18,12 @@ describe('UmbDocumentWorkspaceElement', () => {
 		await expect(element).to.be.accessible(defaultA11yConfig);
 	});
 
-	describe('properties', () => {
-    it('has a entityKey property', () => {
-      expect(element).to.have.property('entityKey');
+	describe('methods', () => {
+    it('has a load method', () => {
+      expect(element).to.have.property('load').that.is.a('function');
     });
-    it('has a create property', () => {
-      expect(element).to.have.property('create');
+    it('has a create method', () => {
+      expect(element).to.have.property('create').that.is.a('function');
     });
 	});
 });

@@ -4,8 +4,7 @@ import { customElement, property, state } from 'lit/decorators.js';
 import { IRoutingInfo, RouterSlot } from 'router-slot';
 import { map } from 'rxjs';
 
-import { createExtensionElement } from '@umbraco-cms/extensions-api';
-import { umbExtensionsRegistry } from '@umbraco-cms/extensions-api';
+import { createExtensionElement , umbExtensionsRegistry } from '@umbraco-cms/extensions-api';
 import type {
 	ManifestWorkspaceAction,
 	ManifestWorkspaceView,
