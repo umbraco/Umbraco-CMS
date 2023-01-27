@@ -1,6 +1,6 @@
 import type { DocumentBlueprintDetails } from '@umbraco-cms/models';
 import { UmbContextToken } from '@umbraco-cms/context-api';
-import { createObservablePart, ArrayState } from '@umbraco-cms/observable-api';
+import { ArrayState } from '@umbraco-cms/observable-api';
 import { UmbStoreBase } from '@umbraco-cms/store';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 
@@ -39,9 +39,14 @@ export class UmbDocumentBlueprintDetailStore extends UmbStoreBase {
 				this.#data.append(data);
 			});
 
-		return createObservablePart(this.#data, (documents) =>
+		return this.#data.getObservablePart((documents) =>
 			documents.find((document) => document.key === key)
 		);
+	}
+
+	getScaffold(entityType: string, parentKey: string | null) {
+		return {
+		} as DocumentBlueprintDetails;
 	}
 
 	// TODO: make sure UI somehow can follow the status of this action.

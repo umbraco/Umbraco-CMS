@@ -1,7 +1,7 @@
 import type { UserDetails } from '@umbraco-cms/models';
-import { createObservablePart, ArrayState, NumberState } from '@umbraco-cms/observable-api';
+import { ArrayState, NumberState } from '@umbraco-cms/observable-api';
 import { UmbContextToken } from '@umbraco-cms/context-api';
-import { UmbStoreBase } from '@umbraco-cms/store';
+import { UmbEntityDetailStore, UmbStoreBase } from '@umbraco-cms/store';
 import type { UmbControllerHostInterface } from '@umbraco-cms/controller';
 
 export type UmbUserStoreItemType = UserDetails;
@@ -14,7 +14,7 @@ export const UMB_USER_STORE_CONTEXT_TOKEN = new UmbContextToken<UmbUserStore>('U
  * @extends {UmbStoreBase}
  * @description - Data Store for Users
  */
-export class UmbUserStore extends UmbStoreBase {
+export class UmbUserStore extends UmbStoreBase implements UmbEntityDetailStore<UserDetails> {
 
 
 	#users = new ArrayState<UserDetails>([], x => x.key);
@@ -26,6 +26,27 @@ export class UmbUserStore extends UmbStoreBase {
 
 	constructor(host: UmbControllerHostInterface) {
 		super(host, UMB_USER_STORE_CONTEXT_TOKEN.toString());
+	}
+
+
+	getScaffold(entityType: string, parentKey: string | null) {
+		return  {
+			key: '',
+			name: '',
+			icon: '',
+			type: 'user',
+			hasChildren: false,
+			parentKey: '',
+			email: '',
+			language: '',
+			status: 'enabled',
+			updateDate: '8/27/2022',
+			createDate: '9/19/2022',
+			failedLoginAttempts: 0,
+			userGroups: [],
+			contentStartNodes: [],
+			mediaStartNodes: [],
+		} as UserDetails;
 	}
 
 
@@ -57,7 +78,7 @@ export class UmbUserStore extends UmbStoreBase {
 				this.#users.appendOne(data);
 			});
 
-		return createObservablePart(this.#users, (users: Array<UmbUserStoreItemType>) => users.find((user: UmbUserStoreItemType) => user.key === key));
+		return this.#users.getObservablePart((users: Array<UmbUserStoreItemType>) => users.find((user: UmbUserStoreItemType) => user.key === key));
 	}
 
 
@@ -75,7 +96,7 @@ export class UmbUserStore extends UmbStoreBase {
 				this.#users.append(data);
 			});
 
-		return createObservablePart(this.#users, (users: Array<UmbUserStoreItemType>) => users.filter((user: UmbUserStoreItemType) => keys.includes(user.key)));
+		return this.#users.getObservablePart((users: Array<UmbUserStoreItemType>) => users.filter((user: UmbUserStoreItemType) => keys.includes(user.key)));
 	}
 
 	getByName(name: string) {
@@ -89,7 +110,7 @@ export class UmbUserStore extends UmbStoreBase {
 				this.#users.append(data);
 			});
 
-		return createObservablePart(this.#users, (users: Array<UmbUserStoreItemType>) => users.filter((user: UmbUserStoreItemType) => user.name.toLocaleLowerCase().includes(name)));
+		return this.#users.getObservablePart((users: Array<UmbUserStoreItemType>) => users.filter((user: UmbUserStoreItemType) => user.name.toLocaleLowerCase().includes(name)));
 	}
 
 	async enableUsers(userKeys: Array<string>) {

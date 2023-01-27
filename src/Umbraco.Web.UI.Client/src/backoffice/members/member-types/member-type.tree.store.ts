@@ -1,7 +1,7 @@
 import { EntityTreeItem, MemberTypeResource, } from '@umbraco-cms/backend-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/resources';
 import { UmbContextToken } from '@umbraco-cms/context-api';
-import { createObservablePart, ArrayState } from '@umbraco-cms/observable-api';
+import { ArrayState } from '@umbraco-cms/observable-api';
 import { UmbStoreBase } from '@umbraco-cms/store';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 
@@ -55,7 +55,7 @@ export class UmbMemberTypeTreeStore extends UmbStoreBase {
 		});
 
 		// TODO: remove ignore when we know how to handle trashed items.
-		return createObservablePart(this.#data, (items) => items.filter((item) => item.parentKey === null));
+		return this.#data.getObservablePart((items) => items.filter((item) => item.parentKey === null));
 	}
 
 	getTreeItemChildren(key: string) {
@@ -73,7 +73,7 @@ export class UmbMemberTypeTreeStore extends UmbStoreBase {
 		});
 		*/
 
-		return createObservablePart(this.#data, (items) => items.filter((item) => item.parentKey === key));
+		return this.#data.getObservablePart((items) => items.filter((item) => item.parentKey === key));
 	}
 
 	getTreeItems(keys: Array<string>) {
@@ -91,6 +91,6 @@ export class UmbMemberTypeTreeStore extends UmbStoreBase {
 			});
 		}
 
-		return createObservablePart(this.#data, (items) => items.filter((item) => keys.includes(item.key ?? '')));
+		return this.#data.getObservablePart((items) => items.filter((item) => keys.includes(item.key ?? '')));
 	}
 }

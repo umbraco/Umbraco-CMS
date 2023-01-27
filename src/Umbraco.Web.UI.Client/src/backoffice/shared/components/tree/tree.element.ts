@@ -38,10 +38,6 @@ export class UmbTreeElement extends UmbLitElement {
 		this._selectable = newVal;
 		this.requestUpdate('selectable', oldVal);
 		this._treeContext?.setSelectable(newVal);
-
-		if (newVal) {
-			this._observeSelection();
-		}
 	}
 
 	private _selection: Array<string> = [];
@@ -99,6 +95,8 @@ export class UmbTreeElement extends UmbLitElement {
 		this._treeContext = new UmbTreeContextBase(this._tree);
 		this._treeContext.setSelectable(this.selectable);
 		this._treeContext.setSelection(this.selection);
+
+		this._observeSelection();
 
 		this.provideContext('umbTreeContext', this._treeContext);
 	}

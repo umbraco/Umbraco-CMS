@@ -1,6 +1,5 @@
 import { expect } from '@open-wc/testing';
 import { ObjectState } from './object-state';
-import { createObservablePart } from '@umbraco-cms/observable-api';
 
 describe('ObjectState', () => {
 
@@ -28,11 +27,11 @@ describe('ObjectState', () => {
 
 	});
 
-	it('use createObservablePart, updates on its specific change.', (done) => {
+	it('use getObservablePart, updates on its specific change.', (done) => {
 
 		let amountOfCallbacks = 0;
 
-		const subObserver = createObservablePart(subject, data => data.another);
+		const subObserver = subject.getObservablePart(data => data.another);
 		subObserver.subscribe((value) => {
 			amountOfCallbacks++;
 			if(amountOfCallbacks === 1) {

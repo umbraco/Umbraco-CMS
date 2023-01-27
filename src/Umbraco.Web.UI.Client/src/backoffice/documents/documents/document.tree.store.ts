@@ -1,8 +1,8 @@
 import { DocumentResource, DocumentTreeItem } from '@umbraco-cms/backend-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/resources';
 import { UmbContextToken } from '@umbraco-cms/context-api';
-import { createObservablePart, ArrayState } from '@umbraco-cms/observable-api';
-import { UmbStoreBase } from '@umbraco-cms/store';
+import { ArrayState } from '@umbraco-cms/observable-api';
+import { UmbStoreBase, UmbTreeStore } from '@umbraco-cms/store';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 
 
@@ -15,7 +15,7 @@ export const UMB_DOCUMENT_TREE_STORE_CONTEXT_TOKEN = new UmbContextToken<UmbDocu
  * @extends {UmbStoreBase}
  * @description - Data Store for Documents
  */
-export class UmbDocumentTreeStore extends UmbStoreBase {
+export class UmbDocumentTreeStore extends UmbStoreBase implements UmbTreeStore<DocumentTreeItem> {
 
 
 	private _data = new ArrayState<DocumentTreeItem>([], (x) => x.key);
@@ -39,6 +39,19 @@ export class UmbDocumentTreeStore extends UmbStoreBase {
 		this._data.append(data);
 	}
 
+	async move(keys: Array<string>, destination: string) {
+		// TODO: use backend cli when available.
+		const res = await fetch('/umbraco/management/api/v1/document/move', {
+			method: 'POST',
+			body: JSON.stringify({ keys, destination }),
+			headers: {
+				'Content-Type': 'application/json',
+			},
+		});
+		const data = await res.json();
+		this._data.append(data);
+	}
+
 	getTreeRoot() {
 		tryExecuteAndNotify(this._host, DocumentResource.getTreeDocumentRoot({})).then(({ data }) => {
 			if (data) {
@@ -49,7 +62,7 @@ export class UmbDocumentTreeStore extends UmbStoreBase {
 
 		// TODO: how do we handle trashed items?
 		// TODO: remove ignore when we know how to handle trashed items.
-		return createObservablePart(this._data, (items) => items.filter((item) => item.parentKey === null && !item.isTrashed));
+		return this._data.getObservablePart((items) => items.filter((item) => item.parentKey === null && !item.isTrashed));
 	}
 
 	getTreeItemChildren(key: string) {
@@ -67,7 +80,7 @@ export class UmbDocumentTreeStore extends UmbStoreBase {
 
 		// TODO: how do we handle trashed items?
 		// TODO: remove ignore when we know how to handle trashed items.
-		return createObservablePart(this._data, (items) => items.filter((item) => item.parentKey === key && !item.isTrashed));
+		return this._data.getObservablePart((items) => items.filter((item) => item.parentKey === key && !item.isTrashed));
 	}
 
 	getTreeItems(keys: Array<string>) {
@@ -85,6 +98,6 @@ export class UmbDocumentTreeStore extends UmbStoreBase {
 			});
 		}
 
-		return createObservablePart(this._data, (items) => items.filter((item) => keys.includes(item.key ?? '')));
+		return this._data.getObservablePart((items) => items.filter((item) => keys.includes(item.key ?? '')));
 	}
 }
