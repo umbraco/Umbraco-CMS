@@ -1,6 +1,7 @@
 // TODO: lazy load
 import './layouts/confirm/modal-layout-confirm.element';
 import './layouts/content-picker/modal-layout-content-picker.element';
+import './layouts/media-picker/modal-layout-media-picker.element';
 import './layouts/property-editor-ui-picker/modal-layout-property-editor-ui-picker.element';
 import './layouts/modal-layout-current-user.element';
 import './layouts/icon-picker/modal-layout-icon-picker.element';
@@ -12,8 +13,8 @@ import type { UmbModalIconPickerData } from './layouts/icon-picker/modal-layout-
 import type { UmbModalConfirmData } from './layouts/confirm/modal-layout-confirm.element';
 import type { UmbModalContentPickerData } from './layouts/content-picker/modal-layout-content-picker.element';
 import type { UmbModalPropertyEditorUIPickerData } from './layouts/property-editor-ui-picker/modal-layout-property-editor-ui-picker.element';
+import type { UmbModalMediaPickerData } from './layouts/media-picker/modal-layout-media-picker.element';
 import { UmbModalHandler } from './modal-handler';
-import { UmbModalMediaPickerData } from './layouts/media-picker/modal-layout-media-picker.element';
 import { UmbContextToken } from '@umbraco-cms/context-api';
 
 export type UmbModalType = 'dialog' | 'sidebar';

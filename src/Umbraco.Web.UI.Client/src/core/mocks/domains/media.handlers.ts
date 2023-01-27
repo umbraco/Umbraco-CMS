@@ -29,8 +29,6 @@ export const handlers = [
 		const data = await req.json();
 		if (!data) return;
 
-		console.log('HANDLER', data);
-
 		const moved = umbMediaData.move(data.keys, data.destination);
 
 		return res(ctx.status(200), ctx.json(moved));
