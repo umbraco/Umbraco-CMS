@@ -1,7 +1,7 @@
 import type { UserGroupDetails } from '@umbraco-cms/models';
 import { UmbContextToken } from '@umbraco-cms/context-api';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
-import { createObservablePart, ArrayState } from '@umbraco-cms/observable-api';
+import { ArrayState } from '@umbraco-cms/observable-api';
 import { UmbEntityDetailStore, UmbStoreBase } from '@umbraco-cms/store';
 
 // TODO: get rid of this type addition & { ... }:
@@ -63,7 +63,7 @@ export class UmbUserGroupStore extends UmbStoreBase implements UmbEntityDetailSt
 				this.#groups.append([data]);
 			});
 
-		return createObservablePart(this.groups, (userGroups) => userGroups.find(userGroup => userGroup.key === key));
+		return this.#groups.getObservablePart((userGroups) => userGroups.find(userGroup => userGroup.key === key));
 	}
 
 	getByKeys(keys: Array<string>) {
@@ -74,7 +74,7 @@ export class UmbUserGroupStore extends UmbStoreBase implements UmbEntityDetailSt
 				this.#groups.append(data);
 			});
 
-			return createObservablePart(this.groups, (items) => items.filter(node => keys.includes(node.key)));
+			return this.#groups.getObservablePart((items) => items.filter(node => keys.includes(node.key)));
 	}
 
 	async save(userGroups: Array<UserGroupDetails>) {

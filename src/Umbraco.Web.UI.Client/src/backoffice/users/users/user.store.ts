@@ -1,5 +1,5 @@
 import type { UserDetails } from '@umbraco-cms/models';
-import { createObservablePart, ArrayState, NumberState } from '@umbraco-cms/observable-api';
+import { ArrayState, NumberState } from '@umbraco-cms/observable-api';
 import { UmbContextToken } from '@umbraco-cms/context-api';
 import { UmbEntityDetailStore, UmbStoreBase } from '@umbraco-cms/store';
 import type { UmbControllerHostInterface } from '@umbraco-cms/controller';
@@ -78,7 +78,7 @@ export class UmbUserStore extends UmbStoreBase implements UmbEntityDetailStore<U
 				this.#users.appendOne(data);
 			});
 
-		return createObservablePart(this.#users, (users: Array<UmbUserStoreItemType>) => users.find((user: UmbUserStoreItemType) => user.key === key));
+		return this.#users.getObservablePart((users: Array<UmbUserStoreItemType>) => users.find((user: UmbUserStoreItemType) => user.key === key));
 	}
 
 
@@ -96,7 +96,7 @@ export class UmbUserStore extends UmbStoreBase implements UmbEntityDetailStore<U
 				this.#users.append(data);
 			});
 
-		return createObservablePart(this.#users, (users: Array<UmbUserStoreItemType>) => users.filter((user: UmbUserStoreItemType) => keys.includes(user.key)));
+		return this.#users.getObservablePart((users: Array<UmbUserStoreItemType>) => users.filter((user: UmbUserStoreItemType) => keys.includes(user.key)));
 	}
 
 	getByName(name: string) {
@@ -110,7 +110,7 @@ export class UmbUserStore extends UmbStoreBase implements UmbEntityDetailStore<U
 				this.#users.append(data);
 			});
 
-		return createObservablePart(this.#users, (users: Array<UmbUserStoreItemType>) => users.filter((user: UmbUserStoreItemType) => user.name.toLocaleLowerCase().includes(name)));
+		return this.#users.getObservablePart((users: Array<UmbUserStoreItemType>) => users.filter((user: UmbUserStoreItemType) => user.name.toLocaleLowerCase().includes(name)));
 	}
 
 	async enableUsers(userKeys: Array<string>) {

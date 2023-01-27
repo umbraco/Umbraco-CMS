@@ -1,7 +1,7 @@
 import { UmbWorkspaceEntityContextInterface } from '../workspace/workspace-context/workspace-entity-context.interface';
 import type { DataTypeDetails } from '@umbraco-cms/models';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
-import { createObservablePart, ObjectState } from '@umbraco-cms/observable-api';
+import { ObjectState } from '@umbraco-cms/observable-api';
 import { UmbContextConsumerController, UmbContextProviderController } from '@umbraco-cms/context-api';
 
 // If we get this from the server then we can consider using TypeScripts Partial<> around the model from the Management-API.
@@ -18,11 +18,11 @@ export class UmbWorkspacePropertyContext<ValueType = unknown> {
 
 	private _data = new ObjectState<WorkspacePropertyData<ValueType>>({});
 
-	public readonly alias = createObservablePart(this._data, (data) => data.alias);
-	public readonly label = createObservablePart(this._data, (data) => data.label);
-	public readonly description = createObservablePart(this._data, (data) => data.description);
-	public readonly value = createObservablePart(this._data, (data) => data.value);
-	public readonly config = createObservablePart(this._data, (data) => data.config);
+	public readonly alias = this._data.getObservablePart((data) => data.alias);
+	public readonly label = this._data.getObservablePart((data) => data.label);
+	public readonly description = this._data.getObservablePart((data) => data.description);
+	public readonly value = this._data.getObservablePart((data) => data.value);
+	public readonly config = this._data.getObservablePart((data) => data.config);
 
 	private _workspaceContext?: UmbWorkspaceEntityContextInterface;
 

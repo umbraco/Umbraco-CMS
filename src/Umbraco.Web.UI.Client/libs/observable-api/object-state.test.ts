@@ -27,7 +27,7 @@ describe('ObjectState', () => {
 
 	});
 
-	it('use createObservablePart, updates on its specific change.', (done) => {
+	it('use getObservablePart, updates on its specific change.', (done) => {
 
 		let amountOfCallbacks = 0;
 

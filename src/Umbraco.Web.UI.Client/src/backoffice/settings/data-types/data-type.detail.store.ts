@@ -1,6 +1,6 @@
 import type { DataTypeDetails } from '@umbraco-cms/models';
 import { UmbContextToken } from '@umbraco-cms/context-api';
-import { createObservablePart, ArrayState } from '@umbraco-cms/observable-api';
+import { ArrayState } from '@umbraco-cms/observable-api';
 import { UmbEntityDetailStore, UmbStoreBase } from '@umbraco-cms/store';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 
@@ -54,7 +54,7 @@ export class UmbDataTypeDetailStore extends UmbStoreBase implements UmbEntityDet
 			});
 
 
-		return createObservablePart(this.#data, (documents) =>
+		return this.#data.getObservablePart((documents) =>
 			documents.find((document) => document.key === key)
 		);
 	}
