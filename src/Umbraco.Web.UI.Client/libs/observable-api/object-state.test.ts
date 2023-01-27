@@ -32,7 +32,7 @@ describe('ObjectState', () => {
 
 		let amountOfCallbacks = 0;
 
-		const subObserver = createObservablePart(subject, data => data.another);
+		const subObserver = subject.getObservablePart(data => data.another);
 		subObserver.subscribe((value) => {
 			amountOfCallbacks++;
 			if(amountOfCallbacks === 1) {
