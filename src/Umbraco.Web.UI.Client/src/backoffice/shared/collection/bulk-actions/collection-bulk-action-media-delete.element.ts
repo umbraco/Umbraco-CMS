@@ -20,7 +20,6 @@ export class UmbCollectionBulkActionDeleteElement extends UmbLitElement {
 	public manifest?: ManifestCollectionBulkAction;
 
 	#modalService?: UmbModalService;
-	#mediaStore?: UmbMediaTreeStore;
 
 	constructor() {
 		super();
@@ -31,10 +30,6 @@ export class UmbCollectionBulkActionDeleteElement extends UmbLitElement {
 
 		this.consumeContext(UMB_MODAL_SERVICE_CONTEXT_TOKEN, (instance) => {
 			this.#modalService = instance;
-		});
-
-		this.consumeContext(UMB_MEDIA_TREE_STORE_CONTEXT_TOKEN, (instance) => {
-			this.#mediaStore = instance;
 		});
 	}
 
@@ -63,7 +58,7 @@ export class UmbCollectionBulkActionDeleteElement extends UmbLitElement {
 						dataSubscription?.unsubscribe();
 
 						if (confirmed) {
-							this.#mediaStore?.trash(selection);
+							this.#collectionContext?.trash(selection);
 							this.#collectionContext?.clearSelection();
 						}
 					});

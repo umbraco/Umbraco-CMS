@@ -10,8 +10,19 @@ export interface UmbDataStore {
 }
 
 export interface UmbTreeStore<T> extends UmbDataStore {
+
 	getTreeRoot(): Observable<Array<T>>;
+
 	getTreeItemChildren(key: string): Observable<Array<T>>;
+
+	// Notice: this might not be right to put here as only some content items has ability to be trashed.
+	/**
+	 * @description - Trash data.
+	 * @param {object} data
+	 * @return {*}  {(Promise<void>)}
+	 * @memberof UmbContentStore
+	 */
+	trash(keys: string[]): Promise<void>;
 }
 
 export interface UmbContentStore<T> extends UmbDataStore {

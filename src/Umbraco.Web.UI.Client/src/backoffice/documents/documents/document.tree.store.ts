@@ -2,7 +2,7 @@ import { DocumentResource, DocumentTreeItem } from '@umbraco-cms/backend-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/resources';
 import { UmbContextToken } from '@umbraco-cms/context-api';
 import { createObservablePart, ArrayState } from '@umbraco-cms/observable-api';
-import { UmbStoreBase } from '@umbraco-cms/store';
+import { UmbStoreBase, UmbTreeStore } from '@umbraco-cms/store';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 
 
@@ -15,7 +15,7 @@ export const UMB_DOCUMENT_TREE_STORE_CONTEXT_TOKEN = new UmbContextToken<UmbDocu
  * @extends {UmbStoreBase}
  * @description - Data Store for Documents
  */
-export class UmbDocumentTreeStore extends UmbStoreBase {
+export class UmbDocumentTreeStore extends UmbStoreBase implements UmbTreeStore<DocumentTreeItem> {
 
 
 	private _data = new ArrayState<DocumentTreeItem>([], (x) => x.key);

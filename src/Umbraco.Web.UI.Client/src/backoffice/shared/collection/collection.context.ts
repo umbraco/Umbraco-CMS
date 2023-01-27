@@ -92,6 +92,11 @@ export class UmbCollectionContext<
 		this.#selection.next(value);
 	}
 
+	// TODO: Not all can trash, so maybe we need to differentiate on collection contexts or fix it with another architecture.
+	public trash(keys:string[]) {
+		this._store?.trash(keys);
+	}
+
 	public clearSelection() {
 		this.#selection.next([]);
 	}

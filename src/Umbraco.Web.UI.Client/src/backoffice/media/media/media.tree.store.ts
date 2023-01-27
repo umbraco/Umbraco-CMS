@@ -3,7 +3,7 @@ import { MediaResource, ContentTreeItem } from '@umbraco-cms/backend-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/resources';
 import { UmbContextToken } from '@umbraco-cms/context-api';
 import { createObservablePart, ArrayState } from '@umbraco-cms/observable-api';
-import { UmbStoreBase } from '@umbraco-cms/store';
+import { UmbStoreBase, UmbTreeStore } from '@umbraco-cms/store';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 
 export const UMB_MEDIA_TREE_STORE_CONTEXT_TOKEN = new UmbContextToken<UmbMediaTreeStore>('UmbMediaTreeStore');
@@ -17,7 +17,8 @@ export type MediaTreeItem = ContentTreeItem;
  * @extends {UmbStoreBase}
  * @description - Data Store for Media
  */
-export class UmbMediaTreeStore extends UmbStoreBase {
+export class UmbMediaTreeStore extends UmbStoreBase implements UmbTreeStore<MediaTreeItem> {
+
 	#data = new ArrayState<MediaTreeItem>([], (x) => x.key);
 
 	constructor(host: UmbControllerHostInterface) {
