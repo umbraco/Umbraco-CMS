@@ -46,22 +46,6 @@ export class UmbDocumentTypeWorkspaceElement extends UmbLitElement implements Um
 		name: 'umb:document-dashed-line',
 	};
 
-	private _entityKey!: string;
-	@property()
-	public get entityKey(): string {
-		return this._entityKey;
-	}
-	public set entityKey(value: string) {
-		this._entityKey = value;
-		if (this._entityKey) {
-			this._workspaceContext?.load(this._entityKey);
-		}
-	}
-
-	@property()
-	public set create(parentKey: string | null) {
-		this._workspaceContext?.create(parentKey);
-	}
 
 	private _workspaceContext: UmbWorkspaceDocumentTypeContext = new UmbWorkspaceDocumentTypeContext(this);
 
@@ -81,6 +65,14 @@ export class UmbDocumentTypeWorkspaceElement extends UmbLitElement implements Um
 			// TODO: make method to identify if data is of type DocumentTypeDetails
 			this._documentType = data as DocumentTypeDetails;
 		});
+	}
+
+	public load(entityKey: string) {
+		this._workspaceContext.load(entityKey);
+	}
+
+	public create(parentKey: string | null) {
+		this._workspaceContext.create(parentKey);
 	}
 
 	// TODO. find a way where we don't have to do this for all workspaces.

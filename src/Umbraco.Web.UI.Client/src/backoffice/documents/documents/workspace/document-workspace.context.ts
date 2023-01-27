@@ -1,4 +1,4 @@
-import { UmbDocumentDetailStore, UMB_DOCUMENT_DETAIL_STORE_CONTEXT_TOKEN } from '../document.detail.store';
+import { UMB_DOCUMENT_DETAIL_STORE_CONTEXT_TOKEN } from '../document.detail.store';
 import type { UmbWorkspaceEntityContextInterface } from '../../../shared/components/workspace/workspace-context/workspace-entity-context.interface';
 import { UmbWorkspaceContext } from '../../../shared/components/workspace/workspace-context/workspace-context';
 import { UmbEntityWorkspaceManager } from '../../../shared/components/workspace/workspace-context/entity-manager-controller';
@@ -17,6 +17,7 @@ export class UmbDocumentWorkspaceContext extends UmbWorkspaceContext implements 
 		this.#manager.state.update({name: name})
 	}
 	getEntityType = this.#manager.getEntityType;
+	getUnique = this.#manager.getEntityKey;
 	getEntityKey = this.#manager.getEntityKey;
 	getStore = this.#manager.getStore;
 	getData = this.#manager.getData;

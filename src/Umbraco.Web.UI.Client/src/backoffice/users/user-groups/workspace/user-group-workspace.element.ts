@@ -1,7 +1,7 @@
 import { UUIInputElement, UUIInputEvent } from '@umbraco-ui/uui';
 import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, html, nothing } from 'lit';
-import { customElement, property, state } from 'lit/decorators.js';
+import { customElement, state } from 'lit/decorators.js';
 import { repeat } from 'lit/directives/repeat.js';
 import { distinctUntilChanged } from 'rxjs';
 import { UmbUserStore, UMB_USER_STORE_CONTEXT_TOKEN } from '../../../users/users/user.store';
@@ -186,22 +186,7 @@ export class UmbUserGroupWorkspaceElement extends UmbLitElement implements UmbWo
 
 	private _userStore?: UmbUserStore;
 
-	private _entityKey!: string;
-	@property()
-	public get entityKey(): string {
-		return this._entityKey;
-	}
-	public set entityKey(value: string) {
-		this._entityKey = value;
-		if (this._entityKey) {
-			this._workspaceContext.load(this._entityKey);
-		}
-	}
 
-	@property()
-	public set create(parentKey: string | null) {
-		this._workspaceContext.create(parentKey);
-	}
 
 	private _workspaceContext: UmbWorkspaceUserGroupContext = new UmbWorkspaceUserGroupContext(this);
 
@@ -224,6 +209,14 @@ export class UmbUserGroupWorkspaceElement extends UmbLitElement implements UmbWo
 		this.observe(this._workspaceContext.data.pipe(distinctUntilChanged()), (userGroup) => {
 			this._userGroup = userGroup;
 		});
+	}
+
+	public load(entityKey: string) {
+		this._workspaceContext.load(entityKey);
+	}
+
+	public create(parentKey: string | null) {
+		this._workspaceContext.create(parentKey);
 	}
 
 	private _registerWorkspaceActions() {
@@ -255,7 +248,8 @@ export class UmbUserGroupWorkspaceElement extends UmbLitElement implements UmbWo
 		this.observe(this._userStore.getAll(), (users) => {
 			// TODO: handle if there is no users.
 			if (!this._userKeys && users.length > 0) {
-				this._userKeys = users.filter((user) => user.userGroups.includes(this.entityKey)).map((user) => user.key);
+				const entityKey = this._workspaceContext.getEntityKey();
+				this._userKeys = users.filter((user) => user.userGroups.includes(entityKey)).map((user) => user.key);
 				//this._updateProperty('users', this._userKeys);
 				// TODO: make a method on the UmbWorkspaceUserGroupContext:
 				//this._workspaceContext.setUsers();

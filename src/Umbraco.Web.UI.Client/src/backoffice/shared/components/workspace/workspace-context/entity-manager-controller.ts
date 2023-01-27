@@ -26,7 +26,7 @@ export class UmbEntityWorkspaceManager<StoreType extends UmbEntityDetailStore<En
 
 	#isNew = false;
 	private _entityType;
-	private _entityKey?: string;
+	private _entityKey!: string;
 
 	private _createAtParentKey?: string | null;
 
@@ -74,7 +74,7 @@ export class UmbEntityWorkspaceManager<StoreType extends UmbEntityDetailStore<En
 	getEntityType() {
 		return this._entityType;
 	}
-	getEntityKey() {
+	getEntityKey(): string {
 		return this._entityKey;
 	}
 

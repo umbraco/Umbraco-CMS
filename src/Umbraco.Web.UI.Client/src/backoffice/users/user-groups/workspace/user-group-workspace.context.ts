@@ -18,6 +18,7 @@ export class UmbWorkspaceUserGroupContext extends UmbWorkspaceContext implements
 		this.#manager.state.update({name: name})
 	}
 	getEntityType = this.#manager.getEntityType;
+	getUnique = this.#manager.getEntityKey;
 	getEntityKey = this.#manager.getEntityKey;
 	getStore = this.#manager.getStore;
 	getData = this.#manager.getData;

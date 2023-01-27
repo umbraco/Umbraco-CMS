@@ -63,7 +63,9 @@ export class UmbVariantSelectorElement extends UmbLitElement {
 		if (!this._workspaceContext) return;
 
 		this.observe(this._workspaceContext.data, (data) => {
-			this._content = data;
+			if(data) {
+				this._content = data;
+			}
 		});
 	}
 

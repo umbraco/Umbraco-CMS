@@ -1,4 +1,4 @@
 export interface UmbWorkspaceEntityElement {
-	set entityKey(key: string);
-	set create(parentKey: string | null);
+	load(key: string): void;
+	create(parentKey: string | null): void;
 }

@@ -1,7 +1,7 @@
 import { UmbEntityWorkspaceManager } from '../../../shared/components/workspace/workspace-context/entity-manager-controller';
 import { UmbWorkspaceContext } from '../../../shared/components/workspace/workspace-context/workspace-context';
 import { UmbWorkspaceEntityContextInterface } from '../../../shared/components/workspace/workspace-context/workspace-entity-context.interface';
-import { UmbDocumentTypeDetailStore, UMB_DOCUMENT_TYPE_DETAIL_STORE_CONTEXT_TOKEN } from '../document-type.detail.store';
+import { UMB_DOCUMENT_TYPE_DETAIL_STORE_CONTEXT_TOKEN } from '../document-type.detail.store';
 import type { DocumentTypeDetails } from '@umbraco-cms/models';
 
 export class UmbWorkspaceDocumentTypeContext extends UmbWorkspaceContext implements UmbWorkspaceEntityContextInterface<DocumentTypeDetails | undefined> {
@@ -19,6 +19,7 @@ export class UmbWorkspaceDocumentTypeContext extends UmbWorkspaceContext impleme
 		this.#manager.state.update({icon: icon})
 	}
 	getEntityType = this.#manager.getEntityType;
+	getUnique = this.#manager.getEntityKey;
 	getEntityKey = this.#manager.getEntityKey;
 	getStore = this.#manager.getStore;
 	getData = this.#manager.getData;

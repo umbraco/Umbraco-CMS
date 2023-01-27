@@ -26,6 +26,7 @@ export class UmbWorkspaceDataTypeContext extends UmbWorkspaceContext implements 
 		this.#manager.state.update({propertyEditorUIAlias: alias});
 	}
 	getEntityType = this.#manager.getEntityType;
+	getUnique = this.#manager.getEntityKey;
 	getEntityKey = this.#manager.getEntityKey;
 	getStore = this.#manager.getStore;
 	getData = this.#manager.getData;

@@ -1,23 +1,15 @@
 import type { Observable } from "rxjs";
+import { UmbWorkspaceContextInterface } from "./workspace-context.interface";
 import { UmbEntityDetailStore } from "@umbraco-cms/store";
 
-export interface UmbWorkspaceEntityContextInterface<T = unknown> {
+export interface UmbWorkspaceEntityContextInterface<T = unknown> extends UmbWorkspaceContextInterface<T> {
 
-
-	readonly data: Observable<T>;
 	readonly name: Observable<string|undefined>;
 
-	//entityKey?: string;
-	//entityType: string;
-
-	getEntityKey(): string | undefined;
+	getEntityKey(): string | undefined;// COnsider if this should go away now that we have getUnique()
 	getEntityType(): string;
 
 	getData(): T;
-
-	load(entityKey: string): void;
-
-	create(parentKey: string | null): void;
 
 	getStore(): UmbEntityDetailStore<T> | undefined;
 
@@ -25,5 +17,4 @@ export interface UmbWorkspaceEntityContextInterface<T = unknown> {
 
 	save(): Promise<void>;
 
-	destroy(): void;
 }

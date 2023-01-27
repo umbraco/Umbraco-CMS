@@ -18,24 +18,15 @@ export class UmbDocumentWorkspaceElement extends UmbLitElement implements UmbWor
 		`,
 	];
 
-	private _entityKey!: string;
-	@property()
-	public get entityKey(): string {
-		return this._entityKey;
-	}
-	public set entityKey(value: string) {
-		this._entityKey = value;
-		if (this._entityKey) {
-			this._workspaceContext.load(this._entityKey);
-		}
+	private _workspaceContext: UmbDocumentWorkspaceContext = new UmbDocumentWorkspaceContext(this);
+
+	public load(entityKey: string) {
+		this._workspaceContext.load(entityKey);
 	}
 
-	@property()
-	public set create(parentKey: string | null) {
+	public create(parentKey: string | null) {
 		this._workspaceContext.create(parentKey);
 	}
-
-	private _workspaceContext: UmbDocumentWorkspaceContext = new UmbDocumentWorkspaceContext(this);
 
 	render() {
 		return html`<umb-workspace-content alias="Umb.Workspace.Document"></umb-workspace-content>`;
