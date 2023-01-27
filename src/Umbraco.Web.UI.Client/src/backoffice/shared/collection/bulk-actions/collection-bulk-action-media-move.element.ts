@@ -4,7 +4,6 @@ import { customElement } from 'lit/decorators.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
 import { UmbCollectionContext, UMB_COLLECTION_CONTEXT_TOKEN } from '../collection.context';
 import { UmbModalService, UMB_MODAL_SERVICE_CONTEXT_TOKEN } from '../../../../core/modal';
-import { UmbMediaTreeStore, UMB_MEDIA_TREE_STORE_CONTEXT_TOKEN } from '../../../media/media/media.tree.store';
 import { UmbLitElement } from '@umbraco-cms/element';
 import type { ManifestCollectionBulkAction } from '@umbraco-cms/models';
 
@@ -18,7 +17,6 @@ export class UmbCollectionBulkActionMoveElement extends UmbLitElement {
 	public manifest?: ManifestCollectionBulkAction;
 
 	#modalService?: UmbModalService;
-	#mediaTreeStore?: UmbMediaTreeStore;
 
 	constructor() {
 		super();
@@ -31,9 +29,6 @@ export class UmbCollectionBulkActionMoveElement extends UmbLitElement {
 			this.#modalService = instance;
 		});
 
-		this.consumeContext(UMB_MEDIA_TREE_STORE_CONTEXT_TOKEN, (instance) => {
-			this.#mediaTreeStore = instance;
-		});
 	}
 
 	#handleClick() {
@@ -44,7 +39,7 @@ export class UmbCollectionBulkActionMoveElement extends UmbLitElement {
 			});
 			modalHandler?.onClose().then((data) => {
 				if (selection.length > 0) {
-					this.#mediaTreeStore?.move(selection, data.selection[0]);
+					this.#collectionContext?.move(selection, data.selection[0]);
 				}
 				selectionSubscription?.unsubscribe();
 				this.#collectionContext?.clearSelection();

@@ -93,8 +93,13 @@ export class UmbCollectionContext<
 	}
 
 	// TODO: Not all can trash, so maybe we need to differentiate on collection contexts or fix it with another architecture.
-	public trash(keys:string[]) {
+	public trash(keys: string[]) {
 		this._store?.trash(keys);
+	}
+
+	// TODO: Not all can move, so maybe we need to differentiate on collection contexts or fix it with another architecture.
+	public move(keys: string[], destination: string) {
+		this._store?.move(keys, destination);
 	}
 
 	public clearSelection() {
