@@ -197,6 +197,8 @@ public class LogviewerTests
     [TestCase("@mt = '{EndMessage} ({Duration}ms) [Timing {TimingId}]'", 26)]
     [TestCase("SortedComponentTypes[?] = 'Umbraco.Web.Search.ExamineComponent'", 1)]
     [TestCase("Contains(SortedComponentTypes[?], 'DatabaseServer')", 1)]
+    [TestCase("@Message like '%definition%'", 6)]
+    [TestCase("definition", 6)]
     [Test]
     public void Logs_Can_Query_With_Expressions(string queryToVerify, int expectedCount)
     {
