@@ -4,7 +4,7 @@ import { customElement, state, query, property } from 'lit/decorators.js';
 import { UUIButtonState, UUIPaginationElement, UUIPaginationEvent } from '@umbraco-ui/uui';
 import { UmbModalService, UMB_MODAL_SERVICE_CONTEXT_TOKEN } from '../../../../core/modal';
 import { UmbLitElement } from '@umbraco-cms/element';
-import { RedirectManagementResource, RedirectStatus, RedirectUrl, RedirectUrlStatus } from '@umbraco-cms/backend-api';
+import { RedirectManagementResource, RedirectStatus, RedirectUrl } from '@umbraco-cms/backend-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/resources';
 
 @customElement('umb-dashboard-redirect-management')
