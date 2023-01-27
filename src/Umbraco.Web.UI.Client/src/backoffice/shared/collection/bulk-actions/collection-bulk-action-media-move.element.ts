@@ -2,14 +2,11 @@ import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, html } from 'lit';
 import { customElement } from 'lit/decorators.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
-import { map } from 'rxjs';
-import { repeat } from 'lit-html/directives/repeat.js';
 import { UmbCollectionContext, UMB_COLLECTION_CONTEXT_TOKEN } from '../collection.context';
 import { UmbModalService, UMB_MODAL_SERVICE_CONTEXT_TOKEN } from '../../../../core/modal';
 import { UmbMediaTreeStore, UMB_MEDIA_TREE_STORE_CONTEXT_TOKEN } from '../../../media/media/media.tree.store';
 import { UmbLitElement } from '@umbraco-cms/element';
-import type { ManifestCollectionBulkAction, MediaDetails } from '@umbraco-cms/models';
-import { UmbMediaDetailStore } from 'src/backoffice/media/media/media.detail.store';
+import type { ManifestCollectionBulkAction } from '@umbraco-cms/models';
 
 @customElement('umb-collection-bulk-action-media-move')
 export class UmbCollectionBulkActionMoveElement extends UmbLitElement {
@@ -39,12 +36,11 @@ export class UmbCollectionBulkActionMoveElement extends UmbLitElement {
 		});
 	}
 
-	#handleClick(event: Event) {
+	#handleClick() {
 		const selectionSubscription = this.#collectionContext?.selection.subscribe((selection) => {
-			const modalHandler = this.#modalService?.contentPicker({
+			const modalHandler = this.#modalService?.mediaPicker({
 				selection: [],
 				multiple: false,
-				alias: 'Umb.Tree.Media',
 			});
 			modalHandler?.onClose().then((data) => {
 				if (selection.length > 0) {

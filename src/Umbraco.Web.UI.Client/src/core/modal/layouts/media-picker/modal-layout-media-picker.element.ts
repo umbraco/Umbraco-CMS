@@ -3,16 +3,15 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, state } from 'lit/decorators.js';
 import { UmbModalLayoutElement } from '../modal-layout.element';
 
-export interface UmbModalContentPickerData {
+export interface UmbModalMediaPickerData {
 	multiple?: boolean;
 	selection: Array<string>;
 }
 
 import { UmbTreeElement } from '../../../../backoffice/shared/components/tree/tree.element';
 
-// TODO: make use of UmbPickerLayoutBase
-@customElement('umb-modal-layout-content-picker')
-export class UmbModalLayoutContentPickerElement extends UmbModalLayoutElement<UmbModalContentPickerData> {
+@customElement('umb-modal-layout-media-picker')
+export class UmbModalLayoutMediaPickerElement extends UmbModalLayoutElement<UmbModalMediaPickerData> {
 	static styles = [
 		UUITextStyles,
 		css`
@@ -82,7 +81,7 @@ export class UmbModalLayoutContentPickerElement extends UmbModalLayoutElement<Um
 					<uui-input></uui-input>
 					<hr />
 					<umb-tree
-						alias="Umb.Tree.Documents"
+						alias="Umb.Tree.Media"
 						@selected=${this._handleSelectionChange}
 						.selection=${this._selection}
 						selectable></umb-tree>
@@ -98,6 +97,6 @@ export class UmbModalLayoutContentPickerElement extends UmbModalLayoutElement<Um
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-modal-layout-content-picker': UmbModalLayoutContentPickerElement;
+		'umb-modal-layout-media-picker': UmbModalLayoutMediaPickerElement;
 	}
 }

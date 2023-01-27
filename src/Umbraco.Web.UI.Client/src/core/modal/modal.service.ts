@@ -13,6 +13,7 @@ import type { UmbModalConfirmData } from './layouts/confirm/modal-layout-confirm
 import type { UmbModalContentPickerData } from './layouts/content-picker/modal-layout-content-picker.element';
 import type { UmbModalPropertyEditorUIPickerData } from './layouts/property-editor-ui-picker/modal-layout-property-editor-ui-picker.element';
 import { UmbModalHandler } from './modal-handler';
+import { UmbModalMediaPickerData } from './layouts/media-picker/modal-layout-media-picker.element';
 import { UmbContextToken } from '@umbraco-cms/context-api';
 
 export type UmbModalType = 'dialog' | 'sidebar';
@@ -49,6 +50,17 @@ export class UmbModalService {
 	 */
 	public contentPicker(data?: UmbModalContentPickerData): UmbModalHandler {
 		return this.open('umb-modal-layout-content-picker', { data, type: 'sidebar', size: 'small' });
+	}
+
+	/**
+	 * Opens a Media Picker sidebar modal
+	 * @public
+	 * @param {UmbModalMediaPickerData} [data]
+	 * @return {*}  {UmbModalHandler}
+	 * @memberof UmbModalService
+	 */
+	public mediaPicker(data?: UmbModalMediaPickerData): UmbModalHandler {
+		return this.open('umb-modal-layout-media-picker', { data, type: 'sidebar', size: 'small' });
 	}
 
 	/**
