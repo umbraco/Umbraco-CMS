@@ -169,11 +169,14 @@ export class UmbDashboardRedirectManagementElement extends UmbLitElement {
 	}
 
 	private async _toggleRedirect() {
-		const { data } = await tryExecuteAndNotify(
+		const { error } = await tryExecuteAndNotify(
 			this,
 			RedirectManagementResource.postRedirectManagementStatus({ status: RedirectStatus.ENABLED })
 		);
-		this._trackerStatus = !this._trackerStatus;
+
+		if (!error) {
+			this._trackerStatus = !this._trackerStatus;
+		}
 	}
 
 	private _inputHandler(pressed: KeyboardEvent) {
