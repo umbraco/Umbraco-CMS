@@ -2,12 +2,11 @@
 /* tslint:disable */
 /* eslint-disable */
 import type { ContentResult } from '../models/ContentResult';
-import type { CreatedResult } from '../models/CreatedResult';
-import type { Dictionary } from '../models/Dictionary';
 import type { DictionaryImport } from '../models/DictionaryImport';
 import type { DictionaryItem } from '../models/DictionaryItem';
+import type { DictionaryItemCreateModel } from '../models/DictionaryItemCreateModel';
+import type { DictionaryItemUpdateModel } from '../models/DictionaryItemUpdateModel';
 import type { FolderTreeItem } from '../models/FolderTreeItem';
-import type { JsonPatch } from '../models/JsonPatch';
 import type { PagedDictionaryOverview } from '../models/PagedDictionaryOverview';
 import type { PagedEntityTreeItem } from '../models/PagedEntityTreeItem';
 
@@ -39,14 +38,14 @@ export class DictionaryResource {
     }
 
     /**
-     * @returns CreatedResult Created
+     * @returns any Created
      * @throws ApiError
      */
     public static postDictionary({
         requestBody,
     }: {
-        requestBody?: DictionaryItem,
-    }): CancelablePromise<CreatedResult> {
+        requestBody?: DictionaryItemCreateModel,
+    }): CancelablePromise<any> {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/umbraco/management/api/v1/dictionary',
@@ -54,44 +53,21 @@ export class DictionaryResource {
             mediaType: 'application/json',
             errors: {
                 400: `Bad Request`,
-            },
-        });
-    }
-
-    /**
-     * @returns ContentResult Success
-     * @throws ApiError
-     */
-    public static patchDictionaryById({
-        id,
-        requestBody,
-    }: {
-        id: string,
-        requestBody?: Array<JsonPatch>,
-    }): CancelablePromise<ContentResult> {
-        return __request(OpenAPI, {
-            method: 'PATCH',
-            url: '/umbraco/management/api/v1/dictionary/{id}',
-            path: {
-                'id': id,
-            },
-            body: requestBody,
-            mediaType: 'application/json',
-            errors: {
                 404: `Not Found`,
+                409: `Conflict`,
             },
         });
     }
 
     /**
-     * @returns Dictionary Success
+     * @returns DictionaryItem Success
      * @throws ApiError
      */
     public static getDictionaryByKey({
         key,
     }: {
         key: string,
-    }): CancelablePromise<Dictionary> {
+    }): CancelablePromise<DictionaryItem> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/dictionary/{key}',
@@ -120,6 +96,33 @@ export class DictionaryResource {
                 'key': key,
             },
             errors: {
+                400: `Bad Request`,
+                404: `Not Found`,
+            },
+        });
+    }
+
+    /**
+     * @returns any Success
+     * @throws ApiError
+     */
+    public static putDictionaryByKey({
+        key,
+        requestBody,
+    }: {
+        key: string,
+        requestBody?: DictionaryItemUpdateModel,
+    }): CancelablePromise<any> {
+        return __request(OpenAPI, {
+            method: 'PUT',
+            url: '/umbraco/management/api/v1/dictionary/{key}',
+            path: {
+                'key': key,
+            },
+            body: requestBody,
+            mediaType: 'application/json',
+            errors: {
+                400: `Bad Request`,
                 404: `Not Found`,
             },
         });

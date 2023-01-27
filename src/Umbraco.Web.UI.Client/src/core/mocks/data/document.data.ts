@@ -5,6 +5,45 @@ import type { DocumentDetails } from '@umbraco-cms/models';
 
 export const data: Array<DocumentDetails> = [
 	{
+		name: 'Multiple Text String',
+		type: 'document',
+		icon: 'favorite',
+		hasChildren: false,
+		key: '6f31e382-458c-4f96-95ea-cc26c51009d4',
+		isContainer: false,
+		parentKey: null,
+		noAccess: false,
+		isProtected: false,
+		isPublished: false,
+		isEdited: false,
+		isTrashed: false,
+		properties: [
+			{
+				alias: 'multipleTextString',
+				label: 'Multiple Text String',
+				description: '',
+				dataTypeKey: 'dt-multipleTextString',
+			},
+		],
+		data: [
+			{
+				alias: 'multipleTextString',
+				value: [
+					{
+						value: 'Value 1',
+					},
+					{
+						value: 'Value 2',
+					},
+					{
+						value: 'Value 3',
+					},
+				],
+			},
+		],
+		variants: [],
+	},
+	{
 		name: 'All Property Editors',
 		type: 'document',
 		icon: 'favorite',
