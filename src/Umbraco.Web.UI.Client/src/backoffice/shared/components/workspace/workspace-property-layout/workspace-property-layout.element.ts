@@ -17,11 +17,18 @@ export class UmbWorkspacePropertyLayoutElement extends LitElement {
 				display: grid;
 				grid-template-columns: 200px 600px;
 				gap: var(--uui-size-layout-2);
-			}
-			:host {
 				border-bottom: 1px solid var(--uui-color-divider);
 				padding: var(--uui-size-space-6) 0;
 			}
+
+			:host([orientation="vertical"]) {
+				display:block;
+			}
+
+			:host(:last-of-type) {
+				border-bottom:none;
+			}
+
 			p {
 				margin-bottom: 0;
 			}
@@ -41,6 +48,9 @@ export class UmbWorkspacePropertyLayoutElement extends LitElement {
 	 */
 	@property({ type: String })
 	public label = '';
+
+	@property({ type: String })
+	public orientation: 'horizontal' | 'vertical' = 'horizontal';
 
 	/**
 	 * Description: render a description underneath the label.

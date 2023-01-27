@@ -13,6 +13,19 @@ const tree: ManifestTree = {
 	},
 };
 
-const treeItemActions: Array<ManifestTreeItemAction> = [];
+const treeItemActions: Array<ManifestTreeItemAction> = [	
+	{
+		type: 'treeItemAction',
+		alias: 'Umb.TreeItemAction.MemberGroup.Delete',
+		name: 'Member Group Tree Item Action Delete',
+		loader: () => import('./actions/action-member-group-delete.element'),
+		weight: 100,
+		meta: {
+			entityType: 'member-group',
+			label: 'Delete',
+			icon: 'delete',
+		},
+	},
+];
 
 export const manifests = [tree, ...treeItemActions];
