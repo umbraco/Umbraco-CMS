@@ -1,7 +1,7 @@
+import type { MemberGroupDetails } from '@umbraco-cms/models';
+import { EntityTreeItem, PagedEntityTreeItem } from '@umbraco-cms/backend-api';
 import { UmbEntityData } from './entity.data';
 import { createEntityTreeItem } from './utils';
-import { EntityTreeItem, PagedEntityTreeItem } from '@umbraco-cms/backend-api';
-import type { MemberGroupDetails } from '@umbraco-cms/models';
 
 export const data: Array<MemberGroupDetails> = [
 	{

@@ -5,15 +5,15 @@ import { ArrayState } from '@umbraco-cms/observable-api';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 import { UmbStoreBase } from '@umbraco-cms/store';
 
-export const UMB_MEMBER_GROUP_STORE_CONTEXT_TOKEN = new UmbContextToken<UmbMemberGroupStore>('UmbMemberGroupStore');
+export const UMB_MEMBER_GROUP_DETAIL_STORE_CONTEXT_TOKEN = new UmbContextToken<UmbMemberGroupDetailStore>('UmbMemberGroupDetailStore');
 
 /**
  * @export
- * @class UmbMemberGroupStore
+ * @class UmbMemberGroupDetailStore
  * @extends {UmbStoreBase}
- * @description - Data Store for Member Groups
+ * @description - Detail Data Store for Member Groups
  */
-export class UmbMemberGroupStore extends UmbStoreBase {
+export class UmbMemberGroupDetailStore extends UmbStoreBase {
 
 
 	#groups = new ArrayState<MemberGroupDetails>([], x => x.key);
@@ -21,7 +21,7 @@ export class UmbMemberGroupStore extends UmbStoreBase {
 
 
 	constructor(host: UmbControllerHostInterface) {
-		super(host, UMB_MEMBER_GROUP_STORE_CONTEXT_TOKEN.toString());
+		super(host, UMB_MEMBER_GROUP_DETAIL_STORE_CONTEXT_TOKEN.toString());
 	}
 
 	getByKey(key: string): Observable<MemberGroupDetails | null> {
