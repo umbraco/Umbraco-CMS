@@ -31,6 +31,7 @@ export class UmbSectionDashboardsElement extends UmbLitElement {
 
 			#scroll-container {
 				flex:1;
+				position:relative;
 			}
 
 			#router-slot {
