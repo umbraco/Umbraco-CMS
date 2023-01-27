@@ -1,40 +1,51 @@
-import { UmbWorkspaceContentContext } from '../../../shared/components/workspace/workspace-content/workspace-content.context';
-import { UMB_DATA_TYPE_DETAIL_STORE_CONTEXT_TOKEN} from '../../../settings/data-types/data-type.detail.store';
-import type {	UmbDataTypeDetailStore} from '../../../settings/data-types/data-type.detail.store';
-import type { DataTypeDetails, DataTypePropertyData } from '@umbraco-cms/models';
-import { UmbControllerHostInterface } from '@umbraco-cms/controller';
+import { UmbWorkspaceContext } from '../../../shared/components/workspace/workspace-context/workspace-context';
+import { UmbWorkspaceEntityContextInterface } from '../../../shared/components/workspace/workspace-context/workspace-entity-context.interface';
+import { UmbEntityWorkspaceManager } from '../../../shared/components/workspace/workspace-context/entity-manager-controller';
+import { UMB_DATA_TYPE_DETAIL_STORE_CONTEXT_TOKEN } from '../data-type.detail.store';
+import type { DataTypeDetails } from '@umbraco-cms/models';
 import { appendToFrozenArray } from '@umbraco-cms/observable-api';
 
-const DefaultDataTypeData = {
-	key: '',
-	name: '',
-	icon: '',
-	type: 'data-type',
-	hasChildren: false,
-	parentKey: '',
-	propertyEditorModelAlias: '',
-	propertyEditorUIAlias: '',
-	data: [],
-} as DataTypeDetails;
+export class UmbWorkspaceDataTypeContext extends UmbWorkspaceContext implements UmbWorkspaceEntityContextInterface<DataTypeDetails | undefined> {
 
-export class UmbWorkspaceDataTypeContext extends UmbWorkspaceContentContext<
-	DataTypeDetails,
-	UmbDataTypeDetailStore
-> {
-	constructor(host: UmbControllerHostInterface) {
-		super(host, DefaultDataTypeData, UMB_DATA_TYPE_DETAIL_STORE_CONTEXT_TOKEN.toString(), 'dataType');
+	#manager = new UmbEntityWorkspaceManager(this._host, 'data-type', UMB_DATA_TYPE_DETAIL_STORE_CONTEXT_TOKEN);
+
+
+
+
+
+	public readonly data = this.#manager.state.asObservable();
+	public readonly name = this.#manager.state.getObservablePart((state) => state?.name);
+
+	setName(name: string) {
+		this.#manager.state.update({name: name});
 	}
+	setPropertyEditorModelAlias(alias?: string) {
+		this.#manager.state.update({propertyEditorModelAlias: alias});
+	}
+	setPropertyEditorUIAlias(alias?: string) {
+		this.#manager.state.update({propertyEditorUIAlias: alias});
+	}
+	getEntityType = this.#manager.getEntityType;
+	getUnique = this.#manager.getEntityKey;
+	getEntityKey = this.#manager.getEntityKey;
+	getStore = this.#manager.getStore;
+	getData = this.#manager.getData;
+	load = this.#manager.load;
+	create = this.#manager.create;
+	save = this.#manager.save;
+	destroy = this.#manager.destroy;
 
-	public setPropertyValue(alias: string, value: unknown) {
-		// TODO: make sure to check that we have a details model? otherwise fail? 8This can be relevant if we use the same context for tree actions?
-		const entry = { alias: alias, value: value };
 
-		const newDataSet = appendToFrozenArray(
-			(this._data.getValue() as DataTypeDetails).data,
-			entry,
-			(x: DataTypePropertyData) => x.alias
-		);
+	// This could eventually be moved out as well?
+	setPropertyValue(alias: string, value: unknown) {
 
-		this.update({ data: newDataSet });
+		const entry = {alias: alias, value: value};
+
+		const currentData = this.#manager.getData();
+		if (currentData) {
+			const newDataSet = appendToFrozenArray(currentData.data, entry, x => x.alias);
+
+			this.#manager.state.update({data: newDataSet});
+		}
 	}
 }

@@ -3,8 +3,7 @@ import type { TemplateResult } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { map } from 'rxjs';
 import { repeat } from 'lit/directives/repeat.js';
-import { umbExtensionsRegistry } from '@umbraco-cms/extensions-api';
-import { createExtensionElement, isManifestElementableType } from '@umbraco-cms/extensions-api';
+import { umbExtensionsRegistry , createExtensionElement, isManifestElementableType } from '@umbraco-cms/extensions-api';
 import { UmbLitElement } from '@umbraco-cms/element';
 
 export type InitializedExtension = { alias: string; weight: number; component: HTMLElement | null };

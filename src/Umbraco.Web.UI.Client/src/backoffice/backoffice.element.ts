@@ -34,7 +34,7 @@ import { UmbDataTypeDetailStore } from './settings/data-types/data-type.detail.s
 import { UmbDataTypeTreeStore } from './settings/data-types/tree/data-type.tree.store';
 import { UmbTemplateTreeStore } from './templating/templates/tree/template.tree.store';
 import { UmbTemplateDetailStore } from './templating/templates/template.detail.store';
-
+import { UmbThemeService, UMB_THEME_SERVICE_CONTEXT_TOKEN } from './themes/theme.service';
 import { UmbNotificationService, UMB_NOTIFICATION_SERVICE_CONTEXT_TOKEN } from '@umbraco-cms/notification';
 
 // Domains
@@ -100,6 +100,7 @@ export class UmbBackofficeElement extends UmbLitElement {
 
 		this.provideContext(UMB_BACKOFFICE_CONTEXT_TOKEN, new UmbBackofficeContext());
 		this.provideContext(UMB_CURRENT_USER_HISTORY_STORE_CONTEXT_TOKEN, new UmbCurrentUserHistoryStore());
+		this.provideContext(UMB_THEME_SERVICE_CONTEXT_TOKEN, new UmbThemeService());
 	}
 
 	render() {

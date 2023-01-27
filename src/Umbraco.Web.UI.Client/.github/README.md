@@ -39,3 +39,7 @@ See the Main branch in action here as an [Azure Static Web App](https://ashy-bay
 ### Storybook
 
 Storybook is also being built and deployed automatically on the Main branch, including a preview URL on each pull request. See it in action on this [Azure Static Web App](https://ambitious-stone-0033b3603.1.azurestaticapps.net/).
+
+## Contributing
+
+We accept contributions to this project. However be aware that we are mainly working on a private backlog, so not everyone will be immediately obvious. If you want to get started on contributing, please read the [contribute space](https://github.com/umbraco/Umbraco.CMS.Backoffice/contribute) where you will be able to find the guidelines on how to contribute as well as a list of good first issues.

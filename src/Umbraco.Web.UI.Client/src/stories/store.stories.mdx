@@ -84,7 +84,7 @@ class MyProductStore {
 		});
 
 		// Return a Observable part, to listen for this specific product and the future changes of it.
-		return createObservablePart(this.#data, (documents) =>
+		return this.#data.getObservablePart((documents) =>
 			documents.find((document) => document.key === key)
 		);
 	}
@@ -136,8 +136,8 @@ class MyProductStore {
 	#products = new ArrayState(<Array<MyProductType>>[]);
 
 	public readonly products = this.#products.asObservable();
-	public readonly amountOfProducts = createObservablePart(this.#products, (products) => products.length);
-	public readonly topTenRatedProducts = createObservablePart(this.#products, (products) => products.sort((a, b) => b.rating - a.rating).slice(0, 10));
+	public readonly amountOfProducts = this.#products.getObservablePart((products) => products.length);
+	public readonly topTenRatedProducts = this.#products.getObservablePart((products) => products.sort((a, b) => b.rating - a.rating).slice(0, 10));
 
 	...
 
