@@ -2,8 +2,7 @@ import { html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { IRoute, IRoutingInfo } from 'router-slot';
 import type { ManifestWorkspace } from '@umbraco-cms/models';
-import { createExtensionElement } from '@umbraco-cms/extensions-api';
-import { umbExtensionsRegistry } from '@umbraco-cms/extensions-api';
+import { createExtensionElement , umbExtensionsRegistry } from '@umbraco-cms/extensions-api';
 import { UmbLitElement } from '@umbraco-cms/element';
 
 @customElement('umb-created-packages-section-view')

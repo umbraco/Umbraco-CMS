@@ -1,6 +1,7 @@
 // TODO: lazy load
 import './layouts/confirm/modal-layout-confirm.element';
 import './layouts/content-picker/modal-layout-content-picker.element';
+import './layouts/media-picker/modal-layout-media-picker.element';
 import './layouts/property-editor-ui-picker/modal-layout-property-editor-ui-picker.element';
 import './layouts/modal-layout-current-user.element';
 import './layouts/icon-picker/modal-layout-icon-picker.element';
@@ -12,6 +13,7 @@ import type { UmbModalIconPickerData } from './layouts/icon-picker/modal-layout-
 import type { UmbModalConfirmData } from './layouts/confirm/modal-layout-confirm.element';
 import type { UmbModalContentPickerData } from './layouts/content-picker/modal-layout-content-picker.element';
 import type { UmbModalPropertyEditorUIPickerData } from './layouts/property-editor-ui-picker/modal-layout-property-editor-ui-picker.element';
+import type { UmbModalMediaPickerData } from './layouts/media-picker/modal-layout-media-picker.element';
 import { UmbModalHandler } from './modal-handler';
 import { UmbContextToken } from '@umbraco-cms/context-api';
 
@@ -49,6 +51,17 @@ export class UmbModalService {
 	 */
 	public contentPicker(data?: UmbModalContentPickerData): UmbModalHandler {
 		return this.open('umb-modal-layout-content-picker', { data, type: 'sidebar', size: 'small' });
+	}
+
+	/**
+	 * Opens a Media Picker sidebar modal
+	 * @public
+	 * @param {UmbModalMediaPickerData} [data]
+	 * @return {*}  {UmbModalHandler}
+	 * @memberof UmbModalService
+	 */
+	public mediaPicker(data?: UmbModalMediaPickerData): UmbModalHandler {
+		return this.open('umb-modal-layout-media-picker', { data, type: 'sidebar', size: 'small' });
 	}
 
 	/**

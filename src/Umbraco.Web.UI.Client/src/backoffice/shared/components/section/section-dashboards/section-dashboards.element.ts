@@ -6,6 +6,7 @@ import { first, map } from 'rxjs';
 import { UmbSectionContext, UMB_SECTION_CONTEXT_TOKEN } from '../section.context';
 import { createExtensionElement, umbExtensionsRegistry } from '@umbraco-cms/extensions-api';
 import type { ManifestDashboard, ManifestDashboardCollection, ManifestWithMeta } from '@umbraco-cms/models';
+
 import { UmbLitElement } from '@umbraco-cms/element';
 
 @customElement('umb-section-dashboards')
