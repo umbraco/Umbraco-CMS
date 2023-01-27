@@ -316,13 +316,15 @@ export class UmbDashboardRedirectManagementElement extends UmbLitElement {
 	}
 
 	private _renderPagination() {
-		if (this._total && Math.ceil(this._total / this.itemsPerPage) > 1) {
-			return html`<div class="pagination">
-				<uui-pagination
-					total="${Math.ceil(this._total / this.itemsPerPage)}"
-					@change="${this._onPageChange}"></uui-pagination>
-			</div>`;
-		} else return nothing;
+		if (!this._total) return nothing;
+
+		const totalPages = Math.ceil(this._total / this.itemsPerPage);
+
+		if (totalPages <= 1) return nothing;
+
+		return html`<div class="pagination">
+			<uui-pagination .total=${totalPages} @change="${this._onPageChange}"></uui-pagination>
+		</div>`;
 	}
 }
 
