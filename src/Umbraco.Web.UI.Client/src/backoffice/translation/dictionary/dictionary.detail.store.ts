@@ -1,6 +1,6 @@
 import type { DictionaryDetails } from '@umbraco-cms/models';
 import { UmbContextToken } from '@umbraco-cms/context-api';
-import { createObservablePart, ArrayState } from '@umbraco-cms/observable-api';
+import { ArrayState } from '@umbraco-cms/observable-api';
 import { UmbEntityDetailStore, UmbStoreBase } from '@umbraco-cms/store';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 import { EntityTreeItem } from '@umbraco-cms/backend-api';
@@ -47,7 +47,7 @@ export class UmbDictionaryDetailStore extends UmbStoreBase implements UmbEntityD
 				this.#data.append(data);
 			});
 
-		return createObservablePart(this.#data, (documents) =>
+		return this.#data.getObservablePart((documents) =>
 			documents.find((document) => document.key === key)
 		);
 	}
