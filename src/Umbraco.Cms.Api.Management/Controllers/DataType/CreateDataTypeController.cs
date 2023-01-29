@@ -1,10 +1,12 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Management.ViewModels.DataType;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Api.Management.Controllers.DataType;
 
@@ -24,21 +26,15 @@ public class CreateDataTypeController : DataTypeControllerBase
     [HttpPost]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(StatusCodes.Status201Created)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<ActionResult> Create(DataTypeCreateModel dataTypeCreateModel)
+    public async Task<IActionResult> Create(DataTypeCreateModel dataTypeCreateModel)
     {
-        IDataType? created = _umbracoMapper.Map<IDataType>(dataTypeCreateModel);
-        if (created == null)
-        {
-            return BadRequest("Could not map the POSTed model to a data type");
-        }
+        IDataType? created = _umbracoMapper.Map<IDataType>(dataTypeCreateModel)!;
+        Attempt<IDataType, DataTypeOperationStatus> result = await _dataTypeService.CreateAsync(created, CurrentUserId(_backOfficeSecurityAccessor));
 
-        ProblemDetails? validationIssues = Save(created, _dataTypeService, _backOfficeSecurityAccessor);
-        if (validationIssues != null)
-        {
-            return BadRequest(validationIssues);
-        }
-
-        return await Task.FromResult(CreatedAtAction<ByKeyDataTypeController>(controller => nameof(controller.ByKey), created.Key));
+        return result.Success
+            ? CreatedAtAction<ByKeyDataTypeController>(controller => nameof(controller.ByKey), created.Key)
+            : DataTypeOperationStatusResult(result.Status);
     }
 }

@@ -13,6 +13,7 @@ using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Serialization;
+using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Extensions;
 
@@ -30,10 +31,6 @@ namespace Umbraco.Cms.Core.Services.Implement
         private readonly IAuditRepository _auditRepository;
         private readonly IEntityRepository _entityRepository;
         private readonly IIOHelper _ioHelper;
-        private readonly ILocalizedTextService _localizedTextService;
-        private readonly ILocalizationService _localizationService;
-        private readonly IShortStringHelper _shortStringHelper;
-        private readonly IJsonSerializer _jsonSerializer;
         private readonly IEditorConfigurationParser _editorConfigurationParser;
 
         [Obsolete("Please use constructor that takes an ")]
@@ -76,10 +73,6 @@ namespace Umbraco.Cms.Core.Services.Implement
             _entityRepository = entityRepository;
             _contentTypeRepository = contentTypeRepository;
             _ioHelper = ioHelper;
-            _localizedTextService = localizedTextService;
-            _localizationService = localizationService;
-            _shortStringHelper = shortStringHelper;
-            _jsonSerializer = jsonSerializer;
         }
 
         public DataTypeService(
@@ -107,10 +100,6 @@ namespace Umbraco.Cms.Core.Services.Implement
             _entityRepository = entityRepository;
             _contentTypeRepository = contentTypeRepository;
             _ioHelper = ioHelper;
-            _localizedTextService = localizedTextService;
-            _localizationService = localizationService;
-            _shortStringHelper = shortStringHelper;
-            _jsonSerializer = jsonSerializer;
             _editorConfigurationParser = editorConfigurationParser;
         }
 
@@ -309,12 +298,17 @@ namespace Umbraco.Cms.Core.Services.Implement
         /// </summary>
         /// <param name="name">Name of the <see cref="IDataType"/></param>
         /// <returns><see cref="IDataType"/></returns>
+        [Obsolete("Please use GetAsync. Will be removed in V15.")]
         public IDataType? GetDataType(string name)
+            => GetAsync(name).GetAwaiter().GetResult();
+
+        /// <inheritdoc />
+        public async Task<IDataType?> GetAsync(string name)
         {
             using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
             IDataType? dataType = _dataTypeRepository.Get(Query<IDataType>().Where(x => x.Name == name))?.FirstOrDefault();
             ConvertMissingEditorOfDataTypeToLabel(dataType);
-            return dataType;
+            return await Task.FromResult(dataType);
         }
 
         /// <summary>
@@ -322,6 +316,7 @@ namespace Umbraco.Cms.Core.Services.Implement
         /// </summary>
         /// <param name="id">Id of the <see cref="IDataType"/></param>
         /// <returns><see cref="IDataType"/></returns>
+        [Obsolete("Please use GetAsync. Will be removed in V15.")]
         public IDataType? GetDataType(int id)
         {
             using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
@@ -335,13 +330,17 @@ namespace Umbraco.Cms.Core.Services.Implement
         /// </summary>
         /// <param name="id">Unique guid Id of the DataType</param>
         /// <returns><see cref="IDataType"/></returns>
+        [Obsolete("Please use GetAsync. Will be removed in V15.")]
         public IDataType? GetDataType(Guid id)
+            => GetAsync(id).GetAwaiter().GetResult();
+
+        /// <inheritdoc />
+        public async Task<IDataType?> GetAsync(Guid id)
         {
             using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
-            IQuery<IDataType> query = Query<IDataType>().Where(x => x.Key == id);
-            IDataType? dataType = _dataTypeRepository.Get(query).FirstOrDefault();
+            IDataType? dataType = GetDataTypeFromRepository(id);
             ConvertMissingEditorOfDataTypeToLabel(dataType);
-            return dataType;
+            return await Task.FromResult(dataType);
         }
 
         /// <summary>
@@ -349,13 +348,18 @@ namespace Umbraco.Cms.Core.Services.Implement
         /// </summary>
         /// <param name="propertyEditorAlias">Alias of the property editor</param>
         /// <returns>Collection of <see cref="IDataType"/> objects with a matching control id</returns>
+        [Obsolete("Please use GetByEditorAliasAsync. Will be removed in V15.")]
         public IEnumerable<IDataType> GetByEditorAlias(string propertyEditorAlias)
+            => GetByEditorAliasAsync(propertyEditorAlias).GetAwaiter().GetResult();
+
+        /// <inheritdoc />
+        public async Task<IEnumerable<IDataType>> GetByEditorAliasAsync(string propertyEditorAlias)
         {
             using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
             IQuery<IDataType> query = Query<IDataType>().Where(x => x.EditorAlias == propertyEditorAlias);
-            IEnumerable<IDataType> dataType = _dataTypeRepository.Get(query).ToArray();
-            ConvertMissingEditorsOfDataTypesToLabels(dataType);
-            return dataType;
+            IEnumerable<IDataType> dataTypes = _dataTypeRepository.Get(query).ToArray();
+            ConvertMissingEditorsOfDataTypesToLabels(dataTypes);
+            return await Task.FromResult(dataTypes);
         }
 
         /// <summary>
@@ -485,19 +489,7 @@ namespace Umbraco.Cms.Core.Services.Implement
         /// <param name="userId">Id of the user issuing the save</param>
         public void Save(IDataType dataType, int userId = Constants.Security.SuperUserId)
         {
-            EventMessages evtMsgs = EventMessagesFactory.Get();
-            dataType.CreatorId = userId;
-
-            using ICoreScope scope = ScopeProvider.CreateCoreScope();
-            var saveEventArgs = new SaveEventArgs<IDataType>(dataType);
-
-            var savingDataTypeNotification = new DataTypeSavingNotification(dataType, evtMsgs);
-            if (scope.Notifications.PublishCancelable(savingDataTypeNotification))
-            {
-                scope.Complete();
-                return;
-            }
-
+            // mimic old service behavior
             if (string.IsNullOrWhiteSpace(dataType.Name))
             {
                 throw new ArgumentException("Cannot save datatype with empty name.");
@@ -508,19 +500,44 @@ namespace Umbraco.Cms.Core.Services.Implement
                 throw new InvalidOperationException("Name cannot be more than 255 characters in length.");
             }
 
-            _dataTypeRepository.Save(dataType);
-
-            scope.Notifications.Publish(new DataTypeSavedNotification(dataType, evtMsgs).WithStateFrom(savingDataTypeNotification));
-
-            Audit(AuditType.Save, userId, dataType.Id);
-            scope.Complete();
+            Attempt<IDataType, DataTypeOperationStatus> result = SaveAsync(
+                dataType,
+                () => DataTypeOperationStatus.Success,
+                userId,
+                AuditType.Sort).GetAwaiter().GetResult();
         }
+
+        /// <inheritdoc />
+        public async Task<Attempt<IDataType, DataTypeOperationStatus>> CreateAsync(IDataType dataType, int userId = Constants.Security.SuperUserId)
+        {
+            if (dataType.Id != 0)
+            {
+                return Attempt.FailWithStatus(DataTypeOperationStatus.InvalidId, dataType);
+            }
+
+            return await SaveAsync(dataType, () => DataTypeOperationStatus.Success, userId, AuditType.New);
+        }
+
+        /// <inheritdoc />
+        public async Task<Attempt<IDataType, DataTypeOperationStatus>> UpdateAsync(IDataType dataType, int userId = Constants.Security.SuperUserId)
+            => await SaveAsync(
+                dataType,
+                () =>
+                {
+                    IDataType? current = _dataTypeRepository.Get(dataType.Id);
+                    return current == null
+                        ? DataTypeOperationStatus.NotFound
+                        : DataTypeOperationStatus.Success;
+                },
+                userId,
+                AuditType.New);
 
         /// <summary>
         /// Saves a collection of <see cref="IDataType"/>
         /// </summary>
         /// <param name="dataTypeDefinitions"><see cref="IDataType"/> to save</param>
         /// <param name="userId">Id of the user issuing the save</param>
+        [Obsolete("Please use CreateAsync or UpdateAsync. Will be removed in V15.")]
         public void Save(IEnumerable<IDataType> dataTypeDefinitions, int userId)
         {
             EventMessages evtMsgs = EventMessagesFactory.Get();
@@ -557,14 +574,25 @@ namespace Umbraco.Cms.Core.Services.Implement
         /// <param name="dataType"><see cref="IDataType"/> to delete</param>
         /// <param name="userId">Optional Id of the user issuing the deletion</param>
         public void Delete(IDataType dataType, int userId = Constants.Security.SuperUserId)
+            => DeleteAsync(dataType.Key, userId).GetAwaiter().GetResult();
+
+        /// <inheritdoc />
+        public async Task<Attempt<IDataType?, DataTypeOperationStatus>> DeleteAsync(Guid id, int userId = Constants.Security.SuperUserId)
         {
-            EventMessages evtMsgs = EventMessagesFactory.Get();
+            EventMessages eventMessages = EventMessagesFactory.Get();
             using ICoreScope scope = ScopeProvider.CreateCoreScope();
-            var deletingDataTypeNotification = new DataTypeDeletingNotification(dataType, evtMsgs);
-            if (scope.Notifications.PublishCancelable(deletingDataTypeNotification))
+
+            IDataType? dataType = GetDataTypeFromRepository(id);
+            if (dataType == null)
+            {
+                return Attempt.FailWithStatus(DataTypeOperationStatus.NotFound, dataType);
+            }
+
+            var deletingDataTypeNotification = new DataTypeDeletingNotification(dataType, eventMessages);
+            if (await scope.Notifications.PublishCancelableAsync(deletingDataTypeNotification))
             {
                 scope.Complete();
-                return;
+                return Attempt.FailWithStatus<IDataType?, DataTypeOperationStatus>(DataTypeOperationStatus.CancelledByNotification, dataType);
             }
 
             // find ContentTypes using this IDataTypeDefinition on a PropertyType, and delete
@@ -599,17 +627,35 @@ namespace Umbraco.Cms.Core.Services.Implement
 
             _dataTypeRepository.Delete(dataType);
 
-            scope.Notifications.Publish(new DataTypeDeletedNotification(dataType, evtMsgs).WithStateFrom(deletingDataTypeNotification));
+            scope.Notifications.Publish(new DataTypeDeletedNotification(dataType, eventMessages).WithStateFrom(deletingDataTypeNotification));
 
             Audit(AuditType.Delete, userId, dataType.Id);
 
             scope.Complete();
+
+            return Attempt.SucceedWithStatus<IDataType?, DataTypeOperationStatus>(DataTypeOperationStatus.Success, dataType);
         }
 
+        /// <inheritdoc />
+        [Obsolete("Please use GetReferencesAsync. Will be deleted in V15.")]
         public IReadOnlyDictionary<Udi, IEnumerable<string>> GetReferences(int id)
         {
             using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete:true);
             return _dataTypeRepository.FindUsages(id);
+        }
+
+        /// <inheritdoc />
+        public async Task<Attempt<IReadOnlyDictionary<Udi, IEnumerable<string>>, DataTypeOperationStatus>> GetReferencesAsync(Guid id)
+        {
+            using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete:true);
+            IDataType? dataType = GetDataTypeFromRepository(id);
+            if (dataType == null)
+            {
+                return Attempt.FailWithStatus<IReadOnlyDictionary<Udi, IEnumerable<string>>, DataTypeOperationStatus>(DataTypeOperationStatus.NotFound, new Dictionary<Udi, IEnumerable<string>>());
+            }
+
+            IReadOnlyDictionary<Udi, IEnumerable<string>> usages = _dataTypeRepository.FindUsages(dataType.Id);
+            return await Task.FromResult(Attempt.SucceedWithStatus(DataTypeOperationStatus.Success, usages));
         }
 
         /// <inheritdoc />
@@ -624,10 +670,68 @@ namespace Umbraco.Cms.Core.Services.Implement
                 : configurationEditor.Validate(dataType.ConfigurationData);
         }
 
-        private void Audit(AuditType type, int userId, int objectId)
+        private async Task<Attempt<IDataType, DataTypeOperationStatus>> SaveAsync(
+            IDataType dataType,
+            Func<DataTypeOperationStatus> operationValidation,
+            int userId,
+            AuditType auditType)
         {
-            _auditRepository.Save(new AuditItem(objectId, type, userId, ObjectTypes.GetName(UmbracoObjectTypes.DataType)));
+            IEnumerable<ValidationResult> validationResults = ValidateConfigurationData(dataType);
+            if (validationResults.Any())
+            {
+                LoggerFactory
+                    .CreateLogger<DataTypeService>()
+                    .LogError($"Invalid data type configuration for data type: {dataType.Name} - validation error messages: {string.Join(Environment.NewLine, validationResults.Select(r => r.ErrorMessage))}");
+                return Attempt.FailWithStatus(DataTypeOperationStatus.InvalidConfiguration, dataType);
+            }
+
+            EventMessages eventMessages = EventMessagesFactory.Get();
+            dataType.CreatorId = userId;
+
+            using ICoreScope scope = ScopeProvider.CreateCoreScope();
+
+            DataTypeOperationStatus status = operationValidation();
+            if (status != DataTypeOperationStatus.Success)
+            {
+                return Attempt.FailWithStatus(status, dataType);
+            }
+
+            var savingDataTypeNotification = new DataTypeSavingNotification(dataType, eventMessages);
+            if (await scope.Notifications.PublishCancelableAsync(savingDataTypeNotification))
+            {
+                scope.Complete();
+                return Attempt.FailWithStatus(DataTypeOperationStatus.CancelledByNotification, dataType);
+            }
+
+            if (string.IsNullOrWhiteSpace(dataType.Name))
+            {
+                return Attempt.FailWithStatus(DataTypeOperationStatus.InvalidName, dataType);
+            }
+
+            if (dataType.Name is { Length: > 255 })
+            {
+                return Attempt.FailWithStatus(DataTypeOperationStatus.InvalidName, dataType);
+            }
+
+            _dataTypeRepository.Save(dataType);
+
+            scope.Notifications.Publish(new DataTypeSavedNotification(dataType, eventMessages).WithStateFrom(savingDataTypeNotification));
+
+            Audit(auditType, userId, dataType.Id);
+            scope.Complete();
+
+            return Attempt.SucceedWithStatus(DataTypeOperationStatus.Success, dataType);
         }
 
+
+        private IDataType? GetDataTypeFromRepository(Guid id)
+        {
+            IQuery<IDataType> query = Query<IDataType>().Where(x => x.Key == id);
+            IDataType? dataType = _dataTypeRepository.Get(query).FirstOrDefault();
+            return dataType;
+        }
+
+        private void Audit(AuditType type, int userId, int objectId)
+            => _auditRepository.Save(new AuditItem(objectId, type, userId, ObjectTypes.GetName(UmbracoObjectTypes.DataType)));
     }
 }

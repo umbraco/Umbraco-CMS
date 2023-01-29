@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Core.Services;
 
@@ -14,7 +15,15 @@ public interface IDataTypeService : IService
     /// </summary>
     /// <param name="id"></param>
     /// <returns></returns>
+    [Obsolete("Please use GetReferencesAsync. Will be deleted in V15.")]
     IReadOnlyDictionary<Udi, IEnumerable<string>> GetReferences(int id);
+
+    /// <summary>
+    ///     Returns a dictionary of content type <see cref="Udi" />s and the property type aliases that use a <see cref="IDataType" />
+    /// </summary>
+    /// <param name="id">The guid Id of the <see cref="IDataType" /></param>
+    /// <returns></returns>
+    Task<Attempt<IReadOnlyDictionary<Udi, IEnumerable<string>>, DataTypeOperationStatus>> GetReferencesAsync(Guid id);
 
     Attempt<OperationResult<OperationResultType, EntityContainer>?> CreateContainer(int parentId, Guid key, string name, int userId = Constants.Security.SuperUserId);
 
@@ -41,6 +50,7 @@ public interface IDataTypeService : IService
     /// <returns>
     ///     <see cref="IDataType" />
     /// </returns>
+    [Obsolete("Please use GetAsync. Will be removed in V15.")]
     IDataType? GetDataType(string name);
 
     /// <summary>
@@ -50,6 +60,7 @@ public interface IDataTypeService : IService
     /// <returns>
     ///     <see cref="IDataType" />
     /// </returns>
+    [Obsolete("Please use GetAsync. Will be removed in V15.")]
     IDataType? GetDataType(int id);
 
     /// <summary>
@@ -59,7 +70,26 @@ public interface IDataTypeService : IService
     /// <returns>
     ///     <see cref="IDataType" />
     /// </returns>
+    [Obsolete("Please use GetAsync. Will be removed in V15.")]
     IDataType? GetDataType(Guid id);
+
+    /// <summary>
+    ///     Gets an <see cref="IDataType" /> by its Name
+    /// </summary>
+    /// <param name="name">Name of the <see cref="IDataType" /></param>
+    /// <returns>
+    ///     <see cref="IDataType" />
+    /// </returns>
+    Task<IDataType?> GetAsync(string name);
+
+    /// <summary>
+    ///     Gets an <see cref="IDataType" /> by its unique guid Id
+    /// </summary>
+    /// <param name="id">Unique guid Id of the DataType</param>
+    /// <returns>
+    ///     <see cref="IDataType" />
+    /// </returns>
+    Task<IDataType?> GetAsync(Guid id);
 
     /// <summary>
     ///     Gets all <see cref="IDataType" /> objects or those with the ids passed in
@@ -73,6 +103,7 @@ public interface IDataTypeService : IService
     /// </summary>
     /// <param name="dataType"><see cref="IDataType" /> to save</param>
     /// <param name="userId">Id of the user issuing the save</param>
+    [Obsolete("Please use CreateAsync or UpdateAsync. Will be removed in V15.")]
     void Save(IDataType dataType, int userId = Constants.Security.SuperUserId);
 
     /// <summary>
@@ -80,7 +111,22 @@ public interface IDataTypeService : IService
     /// </summary>
     /// <param name="dataTypeDefinitions"><see cref="IDataType" /> to save</param>
     /// <param name="userId">Id of the user issuing the save</param>
+    [Obsolete("Please use CreateAsync or UpdateAsync. Will be removed in V15.")]
     void Save(IEnumerable<IDataType> dataTypeDefinitions, int userId = Constants.Security.SuperUserId);
+
+    /// <summary>
+    ///     Creates a new <see cref="IDataType" />
+    /// </summary>
+    /// <param name="dataType"><see cref="IDataType" /> to create</param>
+    /// <param name="userId">Id of the user issuing the creation</param>
+    Task<Attempt<IDataType, DataTypeOperationStatus>> CreateAsync(IDataType dataType, int userId = Constants.Security.SuperUserId);
+
+    /// <summary>
+    ///     Updates an existing <see cref="IDataType" />
+    /// </summary>
+    /// <param name="dataType"><see cref="IDataType" /> to update</param>
+    /// <param name="userId">Id of the user issuing the update</param>
+    Task<Attempt<IDataType, DataTypeOperationStatus>> UpdateAsync(IDataType dataType, int userId = Constants.Security.SuperUserId);
 
     /// <summary>
     ///     Deletes an <see cref="IDataType" />
@@ -91,14 +137,34 @@ public interface IDataTypeService : IService
     /// </remarks>
     /// <param name="dataType"><see cref="IDataType" /> to delete</param>
     /// <param name="userId">Id of the user issuing the deletion</param>
+    [Obsolete("Please use DeleteAsync. Will be removed in V15.")]
     void Delete(IDataType dataType, int userId = Constants.Security.SuperUserId);
+
+    /// <summary>
+    ///     Deletes an <see cref="IDataType" />
+    /// </summary>
+    /// <remarks>
+    ///     Please note that deleting a <see cref="IDataType" /> will remove
+    ///     all the <see cref="IPropertyType" /> data that references this <see cref="IDataType" />.
+    /// </remarks>
+    /// <param name="id">The guid Id of the <see cref="IDataType" /> to delete</param>
+    /// <param name="userId">Id of the user issuing the deletion</param>
+    Task<Attempt<IDataType?, DataTypeOperationStatus>> DeleteAsync(Guid id, int userId = Constants.Security.SuperUserId);
 
     /// <summary>
     ///     Gets a <see cref="IDataType" /> by its control Id
     /// </summary>
     /// <param name="propertyEditorAlias">Alias of the property editor</param>
     /// <returns>Collection of <see cref="IDataType" /> objects with a matching control id</returns>
+    [Obsolete("Please use GetByEditorAliasAsync. Will be removed in V15.")]
     IEnumerable<IDataType> GetByEditorAlias(string propertyEditorAlias);
+
+    /// <summary>
+    ///     Gets all <see cref="IDataType" /> for a given property editor
+    /// </summary>
+    /// <param name="propertyEditorAlias">Alias of the property editor</param>
+    /// <returns>Collection of <see cref="IDataType" /> configured for the property editor</returns>
+    Task<IEnumerable<IDataType>> GetByEditorAliasAsync(string propertyEditorAlias);
 
     Attempt<OperationResult<MoveOperationStatusType>?> Move(IDataType toMove, int parentId);
 
