@@ -27,7 +27,7 @@ public class DictionaryFactory : IDictionaryFactory
             .Select(language => language.IsoCode)
             .ToArray();
         IDictionaryTranslation[] validTranslations = dictionaryItem.Translations
-            .Where(t => validLanguageIsoCodes.Contains(t.IsoCode))
+            .Where(t => validLanguageIsoCodes.Contains(t.LanguageIsoCode))
             .ToArray();
         dictionaryViewModel.Translations = validTranslations
             .Select(translation => _umbracoMapper.Map<DictionaryItemTranslationModel>(translation))

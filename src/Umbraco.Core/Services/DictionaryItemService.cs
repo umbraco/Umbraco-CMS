@@ -246,7 +246,7 @@ internal sealed class DictionaryItemService : RepositoryService, IDictionaryItem
         }
 
         var allLanguageIsoCodes = allLanguages.Select(language => language.IsoCode).ToArray();
-        dictionaryItem.Translations = translationsAsArray.Where(translation => allLanguageIsoCodes.Contains(translation.IsoCode)).ToArray();
+        dictionaryItem.Translations = translationsAsArray.Where(translation => allLanguageIsoCodes.Contains(translation.LanguageIsoCode)).ToArray();
     }
 
     private bool HasItemKeyCollision(IDictionaryItem dictionaryItem)

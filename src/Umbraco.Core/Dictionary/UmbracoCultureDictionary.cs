@@ -138,5 +138,5 @@ internal class DefaultCultureDictionary : ICultureDictionary
         return result;
     }
 
-    private bool IsCurrentLanguage(IDictionaryTranslation translation) => translation.IsoCode.Equals(Language?.IsoCode);
+    private bool IsCurrentLanguage(IDictionaryTranslation translation) => translation.LanguageIsoCode.Equals(Language?.IsoCode);
 }

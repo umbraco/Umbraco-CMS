@@ -12,7 +12,7 @@ public static class DictionaryItemExtensions
     /// <returns></returns>
     public static string? GetTranslatedValue(this IDictionaryItem d, string isoCode)
     {
-        IDictionaryTranslation? trans = d.Translations.FirstOrDefault(x => x.IsoCode == isoCode);
+        IDictionaryTranslation? trans = d.Translations.FirstOrDefault(x => x.LanguageIsoCode == isoCode);
         return trans == null ? string.Empty : trans.Value;
     }
 
@@ -33,7 +33,7 @@ public static class DictionaryItemExtensions
     /// <param name="value"></param>
     public static void AddOrUpdateDictionaryValue(this IDictionaryItem item, ILanguage language, string value)
     {
-        IDictionaryTranslation? existing = item.Translations?.FirstOrDefault(x => x.IsoCode.Equals(language.IsoCode));
+        IDictionaryTranslation? existing = item.Translations?.FirstOrDefault(x => x.LanguageIsoCode.Equals(language.IsoCode));
         if (existing != null)
         {
             existing.Value = value;

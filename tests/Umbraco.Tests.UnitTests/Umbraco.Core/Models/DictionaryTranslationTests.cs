@@ -32,7 +32,7 @@ public class DictionaryTranslationTests
         Assert.AreEqual(clone.Id, item.Id);
         Assert.AreEqual(clone.Key, item.Key);
         Assert.AreEqual(clone.UpdateDate, item.UpdateDate);
-        Assert.AreEqual(clone.IsoCode, item.IsoCode);
+        Assert.AreEqual(clone.LanguageIsoCode, item.LanguageIsoCode);
         Assert.AreEqual(clone.Value, item.Value);
 
         // This double verifies by reflection

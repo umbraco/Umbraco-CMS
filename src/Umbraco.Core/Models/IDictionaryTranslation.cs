@@ -5,7 +5,7 @@ namespace Umbraco.Cms.Core.Models;
 
 public interface IDictionaryTranslation : IEntity, IRememberBeingDirty
 {
-    string IsoCode { get; }
+    string LanguageIsoCode { get; }
 
     /// <summary>
     ///     Gets or sets the translated text

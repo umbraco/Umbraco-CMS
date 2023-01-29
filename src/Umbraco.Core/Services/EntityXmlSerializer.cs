@@ -578,7 +578,7 @@ internal class EntityXmlSerializer : IEntityXmlSerializer
         {
             xml.Add(new XElement(
                 "Value",
-                new XAttribute("LanguageCultureAlias", translation.IsoCode),
+                new XAttribute("LanguageCultureAlias", translation.LanguageIsoCode),
                 new XCData(translation.Value)));
         }
 

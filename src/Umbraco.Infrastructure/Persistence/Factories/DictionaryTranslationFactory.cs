@@ -29,9 +29,9 @@ internal static class DictionaryTranslationFactory
 
     public static LanguageTextDto BuildDto(IDictionaryTranslation entity, Guid uniqueId, IDictionary<string, ILanguage> languagesByIsoCode)
     {
-        if (languagesByIsoCode.TryGetValue(entity.IsoCode, out ILanguage? language) == false)
+        if (languagesByIsoCode.TryGetValue(entity.LanguageIsoCode, out ILanguage? language) == false)
         {
-            throw new ArgumentException($"Could not find language with ISO code: {entity.IsoCode}", nameof(entity));
+            throw new ArgumentException($"Could not find language with ISO code: {entity.LanguageIsoCode}", nameof(entity));
         }
 
         var text = new LanguageTextDto { LanguageId = language.Id, UniqueId = uniqueId, Value = entity.Value };

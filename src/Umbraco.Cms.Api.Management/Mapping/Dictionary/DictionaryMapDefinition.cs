@@ -26,7 +26,7 @@ public class DictionaryMapDefinition : IMapDefinition
     // Umbraco.Code.MapAll
     private void Map(IDictionaryTranslation source, DictionaryItemTranslationModel target, MapperContext context)
     {
-        target.IsoCode = source.IsoCode;
+        target.IsoCode = source.LanguageIsoCode;
         target.Translation = source.Value;
     }
 
@@ -53,7 +53,7 @@ public class DictionaryMapDefinition : IMapDefinition
         target.TranslatedIsoCodes = source
             .Translations
             .Where(translation => translation.Value.IsNullOrWhiteSpace() == false)
-            .Select(translation => translation.IsoCode)
+            .Select(translation => translation.LanguageIsoCode)
             .ToArray();
     }
 }

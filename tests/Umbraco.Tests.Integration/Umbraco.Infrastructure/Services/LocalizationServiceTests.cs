@@ -274,7 +274,7 @@ public class LocalizationServiceTests : UmbracoIntegrationTest
         foreach (var language in allLangs)
         {
             Assert.AreEqual("Hellooooo",
-                item.Translations.Single(x => x.IsoCode == language.IsoCode).Value);
+                item.Translations.Single(x => x.LanguageIsoCode == language.IsoCode).Value);
         }
     }
 

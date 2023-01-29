@@ -15,7 +15,7 @@ public class DictionaryTranslation : EntityBase, IDictionaryTranslation
 
     public DictionaryTranslation(ILanguage language, string value)
     {
-        IsoCode = language.IsoCode;
+        LanguageIsoCode = language.IsoCode;
         _value = value;
     }
 
@@ -23,7 +23,7 @@ public class DictionaryTranslation : EntityBase, IDictionaryTranslation
         : this(language, value) =>
         Key = uniqueId;
 
-    public string IsoCode { get; private set; }
+    public string LanguageIsoCode { get; private set; }
 
     /// <summary>
     ///     Gets or sets the translated text
