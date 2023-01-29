@@ -18,7 +18,8 @@
             "in": "query",
             "schema": {
               "type": "integer",
-              "format": "int32"
+              "format": "int32",
+              "default": 0
             }
           },
           {
@@ -26,7 +27,8 @@
             "in": "query",
             "schema": {
               "type": "integer",
-              "format": "int32"
+              "format": "int32",
+              "default": 100
             }
           }
         ],
@@ -522,7 +524,8 @@
             "in": "query",
             "schema": {
               "type": "integer",
-              "format": "int32"
+              "format": "int32",
+              "default": 0
             }
           },
           {
@@ -530,7 +533,8 @@
             "in": "query",
             "schema": {
               "type": "integer",
-              "format": "int32"
+              "format": "int32",
+              "default": 100
             }
           }
         ],
@@ -836,7 +840,7 @@
         ],
         "operationId": "PostDictionaryUpload",
         "requestBody": {
-          "content": { }
+          "content": {}
         },
         "responses": {
           "200": {
@@ -1901,36 +1905,6 @@
       }
     },
     "/umbraco/management/api/v1/language": {
-      "post": {
-        "tags": [
-          "Language"
-        ],
-        "operationId": "PostLanguage",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/Language"
-              }
-            }
-          }
-        },
-        "responses": {
-          "400": {
-            "description": "Bad Request",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          },
-          "201": {
-            "description": "Created"
-          }
-        }
-      },
       "get": {
         "tags": [
           "Language"
@@ -1942,7 +1916,8 @@
             "in": "query",
             "schema": {
               "type": "integer",
-              "format": "int32"
+              "format": "int32",
+              "default": 0
             }
           },
           {
@@ -1950,7 +1925,8 @@
             "in": "query",
             "schema": {
               "type": "integer",
-              "format": "int32"
+              "format": "int32",
+              "default": 100
             }
           }
         ],
@@ -1966,22 +1942,61 @@
             }
           }
         }
+      },
+      "post": {
+        "tags": [
+          "Language"
+        ],
+        "operationId": "PostLanguage",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LanguageCreateModel"
+              }
+            }
+          }
+        },
+        "responses": {
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "201": {
+            "description": "Created"
+          }
+        }
       }
     },
-    "/umbraco/management/api/v1/language/{id}": {
+    "/umbraco/management/api/v1/language/{isoCode}": {
       "get": {
         "tags": [
           "Language"
         ],
-        "operationId": "GetLanguageById",
+        "operationId": "GetLanguageByIsoCode",
         "parameters": [
           {
-            "name": "id",
+            "name": "isoCode",
             "in": "path",
             "required": true,
             "schema": {
-              "type": "integer",
-              "format": "int32"
+              "type": "string"
             }
           }
         ],
@@ -1991,7 +2006,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/NotFoundResult"
+                  "$ref": "#/components/schemas/ProblemDetails"
                 }
               }
             }
@@ -2012,15 +2027,14 @@
         "tags": [
           "Language"
         ],
-        "operationId": "DeleteLanguageById",
+        "operationId": "DeleteLanguageByIsoCode",
         "parameters": [
           {
-            "name": "id",
+            "name": "isoCode",
             "in": "path",
             "required": true,
             "schema": {
-              "type": "integer",
-              "format": "int32"
+              "type": "string"
             }
           }
         ],
@@ -2054,15 +2068,14 @@
         "tags": [
           "Language"
         ],
-        "operationId": "PutLanguageById",
+        "operationId": "PutLanguageByIsoCode",
         "parameters": [
           {
-            "name": "id",
+            "name": "isoCode",
             "in": "path",
             "required": true,
             "schema": {
-              "type": "integer",
-              "format": "int32"
+              "type": "string"
             }
           }
         ],
@@ -2070,7 +2083,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/Language"
+                "$ref": "#/components/schemas/LanguageUpdateModel"
               }
             }
           }
@@ -2086,6 +2099,415 @@
               }
             }
           },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/umbraco/management/api/v1/log-viewer/level": {
+      "get": {
+        "tags": [
+          "Log Viewer"
+        ],
+        "operationId": "GetLogViewerLevel",
+        "parameters": [
+          {
+            "name": "skip",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 0
+            }
+          },
+          {
+            "name": "take",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 100
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedLogger"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/umbraco/management/api/v1/log-viewer/level-count": {
+      "get": {
+        "tags": [
+          "Log Viewer"
+        ],
+        "operationId": "GetLogViewerLevelCount",
+        "parameters": [
+          {
+            "name": "startDate",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "endDate",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/umbraco/management/api/v1/log-viewer/log": {
+      "get": {
+        "tags": [
+          "Log Viewer"
+        ],
+        "operationId": "GetLogViewerLog",
+        "parameters": [
+          {
+            "name": "skip",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 0
+            }
+          },
+          {
+            "name": "take",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 100
+            }
+          },
+          {
+            "name": "orderDirection",
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/Direction"
+            }
+          },
+          {
+            "name": "filterExpression",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "logLevel",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/components/schemas/LogLevel"
+              }
+            }
+          },
+          {
+            "name": "startDate",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "endDate",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedLogMessage"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/umbraco/management/api/v1/log-viewer/message-template": {
+      "get": {
+        "tags": [
+          "Log Viewer"
+        ],
+        "operationId": "GetLogViewerMessageTemplate",
+        "parameters": [
+          {
+            "name": "skip",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 0
+            }
+          },
+          {
+            "name": "take",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 100
+            }
+          },
+          {
+            "name": "startDate",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "endDate",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedLogTemplate"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/umbraco/management/api/v1/log-viewer/saved-search": {
+      "get": {
+        "tags": [
+          "Log Viewer"
+        ],
+        "operationId": "GetLogViewerSavedSearch",
+        "parameters": [
+          {
+            "name": "skip",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 0
+            }
+          },
+          {
+            "name": "take",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 100
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedSavedLogSearch"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Log Viewer"
+        ],
+        "operationId": "PostLogViewerSavedSearch",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SavedLogSearch"
+              }
+            }
+          }
+        },
+        "responses": {
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "201": {
+            "description": "Created"
+          }
+        }
+      }
+    },
+    "/umbraco/management/api/v1/log-viewer/saved-search/{name}": {
+      "get": {
+        "tags": [
+          "Log Viewer"
+        ],
+        "operationId": "GetLogViewerSavedSearchByName",
+        "parameters": [
+          {
+            "name": "name",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotFoundResult"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SavedLogSearch"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Log Viewer"
+        ],
+        "operationId": "DeleteLogViewerSavedSearchByName",
+        "parameters": [
+          {
+            "name": "name",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotFoundResult"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/umbraco/management/api/v1/log-viewer/validate-logs-size": {
+      "get": {
+        "tags": [
+          "Log Viewer"
+        ],
+        "operationId": "GetLogViewerValidateLogsSize",
+        "parameters": [
+          {
+            "name": "startDate",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "endDate",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          }
+        ],
+        "responses": {
           "400": {
             "description": "Bad Request",
             "content": {
@@ -5224,28 +5646,22 @@
             "type": "integer",
             "format": "int32"
           },
-          "translations": {
+          "translatedIsoCodes": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/DictionaryTranslationOverview"
-            },
-            "readOnly": true
+              "type": "string"
+            }
           }
         },
         "additionalProperties": false
       },
-      "DictionaryTranslationOverview": {
-        "type": "object",
-        "properties": {
-          "displayName": {
-            "type": "string",
-            "nullable": true
-          },
-          "hasTranslation": {
-            "type": "boolean"
-          }
-        },
-        "additionalProperties": false
+      "Direction": {
+        "enum": [
+          "Ascending",
+          "Descending"
+        ],
+        "type": "integer",
+        "format": "int32"
       },
       "DocumentBlueprintTreeItem": {
         "type": "object",
@@ -5933,7 +6349,7 @@
           },
           "providerProperties": {
             "type": "object",
-            "additionalProperties": { },
+            "additionalProperties": {},
             "nullable": true
           }
         },
@@ -5978,22 +6394,10 @@
         "additionalProperties": false
       },
       "Language": {
-        "required": [
-          "isoCode"
-        ],
         "type": "object",
         "properties": {
-          "id": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "isoCode": {
-            "minLength": 1,
-            "type": "string"
-          },
           "name": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "isDefault": {
             "type": "boolean"
@@ -6001,9 +6405,52 @@
           "isMandatory": {
             "type": "boolean"
           },
-          "fallbackLanguageId": {
-            "type": "integer",
-            "format": "int32",
+          "fallbackIsoCode": {
+            "type": "string",
+            "nullable": true
+          },
+          "isoCode": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "LanguageCreateModel": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "isDefault": {
+            "type": "boolean"
+          },
+          "isMandatory": {
+            "type": "boolean"
+          },
+          "fallbackIsoCode": {
+            "type": "string",
+            "nullable": true
+          },
+          "isoCode": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "LanguageUpdateModel": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "isDefault": {
+            "type": "boolean"
+          },
+          "isMandatory": {
+            "type": "boolean"
+          },
+          "fallbackIsoCode": {
+            "type": "string",
             "nullable": true
           }
         },
@@ -6017,6 +6464,88 @@
         ],
         "type": "integer",
         "format": "int32"
+      },
+      "LogLevel": {
+        "enum": [
+          "Verbose",
+          "Debug",
+          "Information",
+          "Warning",
+          "Error",
+          "Fatal"
+        ],
+        "type": "integer",
+        "format": "int32"
+      },
+      "LogMessage": {
+        "type": "object",
+        "properties": {
+          "timestamp": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "level": {
+            "$ref": "#/components/schemas/LogLevel"
+          },
+          "messageTemplate": {
+            "type": "string",
+            "nullable": true
+          },
+          "renderedMessage": {
+            "type": "string",
+            "nullable": true
+          },
+          "properties": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/LogMessageProperty"
+            }
+          },
+          "exception": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "LogMessageProperty": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "value": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "LogTemplate": {
+        "type": "object",
+        "properties": {
+          "messageTemplate": {
+            "type": "string",
+            "nullable": true
+          },
+          "count": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "additionalProperties": false
+      },
+      "Logger": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "level": {
+            "$ref": "#/components/schemas/LogLevel"
+          }
+        },
+        "additionalProperties": false
       },
       "MemberInfo": {
         "type": "object",
@@ -6802,6 +7331,66 @@
         },
         "additionalProperties": false
       },
+      "PagedLogMessage": {
+        "required": [
+          "items",
+          "total"
+        ],
+        "type": "object",
+        "properties": {
+          "total": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/LogMessage"
+            }
+          }
+        },
+        "additionalProperties": false
+      },
+      "PagedLogTemplate": {
+        "required": [
+          "items",
+          "total"
+        ],
+        "type": "object",
+        "properties": {
+          "total": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/LogTemplate"
+            }
+          }
+        },
+        "additionalProperties": false
+      },
+      "PagedLogger": {
+        "required": [
+          "items",
+          "total"
+        ],
+        "type": "object",
+        "properties": {
+          "total": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Logger"
+            }
+          }
+        },
+        "additionalProperties": false
+      },
       "PagedRecycleBinItem": {
         "required": [
           "items",
@@ -6877,6 +7466,26 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/RelationItem"
+            }
+          }
+        },
+        "additionalProperties": false
+      },
+      "PagedSavedLogSearch": {
+        "required": [
+          "items",
+          "total"
+        ],
+        "type": "object",
+        "properties": {
+          "total": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SavedLogSearch"
             }
           }
         },
@@ -7053,7 +7662,7 @@
             "nullable": true
           }
         },
-        "additionalProperties": { }
+        "additionalProperties": {}
       },
       "ProfilingStatus": {
         "type": "object",
@@ -7323,6 +7932,18 @@
         "properties": {
           "value": {
             "$ref": "#/components/schemas/IntPtr"
+          }
+        },
+        "additionalProperties": false
+      },
+      "SavedLogSearch": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "query": {
+            "type": "string"
           }
         },
         "additionalProperties": false
@@ -8399,7 +9020,7 @@
           "authorizationCode": {
             "authorizationUrl": "/umbraco/management/api/v1.0/security/back-office/authorize",
             "tokenUrl": "/umbraco/management/api/v1.0/security/back-office/token",
-            "scopes": { }
+            "scopes": {}
           }
         }
       }
@@ -8407,7 +9028,7 @@
   },
   "security": [
     {
-      "OAuth": [ ]
+      "OAuth": []
     }
   ]
 }

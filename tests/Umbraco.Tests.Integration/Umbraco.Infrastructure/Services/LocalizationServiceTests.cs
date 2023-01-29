@@ -5,7 +5,6 @@ using System.Diagnostics;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Builders.Extensions;
@@ -134,27 +133,26 @@ public class LocalizationServiceTests : UmbracoIntegrationTest
             for (var i = 0; i < 25; i++)
             {
                 // Create 2 per level
-                var result = LocalizationService.Create(
-                    "D1" + i,
-                    currParentId,
-                    new List<IDictionaryTranslation>
+                var desc1 = new DictionaryItem(currParentId, "D1" + i)
+                {
+                    Translations = new List<IDictionaryTranslation>
                     {
                         new DictionaryTranslation(en, "ChildValue1 " + i),
                         new DictionaryTranslation(dk, "BørnVærdi1 " + i)
-                    });
-
-                Assert.IsTrue(result.Success);
-
-                LocalizationService.Create(
-                    "D2" + i,
-                    currParentId,
-                    new List<IDictionaryTranslation>
+                    }
+                };
+                var desc2 = new DictionaryItem(currParentId, "D2" + i)
+                {
+                    Translations = new List<IDictionaryTranslation>
                     {
                         new DictionaryTranslation(en, "ChildValue2 " + i),
                         new DictionaryTranslation(dk, "BørnVærdi2 " + i)
-                    });
+                    }
+                };
+                LocalizationService.Save(desc1);
+                LocalizationService.Save(desc2);
 
-                currParentId = result.Result!.Key;
+                currParentId = desc1.Key;
             }
 
             ScopeAccessor.AmbientScope.Database.AsUmbracoDatabase().EnableSqlTrace = true;
@@ -241,12 +239,14 @@ public class LocalizationServiceTests : UmbracoIntegrationTest
     {
         var english = LocalizationService.GetLanguageByIsoCode("en-US");
 
-        var result = LocalizationService.Create("Testing123", null, new List<IDictionaryTranslation> { new DictionaryTranslation(english, "Hello world") });
-        Assert.True(result.Success);
+        var item = (IDictionaryItem)new DictionaryItem("Testing123")
+        {
+            Translations = new List<IDictionaryTranslation> { new DictionaryTranslation(english, "Hello world") }
+        };
+        LocalizationService.Save(item);
 
         // re-get
-        var item = LocalizationService.GetDictionaryItemById(result.Result!.Id);
-        Assert.NotNull(item);
+        item = LocalizationService.GetDictionaryItemById(item.Id);
 
         Assert.Greater(item.Id, 0);
         Assert.IsTrue(item.HasIdentity);
@@ -256,57 +256,26 @@ public class LocalizationServiceTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public void Can_Create_DictionaryItem_At_Root_With_All_Languages()
+    public void Can_Create_DictionaryItem_At_Root_With_Identity()
     {
-        var allLangs = LocalizationService.GetAllLanguages().ToArray();
-        Assert.Greater(allLangs.Length, 0);
-
-        var translations = allLangs.Select(language => new DictionaryTranslation(language, $"Translation for: {language.IsoCode}")).ToArray();
-        var result = LocalizationService.Create("Testing12345", null, translations);
-
-        Assert.IsTrue(result.Success);
-        Assert.AreEqual(DictionaryItemOperationStatus.Success, result.Status);
-        Assert.NotNull(result.Result);
+        var item = LocalizationService.CreateDictionaryItemWithIdentity(
+            "Testing12345", null, "Hellooooo");
 
         // re-get
-        var item = LocalizationService.GetDictionaryItemById(result.Result!.Id);
+        item = LocalizationService.GetDictionaryItemById(item.Id);
 
         Assert.IsNotNull(item);
         Assert.Greater(item.Id, 0);
         Assert.IsTrue(item.HasIdentity);
         Assert.IsFalse(item.ParentId.HasValue);
         Assert.AreEqual("Testing12345", item.ItemKey);
+        var allLangs = LocalizationService.GetAllLanguages();
+        Assert.Greater(allLangs.Count(), 0);
         foreach (var language in allLangs)
         {
-            Assert.AreEqual($"Translation for: {language.IsoCode}",
+            Assert.AreEqual("Hellooooo",
                 item.Translations.Single(x => x.Language.CultureName == language.CultureName).Value);
         }
-    }
-
-    [Test]
-    public void Can_Create_DictionaryItem_At_Root_With_Some_Languages()
-    {
-        var allLangs = LocalizationService.GetAllLanguages().ToArray();
-        Assert.Greater(allLangs.Length, 1);
-
-        var firstLanguage = allLangs.First();
-        var translations = new[] { new DictionaryTranslation(firstLanguage, $"Translation for: {firstLanguage.IsoCode}") };
-        var result = LocalizationService.Create("Testing12345", null, translations);
-
-        Assert.IsTrue(result.Success);
-        Assert.AreEqual(DictionaryItemOperationStatus.Success, result.Status);
-        Assert.NotNull(result.Result);
-
-        // re-get
-        var item = LocalizationService.GetDictionaryItemById(result.Result!.Id);
-
-        Assert.IsNotNull(item);
-        Assert.Greater(item.Id, 0);
-        Assert.IsTrue(item.HasIdentity);
-        Assert.IsFalse(item.ParentId.HasValue);
-        Assert.AreEqual("Testing12345", item.ItemKey);
-        Assert.AreEqual(1, item.Translations.Count());
-        Assert.AreEqual(firstLanguage.Id, item.Translations.First().LanguageId);
     }
 
     [Test]
@@ -314,17 +283,15 @@ public class LocalizationServiceTests : UmbracoIntegrationTest
     {
         var english = LocalizationService.GetLanguageByIsoCode("en-US");
 
-        var result = LocalizationService.Create("Testing123", null);
-        Assert.True(result.Success);
+        var item = (IDictionaryItem)new DictionaryItem("Testing123");
+        LocalizationService.Save(item);
 
         // re-get
-        var item = LocalizationService.GetDictionaryItemById(result.Result!.Id);
-        Assert.NotNull(item);
+        item = LocalizationService.GetDictionaryItemById(item.Id);
 
         item.Translations = new List<IDictionaryTranslation> { new DictionaryTranslation(english, "Hello world") };
 
-        result = LocalizationService.Update(item);
-        Assert.True(result.Success);
+        LocalizationService.Save(item);
 
         Assert.AreEqual(1, item.Translations.Count());
         foreach (var translation in item.Translations)
@@ -339,12 +306,10 @@ public class LocalizationServiceTests : UmbracoIntegrationTest
                 "My new value")
         };
 
-        result = LocalizationService.Update(item);
-        Assert.True(result.Success);
+        LocalizationService.Save(item);
 
         // re-get
         item = LocalizationService.GetDictionaryItemById(item.Id);
-        Assert.NotNull(item);
 
         Assert.AreEqual(2, item.Translations.Count());
         Assert.AreEqual("Hello world", item.Translations.First().Value);
@@ -357,9 +322,7 @@ public class LocalizationServiceTests : UmbracoIntegrationTest
         var item = LocalizationService.GetDictionaryItemByKey("Child");
         Assert.NotNull(item);
 
-        var result = LocalizationService.Delete(item.Key);
-        Assert.IsTrue(result.Success);
-        Assert.AreEqual(DictionaryItemOperationStatus.Success, result.Status);
+        LocalizationService.Delete(item);
 
         var deletedItem = LocalizationService.GetDictionaryItemByKey("Child");
         Assert.Null(deletedItem);
@@ -374,8 +337,7 @@ public class LocalizationServiceTests : UmbracoIntegrationTest
             translation.Value += "UPDATED";
         }
 
-        var result = LocalizationService.Update(item);
-        Assert.True(result.Success);
+        LocalizationService.Save(item);
 
         var updatedItem = LocalizationService.GetDictionaryItemByKey("Child");
         Assert.NotNull(updatedItem);
@@ -472,78 +434,6 @@ public class LocalizationServiceTests : UmbracoIntegrationTest
         Assert.Null(result);
     }
 
-    [Test]
-    public void Cannot_Add_Duplicate_DictionaryItem_Key()
-    {
-        var item = LocalizationService.GetDictionaryItemByKey("Child");
-        Assert.IsNotNull(item);
-
-        item.ItemKey = "Parent";
-
-        var result = LocalizationService.Update(item);
-        Assert.IsFalse(result.Success);
-        Assert.AreEqual(DictionaryItemOperationStatus.DuplicateItemKey, result.Status);
-
-        var item2 = LocalizationService.GetDictionaryItemByKey("Child");
-        Assert.IsNotNull(item2);
-        Assert.AreEqual(item.Key, item2.Key);
-    }
-
-    [Test]
-    public void Cannot_Create_Child_DictionaryItem_Under_Missing_Parent()
-    {
-        var itemKey = Guid.NewGuid().ToString("N");
-
-        var result = LocalizationService.Create(itemKey, Guid.NewGuid(), Array.Empty<IDictionaryTranslation>());
-        Assert.IsFalse(result.Success);
-        Assert.AreEqual(DictionaryItemOperationStatus.ParentNotFound, result.Status);
-
-        var item = LocalizationService.GetDictionaryItemByKey(itemKey);
-        Assert.IsNull(item);
-    }
-
-    [Test]
-    public void Cannot_Create_Multiple_DictionaryItems_With_Same_ItemKey()
-    {
-        var itemKey = Guid.NewGuid().ToString("N");
-        var result = LocalizationService.Create(itemKey, null, Array.Empty<IDictionaryTranslation>());
-
-        Assert.IsTrue(result.Success);
-
-        result = LocalizationService.Create(itemKey, null, Array.Empty<IDictionaryTranslation>());
-        Assert.IsFalse(result.Success);
-        Assert.AreEqual(DictionaryItemOperationStatus.DuplicateItemKey, result.Status);
-    }
-
-    [Test]
-    public void Cannot_Update_Non_Existant_DictionaryItem()
-    {
-        var result = LocalizationService.Update(new DictionaryItem("NoSuchItemKey"));
-        Assert.False(result.Success);
-        Assert.AreEqual(DictionaryItemOperationStatus.ItemNotFound, result.Status);
-    }
-
-    [Test]
-    public void Cannot_Update_DictionaryItem_With_Empty_Id()
-    {
-        var item = LocalizationService.GetDictionaryItemByKey("Child");
-        Assert.IsNotNull(item);
-
-        item = new DictionaryItem(item.ParentId, item.ItemKey) { Key = item.Key, Translations = item.Translations };
-
-        var result = LocalizationService.Update(item);
-        Assert.False(result.Success);
-        Assert.AreEqual(DictionaryItemOperationStatus.ItemNotFound, result.Status);
-    }
-
-    [Test]
-    public void Cannot_Delete_Non_Existant_DictionaryItem()
-    {
-        var result = LocalizationService.Delete(Guid.NewGuid());
-        Assert.IsFalse(result.Success);
-        Assert.AreEqual(DictionaryItemOperationStatus.ItemNotFound, result.Status);
-    }
-
     public void CreateTestData()
     {
         var languageDaDk = new LanguageBuilder()
@@ -558,31 +448,27 @@ public class LocalizationServiceTests : UmbracoIntegrationTest
         _danishLangId = languageDaDk.Id;
         _englishLangId = languageEnGb.Id;
 
-        var result = LocalizationService.Create(
-            "Parent",
-            null,
-            new List<IDictionaryTranslation>
+        var parentItem = new DictionaryItem("Parent")
+        {
+            Translations = new List<IDictionaryTranslation>
             {
                 new DictionaryTranslation(languageEnGb, "ParentValue"),
                 new DictionaryTranslation(languageDaDk, "ForældreVærdi")
-            });
-        Assert.True(result.Success);
-        IDictionaryItem parentItem = result.Result!;
-
+            }
+        };
+        LocalizationService.Save(parentItem);
         _parentItemGuidId = parentItem.Key;
         _parentItemIntId = parentItem.Id;
 
-        result = LocalizationService.Create(
-            "Child",
-            parentItem.Key,
-            new List<IDictionaryTranslation>
+        var childItem = new DictionaryItem(parentItem.Key, "Child")
+        {
+            Translations = new List<IDictionaryTranslation>
             {
                 new DictionaryTranslation(languageEnGb, "ChildValue"),
                 new DictionaryTranslation(languageDaDk, "BørnVærdi")
-            });
-        Assert.True(result.Success);
-        IDictionaryItem childItem = result.Result!;
-
+            }
+        };
+        LocalizationService.Save(childItem);
         _childItemGuidId = childItem.Key;
         _childItemIntId = childItem.Id;
     }

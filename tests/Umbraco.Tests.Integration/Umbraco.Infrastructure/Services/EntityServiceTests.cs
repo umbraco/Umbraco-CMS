@@ -25,23 +25,23 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services;
 public class EntityServiceTests : UmbracoIntegrationTest
 {
     [SetUp]
-    public void SetupTestData()
+    public async Task SetupTestData()
     {
         if (_langFr == null && _langEs == null)
         {
             _langFr = new Language("fr-FR", "French (France)");
             _langEs = new Language("es-ES", "Spanish (Spain)");
-            LocalizationService.Save(_langFr);
-            LocalizationService.Save(_langEs);
+            await LanguageService.CreateAsync(_langFr);
+            await LanguageService.CreateAsync(_langEs);
         }
 
         CreateTestData();
     }
 
-    private Language _langFr;
-    private Language _langEs;
+    private Language? _langFr;
+    private Language? _langEs;
 
-    private ILocalizationService LocalizationService => GetRequiredService<ILocalizationService>();
+    private ILanguageService LanguageService => GetRequiredService<ILanguageService>();
 
     private IContentTypeService ContentTypeService => GetRequiredService<IContentTypeService>();
 

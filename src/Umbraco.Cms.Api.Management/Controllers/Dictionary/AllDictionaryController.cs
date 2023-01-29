@@ -10,28 +10,22 @@ namespace Umbraco.Cms.Api.Management.Controllers.Dictionary;
 
 public class AllDictionaryController : DictionaryControllerBase
 {
-    private readonly ILocalizationService _localizationService;
+    private readonly IDictionaryItemService _dictionaryItemService;
     private readonly IUmbracoMapper _umbracoMapper;
 
-    public AllDictionaryController(ILocalizationService localizationService, IUmbracoMapper umbracoMapper)
+    public AllDictionaryController(IDictionaryItemService dictionaryItemService, IUmbracoMapper umbracoMapper)
     {
-        _localizationService = localizationService;
+        _dictionaryItemService = dictionaryItemService;
         _umbracoMapper = umbracoMapper;
     }
 
-
-    /// <summary>
-    ///     Retrieves a list with all dictionary items
-    /// </summary>
-    /// <returns>
-    ///     The <see cref="IEnumerable{T}" />.
-    /// </returns>
     [HttpGet]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedViewModel<DictionaryOverviewViewModel>), StatusCodes.Status200OK)]
-    public async Task<ActionResult<PagedViewModel<DictionaryOverviewViewModel>>> All(int skip, int take)
+    // FIXME: make this action slim (move logic somewhere else)
+    public async Task<ActionResult<PagedViewModel<DictionaryOverviewViewModel>>> All(int skip = 0, int take = 100)
     {
-        IDictionaryItem[] items = _localizationService.GetDictionaryItemDescendants(null).ToArray();
+        IDictionaryItem[] items = (await _dictionaryItemService.GetDescendantsAsync(null)).ToArray();
         var list = new List<DictionaryOverviewViewModel>(items.Length);
 
         // Build the proper tree structure, as we can have nested dictionary items

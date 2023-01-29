@@ -6,11 +6,11 @@ namespace Umbraco.Cms.Api.Management.Factories;
 
 public interface IDictionaryFactory
 {
-    IDictionaryItem MapUpdateModelToDictionaryItem(IDictionaryItem current, DictionaryItemUpdateModel dictionaryItemUpdateModel);
+    Task<IDictionaryItem> MapUpdateModelToDictionaryItemAsync(IDictionaryItem current, DictionaryItemUpdateModel dictionaryItemUpdateModel);
 
-    IEnumerable<IDictionaryTranslation> MapTranslations(IEnumerable<DictionaryItemTranslationModel> translationModels);
+    Task<IDictionaryItem> MapCreateModelToDictionaryItemAsync(DictionaryItemCreateModel dictionaryItemUpdateModel);
 
-    DictionaryItemViewModel CreateDictionaryItemViewModel(IDictionaryItem dictionaryItem);
+    Task<DictionaryItemViewModel> CreateDictionaryItemViewModelAsync(IDictionaryItem dictionaryItem);
 
     DictionaryImportViewModel CreateDictionaryImportViewModel(FormFileUploadResult formFileUploadResult);
 }

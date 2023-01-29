@@ -16,29 +16,42 @@ namespace Umbraco.Cms.Api.Management.Controllers.Dictionary.Tree;
 // tree controller base. We'll keep it though, in the hope that we can mend EntityService.
 public class DictionaryTreeControllerBase : EntityTreeControllerBase<EntityTreeItemViewModel>
 {
-    public DictionaryTreeControllerBase(IEntityService entityService, ILocalizationService localizationService)
+    public DictionaryTreeControllerBase(IEntityService entityService, IDictionaryItemService dictionaryItemService)
         : base(entityService) =>
-        LocalizationService = localizationService;
+        DictionaryItemService = dictionaryItemService;
 
     // dictionary items do not currently have a known UmbracoObjectType, so we'll settle with Unknown for now
     protected override UmbracoObjectTypes ItemObjectType => UmbracoObjectTypes.Unknown;
 
-    protected ILocalizationService LocalizationService { get; }
+    protected IDictionaryItemService DictionaryItemService { get; }
 
-    protected EntityTreeItemViewModel[] MapTreeItemViewModels(Guid? parentKey, IDictionaryItem[] dictionaryItems)
-        => dictionaryItems.Select(dictionaryItem => new EntityTreeItemViewModel
+    protected async Task<EntityTreeItemViewModel[]> MapTreeItemViewModels(Guid? parentKey, IDictionaryItem[] dictionaryItems)
+    {
+        async Task<EntityTreeItemViewModel> CreateEntityTreeItemViewModelAsync(IDictionaryItem dictionaryItem)
         {
-            Icon = Constants.Icons.RelationType,
-            Name = dictionaryItem.ItemKey,
-            Key = dictionaryItem.Key,
-            Type = Constants.UdiEntityType.DictionaryItem,
-            // FIXME - do not hardcode HasChildren to false for all dictionary items
-            HasChildren = false,
-            IsContainer = LocalizationService.GetDictionaryItemChildren(dictionaryItem.Key).Any(),
-            ParentKey = parentKey
-        }).ToArray();
+            var hasChildren = (await DictionaryItemService.GetChildrenAsync(dictionaryItem.Key)).Any();
+            return new EntityTreeItemViewModel
+            {
+                Icon = Constants.Icons.RelationType,
+                Name = dictionaryItem.ItemKey,
+                Key = dictionaryItem.Key,
+                Type = Constants.UdiEntityType.DictionaryItem,
+                HasChildren = hasChildren,
+                IsContainer = false,
+                ParentKey = parentKey
+            };
+        }
 
-    // localization service does not (yet) allow pagination of dictionary items, we have to do it in memory for now
+        var items = new List<EntityTreeItemViewModel>(dictionaryItems.Length);
+        foreach (IDictionaryItem dictionaryItem in dictionaryItems)
+        {
+            items.Add(await CreateEntityTreeItemViewModelAsync(dictionaryItem));
+        }
+
+        return items.ToArray();
+    }
+
+    // language service does not (yet) allow pagination of dictionary items, we have to do it in memory for now
     protected IDictionaryItem[] PaginatedDictionaryItems(long pageNumber, int pageSize, IEnumerable<IDictionaryItem> allDictionaryItems, out long totalItems)
     {
         IDictionaryItem[] allDictionaryItemsAsArray = allDictionaryItems.ToArray();

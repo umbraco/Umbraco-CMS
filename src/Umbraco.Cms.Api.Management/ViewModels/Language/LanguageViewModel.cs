@@ -1,19 +1,6 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿namespace Umbraco.Cms.Api.Management.ViewModels.Language;
 
-namespace Umbraco.Cms.Api.Management.ViewModels.Language;
-
-public class LanguageViewModel
+public class LanguageViewModel : LanguageModelBase
 {
-    public int Id { get; set; }
-
-    [Required(AllowEmptyStrings = false)]
-    public string IsoCode { get; set; } = null!;
-
-    public string? Name { get; set; }
-
-    public bool IsDefault { get; set; }
-
-    public bool IsMandatory { get; set; }
-
-    public int? FallbackLanguageId { get; set; }
+    public string IsoCode { get; set; } = string.Empty;
 }

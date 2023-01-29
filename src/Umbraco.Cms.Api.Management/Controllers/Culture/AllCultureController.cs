@@ -20,14 +20,19 @@ public class AllCultureController : CultureControllerBase
     [HttpGet]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedViewModel<CultureViewModel>), StatusCodes.Status200OK)]
-    public async Task<PagedViewModel<CultureViewModel>> GetAll(int skip, int take)
+    public async Task<PagedViewModel<CultureViewModel>> GetAll(int skip = 0, int take = 100)
     {
-        IEnumerable<CultureInfo> list = CultureInfo.GetCultures(CultureTypes.AllCultures)
+        CultureInfo[] all = CultureInfo.GetCultures(CultureTypes.AllCultures)
             .DistinctBy(x => x.Name)
             .OrderBy(x => x.EnglishName)
-            .Skip(skip)
-            .Take(take);
+            .ToArray();
 
-        return await Task.FromResult(_umbracoMapper.Map<PagedViewModel<CultureViewModel>>(list)!);
+        var viewModel = new PagedViewModel<CultureViewModel>
+        {
+            Items = _umbracoMapper.MapEnumerable<CultureInfo, CultureViewModel>(all.Skip(skip).Take(take)),
+            Total = all.Length
+        };
+
+        return await Task.FromResult(viewModel);
     }
 }

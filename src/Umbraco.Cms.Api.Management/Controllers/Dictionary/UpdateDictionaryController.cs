@@ -12,16 +12,16 @@ namespace Umbraco.Cms.Api.Management.Controllers.Dictionary;
 
 public class UpdateDictionaryController : DictionaryControllerBase
 {
-    private readonly ILocalizationService _localizationService;
+    private readonly IDictionaryItemService _dictionaryItemService;
     private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
     private readonly IDictionaryFactory _dictionaryFactory;
 
     public UpdateDictionaryController(
-        ILocalizationService localizationService,
+        IDictionaryItemService dictionaryItemService,
         IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
         IDictionaryFactory dictionaryFactory)
     {
-        _localizationService = localizationService;
+        _dictionaryItemService = dictionaryItemService;
         _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
         _dictionaryFactory = dictionaryFactory;
     }
@@ -33,21 +33,19 @@ public class UpdateDictionaryController : DictionaryControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Update(Guid key, DictionaryItemUpdateModel dictionaryItemUpdateModel)
     {
-        IDictionaryItem? current = _localizationService.GetDictionaryItemById(key);
+        IDictionaryItem? current = await _dictionaryItemService.GetAsync(key);
         if (current == null)
         {
             return NotFound();
         }
 
-        IDictionaryItem updated = _dictionaryFactory.MapUpdateModelToDictionaryItem(current, dictionaryItemUpdateModel);
+        IDictionaryItem updated = await _dictionaryFactory.MapUpdateModelToDictionaryItemAsync(current, dictionaryItemUpdateModel);
 
-        Attempt<IDictionaryItem, DictionaryItemOperationStatus> result = _localizationService.Update(updated, CurrentUserId(_backOfficeSecurityAccessor));
+        Attempt<IDictionaryItem, DictionaryItemOperationStatus> result =
+            await _dictionaryItemService.UpdateAsync(updated, CurrentUserId(_backOfficeSecurityAccessor));
 
-        if (result.Success)
-        {
-            return await Task.FromResult(Ok());
-        }
-
-        return DictionaryItemOperationStatusResult(result.Status);
+        return result.Success
+            ? Ok()
+            : DictionaryItemOperationStatusResult(result.Status);
     }
 }
