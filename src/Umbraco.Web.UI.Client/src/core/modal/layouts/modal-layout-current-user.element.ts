@@ -21,6 +21,7 @@ export class UmbModalLayoutCurrentUserElement extends UmbLitElement {
 		css`
 			:host {
 				display: block;
+				color: var(--uui-color-text);
 			}
 			:host,
 			umb-workspace-layout {
