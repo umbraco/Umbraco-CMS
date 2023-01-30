@@ -4,7 +4,7 @@ import { customElement, property, state } from 'lit/decorators.js';
 import { IRoutingInfo, RouterSlot } from 'router-slot';
 import { map } from 'rxjs';
 
-import { createExtensionElement , umbExtensionsRegistry } from '@umbraco-cms/extensions-api';
+import { createExtensionElement, umbExtensionsRegistry } from '@umbraco-cms/extensions-api';
 import type {
 	ManifestWorkspaceAction,
 	ManifestWorkspaceView,
@@ -54,7 +54,7 @@ export class UmbWorkspaceLayout extends UmbLitElement {
 
 			umb-extension-slot[slot='actions'] {
 				display: flex;
-				gap: 6px;
+				gap: var(--uui-size-space-2);
 			}
 		`,
 	];

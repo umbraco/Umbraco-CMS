@@ -14,9 +14,9 @@ export class UmbDashboardRedirectManagementElement extends UmbLitElement {
 		css`
 			.actions {
 				display: flex;
-				gap: 4px;
+				gap: var(--uui-size-space-1);
 				justify-content: space-between;
-				margin-bottom: 12px;
+				margin-bottom: var(--uui-size-space-4);
 			}
 
 			.actions uui-icon {

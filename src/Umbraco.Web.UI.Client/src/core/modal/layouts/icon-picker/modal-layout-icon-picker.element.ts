@@ -46,7 +46,7 @@ export class UmbModalLayoutIconPickerElement extends UmbModalLayoutElement<UmbMo
 				width: 100%;
 			}
 			#searchbar_icon {
-				padding-left: 6px;
+				padding-left: var(--uui-size-space-2);
 			}
 
 			#icon-selection {
@@ -63,7 +63,7 @@ export class UmbModalLayoutIconPickerElement extends UmbModalLayoutElement<UmbMo
 				border-radius: var(--uui-border-radius);
 				width: 100%;
 				height: 100%;
-				padding: 8px;
+				padding: var(--uui-size-space-3);
 				box-sizing: border-box;
 			}
 

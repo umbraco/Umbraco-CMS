@@ -30,7 +30,7 @@ export class UmbDashboardHealthCheckActionElement extends UmbLitElement {
 			}
 
 			.action {
-				padding: 20px 25px;
+				padding: var(--uui-size-space-5) var(--uui-size-space-6);
 				width: 100%;
 			}
 
