@@ -14,7 +14,7 @@ export class UmbTemplateWorkspaceContext {
 
 	constructor(host: UmbControllerHostInterface) {
 		this.#host = host;
-		this.#templateRepository = new UmbTemplateRepository(host);
+		this.#templateRepository = new UmbTemplateRepository(this.#host);
 	}
 
 	setName(value: string) {
@@ -41,5 +41,9 @@ export class UmbTemplateWorkspaceContext {
 	async save(isNew: boolean) {
 		if (!this.#data.value) return;
 		isNew ? this.#templateRepository.insert(this.#data.value) : this.#templateRepository.update(this.#data.value);
+	}
+
+	async delete(key: string) {
+		await this.#templateRepository.delete(key);
 	}
 }

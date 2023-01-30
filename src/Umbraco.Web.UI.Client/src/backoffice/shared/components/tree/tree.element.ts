@@ -64,8 +64,9 @@ export class UmbTreeElement extends UmbLitElement {
 	private _treeContext?: UmbTreeContextBase;
 	private _store?: UmbTreeStore<Entity>;
 
-	connectedCallback(): void {
-		super.connectedCallback();
+	#repository?: any; // TODO: make interface
+
+	protected firstUpdated(): void {
 		this._observeTree();
 	}
 
@@ -76,12 +77,22 @@ export class UmbTreeElement extends UmbLitElement {
 			umbExtensionsRegistry
 				.extensionsOfType('tree')
 				.pipe(map((trees) => trees.find((tree) => tree.alias === this.alias))),
-			(tree) => {
+			async (tree) => {
+				if (this._tree?.alias === tree?.alias) return;
+
 				this._tree = tree;
-				if (tree) {
-					this._provideTreeContext();
+				this._provideTreeContext();
+
+				// TODO: remove this when repositories are in place.
+				if (this._tree?.meta.storeAlias) {
 					this._provideStore();
-					this._observeTreeRoot();
+				}
+
+				if (this._tree?.meta.repository) {
+					// TODO: create a helper function to create the repository.
+					this.#repository = new this._tree.meta.repository(this);
+					await this.#repository.init();
+					this._observeRepositoryTreeRoot();
 				}
 			}
 		);
@@ -101,6 +112,7 @@ export class UmbTreeElement extends UmbLitElement {
 		this.provideContext('umbTreeContext', this._treeContext);
 	}
 
+	// TODO: remove this when repositories are in place.
 	private _provideStore() {
 		// TODO: Clean up store, if already existing.
 
@@ -109,6 +121,15 @@ export class UmbTreeElement extends UmbLitElement {
 		this.consumeContext(this._tree.meta.storeAlias, (store: UmbTreeStore<Entity>) => {
 			this._store = store;
 			this.provideContext('umbStore', store);
+			this._observeStoreTreeRoot();
+		});
+	}
+
+	private async _observeRepositoryTreeRoot() {
+		this.#repository.getTreeRoot();
+
+		this.observe(this.#repository.treeRootChanged(), (rootItems) => {
+			this._items = rootItems as Entity[];
 		});
 	}
 
@@ -122,7 +143,7 @@ export class UmbTreeElement extends UmbLitElement {
 		});
 	}
 
-	private _observeTreeRoot() {
+	private _observeStoreTreeRoot() {
 		if (!this._store?.getTreeRoot) return;
 
 		this._loading = true;

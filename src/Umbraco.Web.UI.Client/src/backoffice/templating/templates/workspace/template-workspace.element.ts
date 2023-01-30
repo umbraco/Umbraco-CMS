@@ -22,11 +22,14 @@ export class UmbTemplateWorkspaceElement extends UmbLitElement {
 		`,
 	];
 
-	@property()
-	public entityKey?: string;
+	public load(entityKey: string) {
+		this.#templateWorkspaceContext.load(entityKey);
+	}
 
-	@property()
-	public create?: string | null;
+	public create(parentKey: string | null) {
+		this.#isNew = true;
+		this.#templateWorkspaceContext.createScaffold(parentKey);
+	}
 
 	@state()
 	private _name?: string | null = '';
@@ -34,9 +37,8 @@ export class UmbTemplateWorkspaceElement extends UmbLitElement {
 	@state()
 	private _content?: string | null = '';
 
-	private isNew = false;
-
 	#templateWorkspaceContext = new UmbTemplateWorkspaceContext(this);
+	#isNew = false;
 
 	async connectedCallback() {
 		super.connectedCallback();
@@ -48,16 +50,6 @@ export class UmbTemplateWorkspaceElement extends UmbLitElement {
 		this.observe(this.#templateWorkspaceContext.content, (content) => {
 			this._content = content;
 		});
-
-		if (!this.entityKey && this.create !== undefined) {
-			this.isNew = true;
-			this.#templateWorkspaceContext.createScaffold(this.create);
-			return;
-		}
-
-		if (this.entityKey) {
-			this.#templateWorkspaceContext.load(this.entityKey);
-		}
 	}
 
 	// TODO: temp code for testing create and save
@@ -74,7 +66,7 @@ export class UmbTemplateWorkspaceElement extends UmbLitElement {
 	}
 
 	#onSave() {
-		this.#templateWorkspaceContext.save(this.isNew);
+		this.#templateWorkspaceContext.save(this.#isNew);
 	}
 
 	render() {

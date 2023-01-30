@@ -1,4 +1,4 @@
-import { UMB_TEMPLATE_TREE_STORE_CONTEXT_TOKEN } from './template.tree.store';
+import { UmbTemplateRepository } from '../template.repository';
 import type { ManifestTree, ManifestTreeItemAction } from '@umbraco-cms/models';
 
 const tree: ManifestTree = {
@@ -6,7 +6,8 @@ const tree: ManifestTree = {
 	alias: 'Umb.Tree.Templates',
 	name: 'Templates Tree',
 	meta: {
-		storeAlias: UMB_TEMPLATE_TREE_STORE_CONTEXT_TOKEN.toString(),
+		//storeAlias: UMB_TEMPLATE_TREE_STORE_CONTEXT_TOKEN.toString(),
+		repository: UmbTemplateRepository,
 	},
 };
 

@@ -1,8 +1,7 @@
 import { UmbContextToken } from '@umbraco-cms/context-api';
-import { createObservablePart, ArrayState } from '@umbraco-cms/observable-api';
+import { ArrayState } from '@umbraco-cms/observable-api';
 import { UmbStoreBase } from '@umbraco-cms/store';
-import { Template, TemplateCreateModel, TemplateResource, TemplateUpdateModel } from '@umbraco-cms/backend-api';
-import { tryExecuteAndNotify } from '@umbraco-cms/resources';
+import { Template } from '@umbraco-cms/backend-api';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 
 /**

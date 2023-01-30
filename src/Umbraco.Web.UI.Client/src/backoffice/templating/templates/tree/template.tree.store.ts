@@ -1,5 +1,4 @@
-import { EntityTreeItem, TemplateResource } from '@umbraco-cms/backend-api';
-import { tryExecuteAndNotify } from '@umbraco-cms/resources';
+import { EntityTreeItem } from '@umbraco-cms/backend-api';
 import { UmbContextToken } from '@umbraco-cms/context-api';
 import { createObservablePart, ArrayState } from '@umbraco-cms/observable-api';
 import { UmbStoreBase } from '@umbraco-cms/store';
@@ -18,48 +17,19 @@ export class UmbTemplateTreeStore extends UmbStoreBase {
 		super(host, UMB_TEMPLATE_TREE_STORE_CONTEXT_TOKEN.toString());
 	}
 
-	getTreeRoot() {
-		tryExecuteAndNotify(this._host, TemplateResource.getTreeTemplateRoot({})).then(({ data }) => {
-			if (data) {
-				// TODO: how do we handle if an item has been removed during this session(like in another tab or by another user)?
-				this.#data.append(data.items);
-			}
-		});
+	appendTreeItems(items: Array<EntityTreeItem>) {
+		this.#data.append(items);
+	}
 
+	treeRootChanged() {
 		return createObservablePart(this.#data, (items) => items.filter((item) => item.parentKey === null));
 	}
 
-	getTreeItemChildren(key: string) {
-		tryExecuteAndNotify(
-			this._host,
-			TemplateResource.getTreeTemplateChildren({
-				parentKey: key,
-			})
-		).then(({ data }) => {
-			if (data) {
-				// TODO: how do we handle if an item has been removed during this session(like in another tab or by another user)?
-				this.#data.append(data.items);
-			}
-		});
-
+	treeItemChildrenChanged(key: string) {
 		return createObservablePart(this.#data, (items) => items.filter((item) => item.parentKey === key));
 	}
 
-	getTreeItems(keys: Array<string>) {
-		if (keys?.length > 0) {
-			tryExecuteAndNotify(
-				this._host,
-				TemplateResource.getTreeTemplateItem({
-					key: keys,
-				})
-			).then(({ data }) => {
-				if (data) {
-					// TODO: how do we handle if an item has been removed during this session(like in another tab or by another user)?
-					this.#data.append(data);
-				}
-			});
-		}
-
+	treeItemsChanged(keys: Array<string>) {
 		return createObservablePart(this.#data, (items) => items.filter((item) => keys.includes(item.key ?? '')));
 	}
 }
