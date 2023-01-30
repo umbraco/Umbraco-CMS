@@ -1,9 +1,8 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
-import { UmbLanguageStore, UMB_LANGUAGE_STORE_CONTEXT_TOKEN } from '../../language.store';
+import { UmbLanguageStore, UmbLanguageStoreItemType, UMB_LANGUAGE_STORE_CONTEXT_TOKEN } from '../../language.store';
 import { UmbTableColumn, UmbTableConfig, UmbTableItem } from '../../../../shared/components/table';
-import type { LanguageDetails } from '@umbraco-cms/models';
 import { UmbLitElement } from '@umbraco-cms/element';
 
 import '../language/language-workspace.element';
@@ -87,17 +86,17 @@ export class UmbLanguageRootWorkspaceElement extends UmbLitElement {
 		});
 	}
 
-	private _createTableItems(languages: Array<LanguageDetails>) {
+	private _createTableItems(languages: Array<UmbLanguageStoreItemType>) {
 		this._tableItems = languages.map((language) => {
 			return {
-				key: language.id?.toString() ?? '',
+				key: language.isoCode ?? '',
 				icon: 'umb:globe',
 				data: [
 					{
 						columnAlias: 'languageName',
 						value: {
 							name: language.name,
-							key: language.key,
+							key: language.isoCode,
 						},
 					},
 					{
@@ -114,7 +113,7 @@ export class UmbLanguageRootWorkspaceElement extends UmbLitElement {
 					},
 					{
 						columnAlias: 'fallBackLanguage',
-						value: languages.find((x) => x.id === language.fallbackLanguageId)?.name,
+						value: languages.find((x) => x.isoCode === language.fallbackIsoCode)?.name,
 					},
 					{
 						columnAlias: 'delete',

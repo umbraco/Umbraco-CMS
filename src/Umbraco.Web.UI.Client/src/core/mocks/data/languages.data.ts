@@ -1,24 +1,24 @@
+import { UmbLanguageStoreItemType } from '../../../backoffice/settings/languages/language.store';
 import { UmbData } from './data';
-import type { LanguageDetails } from '@umbraco-cms/models';
 
 // Temp mocked database
-class UmbLanguagesData extends UmbData<LanguageDetails> {
-	constructor(data: LanguageDetails[]) {
+class UmbLanguagesData extends UmbData<UmbLanguageStoreItemType> {
+	constructor(data: UmbLanguageStoreItemType[]) {
 		super(data);
 	}
 
 	// skip can be number or null
-	getAll(skip = 0, take = this.data.length): Array<LanguageDetails> {
+	getAll(skip = 0, take = this.data.length): Array<UmbLanguageStoreItemType> {
 		return this.data.slice(skip, take);
 	}
 
 	getByKey(key: string) {
-		return this.data.find((item) => item.key === key);
+		return this.data.find((item) => item.isoCode === key);
 	}
 
-	save(saveItems: Array<LanguageDetails>) {
+	save(saveItems: Array<UmbLanguageStoreItemType>) {
 		saveItems.forEach((saveItem) => {
-			const foundIndex = this.data.findIndex((item) => item.key === saveItem.key);
+			const foundIndex = this.data.findIndex((item) => item.isoCode === saveItem.isoCode);
 			if (foundIndex !== -1) {
 				// update
 				this.data[foundIndex] = saveItem;
@@ -33,7 +33,7 @@ class UmbLanguagesData extends UmbData<LanguageDetails> {
 
 	delete(keys: Array<string>) {
 		keys.forEach((key) => {
-			const foundIndex = this.data.findIndex((item) => item.key === key);
+			const foundIndex = this.data.findIndex((item) => item.isoCode === key);
 			if (foundIndex !== -1) {
 				this.data.splice(foundIndex, 1);
 			}
@@ -42,8 +42,8 @@ class UmbLanguagesData extends UmbData<LanguageDetails> {
 		return keys;
 	}
 
-	updateData(updateItem: LanguageDetails) {
-		const itemIndex = this.data.findIndex((item) => item.key === updateItem.key);
+	updateData(updateItem: UmbLanguageStoreItemType) {
+		const itemIndex = this.data.findIndex((item) => item.isoCode === updateItem.isoCode);
 		const item = this.data[itemIndex];
 		if (!item) return;
 
@@ -64,41 +64,33 @@ class UmbLanguagesData extends UmbData<LanguageDetails> {
 	}
 }
 
-export const MockData: Array<LanguageDetails> = [
+export const MockData: Array<UmbLanguageStoreItemType> = [
 	{
-		id: 1,
-		key: 'asdail12h3k1h23k12h3',
 		name: 'English',
 		isoCode: 'en',
 		isDefault: true,
 		isMandatory: true,
 	},
 	{
-		id: 2,
-		key: 'kajshdkjashdkuahwdu',
 		name: 'Danish',
 		isoCode: 'da',
 		isDefault: false,
 		isMandatory: false,
-		fallbackLanguageId: 1,
+		fallbackIsoCode: 'en',
 	},
 	{
-		id: 3,
-		key: 'k12n3kj12h3123n9812h3',
 		name: 'German',
 		isoCode: 'de',
 		isDefault: false,
 		isMandatory: false,
-		fallbackLanguageId: 1,
+		fallbackIsoCode: 'en',
 	},
 	{
-		id: 4,
-		key: '1kl2n31231iuqshdiuashd',
 		name: 'French',
 		isoCode: 'fr',
 		isDefault: false,
 		isMandatory: false,
-		fallbackLanguageId: 1,
+		fallbackIsoCode: 'en',
 	},
 ];
 

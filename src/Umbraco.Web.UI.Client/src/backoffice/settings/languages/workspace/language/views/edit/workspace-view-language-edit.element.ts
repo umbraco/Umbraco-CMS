@@ -5,8 +5,11 @@ import { repeat } from 'lit/directives/repeat.js';
 import { customElement, property, state } from 'lit/decorators.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
 import { UmbWorkspaceLanguageContext } from '../../language-workspace.context';
-import { UmbLanguageStore, UMB_LANGUAGE_STORE_CONTEXT_TOKEN } from '../../../../language.store';
-import type { LanguageDetails } from '@umbraco-cms/models';
+import {
+	UmbLanguageStore,
+	UmbLanguageStoreItemType,
+	UMB_LANGUAGE_STORE_CONTEXT_TOKEN,
+} from '../../../../language.store';
 import { UmbLitElement } from '@umbraco-cms/element';
 
 @customElement('umb-workspace-view-language-edit')
@@ -37,10 +40,10 @@ export class UmbWorkspaceViewLanguageEditElement extends UmbLitElement {
 	];
 
 	@property()
-	language?: LanguageDetails;
+	language?: UmbLanguageStoreItemType;
 
 	@state()
-	private _languages: LanguageDetails[] = [];
+	private _languages: UmbLanguageStoreItemType[] = [];
 
 	@state()
 	private _search = '';
@@ -63,7 +66,7 @@ export class UmbWorkspaceViewLanguageEditElement extends UmbLitElement {
 		this.consumeContext(UMB_LANGUAGE_STORE_CONTEXT_TOKEN, (instance: UmbLanguageStore) => {
 			if (!instance) return;
 
-			instance.getAll().subscribe((languages: Array<LanguageDetails>) => {
+			instance.getAll().subscribe((languages: Array<UmbLanguageStoreItemType>) => {
 				this._languages = languages;
 			});
 		});
@@ -108,7 +111,7 @@ export class UmbWorkspaceViewLanguageEditElement extends UmbLitElement {
 	private _handleFallbackChange(event: UUIComboboxEvent) {
 		if (event instanceof UUIComboboxEvent) {
 			const target = event.composedPath()[0] as UUIComboboxElement;
-			this._languageWorkspaceContext?.update({ fallbackLanguageId: Number.parseInt(target.value.toString()) });
+			this._languageWorkspaceContext?.update({ fallbackIsoCode: target.value.toString() });
 		}
 	}
 
@@ -125,7 +128,7 @@ export class UmbWorkspaceViewLanguageEditElement extends UmbLitElement {
 	}
 
 	private get _fallbackLanguage() {
-		return this._fallbackLanguages.find((language) => language.id === this.language?.fallbackLanguageId);
+		return this._fallbackLanguages.find((language) => language.isoCode === this.language?.fallbackIsoCode);
 	}
 
 	private _renderDefaultLanguageWarning() {
@@ -151,7 +154,7 @@ export class UmbWorkspaceViewLanguageEditElement extends UmbLitElement {
 				<umb-workspace-property-layout label="Language">
 					<uui-combobox
 						slot="editor"
-						value=${this.language.isoCode}
+						value=${ifDefined(this.language.isoCode)}
 						@change=${this._handleLanguageChange}
 						@search=${this._handleSearchChange}>
 						<uui-combobox-list>
@@ -160,7 +163,9 @@ export class UmbWorkspaceViewLanguageEditElement extends UmbLitElement {
 								(language) => language.isoCode,
 								(language) =>
 									html`
-										<uui-combobox-list-option value=${language.isoCode}>${language.name}</uui-combobox-list-option>
+										<uui-combobox-list-option value=${ifDefined(language.isoCode)}
+											>${language.name}</uui-combobox-list-option
+										>
 									`
 							)}
 						</uui-combobox-list>
@@ -192,7 +197,7 @@ export class UmbWorkspaceViewLanguageEditElement extends UmbLitElement {
 					description="To allow multi-lingual content to fall back to another language if not present in the requested language, select it here.">
 					<uui-combobox
 						slot="editor"
-						value=${ifDefined(this._fallbackLanguage?.id)}
+						value=${ifDefined(this._fallbackLanguage?.isoCode)}
 						@change=${this._handleFallbackChange}>
 						<uui-combobox-list>
 							${repeat(
@@ -200,7 +205,9 @@ export class UmbWorkspaceViewLanguageEditElement extends UmbLitElement {
 								(language) => language.isoCode,
 								(language) =>
 									html`
-										<uui-combobox-list-option value=${language.id ?? 0}>${language.name}</uui-combobox-list-option>
+										<uui-combobox-list-option value=${ifDefined(language.isoCode)}
+											>${language.name}</uui-combobox-list-option
+										>
 									`
 							)}
 						</uui-combobox-list>
