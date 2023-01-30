@@ -17,7 +17,12 @@ export class UmbTemplateDetailServerDataSource implements TemplateDetailDataSour
 	async createScaffold(parentKey: string | null) {
 		let masterTemplateAlias: string | undefined = undefined;
 		let error = undefined;
-		let data = undefined;
+		const data: Template = {
+			key: uuid(),
+			name: '',
+			alias: '',
+			content: '',
+		};
 
 		// TODO: update when backend is updated so we don't have to do two calls
 		if (parentKey) {
@@ -35,15 +40,7 @@ export class UmbTemplateDetailServerDataSource implements TemplateDetailDataSour
 		);
 
 		error = scaffoldError;
-
-		if (scaffoldData?.content) {
-			data = {
-				key: uuid(),
-				name: '',
-				alias: '',
-				content: scaffoldData?.content,
-			};
-		}
+		data.content = scaffoldData?.content || '';
 
 		return { data, error };
 	}

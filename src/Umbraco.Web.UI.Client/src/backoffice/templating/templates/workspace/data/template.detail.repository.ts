@@ -52,16 +52,16 @@ export class UmbTemplateDetailRepository implements UmbRepository {
 		}
 	}
 
-	async createScaffold(parentKey: string | null): Promise<{ data?: Template; error?: ProblemDetails }> {
+	async createScaffold(parentKey: string | null) {
 		if (!parentKey) {
 			const error: ProblemDetails = { title: 'Parent key is missing' };
-			return { error };
+			return { data: undefined, error };
 		}
 
 		return this.#dataSource.createScaffold(parentKey);
 	}
 
-	async get(key: string): Promise<{ data?: Template; error?: ProblemDetails }> {
+	async get(key: string) {
 		if (!key) {
 			const error: ProblemDetails = { title: 'Key is missing' };
 			return { error };
@@ -70,7 +70,7 @@ export class UmbTemplateDetailRepository implements UmbRepository {
 		return this.#dataSource.get(key);
 	}
 
-	async insert(template: Template): Promise<{ error?: ProblemDetails }> {
+	async insert(template: Template) {
 		if (!template) {
 			const error: ProblemDetails = { title: 'Template is missing' };
 			return { error };
@@ -90,7 +90,7 @@ export class UmbTemplateDetailRepository implements UmbRepository {
 		return { error };
 	}
 
-	async update(template: Template): Promise<{ error?: ProblemDetails }> {
+	async update(template: Template) {
 		if (!template || !template.key) {
 			const error: ProblemDetails = { title: 'Template is missing' };
 			return { error };
@@ -111,7 +111,7 @@ export class UmbTemplateDetailRepository implements UmbRepository {
 		return { error };
 	}
 
-	async delete(key: string): Promise<{ error?: ProblemDetails }> {
+	async delete(key: string) {
 		if (!key) {
 			const error: ProblemDetails = { title: 'Key is missing' };
 			return { error };
