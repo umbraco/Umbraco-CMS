@@ -1,11 +1,11 @@
-import { UmbTemplateRepository } from '../template.repository';
+import { UmbTemplateDetailRepository } from '../template.detail.repository';
 import { createObservablePart, DeepState } from '@umbraco-cms/observable-api';
 import { Template } from '@umbraco-cms/backend-api';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 
 export class UmbTemplateWorkspaceContext {
 	#host: UmbControllerHostInterface;
-	#templateRepository: UmbTemplateRepository;
+	#templateRepository: UmbTemplateDetailRepository;
 
 	#data = new DeepState<Template | undefined>(undefined);
 	data = this.#data.asObservable();
@@ -14,7 +14,7 @@ export class UmbTemplateWorkspaceContext {
 
 	constructor(host: UmbControllerHostInterface) {
 		this.#host = host;
-		this.#templateRepository = new UmbTemplateRepository(this.#host);
+		this.#templateRepository = new UmbTemplateDetailRepository(this.#host);
 	}
 
 	setName(value: string) {

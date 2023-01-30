@@ -1,22 +1,19 @@
-import { Observable } from 'rxjs';
 import { UmbTemplateDetailStore, UMB_TEMPLATE_DETAIL_STORE_CONTEXT_TOKEN } from './template.detail.store';
-import { UmbTemplateTreeStore, UMB_TEMPLATE_TREE_STORE_CONTEXT_TOKEN } from './tree/template.tree.store';
 import { TemplateServerDataSource } from './data/template.server';
-import { EntityTreeItem, PagedEntityTreeItem, ProblemDetails, Template } from '@umbraco-cms/backend-api';
+import { ProblemDetails, Template } from '@umbraco-cms/backend-api';
 import { UmbContextConsumerController } from '@umbraco-cms/context-api';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 import { UmbNotificationService, UMB_NOTIFICATION_SERVICE_CONTEXT_TOKEN } from '@umbraco-cms/notification';
 
 /* We need to create a new instance of the repository from within the element context. We want the notifications to be displayed in the right context. */
 // element -> context -> repository -> (store) -> data source
-export class UmbTemplateRepository {
+export class UmbTemplateDetailRepository {
 	#host: UmbControllerHostInterface;
 	#dataSource: TemplateServerDataSource;
 	#detailStore?: UmbTemplateDetailStore;
-	#treeStore!: UmbTemplateTreeStore;
 	#notificationService?: UmbNotificationService;
 	#initResolver?: (value: unknown) => void;
-	#ready = false;
+	initialized = false;
 
 	constructor(host: UmbControllerHostInterface) {
 		this.#host = host;
@@ -25,29 +22,24 @@ export class UmbTemplateRepository {
 
 		new UmbContextConsumerController(this.#host, UMB_TEMPLATE_DETAIL_STORE_CONTEXT_TOKEN, (instance) => {
 			this.#detailStore = instance;
-			this.#checkIfReady();
-		});
-
-		new UmbContextConsumerController(this.#host, UMB_TEMPLATE_TREE_STORE_CONTEXT_TOKEN, (instance) => {
-			this.#treeStore = instance;
-			this.#checkIfReady();
+			this.#checkIfInitialized();
 		});
 
 		new UmbContextConsumerController(this.#host, UMB_NOTIFICATION_SERVICE_CONTEXT_TOKEN, (instance) => {
 			this.#notificationService = instance;
-			this.#checkIfReady();
+			this.#checkIfInitialized();
 		});
 	}
 
 	init() {
 		return new Promise((resolve) => {
-			this.#ready ? resolve(true) : (this.#initResolver = resolve);
+			this.initialized ? resolve(true) : (this.#initResolver = resolve);
 		});
 	}
 
-	#checkIfReady() {
-		if (this.#detailStore && this.#treeStore && this.#notificationService) {
-			this.#ready = true;
+	#checkIfInitialized() {
+		if (this.#detailStore && this.#notificationService) {
+			this.initialized = true;
 			this.#initResolver?.(true);
 		}
 	}
@@ -126,58 +118,5 @@ export class UmbTemplateRepository {
 		// TODO: remove from detail store
 		// TODO: remove from tree store
 		return { error };
-	}
-
-	// TODO: split into multiple repositories
-	async getTreeRoot(): Promise<{ data?: PagedEntityTreeItem; error?: ProblemDetails }> {
-		const { data, error } = await this.#dataSource.getTreeRoot();
-
-		if (data) {
-			this.#treeStore?.appendTreeItems(data.items);
-		}
-
-		return { data, error };
-	}
-
-	async getTreeItemChildren(parentKey: string): Promise<{ data?: PagedEntityTreeItem; error?: ProblemDetails }> {
-		if (!parentKey) {
-			const error: ProblemDetails = { title: 'Parent key is missing' };
-			return { error };
-		}
-
-		const { data, error } = await this.#dataSource.getTreeItemChildren(parentKey);
-
-		if (data) {
-			this.#treeStore?.appendTreeItems(data.items);
-		}
-
-		return { data, error };
-	}
-
-	async getTreeItems(keys: Array<string>): Promise<{ data?: EntityTreeItem[]; error?: ProblemDetails }> {
-		if (!keys) {
-			const error: ProblemDetails = { title: 'Keys are missing' };
-			return { error };
-		}
-
-		const { data, error } = await this.#dataSource.getTreeItems(keys);
-
-		if (data) {
-			this.#treeStore?.appendTreeItems(data);
-		}
-
-		return { data, error };
-	}
-
-	treeRootChanged(): Observable<EntityTreeItem[]> {
-		return this.#treeStore.treeRootChanged?.();
-	}
-
-	treeItemChildrenChanged(key: string): Observable<EntityTreeItem[]> {
-		return this.#treeStore.treeItemChildrenChanged?.(key);
-	}
-
-	treeItemsChanged(keys: Array<string>): Observable<EntityTreeItem[]> {
-		return this.#treeStore.treeItemsChanged?.(keys);
 	}
 }
