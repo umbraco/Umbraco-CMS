@@ -17,7 +17,7 @@ export class UmbTemplateTreeStore extends UmbStoreBase {
 		super(host, UMB_TEMPLATE_TREE_STORE_CONTEXT_TOKEN.toString());
 	}
 
-	appendTreeItems(items: Array<EntityTreeItem>) {
+	appendItems(items: Array<EntityTreeItem>) {
 		this.#data.append(items);
 	}
 
@@ -39,15 +39,15 @@ export class UmbTemplateTreeStore extends UmbStoreBase {
 		}
 	}
 
-	treeRootChanged() {
+	rootChanged() {
 		return createObservablePart(this.#data, (items) => items.filter((item) => item.parentKey === null));
 	}
 
-	treeItemChildrenChanged(key: string) {
+	itemChildrenChanged(key: string) {
 		return createObservablePart(this.#data, (items) => items.filter((item) => item.parentKey === key));
 	}
 
-	treeItemsChanged(keys: Array<string>) {
+	itemsChanged(keys: Array<string>) {
 		return createObservablePart(this.#data, (items) => items.filter((item) => keys.includes(item.key ?? '')));
 	}
 }
