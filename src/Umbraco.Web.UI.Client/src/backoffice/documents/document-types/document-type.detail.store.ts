@@ -1,7 +1,7 @@
 import type { DocumentTypeDetails } from '@umbraco-cms/models';
 import { UmbContextToken } from '@umbraco-cms/context-api';
-import { createObservablePart, ArrayState } from '@umbraco-cms/observable-api';
-import { UmbStoreBase } from '@umbraco-cms/store';
+import { ArrayState } from '@umbraco-cms/observable-api';
+import { UmbEntityDetailStore, UmbStoreBase } from '@umbraco-cms/store';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 
 
@@ -14,14 +14,27 @@ export const UMB_DOCUMENT_TYPE_DETAIL_STORE_CONTEXT_TOKEN = new UmbContextToken<
  * @extends {UmbStoreBase}
  * @description - Details Data Store for Document Types
  */
-export class UmbDocumentTypeDetailStore extends UmbStoreBase {
-
+export class UmbDocumentTypeDetailStore extends UmbStoreBase implements UmbEntityDetailStore<DocumentTypeDetails> {
 
 	#data = new ArrayState<DocumentTypeDetails>([], (x) => x.key);
 
 
 	constructor(host: UmbControllerHostInterface) {
 		super(host, UMB_DOCUMENT_TYPE_DETAIL_STORE_CONTEXT_TOKEN.toString());
+	}
+
+
+	getScaffold(entityType: string, parentKey: string | null) {
+		return {
+			key: '',
+			name: '',
+			icon: '',
+			type: '',
+			hasChildren: false,
+			parentKey: '',
+			alias: '',
+			properties: [],
+		} as DocumentTypeDetails;
 	}
 
 	/**
@@ -38,7 +51,7 @@ export class UmbDocumentTypeDetailStore extends UmbStoreBase {
 				this.#data.append(data);
 			});
 
-		return createObservablePart(this.#data, (documentTypes) =>
+		return this.#data.getObservablePart((documentTypes) =>
 			documentTypes.find((documentType) => documentType.key === key)
 		);
 	}

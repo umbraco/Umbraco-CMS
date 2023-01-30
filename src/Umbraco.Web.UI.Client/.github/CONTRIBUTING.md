@@ -13,15 +13,12 @@ Here is the LIT documentation and playground: [https://lit.dev](https://lit.dev)
 
 ### What is the process of contribution?
 
-* Umbraco HQ owns the Management API on the backend
-* Features can be worked on in the frontend when there is an API, or otherwise, if no API is required
-* A contribution should be made in a fork of the backoffice repository
-* Once a contribution is ready, a pull request should be made towards the backoffice repository, where HQ will assign a reviewer
-* A pull request should always indicate what part of a feature it tries to solve, i.e. which labels can be removed from the issue on the projects board
-
-### How to work with Github Projects
-
-TBD
+- Read the [README](README.md) to learn how to get the project up and running
+- Find an issue marked as [community/up-for-grabs](https://github.com/umbraco/Umbraco.CMS.Backoffice/issues?q=is%3Aissue+is%3Aopen+label%3Acommunity%2Fup-for-grabs) - note that some are also marked [good first issue](https://github.com/umbraco/Umbraco.CMS.Backoffice/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22) which indicates they are simple to get started on
+- Umbraco HQ owns the Management API on the backend, so features can be worked on in the frontend only when there is an API, or otherwise, if no API is required
+- A contribution should be made in a fork of the repository
+- Once a contribution is ready, a pull request should be made towards this repository and HQ will assign a reviewer
+- A pull request should always indicate what part of a feature it tries to solve, i.e. does it close the targeted issue (if any) or does the developer expect Umbraco HQ to take over
 
 ## Contributing in general terms
 

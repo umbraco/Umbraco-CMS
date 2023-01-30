@@ -2,7 +2,7 @@ import { css, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import type { UUIButtonState } from '@umbraco-ui/uui';
-import { UmbWorkspaceContentContext } from '../../workspace-content/workspace-content.context';
+import { UmbWorkspaceEntityContextInterface } from '../../workspace-context/workspace-entity-context.interface';
 import { UmbLitElement } from '@umbraco-cms/element';
 import type { ManifestWorkspaceAction } from '@umbraco-cms/models';
 
@@ -13,7 +13,7 @@ export class UmbWorkspaceActionNodeSaveElement extends UmbLitElement {
 	@state()
 	private _saveButtonState?: UUIButtonState;
 
-	private _workspaceContext?: UmbWorkspaceContentContext;
+	private _workspaceContext?: UmbWorkspaceEntityContextInterface;
 
 	public manifest?: ManifestWorkspaceAction;
 
@@ -21,7 +21,7 @@ export class UmbWorkspaceActionNodeSaveElement extends UmbLitElement {
 		super();
 
 		// TODO: Figure out how to get the magic string for the workspace context.
-		this.consumeContext<UmbWorkspaceContentContext>('umbWorkspaceContext', (instance) => {
+		this.consumeContext<UmbWorkspaceEntityContextInterface>('umbWorkspaceContext', (instance) => {
 			this._workspaceContext = instance;
 		});
 	}
