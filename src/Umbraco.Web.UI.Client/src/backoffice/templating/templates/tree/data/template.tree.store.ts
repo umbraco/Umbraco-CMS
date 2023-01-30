@@ -43,8 +43,8 @@ export class UmbTemplateTreeStore extends UmbStoreBase {
 		return createObservablePart(this.#data, (items) => items.filter((item) => item.parentKey === null));
 	}
 
-	itemChildrenChanged(key: string) {
-		return createObservablePart(this.#data, (items) => items.filter((item) => item.parentKey === key));
+	childrenChanged(parentKey: string) {
+		return createObservablePart(this.#data, (items) => items.filter((item) => item.parentKey === parentKey));
 	}
 
 	itemsChanged(keys: Array<string>) {

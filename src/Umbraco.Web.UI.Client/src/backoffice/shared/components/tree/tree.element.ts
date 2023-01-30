@@ -64,7 +64,7 @@ export class UmbTreeElement extends UmbLitElement {
 	private _treeContext?: UmbTreeContextBase;
 	private _store?: UmbTreeStore<Entity>;
 
-	#repository?: any; // TODO: make interface
+	#treeRepository?: any; // TODO: make interface
 
 	protected firstUpdated(): void {
 		this._observeTree();
@@ -90,8 +90,8 @@ export class UmbTreeElement extends UmbLitElement {
 
 				if (this._tree?.meta.repository) {
 					// TODO: create a helper function to create the repository.
-					this.#repository = new this._tree.meta.repository(this);
-					await this.#repository.init();
+					this.#treeRepository = new this._tree.meta.repository(this);
+					await this.#treeRepository.init();
 					this._observeRepositoryTreeRoot();
 				}
 			}
@@ -126,9 +126,9 @@ export class UmbTreeElement extends UmbLitElement {
 	}
 
 	private async _observeRepositoryTreeRoot() {
-		this.#repository.getTreeRoot();
+		this.#treeRepository.getRoot();
 
-		this.observe(this.#repository.treeRootChanged(), (rootItems) => {
+		this.observe(this.#treeRepository.rootChanged(), (rootItems) => {
 			this._items = rootItems as Entity[];
 		});
 	}
