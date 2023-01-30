@@ -1,3 +1,4 @@
+import { UmbRepository } from '../../../../../core/repository';
 import { UmbTemplateDetailStore, UMB_TEMPLATE_DETAIL_STORE_CONTEXT_TOKEN } from './template.detail.store';
 import { UmbTemplateDetailServerDataSource } from './sources/template.detail.server.data';
 import { ProblemDetails, Template } from '@umbraco-cms/backend-api';
@@ -7,13 +8,13 @@ import { UmbNotificationService, UMB_NOTIFICATION_SERVICE_CONTEXT_TOKEN } from '
 
 /* We need to create a new instance of the repository from within the element context. We want the notifications to be displayed in the right context. */
 // element -> context -> repository -> (store) -> data source
-export class UmbTemplateDetailRepository {
+export class UmbTemplateDetailRepository implements UmbRepository {
 	#host: UmbControllerHostInterface;
 	#dataSource: UmbTemplateDetailServerDataSource;
 	#detailStore?: UmbTemplateDetailStore;
 	#notificationService?: UmbNotificationService;
-	#initResolver?: (value: unknown) => void;
-	initialized = false;
+	#initResolver?: () => void;
+	#initialized = false;
 
 	constructor(host: UmbControllerHostInterface) {
 		this.#host = host;
@@ -32,15 +33,15 @@ export class UmbTemplateDetailRepository {
 	}
 
 	init() {
-		return new Promise((resolve) => {
-			this.initialized ? resolve(true) : (this.#initResolver = resolve);
+		return new Promise<void>((resolve) => {
+			this.#initialized ? resolve() : (this.#initResolver = resolve);
 		});
 	}
 
 	#checkIfInitialized() {
 		if (this.#detailStore && this.#notificationService) {
-			this.initialized = true;
-			this.#initResolver?.(true);
+			this.#initialized = true;
+			this.#initResolver?.();
 		}
 	}
 

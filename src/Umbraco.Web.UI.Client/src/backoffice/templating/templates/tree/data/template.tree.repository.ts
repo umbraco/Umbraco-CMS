@@ -1,4 +1,5 @@
 import { Observable } from 'rxjs';
+import { UmbRepository } from '../../../../../core/repository';
 import { TemplateTreeServerDataSource } from './sources/template.tree.server.data';
 import { UmbTemplateTreeStore, UMB_TEMPLATE_TREE_STORE_CONTEXT_TOKEN } from './template.tree.store';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
@@ -6,12 +7,12 @@ import { UmbNotificationService, UMB_NOTIFICATION_SERVICE_CONTEXT_TOKEN } from '
 import { UmbContextConsumerController } from '@umbraco-cms/context-api';
 import { EntityTreeItem, PagedEntityTreeItem, ProblemDetails } from '@umbraco-cms/backend-api';
 
-export class UmbTemplateTreeRepository {
+export class UmbTemplateTreeRepository implements UmbRepository {
 	#host: UmbControllerHostInterface;
 	#dataSource: TemplateTreeServerDataSource;
 	#treeStore!: UmbTemplateTreeStore;
 	#notificationService?: UmbNotificationService;
-	#initResolver?: (value: unknown) => void;
+	#initResolver?: () => void;
 	#initialized = false;
 
 	constructor(host: UmbControllerHostInterface) {
@@ -31,15 +32,15 @@ export class UmbTemplateTreeRepository {
 	}
 
 	init() {
-		return new Promise((resolve) => {
-			this.#initialized ? resolve(true) : (this.#initResolver = resolve);
+		return new Promise<void>((resolve) => {
+			this.#initialized ? resolve() : (this.#initResolver = resolve);
 		});
 	}
 
 	#checkIfInitialized() {
 		if (this.#treeStore && this.#notificationService) {
 			this.#initialized = true;
-			this.#initResolver?.(true);
+			this.#initResolver?.();
 		}
 	}
 
