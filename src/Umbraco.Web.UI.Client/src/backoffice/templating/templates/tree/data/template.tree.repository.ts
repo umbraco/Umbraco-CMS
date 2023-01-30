@@ -44,7 +44,7 @@ export class UmbTemplateTreeRepository implements UmbRepository {
 	}
 
 	async getTreeRoot() {
-		const { data, error } = await this.#dataSource.getTreeRoot();
+		const { data, error } = await this.#dataSource.getRoot();
 
 		if (data) {
 			this.#treeStore?.appendItems(data.items);
@@ -59,7 +59,7 @@ export class UmbTemplateTreeRepository implements UmbRepository {
 			return { data: undefined, error };
 		}
 
-		const { data, error } = await this.#dataSource.getTreeItemChildren(parentKey);
+		const { data, error } = await this.#dataSource.getItemChildren(parentKey);
 
 		if (data) {
 			this.#treeStore?.appendItems(data.items);
@@ -74,7 +74,7 @@ export class UmbTemplateTreeRepository implements UmbRepository {
 			return { data: undefined, error };
 		}
 
-		const { data, error } = await this.#dataSource.getTreeItems(keys);
+		const { data, error } = await this.#dataSource.getItems(keys);
 
 		if (data) {
 			this.#treeStore?.appendItems(data);

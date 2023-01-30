@@ -9,11 +9,11 @@ export class TemplateTreeServerDataSource implements TemplateTreeDataSource {
 		this.#host = host;
 	}
 
-	async getTreeRoot() {
+	async getRoot() {
 		return tryExecuteAndNotify(this.#host, TemplateResource.getTreeTemplateRoot({}));
 	}
 
-	async getTreeItemChildren(parentKey: string | null) {
+	async getItemChildren(parentKey: string | null) {
 		if (!parentKey) {
 			const error: ProblemDetails = { title: 'Parent key is missing' };
 			return { error };
@@ -27,7 +27,7 @@ export class TemplateTreeServerDataSource implements TemplateTreeDataSource {
 		);
 	}
 
-	async getTreeItems(keys: Array<string>) {
+	async getItems(keys: Array<string>) {
 		if (keys) {
 			const error: ProblemDetails = { title: 'Keys are missing' };
 			return { error };
