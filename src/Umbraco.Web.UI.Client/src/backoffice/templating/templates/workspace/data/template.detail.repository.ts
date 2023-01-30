@@ -1,4 +1,5 @@
 import { UmbRepository } from '../../../../../core/repository';
+import { UmbTemplateTreeStore, UMB_TEMPLATE_TREE_STORE_CONTEXT_TOKEN } from '../../tree/data/template.tree.store';
 import { UmbTemplateDetailStore, UMB_TEMPLATE_DETAIL_STORE_CONTEXT_TOKEN } from './template.detail.store';
 import { UmbTemplateDetailServerDataSource } from './sources/template.detail.server.data';
 import { ProblemDetails, Template } from '@umbraco-cms/backend-api';
@@ -12,6 +13,7 @@ export class UmbTemplateDetailRepository implements UmbRepository {
 	#host: UmbControllerHostInterface;
 	#dataSource: UmbTemplateDetailServerDataSource;
 	#detailStore?: UmbTemplateDetailStore;
+	#treeStore?: UmbTemplateTreeStore;
 	#notificationService?: UmbNotificationService;
 	#initResolver?: () => void;
 	#initialized = false;
@@ -23,6 +25,11 @@ export class UmbTemplateDetailRepository implements UmbRepository {
 
 		new UmbContextConsumerController(this.#host, UMB_TEMPLATE_DETAIL_STORE_CONTEXT_TOKEN, (instance) => {
 			this.#detailStore = instance;
+			this.#checkIfInitialized();
+		});
+
+		new UmbContextConsumerController(this.#host, UMB_TEMPLATE_TREE_STORE_CONTEXT_TOKEN, (instance) => {
+			this.#treeStore = instance;
 			this.#checkIfInitialized();
 		});
 
@@ -84,7 +91,7 @@ export class UmbTemplateDetailRepository implements UmbRepository {
 	}
 
 	async update(template: Template): Promise<{ error?: ProblemDetails }> {
-		if (!template) {
+		if (!template || !template.key) {
 			const error: ProblemDetails = { title: 'Template is missing' };
 			return { error };
 		}
@@ -99,6 +106,7 @@ export class UmbTemplateDetailRepository implements UmbRepository {
 		// TODO: we currently don't use the detail store for anything.
 		// Consider to look up the data before fetching from the server
 		this.#detailStore?.append(template);
+		this.#treeStore?.updateItem(template.key, { name: template.name });
 
 		return { error };
 	}
@@ -116,8 +124,8 @@ export class UmbTemplateDetailRepository implements UmbRepository {
 			this.#notificationService?.peek('positive', notification);
 		}
 
-		// TODO: remove from detail store
-		// TODO: remove from tree store
+		this.#treeStore?.removeItem(key);
+
 		return { error };
 	}
 }

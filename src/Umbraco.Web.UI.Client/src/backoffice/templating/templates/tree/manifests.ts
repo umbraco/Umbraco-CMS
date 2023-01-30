@@ -16,11 +16,23 @@ const treeItemActions: Array<ManifestTreeItemAction> = [
 		alias: 'Umb.TreeItemAction.Template.Create',
 		name: 'Create Template Tree Action',
 		loader: () => import('./actions/create/create-template-tree-action.element'),
-		weight: 200,
+		weight: 300,
 		meta: {
 			entityType: 'template',
 			label: 'Create',
 			icon: 'umb:add',
+		},
+	},
+	{
+		type: 'treeItemAction',
+		alias: 'Umb.TreeItemAction.Template.Delete',
+		name: 'Delete Template Tree Action',
+		loader: () => import('./actions/delete/delete-template-tree-action.element'),
+		weight: 200,
+		meta: {
+			entityType: 'template',
+			label: 'Delete',
+			icon: 'umb:trash',
 		},
 	},
 ];

@@ -21,6 +21,24 @@ export class UmbTemplateTreeStore extends UmbStoreBase {
 		this.#data.append(items);
 	}
 
+	updateItem(key: string, data: Partial<EntityTreeItem>): void {
+		const entries = this.#data.getValue();
+		const entry = entries.find((entry) => entry.key === key);
+
+		if (entry) {
+			this.#data.appendOne({ ...entry, ...data });
+		}
+	}
+
+	removeItem(key: string): void {
+		const entries = this.#data.getValue();
+		const entry = entries.find((entry) => entry.key === key);
+
+		if (entry) {
+			this.#data.remove([key]);
+		}
+	}
+
 	treeRootChanged() {
 		return createObservablePart(this.#data, (items) => items.filter((item) => item.parentKey === null));
 	}
