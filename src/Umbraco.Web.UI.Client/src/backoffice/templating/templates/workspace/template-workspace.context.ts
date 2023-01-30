@@ -1,11 +1,11 @@
-import { UmbTemplateDetailRepository } from '../template.detail.repository';
+import { UmbTemplateDetailRepository } from './data/template.detail.repository';
 import { createObservablePart, DeepState } from '@umbraco-cms/observable-api';
 import { Template } from '@umbraco-cms/backend-api';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 
 export class UmbTemplateWorkspaceContext {
 	#host: UmbControllerHostInterface;
-	#templateRepository: UmbTemplateDetailRepository;
+	#templateDetailRepo: UmbTemplateDetailRepository;
 
 	#data = new DeepState<Template | undefined>(undefined);
 	data = this.#data.asObservable();
@@ -14,7 +14,7 @@ export class UmbTemplateWorkspaceContext {
 
 	constructor(host: UmbControllerHostInterface) {
 		this.#host = host;
-		this.#templateRepository = new UmbTemplateDetailRepository(this.#host);
+		this.#templateDetailRepo = new UmbTemplateDetailRepository(this.#host);
 	}
 
 	setName(value: string) {
@@ -26,24 +26,24 @@ export class UmbTemplateWorkspaceContext {
 	}
 
 	async load(entityKey: string) {
-		const { data } = await this.#templateRepository.get(entityKey);
+		const { data } = await this.#templateDetailRepo.get(entityKey);
 		if (data) {
 			this.#data.next(data);
 		}
 	}
 
 	async createScaffold(parentKey: string | null) {
-		const { data } = await this.#templateRepository.createScaffold(parentKey);
+		const { data } = await this.#templateDetailRepo.createScaffold(parentKey);
 		if (!data) return;
 		this.#data.next(data);
 	}
 
 	async save(isNew: boolean) {
 		if (!this.#data.value) return;
-		isNew ? this.#templateRepository.insert(this.#data.value) : this.#templateRepository.update(this.#data.value);
+		isNew ? this.#templateDetailRepo.insert(this.#data.value) : this.#templateDetailRepo.update(this.#data.value);
 	}
 
 	async delete(key: string) {
-		await this.#templateRepository.delete(key);
+		await this.#templateDetailRepo.delete(key);
 	}
 }

@@ -1,5 +1,5 @@
 import { Observable } from 'rxjs';
-import { TemplateServerDataSource } from '../data/template.server';
+import { TemplateTreeServerDataSource } from './sources/template.tree.server.data';
 import { UmbTemplateTreeStore, UMB_TEMPLATE_TREE_STORE_CONTEXT_TOKEN } from './template.tree.store';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 import { UmbNotificationService, UMB_NOTIFICATION_SERVICE_CONTEXT_TOKEN } from '@umbraco-cms/notification';
@@ -8,7 +8,7 @@ import { EntityTreeItem, PagedEntityTreeItem, ProblemDetails } from '@umbraco-cm
 
 export class UmbTemplateTreeRepository {
 	#host: UmbControllerHostInterface;
-	#dataSource: TemplateServerDataSource;
+	#dataSource: TemplateTreeServerDataSource;
 	#treeStore!: UmbTemplateTreeStore;
 	#notificationService?: UmbNotificationService;
 	#initResolver?: (value: unknown) => void;
@@ -17,7 +17,7 @@ export class UmbTemplateTreeRepository {
 	constructor(host: UmbControllerHostInterface) {
 		this.#host = host;
 		// TODO: figure out how spin up get the correct data source
-		this.#dataSource = new TemplateServerDataSource(this.#host);
+		this.#dataSource = new TemplateTreeServerDataSource(this.#host);
 
 		new UmbContextConsumerController(this.#host, UMB_TEMPLATE_TREE_STORE_CONTEXT_TOKEN, (instance) => {
 			this.#treeStore = instance;

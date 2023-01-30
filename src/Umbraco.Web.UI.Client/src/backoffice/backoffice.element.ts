@@ -32,8 +32,8 @@ import { UmbDocumentBlueprintDetailStore } from './documents/document-blueprints
 import { UmbDocumentBlueprintTreeStore } from './documents/document-blueprints/document-blueprint.tree.store';
 import { UmbDataTypeDetailStore } from './settings/data-types/data-type.detail.store';
 import { UmbDataTypeTreeStore } from './settings/data-types/tree/data-type.tree.store';
-import { UmbTemplateTreeStore } from './templating/templates/tree/template.tree.store';
-import { UmbTemplateDetailStore } from './templating/templates/template.detail.store';
+import { UmbTemplateTreeStore } from './templating/templates/tree/data/template.tree.store';
+import { UmbTemplateDetailStore } from './templating/templates/workspace/data/template.detail.store';
 import { UmbThemeService, UMB_THEME_SERVICE_CONTEXT_TOKEN } from './themes/theme.service';
 import { UmbNotificationService, UMB_NOTIFICATION_SERVICE_CONTEXT_TOKEN } from '@umbraco-cms/notification';
 

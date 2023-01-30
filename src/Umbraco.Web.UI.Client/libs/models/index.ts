@@ -149,3 +149,10 @@ export interface DocumentBlueprintDetails {
 	icon: string;
 	documentTypeKey: string;
 }
+
+export type DataSourceError = Record<string, any>;
+
+export interface DataSourceResponse<T = undefined> {
+	data?: T;
+	error?: DataSourceError;
+}

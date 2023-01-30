@@ -1,10 +1,10 @@
 import { v4 as uuid } from 'uuid';
-import { TemplateDataSource } from '.';
+import { TemplateDetailDataSource } from '.';
 import { ProblemDetails, Template, TemplateResource } from '@umbraco-cms/backend-api';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 import { tryExecuteAndNotify } from '@umbraco-cms/resources';
 
-export class TemplateServerDataSource implements TemplateDataSource {
+export class UmbTemplateDetailServerDataSource implements TemplateDetailDataSource {
 	#host: UmbControllerHostInterface;
 	constructor(host: UmbControllerHostInterface) {
 		this.#host = host;
@@ -70,37 +70,5 @@ export class TemplateServerDataSource implements TemplateDataSource {
 		}
 
 		return await tryExecuteAndNotify(this.#host, TemplateResource.deleteTemplateByKey({ key }));
-	}
-
-	async getTreeRoot() {
-		return tryExecuteAndNotify(this.#host, TemplateResource.getTreeTemplateRoot({}));
-	}
-
-	async getTreeItemChildren(parentKey: string | null) {
-		if (!parentKey) {
-			const error: ProblemDetails = { title: 'Parent key is missing' };
-			return { error };
-		}
-
-		return tryExecuteAndNotify(
-			this.#host,
-			TemplateResource.getTreeTemplateChildren({
-				parentKey,
-			})
-		);
-	}
-
-	async getTreeItems(keys: Array<string>) {
-		if (keys) {
-			const error: ProblemDetails = { title: 'Keys are missing' };
-			return { error };
-		}
-
-		return tryExecuteAndNotify(
-			this.#host,
-			TemplateResource.getTreeTemplateItem({
-				key: keys,
-			})
-		);
 	}
 }

@@ -1,5 +1,5 @@
 import { UmbTemplateDetailStore, UMB_TEMPLATE_DETAIL_STORE_CONTEXT_TOKEN } from './template.detail.store';
-import { TemplateServerDataSource } from './data/template.server';
+import { UmbTemplateDetailServerDataSource } from './sources/template.detail.server.data';
 import { ProblemDetails, Template } from '@umbraco-cms/backend-api';
 import { UmbContextConsumerController } from '@umbraco-cms/context-api';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
@@ -9,7 +9,7 @@ import { UmbNotificationService, UMB_NOTIFICATION_SERVICE_CONTEXT_TOKEN } from '
 // element -> context -> repository -> (store) -> data source
 export class UmbTemplateDetailRepository {
 	#host: UmbControllerHostInterface;
-	#dataSource: TemplateServerDataSource;
+	#dataSource: UmbTemplateDetailServerDataSource;
 	#detailStore?: UmbTemplateDetailStore;
 	#notificationService?: UmbNotificationService;
 	#initResolver?: (value: unknown) => void;
@@ -18,7 +18,7 @@ export class UmbTemplateDetailRepository {
 	constructor(host: UmbControllerHostInterface) {
 		this.#host = host;
 		// TODO: figure out how spin up get the correct data source
-		this.#dataSource = new TemplateServerDataSource(this.#host);
+		this.#dataSource = new UmbTemplateDetailServerDataSource(this.#host);
 
 		new UmbContextConsumerController(this.#host, UMB_TEMPLATE_DETAIL_STORE_CONTEXT_TOKEN, (instance) => {
 			this.#detailStore = instance;
