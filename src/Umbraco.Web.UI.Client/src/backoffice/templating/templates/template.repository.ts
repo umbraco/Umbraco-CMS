@@ -1,7 +1,7 @@
 import { Observable } from 'rxjs';
 import { UmbTemplateDetailStore, UMB_TEMPLATE_DETAIL_STORE_CONTEXT_TOKEN } from './template.detail.store';
 import { UmbTemplateTreeStore, UMB_TEMPLATE_TREE_STORE_CONTEXT_TOKEN } from './tree/template.tree.store';
-import { TemplateServerDataSource } from './template.server';
+import { TemplateServerDataSource } from './data/template.server';
 import { EntityTreeItem, PagedEntityTreeItem, ProblemDetails, Template } from '@umbraco-cms/backend-api';
 import { UmbContextConsumerController } from '@umbraco-cms/context-api';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';

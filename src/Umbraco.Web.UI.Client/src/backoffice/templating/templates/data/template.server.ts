@@ -1,5 +1,5 @@
 import { v4 as uuid } from 'uuid';
-import { TemplateDataSource } from './data';
+import { TemplateDataSource } from '.';
 import { ProblemDetails, Template, TemplateResource } from '@umbraco-cms/backend-api';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 import { tryExecuteAndNotify } from '@umbraco-cms/resources';
