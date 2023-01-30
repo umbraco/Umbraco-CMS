@@ -13,7 +13,7 @@ const DefaultLanguageData: UmbLanguageStoreItemType = {
 export class UmbWorkspaceLanguageContext {
 	public host: UmbControllerHostInterface;
 
-	private _entityKey!: string;
+	private _entityKey: string | null;
 
 	private _data;
 	public readonly data;
@@ -21,7 +21,7 @@ export class UmbWorkspaceLanguageContext {
 	private _store: UmbLanguageStore | null = null;
 	protected _storeObserver?: UmbObserverController<UmbLanguageStoreItemType>;
 
-	constructor(host: UmbControllerHostInterface, entityKey: string) {
+	constructor(host: UmbControllerHostInterface, entityKey: string | null) {
 		this.host = host;
 		this._entityKey = entityKey;
 
@@ -35,7 +35,7 @@ export class UmbWorkspaceLanguageContext {
 	}
 
 	private _observeStore(): void {
-		if (!this._store || this._entityKey === 'new') {
+		if (!this._store || this._entityKey === null) {
 			return;
 		}
 

@@ -3,12 +3,13 @@ import { css, html, nothing } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { UUIInputElement, UUIInputEvent } from '@umbraco-ui/uui';
 import { UmbLanguageStoreItemType } from '../../language.store';
+import { UmbWorkspaceEntityElement } from '../../../../shared/components/workspace/workspace-entity-element.interface';
 import { UmbWorkspaceLanguageContext } from './language-workspace.context';
 import { UmbLitElement } from '@umbraco-cms/element';
 import '../../../../shared/components/workspace/actions/save/workspace-action-node-save.element.ts';
 
 @customElement('umb-language-workspace')
-export class UmbLanguageWorkspaceElement extends UmbLitElement {
+export class UmbLanguageWorkspaceElement extends UmbLitElement implements UmbWorkspaceEntityElement {
 	static styles = [
 		UUITextStyles,
 		css`
@@ -27,22 +28,18 @@ export class UmbLanguageWorkspaceElement extends UmbLitElement {
 	@property()
 	language?: UmbLanguageStoreItemType;
 
-	private _entityKey!: string;
-	@property()
-	public get entityKey(): string {
-		return this._entityKey;
-	}
-	public set entityKey(value: string) {
-		this._entityKey = value;
-		if (this._entityKey && !this._languageWorkspaceContext) {
-			this.provideLanguageWorkspaceContext();
-		}
-	}
-
 	private _languageWorkspaceContext?: UmbWorkspaceLanguageContext;
 
-	public provideLanguageWorkspaceContext() {
-		this._languageWorkspaceContext = new UmbWorkspaceLanguageContext(this, this._entityKey);
+	load(key: string): void {
+		this.provideLanguageWorkspaceContext(key);
+	}
+
+	create(parentKey: string | null): void {
+		this.provideLanguageWorkspaceContext(parentKey);
+	}
+
+	public provideLanguageWorkspaceContext(entityKey: string | null) {
+		this._languageWorkspaceContext = new UmbWorkspaceLanguageContext(this, entityKey);
 		this.provideContext('umbWorkspaceContext', this._languageWorkspaceContext);
 		this._languageWorkspaceContext.data.subscribe((language) => {
 			this.language = language;

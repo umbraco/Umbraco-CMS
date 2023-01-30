@@ -3,6 +3,7 @@ import { css, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { UmbLanguageStore, UmbLanguageStoreItemType, UMB_LANGUAGE_STORE_CONTEXT_TOKEN } from '../../language.store';
 import { UmbTableColumn, UmbTableConfig, UmbTableItem } from '../../../../shared/components/table';
+import { UmbWorkspaceEntityElement } from '../../../../shared/components/workspace/workspace-entity-element.interface';
 import { UmbLitElement } from '@umbraco-cms/element';
 
 import '../language/language-workspace.element';
@@ -10,7 +11,7 @@ import './language-root-table-delete-column-layout.element';
 import './language-root-table-name-column-layout.element';
 
 @customElement('umb-language-root-workspace')
-export class UmbLanguageRootWorkspaceElement extends UmbLitElement {
+export class UmbLanguageRootWorkspaceElement extends UmbLitElement implements UmbWorkspaceEntityElement {
 	static styles = [
 		UUITextStyles,
 		css`
@@ -80,6 +81,14 @@ export class UmbLanguageRootWorkspaceElement extends UmbLitElement {
 		});
 	}
 
+	load(): void {
+		// Not relevant for this workspace
+	}
+
+	create(): void {
+		// Not relevant for this workspace
+	}
+
 	private _observeLanguages() {
 		this._languageStore?.getAll().subscribe((languages) => {
 			this._createTableItems(languages);
@@ -127,7 +136,7 @@ export class UmbLanguageRootWorkspaceElement extends UmbLitElement {
 	render() {
 		return html`
 			<umb-body-layout no-header-background>
-				<a id="add-language" slot="header" href="section/settings/language/edit/new">
+				<a id="add-language" slot="header" href="section/settings/language/create/root">
 					<uui-button label="Add language" look="outline" color="default"></uui-button>
 				</a>
 				<umb-table .config=${this._tableConfig} .columns=${this._tableColumns} .items=${this._tableItems}></umb-table>
