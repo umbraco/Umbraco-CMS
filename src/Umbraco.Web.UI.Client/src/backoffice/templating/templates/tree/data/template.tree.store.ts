@@ -21,7 +21,7 @@ export class UmbTemplateTreeStore extends UmbStoreBase {
 		this.#data.append(items);
 	}
 
-	updateItem(key: string, data: Partial<EntityTreeItem>): void {
+	updateItem(key: string, data: Partial<EntityTreeItem>) {
 		const entries = this.#data.getValue();
 		const entry = entries.find((entry) => entry.key === key);
 
@@ -30,7 +30,7 @@ export class UmbTemplateTreeStore extends UmbStoreBase {
 		}
 	}
 
-	removeItem(key: string): void {
+	removeItem(key: string) {
 		const entries = this.#data.getValue();
 		const entry = entries.find((entry) => entry.key === key);
 
