@@ -60,7 +60,7 @@ export class UmbModalLayoutIconPickerElement extends UmbModalLayoutElement<UmbMo
 
 			#icon-selection .icon {
 				display: inline-block;
-				border-radius: 2px;
+				border-radius: var(--uui-border-radius);
 				width: 100%;
 				height: 100%;
 				padding: 8px;
