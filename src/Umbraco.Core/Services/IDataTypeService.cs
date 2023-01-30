@@ -25,22 +25,31 @@ public interface IDataTypeService : IService
     /// <returns></returns>
     Task<Attempt<IReadOnlyDictionary<Udi, IEnumerable<string>>, DataTypeOperationStatus>> GetReferencesAsync(Guid id);
 
+    [Obsolete("Please use IDataTypeContainerService for all data type container operations. Will be removed in V15.")]
     Attempt<OperationResult<OperationResultType, EntityContainer>?> CreateContainer(int parentId, Guid key, string name, int userId = Constants.Security.SuperUserId);
 
+    [Obsolete("Please use IDataTypeContainerService for all data type container operations. Will be removed in V15.")]
     Attempt<OperationResult?> SaveContainer(EntityContainer container, int userId = Constants.Security.SuperUserId);
 
+    [Obsolete("Please use IDataTypeContainerService for all data type container operations. Will be removed in V15.")]
     EntityContainer? GetContainer(int containerId);
 
+    [Obsolete("Please use IDataTypeContainerService for all data type container operations. Will be removed in V15.")]
     EntityContainer? GetContainer(Guid containerId);
 
+    [Obsolete("Please use IDataTypeContainerService for all data type container operations. Will be removed in V15.")]
     IEnumerable<EntityContainer> GetContainers(string folderName, int level);
 
+    [Obsolete("Please use IDataTypeContainerService for all data type container operations. Will be removed in V15.")]
     IEnumerable<EntityContainer> GetContainers(IDataType dataType);
 
+    [Obsolete("Please use IDataTypeContainerService for all data type container operations. Will be removed in V15.")]
     IEnumerable<EntityContainer> GetContainers(int[] containerIds);
 
+    [Obsolete("Please use IDataTypeContainerService for all data type container operations. Will be removed in V15.")]
     Attempt<OperationResult?> DeleteContainer(int containerId, int userId = Constants.Security.SuperUserId);
 
+    [Obsolete("Please use IDataTypeContainerService for all data type container operations. Will be removed in V15.")]
     Attempt<OperationResult<OperationResultType, EntityContainer>?> RenameContainer(int id, string name, int userId = Constants.Security.SuperUserId);
 
     /// <summary>
