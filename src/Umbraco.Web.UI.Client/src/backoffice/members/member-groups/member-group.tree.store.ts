@@ -1,13 +1,12 @@
 import { EntityTreeItem, MemberGroupResource, } from '@umbraco-cms/backend-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/resources';
 import { UmbContextToken } from '@umbraco-cms/context-api';
-import { createObservablePart, ArrayState } from '@umbraco-cms/observable-api';
+import { ArrayState } from '@umbraco-cms/observable-api';
 import { UmbStoreBase } from '@umbraco-cms/store';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 
 
 export const UMB_MEMBER_GROUP_TREE_STORE_CONTEXT_TOKEN = new UmbContextToken<UmbMemberGroupTreeStore>('UmbMemberGroupTreeStore');
-
 
 /**
  * @export
@@ -17,10 +16,8 @@ export const UMB_MEMBER_GROUP_TREE_STORE_CONTEXT_TOKEN = new UmbContextToken<Umb
  */
 export class UmbMemberGroupTreeStore extends UmbStoreBase {
 
-
 	// TODO: use the right type here:
 	#data = new ArrayState<EntityTreeItem>([], (x) => x.key);
-
 
 	constructor(host: UmbControllerHostInterface) {
 		super(host, UMB_MEMBER_GROUP_TREE_STORE_CONTEXT_TOKEN.toString());
@@ -55,25 +52,23 @@ export class UmbMemberGroupTreeStore extends UmbStoreBase {
 		});
 
 		// TODO: remove ignore when we know how to handle trashed items.
-		return createObservablePart(this.#data, (items) => items.filter((item) => item.parentKey === null));
+		return this.#data.getObservablePart((items) => items.filter((item) => item.parentKey === null));
 	}
 
-	getTreeItemChildren(key: string) {
-		/*
-		tryExecuteAndNotify(
-			this._host,
-			MemberTypeResource.getTreeMemberTypeChildren({
-				parentKey: key,
-			})
-		).then(({ data }) => {
-			if (data) {
-				// TODO: how do we handle if an item has been removed during this session(like in another tab or by another user)?
-				this.#data.append(data.items);
-			}
-		});
-		*/
+	getTreeItemChildren(key: string) {		
+		// tryExecuteAndNotify(
+		// 	this._host,
+		// 	MemberGroupResource.getTreeMemberGroupChildren({
+		// 		parentKey: key,
+		// 	})
+		// ).then(({ data }) => {
+		// 	if (data) {
+		// 		// TODO: how do we handle if an item has been removed during this session(like in another tab or by another user)?
+		// 		this.#data.append(data.items);
+		// 	}
+		// });		
 
-		return createObservablePart(this.#data, (items) => items.filter((item) => item.parentKey === key));
+		return this.#data.getObservablePart((items) => items.filter((item) => item.parentKey === key));
 	}
 
 	getTreeItems(keys: Array<string>) {
@@ -91,6 +86,6 @@ export class UmbMemberGroupTreeStore extends UmbStoreBase {
 			});
 		}
 
-		return createObservablePart(this.#data, (items) => items.filter((item) => keys.includes(item.key ?? '')));
+		return this.#data.getObservablePart((items) => items.filter((item) => keys.includes(item.key ?? '')));
 	}
 }
