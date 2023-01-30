@@ -29,7 +29,7 @@ export class UmbModalLayoutIconPickerElement extends UmbModalLayoutElement<UmbMo
 				display: flex;
 				flex-direction: column;
 				height: 100%;
-				background-color: white;
+				background-color: var(--uui-color-surface);
 				box-shadow: var(--uui-shadow-depth-1, 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24));
 				border-radius: var(--uui-border-radius);
 				padding: var(--uui-size-space-5);
@@ -74,7 +74,7 @@ export class UmbModalLayoutIconPickerElement extends UmbModalLayoutElement<UmbMo
 			#icon-selection .icon:focus,
 			#icon-selection .icon:hover,
 			#icon-selection .icon.selected {
-				background-color: rgba(0, 0, 0, 0.1);
+				background-color: var(--uui-color-selected);
 			}
 
 			uui-button {

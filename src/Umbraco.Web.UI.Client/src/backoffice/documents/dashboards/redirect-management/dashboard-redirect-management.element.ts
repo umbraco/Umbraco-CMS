@@ -56,7 +56,7 @@ export class UmbDashboardRedirectManagementElement extends UmbLitElement {
 			}
 			.trackerDisabled::after {
 				content: '';
-				background-color: rgba(250, 250, 250, 0.7);
+				background-color: var(--uui-color-disabled);
 				position: absolute;
 				border-radius: 2px;
 				left: 0;

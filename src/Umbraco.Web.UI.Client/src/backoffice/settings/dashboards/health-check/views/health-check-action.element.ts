@@ -17,7 +17,7 @@ export class UmbDashboardHealthCheckActionElement extends UmbLitElement {
 				margin: var(--uui-size-space-4) 0;
 				display: block;
 				border-radius: var(--uui-border-radius);
-				background-color: #eee;
+				background-color: var(--uui-color-surface-alt);
 			}
 			form {
 				margin: 0;
