@@ -2,7 +2,7 @@ import { css, html } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, state } from 'lit/decorators.js';
 import { UUISelectEvent } from '@umbraco-ui/uui';
-import { UmbThemeService, UMB_THEME_SERVICE_CONTEXT_TOKEN } from '../../themes/theme.service';
+import { UmbThemeContext, UMB_THEME_CONTEXT_TOKEN } from '../../themes/theme.context';
 import { UmbLitElement } from '@umbraco-cms/element';
 
 @customElement('umb-user-dashboard-test')
@@ -23,25 +23,29 @@ export class UmbUserDashboardTestElement extends UmbLitElement {
 		`,
 	];
 
-	#themeService?: UmbThemeService;
+	#themeService?: UmbThemeContext;
 
 	@state()
-	private _theme = '';
+	private _theme: string | null = null;
 
 	@state()
 	private _themes: Array<string> = [];
 
 	constructor() {
 		super();
-		this.consumeContext(UMB_THEME_SERVICE_CONTEXT_TOKEN, (instance) => {
+		this.consumeContext(UMB_THEME_CONTEXT_TOKEN, (instance) => {
+
+			console.log("ThemeCOntext", instance)
 			this.#themeService = instance;
 			instance.theme.subscribe((theme) => {
 				this._theme = theme;
 			});
+
+			instance.setThemeByAlias('umb-dark-theme');
 			// TODO: We should get rid of the #themes state and instead use an extension point:
-			instance.themes.subscribe((themes) => {
+			/*instance.themes.subscribe((themes) => {
 				this._themes = themes.map((t) => t.name);
-			});
+			});*/
 		});
 	}
 

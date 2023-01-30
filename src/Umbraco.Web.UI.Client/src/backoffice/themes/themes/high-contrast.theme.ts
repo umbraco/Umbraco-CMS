@@ -1,5 +1,5 @@
 import { css } from 'lit';
-import { UmbTheme } from '../theme.service';
+import { UmbTheme } from '../theme.context';
 
 // TODO: We should get this from UUI, and it should be served through an extension.
 const name = 'High Contrast';

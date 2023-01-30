@@ -33,7 +33,7 @@ import { UmbDocumentBlueprintTreeStore } from './documents/document-blueprints/d
 
 import { UmbDataTypeDetailStore } from './settings/data-types/data-type.detail.store';
 import { UmbDataTypeTreeStore } from './settings/data-types/data-type.tree.store';
-import { UmbThemeContext } from './themes/theme.service';
+import { UmbThemeContext } from './themes/theme.context';
 import { UmbNotificationService, UMB_NOTIFICATION_SERVICE_CONTEXT_TOKEN } from '@umbraco-cms/notification';
 
 // Domains

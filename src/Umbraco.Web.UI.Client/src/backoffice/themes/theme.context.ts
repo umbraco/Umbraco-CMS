@@ -1,14 +1,20 @@
-import { dark, highContrast } from './themes';
+import { map } from 'rxjs';
+//import { dark, highContrast } from './themes';
+import type { CSSResult } from 'lit';
+import { manifests } from './manifests';
 import { UmbContextProviderController, UmbContextToken } from '@umbraco-cms/context-api';
 import { StringState, UmbObserverController } from '@umbraco-cms/observable-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-api';
-import { map } from 'rxjs';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
+import { ManifestTheme } from '@umbraco-cms/extensions-registry';
 
 export interface UmbTheme {
 	name: string;
-	css: string;
+	css: CSSResult;
 }
+
+
+const LOCAL_STORAGE_KEY = 'umb-theme-alias';
 
 export class UmbThemeContext {
 
@@ -36,40 +42,47 @@ export class UmbThemeContext {
 
 		this._host = host;
 
-		new UmbContextProviderController(host, UMB_THEME_SERVICE_CONTEXT_TOKEN, this);
+		console.log("Theme COntext")
+
+		new UmbContextProviderController(host, UMB_THEME_CONTEXT_TOKEN, this);
 
 		//TODO: Figure out how to extend this with themes from packages
 		//this.addTheme(dark);
 		//this.addTheme(highContrast);
 		this.#styleElement = document.createElement('style');
 
-		const storedTheme = localStorage.getItem('umb-theme');
+		const storedTheme = localStorage.getItem(LOCAL_STORAGE_KEY);
 		if(storedTheme) {
-			this.setThemeByName(storedTheme);
+			this.setThemeByAlias(storedTheme);
 		}
 
 		document.documentElement.insertAdjacentElement('beforeend', this.#styleElement);
 	}
 
-	private setThemeByName(themeName: string | null) {
+	public setThemeByAlias(themeAlias: string | null) {
 
-		this.#theme.next(themeName);
+		this.#theme.next(themeAlias);
 
 		this.themeSubscription?.destroy();
-		if(themeName != null) {
-			localStorage.setItem('umb-theme', themeName);
+		if(themeAlias != null) {
+			localStorage.setItem(LOCAL_STORAGE_KEY, themeAlias);
 			this.themeSubscription = new UmbObserverController(this._host,
 				umbExtensionsRegistry.extensionsOfType('theme').pipe(map(
-					(value) => value.name === themeName
+					(extensions) => extensions.filter((extension) => extension.alias === themeAlias)
 				))
 			,
-				(theme) => {
+				async (themes) => {
+					if (themes.length > 0 && themes[0].loader) {
+						const result = await themes[0].loader();
+						console.log("result from loader: ", result.default);
+						this.#styleElement.innerHTML = result.default;
+					}
 					// how to get CSS.
 					//this.#styleElement.innerHTML = "";
 				}
 			);
 		} else {
-			localStorage.removeItem('umb-theme');
+			localStorage.removeItem(LOCAL_STORAGE_KEY);
 			this.#styleElement.innerHTML = "";
 		}
 
@@ -82,8 +95,15 @@ export class UmbThemeContext {
 	*/
 }
 
-export const UMB_THEME_SERVICE_CONTEXT_TOKEN = new UmbContextToken<UmbThemeContext>(UmbThemeContext.name);
-function UmbObserveController(arg0: Subscription): any {
-	throw new Error('Function not implemented.');
-}
+export const UMB_THEME_CONTEXT_TOKEN = new UmbContextToken<UmbThemeContext>('umbThemeContext');
 
+
+
+// TODO: Can we do this in a smarter way:
+const registerExtensions = (manifests: Array<ManifestTheme>) => {
+	manifests.forEach((manifest) => {
+		umbExtensionsRegistry.register(manifest);
+	});
+};
+
+registerExtensions([...manifests]);
