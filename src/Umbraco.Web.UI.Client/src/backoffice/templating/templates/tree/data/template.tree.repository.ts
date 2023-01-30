@@ -84,15 +84,15 @@ export class UmbTemplateTreeRepository implements UmbRepository {
 		return { data, error };
 	}
 
-	treeRootChanged(): Observable<EntityTreeItem[]> {
+	treeRootChanged() {
 		return this.#treeStore.treeRootChanged?.();
 	}
 
-	treeItemChildrenChanged(key: string): Observable<EntityTreeItem[]> {
+	treeItemChildrenChanged(key: string) {
 		return this.#treeStore.treeItemChildrenChanged?.(key);
 	}
 
-	treeItemsChanged(keys: Array<string>): Observable<EntityTreeItem[]> {
+	treeItemsChanged(keys: Array<string>) {
 		return this.#treeStore.treeItemsChanged?.(keys);
 	}
 }
