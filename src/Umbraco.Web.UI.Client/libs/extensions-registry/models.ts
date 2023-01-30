@@ -16,6 +16,7 @@ import type { ManifestPackageView } from './package-view.models';
 import type { ManifestExternalLoginProvider } from './external-login-provider.models';
 import type { ManifestCollectionBulkAction } from './collection-bulk-action.models';
 import type { ManifestCollectionView } from './collection-view.models';
+import type { ManifestHealthCheck } from './health-check.models';
 import type { ManifestSidebarMenuItem } from './sidebar-menu-item.models';
 
 export * from './header-app.models';
@@ -36,6 +37,7 @@ export * from './package-view.models';
 export * from './external-login-provider.models';
 export * from './collection-bulk-action.models';
 export * from './collection-view.models';
+export * from './health-check.models';
 export * from './sidebar-menu-item.models';
 
 export type ManifestTypes =
@@ -60,6 +62,7 @@ export type ManifestTypes =
 	| ManifestEntrypoint
 	| ManifestCollectionBulkAction
 	| ManifestCollectionView
+	| ManifestHealthCheck
 	| ManifestSidebarMenuItem;
 
 export type ManifestStandardTypes = ManifestTypes['type'];

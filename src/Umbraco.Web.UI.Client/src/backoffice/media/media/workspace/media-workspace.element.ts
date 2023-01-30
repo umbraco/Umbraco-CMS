@@ -17,25 +17,16 @@ export class UmbMediaWorkspaceElement extends UmbLitElement {
 		`,
 	];
 
-	private _entityKey!: string;
-	@property()
-	public get entityKey(): string {
-		return this._entityKey;
-	}
-	public set entityKey(value: string) {
-		this._entityKey = value;
-		if (this._entityKey) {
-			this._workspaceContext?.load(this._entityKey);
-		}
-	}
-
-	@property()
-	public set create(parentKey: string | null) {
-		this._workspaceContext?.create(parentKey);
-	}
 
 	private _workspaceContext: UmbWorkspaceMediaContext = new UmbWorkspaceMediaContext(this);
 
+	public load(value: string) {
+		this._workspaceContext?.load(value);
+	}
+
+	public create(parentKey: string | null) {
+		this._workspaceContext?.create(parentKey);
+	}
 
 	render() {
 		return html`<umb-workspace-content alias="Umb.Workspace.Media"></umb-workspace-content>`;

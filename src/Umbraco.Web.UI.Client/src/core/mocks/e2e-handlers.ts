@@ -10,6 +10,7 @@ import { handlers as telemetryHandlers } from './domains/telemetry.handlers';
 import { handlers as examineManagementHandlers } from './domains/examine-management.handlers';
 import { handlers as modelsBuilderHandlers } from './domains/modelsbuilder.handlers';
 import { handlers as profileHandlers } from './domains/performance-profiling.handlers';
+import { handlers as healthCheckHandlers } from './domains/health-check.handlers';
 import { handlers as redirectManagementHandlers } from './domains/redirect-management.handlers';
 
 export const handlers = [
@@ -27,5 +28,6 @@ export const handlers = [
 	...examineManagementHandlers,
 	...modelsBuilderHandlers,
 	...profileHandlers,
+	...healthCheckHandlers,
 	...redirectManagementHandlers,
 ];

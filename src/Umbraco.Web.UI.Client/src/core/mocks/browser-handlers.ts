@@ -11,6 +11,7 @@ import { handlers as usersHandlers } from './domains/users.handlers';
 import { handlers as userGroupsHandlers } from './domains/user-groups.handlers';
 import { handlers as examineManagementHandlers } from './domains/examine-management.handlers';
 import { handlers as modelsBuilderHandlers } from './domains/modelsbuilder.handlers';
+import { handlers as healthCheckHandlers } from './domains/health-check.handlers';
 import { handlers as profilingHandlers } from './domains/performance-profiling.handlers';
 import { handlers as documentHandlers } from './domains/document.handlers';
 import { handlers as mediaHandlers } from './domains/media.handlers';
@@ -40,6 +41,7 @@ const handlers = [
 	...memberTypeHandlers,
 	...examineManagementHandlers,
 	...modelsBuilderHandlers,
+	...healthCheckHandlers,
 	...profilingHandlers,
 	...dictionaryHandlers,
 	...languageHandlers,
