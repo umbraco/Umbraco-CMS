@@ -1,34 +1,12 @@
-using System.Globalization;
+﻿using System.Globalization;
 using NPoco;
 
-namespace Umbraco.Cms.Persistence.Sqlite.Mappers;
+namespace Umbraco.Cms.Core.Mapping;
 
-public class SqlitePocoGuidMapper : DefaultMapper
+public class UmbracoDefaultMapper : DefaultMapper
 {
     public override Func<object, object?> GetFromDbConverter(Type destType, Type sourceType)
     {
-        if (destType == typeof(Guid))
-        {
-            return value =>
-            {
-                var result = Guid.Parse($"{value}");
-                return result;
-            };
-        }
-
-        if (destType == typeof(Guid?))
-        {
-            return value =>
-            {
-                if (Guid.TryParse($"{value}", out Guid result))
-                {
-                    return result;
-                }
-
-                return default(Guid?);
-            };
-        }
-
         if (destType == typeof(decimal))
         {
             return value =>
