@@ -1,10 +1,10 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { css, nothing } from 'lit';
 import type { TemplateResult } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { map } from 'rxjs';
 import { repeat } from 'lit/directives/repeat.js';
-import { umbExtensionsRegistry } from '@umbraco-cms/extensions-api';
-import { createExtensionElement, isManifestElementableType } from '@umbraco-cms/extensions-api';
+import { createExtensionElement, isManifestElementableType, umbExtensionsRegistry } from '@umbraco-cms/extensions-api';
 import { UmbLitElement } from '@umbraco-cms/element';
 
 export type InitializedExtension = { alias: string; weight: number; component: HTMLElement | null };
@@ -68,6 +68,7 @@ export class UmbExtensionSlotElement extends UmbLitElement {
 						};
 						this._extensions.push(extensionObject);
 						let component;
+
 						if (isManifestElementableType(extension)) {
 							component = await createExtensionElement(extension);
 						} else {

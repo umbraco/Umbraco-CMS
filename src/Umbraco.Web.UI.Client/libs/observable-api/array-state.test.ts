@@ -1,6 +1,5 @@
 import { expect } from '@open-wc/testing';
 import { ArrayState } from './array-state';
-import { createObservablePart } from '@umbraco-cms/observable-api';
 
 describe('ArrayState', () => {
 
@@ -76,9 +75,9 @@ describe('ArrayState', () => {
 	});
 
 
-	it('createObservablePart for a specific entry of array', (done) => {
+	it('getObservablePart for a specific entry of array', (done) => {
 
-		const subObserver = createObservablePart(subject, data => data.find(x => x.key === '2'));
+		const subObserver = subject.getObservablePart(data => data.find(x => x.key === '2'));
 		subObserver.subscribe((entry) => {
 			if(entry) {
 				expect(entry.another).to.be.equal(initialData[1].another);
@@ -89,12 +88,12 @@ describe('ArrayState', () => {
 	});
 
 
-	it('createObservablePart returns undefined if item does not exist', (done) => {
+	it('getObservablePart returns undefined if item does not exist', (done) => {
 
 		let amountOfCallbacks = 0;
 		const newItem = {key: '4', another: 'myValue4'};
 
-		const subObserver = createObservablePart(subject, data => data.find(x => x.key === newItem.key));
+		const subObserver = subject.getObservablePart(data => data.find(x => x.key === newItem.key));
 		subObserver.subscribe((entry) => {
 			amountOfCallbacks++;
 			if(amountOfCallbacks === 1) {
@@ -130,12 +129,12 @@ describe('ArrayState', () => {
 
 	});
 
-	it('createObservablePart returns the replaced item', (done) => {
+	it('getObservablePart returns the replaced item', (done) => {
 
 		const newItem = {key: '2', another: 'myValue4'};
 		subject.appendOne(newItem);
 
-		const subObserver = createObservablePart(subject, data => data.find(x => x.key === newItem.key));
+		const subObserver = subject.getObservablePart(data => data.find(x => x.key === newItem.key));
 		subObserver.subscribe((entry) => {
 			expect(entry).to.be.equal(newItem);// Second callback should give us the right data:
 			if(entry) {

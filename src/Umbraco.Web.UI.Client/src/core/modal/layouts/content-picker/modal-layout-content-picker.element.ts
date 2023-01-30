@@ -51,15 +51,20 @@ export class UmbModalLayoutContentPickerElement extends UmbModalLayoutElement<Um
 	@state()
 	_selection: Array<string> = [];
 
+	@state()
+	_multiple = true;
+
 	connectedCallback() {
 		super.connectedCallback();
 		this._selection = this.data?.selection ?? [];
+		this._multiple = this.data?.multiple ?? true;
 	}
 
 	private _handleSelectionChange(e: CustomEvent) {
 		e.stopPropagation();
 		const element = e.target as UmbTreeElement;
-		this._selection = element.selection;
+		//TODO: Should multiple property be implemented here or be passed down into umb-tree?
+		this._selection = this._multiple ? element.selection : [element.selection[element.selection.length - 1]];
 	}
 
 	private _submit() {

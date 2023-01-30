@@ -67,7 +67,7 @@ export class UmbDataTypeWorkspaceElement extends UmbLitElement {
 			const target = event.composedPath()[0] as UUIInputElement;
 
 			if (typeof target?.value === 'string') {
-				this._workspaceContext.update({ name: target.value });
+				this._workspaceContext.setName(target.value);
 			}
 		}
 	}
