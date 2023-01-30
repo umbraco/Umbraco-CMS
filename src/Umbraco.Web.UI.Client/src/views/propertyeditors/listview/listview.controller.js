@@ -80,12 +80,12 @@ function listViewController($scope, $interpolate, $routeParams, $injector, $time
         var idsWithPermissions = null;
 
         $scope.buttonPermissions = {
-            canCopy: true,
-            canCreate: true,
-            canDelete: true,
-            canMove: true,
-            canPublish: true,
-            canUnpublish: true
+            canCopy: false,
+            canCreate: false,
+            canDelete: false,
+            canMove: false,
+            canPublish: false,
+            canUnpublish: false
         };
 
         $scope.$watch("selection.length", function (newVal, oldVal) {
