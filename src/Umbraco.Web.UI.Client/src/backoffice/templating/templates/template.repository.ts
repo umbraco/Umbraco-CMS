@@ -1,23 +1,17 @@
-import { v4 as uuid } from 'uuid';
 import { Observable } from 'rxjs';
 import { UmbTemplateDetailStore, UMB_TEMPLATE_DETAIL_STORE_CONTEXT_TOKEN } from './template.detail.store';
 import { UmbTemplateTreeStore, UMB_TEMPLATE_TREE_STORE_CONTEXT_TOKEN } from './tree/template.tree.store';
-import { EntityTreeItem, Template, TemplateResource } from '@umbraco-cms/backend-api';
+import { TemplateServerDataSource } from './template.server';
+import { EntityTreeItem, PagedEntityTreeItem, ProblemDetails, Template } from '@umbraco-cms/backend-api';
 import { UmbContextConsumerController } from '@umbraco-cms/context-api';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
-import { tryExecuteAndNotify } from '@umbraco-cms/resources';
 import { UmbNotificationService, UMB_NOTIFICATION_SERVICE_CONTEXT_TOKEN } from '@umbraco-cms/notification';
 
-/* we need to new up the repository from within the element context. We want the correct context for
-the notifications to be displayed in the correct place. */
-
+/* We need to create a new instance of the repository from within the element context. We want the notifications to be displayed in the right context. */
 // element -> context -> repository -> (store) -> data source
-
-/* TODO: don't call the server directly from the repository. 
-We need to be able to swap it out with a local database in the future. 
-Implement data sources */
 export class UmbTemplateRepository {
 	#host: UmbControllerHostInterface;
+	#dataSource: TemplateServerDataSource;
 	#detailStore?: UmbTemplateDetailStore;
 	#treeStore!: UmbTemplateTreeStore;
 	#notificationService?: UmbNotificationService;
@@ -26,6 +20,8 @@ export class UmbTemplateRepository {
 
 	constructor(host: UmbControllerHostInterface) {
 		this.#host = host;
+		// TODO: figure out how spin up get the correct data source
+		this.#dataSource = new TemplateServerDataSource(this.#host);
 
 		new UmbContextConsumerController(this.#host, UMB_TEMPLATE_DETAIL_STORE_CONTEXT_TOKEN, (instance) => {
 			this.#detailStore = instance;
@@ -56,55 +52,31 @@ export class UmbTemplateRepository {
 		}
 	}
 
-	async new(parentKey: string | null): Promise<{ data?: Template; error?: unknown }> {
-		let masterTemplateAlias: string | undefined = undefined;
-		let error = undefined;
-		let data = undefined;
-
-		// TODO: can we do something so we don't have to call two endpoints?
-		if (parentKey) {
-			const { data: parentData, error: parentError } = await tryExecuteAndNotify(
-				this.#host,
-				TemplateResource.getTemplateByKey({ key: parentKey })
-			);
-			masterTemplateAlias = parentData?.alias;
-			error = parentError;
+	async createScaffold(parentKey: string | null): Promise<{ data?: Template; error?: ProblemDetails }> {
+		if (!parentKey) {
+			const error: ProblemDetails = { title: 'Parent key is missing' };
+			return { error };
 		}
 
-		const { data: scaffoldData, error: scaffoldError } = await tryExecuteAndNotify(
-			this.#host,
-			TemplateResource.getTemplateScaffold({ masterTemplateAlias })
-		);
-		error = scaffoldError;
-
-		if (scaffoldData?.content) {
-			data = {
-				key: uuid(),
-				name: '',
-				alias: '',
-				content: scaffoldData?.content,
-			};
-		}
-
-		return { data, error };
+		return this.#dataSource.createScaffold(parentKey);
 	}
 
-	async get(key: string): Promise<{ data?: Template; error?: unknown }> {
+	async get(key: string): Promise<{ data?: Template; error?: ProblemDetails }> {
 		if (!key) {
-			return { error: 'key is missing' };
+			const error: ProblemDetails = { title: 'Key is missing' };
+			return { error };
 		}
 
-		const { data, error } = await tryExecuteAndNotify(this.#host, TemplateResource.getTemplateByKey({ key }));
-		return { data, error };
+		return this.#dataSource.get(key);
 	}
 
-	async insert(template: Template): Promise<{ error?: unknown }> {
+	async insert(template: Template): Promise<{ error?: ProblemDetails }> {
 		if (!template) {
-			return { error: 'Template is missing' };
+			const error: ProblemDetails = { title: 'Template is missing' };
+			return { error };
 		}
 
-		const payload = { requestBody: template };
-		const { error } = await tryExecuteAndNotify(this.#host, TemplateResource.postTemplate(payload));
+		const { error } = await this.#dataSource.insert(template);
 
 		if (!error) {
 			const notification = { data: { message: `Template created` } };
@@ -118,13 +90,13 @@ export class UmbTemplateRepository {
 		return { error };
 	}
 
-	async update(template: Template): Promise<{ error?: unknown }> {
-		if (!template.key) {
-			return { error: 'Template key is missing' };
+	async update(template: Template): Promise<{ error?: ProblemDetails }> {
+		if (!template) {
+			const error: ProblemDetails = { title: 'Template is missing' };
+			return { error };
 		}
 
-		const payload = { key: template.key, requestBody: template };
-		const { error } = await tryExecuteAndNotify(this.#host, TemplateResource.putTemplateByKey(payload));
+		const { error } = await this.#dataSource.update(template);
 
 		if (!error) {
 			const notification = { data: { message: `Template saved` } };
@@ -138,15 +110,16 @@ export class UmbTemplateRepository {
 		return { error };
 	}
 
-	async delete(key: string): Promise<{ error?: unknown }> {
-		if (key) {
-			return { error: 'Key is missing' };
+	async delete(key: string): Promise<{ error?: ProblemDetails }> {
+		if (!key) {
+			const error: ProblemDetails = { title: 'Key is missing' };
+			return { error };
 		}
 
-		const { error } = await tryExecuteAndNotify(this.#host, TemplateResource.deleteTemplateByKey({ key }));
+		const { error } = await this.#dataSource.delete(key);
 
 		if (!error) {
-			const notification = { data: { message: `Template saved` } };
+			const notification = { data: { message: `Template deleted` } };
 			this.#notificationService?.peek('positive', notification);
 		}
 
@@ -155,30 +128,9 @@ export class UmbTemplateRepository {
 		return { error };
 	}
 
-	// TODO: add delete
 	// TODO: split into multiple repositories
-
-	async getTreeRoot(): Promise<{ data?: unknown; error?: unknown }> {
-		const { data, error } = await tryExecuteAndNotify(this.#host, TemplateResource.getTreeTemplateRoot({}));
-
-		if (data) {
-			this.#treeStore?.appendTreeItems(data.items);
-		}
-
-		return { data, error };
-	}
-
-	async getTreeItemChildren(key: string): Promise<{ data?: unknown; error?: unknown }> {
-		if (key) {
-			return { error: 'Key is missing' };
-		}
-
-		const { data, error } = await tryExecuteAndNotify(
-			this.#host,
-			TemplateResource.getTreeTemplateChildren({
-				parentKey: key,
-			})
-		);
+	async getTreeRoot(): Promise<{ data?: PagedEntityTreeItem; error?: ProblemDetails }> {
+		const { data, error } = await this.#dataSource.getTreeRoot();
 
 		if (data) {
 			this.#treeStore?.appendTreeItems(data.items);
@@ -187,17 +139,28 @@ export class UmbTemplateRepository {
 		return { data, error };
 	}
 
-	async getTreeItems(keys: Array<string>): Promise<{ data?: unknown; error?: unknown }> {
-		if (keys) {
-			return { error: 'Keys are missing' };
+	async getTreeItemChildren(parentKey: string): Promise<{ data?: PagedEntityTreeItem; error?: ProblemDetails }> {
+		if (!parentKey) {
+			const error: ProblemDetails = { title: 'Parent key is missing' };
+			return { error };
 		}
 
-		const { data, error } = await tryExecuteAndNotify(
-			this.#host,
-			TemplateResource.getTreeTemplateItem({
-				key: keys,
-			})
-		);
+		const { data, error } = await this.#dataSource.getTreeItemChildren(parentKey);
+
+		if (data) {
+			this.#treeStore?.appendTreeItems(data.items);
+		}
+
+		return { data, error };
+	}
+
+	async getTreeItems(keys: Array<string>): Promise<{ data?: EntityTreeItem[]; error?: ProblemDetails }> {
+		if (!keys) {
+			const error: ProblemDetails = { title: 'Keys are missing' };
+			return { error };
+		}
+
+		const { data, error } = await this.#dataSource.getTreeItems(keys);
 
 		if (data) {
 			this.#treeStore?.appendTreeItems(data);

@@ -33,7 +33,7 @@ export class UmbTemplateWorkspaceContext {
 	}
 
 	async createScaffold(parentKey: string | null) {
-		const { data } = await this.#templateRepository.new(parentKey);
+		const { data } = await this.#templateRepository.createScaffold(parentKey);
 		if (!data) return;
 		this.#data.next(data);
 	}
