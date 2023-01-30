@@ -4,6 +4,7 @@ import {
 	DocumentTypeTreeItem,
 	EntityTreeItem,
 	FolderTreeItem,
+	ProblemDetails,
 } from '@umbraco-cms/backend-api';
 
 // Extension Manifests
@@ -150,9 +151,7 @@ export interface DocumentBlueprintDetails {
 	documentTypeKey: string;
 }
 
-export type DataSourceError = Record<string, any>;
-
 export interface DataSourceResponse<T = undefined> {
 	data?: T;
-	error?: DataSourceError;
+	error?: ProblemDetails;
 }

@@ -1,11 +1,10 @@
-import { Observable } from 'rxjs';
 import { UmbRepository } from '../../../../../core/repository';
 import { TemplateTreeServerDataSource } from './sources/template.tree.server.data';
 import { UmbTemplateTreeStore, UMB_TEMPLATE_TREE_STORE_CONTEXT_TOKEN } from './template.tree.store';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 import { UmbNotificationService, UMB_NOTIFICATION_SERVICE_CONTEXT_TOKEN } from '@umbraco-cms/notification';
 import { UmbContextConsumerController } from '@umbraco-cms/context-api';
-import { EntityTreeItem, PagedEntityTreeItem, ProblemDetails } from '@umbraco-cms/backend-api';
+import { ProblemDetails } from '@umbraco-cms/backend-api';
 
 export class UmbTemplateTreeRepository implements UmbRepository {
 	#host: UmbControllerHostInterface;
@@ -44,7 +43,7 @@ export class UmbTemplateTreeRepository implements UmbRepository {
 		}
 	}
 
-	async getTreeRoot(): Promise<{ data?: PagedEntityTreeItem; error?: ProblemDetails }> {
+	async getTreeRoot() {
 		const { data, error } = await this.#dataSource.getTreeRoot();
 
 		if (data) {
@@ -54,10 +53,10 @@ export class UmbTemplateTreeRepository implements UmbRepository {
 		return { data, error };
 	}
 
-	async getTreeItemChildren(parentKey: string): Promise<{ data?: PagedEntityTreeItem; error?: ProblemDetails }> {
+	async getTreeItemChildren(parentKey: string) {
 		if (!parentKey) {
 			const error: ProblemDetails = { title: 'Parent key is missing' };
-			return { error };
+			return { data: undefined, error };
 		}
 
 		const { data, error } = await this.#dataSource.getTreeItemChildren(parentKey);
@@ -69,10 +68,10 @@ export class UmbTemplateTreeRepository implements UmbRepository {
 		return { data, error };
 	}
 
-	async getTreeItems(keys: Array<string>): Promise<{ data?: EntityTreeItem[]; error?: ProblemDetails }> {
+	async getTreeItems(keys: Array<string>) {
 		if (!keys) {
 			const error: ProblemDetails = { title: 'Keys are missing' };
-			return { error };
+			return { data: undefined, error };
 		}
 
 		const { data, error } = await this.#dataSource.getTreeItems(keys);
