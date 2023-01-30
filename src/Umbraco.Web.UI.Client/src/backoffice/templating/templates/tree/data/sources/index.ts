@@ -1,4 +1,4 @@
-import { DataSourceResponse } from '../../../workspace/data';
+import type { DataSourceResponse } from '@umbraco-cms/models';
 import { EntityTreeItem, PagedEntityTreeItem } from '@umbraco-cms/backend-api';
 
 export interface TemplateTreeDataSource {
