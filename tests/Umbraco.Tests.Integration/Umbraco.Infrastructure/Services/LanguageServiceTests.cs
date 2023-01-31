@@ -250,7 +250,7 @@ public class LanguageServiceTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public async Task Cannot_Create_Language_With_NonExisting_Fallback_Language()
+    public async Task Cannot_Create_Language_With_Invalid_Fallback_Language()
     {
         var isoCode = "en-AU";
         var languageEnAu = new LanguageBuilder()
@@ -259,7 +259,20 @@ public class LanguageServiceTests : UmbracoIntegrationTest
             .Build();
         var result = await LanguageService.CreateAsync(languageEnAu);
         Assert.IsFalse(result.Success);
-        Assert.AreEqual(LanguageOperationStatus.InvalidIsoCode, result.Status);
+        Assert.AreEqual(LanguageOperationStatus.InvalidFallbackIsoCode, result.Status);
+    }
+    
+    [Test]
+    public async Task Cannot_Create_Language_With_NonExisting_Fallback_Language()
+    {
+        var isoCode = "en-AU";
+        var languageEnAu = new LanguageBuilder()
+            .WithCultureInfo(isoCode)
+            .WithFallbackLanguageIsoCode("fr-FR")
+            .Build();
+        var result = await LanguageService.CreateAsync(languageEnAu);
+        Assert.IsFalse(result.Success);
+        Assert.AreEqual(LanguageOperationStatus.InvalidFallback, result.Status);
     }
 
     [Test]
@@ -300,12 +313,25 @@ public class LanguageServiceTests : UmbracoIntegrationTest
         Assert.NotNull(languageDaDk);
         Assert.IsNull(languageDaDk.FallbackIsoCode);
 
-        languageDaDk.FallbackIsoCode = "no-such-iso-code";
+        languageDaDk.FallbackIsoCode = "fr-FR";
         var result = await LanguageService.UpdateAsync(languageDaDk);
         Assert.IsFalse(result.Success);
         Assert.AreEqual(LanguageOperationStatus.InvalidFallback, result.Status);
     }
 
+    [Test]
+    public async Task Cannot_Update_Language_With_Invalid_Fallback_Language()
+    {
+        ILanguage languageDaDk = await LanguageService.GetAsync("da-DK");
+        Assert.NotNull(languageDaDk);
+        Assert.IsNull(languageDaDk.FallbackIsoCode);
+
+        languageDaDk.FallbackIsoCode = "no-such-iso-code";
+        var result = await LanguageService.UpdateAsync(languageDaDk);
+        Assert.IsFalse(result.Success);
+        Assert.AreEqual(LanguageOperationStatus.InvalidFallbackIsoCode, result.Status);
+    }
+    
     [Test]
     public async Task Cannot_Create_Direct_Cyclic_Fallback_Language()
     {
