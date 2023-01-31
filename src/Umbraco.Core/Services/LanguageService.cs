@@ -257,7 +257,7 @@ internal sealed class LanguageService : RepositoryService, ILanguageService
         try
         {
             var culture = CultureInfo.GetCultureInfo(isoCode);
-            return culture.Name == isoCode;
+            return culture.Name == isoCode && culture.CultureTypes.HasFlag(CultureTypes.UserCustomCulture) == false;
         }
         catch (CultureNotFoundException)
         {
