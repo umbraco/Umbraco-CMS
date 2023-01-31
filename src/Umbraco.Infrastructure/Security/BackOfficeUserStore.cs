@@ -395,7 +395,7 @@ public class BackOfficeUserStore : UmbracoUserStore<BackOfficeIdentityUser, Iden
             throw new ArgumentNullException(nameof(normalizedRoleName));
         }
 
-        IUserGroup? userGroup = _userService.GetUserGroupByAlias(normalizedRoleName);
+        IUserGroup? userGroup = _userGroupService.GetAsync(normalizedRoleName).Result;
 
         IEnumerable<IUser> users = _userService.GetAllInGroup(userGroup?.Id);
         IList<BackOfficeIdentityUser> backOfficeIdentityUsers =
@@ -500,7 +500,7 @@ public class BackOfficeUserStore : UmbracoUserStore<BackOfficeIdentityUser, Iden
         string normalizedRoleName,
         CancellationToken cancellationToken)
     {
-        IUserGroup? group = _userService.GetUserGroupByAlias(normalizedRoleName);
+        IUserGroup? group = _userGroupService.GetAsync(normalizedRoleName).Result;
         if (group?.Name is null)
         {
             return Task.FromResult<IdentityRole<string>?>(null);
