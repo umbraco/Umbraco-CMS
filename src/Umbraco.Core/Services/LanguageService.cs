@@ -149,9 +149,13 @@ internal sealed class LanguageService : RepositoryService, ILanguageService
         string auditMessage,
         int userId)
     {
-        if (HasValidIsoCode(language) == false)
+        if (HasValidIsoCode(language.IsoCode) == false)
         {
             return Attempt.FailWithStatus(LanguageOperationStatus.InvalidIsoCode, language);
+        }
+        if (language.FallbackIsoCode is not null && HasValidIsoCode(language.FallbackIsoCode) == false)
+        {
+            return Attempt.FailWithStatus(LanguageOperationStatus.InvalidFallbackIsoCode, language);
         }
 
         using (ICoreScope scope = ScopeProvider.CreateCoreScope())
@@ -248,12 +252,12 @@ internal sealed class LanguageService : RepositoryService, ILanguageService
         }
     }
 
-    private static bool HasValidIsoCode(ILanguage language)
+    private static bool HasValidIsoCode(string isoCode)
     {
         try
         {
-            var culture = CultureInfo.GetCultureInfo(language.IsoCode);
-            return culture.Name == language.IsoCode;
+            var culture = CultureInfo.GetCultureInfo(isoCode);
+            return culture.Name == isoCode;
         }
         catch (CultureNotFoundException)
         {
