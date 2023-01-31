@@ -2,7 +2,7 @@
 /* tslint:disable */
 /* eslint-disable */
 
-export type Language = {
+export type LanguageCreateModel = {
     name?: string;
     isDefault?: boolean;
     isMandatory?: boolean;

@@ -22,7 +22,7 @@ export class DictionaryResource {
      */
     public static getDictionary({
         skip,
-        take,
+        take = 100,
     }: {
         skip?: number,
         take?: number,

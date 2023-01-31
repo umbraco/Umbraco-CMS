@@ -34,6 +34,7 @@ import { UmbDataTypeDetailStore } from './settings/data-types/data-type.detail.s
 import { UmbDataTypeTreeStore } from './settings/data-types/tree/data-type.tree.store';
 import { UmbTemplateTreeStore } from './templating/templates/tree/data/template.tree.store';
 import { UmbTemplateDetailStore } from './templating/templates/workspace/data/template.detail.store';
+import { UmbLanguageStore } from './settings/languages/language.store';
 import { UmbThemeService, UMB_THEME_SERVICE_CONTEXT_TOKEN } from './themes/theme.service';
 import { UmbNotificationService, UMB_NOTIFICATION_SERVICE_CONTEXT_TOKEN } from '@umbraco-cms/notification';
 
@@ -97,6 +98,7 @@ export class UmbBackofficeElement extends UmbLitElement {
 		new UmbDocumentBlueprintTreeStore(this);
 		new UmbTemplateTreeStore(this);
 		new UmbTemplateDetailStore(this);
+		new UmbLanguageStore(this);
 
 		this.provideContext(UMB_BACKOFFICE_CONTEXT_TOKEN, new UmbBackofficeContext());
 		this.provideContext(UMB_CURRENT_USER_HISTORY_STORE_CONTEXT_TOKEN, new UmbCurrentUserHistoryStore());

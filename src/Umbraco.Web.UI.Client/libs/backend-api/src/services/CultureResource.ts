@@ -15,7 +15,7 @@ export class CultureResource {
      */
     public static getCulture({
         skip,
-        take,
+        take = 100,
     }: {
         skip?: number,
         take?: number,
