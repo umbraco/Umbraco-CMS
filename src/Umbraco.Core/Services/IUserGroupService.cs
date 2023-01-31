@@ -4,6 +4,9 @@ using Umbraco.New.Cms.Core.Models;
 
 namespace Umbraco.Cms.Core.Services;
 
+/// <summary>
+/// Manages user groups.
+/// </summary>
 public interface IUserGroupService
 {
     /// <summary>

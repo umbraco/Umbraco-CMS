@@ -12,6 +12,7 @@ using Umbraco.New.Cms.Core.Models;
 
 namespace Umbraco.Cms.Core.Services;
 
+/// <inheritdoc cref="Umbraco.Cms.Core.Services.IUserGroupService" />
 internal sealed class UserGroupService : RepositoryService, IUserGroupService
 {
     private readonly IUserGroupRepository _userGroupRepository;
@@ -32,6 +33,7 @@ internal sealed class UserGroupService : RepositoryService, IUserGroupService
         _userService = userService;
     }
 
+    /// <inheritdoc/>
     public Task<PagedModel<IUserGroup>> GetAllAsync(int skip, int take)
     {
         using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
@@ -83,7 +85,7 @@ internal sealed class UserGroupService : RepositoryService, IUserGroupService
     {
         if (string.IsNullOrWhiteSpace(alias))
         {
-            throw new ArgumentException("Value cannot be null or whitespace.", "alias");
+            throw new ArgumentException("Value cannot be null or whitespace.", nameof(alias));
         }
 
         using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
