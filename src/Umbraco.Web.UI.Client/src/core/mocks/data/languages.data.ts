@@ -28,6 +28,14 @@ class UmbLanguagesData extends UmbData<UmbLanguageStoreItemType> {
 				this.data[foundIndex] = saveItem;
 				this.updateData(saveItem);
 			} else {
+				// Set all other languages to not default
+				if (saveItem.isDefault) {
+					this.data.forEach((item) => {
+						if (saveItem !== item) {
+							item.isDefault = false;
+						}
+					});
+				}
 				this.data.push(saveItem);
 			}
 		});
@@ -54,6 +62,7 @@ class UmbLanguagesData extends UmbData<UmbLanguageStoreItemType> {
 		const itemKeys = Object.keys(item);
 		const newItem = {};
 
+		// Set all other languages to not default
 		if (updateItem.isDefault) {
 			this.data.forEach((item) => {
 				if (updateItem !== item) {
