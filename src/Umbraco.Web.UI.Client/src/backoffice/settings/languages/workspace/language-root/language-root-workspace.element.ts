@@ -34,7 +34,7 @@ export class UmbLanguageRootWorkspaceElement extends UmbLitElement implements Um
 
 	@state()
 	private _tableConfig: UmbTableConfig = {
-		allowSelection: true,
+		allowSelection: false,
 	};
 
 	@state()
