@@ -4,8 +4,10 @@ import {
 	DocumentTypeTreeItem,
 	EntityTreeItem,
 	FolderTreeItem,
+	PagedEntityTreeItem,
 	ProblemDetails,
 } from '@umbraco-cms/backend-api';
+import { Observable } from 'rxjs';
 
 // Extension Manifests
 export * from '@umbraco-cms/extensions-registry';
@@ -154,4 +156,17 @@ export interface DocumentBlueprintDetails {
 export interface DataSourceResponse<T = undefined> {
 	data?: T;
 	error?: ProblemDetails;
+}
+
+export interface UmbTreeRepository {
+	getRoot: () => Promise<{
+		data: PagedEntityTreeItem | undefined;
+		updates: Observable<EntityTreeItem[]> | undefined;
+		error: ProblemDetails | undefined;
+	}>;
+	getChildren: (parentKey: string | null) => Promise<{
+		data: PagedEntityTreeItem | undefined;
+		updates: Observable<EntityTreeItem[]> | undefined;
+		error: ProblemDetails | undefined;
+	}>;
 }

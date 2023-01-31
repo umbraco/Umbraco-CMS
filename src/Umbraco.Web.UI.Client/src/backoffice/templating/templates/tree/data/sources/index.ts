@@ -3,6 +3,6 @@ import { EntityTreeItem, PagedEntityTreeItem } from '@umbraco-cms/backend-api';
 
 export interface TemplateTreeDataSource {
 	getRoot(): Promise<DataSourceResponse<PagedEntityTreeItem>>;
-	getItemChildren(parentKey: string): Promise<DataSourceResponse<PagedEntityTreeItem>>;
+	getChildren(parentKey: string): Promise<DataSourceResponse<PagedEntityTreeItem>>;
 	getItems(key: Array<string>): Promise<DataSourceResponse<EntityTreeItem[]>>;
 }

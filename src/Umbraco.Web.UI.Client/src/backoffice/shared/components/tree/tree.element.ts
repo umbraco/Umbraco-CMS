@@ -87,12 +87,6 @@ export class UmbTreeElement extends UmbLitElement {
 				if (this._tree?.meta.storeAlias) {
 					this._provideStore();
 				}
-
-				if (this._tree?.meta.repository) {
-					// TODO: create a helper function to create the repository.
-					this.#treeRepository = new this._tree.meta.repository(this);
-					this._observeRepositoryTreeRoot();
-				}
 			}
 		);
 	}
@@ -102,11 +96,12 @@ export class UmbTreeElement extends UmbLitElement {
 
 		// TODO: if a new tree comes around, which is different, then we should clean up and re provide.
 
-		this._treeContext = new UmbTreeContextBase(this._tree);
+		this._treeContext = new UmbTreeContextBase(this, this._tree);
 		this._treeContext.setSelectable(this.selectable);
 		this._treeContext.setSelection(this.selection);
 
 		this._observeSelection();
+		this._observeRepositoryTreeRoot();
 
 		this.provideContext('umbTreeContext', this._treeContext);
 	}
@@ -125,7 +120,9 @@ export class UmbTreeElement extends UmbLitElement {
 	}
 
 	private async _observeRepositoryTreeRoot() {
-		const { updates } = await this.#treeRepository.getRoot();
+		if (!this._treeContext?.getRoot) return;
+
+		const { updates } = await this._treeContext.getRoot();
 
 		if (updates) {
 			this.observe(updates, (rootItems) => {

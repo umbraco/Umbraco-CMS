@@ -13,7 +13,7 @@ export class TemplateTreeServerDataSource implements TemplateTreeDataSource {
 		return tryExecuteAndNotify(this.#host, TemplateResource.getTreeTemplateRoot({}));
 	}
 
-	async getItemChildren(parentKey: string | null) {
+	async getChildren(parentKey: string | null) {
 		if (!parentKey) {
 			const error: ProblemDetails = { title: 'Parent key is missing' };
 			return { error };

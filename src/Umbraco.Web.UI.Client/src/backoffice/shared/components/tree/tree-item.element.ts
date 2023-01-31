@@ -167,8 +167,27 @@ export class UmbTreeItem extends UmbLitElement {
 	private _onShowChildren() {
 		if (this._childItems && this._childItems.length > 0) return;
 		this._observeChildren();
+		this._observeRepositoryChildren();
 	}
 
+	private async _observeRepositoryChildren() {
+		if (!this._treeContext?.getChildren) return;
+
+		this._loading = true;
+
+		const { updates } = await this._treeContext.getChildren(this.key);
+
+		this._loading = false;
+
+		if (updates) {
+			this.observe(updates, (childItems) => {
+				this._childItems = childItems as Entity[];
+				this._loading = false;
+			});
+		}
+	}
+
+	// TODO: remove when repositories are in place
 	private _observeChildren() {
 		if (!this._store?.getTreeItemChildren) return;
 

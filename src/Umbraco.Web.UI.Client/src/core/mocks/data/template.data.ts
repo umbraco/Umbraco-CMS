@@ -40,6 +40,18 @@ export const data: Array<TemplateDBItem> = [
 		name: 'Test',
 		type: 'template',
 		icon: 'icon-layout',
+		hasChildren: true,
+		alias: 'Test',
+		content:
+			'@using Umbraco.Cms.Web.Common.PublishedModels;\n@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<ContentModels.Test>\r\n@using ContentModels = Umbraco.Cms.Web.Common.PublishedModels;\r\n@{\r\n\tLayout = null;\r\n}',
+	},
+	{
+		key: '9a84c0b3-03b4-4dd4-84ac-706740ac0f72',
+		isContainer: false,
+		parentKey: '9a84c0b3-03b4-4dd4-84ac-706740ac0f71',
+		name: 'Child',
+		type: 'template',
+		icon: 'icon-layout',
 		hasChildren: false,
 		alias: 'Test',
 		content:

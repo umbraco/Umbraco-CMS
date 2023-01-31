@@ -4,12 +4,13 @@ import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 import { UmbNotificationService, UMB_NOTIFICATION_SERVICE_CONTEXT_TOKEN } from '@umbraco-cms/notification';
 import { UmbContextConsumerController } from '@umbraco-cms/context-api';
 import { ProblemDetails } from '@umbraco-cms/backend-api';
+import type { UmbTreeRepository } from '@umbraco-cms/models';
 
 // Move to documentation / JSdoc
 /* We need to create a new instance of the repository from within the element context. We want the notifications to be displayed in the right context. */
 // element -> context -> repository -> (store) -> data source
 // All methods should be async and return a promise. Some methods might return an observable as part of the promise response.
-export class UmbTemplateTreeRepository {
+export class UmbTemplateTreeRepository implements UmbTreeRepository {
 	#host: UmbControllerHostInterface;
 	#dataSource: TemplateTreeServerDataSource;
 	#treeStore!: UmbTemplateTreeStore;
@@ -60,7 +61,7 @@ export class UmbTemplateTreeRepository {
 		return { data, updates, error };
 	}
 
-	async getItemChildren(parentKey: string) {
+	async getChildren(parentKey: string | null) {
 		await this.#init();
 		let updates = undefined;
 
@@ -69,14 +70,14 @@ export class UmbTemplateTreeRepository {
 			return { data: undefined, updates, error };
 		}
 
-		const { data, error } = await this.#dataSource.getItemChildren(parentKey);
+		const { data, error } = await this.#dataSource.getChildren(parentKey);
 
 		if (data) {
 			this.#treeStore?.appendItems(data.items);
 			updates = this.#treeStore?.childrenChanged(parentKey);
 		}
 
-		return { data, error };
+		return { data, updates, error };
 	}
 
 	async getItems(keys: Array<string>) {
