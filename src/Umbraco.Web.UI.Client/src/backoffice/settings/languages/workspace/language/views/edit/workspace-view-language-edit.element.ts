@@ -46,7 +46,13 @@ export class UmbWorkspaceViewLanguageEditElement extends UmbLitElement {
 	private _languages: UmbLanguageStoreItemType[] = [];
 
 	@state()
+	private _availableLanguages: UmbLanguageStoreItemType[] = [];
+
+	@state()
 	private _search = '';
+
+	@state()
+	private _startedAsDefault: boolean | null = null;
 
 	private _languageWorkspaceContext?: UmbWorkspaceLanguageContext;
 
@@ -58,8 +64,16 @@ export class UmbWorkspaceViewLanguageEditElement extends UmbLitElement {
 
 			if (!this._languageWorkspaceContext) return;
 
-			this._languageWorkspaceContext.data.subscribe((language) => {
+			this.observe(this._languageWorkspaceContext.data, (language) => {
 				this.language = language;
+
+				if (this._startedAsDefault === null) {
+					this._startedAsDefault = language.isDefault ?? false;
+					console.log('first', language);
+				}
+			});
+			this.observe(this._languageWorkspaceContext.getAvailableLanguages(), (languages) => {
+				this._availableLanguages = languages;
 			});
 		});
 
@@ -116,7 +130,7 @@ export class UmbWorkspaceViewLanguageEditElement extends UmbLitElement {
 	}
 
 	private get _filteredLanguages() {
-		return this._languages.filter((language) => {
+		return this._availableLanguages.filter((language) => {
 			return language.name?.toLowerCase().includes(this._search.toLowerCase());
 		});
 	}
@@ -131,19 +145,12 @@ export class UmbWorkspaceViewLanguageEditElement extends UmbLitElement {
 		return this._fallbackLanguages.find((language) => language.isoCode === this.language?.fallbackIsoCode);
 	}
 
-	private get _nonEditedLanguage() {
-		return this._languages.find((language) => language.isoCode === this.language?.isoCode);
+	private get _fromAvailableLanguages() {
+		return this._availableLanguages.find((language) => language.isoCode === this.language?.isoCode);
 	}
 
 	private _renderDefaultLanguageWarning() {
-		let originalIsDefault = false;
-
-		if (this.language?.isoCode) {
-			originalIsDefault =
-				this._languages.find((language) => language.isoCode === this.language?.isoCode)?.isDefault ?? false;
-		}
-
-		if (originalIsDefault === this.language?.isDefault) return nothing;
+		if (this._startedAsDefault || this.language?.isDefault !== true) return nothing;
 
 		return html`<div id="default-language-warning">
 			Switching default language may result in default content missing.
@@ -158,7 +165,7 @@ export class UmbWorkspaceViewLanguageEditElement extends UmbLitElement {
 				<umb-workspace-property-layout label="Language">
 					<uui-combobox
 						slot="editor"
-						value=${ifDefined(this.language.isoCode)}
+						value=${ifDefined(this._fromAvailableLanguages?.isoCode)}
 						@change=${this._handleLanguageChange}
 						@search=${this._handleSearchChange}>
 						<uui-combobox-list>
@@ -181,7 +188,7 @@ export class UmbWorkspaceViewLanguageEditElement extends UmbLitElement {
 				<umb-workspace-property-layout label="Settings">
 					<div slot="editor">
 						<uui-toggle
-							?disabled=${this._nonEditedLanguage?.isDefault || false}
+							?disabled=${this._startedAsDefault}
 							?checked=${this.language.isDefault || false}
 							@change=${this._handleDefaultChange}>
 							<div>

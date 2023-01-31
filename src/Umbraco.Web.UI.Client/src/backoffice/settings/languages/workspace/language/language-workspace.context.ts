@@ -49,6 +49,12 @@ export class UmbWorkspaceLanguageContext {
 	public getData() {
 		return this._data.getValue();
 	}
+
+	public getAvailableLanguages() {
+		//TODO: Don't use !, however this will be changed with the introduction of repositories.
+		return this._store!.getAvailable();
+	}
+
 	public update(data: Partial<UmbLanguageStoreItemType>) {
 		this._data.next({ ...this.getData(), ...data });
 	}

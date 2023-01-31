@@ -5,6 +5,7 @@ import { UmbContextToken } from '@umbraco-cms/context-api';
 import { UmbStoreBase } from '@umbraco-cms/store';
 import { ArrayState } from '@umbraco-cms/observable-api';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
+import { umbracoPath } from '@umbraco-cms/utils';
 
 export type UmbLanguageStoreItemType = Language;
 export const UMB_LANGUAGE_STORE_CONTEXT_TOKEN = new UmbContextToken<UmbLanguageStore>('umbLanguageStore');
@@ -17,6 +18,9 @@ export const UMB_LANGUAGE_STORE_CONTEXT_TOKEN = new UmbContextToken<UmbLanguageS
  */
 export class UmbLanguageStore extends UmbStoreBase {
 	#data = new ArrayState<UmbLanguageStoreItemType>([], (x) => x.isoCode);
+	#availableLanguages = new ArrayState<UmbLanguageStoreItemType>([], (x) => x.isoCode);
+
+	public readonly availableLanguages = this.#availableLanguages.asObservable();
 
 	constructor(host: UmbControllerHostInterface) {
 		super(host, UMB_LANGUAGE_STORE_CONTEXT_TOKEN.toString());
@@ -38,6 +42,18 @@ export class UmbLanguageStore extends UmbStoreBase {
 		});
 
 		return this.#data;
+	}
+
+	getAvailable() {
+		fetch(umbracoPath('/languages').toString())
+			.then((res) => res.json())
+			.then((data) => {
+				console.log('data', data);
+
+				this.#availableLanguages.append(data);
+			});
+
+		return this.availableLanguages;
 	}
 
 	async save(language: UmbLanguageStoreItemType): Promise<void> {
