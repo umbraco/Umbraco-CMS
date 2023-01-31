@@ -74,7 +74,7 @@ public interface IUserGroupService
     /// <summary>
     ///     Deletes a UserGroup
     /// </summary>
-    /// <param name="userGroup">UserGroup to delete</param>
-    /// <returns></returns>
-    Task<Attempt<UserGroupOperationStatus>> DeleteAsync(IUserGroup userGroup);
+    /// <param name="key">The key of the user group to delete.</param>
+    /// <returns>An attempt indicating if the operation was a success as well as a more detailed <see cref="UserGroupOperationStatus"/>.</returns>
+    Task<Attempt<UserGroupOperationStatus>> DeleteAsync(Guid key);
 }

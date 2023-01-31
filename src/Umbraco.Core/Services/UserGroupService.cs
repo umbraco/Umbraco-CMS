@@ -103,6 +103,54 @@ internal sealed class UserGroupService : RepositoryService, IUserGroupService
         return Task.FromResult(groups);
     }
 
+    /// <inheritdoc/>
+    public async Task<Attempt<UserGroupOperationStatus>> DeleteAsync(Guid key)
+    {
+        IUserGroup? userGroup = await GetAsync(key);
+
+        Attempt<UserGroupOperationStatus> validationResult = ValidateUserGroupDeletion(userGroup);
+        if (validationResult.Success is false)
+        {
+            return validationResult;
+        }
+
+        EventMessages eventMessages = EventMessagesFactory.Get();
+
+        using (ICoreScope scope = ScopeProvider.CreateCoreScope())
+        {
+            var deletingNotification = new UserGroupDeletingNotification(userGroup!, eventMessages);
+
+            if (await scope.Notifications.PublishCancelableAsync(deletingNotification))
+            {
+                scope.Complete();
+                return Attempt.Fail(UserGroupOperationStatus.CancelledByNotification);
+            }
+
+            _userGroupRepository.Delete(userGroup!);
+
+            scope.Notifications.Publish(new UserGroupDeletedNotification(userGroup!, eventMessages).WithStateFrom(deletingNotification));
+
+            scope.Complete();
+        }
+
+        return Attempt.Succeed(UserGroupOperationStatus.Success);
+    }
+
+    private Attempt<UserGroupOperationStatus> ValidateUserGroupDeletion(IUserGroup? userGroup)
+    {
+        if (userGroup is null)
+        {
+            return Attempt.Fail(UserGroupOperationStatus.NotFound);
+        }
+
+        if (userGroup.IsSystemUserGroup())
+        {
+            return Attempt.Fail(UserGroupOperationStatus.IsSystemUserGroup);
+        }
+
+        return Attempt.Succeed(UserGroupOperationStatus.Success);
+    }
+
     /// <inheritdoc />
     public async Task<Attempt<IUserGroup, UserGroupOperationStatus>> CreateAsync(
         IUserGroup userGroup,
@@ -156,6 +204,18 @@ internal sealed class UserGroupService : RepositoryService, IUserGroupService
         return Attempt.SucceedWithStatus(UserGroupOperationStatus.Success, userGroup);
     }
 
+    private async Task<Attempt<IUserGroup, UserGroupOperationStatus>> ValidateUserGroupCreationAsync(IUserGroup userGroup)
+    {
+        if (await IsNewUserGroup(userGroup) is false)
+        {
+            return Attempt.FailWithStatus(UserGroupOperationStatus.AlreadyExists, userGroup);
+        }
+
+        return UserGroupHasUniqueAlias(userGroup) is false
+            ? Attempt.FailWithStatus(UserGroupOperationStatus.DuplicateAlias, userGroup)
+            : Attempt.SucceedWithStatus(UserGroupOperationStatus.Success, userGroup);
+    }
+
     /// <inheritdoc />
     public async Task<Attempt<IUserGroup, UserGroupOperationStatus>> UpdateAsync(
         IUserGroup userGroup,
@@ -194,19 +254,6 @@ internal sealed class UserGroupService : RepositoryService, IUserGroupService
 
         scope.Complete();
         return Attempt.SucceedWithStatus(UserGroupOperationStatus.Success, userGroup);
-    }
-
-
-    private async Task<Attempt<IUserGroup, UserGroupOperationStatus>> ValidateUserGroupCreationAsync(IUserGroup userGroup)
-    {
-        if (await IsNewUserGroup(userGroup) is false)
-        {
-            return Attempt.FailWithStatus(UserGroupOperationStatus.AlreadyExists, userGroup);
-        }
-
-        return UserGroupHasUniqueAlias(userGroup) is false
-            ? Attempt.FailWithStatus(UserGroupOperationStatus.DuplicateAlias, userGroup)
-            : Attempt.SucceedWithStatus(UserGroupOperationStatus.Success, userGroup);
     }
 
     private async Task<Attempt<IUserGroup, UserGroupOperationStatus>> ValidateUserGroupUpdateAsync(IUserGroup userGroup)
@@ -249,7 +296,4 @@ internal sealed class UserGroupService : RepositoryService, IUserGroupService
 
         return userIds;
     }
-
-    /// <inheritdoc />
-    public Task<Attempt<UserGroupOperationStatus>> DeleteAsync(IUserGroup userGroup) => throw new NotImplementedException();
 }

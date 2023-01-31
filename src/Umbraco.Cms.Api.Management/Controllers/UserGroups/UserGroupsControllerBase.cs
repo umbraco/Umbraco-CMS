@@ -30,17 +30,25 @@ public class UserGroupsControllerBase : ManagementApiControllerBase
                 .WithTitle("Missing user")
                 .WithDetail("A performing user was not found when attempting to create the user group.")
                 .Build()),
-            UserGroupOperationStatus.UnauthorizedMissingSections => Unauthorized(new ProblemDetailsBuilder()
-                .WithTitle("Unauthorized section")
-                .WithDetail("The specified allowed section contained a section the performing user doesn't have access to.")
+            UserGroupOperationStatus.IsSystemUserGroup => BadRequest(new ProblemDetailsBuilder()
+                .WithTitle("System user group")
+                .WithDetail("The operation is not allowed on a system user group.")
                 .Build()),
             UserGroupOperationStatus.UnauthorizedMissingUserSection => Unauthorized(new ProblemDetailsBuilder()
                 .WithTitle("Unauthorized")
                 .WithDetail("The performing user does not have access to the required section")
                 .Build()),
+            UserGroupOperationStatus.UnauthorizedMissingSections => Unauthorized(new ProblemDetailsBuilder()
+                .WithTitle("Unauthorized section")
+                .WithDetail("The specified allowed section contained a section the performing user doesn't have access to.")
+                .Build()),
             UserGroupOperationStatus.UnauthorizedStartNodes => Unauthorized(new ProblemDetailsBuilder()
                 .WithTitle("Unauthorized start node")
                 .WithDetail("The specified start nodes contained a start node the performing user doesn't have access to.")
+                .Build()),
+            UserGroupOperationStatus.UnauthorizedMissingUserGroup => Unauthorized(new ProblemDetailsBuilder()
+                .WithTitle("User not in user group")
+                .WithDetail("The current user is not in the user group")
                 .Build()),
             UserGroupOperationStatus.CancelledByNotification => BadRequest(new ProblemDetailsBuilder()
                 .WithTitle("Cancelled by notification")

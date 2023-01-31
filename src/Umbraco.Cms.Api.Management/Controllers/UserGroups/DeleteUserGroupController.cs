@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Core;
-using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.OperationStatus;
 
@@ -22,14 +21,7 @@ public class DeleteUserGroupController : UserGroupsControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Delete(Guid key)
     {
-        IUserGroup? group = await _userGroupService.GetAsync(key);
-
-        if (group is null)
-        {
-            return NotFound();
-        }
-
-        Attempt<UserGroupOperationStatus> result = await _userGroupService.DeleteAsync(group);
+        Attempt<UserGroupOperationStatus> result = await _userGroupService.DeleteAsync(key);
 
         return result.Success
             ? Ok()
