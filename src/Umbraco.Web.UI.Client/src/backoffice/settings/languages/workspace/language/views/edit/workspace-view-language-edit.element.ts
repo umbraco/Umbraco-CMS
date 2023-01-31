@@ -131,6 +131,10 @@ export class UmbWorkspaceViewLanguageEditElement extends UmbLitElement {
 		return this._fallbackLanguages.find((language) => language.isoCode === this.language?.fallbackIsoCode);
 	}
 
+	private get _nonEditedLanguage() {
+		return this._languages.find((language) => language.isoCode === this.language?.isoCode);
+	}
+
 	private _renderDefaultLanguageWarning() {
 		let originalIsDefault = false;
 
@@ -176,7 +180,10 @@ export class UmbWorkspaceViewLanguageEditElement extends UmbLitElement {
 				</umb-workspace-property-layout>
 				<umb-workspace-property-layout label="Settings">
 					<div slot="editor">
-						<uui-toggle ?checked=${this.language.isDefault || false} @change=${this._handleDefaultChange}>
+						<uui-toggle
+							?disabled=${this._nonEditedLanguage?.isDefault || false}
+							?checked=${this.language.isDefault || false}
+							@change=${this._handleDefaultChange}>
 							<div>
 								<b>Default language</b>
 								<div>An Umbraco site can only have one default language set.</div>
