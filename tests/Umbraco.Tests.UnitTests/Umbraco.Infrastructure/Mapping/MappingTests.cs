@@ -13,8 +13,8 @@ using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
-using Umbraco.Cms.Core.Scoping;
-using IScopeProvider = Umbraco.Cms.Infrastructure.Scoping.IScopeProvider;
+using Umbraco.Cms.Infrastructure.Scoping;
+using RepositoryCacheMode= Umbraco.Cms.Core.Scoping.RepositoryCacheMode;
 using PropertyCollection = Umbraco.Cms.Core.Models.PropertyCollection;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Mapping;

@@ -4,10 +4,9 @@
 using System.Globalization;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Notifications;
-using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Extensions;
-using IScope = Umbraco.Cms.Infrastructure.Scoping.IScope;
+using Umbraco.Cms.Infrastructure.Scoping;
 
 namespace Umbraco.Cms.Core.Events;
 

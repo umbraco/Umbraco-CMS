@@ -12,11 +12,12 @@ using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.PublishedCache;
-using Umbraco.Cms.Core.Scoping;
+
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Tests.UnitTests.Umbraco.Core.ShortStringHelper;
-using IScopeProvider = Umbraco.Cms.Infrastructure.Scoping.IScopeProvider;
+using Umbraco.Cms.Infrastructure.Scoping;
+using RepositoryCacheMode=Umbraco.Cms.Core.Scoping.RepositoryCacheMode;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Security;
 

@@ -1,7 +1,6 @@
-﻿using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Repositories;
-using Umbraco.Cms.Core.Scoping;
-using IScope = Umbraco.Cms.Infrastructure.Scoping.IScope;
+using Umbraco.Cms.Infrastructure.Scoping;
 
 namespace Umbraco.Cms.Core.Logging.Viewer;
 
