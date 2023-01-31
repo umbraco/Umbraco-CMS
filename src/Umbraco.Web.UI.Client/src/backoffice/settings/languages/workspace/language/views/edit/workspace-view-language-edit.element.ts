@@ -11,6 +11,7 @@ import {
 	UMB_LANGUAGE_STORE_CONTEXT_TOKEN,
 } from '../../../../language.store';
 import { UmbLitElement } from '@umbraco-cms/element';
+import { Language } from '@umbraco-cms/backend-api';
 
 @customElement('umb-workspace-view-language-edit')
 export class UmbWorkspaceViewLanguageEditElement extends UmbLitElement {
@@ -129,10 +130,11 @@ export class UmbWorkspaceViewLanguageEditElement extends UmbLitElement {
 		}
 	}
 
-	private get _filteredLanguages() {
-		return this._availableLanguages.filter((language) => {
-			return language.name?.toLowerCase().includes(this._search.toLowerCase());
-		});
+	private get _filteredLanguages(): Array<Language> {
+		// Filter out languages already in use, except the current language.
+		return this._availableLanguages.filter(
+			(language) => !this._languages.some((x) => x.isoCode === language.isoCode && x.isoCode !== this.language?.isoCode)
+		);
 	}
 
 	private get _fallbackLanguages() {
