@@ -58,6 +58,7 @@ public class ContentController : ContentControllerBase
     private readonly ILocalizedTextService _localizedTextService;
     private readonly INotificationService _notificationService;
     private readonly ICultureImpactFactory _cultureImpactFactory;
+    private readonly IUserGroupService _userGroupService;
     private readonly ILogger<ContentController> _logger;
     private readonly PropertyEditorCollection _propertyEditors;
     private readonly IPublishedUrlProvider _publishedUrlProvider;
@@ -91,7 +92,8 @@ public class ContentController : ContentControllerBase
         ICoreScopeProvider scopeProvider,
         IAuthorizationService authorizationService,
         IContentVersionService contentVersionService,
-        ICultureImpactFactory cultureImpactFactory)
+        ICultureImpactFactory cultureImpactFactory,
+        IUserGroupService userGroupService)
         : base(cultureDictionary, loggerFactory, shortStringHelper, eventMessages, localizedTextService, serializer)
     {
         _propertyEditors = propertyEditors;
@@ -112,13 +114,14 @@ public class ContentController : ContentControllerBase
         _authorizationService = authorizationService;
         _contentVersionService = contentVersionService;
         _cultureImpactFactory = cultureImpactFactory;
+        _userGroupService = userGroupService;
         _logger = loggerFactory.CreateLogger<ContentController>();
         _scopeProvider = scopeProvider;
         _allLangs = new Lazy<IDictionary<string, ILanguage>>(() =>
-            _localizationService.GetAllLanguages().ToDictionary(x => x.IsoCode, x => x, StringComparer.InvariantCultureIgnoreCase));
+        _localizationService.GetAllLanguages().ToDictionary(x => x.IsoCode, x => x, StringComparer.InvariantCultureIgnoreCase));
     }
 
-    [Obsolete("Use constructor that accepts ICultureImpactService as a parameter, scheduled for removal in V12")]
+    [Obsolete("User constructor that takes a IUserGroupService, scheduled for removal in V15.")]
     public ContentController(
         ICultureDictionary cultureDictionary,
         ILoggerFactory loggerFactory,
@@ -142,7 +145,8 @@ public class ContentController : ContentControllerBase
         IJsonSerializer serializer,
         ICoreScopeProvider scopeProvider,
         IAuthorizationService authorizationService,
-        IContentVersionService contentVersionService)
+        IContentVersionService contentVersionService,
+        ICultureImpactFactory cultureImpactFactory)
         : this(
             cultureDictionary,
             loggerFactory,
@@ -167,9 +171,11 @@ public class ContentController : ContentControllerBase
             scopeProvider,
             authorizationService,
             contentVersionService,
-            StaticServiceProvider.Instance.GetRequiredService<ICultureImpactFactory>())
-      {
-      }
+            cultureImpactFactory,
+            StaticServiceProvider.Instance.GetRequiredService<IUserGroupService>()
+        )
+    {
+    }
 
     public object? Domains { get; private set; }
 
@@ -224,7 +230,7 @@ public class ContentController : ContentControllerBase
         var contentPermissions = _contentService.GetPermissions(content)
             .ToDictionary(x => x.UserGroupId, x => x);
 
-        IUserGroup[] allUserGroups = _userService.GetAllUserGroups().ToArray();
+        IUserGroup[] allUserGroups = _userGroupService.GetAllAsync().Result.ToArray();
 
         //loop through each user group
         foreach (IUserGroup userGroup in allUserGroups)
@@ -277,7 +283,7 @@ public class ContentController : ContentControllerBase
 
         // TODO: Should non-admins be able to see detailed permissions?
 
-        IEnumerable<IUserGroup> allUserGroups = _userService.GetAllUserGroups();
+        IEnumerable<IUserGroup> allUserGroups = _userGroupService.GetAllAsync().Result;
 
         return GetDetailedPermissions(content, allUserGroups);
     }
