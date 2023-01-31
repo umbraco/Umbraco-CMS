@@ -3,6 +3,7 @@ using Serilog;
 using Serilog.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Extensions;
+using Umbraco.New.Cms.Core.Models;
 
 namespace Umbraco.Cms.Core.Logging.Viewer;
 
@@ -19,16 +20,24 @@ public abstract class SerilogLogViewerSourceBase : ILogViewer
 
     public abstract bool CanHandleLargeLogs { get; }
 
+    [Obsolete("Use ILogViewerService.CanViewLogsAsync instead. Scheduled for removal in Umbraco 15.")]
     public abstract bool CheckCanOpenLogs(LogTimePeriod logTimePeriod);
 
+    [Obsolete("Use ILogViewerService.GetSavedLogQueriesAsync instead. Scheduled for removal in Umbraco 15.")]
     public virtual IReadOnlyList<SavedLogSearch> GetSavedSearches()
         => _logViewerConfig.GetSavedSearches();
 
-    public virtual IReadOnlyList<SavedLogSearch> AddSavedSearch(string? name, string? query)
+    [Obsolete("Use ILogViewerService.AddSavedLogQueryAsync instead. Scheduled for removal in Umbraco 15.")]
+    public virtual IReadOnlyList<SavedLogSearch> AddSavedSearch(string name, string query)
         => _logViewerConfig.AddSavedSearch(name, query);
 
-    public virtual IReadOnlyList<SavedLogSearch> DeleteSavedSearch(string? name, string? query)
-        => _logViewerConfig.DeleteSavedSearch(name, query);
+    [Obsolete("Use the overload that only takes a 'name' parameter instead. This will be removed in Umbraco 14.")]
+    public virtual IReadOnlyList<SavedLogSearch> DeleteSavedSearch(string name, string query)
+        => DeleteSavedSearch(name);
+
+    [Obsolete("Use ILogViewerService.DeleteSavedLogQueryAsync instead. Scheduled for removal in Umbraco 15.")]
+    public virtual IReadOnlyList<SavedLogSearch> DeleteSavedSearch(string name)
+        => _logViewerConfig.DeleteSavedSearch(name);
 
     public int GetNumberOfErrors(LogTimePeriod logTimePeriod)
     {
@@ -37,6 +46,7 @@ public abstract class SerilogLogViewerSourceBase : ILogViewer
         return errorCounter.Count;
     }
 
+    [Obsolete("Use ILogViewerService.GetLogLevelCounts instead. Scheduled for removal in Umbraco 15.")]
     public LogLevelCounts GetLogLevelCounts(LogTimePeriod logTimePeriod)
     {
         var counter = new CountingFilter();
@@ -44,6 +54,7 @@ public abstract class SerilogLogViewerSourceBase : ILogViewer
         return counter.Counts;
     }
 
+    [Obsolete("Use ILogViewerService.GetMessageTemplates instead. Scheduled for removal in Umbraco 15.")]
     public IEnumerable<LogTemplate> GetMessageTemplates(LogTimePeriod logTimePeriod)
     {
         var messageTemplates = new MessageTemplateFilter();
@@ -56,6 +67,7 @@ public abstract class SerilogLogViewerSourceBase : ILogViewer
         return templates;
     }
 
+    [Obsolete("Use ILogViewerService.GetPagedLogs instead. Scheduled for removal in Umbraco 15.")]
     public PagedResult<LogMessage> GetLogs(
         LogTimePeriod logTimePeriod,
         int pageNumber = 1,
@@ -63,6 +75,72 @@ public abstract class SerilogLogViewerSourceBase : ILogViewer
         Direction orderDirection = Direction.Descending,
         string? filterExpression = null,
         string[]? logLevels = null)
+    {
+        IReadOnlyList<LogEvent> filteredLogs = GetFilteredLogs(logTimePeriod, filterExpression, logLevels);
+        long totalRecords = filteredLogs.Count;
+
+        // Order By, Skip, Take & Select
+        IEnumerable<LogMessage> logMessages = filteredLogs
+            .OrderBy(l => l.Timestamp, orderDirection)
+            .Skip(pageSize * (pageNumber - 1))
+            .Take(pageSize)
+            .Select(x => new LogMessage
+            {
+                Timestamp = x.Timestamp,
+                Level = x.Level,
+                MessageTemplateText = x.MessageTemplate.Text,
+                Exception = x.Exception?.ToString(),
+                Properties = x.Properties,
+                RenderedMessage = x.RenderMessage(),
+            });
+
+        return new PagedResult<LogMessage>(totalRecords, pageNumber, pageSize) { Items = logMessages };
+    }
+
+    [Obsolete("Use ILogViewerService.GetPagedLogs instead. Scheduled for removal in Umbraco 15.")]
+    public PagedModel<LogMessage> GetLogsAsPagedModel(
+        LogTimePeriod logTimePeriod,
+        int skip,
+        int take,
+        Direction orderDirection = Direction.Descending,
+        string? filterExpression = null,
+        string[]? logLevels = null)
+    {
+        IReadOnlyList<LogEvent> filteredLogs = GetFilteredLogs(logTimePeriod, filterExpression, logLevels);
+
+        // Order By, Skip, Take & Select
+        IEnumerable<LogMessage> logMessages = filteredLogs
+            .OrderBy(l => l.Timestamp, orderDirection)
+            .Skip(skip)
+            .Take(take)
+            .Select(x => new LogMessage
+            {
+                Timestamp = x.Timestamp,
+                Level = x.Level,
+                MessageTemplateText = x.MessageTemplate.Text,
+                Exception = x.Exception?.ToString(),
+                Properties = x.Properties,
+                RenderedMessage = x.RenderMessage(),
+            });
+
+        return new PagedModel<LogMessage>(logMessages.Count(), logMessages);
+    }
+
+    /// <summary>
+    ///     Get the Serilog minimum-level and UmbracoFile-level values from the config file.
+    /// </summary>
+    [Obsolete("Use ILogViewerService.GetLogLevelsFromSinks instead. Scheduled for removal in Umbraco 15.")]
+    public ReadOnlyDictionary<string, LogEventLevel?> GetLogLevels() => _logLevelLoader.GetLogLevelsFromSinks();
+
+    /// <summary>
+    ///     Get all logs from your chosen data source back as Serilog LogEvents
+    /// </summary>
+    protected abstract IReadOnlyList<LogEvent> GetLogs(LogTimePeriod logTimePeriod, ILogFilter filter, int skip, int take);
+
+    private IReadOnlyList<LogEvent> GetFilteredLogs(
+        LogTimePeriod logTimePeriod,
+        string? filterExpression,
+        string[]? logLevels)
     {
         var expression = new ExpressionFilter(filterExpression);
         IReadOnlyList<LogEvent> filteredLogs = GetLogs(logTimePeriod, expression, 0, int.MaxValue);
@@ -94,33 +172,6 @@ public abstract class SerilogLogViewerSourceBase : ILogViewer
             }
         }
 
-        long totalRecords = filteredLogs.Count;
-
-        // Order By, Skip, Take & Select
-        IEnumerable<LogMessage> logMessages = filteredLogs
-            .OrderBy(l => l.Timestamp, orderDirection)
-            .Skip(pageSize * (pageNumber - 1))
-            .Take(pageSize)
-            .Select(x => new LogMessage
-            {
-                Timestamp = x.Timestamp,
-                Level = x.Level,
-                MessageTemplateText = x.MessageTemplate.Text,
-                Exception = x.Exception?.ToString(),
-                Properties = x.Properties,
-                RenderedMessage = x.RenderMessage(),
-            });
-
-        return new PagedResult<LogMessage>(totalRecords, pageNumber, pageSize) { Items = logMessages };
+        return filteredLogs;
     }
-
-    /// <summary>
-    ///     Get the Serilog minimum-level and UmbracoFile-level values from the config file.
-    /// </summary>
-    public ReadOnlyDictionary<string, LogEventLevel?> GetLogLevels() => _logLevelLoader.GetLogLevelsFromSinks();
-
-    /// <summary>
-    ///     Get all logs from your chosen data source back as Serilog LogEvents
-    /// </summary>
-    protected abstract IReadOnlyList<LogEvent> GetLogs(LogTimePeriod logTimePeriod, ILogFilter filter, int skip, int take);
 }

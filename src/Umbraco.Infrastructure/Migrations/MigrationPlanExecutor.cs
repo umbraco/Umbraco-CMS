@@ -1,5 +1,7 @@
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Migrations;
 using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Scoping;
@@ -61,6 +63,23 @@ public class MigrationPlanExecutor : IMigrationPlanExecutor
         _logger = _loggerFactory.CreateLogger<MigrationPlanExecutor>();
     }
 
+    [Obsolete("Use constructor with 7 parameters")]
+    public MigrationPlanExecutor(
+        ICoreScopeProvider scopeProvider,
+        IScopeAccessor scopeAccessor,
+        ILoggerFactory loggerFactory,
+        IMigrationBuilder migrationBuilder)
+        : this(
+            scopeProvider,
+            scopeAccessor,
+            loggerFactory,
+            migrationBuilder,
+            StaticServiceProvider.Instance.GetRequiredService<IUmbracoDatabaseFactory>(),
+            StaticServiceProvider.Instance.GetRequiredService<IPublishedSnapshotService>(),
+            StaticServiceProvider.Instance.GetRequiredService<DistributedCache>())
+    {
+    }
+
     /// <summary>
     ///     Executes the plan.
     /// </summary>
@@ -71,6 +90,7 @@ public class MigrationPlanExecutor : IMigrationPlanExecutor
     /// <para>Each migration in the plan, may or may not run in a scope depending on the type of plan.</para>
     /// <para>A plan can complete partially, the changes of each completed migration will be saved.</para>
     /// </remarks>
+    [Obsolete("This will return an ExecutedMigrationPlan in V13")]
     public ExecutedMigrationPlan ExecutePlan(MigrationPlan plan, string fromState)
     {
         plan.Validate();

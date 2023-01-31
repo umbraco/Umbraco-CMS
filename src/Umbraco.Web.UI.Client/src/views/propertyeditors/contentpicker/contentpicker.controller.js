@@ -246,7 +246,7 @@ function contentPickerController($scope, $q, $routeParams, $location, entityReso
     }
     else if ($scope.model.config.startNode.query) {
         //if we have a query for the startnode, we will use that.
-        var rootId = $routeParams.id;
+        var rootId = editorState.current.id;
         entityResource.getByQuery($scope.model.config.startNode.query, rootId, "Document").then(function (ent) {
             dialogOptions.startNodeId = ($scope.model.config.idType === "udi" ? ent.udi : ent.id).toString();
         });

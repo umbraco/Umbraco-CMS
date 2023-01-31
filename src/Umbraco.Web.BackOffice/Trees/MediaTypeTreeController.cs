@@ -112,7 +112,7 @@ public class MediaTypeTreeController : TreeController, ISearchableTree
 
             // root actions
             menu.Items.Add<ActionNew>(LocalizedTextService, opensDialog: true, useLegacyIcon: false);
-            menu.Items.Add(new RefreshNode(LocalizedTextService));
+            menu.Items.Add(new RefreshNode(LocalizedTextService, true));
             return menu;
         }
 

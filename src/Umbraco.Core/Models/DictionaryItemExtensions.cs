@@ -26,4 +26,33 @@ public static class DictionaryItemExtensions
         IDictionaryTranslation? defaultTranslation = d.Translations.FirstOrDefault(x => x.Language?.Id == 1);
         return defaultTranslation == null ? string.Empty : defaultTranslation.Value;
     }
+
+    /// <summary>
+    ///     Adds or updates a translation for a dictionary item and language
+    /// </summary>
+    /// <param name="item"></param>
+    /// <param name="language"></param>
+    /// <param name="value"></param>
+    public static void AddOrUpdateDictionaryValue(this IDictionaryItem item, ILanguage language, string value)
+    {
+        IDictionaryTranslation? existing = item.Translations?.FirstOrDefault(x => x.Language?.Id == language.Id);
+        if (existing != null)
+        {
+            existing.Value = value;
+        }
+        else
+        {
+            if (item.Translations is not null)
+            {
+                item.Translations = new List<IDictionaryTranslation>(item.Translations)
+                {
+                    new DictionaryTranslation(language, value),
+                };
+            }
+            else
+            {
+                item.Translations = new List<IDictionaryTranslation> { new DictionaryTranslation(language, value) };
+            }
+        }
+    }
 }

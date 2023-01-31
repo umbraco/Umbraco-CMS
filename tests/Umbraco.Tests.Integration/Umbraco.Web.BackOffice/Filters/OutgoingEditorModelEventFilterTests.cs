@@ -1,10 +1,5 @@
-﻿using System;
-using System.Linq;
-using System.Net;
-using System.Net.Http;
-using System.Threading.Tasks;
+﻿using System.Net;
 using NUnit.Framework;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
@@ -16,7 +11,6 @@ using Umbraco.Cms.Tests.Common.Builders.Extensions;
 using Umbraco.Cms.Tests.Integration.TestServerTest;
 using Umbraco.Cms.Web.BackOffice.Controllers;
 using Umbraco.Cms.Web.Common.Formatters;
-using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Web.BackOffice.Filters;
 
@@ -76,7 +70,7 @@ public class OutgoingEditorModelEventFilterTests : UmbracoTestServerTestBase
         const string SweIso = "sv-SE";
         var contentTypeService = GetRequiredService<IContentTypeService>();
         var contentService = GetRequiredService<IContentService>();
-        var localizationService = GetRequiredService<ILocalizationService>();
+        var languageService = GetRequiredService<ILanguageService>();
         IJsonSerializer serializer = GetRequiredService<IJsonSerializer>();
 
         var contentType = new ContentTypeBuilder()
@@ -94,8 +88,8 @@ public class OutgoingEditorModelEventFilterTests : UmbracoTestServerTestBase
             .WithIsDefault(false)
             .Build();
 
-        localizationService.Save(dkLang);
-        localizationService.Save(sweLang);
+        await languageService.CreateAsync(dkLang);
+        await languageService.CreateAsync(sweLang);
 
         var content = new ContentBuilder()
             .WithoutIdentity()

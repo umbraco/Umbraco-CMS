@@ -30,16 +30,18 @@ Use this directive make an element sticky and follow the page when scrolling. `u
         /**
         Toggle `umb-sticky-bar--active` class on the sticky-bar element
         **/
-        const setClass = (addClass, current) => current.classList.toggle('umb-sticky-bar--active', addClass);                    
+        const setClass = (addClass, current) => current.classList.toggle('umb-sticky-bar--active', addClass);
 
         /**
         Inserts two elements in the umbStickyBar parent element
         These are used by the IntersectionObserve to calculate scroll position
         **/
         const addSentinel = current => {
-            const sentinel = document.createElement('div');
-            sentinel.classList.add('umb-sticky-sentinel', '-top');
+          if (current.parentElement.querySelector(".umb-sticky-sentinel") === null) {
+            const sentinel = document.createElement("div");
+            sentinel.classList.add("umb-sticky-sentinel", "-top");
             current.parentElement.prepend(sentinel);
+          }
         };
 
         /**

@@ -7,8 +7,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="CSharpTest.Net.Collections-NetStd2" Version="14.907.0" />
     <PackageReference Include="MessagePack" Version="2.4.59" />
+    <PackageReference Include="Umbraco.CSharpTest.Net.Collections" Version="15.0.0" />
     <PackageReference Include="K4os.Compression.LZ4" Version="1.2.16" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.2" />
   </ItemGroup>

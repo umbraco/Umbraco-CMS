@@ -1013,6 +1013,21 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             return SimilarNodeName.GetUniqueName(names, id, nodeName);
         }
 
+        protected virtual bool SortorderExists(int parentId, int sortOrder)
+        {
+            SqlTemplate? template = SqlContext.Templates.Get(Constants.SqlTemplates.VersionableRepository.SortOrderExists, tsql => tsql
+                .Select("sortOrder")
+                .From<NodeDto>()
+                .Where<NodeDto>(x => x.NodeObjectType == SqlTemplate.Arg<Guid>("nodeObjectType") &&
+                x.ParentId == SqlTemplate.Arg<int>("parentId") &&
+                x.SortOrder == SqlTemplate.Arg<int>("sortOrder")));
+
+            Sql<ISqlContext> sql = template.Sql(NodeObjectTypeId, parentId, sortOrder);
+            var result = Database.ExecuteScalar<int?>(sql);
+
+            return result != null;
+        }
+
         protected virtual int GetNewChildSortOrder(int parentId, int first)
         {
             SqlTemplate? template = SqlContext.Templates.Get(Constants.SqlTemplates.VersionableRepository.GetSortOrder, tsql => tsql

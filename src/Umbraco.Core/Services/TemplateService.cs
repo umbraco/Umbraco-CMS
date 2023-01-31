@@ -5,6 +5,7 @@ using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Scoping;
+using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Extensions;
 
@@ -34,10 +35,10 @@ public class TemplateService : RepositoryService, ITemplateService
     }
 
     /// <inheritdoc />
-    public async Task<Attempt<OperationResult<OperationResultType, ITemplate>?>> CreateTemplateForContentTypeAsync(
+    public async Task<Attempt<ITemplate, TemplateOperationStatus>> CreateForContentTypeAsync(
         string contentTypeAlias, string? contentTypeName, int userId = Constants.Security.SuperUserId)
     {
-        var template = new Template(_shortStringHelper, contentTypeName,
+        ITemplate template = new Template(_shortStringHelper, contentTypeName,
 
             // NOTE: We are NOT passing in the content type alias here, we want to use it's name since we don't
             // want to save template file names as camelCase, the Template ctor will clean the alias as
@@ -45,12 +46,12 @@ public class TemplateService : RepositoryService, ITemplateService
             // This fixes: http://issues.umbraco.org/issue/U4-7953
             contentTypeName);
 
-        EventMessages eventMessages = EventMessagesFactory.Get();
-
-        if (contentTypeAlias != null && contentTypeAlias.Length > 255)
+        if (IsValidAlias(template.Alias) == false)
         {
-            throw new InvalidOperationException("Name cannot be more than 255 characters in length.");
+            return Attempt.FailWithStatus(TemplateOperationStatus.InvalidAlias, template);
         }
+
+        EventMessages eventMessages = EventMessagesFactory.Get();
 
         // check that the template hasn't been created on disk before creating the content type
         // if it exists, set the new template content to the existing file content
@@ -66,56 +67,46 @@ public class TemplateService : RepositoryService, ITemplateService
             if (scope.Notifications.PublishCancelable(savingEvent))
             {
                 scope.Complete();
-                return OperationResult.Attempt.Fail<OperationResultType, ITemplate>(
-                    OperationResultType.FailedCancelledByEvent, eventMessages, template);
+                return Attempt.FailWithStatus(TemplateOperationStatus.CancelledByNotification, template);
             }
 
             _templateRepository.Save(template);
             scope.Notifications.Publish(
                 new TemplateSavedNotification(template, eventMessages).WithStateFrom(savingEvent));
 
-            Audit(AuditType.Save, userId, template.Id, UmbracoObjectTypes.Template.GetName());
+            Audit(AuditType.New, userId, template.Id, UmbracoObjectTypes.Template.GetName());
             scope.Complete();
         }
 
-        return await Task.FromResult(OperationResult.Attempt.Succeed<OperationResultType, ITemplate>(
-            OperationResultType.Success,
-            eventMessages,
-            template));
+        return await Task.FromResult(Attempt.SucceedWithStatus(TemplateOperationStatus.Success, template));
     }
 
     /// <inheritdoc />
-    public async Task<ITemplate?> CreateTemplateWithIdentityAsync(
-        string? name,
-        string? alias,
+    public async Task<Attempt<ITemplate, TemplateOperationStatus>> CreateAsync(
+        string name,
+        string alias,
         string? content,
         int userId = Constants.Security.SuperUserId)
+        => await CreateAsync(new Template(_shortStringHelper, name, alias) { Content = content }, userId);
+
+    /// <inheritdoc />
+    public async Task<Attempt<ITemplate, TemplateOperationStatus>> CreateAsync(ITemplate template, int userId = Constants.Security.SuperUserId)
     {
-        if (name == null)
+        try
         {
-            throw new ArgumentNullException(nameof(name));
+            // file might already be on disk, if so grab the content to avoid overwriting
+            template.Content = GetViewContent(template.Alias) ?? template.Content;
+            return await SaveAsync(template, AuditType.New, userId);
         }
-
-        if (string.IsNullOrWhiteSpace(name))
+        catch (PathTooLongException ex)
         {
-            throw new ArgumentException("Name cannot be empty or contain only white-space characters", nameof(name));
+            LoggerFactory.CreateLogger<TemplateService>().LogError(ex, "The template path was too long. Consider making the template alias shorter.");
+            return Attempt.FailWithStatus(TemplateOperationStatus.InvalidAlias, template);
         }
-
-        if (name.Length > 255)
-        {
-            throw new ArgumentOutOfRangeException(nameof(name), "Name cannot be more than 255 characters in length.");
-        }
-
-        // file might already be on disk, if so grab the content to avoid overwriting
-        var template = new Template(_shortStringHelper, name, alias) { Content = GetViewContent(alias) ?? content };
-
-        return await SaveTemplateAsync(template, userId)
-            ? template
-            : null;
     }
 
     /// <inheritdoc />
-    public async Task<IEnumerable<ITemplate>> GetTemplatesAsync(params string[] aliases)
+    public async Task<IEnumerable<ITemplate>> GetAllAsync(params string[] aliases)
     {
         using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
         {
@@ -124,7 +115,7 @@ public class TemplateService : RepositoryService, ITemplateService
     }
 
     /// <inheritdoc />
-    public async Task<IEnumerable<ITemplate>> GetTemplatesAsync(int masterTemplateId)
+    public async Task<IEnumerable<ITemplate>> GetChildrenAsync(int masterTemplateId)
     {
         using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
         {
@@ -133,7 +124,7 @@ public class TemplateService : RepositoryService, ITemplateService
     }
 
     /// <inheritdoc />
-    public async Task<ITemplate?> GetTemplateAsync(string? alias)
+    public async Task<ITemplate?> GetAsync(string? alias)
     {
         using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
         {
@@ -142,7 +133,7 @@ public class TemplateService : RepositoryService, ITemplateService
     }
 
     /// <inheritdoc />
-    public async Task<ITemplate?> GetTemplateAsync(int id)
+    public async Task<ITemplate?> GetAsync(int id)
     {
         using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
         {
@@ -151,7 +142,7 @@ public class TemplateService : RepositoryService, ITemplateService
     }
 
     /// <inheritdoc />
-    public async Task<ITemplate?> GetTemplateAsync(Guid id)
+    public async Task<ITemplate?> GetAsync(Guid id)
     {
         using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
         {
@@ -161,7 +152,7 @@ public class TemplateService : RepositoryService, ITemplateService
     }
 
     /// <inheritdoc />
-    public async Task<IEnumerable<ITemplate>> GetTemplateDescendantsAsync(int masterTemplateId)
+    public async Task<IEnumerable<ITemplate>> GetDescendantsAsync(int masterTemplateId)
     {
         using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
         {
@@ -170,22 +161,42 @@ public class TemplateService : RepositoryService, ITemplateService
     }
 
     /// <inheritdoc />
-    public async Task<bool> SaveTemplateAsync(ITemplate template, int userId = Constants.Security.SuperUserId)
-    {
-        if (template == null)
-        {
-            throw new ArgumentNullException(nameof(template));
-        }
+    public async Task<Attempt<ITemplate, TemplateOperationStatus>> UpdateAsync(ITemplate template, int userId = Constants.Security.SuperUserId)
+        => await SaveAsync(
+            template,
+            AuditType.Save,
+            userId,
+            // fail the attempt if the template does not exist within the scope
+            () => _templateRepository.Exists(template.Id)
+                ? TemplateOperationStatus.Success
+                : TemplateOperationStatus.TemplateNotFound);
 
-        if (string.IsNullOrWhiteSpace(template.Name) || template.Name.Length > 255)
+    private async Task<Attempt<ITemplate, TemplateOperationStatus>> SaveAsync(ITemplate template, AuditType auditType, int userId = Constants.Security.SuperUserId, Func<TemplateOperationStatus>? scopeValidator = null)
+    {
+        if (IsValidAlias(template.Alias) == false)
         {
-            throw new InvalidOperationException(
-                "Name cannot be null, empty, contain only white-space characters or be more than 255 characters in length.");
+            return Attempt.FailWithStatus(TemplateOperationStatus.InvalidAlias, template);
         }
 
         using (ICoreScope scope = ScopeProvider.CreateCoreScope())
         {
-            ITemplate? masterTemplate = await GetMasterTemplate(template.Content);
+            TemplateOperationStatus scopeValidatorStatus = scopeValidator?.Invoke() ?? TemplateOperationStatus.Success;
+            if (scopeValidatorStatus != TemplateOperationStatus.Success)
+            {
+                return Attempt.FailWithStatus(scopeValidatorStatus, template);
+            }
+
+            var masterTemplateAlias = _templateContentParserService.MasterTemplateAlias(template.Content);
+            ITemplate? masterTemplate = masterTemplateAlias.IsNullOrWhiteSpace()
+                ? null
+                : await GetAsync(masterTemplateAlias);
+
+            // fail if the template content specifies a master template but said template does not exist
+            if (masterTemplateAlias.IsNullOrWhiteSpace() == false && masterTemplate == null)
+            {
+                return Attempt.FailWithStatus(TemplateOperationStatus.MasterTemplateNotFound, template);
+            }
+
             await SetMasterTemplateAsync(template, masterTemplate);
 
             EventMessages eventMessages = EventMessagesFactory.Get();
@@ -193,7 +204,7 @@ public class TemplateService : RepositoryService, ITemplateService
             if (scope.Notifications.PublishCancelable(savingNotification))
             {
                 scope.Complete();
-                return false;
+                return Attempt.FailWithStatus(TemplateOperationStatus.CancelledByNotification, template);
             }
 
             _templateRepository.Save(template);
@@ -201,50 +212,22 @@ public class TemplateService : RepositoryService, ITemplateService
             scope.Notifications.Publish(
                 new TemplateSavedNotification(template, eventMessages).WithStateFrom(savingNotification));
 
-            Audit(AuditType.Save, userId, template.Id, UmbracoObjectTypes.Template.GetName());
+            Audit(auditType, userId, template.Id, UmbracoObjectTypes.Template.GetName());
             scope.Complete();
-            return true;
+            return Attempt.SucceedWithStatus(TemplateOperationStatus.Success, template);
         }
     }
 
     /// <inheritdoc />
-    public async Task<bool> SaveTemplateAsync(IEnumerable<ITemplate> templates, int userId = Constants.Security.SuperUserId)
-    {
-        ITemplate[] templatesA = templates.ToArray();
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope())
-        {
-            EventMessages eventMessages = EventMessagesFactory.Get();
-            var savingNotification = new TemplateSavingNotification(templatesA, eventMessages);
-            if (scope.Notifications.PublishCancelable(savingNotification))
-            {
-                scope.Complete();
-                return false;
-            }
-
-            foreach (ITemplate template in templatesA)
-            {
-                _templateRepository.Save(template);
-            }
-
-            scope.Notifications.Publish(
-                new TemplateSavedNotification(templatesA, eventMessages).WithStateFrom(savingNotification));
-
-            Audit(AuditType.Save, userId, -1, UmbracoObjectTypes.Template.GetName());
-            scope.Complete();
-            return await Task.FromResult(true);
-        }
-    }
+    public async Task<Attempt<ITemplate?, TemplateOperationStatus>> DeleteAsync(string alias, int userId = Constants.Security.SuperUserId)
+        => await DeleteAsync(() => Task.FromResult(_templateRepository.Get(alias)), userId);
 
     /// <inheritdoc />
-    public async Task<bool> DeleteTemplateAsync(string alias, int userId = Constants.Security.SuperUserId)
-        => await DeleteTemplateAsync(() => Task.FromResult(_templateRepository.Get(alias)), userId);
+    public async Task<Attempt<ITemplate?, TemplateOperationStatus>> DeleteAsync(Guid key, int userId = Constants.Security.SuperUserId)
+        => await DeleteAsync(async () => await GetAsync(key), userId);
 
     /// <inheritdoc />
-    public async Task<bool> DeleteTemplateAsync(Guid key, int userId = Constants.Security.SuperUserId)
-        => await DeleteTemplateAsync(async () => await GetTemplateAsync(key), userId);
-
-    /// <inheritdoc />
-    public async Task<Stream> GetTemplateFileContentStreamAsync(string filepath)
+    public async Task<Stream> GetFileContentStreamAsync(string filepath)
     {
         using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
         {
@@ -253,7 +236,7 @@ public class TemplateService : RepositoryService, ITemplateService
     }
 
     /// <inheritdoc />
-    public async Task SetTemplateFileContentAsync(string filepath, Stream content)
+    public async Task SetFileContentAsync(string filepath, Stream content)
     {
         using (ICoreScope scope = ScopeProvider.CreateCoreScope())
         {
@@ -264,27 +247,12 @@ public class TemplateService : RepositoryService, ITemplateService
     }
 
     /// <inheritdoc />
-    public async Task<long> GetTemplateFileSizeAsync(string filepath)
+    public async Task<long> GetFileSizeAsync(string filepath)
     {
         using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
         {
             return await Task.FromResult(_templateRepository.GetFileSize(filepath));
         }
-    }
-
-    private async Task<ITemplate?> GetMasterTemplate(string? content)
-    {
-        var masterTemplateAlias = _templateContentParserService.MasterTemplateAlias(content);
-        ITemplate? masterTemplate = masterTemplateAlias.IsNullOrWhiteSpace()
-            ? null
-            : await GetTemplateAsync(masterTemplateAlias);
-
-        if (masterTemplateAlias.IsNullOrWhiteSpace() == false && masterTemplate == null)
-        {
-            throw new ArgumentException($"Could not find master template with alias: {masterTemplateAlias}", content);
-        }
-
-        return masterTemplate;
     }
 
     /// <inheritdoc />
@@ -308,7 +276,7 @@ public class TemplateService : RepositoryService, ITemplateService
                 //After updating the master - ensure we update the path property if it has any children already assigned
                 if (template.Id > 0)
                 {
-                    IEnumerable<ITemplate> templateHasChildren = await GetTemplateDescendantsAsync(template.Id);
+                    IEnumerable<ITemplate> templateHasChildren = await GetDescendantsAsync(template.Id);
 
                     foreach (ITemplate childTemplate in templateHasChildren)
                     {
@@ -331,7 +299,7 @@ public class TemplateService : RepositoryService, ITemplateService
                         childTemplate.Path = masterTemplate.Path + "," + template.Id + "," + childTemplatePath;
 
                         //Save the children with the updated path
-                        await SaveTemplateAsync(childTemplate);
+                        await UpdateAsync(childTemplate);
                     }
                 }
             }
@@ -366,7 +334,7 @@ public class TemplateService : RepositoryService, ITemplateService
     private void Audit(AuditType type, int userId, int objectId, string? entityType) =>
         _auditRepository.Save(new AuditItem(objectId, type, userId, entityType));
 
-    private async Task<bool> DeleteTemplateAsync(Func<Task<ITemplate?>> getTemplate, int userId)
+    private async Task<Attempt<ITemplate?, TemplateOperationStatus>> DeleteAsync(Func<Task<ITemplate?>> getTemplate, int userId)
     {
         using (ICoreScope scope = ScopeProvider.CreateCoreScope())
         {
@@ -374,7 +342,7 @@ public class TemplateService : RepositoryService, ITemplateService
             if (template == null)
             {
                 scope.Complete();
-                return true;
+                return Attempt.FailWithStatus<ITemplate?, TemplateOperationStatus>(TemplateOperationStatus.TemplateNotFound, null);
             }
 
             EventMessages eventMessages = EventMessagesFactory.Get();
@@ -382,7 +350,7 @@ public class TemplateService : RepositoryService, ITemplateService
             if (scope.Notifications.PublishCancelable(deletingNotification))
             {
                 scope.Complete();
-                return false;
+                return Attempt.FailWithStatus<ITemplate?, TemplateOperationStatus>(TemplateOperationStatus.CancelledByNotification, template);
             }
 
             _templateRepository.Delete(template);
@@ -392,7 +360,10 @@ public class TemplateService : RepositoryService, ITemplateService
 
             Audit(AuditType.Delete, userId, template.Id, UmbracoObjectTypes.Template.GetName());
             scope.Complete();
-            return await Task.FromResult(true);
+            return Attempt.SucceedWithStatus<ITemplate?, TemplateOperationStatus>(TemplateOperationStatus.Success, template);
         }
     }
+
+    private static bool IsValidAlias(string alias)
+        => alias.IsNullOrWhiteSpace() == false && alias.Length <= 255;
 }
