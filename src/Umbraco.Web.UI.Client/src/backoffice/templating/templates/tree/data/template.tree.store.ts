@@ -40,15 +40,15 @@ export class UmbTemplateTreeStore extends UmbStoreBase {
 	}
 
 	rootChanged() {
-		return createObservablePart(this.#data, (items) => items.filter((item) => item.parentKey === null));
+		return this.#data.getObservablePart((items) => items.filter((item) => item.parentKey === null));
 	}
 
 	childrenChanged(parentKey: string) {
-		return createObservablePart(this.#data, (items) => items.filter((item) => item.parentKey === parentKey));
+		return this.#data.getObservablePart((items) => items.filter((item) => item.parentKey === parentKey));
 	}
 
 	itemsChanged(keys: Array<string>) {
-		return createObservablePart(this.#data, (items) => items.filter((item) => keys.includes(item.key ?? '')));
+		return this.#data.getObservablePart((items) => items.filter((item) => keys.includes(item.key ?? '')));
 	}
 }
 

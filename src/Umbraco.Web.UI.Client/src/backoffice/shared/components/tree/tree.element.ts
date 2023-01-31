@@ -91,7 +91,6 @@ export class UmbTreeElement extends UmbLitElement {
 				if (this._tree?.meta.repository) {
 					// TODO: create a helper function to create the repository.
 					this.#treeRepository = new this._tree.meta.repository(this);
-					await this.#treeRepository.init();
 					this._observeRepositoryTreeRoot();
 				}
 			}
@@ -126,11 +125,13 @@ export class UmbTreeElement extends UmbLitElement {
 	}
 
 	private async _observeRepositoryTreeRoot() {
-		this.#treeRepository.getRoot();
+		const { updates } = await this.#treeRepository.getRoot();
 
-		this.observe(this.#treeRepository.rootChanged(), (rootItems) => {
-			this._items = rootItems as Entity[];
-		});
+		if (updates) {
+			this.observe(updates, (rootItems) => {
+				this._items = rootItems as Entity[];
+			});
+		}
 	}
 
 	private _observeSelection() {

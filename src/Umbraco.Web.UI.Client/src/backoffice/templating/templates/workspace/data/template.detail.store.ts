@@ -20,6 +20,10 @@ export class UmbTemplateDetailStore extends UmbStoreBase {
 	append(template: Template) {
 		this.#data.append([template]);
 	}
+
+	remove(uniques: string[]) {
+		this.#data.remove(uniques);
+	}
 }
 
 export const UMB_TEMPLATE_DETAIL_STORE_CONTEXT_TOKEN = new UmbContextToken<UmbTemplateDetailStore>(

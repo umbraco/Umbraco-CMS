@@ -1,4 +1,3 @@
-import { UmbRepository } from '../../../../../core/repository';
 import { UmbTemplateTreeStore, UMB_TEMPLATE_TREE_STORE_CONTEXT_TOKEN } from '../../tree/data/template.tree.store';
 import { UmbTemplateDetailStore, UMB_TEMPLATE_DETAIL_STORE_CONTEXT_TOKEN } from './template.detail.store';
 import { UmbTemplateDetailServerDataSource } from './sources/template.detail.server.data';
@@ -7,9 +6,11 @@ import { UmbContextConsumerController } from '@umbraco-cms/context-api';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 import { UmbNotificationService, UMB_NOTIFICATION_SERVICE_CONTEXT_TOKEN } from '@umbraco-cms/notification';
 
+// Move to documentation / JSdoc
 /* We need to create a new instance of the repository from within the element context. We want the notifications to be displayed in the right context. */
 // element -> context -> repository -> (store) -> data source
-export class UmbTemplateDetailRepository implements UmbRepository {
+// All methods should be async and return a promise. Some methods might return an observable as part of the promise response.
+export class UmbTemplateDetailRepository {
 	#host: UmbControllerHostInterface;
 	#dataSource: UmbTemplateDetailServerDataSource;
 	#detailStore?: UmbTemplateDetailStore;
@@ -23,6 +24,7 @@ export class UmbTemplateDetailRepository implements UmbRepository {
 		// TODO: figure out how spin up get the correct data source
 		this.#dataSource = new UmbTemplateDetailServerDataSource(this.#host);
 
+		// TODO: should we allow promises so each method can request the context when it needs it instead of initializing it upfront?
 		new UmbContextConsumerController(this.#host, UMB_TEMPLATE_DETAIL_STORE_CONTEXT_TOKEN, (instance) => {
 			this.#detailStore = instance;
 			this.#checkIfInitialized();
@@ -39,20 +41,23 @@ export class UmbTemplateDetailRepository implements UmbRepository {
 		});
 	}
 
-	init() {
+	#init() {
 		return new Promise<void>((resolve) => {
 			this.#initialized ? resolve() : (this.#initResolver = resolve);
 		});
 	}
 
 	#checkIfInitialized() {
-		if (this.#detailStore && this.#notificationService) {
+		if (this.#detailStore && this.#detailStore && this.#notificationService) {
 			this.#initialized = true;
 			this.#initResolver?.();
 		}
 	}
 
 	async createScaffold(parentKey: string | null) {
+		await this.#init();
+
+		// TODO: should we show a notification if the parent key is missing?
 		if (!parentKey) {
 			const error: ProblemDetails = { title: 'Parent key is missing' };
 			return { data: undefined, error };
@@ -62,6 +67,9 @@ export class UmbTemplateDetailRepository implements UmbRepository {
 	}
 
 	async get(key: string) {
+		await this.#init();
+
+		// TODO: should we show a notification if the key is missing?
 		if (!key) {
 			const error: ProblemDetails = { title: 'Key is missing' };
 			return { error };
@@ -71,6 +79,9 @@ export class UmbTemplateDetailRepository implements UmbRepository {
 	}
 
 	async insert(template: Template) {
+		await this.#init();
+
+		// TODO: should we show a notification if the template is missing?
 		if (!template) {
 			const error: ProblemDetails = { title: 'Template is missing' };
 			return { error };
@@ -91,6 +102,9 @@ export class UmbTemplateDetailRepository implements UmbRepository {
 	}
 
 	async update(template: Template) {
+		await this.#init();
+
+		// TODO: should we show a notification if the template is missing?
 		if (!template || !template.key) {
 			const error: ProblemDetails = { title: 'Template is missing' };
 			return { error };
@@ -105,6 +119,7 @@ export class UmbTemplateDetailRepository implements UmbRepository {
 
 		// TODO: we currently don't use the detail store for anything.
 		// Consider to look up the data before fetching from the server
+		// Consider notify a workspace if a template is updated in the store while someone is editing it.
 		this.#detailStore?.append(template);
 		this.#treeStore?.updateItem(template.key, { name: template.name });
 
@@ -112,6 +127,9 @@ export class UmbTemplateDetailRepository implements UmbRepository {
 	}
 
 	async delete(key: string) {
+		await this.#init();
+
+		// TODO: should we show a notification if the key is missing?
 		if (!key) {
 			const error: ProblemDetails = { title: 'Key is missing' };
 			return { error };
@@ -124,6 +142,10 @@ export class UmbTemplateDetailRepository implements UmbRepository {
 			this.#notificationService?.peek('positive', notification);
 		}
 
+		// TODO: we currently don't use the detail store for anything.
+		// Consider to look up the data before fetching from the server.
+		// Consider notify a workspace if a template is deleted from the store while someone is editing it.
+		this.#detailStore?.remove([key]);
 		this.#treeStore?.removeItem(key);
 
 		return { error };
