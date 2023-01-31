@@ -6,18 +6,24 @@ namespace Umbraco.Cms.Core.Services;
 public interface IUserGroupService
 {
     /// <summary>
-    ///     Gets all UserGroups or those specified as parameters
+    /// Gets all user groups.
+    /// </summary>
+    /// <returns>All user groups as an enumerable list of <see cref="IUserGroup"/>.</returns>
+    Task<IEnumerable<IUserGroup>> GetAllAsync();
+
+    /// <summary>
+    ///     Gets all UserGroups matching an ID in the parameter list.
     /// </summary>
     /// <param name="ids">Optional Ids of UserGroups to retrieve.</param>
     /// <returns>An enumerable list of <see cref="IUserGroup"/>.</returns>
     Task<IEnumerable<IUserGroup>> GetAsync(params int[] ids);
 
     /// <summary>
-    ///     Gets a UserGroup by its Alias
+    ///     Gets all UserGroups matching an alias in the parameter list.
     /// </summary>
     /// <param name="aliases">Alias of the UserGroup to retrieve.</param>
     /// <returns>
-    ///     <see cref="IUserGroup" />
+    ///     <returns>An enumerable list of <see cref="IUserGroup"/>.</returns>
     /// </returns>
     Task<IEnumerable<IUserGroup>> GetAsync(params string[] aliases);
 

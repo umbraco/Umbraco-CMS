@@ -31,6 +31,15 @@ internal sealed class UserGroupService : RepositoryService, IUserGroupService
         _userService = userService;
     }
 
+    public Task<IEnumerable<IUserGroup>> GetAllAsync()
+    {
+        using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+        IEnumerable<IUserGroup> groups = _userGroupRepository.GetMany()
+            .OrderBy(x => x.Name);
+
+        return Task.FromResult(groups);
+    }
+
     /// <inheritdoc />
     public Task<IEnumerable<IUserGroup>> GetAsync(params int[] ids)
     {
@@ -56,6 +65,7 @@ internal sealed class UserGroupService : RepositoryService, IUserGroupService
         IEnumerable<IUserGroup> contents = _userGroupRepository
             .Get(query)
             .WhereNotNull()
+            .OrderBy(x => x.Name)
             .ToArray();
 
         return Task.FromResult(contents);
