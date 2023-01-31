@@ -28,7 +28,7 @@ public class UserTelemetryProvider : IDetailedTelemetryProvider
     public IEnumerable<UsageInformation> GetInformation()
     {
         _userService.GetAll(1, 1, out var total);
-        var userGroups = _userGroupService.GetAllAsync().Result.Count();
+        var userGroups = _userGroupService.GetAllAsync(0, int.MaxValue).Result.Count();
 
         yield return new UsageInformation(Constants.Telemetry.UserCount, total);
         yield return new UsageInformation(Constants.Telemetry.UserGroupCount, userGroups);

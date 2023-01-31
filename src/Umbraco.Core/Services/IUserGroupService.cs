@@ -9,7 +9,7 @@ public interface IUserGroupService
     /// Gets all user groups.
     /// </summary>
     /// <returns>All user groups as an enumerable list of <see cref="IUserGroup"/>.</returns>
-    Task<IEnumerable<IUserGroup>> GetAllAsync();
+    Task<IEnumerable<IUserGroup>> GetAllAsync(int skip, int take);
 
     /// <summary>
     ///     Gets all UserGroups matching an ID in the parameter list.

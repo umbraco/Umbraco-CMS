@@ -31,11 +31,13 @@ internal sealed class UserGroupService : RepositoryService, IUserGroupService
         _userService = userService;
     }
 
-    public Task<IEnumerable<IUserGroup>> GetAllAsync()
+    public Task<IEnumerable<IUserGroup>> GetAllAsync(int skip, int take)
     {
         using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
         IEnumerable<IUserGroup> groups = _userGroupRepository.GetMany()
-            .OrderBy(x => x.Name);
+            .OrderBy(x => x.Name)
+            .Skip(skip)
+            .Take(take);
 
         return Task.FromResult(groups);
     }
