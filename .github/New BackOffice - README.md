@@ -5,6 +5,12 @@
 
 This solution folder contains the projects for the new backoffice. If you're looking to fix or improve the existing CMS, this is not the place to do it, although we do very much appreciate your efforts.
 
+### Getting Started
+To run the new backoffice:
+* Execute `git submodule init` and then `git submodule update` to get the files into Umbraco.Web.UI.New.Client project
+* Run Umbraco.Web.UI.New project
+    * If you get a white page delete Umbraco.Cms.StaticAssets\wwwroot\umbraco folder and run `npm install && npm run build` insinde Umbraco.Web.UI.New.Client folder
+
 ### Project structure
 
 Since the new backoffice API is still very much a work in progress, we've created new projects for the new backoffice API:
