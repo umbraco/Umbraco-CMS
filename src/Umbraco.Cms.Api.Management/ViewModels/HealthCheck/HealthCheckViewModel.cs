@@ -1,12 +1,7 @@
 namespace Umbraco.Cms.Api.Management.ViewModels.HealthCheck;
 
-public class HealthCheckViewModel
+public class HealthCheckViewModel : HealthCheckModelBase
 {
-    /// <summary>
-    ///     Gets or sets the key.
-    /// </summary>
-    public Guid Key { get; set; }
-
     /// <summary>
     ///     Gets or sets the name.
     /// </summary>
