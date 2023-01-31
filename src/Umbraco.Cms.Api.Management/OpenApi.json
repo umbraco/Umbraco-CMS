@@ -1515,7 +1515,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PagedHealthCheckGroup"
+                  "$ref": "#/components/schemas/PagedHealthCheckGroupModelBase"
                 }
               }
             }
@@ -1545,7 +1545,47 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/NotFoundResult"
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HealthCheckGroup"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/umbraco/management/api/v1/health-check-group/{name}/check": {
+      "post": {
+        "tags": [
+          "Health Check"
+        ],
+        "operationId": "PostHealthCheckGroupByNameCheck",
+        "parameters": [
+          {
+            "name": "name",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
                 }
               }
             }
@@ -6182,8 +6222,7 @@
         "type": "object",
         "properties": {
           "name": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "checks": {
             "type": "array",
@@ -6194,13 +6233,18 @@
         },
         "additionalProperties": false
       },
-      "HealthCheckGroupWithResult": {
+      "HealthCheckGroupModelBase": {
         "type": "object",
         "properties": {
           "name": {
-            "type": "string",
-            "nullable": true
-          },
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "HealthCheckGroupWithResult": {
+        "type": "object",
+        "properties": {
           "checks": {
             "type": "array",
             "items": {
@@ -6239,13 +6283,6 @@
           "key": {
             "type": "string",
             "format": "uuid"
-          },
-          "name": {
-            "type": "string"
-          },
-          "description": {
-            "type": "string",
-            "nullable": true
           },
           "results": {
             "type": "array",
@@ -7230,7 +7267,7 @@
         },
         "additionalProperties": false
       },
-      "PagedHealthCheckGroup": {
+      "PagedHealthCheckGroupModelBase": {
         "required": [
           "items",
           "total"
@@ -7244,7 +7281,7 @@
           "items": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/HealthCheckGroup"
+              "$ref": "#/components/schemas/HealthCheckGroupModelBase"
             }
           }
         },
