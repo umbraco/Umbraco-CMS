@@ -28,7 +28,7 @@ class UmbLanguagesData extends UmbData<UmbLanguageStoreItemType> {
 			}
 		});
 
-		return saveItems;
+		return this.data;
 	}
 
 	delete(keys: Array<string>) {
@@ -49,6 +49,14 @@ class UmbLanguagesData extends UmbData<UmbLanguageStoreItemType> {
 
 		const itemKeys = Object.keys(item);
 		const newItem = {};
+
+		if (updateItem.isDefault) {
+			this.data.forEach((item) => {
+				if (updateItem !== item) {
+					item.isDefault = false;
+				}
+			});
+		}
 
 		for (const [key] of Object.entries(updateItem)) {
 			if (itemKeys.indexOf(key) !== -1) {
