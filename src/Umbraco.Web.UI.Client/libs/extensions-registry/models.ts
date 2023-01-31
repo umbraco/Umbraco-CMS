@@ -86,6 +86,17 @@ export interface ManifestElement extends ManifestBase {
 	meta?: any;
 }
 
+export interface ManifestWithView extends ManifestElement {
+	meta: MetaManifestWithView;
+}
+
+export interface MetaManifestWithView {
+	pathname: string;
+	label: string;
+	icon: string;
+}
+
+
 export interface ManifestElementWithElementName extends ManifestElement {
 	elementName: string;
 }
