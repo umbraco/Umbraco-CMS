@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -57,21 +58,18 @@ public abstract class UmbracoIntegrationTestBase
     [OneTimeTearDown]
     public void FixtureTearDown()
     {
-        // var bw = new BackgroundWorker();
-        //
-        // bw.DoWork += new DoWorkEventHandler(delegate(object? sender, DoWorkEventArgs args)
-        // {
-        //     BackgroundWorker b = sender as BackgroundWorker;
-        //
-        //     
-        // });
-        //
-        // bw.RunWorkerAsync();
+        var bw = new BackgroundWorker();
 
-        Parallel.ForEach(_fixtureTeardown, a =>
+        bw.DoWork += delegate
         {
-            a();
-        });
+            Parallel.ForEach(_fixtureTeardown, a =>
+            {
+                a();
+            });
+        };
+
+        bw.RunWorkerAsync();
+
     }
 
     protected ILoggerFactory CreateLoggerFactory()
