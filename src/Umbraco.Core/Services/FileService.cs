@@ -11,6 +11,7 @@ using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Scoping;
+using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Extensions;
 using File = System.IO.File;
@@ -32,7 +33,7 @@ public class FileService : RepositoryService, IFileService
     private readonly IScriptRepository _scriptRepository;
     private readonly IStylesheetRepository _stylesheetRepository;
     private readonly ITemplateService _templateService;
-    private readonly IShortStringHelper _shortStringHelper;
+    private readonly ITemplateRepository _templateRepository;
 
     [Obsolete("Use other ctor - will be removed in Umbraco 15")]
     public FileService(
@@ -77,9 +78,9 @@ public class FileService : RepositoryService, IFileService
         IAuditRepository auditRepository,
         IHostingEnvironment hostingEnvironment,
         ITemplateService templateService,
+        ITemplateRepository templateRepository,
         // unused dependencies but the DI forces us to have them, otherwise we'll get an "ambiguous constructor"
         // exception (and [ActivatorUtilitiesConstructor] doesn't work here either)
-        ITemplateRepository templateRepository,
         IShortStringHelper shortStringHelper,
         IOptions<GlobalSettings> globalSettings)
         : base(uowProvider, loggerFactory, eventMessagesFactory)
@@ -91,7 +92,7 @@ public class FileService : RepositoryService, IFileService
         _auditRepository = auditRepository;
         _hostingEnvironment = hostingEnvironment;
         _templateService = templateService;
-        _shortStringHelper = shortStringHelper;
+        _templateRepository = templateRepository;
     }
 
     #region Stylesheets
@@ -372,7 +373,21 @@ public class FileService : RepositoryService, IFileService
     [Obsolete("Please use ITemplateService for template operations - will be removed in Umbraco 15")]
     public Attempt<OperationResult<OperationResultType, ITemplate>?> CreateTemplateForContentType(
         string contentTypeAlias, string? contentTypeName, int userId = Constants.Security.SuperUserId)
-        => _templateService.CreateTemplateForContentTypeAsync(contentTypeAlias, contentTypeName, userId).GetAwaiter().GetResult();
+    {
+        // mimic old service behavior
+        if (contentTypeAlias.Length > 255)
+        {
+            throw new InvalidOperationException("Name cannot be more than 255 characters in length.");
+        }
+
+        Attempt<ITemplate, TemplateOperationStatus> result = _templateService.CreateForContentTypeAsync(contentTypeAlias, contentTypeName, userId).GetAwaiter().GetResult();
+
+        // mimic old service behavior
+        EventMessages eventMessages = EventMessagesFactory.Get();
+        return result.Success
+            ? OperationResult.Attempt.Succeed(OperationResultType.Success, eventMessages, result.Result)
+            : OperationResult.Attempt.Succeed(OperationResultType.Failed, eventMessages, result.Result);
+    }
 
     /// <summary>
     ///     Create a new template, setting the content if a view exists in the filesystem
@@ -390,8 +405,18 @@ public class FileService : RepositoryService, IFileService
         string? content,
         ITemplate? masterTemplate = null,
         int userId = Constants.Security.SuperUserId)
-        => _templateService.CreateTemplateWithIdentityAsync(name, alias, content, userId).GetAwaiter().GetResult()
-           ?? new Template(_shortStringHelper, name, alias);
+    {
+        // mimic old service behavior
+        ArgumentException.ThrowIfNullOrEmpty(name);
+        ArgumentException.ThrowIfNullOrEmpty(alias);
+        if (name.Length > 255)
+        {
+            throw new ArgumentOutOfRangeException(nameof(name), "Name cannot be more than 255 characters in length.");
+        }
+
+        Attempt<ITemplate, TemplateOperationStatus> result = _templateService.CreateAsync(name, alias, content, userId).GetAwaiter().GetResult();
+        return result.Result;
+    }
 
     /// <summary>
     ///     Gets a list of all <see cref="ITemplate" /> objects
@@ -399,7 +424,7 @@ public class FileService : RepositoryService, IFileService
     /// <returns>An enumerable list of <see cref="ITemplate" /> objects</returns>
     [Obsolete("Please use ITemplateService for template operations - will be removed in Umbraco 15")]
     public IEnumerable<ITemplate> GetTemplates(params string[] aliases)
-        => _templateService.GetTemplatesAsync(aliases).GetAwaiter().GetResult();
+        => _templateService.GetAllAsync(aliases).GetAwaiter().GetResult();
 
     /// <summary>
     ///     Gets a list of all <see cref="ITemplate" /> objects
@@ -407,7 +432,7 @@ public class FileService : RepositoryService, IFileService
     /// <returns>An enumerable list of <see cref="ITemplate" /> objects</returns>
     [Obsolete("Please use ITemplateService for template operations - will be removed in Umbraco 15")]
     public IEnumerable<ITemplate> GetTemplates(int masterTemplateId)
-        => _templateService.GetTemplatesAsync(masterTemplateId).GetAwaiter().GetResult();
+        => _templateService.GetChildrenAsync(masterTemplateId).GetAwaiter().GetResult();
 
     /// <summary>
     ///     Gets a <see cref="ITemplate" /> object by its alias.
@@ -416,7 +441,7 @@ public class FileService : RepositoryService, IFileService
     /// <returns>The <see cref="ITemplate" /> object matching the alias, or null.</returns>
     [Obsolete("Please use ITemplateService for template operations - will be removed in Umbraco 15")]
     public ITemplate? GetTemplate(string? alias)
-        => _templateService.GetTemplateAsync(alias).GetAwaiter().GetResult();
+        => _templateService.GetAsync(alias).GetAwaiter().GetResult();
 
     /// <summary>
     ///     Gets a <see cref="ITemplate" /> object by its identifier.
@@ -425,7 +450,7 @@ public class FileService : RepositoryService, IFileService
     /// <returns>The <see cref="ITemplate" /> object matching the identifier, or null.</returns>
     [Obsolete("Please use ITemplateService for template operations - will be removed in Umbraco 15")]
     public ITemplate? GetTemplate(int id)
-        => _templateService.GetTemplateAsync(id).GetAwaiter().GetResult();
+        => _templateService.GetAsync(id).GetAwaiter().GetResult();
 
     /// <summary>
     ///     Gets a <see cref="ITemplate" /> object by its guid identifier.
@@ -434,7 +459,7 @@ public class FileService : RepositoryService, IFileService
     /// <returns>The <see cref="ITemplate" /> object matching the identifier, or null.</returns>
     [Obsolete("Please use ITemplateService for template operations - will be removed in Umbraco 15")]
     public ITemplate? GetTemplate(Guid id)
-        => _templateService.GetTemplateAsync(id).GetAwaiter().GetResult();
+        => _templateService.GetAsync(id).GetAwaiter().GetResult();
 
     /// <summary>
     ///     Gets the template descendants
@@ -443,7 +468,7 @@ public class FileService : RepositoryService, IFileService
     /// <returns></returns>
     [Obsolete("Please use ITemplateService for template operations - will be removed in Umbraco 15")]
     public IEnumerable<ITemplate> GetTemplateDescendants(int masterTemplateId)
-        => _templateService.GetTemplateDescendantsAsync(masterTemplateId).GetAwaiter().GetResult();
+        => _templateService.GetDescendantsAsync(masterTemplateId).GetAwaiter().GetResult();
 
     /// <summary>
     ///     Saves a <see cref="Template" />
@@ -452,16 +477,62 @@ public class FileService : RepositoryService, IFileService
     /// <param name="userId"></param>
     [Obsolete("Please use ITemplateService for template operations - will be removed in Umbraco 15")]
     public void SaveTemplate(ITemplate template, int userId = Constants.Security.SuperUserId)
-        => _templateService.SaveTemplateAsync(template, userId).GetAwaiter().GetResult();
+    {
+        // mimic old service behavior
+        if (template == null)
+        {
+            throw new ArgumentNullException(nameof(template));
+        }
+
+        if (string.IsNullOrWhiteSpace(template.Name) || template.Name.Length > 255)
+        {
+            throw new InvalidOperationException(
+                "Name cannot be null, empty, contain only white-space characters or be more than 255 characters in length.");
+        }
+
+        if (template.Id > 0)
+        {
+            _templateService.UpdateAsync(template, userId).GetAwaiter().GetResult();
+        }
+        else
+        {
+            _templateService.CreateAsync(template, userId).GetAwaiter().GetResult();
+        }
+    }
 
     /// <summary>
     ///     Saves a collection of <see cref="Template" /> objects
     /// </summary>
     /// <param name="templates">List of <see cref="Template" /> to save</param>
     /// <param name="userId">Optional id of the user</param>
+    // FIXME: we need to re-implement PackageDataInstallation.ImportTemplates so it imports templates in the correct order
+    //        instead of relying on being able to save invalid templates (child templates whose master has yet to be created)
     [Obsolete("Please use ITemplateService for template operations - will be removed in Umbraco 15")]
     public void SaveTemplate(IEnumerable<ITemplate> templates, int userId = Constants.Security.SuperUserId)
-        => _templateService.SaveTemplateAsync(templates, userId).GetAwaiter().GetResult();
+    {
+        ITemplate[] templatesA = templates.ToArray();
+        using (ICoreScope scope = ScopeProvider.CreateCoreScope())
+        {
+            EventMessages eventMessages = EventMessagesFactory.Get();
+            var savingNotification = new TemplateSavingNotification(templatesA, eventMessages);
+            if (scope.Notifications.PublishCancelable(savingNotification))
+            {
+                scope.Complete();
+                return;
+            }
+
+            foreach (ITemplate template in templatesA)
+            {
+                _templateRepository.Save(template);
+            }
+
+            scope.Notifications.Publish(
+                new TemplateSavedNotification(templatesA, eventMessages).WithStateFrom(savingNotification));
+
+            Audit(AuditType.Save, userId, -1, UmbracoObjectTypes.Template.GetName());
+            scope.Complete();
+        }
+    }
 
     /// <summary>
     ///     Deletes a template by its alias
@@ -470,22 +541,22 @@ public class FileService : RepositoryService, IFileService
     /// <param name="userId"></param>
     [Obsolete("Please use ITemplateService for template operations - will be removed in Umbraco 15")]
     public void DeleteTemplate(string alias, int userId = Constants.Security.SuperUserId)
-        => _templateService.DeleteTemplateAsync(alias, userId).GetAwaiter().GetResult();
+        => _templateService.DeleteAsync(alias, userId).GetAwaiter().GetResult();
 
     /// <inheritdoc />
     [Obsolete("Please use ITemplateService for template operations - will be removed in Umbraco 15")]
     public Stream GetTemplateFileContentStream(string filepath)
-        => _templateService.GetTemplateFileContentStreamAsync(filepath).GetAwaiter().GetResult();
+        => _templateService.GetFileContentStreamAsync(filepath).GetAwaiter().GetResult();
 
     /// <inheritdoc />
     [Obsolete("Please use ITemplateService for template operations - will be removed in Umbraco 15")]
     public void SetTemplateFileContent(string filepath, Stream content)
-        => _templateService.SetTemplateFileContentAsync(filepath, content).GetAwaiter().GetResult();
+        => _templateService.SetFileContentAsync(filepath, content).GetAwaiter().GetResult();
 
     /// <inheritdoc />
     [Obsolete("Please use ITemplateService for template operations - will be removed in Umbraco 15")]
     public long GetTemplateFileSize(string filepath)
-        => _templateService.GetTemplateFileSizeAsync(filepath).GetAwaiter().GetResult();
+        => _templateService.GetFileSizeAsync(filepath).GetAwaiter().GetResult();
 
     #endregion
 

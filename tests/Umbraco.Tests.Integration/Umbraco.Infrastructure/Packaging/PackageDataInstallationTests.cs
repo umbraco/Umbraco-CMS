@@ -78,6 +78,12 @@ public class PackageDataInstallationTests : UmbracoIntegrationTestWithContent
 
     private IMediaTypeService MediaTypeService => GetRequiredService<IMediaTypeService>();
 
+    public override void CreateTestData()
+    {
+        DeleteAllTemplateViewFiles();
+        base.CreateTestData();
+    }
+
     [Test]
     public void Can_Import_uBlogsy_ContentTypes_And_Verify_Structure()
     {
