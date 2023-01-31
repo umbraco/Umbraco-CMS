@@ -48,8 +48,6 @@ export class UmbLanguageStore extends UmbStoreBase {
 		fetch(umbracoPath('/languages').toString())
 			.then((res) => res.json())
 			.then((data) => {
-				console.log('data', data);
-
 				this.#availableLanguages.append(data);
 			});
 

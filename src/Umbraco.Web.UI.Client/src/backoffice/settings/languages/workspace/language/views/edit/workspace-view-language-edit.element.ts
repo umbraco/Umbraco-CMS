@@ -53,7 +53,7 @@ export class UmbWorkspaceViewLanguageEditElement extends UmbLitElement {
 	private _search = '';
 
 	@state()
-	private _startedAsDefault: boolean | null = null;
+	private _startData: Language | null = null;
 
 	private _languageWorkspaceContext?: UmbWorkspaceLanguageContext;
 
@@ -68,9 +68,8 @@ export class UmbWorkspaceViewLanguageEditElement extends UmbLitElement {
 			this.observe(this._languageWorkspaceContext.data, (language) => {
 				this.language = language;
 
-				if (this._startedAsDefault === null) {
-					this._startedAsDefault = language.isDefault ?? false;
-					console.log('first', language);
+				if (this._startData === null) {
+					this._startData = language;
 				}
 			});
 			this.observe(this._languageWorkspaceContext.getAvailableLanguages(), (languages) => {
@@ -131,10 +130,14 @@ export class UmbWorkspaceViewLanguageEditElement extends UmbLitElement {
 	}
 
 	private get _filteredLanguages(): Array<Language> {
-		// Filter out languages already in use, except the current language.
-		return this._availableLanguages.filter(
-			(language) => !this._languages.some((x) => x.isoCode === language.isoCode && x.isoCode !== this.language?.isoCode)
+		const onlyNewLanguages = this._availableLanguages.filter(
+			(language) =>
+				!this._languages.some((x) => x.isoCode === language.isoCode && x.isoCode !== this._startData?.isoCode)
 		);
+
+		return onlyNewLanguages.filter((language) => {
+			return language.name?.toLowerCase().includes(this._search.toLowerCase());
+		});
 	}
 
 	private get _fallbackLanguages() {
@@ -152,7 +155,7 @@ export class UmbWorkspaceViewLanguageEditElement extends UmbLitElement {
 	}
 
 	private _renderDefaultLanguageWarning() {
-		if (this._startedAsDefault || this.language?.isDefault !== true) return nothing;
+		if (this._startData?.isDefault || this.language?.isDefault !== true) return nothing;
 
 		return html`<div id="default-language-warning">
 			Switching default language may result in default content missing.
@@ -190,7 +193,7 @@ export class UmbWorkspaceViewLanguageEditElement extends UmbLitElement {
 				<umb-workspace-property-layout label="Settings">
 					<div slot="editor">
 						<uui-toggle
-							?disabled=${this._startedAsDefault}
+							?disabled=${this._startData?.isDefault}
 							?checked=${this.language.isDefault || false}
 							@change=${this._handleDefaultChange}>
 							<div>
