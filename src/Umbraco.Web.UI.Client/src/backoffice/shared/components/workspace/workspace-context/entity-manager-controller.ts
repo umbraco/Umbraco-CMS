@@ -71,34 +71,34 @@ export class UmbEntityWorkspaceManager<StoreType extends UmbEntityDetailStore<En
 		}
 	}
 
-	getEntityType() {
+	getEntityType = () => {
 		return this._entityType;
 	}
-	getEntityKey(): string {
+	getEntityKey = (): string => {
 		return this._entityKey;
 	}
 
-	getStore() {
+	getStore = () => {
 		return this._store;
 	}
 
-	getData() {
+	getData = () => {
 		return this.state.getValue();
 	}
 
-	load(entityKey: string) {
+	load = (entityKey: string) => {
 		this.#isNew = false;
 		this._entityKey = entityKey;
 		this._observeStore();
 	}
 
-	create(parentKey: string | null) {
+	create = (parentKey: string | null) => {
 		this.#isNew = true;
 		this._entityKey = uuidv4();
 		this._createAtParentKey = parentKey;
 	}
 
-	save(): Promise<void> {
+	save = (): Promise<void> => {
 
 		if (!this._store) {
 			// TODO: add a more beautiful error:
@@ -125,7 +125,7 @@ export class UmbEntityWorkspaceManager<StoreType extends UmbEntityDetailStore<En
 	}
 
 
-	public destroy(): void {
+	public destroy = (): void => {
 		this.state.unsubscribe();
 	}
 
