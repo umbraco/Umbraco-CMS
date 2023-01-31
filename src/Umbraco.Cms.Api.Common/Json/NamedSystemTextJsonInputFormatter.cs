@@ -14,4 +14,17 @@ public class NamedSystemTextJsonInputFormatter : SystemTextJsonInputFormatter
 
     public override bool CanRead(InputFormatterContext context)
         => context.HttpContext.CurrentJsonOptionsName() == _jsonOptionsName && base.CanRead(context);
+
+    public override async Task<InputFormatterResult> ReadAsync(InputFormatterContext context)
+    {
+        try
+        {
+            return await base.ReadAsync(context);
+        }
+        catch(NotSupportedException e) // E.g. when trying to deserialize to a interface, without sending the $type as part of the request
+        {
+            context.ModelState.TryAddModelException(string.Empty,new InputFormatterException(e.Message, e));
+            return await InputFormatterResult.FailureAsync();
+        }
+    }
 }
