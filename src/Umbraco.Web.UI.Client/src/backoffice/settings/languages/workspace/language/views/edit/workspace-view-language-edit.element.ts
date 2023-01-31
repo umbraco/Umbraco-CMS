@@ -93,7 +93,7 @@ export class UmbWorkspaceViewLanguageEditElement extends UmbLitElement {
 
 			// If the language name is not set, we set it to the name of the selected language.
 			if (!this.language?.name) {
-				const language = this._languages.find((language) => language.isoCode === target.value.toString());
+				const language = this._availableLanguages.find((language) => language.isoCode === target.value.toString());
 				if (language) {
 					this._languageWorkspaceContext?.update({ name: language.name });
 				}
