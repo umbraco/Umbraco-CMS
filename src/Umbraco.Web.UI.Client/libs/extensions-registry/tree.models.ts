@@ -1,4 +1,5 @@
 import type { ManifestBase } from './models';
+import type { UmbTreeRepositoryFactory } from '@umbraco-cms/models';
 
 export interface ManifestTree extends ManifestBase {
 	type: 'tree';
@@ -7,5 +8,5 @@ export interface ManifestTree extends ManifestBase {
 
 export interface MetaTree {
 	storeAlias?: string;
-	repository?: any; // TODO: add interface
+	repository?: UmbTreeRepositoryFactory;
 }

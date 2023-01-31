@@ -158,6 +158,11 @@ export interface DataSourceResponse<T = undefined> {
 	error?: ProblemDetails;
 }
 
+// TODO; figure out why we can't add UmbControllerHostInterface as host type
+export interface UmbTreeRepositoryFactory {
+	new (host: any): UmbTreeRepository;
+}
+
 export interface UmbTreeRepository {
 	getRoot: () => Promise<{
 		data: PagedEntityTreeItem | undefined;
