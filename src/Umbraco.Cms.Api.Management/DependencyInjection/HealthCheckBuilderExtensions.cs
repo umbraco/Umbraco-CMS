@@ -10,7 +10,7 @@ internal static class HealthCheckBuilderExtensions
 {
     internal static IUmbracoBuilder AddHealthCheck(this IUmbracoBuilder builder)
     {
-        builder.Services.AddTransient<IHealthCheckGroupWithResultViewModelFactory, HealthCheckGroupWithResultViewModelFactory>();
+        builder.Services.AddTransient<IHealthCheckGroupViewModelFactory, HealthCheckGroupViewModelFactory>();
 
         builder.WithCollectionBuilder<MapDefinitionCollectionBuilder>().Add<HealthCheckViewModelsMapDefinition>();
 
