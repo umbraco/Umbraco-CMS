@@ -25,12 +25,9 @@ public class EFDatabaseSchemaCreator : IDatabaseSchemaCreator
         await _dbContextFactory.ExecuteWithContextAsync<Task>(async db =>
         {
             //TODO transaction cannot work with SQLite
-            //using (var transaction = await db.Database.BeginTransactionAsync())
+            // using (var transaction = await db.Database.BeginTransactionAsync())
             {
-                db.Database.Migrate();
-
-                // TODO: Figure out why MigrateAsync just runs in a background thread?
-                // await db.Database.MigrateAsync();
+                await db.Database.MigrateAsync();
 
                 // await transaction.CommitAsync();
             }
