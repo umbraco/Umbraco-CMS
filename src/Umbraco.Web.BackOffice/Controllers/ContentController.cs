@@ -230,7 +230,7 @@ public class ContentController : ContentControllerBase
         var contentPermissions = _contentService.GetPermissions(content)
             .ToDictionary(x => x.UserGroupId, x => x);
 
-        IUserGroup[] allUserGroups = _userGroupService.GetAllAsync(0, int.MaxValue).Result.ToArray();
+        IUserGroup[] allUserGroups = _userGroupService.GetAllAsync(0, int.MaxValue).Result.Items.ToArray();
 
         //loop through each user group
         foreach (IUserGroup userGroup in allUserGroups)
@@ -283,7 +283,7 @@ public class ContentController : ContentControllerBase
 
         // TODO: Should non-admins be able to see detailed permissions?
 
-        IEnumerable<IUserGroup> allUserGroups = _userGroupService.GetAllAsync(0, int.MaxValue).Result;
+        IEnumerable<IUserGroup> allUserGroups = _userGroupService.GetAllAsync(0, int.MaxValue).Result.Items;
 
         return GetDetailedPermissions(content, allUserGroups);
     }

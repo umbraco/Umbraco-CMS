@@ -8,6 +8,7 @@ using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Extensions;
+using Umbraco.New.Cms.Core.Models;
 
 namespace Umbraco.Cms.Core.Services;
 
@@ -31,15 +32,19 @@ internal sealed class UserGroupService : RepositoryService, IUserGroupService
         _userService = userService;
     }
 
-    public Task<IEnumerable<IUserGroup>> GetAllAsync(int skip, int take)
+    public Task<PagedModel<IUserGroup>> GetAllAsync(int skip, int take)
     {
         using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
-        IEnumerable<IUserGroup> groups = _userGroupRepository.GetMany()
-            .OrderBy(x => x.Name)
-            .Skip(skip)
-            .Take(take);
+        IUserGroup[] groups = _userGroupRepository.GetMany()
+            .OrderBy(x => x.Name).ToArray();
 
-        return Task.FromResult(groups);
+        var total = groups.Length;
+
+        return Task.FromResult(new PagedModel<IUserGroup>
+        {
+            Items = groups.Skip(skip).Take(take),
+            Total = total,
+        });
     }
 
     /// <inheritdoc />

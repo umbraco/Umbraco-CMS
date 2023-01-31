@@ -1,5 +1,6 @@
 ﻿using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Services.OperationStatus;
+using Umbraco.New.Cms.Core.Models;
 
 namespace Umbraco.Cms.Core.Services;
 
@@ -8,8 +9,10 @@ public interface IUserGroupService
     /// <summary>
     /// Gets all user groups.
     /// </summary>
+    /// <param name="skip">The amount of user groups to skip.</param>
+    /// <param name="take">The amount of user groups to take.</param>
     /// <returns>All user groups as an enumerable list of <see cref="IUserGroup"/>.</returns>
-    Task<IEnumerable<IUserGroup>> GetAllAsync(int skip, int take);
+    Task<PagedModel<IUserGroup>> GetAllAsync(int skip, int take);
 
     /// <summary>
     ///     Gets all UserGroups matching an ID in the parameter list.

@@ -5,6 +5,7 @@ using Umbraco.Cms.Api.Management.Factories;
 using Umbraco.Cms.Api.Management.ViewModels.UserGroups;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Services;
+using Umbraco.New.Cms.Core.Models;
 
 namespace Umbraco.Cms.Api.Management.Controllers.UserGroups;
 
@@ -31,9 +32,9 @@ public class GetAllUserGroupController : UserGroupsControllerBase
         // If this was enabled we'd only return the groups the current user was in
         // and even if it was set to false we'd still remove the admin group
         // This cannot be implemented until auth is further implemented (currently there's no way to get the current user)
-        IEnumerable<IUserGroup> userGroups = await _userGroupService.GetAllAsync(skip, take);
+        PagedModel<IUserGroup> userGroups = await _userGroupService.GetAllAsync(skip, take);
 
-        var viewModels = _userViewModelFactory.CreateMultiple(userGroups).ToList();
-        return new PagedViewModel<UserGroupViewModel> {Total = viewModels.Count, Items = viewModels};
+        var viewModels = _userViewModelFactory.CreateMultiple(userGroups.Items).ToList();
+        return new PagedViewModel<UserGroupViewModel> { Total = userGroups.Total, Items = viewModels };
     }
 }
