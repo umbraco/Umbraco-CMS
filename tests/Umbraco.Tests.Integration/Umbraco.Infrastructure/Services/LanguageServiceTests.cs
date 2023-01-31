@@ -259,7 +259,7 @@ public class LanguageServiceTests : UmbracoIntegrationTest
             .Build();
         var result = await LanguageService.CreateAsync(languageEnAu);
         Assert.IsFalse(result.Success);
-        Assert.AreEqual(LanguageOperationStatus.InvalidFallback, result.Status);
+        Assert.AreEqual(LanguageOperationStatus.InvalidIsoCode, result.Status);
     }
 
     [Test]
