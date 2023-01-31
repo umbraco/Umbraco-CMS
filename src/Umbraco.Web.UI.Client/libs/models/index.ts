@@ -4,7 +4,6 @@ import {
 	DocumentTypeTreeItem,
 	EntityTreeItem,
 	FolderTreeItem,
-	Language,
 } from '@umbraco-cms/backend-api';
 
 // Extension Manifests

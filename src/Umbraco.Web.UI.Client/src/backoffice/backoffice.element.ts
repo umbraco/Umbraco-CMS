@@ -33,6 +33,7 @@ import { UmbDocumentBlueprintTreeStore } from './documents/document-blueprints/d
 
 import { UmbDataTypeDetailStore } from './settings/data-types/data-type.detail.store';
 import { UmbDataTypeTreeStore } from './settings/data-types/data-type.tree.store';
+import { UmbLanguageStore } from './settings/languages/language.store';
 import { UmbThemeService, UMB_THEME_SERVICE_CONTEXT_TOKEN } from './themes/theme.service';
 import { UmbNotificationService, UMB_NOTIFICATION_SERVICE_CONTEXT_TOKEN } from '@umbraco-cms/notification';
 
@@ -47,7 +48,6 @@ import './packages';
 import './search';
 import './shared';
 import { UmbLitElement } from '@umbraco-cms/element';
-import { UmbLanguageStore, UMB_LANGUAGE_STORE_CONTEXT_TOKEN } from './settings/languages/language.store';
 
 @defineElement('umb-backoffice')
 export class UmbBackofficeElement extends UmbLitElement {
