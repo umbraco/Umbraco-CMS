@@ -1,8 +1,6 @@
 # Umbraco.CMS.Backoffice
 
-[![Storybook](https://github.com/umbraco/Umbraco.CMS.Backoffice/actions/workflows/azure-static-web-apps-ambitious-stone-0033b3603.yml/badge.svg)](https://github.com/umbraco/Umbraco.CMS.Backoffice/actions/workflows/azure-static-web-apps-ambitious-stone-0033b3603.yml)
-|
-[![Static Web App](https://github.com/umbraco/Umbraco.CMS.Backoffice/actions/workflows/azure-static-web-apps-ashy-bay-09f36a803.yml/badge.svg)](https://github.com/umbraco/Umbraco.CMS.Backoffice/actions/workflows/azure-static-web-apps-ashy-bay-09f36a803.yml)
+[![Storybook](https://github.com/umbraco/Umbraco.CMS.Backoffice/actions/workflows/azure-static-web-apps-ambitious-stone-0033b3603.yml/badge.svg)](https://github.com/umbraco/Umbraco.CMS.Backoffice/actions/workflows/azure-static-web-apps-ambitious-stone-0033b3603.yml) [![Static Web App](https://github.com/umbraco/Umbraco.CMS.Backoffice/actions/workflows/azure-static-web-apps-ashy-bay-09f36a803.yml/badge.svg)](https://github.com/umbraco/Umbraco.CMS.Backoffice/actions/workflows/azure-static-web-apps-ashy-bay-09f36a803.yml)
 
 ## Installation instructions
 
