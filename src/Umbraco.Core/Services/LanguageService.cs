@@ -149,11 +149,11 @@ internal sealed class LanguageService : RepositoryService, ILanguageService
         string auditMessage,
         int userId)
     {
-        if (HasValidIsoCode(language.IsoCode) == false)
+        if (IsValidIsoCode(language.IsoCode) == false)
         {
             return Attempt.FailWithStatus(LanguageOperationStatus.InvalidIsoCode, language);
         }
-        if (language.FallbackIsoCode is not null && HasValidIsoCode(language.FallbackIsoCode) == false)
+        if (language.FallbackIsoCode is not null && IsValidIsoCode(language.FallbackIsoCode) == false)
         {
             return Attempt.FailWithStatus(LanguageOperationStatus.InvalidFallbackIsoCode, language);
         }
@@ -252,7 +252,7 @@ internal sealed class LanguageService : RepositoryService, ILanguageService
         }
     }
 
-    private static bool HasValidIsoCode(string isoCode)
+    private static bool IsValidIsoCode(string isoCode)
     {
         try
         {
