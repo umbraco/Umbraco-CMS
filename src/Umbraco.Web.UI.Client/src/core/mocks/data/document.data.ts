@@ -94,6 +94,18 @@ export const data: Array<DocumentDetails> = [
 				dataTypeKey: 'dt-datePicker',
 			},
 			{
+				alias: 'datePickerTime',
+				label: 'Date Picker with Time',
+				description: 'Now with time',
+				dataTypeKey: 'dt-datePicker-time',
+			},
+			{
+				alias: 'time',
+				label: 'Time',
+				description: 'Just time',
+				dataTypeKey: 'dt-time',
+			},
+			{
 				alias: 'email',
 				label: 'Email',
 				description: '',
@@ -244,7 +256,20 @@ export const data: Array<DocumentDetails> = [
 				dataTypeKey: 'dt-userPicker',
 			},
 		],
-		data: [],
+		data: [
+			{
+				alias: 'datePicker',
+				value: '2023-12-24'
+			},
+			{
+				alias: 'datePickerTime',
+				value: '2023-12-24 14:52'
+			},
+			{
+				alias: 'time',
+				value: '14:52:00'
+			},
+		],
 		variants: [],
 	},
 	{
