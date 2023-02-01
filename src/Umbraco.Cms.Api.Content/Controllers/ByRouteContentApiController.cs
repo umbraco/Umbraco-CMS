@@ -27,15 +27,15 @@ public class ByRouteContentApiController : ContentApiControllerBase
     /// <summary>
     ///     Gets a content item by route.
     /// </summary>
-    /// <param name="url">The path to the content item.</param>
+    /// <param name="path">The path to the content item.</param>
     /// <param name="startNode">Optional path for the start node of the content item.</param>
     /// <returns>The content item or not found result.</returns>
-    [HttpGet("{url}")]
+    [HttpGet("{path}")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(IApiContent), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> ByRoute(string url, [FromHeader(Name = "start-node")] string? startNode = null)
+    public async Task<IActionResult> ByRoute(string path, [FromHeader(Name = "start-node")] string? startNode = null)
     {
         IPublishedContentCache? contentCache = GetContentCache();
 
@@ -44,7 +44,7 @@ public class ByRouteContentApiController : ContentApiControllerBase
             return BadRequest(ContentCacheNotFoundProblemDetails());
         }
 
-        var decodedPath = ConstructRoute(url, startNode);
+        var decodedPath = ConstructRoute(path, startNode);
 
         IPublishedContent? contentItem = contentCache.GetByRoute(decodedPath);
 
@@ -56,10 +56,10 @@ public class ByRouteContentApiController : ContentApiControllerBase
         return await Task.FromResult(Ok(ApiContentBuilder.Build(contentItem)));
     }
 
-    // Decode the node url and check "start-node" header if the top level node is not hidden
-    private string ConstructRoute(string url, string? startNodePath)
+    // Decode the node path and check "start-node" header if the top level node is not hidden
+    private string ConstructRoute(string path, string? startNodePath)
     {
-        var decodedPath = $"/{WebUtility.UrlDecode(url).TrimStart(Constants.CharArrays.ForwardSlash)}";
+        var decodedPath = $"/{WebUtility.UrlDecode(path).TrimStart(Constants.CharArrays.ForwardSlash)}";
 
         if (_globalSettings.HideTopLevelNodeFromPath == false)
         {
