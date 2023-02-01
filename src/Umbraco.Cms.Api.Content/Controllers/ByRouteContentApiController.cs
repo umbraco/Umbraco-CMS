@@ -14,28 +14,34 @@ namespace Umbraco.Cms.Api.Content.Controllers;
 public class ByRouteContentApiController : ContentApiControllerBase
 {
     private readonly GlobalSettings _globalSettings;
+    private readonly IStartNodeService _startNodeService;
 
     public ByRouteContentApiController(
         IPublishedSnapshotAccessor publishedSnapshotAccessor,
         IApiContentBuilder apiContentBuilder,
-        IOptions<GlobalSettings> globalSettings)
+        IOptions<GlobalSettings> globalSettings,
+        IStartNodeService startNodeService)
         : base(publishedSnapshotAccessor, apiContentBuilder)
     {
         _globalSettings = globalSettings.Value;
+        _startNodeService = startNodeService;
     }
 
     /// <summary>
     ///     Gets a content item by route.
     /// </summary>
     /// <param name="path">The path to the content item.</param>
-    /// <param name="startNode">Optional path for the start node of the content item.</param>
+    /// <remarks>
+    ///     Optional path for the start node of the content item
+    ///     can be added through a "start-node" header.
+    /// </remarks>
     /// <returns>The content item or not found result.</returns>
     [HttpGet("{path}")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(IApiContent), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> ByRoute(string path, [FromHeader(Name = "start-node")] string? startNode = null)
+    public async Task<IActionResult> ByRoute(string path)
     {
         IPublishedContentCache? contentCache = GetContentCache();
 
@@ -44,7 +50,7 @@ public class ByRouteContentApiController : ContentApiControllerBase
             return BadRequest(ContentCacheNotFoundProblemDetails());
         }
 
-        var decodedPath = ConstructRoute(path, startNode);
+        var decodedPath = ConstructRoute(path);
 
         IPublishedContent? contentItem = contentCache.GetByRoute(decodedPath);
 
@@ -57,16 +63,18 @@ public class ByRouteContentApiController : ContentApiControllerBase
     }
 
     // Decode the node path and check "start-node" header if the top level node is not hidden
-    private string ConstructRoute(string path, string? startNodePath)
+    private string ConstructRoute(string path)
     {
         var decodedPath = $"/{WebUtility.UrlDecode(path).TrimStart(Constants.CharArrays.ForwardSlash)}";
 
         if (_globalSettings.HideTopLevelNodeFromPath == false)
         {
             // Construct the path, using the value from "start-node" header
+            string? startNodePath = _startNodeService.GetStartNode();
+
             if (startNodePath is not null)
             {
-                var combinedPath = $"/{WebUtility.UrlDecode(startNodePath).TrimStart(Constants.CharArrays.ForwardSlash)}{decodedPath}";
+                var combinedPath = $"/{startNodePath}{decodedPath}";
                 return combinedPath;
             }
         }
