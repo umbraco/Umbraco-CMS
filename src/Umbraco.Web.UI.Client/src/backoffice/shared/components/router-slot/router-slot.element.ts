@@ -70,7 +70,6 @@ export class UmbRouterSlotElement extends LitElement {
 
 	private _onNavigationChanged = (event?: any) => {
 		if(event.detail.slot === this.#router) {
-			// Gather the routerFolder
 			this._activeLocalPath = event.detail.match.route.path;
 			this.dispatchEvent(new UmbRouterSlotChangeEvent());
 		}
