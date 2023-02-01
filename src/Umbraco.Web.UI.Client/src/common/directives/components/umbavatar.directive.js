@@ -70,7 +70,7 @@ Use this directive to render an avatar.
 
             function getNameInitials(name) {
                 if(name) {
-                    var names = name.split(' '),
+                    var names = name.replace(/[^a-zA-Z0-9 ]/g,'').split(' '),
                         initials = names[0].substring(0, 1);
 
                     if (names.length > 1) {
