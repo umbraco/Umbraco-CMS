@@ -1,6 +1,6 @@
 ﻿namespace Umbraco.Cms.Persistence.EFCore.Scoping;
 
-public interface IEfCoreScope
+public interface IEfCoreScope : IDisposable
 {
     public IUmbracoEfCoreDatabase UmbracoEfCoreDatabase { get; }
 
