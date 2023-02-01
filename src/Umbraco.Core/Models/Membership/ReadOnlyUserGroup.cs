@@ -29,7 +29,7 @@ public class ReadOnlyUserGroup : IReadOnlyUserGroup, IEquatable<ReadOnlyUserGrou
         HasAccessToAllLanguages = hasAccessToAllLanguages;
     }
 
-    [Obsolete("Please use constructor that takes a guid.")]
+    [Obsolete("Please use constructor that takes a Guid key. Scheduled for removal in v13")]
     public ReadOnlyUserGroup(
         int id,
         string? name,
