@@ -16,16 +16,12 @@ export class UmbThemeContext {
 
 	private themeSubscription?: UmbObserverController;
 
-	#styleElement: HTMLLinkElement | null = null;
+	#styleElement: HTMLLinkElement| HTMLStyleElement | null = null;
 
 	constructor(host: UmbControllerHostInterface) {
 		this._host = host;
 
 		new UmbContextProviderController(host, UMB_THEME_CONTEXT_TOKEN, this);
-
-		this.#styleElement = document.createElement('link');
-		this.#styleElement.setAttribute('rel', 'stylesheet');
-		document.head.appendChild(this.#styleElement);
 
 		const storedTheme = localStorage.getItem(LOCAL_STORAGE_KEY);
 		if (storedTheme) {
@@ -45,9 +41,28 @@ export class UmbThemeContext {
 					.extensionsOfType('theme')
 					.pipe(map((extensions) => extensions.filter((extension) => extension.alias === themeAlias))),
 				async (themes) => {
-					if (themes.length > 0 && themes[0].loader) {
-						const path = await themes[0].loader();
-						this.#styleElement?.setAttribute('href', path);
+					this.#styleElement?.remove();
+					if (themes.length > 0) {
+						if(themes[0].loader) {
+
+							const styleEl = this.#styleElement = document.createElement('style');
+							styleEl.setAttribute('type', 'text/css');
+							document.head.appendChild(styleEl);
+
+							const result = await themes[0].loader();
+							// Checking that this is still our styleElement, it has not been replaced with another theme in between.
+							if(styleEl === this.#styleElement) {
+								(styleEl as any).appendChild(document.createTextNode(result));
+							}
+
+						} else if (themes[0].css) {
+
+							this.#styleElement = document.createElement('link');
+							this.#styleElement.setAttribute('rel', 'stylesheet');
+							this.#styleElement.setAttribute('href', themes[0].css);
+							document.head.appendChild(this.#styleElement);
+
+						}
 					} else {
 						localStorage.removeItem(LOCAL_STORAGE_KEY);
 						this.#styleElement?.setAttribute('href', '');
