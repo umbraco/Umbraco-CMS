@@ -7,7 +7,7 @@ import { UmbSectionContext, UMB_SECTION_CONTEXT_TOKEN } from '../section/section
 import { UmbBackofficeContext, UMB_BACKOFFICE_CONTEXT_TOKEN } from './backoffice.context';
 import type { ManifestSection } from '@umbraco-cms/models';
 import { UmbLitElement } from '@umbraco-cms/element';
-import { createExtensionElementOrFallback } from 'libs/extensions-api/create-extension-element-or-fallback.function';
+import { createExtensionElementOrFallback } from '@umbraco-cms/extensions-api';
 
 @defineElement('umb-backoffice-main')
 export class UmbBackofficeMain extends UmbLitElement {
