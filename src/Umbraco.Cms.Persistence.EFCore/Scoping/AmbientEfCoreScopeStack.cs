@@ -7,7 +7,18 @@ public class AmbientEfCoreScopeStack : IAmbientEfCoreScopeStack
 
     private static AsyncLocal<ConcurrentStack<IEfCoreScope>> _stack = new();
 
-    public IEfCoreScope? AmbientScope { get; }
+    public IEfCoreScope? AmbientScope
+    {
+        get
+        {
+            if (_stack.Value?.TryPeek(out IEfCoreScope? ambientScope) ?? false)
+            {
+                return ambientScope;
+            }
+
+            return null;
+        }
+    }
 
     public IEfCoreScope Pop()
     {

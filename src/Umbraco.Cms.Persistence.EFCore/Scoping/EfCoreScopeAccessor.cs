@@ -2,9 +2,12 @@
 
 public class EfCoreScopeAccessor : IEFCoreScopeAccessor
 {
-    public EfCoreScopeAccessor()
-    {
+    private readonly IAmbientEfCoreScopeStack _ambientEfCoreScopeStack;
 
+    internal EfCoreScopeAccessor(IAmbientEfCoreScopeStack ambientEfCoreScopeStack)
+    {
+        _ambientEfCoreScopeStack = ambientEfCoreScopeStack;
     }
-    public IEfCoreScope? AmbientScope { get; }
+
+    public IEfCoreScope? AmbientScope => _ambientEfCoreScopeStack.AmbientScope;
 }
