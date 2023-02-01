@@ -4,11 +4,10 @@ import { css, html } from 'lit';
 import { state } from 'lit/decorators.js';
 import { IRoutingInfo } from 'router-slot';
 import { UmbSectionContext, UMB_SECTION_CONTEXT_TOKEN } from '../section/section.context';
-import { UmbSectionElement } from '../section/section.element';
 import { UmbBackofficeContext, UMB_BACKOFFICE_CONTEXT_TOKEN } from './backoffice.context';
-import { createExtensionElement } from '@umbraco-cms/extensions-api';
 import type { ManifestSection } from '@umbraco-cms/models';
 import { UmbLitElement } from '@umbraco-cms/element';
+import { createExtensionElementOrFallback } from 'libs/extensions-api/create-extension-element-or-fallback.function';
 
 @defineElement('umb-backoffice-main')
 export class UmbBackofficeMain extends UmbLitElement {
@@ -64,8 +63,10 @@ export class UmbBackofficeMain extends UmbLitElement {
 		this._routes = this._sections.map((section) => {
 			return {
 				path: this._routePrefix + section.meta.pathname,
-				component: () => this._getSectionElement(section),
-				setup: this._onRouteSetup, // TODO: sometimes we can end up in a state where this callback doesn't get called. It could look like a bug in the router-slot.
+				component: () => createExtensionElementOrFallback(section, 'umb-section'),
+				setup: this._onRouteSetup,
+				// TODO: sometimes we can end up in a state where this callback doesn't get called. It could look like a bug in the router-slot.
+				// Niels: Could this be because _backofficeContext is not available at that state?
 			};
 		});
 
@@ -73,15 +74,6 @@ export class UmbBackofficeMain extends UmbLitElement {
 			path: '**',
 			redirectTo: this._routePrefix + this._sections?.[0]?.meta.pathname,
 		});
-	}
-
-	// TODO: Make this a common shared method on @umbraco-cms/extensions-api
-	private _getSectionElement(section: ManifestSection) {
-		if (!section.loader || !section.elementName || !section.js) {
-			return UmbSectionElement;
-		}
-
-		return createExtensionElement(section);
 	}
 
 	private _onRouteSetup = (_component: HTMLElement, info: IRoutingInfo) => {
