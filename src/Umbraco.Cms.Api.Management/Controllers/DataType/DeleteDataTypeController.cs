@@ -1,9 +1,10 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Umbraco.Cms.Api.Management.ViewModels.DataType;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Api.Management.Controllers.DataType;
 
@@ -21,18 +22,14 @@ public class DeleteDataTypeController : DataTypeControllerBase
     [HttpDelete("{key:guid}")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<ActionResult> Delete(Guid key)
+    public async Task<IActionResult> Delete(Guid key)
     {
-        IDataType? dataType = _dataTypeService.GetDataType(key);
-        if (dataType == null)
-        {
-            return NotFound();
-        }
+        Attempt<IDataType?, DataTypeOperationStatus> result = await _dataTypeService.DeleteAsync(key, CurrentUserId(_backOfficeSecurityAccessor));
 
-        // one might expect this method to have an Attempt return value, but no - it has no
-        // return value, we'll just have to assume it succeeds
-        _dataTypeService.Delete(dataType, CurrentUserId(_backOfficeSecurityAccessor));
-        return await Task.FromResult(Ok());
+        return result.Success
+            ? Ok()
+            : DataTypeOperationStatusResult(result.Status);
     }
 }
