@@ -29,13 +29,22 @@ export class UmbWorkspaceViewLanguageEditElement extends UmbLitElement {
 				border: none;
 				border-bottom: 1px solid var(--uui-color-divider);
 			}
+			#culture-warning,
+			#default-language-warning {
+				padding: var(--uui-size-space-4) var(--uui-size-space-5);
+				border: 1px solid;
+				margin-top: var(--uui-size-space-4);
+				border-radius: var(--uui-border-radius);
+			}
+			#culture-warning {
+				background-color: var(--uui-color-danger);
+				color: var(--uui-color-danger-contrast);
+				border-color: var(--uui-color-danger-standalone);
+			}
 			#default-language-warning {
 				background-color: var(--uui-color-warning);
 				color: var(--uui-color-warning-contrast);
-				padding: var(--uui-size-space-4) var(--uui-size-space-5);
-				border: 1px solid var(--uui-color-warning-standalone);
-				margin-top: var(--uui-size-space-4);
-				border-radius: var(--uui-border-radius);
+				border-color: var(--uui-color-warning-standalone);
 			}
 		`,
 	];
@@ -154,6 +163,15 @@ export class UmbWorkspaceViewLanguageEditElement extends UmbLitElement {
 		return this._availableLanguages.find((language) => language.isoCode === this.language?.isoCode);
 	}
 
+	private _renderCultureWarning() {
+		if (this._startData?.isoCode === this.language?.isoCode) return nothing;
+
+		return html`<div id="culture-warning">
+			Changing the culture for a language may be an expensive operation and will result in the content cache and indexes
+			being rebuilt.
+		</div>`;
+	}
+
 	private _renderDefaultLanguageWarning() {
 		if (this._startData?.isDefault || this.language?.isDefault !== true) return nothing;
 
@@ -168,24 +186,26 @@ export class UmbWorkspaceViewLanguageEditElement extends UmbLitElement {
 		return html`
 			<uui-box>
 				<umb-workspace-property-layout label="Language">
-					<uui-combobox
-						slot="editor"
-						value=${ifDefined(this._fromAvailableLanguages?.isoCode)}
-						@change=${this._handleLanguageChange}
-						@search=${this._handleSearchChange}>
-						<uui-combobox-list>
-							${repeat(
-								this._filteredLanguages,
-								(language) => language.isoCode,
-								(language) =>
-									html`
-										<uui-combobox-list-option value=${ifDefined(language.isoCode)}
-											>${language.name}</uui-combobox-list-option
-										>
-									`
-							)}
-						</uui-combobox-list>
-					</uui-combobox>
+					<div slot="editor">
+						<uui-combobox
+							value=${ifDefined(this._fromAvailableLanguages?.isoCode)}
+							@change=${this._handleLanguageChange}
+							@search=${this._handleSearchChange}>
+							<uui-combobox-list>
+								${repeat(
+									this._filteredLanguages,
+									(language) => language.isoCode,
+									(language) =>
+										html`
+											<uui-combobox-list-option value=${ifDefined(language.isoCode)}
+												>${language.name}</uui-combobox-list-option
+											>
+										`
+								)}
+							</uui-combobox-list>
+						</uui-combobox>
+						${this._renderCultureWarning()}
+					</div>
 				</umb-workspace-property-layout>
 				<umb-workspace-property-layout label="ISO Code">
 					<div slot="editor">${this.language.isoCode}</div>
@@ -201,6 +221,7 @@ export class UmbWorkspaceViewLanguageEditElement extends UmbLitElement {
 								<div>An Umbraco site can only have one default language set.</div>
 							</div>
 						</uui-toggle>
+						${this._renderDefaultLanguageWarning()}
 						<hr />
 						<uui-toggle ?checked=${this.language.isMandatory || false} @change=${this._handleMandatoryChange}>
 							<div>
@@ -208,7 +229,6 @@ export class UmbWorkspaceViewLanguageEditElement extends UmbLitElement {
 								<div>Properties on this language have to be filled out before the node can be published.</div>
 							</div>
 						</uui-toggle>
-						${this._renderDefaultLanguageWarning()}
 					</div>
 				</umb-workspace-property-layout>
 				<umb-workspace-property-layout
