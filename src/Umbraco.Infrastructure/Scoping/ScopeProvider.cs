@@ -152,7 +152,7 @@ namespace Umbraco.Cms.Infrastructure.Scoping
             IEventDispatcher? eventDispatcher = null,
             IScopedNotificationPublisher? scopedNotificationPublisher = null,
             bool? scopeFileSystems = null)
-            => new Scope(StaticServiceProvider.Instance.GetRequiredService<IUmbracoEfCoreDatabaseFactory>(), this, _coreDebugSettings, _mediaFileManager, _eventAggregator, _loggerFactory.CreateLogger<Scope>(), _fileSystems, true, null, isolationLevel, repositoryCacheMode, eventDispatcher, scopedNotificationPublisher, scopeFileSystems);
+            => new Scope(this, _coreDebugSettings, _mediaFileManager, _eventAggregator, _loggerFactory.CreateLogger<Scope>(), _fileSystems, true, null, isolationLevel, repositoryCacheMode, eventDispatcher, scopedNotificationPublisher, scopeFileSystems);
 
         /// <inheritdoc />
         public void AttachScope(IScope other, bool callContext = false)
@@ -232,7 +232,7 @@ namespace Umbraco.Cms.Infrastructure.Scoping
             {
                 IScopeContext? ambientContext = AmbientContext;
                 ScopeContext? newContext = ambientContext == null ? new ScopeContext() : null;
-                var scope = new Scope(StaticServiceProvider.Instance.GetRequiredService<IUmbracoEfCoreDatabaseFactory>(), this, _coreDebugSettings, _mediaFileManager, _eventAggregator, _loggerFactory.CreateLogger<Scope>(), _fileSystems, false, newContext, isolationLevel, repositoryCacheMode, eventDispatcher, notificationPublisher, scopeFileSystems, callContext, autoComplete);
+                var scope = new Scope(this, _coreDebugSettings, _mediaFileManager, _eventAggregator, _loggerFactory.CreateLogger<Scope>(), _fileSystems, false, newContext, isolationLevel, repositoryCacheMode, eventDispatcher, notificationPublisher, scopeFileSystems, callContext, autoComplete);
 
                 // assign only if scope creation did not throw!
                 PushAmbientScope(scope);
@@ -243,7 +243,7 @@ namespace Umbraco.Cms.Infrastructure.Scoping
                 return scope;
             }
 
-            var nested = new Scope(StaticServiceProvider.Instance.GetRequiredService<IUmbracoEfCoreDatabaseFactory>(), this, _coreDebugSettings, _mediaFileManager, _eventAggregator, _loggerFactory.CreateLogger<Scope>(), _fileSystems, ambientScope, isolationLevel, repositoryCacheMode, eventDispatcher, notificationPublisher, scopeFileSystems, callContext, autoComplete);
+            var nested = new Scope(this, _coreDebugSettings, _mediaFileManager, _eventAggregator, _loggerFactory.CreateLogger<Scope>(), _fileSystems, ambientScope, isolationLevel, repositoryCacheMode, eventDispatcher, notificationPublisher, scopeFileSystems, callContext, autoComplete);
             PushAmbientScope(nested);
             return nested;
         }
