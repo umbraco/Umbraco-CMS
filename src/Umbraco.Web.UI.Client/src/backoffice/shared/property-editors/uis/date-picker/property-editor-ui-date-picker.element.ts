@@ -3,6 +3,8 @@ import { customElement, property } from 'lit/decorators.js';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { UmbPropertyValueChangeEvent } from '../..';
 import { UmbLitElement } from '@umbraco-cms/element';
+import { PropertyEditorConfigDefaultData } from '@umbraco-cms/extensions-registry';
+
 
 /**
  * @element umb-property-editor-ui-date-picker
@@ -15,38 +17,56 @@ export class UmbPropertyEditorUIDatePickerElement extends UmbLitElement {
 	value = '';
 
 	private updateValue(e: InputEvent) {
-		console.log('config', this.config);
-
 		const dateField = e.target as HTMLInputElement;
 		this.value = dateField.value;
 		this.dispatchEvent(new UmbPropertyValueChangeEvent());
 	}
 
+	private _format?: string;
+
+	// TODO: Warren [Can I get the underlying UUI-input type/enum so I can ensure only valid input types set]
+	private _inputType?: string = "date";
+
+	private _offsetTime?: boolean;
+
 	@property({ type: Array, attribute: false })
-	public config = [];
+	public set config(config: Array<PropertyEditorConfigDefaultData>) {
 
-	// CONFIG 
-	// Date format string
-	// if empty = YYYY-MM-DD
+		console.log('config', config);
 
-	// Based on the format string
-	// We need to change the underlying type for UUI-input
+		// Format string prevalue/config
+		this._format = config.find((x) => x.alias === 'format')?.value;
 
-	// YYYY-MM-DD = date
-	// YYYY-MM-DD HH:mm:ss = datetime-local
-	// HH:mm:ss = time
-	// HH:mm = time
+		// TODO: Warren 
+		// When this is set to true then you need to check the Umbraco.Sys.ServerVariables that comes from C# server in a global JS obejct
+		this._offsetTime = config.find((x) => x.alias === 'offsetTime')?.value;
 
+		// Based on the type of format string change the UUI-input type
+		switch (this._format) {
+			case 'YYYY-MM-DD':
+				this._inputType = "date";
+				break;
 
-	// Config offset time? (Boolean)
-	// Copmpares against a global value in Umbraco.Sys.SeverVariables
+			case 'YYYY-MM-DD HH:mm:ss':
+				this._inputType = "datetime-local";
+				break;
 
+			case 'HH:mm:ss':
+				this._inputType = "time";
+				break;
+			
+			default:
+				break;
+		}
+	}
 
 	render() {
 		return html`
-			<uui-input type="date" @input=${this.updateValue} .value=${this.value}></uui-input>
+			<uui-input .type=${this._inputType} @input=${this.updateValue} .value=${this.value}></uui-input>
 			<div>
-				<small>Chosen Value: ${this.value}</small>
+				<small>Chosen Value: ${this.value}</small><br/>
+				<small>Config Format: ${this._format}</small><br/>
+				<small>Config TimeOffset enabled?: ${this._offsetTime}</small><br/>
 			</div>`;
 	}
 }
