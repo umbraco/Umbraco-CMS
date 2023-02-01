@@ -57,7 +57,7 @@ export class UmbBodyLayout extends LitElement {
 
 			#actions {
 				display: flex;
-				gap: 6px;
+				gap: var(--uui-size-space-2);
 				margin: 0 var(--uui-size-layout-1);
 				margin-left: auto;
 			}
@@ -89,18 +89,39 @@ export class UmbBodyLayout extends LitElement {
 
 	render() {
 		return html`
-			<div id="header" style="display:${this.headline || this._headerSlotHasChildren || this._tabsSlotHasChildren ? '' : 'none'}">
+			<div
+				id="header"
+				style="display:${this.headline || this._headerSlotHasChildren || this._tabsSlotHasChildren ? '' : 'none'}">
 				${this.headline ? html`<h3 id="headline">${this.headline}</h3>` : nothing}
 
-				<slot name="header" @slotchange=${(e: Event) => { this._headerSlotHasChildren = this.hasNodes(e)}}></slot>
-				<slot id="tabs" name="tabs" @slotchange=${(e: Event) => { this._tabsSlotHasChildren = this.hasNodes(e)}}></slot>
+				<slot
+					name="header"
+					@slotchange=${(e: Event) => {
+						this._headerSlotHasChildren = this.hasNodes(e);
+					}}></slot>
+				<slot
+					id="tabs"
+					name="tabs"
+					@slotchange=${(e: Event) => {
+						this._tabsSlotHasChildren = this.hasNodes(e);
+					}}></slot>
 			</div>
 			<uui-scroll-container id="main">
 				<slot></slot>
 			</uui-scroll-container>
 			<div id="footer" style="display:${this._footerSlotHasChildren || this._actionsSlotHasChildren ? '' : 'none'}">
-				<slot name="footer" @slotchange=${(e: Event) => { this._footerSlotHasChildren = this.hasNodes(e)}}></slot>
-				<slot id="actions" name="actions" style="display:${this._actionsSlotHasChildren ? '' : 'none'}" @slotchange=${(e: Event) => { this._actionsSlotHasChildren = this.hasNodes(e)}}></slot>
+				<slot
+					name="footer"
+					@slotchange=${(e: Event) => {
+						this._footerSlotHasChildren = this.hasNodes(e);
+					}}></slot>
+				<slot
+					id="actions"
+					name="actions"
+					style="display:${this._actionsSlotHasChildren ? '' : 'none'}"
+					@slotchange=${(e: Event) => {
+						this._actionsSlotHasChildren = this.hasNodes(e);
+					}}></slot>
 			</div>
 		`;
 	}

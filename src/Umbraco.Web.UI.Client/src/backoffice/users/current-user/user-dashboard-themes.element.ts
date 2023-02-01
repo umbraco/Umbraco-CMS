@@ -15,10 +15,10 @@ export class UmbUserDashboardTestElement extends UmbLitElement {
 				flex-direction: column;
 				gap: var(--uui-size-space-4);
 				padding: var(--uui-size-space-5);
-				border: 1px solid var(--uui-color-border);
 				background: var(--uui-color-surface);
 				color: var(--uui-color-text);
 				border-radius: var(--uui-border-radius);
+				box-shadow: var(--uui-shadow-depth-1);
 			}
 		`,
 	];

@@ -4,7 +4,7 @@ const sidebarMenuItem: ManifestSidebarMenuItem = {
 	type: 'sidebarMenuItem',
 	alias: 'Umb.SidebarMenuItem.MemberGroups',
 	name: 'Member Groups Sidebar Menu Item',
-	weight: 400,
+	weight: 800,
 	loader: () => import('./member-groups-sidebar-menu-item.element'),
 	meta: {
 		label: 'Member Groups',
