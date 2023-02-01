@@ -1,13 +1,13 @@
 import { LitElement, PropertyValueMap } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { IRoute, RouterSlot } from 'router-slot';
-import { UmbRouterSlotChangeEvent, UMBRouterSlotEvent } from './routet-slot-change.event';
+import { UmbRouterSlotChangeEvent } from './routet-slot-change.event';
 import { UmbRouterSlotInitEvent } from './routet-slot-init.event';
 
 /**
- *  @element umb-ref-property-editor-ui
- *  @description - Component for displaying a reference to a Property Editor UI
- *  @extends UUIRefNodeElement
+ *  @element umb-router-slot-element
+ *  @description - Component for wrapping Router Slot element, providing some local events for implementation.
+ *  @extends UmbRouterSlotElement
  */
 @customElement('umb-router-slot')
 export class UmbRouterSlotElement extends LitElement {
