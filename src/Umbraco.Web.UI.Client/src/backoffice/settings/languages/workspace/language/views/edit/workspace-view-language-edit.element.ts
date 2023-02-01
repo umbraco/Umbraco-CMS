@@ -164,7 +164,7 @@ export class UmbWorkspaceViewLanguageEditElement extends UmbLitElement {
 	}
 
 	#renderCultureWarning() {
-		if (this._startData?.isoCode === this.language?.isoCode) return nothing;
+		if (!this._startData?.isoCode || this._startData?.isoCode === this.language?.isoCode) return nothing;
 
 		return html`<div id="culture-warning">
 			Changing the culture for a language may be an expensive operation and will result in the content cache and indexes
