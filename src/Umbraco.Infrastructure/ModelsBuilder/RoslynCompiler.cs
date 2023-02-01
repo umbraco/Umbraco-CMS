@@ -36,7 +36,7 @@ public class RoslynCompiler
         // - we were explicitly adding the wrong runtime dependencies
         // ... at least that the gist of what I can tell.
         MetadataReference[] refs =
-            DependencyContext.Default.CompileLibraries
+            DependencyContext.Default!.CompileLibraries
                 .SelectMany(cl => cl.ResolveReferencePaths())
                 .Select(asm => MetadataReference.CreateFromFile(asm))
                 .ToArray();

@@ -5,6 +5,7 @@ using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Persistence;
 using Umbraco.Cms.Infrastructure.Migrations.Install;
+using Umbraco.Cms.Infrastructure.Persistence.EfCore;
 using Umbraco.Cms.Persistence.EFCore;
 using Umbraco.Cms.Persistence.EFCore.Entities;
 
@@ -29,6 +30,7 @@ public static class UmbracoEFCoreServiceCollectionExtensions
         services.AddUnique<IDatabaseSchemaCreatorFactory, EFDatabaseSchemaCreatorFactory>();
         services.AddUnique<IDatabaseDataCreator, EFCoreDatabaseDataCreator>();
         services.AddSingleton<UmbracoDbContextFactory>();
+        services.AddSingleton<IUmbracoEfCoreDatabaseFactory, UmbracoEfCoreDatabaseFactory>();
 
         return services;
     }

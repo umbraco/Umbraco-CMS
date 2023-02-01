@@ -11,7 +11,7 @@ public interface IScope : ICoreScope
     /// </summary>
     IUmbracoDatabase Database { get; }
 
-    IUmbracoEfCoreDatabase EfCoreDatabase { get; }
+    IUmbracoEfCoreDatabase EfCoreDatabase => null!;
 
     /// <summary>
     ///     Gets the Sql context.
