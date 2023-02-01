@@ -120,15 +120,13 @@ export class UmbTreeElement extends UmbLitElement {
 	}
 
 	private async _observeRepositoryTreeRoot() {
-		if (!this._treeContext?.getRoot) return;
+		if (!this._treeContext?.requestRootItems) return;
 
-		const { updates } = await this._treeContext.getRoot();
+		this._treeContext.requestRootItems();
 
-		if (updates) {
-			this.observe(updates, (rootItems) => {
-				this._items = rootItems as Entity[];
-			});
-		}
+		this.observe(await this._treeContext.rootItems(), (rootItems) => {
+			this._items = rootItems as Entity[];
+		});
 	}
 
 	private _observeSelection() {

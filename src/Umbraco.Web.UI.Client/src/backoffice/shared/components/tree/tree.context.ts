@@ -22,7 +22,7 @@ export class UmbTreeContextBase implements UmbTreeContext {
 	#selection = new DeepState(<Array<string>>[]);
 	public readonly selection = this.#selection.asObservable();
 
-	repository?: UmbTreeRepository;
+	repository!: UmbTreeRepository;
 
 	constructor(host: UmbControllerHostInterface, tree: ManifestTree) {
 		this.#host = host;
@@ -55,18 +55,19 @@ export class UmbTreeContextBase implements UmbTreeContext {
 		this.#selection.next(selection.filter((x) => x !== key));
 	}
 
-	public async getRoot() {
-		if (!this.repository) {
-			return { data: undefined, updates: undefined, error: undefined };
-		}
-		return this.repository?.getRoot();
+	public async requestRootItems() {
+		return this.repository.requestRootItems();
 	}
 
-	public async getChildren(parentKey: string | null) {
-		if (!this.repository) {
-			return { data: undefined, updates: undefined, error: undefined };
-		}
+	public async requestChildrenOf(parentKey: string | null) {
+		return this.repository.requestChildrenOf(parentKey);
+	}
 
-		return this.repository.getChildren(parentKey);
+	public async rootItems() {
+		return this.repository.rootItems();
+	}
+
+	public async childrenOf(parentKey: string | null) {
+		return this.repository.childrenOf(parentKey);
 	}
 }

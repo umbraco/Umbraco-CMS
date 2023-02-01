@@ -13,7 +13,7 @@ import type { UmbTreeRepository } from '@umbraco-cms/models';
 export class UmbTemplateTreeRepository implements UmbTreeRepository {
 	#host: UmbControllerHostInterface;
 	#dataSource: TemplateTreeServerDataSource;
-	#treeStore!: UmbTemplateTreeStore;
+	#treeStore?: UmbTemplateTreeStore;
 	#notificationService?: UmbNotificationService;
 	#initResolver?: () => void;
 	#initialized = false;
@@ -34,11 +34,9 @@ export class UmbTemplateTreeRepository implements UmbTreeRepository {
 		});
 	}
 
-	#init() {
-		return new Promise<void>((resolve) => {
-			this.#initialized ? resolve() : (this.#initResolver = resolve);
-		});
-	}
+	#init = new Promise<void>((resolve) => {
+		this.#initialized ? resolve() : (this.#initResolver = resolve);
+	});
 
 	#checkIfInitialized() {
 		if (this.#treeStore && this.#notificationService) {
@@ -47,54 +45,60 @@ export class UmbTemplateTreeRepository implements UmbTreeRepository {
 		}
 	}
 
-	async getRoot() {
-		await this.#init();
-		let updates = undefined;
+	async requestRootItems() {
+		await this.#init;
 
-		const { data, error } = await this.#dataSource.getRoot();
+		const { data, error } = await this.#dataSource.getRootItems();
 
 		if (data) {
 			this.#treeStore?.appendItems(data.items);
-			updates = this.#treeStore?.rootChanged();
 		}
 
-		return { data, updates, error };
+		return { data, error };
 	}
 
-	async getChildren(parentKey: string | null) {
-		await this.#init();
-		let updates = undefined;
+	async requestChildrenOf(parentKey: string | null) {
+		await this.#init;
 
 		if (!parentKey) {
 			const error: ProblemDetails = { title: 'Parent key is missing' };
-			return { data: undefined, updates, error };
+			return { data: undefined, error };
 		}
 
-		const { data, error } = await this.#dataSource.getChildren(parentKey);
+		const { data, error } = await this.#dataSource.getChildrenOf(parentKey);
 
 		if (data) {
 			this.#treeStore?.appendItems(data.items);
-			updates = this.#treeStore?.childrenChanged(parentKey);
 		}
 
-		return { data, updates, error };
+		return { data, error };
 	}
 
-	async getItems(keys: Array<string>) {
-		await this.#init();
-		let updates = undefined;
+	async requestItems(keys: Array<string>) {
+		await this.#init;
 
 		if (!keys) {
 			const error: ProblemDetails = { title: 'Keys are missing' };
-			return { data: undefined, updates, error };
+			return { data: undefined, error };
 		}
 
 		const { data, error } = await this.#dataSource.getItems(keys);
 
-		if (data) {
-			updates = this.#treeStore?.itemsChanged(keys);
-		}
+		return { data, error };
+	}
 
-		return { data, updates, error };
+	async rootItems() {
+		await this.#init;
+		return this.#treeStore!.rootItems();
+	}
+
+	async childrenOf(parentKey: string | null) {
+		await this.#init;
+		return this.#treeStore!.childrenOf(parentKey);
+	}
+
+	async items(keys: Array<string>) {
+		await this.#init;
+		return this.#treeStore!.items(keys);
 	}
 }

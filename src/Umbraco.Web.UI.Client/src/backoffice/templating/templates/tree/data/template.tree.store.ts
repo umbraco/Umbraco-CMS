@@ -39,15 +39,15 @@ export class UmbTemplateTreeStore extends UmbStoreBase {
 		}
 	}
 
-	rootChanged() {
+	rootItems() {
 		return this.#data.getObservablePart((items) => items.filter((item) => item.parentKey === null));
 	}
 
-	childrenChanged(parentKey: string) {
+	childrenOf(parentKey: string | null) {
 		return this.#data.getObservablePart((items) => items.filter((item) => item.parentKey === parentKey));
 	}
 
-	itemsChanged(keys: Array<string>) {
+	items(keys: Array<string>) {
 		return this.#data.getObservablePart((items) => items.filter((item) => keys.includes(item.key ?? '')));
 	}
 }

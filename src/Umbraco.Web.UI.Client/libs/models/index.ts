@@ -164,14 +164,19 @@ export interface UmbTreeRepositoryFactory {
 }
 
 export interface UmbTreeRepository {
-	getRoot: () => Promise<{
+	requestRootItems: () => Promise<{
 		data: PagedEntityTreeItem | undefined;
-		updates: Observable<EntityTreeItem[]> | undefined;
 		error: ProblemDetails | undefined;
 	}>;
-	getChildren: (parentKey: string | null) => Promise<{
+	requestChildrenOf: (parentKey: string | null) => Promise<{
 		data: PagedEntityTreeItem | undefined;
-		updates: Observable<EntityTreeItem[]> | undefined;
 		error: ProblemDetails | undefined;
 	}>;
+	requestItems: (keys: string[]) => Promise<{
+		data: Array<EntityTreeItem> | undefined;
+		error: ProblemDetails | undefined;
+	}>;
+	rootItems: () => Promise<Observable<EntityTreeItem[]>>;
+	childrenOf: (parentKey: string | null) => Promise<Observable<EntityTreeItem[]>>;
+	items: (keys: string[]) => Promise<Observable<EntityTreeItem[]>>;
 }

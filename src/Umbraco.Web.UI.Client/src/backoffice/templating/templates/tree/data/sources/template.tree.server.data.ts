@@ -9,11 +9,11 @@ export class TemplateTreeServerDataSource implements TemplateTreeDataSource {
 		this.#host = host;
 	}
 
-	async getRoot() {
+	async getRootItems() {
 		return tryExecuteAndNotify(this.#host, TemplateResource.getTreeTemplateRoot({}));
 	}
 
-	async getChildren(parentKey: string | null) {
+	async getChildrenOf(parentKey: string | null) {
 		if (!parentKey) {
 			const error: ProblemDetails = { title: 'Parent key is missing' };
 			return { error };
