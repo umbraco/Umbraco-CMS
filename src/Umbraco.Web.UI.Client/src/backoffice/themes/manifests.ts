@@ -11,14 +11,14 @@ export const themes: Array<ManifestTheme> = [
 		type: 'theme',
 		alias: 'umb-dark-theme',
 		name: 'Dark',
-		loader: () => import('./themes/dark.theme'),
+		loader: () => new Promise((resolve) => resolve('src/backoffice/themes/themes/dark.theme.css')),
 		weight: 200,
 	},
 	{
 		type: 'theme',
 		alias: 'umb-high-contrast-theme',
 		name: 'High contrast',
-		loader: () => import('./themes/high-contrast.theme'),
+		loader: () => new Promise((resolve) => resolve('src/backoffice/themes/themes/high-contrast.theme.css')),
 		weight: 100,
 	},
 ];

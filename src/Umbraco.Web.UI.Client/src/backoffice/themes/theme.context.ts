@@ -1,6 +1,4 @@
 import { map } from 'rxjs';
-//import { dark, highContrast } from './themes';
-import type { CSSResult } from 'lit';
 import { manifests } from './manifests';
 import { UmbContextProviderController, UmbContextToken } from '@umbraco-cms/context-api';
 import { StringState, UmbObserverController } from '@umbraco-cms/observable-api';
@@ -16,35 +14,30 @@ export class UmbThemeContext {
 	#theme = new StringState('umb-light-theme');
 	public readonly theme = this.#theme.asObservable();
 
-	#styleElement: HTMLStyleElement;
-
 	private themeSubscription?: UmbObserverController;
+
+	#styleElement: HTMLLinkElement | null = null;
 
 	constructor(host: UmbControllerHostInterface) {
 		this._host = host;
 
-		console.log('Theme COntext');
-
 		new UmbContextProviderController(host, UMB_THEME_CONTEXT_TOKEN, this);
 
-		//TODO: Figure out how to extend this with themes from packages
-		//this.addTheme(dark);
-		//this.addTheme(highContrast);
-		this.#styleElement = document.createElement('style');
+		this.#styleElement = document.createElement('link');
+		this.#styleElement.setAttribute('rel', 'stylesheet');
+		document.head.appendChild(this.#styleElement);
 
 		const storedTheme = localStorage.getItem(LOCAL_STORAGE_KEY);
 		if (storedTheme) {
 			this.setThemeByAlias(storedTheme);
 		}
-
-		document.documentElement.insertAdjacentElement('beforeend', this.#styleElement);
 	}
 
 	public setThemeByAlias(themeAlias: string) {
 		this.#theme.next(themeAlias);
 
 		this.themeSubscription?.destroy();
-		if (themeAlias != null) {
+		if (themeAlias) {
 			localStorage.setItem(LOCAL_STORAGE_KEY, themeAlias);
 			this.themeSubscription = new UmbObserverController(
 				this._host,
@@ -53,27 +46,19 @@ export class UmbThemeContext {
 					.pipe(map((extensions) => extensions.filter((extension) => extension.alias === themeAlias))),
 				async (themes) => {
 					if (themes.length > 0 && themes[0].loader) {
-						const result = await themes[0].loader();
-						this.#styleElement.innerHTML = result.default;
+						const path = await themes[0].loader();
+						this.#styleElement?.setAttribute('href', path);
 					} else {
-						// If there is no loader, reset to light theme (no theme)
-						this.#styleElement.innerHTML = '';
+						localStorage.removeItem(LOCAL_STORAGE_KEY);
+						this.#styleElement?.setAttribute('href', '');
 					}
-					// how to get CSS.
-					//this.#styleElement.innerHTML = "";
 				}
 			);
 		} else {
 			localStorage.removeItem(LOCAL_STORAGE_KEY);
-			this.#styleElement.innerHTML = '';
+			this.#styleElement?.setAttribute('href', '');
 		}
 	}
-
-	/*
-	public addTheme(theme: UmbTheme) {
-		this.#themes.next([...this.#themes.value, theme]);
-	}
-	*/
 }
 
 export const UMB_THEME_CONTEXT_TOKEN = new UmbContextToken<UmbThemeContext>('umbThemeContext');
