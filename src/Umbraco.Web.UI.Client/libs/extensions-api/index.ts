@@ -8,5 +8,6 @@ export * from './is-manifest-elementable-type.function';
 export * from './is-manifest-js-type.function';
 export * from './is-manifest-loader-type.function';
 export * from './load-extension.function';
+export * from './create-extension-element-or-fallback.function';
 
 export const umbExtensionsRegistry = new UmbExtensionRegistry();
