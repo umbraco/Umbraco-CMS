@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Infrastructure.Persistence.EfCore;
+﻿namespace Umbraco.Cms.Persistence.EFCore;
 
 public interface IUmbracoEfCoreDatabaseFactory
 {

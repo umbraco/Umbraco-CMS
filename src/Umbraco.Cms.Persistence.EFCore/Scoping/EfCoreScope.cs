@@ -4,7 +4,6 @@ using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Scoping;
-using Umbraco.Cms.Infrastructure.Persistence.EfCore;
 using Umbraco.Cms.Infrastructure.Scoping;
 
 namespace Umbraco.Cms.Persistence.EFCore.Scoping;

@@ -1,13 +1,13 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Umbraco.Cms.Persistence.EFCore.Entities;
 
-namespace Umbraco.Cms.Infrastructure.Persistence.EfCore;
+namespace Umbraco.Cms.Persistence.EFCore;
 
 public interface IUmbracoEfCoreDatabase : IDisposable
 {
     /// <summary>
     ///     Gets the Sql context.
     /// </summary>
-    DbContext DbContext { get; }
+    UmbracoEFContext UmbracoEFContext { get; }
 
     /// <summary>
     ///     Gets the database instance unique identifier as a string.

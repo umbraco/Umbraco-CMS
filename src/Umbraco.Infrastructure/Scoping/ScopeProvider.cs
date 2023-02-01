@@ -9,7 +9,6 @@ using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Infrastructure.Persistence;
-using Umbraco.Cms.Infrastructure.Persistence.EfCore;
 using Umbraco.Extensions;
 using CoreDebugSettings = Umbraco.Cms.Core.Configuration.Models.CoreDebugSettings;
 

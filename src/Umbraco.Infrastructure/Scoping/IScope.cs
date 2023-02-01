@@ -1,6 +1,5 @@
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Infrastructure.Persistence;
-using Umbraco.Cms.Infrastructure.Persistence.EfCore;
 
 namespace Umbraco.Cms.Infrastructure.Scoping;
 
@@ -10,8 +9,6 @@ public interface IScope : ICoreScope
     ///     Gets the scope database.
     /// </summary>
     IUmbracoDatabase Database { get; }
-
-    IUmbracoEfCoreDatabase EfCoreDatabase => null!;
 
     /// <summary>
     ///     Gets the Sql context.
