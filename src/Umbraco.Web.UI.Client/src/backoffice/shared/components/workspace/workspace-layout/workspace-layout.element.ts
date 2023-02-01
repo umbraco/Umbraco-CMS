@@ -128,9 +128,10 @@ export class UmbWorkspaceLayout extends UmbLitElement {
 					},
 					setup: (component: Promise<HTMLElement> | HTMLElement, info: IRoutingInfo) => {
 						// When its using import, we get an element, when using createExtensionElement we get a Promise.
-						(component as any).manifest = view;
 						if ((component as any).then) {
 							(component as any).then((el: any) => (el.manifest = view));
+						} else {
+							(component as any).manifest = view;
 						}
 					},
 				};

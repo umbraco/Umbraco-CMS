@@ -109,10 +109,11 @@ export class UmbSectionDashboardsElement extends UmbLitElement {
 					setup: (component: Promise<HTMLElement> | HTMLElement, info: IRoutingInfo) => {
 						this._currentDashboardPathname = info.match.route.path;
 						// When its using import, we get an element, when using createExtensionElement we get a Promise.
-						// TODO: this is a bit hacky, can we do it in a more appropriate way
-						(component as any).manifest = dashboard;
+						// TODO: this is a bit hacky, can we do it in a more appropriate way:
 						if ((component as any).then) {
 							(component as any).then((el: any) => (el.manifest = dashboard));
+						} else {
+							(component as any).manifest = dashboard;
 						}
 					},
 				};
