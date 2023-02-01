@@ -1,8 +1,6 @@
 import { css } from 'lit';
-import { UmbTheme } from '../theme.context';
 
 // TODO: We should get this from UUI, and it should be served through an extension.
-const name = 'High Contrast';
 const cssResult = css`
 	:root {
 		--uui-color-selected: var(--uui-palette-violet-blue, #3544b1);
@@ -59,7 +57,4 @@ const cssResult = css`
 	}
 `;
 
-export const highContrast: UmbTheme = {
-	name: name,
-	css: cssResult.cssText,
-};
+export default cssResult.cssText;

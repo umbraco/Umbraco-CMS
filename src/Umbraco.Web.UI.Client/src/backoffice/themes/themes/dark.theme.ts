@@ -1,8 +1,6 @@
 import { css } from 'lit';
-import { UmbTheme } from '../theme.context';
 
 // TODO: We should get this from UUI, and it should be served through an extension.
-const name = 'Dark';
 const cssResult = css`
 	:root {
 		--uui-color-selected: #316dca;
