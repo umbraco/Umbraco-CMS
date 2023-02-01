@@ -1,5 +1,5 @@
 import { BehaviorSubject, map, Observable } from 'rxjs';
-import type { ManifestTypes, ManifestTypeMap, ManifestBase } from '../../models';
+import type { ManifestTypes, ManifestTypeMap, ManifestBase, ManifestWithLoader, ManifestEntrypoint } from '../../models';
 import { hasDefaultExport } from '../has-default-export.function';
 import { loadExtension } from '../load-extension.function';
 
@@ -13,7 +13,7 @@ export class UmbExtensionRegistry {
 	private _extensions = new BehaviorSubject<Array<ManifestBase>>([]);
 	public readonly extensions = this._extensions.asObservable();
 
-	register(manifest: ManifestTypes & { loader?: () => Promise<object | HTMLElement> }): void {
+	register(manifest: ManifestBase): void {
 		const extensionsValues = this._extensions.getValue();
 		const extension = extensionsValues.find((extension) => extension.alias === manifest.alias);
 
@@ -26,7 +26,7 @@ export class UmbExtensionRegistry {
 
 		// If entrypoint extension, we should load and run it immediately
 		if (manifest.type === 'entrypoint') {
-			loadExtension(manifest).then((js) => {
+			loadExtension(manifest as ManifestEntrypoint).then((js) => {
 				if (hasDefaultExport(js)) {
 					new js.default();
 				} else {
