@@ -32,7 +32,11 @@ export class UmbPropertyEditorUIIconPickerElement extends UmbLitElement {
 
 	render() {
 		return html`
-			<uui-button label="open-icon-picker" look="secondary" @click=${this._openModal} style="margin-right: 9px;">
+			<uui-button
+				label="open-icon-picker"
+				look="secondary"
+				@click=${this._openModal}
+				style="margin-right: var(--uui-size-space-3)">
 				Pick an icon
 			</uui-button>
 		`;
