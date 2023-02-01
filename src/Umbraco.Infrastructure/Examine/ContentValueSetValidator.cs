@@ -1,7 +1,7 @@
 using System.Globalization;
 using Examine;
 using Umbraco.Cms.Core;
-using Umbraco.Cms.Infrastructure.Scoping;
+using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Extensions;
 
