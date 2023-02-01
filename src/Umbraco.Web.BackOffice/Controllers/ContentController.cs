@@ -1931,33 +1931,79 @@ public class ContentController : ContentControllerBase
     }
 
     /// <summary>
-    ///     Publishes a document with a given ID
+    ///     Publishes a document with a given ID and cultures
     /// </summary>
-    /// <param name="id"></param>
+    /// <param name="model"></param>
     /// <returns></returns>
     /// <remarks>
     ///     The EnsureUserPermissionForContent attribute will deny access to this method if the current user
     ///     does not have Publish access to this node.
     /// </remarks>
     [Authorize(Policy = AuthorizationPolicies.ContentPermissionPublishById)]
-    public IActionResult PostPublishById(int id)
+    public IActionResult PostPublishById(PublishContent model)
     {
-        IContent? foundContent = GetObjectFromRequest(() => _contentService.GetById(id));
+        IContent? foundContent = GetObjectFromRequest(() => _contentService.GetById(model.Id));
 
         if (foundContent == null)
         {
-            return HandleContentNotFound(id);
+            return HandleContentNotFound(model.Id);
         }
 
-        PublishResult publishResult = _contentService.SaveAndPublish(foundContent, userId: _backofficeSecurityAccessor.BackOfficeSecurity?.GetUserId().Result ?? 0);
-        if (publishResult.Success == false)
+        if (model.Cultures == null)
         {
-            var notificationModel = new SimpleNotificationModel();
-            AddMessageForPublishStatus(new[] { publishResult }, notificationModel);
-            return ValidationProblem(notificationModel);
+            PublishResult publishResult = _contentService.SaveAndPublish(foundContent, userId: _backofficeSecurityAccessor.BackOfficeSecurity?.GetUserId().Result ?? 0);
+            if (publishResult.Success == false)
+            {
+                var notificationModel = new SimpleNotificationModel();
+                AddMessageForPublishStatus(new[] { publishResult }, notificationModel);
+                return ValidationProblem(notificationModel);
+            }
+
+            return Ok();
         }
 
-        return Ok();
+        var languageCount = _allLangs.Value.Count();
+        if (languageCount == model.Cultures.Length)
+        {
+            PublishResult publishResult = _contentService.SaveAndPublish(foundContent, userId: _backofficeSecurityAccessor.BackOfficeSecurity?.GetUserId().Result ?? 0);
+            if (publishResult.Success == false)
+            {
+                var notificationModel = new SimpleNotificationModel();
+                AddMessageForPublishStatus(new[] { publishResult }, notificationModel);
+                return ValidationProblem(notificationModel);
+            }
+
+            return Ok();
+        }
+        else
+        {
+            var results = new Dictionary<string, PublishResult>();
+            if (model.Cultures is not null)
+            {
+                foreach (var c in model.Cultures)
+                {
+                    PublishResult publishResult = _contentService.SaveAndPublish(foundContent, c, _backofficeSecurityAccessor.BackOfficeSecurity?.GetUserId().Result ?? 0);
+                    results[c] = publishResult;
+                }
+            }
+
+            if (results.Any(x => x.Value.Success == false))
+            {
+                var notificationModel = new SimpleNotificationModel();
+
+                foreach (var c in results)
+                {
+                    if (c.Value.Success == false)
+                    {
+                        AddMessageForPublishStatus(new[] { c.Value }, notificationModel);
+                    }
+                }
+
+                return ValidationProblem(notificationModel);
+            }
+
+            return Ok();
+        }
     }
 
     [HttpDelete]

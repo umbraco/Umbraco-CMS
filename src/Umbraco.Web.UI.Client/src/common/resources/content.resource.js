@@ -1089,20 +1089,22 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
          * @returns {Promise} resourcePromise object containing the published content item.
          *
          */
-        publishById: function (id) {
+        publishById: function (id, cultures) {
 
             if (!id) {
                 throw "id cannot be null";
             }
 
-            return umbRequestHelper.resourcePromise(
-                $http.post(
-                    umbRequestHelper.getApiUrl(
-                        "contentApiBaseUrl",
-                        "PostPublishById",
-                        [{ id: id }])),
-                'Failed to publish content with id ' + id);
+            if (!cultures) {
+                cultures = [];
+            }
 
+          return umbRequestHelper.resourcePromise(
+            $http.post(
+              umbRequestHelper.getApiUrl(
+                "contentApiBaseUrl",
+                "PostPublishById"), { id: id, cultures: cultures }),
+                'Failed to publish content with id ' + id);
         },
 
         /**
