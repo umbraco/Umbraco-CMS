@@ -204,7 +204,7 @@ test.describe('BlockGridEditorInDocument', () => {
     await umbracoApi.dataTypes.ensureNameNotExists(blockGridNameTwo);
   });
 
-  test('Can change a block grid editor in a document to another block grid editor', async ({page, umbracoApi, umbracoUi}) => {
+  test('can change a block grid editor in a document to another block grid editor', async ({page, umbracoApi, umbracoUi}) => {
     const blockGridNameTwo = 'BlockGridNameTwo';
     const elementNameTwo = 'ElementNameTwo';
     const elementAliasTwo = AliasHelper.toAlias(elementNameTwo);
@@ -234,10 +234,6 @@ test.describe('BlockGridEditorInDocument', () => {
 
     // Assert
     await expect(page.locator('.umb-notifications__notifications > .alert-success', {hasText: "Document Type saved"})).toBeVisible();
-    // We reload the page so we can see if the first BlockGridEditor was changed to the second BlockGridEditor
-    await page.reload();
-    // Needs to close tours when page has reloaded
-    await page.click('.umb-tour-step__close');
     // Checks if the second BlockGridEditor is visible
     await expect(page.locator('[data-element="group-' + documentGroupName + '"] >> [data-element="property-' + blockGridAlias + '"]', {hasText: blockGridNameTwo})).toBeVisible();
     // Checks if the first BlockGridEditor is not visible
@@ -249,7 +245,7 @@ test.describe('BlockGridEditorInDocument', () => {
     await umbracoApi.dataTypes.ensureNameNotExists(blockGridNameTwo);
   });
 
-  test('Can remove a block grid editor from a document', async ({page, umbracoApi, umbracoUi}) => {
+  test('can remove a block grid editor from a document', async ({page, umbracoApi, umbracoUi}) => {
     await umbracoApi.documentTypes.ensureNameNotExists(elementName);
 
     // Creates the Element and BlockGridEditor
