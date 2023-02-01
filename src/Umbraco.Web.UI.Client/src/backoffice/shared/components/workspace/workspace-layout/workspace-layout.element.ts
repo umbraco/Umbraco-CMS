@@ -5,7 +5,7 @@ import { IRoutingInfo } from 'router-slot';
 import { map } from 'rxjs';
 import { repeat } from 'lit/directives/repeat.js';
 
-import type { UmbRouterSlotInitEvent } from '../../router-slot/router-slot-init.event';
+import type { UmbRouterSlotInitEvent, UmbRouterSlotChangeEvent } from '../../router-slot';
 import { createExtensionElement, umbExtensionsRegistry } from '@umbraco-cms/extensions-api';
 import type {
 	ManifestWorkspaceAction,
@@ -175,11 +175,9 @@ export class UmbWorkspaceLayout extends UmbLitElement {
 				<umb-router-slot
 					.routes="${this._routes}"
 					@init=${(event: UmbRouterSlotInitEvent) => {
-						console.log('init', event.target);
 						this._routerPath = event.target.absoluteRouterPath;
 					}}
-					@change=${(event: UmbRouterSlotInitEvent) => {
-						console.log('change', event.target);
+					@change=${(event: UmbRouterSlotChangeEvent) => {
 						this._activePath = event.target.localActiveViewPath;
 					}}></umb-router-slot>
 				<slot></slot>
