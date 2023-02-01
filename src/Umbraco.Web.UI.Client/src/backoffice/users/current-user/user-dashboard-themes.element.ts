@@ -4,6 +4,8 @@ import { customElement, state } from 'lit/decorators.js';
 import { UUISelectEvent } from '@umbraco-ui/uui';
 import { UmbThemeContext, UMB_THEME_CONTEXT_TOKEN } from '../../themes/theme.context';
 import { UmbLitElement } from '@umbraco-cms/element';
+import { umbExtensionsRegistry } from '@umbraco-cms/extensions-api';
+import { ManifestTheme } from '@umbraco-cms/extensions-registry';
 
 @customElement('umb-user-dashboard-test')
 export class UmbUserDashboardTestElement extends UmbLitElement {
@@ -26,26 +28,22 @@ export class UmbUserDashboardTestElement extends UmbLitElement {
 	#themeService?: UmbThemeContext;
 
 	@state()
-	private _theme: string | null = null;
+	private _themeAlias: string | null = null;
 
 	@state()
-	private _themes: Array<string> = [];
+	private _themes: Array<ManifestTheme> = [];
 
 	constructor() {
 		super();
 		this.consumeContext(UMB_THEME_CONTEXT_TOKEN, (instance) => {
-
-			console.log("ThemeCOntext", instance)
 			this.#themeService = instance;
-			instance.theme.subscribe((theme) => {
-				this._theme = theme;
+			instance.theme.subscribe((themeAlias) => {
+				this._themeAlias = themeAlias;
 			});
 
-			instance.setThemeByAlias('umb-dark-theme');
-			// TODO: We should get rid of the #themes state and instead use an extension point:
-			/*instance.themes.subscribe((themes) => {
-				this._themes = themes.map((t) => t.name);
-			});*/
+			umbExtensionsRegistry.extensionsOfType('theme').subscribe((themes) => {
+				this._themes = themes;
+			});
 		});
 	}
 
@@ -54,11 +52,11 @@ export class UmbUserDashboardTestElement extends UmbLitElement {
 
 		const theme = event.target.value.toString();
 
-		this.#themeService.changeTheme(theme);
+		this.#themeService.setThemeByAlias(theme);
 	}
 
 	get options() {
-		return this._themes.map((t) => ({ name: t, value: t, selected: t === this._theme }));
+		return this._themes.map((t) => ({ name: t.name, value: t.alias, selected: t.alias === this._themeAlias }));
 	}
 
 	render() {
@@ -67,7 +65,7 @@ export class UmbUserDashboardTestElement extends UmbLitElement {
 			<uui-select
 				label="theme select"
 				@change=${this._handleThemeChange}
-				.value=${this._theme}
+				.value=${this._themeAlias}
 				.options=${this.options}></uui-select>
 		`;
 	}
