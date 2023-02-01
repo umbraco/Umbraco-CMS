@@ -129,7 +129,60 @@ export const data: Array<DataTypeDetails> = [
 		isFolder: false,
 		propertyEditorModelAlias: 'Umbraco.DateTime',
 		propertyEditorUIAlias: 'Umb.PropertyEditorUI.DatePicker',
-		data: [],
+		data: [
+			{
+				alias: 'format',
+				value: 'YYYY-MM-DD',
+			},
+			{
+				alias: 'offsetTime',
+				value: true,
+			}
+		],
+	},
+	{
+		name: 'Date Picker With Time',
+		type: 'data-type',
+		icon: 'umb:autofill',
+		hasChildren: false,
+		key: 'dt-datePicker-time',
+		isContainer: false,
+		parentKey: null,
+		isFolder: false,
+		propertyEditorModelAlias: 'Umbraco.DateTime',
+		propertyEditorUIAlias: 'Umb.PropertyEditorUI.DatePicker',
+		data: [
+			{
+				alias: 'format',
+				value: 'YYYY-MM-DD HH:mm:ss',
+			},
+			{
+				alias: 'offsetTime',
+				value: true,
+			}
+		],
+	},
+	{
+		name: 'Time',
+		type: 'data-type',
+		icon: 'umb:autofill',
+		hasChildren: false,
+		key: 'dt-time',
+		isContainer: false,
+		parentKey: null,
+		isFolder: false,
+		propertyEditorModelAlias: 'Umbraco.DateTime',
+		propertyEditorUIAlias: 'Umb.PropertyEditorUI.DatePicker',
+		data: [
+			{
+				alias: 'format',
+				value: 'HH:mm:ss',
+			},
+			{
+				alias: 'offsetTime',
+				value: false,
+			}
+		],
 	},
 	{
 		name: 'Email',
