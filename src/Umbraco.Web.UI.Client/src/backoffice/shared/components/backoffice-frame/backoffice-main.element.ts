@@ -44,15 +44,18 @@ export class UmbBackofficeMain extends UmbLitElement {
 			this._backofficeContext = _instance;
 			this._observeBackoffice();
 		});
-
 	}
 
 	private async _observeBackoffice() {
-		if(this._backofficeContext) {
-			this.observe(this._backofficeContext.getAllowedSections(), (sections) => {
-				this._sections = sections;
-				this._createRoutes();
-			}, 'observeAllowedSections');
+		if (this._backofficeContext) {
+			this.observe(
+				this._backofficeContext.getAllowedSections(),
+				(sections) => {
+					this._sections = sections;
+					this._createRoutes();
+				},
+				'observeAllowedSections'
+			);
 		}
 	}
 
@@ -94,7 +97,7 @@ export class UmbBackofficeMain extends UmbLitElement {
 	}
 
 	render() {
-		return html`<router-slot .routes=${this._routes}></router-slot>`;
+		return html`<umb-router-slot .routes=${this._routes}></umb-router-slot>`;
 	}
 }
 
