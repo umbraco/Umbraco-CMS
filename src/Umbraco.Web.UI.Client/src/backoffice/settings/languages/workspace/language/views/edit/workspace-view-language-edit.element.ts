@@ -98,14 +98,28 @@ export class UmbWorkspaceViewLanguageEditElement extends UmbLitElement {
 	#handleLanguageChange(event: Event) {
 		if (event instanceof UUIComboboxEvent) {
 			const target = event.composedPath()[0] as UUIComboboxElement;
-			this.#languageWorkspaceContext?.update({ isoCode: target.value.toString() });
+			const isoCode = target.value.toString();
 
-			// If the language name is not set, we set it to the name of the selected language.
-			if (!this.language?.name) {
-				const language = this._availableLanguages.find((language) => language.isoCode === target.value.toString());
-				if (language) {
-					this.#languageWorkspaceContext?.update({ name: language.name });
+			if (isoCode) {
+				this.#languageWorkspaceContext?.update({ isoCode: target.value.toString() });
+
+				// If the language name is not set, we set it to the name of the selected language.
+				if (!this.language?.name) {
+					const language = this._availableLanguages.find((language) => language.isoCode === target.value.toString());
+					if (language) {
+						this.#languageWorkspaceContext?.update({ name: language.name });
+					}
 				}
+			} else {
+				// If the isoCode is empty, we reset the value to the original value.
+				// Provides a way better UX
+				//TODO: Maybe the combobox should implement something similar?
+				const resetFunction = () => {
+					target.value = this.language?.isoCode ?? '';
+				};
+
+				target.addEventListener('close', resetFunction, { once: true });
+				target.addEventListener('blur', resetFunction, { once: true });
 			}
 		}
 	}
