@@ -721,7 +721,7 @@ namespace Umbraco.Cms.Infrastructure.Scoping
             }
         }
 
-        private void EnsureNotDisposed()
+        internal void EnsureNotDisposed()
         {
             // We can't be disposed
             if (_disposed)

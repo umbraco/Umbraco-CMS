@@ -13,9 +13,9 @@ internal class EfCoreScope : Scope
 {
     private readonly IUmbracoEfCoreDatabaseFactory _efCoreDatabaseFactory;
     private IUmbracoEfCoreDatabase? _umbracoEfCoreDatabase;
+    private bool? _completed;
 
     public EfCoreScope(
-        IUmbracoEfCoreDatabaseFactory efCoreDatabaseFactory,
         ScopeProvider scopeProvider,
         CoreDebugSettings coreDebugSettings,
         MediaFileManager mediaFileManager,
@@ -24,6 +24,7 @@ internal class EfCoreScope : Scope
         FileSystems fileSystems,
         bool detachable,
         IScopeContext? scopeContext,
+        IUmbracoEfCoreDatabaseFactory efCoreDatabaseFactory,
         IsolationLevel isolationLevel = IsolationLevel.Unspecified,
         RepositoryCacheMode repositoryCacheMode = RepositoryCacheMode.Unspecified,
         IEventDispatcher? eventDispatcher = null,
@@ -32,7 +33,6 @@ internal class EfCoreScope : Scope
         bool callContext = false,
         bool autoComplete = false)
         : base(
-            efCoreDatabaseFactory,
             scopeProvider,
             coreDebugSettings,
             mediaFileManager,
@@ -53,7 +53,6 @@ internal class EfCoreScope : Scope
     }
 
     public EfCoreScope(
-        IUmbracoEfCoreDatabaseFactory efCoreDatabaseFactory,
         ScopeProvider scopeProvider,
         CoreDebugSettings coreDebugSettings,
         MediaFileManager mediaFileManager,
@@ -61,6 +60,7 @@ internal class EfCoreScope : Scope
         ILogger<Scope> logger,
         FileSystems fileSystems,
         Scope parent,
+        IUmbracoEfCoreDatabaseFactory efCoreDatabaseFactory,
         IsolationLevel isolationLevel = IsolationLevel.Unspecified,
         RepositoryCacheMode repositoryCacheMode = RepositoryCacheMode.Unspecified,
         IEventDispatcher? eventDispatcher = null,
@@ -69,7 +69,6 @@ internal class EfCoreScope : Scope
         bool callContext = false,
         bool autoComplete = false)
         : base(
-            efCoreDatabaseFactory,
             scopeProvider,
             coreDebugSettings,
             mediaFileManager,
@@ -103,6 +102,12 @@ internal class EfCoreScope : Scope
             _umbracoEfCoreDatabase.DbContext.Database.BeginTransaction();
             return _umbracoEfCoreDatabase;
         }
+    }
+
+    public void Dispose()
+    {
+        DisposeEfCoreDatabase();
+        base.Dispose();
     }
 
     private void DisposeEfCoreDatabase()
