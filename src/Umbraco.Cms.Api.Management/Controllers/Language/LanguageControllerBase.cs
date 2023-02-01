@@ -32,6 +32,10 @@ public abstract class LanguageControllerBase : ManagementApiControllerBase
                 .WithTitle("Invalid ISO code")
                 .WithDetail("The attempted ISO code does not represent a valid culture.")
                 .Build()),
+            LanguageOperationStatus.InvalidFallbackIsoCode => BadRequest(new ProblemDetailsBuilder()
+                .WithTitle("Invalid Fallback ISO code")
+                .WithDetail("The attempted fallback ISO code does not represent a valid culture.")
+                .Build()),
             LanguageOperationStatus.CancelledByNotification => BadRequest(new ProblemDetailsBuilder()
                 .WithTitle("Cancelled by notification")
                 .WithDetail("A notification handler prevented the language operation.")

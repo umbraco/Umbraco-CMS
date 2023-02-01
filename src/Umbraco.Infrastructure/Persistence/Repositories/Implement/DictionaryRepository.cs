@@ -20,11 +20,15 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 internal class DictionaryRepository : EntityRepositoryBase<int, IDictionaryItem>, IDictionaryRepository
 {
     private readonly ILoggerFactory _loggerFactory;
+    private readonly ILanguageRepository _languageRepository;
 
     public DictionaryRepository(IScopeAccessor scopeAccessor, AppCaches cache, ILogger<DictionaryRepository> logger,
-        ILoggerFactory loggerFactory)
-        : base(scopeAccessor, cache, logger) =>
+        ILoggerFactory loggerFactory, ILanguageRepository languageRepository)
+        : base(scopeAccessor, cache, logger)
+    {
         _loggerFactory = loggerFactory;
+        _languageRepository = languageRepository;
+    }
 
     public IDictionaryItem? Get(Guid uniqueId)
     {
@@ -63,6 +67,8 @@ internal class DictionaryRepository : EntityRepositoryBase<int, IDictionaryItem>
 
     public IEnumerable<IDictionaryItem> GetDictionaryItemDescendants(Guid? parentId)
     {
+        IDictionary<int, ILanguage> languageIsoCodeById = GetLanguagesById();
+
         // This methods will look up children at each level, since we do not store a path for dictionary (ATM), we need to do a recursive
         // lookup to get descendants. Currently this is the most efficient way to do it
         Func<Guid[], IEnumerable<IEnumerable<IDictionaryItem>>> getItemsFromParents = guids =>
@@ -80,7 +86,7 @@ internal class DictionaryRepository : EntityRepositoryBase<int, IDictionaryItem>
 
                     return Database
                         .FetchOneToMany<DictionaryDto>(x => x.LanguageTextDtos, sql)
-                        .Select(ConvertFromDto);
+                        .Select(dto => ConvertFromDto(dto, languageIsoCodeById));
                 });
         };
 
@@ -91,7 +97,7 @@ internal class DictionaryRepository : EntityRepositoryBase<int, IDictionaryItem>
                 .OrderBy<DictionaryDto>(x => x.UniqueId);
             return Database
                 .FetchOneToMany<DictionaryDto>(x => x.LanguageTextDtos, sql)
-                .Select(ConvertFromDto);
+                .Select(dto => ConvertFromDto(dto, languageIsoCodeById));
         }
 
         return getItemsFromParents(new[] { parentId.Value }).SelectRecursive(items => getItemsFromParents(items.Select(x => x.Key).ToArray())).SelectMany(items => items);
@@ -109,13 +115,16 @@ internal class DictionaryRepository : EntityRepositoryBase<int, IDictionaryItem>
             options);
     }
 
-    protected IDictionaryItem ConvertFromDto(DictionaryDto dto)
+    private IDictionaryItem ConvertFromDto(DictionaryDto dto, IDictionary<int, ILanguage> languagesById)
     {
         IDictionaryItem entity = DictionaryItemFactory.BuildEntity(dto);
 
         entity.Translations = dto.LanguageTextDtos.EmptyNull()
             .Where(x => x.LanguageId > 0)
-            .Select(x => DictionaryTranslationFactory.BuildEntity(x, dto.UniqueId))
+            .Select(x => languagesById.TryGetValue(x.LanguageId, out ILanguage? language)
+                ? DictionaryTranslationFactory.BuildEntity(x, dto.UniqueId, language)
+                : null)
+            .WhereNotNull()
             .ToList();
 
         return entity;
@@ -138,7 +147,7 @@ internal class DictionaryRepository : EntityRepositoryBase<int, IDictionaryItem>
             return null;
         }
 
-        IDictionaryItem entity = ConvertFromDto(dto);
+        IDictionaryItem entity = ConvertFromDto(dto, GetLanguagesById());
 
         // reset dirty initial properties (U4-1946)
         ((EntityBase)entity).ResetDirtyProperties(false);
@@ -162,11 +171,15 @@ internal class DictionaryRepository : EntityRepositoryBase<int, IDictionaryItem>
     private class DictionaryByUniqueIdRepository : SimpleGetRepository<Guid, IDictionaryItem, DictionaryDto>
     {
         private readonly DictionaryRepository _dictionaryRepository;
+        private readonly IDictionary<int, ILanguage> _languagesById;
 
         public DictionaryByUniqueIdRepository(DictionaryRepository dictionaryRepository, IScopeAccessor scopeAccessor,
             AppCaches cache, ILogger<DictionaryByUniqueIdRepository> logger)
-            : base(scopeAccessor, cache, logger) =>
+            : base(scopeAccessor, cache, logger)
+        {
             _dictionaryRepository = dictionaryRepository;
+            _languagesById = dictionaryRepository.GetLanguagesById();
+        }
 
         protected override IEnumerable<DictionaryDto> PerformFetch(Sql sql) =>
             Database
@@ -178,7 +191,7 @@ internal class DictionaryRepository : EntityRepositoryBase<int, IDictionaryItem>
             "cmsDictionary." + SqlSyntax.GetQuotedColumnName("id") + " = @id";
 
         protected override IDictionaryItem ConvertToEntity(DictionaryDto dto) =>
-            _dictionaryRepository.ConvertFromDto(dto);
+            _dictionaryRepository.ConvertFromDto(dto, _languagesById);
 
         protected override object GetBaseWhereClauseArguments(Guid id) => new { id };
 
@@ -201,11 +214,15 @@ internal class DictionaryRepository : EntityRepositoryBase<int, IDictionaryItem>
     private class DictionaryByKeyRepository : SimpleGetRepository<string, IDictionaryItem, DictionaryDto>
     {
         private readonly DictionaryRepository _dictionaryRepository;
+        private readonly IDictionary<int, ILanguage> _languagesById;
 
         public DictionaryByKeyRepository(DictionaryRepository dictionaryRepository, IScopeAccessor scopeAccessor,
             AppCaches cache, ILogger<DictionaryByKeyRepository> logger)
-            : base(scopeAccessor, cache, logger) =>
+            : base(scopeAccessor, cache, logger)
+        {
             _dictionaryRepository = dictionaryRepository;
+            _languagesById = dictionaryRepository.GetLanguagesById();
+        }
 
         protected override IEnumerable<DictionaryDto> PerformFetch(Sql sql) =>
             Database
@@ -217,7 +234,7 @@ internal class DictionaryRepository : EntityRepositoryBase<int, IDictionaryItem>
             "cmsDictionary." + SqlSyntax.GetQuotedColumnName("key") + " = @id";
 
         protected override IDictionaryItem ConvertToEntity(DictionaryDto dto) =>
-            _dictionaryRepository.ConvertFromDto(dto);
+            _dictionaryRepository.ConvertFromDto(dto, _languagesById);
 
         protected override object GetBaseWhereClauseArguments(string? id) => new { id };
 
@@ -245,9 +262,11 @@ internal class DictionaryRepository : EntityRepositoryBase<int, IDictionaryItem>
             sql.WhereIn<DictionaryDto>(x => x.PrimaryKey, ids);
         }
 
+        IDictionary<int, ILanguage> languageIsoCodeById = GetLanguagesById();
+
         return Database
             .FetchOneToMany<DictionaryDto>(x => x.LanguageTextDtos, sql)
-            .Select(ConvertFromDto);
+            .Select(dto => ConvertFromDto(dto, languageIsoCodeById));
     }
 
     protected override IEnumerable<IDictionaryItem> PerformGetByQuery(IQuery<IDictionaryItem> query)
@@ -257,9 +276,11 @@ internal class DictionaryRepository : EntityRepositoryBase<int, IDictionaryItem>
         Sql<ISqlContext> sql = translator.Translate();
         sql.OrderBy<DictionaryDto>(x => x.UniqueId);
 
+        IDictionary<int, ILanguage> languageIsoCodeById = GetLanguagesById();
+
         return Database
             .FetchOneToMany<DictionaryDto>(x => x.LanguageTextDtos, sql)
-            .Select(ConvertFromDto);
+            .Select(dto => ConvertFromDto(dto, languageIsoCodeById));
     }
 
     #endregion
@@ -309,9 +330,11 @@ internal class DictionaryRepository : EntityRepositoryBase<int, IDictionaryItem>
         var id = Convert.ToInt32(Database.Insert(dto));
         dictionaryItem.Id = id;
 
+        IDictionary<string, ILanguage> languagesByIsoCode = GetLanguagesByIsoCode();
+
         foreach (IDictionaryTranslation translation in dictionaryItem.Translations)
         {
-            LanguageTextDto textDto = DictionaryTranslationFactory.BuildDto(translation, dictionaryItem.Key);
+            LanguageTextDto textDto = DictionaryTranslationFactory.BuildDto(translation, dictionaryItem.Key, languagesByIsoCode);
             translation.Id = Convert.ToInt32(Database.Insert(textDto));
             translation.Key = dictionaryItem.Key;
         }
@@ -332,9 +355,11 @@ internal class DictionaryRepository : EntityRepositoryBase<int, IDictionaryItem>
 
         Database.Update(dto);
 
+        IDictionary<string, ILanguage> languagesByIsoCode = GetLanguagesByIsoCode();
+
         foreach (IDictionaryTranslation translation in entity.Translations)
         {
-            LanguageTextDto textDto = DictionaryTranslationFactory.BuildDto(translation, entity.Key);
+            LanguageTextDto textDto = DictionaryTranslationFactory.BuildDto(translation, entity.Key, languagesByIsoCode);
             if (translation.HasIdentity)
             {
                 Database.Update(textDto);
@@ -383,6 +408,14 @@ internal class DictionaryRepository : EntityRepositoryBase<int, IDictionaryItem>
             IsolatedCache.Clear(RepositoryCacheKeys.GetKey<IDictionaryItem, Guid>(dto.UniqueId));
         }
     }
+
+    private IDictionary<int, ILanguage> GetLanguagesById() => _languageRepository
+        .GetMany()
+        .ToDictionary(language => language.Id);
+
+    private IDictionary<string, ILanguage> GetLanguagesByIsoCode() => _languageRepository
+        .GetMany()
+        .ToDictionary(language => language.IsoCode);
 
     #endregion
 }
