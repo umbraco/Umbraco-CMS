@@ -13,7 +13,7 @@ export class UmbExtensionRegistry {
 	private _extensions = new BehaviorSubject<Array<ManifestBase>>([]);
 	public readonly extensions = this._extensions.asObservable();
 
-	register(manifest: ManifestBase): void {
+	register(manifest: ManifestTypes): void {
 		const extensionsValues = this._extensions.getValue();
 		const extension = extensionsValues.find((extension) => extension.alias === manifest.alias);
 
