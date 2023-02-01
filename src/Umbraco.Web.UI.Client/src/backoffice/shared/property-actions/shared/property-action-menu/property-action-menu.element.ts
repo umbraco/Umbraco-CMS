@@ -29,14 +29,14 @@ export class UmbPropertyActionMenuElement extends UmbLitElement {
 			}
 
 			#dropdown {
-				background-color: white;
+				background-color: var(--uui-color-surface);
 				border-radius: var(--uui-border-radius);
 				width: 100%;
 				height: 100%;
 				box-sizing: border-box;
 				box-shadow: var(--uui-shadow-depth-3);
 				min-width: 200px;
-				color: black; /* Change to variable */
+				color: var(--uui-color-text);
 			}
 		`,
 	];

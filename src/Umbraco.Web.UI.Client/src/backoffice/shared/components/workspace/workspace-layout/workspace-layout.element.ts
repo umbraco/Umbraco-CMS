@@ -56,7 +56,7 @@ export class UmbWorkspaceLayout extends UmbLitElement {
 
 			umb-extension-slot[slot='actions'] {
 				display: flex;
-				gap: 6px;
+				gap: var(--uui-size-space-2);
 			}
 		`,
 	];

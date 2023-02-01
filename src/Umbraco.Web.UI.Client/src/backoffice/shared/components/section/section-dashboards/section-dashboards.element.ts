@@ -23,6 +23,7 @@ export class UmbSectionDashboardsElement extends UmbLitElement {
 			#tabs {
 				background-color: var(--uui-color-surface);
 				height: 70px;
+				border-bottom: 1px solid var(--uui-color-border);
 			}
 
 			#scroll-container {
