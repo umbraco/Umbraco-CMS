@@ -1,8 +1,9 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html, nothing } from 'lit';
-import { customElement, property, state } from 'lit/decorators.js';
-import { IRoutingInfo, RouterSlot } from 'router-slot';
+import { customElement, property, state, query } from 'lit/decorators.js';
+import { IRouterSlot, IRoutingInfo, isPathActive } from 'router-slot';
 import { map } from 'rxjs';
+import { repeat } from 'lit/directives/repeat.js';
 
 import { createExtensionElement , umbExtensionsRegistry } from '@umbraco-cms/extensions-api';
 import type {
@@ -62,6 +63,7 @@ export class UmbWorkspaceLayout extends UmbLitElement {
 	@property()
 	public headline = '';
 
+	private _alias = '';
 	/**
 	 * Alias of the workspace. The Layout will render the workspace views that are registered for this workspace alias.
 	 * @public
@@ -70,27 +72,73 @@ export class UmbWorkspaceLayout extends UmbLitElement {
 	 * @default ''
 	 */
 	@property()
-	public alias = '';
+	public get alias() {
+		return this._alias;
+	}
+	public set alias(value) {
+		const oldValue = this._alias;
+		this._alias = value;
+		if (oldValue !== this._alias) {
+			this._observeWorkspaceViews();
+			this.requestUpdate('alias', oldValue);
+		}
+	}
 
 	@state()
 	private _workspaceViews: Array<ManifestWorkspaceView | ManifestWorkspaceViewCollection> = [];
 
 	@state()
-	private _currentView = '';
+	private _routes: any[] = [];
+
+
+	@query('router-slot')
+	private _routerSlotEl?: IRouterSlot;
 
 	@state()
-	private _routes: Array<any> = [];
-
 	private _routerFolder = '';
 
-	connectedCallback(): void {
+
+
+
+	// TODO: can this be a controller?:
+
+	@state()
+	private _activeView?: typeof this._workspaceViews[number];
+
+	#listening = false;
+
+
+	connectedCallback() {
 		super.connectedCallback();
-
-		this._observeWorkspaceViews();
-
-		/* TODO: find a way to construct absolute urls */
-		this._routerFolder = window.location.pathname.split('/view')[0];
+		if(this.#listening) {
+			window.addEventListener("changestate", this._onRouteChanged);
+			this.#listening = true;
+		}
 	}
+
+	disconnectedCallback() {
+		super.disconnectedCallback();
+		window.removeEventListener("changestate", this._onRouteChanged);
+		this.#listening = false;
+	}
+
+
+	firstUpdated() {
+		this._routerFolder = this._routerSlotEl?.constructAbsolutePath('') || '';
+		this._onRouteChanged();
+	}
+
+	private _onRouteChanged = () => {
+		console.log("_onRouteChanged", this._routerSlotEl);
+		if(this._routerSlotEl) {
+			this._workspaceViews.forEach(view => {
+				if(isPathActive(this._routerSlotEl!.constructAbsolutePath('view/'+view.meta.pathname))) {
+					this._activeView = view;
+				}
+			});
+		}
+	}
+
 
 	private _observeWorkspaceViews() {
 		this.observe(
@@ -104,7 +152,7 @@ export class UmbWorkspaceLayout extends UmbLitElement {
 		);
 	}
 
-	private async _createRoutes() {
+	private _createRoutes() {
 		this._routes = [];
 
 		if (this._workspaceViews.length > 0) {
@@ -120,7 +168,6 @@ export class UmbWorkspaceLayout extends UmbLitElement {
 						return createExtensionElement(view);
 					},
 					setup: (component: Promise<HTMLElement> | HTMLElement, info: IRoutingInfo) => {
-						this._currentView = info.match.route.path;
 						// When its using import, we get an element, when using createExtensionElement we get a Promise.
 						(component as any).manifest = view;
 						if ((component as any).then) {
@@ -135,37 +182,42 @@ export class UmbWorkspaceLayout extends UmbLitElement {
 				redirectTo: `view/${this._workspaceViews[0].meta.pathname}`,
 			});
 
-			this.requestUpdate();
-			await this.updateComplete;
-
-			this._forceRouteRender();
 		}
 	}
 
-	// TODO: Figure out why this has been necessary for this case. Come up with another case
-	private _forceRouteRender() {
-		const routerSlotEl = this.shadowRoot?.querySelector('router-slot') as RouterSlot;
-		if (routerSlotEl) {
-			routerSlotEl.render();
+	/*
+	private _temp_isActive(view: any) {
+
+		console.log("_temp_isActive??", this._routerSlotEl)
+		if(this._routerSlotEl) {
+			const viewPath = this._routerSlotEl?.constructAbsolutePath('view/'+view.meta.pathname);
+			console.log("IsActive??", viewPath, isPathActive(viewPath))
+			console.log(view.name, viewPath, isPathActive(viewPath))
+			return isPathActive(viewPath);
 		}
+		return false;
 	}
+	*/
 
 	private _renderTabs() {
 		return html`
 			${this._workspaceViews.length > 0
 				? html`
 						<uui-tab-group slot="tabs">
-							${this._workspaceViews.map(
-								(view: ManifestWorkspaceView | ManifestWorkspaceViewCollection) => html`
-									<uui-tab
-										.label="${view.meta.label || view.name}"
-										href="${this._routerFolder}/view/${view.meta.pathname}"
-										?active="${this._currentView.includes(view.meta.pathname)}">
-										<uui-icon slot="icon" name="${view.meta.icon}"></uui-icon>
-										${view.meta.label || view.name}
-									</uui-tab>
-								`
-							)}
+							${repeat(
+								this._workspaceViews,
+								(view) => view.alias,
+								(view) => html`
+										<uui-tab
+											.label="${view.meta.label || view.name}"
+											href="${this._routerFolder}/view/${view.meta.pathname}"
+											?active="${view === this._activeView}">
+											<uui-icon slot="icon" name="${view.meta.icon}"></uui-icon>
+											${view.meta.label || view.name}
+										</uui-tab>
+									`
+								)
+							}
 						</uui-tab-group>
 				  `
 				: nothing}
