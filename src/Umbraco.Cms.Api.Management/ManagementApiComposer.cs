@@ -27,6 +27,8 @@ public class ManagementApiComposer : IComposer
             .AddUpgrader()
             .AddSearchManagement()
             .AddTrees()
+            .AddDocuments()
+            .AddDocumentTypes()
             .AddLanguages()
             .AddDictionary()
             .AddFileUpload()
