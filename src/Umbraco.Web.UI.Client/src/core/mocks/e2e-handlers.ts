@@ -11,6 +11,7 @@ import { handlers as examineManagementHandlers } from './domains/examine-managem
 import { handlers as modelsBuilderHandlers } from './domains/modelsbuilder.handlers';
 import { handlers as profileHandlers } from './domains/performance-profiling.handlers';
 import { handlers as healthCheckHandlers } from './domains/health-check.handlers';
+import { handlers as languageHandlers } from './domains/language.handlers';
 import { handlers as redirectManagementHandlers } from './domains/redirect-management.handlers';
 
 export const handlers = [
@@ -29,5 +30,6 @@ export const handlers = [
 	...modelsBuilderHandlers,
 	...profileHandlers,
 	...healthCheckHandlers,
+	...languageHandlers,
 	...redirectManagementHandlers,
 ];

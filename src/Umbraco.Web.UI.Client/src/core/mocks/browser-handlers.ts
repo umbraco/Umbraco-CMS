@@ -19,7 +19,8 @@ import { handlers as dictionaryHandlers } from './domains/dictionary.handlers';
 import { handlers as mediaTypeHandlers } from './domains/media-type.handlers';
 import { handlers as memberGroupHandlers } from './domains/member-group.handlers';
 import { handlers as memberTypeHandlers } from './domains/member-type.handlers';
-import { handlers as redirectManagement } from './domains/redirect-management.handlers';
+import { handlers as languageHandlers } from './domains/language.handlers';
+import { handlers as redirectManagementHandlers } from './domains/redirect-management.handlers';
 
 const handlers = [
 	serverHandlers.serverVersionHandler,
@@ -43,7 +44,8 @@ const handlers = [
 	...healthCheckHandlers,
 	...profilingHandlers,
 	...dictionaryHandlers,
-	...redirectManagement,
+	...languageHandlers,
+	...redirectManagementHandlers,
 ];
 
 switch (import.meta.env.VITE_UMBRACO_INSTALL_STATUS) {
