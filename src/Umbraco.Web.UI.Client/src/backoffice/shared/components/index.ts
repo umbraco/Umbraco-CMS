@@ -4,6 +4,7 @@ import './backoffice-frame/backoffice-main.element';
 import './backoffice-frame/backoffice-modal-container.element';
 import './backoffice-frame/backoffice-notification-container.element';
 import './ref-property-editor-ui/ref-property-editor-ui.element';
+import './router-slot/router-slot.element';
 import './content-property/content-property.element';
 import './table/table.element';
 import './code-block/code-block.element';

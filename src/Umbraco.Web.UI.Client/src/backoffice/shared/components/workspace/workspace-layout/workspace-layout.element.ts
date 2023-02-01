@@ -1,10 +1,11 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html, nothing } from 'lit';
-import { customElement, property, state, query } from 'lit/decorators.js';
-import { IRouterSlot, IRoutingInfo, isPathActive } from 'router-slot';
+import { customElement, property, state } from 'lit/decorators.js';
+import { IRoutingInfo } from 'router-slot';
 import { map } from 'rxjs';
 import { repeat } from 'lit/directives/repeat.js';
 
+import type { UmbRouterSlotInitEvent } from '../../router-slot/routet-slot-init.event';
 import { createExtensionElement , umbExtensionsRegistry } from '@umbraco-cms/extensions-api';
 import type {
 	ManifestWorkspaceAction,
@@ -90,54 +91,12 @@ export class UmbWorkspaceLayout extends UmbLitElement {
 	@state()
 	private _routes: any[] = [];
 
-
-	@query('router-slot')
-	private _routerSlotEl?: IRouterSlot;
+	@state()
+	private _routerPath?: string;
 
 	@state()
-	private _routerFolder = '';
+	private _activePath?: string;
 
-
-
-
-	// TODO: can this be a controller?:
-
-	@state()
-	private _activeView?: typeof this._workspaceViews[number];
-
-	#listening = false;
-
-
-	connectedCallback() {
-		super.connectedCallback();
-		if(this.#listening) {
-			window.addEventListener("changestate", this._onRouteChanged);
-			this.#listening = true;
-		}
-	}
-
-	disconnectedCallback() {
-		super.disconnectedCallback();
-		window.removeEventListener("changestate", this._onRouteChanged);
-		this.#listening = false;
-	}
-
-
-	firstUpdated() {
-		this._routerFolder = this._routerSlotEl?.constructAbsolutePath('') || '';
-		this._onRouteChanged();
-	}
-
-	private _onRouteChanged = () => {
-		console.log("_onRouteChanged", this._routerSlotEl);
-		if(this._routerSlotEl) {
-			this._workspaceViews.forEach(view => {
-				if(isPathActive(this._routerSlotEl!.constructAbsolutePath('view/'+view.meta.pathname))) {
-					this._activeView = view;
-				}
-			});
-		}
-	}
 
 
 	private _observeWorkspaceViews() {
@@ -185,20 +144,6 @@ export class UmbWorkspaceLayout extends UmbLitElement {
 		}
 	}
 
-	/*
-	private _temp_isActive(view: any) {
-
-		console.log("_temp_isActive??", this._routerSlotEl)
-		if(this._routerSlotEl) {
-			const viewPath = this._routerSlotEl?.constructAbsolutePath('view/'+view.meta.pathname);
-			console.log("IsActive??", viewPath, isPathActive(viewPath))
-			console.log(view.name, viewPath, isPathActive(viewPath))
-			return isPathActive(viewPath);
-		}
-		return false;
-	}
-	*/
-
 	private _renderTabs() {
 		return html`
 			${this._workspaceViews.length > 0
@@ -210,8 +155,9 @@ export class UmbWorkspaceLayout extends UmbLitElement {
 								(view) => html`
 										<uui-tab
 											.label="${view.meta.label || view.name}"
-											href="${this._routerFolder}/view/${view.meta.pathname}"
-											?active="${view === this._activeView}">
+											href="${this._routerPath}/view/${view.meta.pathname}"
+											?active="${'view/'+view.meta.pathname === this._activePath}"
+										>
 											<uui-icon slot="icon" name="${view.meta.icon}"></uui-icon>
 											${view.meta.label || view.name}
 										</uui-tab>
@@ -230,7 +176,11 @@ export class UmbWorkspaceLayout extends UmbLitElement {
 				<slot name="header" slot="header"></slot>
 				${this._renderTabs()}
 
-				<router-slot .routes="${this._routes}"></router-slot>
+				<umb-router-slot .routes="${this._routes}"
+				@init=${(event: UmbRouterSlotInitEvent) => { this._routerPath = event.target.absoluteRouterPath;}}
+				@change=${(event: UmbRouterSlotInitEvent) => { this._activePath = event.target.localActiveViewPath;}}
+
+				></umb-router-slot>
 				<slot></slot>
 
 				<slot name="footer" slot="footer"></slot>
