@@ -32,6 +32,7 @@
 			"@umbraco-cms/notification": ["libs/notification"],
 			"@umbraco-cms/observable-api": ["libs/observable-api"],
 			"@umbraco-cms/utils": ["libs/utils"],
+			"@umbraco-cms/router": ["libs/router"],
 			"@umbraco-cms/test-utils": ["libs/test-utils"],
 			"@umbraco-cms/resources": ["libs/resources"],
 			"@umbraco-cms/store": ["libs/store"],
