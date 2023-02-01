@@ -1,8 +1,7 @@
 import { LitElement, PropertyValueMap } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { IRoute, RouterSlot } from 'router-slot';
-import { UmbRouterSlotChangeEvent } from './router-slot-change.event';
-import { UmbRouterSlotInitEvent } from './router-slot-init.event';
+import { UmbRouterSlotChangeEvent, UmbRouterSlotInitEvent } from '@umbraco-cms/router';
 
 /**
  *  @element umb-router-slot-element

@@ -5,7 +5,7 @@ import { IRoutingInfo } from 'router-slot';
 import { map } from 'rxjs';
 import { repeat } from 'lit/directives/repeat.js';
 
-import type { UmbRouterSlotInitEvent, UmbRouterSlotChangeEvent } from '../../router-slot';
+import type { UmbRouterSlotInitEvent, UmbRouterSlotChangeEvent } from '@umbraco-cms/router';
 import { createExtensionElement, umbExtensionsRegistry } from '@umbraco-cms/extensions-api';
 import type {
 	ManifestWorkspaceAction,
