@@ -21,6 +21,7 @@ export class UmbModalLayoutCurrentUserElement extends UmbLitElement {
 		css`
 			:host {
 				display: block;
+				color: var(--uui-color-text);
 			}
 			:host,
 			umb-workspace-layout {
@@ -56,7 +57,7 @@ export class UmbModalLayoutCurrentUserElement extends UmbLitElement {
 				text-decoration: none;
 			}
 			.history-item uui-icon {
-				margin-top: 2px;
+				margin-top: var(--uui-size-space-1);
 			}
 			.history-item:hover {
 				color: var(--uui-color-interactive-emphasis);

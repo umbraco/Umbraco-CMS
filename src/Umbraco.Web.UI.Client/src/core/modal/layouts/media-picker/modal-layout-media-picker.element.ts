@@ -16,8 +16,8 @@ export class UmbModalLayoutMediaPickerElement extends UmbModalLayoutElement<UmbM
 		UUITextStyles,
 		css`
 			h3 {
-				margin-left: 16px;
-				margin-right: 16px;
+				margin-left: var(--uui-size-space-5);
+				margin-right: var(--uui-size-space-5);
 			}
 
 			uui-input {
@@ -33,7 +33,7 @@ export class UmbModalLayoutMediaPickerElement extends UmbModalLayoutElement<UmbM
 			#content-list {
 				display: flex;
 				flex-direction: column;
-				gap: 8px;
+				gap: var(--uui-size-space-3);
 			}
 
 			.content-item {

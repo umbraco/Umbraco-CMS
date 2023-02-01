@@ -14,9 +14,9 @@ export class UmbDashboardRedirectManagementElement extends UmbLitElement {
 		css`
 			.actions {
 				display: flex;
-				gap: 4px;
+				gap: var(--uui-size-space-1);
 				justify-content: space-between;
-				margin-bottom: 12px;
+				margin-bottom: var(--uui-size-space-4);
 			}
 
 			.actions uui-icon {
@@ -56,7 +56,7 @@ export class UmbDashboardRedirectManagementElement extends UmbLitElement {
 			}
 			.trackerDisabled::after {
 				content: '';
-				background-color: rgba(250, 250, 250, 0.7);
+				background-color: var(--uui-color-disabled);
 				position: absolute;
 				border-radius: 2px;
 				left: 0;

@@ -118,7 +118,7 @@ export class UmbDataTypeWorkspaceViewEditElement extends UmbLitElement {
 
 	render() {
 		return html`
-			<uui-box style="margin-bottom: 20px;"> ${this._renderPropertyEditorUI()} </uui-box>
+			<uui-box style="margin-bottom: var(--uui-size-space-5);"> ${this._renderPropertyEditorUI()} </uui-box>
 			${this._renderConfig()} </uui-box>
 		`;
 	}
