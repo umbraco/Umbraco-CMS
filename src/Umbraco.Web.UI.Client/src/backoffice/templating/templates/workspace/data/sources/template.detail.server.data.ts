@@ -4,16 +4,40 @@ import { ProblemDetails, Template, TemplateResource } from '@umbraco-cms/backend
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 import { tryExecuteAndNotify } from '@umbraco-cms/resources';
 
+/**
+ * A data source for the Template detail that fetches data from the server
+ * @export
+ * @class UmbTemplateDetailServerDataSource
+ * @implements {TemplateDetailDataSource}
+ */
 export class UmbTemplateDetailServerDataSource implements TemplateDetailDataSource {
 	#host: UmbControllerHostInterface;
+
+	/**
+	 * Creates an instance of UmbTemplateDetailServerDataSource.
+	 * @param {UmbControllerHostInterface} host
+	 * @memberof UmbTemplateDetailServerDataSource
+	 */
 	constructor(host: UmbControllerHostInterface) {
 		this.#host = host;
 	}
 
+	/**
+	 * Fetches a Template with the given key from the server
+	 * @param {string} key
+	 * @return {*}
+	 * @memberof UmbTemplateDetailServerDataSource
+	 */
 	get(key: string) {
 		return tryExecuteAndNotify(this.#host, TemplateResource.getTemplateByKey({ key }));
 	}
 
+	/**
+	 * Creates a new Template scaffold
+	 * @param {(string | null)} parentKey
+	 * @return {*}
+	 * @memberof UmbTemplateDetailServerDataSource
+	 */
 	async createScaffold(parentKey: string | null) {
 		let masterTemplateAlias: string | undefined = undefined;
 		let error = undefined;
@@ -45,11 +69,23 @@ export class UmbTemplateDetailServerDataSource implements TemplateDetailDataSour
 		return { data, error };
 	}
 
+	/**
+	 * Inserts a new Template on the server
+	 * @param {Template} template
+	 * @return {*}
+	 * @memberof UmbTemplateDetailServerDataSource
+	 */
 	async insert(template: Template) {
 		const payload = { requestBody: template };
 		return tryExecuteAndNotify(this.#host, TemplateResource.postTemplate(payload));
 	}
 
+	/**
+	 * Updates a Template on the server
+	 * @param {Template} template
+	 * @return {*}
+	 * @memberof UmbTemplateDetailServerDataSource
+	 */
 	async update(template: Template) {
 		if (!template.key) {
 			const error: ProblemDetails = { title: 'Template key is missing' };
@@ -60,6 +96,12 @@ export class UmbTemplateDetailServerDataSource implements TemplateDetailDataSour
 		return tryExecuteAndNotify(this.#host, TemplateResource.putTemplateByKey(payload));
 	}
 
+	/**
+	 * Deletes a Template on the server
+	 * @param {string} key
+	 * @return {*}
+	 * @memberof UmbTemplateDetailServerDataSource
+	 */
 	async delete(key: string) {
 		if (!key) {
 			const error: ProblemDetails = { title: 'Key is missing' };
