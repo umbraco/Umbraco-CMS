@@ -107,14 +107,12 @@ internal class EfCoreScope : Scope
     public void Dispose()
     {
         DisposeEfCoreDatabase();
-        base.Dispose();
     }
 
     private void DisposeEfCoreDatabase()
     {
         var completed = _completed.HasValue && _completed.Value;
-        var databaseException = false;
-        if (_umbracoEfCoreDatabase != null)
+        if (_umbracoEfCoreDatabase is not null)
         {
             try
             {
