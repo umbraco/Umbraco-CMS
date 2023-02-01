@@ -10,6 +10,7 @@ using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Collections;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Infrastructure.Persistence;
+using Umbraco.Cms.Infrastructure.Persistence.EfCore;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Scoping
@@ -88,6 +89,7 @@ namespace Umbraco.Cms.Infrastructure.Scoping
             _autoComplete = autoComplete;
             Detachable = detachable;
             _dictionaryLocker = new object();
+            EfCoreDatabase = new UmbracoEfCoreDatabase(null!);
 
 #if DEBUG_SCOPES
             _scopeProvider.RegisterScope(this);
@@ -312,6 +314,8 @@ namespace Umbraco.Cms.Infrastructure.Scoping
         public Guid InstanceId { get; } = Guid.NewGuid();
 
         public int CreatedThreadId { get; } = Thread.CurrentThread.ManagedThreadId;
+
+        public IUmbracoEfCoreDatabase EfCoreDatabase { get; }
 
         public ISqlContext SqlContext
         {

@@ -40,6 +40,9 @@
     <PackageReference Include="System.IO.FileSystem.AccessControl" Version="5.0.0" />
     <PackageReference Include="System.Security.Cryptography.Pkcs" Version="7.0.0" />
     <PackageReference Include="System.Threading.Tasks.Dataflow" Version="7.0.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="7.0.0-rc.2.*" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="7.0.0-rc.2.*" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="7.0.0-rc.2.*" />
   </ItemGroup>
 
   <ItemGroup>
