@@ -70,14 +70,14 @@ export class UmbLanguageRootWorkspaceElement extends UmbLitElement implements Um
 	@state()
 	private _tableItems: Array<UmbTableItem> = [];
 
-	private _languageStore?: UmbLanguageStore;
+	#languageStore?: UmbLanguageStore;
 
 	constructor() {
 		super();
 
 		this.consumeContext(UMB_LANGUAGE_STORE_CONTEXT_TOKEN, (instance) => {
-			this._languageStore = instance;
-			this._observeLanguages();
+			this.#languageStore = instance;
+			this.#observeLanguages();
 		});
 	}
 
@@ -89,13 +89,13 @@ export class UmbLanguageRootWorkspaceElement extends UmbLitElement implements Um
 		// Not relevant for this workspace
 	}
 
-	private _observeLanguages() {
-		this._languageStore?.getAll().subscribe((languages) => {
-			this._createTableItems(languages);
+	#observeLanguages() {
+		this.#languageStore?.getAll().subscribe((languages) => {
+			this.#createTableItems(languages);
 		});
 	}
 
-	private _createTableItems(languages: Array<UmbLanguageStoreItemType>) {
+	#createTableItems(languages: Array<UmbLanguageStoreItemType>) {
 		this._tableItems = languages.map((language) => {
 			return {
 				key: language.isoCode ?? '',

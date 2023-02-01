@@ -12,25 +12,25 @@ export class UmbLanguageRootTableDeleteColumnLayoutElement extends UmbLitElement
 	@property({ attribute: false })
 	value!: UmbLanguageStoreItemType;
 
-	private _languageStore?: UmbLanguageStore;
-	private _modalService?: UmbModalService;
+	#languageStore?: UmbLanguageStore;
+	#modalService?: UmbModalService;
 
 	constructor() {
 		super();
 		this.consumeContext(UMB_LANGUAGE_STORE_CONTEXT_TOKEN, (instance) => {
-			this._languageStore = instance;
+			this.#languageStore = instance;
 		});
 
 		this.consumeContext(UMB_MODAL_SERVICE_CONTEXT_TOKEN, (instance) => {
-			this._modalService = instance;
+			this.#modalService = instance;
 		});
 	}
 
-	private _handleDelete(event: MouseEvent) {
+	#handleDelete(event: MouseEvent) {
 		event.stopImmediatePropagation();
-		if (!this._languageStore) return;
+		if (!this.#languageStore) return;
 
-		const modalHandler = this._modalService?.confirm({
+		const modalHandler = this.#modalService?.confirm({
 			headline: 'Delete language',
 			content: html`
 				<div
@@ -45,7 +45,7 @@ export class UmbLanguageRootTableDeleteColumnLayoutElement extends UmbLitElement
 
 		modalHandler?.onClose().then(({ confirmed }) => {
 			if (confirmed) {
-				this._languageStore?.delete([this.value.isoCode!]);
+				this.#languageStore?.delete([this.value.isoCode!]);
 			}
 		});
 	}
@@ -54,7 +54,7 @@ export class UmbLanguageRootTableDeleteColumnLayoutElement extends UmbLitElement
 		if (this.value.isDefault) return nothing;
 
 		return html`<uui-button
-			@click=${this._handleDelete}
+			@click=${this.#handleDelete}
 			color="danger"
 			look="default"
 			compact
