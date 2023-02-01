@@ -5,8 +5,8 @@ import { IRoutingInfo } from 'router-slot';
 import { map } from 'rxjs';
 import { repeat } from 'lit/directives/repeat.js';
 
-import type { UmbRouterSlotInitEvent } from '../../router-slot/routet-slot-init.event';
-import { createExtensionElement , umbExtensionsRegistry } from '@umbraco-cms/extensions-api';
+import type { UmbRouterSlotInitEvent } from '../../router-slot/router-slot-init.event';
+import { createExtensionElement, umbExtensionsRegistry } from '@umbraco-cms/extensions-api';
 import type {
 	ManifestWorkspaceAction,
 	ManifestWorkspaceView,
@@ -97,8 +97,6 @@ export class UmbWorkspaceLayout extends UmbLitElement {
 	@state()
 	private _activePath?: string;
 
-
-
 	private _observeWorkspaceViews() {
 		this.observe(
 			umbExtensionsRegistry
@@ -141,7 +139,6 @@ export class UmbWorkspaceLayout extends UmbLitElement {
 				path: '**',
 				redirectTo: `view/${this._workspaceViews[0].meta.pathname}`,
 			});
-
 		}
 	}
 
@@ -154,17 +151,15 @@ export class UmbWorkspaceLayout extends UmbLitElement {
 								this._workspaceViews,
 								(view) => view.alias,
 								(view) => html`
-										<uui-tab
-											.label="${view.meta.label || view.name}"
-											href="${this._routerPath}/view/${view.meta.pathname}"
-											?active="${'view/'+view.meta.pathname === this._activePath}"
-										>
-											<uui-icon slot="icon" name="${view.meta.icon}"></uui-icon>
-											${view.meta.label || view.name}
-										</uui-tab>
-									`
-								)
-							}
+									<uui-tab
+										.label="${view.meta.label || view.name}"
+										href="${this._routerPath}/view/${view.meta.pathname}"
+										?active="${'view/' + view.meta.pathname === this._activePath}">
+										<uui-icon slot="icon" name="${view.meta.icon}"></uui-icon>
+										${view.meta.label || view.name}
+									</uui-tab>
+								`
+							)}
 						</uui-tab-group>
 				  `
 				: nothing}
@@ -177,11 +172,16 @@ export class UmbWorkspaceLayout extends UmbLitElement {
 				<slot name="header" slot="header"></slot>
 				${this._renderTabs()}
 
-				<umb-router-slot .routes="${this._routes}"
-				@init=${(event: UmbRouterSlotInitEvent) => { this._routerPath = event.target.absoluteRouterPath;}}
-				@change=${(event: UmbRouterSlotInitEvent) => { this._activePath = event.target.localActiveViewPath;}}
-
-				></umb-router-slot>
+				<umb-router-slot
+					.routes="${this._routes}"
+					@init=${(event: UmbRouterSlotInitEvent) => {
+						console.log('init', event.target);
+						this._routerPath = event.target.absoluteRouterPath;
+					}}
+					@change=${(event: UmbRouterSlotInitEvent) => {
+						console.log('change', event.target);
+						this._activePath = event.target.localActiveViewPath;
+					}}></umb-router-slot>
 				<slot></slot>
 
 				<slot name="footer" slot="footer"></slot>
