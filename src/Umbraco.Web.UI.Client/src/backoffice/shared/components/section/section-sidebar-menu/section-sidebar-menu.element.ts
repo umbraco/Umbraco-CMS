@@ -29,7 +29,6 @@ export class UmbSectionSidebarMenuElement extends UmbLitElement {
 		if (!this._sectionContext) return;
 
 		this.observe(this._sectionContext.alias, (alias) => {
-			console.log("this._sectionContext?.alias", alias)
 			this._currentSectionAlias = alias;
 		});
 	}

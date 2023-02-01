@@ -37,6 +37,8 @@ import { UmbThemeContext } from './themes/theme.context';
 import { UmbLanguageStore } from './settings/languages/language.store';
 import { UmbNotificationService, UMB_NOTIFICATION_SERVICE_CONTEXT_TOKEN } from '@umbraco-cms/notification';
 
+import '@umbraco-cms/router';
+
 // Domains
 import './settings';
 import './documents';

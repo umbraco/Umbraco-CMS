@@ -93,6 +93,17 @@ export interface ManifestElement extends ManifestWithLoader<object | HTMLElement
 	meta?: any;
 }
 
+export interface ManifestWithView extends ManifestElement {
+	meta: MetaManifestWithView;
+}
+
+export interface MetaManifestWithView {
+	pathname: string;
+	label: string;
+	icon: string;
+}
+
+
 export interface ManifestElementWithElementName extends ManifestElement {
 	elementName: string;
 }
