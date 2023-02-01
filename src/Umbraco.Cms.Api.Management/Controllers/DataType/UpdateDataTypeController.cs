@@ -1,11 +1,12 @@
-﻿using System.ComponentModel.DataAnnotations;
-using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Management.ViewModels.DataType;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Api.Management.Controllers.DataType;
 
@@ -25,23 +26,21 @@ public class UpdateDataTypeController : DataTypeControllerBase
     [HttpPut("{key:guid}")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<ActionResult> Update(Guid key, DataTypeUpdateModel dataTypeViewModel)
+    public async Task<IActionResult> Update(Guid key, DataTypeUpdateModel dataTypeViewModel)
     {
-        IDataType? current = _dataTypeService.GetDataType(key);
+        IDataType? current = await _dataTypeService.GetAsync(key);
         if (current == null)
         {
             return NotFound();
         }
 
         IDataType updated = _umbracoMapper.Map(dataTypeViewModel, current);
+        Attempt<IDataType, DataTypeOperationStatus> result = await _dataTypeService.UpdateAsync(updated, CurrentUserId(_backOfficeSecurityAccessor));
 
-        ProblemDetails? validationIssues = Save(updated, _dataTypeService, _backOfficeSecurityAccessor);
-        if (validationIssues != null)
-        {
-            return BadRequest(validationIssues);
-        }
-
-        return await Task.FromResult(Ok());
+        return result.Success
+            ? Ok()
+            : DataTypeOperationStatusResult(result.Status);
     }
 }

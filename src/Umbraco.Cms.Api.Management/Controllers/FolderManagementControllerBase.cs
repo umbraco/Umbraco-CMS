@@ -1,32 +1,29 @@
 ﻿using System.Linq.Expressions;
 using Microsoft.AspNetCore.Mvc;
-using Umbraco.Cms.Api.Common.Builders;
 using Umbraco.Cms.Api.Management.ViewModels.Folder;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Security;
-using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Api.Management.Controllers;
 
-public abstract class FolderManagementControllerBase : ManagementApiControllerBase
+public abstract class FolderManagementControllerBase<TStatus> : ManagementApiControllerBase
+    where TStatus : Enum
 {
     private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
 
     protected FolderManagementControllerBase(IBackOfficeSecurityAccessor backOfficeSecurityAccessor)
         => _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
 
-    protected ActionResult GetFolder(Guid key)
+    protected async Task<IActionResult> GetFolderAsync(Guid key)
     {
-        EntityContainer? container = GetContainer(key);
+        EntityContainer? container = await GetContainerAsync(key);
         if (container == null)
         {
             return NotFound($"Could not find the folder with key: {key}");
         }
 
-        EntityContainer? parentContainer = container.ParentId > 0
-            ? GetContainer(container.ParentId)
-            : null;
+        EntityContainer? parentContainer = await GetParentContainerAsync(container);
 
         // we could implement a mapper for this but it seems rather overkill at this point
         return Ok(new FolderViewModel
@@ -37,35 +34,25 @@ public abstract class FolderManagementControllerBase : ManagementApiControllerBa
         });
     }
 
-    protected ActionResult CreateFolder<TCreatedActionController>(
+    protected async Task<IActionResult> CreateFolderAsync<TCreatedActionController>(
         FolderCreateModel folderCreateModel,
         Expression<Func<TCreatedActionController, string>> createdAction)
     {
-        EntityContainer? parentContainer = folderCreateModel.ParentKey.HasValue
-            ? GetContainer(folderCreateModel.ParentKey.Value)
-            : null;
+        var container = new EntityContainer(ContainerObjectType) { Name = folderCreateModel.Name };
 
-        Attempt<OperationResult<OperationResultType, EntityContainer>?> result = CreateContainer(
-            parentContainer?.Id ?? Constants.System.Root,
-            folderCreateModel.Name,
+        Attempt<EntityContainer, TStatus> result = await CreateContainerAsync(
+            container,
+            folderCreateModel.ParentKey,
             CurrentUserId(_backOfficeSecurityAccessor));
 
-        if (result.Success == false)
-        {
-            ProblemDetails problemDetails = new ProblemDetailsBuilder()
-                .WithTitle("Unable to create the folder")
-                .WithDetail(result.Exception?.Message ?? FallbackProblemDetail(result.Result))
-                .Build();
-            return BadRequest(problemDetails);
-        }
-
-        EntityContainer container = result.Result!.Entity!;
-        return CreatedAtAction(createdAction, container.Key);
+        return result.Success
+            ? CreatedAtAction(createdAction, result.Result.Key)
+            : OperationStatusResult(result.Status);
     }
 
-    protected ActionResult UpdateFolder(Guid key, FolderUpdateModel folderUpdateModel)
+    protected async Task<IActionResult> UpdateFolderAsync(Guid key, FolderUpdateModel folderUpdateModel)
     {
-        EntityContainer? container = GetContainer(key);
+        EntityContainer? container = await GetContainerAsync(key);
         if (container == null)
         {
             return NotFound($"Could not find the folder with key: {key}");
@@ -73,50 +60,31 @@ public abstract class FolderManagementControllerBase : ManagementApiControllerBa
 
         container.Name = folderUpdateModel.Name;
 
-        Attempt<OperationResult?> result = SaveContainer(container, CurrentUserId(_backOfficeSecurityAccessor));
-        if (result.Success == false)
-        {
-            ProblemDetails problemDetails = new ProblemDetailsBuilder()
-                .WithTitle("Unable to update the folder")
-                .WithDetail(result.Exception?.Message ?? FallbackProblemDetail(result.Result))
-                .Build();
-            return BadRequest(problemDetails);
-        }
-
-        return Ok();
+        Attempt<EntityContainer, TStatus> result = await UpdateContainerAsync(container, CurrentUserId(_backOfficeSecurityAccessor));
+        return result.Success
+            ? Ok()
+            : OperationStatusResult(result.Status);
     }
 
-    protected ActionResult DeleteFolder(Guid key)
+    protected async Task<IActionResult> DeleteFolderAsync(Guid key)
     {
-        EntityContainer? container = GetContainer(key);
-        if (container == null)
-        {
-            return NotFound($"Could not find the folder with key: {key}");
-        }
-
-        Attempt<OperationResult?> result = DeleteContainer(container.Id, CurrentUserId(_backOfficeSecurityAccessor));
-        if (result.Success == false)
-        {
-            ProblemDetails problemDetails = new ProblemDetailsBuilder()
-                .WithTitle("Unable to delete the folder")
-                .WithDetail(result.Exception?.Message ?? FallbackProblemDetail(result.Result))
-                .Build();
-            return BadRequest(problemDetails);
-        }
-
-        return Ok();
+        Attempt<EntityContainer?, TStatus> result = await DeleteContainerAsync(key, CurrentUserId(_backOfficeSecurityAccessor));
+        return result.Success
+            ? Ok()
+            : OperationStatusResult(result.Status);
     }
 
-    private static string FallbackProblemDetail(OperationResult<OperationResultType>? result)
-        => result != null ? $"The reported operation result was: {result.Result}" : "Check the log for additional details";
+    protected abstract Guid ContainerObjectType { get; }
 
-    protected abstract EntityContainer? GetContainer(Guid key);
+    protected abstract Task<EntityContainer?> GetContainerAsync(Guid key);
 
-    protected abstract EntityContainer? GetContainer(int containerId);
+    protected abstract Task<EntityContainer?> GetParentContainerAsync(EntityContainer container);
 
-    protected abstract Attempt<OperationResult?> SaveContainer(EntityContainer container, int userId);
+    protected abstract Task<Attempt<EntityContainer, TStatus>> CreateContainerAsync(EntityContainer container, Guid? parentId, int userId);
 
-    protected abstract Attempt<OperationResult<OperationResultType, EntityContainer>?> CreateContainer(int parentId, string name, int userId);
+    protected abstract Task<Attempt<EntityContainer, TStatus>> UpdateContainerAsync(EntityContainer container, int userId);
 
-    protected abstract Attempt<OperationResult?> DeleteContainer(int containerId, int userId);
+    protected abstract Task<Attempt<EntityContainer?, TStatus>> DeleteContainerAsync(Guid id, int userId);
+
+    protected abstract IActionResult OperationStatusResult(TStatus status);
 }

@@ -40,6 +40,6 @@ public abstract class LanguageControllerBase : ManagementApiControllerBase
                 .WithTitle("Cancelled by notification")
                 .WithDetail("A notification handler prevented the language operation.")
                 .Build()),
-            _ => StatusCode(StatusCodes.Status500InternalServerError, "Unknown dictionary operation status")
+            _ => StatusCode(StatusCodes.Status500InternalServerError, "Unknown language operation status")
         };
 }
