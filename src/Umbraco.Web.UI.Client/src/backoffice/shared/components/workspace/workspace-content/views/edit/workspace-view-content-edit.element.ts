@@ -36,6 +36,7 @@ export class UmbWorkspaceViewContentEditElement extends UmbLitElement {
 			'umbWorkspaceContext',
 			(workspaceContext) => {
 				this._workspaceContext = workspaceContext;
+				console.log("workspaceContext", workspaceContext)
 				this._observeContent();
 			}
 		);
@@ -55,6 +56,7 @@ export class UmbWorkspaceViewContentEditElement extends UmbLitElement {
 
 			this._properties = content?.properties || [];
 			this._data = content?.data || [];
+			console.log("content", content)
 
 			/*
 				Maybe we should not give the value(Data), but the umb-content-property should get the context and observe its own data.

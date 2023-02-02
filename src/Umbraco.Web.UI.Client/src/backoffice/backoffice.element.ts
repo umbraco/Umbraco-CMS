@@ -19,8 +19,8 @@ import { UmbDocumentTypeDetailStore } from './documents/document-types/document-
 import { UmbDocumentTypeTreeStore } from './documents/document-types/document-type.tree.store';
 import { UmbMediaTypeDetailStore } from './media/media-types/media-type.detail.store';
 import { UmbMediaTypeTreeStore } from './media/media-types/media-type.tree.store';
-import { UmbDocumentDetailStore } from './documents/documents/document.detail.store';
-import { UmbDocumentTreeStore } from './documents/documents/tree/data/document.tree.store';
+import { UmbDocumentDetailStore } from './documents/documents/repository/document.detail.store';
+import { UmbDocumentTreeStore } from './documents/documents/repository/document.tree.store';
 import { UmbMediaDetailStore } from './media/media/media.detail.store';
 import { UmbMediaTreeStore } from './media/media/media.tree.store';
 import { UmbMemberTypeDetailStore } from './members/member-types/member-type.detail.store';

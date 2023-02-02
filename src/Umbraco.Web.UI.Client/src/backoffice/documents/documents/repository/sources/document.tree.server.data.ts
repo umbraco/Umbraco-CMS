@@ -1,4 +1,4 @@
-import type { DocumentTreeDataSource } from './document.tree.data.source.interface';
+import type { RepositoryTreeDataSource } from '../../../../../../libs/repository/repository-tree-data-source.interface';
 import { ProblemDetails, DocumentResource } from '@umbraco-cms/backend-api';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 import { tryExecuteAndNotify } from '@umbraco-cms/resources';
@@ -9,7 +9,7 @@ import { tryExecuteAndNotify } from '@umbraco-cms/resources';
  * @class DocumentTreeServerDataSource
  * @implements {DocumentTreeDataSource}
  */
-export class DocumentTreeServerDataSource implements DocumentTreeDataSource {
+export class DocumentTreeServerDataSource implements RepositoryTreeDataSource {
 	#host: UmbControllerHostInterface;
 
 

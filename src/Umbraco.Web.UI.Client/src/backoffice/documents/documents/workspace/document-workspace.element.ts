@@ -25,7 +25,7 @@ export class UmbDocumentWorkspaceElement extends UmbLitElement implements UmbWor
 	}
 
 	public create(parentKey: string | null) {
-		this._workspaceContext.create(parentKey);
+		this._workspaceContext.createScaffold(parentKey);
 	}
 
 	render() {
