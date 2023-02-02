@@ -1,9 +1,8 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, html } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
+import { ifDefined } from 'lit-html/directives/if-defined.js';
 import { UmbLitElement } from '@umbraco-cms/element';
-import { umbExtensionsRegistry } from '@umbraco-cms/extensions-api';
-import { ManifestEntityAction } from 'libs/extensions-registry/entity-action.models';
 
 @customElement('umb-workspace-action-menu')
 export class UmbWorkspaceActionMenuElement extends UmbLitElement {
@@ -31,32 +30,11 @@ export class UmbWorkspaceActionMenuElement extends UmbLitElement {
 	@property({ type: String })
 	public unique?: string;
 
-	private _entityType = '';
 	@property({ type: String, attribute: 'entity-type' })
-	public get entityType() {
-		return this._entityType;
-	}
-	public set entityType(value) {
-		const oldValue = this._entityType;
-		this._entityType = value;
-		if (oldValue !== this._entityType) {
-			this.#observeEntityActions();
-			this.requestUpdate('entityType', oldValue);
-		}
-	}
-
-	@state()
-	private _entityActions?: Array<ManifestEntityAction>;
+	public entityType?: string;
 
 	@state()
 	private _actionMenuIsOpen = false;
-
-	#observeEntityActions() {
-		// TODO: filter on entity type
-		this.observe(umbExtensionsRegistry.extensionsOfType('entityAction'), (actions) => {
-			this._entityActions = actions;
-		});
-	}
 
 	#close() {
 		this._actionMenuIsOpen = false;
@@ -76,9 +54,7 @@ export class UmbWorkspaceActionMenuElement extends UmbLitElement {
 				<uui-button slot="trigger" label="Actions" @click=${this.#open}></uui-button>
 				<div id="action-menu-dropdown" slot="popover">
 					<uui-scroll-container>
-						${this._entityActions?.map(
-							(manifest) => html`<umb-entity-action .unique=${this.unique} .manifest=${manifest}></umb-entity-action>`
-						)}
+						<umb-entity-action-list entity-type=${ifDefined(this.entityType)}></umb-entity-action-list>
 					</uui-scroll-container>
 				</div>
 			</uui-popover>
