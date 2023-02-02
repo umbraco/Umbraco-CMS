@@ -4,8 +4,8 @@ import { customElement, property, state } from 'lit/decorators.js';
 import { ifDefined } from 'lit-html/directives/if-defined.js';
 import { FormControlMixin } from '@umbraco-ui/uui-base/lib/mixins';
 import { UmbModalService, UMB_MODAL_SERVICE_CONTEXT_TOKEN } from '../../../../core/modal';
-import { UMB_DOCUMENT_TREE_STORE_CONTEXT_TOKEN } from '../../../../backoffice/documents/documents/document.tree.store';
-import type { UmbDocumentTreeStore } from '../../../../backoffice/documents/documents/document.tree.store';
+import { UMB_DOCUMENT_TREE_STORE_CONTEXT_TOKEN } from '../../../documents/documents/tree/data/document.tree.store';
+import type { UmbDocumentTreeStore } from '../../../documents/documents/tree/data/document.tree.store';
 import { UmbLitElement } from '@umbraco-cms/element';
 import type { DocumentTreeItem, FolderTreeItem } from '@umbraco-cms/backend-api';
 import type { UmbObserverController } from '@umbraco-cms/observable-api';
@@ -115,7 +115,7 @@ export class UmbInputDocumentPickerElement extends FormControlMixin(UmbLitElemen
 		if (!this._documentStore) return;
 
 		// TODO: consider changing this to the list data endpoint when it is available
-		this._pickedItemsObserver = this.observe(this._documentStore.getTreeItems(this._selectedKeys), (items) => {
+		this._pickedItemsObserver = this.observe(this._documentStore.items(this._selectedKeys), (items) => {
 			this._items = items;
 		});
 	}

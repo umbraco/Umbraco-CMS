@@ -21,6 +21,7 @@ export class UmbContextConsumerController<T = unknown>
 	}
 
 	public destroy() {
+		super.destroy();
 		if (this.host) {
 			this.host.removeController(this);
 		}
