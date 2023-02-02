@@ -137,6 +137,7 @@ export class UmbTreeElement extends UmbLitElement {
 		});
 	}
 
+	//TODO: remove when repositories are fully implemented:
 	private _observeStoreTreeRoot() {
 		if (!this._store?.getTreeRoot) return;
 
@@ -150,7 +151,6 @@ export class UmbTreeElement extends UmbLitElement {
 	}
 
 	render() {
-		// TODO: Fix Type Mismatch ` as Entity` in this template:
 		return html`
 			${repeat(
 				this._items,
