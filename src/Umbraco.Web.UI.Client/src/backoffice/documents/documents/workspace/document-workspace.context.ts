@@ -1,29 +1,31 @@
-import { UMB_DOCUMENT_DETAIL_STORE_CONTEXT_TOKEN } from '../document.detail.store';
-import type { UmbWorkspaceEntityContextInterface } from '../../../shared/components/workspace/workspace-context/workspace-entity-context.interface';
 import { UmbWorkspaceContext } from '../../../shared/components/workspace/workspace-context/workspace-context';
-import { UmbEntityWorkspaceManager } from '../../../shared/components/workspace/workspace-context/entity-manager-controller';
+import { UmbDocumentRepository } from '../repository/document.repository';
 import type { DocumentDetails } from '@umbraco-cms/models';
-import { appendToFrozenArray } from '@umbraco-cms/observable-api';
+import { appendToFrozenArray, ObjectState } from '@umbraco-cms/observable-api';
+import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 
-export class UmbDocumentWorkspaceContext extends UmbWorkspaceContext implements UmbWorkspaceEntityContextInterface<DocumentDetails | undefined> {
-
-	// Repository notes:
-	/*
-
-	#draft = new ObjectState<Type | undefined>(undefined);
+// TODO: should this contex be called DocumentDraft instead of workspace? or should the draft be part of this?
+export class UmbDocumentWorkspaceContext extends UmbWorkspaceContext {
 
 
-	*/
+	#host: UmbControllerHostInterface;
+	#templateDetailRepo: UmbDocumentRepository;
 
-	// Manager will be removed when we get the Repository:
-	#manager = new UmbEntityWorkspaceManager(this._host, 'document', UMB_DOCUMENT_DETAIL_STORE_CONTEXT_TOKEN);
+	#data = new ObjectState<DocumentDetails | undefined>(undefined);
+	data = this.#data.asObservable();
+	name = this.#data.getObservablePart((data) => data?.name);
 
-	public readonly data = this.#manager.state.asObservable();
-	public readonly name = this.#manager.state.getObservablePart((state) => state?.name);
+	constructor(host: UmbControllerHostInterface) {
+		super(host);
+		this.#host = host;
+		this.#templateDetailRepo = new UmbDocumentRepository(this.#host);
+	}
+
 
 	setName(name: string) {
-		this.#manager.state.update({name: name})
+		this.#data.update({ name });
 	}
+	/*
 	getEntityType = this.#manager.getEntityType;
 	getUnique = this.#manager.getEntityKey;
 	getEntityKey = this.#manager.getEntityKey;
@@ -33,6 +35,7 @@ export class UmbDocumentWorkspaceContext extends UmbWorkspaceContext implements 
 	create = this.#manager.create;
 	save = this.#manager.save;
 	destroy = this.#manager.destroy;
+	*/
 
 	/**
 	 * Concept for Repository impl.:
@@ -52,17 +55,39 @@ export class UmbDocumentWorkspaceContext extends UmbWorkspaceContext implements 
 	 */
 
 
-	// This could eventually be moved out as well?
 	setPropertyValue(alias: string, value: unknown) {
 
 		const entry = {alias: alias, value: value};
 
-		const currentData = this.#manager.getData();
+		const currentData = this.#data.value;
 		if (currentData) {
 			const newDataSet = appendToFrozenArray(currentData.data, entry, x => x.alias);
 
-			this.#manager.state.update({data: newDataSet});
+			this.#data.update({data: newDataSet});
 		}
+	}
+
+
+	async load(entityKey: string) {
+		const { data } = await this.#templateDetailRepo.requestDetails(entityKey);
+		if (data) {
+			this.#data.next(data);
+		}
+	}
+
+	async createScaffold(parentKey: string | null) {
+		const { data } = await this.#templateDetailRepo.createDetailsScaffold(parentKey);
+		if (!data) return;
+		this.#data.next(data);
+	}
+
+	async save(isNew: boolean) {
+		if (!this.#data.value) return;
+		isNew ? this.#templateDetailRepo.createDetail(this.#data.value) : this.#templateDetailRepo.saveDetail(this.#data.value);
+	}
+
+	async delete(key: string) {
+		await this.#templateDetailRepo.delete(key);
 	}
 
 
