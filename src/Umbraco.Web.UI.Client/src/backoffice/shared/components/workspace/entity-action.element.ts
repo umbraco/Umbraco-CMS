@@ -1,4 +1,4 @@
-import { html } from 'lit';
+import { html, nothing } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
 import { UmbLitElement } from '@umbraco-cms/element';
@@ -23,15 +23,17 @@ class UmbEntityActionElement extends UmbLitElement {
 
 	#api: any;
 
-	#onClickLabel() {
-		this.#api.execute();
+	async #onClickLabel() {
+		await this.#api.execute();
 	}
 
 	render() {
 		return html`
-			<uui-menu-item
-				label="${ifDefined(this._manifest?.meta.label)}"
-				@click-label=${this.#onClickLabel}></uui-menu-item>
+			<uui-menu-item label="${ifDefined(this._manifest?.meta.label)}" @click-label=${this.#onClickLabel}>
+				${this._manifest?.meta.icon
+					? html`<uui-icon slot="icon" name="${this._manifest?.meta.icon}"></uui-icon>`
+					: nothing}
+			</uui-menu-item>
 		`;
 	}
 }
