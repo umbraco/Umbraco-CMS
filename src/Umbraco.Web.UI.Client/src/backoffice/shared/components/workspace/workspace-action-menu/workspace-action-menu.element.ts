@@ -54,7 +54,9 @@ export class UmbWorkspaceActionMenuElement extends UmbLitElement {
 				<uui-button slot="trigger" label="Actions" @click=${this.#open}></uui-button>
 				<div id="action-menu-dropdown" slot="popover">
 					<uui-scroll-container>
-						<umb-entity-action-list entity-type=${ifDefined(this.entityType)}></umb-entity-action-list>
+						<umb-entity-action-list entity-type=${ifDefined(this.entityType)} unique=${ifDefined(
+			this.unique
+		)}></umb-entity-action-list>
 					</uui-scroll-container>
 				</div>
 			</uui-popover>
