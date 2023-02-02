@@ -11,6 +11,7 @@ import { UmbNotificationService, UMB_NOTIFICATION_SERVICE_CONTEXT_TOKEN } from '
 // element -> context -> repository -> (store) -> data source
 // All methods should be async and return a promise. Some methods might return an observable as part of the promise response.
 export class UmbTemplateDetailRepository {
+
 	#host: UmbControllerHostInterface;
 	#dataSource: UmbTemplateDetailServerDataSource;
 	#detailStore?: UmbTemplateDetailStore;
@@ -21,6 +22,7 @@ export class UmbTemplateDetailRepository {
 
 	constructor(host: UmbControllerHostInterface) {
 		this.#host = host;
+
 		// TODO: figure out how spin up get the correct data source
 		this.#dataSource = new UmbTemplateDetailServerDataSource(this.#host);
 
@@ -42,6 +44,7 @@ export class UmbTemplateDetailRepository {
 	}
 
 	#init() {
+		// TODO: This would only works with one user of this method. If two, the first one would be forgotten, but maybe its alright for now as I guess this is temporary.
 		return new Promise<void>((resolve) => {
 			this.#initialized ? resolve() : (this.#initResolver = resolve);
 		});
@@ -58,6 +61,7 @@ export class UmbTemplateDetailRepository {
 		await this.#init();
 
 		// TODO: should we show a notification if the parent key is missing?
+		// Investigate what is best for Acceptance testing, cause in that perspective a thrown error might be the best choice?
 		if (!parentKey) {
 			const error: ProblemDetails = { title: 'Parent key is missing' };
 			return { data: undefined, error };
@@ -70,6 +74,7 @@ export class UmbTemplateDetailRepository {
 		await this.#init();
 
 		// TODO: should we show a notification if the key is missing?
+		// Investigate what is best for Acceptance testing, cause in that perspective a thrown error might be the best choice?
 		if (!key) {
 			const error: ProblemDetails = { title: 'Key is missing' };
 			return { error };
@@ -82,6 +87,7 @@ export class UmbTemplateDetailRepository {
 		await this.#init();
 
 		// TODO: should we show a notification if the template is missing?
+		// Investigate what is best for Acceptance testing, cause in that perspective a thrown error might be the best choice?
 		if (!template) {
 			const error: ProblemDetails = { title: 'Template is missing' };
 			return { error };
@@ -97,6 +103,7 @@ export class UmbTemplateDetailRepository {
 		// TODO: we currently don't use the detail store for anything.
 		// Consider to look up the data before fetching from the server
 		this.#detailStore?.append(template);
+		// TODO: Update tree store with the new item?
 
 		return { error };
 	}
@@ -105,6 +112,7 @@ export class UmbTemplateDetailRepository {
 		await this.#init();
 
 		// TODO: should we show a notification if the template is missing?
+		// Investigate what is best for Acceptance testing, cause in that perspective a thrown error might be the best choice?
 		if (!template || !template.key) {
 			const error: ProblemDetails = { title: 'Template is missing' };
 			return { error };
@@ -122,6 +130,7 @@ export class UmbTemplateDetailRepository {
 		// Consider notify a workspace if a template is updated in the store while someone is editing it.
 		this.#detailStore?.append(template);
 		this.#treeStore?.updateItem(template.key, { name: template.name });
+		// TODO: would be nice to align the stores on methods/methodNames.
 
 		return { error };
 	}
@@ -147,6 +156,7 @@ export class UmbTemplateDetailRepository {
 		// Consider notify a workspace if a template is deleted from the store while someone is editing it.
 		this.#detailStore?.remove([key]);
 		this.#treeStore?.removeItem(key);
+		// TODO: would be nice to align the stores on methods/methodNames.
 
 		return { error };
 	}
