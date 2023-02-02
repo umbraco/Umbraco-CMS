@@ -64,8 +64,6 @@ export class UmbTreeElement extends UmbLitElement {
 	private _treeContext?: UmbTreeContextBase;
 	private _store?: UmbTreeStore<Entity>;
 
-	#treeRepository?: any; // TODO: make interface
-
 	protected firstUpdated(): void {
 		this._observeTree();
 	}
