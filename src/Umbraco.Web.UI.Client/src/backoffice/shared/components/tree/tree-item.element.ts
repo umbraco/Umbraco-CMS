@@ -14,6 +14,10 @@ import type { Entity } from '@umbraco-cms/models';
 import type { UmbTreeStore } from '@umbraco-cms/store';
 import { UmbLitElement } from '@umbraco-cms/element';
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-api';
+import {
+	UmbSectionSidebarContext,
+	UMB_SECTION_SIDEBAR_CONTEXT_TOKEN,
+} from '../section/section-sidebar/section-sidebar.context';
 
 @customElement('umb-tree-item')
 export class UmbTreeItem extends UmbLitElement {
@@ -70,7 +74,7 @@ export class UmbTreeItem extends UmbLitElement {
 	private _treeContext?: UmbTreeContextBase;
 	private _store?: UmbTreeStore<unknown>;
 	private _sectionContext?: UmbSectionContext;
-	private _treeContextMenuService?: UmbTreeContextMenuService;
+	private _sectionSidebarContext?: UmbSectionSidebarContext;
 
 	constructor() {
 		super();
@@ -91,8 +95,8 @@ export class UmbTreeItem extends UmbLitElement {
 			this._observeActiveTreeItem();
 		});
 
-		this.consumeContext(UMB_TREE_CONTEXT_MENU_SERVICE_CONTEXT_TOKEN, (treeContextMenuService) => {
-			this._treeContextMenuService = treeContextMenuService;
+		this.consumeContext(UMB_SECTION_SIDEBAR_CONTEXT_TOKEN, (instance) => {
+			this._sectionSidebarContext = instance;
 		});
 	}
 
@@ -208,7 +212,7 @@ export class UmbTreeItem extends UmbLitElement {
 			hasChildren: this.hasChildren,
 			parentKey: this.parentKey,
 		});
-		this._treeContextMenuService?.open({ name: this.label, key: this.key });
+		this._sectionSidebarContext?.openContextMenu(this.entityType, this.key);
 	}
 
 	render() {
