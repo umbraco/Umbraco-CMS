@@ -6,7 +6,7 @@ export class SaveDocumentEntityAction {
 	#host: UmbControllerHostInterface;
 	#key: string;
 	#documentRepository: UmbDocumentRepository;
-	#workspaceContext: any;
+	#workspaceContext?: any;
 
 	constructor(host: UmbControllerHostInterface, key: string) {
 		this.#host = host;
@@ -19,6 +19,7 @@ export class SaveDocumentEntityAction {
 	}
 
 	async execute() {
+		if (!this.#workspaceContext) return;
 		// TODO: it doesn't get the updated value
 		const document = this.#workspaceContext.getData();
 		this.#documentRepository.saveDetail(document);
