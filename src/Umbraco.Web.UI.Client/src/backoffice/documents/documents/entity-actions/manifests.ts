@@ -1,5 +1,5 @@
 import { CreateDocumentEntityAction } from './document-create.entity-action';
-import { DeleteDocumentEntityAction } from './document-delete.entity-action';
+import { TrashDocumentEntityAction } from './document-trash.entity-action';
 import { PublishDocumentEntityAction } from './document-publish.entity-action';
 import { ManifestEntityAction } from 'libs/extensions-registry/entity-action.models';
 
@@ -17,13 +17,13 @@ const entityActions: Array<ManifestEntityAction> = [
 	},
 	{
 		type: 'entityAction',
-		alias: 'Umb.EntityAction.Document.Delete',
-		name: 'Delete Document Entity Action ',
+		alias: 'Umb.EntityAction.Document.Trash',
+		name: 'Trash Document Entity Action ',
 		meta: {
 			entityType: 'document',
 			icon: 'umb:trash',
-			label: 'Delete',
-			api: DeleteDocumentEntityAction,
+			label: 'Trash',
+			api: TrashDocumentEntityAction,
 		},
 	},
 	{
