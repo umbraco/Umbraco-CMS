@@ -61,6 +61,22 @@ export class UmbWorkspaceLayout extends UmbLitElement {
 				display: flex;
 				gap: var(--uui-size-space-2);
 			}
+
+			#action-menu-popover {
+				display: block;
+			}
+			#action-menu-dropdown {
+				overflow: hidden;
+				z-index: -1;
+				background-color: var(--uui-combobox-popover-background-color, var(--uui-color-surface));
+				border: 1px solid var(--uui-color-border);
+				border-radius: var(--uui-border-radius);
+				width: 100%;
+				height: 100%;
+				box-sizing: border-box;
+				box-shadow: var(--uui-shadow-depth-3);
+				width: 500px;
+			}
 		`,
 	];
 
@@ -219,9 +235,29 @@ export class UmbWorkspaceLayout extends UmbLitElement {
 		`;
 	}
 
+	@state()
+	private _actionMenuIsOpen = false;
+
+	#close() {
+		this._actionMenuIsOpen = false;
+	}
+
+	#open() {
+		this._actionMenuIsOpen = true;
+	}
+
 	#renderActionsMenu() {
-		return html`<div slot="actions-menu">
-			${this._entityActions?.map((manifest) => html`<umb-entity-action .manifest=${manifest}></umb-entity-action>`)}
+		return html`
+			<div slot="action-menu">
+			<uui-popover  id="action-menu-popover" .open=${this._actionMenuIsOpen} @close=${this.#close}>
+				<uui-button slot="trigger" label="Actions" @click=${this.#open}></uui-button>
+				<div id="action-menu-dropdown" slot="popover">
+					<uui-scroll-container>
+						${this._entityActions?.map((manifest) => html`<umb-entity-action .manifest=${manifest}></umb-entity-action>`)}
+					</uui-scroll-container>
+				</div>
+			</uui-popover>
+			</div>
 		</div>`;
 	}
 }

@@ -117,8 +117,8 @@ export class UmbBodyLayout extends LitElement {
 						this._tabsSlotHasChildren = this.#hasNodes(e);
 					}}></slot>
 				<slot
-					id="actions-menu"
-					name="actions-menu"
+					id="action-menu"
+					name="action-menu"
 					@slotchange=${(e: Event) => {
 						this._actionsMenuSlotHasChildren = this.#hasNodes(e);
 					}}></slot>
