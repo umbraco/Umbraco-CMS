@@ -24,7 +24,7 @@ public class StartNodeService : IStartNodeService
         if (context is not null && context.Request.Headers.TryGetValue(StartNodeHeaderName, out StringValues headerValue))
         {
             var startNodeHeader = headerValue.ToString();
-            return WebUtility.UrlDecode(startNodeHeader).TrimStart(Constants.CharArrays.ForwardSlash);
+            return WebUtility.UrlDecode(startNodeHeader).Trim(Constants.CharArrays.ForwardSlash);
         }
 
         return null;
