@@ -1,6 +1,6 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html } from 'lit';
-import { customElement, property } from 'lit/decorators.js';
+import { customElement, property, state } from 'lit/decorators.js';
 
 import '../workspace-layout/workspace-layout.element';
 import '../../variant-selector/variant-selector.element';
@@ -10,6 +10,8 @@ import '../../variant-selector/variant-selector.element';
 import './views/edit/workspace-view-content-edit.element';
 import './views/info/workspace-view-content-info.element';
 import { UmbLitElement } from '@umbraco-cms/element';
+
+import '../entity-action.element';
 
 /**
  * TODO: IMPORTANT TODO: Get rid of the content workspace. Instead we aim to get separate components that can be composed by each workspace.
@@ -43,15 +45,14 @@ export class UmbWorkspaceContentElement extends UmbLitElement {
 	@property()
 	alias!: string;
 
-	@property({ type: String, attribute: 'entity-type' })
-	public entityType = '';
-
 	render() {
 		return html`
-			<umb-workspace-layout entity-type=${this.entityType} alias=${this.alias}>
+			<umb-workspace-layout alias=${this.alias}>
 				<div id="header" slot="header">
 					<umb-variant-selector></umb-variant-selector>
 				</div>
+
+				<slot name="action-menu" slot="action-menu"></slot>
 
 				<div id="footer" slot="footer">Breadcrumbs</div>
 			</umb-workspace-layout>

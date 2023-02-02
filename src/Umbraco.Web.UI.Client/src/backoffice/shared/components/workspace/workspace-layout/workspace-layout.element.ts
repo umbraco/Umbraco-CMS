@@ -16,9 +16,6 @@ import type {
 import '../../body-layout/body-layout.element';
 import '../../extension-slot/extension-slot.element';
 import { UmbLitElement } from '@umbraco-cms/element';
-import { ManifestEntityAction } from 'libs/extensions-registry/entity-action.models';
-
-import '../entity-action.element';
 
 /**
  * @element umb-workspace-layout
@@ -61,38 +58,8 @@ export class UmbWorkspaceLayout extends UmbLitElement {
 				display: flex;
 				gap: var(--uui-size-space-2);
 			}
-
-			#action-menu-popover {
-				display: block;
-			}
-			#action-menu-dropdown {
-				overflow: hidden;
-				z-index: -1;
-				background-color: var(--uui-combobox-popover-background-color, var(--uui-color-surface));
-				border: 1px solid var(--uui-color-border);
-				border-radius: var(--uui-border-radius);
-				width: 100%;
-				height: 100%;
-				box-sizing: border-box;
-				box-shadow: var(--uui-shadow-depth-3);
-				width: 500px;
-			}
 		`,
 	];
-
-	private _entityType = '';
-	@property({ type: String, attribute: 'entity-type' })
-	public get entityType() {
-		return this._entityType;
-	}
-	public set entityType(value) {
-		const oldValue = this._entityType;
-		this._entityType = value;
-		if (oldValue !== this._entityType) {
-			this.#observeEntityActions();
-			this.requestUpdate('entityType', oldValue);
-		}
-	}
 
 	@property()
 	public headline = '';
@@ -129,15 +96,6 @@ export class UmbWorkspaceLayout extends UmbLitElement {
 
 	@state()
 	private _activePath?: string;
-
-	@state()
-	private _entityActions?: Array<ManifestEntityAction>;
-
-	#observeEntityActions() {
-		this.observe(umbExtensionsRegistry.extensionsOfType('entityAction'), (actions) => {
-			this._entityActions = actions;
-		});
-	}
 
 	private _observeWorkspaceViews() {
 		this.observe(
@@ -188,7 +146,8 @@ export class UmbWorkspaceLayout extends UmbLitElement {
 		return html`
 			<umb-body-layout .headline=${this.headline}>
 				<slot name="header" slot="header"></slot>
-				${this.#renderTabs()} ${this.#renderActionsMenu()}
+				${this.#renderTabs()}
+				<slot name="action-menu" slot="action-menu"></slot>
 
 				<umb-router-slot
 					.routes="${this._routes}"
@@ -233,32 +192,6 @@ export class UmbWorkspaceLayout extends UmbLitElement {
 				  `
 				: nothing}
 		`;
-	}
-
-	@state()
-	private _actionMenuIsOpen = false;
-
-	#close() {
-		this._actionMenuIsOpen = false;
-	}
-
-	#open() {
-		this._actionMenuIsOpen = true;
-	}
-
-	#renderActionsMenu() {
-		return html`
-			<div slot="action-menu">
-			<uui-popover  id="action-menu-popover" .open=${this._actionMenuIsOpen} @close=${this.#close}>
-				<uui-button slot="trigger" label="Actions" @click=${this.#open}></uui-button>
-				<div id="action-menu-dropdown" slot="popover">
-					<uui-scroll-container>
-						${this._entityActions?.map((manifest) => html`<umb-entity-action .manifest=${manifest}></umb-entity-action>`)}
-					</uui-scroll-container>
-				</div>
-			</uui-popover>
-			</div>
-		</div>`;
 	}
 }
 

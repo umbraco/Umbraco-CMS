@@ -12,7 +12,7 @@ export class TrashDocumentEntityAction {
 	constructor(host: UmbControllerHostInterface, key: string) {
 		this.#host = host;
 		this.#key = key;
-		this.#documentRepository = new UmbDocumentRepository(this.#host);
+		this.#documentRepository = new UmbDocumentRepository(this.#host); // TODO: make repository injectable
 
 		new UmbContextConsumerController(this.#host, UMB_MODAL_SERVICE_CONTEXT_TOKEN, (instance) => {
 			this.#modalService = instance;

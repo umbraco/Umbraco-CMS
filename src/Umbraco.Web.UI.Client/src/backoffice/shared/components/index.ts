@@ -14,3 +14,4 @@ import './section/section-sidebar/section-sidebar.element';
 import './section/section.element';
 import './tree/tree.element';
 import './workspace/workspace-content/workspace-content.element';
+import './workspace/workspace-action-menu/workspace-action-menu.element';
