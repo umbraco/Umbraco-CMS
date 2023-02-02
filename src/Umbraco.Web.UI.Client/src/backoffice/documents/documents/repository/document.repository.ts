@@ -1,6 +1,6 @@
+import type { RepositoryTreeDataSource } from '../../../../../libs/repository/repository-tree-data-source.interface';
 import { DocumentTreeServerDataSource } from './sources/document.tree.server.data';
 import { UmbDocumentTreeStore, UMB_DOCUMENT_TREE_STORE_CONTEXT_TOKEN } from './document.tree.store';
-import type { RepositoryTreeDataSource } from '../../../../../libs/repository/repository-tree-data-source.interface';
 import { UmbDocumentDetailStore, UMB_DOCUMENT_DETAIL_STORE_CONTEXT_TOKEN } from './document.detail.store';
 import { UmbDocumentDetailServerDataSource } from './sources/document.detail.server.data';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
@@ -154,7 +154,7 @@ export class UmbDocumentRepository implements UmbTreeRepository, UmbDetailReposi
 		const { error } = await this.#detailDataSource.insert(template);
 
 		if (!error) {
-			const notification = { data: { message: `Template created` } };
+			const notification = { data: { message: `Document created` } };
 			this.#notificationService?.peek('positive', notification);
 		}
 
@@ -176,7 +176,7 @@ export class UmbDocumentRepository implements UmbTreeRepository, UmbDetailReposi
 		const { error } = await this.#detailDataSource.update(template);
 
 		if (!error) {
-			const notification = { data: { message: `Template saved` } };
+			const notification = { data: { message: `Document saved` } };
 			this.#notificationService?.peek('positive', notification);
 		}
 
@@ -199,7 +199,7 @@ export class UmbDocumentRepository implements UmbTreeRepository, UmbDetailReposi
 			throw new Error('Document key is missing');
 		}
 
-		const { error } = await this.#detailDataSource.delete(key);
+		const { error } = await this.#detailDataSource.trash(key);
 
 		if (!error) {
 			const notification = { data: { message: `Document deleted` } };
