@@ -16,6 +16,9 @@ import type {
 import '../../body-layout/body-layout.element';
 import '../../extension-slot/extension-slot.element';
 import { UmbLitElement } from '@umbraco-cms/element';
+import { ManifestEntityAction } from 'libs/extensions-registry/entity-action.models';
+
+import '../entity-action.element';
 
 /**
  * @element umb-workspace-layout
@@ -61,6 +64,20 @@ export class UmbWorkspaceLayout extends UmbLitElement {
 		`,
 	];
 
+	private _entityType = '';
+	@property({ type: String, attribute: 'entity-type' })
+	public get entityType() {
+		return this._entityType;
+	}
+	public set entityType(value) {
+		const oldValue = this._entityType;
+		this._entityType = value;
+		if (oldValue !== this._entityType) {
+			this.#observeEntityActions();
+			this.requestUpdate('entityType', oldValue);
+		}
+	}
+
 	@property()
 	public headline = '';
 
@@ -96,6 +113,15 @@ export class UmbWorkspaceLayout extends UmbLitElement {
 
 	@state()
 	private _activePath?: string;
+
+	@state()
+	private _entityActions?: Array<ManifestEntityAction>;
+
+	#observeEntityActions() {
+		this.observe(umbExtensionsRegistry.extensionsOfType('entityAction'), (actions) => {
+			this._entityActions = actions;
+		});
+	}
 
 	private _observeWorkspaceViews() {
 		this.observe(
@@ -142,7 +168,34 @@ export class UmbWorkspaceLayout extends UmbLitElement {
 		}
 	}
 
-	private _renderTabs() {
+	render() {
+		return html`
+			<umb-body-layout .headline=${this.headline}>
+				<slot name="header" slot="header"></slot>
+				${this.#renderTabs()} ${this.#renderActionsMenu()}
+
+				<umb-router-slot
+					.routes="${this._routes}"
+					@init=${(event: UmbRouterSlotInitEvent) => {
+						this._routerPath = event.target.absoluteRouterPath;
+					}}
+					@change=${(event: UmbRouterSlotChangeEvent) => {
+						this._activePath = event.target.localActiveViewPath;
+					}}></umb-router-slot>
+				<slot></slot>
+
+				<slot name="footer" slot="footer"></slot>
+				<umb-extension-slot
+					slot="actions"
+					type="workspaceAction"
+					.filter=${(extension: ManifestWorkspaceAction) =>
+						extension.meta.workspaces.includes(this.alias)}></umb-extension-slot>
+				<slot name="actions" slot="actions"></slot>
+			</umb-body-layout>
+		`;
+	}
+
+	#renderTabs() {
 		return html`
 			${this._workspaceViews.length > 0
 				? html`
@@ -166,31 +219,10 @@ export class UmbWorkspaceLayout extends UmbLitElement {
 		`;
 	}
 
-	render() {
-		return html`
-			<umb-body-layout .headline=${this.headline}>
-				<slot name="header" slot="header"></slot>
-				${this._renderTabs()}
-
-				<umb-router-slot
-					.routes="${this._routes}"
-					@init=${(event: UmbRouterSlotInitEvent) => {
-						this._routerPath = event.target.absoluteRouterPath;
-					}}
-					@change=${(event: UmbRouterSlotChangeEvent) => {
-						this._activePath = event.target.localActiveViewPath;
-					}}></umb-router-slot>
-				<slot></slot>
-
-				<slot name="footer" slot="footer"></slot>
-				<umb-extension-slot
-					slot="actions"
-					type="workspaceAction"
-					.filter=${(extension: ManifestWorkspaceAction) =>
-						extension.meta.workspaces.includes(this.alias)}></umb-extension-slot>
-				<slot name="actions" slot="actions"></slot>
-			</umb-body-layout>
-		`;
+	#renderActionsMenu() {
+		return html`<div slot="actions-menu">
+			${this._entityActions?.map((manifest) => html`<umb-entity-action .manifest=${manifest}></umb-entity-action>`)}
+		</div>`;
 	}
 }
 

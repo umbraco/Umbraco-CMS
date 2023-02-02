@@ -29,7 +29,7 @@ export class UmbDocumentWorkspaceElement extends UmbLitElement implements UmbWor
 	}
 
 	render() {
-		return html`<umb-workspace-content alias="Umb.Workspace.Document"></umb-workspace-content>`;
+		return html`<umb-workspace-content entity-type="document" alias="Umb.Workspace.Document"></umb-workspace-content>`;
 	}
 }
 

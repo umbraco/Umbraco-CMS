@@ -15,7 +15,7 @@ import { UmbLitElement } from '@umbraco-cms/element';
  * TODO: IMPORTANT TODO: Get rid of the content workspace. Instead we aim to get separate components that can be composed by each workspace.
  * Example. Document Workspace would use a Variant-component(variant component would talk directly to the workspace-context)
  * As well breadcrumbs etc.
- * 
+ *
  */
 @customElement('umb-workspace-content')
 export class UmbWorkspaceContentElement extends UmbLitElement {
@@ -43,9 +43,12 @@ export class UmbWorkspaceContentElement extends UmbLitElement {
 	@property()
 	alias!: string;
 
+	@property({ type: String, attribute: 'entity-type' })
+	public entityType = '';
+
 	render() {
 		return html`
-			<umb-workspace-layout alias=${this.alias}>
+			<umb-workspace-layout entity-type=${this.entityType} alias=${this.alias}>
 				<div id="header" slot="header">
 					<umb-variant-selector></umb-variant-selector>
 				</div>
