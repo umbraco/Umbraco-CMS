@@ -7,6 +7,7 @@ import {
 	PagedEntityTreeItem,
 	ProblemDetails,
 } from '@umbraco-cms/backend-api';
+import { UmbTreeRepository } from 'libs/repositories/tree-repository.interface';
 import { Observable } from 'rxjs';
 
 // Extension Manifests
@@ -159,24 +160,6 @@ export interface DataSourceResponse<T = undefined> {
 }
 
 // TODO; figure out why we can't add UmbControllerHostInterface as host type
-export interface UmbTreeRepositoryFactory {
+export interface UmbRepositoryFactory {
 	new (host: any): UmbTreeRepository;
-}
-
-export interface UmbTreeRepository {
-	requestRootItems: () => Promise<{
-		data: PagedEntityTreeItem | undefined;
-		error: ProblemDetails | undefined;
-	}>;
-	requestChildrenOf: (parentKey: string | null) => Promise<{
-		data: PagedEntityTreeItem | undefined;
-		error: ProblemDetails | undefined;
-	}>;
-	requestItems: (keys: string[]) => Promise<{
-		data: Array<EntityTreeItem> | undefined;
-		error: ProblemDetails | undefined;
-	}>;
-	rootItems: () => Promise<Observable<EntityTreeItem[]>>;
-	childrenOf: (parentKey: string | null) => Promise<Observable<EntityTreeItem[]>>;
-	items: (keys: string[]) => Promise<Observable<EntityTreeItem[]>>;
 }
