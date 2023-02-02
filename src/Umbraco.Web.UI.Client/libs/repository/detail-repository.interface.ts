@@ -12,11 +12,11 @@ export interface UmbDetailRepository<DetailType> {
 		error?: ProblemDetails;
 	}>
 
-	create(data: DetailType): Promise<{
+	createDetail(data: DetailType): Promise<{
 		error?: ProblemDetails;
 	}>
 
-	save(data: DetailType): Promise<{
+	saveDetail(data: DetailType): Promise<{
 		error?: ProblemDetails;
 	}>
 

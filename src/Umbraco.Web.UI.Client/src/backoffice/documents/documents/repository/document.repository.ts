@@ -4,7 +4,7 @@ import type { DocumentTreeDataSource } from '../tree/data/sources/document.tree.
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 import { UmbContextConsumerController } from '@umbraco-cms/context-api';
 import { ProblemDetails } from '@umbraco-cms/backend-api';
-import type { UmbTreeRepository } from 'libs/repositories/tree-repository.interface';
+import type { UmbTreeRepository } from 'libs/repository/tree-repository.interface';
 
 // Move to documentation / JSdoc
 /* We need to create a new instance of the repository from within the element context. We want the notifications to be displayed in the right context. */
@@ -39,7 +39,7 @@ export class UmbDocumentRepository implements UmbTreeRepository {
 	// TODO: Move
 
 
-	async requestRootItems() {
+	async requestRootTreeItems() {
 		await this.#init;
 
 		const { data, error } = await this.#source.getRootItems();
@@ -51,7 +51,7 @@ export class UmbDocumentRepository implements UmbTreeRepository {
 		return { data, error };
 	}
 
-	async requestChildrenOf(parentKey: string | null) {
+	async requestTreeItemsOf(parentKey: string | null) {
 		await this.#init;
 
 		if (!parentKey) {
@@ -68,7 +68,7 @@ export class UmbDocumentRepository implements UmbTreeRepository {
 		return { data, error };
 	}
 
-	async requestItems(keys: Array<string>) {
+	async requestTreeItems(keys: Array<string>) {
 		await this.#init;
 
 		if (!keys) {
@@ -81,17 +81,17 @@ export class UmbDocumentRepository implements UmbTreeRepository {
 		return { data, error };
 	}
 
-	async rootItems() {
+	async rootTreeItems() {
 		await this.#init;
 		return this.#store!.rootItems;
 	}
 
-	async childrenOf(parentKey: string | null) {
+	async treeItemsOf(parentKey: string | null) {
 		await this.#init;
 		return this.#store!.childrenOf(parentKey);
 	}
 
-	async items(keys: Array<string>) {
+	async treeItems(keys: Array<string>) {
 		await this.#init;
 		return this.#store!.items(keys);
 	}

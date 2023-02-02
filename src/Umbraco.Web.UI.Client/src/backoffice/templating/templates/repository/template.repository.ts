@@ -1,13 +1,13 @@
 import { UmbTemplateDetailServerDataSource } from '../workspace/data/sources/template.detail.server.data';
 import { TemplateTreeServerDataSource } from '../tree/data/sources/template.tree.server.data';
 import { UmbTemplateDetailStore, UMB_TEMPLATE_DETAIL_STORE_CONTEXT_TOKEN } from '../workspace/data/template.detail.store';
-import { UmbTemplateTreeStore, UMB_TEMPLATE_TREE_STORE_CONTEXT_TOKEN } from './template.tree.store';
+import { UmbTemplateTreeStore, UMB_TEMPLATE_TREE_STORE_CONTEXT_TOKEN } from '../tree/data/template.tree.store';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 import { UmbNotificationService, UMB_NOTIFICATION_SERVICE_CONTEXT_TOKEN } from '@umbraco-cms/notification';
 import { UmbContextConsumerController } from '@umbraco-cms/context-api';
 import { ProblemDetails, Template } from '@umbraco-cms/backend-api';
-import { UmbDetailRepository } from 'libs/repositories/detail-repository.interface';
-import { UmbTreeRepository } from 'libs/repositories/tree-repository.interface';
+import { UmbDetailRepository } from 'libs/repository/detail-repository.interface';
+import { UmbTreeRepository } from 'libs/repository/tree-repository.interface';
 
 // Move to documentation / JSdoc
 /* We need to create a new instance of the repository from within the element context. We want the notifications to be displayed in the right context. */
@@ -55,7 +55,7 @@ export class UmbTemplateRepository implements UmbTreeRepository, UmbDetailReposi
 	// TREE:
 
 
-	async requestRootItems() {
+	async requestRootTreeItems() {
 		await this.#init;
 
 		const { data, error } = await this.#treeDataSource.getRootItems();
@@ -67,7 +67,7 @@ export class UmbTemplateRepository implements UmbTreeRepository, UmbDetailReposi
 		return { data, error };
 	}
 
-	async requestChildrenOf(parentKey: string | null) {
+	async requestTreeItemsOf(parentKey: string | null) {
 		await this.#init;
 
 		if (!parentKey) {
@@ -83,7 +83,7 @@ export class UmbTemplateRepository implements UmbTreeRepository, UmbDetailReposi
 		return { data, error };
 	}
 
-	async requestItems(keys: Array<string>) {
+	async requestTreeItems(keys: Array<string>) {
 		await this.#init;
 
 		if (!keys) {
@@ -95,17 +95,17 @@ export class UmbTemplateRepository implements UmbTreeRepository, UmbDetailReposi
 		return { data, error };
 	}
 
-	async rootItems() {
+	async rootTreeItems() {
 		await this.#init;
 		return this.#treeStore!.rootItems();
 	}
 
-	async childrenOf(parentKey: string | null) {
+	async treeItemsOf(parentKey: string | null) {
 		await this.#init;
 		return this.#treeStore!.childrenOf(parentKey);
 	}
 
-	async items(keys: Array<string>) {
+	async treeItems(keys: Array<string>) {
 		await this.#init;
 		return this.#treeStore!.items(keys);
 	}
@@ -147,7 +147,12 @@ export class UmbTemplateRepository implements UmbTreeRepository, UmbDetailReposi
 		return { data, error };
 	}
 
-	async create(template: Template) {
+
+
+	// Could potentially be general methods:
+
+
+	async createDetail(template: Template) {
 		await this.#init;
 
 		if (!template || !template.key) {
@@ -169,7 +174,7 @@ export class UmbTemplateRepository implements UmbTreeRepository, UmbDetailReposi
 		return { error };
 	}
 
-	async save(template: Template) {
+	async saveDetail(template: Template) {
 		await this.#init;
 
 		if (!template || !template.key) {
@@ -192,6 +197,11 @@ export class UmbTemplateRepository implements UmbTreeRepository, UmbDetailReposi
 
 		return { error };
 	}
+
+
+
+
+	// General:
 
 	async delete(key: string) {
 		await this.#init;

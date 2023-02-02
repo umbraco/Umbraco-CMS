@@ -2,19 +2,21 @@ import type { Observable } from "rxjs";
 import { EntityTreeItem, PagedEntityTreeItem, ProblemDetails } from "@umbraco-cms/backend-api";
 
 export interface UmbTreeRepository {
-	requestRootItems: () => Promise<{
+
+	requestRootTreeItems: () => Promise<{
 		data: PagedEntityTreeItem | undefined;
 		error: ProblemDetails | undefined;
 	}>;
-	requestChildrenOf: (parentKey: string | null) => Promise<{
+	requestTreeItemsOf: (parentKey: string | null) => Promise<{
 		data: PagedEntityTreeItem | undefined;
 		error: ProblemDetails | undefined;
 	}>;
-	requestItems: (keys: string[]) => Promise<{
+	requestTreeItems: (keys: string[]) => Promise<{
 		data: Array<EntityTreeItem> | undefined;
 		error: ProblemDetails | undefined;
 	}>;
-	rootItems: () => Promise<Observable<EntityTreeItem[]>>;
-	childrenOf: (parentKey: string | null) => Promise<Observable<EntityTreeItem[]>>;
-	items: (keys: string[]) => Promise<Observable<EntityTreeItem[]>>;
+
+	rootTreeItems: () => Promise<Observable<EntityTreeItem[]>>;
+	treeItemsOf: (parentKey: string | null) => Promise<Observable<EntityTreeItem[]>>;
+	treeItems: (keys: string[]) => Promise<Observable<EntityTreeItem[]>>;
 }

@@ -7,7 +7,7 @@ import {
 	PagedEntityTreeItem,
 	ProblemDetails,
 } from '@umbraco-cms/backend-api';
-import { UmbTreeRepository } from 'libs/repositories/tree-repository.interface';
+import { UmbTreeRepository } from 'libs/repository/tree-repository.interface';
 import { Observable } from 'rxjs';
 
 // Extension Manifests
