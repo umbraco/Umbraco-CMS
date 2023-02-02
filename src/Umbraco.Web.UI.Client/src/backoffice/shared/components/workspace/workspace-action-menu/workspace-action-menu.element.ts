@@ -28,6 +28,9 @@ export class UmbWorkspaceActionMenuElement extends UmbLitElement {
 		`,
 	];
 
+	@property({ type: String })
+	public unique?: string;
+
 	private _entityType = '';
 	@property({ type: String, attribute: 'entity-type' })
 	public get entityType() {
@@ -73,7 +76,9 @@ export class UmbWorkspaceActionMenuElement extends UmbLitElement {
 				<uui-button slot="trigger" label="Actions" @click=${this.#open}></uui-button>
 				<div id="action-menu-dropdown" slot="popover">
 					<uui-scroll-container>
-						${this._entityActions?.map((manifest) => html`<umb-entity-action .manifest=${manifest}></umb-entity-action>`)}
+						${this._entityActions?.map(
+							(manifest) => html`<umb-entity-action .unique=${this.unique} .manifest=${manifest}></umb-entity-action>`
+						)}
 					</uui-scroll-container>
 				</div>
 			</uui-popover>

@@ -6,9 +6,24 @@ import { ManifestEntityAction } from 'libs/extensions-registry/entity-action.mod
 
 @customElement('umb-entity-action')
 class UmbEntityActionElement extends UmbLitElement {
+	private _unique?: string;
+	@property({ type: String })
+	public get unique() {
+		return this._unique;
+	}
+	public set unique(value: string | undefined) {
+		if (!value) return;
+		const oldValue = this._unique;
+		this._unique = value;
+		if (oldValue !== this._unique) {
+			this.#createApi();
+			this.requestUpdate('unique', oldValue);
+		}
+	}
+
 	private _manifest?: ManifestEntityAction;
 	@property({ type: Object, attribute: false })
-	public get entityType() {
+	public get manifest() {
 		return this._manifest;
 	}
 	public set manifest(value: ManifestEntityAction | undefined) {
@@ -16,9 +31,14 @@ class UmbEntityActionElement extends UmbLitElement {
 		const oldValue = this._manifest;
 		this._manifest = value;
 		if (oldValue !== this._manifest) {
-			this.#api = new this._manifest.meta.api(this);
+			this.#createApi();
 			this.requestUpdate('manifest', oldValue);
 		}
+	}
+
+	#createApi() {
+		if (!this._manifest?.meta.api) return;
+		this.#api = new this._manifest.meta.api(this, this.unique);
 	}
 
 	#api: any;
