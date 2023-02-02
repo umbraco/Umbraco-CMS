@@ -6,8 +6,6 @@ import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 
 // TODO: should this contex be called DocumentDraft instead of workspace? or should the draft be part of this?
 export class UmbDocumentWorkspaceContext extends UmbWorkspaceContext {
-
-
 	#host: UmbControllerHostInterface;
 	#templateDetailRepo: UmbDocumentRepository;
 
@@ -21,6 +19,9 @@ export class UmbDocumentWorkspaceContext extends UmbWorkspaceContext {
 		this.#templateDetailRepo = new UmbDocumentRepository(this.#host);
 	}
 
+	getData() {
+		return this.#data.getValue();
+	}
 
 	setName(name: string) {
 		this.#data.update({ name });
@@ -54,19 +55,16 @@ export class UmbDocumentWorkspaceContext extends UmbWorkspaceContext {
 
 	 */
 
-
 	setPropertyValue(alias: string, value: unknown) {
-
-		const entry = {alias: alias, value: value};
+		const entry = { alias: alias, value: value };
 
 		const currentData = this.#data.value;
 		if (currentData) {
-			const newDataSet = appendToFrozenArray(currentData.data, entry, x => x.alias);
+			const newDataSet = appendToFrozenArray(currentData.data, entry, (x) => x.alias);
 
-			this.#data.update({data: newDataSet});
+			this.#data.update({ data: newDataSet });
 		}
 	}
-
 
 	async load(entityKey: string) {
 		const { data } = await this.#templateDetailRepo.requestDetails(entityKey);
@@ -83,14 +81,14 @@ export class UmbDocumentWorkspaceContext extends UmbWorkspaceContext {
 
 	async save(isNew: boolean) {
 		if (!this.#data.value) return;
-		isNew ? this.#templateDetailRepo.createDetail(this.#data.value) : this.#templateDetailRepo.saveDetail(this.#data.value);
+		isNew
+			? this.#templateDetailRepo.createDetail(this.#data.value)
+			: this.#templateDetailRepo.saveDetail(this.#data.value);
 	}
 
 	async delete(key: string) {
 		await this.#templateDetailRepo.delete(key);
 	}
-
-
 
 	/*
 	concept notes:
@@ -103,5 +101,4 @@ export class UmbDocumentWorkspaceContext extends UmbWorkspaceContext {
 
 	}
 	*/
-
 }

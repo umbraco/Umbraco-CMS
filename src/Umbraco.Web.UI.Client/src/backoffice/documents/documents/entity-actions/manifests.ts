@@ -1,6 +1,7 @@
-import { CreateDocumentEntityAction } from './document-create.entity-action';
-import { TrashDocumentEntityAction } from './document-trash.entity-action';
-import { PublishDocumentEntityAction } from './document-publish.entity-action';
+import { CreateDocumentEntityAction } from './create-document.entity-action';
+import { TrashDocumentEntityAction } from './trash-document.entity-action';
+import { PublishDocumentEntityAction } from './publish-document.entity-action';
+import { SaveDocumentEntityAction } from './save-document.entity-action';
 import { ManifestEntityAction } from 'libs/extensions-registry/entity-action.models';
 
 const entityActions: Array<ManifestEntityAction> = [
@@ -35,6 +36,17 @@ const entityActions: Array<ManifestEntityAction> = [
 			icon: 'umb:document',
 			label: 'Publish',
 			api: PublishDocumentEntityAction,
+		},
+	},
+	{
+		type: 'entityAction',
+		alias: 'Umb.EntityAction.Document.Save',
+		name: 'Save Document Entity Action ',
+		meta: {
+			entityType: 'document',
+			icon: 'umb:document',
+			label: 'Save',
+			api: SaveDocumentEntityAction,
 		},
 	},
 ];
