@@ -128,6 +128,7 @@ export class UmbDocumentDetailServerDataSource implements RepositoryDetailDataSo
 	 * @return {*}
 	 * @memberof UmbDocumentDetailServerDataSource
 	 */
+	// TODO: Error mistake in this:
 	async update(document: DocumentDetails) {
 		if (!document.key) {
 			const error: ProblemDetails = { title: 'Document key is missing' };
@@ -140,8 +141,8 @@ export class UmbDocumentDetailServerDataSource implements RepositoryDetailDataSo
 		try {
 			body = JSON.stringify(document);
 		} catch (error) {
-			console.error(error);
-			return Promise.reject();
+			const myError: ProblemDetails = { title: 'JSON could not parse' };
+			return { error: myError };
 		}
 
 		return tryExecuteAndNotify(this.#host,
@@ -163,6 +164,7 @@ export class UmbDocumentDetailServerDataSource implements RepositoryDetailDataSo
 	 * @return {*}
 	 * @memberof UmbTemplateDetailServerDataSource
 	 */
+	// TODO: Error mistake in this:
 	async delete(key: string) {
 		if (!key) {
 			const error: ProblemDetails = { title: 'Key is missing' };
