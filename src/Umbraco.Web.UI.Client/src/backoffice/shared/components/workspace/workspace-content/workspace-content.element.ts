@@ -11,8 +11,6 @@ import './views/edit/workspace-view-content-edit.element';
 import './views/info/workspace-view-content-info.element';
 import { UmbLitElement } from '@umbraco-cms/element';
 
-import '../entity-action.element';
-
 /**
  * TODO: IMPORTANT TODO: Get rid of the content workspace. Instead we aim to get separate components that can be composed by each workspace.
  * Example. Document Workspace would use a Variant-component(variant component would talk directly to the workspace-context)
