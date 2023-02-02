@@ -19,6 +19,7 @@ import type { ManifestCollectionView } from './collection-view.models';
 import type { ManifestHealthCheck } from './health-check.models';
 import type { ManifestSidebarMenuItem } from './sidebar-menu-item.models';
 import type { ManifestTheme } from './theme.models';
+import type { ManifestEntityAction } from './entity-action.models';
 
 export * from './header-app.models';
 export * from './section.models';
@@ -66,7 +67,8 @@ export type ManifestTypes =
 	| ManifestCollectionView
 	| ManifestHealthCheck
 	| ManifestSidebarMenuItem
-	| ManifestTheme;
+	| ManifestTheme
+	| ManifestEntityAction;
 
 export type ManifestStandardTypes = ManifestTypes['type'];
 
@@ -102,7 +104,6 @@ export interface MetaManifestWithView {
 	label: string;
 	icon: string;
 }
-
 
 export interface ManifestElementWithElementName extends ManifestElement {
 	elementName: string;
