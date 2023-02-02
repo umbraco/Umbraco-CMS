@@ -83,6 +83,15 @@ public class SmtpSettings : ValidatableEntryBase
     public string? PickupDirectoryLocation { get; set; }
 
     /// <summary>
+    ///     Gets or sets a value indicating whether connecting via SSL/TLS should check certificate revocation.
+    /// </summary>
+    /// <remarks>
+    ///     Normally, the value of this property should be set to true (the default) for
+    ///     security reasons, but there are times when it may be necessary to set it to false.
+    /// </remarks>
+    public bool CheckCertificateRevocation { get; set; } = true;
+
+    /// <summary>
     ///     Gets or sets a value for the SMTP delivery method.
     /// </summary>
     [DefaultValue(StaticDeliveryMethod)]

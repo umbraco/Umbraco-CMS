@@ -148,6 +148,8 @@ public class EmailSender : IEmailSender
 
         using var client = new SmtpClient();
 
+        client.CheckCertificateRevocation = _globalSettings.Smtp?.CheckCertificateRevocation ?? true;
+
         await client.ConnectAsync(
             _globalSettings.Smtp!.Host,
             _globalSettings.Smtp.Port,
