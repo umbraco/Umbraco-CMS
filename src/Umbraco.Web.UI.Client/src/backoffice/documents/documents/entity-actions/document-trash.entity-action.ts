@@ -1,5 +1,4 @@
-import { UmbTemplateTreeRepository } from '../../../templating/templates/tree/data/template.tree.repository';
-import { UmbTemplateDetailRepository } from '../../../templating/templates/workspace/data/template.detail.repository';
+import { UmbDocumentRepository } from '../repository/document.repository';
 import { UmbContextConsumerController } from '@umbraco-cms/context-api';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 import { UmbModalService, UMB_MODAL_SERVICE_CONTEXT_TOKEN } from '@umbraco-cms/modal';
@@ -8,14 +7,12 @@ export class TrashDocumentEntityAction {
 	#host: UmbControllerHostInterface;
 	#key: string;
 	#modalService?: UmbModalService;
-	#documentDetailRepo: UmbTemplateDetailRepository;
-	#documentTreeRepo: UmbTemplateTreeRepository;
+	#documentRepository: UmbDocumentRepository;
 
 	constructor(host: UmbControllerHostInterface, key: string) {
 		this.#host = host;
 		this.#key = key;
-		this.#documentTreeRepo = new UmbTemplateTreeRepository(this.#host); // TODO: change to document repo
-		this.#documentDetailRepo = new UmbTemplateDetailRepository(this.#host); // TODO: change to document repo
+		this.#documentRepository = new UmbDocumentRepository(this.#host);
 
 		new UmbContextConsumerController(this.#host, UMB_MODAL_SERVICE_CONTEXT_TOKEN, (instance) => {
 			this.#modalService = instance;
@@ -23,7 +20,7 @@ export class TrashDocumentEntityAction {
 	}
 
 	async execute() {
-		const { data } = await this.#documentTreeRepo.requestItems([this.#key]);
+		const { data } = await this.#documentRepository.requestTreeItems([this.#key]);
 
 		if (data) {
 			const item = data[0];
@@ -37,7 +34,7 @@ export class TrashDocumentEntityAction {
 
 			modalHandler?.onClose().then(({ confirmed }) => {
 				if (confirmed) {
-					this.#documentDetailRepo.delete(this.#key);
+					this.#documentRepository.delete(this.#key);
 				}
 			});
 		}
