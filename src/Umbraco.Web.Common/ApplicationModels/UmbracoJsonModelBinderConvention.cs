@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.Extensions.DependencyInjection;
-using Umbraco.Cms.Web.Common.DependencyInjection;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Web.Common.ModelBinders;
 
 namespace Umbraco.Cms.Web.Common.ApplicationModels;

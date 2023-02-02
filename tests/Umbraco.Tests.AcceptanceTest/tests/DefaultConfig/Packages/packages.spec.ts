@@ -7,10 +7,8 @@ test.describe('Packages', () => {
   const packageName = "TestPackage";
   const rootDocTypeName = "Test document type";
   const nodeName = "1) Home";
-  test.beforeEach(async ({page, umbracoApi}) => {
-    // TODO: REMOVE THIS WHEN SQLITE IS FIXED
-    // Wait so we don't bombard the API
-    await page.waitForTimeout(1000);
+  test.beforeEach(async ({ page, umbracoApi }, testInfo) => {
+    await umbracoApi.report.report(testInfo);
     await umbracoApi.login();
   });
 
@@ -39,8 +37,8 @@ test.describe('Packages', () => {
       .withContentTypeAlias(rootDocTypeAlias)
       .withAction("saveNew")
       .addVariant()
-      .withName(nodeName)
-      .withSave(true)
+        .withName(nodeName)
+        .withSave(true)
       .done()
       .build();
     const generatedContent = await umbracoApi.content.save(rootContentNode);
@@ -118,8 +116,12 @@ test.describe('Packages', () => {
     // Navigate to create package section
     await umbracoUi.goToSection(ConstantHelper.sections.packages);
     await page.locator('[data-element="sub-view-umbCreatedPackages"]').click()
-    await umbracoUi.clickElement(umbracoUi.getButtonByLabelKey(ConstantHelper.buttons.delete));
-    await page.waitForTimeout(100);
+
+    // Selects the correct package
+    await page.locator('text=' + packageName + ' Delete >> button').click();
+
+    // Waits until the selector is visible
+    await expect(page.locator('[label-key="contentTypeEditor_yesDelete"]')).toBeVisible();
     await umbracoUi.clickElement(umbracoUi.getButtonByLabelKey('contentTypeEditor_yesDelete'));
 
     // Assert
@@ -128,7 +130,6 @@ test.describe('Packages', () => {
     // Cleanup
     await umbracoApi.content.deleteAllContent();
     await umbracoApi.documentTypes.ensureNameNotExists(rootDocTypeName);
-    await umbracoApi.packages.ensureNameNotExists(packageName);
   });
 
   test('Download package', async ({page, umbracoApi, umbracoUi}) => {

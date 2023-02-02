@@ -326,7 +326,7 @@ public class SqliteSyntaxProvider : SqlSyntaxProviderBase<SqliteSyntaxProvider>
     {
         IEnumerable<string> tables = GetTablesInSchema(db);
 
-        db.OpenSharedConnection();
+        db.BeginTransaction();
         foreach (var table in tables)
         {
             DbCommand? cmd = db.CreateCommand(db.Connection, CommandType.Text, $"PRAGMA table_info({table})");
@@ -341,6 +341,8 @@ public class SqliteSyntaxProvider : SqlSyntaxProviderBase<SqliteSyntaxProvider>
                 yield return new ColumnInfo(table, columnName, ordinal, notNull, type);
             }
         }
+
+        db.CompleteTransaction();
     }
 
     /// <inheritdoc />

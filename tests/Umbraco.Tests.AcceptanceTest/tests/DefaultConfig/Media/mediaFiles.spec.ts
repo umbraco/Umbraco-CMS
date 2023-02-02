@@ -1,12 +1,10 @@
-﻿import {expect} from "@playwright/test";
+import {expect} from "@playwright/test";
 import {ConstantHelper, test} from '@umbraco/playwright-testhelpers';
 
 test.describe('media File Types', () => {
 
-    test.beforeEach(async ({page, umbracoApi, umbracoUi}) => {
-        // TODO: REMOVE THIS WHEN SQLITE IS FIXED
-        // Wait so we don't bombard the API
-        await page.waitForTimeout(1000);
+    test.beforeEach(async ({page, umbracoApi, umbracoUi}, testInfo) => {
+        await umbracoApi.report.report(testInfo);
         await umbracoApi.login();
         await umbracoUi.goToSection(ConstantHelper.sections.media);
         await umbracoApi.media.deleteAllMedia();
@@ -149,7 +147,7 @@ test.describe('media File Types', () => {
             // Action
             await umbracoApi.media.createDefaultFolder(parentName);
             await umbracoUi.refreshMediaTree();
-            await umbracoUi.clickElement(umbracoUi.getTreeItem('media', [parentName]), {
+          await umbracoUi.clickElement(umbracoUi.getTreeItem(ConstantHelper.sections.media, [parentName]), {
                 button: "right",
                 force: true
             });
@@ -175,7 +173,7 @@ test.describe('media File Types', () => {
             // Action
             await umbracoApi.media.createDefaultFolder(parentName);
             await umbracoUi.refreshMediaTree();
-            await umbracoUi.clickElement(umbracoUi.getTreeItem('media', [parentName]), {
+          await umbracoUi.clickElement(umbracoUi.getTreeItem(ConstantHelper.sections.media, [parentName]), {
                 button: "right",
                 force: true
             });
@@ -202,7 +200,7 @@ test.describe('media File Types', () => {
             // Action
             await umbracoApi.media.createDefaultFolder(parentName);
             await umbracoUi.refreshMediaTree();
-            await umbracoUi.clickElement(umbracoUi.getTreeItem('media', [parentName]), {
+            await umbracoUi.clickElement(umbracoUi.getTreeItem(ConstantHelper.sections.media, [parentName]), {
                 button: "right",
                 force: true
             });
@@ -229,7 +227,7 @@ test.describe('media File Types', () => {
             await umbracoApi.media.createDefaultFolder(parentName);
             await umbracoUi.refreshMediaTree();
 
-            await umbracoUi.clickElement(umbracoUi.getTreeItem('media', [parentName]), {
+          await umbracoUi.clickElement(umbracoUi.getTreeItem(ConstantHelper.sections.media, [parentName]), {
                 button: "right",
                 force: true
             });
@@ -256,7 +254,7 @@ test.describe('media File Types', () => {
             // Action
             await umbracoApi.media.createDefaultFolder(parentName);
             await umbracoUi.refreshMediaTree();
-            await umbracoUi.clickElement(umbracoUi.getTreeItem('media', [parentName]), {
+          await umbracoUi.clickElement(umbracoUi.getTreeItem(ConstantHelper.sections.media, [parentName]), {
                 button: "right",
                 force: true
             });
@@ -283,7 +281,7 @@ test.describe('media File Types', () => {
             // Action
             await umbracoApi.media.createDefaultFolder(parentName);
             await umbracoUi.refreshMediaTree();
-            await umbracoUi.clickElement(umbracoUi.getTreeItem('media', [parentName]), {
+          await umbracoUi.clickElement(umbracoUi.getTreeItem(ConstantHelper.sections.media, [parentName]), {
                 button: "right",
                 force: true
             });
@@ -310,7 +308,7 @@ test.describe('media File Types', () => {
             // Action
             await umbracoApi.media.createDefaultFolder(parentName);
             await umbracoUi.refreshMediaTree();
-            await umbracoUi.clickElement(umbracoUi.getTreeItem('media', [parentName]), {
+          await umbracoUi.clickElement(umbracoUi.getTreeItem(ConstantHelper.sections.media, [parentName]), {
                 button: "right",
                 force: true
             });

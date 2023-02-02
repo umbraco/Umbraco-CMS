@@ -1,8 +1,8 @@
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Web;
-using Umbraco.Cms.Web.Common.DependencyInjection;
 
 namespace Umbraco.Extensions;
 

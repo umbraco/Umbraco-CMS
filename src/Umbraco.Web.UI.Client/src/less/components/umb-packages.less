@@ -423,6 +423,15 @@
     margin-bottom: 20px;
 }
 
+.umb-package-details__description a {
+    text-decoration: underline;
+}
+
+.umb-package-details__description a:hover,
+.umb-package-details__description a:focus {
+    text-decoration: none;
+}
+
 /* Links */
 
 .umb-package-details__link {
@@ -492,6 +501,12 @@
 .umb-gallery__thumbnail:hover {
     cursor: pointer;
     border-color: @ui-action-discreet-border-hover;
+}
+
+.umb-gallery__thumbnail:focus-visible,
+.umb-gallery__thumbnail:focus {
+  cursor: pointer;
+  border: 2px solid @ui-outline;
 }
 
 /* PACKAGE LIST */

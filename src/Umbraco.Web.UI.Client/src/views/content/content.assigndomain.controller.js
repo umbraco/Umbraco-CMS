@@ -1,11 +1,12 @@
 (function () {
     "use strict";
 
-    function AssignDomainController($scope, localizationService, languageResource, contentResource, navigationService, notificationsService) {
+    function AssignDomainController($scope, localizationService, languageResource, contentResource, navigationService, notificationsService, $location) {
         var vm = this;
         
         vm.closeDialog = closeDialog;
         vm.addDomain = addDomain;
+        vm.addCurrentDomain = addCurrentDomain;
         vm.removeDomain = removeDomain;
         vm.save = save;
         vm.languages = [];
@@ -80,6 +81,18 @@
                 name: '',
                 lang: vm.defaultLanguage
             });
+        }
+
+        function addCurrentDomain() {
+          var domainToAdd = $location.host();
+          var port = $location.port();
+          if (port != 80 && port != 443) {
+            domainToAdd += ":" + port;
+          }
+          vm.domains.push({
+            name: domainToAdd,
+            lang: vm.defaultLanguage
+          });
         }
 
         function removeDomain(index) {

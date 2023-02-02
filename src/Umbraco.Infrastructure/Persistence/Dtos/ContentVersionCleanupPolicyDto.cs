@@ -13,7 +13,8 @@ internal class ContentVersionCleanupPolicyDto
     public const string TableName = Constants.DatabaseSchema.Tables.ContentVersionCleanupPolicy;
 
     [Column("contentTypeId")]
-    [ForeignKey(typeof(ContentTypeDto), Column = "nodeId", OnDelete = Rule.Cascade)]
+    [PrimaryKeyColumn(AutoIncrement = false)]
+    [ForeignKey(typeof(ContentTypeDto), Column = "nodeId")]
     public int ContentTypeId { get; set; }
 
     [Column("preventCleanup")]

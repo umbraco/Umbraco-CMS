@@ -7,7 +7,7 @@ public class ModelsBuilderDashboard : IDashboard
 {
     public string Alias => "settingsModelsBuilder";
 
-    public string[] Sections => new[] { "settings" };
+    public string[] Sections => new[] {Constants.Applications.Settings };
 
     public string View => "views/dashboard/settings/modelsbuildermanagement.html";
 

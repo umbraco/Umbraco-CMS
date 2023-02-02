@@ -132,6 +132,7 @@
 
 
 
+
                     <div class="umb-group-panel">
 
                         <div class="umb-group-panel__header">
@@ -210,7 +211,7 @@
                                 <div class="umb-el-wrap">
                                     <label class="control-label" for="label"><localize key="blockEditor_areasConfigurations">Area configurations</localize></label>
                                     <umb-property-info-button button-title-key="general_readMore">
-                                        <localize key="blockEditor_areasConfigurationsHelp">To enable nesting of blocks within this block, define one or more areas for blocks to be nested within. Areas follow their own layout witch is defined by the Area Layout Columns. Each Areas column and row span can be adjusted by using the scale-handler in the bottom right.</localize>
+                                      <localize key="blockEditor_areasConfigurationsHelp">To enable the nesting of blocks within this block, define one or more areas. Areas follow the layout defined by their own grid column configuration. The 'column span' and 'row span' for each area can be adjusted by using the scale-handler box in the bottom right hand corner of the selected area.</localize>
                                     </umb-property-info-button>
                                     <div class="controls">
                                         <umb-block-grid-area-editor model="vm.block.areas" block="vm.block" grid-columns="model.gridColumns" all-block-types="model.allBlockTypes" all-block-groups="model.allBlockGroups" loaded-element-types="model.loadedElementTypes"></umb-block-grid-area-editor>

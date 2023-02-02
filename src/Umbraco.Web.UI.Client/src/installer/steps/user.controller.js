@@ -68,7 +68,6 @@ angular.module("umbraco.install").controller("Umbraco.Install.UserController", f
       });
 
       pips.forEach(function (pip) {
-
         pip.addEventListener('click', function () {
           const value = pip.getAttribute('data-value');
           consentSlider.noUiSlider.set(value);
@@ -82,13 +81,14 @@ angular.module("umbraco.install").controller("Umbraco.Install.UserController", f
   };
 
   $scope.validateAndForward = function () {
-    if (this.myForm.$valid) {
+    if (this.installerForm.$valid) {
       installerService.forward();
     }
   };
 
   function onChangeConsent(values) {
-    const result = Number(values[0]) - 1;
+    const result = Math.round(Number(values[0]) - 1);
+
     $scope.$apply(() => {
       setTelemetryLevelAndDescription(result);
     });
