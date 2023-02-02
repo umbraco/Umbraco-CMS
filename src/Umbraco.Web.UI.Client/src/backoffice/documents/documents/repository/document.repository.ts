@@ -11,7 +11,6 @@ import { UmbDetailRepository } from '@umbraco-cms/repository';
 import type { DocumentDetails } from '@umbraco-cms/models';
 import { UmbNotificationService, UMB_NOTIFICATION_SERVICE_CONTEXT_TOKEN } from '@umbraco-cms/notification';
 
-
 type ItemDetailType = DocumentDetails;
 
 // Move to documentation / JSdoc
@@ -19,7 +18,6 @@ type ItemDetailType = DocumentDetails;
 // element -> context -> repository -> (store) -> data source
 // All methods should be async and return a promise. Some methods might return an observable as part of the promise response.
 export class UmbDocumentRepository implements UmbTreeRepository, UmbDetailRepository<ItemDetailType> {
-
 	#init!: Promise<unknown>;
 
 	#host: UmbControllerHostInterface;
@@ -31,7 +29,6 @@ export class UmbDocumentRepository implements UmbTreeRepository, UmbDetailReposi
 	#detailStore?: UmbDocumentDetailStore;
 
 	#notificationService?: UmbNotificationService;
-
 
 	constructor(host: UmbControllerHostInterface) {
 		this.#host = host;
@@ -55,11 +52,8 @@ export class UmbDocumentRepository implements UmbTreeRepository, UmbDetailReposi
 		]);
 	}
 
-
-
 	// TODO: Trash
 	// TODO: Move
-
 
 	async requestRootTreeItems() {
 		await this.#init;
@@ -118,14 +112,6 @@ export class UmbDocumentRepository implements UmbTreeRepository, UmbDetailReposi
 		return this.#treeStore!.items(keys);
 	}
 
-
-
-
-
-
-
-
-
 	// DETAILS:
 
 	async createDetailsScaffold(parentKey: string | null) {
@@ -156,10 +142,7 @@ export class UmbDocumentRepository implements UmbTreeRepository, UmbDetailReposi
 		return { data, error };
 	}
 
-
-
 	// Could potentially be general methods:
-
 
 	async createDetail(template: ItemDetailType) {
 		await this.#init;
@@ -207,9 +190,6 @@ export class UmbDocumentRepository implements UmbTreeRepository, UmbDetailReposi
 		return { error };
 	}
 
-
-
-
 	// General:
 
 	async delete(key: string) {
@@ -235,5 +215,4 @@ export class UmbDocumentRepository implements UmbTreeRepository, UmbDetailReposi
 
 		return { error };
 	}
-
 }
