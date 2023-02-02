@@ -17,7 +17,6 @@ public class DocumentMapDefinition : ContentMapDefinition<IContent, DocumentProp
     public void DefineMaps(IUmbracoMapper mapper)
         => mapper.Define<IContent, DocumentViewModel>((_, _) => new DocumentViewModel(), Map);
 
-    // TODO: handle unpublished, non-variant content
     // Umbraco.Code.MapAll
     private void Map(IContent source, DocumentViewModel target, MapperContext context)
     {

@@ -48,7 +48,7 @@ public abstract class ContentMapDefinition<TContent, TPropertyViewModel, TVarian
     {
         IPropertyValue[] propertyValues = source.Properties.SelectMany(propertyCollection => propertyCollection.Values).ToArray();
         var cultures = source.AvailableCultures.DefaultIfEmpty(null).ToArray();
-        var segments = propertyValues.Select(property => property.Segment).Distinct().ToArray();
+        var segments = propertyValues.Select(property => property.Segment).Distinct().DefaultIfEmpty(null).ToArray();
 
         return cultures
             .SelectMany(culture => segments.Select(segment =>
