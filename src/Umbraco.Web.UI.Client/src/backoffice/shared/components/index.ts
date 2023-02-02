@@ -15,3 +15,6 @@ import './section/section.element';
 import './tree/tree.element';
 import './workspace/workspace-content/workspace-content.element';
 import './workspace/workspace-action-menu/workspace-action-menu.element';
+
+import './entity-action/entity-action.element';
+import './entity-action/entity-action-list.element';
