@@ -2,20 +2,16 @@ import { UmbDocumentRepository } from '../repository/document.repository';
 import { UmbDocumentWorkspaceContext } from '../workspace/document-workspace.context';
 import { UmbContextConsumerController } from '@umbraco-cms/context-api';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
+import { UmbEntityActionBase } from 'src/backoffice/shared/components/entity-action';
 
-export class UmbSaveDocumentEntityAction {
-	#host: UmbControllerHostInterface;
-	#key: string;
-	#documentRepository: UmbDocumentRepository;
+export class UmbSaveDocumentEntityAction extends UmbEntityActionBase<UmbDocumentRepository> {
 	#workspaceContext?: UmbDocumentWorkspaceContext;
 
-	constructor(host: UmbControllerHostInterface, key: string) {
-		this.#host = host;
-		this.#key = key;
-		this.#documentRepository = new UmbDocumentRepository(this.#host); // TODO: make repository injectable
+	constructor(host: UmbControllerHostInterface, unique: string) {
+		super(host, UmbDocumentRepository, unique);
 
 		// TODO: add context token for workspace
-		new UmbContextConsumerController(this.#host, 'umbWorkspaceContext', (instance: UmbDocumentWorkspaceContext) => {
+		new UmbContextConsumerController(this.host, 'umbWorkspaceContext', (instance: UmbDocumentWorkspaceContext) => {
 			this.#workspaceContext = instance;
 		});
 	}
@@ -29,6 +25,6 @@ export class UmbSaveDocumentEntityAction {
 		const document = this.#workspaceContext.getData();
 		// TODO: handle errors
 		if (!document) return;
-		this.#documentRepository.saveDetail(document);
+		this.repository.saveDetail(document);
 	}
 }

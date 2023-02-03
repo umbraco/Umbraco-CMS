@@ -8,5 +8,5 @@ export interface ManifestTree extends ManifestBase {
 
 export interface MetaTree {
 	storeAlias?: string;
-	repository?: UmbRepositoryFactory;
+	repository?: UmbRepositoryFactory<any>;
 }

@@ -1,15 +1,13 @@
+import { UmbDocumentRepository } from '../repository/document.repository';
+import { UmbEntityActionBase } from '../../../shared/components/entity-action';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 
-export class UmbSaveAndPreviewDocumentEntityAction {
-	#host: UmbControllerHostInterface;
-	#key: string;
-
-	constructor(host: UmbControllerHostInterface, key: string) {
-		this.#host = host;
-		this.#key = key;
+export class UmbSaveAndPreviewDocumentEntityAction extends UmbEntityActionBase<UmbDocumentRepository> {
+	constructor(host: UmbControllerHostInterface, unique: string) {
+		super(host, UmbDocumentRepository, unique);
 	}
 
-	execute() {
-		alert('save and preview');
+	async execute() {
+		await this.repository.saveAndPreview();
 	}
 }

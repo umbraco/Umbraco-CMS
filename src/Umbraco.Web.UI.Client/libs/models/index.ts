@@ -7,6 +7,7 @@ import {
 	PagedEntityTreeItem,
 	ProblemDetails,
 } from '@umbraco-cms/backend-api';
+import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 import { UmbTreeRepository } from 'libs/repository/tree-repository.interface';
 import { Observable } from 'rxjs';
 
@@ -158,8 +159,6 @@ export interface DataSourceResponse<T = undefined> {
 	data?: T;
 	error?: ProblemDetails;
 }
-
-// TODO; figure out why we can't add UmbControllerHostInterface as host type
-export interface UmbRepositoryFactory {
-	new (host: any): UmbTreeRepository;
+export interface UmbRepositoryFactory<T> {
+	new (host: UmbControllerHostInterface): T;
 }
