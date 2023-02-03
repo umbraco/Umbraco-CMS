@@ -3,6 +3,9 @@ import { UmbTreeStore } from '@umbraco-cms/store';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 import { UmbContextToken, UmbContextConsumerController } from '@umbraco-cms/context-api';
 import { ArrayState, UmbObserverController } from '@umbraco-cms/observable-api';
+import { umbExtensionsRegistry } from '@umbraco-cms/extensions-api';
+import { createExtensionClass } from 'libs/extensions-api/create-extension-class.function';
+import { UmbTreeRepository } from '@umbraco-cms/repository';
 export class UmbCollectionContext<
 	DataType extends ContentTreeItem,
 	StoreType extends UmbTreeStore<DataType> = UmbTreeStore<DataType>
@@ -10,6 +13,8 @@ export class UmbCollectionContext<
 
 	private _host: UmbControllerHostInterface;
 	private _entityKey: string | null;
+
+	#repository?: UmbTreeRepository;
 
 	private _store?: StoreType;
 	protected _dataObserver?: UmbObserverController<DataType[]>;
@@ -26,18 +31,35 @@ export class UmbCollectionContext<
 	public readonly search = this._search.asObservable();
 	*/
 
-	constructor(host: UmbControllerHostInterface, entityKey: string | null, storeAlias: string) {
+	constructor(host: UmbControllerHostInterface, entityKey: string | null, storeAlias?: string, repositoryAlias?: string) {
 		this._host = host;
 		this._entityKey = entityKey;
 
-		new UmbContextConsumerController(this._host, storeAlias, (_instance: StoreType) => {
-			this._store = _instance;
-			if (!this._store) {
-				// TODO: if we keep the type assumption of _store existing, then we should here make sure to break the application in a good way.
-				return;
-			}
-			this._onStoreSubscription();
-		});
+		if(storeAlias) {
+			new UmbContextConsumerController(this._host, storeAlias, (_instance: StoreType) => {
+				this._store = _instance;
+				if (!this._store) {
+					// TODO: if we keep the type assumption of _store existing, then we should here make sure to break the application in a good way.
+					return;
+				}
+				this._onStoreSubscription();
+			});
+		} else if (repositoryAlias) {
+			console.log("has repo alias:", repositoryAlias);
+			new UmbObserverController(this._host,
+				umbExtensionsRegistry.getByTypeAndAlias('repository', repositoryAlias),
+				async (repositoryManifest) => {
+					// Do something..
+					if(repositoryManifest) {
+						// TODO: use the right interface here, we might need a collection repository interface.
+						const result = await createExtensionClass<UmbTreeRepository>(repositoryManifest, [this._host]);
+						this.#repository = result;
+						console.log("this.#repository", this.#repository)
+					}
+				}
+			);
+
+		}
 	}
 
 	/*

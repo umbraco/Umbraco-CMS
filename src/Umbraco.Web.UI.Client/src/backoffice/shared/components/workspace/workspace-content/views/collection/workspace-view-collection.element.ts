@@ -52,7 +52,8 @@ export class UmbWorkspaceViewCollectionElement extends UmbLitElement {
 			this._collectionContext = new UmbCollectionContext(
 				this,
 				entityKey,
-				manifestMeta.storeAlias
+				manifestMeta.storeAlias,
+				manifestMeta.repositoryAlias
 			);
 			this.provideContext(UMB_COLLECTION_CONTEXT_TOKEN, this._collectionContext);
 		}
