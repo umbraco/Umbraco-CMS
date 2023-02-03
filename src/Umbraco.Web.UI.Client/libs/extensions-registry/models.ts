@@ -42,6 +42,7 @@ export * from './collection-view.models';
 export * from './health-check.models';
 export * from './sidebar-menu-item.models';
 export * from './theme.models';
+export * from './entity-action.models';
 
 export type ManifestTypes =
 	| ManifestCustom

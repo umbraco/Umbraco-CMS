@@ -9,7 +9,14 @@ import { UmbSortChildrenOfDocumentEntityAction } from './sort-children-of.action
 import { UmbCreateDocumentBlueprintEntityAction } from './create-blueprint.action';
 import { UmbDocumentPublicAccessEntityAction } from './public-access.action';
 import { UmbDocumentPermissionsEntityAction } from './permissions.action';
-import { ManifestEntityAction } from 'libs/extensions-registry/entity-action.models';
+import { UmbSaveAndPublishDocumentEntityAction } from './save-and-publish.action';
+import { UmbUnpublishDocumentEntityAction } from './unpublish.action';
+import { UmbSaveAndPreviewDocumentEntityAction } from './save-and-preview.action';
+import { UmbSaveAndScheduleDocumentEntityAction } from './save-and-schedule.action';
+import { UmbRollbackDocumentEntityAction } from './rollback.action';
+import { ManifestEntityAction } from '@umbraco-cms/extensions-registry';
+
+const entityType = 'document';
 
 /* TODO: This is a temporary solution to get the entity actions working.
  Some actions will only work in the tree (sort), others will only work in a workspace (Save, Save and Publish, etc.).
@@ -21,7 +28,7 @@ const entityActions: Array<ManifestEntityAction> = [
 		name: 'Create Document Entity Action',
 		weight: 1000,
 		meta: {
-			entityType: 'document',
+			entityType,
 			icon: 'umb:add',
 			label: 'Create',
 			api: UmbCreateDocumentEntityAction,
@@ -33,7 +40,7 @@ const entityActions: Array<ManifestEntityAction> = [
 		name: 'Trash Document Entity Action',
 		weight: 900,
 		meta: {
-			entityType: 'document',
+			entityType,
 			icon: 'umb:document',
 			label: 'Trash',
 			api: UmbTrashDocumentEntityAction,
@@ -45,7 +52,7 @@ const entityActions: Array<ManifestEntityAction> = [
 		name: 'Create Document Blueprint Entity Action',
 		weight: 800,
 		meta: {
-			entityType: 'document',
+			entityType,
 			icon: 'umb:blueprint',
 			label: 'Create Content Template',
 			api: UmbCreateDocumentBlueprintEntityAction,
@@ -57,7 +64,7 @@ const entityActions: Array<ManifestEntityAction> = [
 		name: 'Move Document Entity Action',
 		weight: 700,
 		meta: {
-			entityType: 'document',
+			entityType,
 			icon: 'umb:enter',
 			label: 'Move',
 			api: UmbMoveDocumentEntityAction,
@@ -69,7 +76,7 @@ const entityActions: Array<ManifestEntityAction> = [
 		name: 'Copy Document Entity Action',
 		weight: 600,
 		meta: {
-			entityType: 'document',
+			entityType,
 			icon: 'umb:documents',
 			label: 'Copy',
 			api: UmbCopyDocumentEntityAction,
@@ -81,7 +88,7 @@ const entityActions: Array<ManifestEntityAction> = [
 		name: 'Sort Document Entity Action',
 		weight: 500,
 		meta: {
-			entityType: 'document',
+			entityType,
 			icon: 'umb:navigation-vertical',
 			label: 'Sort',
 			api: UmbSortChildrenOfDocumentEntityAction,
@@ -93,7 +100,7 @@ const entityActions: Array<ManifestEntityAction> = [
 		name: 'Culture And Hostnames Document Entity Action',
 		weight: 400,
 		meta: {
-			entityType: 'document',
+			entityType,
 			icon: 'umb:home',
 			label: 'Culture And Hostnames',
 			api: UmbDocumentCultureAndHostnamesEntityAction,
@@ -104,7 +111,7 @@ const entityActions: Array<ManifestEntityAction> = [
 		alias: 'Umb.EntityAction.Document.Permissions',
 		name: 'Document Permissions Entity Action',
 		meta: {
-			entityType: 'document',
+			entityType,
 			icon: 'umb:vcard',
 			label: 'Permissions',
 			api: UmbDocumentPermissionsEntityAction,
@@ -115,7 +122,7 @@ const entityActions: Array<ManifestEntityAction> = [
 		alias: 'Umb.EntityAction.Document.PublicAccess',
 		name: 'Document Permissions Entity Action',
 		meta: {
-			entityType: 'document',
+			entityType,
 			icon: 'umb:lock',
 			label: 'Public Access',
 			api: UmbDocumentPublicAccessEntityAction,
@@ -126,7 +133,7 @@ const entityActions: Array<ManifestEntityAction> = [
 		alias: 'Umb.EntityAction.Document.Publish',
 		name: 'Publish Document Entity Action',
 		meta: {
-			entityType: 'document',
+			entityType,
 			icon: 'umb:globe',
 			label: 'Publish',
 			api: UmbPublishDocumentEntityAction,
@@ -134,13 +141,75 @@ const entityActions: Array<ManifestEntityAction> = [
 	},
 	{
 		type: 'entityAction',
-		alias: 'Umb.EntityAction.Document.Save',
-		name: 'Save Document Entity Action ',
+		alias: 'Umb.EntityAction.Document.Publish',
+		name: 'Publish Document Entity Action',
 		meta: {
-			entityType: 'document',
-			icon: 'umb:save',
+			entityType,
+			icon: 'umb:globe',
+			label: 'Publish',
+			api: UmbPublishDocumentEntityAction,
+		},
+	},
+	{
+		type: 'entityAction',
+		alias: 'Umb.EntityAction.Document.Unpublish',
+		name: 'Unpublish Document Entity Action',
+		meta: {
+			entityType,
+			icon: 'umb:globe',
+			label: 'Unpublish',
+			api: UmbUnpublishDocumentEntityAction,
+		},
+	},
+	{
+		type: 'entityAction',
+		alias: 'Umb.EntityAction.Document.Rollback',
+		name: 'Rollback Document Entity Action',
+		meta: {
+			entityType,
+			icon: 'umb:undo',
+			label: 'Rollback',
+			api: UmbRollbackDocumentEntityAction,
+		},
+	},
+	{
+		type: 'entityAction',
+		alias: 'Umb.EntityAction.Document.Save',
+		name: 'Save Document Entity Action',
+		meta: {
+			entityType,
 			label: 'Save',
 			api: UmbSaveDocumentEntityAction,
+		},
+	},
+	{
+		type: 'entityAction',
+		alias: 'Umb.EntityAction.Document.SaveAndPublish',
+		name: 'Save And Publish Document Entity Action',
+		meta: {
+			entityType,
+			label: 'Save And Publish',
+			api: UmbSaveAndPublishDocumentEntityAction,
+		},
+	},
+	{
+		type: 'entityAction',
+		alias: 'Umb.EntityAction.Document.SaveAndPreview',
+		name: 'Unpublish Document Entity Action',
+		meta: {
+			entityType,
+			label: 'Save And Preview',
+			api: UmbSaveAndPreviewDocumentEntityAction,
+		},
+	},
+	{
+		type: 'entityAction',
+		alias: 'Umb.EntityAction.Document.SaveAndSchedule',
+		name: 'Save And Schedule Document Entity Action',
+		meta: {
+			entityType,
+			label: 'Save And Schedule',
+			api: UmbSaveAndScheduleDocumentEntityAction,
 		},
 	},
 ];
