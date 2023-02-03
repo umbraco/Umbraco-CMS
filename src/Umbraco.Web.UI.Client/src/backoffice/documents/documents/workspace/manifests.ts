@@ -73,6 +73,7 @@ const workspaceActions: Array<ManifestWorkspaceAction> = [
 		type: 'workspaceAction',
 		alias: 'Umb.WorkspaceAction.Document.SaveAndPublish',
 		name: 'Save And Publish Document Workspace Action',
+		weight: 100,
 		meta: {
 			workspaces: ['Umb.Workspace.Document'],
 			label: 'Save And Publish',
@@ -85,6 +86,7 @@ const workspaceActions: Array<ManifestWorkspaceAction> = [
 		type: 'workspaceAction',
 		alias: 'Umb.WorkspaceAction.Document.Save',
 		name: 'Save Document Workspace Action',
+		weight: 90,
 		meta: {
 			workspaces: ['Umb.Workspace.Document'],
 			label: 'Save',
@@ -96,6 +98,7 @@ const workspaceActions: Array<ManifestWorkspaceAction> = [
 		type: 'workspaceAction',
 		alias: 'Umb.WorkspaceAction.Document.SaveAndPreview',
 		name: 'Save And Preview Document Workspace Action',
+		weight: 80,
 		meta: {
 			workspaces: ['Umb.Workspace.Document'],
 			label: 'Save And Preview',
@@ -106,6 +109,7 @@ const workspaceActions: Array<ManifestWorkspaceAction> = [
 		type: 'workspaceAction',
 		alias: 'Umb.WorkspaceAction.Document.SaveAndSchedule',
 		name: 'Save And Schedule Document Workspace Action',
+		weight: 70,
 		meta: {
 			workspaces: ['Umb.Workspace.Document'],
 			label: 'Save And Schedule',
