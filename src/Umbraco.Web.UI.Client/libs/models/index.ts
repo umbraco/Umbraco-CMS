@@ -6,6 +6,7 @@ import {
 	FolderTreeItem,
 	ProblemDetails,
 } from '@umbraco-cms/backend-api';
+import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 
 // Extension Manifests
 export * from '@umbraco-cms/extensions-registry';
@@ -156,4 +157,8 @@ export interface DocumentBlueprintDetails {
 export interface DataSourceResponse<T = undefined> {
 	data?: T;
 	error?: ProblemDetails;
+}
+
+export interface UmbRepositoryFactory<T> {
+	new (host: UmbControllerHostInterface): T;
 }

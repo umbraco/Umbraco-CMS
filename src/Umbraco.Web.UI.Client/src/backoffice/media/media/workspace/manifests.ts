@@ -69,7 +69,8 @@ const workspaceActions: Array<ManifestWorkspaceAction> = [
 		type: 'workspaceAction',
 		alias: 'Umb.WorkspaceAction.Media.Save',
 		name: 'Save Media Workspace Action',
-		loader: () => import('src/backoffice/shared/components/workspace/actions/save/workspace-action-node-save.element'),
+		loader: () =>
+			import('src/backoffice/shared/components/workspace/workspace-action/save/workspace-action-node-save.element'),
 		meta: {
 			workspaces: ['Umb.Workspace.Media'],
 			look: 'primary',

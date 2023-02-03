@@ -163,8 +163,8 @@ export class UmbWorkspaceLayout extends UmbLitElement {
 				<umb-extension-slot
 					slot="actions"
 					type="workspaceAction"
-					.filter=${(extension: ManifestWorkspaceAction) =>
-						extension.meta.workspaces.includes(this.alias)}></umb-extension-slot>
+					.filter=${(extension: ManifestWorkspaceAction) => extension.meta.workspaces.includes(this.alias)}
+					default-element="umb-workspace-action"></umb-extension-slot>
 				<slot name="actions" slot="actions"></slot>
 			</umb-body-layout>
 		`;

@@ -1,6 +1,6 @@
 import { UmbCreateDocumentEntityAction } from './create.action';
 import { UmbPublishDocumentEntityAction } from './publish.action';
-import { UmbSaveDocumentEntityAction } from './save.action';
+import { UmbSaveDocumentWorkspaceAction } from '../workspace/actions/save.action';
 import { UmbCopyDocumentEntityAction } from './copy.action';
 import { UmbDocumentCultureAndHostnamesEntityAction } from './culture-and-hostnames.action';
 import { UmbMoveDocumentEntityAction } from './move.action';
@@ -9,10 +9,10 @@ import { UmbSortChildrenOfDocumentEntityAction } from './sort-children-of.action
 import { UmbCreateDocumentBlueprintEntityAction } from './create-blueprint.action';
 import { UmbDocumentPublicAccessEntityAction } from './public-access.action';
 import { UmbDocumentPermissionsEntityAction } from './permissions.action';
-import { UmbSaveAndPublishDocumentEntityAction } from './save-and-publish.action';
+import { UmbSaveAndPublishDocumentWorkspaceAction } from '../workspace/actions/save-and-publish.action';
 import { UmbUnpublishDocumentEntityAction } from './unpublish.action';
-import { UmbSaveAndPreviewDocumentEntityAction } from './save-and-preview.action';
-import { UmbSaveAndScheduleDocumentEntityAction } from './save-and-schedule.action';
+import { UmbSaveAndPreviewDocumentWorkspaceAction } from '../workspace/actions/save-and-preview.action';
+import { UmbSaveAndScheduleDocumentWorkspaceAction } from '../workspace/actions/save-and-schedule.action';
 import { UmbRollbackDocumentEntityAction } from './rollback.action';
 import { ManifestEntityAction } from '@umbraco-cms/extensions-registry';
 
@@ -170,46 +170,6 @@ const entityActions: Array<ManifestEntityAction> = [
 			icon: 'umb:undo',
 			label: 'Rollback',
 			api: UmbRollbackDocumentEntityAction,
-		},
-	},
-	{
-		type: 'entityAction',
-		alias: 'Umb.EntityAction.Document.Save',
-		name: 'Save Document Entity Action',
-		meta: {
-			entityType,
-			label: 'Save',
-			api: UmbSaveDocumentEntityAction,
-		},
-	},
-	{
-		type: 'entityAction',
-		alias: 'Umb.EntityAction.Document.SaveAndPublish',
-		name: 'Save And Publish Document Entity Action',
-		meta: {
-			entityType,
-			label: 'Save And Publish',
-			api: UmbSaveAndPublishDocumentEntityAction,
-		},
-	},
-	{
-		type: 'entityAction',
-		alias: 'Umb.EntityAction.Document.SaveAndPreview',
-		name: 'Unpublish Document Entity Action',
-		meta: {
-			entityType,
-			label: 'Save And Preview',
-			api: UmbSaveAndPreviewDocumentEntityAction,
-		},
-	},
-	{
-		type: 'entityAction',
-		alias: 'Umb.EntityAction.Document.SaveAndSchedule',
-		name: 'Save And Schedule Document Entity Action',
-		meta: {
-			entityType,
-			label: 'Save And Schedule',
-			api: UmbSaveAndScheduleDocumentEntityAction,
 		},
 	},
 ];

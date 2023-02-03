@@ -1,5 +1,14 @@
 import { DOCUMENT_REPOSITORY_ALIAS } from '../repository/manifests';
-import type { ManifestWorkspace, ManifestWorkspaceAction, ManifestWorkspaceView, ManifestWorkspaceViewCollection } from '@umbraco-cms/models';
+import type {
+	ManifestWorkspace,
+	ManifestWorkspaceAction,
+	ManifestWorkspaceView,
+	ManifestWorkspaceViewCollection,
+} from '@umbraco-cms/models';
+import { UmbSaveAndPublishDocumentWorkspaceAction } from './actions/save-and-publish.action';
+import { UmbSaveDocumentWorkspaceAction } from './actions/save.action';
+import { UmbSaveAndPreviewDocumentWorkspaceAction } from './actions/save-and-preview.action';
+import { UmbSaveAndScheduleDocumentWorkspaceAction } from './actions/save-and-schedule.action';
 
 const workspace: ManifestWorkspace = {
 	type: 'workspace',
@@ -54,7 +63,7 @@ const workspaceViewCollections: Array<ManifestWorkspaceViewCollection> = [
 			pathname: 'collection',
 			icon: 'umb:grid',
 			entityType: 'document',
-			repositoryAlias: DOCUMENT_REPOSITORY_ALIAS
+			repositoryAlias: DOCUMENT_REPOSITORY_ALIAS,
 		},
 	},
 ];
@@ -62,35 +71,45 @@ const workspaceViewCollections: Array<ManifestWorkspaceViewCollection> = [
 const workspaceActions: Array<ManifestWorkspaceAction> = [
 	{
 		type: 'workspaceAction',
-		alias: 'Umb.WorkspaceAction.Document.SaveAndPreview',
-		name: 'Save Document Workspace Action',
-		loader: () => import('src/backoffice/shared/components/workspace/actions/save/workspace-action-node-save.element'),
+		alias: 'Umb.WorkspaceAction.Document.SaveAndPublish',
+		name: 'Save And Publish Document Workspace Action',
 		meta: {
 			workspaces: ['Umb.Workspace.Document'],
-			label: 'Save and preview',
+			label: 'Save And Publish',
+			look: 'primary',
+			color: 'positive',
+			api: UmbSaveAndPublishDocumentWorkspaceAction,
 		},
 	},
 	{
 		type: 'workspaceAction',
 		alias: 'Umb.WorkspaceAction.Document.Save',
 		name: 'Save Document Workspace Action',
-		loader: () => import('src/backoffice/shared/components/workspace/actions/save/workspace-action-node-save.element'),
 		meta: {
 			workspaces: ['Umb.Workspace.Document'],
-			look: 'secondary',
 			label: 'Save',
+			look: 'secondary',
+			api: UmbSaveDocumentWorkspaceAction,
 		},
 	},
 	{
 		type: 'workspaceAction',
-		alias: 'Umb.WorkspaceAction.Document.SaveAndPublish',
-		name: 'Save Document Workspace Action',
-		loader: () => import('src/backoffice/shared/components/workspace/actions/save/workspace-action-node-save.element'),
+		alias: 'Umb.WorkspaceAction.Document.SaveAndPreview',
+		name: 'Save And Preview Document Workspace Action',
 		meta: {
 			workspaces: ['Umb.Workspace.Document'],
-			label: 'Save and publish',
-			look: 'primary',
-			color: 'positive',
+			label: 'Save And Preview',
+			api: UmbSaveAndPreviewDocumentWorkspaceAction,
+		},
+	},
+	{
+		type: 'workspaceAction',
+		alias: 'Umb.WorkspaceAction.Document.SaveAndSchedule',
+		name: 'Save And Schedule Document Workspace Action',
+		meta: {
+			workspaces: ['Umb.Workspace.Document'],
+			label: 'Save And Schedule',
+			api: UmbSaveAndScheduleDocumentWorkspaceAction,
 		},
 	},
 ];
