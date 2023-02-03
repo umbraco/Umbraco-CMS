@@ -1,15 +1,19 @@
 import { UmbWorkspaceContext } from '../../../shared/components/workspace/workspace-context/workspace-context';
 import { UmbDocumentRepository } from '../repository/document.repository';
+import { UmbWorkspaceContextInterface } from '../../../shared/components/workspace/workspace-context/workspace-context.interface';
 import type { DocumentDetails } from '@umbraco-cms/models';
 import { appendToFrozenArray, ObjectState } from '@umbraco-cms/observable-api';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 
 // TODO: should this contex be called DocumentDraft instead of workspace? or should the draft be part of this?
-export class UmbDocumentWorkspaceContext extends UmbWorkspaceContext {
+
+type EntityType = DocumentDetails;
+export class UmbDocumentWorkspaceContext extends UmbWorkspaceContext implements UmbWorkspaceContextInterface<EntityType | undefined> {
+
 	#host: UmbControllerHostInterface;
 	#templateDetailRepo: UmbDocumentRepository;
 
-	#data = new ObjectState<DocumentDetails | undefined>(undefined);
+	#data = new ObjectState<EntityType | undefined>(undefined);
 	data = this.#data.asObservable();
 	name = this.#data.getObservablePart((data) => data?.name);
 
@@ -23,6 +27,16 @@ export class UmbDocumentWorkspaceContext extends UmbWorkspaceContext {
 		return this.#data.getValue();
 	}
 
+	/*
+	getUnique() {
+		return this.#data.getKey();
+	}
+	*/
+
+	getEntityType() {
+		return 'document';
+	}
+
 	setName(name: string) {
 		this.#data.update({ name });
 	}
@@ -30,12 +44,7 @@ export class UmbDocumentWorkspaceContext extends UmbWorkspaceContext {
 	getEntityType = this.#manager.getEntityType;
 	getUnique = this.#manager.getEntityKey;
 	getEntityKey = this.#manager.getEntityKey;
-	getStore = this.#manager.getStore;
-	getData = this.#manager.getData;
-	load = this.#manager.load;
-	create = this.#manager.create;
-	save = this.#manager.save;
-	destroy = this.#manager.destroy;
+
 	*/
 
 	/**
