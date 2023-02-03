@@ -25,13 +25,6 @@ export class UmbInputMediaPickerElement extends FormControlMixin(UmbLitElement) 
 	];
 
 	/**
-	 * Set picker to singlemode
-	 * @attr
-	 */
-	@property({ type: Boolean })
-	singlemode?: boolean;
-
-	/**
 	 * This is a minimum amount of selected items in this input.
 	 * @type {number}
 	 * @attr
@@ -133,7 +126,7 @@ export class UmbInputMediaPickerElement extends FormControlMixin(UmbLitElement) 
 	private _openPicker() {
 		// We send a shallow copy(good enough as its just an array of keys) of our this._selectedKeys, as we don't want the modal to manipulate our data:
 		const modalHandler = this._modalService?.mediaPicker({
-			multiple: this.singlemode ? false : true,
+			multiple: this.max === 1 ? false : true,
 			selection: [...this._selectedKeys],
 		});
 		modalHandler?.onClose().then(({ selection }: any) => {
