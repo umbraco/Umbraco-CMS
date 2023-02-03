@@ -110,4 +110,8 @@ export class UmbDocumentWorkspaceContext extends UmbWorkspaceContext implements 
 
 	}
 	*/
+
+	public destroy(): void {
+		this.#data.complete();
+	}
 }
