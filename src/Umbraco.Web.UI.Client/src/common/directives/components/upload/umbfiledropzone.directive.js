@@ -75,6 +75,10 @@ angular.module("umbraco.directives")
               }
             });
 
+            // Add all of the processing and processed files to account for uploading
+            // files in stages (dragging files X at a time into the dropzone).
+            scope.totalQueued = scope.queue.length + scope.processingCount + scope.processed.length;
+
             // Upload not allowed
             if (!scope.acceptedMediatypes || !scope.acceptedMediatypes.length) {
               files.map(file => {
@@ -82,16 +86,19 @@ angular.module("umbraco.directives")
               });
             }
 
-            // If we have Accepted Media Types, we will ask to choose Media Type, if
-            // Choose Media Type returns false, it only had one choice and therefor no reason to
-            if (scope.acceptedMediatypes && _requestChooseMediaTypeDialog() === false) {
-              scope.contentTypeAlias = "umbracoAutoSelect";
+            // If we have Accepted Media Types, we will ask to choose Media Type
+            if (scope.acceptedMediatypes) {
+
+              // If the media type dialog returns a positive answer, it is safe to assume that the
+              // contentTypeAlias has been chosen and we can return early because the dialog will start processing
+              // the queue automatically
+              if (_requestChooseMediaTypeDialog()) {
+                return;
+              }
             }
 
-            // Add all of the processing and processed files to account for uploading
-            // files in stages (dragging files X at a time into the dropzone).
-            scope.totalQueued = scope.queue.length + scope.processingCount + scope.processed.length;
-
+            // Start the processing of the queue here because the media type dialog was not shown and therefore
+            // did not do it earlier
             _processQueueItems();
           }
 
