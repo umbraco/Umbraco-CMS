@@ -4,17 +4,16 @@ import {
 	DocumentTypeTreeItem,
 	EntityTreeItem,
 	FolderTreeItem,
-	PagedEntityTreeItem,
 	ProblemDetails,
 } from '@umbraco-cms/backend-api';
-import { UmbTreeRepository } from 'libs/repository/tree-repository.interface';
-import { Observable } from 'rxjs';
 
 // Extension Manifests
 export * from '@umbraco-cms/extensions-registry';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type HTMLElementConstructor<T = HTMLElement> = new (...args: any[]) => T;
+
+export type ClassConstructor<T> = new (...args: any[]) => T;
 
 // Users
 // TODO: would the right name be Node? as entity is just something with a Key. But node is something in a content structure, aka. with hasChildren and parentKey.
@@ -157,9 +156,4 @@ export interface DocumentBlueprintDetails {
 export interface DataSourceResponse<T = undefined> {
 	data?: T;
 	error?: ProblemDetails;
-}
-
-// TODO; figure out why we can't add UmbControllerHostInterface as host type
-export interface UmbRepositoryFactory {
-	new (host: any): UmbTreeRepository;
 }
