@@ -98,6 +98,11 @@ export interface ManifestClass extends ManifestWithLoader<object> {
 	class?: ClassConstructor<unknown>;
 	//loader?: () => Promise<object | HTMLElement>;
 }
+
+export interface ManifestClassWithClassConstructor extends ManifestClass {
+	class: ClassConstructor<unknown>;
+}
+
 export interface ManifestElement extends ManifestWithLoader<object | HTMLElement> {
 	type: ManifestStandardTypes;
 	js?: string;
