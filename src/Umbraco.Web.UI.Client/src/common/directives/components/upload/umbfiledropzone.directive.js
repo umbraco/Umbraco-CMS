@@ -136,7 +136,7 @@ angular.module("umbraco.directives")
           function _upload(file) {
 
             scope.propertyAlias = scope.propertyAlias ? scope.propertyAlias : "umbracoFile";
-            scope.contentTypeAlias = scope.contentTypeAlias ? scope.contentTypeAlias : "Image";
+            scope.contentTypeAlias = scope.contentTypeAlias ? scope.contentTypeAlias : "umbracoAutoSelect";
 
             scope.processingCount++;
 
