@@ -34,11 +34,10 @@ angular.module("umbraco.directives")
 
           compact: '@',
           hideDropzone: '@',
-          acceptedMediatypes: '=',
+          acceptedMediatypes: '<',
 
-          filesQueued: '=',
-          handleFile: '=',
-          filesUploaded: '='
+          filesQueued: '<',
+          filesUploaded: '<'
         },
         link: function (scope, element, attrs) {
           scope.queue = [];
