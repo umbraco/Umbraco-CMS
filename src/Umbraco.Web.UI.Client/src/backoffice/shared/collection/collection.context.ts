@@ -51,7 +51,6 @@ export class UmbCollectionContext<
 			new UmbObserverController(this._host,
 				umbExtensionsRegistry.getByTypeAndAlias('repository', repositoryAlias),
 				async (repositoryManifest) => {
-					// Do something..
 					if(repositoryManifest) {
 						// TODO: use the right interface here, we might need a collection repository interface.
 						const result = await createExtensionClass<UmbTreeRepository>(repositoryManifest, [this._host]);
