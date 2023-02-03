@@ -84,5 +84,6 @@ public class UmbracoPlan : MigrationPlan
 
         // to 10.5.0 / 11.2.0
         To<AddPrimaryKeyConstrainToContentVersionCleanupDtos>("{83AF7945-DADE-4A02-9041-F3F6EBFAC319}");
+        To<AddDomainSortOrder>("{BB3889ED-E2DE-49F2-8F71-5FD8616A2661}");
     }
 }
