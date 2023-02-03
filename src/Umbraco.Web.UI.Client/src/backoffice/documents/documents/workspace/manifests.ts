@@ -1,4 +1,5 @@
-import type { ManifestWorkspace, ManifestWorkspaceAction, ManifestWorkspaceView } from '@umbraco-cms/models';
+import { DOCUMENT_REPOSITORY_ALIAS } from '../repository/manifests';
+import type { ManifestWorkspace, ManifestWorkspaceAction, ManifestWorkspaceView, ManifestWorkspaceViewCollection } from '@umbraco-cms/models';
 
 const workspace: ManifestWorkspace = {
 	type: 'workspace',
@@ -41,6 +42,23 @@ const workspaceViews: Array<ManifestWorkspaceView> = [
 	},
 ];
 
+const workspaceViewCollections: Array<ManifestWorkspaceViewCollection> = [
+	{
+		type: 'workspaceViewCollection',
+		alias: 'Umb.WorkspaceView.Document.Collection',
+		name: 'Document Workspace Collection View',
+		weight: 300,
+		meta: {
+			workspaces: ['Umb.Workspace.Document'],
+			label: 'Documents',
+			pathname: 'collection',
+			icon: 'umb:grid',
+			entityType: 'document',
+			repositoryAlias: DOCUMENT_REPOSITORY_ALIAS
+		},
+	},
+];
+
 const workspaceActions: Array<ManifestWorkspaceAction> = [
 	{
 		type: 'workspaceAction',
@@ -77,4 +95,4 @@ const workspaceActions: Array<ManifestWorkspaceAction> = [
 	},
 ];
 
-export const manifests = [workspace, ...workspaceViews, ...workspaceActions];
+export const manifests = [workspace, ...workspaceViews, ...workspaceViewCollections, ...workspaceActions];

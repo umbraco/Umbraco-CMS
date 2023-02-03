@@ -1,6 +1,24 @@
 import type { ManifestCollectionView } from '@umbraco-cms/models';
 
 export const manifests: Array<ManifestCollectionView> = [
+
+	{
+		type: 'collectionView',
+		alias: 'Umb.CollectionView.Table',
+		name: 'Table',
+		elementName: 'umb-collection-view-document-table',
+		loader: () => import('./collection-view-document-table.element'),
+		weight: 200,
+		meta: {
+			label: 'Table',
+			icon: 'umb:box',
+			entityType: 'document',
+			pathName: 'table',
+		},
+	},
+
+
+
 	{
 		type: 'collectionView',
 		alias: 'Umb.CollectionView.Grid',
