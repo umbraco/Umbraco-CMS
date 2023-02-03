@@ -3,7 +3,7 @@ import { UmbContextConsumerController } from '@umbraco-cms/context-api';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 import { UmbModalService, UMB_MODAL_SERVICE_CONTEXT_TOKEN } from '@umbraco-cms/modal';
 
-export class TrashDocumentEntityAction {
+export class UmbTrashDocumentEntityAction {
 	#host: UmbControllerHostInterface;
 	#key: string;
 	#modalService?: UmbModalService;
