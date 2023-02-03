@@ -6,7 +6,7 @@ export interface ManifestEntityAction extends ManifestElement {
 }
 
 export interface MetaEntityAction {
-	icon: string;
+	icon?: string;
 	label: string;
 	entityType: string;
 	api: any; // create interface
