@@ -6,14 +6,17 @@ export interface UmbTreeRepository {
 	requestRootTreeItems: () => Promise<{
 		data: PagedEntityTreeItem | undefined;
 		error: ProblemDetails | undefined;
+		asObservable?: () => Observable<EntityTreeItem[]>;
 	}>;
 	requestTreeItemsOf: (parentKey: string | null) => Promise<{
 		data: PagedEntityTreeItem | undefined;
 		error: ProblemDetails | undefined;
+		asObservable?: () => Observable<EntityTreeItem[]>;
 	}>;
 	requestTreeItems: (keys: string[]) => Promise<{
 		data: Array<EntityTreeItem> | undefined;
 		error: ProblemDetails | undefined;
+		asObservable?: () => Observable<EntityTreeItem[]>;
 	}>;
 
 	rootTreeItems: () => Promise<Observable<EntityTreeItem[]>>;

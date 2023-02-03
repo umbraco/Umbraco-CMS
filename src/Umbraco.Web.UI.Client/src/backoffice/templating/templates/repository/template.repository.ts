@@ -55,6 +55,8 @@ export class UmbTemplateRepository implements UmbTreeRepository, UmbDetailReposi
 	// TREE:
 
 
+
+
 	async requestRootTreeItems() {
 		await this.#init;
 
@@ -64,14 +66,15 @@ export class UmbTemplateRepository implements UmbTreeRepository, UmbDetailReposi
 			this.#treeStore?.appendItems(data.items);
 		}
 
-		return { data, error };
+		return { data, error, asObservable: () => this.#treeStore!.rootItems };
 	}
 
 	async requestTreeItemsOf(parentKey: string | null) {
 		await this.#init;
 
 		if (!parentKey) {
-			throw new Error('Parent key is missing');
+			const error: ProblemDetails = { title: 'Parent key is missing' };
+			return { data: undefined, error };
 		}
 
 		const { data, error } = await this.#treeDataSource.getChildrenOf(parentKey);
@@ -80,24 +83,25 @@ export class UmbTemplateRepository implements UmbTreeRepository, UmbDetailReposi
 			this.#treeStore?.appendItems(data.items);
 		}
 
-		return { data, error };
+		return { data, error, asObservable: () => this.#treeStore!.childrenOf(parentKey) };
 	}
 
 	async requestTreeItems(keys: Array<string>) {
 		await this.#init;
 
 		if (!keys) {
-			throw new Error('Keys is missing');
+			const error: ProblemDetails = { title: 'Keys are missing' };
+			return { data: undefined, error };
 		}
 
 		const { data, error } = await this.#treeDataSource.getItems(keys);
 
-		return { data, error };
+		return { data, error, asObservable: () => this.#treeStore!.items(keys) };
 	}
 
 	async rootTreeItems() {
 		await this.#init;
-		return this.#treeStore!.rootItems();
+		return this.#treeStore!.rootItems;
 	}
 
 	async treeItemsOf(parentKey: string | null) {

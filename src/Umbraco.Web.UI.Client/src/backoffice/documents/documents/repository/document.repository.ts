@@ -64,7 +64,7 @@ export class UmbDocumentRepository implements UmbTreeRepository, UmbDetailReposi
 			this.#treeStore?.appendItems(data.items);
 		}
 
-		return { data, error };
+		return { data, error, asObservable: () => this.#treeStore!.rootItems };
 	}
 
 	async requestTreeItemsOf(parentKey: string | null) {
@@ -81,7 +81,7 @@ export class UmbDocumentRepository implements UmbTreeRepository, UmbDetailReposi
 			this.#treeStore?.appendItems(data.items);
 		}
 
-		return { data, error };
+		return { data, error, asObservable: () => this.#treeStore!.childrenOf(parentKey) };
 	}
 
 	async requestTreeItems(keys: Array<string>) {
@@ -94,7 +94,7 @@ export class UmbDocumentRepository implements UmbTreeRepository, UmbDetailReposi
 
 		const { data, error } = await this.#treeSource.getItems(keys);
 
-		return { data, error };
+		return { data, error, asObservable: () => this.#treeStore!.items(keys) };
 	}
 
 	async rootTreeItems() {

@@ -65,9 +65,7 @@ export class UmbTemplateTreeStore extends UmbStoreBase {
 	 * @return {*}
 	 * @memberof UmbTemplateTreeStore
 	 */
-	rootItems() {
-		return this.#data.getObservablePart((items) => items.filter((item) => item.parentKey === null));
-	}
+	rootItems = this.#data.getObservablePart((items) => items.filter((item) => item.parentKey === null));
 
 	/**
 	 * Returns an observable to observe the children of a given parent

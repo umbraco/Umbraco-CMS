@@ -47,7 +47,6 @@ export class UmbCollectionContext<
 				this._onStoreSubscription();
 			});
 		} else if (repositoryAlias) {
-			console.log("has repo alias:", repositoryAlias);
 			new UmbObserverController(this._host,
 				umbExtensionsRegistry.getByTypeAndAlias('repository', repositoryAlias),
 				async (repositoryManifest) => {
@@ -111,26 +110,31 @@ export class UmbCollectionContext<
 		if (this._entityKey) {
 
 			// TODO: we should be able to get an observable from this call. either return a observable or a asObservable() method.
-			this.#repository.requestTreeItemsOf(this._entityKey);
+			const observable = (await this.#repository.requestTreeItemsOf(this._entityKey)).asObservable?.();
 
-			this._dataObserver = new UmbObserverController(
-				this._host,
-				await this.#repository.treeItemsOf(this._entityKey),
-				(nodes) => {
-					if (nodes) {
-						this.#data.next(nodes);
+			if(observable) {
+				this._dataObserver = new UmbObserverController(
+					this._host,
+					observable,
+					(nodes) => {
+						if (nodes) {
+							this.#data.next(nodes);
+						}
 					}
-				}
-			);
+				);
+			}
 
 		} else {
 
-			this.#repository.requestRootTreeItems()
-			this._dataObserver = new UmbObserverController(this._host, await this.#repository.rootTreeItems(), (nodes) => {
-				if (nodes) {
-					this.#data.next(nodes);
-				}
-			});
+			const observable = (await this.#repository.requestRootTreeItems()).asObservable?.();
+
+			if(observable) {
+				this._dataObserver = new UmbObserverController(this._host, observable, (nodes) => {
+					if (nodes) {
+						this.#data.next(nodes);
+					}
+				});
+			}
 		}
 	}
 
