@@ -88,9 +88,6 @@ public sealed class DataTypeCacheRefresher : PayloadCacheRefresherBase<DataTypeC
             }
         }
 
-        // TODO: not sure I like these?
-        TagsValueConverter.ClearCaches();
-
         // refresh the models and cache
         _publishedModelFactory.WithSafeLiveFactoryReset(() =>
             _publishedSnapshotService.Notify(payloads));
