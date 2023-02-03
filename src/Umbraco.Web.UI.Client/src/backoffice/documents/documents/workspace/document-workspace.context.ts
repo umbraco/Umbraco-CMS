@@ -33,6 +33,10 @@ export class UmbDocumentWorkspaceContext extends UmbWorkspaceContext implements 
 	}
 	*/
 
+	getEntityType() {
+		return 'document';
+	}
+
 	setName(name: string) {
 		this.#data.update({ name });
 	}

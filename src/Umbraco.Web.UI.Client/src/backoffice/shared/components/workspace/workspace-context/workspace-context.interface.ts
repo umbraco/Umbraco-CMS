@@ -7,6 +7,8 @@ export interface UmbWorkspaceContextInterface<T = unknown> {
 
 	//getUnique(): string | undefined;
 
+	getEntityType(): string;
+
 	getData(): T;
 
 	destroy(): void;
