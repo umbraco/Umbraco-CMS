@@ -215,4 +215,59 @@ export class UmbDocumentRepository implements UmbTreeRepository, UmbDetailReposi
 
 		return { error };
 	}
+
+	// Listing all currently known methods we need to implement:
+	// these currently only covers posting data
+	// TODO: find a good way to split these
+	async saveAndPublish() {
+		alert('save and publish');
+	}
+
+	async saveAndPreview() {
+		alert('save and preview');
+	}
+
+	async saveAndSchedule() {
+		alert('save and schedule');
+	}
+
+	async createBlueprint() {
+		alert('create document blueprint');
+	}
+
+	async move() {
+		alert('move');
+	}
+
+	async copy() {
+		alert('copy');
+	}
+
+	async sortChildrenOf() {
+		alert('sort');
+	}
+
+	async setCultureAndHostnames() {
+		alert('set culture and hostnames');
+	}
+
+	async setPermissions() {
+		alert('set permissions');
+	}
+
+	async setPublicAccess() {
+		alert('set public access');
+	}
+
+	async publish() {
+		alert('publish');
+	}
+
+	async unpublish() {
+		alert('unpublish');
+	}
+
+	async rollback() {
+		alert('rollback');
+	}
 }

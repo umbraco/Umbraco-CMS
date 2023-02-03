@@ -1,26 +1,22 @@
 import { UmbDocumentRepository } from '../repository/document.repository';
+import { UmbEntityActionBase } from '../../../shared/components/entity-action';
 import { UmbContextConsumerController } from '@umbraco-cms/context-api';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 import { UmbModalService, UMB_MODAL_SERVICE_CONTEXT_TOKEN } from '@umbraco-cms/modal';
 
-export class UmbTrashDocumentEntityAction {
-	#host: UmbControllerHostInterface;
-	#key: string;
+export class UmbTrashDocumentEntityAction extends UmbEntityActionBase<UmbDocumentRepository> {
 	#modalService?: UmbModalService;
-	#documentRepository: UmbDocumentRepository;
 
 	constructor(host: UmbControllerHostInterface, key: string) {
-		this.#host = host;
-		this.#key = key;
-		this.#documentRepository = new UmbDocumentRepository(this.#host); // TODO: make repository injectable
+		super(host, UmbDocumentRepository, key);
 
-		new UmbContextConsumerController(this.#host, UMB_MODAL_SERVICE_CONTEXT_TOKEN, (instance) => {
+		new UmbContextConsumerController(this.host, UMB_MODAL_SERVICE_CONTEXT_TOKEN, (instance) => {
 			this.#modalService = instance;
 		});
 	}
 
 	async execute() {
-		const { data } = await this.#documentRepository.requestTreeItems([this.#key]);
+		const { data } = await this.repository.requestTreeItems([this.unique]);
 
 		if (data) {
 			const item = data[0];
@@ -34,7 +30,7 @@ export class UmbTrashDocumentEntityAction {
 
 			modalHandler?.onClose().then(({ confirmed }) => {
 				if (confirmed) {
-					this.#documentRepository.delete(this.#key);
+					this.repository.delete(this.unique);
 				}
 			});
 		}

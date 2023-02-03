@@ -1,15 +1,13 @@
+import { UmbDocumentRepository } from '../repository/document.repository';
+import { UmbEntityActionBase } from '../../../shared/components/entity-action';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 
-export class UmbUnpublishDocumentEntityAction {
-	#host: UmbControllerHostInterface;
-	#key: string;
-
-	constructor(host: UmbControllerHostInterface, key: string) {
-		this.#host = host;
-		this.#key = key;
+export class UmbUnpublishDocumentEntityAction extends UmbEntityActionBase<UmbDocumentRepository> {
+	constructor(host: UmbControllerHostInterface, unique: string) {
+		super(host, UmbDocumentRepository, unique);
 	}
 
-	execute() {
-		alert('unpublish');
+	async execute() {
+		await this.repository.unpublish();
 	}
 }

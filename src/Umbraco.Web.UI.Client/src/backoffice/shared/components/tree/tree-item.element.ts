@@ -5,19 +5,15 @@ import { ifDefined } from 'lit-html/directives/if-defined.js';
 import { map, Observable } from 'rxjs';
 import { repeat } from 'lit/directives/repeat.js';
 import { UmbSectionContext, UMB_SECTION_CONTEXT_TOKEN } from '../section/section.context';
-import type { UmbTreeContextBase } from './tree.context';
-import {
-	UmbTreeContextMenuService,
-	UMB_TREE_CONTEXT_MENU_SERVICE_CONTEXT_TOKEN,
-} from './context-menu/tree-context-menu.service';
-import type { Entity } from '@umbraco-cms/models';
-import type { UmbTreeStore } from '@umbraco-cms/store';
-import { UmbLitElement } from '@umbraco-cms/element';
-import { umbExtensionsRegistry } from '@umbraco-cms/extensions-api';
 import {
 	UmbSectionSidebarContext,
 	UMB_SECTION_SIDEBAR_CONTEXT_TOKEN,
 } from '../section/section-sidebar/section-sidebar.context';
+import type { UmbTreeContextBase } from './tree.context';
+import type { Entity } from '@umbraco-cms/models';
+import type { UmbTreeStore } from '@umbraco-cms/store';
+import { UmbLitElement } from '@umbraco-cms/element';
+import { umbExtensionsRegistry } from '@umbraco-cms/extensions-api';
 
 @customElement('umb-tree-item')
 export class UmbTreeItem extends UmbLitElement {
@@ -212,7 +208,7 @@ export class UmbTreeItem extends UmbLitElement {
 			hasChildren: this.hasChildren,
 			parentKey: this.parentKey,
 		});
-		this._sectionSidebarContext?.openContextMenu(this.entityType, this.key);
+		this._sectionSidebarContext?.toggleContextMenu(this.entityType, this.key);
 	}
 
 	render() {

@@ -63,21 +63,6 @@ export class UmbSectionSidebarContextMenu extends UmbLitElement {
 	@state()
 	private _unique?: string;
 
-	private _renderBackdrop() {
-		return this._isOpen ? html`<div id="backdrop"></div>` : nothing;
-	}
-
-	// TODO: allow different views depending on left or right click
-	private _renderModal() {
-		return this._isOpen
-			? html`<div id="action-modal">
-					<umb-entity-action-list
-						entity-type=${ifDefined(this._entityType)}
-						unique=${ifDefined(this._unique)}></umb-entity-action-list>
-			  </div>`
-			: nothing;
-	}
-
 	connectedCallback(): void {
 		super.connectedCallback();
 
@@ -92,14 +77,35 @@ export class UmbSectionSidebarContextMenu extends UmbLitElement {
 		});
 	}
 
+	#closeContextMenu() {
+		this.#sectionSidebarContext?.closeContextMenu();
+	}
+
 	render() {
 		return html`
-			${this._renderBackdrop()}
+			${this.#renderBackdrop()}
 			<div id="relative-wrapper">
 				<slot></slot>
-				${this._renderModal()}
+				${this.#renderModal()}
 			</div>
 		`;
+	}
+
+	#renderBackdrop() {
+		// TODO: add keyboard support (close on escape)
+		// eslint-disable-next-line lit-a11y/click-events-have-key-events
+		return this._isOpen ? html`<div id="backdrop" @click=${this.#closeContextMenu}></div>` : nothing;
+	}
+
+	// TODO: allow different views depending on left or right click
+	#renderModal() {
+		return this._isOpen
+			? html`<div id="action-modal">
+					<umb-entity-action-list
+						entity-type=${ifDefined(this._entityType)}
+						unique=${ifDefined(this._unique)}></umb-entity-action-list>
+			  </div>`
+			: nothing;
 	}
 }
 

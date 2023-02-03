@@ -22,6 +22,10 @@ export class UmbSectionSidebarContext {
 		this.#host = host;
 	}
 
+	toggleContextMenu(entityType: string, unique: string) {
+		this.#unique === unique ? this.closeContextMenu() : this.openContextMenu(entityType, unique);
+	}
+
 	openContextMenu(entityType: string, unique: string) {
 		this.#entityType = entityType;
 		this.#unique = unique;

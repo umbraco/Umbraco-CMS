@@ -1,15 +1,13 @@
+import { UmbDocumentRepository } from '../repository/document.repository';
+import { UmbEntityActionBase } from '../../../shared/components/entity-action';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 
-export class UmbMoveDocumentEntityAction {
-	#host: UmbControllerHostInterface;
-	#key: string;
-
-	constructor(host: UmbControllerHostInterface, key: string) {
-		this.#host = host;
-		this.#key = key;
+export class UmbMoveDocumentEntityAction extends UmbEntityActionBase<UmbDocumentRepository> {
+	constructor(host: UmbControllerHostInterface, unique: string) {
+		super(host, UmbDocumentRepository, unique);
 	}
 
-	execute() {
-		alert('move');
+	async execute() {
+		await this.repository.move();
 	}
 }
