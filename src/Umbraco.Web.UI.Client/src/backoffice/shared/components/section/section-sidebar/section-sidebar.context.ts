@@ -1,5 +1,6 @@
 import { UmbContextToken } from '@umbraco-cms/context-api';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
+import { StringState } from '@umbraco-cms/observable-api';
 import { BasicState } from 'libs/observable-api/basic-state';
 
 export class UmbSectionSidebarContext {
@@ -7,35 +8,37 @@ export class UmbSectionSidebarContext {
 	#contextMenuIsOpen = new BasicState<boolean>(false);
 	contextMenuIsOpen = this.#contextMenuIsOpen.asObservable();
 
-	#entityType?: string;
-	#unique?: string;
+	#entityType = new StringState<undefined>(undefined);
+	entityType = this.#entityType.asObservable();
 
-	getUnique() {
-		return this.#unique;
-	}
+	#unique = new StringState<undefined>(undefined);
+	unique = this.#unique.asObservable();
 
-	getEntityType() {
-		return this.#entityType;
-	}
+	#headline = new StringState<undefined>(undefined);
+	headline = this.#headline.asObservable();
 
 	constructor(host: UmbControllerHostInterface) {
 		this.#host = host;
 	}
 
-	toggleContextMenu(entityType: string, unique: string) {
-		this.#unique === unique ? this.closeContextMenu() : this.openContextMenu(entityType, unique);
+	toggleContextMenu(entityType: string, unique: string, headline: string) {
+		this.#unique.getValue() === unique ? this.closeContextMenu() : this.openContextMenu(entityType, unique, headline);
 	}
 
-	openContextMenu(entityType: string, unique: string) {
-		this.#entityType = entityType;
-		this.#unique = unique;
+	// TODO: we wont get notified about tree item name changes because we don't have a subscription
+	// we need to figure out how we best can handle this when we only know the entity and unique id
+	openContextMenu(entityType: string, unique: string, headline: string) {
+		this.#entityType.next(entityType);
+		this.#unique.next(unique);
+		this.#headline.next(headline);
 		this.#contextMenuIsOpen.next(true);
 	}
 
 	closeContextMenu() {
 		this.#contextMenuIsOpen.next(false);
-		this.#entityType = undefined;
-		this.#unique = undefined;
+		this.#entityType.next(undefined);
+		this.#unique.next(undefined);
+		this.#headline.next(undefined);
 	}
 }
 
