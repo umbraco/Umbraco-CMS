@@ -208,7 +208,7 @@ export class UmbTreeItem extends UmbLitElement {
 			hasChildren: this.hasChildren,
 			parentKey: this.parentKey,
 		});
-		this._sectionSidebarContext?.toggleContextMenu(this.entityType, this.key);
+		this._sectionSidebarContext?.toggleContextMenu(this.entityType, this.key, this.label);
 	}
 
 	render() {

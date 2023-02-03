@@ -63,17 +63,19 @@ export class UmbSectionSidebarContextMenu extends UmbLitElement {
 	@state()
 	private _unique?: string;
 
-	connectedCallback(): void {
-		super.connectedCallback();
+	@state()
+	private _headline?: string;
+
+	constructor() {
+		super();
 
 		this.consumeContext(UMB_SECTION_SIDEBAR_CONTEXT_TOKEN, (instance) => {
 			this.#sectionSidebarContext = instance;
 
-			this.observe(this.#sectionSidebarContext.contextMenuIsOpen, (isOpen) => {
-				this._isOpen = isOpen;
-				this._entityType = this.#sectionSidebarContext?.getEntityType();
-				this._unique = this.#sectionSidebarContext?.getUnique();
-			});
+			this.observe(this.#sectionSidebarContext.contextMenuIsOpen, (value) => (this._isOpen = value));
+			this.observe(this.#sectionSidebarContext.unique, (value) => (this._unique = value));
+			this.observe(this.#sectionSidebarContext.entityType, (value) => (this._entityType = value));
+			this.observe(this.#sectionSidebarContext.headline, (value) => (this._headline = value));
 		});
 	}
 
@@ -101,6 +103,7 @@ export class UmbSectionSidebarContextMenu extends UmbLitElement {
 	#renderModal() {
 		return this._isOpen
 			? html`<div id="action-modal">
+					<h3>${this._headline}</h3>
 					<umb-entity-action-list
 						entity-type=${ifDefined(this._entityType)}
 						unique=${ifDefined(this._unique)}></umb-entity-action-list>
