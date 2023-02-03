@@ -1,3 +1,4 @@
+using System.Globalization;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Services;
@@ -56,40 +57,30 @@ public class SliderValueConverter : PropertyValueConverterBase
             if (isRange)
             {
                 string[] rangeRawValues = sourceString.Split(Constants.CharArrays.Comma);
-
-                Attempt<decimal> minimumAttempt = rangeRawValues[0].TryConvertTo<decimal>();
-                if (minimumAttempt.Success)
+                if (decimal.TryParse(rangeRawValues[0], NumberStyles.Number, CultureInfo.InvariantCulture, out decimal minimum))
                 {
                     if (rangeRawValues.Length == 1)
                     {
                         // Configuration is probably changed from single to range, return range with same min/max
                         return new Range<decimal>
                         {
-                            Minimum = minimumAttempt.Result,
-                            Maximum = minimumAttempt.Result
+                            Minimum = minimum,
+                            Maximum = minimum
                         };
                     }
-                    else if (rangeRawValues.Length == 2)
+                    else if (rangeRawValues.Length == 2 && decimal.TryParse(rangeRawValues[1], NumberStyles.Number, CultureInfo.InvariantCulture, out decimal maximum))
                     {
-                        Attempt<decimal> maximumAttempt = rangeRawValues[1].TryConvertTo<decimal>();
-                        if (maximumAttempt.Success)
+                        return new Range<decimal>
                         {
-                            return new Range<decimal>
-                            {
-                                Minimum = minimumAttempt.Result,
-                                Maximum = maximumAttempt.Result
-                            };
-                        }
+                            Minimum = minimum,
+                            Maximum = maximum
+                        };
                     }
                 }
             }
-            else
+            else if (decimal.TryParse(sourceString, NumberStyles.Number, CultureInfo.InvariantCulture, out decimal value))
             {
-                Attempt<decimal> valueAttempt = sourceString.TryConvertTo<decimal>();
-                if (valueAttempt.Success)
-                {
-                    return valueAttempt.Result;
-                }
+                return value;
             }
         }
 
