@@ -199,7 +199,7 @@ export class UmbDocumentRepository implements UmbTreeRepository, UmbDetailReposi
 			throw new Error('Document key is missing');
 		}
 
-		const { error } = await this.#detailDataSource.trash(key);
+		const { error } = await this.#detailDataSource.delete(key);
 
 		if (!error) {
 			const notification = { data: { message: `Document deleted` } };
