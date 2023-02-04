@@ -1177,7 +1177,7 @@ namespace Umbraco.Cms.Infrastructure.Packaging
                 }
 
                 allowedChildren?.Add(new ContentTypeSort(new Lazy<int>(() => allowedChild.Id), sortOrder,
-                    allowedChild.Alias));
+                    allowedChild.Alias, allowedChild.Key));
                 sortOrder++;
             }
 

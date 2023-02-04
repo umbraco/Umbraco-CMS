@@ -652,7 +652,7 @@ public class ContentServiceTagsTests : UmbracoIntegrationTest
         CreateAndAddTagsPropertyType(contentType);
         ContentTypeService.Save(contentType);
         contentType.AllowedContentTypes =
-            new[] { new ContentTypeSort(new Lazy<int>(() => contentType.Id), 0, contentType.Alias) };
+            new[] { new ContentTypeSort(new Lazy<int>(() => contentType.Id), 0, contentType.Alias, contentType.Key) };
 
         var content = ContentBuilder.CreateSimpleContent(contentType, "Tagged content");
         content.AssignTags(PropertyEditorCollection, DataTypeService, Serializer, "tags",
