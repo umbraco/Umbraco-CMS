@@ -17,7 +17,7 @@ public class DocumentMapDefinition : ContentMapDefinition<IContent, DocumentProp
     public void DefineMaps(IUmbracoMapper mapper)
         => mapper.Define<IContent, DocumentViewModel>((_, _) => new DocumentViewModel(), Map);
 
-    // Umbraco.Code.MapAll
+    // Umbraco.Code.MapAll -Urls -TemplateKey
     private void Map(IContent source, DocumentViewModel target, MapperContext context)
     {
         target.Key = source.Key;

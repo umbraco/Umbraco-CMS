@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Umbraco.Cms.Api.Management.Factories;
 using Umbraco.Cms.Api.Management.ViewModels.Document;
-using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
 
@@ -10,12 +10,12 @@ namespace Umbraco.Cms.Api.Management.Controllers.Document;
 public class ByKeyDocumentController : DocumentControllerBase
 {
     private readonly IContentService _contentService;
-    private readonly IUmbracoMapper _umbracoMapper;
+    private readonly IDocumentViewModelFactory _documentViewModelFactory;
 
-    public ByKeyDocumentController(IContentService contentService, IUmbracoMapper umbracoMapper)
+    public ByKeyDocumentController(IContentService contentService, IDocumentViewModelFactory documentViewModelFactory)
     {
         _contentService = contentService;
-        _umbracoMapper = umbracoMapper;
+        _documentViewModelFactory = documentViewModelFactory;
     }
 
     [HttpGet("{key:guid}")]
@@ -30,7 +30,7 @@ public class ByKeyDocumentController : DocumentControllerBase
             return NotFound();
         }
 
-        DocumentViewModel model = _umbracoMapper.Map<DocumentViewModel>(content)!;
-        return await Task.FromResult(Ok(model));
+        DocumentViewModel model = await _documentViewModelFactory.CreateViewModelAsync(content);
+        return Ok(model);
     }
 }

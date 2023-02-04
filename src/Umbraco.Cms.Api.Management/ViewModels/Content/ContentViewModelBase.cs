@@ -1,14 +1,14 @@
 ﻿namespace Umbraco.Cms.Api.Management.ViewModels.Content;
 
-public abstract class ContentViewModelBase<TProperty, TVariant>
-    where TProperty : PropertyViewModelBase
-    where TVariant: VariantViewModelBase
+public abstract class ContentViewModelBase<TPropertyViewModel, TVariantViewModel>
+    where TPropertyViewModel : PropertyViewModelBase
+    where TVariantViewModel: VariantViewModelBase
 {
     public Guid Key { get; set; }
 
     public Guid ContentTypeKey { get; set; }
 
-    public IEnumerable<TProperty> Properties { get; set; } = Array.Empty<TProperty>();
+    public IEnumerable<TPropertyViewModel> Properties { get; set; } = Array.Empty<TPropertyViewModel>();
 
-    public IEnumerable<TVariant> Variants { get; set; } = Array.Empty<TVariant>();
+    public IEnumerable<TVariantViewModel> Variants { get; set; } = Array.Empty<TVariantViewModel>();
 }
