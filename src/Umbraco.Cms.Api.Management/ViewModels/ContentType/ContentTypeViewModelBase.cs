@@ -12,6 +12,8 @@ public abstract class ContentTypeViewModelBase<TPropertyType, TPropertyTypeConta
 
     public string? Description { get; set; }
 
+    public string Icon { get; set; } = string.Empty;
+
     public bool AllowedAsRoot { get; set; }
 
     public bool VariesByCulture { get; set; }
@@ -21,4 +23,8 @@ public abstract class ContentTypeViewModelBase<TPropertyType, TPropertyTypeConta
     public IEnumerable<TPropertyType> Properties { get; set; } = Array.Empty<TPropertyType>();
 
     public IEnumerable<TPropertyTypeContainer> Containers { get; set; } = Array.Empty<TPropertyTypeContainer>();
+
+    public IEnumerable<ContentTypeSort> AllowedContentTypes { get; set; } = Array.Empty<ContentTypeSort>();
+
+    public IEnumerable<ContentTypeComposition> Compositions { get; set; } = Array.Empty<ContentTypeComposition>();
 }
