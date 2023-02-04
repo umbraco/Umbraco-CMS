@@ -45,11 +45,12 @@ public class DictionaryMapDefinition : IMapDefinition
         target.DeleteDate = null;
     }
 
-    // Umbraco.Code.MapAll -Level
+    // Umbraco.Code.MapAll
     private void Map(IDictionaryItem source, DictionaryOverviewViewModel target, MapperContext context)
     {
         target.Key = source.Key;
         target.Name = source.ItemKey;
+        target.ParentKey = source.ParentId;
         target.TranslatedIsoCodes = source
             .Translations
             .Where(translation => translation.Value.IsNullOrWhiteSpace() == false)
