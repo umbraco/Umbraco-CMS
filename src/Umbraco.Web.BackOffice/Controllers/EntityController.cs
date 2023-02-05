@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Security.Cryptography;
+using Examine.Search;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
@@ -750,12 +751,10 @@ public class EntityController : UmbracoAuthorizedJsonController
             }
             //adding multiple conditions ,considering id,key & name as filter param
             var clauses = new List<Expression<Func<IUmbracoEntity, bool>>>();
+            //for id as int
             int.TryParse(filter, out int filterAsIntId);
+            //for key as Guid
             Guid.TryParse(filter, out Guid filterAsGuid);
-            clauses.Add(x =>
-                        x.Id == filterAsIntId ||
-                        x.Name!.SqlContains(filter, TextColumnType.NVarchar) ||
-                        x.Key == filterAsGuid);
             // else proceed as usual
             entities = _entityService.GetPagedChildren(
                 id,
@@ -765,7 +764,9 @@ public class EntityController : UmbracoAuthorizedJsonController
                 out long totalRecords,
                 filter.IsNullOrWhiteSpace()
                     ? null
-                    : _sqlContext.Query<IUmbracoEntity>().WhereAny(clauses),
+                    : _sqlContext.Query<IUmbracoEntity>().Where(x => x.Name!.Contains(filter)
+                      || x.Id == filterAsIntId
+                      || x.Key == filterAsGuid),
                 Ordering.By(orderBy, orderDirection));
 
 
