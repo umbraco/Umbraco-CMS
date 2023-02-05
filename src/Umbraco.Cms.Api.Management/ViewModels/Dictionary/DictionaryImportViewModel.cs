@@ -2,7 +2,7 @@
 
 public class DictionaryImportViewModel
 {
-    public List<DictionaryItemsImportViewModel> DictionaryItems { get; set; } = null!;
+    public IEnumerable<DictionaryItemsImportViewModel> DictionaryItems { get; set; } = Array.Empty<DictionaryItemsImportViewModel>();
 
-    public string? TempFileName { get; set; }
+    public string? FileName { get; set; }
 }

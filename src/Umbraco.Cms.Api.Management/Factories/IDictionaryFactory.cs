@@ -12,5 +12,5 @@ public interface IDictionaryFactory
 
     Task<DictionaryItemViewModel> CreateDictionaryItemViewModelAsync(IDictionaryItem dictionaryItem);
 
-    DictionaryImportViewModel CreateDictionaryImportViewModel(FormFileUploadResult formFileUploadResult);
+    DictionaryImportViewModel CreateDictionaryImportViewModel(UdtFileUpload fileUpload);
 }

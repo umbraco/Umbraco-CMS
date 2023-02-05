@@ -1,5 +1,4 @@
-﻿using System.Xml;
-using Umbraco.Cms.Core.Mapping;
+﻿using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Api.Management.Models;
@@ -55,36 +54,35 @@ public class DictionaryFactory : IDictionaryFactory
         return updated;
     }
 
-    public DictionaryImportViewModel CreateDictionaryImportViewModel(FormFileUploadResult formFileUploadResult)
-    {
-        if (formFileUploadResult.CouldLoad is false || formFileUploadResult.XmlDocument is null)
+    public DictionaryImportViewModel CreateDictionaryImportViewModel(UdtFileUpload udtFileUpload) =>
+        new DictionaryImportViewModel
         {
-            throw new ArgumentNullException("The document of the FormFileUploadResult cannot be null");
-        }
+            FileName = udtFileUpload.FileName,
+            DictionaryItems = udtFileUpload
+                .Content
+                .Descendants("DictionaryItem")
+                .Select(dictionaryItem =>
+                {
+                    if (Guid.TryParse(dictionaryItem.Attributes("Key").FirstOrDefault()?.Value, out Guid itemKey) == false)
+                    {
+                        return null;
+                    }
 
-        var model = new DictionaryImportViewModel
-        {
-            TempFileName = formFileUploadResult.TemporaryPath, DictionaryItems = new List<DictionaryItemsImportViewModel>(),
+                    var name = dictionaryItem.Attributes("Name").FirstOrDefault()?.Value;
+                    if (name.IsNullOrWhiteSpace())
+                    {
+                        return null;
+                    }
+
+                    Guid? parentKey = Guid.TryParse(dictionaryItem.Parent?.Attributes("Key").FirstOrDefault()?.Value, out Guid key)
+                        ? key
+                        : null;
+
+                    return new DictionaryItemsImportViewModel { Name = name, Key = itemKey, ParentKey = parentKey };
+                })
+                .WhereNotNull()
+                .ToArray(),
         };
-
-        var level = 1;
-        var currentParent = string.Empty;
-        foreach (XmlNode dictionaryItem in formFileUploadResult.XmlDocument.GetElementsByTagName("DictionaryItem"))
-        {
-            var name = dictionaryItem.Attributes?.GetNamedItem("Name")?.Value ?? string.Empty;
-            var parentKey = dictionaryItem.ParentNode?.Attributes?.GetNamedItem("Key")?.Value ?? string.Empty;
-
-            if (parentKey != currentParent || level == 1)
-            {
-                level += 1;
-                currentParent = parentKey;
-            }
-
-            model.DictionaryItems.Add(new DictionaryItemsImportViewModel { Level = level, Name = name });
-        }
-
-        return model;
-    }
 
     private async Task MapTranslations(IDictionaryItem dictionaryItem, IEnumerable<DictionaryItemTranslationModel> translationModels)
     {
