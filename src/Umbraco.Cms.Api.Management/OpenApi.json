@@ -816,6 +816,59 @@
         }
       }
     },
+    "/umbraco/management/api/v1/dictionary/{key}/move": {
+      "post": {
+        "tags": [
+          "Dictionary"
+        ],
+        "operationId": "PostDictionaryByKeyMove",
+        "parameters": [
+          {
+            "name": "key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DictionaryMoveModel"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/umbraco/management/api/v1/dictionary/import": {
       "post": {
         "tags": [
@@ -5649,6 +5702,17 @@
             "nullable": true
           },
           "parentKey": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "DictionaryMoveModel": {
+        "type": "object",
+        "properties": {
+          "targetKey": {
             "type": "string",
             "format": "uuid",
             "nullable": true

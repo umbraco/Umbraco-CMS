@@ -90,4 +90,12 @@ public interface IDictionaryItemService
     /// <param name="id">The ID of the <see cref="IDictionaryItem" /> to delete</param>
     /// <param name="userId">Optional id of the user deleting the dictionary item</param>
     Task<Attempt<IDictionaryItem?, DictionaryItemOperationStatus>> DeleteAsync(Guid id, int userId = Constants.Security.SuperUserId);
+
+    /// <summary>
+    ///     Moves a <see cref="IDictionaryItem" /> object
+    /// </summary>
+    /// <param name="dictionaryItem"><see cref="IDictionaryItem" /> to move</param>
+    /// <param name="parentId">Id of the new <see cref="IDictionaryItem" /> parent, null if the item should be moved to the root</param>
+    /// <param name="userId">Optional id of the user moving the dictionary item</param>
+    Task<Attempt<IDictionaryItem, DictionaryItemOperationStatus>> MoveAsync(IDictionaryItem dictionaryItem, Guid? parentId, int userId = Constants.Security.SuperUserId);
 }
