@@ -1,13 +1,26 @@
-import { html, LitElement } from 'lit';
+import { css, html, LitElement } from 'lit';
 import { customElement } from 'lit/decorators.js';
 
 @customElement('umb-logviewer-root-workspace')
 export class UmbLogViewerRootWorkspaceElement extends LitElement {
+	static styles = [
+		css`
+			:host {
+				display: block;
+			}
+
+			#header {
+				display: flex;
+				padding: 0 var(--uui-size-space-6);
+				gap: var(--uui-size-space-4);
+				width: 100%;
+			}
+		`,
+	];
 	render() {
 		return html`
-		<div>
-			<h1>LogViewer Root Workspace</h1>
-		</div>
+			<umb-workspace-layout headline="Log Overview for Today" alias="Umb.Workspace.LogviewerRoot">
+			</umb-workspace-layout>
 		`;
 	}
 }
