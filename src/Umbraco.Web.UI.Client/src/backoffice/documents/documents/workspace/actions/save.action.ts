@@ -1,13 +1,10 @@
 import { UmbDocumentRepository } from '../../repository/document.repository';
-import { UmbDocumentWorkspaceContext } from '../document-workspace.context';
 import { UmbWorkspaceAction } from '../../../../shared/components/workspace/workspace-action';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 
 export class UmbSaveDocumentWorkspaceAction extends UmbWorkspaceAction<UmbDocumentRepository> {
-	#workspaceContext?: UmbDocumentWorkspaceContext;
-
-	constructor(host: UmbControllerHostInterface, unique: string) {
-		super(host, UmbDocumentRepository, unique);
+	constructor(host: UmbControllerHostInterface, repositoryAlias: string, unique: string) {
+		super(host, repositoryAlias, unique);
 	}
 
 	async execute() {
@@ -16,6 +13,6 @@ export class UmbSaveDocumentWorkspaceAction extends UmbWorkspaceAction<UmbDocume
 		const document = this.workspaceContext.getData();
 		// TODO: handle errors
 		if (!document) return;
-		this.repository.saveDetail(document);
+		this.repository?.saveDetail(document);
 	}
 }
