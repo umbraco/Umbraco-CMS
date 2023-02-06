@@ -3,7 +3,6 @@ import { UmbTreeRepository } from '@umbraco-cms/repository';
 import type { ManifestTree } from '@umbraco-cms/models';
 import { DeepState } from '@umbraco-cms/observable-api';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
-import { createExtensionClass } from 'libs/extensions-api/create-extension-class.function';
 
 export interface UmbTreeContext {
 	tree: ManifestTree;
@@ -31,11 +30,8 @@ export class UmbTreeContextBase implements UmbTreeContext {
 		this.tree = tree;
 
 		if (this.tree.meta.repository) {
-			createExtensionClass<UmbTreeRepository>(this.tree.meta, [this.#host]).then((instance) {
-				if(instance) {
-					this.repository = instance;
-				}
-			})
+			// TODO: should be using the right extension and the createExtensionClass method.
+			this.repository = new this.tree.meta.repository(this.#host) as any;
 		}
 	}
 
