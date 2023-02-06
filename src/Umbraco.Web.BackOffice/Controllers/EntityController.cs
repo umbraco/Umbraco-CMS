@@ -750,7 +750,6 @@ public class EntityController : UmbracoAuthorizedJsonController
                 return new PagedResult<EntityBasic>(0, 0, 0);
             }
             //adding multiple conditions ,considering id,key & name as filter param
-            var clauses = new List<Expression<Func<IUmbracoEntity, bool>>>();
             //for id as int
             int.TryParse(filter, out int filterAsIntId);
             //for key as Guid
