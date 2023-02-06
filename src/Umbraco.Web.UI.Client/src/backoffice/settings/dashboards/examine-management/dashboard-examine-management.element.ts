@@ -48,20 +48,23 @@ export class UmbDashboardExamineManagementElement extends UmbLitElement {
 
 	@state()
 	private _routerPath?: string;
-	private _activePath?: string;
+
+	@state()
+	private _activePath = '';
 
 
 	render() {
-		return html` ${this._activePath !== ''
-				? html` <a href="${this._routerPath}/examine-management/"> &larr; Back to overview </a> `
+		return html` ${this._routerPath && this._activePath !== ''
+				? html` <a href=${this._routerPath}> &larr; Back to overview </a> `
 				: nothing}
 			<umb-router-slot
 				.routes=${this._routes}
 				@init=${(event: UmbRouterSlotInitEvent) => {
+					console.log("init", event.target.absoluteRouterPath)
 					this._routerPath = event.target.absoluteRouterPath;
 				}}
 				@change=${(event: UmbRouterSlotChangeEvent) => {
-					this._activePath = event.target.localActiveViewPath;
+					this._activePath = event.target.localActiveViewPath || '';
 				}}></umb-router-slot>`;
 	}
 }
