@@ -1,7 +1,7 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
-import { UmbCollectionContext, UMB_COLLECTION_CONTEXT_TOKEN } from '../collection.context';
+import { UmbCollectionContext, UMB_COLLECTION_CONTEXT_TOKEN } from '../../../shared/collection/collection.context';
 import {
 	UmbTableColumn,
 	UmbTableConfig,
@@ -10,15 +10,15 @@ import {
 	UmbTableItem,
 	UmbTableOrderedEvent,
 	UmbTableSelectedEvent,
-} from '../../components/table';
+} from '../../../shared/components/table';
 import type { DocumentDetails } from '@umbraco-cms/models';
 import { UmbLitElement } from '@umbraco-cms/element';
+import { EntityTreeItem } from '@umbraco-cms/backend-api';
 
 type EntityType = DocumentDetails;
 
-@customElement('umb-collection-view-document-table')
-export class UmbCollectionViewDocumentTableElement extends UmbLitElement {
-
+@customElement('umb-document-table-collection-view')
+export class UmbDocumentTableCollectionViewElement extends UmbLitElement {
 	static styles = [
 		UUITextStyles,
 		css`
@@ -38,7 +38,7 @@ export class UmbCollectionViewDocumentTableElement extends UmbLitElement {
 	];
 
 	@state()
-	private _items?: Array<EntityType>;
+	private _items?: Array<EntityTreeItem>;
 
 	@state()
 	private _tableConfig: UmbTableConfig = {
@@ -50,6 +50,10 @@ export class UmbCollectionViewDocumentTableElement extends UmbLitElement {
 		{
 			name: 'Name',
 			alias: 'entityName',
+		},
+		{
+			name: 'Actions',
+			alias: 'entityActions',
 		},
 	];
 
@@ -82,14 +86,20 @@ export class UmbCollectionViewDocumentTableElement extends UmbLitElement {
 		});
 	}
 
-	private _createTableItems(items: Array<any>) {
+	private _createTableItems(items: Array<EntityTreeItem>) {
 		this._tableItems = items.map((item) => {
+			// TODO: use unique instead of key
+			if (!item.key) throw new Error('Item key is missing.');
 			return {
 				key: item.key,
 				icon: item.icon,
 				data: [
 					{
 						columnAlias: 'entityName',
+						value: item.name || 'Untitled',
+					},
+					{
+						columnAlias: 'entityActions',
 						value: item.name || 'Untitled',
 					},
 				],
@@ -132,8 +142,10 @@ export class UmbCollectionViewDocumentTableElement extends UmbLitElement {
 	}
 }
 
+export default UmbDocumentTableCollectionViewElement;
+
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-collection-view-document-table': UmbCollectionViewDocumentTableElement;
+		'umb-collection-view-document-table': UmbDocumentTableCollectionViewElement;
 	}
 }
