@@ -103,7 +103,7 @@ export class UmbCollectionElement extends UmbLitElement {
 		return html`
 			<umb-body-layout no-header-background>
 				<umb-collection-toolbar slot="header"></umb-collection-toolbar>
-				<router-slot id="router-slot" .routes="${this._routes}"></router-slot>
+				<umb-router-slot id="router-slot" .routes="${this._routes}"></umb-router-slot>
 				${this._selection && this._selection.length > 0
 					? html`<umb-collection-selection-actions slot="footer"></umb-collection-selection-actions>`
 					: nothing}
