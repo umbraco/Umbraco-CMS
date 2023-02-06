@@ -3,11 +3,12 @@ using Umbraco.Cms.Infrastructure.Scoping;
 namespace Umbraco.Cms.Infrastructure.Migrations;
 
 /// <summary>
-/// Base class for creating a migration that does not have a scope provided for it
+/// Base class for creating a migration that does not have a scope provided for it.
 /// </summary>
 public abstract class UnscopedMigrationBase : MigrationBase
 {
-    protected UnscopedMigrationBase(IMigrationContext context) : base(context)
+    protected UnscopedMigrationBase(IMigrationContext context)
+        : base(context)
     {
     }
 

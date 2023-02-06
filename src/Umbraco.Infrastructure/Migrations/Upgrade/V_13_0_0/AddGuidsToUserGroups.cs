@@ -12,7 +12,8 @@ public class AddGuidsToUserGroups : UnscopedMigrationBase
     private const string NewColumnName = "key";
     private readonly IScopeProvider _scopeProvider;
 
-    public AddGuidsToUserGroups(IMigrationContext context, IScopeProvider scopeProvider) : base(context)
+    public AddGuidsToUserGroups(IMigrationContext context, IScopeProvider scopeProvider)
+        : base(context)
     {
         _scopeProvider = scopeProvider;
     }
