@@ -67,7 +67,7 @@ export class UmbDashboardExamineManagementElement extends UmbLitElement {
 		return html` ${this.backbutton
 				? html` <a href="section/settings/dashboard/examine-management"> &larr; Back to overview </a> `
 				: nothing}
-			<router-slot @changestate="${this._onRouteChange}" .routes=${this._routes}></router-slot>`;
+			<umb-router-slot @changestate="${this._onRouteChange}" .routes=${this._routes}></umb-router-slot>`;
 	}
 }
 

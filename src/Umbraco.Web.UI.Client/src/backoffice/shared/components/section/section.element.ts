@@ -199,7 +199,7 @@ export class UmbSectionElement extends UmbLitElement {
 			<umb-section-main>
 				${this._views && this._views.length > 0 ? html`<umb-section-views></umb-section-views>` : nothing}
 				${this._routes && this._routes.length > 0
-					? html`<router-slot id="router-slot" .routes="${this._routes}"></router-slot>`
+					? html`<umb-router-slot id="router-slot" .routes="${this._routes}"></umb-router-slot>`
 					: nothing}
 				<slot></slot>
 			</umb-section-main>

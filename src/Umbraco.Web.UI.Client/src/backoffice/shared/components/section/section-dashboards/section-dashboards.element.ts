@@ -150,7 +150,7 @@ export class UmbSectionDashboardsElement extends UmbLitElement {
 		return html`
 			${this._renderNavigation()}
 			<uui-scroll-container id="scroll-container">
-				<router-slot id="router-slot" .routes="${this._routes}"></router-slot>
+				<umb-router-slot id="router-slot" .routes="${this._routes}"></umb-router-slot>
 			</uui-scroll-container>
 		`;
 	}
