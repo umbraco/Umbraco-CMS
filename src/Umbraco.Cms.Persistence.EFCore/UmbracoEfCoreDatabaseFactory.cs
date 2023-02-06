@@ -1,12 +1,11 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Persistence;
 using Umbraco.Cms.Infrastructure.Persistence.EfCore;
 using Umbraco.Cms.Persistence.EFCore.Entities;
 
 namespace Umbraco.Cms.Persistence.EFCore;
 
-public class UmbracoEfCoreDatabaseFactory : IUmbracoEfCoreDatabaseFactory, IDisposable
+public class UmbracoEfCoreDatabaseFactory : IUmbracoEfCoreDatabaseFactory
 {
     private readonly IDatabaseInfo _databaseInfo;
     private readonly IServiceScopeFactory _scopeFactory;
@@ -30,5 +29,9 @@ public class UmbracoEfCoreDatabaseFactory : IUmbracoEfCoreDatabaseFactory, IDisp
     }
 
 
-    public void Dispose() => _scope?.Dispose();
+    public void Dispose()
+    {
+        _scope?.Dispose();
+        _scope = null;
+    }
 }

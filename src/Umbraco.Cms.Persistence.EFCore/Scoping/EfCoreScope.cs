@@ -1,4 +1,6 @@
-﻿namespace Umbraco.Cms.Persistence.EFCore.Scoping;
+﻿using Umbraco.Extensions;
+
+namespace Umbraco.Cms.Persistence.EFCore.Scoping;
 
 internal class EfCoreScope : IEfCoreScope
 {
@@ -51,6 +53,7 @@ internal class EfCoreScope : IEfCoreScope
             }
             finally
             {
+                _efCoreDatabaseFactory.Dispose();
                 _umbracoEfCoreDatabase.Dispose();
                 _umbracoEfCoreDatabase = null;
             }
