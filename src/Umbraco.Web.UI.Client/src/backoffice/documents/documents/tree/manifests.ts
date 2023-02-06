@@ -11,7 +11,7 @@ const tree: ManifestTree = {
 	meta: {
 		storeAlias: UMB_DOCUMENT_TREE_STORE_CONTEXT_TOKEN.toString(),
 		repository: UmbDocumentRepository,
-	}
+	},
 };
 
 const treeItemActions: Array<ManifestTreeItemAction> = [
@@ -25,18 +25,6 @@ const treeItemActions: Array<ManifestTreeItemAction> = [
 			entityType: 'document',
 			label: 'Create',
 			icon: 'add',
-		},
-	},
-	{
-		type: 'treeItemAction',
-		alias: 'Umb.TreeItemAction.Document.Delete',
-		name: 'Document Tree Item Action Delete',
-		loader: () => import('./actions/action-document-delete.element'),
-		weight: 100,
-		meta: {
-			entityType: 'document',
-			label: 'Delete',
-			icon: 'delete',
 		},
 	},
 	{
