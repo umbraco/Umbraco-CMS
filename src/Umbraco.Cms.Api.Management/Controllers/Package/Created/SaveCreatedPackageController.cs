@@ -35,20 +35,15 @@ public class SaveCreatedPackageController : CreatedPackageControllerBase
     [ProducesResponseType(typeof(PackageDefinitionViewModel), StatusCodes.Status200OK)]
     public async Task<ActionResult<PackageDefinitionViewModel>> Save(PackageDefinitionViewModel model)
     {
-        if (ModelState.IsValid == false)
-        {
-            return await Task.FromResult(ValidationProblem(ModelState));
-        }
-
         PackageDefinition packageDefinition = _packageDefinitionFactory.CreatePackageDefinition(model);
 
         // Save it
         if (!_packagingService.SaveCreatedPackage(packageDefinition))
         {
-            return await Task.FromResult(ValidationProblem(
+            return ValidationProblem(
                 model.Key == default
                     ? $"A package with the name '{model.Name}' already exists"
-                    : $"The package with key {model.Key} was not found"));
+                    : $"The package with key {model.Key} was not found");
         }
 
         return await Task.FromResult(Ok(_umbracoMapper.Map<PackageDefinitionViewModel>(packageDefinition)));

@@ -89,12 +89,9 @@ public class CreatedPackageSchemaRepository : ICreatedPackagesRepository
         List<CreatedPackageSchemaDto> xmlSchemas = _umbracoDatabase.Fetch<CreatedPackageSchemaDto>(query);
         foreach (CreatedPackageSchemaDto packageSchema in xmlSchemas)
         {
-            var packageDefinition = _xmlParser.ToPackageDefinition(XElement.Parse(packageSchema.Value));
+            PackageDefinition? packageDefinition = CreatePackageDefinitionFromSchema(packageSchema);
             if (packageDefinition is not null)
             {
-                packageDefinition.Id = packageSchema.Id;
-                packageDefinition.Name = packageSchema.Name;
-                packageDefinition.PackageId = packageSchema.PackageId;
                 packageDefinitions.Add(packageDefinition);
             }
         }
@@ -108,6 +105,7 @@ public class CreatedPackageSchemaRepository : ICreatedPackagesRepository
             .Select<CreatedPackageSchemaDto>()
             .From<CreatedPackageSchemaDto>()
             .Where<CreatedPackageSchemaDto>(x => x.Id == id);
+
         List<CreatedPackageSchemaDto> schemaDtos = _umbracoDatabase.Fetch<CreatedPackageSchemaDto>(query);
 
         if (schemaDtos.IsCollectionEmpty())
@@ -115,16 +113,7 @@ public class CreatedPackageSchemaRepository : ICreatedPackagesRepository
             return null;
         }
 
-        CreatedPackageSchemaDto packageSchema = schemaDtos.First();
-        var packageDefinition = _xmlParser.ToPackageDefinition(XElement.Parse(packageSchema.Value));
-        if (packageDefinition is not null)
-        {
-            packageDefinition.Id = packageSchema.Id;
-            packageDefinition.Name = packageSchema.Name;
-            packageDefinition.PackageId = packageSchema.PackageId;
-        }
-
-        return packageDefinition;
+        return CreatePackageDefinitionFromSchema(schemaDtos.First());
     }
 
     public PackageDefinition? GetByKey(Guid key)
@@ -141,16 +130,7 @@ public class CreatedPackageSchemaRepository : ICreatedPackagesRepository
             return null;
         }
 
-        CreatedPackageSchemaDto packageSchema = schemaDtos.First();
-        var packageDefinition = _xmlParser.ToPackageDefinition(XElement.Parse(packageSchema.Value));
-        if (packageDefinition is not null)
-        {
-            packageDefinition.Id = packageSchema.Id;
-            packageDefinition.Name = packageSchema.Name;
-            packageDefinition.PackageId = packageSchema.PackageId;
-        }
-
-        return packageDefinition;
+        return CreatePackageDefinitionFromSchema(schemaDtos.First());
     }
 
     public void Delete(int id)
@@ -791,5 +771,19 @@ public class CreatedPackageSchemaRepository : ICreatedPackagesRepository
         {
             mediaTypes.Add(mediaType);
         }
+    }
+
+    private PackageDefinition? CreatePackageDefinitionFromSchema(CreatedPackageSchemaDto packageSchema)
+    {
+        var packageDefinition = _xmlParser.ToPackageDefinition(XElement.Parse(packageSchema.Value));
+
+        if (packageDefinition is not null)
+        {
+            packageDefinition.Id = packageSchema.Id;
+            packageDefinition.Name = packageSchema.Name;
+            packageDefinition.PackageId = packageSchema.PackageId;
+        }
+
+        return packageDefinition;
     }
 }

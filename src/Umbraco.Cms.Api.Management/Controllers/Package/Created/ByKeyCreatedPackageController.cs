@@ -25,7 +25,7 @@ public class ByKeyCreatedPackageController : CreatedPackageControllerBase
     /// <returns>The package or not found result.</returns>
     [HttpGet("{key:guid}")]
     [MapToApiVersion("1.0")]
-    [ProducesResponseType(typeof(NotFoundResult), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(PackageDefinitionViewModel), StatusCodes.Status200OK)]
     public async Task<ActionResult<PackageDefinitionViewModel>> ByKey(Guid key)
     {

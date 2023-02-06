@@ -24,7 +24,7 @@ public class DeleteCreatedPackageController : CreatedPackageControllerBase
     /// <returns>The result of the deletion.</returns>
     [HttpDelete("{key:guid}")]
     [MapToApiVersion("1.0")]
-    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<IActionResult> Delete(Guid key)
     {
@@ -32,10 +32,12 @@ public class DeleteCreatedPackageController : CreatedPackageControllerBase
 
         if (package is null)
         {
-            return await Task.FromResult(NotFound());
+            return NotFound();
         }
 
-        _packagingService.DeleteCreatedPackage(package.Id, _backofficeSecurityAccessor.BackOfficeSecurity?.GetUserId().Result ?? -1);
+        _packagingService.DeleteCreatedPackage(
+            package.Id,
+            _backofficeSecurityAccessor.BackOfficeSecurity?.GetUserId().Result ?? -1);
 
         return await Task.FromResult(Ok());
     }
