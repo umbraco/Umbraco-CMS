@@ -6,6 +6,7 @@ import { UmbDashboardExamineIndexElement } from './views/section-view-examine-in
 import { UmbDashboardExamineSearcherElement } from './views/section-view-examine-searchers';
 
 import { UmbLitElement } from '@umbraco-cms/element';
+import { UmbRouterSlotChangeEvent, UmbRouterSlotInitEvent } from '@umbraco-cms/router';
 
 @customElement('umb-dashboard-examine-management')
 export class UmbDashboardExamineManagementElement extends UmbLitElement {
@@ -46,28 +47,22 @@ export class UmbDashboardExamineManagementElement extends UmbLitElement {
 	];
 
 	@state()
-	private _currentPath?: string;
+	private _routerPath?: string;
+	private _activePath?: string;
 
-	/**
-	 *
-	 */
-	constructor() {
-		super();
-	}
-
-	private _onRouteChange() {
-		this._currentPath = path();
-	}
-
-	private get backbutton(): boolean {
-		return !(this._currentPath?.endsWith('examine-management/'));
-	}
 
 	render() {
-		return html` ${this.backbutton
-				? html` <a href="section/settings/dashboard/examine-management"> &larr; Back to overview </a> `
+		return html` ${this._activePath !== ''
+				? html` <a href="${this._routerPath}/examine-management/"> &larr; Back to overview </a> `
 				: nothing}
-			<umb-router-slot @changestate="${this._onRouteChange}" .routes=${this._routes}></umb-router-slot>`;
+			<umb-router-slot
+				.routes=${this._routes}
+				@init=${(event: UmbRouterSlotInitEvent) => {
+					this._routerPath = event.target.absoluteRouterPath;
+				}}
+				@change=${(event: UmbRouterSlotChangeEvent) => {
+					this._activePath = event.target.localActiveViewPath;
+				}}></umb-router-slot>`;
 	}
 }
 
