@@ -1,16 +1,16 @@
 import { html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
-import { isManifestElementNameType , umbExtensionsRegistry } from '@umbraco-cms/extensions-api';
+import { isManifestElementNameType, umbExtensionsRegistry } from '@umbraco-cms/extensions-api';
 import type { ManifestBase } from '@umbraco-cms/models';
 import { UmbLitElement } from '@umbraco-cms/element';
-import { UMB_MODAL_SERVICE_CONTEXT_TOKEN } from 'src/core/modal/modal.service';
+import { UmbModalService, UMB_MODAL_SERVICE_CONTEXT_TOKEN } from '@umbraco-cms/modal';
 
 @customElement('umb-extension-root-workspace')
 export class UmbExtensionRootWorkspaceElement extends UmbLitElement {
 	@state()
 	private _extensions?: Array<ManifestBase> = undefined;
 
-	private _modalService: UmbModalService;
+	private _modalService?: UmbModalService;
 
 	connectedCallback(): void {
 		super.connectedCallback();
@@ -28,11 +28,11 @@ export class UmbExtensionRootWorkspaceElement extends UmbLitElement {
 	}
 
 	#removeExtension(extension: ManifestBase) {
-		const modalHandler = this._modalService.confirm({
+		const modalHandler = this._modalService?.confirm({
 			headline: 'Unload extension',
 			confirmLabel: 'Unload',
 			content: html`<p>Are you sure you want to unload the extension <strong>${extension.alias}</strong>?</p>`,
-			color: 'danger'
+			color: 'danger',
 		});
 
 		modalHandler?.onClose().then(({ confirmed }: any) => {
@@ -40,7 +40,7 @@ export class UmbExtensionRootWorkspaceElement extends UmbLitElement {
 				umbExtensionsRegistry.unregister(extension.alias);
 			}
 		});
-	}	
+	}
 
 	render() {
 		return html`
