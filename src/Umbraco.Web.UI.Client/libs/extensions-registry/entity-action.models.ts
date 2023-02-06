@@ -10,4 +10,5 @@ export interface MetaEntityAction {
 	label: string;
 	entityType: string;
 	api: any; // create interface
+	repositoryAlias: string;
 }

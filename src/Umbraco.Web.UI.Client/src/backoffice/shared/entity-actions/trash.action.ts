@@ -1,14 +1,15 @@
-import { UmbDocumentRepository } from '../repository/document.repository';
-import { UmbEntityActionBase } from '../../../shared/components/entity-action';
+import { UmbEntityActionBase } from '../components/entity-action';
 import { UmbContextConsumerController } from '@umbraco-cms/context-api';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 import { UmbModalService, UMB_MODAL_SERVICE_CONTEXT_TOKEN } from '@umbraco-cms/modal';
 
-export class UmbTrashDocumentEntityAction extends UmbEntityActionBase<UmbDocumentRepository> {
+export class UmbTrashEntityAction<
+	T extends { trash(unique: string): Promise<void>; requestTreeItems(uniques: Array<string>): any }
+> extends UmbEntityActionBase<T> {
 	#modalService?: UmbModalService;
 
-	constructor(host: UmbControllerHostInterface, key: string) {
-		super(host, UmbDocumentRepository, key);
+	constructor(host: UmbControllerHostInterface, repositoryAlias: string, key: string) {
+		super(host, repositoryAlias, key);
 
 		new UmbContextConsumerController(this.host, UMB_MODAL_SERVICE_CONTEXT_TOKEN, (instance) => {
 			this.#modalService = instance;
@@ -16,6 +17,8 @@ export class UmbTrashDocumentEntityAction extends UmbEntityActionBase<UmbDocumen
 	}
 
 	async execute() {
+		if (!this.repository) return;
+
 		const { data } = await this.repository.requestTreeItems([this.unique]);
 
 		if (data) {
@@ -30,7 +33,7 @@ export class UmbTrashDocumentEntityAction extends UmbEntityActionBase<UmbDocumen
 
 			modalHandler?.onClose().then(({ confirmed }) => {
 				if (confirmed) {
-					this.repository.delete(this.unique);
+					this.repository?.trash(this.unique);
 				}
 			});
 		}

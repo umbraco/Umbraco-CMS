@@ -1,26 +1,20 @@
+import { UmbCopyEntityAction } from '../../../shared/entity-actions/copy.action';
+import { UmbMoveEntityAction } from '../../../shared/entity-actions/move.action';
+import { UmbTrashEntityAction } from '../../../shared/entity-actions/trash.action';
+import { UmbSortChildrenOfEntityAction } from '../../../shared/entity-actions/sort-children-of.action';
 import { UmbCreateDocumentEntityAction } from './create.action';
 import { UmbPublishDocumentEntityAction } from './publish.action';
-import { UmbSaveDocumentWorkspaceAction } from '../workspace/actions/save.action';
-import { UmbCopyDocumentEntityAction } from './copy.action';
 import { UmbDocumentCultureAndHostnamesEntityAction } from './culture-and-hostnames.action';
-import { UmbMoveDocumentEntityAction } from './move.action';
-import { UmbTrashDocumentEntityAction } from './trash.action';
-import { UmbSortChildrenOfDocumentEntityAction } from './sort-children-of.action';
 import { UmbCreateDocumentBlueprintEntityAction } from './create-blueprint.action';
 import { UmbDocumentPublicAccessEntityAction } from './public-access.action';
 import { UmbDocumentPermissionsEntityAction } from './permissions.action';
-import { UmbSaveAndPublishDocumentWorkspaceAction } from '../workspace/actions/save-and-publish.action';
 import { UmbUnpublishDocumentEntityAction } from './unpublish.action';
-import { UmbSaveAndPreviewDocumentWorkspaceAction } from '../workspace/actions/save-and-preview.action';
-import { UmbSaveAndScheduleDocumentWorkspaceAction } from '../workspace/actions/save-and-schedule.action';
 import { UmbRollbackDocumentEntityAction } from './rollback.action';
 import { ManifestEntityAction } from '@umbraco-cms/extensions-registry';
 
 const entityType = 'document';
+const repositoryAlias = 'Umb.Repository.Documents';
 
-/* TODO: This is a temporary solution to get the entity actions working.
- Some actions will only work in the tree (sort), others will only work in a workspace (Save, Save and Publish, etc.).
- we will ned a way to filter in the manifest. Either on type (treeEntityAction, workspaceEntityAction) or on meta (tree, workspace).*/
 const entityActions: Array<ManifestEntityAction> = [
 	{
 		type: 'entityAction',
@@ -31,6 +25,7 @@ const entityActions: Array<ManifestEntityAction> = [
 			entityType,
 			icon: 'umb:add',
 			label: 'Create',
+			repositoryAlias,
 			api: UmbCreateDocumentEntityAction,
 		},
 	},
@@ -43,7 +38,8 @@ const entityActions: Array<ManifestEntityAction> = [
 			entityType,
 			icon: 'umb:document',
 			label: 'Trash',
-			api: UmbTrashDocumentEntityAction,
+			repositoryAlias,
+			api: UmbTrashEntityAction,
 		},
 	},
 	{
@@ -55,6 +51,7 @@ const entityActions: Array<ManifestEntityAction> = [
 			entityType,
 			icon: 'umb:blueprint',
 			label: 'Create Content Template',
+			repositoryAlias,
 			api: UmbCreateDocumentBlueprintEntityAction,
 		},
 	},
@@ -67,7 +64,8 @@ const entityActions: Array<ManifestEntityAction> = [
 			entityType,
 			icon: 'umb:enter',
 			label: 'Move',
-			api: UmbMoveDocumentEntityAction,
+			repositoryAlias,
+			api: UmbMoveEntityAction,
 		},
 	},
 	{
@@ -79,7 +77,8 @@ const entityActions: Array<ManifestEntityAction> = [
 			entityType,
 			icon: 'umb:documents',
 			label: 'Copy',
-			api: UmbCopyDocumentEntityAction,
+			repositoryAlias,
+			api: UmbCopyEntityAction,
 		},
 	},
 	{
@@ -91,7 +90,8 @@ const entityActions: Array<ManifestEntityAction> = [
 			entityType,
 			icon: 'umb:navigation-vertical',
 			label: 'Sort',
-			api: UmbSortChildrenOfDocumentEntityAction,
+			repositoryAlias,
+			api: UmbSortChildrenOfEntityAction,
 		},
 	},
 	{
@@ -103,6 +103,7 @@ const entityActions: Array<ManifestEntityAction> = [
 			entityType,
 			icon: 'umb:home',
 			label: 'Culture And Hostnames',
+			repositoryAlias,
 			api: UmbDocumentCultureAndHostnamesEntityAction,
 		},
 	},
@@ -114,6 +115,7 @@ const entityActions: Array<ManifestEntityAction> = [
 			entityType,
 			icon: 'umb:vcard',
 			label: 'Permissions',
+			repositoryAlias,
 			api: UmbDocumentPermissionsEntityAction,
 		},
 	},
@@ -125,6 +127,7 @@ const entityActions: Array<ManifestEntityAction> = [
 			entityType,
 			icon: 'umb:lock',
 			label: 'Public Access',
+			repositoryAlias,
 			api: UmbDocumentPublicAccessEntityAction,
 		},
 	},
@@ -136,6 +139,7 @@ const entityActions: Array<ManifestEntityAction> = [
 			entityType,
 			icon: 'umb:globe',
 			label: 'Publish',
+			repositoryAlias,
 			api: UmbPublishDocumentEntityAction,
 		},
 	},
@@ -147,6 +151,7 @@ const entityActions: Array<ManifestEntityAction> = [
 			entityType,
 			icon: 'umb:globe',
 			label: 'Publish',
+			repositoryAlias,
 			api: UmbPublishDocumentEntityAction,
 		},
 	},
@@ -158,6 +163,7 @@ const entityActions: Array<ManifestEntityAction> = [
 			entityType,
 			icon: 'umb:globe',
 			label: 'Unpublish',
+			repositoryAlias,
 			api: UmbUnpublishDocumentEntityAction,
 		},
 	},
@@ -169,6 +175,7 @@ const entityActions: Array<ManifestEntityAction> = [
 			entityType,
 			icon: 'umb:undo',
 			label: 'Rollback',
+			repositoryAlias,
 			api: UmbRollbackDocumentEntityAction,
 		},
 	},

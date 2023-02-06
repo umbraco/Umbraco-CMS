@@ -3,8 +3,8 @@ import { UmbEntityActionBase } from '../../../shared/components/entity-action';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 
 export class UmbCreateDocumentEntityAction extends UmbEntityActionBase<UmbDocumentRepository> {
-	constructor(host: UmbControllerHostInterface, unique: string) {
-		super(host, UmbDocumentRepository, unique);
+	constructor(host: UmbControllerHostInterface, repositoryAlias: string, unique: string) {
+		super(host, repositoryAlias, unique);
 	}
 
 	execute() {

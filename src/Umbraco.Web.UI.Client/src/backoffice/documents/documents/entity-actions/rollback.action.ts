@@ -3,11 +3,11 @@ import { UmbEntityActionBase } from '../../../shared/components/entity-action';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 
 export class UmbRollbackDocumentEntityAction extends UmbEntityActionBase<UmbDocumentRepository> {
-	constructor(host: UmbControllerHostInterface, unique: string) {
-		super(host, UmbDocumentRepository, unique);
+	constructor(host: UmbControllerHostInterface, repositoryAlias: string, unique: string) {
+		super(host, repositoryAlias, unique);
 	}
 
 	async execute() {
-		await this.repository.rollback();
+		await this.repository?.rollback();
 	}
 }

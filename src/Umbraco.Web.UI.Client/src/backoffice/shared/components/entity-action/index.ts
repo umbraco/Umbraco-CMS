@@ -1,5 +1,7 @@
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
-import type { UmbRepositoryFactory } from '@umbraco-cms/models';
+import { umbExtensionsRegistry } from '@umbraco-cms/extensions-api';
+import { UmbObserverController } from '@umbraco-cms/observable-api';
+import { createExtensionClass } from 'libs/extensions-api/create-extension-class.function';
 
 export interface UmbEntityAction<T> {
 	unique: string;
@@ -10,11 +12,26 @@ export interface UmbEntityAction<T> {
 export class UmbEntityActionBase<T> {
 	host: UmbControllerHostInterface;
 	unique: string;
-	repository: T;
+	repository?: T;
 
-	constructor(host: UmbControllerHostInterface, repository: UmbRepositoryFactory<T>, unique: string) {
+	constructor(host: UmbControllerHostInterface, repositoryAlias: string, unique: string) {
 		this.host = host;
 		this.unique = unique;
-		this.repository = new repository(this.host);
+
+		// TODO: unsure a method can't be called before everything is initialized
+		new UmbObserverController(
+			this.host,
+			umbExtensionsRegistry.getByTypeAndAlias('repository', repositoryAlias),
+			async (repositoryManifest) => {
+				if (!repositoryManifest) return;
+
+				try {
+					const result = await createExtensionClass<T>(repositoryManifest, [this.host]);
+					this.repository = result;
+				} catch (error) {
+					throw new Error('Could not create repository with alias: ' + repositoryAlias + '');
+				}
+			}
+		);
 	}
 }
