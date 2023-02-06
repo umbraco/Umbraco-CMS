@@ -67,7 +67,8 @@ public class UmbracoRouteValueTransformerTests
             Mock.Of<IDataProtectionProvider>(),
             Mock.Of<IControllerActionSearcher>(),
             publicAccessRequestHandler.Object,
-            Mock.Of<IUmbracoVirtualPageRoute>()
+            Mock.Of<IUmbracoVirtualPageRoute>(),
+            Mock.Of<IOptionsMonitor<GlobalSettings>>()
             );
         return transformer;
     }
