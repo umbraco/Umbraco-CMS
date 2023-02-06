@@ -30,7 +30,8 @@ export class UmbTreeContextBase implements UmbTreeContext {
 		this.tree = tree;
 
 		if (this.tree.meta.repository) {
-			this.repository = new this.tree.meta.repository(this.#host) as UmbTreeRepository;
+			// TODO: should be using the right extension and the createExtensionClass method.
+			this.repository = new this.tree.meta.repository(this.#host) as any;
 		}
 	}
 
