@@ -176,9 +176,9 @@ public class SqliteSyntaxProvider : SqlSyntaxProviderBase<SqliteSyntaxProvider>
 
     public override bool DoesPrimaryKeyExist(IDatabase db, string tableName, string primaryKeyName)
     {
-        IEnumerable<string> items = db
-            .Fetch<string>($"SELECT l.name FROM pragma_table_info('{tableName}') as l WHERE l.pk = 1;")
-            .Where(x => x == primaryKeyName);
+        IEnumerable<SqliteMaster> items = db.Fetch<SqliteMaster>("select * from sqlite_master where type = 'table'")
+            .Where(x => x.Name == tableName)
+            .Where(x => x.Sql.Contains($"CONSTRAINT {primaryKeyName} PRIMARY KEY"));
 
         return items.Any();
     }
