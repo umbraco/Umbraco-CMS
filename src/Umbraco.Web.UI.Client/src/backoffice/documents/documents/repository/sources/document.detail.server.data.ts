@@ -2,7 +2,7 @@ import { RepositoryDetailDataSource } from '@umbraco-cms/repository';
 import { ProblemDetails } from '@umbraco-cms/backend-api';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 import { tryExecuteAndNotify } from '@umbraco-cms/resources';
-import type { DocumentDetails } from '@umbraco-cms/models';
+import type { DataSourceResponse, DocumentDetails } from '@umbraco-cms/models';
 
 /**
  * A data source for the Template detail that fetches data from the server
@@ -94,10 +94,10 @@ export class UmbDocumentDetailServerDataSource implements RepositoryDetailDataSo
 	 * @return {*}
 	 * @memberof UmbDocumentDetailServerDataSource
 	 */
-	insert(document: DocumentDetails) {
+	async insert(document: DocumentDetails) {
 		if (!document.key) {
-			const error: ProblemDetails = { title: 'Document key is missing' };
-			return { error };
+			//const error: ProblemDetails = { title: 'Document key is missing' };
+			return Promise.reject();
 		}
 		//const payload = { key: document.key, requestBody: document };
 
@@ -110,7 +110,7 @@ export class UmbDocumentDetailServerDataSource implements RepositoryDetailDataSo
 			return Promise.reject();
 		}
 		//return tryExecuteAndNotify(this.#host, DocumentResource.postDocument(payload));
-		return tryExecuteAndNotify(this.#host,
+		return tryExecuteAndNotify<DocumentDetails>(this.#host,
 			fetch('/umbraco/management/api/v1/document/save', {
 					method: 'POST',
 					body: body,
@@ -118,7 +118,7 @@ export class UmbDocumentDetailServerDataSource implements RepositoryDetailDataSo
 						'Content-Type': 'application/json',
 					},
 				}
-			)
+			) as any
 		);
 	}
 
@@ -145,7 +145,7 @@ export class UmbDocumentDetailServerDataSource implements RepositoryDetailDataSo
 			return { error: myError };
 		}
 
-		return tryExecuteAndNotify(this.#host,
+		return tryExecuteAndNotify<DocumentDetails>(this.#host,
 			fetch('/umbraco/management/api/v1/document/save', {
 					method: 'POST',
 					body: body,
@@ -153,9 +153,31 @@ export class UmbDocumentDetailServerDataSource implements RepositoryDetailDataSo
 						'Content-Type': 'application/json',
 					},
 				}
-			)
+			) as any
 		);
+	}
 
+	/**
+	 * Trash a Document on the server
+	 * @param {Document} Document
+	 * @return {*}
+	 * @memberof UmbDocumentDetailServerDataSource
+	 */
+	async trash(key: string) {
+		if (!key) {
+			const error: ProblemDetails = { title: 'Key is missing' };
+			return { error };
+		}
+
+		return tryExecuteAndNotify<DocumentDetails>(this.#host,
+			fetch('/umbraco/management/api/v1/document/trash', {
+				method: 'POST',
+				body: JSON.stringify([key]),
+				headers: {
+					'Content-Type': 'application/json',
+				},
+			}) as any
+		);
 	}
 
 	/**
