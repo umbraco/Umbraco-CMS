@@ -272,7 +272,7 @@ where tbl.[name]=@0 and col.[name]=@1;",
         return !constraintName.IsNullOrWhiteSpace();
     }
 
-    public override bool DoesPrimaryKeyExists(IDatabase db, string tableName, string primaryKeyName)
+    public override bool DoesPrimaryKeyExist(IDatabase db, string tableName, string primaryKeyName)
     {
         IEnumerable<SqlPrimaryKey>? keys = db.Fetch<SqlPrimaryKey>($"select * from sysobjects where xtype='pk' and  parent_obj in (select id from sysobjects where name='{tableName}')")
             .Where(x => x.Name == primaryKeyName);

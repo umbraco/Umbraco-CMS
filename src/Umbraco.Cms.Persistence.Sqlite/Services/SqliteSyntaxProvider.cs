@@ -174,7 +174,7 @@ public class SqliteSyntaxProvider : SqlSyntaxProviderBase<SqliteSyntaxProvider>
         return false;
     }
 
-    public override bool DoesPrimaryKeyExists(IDatabase db, string tableName, string primaryKeyName)
+    public override bool DoesPrimaryKeyExist(IDatabase db, string tableName, string primaryKeyName)
     {
         IEnumerable<string> items = db
             .Fetch<string>($"SELECT l.name FROM pragma_table_info('{tableName}') as l WHERE l.pk = 1;")

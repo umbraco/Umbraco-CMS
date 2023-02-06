@@ -112,7 +112,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations
 
         protected bool PrimaryKeyExists(string tableName, string primaryKeyName)
         {
-            return SqlSyntax.DoesPrimaryKeyExists(Context.Database, tableName, primaryKeyName);
+            return SqlSyntax.DoesPrimaryKeyExist(Context.Database, tableName, primaryKeyName);
         }
 
         protected bool ColumnExists(string tableName, string columnName)
