@@ -10,6 +10,7 @@ export class UmbDocumentTableActionColumnLayoutElement extends LitElement {
 		css`
 			#action-menu-popover {
 				display: block;
+				text-align: right;
 			}
 			#action-menu-dropdown {
 				overflow: hidden;

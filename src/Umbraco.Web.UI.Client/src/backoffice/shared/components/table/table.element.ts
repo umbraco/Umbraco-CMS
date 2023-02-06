@@ -284,7 +284,7 @@ export class UmbTableElement extends LitElement {
 	}
 
 	private _renderRowCell(column: UmbTableColumn, item: UmbTableItem) {
-		return html`<uui-table-cell
+		return html`<uui-table-cell style="width: ${column.width || 'auto'}"
 			>${this._renderCellContent(column, item)}</uui-table-cell
 			>
 		</uui-table-cell>`;
