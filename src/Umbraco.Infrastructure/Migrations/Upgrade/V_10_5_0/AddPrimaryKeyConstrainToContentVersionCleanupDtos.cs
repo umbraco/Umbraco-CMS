@@ -13,7 +13,7 @@ public class AddPrimaryKeyConstrainToContentVersionCleanupDtos : MigrationBase
         IEnumerable<ContentVersionCleanupPolicyDto>? contentVersionCleanupPolicyDtos = null;
         if (TableExists(ContentVersionCleanupPolicyDto.TableName))
         {
-            if (PrimaryKeyExists(ContentVersionCleanupPolicyDto.TableName, "PK_umbracoContentVersionCleanupPolicy"))
+            if (PrimaryKeyExists(ContentVersionCleanupPolicyDto.TableName, "contentTypeId"))
             {
                 return;
             }
