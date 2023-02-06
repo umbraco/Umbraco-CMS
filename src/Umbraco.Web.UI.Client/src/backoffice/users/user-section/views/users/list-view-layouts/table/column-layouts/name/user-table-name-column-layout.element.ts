@@ -1,9 +1,6 @@
 import { html, LitElement } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
-import type {
-	UmbTableColumn,
-	UmbTableItem,
-} from '../../../../../../../../shared/components/table/table.element';
+import type { UmbTableColumn, UmbTableItem } from '../../../../../../../../shared/components/table/table.element';
 
 @customElement('umb-user-table-name-column-layout')
 export class UmbUserTableNameColumnLayoutElement extends LitElement {
@@ -18,7 +15,7 @@ export class UmbUserTableNameColumnLayoutElement extends LitElement {
 
 	render() {
 		return html` <div style="display: flex; align-items: center;">
-			<uui-avatar name="${this.value.name}" style="margin-right: 10px;"></uui-avatar>
+			<uui-avatar name="${this.value.name}" style="margin-right: var(--uui-size-space-3);"></uui-avatar>
 			<a style="font-weight: bold;" href="section/users/view/users/user/${this.item.key}">${this.value.name}</a>
 		</div>`;
 	}

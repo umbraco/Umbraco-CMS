@@ -17,8 +17,8 @@ export class UmbModalLayoutContentPickerElement extends UmbModalLayoutElement<Um
 		UUITextStyles,
 		css`
 			h3 {
-				margin-left: 16px;
-				margin-right: 16px;
+				margin-left: var(--uui-size-space-5);
+				margin-right: var(--uui-size-space-5);
 			}
 
 			uui-input {
@@ -34,7 +34,7 @@ export class UmbModalLayoutContentPickerElement extends UmbModalLayoutElement<Um
 			#content-list {
 				display: flex;
 				flex-direction: column;
-				gap: 8px;
+				gap: var(--uui-size-space-3);
 			}
 
 			.content-item {
@@ -51,15 +51,20 @@ export class UmbModalLayoutContentPickerElement extends UmbModalLayoutElement<Um
 	@state()
 	_selection: Array<string> = [];
 
+	@state()
+	_multiple = true;
+
 	connectedCallback() {
 		super.connectedCallback();
 		this._selection = this.data?.selection ?? [];
+		this._multiple = this.data?.multiple ?? true;
 	}
 
 	private _handleSelectionChange(e: CustomEvent) {
 		e.stopPropagation();
 		const element = e.target as UmbTreeElement;
-		this._selection = element.selection;
+		//TODO: Should multiple property be implemented here or be passed down into umb-tree?
+		this._selection = this._multiple ? element.selection : [element.selection[element.selection.length - 1]];
 	}
 
 	private _submit() {

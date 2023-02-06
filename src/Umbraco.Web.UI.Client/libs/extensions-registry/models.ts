@@ -16,7 +16,9 @@ import type { ManifestPackageView } from './package-view.models';
 import type { ManifestExternalLoginProvider } from './external-login-provider.models';
 import type { ManifestCollectionBulkAction } from './collection-bulk-action.models';
 import type { ManifestCollectionView } from './collection-view.models';
+import type { ManifestHealthCheck } from './health-check.models';
 import type { ManifestSidebarMenuItem } from './sidebar-menu-item.models';
+import type { ManifestTheme } from './theme.models';
 
 export * from './header-app.models';
 export * from './section.models';
@@ -36,7 +38,9 @@ export * from './package-view.models';
 export * from './external-login-provider.models';
 export * from './collection-bulk-action.models';
 export * from './collection-view.models';
+export * from './health-check.models';
 export * from './sidebar-menu-item.models';
+export * from './theme.models';
 
 export type ManifestTypes =
 	| ManifestCustom
@@ -60,7 +64,9 @@ export type ManifestTypes =
 	| ManifestEntrypoint
 	| ManifestCollectionBulkAction
 	| ManifestCollectionView
-	| ManifestSidebarMenuItem;
+	| ManifestHealthCheck
+	| ManifestSidebarMenuItem
+	| ManifestTheme;
 
 export type ManifestStandardTypes = ManifestTypes['type'];
 
@@ -75,13 +81,28 @@ export interface ManifestBase {
 	weight?: number;
 }
 
-export interface ManifestElement extends ManifestBase {
+export interface ManifestWithLoader<LoaderReturnType> extends ManifestBase {
+	loader?: () => Promise<LoaderReturnType>;
+}
+
+export interface ManifestElement extends ManifestWithLoader<object | HTMLElement> {
 	type: ManifestStandardTypes;
 	js?: string;
 	elementName?: string;
-	loader?: () => Promise<object | HTMLElement>;
+	//loader?: () => Promise<object | HTMLElement>;
 	meta?: any;
 }
+
+export interface ManifestWithView extends ManifestElement {
+	meta: MetaManifestWithView;
+}
+
+export interface MetaManifestWithView {
+	pathname: string;
+	label: string;
+	icon: string;
+}
+
 
 export interface ManifestElementWithElementName extends ManifestElement {
 	elementName: string;

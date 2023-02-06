@@ -2,7 +2,6 @@ import { defineElement } from '@umbraco-ui/uui-base/lib/registration';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html } from 'lit';
 
-
 import { UmbModalService, UMB_MODAL_SERVICE_CONTEXT_TOKEN } from '../core/modal';
 import { UmbUserStore } from './users/users/user.store';
 import { UmbUserGroupStore } from './users/user-groups/user-group.store';
@@ -12,9 +11,12 @@ import {
 	UMB_CURRENT_USER_HISTORY_STORE_CONTEXT_TOKEN,
 } from './users/current-user/current-user-history.store';
 
-import { UmbBackofficeContext, UMB_BACKOFFICE_CONTEXT_TOKEN } from './shared/components/backoffice-frame/backoffice.context';
-import {UmbDocumentTypeDetailStore} from './documents/document-types/document-type.detail.store';
-import {UmbDocumentTypeTreeStore} from './documents/document-types/document-type.tree.store';
+import {
+	UmbBackofficeContext,
+	UMB_BACKOFFICE_CONTEXT_TOKEN,
+} from './shared/components/backoffice-frame/backoffice.context';
+import { UmbDocumentTypeDetailStore } from './documents/document-types/document-type.detail.store';
+import { UmbDocumentTypeTreeStore } from './documents/document-types/document-type.tree.store';
 import { UmbMediaTypeDetailStore } from './media/media-types/media-type.detail.store';
 import { UmbMediaTypeTreeStore } from './media/media-types/media-type.tree.store';
 import { UmbDocumentDetailStore } from './documents/documents/document.detail.store';
@@ -28,11 +30,15 @@ import { UmbDictionaryDetailStore } from './translation/dictionary/dictionary.de
 import { UmbDictionaryTreeStore } from './translation/dictionary/dictionary.tree.store';
 import { UmbDocumentBlueprintDetailStore } from './documents/document-blueprints/document-blueprint.detail.store';
 import { UmbDocumentBlueprintTreeStore } from './documents/document-blueprints/document-blueprint.tree.store';
-
 import { UmbDataTypeDetailStore } from './settings/data-types/data-type.detail.store';
-import { UmbDataTypeTreeStore } from './settings/data-types/data-type.tree.store';
+import { UmbDataTypeTreeStore } from './settings/data-types/tree/data-type.tree.store';
+import { UmbTemplateTreeStore } from './templating/templates/tree/data/template.tree.store';
+import { UmbTemplateDetailStore } from './templating/templates/workspace/data/template.detail.store';
+import { UmbThemeContext } from './themes/theme.context';
+import { UmbLanguageStore } from './settings/languages/language.store';
 import { UmbNotificationService, UMB_NOTIFICATION_SERVICE_CONTEXT_TOKEN } from '@umbraco-cms/notification';
 
+import '@umbraco-cms/router';
 
 // Domains
 import './settings';
@@ -43,6 +49,7 @@ import './translation';
 import './users';
 import './packages';
 import './search';
+import './templating';
 import './shared';
 import { UmbLitElement } from '@umbraco-cms/element';
 
@@ -91,9 +98,13 @@ export class UmbBackofficeElement extends UmbLitElement {
 		new UmbDictionaryTreeStore(this);
 		new UmbDocumentBlueprintDetailStore(this);
 		new UmbDocumentBlueprintTreeStore(this);
+		new UmbTemplateTreeStore(this);
+		new UmbTemplateDetailStore(this);
+		new UmbLanguageStore(this);
 
 		this.provideContext(UMB_BACKOFFICE_CONTEXT_TOKEN, new UmbBackofficeContext());
 		this.provideContext(UMB_CURRENT_USER_HISTORY_STORE_CONTEXT_TOKEN, new UmbCurrentUserHistoryStore());
+		new UmbThemeContext(this);
 	}
 
 	render() {

@@ -2,8 +2,8 @@ import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { UmbModalLayoutPickerBase } from '../modal-layout-picker-base';
+import { UmbUserStore, UMB_USER_STORE_CONTEXT_TOKEN } from '../../../../backoffice/users/users/user.store';
 import type { UserDetails } from '@umbraco-cms/models';
-import { UmbUserStore, UMB_USER_STORE_CONTEXT_TOKEN } from 'src/backoffice/users/users/user.store';
 
 @customElement('umb-picker-layout-user')
 export class UmbPickerLayoutUserElement extends UmbModalLayoutPickerBase {
@@ -33,7 +33,7 @@ export class UmbPickerLayoutUserElement extends UmbModalLayoutPickerBase {
 				gap: var(--uui-size-space-5);
 				cursor: pointer;
 				position: relative;
-				border-radius: var(--uui-size-2);
+				border-radius: var(--uui-border-radius);
 			}
 			.item.selected {
 				background-color: var(--uui-color-selected);

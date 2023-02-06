@@ -4,13 +4,9 @@ import { customElement, state } from 'lit/decorators.js';
 import { IRoutingInfo } from 'router-slot';
 import { first, map } from 'rxjs';
 import { UmbSectionContext, UMB_SECTION_CONTEXT_TOKEN } from '../section.context';
-import { createExtensionElement } from '@umbraco-cms/extensions-api';
-import type {
-	ManifestDashboard,
-	ManifestDashboardCollection,
-	ManifestWithMeta,
-} from '@umbraco-cms/models';
-import { umbExtensionsRegistry } from '@umbraco-cms/extensions-api';
+import { createExtensionElement, umbExtensionsRegistry } from '@umbraco-cms/extensions-api';
+import type { ManifestDashboard, ManifestDashboardCollection, ManifestWithMeta } from '@umbraco-cms/models';
+
 import { UmbLitElement } from '@umbraco-cms/element';
 
 @customElement('umb-section-dashboards')
@@ -27,6 +23,7 @@ export class UmbSectionDashboardsElement extends UmbLitElement {
 			#tabs {
 				background-color: var(--uui-color-surface);
 				height: 70px;
+				border-bottom: 1px solid var(--uui-color-border);
 			}
 
 			#scroll-container {
@@ -114,10 +111,11 @@ export class UmbSectionDashboardsElement extends UmbLitElement {
 					setup: (component: Promise<HTMLElement> | HTMLElement, info: IRoutingInfo) => {
 						this._currentDashboardPathname = info.match.route.path;
 						// When its using import, we get an element, when using createExtensionElement we get a Promise.
-						// TODO: this is a bit hacky, can we do it in a more appropriate way
-						(component as any).manifest = dashboard;
+						// TODO: this is a bit hacky, can we do it in a more appropriate way:
 						if ((component as any).then) {
 							(component as any).then((el: any) => (el.manifest = dashboard));
+						} else {
+							(component as any).manifest = dashboard;
 						}
 					},
 				};

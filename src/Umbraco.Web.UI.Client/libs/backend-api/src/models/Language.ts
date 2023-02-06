@@ -3,11 +3,10 @@
 /* eslint-disable */
 
 export type Language = {
-    id?: number;
-    isoCode: string;
-    name?: string | null;
+    name?: string;
     isDefault?: boolean;
     isMandatory?: boolean;
-    fallbackLanguageId?: number | null;
+    fallbackIsoCode?: string | null;
+    isoCode?: string;
 };
 

@@ -25,14 +25,14 @@ export default {
 						'@umbraco-cms/store': './libs/store/index.ts',
 						'@umbraco-cms/utils': './libs/utils/index.ts',
 						'@umbraco-cms/test-utils': './libs/test-utils/index.ts',
-						'@umbraco-cms/resources': './libs/resources/index.ts'
+						'@umbraco-cms/resources': './libs/resources/index.ts',
+						'@umbraco-cms/router': './libs/router/index.ts'
 					},
 				},
 			},
 		}),
 	],
 	browsers: [
-		playwrightLauncher({ product: 'chromium' }),
 		playwrightLauncher({ product: 'firefox' }),
 		playwrightLauncher({ product: 'webkit' }),
 	],

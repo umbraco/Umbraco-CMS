@@ -1,6 +1,6 @@
-import type { ManifestElement } from './models';
+import type { ManifestWithView } from './models';
 
-export interface ManifestWorkspaceView extends ManifestElement {
+export interface ManifestWorkspaceView extends ManifestWithView {
 	type: 'workspaceView';
 	meta: MetaEditorView;
 }

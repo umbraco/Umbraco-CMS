@@ -1,6 +1,6 @@
 import type { DocumentDetails } from '@umbraco-cms/models';
 import { UmbContextToken } from '@umbraco-cms/context-api';
-import { createObservablePart, ArrayState } from '@umbraco-cms/observable-api';
+import { ArrayState } from '@umbraco-cms/observable-api';
 import { UmbStoreBase, UmbContentStore } from '@umbraco-cms/store';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 
@@ -25,7 +25,6 @@ export class UmbDocumentDetailStore extends UmbStoreBase implements UmbContentSt
 	}
 
 	getByKey(key: string) {
-		console.log("document getByKey", key)
 		// TODO: use backend cli when available.
 		fetch(`/umbraco/management/api/v1/document/details/${key}`)
 			.then((res) => res.json())
@@ -33,9 +32,40 @@ export class UmbDocumentDetailStore extends UmbStoreBase implements UmbContentSt
 				this._data.append(data);
 			});
 
-		return createObservablePart(this._data, (documents) =>
+		return this._data.getObservablePart((documents) =>
 			documents.find((document) => document.key === key)
 		);
+	}
+
+	getScaffold(entityType: string, parentKey: string | null) {
+		return {
+			key: '',
+			name: '',
+			icon: '',
+			type: '',
+			hasChildren: false,
+			parentKey: '',
+			isTrashed: false,
+			properties: [
+				{
+					alias: '',
+					label: '',
+					description: '',
+					dataTypeKey: '',
+				},
+			],
+			data: [
+				{
+					alias: '',
+					value: '',
+				},
+			],
+			variants: [
+				{
+					name: '',
+				},
+			],
+		} as DocumentDetails;
 	}
 
 	// TODO: make sure UI somehow can follow the status of this action.

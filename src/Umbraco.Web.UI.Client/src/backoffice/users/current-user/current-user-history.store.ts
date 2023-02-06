@@ -1,5 +1,5 @@
 import { UmbContextToken } from '@umbraco-cms/context-api';
-import { createObservablePart, DeepState } from '@umbraco-cms/observable-api';
+import { DeepState } from '@umbraco-cms/observable-api';
 
 export type UmbModelType = 'dialog' | 'sidebar';
 
@@ -13,7 +13,7 @@ export class UmbCurrentUserHistoryStore {
 	#history = new DeepState(<Array<UmbCurrentUserHistoryItem>>[]);
 
 	public readonly history = this.#history.asObservable();
-	public readonly latestHistory = createObservablePart(this.#history, (historyItems) => historyItems.slice(-10));
+	public readonly latestHistory = this.#history.getObservablePart((historyItems) => historyItems.slice(-10));
 
 	constructor() {
 		if (!('navigation' in window)) return;

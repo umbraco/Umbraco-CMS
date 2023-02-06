@@ -26,6 +26,7 @@ export class UmbBackofficeHeader extends LitElement {
 				--uui-button-padding-top-factor: 1;
 				--uui-button-padding-bottom-factor: 0.5;
 				margin-right: var(--uui-size-space-2);
+				--uui-button-background-color: transparent;
 			}
 
 			#logo img {
