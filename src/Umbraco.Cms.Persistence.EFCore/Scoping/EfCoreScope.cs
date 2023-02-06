@@ -5,14 +5,28 @@ namespace Umbraco.Cms.Persistence.EFCore.Scoping;
 internal class EfCoreScope : IEfCoreScope
 {
     private readonly IUmbracoEfCoreDatabaseFactory _efCoreDatabaseFactory;
-    private IUmbracoEfCoreDatabase _umbracoEfCoreDatabase;
+    private readonly IEFCoreScopeAccessor _efCoreScopeAccessor;
+    private readonly IUmbracoEfCoreDatabase _umbracoEfCoreDatabase;
+    public Guid InstanceId { get; }
+    public IEfCoreScope? ParentScope { get; set; }
     public bool? _completed;
 
-    public EfCoreScope(IUmbracoEfCoreDatabaseFactory efCoreDatabaseFactory)
+    public EfCoreScope(IUmbracoEfCoreDatabaseFactory efCoreDatabaseFactory, IEFCoreScopeAccessor efCoreScopeAccessor)
     {
         _efCoreDatabaseFactory = efCoreDatabaseFactory;
+        _efCoreScopeAccessor = efCoreScopeAccessor;
         _umbracoEfCoreDatabase = _efCoreDatabaseFactory.Create();
         _umbracoEfCoreDatabase.UmbracoEFContext.Database.BeginTransaction();
+        InstanceId = Guid.NewGuid();
+    }
+
+    public EfCoreScope(IUmbracoEfCoreDatabaseFactory efCoreDatabaseFactory, IEFCoreScopeAccessor efCoreScopeAccessor, IEfCoreScope parentScope)
+    {
+        _efCoreDatabaseFactory = efCoreDatabaseFactory;
+        _efCoreScopeAccessor = efCoreScopeAccessor;
+        _umbracoEfCoreDatabase = _efCoreDatabaseFactory.Create();
+        ParentScope = parentScope;
+        InstanceId = Guid.NewGuid();
     }
 
     public async Task<T> ExecuteWithContextAsync<T>(Func<UmbracoEFContext, Task<T>> method) => await method(_umbracoEfCoreDatabase.UmbracoEFContext);
@@ -21,6 +35,13 @@ internal class EfCoreScope : IEfCoreScope
 
     public void Dispose()
     {
+        if (this != _efCoreScopeAccessor.AmbientScope)
+        {
+            var failedMessage =
+                $"The {nameof(EfCoreScope)} {InstanceId} being disposed is not the Ambient {nameof(EfCoreScope)} {_efCoreScopeAccessor.AmbientScope?.InstanceId.ToString() ?? "NULL"}. This typically indicates that a child {nameof(EfCoreScope)} was not disposed, or flowed to a child thread that was not awaited, or concurrent threads are accessing the same {nameof(EfCoreScope)} (Ambient context) which is not supported. If using Task.Run (or similar) as a fire and forget tasks or to run threads in parallel you must suppress execution context flow with ExecutionContext.SuppressFlow() and ExecutionContext.RestoreFlow().";
+            throw new InvalidOperationException(failedMessage);
+        }
+
         DisposeEfCoreDatabase();
     }
 
