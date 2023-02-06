@@ -8,6 +8,7 @@ import {
 import { ApiError, CancelablePromise, ProblemDetails } from '@umbraco-cms/backend-api';
 import { UmbController, UmbControllerHostInterface } from '@umbraco-cms/controller';
 import { UmbContextConsumerController } from '@umbraco-cms/context-api';
+import type { DataSourceResponse } from '@umbraco-cms/models';
 
 export class UmbResourceController extends UmbController {
 	#promise: Promise<any>;
@@ -54,7 +55,7 @@ export class UmbResourceController extends UmbController {
 	/**
 	 * Base execute function with a try/catch block and return a tuple with the result and the error.
 	 */
-	static async tryExecute<T>(promise: Promise<T>): Promise<{ data?: T; error?: ProblemDetails }> {
+	static async tryExecute<T>(promise: Promise<T>): Promise<DataSourceResponse<T>> {
 		try {
 			return { data: await promise };
 		} catch (e) {
@@ -66,7 +67,7 @@ export class UmbResourceController extends UmbController {
 	 * Wrap the {execute} function in a try/catch block and return the result.
 	 * If the executor function throws an error, then show the details in a notification.
 	 */
-	async tryExecuteAndNotify<T>(options?: UmbNotificationOptions<any>): Promise<{ data?: T; error?: ProblemDetails }> {
+	async tryExecuteAndNotify<T>(options?: UmbNotificationOptions<any>): Promise<DataSourceResponse<T>> {
 		const { data, error } = await UmbResourceController.tryExecute<T>(this.#promise);
 
 		if (error) {
