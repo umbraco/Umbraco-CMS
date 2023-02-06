@@ -49,9 +49,9 @@ export class UmbWorkspaceLayout extends UmbLitElement {
 				border-left: 1px solid var(--uui-color-border);
 				border-right: 1px solid var(--uui-color-border);
 			}
-			router-slot {
+
+			#router-slot {
 				height: 100%;
-				flex: 0;
 			}
 
 			umb-extension-slot[slot='actions'] {
@@ -150,6 +150,7 @@ export class UmbWorkspaceLayout extends UmbLitElement {
 				<slot name="action-menu" slot="action-menu"></slot>
 
 				<umb-router-slot
+					id="router-slot"
 					.routes="${this._routes}"
 					@init=${(event: UmbRouterSlotInitEvent) => {
 						this._routerPath = event.target.absoluteRouterPath;

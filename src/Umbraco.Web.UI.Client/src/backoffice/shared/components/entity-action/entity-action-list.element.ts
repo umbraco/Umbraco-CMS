@@ -1,9 +1,9 @@
 import { html } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
+import { map } from 'rxjs';
 import { UmbLitElement } from '@umbraco-cms/element';
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-api';
 import { ManifestEntityAction } from 'libs/extensions-registry/entity-action.models';
-import { map } from 'rxjs';
 
 @customElement('umb-entity-action-list')
 class UmbEntityActionListElement extends UmbLitElement {
@@ -27,6 +27,7 @@ class UmbEntityActionListElement extends UmbLitElement {
 	@state()
 	private _entityActions?: Array<ManifestEntityAction>;
 
+	// TODO: find a solution to use extension slot
 	#observeEntityActions() {
 		// TODO: filter on entity type
 		this.observe(

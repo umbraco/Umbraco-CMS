@@ -3,6 +3,7 @@ import { customElement, property } from 'lit/decorators.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
 import { UmbLitElement } from '@umbraco-cms/element';
 import { ManifestEntityAction } from 'libs/extensions-registry/entity-action.models';
+import { UUIMenuItemEvent } from '@umbraco-ui/uui';
 
 @customElement('umb-entity-action')
 class UmbEntityActionElement extends UmbLitElement {
@@ -43,13 +44,23 @@ class UmbEntityActionElement extends UmbLitElement {
 
 	#api: any;
 
-	async #onClickLabel() {
+	async #onClickLabel(event: UUIMenuItemEvent) {
+		event.stopPropagation();
 		await this.#api.execute();
+	}
+
+	// TODO: we need to stop the regular click event from bubbling up to the table so it doesn't select the row.
+	// This should probably be handled in the UUI Menu item component. so we don't dispatch a label-click event and click event at the same time.
+	#onClick(event: PointerEvent) {
+		event.stopPropagation();
 	}
 
 	render() {
 		return html`
-			<uui-menu-item label="${ifDefined(this._manifest?.meta.label)}" @click-label=${this.#onClickLabel}>
+			<uui-menu-item
+				label="${ifDefined(this._manifest?.meta.label)}"
+				@click-label=${this.#onClickLabel}
+				@click=${this.#onClick}>
 				${this._manifest?.meta.icon
 					? html`<uui-icon slot="icon" name="${this._manifest?.meta.icon}"></uui-icon>`
 					: nothing}

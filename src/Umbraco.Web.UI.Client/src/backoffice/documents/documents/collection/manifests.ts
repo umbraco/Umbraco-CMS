@@ -5,7 +5,7 @@ export const manifests: Array<ManifestCollectionView> = [
 		type: 'collectionView',
 		alias: 'Umb.CollectionView.Document.Table',
 		name: 'Document Table Collection View',
-		loader: () => import('./document-table-collection-view.element'),
+		loader: () => import('./views/table/document-table-collection-view.element'),
 		weight: 200,
 		meta: {
 			label: 'Table',

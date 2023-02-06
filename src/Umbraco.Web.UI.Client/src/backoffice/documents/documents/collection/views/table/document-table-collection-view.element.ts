@@ -1,7 +1,10 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
-import { UmbCollectionContext, UMB_COLLECTION_CONTEXT_TOKEN } from '../../../shared/collection/collection.context';
+import {
+	UmbCollectionContext,
+	UMB_COLLECTION_CONTEXT_TOKEN,
+} from '../../../../../shared/collection/collection.context';
 import {
 	UmbTableColumn,
 	UmbTableConfig,
@@ -10,10 +13,12 @@ import {
 	UmbTableItem,
 	UmbTableOrderedEvent,
 	UmbTableSelectedEvent,
-} from '../../../shared/components/table';
+} from '../../../../../shared/components/table';
 import type { DocumentDetails } from '@umbraco-cms/models';
 import { UmbLitElement } from '@umbraco-cms/element';
 import { EntityTreeItem } from '@umbraco-cms/backend-api';
+
+import './column-layouts/document-table-actions-column-layout.element';
 
 type EntityType = DocumentDetails;
 
@@ -50,10 +55,14 @@ export class UmbDocumentTableCollectionViewElement extends UmbLitElement {
 		{
 			name: 'Name',
 			alias: 'entityName',
+			allowSorting: true,
 		},
+		// TODO: actions should live in an UmbTable element when we have moved the current UmbTable to UUI.
 		{
 			name: 'Actions',
 			alias: 'entityActions',
+			elementName: 'umb-document-table-actions-column-layout',
+			width: '80px',
 		},
 	];
 
@@ -100,7 +109,9 @@ export class UmbDocumentTableCollectionViewElement extends UmbLitElement {
 					},
 					{
 						columnAlias: 'entityActions',
-						value: item.name || 'Untitled',
+						value: {
+							entityType: item.type,
+						},
 					},
 				],
 			};
