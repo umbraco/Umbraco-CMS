@@ -8,16 +8,16 @@ namespace Umbraco.Cms.Api.Management.Factories;
 public class DocumentViewModelFactory : IDocumentViewModelFactory
 {
     private readonly IUmbracoMapper _umbracoMapper;
-    private readonly IDocumentUrlFactory _documentUrlFactory;
+    private readonly IContentUrlFactory _contentUrlFactory;
     private readonly IFileService _fileService;
 
     public DocumentViewModelFactory(
         IUmbracoMapper umbracoMapper,
-        IDocumentUrlFactory documentUrlFactory,
+        IContentUrlFactory contentUrlFactory,
         IFileService fileService)
     {
         _umbracoMapper = umbracoMapper;
-        _documentUrlFactory = documentUrlFactory;
+        _contentUrlFactory = contentUrlFactory;
         _fileService = fileService;
     }
 
@@ -25,7 +25,7 @@ public class DocumentViewModelFactory : IDocumentViewModelFactory
     {
         DocumentViewModel viewModel = _umbracoMapper.Map<DocumentViewModel>(content)!;
 
-        viewModel.Urls = await _documentUrlFactory.GetUrlsAsync(content);
+        viewModel.Urls = await _contentUrlFactory.GetUrlsAsync(content);
 
         viewModel.TemplateKey = content.TemplateId.HasValue
             ? _fileService.GetTemplate(content.TemplateId.Value)?.Key

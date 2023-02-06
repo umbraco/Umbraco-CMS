@@ -23,6 +23,7 @@ public class DocumentTypeMapDefinition : ContentTypeMapDefinition<IContentType, 
         target.Icon = source.Icon ?? string.Empty;
         target.AllowedAsRoot = source.AllowedAsRoot;
         target.VariesByCulture = source.VariesByCulture();
+        target.VariesBySegment = source.VariesBySegment();
         target.IsElement = source.IsElement;
         target.Containers = MapPropertyTypeContainers(source);
         target.Properties = MapPropertyTypes(source);

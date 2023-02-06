@@ -11,7 +11,7 @@ internal static class DocumentBuilderExtensions
     internal static IUmbracoBuilder AddDocuments(this IUmbracoBuilder builder)
     {
         builder.Services.AddTransient<IDocumentViewModelFactory, DocumentViewModelFactory>();
-        builder.Services.AddTransient<IDocumentUrlFactory, DocumentUrlFactory>();
+        builder.Services.AddTransient<IContentUrlFactory, ContentUrlFactory>();
 
         builder.WithCollectionBuilder<MapDefinitionCollectionBuilder>().Add<DocumentMapDefinition>();
 

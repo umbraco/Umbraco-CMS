@@ -1,5 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
-using Umbraco.Cms.Api.Management.ViewModels.Document;
+using Umbraco.Cms.Api.Management.ViewModels.Content;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Routing;
@@ -9,7 +9,7 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Factories;
 
-public class DocumentUrlFactory : IDocumentUrlFactory
+public class ContentUrlFactory : IContentUrlFactory
 {
     private readonly IPublishedRouter _publishedRouter;
     private readonly IUmbracoContextAccessor _umbracoContextAccessor;
@@ -21,7 +21,7 @@ public class DocumentUrlFactory : IDocumentUrlFactory
     private readonly UriUtility _uriUtility;
     private readonly IPublishedUrlProvider _publishedUrlProvider;
 
-    public DocumentUrlFactory(
+    public ContentUrlFactory(
         IPublishedRouter publishedRouter,
         IUmbracoContextAccessor umbracoContextAccessor,
         ILanguageService languageService,
@@ -43,12 +43,12 @@ public class DocumentUrlFactory : IDocumentUrlFactory
         _publishedUrlProvider = publishedUrlProvider;
     }
 
-    public async Task<IEnumerable<DocumentUrlInfo>> GetUrlsAsync(IContent content)
+    public async Task<IEnumerable<ContentUrlInfo>> GetUrlsAsync(IContent content)
     {
         if (_umbracoContextAccessor.TryGetUmbracoContext(out IUmbracoContext? umbracoContext) == false)
         {
-            _loggerFactory.CreateLogger<DocumentUrlFactory>().LogWarning($"Unable to create an Umbraco context while attempting to get URLs for content: {content.Key}");
-            return Array.Empty<DocumentUrlInfo>();
+            _loggerFactory.CreateLogger<ContentUrlFactory>().LogWarning($"Unable to create an Umbraco context while attempting to get URLs for content: {content.Key}");
+            return Array.Empty<ContentUrlInfo>();
         }
 
         UrlInfo[] urlInfos = (await content.GetContentUrlsAsync(
@@ -64,7 +64,7 @@ public class DocumentUrlFactory : IDocumentUrlFactory
 
         return urlInfos
             .Where(urlInfo => urlInfo.IsUrl)
-            .Select(urlInfo => new DocumentUrlInfo { Culture = urlInfo.Culture, Url = urlInfo.Text })
+            .Select(urlInfo => new ContentUrlInfo { Culture = urlInfo.Culture, Url = urlInfo.Text })
             .ToArray();
     }
 }

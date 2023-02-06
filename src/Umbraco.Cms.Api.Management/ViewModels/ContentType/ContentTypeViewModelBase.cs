@@ -18,6 +18,8 @@ public abstract class ContentTypeViewModelBase<TPropertyType, TPropertyTypeConta
 
     public bool VariesByCulture { get; set; }
 
+    public bool VariesBySegment { get; set; }
+
     public bool IsElement { get; set; }
 
     public IEnumerable<TPropertyType> Properties { get; set; } = Array.Empty<TPropertyType>();
@@ -27,4 +29,6 @@ public abstract class ContentTypeViewModelBase<TPropertyType, TPropertyTypeConta
     public IEnumerable<ContentTypeSort> AllowedContentTypes { get; set; } = Array.Empty<ContentTypeSort>();
 
     public IEnumerable<ContentTypeComposition> Compositions { get; set; } = Array.Empty<ContentTypeComposition>();
+
+    public ContentTypeCleanup Cleanup { get; set; } = new();
 }

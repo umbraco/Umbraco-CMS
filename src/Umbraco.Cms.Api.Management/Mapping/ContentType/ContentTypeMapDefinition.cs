@@ -35,6 +35,10 @@ public abstract class ContentTypeMapDefinition<TContentType, TPropertyTypeViewMo
                         MandatoryMessage = propertyType.MandatoryMessage,
                         RegEx = propertyType.ValidationRegExp,
                         RegExMessage = propertyType.ValidationRegExpMessage
+                    },
+                    Appearance = new PropertyTypeAppearance
+                    {
+                        LabelOnTop = propertyType.LabelOnTop
                     }
                 })
             .ToArray();
