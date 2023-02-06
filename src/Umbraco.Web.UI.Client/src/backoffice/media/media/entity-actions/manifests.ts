@@ -11,6 +11,7 @@ const entityActions: Array<ManifestEntityAction> = [
 			icon: 'umb:trash',
 			label: 'Trash',
 			api: TrashMediaEntityAction,
+			repositoryAlias: 'Umb.Repository.Media',
 		},
 	},
 ];
