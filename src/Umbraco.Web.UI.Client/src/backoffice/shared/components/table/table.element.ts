@@ -5,6 +5,7 @@ import { when } from 'lit-html/directives/when.js';
 import { customElement, property, state } from 'lit/decorators.js';
 import { repeat } from 'lit/directives/repeat.js';
 
+// TODO: move to UI Library
 export interface UmbTableItem {
 	key: string;
 	icon?: string;
