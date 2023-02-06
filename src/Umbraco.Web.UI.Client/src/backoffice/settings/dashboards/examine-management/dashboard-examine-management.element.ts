@@ -60,7 +60,6 @@ export class UmbDashboardExamineManagementElement extends UmbLitElement {
 			<umb-router-slot
 				.routes=${this._routes}
 				@init=${(event: UmbRouterSlotInitEvent) => {
-					console.log("init", event.target.absoluteRouterPath)
 					this._routerPath = event.target.absoluteRouterPath;
 				}}
 				@change=${(event: UmbRouterSlotChangeEvent) => {
