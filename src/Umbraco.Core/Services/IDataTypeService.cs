@@ -175,21 +175,32 @@ public interface IDataTypeService : IService
     /// <returns>Collection of <see cref="IDataType" /> configured for the property editor</returns>
     Task<IEnumerable<IDataType>> GetByEditorAliasAsync(string propertyEditorAlias);
 
+    [Obsolete("Please use MoveAsync instead. Will be removed in V15")]
     Attempt<OperationResult<MoveOperationStatusType>?> Move(IDataType toMove, int parentId);
 
-    [Obsolete("Use the method which specifies the userId parameter")]
+    /// <summary>
+    /// Moves a <see cref="IDataType"/> to a given container
+    /// </summary>
+    /// <param name="toMove">The data type to move</param>
+    /// <param name="containerKey">The container key where the data type will be moved to.</param>
+    /// <param name="userId">The user that did the Move action</param>
+    /// <returns></returns>
+    Task<Attempt<IDataType, DataTypeOperationStatus>> MoveAsync(IDataType toMove, Guid? containerKey, int userId = Constants.Security.SuperUserId);
+
+    [Obsolete("Please use CopyASync instead. Will be removed in V15")]
     Attempt<OperationResult<MoveOperationStatusType, IDataType>?> Copy(IDataType copying, int containerId) => Copy(copying, containerId, Constants.Security.SuperUserId);
 
+    [Obsolete("Please use CopyASync instead. Will be removed in V15")]
+    Attempt<OperationResult<MoveOperationStatusType, IDataType>?> Copy(IDataType copying, int containerId, int userId = Constants.Security.SuperUserId) => throw new NotImplementedException();
+
     /// <summary>
-    /// Copies the give <see cref="IDataType"/> to a given container
-    /// We have the default implementation here to avoid breaking changes for the user
+    /// Copies a <see cref="IDataType"/> to a given container
     /// </summary>
-    /// <param name="copying">The data type that will be copied</param>
-    /// <param name="containerId">The container ID under where the data type will be copied</param>
+    /// <param name="toCopy">The data type that will be copied</param>
+    /// <param name="containerKey">The container key where the data type will be copied to.</param>
     /// <param name="userId">The user that did the Copy action</param>
     /// <returns></returns>
-    /// <exception cref="NotImplementedException"></exception>
-    Attempt<OperationResult<MoveOperationStatusType, IDataType>?> Copy(IDataType copying, int containerId, int userId = Constants.Security.SuperUserId) => throw new NotImplementedException();
+    Task<Attempt<IDataType, DataTypeOperationStatus>> CopyAsync(IDataType toCopy, Guid? containerKey, int userId = Constants.Security.SuperUserId);
 
     /// <summary>
     /// Performs validation for the configuration data of a given data type.

@@ -65,6 +65,16 @@
           "201": {
             "description": "Created"
           },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
           "404": {
             "description": "Not Found",
             "content": {
@@ -138,6 +148,16 @@
           "200": {
             "description": "Success"
           },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
           "404": {
             "description": "Not Found",
             "content": {
@@ -171,6 +191,102 @@
             "application/json": {
               "schema": {
                 "$ref": "#/components/schemas/DataTypeUpdateModel"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/umbraco/management/api/v1/data-type/{key}/copy": {
+      "post": {
+        "tags": [
+          "Data Type"
+        ],
+        "operationId": "PostDataTypeByKeyCopy",
+        "parameters": [
+          {
+            "name": "key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DataTypeCopyModel"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/umbraco/management/api/v1/data-type/{key}/move": {
+      "post": {
+        "tags": [
+          "Data Type"
+        ],
+        "operationId": "PostDataTypeByKeyMove",
+        "parameters": [
+          {
+            "name": "key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DataTypeMoveModel"
               }
             }
           }
@@ -840,7 +956,7 @@
         ],
         "operationId": "PostDictionaryUpload",
         "requestBody": {
-          "content": {}
+          "content": { }
         },
         "responses": {
           "200": {
@@ -5361,6 +5477,16 @@
         },
         "additionalProperties": false
       },
+      "DataTypeCopyModel": {
+        "type": "object",
+        "properties": {
+          "targetKey": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        "additionalProperties": false
+      },
       "DataTypeCreateModel": {
         "type": "object",
         "properties": {
@@ -5384,6 +5510,16 @@
             "type": "string",
             "format": "uuid",
             "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "DataTypeMoveModel": {
+        "type": "object",
+        "properties": {
+          "targetKey": {
+            "type": "string",
+            "format": "uuid"
           }
         },
         "additionalProperties": false
@@ -6349,7 +6485,7 @@
           },
           "providerProperties": {
             "type": "object",
-            "additionalProperties": {},
+            "additionalProperties": { },
             "nullable": true
           }
         },
@@ -7662,7 +7798,7 @@
             "nullable": true
           }
         },
-        "additionalProperties": {}
+        "additionalProperties": { }
       },
       "ProfilingStatus": {
         "type": "object",
@@ -9020,7 +9156,7 @@
           "authorizationCode": {
             "authorizationUrl": "/umbraco/management/api/v1.0/security/back-office/authorize",
             "tokenUrl": "/umbraco/management/api/v1.0/security/back-office/token",
-            "scopes": {}
+            "scopes": { }
           }
         }
       }
@@ -9028,7 +9164,7 @@
   },
   "security": [
     {
-      "OAuth": []
+      "OAuth": [ ]
     }
   ]
 }

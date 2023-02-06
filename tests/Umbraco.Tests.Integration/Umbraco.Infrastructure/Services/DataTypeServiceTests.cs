@@ -22,7 +22,10 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services;
 public class DataTypeServiceTests : UmbracoIntegrationTest
 {
     private IDataValueEditorFactory DataValueEditorFactory => GetRequiredService<IDataValueEditorFactory>();
+
     private IDataTypeService DataTypeService => GetRequiredService<IDataTypeService>();
+
+    private IDataTypeContainerService DataTypeContainerService => GetRequiredService<IDataTypeContainerService>();
 
     private IContentTypeService ContentTypeService => GetRequiredService<IContentTypeService>();
 
@@ -168,6 +171,152 @@ public class DataTypeServiceTests : UmbracoIntegrationTest
     }
 
     [Test]
+    public async Task Can_Create_DataType_In_Container()
+    {
+        var container = (await DataTypeContainerService.CreateAsync(new EntityContainer(Constants.ObjectTypes.DataType) { Name = "Root Container" })).Result;
+
+        var result = await DataTypeService.CreateAsync(
+            new DataType(new LabelPropertyEditor(DataValueEditorFactory, IOHelper), ConfigurationEditorJsonSerializer)
+            {
+                Name = "Testing Textfield",
+                DatabaseType = ValueStorageType.Ntext,
+                ParentId = container.Id
+            });
+
+        Assert.True(result.Success);
+        Assert.IsNotNull(result.Result);
+        Assert.AreEqual(DataTypeOperationStatus.Success, result.Status);
+
+        var dataType = await DataTypeService.GetAsync(result.Result.Key);
+        Assert.IsNotNull(dataType);
+        Assert.AreEqual(container.Id, dataType.ParentId);
+    }
+
+    [Test]
+    public async Task Can_Move_DataType_To_Container()
+    {
+        var dataType = (await DataTypeService.CreateAsync(
+            new DataType(new LabelPropertyEditor(DataValueEditorFactory, IOHelper), ConfigurationEditorJsonSerializer)
+            {
+                Name = "Testing Textfield",
+                DatabaseType = ValueStorageType.Ntext
+            })).Result;
+
+        var container = (await DataTypeContainerService.CreateAsync(new EntityContainer(Constants.ObjectTypes.DataType) { Name = "Root Container" })).Result;
+
+        dataType = await DataTypeService.GetAsync(dataType.Key);
+        Assert.IsNotNull(dataType);
+        Assert.AreEqual(Constants.System.Root, dataType.ParentId);
+
+        var result = await DataTypeService.MoveAsync(dataType, container.Key);
+        Assert.IsTrue(result.Success);
+        Assert.AreEqual(DataTypeOperationStatus.Success, result.Status);
+
+        dataType = await DataTypeService.GetAsync(dataType.Key);
+        Assert.IsNotNull(dataType);
+        Assert.AreEqual(container.Id, dataType.ParentId);
+    }
+
+    [Test]
+    public async Task Can_Move_DataType_To_Root()
+    {
+        var container = (await DataTypeContainerService.CreateAsync(new EntityContainer(Constants.ObjectTypes.DataType) { Name = "Root Container" })).Result;
+        var dataType = (await DataTypeService.CreateAsync(
+            new DataType(new LabelPropertyEditor(DataValueEditorFactory, IOHelper), ConfigurationEditorJsonSerializer)
+            {
+                Name = "Testing Textfield",
+                DatabaseType = ValueStorageType.Ntext,
+                ParentId = container.Id
+            })).Result;
+
+        dataType = await DataTypeService.GetAsync(dataType.Key);
+        Assert.IsNotNull(dataType);
+        Assert.AreEqual(container.Id, dataType.ParentId);
+
+        var result = await DataTypeService.MoveAsync(dataType, null);
+        Assert.IsTrue(result.Success);
+        Assert.AreEqual(DataTypeOperationStatus.Success, result.Status);
+
+        dataType = await DataTypeService.GetAsync(dataType.Key);
+        Assert.IsNotNull(dataType);
+        Assert.AreEqual(Constants.System.Root, dataType.ParentId);
+    }
+
+    [Test]
+    public async Task Can_Copy_DataType_To_Root()
+    {
+        var dataType = (await DataTypeService.CreateAsync(
+            new DataType(new LabelPropertyEditor(DataValueEditorFactory, IOHelper), ConfigurationEditorJsonSerializer)
+            {
+                Name = "Testing Textfield",
+                DatabaseType = ValueStorageType.Ntext
+            })).Result;
+
+        var result = await DataTypeService.CopyAsync(dataType, null);
+        Assert.IsTrue(result.Success);
+        Assert.AreEqual(DataTypeOperationStatus.Success, result.Status);
+        Assert.IsNotNull(result.Result);
+        Assert.AreNotEqual(dataType.Key, result.Result.Key);
+        Assert.AreNotEqual(dataType.Name, result.Result.Name);
+
+        IDataType copy = await DataTypeService.GetAsync(result.Result.Key);
+        Assert.IsNotNull(copy);
+        Assert.AreEqual(Constants.System.Root, copy.ParentId);
+    }
+
+    [Test]
+    public async Task Can_Copy_DataType_To_Container()
+    {
+        var container = (await DataTypeContainerService.CreateAsync(new EntityContainer(Constants.ObjectTypes.DataType) { Name = "Root Container" })).Result;
+        var dataType = (await DataTypeService.CreateAsync(
+            new DataType(new LabelPropertyEditor(DataValueEditorFactory, IOHelper), ConfigurationEditorJsonSerializer)
+            {
+                Name = "Testing Textfield",
+                DatabaseType = ValueStorageType.Ntext
+            })).Result;
+
+        var result = await DataTypeService.CopyAsync(dataType, container.Key);
+        Assert.IsTrue(result.Success);
+        Assert.AreEqual(DataTypeOperationStatus.Success, result.Status);
+        Assert.IsNotNull(result.Result);
+        Assert.AreNotEqual(dataType.Key, result.Result.Key);
+        Assert.AreNotEqual(dataType.Name, result.Result.Name);
+
+        IDataType copy = await DataTypeService.GetAsync(result.Result.Key);
+        Assert.IsNotNull(copy);
+        Assert.AreEqual(container.Id, copy.ParentId);
+    }
+
+    [Test]
+    public async Task Can_Copy_DataType_Between_Containers()
+    {
+        var container1 = (await DataTypeContainerService.CreateAsync(new EntityContainer(Constants.ObjectTypes.DataType) { Name = "Root Container 1" })).Result;
+        var container2 = (await DataTypeContainerService.CreateAsync(new EntityContainer(Constants.ObjectTypes.DataType) { Name = "Root Container 2" })).Result;
+        var dataType = (await DataTypeService.CreateAsync(
+            new DataType(new LabelPropertyEditor(DataValueEditorFactory, IOHelper), ConfigurationEditorJsonSerializer)
+            {
+                Name = "Testing Textfield",
+                DatabaseType = ValueStorageType.Ntext,
+                ParentId = container1.Id
+            })).Result;
+
+        var result = await DataTypeService.CopyAsync(dataType, container2.Key);
+        Assert.IsTrue(result.Success);
+        Assert.AreEqual(DataTypeOperationStatus.Success, result.Status);
+        Assert.IsNotNull(result.Result);
+        Assert.AreNotEqual(dataType.Key, result.Result.Key);
+        Assert.AreNotEqual(dataType.Name, result.Result.Name);
+
+        IDataType original = await DataTypeService.GetAsync(dataType.Key);
+        Assert.IsNotNull(original);
+        Assert.AreEqual(container1.Id, original.ParentId);
+
+        IDataType copy = await DataTypeService.GetAsync(result.Result.Key);
+        Assert.IsNotNull(copy);
+        Assert.AreEqual(container2.Id, copy.ParentId);
+    }
+
+    [Test]
     public async Task Cannot_Create_DataType_With_Empty_Name()
     {
         // Act
@@ -218,5 +367,28 @@ public class DataTypeServiceTests : UmbracoIntegrationTest
 
         // Act & Assert
         Assert.Throws<ArgumentException>(() => DataTypeService.Save(dataTypeDefinition));
+    }
+
+    [Test]
+    public async Task Cannot_Move_DataType_To_Non_Existing_Container()
+    {
+        var dataType = (await DataTypeService.CreateAsync(
+            new DataType(new LabelPropertyEditor(DataValueEditorFactory, IOHelper), ConfigurationEditorJsonSerializer)
+            {
+                Name = "Testing Textfield",
+                DatabaseType = ValueStorageType.Ntext
+            })).Result;
+
+        dataType = await DataTypeService.GetAsync(dataType.Key);
+        Assert.IsNotNull(dataType);
+        Assert.AreEqual(Constants.System.Root, dataType.ParentId);
+
+        var result = await DataTypeService.MoveAsync(dataType, Guid.NewGuid());
+        Assert.IsFalse(result.Success);
+        Assert.AreEqual(DataTypeOperationStatus.ParentNotFound, result.Status);
+
+        dataType = await DataTypeService.GetAsync(dataType.Key);
+        Assert.IsNotNull(dataType);
+        Assert.AreEqual(Constants.System.Root, dataType.ParentId);
     }
 }

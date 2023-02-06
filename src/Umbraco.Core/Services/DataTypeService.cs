@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using System.Diagnostics;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.DependencyInjection;
@@ -355,50 +356,73 @@ namespace Umbraco.Cms.Core.Services.Implement
 
         public Attempt<OperationResult<MoveOperationStatusType>?> Move(IDataType toMove, int parentId)
         {
-            EventMessages evtMsgs = EventMessagesFactory.Get();
-            if (toMove.ParentId == parentId)
+            Guid? containerKey = null;
+            if (parentId > 0)
             {
-                return OperationResult.Attempt.Fail(MoveOperationStatusType.FailedNotAllowedByPath, evtMsgs);
+                // mimic obsolete Copy method behavior
+                EntityContainer? container = GetContainer(parentId);
+                if (container is null)
+                {
+                    throw new DataOperationException<MoveOperationStatusType>(MoveOperationStatusType.FailedParentNotFound);
+                }
+
+                containerKey = container.Key;
             }
 
-            var moveInfo = new List<MoveEventInfo<IDataType>>();
+            Attempt<IDataType, DataTypeOperationStatus> result = MoveAsync(toMove, containerKey).GetAwaiter().GetResult();
+
+            // mimic old service behavior
+            EventMessages evtMsgs = EventMessagesFactory.Get();
+            return result.Status switch
+            {
+                DataTypeOperationStatus.Success => OperationResult.Attempt.Succeed(MoveOperationStatusType.Success, evtMsgs),
+                DataTypeOperationStatus.CancelledByNotification => OperationResult.Attempt.Fail(MoveOperationStatusType.FailedCancelledByEvent, evtMsgs),
+                DataTypeOperationStatus.ParentNotFound => OperationResult.Attempt.Fail(MoveOperationStatusType.FailedParentNotFound, evtMsgs),
+                _ =>  OperationResult.Attempt.Fail<MoveOperationStatusType>(MoveOperationStatusType.FailedNotAllowedByPath, evtMsgs, new InvalidOperationException($"Invalid operation status: {result.Status}")),
+            };
+        }
+
+        public async Task<Attempt<IDataType, DataTypeOperationStatus>> MoveAsync(IDataType toMove, Guid? containerKey, int userId = Constants.Security.SuperUserId)
+        {
+            EventMessages eventMessages = EventMessagesFactory.Get();
 
             using (ICoreScope scope = ScopeProvider.CreateCoreScope())
             {
-                var moveEventInfo = new MoveEventInfo<IDataType>(toMove, toMove.Path, parentId);
+                EntityContainer? container = null;
+                var parentId = Constants.System.Root;
+                if (containerKey.HasValue && containerKey.Value != Guid.Empty)
+                {
+                    container = await _dataTypeContainerService.GetAsync(containerKey.Value);
+                    if (container is null)
+                    {
+                        return Attempt.FailWithStatus(DataTypeOperationStatus.ParentNotFound, toMove);
+                    }
 
-                var movingDataTypeNotification = new DataTypeMovingNotification(moveEventInfo, evtMsgs);
+                    parentId = container.Id;
+                }
+
+                if (toMove.ParentId == parentId)
+                {
+                    return Attempt.SucceedWithStatus(DataTypeOperationStatus.Success, toMove);
+                }
+
+                var moveEventInfo = new MoveEventInfo<IDataType>(toMove, toMove.Path, parentId);
+                var movingDataTypeNotification = new DataTypeMovingNotification(moveEventInfo, eventMessages);
                 if (scope.Notifications.PublishCancelable(movingDataTypeNotification))
                 {
                     scope.Complete();
-                    return OperationResult.Attempt.Fail(MoveOperationStatusType.FailedCancelledByEvent, evtMsgs);
+                    return Attempt.FailWithStatus(DataTypeOperationStatus.CancelledByNotification, toMove);
                 }
 
-                try
-                {
-                    EntityContainer? container = null;
-                    if (parentId > 0)
-                    {
-                        container = _dataTypeContainerRepository.Get(parentId);
-                        if (container == null)
-                        {
-                            throw new DataOperationException<MoveOperationStatusType>(MoveOperationStatusType.FailedParentNotFound); // causes rollback
-                        }
-                    }
-                    moveInfo.AddRange(_dataTypeRepository.Move(toMove, container));
+                _dataTypeRepository.Move(toMove, container);
 
-                    scope.Notifications.Publish(new DataTypeMovedNotification(moveEventInfo, evtMsgs).WithStateFrom(movingDataTypeNotification));
+                scope.Notifications.Publish(new DataTypeMovedNotification(moveEventInfo, eventMessages).WithStateFrom(movingDataTypeNotification));
 
-                    scope.Complete();
-                }
-                catch (DataOperationException<MoveOperationStatusType> ex)
-                {
-                    scope.Complete(); // TODO: what are we doing here exactly?
-                    return OperationResult.Attempt.Fail(ex.Operation, evtMsgs);
-                }
+                Audit(AuditType.Move, userId, toMove.Id);
+                scope.Complete();
             }
 
-            return OperationResult.Attempt.Succeed(MoveOperationStatusType.Success, evtMsgs);
+            return Attempt.SucceedWithStatus(DataTypeOperationStatus.Success, toMove);
         }
 
         [Obsolete("Use the method which specifies the userId parameter")]
@@ -409,32 +433,54 @@ namespace Umbraco.Cms.Core.Services.Implement
 
         public Attempt<OperationResult<MoveOperationStatusType, IDataType>?> Copy(IDataType copying, int containerId, int userId = Constants.Security.SuperUserId)
         {
-            var evtMsgs = EventMessagesFactory.Get();
-
-            IDataType copy;
-            try
+            Guid? containerKey = null;
+            if (containerId > 0)
             {
-                if (containerId > 0)
+                // mimic obsolete Copy method behavior
+                EntityContainer? container = GetContainer(containerId);
+                if (container is null)
                 {
-                    var container = GetContainer(containerId);
-                    if (container is null)
-                    {
-                        throw new DataOperationException<MoveOperationStatusType>(MoveOperationStatusType.FailedParentNotFound); // causes rollback
-                    }
+                    throw new DataOperationException<MoveOperationStatusType>(MoveOperationStatusType.FailedParentNotFound);
                 }
-                copy = copying.DeepCloneWithResetIdentities();
 
-                copy.Name += " (copy)"; // might not be unique
-                copy.ParentId = containerId;
-
-                Save(copy, userId);
+                containerKey = container.Key;
             }
-            catch (DataOperationException<MoveOperationStatusType> ex)
+
+            Attempt<IDataType, DataTypeOperationStatus> result = CopyAsync(copying, containerKey, userId).GetAwaiter().GetResult();
+
+            // mimic old service behavior
+            EventMessages evtMsgs = EventMessagesFactory.Get();
+            return result.Status switch
             {
-                return OperationResult.Attempt.Fail<MoveOperationStatusType, IDataType>(ex.Operation, evtMsgs); // causes rollback
+                DataTypeOperationStatus.Success => OperationResult.Attempt.Succeed(MoveOperationStatusType.Success, evtMsgs, result.Result),
+                DataTypeOperationStatus.CancelledByNotification => OperationResult.Attempt.Fail(MoveOperationStatusType.FailedCancelledByEvent, evtMsgs, result.Result),
+                DataTypeOperationStatus.ParentNotFound => OperationResult.Attempt.Fail(MoveOperationStatusType.FailedParentNotFound, evtMsgs, result.Result),
+                _ =>  OperationResult.Attempt.Fail(MoveOperationStatusType.FailedNotAllowedByPath, evtMsgs, result.Result, new InvalidOperationException($"Invalid operation status: {result.Status}")),
+            };
+        }
+
+        /// <inheritdoc />
+        public async Task<Attempt<IDataType, DataTypeOperationStatus>> CopyAsync(IDataType toCopy, Guid? containerKey, int userId = Constants.Security.SuperUserId)
+        {
+            EntityContainer? container = null;
+            if (containerKey.HasValue && containerKey.Value != Guid.Empty)
+            {
+                container = await _dataTypeContainerService.GetAsync(containerKey.Value);
+                if (container is null)
+                {
+                    return Attempt.FailWithStatus(DataTypeOperationStatus.ParentNotFound, toCopy);
+                }
             }
 
-            return OperationResult.Attempt.Succeed(MoveOperationStatusType.Success, evtMsgs, copy);
+            IDataType copy = toCopy.DeepCloneWithResetIdentities();
+            copy.Name += " (copy)"; // might not be unique
+
+            if (container != null)
+            {
+                copy.ParentId = container.Id;
+            }
+
+            return await SaveAsync(copy, () => DataTypeOperationStatus.Success, userId, AuditType.Copy);
         }
 
         /// <summary>
@@ -442,6 +488,7 @@ namespace Umbraco.Cms.Core.Services.Implement
         /// </summary>
         /// <param name="dataType"><see cref="IDataType"/> to save</param>
         /// <param name="userId">Id of the user issuing the save</param>
+        [Obsolete("Please use CreateAsync or UpdateAsync. Will be removed in V15.")]
         public void Save(IDataType dataType, int userId = Constants.Security.SuperUserId)
         {
             // mimic old service behavior
