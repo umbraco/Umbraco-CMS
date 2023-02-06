@@ -272,6 +272,8 @@ where tbl.[name]=@0 and col.[name]=@1;",
         return !constraintName.IsNullOrWhiteSpace();
     }
 
+    public override bool DoesPrimaryKeyExists(IDatabase db, string tableName, string primaryKeyName) => false;
+
     public override bool DoesTableExist(IDatabase db, string tableName)
     {
         var result =

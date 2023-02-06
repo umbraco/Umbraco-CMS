@@ -174,6 +174,15 @@ public class SqliteSyntaxProvider : SqlSyntaxProviderBase<SqliteSyntaxProvider>
         return false;
     }
 
+    public override bool DoesPrimaryKeyExists(IDatabase db, string tableName, string primaryKeyName)
+    {
+        IEnumerable<SqliteMaster> items = db
+            .Fetch<SqliteMaster>($"SELECT l.name FROM pragma_table_info('{tableName}') as l WHERE l.pk = 1;")
+            .Where(x => x.Name == primaryKeyName);
+
+        return items.Any();
+    }
+
     public override string GetFieldNameForUpdate<TDto>(Expression<Func<TDto, object?>> fieldSelector, string? tableAlias = null)
     {
         var field = ExpressionHelper.FindProperty(fieldSelector).Item1 as PropertyInfo;

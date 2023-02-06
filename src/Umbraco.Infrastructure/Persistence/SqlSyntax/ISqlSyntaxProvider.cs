@@ -187,6 +187,7 @@ public interface ISqlSyntaxProvider
     ///     </para>
     /// </remarks>
     bool TryGetDefaultConstraint(IDatabase db, string? tableName, string columnName, [MaybeNullWhen(false)] out string constraintName);
+    bool DoesPrimaryKeyExists(IDatabase db, string tableName, string primaryKeyName);
 
     string GetFieldNameForUpdate<TDto>(Expression<Func<TDto, object?>> fieldSelector, string? tableAlias = null);
 
