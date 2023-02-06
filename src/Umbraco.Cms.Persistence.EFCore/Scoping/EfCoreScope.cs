@@ -1,32 +1,21 @@
-﻿using Umbraco.Extensions;
+﻿using Umbraco.Cms.Persistence.EFCore.Entities;
 
 namespace Umbraco.Cms.Persistence.EFCore.Scoping;
 
 internal class EfCoreScope : IEfCoreScope
 {
     private readonly IUmbracoEfCoreDatabaseFactory _efCoreDatabaseFactory;
-    private IUmbracoEfCoreDatabase? _umbracoEfCoreDatabase;
+    private IUmbracoEfCoreDatabase _umbracoEfCoreDatabase;
     public bool? _completed;
 
     public EfCoreScope(IUmbracoEfCoreDatabaseFactory efCoreDatabaseFactory)
     {
         _efCoreDatabaseFactory = efCoreDatabaseFactory;
+        _umbracoEfCoreDatabase = _efCoreDatabaseFactory.Create();
+        _umbracoEfCoreDatabase.UmbracoEFContext.Database.BeginTransaction();
     }
 
-    public IUmbracoEfCoreDatabase UmbracoEfCoreDatabase
-    {
-        get
-        {
-            if (_umbracoEfCoreDatabase is not null)
-            {
-                return _umbracoEfCoreDatabase;
-            }
-
-            _umbracoEfCoreDatabase = _efCoreDatabaseFactory.Create();
-            _umbracoEfCoreDatabase.UmbracoEFContext.Database.BeginTransaction();
-            return _umbracoEfCoreDatabase;
-        }
-    }
+    public async Task<T> ExecuteWithContextAsync<T>(Func<UmbracoEFContext, Task<T>> method) => await method(_umbracoEfCoreDatabase.UmbracoEFContext);
 
     public void Complete() => _completed = true;
 
@@ -38,25 +27,21 @@ internal class EfCoreScope : IEfCoreScope
     private void DisposeEfCoreDatabase()
     {
         var completed = _completed.HasValue && _completed.Value;
-        if (_umbracoEfCoreDatabase is not null)
+        try
         {
-            try
+            if (completed)
             {
-                if (completed)
-                {
-                    _umbracoEfCoreDatabase.UmbracoEFContext.Database.CommitTransaction();
-                }
-                else
-                {
-                    _umbracoEfCoreDatabase.UmbracoEFContext.Database.RollbackTransaction();
-                }
+                _umbracoEfCoreDatabase.UmbracoEFContext.Database.CommitTransaction();
             }
-            finally
+            else
             {
-                _efCoreDatabaseFactory.Dispose();
-                _umbracoEfCoreDatabase.Dispose();
-                _umbracoEfCoreDatabase = null;
+                _umbracoEfCoreDatabase.UmbracoEFContext.Database.RollbackTransaction();
             }
+        }
+        finally
+        {
+            _efCoreDatabaseFactory.Dispose();
+            _umbracoEfCoreDatabase.Dispose();
         }
     }
 }

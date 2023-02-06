@@ -9,12 +9,14 @@ public class UmbracoEfCoreDatabaseFactory : IUmbracoEfCoreDatabaseFactory
 {
     private readonly IDatabaseInfo _databaseInfo;
     private readonly IServiceScopeFactory _scopeFactory;
+    private readonly UmbracoDbContextFactory _umbracoDbContextFactory;
     private IServiceScope? _scope;
 
-    public UmbracoEfCoreDatabaseFactory(IDatabaseInfo databaseInfo, IServiceScopeFactory scopeFactory)
+    public UmbracoEfCoreDatabaseFactory(IDatabaseInfo databaseInfo, IServiceScopeFactory scopeFactory, UmbracoDbContextFactory umbracoDbContextFactory)
     {
         _databaseInfo = databaseInfo;
         _scopeFactory = scopeFactory;
+        _umbracoDbContextFactory = umbracoDbContextFactory;
     }
 
     public IUmbracoEfCoreDatabase Create()
@@ -25,7 +27,7 @@ public class UmbracoEfCoreDatabaseFactory : IUmbracoEfCoreDatabaseFactory
         }
 
         UmbracoEFContext umbracoEfContext = _scope.ServiceProvider.GetRequiredService<UmbracoEFContext>();
-        return new UmbracoEfCoreDatabase(_databaseInfo, umbracoEfContext);
+        return new UmbracoEfCoreDatabase(_databaseInfo, umbracoEfContext, _umbracoDbContextFactory);
     }
 
 
