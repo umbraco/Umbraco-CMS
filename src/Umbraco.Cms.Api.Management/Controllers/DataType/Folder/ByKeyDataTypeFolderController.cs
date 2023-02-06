@@ -8,8 +8,8 @@ namespace Umbraco.Cms.Api.Management.Controllers.DataType.Folder;
 
 public class ByKeyDataTypeFolderController : DataTypeFolderControllerBase
 {
-    public ByKeyDataTypeFolderController(IBackOfficeSecurityAccessor backOfficeSecurityAccessor, IDataTypeService dataTypeService)
-        : base(backOfficeSecurityAccessor, dataTypeService)
+    public ByKeyDataTypeFolderController(IBackOfficeSecurityAccessor backOfficeSecurityAccessor, IDataTypeContainerService dataTypeContainerService)
+        : base(backOfficeSecurityAccessor, dataTypeContainerService)
     {
     }
 
@@ -17,6 +17,5 @@ public class ByKeyDataTypeFolderController : DataTypeFolderControllerBase
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(FolderViewModel), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<ActionResult<FolderViewModel>> ByKey(Guid key)
-        => await Task.FromResult(GetFolder(key));
+    public async Task<IActionResult> ByKey(Guid key) => await GetFolderAsync(key);
 }

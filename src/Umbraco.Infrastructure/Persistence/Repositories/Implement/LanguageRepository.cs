@@ -31,11 +31,7 @@ internal class LanguageRepository : EntityRepositoryBase<int, ILanguage>, ILangu
 
     public ILanguage? GetByIsoCode(string isoCode)
     {
-        // ensure cache is populated, in a non-expensive way
-        if (TypedCachePolicy != null)
-        {
-            TypedCachePolicy.GetAllCached(PerformGetAll);
-        }
+        EnsureCacheIsPopulated();
 
         var id = GetIdByIsoCode(isoCode, false);
         return id.HasValue ? Get(id.Value) : null;
@@ -50,15 +46,7 @@ internal class LanguageRepository : EntityRepositoryBase<int, ILanguage>, ILangu
             return null;
         }
 
-        // ensure cache is populated, in a non-expensive way
-        if (TypedCachePolicy != null)
-        {
-            TypedCachePolicy.GetAllCached(PerformGetAll);
-        }
-        else
-        {
-            PerformGetAll(); // We don't have a typed cache (i.e. unit tests) but need to populate the _codeIdMap
-        }
+        EnsureCacheIsPopulated();
 
         lock (_codeIdMap)
         {
@@ -85,15 +73,7 @@ internal class LanguageRepository : EntityRepositoryBase<int, ILanguage>, ILangu
             return null;
         }
 
-        // ensure cache is populated, in a non-expensive way
-        if (TypedCachePolicy != null)
-        {
-            TypedCachePolicy.GetAllCached(PerformGetAll);
-        }
-        else
-        {
-            PerformGetAll();
-        }
+        EnsureCacheIsPopulated();
 
         // yes, we want to lock _codeIdMap
         lock (_codeIdMap)
@@ -120,7 +100,19 @@ internal class LanguageRepository : EntityRepositoryBase<int, ILanguage>, ILangu
         new FullDataSetRepositoryCachePolicy<ILanguage, int>(GlobalIsolatedCache, ScopeAccessor, GetEntityId, /*expires:*/ false);
 
     protected ILanguage ConvertFromDto(LanguageDto dto)
-        => LanguageFactory.BuildEntity(dto);
+    {
+        // yes, we want to lock _codeIdMap
+        lock (_codeIdMap)
+        {
+            string? fallbackIsoCode = null;
+            if (dto.FallbackLanguageId.HasValue && _idCodeMap.TryGetValue(dto.FallbackLanguageId.Value, out fallbackIsoCode) == false)
+            {
+                throw new ArgumentException($"The ISO code map did not contain ISO code for fallback language ID: {dto.FallbackLanguageId}. Please reload the caches.");
+            }
+
+            return LanguageFactory.BuildEntity(dto, fallbackIsoCode);
+        }
+    }
 
     // do NOT leak that language, it's not deep-cloned!
     private ILanguage GetDefault()
@@ -172,20 +164,25 @@ internal class LanguageRepository : EntityRepositoryBase<int, ILanguage>, ILangu
         sql.OrderBy<LanguageDto>(x => x.Id);
 
         // get languages
-        var languages = Database.Fetch<LanguageDto>(sql).Select(ConvertFromDto).OrderBy(x => x.Id).ToList();
+        List<LanguageDto>? languageDtos = Database.Fetch<LanguageDto>(sql) ?? new List<LanguageDto>();
 
-        // initialize the code-id map
-        lock (_codeIdMap)
+        // initialize the code-id map if we've reloaded the entire set of languages
+        if (ids?.Any() == false)
         {
-            _codeIdMap.Clear();
-            _idCodeMap.Clear();
-            foreach (ILanguage language in languages)
+            lock (_codeIdMap)
             {
-                _codeIdMap[language.IsoCode] = language.Id;
-                _idCodeMap[language.Id] = language.IsoCode.ToLowerInvariant();
+                _codeIdMap.Clear();
+                _idCodeMap.Clear();
+                foreach (LanguageDto languageDto in languageDtos)
+                {
+                    ArgumentException.ThrowIfNullOrEmpty(languageDto.IsoCode, nameof(LanguageDto.IsoCode));
+                    _codeIdMap[languageDto.IsoCode] = languageDto.Id;
+                    _idCodeMap[languageDto.Id] = languageDto.IsoCode;
+                }
             }
         }
 
+        var languages = languageDtos.Select(ConvertFromDto).OrderBy(x => x.Id).ToList();
         return languages;
     }
 
@@ -247,6 +244,8 @@ internal class LanguageRepository : EntityRepositoryBase<int, ILanguage>, ILangu
             throw new InvalidOperationException("Cannot save a language without an ISO code and a culture name.");
         }
 
+        EnsureCacheIsPopulated();
+
         entity.AddingEntity();
 
         // deal with entity becoming the new default entity
@@ -262,10 +261,17 @@ internal class LanguageRepository : EntityRepositoryBase<int, ILanguage>, ILangu
         // fallback cycles are detected at service level
 
         // insert
-        LanguageDto dto = LanguageFactory.BuildDto(entity);
+        LanguageDto dto = LanguageFactory.BuildDto(entity, GetFallbackLanguageId(entity));
         var id = Convert.ToInt32(Database.Insert(dto));
         entity.Id = id;
         entity.ResetDirtyProperties();
+
+        // yes, we want to lock _codeIdMap
+        lock (_codeIdMap)
+        {
+            _codeIdMap[entity.IsoCode] = entity.Id;
+            _idCodeMap[entity.Id] = entity.IsoCode;
+        }
     }
 
     protected override void PersistUpdatedItem(ILanguage entity)
@@ -275,6 +281,8 @@ internal class LanguageRepository : EntityRepositoryBase<int, ILanguage>, ILangu
         {
             throw new InvalidOperationException("Cannot save a language without an ISO code and a culture name.");
         }
+
+        EnsureCacheIsPopulated();
 
         entity.UpdatingEntity();
 
@@ -324,9 +332,17 @@ internal class LanguageRepository : EntityRepositoryBase<int, ILanguage>, ILangu
         // fallback cycles are detected at service level
 
         // update
-        LanguageDto dto = LanguageFactory.BuildDto(entity);
+        LanguageDto dto = LanguageFactory.BuildDto(entity, GetFallbackLanguageId(entity));
         Database.Update(dto);
         entity.ResetDirtyProperties();
+
+        // yes, we want to lock _codeIdMap
+        lock (_codeIdMap)
+        {
+            _codeIdMap.RemoveAll(kvp => kvp.Value == entity.Id);
+            _codeIdMap[entity.IsoCode] = entity.Id;
+            _idCodeMap[entity.Id] = entity.IsoCode;
+        }
     }
 
     protected override void PersistDeletedItem(ILanguage entity)
@@ -354,6 +370,38 @@ internal class LanguageRepository : EntityRepositoryBase<int, ILanguage>, ILangu
 
         // delete
         base.PersistDeletedItem(entity);
+
+        // yes, we want to lock _codeIdMap
+        lock (_codeIdMap)
+        {
+            _codeIdMap.RemoveAll(kvp => kvp.Value == entity.Id);
+            _idCodeMap.Remove(entity.Id);
+        }
+    }
+
+    private void EnsureCacheIsPopulated()
+    {
+        // ensure cache is populated, in a non-expensive way
+        if (TypedCachePolicy != null)
+        {
+            TypedCachePolicy.GetAllCached(PerformGetAll);
+        }
+        else
+        {
+            PerformGetAll(); // We don't have a typed cache (i.e. unit tests) but need to populate the _codeIdMap
+        }
+    }
+
+    private int? GetFallbackLanguageId(ILanguage entity)
+    {
+        int? fallbackLanguageId = null;
+        if (entity.FallbackIsoCode.IsNullOrWhiteSpace() == false &&
+            _codeIdMap.TryGetValue(entity.FallbackIsoCode, out var languageId))
+        {
+            fallbackLanguageId = languageId;
+        }
+
+        return fallbackLanguageId;
     }
 
     #endregion
