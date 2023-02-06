@@ -1,6 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using Umbraco.Cms.Api.Management.Factories;
-using Umbraco.Cms.Api.Management.Mapping.Culture;
+﻿using Umbraco.Cms.Api.Management.Mapping.Culture;
 using Umbraco.Cms.Api.Management.Mapping.Language;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Mapping;
@@ -11,8 +9,6 @@ internal static class LanguageBuilderExtensions
 {
     internal static IUmbracoBuilder AddLanguages(this IUmbracoBuilder builder)
     {
-        builder.Services.AddTransient<ILanguageFactory, LanguageFactory>();
-
         builder.WithCollectionBuilder<MapDefinitionCollectionBuilder>()
             .Add<LanguageViewModelsMapDefinition>()
             .Add<CultureViewModelMapDefinition>();

@@ -4377,6 +4377,16 @@
           "201": {
             "description": "Created"
           },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
           "404": {
             "description": "Not Found",
             "content": {
@@ -4450,6 +4460,16 @@
           "200": {
             "description": "Success"
           },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
           "404": {
             "description": "Not Found",
             "content": {
@@ -4490,6 +4510,16 @@
         "responses": {
           "200": {
             "description": "Success"
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
           },
           "404": {
             "description": "Not Found",
@@ -4559,15 +4589,6 @@
           "Template"
         ],
         "operationId": "GetTemplateScaffold",
-        "parameters": [
-          {
-            "name": "masterTemplateAlias",
-            "in": "query",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
         "responses": {
           "200": {
             "description": "Success",

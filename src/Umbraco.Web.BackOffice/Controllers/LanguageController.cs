@@ -139,7 +139,7 @@ public class LanguageController : UmbracoAuthorizedJsonController
             {
                 IsDefault = language.IsDefault,
                 IsMandatory = language.IsMandatory,
-                FallbackLanguageId = language.FallbackLanguageId
+                FallbackIsoCode = language.FallbackIsoCode
             };
 
             _localizationService.Save(newLang);
@@ -162,14 +162,14 @@ public class LanguageController : UmbracoAuthorizedJsonController
 
         existingById.IsDefault = language.IsDefault;
         existingById.IsMandatory = language.IsMandatory;
-        existingById.FallbackLanguageId = language.FallbackLanguageId;
+        existingById.FallbackIsoCode = language.FallbackIsoCode;
 
         // modifying an existing language can create a fallback, verify
         // note that the service will check again, dealing with race conditions
-        if (existingById.FallbackLanguageId.HasValue)
+        if (existingById.FallbackIsoCode != null)
         {
-            var languages = _localizationService.GetAllLanguages().ToDictionary(x => x.Id, x => x);
-            if (!languages.ContainsKey(existingById.FallbackLanguageId.Value))
+            var languages = _localizationService.GetAllLanguages().ToDictionary(x => x.IsoCode, x => x);
+            if (!languages.ContainsKey(existingById.FallbackIsoCode))
             {
                 ModelState.AddModelError("FallbackLanguage", "The selected fall back language does not exist.");
                 return ValidationProblem(ModelState);
@@ -178,7 +178,7 @@ public class LanguageController : UmbracoAuthorizedJsonController
             if (CreatesCycle(existingById, languages))
             {
                 ModelState.AddModelError("FallbackLanguage",
-                    $"The selected fall back language {languages[existingById.FallbackLanguageId.Value].IsoCode} would create a circular path.");
+                    $"The selected fall back language {existingById.FallbackIsoCode} would create a circular path.");
                 return ValidationProblem(ModelState);
             }
         }
@@ -188,7 +188,7 @@ public class LanguageController : UmbracoAuthorizedJsonController
     }
 
     // see LocalizationService
-    private bool CreatesCycle(ILanguage language, IDictionary<int, ILanguage> languages)
+    private bool CreatesCycle(ILanguage language, IDictionary<string, ILanguage> languagesByIsoCode)
     {
         // a new language is not referenced yet, so cannot be part of a cycle
         if (!language.HasIdentity)
@@ -196,20 +196,20 @@ public class LanguageController : UmbracoAuthorizedJsonController
             return false;
         }
 
-        var id = language.FallbackLanguageId;
+        var isoCode = language.FallbackIsoCode;
         while (true) // assuming languages does not already contains a cycle, this must end
         {
-            if (!id.HasValue)
+            if (isoCode == null)
             {
                 return false; // no fallback means no cycle
             }
 
-            if (id.Value == language.Id)
+            if (isoCode == language.IsoCode)
             {
                 return true; // back to language = cycle!
             }
 
-            id = languages[id.Value].FallbackLanguageId; // else keep chaining
+            isoCode = languagesByIsoCode[isoCode].FallbackIsoCode; // else keep chaining
         }
     }
 }

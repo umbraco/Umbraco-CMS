@@ -9,5 +9,6 @@ public enum LanguageOperationStatus
     MissingDefault,
     DuplicateIsoCode,
     InvalidIsoCode,
+    InvalidFallbackIsoCode,
     InvalidId
 }

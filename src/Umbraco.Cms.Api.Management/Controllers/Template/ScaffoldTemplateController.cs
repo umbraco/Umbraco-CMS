@@ -16,11 +16,11 @@ public class ScaffoldTemplateController : TemplateControllerBase
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(TemplateScaffoldViewModel), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<ActionResult<TemplateScaffoldViewModel>> Scaffold(string? masterTemplateAlias = null)
+    public async Task<ActionResult<TemplateScaffoldViewModel>> Scaffold()
     {
         var scaffoldViewModel = new TemplateScaffoldViewModel
         {
-            Content = _defaultViewContentProvider.GetDefaultFileContent(masterTemplateAlias)
+            Content = _defaultViewContentProvider.GetDefaultFileContent()
         };
 
         return await Task.FromResult(Ok(scaffoldViewModel));
