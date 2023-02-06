@@ -14,16 +14,13 @@ using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Composing;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Logging;
-using Umbraco.Cms.Core.Persistence;
 using Umbraco.Cms.Core.Runtime;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Sync;
 using Umbraco.Cms.Core.WebAssets;
 using Umbraco.Cms.Infrastructure.Examine;
 using Umbraco.Cms.Infrastructure.HostedServices;
-using Umbraco.Cms.Infrastructure.Migrations.Install;
 using Umbraco.Cms.Infrastructure.PublishedCache;
-using Umbraco.Cms.Persistence.EFCore;
 using Umbraco.Cms.Persistence.EFCore.Entities;
 using Umbraco.Cms.Tests.Common.TestHelpers.Stubs;
 using Umbraco.Cms.Tests.Integration.Implementations;
@@ -63,6 +60,8 @@ public static class UmbracoBuilderExtensions
         builder.Services.AddUnique<IServerMessenger, NoopServerMessenger>();
         builder.Services.AddUnique<IProfiler, TestProfiler>();
 
+        builder.Services.AddSingleton<UmbracoTestDatabaseConfigurationFactory>();
+
         builder.Services.AddDbContext<UmbracoEFContext>((serviceProvider, options) =>
         {
             var testDatabaseType = builder.Config.GetValue<TestDatabaseSettings.TestDatabaseType>("Tests:Database:DatabaseType");
@@ -76,11 +75,8 @@ public static class UmbracoBuilderExtensions
                 options.UseSqlServer(serviceProvider.GetRequiredService<IOptionsMonitor<ConnectionStrings>>().CurrentValue.ConnectionString);
             }
         });
-        builder.Services.AddUnique<IDatabaseInfo, EFDatabaseInfo>();
-        builder.Services.AddUnique<IDatabaseSchemaCreatorFactory, EFDatabaseSchemaCreatorFactory>();
-        builder.Services.AddUnique<IDatabaseDataCreator, EFCoreDatabaseDataCreator>();
-        builder.Services.AddSingleton<UmbracoDbContextFactory>();
-        builder.Services.AddSingleton<UmbracoTestDatabaseConfigurationFactory>();
+
+        builder.Services.AddUmbracoEFCore(builder.Config);
 
         return builder;
     }
