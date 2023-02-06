@@ -9,7 +9,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_13_0_0;
 
 public class AddGuidsToUserGroups : UnscopedMigrationBase
 {
-    private const string NewColumnName = "uniqueId";
+    private const string NewColumnName = "key";
     private readonly IScopeProvider _scopeProvider;
 
     public AddGuidsToUserGroups(IMigrationContext context, IScopeProvider scopeProvider) : base(context)
@@ -76,7 +76,7 @@ public class AddGuidsToUserGroups : UnscopedMigrationBase
         IEnumerable<UserGroupDto> groups = Database.Fetch<OldUserGroupDto>().Select(x => new UserGroupDto
         {
             Id = x.Id,
-            UniqueId = Guid.NewGuid(),
+            Key = Guid.NewGuid(),
             Alias = x.Alias,
             Name = x.Name,
             DefaultPermissions = x.DefaultPermissions,
