@@ -33,10 +33,13 @@ export class UmbCollectionBulkActionDeleteElement extends UmbLitElement {
 	}
 
 	#handleClick(event: Event) {
+
+		// TODO: Revisit this subscription nightmare, can we make this simpler, avoid subscribing to the selection?
+
 		const selectionSubscription = this.#collectionContext?.selection.subscribe((selection) => {
 			const dataSubscription = this.#collectionContext?.data
-				.pipe(map((items) => items.filter((item) => selection.includes(item.key))))
-				.subscribe((items: Array<MediaDetails>) => {
+				.pipe(map((items) => items.filter((item) => item.key && selection.includes(item.key))))
+				.subscribe((items: Array<any>) => {
 					const modalHandler = this.#modalService?.confirm({
 						headline: `Deleting ${selection.length} items`,
 						content: html`
