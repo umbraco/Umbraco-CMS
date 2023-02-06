@@ -6,24 +6,30 @@ internal class EfCoreScope : IEfCoreScope
 {
     private readonly IUmbracoEfCoreDatabaseFactory _efCoreDatabaseFactory;
     private readonly IEFCoreScopeAccessor _efCoreScopeAccessor;
+    private readonly IEfCoreScopeProvider _efCoreScopeProvider;
     private readonly IUmbracoEfCoreDatabase _umbracoEfCoreDatabase;
+
     public Guid InstanceId { get; }
-    public IEfCoreScope? ParentScope { get; set; }
+
+    public IEfCoreScope? ParentScope { get; }
+
     public bool? _completed;
 
-    public EfCoreScope(IUmbracoEfCoreDatabaseFactory efCoreDatabaseFactory, IEFCoreScopeAccessor efCoreScopeAccessor)
+    public EfCoreScope(IUmbracoEfCoreDatabaseFactory efCoreDatabaseFactory, IEFCoreScopeAccessor efCoreScopeAccessor, IEfCoreScopeProvider efCoreScopeProvider)
     {
         _efCoreDatabaseFactory = efCoreDatabaseFactory;
         _efCoreScopeAccessor = efCoreScopeAccessor;
+        _efCoreScopeProvider = efCoreScopeProvider;
         _umbracoEfCoreDatabase = _efCoreDatabaseFactory.Create();
         _umbracoEfCoreDatabase.UmbracoEFContext.Database.BeginTransaction();
         InstanceId = Guid.NewGuid();
     }
 
-    public EfCoreScope(IUmbracoEfCoreDatabaseFactory efCoreDatabaseFactory, IEFCoreScopeAccessor efCoreScopeAccessor, IEfCoreScope parentScope)
+    public EfCoreScope(IUmbracoEfCoreDatabaseFactory efCoreDatabaseFactory, IEFCoreScopeAccessor efCoreScopeAccessor, IEfCoreScopeProvider efCoreScopeProvider, IEfCoreScope parentScope)
     {
         _efCoreDatabaseFactory = efCoreDatabaseFactory;
         _efCoreScopeAccessor = efCoreScopeAccessor;
+        _efCoreScopeProvider = efCoreScopeProvider;
         _umbracoEfCoreDatabase = _efCoreDatabaseFactory.Create();
         ParentScope = parentScope;
         InstanceId = Guid.NewGuid();
@@ -42,7 +48,12 @@ internal class EfCoreScope : IEfCoreScope
             throw new InvalidOperationException(failedMessage);
         }
 
-        DisposeEfCoreDatabase();
+        if (ParentScope is null)
+        {
+            DisposeEfCoreDatabase();
+        }
+
+        _efCoreScopeProvider.PopAmbientScope();
     }
 
     private void DisposeEfCoreDatabase()

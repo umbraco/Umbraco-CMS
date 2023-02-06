@@ -29,13 +29,15 @@ public class EfCoreScopeProvider : IEfCoreScopeProvider
     {
         if (_ambientEfCoreScopeStack.AmbientScope is null)
         {
-            var ambientScope = new EfCoreScope(_umbracoEfCoreDatabaseFactory, _efCoreScopeAccessor);
+            var ambientScope = new EfCoreScope(_umbracoEfCoreDatabaseFactory, _efCoreScopeAccessor, this);
             _ambientEfCoreScopeStack.Push(ambientScope);
             return ambientScope;
         }
 
-        var efCoreScope = new EfCoreScope(_umbracoEfCoreDatabaseFactory, _efCoreScopeAccessor, _ambientEfCoreScopeStack.AmbientScope);
+        var efCoreScope = new EfCoreScope(_umbracoEfCoreDatabaseFactory, _efCoreScopeAccessor, this, _ambientEfCoreScopeStack.AmbientScope);
         _ambientEfCoreScopeStack.Push(efCoreScope);
         return efCoreScope;
     }
+
+    public void PopAmbientScope() => _ambientEfCoreScopeStack.Pop();
 }

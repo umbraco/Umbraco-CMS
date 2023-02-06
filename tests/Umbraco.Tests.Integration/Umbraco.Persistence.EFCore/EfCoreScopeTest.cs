@@ -46,7 +46,7 @@ public class EfCoreScopeTest : UmbracoIntegrationTest
         var t = Task.Run(() =>
         {
             IEfCoreScope nested = EfCoreScopeProvider.CreateScope();
-            Thread.Sleep(20000);
+            Thread.Sleep(2000);
             nested.Dispose();
         });
 
