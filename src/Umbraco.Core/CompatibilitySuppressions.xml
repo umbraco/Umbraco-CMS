@@ -331,6 +331,13 @@
   </Suppression>
   <Suppression>
     <DiagnosticId>CP0002</DiagnosticId>
+    <Target>M:Umbraco.Cms.Core.Services.Implement.DataTypeService.#ctor(Umbraco.Cms.Core.PropertyEditors.IDataValueEditorFactory,Umbraco.Cms.Core.Scoping.ICoreScopeProvider,Microsoft.Extensions.Logging.ILoggerFactory,Umbraco.Cms.Core.Events.IEventMessagesFactory,Umbraco.Cms.Core.Persistence.Repositories.IDataTypeRepository,Umbraco.Cms.Core.Persistence.Repositories.IDataTypeContainerRepository,Umbraco.Cms.Core.Persistence.Repositories.IAuditRepository,Umbraco.Cms.Core.Persistence.Repositories.IEntityRepository,Umbraco.Cms.Core.Persistence.Repositories.IContentTypeRepository,Umbraco.Cms.Core.IO.IIOHelper,Umbraco.Cms.Core.Services.ILocalizedTextService,Umbraco.Cms.Core.Services.ILocalizationService,Umbraco.Cms.Core.Strings.IShortStringHelper,Umbraco.Cms.Core.Serialization.IJsonSerializer)</Target>
+    <Left>lib/net7.0/Umbraco.Core.dll</Left>
+    <Right>lib/net7.0/Umbraco.Core.dll</Right>
+    <IsBaselineSuppression>true</IsBaselineSuppression>
+  </Suppression>
+  <Suppression>
+    <DiagnosticId>CP0002</DiagnosticId>
     <Target>M:Umbraco.Extensions.DictionaryItemExtensions.GetDefaultValue(Umbraco.Cms.Core.Models.IDictionaryItem)</Target>
     <Left>lib/net7.0/Umbraco.Core.dll</Left>
     <Right>lib/net7.0/Umbraco.Core.dll</Right>
@@ -339,13 +346,6 @@
   <Suppression>
     <DiagnosticId>CP0002</DiagnosticId>
     <Target>M:Umbraco.Extensions.DictionaryItemExtensions.GetTranslatedValue(Umbraco.Cms.Core.Models.IDictionaryItem,System.Int32)</Target>
-    <Left>lib/net7.0/Umbraco.Core.dll</Left>
-    <Right>lib/net7.0/Umbraco.Core.dll</Right>
-    <IsBaselineSuppression>true</IsBaselineSuppression>
-  </Suppression>
-  <Suppression>
-    <DiagnosticId>CP0002</DiagnosticId>
-    <Target>M:Umbraco.Cms.Core.Services.Implement.DataTypeService.#ctor(Umbraco.Cms.Core.PropertyEditors.IDataValueEditorFactory,Umbraco.Cms.Core.Scoping.ICoreScopeProvider,Microsoft.Extensions.Logging.ILoggerFactory,Umbraco.Cms.Core.Events.IEventMessagesFactory,Umbraco.Cms.Core.Persistence.Repositories.IDataTypeRepository,Umbraco.Cms.Core.Persistence.Repositories.IDataTypeContainerRepository,Umbraco.Cms.Core.Persistence.Repositories.IAuditRepository,Umbraco.Cms.Core.Persistence.Repositories.IEntityRepository,Umbraco.Cms.Core.Persistence.Repositories.IContentTypeRepository,Umbraco.Cms.Core.IO.IIOHelper,Umbraco.Cms.Core.Services.ILocalizedTextService,Umbraco.Cms.Core.Services.ILocalizationService,Umbraco.Cms.Core.Strings.IShortStringHelper,Umbraco.Cms.Core.Serialization.IJsonSerializer)</Target>
     <Left>lib/net7.0/Umbraco.Core.dll</Left>
     <Right>lib/net7.0/Umbraco.Core.dll</Right>
     <IsBaselineSuppression>true</IsBaselineSuppression>
@@ -388,6 +388,13 @@
   <Suppression>
     <DiagnosticId>CP0006</DiagnosticId>
     <Target>M:Umbraco.Cms.Core.Deploy.IValueConnector.ToArtifact(System.Object,Umbraco.Cms.Core.Models.IPropertyType,System.Collections.Generic.ICollection{Umbraco.Cms.Core.Deploy.ArtifactDependency},Umbraco.Cms.Core.Deploy.IContextCache)</Target>
+    <Left>lib/net7.0/Umbraco.Core.dll</Left>
+    <Right>lib/net7.0/Umbraco.Core.dll</Right>
+    <IsBaselineSuppression>true</IsBaselineSuppression>
+  </Suppression>
+  <Suppression>
+    <DiagnosticId>CP0006</DiagnosticId>
+    <Target>M:Umbraco.Cms.Core.Packaging.IPackageDefinitionRepository.GetByKey(System.Guid)</Target>
     <Left>lib/net7.0/Umbraco.Core.dll</Left>
     <Right>lib/net7.0/Umbraco.Core.dll</Right>
     <IsBaselineSuppression>true</IsBaselineSuppression>
@@ -535,6 +542,13 @@
   <Suppression>
     <DiagnosticId>CP0006</DiagnosticId>
     <Target>M:Umbraco.Cms.Core.Services.ILocalizationService.Update(Umbraco.Cms.Core.Models.ILanguage,System.Int32)</Target>
+    <Left>lib/net7.0/Umbraco.Core.dll</Left>
+    <Right>lib/net7.0/Umbraco.Core.dll</Right>
+    <IsBaselineSuppression>true</IsBaselineSuppression>
+  </Suppression>
+  <Suppression>
+    <DiagnosticId>CP0006</DiagnosticId>
+    <Target>M:Umbraco.Cms.Core.Services.IPackagingService.GetCreatedPackageByKey(System.Guid)</Target>
     <Left>lib/net7.0/Umbraco.Core.dll</Left>
     <Right>lib/net7.0/Umbraco.Core.dll</Right>
     <IsBaselineSuppression>true</IsBaselineSuppression>
