@@ -6,8 +6,8 @@ import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 export class UmbSaveAndScheduleDocumentWorkspaceAction extends UmbWorkspaceAction<UmbDocumentRepository> {
 	#workspaceContext?: UmbDocumentWorkspaceContext;
 
-	constructor(host: UmbControllerHostInterface, unique: string) {
-		super(host, UmbDocumentRepository, unique);
+	constructor(host: UmbControllerHostInterface, repositoryAlias: string, unique: string) {
+		super(host, repositoryAlias, unique);
 	}
 
 	async execute() {
@@ -16,6 +16,6 @@ export class UmbSaveAndScheduleDocumentWorkspaceAction extends UmbWorkspaceActio
 		const document = this.workspaceContext.getData();
 		// TODO: handle errors
 		if (!document) return;
-		this.repository.saveAndSchedule();
+		this.repository?.saveAndSchedule();
 	}
 }
