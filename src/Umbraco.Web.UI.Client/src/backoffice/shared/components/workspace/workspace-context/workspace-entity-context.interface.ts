@@ -11,5 +11,5 @@ export interface UmbWorkspaceEntityContextInterface<T = unknown> extends UmbWork
 
 	setPropertyValue(alias: string, value: unknown): void;
 
-	save(isNew: boolean): Promise<void>;
+	save(): Promise<void>;
 }

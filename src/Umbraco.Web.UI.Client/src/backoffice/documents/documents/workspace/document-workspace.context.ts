@@ -12,6 +12,7 @@ export class UmbDocumentWorkspaceContext
 	extends UmbWorkspaceContext
 	implements UmbWorkspaceEntityContextInterface<EntityType | undefined>
 {
+	#isNew = false;
 	#host: UmbControllerHostInterface;
 	#templateDetailRepo: UmbDocumentRepository;
 
@@ -84,6 +85,7 @@ export class UmbDocumentWorkspaceContext
 	async load(entityKey: string) {
 		const { data } = await this.#templateDetailRepo.requestDetails(entityKey);
 		if (data) {
+			this.#isNew = false;
 			this.#data.next(data);
 		}
 	}
@@ -91,14 +93,19 @@ export class UmbDocumentWorkspaceContext
 	async createScaffold(parentKey: string | null) {
 		const { data } = await this.#templateDetailRepo.createDetailsScaffold(parentKey);
 		if (!data) return;
+		this.#isNew = true;
 		this.#data.next(data);
 	}
 
-	async save(isNew: boolean) {
+	async save() {
 		if (!this.#data.value) return;
-		isNew
-			? this.#templateDetailRepo.createDetail(this.#data.value)
-			: this.#templateDetailRepo.saveDetail(this.#data.value);
+		if (this.#isNew) {
+			await this.#templateDetailRepo.createDetail(this.#data.value);
+		} else {
+			await this.#templateDetailRepo.saveDetail(this.#data.value);
+		}
+		// If it went well, then its not new anymore?.
+		this.#isNew = false;
 	}
 
 	async delete(key: string) {
