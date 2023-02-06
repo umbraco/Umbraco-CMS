@@ -8,8 +8,10 @@ import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 // TODO: should this contex be called DocumentDraft instead of workspace? or should the draft be part of this?
 
 type EntityType = DocumentDetails;
-export class UmbDocumentWorkspaceContext extends UmbWorkspaceContext implements UmbWorkspaceEntityContextInterface<EntityType | undefined> {
-
+export class UmbDocumentWorkspaceContext
+	extends UmbWorkspaceContext
+	implements UmbWorkspaceEntityContextInterface<EntityType | undefined>
+{
 	#host: UmbControllerHostInterface;
 	#templateDetailRepo: UmbDocumentRepository;
 
