@@ -11,5 +11,5 @@ export interface MetaWorkspaceAction {
 	label?: string; //TODO: Use or implement additional label-key
 	look?: InterfaceLook;
 	color?: InterfaceColor;
-	api: any; //TODO: Implement UmbEntityAction
+	api?: any; //TODO: Implement UmbEntityAction
 }
