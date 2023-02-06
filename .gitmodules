@@ -1,0 +1,3 @@
+[submodule "src/Umbraco.Web.UI.New.Client"]
+	path = src/Umbraco.Web.UI.New.Client
+	url = https://github.com/umbraco/Umbraco.CMS.Backoffice.git

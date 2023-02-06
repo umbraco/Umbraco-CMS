@@ -1,3 +1,6 @@
+using System.Text;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core;
@@ -42,6 +45,8 @@ public sealed class BackOfficeAreaRoutes : IAreaRoutes
     /// <inheritdoc />
     public void CreateRoutes(IEndpointRouteBuilder endpoints)
     {
+
+
         switch (_runtimeState.Level)
         {
             case RuntimeLevel.Install:
@@ -75,6 +80,16 @@ public sealed class BackOfficeAreaRoutes : IAreaRoutes
             new { action = @"[a-zA-Z]*", id = @"[a-zA-Z]*" });
 
         endpoints.MapUmbracoApiRoute<AuthenticationController>(_umbracoPathSegment, Constants.Web.Mvc.BackOfficeApiArea, true, string.Empty);
+
+        endpoints.MapAreaControllerRoute(
+            "catch-all-sections-to-client",
+            Constants.Web.Mvc.BackOfficeArea,
+            new StringBuilder(_umbracoPathSegment).Append("/section/{**slug}").ToString(),
+            new
+            {
+                Controller = ControllerExtensions.GetControllerName<BackOfficeController>(),
+                Action = nameof(BackOfficeController.Default)
+            });
     }
 
     /// <summary>

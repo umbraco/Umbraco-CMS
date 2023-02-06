@@ -1,3 +1,4 @@
+using HtmlAgilityPack;
 using Umbraco.Cms.Infrastructure.Migrations.PostMigrations;
 
 namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_8_0_1;
@@ -10,8 +11,8 @@ public class ChangeNuCacheJsonFormat : MigrationBase
     {
     }
 
-    protected override void Migrate() =>
-
-        // nothing - just adding the post-migration
-        Context.AddPostMigration<RebuildPublishedSnapshot>();
+    protected override void Migrate()
+    {
+        // This has been removed since post migrations are no longer a thing, and this migration should be deleted.
+    }
 }

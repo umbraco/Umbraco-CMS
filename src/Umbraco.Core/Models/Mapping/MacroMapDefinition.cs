@@ -79,11 +79,8 @@ public class MacroMapDefinition : IMapDefinition
         target.View = paramEditor?.GetValueEditor().View;
 
         // sets the parameter configuration to be the default configuration editor's configuration,
-        // ie configurationEditor.DefaultConfigurationObject, prepared for the value editor, ie
-        // after ToValueEditor - important to use DefaultConfigurationObject here, because depending
-        // on editors, ToValueEditor expects the actual strongly typed configuration - not the
-        // dictionary thing returned by DefaultConfiguration
+        // ie configurationEditor.DefaultConfigurationObject, prepared for the value editor
         IConfigurationEditor? configurationEditor = paramEditor?.GetConfigurationEditor();
-        target.Configuration = configurationEditor?.ToValueEditor(configurationEditor.DefaultConfigurationObject);
+        target.Configuration = configurationEditor?.FromConfigurationEditor(configurationEditor.DefaultConfiguration);
     }
 }

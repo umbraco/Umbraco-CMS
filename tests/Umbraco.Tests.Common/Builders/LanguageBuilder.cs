@@ -29,7 +29,7 @@ public class LanguageBuilder<TParent>
     private CultureInfo _cultureInfo;
     private string _cultureName;
     private DateTime? _deleteDate;
-    private int? _fallbackLanguageId;
+    private string? _fallbackLanguageIsoCode;
     private int? _id;
     private bool? _isDefault;
     private bool? _isMandatory;
@@ -95,9 +95,9 @@ public class LanguageBuilder<TParent>
         return this;
     }
 
-    public LanguageBuilder<TParent> WithFallbackLanguageId(int fallbackLanguageId)
+    public LanguageBuilder<TParent> WithFallbackLanguageIsoCode(string fallbackLanguageIsoCode)
     {
-        _fallbackLanguageId = fallbackLanguageId;
+        _fallbackLanguageIsoCode = fallbackLanguageIsoCode;
         return this;
     }
 
@@ -109,7 +109,7 @@ public class LanguageBuilder<TParent>
         var createDate = _createDate ?? DateTime.Now;
         var updateDate = _updateDate ?? DateTime.Now;
         var deleteDate = _deleteDate;
-        var fallbackLanguageId = _fallbackLanguageId;
+        var fallbackLanguageIsoCode = _fallbackLanguageIsoCode;
         var isDefault = _isDefault ?? false;
         var isMandatory = _isMandatory ?? false;
 
@@ -122,7 +122,7 @@ public class LanguageBuilder<TParent>
             DeleteDate = deleteDate,
             IsDefault = isDefault,
             IsMandatory = isMandatory,
-            FallbackLanguageId = fallbackLanguageId
+            FallbackIsoCode = fallbackLanguageIsoCode
         };
     }
 }

@@ -1,75 +1,51 @@
-﻿using System.Net.Mime;
-using System.Text;
-using System.Text.Json;
-using Json.Patch;
-using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Umbraco.Cms.Core.Mapping;
+using Umbraco.Cms.Api.Management.Factories;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Cms.Api.Management.Serialization;
-using Umbraco.Cms.Api.Management.Services;
 using Umbraco.Cms.Api.Management.ViewModels.Dictionary;
-using Umbraco.Cms.Api.Management.ViewModels.JsonPatch;
-using Umbraco.New.Cms.Core.Factories;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Security;
+using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Dictionary;
 
 public class UpdateDictionaryController : DictionaryControllerBase
 {
-    private readonly ILocalizationService _localizationService;
-    private readonly IUmbracoMapper _umbracoMapper;
-    private readonly IDictionaryService _dictionaryService;
+    private readonly IDictionaryItemService _dictionaryItemService;
+    private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
     private readonly IDictionaryFactory _dictionaryFactory;
-    private readonly IJsonPatchService _jsonPatchService;
-    private readonly ISystemTextJsonSerializer _systemTextJsonSerializer;
 
     public UpdateDictionaryController(
-        ILocalizationService localizationService,
-        IUmbracoMapper umbracoMapper,
-        IDictionaryService dictionaryService,
-        IDictionaryFactory dictionaryFactory,
-        IJsonPatchService jsonPatchService,
-        ISystemTextJsonSerializer systemTextJsonSerializer)
+        IDictionaryItemService dictionaryItemService,
+        IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
+        IDictionaryFactory dictionaryFactory)
     {
-        _localizationService = localizationService;
-        _umbracoMapper = umbracoMapper;
-        _dictionaryService = dictionaryService;
+        _dictionaryItemService = dictionaryItemService;
+        _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
         _dictionaryFactory = dictionaryFactory;
-        _jsonPatchService = jsonPatchService;
-        _systemTextJsonSerializer = systemTextJsonSerializer;
     }
 
-    [HttpPatch("{id:Guid}")]
+    [HttpPut($"{{{nameof(key)}:guid}}")]
     [MapToApiVersion("1.0")]
-    [ProducesResponseType(typeof(ContentResult), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(NotFoundResult), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> Update(Guid id, JsonPatchViewModel[] updateViewModel)
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> Update(Guid key, DictionaryItemUpdateModel dictionaryItemUpdateModel)
     {
-        IDictionaryItem? dictionaryItem = _localizationService.GetDictionaryItemById(id);
-
-        if (dictionaryItem is null)
+        IDictionaryItem? current = await _dictionaryItemService.GetAsync(key);
+        if (current == null)
         {
             return NotFound();
         }
 
-        DictionaryViewModel dictionaryToPatch = _umbracoMapper.Map<DictionaryViewModel>(dictionaryItem)!;
+        IDictionaryItem updated = await _dictionaryFactory.MapUpdateModelToDictionaryItemAsync(current, dictionaryItemUpdateModel);
 
-        PatchResult? result = _jsonPatchService.Patch(updateViewModel, dictionaryToPatch);
+        Attempt<IDictionaryItem, DictionaryItemOperationStatus> result =
+            await _dictionaryItemService.UpdateAsync(updated, CurrentUserId(_backOfficeSecurityAccessor));
 
-        if (result?.Result is null)
-        {
-            throw new JsonException("Could not patch the JsonPatchViewModel");
-        }
-
-        DictionaryViewModel? updatedDictionaryItem = _systemTextJsonSerializer.Deserialize<DictionaryViewModel>(result.Result.ToJsonString());
-        if (updatedDictionaryItem is null)
-        {
-            throw new JsonException("Could not serialize from PatchResult to DictionaryViewModel");
-        }
-
-        IDictionaryItem dictionaryToSave = _dictionaryFactory.CreateDictionaryItem(updatedDictionaryItem!);
-        _localizationService.Save(dictionaryToSave);
-        return await Task.FromResult(Content(_dictionaryService.CalculatePath(dictionaryToSave.ParentId, dictionaryToSave.Id), MediaTypeNames.Text.Plain, Encoding.UTF8));
+        return result.Success
+            ? Ok()
+            : DictionaryItemOperationStatusResult(result.Status);
     }
 }

@@ -2,7 +2,7 @@
 
 namespace Umbraco.New.Cms.Core.Models.Configuration;
 
-// TODO: merge this class with relevant existing settings from Core and clean up
+// FIXME: merge this class with relevant existing settings from Core and clean up
 [UmbracoOptions($"{Umbraco.Cms.Core.Constants.Configuration.ConfigPrefix}NewBackOffice")]
 public class NewBackOfficeSettings
 {

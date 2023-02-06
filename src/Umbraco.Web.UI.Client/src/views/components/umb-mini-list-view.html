@@ -64,12 +64,12 @@
                     ng-class="{'-selected':child.selected, 'not-allowed':!child.allowed}">
                     <div class="umb-table-cell umb-table-cell--auto-width" ng-class="{'umb-table-cell--faded':child.published === false}">
                         <div class="flex items-center">
-                            <umb-icon icon="icon-navigation-right" class="umb-table__row-expand" ng-click="openNode($event, child)" ng-class="{'umb-table__row-expand--hidden': child.metaData.hasChildren !== true}">&nbsp;</umb-icon>
-                            <umb-icon icon="{{child.icon}}" class="umb-table-body__icon umb-table-body__fileicon"></umb-icon>
+                            <umb-icon icon="icon-navigation-right" class="umb-table__row-expand cursor-pointer" ng-click="openNode($event, child)" ng-class="{'umb-table__row-expand--hidden': child.metaData.hasChildren !== true}">&nbsp;</umb-icon>
+                            <umb-icon icon="{{child.icon}}" class="umb-table-body__icon umb-table-body__fileicon umb-minilistview__fade-not-allowed"></umb-icon>
                             <umb-icon icon="icon-check" class="umb-table-body__icon umb-table-body__checkicon"></umb-icon>
                         </div>
                     </div>
-                    <div class="umb-table-cell black" ng-class="{'umb-table-cell--faded':child.published === false}">{{ child.name }}</div>
+                    <div class="umb-table-cell black umb-minilistview__fade-not-allowed" ng-class="{'umb-table-cell--faded':child.published === false}">{{ child.name }}</div>
                 </div>
 
                 <!-- Show a message when no items are found, depending on whether you searched or the list was empty anyway -->

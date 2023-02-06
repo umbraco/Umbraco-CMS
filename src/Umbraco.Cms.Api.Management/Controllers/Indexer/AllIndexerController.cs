@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Management.Factories;
 using Umbraco.Cms.Api.Common.ViewModels.Pagination;
-using Umbraco.Cms.Api.Management.ViewModels.Search;
+using Umbraco.Cms.Api.Management.ViewModels.Indexer;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Indexer;

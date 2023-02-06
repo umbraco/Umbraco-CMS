@@ -32,6 +32,7 @@ using Umbraco.Cms.Core.Runtime;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Services.Implement;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Core.Templates;
 using Umbraco.Cms.Core.Trees;
@@ -117,7 +118,7 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.AddScoped<IHttpScopeReference, HttpScopeReference>();
 
         builder.Services.AddSingleton<IJsonSerializer, JsonNetSerializer>();
-        builder.Services.AddSingleton<IConfigurationEditorJsonSerializer, ConfigurationEditorJsonSerializer>();
+        builder.Services.AddSingleton<IConfigurationEditorJsonSerializer, ContextualConfigurationEditorJsonSerializer>();
         builder.Services.AddSingleton<IMenuItemCollectionFactory, MenuItemCollectionFactory>();
 
         // register database builder
@@ -232,6 +233,7 @@ public static partial class UmbracoBuilderExtensions
             factory.GetRequiredService<ILoggingConfiguration>(),
             factory.GetRequiredService<ILogLevelLoader>(),
             Log.Logger));
+        builder.Services.AddSingleton<ILogViewerService, LogViewerService>();
 
         return builder;
     }

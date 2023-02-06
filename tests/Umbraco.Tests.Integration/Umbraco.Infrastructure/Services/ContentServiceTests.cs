@@ -50,7 +50,7 @@ public class ContentServiceTests : UmbracoIntegrationTestWithContent
 
     private IDataTypeService DataTypeService => GetRequiredService<IDataTypeService>();
 
-    private ILocalizationService LocalizationService => GetRequiredService<ILocalizationService>();
+    private ILanguageService LanguageService => GetRequiredService<ILanguageService>();
 
     private IAuditService AuditService => GetRequiredService<IAuditService>();
 
@@ -190,7 +190,7 @@ public class ContentServiceTests : UmbracoIntegrationTestWithContent
     }
 
     [Test]
-    public void Perform_Scheduled_Publishing()
+    public async Task Perform_Scheduled_Publishing()
     {
         var langUk = new LanguageBuilder()
             .WithCultureInfo("en-GB")
@@ -200,8 +200,8 @@ public class ContentServiceTests : UmbracoIntegrationTestWithContent
             .WithCultureInfo("fr-FR")
             .Build();
 
-        LocalizationService.Save(langFr);
-        LocalizationService.Save(langUk);
+        await LanguageService.CreateAsync(langFr);
+        await LanguageService.CreateAsync(langUk);
 
         var ctInvariant = ContentTypeBuilder.CreateBasicContentType("invariantPage");
         ContentTypeService.Save(ctInvariant);
@@ -837,7 +837,7 @@ public class ContentServiceTests : UmbracoIntegrationTestWithContent
     }
 
     [Test]
-    public void Unpublishing_Mandatory_Language_Unpublishes_Document()
+    public async Task Unpublishing_Mandatory_Language_Unpublishes_Document()
     {
         var langUk = new LanguageBuilder()
             .WithCultureInfo("en-GB")
@@ -848,8 +848,8 @@ public class ContentServiceTests : UmbracoIntegrationTestWithContent
             .WithCultureInfo("fr-FR")
             .Build();
 
-        LocalizationService.Save(langFr);
-        LocalizationService.Save(langUk);
+        await LanguageService.CreateAsync(langFr);
+        await LanguageService.CreateAsync(langUk);
 
         var contentType = ContentTypeBuilder.CreateBasicContentType();
         contentType.Variations = ContentVariation.Culture;
@@ -941,7 +941,7 @@ public class ContentServiceTests : UmbracoIntegrationTestWithContent
     }
 
     [Test]
-    public void Pending_Invariant_Property_Changes_Affect_Default_Language_Edited_State()
+    public async Task Pending_Invariant_Property_Changes_Affect_Default_Language_Edited_State()
     {
         // Arrange
         var langGb = new LanguageBuilder()
@@ -952,8 +952,8 @@ public class ContentServiceTests : UmbracoIntegrationTestWithContent
             .WithCultureInfo("fr-FR")
             .Build();
 
-        LocalizationService.Save(langFr);
-        LocalizationService.Save(langGb);
+        await LanguageService.CreateAsync(langFr);
+        await LanguageService.CreateAsync(langGb);
 
         var contentType = ContentTypeBuilder.CreateMetaContentType();
         contentType.Variations = ContentVariation.Culture;
@@ -1018,7 +1018,7 @@ public class ContentServiceTests : UmbracoIntegrationTestWithContent
     }
 
     [Test]
-    public void Can_Unpublish_Content_Variation_And_Detect_Changed_Cultures()
+    public async Task Can_Unpublish_Content_Variation_And_Detect_Changed_Cultures()
     {
         // Arrange
         var langGb = new LanguageBuilder()
@@ -1030,8 +1030,8 @@ public class ContentServiceTests : UmbracoIntegrationTestWithContent
             .WithCultureInfo("fr-FR")
             .Build();
 
-        LocalizationService.Save(langFr);
-        LocalizationService.Save(langGb);
+        await LanguageService.CreateAsync(langFr);
+        await LanguageService.CreateAsync(langGb);
 
         var contentType = ContentTypeBuilder.CreateBasicContentType();
         contentType.Variations = ContentVariation.Culture;
@@ -1211,7 +1211,7 @@ public class ContentServiceTests : UmbracoIntegrationTestWithContent
     }
 
     [Test]
-    public void Can_Publish_And_Unpublish_Cultures_In_Single_Operation()
+    public async Task Can_Publish_And_Unpublish_Cultures_In_Single_Operation()
     {
         // TODO: This is using an internal API - we aren't exposing this publicly (at least for now) but we'll keep the test around
         var langFr = new LanguageBuilder()
@@ -1220,8 +1220,8 @@ public class ContentServiceTests : UmbracoIntegrationTestWithContent
         var langDa = new LanguageBuilder()
             .WithCultureInfo("da")
             .Build();
-        LocalizationService.Save(langFr);
-        LocalizationService.Save(langDa);
+        await LanguageService.CreateAsync(langFr);
+        await LanguageService.CreateAsync(langDa);
 
         var ct = ContentTypeBuilder.CreateBasicContentType();
         ct.Variations = ContentVariation.Culture;
@@ -2317,7 +2317,7 @@ public class ContentServiceTests : UmbracoIntegrationTestWithContent
     }
 
     [Test]
-    public void Can_Rollback_Version_On_Multilingual()
+    public async Task Can_Rollback_Version_On_Multilingual()
     {
         var langFr = new LanguageBuilder()
             .WithCultureInfo("fr")
@@ -2325,8 +2325,8 @@ public class ContentServiceTests : UmbracoIntegrationTestWithContent
         var langDa = new LanguageBuilder()
             .WithCultureInfo("da")
             .Build();
-        LocalizationService.Save(langFr);
-        LocalizationService.Save(langDa);
+        await LanguageService.CreateAsync(langFr);
+        await LanguageService.CreateAsync(langDa);
 
         var template = TemplateBuilder.CreateTextPageTemplate();
         FileService.SaveTemplate(template);
@@ -2789,13 +2789,13 @@ public class ContentServiceTests : UmbracoIntegrationTestWithContent
         Assert.IsFalse(content.Published);
         Assert.IsTrue(content.Edited);
 
-        // FIXME: depending on 1 line in ContentBaseFactory.BuildEntity
+        // TODO: depending on 1 line in ContentBaseFactory.BuildEntity
         // the published infos can be gone or not
         // if gone, it's not consistent with above
         Assert.AreEqual(vpk, ((Content)content).VersionId);
         Assert.AreEqual(ppk, ((Content)content).PublishedVersionId); // still there
 
-        // FIXME: depending on 1 line in ContentRepository.MapDtoToContent
+        // TODO: depending on 1 line in ContentRepository.MapDtoToContent
         // the published values can be null or not
         // if null, it's not consistent with above
         // Assert.IsNull(content.GetValue("title", published:  true));
@@ -2811,7 +2811,7 @@ public class ContentServiceTests : UmbracoIntegrationTestWithContent
         //
         // ContentService.SaveAndPublish(content);
 
-        // FIXME: what shall we do of all this?
+        // TODO: what shall we do of all this?
         /*
         // this basically republishes a content
         // what if it never was published?
@@ -2822,11 +2822,11 @@ public class ContentServiceTests : UmbracoIntegrationTestWithContent
         Assert.IsTrue(content.Published);
         Assert.IsFalse(content.Edited);
 
-        // FIXME: should it be 2 or 3
+        // TODO: should it be 2 or 3
         versions = ContentService.GetVersions(content.Id);
         Assert.AreEqual(2, versions.Count());
 
-        // FIXME: now test rollbacks
+        // TODO: now test rollbacks
         var version = ContentService.GetByVersion(content.Id); // test that it gets a version - should be GetVersion
         var previousVersion = ContentService.GetVersions(content.Id).Skip(1).FirstOrDefault(); // need an optimized way to do this
         content.CopyValues(version); // copies the edited value - always
@@ -2838,9 +2838,9 @@ public class ContentServiceTests : UmbracoIntegrationTestWithContent
     }
 
     [Test]
-    public void Ensure_Invariant_Name()
+    public async Task Ensure_Invariant_Name()
     {
-        var languageService = LocalizationService;
+        var languageService = LanguageService;
 
         var langUk = new LanguageBuilder()
             .WithCultureInfo("en-GB")
@@ -2850,8 +2850,8 @@ public class ContentServiceTests : UmbracoIntegrationTestWithContent
             .WithCultureInfo("fr-FR")
             .Build();
 
-        languageService.Save(langFr);
-        languageService.Save(langUk);
+        await languageService.CreateAsync(langFr);
+        await languageService.CreateAsync(langUk);
 
         var contentTypeService = ContentTypeService;
 
@@ -2871,7 +2871,7 @@ public class ContentServiceTests : UmbracoIntegrationTestWithContent
         // the name will be set to the default culture variant name
         Assert.AreEqual("name-us", content.Name);
 
-        // FIXME: should we always sync the invariant name even on update? see EnsureInvariantNameValues
+        // TODO: should we always sync the invariant name even on update? see EnsureInvariantNameValues
         ////updating the default culture variant name should also update the invariant name so they stay in sync
         // content.SetName("name-us-2", langUk.IsoCode);
         // ContentService.Save(content);
@@ -2879,9 +2879,9 @@ public class ContentServiceTests : UmbracoIntegrationTestWithContent
     }
 
     [Test]
-    public void Ensure_Unique_Culture_Names()
+    public async Task Ensure_Unique_Culture_Names()
     {
-        var languageService = LocalizationService;
+        var languageService = LanguageService;
 
         var langUk = new LanguageBuilder()
             .WithCultureInfo("en-GB")
@@ -2891,8 +2891,8 @@ public class ContentServiceTests : UmbracoIntegrationTestWithContent
             .WithCultureInfo("fr-FR")
             .Build();
 
-        languageService.Save(langFr);
-        languageService.Save(langUk);
+        await languageService.CreateAsync(langFr);
+        await languageService.CreateAsync(langUk);
 
         var contentTypeService = ContentTypeService;
 
@@ -2921,9 +2921,9 @@ public class ContentServiceTests : UmbracoIntegrationTestWithContent
     }
 
     [Test]
-    public void Can_Get_Paged_Children_WithFilterAndOrder()
+    public async Task Can_Get_Paged_Children_WithFilterAndOrder()
     {
-        var languageService = LocalizationService;
+        var languageService = LanguageService;
 
         var langUk = new LanguageBuilder()
             .WithCultureInfo("en-GB")
@@ -2937,9 +2937,9 @@ public class ContentServiceTests : UmbracoIntegrationTestWithContent
             .WithCultureInfo("da-DK")
             .Build();
 
-        languageService.Save(langFr);
-        languageService.Save(langUk);
-        languageService.Save(langDa);
+        await languageService.CreateAsync(langFr);
+        await languageService.CreateAsync(langUk);
+        await languageService.CreateAsync(langDa);
 
         var contentTypeService = ContentTypeService;
 
@@ -3054,9 +3054,9 @@ public class ContentServiceTests : UmbracoIntegrationTestWithContent
     }
 
     [Test]
-    public void Can_SaveRead_Variations()
+    public async Task Can_SaveRead_Variations()
     {
-        var languageService = LocalizationService;
+        var languageService = LanguageService;
         var langPt = new LanguageBuilder()
             .WithCultureInfo("pt-PT")
             .WithIsDefault(true)
@@ -3071,9 +3071,9 @@ public class ContentServiceTests : UmbracoIntegrationTestWithContent
             .WithCultureInfo("de-DE")
             .Build();
 
-        languageService.Save(langFr);
-        languageService.Save(langUk);
-        languageService.Save(langDe);
+        await languageService.CreateAsync(langFr);
+        await languageService.CreateAsync(langUk);
+        await languageService.CreateAsync(langDe);
 
         var contentTypeService = ContentTypeService;
 
@@ -3083,7 +3083,7 @@ public class ContentServiceTests : UmbracoIntegrationTestWithContent
             ValueStorageType.Nvarchar, "prop")
         { Variations = ContentVariation.Culture });
 
-        // FIXME: add test w/ an invariant prop
+        // TODO: add test w/ an invariant prop
         ContentTypeService.Save(contentType);
 
         var content = ContentService.Create("Home US", Constants.System.Root, "umbTextpage");
@@ -3486,8 +3486,8 @@ public class ContentServiceTests : UmbracoIntegrationTestWithContent
         langFr = (Language)new LanguageBuilder()
             .WithCultureInfo("fr-FR")
             .Build();
-        LocalizationService.Save(langFr);
-        LocalizationService.Save(langUk);
+        LanguageService.CreateAsync(langFr).GetAwaiter().GetResult();
+        LanguageService.CreateAsync(langUk).GetAwaiter().GetResult();
 
         contentType = ContentTypeBuilder.CreateBasicContentType();
         contentType.Variations = ContentVariation.Culture;

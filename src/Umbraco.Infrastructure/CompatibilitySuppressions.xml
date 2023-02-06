@@ -1,6 +1,55 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Suppressions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
   <Suppression>
+    <DiagnosticId>CP0001</DiagnosticId>
+    <Target>T:Umbraco.Cms.Core.Logging.Viewer.LogLevelCounts</Target>
+    <Left>lib/net7.0/Umbraco.Infrastructure.dll</Left>
+    <Right>lib/net7.0/Umbraco.Infrastructure.dll</Right>
+    <IsBaselineSuppression>true</IsBaselineSuppression>
+  </Suppression>
+  <Suppression>
+    <DiagnosticId>CP0001</DiagnosticId>
+    <Target>T:Umbraco.Cms.Core.Logging.Viewer.LogTemplate</Target>
+    <Left>lib/net7.0/Umbraco.Infrastructure.dll</Left>
+    <Right>lib/net7.0/Umbraco.Infrastructure.dll</Right>
+    <IsBaselineSuppression>true</IsBaselineSuppression>
+  </Suppression>
+  <Suppression>
+    <DiagnosticId>CP0001</DiagnosticId>
+    <Target>T:Umbraco.Cms.Core.Logging.Viewer.LogTimePeriod</Target>
+    <Left>lib/net7.0/Umbraco.Infrastructure.dll</Left>
+    <Right>lib/net7.0/Umbraco.Infrastructure.dll</Right>
+    <IsBaselineSuppression>true</IsBaselineSuppression>
+  </Suppression>
+  <Suppression>
+    <DiagnosticId>CP0001</DiagnosticId>
+    <Target>T:Umbraco.Cms.Infrastructure.Migrations.PostMigrations.ClearCsrfCookies</Target>
+    <Left>lib/net7.0/Umbraco.Infrastructure.dll</Left>
+    <Right>lib/net7.0/Umbraco.Infrastructure.dll</Right>
+    <IsBaselineSuppression>true</IsBaselineSuppression>
+  </Suppression>
+  <Suppression>
+    <DiagnosticId>CP0001</DiagnosticId>
+    <Target>T:Umbraco.Cms.Infrastructure.Migrations.PostMigrations.DeleteLogViewerQueryFile</Target>
+    <Left>lib/net7.0/Umbraco.Infrastructure.dll</Left>
+    <Right>lib/net7.0/Umbraco.Infrastructure.dll</Right>
+    <IsBaselineSuppression>true</IsBaselineSuppression>
+  </Suppression>
+  <Suppression>
+    <DiagnosticId>CP0001</DiagnosticId>
+    <Target>T:Umbraco.Cms.Infrastructure.Migrations.PostMigrations.RebuildPublishedSnapshot</Target>
+    <Left>lib/net7.0/Umbraco.Infrastructure.dll</Left>
+    <Right>lib/net7.0/Umbraco.Infrastructure.dll</Right>
+    <IsBaselineSuppression>true</IsBaselineSuppression>
+  </Suppression>
+  <Suppression>
+    <DiagnosticId>CP0002</DiagnosticId>
+    <Target>M:Umbraco.Cms.Core.Migrations.IMigrationPlanExecutor.Execute(Umbraco.Cms.Infrastructure.Migrations.MigrationPlan,System.String)</Target>
+    <Left>lib/net7.0/Umbraco.Infrastructure.dll</Left>
+    <Right>lib/net7.0/Umbraco.Infrastructure.dll</Right>
+    <IsBaselineSuppression>true</IsBaselineSuppression>
+  </Suppression>
+  <Suppression>
     <DiagnosticId>CP0002</DiagnosticId>
     <Target>M:Umbraco.Cms.Core.Models.Blocks.BlockGridLayoutItem.get_ForceLeft</Target>
     <Left>lib/net7.0/Umbraco.Infrastructure.dll</Left>
@@ -29,6 +78,62 @@
     <IsBaselineSuppression>true</IsBaselineSuppression>
   </Suppression>
   <Suppression>
+    <DiagnosticId>CP0002</DiagnosticId>
+    <Target>M:Umbraco.Cms.Infrastructure.Install.PackageMigrationRunner.#ctor(Umbraco.Cms.Core.Logging.IProfilingLogger,Umbraco.Cms.Core.Scoping.ICoreScopeProvider,Umbraco.Cms.Core.Packaging.PendingPackageMigrations,Umbraco.Cms.Core.Packaging.PackageMigrationPlanCollection,Umbraco.Cms.Core.Migrations.IMigrationPlanExecutor,Umbraco.Cms.Core.Services.IKeyValueService,Umbraco.Cms.Core.Events.IEventAggregator)</Target>
+    <Left>lib/net7.0/Umbraco.Infrastructure.dll</Left>
+    <Right>lib/net7.0/Umbraco.Infrastructure.dll</Right>
+    <IsBaselineSuppression>true</IsBaselineSuppression>
+  </Suppression>
+  <Suppression>
+    <DiagnosticId>CP0002</DiagnosticId>
+    <Target>M:Umbraco.Cms.Infrastructure.Migrations.IMigrationContext.AddPostMigration``1</Target>
+    <Left>lib/net7.0/Umbraco.Infrastructure.dll</Left>
+    <Right>lib/net7.0/Umbraco.Infrastructure.dll</Right>
+    <IsBaselineSuppression>true</IsBaselineSuppression>
+  </Suppression>
+  <Suppression>
+    <DiagnosticId>CP0002</DiagnosticId>
+    <Target>M:Umbraco.Cms.Infrastructure.Migrations.Install.DatabaseBuilder.#ctor(Umbraco.Cms.Core.Scoping.ICoreScopeProvider,Umbraco.Cms.Infrastructure.Scoping.IScopeAccessor,Umbraco.Cms.Infrastructure.Persistence.IUmbracoDatabaseFactory,Umbraco.Cms.Core.Services.IRuntimeState,Microsoft.Extensions.Logging.ILoggerFactory,Umbraco.Cms.Core.Services.IKeyValueService,Umbraco.Cms.Infrastructure.Persistence.IDbProviderFactoryCreator,Umbraco.Cms.Core.Configuration.IConfigManipulator,Microsoft.Extensions.Options.IOptionsMonitor{Umbraco.Cms.Core.Configuration.Models.GlobalSettings},Microsoft.Extensions.Options.IOptionsMonitor{Umbraco.Cms.Core.Configuration.Models.ConnectionStrings},Umbraco.Cms.Core.Migrations.IMigrationPlanExecutor,Umbraco.Cms.Infrastructure.Migrations.Install.DatabaseSchemaCreatorFactory,System.Collections.Generic.IEnumerable{Umbraco.Cms.Infrastructure.Persistence.IDatabaseProviderMetadata})</Target>
+    <Left>lib/net7.0/Umbraco.Infrastructure.dll</Left>
+    <Right>lib/net7.0/Umbraco.Infrastructure.dll</Right>
+    <IsBaselineSuppression>true</IsBaselineSuppression>
+  </Suppression>
+  <Suppression>
+    <DiagnosticId>CP0002</DiagnosticId>
+    <Target>M:Umbraco.Cms.Infrastructure.Migrations.MigrationPlan.AddPostMigration``1</Target>
+    <Left>lib/net7.0/Umbraco.Infrastructure.dll</Left>
+    <Right>lib/net7.0/Umbraco.Infrastructure.dll</Right>
+    <IsBaselineSuppression>true</IsBaselineSuppression>
+  </Suppression>
+  <Suppression>
+    <DiagnosticId>CP0002</DiagnosticId>
+    <Target>M:Umbraco.Cms.Infrastructure.Migrations.MigrationPlan.get_PostMigrationTypes</Target>
+    <Left>lib/net7.0/Umbraco.Infrastructure.dll</Left>
+    <Right>lib/net7.0/Umbraco.Infrastructure.dll</Right>
+    <IsBaselineSuppression>true</IsBaselineSuppression>
+  </Suppression>
+  <Suppression>
+    <DiagnosticId>CP0002</DiagnosticId>
+    <Target>M:Umbraco.Cms.Infrastructure.Migrations.MigrationPlanExecutor.#ctor(Umbraco.Cms.Core.Scoping.ICoreScopeProvider,Umbraco.Cms.Infrastructure.Scoping.IScopeAccessor,Microsoft.Extensions.Logging.ILoggerFactory,Umbraco.Cms.Infrastructure.Migrations.IMigrationBuilder)</Target>
+    <Left>lib/net7.0/Umbraco.Infrastructure.dll</Left>
+    <Right>lib/net7.0/Umbraco.Infrastructure.dll</Right>
+    <IsBaselineSuppression>true</IsBaselineSuppression>
+  </Suppression>
+  <Suppression>
+    <DiagnosticId>CP0002</DiagnosticId>
+    <Target>M:Umbraco.Cms.Infrastructure.Migrations.MigrationPlanExecutor.Execute(Umbraco.Cms.Infrastructure.Migrations.MigrationPlan,System.String)</Target>
+    <Left>lib/net7.0/Umbraco.Infrastructure.dll</Left>
+    <Right>lib/net7.0/Umbraco.Infrastructure.dll</Right>
+    <IsBaselineSuppression>true</IsBaselineSuppression>
+  </Suppression>
+  <Suppression>
+    <DiagnosticId>CP0002</DiagnosticId>
+    <Target>M:Umbraco.Cms.Infrastructure.Migrations.Upgrade.Upgrader.Execute(Umbraco.Cms.Core.Migrations.IMigrationPlanExecutor,Umbraco.Cms.Core.Scoping.IScopeProvider,Umbraco.Cms.Core.Services.IKeyValueService)</Target>
+    <Left>lib/net7.0/Umbraco.Infrastructure.dll</Left>
+    <Right>lib/net7.0/Umbraco.Infrastructure.dll</Right>
+    <IsBaselineSuppression>true</IsBaselineSuppression>
+  </Suppression>
+  <Suppression>
     <DiagnosticId>CP0006</DiagnosticId>
     <Target>M:Umbraco.Cms.Core.Deploy.IGridCellValueConnector.GetValue(Umbraco.Cms.Core.Models.GridValue.GridControl,System.Collections.Generic.ICollection{Umbraco.Cms.Core.Deploy.ArtifactDependency},Umbraco.Cms.Core.Deploy.IContextCache)</Target>
     <Left>lib/net7.0/Umbraco.Infrastructure.dll</Left>
@@ -38,6 +143,20 @@
   <Suppression>
     <DiagnosticId>CP0006</DiagnosticId>
     <Target>M:Umbraco.Cms.Core.Deploy.IGridCellValueConnector.SetValue(Umbraco.Cms.Core.Models.GridValue.GridControl,Umbraco.Cms.Core.Deploy.IContextCache)</Target>
+    <Left>lib/net7.0/Umbraco.Infrastructure.dll</Left>
+    <Right>lib/net7.0/Umbraco.Infrastructure.dll</Right>
+    <IsBaselineSuppression>true</IsBaselineSuppression>
+  </Suppression>
+  <Suppression>
+    <DiagnosticId>CP0006</DiagnosticId>
+    <Target>M:Umbraco.Cms.Core.Logging.Viewer.ILogViewer.GetLogsAsPagedModel(Umbraco.Cms.Core.Logging.Viewer.LogTimePeriod,System.Int32,System.Int32,Umbraco.Cms.Core.Direction,System.String,System.String[])</Target>
+    <Left>lib/net7.0/Umbraco.Infrastructure.dll</Left>
+    <Right>lib/net7.0/Umbraco.Infrastructure.dll</Right>
+    <IsBaselineSuppression>true</IsBaselineSuppression>
+  </Suppression>
+  <Suppression>
+    <DiagnosticId>CP0006</DiagnosticId>
+    <Target>M:Umbraco.Cms.Core.Migrations.IMigrationPlanExecutor.ExecutePlan(Umbraco.Cms.Infrastructure.Migrations.MigrationPlan,System.String)</Target>
     <Left>lib/net7.0/Umbraco.Infrastructure.dll</Left>
     <Right>lib/net7.0/Umbraco.Infrastructure.dll</Right>
     <IsBaselineSuppression>true</IsBaselineSuppression>

@@ -1,0 +1,90 @@
+﻿using System.Linq.Expressions;
+using Microsoft.AspNetCore.Mvc;
+using Umbraco.Cms.Api.Management.ViewModels.Folder;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Security;
+
+namespace Umbraco.Cms.Api.Management.Controllers;
+
+public abstract class FolderManagementControllerBase<TStatus> : ManagementApiControllerBase
+    where TStatus : Enum
+{
+    private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
+
+    protected FolderManagementControllerBase(IBackOfficeSecurityAccessor backOfficeSecurityAccessor)
+        => _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
+
+    protected async Task<IActionResult> GetFolderAsync(Guid key)
+    {
+        EntityContainer? container = await GetContainerAsync(key);
+        if (container == null)
+        {
+            return NotFound($"Could not find the folder with key: {key}");
+        }
+
+        EntityContainer? parentContainer = await GetParentContainerAsync(container);
+
+        // we could implement a mapper for this but it seems rather overkill at this point
+        return Ok(new FolderViewModel
+        {
+            Name = container.Name!,
+            Key = container.Key,
+            ParentKey = parentContainer?.Key
+        });
+    }
+
+    protected async Task<IActionResult> CreateFolderAsync<TCreatedActionController>(
+        FolderCreateModel folderCreateModel,
+        Expression<Func<TCreatedActionController, string>> createdAction)
+    {
+        var container = new EntityContainer(ContainerObjectType) { Name = folderCreateModel.Name };
+
+        Attempt<EntityContainer, TStatus> result = await CreateContainerAsync(
+            container,
+            folderCreateModel.ParentKey,
+            CurrentUserId(_backOfficeSecurityAccessor));
+
+        return result.Success
+            ? CreatedAtAction(createdAction, result.Result.Key)
+            : OperationStatusResult(result.Status);
+    }
+
+    protected async Task<IActionResult> UpdateFolderAsync(Guid key, FolderUpdateModel folderUpdateModel)
+    {
+        EntityContainer? container = await GetContainerAsync(key);
+        if (container == null)
+        {
+            return NotFound($"Could not find the folder with key: {key}");
+        }
+
+        container.Name = folderUpdateModel.Name;
+
+        Attempt<EntityContainer, TStatus> result = await UpdateContainerAsync(container, CurrentUserId(_backOfficeSecurityAccessor));
+        return result.Success
+            ? Ok()
+            : OperationStatusResult(result.Status);
+    }
+
+    protected async Task<IActionResult> DeleteFolderAsync(Guid key)
+    {
+        Attempt<EntityContainer?, TStatus> result = await DeleteContainerAsync(key, CurrentUserId(_backOfficeSecurityAccessor));
+        return result.Success
+            ? Ok()
+            : OperationStatusResult(result.Status);
+    }
+
+    protected abstract Guid ContainerObjectType { get; }
+
+    protected abstract Task<EntityContainer?> GetContainerAsync(Guid key);
+
+    protected abstract Task<EntityContainer?> GetParentContainerAsync(EntityContainer container);
+
+    protected abstract Task<Attempt<EntityContainer, TStatus>> CreateContainerAsync(EntityContainer container, Guid? parentId, int userId);
+
+    protected abstract Task<Attempt<EntityContainer, TStatus>> UpdateContainerAsync(EntityContainer container, int userId);
+
+    protected abstract Task<Attempt<EntityContainer?, TStatus>> DeleteContainerAsync(Guid id, int userId);
+
+    protected abstract IActionResult OperationStatusResult(TStatus status);
+}

@@ -313,9 +313,13 @@ public class DataTypeDefinitionRepositoryTest : UmbracoIntegrationTest
                 {
                     DatabaseType = ValueStorageType.Integer,
                     Name = "AgeDataType",
-                    CreatorId = 0,
-                    Configuration = new LabelConfiguration { ValueType = ValueTypes.Xml }
+                    CreatorId = 0
                 };
+
+            dataTypeDefinition.ConfigurationData = dataTypeDefinition.Editor!.GetConfigurationEditor()
+                .FromConfigurationObject(
+                    new LabelConfiguration { ValueType = ValueTypes.Xml },
+                    ConfigurationEditorJsonSerializer);
 
             // Act
             DataTypeRepository.Save(dataTypeDefinition);
@@ -327,17 +331,17 @@ public class DataTypeDefinitionRepositoryTest : UmbracoIntegrationTest
             Assert.That(dataTypeDefinition.HasIdentity, Is.True);
             Assert.That(exists, Is.True);
 
-            // cannot compare 'configuration' as it's two different objects
-            TestHelper.AssertPropertyValuesAreEqual(dataTypeDefinition, fetched, ignoreProperties: new[] { "Configuration" });
+            // cannot compare the configuration objects as they are two different objects
+            TestHelper.AssertPropertyValuesAreEqual(dataTypeDefinition, fetched, ignoreProperties: new[] { nameof(DataType.ConfigurationObject) });
 
             // still, can compare explicitely
-            Assert.IsNotNull(dataTypeDefinition.Configuration);
-            Assert.IsInstanceOf<LabelConfiguration>(dataTypeDefinition.Configuration);
-            Assert.IsNotNull(fetched.Configuration);
-            Assert.IsInstanceOf<LabelConfiguration>(fetched.Configuration);
+            Assert.IsNotNull(dataTypeDefinition.ConfigurationObject);
+            Assert.IsInstanceOf<LabelConfiguration>(dataTypeDefinition.ConfigurationObject);
+            Assert.IsNotNull(fetched.ConfigurationObject);
+            Assert.IsInstanceOf<LabelConfiguration>(fetched.ConfigurationObject);
             Assert.AreEqual(
-                ConfigurationEditor.ConfigurationAs<LabelConfiguration>(dataTypeDefinition.Configuration).ValueType,
-                ConfigurationEditor.ConfigurationAs<LabelConfiguration>(fetched.Configuration).ValueType);
+                ConfigurationEditor.ConfigurationAs<LabelConfiguration>(dataTypeDefinition.ConfigurationObject).ValueType,
+                ConfigurationEditor.ConfigurationAs<LabelConfiguration>(fetched.ConfigurationObject).ValueType);
         }
     }
 

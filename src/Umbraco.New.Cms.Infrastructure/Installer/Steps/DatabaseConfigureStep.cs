@@ -47,20 +47,7 @@ public class DatabaseConfigureStep : IInstallStep
         // If the connection string is already present in config we don't need to configure it again
         if (_connectionStrings.CurrentValue.IsConnectionStringConfigured())
         {
-            try
-            {
-                // Since a connection string was present we verify the db can connect and query
-                _databaseBuilder.ValidateSchema();
-
-                return Task.FromResult(false);
-            }
-            catch (Exception ex)
-            {
-                // Something went wrong, could not connect so probably need to reconfigure
-                _logger.LogError(ex, "An error occurred, reconfiguring...");
-
-                return Task.FromResult(true);
-            }
+            return Task.FromResult(false);
         }
 
         return Task.FromResult(true);

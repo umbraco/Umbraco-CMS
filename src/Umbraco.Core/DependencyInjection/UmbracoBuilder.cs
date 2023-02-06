@@ -281,6 +281,9 @@ namespace Umbraco.Cms.Core.DependencyInjection
             Services.AddUnique<IContentVersionService, ContentVersionService>();
             Services.AddUnique<IUserService, UserService>();
             Services.AddUnique<ILocalizationService, LocalizationService>();
+            Services.AddUnique<IDictionaryItemService, DictionaryItemService>();
+            Services.AddUnique<IDataTypeContainerService, DataTypeContainerService>();
+            Services.AddUnique<ILanguageService, LanguageService>();
             Services.AddUnique<IMacroService, MacroService>();
             Services.AddUnique<IMemberGroupService, MemberGroupService>();
             Services.AddUnique<IRedirectUrlService, RedirectUrlService>();
@@ -296,6 +299,8 @@ namespace Umbraco.Cms.Core.DependencyInjection
             Services.AddUnique<IContentTypeBaseServiceProvider, ContentTypeBaseServiceProvider>();
             Services.AddUnique<IMediaTypeService, MediaTypeService>();
             Services.AddUnique<IFileService, FileService>();
+            Services.AddUnique<ITemplateService, TemplateService>();
+            Services.AddUnique<ITemplateContentParserService, TemplateContentParserService>();
             Services.AddUnique<IEntityService, EntityService>();
             Services.AddUnique<IRelationService, RelationService>();
             Services.AddUnique<IMemberTypeService, MemberTypeService>();

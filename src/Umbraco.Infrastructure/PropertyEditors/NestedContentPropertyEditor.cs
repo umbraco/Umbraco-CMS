@@ -171,7 +171,7 @@ public class NestedContentPropertyEditor : DataEditor
                         continue;
                     }
 
-                    object? configuration = _dataTypeService.GetDataType(prop.Value.PropertyType.DataTypeKey)?.Configuration;
+                    object? configuration = _dataTypeService.GetDataType(prop.Value.PropertyType.DataTypeKey)?.ConfigurationObject;
 
                     result.AddRange(tagsProvider.GetTags(prop.Value.Value, configuration, languageId));
                 }
@@ -207,7 +207,7 @@ public class NestedContentPropertyEditor : DataEditor
                         }
 
                         var tempConfig = _dataTypeService.GetDataType(prop.Value.PropertyType.DataTypeId)
-                            ?.Configuration;
+                            ?.ConfigurationObject;
                         IDataValueEditor valEditor = propEditor.GetValueEditor(tempConfig);
                         var convValue = valEditor.ConvertDbToString(prop.Value.PropertyType, prop.Value.Value);
 
@@ -277,7 +277,7 @@ public class NestedContentPropertyEditor : DataEditor
                         var dataTypeId = prop.Value.PropertyType.DataTypeId;
                         if (!valEditors.TryGetValue(dataTypeId, out IDataValueEditor? valEditor))
                         {
-                            var tempConfig = _dataTypeService.GetDataType(dataTypeId)?.Configuration;
+                            var tempConfig = _dataTypeService.GetDataType(dataTypeId)?.ConfigurationObject;
                             valEditor = propEditor.GetValueEditor(tempConfig);
 
                             valEditors.Add(dataTypeId, valEditor);
@@ -329,7 +329,7 @@ public class NestedContentPropertyEditor : DataEditor
                 {
                     // Fetch the property types prevalue
                     var propConfiguration =
-                        _dataTypeService.GetDataType(prop.Value.PropertyType.DataTypeId)?.Configuration;
+                        _dataTypeService.GetDataType(prop.Value.PropertyType.DataTypeId)?.ConfigurationObject;
 
                     // Lookup the property editor
                     IDataEditor? propEditor = _propertyEditors[prop.Value.PropertyType.PropertyEditorAlias];

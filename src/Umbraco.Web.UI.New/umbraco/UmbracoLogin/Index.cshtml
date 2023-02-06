@@ -1,0 +1,54 @@
+@{
+    string returnTo = "/umbraco";
+    var redirectToValues = Context.Request.Query["redirectTo"];
+    if (redirectToValues.Count > 0)
+    {
+        var redirectTo = redirectToValues[0];
+        if (redirectTo is not null)
+        {
+            returnTo = redirectTo;
+        }
+    }
+}
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>Umbraco</title>
+
+        <link rel="stylesheet" href="https://unpkg.com/blocks.css/dist/blocks.min.css" />
+
+        <style>
+            body {
+                display: grid;
+                place-content: center;
+                justify-content: center;
+                align-items:  center;
+
+                width: 100%;
+                height: 100vh;
+            }
+
+            .card {
+                display:  grid;
+                place-items: center;
+            }
+        </style>
+    </head>
+<body>
+<div class="card fixed block">
+    <h1>Umbraco login universe</h1>
+    <p>We have not yet implemented login, so for your pleasure, we present you a login button that just works™</p>
+    <button type="button" id="login" class="accent block">LOGIN</button>
+</div>
+
+    <script>
+    !(function () {
+        const button = document.getElementById("login");
+        button.addEventListener('click', () => {
+            sessionStorage.setItem('is-authenticated', 'true');
+            location.href = '@returnTo';
+        });
+    })();
+    </script>
+</body>
+</html>

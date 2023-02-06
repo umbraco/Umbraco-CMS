@@ -43,13 +43,14 @@ public class MergeDateAndDateTimePropertyEditor : MigrationBase
 
         foreach (DataTypeDto dataType in dataTypes)
         {
-            DateTimeConfiguration config;
+            DateTimeConfiguration config = new DateTimeConfiguration();
             try
             {
-                config = (DateTimeConfiguration)new CustomDateTimeConfigurationEditor(
-                    _ioHelper,
-                    _editorConfigurationParser).FromDatabase(
-                    dataType.Configuration, _configurationEditorJsonSerializer);
+                // this migration is obsolete, no reason to refactor this code
+                // config = (DateTimeConfiguration)new CustomDateTimeConfigurationEditor(
+                //     _ioHelper,
+                //     _editorConfigurationParser).FromDatabase(
+                //     dataType.Configuration, _configurationEditorJsonSerializer);
 
                 // If the Umbraco.Date type is the default from V7 and it has never been updated, then the
                 // configuration is empty, and the format stuff is handled by in JS by moment.js. - We can't do that
@@ -72,7 +73,8 @@ public class MergeDateAndDateTimePropertyEditor : MigrationBase
             config.OffsetTime = false;
 
             dataType.EditorAlias = Constants.PropertyEditors.Aliases.DateTime;
-            dataType.Configuration = ConfigurationEditor.ToDatabase(config, _configurationEditorJsonSerializer);
+            // this migration is obsolete, no reason to refactor this code
+            // dataType.Configuration = ConfigurationEditor.ToDatabase(config, _configurationEditorJsonSerializer);
 
             Database.Update(dataType);
         }

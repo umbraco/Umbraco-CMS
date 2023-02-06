@@ -112,7 +112,7 @@ public class MultipleTextStringPropertyEditor : DataEditor
                     $"editorValue.DataTypeConfiguration is {editorValue.DataTypeConfiguration?.GetType()} but must be {typeof(MultipleTextStringConfiguration)}");
             }
 
-            var max = config.Maximum;
+            var max = config.Max;
 
             // The legacy property editor saved this data as new line delimited! strange but we have to maintain that.
             IEnumerable<string?> array = asArray.OfType<JObject>()

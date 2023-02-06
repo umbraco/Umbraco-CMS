@@ -6,7 +6,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Factories;
 
 internal static class LanguageFactory
 {
-    public static ILanguage BuildEntity(LanguageDto dto)
+    public static ILanguage BuildEntity(LanguageDto dto, string? fallbackIsoCode)
     {
         ArgumentNullException.ThrowIfNull(dto);
         if (dto.IsoCode is null)
@@ -21,7 +21,7 @@ internal static class LanguageFactory
             Id = dto.Id,
             IsDefault = dto.IsDefault,
             IsMandatory = dto.IsMandatory,
-            FallbackLanguageId = dto.FallbackLanguageId,
+            FallbackIsoCode = fallbackIsoCode
         };
 
         // Reset dirty initial properties
@@ -30,7 +30,7 @@ internal static class LanguageFactory
         return lang;
     }
 
-    public static LanguageDto BuildDto(ILanguage entity)
+    public static LanguageDto BuildDto(ILanguage entity, int? fallbackLanguageId)
     {
         ArgumentNullException.ThrowIfNull(entity);
 
@@ -40,7 +40,7 @@ internal static class LanguageFactory
             CultureName = entity.CultureName,
             IsDefault = entity.IsDefault,
             IsMandatory = entity.IsMandatory,
-            FallbackLanguageId = entity.FallbackLanguageId,
+            FallbackLanguageId = fallbackLanguageId
         };
 
         if (entity.HasIdentity)

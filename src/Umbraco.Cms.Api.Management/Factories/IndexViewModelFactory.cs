@@ -1,7 +1,7 @@
 ﻿using Examine;
+using Umbraco.Cms.Api.Management.ViewModels.Indexer;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Infrastructure.Examine;
-using Umbraco.Cms.Api.Management.ViewModels.Search;
 using Umbraco.New.Cms.Infrastructure.Services;
 
 namespace Umbraco.Cms.Api.Management.Factories;
@@ -26,7 +26,7 @@ public class IndexViewModelFactory : IIndexViewModelFactory
             return new IndexViewModel
             {
                 Name = index.Name,
-                HealthStatus = "Rebuilding",
+                HealthStatus = HealthStatus.Rebuilding,
                 SearcherName = index.Searcher.Name,
                 DocumentCount = 0,
                 FieldCount = 0,
@@ -55,7 +55,7 @@ public class IndexViewModelFactory : IIndexViewModelFactory
         var indexerModel = new IndexViewModel
         {
             Name = index.Name,
-            HealthStatus = isHealthy.Success ? isHealthy.Result ?? "Healthy" : isHealthy.Result ?? "Unhealthy",
+            HealthStatus = isHealthy.Success ? HealthStatus.Healthy : HealthStatus.Unhealthy,
             CanRebuild = _indexRebuilder.CanRebuild(index.Name),
             SearcherName = index.Searcher.Name,
             DocumentCount = indexDiag.GetDocumentCount(),

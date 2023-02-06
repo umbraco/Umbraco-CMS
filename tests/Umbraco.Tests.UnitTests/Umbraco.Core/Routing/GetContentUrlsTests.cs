@@ -77,7 +77,7 @@ public class GetContentUrlsTests : PublishedSnapshotServiceTestBase
     {
         var contentType = ContentTypeBuilder.CreateBasicContentType();
         var content = ContentBuilder.CreateBasicContent(contentType);
-        content.Id = 1046; // FIXME: we are using this ID only because it's built into the test XML published cache
+        content.Id = 1046; // TODO: we are using this ID only because it's built into the test XML published cache
         content.Path = "-1,1046";
 
         var umbracoContextAccessor = GetUmbracoContextAccessor("http://localhost:8000");
@@ -109,7 +109,7 @@ public class GetContentUrlsTests : PublishedSnapshotServiceTestBase
     {
         var contentType = ContentTypeBuilder.CreateBasicContentType();
         var content = ContentBuilder.CreateBasicContent(contentType);
-        content.Id = 1046; // FIXME: we are using this ID only because it's built into the test XML published cache
+        content.Id = 1046; // TODO: we are using this ID only because it's built into the test XML published cache
         content.Path = "-1,1046";
         content.Published = true;
 
@@ -150,13 +150,13 @@ public class GetContentUrlsTests : PublishedSnapshotServiceTestBase
     {
         var contentType = ContentTypeBuilder.CreateBasicContentType();
         var parent = ContentBuilder.CreateBasicContent(contentType);
-        parent.Id = 1046; // FIXME: we are using this ID only because it's built into the test XML published cache
+        parent.Id = 1046; // TODO: we are using this ID only because it's built into the test XML published cache
         parent.Name = "home";
         parent.Path = "-1,1046";
         parent.Published = true;
         var child = ContentBuilder.CreateBasicContent(contentType);
         child.Name = "sub1";
-        child.Id = 1173; // FIXME: we are using this ID only because it's built into the test XML published cache
+        child.Id = 1173; // TODO: we are using this ID only because it's built into the test XML published cache
         child.Path = "-1,1046,1173";
         child.Published = true;
 

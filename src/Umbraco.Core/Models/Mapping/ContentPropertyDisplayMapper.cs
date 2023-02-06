@@ -38,7 +38,7 @@ internal class ContentPropertyDisplayMapper : ContentPropertyBasicMapper<Content
 
         var config = originalProp.PropertyType is null
             ? null
-            : DataTypeService.GetDataType(originalProp.PropertyType.DataTypeId)?.Configuration;
+            : DataTypeService.GetDataType(originalProp.PropertyType.DataTypeId)?.ConfigurationData;
 
         // TODO: IDataValueEditor configuration - general issue
         // GetValueEditor() returns a non-configured IDataValueEditor
@@ -75,7 +75,10 @@ internal class ContentPropertyDisplayMapper : ContentPropertyBasicMapper<Content
         else
         {
             // let the property editor format the pre-values
-            dest.Config = dest.PropertyEditor.GetConfigurationEditor().ToValueEditor(config);
+            if (config != null)
+            {
+                dest.Config = dest.PropertyEditor.GetConfigurationEditor().ToValueEditor(config);
+            }
             dest.View = valEditor?.View;
         }
 

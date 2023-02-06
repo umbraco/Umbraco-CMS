@@ -11,6 +11,7 @@ namespace Umbraco.Cms.Api.Management.Controllers.Dictionary;
 
 public class ExportDictionaryController : DictionaryControllerBase
 {
+    // FIXME: use IDictionaryItemService instead of ILocalizationService
     private readonly ILocalizationService _localizationService;
     private readonly IEntityXmlSerializer _entityXmlSerializer;
 

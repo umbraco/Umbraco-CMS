@@ -568,7 +568,7 @@ public class EntityController : UmbracoAuthorizedJsonController
     [HttpGet]
     public UrlAndAnchors GetUrlAndAnchors(int id, string? culture = "*")
     {
-        culture ??= ClientCulture();
+        culture = culture is null or "*" ? ClientCulture() : culture;
 
         var url = _publishedUrlProvider.GetUrl(id, culture: culture);
         IEnumerable<string> anchorValues = _contentService.GetAnchorValuesFromRTEs(id, culture);

@@ -149,7 +149,7 @@ public static partial class UmbracoBuilderExtensions
 
         // WebRootFileProviderFactory is just a wrapper around the IWebHostEnvironment.WebRootFileProvider,
         // therefore no need to register it as singleton
-        builder.Services.AddSingleton<IManifestFileProviderFactory, WebRootFileProviderFactory>();
+        builder.Services.AddSingleton<IManifestFileProviderFactory, ContentAndWebRootFileProviderFactory>();
         builder.Services.AddSingleton<IGridEditorsConfigFileProviderFactory, WebRootFileProviderFactory>();
 
         // Must be added here because DbProviderFactories is netstandard 2.1 so cannot exist in Infra for now

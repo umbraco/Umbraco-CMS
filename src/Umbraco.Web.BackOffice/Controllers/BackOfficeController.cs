@@ -118,19 +118,6 @@ public class BackOfficeController : UmbracoController
     [AllowAnonymous]
     public async Task<IActionResult> Default()
     {
-        // Check if we not are in an run state, if so we need to redirect
-        if (_runtimeState.Level != RuntimeLevel.Run)
-        {
-            if (_runtimeState.Level == RuntimeLevel.Upgrade)
-            {
-                return RedirectToAction(nameof(AuthorizeUpgrade), routeValues: new RouteValueDictionary()
-                {
-                    ["redir"] = _globalSettings.GetBackOfficePath(_hostingEnvironment),
-                });
-            }
-            return Redirect("/");
-        }
-
         // force authentication to occur since this is not an authorized endpoint
         AuthenticateResult result = await this.AuthenticateBackOfficeAsync();
 
@@ -227,7 +214,7 @@ public class BackOfficeController : UmbracoController
             return new LocalRedirectResult(installerUrl);
         }
 
-        var viewPath = Path.Combine(Constants.SystemDirectories.Umbraco, Constants.Web.Mvc.BackOfficeArea, nameof(AuthorizeUpgrade) + ".cshtml");
+        var viewPath = Path.Combine(Constants.SystemDirectories.Umbraco, Constants.Web.Mvc.BackOfficeArea, nameof(Default) + ".cshtml");
 
         return await RenderDefaultOrProcessExternalLoginAsync(
             result,

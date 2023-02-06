@@ -56,6 +56,7 @@ test.describe('BlockListEditorContent', () => {
       .addGroup()
         .withName('BlockListGroup')
         .addCustomProperty(dataType['id'])
+          .withLabel('BlockGroup')
           .withAlias(blockListAlias)
         .done()
       .done()
@@ -281,7 +282,7 @@ test.describe('BlockListEditorContent', () => {
     await expect(page.locator('.alert-error')).toBeVisible();
 
     // Adds another block
-    await page.locator('[id="' + blockListAlias + '"]').click();
+    await page.locator('[id="' + 'button_' + blockListAlias + '"]').click();
     await page.locator('[label="Create"]').click();
 
     await umbracoUi.clickElement(umbracoUi.getButtonByLabelKey(ConstantHelper.buttons.saveAndPublish));

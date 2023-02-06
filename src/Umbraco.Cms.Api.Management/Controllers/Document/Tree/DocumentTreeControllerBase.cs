@@ -54,6 +54,7 @@ public abstract class DocumentTreeControllerBase : UserStartNodeTreeControllerBa
             viewModel.IsEdited = documentEntitySlim.Edited;
             viewModel.Icon = documentEntitySlim.ContentTypeIcon ?? viewModel.Icon;
             viewModel.IsProtected = _publicAccessService.IsProtected(entity.Path);
+            viewModel.IsTrashed = entity.Trashed;
 
             if (_culture != null && documentEntitySlim.Variations.VariesByCulture())
             {

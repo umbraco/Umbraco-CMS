@@ -356,7 +356,7 @@ public class ContentTypeController : ContentTypeControllerBase<IContentType>
             return NotFound();
         }
 
-        var configuration = _dataTypeService.GetDataType(id)?.Configuration;
+        IDictionary<string, object>? configuration = _dataTypeService.GetDataType(id)?.ConfigurationData;
         IDataEditor? editor = _propertyEditors[dataTypeDiff.EditorAlias];
 
         return new ContentPropertyDisplay
@@ -364,7 +364,9 @@ public class ContentTypeController : ContentTypeControllerBase<IContentType>
             Editor = dataTypeDiff.EditorAlias,
             Validation = new PropertyTypeValidation(),
             View = editor?.GetValueEditor().View,
-            Config = editor?.GetConfigurationEditor().ToConfigurationEditor(configuration)
+            Config = configuration != null
+                ? editor?.GetConfigurationEditor().ToConfigurationEditor(configuration)
+                : null
         };
     }
 

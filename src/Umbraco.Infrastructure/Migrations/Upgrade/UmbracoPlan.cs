@@ -2,6 +2,7 @@ using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_10_0_0;
 using Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_10_2_0;
+using Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_10_5_0;
 using Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_12_0_0;
 using Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_13_0_0;
 
@@ -43,7 +44,10 @@ public class UmbracoPlan : MigrationPlan
     /// <summary>
     ///     Defines the plan.
     /// </summary>
-    protected void DefinePlan()
+    /// <remarks>
+    /// This is virtual for testing purposes.
+    /// </remarks>
+    protected virtual void DefinePlan()
     {
         // MODIFYING THE PLAN
         //
@@ -83,10 +87,15 @@ public class UmbracoPlan : MigrationPlan
         // To 10.4.0
         To<V_10_4_0.AddBlockGridPartialViews>("{3F5D492A-A3DB-43F9-A73E-9FEE3B180E6C}");
 
+        // to 10.5.0 / 11.2.0
+        To<AddPrimaryKeyConstrainToContentVersionCleanupDtos>("{83AF7945-DADE-4A02-9041-F3F6EBFAC319}");
+
         // To 12.0.0
         To<UseNvarcharInsteadOfNText>("{888A0D5D-51E4-4C7E-AA0A-01306523C7FB}");
 
         // To 13.0.0
+        To<AddPropertyEditorUiAliasColumn>("{419827A0-4FCE-464B-A8F3-247C6092AF55}");
+        To<MigrateDataTypeConfigurations>("{5F15A1CC-353D-4889-8C7E-F303B4766196}");
         To<UpdateDefaultGuidsOfCreatedPackages>("{E073DBC0-9E8E-4C92-8210-9CB18364F46E}");
     }
 }

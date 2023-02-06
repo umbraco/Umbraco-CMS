@@ -134,7 +134,7 @@ public abstract class ContentControllerBase : BackOfficeNotificationsController
 
 
             // create the property data for the property editor
-            var data = new ContentPropertyData(propertyDto.Value, propertyDto.DataType?.Configuration)
+            var data = new ContentPropertyData(propertyDto.Value, propertyDto.DataType?.ConfigurationObject)
             {
                 ContentKey = contentItem.PersistedContent!.Key,
                 PropertyTypeKey = property.PropertyType.Key,
@@ -151,7 +151,7 @@ public abstract class ContentControllerBase : BackOfficeNotificationsController
             if (tagAttribute is not null && valueEditor is not IDataValueTags)
             {
                 TagConfiguration? tagConfiguration =
-                    ConfigurationEditor.ConfigurationAs<TagConfiguration>(propertyDto.DataType?.Configuration);
+                    ConfigurationEditor.ConfigurationAs<TagConfiguration>(propertyDto.DataType?.ConfigurationObject);
                 if (tagConfiguration is not null && tagConfiguration.Delimiter == default)
                 {
                     tagConfiguration.Delimiter = tagAttribute.Delimiter;

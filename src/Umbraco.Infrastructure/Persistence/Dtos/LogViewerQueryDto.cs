@@ -15,8 +15,8 @@ internal class LogViewerQueryDto
 
     [Column("name")]
     [Index(IndexTypes.UniqueNonClustered, Name = "IX_LogViewerQuery_name")]
-    public string? Name { get; set; }
+    public required string Name { get; set; }
 
     [Column("query")]
-    public string? Query { get; set; }
+    public required string Query { get; set; }
 }

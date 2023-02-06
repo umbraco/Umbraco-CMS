@@ -29,34 +29,17 @@ public class TagConfigurationEditor : ConfigurationEditor<TagConfiguration>
         Field(nameof(TagConfiguration.StorageType)).Validators.Add(new RequiredValidator(localizedTextService));
     }
 
-    public override Dictionary<string, object> ToConfigurationEditor(TagConfiguration? configuration)
+    public override IDictionary<string, object> ToConfigurationEditor(IDictionary<string, object> configuration)
     {
-        Dictionary<string, object> dictionary = base.ToConfigurationEditor(configuration);
+        IDictionary<string, object> config = base.ToConfigurationEditor(configuration);
 
         // the front-end editor expects the string value of the storage type
-        if (!dictionary.TryGetValue("storageType", out var storageType))
+        // TODO: this (default value) belongs on the client side!
+        if (!config.ContainsKey("storageType"))
         {
-            storageType = TagsStorageType.Json; // default to Json
+            config["storageType"] = TagsStorageType.Json.ToString();
         }
 
-        dictionary["storageType"] = storageType.ToString()!;
-
-        return dictionary;
-    }
-
-    public override TagConfiguration? FromConfigurationEditor(
-        IDictionary<string, object?>? editorValues,
-        TagConfiguration? configuration)
-    {
-        // the front-end editor returns the string value of the storage type
-        // pure Json could do with
-        // [JsonConverter(typeof(StringEnumConverter))]
-        // but here we're only deserializing to object and it's too late
-        if (editorValues is not null)
-        {
-            editorValues["storageType"] = Enum.Parse(typeof(TagsStorageType), (string)editorValues["storageType"]!);
-        }
-
-        return base.FromConfigurationEditor(editorValues, configuration);
+        return config;
     }
 }

@@ -211,7 +211,7 @@ public class PropertyValidationService : IPropertyValidationService
             return true;
         }
 
-        var configuration = _dataTypeService.GetDataType(propertyType.DataTypeId)?.Configuration;
+        var configuration = _dataTypeService.GetDataType(propertyType.DataTypeId)?.ConfigurationObject;
         IDataValueEditor valueEditor = editor.GetValueEditor(configuration);
         return !valueEditor.Validate(value, propertyType.Mandatory, propertyType.ValidationRegExp).Any();
     }

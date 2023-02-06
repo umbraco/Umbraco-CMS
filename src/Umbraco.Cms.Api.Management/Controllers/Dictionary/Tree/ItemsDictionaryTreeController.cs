@@ -8,8 +8,8 @@ namespace Umbraco.Cms.Api.Management.Controllers.Dictionary.Tree;
 
 public class ItemsDictionaryTreeController : DictionaryTreeControllerBase
 {
-    public ItemsDictionaryTreeController(IEntityService entityService, ILocalizationService localizationService)
-        : base(entityService, localizationService)
+    public ItemsDictionaryTreeController(IEntityService entityService, IDictionaryItemService dictionaryItemService)
+        : base(entityService, dictionaryItemService)
     {
     }
 
@@ -18,9 +18,9 @@ public class ItemsDictionaryTreeController : DictionaryTreeControllerBase
     [ProducesResponseType(typeof(IEnumerable<FolderTreeItemViewModel>), StatusCodes.Status200OK)]
     public async Task<ActionResult<IEnumerable<FolderTreeItemViewModel>>> Items([FromQuery(Name = "key")] Guid[] keys)
     {
-        IDictionaryItem[] dictionaryItems = LocalizationService.GetDictionaryItemsByIds(keys).ToArray();
+        IDictionaryItem[] dictionaryItems = (await DictionaryItemService.GetManyAsync(keys)).ToArray();
 
-        EntityTreeItemViewModel[] viewModels = MapTreeItemViewModels(null, dictionaryItems);
+        EntityTreeItemViewModel[] viewModels = await MapTreeItemViewModels(null, dictionaryItems);
 
         return await Task.FromResult(Ok(viewModels));
     }

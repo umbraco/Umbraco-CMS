@@ -29,7 +29,7 @@ public static class PublishedElementExtensions
         return model.Value(publishedValueFallback, alias, culture, segment, fallback, defaultValue);
     }
 
-    // fixme that one should be public so ppl can use it
+    // TODO: that one should be public so ppl can use it
     private static string GetAlias<TModel, TValue>(TModel model, Expression<Func<TModel, TValue>> property)
     {
         if (property.NodeType != ExpressionType.Lambda)

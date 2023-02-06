@@ -60,7 +60,7 @@ public static class DataTypeExtensions
             throw new ArgumentNullException(nameof(dataType));
         }
 
-        var configuration = dataType.Configuration;
+        var configuration = dataType.ConfigurationObject;
 
         switch (configuration)
         {

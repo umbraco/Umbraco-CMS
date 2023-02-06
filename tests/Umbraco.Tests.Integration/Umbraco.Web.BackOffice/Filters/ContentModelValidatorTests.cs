@@ -48,9 +48,18 @@ public class ContentModelValidatorTests : UmbracoIntegrationTest
 
         var complexDataType = new DataType(complexTestEditor, serializer)
         {
-            Name = "ComplexTest",
-            Configuration = complexEditorConfig
+            Name = "ComplexTest"
         };
+
+        complexDataType.ConfigurationData = complexDataType.Editor!.GetConfigurationEditor()
+            .FromConfigurationObject(
+                complexEditorConfig,
+                serializer);
+
+        var configuration = complexDataType.ConfigurationObject as NestedContentConfiguration;
+        Assert.NotNull(configuration);
+        Assert.AreEqual(1, configuration.ContentTypes!.Length);
+        Assert.AreEqual("feature", configuration.ContentTypes.First().Alias);
 
         var testDataType = new DataType(testEditor, serializer) { Name = "Test" };
         dataTypeService.Save(complexDataType);

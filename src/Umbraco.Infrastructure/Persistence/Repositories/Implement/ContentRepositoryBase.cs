@@ -311,7 +311,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                     continue; // not implementing IDataValueTags, continue
                 }
 
-                object? configuration = DataTypeService.GetDataType(property.PropertyType.DataTypeId)?.Configuration;
+                object? configuration = DataTypeService.GetDataType(property.PropertyType.DataTypeId)?.ConfigurationObject;
 
                 if (property.PropertyType.VariesByCulture())
                 {
@@ -1011,6 +1011,21 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             List<SimilarNodeName>? names = Database.Fetch<SimilarNodeName>(sql);
 
             return SimilarNodeName.GetUniqueName(names, id, nodeName);
+        }
+
+        protected virtual bool SortorderExists(int parentId, int sortOrder)
+        {
+            SqlTemplate? template = SqlContext.Templates.Get(Constants.SqlTemplates.VersionableRepository.SortOrderExists, tsql => tsql
+                .Select("sortOrder")
+                .From<NodeDto>()
+                .Where<NodeDto>(x => x.NodeObjectType == SqlTemplate.Arg<Guid>("nodeObjectType") &&
+                x.ParentId == SqlTemplate.Arg<int>("parentId") &&
+                x.SortOrder == SqlTemplate.Arg<int>("sortOrder")));
+
+            Sql<ISqlContext> sql = template.Sql(NodeObjectTypeId, parentId, sortOrder);
+            var result = Database.ExecuteScalar<int?>(sql);
+
+            return result != null;
         }
 
         protected virtual int GetNewChildSortOrder(int parentId, int first)

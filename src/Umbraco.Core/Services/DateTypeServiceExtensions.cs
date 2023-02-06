@@ -15,7 +15,7 @@ public static class DateTypeServiceExtensions
 
         IDataType? dataType = dataTypeService.GetDataType(key);
 
-        if (dataType != null && dataType.Configuration is IIgnoreUserStartNodesConfig ignoreStartNodesConfig)
+        if (dataType != null && dataType.ConfigurationObject is IIgnoreUserStartNodesConfig ignoreStartNodesConfig)
         {
             return ignoreStartNodesConfig.IgnoreUserStartNodes;
         }
