@@ -5,7 +5,7 @@ import type { UmbWorkspaceEntityElement } from '../../../shared/components/works
 import { UmbMediaWorkspaceContext } from './media-workspace.context';
 import { UmbLitElement } from '@umbraco-cms/element';
 
-@customElement('umb-document-workspace')
+@customElement('umb-media-workspace')
 export class UmbMediaWorkspaceElement extends UmbLitElement implements UmbWorkspaceEntityElement {
 	static styles = [
 		UUITextStyles,
