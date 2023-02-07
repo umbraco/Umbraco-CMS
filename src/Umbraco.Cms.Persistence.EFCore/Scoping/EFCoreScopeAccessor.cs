@@ -3,16 +3,11 @@ using Umbraco.Cms.Core.DependencyInjection;
 
 namespace Umbraco.Cms.Persistence.EFCore.Scoping;
 
-internal class EfCoreScopeAccessor : IEFCoreScopeAccessor
+internal class EFCoreScopeAccessor : IEFCoreScopeAccessor
 {
     private readonly IAmbientEfCoreScopeStack _ambientEfCoreScopeStack;
 
-    public EfCoreScopeAccessor()
-        : this (StaticServiceProvider.Instance.GetRequiredService<IAmbientEfCoreScopeStack>())
-    {
-    }
-
-    internal EfCoreScopeAccessor(IAmbientEfCoreScopeStack ambientEfCoreScopeStack)
+    public EFCoreScopeAccessor(IAmbientEfCoreScopeStack ambientEfCoreScopeStack)
     {
         _ambientEfCoreScopeStack = ambientEfCoreScopeStack;
     }

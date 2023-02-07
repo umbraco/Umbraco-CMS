@@ -30,7 +30,7 @@ public static class UmbracoEFCoreServiceCollectionExtensions
         services.AddSingleton<UmbracoDbContextFactory>();
         services.AddUnique<IUmbracoEfCoreDatabaseFactory, UmbracoEfCoreDatabaseFactory>();
         services.AddUnique<IAmbientEfCoreScopeStack, AmbientEfCoreScopeStack>();
-        services.AddUnique<IEFCoreScopeAccessor, EfCoreScopeAccessor>();
+        services.AddUnique<IEFCoreScopeAccessor, EFCoreScopeAccessor>();
         services.AddUnique<IEfCoreScopeProvider, EfCoreScopeProvider>();
 
         return services;
