@@ -1,9 +1,13 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, html, nothing } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
+import { map } from 'rxjs';
 import { UmbCollectionContext, UMB_COLLECTION_CONTEXT_TOKEN } from './collection.context';
-import type { MediaDetails } from '@umbraco-cms/models';
+import type { ManifestEntityBulkAction, MediaDetails } from '@umbraco-cms/models';
 import { UmbLitElement } from '@umbraco-cms/element';
+import { umbExtensionsRegistry } from '@umbraco-cms/extensions-api';
+
+import '../entity-bulk-actions/entity-bulk-action.element';
 
 @customElement('umb-collection-selection-actions')
 export class UmbCollectionSelectionActionsElement extends UmbLitElement {
@@ -22,7 +26,7 @@ export class UmbCollectionSelectionActionsElement extends UmbLitElement {
 				justify-content: space-between;
 			}
 			#selection-info,
-			umb-extension-slot {
+			#actions {
 				display: flex;
 				align-items: center;
 				box-sizing: border-box;
@@ -32,7 +36,7 @@ export class UmbCollectionSelectionActionsElement extends UmbLitElement {
 	];
 
 	@property()
-	public entityType = 'media';
+	public entityType: string | null = null;
 
 	@state()
 	private _nodesLength = 0;
@@ -40,13 +44,19 @@ export class UmbCollectionSelectionActionsElement extends UmbLitElement {
 	@state()
 	private _selectionLength = 0;
 
+	@state()
+	private _entityBulkActions: Array<ManifestEntityBulkAction> = [];
+
 	private _collectionContext?: UmbCollectionContext<MediaDetails>;
+	private _selection: Array<string> = [];
 
 	constructor() {
 		super();
 		this.consumeContext(UMB_COLLECTION_CONTEXT_TOKEN, (instance) => {
 			this._collectionContext = instance;
+			this.entityType = instance.getEntityType();
 			this._observeCollectionContext();
+			this.#observeEntityBulkActions();
 		});
 	}
 
@@ -70,11 +80,26 @@ export class UmbCollectionSelectionActionsElement extends UmbLitElement {
 
 		this.observe(this._collectionContext.selection, (selection) => {
 			this._selectionLength = selection.length;
+			this._selection = selection;
 		});
 	}
 
 	private _renderSelectionCount() {
 		return html`<div>${this._selectionLength} of ${this._nodesLength} selected</div>`;
+	}
+
+	// TODO: find a solution to use extension slot
+	#observeEntityBulkActions() {
+		this.observe(
+			umbExtensionsRegistry.extensionsOfType('entityBulkAction').pipe(
+				map((extensions) => {
+					return extensions.filter((extension) => extension.meta.entityType === this.entityType);
+				})
+			),
+			(bulkActions) => {
+				this._entityBulkActions = bulkActions;
+			}
+		);
 	}
 
 	render() {
@@ -88,9 +113,13 @@ export class UmbCollectionSelectionActionsElement extends UmbLitElement {
 					look="secondary"></uui-button>
 				${this._renderSelectionCount()}
 			</div>
-			<umb-extension-slot
-				type="collectionBulkAction"
-				.filter=${(manifest: any) => manifest.meta.entityType === this.entityType}></umb-extension-slot>`;
+
+			<div id="actions">
+				${this._entityBulkActions?.map(
+					(manifest) =>
+						html`<umb-entity-bulk-action .selection=${this._selection} .manifest=${manifest}></umb-entity-bulk-action>`
+				)}
+			</div>`;
 	}
 }
 
