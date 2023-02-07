@@ -148,9 +148,11 @@ export class UmbTreeItem extends UmbLitElement {
 	private _observeTreeItemActions() {
 		// TODO: Stop previous observation, currently we can do this from the UmbElementMixin as its a new subscription when Actions or entityType has changed.
 		// Solution: store the current observation controller and if it existing then destroy it.
+		// TODO: as long as a tree consist of one entity type we don't have to observe this every time a new tree item is created.
+		// Solution: move this to the tree context and observe it once.
 		this.observe(
 			umbExtensionsRegistry
-				.extensionsOfType('treeItemAction')
+				.extensionsOfType('entityAction')
 				.pipe(map((actions) => actions.filter((action) => action.meta.entityType === this._entityType))),
 			(actions) => {
 				this._hasActions = actions.length > 0;
