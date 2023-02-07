@@ -18,8 +18,20 @@ export class UmbInputMediaPickerElement extends FormControlMixin(UmbLitElement) 
 	static styles = [
 		UUITextStyles,
 		css`
+			:host {
+				display: grid;
+				gap: var(--uui-size-space-3);
+				padding: var(--uui-size-space-5);
+				border: 1px solid var(--uui-color-border);
+				grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+			}
 			#add-button {
-				width: 100%;
+				text-align: center;
+				min-height: 160px;
+			}
+			uui-icon {
+				display: block;
+				margin: 0 auto;
 			}
 		`,
 	];
@@ -153,12 +165,16 @@ export class UmbInputMediaPickerElement extends FormControlMixin(UmbLitElement) 
 	private _setSelection(newSelection: Array<string>) {
 		this.selectedKeys = newSelection;
 		this.dispatchEvent(new CustomEvent('change', { bubbles: true, composed: true }));
+		console.log(this._items);
 	}
 
 	render() {
 		return html`
 			${this._items?.map((item) => this._renderItem(item))}
-			<uui-button id="add-button" look="placeholder" @click=${this._openPicker} label="open">Add</uui-button>
+			<uui-button id="add-button" look="placeholder" @click=${this._openPicker} label="open">
+				<uui-icon name="umb:add"></uui-icon>
+				Add
+			</uui-button>
 		`;
 	}
 
@@ -167,13 +183,20 @@ export class UmbInputMediaPickerElement extends FormControlMixin(UmbLitElement) 
 		const tempItem = item as FolderTreeItem & { isTrashed: boolean };
 
 		return html`
-			<uui-ref-node name=${ifDefined(item.name === null ? undefined : item.name)} detail=${ifDefined(item.key)}>
+			<uui-card-media
+				name=${ifDefined(item.name === null ? undefined : item.name)}
+				detail=${ifDefined(item.key)}
+				file-ext="jpg">
 				${tempItem.isTrashed ? html` <uui-tag size="s" slot="tag" color="danger">Trashed</uui-tag> ` : nothing}
 				<uui-action-bar slot="actions">
-					<uui-button @click=${() => this._removeItem(item)} label="Remove media ${item.name}">Remove</uui-button>
+					<uui-button label="Copy media">
+						<uui-icon name="umb:documents"></uui-icon>
+					</uui-button>
+					<uui-button @click=${() => this._removeItem(item)} label="Remove media ${item.name}">
+						<uui-icon name="umb:trash"></uui-icon>
+					</uui-button>
 				</uui-action-bar>
-				<uui-icon slot="icon" name=${ifDefined('umb:' + item.icon)}></uui-icon>
-			</uui-ref-node>
+			</uui-card-media>
 		`;
 	}
 }
