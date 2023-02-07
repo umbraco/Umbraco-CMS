@@ -1,17 +1,18 @@
 import { UUIInputElement, UUIInputEvent } from '@umbraco-ui/uui';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html } from 'lit';
-import { customElement, property, state } from 'lit/decorators.js';
+import { customElement, state } from 'lit/decorators.js';
 import { distinctUntilChanged } from 'rxjs';
-import { UmbLitElement } from '@umbraco-cms/element';
+import { UmbWorkspaceEntityElement } from '../../../../backoffice/shared/components/workspace/workspace-entity-element.interface';
 import { UmbWorkspaceMemberGroupContext } from './member-group-workspace.context';
+import { UmbLitElement } from '@umbraco-cms/element';
 
 /**
  * @element umb-member-group-workspace
  * @description - Element for displaying a Member Group Workspace
  */
 @customElement('umb-member-group-workspace')
-export class UmbMemberGroupWorkspaceElement extends UmbLitElement {
+export class UmbMemberGroupWorkspaceElement extends UmbLitElement implements UmbWorkspaceEntityElement {
 	static styles = [
 		UUITextStyles,
 		css`
@@ -28,32 +29,22 @@ export class UmbMemberGroupWorkspaceElement extends UmbLitElement {
 			}
 		`,
 	];
+	private _workspaceContext: UmbWorkspaceMemberGroupContext = new UmbWorkspaceMemberGroupContext(this);
 
-	private _entityKey!: string;
-	@property()
-	public get entityKey(): string {
-		return this._entityKey;
-	}
-	public set entityKey(value: string) {
-		this._entityKey = value;
-		if (this._entityKey) {
-			this._workspaceContext.load(this._entityKey);
-		}
+	public load(entityKey: string) {
+		this._workspaceContext.load(entityKey);
 	}
 
-	@property()
-	public set create(parentKey: string | null) {
+	public create(parentKey: string | null) {
 		this._workspaceContext.create(parentKey);
 	}
-
-	private _workspaceContext: UmbWorkspaceMemberGroupContext = new UmbWorkspaceMemberGroupContext(this);
 
 	@state()
 	private _memberGroupName = '';
 
 	constructor() {
 		super();
-		this.provideContext('umbWorkspaceContext', this._workspaceContext);
+
 		this.observe(this._workspaceContext.data.pipe(distinctUntilChanged()), (memberGroup) => {
 			if (memberGroup && memberGroup.name !== this._memberGroupName) {
 				this._memberGroupName = memberGroup.name ?? '';

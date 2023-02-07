@@ -1,5 +1,5 @@
-import type { MemberGroupDetails } from '@umbraco-cms/models';
 import { UMB_MEMBER_GROUP_DETAIL_STORE_CONTEXT_TOKEN } from '../member-group.detail.store';
+import type { MemberGroupDetails } from '@umbraco-cms/models';
 import { UmbWorkspaceEntityContextInterface } from 'src/backoffice/shared/components/workspace/workspace-context/workspace-entity-context.interface';
 import { UmbEntityWorkspaceManager } from 'src/backoffice/shared/components/workspace/workspace-context/entity-manager-controller';
 import { UmbWorkspaceContext } from 'src/backoffice/shared/components/workspace/workspace-context/workspace-context';
