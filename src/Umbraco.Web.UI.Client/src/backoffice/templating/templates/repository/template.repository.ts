@@ -1,6 +1,9 @@
 import { UmbTemplateDetailServerDataSource } from '../workspace/data/sources/template.detail.server.data';
 import { TemplateTreeServerDataSource } from '../tree/data/sources/template.tree.server.data';
-import { UmbTemplateDetailStore, UMB_TEMPLATE_DETAIL_STORE_CONTEXT_TOKEN } from '../workspace/data/template.detail.store';
+import {
+	UmbTemplateDetailStore,
+	UMB_TEMPLATE_DETAIL_STORE_CONTEXT_TOKEN,
+} from '../workspace/data/template.detail.store';
 import { UmbTemplateTreeStore, UMB_TEMPLATE_TREE_STORE_CONTEXT_TOKEN } from '../tree/data/template.tree.store';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 import { UmbNotificationService, UMB_NOTIFICATION_SERVICE_CONTEXT_TOKEN } from '@umbraco-cms/notification';
@@ -14,8 +17,6 @@ import { UmbTreeRepository } from 'libs/repository/tree-repository.interface';
 // element -> context -> repository -> (store) -> data source
 // All methods should be async and return a promise. Some methods might return an observable as part of the promise response.
 export class UmbTemplateRepository implements UmbTreeRepository, UmbDetailRepository<Template> {
-
-
 	#init;
 	#host: UmbControllerHostInterface;
 
@@ -26,7 +27,6 @@ export class UmbTemplateRepository implements UmbTreeRepository, UmbDetailReposi
 	#detailStore?: UmbTemplateDetailStore;
 
 	#notificationService?: UmbNotificationService;
-
 
 	constructor(host: UmbControllerHostInterface) {
 		this.#host = host;
@@ -50,12 +50,7 @@ export class UmbTemplateRepository implements UmbTreeRepository, UmbDetailReposi
 		]);
 	}
 
-
-
 	// TREE:
-
-
-
 
 	async requestRootTreeItems() {
 		await this.#init;
@@ -114,13 +109,6 @@ export class UmbTemplateRepository implements UmbTreeRepository, UmbDetailReposi
 		return this.#treeStore!.items(keys);
 	}
 
-
-
-
-
-
-
-
 	// DETAILS:
 
 	async createDetailsScaffold(parentKey: string | null) {
@@ -151,10 +139,7 @@ export class UmbTemplateRepository implements UmbTreeRepository, UmbDetailReposi
 		return { data, error };
 	}
 
-
-
 	// Could potentially be general methods:
-
 
 	async createDetail(template: Template) {
 		await this.#init;
@@ -202,9 +187,6 @@ export class UmbTemplateRepository implements UmbTreeRepository, UmbDetailReposi
 		return { error };
 	}
 
-
-
-
 	// General:
 
 	async delete(key: string) {
@@ -230,10 +212,4 @@ export class UmbTemplateRepository implements UmbTreeRepository, UmbDetailReposi
 
 		return { error };
 	}
-
-
-
-
-
-
 }
