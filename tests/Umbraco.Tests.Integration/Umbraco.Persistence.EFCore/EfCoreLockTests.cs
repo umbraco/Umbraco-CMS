@@ -51,4 +51,78 @@ public class EfCoreLockTests : UmbracoIntegrationTest
             scope.Complete();
         }
     }
+
+    [Test]
+    public void ConcurrentReadersTest()
+    {
+        const int threadCount = 8;
+        var threads = new Thread[threadCount];
+        var exceptions = new Exception[threadCount];
+        var locker = new object();
+        var acquired = 0;
+        var m2 = new ManualResetEventSlim(false);
+        var m1 = new ManualResetEventSlim(false);
+
+        for (var i = 0; i < threadCount; i++)
+        {
+            var ic = i; // capture
+            threads[i] = new Thread(() =>
+            {
+                using (var scope = EfCoreScopeProvider.CreateScope())
+                {
+                    try
+                    {
+                        scope.EagerReadLock(Constants.Locks.Servers);
+                        lock (locker)
+                        {
+                            acquired++;
+                            if (acquired == threadCount)
+                            {
+                                m2.Set();
+                            }
+                        }
+
+                        m1.Wait();
+                        lock (locker)
+                        {
+                            acquired--;
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        exceptions[ic] = e;
+                    }
+
+                    scope.Complete();
+                }
+            });
+        }
+
+        // ensure that current scope does not leak into starting threads
+        using (ExecutionContext.SuppressFlow())
+        {
+            foreach (var thread in threads)
+            {
+                thread.Start();
+            }
+        }
+
+        m2.Wait();
+        // all threads have locked in parallel
+        var maxAcquired = acquired;
+        m1.Set();
+
+        foreach (var thread in threads)
+        {
+            thread.Join();
+        }
+
+        Assert.AreEqual(threadCount, maxAcquired);
+        Assert.AreEqual(0, acquired);
+
+        for (var i = 0; i < threadCount; i++)
+        {
+            Assert.IsNull(exceptions[i]);
+        }
+    }
 }
