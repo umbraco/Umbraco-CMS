@@ -115,11 +115,10 @@ public class EfCoreScopeTest : UmbracoIntegrationTest
     public async Task CanAccessDbContext()
     {
         using var scope = EfCoreScopeProvider.CreateScope();
-        await scope.ExecuteWithContextAsync(async db =>
+        await scope.ExecuteWithContextAsync<Task>(async db =>
         {
             Assert.IsTrue(await db.Database.CanConnectAsync());
             Assert.IsNotNull(db.Database.CurrentTransaction); // in a transaction
-            return Task.CompletedTask;
         });
         scope.Complete();
     }
@@ -128,24 +127,21 @@ public class EfCoreScopeTest : UmbracoIntegrationTest
     public async Task CanAccessNestedDbContext()
     {
         using var scope = EfCoreScopeProvider.CreateScope();
-        await scope.ExecuteWithContextAsync(async db =>
+        await scope.ExecuteWithContextAsync<Task>(async db =>
         {
             Assert.IsTrue(await db.Database.CanConnectAsync());
             var parentTransaction = db.Database.CurrentTransaction;
 
             using (var nestedSCope = EfCoreScopeProvider.CreateScope())
             {
-                await nestedSCope.ExecuteWithContextAsync(async nestedDb =>
+                await nestedSCope.ExecuteWithContextAsync<Task>(async nestedDb =>
                 {
                     Assert.IsTrue(await nestedDb.Database.CanConnectAsync());
                     Assert.IsNotNull(nestedDb.Database.CurrentTransaction); // in a transaction
                     var childTransaction = nestedDb.Database.CurrentTransaction;
                     Assert.AreSame(parentTransaction, childTransaction);
-                    return Task.CompletedTask;
                 });
             }
-
-            return Task.CompletedTask;
         });
         scope.Complete();
     }
@@ -248,42 +244,38 @@ public class EfCoreScopeTest : UmbracoIntegrationTest
     {
         using (IEfCoreScope scope = EfCoreScopeProvider.CreateScope())
         {
-            await scope.ExecuteWithContextAsync(async db =>
+            await scope.ExecuteWithContextAsync<Task>(async db =>
             {
                 await db.Database.ExecuteSqlAsync($"CREATE TABLE tmp3 (id INT, name NVARCHAR(64))");
-                return Task.CompletedTask;
             });
             scope.Complete();
         }
 
         using (IEfCoreScope scope = EfCoreScopeProvider.CreateScope())
         {
-            await scope.ExecuteWithContextAsync(async db =>
+            await scope.ExecuteWithContextAsync<Task>(async db =>
             {
                 await db.Database.ExecuteSqlAsync($"INSERT INTO tmp3 (id, name) VALUES (1, 'a')");
 
                 string? result = await db.Database.ExecuteScalarAsync<string>("SELECT name FROM tmp3 WHERE id=1");
                 Assert.AreEqual("a", result);
-                return Task.CompletedTask;
             });
         }
 
         using (IEfCoreScope scope = EfCoreScopeProvider.CreateScope())
         {
-            await scope.ExecuteWithContextAsync(async db =>
+            await scope.ExecuteWithContextAsync<Task>(async db =>
             {
                 string n = await db.Database.ExecuteScalarAsync<string>("SELECT name FROM tmp3 WHERE id=1");
                 Assert.IsNull(n);
-                return Task.CompletedTask;
             });
         }
 
         using (IEfCoreScope scope = EfCoreScopeProvider.CreateScope())
         {
-            await scope.ExecuteWithContextAsync(async db =>
+            await scope.ExecuteWithContextAsync<Task>(async db =>
             {
                 await db.Database.ExecuteSqlAsync($"INSERT INTO tmp3 (id, name) VALUES (1, 'a')");
-                return Task.CompletedTask;
             });
 
             scope.Complete();
@@ -291,12 +283,10 @@ public class EfCoreScopeTest : UmbracoIntegrationTest
 
         using (IEfCoreScope scope = EfCoreScopeProvider.CreateScope())
         {
-            await scope.ExecuteWithContextAsync(async db =>
+            await scope.ExecuteWithContextAsync<Task>(async db =>
             {
                 string n = await db.Database.ExecuteScalarAsync<string>("SELECT name FROM tmp3 WHERE id=1");
                 Assert.AreEqual("a", n);
-
-                return Task.CompletedTask;
             });
 
             scope.Complete();
@@ -308,10 +298,9 @@ public class EfCoreScopeTest : UmbracoIntegrationTest
     {
         using (IEfCoreScope scope = EfCoreScopeProvider.CreateScope())
         {
-            await scope.ExecuteWithContextAsync(async db =>
+            await scope.ExecuteWithContextAsync<Task>(async db =>
             {
                 await db.Database.ExecuteSqlAsync($"CREATE TABLE tmp1 (id INT, name NVARCHAR(64))");
-                return Task.CompletedTask;
             });
 
             scope.Complete();
@@ -320,7 +309,7 @@ public class EfCoreScopeTest : UmbracoIntegrationTest
         using (IEfCoreScope scope = EfCoreScopeProvider.CreateScope())
         {
             string n;
-            await scope.ExecuteWithContextAsync(async db =>
+            await scope.ExecuteWithContextAsync<Task>(async db =>
             {
                 await db.Database.ExecuteSqlAsync($"INSERT INTO tmp1 (id, name) VALUES (1, 'a')");
                 n = await db.Database.ExecuteScalarAsync<string>("SELECT name FROM tmp1 WHERE id=1");
@@ -328,18 +317,16 @@ public class EfCoreScopeTest : UmbracoIntegrationTest
 
                 using (IEfCoreScope nested = EfCoreScopeProvider.CreateScope())
                 {
-                    await nested.ExecuteWithContextAsync(async nestedDatabase =>
+                    await nested.ExecuteWithContextAsync<Task>(async nestedDatabase =>
                     {
                         await nestedDatabase.Database.ExecuteSqlAsync($"INSERT INTO tmp1 (id, name) VALUES (2, 'b')");
                         string nn = await nestedDatabase.Database.ExecuteScalarAsync<string>("SELECT name FROM tmp1 WHERE id=2");
                         Assert.AreEqual("b", nn);
-                        return Task.CompletedTask;
                     });
                 }
 
                 n = await db.Database.ExecuteScalarAsync<string>("SELECT name FROM tmp1 WHERE id=2");
                 Assert.AreEqual("b", n);
-                return Task.CompletedTask;
             });
 
             scope.Complete();
@@ -347,13 +334,12 @@ public class EfCoreScopeTest : UmbracoIntegrationTest
 
         using (IEfCoreScope scope = EfCoreScopeProvider.CreateScope())
         {
-            await scope.ExecuteWithContextAsync(async database =>
+            await scope.ExecuteWithContextAsync<Task>(async database =>
             {
                 string n = await database.Database.ExecuteScalarAsync<string>("SELECT name FROM tmp1 WHERE id=1");
                 Assert.IsNull(n);
                 n = await database.Database.ExecuteScalarAsync<string>("SELECT name FROM tmp1 WHERE id=2");
                 Assert.IsNull(n);
-                return Task.CompletedTask;
             });
         }
     }

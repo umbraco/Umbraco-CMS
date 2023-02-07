@@ -8,14 +8,17 @@ internal class EfCoreScope : IEfCoreScope
     private readonly IEFCoreScopeAccessor _efCoreScopeAccessor;
     private readonly IEfCoreScopeProvider _efCoreScopeProvider;
     private readonly IUmbracoEfCoreDatabase _umbracoEfCoreDatabase;
+    private bool? _completed;
 
     public Guid InstanceId { get; }
 
     public EfCoreScope? ParentScope { get; }
 
-    public bool? _completed;
 
-    public EfCoreScope(IUmbracoEfCoreDatabaseFactory efCoreDatabaseFactory, IEFCoreScopeAccessor efCoreScopeAccessor, IEfCoreScopeProvider efCoreScopeProvider)
+    public EfCoreScope(
+        IUmbracoEfCoreDatabaseFactory efCoreDatabaseFactory,
+        IEFCoreScopeAccessor efCoreScopeAccessor,
+        IEfCoreScopeProvider efCoreScopeProvider)
     {
         _efCoreDatabaseFactory = efCoreDatabaseFactory;
         _efCoreScopeAccessor = efCoreScopeAccessor;
@@ -37,12 +40,20 @@ internal class EfCoreScope : IEfCoreScope
         IEfCoreScopeProvider efCoreScopeProvider,
         EfCoreScope parentScope)
         : this(
-        efCoreDatabaseFactory,
-        efCoreScopeAccessor,
-        efCoreScopeProvider) =>
+            efCoreDatabaseFactory,
+            efCoreScopeAccessor,
+            efCoreScopeProvider) =>
         ParentScope = parentScope;
 
-    public async Task<T> ExecuteWithContextAsync<T>(Func<UmbracoEFContext, Task<T>> method) => await method(_umbracoEfCoreDatabase.UmbracoEFContext);
+    public async Task<T> ExecuteWithContextAsync<T>(Func<UmbracoEFContext, Task<T>> method) =>
+        await method(_umbracoEfCoreDatabase.UmbracoEFContext);
+
+    public async Task ExecuteWithContextAsync<T>(Func<UmbracoEFContext, Task> method) =>
+        await ExecuteWithContextAsync(async db =>
+        {
+            await method(db);
+            return true; // Do nothing
+        });
 
     public void Complete()
     {
