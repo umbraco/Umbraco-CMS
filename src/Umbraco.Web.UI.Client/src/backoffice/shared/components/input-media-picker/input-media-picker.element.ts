@@ -21,8 +21,6 @@ export class UmbInputMediaPickerElement extends FormControlMixin(UmbLitElement) 
 			:host {
 				display: grid;
 				gap: var(--uui-size-space-3);
-				padding: var(--uui-size-space-5);
-				border: 1px solid var(--uui-color-border);
 				grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
 			}
 			#add-button {
