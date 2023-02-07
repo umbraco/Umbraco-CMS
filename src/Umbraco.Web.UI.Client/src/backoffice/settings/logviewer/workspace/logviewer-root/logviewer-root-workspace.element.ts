@@ -19,7 +19,8 @@ export class UmbLogViewerRootWorkspaceElement extends LitElement {
 	];
 	render() {
 		return html`
-			<umb-workspace-layout headline="Log Overview for Today" alias="Umb.Workspace.LogviewerRoot">
+			<umb-workspace-layout headline="Log Overview for today" alias="Umb.Workspace.LogviewerRoot">
+				hello
 			</umb-workspace-layout>
 		`;
 	}
