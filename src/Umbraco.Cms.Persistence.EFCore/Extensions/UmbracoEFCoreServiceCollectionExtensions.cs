@@ -34,7 +34,6 @@ public static class UmbracoEFCoreServiceCollectionExtensions
         services.AddUnique<IEFCoreScopeAccessor, EFCoreScopeAccessor>();
         services.AddUnique<IEfCoreScopeProvider, EfCoreScopeProvider>();
         services.AddUnique<IHttpEFCoreScopeReference, HttpEFCoreScopeReference>();
-        services.AddUnique<IDistributedLockingMechanism, SqliteEFCoreDistributedLockingMechanism>();
 
         return services;
     }

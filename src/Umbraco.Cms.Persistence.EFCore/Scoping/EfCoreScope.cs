@@ -304,10 +304,10 @@ internal class EfCoreScope : IEfCoreScope
                 _umbracoEfCoreDatabase.UmbracoEFContext.Database.RollbackTransaction();
             }
 
-            _umbracoEfCoreDatabase.Dispose();
+            // _umbracoEfCoreDatabase.Dispose();
         }
 
-        _efCoreDatabaseFactory.Dispose();
+        // _efCoreDatabaseFactory.Dispose();
 
     }
 }
