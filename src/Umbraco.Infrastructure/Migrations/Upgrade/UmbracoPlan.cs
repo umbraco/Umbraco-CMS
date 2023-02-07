@@ -96,6 +96,7 @@ public class UmbracoPlan : MigrationPlan
         // To 13.0.0
         To<AddPropertyEditorUiAliasColumn>("{419827A0-4FCE-464B-A8F3-247C6092AF55}");
         To<MigrateDataTypeConfigurations>("{5F15A1CC-353D-4889-8C7E-F303B4766196}");
+        To<AddGuidsToUserGroups>("{69E12556-D9B3-493A-8E8A-65EC89FB658D}");
         To<UpdateDefaultGuidsOfCreatedPackages>("{E073DBC0-9E8E-4C92-8210-9CB18364F46E}");
     }
 }
