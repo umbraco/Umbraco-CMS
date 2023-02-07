@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core.DependencyInjection;
+using Umbraco.Cms.Core.DistributedLocking;
 
 namespace Umbraco.Cms.Persistence.EFCore.Scoping;
 
@@ -14,15 +15,21 @@ public class EfCoreScopeProvider : IEfCoreScopeProvider
         : this(
             StaticServiceProvider.Instance.GetRequiredService<IAmbientEfCoreScopeStack>(),
             StaticServiceProvider.Instance.GetRequiredService<IUmbracoEfCoreDatabaseFactory>(),
-            StaticServiceProvider.Instance.GetRequiredService<IEFCoreScopeAccessor>())
+            StaticServiceProvider.Instance.GetRequiredService<IEFCoreScopeAccessor>(),
+            StaticServiceProvider.Instance.GetRequiredService<IDistributedLockingMechanismFactory>())
     {
     }
 
-    internal EfCoreScopeProvider(IAmbientEfCoreScopeStack ambientEfCoreScopeStack, IUmbracoEfCoreDatabaseFactory umbracoEfCoreDatabaseFactory, IEFCoreScopeAccessor efCoreScopeAccessor)
+    internal EfCoreScopeProvider(
+        IAmbientEfCoreScopeStack ambientEfCoreScopeStack,
+        IUmbracoEfCoreDatabaseFactory umbracoEfCoreDatabaseFactory,
+        IEFCoreScopeAccessor efCoreScopeAccessor,
+        IDistributedLockingMechanismFactory distributedLockingMechanismFactory)
     {
         _ambientEfCoreScopeStack = ambientEfCoreScopeStack;
         _umbracoEfCoreDatabaseFactory = umbracoEfCoreDatabaseFactory;
         _efCoreScopeAccessor = efCoreScopeAccessor;
+        DistributedLockingMechanismFactory = distributedLockingMechanismFactory;
     }
 
     public IEfCoreScope CreateScope()
@@ -38,6 +45,8 @@ public class EfCoreScopeProvider : IEfCoreScopeProvider
         _ambientEfCoreScopeStack.Push(efCoreScope);
         return efCoreScope;
     }
+
+    public IDistributedLockingMechanismFactory DistributedLockingMechanismFactory { get; }
 
     public void PopAmbientScope() => _ambientEfCoreScopeStack.Pop();
 }

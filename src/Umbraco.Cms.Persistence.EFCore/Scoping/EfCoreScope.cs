@@ -1,5 +1,6 @@
-﻿using Umbraco.Cms.Persistence.EFCore.Entities;
-using Umbraco.Extensions;
+﻿using Umbraco.Cms.Core.Collections;
+using Umbraco.Cms.Core.DistributedLocking;
+using Umbraco.Cms.Persistence.EFCore.Entities;
 
 namespace Umbraco.Cms.Persistence.EFCore.Scoping;
 
@@ -7,14 +8,25 @@ internal class EfCoreScope : IEfCoreScope
 {
     private readonly IUmbracoEfCoreDatabaseFactory _efCoreDatabaseFactory;
     private readonly IEFCoreScopeAccessor _efCoreScopeAccessor;
-    private readonly IEfCoreScopeProvider _efCoreScopeProvider;
+    private readonly EfCoreScopeProvider _efCoreScopeProvider;
     private IUmbracoEfCoreDatabase? _umbracoEfCoreDatabase;
     private bool? _completed;
     private bool _disposed;
 
+    // This is all used to safely track read/write locks at given Scope levels so that
+    // when we dispose we can verify that everything has been cleaned up correctly
+    private readonly object _dictionaryLocker;
+    private StackQueue<(DistributedLockType lockType, TimeSpan timeout, Guid instanceId, int lockId)>? _queuedLocks;
+    private HashSet<int>? _readLocks;
+    private Dictionary<Guid, Dictionary<int, int>>? _readLocksDictionary;
+    private HashSet<int>? _writeLocks;
+    private Dictionary<Guid, Dictionary<int, int>>? _writeLocksDictionary;
+    private Queue<IDistributedLock>? _acquiredLocks;
+
     public Guid InstanceId { get; }
 
     public EfCoreScope? ParentScope { get; }
+
 
 
     public EfCoreScope(
@@ -22,9 +34,11 @@ internal class EfCoreScope : IEfCoreScope
         IEFCoreScopeAccessor efCoreScopeAccessor,
         IEfCoreScopeProvider efCoreScopeProvider)
     {
+        _dictionaryLocker = new object();
         _efCoreDatabaseFactory = efCoreDatabaseFactory;
         _efCoreScopeAccessor = efCoreScopeAccessor;
-        _efCoreScopeProvider = efCoreScopeProvider;
+        _efCoreScopeProvider = (EfCoreScopeProvider)efCoreScopeProvider;
+        _acquiredLocks = new Queue<IDistributedLock>();
 
         InstanceId = Guid.NewGuid();
     }
@@ -81,6 +95,9 @@ internal class EfCoreScope : IEfCoreScope
             throw new InvalidOperationException(failedMessage);
         }
 
+        // Decrement the lock counters on the parent if any.
+        ClearLocks(InstanceId);
+
         if (ParentScope is null)
         {
             DisposeEfCoreDatabase();
@@ -102,6 +119,165 @@ internal class EfCoreScope : IEfCoreScope
             _completed = false;
         }
     }
+
+    public void EagerReadLock(params int[] lockIds) => EagerReadLockInner(InstanceId, null, lockIds);
+
+    /// <summary>
+    ///     Handles acquiring a read lock, will delegate it to the parent if there are any.
+    /// </summary>
+    /// <param name="instanceId">Instance ID of the requesting scope.</param>
+    /// <param name="timeout">Optional database timeout in milliseconds.</param>
+    /// <param name="lockIds">Array of lock object identifiers.</param>
+    private void EagerReadLockInner(Guid instanceId, TimeSpan? timeout, params int[] lockIds)
+    {
+        if (ParentScope is not null)
+        {
+            // If we have a parent we delegate lock creation to parent.
+            ParentScope.EagerReadLockInner(instanceId, timeout, lockIds);
+        }
+        else
+        {
+            lock (_dictionaryLocker)
+            {
+                foreach (var lockId in lockIds)
+                {
+                    IncrementLock(lockId, instanceId, ref _readLocksDictionary);
+
+                    // We are the outermost scope, handle the lock request.
+                    LockInner(
+                        instanceId,
+                        ref _readLocksDictionary!,
+                        ref _readLocks!,
+                        ObtainReadLock,
+                        timeout,
+                        lockId);
+                }
+            }
+        }
+    }
+
+    /// <summary>
+    ///     Obtains a read lock with a custom timeout.
+    /// </summary>
+    /// <param name="lockId">Lock object identifier to lock.</param>
+    /// <param name="timeout">TimeSpan specifying the timout period.</param>
+    private void ObtainReadLock(int lockId, TimeSpan? timeout)
+    {
+        if (_acquiredLocks == null)
+        {
+            throw new InvalidOperationException($"Cannot obtain a read lock as the {nameof(_acquiredLocks)} queue is null.");
+        }
+
+        _acquiredLocks.Enqueue(_efCoreScopeProvider.DistributedLockingMechanismFactory.DistributedLockingMechanism.ReadLock(lockId, timeout));
+    }
+
+    /// <summary>
+    ///     Handles acquiring a lock, this should only be called from the outermost scope.
+    /// </summary>
+    /// <param name="instanceId">Instance ID of the scope requesting the lock.</param>
+    /// <param name="locks">Reference to the applicable locks dictionary (ReadLocks or WriteLocks).</param>
+    /// <param name="locksSet">Reference to the applicable locks hashset (_readLocks or _writeLocks).</param>
+    /// <param name="obtainLock">Delegate used to request the lock from the locking mechanism.</param>
+    /// <param name="timeout">Optional timeout parameter to specify a timeout.</param>
+    /// <param name="lockId">Lock identifier.</param>
+    private void LockInner(
+        Guid instanceId,
+        ref Dictionary<Guid, Dictionary<int, int>> locks,
+        ref HashSet<int>? locksSet,
+        Action<int, TimeSpan?> obtainLock,
+        TimeSpan? timeout,
+        int lockId)
+    {
+        locksSet ??= new HashSet<int>();
+
+        // Only acquire the lock if we haven't done so yet.
+        if (locksSet.Contains(lockId))
+        {
+            return;
+        }
+
+        locksSet.Add(lockId);
+        try
+        {
+            obtainLock(lockId, timeout);
+        }
+        catch
+        {
+            // Something went wrong and we didn't get the lock
+            // Since we at this point have determined that we haven't got any lock with an ID of LockID, it's safe to completely remove it instead of decrementing.
+            locks[instanceId].Remove(lockId);
+
+            // It needs to be removed from the HashSet as well, because that's how we determine to acquire a lock.
+            locksSet.Remove(lockId);
+            throw;
+        }
+    }
+
+    /// <summary>
+    ///     Increment the counter of a locks dictionary, either ReadLocks or WriteLocks,
+    ///     for a specific scope instance and lock identifier. Must be called within a lock.
+    /// </summary>
+    /// <param name="lockId">Lock ID to increment.</param>
+    /// <param name="instanceId">Instance ID of the scope requesting the lock.</param>
+    /// <param name="locks">Reference to the dictionary to increment on</param>
+    private void IncrementLock(int lockId, Guid instanceId, ref Dictionary<Guid, Dictionary<int, int>>? locks)
+    {
+        // Since we've already checked that we're the parent in the WriteLockInner method, we don't need to check again.
+        // If it's the very first time a lock has been requested the WriteLocks dict hasn't been instantiated yet.
+        locks ??= new Dictionary<Guid, Dictionary<int, int>>();
+
+        // Try and get the dict associated with the scope id.
+        var locksDictFound = locks.TryGetValue(instanceId, out Dictionary<int, int>? locksDict);
+        if (locksDictFound)
+        {
+            locksDict!.TryGetValue(lockId, out var value);
+            locksDict[lockId] = value + 1;
+        }
+        else
+        {
+            // The scope hasn't requested a lock yet, so we have to create a dict for it.
+            locks.Add(instanceId, new Dictionary<int, int>());
+            locks[instanceId][lockId] = 1;
+        }
+    }
+
+    /// <summary>
+    ///     Clears all lock counters for a given scope instance, signalling that the scope has been disposed.
+    /// </summary>
+    /// <param name="instanceId">Instance ID of the scope to clear.</param>
+    private void ClearLocks(Guid instanceId)
+    {
+        if (ParentScope is not null)
+        {
+            ParentScope.ClearLocks(instanceId);
+        }
+        else
+        {
+            lock (_dictionaryLocker)
+            {
+                _readLocksDictionary?.Remove(instanceId);
+                _writeLocksDictionary?.Remove(instanceId);
+
+                // remove any queued locks for this instance that weren't used.
+                while (_queuedLocks?.Count > 0)
+                {
+                    // It's safe to assume that the locks on the top of the stack belong to this instance,
+                    // since any child scopes that might have added locks to the stack must be disposed before we try and dispose this instance.
+                    (DistributedLockType lockType, TimeSpan timeout, Guid instanceId, int lockId) top =
+                        _queuedLocks.PeekStack();
+                    if (top.instanceId == instanceId)
+                    {
+                        _queuedLocks.Pop();
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
+            }
+        }
+    }
+
 
     private void InitializeDatabase()
     {

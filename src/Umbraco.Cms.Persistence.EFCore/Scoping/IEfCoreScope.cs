@@ -29,4 +29,6 @@ public interface IEfCoreScope : IDisposable
     /// Completes the scope, if this is not call, the transaction will be rolled back.
     /// </summary>
     void Complete();
+
+    void EagerReadLock(params int[] lockIds);
 }
