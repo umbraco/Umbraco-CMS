@@ -220,7 +220,7 @@ export class UmbWorkspaceViewUsersOverviewElement extends UmbLitElement {
 				</div>
 			</div>
 
-			<router-slot .routes=${this._routes}></router-slot>
+			<umb-router-slot .routes=${this._routes}></umb-router-slot>
 
 			${this._renderSelection()}
 		`;

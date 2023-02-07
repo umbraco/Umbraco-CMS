@@ -64,8 +64,9 @@ export class UmbTreeElement extends UmbLitElement {
 	private _treeContext?: UmbTreeContextBase;
 	private _store?: UmbTreeStore<Entity>;
 
-	connectedCallback(): void {
-		super.connectedCallback();
+	#treeRepository?: any; // TODO: make interface
+
+	protected firstUpdated(): void {
 		this._observeTree();
 	}
 
@@ -76,12 +77,15 @@ export class UmbTreeElement extends UmbLitElement {
 			umbExtensionsRegistry
 				.extensionsOfType('tree')
 				.pipe(map((trees) => trees.find((tree) => tree.alias === this.alias))),
-			(tree) => {
+			async (tree) => {
+				if (this._tree?.alias === tree?.alias) return;
+
 				this._tree = tree;
-				if (tree) {
-					this._provideTreeContext();
+				this._provideTreeContext();
+
+				// TODO: remove this when repositories are in place.
+				if (this._tree?.meta.storeAlias) {
 					this._provideStore();
-					this._observeTreeRoot();
 				}
 			}
 		);
@@ -92,15 +96,17 @@ export class UmbTreeElement extends UmbLitElement {
 
 		// TODO: if a new tree comes around, which is different, then we should clean up and re provide.
 
-		this._treeContext = new UmbTreeContextBase(this._tree);
+		this._treeContext = new UmbTreeContextBase(this, this._tree);
 		this._treeContext.setSelectable(this.selectable);
 		this._treeContext.setSelection(this.selection);
 
 		this._observeSelection();
+		this._observeRepositoryTreeRoot();
 
 		this.provideContext('umbTreeContext', this._treeContext);
 	}
 
+	// TODO: remove this when repositories are in place.
 	private _provideStore() {
 		// TODO: Clean up store, if already existing.
 
@@ -109,6 +115,17 @@ export class UmbTreeElement extends UmbLitElement {
 		this.consumeContext(this._tree.meta.storeAlias, (store: UmbTreeStore<Entity>) => {
 			this._store = store;
 			this.provideContext('umbStore', store);
+			this._observeStoreTreeRoot();
+		});
+	}
+
+	private async _observeRepositoryTreeRoot() {
+		if (!this._treeContext?.requestRootItems) return;
+
+		this._treeContext.requestRootItems();
+
+		this.observe(await this._treeContext.rootItems(), (rootItems) => {
+			this._items = rootItems as Entity[];
 		});
 	}
 
@@ -122,7 +139,7 @@ export class UmbTreeElement extends UmbLitElement {
 		});
 	}
 
-	private _observeTreeRoot() {
+	private _observeStoreTreeRoot() {
 		if (!this._store?.getTreeRoot) return;
 
 		this._loading = true;

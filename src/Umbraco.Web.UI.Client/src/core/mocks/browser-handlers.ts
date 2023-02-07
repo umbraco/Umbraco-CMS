@@ -19,6 +19,7 @@ import { handlers as dictionaryHandlers } from './domains/dictionary.handlers';
 import { handlers as mediaTypeHandlers } from './domains/media-type.handlers';
 import { handlers as memberGroupHandlers } from './domains/member-group.handlers';
 import { handlers as memberTypeHandlers } from './domains/member-type.handlers';
+import { handlers as templateHandlers } from './domains/template.handlers';
 import { handlers as languageHandlers } from './domains/language.handlers';
 import { handlers as redirectManagementHandlers } from './domains/redirect-management.handlers';
 
@@ -44,6 +45,7 @@ const handlers = [
 	...healthCheckHandlers,
 	...profilingHandlers,
 	...dictionaryHandlers,
+	...templateHandlers,
 	...languageHandlers,
 	...redirectManagementHandlers,
 ];
