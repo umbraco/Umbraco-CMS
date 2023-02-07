@@ -15,7 +15,6 @@ export const handlers = [
 	}),
 
 	rest.post<MediaDetails[]>('/umbraco/management/api/v1/media/save', async (req, res, ctx) => {
-		console.warn('Please move to schema');
 		const data = await req.json();
 		if (!data) return;
 
@@ -24,22 +23,16 @@ export const handlers = [
 		return res(ctx.status(200), ctx.json(saved));
 	}),
 
-	rest.post<MediaDetails[]>('/umbraco/management/api/v1/media/move', async (req, res, ctx) => {
-		console.warn('Please move to schema');
+	rest.post('/umbraco/management/api/v1/media/move', async (req, res, ctx) => {
 		const data = await req.json();
 		if (!data) return;
-
 		const moved = umbMediaData.move(data.keys, data.destination);
-
 		return res(ctx.status(200), ctx.json(moved));
 	}),
 
 	rest.post<string[]>('/umbraco/management/api/v1/media/trash', async (req, res, ctx) => {
-		console.warn('Please move to schema');
 		const keys = await req.json();
-
 		const trashed = umbMediaData.trash(keys);
-
 		return res(ctx.status(200), ctx.json(trashed));
 	}),
 
