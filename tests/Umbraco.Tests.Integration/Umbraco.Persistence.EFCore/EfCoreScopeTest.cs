@@ -1,4 +1,5 @@
-﻿using NUnit.Framework;
+﻿using Microsoft.EntityFrameworkCore;
+using NUnit.Framework;
 using Umbraco.Cms.Persistence.EFCore.Scoping;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
@@ -46,7 +47,6 @@ public class EfCoreScopeTest : UmbracoIntegrationTest
     [Test]
     public void NestedCreateScope()
     {
-
         Assert.IsNull(EfCoreScopeAccessor.AmbientScope);
         using (IEfCoreScope scope = EfCoreScopeProvider.CreateScope())
         {
@@ -63,6 +63,52 @@ public class EfCoreScopeTest : UmbracoIntegrationTest
         }
 
         Assert.IsNull(EfCoreScopeAccessor.AmbientScope);
+    }
+
+    [Test]
+    public async Task NestedCreateScopeInnerException()
+    {
+        bool scopeCompleted = false;
+
+        Assert.IsNull(EfCoreScopeAccessor.AmbientScope);
+        try
+        {
+            using (IEfCoreScope scope = EfCoreScopeProvider.CreateScope())
+            {
+                // scopeProvider.Context.Enlist("test", completed => scopeCompleted = completed);
+                scopeCompleted = await scope.ExecuteWithContextAsync(async db =>
+                {
+                    Assert.IsInstanceOf<EfCoreScope>(scope);
+                    Assert.IsNotNull(EfCoreScopeAccessor.AmbientScope);
+                    Assert.AreSame(scope, EfCoreScopeAccessor.AmbientScope);
+                    using (IEfCoreScope nested = EfCoreScopeProvider.CreateScope())
+                    {
+                        Assert.IsInstanceOf<EfCoreScope>(nested);
+                        Assert.IsNotNull(EfCoreScopeAccessor.AmbientScope);
+                        Assert.AreSame(nested, EfCoreScopeAccessor.AmbientScope);
+                        Assert.AreSame(scope, ((EfCoreScope)nested).ParentScope);
+                        nested.Complete();
+                        throw new Exception("bang!");
+                    }
+
+                    return true;
+                });
+
+                scope.Complete();
+            }
+
+            Assert.Fail("Expected exception.");
+        }
+        catch (Exception e)
+        {
+            if (e.Message != "bang!")
+            {
+                Assert.Fail("Wrong exception.");
+            }
+        }
+
+        Assert.IsNull(EfCoreScopeAccessor.AmbientScope);
+        Assert.IsFalse(scopeCompleted);
     }
 
     [Test]
@@ -164,8 +210,8 @@ public class EfCoreScopeTest : UmbracoIntegrationTest
         // This will throw because at this stage a child scope has been created which means
         // it is the Ambient (top) scope but here we're trying to dispose the non top scope.
         Assert.Throws<InvalidOperationException>(() => mainScope.Dispose());
-        t.Wait();        // wait for the child to dispose
-        mainScope.Dispose();    // now it's ok
+        t.Wait(); // wait for the child to dispose
+        mainScope.Dispose(); // now it's ok
         Console.WriteLine("Parent Task disposed: " + EfCoreScopeAccessor.AmbientScope?.InstanceId);
     }
 
@@ -197,4 +243,118 @@ public class EfCoreScopeTest : UmbracoIntegrationTest
         Assert.Pass();
     }
 
+    [Test]
+    public async Task Transaction()
+    {
+        using (IEfCoreScope scope = EfCoreScopeProvider.CreateScope())
+        {
+            await scope.ExecuteWithContextAsync(async db =>
+            {
+                await db.Database.ExecuteSqlAsync($"CREATE TABLE tmp3 (id INT, name NVARCHAR(64))");
+                return Task.CompletedTask;
+            });
+            scope.Complete();
+        }
+
+        using (IEfCoreScope scope = EfCoreScopeProvider.CreateScope())
+        {
+            await scope.ExecuteWithContextAsync(async db =>
+            {
+                await db.Database.ExecuteSqlAsync($"INSERT INTO tmp3 (id, name) VALUES (1, 'a')");
+
+                string? result = await db.Database.ExecuteScalarAsync<string>("SELECT name FROM tmp3 WHERE id=1");
+                Assert.AreEqual("a", result);
+                return Task.CompletedTask;
+            });
+        }
+
+        using (IEfCoreScope scope = EfCoreScopeProvider.CreateScope())
+        {
+            await scope.ExecuteWithContextAsync(async db =>
+            {
+                string n = await db.Database.ExecuteScalarAsync<string>("SELECT name FROM tmp3 WHERE id=1");
+                Assert.IsNull(n);
+                return Task.CompletedTask;
+            });
+        }
+
+        using (IEfCoreScope scope = EfCoreScopeProvider.CreateScope())
+        {
+            await scope.ExecuteWithContextAsync(async db =>
+            {
+                await db.Database.ExecuteSqlAsync($"INSERT INTO tmp3 (id, name) VALUES (1, 'a')");
+                return Task.CompletedTask;
+            });
+
+            scope.Complete();
+        }
+
+        using (IEfCoreScope scope = EfCoreScopeProvider.CreateScope())
+        {
+            await scope.ExecuteWithContextAsync(async db =>
+            {
+                string n = await db.Database.ExecuteScalarAsync<string>("SELECT name FROM tmp3 WHERE id=1");
+                Assert.AreEqual("a", n);
+
+                return Task.CompletedTask;
+            });
+
+            scope.Complete();
+        }
+    }
+
+    [Test]
+    public async Task NestedTransactionInnerFail()
+    {
+        using (IEfCoreScope scope = EfCoreScopeProvider.CreateScope())
+        {
+            await scope.ExecuteWithContextAsync(async db =>
+            {
+                await db.Database.ExecuteSqlAsync($"CREATE TABLE tmp1 (id INT, name NVARCHAR(64))");
+                return Task.CompletedTask;
+            });
+
+            scope.Complete();
+        }
+
+        using (IEfCoreScope scope = EfCoreScopeProvider.CreateScope())
+        {
+            string n;
+            await scope.ExecuteWithContextAsync(async db =>
+            {
+                await db.Database.ExecuteSqlAsync($"INSERT INTO tmp1 (id, name) VALUES (1, 'a')");
+                n = await db.Database.ExecuteScalarAsync<string>("SELECT name FROM tmp1 WHERE id=1");
+                Assert.AreEqual("a", n);
+
+                using (IEfCoreScope nested = EfCoreScopeProvider.CreateScope())
+                {
+                    await nested.ExecuteWithContextAsync(async nestedDatabase =>
+                    {
+                        await nestedDatabase.Database.ExecuteSqlAsync($"INSERT INTO tmp1 (id, name) VALUES (2, 'b')");
+                        string nn = await nestedDatabase.Database.ExecuteScalarAsync<string>("SELECT name FROM tmp1 WHERE id=2");
+                        Assert.AreEqual("b", nn);
+                        return Task.CompletedTask;
+                    });
+                }
+
+                n = await db.Database.ExecuteScalarAsync<string>("SELECT name FROM tmp1 WHERE id=2");
+                Assert.AreEqual("b", n);
+                return Task.CompletedTask;
+            });
+
+            scope.Complete();
+        }
+
+        using (IEfCoreScope scope = EfCoreScopeProvider.CreateScope())
+        {
+            await scope.ExecuteWithContextAsync(async database =>
+            {
+                string n = await database.Database.ExecuteScalarAsync<string>("SELECT name FROM tmp1 WHERE id=1");
+                Assert.IsNull(n);
+                n = await database.Database.ExecuteScalarAsync<string>("SELECT name FROM tmp1 WHERE id=2");
+                Assert.IsNull(n);
+                return Task.CompletedTask;
+            });
+        }
+    }
 }
