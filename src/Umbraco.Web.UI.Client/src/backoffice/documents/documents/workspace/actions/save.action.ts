@@ -1,10 +1,14 @@
-import { UmbDocumentRepository } from '../../repository/document.repository';
 import { UmbWorkspaceAction } from '../../../../shared/components/workspace/workspace-action';
+import { UmbDocumentRepository } from '../../repository/document.repository';
+import { UmbDocumentWorkspaceContext } from '../document-workspace.context';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 
-export class UmbSaveDocumentWorkspaceAction extends UmbWorkspaceAction<UmbDocumentRepository> {
-	constructor(host: UmbControllerHostInterface, repositoryAlias: string, unique: string) {
-		super(host, repositoryAlias, unique);
+export class UmbSaveDocumentWorkspaceAction extends UmbWorkspaceAction<
+	UmbDocumentRepository,
+	UmbDocumentWorkspaceContext
+> {
+	constructor(host: UmbControllerHostInterface, repositoryAlias: string) {
+		super(host, repositoryAlias);
 	}
 
 	async execute() {
