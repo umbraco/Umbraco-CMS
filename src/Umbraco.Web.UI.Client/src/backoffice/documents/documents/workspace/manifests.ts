@@ -1,14 +1,14 @@
 import { DOCUMENT_REPOSITORY_ALIAS } from '../repository/manifests';
+import { UmbSaveWorkspaceAction } from '../../../shared/workspace-actions/save.action';
+import { UmbDocumentSaveAndPublishWorkspaceAction } from './actions/save-and-publish.action';
+import { UmbDocumentSaveAndPreviewWorkspaceAction } from './actions/save-and-preview.action';
+import { UmbSaveAndScheduleDocumentWorkspaceAction } from './actions/save-and-schedule.action';
 import type {
 	ManifestWorkspace,
 	ManifestWorkspaceAction,
 	ManifestWorkspaceView,
 	ManifestWorkspaceViewCollection,
 } from '@umbraco-cms/models';
-import { UmbDocumentSaveAndPublishWorkspaceAction } from './actions/save-and-publish.action';
-import { UmbSaveDocumentWorkspaceAction } from './actions/save.action';
-import { UmbDocumentSaveAndPreviewWorkspaceAction } from './actions/save-and-preview.action';
-import { UmbSaveAndScheduleDocumentWorkspaceAction } from './actions/save-and-schedule.action';
 
 const workspace: ManifestWorkspace = {
 	type: 'workspace',
@@ -93,7 +93,7 @@ const workspaceActions: Array<ManifestWorkspaceAction> = [
 			label: 'Save',
 			look: 'secondary',
 			repositoryAlias: DOCUMENT_REPOSITORY_ALIAS,
-			api: UmbSaveDocumentWorkspaceAction,
+			api: UmbSaveWorkspaceAction,
 		},
 	},
 	{

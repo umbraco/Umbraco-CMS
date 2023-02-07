@@ -1,9 +1,9 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html } from 'lit';
-import { customElement, property, state } from 'lit/decorators.js';
+import { customElement, state } from 'lit/decorators.js';
+import { UUIInputElement, UUITextareaElement } from '@umbraco-ui/uui';
 import { UmbTemplateWorkspaceContext } from './template-workspace.context';
 import { UmbLitElement } from '@umbraco-cms/element';
-import { UUIInputElement, UUITextareaElement } from '@umbraco-ui/uui';
 
 @customElement('umb-template-workspace')
 export class UmbTemplateWorkspaceElement extends UmbLitElement {
@@ -65,16 +65,11 @@ export class UmbTemplateWorkspaceElement extends UmbLitElement {
 		this.#templateWorkspaceContext.setContent(value);
 	}
 
-	#onSave() {
-		this.#templateWorkspaceContext.save(this.#isNew);
-	}
-
 	render() {
 		// TODO: add correct UI elements
-		return html`<umb-workspace-layout>
+		return html`<umb-workspace-layout alias="Umb.Workspace.Template">
 			<uui-input .value=${this._name} @input=${this.#onNameInput}></uui-input>
 			<uui-textarea id="content" .value=${this._content} @input="${this.#onTextareaInput}"></uui-textarea>
-			<uui-button label="Save" look="primary" color="positive" @click=${this.#onSave}></uui-button>
 		</umb-workspace-layout>`;
 	}
 }
