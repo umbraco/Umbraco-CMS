@@ -54,7 +54,7 @@ export class UmbInstalledPackagesSectionViewElement extends UmbLitElement {
 	}
 
 	render() {
-		return html`<router-slot .routes=${this._routes}></router-slot>`;
+		return html`<umb-router-slot .routes=${this._routes}></umb-router-slot>`;
 	}
 }
 

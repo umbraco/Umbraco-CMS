@@ -80,4 +80,19 @@ export class UmbExtensionRegistry {
 			)
 		) as Observable<Array<ExtensionType>>;
 	}
+
+	extensionsSortedByTypeAndWeight<ExtensionType = ManifestBase>(): Observable<Array<ExtensionType>> {
+		return this.extensions.pipe(
+			map((exts) => exts
+				.sort((a, b) => {
+					// If type is the same, sort by weight
+					if (a.type === b.type) {
+						return (a.weight || 0) - (b.weight || 0);
+					}
+
+					// Otherwise sort by type
+					return a.type.localeCompare(b.type);
+				}))
+		) as Observable<Array<ExtensionType>>;
+	}
 }
