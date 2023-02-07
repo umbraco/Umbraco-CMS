@@ -44,7 +44,9 @@ export class UmbPropertyEditorUIMediaPickerElement extends UmbLitElement {
 				@change=${this._onChange}
 				.selectedKeys=${this._value}
 				.min=${this._limitMin}
-				.max=${this._limitMax}></umb-input-media-picker>
+				.max=${this._limitMax}
+				>Add</umb-input-media-picker
+			>
 		`;
 	}
 }

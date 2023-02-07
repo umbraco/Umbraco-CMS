@@ -197,6 +197,7 @@ export class UmbInputMediaPickerElement extends FormControlMixin(UmbLitElement) 
 				</uui-action-bar>
 			</uui-card-media>
 		`;
+		//TODO: <uui-button-inline-create vertical></uui-button-inline-create>
 	}
 }
 
