@@ -21,19 +21,26 @@ internal class EfCoreScope : IEfCoreScope
         _efCoreScopeAccessor = efCoreScopeAccessor;
         _efCoreScopeProvider = efCoreScopeProvider;
         _umbracoEfCoreDatabase = _efCoreDatabaseFactory.Create();
-        _umbracoEfCoreDatabase.UmbracoEFContext.Database.BeginTransaction();
+
+        // Check if we are already in a transaction before starting one
+        if (_umbracoEfCoreDatabase.UmbracoEFContext.Database.CurrentTransaction is null)
+        {
+            _umbracoEfCoreDatabase.UmbracoEFContext.Database.BeginTransaction();
+        }
+
         InstanceId = Guid.NewGuid();
     }
 
-    public EfCoreScope(IUmbracoEfCoreDatabaseFactory efCoreDatabaseFactory, IEFCoreScopeAccessor efCoreScopeAccessor, IEfCoreScopeProvider efCoreScopeProvider, IEfCoreScope parentScope)
-    {
-        _efCoreDatabaseFactory = efCoreDatabaseFactory;
-        _efCoreScopeAccessor = efCoreScopeAccessor;
-        _efCoreScopeProvider = efCoreScopeProvider;
-        _umbracoEfCoreDatabase = _efCoreDatabaseFactory.Create();
+    public EfCoreScope(
+        IUmbracoEfCoreDatabaseFactory efCoreDatabaseFactory,
+        IEFCoreScopeAccessor efCoreScopeAccessor,
+        IEfCoreScopeProvider efCoreScopeProvider,
+        IEfCoreScope parentScope)
+        : this(
+        efCoreDatabaseFactory,
+        efCoreScopeAccessor,
+        efCoreScopeProvider) =>
         ParentScope = parentScope;
-        InstanceId = Guid.NewGuid();
-    }
 
     public async Task<T> ExecuteWithContextAsync<T>(Func<UmbracoEFContext, Task<T>> method) => await method(_umbracoEfCoreDatabase.UmbracoEFContext);
 
