@@ -7,7 +7,7 @@ internal class EfCoreScope : IEfCoreScope
     private readonly IUmbracoEfCoreDatabaseFactory _efCoreDatabaseFactory;
     private readonly IEFCoreScopeAccessor _efCoreScopeAccessor;
     private readonly IEfCoreScopeProvider _efCoreScopeProvider;
-    private readonly IUmbracoEfCoreDatabase _umbracoEfCoreDatabase;
+    private IUmbracoEfCoreDatabase? _umbracoEfCoreDatabase;
     private bool? _completed;
 
     public Guid InstanceId { get; }
@@ -23,13 +23,6 @@ internal class EfCoreScope : IEfCoreScope
         _efCoreDatabaseFactory = efCoreDatabaseFactory;
         _efCoreScopeAccessor = efCoreScopeAccessor;
         _efCoreScopeProvider = efCoreScopeProvider;
-        _umbracoEfCoreDatabase = _efCoreDatabaseFactory.Create();
-
-        // Check if we are already in a transaction before starting one
-        if (_umbracoEfCoreDatabase.UmbracoEFContext.Database.CurrentTransaction is null)
-        {
-            _umbracoEfCoreDatabase.UmbracoEFContext.Database.BeginTransaction();
-        }
 
         InstanceId = Guid.NewGuid();
     }
@@ -45,8 +38,15 @@ internal class EfCoreScope : IEfCoreScope
             efCoreScopeProvider) =>
         ParentScope = parentScope;
 
-    public async Task<T> ExecuteWithContextAsync<T>(Func<UmbracoEFContext, Task<T>> method) =>
-        await method(_umbracoEfCoreDatabase.UmbracoEFContext);
+    public async Task<T> ExecuteWithContextAsync<T>(Func<UmbracoEFContext, Task<T>> method)
+    {
+        if (_umbracoEfCoreDatabase is null)
+        {
+            InitializeDatabase();
+        }
+
+        return await method(_umbracoEfCoreDatabase!.UmbracoEFContext);
+    }
 
     public async Task ExecuteWithContextAsync<T>(Func<UmbracoEFContext, Task> method) =>
         await ExecuteWithContextAsync(async db =>
@@ -93,10 +93,21 @@ internal class EfCoreScope : IEfCoreScope
         }
     }
 
+    private void InitializeDatabase()
+    {
+        _umbracoEfCoreDatabase = _efCoreDatabaseFactory.Create();
+
+        // Check if we are already in a transaction before starting one
+        if (_umbracoEfCoreDatabase.UmbracoEFContext.Database.CurrentTransaction is null)
+        {
+            _umbracoEfCoreDatabase.UmbracoEFContext.Database.BeginTransaction();
+        }
+    }
+
     private void DisposeEfCoreDatabase()
     {
         var completed = _completed.HasValue && _completed.Value;
-        try
+        if (_umbracoEfCoreDatabase is not null)
         {
             if (completed)
             {
@@ -106,11 +117,6 @@ internal class EfCoreScope : IEfCoreScope
             {
                 _umbracoEfCoreDatabase.UmbracoEFContext.Database.RollbackTransaction();
             }
-        }
-        finally
-        {
-            _efCoreDatabaseFactory.Dispose();
-            _umbracoEfCoreDatabase.Dispose();
         }
     }
 }

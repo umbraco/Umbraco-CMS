@@ -128,6 +128,26 @@ public class EfCoreScopeTest : UmbracoIntegrationTest
     }
 
     [Test]
+    public async Task CanAccessDbContextTwice()
+    {
+        using var scope = EfCoreScopeProvider.CreateScope();
+        await scope.ExecuteWithContextAsync<Task>(async database =>
+        {
+            Assert.IsTrue(await database.Database.CanConnectAsync());
+            Assert.IsNotNull(database.Database.CurrentTransaction); // in a transaction
+        });
+        scope.Complete();
+
+        using var scopeTwo = EfCoreScopeProvider.CreateScope();
+        await scopeTwo.ExecuteWithContextAsync<Task>(async database =>
+        {
+            Assert.IsTrue(await database.Database.CanConnectAsync());
+            Assert.IsNotNull(database.Database.CurrentTransaction); // in a transaction
+        });
+        scope.Complete();
+    }
+
+    [Test]
     public async Task CanAccessNestedDbContext()
     {
         using var scope = EfCoreScopeProvider.CreateScope();
