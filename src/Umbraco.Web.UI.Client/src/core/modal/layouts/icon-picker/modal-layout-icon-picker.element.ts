@@ -122,9 +122,6 @@ export class UmbModalLayoutIconPickerElement extends UmbModalLayoutElement<UmbMo
 	@state()
 	private _currentIcon?: string;
 
-	@state()
-	private _isLight = false;
-
 	private _changeIcon(e: { target: HTMLInputElement; type: any; key: unknown }) {
 		if (e.type == 'click' || (e.type == 'keyup' && e.key == 'Enter')) {
 			this._currentIcon = e.target.id;
@@ -149,7 +146,6 @@ export class UmbModalLayoutIconPickerElement extends UmbModalLayoutElement<UmbMo
 
 	private _onColorChange(e: UUIColorSwatchesEvent) {
 		this._currentColor = e.target.value;
-		this._isLight = e.target.isLight;
 	}
 
 	connectedCallback(): void {
