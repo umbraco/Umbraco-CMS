@@ -3,7 +3,6 @@ import { css, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import '../collection.element';
 import { ifDefined } from 'lit-html/directives/if-defined.js';
-import { UmbMediaTreeStore } from '../../../media/media/media.tree.store';
 import { UmbCollectionContext, UMB_COLLECTION_CONTEXT_TOKEN } from '../../../shared/collection/collection.context';
 import type { ManifestDashboardCollection } from '@umbraco-cms/models';
 import type { FolderTreeItem } from '@umbraco-cms/backend-api';
@@ -25,7 +24,7 @@ export class UmbDashboardCollectionElement extends UmbLitElement {
 	];
 
 	// TODO: Use the right type here:
-	private _collectionContext?: UmbCollectionContext<FolderTreeItem, UmbMediaTreeStore>;
+	private _collectionContext?: UmbCollectionContext<FolderTreeItem, any>;
 
 	public manifest!: ManifestDashboardCollection;
 
@@ -37,14 +36,15 @@ export class UmbDashboardCollectionElement extends UmbLitElement {
 
 		if (!this._collectionContext) {
 			const manifestMeta = this.manifest.meta;
-			this._entityType = manifestMeta.entityType as string;
-			this._collectionContext = new UmbCollectionContext(this, null, null, manifestMeta.storeAlias);
+			const repositoryAlias = manifestMeta.repositoryAlias;
+			this._entityType = manifestMeta.entityType;
+			this._collectionContext = new UmbCollectionContext(this, this._entityType, null, '', repositoryAlias);
 			this.provideContext(UMB_COLLECTION_CONTEXT_TOKEN, this._collectionContext);
 		}
 	}
 
 	render() {
-		return html`<umb-collection entityType=${ifDefined(this._entityType)}></umb-collection>`;
+		return html`<umb-collection entity-type=${ifDefined(this._entityType)}></umb-collection>`;
 	}
 }
 
