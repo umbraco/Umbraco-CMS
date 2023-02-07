@@ -2,23 +2,16 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Management.Factories;
 using Umbraco.Cms.Api.Management.ViewModels.HealthCheck;
-using Umbraco.Cms.Core.HealthChecks;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Controllers.HealthCheck.Group;
 
 public class CheckHealthCheckGroupController : HealthCheckGroupControllerBase
 {
-    private readonly HealthCheckCollection _healthChecks;
     private readonly IHealthCheckGroupViewModelFactory _healthCheckGroupViewModelFactory;
 
-    public CheckHealthCheckGroupController(
-        HealthCheckCollection healthChecks,
-        IHealthCheckGroupViewModelFactory healthCheckGroupViewModelFactory)
-    {
-        _healthChecks = healthChecks;
-        _healthCheckGroupViewModelFactory = healthCheckGroupViewModelFactory;
-    }
+    public CheckHealthCheckGroupController(IHealthCheckGroupViewModelFactory healthCheckGroupViewModelFactory)
+        => _healthCheckGroupViewModelFactory = healthCheckGroupViewModelFactory;
 
     /// <summary>
     ///     Check all health checks in the group with a given group name.
@@ -33,7 +26,7 @@ public class CheckHealthCheckGroupController : HealthCheckGroupControllerBase
     public async Task<ActionResult<HealthCheckGroupWithResultViewModel>> ByNameWithResult(string name)
     {
         IEnumerable<IGrouping<string?, Core.HealthChecks.HealthCheck>> groups = _healthCheckGroupViewModelFactory
-            .CreateGroupingFromHealthCheckCollection(_healthChecks);
+            .CreateGroupingFromHealthCheckCollection();
 
         IGrouping<string?, Core.HealthChecks.HealthCheck>? group = groups.FirstOrDefault(x => x.Key.InvariantEquals(name.Trim()));
 

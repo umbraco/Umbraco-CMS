@@ -3,24 +3,20 @@ using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Common.ViewModels.Pagination;
 using Umbraco.Cms.Api.Management.Factories;
 using Umbraco.Cms.Api.Management.ViewModels.HealthCheck;
-using Umbraco.Cms.Core.HealthChecks;
 using Umbraco.Cms.Core.Mapping;
 
 namespace Umbraco.Cms.Api.Management.Controllers.HealthCheck.Group;
 
 public class AllHealthCheckGroupController : HealthCheckGroupControllerBase
 {
-    private readonly HealthCheckCollection _healthChecks;
-    private readonly IHealthCheckGroupViewModelFactory _healthCheckGroupWithResultViewModelFactory;
+    private readonly IHealthCheckGroupViewModelFactory _healthCheckGroupViewModelFactory;
     private readonly IUmbracoMapper _umbracoMapper;
 
     public AllHealthCheckGroupController(
-        HealthCheckCollection healthChecks,
-        IHealthCheckGroupViewModelFactory healthCheckGroupWithResultViewModelFactory,
+        IHealthCheckGroupViewModelFactory healthCheckGroupViewModelFactory,
         IUmbracoMapper umbracoMapper)
     {
-        _healthChecks = healthChecks;
-        _healthCheckGroupWithResultViewModelFactory = healthCheckGroupWithResultViewModelFactory;
+        _healthCheckGroupViewModelFactory = healthCheckGroupViewModelFactory;
         _umbracoMapper = umbracoMapper;
     }
 
@@ -35,8 +31,8 @@ public class AllHealthCheckGroupController : HealthCheckGroupControllerBase
     [ProducesResponseType(typeof(PagedViewModel<HealthCheckGroupModelBase>), StatusCodes.Status200OK)]
     public async Task<ActionResult<PagedViewModel<HealthCheckGroupModelBase>>> All(int skip = 0, int take = 100)
     {
-        IEnumerable<IGrouping<string?, Core.HealthChecks.HealthCheck>> groups = _healthCheckGroupWithResultViewModelFactory
-            .CreateGroupingFromHealthCheckCollection(_healthChecks)
+        IEnumerable<IGrouping<string?, Core.HealthChecks.HealthCheck>> groups = _healthCheckGroupViewModelFactory
+            .CreateGroupingFromHealthCheckCollection()
             .Skip(skip)
             .Take(take);
 

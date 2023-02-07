@@ -5,7 +5,7 @@ namespace Umbraco.Cms.Api.Management.Factories;
 
 public interface IHealthCheckGroupViewModelFactory
 {
-    IEnumerable<IGrouping<string?, HealthCheck>> CreateGroupingFromHealthCheckCollection(HealthCheckCollection healthChecks);
+    IEnumerable<IGrouping<string?, HealthCheck>> CreateGroupingFromHealthCheckCollection();
 
     HealthCheckGroupWithResultViewModel CreateHealthCheckGroupWithResultViewModel(IGrouping<string?, HealthCheck> healthCheckGroup);
 

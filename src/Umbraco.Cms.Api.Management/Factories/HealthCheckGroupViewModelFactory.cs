@@ -10,26 +10,29 @@ namespace Umbraco.Cms.Api.Management.Factories;
 public class HealthCheckGroupViewModelFactory : IHealthCheckGroupViewModelFactory
 {
     private readonly HealthChecksSettings _healthChecksSettings;
+    private readonly HealthCheckCollection _healthChecks;
     private readonly ILogger<IHealthCheckGroupViewModelFactory> _logger;
     private readonly IUmbracoMapper _umbracoMapper;
 
     public HealthCheckGroupViewModelFactory(
         IOptions<HealthChecksSettings> healthChecksSettings,
+        HealthCheckCollection healthChecks,
         ILogger<IHealthCheckGroupViewModelFactory> logger,
         IUmbracoMapper umbracoMapper)
     {
         _healthChecksSettings = healthChecksSettings.Value;
+        _healthChecks = healthChecks;
         _logger = logger;
         _umbracoMapper = umbracoMapper;
     }
 
-    public IEnumerable<IGrouping<string?, HealthCheck>> CreateGroupingFromHealthCheckCollection(HealthCheckCollection healthChecks)
+    public IEnumerable<IGrouping<string?, HealthCheck>> CreateGroupingFromHealthCheckCollection()
     {
         IList<Guid> disabledCheckIds = _healthChecksSettings.DisabledChecks
             .Select(x => x.Id)
             .ToList();
 
-        IEnumerable<IGrouping<string?, HealthCheck>> groups = healthChecks
+        IEnumerable<IGrouping<string?, HealthCheck>> groups = _healthChecks
             .Where(x => disabledCheckIds.Contains(x.Id) == false)
             .GroupBy(x => x.Group)
             .OrderBy(x => x.Key);
