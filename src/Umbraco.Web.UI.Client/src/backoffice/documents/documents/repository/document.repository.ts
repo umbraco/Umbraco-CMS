@@ -166,14 +166,14 @@ export class UmbDocumentRepository implements UmbTreeRepository, UmbDetailReposi
 		return { error };
 	}
 
-	async saveDetail(template: ItemDetailType) {
+	async saveDetail(document: ItemDetailType) {
 		await this.#init;
 
-		if (!template || !template.key) {
+		if (!document || !document.key) {
 			throw new Error('Template is missing');
 		}
 
-		const { error } = await this.#detailDataSource.update(template);
+		const { error } = await this.#detailDataSource.update(document);
 
 		if (!error) {
 			const notification = { data: { message: `Document saved` } };
@@ -183,8 +183,9 @@ export class UmbDocumentRepository implements UmbTreeRepository, UmbDetailReposi
 		// TODO: we currently don't use the detail store for anything.
 		// Consider to look up the data before fetching from the server
 		// Consider notify a workspace if a template is updated in the store while someone is editing it.
-		this.#detailStore?.append(template);
-		this.#treeStore?.updateItem(template.key, { name: template.name });
+		this.#detailStore?.append(document);
+		this.#treeStore?.updateItem(document.key, { name: document.name });
+
 		// TODO: would be nice to align the stores on methods/methodNames.
 
 		return { error };
