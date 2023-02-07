@@ -11,6 +11,6 @@ export interface MetaWorkspaceAction {
 	label?: string; //TODO: Use or implement additional label-key
 	look?: InterfaceLook;
 	color?: InterfaceColor;
-	repositoryAlias: string;
-	api: any; //TODO: Implement UmbEntityAction
+	repositoryAlias?: string; // TODO: make mandatory when repositories are fully implemented
+	api?: any; //TODO: Implement UmbEntityAction
 }
