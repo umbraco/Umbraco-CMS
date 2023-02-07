@@ -9,5 +9,6 @@ export * from './is-manifest-js-type.function';
 export * from './is-manifest-loader-type.function';
 export * from './load-extension.function';
 export * from './create-extension-element-or-fallback.function';
+export * from './create-extension-class.function';
 
 export const umbExtensionsRegistry = new UmbExtensionRegistry();
