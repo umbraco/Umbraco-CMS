@@ -3,6 +3,7 @@ import { manifests as sidebarMenuItemManifests } from './sidebar-menu-item/manif
 import { manifests as treeManifests } from './tree/manifests';
 import { manifests as workspaceManifests } from './workspace/manifests';
 import { manifests as entityActionsManifests } from './entity-actions/manifests';
+import { manifests as entityBulkActionsManifests } from './entity-bulk-actions/manifests';
 
 export const manifests = [
 	...repositoryManifests,
@@ -10,4 +11,5 @@ export const manifests = [
 	...treeManifests,
 	...workspaceManifests,
 	...entityActionsManifests,
+	...entityBulkActionsManifests,
 ];
