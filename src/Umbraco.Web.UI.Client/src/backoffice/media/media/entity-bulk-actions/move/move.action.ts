@@ -1,5 +1,5 @@
 import type { UmbMediaRepository } from '../../repository/media.repository';
-import { UmbActionBase } from '../../../../shared/entity-actions';
+import { UmbActionBase } from '../../../../shared/action';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 import { UmbContextConsumerController } from '@umbraco-cms/context-api';
 import { UmbModalService, UMB_MODAL_SERVICE_CONTEXT_TOKEN } from '@umbraco-cms/modal';

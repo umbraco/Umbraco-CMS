@@ -1,5 +1,5 @@
 import { UmbDocumentRepository } from '../../repository/document.repository';
-import { UmbActionBase } from '../../../../shared/entity-actions';
+import { UmbActionBase } from '../../../../shared/action';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 
 export class UmbDocumentCopyEntityBulkAction extends UmbActionBase<UmbDocumentRepository> {

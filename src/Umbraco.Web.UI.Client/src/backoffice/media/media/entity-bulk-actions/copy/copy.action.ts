@@ -1,5 +1,5 @@
 import type { UmbMediaRepository } from '../../repository/media.repository';
-import { UmbActionBase } from '../../../../shared/entity-actions';
+import { UmbActionBase } from '../../../../shared/action';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 
 export class UmbMediaCopyEntityBulkAction extends UmbActionBase<UmbMediaRepository> {
@@ -16,6 +16,6 @@ export class UmbMediaCopyEntityBulkAction extends UmbActionBase<UmbMediaReposito
 
 	async execute() {
 		console.log(`execute copy for: ${this.#selection}`);
-		await this.repository?.copy();
+		await this.repository?.copy([], '');
 	}
 }
