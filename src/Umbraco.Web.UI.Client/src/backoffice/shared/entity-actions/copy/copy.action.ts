@@ -1,7 +1,7 @@
-import { UmbActionBase } from '../components/entity-action';
+import { UmbActionBase } from '..';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 
-export class UmbMoveEntityAction<T extends { move(): Promise<void> }> extends UmbActionBase<T> {
+export class UmbCopyEntityAction<T extends { copy(): Promise<void> }> extends UmbActionBase<T> {
 	#unique: string;
 
 	constructor(host: UmbControllerHostInterface, repositoryAlias: string, unique: string) {
@@ -11,6 +11,6 @@ export class UmbMoveEntityAction<T extends { move(): Promise<void> }> extends Um
 
 	async execute() {
 		console.log(`execute for: ${this.#unique}`);
-		await this.repository?.move();
+		await this.repository?.copy();
 	}
 }

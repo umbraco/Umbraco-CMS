@@ -1,5 +1,5 @@
 import { UmbDocumentRepository } from '../repository/document.repository';
-import { UmbActionBase } from '../../../shared/components/entity-action';
+import { UmbActionBase } from '../../../shared/entity-actions';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 
 export class UmbUnpublishDocumentEntityAction extends UmbActionBase<UmbDocumentRepository> {

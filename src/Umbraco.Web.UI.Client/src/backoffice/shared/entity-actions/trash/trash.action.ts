@@ -1,4 +1,4 @@
-import { UmbActionBase } from '../components/entity-action';
+import { UmbActionBase } from '..';
 import { UmbContextConsumerController } from '@umbraco-cms/context-api';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 import { UmbModalService, UMB_MODAL_SERVICE_CONTEXT_TOKEN } from '@umbraco-cms/modal';

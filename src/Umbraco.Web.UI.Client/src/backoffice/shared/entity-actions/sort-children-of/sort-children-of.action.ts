@@ -1,7 +1,7 @@
-import { UmbActionBase } from '../components/entity-action';
+import { UmbActionBase } from '..';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 
-export class UmbCopyEntityAction<T extends { copy(): Promise<void> }> extends UmbActionBase<T> {
+export class UmbSortChildrenOfEntityAction<T extends { sortChildrenOf(): Promise<void> }> extends UmbActionBase<T> {
 	#unique: string;
 
 	constructor(host: UmbControllerHostInterface, repositoryAlias: string, unique: string) {
@@ -11,6 +11,6 @@ export class UmbCopyEntityAction<T extends { copy(): Promise<void> }> extends Um
 
 	async execute() {
 		console.log(`execute for: ${this.#unique}`);
-		await this.repository?.copy();
+		await this.repository?.sortChildrenOf();
 	}
 }
