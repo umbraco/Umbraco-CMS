@@ -217,11 +217,21 @@ export class UmbMediaRepository implements UmbTreeRepository, UmbDetailRepositor
 		alert('trash');
 	}
 
-	async move() {
-		alert('move');
+	async move(keys: Array<string>, destination: string) {
+		// TODO: use backend cli when available.
+		const res = await fetch('/umbraco/management/api/v1/media/move', {
+			method: 'POST',
+			body: JSON.stringify({ keys, destination }),
+			headers: {
+				'Content-Type': 'application/json',
+			},
+		});
+		const data = await res.json();
+		this.#treeStore?.appendItems(data);
 	}
 
-	async copy() {
+	async copy(uniques: Array<string>, destination: string) {
+		console.log(`copy: ${uniques} to ${destination}`);
 		alert('copy');
 	}
 
