@@ -1,4 +1,3 @@
-using System.Data;
 using NPoco;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Infrastructure.Persistence.DatabaseAnnotations;
@@ -6,6 +5,7 @@ using Umbraco.Cms.Infrastructure.Persistence.DatabaseAnnotations;
 namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 
 [TableName(TableName)]
+[PrimaryKey("contentTypeId", AutoIncrement = false)]
 [ExplicitColumns]
 internal class ContentVersionCleanupPolicyDto
 {
