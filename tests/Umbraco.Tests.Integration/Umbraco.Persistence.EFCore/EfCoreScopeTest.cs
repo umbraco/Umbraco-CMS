@@ -2,7 +2,7 @@
 using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
-using Umbraco.Cms.Infrastructure.Scoping;
+using Umbraco.Cms.Persistence.EFCore;
 using Umbraco.Cms.Persistence.EFCore.Scoping;
 using Umbraco.Cms.Tests.Common;
 using Umbraco.Cms.Tests.Common.Testing;
@@ -503,5 +503,70 @@ public class EfCoreScopeTest : UmbracoIntegrationTest
         }
 
         Assert.IsNull(EfCoreScopeAccessor.AmbientScope);
+    }
+
+    [Test]
+    public void CallContextScope2()
+    {
+        var taskHelper = new TaskHelper(Mock.Of<ILogger<TaskHelper>>());
+        Assert.IsNull(EfCoreScopeAccessor.AmbientScope);
+
+        using (IEfCoreScope scope = EfCoreScopeProvider.CreateScope())
+        {
+            Assert.IsNotNull(EfCoreScopeAccessor.AmbientScope);
+
+            // Run on another thread without a flowed context
+            Task t = taskHelper.ExecuteBackgroundTask(() =>
+            {
+                Assert.IsNull(EfCoreScopeAccessor.AmbientScope);
+
+                using (IEfCoreScope newScope = EfCoreScopeProvider.CreateScope())
+                {
+                    Assert.IsNotNull(EfCoreScopeAccessor.AmbientScope);
+                    Assert.IsNull(EfCoreScopeAccessor.AmbientScope.ParentScope);
+                }
+
+                Assert.IsNull(EfCoreScopeAccessor.AmbientScope);
+                return Task.CompletedTask;
+            });
+
+            Task.WaitAll(t);
+
+            Assert.IsNotNull(EfCoreScopeAccessor.AmbientScope);
+            Assert.AreSame(scope, EfCoreScopeAccessor.AmbientScope);
+        }
+
+        Assert.IsNull(EfCoreScopeAccessor.AmbientScope);
+    }
+
+    [Test]
+    public void ScopeReference()
+    {
+        IEfCoreScope scope = EfCoreScopeProvider.CreateScope();
+        IEfCoreScope nested = EfCoreScopeProvider.CreateScope();
+
+        Assert.IsNotNull(EfCoreScopeAccessor.AmbientScope);
+
+        var scopeRef = new HttpEFCoreScopeReference(EfCoreScopeAccessor);
+        scopeRef.Register();
+        scopeRef.Dispose();
+
+        Assert.IsNull(EfCoreScopeAccessor.AmbientScope);
+
+        Assert.ThrowsAsync<InvalidOperationException>(async () =>
+        {
+            await scope.ExecuteWithContextAsync<Task>(async db =>
+            {
+                await db.Database.CanConnectAsync();
+            });
+        });
+
+        Assert.ThrowsAsync<InvalidOperationException>(async () =>
+        {
+            await nested.ExecuteWithContextAsync<Task>(async db =>
+            {
+                await db.Database.CanConnectAsync();
+            });
+        });
     }
 }

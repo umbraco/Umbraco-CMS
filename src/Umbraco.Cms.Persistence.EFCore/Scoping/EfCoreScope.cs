@@ -10,6 +10,7 @@ internal class EfCoreScope : IEfCoreScope
     private readonly IEfCoreScopeProvider _efCoreScopeProvider;
     private IUmbracoEfCoreDatabase? _umbracoEfCoreDatabase;
     private bool? _completed;
+    private bool _disposed;
 
     public Guid InstanceId { get; }
 
@@ -41,6 +42,11 @@ internal class EfCoreScope : IEfCoreScope
 
     public async Task<T> ExecuteWithContextAsync<T>(Func<UmbracoEFContext, Task<T>> method)
     {
+        if (_disposed)
+        {
+            throw new InvalidOperationException("The scope has been disposed, therefore the database is not available.");
+        }
+
         if (_umbracoEfCoreDatabase is null)
         {
             InitializeDatabase();
@@ -85,6 +91,7 @@ internal class EfCoreScope : IEfCoreScope
         }
 
         _efCoreScopeProvider.PopAmbientScope();
+        _disposed = true;
     }
 
     public void ChildCompleted(bool? completed)
