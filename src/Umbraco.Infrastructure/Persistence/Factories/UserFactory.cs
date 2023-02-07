@@ -110,12 +110,23 @@ internal static class UserFactory
         return dto;
     }
 
-    private static IReadOnlyUserGroup ToReadOnlyGroup(UserGroupDto group) =>
-        new ReadOnlyUserGroup(group.Id, group.Name, group.Icon,
-            group.StartContentId, group.StartMediaId, group.Alias, group.UserGroup2LanguageDtos.Select(x => x.LanguageId),
+    private static IReadOnlyUserGroup ToReadOnlyGroup(UserGroupDto group)
+    {
+        IEnumerable<string> permissions = group.DefaultPermissions is null
+            ? Enumerable.Empty<string>()
+            : group.DefaultPermissions.ToCharArray().Select(x => x.ToString());
+
+        return new ReadOnlyUserGroup(
+            group.Id,
+            group.Key,
+            group.Name,
+            group.Icon,
+            group.StartContentId,
+            group.StartMediaId,
+            group.Alias,
+            group.UserGroup2LanguageDtos.Select(x => x.LanguageId),
             group.UserGroup2AppDtos.Select(x => x.AppAlias).WhereNotNull().ToArray(),
-            group.DefaultPermissions == null
-                ? Enumerable.Empty<string>()
-                : group.DefaultPermissions.ToCharArray().Select(x => x.ToString()),
+            permissions,
             group.HasAccessToAllLanguages);
+    }
 }
