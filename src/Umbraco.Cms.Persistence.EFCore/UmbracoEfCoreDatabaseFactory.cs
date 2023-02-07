@@ -26,4 +26,10 @@ public class UmbracoEfCoreDatabaseFactory : IUmbracoEfCoreDatabaseFactory
         UmbracoEFContext umbracoEfContext = _scope.ServiceProvider.GetRequiredService<UmbracoEFContext>();
         return new UmbracoEfCoreDatabase(_databaseInfo, umbracoEfContext, _umbracoDbContextFactory);
     }
+
+    public void Dispose()
+    {
+        _scope?.Dispose();
+        _scope = null;
+    }
 }

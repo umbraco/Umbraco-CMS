@@ -1,4 +1,5 @@
 ﻿using Umbraco.Cms.Persistence.EFCore.Entities;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Persistence.EFCore.Scoping;
 
@@ -63,6 +64,8 @@ internal class EfCoreScope : IEfCoreScope
         }
     }
 
+    public void Reset() => _completed = null;
+
     public void Dispose()
     {
         if (this != _efCoreScopeAccessor.AmbientScope)
@@ -117,6 +120,11 @@ internal class EfCoreScope : IEfCoreScope
             {
                 _umbracoEfCoreDatabase.UmbracoEFContext.Database.RollbackTransaction();
             }
+
+            _umbracoEfCoreDatabase.Dispose();
         }
+
+        _efCoreDatabaseFactory.Dispose();
+
     }
 }
