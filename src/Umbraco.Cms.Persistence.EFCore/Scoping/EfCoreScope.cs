@@ -11,7 +11,7 @@ internal class EfCoreScope : IEfCoreScope
 
     public Guid InstanceId { get; }
 
-    public IEfCoreScope? ParentScope { get; }
+    public EfCoreScope? ParentScope { get; }
 
     public bool? _completed;
 
@@ -35,7 +35,7 @@ internal class EfCoreScope : IEfCoreScope
         IUmbracoEfCoreDatabaseFactory efCoreDatabaseFactory,
         IEFCoreScopeAccessor efCoreScopeAccessor,
         IEfCoreScopeProvider efCoreScopeProvider,
-        IEfCoreScope parentScope)
+        EfCoreScope parentScope)
         : this(
         efCoreDatabaseFactory,
         efCoreScopeAccessor,
@@ -44,7 +44,13 @@ internal class EfCoreScope : IEfCoreScope
 
     public async Task<T> ExecuteWithContextAsync<T>(Func<UmbracoEFContext, Task<T>> method) => await method(_umbracoEfCoreDatabase.UmbracoEFContext);
 
-    public void Complete() => _completed = true;
+    public void Complete()
+    {
+        if (_completed.HasValue == false)
+        {
+            _completed = true;
+        }
+    }
 
     public void Dispose()
     {
@@ -59,8 +65,21 @@ internal class EfCoreScope : IEfCoreScope
         {
             DisposeEfCoreDatabase();
         }
+        else
+        {
+            ParentScope.ChildCompleted(_completed);
+        }
 
         _efCoreScopeProvider.PopAmbientScope();
+    }
+
+    public void ChildCompleted(bool? completed)
+    {
+        // if child did not complete we cannot complete
+        if (completed.HasValue == false || completed.Value == false)
+        {
+            _completed = false;
+        }
     }
 
     private void DisposeEfCoreDatabase()

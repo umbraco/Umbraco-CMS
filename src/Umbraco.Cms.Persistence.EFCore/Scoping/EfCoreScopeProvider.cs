@@ -34,7 +34,7 @@ public class EfCoreScopeProvider : IEfCoreScopeProvider
             return ambientScope;
         }
 
-        var efCoreScope = new EfCoreScope(_umbracoEfCoreDatabaseFactory, _efCoreScopeAccessor, this, _ambientEfCoreScopeStack.AmbientScope);
+        var efCoreScope = new EfCoreScope(_umbracoEfCoreDatabaseFactory, _efCoreScopeAccessor, this, (EfCoreScope)_ambientEfCoreScopeStack.AmbientScope);
         _ambientEfCoreScopeStack.Push(efCoreScope);
         return efCoreScope;
     }
