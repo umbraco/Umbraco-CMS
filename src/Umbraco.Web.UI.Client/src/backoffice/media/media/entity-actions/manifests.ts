@@ -1,4 +1,4 @@
-import { TrashMediaEntityAction } from './trash-media.entity-action';
+import { UmbTrashEntityAction } from '../../../shared/entity-actions/trash/trash.action';
 import { ManifestEntityAction } from 'libs/extensions-registry/entity-action.models';
 
 const entityActions: Array<ManifestEntityAction> = [
@@ -10,7 +10,7 @@ const entityActions: Array<ManifestEntityAction> = [
 			entityType: 'media',
 			icon: 'umb:trash',
 			label: 'Trash',
-			api: TrashMediaEntityAction,
+			api: UmbTrashEntityAction,
 			repositoryAlias: 'Umb.Repository.Media',
 		},
 	},

@@ -33,7 +33,6 @@ export class UmbCollectionBulkActionDeleteElement extends UmbLitElement {
 	}
 
 	#handleClick(event: Event) {
-
 		// TODO: Revisit this subscription nightmare, can we make this simpler, avoid subscribing to the selection?
 
 		const selectionSubscription = this.#collectionContext?.selection.subscribe((selection) => {

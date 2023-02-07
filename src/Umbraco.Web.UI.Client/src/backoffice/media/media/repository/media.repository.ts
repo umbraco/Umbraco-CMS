@@ -213,6 +213,10 @@ export class UmbMediaRepository implements UmbTreeRepository, UmbDetailRepositor
 		return { error };
 	}
 
+	async trash() {
+		alert('trash');
+	}
+
 	async move() {
 		alert('move');
 	}
