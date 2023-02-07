@@ -2,13 +2,12 @@ import { defineElement } from '@umbraco-ui/uui-base/lib/registration';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html } from 'lit';
 import { state } from 'lit/decorators.js';
-import { IRoutingInfo } from 'router-slot';
 import { UmbSectionContext, UMB_SECTION_CONTEXT_TOKEN } from '../section/section.context';
-import { UmbSectionElement } from '../section/section.element';
 import { UmbBackofficeContext, UMB_BACKOFFICE_CONTEXT_TOKEN } from './backoffice.context';
-import { createExtensionElement } from '@umbraco-cms/extensions-api';
 import type { ManifestSection } from '@umbraco-cms/models';
 import { UmbLitElement } from '@umbraco-cms/element';
+import { createExtensionElementOrFallback } from '@umbraco-cms/extensions-api';
+import { UmbRouterSlotChangeEvent } from '@umbraco-cms/router';
 
 @defineElement('umb-backoffice-main')
 export class UmbBackofficeMain extends UmbLitElement {
@@ -45,15 +44,18 @@ export class UmbBackofficeMain extends UmbLitElement {
 			this._backofficeContext = _instance;
 			this._observeBackoffice();
 		});
-
 	}
 
 	private async _observeBackoffice() {
-		if(this._backofficeContext) {
-			this.observe(this._backofficeContext.getAllowedSections(), (sections) => {
-				this._sections = sections;
-				this._createRoutes();
-			}, 'observeAllowedSections');
+		if (this._backofficeContext) {
+			this.observe(
+				this._backofficeContext.getAllowedSections(),
+				(sections) => {
+					this._sections = sections;
+					this._createRoutes();
+				},
+				'observeAllowedSections'
+			);
 		}
 	}
 
@@ -64,8 +66,7 @@ export class UmbBackofficeMain extends UmbLitElement {
 		this._routes = this._sections.map((section) => {
 			return {
 				path: this._routePrefix + section.meta.pathname,
-				component: () => this._getSectionElement(section),
-				setup: this._onRouteSetup, // TODO: sometimes we can end up in a state where this callback doesn't get called. It could look like a bug in the router-slot.
+				component: () => createExtensionElementOrFallback(section, 'umb-section'),
 			};
 		});
 
@@ -75,17 +76,8 @@ export class UmbBackofficeMain extends UmbLitElement {
 		});
 	}
 
-	// TODO: Make this a common shared method on @umbraco-cms/extensions-api
-	private _getSectionElement(section: ManifestSection) {
-		if (!section.loader || !section.elementName || !section.js) {
-			return UmbSectionElement;
-		}
-
-		return createExtensionElement(section);
-	}
-
-	private _onRouteSetup = (_component: HTMLElement, info: IRoutingInfo) => {
-		const currentPath = info.match.route.path;
+	private _onRouteChange = (event: UmbRouterSlotChangeEvent) => {
+		const currentPath = event.target.localActiveViewPath || ''
 		const section = this._sections.find((s) => this._routePrefix + s.meta.pathname === currentPath);
 		if (!section) return;
 		this._backofficeContext?.setActiveSectionAlias(section.alias);
@@ -102,7 +94,11 @@ export class UmbBackofficeMain extends UmbLitElement {
 	}
 
 	render() {
-		return html`<router-slot .routes=${this._routes}></router-slot>`;
+		return html`
+			<umb-router-slot
+				.routes=${this._routes}
+				@change=${this._onRouteChange}
+			></umb-router-slot>`;
 	}
 }
 

@@ -44,7 +44,7 @@ export class UmbWorkspaceViewUsersOverviewElement extends UmbLitElement {
 				display: flex;
 				justify-content: space-between;
 				white-space: nowrap;
-				gap: 16px;
+				gap: var(--uui-size-space-5);
 				align-items: center;
 			}
 			#user-list {
@@ -61,7 +61,7 @@ export class UmbWorkspaceViewUsersOverviewElement extends UmbLitElement {
 
 			.filter-dropdown {
 				display: flex;
-				gap: 8px;
+				gap: var(--uui-size-space-3);
 				flex-direction: column;
 				background-color: var(--uui-color-surface);
 				padding: var(--uui-size-space-4);
@@ -220,7 +220,7 @@ export class UmbWorkspaceViewUsersOverviewElement extends UmbLitElement {
 				</div>
 			</div>
 
-			<router-slot .routes=${this._routes}></router-slot>
+			<umb-router-slot .routes=${this._routes}></umb-router-slot>
 
 			${this._renderSelection()}
 		`;

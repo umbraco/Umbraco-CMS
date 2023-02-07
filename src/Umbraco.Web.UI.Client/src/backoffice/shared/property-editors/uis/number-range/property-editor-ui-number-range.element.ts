@@ -22,10 +22,10 @@ export class UmbPropertyEditorUINumberRangeElement extends UmbLitElement {
 	public get value() {
 		return this._value;
 	}
-	public set value(value: ValueType) {
-		this._value = value;
-		this._minValue = value.min;
-		this._maxValue = value.max;
+	public set value(value: ValueType | undefined) {
+		this._value = value || { min: undefined, max: undefined };
+		this._minValue = value?.min;
+		this._maxValue = value?.max;
 	}
 
 	@property({ type: Array, attribute: false })

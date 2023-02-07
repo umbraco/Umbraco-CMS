@@ -30,7 +30,7 @@ export class UmbPickerLayoutSectionElement extends UmbModalLayoutPickerBase {
 				padding: var(--uui-size-4) var(--uui-size-2);
 				gap: var(--uui-size-space-5);
 				align-items: center;
-				border-radius: var(--uui-size-2);
+				border-radius: var(--uui-border-radius);
 				cursor: pointer;
 			}
 			.item.selected {
