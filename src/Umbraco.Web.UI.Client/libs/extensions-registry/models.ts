@@ -3,6 +3,7 @@ import type { ManifestCollectionView } from './collection-view.models';
 import type { ManifestDashboard } from './dashboard.models';
 import type { ManifestDashboardCollection } from './dashboard-collection.models';
 import type { ManifestEntityAction } from './entity-action.models';
+import type { ManifestEntityBulkAction } from './entity-bulk-action.models';
 import type { ManifestExternalLoginProvider } from './external-login-provider.models';
 import type { ManifestHeaderApp } from './header-app.models';
 import type { ManifestHealthCheck } from './health-check.models';
@@ -20,7 +21,7 @@ import type { ManifestWorkspace } from './workspace.models';
 import type { ManifestWorkspaceAction } from './workspace-action.models';
 import type { ManifestWorkspaceView } from './workspace-view.models';
 import type { ManifestWorkspaceViewCollection } from './workspace-view-collection.models';
-import { ManifestRepository } from './repository.models';
+import type { ManifestRepository } from './repository.models';
 import type { ClassConstructor } from '@umbraco-cms/models';
 
 export * from './collection-bulk-action.models';
@@ -28,6 +29,7 @@ export * from './collection-view.models';
 export * from './dashboard-collection.models';
 export * from './dashboard.models';
 export * from './entity-action.models';
+export * from './entity-bulk-action.models';
 export * from './external-login-provider.models';
 export * from './header-app.models';
 export * from './health-check.models';
@@ -44,6 +46,7 @@ export * from './user-dashboard.models';
 export * from './workspace-action.models';
 export * from './workspace-view-collection.models';
 export * from './workspace-view.models';
+export * from './repository.models';
 export * from './workspace.models';
 
 export type ManifestTypes =
@@ -53,6 +56,7 @@ export type ManifestTypes =
 	| ManifestDashboard
 	| ManifestDashboardCollection
 	| ManifestEntityAction
+	| ManifestEntityBulkAction
 	| ManifestEntrypoint
 	| ManifestExternalLoginProvider
 	| ManifestHeaderApp
