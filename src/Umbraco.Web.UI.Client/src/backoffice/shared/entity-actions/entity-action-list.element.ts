@@ -29,7 +29,6 @@ class UmbEntityActionListElement extends UmbLitElement {
 
 	// TODO: find a solution to use extension slot
 	#observeEntityActions() {
-		// TODO: filter on entity type
 		this.observe(
 			umbExtensionsRegistry.extensionsOfType('entityAction').pipe(
 				map((extensions) => {
