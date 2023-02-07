@@ -32,6 +32,7 @@ public static class UmbracoEFCoreServiceCollectionExtensions
         services.AddUnique<IAmbientEfCoreScopeStack, AmbientEfCoreScopeStack>();
         services.AddUnique<IEFCoreScopeAccessor, EFCoreScopeAccessor>();
         services.AddUnique<IEfCoreScopeProvider, EfCoreScopeProvider>();
+        services.AddUnique<IHttpEFCoreScopeReference, HttpEFCoreScopeReference>();
 
         return services;
     }
