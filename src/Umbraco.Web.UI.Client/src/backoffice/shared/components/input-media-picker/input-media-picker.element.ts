@@ -167,13 +167,14 @@ export class UmbInputMediaPickerElement extends FormControlMixin(UmbLitElement) 
 	}
 
 	render() {
-		return html`
-			${this._items?.map((item) => this._renderItem(item))}
-			<uui-button id="add-button" look="placeholder" @click=${this._openPicker} label="open">
-				<uui-icon name="umb:add"></uui-icon>
-				Add
-			</uui-button>
-		`;
+		return html` ${this._items?.map((item) => this._renderItem(item))} ${this._renderButton()} `;
+	}
+	private _renderButton() {
+		if (this.max == 1 && this._items && this._items.length > 0) return;
+		return html`<uui-button id="add-button" look="placeholder" @click=${this._openPicker} label="open">
+			<uui-icon name="umb:add"></uui-icon>
+			Add
+		</uui-button>`;
 	}
 
 	private _renderItem(item: FolderTreeItem) {
