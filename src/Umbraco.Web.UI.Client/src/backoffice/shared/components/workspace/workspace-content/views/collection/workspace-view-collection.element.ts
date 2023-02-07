@@ -45,12 +45,14 @@ export class UmbWorkspaceViewCollectionElement extends UmbLitElement {
 
 	protected _provideWorkspace() {
 		const entityKey = this._workspaceContext?.getEntityKey();
-		if (entityKey != null) {
+		const entityType = this._workspaceContext?.getEntityType();
 
+		if (entityKey != null && entityType != null) {
 			const manifestMeta = this.manifest.meta;
 
 			this._collectionContext = new UmbCollectionContext(
 				this,
+				entityType,
 				entityKey,
 				manifestMeta.storeAlias,
 				manifestMeta.repositoryAlias

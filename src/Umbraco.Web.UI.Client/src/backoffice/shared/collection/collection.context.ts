@@ -12,8 +12,8 @@ export class UmbCollectionContext<
 	DataType extends EntityTreeItem,
 	StoreType extends UmbTreeStore<DataType> = UmbTreeStore<DataType>
 > {
-
 	private _host: UmbControllerHostInterface;
+	private _entityType: string | null;
 	private _entityKey: string | null;
 
 	#repository?: UmbTreeRepository;
@@ -33,11 +33,18 @@ export class UmbCollectionContext<
 	public readonly search = this._search.asObservable();
 	*/
 
-	constructor(host: UmbControllerHostInterface, entityKey: string | null, storeAlias?: string, repositoryAlias?: string) {
+	constructor(
+		host: UmbControllerHostInterface,
+		entityType: string | null,
+		entityKey: string | null,
+		storeAlias?: string,
+		repositoryAlias?: string
+	) {
+		this._entityType = entityType;
 		this._host = host;
 		this._entityKey = entityKey;
 
-		if(storeAlias) {
+		if (storeAlias) {
 			new UmbContextConsumerController(this._host, storeAlias, (_instance: StoreType) => {
 				this._store = _instance;
 				if (!this._store) {
@@ -47,10 +54,11 @@ export class UmbCollectionContext<
 				this._onStoreSubscription();
 			});
 		} else if (repositoryAlias) {
-			new UmbObserverController(this._host,
+			new UmbObserverController(
+				this._host,
 				umbExtensionsRegistry.getByTypeAndAlias('repository', repositoryAlias),
 				async (repositoryManifest) => {
-					if(repositoryManifest) {
+					if (repositoryManifest) {
 						// TODO: use the right interface here, we might need a collection repository interface.
 						const result = await createExtensionClass<UmbTreeRepository>(repositoryManifest, [this._host]);
 						this.#repository = result;
@@ -58,7 +66,6 @@ export class UmbCollectionContext<
 					}
 				}
 			);
-
 		}
 	}
 
@@ -73,6 +80,10 @@ export class UmbCollectionContext<
 		this._data.next({ ...this.getData(), ...data });
 	}
 	*/
+
+	public getEntityType() {
+		return this._entityType;
+	}
 
 	protected _onStoreSubscription(): void {
 		if (!this._store) {
@@ -108,27 +119,20 @@ export class UmbCollectionContext<
 		this._dataObserver?.destroy();
 
 		if (this._entityKey) {
-
 			// TODO: we should be able to get an observable from this call. either return a observable or a asObservable() method.
 			const observable = (await this.#repository.requestTreeItemsOf(this._entityKey)).asObservable?.();
 
-			if(observable) {
-				this._dataObserver = new UmbObserverController(
-					this._host,
-					observable,
-					(nodes) => {
-						if (nodes) {
-							this.#data.next(nodes);
-						}
+			if (observable) {
+				this._dataObserver = new UmbObserverController(this._host, observable, (nodes) => {
+					if (nodes) {
+						this.#data.next(nodes);
 					}
-				);
+				});
 			}
-
 		} else {
-
 			const observable = (await this.#repository.requestRootTreeItems()).asObservable?.();
 
-			if(observable) {
+			if (observable) {
 				this._dataObserver = new UmbObserverController(this._host, observable, (nodes) => {
 					if (nodes) {
 						this.#data.next(nodes);

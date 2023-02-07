@@ -4,10 +4,7 @@ import { customElement, state } from 'lit/decorators.js';
 import '../collection.element';
 import { ifDefined } from 'lit-html/directives/if-defined.js';
 import { UmbMediaTreeStore } from '../../../media/media/media.tree.store';
-import {
-	UmbCollectionContext,
-	UMB_COLLECTION_CONTEXT_TOKEN,
-} from '../../../shared/collection/collection.context';
+import { UmbCollectionContext, UMB_COLLECTION_CONTEXT_TOKEN } from '../../../shared/collection/collection.context';
 import type { ManifestDashboardCollection } from '@umbraco-cms/models';
 import type { FolderTreeItem } from '@umbraco-cms/backend-api';
 import { UmbLitElement } from '@umbraco-cms/element';
@@ -41,7 +38,7 @@ export class UmbDashboardCollectionElement extends UmbLitElement {
 		if (!this._collectionContext) {
 			const manifestMeta = this.manifest.meta;
 			this._entityType = manifestMeta.entityType as string;
-			this._collectionContext = new UmbCollectionContext(this, null, manifestMeta.storeAlias);
+			this._collectionContext = new UmbCollectionContext(this, null, null, manifestMeta.storeAlias);
 			this.provideContext(UMB_COLLECTION_CONTEXT_TOKEN, this._collectionContext);
 		}
 	}
