@@ -1,4 +1,3 @@
-using System.Data;
 using NPoco;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Infrastructure.Persistence.DatabaseAnnotations;
@@ -13,7 +12,7 @@ internal class ContentVersionCleanupPolicyDto
     public const string TableName = Constants.DatabaseSchema.Tables.ContentVersionCleanupPolicy;
 
     [Column("contentTypeId")]
-    [PrimaryKeyColumn(AutoIncrement = false)]
+    [PrimaryKeyColumn(AutoIncrement = false, Name = "PK_umbracoContentVersionCleanupPolicy")]
     [ForeignKey(typeof(ContentTypeDto), Column = "nodeId")]
     public int ContentTypeId { get; set; }
 
