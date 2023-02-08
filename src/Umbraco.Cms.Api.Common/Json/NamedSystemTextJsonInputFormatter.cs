@@ -21,9 +21,10 @@ public class NamedSystemTextJsonInputFormatter : SystemTextJsonInputFormatter
         {
             return await base.ReadAsync(context);
         }
-        catch(NotSupportedException e) // E.g. when trying to deserialize to a interface, without sending the $type as part of the request
+        catch (NotSupportedException exception)
         {
-            context.ModelState.TryAddModelException(string.Empty,new InputFormatterException(e.Message, e));
+            // This happens when trying to deserialize to an interface, without sending the $type as part of the request
+            context.ModelState.TryAddModelException(string.Empty, new InputFormatterException(exception.Message, exception));
             return await InputFormatterResult.FailureAsync();
         }
     }
