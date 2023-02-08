@@ -62,7 +62,8 @@ public static class UmbracoBuilderExtensions
 
         builder.Services.AddSingleton<UmbracoTestDatabaseConfigurationFactory>();
 
-        builder.Services.AddDbContext<UmbracoEFContext>((serviceProvider, options) =>
+        builder.Services.AddDbContext<UmbracoEFContext>(
+            (serviceProvider, options) =>
         {
             var testDatabaseType = builder.Config.GetValue<TestDatabaseSettings.TestDatabaseType>("Tests:Database:DatabaseType");
             if (testDatabaseType is TestDatabaseSettings.TestDatabaseType.Sqlite)
@@ -74,7 +75,8 @@ public static class UmbracoBuilderExtensions
                 // If not Sqlite, assume SqlServer
                 options.UseSqlServer(serviceProvider.GetRequiredService<IOptionsMonitor<ConnectionStrings>>().CurrentValue.ConnectionString);
             }
-        });
+        },
+            optionsLifetime: ServiceLifetime.Singleton);
 
         builder.Services.AddUmbracoEFCore(builder.Config);
 

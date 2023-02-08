@@ -14,7 +14,8 @@ public static class UmbracoEFCoreServiceCollectionExtensions
 {
     public static IServiceCollection AddUmbracoEFCore(this IServiceCollection services, IConfiguration configuration, Action<DbContextOptionsBuilder, IConfiguration>? optionsAction = null)
     {
-        services.AddDbContext<UmbracoEFContext>(options =>
+        services.AddDbContext<UmbracoEFContext>(
+            options =>
         {
             if (optionsAction is not null)
             {
@@ -24,7 +25,8 @@ public static class UmbracoEFCoreServiceCollectionExtensions
             {
                 DefaultOptionsAction(options, configuration);
             }
-        });
+        },
+            optionsLifetime: ServiceLifetime.Singleton);
         services.AddDbContextFactory<UmbracoEFContext>(options =>
         {
             if (optionsAction is not null)
