@@ -17,7 +17,14 @@ internal static class SchemaIdGenerator
         if (type.IsGenericType)
         {
             // append the generic type names, ultimately turning i.e. "PagedViewModel<RelationItemViewModel>" into "PagedRelationItem"
-            name += string.Join(string.Empty, type.GenericTypeArguments.Select(SanitizedTypeName));
+            name = $"{name}{string.Join(string.Empty, type.GenericTypeArguments.Select(SanitizedTypeName))}";
+        }
+
+        if (name.EndsWith("Model") == false)
+        {
+            // because some models names clash with common classes in TypeScript (i.e. Document),
+            // we need to add a "Model" postfix to all models
+            name = $"{name}Model";
         }
 
         // make absolutely sure we don't pass any invalid named by removing all non-word chars

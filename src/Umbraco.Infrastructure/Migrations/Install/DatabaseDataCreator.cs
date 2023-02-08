@@ -1165,10 +1165,14 @@ internal class DatabaseDataCreator
 
     private void CreateUserGroupData()
     {
-        _database.Insert(Constants.DatabaseSchema.Tables.UserGroup, "id", false,
+        _database.Insert(
+            Constants.DatabaseSchema.Tables.UserGroup,
+            "id",
+            false,
             new UserGroupDto
             {
                 Id = 1,
+                Key = Guid.NewGuid(),
                 StartMediaId = -1,
                 StartContentId = -1,
                 Alias = Constants.Security.AdminGroupAlias,
@@ -1179,10 +1183,14 @@ internal class DatabaseDataCreator
                 Icon = "icon-medal",
                 HasAccessToAllLanguages = true,
             });
-        _database.Insert(Constants.DatabaseSchema.Tables.UserGroup, "id", false,
+        _database.Insert(
+            Constants.DatabaseSchema.Tables.UserGroup,
+            "id",
+            false,
             new UserGroupDto
             {
                 Id = 2,
+                Key = Guid.NewGuid(),
                 StartMediaId = -1,
                 StartContentId = -1,
                 Alias = Constants.Security.WriterGroupAlias,
@@ -1193,10 +1201,14 @@ internal class DatabaseDataCreator
                 Icon = "icon-edit",
                 HasAccessToAllLanguages = true,
             });
-        _database.Insert(Constants.DatabaseSchema.Tables.UserGroup, "id", false,
+        _database.Insert(
+            Constants.DatabaseSchema.Tables.UserGroup,
+            "id",
+            false,
             new UserGroupDto
             {
                 Id = 3,
+                Key = Guid.NewGuid(),
                 StartMediaId = -1,
                 StartContentId = -1,
                 Alias = Constants.Security.EditorGroupAlias,
@@ -1207,10 +1219,14 @@ internal class DatabaseDataCreator
                 Icon = "icon-tools",
                 HasAccessToAllLanguages = true,
             });
-        _database.Insert(Constants.DatabaseSchema.Tables.UserGroup, "id", false,
+        _database.Insert(
+            Constants.DatabaseSchema.Tables.UserGroup,
+            "id",
+            false,
             new UserGroupDto
             {
                 Id = 4,
+                Key = Guid.NewGuid(),
                 StartMediaId = -1,
                 StartContentId = -1,
                 Alias = Constants.Security.TranslatorGroupAlias,
@@ -1221,10 +1237,14 @@ internal class DatabaseDataCreator
                 Icon = "icon-globe",
                 HasAccessToAllLanguages = true,
             });
-        _database.Insert(Constants.DatabaseSchema.Tables.UserGroup, "id", false,
+        _database.Insert(
+            Constants.DatabaseSchema.Tables.UserGroup,
+            "id",
+            false,
             new UserGroupDto
             {
                 Id = 5,
+                Key = Guid.NewGuid(),
                 Alias = Constants.Security.SensitiveDataGroupAlias,
                 Name = "Sensitive data",
                 DefaultPermissions = string.Empty,
