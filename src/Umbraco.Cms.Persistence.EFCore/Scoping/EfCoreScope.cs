@@ -33,13 +33,15 @@ internal class EfCoreScope : IEfCoreScope
     public EfCoreScope(
         IUmbracoEfCoreDatabaseFactory efCoreDatabaseFactory,
         IEFCoreScopeAccessor efCoreScopeAccessor,
-        IEfCoreScopeProvider efCoreScopeProvider)
+        IEfCoreScopeProvider efCoreScopeProvider,
+        IScopeContext? scopeContext)
     {
         _dictionaryLocker = new object();
         _efCoreDatabaseFactory = efCoreDatabaseFactory;
         _efCoreScopeAccessor = efCoreScopeAccessor;
         _efCoreScopeProvider = (EfCoreScopeProvider)efCoreScopeProvider;
         _acquiredLocks = new Queue<IDistributedLock>();
+        ScopeContext = scopeContext;
 
         InstanceId = Guid.NewGuid();
     }
@@ -48,11 +50,13 @@ internal class EfCoreScope : IEfCoreScope
         IUmbracoEfCoreDatabaseFactory efCoreDatabaseFactory,
         IEFCoreScopeAccessor efCoreScopeAccessor,
         IEfCoreScopeProvider efCoreScopeProvider,
-        EfCoreScope parentScope)
+        EfCoreScope parentScope,
+        IScopeContext? scopeContext)
         : this(
             efCoreDatabaseFactory,
             efCoreScopeAccessor,
-            efCoreScopeProvider) =>
+            efCoreScopeProvider,
+            scopeContext) =>
         ParentScope = parentScope;
 
     public async Task<T> ExecuteWithContextAsync<T>(Func<UmbracoEFContext, Task<T>> method)
@@ -109,6 +113,21 @@ internal class EfCoreScope : IEfCoreScope
         }
 
         _efCoreScopeProvider.PopAmbientScope();
+
+        // if *we* created it, then get rid of it
+        if (_efCoreScopeProvider.AmbientScopeContext == ScopeContext)
+        {
+            try
+            {
+                _efCoreScopeProvider.AmbientScopeContext?.ScopeExit(_completed.HasValue && _completed.Value);
+            }
+            finally
+            {
+                // removes the ambient context (ambient scope already gone)
+                _efCoreScopeProvider.PopAmbientScopeContext();
+            }
+        }
+
         _disposed = true;
     }
 

@@ -3,6 +3,4 @@
 public interface IEfCoreScopeProvider
 {
     IEfCoreScope CreateScope();
-
-    void PopAmbientScope();
 }
