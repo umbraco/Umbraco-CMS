@@ -24,3 +24,4 @@ import './workspace/workspace-action-menu/workspace-action-menu.element';
 
 import '../entity-actions/entity-action.element';
 import '../entity-actions/entity-action-list.element';
+import './empty-state/empty-state.element';
