@@ -816,6 +816,59 @@
         }
       }
     },
+    "/umbraco/management/api/v1/dictionary/{key}/move": {
+      "post": {
+        "tags": [
+          "Dictionary"
+        ],
+        "operationId": "PostDictionaryByKeyMove",
+        "parameters": [
+          {
+            "name": "key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DictionaryMoveModel"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetailsModel"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetailsModel"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/umbraco/management/api/v1/dictionary/import": {
       "post": {
         "tags": [
@@ -865,7 +918,7 @@
         ],
         "operationId": "PostDictionaryUpload",
         "requestBody": {
-          "content": {}
+          "content": { }
         },
         "responses": {
           "200": {
@@ -5680,6 +5733,17 @@
         },
         "additionalProperties": false
       },
+      "DictionaryMoveModel": {
+        "type": "object",
+        "properties": {
+          "targetKey": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
       "DictionaryOverviewModel": {
         "type": "object",
         "properties": {
@@ -6412,7 +6476,7 @@
           },
           "providerProperties": {
             "type": "object",
-            "additionalProperties": {},
+            "additionalProperties": { },
             "nullable": true
           }
         },
@@ -7725,7 +7789,7 @@
             "nullable": true
           }
         },
-        "additionalProperties": {}
+        "additionalProperties": { }
       },
       "ProfilingStatusModel": {
         "type": "object",
@@ -9083,7 +9147,7 @@
           "authorizationCode": {
             "authorizationUrl": "/umbraco/management/api/v1.0/security/back-office/authorize",
             "tokenUrl": "/umbraco/management/api/v1.0/security/back-office/token",
-            "scopes": {}
+            "scopes": { }
           }
         }
       }
@@ -9091,7 +9155,7 @@
   },
   "security": [
     {
-      "OAuth": []
+      "OAuth": [ ]
     }
   ]
 }
