@@ -49,7 +49,6 @@ public sealed class UmbracoJsonTypeInfoResolver : DefaultJsonTypeInfoResolver, I
                 }
 
                 result.PolymorphismOptions = jsonPolymorphismOptions;
-
             }
         }
 
