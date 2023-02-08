@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Umbraco.Cms.Api.Common.Builders;
 using Umbraco.Cms.Api.Management.Factories;
 using Umbraco.Cms.Api.Management.ViewModels.Package;
 using Umbraco.Cms.Core.Mapping;
@@ -40,10 +41,17 @@ public class SaveCreatedPackageController : CreatedPackageControllerBase
         // Save it
         if (!_packagingService.SaveCreatedPackage(packageDefinition))
         {
-            return ValidationProblem(
-                model.Key == default
+            var errorDetails = model.Key == default
                     ? $"A package with the name '{model.Name}' already exists"
-                    : $"The package with key {model.Key} was not found");
+                    : $"The package with key {model.Key} was not found";
+
+            ProblemDetails invalidModelProblem =
+                new ProblemDetailsBuilder()
+                    .WithTitle("Package could not be saved")
+                    .WithDetail(errorDetails)
+                    .Build();
+
+            return BadRequest(invalidModelProblem);
         }
 
         return await Task.FromResult(Ok(_umbracoMapper.Map<PackageDefinitionViewModel>(packageDefinition)));
