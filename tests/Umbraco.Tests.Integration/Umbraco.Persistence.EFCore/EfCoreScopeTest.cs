@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
+using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Persistence.EFCore;
 using Umbraco.Cms.Persistence.EFCore.Scoping;
 using Umbraco.Cms.Tests.Common;
@@ -569,5 +570,67 @@ public class EfCoreScopeTest : UmbracoIntegrationTest
                 await db.Database.CanConnectAsync();
             });
         });
+    }
+    
+    [TestCase(true)]
+    [TestCase(false)]
+    public void ScopeContextEnlist(bool complete)
+    {
+        bool? completed = null;
+        IEfCoreScope ambientScope = null;
+        IScopeContext ambientContext = null;
+
+        Assert.IsNull(EfCoreScopeAccessor.AmbientScope);
+        using (IEfCoreScope scope = EfCoreScopeProvider.CreateScope())
+        {
+            scope.ScopeContext.Enlist("name", c =>
+            {
+                completed = c;
+                ambientScope = EfCoreScopeAccessor.AmbientScope;
+                ambientContext = EfCoreScopeProvider.AmbientScopeContext;
+            });
+            if (complete)
+            {
+                scope.Complete();
+            }
+        }
+
+        Assert.IsNull(EfCoreScopeAccessor.AmbientScope);
+        Assert.IsNull(EfCoreScopeProvider.AmbientScopeContext);
+        Assert.IsNotNull(completed);
+        Assert.AreEqual(complete, completed.Value);
+        Assert.IsNull(ambientScope); // the scope is gone
+        Assert.IsNotNull(ambientContext); // the context is still there
+    }
+    
+    [TestCase(true)]
+    [TestCase(false)]
+    public void ScopeContextEnlistAgain(bool complete)
+    {
+        bool? completed = null;
+        bool? completed2 = null;
+
+        Assert.IsNull(EfCoreScopeAccessor.AmbientScope);
+        using (IEfCoreScope scope = EfCoreScopeProvider.CreateScope())
+        {
+            scope.ScopeContext.Enlist("name", c =>
+            {
+                completed = c;
+
+                // at that point the scope is gone, but the context is still there
+                IScopeContext ambientContext = EfCoreScopeProvider.AmbientScopeContext;
+                ambientContext.Enlist("another", c2 => completed2 = c2);
+            });
+            if (complete)
+            {
+                scope.Complete();
+            }
+        }
+
+        Assert.IsNull(EfCoreScopeAccessor.AmbientScope);
+        Assert.IsNull(EfCoreScopeProvider.AmbientScopeContext);
+        Assert.IsNotNull(completed);
+        Assert.AreEqual(complete, completed.Value);
+        Assert.AreEqual(complete, completed2.Value);
     }
 }
