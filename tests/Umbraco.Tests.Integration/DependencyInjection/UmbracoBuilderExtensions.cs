@@ -75,8 +75,7 @@ public static class UmbracoBuilderExtensions
                 // If not Sqlite, assume SqlServer
                 options.UseSqlServer(serviceProvider.GetRequiredService<IOptionsMonitor<ConnectionStrings>>().CurrentValue.ConnectionString);
             }
-        },
-            optionsLifetime: ServiceLifetime.Singleton);
+        });
 
         builder.Services.AddUmbracoEFCore(builder.Config);
 

@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core.Persistence;
 using Umbraco.Cms.Persistence.EFCore.Entities;
 
@@ -7,17 +7,26 @@ namespace Umbraco.Cms.Persistence.EFCore;
 public class UmbracoEfCoreDatabaseFactory : IUmbracoEfCoreDatabaseFactory
 {
     private readonly IDatabaseInfo _databaseInfo;
-    private readonly IDbContextFactory<UmbracoEFContext> _dbContextFactory;
+    private readonly IServiceScopeFactory _scopeFactory;
+    private IServiceScope? _scope;
 
-    public UmbracoEfCoreDatabaseFactory(IDatabaseInfo databaseInfo, IDbContextFactory<UmbracoEFContext> dbContextFactory)
+    public UmbracoEfCoreDatabaseFactory(IDatabaseInfo databaseInfo, IServiceScopeFactory scopeFactory)
     {
         _databaseInfo = databaseInfo;
-        _dbContextFactory = dbContextFactory;
+        _scopeFactory = scopeFactory;
     }
 
     public IUmbracoEfCoreDatabase Create()
     {
-        UmbracoEFContext umbracoEfContext = _dbContextFactory.CreateDbContext();
+        _scope ??= _scopeFactory.CreateScope();
+
+        UmbracoEFContext umbracoEfContext = _scope.ServiceProvider.GetRequiredService<UmbracoEFContext>();
         return new UmbracoEfCoreDatabase(_databaseInfo, umbracoEfContext);
+    }
+
+    public void Dispose()
+    {
+        _scope?.Dispose();
+        _scope = null;
     }
 }

@@ -25,18 +25,6 @@ public static class UmbracoEFCoreServiceCollectionExtensions
             {
                 DefaultOptionsAction(options, configuration);
             }
-        },
-            optionsLifetime: ServiceLifetime.Singleton);
-        services.AddDbContextFactory<UmbracoEFContext>(options =>
-        {
-            if (optionsAction is not null)
-            {
-                optionsAction(options, configuration);
-            }
-            else
-            {
-                DefaultOptionsAction(options, configuration);
-            }
         });
 
         services.AddUnique<IDatabaseInfo, EFDatabaseInfo>();
