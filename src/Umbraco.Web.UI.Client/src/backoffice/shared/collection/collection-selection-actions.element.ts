@@ -2,6 +2,7 @@ import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, html, nothing } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { map } from 'rxjs';
+import { UmbExecutedEvent } from '../../../core/events';
 import { UmbCollectionContext, UMB_COLLECTION_CONTEXT_TOKEN } from './collection.context';
 import type { ManifestEntityBulkAction, MediaDetails } from '@umbraco-cms/models';
 import { UmbLitElement } from '@umbraco-cms/element';
@@ -102,6 +103,11 @@ export class UmbCollectionSelectionActionsElement extends UmbLitElement {
 		);
 	}
 
+	#onActionExecuted(event: UmbExecutedEvent) {
+		event.stopPropagation();
+		this._collectionContext?.clearSelection();
+	}
+
 	render() {
 		if (this._selectionLength === 0) return nothing;
 
@@ -117,7 +123,10 @@ export class UmbCollectionSelectionActionsElement extends UmbLitElement {
 			<div id="actions">
 				${this._entityBulkActions?.map(
 					(manifest) =>
-						html`<umb-entity-bulk-action .selection=${this._selection} .manifest=${manifest}></umb-entity-bulk-action>`
+						html`<umb-entity-bulk-action
+							@executed=${this.#onActionExecuted}
+							.selection=${this._selection}
+							.manifest=${manifest}></umb-entity-bulk-action>`
 				)}
 			</div>`;
 	}
