@@ -14,4 +14,7 @@ import './section/section-sidebar/section-sidebar.element';
 import './section/section.element';
 import './tree/tree.element';
 import './workspace/workspace-content/workspace-content.element';
+import './input-media-picker/input-media-picker.element';
+import './input-document-picker/input-document-picker.element';
 import './empty-state/empty-state.element';
+

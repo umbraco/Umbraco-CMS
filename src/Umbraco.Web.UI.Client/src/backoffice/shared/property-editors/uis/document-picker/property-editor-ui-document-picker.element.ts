@@ -1,8 +1,7 @@
 import { html } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
+import { UmbInputDocumentPickerElement } from '../../../components/input-document-picker/input-document-picker.element';
 import { UmbLitElement } from '@umbraco-cms/element';
-import type { UmbInputDocumentPickerElement } from 'src/backoffice/shared/components/input-document-picker/input-document-picker.element';
-import '../../../components/input-document-picker/input-document-picker.element';
 import type { DataTypePropertyData } from '@umbraco-cms/models';
 
 @customElement('umb-property-editor-ui-document-picker')
