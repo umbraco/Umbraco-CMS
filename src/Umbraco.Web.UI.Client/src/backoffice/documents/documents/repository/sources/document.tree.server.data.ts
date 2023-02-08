@@ -12,30 +12,34 @@ import { tryExecuteAndNotify } from '@umbraco-cms/resources';
 export class DocumentTreeServerDataSource implements RepositoryTreeDataSource {
 	#host: UmbControllerHostInterface;
 
-
 	// TODO: how do we handle trashed items?
 	async trashItems(keys: Array<string>) {
 		// TODO: use backend cli when available.
-		return tryExecuteAndNotify(this.#host, fetch('/umbraco/management/api/v1/document/trash', {
-			method: 'POST',
-			body: JSON.stringify(keys),
-			headers: {
-				'Content-Type': 'application/json',
-			},
-		}));
+		return tryExecuteAndNotify(
+			this.#host,
+			fetch('/umbraco/management/api/v1/document/trash', {
+				method: 'POST',
+				body: JSON.stringify(keys),
+				headers: {
+					'Content-Type': 'application/json',
+				},
+			})
+		);
 	}
 
 	async moveItems(keys: Array<string>, destination: string) {
 		// TODO: use backend cli when available.
-		return tryExecuteAndNotify(this.#host, fetch('/umbraco/management/api/v1/document/move', {
-			method: 'POST',
-			body: JSON.stringify({ keys, destination }),
-			headers: {
-				'Content-Type': 'application/json',
-			},
-		}));
+		return tryExecuteAndNotify(
+			this.#host,
+			fetch('/umbraco/management/api/v1/document/move', {
+				method: 'POST',
+				body: JSON.stringify({ keys, destination }),
+				headers: {
+					'Content-Type': 'application/json',
+				},
+			})
+		);
 	}
-
 
 	/**
 	 * Creates an instance of DocumentTreeServerDataSource.
@@ -82,7 +86,7 @@ export class DocumentTreeServerDataSource implements RepositoryTreeDataSource {
 	 * @memberof DocumentTreeServerDataSource
 	 */
 	async getItems(keys: Array<string>) {
-		if (keys) {
+		if (!keys) {
 			const error: ProblemDetails = { title: 'Keys are missing' };
 			return { error };
 		}
