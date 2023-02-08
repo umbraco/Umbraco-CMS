@@ -9,7 +9,6 @@ public sealed class UmbracoJsonTypeInfoResolver : DefaultJsonTypeInfoResolver, I
 {
     private readonly ITypeFinder _typeFinder;
     private readonly ConcurrentDictionary<Type, ISet<Type>> _subTypesCache = new ConcurrentDictionary<Type, ISet<Type>>();
-    private readonly ConcurrentDictionary<Type, ISet<Type>> _implementsCache = new ConcurrentDictionary<Type, ISet<Type>>();
 
     public UmbracoJsonTypeInfoResolver(ITypeFinder typeFinder)
     {
