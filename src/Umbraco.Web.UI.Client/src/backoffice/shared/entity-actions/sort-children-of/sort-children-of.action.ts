@@ -1,4 +1,5 @@
 import { UmbEntityActionBase } from '..';
+import { UmbExecutedEvent } from '../../../../core/events';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 
 export class UmbSortChildrenOfEntityAction<
@@ -11,5 +12,6 @@ export class UmbSortChildrenOfEntityAction<
 	async execute() {
 		console.log(`execute for: ${this.unique}`);
 		await this.repository?.sortChildrenOf();
+		this.host.dispatchEvent(new UmbExecutedEvent());
 	}
 }

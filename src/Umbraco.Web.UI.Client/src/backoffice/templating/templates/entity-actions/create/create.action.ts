@@ -1,4 +1,5 @@
 import { UmbEntityActionBase } from '../../../../shared/entity-actions';
+import { UmbExecutedEvent } from '../../../../../core/events';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 
 export class UmbCreateEntityAction<T extends { copy(): Promise<void> }> extends UmbEntityActionBase<T> {
@@ -12,5 +13,6 @@ export class UmbCreateEntityAction<T extends { copy(): Promise<void> }> extends 
 		const url = `section/settings/template/create/${this.unique || 'root'}`;
 		// TODO: how do we handle this with a href?
 		history.pushState(null, '', url);
+		this.host.dispatchEvent(new UmbExecutedEvent());
 	}
 }

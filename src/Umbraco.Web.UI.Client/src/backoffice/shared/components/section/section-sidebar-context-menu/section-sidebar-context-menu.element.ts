@@ -83,6 +83,11 @@ export class UmbSectionSidebarContextMenu extends UmbLitElement {
 		this.#sectionSidebarContext?.closeContextMenu();
 	}
 
+	#onActionExecuted(event: CustomEvent) {
+		event.stopPropagation();
+		this.#closeContextMenu();
+	}
+
 	render() {
 		return html`
 			${this.#renderBackdrop()}
@@ -105,6 +110,7 @@ export class UmbSectionSidebarContextMenu extends UmbLitElement {
 			? html`<div id="action-modal">
 					<h3>${this._headline}</h3>
 					<umb-entity-action-list
+						@executed=${this.#onActionExecuted}
 						entity-type=${ifDefined(this._entityType)}
 						unique=${ifDefined(this._unique)}></umb-entity-action-list>
 			  </div>`

@@ -1,4 +1,5 @@
 import { UmbEntityActionBase } from '..';
+import { UmbExecutedEvent } from '../../../../core/events';
 import { UmbContextConsumerController } from '@umbraco-cms/context-api';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 import { UmbModalService, UMB_MODAL_SERVICE_CONTEXT_TOKEN } from '@umbraco-cms/modal';
@@ -17,25 +18,25 @@ export class UmbDeleteEntityAction<
 	}
 
 	async execute() {
-		if (!this.repository) return;
+		if (!this.repository || !this.#modalService) return;
 
 		const { data } = await this.repository.requestTreeItems([this.unique]);
 
 		if (data) {
 			const item = data[0];
 
-			const modalHandler = this.#modalService?.confirm({
+			const modalHandler = this.#modalService.confirm({
 				headline: `Delete ${item.name}`,
 				content: 'Are you sure you want to delete this item?',
 				color: 'danger',
 				confirmLabel: 'Delete',
 			});
 
-			modalHandler?.onClose().then(({ confirmed }) => {
-				if (confirmed) {
-					this.repository?.delete(this.unique);
-				}
-			});
+			const { confirmed } = await modalHandler.onClose();
+			if (confirmed) {
+				await this.repository?.delete(this.unique);
+				this.host.dispatchEvent(new UmbExecutedEvent());
+			}
 		}
 	}
 }

@@ -1,5 +1,6 @@
 import { UmbDocumentRepository } from '../repository/document.repository';
 import { UmbEntityActionBase } from '../../../shared/entity-actions';
+import { UmbExecutedEvent } from '../../../../core/events';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 
 export class UmbDocumentPermissionsEntityAction extends UmbEntityActionBase<UmbDocumentRepository> {
@@ -10,5 +11,6 @@ export class UmbDocumentPermissionsEntityAction extends UmbEntityActionBase<UmbD
 	async execute() {
 		console.log(`execute for: ${this.unique}`);
 		await this.repository?.setPermissions();
+		this.host.dispatchEvent(new UmbExecutedEvent());
 	}
 }
