@@ -1,6 +1,8 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.DistributedLocking;
+using Umbraco.Cms.Persistence.EFCore;
 using Umbraco.Cms.Persistence.EFCore.Entities;
 using Umbraco.Cms.Persistence.EFCore.Scoping;
 using Umbraco.Cms.Persistence.Sqlite.Interceptors;
@@ -28,9 +30,9 @@ public class EfCoreLockTests : UmbracoIntegrationTest
         {
             scope.ExecuteWithContextAsync<Task>(async database =>
             {
-                database.UmbracoLocks.Add(new UmbracoLock {Id = 1, Name = "Lock.1"});
-                database.UmbracoLocks.Add(new UmbracoLock {Id = 1, Name = "Lock.2"});
-                database.UmbracoLocks.Add(new UmbracoLock {Id = 1, Name = "Lock.3"});
+                database.UmbracoLocks.Add(new UmbracoLock { Id = 1, Name = "Lock.1" });
+                database.UmbracoLocks.Add(new UmbracoLock { Id = 2, Name = "Lock.2" });
+                database.UmbracoLocks.Add(new UmbracoLock { Id = 3, Name = "Lock.3" });
 
             });
 
@@ -38,9 +40,13 @@ public class EfCoreLockTests : UmbracoIntegrationTest
         }
     }
 
-    protected override void ConfigureTestServices(IServiceCollection services) =>
+    protected override void ConfigureTestServices(IServiceCollection services)
+    {
         // SQLite + retry policy makes tests fail, we retry before throwing distributed locking timeout.
         services.RemoveAll(x => x.ImplementationType == typeof(SqliteAddRetryPolicyInterceptor));
+        services.AddUnique<IDistributedLockingMechanism, SqliteEFCoreDistributedLockingMechanism>();
+    }
+
 
     [Test]
     public void SingleReadLockTest()
