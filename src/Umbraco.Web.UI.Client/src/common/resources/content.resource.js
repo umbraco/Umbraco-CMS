@@ -1090,21 +1090,26 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
          *
          */
         publishById: function (id, cultures) {
-
             if (!id) {
                 throw "id cannot be null";
             }
 
             if (!cultures) {
-                cultures = [];
+                return umbRequestHelper.resourcePromise(
+                  $http.post(
+                    umbRequestHelper.getApiUrl(
+                      "contentApiBaseUrl",
+                      "PostPublishById"), { id: id }),
+                  'Failed to publish content with id ' + id);
             }
-
-          return umbRequestHelper.resourcePromise(
-            $http.post(
-              umbRequestHelper.getApiUrl(
-                "contentApiBaseUrl",
-                "PostPublishById"), { id: id, cultures: cultures }),
-                'Failed to publish content with id ' + id);
+            else {
+                return umbRequestHelper.resourcePromise(
+                  $http.post(
+                    umbRequestHelper.getApiUrl(
+                      "contentApiBaseUrl",
+                      "PostPublishByIdAndCulture"), { id: id, cultures: cultures }),
+                  'Failed to publish content with id ' + id);
+            }
         },
 
         /**

@@ -168,8 +168,8 @@ public class ContentController : ContentControllerBase
             authorizationService,
             contentVersionService,
             StaticServiceProvider.Instance.GetRequiredService<ICultureImpactFactory>())
-      {
-      }
+    {
+    }
 
     public object? Domains { get; private set; }
 
@@ -1931,7 +1931,37 @@ public class ContentController : ContentControllerBase
     }
 
     /// <summary>
-    ///     Publishes a document with a given ID and cultures
+    ///     Publishes a document with a given ID
+    /// </summary>
+    /// <param name="id"></param>
+    /// <returns></returns>
+    /// <remarks>
+    ///     The EnsureUserPermissionForContent attribute will deny access to this method if the current user
+    ///     does not have Publish access to this node.
+    /// </remarks>
+    [Authorize(Policy = AuthorizationPolicies.ContentPermissionPublishById)]
+    public IActionResult PostPublishById(int id)
+    {
+        IContent? foundContent = GetObjectFromRequest(() => _contentService.GetById(id));
+
+        if (foundContent == null)
+        {
+            return HandleContentNotFound(id);
+        }
+
+        PublishResult publishResult = _contentService.SaveAndPublish(foundContent, userId: _backofficeSecurityAccessor.BackOfficeSecurity?.GetUserId().Result ?? 0);
+        if (publishResult.Success == false)
+        {
+            var notificationModel = new SimpleNotificationModel();
+            AddMessageForPublishStatus(new[] { publishResult }, notificationModel);
+            return ValidationProblem(notificationModel);
+        }
+
+        return Ok();
+    }
+
+    /// <summary>
+    ///     Publishes a document with a given ID and cultures.
     /// </summary>
     /// <param name="model"></param>
     /// <returns></returns>
@@ -1940,7 +1970,7 @@ public class ContentController : ContentControllerBase
     ///     does not have Publish access to this node.
     /// </remarks>
     [Authorize(Policy = AuthorizationPolicies.ContentPermissionPublishById)]
-    public IActionResult PostPublishById(PublishContent model)
+    public IActionResult PostPublishByIdAndCulture(PublishContent model)
     {
         IContent? foundContent = GetObjectFromRequest(() => _contentService.GetById(model.Id));
 
@@ -1949,61 +1979,37 @@ public class ContentController : ContentControllerBase
             return HandleContentNotFound(model.Id);
         }
 
-        if (model.Cultures == null)
-        {
-            PublishResult publishResult = _contentService.SaveAndPublish(foundContent, userId: _backofficeSecurityAccessor.BackOfficeSecurity?.GetUserId().Result ?? 0);
-            if (publishResult.Success == false)
-            {
-                var notificationModel = new SimpleNotificationModel();
-                AddMessageForPublishStatus(new[] { publishResult }, notificationModel);
-                return ValidationProblem(notificationModel);
-            }
-
-            return Ok();
-        }
-
         var languageCount = _allLangs.Value.Count();
-        if (languageCount == model.Cultures.Length)
+        if (model.Cultures == null || !model.Cultures.Any() || model.Cultures.Length == languageCount)
         {
-            PublishResult publishResult = _contentService.SaveAndPublish(foundContent, userId: _backofficeSecurityAccessor.BackOfficeSecurity?.GetUserId().Result ?? 0);
-            if (publishResult.Success == false)
-            {
-                var notificationModel = new SimpleNotificationModel();
-                AddMessageForPublishStatus(new[] { publishResult }, notificationModel);
-                return ValidationProblem(notificationModel);
-            }
-
-            return Ok();
+            return PostPublishById(model.Id);
         }
-        else
+
+        var results = new Dictionary<string, PublishResult>();
+
+        foreach (var culture in model.Cultures)
         {
-            var results = new Dictionary<string, PublishResult>();
-            if (model.Cultures is not null)
+            PublishResult publishResult = _contentService.SaveAndPublish(foundContent, culture, _backofficeSecurityAccessor.BackOfficeSecurity?.GetUserId().Result ?? 0);
+            results[culture] = publishResult;
+        }
+
+
+        if (results.Any(x => x.Value.Success == false))
+        {
+            var notificationModel = new SimpleNotificationModel();
+
+            foreach (var culture in results)
             {
-                foreach (var c in model.Cultures)
+                if (culture.Value.Success == false)
                 {
-                    PublishResult publishResult = _contentService.SaveAndPublish(foundContent, c, _backofficeSecurityAccessor.BackOfficeSecurity?.GetUserId().Result ?? 0);
-                    results[c] = publishResult;
+                    AddMessageForPublishStatus(new[] { culture.Value }, notificationModel);
                 }
             }
 
-            if (results.Any(x => x.Value.Success == false))
-            {
-                var notificationModel = new SimpleNotificationModel();
-
-                foreach (var c in results)
-                {
-                    if (c.Value.Success == false)
-                    {
-                        AddMessageForPublishStatus(new[] { c.Value }, notificationModel);
-                    }
-                }
-
-                return ValidationProblem(notificationModel);
-            }
-
-            return Ok();
+            return ValidationProblem(notificationModel);
         }
+
+        return Ok();
     }
 
     [HttpDelete]
