@@ -57,7 +57,7 @@ export class TemplateTreeServerDataSource implements TemplateTreeDataSource {
 	 * @memberof TemplateTreeServerDataSource
 	 */
 	async getItems(keys: Array<string>) {
-		if (keys) {
+		if (!keys) {
 			const error: ProblemDetails = { title: 'Keys are missing' };
 			return { error };
 		}
