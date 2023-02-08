@@ -25,6 +25,18 @@ public static class UmbracoEFCoreServiceCollectionExtensions
                 DefaultOptionsAction(options, configuration);
             }
         });
+        services.AddDbContextFactory<UmbracoEFContext>(options =>
+        {
+            if (optionsAction is not null)
+            {
+                optionsAction(options, configuration);
+            }
+            else
+            {
+                DefaultOptionsAction(options, configuration);
+            }
+        });
+
         services.AddUnique<IDatabaseInfo, EFDatabaseInfo>();
         services.AddUnique<IDatabaseSchemaCreatorFactory, EFDatabaseSchemaCreatorFactory>();
         services.AddUnique<IDatabaseDataCreator, EFCoreDatabaseDataCreator>();

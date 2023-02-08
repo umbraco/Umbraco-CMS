@@ -9,7 +9,7 @@ internal class UmbracoEfCoreDatabase : IUmbracoEfCoreDatabase
     private readonly Guid _instanceGuid = Guid.NewGuid();
     private string? _instanceId;
 
-    public UmbracoEfCoreDatabase(IDatabaseInfo databaseInfo, UmbracoEFContext umbracoEfContext, UmbracoDbContextFactory umbracoDbContextFactory)
+    public UmbracoEfCoreDatabase(IDatabaseInfo databaseInfo, UmbracoEFContext umbracoEfContext)
     {
         _databaseInfo = databaseInfo;
         UmbracoEFContext = umbracoEfContext;
