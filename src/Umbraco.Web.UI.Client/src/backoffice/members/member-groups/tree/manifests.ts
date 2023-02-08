@@ -1,5 +1,5 @@
-import type { ManifestTree, ManifestTreeItemAction } from '@umbraco-cms/models';
 import { UMB_MEMBER_GROUP_TREE_STORE_CONTEXT_TOKEN } from '../member-group.tree.store';
+import type { ManifestTree, ManifestTreeItemAction } from '@umbraco-cms/models';
 
 const treeAlias = 'Umb.Tree.MemberGroups';
 

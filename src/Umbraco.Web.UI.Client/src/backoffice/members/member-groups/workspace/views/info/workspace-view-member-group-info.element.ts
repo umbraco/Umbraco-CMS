@@ -43,7 +43,6 @@ export class UmbWorkspaceViewMemberGroupInfoElement extends UmbLitElement {
 		// TODO: Figure out if this is the best way to consume the context or if it can be strongly typed with an UmbContextToken
 		this.consumeContext<UmbWorkspaceMemberGroupContext>('umbWorkspaceContext', (memberGroupContext) => {
 			this._workspaceContext = memberGroupContext;
-			console.log(memberGroupContext);
 			this._observeMemberGroup();
 		});
 	}
@@ -52,7 +51,6 @@ export class UmbWorkspaceViewMemberGroupInfoElement extends UmbLitElement {
 		if (!this._workspaceContext) return;
 
 		this.observe(this._workspaceContext.data.pipe(distinctUntilChanged()), (memberGroup) => {
-			console.log(memberGroup);
 			if (!memberGroup) return;
 
 			// TODO: handle if model is not of the type wanted.

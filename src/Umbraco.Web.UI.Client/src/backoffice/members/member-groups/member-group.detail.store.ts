@@ -1,7 +1,8 @@
 import { Observable } from 'rxjs';
+import { umbMemberGroupData } from '../../../core/mocks/data/member-group.data';
 import type { MemberGroupDetails } from '@umbraco-cms/models';
 import { UmbContextToken } from '@umbraco-cms/context-api';
-import { ArrayState } from '@umbraco-cms/observable-api';
+import { ArrayState, createObservablePart } from '@umbraco-cms/observable-api';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 import { UmbEntityDetailStore, UmbStoreBase } from '@umbraco-cms/store';
 
@@ -33,28 +34,22 @@ export class UmbMemberGroupDetailStore extends UmbStoreBase implements UmbEntity
 	 * @return {*}  {(Observable<MemberGroupDetails>)}
 	 * @memberof UmbMemberGroupDetailStore
 	 */
-	getByKey(key: string): Observable<MemberGroupDetails | undefined> {
+	getByKey(key: string): Observable<MemberGroupDetails> {
 		// tryExecuteAndNotify(this.host, MemberGroupResource.getMemberGroupByKey({ key })).then(({ data }) => {
 		// 	if (data) {
 		// 		this.#data.appendOne(data);
 		// 	}
 		// });
 
-		// return createObservablePart(
-		// 	this.#data,
-		// 	(groups) => groups.find((group) => group.key === key) as MemberGroupDetails
-		// );
+		// temp until Resource is updated
+		const group = umbMemberGroupData.getByKey(key);
+		if (group) {
+			this.#data.appendOne(group);
+		}
 
-		// TODO: use backend cli when available.
-		fetch(`/umbraco/management/api/v1/member-group/${key}`)
-			.then((res) => res.json())
-			.then((data) => {
-				this.#data.append(data);
-				console.log(data);
-			});
-
-		return this.#data.getObservablePart((memberGroups) =>
-			memberGroups.find((memberGroup) => memberGroup.key === key)
+		return createObservablePart(
+			this.#data,
+			(groups) => groups.find((group) => group.key === key) as MemberGroupDetails
 		);
 	}
 

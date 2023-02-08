@@ -3,14 +3,14 @@ import { css, html } from 'lit';
 import { customElement } from 'lit/decorators.js';
 import { UmbModalService, UMB_MODAL_SERVICE_CONTEXT_TOKEN } from '../../../../../core/modal';
 import UmbTreeItemActionElement from '../../../../shared/components/tree/action/tree-item-action.element';
-import { UmbMemberGroupTreeStore, UMB_MEMBER_GROUP_TREE_STORE_CONTEXT_TOKEN } from '../../member-group.tree.store';
+import { UmbMemberTreeStore, UMB_MEMBER_TREE_STORE_CONTEXT_TOKEN } from '../../member.tree.store';
 
-@customElement('umb-tree-action-member-group-delete')
-export default class UmbTreeActionMemberGroupDeleteElement extends UmbTreeItemActionElement {
+@customElement('umb-tree-action-member-delete')
+export default class UmbTreeActionMemberDeleteElement extends UmbTreeItemActionElement {
 	static styles = [UUITextStyles, css``];
 
 	private _modalService?: UmbModalService;
-	private _memberGroupTreeStore?: UmbMemberGroupTreeStore;
+	private _memberTreeStore?: UmbMemberTreeStore;
 
 	connectedCallback(): void {
 		super.connectedCallback();
@@ -19,8 +19,8 @@ export default class UmbTreeActionMemberGroupDeleteElement extends UmbTreeItemAc
 			this._modalService = modalService;
 		});
 
-		this.consumeContext(UMB_MEMBER_GROUP_TREE_STORE_CONTEXT_TOKEN, (memberGroupTreeStore) => {
-			this._memberGroupTreeStore = memberGroupTreeStore;
+		this.consumeContext(UMB_MEMBER_TREE_STORE_CONTEXT_TOKEN, (memberTreeStore) => {
+			this._memberTreeStore = memberTreeStore;
 		});
 	}
 
@@ -33,8 +33,8 @@ export default class UmbTreeActionMemberGroupDeleteElement extends UmbTreeItemAc
 		});
 
 		modalHandler?.onClose().then(({ confirmed }: any) => {
-			if (confirmed && this._treeContextMenuService && this._memberGroupTreeStore && this._activeTreeItem) {
-				this._memberGroupTreeStore?.delete([this._activeTreeItem.key]);
+			if (confirmed && this._treeContextMenuService && this._memberTreeStore && this._activeTreeItem) {
+				this._memberTreeStore?.delete([this._activeTreeItem.key]);
 				this._treeContextMenuService.close();
 			}
 		});
@@ -49,6 +49,6 @@ export default class UmbTreeActionMemberGroupDeleteElement extends UmbTreeItemAc
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-tree-action-member-group-delete': UmbTreeActionMemberGroupDeleteElement;
+		'umb-tree-action-member-delete': UmbTreeActionMemberDeleteElement;
 	}
 }

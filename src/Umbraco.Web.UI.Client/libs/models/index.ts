@@ -137,6 +137,10 @@ export interface MemberGroupDetails extends EntityTreeItem {
 	key: string; // TODO: Remove this when the backend is fixed
 }
 
+export interface MemberDetails extends EntityTreeItem {
+	key: string; // TODO: Remove this when the backend is fixed
+}
+
 // Dictionary
 export interface DictionaryDetails extends EntityTreeItem {
 	key: string; // TODO: Remove this when the backend is fixed

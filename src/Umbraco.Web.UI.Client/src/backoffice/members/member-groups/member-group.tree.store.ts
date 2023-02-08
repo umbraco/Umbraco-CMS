@@ -48,6 +48,7 @@ export class UmbMemberGroupTreeStore extends UmbStoreBase {
 			if (data) {
 				// TODO: how do we handle if an item has been removed during this session(like in another tab or by another user)?
 				this.#data.append(data.items);
+				console.log(this.#data);
 			}
 		});
 

@@ -27,6 +27,8 @@ import { UmbMemberTypeDetailStore } from './members/member-types/member-type.det
 import { UmbMemberTypeTreeStore } from './members/member-types/member-type.tree.store';
 import { UmbMemberGroupDetailStore } from './members/member-groups/member-group.detail.store';
 import { UmbMemberGroupTreeStore } from './members/member-groups/member-group.tree.store';
+import { UmbMemberDetailStore } from './members/members/member.detail.store';
+import { UmbMemberTreeStore } from './members/members/member.tree.store';
 import { UmbDictionaryDetailStore } from './translation/dictionary/dictionary.detail.store';
 import { UmbDictionaryTreeStore } from './translation/dictionary/dictionary.tree.store';
 import { UmbDocumentBlueprintDetailStore } from './documents/document-blueprints/document-blueprint.detail.store';
@@ -96,6 +98,8 @@ export class UmbBackofficeElement extends UmbLitElement {
 		new UmbUserGroupStore(this);
 		new UmbMemberGroupDetailStore(this);
 		new UmbMemberGroupTreeStore(this);
+		new UmbMemberDetailStore(this);
+		new UmbMemberTreeStore(this);
 		new UmbDictionaryDetailStore(this);
 		new UmbDictionaryTreeStore(this);
 		new UmbDocumentBlueprintDetailStore(this);
