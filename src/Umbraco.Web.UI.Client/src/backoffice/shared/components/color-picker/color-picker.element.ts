@@ -1,23 +1,13 @@
-import { css, html, nothing } from 'lit';
+import { css, html } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
-import { customElement, property, state } from 'lit/decorators.js';
+import { customElement, property } from 'lit/decorators.js';
 import { FormControlMixin } from '@umbraco-ui/uui-base/lib/mixins';
-
-import { UmbLitElement } from '@umbraco-cms/element';
 import { UUIColorSwatchesEvent } from '@umbraco-ui/uui';
-
-import { ifDefined } from 'lit/directives/if-defined';
+import { UmbLitElement } from '@umbraco-cms/element';
 
 @customElement('umb-color-picker')
 export class UmbColorPickerElement extends FormControlMixin(UmbLitElement) {
-	static styles = [
-		UUITextStyles,
-		css`
-			#add-button {
-				width: 100%;
-			}
-		`,
-	];
+	static styles = [UUITextStyles];
 
 	@property({ type: Boolean })
 	showLabels = false;
