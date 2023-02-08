@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
@@ -31,7 +31,7 @@ public class ChildrenDictionaryTreeController : DictionaryTreeControllerBase
             await DictionaryItemService.GetChildrenAsync(parentKey),
             out var totalItems);
 
-        EntityTreeItemViewModel[] viewModels = await MapTreeItemViewModels(null, dictionaryItems);
+        EntityTreeItemViewModel[] viewModels = await MapTreeItemViewModels(parentKey, dictionaryItems);
 
         PagedViewModel<EntityTreeItemViewModel> result = PagedViewModel(viewModels, totalItems);
         return await Task.FromResult(Ok(result));
