@@ -17,7 +17,7 @@ public sealed class UmbracoJsonTypeInfoResolver : DefaultJsonTypeInfoResolver, I
 
     public IEnumerable<Type> FindSubTypes(Type type)
     {
-        if (_subTypesCache.TryGetValue(type, out var cachedResult))
+        if (_subTypesCache.TryGetValue(type, out ISet<Type>? cachedResult))
         {
             return cachedResult;
         }
