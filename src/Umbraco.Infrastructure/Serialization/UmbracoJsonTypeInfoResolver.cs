@@ -29,7 +29,7 @@ public sealed class UmbracoJsonTypeInfoResolver : DefaultJsonTypeInfoResolver, I
 
     public override JsonTypeInfo GetTypeInfo(Type type, JsonSerializerOptions options)
     {
-        var result = base.GetTypeInfo(type, options);
+        JsonTypeInfo result = base.GetTypeInfo(type, options);
 
         if (type.IsInterface)
         {
