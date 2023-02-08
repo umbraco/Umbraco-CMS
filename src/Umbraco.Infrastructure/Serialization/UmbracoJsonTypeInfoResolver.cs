@@ -33,7 +33,7 @@ public sealed class UmbracoJsonTypeInfoResolver : DefaultJsonTypeInfoResolver, I
 
         if (type.IsInterface)
         {
-            var subTypes = FindSubTypes(type);
+            Type[] subTypes = FindSubTypes(type).ToArray();
 
             if (subTypes.Any())
             {
