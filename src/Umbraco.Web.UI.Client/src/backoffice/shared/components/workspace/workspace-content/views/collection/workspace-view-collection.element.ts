@@ -62,7 +62,7 @@ export class UmbWorkspaceViewCollectionElement extends UmbLitElement {
 	}
 
 	render() {
-		return html`<umb-collection entityType=${ifDefined(this._workspaceContext?.getEntityType())}></umb-collection>`;
+		return html`<umb-collection entity-type=${ifDefined(this._workspaceContext?.getEntityType())}></umb-collection>`;
 	}
 }
 
