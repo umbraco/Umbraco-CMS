@@ -31,26 +31,30 @@ public sealed class UmbracoJsonTypeInfoResolver : DefaultJsonTypeInfoResolver, I
     {
         JsonTypeInfo result = base.GetTypeInfo(type, options);
 
-        if (type.IsInterface)
+        if (!type.IsInterface)
         {
-            Type[] subTypes = FindSubTypes(type).ToArray();
-
-            if (subTypes.Any())
-            {
-                JsonPolymorphismOptions jsonPolymorphismOptions = result.PolymorphismOptions ?? new JsonPolymorphismOptions();
-
-                IEnumerable<Type> knownSubTypes = jsonPolymorphismOptions.DerivedTypes.Select(x => x.DerivedType);
-                IEnumerable<Type> subTypesToAdd = subTypes.Except(knownSubTypes);
-                foreach (Type subType in subTypesToAdd)
-                {
-                    jsonPolymorphismOptions.DerivedTypes.Add(new JsonDerivedType(
-                        subType,
-                        subType.Name ?? string.Empty));
-                }
-
-                result.PolymorphismOptions = jsonPolymorphismOptions;
-            }
+            return result;
         }
+
+        Type[] subTypes = FindSubTypes(type).ToArray();
+
+        if (!subTypes.Any())
+        {
+            return result;
+        }
+
+        JsonPolymorphismOptions jsonPolymorphismOptions = result.PolymorphismOptions ?? new JsonPolymorphismOptions();
+
+        IEnumerable<Type> knownSubTypes = jsonPolymorphismOptions.DerivedTypes.Select(x => x.DerivedType);
+        IEnumerable<Type> subTypesToAdd = subTypes.Except(knownSubTypes);
+        foreach (Type subType in subTypesToAdd)
+        {
+            jsonPolymorphismOptions.DerivedTypes.Add(new JsonDerivedType(
+                subType,
+                subType.Name ?? string.Empty));
+        }
+
+        result.PolymorphismOptions = jsonPolymorphismOptions;
 
         return result;
     }
