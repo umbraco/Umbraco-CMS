@@ -85,7 +85,7 @@ internal sealed class ConfigureUmbracoSwaggerGenOptions : IConfigureOptions<Swag
 
             return null;
         });
-        swaggerGenOptions.SelectDiscriminatorValueUsing(x=>x.Name);
+        swaggerGenOptions.SelectDiscriminatorValueUsing(x => x.Name);
     }
 
     private static string CustomOperationId(ApiDescription api)
