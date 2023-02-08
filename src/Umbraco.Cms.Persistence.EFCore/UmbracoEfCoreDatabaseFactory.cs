@@ -1,6 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core.Persistence;
-using Umbraco.Cms.Infrastructure.Persistence.EfCore;
 using Umbraco.Cms.Persistence.EFCore.Entities;
 
 namespace Umbraco.Cms.Persistence.EFCore;
