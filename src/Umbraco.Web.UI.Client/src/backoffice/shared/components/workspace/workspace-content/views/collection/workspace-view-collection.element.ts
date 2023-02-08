@@ -2,7 +2,6 @@ import { css, html } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement } from 'lit/decorators.js';
 import { ifDefined } from 'lit-html/directives/if-defined.js';
-import { UmbMediaTreeStore } from '../../../../../../media/media/media.tree.store';
 import {
 	UmbCollectionContext,
 	UMB_COLLECTION_CONTEXT_TOKEN,
@@ -31,7 +30,8 @@ export class UmbWorkspaceViewCollectionElement extends UmbLitElement {
 
 	private _workspaceContext?: UmbWorkspaceEntityContextInterface;
 
-	private _collectionContext?: UmbCollectionContext<FolderTreeItem, UmbMediaTreeStore>;
+	// TODO: add type for the collection context.
+	private _collectionContext?: UmbCollectionContext<FolderTreeItem, any>;
 
 	constructor() {
 		super();
