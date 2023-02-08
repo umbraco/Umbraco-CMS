@@ -3,6 +3,7 @@ import { css, html } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { ifDefined } from 'lit-html/directives/if-defined.js';
 import { UmbLitElement } from '@umbraco-cms/element';
+import { UmbExecutedEvent } from 'src/core/events';
 
 @customElement('umb-workspace-action-menu')
 export class UmbWorkspaceActionMenuElement extends UmbLitElement {
@@ -44,6 +45,11 @@ export class UmbWorkspaceActionMenuElement extends UmbLitElement {
 		this._actionMenuIsOpen = true;
 	}
 
+	#onActionExecuted(event: UmbExecutedEvent) {
+		event.stopPropagation();
+		this.#close();
+	}
+
 	render() {
 		return html` ${this.#renderActionsMenu()} `;
 	}
@@ -54,9 +60,9 @@ export class UmbWorkspaceActionMenuElement extends UmbLitElement {
 				<uui-button slot="trigger" label="Actions" @click=${this.#open}></uui-button>
 				<div id="action-menu-dropdown" slot="popover">
 					<uui-scroll-container>
-						<umb-entity-action-list entity-type=${ifDefined(this.entityType)} unique=${ifDefined(
-			this.unique
-		)}></umb-entity-action-list>
+						<umb-entity-action-list @executed=${this.#onActionExecuted} entity-type=${ifDefined(
+			this.entityType
+		)} unique=${ifDefined(this.unique)}></umb-entity-action-list>
 					</uui-scroll-container>
 				</div>
 			</uui-popover>
