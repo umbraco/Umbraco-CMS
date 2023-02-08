@@ -43,7 +43,8 @@ public sealed class UmbracoJsonTypeInfoResolver : DefaultJsonTypeInfoResolver, I
                 IEnumerable<Type> subTypesToAdd = subTypes.Except(knownSubTypes);
                 foreach (Type subType in subTypesToAdd)
                 {
-                    jsonPolymorphismOptions.DerivedTypes.Add(new JsonDerivedType(subType,
+                    jsonPolymorphismOptions.DerivedTypes.Add(new JsonDerivedType(
+                        subType,
                         subType.Name ?? string.Empty));
                 }
 
