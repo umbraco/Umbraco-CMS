@@ -54,8 +54,8 @@ public class DictionaryFactory : IDictionaryFactory
         return updated;
     }
 
-    public DictionaryImportViewModel CreateDictionaryImportViewModel(UdtFileUpload udtFileUpload) =>
-        new DictionaryImportViewModel
+    public DictionaryUploadViewModel CreateDictionaryImportViewModel(UdtFileUpload udtFileUpload) =>
+        new DictionaryUploadViewModel
         {
             FileName = udtFileUpload.FileName,
             DictionaryItems = udtFileUpload

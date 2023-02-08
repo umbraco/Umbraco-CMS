@@ -766,12 +766,12 @@
         }
       }
     },
-    "/umbraco/management/api/v1/dictionary/export/{key}": {
+    "/umbraco/management/api/v1/dictionary/{key}/export": {
       "get": {
         "tags": [
           "Dictionary"
         ],
-        "operationId": "GetDictionaryExportByKey",
+        "operationId": "GetDictionaryByKeyExport",
         "parameters": [
           {
             "name": "key",
@@ -822,30 +822,25 @@
           "Dictionary"
         ],
         "operationId": "PostDictionaryImport",
-        "parameters": [
-          {
-            "name": "file",
-            "in": "query",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "parentId",
-            "in": "query",
-            "schema": {
-              "type": "integer",
-              "format": "int32"
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DictionaryImportModel"
+              }
             }
           }
-        ],
+        },
         "responses": {
-          "200": {
-            "description": "Success",
+          "201": {
+            "description": "Created"
+          },
+          "400": {
+            "description": "Bad Request",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ContentResultModel"
+                  "$ref": "#/components/schemas/ProblemDetailsModel"
                 }
               }
             }
@@ -855,7 +850,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/NotFoundResultModel"
+                  "$ref": "#/components/schemas/ProblemDetailsModel"
                 }
               }
             }
@@ -878,7 +873,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/DictionaryImportModel"
+                  "$ref": "#/components/schemas/DictionaryUploadModel"
                 }
               }
             }
@@ -5203,25 +5198,6 @@
         },
         "additionalProperties": false
       },
-      "ContentResultModel": {
-        "type": "object",
-        "properties": {
-          "content": {
-            "type": "string",
-            "nullable": true
-          },
-          "contentType": {
-            "type": "string",
-            "nullable": true
-          },
-          "statusCode": {
-            "type": "integer",
-            "format": "int32",
-            "nullable": true
-          }
-        },
-        "additionalProperties": false
-      },
       "ContentTreeItemModel": {
         "type": "object",
         "properties": {
@@ -5568,14 +5544,12 @@
       "DictionaryImportModel": {
         "type": "object",
         "properties": {
-          "dictionaryItems": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/DictionaryItemsImportModel"
-            }
+          "fileName": {
+            "type": "string"
           },
-          "tempFileName": {
+          "parentKey": {
             "type": "string",
+            "format": "uuid",
             "nullable": true
           }
         },
@@ -5650,13 +5624,18 @@
       "DictionaryItemsImportModel": {
         "type": "object",
         "properties": {
+          "key": {
+            "type": "string",
+            "format": "uuid"
+          },
           "name": {
             "type": "string",
             "nullable": true
           },
-          "level": {
-            "type": "integer",
-            "format": "int32"
+          "parentKey": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
           }
         },
         "additionalProperties": false
@@ -5672,15 +5651,32 @@
             "type": "string",
             "format": "uuid"
           },
-          "level": {
-            "type": "integer",
-            "format": "int32"
+          "parentKey": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
           },
           "translatedIsoCodes": {
             "type": "array",
             "items": {
               "type": "string"
             }
+          }
+        },
+        "additionalProperties": false
+      },
+      "DictionaryUploadModel": {
+        "type": "object",
+        "properties": {
+          "dictionaryItems": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DictionaryItemsImportModel"
+            }
+          },
+          "fileName": {
+            "type": "string",
+            "nullable": true
           }
         },
         "additionalProperties": false
