@@ -79,49 +79,7 @@
   </Suppression>
   <Suppression>
     <DiagnosticId>CP0002</DiagnosticId>
-    <Target>M:Umbraco.Cms.Infrastructure.Install.PackageMigrationRunner.#ctor(Umbraco.Cms.Core.Logging.IProfilingLogger,Umbraco.Cms.Core.Scoping.ICoreScopeProvider,Umbraco.Cms.Core.Packaging.PendingPackageMigrations,Umbraco.Cms.Core.Packaging.PackageMigrationPlanCollection,Umbraco.Cms.Core.Migrations.IMigrationPlanExecutor,Umbraco.Cms.Core.Services.IKeyValueService,Umbraco.Cms.Core.Events.IEventAggregator)</Target>
-    <Left>lib/net7.0/Umbraco.Infrastructure.dll</Left>
-    <Right>lib/net7.0/Umbraco.Infrastructure.dll</Right>
-    <IsBaselineSuppression>true</IsBaselineSuppression>
-  </Suppression>
-  <Suppression>
-    <DiagnosticId>CP0002</DiagnosticId>
-    <Target>M:Umbraco.Cms.Infrastructure.Migrations.IMigrationContext.AddPostMigration``1</Target>
-    <Left>lib/net7.0/Umbraco.Infrastructure.dll</Left>
-    <Right>lib/net7.0/Umbraco.Infrastructure.dll</Right>
-    <IsBaselineSuppression>true</IsBaselineSuppression>
-  </Suppression>
-  <Suppression>
-    <DiagnosticId>CP0002</DiagnosticId>
-    <Target>M:Umbraco.Cms.Infrastructure.Migrations.Install.DatabaseBuilder.#ctor(Umbraco.Cms.Core.Scoping.ICoreScopeProvider,Umbraco.Cms.Infrastructure.Scoping.IScopeAccessor,Umbraco.Cms.Infrastructure.Persistence.IUmbracoDatabaseFactory,Umbraco.Cms.Core.Services.IRuntimeState,Microsoft.Extensions.Logging.ILoggerFactory,Umbraco.Cms.Core.Services.IKeyValueService,Umbraco.Cms.Infrastructure.Persistence.IDbProviderFactoryCreator,Umbraco.Cms.Core.Configuration.IConfigManipulator,Microsoft.Extensions.Options.IOptionsMonitor{Umbraco.Cms.Core.Configuration.Models.GlobalSettings},Microsoft.Extensions.Options.IOptionsMonitor{Umbraco.Cms.Core.Configuration.Models.ConnectionStrings},Umbraco.Cms.Core.Migrations.IMigrationPlanExecutor,Umbraco.Cms.Infrastructure.Migrations.Install.DatabaseSchemaCreatorFactory,System.Collections.Generic.IEnumerable{Umbraco.Cms.Infrastructure.Persistence.IDatabaseProviderMetadata})</Target>
-    <Left>lib/net7.0/Umbraco.Infrastructure.dll</Left>
-    <Right>lib/net7.0/Umbraco.Infrastructure.dll</Right>
-    <IsBaselineSuppression>true</IsBaselineSuppression>
-  </Suppression>
-  <Suppression>
-    <DiagnosticId>CP0002</DiagnosticId>
-    <Target>M:Umbraco.Cms.Infrastructure.Migrations.MigrationPlan.AddPostMigration``1</Target>
-    <Left>lib/net7.0/Umbraco.Infrastructure.dll</Left>
-    <Right>lib/net7.0/Umbraco.Infrastructure.dll</Right>
-    <IsBaselineSuppression>true</IsBaselineSuppression>
-  </Suppression>
-  <Suppression>
-    <DiagnosticId>CP0002</DiagnosticId>
-    <Target>M:Umbraco.Cms.Infrastructure.Migrations.MigrationPlan.get_PostMigrationTypes</Target>
-    <Left>lib/net7.0/Umbraco.Infrastructure.dll</Left>
-    <Right>lib/net7.0/Umbraco.Infrastructure.dll</Right>
-    <IsBaselineSuppression>true</IsBaselineSuppression>
-  </Suppression>
-  <Suppression>
-    <DiagnosticId>CP0002</DiagnosticId>
-    <Target>M:Umbraco.Cms.Infrastructure.Migrations.MigrationPlanExecutor.#ctor(Umbraco.Cms.Core.Scoping.ICoreScopeProvider,Umbraco.Cms.Infrastructure.Scoping.IScopeAccessor,Microsoft.Extensions.Logging.ILoggerFactory,Umbraco.Cms.Infrastructure.Migrations.IMigrationBuilder)</Target>
-    <Left>lib/net7.0/Umbraco.Infrastructure.dll</Left>
-    <Right>lib/net7.0/Umbraco.Infrastructure.dll</Right>
-    <IsBaselineSuppression>true</IsBaselineSuppression>
-  </Suppression>
-  <Suppression>
-    <DiagnosticId>CP0002</DiagnosticId>
-    <Target>M:Umbraco.Cms.Infrastructure.Migrations.Upgrade.Upgrader.Execute(Umbraco.Cms.Core.Migrations.IMigrationPlanExecutor,Umbraco.Cms.Core.Scoping.IScopeProvider,Umbraco.Cms.Core.Services.IKeyValueService)</Target>
+    <Target>M:Umbraco.Cms.Core.Security.BackOfficeUserStore.#ctor(Umbraco.Cms.Core.Scoping.ICoreScopeProvider,Umbraco.Cms.Core.Services.IUserService,Umbraco.Cms.Core.Services.IEntityService,Umbraco.Cms.Core.Services.IExternalLoginWithKeyService,Microsoft.Extensions.Options.IOptions{Umbraco.Cms.Core.Configuration.Models.GlobalSettings},Umbraco.Cms.Core.Mapping.IUmbracoMapper,Umbraco.Cms.Core.Security.BackOfficeErrorDescriber,Umbraco.Cms.Core.Cache.AppCaches)</Target>
     <Left>lib/net7.0/Umbraco.Infrastructure.dll</Left>
     <Right>lib/net7.0/Umbraco.Infrastructure.dll</Right>
     <IsBaselineSuppression>true</IsBaselineSuppression>
