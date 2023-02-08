@@ -118,36 +118,9 @@ public class PackagingService : IPackagingService
 
     public IEnumerable<InstalledPackage> GetAllInstalledPackages()
     {
-        IReadOnlyDictionary<string, string?>? keyValues =
-            _keyValueService.FindByKeyPrefix(Constants.Conventions.Migrations.KeyValuePrefix);
-
-        var installedPackages = new Dictionary<string, InstalledPackage>();
-
-        // Collect the package from the package migration plans
-        foreach (PackageMigrationPlan plan in _packageMigrationPlans)
-        {
-            if (!installedPackages.TryGetValue(plan.PackageName, out InstalledPackage? installedPackage))
-            {
-                installedPackage = new InstalledPackage { PackageName = plan.PackageName };
-                installedPackages.Add(plan.PackageName, installedPackage);
-            }
-
-            var currentPlans = installedPackage.PackageMigrationPlans.ToList();
-            if (keyValues is null || keyValues.TryGetValue(
-                Constants.Conventions.Migrations.KeyValuePrefix + plan.Name,
-                out var currentState) is false)
-            {
-                currentState = null;
-            }
-
-            currentPlans.Add(new InstalledPackageMigrationPlans
-            {
-                CurrentMigrationId = currentState,
-                FinalMigrationId = plan.FinalState,
-            });
-
-            installedPackage.PackageMigrationPlans = currentPlans;
-        }
+        // Collect the packages from the package migration plans
+        var installedPackages = GetInstalledPackagesFromMigrationPlans()
+            .ToDictionary(package => package.PackageName!, package => package); // PackageName cannot be null here
 
         // Collect and merge the packages from the manifests
         foreach (PackageManifest package in _manifestParser.GetManifests())
@@ -159,7 +132,8 @@ public class PackagingService : IPackagingService
 
             if (!installedPackages.TryGetValue(package.PackageName, out InstalledPackage? installedPackage))
             {
-                installedPackage = new InstalledPackage {
+                installedPackage = new InstalledPackage
+                {
                     PackageName = package.PackageName,
                     Version = string.IsNullOrEmpty(package.Version) ? "Unknown" : package.Version,
                 };
@@ -175,4 +149,36 @@ public class PackagingService : IPackagingService
     }
 
     #endregion
+
+    public IEnumerable<InstalledPackage> GetInstalledPackagesFromMigrationPlans()
+    {
+        IReadOnlyDictionary<string, string?>? keyValues =
+            _keyValueService.FindByKeyPrefix(Constants.Conventions.Migrations.KeyValuePrefix);
+
+        InstalledPackage[] installedPackages = _packageMigrationPlans
+            .GroupBy(plan => plan.PackageName)
+            .Select(group =>
+            {
+                var package = new InstalledPackage
+                {
+                    PackageName = group.Key,
+                };
+
+                var currentState = keyValues?
+                    .GetValueOrDefault(Constants.Conventions.Migrations.KeyValuePrefix + package.PackageName);
+
+                package.PackageMigrationPlans = group
+                    .Select(plan => new InstalledPackageMigrationPlans
+                    {
+                        CurrentMigrationId = currentState,
+                        FinalMigrationId = plan.FinalState,
+                    })
+                    .ToArray();
+
+                return package;
+            })
+            .ToArray();
+
+        return installedPackages;
+    }
 }

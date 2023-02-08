@@ -28,6 +28,11 @@ public interface IPackagingService : IService
     /// <returns></returns>
     IEnumerable<InstalledPackage> GetAllInstalledPackages();
 
+    /// <summary>
+    ///     Returns installed packages collected from the package migration plans.
+    /// </summary>
+    IEnumerable<InstalledPackage> GetInstalledPackagesFromMigrationPlans();
+
     InstalledPackage? GetInstalledPackageByName(string packageName);
 
     /// <summary>
