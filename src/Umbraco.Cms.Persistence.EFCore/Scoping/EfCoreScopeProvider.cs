@@ -37,16 +37,13 @@ public class EfCoreScopeProvider : IEfCoreScopeProvider
         DistributedLockingMechanismFactory = distributedLockingMechanismFactory;
     }
 
-    public IEfCoreScope CreateDetachedScope()
-    {
-        return new EfCoreScope(_umbracoEfCoreDatabaseFactory, _efCoreScopeAccessor, this, null, true);
-    }
+    public IEfCoreScope CreateDetachedScope() => new EfCoreDetachableScope(_umbracoEfCoreDatabaseFactory, _efCoreScopeAccessor, this, null);
 
     public void AttachScope(IEfCoreScope other)
     {
         // IScopeProvider.AttachScope works with an IScope
         // but here we can only deal with our own Scope class
-        if (other is not EfCoreScope otherScope)
+        if (other is not EfCoreDetachableScope otherScope)
         {
             throw new ArgumentException("Not a Scope instance.");
         }
@@ -71,7 +68,11 @@ public class EfCoreScopeProvider : IEfCoreScopeProvider
 
     public IEfCoreScope DetachScope()
     {
-        EfCoreScope? ambientScope = (EfCoreScope)_ambientEfCoreScopeStack.AmbientScope!;
+        if (_ambientEfCoreScopeStack.AmbientScope is not EfCoreDetachableScope ambientScope)
+        {
+            throw new InvalidOperationException("Ambient scope is not detachable");
+        }
+
         if (ambientScope == null)
         {
             throw new InvalidOperationException("There is no ambient scope.");
@@ -85,10 +86,10 @@ public class EfCoreScopeProvider : IEfCoreScopeProvider
         PopAmbientScope();
         PopAmbientScopeContext();
 
-        EfCoreScope? originalScope = (EfCoreScope)_ambientEfCoreScopeStack.AmbientScope!;
+        var originalScope = (EfCoreScope)_ambientEfCoreScopeStack.AmbientScope!;
         if (originalScope != ambientScope.OriginalScope)
         {
-            throw new InvalidOperationException($"The detatched scope ({ambientScope.InstanceId}) does not match the original ({originalScope?.InstanceId})");
+            throw new InvalidOperationException($"The detatched scope ({ambientScope.InstanceId}) does not match the original ({originalScope.InstanceId})");
         }
 
         IScopeContext? originalScopeContext = AmbientScopeContext;
@@ -111,7 +112,7 @@ public class EfCoreScopeProvider : IEfCoreScopeProvider
         if (_ambientEfCoreScopeStack.AmbientScope is null)
         {
             ScopeContext? newContext = _ambientEfCoreScopeContextStack.AmbientContext == null ? new ScopeContext() : null;
-            var ambientScope = new EfCoreScope(_umbracoEfCoreDatabaseFactory, _efCoreScopeAccessor, this, newContext, false);
+            var ambientScope = new EfCoreScope(_umbracoEfCoreDatabaseFactory, _efCoreScopeAccessor, this, newContext);
 
             if (newContext != null)
             {

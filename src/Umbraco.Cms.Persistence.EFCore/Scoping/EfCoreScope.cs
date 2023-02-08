@@ -30,21 +30,11 @@ internal class EfCoreScope : IEfCoreScope
 
     public IScopeContext? ScopeContext { get; set; }
 
-    // Properties needed for DetachedScope
-    public EfCoreScope? OriginalScope { get; set; }
-
-    public IScopeContext? OriginalContext { get; set; }
-
-    public bool Detachable { get; set; }
-
-    public bool Attached { get; set; }
-
     public EfCoreScope(
         IUmbracoEfCoreDatabaseFactory efCoreDatabaseFactory,
         IEFCoreScopeAccessor efCoreScopeAccessor,
         IEfCoreScopeProvider efCoreScopeProvider,
-        IScopeContext? scopeContext,
-        bool detachable)
+        IScopeContext? scopeContext)
     {
         _efCoreDatabaseFactory = efCoreDatabaseFactory;
         _dictionaryLocker = new object();
@@ -53,19 +43,19 @@ internal class EfCoreScope : IEfCoreScope
         _acquiredLocks = new Queue<IDistributedLock>();
         InstanceId = Guid.NewGuid();
 
-        if (detachable)
-        {
-            if (scopeContext is not null)
-            {
-                throw new ArgumentException("Cannot set context on detachable scope.", nameof(scopeContext));
-            }
-
-            Detachable = true;
-
-            ScopeContext = new ScopeContext();
-
-            return;
-        }
+        // if (detachable)
+        // {
+        //     if (scopeContext is not null)
+        //     {
+        //         throw new ArgumentException("Cannot set context on detachable scope.", nameof(scopeContext));
+        //     }
+        //
+        //     Detachable = true;
+        //
+        //     ScopeContext = new ScopeContext();
+        //
+        //     return;
+        // }
 
         ScopeContext = scopeContext;
 
@@ -81,8 +71,7 @@ internal class EfCoreScope : IEfCoreScope
             efCoreDatabaseFactory,
             efCoreScopeAccessor,
             efCoreScopeProvider,
-            scopeContext,
-            false) =>
+            scopeContext) =>
         ParentScope = parentScope;
 
     public async Task<T> ExecuteWithContextAsync<T>(Func<UmbracoEFContext, Task<T>> method)
@@ -142,7 +131,6 @@ internal class EfCoreScope : IEfCoreScope
 
 
         HandleScopeContext();
-        HandleDetachedScopes();
 
         _disposed = true;
     }
@@ -323,30 +311,6 @@ internal class EfCoreScope : IEfCoreScope
         if (_umbracoEfCoreDatabase.UmbracoEFContext.Database.CurrentTransaction is null)
         {
             _umbracoEfCoreDatabase.UmbracoEFContext.Database.BeginTransaction();
-        }
-    }
-
-    private void HandleDetachedScopes()
-    {
-        if (Detachable)
-        {
-            // get out of the way, restore original
-
-            // TODO: Difficult to know if this is correct since this is all required
-            // by Deploy which I don't fully understand since there is limited tests on this in the CMS
-            if (OriginalScope != _efCoreScopeAccessor.AmbientScope)
-            {
-                _efCoreScopeProvider.PopAmbientScope();
-            }
-
-            if (OriginalContext != _efCoreScopeProvider.AmbientScopeContext)
-            {
-                _efCoreScopeProvider.PopAmbientScopeContext();
-            }
-
-            Attached = false;
-            OriginalScope = null;
-            OriginalContext = null;
         }
     }
 
