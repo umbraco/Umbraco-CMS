@@ -13,9 +13,9 @@ public class DictionaryOverviewViewModel
     public Guid Key { get; set; }
 
     /// <summary>
-    ///     Gets or sets the level.
+    ///     Gets or sets the parent key.
     /// </summary>
-    public int Level { get; set; }
+    public Guid? ParentKey { get; set; }
 
     /// <summary>
     ///     Sets the translations.
