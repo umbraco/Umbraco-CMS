@@ -1,6 +1,7 @@
 import { css, html, LitElement, nothing } from 'lit';
 import { ifDefined } from 'lit-html/directives/if-defined.js';
 import { customElement, property, state } from 'lit/decorators.js';
+import { UmbExecutedEvent } from 'src/core/events';
 import type { UmbTableColumn, UmbTableItem } from '../../../../../../shared/components/table';
 
 // TODO: this could be done more generic, but for now we just need it for the document table
@@ -48,6 +49,11 @@ export class UmbDocumentTableActionColumnLayoutElement extends LitElement {
 		this._actionMenuIsOpen = true;
 	}
 
+	#onActionExecuted(event: UmbExecutedEvent) {
+		event.stopPropagation();
+		this.#close();
+	}
+
 	render() {
 		return html`
 			<uui-popover id="action-menu-popover" .open=${this._actionMenuIsOpen} @close=${this.#close}>
@@ -62,6 +68,7 @@ export class UmbDocumentTableActionColumnLayoutElement extends LitElement {
 			<div id="action-menu-dropdown" slot="popover">
 				<uui-scroll-container>
 					<umb-entity-action-list
+						@executed=${this.#onActionExecuted}
 						entity-type=${ifDefined(this.value.entityType)}
 						unique=${ifDefined(this.item.key)}></umb-entity-action-list>
 				</uui-scroll-container>
