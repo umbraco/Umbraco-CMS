@@ -6,10 +6,11 @@ using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services.OperationStatus;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Services;
 
-internal class LanguageService : RepositoryService, ILanguageService
+internal sealed class LanguageService : RepositoryService, ILanguageService
 {
     private readonly ILanguageRepository _languageRepository;
     private readonly IAuditRepository _auditRepository;
@@ -148,9 +149,13 @@ internal class LanguageService : RepositoryService, ILanguageService
         string auditMessage,
         int userId)
     {
-        if (HasValidIsoCode(language) == false)
+        if (IsValidIsoCode(language.IsoCode) == false)
         {
             return Attempt.FailWithStatus(LanguageOperationStatus.InvalidIsoCode, language);
+        }
+        if (language.FallbackIsoCode is not null && IsValidIsoCode(language.FallbackIsoCode) == false)
+        {
+            return Attempt.FailWithStatus(LanguageOperationStatus.InvalidFallbackIsoCode, language);
         }
 
         using (ICoreScope scope = ScopeProvider.CreateCoreScope())
@@ -195,25 +200,24 @@ internal class LanguageService : RepositoryService, ILanguageService
     private bool HasInvalidFallbackLanguage(ILanguage language)
     {
         // no fallback language = valid
-        if (language.FallbackLanguageId.HasValue == false)
+        if (language.FallbackIsoCode == null)
         {
             return false;
         }
 
         // does the fallback language actually exist?
-        var languages = _languageRepository.GetMany().ToDictionary(x => x.Id, x => x);
-        if (languages.ContainsKey(language.FallbackLanguageId.Value) == false)
+        var languagesByIsoCode = _languageRepository.GetMany().ToDictionary(x => x.IsoCode, x => x, StringComparer.OrdinalIgnoreCase);
+        if (!languagesByIsoCode.ContainsKey(language.FallbackIsoCode))
         {
             return true;
         }
 
-        // does the fallback language create a cycle?
-        if (CreatesCycle(language, languages))
+        if (CreatesCycle(language, languagesByIsoCode))
         {
             // explicitly logging this because it may not be obvious, specially with implicit cyclic fallbacks
             LoggerFactory
                 .CreateLogger<LanguageService>()
-                .Log(LogLevel.Error, $"Cannot use language {languages[language.FallbackLanguageId.Value].IsoCode} as fallback for language {language.IsoCode} as this would create a fallback cycle.");
+                .Log(LogLevel.Error, $"Cannot use language {language.FallbackIsoCode} as fallback for language {language.IsoCode} as this would create a fallback cycle.");
 
             return true;
         }
@@ -221,7 +225,7 @@ internal class LanguageService : RepositoryService, ILanguageService
         return false;
     }
 
-    private bool CreatesCycle(ILanguage language, IDictionary<int, ILanguage> languages)
+    private bool CreatesCycle(ILanguage language, IDictionary<string, ILanguage> languagesByIsoCode)
     {
         // a new language is not referenced yet, so cannot be part of a cycle
         if (!language.HasIdentity)
@@ -229,31 +233,31 @@ internal class LanguageService : RepositoryService, ILanguageService
             return false;
         }
 
-        var id = language.FallbackLanguageId;
+        var isoCode = language.FallbackIsoCode;
 
         // assuming languages does not already contains a cycle, this must end
         while (true)
         {
-            if (!id.HasValue)
+            if (isoCode == null)
             {
                 return false; // no fallback means no cycle
             }
 
-            if (id.Value == language.Id)
+            if (isoCode.InvariantEquals(language.IsoCode))
             {
                 return true; // back to language = cycle!
             }
 
-            id = languages[id.Value].FallbackLanguageId; // else keep chaining
+            isoCode = languagesByIsoCode[isoCode].FallbackIsoCode; // else keep chaining
         }
     }
 
-    private static bool HasValidIsoCode(ILanguage language)
+    private static bool IsValidIsoCode(string isoCode)
     {
         try
         {
-            var culture = CultureInfo.GetCultureInfo(language.IsoCode);
-            return culture.Name == language.IsoCode;
+            var culture = CultureInfo.GetCultureInfo(isoCode);
+            return culture.Name == isoCode && culture.CultureTypes.HasFlag(CultureTypes.UserCustomCulture) == false;
         }
         catch (CultureNotFoundException)
         {

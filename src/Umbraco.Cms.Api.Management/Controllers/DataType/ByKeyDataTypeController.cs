@@ -24,12 +24,12 @@ public class ByKeyDataTypeController : DataTypeControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<DataTypeViewModel>> ByKey(Guid key)
     {
-        IDataType? dataType = _dataTypeService.GetDataType(key);
+        IDataType? dataType = await _dataTypeService.GetAsync(key);
         if (dataType == null)
         {
             return NotFound();
         }
 
-        return await Task.FromResult(Ok(_umbracoMapper.Map<DataTypeViewModel>(dataType)));
+        return Ok(_umbracoMapper.Map<DataTypeViewModel>(dataType));
     }
 }

@@ -1,52 +1,53 @@
-﻿using System.Net.Mime;
-using System.Text;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Umbraco.Cms.Core;
-using Umbraco.Cms.Core.Extensions;
+using Umbraco.Cms.Api.Common.Builders;
 using Umbraco.Cms.Core.Models;
-using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Api.Management.Services;
-using IHostingEnvironment = Umbraco.Cms.Core.Hosting.IHostingEnvironment;
+using Umbraco.Cms.Api.Management.Services.OperationStatus;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Security;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Dictionary;
 
 public class ImportDictionaryController : DictionaryControllerBase
 {
-    private readonly IDictionaryService _dictionaryService;
-    private readonly IWebHostEnvironment _webHostEnvironment;
-    private readonly ILoadDictionaryItemService _loadDictionaryItemService;
+    private readonly IDictionaryItemImportService _dictionaryItemImportService;
+    private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
 
     public ImportDictionaryController(
-        IDictionaryService dictionaryService,
-        IWebHostEnvironment webHostEnvironment,
-        ILoadDictionaryItemService loadDictionaryItemService)
+        IDictionaryItemImportService dictionaryItemImportService,
+        IBackOfficeSecurityAccessor backOfficeSecurityAccessor)
     {
-        _dictionaryService = dictionaryService;
-        _webHostEnvironment = webHostEnvironment;
-        _loadDictionaryItemService = loadDictionaryItemService;
+        _dictionaryItemImportService = dictionaryItemImportService;
+        _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
     }
 
     [HttpPost("import")]
     [MapToApiVersion("1.0")]
-    [ProducesResponseType(typeof(ContentResult), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(NotFoundResult), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> ImportDictionary(string file, int? parentId)
+    [ProducesResponseType(StatusCodes.Status201Created)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> Import(ViewModels.Dictionary.DictionaryImportModel dictionaryImportModel)
     {
-        if (string.IsNullOrWhiteSpace(file))
+        Attempt<IDictionaryItem?, DictionaryImportOperationStatus> result = await _dictionaryItemImportService
+            .ImportDictionaryItemFromUdtFileAsync(
+                dictionaryImportModel.FileName,
+                dictionaryImportModel.ParentKey,
+                CurrentUserId(_backOfficeSecurityAccessor));
+
+        return result.Status switch
         {
-            return NotFound();
-        }
-
-        var filePath = Path.Combine(_webHostEnvironment.MapPathContentRoot(Constants.SystemDirectories.Data), file);
-        if (_webHostEnvironment.ContentRootFileProvider.GetFileInfo(filePath) is null)
-        {
-            return await Task.FromResult(NotFound());
-        }
-
-        IDictionaryItem dictionaryItem = _loadDictionaryItemService.Load(filePath, parentId);
-
-        return await Task.FromResult(Content(_dictionaryService.CalculatePath(dictionaryItem.ParentId, dictionaryItem.Id), MediaTypeNames.Text.Plain, Encoding.UTF8));
+            DictionaryImportOperationStatus.Success => CreatedAtAction<ByKeyDictionaryController>(controller => nameof(controller.ByKey), result.Result!.Key),
+            DictionaryImportOperationStatus.ParentNotFound => NotFound("The parent dictionary item could not be found."),
+            DictionaryImportOperationStatus.InvalidFileType => BadRequest(new ProblemDetailsBuilder()
+                .WithTitle("Invalid file type")
+                .WithDetail("The dictionary import only supports UDT files.")
+                .Build()),
+            DictionaryImportOperationStatus.InvalidFileContent => BadRequest(new ProblemDetailsBuilder()
+                .WithTitle("Invalid file content")
+                .WithDetail("The uploaded file could not be read as a valid UDT file.")
+                .Build()),
+            _ => StatusCode(StatusCodes.Status500InternalServerError, "Unknown dictionary import operation status")
+        };
     }
 }

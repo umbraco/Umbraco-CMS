@@ -8,14 +8,14 @@ namespace Umbraco.Cms.Api.Management.Controllers.DataType.Folder;
 
 public class CreateDataTypeFolderController : DataTypeFolderControllerBase
 {
-    public CreateDataTypeFolderController(IBackOfficeSecurityAccessor backOfficeSecurityAccessor, IDataTypeService dataTypeService)
-        : base(backOfficeSecurityAccessor, dataTypeService)
+    public CreateDataTypeFolderController(IBackOfficeSecurityAccessor backOfficeSecurityAccessor, IDataTypeContainerService dataTypeContainerService)
+        : base(backOfficeSecurityAccessor, dataTypeContainerService)
     {
     }
 
     [HttpPost]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(StatusCodes.Status201Created)]
-    public async Task<ActionResult> Create(FolderCreateModel folderCreateModel)
-        => await Task.FromResult(CreateFolder<ByKeyDataTypeFolderController>(folderCreateModel, controller => nameof(controller.ByKey)));
+    public async Task<IActionResult> Create(FolderCreateModel folderCreateModel)
+        => await CreateFolderAsync<ByKeyDataTypeFolderController>(folderCreateModel, controller => nameof(controller.ByKey));
 }

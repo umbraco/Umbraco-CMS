@@ -78,6 +78,12 @@ public class PackageDataInstallationTests : UmbracoIntegrationTestWithContent
 
     private IMediaTypeService MediaTypeService => GetRequiredService<IMediaTypeService>();
 
+    public override void CreateTestData()
+    {
+        DeleteAllTemplateViewFiles();
+        base.CreateTestData();
+    }
+
     [Test]
     public void Can_Import_uBlogsy_ContentTypes_And_Verify_Structure()
     {
@@ -858,7 +864,7 @@ public class PackageDataInstallationTests : UmbracoIntegrationTestWithContent
     {
         Assert.That(await DictionaryItemService.ExistsAsync(dictionaryItemName), "DictionaryItem key does not exist");
         var dictionaryItem = await DictionaryItemService.GetAsync(dictionaryItemName);
-        var translation = dictionaryItem.Translations.SingleOrDefault(i => i.Language.IsoCode == cultureCode);
+        var translation = dictionaryItem.Translations.SingleOrDefault(i => i.LanguageIsoCode == cultureCode);
         Assert.IsNotNull(translation, "Translation to {0} was not added", cultureCode);
         var value = translation.Value;
         Assert.That(value, Is.EqualTo(expectedValue), "Translation value was not set");
