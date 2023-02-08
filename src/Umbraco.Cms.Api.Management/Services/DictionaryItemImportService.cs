@@ -51,7 +51,7 @@ internal sealed class DictionaryItemImportService : IDictionaryItemImportService
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, $"Error loading UDT file: {fileName}");
+            _logger.LogError(ex, "Error loading UDT file: {FileName}", fileName);
             return Attempt.FailWithStatus<IDictionaryItem?, DictionaryImportOperationStatus>(DictionaryImportOperationStatus.InvalidFileContent, null);
         }
 
