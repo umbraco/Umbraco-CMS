@@ -2,6 +2,7 @@
 
 namespace Umbraco.Cms.Persistence.EFCore;
 
+// TODO: DI this where it doesn't overwrite the others if not using EFCore scopes
 public class HttpEFCoreScopeReference : IHttpEFCoreScopeReference
 {
     private readonly IEFCoreScopeAccessor _efCoreScopeAccessor;
