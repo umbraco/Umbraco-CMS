@@ -110,6 +110,11 @@ namespace Umbraco.Cms.Infrastructure.Migrations
             return indexes.Any(x => x.Item2.InvariantEquals(indexName));
         }
 
+        protected bool PrimaryKeyExists(string tableName, string primaryKeyName)
+        {
+            return SqlSyntax.DoesPrimaryKeyExist(Context.Database, tableName, primaryKeyName);
+        }
+
         protected bool ColumnExists(string tableName, string columnName)
         {
             ColumnInfo[]? columns = SqlSyntax.GetColumnsInSchema(Context.Database).Distinct().ToArray();

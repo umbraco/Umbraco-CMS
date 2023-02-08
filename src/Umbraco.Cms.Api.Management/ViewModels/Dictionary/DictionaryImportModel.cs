@@ -2,7 +2,7 @@
 
 public class DictionaryImportModel
 {
-    public string FileName { get; set; } = string.Empty;
+    public required string FileName { get; set; }
 
     public Guid? ParentKey { get; set; }
 }

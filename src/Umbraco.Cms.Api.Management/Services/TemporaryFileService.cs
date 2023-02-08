@@ -46,7 +46,7 @@ internal sealed class TemporaryFileService : ITemporaryFileService
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, $"Error deleting temporary file: {filePath}");
+            _logger.LogError(ex, "Error deleting temporary file: {FilePath}", filePath);
             return await Task.FromResult(false);
         }
     }

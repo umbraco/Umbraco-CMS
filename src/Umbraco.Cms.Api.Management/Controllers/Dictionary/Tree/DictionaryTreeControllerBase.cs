@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
@@ -32,7 +32,7 @@ public class DictionaryTreeControllerBase : EntityTreeControllerBase<EntityTreeI
             var hasChildren = (await DictionaryItemService.GetChildrenAsync(dictionaryItem.Key)).Any();
             return new EntityTreeItemViewModel
             {
-                Icon = Constants.Icons.RelationType,
+                Icon = Constants.Icons.Dictionary,
                 Name = dictionaryItem.ItemKey,
                 Key = dictionaryItem.Key,
                 Type = Constants.UdiEntityType.DictionaryItem,
