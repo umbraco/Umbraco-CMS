@@ -59,7 +59,6 @@ public class ManagementApiComposer : IComposer
                 // any generic JSON options go here
             })
             .AddJsonOptions(New.Cms.Core.Constants.JsonOptionsNames.BackOffice, _ => { });
-            ;
 
         services.ConfigureOptions<ConfigureUmbracoBackofficeJsonOptions>( );
 
