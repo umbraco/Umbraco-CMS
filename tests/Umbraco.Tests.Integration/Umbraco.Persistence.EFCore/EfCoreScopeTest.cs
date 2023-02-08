@@ -80,8 +80,9 @@ public class EfCoreScopeTest : UmbracoIntegrationTest
             using (IEfCoreScope scope = EfCoreScopeProvider.CreateScope())
             {
                 // scopeProvider.Context.Enlist("test", completed => scopeCompleted = completed);
-                scopeCompleted = await scope.ExecuteWithContextAsync(async database =>
+                await scope.ExecuteWithContextAsync(async database =>
                 {
+                    scope.ScopeContext!.Enlist("test", completed => scopeCompleted = completed);
                     Assert.IsInstanceOf<EfCoreScope>(scope);
                     Assert.IsNotNull(EfCoreScopeAccessor.AmbientScope);
                     Assert.AreSame(scope, EfCoreScopeAccessor.AmbientScope);
