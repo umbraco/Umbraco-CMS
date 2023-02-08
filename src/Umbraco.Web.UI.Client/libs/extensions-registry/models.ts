@@ -1,4 +1,3 @@
-import type { ManifestCollectionBulkAction } from './collection-bulk-action.models';
 import type { ManifestCollectionView } from './collection-view.models';
 import type { ManifestDashboard } from './dashboard.models';
 import type { ManifestDashboardCollection } from './dashboard-collection.models';
@@ -24,7 +23,6 @@ import type { ManifestWorkspaceViewCollection } from './workspace-view-collectio
 import type { ManifestRepository } from './repository.models';
 import type { ClassConstructor } from '@umbraco-cms/models';
 
-export * from './collection-bulk-action.models';
 export * from './collection-view.models';
 export * from './dashboard-collection.models';
 export * from './dashboard.models';
@@ -50,7 +48,6 @@ export * from './repository.models';
 export * from './workspace.models';
 
 export type ManifestTypes =
-	| ManifestCollectionBulkAction
 	| ManifestCollectionView
 	| ManifestCustom
 	| ManifestDashboard

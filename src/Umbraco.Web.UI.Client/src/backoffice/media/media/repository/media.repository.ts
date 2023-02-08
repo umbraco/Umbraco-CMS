@@ -213,8 +213,9 @@ export class UmbMediaRepository implements UmbTreeRepository, UmbDetailRepositor
 		return { error };
 	}
 
-	async trash() {
-		alert('trash');
+	async trash(keys: Array<string>) {
+		console.log('media trash: ' + keys);
+		alert('implement trash');
 	}
 
 	async move(keys: Array<string>, destination: string) {

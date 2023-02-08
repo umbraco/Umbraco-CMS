@@ -220,8 +220,9 @@ export class UmbDocumentRepository implements UmbTreeRepository, UmbDetailReposi
 	// Listing all currently known methods we need to implement:
 	// these currently only covers posting data
 	// TODO: find a good way to split these
-	async trash() {
-		alert('trash');
+	async trash(keys: Array<string>) {
+		console.log('document trash: ' + keys);
+		alert('implement trash');
 	}
 
 	async saveAndPublish() {
