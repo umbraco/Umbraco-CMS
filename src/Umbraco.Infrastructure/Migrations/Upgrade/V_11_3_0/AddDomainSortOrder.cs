@@ -1,6 +1,6 @@
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 
-namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_10_5_0;
+namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_11_3_0;
 
 public class AddDomainSortOrder : MigrationBase
 {
