@@ -130,9 +130,9 @@ internal sealed class UserGroupAuthorizationService : IUserGroupAuthorizationSer
     /// Ensures that the performing user is part of the user group.
     /// </summary>
     private Attempt<UserGroupOperationStatus> AuthorizeGroupAccess(IUser performingUser, IUserGroup userGroup) =>
-        performingUser.Groups.Any(x => x.Key == userGroup.Key) is false
-            ? Attempt.Fail(UserGroupOperationStatus.UnauthorizedMissingUserGroup)
-            : Attempt.Succeed(UserGroupOperationStatus.Success);
+        performingUser.Groups.Any(x => x.Key == userGroup.Key) || performingUser.IsAdmin()
+            ? Attempt.Succeed(UserGroupOperationStatus.Success)
+            : Attempt.Fail(UserGroupOperationStatus.UnauthorizedMissingUserGroup);
 
     // We explicitly take an IUser here which is non-nullable, since nullability should be handled in caller.
     private Attempt<UserGroupOperationStatus> AuthorizeContentStartNode(IUser user, IUserGroup userGroup)
