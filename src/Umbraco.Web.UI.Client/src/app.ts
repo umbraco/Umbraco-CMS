@@ -2,8 +2,6 @@ import '@umbraco-ui/uui-css/dist/uui-css.css';
 import '@umbraco-cms/css';
 
 // TODO: remove these imports when they are part of UUI
-import '@umbraco-ui/uui-color-swatch';
-import '@umbraco-ui/uui-color-swatches';
 import '@umbraco-ui/uui-modal';
 import '@umbraco-ui/uui-modal-container';
 import '@umbraco-ui/uui-modal-dialog';
@@ -16,7 +14,6 @@ import type { Guard, IRoute } from 'router-slot/model';
 import { UUIIconRegistryEssential } from '@umbraco-ui/uui';
 import { css, html } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
-
 
 import { UmbLitElement } from '@umbraco-cms/element';
 import { tryExecuteAndNotify } from '@umbraco-cms/resources';
