@@ -36,7 +36,7 @@ const entityActions: Array<ManifestEntityAction> = [
 		weight: 900,
 		meta: {
 			entityType,
-			icon: 'umb:document',
+			icon: 'umb:trash',
 			label: 'Trash',
 			repositoryAlias,
 			api: UmbTrashEntityAction,
