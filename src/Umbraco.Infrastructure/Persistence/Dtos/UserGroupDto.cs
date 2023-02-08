@@ -21,11 +21,11 @@ public class UserGroupDto
     [PrimaryKeyColumn(IdentitySeed = 6)]
     public int Id { get; set; }
 
-    [Column("uniqueId")]
+    [Column("key")]
     [NullSetting(NullSetting = NullSettings.NotNull)]
     [Constraint(Default = SystemMethods.NewGuid)]
     [Index(IndexTypes.UniqueNonClustered, Name = "IX_umbracoUserGroup_userGroupKey")]
-    public Guid UniqueId { get; set; }
+    public Guid Key { get; set; }
 
     [Column("userGroupAlias")]
     [Length(200)]

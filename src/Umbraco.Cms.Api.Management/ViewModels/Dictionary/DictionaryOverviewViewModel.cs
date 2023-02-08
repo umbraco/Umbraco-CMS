@@ -1,14 +1,7 @@
-﻿using Umbraco.Cms.Core.Models.ContentEditing;
-
-namespace Umbraco.Cms.Api.Management.ViewModels.Dictionary;
+﻿namespace Umbraco.Cms.Api.Management.ViewModels.Dictionary;
 
 public class DictionaryOverviewViewModel
 {
-    /// <summary>
-    ///     Initializes a new instance of the <see cref="DictionaryOverviewDisplay" /> class.
-    /// </summary>
-    public DictionaryOverviewViewModel() => Translations = new List<DictionaryTranslationOverviewViewModel>();
-
     /// <summary>
     ///     Gets or sets the key.
     /// </summary>
@@ -20,12 +13,12 @@ public class DictionaryOverviewViewModel
     public Guid Key { get; set; }
 
     /// <summary>
-    ///     Gets or sets the level.
+    ///     Gets or sets the parent key.
     /// </summary>
-    public int Level { get; set; }
+    public Guid? ParentKey { get; set; }
 
     /// <summary>
     ///     Sets the translations.
     /// </summary>
-    public List<DictionaryTranslationOverviewViewModel> Translations { get; }
+    public IEnumerable<string> TranslatedIsoCodes { get; set; } = Array.Empty<string>();
 }

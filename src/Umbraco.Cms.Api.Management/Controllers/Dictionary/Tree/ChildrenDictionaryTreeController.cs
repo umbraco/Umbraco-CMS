@@ -10,8 +10,8 @@ namespace Umbraco.Cms.Api.Management.Controllers.Dictionary.Tree;
 
 public class ChildrenDictionaryTreeController : DictionaryTreeControllerBase
 {
-    public ChildrenDictionaryTreeController(IEntityService entityService, ILocalizationService localizationService)
-        : base(entityService, localizationService)
+    public ChildrenDictionaryTreeController(IEntityService entityService, IDictionaryItemService dictionaryItemService)
+        : base(entityService, dictionaryItemService)
     {
     }
 
@@ -28,10 +28,10 @@ public class ChildrenDictionaryTreeController : DictionaryTreeControllerBase
         IDictionaryItem[] dictionaryItems = PaginatedDictionaryItems(
             pageNumber,
             pageSize,
-            LocalizationService.GetDictionaryItemChildren(parentKey),
+            await DictionaryItemService.GetChildrenAsync(parentKey),
             out var totalItems);
 
-        EntityTreeItemViewModel[] viewModels = MapTreeItemViewModels(null, dictionaryItems);
+        EntityTreeItemViewModel[] viewModels = await MapTreeItemViewModels(null, dictionaryItems);
 
         PagedViewModel<EntityTreeItemViewModel> result = PagedViewModel(viewModels, totalItems);
         return await Task.FromResult(Ok(result));

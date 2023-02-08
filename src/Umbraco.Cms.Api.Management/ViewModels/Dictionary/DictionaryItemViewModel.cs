@@ -1,8 +1,6 @@
 ﻿namespace Umbraco.Cms.Api.Management.ViewModels.Dictionary;
 
-public class DictionaryItemViewModel
+public class DictionaryItemViewModel : DictionaryItemModelBase
 {
-    public Guid? ParentId { get; set; }
-
     public Guid Key { get; set; }
 }

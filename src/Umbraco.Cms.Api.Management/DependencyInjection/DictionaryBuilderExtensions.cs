@@ -4,7 +4,6 @@ using Umbraco.Cms.Api.Management.Mapping.Dictionary;
 using Umbraco.Cms.Api.Management.Services;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Mapping;
-using Umbraco.New.Cms.Core.Factories;
 
 namespace Umbraco.Cms.Api.Management.DependencyInjection;
 
@@ -14,9 +13,9 @@ internal static class DictionaryBuilderExtensions
     {
         builder.Services
             .AddTransient<IDictionaryFactory, DictionaryFactory>()
-            .AddTransient<ILoadDictionaryItemService, LoadDictionaryItemService>();
+            .AddTransient<IDictionaryItemImportService, DictionaryItemImportService>();
 
-        builder.WithCollectionBuilder<MapDefinitionCollectionBuilder>().Add<DictionaryViewModelMapDefinition>();
+        builder.WithCollectionBuilder<MapDefinitionCollectionBuilder>().Add<DictionaryMapDefinition>();
 
         return builder;
     }

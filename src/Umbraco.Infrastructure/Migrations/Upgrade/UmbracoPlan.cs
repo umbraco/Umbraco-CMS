@@ -2,6 +2,7 @@ using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_10_0_0;
 using Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_10_2_0;
+using Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_10_5_0;
 using Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_12_0_0;
 using Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_13_0_0;
 
@@ -85,6 +86,9 @@ public class UmbracoPlan : MigrationPlan
 
         // To 10.4.0
         To<V_10_4_0.AddBlockGridPartialViews>("{3F5D492A-A3DB-43F9-A73E-9FEE3B180E6C}");
+
+        // to 10.5.0 / 11.2.0
+        To<AddPrimaryKeyConstrainToContentVersionCleanupDtos>("{83AF7945-DADE-4A02-9041-F3F6EBFAC319}");
 
         // To 12.0.0
         To<UseNvarcharInsteadOfNText>("{888A0D5D-51E4-4C7E-AA0A-01306523C7FB}");

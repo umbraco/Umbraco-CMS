@@ -22,7 +22,7 @@ internal static class UserGroupFactory
         {
             userGroup.DisableChangeTracking();
             userGroup.Id = dto.Id;
-            userGroup.Key = dto.UniqueId;
+            userGroup.Key = dto.Key;
             userGroup.CreateDate = dto.CreateDate;
             userGroup.UpdateDate = dto.UpdateDate;
             userGroup.StartContentId = dto.StartContentId;
@@ -55,7 +55,7 @@ internal static class UserGroupFactory
     {
         var dto = new UserGroupDto
         {
-            UniqueId = entity.Key,
+            Key = entity.Key,
             Alias = entity.Alias,
             DefaultPermissions = entity.Permissions == null ? string.Empty : string.Join(string.Empty, entity.Permissions),
             Name = entity.Name,

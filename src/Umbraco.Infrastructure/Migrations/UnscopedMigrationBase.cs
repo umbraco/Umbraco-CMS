@@ -1,13 +1,14 @@
-using Umbraco.Cms.Infrastructure.Scoping;
+﻿using Umbraco.Cms.Infrastructure.Scoping;
 
 namespace Umbraco.Cms.Infrastructure.Migrations;
 
 /// <summary>
-/// Base class for creating a migration that does not have a scope provided for it
+/// Base class for creating a migration that does not have a scope provided for it.
 /// </summary>
 public abstract class UnscopedMigrationBase : MigrationBase
 {
-    protected UnscopedMigrationBase(IMigrationContext context) : base(context)
+    protected UnscopedMigrationBase(IMigrationContext context)
+        : base(context)
     {
     }
 
@@ -17,7 +18,7 @@ public abstract class UnscopedMigrationBase : MigrationBase
     /// but later need to have your queries scoped in a transaction.</para>
     /// </summary>
     /// <param name="scope">The scope to get the database from.</param>
-    /// <exception cref="InvalidOperationException">If the migration is missing or has a malformed MigrationContext this exception is thrown.</exception>
+    /// <exception cref="InvalidOperationException">If the migration is missing or has a malformed MigrationContext, this exception is thrown.</exception>
     protected void ScopeDatabase(IScope scope)
     {
         if (Context is not MigrationContext context)

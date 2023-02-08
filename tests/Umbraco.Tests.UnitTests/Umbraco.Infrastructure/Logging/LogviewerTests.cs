@@ -197,6 +197,8 @@ public class LogviewerTests
     [TestCase("@mt = '{EndMessage} ({Duration}ms) [Timing {TimingId}]'", 26)]
     [TestCase("SortedComponentTypes[?] = 'Umbraco.Web.Search.ExamineComponent'", 1)]
     [TestCase("Contains(SortedComponentTypes[?], 'DatabaseServer')", 1)]
+    [TestCase("@Message like '%definition%'", 6)]
+    [TestCase("definition", 6)]
     [Test]
     public void Logs_Can_Query_With_Expressions(string queryToVerify, int expectedCount)
     {
@@ -223,7 +225,7 @@ public class LogviewerTests
         // Assert.That(searches, Contains.Item(savedSearch));
 
         // Remove the search from above & ensure it no longer exists
-        _logViewer.DeleteSavedSearch("Unit Test Example", "Has(UnitTest)");
+        _logViewer.DeleteSavedSearch("Unit Test Example");
 
         searches = _logViewer.GetSavedSearches();
         findItem = searches.Where(x => x.Name == "Unit Test Example" && x.Query == "Has(UnitTest)");

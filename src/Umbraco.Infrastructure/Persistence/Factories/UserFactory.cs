@@ -118,7 +118,7 @@ internal static class UserFactory
 
         return new ReadOnlyUserGroup(
             group.Id,
-            group.UniqueId,
+            group.Key,
             group.Name,
             group.Icon,
             group.StartContentId,

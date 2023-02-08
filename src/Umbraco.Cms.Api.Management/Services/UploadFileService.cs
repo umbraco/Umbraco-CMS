@@ -1,65 +1,42 @@
-﻿using System.Xml;
+﻿using System.Xml.Linq;
 using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.FileProviders;
-using Microsoft.Extensions.Hosting;
 using Umbraco.Cms.Core;
-using Umbraco.Cms.Core.Extensions;
-using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Api.Management.Models;
+using Umbraco.Cms.Api.Management.Services.OperationStatus;
 using Umbraco.Extensions;
-using IHostingEnvironment = Umbraco.Cms.Core.Hosting.IHostingEnvironment;
 
 namespace Umbraco.Cms.Api.Management.Services;
 
-public class UploadFileService : IUploadFileService
+internal sealed class UploadFileService : IUploadFileService
 {
-    private readonly IHostEnvironment _hostEnvironment;
-    private readonly ILocalizedTextService _localizedTextService;
+    private readonly ITemporaryFileService _temporaryFileService;
 
-    public UploadFileService(IHostEnvironment hostEnvironment, ILocalizedTextService localizedTextService)
+    public UploadFileService(ITemporaryFileService temporaryFileService) => _temporaryFileService = temporaryFileService;
+
+    public async Task<Attempt<UdtFileUpload, UdtFileUploadOperationStatus>> UploadUdtFileAsync(IFormFile file)
     {
-        _hostEnvironment = hostEnvironment;
-        _localizedTextService = localizedTextService;
-    }
+        UdtFileUpload DefaultModel() => new() { FileName = file.FileName, Content = new XDocument() };
 
-    public FormFileUploadResult TryLoad(IFormFile file)
-    {
-        var formFileUploadResult = new FormFileUploadResult();
-        var fileName = file.FileName.Trim(Constants.CharArrays.DoubleQuote);
-        var ext = fileName.Substring(fileName.LastIndexOf('.') + 1).ToLower();
-        var root = _hostEnvironment.MapPathContentRoot(Constants.SystemDirectories.TempFileUploads);
-        formFileUploadResult.TemporaryPath = Path.Combine(root, fileName);
-
-        if (!Path.GetFullPath(formFileUploadResult.TemporaryPath).StartsWith(Path.GetFullPath(root)))
+        if (".udt".InvariantEquals(Path.GetExtension(file.FileName)) == false)
         {
-            formFileUploadResult.ErrorMessage = _localizedTextService.Localize("media", "invalidFileName");
-            formFileUploadResult.CouldLoad = false;
-            return formFileUploadResult;
+            return Attempt.FailWithStatus(UdtFileUploadOperationStatus.InvalidFileType, DefaultModel());
         }
 
-        if (!ext.InvariantEquals("udt"))
+        var filePath = await _temporaryFileService.SaveFileAsync(file);
+
+        XDocument content;
+        await using (FileStream fileStream = File.OpenRead(filePath))
         {
-            formFileUploadResult.ErrorMessage = _localizedTextService.Localize("media", "disallowedFileType");
-            formFileUploadResult.CouldLoad = false;
-            return formFileUploadResult;
+            content = await XDocument.LoadAsync(fileStream, LoadOptions.None, CancellationToken.None);
         }
 
-        using (FileStream stream = File.Create(formFileUploadResult.TemporaryPath))
+        if (content.Root == null)
         {
-            file.CopyToAsync(stream).GetAwaiter().GetResult();
+            return Attempt.FailWithStatus(UdtFileUploadOperationStatus.InvalidFileContent, DefaultModel());
         }
 
-        formFileUploadResult.XmlDocument = new XmlDocument {XmlResolver = null};
-        formFileUploadResult.XmlDocument.Load(formFileUploadResult.TemporaryPath);
-
-        if (formFileUploadResult.XmlDocument.DocumentElement != null)
-        {
-            return formFileUploadResult;
-        }
-
-        formFileUploadResult.ErrorMessage = _localizedTextService.Localize("speechBubbles", "fileErrorNotFound");
-        formFileUploadResult.CouldLoad = false;
-        return formFileUploadResult;
-
+        // grab the file name from the file path in case the temporary file name is different from the uploaded one
+        var model = new UdtFileUpload { FileName = Path.GetFileName(filePath), Content = content };
+        return Attempt.SucceedWithStatus(UdtFileUploadOperationStatus.Success, model);
     }
 }

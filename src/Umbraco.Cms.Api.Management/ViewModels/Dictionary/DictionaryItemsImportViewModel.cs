@@ -2,7 +2,9 @@
 
 public class DictionaryItemsImportViewModel
 {
+    public Guid Key { get; set; }
+
     public string? Name { get; set; }
 
-    public int Level { get; set; }
+    public Guid? ParentKey { get; set; }
 }

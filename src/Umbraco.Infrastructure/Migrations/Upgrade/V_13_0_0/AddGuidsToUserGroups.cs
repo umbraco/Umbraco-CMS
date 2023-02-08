@@ -9,10 +9,11 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_13_0_0;
 
 public class AddGuidsToUserGroups : UnscopedMigrationBase
 {
-    private const string NewColumnName = "uniqueId";
+    private const string NewColumnName = "key";
     private readonly IScopeProvider _scopeProvider;
 
-    public AddGuidsToUserGroups(IMigrationContext context, IScopeProvider scopeProvider) : base(context)
+    public AddGuidsToUserGroups(IMigrationContext context, IScopeProvider scopeProvider)
+        : base(context)
     {
         _scopeProvider = scopeProvider;
     }
@@ -57,16 +58,16 @@ public class AddGuidsToUserGroups : UnscopedMigrationBase
         // But since you cannot alter columns, we have to copy the data over and delete the old table.
         // However we cannot do this due to foreign keys, so temporarily disable these keys while migrating.
         // This leads to an interesting chicken and egg issue, we have to do this before a transaction
-        // but in the same connection, since foreign keys will default to ON next time we open a connection
+        // but in the same connection, since foreign keys will default to "ON" next time we open a connection.
         // This means we have to just execute the DB command to end the transaction,
-        // instead of using CompleteTransaction since this will end the connection.
+        // instead of using CompleteTransaction, since this will end the connection.
         Database.Execute("COMMIT;");
 
         // We don't have to worry about re-enabling this since it happens automatically.
         Database.Execute("PRAGMA foreign_keys=off;");
         Database.Execute("BEGIN TRANSACTION;");
 
-        // Now that keys are disabled and we have a transaction we'll do our migration
+        // Now that keys are disabled and we have a transaction, we'll do our migration.
         MigrateColumnSqlite();
         scope.Complete();
     }
@@ -76,7 +77,7 @@ public class AddGuidsToUserGroups : UnscopedMigrationBase
         IEnumerable<UserGroupDto> groups = Database.Fetch<OldUserGroupDto>().Select(x => new UserGroupDto
         {
             Id = x.Id,
-            UniqueId = Guid.NewGuid(),
+            Key = Guid.NewGuid(),
             Alias = x.Alias,
             Name = x.Name,
             DefaultPermissions = x.DefaultPermissions,
@@ -87,17 +88,17 @@ public class AddGuidsToUserGroups : UnscopedMigrationBase
             StartContentId = x.StartContentId,
             StartMediaId = x.StartMediaId,
             UserGroup2AppDtos = x.UserGroup2AppDtos,
-            UserGroup2LanguageDtos = x.UserGroup2LanguageDtos,
+            UserGroup2LanguageDtos = x.UserGroup2LanguageDtos
         });
 
         // I realize that this may seem a bit drastic,
-        // however, since SQLite cannot generate GUIDS we have to load all the user groups into memory to generate it
+        // however, since SQLite cannot generate GUIDs we have to load all the user groups into memory to generate it.
         // So instead of going through the trouble of creating a new table, copying over data, and then deleting
         // We can just drop the table directly and re-create it to add the new column.
         Delete.Table(Constants.DatabaseSchema.Tables.UserGroup).Do();
         Create.Table<UserGroupDto>().Do();
 
-        // We have to insert one at a time to be able to not auto increment id
+        // We have to insert one at a time to be able to not auto increment the id.
         foreach (UserGroupDto group in groups)
         {
             Database.Insert(Constants.DatabaseSchema.Tables.UserGroup, "id", false, group);
@@ -171,7 +172,7 @@ public class AddGuidsToUserGroups : UnscopedMigrationBase
         public List<UserGroup2LanguageDto> UserGroup2LanguageDtos { get; set; }
 
         /// <summary>
-        ///     This is only relevant when this column is included in the results (i.e. GetUserGroupsWithUserCounts)
+        ///     This is only relevant when this column is included in the results (i.e. GetUserGroupsWithUserCounts).
         /// </summary>
         [ResultColumn]
         public int UserCount { get; set; }

@@ -1172,7 +1172,7 @@ internal class DatabaseDataCreator
             new UserGroupDto
             {
                 Id = 1,
-                UniqueId = Guid.NewGuid(),
+                Key = Guid.NewGuid(),
                 StartMediaId = -1,
                 StartContentId = -1,
                 Alias = Constants.Security.AdminGroupAlias,
@@ -1190,7 +1190,7 @@ internal class DatabaseDataCreator
             new UserGroupDto
             {
                 Id = 2,
-                UniqueId = Guid.NewGuid(),
+                Key = Guid.NewGuid(),
                 StartMediaId = -1,
                 StartContentId = -1,
                 Alias = Constants.Security.WriterGroupAlias,
@@ -1208,7 +1208,7 @@ internal class DatabaseDataCreator
             new UserGroupDto
             {
                 Id = 3,
-                UniqueId = Guid.NewGuid(),
+                Key = Guid.NewGuid(),
                 StartMediaId = -1,
                 StartContentId = -1,
                 Alias = Constants.Security.EditorGroupAlias,
@@ -1226,7 +1226,7 @@ internal class DatabaseDataCreator
             new UserGroupDto
             {
                 Id = 4,
-                UniqueId = Guid.NewGuid(),
+                Key = Guid.NewGuid(),
                 StartMediaId = -1,
                 StartContentId = -1,
                 Alias = Constants.Security.TranslatorGroupAlias,
@@ -1244,7 +1244,7 @@ internal class DatabaseDataCreator
             new UserGroupDto
             {
                 Id = 5,
-                UniqueId = Guid.NewGuid(),
+                Key = Guid.NewGuid(),
                 Alias = Constants.Security.SensitiveDataGroupAlias,
                 Name = "Sensitive data",
                 DefaultPermissions = string.Empty,

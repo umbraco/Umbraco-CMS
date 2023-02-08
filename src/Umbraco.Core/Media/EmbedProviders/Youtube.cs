@@ -14,7 +14,7 @@ public class YouTube : OEmbedProviderBase
 
     public override string ApiEndpoint => "https://www.youtube.com/oembed";
 
-    public override string[] UrlSchemeRegex => new[] { @"youtu.be/.*", @"youtube.com/watch.*" };
+    public override string[] UrlSchemeRegex => new[] { @"youtu.be/.*", @"youtube.com/watch.*", @"youtube.com/shorts/.*" };
 
     public override Dictionary<string, string> RequestParams => new()
     {

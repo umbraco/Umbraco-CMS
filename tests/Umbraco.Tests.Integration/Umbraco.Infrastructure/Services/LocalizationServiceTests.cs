@@ -1,10 +1,7 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
@@ -226,7 +223,7 @@ public class LocalizationServiceTests : UmbracoIntegrationTest
         var languageDaDk = LocalizationService.GetLanguageByIsoCode("da-DK");
         var languageNbNo = new LanguageBuilder()
             .WithCultureInfo("nb-NO")
-            .WithFallbackLanguageId(languageDaDk.Id)
+            .WithFallbackLanguageIsoCode(languageDaDk.IsoCode)
             .Build();
         LocalizationService.Save(languageNbNo, 0);
         var languageId = languageDaDk.Id;
@@ -277,7 +274,7 @@ public class LocalizationServiceTests : UmbracoIntegrationTest
         foreach (var language in allLangs)
         {
             Assert.AreEqual("Hellooooo",
-                item.Translations.Single(x => x.Language.CultureName == language.CultureName).Value);
+                item.Translations.Single(x => x.LanguageIsoCode == language.IsoCode).Value);
         }
     }
 
