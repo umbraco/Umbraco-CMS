@@ -11,6 +11,8 @@ public interface IReadOnlyUserGroup
 
     int Id { get; }
 
+    Guid Key => Guid.Empty;
+
     int? StartContentId { get; }
 
     int? StartMediaId { get; }

@@ -160,6 +160,8 @@ public class SqliteSyntaxProvider : SqlSyntaxProviderBase<SqliteSyntaxProvider>
 
     public override string ConvertDateToOrderableString => "{0}";
 
+    public override string RenameTable => "ALTER TABLE {0} RENAME TO {1}";
+
     /// <inheritdoc />
     public override string GetSpecialDbType(SpecialDbType dbType) => "TEXT COLLATE NOCASE";
 
@@ -172,6 +174,14 @@ public class SqliteSyntaxProvider : SqlSyntaxProviderBase<SqliteSyntaxProvider>
         // TODO: SQLite
         constraintName = string.Empty;
         return false;
+    }
+
+    public override bool DoesPrimaryKeyExist(IDatabase db, string tableName, string primaryKeyName)
+    {
+        IEnumerable<string> items = db.Fetch<string>($"select sql from sqlite_master where type = 'table' and name = '{tableName}'")
+            .Where(x => x.Contains($"CONSTRAINT {primaryKeyName} PRIMARY KEY"));
+
+        return items.Any();
     }
 
     public override string GetFieldNameForUpdate<TDto>(Expression<Func<TDto, object?>> fieldSelector, string? tableAlias = null)
