@@ -24,4 +24,8 @@ import './workspace/workspace-action-menu/workspace-action-menu.element';
 
 import '../entity-actions/entity-action.element';
 import '../entity-actions/entity-action-list.element';
+
+import './input-media-picker/input-media-picker.element';
+import './input-document-picker/input-document-picker.element';
+
 import './empty-state/empty-state.element';
