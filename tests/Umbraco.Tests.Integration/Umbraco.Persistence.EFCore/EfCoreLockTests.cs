@@ -2,6 +2,7 @@
 using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.DistributedLocking;
+using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Persistence.EFCore;
 using Umbraco.Cms.Persistence.EFCore.Entities;
 using Umbraco.Cms.Persistence.EFCore.Scoping;
@@ -61,6 +62,12 @@ public class EfCoreLockTests : UmbracoIntegrationTest
     [Test]
     public void ConcurrentReadersTest()
     {
+        if (BaseTestDatabase.DatabaseType.IsSqlite())
+        {
+            Assert.Ignore("This test doesn't work with Microsoft.Data.Sqlite in EFCore as we no longer use deferred transactions");
+            return;
+        }
+
         const int threadCount = 8;
         var threads = new Thread[threadCount];
         var exceptions = new Exception[threadCount];
