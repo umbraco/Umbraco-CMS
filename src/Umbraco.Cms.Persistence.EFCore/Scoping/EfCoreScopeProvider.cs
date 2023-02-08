@@ -41,7 +41,7 @@ public class EfCoreScopeProvider : IEfCoreScopeProvider
 
     public void AttachScope(IEfCoreScope other)
     {
-        // IScopeProvider.AttachScope works with an IScope
+        // IScopeProvider.AttachScope works with an IEFCoreScope
         // but here we can only deal with our own Scope class
         if (other is not EfCoreDetachableScope otherScope)
         {
