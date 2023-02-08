@@ -1,23 +1,15 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using NPoco;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
-using Umbraco.Cms.Core.DistributedLocking;
 using Umbraco.Cms.Core.DistributedLocking.Exceptions;
 using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
-using Umbraco.Cms.Persistence.EFCore;
 using Umbraco.Cms.Persistence.Sqlite.Interceptors;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
-using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence;
 
@@ -40,12 +32,9 @@ public class LocksTests : UmbracoIntegrationTest
         }
     }
 
-    protected override void ConfigureTestServices(IServiceCollection services)
-    {
-        services.RemoveAll(x => x.ImplementationType == typeof(SqliteAddRetryPolicyInterceptor));
-        services.AddUnique<IDistributedLockingMechanism, SqliteEFCoreDistributedLockingMechanism>();
-    }
+    protected override void ConfigureTestServices(IServiceCollection services) =>
         // SQLite + retry policy makes tests fail, we retry before throwing distributed locking timeout.
+        services.RemoveAll(x => x.ImplementationType == typeof(SqliteAddRetryPolicyInterceptor));
 
     [Test]
     public void SingleReadLockTest()
