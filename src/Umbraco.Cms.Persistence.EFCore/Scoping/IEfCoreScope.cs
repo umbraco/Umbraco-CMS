@@ -1,4 +1,5 @@
-﻿using Umbraco.Cms.Persistence.EFCore.Entities;
+﻿using Umbraco.Cms.Core.Scoping;
+using Umbraco.Cms.Persistence.EFCore.Entities;
 
 namespace Umbraco.Cms.Persistence.EFCore.Scoping;
 
@@ -16,6 +17,8 @@ public interface IEfCoreScope : IDisposable
     /// <typeparam name="T">Type to use and return.</typeparam>
     /// <returns></returns>
     Task<T> ExecuteWithContextAsync<T>(Func<UmbracoEFContext, Task<T>> method);
+
+    public IScopeContext? ScopeContext { get; set; }
 
     /// <summary>
     /// Executes the given function on the database.

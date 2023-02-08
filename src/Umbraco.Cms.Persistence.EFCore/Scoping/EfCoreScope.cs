@@ -1,5 +1,6 @@
 ﻿using Umbraco.Cms.Core.Collections;
 using Umbraco.Cms.Core.DistributedLocking;
+using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Persistence.EFCore.Entities;
 
 namespace Umbraco.Cms.Persistence.EFCore.Scoping;
@@ -27,7 +28,7 @@ internal class EfCoreScope : IEfCoreScope
 
     public EfCoreScope? ParentScope { get; }
 
-
+    public IScopeContext? ScopeContext { get; set; }
 
     public EfCoreScope(
         IUmbracoEfCoreDatabaseFactory efCoreDatabaseFactory,
