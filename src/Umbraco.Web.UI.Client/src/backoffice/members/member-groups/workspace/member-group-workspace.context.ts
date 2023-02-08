@@ -1,8 +1,8 @@
 import { UMB_MEMBER_GROUP_DETAIL_STORE_CONTEXT_TOKEN } from '../member-group.detail.store';
+import { UmbWorkspaceEntityContextInterface } from '../../../../backoffice/shared/components/workspace/workspace-context/workspace-entity-context.interface';
+import { UmbEntityWorkspaceManager } from '../../../../backoffice/shared/components/workspace/workspace-context/entity-manager-controller';
+import { UmbWorkspaceContext } from '../../../../backoffice/shared/components/workspace/workspace-context/workspace-context';
 import type { MemberGroupDetails } from '@umbraco-cms/models';
-import { UmbWorkspaceEntityContextInterface } from 'src/backoffice/shared/components/workspace/workspace-context/workspace-entity-context.interface';
-import { UmbEntityWorkspaceManager } from 'src/backoffice/shared/components/workspace/workspace-context/entity-manager-controller';
-import { UmbWorkspaceContext } from 'src/backoffice/shared/components/workspace/workspace-context/workspace-context';
 
 export class UmbWorkspaceMemberGroupContext
 	extends UmbWorkspaceContext
