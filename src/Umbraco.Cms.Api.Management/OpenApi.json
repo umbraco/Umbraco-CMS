@@ -916,7 +916,7 @@
         ],
         "operationId": "PostDictionaryUpload",
         "requestBody": {
-          "content": { }
+          "content": {}
         },
         "responses": {
           "200": {
@@ -1614,7 +1614,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PagedHealthCheckGroupModel"
+                  "$ref": "#/components/schemas/PagedHealthCheckGroupModelBaseModel"
                 }
               }
             }
@@ -1644,7 +1644,47 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/NotFoundResultModel"
+                  "$ref": "#/components/schemas/ProblemDetailsModel"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HealthCheckGroupModel"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/umbraco/management/api/v1/health-check-group/{name}/check": {
+      "post": {
+        "tags": [
+          "Health Check"
+        ],
+        "operationId": "PostHealthCheckGroupByNameCheck",
+        "parameters": [
+          {
+            "name": "name",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetailsModel"
                 }
               }
             }
@@ -6551,8 +6591,7 @@
         "type": "object",
         "properties": {
           "name": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "checks": {
             "type": "array",
@@ -6570,13 +6609,18 @@
         },
         "additionalProperties": false
       },
-      "HealthCheckGroupWithResultModel": {
+      "HealthCheckGroupModelBaseModel": {
         "type": "object",
         "properties": {
           "name": {
-            "type": "string",
-            "nullable": true
-          },
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "HealthCheckGroupWithResultModel": {
+        "type": "object",
+        "properties": {
           "checks": {
             "type": "array",
             "items": {
@@ -6642,6 +6686,10 @@
           }
         ],
         "properties": {
+          "key": {
+            "type": "string",
+            "format": "uuid"
+          },
           "results": {
             "type": "array",
             "items": {
@@ -6723,7 +6771,7 @@
           },
           "providerProperties": {
             "type": "object",
-            "additionalProperties": { },
+            "additionalProperties": {},
             "nullable": true
           }
         },
@@ -7901,7 +7949,7 @@
         },
         "additionalProperties": false
       },
-      "PagedHealthCheckGroupModel": {
+      "PagedHealthCheckGroupModelBaseModel": {
         "required": [
           "items",
           "total"
@@ -7917,7 +7965,7 @@
             "items": {
               "oneOf": [
                 {
-                  "$ref": "#/components/schemas/HealthCheckGroupModel"
+                  "$ref": "#/components/schemas/HealthCheckGroupModelBaseModel"
                 }
               ]
             }
@@ -8372,7 +8420,7 @@
             "nullable": true
           }
         },
-        "additionalProperties": { }
+        "additionalProperties": {}
       },
       "ProfilingStatusModel": {
         "type": "object",
@@ -9852,7 +9900,7 @@
           "authorizationCode": {
             "authorizationUrl": "/umbraco/management/api/v1.0/security/back-office/authorize",
             "tokenUrl": "/umbraco/management/api/v1.0/security/back-office/token",
-            "scopes": { }
+            "scopes": {}
           }
         }
       }
@@ -9860,7 +9908,7 @@
   },
   "security": [
     {
-      "OAuth": [ ]
+      "OAuth": []
     }
   ]
 }
