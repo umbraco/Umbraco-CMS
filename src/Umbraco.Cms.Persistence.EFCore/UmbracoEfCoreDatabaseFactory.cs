@@ -1,5 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core.Persistence;
 using Umbraco.Cms.Persistence.EFCore.Entities;
 
@@ -9,7 +8,6 @@ public class UmbracoEfCoreDatabaseFactory : IUmbracoEfCoreDatabaseFactory
 {
     private readonly IDatabaseInfo _databaseInfo;
     private readonly IDbContextFactory<UmbracoEFContext> _dbContextFactory;
-    private IServiceScope? _scope;
 
     public UmbracoEfCoreDatabaseFactory(IDatabaseInfo databaseInfo, IDbContextFactory<UmbracoEFContext> dbContextFactory)
     {
