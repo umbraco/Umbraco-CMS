@@ -5,7 +5,7 @@ describe('UmbPropertyEditorUINumberRangeElement', () => {
 	let element: UmbInputDocumentPickerElement;
 
 	beforeEach(async () => {
-		element = await fixture(html` <umb-input-media-picker></umb-input-media-picker> `);
+		element = await fixture(html` <umb-input-document-picker></umb-input-document-picker> `);
 	});
 
 	it('is defined with its own instance', () => {
