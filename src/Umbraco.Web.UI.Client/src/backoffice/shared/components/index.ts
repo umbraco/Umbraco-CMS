@@ -15,3 +15,4 @@ import './section/section.element';
 import './tree/tree.element';
 import './workspace/workspace-content/workspace-content.element';
 import './empty-state/empty-state.element';
+import './color-picker/color-picker.element';

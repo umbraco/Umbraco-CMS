@@ -59,7 +59,16 @@ export const data: Array<DataTypeDetails> = [
 		isFolder: false,
 		propertyEditorModelAlias: 'Umbraco.ColorPicker',
 		propertyEditorUIAlias: 'Umb.PropertyEditorUI.ColorPicker',
-		data: [],
+		data: [
+			{
+				alias: 'includeLabels',
+				value: false,
+			},
+			{
+				alias: 'colors',
+				value: ['#000000', '#373737', '#9e9e9e', '#607d8b', '#2196f3', '#03a9f4', '#3f51b5', '#9c27b0', '#673ab7'],
+			},
+		],
 	},
 	{
 		name: 'Content Picker',
