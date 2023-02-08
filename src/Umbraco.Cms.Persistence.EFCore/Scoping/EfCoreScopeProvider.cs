@@ -37,6 +37,73 @@ public class EfCoreScopeProvider : IEfCoreScopeProvider
         DistributedLockingMechanismFactory = distributedLockingMechanismFactory;
     }
 
+    public IEfCoreScope CreateDetachedScope()
+    {
+        return new EfCoreScope(_umbracoEfCoreDatabaseFactory, _efCoreScopeAccessor, this, null, true);
+    }
+
+    public void AttachScope(IEfCoreScope other)
+    {
+        // IScopeProvider.AttachScope works with an IScope
+        // but here we can only deal with our own Scope class
+        if (other is not EfCoreScope otherScope)
+        {
+            throw new ArgumentException("Not a Scope instance.");
+        }
+
+        if (otherScope.Detachable == false)
+        {
+            throw new ArgumentException("Not a detachable scope.");
+        }
+
+        if (otherScope.Attached)
+        {
+            throw new InvalidOperationException("Already attached.");
+        }
+
+        otherScope.Attached = true;
+        otherScope.OriginalScope = (EfCoreScope)_ambientEfCoreScopeStack.AmbientScope!;
+        otherScope.OriginalContext = AmbientScopeContext;
+
+        PushAmbientScopeContext(otherScope.ScopeContext);
+        _ambientEfCoreScopeStack.Push(otherScope);
+    }
+
+    public IEfCoreScope DetachScope()
+    {
+        EfCoreScope? ambientScope = (EfCoreScope)_ambientEfCoreScopeStack.AmbientScope!;
+        if (ambientScope == null)
+        {
+            throw new InvalidOperationException("There is no ambient scope.");
+        }
+
+        if (ambientScope.Detachable == false)
+        {
+            throw new InvalidOperationException("Ambient scope is not detachable.");
+        }
+
+        PopAmbientScope();
+        PopAmbientScopeContext();
+
+        EfCoreScope? originalScope = (EfCoreScope)_ambientEfCoreScopeStack.AmbientScope!;
+        if (originalScope != ambientScope.OriginalScope)
+        {
+            throw new InvalidOperationException($"The detatched scope ({ambientScope.InstanceId}) does not match the original ({originalScope?.InstanceId})");
+        }
+
+        IScopeContext? originalScopeContext = AmbientScopeContext;
+        if (originalScopeContext != ambientScope.OriginalContext)
+        {
+            throw new InvalidOperationException($"The detatched scope context does not match the original");
+        }
+
+        ambientScope.OriginalScope = null;
+        ambientScope.OriginalContext = null;
+        ambientScope.Attached = false;
+        return ambientScope;
+    }
+
+
     public IScopeContext? AmbientScopeContext => _ambientEfCoreScopeContextStack.AmbientContext;
 
     public IEfCoreScope CreateScope()
@@ -44,7 +111,7 @@ public class EfCoreScopeProvider : IEfCoreScopeProvider
         if (_ambientEfCoreScopeStack.AmbientScope is null)
         {
             ScopeContext? newContext = _ambientEfCoreScopeContextStack.AmbientContext == null ? new ScopeContext() : null;
-            var ambientScope = new EfCoreScope(_umbracoEfCoreDatabaseFactory, _efCoreScopeAccessor, this, newContext);
+            var ambientScope = new EfCoreScope(_umbracoEfCoreDatabaseFactory, _efCoreScopeAccessor, this, newContext, false);
 
             if (newContext != null)
             {

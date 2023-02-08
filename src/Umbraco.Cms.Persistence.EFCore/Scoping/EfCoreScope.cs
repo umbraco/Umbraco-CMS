@@ -30,20 +30,45 @@ internal class EfCoreScope : IEfCoreScope
 
     public IScopeContext? ScopeContext { get; set; }
 
+    // Properties needed for DetachedScope
+    public EfCoreScope? OriginalScope { get; set; }
+
+    public IScopeContext? OriginalContext { get; set; }
+
+    public bool Detachable { get; set; }
+
+    public bool Attached { get; set; }
+
     public EfCoreScope(
         IUmbracoEfCoreDatabaseFactory efCoreDatabaseFactory,
         IEFCoreScopeAccessor efCoreScopeAccessor,
         IEfCoreScopeProvider efCoreScopeProvider,
-        IScopeContext? scopeContext)
+        IScopeContext? scopeContext,
+        bool detachable)
     {
-        _dictionaryLocker = new object();
         _efCoreDatabaseFactory = efCoreDatabaseFactory;
+        _dictionaryLocker = new object();
         _efCoreScopeAccessor = efCoreScopeAccessor;
         _efCoreScopeProvider = (EfCoreScopeProvider)efCoreScopeProvider;
         _acquiredLocks = new Queue<IDistributedLock>();
+        InstanceId = Guid.NewGuid();
+
+        if (detachable)
+        {
+            if (scopeContext is not null)
+            {
+                throw new ArgumentException("Cannot set context on detachable scope.", nameof(scopeContext));
+            }
+
+            Detachable = true;
+
+            ScopeContext = new ScopeContext();
+
+            return;
+        }
+
         ScopeContext = scopeContext;
 
-        InstanceId = Guid.NewGuid();
     }
 
     public EfCoreScope(
@@ -56,7 +81,8 @@ internal class EfCoreScope : IEfCoreScope
             efCoreDatabaseFactory,
             efCoreScopeAccessor,
             efCoreScopeProvider,
-            scopeContext) =>
+            scopeContext,
+            false) =>
         ParentScope = parentScope;
 
     public async Task<T> ExecuteWithContextAsync<T>(Func<UmbracoEFContext, Task<T>> method)
@@ -114,19 +140,9 @@ internal class EfCoreScope : IEfCoreScope
 
         _efCoreScopeProvider.PopAmbientScope();
 
-        // if *we* created it, then get rid of it
-        if (_efCoreScopeProvider.AmbientScopeContext == ScopeContext)
-        {
-            try
-            {
-                _efCoreScopeProvider.AmbientScopeContext?.ScopeExit(_completed.HasValue && _completed.Value);
-            }
-            finally
-            {
-                // removes the ambient context (ambient scope already gone)
-                _efCoreScopeProvider.PopAmbientScopeContext();
-            }
-        }
+
+        HandleScopeContext();
+        HandleDetachedScopes();
 
         _disposed = true;
     }
@@ -307,6 +323,47 @@ internal class EfCoreScope : IEfCoreScope
         if (_umbracoEfCoreDatabase.UmbracoEFContext.Database.CurrentTransaction is null)
         {
             _umbracoEfCoreDatabase.UmbracoEFContext.Database.BeginTransaction();
+        }
+    }
+
+    private void HandleDetachedScopes()
+    {
+        if (Detachable)
+        {
+            // get out of the way, restore original
+
+            // TODO: Difficult to know if this is correct since this is all required
+            // by Deploy which I don't fully understand since there is limited tests on this in the CMS
+            if (OriginalScope != _efCoreScopeAccessor.AmbientScope)
+            {
+                _efCoreScopeProvider.PopAmbientScope();
+            }
+
+            if (OriginalContext != _efCoreScopeProvider.AmbientScopeContext)
+            {
+                _efCoreScopeProvider.PopAmbientScopeContext();
+            }
+
+            Attached = false;
+            OriginalScope = null;
+            OriginalContext = null;
+        }
+    }
+
+    private void HandleScopeContext()
+    {
+        // if *we* created it, then get rid of it
+        if (_efCoreScopeProvider.AmbientScopeContext == ScopeContext)
+        {
+            try
+            {
+                _efCoreScopeProvider.AmbientScopeContext?.ScopeExit(_completed.HasValue && _completed.Value);
+            }
+            finally
+            {
+                // removes the ambient context (ambient scope already gone)
+                _efCoreScopeProvider.PopAmbientScopeContext();
+            }
         }
     }
 

@@ -425,7 +425,6 @@ public class EfCoreScopeTest : UmbracoIntegrationTest
     [Test]
     public async Task NestedTransactionComplete()
     {
-
         using (IEfCoreScope scope = EfCoreScopeProvider.CreateScope())
         {
             await scope.ExecuteWithContextAsync<Task>(async database =>
@@ -448,7 +447,8 @@ public class EfCoreScopeTest : UmbracoIntegrationTest
                     await scope.ExecuteWithContextAsync<Task>(async nestedDatabase =>
                     {
                         await nestedDatabase.Database.ExecuteSqlAsync($"INSERT INTO tmp (id, name) VALUES (2, 'b')");
-                        string nn = await nestedDatabase.Database.ExecuteScalarAsync<string>("SELECT name FROM tmp WHERE id=2");
+                        string nn =
+                            await nestedDatabase.Database.ExecuteScalarAsync<string>("SELECT name FROM tmp WHERE id=2");
                         Assert.AreEqual("b", nn);
                     });
 
@@ -571,7 +571,7 @@ public class EfCoreScopeTest : UmbracoIntegrationTest
             });
         });
     }
-    
+
     [TestCase(true)]
     [TestCase(false)]
     public void ScopeContextEnlist(bool complete)
@@ -602,7 +602,7 @@ public class EfCoreScopeTest : UmbracoIntegrationTest
         Assert.IsNull(ambientScope); // the scope is gone
         Assert.IsNotNull(ambientContext); // the context is still there
     }
-    
+
     [TestCase(true)]
     [TestCase(false)]
     public void ScopeContextEnlistAgain(bool complete)
@@ -632,5 +632,63 @@ public class EfCoreScopeTest : UmbracoIntegrationTest
         Assert.IsNotNull(completed);
         Assert.AreEqual(complete, completed.Value);
         Assert.AreEqual(complete, completed2.Value);
+    }
+
+    [Test]
+    public void DetachableScope()
+    {
+        Assert.IsNull(EfCoreScopeAccessor.AmbientScope);
+        using (IEfCoreScope scope = EfCoreScopeProvider.CreateScope())
+        {
+            Assert.IsInstanceOf<EfCoreScope>(scope);
+            Assert.IsNotNull(EfCoreScopeAccessor.AmbientScope);
+            Assert.AreSame(scope, EfCoreScopeAccessor.AmbientScope);
+
+            Assert.IsNotNull(EfCoreScopeProvider.AmbientScopeContext); // the ambient context
+            Assert.IsNotNull(scope.ScopeContext); // the ambient context too (getter only)
+            IScopeContext context = scope.ScopeContext;
+
+            IEfCoreScope detached = EfCoreScopeProvider.CreateDetachedScope();
+            EfCoreScopeProvider.AttachScope(detached);
+
+            Assert.AreEqual(detached, EfCoreScopeAccessor.AmbientScope);
+            Assert.AreNotSame(context, EfCoreScopeProvider.AmbientScopeContext);
+
+            // nesting under detached!
+            using (IEfCoreScope nested = EfCoreScopeProvider.CreateScope())
+            {
+                Assert.Throws<InvalidOperationException>(() =>
+
+                    // cannot detach a non-detachable scope
+                    EfCoreScopeProvider.DetachScope());
+                nested.Complete();
+            }
+
+            Assert.AreEqual(detached, EfCoreScopeAccessor.AmbientScope);
+            Assert.AreNotSame(context, EfCoreScopeProvider.AmbientScopeContext);
+
+            // can detach
+            Assert.AreSame(detached, EfCoreScopeProvider.DetachScope());
+
+            Assert.AreSame(scope, EfCoreScopeAccessor.AmbientScope);
+            Assert.AreSame(context, EfCoreScopeProvider.AmbientScopeContext);
+
+            Assert.Throws<InvalidOperationException>(() =>
+
+                // cannot disposed a non-attached scope
+                // in fact, only the ambient scope can be disposed
+                detached.Dispose());
+
+            EfCoreScopeProvider.AttachScope(detached);
+            detached.Complete();
+            detached.Dispose();
+
+            // has self-detached, and is gone!
+            Assert.AreSame(scope, EfCoreScopeAccessor.AmbientScope);
+            Assert.AreSame(context, EfCoreScopeProvider.AmbientScopeContext);
+        }
+
+        Assert.IsNull(EfCoreScopeAccessor.AmbientScope);
+        Assert.IsNull(EfCoreScopeProvider.AmbientScopeContext);
     }
 }
