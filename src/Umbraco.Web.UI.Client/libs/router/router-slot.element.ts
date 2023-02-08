@@ -1,3 +1,4 @@
+import 'router-slot';
 import { LitElement, PropertyValueMap } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { IRoute, RouterSlot } from 'router-slot';
@@ -7,6 +8,8 @@ import { UmbRouterSlotChangeEvent, UmbRouterSlotInitEvent } from '@umbraco-cms/r
  *  @element umb-router-slot-element
  *  @description - Component for wrapping Router Slot element, providing some local events for implementation.
  *  @extends UmbRouterSlotElement
+ * @fires {UmbRouterSlotInitEvent} init - fires when the media card is selected
+ * @fires {UmbRouterSlotChangeEvent} change - fires when the media card is unselected
  */
 @customElement('umb-router-slot')
 export class UmbRouterSlotElement extends LitElement {
@@ -38,7 +41,10 @@ export class UmbRouterSlotElement extends LitElement {
 	constructor() {
 		super();
 		this.#router = document.createElement('router-slot');
+		// Note: I decided not to use the local changestate event, because it is not fired when the route is changed from any router-slot. And for now I wanted to keep it local.
+		//this.#router.addEventListener('changestate', this._onNavigationChanged);
 	}
+
 
 	connectedCallback() {
 		super.connectedCallback();
@@ -53,6 +59,7 @@ export class UmbRouterSlotElement extends LitElement {
 		window.removeEventListener('navigationsuccess', this._onNavigationChanged);
 		this.#listening = false;
 	}
+
 
 	protected firstUpdated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
 		super.firstUpdated(_changedProperties);
