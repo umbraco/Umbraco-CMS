@@ -1,7 +1,13 @@
-import type { ContentTreeItem, DocumentTreeItem, DocumentTypeTreeItem, EntityTreeItem, FolderTreeItem } from "@umbraco-cms/backend-api";
-import type { DocumentDetails, DocumentTypeDetails } from "@umbraco-cms/models";
+import type {
+	ContentTreeItemModel,
+	DocumentTreeItemModel,
+	DocumentTypeTreeItemModel,
+	EntityTreeItemModel,
+	FolderTreeItemModel,
+} from '@umbraco-cms/backend-api';
+import type { DocumentDetails, DocumentTypeDetails } from '@umbraco-cms/models';
 
-export const createEntityTreeItem = (item: any): EntityTreeItem => {
+export const createEntityTreeItem = (item: any): EntityTreeItemModel => {
 	return {
 		name: item.name,
 		type: item.type,
@@ -13,7 +19,7 @@ export const createEntityTreeItem = (item: any): EntityTreeItem => {
 	};
 };
 
-export const createFolderTreeItem = (item: any): FolderTreeItem => {
+export const createFolderTreeItem = (item: any): FolderTreeItemModel => {
 	return {
 		...createEntityTreeItem(item),
 		isFolder: item.isFolder,
@@ -21,7 +27,7 @@ export const createFolderTreeItem = (item: any): FolderTreeItem => {
 };
 
 // TODO: remove isTrashed type extension when we have found a solution to trashed items
-export const createContentTreeItem = (item: any): ContentTreeItem & { isTrashed: boolean } => {
+export const createContentTreeItem = (item: any): ContentTreeItemModel & { isTrashed: boolean } => {
 	return {
 		...createEntityTreeItem(item),
 		noAccess: item.noAccess,
@@ -30,7 +36,7 @@ export const createContentTreeItem = (item: any): ContentTreeItem & { isTrashed:
 };
 
 // TODO: remove isTrashed type extension when we have found a solution to trashed items
-export const createDocumentTreeItem = (item: DocumentDetails): DocumentTreeItem & { isTrashed: boolean }  => {
+export const createDocumentTreeItem = (item: DocumentDetails): DocumentTreeItemModel & { isTrashed: boolean } => {
 	return {
 		...createContentTreeItem(item),
 		noAccess: item.noAccess,
@@ -39,11 +45,11 @@ export const createDocumentTreeItem = (item: DocumentDetails): DocumentTreeItem 
 		isEdited: item.isEdited,
 		isTrashed: item.isTrashed,
 	};
-}
+};
 
-export const createDocumentTypeTreeItem = (item: DocumentTypeDetails): DocumentTypeTreeItem => {
+export const createDocumentTypeTreeItem = (item: DocumentTypeDetails): DocumentTypeTreeItemModel => {
 	return {
 		...createFolderTreeItem(item),
-		isElement: item.isElement
+		isElement: item.isElement,
 	};
 };
