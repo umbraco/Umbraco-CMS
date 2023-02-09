@@ -22,11 +22,6 @@ export const handlers = [
 		return res(ctx.status(200), ctx.json(response));
 	}),
 
-	rest.get(umbracoPath('/languages'), (req, res, ctx) => {
-		const items = umbLanguagesData.getAvailable();
-		return res(ctx.status(200), ctx.json(items));
-	}),
-
 	rest.get(umbracoPath('/language/:key'), (req, res, ctx) => {
 		const key = req.params.key as string;
 
