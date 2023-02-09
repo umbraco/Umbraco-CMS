@@ -2,6 +2,7 @@
 using System.Data.Common;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Storage;
 
 namespace Umbraco.Extensions;
 
@@ -20,6 +21,11 @@ public static class DbContextExtensions
     public static async Task<T?> ExecuteScalarAsync<T>(this DatabaseFacade database, string sql, List<DbParameter>? parameters = null, CommandType commandType = CommandType.Text, int? commandTimeOutInSeconds = null)
     {
         using DbCommand dbCommand = database.GetDbConnection().CreateCommand();
+
+        if (database.CurrentTransaction is not null)
+        {
+            dbCommand.Transaction = database.CurrentTransaction.GetDbTransaction();
+        }
 
         if (dbCommand.Connection?.State != ConnectionState.Open)
         {
