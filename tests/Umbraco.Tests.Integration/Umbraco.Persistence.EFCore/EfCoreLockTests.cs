@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using System.Transactions;
+using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.DistributedLocking;
@@ -17,7 +18,6 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Persistence.EFCore;
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest, Logger = UmbracoTestOptions.Logger.Console)]
 public class EfCoreLockTests : UmbracoIntegrationTest
 {
-
     private IEfCoreScopeProvider EfCoreScopeProvider =>
         GetRequiredService<IEfCoreScopeProvider>();
 
@@ -31,10 +31,9 @@ public class EfCoreLockTests : UmbracoIntegrationTest
         {
             scope.ExecuteWithContextAsync<Task>(async database =>
             {
-                database.UmbracoLocks.Add(new UmbracoLock { Id = 1, Name = "Lock.1" });
-                database.UmbracoLocks.Add(new UmbracoLock { Id = 2, Name = "Lock.2" });
-                database.UmbracoLocks.Add(new UmbracoLock { Id = 3, Name = "Lock.3" });
-
+                database.UmbracoLocks.Add(new UmbracoLock {Id = 1, Name = "Lock.1"});
+                database.UmbracoLocks.Add(new UmbracoLock {Id = 2, Name = "Lock.2"});
+                database.UmbracoLocks.Add(new UmbracoLock {Id = 3, Name = "Lock.3"});
             });
 
             scope.Complete();
@@ -64,7 +63,8 @@ public class EfCoreLockTests : UmbracoIntegrationTest
     {
         if (BaseTestDatabase.DatabaseType.IsSqlite())
         {
-            Assert.Ignore("This test doesn't work with Microsoft.Data.Sqlite in EFCore as we no longer use deferred transactions");
+            Assert.Ignore(
+                "This test doesn't work with Microsoft.Data.Sqlite in EFCore as we no longer use deferred transactions");
             return;
         }
 
@@ -137,5 +137,27 @@ public class EfCoreLockTests : UmbracoIntegrationTest
         {
             Assert.IsNull(exceptions[i]);
         }
+    }
+
+    [Test]
+    public void GivenNonEagerLocking_WhenNoDbIsAccessed_ThenNoSqlIsExecuted()
+    {
+        var sqlCount = 0;
+
+        using (var scope = EfCoreScopeProvider.CreateScope())
+        {
+            // Issue a lock request, but we are using non-eager
+            // locks so this only queues the request.
+            // The lock will not be issued unless we resolve
+            // scope.Database
+            scope.WriteLock(Constants.Locks.Servers);
+
+            scope.ExecuteWithContextAsync<Task>(async db =>
+            {
+                sqlCount = db.ChangeTracker.Entries().Count();
+            });
+        }
+
+        Assert.AreEqual(0, sqlCount);
     }
 }

@@ -16,6 +16,7 @@ internal class EfCoreScope : IEfCoreScope
 
     // This is all used to safely track read/write locks at given Scope levels so that
     // when we dispose we can verify that everything has been cleaned up correctly
+    private readonly object _lockQueueLocker = new();
     private readonly object _dictionaryLocker;
     private StackQueue<(DistributedLockType lockType, TimeSpan timeout, Guid instanceId, int lockId)>? _queuedLocks;
     private HashSet<int>? _readLocks;
@@ -58,7 +59,6 @@ internal class EfCoreScope : IEfCoreScope
         // }
 
         ScopeContext = scopeContext;
-
     }
 
     public EfCoreScope(
@@ -78,7 +78,8 @@ internal class EfCoreScope : IEfCoreScope
     {
         if (_disposed)
         {
-            throw new InvalidOperationException("The scope has been disposed, therefore the database is not available.");
+            throw new InvalidOperationException(
+                "The scope has been disposed, therefore the database is not available.");
         }
 
         if (_umbracoEfCoreDatabase is null)
@@ -101,6 +102,50 @@ internal class EfCoreScope : IEfCoreScope
         if (_completed.HasValue == false)
         {
             _completed = true;
+        }
+    }
+
+    public void ReadLock(params int[] lockIds) => LazyReadLockInner(InstanceId, lockIds);
+
+    public void LazyReadLockInner(Guid instanceId, params int[] lockIds)
+    {
+        if (ParentScope != null)
+        {
+            ParentScope.LazyReadLockInner(instanceId, lockIds);
+        }
+        else
+        {
+            LazyLockInner(DistributedLockType.ReadLock, instanceId, lockIds);
+        }
+    }
+
+    public void WriteLock(params int[] lockIds) => LazyWriteLockInner(InstanceId, lockIds);
+
+    public void LazyWriteLockInner(Guid instanceId, params int[] lockIds)
+    {
+        if (ParentScope != null)
+        {
+            ParentScope.LazyWriteLockInner(instanceId, lockIds);
+        }
+        else
+        {
+            LazyLockInner(DistributedLockType.WriteLock, instanceId, lockIds);
+        }
+    }
+
+    private void LazyLockInner(DistributedLockType lockType, Guid instanceId, params int[] lockIds)
+    {
+        lock (_lockQueueLocker)
+        {
+            if (_queuedLocks == null)
+            {
+                _queuedLocks = new StackQueue<(DistributedLockType, TimeSpan, Guid, int)>();
+            }
+
+            foreach (var lockId in lockIds)
+            {
+                _queuedLocks.Enqueue((lockType, TimeSpan.Zero, instanceId, lockId));
+            }
         }
     }
 
@@ -146,6 +191,60 @@ internal class EfCoreScope : IEfCoreScope
 
     public void EagerReadLock(params int[] lockIds) => EagerReadLockInner(InstanceId, null, lockIds);
 
+    public void EagerWriteLock(params int[] lockIds) => EagerReadLockInner(InstanceId, null, lockIds);
+
+    /// <summary>
+    ///     Handles acquiring a write lock with a specified timeout, will delegate it to the parent if there are any.
+    /// </summary>
+    /// <param name="instanceId">Instance ID of the requesting scope.</param>
+    /// <param name="timeout">Optional database timeout in milliseconds.</param>
+    /// <param name="lockIds">Array of lock object identifiers.</param>
+    private void EagerWriteLockInner(Guid instanceId, TimeSpan? timeout, params int[] lockIds)
+    {
+        if (ParentScope is not null)
+        {
+            // If we have a parent we delegate lock creation to parent.
+            ParentScope.EagerWriteLockInner(instanceId, timeout, lockIds);
+        }
+        else
+        {
+            lock (_dictionaryLocker)
+            {
+                foreach (var lockId in lockIds)
+                {
+                    IncrementLock(lockId, instanceId, ref _writeLocksDictionary);
+
+                    // We are the outermost scope, handle the lock request.
+                    LockInner(
+                        instanceId,
+                        ref _writeLocksDictionary!,
+                        ref _writeLocks!,
+                        ObtainWriteLock,
+                        timeout,
+                        lockId);
+                }
+            }
+        }
+    }
+
+    /// <summary>
+    ///     Obtains a write lock with a custom timeout.
+    /// </summary>
+    /// <param name="lockId">Lock object identifier to lock.</param>
+    /// <param name="timeout">TimeSpan specifying the timout period.</param>
+    private void ObtainWriteLock(int lockId, TimeSpan? timeout)
+    {
+        if (_acquiredLocks == null)
+        {
+            throw new InvalidOperationException(
+                $"Cannot obtain a write lock as the {nameof(_acquiredLocks)} queue is null.");
+        }
+
+        _acquiredLocks.Enqueue(
+            _efCoreScopeProvider.DistributedLockingMechanismFactory.DistributedLockingMechanism.WriteLock(lockId,
+                timeout));
+    }
+
     /// <summary>
     ///     Handles acquiring a read lock, will delegate it to the parent if there are any.
     /// </summary>
@@ -189,10 +288,13 @@ internal class EfCoreScope : IEfCoreScope
     {
         if (_acquiredLocks == null)
         {
-            throw new InvalidOperationException($"Cannot obtain a read lock as the {nameof(_acquiredLocks)} queue is null.");
+            throw new InvalidOperationException(
+                $"Cannot obtain a read lock as the {nameof(_acquiredLocks)} queue is null.");
         }
 
-        _acquiredLocks.Enqueue(_efCoreScopeProvider.DistributedLockingMechanismFactory.DistributedLockingMechanism.ReadLock(lockId, timeout));
+        _acquiredLocks.Enqueue(
+            _efCoreScopeProvider.DistributedLockingMechanismFactory.DistributedLockingMechanism.ReadLock(lockId,
+                timeout));
     }
 
     /// <summary>
@@ -266,6 +368,93 @@ internal class EfCoreScope : IEfCoreScope
     }
 
     /// <summary>
+    ///     When we require a ReadLock or a WriteLock we don't immediately request these locks from the database,
+    ///     instead we only request them when necessary (lazily).
+    ///     To do this, we queue requests for read/write locks.
+    ///     This is so that if there's a request for either of these
+    ///     locks, but the service/repository returns an item from the cache, we don't end up making a DB call to make the
+    ///     read/write lock.
+    ///     This executes the queue of requested locks in order in an efficient way lazily whenever the database instance is
+    ///     resolved.
+    /// </summary>
+    private void EnsureDbLocks()
+    {
+        // always delegate to the root parent
+        if (ParentScope is not null)
+        {
+            ParentScope.EnsureDbLocks();
+        }
+        else
+        {
+            lock (_lockQueueLocker)
+            {
+                if (_queuedLocks?.Count > 0)
+                {
+                    DistributedLockType currentType = DistributedLockType.ReadLock;
+                    TimeSpan currentTimeout = TimeSpan.Zero;
+                    Guid currentInstanceId = InstanceId;
+                    var collectedIds = new HashSet<int>();
+
+                    var i = 0;
+                    while (_queuedLocks.Count > 0)
+                    {
+                        (DistributedLockType lockType, TimeSpan timeout, Guid instanceId, var lockId) =
+                            _queuedLocks.Dequeue();
+
+                        if (i == 0)
+                        {
+                            currentType = lockType;
+                            currentTimeout = timeout;
+                            currentInstanceId = instanceId;
+                        }
+                        else if (lockType != currentType || timeout != currentTimeout ||
+                                 instanceId != currentInstanceId)
+                        {
+                            // the lock type, instanceId or timeout switched.
+                            // process the lock ids collected
+                            switch (currentType)
+                            {
+                                case DistributedLockType.ReadLock:
+                                    EagerReadLockInner(currentInstanceId,
+                                        currentTimeout == TimeSpan.Zero ? null : currentTimeout,
+                                        collectedIds.ToArray());
+                                    break;
+                                case DistributedLockType.WriteLock:
+                                    EagerWriteLockInner(currentInstanceId,
+                                        currentTimeout == TimeSpan.Zero ? null : currentTimeout,
+                                        collectedIds.ToArray());
+                                    break;
+                            }
+
+                            // clear the collected and set new type
+                            collectedIds.Clear();
+                            currentType = lockType;
+                            currentTimeout = timeout;
+                            currentInstanceId = instanceId;
+                        }
+
+                        collectedIds.Add(lockId);
+                        i++;
+                    }
+
+                    // process the remaining
+                    switch (currentType)
+                    {
+                        case DistributedLockType.ReadLock:
+                            EagerReadLockInner(currentInstanceId,
+                                currentTimeout == TimeSpan.Zero ? null : currentTimeout, collectedIds.ToArray());
+                            break;
+                        case DistributedLockType.WriteLock:
+                            EagerWriteLockInner(currentInstanceId,
+                                currentTimeout == TimeSpan.Zero ? null : currentTimeout, collectedIds.ToArray());
+                            break;
+                    }
+                }
+            }
+        }
+    }
+
+    /// <summary>
     ///     Clears all lock counters for a given scope instance, signalling that the scope has been disposed.
     /// </summary>
     /// <param name="instanceId">Instance ID of the scope to clear.</param>
@@ -310,6 +499,7 @@ internal class EfCoreScope : IEfCoreScope
         // Check if we are already in a transaction before starting one
         if (_umbracoEfCoreDatabase.UmbracoEFContext.Database.CurrentTransaction is null)
         {
+            EnsureDbLocks();
             _umbracoEfCoreDatabase.UmbracoEFContext.Database.BeginTransaction();
         }
     }
@@ -349,6 +539,5 @@ internal class EfCoreScope : IEfCoreScope
         }
 
         // _efCoreDatabaseFactory.Dispose();
-
     }
 }

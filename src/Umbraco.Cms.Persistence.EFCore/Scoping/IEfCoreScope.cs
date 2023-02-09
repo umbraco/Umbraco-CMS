@@ -33,5 +33,19 @@ public interface IEfCoreScope : IDisposable
     /// </summary>
     void Complete();
 
+    /// <summary>
+    ///     Read-locks some lock objects.
+    /// </summary>
+    /// <param name="lockIds">Array of lock object identifiers.</param>
+    void ReadLock(params int[] lockIds);
+
+    /// <summary>
+    ///     Write-locks some lock objects.
+    /// </summary>
+    /// <param name="lockIds">Array of object identifiers.</param>
+    void WriteLock(params int[] lockIds);
+
     void EagerReadLock(params int[] lockIds);
+
+    void EagerWriteLock(params int[] lockIds);
 }
