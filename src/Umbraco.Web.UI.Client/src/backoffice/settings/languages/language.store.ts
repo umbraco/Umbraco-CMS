@@ -1,5 +1,5 @@
 import { Observable } from 'rxjs';
-import { Language, LanguageResource } from '@umbraco-cms/backend-api';
+import { Culture, CultureResource, Language, LanguageResource } from '@umbraco-cms/backend-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/resources';
 import { UmbContextToken } from '@umbraco-cms/context-api';
 import { UmbStoreBase } from '@umbraco-cms/store';
@@ -17,6 +17,9 @@ export const UMB_LANGUAGE_STORE_CONTEXT_TOKEN = new UmbContextToken<UmbLanguageS
  */
 export class UmbLanguageStore extends UmbStoreBase {
 	#data = new ArrayState<UmbLanguageStoreItemType>([], (x) => x.isoCode);
+	#availableLanguages = new ArrayState<Culture>([], (x) => x.name);
+
+	public readonly availableLanguages = this.#availableLanguages.asObservable();
 
 	constructor(host: UmbControllerHostInterface) {
 		super(host, UMB_LANGUAGE_STORE_CONTEXT_TOKEN.toString());
@@ -38,6 +41,15 @@ export class UmbLanguageStore extends UmbStoreBase {
 		});
 
 		return this.#data;
+	}
+
+	getAvailableCultures() {
+		tryExecuteAndNotify(this._host, CultureResource.getCulture({ skip: 0, take: 1000 })).then(({ data }) => {
+			if (!data) return;
+			this.#availableLanguages.append(data.items);
+		});
+
+		return this.availableLanguages;
 	}
 
 	async save(language: UmbLanguageStoreItemType): Promise<void> {

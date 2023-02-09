@@ -22,6 +22,7 @@ import { handlers as memberHandlers } from './domains/member.handlers';
 import { handlers as memberTypeHandlers } from './domains/member-type.handlers';
 import { handlers as templateHandlers } from './domains/template.handlers';
 import { handlers as languageHandlers } from './domains/language.handlers';
+import { handlers as cultureHandlers } from './domains/culture.handlers';
 import { handlers as redirectManagementHandlers } from './domains/redirect-management.handlers';
 
 const handlers = [
@@ -49,6 +50,7 @@ const handlers = [
 	...dictionaryHandlers,
 	...templateHandlers,
 	...languageHandlers,
+	...cultureHandlers,
 	...redirectManagementHandlers,
 ];
 
