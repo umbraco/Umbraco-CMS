@@ -1,7 +1,7 @@
 import { UUIInputElement, UUIInputEvent } from '@umbraco-ui/uui';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html } from 'lit';
-import { customElement, property, state } from 'lit/decorators.js';
+import { customElement, state } from 'lit/decorators.js';
 import { distinctUntilChanged } from 'rxjs';
 import { UmbWorkspaceDataTypeContext } from './data-type-workspace.context';
 import { UmbLitElement } from '@umbraco-cms/element';

@@ -1,13 +1,12 @@
-import { ContentTreeItem } from '@umbraco-cms/backend-api';
-import { UmbTreeStore } from '@umbraco-cms/store';
-import { UmbControllerHostInterface } from '@umbraco-cms/controller';
+import type { ContentTreeItemModel } from '@umbraco-cms/backend-api';
+import type { UmbTreeStore } from '@umbraco-cms/store';
+import type { UmbControllerHostInterface } from '@umbraco-cms/controller';
 import { UmbContextToken, UmbContextConsumerController } from '@umbraco-cms/context-api';
 import { ArrayState, UmbObserverController } from '@umbraco-cms/observable-api';
 export class UmbCollectionContext<
-	DataType extends ContentTreeItem,
+	DataType extends ContentTreeItemModel,
 	StoreType extends UmbTreeStore<DataType> = UmbTreeStore<DataType>
 > {
-
 	private _host: UmbControllerHostInterface;
 	private _entityKey: string | null;
 

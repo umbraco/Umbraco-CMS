@@ -10,7 +10,7 @@ import {
 	UMB_MEDIA_TREE_STORE_CONTEXT_TOKEN,
 } from '../../../../backoffice/media/media/media.tree.store';
 import { UmbLitElement } from '@umbraco-cms/element';
-import type { FolderTreeItem } from '@umbraco-cms/backend-api';
+import type { FolderTreeItemModel } from '@umbraco-cms/backend-api';
 import type { UmbObserverController } from '@umbraco-cms/observable-api';
 
 @customElement('umb-input-media-picker')

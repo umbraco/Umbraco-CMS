@@ -2,7 +2,7 @@ import { rest } from 'msw';
 
 import { getGroupByName, healthGroupsWithoutResult } from '../data/health-check.data';
 
-import { HealthCheckGroup, PagedHealthCheckGroup } from '@umbraco-cms/backend-api';
+import { HealthCheckGroupModel, PagedHealthCheckGroupModel } from '@umbraco-cms/backend-api';
 import { umbracoPath } from '@umbraco-cms/utils';
 
 export const handlers = [
@@ -10,7 +10,7 @@ export const handlers = [
 		return res(
 			// Respond with a 200 status code
 			ctx.status(200),
-			ctx.json<PagedHealthCheckGroup>({ total: 9999, items: healthGroupsWithoutResult })
+			ctx.json<PagedHealthCheckGroupModel>({ total: 9999, items: healthGroupsWithoutResult })
 		);
 	}),
 
@@ -21,7 +21,7 @@ export const handlers = [
 		const group = getGroupByName(name);
 
 		if (group) {
-			return res(ctx.status(200), ctx.json<HealthCheckGroup>(group));
+			return res(ctx.status(200), ctx.json<HealthCheckGroupModel>(group));
 		} else {
 			return res(ctx.status(404));
 		}

@@ -12,7 +12,7 @@ import '../../../../../../shared/components/content-property/content-property.el
 import '../../../../../../shared/collection/dashboards/dashboard-collection.element';
 import { UmbWorkspaceEntityContextInterface } from '../../../workspace-context/workspace-entity-context.interface';
 import { UmbLitElement } from '@umbraco-cms/element';
-import { FolderTreeItem } from '@umbraco-cms/backend-api';
+import { FolderTreeItemModel } from '@umbraco-cms/backend-api';
 import { ManifestWorkspaceViewCollection } from '@umbraco-cms/extensions-registry';
 
 @customElement('umb-workspace-view-collection')
@@ -46,14 +46,9 @@ export class UmbWorkspaceViewCollectionElement extends UmbLitElement {
 	protected _provideWorkspace() {
 		const entityKey = this._workspaceContext?.getEntityKey();
 		if (entityKey != null) {
-
 			const manifestMeta = this.manifest.meta;
 
-			this._collectionContext = new UmbCollectionContext(
-				this,
-				entityKey,
-				manifestMeta.storeAlias
-			);
+			this._collectionContext = new UmbCollectionContext(this, entityKey, manifestMeta.storeAlias);
 			this.provideContext(UMB_COLLECTION_CONTEXT_TOKEN, this._collectionContext);
 		}
 	}

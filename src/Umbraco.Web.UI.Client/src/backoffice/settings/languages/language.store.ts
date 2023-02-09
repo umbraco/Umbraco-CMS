@@ -1,12 +1,12 @@
 import { Observable } from 'rxjs';
-import { Language, LanguageResource } from '@umbraco-cms/backend-api';
+import { LanguageModel, LanguageResource } from '@umbraco-cms/backend-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/resources';
 import { UmbContextToken } from '@umbraco-cms/context-api';
 import { UmbStoreBase } from '@umbraco-cms/store';
 import { ArrayState } from '@umbraco-cms/observable-api';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 
-export type UmbLanguageStoreItemType = Language;
+export type UmbLanguageStoreItemType = LanguageModel;
 export const UMB_LANGUAGE_STORE_CONTEXT_TOKEN = new UmbContextToken<UmbLanguageStore>('umbLanguageStore');
 
 /**
