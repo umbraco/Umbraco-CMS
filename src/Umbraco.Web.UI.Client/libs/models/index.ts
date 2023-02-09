@@ -1,10 +1,10 @@
 import {
-	ContentTreeItem,
-	DocumentTreeItem,
-	DocumentTypeTreeItem,
-	EntityTreeItem,
-	FolderTreeItem,
-	PagedEntityTreeItem,
+	ContentTreeItemModel,
+	DocumentTreeItemModel,
+	DocumentTypeTreeItemModel,
+	EntityTreeItemModel,
+	FolderTreeItemModel,
+	PagedEntityTreeItemModel,
 	ProblemDetailsModel,
 } from '@umbraco-cms/backend-api';
 import { Observable } from 'rxjs';
@@ -26,7 +26,7 @@ export interface Entity {
 	parentKey: string | null;
 }
 
-export interface ContentDetails extends ContentTreeItem {
+export interface ContentDetails extends ContentTreeItemModel {
 	isTrashed: boolean; // TODO: remove only temp part of refactor
 	properties: Array<ContentProperty>;
 	//data: Array<ContentPropertyData>;
@@ -65,7 +65,7 @@ export interface UserGroupDetails extends UserGroupEntity {
 }
 
 // Data Types
-export interface DataTypeDetails extends FolderTreeItem {
+export interface DataTypeDetails extends FolderTreeItemModel {
 	key: string; // TODO: Remove this when the backend is fixed
 	propertyEditorModelAlias: string | null;
 	propertyEditorUIAlias: string | null;
@@ -78,14 +78,14 @@ export interface DataTypePropertyData {
 }
 
 // Document Types
-export interface DocumentTypeDetails extends DocumentTypeTreeItem {
+export interface DocumentTypeDetails extends DocumentTypeTreeItemModel {
 	key: string; // TODO: Remove this when the backend is fixed
 	alias: string;
 	properties: [];
 }
 
 // TODO: Make sure Entity Type/interface.
-export interface MemberTypeDetails extends EntityTreeItem {
+export interface MemberTypeDetails extends EntityTreeItemModel {
 	key: string; // TODO: Remove this when the backend is fixed
 	alias: string;
 	properties: [];
@@ -105,7 +105,7 @@ export interface ContentPropertyData {
 }
 
 // Documents
-export interface DocumentDetails extends DocumentTreeItem {
+export interface DocumentDetails extends DocumentTreeItemModel {
 	key: string; // TODO: Remove this when the backend is fixed
 	isTrashed: boolean; // TODO: remove only temp part of refactor
 	properties: Array<ContentProperty>;
@@ -115,7 +115,7 @@ export interface DocumentDetails extends DocumentTreeItem {
 }
 
 // Media
-export interface MediaDetails extends ContentTreeItem {
+export interface MediaDetails extends ContentTreeItemModel {
 	key: string; // TODO: Remove this when the backend is fixed
 	isTrashed: boolean; // TODO: remove only temp part of refactor
 	properties: Array<ContentProperty>;
@@ -126,19 +126,19 @@ export interface MediaDetails extends ContentTreeItem {
 
 // Media Types
 
-export interface MediaTypeDetails extends FolderTreeItem {
+export interface MediaTypeDetails extends FolderTreeItemModel {
 	key: string; // TODO: Remove this when the backend is fixed
 	alias: string;
 	properties: [];
 }
 
 // Member Groups
-export interface MemberGroupDetails extends EntityTreeItem {
+export interface MemberGroupDetails extends EntityTreeItemModel {
 	key: string; // TODO: Remove this when the backend is fixed
 }
 
 // Dictionary
-export interface DictionaryDetails extends EntityTreeItem {
+export interface DictionaryDetails extends EntityTreeItemModel {
 	key: string; // TODO: Remove this when the backend is fixed
 }
 
@@ -165,18 +165,18 @@ export interface UmbTreeRepositoryFactory {
 
 export interface UmbTreeRepository {
 	requestRootItems: () => Promise<{
-		data: PagedEntityTreeItem | undefined;
+		data: PagedEntityTreeItemModel | undefined;
 		error: ProblemDetailsModel | undefined;
 	}>;
 	requestChildrenOf: (parentKey: string | null) => Promise<{
-		data: PagedEntityTreeItem | undefined;
+		data: PagedEntityTreeItemModel | undefined;
 		error: ProblemDetailsModel | undefined;
 	}>;
 	requestItems: (keys: string[]) => Promise<{
-		data: Array<EntityTreeItem> | undefined;
+		data: Array<EntityTreeItemModel> | undefined;
 		error: ProblemDetailsModel | undefined;
 	}>;
-	rootItems: () => Promise<Observable<EntityTreeItem[]>>;
-	childrenOf: (parentKey: string | null) => Promise<Observable<EntityTreeItem[]>>;
-	items: (keys: string[]) => Promise<Observable<EntityTreeItem[]>>;
+	rootItems: () => Promise<Observable<EntityTreeItemModel[]>>;
+	childrenOf: (parentKey: string | null) => Promise<Observable<EntityTreeItemModel[]>>;
+	items: (keys: string[]) => Promise<Observable<EntityTreeItemModel[]>>;
 }
