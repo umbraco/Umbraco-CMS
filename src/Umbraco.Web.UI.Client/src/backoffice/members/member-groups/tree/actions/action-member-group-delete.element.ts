@@ -3,7 +3,7 @@ import { css, html } from 'lit';
 import { customElement } from 'lit/decorators.js';
 import { UmbModalService, UMB_MODAL_SERVICE_CONTEXT_TOKEN } from '../../../../../core/modal';
 import UmbTreeItemActionElement from '../../../../shared/components/tree/action/tree-item-action.element';
-import { UmbMemberGroupTreeStore, UMB_MEMBER_GROUP_TREE_STORE_CONTEXT_TOKEN } from '../../member-group.tree.store';
+import { UmbMemberGroupTreeStore, UMB_MEMBER_GROUP_TREE_STORE_CONTEXT_TOKEN } from '../data/member-group.tree.store';
 
 @customElement('umb-tree-action-member-group-delete')
 export default class UmbTreeActionMemberGroupDeleteElement extends UmbTreeItemActionElement {
@@ -34,6 +34,9 @@ export default class UmbTreeActionMemberGroupDeleteElement extends UmbTreeItemAc
 
 		modalHandler?.onClose().then(({ confirmed }: any) => {
 			if (confirmed && this._treeContextMenuService && this._memberGroupTreeStore && this._activeTreeItem) {
+				// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+				/* @ts-ignore */
+				// TODO: ignoring this error for now, because we will change this when entity actions are merged
 				this._memberGroupTreeStore?.delete([this._activeTreeItem.key]);
 				this._treeContextMenuService.close();
 			}

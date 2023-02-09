@@ -34,6 +34,9 @@ export default class UmbTreeActionMemberDeleteElement extends UmbTreeItemActionE
 
 		modalHandler?.onClose().then(({ confirmed }: any) => {
 			if (confirmed && this._treeContextMenuService && this._memberTreeStore && this._activeTreeItem) {
+				// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+				/* @ts-ignore */
+				// TODO: ignoring this error for now, because we will change this when entity actions are merged
 				this._memberTreeStore?.delete([this._activeTreeItem.key]);
 				this._treeContextMenuService.close();
 			}
