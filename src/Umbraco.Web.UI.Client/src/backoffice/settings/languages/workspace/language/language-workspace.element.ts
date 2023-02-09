@@ -28,7 +28,7 @@ export class UmbLanguageWorkspaceElement extends UmbLitElement implements UmbWor
 	@property()
 	language?: UmbLanguageStoreItemType;
 
-	private _languageWorkspaceContext?: UmbWorkspaceLanguageContext;
+	#languageWorkspaceContext?: UmbWorkspaceLanguageContext;
 
 	load(key: string): void {
 		this.provideLanguageWorkspaceContext(key);
@@ -39,19 +39,19 @@ export class UmbLanguageWorkspaceElement extends UmbLitElement implements UmbWor
 	}
 
 	public provideLanguageWorkspaceContext(entityKey: string | null) {
-		this._languageWorkspaceContext = new UmbWorkspaceLanguageContext(this, entityKey);
-		this.provideContext('umbWorkspaceContext', this._languageWorkspaceContext);
-		this._languageWorkspaceContext.data.subscribe((language) => {
+		this.#languageWorkspaceContext = new UmbWorkspaceLanguageContext(this, entityKey);
+		this.provideContext('umbWorkspaceContext', this.#languageWorkspaceContext);
+		this.#languageWorkspaceContext.data.subscribe((language) => {
 			this.language = language;
 		});
 	}
 
-	private _handleInput(event: UUIInputEvent) {
+	#handleInput(event: UUIInputEvent) {
 		if (event instanceof UUIInputEvent) {
 			const target = event.composedPath()[0] as UUIInputElement;
 
 			if (typeof target?.value === 'string') {
-				this._languageWorkspaceContext?.update({ name: target.value });
+				this.#languageWorkspaceContext?.update({ name: target.value });
 			}
 		}
 	}
@@ -62,12 +62,10 @@ export class UmbLanguageWorkspaceElement extends UmbLitElement implements UmbWor
 		return html`
 			<umb-workspace-layout alias="Umb.Workspace.Language">
 				<div id="header" slot="header">
-					<a href="/section/settings/language-root">
-						<uui-button compact>
-							<uui-icon name="umb:arrow-left"></uui-icon>
-						</uui-button>
-					</a>
-					<uui-input .value=${this.language.name} @input="${this._handleInput}"></uui-input>
+					<uui-button href="/section/settings/language-root" compact>
+						<uui-icon name="umb:arrow-left"></uui-icon>
+					</uui-button>
+					<uui-input .value=${this.language.name} @input="${this.#handleInput}"></uui-input>
 				</div>
 			</umb-workspace-layout>
 		`;

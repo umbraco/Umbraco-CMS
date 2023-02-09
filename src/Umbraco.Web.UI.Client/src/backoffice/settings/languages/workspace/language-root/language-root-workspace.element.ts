@@ -21,13 +21,8 @@ export class UmbLanguageRootWorkspaceElement extends UmbLitElement implements Um
 				height: 100%;
 			}
 
-			umb-table {
-				padding: 0;
-				margin: var(--uui-size-space-3) var(--uui-size-space-6);
-			}
-			#add-language {
-				margin-left: var(--uui-size-space-6);
-				text-decoration: none;
+			#main {
+				margin: var(--uui-size-space-6);
 			}
 		`,
 	];
@@ -70,14 +65,14 @@ export class UmbLanguageRootWorkspaceElement extends UmbLitElement implements Um
 	@state()
 	private _tableItems: Array<UmbTableItem> = [];
 
-	private _languageStore?: UmbLanguageStore;
+	#languageStore?: UmbLanguageStore;
 
 	constructor() {
 		super();
 
 		this.consumeContext(UMB_LANGUAGE_STORE_CONTEXT_TOKEN, (instance) => {
-			this._languageStore = instance;
-			this._observeLanguages();
+			this.#languageStore = instance;
+			this.#observeLanguages();
 		});
 	}
 
@@ -89,13 +84,13 @@ export class UmbLanguageRootWorkspaceElement extends UmbLitElement implements Um
 		// Not relevant for this workspace
 	}
 
-	private _observeLanguages() {
-		this._languageStore?.getAll().subscribe((languages) => {
-			this._createTableItems(languages);
+	#observeLanguages() {
+		this.#languageStore?.getAll().subscribe((languages) => {
+			this.#createTableItems(languages);
 		});
 	}
 
-	private _createTableItems(languages: Array<UmbLanguageStoreItemType>) {
+	#createTableItems(languages: Array<UmbLanguageStoreItemType>) {
 		this._tableItems = languages.map((language) => {
 			return {
 				key: language.isoCode ?? '',
@@ -135,11 +130,17 @@ export class UmbLanguageRootWorkspaceElement extends UmbLitElement implements Um
 
 	render() {
 		return html`
-			<umb-body-layout no-header-background>
-				<a id="add-language" slot="header" href="section/settings/language/create/root">
-					<uui-button label="Add language" look="outline" color="default"></uui-button>
-				</a>
-				<umb-table .config=${this._tableConfig} .columns=${this._tableColumns} .items=${this._tableItems}></umb-table>
+			<umb-body-layout headline="Languages">
+				<div id="main">
+					<div>
+						<uui-button
+							label="Add language"
+							look="outline"
+							color="default"
+							href="section/settings/language/create/root"></uui-button>
+					</div>
+					<umb-table .config=${this._tableConfig} .columns=${this._tableColumns} .items=${this._tableItems}></umb-table>
+				</div>
 			</umb-body-layout>
 		`;
 	}
