@@ -132,44 +132,51 @@ public class EfCoreScopeTest : UmbracoIntegrationTest
     [Test]
     public async Task CanAccessDbContextTwice()
     {
-        using var scope = EfCoreScopeProvider.CreateScope();
-        await scope.ExecuteWithContextAsync<Task>(async database =>
+        using (var scope = EfCoreScopeProvider.CreateScope())
         {
-            Assert.IsTrue(await database.Database.CanConnectAsync());
-            Assert.IsNotNull(database.Database.CurrentTransaction); // in a transaction
-        });
-        scope.Complete();
+            await scope.ExecuteWithContextAsync<Task>(async database =>
+            {
+                Assert.IsTrue(await database.Database.CanConnectAsync());
+                Assert.IsNotNull(database.Database.CurrentTransaction); // in a transaction
+            });
+            scope.Complete();
+        }
 
-        using var scopeTwo = EfCoreScopeProvider.CreateScope();
-        await scopeTwo.ExecuteWithContextAsync<Task>(async database =>
+        using (var scopeTwo = EfCoreScopeProvider.CreateScope())
         {
-            Assert.IsTrue(await database.Database.CanConnectAsync());
-            Assert.IsNotNull(database.Database.CurrentTransaction); // in a transaction
-        });
-        scope.Complete();
+            await scopeTwo.ExecuteWithContextAsync<Task>(async database =>
+            {
+                Assert.IsTrue(await database.Database.CanConnectAsync());
+                Assert.IsNotNull(database.Database.CurrentTransaction); // in a transaction
+            });
+
+            scopeTwo.Complete();
+        }
     }
 
     [Test]
     public async Task CanAccessNestedDbContext()
     {
-        using var scope = EfCoreScopeProvider.CreateScope();
-        await scope.ExecuteWithContextAsync<Task>(async database =>
+        using (var scope = EfCoreScopeProvider.CreateScope())
         {
-            Assert.IsTrue(await database.Database.CanConnectAsync());
-            var parentTransaction = database.Database.CurrentTransaction;
-
-            using (var nestedSCope = EfCoreScopeProvider.CreateScope())
+            await scope.ExecuteWithContextAsync<Task>(async database =>
             {
-                await nestedSCope.ExecuteWithContextAsync<Task>(async nestedDatabase =>
+                Assert.IsTrue(await database.Database.CanConnectAsync());
+                var parentTransaction = database.Database.CurrentTransaction;
+
+                using (var nestedSCope = EfCoreScopeProvider.CreateScope())
                 {
-                    Assert.IsTrue(await nestedDatabase.Database.CanConnectAsync());
-                    Assert.IsNotNull(nestedDatabase.Database.CurrentTransaction); // in a transaction
-                    var childTransaction = nestedDatabase.Database.CurrentTransaction;
-                    Assert.AreSame(parentTransaction, childTransaction);
-                });
-            }
-        });
-        scope.Complete();
+                    await nestedSCope.ExecuteWithContextAsync<Task>(async nestedDatabase =>
+                    {
+                        Assert.IsTrue(await nestedDatabase.Database.CanConnectAsync());
+                        Assert.IsNotNull(nestedDatabase.Database.CurrentTransaction); // in a transaction
+                        var childTransaction = nestedDatabase.Database.CurrentTransaction;
+                        Assert.AreSame(parentTransaction, childTransaction);
+                    });
+                }
+            });
+            scope.Complete();
+        }
     }
 
     [Test]
