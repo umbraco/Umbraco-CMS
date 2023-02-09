@@ -29,6 +29,7 @@ import '../src/backoffice/shared/components/backoffice-frame/backoffice-notifica
 import '../libs/element/context-provider.element';
 import '../src/backoffice/shared/components/backoffice-frame/backoffice-modal-container.element';
 import '../src/backoffice/shared/components/code-block/code-block.element';
+import '../src/backoffice/shared/components/workspace/workspace-layout/workspace-layout.element';
 
 class UmbStoryBookElement extends LitElement {
 	_umbIconStore = new UmbIconStore();

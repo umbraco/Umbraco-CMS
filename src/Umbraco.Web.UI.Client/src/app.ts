@@ -2,14 +2,12 @@ import '@umbraco-ui/uui-css/dist/uui-css.css';
 import '@umbraco-cms/css';
 
 // TODO: remove these imports when they are part of UUI
-import '@umbraco-ui/uui-color-swatch';
-import '@umbraco-ui/uui-color-swatches';
 import '@umbraco-ui/uui-modal';
 import '@umbraco-ui/uui-modal-container';
 import '@umbraco-ui/uui-modal-dialog';
 import '@umbraco-ui/uui-modal-sidebar';
 import 'element-internals-polyfill';
-import 'router-slot';
+import '@umbraco-cms/router';
 
 import type { Guard, IRoute } from 'router-slot/model';
 
@@ -151,7 +149,7 @@ export class UmbApp extends UmbLitElement {
 	}
 
 	render() {
-		return html`<router-slot id="router-slot" .routes=${this._routes}></router-slot>`;
+		return html`<umb-router-slot id="router-slot" .routes=${this._routes}></umb-router-slot>`;
 	}
 }
 

@@ -2,12 +2,12 @@ import { defineElement } from '@umbraco-ui/uui-base/lib/registration';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html } from 'lit';
 import { state } from 'lit/decorators.js';
-import { IRoutingInfo } from 'router-slot';
 import { UmbSectionContext, UMB_SECTION_CONTEXT_TOKEN } from '../section/section.context';
 import { UmbBackofficeContext, UMB_BACKOFFICE_CONTEXT_TOKEN } from './backoffice.context';
 import type { ManifestSection } from '@umbraco-cms/models';
 import { UmbLitElement } from '@umbraco-cms/element';
 import { createExtensionElementOrFallback } from '@umbraco-cms/extensions-api';
+import { UmbRouterSlotChangeEvent } from '@umbraco-cms/router';
 
 @defineElement('umb-backoffice-main')
 export class UmbBackofficeMain extends UmbLitElement {
@@ -67,9 +67,6 @@ export class UmbBackofficeMain extends UmbLitElement {
 			return {
 				path: this._routePrefix + section.meta.pathname,
 				component: () => createExtensionElementOrFallback(section, 'umb-section'),
-				setup: this._onRouteSetup,
-				// TODO: sometimes we can end up in a state where this callback doesn't get called. It could look like a bug in the router-slot.
-				// Niels: Could this be because _backofficeContext is not available at that state?
 			};
 		});
 
@@ -79,8 +76,8 @@ export class UmbBackofficeMain extends UmbLitElement {
 		});
 	}
 
-	private _onRouteSetup = (_component: HTMLElement, info: IRoutingInfo) => {
-		const currentPath = info.match.route.path;
+	private _onRouteChange = (event: UmbRouterSlotChangeEvent) => {
+		const currentPath = event.target.localActiveViewPath || ''
 		const section = this._sections.find((s) => this._routePrefix + s.meta.pathname === currentPath);
 		if (!section) return;
 		this._backofficeContext?.setActiveSectionAlias(section.alias);
@@ -97,7 +94,11 @@ export class UmbBackofficeMain extends UmbLitElement {
 	}
 
 	render() {
-		return html`<umb-router-slot .routes=${this._routes}></umb-router-slot>`;
+		return html`
+			<umb-router-slot
+				.routes=${this._routes}
+				@change=${this._onRouteChange}
+			></umb-router-slot>`;
 	}
 }
 

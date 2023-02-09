@@ -1,14 +1,12 @@
-import type { UUIColorSwatchesEvent } from '@umbraco-ui/uui-color-swatches';
+import type { UUIColorSwatchesEvent } from '@umbraco-ui/uui';
 
 import { css, html } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, property, state } from 'lit/decorators.js';
+import { styleMap } from 'lit/directives/style-map.js';
 import { UmbModalLayoutElement } from '../modal-layout.element';
 
 import icons from '../../../../../public-assets/icons/icons.json';
-
-import '@umbraco-ui/uui-color-swatch';
-import '@umbraco-ui/uui-color-swatches';
 
 export interface UmbModalIconPickerData {
 	multiple: boolean;
@@ -56,6 +54,7 @@ export class UmbModalLayoutIconPickerElement extends UmbModalLayoutElement<UmbMo
 				overflow-y: scroll;
 				max-height: 100%;
 				min-height: 0;
+				padding: 2px;
 			}
 
 			#icon-selection .icon {
@@ -74,7 +73,7 @@ export class UmbModalLayoutIconPickerElement extends UmbModalLayoutElement<UmbMo
 			#icon-selection .icon:focus,
 			#icon-selection .icon:hover,
 			#icon-selection .icon.selected {
-				background-color: var(--uui-color-selected);
+				outline: 2px solid var(--uui-color-selected);
 			}
 
 			uui-button {
@@ -91,7 +90,7 @@ export class UmbModalLayoutIconPickerElement extends UmbModalLayoutElement<UmbMo
 	iconlist = icons.map((icon) => icon.name);
 
 	@property({ type: Array })
-	iconlistFiltered: Array<string>;
+	iconlistFiltered: Array<string> = [];
 
 	@property({ type: Array })
 	colorlist = [
@@ -118,10 +117,10 @@ export class UmbModalLayoutIconPickerElement extends UmbModalLayoutElement<UmbMo
 	];
 
 	@state()
-	private _currentColor: string;
+	private _currentColor?: string;
 
 	@state()
-	private _currentIcon: string;
+	private _currentIcon?: string;
 
 	private _changeIcon(e: { target: HTMLInputElement; type: any; key: unknown }) {
 		if (e.type == 'click' || (e.type == 'keyup' && e.key == 'Enter')) {
@@ -137,10 +136,6 @@ export class UmbModalLayoutIconPickerElement extends UmbModalLayoutElement<UmbMo
 		}
 	}
 
-	private _setColor(color: string) {
-		return 'color: ' + color;
-	}
-
 	private _close() {
 		this.modalHandler?.close();
 	}
@@ -149,11 +144,8 @@ export class UmbModalLayoutIconPickerElement extends UmbModalLayoutElement<UmbMo
 		this.modalHandler?.close({ color: this._currentColor, icon: this._currentIcon });
 	}
 
-	constructor() {
-		super();
-		this._currentColor = '';
-		this._currentIcon = '';
-		this.iconlistFiltered = [];
+	private _onColorChange(e: UUIColorSwatchesEvent) {
+		this._currentColor = e.target.value;
 	}
 
 	connectedCallback(): void {
@@ -170,8 +162,14 @@ export class UmbModalLayoutIconPickerElement extends UmbModalLayoutElement<UmbMo
 					${this.renderSearchbar()}
 					<hr />
 					<uui-color-swatches
-						.swatches="${this.colorlist}"
-						@change="${(e: UUIColorSwatchesEvent) => (this._currentColor = e.target.value)}"></uui-color-swatches>
+						.value="${this._currentColor || ''}"
+						label="Color switcher for icons"
+						@change="${this._onColorChange}">
+						${this.colorlist.map(
+							(color) =>
+								html` <uui-color-swatch label="${color}" title="${color}" value="${color}"></uui-color-swatch> `
+						)}
+					</uui-color-swatches>
 
 					<hr />
 					<uui-scroll-container id="icon-selection">${this.renderIconSelection()}</uui-scroll-container>
@@ -199,8 +197,9 @@ export class UmbModalLayoutIconPickerElement extends UmbModalLayoutElement<UmbMo
 			return html`
 				<uui-icon
 					tabindex="0"
-					.style="${this._setColor(this._currentColor)}"
+					style=${styleMap({ color: this._currentColor })}
 					class="icon ${icon === this._currentIcon ? 'selected' : ''}"
+					title="${icon}"
 					name="${icon}"
 					label="${icon}"
 					id="${icon}"

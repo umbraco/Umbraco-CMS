@@ -4,22 +4,36 @@ import { customElement, property, state } from 'lit/decorators.js';
 import { ifDefined } from 'lit-html/directives/if-defined.js';
 import { FormControlMixin } from '@umbraco-ui/uui-base/lib/mixins';
 import { UmbModalService, UMB_MODAL_SERVICE_CONTEXT_TOKEN } from '../../../../core/modal';
-import { UMB_DOCUMENT_TREE_STORE_CONTEXT_TOKEN } from '../../../../backoffice/documents/documents/document.tree.store';
-import type { UmbDocumentTreeStore } from '../../../../backoffice/documents/documents/document.tree.store';
+import {
+	MediaTreeItem,
+	UmbMediaTreeStore,
+	UMB_MEDIA_TREE_STORE_CONTEXT_TOKEN,
+} from '../../../../backoffice/media/media/media.tree.store';
 import { UmbLitElement } from '@umbraco-cms/element';
-import type { DocumentTreeItem, FolderTreeItem } from '@umbraco-cms/backend-api';
+import type { FolderTreeItem } from '@umbraco-cms/backend-api';
 import type { UmbObserverController } from '@umbraco-cms/observable-api';
 
-@customElement('umb-input-document-picker')
-export class UmbInputDocumentPickerElement extends FormControlMixin(UmbLitElement) {
+@customElement('umb-input-media-picker')
+export class UmbInputMediaPickerElement extends FormControlMixin(UmbLitElement) {
 	static styles = [
 		UUITextStyles,
 		css`
+			:host {
+				display: grid;
+				gap: var(--uui-size-space-3);
+				grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+			}
 			#add-button {
-				width: 100%;
+				text-align: center;
+				min-height: 160px;
+			}
+			uui-icon {
+				display: block;
+				margin: 0 auto;
 			}
 		`,
 	];
+
 	/**
 	 * This is a minimum amount of selected items in this input.
 	 * @type {number}
@@ -64,7 +78,7 @@ export class UmbInputDocumentPickerElement extends FormControlMixin(UmbLitElemen
 	public set selectedKeys(keys: Array<string>) {
 		this._selectedKeys = keys;
 		super.value = keys.join(',');
-		this._observePickedDocuments();
+		this._observePickedMedias();
 	}
 
 	@property()
@@ -75,10 +89,10 @@ export class UmbInputDocumentPickerElement extends FormControlMixin(UmbLitElemen
 	}
 
 	@state()
-	private _items?: Array<DocumentTreeItem>;
+	private _items?: Array<MediaTreeItem>;
 
 	private _modalService?: UmbModalService;
-	private _documentStore?: UmbDocumentTreeStore;
+	private _mediaStore?: UmbMediaTreeStore;
 	private _pickedItemsObserver?: UmbObserverController<FolderTreeItem>;
 
 	constructor() {
@@ -95,9 +109,9 @@ export class UmbInputDocumentPickerElement extends FormControlMixin(UmbLitElemen
 			() => !!this.max && this._selectedKeys.length > this.max
 		);
 
-		this.consumeContext(UMB_DOCUMENT_TREE_STORE_CONTEXT_TOKEN, (instance) => {
-			this._documentStore = instance;
-			this._observePickedDocuments();
+		this.consumeContext(UMB_MEDIA_TREE_STORE_CONTEXT_TOKEN, (instance) => {
+			this._mediaStore = instance;
+			this._observePickedMedias();
 		});
 		this.consumeContext(UMB_MODAL_SERVICE_CONTEXT_TOKEN, (instance) => {
 			this._modalService = instance;
@@ -108,20 +122,20 @@ export class UmbInputDocumentPickerElement extends FormControlMixin(UmbLitElemen
 		return undefined;
 	}
 
-	private _observePickedDocuments() {
+	private _observePickedMedias() {
 		this._pickedItemsObserver?.destroy();
 
-		if (!this._documentStore) return;
+		if (!this._mediaStore) return;
 
 		// TODO: consider changing this to the list data endpoint when it is available
-		this._pickedItemsObserver = this.observe(this._documentStore.getTreeItems(this._selectedKeys), (items) => {
+		this._pickedItemsObserver = this.observe(this._mediaStore.getTreeItems(this._selectedKeys), (items) => {
 			this._items = items;
 		});
 	}
 
 	private _openPicker() {
 		// We send a shallow copy(good enough as its just an array of keys) of our this._selectedKeys, as we don't want the modal to manipulate our data:
-		const modalHandler = this._modalService?.contentPicker({
+		const modalHandler = this._modalService?.mediaPicker({
 			multiple: this.max === 1 ? false : true,
 			selection: [...this._selectedKeys],
 		});
@@ -149,13 +163,18 @@ export class UmbInputDocumentPickerElement extends FormControlMixin(UmbLitElemen
 	private _setSelection(newSelection: Array<string>) {
 		this.selectedKeys = newSelection;
 		this.dispatchEvent(new CustomEvent('change', { bubbles: true, composed: true }));
+		console.log(this._items);
 	}
 
 	render() {
-		return html`
-			${this._items?.map((item) => this._renderItem(item))}
-			<uui-button id="add-button" look="placeholder" @click=${this._openPicker} label="open">Add</uui-button>
-		`;
+		return html` ${this._items?.map((item) => this._renderItem(item))} ${this._renderButton()} `;
+	}
+	private _renderButton() {
+		if (this.max == 1 && this._items && this._items.length > 0) return;
+		return html`<uui-button id="add-button" look="placeholder" @click=${this._openPicker} label="open">
+			<uui-icon name="umb:add"></uui-icon>
+			Add
+		</uui-button>`;
 	}
 
 	private _renderItem(item: FolderTreeItem) {
@@ -163,20 +182,29 @@ export class UmbInputDocumentPickerElement extends FormControlMixin(UmbLitElemen
 		const tempItem = item as FolderTreeItem & { isTrashed: boolean };
 
 		return html`
-			<uui-ref-node name=${ifDefined(item.name === null ? undefined : item.name)} detail=${ifDefined(item.key)}>
+			<uui-card-media
+				name=${ifDefined(item.name === null ? undefined : item.name)}
+				detail=${ifDefined(item.key)}
+				file-ext="jpg">
 				${tempItem.isTrashed ? html` <uui-tag size="s" slot="tag" color="danger">Trashed</uui-tag> ` : nothing}
 				<uui-action-bar slot="actions">
-					<uui-button @click=${() => this._removeItem(item)} label="Remove document ${item.name}">Remove</uui-button>
+					<uui-button label="Copy media">
+						<uui-icon name="umb:documents"></uui-icon>
+					</uui-button>
+					<uui-button @click=${() => this._removeItem(item)} label="Remove media ${item.name}">
+						<uui-icon name="umb:trash"></uui-icon>
+					</uui-button>
 				</uui-action-bar>
-			</uui-ref-node>
+			</uui-card-media>
 		`;
+		//TODO: <uui-button-inline-create vertical></uui-button-inline-create>
 	}
 }
 
-export default UmbInputDocumentPickerElement;
+export default UmbInputMediaPickerElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-input-document-picker': UmbInputDocumentPickerElement;
+		'umb-input-media-picker': UmbInputMediaPickerElement;
 	}
 }
