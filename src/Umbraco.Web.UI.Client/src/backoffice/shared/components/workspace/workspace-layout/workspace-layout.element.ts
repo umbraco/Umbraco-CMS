@@ -148,27 +148,10 @@ export class UmbWorkspaceLayout extends UmbLitElement {
 				<slot name="header" slot="header"></slot>
 				${this.#renderViews()}
 				<slot name="action-menu" slot="action-menu"></slot>
-
-				<umb-router-slot
-					id="router-slot"
-					.routes="${this._routes}"
-					@init=${(event: UmbRouterSlotInitEvent) => {
-						this._routerPath = event.target.absoluteRouterPath;
-					}}
-					@change=${(event: UmbRouterSlotChangeEvent) => {
-						this._activePath = event.target.localActiveViewPath;
-					}}></umb-router-slot>
-
+				${this.#renderRoutes()}
 				<slot></slot>
-
 				<slot name="footer" slot="footer"></slot>
-
-				<umb-extension-slot
-					slot="actions"
-					type="workspaceAction"
-					.filter=${(extension: ManifestWorkspaceAction) => extension.meta.workspaces.includes(this.alias)}
-					default-element="umb-workspace-action"></umb-extension-slot>
-
+				${this.#renderWorkspaceActions()}
 				<slot name="actions" slot="actions"></slot>
 			</umb-body-layout>
 		`;
@@ -195,6 +178,34 @@ export class UmbWorkspaceLayout extends UmbLitElement {
 						</uui-tab-group>
 				  `
 				: nothing}
+		`;
+	}
+
+	#renderRoutes() {
+		return html`
+			${this._routes.length > 0
+				? html`
+						<umb-router-slot
+							id="router-slot"
+							.routes="${this._routes}"
+							@init=${(event: UmbRouterSlotInitEvent) => {
+								this._routerPath = event.target.absoluteRouterPath;
+							}}
+							@change=${(event: UmbRouterSlotChangeEvent) => {
+								this._activePath = event.target.localActiveViewPath;
+							}}></umb-router-slot>
+				  `
+				: nothing}
+		`;
+	}
+
+	#renderWorkspaceActions() {
+		return html`
+			<umb-extension-slot
+				slot="actions"
+				type="workspaceAction"
+				.filter=${(extension: ManifestWorkspaceAction) => extension.meta.workspaces.includes(this.alias)}
+				default-element="umb-workspace-action"></umb-extension-slot>
 		`;
 	}
 }
