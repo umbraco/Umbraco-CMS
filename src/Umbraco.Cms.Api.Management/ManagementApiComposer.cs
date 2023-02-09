@@ -1,5 +1,6 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using System.Text.Json.Serialization.Metadata;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Composing;
@@ -7,6 +8,7 @@ using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Api.Common.Configuration;
 using Umbraco.Cms.Api.Common.DependencyInjection;
 using Umbraco.Cms.Api.Management.DependencyInjection;
+using Umbraco.Cms.Api.Management.Serialization;
 using Umbraco.Cms.Infrastructure.Serialization;
 using Umbraco.Cms.Web.Common.ApplicationBuilder;
 using Umbraco.New.Cms.Core.Models.Configuration;
@@ -30,7 +32,7 @@ public class ManagementApiComposer : IComposer
             .AddLanguages()
             .AddDictionary()
             .AddFileUpload()
-            .AddHealthCheck()
+            .AddHealthChecks()
             .AddModelsBuilder()
             .AddRedirectUrl()
             .AddTrackedReferences()
@@ -57,13 +59,9 @@ public class ManagementApiComposer : IComposer
             {
                 // any generic JSON options go here
             })
-            .AddJsonOptions(New.Cms.Core.Constants.JsonOptionsNames.BackOffice, options =>
-            {
-                // all back-office specific JSON options go here
-                options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
-                options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
-                options.JsonSerializerOptions.Converters.Add(new JsonObjectConverter());
-            });
+            .AddJsonOptions(New.Cms.Core.Constants.JsonOptionsNames.BackOffice, _ => { });
+
+        services.ConfigureOptions<ConfigureUmbracoBackofficeJsonOptions>( );
 
         // FIXME: when this is moved to core, make the AddUmbracoOptions extension private again and remove core InternalsVisibleTo for Umbraco.Cms.Api.Management
         builder.AddUmbracoOptions<NewBackOfficeSettings>();

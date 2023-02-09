@@ -54,7 +54,7 @@ public class ExecuteActionHealthCheckController : HealthCheckControllerBase
                 Type = "Error",
             };
 
-            return await Task.FromResult(BadRequest(invalidModelProblem));
+            return BadRequest(invalidModelProblem);
         }
 
         HealthCheckStatus result = healthCheck.ExecuteAction(_umbracoMapper.Map<HealthCheckAction>(action)!);
