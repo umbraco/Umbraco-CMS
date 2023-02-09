@@ -2,11 +2,11 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import type { Operator } from './Operator';
+import type { OperatorModel } from './OperatorModel';
 
 export type TemplateQueryExecuteFilterModel = {
     propertyAlias?: string;
     constraintValue?: string;
-    operator?: Operator;
+    operator?: OperatorModel;
 };
 

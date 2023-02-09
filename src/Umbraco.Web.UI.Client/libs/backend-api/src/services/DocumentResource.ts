@@ -1,9 +1,9 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-import type { DocumentTreeItem } from '../models/DocumentTreeItem';
-import type { PagedDocumentTreeItem } from '../models/PagedDocumentTreeItem';
-import type { PagedRecycleBinItem } from '../models/PagedRecycleBinItem';
+import type { DocumentTreeItemModel } from '../models/DocumentTreeItemModel';
+import type { PagedDocumentTreeItemModel } from '../models/PagedDocumentTreeItemModel';
+import type { PagedRecycleBinItemModel } from '../models/PagedRecycleBinItemModel';
 
 import type { CancelablePromise } from '../core/CancelablePromise';
 import { OpenAPI } from '../core/OpenAPI';
@@ -12,7 +12,7 @@ import { request as __request } from '../core/request';
 export class DocumentResource {
 
     /**
-     * @returns PagedRecycleBinItem Success
+     * @returns PagedRecycleBinItemModel Success
      * @throws ApiError
      */
     public static getRecycleBinDocumentChildren({
@@ -23,7 +23,7 @@ export class DocumentResource {
         parentKey?: string,
         skip?: number,
         take?: number,
-    }): CancelablePromise<PagedRecycleBinItem> {
+    }): CancelablePromise<PagedRecycleBinItemModel> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/recycle-bin/document/children',
@@ -39,7 +39,7 @@ export class DocumentResource {
     }
 
     /**
-     * @returns PagedRecycleBinItem Success
+     * @returns PagedRecycleBinItemModel Success
      * @throws ApiError
      */
     public static getRecycleBinDocumentRoot({
@@ -48,7 +48,7 @@ export class DocumentResource {
     }: {
         skip?: number,
         take?: number,
-    }): CancelablePromise<PagedRecycleBinItem> {
+    }): CancelablePromise<PagedRecycleBinItemModel> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/recycle-bin/document/root',
@@ -63,7 +63,7 @@ export class DocumentResource {
     }
 
     /**
-     * @returns PagedDocumentTreeItem Success
+     * @returns PagedDocumentTreeItemModel Success
      * @throws ApiError
      */
     public static getTreeDocumentChildren({
@@ -78,7 +78,7 @@ export class DocumentResource {
         take?: number,
         dataTypeKey?: string,
         culture?: string,
-    }): CancelablePromise<PagedDocumentTreeItem> {
+    }): CancelablePromise<PagedDocumentTreeItemModel> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/tree/document/children',
@@ -93,7 +93,7 @@ export class DocumentResource {
     }
 
     /**
-     * @returns DocumentTreeItem Success
+     * @returns any Success
      * @throws ApiError
      */
     public static getTreeDocumentItem({
@@ -104,7 +104,7 @@ export class DocumentResource {
         key?: Array<string>,
         dataTypeKey?: string,
         culture?: string,
-    }): CancelablePromise<Array<DocumentTreeItem>> {
+    }): CancelablePromise<Array<DocumentTreeItemModel>> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/tree/document/item',
@@ -117,7 +117,7 @@ export class DocumentResource {
     }
 
     /**
-     * @returns PagedDocumentTreeItem Success
+     * @returns PagedDocumentTreeItemModel Success
      * @throws ApiError
      */
     public static getTreeDocumentRoot({
@@ -130,7 +130,7 @@ export class DocumentResource {
         take?: number,
         dataTypeKey?: string,
         culture?: string,
-    }): CancelablePromise<PagedDocumentTreeItem> {
+    }): CancelablePromise<PagedDocumentTreeItemModel> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/tree/document/root',
