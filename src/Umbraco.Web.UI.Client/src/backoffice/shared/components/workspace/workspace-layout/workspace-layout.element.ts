@@ -142,9 +142,9 @@ export class UmbWorkspaceLayout extends UmbLitElement {
 		}
 	}
 
-	private _renderTabs() {
+	#renderViews() {
 		return html`
-			${this._workspaceViews.length > 0
+			${this._workspaceViews.length > 1
 				? html`
 						<uui-tab-group slot="tabs">
 							${repeat(
@@ -170,7 +170,7 @@ export class UmbWorkspaceLayout extends UmbLitElement {
 		return html`
 			<umb-body-layout .headline=${this.headline}>
 				<slot name="header" slot="header"></slot>
-				${this._renderTabs()}
+				${this.#renderViews()}
 
 				<umb-router-slot
 					.routes="${this._routes}"
@@ -180,14 +180,17 @@ export class UmbWorkspaceLayout extends UmbLitElement {
 					@change=${(event: UmbRouterSlotChangeEvent) => {
 						this._activePath = event.target.localActiveViewPath;
 					}}></umb-router-slot>
+
 				<slot></slot>
 
 				<slot name="footer" slot="footer"></slot>
+
 				<umb-extension-slot
 					slot="actions"
 					type="workspaceAction"
 					.filter=${(extension: ManifestWorkspaceAction) =>
 						extension.meta.workspaces.includes(this.alias)}></umb-extension-slot>
+
 				<slot name="actions" slot="actions"></slot>
 			</umb-body-layout>
 		`;
