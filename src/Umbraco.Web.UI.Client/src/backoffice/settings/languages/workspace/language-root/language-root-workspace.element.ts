@@ -21,13 +21,8 @@ export class UmbLanguageRootWorkspaceElement extends UmbLitElement implements Um
 				height: 100%;
 			}
 
-			umb-table {
-				padding: 0;
-				margin: var(--uui-size-space-3) var(--uui-size-space-6);
-			}
-			#add-language {
-				margin-left: var(--uui-size-space-6);
-				text-decoration: none;
+			#main {
+				margin: var(--uui-size-space-6);
 			}
 		`,
 	];
@@ -135,11 +130,17 @@ export class UmbLanguageRootWorkspaceElement extends UmbLitElement implements Um
 
 	render() {
 		return html`
-			<umb-body-layout no-header-background>
-				<a id="add-language" slot="header" href="section/settings/language/create/root">
-					<uui-button label="Add language" look="outline" color="default"></uui-button>
-				</a>
-				<umb-table .config=${this._tableConfig} .columns=${this._tableColumns} .items=${this._tableItems}></umb-table>
+			<umb-body-layout headline="Languages">
+				<div id="main">
+					<div>
+						<uui-button
+							label="Add language"
+							look="outline"
+							color="default"
+							href="section/settings/language/create/root"></uui-button>
+					</div>
+					<umb-table .config=${this._tableConfig} .columns=${this._tableColumns} .items=${this._tableItems}></umb-table>
+				</div>
 			</umb-body-layout>
 		`;
 	}
