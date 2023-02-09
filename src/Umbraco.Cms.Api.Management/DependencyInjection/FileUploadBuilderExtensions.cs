@@ -9,6 +9,7 @@ public static class FileUploadBuilderExtensions
     internal static IUmbracoBuilder AddFileUpload(this IUmbracoBuilder builder)
     {
         builder.Services.AddTransient<IUploadFileService, UploadFileService>();
+        builder.Services.AddTransient<ITemporaryFileService, TemporaryFileService>();
 
         return builder;
     }

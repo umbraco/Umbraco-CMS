@@ -17,15 +17,6 @@ public static class DictionaryItemExtensions
     }
 
     /// <summary>
-    ///     Returns the translation value for the language, if no translation is found it returns an empty string
-    /// </summary>
-    /// <param name="d"></param>
-    /// <param name="language"></param>
-    /// <returns></returns>
-    public static string? GetTranslatedValue(this IDictionaryItem d, ILanguage language)
-        => d.GetTranslatedValue(language.IsoCode);
-
-    /// <summary>
     ///     Adds or updates a translation for a dictionary item and language
     /// </summary>
     /// <param name="item"></param>

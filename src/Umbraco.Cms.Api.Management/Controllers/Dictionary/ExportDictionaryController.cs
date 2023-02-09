@@ -11,23 +11,22 @@ namespace Umbraco.Cms.Api.Management.Controllers.Dictionary;
 
 public class ExportDictionaryController : DictionaryControllerBase
 {
-    // FIXME: use IDictionaryItemService instead of ILocalizationService
-    private readonly ILocalizationService _localizationService;
+    private readonly IDictionaryItemService _dictionaryItemService;
     private readonly IEntityXmlSerializer _entityXmlSerializer;
 
-    public ExportDictionaryController(ILocalizationService localizationService, IEntityXmlSerializer entityXmlSerializer)
+    public ExportDictionaryController(IDictionaryItemService dictionaryItemService, IEntityXmlSerializer entityXmlSerializer)
     {
-        _localizationService = localizationService;
+        _dictionaryItemService = dictionaryItemService;
         _entityXmlSerializer = entityXmlSerializer;
     }
 
-    [HttpGet("export/{key:guid}")]
+    [HttpGet("{key:guid}/export")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(FileContentResult), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(NotFoundResult), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> ExportDictionary(Guid key, bool includeChildren = false)
+    public async Task<IActionResult> Export(Guid key, bool includeChildren = false)
     {
-        IDictionaryItem? dictionaryItem = _localizationService.GetDictionaryItemById(key);
+        IDictionaryItem? dictionaryItem = await _dictionaryItemService.GetAsync(key);
         if (dictionaryItem is null)
         {
             return await Task.FromResult(NotFound());
@@ -35,11 +34,6 @@ public class ExportDictionaryController : DictionaryControllerBase
 
         XElement xml = _entityXmlSerializer.Serialize(dictionaryItem, includeChildren);
 
-        var fileName = $"{dictionaryItem.ItemKey}.udt";
-
-        // Set custom header so umbRequestHelper.downloadFile can save the correct filename
-        HttpContext.Response.Headers.Add("x-filename", fileName);
-
-        return await Task.FromResult(File(Encoding.UTF8.GetBytes(xml.ToDataString()), MediaTypeNames.Application.Octet, fileName));
+        return await Task.FromResult(File(Encoding.UTF8.GetBytes(xml.ToDataString()), MediaTypeNames.Application.Octet, $"{dictionaryItem.ItemKey}.udt"));
     }
 }

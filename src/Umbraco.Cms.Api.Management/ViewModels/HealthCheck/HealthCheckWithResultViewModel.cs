@@ -1,6 +1,6 @@
 namespace Umbraco.Cms.Api.Management.ViewModels.HealthCheck;
 
-public class HealthCheckWithResultViewModel : HealthCheckViewModel
+public class HealthCheckWithResultViewModel : HealthCheckModelBase
 {
     /// <summary>
     ///     Gets or sets the result(s) for a health check.
