@@ -16,16 +16,16 @@ public class RunMigrationPackageController : PackageControllerBase
     /// <summary>
     ///     Runs all migration plans for a package with a given name if any are pending.
     /// </summary>
-    /// <param name="packageName">The name of the package.</param>
+    /// <param name="name">The name of the package.</param>
     /// <returns>The result of running the package migrations.</returns>
-    [HttpPost("{packageName}/run-migration")]
+    [HttpPost("{name}/run-migration")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status409Conflict)]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    public async Task<IActionResult> RunMigrations(string packageName)
+    public async Task<IActionResult> RunMigrations(string name)
     {
-        Attempt<bool, PackageMigrationOperationStatus> result = await _packageMigrationRunner.RunningPendingPackageMigrationsSucceeded(packageName);
+        Attempt<bool, PackageMigrationOperationStatus> result = await _packageMigrationRunner.RunningPendingPackageMigrationsSucceeded(name);
 
         if (result.Success)
         {
