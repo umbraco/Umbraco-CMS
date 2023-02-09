@@ -1,6 +1,7 @@
 import type { Observable } from 'rxjs';
-import type { ManifestTree } from '@umbraco-cms/models';
+import type { ManifestTree, UmbTreeRepository } from '@umbraco-cms/models';
 import { DeepState } from '@umbraco-cms/observable-api';
+import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 
 export interface UmbTreeContext {
 	tree: ManifestTree;
@@ -12,6 +13,7 @@ export interface UmbTreeContext {
 }
 
 export class UmbTreeContextBase implements UmbTreeContext {
+	#host: UmbControllerHostInterface;
 	public tree: ManifestTree;
 
 	#selectable = new DeepState(false);
@@ -20,8 +22,15 @@ export class UmbTreeContextBase implements UmbTreeContext {
 	#selection = new DeepState(<Array<string>>[]);
 	public readonly selection = this.#selection.asObservable();
 
-	constructor(tree: ManifestTree) {
+	repository!: UmbTreeRepository;
+
+	constructor(host: UmbControllerHostInterface, tree: ManifestTree) {
+		this.#host = host;
 		this.tree = tree;
+
+		if (this.tree.meta.repository) {
+			this.repository = new this.tree.meta.repository(this.#host);
+		}
 	}
 
 	public setSelectable(value: boolean) {
@@ -35,7 +44,7 @@ export class UmbTreeContextBase implements UmbTreeContext {
 
 	public select(key: string) {
 		const oldSelection = this.#selection.getValue();
-		if(oldSelection.indexOf(key) !== -1) return;
+		if (oldSelection.indexOf(key) !== -1) return;
 
 		const selection = [...oldSelection, key];
 		this.#selection.next(selection);
@@ -44,5 +53,21 @@ export class UmbTreeContextBase implements UmbTreeContext {
 	public deselect(key: string) {
 		const selection = this.#selection.getValue();
 		this.#selection.next(selection.filter((x) => x !== key));
+	}
+
+	public async requestRootItems() {
+		return this.repository.requestRootItems();
+	}
+
+	public async requestChildrenOf(parentKey: string | null) {
+		return this.repository.requestChildrenOf(parentKey);
+	}
+
+	public async rootItems() {
+		return this.repository.rootItems();
+	}
+
+	public async childrenOf(parentKey: string | null) {
+		return this.repository.childrenOf(parentKey);
 	}
 }

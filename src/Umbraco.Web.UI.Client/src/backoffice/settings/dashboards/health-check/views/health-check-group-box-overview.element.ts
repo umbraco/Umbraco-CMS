@@ -43,7 +43,7 @@ export class UmbHealthCheckGroupBoxOverviewElement extends UmbLitElement {
 				cursor: pointer;
 				text-decoration: none;
 				color: var(--uui-color-text);
-				margin-bottom: 10px;
+				margin-bottom: var(--uui-size-space-3);
 				display: block;
 			}
 

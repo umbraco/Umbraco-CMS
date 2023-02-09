@@ -8,6 +8,7 @@ import { createExtensionElement, umbExtensionsRegistry } from '@umbraco-cms/exte
 import type { ManifestDashboard, ManifestDashboardCollection, ManifestWithMeta } from '@umbraco-cms/models';
 
 import { UmbLitElement } from '@umbraco-cms/element';
+import { UmbRouterSlotChangeEvent, UmbRouterSlotInitEvent } from '@umbraco-cms/router';
 
 @customElement('umb-section-dashboards')
 export class UmbSectionDashboardsElement extends UmbLitElement {
@@ -23,10 +24,12 @@ export class UmbSectionDashboardsElement extends UmbLitElement {
 			#tabs {
 				background-color: var(--uui-color-surface);
 				height: 70px;
+				border-bottom: 1px solid var(--uui-color-border);
 			}
 
 			#scroll-container {
-				flex: 1;
+				flex:1;
+				position:relative;
 			}
 
 			#router-slot {
@@ -41,13 +44,13 @@ export class UmbSectionDashboardsElement extends UmbLitElement {
 	private _dashboards?: Array<ManifestDashboard | ManifestDashboardCollection>;
 
 	@state()
-	private _currentDashboardPathname = '';
-
-	@state()
 	private _routes: Array<any> = [];
 
 	@state()
-	private _currentSectionPathname = '';
+	private _routerPath?: string;
+
+	@state()
+	private _activePath?: string;
 
 	private _currentSectionAlias?: string;
 	private _sectionContext?: UmbSectionContext;
@@ -67,9 +70,6 @@ export class UmbSectionDashboardsElement extends UmbLitElement {
 		this.observe(this._sectionContext.alias.pipe(first()), (alias) => {
 			this._currentSectionAlias = alias;
 			this._observeDashboards();
-		});
-		this.observe(this._sectionContext.pathname.pipe(first()), (pathname) => {
-			this._currentSectionPathname = pathname || '';
 		});
 	}
 
@@ -107,12 +107,12 @@ export class UmbSectionDashboardsElement extends UmbLitElement {
 						return createExtensionElement(dashboard);
 					},
 					setup: (component: Promise<HTMLElement> | HTMLElement, info: IRoutingInfo) => {
-						this._currentDashboardPathname = info.match.route.path;
 						// When its using import, we get an element, when using createExtensionElement we get a Promise.
-						// TODO: this is a bit hacky, can we do it in a more appropriate way
-						(component as any).manifest = dashboard;
+						// TODO: this is a bit hacky, can we do it in a more appropriate way:
 						if ((component as any).then) {
 							(component as any).then((el: any) => (el.manifest = dashboard));
+						} else {
+							(component as any).manifest = dashboard;
 						}
 					},
 				};
@@ -133,9 +133,9 @@ export class UmbSectionDashboardsElement extends UmbLitElement {
 							${this._dashboards.map(
 								(dashboard) => html`
 									<uui-tab
-										href="${`section/${this._currentSectionPathname}/dashboard/${dashboard.meta.pathname}`}"
+										href="${this._routerPath}/${dashboard.meta.pathname}"
 										label=${dashboard.meta.label || dashboard.name}
-										?active="${dashboard.meta.pathname === this._currentDashboardPathname}"></uui-tab>
+										?active="${dashboard.meta.pathname === this._activePath}"></uui-tab>
 								`
 							)}
 						</uui-tab-group>
@@ -148,7 +148,16 @@ export class UmbSectionDashboardsElement extends UmbLitElement {
 		return html`
 			${this._renderNavigation()}
 			<uui-scroll-container id="scroll-container">
-				<router-slot id="router-slot" .routes="${this._routes}"></router-slot>
+				<umb-router-slot
+					id="router-slot"
+					.routes="${this._routes}"
+					@init=${(event: UmbRouterSlotInitEvent) => {
+						this._routerPath = event.target.absoluteRouterPath;
+					}}
+					@change=${(event: UmbRouterSlotChangeEvent) => {
+						this._activePath = event.target.localActiveViewPath;
+					}}
+				></umb-router-slot>
 			</uui-scroll-container>
 		`;
 	}

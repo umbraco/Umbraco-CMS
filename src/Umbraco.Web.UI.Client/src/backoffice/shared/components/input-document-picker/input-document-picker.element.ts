@@ -20,7 +20,6 @@ export class UmbInputDocumentPickerElement extends FormControlMixin(UmbLitElemen
 			}
 		`,
 	];
-
 	/**
 	 * This is a minimum amount of selected items in this input.
 	 * @type {number}
@@ -122,7 +121,10 @@ export class UmbInputDocumentPickerElement extends FormControlMixin(UmbLitElemen
 
 	private _openPicker() {
 		// We send a shallow copy(good enough as its just an array of keys) of our this._selectedKeys, as we don't want the modal to manipulate our data:
-		const modalHandler = this._modalService?.contentPicker({ multiple: true, selection: [...this._selectedKeys] });
+		const modalHandler = this._modalService?.contentPicker({
+			multiple: this.max === 1 ? false : true,
+			selection: [...this._selectedKeys],
+		});
 		modalHandler?.onClose().then(({ selection }: any) => {
 			this._setSelection(selection);
 		});

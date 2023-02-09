@@ -33,7 +33,7 @@ export class UmbPickerLayoutUserElement extends UmbModalLayoutPickerBase {
 				gap: var(--uui-size-space-5);
 				cursor: pointer;
 				position: relative;
-				border-radius: var(--uui-size-2);
+				border-radius: var(--uui-border-radius);
 			}
 			.item.selected {
 				background-color: var(--uui-color-selected);

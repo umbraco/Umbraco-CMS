@@ -13,6 +13,7 @@ export class UmbCurrentUserHeaderApp extends UmbLitElement {
 		css`
 			uui-button {
 				font-size: 14px;
+				--uui-button-background-color: transparent;
 			}
 		`,
 	];
