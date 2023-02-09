@@ -11,7 +11,7 @@ import {
 	UMB_LANGUAGE_STORE_CONTEXT_TOKEN,
 } from '../../../../language.store';
 import { UmbLitElement } from '@umbraco-cms/element';
-import { Language } from '@umbraco-cms/backend-api';
+import { Culture, Language } from '@umbraco-cms/backend-api';
 
 @customElement('umb-workspace-view-language-edit')
 export class UmbWorkspaceViewLanguageEditElement extends UmbLitElement {
@@ -56,7 +56,7 @@ export class UmbWorkspaceViewLanguageEditElement extends UmbLitElement {
 	private _languages: UmbLanguageStoreItemType[] = [];
 
 	@state()
-	private _availableLanguages: UmbLanguageStoreItemType[] = [];
+	private _availableCultures: Culture[] = [];
 
 	@state()
 	private _search = '';
@@ -81,8 +81,8 @@ export class UmbWorkspaceViewLanguageEditElement extends UmbLitElement {
 					this._startData = language;
 				}
 			});
-			this.observe(this.#languageWorkspaceContext.getAvailableLanguages(), (languages) => {
-				this._availableLanguages = languages;
+			this.observe(this.#languageWorkspaceContext.getAvailableCultures(), (cultures) => {
+				this._availableCultures = cultures;
 			});
 		});
 
@@ -101,11 +101,11 @@ export class UmbWorkspaceViewLanguageEditElement extends UmbLitElement {
 			const isoCode = target.value.toString();
 
 			if (isoCode) {
-				this.#languageWorkspaceContext?.update({ isoCode: target.value.toString() });
+				this.#languageWorkspaceContext?.update({ isoCode });
 
 				// If the language name is not set, we set it to the name of the selected language.
 				if (!this.language?.name) {
-					const language = this._availableLanguages.find((language) => language.isoCode === target.value.toString());
+					const language = this._availableCultures.find((culture) => culture.name === isoCode);
 					if (language) {
 						this.#languageWorkspaceContext?.update({ name: language.name });
 					}
@@ -124,6 +124,7 @@ export class UmbWorkspaceViewLanguageEditElement extends UmbLitElement {
 		}
 	}
 
+	// TODO: move some of these methods to the context
 	#handleSearchChange(event: Event) {
 		const target = event.composedPath()[0] as UUIComboboxElement;
 		this._search = target.search;
@@ -152,14 +153,9 @@ export class UmbWorkspaceViewLanguageEditElement extends UmbLitElement {
 		}
 	}
 
-	get #filteredLanguages(): Array<Language> {
-		const onlyNewLanguages = this._availableLanguages.filter(
-			(language) =>
-				!this._languages.some((x) => x.isoCode === language.isoCode && x.isoCode !== this._startData?.isoCode)
-		);
-
-		return onlyNewLanguages.filter((language) => {
-			return language.name?.toLowerCase().includes(this._search.toLowerCase());
+	get #filteredCultures(): Array<Culture> {
+		return this._availableCultures.filter((culture) => {
+			return culture.englishName?.toLowerCase().includes(this._search.toLowerCase());
 		});
 	}
 
@@ -173,8 +169,8 @@ export class UmbWorkspaceViewLanguageEditElement extends UmbLitElement {
 		return this.#fallbackLanguages.find((language) => language.isoCode === this.language?.fallbackIsoCode);
 	}
 
-	get #fromAvailableLanguages() {
-		return this._availableLanguages.find((language) => language.isoCode === this.language?.isoCode);
+	get #fromAvailableCultures() {
+		return this._availableCultures.find((culture) => culture.name === this.language?.isoCode);
 	}
 
 	#renderCultureWarning() {
@@ -202,17 +198,17 @@ export class UmbWorkspaceViewLanguageEditElement extends UmbLitElement {
 				<umb-workspace-property-layout label="Language">
 					<div slot="editor">
 						<uui-combobox
-							value=${ifDefined(this.#fromAvailableLanguages?.isoCode)}
+							value=${ifDefined(this.#fromAvailableCultures?.name)}
 							@change=${this.#handleLanguageChange}
 							@search=${this.#handleSearchChange}>
 							<uui-combobox-list>
 								${repeat(
-									this.#filteredLanguages,
-									(language) => language.isoCode,
+									this.#filteredCultures,
+									(language) => language.name,
 									(language) =>
 										html`
-											<uui-combobox-list-option value=${ifDefined(language.isoCode)}
-												>${language.name}</uui-combobox-list-option
+											<uui-combobox-list-option value=${ifDefined(language.name)}
+												>${language.englishName}</uui-combobox-list-option
 											>
 										`
 								)}

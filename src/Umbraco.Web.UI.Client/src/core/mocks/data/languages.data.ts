@@ -16,10 +16,6 @@ class UmbLanguagesData extends UmbData<UmbLanguageStoreItemType> {
 		return this.data.find((item) => item.isoCode === key);
 	}
 
-	getAvailable() {
-		return MockAvailable;
-	}
-
 	save(saveItems: Array<UmbLanguageStoreItemType>) {
 		saveItems.forEach((saveItem) => {
 			const foundIndex = this.data.findIndex((item) => item.isoCode === saveItem.isoCode);
@@ -95,36 +91,6 @@ export const MockData: Array<UmbLanguageStoreItemType> = [
 	{
 		name: 'Danish',
 		isoCode: 'da',
-		isDefault: false,
-		isMandatory: false,
-		fallbackIsoCode: 'en',
-	},
-];
-
-export const MockAvailable: Array<UmbLanguageStoreItemType> = [
-	{
-		name: 'English',
-		isoCode: 'en',
-		isDefault: true,
-		isMandatory: true,
-	},
-	{
-		name: 'Danish',
-		isoCode: 'da',
-		isDefault: false,
-		isMandatory: false,
-		fallbackIsoCode: 'en',
-	},
-	{
-		name: 'German',
-		isoCode: 'de',
-		isDefault: false,
-		isMandatory: false,
-		fallbackIsoCode: 'en',
-	},
-	{
-		name: 'French',
-		isoCode: 'fr',
 		isDefault: false,
 		isMandatory: false,
 		fallbackIsoCode: 'en',
