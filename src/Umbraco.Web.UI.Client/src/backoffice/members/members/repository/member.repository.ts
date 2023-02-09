@@ -6,7 +6,7 @@ import { UmbContextConsumerController } from '@umbraco-cms/context-api';
 import { ProblemDetails } from '@umbraco-cms/backend-api';
 import { UmbTreeRepository } from '@umbraco-cms/repository';
 
-export class UmbMemberTreeRepository implements UmbTreeRepository {
+export class UmbMemberRepository implements UmbTreeRepository {
 	#host: UmbControllerHostInterface;
 	#dataSource: MemberTreeServerDataSource;
 	#treeStore?: UmbMemberTreeStore;
