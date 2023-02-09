@@ -4,7 +4,7 @@ import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 import { UmbNotificationService, UMB_NOTIFICATION_SERVICE_CONTEXT_TOKEN } from '@umbraco-cms/notification';
 import { UmbContextConsumerController } from '@umbraco-cms/context-api';
 import { ProblemDetails } from '@umbraco-cms/backend-api';
-import type { UmbTreeRepository } from '@umbraco-cms/models';
+import { UmbTreeRepository } from '@umbraco-cms/repository';
 
 export class UmbMemberTreeRepository implements UmbTreeRepository {
 	#host: UmbControllerHostInterface;
@@ -41,7 +41,7 @@ export class UmbMemberTreeRepository implements UmbTreeRepository {
 		}
 	}
 
-	async requestRootItems() {
+	async requestRootTreeItems() {
 		await this.#init;
 
 		const { data, error } = await this.#dataSource.getRootItems();
@@ -53,12 +53,12 @@ export class UmbMemberTreeRepository implements UmbTreeRepository {
 		return { data, error };
 	}
 
-	async requestChildrenOf(parentKey: string | null) {
+	async requestTreeItemsOf(parentKey: string | null) {
 		const error: ProblemDetails = { title: 'Not implemented' };
-		return { data: undefined, error };	
+		return { data: undefined, error };
 	}
 
-	async requestItems(keys: Array<string>) {
+	async requestTreeItems(keys: Array<string>) {
 		await this.#init;
 
 		if (!keys) {
@@ -71,17 +71,17 @@ export class UmbMemberTreeRepository implements UmbTreeRepository {
 		return { data, error };
 	}
 
-	async rootItems() {
+	async rootTreeItems() {
 		await this.#init;
 		return this.#treeStore!.rootItems();
 	}
 
-	async childrenOf(parentKey: string | null) {
+	async treeItemsOf(parentKey: string | null) {
 		await this.#init;
 		return this.#treeStore!.childrenOf(parentKey);
 	}
 
-	async items(keys: Array<string>) {
+	async treeItems(keys: Array<string>) {
 		await this.#init;
 		return this.#treeStore!.items(keys);
 	}

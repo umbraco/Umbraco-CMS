@@ -26,7 +26,7 @@ import { UmbMediaTreeStore } from './media/media/repository/media.tree.store';
 import { UmbMemberTypeDetailStore } from './members/member-types/member-type.detail.store';
 import { UmbMemberTypeTreeStore } from './members/member-types/member-type.tree.store';
 import { UmbMemberGroupDetailStore } from './members/member-groups/member-group.detail.store';
-import { UmbMemberGroupTreeStore } from './members/member-groups/tree/data/member-group.tree.store';
+import { UmbMemberGroupTreeStore } from './members/member-groups/repository/member-group.tree.store';
 import { UmbMemberDetailStore } from './members/members/member.detail.store';
 import { UmbMemberTreeStore } from './members/members/tree/data/member.tree.store';
 import { UmbDictionaryDetailStore } from './translation/dictionary/dictionary.detail.store';
