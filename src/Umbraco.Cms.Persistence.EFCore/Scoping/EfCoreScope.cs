@@ -494,7 +494,10 @@ internal class EfCoreScope : IEfCoreScope
 
     private void InitializeDatabase()
     {
-        _umbracoEfCoreDatabase = _efCoreDatabaseFactory.Create();
+        if (_umbracoEfCoreDatabase is null)
+        {
+            _umbracoEfCoreDatabase = FindDatabase();
+        }
 
         // Check if we are already in a transaction before starting one
         if (_umbracoEfCoreDatabase.UmbracoEFContext.Database.CurrentTransaction is null)
@@ -502,6 +505,16 @@ internal class EfCoreScope : IEfCoreScope
             EnsureDbLocks();
             _umbracoEfCoreDatabase.UmbracoEFContext.Database.BeginTransaction();
         }
+    }
+
+    private IUmbracoEfCoreDatabase FindDatabase()
+    {
+        if (ParentScope is not null)
+        {
+            return ParentScope.FindDatabase();
+        }
+
+        return _umbracoEfCoreDatabase ??= _efCoreDatabaseFactory.Create();
     }
 
     private void HandleScopeContext()
@@ -535,7 +548,7 @@ internal class EfCoreScope : IEfCoreScope
                 _umbracoEfCoreDatabase.UmbracoEFContext.Database.RollbackTransaction();
             }
 
-            // _umbracoEfCoreDatabase.Dispose();
+            _umbracoEfCoreDatabase.Dispose();
         }
 
         // _efCoreDatabaseFactory.Dispose();
