@@ -36,7 +36,6 @@ export class UmbPropertyEditorUICheckboxListElement extends UmbLitElement {
 	private _onChange(event: CustomEvent) {
 		this.value = (event.target as UmbInputCheckboxListElement).selectedKeys;
 		this.dispatchEvent(new CustomEvent('property-value-change'));
-		console.log(this._value);
 	}
 
 	render() {
