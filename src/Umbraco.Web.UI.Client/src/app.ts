@@ -17,7 +17,7 @@ import { customElement, property, state } from 'lit/decorators.js';
 
 import { UmbLitElement } from '@umbraco-cms/element';
 import { tryExecuteAndNotify } from '@umbraco-cms/resources';
-import { OpenAPI, RuntimeLevel, ServerResource } from '@umbraco-cms/backend-api';
+import { OpenAPI, RuntimeLevelModel, ServerResource } from '@umbraco-cms/backend-api';
 import { UmbIconStore } from '@umbraco-cms/store';
 
 @customElement('umb-app')
@@ -59,7 +59,7 @@ export class UmbApp extends UmbLitElement {
 	private _umbIconRegistry = new UmbIconStore();
 
 	private _iconRegistry = new UUIIconRegistryEssential();
-	private _runtimeLevel = RuntimeLevel.UNKNOWN;
+	private _runtimeLevel = RuntimeLevelModel.UNKNOWN;
 
 	constructor() {
 		super();
@@ -91,20 +91,20 @@ export class UmbApp extends UmbLitElement {
 
 	private async _setInitStatus() {
 		const { data } = await tryExecuteAndNotify(this, ServerResource.getServerStatus());
-		this._runtimeLevel = data?.serverStatus ?? RuntimeLevel.UNKNOWN;
+		this._runtimeLevel = data?.serverStatus ?? RuntimeLevelModel.UNKNOWN;
 	}
 
 	private _redirect() {
 		switch (this._runtimeLevel) {
-			case RuntimeLevel.INSTALL:
+			case RuntimeLevelModel.INSTALL:
 				history.replaceState(null, '', '/install');
 				break;
 
-			case RuntimeLevel.UPGRADE:
+			case RuntimeLevelModel.UPGRADE:
 				history.replaceState(null, '', '/upgrade');
 				break;
 
-			case RuntimeLevel.RUN: {
+			case RuntimeLevelModel.RUN: {
 				const pathname =
 					window.location.pathname === '/install' || window.location.pathname === '/upgrade'
 						? '/'
