@@ -18,6 +18,7 @@ import { handlers as mediaHandlers } from './domains/media.handlers';
 import { handlers as dictionaryHandlers } from './domains/dictionary.handlers';
 import { handlers as mediaTypeHandlers } from './domains/media-type.handlers';
 import { handlers as memberGroupHandlers } from './domains/member-group.handlers';
+import { handlers as memberHandlers } from './domains/member.handlers';
 import { handlers as memberTypeHandlers } from './domains/member-type.handlers';
 import { handlers as templateHandlers } from './domains/template.handlers';
 import { handlers as languageHandlers } from './domains/language.handlers';
@@ -40,6 +41,7 @@ const handlers = [
 	...userGroupsHandlers,
 	...mediaTypeHandlers,
 	...memberGroupHandlers,
+	...memberHandlers,
 	...memberTypeHandlers,
 	...examineManagementHandlers,
 	...modelsBuilderHandlers,
