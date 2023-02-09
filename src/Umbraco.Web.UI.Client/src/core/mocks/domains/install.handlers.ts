@@ -1,5 +1,11 @@
 import { rest } from 'msw';
-import { DatabaseInstall, Install, InstallSettings, ProblemDetails, TelemetryLevel } from '@umbraco-cms/backend-api';
+import {
+	DatabaseInstall,
+	Install,
+	InstallSettings,
+	ProblemDetailsModel,
+	TelemetryLevel,
+} from '@umbraco-cms/backend-api';
 import { umbracoPath } from '@umbraco-cms/utils';
 
 export const handlers = [
@@ -78,7 +84,7 @@ export const handlers = [
 		if (body.name === 'validate') {
 			return res(
 				ctx.status(400),
-				ctx.json<ProblemDetails>({
+				ctx.json<ProblemDetailsModel>({
 					type: 'connection',
 					status: 400,
 					detail: 'Database connection failed',
@@ -100,7 +106,7 @@ export const handlers = [
 				// Respond with a 200 status code
 				ctx.status(400),
 				ctx.delay(1000),
-				ctx.json<ProblemDetails>({
+				ctx.json<ProblemDetailsModel>({
 					type: 'validation',
 					status: 400,
 					detail: 'Something went wrong',

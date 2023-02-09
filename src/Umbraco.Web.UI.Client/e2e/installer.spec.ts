@@ -1,7 +1,7 @@
 import { rest } from 'msw';
 
 import { umbracoPath } from '@umbraco-cms/utils';
-import { ProblemDetails, RuntimeLevel, ServerStatus } from '@umbraco-cms/backend-api';
+import { ProblemDetailsModel, RuntimeLevel, ServerStatus } from '@umbraco-cms/backend-api';
 import { expect, test } from './test';
 
 test.describe('installer tests', () => {
@@ -62,7 +62,7 @@ test.describe('installer tests', () => {
 					return res(
 						// Respond with a 200 status code
 						ctx.status(400),
-						ctx.json<ProblemDetails>({
+						ctx.json<ProblemDetailsModel>({
 							status: 400,
 							type: 'validation',
 							detail: 'Something went wrong',

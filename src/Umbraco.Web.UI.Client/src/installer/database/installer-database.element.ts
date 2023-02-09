@@ -3,7 +3,7 @@ import { css, CSSResultGroup, html, nothing } from 'lit';
 import { customElement, property, query, state } from 'lit/decorators.js';
 
 import { UmbInstallerContext, UMB_INSTALLER_CONTEXT_TOKEN } from '../installer.context';
-import { DatabaseInstall, DatabaseSettings, InstallResource, ProblemDetails } from '@umbraco-cms/backend-api';
+import { DatabaseInstall, DatabaseSettings, InstallResource, ProblemDetailsModel } from '@umbraco-cms/backend-api';
 import { UmbLitElement } from '@umbraco-cms/element';
 import { tryExecute } from '@umbraco-cms/resources';
 
@@ -251,7 +251,7 @@ export class UmbInstallerDatabaseElement extends UmbLitElement {
 		history.replaceState(null, '', '/content');
 	}
 
-	private _handleRejected(e: ProblemDetails) {
+	private _handleRejected(e: ProblemDetailsModel) {
 		this._installerContext?.setInstallStatus(e);
 	}
 

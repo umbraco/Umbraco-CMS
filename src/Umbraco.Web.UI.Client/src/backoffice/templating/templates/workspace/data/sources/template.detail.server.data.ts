@@ -1,6 +1,6 @@
 import { v4 as uuid } from 'uuid';
 import { TemplateDetailDataSource } from '.';
-import { ProblemDetails, Template, TemplateResource } from '@umbraco-cms/backend-api';
+import { ProblemDetailsModel, Template, TemplateResource } from '@umbraco-cms/backend-api';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 import { tryExecuteAndNotify } from '@umbraco-cms/resources';
 
@@ -88,7 +88,7 @@ export class UmbTemplateDetailServerDataSource implements TemplateDetailDataSour
 	 */
 	async update(template: Template) {
 		if (!template.key) {
-			const error: ProblemDetails = { title: 'Template key is missing' };
+			const error: ProblemDetailsModel = { title: 'Template key is missing' };
 			return { error };
 		}
 
@@ -104,7 +104,7 @@ export class UmbTemplateDetailServerDataSource implements TemplateDetailDataSour
 	 */
 	async delete(key: string) {
 		if (!key) {
-			const error: ProblemDetails = { title: 'Key is missing' };
+			const error: ProblemDetailsModel = { title: 'Key is missing' };
 			return { error };
 		}
 

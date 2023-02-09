@@ -3,7 +3,7 @@ import { UmbTemplateTreeStore, UMB_TEMPLATE_TREE_STORE_CONTEXT_TOKEN } from './t
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 import { UmbNotificationService, UMB_NOTIFICATION_SERVICE_CONTEXT_TOKEN } from '@umbraco-cms/notification';
 import { UmbContextConsumerController } from '@umbraco-cms/context-api';
-import { ProblemDetails } from '@umbraco-cms/backend-api';
+import { ProblemDetailsModel } from '@umbraco-cms/backend-api';
 import type { UmbTreeRepository } from '@umbraco-cms/models';
 
 // Move to documentation / JSdoc
@@ -61,7 +61,7 @@ export class UmbTemplateTreeRepository implements UmbTreeRepository {
 		await this.#init;
 
 		if (!parentKey) {
-			const error: ProblemDetails = { title: 'Parent key is missing' };
+			const error: ProblemDetailsModel = { title: 'Parent key is missing' };
 			return { data: undefined, error };
 		}
 
@@ -78,7 +78,7 @@ export class UmbTemplateTreeRepository implements UmbTreeRepository {
 		await this.#init;
 
 		if (!keys) {
-			const error: ProblemDetails = { title: 'Keys are missing' };
+			const error: ProblemDetailsModel = { title: 'Keys are missing' };
 			return { data: undefined, error };
 		}
 

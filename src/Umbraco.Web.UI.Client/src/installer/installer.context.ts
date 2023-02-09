@@ -1,5 +1,11 @@
 import { Observable } from 'rxjs';
-import { Install, InstallResource, InstallSettings, ProblemDetails, TelemetryLevel } from '@umbraco-cms/backend-api';
+import {
+	Install,
+	InstallResource,
+	InstallSettings,
+	ProblemDetailsModel,
+	TelemetryLevel,
+} from '@umbraco-cms/backend-api';
 import { tryExecute } from '@umbraco-cms/resources';
 import { UmbContextToken } from '@umbraco-cms/context-api';
 import { ObjectState, NumberState } from '@umbraco-cms/observable-api';
@@ -23,7 +29,7 @@ export class UmbInstallerContext {
 	private _settings = new ObjectState<InstallSettings | undefined>(undefined);
 	public readonly settings = this._settings.asObservable();
 
-	private _installStatus = new ObjectState<ProblemDetails | null>(null);
+	private _installStatus = new ObjectState<ProblemDetailsModel | null>(null);
 	public readonly installStatus = this._installStatus.asObservable();
 
 	constructor() {
@@ -43,10 +49,10 @@ export class UmbInstallerContext {
 	/**
 	 * Observable method to get the install status in the installation process
 	 * @public
-	 * @return {*}  {(Observable<ProblemDetails | null>)}
+	 * @return {*}  {(Observable<ProblemDetailsModel | null>)}
 	 * @memberof UmbInstallerContext
 	 */
-	public installStatusChanges(): Observable<ProblemDetails | null> {
+	public installStatusChanges(): Observable<ProblemDetailsModel | null> {
 		return this.installStatus;
 	}
 
@@ -101,10 +107,10 @@ export class UmbInstallerContext {
 	/**
 	 * Set the install status
 	 * @public
-	 * @param {(ProblemDetails | null)} status
+	 * @param {(ProblemDetailsModel | null)} status
 	 * @memberof UmbInstallerContext
 	 */
-	public setInstallStatus(status: ProblemDetails | null): void {
+	public setInstallStatus(status: ProblemDetailsModel | null): void {
 		this._installStatus.next(status);
 	}
 
