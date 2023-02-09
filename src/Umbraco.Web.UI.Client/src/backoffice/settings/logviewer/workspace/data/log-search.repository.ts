@@ -30,6 +30,7 @@ export class UmbLogSearchRepository {
 			this.#notificationService = instance;
 			this.#checkIfInitialized();
 		});
+
 	}
 
 	#init() {

@@ -1,8 +1,11 @@
-import { css, html, LitElement } from 'lit';
-import { customElement } from 'lit/decorators.js';
+import { css, html } from 'lit';
+import { customElement, state } from 'lit/decorators.js';
+import { UmbLogViewerWorkspaceContext } from './logviewer-root.context';
+import { UmbLitElement } from '@umbraco-cms/element';
+import { SavedLogSearch } from '@umbraco-cms/backend-api';
 
 @customElement('umb-logviewer-root-workspace')
-export class UmbLogViewerRootWorkspaceElement extends LitElement {
+export class UmbLogViewerRootWorkspaceElement extends UmbLitElement {
 	static styles = [
 		css`
 			:host {
@@ -17,12 +20,35 @@ export class UmbLogViewerRootWorkspaceElement extends LitElement {
 			}
 		`,
 	];
+
+	@state()
+	private _savedSearches: SavedLogSearch[] = [];
+
+	load(): void {
+		// Not relevant for this workspace -added to prevent the error from popping up
+		console.log('Loading something from somewhere');
+	}
+
+	create(): void {
+		// Not relevant for this workspace
+	}
+
+	#logViewerContext = new UmbLogViewerWorkspaceContext(this);
+
+	async connectedCallback() {
+		super.connectedCallback();
+
+		this.observe(this.#logViewerContext.savedSearches, (savedSearches) => {
+
+			this._savedSearches = savedSearches ?? [];
+		});
+		await this.#logViewerContext.getSavedSearches();
+	}
+
 	render() {
-		return html`
-			<umb-workspace-layout headline="Log Overview for today" alias="Umb.Workspace.LogviewerRoot">
-				hello
-			</umb-workspace-layout>
-		`;
+		return html` <umb-workspace-layout headline="Log Overview for today">
+			${this._savedSearches.map((search) => html`<div>${search.name}</div>`)} bloblllo
+		</umb-workspace-layout>`;
 	}
 }
 

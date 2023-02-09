@@ -22,6 +22,7 @@ import { handlers as memberTypeHandlers } from './domains/member-type.handlers';
 import { handlers as templateHandlers } from './domains/template.handlers';
 import { handlers as languageHandlers } from './domains/language.handlers';
 import { handlers as redirectManagementHandlers } from './domains/redirect-management.handlers';
+import { handlers as logViewerHandlers } from './domains/log-viewer.handlers';
 
 const handlers = [
 	serverHandlers.serverVersionHandler,
@@ -48,6 +49,7 @@ const handlers = [
 	...templateHandlers,
 	...languageHandlers,
 	...redirectManagementHandlers,
+	...logViewerHandlers,
 ];
 
 switch (import.meta.env.VITE_UMBRACO_INSTALL_STATUS) {
