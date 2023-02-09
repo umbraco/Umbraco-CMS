@@ -1,7 +1,7 @@
 import { rest } from 'msw';
 
 import { umbracoPath } from '@umbraco-cms/utils';
-import { ProblemDetailsModel, RuntimeLevel, ServerStatus } from '@umbraco-cms/backend-api';
+import { ProblemDetailsModel, RuntimeLevelModel, ServerStatusModel } from '@umbraco-cms/backend-api';
 import { expect, test } from './test';
 
 test.describe('installer tests', () => {
@@ -12,8 +12,8 @@ test.describe('installer tests', () => {
 				return res(
 					// Respond with a 200 status code
 					ctx.status(200),
-					ctx.json<ServerStatus>({
-						serverStatus: RuntimeLevel.INSTALL,
+					ctx.json<ServerStatusModel>({
+						serverStatus: RuntimeLevelModel.INSTALL,
 					})
 				);
 			})

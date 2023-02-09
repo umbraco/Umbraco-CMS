@@ -1,6 +1,6 @@
 import { rest } from 'msw';
 import { umbracoPath } from '@umbraco-cms/utils';
-import { ProblemDetailsModel, RuntimeLevel, ServerStatus } from '@umbraco-cms/backend-api';
+import { ProblemDetailsModel, RuntimeLevelModel, ServerStatusModel } from '@umbraco-cms/backend-api';
 import { expect, test } from './test';
 
 test.describe('upgrader tests', () => {
@@ -11,8 +11,8 @@ test.describe('upgrader tests', () => {
 				return res(
 					// Respond with a 200 status code
 					ctx.status(200),
-					ctx.json<ServerStatus>({
-						serverStatus: RuntimeLevel.UPGRADE,
+					ctx.json<ServerStatusModel>({
+						serverStatus: RuntimeLevelModel.UPGRADE,
 					})
 				);
 			})
