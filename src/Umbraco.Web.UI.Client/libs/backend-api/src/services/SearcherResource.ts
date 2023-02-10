@@ -1,8 +1,8 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-import type { PagedSearcher } from '../models/PagedSearcher';
-import type { PagedSearchResult } from '../models/PagedSearchResult';
+import type { PagedSearcherModel } from '../models/PagedSearcherModel';
+import type { PagedSearchResultModel } from '../models/PagedSearchResultModel';
 
 import type { CancelablePromise } from '../core/CancelablePromise';
 import { OpenAPI } from '../core/OpenAPI';
@@ -11,7 +11,7 @@ import { request as __request } from '../core/request';
 export class SearcherResource {
 
     /**
-     * @returns PagedSearcher Success
+     * @returns PagedSearcherModel Success
      * @throws ApiError
      */
     public static getSearcher({
@@ -20,7 +20,7 @@ export class SearcherResource {
     }: {
         skip?: number,
         take?: number,
-    }): CancelablePromise<PagedSearcher> {
+    }): CancelablePromise<PagedSearcherModel> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/searcher',
@@ -32,7 +32,7 @@ export class SearcherResource {
     }
 
     /**
-     * @returns PagedSearchResult Success
+     * @returns PagedSearchResultModel Success
      * @throws ApiError
      */
     public static getSearcherBySearcherNameQuery({
@@ -45,7 +45,7 @@ export class SearcherResource {
         term?: string,
         skip?: number,
         take?: number,
-    }): CancelablePromise<PagedSearchResult> {
+    }): CancelablePromise<PagedSearchResultModel> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/searcher/{searcherName}/query',

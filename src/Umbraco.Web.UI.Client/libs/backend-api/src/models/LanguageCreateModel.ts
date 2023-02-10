@@ -2,11 +2,9 @@
 /* tslint:disable */
 /* eslint-disable */
 
-export type LanguageCreateModel = {
-    name?: string;
-    isDefault?: boolean;
-    isMandatory?: boolean;
-    fallbackIsoCode?: string | null;
+import type { LanguageModelBaseModel } from './LanguageModelBaseModel';
+
+export type LanguageCreateModel = (LanguageModelBaseModel & {
     isoCode?: string;
-};
+});
 

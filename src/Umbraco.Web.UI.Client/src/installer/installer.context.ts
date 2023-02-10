@@ -1,5 +1,11 @@
 import { Observable } from 'rxjs';
-import { Install, InstallResource, InstallSettings, ProblemDetails, TelemetryLevel } from '@umbraco-cms/backend-api';
+import {
+	InstallModel,
+	InstallResource,
+	InstallSettingsModel,
+	ProblemDetailsModel,
+	TelemetryLevelModel,
+} from '@umbraco-cms/backend-api';
 import { tryExecute } from '@umbraco-cms/resources';
 import { UmbContextToken } from '@umbraco-cms/context-api';
 import { ObjectState, NumberState } from '@umbraco-cms/observable-api';
@@ -10,20 +16,20 @@ import { ObjectState, NumberState } from '@umbraco-cms/observable-api';
  * @class UmbInstallerContext
  */
 export class UmbInstallerContext {
-	private _data = new ObjectState<Install>({
+	private _data = new ObjectState<InstallModel>({
 		user: { name: '', email: '', password: '', subscribeToNewsletter: false },
 		database: { id: '', providerName: '' },
-		telemetryLevel: TelemetryLevel.BASIC,
+		telemetryLevel: TelemetryLevelModel.BASIC,
 	});
 	public readonly data = this._data.asObservable();
 
 	private _currentStep = new NumberState<number>(1);
 	public readonly currentStep = this._currentStep.asObservable();
 
-	private _settings = new ObjectState<InstallSettings | undefined>(undefined);
+	private _settings = new ObjectState<InstallSettingsModel | undefined>(undefined);
 	public readonly settings = this._settings.asObservable();
 
-	private _installStatus = new ObjectState<ProblemDetails | null>(null);
+	private _installStatus = new ObjectState<ProblemDetailsModel | null>(null);
 	public readonly installStatus = this._installStatus.asObservable();
 
 	constructor() {
@@ -43,10 +49,10 @@ export class UmbInstallerContext {
 	/**
 	 * Observable method to get the install status in the installation process
 	 * @public
-	 * @return {*}  {(Observable<ProblemDetails | null>)}
+	 * @return {*}  {(Observable<ProblemDetailsModel | null>)}
 	 * @memberof UmbInstallerContext
 	 */
-	public installStatusChanges(): Observable<ProblemDetails | null> {
+	public installStatusChanges(): Observable<ProblemDetailsModel | null> {
 		return this.installStatus;
 	}
 
@@ -84,7 +90,7 @@ export class UmbInstallerContext {
 	 * @param {Partial<PostInstallRequest>} data
 	 * @memberof UmbInstallerContext
 	 */
-	public appendData(data: Partial<Install>): void {
+	public appendData(data: Partial<InstallModel>): void {
 		this._data.next({ ...this.getData(), ...data });
 	}
 
@@ -94,17 +100,17 @@ export class UmbInstallerContext {
 	 * @return {*}  {PostInstallRequest}
 	 * @memberof UmbInstallerContext
 	 */
-	public getData(): Install {
+	public getData(): InstallModel {
 		return this._data.getValue();
 	}
 
 	/**
 	 * Set the install status
 	 * @public
-	 * @param {(ProblemDetails | null)} status
+	 * @param {(ProblemDetailsModel | null)} status
 	 * @memberof UmbInstallerContext
 	 */
-	public setInstallStatus(status: ProblemDetails | null): void {
+	public setInstallStatus(status: ProblemDetailsModel | null): void {
 		this._installStatus.next(status);
 	}
 

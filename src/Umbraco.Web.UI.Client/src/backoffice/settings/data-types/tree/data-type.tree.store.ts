@@ -1,13 +1,11 @@
-import { DataTypeResource, DocumentTreeItem } from '@umbraco-cms/backend-api';
+import { DataTypeResource, DocumentTreeItemModel } from '@umbraco-cms/backend-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/resources';
 import { UmbContextToken } from '@umbraco-cms/context-api';
 import { ArrayState } from '@umbraco-cms/observable-api';
 import { UmbStoreBase } from '@umbraco-cms/store';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 
-
 export const UMB_DATA_TYPE_TREE_STORE_CONTEXT_TOKEN = new UmbContextToken<UmbDataTypeTreeStore>('UmbDataTypeTreeStore');
-
 
 /**
  * @export
@@ -16,10 +14,7 @@ export const UMB_DATA_TYPE_TREE_STORE_CONTEXT_TOKEN = new UmbContextToken<UmbDat
  * @description - Tree Data Store for Data Types
  */
 export class UmbDataTypeTreeStore extends UmbStoreBase {
-
-
-	#data = new ArrayState<DocumentTreeItem>([], (x) => x.key);
-
+	#data = new ArrayState<DocumentTreeItemModel>([], (x) => x.key);
 
 	constructor(host: UmbControllerHostInterface) {
 		super(host, UMB_DATA_TYPE_TREE_STORE_CONTEXT_TOKEN.toString());

@@ -5,7 +5,7 @@ import {
 	UmbNotificationDefaultData,
 	UMB_NOTIFICATION_SERVICE_CONTEXT_TOKEN,
 } from '@umbraco-cms/notification';
-import { ApiError, CancelablePromise, ProblemDetails } from '@umbraco-cms/backend-api';
+import { ApiError, CancelablePromise, ProblemDetailsModel } from '@umbraco-cms/backend-api';
 import { UmbController, UmbControllerHostInterface } from '@umbraco-cms/controller';
 import { UmbContextConsumerController } from '@umbraco-cms/context-api';
 import type { DataSourceResponse } from '@umbraco-cms/models';
@@ -34,13 +34,13 @@ export class UmbResourceController extends UmbController {
 	}
 
 	/**
-	 * Extract the ProblemDetails object from an ApiError.
+	 * Extract the ProblemDetailsModel object from an ApiError.
 	 *
-	 * This assumes that all ApiErrors contain a ProblemDetails object in their body.
+	 * This assumes that all ApiErrors contain a ProblemDetailsModel object in their body.
 	 */
-	static toProblemDetails(error: unknown): ProblemDetails | undefined {
+	static toProblemDetailsModel(error: unknown): ProblemDetailsModel | undefined {
 		if (error instanceof ApiError) {
-			const errorDetails = error.body as ProblemDetails;
+			const errorDetails = error.body as ProblemDetailsModel;
 			return errorDetails;
 		} else if (error instanceof Error) {
 			return {
@@ -59,7 +59,7 @@ export class UmbResourceController extends UmbController {
 		try {
 			return { data: await promise };
 		} catch (e) {
-			return { error: UmbResourceController.toProblemDetails(e) };
+			return { error: UmbResourceController.toProblemDetailsModel(e) };
 		}
 	}
 

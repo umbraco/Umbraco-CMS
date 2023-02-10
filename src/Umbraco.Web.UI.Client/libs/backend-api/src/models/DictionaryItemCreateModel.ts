@@ -2,11 +2,9 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import type { DictionaryItemTranslationModel } from './DictionaryItemTranslationModel';
+import type { DictionaryItemModelBaseModel } from './DictionaryItemModelBaseModel';
 
-export type DictionaryItemCreateModel = {
-    name?: string;
-    translations?: Array<DictionaryItemTranslationModel>;
+export type DictionaryItemCreateModel = (DictionaryItemModelBaseModel & {
     parentKey?: string | null;
-};
+});
 

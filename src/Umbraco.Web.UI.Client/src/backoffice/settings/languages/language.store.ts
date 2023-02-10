@@ -1,12 +1,12 @@
 import { Observable } from 'rxjs';
-import { Culture, CultureResource, Language, LanguageResource } from '@umbraco-cms/backend-api';
+import { CultureModel, CultureResource, LanguageModel, LanguageResource } from '@umbraco-cms/backend-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/resources';
 import { UmbContextToken } from '@umbraco-cms/context-api';
 import { UmbStoreBase } from '@umbraco-cms/store';
 import { ArrayState } from '@umbraco-cms/observable-api';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 
-export type UmbLanguageStoreItemType = Language;
+export type UmbLanguageStoreItemType = LanguageModel;
 export const UMB_LANGUAGE_STORE_CONTEXT_TOKEN = new UmbContextToken<UmbLanguageStore>('umbLanguageStore');
 
 /**
@@ -17,7 +17,7 @@ export const UMB_LANGUAGE_STORE_CONTEXT_TOKEN = new UmbContextToken<UmbLanguageS
  */
 export class UmbLanguageStore extends UmbStoreBase {
 	#data = new ArrayState<UmbLanguageStoreItemType>([], (x) => x.isoCode);
-	#availableLanguages = new ArrayState<Culture>([], (x) => x.name);
+	#availableLanguages = new ArrayState<CultureModel>([], (x) => x.name);
 
 	public readonly availableLanguages = this.#availableLanguages.asObservable();
 

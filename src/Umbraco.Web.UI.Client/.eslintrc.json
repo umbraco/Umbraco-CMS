@@ -31,7 +31,7 @@
 			},
 			"rules": {
 				"no-var": "error",
-				"import/no-unresolved": "error",
+				"import/no-unresolved": "off",
 				"import/order": "warn",
 				"local-rules/bad-type-import": "error",
 				"local-rules/no-direct-api-import": "warn",

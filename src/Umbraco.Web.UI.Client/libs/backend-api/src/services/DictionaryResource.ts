@@ -1,14 +1,15 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-import type { ContentResult } from '../models/ContentResult';
-import type { DictionaryImport } from '../models/DictionaryImport';
-import type { DictionaryItem } from '../models/DictionaryItem';
+import type { DictionaryImportModel } from '../models/DictionaryImportModel';
 import type { DictionaryItemCreateModel } from '../models/DictionaryItemCreateModel';
+import type { DictionaryItemModel } from '../models/DictionaryItemModel';
 import type { DictionaryItemUpdateModel } from '../models/DictionaryItemUpdateModel';
-import type { FolderTreeItem } from '../models/FolderTreeItem';
-import type { PagedDictionaryOverview } from '../models/PagedDictionaryOverview';
-import type { PagedEntityTreeItem } from '../models/PagedEntityTreeItem';
+import type { DictionaryUploadModel } from '../models/DictionaryUploadModel';
+import type { DocumentTypeTreeItemModel } from '../models/DocumentTypeTreeItemModel';
+import type { FolderTreeItemModel } from '../models/FolderTreeItemModel';
+import type { PagedDictionaryOverviewModel } from '../models/PagedDictionaryOverviewModel';
+import type { PagedEntityTreeItemModel } from '../models/PagedEntityTreeItemModel';
 
 import type { CancelablePromise } from '../core/CancelablePromise';
 import { OpenAPI } from '../core/OpenAPI';
@@ -17,7 +18,7 @@ import { request as __request } from '../core/request';
 export class DictionaryResource {
 
     /**
-     * @returns PagedDictionaryOverview Success
+     * @returns PagedDictionaryOverviewModel Success
      * @throws ApiError
      */
     public static getDictionary({
@@ -26,7 +27,7 @@ export class DictionaryResource {
     }: {
         skip?: number,
         take?: number,
-    }): CancelablePromise<PagedDictionaryOverview> {
+    }): CancelablePromise<PagedDictionaryOverviewModel> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/dictionary',
@@ -60,14 +61,14 @@ export class DictionaryResource {
     }
 
     /**
-     * @returns DictionaryItem Success
+     * @returns any Success
      * @throws ApiError
      */
     public static getDictionaryByKey({
         key,
     }: {
         key: string,
-    }): CancelablePromise<DictionaryItem> {
+    }): CancelablePromise<DictionaryItemModel> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/dictionary/{key}',
@@ -132,7 +133,7 @@ export class DictionaryResource {
      * @returns binary Success
      * @throws ApiError
      */
-    public static getDictionaryExportByKey({
+    public static getDictionaryByKeyExport({
         key,
         includeChildren = false,
     }: {
@@ -141,7 +142,7 @@ export class DictionaryResource {
     }): CancelablePromise<Blob> {
         return __request(OpenAPI, {
             method: 'GET',
-            url: '/umbraco/management/api/v1/dictionary/export/{key}',
+            url: '/umbraco/management/api/v1/dictionary/{key}/export',
             path: {
                 'key': key,
             },
@@ -155,38 +156,35 @@ export class DictionaryResource {
     }
 
     /**
-     * @returns ContentResult Success
+     * @returns any Created
      * @throws ApiError
      */
     public static postDictionaryImport({
-        file,
-        parentId,
+        requestBody,
     }: {
-        file?: string,
-        parentId?: number,
-    }): CancelablePromise<ContentResult> {
+        requestBody?: DictionaryImportModel,
+    }): CancelablePromise<any> {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/umbraco/management/api/v1/dictionary/import',
-            query: {
-                'file': file,
-                'parentId': parentId,
-            },
+            body: requestBody,
+            mediaType: 'application/json',
             errors: {
+                400: `Bad Request`,
                 404: `Not Found`,
             },
         });
     }
 
     /**
-     * @returns DictionaryImport Success
+     * @returns any Success
      * @throws ApiError
      */
     public static postDictionaryUpload({
         requestBody,
     }: {
         requestBody?: any,
-    }): CancelablePromise<DictionaryImport> {
+    }): CancelablePromise<DictionaryUploadModel> {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/umbraco/management/api/v1/dictionary/upload',
@@ -198,7 +196,7 @@ export class DictionaryResource {
     }
 
     /**
-     * @returns PagedEntityTreeItem Success
+     * @returns PagedEntityTreeItemModel Success
      * @throws ApiError
      */
     public static getTreeDictionaryChildren({
@@ -209,7 +207,7 @@ export class DictionaryResource {
         parentKey?: string,
         skip?: number,
         take?: number,
-    }): CancelablePromise<PagedEntityTreeItem> {
+    }): CancelablePromise<PagedEntityTreeItemModel> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/tree/dictionary/children',
@@ -222,14 +220,14 @@ export class DictionaryResource {
     }
 
     /**
-     * @returns FolderTreeItem Success
+     * @returns any Success
      * @throws ApiError
      */
     public static getTreeDictionaryItem({
         key,
     }: {
         key?: Array<string>,
-    }): CancelablePromise<Array<FolderTreeItem>> {
+    }): CancelablePromise<Array<(FolderTreeItemModel | DocumentTypeTreeItemModel)>> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/tree/dictionary/item',
@@ -240,7 +238,7 @@ export class DictionaryResource {
     }
 
     /**
-     * @returns PagedEntityTreeItem Success
+     * @returns PagedEntityTreeItemModel Success
      * @throws ApiError
      */
     public static getTreeDictionaryRoot({
@@ -249,7 +247,7 @@ export class DictionaryResource {
     }: {
         skip?: number,
         take?: number,
-    }): CancelablePromise<PagedEntityTreeItem> {
+    }): CancelablePromise<PagedEntityTreeItemModel> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/tree/dictionary/root',

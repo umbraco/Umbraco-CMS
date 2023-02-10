@@ -6,7 +6,7 @@ import { FormControlMixin } from '@umbraco-ui/uui-base/lib/mixins';
 import { UmbModalService, UMB_MODAL_SERVICE_CONTEXT_TOKEN } from '../../../../core/modal';
 import { UmbMediaRepository } from '../../../media/media/repository/media.repository';
 import { UmbLitElement } from '@umbraco-cms/element';
-import type { EntityTreeItem, FolderTreeItem } from '@umbraco-cms/backend-api';
+import type { EntityTreeItemModel, FolderTreeItemModel } from '@umbraco-cms/backend-api';
 import type { UmbObserverController } from '@umbraco-cms/observable-api';
 
 @customElement('umb-input-media-picker')
@@ -85,10 +85,10 @@ export class UmbInputMediaPickerElement extends FormControlMixin(UmbLitElement) 
 	}
 
 	@state()
-	private _items?: Array<EntityTreeItem>;
+	private _items?: Array<EntityTreeItemModel>;
 
 	private _modalService?: UmbModalService;
-	private _pickedItemsObserver?: UmbObserverController<FolderTreeItem>;
+	private _pickedItemsObserver?: UmbObserverController<FolderTreeItemModel>;
 	private _repository = new UmbMediaRepository(this);
 
 	constructor() {
@@ -143,7 +143,7 @@ export class UmbInputMediaPickerElement extends FormControlMixin(UmbLitElement) 
 		});
 	}
 
-	private _removeItem(item: FolderTreeItem) {
+	private _removeItem(item: FolderTreeItemModel) {
 		const modalHandler = this._modalService?.confirm({
 			color: 'danger',
 			headline: `Remove ${item.name}?`,
@@ -175,9 +175,9 @@ export class UmbInputMediaPickerElement extends FormControlMixin(UmbLitElement) 
 		</uui-button>`;
 	}
 
-	private _renderItem(item: FolderTreeItem) {
+	private _renderItem(item: FolderTreeItemModel) {
 		// TODO: remove when we have a way to handle trashed items
-		const tempItem = item as FolderTreeItem & { isTrashed: boolean };
+		const tempItem = item as FolderTreeItemModel & { isTrashed: boolean };
 
 		return html`
 			<uui-card-media

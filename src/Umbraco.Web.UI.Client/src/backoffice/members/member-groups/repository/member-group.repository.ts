@@ -3,9 +3,9 @@ import { UmbMemberGroupTreeStore, UMB_MEMBER_GROUP_TREE_STORE_CONTEXT_TOKEN } fr
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 import { UmbNotificationService, UMB_NOTIFICATION_SERVICE_CONTEXT_TOKEN } from '@umbraco-cms/notification';
 import { UmbContextConsumerController } from '@umbraco-cms/context-api';
-import { ProblemDetails } from '@umbraco-cms/backend-api';
-import type { UmbTreeRepository } from 'libs/repository/tree-repository.interface';
 import type { MemberGroupDetails } from '@umbraco-cms/models';
+import { ProblemDetailsModel } from '@umbraco-cms/backend-api';
+import type { UmbTreeRepository } from '@umbraco-cms/models';
 
 export class UmbMemberGroupRepository implements UmbTreeRepository {
 	#host: UmbControllerHostInterface;
@@ -55,7 +55,7 @@ export class UmbMemberGroupRepository implements UmbTreeRepository {
 	}
 
 	async requestTreeItemsOf(parentKey: string | null) {
-		const error: ProblemDetails = { title: 'Not implemented' };
+		const error: ProblemDetailsModel = { title: 'Not implemented' };
 		return { data: undefined, error };
 	}
 
@@ -63,7 +63,7 @@ export class UmbMemberGroupRepository implements UmbTreeRepository {
 		await this.#init;
 
 		if (!keys) {
-			const error: ProblemDetails = { title: 'Keys are missing' };
+			const error: ProblemDetailsModel = { title: 'Keys are missing' };
 			return { data: undefined, error };
 		}
 

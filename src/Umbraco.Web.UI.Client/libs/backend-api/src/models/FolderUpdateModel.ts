@@ -2,7 +2,7 @@
 /* tslint:disable */
 /* eslint-disable */
 
-export type FolderUpdateModel = {
-    name?: string;
-};
+import type { FolderModelBaseModel } from './FolderModelBaseModel';
+
+export type FolderUpdateModel = FolderModelBaseModel;
 

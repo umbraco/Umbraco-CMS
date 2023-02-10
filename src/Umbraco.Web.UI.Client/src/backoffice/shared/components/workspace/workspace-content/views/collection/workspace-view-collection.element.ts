@@ -9,9 +9,9 @@ import {
 
 import '../../../../../../shared/components/content-property/content-property.element';
 import '../../../../../../shared/collection/dashboards/dashboard-collection.element';
-import { UmbWorkspaceEntityContextInterface } from '../../../workspace-context/workspace-entity-context.interface';
+import type { UmbWorkspaceEntityContextInterface } from '../../../workspace-context/workspace-entity-context.interface';
 import { UmbLitElement } from '@umbraco-cms/element';
-import { FolderTreeItem } from '@umbraco-cms/backend-api';
+import type { FolderTreeItemModel } from '@umbraco-cms/backend-api';
 import { ManifestWorkspaceViewCollection } from '@umbraco-cms/extensions-registry';
 
 @customElement('umb-workspace-view-collection')
@@ -31,7 +31,7 @@ export class UmbWorkspaceViewCollectionElement extends UmbLitElement {
 	private _workspaceContext?: UmbWorkspaceEntityContextInterface;
 
 	// TODO: add type for the collection context.
-	private _collectionContext?: UmbCollectionContext<FolderTreeItem, any>;
+	private _collectionContext?: UmbCollectionContext<FolderTreeItemModel, any>;
 
 	constructor() {
 		super();
