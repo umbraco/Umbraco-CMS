@@ -1,12 +1,12 @@
 import { UmbDocumentRepository } from '../../repository/document.repository';
 import { UmbEntityActionBase } from '../../../../shared/entity-actions';
+import type { UmbCreateDocumentModalResultData } from './create-document-modal-layout.element';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 import { UmbModalService, UMB_MODAL_SERVICE_CONTEXT_TOKEN } from '@umbraco-cms/modal';
 import { UmbContextConsumerController } from '@umbraco-cms/context-api';
 
 // TODO: temp import
 import './create-document-modal-layout.element.ts';
-import { UmbCreateDocumentModalResultData } from './create-document-modal-layout.element';
 
 export class UmbCreateDocumentEntityAction extends UmbEntityActionBase<UmbDocumentRepository> {
 	#modalService?: UmbModalService;
