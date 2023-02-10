@@ -2,8 +2,9 @@
 /* tslint:disable */
 /* eslint-disable */
 
-export type FolderCreateModel = {
-    name?: string;
+import type { FolderModelBaseModel } from './FolderModelBaseModel';
+
+export type FolderCreateModel = (FolderModelBaseModel & {
     parentKey?: string | null;
-};
+});
 

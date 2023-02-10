@@ -1,13 +1,13 @@
-import { EntityTreeItem, MemberTypeResource, } from '@umbraco-cms/backend-api';
+import { EntityTreeItemModel, MemberTypeResource } from '@umbraco-cms/backend-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/resources';
 import { UmbContextToken } from '@umbraco-cms/context-api';
 import { ArrayState } from '@umbraco-cms/observable-api';
 import { UmbStoreBase } from '@umbraco-cms/store';
-import { UmbControllerHostInterface } from '@umbraco-cms/controller';
+import type { UmbControllerHostInterface } from '@umbraco-cms/controller';
 
-
-export const UMB_MEMBER_TYPE_TREE_STORE_CONTEXT_TOKEN = new UmbContextToken<UmbMemberTypeTreeStore>('UmbMemberTypeTreeStore');
-
+export const UMB_MEMBER_TYPE_TREE_STORE_CONTEXT_TOKEN = new UmbContextToken<UmbMemberTypeTreeStore>(
+	'UmbMemberTypeTreeStore'
+);
 
 /**
  * @export
@@ -16,11 +16,8 @@ export const UMB_MEMBER_TYPE_TREE_STORE_CONTEXT_TOKEN = new UmbContextToken<UmbM
  * @description - Tree Data Store for Member Types
  */
 export class UmbMemberTypeTreeStore extends UmbStoreBase {
-
-
 	// TODO: use the right type here:
-	#data = new ArrayState<EntityTreeItem>([], (x) => x.key);
-
+	#data = new ArrayState<EntityTreeItemModel>([], (x) => x.key);
 
 	constructor(host: UmbControllerHostInterface) {
 		super(host, UMB_MEMBER_TYPE_TREE_STORE_CONTEXT_TOKEN.toString());

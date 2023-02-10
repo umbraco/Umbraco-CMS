@@ -1,7 +1,6 @@
 import { MemberTreeDataSource } from '.';
-import { ProblemDetails } from '@umbraco-cms/backend-api';
+import { ProblemDetailsModel } from '@umbraco-cms/backend-api';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
-import { tryExecuteAndNotify } from '@umbraco-cms/resources';
 
 /**
  * A data source for the Member tree that fetches data from the server
@@ -47,7 +46,7 @@ export class MemberTreeServerDataSource implements MemberTreeDataSource {
 		return { data, error: undefined };
 
 		// if (keys) {
-		// 	const error: ProblemDetails = { title: 'Keys are missing' };
+		// 	const error: ProblemDetailsModel = { title: 'Keys are missing' };
 		// 	return { error };
 		// }
 

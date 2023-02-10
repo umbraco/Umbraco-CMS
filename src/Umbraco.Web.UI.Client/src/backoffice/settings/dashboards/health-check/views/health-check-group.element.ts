@@ -10,11 +10,12 @@ import {
 	UMB_HEALTHCHECK_DASHBOARD_CONTEXT_TOKEN,
 } from '../health-check-dashboard.context';
 import {
-	HealthCheckAction,
-	HealthCheckGroupWithResult,
+	HealthCheckActionModel,
+	HealthCheckGroupModel,
+	HealthCheckModel,
 	HealthCheckResource,
-	HealthCheckWithResult,
-	StatusResultType,
+	HealthCheckWithResultModel,
+	StatusResultTypeModel,
 } from '@umbraco-cms/backend-api';
 import { UmbLitElement } from '@umbraco-cms/element';
 import { tryExecuteAndNotify } from '@umbraco-cms/resources';
@@ -73,15 +74,15 @@ export class UmbDashboardHealthCheckGroupElement extends UmbLitElement {
 	private _buttonState: UUIButtonState;
 
 	@state()
-	private _group?: HealthCheckGroupWithResult;
+	private _group?: HealthCheckGroupModel;
 
 	private _healthCheckContext?: UmbHealthCheckDashboardContext;
 
 	@state()
-	private _checks?: HealthCheckWithResult[] | null;
+	private _checks?: HealthCheckModel[];
 
 	@state()
-	private _keyResults?: any;
+	private _keyResults?: HealthCheckWithResultModel[];
 
 	private _api?: UmbHealthCheckContext;
 
@@ -94,13 +95,13 @@ export class UmbDashboardHealthCheckGroupElement extends UmbLitElement {
 
 			this._api?.getGroupChecks(this.groupName);
 
-			this._api?.checks.subscribe((checks) => {
-				this._checks = checks;
-				this._group = { name: this.groupName, checks: this._checks };
+			this._api?.checks.subscribe((group) => {
+				this._checks = group?.checks;
+				this._group = group;
 			});
 
 			this._api?.results.subscribe((results) => {
-				this._keyResults = results;
+				this._keyResults = results?.checks;
 			});
 		});
 	}
@@ -111,7 +112,7 @@ export class UmbDashboardHealthCheckGroupElement extends UmbLitElement {
 		this._buttonState = 'success';
 	}
 
-	private _onActionClick(action: HealthCheckAction) {
+	private _onActionClick(action: HealthCheckActionModel) {
 		return tryExecuteAndNotify(this, HealthCheckResource.postHealthCheckExecuteAction({ requestBody: action }));
 	}
 
@@ -145,10 +146,18 @@ export class UmbDashboardHealthCheckGroupElement extends UmbLitElement {
 	}
 
 	renderCheckResults(key: string) {
-		const checkResults = this._keyResults?.find((result: any) => result.key === key);
+		if (!this._keyResults) {
+			return nothing;
+		}
+		const checkResults = this._keyResults.find((x) => x.key === key);
+
+		if (!checkResults) {
+			return nothing;
+		}
+
 		return html`<uui-icon-registry-essential>
 			<div class="check-results-wrapper">
-				${checkResults?.results.map((result: any) => {
+				${checkResults.results?.map((result) => {
 					return html`<div class="check-result">
 						<div class="check-result-description">
 							<span>${this.renderIcon(result.resultType)}</span>
@@ -173,22 +182,22 @@ export class UmbDashboardHealthCheckGroupElement extends UmbLitElement {
 		</uui-icon-registry-essential>`;
 	}
 
-	private renderIcon(type?: StatusResultType) {
+	private renderIcon(type?: StatusResultTypeModel) {
 		switch (type) {
-			case StatusResultType.SUCCESS:
+			case StatusResultTypeModel.SUCCESS:
 				return html`<uui-icon style="color: var(--uui-color-positive);" name="check"></uui-icon>`;
-			case StatusResultType.WARNING:
+			case StatusResultTypeModel.WARNING:
 				return html`<uui-icon style="color: var(--uui-color-warning);" name="alert"></uui-icon>`;
-			case StatusResultType.ERROR:
+			case StatusResultTypeModel.ERROR:
 				return html`<uui-icon style="color: var(--uui-color-danger);" name="remove"></uui-icon>`;
-			case StatusResultType.INFO:
+			case StatusResultTypeModel.INFO:
 				return html`<uui-icon style="color:black;" name="info"></uui-icon>`;
 			default:
 				return nothing;
 		}
 	}
 
-	private renderActions(actions: HealthCheckAction[]) {
+	private renderActions(actions: HealthCheckActionModel[]) {
 		if (actions.length)
 			return html` <div class="action-wrapper">
 				${actions.map(

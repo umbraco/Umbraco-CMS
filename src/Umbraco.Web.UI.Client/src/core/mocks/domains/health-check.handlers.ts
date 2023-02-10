@@ -1,8 +1,20 @@
 import { rest } from 'msw';
 
-import { getGroupByName, healthGroupsWithoutResult } from '../data/health-check.data';
+import {
+	getGroupByName,
+	getGroupWithResultsByName,
+	healthGroups,
+	healthGroupsWithoutResult,
+} from '../data/health-check.data';
 
-import { HealthCheckGroup, PagedHealthCheckGroup } from '@umbraco-cms/backend-api';
+import {
+	HealthCheckActionModel,
+	HealthCheckGroupModel,
+	HealthCheckGroupWithResultModel,
+	HealthCheckResultModel,
+	PagedHealthCheckGroupModelBaseModel,
+	StatusResultTypeModel,
+} from '@umbraco-cms/backend-api';
 import { umbracoPath } from '@umbraco-cms/utils';
 
 export const handlers = [
@@ -10,7 +22,7 @@ export const handlers = [
 		return res(
 			// Respond with a 200 status code
 			ctx.status(200),
-			ctx.json<PagedHealthCheckGroup>({ total: 9999, items: healthGroupsWithoutResult })
+			ctx.json<PagedHealthCheckGroupModelBaseModel>({ total: 9999, items: healthGroupsWithoutResult })
 		);
 	}),
 
@@ -21,18 +33,48 @@ export const handlers = [
 		const group = getGroupByName(name);
 
 		if (group) {
-			return res(ctx.status(200), ctx.json<HealthCheckGroup>(group));
+			return res(ctx.status(200), ctx.json<HealthCheckGroupModel>(group));
 		} else {
 			return res(ctx.status(404));
 		}
 	}),
 
-	rest.post(umbracoPath('/health-check/execute-action'), async (_req, res, ctx) => {
-		await new Promise((resolve) => setTimeout(resolve, (Math.random() + 1) * 1000)); // simulate a delay of 1-2 seconds
+	rest.post(umbracoPath('/health-check-group/:name/check'), (_req, res, ctx) => {
+		const name = _req.params.name as string;
+		if (!name) return;
+
+		const group = getGroupWithResultsByName(name);
+
+		if (group) {
+			return res(ctx.status(200), ctx.json<HealthCheckGroupWithResultModel>(group));
+		} else {
+			return res(ctx.status(404));
+		}
+	}),
+
+	rest.post<HealthCheckActionModel>(umbracoPath('/health-check/execute-action'), async (req, res, ctx) => {
+		const body = await req.json<HealthCheckActionModel>();
+		const healthCheckKey = body.healthCheckKey;
+		// Find the health check based on the healthCheckKey from the healthGroups[].checks
+		const healthCheck = healthGroups.flatMap((group) => group.checks).find((check) => check?.key === healthCheckKey);
+
+		if (!healthCheck) {
+			return res(ctx.status(404));
+		}
+
+		const result = healthCheck.results?.at(0);
+
+		if (!result) {
+			return res(ctx.status(404));
+		}
+
+		result.resultType = StatusResultTypeModel.SUCCESS;
+
 		return res(
 			// Respond with a 200 status code
+			ctx.delay(1000),
 			ctx.status(200),
-			ctx.json<boolean>(true)
+			ctx.json<HealthCheckResultModel>(result)
 		);
 	}),
 ];

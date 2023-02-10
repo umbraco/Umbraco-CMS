@@ -10,7 +10,7 @@ import {
 	UMB_MEDIA_TREE_STORE_CONTEXT_TOKEN,
 } from '../../../../backoffice/media/media/media.tree.store';
 import { UmbLitElement } from '@umbraco-cms/element';
-import type { FolderTreeItem } from '@umbraco-cms/backend-api';
+import type { FolderTreeItemModel } from '@umbraco-cms/backend-api';
 import type { UmbObserverController } from '@umbraco-cms/observable-api';
 
 @customElement('umb-input-media-picker')
@@ -93,7 +93,7 @@ export class UmbInputMediaPickerElement extends FormControlMixin(UmbLitElement) 
 
 	private _modalService?: UmbModalService;
 	private _mediaStore?: UmbMediaTreeStore;
-	private _pickedItemsObserver?: UmbObserverController<FolderTreeItem>;
+	private _pickedItemsObserver?: UmbObserverController<FolderTreeItemModel>;
 
 	constructor() {
 		super();
@@ -144,7 +144,7 @@ export class UmbInputMediaPickerElement extends FormControlMixin(UmbLitElement) 
 		});
 	}
 
-	private _removeItem(item: FolderTreeItem) {
+	private _removeItem(item: FolderTreeItemModel) {
 		const modalHandler = this._modalService?.confirm({
 			color: 'danger',
 			headline: `Remove ${item.name}?`,
@@ -177,9 +177,9 @@ export class UmbInputMediaPickerElement extends FormControlMixin(UmbLitElement) 
 		</uui-button>`;
 	}
 
-	private _renderItem(item: FolderTreeItem) {
+	private _renderItem(item: FolderTreeItemModel) {
 		// TODO: remove when we have a way to handle trashed items
-		const tempItem = item as FolderTreeItem & { isTrashed: boolean };
+		const tempItem = item as FolderTreeItemModel & { isTrashed: boolean };
 
 		return html`
 			<uui-card-media

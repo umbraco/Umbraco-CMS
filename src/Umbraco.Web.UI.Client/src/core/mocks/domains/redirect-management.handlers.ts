@@ -1,6 +1,11 @@
 import { rest } from 'msw';
 import { umbracoPath } from '@umbraco-cms/utils';
-import { PagedRedirectUrl, RedirectUrl, RedirectStatus, RedirectUrlStatus } from '@umbraco-cms/backend-api';
+import {
+	PagedRedirectUrlModel,
+	RedirectUrlModel,
+	RedirectStatusModel,
+	RedirectUrlStatusModel,
+} from '@umbraco-cms/backend-api';
 
 export const handlers = [
 	rest.get(umbracoPath('/redirect-management'), (_req, res, ctx) => {
@@ -9,35 +14,35 @@ export const handlers = [
 		const take = parseInt(_req.url.searchParams.get('take') ?? '20', 10);
 
 		if (filter) {
-			const filtered: RedirectUrl[] = [];
+			const filtered: RedirectUrlModel[] = [];
 
 			PagedRedirectUrlData.items.forEach((item) => {
 				if (item.originalUrl?.includes(filter)) filtered.push(item);
 			});
-			const filteredPagedData: PagedRedirectUrl = {
+			const filteredPagedData: PagedRedirectUrlModel = {
 				total: filtered.length,
 				items: filtered.slice(skip, skip + take),
 			};
-			return res(ctx.status(200), ctx.json<PagedRedirectUrl>(filteredPagedData));
+			return res(ctx.status(200), ctx.json<PagedRedirectUrlModel>(filteredPagedData));
 		} else {
 			const items = PagedRedirectUrlData.items.slice(skip, skip + take);
 
-			const PagedData: PagedRedirectUrl = {
+			const PagedData: PagedRedirectUrlModel = {
 				total: PagedRedirectUrlData.total,
 				items,
 			};
-			return res(ctx.status(200), ctx.json<PagedRedirectUrl>(PagedData));
+			return res(ctx.status(200), ctx.json<PagedRedirectUrlModel>(PagedData));
 		}
 	}),
 
 	rest.get(umbracoPath('/redirect-management/:key'), async (_req, res, ctx) => {
 		const key = _req.params.key as string;
 		if (!key) return res(ctx.status(404));
-		if (key === 'status') return res(ctx.status(200), ctx.json<RedirectUrlStatus>(UrlTracker));
+		if (key === 'status') return res(ctx.status(200), ctx.json<RedirectUrlStatusModel>(UrlTracker));
 
 		const PagedRedirectUrlObject = _getRedirectUrlByKey(key);
 
-		return res(ctx.status(200), ctx.json<PagedRedirectUrl>(PagedRedirectUrlObject));
+		return res(ctx.status(200), ctx.json<PagedRedirectUrlModel>(PagedRedirectUrlObject));
 	}),
 
 	rest.delete(umbracoPath('/redirect-management/:key'), async (_req, res, ctx) => {
@@ -54,17 +59,18 @@ export const handlers = [
 	}),*/
 
 	rest.post(umbracoPath('/redirect-management/status'), async (_req, res, ctx) => {
-		UrlTracker.status = UrlTracker.status === RedirectStatus.ENABLED ? RedirectStatus.DISABLED : RedirectStatus.ENABLED;
+		UrlTracker.status =
+			UrlTracker.status === RedirectStatusModel.ENABLED ? RedirectStatusModel.DISABLED : RedirectStatusModel.ENABLED;
 		return res(ctx.status(200), ctx.json<any>(UrlTracker.status));
 	}),
 ];
 
 // Mock Data
 
-const UrlTracker: RedirectUrlStatus = { status: RedirectStatus.ENABLED, userIsAdmin: true };
+const UrlTracker: RedirectUrlStatusModel = { status: RedirectStatusModel.ENABLED, userIsAdmin: true };
 
 const _getRedirectUrlByKey = (key: string) => {
-	const PagedResult: PagedRedirectUrl = {
+	const PagedResult: PagedRedirectUrlModel = {
 		total: 0,
 		items: [],
 	};
@@ -80,14 +86,14 @@ const _getRedirectUrlByKey = (key: string) => {
 const _deleteRedirectUrlByKey = (key: string) => {
 	const index = RedirectUrlData.findIndex((data) => data.key === key);
 	if (index > -1) RedirectUrlData.splice(index, 1);
-	const PagedResult: PagedRedirectUrl = {
+	const PagedResult: PagedRedirectUrlModel = {
 		items: RedirectUrlData,
 		total: RedirectUrlData.length,
 	};
 	return PagedResult;
 };
 
-const RedirectUrlData: RedirectUrl[] = [
+const RedirectUrlData: RedirectUrlModel[] = [
 	{
 		key: '1',
 		created: '2022-12-05T13:59:43.6827244',
@@ -167,7 +173,7 @@ const RedirectUrlData: RedirectUrl[] = [
 	},
 ];
 
-const PagedRedirectUrlData: PagedRedirectUrl = {
+const PagedRedirectUrlData: PagedRedirectUrlModel = {
 	total: RedirectUrlData.length,
 	items: RedirectUrlData,
 };

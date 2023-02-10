@@ -1,8 +1,8 @@
-import { EntityTreeItem } from '@umbraco-cms/backend-api';
+import type { EntityTreeItemModel } from '@umbraco-cms/backend-api';
 import { UmbContextToken } from '@umbraco-cms/context-api';
 import { ArrayState } from '@umbraco-cms/observable-api';
 import { UmbStoreBase } from '@umbraco-cms/store';
-import { UmbControllerHostInterface } from '@umbraco-cms/controller';
+import type { UmbControllerHostInterface } from '@umbraco-cms/controller';
 
 /**
  * @export
@@ -11,7 +11,7 @@ import { UmbControllerHostInterface } from '@umbraco-cms/controller';
  * @description - Tree Data Store for Members
  */
 export class UmbMemberTreeStore extends UmbStoreBase {
-	#data = new ArrayState<EntityTreeItem>([], (x) => x.key);
+	#data = new ArrayState<EntityTreeItemModel>([], (x) => x.key);
 
 	/**
 	 * Creates an instance of UmbTemplateTreeStore.
@@ -27,7 +27,7 @@ export class UmbMemberTreeStore extends UmbStoreBase {
 	 * @param {Array<EntityTreeItem>} items
 	 * @memberof UmbTemplateTreeStore
 	 */
-	appendItems(items: Array<EntityTreeItem>) {
+	appendItems(items: Array<EntityTreeItemModel>) {
 		this.#data.append(items);
 	}
 
@@ -37,7 +37,7 @@ export class UmbMemberTreeStore extends UmbStoreBase {
 	 * @param {Partial<EntityTreeItem>} data
 	 * @memberof UmbMemberGroupTreeStore
 	 */
-	updateItem(key: string, data: Partial<EntityTreeItem>) {
+	updateItem(key: string, data: Partial<EntityTreeItemModel>) {
 		const entries = this.#data.getValue();
 		const entry = entries.find((entry) => entry.key === key);
 
@@ -90,6 +90,4 @@ export class UmbMemberTreeStore extends UmbStoreBase {
 	}
 }
 
-export const UMB_MEMBER_TREE_STORE_CONTEXT_TOKEN = new UmbContextToken<UmbMemberTreeStore>(
-	UmbMemberTreeStore.name
-);
+export const UMB_MEMBER_TREE_STORE_CONTEXT_TOKEN = new UmbContextToken<UmbMemberTreeStore>(UmbMemberTreeStore.name);

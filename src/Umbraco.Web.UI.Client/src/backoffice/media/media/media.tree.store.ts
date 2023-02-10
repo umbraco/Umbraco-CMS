@@ -1,5 +1,5 @@
 import type { Observable } from 'rxjs';
-import { MediaResource, ContentTreeItem } from '@umbraco-cms/backend-api';
+import { MediaResource, ContentTreeItemModel } from '@umbraco-cms/backend-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/resources';
 import { UmbContextToken } from '@umbraco-cms/context-api';
 import { ArrayState } from '@umbraco-cms/observable-api';
@@ -9,7 +9,7 @@ import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 export const UMB_MEDIA_TREE_STORE_CONTEXT_TOKEN = new UmbContextToken<UmbMediaTreeStore>('UmbMediaTreeStore');
 
 // TODO: Stop using ContentTreeItem
-export type MediaTreeItem = ContentTreeItem;
+export type MediaTreeItem = ContentTreeItemModel;
 
 /**
  * @export
@@ -18,7 +18,6 @@ export type MediaTreeItem = ContentTreeItem;
  * @description - Data Store for Media
  */
 export class UmbMediaTreeStore extends UmbStoreBase implements UmbTreeStore<MediaTreeItem> {
-
 	#data = new ArrayState<MediaTreeItem>([], (x) => x.key);
 
 	constructor(host: UmbControllerHostInterface) {
@@ -63,9 +62,7 @@ export class UmbMediaTreeStore extends UmbStoreBase implements UmbTreeStore<Medi
 
 		// TODO: how do we handle trashed items?
 		// TODO: remove ignore when we know how to handle trashed items.
-		return this.#data.getObservablePart((items) =>
-			items.filter((item) => item.parentKey === null && !item.isTrashed)
-		);
+		return this.#data.getObservablePart((items) => items.filter((item) => item.parentKey === null && !item.isTrashed));
 	}
 
 	getTreeItemChildren(key: string): Observable<Array<MediaTreeItem>> {
@@ -83,9 +80,7 @@ export class UmbMediaTreeStore extends UmbStoreBase implements UmbTreeStore<Medi
 
 		// TODO: how do we handle trashed items?
 		// TODO: remove ignore when we know how to handle trashed items.
-		return this.#data.getObservablePart((items) =>
-			items.filter((item) => item.parentKey === key && !item.isTrashed)
-		);
+		return this.#data.getObservablePart((items) => items.filter((item) => item.parentKey === key && !item.isTrashed));
 	}
 
 	getTreeItems(keys: Array<string>): Observable<Array<MediaTreeItem>> {

@@ -1,5 +1,11 @@
 import { rest } from 'msw';
-import { DatabaseInstall, Install, InstallSettings, ProblemDetails, TelemetryLevel } from '@umbraco-cms/backend-api';
+import {
+	DatabaseInstallModel,
+	InstallModel,
+	InstallSettingsModel,
+	ProblemDetailsModel,
+	TelemetryLevelModel,
+} from '@umbraco-cms/backend-api';
 import { umbracoPath } from '@umbraco-cms/utils';
 
 export const handlers = [
@@ -7,21 +13,21 @@ export const handlers = [
 		return res(
 			// Respond with a 200 status code
 			ctx.status(200),
-			ctx.json<InstallSettings>({
+			ctx.json<InstallSettingsModel>({
 				user: {
 					minCharLength: 2,
 					minNonAlphaNumericLength: 0,
 					consentLevels: [
 						{
-							level: TelemetryLevel.MINIMAL,
+							level: TelemetryLevelModel.MINIMAL,
 							description: 'We will only send an anonymized site ID to let us know that the site exists.',
 						},
 						{
-							level: TelemetryLevel.BASIC,
+							level: TelemetryLevelModel.BASIC,
 							description: 'We will send an anonymized site ID, umbraco version, and packages installed',
 						},
 						{
-							level: TelemetryLevel.DETAILED,
+							level: TelemetryLevelModel.DETAILED,
 							description:
 								'We will send:<ul><li>Anonymized site ID, umbraco version, and packages installed.</li><li>Number of: Root nodes, Content nodes, Macros, Media, Document Types, Templates, Languages, Domains, User Group, Users, Members, and Property Editors in use.</li><li>System information: Webserver, server OS, server framework, server OS language, and database provider.</li><li>Configuration settings: Modelsbuilder mode, if custom Umbraco path exists, ASP environment, and if you are in debug mode.</li></ul><i>We might change what we send on the Detailed level in the future. If so, it will be listed above.<br>By choosing "Detailed" you agree to current and future anonymized information being collected.</i>',
 						},
@@ -73,12 +79,12 @@ export const handlers = [
 	}),
 
 	rest.post(umbracoPath('/install/validate-database'), async (req, res, ctx) => {
-		const body = await req.json<DatabaseInstall>();
+		const body = await req.json<DatabaseInstallModel>();
 
 		if (body.name === 'validate') {
 			return res(
 				ctx.status(400),
-				ctx.json<ProblemDetails>({
+				ctx.json<ProblemDetailsModel>({
 					type: 'connection',
 					status: 400,
 					detail: 'Database connection failed',
@@ -93,14 +99,14 @@ export const handlers = [
 	}),
 
 	rest.post(umbracoPath('/install/setup'), async (req, res, ctx) => {
-		const body = await req.json<Install>();
+		const body = await req.json<InstallModel>();
 
 		if (body.database?.name === 'fail') {
 			return res(
 				// Respond with a 200 status code
 				ctx.status(400),
 				ctx.delay(1000),
-				ctx.json<ProblemDetails>({
+				ctx.json<ProblemDetailsModel>({
 					type: 'validation',
 					status: 400,
 					detail: 'Something went wrong',

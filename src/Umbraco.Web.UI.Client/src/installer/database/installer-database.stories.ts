@@ -7,7 +7,7 @@ import { rest } from 'msw';
 import { installerContextProvider } from '../shared/utils.story-helpers';
 
 import type { UmbInstallerDatabaseElement } from './installer-database.element';
-import { InstallSettings } from '@umbraco-cms/backend-api';
+import type { InstallSettingsModel } from '@umbraco-cms/backend-api';
 export default {
 	title: 'Apps/Installer/Steps',
 	component: 'umb-installer-database',
@@ -30,7 +30,7 @@ Step3DatabasePreconfigured.parameters = {
 				rest.get('/umbraco/backoffice/install/settings', (_req, res, ctx) => {
 					return res(
 						ctx.status(200),
-						ctx.json<InstallSettings>({
+						ctx.json<InstallSettingsModel>({
 							user: { consentLevels: [], minCharLength: 2, minNonAlphaNumericLength: 2 },
 							databases: [
 								{

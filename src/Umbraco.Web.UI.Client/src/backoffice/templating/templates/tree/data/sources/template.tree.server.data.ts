@@ -1,5 +1,5 @@
 import { TemplateTreeDataSource } from '.';
-import { ProblemDetails, TemplateResource } from '@umbraco-cms/backend-api';
+import { ProblemDetailsModel, TemplateResource } from '@umbraco-cms/backend-api';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 import { tryExecuteAndNotify } from '@umbraco-cms/resources';
 
@@ -38,7 +38,7 @@ export class TemplateTreeServerDataSource implements TemplateTreeDataSource {
 	 */
 	async getChildrenOf(parentKey: string | null) {
 		if (!parentKey) {
-			const error: ProblemDetails = { title: 'Parent key is missing' };
+			const error: ProblemDetailsModel = { title: 'Parent key is missing' };
 			return { error };
 		}
 
@@ -58,7 +58,7 @@ export class TemplateTreeServerDataSource implements TemplateTreeDataSource {
 	 */
 	async getItems(keys: Array<string>) {
 		if (keys) {
-			const error: ProblemDetails = { title: 'Keys are missing' };
+			const error: ProblemDetailsModel = { title: 'Keys are missing' };
 			return { error };
 		}
 

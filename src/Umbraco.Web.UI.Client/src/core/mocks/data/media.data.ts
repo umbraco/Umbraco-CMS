@@ -1,6 +1,6 @@
 import { UmbEntityData } from './entity.data';
 import { createContentTreeItem } from './utils';
-import { ContentTreeItem, PagedContentTreeItem } from '@umbraco-cms/backend-api';
+import { ContentTreeItemModel, PagedContentTreeItemModel } from '@umbraco-cms/backend-api';
 import type { MediaDetails } from '@umbraco-cms/models';
 
 export const data: Array<MediaDetails> = [
@@ -199,21 +199,21 @@ class UmbMediaData extends UmbEntityData<MediaDetails> {
 		super(data);
 	}
 
-	getTreeRoot(): PagedContentTreeItem {
+	getTreeRoot(): PagedContentTreeItemModel {
 		const items = this.data.filter((item) => item.parentKey === null);
 		const treeItems = items.map((item) => createContentTreeItem(item));
 		const total = items.length;
 		return { items: treeItems, total };
 	}
 
-	getTreeItemChildren(key: string): PagedContentTreeItem {
+	getTreeItemChildren(key: string): PagedContentTreeItemModel {
 		const items = this.data.filter((item) => item.parentKey === key);
 		const treeItems = items.map((item) => createContentTreeItem(item));
 		const total = items.length;
 		return { items: treeItems, total };
 	}
 
-	getTreeItem(keys: Array<string>): Array<ContentTreeItem> {
+	getTreeItem(keys: Array<string>): Array<ContentTreeItemModel> {
 		const items = this.data.filter((item) => keys.includes(item.key));
 		return items.map((item) => createContentTreeItem(item));
 	}

@@ -1,9 +1,9 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-import type { CreatedResult } from '../models/CreatedResult';
-import type { ModelsBuilder } from '../models/ModelsBuilder';
-import type { OutOfDateStatus } from '../models/OutOfDateStatus';
+import type { CreatedResultModel } from '../models/CreatedResultModel';
+import type { ModelsBuilderModel } from '../models/ModelsBuilderModel';
+import type { OutOfDateStatusModel } from '../models/OutOfDateStatusModel';
 
 import type { CancelablePromise } from '../core/CancelablePromise';
 import { OpenAPI } from '../core/OpenAPI';
@@ -12,10 +12,10 @@ import { request as __request } from '../core/request';
 export class ModelsBuilderResource {
 
     /**
-     * @returns CreatedResult Created
+     * @returns CreatedResultModel Created
      * @throws ApiError
      */
-    public static postModelsBuilderBuild(): CancelablePromise<CreatedResult> {
+    public static postModelsBuilderBuild(): CancelablePromise<CreatedResultModel> {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/umbraco/management/api/v1/models-builder/build',
@@ -26,10 +26,10 @@ export class ModelsBuilderResource {
     }
 
     /**
-     * @returns ModelsBuilder Success
+     * @returns any Success
      * @throws ApiError
      */
-    public static getModelsBuilderDashboard(): CancelablePromise<ModelsBuilder> {
+    public static getModelsBuilderDashboard(): CancelablePromise<ModelsBuilderModel> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/models-builder/dashboard',
@@ -37,10 +37,10 @@ export class ModelsBuilderResource {
     }
 
     /**
-     * @returns OutOfDateStatus Success
+     * @returns any Success
      * @throws ApiError
      */
-    public static getModelsBuilderStatus(): CancelablePromise<OutOfDateStatus> {
+    public static getModelsBuilderStatus(): CancelablePromise<OutOfDateStatusModel> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/models-builder/status',

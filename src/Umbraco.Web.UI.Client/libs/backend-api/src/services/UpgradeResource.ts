@@ -1,7 +1,7 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-import type { UpgradeSettings } from '../models/UpgradeSettings';
+import type { UpgradeSettingsModel } from '../models/UpgradeSettingsModel';
 
 import type { CancelablePromise } from '../core/CancelablePromise';
 import { OpenAPI } from '../core/OpenAPI';
@@ -25,10 +25,10 @@ export class UpgradeResource {
     }
 
     /**
-     * @returns UpgradeSettings Success
+     * @returns any Success
      * @throws ApiError
      */
-    public static getUpgradeSettings(): CancelablePromise<UpgradeSettings> {
+    public static getUpgradeSettings(): CancelablePromise<UpgradeSettingsModel> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/upgrade/settings',

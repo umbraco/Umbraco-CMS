@@ -1,23 +1,27 @@
-import { HealthCheckGroup, HealthCheckGroupWithResult, StatusResultType } from '@umbraco-cms/backend-api';
+import {
+	HealthCheckGroupModel,
+	HealthCheckGroupWithResultModel,
+	StatusResultTypeModel,
+} from '@umbraco-cms/backend-api';
 
 export function getGroupByName(name: string) {
-	return healthGroups.find((group) => group.name == name);
+	return healthGroupsWithoutResult.find((group) => group.name?.toLowerCase() == name.toLowerCase());
 }
 
-export const healthGroups: HealthCheckGroupWithResult[] = [
+export function getGroupWithResultsByName(name: string) {
+	return healthGroups.find((group) => group.name.toLowerCase() === name.toLowerCase());
+}
+
+export const healthGroups: Array<HealthCheckGroupWithResultModel & { name: string }> = [
 	{
 		name: 'Configuration',
 		checks: [
 			{
-				key: 'd0f7599e-9b2a-4d9e-9883-81c7edc5616f',
-				name: 'Macro errors',
-				description:
-					'Checks to make sure macro errors are not set to throw a YSOD (yellow screen of death), which would prevent certain or all pages from loading completely.',
 				results: [
 					{
 						message: `MacroErrors are set to 'Throw' which will prevent some or all pages in your site from loading
 						completely if there are any errors in macros. Rectifying this will set the value to 'Inline'. `,
-						resultType: StatusResultType.ERROR,
+						resultType: StatusResultTypeModel.ERROR,
 						readMoreLink: 'https://umbra.co/healthchecks-macro-errors',
 						actions: [
 							{
@@ -33,13 +37,10 @@ export const healthGroups: HealthCheckGroupWithResult[] = [
 			},
 			{
 				key: '3e2f7b14-4b41-452b-9a30-e67fbc8e1206',
-				name: 'Notification Email Settings',
-				description:
-					"If notifications are used, the 'from' email address should be specified and changed from the default value.",
 				results: [
 					{
 						message: `Notification email is still set to the default value of <strong>your@email.here</strong>.`,
-						resultType: StatusResultType.ERROR,
+						resultType: StatusResultTypeModel.ERROR,
 						readMoreLink: 'https://umbra.co/healthchecks-notification-email',
 					},
 				],
@@ -51,15 +52,12 @@ export const healthGroups: HealthCheckGroupWithResult[] = [
 		checks: [
 			{
 				key: '73dd0c1c-e0ca-4c31-9564-1dca509788af',
-				name: 'Database data integrity check',
-				description: 'Checks for various data integrity issues in the Umbraco database.',
-				//group: 'Data Integrity',
 				results: [
 					{
 						message: `All document paths are valid`,
-						resultType: StatusResultType.SUCCESS,
+						resultType: StatusResultTypeModel.SUCCESS,
 					},
-					{ message: `All media paths are valid`, resultType: StatusResultType.SUCCESS },
+					{ message: `All media paths are valid`, resultType: StatusResultTypeModel.SUCCESS },
 				],
 			},
 		],
@@ -69,15 +67,11 @@ export const healthGroups: HealthCheckGroupWithResult[] = [
 		checks: [
 			{
 				key: '61214ff3-fc57-4b31-b5cf-1d095c977d6d',
-				name: 'Debug Compilation Mode',
-				description:
-					'Leaving debug compilation mode enabled can severely slow down a website and take up more memory on the server.',
-				//group: 'Live Environment',
 				results: [
 					{
 						message: `Debug compilation mode is currently enabled. It is recommended to disable this setting before
 						go live.`,
-						resultType: StatusResultType.ERROR,
+						resultType: StatusResultTypeModel.ERROR,
 						readMoreLink: 'https://umbra.co/healthchecks-compilation-debug',
 					},
 				],
@@ -89,25 +83,22 @@ export const healthGroups: HealthCheckGroupWithResult[] = [
 		checks: [
 			{
 				key: '53dba282-4a79-4b67-b958-b29ec40fcc23',
-				name: 'Folder & File Permissions',
-				description: 'Checks that the web server folder and file permissions are set correctly for Umbraco to run.',
-				//group: 'Permissions',
 				results: [
 					{
 						message: `Folder creation`,
-						resultType: StatusResultType.SUCCESS,
+						resultType: StatusResultTypeModel.SUCCESS,
 					},
 					{
 						message: `File writing for packages`,
-						resultType: StatusResultType.SUCCESS,
+						resultType: StatusResultTypeModel.SUCCESS,
 					},
 					{
 						message: `File writing`,
-						resultType: StatusResultType.SUCCESS,
+						resultType: StatusResultTypeModel.SUCCESS,
 					},
 					{
 						message: `Media folder creation`,
-						resultType: StatusResultType.SUCCESS,
+						resultType: StatusResultTypeModel.SUCCESS,
 					},
 				],
 			},
@@ -118,112 +109,86 @@ export const healthGroups: HealthCheckGroupWithResult[] = [
 		checks: [
 			{
 				key: '6708ca45-e96e-40b8-a40a-0607c1ca7f28',
-				name: 'Application URL Configuration',
-				description: 'Checks if the Umbraco application URL is configured for your site.',
-				//group: 'Security',
 				results: [
 					{
 						message: `The appSetting 'Umbraco:CMS:WebRouting:UmbracoApplicationUrl' is not set`,
-						resultType: StatusResultType.WARNING,
+						resultType: StatusResultTypeModel.WARNING,
 						readMoreLink: 'https://umbra.co/healthchecks-umbraco-application-url',
 					},
 				],
 			},
 			{
 				key: 'ed0d7e40-971e-4be8-ab6d-8cc5d0a6a5b0',
-				name: 'Click-Jacking Protection',
-				description:
-					'Checks if your site is allowed to be IFRAMEd by another site and thus would be susceptible to click-jacking.',
-				//group: 'Security',
 				results: [
 					{
 						message: `Error pinging the URL https://localhost:44361 - 'The SSL connection could not be established,
 						see inner exception.'`,
-						resultType: StatusResultType.ERROR,
+						resultType: StatusResultTypeModel.ERROR,
 						readMoreLink: 'https://umbra.co/healthchecks-click-jacking',
 					},
 				],
 			},
 			{
 				key: '1cf27db3-efc0-41d7-a1bb-ea912064e071',
-				name: 'Content/MIME Sniffing Protection',
-				description: 'Checks that your site contains a header used to protect against MIME sniffing vulnerabilities.',
-				//group: 'Security',
 				results: [
 					{
 						message: `Error pinging the URL https://localhost:44361 - 'The SSL connection could not be established,
 						see inner exception.'`,
-						resultType: StatusResultType.ERROR,
+						resultType: StatusResultTypeModel.ERROR,
 						readMoreLink: 'https://umbra.co/healthchecks-no-sniff',
 					},
 				],
 			},
 			{
 				key: 'e2048c48-21c5-4be1-a80b-8062162df124',
-				name: 'Cookie hijacking and protocol downgrade attacks Protection (Strict-Transport-Security Header (HSTS))',
-				description:
-					'Checks if your site, when running with HTTPS, contains the Strict-Transport-Security Header (HSTS).',
-				//group: 'Security',
 				results: [
 					{
 						message: `Error pinging the URL https://localhost:44361 - 'The SSL connection could not be established,
 						see inner exception.'`,
-						resultType: StatusResultType.ERROR,
+						resultType: StatusResultTypeModel.ERROR,
 						readMoreLink: 'https://umbra.co/healthchecks-hsts',
 					},
 				],
 			},
 			{
 				key: 'f4d2b02e-28c5-4999-8463-05759fa15c3a',
-				name: 'Cross-site scripting Protection (X-XSS-Protection header)',
-				description:
-					'This header enables the Cross-site scripting (XSS) filter in your browser. It checks for the presence of the X-XSS-Protection-header.',
-				//group: 'Security',
 				results: [
 					{
 						message: `Error pinging the URL https://localhost:44361 - 'The SSL connection could not be established,
 						see inner exception.'`,
-						resultType: StatusResultType.ERROR,
+						resultType: StatusResultTypeModel.ERROR,
 						readMoreLink: 'https://umbra.co/healthchecks-xss-protection',
 					},
 				],
 			},
 			{
 				key: '92abbaa2-0586-4089-8ae2-9a843439d577',
-				name: 'Excessive Headers',
-				description:
-					'Checks to see if your site is revealing information in its headers that gives away unnecessary details about the technology used to build and host it.',
-				//group: 'Security',
 				results: [
 					{
 						message: `Error pinging the URL https://localhost:44361 - 'The SSL connection could not be established,
 						see inner exception.'`,
-						resultType: StatusResultType.WARNING,
+						resultType: StatusResultTypeModel.WARNING,
 						readMoreLink: 'https://umbra.co/healthchecks-excessive-headers',
 					},
 				],
 			},
 			{
 				key: 'eb66bb3b-1bcd-4314-9531-9da2c1d6d9a7',
-				name: 'HTTPS Configuration',
-				description:
-					'Checks if your site is configured to work over HTTPS and if the Umbraco related configuration for that is correct.',
-				//group: 'Security',
 				results: [
 					{
 						message: `You are currently viewing the site using HTTPS scheme`,
-						resultType: StatusResultType.SUCCESS,
+						resultType: StatusResultTypeModel.SUCCESS,
 					},
 					{
 						message: `The appSetting 'Umbraco:CMS:Global:UseHttps' is set to 'False' in your appSettings.json file,
 						your cookies are not marked as secure.`,
-						resultType: StatusResultType.ERROR,
+						resultType: StatusResultTypeModel.ERROR,
 						readMoreLink: 'https://umbra.co/healthchecks-https-config',
 					},
 					{
 						message: `Error pinging the URL https://localhost:44361/ - 'The SSL connection could not be established,
 						see inner exception.'"`,
-						resultType: StatusResultType.ERROR,
+						resultType: StatusResultTypeModel.ERROR,
 						readMoreLink: 'https://umbra.co/healthchecks-https-request',
 					},
 				],
@@ -235,21 +200,18 @@ export const healthGroups: HealthCheckGroupWithResult[] = [
 		checks: [
 			{
 				key: '1b5d221b-ce99-4193-97cb-5f3261ec73df',
-				name: 'SMTP Settings',
-				description: 'Checks that valid settings for sending emails are in place.',
-				//group: 'Services',
 				results: [
 					{
 						message: `The 'Umbraco:CMS:Global:Smtp' configuration could not be found.`,
 						readMoreLink: 'https://umbra.co/healthchecks-smtp',
-						resultType: StatusResultType.ERROR,
+						resultType: StatusResultTypeModel.ERROR,
 					},
 				],
 			},
 		],
 	},
 ];
-export const healthGroupsWithoutResult: HealthCheckGroup[] = [
+export const healthGroupsWithoutResult: HealthCheckGroupModel[] = [
 	{
 		name: 'Configuration',
 		checks: [

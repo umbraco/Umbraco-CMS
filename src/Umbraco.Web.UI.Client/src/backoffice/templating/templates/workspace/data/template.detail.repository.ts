@@ -1,9 +1,9 @@
 import { UmbTemplateTreeStore, UMB_TEMPLATE_TREE_STORE_CONTEXT_TOKEN } from '../../tree/data/template.tree.store';
 import { UmbTemplateDetailStore, UMB_TEMPLATE_DETAIL_STORE_CONTEXT_TOKEN } from './template.detail.store';
 import { UmbTemplateDetailServerDataSource } from './sources/template.detail.server.data';
-import { ProblemDetails, Template } from '@umbraco-cms/backend-api';
+import type { ProblemDetailsModel, TemplateModel } from '@umbraco-cms/backend-api';
 import { UmbContextConsumerController } from '@umbraco-cms/context-api';
-import { UmbControllerHostInterface } from '@umbraco-cms/controller';
+import type { UmbControllerHostInterface } from '@umbraco-cms/controller';
 import { UmbNotificationService, UMB_NOTIFICATION_SERVICE_CONTEXT_TOKEN } from '@umbraco-cms/notification';
 
 // Move to documentation / JSdoc
@@ -11,7 +11,6 @@ import { UmbNotificationService, UMB_NOTIFICATION_SERVICE_CONTEXT_TOKEN } from '
 // element -> context -> repository -> (store) -> data source
 // All methods should be async and return a promise. Some methods might return an observable as part of the promise response.
 export class UmbTemplateDetailRepository {
-
 	#host: UmbControllerHostInterface;
 	#dataSource: UmbTemplateDetailServerDataSource;
 	#detailStore?: UmbTemplateDetailStore;
@@ -61,13 +60,14 @@ export class UmbTemplateDetailRepository {
 		await this.#init();
 
 		// TODO: should we show a notification if the parent key is missing?
+		// TODO: What is the parentKey used for?
 		// Investigate what is best for Acceptance testing, cause in that perspective a thrown error might be the best choice?
 		if (!parentKey) {
-			const error: ProblemDetails = { title: 'Parent key is missing' };
+			const error: ProblemDetailsModel = { title: 'Parent key is missing' };
 			return { data: undefined, error };
 		}
 
-		return this.#dataSource.createScaffold(parentKey);
+		return this.#dataSource.createScaffold();
 	}
 
 	async get(key: string) {
@@ -76,20 +76,20 @@ export class UmbTemplateDetailRepository {
 		// TODO: should we show a notification if the key is missing?
 		// Investigate what is best for Acceptance testing, cause in that perspective a thrown error might be the best choice?
 		if (!key) {
-			const error: ProblemDetails = { title: 'Key is missing' };
+			const error: ProblemDetailsModel = { title: 'Key is missing' };
 			return { error };
 		}
 
 		return this.#dataSource.get(key);
 	}
 
-	async insert(template: Template) {
+	async insert(template: TemplateModel) {
 		await this.#init();
 
 		// TODO: should we show a notification if the template is missing?
 		// Investigate what is best for Acceptance testing, cause in that perspective a thrown error might be the best choice?
 		if (!template) {
-			const error: ProblemDetails = { title: 'Template is missing' };
+			const error: ProblemDetailsModel = { title: 'Template is missing' };
 			return { error };
 		}
 
@@ -108,13 +108,13 @@ export class UmbTemplateDetailRepository {
 		return { error };
 	}
 
-	async update(template: Template) {
+	async update(template: TemplateModel) {
 		await this.#init();
 
 		// TODO: should we show a notification if the template is missing?
 		// Investigate what is best for Acceptance testing, cause in that perspective a thrown error might be the best choice?
 		if (!template || !template.key) {
-			const error: ProblemDetails = { title: 'Template is missing' };
+			const error: ProblemDetailsModel = { title: 'Template is missing' };
 			return { error };
 		}
 
@@ -140,7 +140,7 @@ export class UmbTemplateDetailRepository {
 
 		// TODO: should we show a notification if the key is missing?
 		if (!key) {
-			const error: ProblemDetails = { title: 'Key is missing' };
+			const error: ProblemDetailsModel = { title: 'Key is missing' };
 			return { error };
 		}
 

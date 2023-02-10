@@ -1,5 +1,5 @@
 import { MemberGroupTreeDataSource } from '.';
-import { MemberGroupResource, ProblemDetails } from '@umbraco-cms/backend-api';
+import { MemberGroupResource, ProblemDetailsModel } from '@umbraco-cms/backend-api';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 import { tryExecuteAndNotify } from '@umbraco-cms/resources';
 
@@ -21,7 +21,7 @@ export class MemberGroupTreeServerDataSource implements MemberGroupTreeDataSourc
 		this.#host = host;
 	}
 
-	/** 
+	/**
 	 * Fetches the root items for the tree from the server
 	 * @return {*}
 	 * @memberof MemberGroupTreeServerDataSource
@@ -38,7 +38,7 @@ export class MemberGroupTreeServerDataSource implements MemberGroupTreeDataSourc
 	 */
 	async getItems(keys: Array<string>) {
 		if (keys) {
-			const error: ProblemDetails = { title: 'Keys are missing' };
+			const error: ProblemDetailsModel = { title: 'Keys are missing' };
 			return { error };
 		}
 

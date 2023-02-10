@@ -1,12 +1,13 @@
-import { FolderTreeItem, MediaTypeResource } from '@umbraco-cms/backend-api';
+import { FolderTreeItemModel, MediaTypeResource } from '@umbraco-cms/backend-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/resources';
 import { UmbContextToken } from '@umbraco-cms/context-api';
 import { ArrayState } from '@umbraco-cms/observable-api';
 import { UmbStoreBase } from '@umbraco-cms/store';
-import { UmbControllerHostInterface } from '@umbraco-cms/controller';
+import type { UmbControllerHostInterface } from '@umbraco-cms/controller';
 
-export const UMB_DATA_TYPE_TREE_STORE_CONTEXT_TOKEN = new UmbContextToken<UmbMediaTypeTreeStore>('UmbMediaTypeTreeStore');
-
+export const UMB_DATA_TYPE_TREE_STORE_CONTEXT_TOKEN = new UmbContextToken<UmbMediaTypeTreeStore>(
+	'UmbMediaTypeTreeStore'
+);
 
 /**
  * @export
@@ -15,15 +16,11 @@ export const UMB_DATA_TYPE_TREE_STORE_CONTEXT_TOKEN = new UmbContextToken<UmbMed
  * @description - Tree Data Store for Media Types
  */
 export class UmbMediaTypeTreeStore extends UmbStoreBase {
-
-
-	#data = new ArrayState<FolderTreeItem>([], (x) => x.key);
-
+	#data = new ArrayState<FolderTreeItemModel>([], (x) => x.key);
 
 	constructor(host: UmbControllerHostInterface) {
 		super(host, UMB_DATA_TYPE_TREE_STORE_CONTEXT_TOKEN.toString());
 	}
-
 
 	getTreeRoot() {
 		tryExecuteAndNotify(this._host, MediaTypeResource.getTreeMediaTypeRoot({})).then(({ data }) => {
@@ -35,7 +32,7 @@ export class UmbMediaTypeTreeStore extends UmbStoreBase {
 		return this.#data.getObservablePart((items) => items.filter((item) => item.parentKey === null));
 	}
 
-	getTreeItemChildren(key: string){
+	getTreeItemChildren(key: string) {
 		tryExecuteAndNotify(
 			this._host,
 			MediaTypeResource.getTreeMediaTypeChildren({

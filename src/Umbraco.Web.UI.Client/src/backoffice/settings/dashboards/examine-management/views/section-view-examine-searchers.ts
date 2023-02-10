@@ -4,7 +4,7 @@ import { customElement, state, query, property } from 'lit/decorators.js';
 
 import { UmbModalService, UMB_MODAL_SERVICE_CONTEXT_TOKEN } from '../../../../../core/modal';
 
-import { SearchResult, SearcherResource, Field } from '@umbraco-cms/backend-api';
+import { SearchResultModel, SearcherResource, FieldModel } from '@umbraco-cms/backend-api';
 import { UmbLitElement } from '@umbraco-cms/element';
 import { tryExecuteAndNotify } from '@umbraco-cms/resources';
 
@@ -107,7 +107,7 @@ export class UmbDashboardExamineSearcherElement extends UmbLitElement {
 	searcherName!: string;
 
 	@state()
-	private _searchResults?: SearchResult[];
+	private _searchResults?: SearchResultModel[];
 
 	@state()
 	private _exposedFields?: ExposedSearchResultField[];
@@ -205,7 +205,7 @@ export class UmbDashboardExamineSearcherElement extends UmbLitElement {
 	}
 
 	// Find the field named 'nodeName' and return its value if it exists in the fields array
-	private getSearchResultNodeName(searchResult: SearchResult): string {
+	private getSearchResultNodeName(searchResult: SearchResultModel): string {
 		const nodeNameField = searchResult.fields?.find((field) => field.name?.toUpperCase() === 'NODENAME');
 		return nodeNameField?.values?.join(', ') ?? '';
 	}
@@ -287,7 +287,7 @@ export class UmbDashboardExamineSearcherElement extends UmbLitElement {
 		})}`;
 	}
 
-	renderBodyCells(cellData: Field[]) {
+	renderBodyCells(cellData: FieldModel[]) {
 		return html`${this._exposedFields?.map((slot) => {
 			return cellData.map((field) => {
 				return slot.exposed && field.name == slot.name

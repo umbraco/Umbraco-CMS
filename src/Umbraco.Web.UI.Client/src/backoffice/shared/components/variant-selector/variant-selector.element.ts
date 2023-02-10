@@ -4,7 +4,7 @@ import { customElement, property, state } from 'lit/decorators.js';
 import { UUIInputElement, UUIInputEvent } from '@umbraco-ui/uui';
 import type { UmbWorkspaceEntityContextInterface } from '../workspace/workspace-context/workspace-entity-context.interface';
 import { UmbLitElement } from '@umbraco-cms/element';
-import type { ContentTreeItem } from '@umbraco-cms/backend-api';
+import type { ContentTreeItemModel } from '@umbraco-cms/backend-api';
 
 @customElement('umb-variant-selector')
 export class UmbVariantSelectorElement extends UmbLitElement {
@@ -42,15 +42,15 @@ export class UmbVariantSelectorElement extends UmbLitElement {
 
 	// TODO: use a more specific type here, something with variants.
 	@state()
-	_content?: ContentTreeItem;
+	_content?: ContentTreeItemModel;
 
-	private _workspaceContext?: UmbWorkspaceEntityContextInterface<ContentTreeItem>;
+	private _workspaceContext?: UmbWorkspaceEntityContextInterface<ContentTreeItemModel>;
 
 	constructor() {
 		super();
 
 		// TODO: Figure out how to get the magic string for the workspace context.
-		this.consumeContext<UmbWorkspaceEntityContextInterface<ContentTreeItem>>(
+		this.consumeContext<UmbWorkspaceEntityContextInterface<ContentTreeItemModel>>(
 			'umbWorkspaceContext',
 			(instance) => {
 				this._workspaceContext = instance;

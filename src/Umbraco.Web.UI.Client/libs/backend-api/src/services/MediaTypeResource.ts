@@ -1,8 +1,9 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-import type { FolderTreeItem } from '../models/FolderTreeItem';
-import type { PagedFolderTreeItem } from '../models/PagedFolderTreeItem';
+import type { DocumentTypeTreeItemModel } from '../models/DocumentTypeTreeItemModel';
+import type { FolderTreeItemModel } from '../models/FolderTreeItemModel';
+import type { PagedFolderTreeItemModel } from '../models/PagedFolderTreeItemModel';
 
 import type { CancelablePromise } from '../core/CancelablePromise';
 import { OpenAPI } from '../core/OpenAPI';
@@ -11,7 +12,7 @@ import { request as __request } from '../core/request';
 export class MediaTypeResource {
 
     /**
-     * @returns PagedFolderTreeItem Success
+     * @returns PagedFolderTreeItemModel Success
      * @throws ApiError
      */
     public static getTreeMediaTypeChildren({
@@ -24,7 +25,7 @@ export class MediaTypeResource {
         skip?: number,
         take?: number,
         foldersOnly?: boolean,
-    }): CancelablePromise<PagedFolderTreeItem> {
+    }): CancelablePromise<PagedFolderTreeItemModel> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/tree/media-type/children',
@@ -38,14 +39,14 @@ export class MediaTypeResource {
     }
 
     /**
-     * @returns FolderTreeItem Success
+     * @returns any Success
      * @throws ApiError
      */
     public static getTreeMediaTypeItem({
         key,
     }: {
         key?: Array<string>,
-    }): CancelablePromise<Array<FolderTreeItem>> {
+    }): CancelablePromise<Array<(FolderTreeItemModel | DocumentTypeTreeItemModel)>> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/tree/media-type/item',
@@ -56,7 +57,7 @@ export class MediaTypeResource {
     }
 
     /**
-     * @returns PagedFolderTreeItem Success
+     * @returns PagedFolderTreeItemModel Success
      * @throws ApiError
      */
     public static getTreeMediaTypeRoot({
@@ -67,7 +68,7 @@ export class MediaTypeResource {
         skip?: number,
         take?: number,
         foldersOnly?: boolean,
-    }): CancelablePromise<PagedFolderTreeItem> {
+    }): CancelablePromise<PagedFolderTreeItemModel> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/tree/media-type/root',

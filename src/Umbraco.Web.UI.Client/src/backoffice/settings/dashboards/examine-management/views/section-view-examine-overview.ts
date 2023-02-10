@@ -2,7 +2,13 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html, nothing } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 
-import { HealthStatus, Index, IndexerResource, Searcher, SearcherResource } from '@umbraco-cms/backend-api';
+import {
+	HealthStatusModel,
+	IndexModel,
+	IndexerResource,
+	SearcherModel,
+	SearcherResource,
+} from '@umbraco-cms/backend-api';
 import { UmbLitElement } from '@umbraco-cms/element';
 import { tryExecuteAndNotify } from '@umbraco-cms/resources';
 
@@ -52,10 +58,10 @@ export class UmbDashboardExamineOverviewElement extends UmbLitElement {
 	];
 
 	@state()
-	private _indexers?: Index[];
+	private _indexers?: IndexModel[];
 
 	@state()
-	private _searchers?: Searcher[];
+	private _searchers?: SearcherModel[];
 
 	@state()
 	private _loadingIndexers = false;
@@ -112,7 +118,7 @@ export class UmbDashboardExamineOverviewElement extends UmbLitElement {
 						<uui-table-cell style="width:0px">
 							<uui-icon-essentials>
 							${
-								index.healthStatus === HealthStatus.UNHEALTHY
+								index.healthStatus === HealthStatusModel.UNHEALTHY
 									? html`<uui-icon name="wrong" class="danger"></uui-icon>`
 									: html`<uui-icon name="check" class="positive"></uui-icon>`
 							}

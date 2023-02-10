@@ -3,13 +3,13 @@ import { UmbContextConsumerController, UmbContextToken } from "@umbraco-cms/cont
 import { UmbControllerHostInterface } from "@umbraco-cms/controller";
 import { UmbNotificationDefaultData, UmbNotificationService, UMB_NOTIFICATION_SERVICE_CONTEXT_TOKEN } from "@umbraco-cms/notification";
 import { ObjectState, UmbObserverController } from "@umbraco-cms/observable-api";
-import { EntityTreeItem } from '@umbraco-cms/backend-api';
+import type { EntityTreeItemModel } from '@umbraco-cms/backend-api';
 import { UmbEntityDetailStore } from '@umbraco-cms/store';
 
 
 // Extend entityType base type?, so we are sure to have parentKey?
 // TODO: switch to use EntityDetailItem ? if we can have such type?
-export class UmbEntityWorkspaceManager<StoreType extends UmbEntityDetailStore<EntityDetailsType>, EntityDetailsType extends EntityTreeItem = ReturnType<StoreType['getScaffold']>> {
+export class UmbEntityWorkspaceManager<StoreType extends UmbEntityDetailStore<EntityDetailsType>, EntityDetailsType extends EntityTreeItemModel = ReturnType<StoreType['getScaffold']>> {
 
 
 	private _host;
