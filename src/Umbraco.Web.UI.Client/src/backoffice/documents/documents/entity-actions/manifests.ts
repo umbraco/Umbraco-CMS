@@ -2,7 +2,7 @@ import { UmbCopyEntityAction } from '../../../shared/entity-actions/copy/copy.ac
 import { UmbMoveEntityAction } from '../../../shared/entity-actions/move/move.action';
 import { UmbTrashEntityAction } from '../../../shared/entity-actions/trash/trash.action';
 import { UmbSortChildrenOfEntityAction } from '../../../shared/entity-actions/sort-children-of/sort-children-of.action';
-import { UmbCreateDocumentEntityAction } from './create.action';
+import { UmbCreateDocumentEntityAction } from './create/create.action';
 import { UmbPublishDocumentEntityAction } from './publish.action';
 import { UmbDocumentCultureAndHostnamesEntityAction } from './culture-and-hostnames.action';
 import { UmbCreateDocumentBlueprintEntityAction } from './create-blueprint.action';
