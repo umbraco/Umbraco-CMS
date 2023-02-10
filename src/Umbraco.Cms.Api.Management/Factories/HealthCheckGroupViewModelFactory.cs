@@ -7,29 +7,32 @@ using Umbraco.Cms.Core.Mapping;
 
 namespace Umbraco.Cms.Api.Management.Factories;
 
-public class HealthCheckGroupWithResultViewModelFactory : IHealthCheckGroupWithResultViewModelFactory
+public class HealthCheckGroupViewModelFactory : IHealthCheckGroupViewModelFactory
 {
     private readonly HealthChecksSettings _healthChecksSettings;
-    private readonly ILogger<IHealthCheckGroupWithResultViewModelFactory> _logger;
+    private readonly HealthCheckCollection _healthChecks;
+    private readonly ILogger<IHealthCheckGroupViewModelFactory> _logger;
     private readonly IUmbracoMapper _umbracoMapper;
 
-    public HealthCheckGroupWithResultViewModelFactory(
+    public HealthCheckGroupViewModelFactory(
         IOptions<HealthChecksSettings> healthChecksSettings,
-        ILogger<IHealthCheckGroupWithResultViewModelFactory> logger,
+        HealthCheckCollection healthChecks,
+        ILogger<IHealthCheckGroupViewModelFactory> logger,
         IUmbracoMapper umbracoMapper)
     {
         _healthChecksSettings = healthChecksSettings.Value;
+        _healthChecks = healthChecks;
         _logger = logger;
         _umbracoMapper = umbracoMapper;
     }
 
-    public IEnumerable<IGrouping<string?, HealthCheck>> CreateGroupingFromHealthCheckCollection(HealthCheckCollection healthChecks)
+    public IEnumerable<IGrouping<string?, HealthCheck>> CreateGroupingFromHealthCheckCollection()
     {
         IList<Guid> disabledCheckIds = _healthChecksSettings.DisabledChecks
             .Select(x => x.Id)
             .ToList();
 
-        IEnumerable<IGrouping<string?, HealthCheck>> groups = healthChecks
+        IEnumerable<IGrouping<string?, HealthCheck>> groups = _healthChecks
             .Where(x => disabledCheckIds.Contains(x.Id) == false)
             .GroupBy(x => x.Group)
             .OrderBy(x => x.Key);
@@ -48,7 +51,6 @@ public class HealthCheckGroupWithResultViewModelFactory : IHealthCheckGroupWithR
 
         var healthCheckGroupViewModel = new HealthCheckGroupWithResultViewModel
         {
-            Name = healthCheckGroup.Key,
             Checks = healthChecks
         };
 
@@ -57,15 +59,13 @@ public class HealthCheckGroupWithResultViewModelFactory : IHealthCheckGroupWithR
 
     public HealthCheckWithResultViewModel CreateHealthCheckWithResultViewModel(HealthCheck healthCheck)
     {
-        _logger.LogDebug("Running health check: " + healthCheck.Name);
+        _logger.LogDebug($"Running health check: {healthCheck.Name}");
 
         IEnumerable<HealthCheckStatus> results = healthCheck.GetStatus().Result;
 
         var healthCheckViewModel = new HealthCheckWithResultViewModel
         {
             Key = healthCheck.Id,
-            Name = healthCheck.Name,
-            Description = healthCheck.Description,
             Results = _umbracoMapper.MapEnumerable<HealthCheckStatus, HealthCheckResultViewModel>(results)
         };
 

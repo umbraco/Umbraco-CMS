@@ -15,6 +15,12 @@ internal class PublishedRequestFilterAttribute : ResultFilterAttribute
     /// </summary>
     public override void OnResultExecuting(ResultExecutingContext context)
     {
+        if (context.Result is not null)
+        {
+            // If the result is already set, we just skip the execution
+            return;
+        }
+
         UmbracoRouteValues routeVals = GetUmbracoRouteValues(context);
         IPublishedRequest pcr = routeVals.PublishedRequest;
 
