@@ -1,5 +1,4 @@
 import { UmbEntityActionBase } from '..';
-import { UmbExecutedEvent } from '../../../../core/events';
 import { UmbContextConsumerController } from '@umbraco-cms/context-api';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 import { UmbModalService, UMB_MODAL_SERVICE_CONTEXT_TOKEN } from '@umbraco-cms/modal';
@@ -35,7 +34,6 @@ export class UmbDeleteEntityAction<
 			const { confirmed } = await modalHandler.onClose();
 			if (confirmed) {
 				await this.repository?.delete(this.unique);
-				this.host.dispatchEvent(new UmbExecutedEvent());
 			}
 		}
 	}

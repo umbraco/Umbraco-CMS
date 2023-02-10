@@ -1,6 +1,5 @@
 import { UmbDocumentRepository } from '../../repository/document.repository';
 import { UmbActionBase } from '../../../../shared/action';
-import { UmbExecutedEvent } from '../../../../../core/events';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 
 export class UmbDocumentCopyEntityBulkAction extends UmbActionBase<UmbDocumentRepository> {
@@ -18,6 +17,5 @@ export class UmbDocumentCopyEntityBulkAction extends UmbActionBase<UmbDocumentRe
 	async execute() {
 		console.log(`execute copy for: ${this.#selection}`);
 		await this.repository?.copy();
-		this.host.dispatchEvent(new UmbExecutedEvent());
 	}
 }

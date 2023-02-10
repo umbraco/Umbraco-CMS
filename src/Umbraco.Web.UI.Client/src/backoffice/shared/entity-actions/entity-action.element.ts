@@ -1,9 +1,10 @@
 import { html, nothing } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
+import { UUIMenuItemEvent } from '@umbraco-ui/uui';
+import { UmbExecutedEvent } from '../../../core/events';
 import { UmbLitElement } from '@umbraco-cms/element';
 import { ManifestEntityAction } from 'libs/extensions-registry/entity-action.models';
-import { UUIMenuItemEvent } from '@umbraco-ui/uui';
 
 @customElement('umb-entity-action')
 class UmbEntityActionElement extends UmbLitElement {
@@ -47,6 +48,7 @@ class UmbEntityActionElement extends UmbLitElement {
 	async #onClickLabel(event: UUIMenuItemEvent) {
 		event.stopPropagation();
 		await this.#api.execute();
+		this.dispatchEvent(new UmbExecutedEvent());
 	}
 
 	// TODO: we need to stop the regular click event from bubbling up to the table so it doesn't select the row.

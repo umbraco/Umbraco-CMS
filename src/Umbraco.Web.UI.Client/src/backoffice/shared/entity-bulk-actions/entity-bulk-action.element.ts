@@ -1,6 +1,7 @@
 import { html } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { ifDefined } from 'lit-html/directives/if-defined.js';
+import { UmbExecutedEvent } from '../../../core/events';
 import { UmbLitElement } from '@umbraco-cms/element';
 import { ManifestEntityBulkAction } from '@umbraco-cms/extensions-registry';
 
@@ -44,6 +45,7 @@ class UmbEntityBulkActionElement extends UmbLitElement {
 	async #onClick(event: PointerEvent) {
 		event.stopPropagation();
 		await this.#api.execute();
+		this.dispatchEvent(new UmbExecutedEvent());
 	}
 
 	render() {

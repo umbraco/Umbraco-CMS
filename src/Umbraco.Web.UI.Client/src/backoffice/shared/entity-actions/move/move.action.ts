@@ -1,5 +1,4 @@
 import { UmbEntityActionBase } from '..';
-import { UmbExecutedEvent } from '../../../../core/events';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 
 export class UmbMoveEntityAction<T extends { move(): Promise<void> }> extends UmbEntityActionBase<T> {
@@ -10,6 +9,5 @@ export class UmbMoveEntityAction<T extends { move(): Promise<void> }> extends Um
 	async execute() {
 		console.log(`execute for: ${this.unique}`);
 		await this.repository?.move();
-		this.host.dispatchEvent(new UmbExecutedEvent());
 	}
 }

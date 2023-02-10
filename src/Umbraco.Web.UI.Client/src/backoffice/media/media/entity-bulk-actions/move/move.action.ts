@@ -1,6 +1,5 @@
 import type { UmbMediaRepository } from '../../repository/media.repository';
 import { UmbActionBase } from '../../../../shared/action';
-import { UmbExecutedEvent } from '../../../../../core/events';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 import { UmbContextConsumerController } from '@umbraco-cms/context-api';
 import { UmbModalService, UMB_MODAL_SERVICE_CONTEXT_TOKEN } from '@umbraco-cms/modal';
@@ -28,6 +27,5 @@ export class UmbMediaMoveEntityBulkAction extends UmbActionBase<UmbMediaReposito
 		const selection = await modalHandler?.onClose();
 		const destination = selection[0];
 		await this.repository?.move(this.#selection, destination);
-		this.host.dispatchEvent(new UmbExecutedEvent());
 	}
 }
