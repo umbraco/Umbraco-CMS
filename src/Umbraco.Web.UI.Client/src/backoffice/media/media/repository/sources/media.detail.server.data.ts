@@ -1,5 +1,5 @@
 import { RepositoryDetailDataSource } from '@umbraco-cms/repository';
-import { ProblemDetails } from '@umbraco-cms/backend-api';
+import { ProblemDetailsModel } from '@umbraco-cms/backend-api';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 import { tryExecuteAndNotify } from '@umbraco-cms/resources';
 import type { MediaDetails } from '@umbraco-cms/models';
@@ -30,7 +30,7 @@ export class UmbMediaDetailServerDataSource implements RepositoryDetailDataSourc
 	 */
 	async get(key: string) {
 		if (!key) {
-			const error: ProblemDetails = { title: 'Key is missing' };
+			const error: ProblemDetailsModel = { title: 'Key is missing' };
 			return { error };
 		}
 
@@ -125,7 +125,7 @@ export class UmbMediaDetailServerDataSource implements RepositoryDetailDataSourc
 	// TODO: Error mistake in this:
 	async update(media: MediaDetails) {
 		if (!media.key) {
-			const error: ProblemDetails = { title: 'Media key is missing' };
+			const error: ProblemDetailsModel = { title: 'Media key is missing' };
 			return { error };
 		}
 		//const payload = { key: media.key, requestBody: media };
@@ -135,7 +135,7 @@ export class UmbMediaDetailServerDataSource implements RepositoryDetailDataSourc
 		try {
 			body = JSON.stringify(media);
 		} catch (error) {
-			const myError: ProblemDetails = { title: 'JSON could not parse' };
+			const myError: ProblemDetailsModel = { title: 'JSON could not parse' };
 			return { error: myError };
 		}
 
@@ -159,7 +159,7 @@ export class UmbMediaDetailServerDataSource implements RepositoryDetailDataSourc
 	 */
 	async trash(key: string) {
 		if (!key) {
-			const error: ProblemDetails = { title: 'Key is missing' };
+			const error: ProblemDetailsModel = { title: 'Key is missing' };
 			return { error };
 		}
 
@@ -184,7 +184,7 @@ export class UmbMediaDetailServerDataSource implements RepositoryDetailDataSourc
 	// TODO: Error mistake in this:
 	async delete(key: string) {
 		if (!key) {
-			const error: ProblemDetails = { title: 'Key is missing' };
+			const error: ProblemDetailsModel = { title: 'Key is missing' };
 			return { error };
 		}
 

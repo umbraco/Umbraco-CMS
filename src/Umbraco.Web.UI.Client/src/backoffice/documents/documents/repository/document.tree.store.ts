@@ -1,4 +1,4 @@
-import { EntityTreeItem } from '@umbraco-cms/backend-api';
+import { EntityTreeItemModel } from '@umbraco-cms/backend-api';
 import { UmbContextToken } from '@umbraco-cms/context-api';
 import { ArrayState } from '@umbraco-cms/observable-api';
 import { UmbStoreBase } from '@umbraco-cms/store';
@@ -12,7 +12,7 @@ import { UmbControllerHostInterface } from '@umbraco-cms/controller';
  */
 // TODO: consider if tree store could be turned into a general EntityTreeStore class?
 export class UmbDocumentTreeStore extends UmbStoreBase {
-	#data = new ArrayState<EntityTreeItem>([], (x) => x.key);
+	#data = new ArrayState<EntityTreeItemModel>([], (x) => x.key);
 
 	/**
 	 * Creates an instance of UmbDocumentTreeStore.
@@ -25,20 +25,20 @@ export class UmbDocumentTreeStore extends UmbStoreBase {
 
 	/**
 	 * Appends items to the store
-	 * @param {Array<EntityTreeItem>} items
+	 * @param {Array<EntityTreeItemModel>} items
 	 * @memberof UmbDocumentTreeStore
 	 */
-	appendItems(items: Array<EntityTreeItem>) {
+	appendItems(items: Array<EntityTreeItemModel>) {
 		this.#data.append(items);
 	}
 
 	/**
 	 * Updates an item in the store
 	 * @param {string} key
-	 * @param {Partial<EntityTreeItem>} data
+	 * @param {Partial<EntityTreeItemModel>} data
 	 * @memberof UmbDocumentTreeStore
 	 */
-	updateItem(key: string, data: Partial<EntityTreeItem>) {
+	updateItem(key: string, data: Partial<EntityTreeItemModel>) {
 		const entries = this.#data.getValue();
 		const entry = entries.find((entry) => entry.key === key);
 

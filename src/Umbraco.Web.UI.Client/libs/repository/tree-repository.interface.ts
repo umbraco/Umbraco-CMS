@@ -1,25 +1,24 @@
-import type { Observable } from "rxjs";
-import { EntityTreeItem, PagedEntityTreeItem, ProblemDetails } from "@umbraco-cms/backend-api";
+import type { Observable } from 'rxjs';
+import { EntityTreeItemModel, PagedEntityTreeItemModel, ProblemDetailsModel } from '@umbraco-cms/backend-api';
 
 export interface UmbTreeRepository {
-
 	requestRootTreeItems: () => Promise<{
-		data: PagedEntityTreeItem | undefined;
-		error: ProblemDetails | undefined;
-		asObservable?: () => Observable<EntityTreeItem[]>;
+		data: PagedEntityTreeItemModel | undefined;
+		error: ProblemDetailsModel | undefined;
+		asObservable?: () => Observable<EntityTreeItemModel[]>;
 	}>;
 	requestTreeItemsOf: (parentKey: string | null) => Promise<{
-		data: PagedEntityTreeItem | undefined;
-		error: ProblemDetails | undefined;
-		asObservable?: () => Observable<EntityTreeItem[]>;
+		data: PagedEntityTreeItemModel | undefined;
+		error: ProblemDetailsModel | undefined;
+		asObservable?: () => Observable<EntityTreeItemModel[]>;
 	}>;
 	requestTreeItems: (keys: string[]) => Promise<{
-		data: Array<EntityTreeItem> | undefined;
-		error: ProblemDetails | undefined;
-		asObservable?: () => Observable<EntityTreeItem[]>;
+		data: Array<EntityTreeItemModel> | undefined;
+		error: ProblemDetailsModel | undefined;
+		asObservable?: () => Observable<EntityTreeItemModel[]>;
 	}>;
 
-	rootTreeItems: () => Promise<Observable<EntityTreeItem[]>>;
-	treeItemsOf: (parentKey: string | null) => Promise<Observable<EntityTreeItem[]>>;
-	treeItems: (keys: string[]) => Promise<Observable<EntityTreeItem[]>>;
+	rootTreeItems: () => Promise<Observable<EntityTreeItemModel[]>>;
+	treeItemsOf: (parentKey: string | null) => Promise<Observable<EntityTreeItemModel[]>>;
+	treeItems: (keys: string[]) => Promise<Observable<EntityTreeItemModel[]>>;
 }

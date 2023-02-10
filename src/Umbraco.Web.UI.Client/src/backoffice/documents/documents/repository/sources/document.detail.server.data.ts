@@ -1,5 +1,5 @@
 import { RepositoryDetailDataSource } from '@umbraco-cms/repository';
-import { ProblemDetails } from '@umbraco-cms/backend-api';
+import { ProblemDetailsModel } from '@umbraco-cms/backend-api';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 import { tryExecuteAndNotify } from '@umbraco-cms/resources';
 import type { DataSourceResponse, DocumentDetails } from '@umbraco-cms/models';
@@ -11,7 +11,6 @@ import type { DataSourceResponse, DocumentDetails } from '@umbraco-cms/models';
  * @implements {TemplateDetailDataSource}
  */
 export class UmbDocumentDetailServerDataSource implements RepositoryDetailDataSource<DocumentDetails> {
-
 	#host: UmbControllerHostInterface;
 
 	/**
@@ -30,21 +29,19 @@ export class UmbDocumentDetailServerDataSource implements RepositoryDetailDataSo
 	 * @memberof UmbDocumentDetailServerDataSource
 	 */
 	async get(key: string) {
-
 		if (!key) {
-			const error: ProblemDetails = { title: 'Key is missing' };
+			const error: ProblemDetailsModel = { title: 'Key is missing' };
 			return { error };
 		}
 
-		return tryExecuteAndNotify(this.#host,
+		return tryExecuteAndNotify(
+			this.#host,
 			// TODO: use backend cli when available.
 			fetch(`/umbraco/management/api/v1/document/details/${key}`)
-			.then((res) => res.json())
-			.then((res) => res[0] || undefined)
+				.then((res) => res.json())
+				.then((res) => res[0] || undefined)
 		);
-
 	}
-
 
 	/**
 	 * Creates a new Document scaffold
@@ -53,7 +50,6 @@ export class UmbDocumentDetailServerDataSource implements RepositoryDetailDataSo
 	 * @memberof UmbDocumentDetailServerDataSource
 	 */
 	async createScaffold(parentKey: string | null) {
-
 		const data: DocumentDetails = {
 			key: '',
 			name: '',
@@ -86,8 +82,6 @@ export class UmbDocumentDetailServerDataSource implements RepositoryDetailDataSo
 		return { data };
 	}
 
-
-
 	/**
 	 * Inserts a new Document on the server
 	 * @param {Document} document
@@ -110,15 +104,15 @@ export class UmbDocumentDetailServerDataSource implements RepositoryDetailDataSo
 			return Promise.reject();
 		}
 		//return tryExecuteAndNotify(this.#host, DocumentResource.postDocument(payload));
-		return tryExecuteAndNotify<DocumentDetails>(this.#host,
+		return tryExecuteAndNotify<DocumentDetails>(
+			this.#host,
 			fetch('/umbraco/management/api/v1/document/save', {
-					method: 'POST',
-					body: body,
-					headers: {
-						'Content-Type': 'application/json',
-					},
-				}
-			) as any
+				method: 'POST',
+				body: body,
+				headers: {
+					'Content-Type': 'application/json',
+				},
+			}) as any
 		);
 	}
 
@@ -131,7 +125,7 @@ export class UmbDocumentDetailServerDataSource implements RepositoryDetailDataSo
 	// TODO: Error mistake in this:
 	async update(document: DocumentDetails) {
 		if (!document.key) {
-			const error: ProblemDetails = { title: 'Document key is missing' };
+			const error: ProblemDetailsModel = { title: 'Document key is missing' };
 			return { error };
 		}
 		//const payload = { key: document.key, requestBody: document };
@@ -141,19 +135,19 @@ export class UmbDocumentDetailServerDataSource implements RepositoryDetailDataSo
 		try {
 			body = JSON.stringify(document);
 		} catch (error) {
-			const myError: ProblemDetails = { title: 'JSON could not parse' };
+			const myError: ProblemDetailsModel = { title: 'JSON could not parse' };
 			return { error: myError };
 		}
 
-		return tryExecuteAndNotify<DocumentDetails>(this.#host,
+		return tryExecuteAndNotify<DocumentDetails>(
+			this.#host,
 			fetch('/umbraco/management/api/v1/document/save', {
-					method: 'POST',
-					body: body,
-					headers: {
-						'Content-Type': 'application/json',
-					},
-				}
-			) as any
+				method: 'POST',
+				body: body,
+				headers: {
+					'Content-Type': 'application/json',
+				},
+			}) as any
 		);
 	}
 
@@ -165,11 +159,12 @@ export class UmbDocumentDetailServerDataSource implements RepositoryDetailDataSo
 	 */
 	async trash(key: string) {
 		if (!key) {
-			const error: ProblemDetails = { title: 'Key is missing' };
+			const error: ProblemDetailsModel = { title: 'Key is missing' };
 			return { error };
 		}
 
-		return tryExecuteAndNotify<DocumentDetails>(this.#host,
+		return tryExecuteAndNotify<DocumentDetails>(
+			this.#host,
 			fetch('/umbraco/management/api/v1/document/trash', {
 				method: 'POST',
 				body: JSON.stringify([key]),
@@ -189,11 +184,12 @@ export class UmbDocumentDetailServerDataSource implements RepositoryDetailDataSo
 	// TODO: Error mistake in this:
 	async delete(key: string) {
 		if (!key) {
-			const error: ProblemDetails = { title: 'Key is missing' };
+			const error: ProblemDetailsModel = { title: 'Key is missing' };
 			return { error };
 		}
 
-		return tryExecuteAndNotify(this.#host,
+		return tryExecuteAndNotify(
+			this.#host,
 			fetch('/umbraco/management/api/v1/document/trash', {
 				method: 'POST',
 				body: JSON.stringify([key]),
@@ -203,5 +199,4 @@ export class UmbDocumentDetailServerDataSource implements RepositoryDetailDataSo
 			})
 		);
 	}
-
 }

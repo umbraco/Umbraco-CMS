@@ -5,7 +5,7 @@ import { UmbDocumentDetailStore, UMB_DOCUMENT_DETAIL_STORE_CONTEXT_TOKEN } from 
 import { UmbDocumentDetailServerDataSource } from './sources/document.detail.server.data';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 import { UmbContextConsumerController } from '@umbraco-cms/context-api';
-import { ProblemDetails } from '@umbraco-cms/backend-api';
+import { ProblemDetailsModel } from '@umbraco-cms/backend-api';
 import type { UmbTreeRepository } from 'libs/repository/tree-repository.interface';
 import { UmbDetailRepository } from '@umbraco-cms/repository';
 import type { DocumentDetails } from '@umbraco-cms/models';
@@ -71,7 +71,7 @@ export class UmbDocumentRepository implements UmbTreeRepository, UmbDetailReposi
 		await this.#init;
 
 		if (!parentKey) {
-			const error: ProblemDetails = { title: 'Parent key is missing' };
+			const error: ProblemDetailsModel = { title: 'Parent key is missing' };
 			return { data: undefined, error };
 		}
 
@@ -88,7 +88,7 @@ export class UmbDocumentRepository implements UmbTreeRepository, UmbDetailReposi
 		await this.#init;
 
 		if (!keys) {
-			const error: ProblemDetails = { title: 'Keys are missing' };
+			const error: ProblemDetailsModel = { title: 'Keys are missing' };
 			return { data: undefined, error };
 		}
 
@@ -130,7 +130,7 @@ export class UmbDocumentRepository implements UmbTreeRepository, UmbDetailReposi
 		// TODO: should we show a notification if the key is missing?
 		// Investigate what is best for Acceptance testing, cause in that perspective a thrown error might be the best choice?
 		if (!key) {
-			const error: ProblemDetails = { title: 'Key is missing' };
+			const error: ProblemDetailsModel = { title: 'Key is missing' };
 			return { error };
 		}
 		const { data, error } = await this.#detailDataSource.get(key);

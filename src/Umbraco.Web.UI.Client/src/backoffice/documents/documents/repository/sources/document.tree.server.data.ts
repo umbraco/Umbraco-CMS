@@ -1,5 +1,5 @@
 import type { RepositoryTreeDataSource } from '../../../../../../libs/repository/repository-tree-data-source.interface';
-import { ProblemDetails, DocumentResource } from '@umbraco-cms/backend-api';
+import { ProblemDetailsModel, DocumentResource } from '@umbraco-cms/backend-api';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 import { tryExecuteAndNotify } from '@umbraco-cms/resources';
 
@@ -67,7 +67,7 @@ export class DocumentTreeServerDataSource implements RepositoryTreeDataSource {
 	 */
 	async getChildrenOf(parentKey: string | null) {
 		if (!parentKey) {
-			const error: ProblemDetails = { title: 'Parent key is missing' };
+			const error: ProblemDetailsModel = { title: 'Parent key is missing' };
 			return { error };
 		}
 
@@ -87,7 +87,7 @@ export class DocumentTreeServerDataSource implements RepositoryTreeDataSource {
 	 */
 	async getItems(keys: Array<string>) {
 		if (!keys) {
-			const error: ProblemDetails = { title: 'Keys are missing' };
+			const error: ProblemDetailsModel = { title: 'Keys are missing' };
 			return { error };
 		}
 
