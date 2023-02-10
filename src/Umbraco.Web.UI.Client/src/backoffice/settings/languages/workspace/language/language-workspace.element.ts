@@ -6,7 +6,7 @@ import { UmbLanguageStoreItemType } from '../../language.store';
 import { UmbWorkspaceEntityElement } from '../../../../shared/components/workspace/workspace-entity-element.interface';
 import { UmbWorkspaceLanguageContext } from './language-workspace.context';
 import { UmbLitElement } from '@umbraco-cms/element';
-import '../../../../shared/components/workspace/actions/save/workspace-action-node-save.element.ts';
+import '../../../../shared/components/workspace/workspace-action/save/workspace-action-node-save.element.ts';
 
 @customElement('umb-language-workspace')
 export class UmbLanguageWorkspaceElement extends UmbLitElement implements UmbWorkspaceEntityElement {

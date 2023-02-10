@@ -1,14 +1,16 @@
-import type { InterfaceColor, InterfaceLook } from '@umbraco-ui/uui-base/lib/types/index'
+import type { InterfaceColor, InterfaceLook } from '@umbraco-ui/uui-base/lib/types/index';
 import type { ManifestElement } from './models';
 
 export interface ManifestWorkspaceAction extends ManifestElement {
 	type: 'workspaceAction';
-	meta: MetaEditorAction;
+	meta: MetaWorkspaceAction;
 }
 
-export interface MetaEditorAction {
+export interface MetaWorkspaceAction {
 	workspaces: Array<string>;
-	label?: string, //TODO: Use or implement additional label-key
-	look?: InterfaceLook,
-	color?: InterfaceColor,
+	label?: string; //TODO: Use or implement additional label-key
+	look?: InterfaceLook;
+	color?: InterfaceColor;
+	repositoryAlias?: string; // TODO: make mandatory when repositories are fully implemented
+	api?: any; //TODO: Implement UmbEntityAction
 }

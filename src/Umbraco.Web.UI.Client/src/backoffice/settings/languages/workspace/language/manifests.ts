@@ -15,7 +15,8 @@ const workspaceActions: Array<ManifestWorkspaceAction> = [
 		type: 'workspaceAction',
 		alias: 'Umb.WorkspaceAction.Language.Save',
 		name: 'Save Language Workspace Action',
-		loader: () => import('../../../../shared/components/workspace/actions/save/workspace-action-node-save.element'),
+		loader: () =>
+			import('../../../../shared/components/workspace/workspace-action/save/workspace-action-node-save.element'),
 		meta: {
 			workspaces: ['Umb.Workspace.Language'],
 			look: 'primary',

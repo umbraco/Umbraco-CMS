@@ -1,13 +1,15 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css';
-import { css, html, LitElement } from 'lit';
+import { css, html, LitElement, nothing } from 'lit';
 import { ifDefined } from 'lit-html/directives/if-defined.js';
 import { when } from 'lit-html/directives/when.js';
 import { customElement, property, state } from 'lit/decorators.js';
 import { repeat } from 'lit/directives/repeat.js';
 
+// TODO: move to UI Library - entity actions should NOT be moved to UI Library but stay in an UmbTable element
 export interface UmbTableItem {
 	key: string;
 	icon?: string;
+	entityType?: string;
 	data: Array<UmbTableItemData>;
 }
 
@@ -20,6 +22,8 @@ export interface UmbTableColumn {
 	name: string;
 	alias: string;
 	elementName?: string;
+	width?: string;
+	allowSorting?: boolean;
 }
 
 export interface UmbTableConfig {
@@ -218,13 +222,20 @@ export class UmbTableElement extends LitElement {
 	private _renderHeaderCell(column: UmbTableColumn) {
 		return html`
 			<uui-table-head-cell style="--uui-table-cell-padding: 0">
-				<button
-					style="padding: var(--uui-size-4) var(--uui-size-5);"
-					@click="${() => this._handleOrderingChange(column)}">
-					${column.name}
-					<uui-symbol-sort ?active=${this.orderingColumn === column.alias} ?descending=${this.orderingDesc}>
-					</uui-symbol-sort></button
-			></uui-table-head-cell>
+				${column.allowSorting ? html`${this._renderSortingUI(column)}` : nothing}
+			</uui-table-head-cell>
+		`;
+	}
+
+	private _renderSortingUI(column: UmbTableColumn) {
+		return html`
+			<button
+				style="padding: var(--uui-size-4) var(--uui-size-5);"
+				@click="${() => this._handleOrderingChange(column)}">
+				${column.name}
+				<uui-symbol-sort ?active=${this.orderingColumn === column.alias} ?descending=${this.orderingDesc}>
+				</uui-symbol-sort>
+			</button>
 		`;
 	}
 
@@ -273,7 +284,7 @@ export class UmbTableElement extends LitElement {
 	}
 
 	private _renderRowCell(column: UmbTableColumn, item: UmbTableItem) {
-		return html`<uui-table-cell
+		return html`<uui-table-cell style="width: ${column.width || 'auto'}"
 			>${this._renderCellContent(column, item)}</uui-table-cell
 			>
 		</uui-table-cell>`;

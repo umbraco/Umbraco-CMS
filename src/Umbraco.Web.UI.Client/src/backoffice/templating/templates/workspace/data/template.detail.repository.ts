@@ -83,6 +83,7 @@ export class UmbTemplateDetailRepository {
 		return this.#dataSource.get(key);
 	}
 
+	// Could potentially be named differently. could be:  Create
 	async insert(template: TemplateModel) {
 		await this.#init();
 
@@ -108,6 +109,7 @@ export class UmbTemplateDetailRepository {
 		return { error };
 	}
 
+	// Could potentially be named differently. could be:  Save
 	async update(template: TemplateModel) {
 		await this.#init();
 

@@ -49,9 +49,9 @@ export class UmbWorkspaceLayout extends UmbLitElement {
 				border-left: 1px solid var(--uui-color-border);
 				border-right: 1px solid var(--uui-color-border);
 			}
-			router-slot {
+
+			#router-slot {
 				height: 100%;
-				flex: 0;
 			}
 
 			umb-extension-slot[slot='actions'] {
@@ -142,6 +142,21 @@ export class UmbWorkspaceLayout extends UmbLitElement {
 		}
 	}
 
+	render() {
+		return html`
+			<umb-body-layout .headline=${this.headline}>
+				<slot name="header" slot="header"></slot>
+				${this.#renderViews()}
+				<slot name="action-menu" slot="action-menu"></slot>
+				${this.#renderRoutes()}
+				<slot></slot>
+				<slot name="footer" slot="footer"></slot>
+				${this.#renderWorkspaceActions()}
+				<slot name="actions" slot="actions"></slot>
+			</umb-body-layout>
+		`;
+	}
+
 	#renderViews() {
 		return html`
 			${this._workspaceViews.length > 1
@@ -166,33 +181,31 @@ export class UmbWorkspaceLayout extends UmbLitElement {
 		`;
 	}
 
-	render() {
+	#renderRoutes() {
 		return html`
-			<umb-body-layout .headline=${this.headline}>
-				<slot name="header" slot="header"></slot>
-				${this.#renderViews()}
+			${this._routes.length > 0
+				? html`
+						<umb-router-slot
+							id="router-slot"
+							.routes="${this._routes}"
+							@init=${(event: UmbRouterSlotInitEvent) => {
+								this._routerPath = event.target.absoluteRouterPath;
+							}}
+							@change=${(event: UmbRouterSlotChangeEvent) => {
+								this._activePath = event.target.localActiveViewPath;
+							}}></umb-router-slot>
+				  `
+				: nothing}
+		`;
+	}
 
-				<umb-router-slot
-					.routes="${this._routes}"
-					@init=${(event: UmbRouterSlotInitEvent) => {
-						this._routerPath = event.target.absoluteRouterPath;
-					}}
-					@change=${(event: UmbRouterSlotChangeEvent) => {
-						this._activePath = event.target.localActiveViewPath;
-					}}></umb-router-slot>
-
-				<slot></slot>
-
-				<slot name="footer" slot="footer"></slot>
-
-				<umb-extension-slot
-					slot="actions"
-					type="workspaceAction"
-					.filter=${(extension: ManifestWorkspaceAction) =>
-						extension.meta.workspaces.includes(this.alias)}></umb-extension-slot>
-
-				<slot name="actions" slot="actions"></slot>
-			</umb-body-layout>
+	#renderWorkspaceActions() {
+		return html`
+			<umb-extension-slot
+				slot="actions"
+				type="workspaceAction"
+				.filter=${(extension: ManifestWorkspaceAction) => extension.meta.workspaces.includes(this.alias)}
+				default-element="umb-workspace-action"></umb-extension-slot>
 		`;
 	}
 }

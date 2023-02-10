@@ -1,3 +1,5 @@
+import { TEMPLATE_REPOSITORY_ALIAS } from '../repository/manifests';
+import { UmbSaveWorkspaceAction } from '../../../shared/workspace-actions/save.action';
 import type { ManifestWorkspace, ManifestWorkspaceAction, ManifestWorkspaceView } from '@umbraco-cms/models';
 
 const workspace: ManifestWorkspace = {
@@ -12,6 +14,21 @@ const workspace: ManifestWorkspace = {
 
 const workspaceViews: Array<ManifestWorkspaceView> = [];
 
-const workspaceActions: Array<ManifestWorkspaceAction> = [];
+const workspaceActions: Array<ManifestWorkspaceAction> = [
+	{
+		type: 'workspaceAction',
+		alias: 'Umb.WorkspaceAction.Template.Save',
+		name: 'Save Template',
+		weight: 70,
+		meta: {
+			look: 'primary',
+			color: 'positive',
+			workspaces: ['Umb.Workspace.Template'],
+			label: 'Save',
+			repositoryAlias: TEMPLATE_REPOSITORY_ALIAS,
+			api: UmbSaveWorkspaceAction,
+		},
+	},
+];
 
 export const manifests = [workspace, ...workspaceViews, ...workspaceActions];

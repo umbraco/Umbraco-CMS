@@ -1,4 +1,3 @@
-import { UMB_MEDIA_TREE_STORE_CONTEXT_TOKEN } from './media/media.tree.store';
 import type { ManifestDashboardCollection, ManifestSection } from '@umbraco-cms/models';
 
 const sectionAlias = 'Umb.Section.Media';
@@ -25,7 +24,7 @@ const dashboards: Array<ManifestDashboardCollection> = [
 			sections: [sectionAlias],
 			pathname: 'media-management',
 			entityType: 'media',
-			storeAlias: UMB_MEDIA_TREE_STORE_CONTEXT_TOKEN.toString(),
+			repositoryAlias: 'Umb.Repository.Media',
 		},
 	},
 ];

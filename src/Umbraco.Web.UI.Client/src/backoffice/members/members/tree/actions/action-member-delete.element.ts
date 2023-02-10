@@ -3,7 +3,7 @@ import { css, html } from 'lit';
 import { customElement } from 'lit/decorators.js';
 import { UmbModalService, UMB_MODAL_SERVICE_CONTEXT_TOKEN } from '../../../../../core/modal';
 import UmbTreeItemActionElement from '../../../../shared/components/tree/action/tree-item-action.element';
-import { UmbMemberTreeStore, UMB_MEMBER_TREE_STORE_CONTEXT_TOKEN } from '../data/member.tree.store';
+import { UmbMemberTreeStore, UMB_MEMBER_TREE_STORE_CONTEXT_TOKEN } from '../../repository/member.tree.store';
 
 @customElement('umb-tree-action-member-delete')
 export default class UmbTreeActionMemberDeleteElement extends UmbTreeItemActionElement {

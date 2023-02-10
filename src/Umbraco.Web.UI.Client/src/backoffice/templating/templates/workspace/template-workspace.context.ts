@@ -1,7 +1,8 @@
 import { UmbTemplateDetailRepository } from './data/template.detail.repository';
 import { createObservablePart, DeepState } from '@umbraco-cms/observable-api';
-import type { TemplateModel } from '@umbraco-cms/backend-api';
-import type { UmbControllerHostInterface } from '@umbraco-cms/controller';
+import { TemplateModel } from '@umbraco-cms/backend-api';
+import { UmbControllerHostInterface } from '@umbraco-cms/controller';
+import { UmbContextProviderController } from '@umbraco-cms/context-api';
 
 export class UmbTemplateWorkspaceContext {
 	#host: UmbControllerHostInterface;
@@ -15,6 +16,11 @@ export class UmbTemplateWorkspaceContext {
 	constructor(host: UmbControllerHostInterface) {
 		this.#host = host;
 		this.#templateDetailRepo = new UmbTemplateDetailRepository(this.#host);
+		new UmbContextProviderController(this.#host, 'umbWorkspaceContext', this);
+	}
+
+	getData() {
+		return this.#data.getValue();
 	}
 
 	setName(value: string) {

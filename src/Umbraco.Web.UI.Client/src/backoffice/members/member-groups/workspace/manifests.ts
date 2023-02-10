@@ -1,3 +1,5 @@
+import { MEMBER_GROUP_REPOSITORY_ALIAS } from '../repository/manifests';
+import { UmbSaveWorkspaceAction } from '../../../shared/workspace-actions/save.action';
 import type { ManifestWorkspace, ManifestWorkspaceAction, ManifestWorkspaceView } from '@umbraco-cms/models';
 
 const workspace: ManifestWorkspace = {
@@ -9,7 +11,6 @@ const workspace: ManifestWorkspace = {
 		entityType: 'member-group',
 	},
 };
-
 
 const workspaceViews: Array<ManifestWorkspaceView> = [
 	{
@@ -30,13 +31,15 @@ const workspaceViews: Array<ManifestWorkspaceView> = [
 const workspaceActions: Array<ManifestWorkspaceAction> = [
 	{
 		type: 'workspaceAction',
-		alias: 'Umb.WorkspaceAction.MemberGroup.Save',
+		alias: 'Umb.WorkspaceAction.MemberGroup.SaveAndPublish',
 		name: 'Save Member Group Workspace Action',
-		loader: () => import('src/backoffice/shared/components/workspace/actions/save/workspace-action-node-save.element'),
 		meta: {
 			workspaces: ['Umb.Workspace.MemberGroup'],
+			label: 'Save',
 			look: 'primary',
 			color: 'positive',
+			repositoryAlias: MEMBER_GROUP_REPOSITORY_ALIAS,
+			api: UmbSaveWorkspaceAction,
 		},
 	},
 ];

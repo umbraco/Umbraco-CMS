@@ -10,5 +10,5 @@ export interface MetaDashboardCollection {
 	pathname: string;
 	label?: string;
 	entityType: string;
-	storeAlias: string;
+	repositoryAlias: string;
 }

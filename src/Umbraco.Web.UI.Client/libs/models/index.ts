@@ -1,3 +1,4 @@
+import { Observable } from 'rxjs';
 import {
 	ContentTreeItemModel,
 	DocumentTreeItemModel,
@@ -7,13 +8,15 @@ import {
 	PagedEntityTreeItemModel,
 	ProblemDetailsModel,
 } from '@umbraco-cms/backend-api';
-import { Observable } from 'rxjs';
+import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 
 // Extension Manifests
 export * from '@umbraco-cms/extensions-registry';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type HTMLElementConstructor<T = HTMLElement> = new (...args: any[]) => T;
+
+export type ClassConstructor<T> = new (...args: any[]) => T;
 
 // Users
 // TODO: would the right name be Node? as entity is just something with a Key. But node is something in a content structure, aka. with hasChildren and parentKey.
@@ -160,27 +163,4 @@ export interface DocumentBlueprintDetails {
 export interface DataSourceResponse<T = undefined> {
 	data?: T;
 	error?: ProblemDetailsModel;
-}
-
-// TODO; figure out why we can't add UmbControllerHostInterface as host type
-export interface UmbTreeRepositoryFactory {
-	new (host: any): UmbTreeRepository;
-}
-
-export interface UmbTreeRepository {
-	requestRootItems: () => Promise<{
-		data: PagedEntityTreeItemModel | undefined;
-		error: ProblemDetailsModel | undefined;
-	}>;
-	requestChildrenOf: (parentKey: string | null) => Promise<{
-		data: PagedEntityTreeItemModel | undefined;
-		error: ProblemDetailsModel | undefined;
-	}>;
-	requestItems: (keys: string[]) => Promise<{
-		data: Array<EntityTreeItemModel> | undefined;
-		error: ProblemDetailsModel | undefined;
-	}>;
-	rootItems: () => Promise<Observable<EntityTreeItemModel[]>>;
-	childrenOf: (parentKey: string | null) => Promise<Observable<EntityTreeItemModel[]>>;
-	items: (keys: string[]) => Promise<Observable<EntityTreeItemModel[]>>;
 }

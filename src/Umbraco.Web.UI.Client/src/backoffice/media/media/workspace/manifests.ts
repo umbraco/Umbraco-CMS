@@ -1,4 +1,3 @@
-import { UMB_MEDIA_TREE_STORE_CONTEXT_TOKEN } from '../media.tree.store';
 import type {
 	ManifestWorkspace,
 	ManifestWorkspaceAction,
@@ -59,7 +58,7 @@ const workspaceViewCollections: Array<ManifestWorkspaceViewCollection> = [
 			pathname: 'collection',
 			icon: 'umb:grid',
 			entityType: 'media',
-			storeAlias: UMB_MEDIA_TREE_STORE_CONTEXT_TOKEN.toString(),
+			repositoryAlias: 'Umb.Repository.Media',
 		},
 	},
 ];
@@ -69,7 +68,8 @@ const workspaceActions: Array<ManifestWorkspaceAction> = [
 		type: 'workspaceAction',
 		alias: 'Umb.WorkspaceAction.Media.Save',
 		name: 'Save Media Workspace Action',
-		loader: () => import('src/backoffice/shared/components/workspace/actions/save/workspace-action-node-save.element'),
+		loader: () =>
+			import('src/backoffice/shared/components/workspace/workspace-action/save/workspace-action-node-save.element'),
 		meta: {
 			workspaces: ['Umb.Workspace.Media'],
 			look: 'primary',

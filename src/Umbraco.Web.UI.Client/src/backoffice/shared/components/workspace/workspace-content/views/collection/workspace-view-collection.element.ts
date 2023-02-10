@@ -2,7 +2,6 @@ import { css, html } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement } from 'lit/decorators.js';
 import { ifDefined } from 'lit-html/directives/if-defined.js';
-import { UmbMediaTreeStore } from '../../../../../../media/media/media.tree.store';
 import {
 	UmbCollectionContext,
 	UMB_COLLECTION_CONTEXT_TOKEN,
@@ -31,7 +30,8 @@ export class UmbWorkspaceViewCollectionElement extends UmbLitElement {
 
 	private _workspaceContext?: UmbWorkspaceEntityContextInterface;
 
-	private _collectionContext?: UmbCollectionContext<FolderTreeItemModel, UmbMediaTreeStore>;
+	// TODO: add type for the collection context.
+	private _collectionContext?: UmbCollectionContext<FolderTreeItemModel, any>;
 
 	constructor() {
 		super();
@@ -45,16 +45,24 @@ export class UmbWorkspaceViewCollectionElement extends UmbLitElement {
 
 	protected _provideWorkspace() {
 		const entityKey = this._workspaceContext?.getEntityKey();
-		if (entityKey != null) {
+		const entityType = this._workspaceContext?.getEntityType();
+
+		if (entityKey != null && entityType != null) {
 			const manifestMeta = this.manifest.meta;
 
-			this._collectionContext = new UmbCollectionContext(this, entityKey, manifestMeta.storeAlias);
+			this._collectionContext = new UmbCollectionContext(
+				this,
+				entityType,
+				entityKey,
+				manifestMeta.storeAlias,
+				manifestMeta.repositoryAlias
+			);
 			this.provideContext(UMB_COLLECTION_CONTEXT_TOKEN, this._collectionContext);
 		}
 	}
 
 	render() {
-		return html`<umb-collection entityType=${ifDefined(this._workspaceContext?.getEntityType())}></umb-collection>`;
+		return html`<umb-collection entity-type=${ifDefined(this._workspaceContext?.getEntityType())}></umb-collection>`;
 	}
 }
 
