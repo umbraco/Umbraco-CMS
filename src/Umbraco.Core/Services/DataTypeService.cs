@@ -474,11 +474,7 @@ namespace Umbraco.Cms.Core.Services.Implement
 
             IDataType copy = toCopy.DeepCloneWithResetIdentities();
             copy.Name += " (copy)"; // might not be unique
-
-            if (container != null)
-            {
-                copy.ParentId = container.Id;
-            }
+            copy.ParentId = container?.Id ?? Constants.System.Root;
 
             return await SaveAsync(copy, () => DataTypeOperationStatus.Success, userId, AuditType.Copy);
         }

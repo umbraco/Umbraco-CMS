@@ -317,6 +317,34 @@ public class DataTypeServiceTests : UmbracoIntegrationTest
     }
 
     [Test]
+    public async Task Can_Copy_DataType_From_Container_To_Root()
+    {
+        var container1 = (await DataTypeContainerService.CreateAsync(new EntityContainer(Constants.ObjectTypes.DataType) { Name = "Root Container 1" })).Result;
+        var dataType = (await DataTypeService.CreateAsync(
+            new DataType(new LabelPropertyEditor(DataValueEditorFactory, IOHelper), ConfigurationEditorJsonSerializer)
+            {
+                Name = "Testing Textfield",
+                DatabaseType = ValueStorageType.Ntext,
+                ParentId = container1.Id
+            })).Result;
+
+        var result = await DataTypeService.CopyAsync(dataType, null);
+        Assert.IsTrue(result.Success);
+        Assert.AreEqual(DataTypeOperationStatus.Success, result.Status);
+        Assert.IsNotNull(result.Result);
+        Assert.AreNotEqual(dataType.Key, result.Result.Key);
+        Assert.AreNotEqual(dataType.Name, result.Result.Name);
+
+        IDataType original = await DataTypeService.GetAsync(dataType.Key);
+        Assert.IsNotNull(original);
+        Assert.AreEqual(container1.Id, original.ParentId);
+
+        IDataType copy = await DataTypeService.GetAsync(result.Result.Key);
+        Assert.IsNotNull(copy);
+        Assert.AreEqual(Constants.System.Root, copy.ParentId);
+    }
+
+    [Test]
     public async Task Cannot_Create_DataType_With_Empty_Name()
     {
         // Act
