@@ -5,7 +5,7 @@ import { UmbNotificationService, UMB_NOTIFICATION_SERVICE_CONTEXT_TOKEN } from '
 import { UmbContextConsumerController } from '@umbraco-cms/context-api';
 import type { MemberGroupDetails } from '@umbraco-cms/models';
 import { ProblemDetailsModel } from '@umbraco-cms/backend-api';
-import type { UmbTreeRepository } from '@umbraco-cms/models';
+import type { UmbTreeRepository } from '@umbraco-cms/repository';
 
 export class UmbMemberGroupRepository implements UmbTreeRepository {
 	#host: UmbControllerHostInterface;

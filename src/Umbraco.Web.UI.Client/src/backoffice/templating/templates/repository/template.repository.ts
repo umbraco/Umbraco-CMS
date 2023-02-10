@@ -8,7 +8,7 @@ import { UmbTemplateTreeStore, UMB_TEMPLATE_TREE_STORE_CONTEXT_TOKEN } from '../
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 import { UmbNotificationService, UMB_NOTIFICATION_SERVICE_CONTEXT_TOKEN } from '@umbraco-cms/notification';
 import { UmbContextConsumerController } from '@umbraco-cms/context-api';
-import { ProblemDetails, Template } from '@umbraco-cms/backend-api';
+import { ProblemDetailsModel, TemplateModel } from '@umbraco-cms/backend-api';
 import { UmbDetailRepository } from 'libs/repository/detail-repository.interface';
 import { UmbTreeRepository } from 'libs/repository/tree-repository.interface';
 
@@ -16,7 +16,7 @@ import { UmbTreeRepository } from 'libs/repository/tree-repository.interface';
 /* We need to create a new instance of the repository from within the element context. We want the notifications to be displayed in the right context. */
 // element -> context -> repository -> (store) -> data source
 // All methods should be async and return a promise. Some methods might return an observable as part of the promise response.
-export class UmbTemplateRepository implements UmbTreeRepository, UmbDetailRepository<Template> {
+export class UmbTemplateRepository implements UmbTreeRepository, UmbDetailRepository<TemplateModel> {
 	#init;
 	#host: UmbControllerHostInterface;
 
@@ -68,7 +68,7 @@ export class UmbTemplateRepository implements UmbTreeRepository, UmbDetailReposi
 		await this.#init;
 
 		if (!parentKey) {
-			const error: ProblemDetails = { title: 'Parent key is missing' };
+			const error: ProblemDetailsModel = { title: 'Parent key is missing' };
 			return { data: undefined, error };
 		}
 
@@ -85,7 +85,7 @@ export class UmbTemplateRepository implements UmbTreeRepository, UmbDetailReposi
 		await this.#init;
 
 		if (!keys) {
-			const error: ProblemDetails = { title: 'Keys are missing' };
+			const error: ProblemDetailsModel = { title: 'Keys are missing' };
 			return { data: undefined, error };
 		}
 
@@ -118,7 +118,8 @@ export class UmbTemplateRepository implements UmbTreeRepository, UmbDetailReposi
 			throw new Error('Parent key is missing');
 		}
 
-		return this.#detailDataSource.createScaffold(parentKey);
+		// TODO: add parent key to create scaffold
+		return this.#detailDataSource.createScaffold();
 	}
 
 	async requestDetails(key: string) {
@@ -127,7 +128,7 @@ export class UmbTemplateRepository implements UmbTreeRepository, UmbDetailReposi
 		// TODO: should we show a notification if the key is missing?
 		// Investigate what is best for Acceptance testing, cause in that perspective a thrown error might be the best choice?
 		if (!key) {
-			const error: ProblemDetails = { title: 'Key is missing' };
+			const error: ProblemDetailsModel = { title: 'Key is missing' };
 			return { error };
 		}
 		const { data, error } = await this.#detailDataSource.get(key);
@@ -141,7 +142,7 @@ export class UmbTemplateRepository implements UmbTreeRepository, UmbDetailReposi
 
 	// Could potentially be general methods:
 
-	async createDetail(template: Template) {
+	async createDetail(template: TemplateModel) {
 		await this.#init;
 
 		if (!template || !template.key) {
@@ -163,7 +164,7 @@ export class UmbTemplateRepository implements UmbTreeRepository, UmbDetailReposi
 		return { error };
 	}
 
-	async saveDetail(template: Template) {
+	async saveDetail(template: TemplateModel) {
 		await this.#init;
 
 		if (!template || !template.key) {
