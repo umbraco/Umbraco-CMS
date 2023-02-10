@@ -1,4 +1,4 @@
-import type { UmbEntityData } from './entity.data';
+import { UmbEntityData } from './entity.data';
 import { createDocumentTypeTreeItem } from './utils';
 import type { DocumentTypeTreeItemModel } from '@umbraco-cms/backend-api';
 import type { DocumentTypeDetails } from '@umbraco-cms/models';

@@ -1,4 +1,4 @@
-import type { UmbEntityData } from './entity.data';
+import { UmbEntityData } from './entity.data';
 import { createEntityTreeItem } from './utils';
 import type { EntityTreeItemModel } from '@umbraco-cms/backend-api';
 import type { DictionaryDetails } from '@umbraco-cms/models';
