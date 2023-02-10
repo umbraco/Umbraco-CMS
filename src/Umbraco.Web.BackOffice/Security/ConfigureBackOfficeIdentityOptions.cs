@@ -17,7 +17,7 @@ public sealed class ConfigureBackOfficeIdentityOptions : IConfigureOptions<BackO
     private readonly UserPasswordConfigurationSettings _userPasswordConfiguration;
     private readonly SecuritySettings _securitySettings;
 
-    [Obsolete("Use the constructor that accepts SecuritySettings. Will be removed in V12.")]
+    [Obsolete("Use the constructor that accepts SecuritySettings. Will be removed in V13.")]
     public ConfigureBackOfficeIdentityOptions(IOptions<UserPasswordConfigurationSettings> userPasswordConfiguration)
         : this(userPasswordConfiguration, StaticServiceProvider.Instance.GetRequiredService<IOptions<SecuritySettings>>())
     {
