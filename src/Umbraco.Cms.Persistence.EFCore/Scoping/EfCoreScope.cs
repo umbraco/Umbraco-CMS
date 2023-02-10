@@ -44,20 +44,6 @@ internal class EfCoreScope : IEfCoreScope
         _acquiredLocks = new Queue<IDistributedLock>();
         InstanceId = Guid.NewGuid();
 
-        // if (detachable)
-        // {
-        //     if (scopeContext is not null)
-        //     {
-        //         throw new ArgumentException("Cannot set context on detachable scope.", nameof(scopeContext));
-        //     }
-        //
-        //     Detachable = true;
-        //
-        //     ScopeContext = new ScopeContext();
-        //
-        //     return;
-        // }
-
         ScopeContext = scopeContext;
     }
 
