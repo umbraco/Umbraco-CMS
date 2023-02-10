@@ -1010,7 +1010,7 @@
         ],
         "operationId": "PostDictionaryUpload",
         "requestBody": {
-          "content": {}
+          "content": { }
         },
         "responses": {
           "200": {
@@ -5787,7 +5787,8 @@
         "properties": {
           "targetKey": {
             "type": "string",
-            "format": "uuid"
+            "format": "uuid",
+            "nullable": true
           }
         },
         "additionalProperties": false
@@ -5859,7 +5860,8 @@
         "properties": {
           "targetKey": {
             "type": "string",
-            "format": "uuid"
+            "format": "uuid",
+            "nullable": true
           }
         },
         "additionalProperties": false
@@ -6895,7 +6897,7 @@
           },
           "providerProperties": {
             "type": "object",
-            "additionalProperties": {},
+            "additionalProperties": { },
             "nullable": true
           }
         },
@@ -8547,7 +8549,7 @@
             "nullable": true
           }
         },
-        "additionalProperties": {}
+        "additionalProperties": { }
       },
       "ProfilingStatusModel": {
         "type": "object",
@@ -10027,7 +10029,7 @@
           "authorizationCode": {
             "authorizationUrl": "/umbraco/management/api/v1.0/security/back-office/authorize",
             "tokenUrl": "/umbraco/management/api/v1.0/security/back-office/token",
-            "scopes": {}
+            "scopes": { }
           }
         }
       }
@@ -10035,7 +10037,7 @@
   },
   "security": [
     {
-      "OAuth": []
+      "OAuth": [ ]
     }
   ]
 }
