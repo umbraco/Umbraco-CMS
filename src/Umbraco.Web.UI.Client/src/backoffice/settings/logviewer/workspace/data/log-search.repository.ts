@@ -30,7 +30,6 @@ export class UmbLogSearchRepository {
 			this.#notificationService = instance;
 			this.#checkIfInitialized();
 		});
-
 	}
 
 	#init() {
@@ -47,10 +46,10 @@ export class UmbLogSearchRepository {
 		}
 	}
 
-	async getSavedSearches() {
+	async getSavedSearches({ skip, take }: { skip: number; take: number }) {
 		await this.#init();
 
-		return this.#dataSource.getLogViewerSavedSearch();
+		return this.#dataSource.getAllSavedSearches({ skip, take });
 	}
 
 	// async insert(template: Template) {

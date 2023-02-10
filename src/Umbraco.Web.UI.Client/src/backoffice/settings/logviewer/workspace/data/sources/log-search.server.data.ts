@@ -1,5 +1,5 @@
 import { LogSearchDataSource } from '.';
-import { LogViewerResource } from '@umbraco-cms/backend-api';
+import { LogViewerResource, SavedLogSearch } from '@umbraco-cms/backend-api';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 import { tryExecuteAndNotify } from '@umbraco-cms/resources';
 
@@ -22,12 +22,44 @@ export class UmbLogSearchesServerDataSource implements LogSearchDataSource {
 	}
 
 	/**
-	 * Gets the user's saved searches
-	 * @param {string} key
+	 * Grabs all the log viewer saved searches from the server
+	 *
+	 * @param {{ skip?: number; take?: number }} { skip = 0, take = 100 }
 	 * @return {*}
 	 * @memberof UmbLogSearchesServerDataSource
 	 */
-	async getLogViewerSavedSearch() {
-		return await tryExecuteAndNotify(this.#host, LogViewerResource.getLogViewerSavedSearch({}));
+	async getAllSavedSearches({ skip = 0, take = 100 }: { skip?: number; take?: number }) {
+		return await tryExecuteAndNotify(this.#host, LogViewerResource.getLogViewerSavedSearch({ skip, take }));
+	}
+	/**
+	 * Get a log viewer saved search by name from the server
+	 *
+	 * @param {{ name: string }} { name }
+	 * @return {*}
+	 * @memberof UmbLogSearchesServerDataSource
+	 */
+	async getSavedSearchByName({ name }: { name: string }) {
+		return await tryExecuteAndNotify(this.#host, LogViewerResource.getLogViewerSavedSearchByName({ name }));
+	}
+
+	/**
+	 *	Post a new log viewer saved search to the server
+	 *
+	 * @param {{ requestBody?: SavedLogSearch }} { requestBody }
+	 * @return {*}
+	 * @memberof UmbLogSearchesServerDataSource
+	 */
+	async postLogViewerSavedSearch({ requestBody }: { requestBody?: SavedLogSearch }) {
+		return await tryExecuteAndNotify(this.#host, LogViewerResource.postLogViewerSavedSearch({ requestBody }));
+	}
+	/**
+	 * Remove a log viewer saved search by name from the server
+	 *
+	 * @param {{ name: string }} { name }
+	 * @return {*}
+	 * @memberof UmbLogSearchesServerDataSource
+	 */
+	async deleteSavedSearchByName({ name }: { name: string }) {
+		return await tryExecuteAndNotify(this.#host, LogViewerResource.deleteLogViewerSavedSearchByName({ name }));
 	}
 }

@@ -17,7 +17,7 @@ export class UmbLogViewerWorkspaceContext {
 	}
 
 	async getSavedSearches() {
-		const { data } = await this.#repository.getSavedSearches();
+		const { data } = await this.#repository.getSavedSearches({ skip: 0, take: 100 });
 
 		if (data) {
 			this.#data.next(data);
