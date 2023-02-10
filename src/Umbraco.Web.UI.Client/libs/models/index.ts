@@ -164,25 +164,3 @@ export interface DataSourceResponse<T = undefined> {
 	data?: T;
 	error?: ProblemDetailsModel;
 }
-
-export interface UmbRepositoryFactory<T> {
-	new (host: UmbControllerHostInterface): T;
-}
-
-export interface UmbTreeRepository {
-	requestRootItems: () => Promise<{
-		data: PagedEntityTreeItemModel | undefined;
-		error: ProblemDetailsModel | undefined;
-	}>;
-	requestChildrenOf: (parentKey: string | null) => Promise<{
-		data: PagedEntityTreeItemModel | undefined;
-		error: ProblemDetailsModel | undefined;
-	}>;
-	requestItems: (keys: string[]) => Promise<{
-		data: Array<EntityTreeItemModel> | undefined;
-		error: ProblemDetailsModel | undefined;
-	}>;
-	rootItems: () => Promise<Observable<EntityTreeItemModel[]>>;
-	childrenOf: (parentKey: string | null) => Promise<Observable<EntityTreeItemModel[]>>;
-	items: (keys: string[]) => Promise<Observable<EntityTreeItemModel[]>>;
-}
