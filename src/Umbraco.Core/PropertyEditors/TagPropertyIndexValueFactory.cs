@@ -3,7 +3,7 @@ using Umbraco.Cms.Core.Serialization;
 
 namespace Umbraco.Cms.Core.PropertyEditors;
 
-internal class TagPropertyIndexValueFactory : JsonPropertyIndexValueFactoryBase<string[]>, ITagPropertyIndexValueFactory
+public class TagPropertyIndexValueFactory : JsonPropertyIndexValueFactoryBase<string[]>, ITagPropertyIndexValueFactory
 {
     public TagPropertyIndexValueFactory(IJsonSerializer jsonSerializer) : base(jsonSerializer)
     {
