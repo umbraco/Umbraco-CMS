@@ -27,7 +27,7 @@ public class MoveDataTypeController : DataTypeControllerBase
     public async Task<IActionResult> Move(Guid key, DataTypeMoveModel dataTypeMoveModel)
     {
         IDataType? source = await _dataTypeService.GetAsync(key);
-        if (source == null)
+        if (source is null)
         {
             return NotFound();
         }

@@ -181,7 +181,7 @@ public interface IDataTypeService : IService
     /// <summary>
     /// Moves a <see cref="IDataType"/> to a given container
     /// </summary>
-    /// <param name="toMove">The data type to move</param>
+    /// <param name="toMove">The data type that will be moved</param>
     /// <param name="containerKey">The container key where the data type will be moved to.</param>
     /// <param name="userId">The user that did the Move action</param>
     /// <returns></returns>

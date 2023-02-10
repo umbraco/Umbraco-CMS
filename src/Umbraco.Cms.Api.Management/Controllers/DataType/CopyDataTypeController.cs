@@ -27,7 +27,7 @@ public class CopyDataTypeController : DataTypeControllerBase
     public async Task<IActionResult> Copy(Guid key, DataTypeCopyModel dataTypeCopyModel)
     {
         IDataType? source = await _dataTypeService.GetAsync(key);
-        if (source == null)
+        if (source is null)
         {
             return NotFound();
         }
