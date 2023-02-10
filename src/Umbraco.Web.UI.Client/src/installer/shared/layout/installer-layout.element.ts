@@ -1,4 +1,4 @@
-import {css, CSSResultGroup, html, LitElement, unsafeCSS} from 'lit';
+import { css, CSSResultGroup, html, LitElement, unsafeCSS } from 'lit';
 import { customElement } from 'lit/decorators.js';
 import logoImg from '/umbraco_logomark_white.svg';
 import installerImg from '/installer.jpg';
