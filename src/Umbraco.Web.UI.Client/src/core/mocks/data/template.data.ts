@@ -2,16 +2,16 @@ import { v4 as uuid } from 'uuid';
 import { UmbEntityData } from './entity.data';
 import { createEntityTreeItem } from './utils';
 import {
-	EntityTreeItem,
-	PagedEntityTreeItem,
-	Template,
+	EntityTreeItemModel,
+	PagedEntityTreeItemModel,
+	TemplateModel,
 	TemplateCreateModel,
-	TemplateScaffold,
+	TemplateScaffoldModel,
 } from '@umbraco-cms/backend-api';
 
-type TemplateDBItem = Template & EntityTreeItem;
+type TemplateDBItem = TemplateModel & EntityTreeItemModel;
 
-const createTemplate = (dbItem: TemplateDBItem): Template => {
+const createTemplate = (dbItem: TemplateDBItem): TemplateModel => {
 	return {
 		key: dbItem.key,
 		name: dbItem.name,
@@ -72,12 +72,12 @@ class UmbTemplateData extends UmbEntityData<TemplateDBItem> {
 		super(data);
 	}
 
-	getByKey(key: string): Template | undefined {
+	getByKey(key: string): TemplateModel | undefined {
 		const item = this.data.find((item) => item.key === key);
 		return item ? createTemplate(item) : undefined;
 	}
 
-	getScaffold(masterTemplateAlias: string): TemplateScaffold {
+	getScaffold(masterTemplateAlias: string): TemplateScaffoldModel {
 		return {
 			content: `Template Scaffold Mock: Layout = ${masterTemplateAlias || null};`,
 		};
@@ -92,26 +92,26 @@ class UmbTemplateData extends UmbEntityData<TemplateDBItem> {
 		return template;
 	}
 
-	update(template: Template) {
+	update(template: TemplateModel) {
 		this.updateData(template);
 		return template;
 	}
 
-	getTreeRoot(): PagedEntityTreeItem {
+	getTreeRoot(): PagedEntityTreeItemModel {
 		const items = this.data.filter((item) => item.parentKey === null);
 		const treeItems = items.map((item) => createEntityTreeItem(item));
 		const total = items.length;
 		return { items: treeItems, total };
 	}
 
-	getTreeItemChildren(key: string): PagedEntityTreeItem {
+	getTreeItemChildren(key: string): PagedEntityTreeItemModel {
 		const items = this.data.filter((item) => item.parentKey === key);
 		const treeItems = items.map((item) => createEntityTreeItem(item));
 		const total = items.length;
 		return { items: treeItems, total };
 	}
 
-	getTreeItem(keys: Array<string>): Array<EntityTreeItem> {
+	getTreeItem(keys: Array<string>): Array<EntityTreeItemModel> {
 		const items = this.data.filter((item) => keys.includes(item.key ?? ''));
 		return items.map((item) => createEntityTreeItem(item));
 	}

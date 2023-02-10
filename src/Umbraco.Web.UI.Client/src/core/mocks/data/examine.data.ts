@@ -1,4 +1,4 @@
-import { HealthStatus, Index, PagedIndex, SearchResult } from '@umbraco-cms/backend-api';
+import { HealthStatusModel, IndexModel, PagedIndexModel, SearchResultModel } from '@umbraco-cms/backend-api';
 
 export function getIndexByName(indexName: string) {
 	return Indexers.find((index) => {
@@ -7,15 +7,15 @@ export function getIndexByName(indexName: string) {
 	});
 }
 
-export function getSearchResultsMockData(): SearchResult[] {
+export function getSearchResultsMockData(): SearchResultModel[] {
 	return searchResultMockData;
 }
 
-export const Indexers: Index[] = [
+export const Indexers: IndexModel[] = [
 	{
 		name: 'ExternalIndex',
 		canRebuild: true,
-		healthStatus: HealthStatus.HEALTHY,
+		healthStatus: HealthStatusModel.HEALTHY,
 		documentCount: 0,
 		fieldCount: 0,
 		providerProperties: {
@@ -34,7 +34,7 @@ export const Indexers: Index[] = [
 	{
 		name: 'InternalIndex',
 		canRebuild: true,
-		healthStatus: HealthStatus.HEALTHY,
+		healthStatus: HealthStatusModel.HEALTHY,
 		documentCount: 0,
 		fieldCount: 0,
 		providerProperties: {
@@ -53,7 +53,7 @@ export const Indexers: Index[] = [
 	{
 		name: 'MemberIndex',
 		canRebuild: true,
-		healthStatus: HealthStatus.HEALTHY,
+		healthStatus: HealthStatusModel.HEALTHY,
 		fieldCount: 0,
 		documentCount: 0,
 		providerProperties: {
@@ -71,12 +71,12 @@ export const Indexers: Index[] = [
 	},
 ];
 
-export const PagedIndexers: PagedIndex = {
+export const PagedIndexers: PagedIndexModel = {
 	items: Indexers,
 	total: 0,
 };
 
-export const searchResultMockData: SearchResult[] = [
+export const searchResultMockData: SearchResultModel[] = [
 	{
 		id: '1',
 		score: 1,

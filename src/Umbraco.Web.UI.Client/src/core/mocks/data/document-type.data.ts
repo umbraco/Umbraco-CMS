@@ -1,6 +1,6 @@
-import { UmbEntityData } from './entity.data';
+import type { UmbEntityData } from './entity.data';
 import { createDocumentTypeTreeItem } from './utils';
-import { DocumentTypeTreeItem } from '@umbraco-cms/backend-api';
+import type { DocumentTypeTreeItemModel } from '@umbraco-cms/backend-api';
 import type { DocumentTypeDetails } from '@umbraco-cms/models';
 
 export const data: Array<DocumentTypeDetails> = [
@@ -41,17 +41,17 @@ class UmbDocumentTypeData extends UmbEntityData<DocumentTypeDetails> {
 		super(data);
 	}
 
-	getTreeRoot(): Array<DocumentTypeTreeItem> {
+	getTreeRoot(): Array<DocumentTypeTreeItemModel> {
 		const rootItems = this.data.filter((item) => item.parentKey === null);
 		return rootItems.map((item) => createDocumentTypeTreeItem(item));
 	}
 
-	getTreeItemChildren(key: string): Array<DocumentTypeTreeItem> {
+	getTreeItemChildren(key: string): Array<DocumentTypeTreeItemModel> {
 		const childItems = this.data.filter((item) => item.parentKey === key);
 		return childItems.map((item) => createDocumentTypeTreeItem(item));
 	}
 
-	getTreeItem(keys: Array<string>): Array<DocumentTypeTreeItem> {
+	getTreeItem(keys: Array<string>): Array<DocumentTypeTreeItemModel> {
 		const items = this.data.filter((item) => keys.includes(item.key ?? ''));
 		return items.map((item) => createDocumentTypeTreeItem(item));
 	}

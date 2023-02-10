@@ -4,7 +4,7 @@ import { customElement, state, query, property } from 'lit/decorators.js';
 import { UUIButtonState, UUIPaginationElement, UUIPaginationEvent } from '@umbraco-ui/uui';
 import { UmbModalService, UMB_MODAL_SERVICE_CONTEXT_TOKEN } from '../../../../core/modal';
 import { UmbLitElement } from '@umbraco-cms/element';
-import { RedirectManagementResource, RedirectStatus, RedirectUrl } from '@umbraco-cms/backend-api';
+import { RedirectManagementResource, RedirectStatusModel, RedirectUrlModel } from '@umbraco-cms/backend-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/resources';
 
 @customElement('umb-dashboard-redirect-management')
@@ -82,7 +82,7 @@ export class UmbDashboardRedirectManagementElement extends UmbLitElement {
 	itemsPerPage = 20;
 
 	@state()
-	private _redirectData?: RedirectUrl[];
+	private _redirectData?: RedirectUrlModel[];
 
 	@state()
 	private _trackerStatus = true;
@@ -122,10 +122,10 @@ export class UmbDashboardRedirectManagementElement extends UmbLitElement {
 
 	private async _getTrackerStatus() {
 		const { data } = await tryExecuteAndNotify(this, RedirectManagementResource.getRedirectManagementStatus());
-		if (data && data.status) this._trackerStatus = data.status === RedirectStatus.ENABLED ? true : false;
+		if (data && data.status) this._trackerStatus = data.status === RedirectStatusModel.ENABLED ? true : false;
 	}
 
-	private _removeRedirectHandler(data: RedirectUrl) {
+	private _removeRedirectHandler(data: RedirectUrlModel) {
 		const modalHandler = this._modalService?.confirm({
 			headline: 'Delete',
 			content: html`
@@ -144,7 +144,7 @@ export class UmbDashboardRedirectManagementElement extends UmbLitElement {
 		});
 	}
 
-	private async _removeRedirect(r: RedirectUrl) {
+	private async _removeRedirect(r: RedirectUrlModel) {
 		if (!r.key) return;
 		const res = await tryExecuteAndNotify(
 			this,
@@ -171,7 +171,7 @@ export class UmbDashboardRedirectManagementElement extends UmbLitElement {
 	private async _toggleRedirect() {
 		const { error } = await tryExecuteAndNotify(
 			this,
-			RedirectManagementResource.postRedirectManagementStatus({ status: RedirectStatus.ENABLED })
+			RedirectManagementResource.postRedirectManagementStatus({ status: RedirectStatusModel.ENABLED })
 		);
 
 		if (!error) {

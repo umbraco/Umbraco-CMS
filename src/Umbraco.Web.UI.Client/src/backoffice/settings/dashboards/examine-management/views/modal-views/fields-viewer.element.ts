@@ -2,10 +2,10 @@ import { html, css, nothing } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement } from 'lit/decorators.js';
 import { UmbModalLayoutElement } from '../../../../../../core/modal';
-import { SearchResult } from '@umbraco-cms/backend-api';
+import type { SearchResultModel } from '@umbraco-cms/backend-api';
 
 @customElement('umb-modal-layout-fields-viewer')
-export class UmbModalLayoutFieldsViewerElement extends UmbModalLayoutElement<SearchResult & { name: string }> {
+export class UmbModalLayoutFieldsViewerElement extends UmbModalLayoutElement<SearchResultModel & { name: string }> {
 	static styles = [
 		UUITextStyles,
 		css`

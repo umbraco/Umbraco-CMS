@@ -1,8 +1,8 @@
 import { UmbContextToken } from '@umbraco-cms/context-api';
 import { ArrayState } from '@umbraco-cms/observable-api';
 import { UmbStoreBase } from '@umbraco-cms/store';
-import { Template } from '@umbraco-cms/backend-api';
-import { UmbControllerHostInterface } from '@umbraco-cms/controller';
+import type { TemplateModel } from '@umbraco-cms/backend-api';
+import type { UmbControllerHostInterface } from '@umbraco-cms/controller';
 
 /**
  * @export
@@ -11,7 +11,7 @@ import { UmbControllerHostInterface } from '@umbraco-cms/controller';
  * @description - Data Store for Template Details
  */
 export class UmbTemplateDetailStore extends UmbStoreBase {
-	#data = new ArrayState<Template>([], (x) => x.key);
+	#data = new ArrayState<TemplateModel>([], (x) => x.key);
 
 	/**
 	 * Creates an instance of UmbTemplateDetailStore.
@@ -27,7 +27,7 @@ export class UmbTemplateDetailStore extends UmbStoreBase {
 	 * @param {Template} template
 	 * @memberof UmbTemplateDetailStore
 	 */
-	append(template: Template) {
+	append(template: TemplateModel) {
 		this.#data.append([template]);
 	}
 

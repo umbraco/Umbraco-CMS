@@ -25,7 +25,7 @@ export class UmbDashboardCollectionElement extends UmbLitElement {
 	];
 
 	// TODO: Use the right type here:
-	private _collectionContext?: UmbCollectionContext<FolderTreeItem, UmbMediaTreeStore>;
+	private _collectionContext?: UmbCollectionContext<FolderTreeItemModel, UmbMediaTreeStore>;
 
 	public manifest!: ManifestDashboardCollection;
 

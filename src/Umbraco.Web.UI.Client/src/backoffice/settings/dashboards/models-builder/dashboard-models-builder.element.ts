@@ -3,7 +3,7 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html, nothing } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 
-import { ModelsBuilder, ModelsBuilderResource, ModelsMode } from '@umbraco-cms/backend-api';
+import { ModelsBuilderModel, ModelsBuilderResource, ModelsModeModel } from '@umbraco-cms/backend-api';
 import { UmbLitElement } from '@umbraco-cms/element';
 import { tryExecuteAndNotify } from '@umbraco-cms/resources';
 
@@ -41,7 +41,7 @@ export class UmbDashboardModelsBuilderElement extends UmbLitElement {
 	];
 
 	@state()
-	private _modelsBuilder?: ModelsBuilder;
+	private _modelsBuilder?: ModelsBuilderModel;
 
 	@state()
 	private _buttonStateBuild: UUIButtonState = undefined;
@@ -129,7 +129,7 @@ export class UmbDashboardModelsBuilderElement extends UmbLitElement {
 	}
 
 	private renderList() {
-		if (this._modelsBuilder?.mode !== ModelsMode.NOTHING) {
+		if (this._modelsBuilder?.mode !== ModelsModeModel.NOTHING) {
 			return html`${this._modelsBuilder?.modelsNamespace
 				? html`<li>The <strong>models namespace</strong> is ${this._modelsBuilder.modelsNamespace}.</li>`
 				: nothing}
@@ -144,13 +144,13 @@ export class UmbDashboardModelsBuilderElement extends UmbLitElement {
 
 	renderModelsMode() {
 		switch (this._modelsBuilder?.mode) {
-			case ModelsMode.IN_MEMORY_AUTO:
+			case ModelsModeModel.IN_MEMORY_AUTO:
 				return 'Strongly typed models are re-generated on startup and anytime schema changes (i.e. Content Type) are made. No recompilation necessary but the generated models are not available to code outside of Razor.';
-			case ModelsMode.SOURCE_CODE_MANUAL:
+			case ModelsModeModel.SOURCE_CODE_MANUAL:
 				return 'Strongly typed models are generated on demand. Recompilation is necessary and models are available to all CSharp code.';
-			case ModelsMode.SOURCE_CODE_AUTO:
+			case ModelsModeModel.SOURCE_CODE_AUTO:
 				return 'Strong typed models are generated on demand and anytime schema changes (i.e. Content Type) are made. Recompilation is necessary and models are available to all CSharp code.';
-			case ModelsMode.NOTHING:
+			case ModelsModeModel.NOTHING:
 				return 'Strongly typed models are not generated. All content and cache will operate from instance of IPublishedContent only.';
 			default:
 				return;

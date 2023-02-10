@@ -2,7 +2,7 @@ import type { TemplateModel } from '@umbraco-cms/backend-api';
 import type { DataSourceResponse } from '@umbraco-cms/models';
 
 export interface TemplateDetailDataSource {
-	createScaffold(parentKey: string | null): Promise<DataSourceResponse<TemplateModel>>;
+	createScaffold(): Promise<DataSourceResponse<TemplateModel>>;
 	get(key: string): Promise<DataSourceResponse<TemplateModel>>;
 	insert(template: TemplateModel): Promise<DataSourceResponse>;
 	update(template: TemplateModel): Promise<DataSourceResponse>;
