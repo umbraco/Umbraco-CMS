@@ -863,6 +863,63 @@
         }
       }
     },
+    "/umbraco/management/api/v1/dictionary/{key}/move": {
+      "post": {
+        "tags": [
+          "Dictionary"
+        ],
+        "operationId": "PostDictionaryByKeyMove",
+        "parameters": [
+          {
+            "name": "key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/DictionaryMoveModel"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetailsModel"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetailsModel"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/umbraco/management/api/v1/dictionary/import": {
       "post": {
         "tags": [
@@ -2374,7 +2431,18 @@
             }
           },
           "200": {
-            "description": "Success"
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/LogLevelCountsModel"
+                    }
+                  ]
+                }
+              }
+            }
           }
         }
       }
@@ -6342,6 +6410,17 @@
         },
         "additionalProperties": false
       },
+      "DictionaryMoveModel": {
+        "type": "object",
+        "properties": {
+          "targetKey": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
       "DictionaryOverviewModel": {
         "type": "object",
         "properties": {
@@ -7368,6 +7447,32 @@
         ],
         "type": "integer",
         "format": "int32"
+      },
+      "LogLevelCountsModel": {
+        "type": "object",
+        "properties": {
+          "information": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "debug": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "warning": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "error": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "fatal": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "additionalProperties": false
       },
       "LogLevelModel": {
         "enum": [

@@ -27,6 +27,10 @@ public abstract class DictionaryControllerBase : ManagementApiControllerBase
                 .WithTitle("Cancelled by notification")
                 .WithDetail("A notification handler prevented the dictionary item operation.")
                 .Build()),
+            DictionaryItemOperationStatus.InvalidParent => BadRequest(new ProblemDetailsBuilder()
+                .WithTitle("Invalid parent")
+                .WithDetail("The targeted parent dictionary item is not valid for this dictionary item operation.")
+                .Build()),
             _ => StatusCode(StatusCodes.Status500InternalServerError, "Unknown dictionary operation status")
         };
 }

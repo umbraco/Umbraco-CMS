@@ -175,6 +175,39 @@ public class DictionaryItemServiceTests : UmbracoIntegrationTest
     }
 
     [Test]
+    public async Task Can_Create_DictionaryItem_Under_Parent_DictionaryItem()
+    {
+        var english = await LanguageService.GetAsync("en-US");
+
+        var result = await DictionaryItemService.CreateAsync(
+            new DictionaryItem("Testing123")
+            {
+                Translations = new List<IDictionaryTranslation> { new DictionaryTranslation(english, "Hello parent") }
+            });
+        Assert.True(result.Success);
+        var parentKey = result.Result.Key;
+
+        result = await DictionaryItemService.CreateAsync(
+            new DictionaryItem("Testing456")
+            {
+                Translations = new List<IDictionaryTranslation> { new DictionaryTranslation(english, "Hello child") },
+                ParentId = parentKey
+            });
+        Assert.True(result.Success);
+
+        // re-get
+        var item = await DictionaryItemService.GetAsync(result.Result!.Key);
+        Assert.NotNull(item);
+
+        Assert.Greater(item.Id, 0);
+        Assert.IsTrue(item.HasIdentity);
+        Assert.IsTrue(item.ParentId.HasValue);
+        Assert.AreEqual("Testing456", item.ItemKey);
+        Assert.AreEqual(1, item.Translations.Count());
+        Assert.AreEqual(parentKey, item.ParentId);
+    }
+
+    [Test]
     public async Task Can_Create_DictionaryItem_At_Root_With_All_Languages()
     {
         var allLangs = (await LanguageService.GetAllAsync()).ToArray();
@@ -332,6 +365,68 @@ public class DictionaryItemServiceTests : UmbracoIntegrationTest
     }
 
     [Test]
+    public async Task Can_Move_DictionaryItem_To_Root()
+    {
+        var rootOneKey = (await DictionaryItemService.CreateAsync(new DictionaryItem("RootOne"))).Result.Key;
+        var childKey = (await DictionaryItemService.CreateAsync(new DictionaryItem("ChildOne") { ParentId = rootOneKey })).Result.Key;
+
+        var child = await DictionaryItemService.GetAsync(childKey);
+        Assert.AreEqual(rootOneKey, child.ParentId);
+
+        var result = await DictionaryItemService.MoveAsync(child, null);
+        Assert.IsTrue(result.Success);
+        Assert.AreEqual(DictionaryItemOperationStatus.Success, result.Status);
+
+        child = await DictionaryItemService.GetAsync(childKey);
+        Assert.AreEqual(null, child.ParentId);
+
+        var rootItemKeys = (await DictionaryItemService.GetAtRootAsync()).Select(item => item.Key);
+        Assert.True(rootItemKeys.Contains(childKey));
+
+        var rootOneChildren = await DictionaryItemService.GetChildrenAsync(rootOneKey);
+        Assert.AreEqual(0, rootOneChildren.Count());
+    }
+
+    [Test]
+    public async Task Can_Move_DictionaryItem_To_Other_Parent()
+    {
+        var rootOneKey = (await DictionaryItemService.CreateAsync(new DictionaryItem("RootOne"))).Result.Key;
+        var rootTwoKey = (await DictionaryItemService.CreateAsync(new DictionaryItem("RootTwo"))).Result.Key;
+        var childKey = (await DictionaryItemService.CreateAsync(new DictionaryItem("ChildOne") { ParentId = rootOneKey })).Result.Key;
+
+        var child = await DictionaryItemService.GetAsync(childKey);
+        Assert.AreEqual(rootOneKey, child.ParentId);
+
+        var result = await DictionaryItemService.MoveAsync(child, rootTwoKey);
+        Assert.IsTrue(result.Success);
+        Assert.AreEqual(DictionaryItemOperationStatus.Success, result.Status);
+
+        child = await DictionaryItemService.GetAsync(childKey);
+        Assert.AreEqual(rootTwoKey, child.ParentId);
+    }
+
+    [Test]
+    public async Task Can_Move_DictionaryItem_From_Root()
+    {
+        var rootOneKey = (await DictionaryItemService.CreateAsync(new DictionaryItem("RootOne"))).Result.Key;
+        var rootTwoKey = (await DictionaryItemService.CreateAsync(new DictionaryItem("RootTwo"))).Result.Key;
+        var childKey = (await DictionaryItemService.CreateAsync(new DictionaryItem("ChildOne") { ParentId = rootOneKey })).Result.Key;
+
+        var rootTwo = await DictionaryItemService.GetAsync(rootTwoKey);
+        Assert.IsNull(rootTwo.ParentId);
+
+        var result = await DictionaryItemService.MoveAsync(rootTwo, childKey);
+        Assert.IsTrue(result.Success);
+        Assert.AreEqual(DictionaryItemOperationStatus.Success, result.Status);
+
+        rootTwo = await DictionaryItemService.GetAsync(rootTwoKey);
+        Assert.AreEqual(childKey, rootTwo.ParentId);
+
+        var rootItemKeys = (await DictionaryItemService.GetAtRootAsync()).Select(item => item.Key);
+        Assert.IsFalse(rootItemKeys.Contains(rootTwoKey));
+    }
+
+    [Test]
     public async Task Cannot_Add_Duplicate_DictionaryItem_ItemKey()
     {
         var item = await DictionaryItemService.GetAsync("Child");
@@ -448,6 +543,48 @@ public class DictionaryItemServiceTests : UmbracoIntegrationTest
         var result = await DictionaryItemService.CreateAsync(childItem);
         Assert.IsFalse(result.Success);
         Assert.AreEqual(DictionaryItemOperationStatus.InvalidId, result.Status);
+    }
+
+    [Test]
+    public async Task Cannot_Move_DictionaryItem_To_Itself()
+    {
+        var root = (await DictionaryItemService.CreateAsync(new DictionaryItem("RootOne"))).Result;
+
+        var result = await DictionaryItemService.MoveAsync(root, root.Key);
+        Assert.IsFalse(result.Success);
+        Assert.AreEqual(DictionaryItemOperationStatus.InvalidParent, result.Status);
+
+        root = await DictionaryItemService.GetAsync(root.Key);
+        Assert.IsNull(root.ParentId);
+    }
+
+    [Test]
+    public async Task Cannot_Move_DictionaryItem_To_Child()
+    {
+        var root = (await DictionaryItemService.CreateAsync(new DictionaryItem("RootOne"))).Result;
+        var child = (await DictionaryItemService.CreateAsync(new DictionaryItem("ChildOne") { ParentId = root.Key })).Result;
+
+        var result = await DictionaryItemService.MoveAsync(root, child.Key);
+        Assert.IsFalse(result.Success);
+        Assert.AreEqual(DictionaryItemOperationStatus.InvalidParent, result.Status);
+
+        root = await DictionaryItemService.GetAsync(root.Key);
+        Assert.IsNull(root.ParentId);
+    }
+
+    [Test]
+    public async Task Cannot_Move_DictionaryItem_To_Descendant()
+    {
+        var root = (await DictionaryItemService.CreateAsync(new DictionaryItem("RootOne"))).Result;
+        var child = (await DictionaryItemService.CreateAsync(new DictionaryItem("ChildOne") { ParentId = root.Key })).Result;
+        var grandChild = (await DictionaryItemService.CreateAsync(new DictionaryItem("GrandChildOne") { ParentId = child.Key })).Result;
+
+        var result = await DictionaryItemService.MoveAsync(root, grandChild.Key);
+        Assert.IsFalse(result.Success);
+        Assert.AreEqual(DictionaryItemOperationStatus.InvalidParent, result.Status);
+
+        root = await DictionaryItemService.GetAsync(root.Key);
+        Assert.IsNull(root.ParentId);
     }
 
     private async Task CreateTestData()

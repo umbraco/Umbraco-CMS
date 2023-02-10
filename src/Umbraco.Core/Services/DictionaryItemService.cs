@@ -171,6 +171,67 @@ internal sealed class DictionaryItemService : RepositoryService, IDictionaryItem
         }
     }
 
+    /// <inheritdoc/>
+    public async Task<Attempt<IDictionaryItem, DictionaryItemOperationStatus>> MoveAsync(
+        IDictionaryItem dictionaryItem,
+        Guid? parentId,
+        int userId = Constants.Security.SuperUserId)
+    {
+        // same parent? then just ignore this operation, assume success.
+        if (dictionaryItem.ParentId == parentId)
+        {
+            return Attempt.SucceedWithStatus(DictionaryItemOperationStatus.Success, dictionaryItem);
+        }
+
+        // cannot move a dictionary item underneath itself
+        if (dictionaryItem.Key == parentId)
+        {
+            return Attempt.FailWithStatus(DictionaryItemOperationStatus.InvalidParent, dictionaryItem);
+        }
+
+        using (ICoreScope scope = ScopeProvider.CreateCoreScope())
+        {
+            IDictionaryItem? parent = parentId.HasValue ? _dictionaryRepository.Get(parentId.Value) : null;
+
+            // validate parent if applicable
+            if (parentId.HasValue && parent == null)
+            {
+                return Attempt.FailWithStatus(DictionaryItemOperationStatus.ParentNotFound, dictionaryItem);
+            }
+
+            // ensure we don't move a dictionary item underneath one of its own descendants
+            if (parent != null)
+            {
+                IEnumerable<IDictionaryItem> descendants = _dictionaryRepository.GetDictionaryItemDescendants(dictionaryItem.Key);
+                if (descendants.Any(item => item.Key == parent.Key))
+                {
+                    return Attempt.FailWithStatus(DictionaryItemOperationStatus.InvalidParent, dictionaryItem);
+                }
+            }
+
+            dictionaryItem.ParentId = parentId;
+
+            EventMessages eventMessages = EventMessagesFactory.Get();
+            var moveEventInfo = new MoveEventInfo<IDictionaryItem>(dictionaryItem, string.Empty, parent?.Id ?? Constants.System.Root);
+            var movingNotification = new DictionaryItemMovingNotification(moveEventInfo, eventMessages);
+            if (await scope.Notifications.PublishCancelableAsync(movingNotification))
+            {
+                scope.Complete();
+                return Attempt.FailWithStatus(DictionaryItemOperationStatus.CancelledByNotification, dictionaryItem);
+            }
+
+            _dictionaryRepository.Save(dictionaryItem);
+
+            scope.Notifications.Publish(
+                new DictionaryItemMovedNotification(moveEventInfo, eventMessages).WithStateFrom(movingNotification));
+
+            Audit(AuditType.Move, "Move DictionaryItem", userId, dictionaryItem.Id, nameof(DictionaryItem));
+            scope.Complete();
+
+            return await Task.FromResult(Attempt.SucceedWithStatus(DictionaryItemOperationStatus.Success, dictionaryItem));
+        }
+    }
+
     private async Task<Attempt<IDictionaryItem, DictionaryItemOperationStatus>> SaveAsync(
         IDictionaryItem dictionaryItem,
         Func<DictionaryItemOperationStatus> operationValidation,
