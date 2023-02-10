@@ -32,9 +32,9 @@ public class NestedContentPropertyEditor : DataEditor
     public const string ContentTypeAliasPropertyKey = "ncContentTypeAlias";
     private readonly IEditorConfigurationParser _editorConfigurationParser;
     private readonly IIOHelper _ioHelper;
+    private readonly INestedContentPropertyIndexValueFactory _nestedContentPropertyIndexValueFactory;
 
-    // Scheduled for removal in v12
-    [Obsolete("Please use constructor that takes an IEditorConfigurationParser instead")]
+    [Obsolete("Use non-obsoleted ctor. This will be removed in Umbraco 12.")]
     public NestedContentPropertyEditor(
         IDataValueEditorFactory dataValueEditorFactory,
         IIOHelper ioHelper)
@@ -42,16 +42,34 @@ public class NestedContentPropertyEditor : DataEditor
     {
     }
 
+    [Obsolete("Use non-obsoleted ctor. This will be removed in Umbraco 13.")]
     public NestedContentPropertyEditor(
         IDataValueEditorFactory dataValueEditorFactory,
         IIOHelper ioHelper,
         IEditorConfigurationParser editorConfigurationParser)
+        : this(
+            dataValueEditorFactory,
+            ioHelper,
+            editorConfigurationParser,
+            StaticServiceProvider.Instance.GetRequiredService<INestedContentPropertyIndexValueFactory>())
+    {
+
+    }
+
+    public NestedContentPropertyEditor(
+        IDataValueEditorFactory dataValueEditorFactory,
+        IIOHelper ioHelper,
+        IEditorConfigurationParser editorConfigurationParser,
+        INestedContentPropertyIndexValueFactory nestedContentPropertyIndexValueFactory)
         : base(dataValueEditorFactory)
     {
         _ioHelper = ioHelper;
         _editorConfigurationParser = editorConfigurationParser;
+        _nestedContentPropertyIndexValueFactory = nestedContentPropertyIndexValueFactory;
         SupportsReadOnly = true;
     }
+
+    public override IPropertyIndexValueFactory PropertyIndexValueFactory => _nestedContentPropertyIndexValueFactory;
 
     #region Pre Value Editor
 
