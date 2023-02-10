@@ -1,7 +1,7 @@
 import type { DataSourceResponse } from '@umbraco-cms/models';
-import { EntityTreeItem, PagedEntityTreeItem } from '@umbraco-cms/backend-api';
+import { EntityTreeItemModel, PagedEntityTreeItemModel } from '@umbraco-cms/backend-api';
 
 export interface MemberGroupTreeDataSource {
-	getRootItems(): Promise<DataSourceResponse<PagedEntityTreeItem>>;
-	getItems(key: Array<string>): Promise<DataSourceResponse<EntityTreeItem[]>>;
+	getRootItems(): Promise<DataSourceResponse<PagedEntityTreeItemModel>>;
+	getItems(key: Array<string>): Promise<DataSourceResponse<EntityTreeItemModel[]>>;
 }

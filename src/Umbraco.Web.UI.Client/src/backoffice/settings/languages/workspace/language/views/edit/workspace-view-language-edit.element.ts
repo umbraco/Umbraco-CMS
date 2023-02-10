@@ -11,7 +11,7 @@ import {
 	UMB_LANGUAGE_STORE_CONTEXT_TOKEN,
 } from '../../../../language.store';
 import { UmbLitElement } from '@umbraco-cms/element';
-import { Culture, Language } from '@umbraco-cms/backend-api';
+import { CultureModel, LanguageModel } from '@umbraco-cms/backend-api';
 
 @customElement('umb-workspace-view-language-edit')
 export class UmbWorkspaceViewLanguageEditElement extends UmbLitElement {
@@ -56,13 +56,13 @@ export class UmbWorkspaceViewLanguageEditElement extends UmbLitElement {
 	private _languages: UmbLanguageStoreItemType[] = [];
 
 	@state()
-	private _availableCultures: Culture[] = [];
+	private _availableCultures: CultureModel[] = [];
 
 	@state()
 	private _search = '';
 
 	@state()
-	private _startData: Language | null = null;
+	private _startData: LanguageModel | null = null;
 
 	#languageWorkspaceContext?: UmbWorkspaceLanguageContext;
 
@@ -153,7 +153,7 @@ export class UmbWorkspaceViewLanguageEditElement extends UmbLitElement {
 		}
 	}
 
-	get #filteredCultures(): Array<Culture> {
+	get #filteredCultures(): Array<CultureModel> {
 		return this._availableCultures.filter((culture) => {
 			return culture.englishName?.toLowerCase().includes(this._search.toLowerCase());
 		});

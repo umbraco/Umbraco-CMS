@@ -3,7 +3,7 @@ import { MemberTreeServerDataSource } from './sources/member.tree.server.data';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 import { UmbNotificationService, UMB_NOTIFICATION_SERVICE_CONTEXT_TOKEN } from '@umbraco-cms/notification';
 import { UmbContextConsumerController } from '@umbraco-cms/context-api';
-import { ProblemDetails } from '@umbraco-cms/backend-api';
+import { ProblemDetailsModel } from '@umbraco-cms/backend-api';
 import type { UmbTreeRepository } from '@umbraco-cms/models';
 
 export class UmbMemberTreeRepository implements UmbTreeRepository {
@@ -54,15 +54,15 @@ export class UmbMemberTreeRepository implements UmbTreeRepository {
 	}
 
 	async requestChildrenOf(parentKey: string | null) {
-		const error: ProblemDetails = { title: 'Not implemented' };
-		return { data: undefined, error };	
+		const error: ProblemDetailsModel = { title: 'Not implemented' };
+		return { data: undefined, error };
 	}
 
 	async requestItems(keys: Array<string>) {
 		await this.#init;
 
 		if (!keys) {
-			const error: ProblemDetails = { title: 'Keys are missing' };
+			const error: ProblemDetailsModel = { title: 'Keys are missing' };
 			return { data: undefined, error };
 		}
 
