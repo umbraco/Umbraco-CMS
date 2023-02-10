@@ -4,18 +4,28 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.PropertyEditors;
 
+/// <summary>
+///  Abstract base for property index value factories where the value is json.
+/// </summary>
+/// <typeparam name="TSerialized">The type to deserialize the json to.</typeparam>
 public abstract class JsonPropertyIndexValueFactoryBase<TSerialized> : IPropertyIndexValueFactory
 {
     private readonly IJsonSerializer _jsonSerializer;
 
+    /// <summary>
+    ///  Constructor for the JsonPropertyIndexValueFactoryBase.
+    /// </summary>
     protected JsonPropertyIndexValueFactoryBase(IJsonSerializer jsonSerializer)
     {
         _jsonSerializer = jsonSerializer;
     }
 
-
-    public IEnumerable<KeyValuePair<string, IEnumerable<object?>>> GetIndexValues(IProperty property, string? culture,
-        string? segment, bool published)
+    /// <inheritdoc />
+    public IEnumerable<KeyValuePair<string, IEnumerable<object?>>> GetIndexValues(
+        IProperty property,
+        string? culture,
+        string? segment,
+        bool published)
     {
         var result = new List<KeyValuePair<string, IEnumerable<object?>>>();
 
@@ -52,9 +62,23 @@ public abstract class JsonPropertyIndexValueFactoryBase<TSerialized> : IProperty
         return result;
     }
 
-    protected virtual IEnumerable<KeyValuePair<string, IEnumerable<object?>>> HandleResume(List<KeyValuePair<string, IEnumerable<object?>>> result, IProperty property, string? culture,
-        string? segment, bool published) => ArraySegment<KeyValuePair<string, IEnumerable<object?>>>.Empty;
+    /// <summary>
+    ///  Method to return a list of resume of the content. By default this returns an empty list
+    /// </summary>
+    protected virtual IEnumerable<KeyValuePair<string, IEnumerable<object?>>> HandleResume(
+        List<KeyValuePair<string, IEnumerable<object?>>> result,
+        IProperty property,
+        string? culture,
+        string? segment,
+        bool published) => Array.Empty<KeyValuePair<string, IEnumerable<object?>>>();
 
-    protected abstract IEnumerable<KeyValuePair<string, IEnumerable<object?>>> Handle(TSerialized deserializedObject, IProperty property, string? culture,
-        string? segment, bool published);
+    /// <summary>
+    ///  Method that handle the deserialized object.
+    /// </summary>
+    protected abstract IEnumerable<KeyValuePair<string, IEnumerable<object?>>> Handle(
+        TSerialized deserializedObject,
+        IProperty property,
+        string? culture,
+        string? segment,
+        bool published);
 }
