@@ -4,6 +4,7 @@ public class ReadOnlyUserGroup : IReadOnlyUserGroup, IEquatable<ReadOnlyUserGrou
 {
     public ReadOnlyUserGroup(
         int id,
+        Guid key,
         string? name,
         string? icon,
         int? startContentId,
@@ -17,6 +18,7 @@ public class ReadOnlyUserGroup : IReadOnlyUserGroup, IEquatable<ReadOnlyUserGrou
         Name = name ?? string.Empty;
         Icon = icon;
         Id = id;
+        Key = key;
         Alias = alias ?? string.Empty;
         AllowedLanguages = allowedLanguages.ToArray();
         AllowedSections = allowedSections.ToArray();
@@ -28,21 +30,9 @@ public class ReadOnlyUserGroup : IReadOnlyUserGroup, IEquatable<ReadOnlyUserGrou
         HasAccessToAllLanguages = hasAccessToAllLanguages;
     }
 
-    [Obsolete("please use ctor that takes allowedActions & hasAccessToAllLanguages instead, scheduled for removal in v12")]
-    public ReadOnlyUserGroup(
-        int id,
-        string? name,
-        string? icon,
-        int? startContentId,
-        int? startMediaId,
-        string? alias,
-        IEnumerable<string> allowedSections,
-        IEnumerable<string>? permissions)
-    : this(id, name, icon, startContentId, startMediaId, alias, Enumerable.Empty<int>(), allowedSections, permissions, true)
-    {
-    }
-
     public int Id { get; }
+
+    public Guid Key { get; }
 
     public bool Equals(ReadOnlyUserGroup? other)
     {

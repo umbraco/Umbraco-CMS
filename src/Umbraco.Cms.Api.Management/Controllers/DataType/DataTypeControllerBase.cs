@@ -1,12 +1,9 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Common.Builders;
 using Umbraco.Cms.Api.Management.Routing;
 using Umbraco.Cms.Core;
-using Umbraco.Cms.Core.Models;
-using Umbraco.Cms.Core.Models.Membership;
-using Umbraco.Cms.Core.Security;
-using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Api.Management.Controllers.DataType;
 
@@ -16,19 +13,23 @@ namespace Umbraco.Cms.Api.Management.Controllers.DataType;
 [ApiVersion("1.0")]
 public abstract class DataTypeControllerBase : ManagementApiControllerBase
 {
-    protected static ProblemDetails? Save(IDataType dataType, IDataTypeService dataTypeService, IBackOfficeSecurityAccessor backOfficeSecurityAccessor)
-    {
-        ValidationResult[] validationResults = dataTypeService.ValidateConfigurationData(dataType).ToArray();
-        if (validationResults.Any())
+    protected IActionResult DataTypeOperationStatusResult(DataTypeOperationStatus status) =>
+        status switch
         {
-            return new ProblemDetailsBuilder()
+            DataTypeOperationStatus.InvalidConfiguration => BadRequest(new ProblemDetailsBuilder()
                 .WithTitle("Invalid data type configuration")
-                .WithDetail(string.Join(Environment.NewLine, validationResults.Select(r => r.ErrorMessage)))
-                .Build();
-        }
-
-        dataTypeService.Save(dataType, CurrentUserId(backOfficeSecurityAccessor));
-
-        return null;
-    }
+                .WithDetail("The supplied data type configuration was not valid. Please see the log for more details.")
+                .Build()),
+            DataTypeOperationStatus.NotFound => NotFound("The data type could not be found"),
+            DataTypeOperationStatus.InvalidName => BadRequest(new ProblemDetailsBuilder()
+                .WithTitle("Invalid data type name")
+                .WithDetail("The data type name must be non-empty and no longer than 255 characters.")
+                .Build()),
+            DataTypeOperationStatus.CancelledByNotification => BadRequest(new ProblemDetailsBuilder()
+                .WithTitle("Cancelled by notification")
+                .WithDetail("A notification handler prevented the data type operation.")
+                .Build()),
+            DataTypeOperationStatus.ParentNotFound => NotFound("The targeted parent for the data type operation was not found."),
+            _ => StatusCode(StatusCodes.Status500InternalServerError, "Unknown data type operation status")
+        };
 }

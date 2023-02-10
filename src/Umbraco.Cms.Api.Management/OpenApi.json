@@ -38,7 +38,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PagedCulture"
+                  "$ref": "#/components/schemas/PagedCultureModel"
                 }
               }
             }
@@ -56,7 +56,11 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/DataTypeCreateModel"
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/DataTypeCreateModel"
+                  }
+                ]
               }
             }
           }
@@ -65,12 +69,22 @@
           "201": {
             "description": "Created"
           },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetailsModel"
+                }
+              }
+            }
+          },
           "404": {
             "description": "Not Found",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
+                  "$ref": "#/components/schemas/ProblemDetailsModel"
                 }
               }
             }
@@ -101,7 +115,11 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/DataType"
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/DataTypeModel"
+                    }
+                  ]
                 }
               }
             }
@@ -111,7 +129,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
+                  "$ref": "#/components/schemas/ProblemDetailsModel"
                 }
               }
             }
@@ -138,12 +156,22 @@
           "200": {
             "description": "Success"
           },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetailsModel"
+                }
+              }
+            }
+          },
           "404": {
             "description": "Not Found",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
+                  "$ref": "#/components/schemas/ProblemDetailsModel"
                 }
               }
             }
@@ -170,7 +198,115 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/DataTypeUpdateModel"
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/DataTypeUpdateModel"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetailsModel"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetailsModel"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/umbraco/management/api/v1/data-type/{key}/copy": {
+      "post": {
+        "tags": [
+          "Data Type"
+        ],
+        "operationId": "PostDataTypeByKeyCopy",
+        "parameters": [
+          {
+            "name": "key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/DataTypeCopyModel"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetailsModel"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/umbraco/management/api/v1/data-type/{key}/move": {
+      "post": {
+        "tags": [
+          "Data Type"
+        ],
+        "operationId": "PostDataTypeByKeyMove",
+        "parameters": [
+          {
+            "name": "key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/DataTypeMoveModel"
+                  }
+                ]
               }
             }
           }
@@ -184,7 +320,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
+                  "$ref": "#/components/schemas/ProblemDetailsModel"
                 }
               }
             }
@@ -217,7 +353,11 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/DataTypeReference"
+                    "oneOf": [
+                      {
+                        "$ref": "#/components/schemas/DataTypeReferenceModel"
+                      }
+                    ]
                   }
                 }
               }
@@ -228,7 +368,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
+                  "$ref": "#/components/schemas/ProblemDetailsModel"
                 }
               }
             }
@@ -246,7 +386,11 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/FolderCreateModel"
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/FolderCreateModel"
+                  }
+                ]
               }
             }
           }
@@ -281,7 +425,11 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Folder"
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/FolderModel"
+                    }
+                  ]
                 }
               }
             }
@@ -291,7 +439,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
+                  "$ref": "#/components/schemas/ProblemDetailsModel"
                 }
               }
             }
@@ -323,7 +471,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
+                  "$ref": "#/components/schemas/ProblemDetailsModel"
                 }
               }
             }
@@ -350,7 +498,11 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/FolderUpdateModel"
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/FolderUpdateModel"
+                  }
+                ]
               }
             }
           }
@@ -364,7 +516,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
+                  "$ref": "#/components/schemas/ProblemDetailsModel"
                 }
               }
             }
@@ -420,7 +572,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PagedFolderTreeItem"
+                  "$ref": "#/components/schemas/PagedFolderTreeItemModel"
                 }
               }
             }
@@ -455,7 +607,14 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/FolderTreeItem"
+                    "oneOf": [
+                      {
+                        "$ref": "#/components/schemas/FolderTreeItemModel"
+                      },
+                      {
+                        "$ref": "#/components/schemas/DocumentTypeTreeItemModel"
+                      }
+                    ]
                   }
                 }
               }
@@ -504,7 +663,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PagedFolderTreeItem"
+                  "$ref": "#/components/schemas/PagedFolderTreeItemModel"
                 }
               }
             }
@@ -544,7 +703,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PagedDictionaryOverview"
+                  "$ref": "#/components/schemas/PagedDictionaryOverviewModel"
                 }
               }
             }
@@ -560,7 +719,11 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/DictionaryItemCreateModel"
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/DictionaryItemCreateModel"
+                  }
+                ]
               }
             }
           }
@@ -574,7 +737,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
+                  "$ref": "#/components/schemas/ProblemDetailsModel"
                 }
               }
             }
@@ -584,7 +747,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
+                  "$ref": "#/components/schemas/ProblemDetailsModel"
                 }
               }
             }
@@ -594,7 +757,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
+                  "$ref": "#/components/schemas/ProblemDetailsModel"
                 }
               }
             }
@@ -625,7 +788,11 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/DictionaryItem"
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/DictionaryItemModel"
+                    }
+                  ]
                 }
               }
             }
@@ -635,7 +802,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
+                  "$ref": "#/components/schemas/ProblemDetailsModel"
                 }
               }
             }
@@ -667,7 +834,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
+                  "$ref": "#/components/schemas/ProblemDetailsModel"
                 }
               }
             }
@@ -677,7 +844,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
+                  "$ref": "#/components/schemas/ProblemDetailsModel"
                 }
               }
             }
@@ -704,7 +871,11 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/DictionaryItemUpdateModel"
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/DictionaryItemUpdateModel"
+                  }
+                ]
               }
             }
           }
@@ -718,7 +889,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
+                  "$ref": "#/components/schemas/ProblemDetailsModel"
                 }
               }
             }
@@ -728,7 +899,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
+                  "$ref": "#/components/schemas/ProblemDetailsModel"
                 }
               }
             }
@@ -736,12 +907,12 @@
         }
       }
     },
-    "/umbraco/management/api/v1/dictionary/export/{key}": {
+    "/umbraco/management/api/v1/dictionary/{key}/export": {
       "get": {
         "tags": [
           "Dictionary"
         ],
-        "operationId": "GetDictionaryExportByKey",
+        "operationId": "GetDictionaryByKeyExport",
         "parameters": [
           {
             "name": "key",
@@ -778,7 +949,64 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/NotFoundResult"
+                  "$ref": "#/components/schemas/NotFoundResultModel"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/umbraco/management/api/v1/dictionary/{key}/move": {
+      "post": {
+        "tags": [
+          "Dictionary"
+        ],
+        "operationId": "PostDictionaryByKeyMove",
+        "parameters": [
+          {
+            "name": "key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/DictionaryMoveModel"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetailsModel"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetailsModel"
                 }
               }
             }
@@ -792,30 +1020,29 @@
           "Dictionary"
         ],
         "operationId": "PostDictionaryImport",
-        "parameters": [
-          {
-            "name": "file",
-            "in": "query",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "parentId",
-            "in": "query",
-            "schema": {
-              "type": "integer",
-              "format": "int32"
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/DictionaryImportModel"
+                  }
+                ]
+              }
             }
           }
-        ],
+        },
         "responses": {
-          "200": {
-            "description": "Success",
+          "201": {
+            "description": "Created"
+          },
+          "400": {
+            "description": "Bad Request",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ContentResult"
+                  "$ref": "#/components/schemas/ProblemDetailsModel"
                 }
               }
             }
@@ -825,7 +1052,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/NotFoundResult"
+                  "$ref": "#/components/schemas/ProblemDetailsModel"
                 }
               }
             }
@@ -840,7 +1067,7 @@
         ],
         "operationId": "PostDictionaryUpload",
         "requestBody": {
-          "content": {}
+          "content": { }
         },
         "responses": {
           "200": {
@@ -848,7 +1075,11 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/DictionaryImport"
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/DictionaryUploadModel"
+                    }
+                  ]
                 }
               }
             }
@@ -858,7 +1089,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
+                  "$ref": "#/components/schemas/ProblemDetailsModel"
                 }
               }
             }
@@ -906,7 +1137,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PagedEntityTreeItem"
+                  "$ref": "#/components/schemas/PagedEntityTreeItemModel"
                 }
               }
             }
@@ -941,7 +1172,14 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/FolderTreeItem"
+                    "oneOf": [
+                      {
+                        "$ref": "#/components/schemas/FolderTreeItemModel"
+                      },
+                      {
+                        "$ref": "#/components/schemas/DocumentTypeTreeItemModel"
+                      }
+                    ]
                   }
                 }
               }
@@ -982,7 +1220,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PagedEntityTreeItem"
+                  "$ref": "#/components/schemas/PagedEntityTreeItemModel"
                 }
               }
             }
@@ -1017,7 +1255,11 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/DocumentBlueprintTreeItem"
+                    "oneOf": [
+                      {
+                        "$ref": "#/components/schemas/DocumentBlueprintTreeItemModel"
+                      }
+                    ]
                   }
                 }
               }
@@ -1058,7 +1300,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PagedDocumentBlueprintTreeItem"
+                  "$ref": "#/components/schemas/PagedDocumentBlueprintTreeItemModel"
                 }
               }
             }
@@ -1114,7 +1356,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PagedDocumentTypeTreeItem"
+                  "$ref": "#/components/schemas/PagedDocumentTypeTreeItemModel"
                 }
               }
             }
@@ -1149,7 +1391,11 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/DocumentTypeTreeItem"
+                    "oneOf": [
+                      {
+                        "$ref": "#/components/schemas/DocumentTypeTreeItemModel"
+                      }
+                    ]
                   }
                 }
               }
@@ -1198,7 +1444,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PagedDocumentTypeTreeItem"
+                  "$ref": "#/components/schemas/PagedDocumentTypeTreeItemModel"
                 }
               }
             }
@@ -1246,7 +1492,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
+                  "$ref": "#/components/schemas/ProblemDetailsModel"
                 }
               }
             }
@@ -1256,7 +1502,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PagedRecycleBinItem"
+                  "$ref": "#/components/schemas/PagedRecycleBinItemModel"
                 }
               }
             }
@@ -1296,7 +1542,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
+                  "$ref": "#/components/schemas/ProblemDetailsModel"
                 }
               }
             }
@@ -1306,7 +1552,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PagedRecycleBinItem"
+                  "$ref": "#/components/schemas/PagedRecycleBinItemModel"
                 }
               }
             }
@@ -1369,7 +1615,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PagedDocumentTreeItem"
+                  "$ref": "#/components/schemas/PagedDocumentTreeItemModel"
                 }
               }
             }
@@ -1419,7 +1665,11 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/DocumentTreeItem"
+                    "oneOf": [
+                      {
+                        "$ref": "#/components/schemas/DocumentTreeItemModel"
+                      }
+                    ]
                   }
                 }
               }
@@ -1475,7 +1725,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PagedDocumentTreeItem"
+                  "$ref": "#/components/schemas/PagedDocumentTreeItemModel"
                 }
               }
             }
@@ -1515,7 +1765,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PagedHealthCheckGroup"
+                  "$ref": "#/components/schemas/PagedHealthCheckGroupModelBaseModel"
                 }
               }
             }
@@ -1545,7 +1795,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/NotFoundResult"
+                  "$ref": "#/components/schemas/ProblemDetailsModel"
                 }
               }
             }
@@ -1555,7 +1805,55 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/HealthCheckGroupWithResult"
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/HealthCheckGroupModel"
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/umbraco/management/api/v1/health-check-group/{name}/check": {
+      "post": {
+        "tags": [
+          "Health Check"
+        ],
+        "operationId": "PostHealthCheckGroupByNameCheck",
+        "parameters": [
+          {
+            "name": "name",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetailsModel"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/HealthCheckGroupWithResultModel"
+                    }
+                  ]
                 }
               }
             }
@@ -1573,7 +1871,11 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/HealthCheckAction"
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/HealthCheckActionModel"
+                  }
+                ]
               }
             }
           }
@@ -1584,7 +1886,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
+                  "$ref": "#/components/schemas/ProblemDetailsModel"
                 }
               }
             }
@@ -1594,7 +1896,11 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/HealthCheckResult"
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/HealthCheckResultModel"
+                    }
+                  ]
                 }
               }
             }
@@ -1654,7 +1960,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
+                  "$ref": "#/components/schemas/ProblemDetailsModel"
                 }
               }
             }
@@ -1664,7 +1970,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PagedHelpPage"
+                  "$ref": "#/components/schemas/PagedHelpPageModel"
                 }
               }
             }
@@ -1702,7 +2008,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PagedIndex"
+                  "$ref": "#/components/schemas/PagedIndexModel"
                 }
               }
             }
@@ -1732,7 +2038,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
+                  "$ref": "#/components/schemas/ProblemDetailsModel"
                 }
               }
             }
@@ -1742,7 +2048,11 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Index"
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/IndexModel"
+                    }
+                  ]
                 }
               }
             }
@@ -1772,7 +2082,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
+                  "$ref": "#/components/schemas/ProblemDetailsModel"
                 }
               }
             }
@@ -1782,7 +2092,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/OkResult"
+                  "$ref": "#/components/schemas/OkResultModel"
                 }
               }
             }
@@ -1802,7 +2112,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
+                  "$ref": "#/components/schemas/ProblemDetailsModel"
                 }
               }
             }
@@ -1812,7 +2122,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
+                  "$ref": "#/components/schemas/ProblemDetailsModel"
                 }
               }
             }
@@ -1822,7 +2132,11 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/InstallSettings"
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/InstallSettingsModel"
+                    }
+                  ]
                 }
               }
             }
@@ -1840,7 +2154,11 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/Install"
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/InstallModel"
+                  }
+                ]
               }
             }
           }
@@ -1851,7 +2169,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
+                  "$ref": "#/components/schemas/ProblemDetailsModel"
                 }
               }
             }
@@ -1861,7 +2179,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
+                  "$ref": "#/components/schemas/ProblemDetailsModel"
                 }
               }
             }
@@ -1882,7 +2200,11 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/DatabaseInstall"
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/DatabaseInstallModel"
+                  }
+                ]
               }
             }
           }
@@ -1893,7 +2215,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
+                  "$ref": "#/components/schemas/ProblemDetailsModel"
                 }
               }
             }
@@ -1936,7 +2258,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PagedLanguage"
+                  "$ref": "#/components/schemas/PagedLanguageModel"
                 }
               }
             }
@@ -1952,7 +2274,11 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/LanguageCreateModel"
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/LanguageCreateModel"
+                  }
+                ]
               }
             }
           }
@@ -1963,7 +2289,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
+                  "$ref": "#/components/schemas/ProblemDetailsModel"
                 }
               }
             }
@@ -1973,7 +2299,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
+                  "$ref": "#/components/schemas/ProblemDetailsModel"
                 }
               }
             }
@@ -2006,7 +2332,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
+                  "$ref": "#/components/schemas/ProblemDetailsModel"
                 }
               }
             }
@@ -2016,7 +2342,11 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Language"
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/LanguageModel"
+                    }
+                  ]
                 }
               }
             }
@@ -2044,7 +2374,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
+                  "$ref": "#/components/schemas/ProblemDetailsModel"
                 }
               }
             }
@@ -2054,7 +2384,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
+                  "$ref": "#/components/schemas/ProblemDetailsModel"
                 }
               }
             }
@@ -2083,7 +2413,11 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/LanguageUpdateModel"
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/LanguageUpdateModel"
+                  }
+                ]
               }
             }
           }
@@ -2094,7 +2428,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/NotFoundResult"
+                  "$ref": "#/components/schemas/NotFoundResultModel"
                 }
               }
             }
@@ -2104,7 +2438,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
+                  "$ref": "#/components/schemas/ProblemDetailsModel"
                 }
               }
             }
@@ -2147,7 +2481,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PagedLogger"
+                  "$ref": "#/components/schemas/PagedLoggerModel"
                 }
               }
             }
@@ -2185,7 +2519,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
+                  "$ref": "#/components/schemas/ProblemDetailsModel"
                 }
               }
             }
@@ -2225,7 +2559,7 @@
             "name": "orderDirection",
             "in": "query",
             "schema": {
-              "$ref": "#/components/schemas/Direction"
+              "$ref": "#/components/schemas/DirectionModel"
             }
           },
           {
@@ -2241,7 +2575,7 @@
             "schema": {
               "type": "array",
               "items": {
-                "$ref": "#/components/schemas/LogLevel"
+                "$ref": "#/components/schemas/LogLevelModel"
               }
             }
           },
@@ -2268,7 +2602,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PagedLogMessage"
+                  "$ref": "#/components/schemas/PagedLogMessageModel"
                 }
               }
             }
@@ -2324,7 +2658,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
+                  "$ref": "#/components/schemas/ProblemDetailsModel"
                 }
               }
             }
@@ -2334,7 +2668,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PagedLogTemplate"
+                  "$ref": "#/components/schemas/PagedLogTemplateModel"
                 }
               }
             }
@@ -2374,7 +2708,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PagedSavedLogSearch"
+                  "$ref": "#/components/schemas/PagedSavedLogSearchModel"
                 }
               }
             }
@@ -2390,7 +2724,11 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/SavedLogSearch"
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/SavedLogSearchModel"
+                  }
+                ]
               }
             }
           }
@@ -2401,7 +2739,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
+                  "$ref": "#/components/schemas/ProblemDetailsModel"
                 }
               }
             }
@@ -2434,7 +2772,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/NotFoundResult"
+                  "$ref": "#/components/schemas/NotFoundResultModel"
                 }
               }
             }
@@ -2444,7 +2782,11 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/SavedLogSearch"
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/SavedLogSearchModel"
+                    }
+                  ]
                 }
               }
             }
@@ -2472,7 +2814,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/NotFoundResult"
+                  "$ref": "#/components/schemas/NotFoundResultModel"
                 }
               }
             }
@@ -2513,7 +2855,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
+                  "$ref": "#/components/schemas/ProblemDetailsModel"
                 }
               }
             }
@@ -2572,7 +2914,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PagedFolderTreeItem"
+                  "$ref": "#/components/schemas/PagedFolderTreeItemModel"
                 }
               }
             }
@@ -2607,7 +2949,14 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/FolderTreeItem"
+                    "oneOf": [
+                      {
+                        "$ref": "#/components/schemas/FolderTreeItemModel"
+                      },
+                      {
+                        "$ref": "#/components/schemas/DocumentTypeTreeItemModel"
+                      }
+                    ]
                   }
                 }
               }
@@ -2656,7 +3005,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PagedFolderTreeItem"
+                  "$ref": "#/components/schemas/PagedFolderTreeItemModel"
                 }
               }
             }
@@ -2704,7 +3053,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
+                  "$ref": "#/components/schemas/ProblemDetailsModel"
                 }
               }
             }
@@ -2714,7 +3063,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PagedRecycleBinItem"
+                  "$ref": "#/components/schemas/PagedRecycleBinItemModel"
                 }
               }
             }
@@ -2754,7 +3103,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
+                  "$ref": "#/components/schemas/ProblemDetailsModel"
                 }
               }
             }
@@ -2764,7 +3113,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PagedRecycleBinItem"
+                  "$ref": "#/components/schemas/PagedRecycleBinItemModel"
                 }
               }
             }
@@ -2820,7 +3169,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PagedContentTreeItem"
+                  "$ref": "#/components/schemas/PagedContentTreeItemModel"
                 }
               }
             }
@@ -2863,7 +3212,14 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/ContentTreeItem"
+                    "oneOf": [
+                      {
+                        "$ref": "#/components/schemas/ContentTreeItemModel"
+                      },
+                      {
+                        "$ref": "#/components/schemas/DocumentTreeItemModel"
+                      }
+                    ]
                   }
                 }
               }
@@ -2912,7 +3268,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PagedContentTreeItem"
+                  "$ref": "#/components/schemas/PagedContentTreeItemModel"
                 }
               }
             }
@@ -2947,7 +3303,26 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/EntityTreeItem"
+                    "oneOf": [
+                      {
+                        "$ref": "#/components/schemas/EntityTreeItemModel"
+                      },
+                      {
+                        "$ref": "#/components/schemas/ContentTreeItemModel"
+                      },
+                      {
+                        "$ref": "#/components/schemas/DocumentBlueprintTreeItemModel"
+                      },
+                      {
+                        "$ref": "#/components/schemas/DocumentTreeItemModel"
+                      },
+                      {
+                        "$ref": "#/components/schemas/DocumentTypeTreeItemModel"
+                      },
+                      {
+                        "$ref": "#/components/schemas/FolderTreeItemModel"
+                      }
+                    ]
                   }
                 }
               }
@@ -2988,7 +3363,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PagedEntityTreeItem"
+                  "$ref": "#/components/schemas/PagedEntityTreeItemModel"
                 }
               }
             }
@@ -3023,7 +3398,26 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/EntityTreeItem"
+                    "oneOf": [
+                      {
+                        "$ref": "#/components/schemas/EntityTreeItemModel"
+                      },
+                      {
+                        "$ref": "#/components/schemas/ContentTreeItemModel"
+                      },
+                      {
+                        "$ref": "#/components/schemas/DocumentBlueprintTreeItemModel"
+                      },
+                      {
+                        "$ref": "#/components/schemas/DocumentTreeItemModel"
+                      },
+                      {
+                        "$ref": "#/components/schemas/DocumentTypeTreeItemModel"
+                      },
+                      {
+                        "$ref": "#/components/schemas/FolderTreeItemModel"
+                      }
+                    ]
                   }
                 }
               }
@@ -3064,7 +3458,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PagedEntityTreeItem"
+                  "$ref": "#/components/schemas/PagedEntityTreeItemModel"
                 }
               }
             }
@@ -3084,7 +3478,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/CreatedResult"
+                  "$ref": "#/components/schemas/CreatedResultModel"
                 }
               }
             }
@@ -3094,7 +3488,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
+                  "$ref": "#/components/schemas/ProblemDetailsModel"
                 }
               }
             }
@@ -3114,7 +3508,11 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ModelsBuilder"
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/ModelsBuilderModel"
+                    }
+                  ]
                 }
               }
             }
@@ -3134,7 +3532,11 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/OutOfDateStatus"
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/OutOfDateStatusModel"
+                    }
+                  ]
                 }
               }
             }
@@ -3181,7 +3583,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PagedFileSystemTreeItem"
+                  "$ref": "#/components/schemas/PagedFileSystemTreeItemModel"
                 }
               }
             }
@@ -3215,7 +3617,11 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/FileSystemTreeItem"
+                    "oneOf": [
+                      {
+                        "$ref": "#/components/schemas/FileSystemTreeItemModel"
+                      }
+                    ]
                   }
                 }
               }
@@ -3256,7 +3662,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PagedFileSystemTreeItem"
+                  "$ref": "#/components/schemas/PagedFileSystemTreeItemModel"
                 }
               }
             }
@@ -3276,7 +3682,11 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ProfilingStatus"
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/ProfilingStatusModel"
+                    }
+                  ]
                 }
               }
             }
@@ -3380,7 +3790,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
+                  "$ref": "#/components/schemas/ProblemDetailsModel"
                 }
               }
             }
@@ -3390,7 +3800,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PagedRedirectUrl"
+                  "$ref": "#/components/schemas/PagedRedirectUrlModel"
                 }
               }
             }
@@ -3437,7 +3847,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PagedRedirectUrl"
+                  "$ref": "#/components/schemas/PagedRedirectUrlModel"
                 }
               }
             }
@@ -3479,7 +3889,11 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/RedirectUrlStatus"
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/RedirectUrlStatusModel"
+                    }
+                  ]
                 }
               }
             }
@@ -3496,7 +3910,7 @@
             "name": "status",
             "in": "query",
             "schema": {
-              "$ref": "#/components/schemas/RedirectStatus"
+              "$ref": "#/components/schemas/RedirectStatusModel"
             }
           }
         ],
@@ -3534,7 +3948,14 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/FolderTreeItem"
+                    "oneOf": [
+                      {
+                        "$ref": "#/components/schemas/FolderTreeItemModel"
+                      },
+                      {
+                        "$ref": "#/components/schemas/DocumentTypeTreeItemModel"
+                      }
+                    ]
                   }
                 }
               }
@@ -3575,7 +3996,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PagedEntityTreeItem"
+                  "$ref": "#/components/schemas/PagedEntityTreeItemModel"
                 }
               }
             }
@@ -3606,7 +4027,11 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Relation"
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/RelationModel"
+                    }
+                  ]
                 }
               }
             }
@@ -3616,7 +4041,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/NotFoundResult"
+                  "$ref": "#/components/schemas/NotFoundResultModel"
                 }
               }
             }
@@ -3671,7 +4096,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PagedRelation"
+                  "$ref": "#/components/schemas/PagedRelationModel"
                 }
               }
             }
@@ -3718,7 +4143,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PagedFileSystemTreeItem"
+                  "$ref": "#/components/schemas/PagedFileSystemTreeItemModel"
                 }
               }
             }
@@ -3752,7 +4177,11 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/FileSystemTreeItem"
+                    "oneOf": [
+                      {
+                        "$ref": "#/components/schemas/FileSystemTreeItemModel"
+                      }
+                    ]
                   }
                 }
               }
@@ -3793,7 +4222,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PagedFileSystemTreeItem"
+                  "$ref": "#/components/schemas/PagedFileSystemTreeItemModel"
                 }
               }
             }
@@ -3831,7 +4260,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PagedSearcher"
+                  "$ref": "#/components/schemas/PagedSearcherModel"
                 }
               }
             }
@@ -3884,7 +4313,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PagedSearchResult"
+                  "$ref": "#/components/schemas/PagedSearchResultModel"
                 }
               }
             }
@@ -3894,7 +4323,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
+                  "$ref": "#/components/schemas/ProblemDetailsModel"
                 }
               }
             }
@@ -3938,7 +4367,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
+                  "$ref": "#/components/schemas/ProblemDetailsModel"
                 }
               }
             }
@@ -3948,7 +4377,11 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ServerStatus"
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/ServerStatusModel"
+                    }
+                  ]
                 }
               }
             }
@@ -3968,7 +4401,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
+                  "$ref": "#/components/schemas/ProblemDetailsModel"
                 }
               }
             }
@@ -3978,7 +4411,11 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Version"
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/VersionModel"
+                    }
+                  ]
                 }
               }
             }
@@ -4025,7 +4462,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PagedFileSystemTreeItem"
+                  "$ref": "#/components/schemas/PagedFileSystemTreeItemModel"
                 }
               }
             }
@@ -4059,7 +4496,11 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/FileSystemTreeItem"
+                    "oneOf": [
+                      {
+                        "$ref": "#/components/schemas/FileSystemTreeItemModel"
+                      }
+                    ]
                   }
                 }
               }
@@ -4100,7 +4541,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PagedFileSystemTreeItem"
+                  "$ref": "#/components/schemas/PagedFileSystemTreeItemModel"
                 }
               }
             }
@@ -4147,7 +4588,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PagedFileSystemTreeItem"
+                  "$ref": "#/components/schemas/PagedFileSystemTreeItemModel"
                 }
               }
             }
@@ -4181,7 +4622,11 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/FileSystemTreeItem"
+                    "oneOf": [
+                      {
+                        "$ref": "#/components/schemas/FileSystemTreeItemModel"
+                      }
+                    ]
                   }
                 }
               }
@@ -4222,7 +4667,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PagedFileSystemTreeItem"
+                  "$ref": "#/components/schemas/PagedFileSystemTreeItemModel"
                 }
               }
             }
@@ -4260,7 +4705,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PagedTelemetry"
+                  "$ref": "#/components/schemas/PagedTelemetryModel"
                 }
               }
             }
@@ -4280,7 +4725,11 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Telemetry"
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/TelemetryModel"
+                    }
+                  ]
                 }
               }
             }
@@ -4296,7 +4745,11 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/Telemetry"
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/TelemetryModel"
+                  }
+                ]
               }
             }
           }
@@ -4307,7 +4760,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
+                  "$ref": "#/components/schemas/ProblemDetailsModel"
                 }
               }
             }
@@ -4328,7 +4781,11 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/TemplateCreateModel"
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/TemplateCreateModel"
+                  }
+                ]
               }
             }
           }
@@ -4342,7 +4799,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
+                  "$ref": "#/components/schemas/ProblemDetailsModel"
                 }
               }
             }
@@ -4352,7 +4809,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
+                  "$ref": "#/components/schemas/ProblemDetailsModel"
                 }
               }
             }
@@ -4383,7 +4840,11 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Template"
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/TemplateModel"
+                    }
+                  ]
                 }
               }
             }
@@ -4393,7 +4854,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
+                  "$ref": "#/components/schemas/ProblemDetailsModel"
                 }
               }
             }
@@ -4425,7 +4886,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
+                  "$ref": "#/components/schemas/ProblemDetailsModel"
                 }
               }
             }
@@ -4435,7 +4896,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
+                  "$ref": "#/components/schemas/ProblemDetailsModel"
                 }
               }
             }
@@ -4462,7 +4923,11 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/TemplateUpdateModel"
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/TemplateUpdateModel"
+                  }
+                ]
               }
             }
           }
@@ -4476,7 +4941,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
+                  "$ref": "#/components/schemas/ProblemDetailsModel"
                 }
               }
             }
@@ -4486,7 +4951,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
+                  "$ref": "#/components/schemas/ProblemDetailsModel"
                 }
               }
             }
@@ -4504,7 +4969,11 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/TemplateQueryExecuteModel"
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/TemplateQueryExecuteModel"
+                  }
+                ]
               }
             }
           }
@@ -4515,7 +4984,11 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/TemplateQueryResult"
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/TemplateQueryResultModel"
+                    }
+                  ]
                 }
               }
             }
@@ -4535,7 +5008,11 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/TemplateQuerySettings"
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/TemplateQuerySettingsModel"
+                    }
+                  ]
                 }
               }
             }
@@ -4555,7 +5032,11 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/TemplateScaffold"
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/TemplateScaffoldModel"
+                    }
+                  ]
                 }
               }
             }
@@ -4565,7 +5046,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
+                  "$ref": "#/components/schemas/ProblemDetailsModel"
                 }
               }
             }
@@ -4613,7 +5094,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PagedEntityTreeItem"
+                  "$ref": "#/components/schemas/PagedEntityTreeItemModel"
                 }
               }
             }
@@ -4648,7 +5129,26 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/EntityTreeItem"
+                    "oneOf": [
+                      {
+                        "$ref": "#/components/schemas/EntityTreeItemModel"
+                      },
+                      {
+                        "$ref": "#/components/schemas/ContentTreeItemModel"
+                      },
+                      {
+                        "$ref": "#/components/schemas/DocumentBlueprintTreeItemModel"
+                      },
+                      {
+                        "$ref": "#/components/schemas/DocumentTreeItemModel"
+                      },
+                      {
+                        "$ref": "#/components/schemas/DocumentTypeTreeItemModel"
+                      },
+                      {
+                        "$ref": "#/components/schemas/FolderTreeItemModel"
+                      }
+                    ]
                   }
                 }
               }
@@ -4689,7 +5189,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PagedEntityTreeItem"
+                  "$ref": "#/components/schemas/PagedEntityTreeItemModel"
                 }
               }
             }
@@ -4743,7 +5243,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PagedRelationItem"
+                  "$ref": "#/components/schemas/PagedRelationItemModel"
                 }
               }
             }
@@ -4797,7 +5297,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PagedRelationItem"
+                  "$ref": "#/components/schemas/PagedRelationItemModel"
                 }
               }
             }
@@ -4853,7 +5353,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PagedRelationItem"
+                  "$ref": "#/components/schemas/PagedRelationItemModel"
                 }
               }
             }
@@ -4876,7 +5376,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
+                  "$ref": "#/components/schemas/ProblemDetailsModel"
                 }
               }
             }
@@ -4886,7 +5386,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
+                  "$ref": "#/components/schemas/ProblemDetailsModel"
                 }
               }
             }
@@ -4906,7 +5406,11 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/UpgradeSettings"
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/UpgradeSettingsModel"
+                    }
+                  ]
                 }
               }
             }
@@ -4916,7 +5420,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
+                  "$ref": "#/components/schemas/ProblemDetailsModel"
                 }
               }
             }
@@ -4927,20 +5431,56 @@
   },
   "components": {
     "schemas": {
-      "Assembly": {
+      "ActionJsonTypeInfoModel": {
+        "type": "object",
+        "properties": {
+          "target": {
+            "nullable": true,
+            "readOnly": true
+          },
+          "method": {
+            "$ref": "#/components/schemas/MethodInfoModel"
+          }
+        },
+        "additionalProperties": false
+      },
+      "AngularJsonMediaTypeFormatterModel": {
+        "required": [
+          "$type"
+        ],
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/NewtonsoftJsonOutputFormatterModel"
+          }
+        ],
+        "properties": {
+          "$type": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false,
+        "discriminator": {
+          "propertyName": "$type",
+          "mapping": {
+            "AngularJsonMediaTypeFormatter": "#/components/schemas/AngularJsonMediaTypeFormatterModel"
+          }
+        }
+      },
+      "AssemblyModel": {
         "type": "object",
         "properties": {
           "definedTypes": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/TypeInfo"
+              "$ref": "#/components/schemas/TypeInfoModel"
             },
             "readOnly": true
           },
           "exportedTypes": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/Type"
+              "$ref": "#/components/schemas/TypeModel"
             },
             "readOnly": true
           },
@@ -4951,7 +5491,7 @@
             "deprecated": true
           },
           "entryPoint": {
-            "$ref": "#/components/schemas/MethodInfo"
+            "$ref": "#/components/schemas/MethodInfoModel"
           },
           "fullName": {
             "type": "string",
@@ -4985,7 +5525,7 @@
           "customAttributes": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/CustomAttributeData"
+              "$ref": "#/components/schemas/CustomAttributeDataModel"
             },
             "readOnly": true
           },
@@ -4995,12 +5535,12 @@
             "deprecated": true
           },
           "manifestModule": {
-            "$ref": "#/components/schemas/Module"
+            "$ref": "#/components/schemas/ModuleModel"
           },
           "modules": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/Module"
+              "$ref": "#/components/schemas/ModuleModel"
             },
             "readOnly": true
           },
@@ -5015,12 +5555,12 @@
             "readOnly": true
           },
           "securityRuleSet": {
-            "$ref": "#/components/schemas/SecurityRuleSet"
+            "$ref": "#/components/schemas/SecurityRuleSetModel"
           }
         },
         "additionalProperties": false
       },
-      "CallingConventions": {
+      "CallingConventionsModel": {
         "enum": [
           "Standard",
           "VarArgs",
@@ -5031,11 +5571,11 @@
         "type": "integer",
         "format": "int32"
       },
-      "ConsentLevel": {
+      "ConsentLevelModel": {
         "type": "object",
         "properties": {
           "level": {
-            "$ref": "#/components/schemas/TelemetryLevel"
+            "$ref": "#/components/schemas/TelemetryLevelModel"
           },
           "description": {
             "type": "string"
@@ -5043,7 +5583,7 @@
         },
         "additionalProperties": false
       },
-      "ConstructorInfo": {
+      "ConstructorInfoModel": {
         "type": "object",
         "properties": {
           "name": {
@@ -5051,18 +5591,18 @@
             "readOnly": true
           },
           "declaringType": {
-            "$ref": "#/components/schemas/Type"
+            "$ref": "#/components/schemas/TypeModel"
           },
           "reflectedType": {
-            "$ref": "#/components/schemas/Type"
+            "$ref": "#/components/schemas/TypeModel"
           },
           "module": {
-            "$ref": "#/components/schemas/Module"
+            "$ref": "#/components/schemas/ModuleModel"
           },
           "customAttributes": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/CustomAttributeData"
+              "$ref": "#/components/schemas/CustomAttributeDataModel"
             },
             "readOnly": true
           },
@@ -5076,13 +5616,13 @@
             "readOnly": true
           },
           "attributes": {
-            "$ref": "#/components/schemas/MethodAttributes"
+            "$ref": "#/components/schemas/MethodAttributesModel"
           },
           "methodImplementationFlags": {
-            "$ref": "#/components/schemas/MethodImplAttributes"
+            "$ref": "#/components/schemas/MethodImplAttributesModel"
           },
           "callingConvention": {
-            "$ref": "#/components/schemas/CallingConventions"
+            "$ref": "#/components/schemas/CallingConventionsModel"
           },
           "isAbstract": {
             "type": "boolean",
@@ -5153,7 +5693,7 @@
             "readOnly": true
           },
           "methodHandle": {
-            "$ref": "#/components/schemas/RuntimeMethodHandle"
+            "$ref": "#/components/schemas/RuntimeMethodHandleModel"
           },
           "isSecurityCritical": {
             "type": "boolean",
@@ -5168,57 +5708,19 @@
             "readOnly": true
           },
           "memberType": {
-            "$ref": "#/components/schemas/MemberTypes"
+            "$ref": "#/components/schemas/MemberTypesModel"
           }
         },
         "additionalProperties": false
       },
-      "ContentResult": {
+      "ContentTreeItemModel": {
         "type": "object",
-        "properties": {
-          "content": {
-            "type": "string",
-            "nullable": true
-          },
-          "contentType": {
-            "type": "string",
-            "nullable": true
-          },
-          "statusCode": {
-            "type": "integer",
-            "format": "int32",
-            "nullable": true
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/EntityTreeItemModel"
           }
-        },
-        "additionalProperties": false
-      },
-      "ContentTreeItem": {
-        "type": "object",
+        ],
         "properties": {
-          "name": {
-            "type": "string"
-          },
-          "type": {
-            "type": "string"
-          },
-          "icon": {
-            "type": "string"
-          },
-          "hasChildren": {
-            "type": "boolean"
-          },
-          "key": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "isContainer": {
-            "type": "boolean"
-          },
-          "parentKey": {
-            "type": "string",
-            "format": "uuid",
-            "nullable": true
-          },
           "noAccess": {
             "type": "boolean"
           },
@@ -5228,7 +5730,7 @@
         },
         "additionalProperties": false
       },
-      "CreatedResult": {
+      "CreatedResultModel": {
         "type": "object",
         "properties": {
           "value": {
@@ -5237,7 +5739,14 @@
           "formatters": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/IOutputFormatter"
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/NamedSystemTextJsonOutputFormatterModel"
+                },
+                {
+                  "$ref": "#/components/schemas/AngularJsonMediaTypeFormatterModel"
+                }
+              ]
             }
           },
           "contentTypes": {
@@ -5247,7 +5756,7 @@
             }
           },
           "declaredType": {
-            "$ref": "#/components/schemas/Type"
+            "$ref": "#/components/schemas/TypeModel"
           },
           "statusCode": {
             "type": "integer",
@@ -5260,7 +5769,7 @@
         },
         "additionalProperties": false
       },
-      "Culture": {
+      "CultureModel": {
         "type": "object",
         "properties": {
           "name": {
@@ -5272,40 +5781,40 @@
         },
         "additionalProperties": false
       },
-      "CustomAttributeData": {
+      "CustomAttributeDataModel": {
         "type": "object",
         "properties": {
           "attributeType": {
-            "$ref": "#/components/schemas/Type"
+            "$ref": "#/components/schemas/TypeModel"
           },
           "constructor": {
-            "$ref": "#/components/schemas/ConstructorInfo"
+            "$ref": "#/components/schemas/ConstructorInfoModel"
           },
           "constructorArguments": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/CustomAttributeTypedArgument"
+              "$ref": "#/components/schemas/CustomAttributeTypedArgumentModel"
             },
             "readOnly": true
           },
           "namedArguments": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/CustomAttributeNamedArgument"
+              "$ref": "#/components/schemas/CustomAttributeNamedArgumentModel"
             },
             "readOnly": true
           }
         },
         "additionalProperties": false
       },
-      "CustomAttributeNamedArgument": {
+      "CustomAttributeNamedArgumentModel": {
         "type": "object",
         "properties": {
           "memberInfo": {
-            "$ref": "#/components/schemas/MemberInfo"
+            "$ref": "#/components/schemas/MemberInfoModel"
           },
           "typedValue": {
-            "$ref": "#/components/schemas/CustomAttributeTypedArgument"
+            "$ref": "#/components/schemas/CustomAttributeTypedArgumentModel"
           },
           "memberName": {
             "type": "string",
@@ -5318,11 +5827,11 @@
         },
         "additionalProperties": false
       },
-      "CustomAttributeTypedArgument": {
+      "CustomAttributeTypedArgumentModel": {
         "type": "object",
         "properties": {
           "argumentType": {
-            "$ref": "#/components/schemas/Type"
+            "$ref": "#/components/schemas/TypeModel"
           },
           "value": {
             "nullable": true
@@ -5330,25 +5839,41 @@
         },
         "additionalProperties": false
       },
-      "DataType": {
+      "DataTypeCopyModel": {
         "type": "object",
         "properties": {
-          "name": {
-            "type": "string"
-          },
-          "propertyEditorAlias": {
-            "type": "string"
-          },
-          "propertyEditorUiAlias": {
+          "targetKey": {
             "type": "string",
+            "format": "uuid",
             "nullable": true
-          },
-          "data": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/DataTypeProperty"
-            }
-          },
+          }
+        },
+        "additionalProperties": false
+      },
+      "DataTypeCreateModel": {
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/DataTypeModelBaseModel"
+          }
+        ],
+        "properties": {
+          "parentKey": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "DataTypeModel": {
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/DataTypeModelBaseModel"
+          }
+        ],
+        "properties": {
           "key": {
             "type": "string",
             "format": "uuid"
@@ -5361,7 +5886,7 @@
         },
         "additionalProperties": false
       },
-      "DataTypeCreateModel": {
+      "DataTypeModelBaseModel": {
         "type": "object",
         "properties": {
           "name": {
@@ -5377,10 +5902,20 @@
           "data": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/DataTypeProperty"
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/DataTypePropertyModel"
+                }
+              ]
             }
-          },
-          "parentKey": {
+          }
+        },
+        "additionalProperties": false
+      },
+      "DataTypeMoveModel": {
+        "type": "object",
+        "properties": {
+          "targetKey": {
             "type": "string",
             "format": "uuid",
             "nullable": true
@@ -5388,7 +5923,7 @@
         },
         "additionalProperties": false
       },
-      "DataTypeProperty": {
+      "DataTypePropertyModel": {
         "type": "object",
         "properties": {
           "alias": {
@@ -5400,7 +5935,7 @@
         },
         "additionalProperties": false
       },
-      "DataTypePropertyReference": {
+      "DataTypePropertyReferenceModel": {
         "type": "object",
         "properties": {
           "name": {
@@ -5412,7 +5947,7 @@
         },
         "additionalProperties": false
       },
-      "DataTypeReference": {
+      "DataTypeReferenceModel": {
         "type": "object",
         "properties": {
           "key": {
@@ -5425,7 +5960,11 @@
           "properties": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/DataTypePropertyReference"
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/DataTypePropertyReferenceModel"
+                }
+              ]
             }
           }
         },
@@ -5433,27 +5972,14 @@
       },
       "DataTypeUpdateModel": {
         "type": "object",
-        "properties": {
-          "name": {
-            "type": "string"
-          },
-          "propertyEditorAlias": {
-            "type": "string"
-          },
-          "propertyEditorUiAlias": {
-            "type": "string",
-            "nullable": true
-          },
-          "data": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/DataTypeProperty"
-            }
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/DataTypeModelBaseModel"
           }
-        },
+        ],
         "additionalProperties": false
       },
-      "DatabaseInstall": {
+      "DatabaseInstallModel": {
         "required": [
           "id",
           "providerName"
@@ -5494,7 +6020,7 @@
         },
         "additionalProperties": false
       },
-      "DatabaseSettings": {
+      "DatabaseSettingsModel": {
         "type": "object",
         "properties": {
           "id": {
@@ -5535,34 +6061,81 @@
         },
         "additionalProperties": false
       },
-      "DictionaryImport": {
+      "DecoderFallbackModel": {
         "type": "object",
         "properties": {
-          "dictionaryItems": {
+          "maxCharCount": {
+            "type": "integer",
+            "format": "int32",
+            "readOnly": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "DefaultJsonTypeInfoResolverModel": {
+        "required": [
+          "$type"
+        ],
+        "type": "object",
+        "properties": {
+          "$type": {
+            "type": "string"
+          },
+          "modifiers": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/DictionaryItemsImport"
-            }
+              "$ref": "#/components/schemas/ActionJsonTypeInfoModel"
+            },
+            "readOnly": true
+          }
+        },
+        "additionalProperties": false,
+        "discriminator": {
+          "propertyName": "$type",
+          "mapping": {
+            "DefaultJsonTypeInfoResolver": "#/components/schemas/DefaultJsonTypeInfoResolverModel",
+            "UmbracoJsonTypeInfoResolver": "#/components/schemas/UmbracoJsonTypeInfoResolverModel"
+          }
+        }
+      },
+      "DictionaryImportModel": {
+        "type": "object",
+        "properties": {
+          "fileName": {
+            "type": "string"
           },
-          "tempFileName": {
+          "parentKey": {
             "type": "string",
+            "format": "uuid",
             "nullable": true
           }
         },
         "additionalProperties": false
       },
-      "DictionaryItem": {
+      "DictionaryItemCreateModel": {
         "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/DictionaryItemModelBaseModel"
+          }
+        ],
         "properties": {
-          "name": {
-            "type": "string"
-          },
-          "translations": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/DictionaryItemTranslationModel"
-            }
-          },
+          "parentKey": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "DictionaryItemModel": {
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/DictionaryItemModelBaseModel"
+          }
+        ],
+        "properties": {
           "key": {
             "type": "string",
             "format": "uuid"
@@ -5570,7 +6143,7 @@
         },
         "additionalProperties": false
       },
-      "DictionaryItemCreateModel": {
+      "DictionaryItemModelBaseModel": {
         "type": "object",
         "properties": {
           "name": {
@@ -5579,13 +6152,12 @@
           "translations": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/DictionaryItemTranslationModel"
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/DictionaryItemTranslationModel"
+                }
+              ]
             }
-          },
-          "parentKey": {
-            "type": "string",
-            "format": "uuid",
-            "nullable": true
           }
         },
         "additionalProperties": false
@@ -5604,34 +6176,44 @@
       },
       "DictionaryItemUpdateModel": {
         "type": "object",
-        "properties": {
-          "name": {
-            "type": "string"
-          },
-          "translations": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/DictionaryItemTranslationModel"
-            }
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/DictionaryItemModelBaseModel"
           }
-        },
+        ],
         "additionalProperties": false
       },
-      "DictionaryItemsImport": {
+      "DictionaryItemsImportModel": {
         "type": "object",
         "properties": {
+          "key": {
+            "type": "string",
+            "format": "uuid"
+          },
           "name": {
             "type": "string",
             "nullable": true
           },
-          "level": {
-            "type": "integer",
-            "format": "int32"
+          "parentKey": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
           }
         },
         "additionalProperties": false
       },
-      "DictionaryOverview": {
+      "DictionaryMoveModel": {
+        "type": "object",
+        "properties": {
+          "targetKey": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "DictionaryOverviewModel": {
         "type": "object",
         "properties": {
           "name": {
@@ -5642,9 +6224,10 @@
             "type": "string",
             "format": "uuid"
           },
-          "level": {
-            "type": "integer",
-            "format": "int32"
+          "parentKey": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
           },
           "translatedIsoCodes": {
             "type": "array",
@@ -5655,7 +6238,27 @@
         },
         "additionalProperties": false
       },
-      "Direction": {
+      "DictionaryUploadModel": {
+        "type": "object",
+        "properties": {
+          "dictionaryItems": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/DictionaryItemsImportModel"
+                }
+              ]
+            }
+          },
+          "fileName": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "DirectionModel": {
         "enum": [
           "Ascending",
           "Descending"
@@ -5663,33 +6266,14 @@
         "type": "integer",
         "format": "int32"
       },
-      "DocumentBlueprintTreeItem": {
+      "DocumentBlueprintTreeItemModel": {
         "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/EntityTreeItemModel"
+          }
+        ],
         "properties": {
-          "name": {
-            "type": "string"
-          },
-          "type": {
-            "type": "string"
-          },
-          "icon": {
-            "type": "string"
-          },
-          "hasChildren": {
-            "type": "boolean"
-          },
-          "key": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "isContainer": {
-            "type": "boolean"
-          },
-          "parentKey": {
-            "type": "string",
-            "format": "uuid",
-            "nullable": true
-          },
           "documentTypeKey": {
             "type": "string",
             "format": "uuid"
@@ -5704,39 +6288,14 @@
         },
         "additionalProperties": false
       },
-      "DocumentTreeItem": {
+      "DocumentTreeItemModel": {
         "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ContentTreeItemModel"
+          }
+        ],
         "properties": {
-          "name": {
-            "type": "string"
-          },
-          "type": {
-            "type": "string"
-          },
-          "icon": {
-            "type": "string"
-          },
-          "hasChildren": {
-            "type": "boolean"
-          },
-          "key": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "isContainer": {
-            "type": "boolean"
-          },
-          "parentKey": {
-            "type": "string",
-            "format": "uuid",
-            "nullable": true
-          },
-          "noAccess": {
-            "type": "boolean"
-          },
-          "isTrashed": {
-            "type": "boolean"
-          },
           "isProtected": {
             "type": "boolean"
           },
@@ -5749,57 +6308,104 @@
         },
         "additionalProperties": false
       },
-      "DocumentTypeTreeItem": {
+      "DocumentTypeTreeItemModel": {
         "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/FolderTreeItemModel"
+          }
+        ],
         "properties": {
-          "name": {
-            "type": "string"
-          },
-          "type": {
-            "type": "string"
-          },
-          "icon": {
-            "type": "string"
-          },
-          "hasChildren": {
-            "type": "boolean"
-          },
-          "key": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "isContainer": {
-            "type": "boolean"
-          },
-          "parentKey": {
-            "type": "string",
-            "format": "uuid",
-            "nullable": true
-          },
-          "isFolder": {
-            "type": "boolean"
-          },
           "isElement": {
             "type": "boolean"
           }
         },
         "additionalProperties": false
       },
-      "EntityTreeItem": {
+      "EncoderFallbackModel": {
         "type": "object",
         "properties": {
-          "name": {
-            "type": "string"
+          "maxCharCount": {
+            "type": "integer",
+            "format": "int32",
+            "readOnly": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "EncodingModel": {
+        "type": "object",
+        "properties": {
+          "preamble": {
+            "$ref": "#/components/schemas/ReadOnlySpanByteModel"
           },
-          "type": {
-            "type": "string"
+          "bodyName": {
+            "type": "string",
+            "readOnly": true
           },
-          "icon": {
-            "type": "string"
+          "encodingName": {
+            "type": "string",
+            "readOnly": true
           },
-          "hasChildren": {
-            "type": "boolean"
+          "headerName": {
+            "type": "string",
+            "readOnly": true
           },
+          "webName": {
+            "type": "string",
+            "readOnly": true
+          },
+          "windowsCodePage": {
+            "type": "integer",
+            "format": "int32",
+            "readOnly": true
+          },
+          "isBrowserDisplay": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "isBrowserSave": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "isMailNewsDisplay": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "isMailNewsSave": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "isSingleByte": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "encoderFallback": {
+            "$ref": "#/components/schemas/EncoderFallbackModel"
+          },
+          "decoderFallback": {
+            "$ref": "#/components/schemas/DecoderFallbackModel"
+          },
+          "isReadOnly": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "codePage": {
+            "type": "integer",
+            "format": "int32",
+            "readOnly": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "EntityTreeItemModel": {
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/TreeItemModel"
+          }
+        ],
+        "properties": {
           "key": {
             "type": "string",
             "format": "uuid"
@@ -5815,7 +6421,7 @@
         },
         "additionalProperties": false
       },
-      "EventAttributes": {
+      "EventAttributesModel": {
         "enum": [
           "None",
           "SpecialName",
@@ -5825,7 +6431,7 @@
         "type": "integer",
         "format": "int32"
       },
-      "EventInfo": {
+      "EventInfoModel": {
         "type": "object",
         "properties": {
           "name": {
@@ -5833,18 +6439,18 @@
             "readOnly": true
           },
           "declaringType": {
-            "$ref": "#/components/schemas/Type"
+            "$ref": "#/components/schemas/TypeModel"
           },
           "reflectedType": {
-            "$ref": "#/components/schemas/Type"
+            "$ref": "#/components/schemas/TypeModel"
           },
           "module": {
-            "$ref": "#/components/schemas/Module"
+            "$ref": "#/components/schemas/ModuleModel"
           },
           "customAttributes": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/CustomAttributeData"
+              "$ref": "#/components/schemas/CustomAttributeDataModel"
             },
             "readOnly": true
           },
@@ -5858,50 +6464,35 @@
             "readOnly": true
           },
           "memberType": {
-            "$ref": "#/components/schemas/MemberTypes"
+            "$ref": "#/components/schemas/MemberTypesModel"
           },
           "attributes": {
-            "$ref": "#/components/schemas/EventAttributes"
+            "$ref": "#/components/schemas/EventAttributesModel"
           },
           "isSpecialName": {
             "type": "boolean",
             "readOnly": true
           },
           "addMethod": {
-            "$ref": "#/components/schemas/MethodInfo"
+            "$ref": "#/components/schemas/MethodInfoModel"
           },
           "removeMethod": {
-            "$ref": "#/components/schemas/MethodInfo"
+            "$ref": "#/components/schemas/MethodInfoModel"
           },
           "raiseMethod": {
-            "$ref": "#/components/schemas/MethodInfo"
+            "$ref": "#/components/schemas/MethodInfoModel"
           },
           "isMulticast": {
             "type": "boolean",
             "readOnly": true
           },
           "eventHandlerType": {
-            "$ref": "#/components/schemas/Type"
+            "$ref": "#/components/schemas/TypeModel"
           }
         },
         "additionalProperties": false
       },
-      "Field": {
-        "type": "object",
-        "properties": {
-          "name": {
-            "type": "string"
-          },
-          "values": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          }
-        },
-        "additionalProperties": false
-      },
-      "FieldAttributes": {
+      "FieldAttributesModel": {
         "enum": [
           "PrivateScope",
           "Private",
@@ -5926,7 +6517,7 @@
         "type": "integer",
         "format": "int32"
       },
-      "FieldInfo": {
+      "FieldInfoModel": {
         "type": "object",
         "properties": {
           "name": {
@@ -5934,18 +6525,18 @@
             "readOnly": true
           },
           "declaringType": {
-            "$ref": "#/components/schemas/Type"
+            "$ref": "#/components/schemas/TypeModel"
           },
           "reflectedType": {
-            "$ref": "#/components/schemas/Type"
+            "$ref": "#/components/schemas/TypeModel"
           },
           "module": {
-            "$ref": "#/components/schemas/Module"
+            "$ref": "#/components/schemas/ModuleModel"
           },
           "customAttributes": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/CustomAttributeData"
+              "$ref": "#/components/schemas/CustomAttributeDataModel"
             },
             "readOnly": true
           },
@@ -5959,13 +6550,13 @@
             "readOnly": true
           },
           "memberType": {
-            "$ref": "#/components/schemas/MemberTypes"
+            "$ref": "#/components/schemas/MemberTypesModel"
           },
           "attributes": {
-            "$ref": "#/components/schemas/FieldAttributes"
+            "$ref": "#/components/schemas/FieldAttributesModel"
           },
           "fieldType": {
-            "$ref": "#/components/schemas/Type"
+            "$ref": "#/components/schemas/TypeModel"
           },
           "isInitOnly": {
             "type": "boolean",
@@ -6028,26 +6619,34 @@
             "readOnly": true
           },
           "fieldHandle": {
-            "$ref": "#/components/schemas/RuntimeFieldHandle"
+            "$ref": "#/components/schemas/RuntimeFieldHandleModel"
           }
         },
         "additionalProperties": false
       },
-      "FileSystemTreeItem": {
+      "FieldModel": {
         "type": "object",
         "properties": {
           "name": {
             "type": "string"
           },
-          "type": {
-            "type": "string"
-          },
-          "icon": {
-            "type": "string"
-          },
-          "hasChildren": {
-            "type": "boolean"
-          },
+          "values": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "additionalProperties": false
+      },
+      "FileSystemTreeItemModel": {
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/TreeItemModel"
+          }
+        ],
+        "properties": {
           "path": {
             "type": "string"
           },
@@ -6057,29 +6656,33 @@
         },
         "additionalProperties": false
       },
-      "Folder": {
-        "type": "object",
-        "properties": {
-          "name": {
-            "type": "string"
-          },
-          "key": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "parentKey": {
-            "type": "string",
-            "format": "uuid",
-            "nullable": true
-          }
-        },
-        "additionalProperties": false
-      },
       "FolderCreateModel": {
         "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/FolderModelBaseModel"
+          }
+        ],
         "properties": {
-          "name": {
-            "type": "string"
+          "parentKey": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "FolderModel": {
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/FolderModelBaseModel"
+          }
+        ],
+        "properties": {
+          "key": {
+            "type": "string",
+            "format": "uuid"
           },
           "parentKey": {
             "type": "string",
@@ -6089,33 +6692,23 @@
         },
         "additionalProperties": false
       },
-      "FolderTreeItem": {
+      "FolderModelBaseModel": {
         "type": "object",
         "properties": {
           "name": {
             "type": "string"
-          },
-          "type": {
-            "type": "string"
-          },
-          "icon": {
-            "type": "string"
-          },
-          "hasChildren": {
-            "type": "boolean"
-          },
-          "key": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "isContainer": {
-            "type": "boolean"
-          },
-          "parentKey": {
-            "type": "string",
-            "format": "uuid",
-            "nullable": true
-          },
+          }
+        },
+        "additionalProperties": false
+      },
+      "FolderTreeItemModel": {
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/EntityTreeItemModel"
+          }
+        ],
+        "properties": {
           "isFolder": {
             "type": "boolean"
           }
@@ -6124,14 +6717,14 @@
       },
       "FolderUpdateModel": {
         "type": "object",
-        "properties": {
-          "name": {
-            "type": "string"
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/FolderModelBaseModel"
           }
-        },
+        ],
         "additionalProperties": false
       },
-      "GenericParameterAttributes": {
+      "GenericParameterAttributesModel": {
         "enum": [
           "None",
           "Covariant",
@@ -6145,24 +6738,7 @@
         "type": "integer",
         "format": "int32"
       },
-      "HealthCheck": {
-        "type": "object",
-        "properties": {
-          "key": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "name": {
-            "type": "string"
-          },
-          "description": {
-            "type": "string",
-            "nullable": true
-          }
-        },
-        "additionalProperties": false
-      },
-      "HealthCheckAction": {
+      "HealthCheckActionModel": {
         "type": "object",
         "properties": {
           "healthCheckKey": {
@@ -6199,51 +6775,97 @@
         },
         "additionalProperties": false
       },
-      "HealthCheckGroup": {
+      "HealthCheckGroupModel": {
         "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/HealthCheckGroupModelBaseModel"
+          }
+        ],
         "properties": {
-          "name": {
-            "type": "string",
-            "nullable": true
-          },
           "checks": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/HealthCheck"
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/HealthCheckModel"
+                }
+              ]
             }
           }
         },
         "additionalProperties": false
       },
-      "HealthCheckGroupWithResult": {
+      "HealthCheckGroupModelBaseModel": {
         "type": "object",
         "properties": {
           "name": {
-            "type": "string",
-            "nullable": true
-          },
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "HealthCheckGroupWithResultModel": {
+        "type": "object",
+        "properties": {
           "checks": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/HealthCheckWithResult"
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/HealthCheckWithResultModel"
+                }
+              ]
             }
           }
         },
         "additionalProperties": false
       },
-      "HealthCheckResult": {
+      "HealthCheckModel": {
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/HealthCheckModelBaseModel"
+          }
+        ],
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "HealthCheckModelBaseModel": {
+        "type": "object",
+        "properties": {
+          "key": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        "additionalProperties": false
+      },
+      "HealthCheckResultModel": {
         "type": "object",
         "properties": {
           "message": {
             "type": "string"
           },
           "resultType": {
-            "$ref": "#/components/schemas/StatusResultType"
+            "$ref": "#/components/schemas/StatusResultTypeModel"
           },
           "actions": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/HealthCheckAction"
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/HealthCheckActionModel"
+                }
+              ]
             },
             "nullable": true
           },
@@ -6254,31 +6876,29 @@
         },
         "additionalProperties": false
       },
-      "HealthCheckWithResult": {
+      "HealthCheckWithResultModel": {
         "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/HealthCheckModelBaseModel"
+          }
+        ],
         "properties": {
-          "key": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "name": {
-            "type": "string"
-          },
-          "description": {
-            "type": "string",
-            "nullable": true
-          },
           "results": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/HealthCheckResult"
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/HealthCheckResultModel"
+                }
+              ]
             },
             "nullable": true
           }
         },
         "additionalProperties": false
       },
-      "HealthStatus": {
+      "HealthStatusModel": {
         "enum": [
           "Healthy",
           "Unhealthy",
@@ -6287,7 +6907,7 @@
         "type": "integer",
         "format": "int32"
       },
-      "HelpPage": {
+      "HelpPageModel": {
         "type": "object",
         "properties": {
           "name": {
@@ -6309,15 +6929,11 @@
         },
         "additionalProperties": false
       },
-      "ICustomAttributeProvider": {
+      "ICustomAttributeProviderModel": {
         "type": "object",
         "additionalProperties": false
       },
-      "IOutputFormatter": {
-        "type": "object",
-        "additionalProperties": false
-      },
-      "Index": {
+      "IndexModel": {
         "required": [
           "canRebuild",
           "documentCount",
@@ -6331,7 +6947,7 @@
             "type": "string"
           },
           "healthStatus": {
-            "$ref": "#/components/schemas/HealthStatus"
+            "$ref": "#/components/schemas/HealthStatusModel"
           },
           "canRebuild": {
             "type": "boolean"
@@ -6349,13 +6965,13 @@
           },
           "providerProperties": {
             "type": "object",
-            "additionalProperties": {},
+            "additionalProperties": { },
             "nullable": true
           }
         },
         "additionalProperties": false
       },
-      "Install": {
+      "InstallModel": {
         "required": [
           "database",
           "user"
@@ -6363,59 +6979,231 @@
         "type": "object",
         "properties": {
           "user": {
-            "$ref": "#/components/schemas/UserInstall"
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/UserInstallModel"
+              }
+            ]
           },
           "database": {
-            "$ref": "#/components/schemas/DatabaseInstall"
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/DatabaseInstallModel"
+              }
+            ]
           },
           "telemetryLevel": {
-            "$ref": "#/components/schemas/TelemetryLevel"
+            "$ref": "#/components/schemas/TelemetryLevelModel"
           }
         },
         "additionalProperties": false
       },
-      "InstallSettings": {
+      "InstallSettingsModel": {
         "type": "object",
         "properties": {
           "user": {
-            "$ref": "#/components/schemas/UserSettings"
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/UserSettingsModel"
+              }
+            ]
           },
           "databases": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/DatabaseSettings"
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/DatabaseSettingsModel"
+                }
+              ]
             }
           }
         },
         "additionalProperties": false
       },
-      "IntPtr": {
+      "IntPtrModel": {
         "type": "object",
         "additionalProperties": false
       },
-      "Language": {
+      "JavaScriptEncoderModel": {
         "type": "object",
         "properties": {
-          "name": {
-            "type": "string"
+          "maxOutputCharactersPerInputCharacter": {
+            "type": "integer",
+            "format": "int32",
+            "readOnly": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "JsonCommentHandlingModel": {
+        "enum": [
+          "Disallow",
+          "Skip",
+          "Allow"
+        ],
+        "type": "integer",
+        "format": "int32"
+      },
+      "JsonConverterObjectModel": {
+        "type": "object",
+        "properties": {
+          "handleNull": {
+            "type": "boolean",
+            "readOnly": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "JsonIgnoreConditionModel": {
+        "enum": [
+          "Never",
+          "Always",
+          "WhenWritingDefault",
+          "WhenWritingNull"
+        ],
+        "type": "integer",
+        "format": "int32"
+      },
+      "JsonNamingPolicyModel": {
+        "type": "object",
+        "additionalProperties": false
+      },
+      "JsonNumberHandlingModel": {
+        "enum": [
+          "Strict",
+          "AllowReadingFromString",
+          "WriteAsString",
+          "AllowNamedFloatingPointLiterals"
+        ],
+        "type": "integer",
+        "format": "int32"
+      },
+      "JsonObjectConverterModel": {
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/JsonConverterObjectModel"
+          }
+        ],
+        "additionalProperties": false
+      },
+      "JsonSerializerOptionsModel": {
+        "type": "object",
+        "properties": {
+          "converters": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/JsonObjectConverterModel"
+                }
+              ]
+            },
+            "readOnly": true
           },
-          "isDefault": {
-            "type": "boolean"
-          },
-          "isMandatory": {
-            "type": "boolean"
-          },
-          "fallbackIsoCode": {
-            "type": "string",
+          "typeInfoResolver": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/UmbracoJsonTypeInfoResolverModel"
+              }
+            ],
             "nullable": true
           },
+          "allowTrailingCommas": {
+            "type": "boolean"
+          },
+          "defaultBufferSize": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "encoder": {
+            "$ref": "#/components/schemas/JavaScriptEncoderModel"
+          },
+          "dictionaryKeyPolicy": {
+            "$ref": "#/components/schemas/JsonNamingPolicyModel"
+          },
+          "ignoreNullValues": {
+            "type": "boolean",
+            "deprecated": true
+          },
+          "defaultIgnoreCondition": {
+            "$ref": "#/components/schemas/JsonIgnoreConditionModel"
+          },
+          "numberHandling": {
+            "$ref": "#/components/schemas/JsonNumberHandlingModel"
+          },
+          "ignoreReadOnlyProperties": {
+            "type": "boolean"
+          },
+          "ignoreReadOnlyFields": {
+            "type": "boolean"
+          },
+          "includeFields": {
+            "type": "boolean"
+          },
+          "maxDepth": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "propertyNamingPolicy": {
+            "$ref": "#/components/schemas/JsonNamingPolicyModel"
+          },
+          "propertyNameCaseInsensitive": {
+            "type": "boolean"
+          },
+          "readCommentHandling": {
+            "$ref": "#/components/schemas/JsonCommentHandlingModel"
+          },
+          "unknownTypeHandling": {
+            "$ref": "#/components/schemas/JsonUnknownTypeHandlingModel"
+          },
+          "writeIndented": {
+            "type": "boolean"
+          },
+          "referenceHandler": {
+            "$ref": "#/components/schemas/ReferenceHandlerModel"
+          }
+        },
+        "additionalProperties": false
+      },
+      "JsonUnknownTypeHandlingModel": {
+        "enum": [
+          "JsonElement",
+          "JsonNode"
+        ],
+        "type": "integer",
+        "format": "int32"
+      },
+      "LanguageCreateModel": {
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/LanguageModelBaseModel"
+          }
+        ],
+        "properties": {
           "isoCode": {
             "type": "string"
           }
         },
         "additionalProperties": false
       },
-      "LanguageCreateModel": {
+      "LanguageModel": {
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/LanguageModelBaseModel"
+          }
+        ],
+        "properties": {
+          "isoCode": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "LanguageModelBaseModel": {
         "type": "object",
         "properties": {
           "name": {
@@ -6430,33 +7218,20 @@
           "fallbackIsoCode": {
             "type": "string",
             "nullable": true
-          },
-          "isoCode": {
-            "type": "string"
           }
         },
         "additionalProperties": false
       },
       "LanguageUpdateModel": {
         "type": "object",
-        "properties": {
-          "name": {
-            "type": "string"
-          },
-          "isDefault": {
-            "type": "boolean"
-          },
-          "isMandatory": {
-            "type": "boolean"
-          },
-          "fallbackIsoCode": {
-            "type": "string",
-            "nullable": true
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/LanguageModelBaseModel"
           }
-        },
+        ],
         "additionalProperties": false
       },
-      "LayoutKind": {
+      "LayoutKindModel": {
         "enum": [
           "Sequential",
           "Explicit",
@@ -6465,7 +7240,7 @@
         "type": "integer",
         "format": "int32"
       },
-      "LogLevel": {
+      "LogLevelModel": {
         "enum": [
           "Verbose",
           "Debug",
@@ -6477,7 +7252,7 @@
         "type": "integer",
         "format": "int32"
       },
-      "LogMessage": {
+      "LogMessageModel": {
         "type": "object",
         "properties": {
           "timestamp": {
@@ -6485,7 +7260,7 @@
             "format": "date-time"
           },
           "level": {
-            "$ref": "#/components/schemas/LogLevel"
+            "$ref": "#/components/schemas/LogLevelModel"
           },
           "messageTemplate": {
             "type": "string",
@@ -6498,7 +7273,11 @@
           "properties": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/LogMessageProperty"
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/LogMessagePropertyModel"
+                }
+              ]
             }
           },
           "exception": {
@@ -6508,7 +7287,7 @@
         },
         "additionalProperties": false
       },
-      "LogMessageProperty": {
+      "LogMessagePropertyModel": {
         "type": "object",
         "properties": {
           "name": {
@@ -6521,7 +7300,7 @@
         },
         "additionalProperties": false
       },
-      "LogTemplate": {
+      "LogTemplateModel": {
         "type": "object",
         "properties": {
           "messageTemplate": {
@@ -6535,41 +7314,41 @@
         },
         "additionalProperties": false
       },
-      "Logger": {
+      "LoggerModel": {
         "type": "object",
         "properties": {
           "name": {
             "type": "string"
           },
           "level": {
-            "$ref": "#/components/schemas/LogLevel"
+            "$ref": "#/components/schemas/LogLevelModel"
           }
         },
         "additionalProperties": false
       },
-      "MemberInfo": {
+      "MemberInfoModel": {
         "type": "object",
         "properties": {
           "memberType": {
-            "$ref": "#/components/schemas/MemberTypes"
+            "$ref": "#/components/schemas/MemberTypesModel"
           },
           "name": {
             "type": "string",
             "readOnly": true
           },
           "declaringType": {
-            "$ref": "#/components/schemas/Type"
+            "$ref": "#/components/schemas/TypeModel"
           },
           "reflectedType": {
-            "$ref": "#/components/schemas/Type"
+            "$ref": "#/components/schemas/TypeModel"
           },
           "module": {
-            "$ref": "#/components/schemas/Module"
+            "$ref": "#/components/schemas/ModuleModel"
           },
           "customAttributes": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/CustomAttributeData"
+              "$ref": "#/components/schemas/CustomAttributeDataModel"
             },
             "readOnly": true
           },
@@ -6585,7 +7364,7 @@
         },
         "additionalProperties": false
       },
-      "MemberTypes": {
+      "MemberTypesModel": {
         "enum": [
           "Constructor",
           "Event",
@@ -6600,7 +7379,7 @@
         "type": "integer",
         "format": "int32"
       },
-      "MethodAttributes": {
+      "MethodAttributesModel": {
         "enum": [
           "ReuseSlot",
           "PrivateScope",
@@ -6630,29 +7409,29 @@
         "type": "integer",
         "format": "int32"
       },
-      "MethodBase": {
+      "MethodBaseModel": {
         "type": "object",
         "properties": {
           "memberType": {
-            "$ref": "#/components/schemas/MemberTypes"
+            "$ref": "#/components/schemas/MemberTypesModel"
           },
           "name": {
             "type": "string",
             "readOnly": true
           },
           "declaringType": {
-            "$ref": "#/components/schemas/Type"
+            "$ref": "#/components/schemas/TypeModel"
           },
           "reflectedType": {
-            "$ref": "#/components/schemas/Type"
+            "$ref": "#/components/schemas/TypeModel"
           },
           "module": {
-            "$ref": "#/components/schemas/Module"
+            "$ref": "#/components/schemas/ModuleModel"
           },
           "customAttributes": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/CustomAttributeData"
+              "$ref": "#/components/schemas/CustomAttributeDataModel"
             },
             "readOnly": true
           },
@@ -6666,13 +7445,13 @@
             "readOnly": true
           },
           "attributes": {
-            "$ref": "#/components/schemas/MethodAttributes"
+            "$ref": "#/components/schemas/MethodAttributesModel"
           },
           "methodImplementationFlags": {
-            "$ref": "#/components/schemas/MethodImplAttributes"
+            "$ref": "#/components/schemas/MethodImplAttributesModel"
           },
           "callingConvention": {
-            "$ref": "#/components/schemas/CallingConventions"
+            "$ref": "#/components/schemas/CallingConventionsModel"
           },
           "isAbstract": {
             "type": "boolean",
@@ -6743,7 +7522,7 @@
             "readOnly": true
           },
           "methodHandle": {
-            "$ref": "#/components/schemas/RuntimeMethodHandle"
+            "$ref": "#/components/schemas/RuntimeMethodHandleModel"
           },
           "isSecurityCritical": {
             "type": "boolean",
@@ -6760,7 +7539,7 @@
         },
         "additionalProperties": false
       },
-      "MethodImplAttributes": {
+      "MethodImplAttributesModel": {
         "enum": [
           "IL",
           "Managed",
@@ -6783,7 +7562,7 @@
         "type": "integer",
         "format": "int32"
       },
-      "MethodInfo": {
+      "MethodInfoModel": {
         "type": "object",
         "properties": {
           "name": {
@@ -6791,18 +7570,18 @@
             "readOnly": true
           },
           "declaringType": {
-            "$ref": "#/components/schemas/Type"
+            "$ref": "#/components/schemas/TypeModel"
           },
           "reflectedType": {
-            "$ref": "#/components/schemas/Type"
+            "$ref": "#/components/schemas/TypeModel"
           },
           "module": {
-            "$ref": "#/components/schemas/Module"
+            "$ref": "#/components/schemas/ModuleModel"
           },
           "customAttributes": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/CustomAttributeData"
+              "$ref": "#/components/schemas/CustomAttributeDataModel"
             },
             "readOnly": true
           },
@@ -6816,13 +7595,13 @@
             "readOnly": true
           },
           "attributes": {
-            "$ref": "#/components/schemas/MethodAttributes"
+            "$ref": "#/components/schemas/MethodAttributesModel"
           },
           "methodImplementationFlags": {
-            "$ref": "#/components/schemas/MethodImplAttributes"
+            "$ref": "#/components/schemas/MethodImplAttributesModel"
           },
           "callingConvention": {
-            "$ref": "#/components/schemas/CallingConventions"
+            "$ref": "#/components/schemas/CallingConventionsModel"
           },
           "isAbstract": {
             "type": "boolean",
@@ -6893,7 +7672,7 @@
             "readOnly": true
           },
           "methodHandle": {
-            "$ref": "#/components/schemas/RuntimeMethodHandle"
+            "$ref": "#/components/schemas/RuntimeMethodHandleModel"
           },
           "isSecurityCritical": {
             "type": "boolean",
@@ -6908,25 +7687,25 @@
             "readOnly": true
           },
           "memberType": {
-            "$ref": "#/components/schemas/MemberTypes"
+            "$ref": "#/components/schemas/MemberTypesModel"
           },
           "returnParameter": {
-            "$ref": "#/components/schemas/ParameterInfo"
+            "$ref": "#/components/schemas/ParameterInfoModel"
           },
           "returnType": {
-            "$ref": "#/components/schemas/Type"
+            "$ref": "#/components/schemas/TypeModel"
           },
           "returnTypeCustomAttributes": {
-            "$ref": "#/components/schemas/ICustomAttributeProvider"
+            "$ref": "#/components/schemas/ICustomAttributeProviderModel"
           }
         },
         "additionalProperties": false
       },
-      "ModelsBuilder": {
+      "ModelsBuilderModel": {
         "type": "object",
         "properties": {
           "mode": {
-            "$ref": "#/components/schemas/ModelsMode"
+            "$ref": "#/components/schemas/ModelsModeModel"
           },
           "canGenerate": {
             "type": "boolean"
@@ -6952,7 +7731,7 @@
         },
         "additionalProperties": false
       },
-      "ModelsMode": {
+      "ModelsModeModel": {
         "enum": [
           "Nothing",
           "InMemoryAuto",
@@ -6962,11 +7741,22 @@
         "type": "integer",
         "format": "int32"
       },
-      "Module": {
+      "ModuleHandleModel": {
+        "type": "object",
+        "properties": {
+          "mdStreamVersion": {
+            "type": "integer",
+            "format": "int32",
+            "readOnly": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "ModuleModel": {
         "type": "object",
         "properties": {
           "assembly": {
-            "$ref": "#/components/schemas/Assembly"
+            "$ref": "#/components/schemas/AssemblyModel"
           },
           "fullyQualifiedName": {
             "type": "string",
@@ -6991,12 +7781,12 @@
             "readOnly": true
           },
           "moduleHandle": {
-            "$ref": "#/components/schemas/ModuleHandle"
+            "$ref": "#/components/schemas/ModuleHandleModel"
           },
           "customAttributes": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/CustomAttributeData"
+              "$ref": "#/components/schemas/CustomAttributeDataModel"
             },
             "readOnly": true
           },
@@ -7008,18 +7798,63 @@
         },
         "additionalProperties": false
       },
-      "ModuleHandle": {
+      "NamedSystemTextJsonOutputFormatterModel": {
+        "required": [
+          "$type"
+        ],
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/SystemTextJsonOutputFormatterModel"
+          }
+        ],
+        "properties": {
+          "$type": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false,
+        "discriminator": {
+          "propertyName": "$type",
+          "mapping": {
+            "NamedSystemTextJsonOutputFormatter": "#/components/schemas/NamedSystemTextJsonOutputFormatterModel"
+          }
+        }
+      },
+      "NewtonsoftJsonOutputFormatterModel": {
+        "required": [
+          "$type"
+        ],
         "type": "object",
         "properties": {
-          "mdStreamVersion": {
-            "type": "integer",
-            "format": "int32",
+          "$type": {
+            "type": "string"
+          },
+          "supportedMediaTypes": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "readOnly": true
+          },
+          "supportedEncodings": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/EncodingModel"
+            },
             "readOnly": true
           }
         },
-        "additionalProperties": false
+        "additionalProperties": false,
+        "discriminator": {
+          "propertyName": "$type",
+          "mapping": {
+            "NewtonsoftJsonOutputFormatter": "#/components/schemas/NewtonsoftJsonOutputFormatterModel",
+            "AngularJsonMediaTypeFormatter": "#/components/schemas/AngularJsonMediaTypeFormatterModel"
+          }
+        }
       },
-      "NotFoundResult": {
+      "NotFoundResultModel": {
         "type": "object",
         "properties": {
           "statusCode": {
@@ -7029,7 +7864,7 @@
         },
         "additionalProperties": false
       },
-      "OkResult": {
+      "OkResultModel": {
         "type": "object",
         "properties": {
           "statusCode": {
@@ -7039,7 +7874,7 @@
         },
         "additionalProperties": false
       },
-      "Operator": {
+      "OperatorModel": {
         "enum": [
           "Equals",
           "NotEquals",
@@ -7053,16 +7888,16 @@
         "type": "integer",
         "format": "int32"
       },
-      "OutOfDateStatus": {
+      "OutOfDateStatusModel": {
         "type": "object",
         "properties": {
           "status": {
-            "$ref": "#/components/schemas/OutOfDateType"
+            "$ref": "#/components/schemas/OutOfDateTypeModel"
           }
         },
         "additionalProperties": false
       },
-      "OutOfDateType": {
+      "OutOfDateTypeModel": {
         "enum": [
           "OutOfDate",
           "Current",
@@ -7071,7 +7906,7 @@
         "type": "integer",
         "format": "int32"
       },
-      "PagedContentTreeItem": {
+      "PagedContentTreeItemModel": {
         "required": [
           "items",
           "total"
@@ -7085,13 +7920,20 @@
           "items": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/ContentTreeItem"
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/ContentTreeItemModel"
+                },
+                {
+                  "$ref": "#/components/schemas/DocumentTreeItemModel"
+                }
+              ]
             }
           }
         },
         "additionalProperties": false
       },
-      "PagedCulture": {
+      "PagedCultureModel": {
         "required": [
           "items",
           "total"
@@ -7105,13 +7947,17 @@
           "items": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/Culture"
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/CultureModel"
+                }
+              ]
             }
           }
         },
         "additionalProperties": false
       },
-      "PagedDictionaryOverview": {
+      "PagedDictionaryOverviewModel": {
         "required": [
           "items",
           "total"
@@ -7125,13 +7971,17 @@
           "items": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/DictionaryOverview"
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/DictionaryOverviewModel"
+                }
+              ]
             }
           }
         },
         "additionalProperties": false
       },
-      "PagedDocumentBlueprintTreeItem": {
+      "PagedDocumentBlueprintTreeItemModel": {
         "required": [
           "items",
           "total"
@@ -7145,13 +7995,17 @@
           "items": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/DocumentBlueprintTreeItem"
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/DocumentBlueprintTreeItemModel"
+                }
+              ]
             }
           }
         },
         "additionalProperties": false
       },
-      "PagedDocumentTreeItem": {
+      "PagedDocumentTreeItemModel": {
         "required": [
           "items",
           "total"
@@ -7165,13 +8019,17 @@
           "items": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/DocumentTreeItem"
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/DocumentTreeItemModel"
+                }
+              ]
             }
           }
         },
         "additionalProperties": false
       },
-      "PagedDocumentTypeTreeItem": {
+      "PagedDocumentTypeTreeItemModel": {
         "required": [
           "items",
           "total"
@@ -7185,13 +8043,17 @@
           "items": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/DocumentTypeTreeItem"
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/DocumentTypeTreeItemModel"
+                }
+              ]
             }
           }
         },
         "additionalProperties": false
       },
-      "PagedEntityTreeItem": {
+      "PagedEntityTreeItemModel": {
         "required": [
           "items",
           "total"
@@ -7205,13 +8067,32 @@
           "items": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/EntityTreeItem"
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/EntityTreeItemModel"
+                },
+                {
+                  "$ref": "#/components/schemas/ContentTreeItemModel"
+                },
+                {
+                  "$ref": "#/components/schemas/DocumentBlueprintTreeItemModel"
+                },
+                {
+                  "$ref": "#/components/schemas/DocumentTreeItemModel"
+                },
+                {
+                  "$ref": "#/components/schemas/DocumentTypeTreeItemModel"
+                },
+                {
+                  "$ref": "#/components/schemas/FolderTreeItemModel"
+                }
+              ]
             }
           }
         },
         "additionalProperties": false
       },
-      "PagedFileSystemTreeItem": {
+      "PagedFileSystemTreeItemModel": {
         "required": [
           "items",
           "total"
@@ -7225,13 +8106,17 @@
           "items": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/FileSystemTreeItem"
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/FileSystemTreeItemModel"
+                }
+              ]
             }
           }
         },
         "additionalProperties": false
       },
-      "PagedFolderTreeItem": {
+      "PagedFolderTreeItemModel": {
         "required": [
           "items",
           "total"
@@ -7245,13 +8130,20 @@
           "items": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/FolderTreeItem"
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/FolderTreeItemModel"
+                },
+                {
+                  "$ref": "#/components/schemas/DocumentTypeTreeItemModel"
+                }
+              ]
             }
           }
         },
         "additionalProperties": false
       },
-      "PagedHealthCheckGroup": {
+      "PagedHealthCheckGroupModelBaseModel": {
         "required": [
           "items",
           "total"
@@ -7265,13 +8157,20 @@
           "items": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/HealthCheckGroup"
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/HealthCheckGroupModelBaseModel"
+                },
+                {
+                  "$ref": "#/components/schemas/HealthCheckGroupModel"
+                }
+              ]
             }
           }
         },
         "additionalProperties": false
       },
-      "PagedHelpPage": {
+      "PagedHelpPageModel": {
         "required": [
           "items",
           "total"
@@ -7285,13 +8184,17 @@
           "items": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/HelpPage"
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/HelpPageModel"
+                }
+              ]
             }
           }
         },
         "additionalProperties": false
       },
-      "PagedIndex": {
+      "PagedIndexModel": {
         "required": [
           "items",
           "total"
@@ -7305,13 +8208,17 @@
           "items": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/Index"
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/IndexModel"
+                }
+              ]
             }
           }
         },
         "additionalProperties": false
       },
-      "PagedLanguage": {
+      "PagedLanguageModel": {
         "required": [
           "items",
           "total"
@@ -7325,13 +8232,17 @@
           "items": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/Language"
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/LanguageModel"
+                }
+              ]
             }
           }
         },
         "additionalProperties": false
       },
-      "PagedLogMessage": {
+      "PagedLogMessageModel": {
         "required": [
           "items",
           "total"
@@ -7345,13 +8256,17 @@
           "items": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/LogMessage"
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/LogMessageModel"
+                }
+              ]
             }
           }
         },
         "additionalProperties": false
       },
-      "PagedLogTemplate": {
+      "PagedLogTemplateModel": {
         "required": [
           "items",
           "total"
@@ -7365,13 +8280,17 @@
           "items": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/LogTemplate"
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/LogTemplateModel"
+                }
+              ]
             }
           }
         },
         "additionalProperties": false
       },
-      "PagedLogger": {
+      "PagedLoggerModel": {
         "required": [
           "items",
           "total"
@@ -7385,13 +8304,17 @@
           "items": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/Logger"
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/LoggerModel"
+                }
+              ]
             }
           }
         },
         "additionalProperties": false
       },
-      "PagedRecycleBinItem": {
+      "PagedRecycleBinItemModel": {
         "required": [
           "items",
           "total"
@@ -7405,13 +8328,17 @@
           "items": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/RecycleBinItem"
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/RecycleBinItemModel"
+                }
+              ]
             }
           }
         },
         "additionalProperties": false
       },
-      "PagedRedirectUrl": {
+      "PagedRedirectUrlModel": {
         "required": [
           "items",
           "total"
@@ -7425,13 +8352,17 @@
           "items": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/RedirectUrl"
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/RedirectUrlModel"
+                }
+              ]
             }
           }
         },
         "additionalProperties": false
       },
-      "PagedRelation": {
+      "PagedRelationItemModel": {
         "required": [
           "items",
           "total"
@@ -7445,13 +8376,17 @@
           "items": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/Relation"
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/RelationItemModel"
+                }
+              ]
             }
           }
         },
         "additionalProperties": false
       },
-      "PagedRelationItem": {
+      "PagedRelationModel": {
         "required": [
           "items",
           "total"
@@ -7465,13 +8400,17 @@
           "items": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/RelationItem"
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/RelationModel"
+                }
+              ]
             }
           }
         },
         "additionalProperties": false
       },
-      "PagedSavedLogSearch": {
+      "PagedSavedLogSearchModel": {
         "required": [
           "items",
           "total"
@@ -7485,13 +8424,17 @@
           "items": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/SavedLogSearch"
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/SavedLogSearchModel"
+                }
+              ]
             }
           }
         },
         "additionalProperties": false
       },
-      "PagedSearchResult": {
+      "PagedSearchResultModel": {
         "required": [
           "items",
           "total"
@@ -7505,13 +8448,17 @@
           "items": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/SearchResult"
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/SearchResultModel"
+                }
+              ]
             }
           }
         },
         "additionalProperties": false
       },
-      "PagedSearcher": {
+      "PagedSearcherModel": {
         "required": [
           "items",
           "total"
@@ -7525,13 +8472,17 @@
           "items": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/Searcher"
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/SearcherModel"
+                }
+              ]
             }
           }
         },
         "additionalProperties": false
       },
-      "PagedTelemetry": {
+      "PagedTelemetryModel": {
         "required": [
           "items",
           "total"
@@ -7545,13 +8496,17 @@
           "items": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/Telemetry"
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/TelemetryModel"
+                }
+              ]
             }
           }
         },
         "additionalProperties": false
       },
-      "ParameterAttributes": {
+      "ParameterAttributesModel": {
         "enum": [
           "None",
           "In",
@@ -7568,14 +8523,14 @@
         "type": "integer",
         "format": "int32"
       },
-      "ParameterInfo": {
+      "ParameterInfoModel": {
         "type": "object",
         "properties": {
           "attributes": {
-            "$ref": "#/components/schemas/ParameterAttributes"
+            "$ref": "#/components/schemas/ParameterAttributesModel"
           },
           "member": {
-            "$ref": "#/components/schemas/MemberInfo"
+            "$ref": "#/components/schemas/MemberInfoModel"
           },
           "name": {
             "type": "string",
@@ -7583,7 +8538,7 @@
             "readOnly": true
           },
           "parameterType": {
-            "$ref": "#/components/schemas/Type"
+            "$ref": "#/components/schemas/TypeModel"
           },
           "position": {
             "type": "integer",
@@ -7625,7 +8580,7 @@
           "customAttributes": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/CustomAttributeData"
+              "$ref": "#/components/schemas/CustomAttributeDataModel"
             },
             "readOnly": true
           },
@@ -7637,7 +8592,7 @@
         },
         "additionalProperties": false
       },
-      "ProblemDetails": {
+      "ProblemDetailsModel": {
         "type": "object",
         "properties": {
           "type": {
@@ -7662,9 +8617,9 @@
             "nullable": true
           }
         },
-        "additionalProperties": {}
+        "additionalProperties": { }
       },
-      "ProfilingStatus": {
+      "ProfilingStatusModel": {
         "type": "object",
         "properties": {
           "enabled": {
@@ -7673,7 +8628,7 @@
         },
         "additionalProperties": false
       },
-      "PropertyAttributes": {
+      "PropertyAttributesModel": {
         "enum": [
           "None",
           "SpecialName",
@@ -7687,7 +8642,7 @@
         "type": "integer",
         "format": "int32"
       },
-      "PropertyInfo": {
+      "PropertyInfoModel": {
         "type": "object",
         "properties": {
           "name": {
@@ -7695,18 +8650,18 @@
             "readOnly": true
           },
           "declaringType": {
-            "$ref": "#/components/schemas/Type"
+            "$ref": "#/components/schemas/TypeModel"
           },
           "reflectedType": {
-            "$ref": "#/components/schemas/Type"
+            "$ref": "#/components/schemas/TypeModel"
           },
           "module": {
-            "$ref": "#/components/schemas/Module"
+            "$ref": "#/components/schemas/ModuleModel"
           },
           "customAttributes": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/CustomAttributeData"
+              "$ref": "#/components/schemas/CustomAttributeDataModel"
             },
             "readOnly": true
           },
@@ -7720,13 +8675,13 @@
             "readOnly": true
           },
           "memberType": {
-            "$ref": "#/components/schemas/MemberTypes"
+            "$ref": "#/components/schemas/MemberTypesModel"
           },
           "propertyType": {
-            "$ref": "#/components/schemas/Type"
+            "$ref": "#/components/schemas/TypeModel"
           },
           "attributes": {
-            "$ref": "#/components/schemas/PropertyAttributes"
+            "$ref": "#/components/schemas/PropertyAttributesModel"
           },
           "isSpecialName": {
             "type": "boolean",
@@ -7741,15 +8696,30 @@
             "readOnly": true
           },
           "getMethod": {
-            "$ref": "#/components/schemas/MethodInfo"
+            "$ref": "#/components/schemas/MethodInfoModel"
           },
           "setMethod": {
-            "$ref": "#/components/schemas/MethodInfo"
+            "$ref": "#/components/schemas/MethodInfoModel"
           }
         },
         "additionalProperties": false
       },
-      "RecycleBinItem": {
+      "ReadOnlySpanByteModel": {
+        "type": "object",
+        "properties": {
+          "length": {
+            "type": "integer",
+            "format": "int32",
+            "readOnly": true
+          },
+          "isEmpty": {
+            "type": "boolean",
+            "readOnly": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "RecycleBinItemModel": {
         "type": "object",
         "properties": {
           "key": {
@@ -7779,7 +8749,7 @@
         },
         "additionalProperties": false
       },
-      "RedirectStatus": {
+      "RedirectStatusModel": {
         "enum": [
           "Enabled",
           "Disabled"
@@ -7787,7 +8757,7 @@
         "type": "integer",
         "format": "int32"
       },
-      "RedirectUrl": {
+      "RedirectUrlModel": {
         "type": "object",
         "properties": {
           "key": {
@@ -7815,11 +8785,11 @@
         },
         "additionalProperties": false
       },
-      "RedirectUrlStatus": {
+      "RedirectUrlStatusModel": {
         "type": "object",
         "properties": {
           "status": {
-            "$ref": "#/components/schemas/RedirectStatus"
+            "$ref": "#/components/schemas/RedirectStatusModel"
           },
           "userIsAdmin": {
             "type": "boolean"
@@ -7827,37 +8797,11 @@
         },
         "additionalProperties": false
       },
-      "Relation": {
+      "ReferenceHandlerModel": {
         "type": "object",
-        "properties": {
-          "parentId": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "parentName": {
-            "type": "string",
-            "nullable": true
-          },
-          "childId": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "childName": {
-            "type": "string",
-            "nullable": true
-          },
-          "createDate": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "comment": {
-            "type": "string",
-            "nullable": true
-          }
-        },
         "additionalProperties": false
       },
-      "RelationItem": {
+      "RelationItemModel": {
         "type": "object",
         "properties": {
           "nodeKey": {
@@ -7897,16 +8841,46 @@
         },
         "additionalProperties": false
       },
-      "RuntimeFieldHandle": {
+      "RelationModel": {
         "type": "object",
         "properties": {
-          "value": {
-            "$ref": "#/components/schemas/IntPtr"
+          "parentId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "parentName": {
+            "type": "string",
+            "nullable": true
+          },
+          "childId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "childName": {
+            "type": "string",
+            "nullable": true
+          },
+          "createDate": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "comment": {
+            "type": "string",
+            "nullable": true
           }
         },
         "additionalProperties": false
       },
-      "RuntimeLevel": {
+      "RuntimeFieldHandleModel": {
+        "type": "object",
+        "properties": {
+          "value": {
+            "$ref": "#/components/schemas/IntPtrModel"
+          }
+        },
+        "additionalProperties": false
+      },
+      "RuntimeLevelModel": {
         "enum": [
           "Unknown",
           "Boot",
@@ -7918,25 +8892,25 @@
         "type": "integer",
         "format": "int32"
       },
-      "RuntimeMethodHandle": {
+      "RuntimeMethodHandleModel": {
         "type": "object",
         "properties": {
           "value": {
-            "$ref": "#/components/schemas/IntPtr"
+            "$ref": "#/components/schemas/IntPtrModel"
           }
         },
         "additionalProperties": false
       },
-      "RuntimeTypeHandle": {
+      "RuntimeTypeHandleModel": {
         "type": "object",
         "properties": {
           "value": {
-            "$ref": "#/components/schemas/IntPtr"
+            "$ref": "#/components/schemas/IntPtrModel"
           }
         },
         "additionalProperties": false
       },
-      "SavedLogSearch": {
+      "SavedLogSearchModel": {
         "type": "object",
         "properties": {
           "name": {
@@ -7948,7 +8922,7 @@
         },
         "additionalProperties": false
       },
-      "SearchResult": {
+      "SearchResultModel": {
         "type": "object",
         "properties": {
           "id": {
@@ -7966,13 +8940,17 @@
           "fields": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/Field"
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/FieldModel"
+                }
+              ]
             }
           }
         },
         "additionalProperties": false
       },
-      "Searcher": {
+      "SearcherModel": {
         "type": "object",
         "properties": {
           "name": {
@@ -7981,7 +8959,7 @@
         },
         "additionalProperties": false
       },
-      "SecurityRuleSet": {
+      "SecurityRuleSetModel": {
         "enum": [
           "None",
           "Level1",
@@ -7990,16 +8968,16 @@
         "type": "integer",
         "format": "int32"
       },
-      "ServerStatus": {
+      "ServerStatusModel": {
         "type": "object",
         "properties": {
           "serverStatus": {
-            "$ref": "#/components/schemas/RuntimeLevel"
+            "$ref": "#/components/schemas/RuntimeLevelModel"
           }
         },
         "additionalProperties": false
       },
-      "StatusResultType": {
+      "StatusResultTypeModel": {
         "enum": [
           "Success",
           "Warning",
@@ -8009,28 +8987,55 @@
         "type": "integer",
         "format": "int32"
       },
-      "StructLayoutAttribute": {
+      "StructLayoutAttributeModel": {
         "type": "object",
         "properties": {
           "typeId": {
             "readOnly": true
           },
           "value": {
-            "$ref": "#/components/schemas/LayoutKind"
+            "$ref": "#/components/schemas/LayoutKindModel"
           }
         },
         "additionalProperties": false
       },
-      "Telemetry": {
+      "SystemTextJsonOutputFormatterModel": {
+        "required": [
+          "$type"
+        ],
         "type": "object",
         "properties": {
-          "telemetryLevel": {
-            "$ref": "#/components/schemas/TelemetryLevel"
+          "$type": {
+            "type": "string"
+          },
+          "supportedMediaTypes": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "readOnly": true
+          },
+          "supportedEncodings": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/EncodingModel"
+            },
+            "readOnly": true
+          },
+          "serializerOptions": {
+            "$ref": "#/components/schemas/JsonSerializerOptionsModel"
           }
         },
-        "additionalProperties": false
+        "additionalProperties": false,
+        "discriminator": {
+          "propertyName": "$type",
+          "mapping": {
+            "SystemTextJsonOutputFormatter": "#/components/schemas/SystemTextJsonOutputFormatterModel",
+            "NamedSystemTextJsonOutputFormatter": "#/components/schemas/NamedSystemTextJsonOutputFormatterModel"
+          }
+        }
       },
-      "TelemetryLevel": {
+      "TelemetryLevelModel": {
         "enum": [
           "Minimal",
           "Basic",
@@ -8039,19 +9044,32 @@
         "type": "integer",
         "format": "int32"
       },
-      "Template": {
+      "TelemetryModel": {
         "type": "object",
         "properties": {
-          "name": {
-            "type": "string"
-          },
-          "alias": {
-            "type": "string"
-          },
-          "content": {
-            "type": "string",
-            "nullable": true
-          },
+          "telemetryLevel": {
+            "$ref": "#/components/schemas/TelemetryLevelModel"
+          }
+        },
+        "additionalProperties": false
+      },
+      "TemplateCreateModel": {
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/TemplateModelBaseModel"
+          }
+        ],
+        "additionalProperties": false
+      },
+      "TemplateModel": {
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/TemplateModelBaseModel"
+          }
+        ],
+        "properties": {
           "key": {
             "type": "string",
             "format": "uuid"
@@ -8059,7 +9077,7 @@
         },
         "additionalProperties": false
       },
-      "TemplateCreateModel": {
+      "TemplateModelBaseModel": {
         "type": "object",
         "properties": {
           "name": {
@@ -8085,7 +9103,7 @@
             "type": "string"
           },
           "operator": {
-            "$ref": "#/components/schemas/Operator"
+            "$ref": "#/components/schemas/OperatorModel"
           }
         },
         "additionalProperties": false
@@ -8105,12 +9123,21 @@
           "filters": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/TemplateQueryExecuteFilterModel"
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/TemplateQueryExecuteFilterModel"
+                }
+              ]
             },
             "nullable": true
           },
           "sort": {
-            "$ref": "#/components/schemas/TemplateQueryExecuteSortModel"
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/TemplateQueryExecuteSortModel"
+              }
+            ],
+            "nullable": true
           },
           "take": {
             "type": "integer",
@@ -8132,34 +9159,34 @@
         },
         "additionalProperties": false
       },
-      "TemplateQueryOperator": {
+      "TemplateQueryOperatorModel": {
         "type": "object",
         "properties": {
           "operator": {
-            "$ref": "#/components/schemas/Operator"
+            "$ref": "#/components/schemas/OperatorModel"
           },
           "applicableTypes": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/TemplateQueryPropertyType"
+              "$ref": "#/components/schemas/TemplateQueryPropertyTypeModel"
             }
           }
         },
         "additionalProperties": false
       },
-      "TemplateQueryProperty": {
+      "TemplateQueryPropertyModel": {
         "type": "object",
         "properties": {
           "alias": {
             "type": "string"
           },
           "type": {
-            "$ref": "#/components/schemas/TemplateQueryPropertyType"
+            "$ref": "#/components/schemas/TemplateQueryPropertyTypeModel"
           }
         },
         "additionalProperties": false
       },
-      "TemplateQueryPropertyType": {
+      "TemplateQueryPropertyTypeModel": {
         "enum": [
           "String",
           "DateTime",
@@ -8168,7 +9195,19 @@
         "type": "integer",
         "format": "int32"
       },
-      "TemplateQueryResult": {
+      "TemplateQueryResultItemModel": {
+        "type": "object",
+        "properties": {
+          "icon": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "TemplateQueryResultModel": {
         "type": "object",
         "properties": {
           "queryExpression": {
@@ -8177,7 +9216,11 @@
           "sampleResults": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/TemplateQueryResultItem"
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/TemplateQueryResultItemModel"
+                }
+              ]
             }
           },
           "resultCount": {
@@ -8191,19 +9234,7 @@
         },
         "additionalProperties": false
       },
-      "TemplateQueryResultItem": {
-        "type": "object",
-        "properties": {
-          "icon": {
-            "type": "string"
-          },
-          "name": {
-            "type": "string"
-          }
-        },
-        "additionalProperties": false
-      },
-      "TemplateQuerySettings": {
+      "TemplateQuerySettingsModel": {
         "type": "object",
         "properties": {
           "contentTypeAliases": {
@@ -8215,19 +9246,27 @@
           "properties": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/TemplateQueryProperty"
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/TemplateQueryPropertyModel"
+                }
+              ]
             }
           },
           "operators": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/TemplateQueryOperator"
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/TemplateQueryOperatorModel"
+                }
+              ]
             }
           }
         },
         "additionalProperties": false
       },
-      "TemplateScaffold": {
+      "TemplateScaffoldModel": {
         "type": "object",
         "properties": {
           "content": {
@@ -8238,310 +9277,32 @@
       },
       "TemplateUpdateModel": {
         "type": "object",
-        "properties": {
-          "name": {
-            "type": "string"
-          },
-          "alias": {
-            "type": "string"
-          },
-          "content": {
-            "type": "string",
-            "nullable": true
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/TemplateModelBaseModel"
           }
-        },
+        ],
         "additionalProperties": false
       },
-      "Type": {
+      "TreeItemModel": {
         "type": "object",
         "properties": {
           "name": {
-            "type": "string",
-            "readOnly": true
+            "type": "string"
           },
-          "customAttributes": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/CustomAttributeData"
-            },
-            "readOnly": true
+          "type": {
+            "type": "string"
           },
-          "isCollectible": {
-            "type": "boolean",
-            "readOnly": true
+          "icon": {
+            "type": "string"
           },
-          "metadataToken": {
-            "type": "integer",
-            "format": "int32",
-            "readOnly": true
-          },
-          "isInterface": {
-            "type": "boolean",
-            "readOnly": true
-          },
-          "memberType": {
-            "$ref": "#/components/schemas/MemberTypes"
-          },
-          "namespace": {
-            "type": "string",
-            "nullable": true,
-            "readOnly": true
-          },
-          "assemblyQualifiedName": {
-            "type": "string",
-            "nullable": true,
-            "readOnly": true
-          },
-          "fullName": {
-            "type": "string",
-            "nullable": true,
-            "readOnly": true
-          },
-          "assembly": {
-            "$ref": "#/components/schemas/Assembly"
-          },
-          "module": {
-            "$ref": "#/components/schemas/Module"
-          },
-          "isNested": {
-            "type": "boolean",
-            "readOnly": true
-          },
-          "declaringType": {
-            "$ref": "#/components/schemas/Type"
-          },
-          "declaringMethod": {
-            "$ref": "#/components/schemas/MethodBase"
-          },
-          "reflectedType": {
-            "$ref": "#/components/schemas/Type"
-          },
-          "underlyingSystemType": {
-            "$ref": "#/components/schemas/Type"
-          },
-          "isTypeDefinition": {
-            "type": "boolean",
-            "readOnly": true
-          },
-          "isArray": {
-            "type": "boolean",
-            "readOnly": true
-          },
-          "isByRef": {
-            "type": "boolean",
-            "readOnly": true
-          },
-          "isPointer": {
-            "type": "boolean",
-            "readOnly": true
-          },
-          "isConstructedGenericType": {
-            "type": "boolean",
-            "readOnly": true
-          },
-          "isGenericParameter": {
-            "type": "boolean",
-            "readOnly": true
-          },
-          "isGenericTypeParameter": {
-            "type": "boolean",
-            "readOnly": true
-          },
-          "isGenericMethodParameter": {
-            "type": "boolean",
-            "readOnly": true
-          },
-          "isGenericType": {
-            "type": "boolean",
-            "readOnly": true
-          },
-          "isGenericTypeDefinition": {
-            "type": "boolean",
-            "readOnly": true
-          },
-          "isSZArray": {
-            "type": "boolean",
-            "readOnly": true
-          },
-          "isVariableBoundArray": {
-            "type": "boolean",
-            "readOnly": true
-          },
-          "isByRefLike": {
-            "type": "boolean",
-            "readOnly": true
-          },
-          "hasElementType": {
-            "type": "boolean",
-            "readOnly": true
-          },
-          "genericTypeArguments": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/Type"
-            },
-            "readOnly": true
-          },
-          "genericParameterPosition": {
-            "type": "integer",
-            "format": "int32",
-            "readOnly": true
-          },
-          "genericParameterAttributes": {
-            "$ref": "#/components/schemas/GenericParameterAttributes"
-          },
-          "attributes": {
-            "$ref": "#/components/schemas/TypeAttributes"
-          },
-          "isAbstract": {
-            "type": "boolean",
-            "readOnly": true
-          },
-          "isImport": {
-            "type": "boolean",
-            "readOnly": true
-          },
-          "isSealed": {
-            "type": "boolean",
-            "readOnly": true
-          },
-          "isSpecialName": {
-            "type": "boolean",
-            "readOnly": true
-          },
-          "isClass": {
-            "type": "boolean",
-            "readOnly": true
-          },
-          "isNestedAssembly": {
-            "type": "boolean",
-            "readOnly": true
-          },
-          "isNestedFamANDAssem": {
-            "type": "boolean",
-            "readOnly": true
-          },
-          "isNestedFamily": {
-            "type": "boolean",
-            "readOnly": true
-          },
-          "isNestedFamORAssem": {
-            "type": "boolean",
-            "readOnly": true
-          },
-          "isNestedPrivate": {
-            "type": "boolean",
-            "readOnly": true
-          },
-          "isNestedPublic": {
-            "type": "boolean",
-            "readOnly": true
-          },
-          "isNotPublic": {
-            "type": "boolean",
-            "readOnly": true
-          },
-          "isPublic": {
-            "type": "boolean",
-            "readOnly": true
-          },
-          "isAutoLayout": {
-            "type": "boolean",
-            "readOnly": true
-          },
-          "isExplicitLayout": {
-            "type": "boolean",
-            "readOnly": true
-          },
-          "isLayoutSequential": {
-            "type": "boolean",
-            "readOnly": true
-          },
-          "isAnsiClass": {
-            "type": "boolean",
-            "readOnly": true
-          },
-          "isAutoClass": {
-            "type": "boolean",
-            "readOnly": true
-          },
-          "isUnicodeClass": {
-            "type": "boolean",
-            "readOnly": true
-          },
-          "isCOMObject": {
-            "type": "boolean",
-            "readOnly": true
-          },
-          "isContextful": {
-            "type": "boolean",
-            "readOnly": true
-          },
-          "isEnum": {
-            "type": "boolean",
-            "readOnly": true
-          },
-          "isMarshalByRef": {
-            "type": "boolean",
-            "readOnly": true
-          },
-          "isPrimitive": {
-            "type": "boolean",
-            "readOnly": true
-          },
-          "isValueType": {
-            "type": "boolean",
-            "readOnly": true
-          },
-          "isSignatureType": {
-            "type": "boolean",
-            "readOnly": true
-          },
-          "isSecurityCritical": {
-            "type": "boolean",
-            "readOnly": true
-          },
-          "isSecuritySafeCritical": {
-            "type": "boolean",
-            "readOnly": true
-          },
-          "isSecurityTransparent": {
-            "type": "boolean",
-            "readOnly": true
-          },
-          "structLayoutAttribute": {
-            "$ref": "#/components/schemas/StructLayoutAttribute"
-          },
-          "typeInitializer": {
-            "$ref": "#/components/schemas/ConstructorInfo"
-          },
-          "typeHandle": {
-            "$ref": "#/components/schemas/RuntimeTypeHandle"
-          },
-          "guid": {
-            "type": "string",
-            "format": "uuid",
-            "readOnly": true
-          },
-          "baseType": {
-            "$ref": "#/components/schemas/Type"
-          },
-          "isSerializable": {
-            "type": "boolean",
-            "readOnly": true
-          },
-          "containsGenericParameters": {
-            "type": "boolean",
-            "readOnly": true
-          },
-          "isVisible": {
-            "type": "boolean",
-            "readOnly": true
+          "hasChildren": {
+            "type": "boolean"
           }
         },
         "additionalProperties": false
       },
-      "TypeAttributes": {
+      "TypeAttributesModel": {
         "enum": [
           "NotPublic",
           "AutoLayout",
@@ -8579,7 +9340,7 @@
         "type": "integer",
         "format": "int32"
       },
-      "TypeInfo": {
+      "TypeInfoModel": {
         "type": "object",
         "properties": {
           "name": {
@@ -8589,7 +9350,7 @@
           "customAttributes": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/CustomAttributeData"
+              "$ref": "#/components/schemas/CustomAttributeDataModel"
             },
             "readOnly": true
           },
@@ -8607,7 +9368,7 @@
             "readOnly": true
           },
           "memberType": {
-            "$ref": "#/components/schemas/MemberTypes"
+            "$ref": "#/components/schemas/MemberTypesModel"
           },
           "namespace": {
             "type": "string",
@@ -8625,26 +9386,26 @@
             "readOnly": true
           },
           "assembly": {
-            "$ref": "#/components/schemas/Assembly"
+            "$ref": "#/components/schemas/AssemblyModel"
           },
           "module": {
-            "$ref": "#/components/schemas/Module"
+            "$ref": "#/components/schemas/ModuleModel"
           },
           "isNested": {
             "type": "boolean",
             "readOnly": true
           },
           "declaringType": {
-            "$ref": "#/components/schemas/Type"
+            "$ref": "#/components/schemas/TypeModel"
           },
           "declaringMethod": {
-            "$ref": "#/components/schemas/MethodBase"
+            "$ref": "#/components/schemas/MethodBaseModel"
           },
           "reflectedType": {
-            "$ref": "#/components/schemas/Type"
+            "$ref": "#/components/schemas/TypeModel"
           },
           "underlyingSystemType": {
-            "$ref": "#/components/schemas/Type"
+            "$ref": "#/components/schemas/TypeModel"
           },
           "isTypeDefinition": {
             "type": "boolean",
@@ -8705,7 +9466,7 @@
           "genericTypeArguments": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/Type"
+              "$ref": "#/components/schemas/TypeModel"
             },
             "readOnly": true
           },
@@ -8715,10 +9476,10 @@
             "readOnly": true
           },
           "genericParameterAttributes": {
-            "$ref": "#/components/schemas/GenericParameterAttributes"
+            "$ref": "#/components/schemas/GenericParameterAttributesModel"
           },
           "attributes": {
-            "$ref": "#/components/schemas/TypeAttributes"
+            "$ref": "#/components/schemas/TypeAttributesModel"
           },
           "isAbstract": {
             "type": "boolean",
@@ -8837,13 +9598,13 @@
             "readOnly": true
           },
           "structLayoutAttribute": {
-            "$ref": "#/components/schemas/StructLayoutAttribute"
+            "$ref": "#/components/schemas/StructLayoutAttributeModel"
           },
           "typeInitializer": {
-            "$ref": "#/components/schemas/ConstructorInfo"
+            "$ref": "#/components/schemas/ConstructorInfoModel"
           },
           "typeHandle": {
-            "$ref": "#/components/schemas/RuntimeTypeHandle"
+            "$ref": "#/components/schemas/RuntimeTypeHandleModel"
           },
           "guid": {
             "type": "string",
@@ -8851,7 +9612,7 @@
             "readOnly": true
           },
           "baseType": {
-            "$ref": "#/components/schemas/Type"
+            "$ref": "#/components/schemas/TypeModel"
           },
           "isSerializable": {
             "type": "boolean",
@@ -8868,70 +9629,382 @@
           "genericTypeParameters": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/Type"
+              "$ref": "#/components/schemas/TypeModel"
             },
             "readOnly": true
           },
           "declaredConstructors": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/ConstructorInfo"
+              "$ref": "#/components/schemas/ConstructorInfoModel"
             },
             "readOnly": true
           },
           "declaredEvents": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/EventInfo"
+              "$ref": "#/components/schemas/EventInfoModel"
             },
             "readOnly": true
           },
           "declaredFields": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/FieldInfo"
+              "$ref": "#/components/schemas/FieldInfoModel"
             },
             "readOnly": true
           },
           "declaredMembers": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/MemberInfo"
+              "$ref": "#/components/schemas/MemberInfoModel"
             },
             "readOnly": true
           },
           "declaredMethods": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/MethodInfo"
+              "$ref": "#/components/schemas/MethodInfoModel"
             },
             "readOnly": true
           },
           "declaredNestedTypes": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/TypeInfo"
+              "$ref": "#/components/schemas/TypeInfoModel"
             },
             "readOnly": true
           },
           "declaredProperties": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/PropertyInfo"
+              "$ref": "#/components/schemas/PropertyInfoModel"
             },
             "readOnly": true
           },
           "implementedInterfaces": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/Type"
+              "$ref": "#/components/schemas/TypeModel"
             },
             "readOnly": true
           }
         },
         "additionalProperties": false
       },
-      "UpgradeSettings": {
+      "TypeModel": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "readOnly": true
+          },
+          "customAttributes": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CustomAttributeDataModel"
+            },
+            "readOnly": true
+          },
+          "isCollectible": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "metadataToken": {
+            "type": "integer",
+            "format": "int32",
+            "readOnly": true
+          },
+          "isInterface": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "memberType": {
+            "$ref": "#/components/schemas/MemberTypesModel"
+          },
+          "namespace": {
+            "type": "string",
+            "nullable": true,
+            "readOnly": true
+          },
+          "assemblyQualifiedName": {
+            "type": "string",
+            "nullable": true,
+            "readOnly": true
+          },
+          "fullName": {
+            "type": "string",
+            "nullable": true,
+            "readOnly": true
+          },
+          "assembly": {
+            "$ref": "#/components/schemas/AssemblyModel"
+          },
+          "module": {
+            "$ref": "#/components/schemas/ModuleModel"
+          },
+          "isNested": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "declaringType": {
+            "$ref": "#/components/schemas/TypeModel"
+          },
+          "declaringMethod": {
+            "$ref": "#/components/schemas/MethodBaseModel"
+          },
+          "reflectedType": {
+            "$ref": "#/components/schemas/TypeModel"
+          },
+          "underlyingSystemType": {
+            "$ref": "#/components/schemas/TypeModel"
+          },
+          "isTypeDefinition": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "isArray": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "isByRef": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "isPointer": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "isConstructedGenericType": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "isGenericParameter": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "isGenericTypeParameter": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "isGenericMethodParameter": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "isGenericType": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "isGenericTypeDefinition": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "isSZArray": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "isVariableBoundArray": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "isByRefLike": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "hasElementType": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "genericTypeArguments": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TypeModel"
+            },
+            "readOnly": true
+          },
+          "genericParameterPosition": {
+            "type": "integer",
+            "format": "int32",
+            "readOnly": true
+          },
+          "genericParameterAttributes": {
+            "$ref": "#/components/schemas/GenericParameterAttributesModel"
+          },
+          "attributes": {
+            "$ref": "#/components/schemas/TypeAttributesModel"
+          },
+          "isAbstract": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "isImport": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "isSealed": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "isSpecialName": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "isClass": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "isNestedAssembly": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "isNestedFamANDAssem": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "isNestedFamily": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "isNestedFamORAssem": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "isNestedPrivate": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "isNestedPublic": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "isNotPublic": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "isPublic": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "isAutoLayout": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "isExplicitLayout": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "isLayoutSequential": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "isAnsiClass": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "isAutoClass": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "isUnicodeClass": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "isCOMObject": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "isContextful": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "isEnum": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "isMarshalByRef": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "isPrimitive": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "isValueType": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "isSignatureType": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "isSecurityCritical": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "isSecuritySafeCritical": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "isSecurityTransparent": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "structLayoutAttribute": {
+            "$ref": "#/components/schemas/StructLayoutAttributeModel"
+          },
+          "typeInitializer": {
+            "$ref": "#/components/schemas/ConstructorInfoModel"
+          },
+          "typeHandle": {
+            "$ref": "#/components/schemas/RuntimeTypeHandleModel"
+          },
+          "guid": {
+            "type": "string",
+            "format": "uuid",
+            "readOnly": true
+          },
+          "baseType": {
+            "$ref": "#/components/schemas/TypeModel"
+          },
+          "isSerializable": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "containsGenericParameters": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "isVisible": {
+            "type": "boolean",
+            "readOnly": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "UmbracoJsonTypeInfoResolverModel": {
+        "required": [
+          "$type"
+        ],
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/DefaultJsonTypeInfoResolverModel"
+          }
+        ],
+        "properties": {
+          "$type": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false,
+        "discriminator": {
+          "propertyName": "$type",
+          "mapping": {
+            "UmbracoJsonTypeInfoResolver": "#/components/schemas/UmbracoJsonTypeInfoResolverModel"
+          }
+        }
+      },
+      "UpgradeSettingsModel": {
         "type": "object",
         "properties": {
           "currentState": {
@@ -8953,7 +10026,7 @@
         },
         "additionalProperties": false
       },
-      "UserInstall": {
+      "UserInstallModel": {
         "required": [
           "email",
           "name",
@@ -8982,7 +10055,7 @@
         },
         "additionalProperties": false
       },
-      "UserSettings": {
+      "UserSettingsModel": {
         "type": "object",
         "properties": {
           "minCharLength": {
@@ -8996,13 +10069,17 @@
           "consentLevels": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/ConsentLevel"
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/ConsentLevelModel"
+                }
+              ]
             }
           }
         },
         "additionalProperties": false
       },
-      "Version": {
+      "VersionModel": {
         "type": "object",
         "properties": {
           "version": {
@@ -9020,7 +10097,7 @@
           "authorizationCode": {
             "authorizationUrl": "/umbraco/management/api/v1.0/security/back-office/authorize",
             "tokenUrl": "/umbraco/management/api/v1.0/security/back-office/token",
-            "scopes": {}
+            "scopes": { }
           }
         }
       }
@@ -9028,7 +10105,7 @@
   },
   "security": [
     {
-      "OAuth": []
+      "OAuth": [ ]
     }
   ]
 }

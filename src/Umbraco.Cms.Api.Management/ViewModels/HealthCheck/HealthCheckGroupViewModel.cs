@@ -1,12 +1,7 @@
 namespace Umbraco.Cms.Api.Management.ViewModels.HealthCheck;
 
-public class HealthCheckGroupViewModel
+public class HealthCheckGroupViewModel : HealthCheckGroupModelBase
 {
-    /// <summary>
-    ///     Gets or sets the name.
-    /// </summary>
-    public string? Name { get; set; }
-
     /// <summary>
     ///     Gets or sets the health checks.
     /// </summary>

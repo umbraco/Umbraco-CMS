@@ -3,8 +3,8 @@ using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Management.Factories;
 using Umbraco.Cms.Api.Management.ViewModels.DataType;
 using Umbraco.Cms.Core;
-using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Api.Management.Controllers.DataType;
 
@@ -23,17 +23,15 @@ public class ReferencesDataTypeController : DataTypeControllerBase
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(DataTypeReferenceViewModel[]), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<ActionResult<DataTypeReferenceViewModel[]>> References(Guid key)
+    public async Task<IActionResult> References(Guid key)
     {
-        IDataType? dataType = _dataTypeService.GetDataType(key);
-        if (dataType == null)
+        Attempt<IReadOnlyDictionary<Udi, IEnumerable<string>>, DataTypeOperationStatus> result = await _dataTypeService.GetReferencesAsync(key);
+        if (result.Success == false)
         {
-            return NotFound();
+            return DataTypeOperationStatusResult(result.Status);
         }
 
-        IReadOnlyDictionary<Udi, IEnumerable<string>> usages = _dataTypeService.GetReferences(dataType.Id);
-        DataTypeReferenceViewModel[] viewModels = _dataTypeReferenceViewModelFactory.CreateDataTypeReferenceViewModels(usages).ToArray();
-
-        return await Task.FromResult(Ok(viewModels));
+        DataTypeReferenceViewModel[] viewModels = _dataTypeReferenceViewModelFactory.CreateDataTypeReferenceViewModels(result.Result).ToArray();
+        return Ok(viewModels);
     }
 }

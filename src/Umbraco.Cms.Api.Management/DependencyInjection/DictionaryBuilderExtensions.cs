@@ -13,7 +13,7 @@ internal static class DictionaryBuilderExtensions
     {
         builder.Services
             .AddTransient<IDictionaryFactory, DictionaryFactory>()
-            .AddTransient<ILoadDictionaryItemService, LoadDictionaryItemService>();
+            .AddTransient<IDictionaryItemImportService, DictionaryItemImportService>();
 
         builder.WithCollectionBuilder<MapDefinitionCollectionBuilder>().Add<DictionaryMapDefinition>();
 
