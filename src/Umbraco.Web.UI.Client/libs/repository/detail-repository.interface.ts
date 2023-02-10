@@ -1,27 +1,25 @@
-import type { ProblemDetails } from "@umbraco-cms/backend-api";
+import type { ProblemDetailsModel } from '@umbraco-cms/backend-api';
 
 export interface UmbDetailRepository<DetailType> {
-
 	createDetailsScaffold(parentKey: string | null): Promise<{
 		data?: DetailType;
-		error?: ProblemDetails;
-	}>
+		error?: ProblemDetailsModel;
+	}>;
 
 	requestDetails(key: string): Promise<{
 		data?: DetailType;
-		error?: ProblemDetails;
-	}>
+		error?: ProblemDetailsModel;
+	}>;
 
 	createDetail(data: DetailType): Promise<{
-		error?: ProblemDetails;
-	}>
+		error?: ProblemDetailsModel;
+	}>;
 
 	saveDetail(data: DetailType): Promise<{
-		error?: ProblemDetails;
-	}>
+		error?: ProblemDetailsModel;
+	}>;
 
 	delete(key: string): Promise<{
-		error?: ProblemDetails;
-	}>
-
+		error?: ProblemDetailsModel;
+	}>;
 }
