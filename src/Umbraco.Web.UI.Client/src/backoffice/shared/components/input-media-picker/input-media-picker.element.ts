@@ -163,7 +163,6 @@ export class UmbInputMediaPickerElement extends FormControlMixin(UmbLitElement) 
 	private _setSelection(newSelection: Array<string>) {
 		this.selectedKeys = newSelection;
 		this.dispatchEvent(new CustomEvent('change', { bubbles: true, composed: true }));
-		console.log(this._items);
 	}
 
 	render() {

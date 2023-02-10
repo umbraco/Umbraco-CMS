@@ -1,15 +1,15 @@
 import { expect, fixture, html } from '@open-wc/testing';
-import { UmbInputMediaPickerElement } from './input-media-picker.element';
+import { UmbColorPickerElement } from './color-picker.element';
 import { defaultA11yConfig } from '@umbraco-cms/test-utils';
-describe('UmbInputMediaPickerElement', () => {
-	let element: UmbInputMediaPickerElement;
+describe('UmbColorPickerElement', () => {
+	let element: UmbColorPickerElement;
 
 	beforeEach(async () => {
-		element = await fixture(html` <umb-input-media-picker></umb-input-media-picker> `);
+		element = await fixture(html` <umb-color-picker></umb-color-picker> `);
 	});
 
 	it('is defined with its own instance', () => {
-		expect(element).to.be.instanceOf(UmbInputMediaPickerElement);
+		expect(element).to.be.instanceOf(UmbColorPickerElement);
 	});
 
 	it('passes the a11y audit', async () => {
