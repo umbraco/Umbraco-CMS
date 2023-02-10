@@ -44,7 +44,25 @@ internal abstract class NestedPropertyIndexValueFactoryBase<TSerialized, TItem> 
                     propertyTypeDictionary, nestedContentRowValue));
             }
 
-            return result;
+            return MoveRawKeySegmentsToStart(result);
+        }
+
+        private IEnumerable<KeyValuePair<string, IEnumerable<object?>>> MoveRawKeySegmentsToStart(List<KeyValuePair<string, IEnumerable<object?>>> indexContent)
+        {
+            foreach (KeyValuePair<string, IEnumerable<object?>> indexedKeyValuePair in indexContent)
+            {
+                //Tests if key includes the RawFieldPrefix, and it is not in the start
+                if (indexedKeyValuePair.Key.Substring(1).Contains(UmbracoExamineFieldNames.RawFieldPrefix))
+                {
+                    var newKey = UmbracoExamineFieldNames.RawFieldPrefix + indexedKeyValuePair.Key.Replace(UmbracoExamineFieldNames.RawFieldPrefix, string.Empty);
+                    yield return new KeyValuePair<string, IEnumerable<object?>>(newKey, indexedKeyValuePair.Value);
+                }
+                else
+                {
+                    yield return indexedKeyValuePair;
+                }
+            }
+
         }
 
         protected abstract IContentType? GetContentTypeOfNestedItem(TItem input);
