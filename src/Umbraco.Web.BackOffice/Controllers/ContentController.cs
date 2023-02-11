@@ -3013,9 +3013,9 @@ public class ContentController : ContentControllerBase
 
     [Authorize(Policy = AuthorizationPolicies.ContentPermissionRollbackById)]
     [HttpPost]
-    public IActionResult PostRollbackContent(int contentId, int versionId, string culture = "*")
+    public IActionResult PostRollbackContent(int contentId, int versionId, string? culture = null)
     {
-        OperationResult rollbackResult = _contentService.Rollback(contentId, versionId, culture, _backofficeSecurityAccessor.BackOfficeSecurity?.GetUserId().Result ?? -1);
+        OperationResult rollbackResult = _contentService.Rollback(contentId, versionId, culture ?? "*", _backofficeSecurityAccessor.BackOfficeSecurity?.GetUserId().Result ?? -1);
 
         if (rollbackResult.Success)
         {

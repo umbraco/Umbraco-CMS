@@ -304,6 +304,14 @@ function listViewController($scope, $interpolate, $routeParams, $injector, $time
                     navigationService.reloadSection(section);
                 }
             }
+        }).catch(function(error){
+          // if someone attempts to add mix listviews across sections (i.e. use a members list view on content types),
+          // a not-supported exception will be most likely be thrown, at least for the default list views - lets be
+          // helpful and show a meaningful error message directly in content/content type UI
+          if(error.data && error.data.ExceptionType && error.data.ExceptionType.indexOf("System.NotSupportedException") > -1) {
+            $scope.viewLoadedError = error.errorMsg + ": " + error.data.ExceptionMessage;
+          }
+          $scope.viewLoaded = true;
         });
     };
 
@@ -674,9 +682,18 @@ function listViewController($scope, $interpolate, $routeParams, $injector, $time
             }
 
             if (e.nameExp) {
-                var newValue = e.nameExp({ value });
-                if (newValue && (newValue = newValue.trim())) {
-                    value = newValue;
+                if (/{{.*\s*\w+\s*\|\s*\w+\s*.*}}/.test(e.nameTemplate)) { //check whether the name template has a filter
+                    value = {
+                      value,
+                      expression: e.nameExp
+                    };
+                }
+                else {
+                    var newValue = e.nameExp({ value });
+
+                    if (newValue && (newValue = newValue.trim())) {
+                      value = newValue;
+                    }
                 }
             }
 

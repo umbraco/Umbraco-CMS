@@ -4,7 +4,9 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Strings;
@@ -322,5 +324,50 @@ public class StringExtensionsTests
     {
         var output = input.ReplaceMany(toReplace.ToArray(), replacement);
         Assert.AreEqual(expected, output);
+    }
+
+    [Test]
+    public void IsFullPath()
+    {
+        bool isWindows = System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
+
+        // These are full paths on Windows, but not on Linux
+        TryIsFullPath(@"C:\dir\file.ext", isWindows);
+        TryIsFullPath(@"C:\dir\", isWindows);
+        TryIsFullPath(@"C:\dir", isWindows);
+        TryIsFullPath(@"C:\", isWindows);
+        TryIsFullPath(@"\\unc\share\dir\file.ext", isWindows);
+        TryIsFullPath(@"\\unc\share", isWindows);
+
+        // These are full paths on Linux, but not on Windows
+        TryIsFullPath(@"/some/file", !isWindows);
+        TryIsFullPath(@"/dir", !isWindows);
+        TryIsFullPath(@"/", !isWindows);
+
+        // Not full paths on either Windows or Linux
+        TryIsFullPath(@"file.ext", false);
+        TryIsFullPath(@"dir\file.ext", false);
+        TryIsFullPath(@"\dir\file.ext", false);
+        TryIsFullPath(@"C:", false);
+        TryIsFullPath(@"C:dir\file.ext", false);
+        TryIsFullPath(@"\dir", false); // An "absolute", but not "full" path
+
+        // Invalid on both Windows and Linux
+        TryIsFullPath("", false, false);
+        TryIsFullPath("   ", false, false); // technically, a valid filename on Linux
+    }
+
+    private static void TryIsFullPath(string path, bool expectedIsFull, bool expectedIsValid = true)
+    {
+        Assert.AreEqual(expectedIsFull, path.IsFullPath(), "IsFullPath('" + path + "')");
+
+        if (expectedIsFull)
+        {
+            Assert.AreEqual(path, Path.GetFullPath(path));
+        }
+        else if (expectedIsValid)
+        {
+            Assert.AreNotEqual(path, Path.GetFullPath(path));
+        }
     }
 }

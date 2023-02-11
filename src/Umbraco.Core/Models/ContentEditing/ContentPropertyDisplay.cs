@@ -15,6 +15,9 @@ public class ContentPropertyDisplay : ContentPropertyBasic
         Validation = new PropertyTypeValidation();
     }
 
+    [DataMember(Name = "variations")]
+    public ContentVariation Variations { get; set; }
+
     [DataMember(Name = "label", IsRequired = true)]
     [Required]
     public string? Label { get; set; }

@@ -3,9 +3,7 @@ umb-media-card {
     position: relative;
     display: inline-block;
     width: 100%;
-    //background-color: white;
     border-radius: @baseBorderRadius;
-    //box-shadow: 0 1px 2px rgba(0,0,0,.2);
     overflow: hidden;
     transition: box-shadow 120ms;
     cursor: pointer;
@@ -194,3 +192,32 @@ umb-media-card {
         }
     }
 }
+
+
+.umb-media-card {
+    .__upload-progress-container {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        width: 100%;
+        height: 100%;
+        backdrop-filter: blur(2px);
+        background-color: rgba(255,255,255,.7);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        .__upload-progress {
+            width: 66%;
+            margin-top: 13px;
+        }
+
+        .__upload-progress-label {
+            font-size: 13px;
+            margin-top: 3px;
+        }
+    }
+}
+

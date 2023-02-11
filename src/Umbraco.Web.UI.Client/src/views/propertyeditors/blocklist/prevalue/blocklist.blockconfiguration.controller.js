@@ -72,7 +72,7 @@
             });
 
             event.stopPropagation();
-        }
+        };
 
         vm.removeBlockByIndex = function (index) {
             $scope.model.value.splice(index, 1);

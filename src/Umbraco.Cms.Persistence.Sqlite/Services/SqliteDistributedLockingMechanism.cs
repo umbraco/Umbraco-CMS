@@ -1,5 +1,6 @@
 using System.Data;
 using System.Data.Common;
+using System.Globalization;
 using Microsoft.Data.SqlClient;
 using Microsoft.Data.Sqlite;
 using Microsoft.Extensions.Logging;
@@ -142,7 +143,7 @@ public class SqliteDistributedLockingMechanism : IDistributedLockingMechanism
                     "SqliteDistributedLockingMechanism requires a transaction to function.");
             }
 
-            var query = @$"UPDATE umbracoLock SET value = (CASE WHEN (value=1) THEN -1 ELSE 1 END) WHERE id = {LockId}";
+            var query = @$"UPDATE umbracoLock SET value = (CASE WHEN (value=1) THEN -1 ELSE 1 END) WHERE id = {LockId.ToString(CultureInfo.InvariantCulture)}";
 
             DbCommand command = db.CreateCommand(db.Connection, CommandType.Text, query);
 

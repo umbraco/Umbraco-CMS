@@ -22,6 +22,9 @@ public class SecuritySettings
     internal const string StaticAllowedUserNameCharacters =
         "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+\\";
 
+    internal const int StaticMemberDefaultLockoutTimeInMinutes = 30 * 24 * 60;
+    internal const int StaticUserDefaultLockoutTimeInMinutes = 30 * 24 * 60;
+
     /// <summary>
     ///     Gets or sets a value indicating whether to keep the user logged in.
     /// </summary>
@@ -86,9 +89,22 @@ public class SecuritySettings
     [DefaultValue(StaticUserBypassTwoFactorForExternalLogins)]
     public bool UserBypassTwoFactorForExternalLogins { get; set; } = StaticUserBypassTwoFactorForExternalLogins;
 
-        /// <summary>
-        /// Gets or sets a value indicating whether to allow editing invariant properties from a non-default language variation.
-        /// </summary>
-        [DefaultValue(StaticAllowEditInvariantFromNonDefault)]
-        public bool AllowEditInvariantFromNonDefault { get; set; } = StaticAllowEditInvariantFromNonDefault;
+    /// <summary>
+    ///     Gets or sets a value for how long (in minutes) a member is locked out when a lockout occurs.
+    /// </summary>
+    [DefaultValue(StaticMemberDefaultLockoutTimeInMinutes)]
+    public int MemberDefaultLockoutTimeInMinutes { get; set; } = StaticMemberDefaultLockoutTimeInMinutes;
+
+    /// <summary>
+    ///     Gets or sets a value for how long (in minutes) a user is locked out when a lockout occurs.
+    /// </summary>
+    [DefaultValue(StaticUserDefaultLockoutTimeInMinutes)]
+    public int UserDefaultLockoutTimeInMinutes { get; set; } = StaticUserDefaultLockoutTimeInMinutes;
+
+    /// <summary>
+    /// Gets or sets a value indicating whether to allow editing invariant properties from a non-default language variation.
+    /// </summary>
+    [Obsolete("Use ContentSettings.AllowEditFromInvariant instead")]
+    [DefaultValue(StaticAllowEditInvariantFromNonDefault)]
+    public bool AllowEditInvariantFromNonDefault { get; set; } = StaticAllowEditInvariantFromNonDefault;
 }

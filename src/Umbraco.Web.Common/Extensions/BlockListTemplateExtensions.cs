@@ -10,6 +10,33 @@ public static class BlockListTemplateExtensions
     public const string DefaultFolder = "blocklist/";
     public const string DefaultTemplate = "default";
 
+    #region Async
+
+    public static async Task<IHtmlContent> GetBlockListHtmlAsync(this IHtmlHelper html, BlockListModel? model, string template = DefaultTemplate)
+    {
+        if (model?.Count == 0)
+        {
+            return new HtmlString(string.Empty);
+        }
+
+        return await html.PartialAsync(DefaultFolderTemplate(template), model);
+    }
+
+    public static async Task<IHtmlContent> GetBlockListHtmlAsync(this IHtmlHelper html, IPublishedProperty property, string template = DefaultTemplate)
+        => await GetBlockListHtmlAsync(html, property.GetValue() as BlockListModel, template);
+
+    public static async Task<IHtmlContent> GetBlockListHtmlAsync(this IHtmlHelper html, IPublishedContent contentItem, string propertyAlias)
+        => await GetBlockListHtmlAsync(html, contentItem, propertyAlias, DefaultTemplate);
+
+    public static async Task<IHtmlContent> GetBlockListHtmlAsync(this IHtmlHelper html, IPublishedContent contentItem, string propertyAlias, string template)
+    {
+        IPublishedProperty property = GetRequiredProperty(contentItem, propertyAlias);
+        return await GetBlockListHtmlAsync(html, property.GetValue() as BlockListModel, template);
+    }
+    #endregion
+
+    #region Sync
+
     public static IHtmlContent GetBlockListHtml(this IHtmlHelper html, BlockListModel? model, string template = DefaultTemplate)
     {
         if (model?.Count == 0)
@@ -17,8 +44,7 @@ public static class BlockListTemplateExtensions
             return new HtmlString(string.Empty);
         }
 
-        var view = DefaultFolder + template;
-        return html.Partial(view, model);
+        return html.Partial(DefaultFolderTemplate(template), model);
     }
 
     public static IHtmlContent GetBlockListHtml(this IHtmlHelper html, IPublishedProperty property, string template = DefaultTemplate)
@@ -29,10 +55,17 @@ public static class BlockListTemplateExtensions
 
     public static IHtmlContent GetBlockListHtml(this IHtmlHelper html, IPublishedContent contentItem, string propertyAlias, string template)
     {
-        if (propertyAlias == null)
-        {
-            throw new ArgumentNullException(nameof(propertyAlias));
-        }
+        IPublishedProperty property = GetRequiredProperty(contentItem, propertyAlias);
+        return GetBlockListHtml(html, property.GetValue() as BlockListModel, template);
+    }
+
+    #endregion
+
+    private static string DefaultFolderTemplate(string template) => $"{DefaultFolder}{template}";
+
+    private static IPublishedProperty GetRequiredProperty(IPublishedContent contentItem, string propertyAlias)
+    {
+        ArgumentNullException.ThrowIfNull(propertyAlias);
 
         if (string.IsNullOrWhiteSpace(propertyAlias))
         {
@@ -41,12 +74,12 @@ public static class BlockListTemplateExtensions
                 nameof(propertyAlias));
         }
 
-        IPublishedProperty? prop = contentItem.GetProperty(propertyAlias);
-        if (prop == null)
+        IPublishedProperty? property = contentItem.GetProperty(propertyAlias);
+        if (property == null)
         {
             throw new InvalidOperationException("No property type found with alias " + propertyAlias);
         }
 
-        return GetBlockListHtml(html, prop.GetValue() as BlockListModel, template);
+        return property;
     }
 }

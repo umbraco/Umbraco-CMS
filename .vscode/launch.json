@@ -9,9 +9,8 @@
             "type": "coreclr",
             "request": "launch",
             "preLaunchTask": "Dotnet build",
-            // If you have changed target frameworks, make sure to update the program path.
-            "program": "${workspaceFolder}/src/Umbraco.Web.UI/bin/Debug/net5.0/Umbraco.Web.UI.dll",
-            "args": [],
+            "program": "dotnet",
+            "args": ["run"],
             "cwd": "${workspaceFolder}/src/Umbraco.Web.UI",
             "stopAtEntry": false,
             "requireExactSource": false,

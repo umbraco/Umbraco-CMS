@@ -17,10 +17,14 @@ label small, .guiDialogTiny {
 }
 
 label.control-label, .control-label {
-  padding: 0 10px 0 0 !important;
   font-weight: bold;
   color: @black;
   font-size: 14px;
+}
+
+label.control-label[disabled], .control-label[disabled] {
+  color: @gray-5;
+  pointer-events: none;
 }
 
 
@@ -770,7 +774,7 @@ input.search-query {
 
 // Margin to space out fieldsets
 .control-group {
-  margin-bottom: (@baseLineHeight / 2);
+  margin-bottom: (@baseLineHeight / 2) + 5px;
 }
 
 //modifier for control group
@@ -799,6 +803,9 @@ legend + .control-group {
     width: (@horizontalComponentOffset - 20);
     padding-top: 5px;
     text-align: right;
+    &[disabled] {
+      color: @gray-5;
+    }
   }
   // Move over all input controls and content
   .controls {

@@ -26,24 +26,12 @@ public static class MapperContextExtensions
     /// <summary>
     ///     Sets a context culture.
     /// </summary>
-    public static void SetCulture(this MapperContext context, string? culture)
-    {
-        if (culture is not null)
-        {
-            context.Items[CultureKey] = culture;
-        }
-    }
+    public static void SetCulture(this MapperContext context, string? culture) => context.Items[CultureKey] = culture;
 
     /// <summary>
     ///     Sets a context segment.
     /// </summary>
-    public static void SetSegment(this MapperContext context, string? segment)
-    {
-        if (segment is not null)
-        {
-            context.Items[SegmentKey] = segment;
-        }
-    }
+    public static void SetSegment(this MapperContext context, string? segment) => context.Items[SegmentKey] = segment;
 
     /// <summary>
     ///     Get included properties.

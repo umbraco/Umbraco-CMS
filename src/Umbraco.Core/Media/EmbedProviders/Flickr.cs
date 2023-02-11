@@ -4,7 +4,9 @@ using Umbraco.Cms.Core.Serialization;
 
 namespace Umbraco.Cms.Core.Media.EmbedProviders;
 
-// TODO(V10) : change base class to OEmbedProviderBase
+/// <summary>
+///     Embed Provider for Flickr the popular online image hosting and video hosting service.
+/// </summary>
 public class Flickr : EmbedProviderBase
 {
     public Flickr(IJsonSerializer jsonSerializer)

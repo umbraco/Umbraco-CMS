@@ -845,6 +845,10 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
     public Attempt<OperationResult<MoveOperationStatusType>?> Move(TItem moving, int containerId)
     {
         EventMessages eventMessages = EventMessagesFactory.Get();
+        if(moving.ParentId == containerId)
+        {
+            return OperationResult.Attempt.Fail(MoveOperationStatusType.FailedNotAllowedByPath, eventMessages);
+        }
 
         var moveInfo = new List<MoveEventInfo<TItem>>();
         using (ICoreScope scope = ScopeProvider.CreateCoreScope())

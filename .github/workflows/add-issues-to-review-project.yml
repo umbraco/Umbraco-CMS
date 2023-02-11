@@ -5,6 +5,9 @@ on:
     types:
       - opened
 
+permissions:
+  contents: read
+
 jobs:
   get-user-type:
     runs-on: ubuntu-latest
@@ -43,6 +46,8 @@ jobs:
             core.setOutput("ignored", isIgnoredUser);
             console.log("Ignored is", isIgnoredUser);
   add-to-project:
+    permissions:
+      repository-projects: write # for actions/add-to-project
     if: needs.get-user-type.outputs.ignored == 'false'
     runs-on: ubuntu-latest
     needs: [get-user-type]

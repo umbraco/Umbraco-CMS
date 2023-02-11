@@ -54,12 +54,20 @@ angular.module("umbraco.install").controller("Umbraco.Install.UserController", f
 
       const pips = consentSlider.querySelectorAll('.noUi-value');
 
+      consentSlider.noUiSlider.on('update', function (values,handle) {
+        consentSlider.querySelectorAll('.noUi-value').forEach(pip => {
+          pip.classList.remove("noUi-value-active");
+          if (Number(values[handle]) === Number(pip.getAttribute('data-value'))) {
+            pip.classList.add("noUi-value-active");
+          }
+        });
+      });
+
       $(consentSlider).on('$destroy', function () {
         consentSlider.noUiSlider.off();
       });
 
       pips.forEach(function (pip) {
-
         pip.addEventListener('click', function () {
           const value = pip.getAttribute('data-value');
           consentSlider.noUiSlider.set(value);
@@ -73,13 +81,14 @@ angular.module("umbraco.install").controller("Umbraco.Install.UserController", f
   };
 
   $scope.validateAndForward = function () {
-    if (this.myForm.$valid) {
+    if (this.installerForm.$valid) {
       installerService.forward();
     }
   };
 
   function onChangeConsent(values) {
-    const result = Number(values[0]) - 1;
+    const result = Math.round(Number(values[0]) - 1);
+
     $scope.$apply(() => {
       setTelemetryLevelAndDescription(result);
     });

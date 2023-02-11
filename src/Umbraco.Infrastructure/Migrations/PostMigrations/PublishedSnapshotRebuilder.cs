@@ -26,7 +26,7 @@ public class PublishedSnapshotRebuilder : IPublishedSnapshotRebuilder
     /// <inheritdoc />
     public void Rebuild()
     {
-        _publishedSnapshotService.Rebuild();
+        _publishedSnapshotService.RebuildAll();
         _distributedCache.RefreshAllPublishedSnapshot();
     }
 }

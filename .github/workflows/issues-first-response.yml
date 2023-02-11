@@ -1,0 +1,53 @@
+name: issue-first-response
+
+on:
+  issues:
+    types: [opened]
+
+jobs: 
+  send-response:
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+      pull-requests: write    
+    steps:
+      - name: Install dependencies
+        run: |
+          npm install node-fetch@2
+      - name: Fetch random comment 🗣️ and add it to the issue
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const fetch = require('node-fetch')
+
+            const response = await fetch('https://collaboratorsv2.euwest01.umbraco.io/umbraco/api/comments/PostComment', {
+              method: 'post',
+              body: JSON.stringify({
+                repo: '${{ github.repository }}',
+                number: '${{ github.event.number }}',
+                actor: '${{ github.actor }}',
+                commentType: 'opened-issue-first-comment'
+              }),
+              headers: {
+                'Authorization': 'Bearer ${{ secrets.OUR_BOT_API_TOKEN }}',
+                'Content-Type': 'application/json'
+              }
+            });
+
+            try {
+                const data = await response.text();
+
+                if(response.status === 200 && data !== '') {
+                    github.rest.issues.createComment({
+                        issue_number: context.issue.number,
+                        owner: context.repo.owner,
+                        repo: context.repo.repo,
+                        body: data
+                    });
+                } else {
+                    console.log("Status code did not indicate success:", response.status);
+                    console.log("Returned data:", data);
+                }
+            } catch(error) {
+                console.log(error);
+            }

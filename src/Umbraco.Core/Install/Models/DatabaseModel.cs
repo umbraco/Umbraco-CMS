@@ -11,6 +11,8 @@ public class DatabaseModel
     [DataMember(Name = "providerName")]
     public string? ProviderName { get; set; }
 
+    // TODO: Make this nullable in V11
+    // Server can be null, for instance when installing a SQLite database.
     [DataMember(Name = "server")]
     public string Server { get; set; } = null!;
 
@@ -18,10 +20,10 @@ public class DatabaseModel
     public string DatabaseName { get; set; } = null!;
 
     [DataMember(Name = "login")]
-    public string Login { get; set; } = null!;
+    public string? Login { get; set; }
 
     [DataMember(Name = "password")]
-    public string Password { get; set; } = null!;
+    public string? Password { get; set; }
 
     [DataMember(Name = "integratedAuth")]
     public bool IntegratedAuth { get; set; }

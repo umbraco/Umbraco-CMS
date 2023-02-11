@@ -2,7 +2,7 @@
 <language alias="ru" intName="Russian" localName="русский" lcid="" culture="ru-RU">
   <creator>
     <name>The Umbraco community</name>
-    <link>https://our.umbraco.com/documentation/Extending-Umbraco/Language-Files</link>
+    <link>https://docs.umbraco.com/umbraco-cms/extending/language-files</link>
   </creator>
   <area alias="actions">
     <key alias="assigndomain">Языки и домены</key>
@@ -218,7 +218,7 @@
     <key alias="removeDate">Очистить дату</key>
     <key alias="routeError">ВНИМАНИЕ: этот документ опубликован, но его URL вступает в противоречие с документом %0%</key>
     <key alias="scheduledPublishServerTime">Это время будет соответствовать следующему времени на сервере:</key>
-    <key alias="scheduledPublishDocumentation"><![CDATA[<a href="https://our.umbraco.com/documentation/Getting-Started/Data/Scheduled-Publishing/#timezones" target="_blank" rel="noopener">Что это означает?</a>]]></key>
+    <key alias="scheduledPublishDocumentation"><![CDATA[<a href="https://docs.umbraco.com/umbraco-cms/fundamentals/data/scheduled-publishing#timezones" target="_blank" rel="noopener">Что это означает?</a>]]></key>
     <key alias="setDate">Задать дату</key>
     <key alias="sortDone">Порядок сортировки обновлен</key>
     <key alias="sortHelp">Для сортировки узлов просто перетаскивайте узлы или нажмите на заголовке столбца. Вы можете выбрать несколько узлов, удерживая клавиши "shift" или "ctrl" при пометке</key>
@@ -1195,7 +1195,6 @@
     <key alias="folderWasRenamed">'%0%' была переименована в '%1%'</key>
   </area>
   <area alias="rollback">
-    <key alias="currentVersion">Текущая версия</key>
     <key alias="diffHelp"><![CDATA[Здесь показаны различия между новейшей версией документа и выбранной Вами версией.<br /><del>Красным</del> отмечен текст, которого уже нет в последней версии, <ins>зеленым</ins> - текст, который добавлен]]></key>
     <key alias="documentRolledBack">Произведен откат к ранней версии</key>
     <key alias="htmlHelp">Текущая версия показана в виде HTML. Для просмотра различий в версиях выберите режим сравнения</key>

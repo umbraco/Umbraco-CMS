@@ -1,4 +1,4 @@
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration;
@@ -9,6 +9,7 @@ using Umbraco.Cms.Web.Common.DependencyInjection;
 
 namespace Umbraco.Cms.Core.Install.InstallSteps;
 
+[Obsolete("Will be replace with a new step with the new backoffice")]
 [InstallSetupStep(
     InstallationType.NewInstall | InstallationType.Upgrade,
     "TelemetryIdConfiguration",

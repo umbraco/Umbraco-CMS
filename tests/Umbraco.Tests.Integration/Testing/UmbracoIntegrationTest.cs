@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -104,7 +105,7 @@ public abstract class UmbracoIntegrationTest : UmbracoIntegrationTestBase
                 context.HostingEnvironment = TestHelper.GetWebHostEnvironment();
                 configBuilder.Sources.Clear();
                 configBuilder.AddInMemoryCollection(InMemoryConfiguration);
-                configBuilder.AddConfiguration(GlobalSetupTeardown.TestConfiguration);
+                SetUpTestConfiguration(configBuilder);
 
                 Configuration = configBuilder.Build();
             })
@@ -193,4 +194,12 @@ public abstract class UmbracoIntegrationTest : UmbracoIntegrationTestBase
     }
 
     protected virtual T GetRequiredService<T>() => Services.GetRequiredService<T>();
+
+    protected virtual void SetUpTestConfiguration(IConfigurationBuilder configBuilder)
+    {
+        if (GlobalSetupTeardown.TestConfiguration is not null)
+        {
+            configBuilder.AddConfiguration(GlobalSetupTeardown.TestConfiguration);
+        }
+    }
 }

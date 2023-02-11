@@ -1,7 +1,7 @@
 (function () {
   "use strict";
 
-  function UserGroupEditController($scope, $location, $routeParams, userGroupsResource, localizationService, contentEditingHelper, editorService, overlayService) {
+  function UserGroupEditController($scope, $location, $routeParams, userGroupsResource, localizationService, contentEditingHelper, editorService, overlayService, eventsService) {
 
     var infiniteMode = $scope.model && $scope.model.infiniteMode;
     var id = infiniteMode ? $scope.model.id : $routeParams.id;
@@ -107,6 +107,11 @@
           setSectionIcon(vm.userGroup.sections);
           makeBreadcrumbs();
           vm.page.saveButtonState = "success";
+
+          eventsService.emit("editors.userGroups.userGroupSaved", {
+            userGroup: vm.userGroup,
+            isNew: create
+          });
         }
       }, function (err) {
         vm.page.saveButtonState = "error";

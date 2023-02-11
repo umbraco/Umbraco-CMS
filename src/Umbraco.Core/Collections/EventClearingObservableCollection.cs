@@ -1,5 +1,6 @@
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
+using Umbraco.Cms.Core.Models;
 
 namespace Umbraco.Cms.Core.Collections;
 
@@ -7,7 +8,7 @@ namespace Umbraco.Cms.Core.Collections;
 ///     Allows clearing all event handlers
 /// </summary>
 /// <typeparam name="TValue"></typeparam>
-public class EventClearingObservableCollection<TValue> : ObservableCollection<TValue>, INotifyCollectionChanged
+public class EventClearingObservableCollection<TValue> : ObservableCollection<TValue>, INotifyCollectionChanged, IDeepCloneable
 {
     // need to explicitly implement with event accessor syntax in order to override in order to to clear
     // c# events are weird, they do not behave the same way as other c# things that are 'virtual',
@@ -39,4 +40,12 @@ public class EventClearingObservableCollection<TValue> : ObservableCollection<TV
     ///     Clears all event handlers for the <see cref="CollectionChanged" /> event
     /// </summary>
     public void ClearCollectionChangedEvents() => _changed = null;
+
+    public object DeepClone()
+    {
+        var clone = new EventClearingObservableCollection<TValue>();
+        DeepCloneHelper.CloneListItems<EventClearingObservableCollection<TValue>, TValue>(this, clone);
+
+        return clone;
+    }
 }

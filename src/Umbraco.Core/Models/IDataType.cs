@@ -28,14 +28,26 @@ public interface IDataType : IUmbracoEntity, IRememberBeingDirty
     ValueStorageType DatabaseType { get; set; }
 
     /// <summary>
-    ///     Gets or sets the configuration object.
+    /// Gets or sets the configuration object.
     /// </summary>
     /// <remarks>
-    ///     <para>The configuration object is serialized to Json and stored into the database.</para>
-    ///     <para>
-    ///         The serialized Json is deserialized by the property editor, which by default should
-    ///         return a Dictionary{string, object} but could return a typed object e.g. MyEditor.Configuration.
-    ///     </para>
+    /// <para>The configuration object is serialized to Json and stored into the database.</para>
+    /// <para>The serialized Json is deserialized by the property editor, which by default should
+    /// return a Dictionary{string, object} but could return a typed object e.g. MyEditor.Configuration.</para>
     /// </remarks>
     object? Configuration { get; set; }
+
+    /// <summary>
+    /// Creates a deep clone of the current entity with its identity/alias reset
+    /// We have the default implementation here to avoid breaking changes for the user
+    /// </summary>
+    /// <returns></returns>
+    IDataType DeepCloneWithResetIdentities()
+    {
+        var clone = (DataType)DeepClone();
+        clone.Key = Guid.Empty;
+        clone.ResetIdentity();
+        return clone;
+    }
 }
+

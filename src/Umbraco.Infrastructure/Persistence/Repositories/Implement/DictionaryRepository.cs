@@ -33,11 +33,25 @@ internal class DictionaryRepository : EntityRepositoryBase<int, IDictionaryItem>
         return uniqueIdRepo.Get(uniqueId);
     }
 
+    public IEnumerable<IDictionaryItem> GetMany(params Guid[] uniqueIds)
+    {
+        var uniqueIdRepo = new DictionaryByUniqueIdRepository(this, ScopeAccessor, AppCaches,
+            _loggerFactory.CreateLogger<DictionaryByUniqueIdRepository>());
+        return uniqueIdRepo.GetMany(uniqueIds);
+    }
+
     public IDictionaryItem? Get(string key)
     {
         var keyRepo = new DictionaryByKeyRepository(this, ScopeAccessor, AppCaches,
             _loggerFactory.CreateLogger<DictionaryByKeyRepository>());
         return keyRepo.Get(key);
+    }
+
+    public IEnumerable<IDictionaryItem> GetManyByKeys(string[] keys)
+    {
+        var keyRepo = new DictionaryByKeyRepository(this, ScopeAccessor, AppCaches,
+            _loggerFactory.CreateLogger<DictionaryByKeyRepository>());
+        return keyRepo.GetMany(keys);
     }
 
     public Dictionary<string, Guid> GetDictionaryItemKeyMap()
@@ -70,12 +84,17 @@ internal class DictionaryRepository : EntityRepositoryBase<int, IDictionaryItem>
                 });
         };
 
-        IEnumerable<IEnumerable<IDictionaryItem>> childItems = parentId.HasValue == false
-            ? new[] { GetRootDictionaryItems() }
-            : getItemsFromParents(new[] { parentId.Value });
+        if (!parentId.HasValue)
+        {
+            Sql<ISqlContext> sql = GetBaseQuery(false)
+                .Where<DictionaryDto>(x => x.PrimaryKey > 0)
+                .OrderBy<DictionaryDto>(x => x.UniqueId);
+            return Database
+                .FetchOneToMany<DictionaryDto>(x => x.LanguageTextDtos, sql)
+                .Select(ConvertFromDto);
+        }
 
-        return childItems.SelectRecursive(items => getItemsFromParents(items.Select(x => x.Key).ToArray()))
-            .SelectMany(items => items);
+        return getItemsFromParents(new[] { parentId.Value }).SelectRecursive(items => getItemsFromParents(items.Select(x => x.Key).ToArray())).SelectMany(items => items);
     }
 
     protected override IRepositoryCachePolicy<IDictionaryItem, int> CreateCachePolicy()

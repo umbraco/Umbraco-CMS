@@ -252,6 +252,7 @@ public abstract class UmbracoUserManager<TUser, TPasswordConfig> : UserManager<T
     public async Task<bool> ValidateCredentialsAsync(string username, string password)
     {
         TUser user = await FindByNameAsync(username);
+        
         if (user == null)
         {
             return false;
@@ -262,10 +263,10 @@ public abstract class UmbracoUserManager<TUser, TPasswordConfig> : UserManager<T
             throw new NotSupportedException("The current user store does not implement " +
                                             typeof(IUserPasswordStore<>));
         }
+        
+        var result = await VerifyPasswordAsync(userPasswordStore, user, password);
 
-        var hash = await userPasswordStore.GetPasswordHashAsync(user, CancellationToken.None);
-
-        return await VerifyPasswordAsync(userPasswordStore, user, password) == PasswordVerificationResult.Success;
+        return result == PasswordVerificationResult.Success || result == PasswordVerificationResult.SuccessRehashNeeded;
     }
 
     public virtual async Task<IList<string>> GetValidTwoFactorProvidersAsync(TUser user)

@@ -1,25 +1,33 @@
-﻿using Microsoft.Extensions.Options;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Web.Common.DependencyInjection;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Services;
 
 public class CultureImpactFactory : ICultureImpactFactory
 {
-    private SecuritySettings _securitySettings;
+    private ContentSettings _contentSettings;
 
-    public CultureImpactFactory(IOptionsMonitor<SecuritySettings> securitySettings)
+    public CultureImpactFactory(IOptionsMonitor<ContentSettings> contentSettings)
     {
-        _securitySettings = securitySettings.CurrentValue;
+        _contentSettings = contentSettings.CurrentValue;
 
-        securitySettings.OnChange(x => _securitySettings = x);
+        contentSettings.OnChange(x => _contentSettings = x);
+    }
+
+    [Obsolete("Use constructor that takes IOptionsMonitor<SecuritySettings> instead. Scheduled for removal in V12")]
+    public CultureImpactFactory(IOptionsMonitor<SecuritySettings> securitySettings)
+        : this(StaticServiceProvider.Instance.GetRequiredService<IOptionsMonitor<ContentSettings>>())
+    {
     }
 
     /// <inheritdoc/>
     public CultureImpact? Create(string? culture, bool isDefault, IContent content)
     {
-        TryCreate(culture, isDefault, content.ContentType.Variations, true, _securitySettings.AllowEditInvariantFromNonDefault, out CultureImpact? impact);
+        TryCreate(culture, isDefault, content.ContentType.Variations, true, _contentSettings.AllowEditInvariantFromNonDefault, out CultureImpact? impact);
 
         return impact;
     }
@@ -48,7 +56,7 @@ public class CultureImpactFactory : ICultureImpactFactory
             throw new ArgumentException("Culture \"*\" is not explicit.");
         }
 
-        return new CultureImpact(culture, isDefault, _securitySettings.AllowEditInvariantFromNonDefault);
+        return new CultureImpact(culture, isDefault, _contentSettings.AllowEditInvariantFromNonDefault);
     }
 
     /// <inheritdoc/>

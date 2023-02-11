@@ -17,7 +17,8 @@ namespace Umbraco.Cms.Core.PropertyEditors;
     EditorType.PropertyValue | EditorType.MacroParameter,
     "Textbox",
     "textbox",
-    Group = Constants.PropertyEditors.Groups.Common)]
+    Group = Constants.PropertyEditors.Groups.Common,
+    ValueEditorIsReusable = true)]
 public class TextboxPropertyEditor : DataEditor
 {
     private readonly IEditorConfigurationParser _editorConfigurationParser;

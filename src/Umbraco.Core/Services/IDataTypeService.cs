@@ -16,7 +16,7 @@ public interface IDataTypeService : IService
     IReadOnlyDictionary<Udi, IEnumerable<string>> GetReferences(int id);
 
     Attempt<OperationResult<OperationResultType, EntityContainer>?> CreateContainer(int parentId, Guid key, string name, int userId = Constants.Security.SuperUserId);
-
+    
     Attempt<OperationResult?> SaveContainer(EntityContainer container, int userId = Constants.Security.SuperUserId);
 
     EntityContainer? GetContainer(int containerId);
@@ -100,4 +100,19 @@ public interface IDataTypeService : IService
     IEnumerable<IDataType> GetByEditorAlias(string propertyEditorAlias);
 
     Attempt<OperationResult<MoveOperationStatusType>?> Move(IDataType toMove, int parentId);
+
+    [Obsolete("Use the method which specifies the userId parameter")]
+    Attempt<OperationResult<MoveOperationStatusType, IDataType>?> Copy(IDataType copying, int containerId) => Copy(copying, containerId, Constants.Security.SuperUserId);
+
+    /// <summary>
+    /// Copies the give <see cref="IDataType"/> to a given container
+    /// We have the default implementation here to avoid breaking changes for the user
+    /// </summary>
+    /// <param name="copying">The data type that will be copied</param>
+    /// <param name="containerId">The container ID under where the data type will be copied</param>
+    /// <param name="userId">The user that did the Copy action</param>
+    /// <returns></returns>
+    /// <exception cref="NotImplementedException"></exception>
+    Attempt<OperationResult<MoveOperationStatusType, IDataType>?> Copy(IDataType copying, int containerId, int userId = Constants.Security.SuperUserId) => throw new NotImplementedException();
+
 }

@@ -75,17 +75,7 @@ public class UmbracoRouteValuesFactory : IUmbracoRouteValuesFactory
             throw new ArgumentNullException(nameof(request));
         }
 
-        string? customActionName = null;
-
-        // check that a template is defined), if it doesn't and there is a hijacked route it will just route
-        // to the index Action
-        if (request.HasTemplate())
-        {
-            // the template Alias should always be already saved with a safe name.
-            // if there are hyphens in the name and there is a hijacked route, then the Action will need to be attributed
-            // with the action name attribute.
-            customActionName = request.GetTemplateAlias()?.Split('.')[0].ToSafeAlias(_shortStringHelper);
-        }
+        string? customActionName = GetTemplateName(request);
 
         // The default values for the default controller/action
         var def = new UmbracoRouteValues(
@@ -160,10 +150,12 @@ public class UmbracoRouteValuesFactory : IUmbracoRouteValuesFactory
                     $"The call to {nameof(IPublishedRouter.UpdateRequestAsync)} cannot return null");
             }
 
+			string? customActionName = GetTemplateName(request);
+			
             def = new UmbracoRouteValues(
                 request,
                 def.ControllerActionDescriptor,
-                def.TemplateName);
+                customActionName);
 
             // if the content has changed, we must then again check for hijacked routes
             if (content != request.PublishedContent)
@@ -173,5 +165,20 @@ public class UmbracoRouteValuesFactory : IUmbracoRouteValuesFactory
         }
 
         return def;
+    }
+	
+	private string? GetTemplateName(IPublishedRequest request)
+    {
+        // check that a template is defined), if it doesn't and there is a hijacked route it will just route
+        // to the index Action
+        if (request.HasTemplate())
+        {
+            // the template Alias should always be already saved with a safe name.
+            // if there are hyphens in the name and there is a hijacked route, then the Action will need to be attributed
+            // with the action name attribute.
+            return request.GetTemplateAlias()?.Split('.')[0].ToSafeAlias(_shortStringHelper);
+        }
+
+        return null;
     }
 }

@@ -51,7 +51,7 @@ public class NuCacheContentService : RepositoryService, INuCacheContentService
             using (_profilingLogger.TraceDuration<NuCacheContentService>(
                        $"Rebuilding NuCache database with {serializer} serializer"))
             {
-                Rebuild();
+                RebuildAll();
                 _keyValueService.SetValue(NuCacheSerializerKey, serializer.ToString());
             }
         }
@@ -114,10 +114,16 @@ public class NuCacheContentService : RepositoryService, INuCacheContentService
         => _repository.RefreshMember(member);
 
     /// <inheritdoc />
+    public void RebuildAll()
+    {
+        Rebuild(Array.Empty<int>(), Array.Empty<int>(), Array.Empty<int>());
+    }
+
+    /// <inheritdoc />
     public void Rebuild(
-        IReadOnlyCollection<int>? contentTypeIds = null,
-        IReadOnlyCollection<int>? mediaTypeIds = null,
-        IReadOnlyCollection<int>? memberTypeIds = null)
+    IReadOnlyCollection<int>? contentTypeIds = null,
+    IReadOnlyCollection<int>? mediaTypeIds = null,
+    IReadOnlyCollection<int>? memberTypeIds = null)
     {
         using (ICoreScope scope = ScopeProvider.CreateCoreScope(repositoryCacheMode: RepositoryCacheMode.Scoped))
         {
