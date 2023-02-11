@@ -16,6 +16,9 @@ public class DocumentTypeDisplay : ContentTypeCompositionDisplay<PropertyTypeDis
     [DataMember(Name = "allowedTemplates")]
     public IEnumerable<EntityBasic> AllowedTemplates { get; set; }
 
+    [DataMember(Name = "variations")]
+    public ContentVariation Variations { get; set; }
+
     [DataMember(Name = "defaultTemplate")]
     public EntityBasic? DefaultTemplate { get; set; }
 

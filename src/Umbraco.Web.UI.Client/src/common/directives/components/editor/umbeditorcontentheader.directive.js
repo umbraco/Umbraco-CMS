@@ -238,6 +238,7 @@
             scope: {
                 name: "=",
                 nameDisabled: "<?",
+                nameReadonly: "<?",
                 menu: "=",
                 hideActionsMenu: "<?",
                 disableActionsMenu: "<?",

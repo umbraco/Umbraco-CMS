@@ -3,6 +3,7 @@ using Umbraco.Cms.Core.Models;
 
 namespace Umbraco.Cms.Core.Install.Models;
 
+[Obsolete("Will no longer be required with the new backoffice API")]
 [DataContract(Name = "user", Namespace = "")]
 public class UserModel
 {

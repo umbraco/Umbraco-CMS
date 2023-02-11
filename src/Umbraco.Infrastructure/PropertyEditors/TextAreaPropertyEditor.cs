@@ -18,7 +18,8 @@ namespace Umbraco.Cms.Core.PropertyEditors;
     "Textarea",
     "textarea",
     ValueType = ValueTypes.Text,
-    Icon = "icon-application-window-alt")]
+    Icon = "icon-application-window-alt",
+    ValueEditorIsReusable = true)]
 public class TextAreaPropertyEditor : DataEditor
 {
     private readonly IEditorConfigurationParser _editorConfigurationParser;
@@ -44,6 +45,7 @@ public class TextAreaPropertyEditor : DataEditor
     {
         _ioHelper = ioHelper;
         _editorConfigurationParser = editorConfigurationParser;
+        SupportsReadOnly = true;
     }
 
     /// <inheritdoc />

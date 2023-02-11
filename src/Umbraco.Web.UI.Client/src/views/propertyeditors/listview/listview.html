@@ -10,7 +10,7 @@
 
            <umb-editor-sub-header-content-left>
 
-               <umb-editor-sub-header-section ng-if="(listViewAllowedTypes && listViewAllowedTypes.length > 0 && (selection.length == 0)) && (currentNodePermissions == null || currentNodePermissions.canCreate)">
+               <umb-editor-sub-header-section ng-if="(listViewAllowedTypes && listViewAllowedTypes.length > 0 && (selection.length == 0)) && (currentNodePermissions == null || currentNodePermissions.canCreate) && options.allowCreate">
 
                     <!-- Renders when it's only possible to create one specific document type for, which no blueprint exists-->
                    <div class="btn-group" ng-show="createAllowedButtonSingle">
@@ -202,7 +202,7 @@
        </umb-editor-sub-header>
 
        <umb-list-view-layout
-         ng-if="viewLoaded"
+         ng-if="viewLoaded && !viewLoadedError"
          content-id="contentId"
          folders="folders"
          items="listViewResultSet.items"
@@ -213,6 +213,8 @@
       </umb-list-view-layout>
 
       <umb-load-indicator ng-show="!viewLoaded"></umb-load-indicator>
+
+      <div ng-if="viewLoaded && viewLoadedError" class="umb-alert umb-alert--warning">{{viewLoadedError}}</div>
 
       <div class="flex justify-center">
           <umb-pagination

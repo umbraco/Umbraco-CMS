@@ -21,6 +21,12 @@ public interface IUserGroup : IEntity, IRememberBeingDirty
     string? Name { get; set; }
 
     /// <summary>
+    ///     If this property is true it will give the group access to all languages
+    /// </summary>
+    /// This is set to return true as default to avoid breaking changes
+    public bool HasAccessToAllLanguages => true;
+
+    /// <summary>
     ///     The set of default permissions
     /// </summary>
     /// <remarks>
@@ -31,14 +37,28 @@ public interface IUserGroup : IEntity, IRememberBeingDirty
 
     IEnumerable<string> AllowedSections { get; }
 
-    /// <summary>
-    ///     Specifies the number of users assigned to this group
-    /// </summary>
-    int UserCount { get; }
-
     void RemoveAllowedSection(string sectionAlias);
 
     void AddAllowedSection(string sectionAlias);
 
     void ClearAllowedSections();
+
+    IEnumerable<int> AllowedLanguages => Enumerable.Empty<int>();
+
+    void RemoveAllowedLanguage(int languageId)
+    {
+    }
+
+    void AddAllowedLanguage(int languageId)
+    {
+    }
+
+    void ClearAllowedLanguages()
+    {
+    }
+
+    /// <summary>
+    ///     Specifies the number of users assigned to this group
+    /// </summary>
+    int UserCount { get; }
 }

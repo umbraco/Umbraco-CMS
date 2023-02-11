@@ -56,7 +56,7 @@ namespace Umbraco.Cms.Core.Snippets
             return content;
         }
 
-        private string CleanUpContents(string content)
+        private static string CleanUpContents(string content)
         {
             // Strip the @inherits if it's there
             var headerMatch = new Regex("^@inherits\\s+?.*$", RegexOptions.Multiline);
@@ -64,7 +64,9 @@ namespace Umbraco.Cms.Core.Snippets
 
             return newContent
                 .Replace("Model.Content.", "Model.")
-                .Replace("(Model.Content)", "(Model)");
+                .Replace("(Model.Content)", "(Model)")
+                .Replace("Model?.Content.", "Model.")
+                .Replace("(Model?.Content)", "(Model)");
         }
     }
 }

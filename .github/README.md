@@ -25,7 +25,7 @@ If you want to DIY, then you can [download Umbraco]((https://our.umbraco.com/dow
 
 ## Documentation
 
-The documentation for Umbraco CMS can be found [on Our Umbraco](https://our.umbraco.com/documentation/). The source for the Umbraco docs is [open source as well](https://github.com/umbraco/UmbracoDocs) and we're happy to look at your documentation contributions.
+The documentation for Umbraco CMS can be found [on Our Umbraco](https://docs.umbraco.com/). The source for the Umbraco docs is [open source as well](https://github.com/umbraco/UmbracoDocs) and we're happy to look at your documentation contributions.
 
 ## Join the Umbraco community
 

@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.Logging;
@@ -6,6 +6,8 @@ using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Actions;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
+using Umbraco.Cms.Core.Models.Membership;
+using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Web.BackOffice.Authorization;
 using Umbraco.Cms.Web.Common.Authorization;
@@ -26,6 +28,8 @@ internal sealed class ContentSaveValidationAttribute : TypeFilterAttribute
     {
         private readonly IAuthorizationService _authorizationService;
         private readonly IContentService _contentService;
+        private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
+        private readonly ILocalizationService _localizationService;
         private readonly ILoggerFactory _loggerFactory;
         private readonly IPropertyValidationService _propertyValidationService;
 
@@ -34,13 +38,17 @@ internal sealed class ContentSaveValidationAttribute : TypeFilterAttribute
             ILoggerFactory loggerFactory,
             IContentService contentService,
             IPropertyValidationService propertyValidationService,
-            IAuthorizationService authorizationService)
+            IAuthorizationService authorizationService,
+            IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
+            ILocalizationService localizationService)
         {
             _loggerFactory = loggerFactory ?? throw new ArgumentNullException(nameof(loggerFactory));
             _contentService = contentService ?? throw new ArgumentNullException(nameof(contentService));
             _propertyValidationService = propertyValidationService ??
                                          throw new ArgumentNullException(nameof(propertyValidationService));
             _authorizationService = authorizationService;
+            _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
+            _localizationService = localizationService;
         }
 
         public async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
@@ -135,6 +143,31 @@ internal sealed class ContentSaveValidationAttribute : TypeFilterAttribute
             var permissionToCheck = new List<char>();
             IContent? contentToCheck = null;
             int contentIdToCheck;
+
+            // First check if user has Access to that language
+            IUser? currentUser = _backOfficeSecurityAccessor.BackOfficeSecurity?.CurrentUser;
+            bool hasAccess = false;
+            if (currentUser is null)
+            {
+                return false;
+            }
+
+            foreach (IReadOnlyUserGroup group in currentUser.Groups)
+            {
+                IEnumerable<ILanguage> languages = _localizationService.GetAllLanguages().Where(x => group.AllowedLanguages.Contains(x.Id));
+                if (group.AllowedLanguages.Count() is 0 ||
+                    languages.Select(x => x.IsoCode).Intersect(contentItem?.Variants.Where(x => x.Save || x.Publish).Select(x => x.Culture) ?? Enumerable.Empty<string>()).Count() is not 0)
+                {
+                    hasAccess = true;
+                }
+            }
+
+            if (!hasAccess && contentItem?.Variants.First().Culture is not null)
+            {
+                actionContext.ModelState.AddModelError(Constants.ModelStateErrorKeys.PermissionError, "User does not have access to save language");
+                return false;
+            }
+
             switch (contentItem?.Action)
             {
                 case ContentSaveAction.Save:

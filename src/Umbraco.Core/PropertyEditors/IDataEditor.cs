@@ -14,6 +14,8 @@ public interface IDataEditor : IDiscoverable
     /// </summary>
     string Alias { get; }
 
+    bool SupportsReadOnly => false;
+
     /// <summary>
     ///     Gets the type of the editor.
     /// </summary>

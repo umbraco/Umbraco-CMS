@@ -29,7 +29,8 @@ namespace Umbraco.Cms.Core.PropertyEditors;
     ValueType = ValueTypes.Text,
     HideLabel = false,
     Group = Constants.PropertyEditors.Groups.RichContent,
-    Icon = "icon-browser-window")]
+    Icon = "icon-browser-window",
+    ValueEditorIsReusable = true)]
 public class RichTextPropertyEditor : DataEditor
 {
     private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
@@ -62,13 +63,6 @@ public class RichTextPropertyEditor : DataEditor
             macroParameterParser,
             StaticServiceProvider.Instance.GetRequiredService<IEditorConfigurationParser>())
     {
-        _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
-        _imageSourceParser = imageSourceParser;
-        _localLinkParser = localLinkParser;
-        _pastedImages = pastedImages;
-        _ioHelper = ioHelper;
-        _imageUrlGenerator = imageUrlGenerator;
-        _macroParameterParser = macroParameterParser;
     }
 
     [Obsolete("Use the constructor which takes an IHtmlMacroParameterParser instead")]
@@ -116,6 +110,7 @@ public class RichTextPropertyEditor : DataEditor
         _imageUrlGenerator = imageUrlGenerator;
         _macroParameterParser = macroParameterParser;
         _editorConfigurationParser = editorConfigurationParser;
+        SupportsReadOnly = true;
     }
 
     public override IPropertyIndexValueFactory PropertyIndexValueFactory => new RichTextPropertyIndexValueFactory();

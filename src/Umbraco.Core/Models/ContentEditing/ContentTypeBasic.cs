@@ -42,6 +42,9 @@ public class ContentTypeBasic : EntityBasic
     [DataMember(Name = "thumbnail")]
     public string? Thumbnail { get; set; }
 
+    [DataMember(Name = "variations")]
+    public ContentVariation Variations { get; set; }
+
     /// <summary>
     ///     Returns true if the icon represents a CSS class instead of a file path
     /// </summary>

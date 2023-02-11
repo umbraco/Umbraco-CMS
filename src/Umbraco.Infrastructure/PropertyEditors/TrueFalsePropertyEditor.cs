@@ -18,7 +18,8 @@ namespace Umbraco.Cms.Core.PropertyEditors;
     "boolean",
     ValueType = ValueTypes.Integer,
     Group = Constants.PropertyEditors.Groups.Common,
-    Icon = "icon-checkbox")]
+    Icon = "icon-checkbox",
+    ValueEditorIsReusable = true)]
 public class TrueFalsePropertyEditor : DataEditor
 {
     private readonly IEditorConfigurationParser _editorConfigurationParser;
@@ -44,6 +45,7 @@ public class TrueFalsePropertyEditor : DataEditor
     {
         _ioHelper = ioHelper;
         _editorConfigurationParser = editorConfigurationParser;
+        SupportsReadOnly = true;
     }
 
     /// <inheritdoc />

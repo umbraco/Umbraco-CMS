@@ -10,7 +10,11 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 [ExplicitColumns]
 public class UserGroupDto
 {
-    public UserGroupDto() => UserGroup2AppDtos = new List<UserGroup2AppDto>();
+    public UserGroupDto()
+    {
+        UserGroup2AppDtos = new List<UserGroup2AppDto>();
+        UserGroup2LanguageDtos = new List<UserGroup2LanguageDto>();
+    }
 
     [Column("id")]
     [PrimaryKeyColumn(IdentitySeed = 6)]
@@ -45,6 +49,10 @@ public class UserGroupDto
     [NullSetting(NullSetting = NullSettings.Null)]
     public string? Icon { get; set; }
 
+    [Column("hasAccessToAllLanguages")]
+    [NullSetting(NullSetting = NullSettings.NotNull)]
+    public bool HasAccessToAllLanguages { get; set; }
+
     [Column("startContentId")]
     [NullSetting(NullSetting = NullSettings.Null)]
     [ForeignKey(typeof(NodeDto), Name = "FK_startContentId_umbracoNode_id")]
@@ -58,6 +66,10 @@ public class UserGroupDto
     [ResultColumn]
     [Reference(ReferenceType.Many, ReferenceMemberName = "UserGroupId")]
     public List<UserGroup2AppDto> UserGroup2AppDtos { get; set; }
+
+    [ResultColumn]
+    [Reference(ReferenceType.Many, ReferenceMemberName = "UserGroupId")]
+    public List<UserGroup2LanguageDto> UserGroup2LanguageDtos { get; set; }
 
     /// <summary>
     ///     This is only relevant when this column is included in the results (i.e. GetUserGroupsWithUserCounts)

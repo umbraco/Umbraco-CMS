@@ -41,7 +41,7 @@
                         <h5><localize key="contentTypeEditor_configuration">Configuration</localize></h5>
 
                         <umb-property property="preValue" ng-repeat="preValue in vm.dataType.preValues">
-                            <umb-property-editor model="preValue" is-pre-value="true"></umb-property-editor>
+                            <umb-property-editor model="preValue" pre-values="vm.dataType.preValues" is-pre-value="true"></umb-property-editor>
                         </umb-property>
                     </div>
 

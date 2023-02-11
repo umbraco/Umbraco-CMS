@@ -14,7 +14,7 @@ public class StringUdi : Udi
     /// <param name="entityType">The entity type part of the udi.</param>
     /// <param name="id">The string id part of the udi.</param>
     public StringUdi(string entityType, string id)
-        : base(entityType, "umb://" + entityType + "/" + EscapeUriString(id)) =>
+        : base(entityType, Constants.Conventions.Udi.Prefix + entityType + "/" + EscapeUriString(id)) =>
         Id = id;
 
     /// <summary>

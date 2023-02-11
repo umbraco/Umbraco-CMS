@@ -1,9 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
-
   <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
-    <PackageId>Umbraco.Cms.Persistence.SqlServer</PackageId>
-    <Title>Umbraco.Cms.Persistence.SqlServer</Title>
+    <Title>Umbraco CMS - Persistence - SQL Server</Title>
     <Description>Adds support for SQL Server to Umbraco CMS.</Description>
   </PropertyGroup>
 
@@ -19,5 +16,4 @@
       <_Parameter1>Umbraco.Tests.UnitTests</_Parameter1>
     </AssemblyAttribute>
   </ItemGroup>
-
 </Project>

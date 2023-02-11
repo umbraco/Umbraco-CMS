@@ -2,7 +2,7 @@
 
     function () {
 
-        var link = function ($scope) {
+        var link = function ($scope, el, attrs) {
 
             // Clone the model because some property editors
             // do weird things like updating and config values
@@ -10,6 +10,12 @@
             // time, we'll just sync the value back when we need to
             $scope.model = Utilities.copy($scope.ngModel);
             $scope.nodeContext = $scope.model;
+
+            $scope.readonly = false;
+
+            attrs.$observe('readonly', (value) => {
+                $scope.readonly = value !== undefined;
+            });
 
             // Find the selected tab
             var selectedTab = $scope.model.variants[0].tabs[0];

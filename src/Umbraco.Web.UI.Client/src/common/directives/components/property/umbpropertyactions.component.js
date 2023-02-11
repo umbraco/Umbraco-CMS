@@ -5,7 +5,9 @@
      * A component to render the property action toggle
      */
     
-    function umbPropertyActionsController(keyboardService, localizationService) {
+    function umbPropertyActionsController(keyboardService, localizationService, $scope) {
+
+        var unsubscribe = [];
 
         var vm = this;
 
@@ -56,6 +58,9 @@
         }
 
         function onDestroy() {
+            for (var i = 0; i < unsubscribe.length; i++) {
+                unsubscribe[i]();
+            }
             if (vm.isOpen === true) {
                 destroyDropDown();
             }
@@ -72,25 +77,35 @@
                 vm.labels.openText = values[0];
                 vm.labels.closeText = values[1];
             });
+
+            unsubscribe.push($scope.$watchCollection("vm.actions",
+                function (newValue, oldValue) {
+                    if (newValue !== oldValue) {
+                        updateActions();
+                    }
+                }
+            ));
         }
 
         function onChanges(simpleChanges) {
             if (simpleChanges.actions) {
-
-              let actions = simpleChanges.actions.currentValue || [];
-
-              Utilities.forEach(actions, action => {
-
-                if (action.labelKey) {
-                    localizationService.localize(action.labelKey, (action.labelTokens || []), action.label).then(data => {
-                      action.label = data;
-                    });
-                    
-                    action.useLegacyIcon = action.useLegacyIcon === false ? false : true;
-                    action.icon = (action.useLegacyIcon ? 'icon-' : '') + action.icon;
-                }
-              });
+                updateActions();
             }
+        }
+
+        function updateActions() {
+
+            Utilities.forEach(vm.actions || [], action => {
+
+              if (action.labelKey) {
+                  localizationService.localize(action.labelKey, (action.labelTokens || []), action.label).then(data => {
+                    action.label = data;
+                  });
+                  
+                  action.useLegacyIcon = action.useLegacyIcon === false ? false : true;
+                  action.icon = (action.useLegacyIcon && action.icon.indexOf('icon-') !== 0 ? 'icon-' : '') + action.icon;
+              }
+            });
         }
     }
 

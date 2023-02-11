@@ -13,6 +13,7 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Install.InstallSteps
 {
+    [Obsolete("Will be replace with a new step with the new backoffice")]
     [InstallSetupStep(InstallationType.Upgrade | InstallationType.NewInstall, "DatabaseUpgrade", 12, "")]
     public class DatabaseUpgradeStep : InstallSetupStep<object>
     {

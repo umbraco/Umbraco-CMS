@@ -4,6 +4,8 @@ using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Semver;
 using Umbraco.Cms.Infrastructure.Migrations.Upgrade.Common;
 using Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_10_0_0;
+using Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_10_2_0;
+using Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_10_5_0;
 using Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_8_0_0;
 using Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_8_0_1;
 using Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_8_1_0;
@@ -288,5 +290,18 @@ public class UmbracoPlan : MigrationPlan
 
         // TO 10.0.0
         To<AddMemberPropertiesAsColumns>("{B7E0D53C-2B0E-418B-AB07-2DDE486E225F}");
+
+        // TO 10.2.0
+        To<AddUserGroup2LanguageTable>("{D0B3D29D-F4D5-43E3-BA67-9D49256F3266}");
+        To<AddHasAccessToAllLanguagesColumn>("{79D8217B-5920-4C0E-8E9A-3CF8FA021882}");
+
+        // To 10.3.0
+        To<V_10_3_0.AddBlockGridPartialViews>("{56833770-3B7E-4FD5-A3B6-3416A26A7A3F}");
+
+        // To 10.4.0
+        To<V_10_4_0.AddBlockGridPartialViews>("{3F5D492A-A3DB-43F9-A73E-9FEE3B180E6C}");
+
+        // to 10.5.0
+        To<AddPrimaryKeyConstrainToContentVersionCleanupDtos>("{83AF7945-DADE-4A02-9041-F3F6EBFAC319}");
     }
 }

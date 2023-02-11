@@ -44,8 +44,11 @@
 
         var vm = this;
 
+        vm.readonly = false;
+
         vm.$onInit = onInit;
         vm.change = change;
+        vm.click = click;
 
         function onInit() {
             vm.inputId = vm.inputId || "umb-radio_" + String.CreateGuid();
@@ -74,6 +77,17 @@
                 }, 0);
             }
         }
+
+        function click($event) {
+            if (vm.readonly) {
+                $event.preventDefault();
+                $event.stopPropagation();
+            }
+        }
+
+        $attrs.$observe('readonly', (value) => {
+            vm.readonly = value !== undefined;
+        });
     }
 
     var component = {

@@ -14,5 +14,6 @@ public class MultipleContentTypeParameterEditor : DataEditor
         // configure
         DefaultConfiguration.Add("multiple", true);
         DefaultConfiguration.Add("entityType", "DocumentType");
+        SupportsReadOnly = true;
     }
 }

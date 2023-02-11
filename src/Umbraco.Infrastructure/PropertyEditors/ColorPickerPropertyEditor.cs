@@ -14,7 +14,8 @@ namespace Umbraco.Cms.Core.PropertyEditors;
     "Color Picker",
     "colorpicker",
     Icon = "icon-colorpicker",
-    Group = Constants.PropertyEditors.Groups.Pickers)]
+    Group = Constants.PropertyEditors.Groups.Pickers,
+    ValueEditorIsReusable = true)]
 public class ColorPickerPropertyEditor : DataEditor
 {
     private readonly IEditorConfigurationParser _editorConfigurationParser;
@@ -41,6 +42,7 @@ public class ColorPickerPropertyEditor : DataEditor
         _ioHelper = ioHelper;
         _jsonSerializer = jsonSerializer;
         _editorConfigurationParser = editorConfigurationParser;
+        SupportsReadOnly = true;
     }
 
     /// <inheritdoc />

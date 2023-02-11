@@ -28,7 +28,8 @@ namespace Umbraco.Cms.Core.PropertyEditors;
     ValueType = ValueTypes.Json,
     HideLabel = false,
     Group = Constants.PropertyEditors.Groups.Media,
-    Icon = "icon-crop")]
+    Icon = "icon-crop",
+    ValueEditorIsReusable = true)]
 public class ImageCropperPropertyEditor : DataEditor, IMediaUrlGenerator,
     INotificationHandler<ContentCopiedNotification>, INotificationHandler<ContentDeletedNotification>,
     INotificationHandler<MediaDeletedNotification>, INotificationHandler<MediaSavingNotification>,
@@ -93,6 +94,7 @@ public class ImageCropperPropertyEditor : DataEditor, IMediaUrlGenerator,
         _logger = loggerFactory.CreateLogger<ImageCropperPropertyEditor>();
 
         contentSettings.OnChange(x => _contentSettings = x);
+        SupportsReadOnly = true;
     }
 
     public bool TryGetMediaPath(string? propertyEditorAlias, object? value, out string? mediaPath)

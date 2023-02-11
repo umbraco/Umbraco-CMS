@@ -97,6 +97,8 @@
                     if(anchorLink) {
                         anchorLink.focus();
                     }
+                    const anchorButton = element[0].querySelector('#umbraco-logo-mark');
+                    anchorButton.classList.add("active");
                 });
             };
             scope.keepLogoModal = function() {
@@ -108,6 +110,8 @@
                     scope.logoModal.timer = $timeout(function () {
                         scope.logoModal.show = false;
                     }, 100);
+                  const anchorButton = element[0].querySelector('#umbraco-logo-mark');
+                  anchorButton.classList.remove("active");
                 }
             };
             scope.stopClickEvent = function($event) {

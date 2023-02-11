@@ -3,7 +3,7 @@
    <div
       class="umb-content-grid__item umb-outline umb-outline--surrounding"
       ng-repeat="item in content"
-      ng-class="{'-selected': item.selected}"
+      ng-class="{'-selected': item.selected, '-clickable': allowClick !== false}"
       ng-click="clickItem(item, $event, $index)">
 
       <div class="umb-content-grid__content">
@@ -23,7 +23,7 @@
             </li>
             <li class="umb-content-grid__details-item" ng-repeat="property in contentProperties">
                 <div class="umb-content-grid__details-label">{{ property.header }}:</div>
-                <div class="umb-content-grid__details-value">{{ item[property.alias] }}</div>
+                <div class="umb-content-grid__details-value">{{ item[property.alias].expression ? item[property.alias].expression({value: item[property.alias].value}) : item[property.alias] }}</div>
             </li>
         </ul>
 

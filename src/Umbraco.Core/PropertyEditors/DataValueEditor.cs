@@ -79,6 +79,8 @@ public class DataValueEditor : IDataValueEditor
     /// </summary>
     public virtual object? Configuration { get; set; }
 
+    public bool SupportsReadOnly { get; set; }
+
     /// <summary>
     ///     Gets the validator used to validate the special property type -level "required".
     /// </summary>

@@ -8,6 +8,7 @@ using System.Linq.Expressions;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Xml;
+using Microsoft.Extensions.Primitives;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Collections;
 
@@ -189,9 +190,10 @@ public static class ObjectExtensions
             else
             {
                 // target is not a generic type
-                if (input is string inputString)
+                var inputString = input as string ?? (input is StringValues sv ? sv.ToString() : null);
+                if (inputString != null)
                 {
-                    // Try convert from string, returns an Attempt if the string could be
+                    // Try convert from string or StringValues, returns an Attempt if the string could be
                     // processed (either succeeded or failed), else null if we need to try
                     // other methods
                     Attempt<object?>? result = TryConvertToFromString(inputString, target);

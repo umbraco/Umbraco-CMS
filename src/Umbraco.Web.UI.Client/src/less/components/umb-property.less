@@ -1,0 +1,26 @@
+.umb-property:focus-within .umb-property-variant-label-container,
+.umb-property:hover .umb-property-variant-label-container {
+  opacity: 1;
+}
+
+.umb-property:hover .umb-property:not(:hover) .umb-property-variant-label-container {
+  opacity: 0;
+}
+
+.umb-property-variant-label-container {
+  float: left;
+  clear: both;
+  opacity: 0;
+}
+
+.umb-property-variant-label {
+  font-size: 11px;
+  padding: 0 7px;
+  background: @gray-10;
+  border-radius: 3px;
+  display: inline-block;
+}
+
+.umb-property-variant-label + .umb-property-variant-label {
+  margin-right: 3px;
+}

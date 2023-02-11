@@ -56,8 +56,6 @@ namespace JsonSchema
 
                 public LoggingSettings? Logging { get; set; }
 
-                public MemberPasswordConfigurationSettings? MemberPassword { get; set; }
-
                 public NuCacheSettings? NuCache { get; set; }
 
                 public RequestHandlerSettings? RequestHandler { get; set; }
@@ -69,8 +67,6 @@ namespace JsonSchema
                 public TourSettings? Tours { get; set; }
 
                 public TypeFinderSettings? TypeFinder { get; set; }
-
-                public UserPasswordConfigurationSettings? UserPassword { get; set; }
 
                 public WebRoutingSettings? WebRouting { get; set; }
 
@@ -95,6 +91,8 @@ namespace JsonSchema
                 public InstallDefaultDataSettings? DefaultDataCreation { get; set; }
 
                 public DataTypesSettings? DataTypes { get; set; }
+
+                public MarketplaceSettings? Marketplace { get; set; }
             }
 
             /// <summary>

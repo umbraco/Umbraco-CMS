@@ -14,6 +14,9 @@ public class InstalledPackage
     [DataMember(Name = "packageView")]
     public string? PackageView { get; set; }
 
+    [DataMember(Name = "version")]
+    public string? Version { get; set; }
+
     [DataMember(Name = "plans")]
     public IEnumerable<InstalledPackageMigrationPlans> PackageMigrationPlans { get; set; } =
         Enumerable.Empty<InstalledPackageMigrationPlans>();

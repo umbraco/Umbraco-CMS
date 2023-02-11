@@ -2,7 +2,7 @@
 <language alias="ja" intName="Japanese" localName="日本語" lcid="17" culture="ja-JP">
   <creator>
     <name>The Umbraco community</name>
-    <link>https://our.umbraco.com/documentation/Extending-Umbraco/Language-Files</link>
+    <link>https://docs.umbraco.com/umbraco-cms/extending/language-files</link>
   </creator>
   <area alias="actions">
     <key alias="assigndomain">ドメインの割り当て</key>
@@ -481,7 +481,7 @@
       を押して続行してください。]]></key>
     <key alias="databaseUpToDate"><![CDATA[データベースを更新しました！ <strong>次へ</strong> をクリックして設定ウィザードを進めてください。]]></key>
     <key alias="defaultUserChangePass"><![CDATA[<strong>デフォルトユーザーのパスワードを変更する必要があります！</strong>]]></key>
-    <key alias="defaultUserDisabled"><![CDATA[<strong>デフォルトユーザーは無効化されているかUmbracoにアクセスできない状態になっています！</strong></p><p>これ以上のアクションは必要ありません。<b>次へ</b>をクリックして続行してください。]]></key>
+    <key alias="defaultUserDisabled"><![CDATA[<strong>デフォルトユーザーは無効化されているかUmbracoにアクセスできない状態になっています！</strong></p><p>これ以上のアクションは必要ありません。<strong>次へ</strong>をクリックして続行してください。]]></key>
     <key alias="defaultUserPassChanged"><![CDATA[<strong>インストール後にデフォルトユーザーのパスワードが変更されています！</strong></p><p>これ以上のアクションは必要ありません。<strong>次へ</strong>をクリックして続行してください。]]></key>
     <key alias="defaultUserPasswordChanged">パスワードは変更されました！</key>
     <key alias="greatStart">始めに、ビデオによる解説を見ましょう</key>
@@ -555,7 +555,7 @@ Runwayをインストールして作られた新しいウェブサイトがど�
     <key alias="Version3">Umbraco Version 3</key>
     <key alias="Version4">Umbraco Version 4</key>
     <key alias="watch">見る</key>
-    <key alias="welcomeIntro"><![CDATA[このウィザードでは <strong>umbraco %0%</strong> の新規インストールまたは3.0からの更新について設定方法を案内します。
+    <key alias="welcomeIntro"><![CDATA[このウィザードでは <strong>Umbraco %0%</strong> の新規インストールまたは3.0からの更新について設定方法を案内します。
                                 <br /><br />
                                 <strong>"次へ"</strong>を押してウィザードを開始します。]]></key>
   </area>
@@ -730,7 +730,6 @@ Runwayをインストールして作られた新しいウェブサイトがど�
     <key alias="reset">リセット</key>
   </area>
   <area alias="rollback">
-    <key alias="currentVersion">現在の版</key>
     <key alias="diffHelp"><![CDATA[現在の版と選択した以前の版との比較を表示します。<br /><del>赤</del> の文字列は以前の版にはない部分で、<ins>緑の文字列は以前の版にのみある部分です。</ins>]]></key>
     <key alias="documentRolledBack">ドキュメントは以前の版に戻りました</key>
     <key alias="htmlHelp">選択した版をhtmlで表示します。２つの版の比較を表示したいときは、Diff を選択してください。</key>
@@ -849,9 +848,9 @@ Runwayをインストールして作られた新しいウェブサイトがど�
     <key alias="insertContentAreaPlaceHolder">コンテンツ領域プレースホルダーの挿入</key>
     <key alias="insertDictionaryItem">ディクショナリ アイテムを挿入</key>
     <key alias="insertMacro">マクロの挿入</key>
-    <key alias="insertPageField">umbraco ページフィールドの挿入</key>
+    <key alias="insertPageField">Umbraco ページフィールドの挿入</key>
     <key alias="mastertemplate">マスターテンプレート</key>
-    <key alias="quickGuide">umbraco テンプレートタグのクイックガイド</key>
+    <key alias="quickGuide">Umbraco テンプレートタグのクイックガイド</key>
     <key alias="template">テンプレート</key>
   </area>
   <area alias="grid">

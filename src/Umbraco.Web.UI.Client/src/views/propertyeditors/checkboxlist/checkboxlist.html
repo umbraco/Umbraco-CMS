@@ -4,7 +4,15 @@
 
         <ul class="unstyled">
             <li ng-repeat="item in vm.viewItems track by item.key">
-                <umb-checkbox name="{{::model.alias}}_{{::vm.uniqueId}}" value="{{::item.value}}" model="item.checked" text="{{::item.value}}" on-change="vm.change(model, value)" required="model.validation.mandatory && !model.value.length"></umb-checkbox>
+                <umb-checkbox 
+                    name="{{::model.alias}}_{{::vm.uniqueId}}" 
+                    value="{{::item.value}}" 
+                    model="item.checked" 
+                    text="{{::item.value}}" 
+                    on-change="vm.change(model, value)" 
+                    required="model.validation.mandatory && !model.value.length"
+                    ng-attr-readonly="{{ readonly || undefined }}">
+                </umb-checkbox>
             </li>
         </ul>
 

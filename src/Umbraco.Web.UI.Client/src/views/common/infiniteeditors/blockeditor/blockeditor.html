@@ -37,6 +37,7 @@
                     </umb-button>
 
                     <umb-button
+                        ng-if="!vm.model.hideSubmitButton",
                         action="vm.submitAndClose()"
                         button-style="primary"
                         state="vm.saveButtonState"

@@ -6,10 +6,11 @@
             rows="{{model.config.rows || 10}}"
             class="umb-property-editor umb-textarea textstring"
             val-server="value"
-            ng-keyup="change()"
+            ng-change="change()"
             ng-trim="false"
             ng-required="model.validation.mandatory"
             aria-required="{{model.validation.mandatory}}"
+            ng-readonly="readonly"
             aria-invalid="{{validLength ? false : true}}">
         </textarea>
 

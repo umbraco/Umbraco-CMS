@@ -34,7 +34,7 @@
 
                 var active = vm.variants.find(v => v.active);
 
-                if (active && publishedVariantFilter(active)) {
+                if (active && publishedVariantFilter(active) && allowUnpublish(active)) {
                     //ensure that the current one is selected
                     active.save = true;
                 }
@@ -43,6 +43,10 @@
                 changeSelection(active);
             }
             
+        }
+
+        function allowUnpublish (variant) {
+            return variant.allowedActions.includes("Z");
         }
 
         function changeSelection(selectedVariant) {
@@ -101,13 +105,15 @@
             //determine a variant is 'published' (meaning it will show up as able unpublish)
             // * it has been published
             // * it has been published with pending changes
-            return (variant.state === "Published" || variant.state === "PublishedPendingChanges");
+            variant.notAllowed = allowUnpublish(variant) === false && variant.active;
+            return (variant.state === "Published" || variant.state === "PublishedPendingChanges") && (allowUnpublish(variant) || variant.active);
         }
 
         //when this dialog is closed, remove all unpublish and disabled flags
         $scope.$on('$destroy', () => {
             vm.variants.forEach(variant => {
                 variant.save = variant.disabled = false;
+                variant.notAllowed = false;
             });
         });
 

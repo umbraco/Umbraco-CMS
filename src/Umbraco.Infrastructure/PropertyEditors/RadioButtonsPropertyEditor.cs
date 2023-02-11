@@ -17,7 +17,8 @@ namespace Umbraco.Cms.Core.PropertyEditors;
     "radiobuttons",
     ValueType = ValueTypes.String,
     Group = Constants.PropertyEditors.Groups.Lists,
-    Icon = "icon-target")]
+    Icon = "icon-target",
+    ValueEditorIsReusable = true)]
 public class RadioButtonsPropertyEditor : DataEditor
 {
     private readonly IEditorConfigurationParser _editorConfigurationParser;
@@ -32,8 +33,6 @@ public class RadioButtonsPropertyEditor : DataEditor
         ILocalizedTextService localizedTextService)
         : this(dataValueEditorFactory, ioHelper, localizedTextService, StaticServiceProvider.Instance.GetRequiredService<IEditorConfigurationParser>())
     {
-        _ioHelper = ioHelper;
-        _localizedTextService = localizedTextService;
     }
 
     /// <summary>
@@ -49,6 +48,7 @@ public class RadioButtonsPropertyEditor : DataEditor
         _ioHelper = ioHelper;
         _localizedTextService = localizedTextService;
         _editorConfigurationParser = editorConfigurationParser;
+        SupportsReadOnly = true;
     }
 
     /// <summary>

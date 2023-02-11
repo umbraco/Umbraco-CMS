@@ -26,12 +26,18 @@ internal static class UserGroupFactory
             userGroup.UpdateDate = dto.UpdateDate;
             userGroup.StartContentId = dto.StartContentId;
             userGroup.StartMediaId = dto.StartMediaId;
+            userGroup.HasAccessToAllLanguages = dto.HasAccessToAllLanguages;
             if (dto.UserGroup2AppDtos != null)
             {
                 foreach (UserGroup2AppDto app in dto.UserGroup2AppDtos)
                 {
                     userGroup.AddAllowedSection(app.AppAlias);
                 }
+            }
+
+            foreach (UserGroup2LanguageDto language in dto.UserGroup2LanguageDtos)
+            {
+                userGroup.AddAllowedLanguage(language.LanguageId);
             }
 
             userGroup.ResetDirtyProperties(false);
@@ -56,6 +62,7 @@ internal static class UserGroupFactory
             Icon = entity.Icon,
             StartMediaId = entity.StartMediaId,
             StartContentId = entity.StartContentId,
+            HasAccessToAllLanguages = entity.HasAccessToAllLanguages,
         };
 
         foreach (var app in entity.AllowedSections)

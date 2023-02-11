@@ -21,7 +21,8 @@ namespace Umbraco.Cms.Core.PropertyEditors;
     "File upload",
     "fileupload",
     Group = Constants.PropertyEditors.Groups.Media,
-    Icon = "icon-download-alt")]
+    Icon = "icon-download-alt",
+    ValueEditorIsReusable = true)]
 public class FileUploadPropertyEditor : DataEditor, IMediaUrlGenerator,
     INotificationHandler<ContentCopiedNotification>, INotificationHandler<ContentDeletedNotification>,
     INotificationHandler<MediaDeletedNotification>, INotificationHandler<MediaSavingNotification>,
@@ -75,6 +76,7 @@ public class FileUploadPropertyEditor : DataEditor, IMediaUrlGenerator,
         _contentService = contentService;
         _ioHelper = ioHelper;
         _editorConfigurationParser = editorConfigurationParser;
+        SupportsReadOnly = true;
     }
 
     public bool TryGetMediaPath(string? propertyEditorAlias, object? value, [MaybeNullWhen(false)] out string mediaPath)

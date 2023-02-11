@@ -38,6 +38,7 @@
 
             if (vm.variants.length > 1) {
 
+                vm.displayVariants = vm.displayVariants.filter(variant => allowPublish(variant));
                 vm.displayVariants = contentEditingHelper.getSortedVariantsAndSegments(vm.displayVariants);
 
                 var active = vm.variants.find(v => v.active);
@@ -56,6 +57,10 @@
                     "tokens": [vm.variants[0].name]
                 };
             }            
+        }
+
+        function allowPublish (variant) {
+            return variant.allowedActions.includes("U");
         }
 
         function toggleIncludeUnpublished() {

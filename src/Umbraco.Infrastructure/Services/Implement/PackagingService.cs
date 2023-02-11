@@ -133,7 +133,7 @@ public class PackagingService : IPackagingService
             var currentPlans = installedPackage.PackageMigrationPlans.ToList();
             if (keyValues is null || keyValues.TryGetValue(
                 Constants.Conventions.Migrations.KeyValuePrefix + plan.Name,
-                out var currentState))
+                out var currentState) is false)
             {
                 currentState = null;
             }
@@ -157,7 +157,10 @@ public class PackagingService : IPackagingService
 
             if (!installedPackages.TryGetValue(package.PackageName, out InstalledPackage? installedPackage))
             {
-                installedPackage = new InstalledPackage { PackageName = package.PackageName };
+                installedPackage = new InstalledPackage {
+                    PackageName = package.PackageName,
+                    Version = string.IsNullOrEmpty(package.Version) ? "Unknown" : package.Version,
+                };
 
                 installedPackages.Add(package.PackageName, installedPackage);
             }

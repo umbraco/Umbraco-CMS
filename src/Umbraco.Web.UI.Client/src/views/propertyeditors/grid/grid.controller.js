@@ -48,6 +48,7 @@ angular.module("umbraco")
                 tolerance: "pointer",
                 zIndex: 999999999999999999,
                 scrollSensitivity: 100,
+                disabled: $scope.readonly,
                 cursorAt: {
                     top: 40,
                     left: 60
@@ -120,6 +121,7 @@ angular.module("umbraco")
                 tolerance: "pointer",
                 zIndex: 999999999999999999,
                 scrollSensitivity: 100,
+                disabled: $scope.readonly,
                 cursorAt: {
                     top: 45,
                     left: 90
@@ -304,6 +306,8 @@ angular.module("umbraco")
             };
 
             $scope.showReorderButton = function () {
+                if ($scope.readonly) return false;
+
                 if ($scope.model.value && $scope.model.value.sections) {
                     for (var i = 0; $scope.model.value.sections.length > i; i++) {
                         var section = $scope.model.value.sections[i];
@@ -359,6 +363,7 @@ angular.module("umbraco")
             // *********************************************
 
             $scope.clickRow = function (index, rows, $event) {
+                if ($scope.readonly) return;
 
                 $scope.currentRowWithActiveChild = null;
                 $scope.active = rows[index];
@@ -579,6 +584,7 @@ angular.module("umbraco")
             // *********************************************
 
             $scope.clickCell = function (index, cells, row, $event) {
+                if ($scope.readonly) return;
 
                 $scope.currentCellWithActiveChild = null;
 
@@ -601,6 +607,7 @@ angular.module("umbraco")
             // Control management functions
             // *********************************************
             $scope.clickControl = function (index, controls, cell, $event) {
+                if ($scope.readonly) return;
 
                 $scope.active = controls[index];
                 $scope.currentCellWithActiveChild = cell;

@@ -59,4 +59,10 @@ public class UserDetail : UserProfile
     /// </summary>
     [DataMember(Name = "allowedSections")]
     public IEnumerable<string>? AllowedSections { get; set; }
+
+    /// <summary>
+    ///     A list of language culcure codes the user is allowed to view.
+    /// </summary>
+    [DataMember(Name = "allowedLanguageIds")]
+    public IEnumerable<int>? AllowedLanguageIds { get; set; }
 }

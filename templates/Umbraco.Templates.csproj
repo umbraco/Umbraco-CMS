@@ -1,22 +1,16 @@
 <Project Sdk="Microsoft.NET.Sdk">
-  <!-- Enable multi-level merging with src -->
-  <Import Project="$([MSBuild]::GetPathOfFileAbove('Directory.Build.props', '$(MSBuildThisFileDirectory)../src/'))" />
-
   <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
+    <Title>Umbraco CMS - Templates</Title>
+    <Description>Coontains templates for Umbraco CMS.</Description>
     <PackageType>Template</PackageType>
     <IncludeBuildOutput>false</IncludeBuildOutput>
-    <ContentTargetFolders>.</ContentTargetFolders>
+    <IncludeSymbols>false</IncludeSymbols>
     <NoDefaultExcludes>true</NoDefaultExcludes>
     <IncludeContentInPack>true</IncludeContentInPack>
-    <IncludeBuildOutput>false</IncludeBuildOutput>
     <ContentTargetFolders>.</ContentTargetFolders>
-    <NoDefaultExcludes>true</NoDefaultExcludes>
-    <IncludeSymbols>false</IncludeSymbols>
   </PropertyGroup>
 
   <ItemGroup>
-    <Content Include="icon.png" Visible="false" />
     <Content Include="UmbracoPackage\**" Exclude="bin;obj" />
     <Content Include="UmbracoProject\**" Exclude="bin;obj" />
     <Content Include="..\src\Umbraco.Web.UI\Program.cs">
@@ -34,6 +28,10 @@
     <Content Include="..\src\Umbraco.Web.UI\Views\Partials\grid\**">
       <Link>UmbracoProject\Views\Partials\grid\%(RecursiveDir)%(Filename)%(Extension)</Link>
       <PackagePath>UmbracoProject\Views\Partials\grid</PackagePath>
+    </Content>
+    <Content Include="..\src\Umbraco.Web.UI\Views\Partials\blockgrid\**">
+      <Link>UmbracoProject\Views\Partials\blockgrid\%(RecursiveDir)%(Filename)%(Extension)</Link>
+      <PackagePath>UmbracoProject\Views\Partials\blockgrid</PackagePath>
     </Content>
     <Content Include="..\src\Umbraco.Web.UI\Views\_ViewImports.cshtml">
       <Link>UmbracoProject\Views\_ViewImports.cshtml</Link>

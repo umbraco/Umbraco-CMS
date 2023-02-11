@@ -2,7 +2,7 @@
 
     .sp-replacer {
         display: inline-flex;
-        margin-right: 18px;
+        margin-right: 12px;
         height: 32px;
 
         &.sp-light {
@@ -17,5 +17,11 @@
         .sp-dd {
             line-height: 2rem;
         }
+    }
+}
+
+.umb-color-picker[readonly] {
+    .sp-replacer {
+        cursor: not-allowed;
     }
 }

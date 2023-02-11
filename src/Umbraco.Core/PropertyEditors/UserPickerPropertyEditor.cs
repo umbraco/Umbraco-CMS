@@ -6,14 +6,14 @@ namespace Umbraco.Cms.Core.PropertyEditors;
     "userpicker",
     ValueType = ValueTypes.Integer,
     Group = Constants.PropertyEditors.Groups.People,
-    Icon = Constants.Icons.User)]
+    Icon = Constants.Icons.User,
+    ValueEditorIsReusable = true)]
 public class UserPickerPropertyEditor : DataEditor
 {
     public UserPickerPropertyEditor(
         IDataValueEditorFactory dataValueEditorFactory)
-        : base(dataValueEditorFactory)
-    {
-    }
+        : base(dataValueEditorFactory) =>
+        SupportsReadOnly = true;
 
     protected override IConfigurationEditor CreateConfigurationEditor() => new UserPickerConfiguration();
 }

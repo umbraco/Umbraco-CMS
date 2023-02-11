@@ -68,4 +68,11 @@ public class ContentPropertyBasic
     /// </summary>
     [IgnoreDataMember]
     public IDataEditor? PropertyEditor { get; set; }
+
+    /// <summary>
+    ///     Used internally during model mapping
+    /// </summary>
+    [DataMember(Name = "supportsReadOnly")]
+    [ReadOnly(true)]
+    public bool SupportsReadOnly { get; set; }
 }
