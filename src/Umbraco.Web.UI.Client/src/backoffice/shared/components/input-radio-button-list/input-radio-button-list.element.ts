@@ -44,6 +44,8 @@ export class UmbInputRadioButtonListElement extends FormControlMixin(UmbLitEleme
 	}
 
 	render() {
+		console.log('list', this.list);
+
 		if (!this.list) return nothing;
 		return html`<form>
 			<uui-form @change="${this._setSelection}">
@@ -54,7 +56,7 @@ export class UmbInputRadioButtonListElement extends FormControlMixin(UmbLitEleme
 		</form>`;
 	}
 
-	renderRadioButton(item: any) {
+	renderRadioButton(item: { key: string; label: string }) {
 		return html`<uui-radio value="${item.key}" label="${item.label}"></uui-radio>`;
 	}
 }
