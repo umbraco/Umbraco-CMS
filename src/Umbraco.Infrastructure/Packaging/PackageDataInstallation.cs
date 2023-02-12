@@ -73,44 +73,6 @@ namespace Umbraco.Cms.Infrastructure.Packaging
             _mediaTypeService = mediaTypeService;
         }
 
-        // Also remove factory service registration when this constructor is removed
-        [Obsolete("Use the constructor with Infrastructure.IScopeProvider and without global settings and hosting environment instead.")]
-        public PackageDataInstallation(
-            IDataValueEditorFactory dataValueEditorFactory,
-            ILogger<PackageDataInstallation> logger,
-            IFileService fileService,
-            IMacroService macroService,
-            ILocalizationService localizationService,
-            IDataTypeService dataTypeService,
-            IEntityService entityService,
-            IContentTypeService contentTypeService,
-            IContentService contentService,
-            PropertyEditorCollection propertyEditors,
-            IScopeProvider scopeProvider,
-            IShortStringHelper shortStringHelper,
-            IOptions<GlobalSettings> globalSettings,
-            IConfigurationEditorJsonSerializer serializer,
-            IMediaService mediaService,
-            IMediaTypeService mediaTypeService,
-            IHostingEnvironment hostingEnvironment)
-            : this(
-                  dataValueEditorFactory,
-                  logger,
-                  fileService,
-                  macroService,
-                  localizationService,
-                  dataTypeService,
-                  entityService,
-                  contentTypeService,
-                  contentService,
-                  propertyEditors,
-                  scopeProvider,
-                  shortStringHelper,
-                  serializer,
-                  mediaService,
-                  mediaTypeService)
-        { }
-
         #region Install/Uninstall
 
             public InstallationSummary InstallPackageData(CompiledPackage compiledPackage, int userId)
