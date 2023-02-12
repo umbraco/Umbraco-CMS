@@ -277,7 +277,15 @@ export const data: Array<DataTypeDetails> = [
 		isFolder: false,
 		propertyEditorModelAlias: 'Umbraco.RadioButtonList',
 		propertyEditorUIAlias: 'Umb.PropertyEditorUI.RadioButtonList',
-		data: [],
+		data: [
+			{
+				alias: 'itemList',
+				value: [
+					{ label: 'Label 1', key: '123' },
+					{ label: 'Label 2', key: '456' },
+				],
+			},
+		],
 	},
 	{
 		name: 'Checkbox List',
