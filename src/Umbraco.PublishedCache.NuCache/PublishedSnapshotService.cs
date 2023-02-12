@@ -11,16 +11,15 @@ using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Runtime;
-using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.Changes;
 using Umbraco.Cms.Core.Sync;
 using Umbraco.Cms.Infrastructure.PublishedCache.DataSource;
 using Umbraco.Cms.Infrastructure.PublishedCache.Persistence;
 using Umbraco.Extensions;
+using Umbraco.Cms.Infrastructure.Scoping;
 using File = System.IO.File;
-using IScope = Umbraco.Cms.Infrastructure.Scoping.IScope;
-using IScopeProvider = Umbraco.Cms.Infrastructure.Scoping.IScopeProvider;
+using IScopeContext = Umbraco.Cms.Core.Scoping.IScopeContext;
 
 namespace Umbraco.Cms.Infrastructure.PublishedCache;
 

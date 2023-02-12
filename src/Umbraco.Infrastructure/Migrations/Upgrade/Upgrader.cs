@@ -2,7 +2,7 @@ using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Migrations;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services;
-
+using IScopeProvider= Umbraco.Cms.Infrastructure.Scoping.IScopeProvider;
 namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade;
 
 /// <summary>

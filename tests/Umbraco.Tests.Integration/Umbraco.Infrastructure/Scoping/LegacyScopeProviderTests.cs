@@ -1,7 +1,8 @@
 using NUnit.Framework;
-using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
+using Umbraco.Cms.Infrastructure.Scoping;
+using ICoreScopeProvider = Umbraco.Cms.Core.Scoping.ICoreScopeProvider;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Scoping;
 

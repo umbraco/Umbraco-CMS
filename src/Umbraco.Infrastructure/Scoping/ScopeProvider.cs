@@ -11,7 +11,6 @@ using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Extensions;
 using CoreDebugSettings = Umbraco.Cms.Core.Configuration.Models.CoreDebugSettings;
-
 #if DEBUG_SCOPES
 using System.Linq;
 using System.Text;
@@ -25,7 +24,7 @@ namespace Umbraco.Cms.Infrastructure.Scoping
     internal class ScopeProvider :
         ICoreScopeProvider,
         IScopeProvider,
-        Core.Scoping.IScopeProvider,
+       // Core.Scoping.IScopeProvider,
         IScopeAccessor // TODO: No need to implement this here but literally hundreds of our tests cast ScopeProvider to ScopeAccessor
     {
         private readonly ILogger<ScopeProvider> _logger;
@@ -407,7 +406,8 @@ namespace Umbraco.Cms.Infrastructure.Scoping
         }
 #endif
         /// <inheritdoc />
-        Cms.Core.Scoping.IScope Cms.Core.Scoping.IScopeProvider.CreateScope(
+        IScope
+            IScopeProvider.CreateScope(
             IsolationLevel isolationLevel = IsolationLevel.Unspecified,
             RepositoryCacheMode repositoryCacheMode = RepositoryCacheMode.Unspecified,
             IEventDispatcher? eventDispatcher = null,
@@ -425,7 +425,7 @@ namespace Umbraco.Cms.Infrastructure.Scoping
                 autoComplete);
 
         /// <inheritdoc />
-        Core.Scoping.IScope Core.Scoping.IScopeProvider.CreateDetachedScope(IsolationLevel isolationLevel,
+        IScope IScopeProvider.CreateDetachedScope(IsolationLevel isolationLevel,
             RepositoryCacheMode repositoryCacheMode, IEventDispatcher? eventDispatcher,
             IScopedNotificationPublisher? scopedNotificationPublisher, bool? scopeFileSystems) =>
             (Core.Scoping.IScope)CreateDetachedScope(
@@ -436,12 +436,12 @@ namespace Umbraco.Cms.Infrastructure.Scoping
                 scopeFileSystems);
 
         /// <inheritdoc />
-        void Core.Scoping.IScopeProvider.AttachScope(Core.Scoping.IScope scope, bool callContext) =>
+        void IScopeProvider.AttachScope(IScope scope, bool callContext) =>
             AttachScope(scope, callContext);
 
         /// <inheritdoc />
-        Core.Scoping.IScope Core.Scoping.IScopeProvider.DetachScope() =>
-            (Core.Scoping.IScope)DetachScope();
+        IScope IScopeProvider.DetachScope() =>
+            (IScope)DetachScope();
     }
 
 #if DEBUG_SCOPES
