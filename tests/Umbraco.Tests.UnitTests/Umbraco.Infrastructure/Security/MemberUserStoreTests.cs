@@ -16,7 +16,7 @@ using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Tests.UnitTests.Umbraco.Core.ShortStringHelper;
 using Umbraco.Cms.Infrastructure.Scoping;
-using RepositoryCacheMode = Umbraco.Cms.Core.Scoping.RepositoryCacheMode;
+using RepositoryCacheMode = Umbraco.Cms.Core.Scoping.RepositoryCacheMode; 
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Security;
 
