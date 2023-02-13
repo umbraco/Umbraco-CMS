@@ -3,6 +3,7 @@ import './layouts/confirm/modal-layout-confirm.element';
 import './layouts/content-picker/modal-layout-content-picker.element';
 import './layouts/media-picker/modal-layout-media-picker.element';
 import './layouts/property-editor-ui-picker/modal-layout-property-editor-ui-picker.element';
+import './layouts/property-settings/modal-layout-property-settings.element';
 import './layouts/modal-layout-current-user.element';
 import './layouts/icon-picker/modal-layout-icon-picker.element';
 
@@ -94,6 +95,16 @@ export class UmbModalService {
 	 */
 	public userSettings(): UmbModalHandler {
 		return this.open('umb-modal-layout-current-user', { type: 'sidebar', size: 'small' });
+	}
+
+	/**
+	 * Opens the property settings sidebar modal
+	 * @public
+	 * @return {*}  {UmbModalHandler}
+	 * @memberof UmbModalService
+	 */
+	public propertySettings(): UmbModalHandler {
+		return this.open('umb-modal-layout-property-settings', { type: 'sidebar', size: 'small' });
 	}
 
 	/**
