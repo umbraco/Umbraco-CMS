@@ -5,6 +5,7 @@ using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Api.Management.ViewModels.Dictionary;
 using Umbraco.Cms.Api.Common.ViewModels.Pagination;
+using Umbraco.Cms.Core;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Dictionary;
 
@@ -25,7 +26,7 @@ public class AllDictionaryController : DictionaryControllerBase
     public async Task<ActionResult<PagedViewModel<DictionaryOverviewViewModel>>> All(int skip = 0, int take = 100)
     {
         // unfortunately we can't paginate here...we'll have to get all and paginate in memory
-        IDictionaryItem[] items = (await _dictionaryItemService.GetDescendantsAsync(null)).ToArray();
+        IDictionaryItem[] items = (await _dictionaryItemService.GetDescendantsAsync(Constants.System.RootKey)).ToArray();
         var model = new PagedViewModel<DictionaryOverviewViewModel>
         {
             Total = items.Length,
