@@ -19,6 +19,11 @@ public static partial class Constants
         public const string RootString = "-1";
 
         /// <summary>
+        ///     The GUID identifier for global system root node.
+        /// </summary>
+        public static readonly Guid? RootKey = null;
+
+        /// <summary>
         ///     The integer identifier for content's recycle bin.
         /// </summary>
         public const int RecycleBinContent = -20;
