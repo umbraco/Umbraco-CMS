@@ -51,43 +51,74 @@ public class SliderValueConverter : PropertyValueConverterBase
     {
         bool isRange = IsRange(propertyType);
 
-        string? sourceString = source?.ToString();
-        if (string.IsNullOrEmpty(sourceString) == false)
+        var sourceString = source?.ToString();
+        if (string.IsNullOrEmpty(sourceString))
         {
-            if (isRange)
-            {
-                string[] rangeRawValues = sourceString.Split(Constants.CharArrays.Comma);
-                if (decimal.TryParse(rangeRawValues[0], NumberStyles.Number, CultureInfo.InvariantCulture, out decimal minimum))
-                {
-                    if (rangeRawValues.Length == 1)
-                    {
-                        // Configuration is probably changed from single to range, return range with same min/max
-                        return new Range<decimal>
-                        {
-                            Minimum = minimum,
-                            Maximum = minimum
-                        };
-                    }
-                    else if (rangeRawValues.Length == 2 && decimal.TryParse(rangeRawValues[1], NumberStyles.Number, CultureInfo.InvariantCulture, out decimal maximum))
-                    {
-                        return new Range<decimal>
-                        {
-                            Minimum = minimum,
-                            Maximum = maximum
-                        };
-                    }
-                }
-            }
-            else if (decimal.TryParse(sourceString, NumberStyles.Number, CultureInfo.InvariantCulture, out decimal value))
-            {
-                return value;
-            }
+            return isRange
+                ? new Range<decimal>()
+                : default(decimal);
         }
 
         return isRange
-            ? new Range<decimal>()
-            : default(decimal);
+            ? HandleRange(sourceString)
+            : HandleDecimal(sourceString);
     }
+
+    private static object? HandleRange(string sourceString)
+    {
+        string[] rangeRawValues = sourceString.Split(Constants.CharArrays.Comma);
+
+        if (TryParseDecimal(rangeRawValues[0], out var minimum))
+        {
+            if (rangeRawValues.Length == 1)
+            {
+                // Configuration is probably changed from single to range, return range with same min/max
+                return new Range<decimal>
+                {
+                    Minimum = minimum,
+                    Maximum = minimum
+                };
+            }
+
+            if (rangeRawValues.Length == 2 && TryParseDecimal(rangeRawValues[1], out var maximum))
+            {
+                return new Range<decimal>
+                {
+                    Minimum = minimum,
+                    Maximum = maximum
+                };
+            }
+        }
+
+        return new Range<decimal>();
+    }
+
+    private static object? HandleDecimal(string sourceString)
+    {
+
+        // This used to be a range slider, so we'll assign the minimum value as the new value
+        if (sourceString.Contains(','))
+        {
+            var minimumValueRepresentation = sourceString.Split(Constants.CharArrays.Comma)[0];
+
+            if (TryParseDecimal(minimumValueRepresentation, out var minimum))
+            {
+                return minimum;
+            }
+        }
+        else if (TryParseDecimal(sourceString, out var value))
+        {
+            return value;
+        }
+
+        return default(decimal);
+    }
+
+    /// <summary>
+    /// Helper method for parsing a double consistently
+    /// </summary>
+    private static bool TryParseDecimal(string? representation, out decimal value)
+        => decimal.TryParse(representation, NumberStyles.Number, CultureInfo.InvariantCulture, out value);
 
     private static bool IsRange(IPublishedPropertyType propertyType)
         => propertyType.DataType.ConfigurationAs<SliderConfiguration>()?.EnableRange == true;
