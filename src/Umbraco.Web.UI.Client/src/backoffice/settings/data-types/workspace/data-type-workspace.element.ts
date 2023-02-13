@@ -2,8 +2,7 @@ import { UUIInputElement, UUIInputEvent } from '@umbraco-ui/uui';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
-import { distinctUntilChanged } from 'rxjs';
-import { UmbWorkspaceDataTypeContext } from './data-type-workspace.context';
+import { UmbDataTypeWorkspaceContext } from './data-type-workspace.context';
 import { UmbLitElement } from '@umbraco-cms/element';
 
 /**
@@ -29,11 +28,10 @@ export class UmbDataTypeWorkspaceElement extends UmbLitElement {
 		`,
 	];
 
-	private _workspaceContext: UmbWorkspaceDataTypeContext = new UmbWorkspaceDataTypeContext(this);
+	private _workspaceContext = new UmbDataTypeWorkspaceContext(this);
 
 	public load(value: string) {
 		this._workspaceContext?.load(value);
-		//this._unique = entityKey;
 	}
 
 	public create(parentKey: string | null) {
@@ -46,10 +44,15 @@ export class UmbDataTypeWorkspaceElement extends UmbLitElement {
 	constructor() {
 		super();
 		this.provideContext('umbWorkspaceContext', this._workspaceContext);
+
 		this.observe(this._workspaceContext.name, (dataTypeName) => {
 			if (dataTypeName !== this._dataTypeName) {
 				this._dataTypeName = dataTypeName ?? '';
 			}
+		});
+
+		this.observe(this._workspaceContext.test2, (hello) => {
+			console.log('hello', hello);
 		});
 	}
 

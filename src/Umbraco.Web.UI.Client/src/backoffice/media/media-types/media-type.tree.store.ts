@@ -5,7 +5,7 @@ import { ArrayState } from '@umbraco-cms/observable-api';
 import { UmbStoreBase } from '@umbraco-cms/store';
 import type { UmbControllerHostInterface } from '@umbraco-cms/controller';
 
-export const UMB_DATA_TYPE_TREE_STORE_CONTEXT_TOKEN = new UmbContextToken<UmbMediaTypeTreeStore>(
+export const UMB_MEDIA_TYPE_TREE_STORE_CONTEXT_TOKEN = new UmbContextToken<UmbMediaTypeTreeStore>(
 	'UmbMediaTypeTreeStore'
 );
 
@@ -19,7 +19,7 @@ export class UmbMediaTypeTreeStore extends UmbStoreBase {
 	#data = new ArrayState<FolderTreeItemModel>([], (x) => x.key);
 
 	constructor(host: UmbControllerHostInterface) {
-		super(host, UMB_DATA_TYPE_TREE_STORE_CONTEXT_TOKEN.toString());
+		super(host, UMB_MEDIA_TYPE_TREE_STORE_CONTEXT_TOKEN.toString());
 	}
 
 	getTreeRoot() {
