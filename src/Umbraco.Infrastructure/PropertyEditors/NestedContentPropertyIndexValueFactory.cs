@@ -10,9 +10,8 @@ namespace Umbraco.Cms.Core.PropertyEditors;
 internal sealed class NestedContentPropertyIndexValueFactory
     : NestedPropertyIndexValueFactoryBase<
             NestedContentPropertyEditor.NestedContentValues.NestedContentRowValue[],
-            NestedContentPropertyEditor.NestedContentValues.NestedContentRowValue
-        >
-        , INestedContentPropertyIndexValueFactory
+            NestedContentPropertyEditor.NestedContentValues.NestedContentRowValue>,
+        INestedContentPropertyIndexValueFactory
 {
     private readonly IContentTypeService _contentTypeService;
 

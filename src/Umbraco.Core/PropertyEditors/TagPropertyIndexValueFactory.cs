@@ -9,8 +9,13 @@ public class TagPropertyIndexValueFactory : JsonPropertyIndexValueFactoryBase<st
     {
     }
 
-    protected override IEnumerable<KeyValuePair<string, IEnumerable<object?>>> Handle(string[] deserializedObject, IProperty property, string? culture, string? segment, bool published)
+    protected override IEnumerable<KeyValuePair<string, IEnumerable<object?>>> Handle(
+        string[] deserializedPropertyValue,
+        IProperty property,
+        string? culture,
+        string? segment,
+        bool published)
     {
-        yield return new KeyValuePair<string, IEnumerable<object?>>(property.Alias, deserializedObject);
+        yield return new KeyValuePair<string, IEnumerable<object?>>(property.Alias, deserializedPropertyValue);
     }
 }

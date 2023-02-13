@@ -19,7 +19,7 @@ internal abstract class NestedPropertyIndexValueFactoryBase<TSerialized, TItem> 
     }
 
     protected override IEnumerable<KeyValuePair<string, IEnumerable<object?>>> Handle(
-        TSerialized deserializedObject,
+        TSerialized deserializedPropertyValue,
         IProperty property,
         string? culture,
         string? segment,
@@ -27,7 +27,7 @@ internal abstract class NestedPropertyIndexValueFactoryBase<TSerialized, TItem> 
     {
         var result = new List<KeyValuePair<string, IEnumerable<object?>>>();
 
-        foreach (TItem nestedContentRowValue in GetDataItems(deserializedObject))
+        foreach (TItem nestedContentRowValue in GetDataItems(deserializedPropertyValue))
         {
             IContentType? contentType = GetContentTypeOfNestedItem(nestedContentRowValue);
 
@@ -62,7 +62,7 @@ internal abstract class NestedPropertyIndexValueFactoryBase<TSerialized, TItem> 
     {
         foreach (KeyValuePair<string, IEnumerable<object?>> indexedKeyValuePair in indexContent)
         {
-            //Tests if key includes the RawFieldPrefix and it is not in the start
+            // Tests if key includes the RawFieldPrefix and it is not in the start
             if (indexedKeyValuePair.Key.Substring(1).Contains(UmbracoExamineFieldNames.RawFieldPrefix))
             {
                 var newKey = UmbracoExamineFieldNames.RawFieldPrefix +
@@ -116,7 +116,7 @@ internal abstract class NestedPropertyIndexValueFactoryBase<TSerialized, TItem> 
         var stringBuilder = new StringBuilder();
         foreach ((var indexKey, IEnumerable<object?>? indexedValue) in indexedContent)
         {
-            //Ignore Raw fields
+            // Ignore Raw fields
             if (indexKey.Contains(UmbracoExamineFieldNames.RawFieldPrefix))
             {
                 continue;

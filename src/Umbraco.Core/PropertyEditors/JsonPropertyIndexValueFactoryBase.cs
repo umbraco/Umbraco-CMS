@@ -29,30 +29,30 @@ public abstract class JsonPropertyIndexValueFactoryBase<TSerialized> : IProperty
     {
         var result = new List<KeyValuePair<string, IEnumerable<object?>>>();
 
-        var val = property.GetValue(culture, segment, published);
+        var propertyValue = property.GetValue(culture, segment, published);
 
-        //if there is a value, it's a string and it's detected as json
-        if (val is string rawVal && rawVal.DetectIsJson())
+        // If there is a value, it's a string and it's detected as json.
+        if (propertyValue is string rawValue && rawValue.DetectIsJson())
         {
             try
             {
-                TSerialized? deserializedObject = _jsonSerializer.Deserialize<TSerialized>(rawVal);
+                TSerialized? deserializedPropertyValue = _jsonSerializer.Deserialize<TSerialized>(rawValue);
 
-                if (deserializedObject is null)
+                if (deserializedPropertyValue is null)
                 {
                     return result;
                 }
 
-                result.AddRange(Handle(deserializedObject, property, culture, segment, published));
+                result.AddRange(Handle(deserializedPropertyValue, property, culture, segment, published));
             }
             catch (InvalidCastException)
             {
-                //swallow...on purpose, there's a chance that this isn't the json format we are looking for
+                // Swallow...on purpose, there's a chance that this isn't the json format we are looking for
                 // and we don't want that to affect the website.
             }
             catch (ArgumentException)
             {
-                //swallow on purpose to prevent this error:
+                // Swallow on purpose to prevent this error:
                 // Can not add Newtonsoft.Json.Linq.JValue to Newtonsoft.Json.Linq.JObject.
             }
         }
@@ -76,7 +76,7 @@ public abstract class JsonPropertyIndexValueFactoryBase<TSerialized> : IProperty
     ///  Method that handle the deserialized object.
     /// </summary>
     protected abstract IEnumerable<KeyValuePair<string, IEnumerable<object?>>> Handle(
-        TSerialized deserializedObject,
+        TSerialized deserializedPropertyValue,
         IProperty property,
         string? culture,
         string? segment,
