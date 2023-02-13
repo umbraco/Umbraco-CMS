@@ -8,7 +8,14 @@ import { UmbLitElement } from '@umbraco-cms/element';
 
 @customElement('umb-input-radio-button-list')
 export class UmbInputRadioButtonListElement extends FormControlMixin(UmbLitElement) {
-	static styles = [UUITextStyles, css``];
+	static styles = [
+		UUITextStyles,
+		css`
+			:host {
+				display: block;
+			}
+		`,
+	];
 
 	/**
 	 * List of items.
@@ -38,22 +45,16 @@ export class UmbInputRadioButtonListElement extends FormControlMixin(UmbLitEleme
 
 	private _setSelection(e: UUIBooleanInputEvent) {
 		e.stopPropagation();
-		if (e.target.checked) this.selectedKey = e.target.value;
-
+		if (e.target.value) this.selectedKey = e.target.value;
 		this.dispatchEvent(new CustomEvent('change', { bubbles: true, composed: true }));
 	}
 
 	render() {
-		console.log('list', this.list);
-
 		if (!this.list) return nothing;
-		return html`<form>
-			<uui-form @change="${this._setSelection}">
-				<uui-radio-group .value=${this.value}>
-					${repeat(this.list, (item) => item.key, this.renderRadioButton)}
-				</uui-radio-group>
-			</uui-form>
-		</form>`;
+
+		return html`<uui-radio-group .value=${this.value} @change=${this._setSelection}>
+			${repeat(this.list, (item) => item.key, this.renderRadioButton)}
+		</uui-radio-group>`;
 	}
 
 	renderRadioButton(item: { key: string; label: string }) {

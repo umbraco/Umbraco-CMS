@@ -41,7 +41,7 @@ export class UmbPropertyEditorUIRadioButtonListElement extends UmbLitElement {
 	render() {
 		return html`<umb-input-radio-button-list
 			@change="${this._onChange}"
-			.selectedKeys="${this._value}"
+			.selectedKey="${this._value}"
 			.list="${this._list}"></umb-input-radio-button-list>`;
 	}
 }
