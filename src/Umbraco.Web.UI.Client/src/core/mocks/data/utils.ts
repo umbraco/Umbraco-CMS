@@ -4,8 +4,9 @@ import type {
 	DocumentTypeTreeItemModel,
 	EntityTreeItemModel,
 	FolderTreeItemModel,
+	DocumentTypeModel,
+	DocumentModel,
 } from '@umbraco-cms/backend-api';
-import type { DocumentDetails, DocumentTypeDetails } from '@umbraco-cms/models';
 
 export const createEntityTreeItem = (item: any): EntityTreeItemModel => {
 	return {
@@ -36,18 +37,20 @@ export const createContentTreeItem = (item: any): ContentTreeItemModel & { isTra
 };
 
 // TODO: remove isTrashed type extension when we have found a solution to trashed items
-export const createDocumentTreeItem = (item: DocumentDetails): DocumentTreeItemModel & { isTrashed: boolean } => {
+export const createDocumentTreeItem = (item: DocumentModel): DocumentTreeItemModel & { isTrashed: boolean } => {
 	return {
 		...createContentTreeItem(item),
+		/*
 		noAccess: item.noAccess,
 		isProtected: item.isProtected,
 		isPublished: item.isPublished,
 		isEdited: item.isEdited,
 		isTrashed: item.isTrashed,
+		*/
 	};
 };
 
-export const createDocumentTypeTreeItem = (item: DocumentTypeDetails): DocumentTypeTreeItemModel => {
+export const createDocumentTypeTreeItem = (item: DocumentTypeModel): DocumentTypeTreeItemModel => {
 	return {
 		...createFolderTreeItem(item),
 		isElement: item.isElement,

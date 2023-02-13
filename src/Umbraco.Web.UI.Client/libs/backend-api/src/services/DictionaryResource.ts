@@ -5,6 +5,7 @@ import type { DictionaryImportModel } from '../models/DictionaryImportModel';
 import type { DictionaryItemCreateModel } from '../models/DictionaryItemCreateModel';
 import type { DictionaryItemModel } from '../models/DictionaryItemModel';
 import type { DictionaryItemUpdateModel } from '../models/DictionaryItemUpdateModel';
+import type { DictionaryMoveModel } from '../models/DictionaryMoveModel';
 import type { DictionaryUploadModel } from '../models/DictionaryUploadModel';
 import type { DocumentTypeTreeItemModel } from '../models/DocumentTypeTreeItemModel';
 import type { FolderTreeItemModel } from '../models/FolderTreeItemModel';
@@ -150,6 +151,32 @@ export class DictionaryResource {
                 'includeChildren': includeChildren,
             },
             errors: {
+                404: `Not Found`,
+            },
+        });
+    }
+
+    /**
+     * @returns any Success
+     * @throws ApiError
+     */
+    public static postDictionaryByKeyMove({
+        key,
+        requestBody,
+    }: {
+        key: string,
+        requestBody?: DictionaryMoveModel,
+    }): CancelablePromise<any> {
+        return __request(OpenAPI, {
+            method: 'POST',
+            url: '/umbraco/management/api/v1/dictionary/{key}/move',
+            path: {
+                'key': key,
+            },
+            body: requestBody,
+            mediaType: 'application/json',
+            errors: {
+                400: `Bad Request`,
                 404: `Not Found`,
             },
         });

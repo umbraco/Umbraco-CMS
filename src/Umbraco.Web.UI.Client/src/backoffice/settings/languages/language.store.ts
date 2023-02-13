@@ -73,10 +73,11 @@ export class UmbLanguageStore extends UmbStoreBase {
 	}
 
 	async delete(isoCodes: Array<string>) {
+		// TODO: revisit this. It looks a bit weird with the nested tryExecuteAndNotify
 		const queue = isoCodes.map((isoCode) =>
 			tryExecuteAndNotify(
 				this._host,
-				LanguageResource.deleteLanguageByIsoCode({ isoCode }).then(() => isoCode)
+				tryExecuteAndNotify(this._host, LanguageResource.deleteLanguageByIsoCode({ isoCode })).then(() => isoCode)
 			)
 		);
 		const results = await Promise.all(queue);

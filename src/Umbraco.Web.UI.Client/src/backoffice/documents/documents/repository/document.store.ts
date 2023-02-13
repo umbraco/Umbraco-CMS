@@ -1,4 +1,4 @@
-import type { DocumentDetails } from '@umbraco-cms/models';
+import { DocumentModel } from '@umbraco-cms/backend-api';
 import { UmbContextToken } from '@umbraco-cms/context-api';
 import { ArrayState } from '@umbraco-cms/observable-api';
 import { UmbStoreBase } from '@umbraco-cms/store';
@@ -10,9 +10,8 @@ import { UmbControllerHostInterface } from '@umbraco-cms/controller';
  * @extends {UmbStoreBase}
  * @description - Data Store for Template Details
  */
-export class UmbDocumentDetailStore extends UmbStoreBase {
-
-	#data = new ArrayState<DocumentDetails>([], (x) => x.key);
+export class UmbDocumentStore extends UmbStoreBase {
+	#data = new ArrayState<DocumentModel>([], (x) => x.key);
 
 	/**
 	 * Creates an instance of UmbDocumentDetailStore.
@@ -20,7 +19,7 @@ export class UmbDocumentDetailStore extends UmbStoreBase {
 	 * @memberof UmbDocumentDetailStore
 	 */
 	constructor(host: UmbControllerHostInterface) {
-		super(host, UmbDocumentDetailStore.name);
+		super(host, UmbDocumentStore.name);
 	}
 
 	/**
@@ -28,8 +27,17 @@ export class UmbDocumentDetailStore extends UmbStoreBase {
 	 * @param {DocumentDetails} document
 	 * @memberof UmbDocumentDetailStore
 	 */
-	append(document: DocumentDetails) {
+	append(document: DocumentModel) {
 		this.#data.append([document]);
+	}
+
+	/**
+	 * Append a document to the store
+	 * @param {DocumentModel} document
+	 * @memberof UmbDocumentStore
+	 */
+	byKey(key: DocumentModel['key']) {
+		return this.#data.getObservablePart((x) => x.find((y) => y.key === key));
 	}
 
 	/**
@@ -37,11 +45,9 @@ export class UmbDocumentDetailStore extends UmbStoreBase {
 	 * @param {string[]} uniques
 	 * @memberof UmbDocumentDetailStore
 	 */
-	remove(uniques: string[]) {
+	remove(uniques: Array<DocumentModel['key']>) {
 		this.#data.remove(uniques);
 	}
 }
 
-export const UMB_DOCUMENT_DETAIL_STORE_CONTEXT_TOKEN = new UmbContextToken<UmbDocumentDetailStore>(
-	UmbDocumentDetailStore.name
-);
+export const UMB_DOCUMENT_DETAIL_STORE_CONTEXT_TOKEN = new UmbContextToken<UmbDocumentStore>(UmbDocumentStore.name);

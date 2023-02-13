@@ -1,8 +1,9 @@
 import { html } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
-import { UmbInputDocumentPickerElement } from '../../../components/input-document-picker/input-document-picker.element';
+import type { UmbInputDocumentPickerElement } from '../../../components/input-document-picker/input-document-picker.element';
 import { UmbLitElement } from '@umbraco-cms/element';
-import type { DataTypePropertyData } from '@umbraco-cms/models';
+import '../../../components/input-document-picker/input-document-picker.element';
+import type { DataTypePropertyModel } from '@umbraco-cms/backend-api';
 
 @customElement('umb-property-editor-ui-document-picker')
 export class UmbPropertyEditorUIContentPickerElement extends UmbLitElement {
@@ -17,7 +18,7 @@ export class UmbPropertyEditorUIContentPickerElement extends UmbLitElement {
 	}
 
 	@property({ type: Array, attribute: false })
-	public set config(config: Array<DataTypePropertyData>) {
+	public set config(config: Array<DataTypePropertyModel>) {
 		const validationLimit = config.find((x) => x.alias === 'validationLimit');
 
 		this._limitMin = (validationLimit?.value as any).min;

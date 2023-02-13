@@ -33,10 +33,11 @@ export class UmbDataTypeWorkspaceElement extends UmbLitElement {
 
 	public load(value: string) {
 		this._workspaceContext?.load(value);
+		//this._unique = entityKey;
 	}
 
 	public create(parentKey: string | null) {
-		this._workspaceContext?.create(parentKey);
+		this._workspaceContext.createScaffold(parentKey);
 	}
 
 	@state()
@@ -45,9 +46,9 @@ export class UmbDataTypeWorkspaceElement extends UmbLitElement {
 	constructor() {
 		super();
 		this.provideContext('umbWorkspaceContext', this._workspaceContext);
-		this.observe(this._workspaceContext.data.pipe(distinctUntilChanged()), (dataType) => {
-			if (dataType && dataType.name !== this._dataTypeName) {
-				this._dataTypeName = dataType.name ?? '';
+		this.observe(this._workspaceContext.name, (dataTypeName) => {
+			if (dataTypeName !== this._dataTypeName) {
+				this._dataTypeName = dataTypeName ?? '';
 			}
 		});
 	}

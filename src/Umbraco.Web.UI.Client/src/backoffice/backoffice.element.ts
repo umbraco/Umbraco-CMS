@@ -15,11 +15,11 @@ import {
 	UmbBackofficeContext,
 	UMB_BACKOFFICE_CONTEXT_TOKEN,
 } from './shared/components/backoffice-frame/backoffice.context';
-import { UmbDocumentTypeDetailStore } from './documents/document-types/document-type.detail.store';
-import { UmbDocumentTypeTreeStore } from './documents/document-types/document-type.tree.store';
+import { UmbDocumentTypeStore } from './documents/document-types/repository/document-type.store';
+import { UmbDocumentTypeTreeStore } from './documents/document-types/repository/document-type.tree.store';
 import { UmbMediaTypeDetailStore } from './media/media-types/media-type.detail.store';
 import { UmbMediaTypeTreeStore } from './media/media-types/media-type.tree.store';
-import { UmbDocumentDetailStore } from './documents/documents/repository/document.detail.store';
+import { UmbDocumentStore } from './documents/documents/repository/document.store';
 import { UmbDocumentTreeStore } from './documents/documents/repository/document.tree.store';
 import { UmbMediaDetailStore } from './media/media/repository/media.detail.store';
 import { UmbMediaTreeStore } from './media/media/repository/media.tree.store';
@@ -33,7 +33,7 @@ import { UmbDictionaryDetailStore } from './translation/dictionary/dictionary.de
 import { UmbDictionaryTreeStore } from './translation/dictionary/dictionary.tree.store';
 import { UmbDocumentBlueprintDetailStore } from './documents/document-blueprints/document-blueprint.detail.store';
 import { UmbDocumentBlueprintTreeStore } from './documents/document-blueprints/document-blueprint.tree.store';
-import { UmbDataTypeDetailStore } from './settings/data-types/data-type.detail.store';
+import { UmbDataTypeStore } from './settings/data-types/repository/data-type.store';
 import { UmbDataTypeTreeStore } from './settings/data-types/tree/data-type.tree.store';
 import { UmbTemplateTreeStore } from './templating/templates/tree/data/template.tree.store';
 import { UmbTemplateDetailStore } from './templating/templates/workspace/data/template.detail.store';
@@ -82,16 +82,16 @@ export class UmbBackofficeElement extends UmbLitElement {
 		// TODO: find a way this is possible outside this element. It needs to be possible to register stores in extensions
 		this.provideContext(UMB_CURRENT_USER_STORE_CONTEXT_TOKEN, new UmbCurrentUserStore());
 
-		new UmbDocumentDetailStore(this);
+		new UmbDocumentStore(this);
 		new UmbDocumentTreeStore(this);
 		new UmbMediaDetailStore(this);
 		new UmbMediaTreeStore(this);
-		new UmbDataTypeDetailStore(this);
+		new UmbDataTypeStore(this);
 		new UmbDataTypeTreeStore(this);
 		new UmbUserStore(this);
 		new UmbMediaTypeDetailStore(this);
 		new UmbMediaTypeTreeStore(this);
-		new UmbDocumentTypeDetailStore(this);
+		new UmbDocumentTypeStore(this);
 		new UmbDocumentTypeTreeStore(this);
 		new UmbMemberTypeDetailStore(this);
 		new UmbMemberTypeTreeStore(this);

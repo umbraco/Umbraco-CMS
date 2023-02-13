@@ -25,8 +25,7 @@ const workspaceViews: Array<ManifestWorkspaceView> = [
 		type: 'workspaceView',
 		alias: 'Umb.WorkspaceView.Document.Edit',
 		name: 'Document Workspace Edit View',
-		loader: () =>
-			import('../../../shared/components/workspace/workspace-content/views/edit/workspace-view-content-edit.element'),
+		loader: () => import('./views/workspace-view-document-edit.element'),
 		weight: 200,
 		meta: {
 			workspaces: ['Umb.Workspace.Document'],
@@ -52,6 +51,8 @@ const workspaceViews: Array<ManifestWorkspaceView> = [
 ];
 
 const workspaceViewCollections: Array<ManifestWorkspaceViewCollection> = [
+	/*
+	// TODO: Reenable this:
 	{
 		type: 'workspaceViewCollection',
 		alias: 'Umb.WorkspaceView.Document.Collection',
@@ -66,6 +67,7 @@ const workspaceViewCollections: Array<ManifestWorkspaceViewCollection> = [
 			repositoryAlias: DOCUMENT_REPOSITORY_ALIAS,
 		},
 	},
+	*/
 ];
 
 const workspaceActions: Array<ManifestWorkspaceAction> = [
