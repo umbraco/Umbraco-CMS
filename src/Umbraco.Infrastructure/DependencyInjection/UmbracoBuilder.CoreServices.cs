@@ -117,7 +117,7 @@ public static partial class UmbracoBuilderExtensions
 
         builder.Services.AddScoped<IHttpScopeReference, HttpScopeReference>();
 
-        builder.Services.AddSingleton<IJsonSerializer, JsonNetSerializer>();
+        builder.Services.AddSingleton<IJsonSerializer, ContextualJsonSerializer>();
         builder.Services.AddSingleton<IConfigurationEditorJsonSerializer, ContextualConfigurationEditorJsonSerializer>();
         builder.Services.AddSingleton<IMenuItemCollectionFactory, MenuItemCollectionFactory>();
 
@@ -127,6 +127,8 @@ public static partial class UmbracoBuilderExtensions
 
         // register manifest parser, will be injected in collection builders where needed
         builder.Services.AddSingleton<IManifestParser, ManifestParser>();
+        builder.Services.AddSingleton<IExtensionManifestReader, ExtensionManifestReader>();
+        builder.Services.AddSingleton<IExtensionManifestService, ExtensionManifestService>();
 
         // register the manifest filter collection builder (collection is empty by default)
         builder.ManifestFilters();

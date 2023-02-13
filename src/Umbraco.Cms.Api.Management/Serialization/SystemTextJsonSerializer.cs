@@ -2,6 +2,7 @@
 
 namespace Umbraco.Cms.Api.Management.Serialization;
 
+// TOOD: move this to Infrastructure.Serialization + get rid of ISystemTextJsonSerializer
 public class SystemTextJsonSerializer : ISystemTextJsonSerializer
 {
     private JsonSerializerOptions _jsonSerializerOptions;
