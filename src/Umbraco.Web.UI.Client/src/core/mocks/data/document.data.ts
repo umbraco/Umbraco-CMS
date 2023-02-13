@@ -379,7 +379,7 @@ export const treeData: Array<DocumentTreeItemModel> = [
 		name: 'All property editors',
 		type: 'document',
 		icon: 'icon-item-arrangement',
-		hasChildren: false,
+		hasChildren: true,
 	},
 	{
 		isProtected: false,
