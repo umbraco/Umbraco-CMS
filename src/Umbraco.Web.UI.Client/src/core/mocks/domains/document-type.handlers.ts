@@ -4,7 +4,7 @@ import type { DocumentTypeDetails } from '@umbraco-cms/models';
 
 // TODO: add schema
 export const handlers = [
-	rest.get('/umbraco/backoffice/document-type/:key', (req, res, ctx) => {
+	rest.get('/umbraco/management/api/v1/document-type/details/:key', (req, res, ctx) => {
 		const key = req.params.key as string;
 		if (!key) return;
 
@@ -13,7 +13,7 @@ export const handlers = [
 		return res(ctx.status(200), ctx.json([document]));
 	}),
 
-	rest.post<DocumentTypeDetails[]>('/umbraco/backoffice/document-type/save', (req, res, ctx) => {
+	rest.post<DocumentTypeDetails[]>('/umbraco/management/api/v1/document-type/details/save', (req, res, ctx) => {
 		const data = req.body;
 		if (!data) return;
 

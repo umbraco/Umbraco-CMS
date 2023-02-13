@@ -5,10 +5,19 @@ import { distinctUntilChanged } from 'rxjs';
 import { UmbWorkspaceDocumentTypeContext } from '../../document-type-workspace.context';
 import { UmbLitElement } from '@umbraco-cms/element';
 import type { DocumentTypeDetails } from '@umbraco-cms/models';
+import '../../../../../shared/property-creator/property-creator.element.ts';
 
 @customElement('umb-workspace-view-document-type-design')
 export class UmbWorkspaceViewDocumentTypeDesignElement extends UmbLitElement {
-	static styles = [UUITextStyles, css``];
+	static styles = [
+		UUITextStyles,
+		css`
+			:host {
+				display: block;
+				margin: var(--uui-size-space-6);
+			}
+		`,
+	];
 
 	@state()
 	_documentType?: DocumentTypeDetails | null;
@@ -34,7 +43,11 @@ export class UmbWorkspaceViewDocumentTypeDesignElement extends UmbLitElement {
 	}
 
 	render() {
-		return html`<div>Design of ${this._documentType?.name}</div>`;
+		return html`<uui-box headline=${this._documentType?.name ?? ''}>
+			<div>
+				<umb-property-creator></umb-property-creator>
+			</div>
+		</uui-box>`;
 	}
 }
 
