@@ -19,7 +19,7 @@ public class JITOptimizerValidator : RuntimeModeProductionValidatorBase
         DebuggableAttribute? debuggableAttribute = Assembly.GetEntryAssembly()?.GetCustomAttribute<DebuggableAttribute>();
         if (debuggableAttribute != null && debuggableAttribute.IsJITOptimizerDisabled)
         {
-            validationErrorMessage = "The JIT/runtime optimizer of the entry assembly needs to be enabled in production mode.";
+            validationErrorMessage = "The JIT/runtime optimizer of the entry assembly needs to be enabled in production mode.  The project should be built/published in Release (or similar) configuration in production mode.";
             return false;
         }
 
