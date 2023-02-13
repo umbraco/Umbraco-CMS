@@ -4,6 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Api.Common.Configuration;
 using Umbraco.Cms.Api.Common.DependencyInjection;
 using Umbraco.Cms.Api.Content.Filters;
+using Umbraco.Cms.Api.Content.Rendering;
 using Umbraco.Cms.Api.Content.Services;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.ContentApi;
@@ -16,6 +17,8 @@ public static class UmbracoBuilderExtensions
     public static IUmbracoBuilder AddContentApi(this IUmbracoBuilder builder)
     {
         builder.Services.AddScoped<IStartNodeService, StartNodeService>();
+        builder.Services.AddScoped<IOutputExpansionStrategy, RequestContextOutputExpansionStrategy>();
+        builder.Services.AddSingleton<IOutputExpansionStrategyAccessor, RequestContextOutputExpansionStrategyAccessor>();
 
         builder
             .Services

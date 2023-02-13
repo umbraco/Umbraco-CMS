@@ -5,5 +5,5 @@ namespace Umbraco.Cms.Core.ContentApi;
 
 public interface IApiElementBuilder
 {
-    IApiElement Build(IPublishedElement element, bool expand = true);
+    IApiElement Build(IPublishedElement element);
 }

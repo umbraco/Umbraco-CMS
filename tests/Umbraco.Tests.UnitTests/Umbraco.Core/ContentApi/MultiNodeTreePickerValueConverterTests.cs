@@ -15,20 +15,17 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.ContentApi;
 [TestFixture]
 public class MultiNodeTreePickerValueConverterTests : PropertyValueConverterTests
 {
-    private MultiNodeTreePickerValueConverter MultiNodeTreePickerValueConverter(bool shouldExpand)
+    private MultiNodeTreePickerValueConverter MultiNodeTreePickerValueConverter()
     {
-        var expansionStrategy = new Mock<IOutputExpansionStrategy>();
-        expansionStrategy.Setup(e => e.ShouldExpand(It.IsAny<IPublishedPropertyType>())).Returns(shouldExpand);
+        var expansionStrategyAccessor = CreateOutputExpansionStrategyAccessor();
 
         var contentNameProvider = new PublishedContentNameProvider();
-        var propertyMapper = new PropertyMapper();
         return new MultiNodeTreePickerValueConverter(
             PublishedSnapshotAccessor,
             Mock.Of<IUmbracoContextAccessor>(),
             Mock.Of<IMemberService>(),
-            new ApiContentBuilder(propertyMapper, contentNameProvider, PublishedUrlProvider),
-            new ApiMediaBuilder(propertyMapper, contentNameProvider, PublishedUrlProvider, Mock.Of<IPublishedValueFallback>()),
-            expansionStrategy.Object);
+            new ApiContentBuilder(contentNameProvider, PublishedUrlProvider, expansionStrategyAccessor),
+            new ApiMediaBuilder(contentNameProvider, PublishedUrlProvider, Mock.Of<IPublishedValueFallback>(), expansionStrategyAccessor));
     }
 
     private PublishedDataType MultiNodePickerPublishedDataType(bool multiSelect, string entityType) =>
@@ -48,7 +45,7 @@ public class MultiNodeTreePickerValueConverterTests : PropertyValueConverterTest
         var publishedPropertyType = new Mock<IPublishedPropertyType>();
         publishedPropertyType.SetupGet(p => p.DataType).Returns(publishedDataType);
 
-        var valueConverter = MultiNodeTreePickerValueConverter(false);
+        var valueConverter = MultiNodeTreePickerValueConverter();
 
         Assert.AreEqual(typeof(IEnumerable<IApiContent>), valueConverter.GetContentApiPropertyValueType(publishedPropertyType.Object));
 
@@ -76,7 +73,7 @@ public class MultiNodeTreePickerValueConverterTests : PropertyValueConverterTest
             .Setup(pcc => pcc.GetById(otherContentKey))
             .Returns(otherContent.Object);
 
-        var valueConverter = MultiNodeTreePickerValueConverter(false);
+        var valueConverter = MultiNodeTreePickerValueConverter();
 
         Assert.AreEqual(typeof(IEnumerable<IApiContent>), valueConverter.GetContentApiPropertyValueType(publishedPropertyType.Object));
 
@@ -95,9 +92,8 @@ public class MultiNodeTreePickerValueConverterTests : PropertyValueConverterTest
         Assert.AreEqual("TheContentType", result.Last().ContentType);
     }
 
-    [TestCase(false)]
-    [TestCase(true)]
-    public void MultiNodeTreePickerValueConverter_HandlesContentExpansion(bool shouldExpand)
+    [Test]
+    public void MultiNodeTreePickerValueConverter_RendersContentProperties()
     {
         var content = new Mock<IPublishedContent>();
 
@@ -123,7 +119,7 @@ public class MultiNodeTreePickerValueConverterTests : PropertyValueConverterTest
         var publishedPropertyType = new Mock<IPublishedPropertyType>();
         publishedPropertyType.SetupGet(p => p.DataType).Returns(publishedDataType);
 
-        var valueConverter = MultiNodeTreePickerValueConverter(shouldExpand);
+        var valueConverter = MultiNodeTreePickerValueConverter();
 
         Assert.AreEqual(typeof(IEnumerable<IApiContent>), valueConverter.GetContentApiPropertyValueType(publishedPropertyType.Object));
 
@@ -135,14 +131,9 @@ public class MultiNodeTreePickerValueConverterTests : PropertyValueConverterTest
         Assert.AreEqual(key, result.First().Id);
         Assert.AreEqual("page-url-segment", result.First().Url);
         Assert.AreEqual("TheContentType", result.First().ContentType);
-        if (shouldExpand)
-        {
-            Assert.AreEqual(2, result.First().Properties.Count);
-        }
-        else
-        {
-            Assert.IsEmpty(result.First().Properties);
-        }
+        Assert.AreEqual(2, result.First().Properties.Count);
+        Assert.AreEqual("Content API value", result.First().Properties[ContentApiPropertyType.Alias]);
+        Assert.AreEqual("Default value", result.First().Properties[DefaultPropertyType.Alias]);
     }
 
     [Test]
@@ -152,7 +143,7 @@ public class MultiNodeTreePickerValueConverterTests : PropertyValueConverterTest
         var publishedPropertyType = new Mock<IPublishedPropertyType>();
         publishedPropertyType.SetupGet(p => p.DataType).Returns(publishedDataType);
 
-        var valueConverter = MultiNodeTreePickerValueConverter(false);
+        var valueConverter = MultiNodeTreePickerValueConverter();
 
         Assert.AreEqual(typeof(IEnumerable<IApiMedia>), valueConverter.GetContentApiPropertyValueType(publishedPropertyType.Object));
 
@@ -179,7 +170,7 @@ public class MultiNodeTreePickerValueConverterTests : PropertyValueConverterTest
             .Setup(pcc => pcc.GetById(otherMediaKey))
             .Returns(otherMedia.Object);
 
-        var valueConverter = MultiNodeTreePickerValueConverter(false);
+        var valueConverter = MultiNodeTreePickerValueConverter();
 
         Assert.AreEqual(typeof(IEnumerable<IApiMedia>), valueConverter.GetContentApiPropertyValueType(publishedPropertyType.Object));
 
@@ -204,7 +195,7 @@ public class MultiNodeTreePickerValueConverterTests : PropertyValueConverterTest
         var publishedPropertyType = new Mock<IPublishedPropertyType>();
         publishedPropertyType.SetupGet(p => p.DataType).Returns(publishedDataType);
 
-        var valueConverter = MultiNodeTreePickerValueConverter(false);
+        var valueConverter = MultiNodeTreePickerValueConverter();
 
         Assert.AreEqual(typeof(IEnumerable<IApiContent>), valueConverter.GetContentApiPropertyValueType(publishedPropertyType.Object));
 
@@ -225,7 +216,7 @@ public class MultiNodeTreePickerValueConverterTests : PropertyValueConverterTest
         var publishedPropertyType = new Mock<IPublishedPropertyType>();
         publishedPropertyType.SetupGet(p => p.DataType).Returns(publishedDataType);
 
-        var valueConverter = MultiNodeTreePickerValueConverter(false);
+        var valueConverter = MultiNodeTreePickerValueConverter();
 
         Assert.AreEqual(typeof(IEnumerable<IApiMedia>), valueConverter.GetContentApiPropertyValueType(publishedPropertyType.Object));
 
@@ -247,7 +238,7 @@ public class MultiNodeTreePickerValueConverterTests : PropertyValueConverterTest
         var publishedPropertyType = new Mock<IPublishedPropertyType>();
         publishedPropertyType.SetupGet(p => p.DataType).Returns(publishedDataType);
 
-        var valueConverter = MultiNodeTreePickerValueConverter(false);
+        var valueConverter = MultiNodeTreePickerValueConverter();
 
         Assert.AreEqual(typeof(string), valueConverter.GetContentApiPropertyValueType(publishedPropertyType.Object));
 
@@ -266,7 +257,7 @@ public class MultiNodeTreePickerValueConverterTests : PropertyValueConverterTest
         var publishedPropertyType = new Mock<IPublishedPropertyType>();
         publishedPropertyType.SetupGet(p => p.DataType).Returns(publishedDataType);
 
-        var valueConverter = MultiNodeTreePickerValueConverter(false);
+        var valueConverter = MultiNodeTreePickerValueConverter();
 
         var result = valueConverter.ConvertIntermediateToContentApiObject(Mock.Of<IPublishedElement>(), publishedPropertyType.Object, PropertyCacheLevel.Element, inter, false) as IEnumerable<IApiContent>;
         Assert.NotNull(result);
@@ -282,7 +273,7 @@ public class MultiNodeTreePickerValueConverterTests : PropertyValueConverterTest
         var publishedPropertyType = new Mock<IPublishedPropertyType>();
         publishedPropertyType.SetupGet(p => p.DataType).Returns(publishedDataType);
 
-        var valueConverter = MultiNodeTreePickerValueConverter(false);
+        var valueConverter = MultiNodeTreePickerValueConverter();
 
         var result = valueConverter.ConvertIntermediateToContentApiObject(Mock.Of<IPublishedElement>(), publishedPropertyType.Object, PropertyCacheLevel.Element, inter, false) as IEnumerable<IApiContent>;
         Assert.NotNull(result);

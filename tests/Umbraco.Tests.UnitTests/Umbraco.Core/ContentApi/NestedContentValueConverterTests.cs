@@ -21,7 +21,7 @@ public class NestedContentValueConverterTests : PropertyValueConverterTests
     private NestedContentSingleValueConverter _nestedContentSingleValueConverter;
     private NestedContentManyValueConverter _nestedContentManyValueConverter;
     private IPublishedPropertyType _publishedPropertyType;
-    
+
     [SetUp]
     public void SetupThis()
     {
@@ -31,7 +31,7 @@ public class NestedContentValueConverterTests : PropertyValueConverterTests
             .Returns((IPublishedElement element) => element);
         _publishedModelFactory = publishedModelFactoryMock.Object;
 
-        _apiElementBuilder = new ApiElementBuilder(new PropertyMapper());
+        _apiElementBuilder = new ApiElementBuilder(CreateOutputExpansionStrategyAccessor());
 
         var profilingLogger = new ProfilingLogger(Mock.Of<ILogger<ProfilingLogger>>(), Mock.Of<IProfiler>());
 

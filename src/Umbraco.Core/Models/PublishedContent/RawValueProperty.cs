@@ -61,6 +61,6 @@ public class RawValueProperty : PublishedPropertyBase
     public override object? GetXPathValue(string? culture = null, string? segment = null)
         => string.IsNullOrEmpty(culture) & string.IsNullOrEmpty(segment) ? _xpathValue.Value : null;
 
-    public override object? GetContentApiValue(string? culture = null, string? segment = null)
+    public override object? GetContentApiValue(bool expanding, string? culture = null, string? segment = null)
         => string.IsNullOrEmpty(culture) & string.IsNullOrEmpty(segment) ? _contentApiValue.Value : null;
 }

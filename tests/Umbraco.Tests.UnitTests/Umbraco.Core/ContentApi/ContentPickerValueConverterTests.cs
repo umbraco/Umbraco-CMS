@@ -13,12 +13,13 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.ContentApi;
 [TestFixture]
 public class ContentPickerValueConverterTests : PropertyValueConverterTests
 {
-    private ContentPickerValueConverter CreateValueConverter(bool shouldExpand, IPublishedContentNameProvider? nameProvider = null)
-    {
-        var expansionStrategy = new Mock<IOutputExpansionStrategy>();
-        expansionStrategy.Setup(e => e.ShouldExpand(It.IsAny<IPublishedPropertyType>())).Returns(shouldExpand);
-        return new ContentPickerValueConverter(PublishedSnapshotAccessor, expansionStrategy.Object, new ApiContentBuilder(new PropertyMapper(), nameProvider ?? new PublishedContentNameProvider(), PublishedUrlProvider));
-    }
+    private ContentPickerValueConverter CreateValueConverter(IPublishedContentNameProvider? nameProvider = null)
+        => new ContentPickerValueConverter(
+            PublishedSnapshotAccessor,
+            new ApiContentBuilder(
+                nameProvider ?? new PublishedContentNameProvider(),
+                PublishedUrlProvider,
+                CreateOutputExpansionStrategyAccessor()));
 
     [Test]
     public void ContentPickerValueConverter_BuildsContentApiOutput()
@@ -26,7 +27,7 @@ public class ContentPickerValueConverterTests : PropertyValueConverterTests
         var publishedPropertyType = new Mock<IPublishedPropertyType>();
         publishedPropertyType.SetupGet(p => p.Alias).Returns("test");
 
-        var valueConverter = CreateValueConverter(false);
+        var valueConverter = CreateValueConverter();
         Assert.AreEqual(typeof(IApiContent), valueConverter.GetContentApiPropertyValueType(publishedPropertyType.Object));
         var result = valueConverter.ConvertIntermediateToContentApiObject(
             Mock.Of<IPublishedContent>(),
@@ -52,7 +53,7 @@ public class ContentPickerValueConverterTests : PropertyValueConverterTests
         var customNameProvider = new Mock<IPublishedContentNameProvider>();
         customNameProvider.Setup(n => n.GetName(PublishedContent)).Returns($"Custom name for: {PublishedContent.Name}");
 
-        var valueConverter = CreateValueConverter(false, customNameProvider.Object);
+        var valueConverter = CreateValueConverter(customNameProvider.Object);
         var result = valueConverter.ConvertIntermediateToContentApiObject(
             Mock.Of<IPublishedContent>(),
             publishedPropertyType.Object,
@@ -64,9 +65,8 @@ public class ContentPickerValueConverterTests : PropertyValueConverterTests
         Assert.AreEqual("Custom name for: The page", result.Name);
     }
 
-    [TestCase(true)]
-    [TestCase(false)]
-    public void ContentPickerValueConverter_HandlesOutputExpansionStrategy(bool shouldExpand)
+    [Test]
+    public void ContentPickerValueConverter_RendersContentProperties()
     {
         var content = new Mock<IPublishedContent>();
 
@@ -91,7 +91,7 @@ public class ContentPickerValueConverterTests : PropertyValueConverterTests
             .Setup(pcc => pcc.GetById(key))
             .Returns(content.Object);
 
-        var valueConverter = CreateValueConverter(shouldExpand);
+        var valueConverter = CreateValueConverter();
         Assert.AreEqual(typeof(IApiContent), valueConverter.GetContentApiPropertyValueType(publishedPropertyType.Object));
         var result = valueConverter.ConvertIntermediateToContentApiObject(
             Mock.Of<IPublishedContent>(),
@@ -105,13 +105,8 @@ public class ContentPickerValueConverterTests : PropertyValueConverterTests
         Assert.AreEqual(content.Object.Key, result.Id);
         Assert.AreEqual("page-url-segment", result.Url);
         Assert.AreEqual("TheContentType", result.ContentType);
-        if (shouldExpand)
-        {
-            Assert.AreEqual(2, result.Properties.Count);
-        }
-        else
-        {
-            Assert.IsEmpty(result.Properties);
-        }
+        Assert.AreEqual(2, result.Properties.Count);
+        Assert.AreEqual("Content API value", result.Properties[ContentApiPropertyType.Alias]);
+        Assert.AreEqual("Default value", result.Properties[DefaultPropertyType.Alias]);
     }
 }

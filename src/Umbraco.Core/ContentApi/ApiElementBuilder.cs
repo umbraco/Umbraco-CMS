@@ -5,12 +5,23 @@ namespace Umbraco.Cms.Core.ContentApi;
 
 public class ApiElementBuilder : IApiElementBuilder
 {
-    private readonly IPropertyMapper _propertyMapper;
+    private readonly IOutputExpansionStrategyAccessor _outputExpansionStrategyAccessor;
 
-    public ApiElementBuilder(IPropertyMapper propertyMapper) => _propertyMapper = propertyMapper;
+    public ApiElementBuilder(IOutputExpansionStrategyAccessor outputExpansionStrategyAccessor)
+    {
+        _outputExpansionStrategyAccessor = outputExpansionStrategyAccessor;
+    }
 
-    public IApiElement Build(IPublishedElement element, bool expand = true) => new ApiElement(
-        element.Key,
-        element.ContentType.Alias,
-        expand ? _propertyMapper.Map(element) : new Dictionary<string, object?>());
+    public IApiElement Build(IPublishedElement element)
+    {
+        IDictionary<string, object?> properties =
+            _outputExpansionStrategyAccessor.TryGetValue(out IOutputExpansionStrategy? outputExpansionStrategy)
+                ? outputExpansionStrategy.MapElementProperties(element)
+                : new Dictionary<string, object?>();
+
+        return new ApiElement(
+            element.Key,
+            element.ContentType.Alias,
+            properties);
+    }
 }

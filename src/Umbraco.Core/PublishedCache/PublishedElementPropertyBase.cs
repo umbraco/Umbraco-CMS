@@ -214,23 +214,41 @@ internal class PublishedElementPropertyBase : PublishedPropertyBase
         }
     }
 
-    public override object? GetContentApiValue(string? culture = null, string? segment = null)
+    public override object? GetContentApiValue(bool expanding, string? culture = null, string? segment = null)
     {
         GetCacheLevels(out PropertyCacheLevel cacheLevel, out PropertyCacheLevel referenceCacheLevel);
 
         lock (_locko)
         {
             CacheValues cacheValues = GetCacheValues(cacheLevel);
-            if (cacheValues.ContentApiObjectInitialized)
-            {
-                return cacheValues.ContentApiObjectValue;
-            }
 
-            cacheValues.ContentApiObjectValue =
-                PropertyType.ConvertInterToContentApiObject(Element, referenceCacheLevel, GetInterValue(), IsPreviewing);
-            cacheValues.ContentApiObjectInitialized = true;
-            return cacheValues.ContentApiObjectValue;
+            object? GetContentApiObject() => PropertyType.ConvertInterToContentApiObject(Element, referenceCacheLevel, GetInterValue(), IsPreviewing);
+            return expanding
+                ? GetContentApiExpandedObject(cacheValues, GetContentApiObject)
+                : GetContentApiDefaultObject(cacheValues, GetContentApiObject);
         }
+    }
+
+    private object? GetContentApiDefaultObject(CacheValues cacheValues, Func<object?> getValue)
+    {
+        if (cacheValues.ContentApiDefaultObjectInitialized == false)
+        {
+            cacheValues.ContentApiDefaultObjectValue = getValue();
+            cacheValues.ContentApiDefaultObjectInitialized = true;
+        }
+
+        return cacheValues.ContentApiDefaultObjectValue;
+    }
+
+    private object? GetContentApiExpandedObject(CacheValues cacheValues, Func<object?> getValue)
+    {
+        if (cacheValues.ContentApiExpandedObjectInitialized == false)
+        {
+            cacheValues.ContentApiExpandedObjectValue = getValue();
+            cacheValues.ContentApiExpandedObjectInitialized = true;
+        }
+
+        return cacheValues.ContentApiExpandedObjectValue;
     }
 
     protected class CacheValues
@@ -239,7 +257,9 @@ internal class PublishedElementPropertyBase : PublishedPropertyBase
         public object? ObjectValue;
         public bool XPathInitialized;
         public object? XPathValue;
-        public bool ContentApiObjectInitialized;
-        public object? ContentApiObjectValue;
+        public bool ContentApiDefaultObjectInitialized;
+        public object? ContentApiDefaultObjectValue;
+        public bool ContentApiExpandedObjectInitialized;
+        public object? ContentApiExpandedObjectValue;
     }
 }
