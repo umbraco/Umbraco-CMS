@@ -1,12 +1,12 @@
-import { css, html } from 'lit';
+import { html } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, property } from 'lit/decorators.js';
 import { FormControlMixin } from '@umbraco-ui/uui-base/lib/mixins';
 import { UUIColorSwatchesEvent } from '@umbraco-ui/uui';
 import { UmbLitElement } from '@umbraco-cms/element';
 
-@customElement('umb-color-picker')
-export class UmbColorPickerElement extends FormControlMixin(UmbLitElement) {
+@customElement('umb-input-color-picker')
+export class UmbInputColorPickerElement extends FormControlMixin(UmbLitElement) {
 	static styles = [UUITextStyles];
 
 	@property({ type: Boolean })
@@ -45,10 +45,10 @@ export class UmbColorPickerElement extends FormControlMixin(UmbLitElement) {
 	}
 }
 
-export default UmbColorPickerElement;
+export default UmbInputColorPickerElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-color-picker': UmbColorPickerElement;
+		'umb-input-color-picker': UmbInputColorPickerElement;
 	}
 }

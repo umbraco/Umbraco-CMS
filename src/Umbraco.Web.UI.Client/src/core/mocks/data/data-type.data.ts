@@ -324,7 +324,12 @@ export const data: Array<DataTypeDetails> = [
 		isFolder: false,
 		propertyEditorModelAlias: 'Umbraco.MediaPicker3',
 		propertyEditorUIAlias: 'Umb.PropertyEditorUI.MediaPicker',
-		data: [],
+		data: [
+			{
+				alias: 'validationLimit',
+				value: { max: 1 },
+			},
+		],
 	},
 	{
 		name: 'Image Cropper',
