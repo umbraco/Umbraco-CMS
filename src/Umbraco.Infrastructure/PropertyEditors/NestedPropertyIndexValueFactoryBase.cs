@@ -152,7 +152,13 @@ internal abstract class NestedPropertyIndexValueFactoryBase<TSerialized, TItem> 
             if (propertyTypeDictionary.TryGetValue(propertyAlias, out IPropertyType? propertyType))
             {
                 IProperty subProperty = new Property(propertyType);
-                subProperty.SetValue(propertyValue);
+                subProperty.SetValue(propertyValue, culture, segment);
+
+                if (published)
+                {
+                    subProperty.PublishValues(culture, segment ?? "*");
+                }
+
                 IDataEditor? editor = _propertyEditorCollection[propertyType.PropertyEditorAlias];
                 if (editor is null)
                 {
