@@ -17,7 +17,7 @@ public class UserGroupsControllerBase : ManagementApiControllerBase
     protected IActionResult UserGroupOperationStatusResult(UserGroupOperationStatus status) =>
         status switch
         {
-            UserGroupOperationStatus.NotFound => NotFound(),
+            UserGroupOperationStatus.NotFound => NotFound("The user group could not be found"),
             UserGroupOperationStatus.AlreadyExists => Conflict(new ProblemDetailsBuilder()
                 .WithTitle("User group already exists")
                 .WithDetail("The user group exists already.")
