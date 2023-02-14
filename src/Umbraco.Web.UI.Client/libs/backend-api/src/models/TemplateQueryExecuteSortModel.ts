@@ -6,4 +6,3 @@ export type TemplateQueryExecuteSortModel = {
     propertyAlias?: string;
     direction?: string | null;
 };
-

@@ -44,10 +44,10 @@ export class DictionaryResource {
      * @throws ApiError
      */
     public static postDictionary({
-        requestBody,
-    }: {
-        requestBody?: DictionaryItemCreateModel,
-    }): CancelablePromise<any> {
+requestBody,
+}: {
+requestBody?: DictionaryItemCreateModel,
+}): CancelablePromise<any> {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/umbraco/management/api/v1/dictionary',
@@ -87,10 +87,10 @@ export class DictionaryResource {
      * @throws ApiError
      */
     public static deleteDictionaryByKey({
-        key,
-    }: {
-        key: string,
-    }): CancelablePromise<any> {
+key,
+}: {
+key: string,
+}): CancelablePromise<any> {
         return __request(OpenAPI, {
             method: 'DELETE',
             url: '/umbraco/management/api/v1/dictionary/{key}',
@@ -109,12 +109,12 @@ export class DictionaryResource {
      * @throws ApiError
      */
     public static putDictionaryByKey({
-        key,
-        requestBody,
-    }: {
-        key: string,
-        requestBody?: DictionaryItemUpdateModel,
-    }): CancelablePromise<any> {
+key,
+requestBody,
+}: {
+key: string,
+requestBody?: DictionaryItemUpdateModel,
+}): CancelablePromise<any> {
         return __request(OpenAPI, {
             method: 'PUT',
             url: '/umbraco/management/api/v1/dictionary/{key}',

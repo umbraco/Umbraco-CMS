@@ -7,6 +7,10 @@ export class UmbEntityData<T extends Entity> extends UmbData<T> {
 		super(data);
 	}
 
+	getList(skip: number, take: number) {
+		return this.data.slice(skip, skip + take);
+	}
+	
 	getByKey(key: string) {
 		return this.data.find((item) => item.key === key);
 	}

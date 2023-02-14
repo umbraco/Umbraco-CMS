@@ -27,6 +27,10 @@ export class UmbWorkspacePropertyElement extends UmbLitElement {
 				display: block;
 			}
 
+			:host(:last-child) umb-workspace-property-layout {
+				border-bottom:0;
+			}
+
 			p {
 				color: var(--uui-color-text-alt);
 			}
