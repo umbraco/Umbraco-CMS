@@ -1,6 +1,3 @@
-using System.Text.Json;
-using System.Text.Json.Serialization;
-using System.Text.Json.Serialization.Metadata;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Composing;
@@ -9,7 +6,6 @@ using Umbraco.Cms.Api.Common.Configuration;
 using Umbraco.Cms.Api.Common.DependencyInjection;
 using Umbraco.Cms.Api.Management.DependencyInjection;
 using Umbraco.Cms.Api.Management.Serialization;
-using Umbraco.Cms.Infrastructure.Serialization;
 using Umbraco.Cms.Web.Common.ApplicationBuilder;
 using Umbraco.New.Cms.Core.Models.Configuration;
 
@@ -46,6 +42,7 @@ public class ManagementApiComposer : IComposer
 
         services
             .ConfigureOptions<ConfigureMvcOptions>()
+            .ConfigureOptions<ConfigureApiBehaviorOptions>()
             .Configure<UmbracoPipelineOptions>(options =>
             {
                 options.AddFilter(new UmbracoPipelineFilter(
