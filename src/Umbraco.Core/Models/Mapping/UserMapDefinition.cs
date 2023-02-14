@@ -227,7 +227,7 @@ public class UserMapDefinition : IMapDefinition
         target.IsApproved = false;
 
         target.ClearGroups();
-        IEnumerable<IUserGroup> groups = _userGroupService.GetAsync(source.UserGroups.ToArray()).Result;
+        IEnumerable<IUserGroup> groups = _userGroupService.GetAsync(source.UserGroups.ToArray()).GetAwaiter().GetResult();
         foreach (IUserGroup group in groups)
         {
             target.AddGroup(group.ToReadOnlyGroup());
@@ -252,7 +252,7 @@ public class UserMapDefinition : IMapDefinition
         target.Id = source.Id;
 
         target.ClearGroups();
-        IEnumerable<IUserGroup> groups = _userGroupService.GetAsync(source.UserGroups.ToArray()).Result;
+        IEnumerable<IUserGroup> groups = _userGroupService.GetAsync(source.UserGroups.ToArray()).GetAwaiter().GetResult();
         foreach (IUserGroup group in groups)
         {
             target.AddGroup(group.ToReadOnlyGroup());

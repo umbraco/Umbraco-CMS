@@ -46,7 +46,7 @@ internal sealed class UserGroupValidateAttribute : TypeFilterAttribute
             switch (userGroupSave?.Action)
             {
                 case ContentSaveAction.Save:
-                    persisted = _userGroupService.GetAsync(Convert.ToInt32(userGroupSave.Id)).Result;
+                    persisted = _userGroupService.GetAsync(Convert.ToInt32(userGroupSave.Id)).GetAwaiter().GetResult();
                     if (persisted == null)
                     {
                         var message = $"User group with id: {userGroupSave.Id} was not found";
@@ -74,7 +74,7 @@ internal sealed class UserGroupValidateAttribute : TypeFilterAttribute
             //now assign the persisted entity to the model so we can use it in the action
             userGroupSave.PersistedUserGroup = persisted;
 
-            IUserGroup? existing = _userGroupService.GetAsync(userGroupSave.Alias).Result;
+            IUserGroup? existing = _userGroupService.GetAsync(userGroupSave.Alias).GetAwaiter().GetResult();
             if (existing != null && existing.Id != userGroupSave.PersistedUserGroup.Id)
             {
                 context.ModelState.AddModelError("Alias", "A user group with this alias already exists");
