@@ -31,6 +31,9 @@ export class UmbContextProvider<HostType extends EventTarget = EventTarget> {
 	public hostConnected() {
 		this.host.addEventListener(umbContextRequestEventType, this._handleContextRequest);
 		this.host.dispatchEvent(new UmbContextProvideEventImplementation(this._contextAlias));
+
+		// Listen to our debug event 'umb:debug-contexts'
+		this.host.addEventListener('umb:debug-contexts', this._handleDebugContextRequest);
 	}
 
 	/**
@@ -52,6 +55,17 @@ export class UmbContextProvider<HostType extends EventTarget = EventTarget> {
 
 		event.stopPropagation();
 		event.callback(this.#instance);
+	};
+
+	private _handleDebugContextRequest = (event: Event) => {
+
+		
+		console.log('Context Alias:', this._contextAlias);
+		console.log('Context Instance:', this.#instance);
+
+		// Do I update an array on the event which
+		// The Debug element can then render in UI?!
+		console.log('Event:', event);
 	};
 
 

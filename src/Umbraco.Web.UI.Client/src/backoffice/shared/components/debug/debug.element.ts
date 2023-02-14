@@ -13,13 +13,10 @@ export class UmbDebug extends LitElement {
 				display: block;
 				font-family: monospace;
 
-				position:absolute;
-				bottom:0;
-				left:0;
 				z-index:10000;
 
-				width:calc(100% - 20px);
-				padding:10px;
+				width:100%;
+				padding:10px 0;
 			}
 
 			.events {
@@ -31,6 +28,9 @@ export class UmbDebug extends LitElement {
 
 			.events.open {
 				height:200px;
+			}
+
+			.events > div {
 				padding:10px;
 			}
 
@@ -43,6 +43,9 @@ export class UmbDebug extends LitElement {
     @property({reflect: true, type: Boolean})
     enabled = false;
 
+	@property({type: Array<String>})
+	contextAliases = ['UmbTemplateDetailStore', 'umbLanguageStore'];
+
     @state()
 	private _debugPaneOpen = false;
 
@@ -50,22 +53,18 @@ export class UmbDebug extends LitElement {
         this._debugPaneOpen = !this._debugPaneOpen;
     }
 
-    constructor() {
-        super();
+	connectedCallback(): void {
+		super.connectedCallback();
 
-        // Get outer element <umb-app>
-        const app = window.document.querySelector('umb-app');
+		// Create event that bubbles up through the DOM
+		const event = new CustomEvent('umb:debug-contexts', {
+			bubbles: true,
+			composed: true			
+		});
 
-        app?.addEventListener(umbContextRequestEventType as unknown as UmbContextRequestEventImplementation, (e) => {
-            // Console.log event
-            console.log('Some event', e.type);
-            console.log('Some event thing', e);
-            console.log('Some event thing', e.contextAlias);
-
-        });
-
-        //this.addEventListener('click', (e) => console.log(e.type, e.target.localName));
-    }
+		// Dispatch it
+		this.dispatchEvent(event);
+	}
 
 	render() {
 
@@ -78,7 +77,14 @@ export class UmbDebug extends LitElement {
 					</uui-button>
 
 					<div class="events ${this._debugPaneOpen ? 'open' : ''}">
-						<h4>Events</h4>
+						<div>
+							<h4>Context Aliases to consume</h4>
+							<ul>
+								${this.contextAliases.map((ctxAlias) =>
+									html`<li>${ctxAlias}</li>`
+								)}
+							</ul>
+						</div>						
 					</div>
                 </div>
 			`;
