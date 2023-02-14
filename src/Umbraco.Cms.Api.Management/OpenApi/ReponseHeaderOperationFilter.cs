@@ -19,19 +19,15 @@ internal class ReponseHeaderOperationFilter : IOperationFilter
         }
     }
 
-    private void SetHeader(OpenApiResponse value, string headername, string description, string type, string format)
+    private void SetHeader(OpenApiResponse value, string headerName, string description, string type, string format)
     {
-        if (value is null)
-        {
-            return;
-        }
 
         if (value.Headers is null)
         {
             value.Headers = new Dictionary<string, OpenApiHeader>();
         }
 
-        value.Headers[headername] = new OpenApiHeader()
+        value.Headers[headerName] = new OpenApiHeader()
         {
             Description = description,
             Schema = new OpenApiSchema { Description = description, Type = type, Format = format }
