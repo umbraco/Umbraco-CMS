@@ -2385,7 +2385,7 @@ public class ContentService : RepositoryService, IContentService
 
             var originalPath = content.Path;
             var moveEventInfo =
-                new MoveEventInfo<IContent>(content, originalPath, Constants.System.RecycleBinContent);
+                new MoveToRecycleBinEventInfo<IContent>(content, originalPath);
 
             var movingToRecycleBinNotification =
                 new ContentMovingToRecycleBinNotification(moveEventInfo, eventMessages);
@@ -2488,9 +2488,13 @@ public class ContentService : RepositoryService, IContentService
                 new ContentTreeChangeNotification(content, TreeChangeTypes.RefreshBranch, eventMessages));
 
             // changes
-            MoveEventInfo<IContent>[] moveInfo = moves
-                .Select(x => new MoveEventInfo<IContent>(x.Item1, x.Item2, x.Item1.ParentId))
-                .ToArray();
+            List<MoveEventInfo<IContent>> moveInfo = new ();
+
+            foreach ((IContent, string) move in moves)
+            {
+                IEntitySlim? parentEntity = _entityRepository.Get(move.Item1.ParentId);
+                moveInfo.Add(new MoveEventInfo<IContent>(move.Item1, move.Item2, move.Item1.ParentId, parentEntity?.Key));
+            }
 
             scope.Notifications.Publish(
                 new ContentMovedNotification(moveInfo, eventMessages).WithStateFrom(movingNotification));
