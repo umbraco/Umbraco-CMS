@@ -11,11 +11,11 @@ import { html } from 'lit-html';
 import { initialize, mswDecorator } from 'msw-storybook-addon';
 import { setCustomElements } from '@storybook/web-components';
 
-import { UmbDataTypeStore } from '../src/backoffice/settings/data-types/data-type.store';
+import { UmbDataTypeStore } from '../src/backoffice/settings/data-types/repository/data-type.store.ts';
 import {
-	UMB_DOCUMENT_TYPE_DETAIL_STORE_CONTEXT_TOKEN,
+	UMB_DOCUMENT_TYPE_STORE_CONTEXT_TOKEN,
 	UmbDocumentTypeStore,
-} from '../src/backoffice/documents/document-types/document-type.detail.store';
+} from '../src/backoffice/documents/document-types/repository/document-type.store.ts';
 
 import customElementManifests from '../custom-elements.json';
 import { UmbIconStore } from '../libs/store/icon/icon.store';
@@ -69,7 +69,7 @@ const dataTypeStoreProvider = (story) => html`
 
 const documentTypeStoreProvider = (story) => html`
 	<umb-context-provider
-		key=${UMB_DOCUMENT_TYPE_DETAIL_STORE_CONTEXT_TOKEN.toString()}
+		key=${UMB_DOCUMENT_TYPE_STORE_CONTEXT_TOKEN.toString()}
 		.create=${(host) => new UmbDocumentTypeStore(host)}
 		>${story()}</umb-context-provider
 	>
