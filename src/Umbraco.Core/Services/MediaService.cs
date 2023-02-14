@@ -947,7 +947,7 @@ namespace Umbraco.Cms.Core.Services
 
                 var originalPath = media.Path;
 
-                var moveEventInfo = new MoveEventInfo<IMedia>(media, originalPath, Constants.System.RecycleBinMedia);
+                var moveEventInfo = new MoveToRecycleBinEventInfo<IMedia>(media, originalPath);
 
                 var movingToRecycleBinNotification = new MediaMovingToRecycleBinNotification(moveEventInfo, messages);
                 if (scope.Notifications.PublishCancelable(movingToRecycleBinNotification))
