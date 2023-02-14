@@ -90,14 +90,7 @@
             }
           },
           "404": {
-            "description": "Not Found",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetailsModel"
-                }
-              }
-            }
+            "description": "Not Found"
           }
         }
       }
@@ -135,14 +128,7 @@
             }
           },
           "404": {
-            "description": "Not Found",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetailsModel"
-                }
-              }
-            }
+            "description": "Not Found"
           }
         }
       },
@@ -177,14 +163,7 @@
             }
           },
           "404": {
-            "description": "Not Found",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetailsModel"
-                }
-              }
-            }
+            "description": "Not Found"
           }
         }
       },
@@ -232,14 +211,7 @@
             }
           },
           "404": {
-            "description": "Not Found",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetailsModel"
-                }
-              }
-            }
+            "description": "Not Found"
           }
         }
       }
@@ -289,14 +261,7 @@
             }
           },
           "404": {
-            "description": "Not Found",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetailsModel"
-                }
-              }
-            }
+            "description": "Not Found"
           }
         }
       }
@@ -336,14 +301,7 @@
             "description": "Success"
           },
           "404": {
-            "description": "Not Found",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetailsModel"
-                }
-              }
-            }
+            "description": "Not Found"
           }
         }
       }
@@ -384,14 +342,7 @@
             }
           },
           "404": {
-            "description": "Not Found",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetailsModel"
-                }
-              }
-            }
+            "description": "Not Found"
           }
         }
       }
@@ -465,14 +416,7 @@
             }
           },
           "404": {
-            "description": "Not Found",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetailsModel"
-                }
-              }
-            }
+            "description": "Not Found"
           }
         }
       },
@@ -497,14 +441,7 @@
             "description": "Success"
           },
           "404": {
-            "description": "Not Found",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetailsModel"
-                }
-              }
-            }
+            "description": "Not Found"
           }
         }
       },
@@ -542,14 +479,7 @@
             "description": "Success"
           },
           "404": {
-            "description": "Not Found",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetailsModel"
-                }
-              }
-            }
+            "description": "Not Found"
           }
         }
       }
@@ -773,14 +703,7 @@
             }
           },
           "404": {
-            "description": "Not Found",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetailsModel"
-                }
-              }
-            }
+            "description": "Not Found"
           },
           "400": {
             "description": "Bad Request",
@@ -838,14 +761,7 @@
             }
           },
           "404": {
-            "description": "Not Found",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetailsModel"
-                }
-              }
-            }
+            "description": "Not Found"
           }
         }
       },
@@ -880,14 +796,7 @@
             }
           },
           "404": {
-            "description": "Not Found",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetailsModel"
-                }
-              }
-            }
+            "description": "Not Found"
           }
         }
       },
@@ -935,14 +844,7 @@
             }
           },
           "404": {
-            "description": "Not Found",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetailsModel"
-                }
-              }
-            }
+            "description": "Not Found"
           }
         }
       }
@@ -985,14 +887,7 @@
             }
           },
           "404": {
-            "description": "Not Found",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/NotFoundResultModel"
-                }
-              }
-            }
+            "description": "Not Found"
           }
         }
       }
@@ -1042,14 +937,7 @@
             }
           },
           "404": {
-            "description": "Not Found",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetailsModel"
-                }
-              }
-            }
+            "description": "Not Found"
           }
         }
       }
@@ -1098,14 +986,7 @@
             }
           },
           "404": {
-            "description": "Not Found",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetailsModel"
-                }
-              }
-            }
+            "description": "Not Found"
           }
         }
       }
@@ -1538,14 +1419,7 @@
         ],
         "responses": {
           "401": {
-            "description": "Unauthorized",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetailsModel"
-                }
-              }
-            }
+            "description": "Unauthorized"
           },
           "200": {
             "description": "Success",
@@ -1588,14 +1462,7 @@
         ],
         "responses": {
           "401": {
-            "description": "Unauthorized",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetailsModel"
-                }
-              }
-            }
+            "description": "Unauthorized"
           },
           "200": {
             "description": "Success",
@@ -1841,14 +1708,7 @@
         ],
         "responses": {
           "404": {
-            "description": "Not Found",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetailsModel"
-                }
-              }
-            }
+            "description": "Not Found"
           },
           "200": {
             "description": "Success",
@@ -1885,14 +1745,7 @@
         ],
         "responses": {
           "404": {
-            "description": "Not Found",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetailsModel"
-                }
-              }
-            }
+            "description": "Not Found"
           },
           "200": {
             "description": "Success",
@@ -2335,14 +2188,7 @@
         },
         "responses": {
           "404": {
-            "description": "Not Found",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetailsModel"
-                }
-              }
-            }
+            "description": "Not Found"
           },
           "400": {
             "description": "Bad Request",
@@ -2388,14 +2234,7 @@
         ],
         "responses": {
           "404": {
-            "description": "Not Found",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetailsModel"
-                }
-              }
-            }
+            "description": "Not Found"
           },
           "200": {
             "description": "Success",
@@ -2484,14 +2323,7 @@
         },
         "responses": {
           "404": {
-            "description": "Not Found",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/NotFoundResultModel"
-                }
-              }
-            }
+            "description": "Not Found"
           },
           "400": {
             "description": "Bad Request",
@@ -2838,14 +2670,7 @@
         ],
         "responses": {
           "404": {
-            "description": "Not Found",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/NotFoundResultModel"
-                }
-              }
-            }
+            "description": "Not Found"
           },
           "200": {
             "description": "Success",
@@ -2880,14 +2705,7 @@
         ],
         "responses": {
           "404": {
-            "description": "Not Found",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/NotFoundResultModel"
-                }
-              }
-            }
+            "description": "Not Found"
           },
           "200": {
             "description": "Success"
@@ -3119,14 +2937,7 @@
         ],
         "responses": {
           "401": {
-            "description": "Unauthorized",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetailsModel"
-                }
-              }
-            }
+            "description": "Unauthorized"
           },
           "200": {
             "description": "Success",
@@ -3169,14 +2980,7 @@
         ],
         "responses": {
           "401": {
-            "description": "Unauthorized",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetailsModel"
-                }
-              }
-            }
+            "description": "Unauthorized"
           },
           "200": {
             "description": "Success",
@@ -4100,14 +3904,7 @@
             }
           },
           "404": {
-            "description": "Not Found",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/NotFoundResultModel"
-                }
-              }
-            }
+            "description": "Not Found"
           }
         }
       }
@@ -4878,14 +4675,7 @@
             }
           },
           "404": {
-            "description": "Not Found",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetailsModel"
-                }
-              }
-            }
+            "description": "Not Found"
           }
         }
       }
@@ -4923,14 +4713,7 @@
             }
           },
           "404": {
-            "description": "Not Found",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetailsModel"
-                }
-              }
-            }
+            "description": "Not Found"
           }
         }
       },
@@ -4965,14 +4748,7 @@
             }
           },
           "404": {
-            "description": "Not Found",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetailsModel"
-                }
-              }
-            }
+            "description": "Not Found"
           }
         }
       },
@@ -5020,14 +4796,7 @@
             }
           },
           "404": {
-            "description": "Not Found",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetailsModel"
-                }
-              }
-            }
+            "description": "Not Found"
           }
         }
       }
@@ -5115,14 +4884,7 @@
             }
           },
           "404": {
-            "description": "Not Found",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetailsModel"
-                }
-              }
-            }
+            "description": "Not Found"
           }
         }
       }
@@ -6574,16 +6336,6 @@
         ],
         "type": "integer",
         "format": "int32"
-      },
-      "NotFoundResultModel": {
-        "type": "object",
-        "properties": {
-          "statusCode": {
-            "type": "integer",
-            "format": "int32"
-          }
-        },
-        "additionalProperties": false
       },
       "OkResultModel": {
         "type": "object",
