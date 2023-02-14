@@ -54,12 +54,12 @@ public class SliderValueConverter : PropertyValueConverterBase
         string? sourceString = source?.ToString();
         if (string.IsNullOrEmpty(sourceString) == false)
         {
-            if (isRange)
+            string[] rawValues = sourceString.Split(Constants.CharArrays.Comma);
+            if (decimal.TryParse(rawValues[0], NumberStyles.Number, CultureInfo.InvariantCulture, out decimal minimum))
             {
-                string[] rangeRawValues = sourceString.Split(Constants.CharArrays.Comma);
-                if (decimal.TryParse(rangeRawValues[0], NumberStyles.Number, CultureInfo.InvariantCulture, out decimal minimum))
+                if (isRange)
                 {
-                    if (rangeRawValues.Length == 1)
+                    if (rawValues.Length == 1)
                     {
                         // Configuration is probably changed from single to range, return range with same min/max
                         return new Range<decimal>
@@ -68,7 +68,7 @@ public class SliderValueConverter : PropertyValueConverterBase
                             Maximum = minimum
                         };
                     }
-                    else if (rangeRawValues.Length == 2 && decimal.TryParse(rangeRawValues[1], NumberStyles.Number, CultureInfo.InvariantCulture, out decimal maximum))
+                    else if (rawValues.Length == 2 && decimal.TryParse(rawValues[1], NumberStyles.Number, CultureInfo.InvariantCulture, out decimal maximum))
                     {
                         return new Range<decimal>
                         {
@@ -77,13 +77,15 @@ public class SliderValueConverter : PropertyValueConverterBase
                         };
                     }
                 }
-            }
-            else if (decimal.TryParse(sourceString, NumberStyles.Number, CultureInfo.InvariantCulture, out decimal value))
-            {
-                return value;
+                else
+                {
+                    // Return single value, regardless of whether it contains a range
+                    return minimum;
+                }
             }
         }
 
+        // No value or parsing failed
         return isRange
             ? new Range<decimal>()
             : default(decimal);
