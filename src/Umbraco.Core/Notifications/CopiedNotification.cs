@@ -27,6 +27,7 @@ public abstract class CopiedNotification<T> : ObjectNotification<T>
 
     public T Copy { get; }
 
+    [Obsolete("Please use parent key instead, scheduled for removal in V15")]
     public int ParentId { get; }
 
     public Guid? ParentKey { get; }

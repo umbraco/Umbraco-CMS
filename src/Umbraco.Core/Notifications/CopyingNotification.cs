@@ -26,6 +26,7 @@ public abstract class CopyingNotification<T> : CancelableObjectNotification<T>
 
     public T Copy { get; }
 
+    [Obsolete("Please use parent key instead, scheduled for removal in V15")]
     public int ParentId { get; }
 
     public Guid? ParentKey { get; }
