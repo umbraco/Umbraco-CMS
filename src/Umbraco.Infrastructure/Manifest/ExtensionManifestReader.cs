@@ -23,15 +23,42 @@ internal sealed class ExtensionManifestReader : IExtensionManifestReader
 
     public async Task<IEnumerable<ExtensionManifest>> GetManifestsAsync()
     {
-        var manifests = new List<ExtensionManifest>();
         IFileProvider? manifestFileProvider = _manifestFileProviderFactory.Create();
-
         if (manifestFileProvider is null)
         {
             throw new ArgumentNullException(nameof(manifestFileProvider));
         }
 
         IFileInfo[] manifestFiles = GetAllManifestFiles(manifestFileProvider, Constants.SystemDirectories.AppPlugins).ToArray();
+        return await ParseManifests(manifestFiles);
+    }
+
+    private static IEnumerable<IFileInfo> GetAllManifestFiles(IFileProvider fileProvider, string path)
+    {
+        // TODO: use the correct file name
+        const string extensionFileName = "extension.json";
+        foreach (IFileInfo fileInfo in fileProvider.GetDirectoryContents(path))
+        {
+            if (fileInfo.IsDirectory)
+            {
+                var virtualPath = WebPath.Combine(path, fileInfo.Name);
+
+                // find all extension manifest files recursively
+                foreach (IFileInfo nested in GetAllManifestFiles(fileProvider, virtualPath))
+                {
+                    yield return nested;
+                }
+            }
+            else if (fileInfo.Name.InvariantEquals(extensionFileName))
+            {
+                yield return fileInfo;
+            }
+        }
+    }
+
+    private async Task<IEnumerable<ExtensionManifest>> ParseManifests(IFileInfo[] manifestFiles)
+    {
+        var manifests = new List<ExtensionManifest>();
         foreach (IFileInfo fileInfo in manifestFiles)
         {
             string fileContent;
@@ -63,28 +90,5 @@ internal sealed class ExtensionManifestReader : IExtensionManifestReader
         }
 
         return manifests;
-    }
-
-    // get all extension manifest files (recursively)
-    private static IEnumerable<IFileInfo> GetAllManifestFiles(IFileProvider fileProvider, string path)
-    {
-        foreach (IFileInfo fileInfo in fileProvider.GetDirectoryContents(path))
-        {
-            if (fileInfo.IsDirectory)
-            {
-                var virtualPath = WebPath.Combine(path, fileInfo.Name);
-
-                // recursively find nested extension manifest files
-                foreach (IFileInfo nested in GetAllManifestFiles(fileProvider, virtualPath))
-                {
-                    yield return nested;
-                }
-            }
-            // TODO: use the correct file name
-            else if (fileInfo.Name.InvariantEquals("extension.json") && !string.IsNullOrEmpty(fileInfo.PhysicalPath))
-            {
-                yield return fileInfo;
-            }
-        }
     }
 }
