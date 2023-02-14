@@ -9,8 +9,7 @@ public class MoveEventInfo<TEntity> : MoveEventInfoBase<TEntity>
         NewParentKey = newParentKey;
     }
 
-    public MoveEventInfo(TEntity entity, string originalPath, int newParentId) : this(entity, originalPath, newParentId,
-        null)
+    public MoveEventInfo(TEntity entity, string originalPath, int newParentId) : this(entity, originalPath, newParentId, null)
     {
     }
 

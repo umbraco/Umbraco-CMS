@@ -80,6 +80,7 @@ internal abstract class ContentTypeRepositoryBase<TEntity> : EntityRepositoryBas
     public IEnumerable<MoveEventInfo<TEntity>> Move(TEntity moving, EntityContainer? container)
     {
         var parentId = Constants.System.Root;
+        Guid? parentKey = Constants.System.RootKey;
         if (container != null)
         {
             // check path
@@ -92,10 +93,11 @@ internal abstract class ContentTypeRepositoryBase<TEntity> : EntityRepositoryBas
             }
 
             parentId = container.Id;
+            parentKey = container.Key;
         }
 
         // track moved entities
-        var moveInfo = new List<MoveEventInfo<TEntity>> { new(moving, moving.Path, parentId) };
+        var moveInfo = new List<MoveEventInfo<TEntity>> { new(moving, moving.Path, parentId, parentKey) };
 
         // get the level delta (old pos to new pos)
         var levelDelta = container == null

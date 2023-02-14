@@ -48,7 +48,8 @@ internal class DataTypeRepository : EntityRepositoryBase<int, IDataType>, IDataT
 
     public IEnumerable<MoveEventInfo<IDataType>> Move(IDataType toMove, EntityContainer? container)
     {
-        var parentId = -1;
+        var parentId = Constants.System.Root;
+        Guid? parentKey = Constants.System.RootKey;
         if (container != null)
         {
             // Check on paths
@@ -60,10 +61,11 @@ internal class DataTypeRepository : EntityRepositoryBase<int, IDataType>, IDataT
             }
 
             parentId = container.Id;
+            parentKey = container.Key;
         }
 
         // used to track all the moved entities to be given to the event
-        var moveInfo = new List<MoveEventInfo<IDataType>> { new(toMove, toMove.Path, parentId) };
+        var moveInfo = new List<MoveEventInfo<IDataType>> { new(toMove, toMove.Path, parentId, parentKey) };
 
         var origPath = toMove.Path;
 
