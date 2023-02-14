@@ -35,13 +35,13 @@ public class ExtensionManifestReaderTests
     }
 
     [Test]
-    public async Task CanGetManifestAtRoot()
+    public async Task CanReadManifestAtRoot()
     {
         _rootDirectoryContentsMock
             .Setup(f => f.GetEnumerator())
             .Returns(new List<IFileInfo> { CreateExtensionManifestFile() }.GetEnumerator());
 
-        var result = await _reader.GetManifestsAsync();
+        var result = await _reader.ReadManifestsAsync();
         Assert.AreEqual(1, result.Count());
 
         var first = result.First();
@@ -52,7 +52,7 @@ public class ExtensionManifestReaderTests
     }
 
     [Test]
-    public async Task CanGetManifestsInRootDirectories()
+    public async Task CanReadManifestsInRootDirectories()
     {
         var directory1 = CreateDirectoryMock("/my-extension", CreateExtensionManifestFile(DefaultManifestContent("Extension One")));
         var directory2 = CreateDirectoryMock("/my-other-extension", CreateExtensionManifestFile(DefaultManifestContent("Extension Two")));
@@ -60,14 +60,14 @@ public class ExtensionManifestReaderTests
             .Setup(f => f.GetEnumerator())
             .Returns(new List<IFileInfo> { directory1, directory2 }.GetEnumerator());
 
-        var result = await _reader.GetManifestsAsync();
+        var result = await _reader.ReadManifestsAsync();
         Assert.AreEqual(2, result.Count());
         Assert.AreEqual("Extension One", result.First().Name);
         Assert.AreEqual("Extension Two", result.Last().Name);
     }
 
     [Test]
-    public async Task CanGetManifestsRecursively()
+    public async Task CanReadManifestsRecursively()
     {
         var childFolder = CreateDirectoryMock("/my-parent-folder/my-child-folder", CreateExtensionManifestFile(DefaultManifestContent("Nested Extension")));
         var parentFolder = CreateDirectoryMock("/my-parent-folder", childFolder);
@@ -76,7 +76,7 @@ public class ExtensionManifestReaderTests
             .Setup(f => f.GetEnumerator())
             .Returns(new List<IFileInfo> { parentFolder }.GetEnumerator());
 
-        var result = await _reader.GetManifestsAsync();
+        var result = await _reader.ReadManifestsAsync();
         Assert.AreEqual(1, result.Count());
         Assert.AreEqual("Nested Extension", result.First().Name);
     }
@@ -91,7 +91,7 @@ public class ExtensionManifestReaderTests
             .Setup(f => f.GetEnumerator())
             .Returns(new List<IFileInfo> { emptyFolder, extensionFolder }.GetEnumerator());
 
-        var result = await _reader.GetManifestsAsync();
+        var result = await _reader.ReadManifestsAsync();
         Assert.AreEqual(1, result.Count());
         Assert.AreEqual("My Extension", result.First().Name);
     }
@@ -112,7 +112,7 @@ public class ExtensionManifestReaderTests
             .Setup(f => f.GetEnumerator())
             .Returns(new List<IFileInfo> { otherFolder, extensionFolder }.GetEnumerator());
 
-        var result = await _reader.GetManifestsAsync();
+        var result = await _reader.ReadManifestsAsync();
         Assert.AreEqual(1, result.Count());
         Assert.AreEqual("My Extension", result.First().Name);
     }
@@ -126,12 +126,12 @@ public class ExtensionManifestReaderTests
             .Setup(f => f.GetEnumerator())
             .Returns(folders.GetEnumerator());
 
-        var result = await _reader.GetManifestsAsync();
+        var result = await _reader.ReadManifestsAsync();
         Assert.AreEqual(0, result.Count());
     }
 
     [Test]
-    public async Task CannotGetManifestWithoutName()
+    public async Task CannotReadManifestWithoutName()
     {
         var content = @"{
     ""version"": ""1.2.3"",
@@ -147,14 +147,14 @@ public class ExtensionManifestReaderTests
             .Setup(f => f.GetEnumerator())
             .Returns(new List<IFileInfo> { CreateExtensionManifestFile(content) }.GetEnumerator());
 
-        var result = await _reader.GetManifestsAsync();
+        var result = await _reader.ReadManifestsAsync();
         Assert.AreEqual(0, result.Count());
 
         EnsureLogErrorWasCalled();
     }
 
     [Test]
-    public async Task CannotGetManifestWithoutExtensions()
+    public async Task CannotReadManifestWithoutExtensions()
     {
         var content = @"{
     ""name"": ""Something"",
@@ -165,7 +165,7 @@ public class ExtensionManifestReaderTests
             .Setup(f => f.GetEnumerator())
             .Returns(new List<IFileInfo> { CreateExtensionManifestFile(content) }.GetEnumerator());
 
-        var result = await _reader.GetManifestsAsync();
+        var result = await _reader.ReadManifestsAsync();
         Assert.AreEqual(0, result.Count());
 
         EnsureLogErrorWasCalled();
@@ -173,13 +173,13 @@ public class ExtensionManifestReaderTests
 
     [TestCase("This is not JSON")]
     [TestCase(@"{""name"": ""invalid-json"", ""version"": ")]
-    public async Task CannotGetInvalidManifest(string content)
+    public async Task CannotReadInvalidManifest(string content)
     {
         _rootDirectoryContentsMock
             .Setup(f => f.GetEnumerator())
             .Returns(new List<IFileInfo> { CreateExtensionManifestFile(content) }.GetEnumerator());
 
-        var result = await _reader.GetManifestsAsync();
+        var result = await _reader.ReadManifestsAsync();
         Assert.AreEqual(0, result.Count());
 
         EnsureLogErrorWasCalled();

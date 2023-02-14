@@ -21,7 +21,7 @@ internal sealed class ExtensionManifestReader : IExtensionManifestReader
         _logger = logger;
     }
 
-    public async Task<IEnumerable<ExtensionManifest>> GetManifestsAsync()
+    public async Task<IEnumerable<ExtensionManifest>> ReadManifestsAsync()
     {
         IFileProvider? manifestFileProvider = _manifestFileProviderFactory.Create();
         if (manifestFileProvider is null)

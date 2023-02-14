@@ -2,5 +2,5 @@
 
 public interface IExtensionManifestReader
 {
-    Task<IEnumerable<ExtensionManifest>> GetManifestsAsync();
+    Task<IEnumerable<ExtensionManifest>> ReadManifestsAsync();
 }

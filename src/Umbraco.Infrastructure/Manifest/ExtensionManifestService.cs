@@ -8,5 +8,5 @@ internal sealed class ExtensionManifestService : IExtensionManifestService
         => _extensionManifestReader = extensionManifestReader;
 
     // TODO: cache manifests for the app lifetime
-    public async Task<IEnumerable<ExtensionManifest>> GetManifestsAsync() => await _extensionManifestReader.GetManifestsAsync();
+    public async Task<IEnumerable<ExtensionManifest>> GetManifestsAsync() => await _extensionManifestReader.ReadManifestsAsync();
 }
