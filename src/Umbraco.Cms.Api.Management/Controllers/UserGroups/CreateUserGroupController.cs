@@ -28,7 +28,7 @@ public class CreateUserGroupController : UserGroupsControllerBase
 
     [HttpPost]
     [MapToApiVersion("1.0")]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status201Created)]
     public async Task<IActionResult> Create(UserGroupSaveModel userGroupSaveModel)
     {
