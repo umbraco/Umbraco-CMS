@@ -10,6 +10,7 @@ using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.DistributedLocking;
 using Umbraco.Cms.Core.Events;
+using Umbraco.Cms.Core.Plugin;
 using Umbraco.Cms.Core.Handlers;
 using Umbraco.Cms.Core.HealthChecks.NotificationMethods;
 using Umbraco.Cms.Core.Hosting;
@@ -39,6 +40,7 @@ using Umbraco.Cms.Core.Trees;
 using Umbraco.Cms.Core.Web;
 using Umbraco.Cms.Infrastructure.DistributedLocking;
 using Umbraco.Cms.Infrastructure.Examine;
+using Umbraco.Cms.Infrastructure.Plugin;
 using Umbraco.Cms.Infrastructure.HealthChecks;
 using Umbraco.Cms.Infrastructure.HostedServices;
 using Umbraco.Cms.Infrastructure.Install;
@@ -127,8 +129,8 @@ public static partial class UmbracoBuilderExtensions
 
         // register manifest parser, will be injected in collection builders where needed
         builder.Services.AddSingleton<IManifestParser, ManifestParser>();
-        builder.Services.AddSingleton<IExtensionManifestReader, ExtensionManifestReader>();
-        builder.Services.AddSingleton<IExtensionManifestService, ExtensionManifestService>();
+        builder.Services.AddSingleton<IPluginConfigurationReader, PluginConfigurationReader>();
+        builder.Services.AddSingleton<IPluginConfigurationService, PluginConfigurationService>();
 
         // register the manifest filter collection builder (collection is empty by default)
         builder.ManifestFilters();

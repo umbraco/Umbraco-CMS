@@ -1,6 +1,6 @@
 ﻿namespace Umbraco.Cms.Api.Management.ViewModels.Package;
 
-public class ExtensionManifestViewModel
+public class PluginConfigurationViewModel
 {
     public string Name { get; set; } = string.Empty;
 

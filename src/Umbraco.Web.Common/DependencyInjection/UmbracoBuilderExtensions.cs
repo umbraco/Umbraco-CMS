@@ -151,6 +151,7 @@ public static partial class UmbracoBuilderExtensions
         // therefore no need to register it as singleton
         builder.Services.AddSingleton<IManifestFileProviderFactory, ContentAndWebRootFileProviderFactory>();
         builder.Services.AddSingleton<IGridEditorsConfigFileProviderFactory, WebRootFileProviderFactory>();
+        builder.Services.AddSingleton<IPluginConfigurationFileProviderFactory, ContentAndWebRootFileProviderFactory>();
 
         // Must be added here because DbProviderFactories is netstandard 2.1 so cannot exist in Infra for now
         builder.Services.AddSingleton<IDbProviderFactoryCreator>(factory => new DbProviderFactoryCreator(

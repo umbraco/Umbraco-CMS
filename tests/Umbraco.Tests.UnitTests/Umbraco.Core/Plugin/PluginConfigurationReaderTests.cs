@@ -6,17 +6,17 @@ using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.IO;
-using Umbraco.Cms.Core.Manifest;
+using Umbraco.Cms.Infrastructure.Plugin;
 using Umbraco.Cms.Infrastructure.Serialization;
 
-namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Manifest;
+namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Plugin;
 
 [TestFixture]
-public class ExtensionManifestReaderTests
+public class PluginConfigurationReaderTests
 {
-    private IExtensionManifestReader _reader;
+    private IPluginConfigurationReader _reader;
     private Mock<IDirectoryContents> _rootDirectoryContentsMock;
-    private Mock<ILogger<ExtensionManifestReader>> _loggerMock;
+    private Mock<ILogger<PluginConfigurationReader>> _loggerMock;
     private Mock<IFileProvider> _fileProviderMock;
 
     [SetUp]
@@ -27,82 +27,82 @@ public class ExtensionManifestReaderTests
         _fileProviderMock
             .Setup(m => m.GetDirectoryContents(Constants.SystemDirectories.AppPlugins))
             .Returns(_rootDirectoryContentsMock.Object);
-        var fileProviderFactoryMock = new Mock<IManifestFileProviderFactory>();
+        var fileProviderFactoryMock = new Mock<IPluginConfigurationFileProviderFactory>();
         fileProviderFactoryMock.Setup(m => m.Create()).Returns(_fileProviderMock.Object);
 
-        _loggerMock = new Mock<ILogger<ExtensionManifestReader>>();
-        _reader = new ExtensionManifestReader(fileProviderFactoryMock.Object, new SystemTextJsonSerializer(), _loggerMock.Object);
+        _loggerMock = new Mock<ILogger<PluginConfigurationReader>>();
+        _reader = new PluginConfigurationReader(fileProviderFactoryMock.Object, new SystemTextJsonSerializer(), _loggerMock.Object);
     }
 
     [Test]
-    public async Task CanReadManifestAtRoot()
+    public async Task Can_Read_PluginConfigurations_At_Root()
     {
         _rootDirectoryContentsMock
             .Setup(f => f.GetEnumerator())
-            .Returns(new List<IFileInfo> { CreateExtensionManifestFile() }.GetEnumerator());
+            .Returns(new List<IFileInfo> { CreatePluginConfigurationFile() }.GetEnumerator());
 
-        var result = await _reader.ReadManifestsAsync();
+        var result = await _reader.ReadPluginConfigurationsAsync();
         Assert.AreEqual(1, result.Count());
 
         var first = result.First();
-        Assert.AreEqual("My Extension Manifest", first.Name);
+        Assert.AreEqual("My Plugin Configuration", first.Name);
         Assert.AreEqual("1.2.3", first.Version);
         Assert.AreEqual(2, first.Extensions.Count());
         Assert.IsTrue(first.Extensions.All(e => e is JsonElement));
     }
 
     [Test]
-    public async Task CanReadManifestsInRootDirectories()
+    public async Task Can_Read_PluginConfiguration_In_Root_Directories()
     {
-        var directory1 = CreateDirectoryMock("/my-extension", CreateExtensionManifestFile(DefaultManifestContent("Extension One")));
-        var directory2 = CreateDirectoryMock("/my-other-extension", CreateExtensionManifestFile(DefaultManifestContent("Extension Two")));
+        var plugin1 = CreateDirectoryMock("/my-extension", CreatePluginConfigurationFile(DefaultPluginConfigurationContent("Plugin One")));
+        var plugin2 = CreateDirectoryMock("/my-other-extension", CreatePluginConfigurationFile(DefaultPluginConfigurationContent("Plugin Two")));
         _rootDirectoryContentsMock
             .Setup(f => f.GetEnumerator())
-            .Returns(new List<IFileInfo> { directory1, directory2 }.GetEnumerator());
+            .Returns(new List<IFileInfo> { plugin1, plugin2 }.GetEnumerator());
 
-        var result = await _reader.ReadManifestsAsync();
+        var result = await _reader.ReadPluginConfigurationsAsync();
         Assert.AreEqual(2, result.Count());
-        Assert.AreEqual("Extension One", result.First().Name);
-        Assert.AreEqual("Extension Two", result.Last().Name);
+        Assert.AreEqual("Plugin One", result.First().Name);
+        Assert.AreEqual("Plugin Two", result.Last().Name);
     }
 
     [Test]
-    public async Task CanReadManifestsRecursively()
+    public async Task Can_Read_PluginConfigurations_Recursively()
     {
-        var childFolder = CreateDirectoryMock("/my-parent-folder/my-child-folder", CreateExtensionManifestFile(DefaultManifestContent("Nested Extension")));
+        var childFolder = CreateDirectoryMock("/my-parent-folder/my-child-folder", CreatePluginConfigurationFile(DefaultPluginConfigurationContent("Nested Plugin")));
         var parentFolder = CreateDirectoryMock("/my-parent-folder", childFolder);
 
         _rootDirectoryContentsMock
             .Setup(f => f.GetEnumerator())
             .Returns(new List<IFileInfo> { parentFolder }.GetEnumerator());
 
-        var result = await _reader.ReadManifestsAsync();
+        var result = await _reader.ReadPluginConfigurationsAsync();
         Assert.AreEqual(1, result.Count());
-        Assert.AreEqual("Nested Extension", result.First().Name);
+        Assert.AreEqual("Nested Plugin", result.First().Name);
     }
 
     [Test]
-    public async Task CanSkipEmptyDirectories()
+    public async Task Can_Skip_Empty_Directories()
     {
-        var extensionFolder = CreateDirectoryMock("/my-extension-folder", CreateExtensionManifestFile(DefaultManifestContent("My Extension")));
+        var pluginFolder = CreateDirectoryMock("/my-plugin-folder", CreatePluginConfigurationFile(DefaultPluginConfigurationContent("My Plugin")));
         var emptyFolder = CreateDirectoryMock("/my-empty-folder");
 
         _rootDirectoryContentsMock
             .Setup(f => f.GetEnumerator())
-            .Returns(new List<IFileInfo> { emptyFolder, extensionFolder }.GetEnumerator());
+            .Returns(new List<IFileInfo> { emptyFolder, pluginFolder }.GetEnumerator());
 
-        var result = await _reader.ReadManifestsAsync();
+        var result = await _reader.ReadPluginConfigurationsAsync();
         Assert.AreEqual(1, result.Count());
-        Assert.AreEqual("My Extension", result.First().Name);
+        Assert.AreEqual("My Plugin", result.First().Name);
     }
 
     [Test]
-    public async Task CanSkipOtherFiles()
+    public async Task Can_Skip_Other_Files()
     {
-        var extensionFolder = CreateDirectoryMock(
-            "/my-extension-folder",
+        var pluginFolder = CreateDirectoryMock(
+            "/my-plugin-folder",
             CreateOtherFile("my.js"),
-            CreateExtensionManifestFile(DefaultManifestContent("My Extension")));
+            CreatePluginConfigurationFile(DefaultPluginConfigurationContent("My Plugin")));
         var otherFolder = CreateDirectoryMock(
             "/my-empty-folder",
             CreateOtherFile("some.js"),
@@ -110,15 +110,15 @@ public class ExtensionManifestReaderTests
 
         _rootDirectoryContentsMock
             .Setup(f => f.GetEnumerator())
-            .Returns(new List<IFileInfo> { otherFolder, extensionFolder }.GetEnumerator());
+            .Returns(new List<IFileInfo> { otherFolder, pluginFolder }.GetEnumerator());
 
-        var result = await _reader.ReadManifestsAsync();
+        var result = await _reader.ReadPluginConfigurationsAsync();
         Assert.AreEqual(1, result.Count());
-        Assert.AreEqual("My Extension", result.First().Name);
+        Assert.AreEqual("My Plugin", result.First().Name);
     }
 
     [Test]
-    public async Task CanHandleAllEmptyDirectories()
+    public async Task Can_Handle_All_Empty_Directories()
     {
         var folders = Enumerable.Range(1, 10).Select(i => CreateDirectoryMock($"/my-empty-folder-{i}")).ToList();
 
@@ -126,12 +126,12 @@ public class ExtensionManifestReaderTests
             .Setup(f => f.GetEnumerator())
             .Returns(folders.GetEnumerator());
 
-        var result = await _reader.ReadManifestsAsync();
+        var result = await _reader.ReadPluginConfigurationsAsync();
         Assert.AreEqual(0, result.Count());
     }
 
     [Test]
-    public async Task CannotReadManifestWithoutName()
+    public async Task Cannot_Read_PluginConfiguration_Without_Name()
     {
         var content = @"{
     ""version"": ""1.2.3"",
@@ -145,16 +145,16 @@ public class ExtensionManifestReaderTests
 }";
         _rootDirectoryContentsMock
             .Setup(f => f.GetEnumerator())
-            .Returns(new List<IFileInfo> { CreateExtensionManifestFile(content) }.GetEnumerator());
+            .Returns(new List<IFileInfo> { CreatePluginConfigurationFile(content) }.GetEnumerator());
 
-        var result = await _reader.ReadManifestsAsync();
+        var result = await _reader.ReadPluginConfigurationsAsync();
         Assert.AreEqual(0, result.Count());
 
         EnsureLogErrorWasCalled();
     }
 
     [Test]
-    public async Task CannotReadManifestWithoutExtensions()
+    public async Task Cannot_Read_PluginConfiguration_Without_Extensions()
     {
         var content = @"{
     ""name"": ""Something"",
@@ -163,9 +163,9 @@ public class ExtensionManifestReaderTests
 }";
         _rootDirectoryContentsMock
             .Setup(f => f.GetEnumerator())
-            .Returns(new List<IFileInfo> { CreateExtensionManifestFile(content) }.GetEnumerator());
+            .Returns(new List<IFileInfo> { CreatePluginConfigurationFile(content) }.GetEnumerator());
 
-        var result = await _reader.ReadManifestsAsync();
+        var result = await _reader.ReadPluginConfigurationsAsync();
         Assert.AreEqual(0, result.Count());
 
         EnsureLogErrorWasCalled();
@@ -173,13 +173,13 @@ public class ExtensionManifestReaderTests
 
     [TestCase("This is not JSON")]
     [TestCase(@"{""name"": ""invalid-json"", ""version"": ")]
-    public async Task CannotReadInvalidManifest(string content)
+    public async Task Cannot_Read_Invalid_PluginConfiguration(string content)
     {
         _rootDirectoryContentsMock
             .Setup(f => f.GetEnumerator())
-            .Returns(new List<IFileInfo> { CreateExtensionManifestFile(content) }.GetEnumerator());
+            .Returns(new List<IFileInfo> { CreatePluginConfigurationFile(content) }.GetEnumerator());
 
-        var result = await _reader.ReadManifestsAsync();
+        var result = await _reader.ReadPluginConfigurationsAsync();
         Assert.AreEqual(0, result.Count());
 
         EnsureLogErrorWasCalled();
@@ -213,9 +213,9 @@ public class ExtensionManifestReaderTests
         return fileInfo.Object;
     }
 
-    private IFileInfo CreateExtensionManifestFile(string? content = null)
+    private IFileInfo CreatePluginConfigurationFile(string? content = null)
     {
-        content ??= DefaultManifestContent();
+        content ??= DefaultPluginConfigurationContent();
 
         var fileInfo = new Mock<IFileInfo>();
         fileInfo.SetupGet(f => f.IsDirectory).Returns(false);
@@ -235,7 +235,7 @@ public class ExtensionManifestReaderTests
         return fileInfo.Object;
     }
 
-    private static string DefaultManifestContent(string name = "My Extension Manifest")
+    private static string DefaultPluginConfigurationContent(string name = "My Plugin Configuration")
         => @"{
     ""name"": ""##NAME##"",
     ""version"": ""1.2.3"",

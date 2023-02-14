@@ -1,6 +1,7 @@
 using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Configuration;
+using Umbraco.Cms.Core.Plugin;
 using Umbraco.Cms.Core.Manifest;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Semver;
@@ -23,7 +24,7 @@ public class TelemetryServiceTests
             siteIdentifierServiceMock.Object,
             usageInformationServiceMock.Object,
             Mock.Of<IMetricsConsentService>(),
-            Mock.Of<IExtensionManifestService>());
+            Mock.Of<IPluginConfigurationService>());
         Guid guid;
 
         await sut.GetTelemetryReportDataAsync();
@@ -39,7 +40,7 @@ public class TelemetryServiceTests
             CreateSiteIdentifierService(false),
             Mock.Of<IUsageInformationService>(),
             Mock.Of<IMetricsConsentService>(),
-            Mock.Of<IExtensionManifestService>());
+            Mock.Of<IPluginConfigurationService>());
 
         var result = await sut.GetTelemetryReportDataAsync();
         Assert.IsNull(result);
@@ -57,7 +58,7 @@ public class TelemetryServiceTests
             CreateSiteIdentifierService(),
             Mock.Of<IUsageInformationService>(),
             metricsConsentService.Object,
-            Mock.Of<IExtensionManifestService>());
+            Mock.Of<IPluginConfigurationService>());
 
         var result = await sut.GetTelemetryReportDataAsync();
 
@@ -72,7 +73,7 @@ public class TelemetryServiceTests
         var versionPackageName = "VersionPackage";
         var packageVersion = "1.0.0";
         var noVersionPackageName = "NoVersionPackage";
-        ExtensionManifest[] manifests =
+        PluginConfiguration[] manifests =
         {
             new() { Name = versionPackageName, Version = packageVersion, Extensions = Array.Empty<object>()},
             new() { Name = noVersionPackageName, Extensions = Array.Empty<object>() },
@@ -107,7 +108,7 @@ public class TelemetryServiceTests
     public async Task RespectsAllowPackageTelemetry()
     {
         var version = CreateUmbracoVersion(9, 1, 1);
-        ExtensionManifest[] manifests =
+        PluginConfiguration[] manifests =
         {
             new() { Name = "DoNotTrack", AllowTelemetry = false, Extensions = Array.Empty<object>() },
             new() { Name = "TrackingAllowed", AllowTelemetry = true, Extensions = Array.Empty<object>() },
@@ -132,10 +133,10 @@ public class TelemetryServiceTests
         });
     }
 
-    private IExtensionManifestService CreateExtensionManifestService(IEnumerable<ExtensionManifest> manifests)
+    private IPluginConfigurationService CreateExtensionManifestService(IEnumerable<PluginConfiguration> manifests)
     {
-        var mock = new Mock<IExtensionManifestService>();
-        mock.Setup(x => x.GetManifestsAsync()).Returns(Task.FromResult(manifests));
+        var mock = new Mock<IPluginConfigurationService>();
+        mock.Setup(x => x.GetPluginConfigurationsAsync()).Returns(Task.FromResult(manifests));
         return mock.Object;
     }
 
