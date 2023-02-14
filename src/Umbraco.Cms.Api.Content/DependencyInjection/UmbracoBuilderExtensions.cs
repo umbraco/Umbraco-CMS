@@ -3,7 +3,7 @@ using System.Text.Json.Serialization;
 using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Api.Common.Configuration;
 using Umbraco.Cms.Api.Common.DependencyInjection;
-using Umbraco.Cms.Api.Content.Filters;
+using Umbraco.Cms.Api.Content.Json;
 using Umbraco.Cms.Api.Content.Services;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.ContentApi;
