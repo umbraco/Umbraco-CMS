@@ -149,9 +149,7 @@ export class UmbApp extends UmbLitElement {
 	}
 
 	render() {
-		return html`
-			<umb-debug enabled></umb-debug>
-			<umb-router-slot id="router-slot" .routes=${this._routes}></umb-router-slot>`;
+		return html`<umb-router-slot id="router-slot" .routes=${this._routes}></umb-router-slot>`;
 	}
 }
 
