@@ -1,3 +1,4 @@
+import '../donut-chart';
 import { css, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { UmbLogViewerWorkspaceContext } from './logviewer-root.context';
@@ -173,6 +174,9 @@ export class UmbLogViewerRootWorkspaceElement extends UmbLitElement {
 	@state()
 	private _savedSearches: SavedLogSearch[] = [];
 
+	@state()
+	private _totalLogCount = 0;
+
 	load(): void {
 		// Not relevant for this workspace -added to prevent the error from popping up
 		console.log('Loading something from somewhere');
@@ -191,6 +195,14 @@ export class UmbLogViewerRootWorkspaceElement extends UmbLitElement {
 			this._savedSearches = savedSearches ?? [];
 		});
 		await this.#logViewerContext.getSavedSearches();
+
+		this._totalLogCount = Object.values(logLevels).reduce((acc, count) => acc + count, 0);
+	}
+
+	logPercentage(partialValue: number) {
+		if (this._totalLogCount === 0) return 0;
+
+		return Math.round((100 * partialValue) / this._totalLogCount);
 	}
 
 	#renderSearchItem(searchListItem: SavedLogSearch) {
@@ -248,7 +260,18 @@ export class UmbLogViewerRootWorkspaceElement extends UmbLitElement {
 									)}
 								</ul>
 							</div>
-							<div id="chart"></div>
+							<!-- <div id="chart"></div> -->
+							<umb-donut-chart>
+							${Object.entries(logLevels).map(
+								([level, number]) =>
+									html`<umb-donut-slice
+										.percent=${this.logPercentage(number)}
+										.color=${`var(--umb-log-viewer-${level}-color)`}></umb-donut-slice> `
+							)}
+								<!-- <umb-donut-slice .percent=${10} .color=${'var(--umb-log-viewer-debug-color)'}></umb-donut-slice>
+								<umb-donut-slice .percent=${25} .color=${'var(--umb-log-viewer-information-color)'}></umb-donut-slice>
+								<umb-donut-slice .percent=${50} .color=${'var(--umb-log-viewer-warning-color)'}></umb-donut-slice> -->
+							</umb-donut-chart>
 						</div>
 					</uui-box>
 				</div>
