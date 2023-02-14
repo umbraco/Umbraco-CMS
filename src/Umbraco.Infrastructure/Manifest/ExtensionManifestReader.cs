@@ -35,8 +35,7 @@ internal sealed class ExtensionManifestReader : IExtensionManifestReader
 
     private static IEnumerable<IFileInfo> GetAllManifestFiles(IFileProvider fileProvider, string path)
     {
-        // TODO: use the correct file name
-        const string extensionFileName = "extension.json";
+        const string extensionFileName = "umbraco-package.json";
         foreach (IFileInfo fileInfo in fileProvider.GetDirectoryContents(path))
         {
             if (fileInfo.IsDirectory)

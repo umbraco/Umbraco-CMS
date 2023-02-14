@@ -219,7 +219,7 @@ public class ExtensionManifestReaderTests
 
         var fileInfo = new Mock<IFileInfo>();
         fileInfo.SetupGet(f => f.IsDirectory).Returns(false);
-        fileInfo.SetupGet(f => f.Name).Returns("extension.json");
+        fileInfo.SetupGet(f => f.Name).Returns("umbraco-package.json");
         fileInfo.Setup(f => f.CreateReadStream()).Returns(new MemoryStream(Encoding.UTF8.GetBytes(content)));
 
         return fileInfo.Object;
