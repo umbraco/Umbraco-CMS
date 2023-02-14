@@ -31,25 +31,16 @@ export class UmbEntityData<T extends Entity> extends UmbData<T> {
 		return saveItems;
 	}
 
-	move(keys: Array<string>, destination: string) {
-		const movedItems: Array<T> = [];
-
-		//Don't do anything if something is moved into itself.
-		if (keys.includes(destination)) return [];
-
-		keys.forEach((key) => {
-			const item = this.getByKey(key);
-			if (!item) return;
-
-			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-			// @ts-ignore
-			item.parentKey = destination;
-			this.updateData(item);
-			movedItems.push(item);
+	move(keys: Array<string>, destinationKey: string) {
+		const items = this.getByKeys(keys);
+		const movedItems = items.map((item) => {
+			return {
+				...item,
+				parentKey: destinationKey,
+			};
 		});
 
-		console.log('data', this.data, 'movedItems', movedItems, 'destination', destination);
-
+		movedItems.forEach((movedItem) => this.updateData(movedItem));
 		return movedItems;
 	}
 

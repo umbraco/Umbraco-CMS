@@ -5,5 +5,6 @@ export * from './string-state';
 export * from './deep-state';
 export * from './array-state';
 export * from './object-state';
-export * from './create-observable-part.method'
-export * from './append-to-frozen-array.method'
+export * from './create-observable-part.method';
+export * from './append-to-frozen-array.method';
+export * from './partial-update-frozen-array.method';

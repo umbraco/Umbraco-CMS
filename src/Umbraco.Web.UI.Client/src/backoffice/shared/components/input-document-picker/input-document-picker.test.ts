@@ -1,7 +1,7 @@
 import { expect, fixture, html } from '@open-wc/testing';
 import { UmbInputDocumentPickerElement } from './input-document-picker.element';
 import { defaultA11yConfig } from '@umbraco-cms/test-utils';
-describe('UmbPropertyEditorUINumberRangeElement', () => {
+describe('UmbInputDocumentPickerElement', () => {
 	let element: UmbInputDocumentPickerElement;
 
 	beforeEach(async () => {

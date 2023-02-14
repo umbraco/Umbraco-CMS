@@ -5,11 +5,11 @@ import { ifDefined } from 'lit-html/directives/if-defined.js';
 import { map, Observable } from 'rxjs';
 import { repeat } from 'lit/directives/repeat.js';
 import { UmbSectionContext, UMB_SECTION_CONTEXT_TOKEN } from '../section/section.context';
-import type { UmbTreeContextBase } from './tree.context';
 import {
-	UmbTreeContextMenuService,
-	UMB_TREE_CONTEXT_MENU_SERVICE_CONTEXT_TOKEN,
-} from './context-menu/tree-context-menu.service';
+	UmbSectionSidebarContext,
+	UMB_SECTION_SIDEBAR_CONTEXT_TOKEN,
+} from '../section/section-sidebar/section-sidebar.context';
+import type { UmbTreeContextBase } from './tree.context';
 import type { Entity } from '@umbraco-cms/models';
 import type { UmbTreeStore } from '@umbraco-cms/store';
 import { UmbLitElement } from '@umbraco-cms/element';
@@ -70,7 +70,7 @@ export class UmbTreeItem extends UmbLitElement {
 	private _treeContext?: UmbTreeContextBase;
 	private _store?: UmbTreeStore<unknown>;
 	private _sectionContext?: UmbSectionContext;
-	private _treeContextMenuService?: UmbTreeContextMenuService;
+	private _sectionSidebarContext?: UmbSectionSidebarContext;
 
 	constructor() {
 		super();
@@ -91,8 +91,8 @@ export class UmbTreeItem extends UmbLitElement {
 			this._observeActiveTreeItem();
 		});
 
-		this.consumeContext(UMB_TREE_CONTEXT_MENU_SERVICE_CONTEXT_TOKEN, (treeContextMenuService) => {
-			this._treeContextMenuService = treeContextMenuService;
+		this.consumeContext(UMB_SECTION_SIDEBAR_CONTEXT_TOKEN, (instance) => {
+			this._sectionSidebarContext = instance;
 		});
 	}
 
@@ -148,9 +148,11 @@ export class UmbTreeItem extends UmbLitElement {
 	private _observeTreeItemActions() {
 		// TODO: Stop previous observation, currently we can do this from the UmbElementMixin as its a new subscription when Actions or entityType has changed.
 		// Solution: store the current observation controller and if it existing then destroy it.
+		// TODO: as long as a tree consist of one entity type we don't have to observe this every time a new tree item is created.
+		// Solution: move this to the tree context and observe it once.
 		this.observe(
 			umbExtensionsRegistry
-				.extensionsOfType('treeItemAction')
+				.extensionsOfType('entityAction')
 				.pipe(map((actions) => actions.filter((action) => action.meta.entityType === this._entityType))),
 			(actions) => {
 				this._hasActions = actions.length > 0;
@@ -208,7 +210,7 @@ export class UmbTreeItem extends UmbLitElement {
 			hasChildren: this.hasChildren,
 			parentKey: this.parentKey,
 		});
-		this._treeContextMenuService?.open({ name: this.label, key: this.key });
+		this._sectionSidebarContext?.toggleContextMenu(this.entityType, this.key, this.label);
 	}
 
 	render() {

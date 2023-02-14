@@ -1,10 +1,11 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-import type { HealthCheckAction } from '../models/HealthCheckAction';
-import type { HealthCheckGroupWithResult } from '../models/HealthCheckGroupWithResult';
-import type { HealthCheckResult } from '../models/HealthCheckResult';
-import type { PagedHealthCheckGroup } from '../models/PagedHealthCheckGroup';
+import type { HealthCheckActionModel } from '../models/HealthCheckActionModel';
+import type { HealthCheckGroupModel } from '../models/HealthCheckGroupModel';
+import type { HealthCheckGroupWithResultModel } from '../models/HealthCheckGroupWithResultModel';
+import type { HealthCheckResultModel } from '../models/HealthCheckResultModel';
+import type { PagedHealthCheckGroupModelBaseModel } from '../models/PagedHealthCheckGroupModelBaseModel';
 
 import type { CancelablePromise } from '../core/CancelablePromise';
 import { OpenAPI } from '../core/OpenAPI';
@@ -13,7 +14,7 @@ import { request as __request } from '../core/request';
 export class HealthCheckResource {
 
     /**
-     * @returns PagedHealthCheckGroup Success
+     * @returns PagedHealthCheckGroupModelBaseModel Success
      * @throws ApiError
      */
     public static getHealthCheckGroup({
@@ -22,7 +23,7 @@ export class HealthCheckResource {
     }: {
         skip?: number,
         take?: number,
-    }): CancelablePromise<PagedHealthCheckGroup> {
+    }): CancelablePromise<PagedHealthCheckGroupModelBaseModel> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/health-check-group',
@@ -34,14 +35,14 @@ export class HealthCheckResource {
     }
 
     /**
-     * @returns HealthCheckGroupWithResult Success
+     * @returns any Success
      * @throws ApiError
      */
     public static getHealthCheckGroupByName({
         name,
     }: {
         name: string,
-    }): CancelablePromise<HealthCheckGroupWithResult> {
+    }): CancelablePromise<HealthCheckGroupModel> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/health-check-group/{name}',
@@ -55,14 +56,35 @@ export class HealthCheckResource {
     }
 
     /**
-     * @returns HealthCheckResult Success
+     * @returns any Success
+     * @throws ApiError
+     */
+    public static postHealthCheckGroupByNameCheck({
+        name,
+    }: {
+        name: string,
+    }): CancelablePromise<HealthCheckGroupWithResultModel> {
+        return __request(OpenAPI, {
+            method: 'POST',
+            url: '/umbraco/management/api/v1/health-check-group/{name}/check',
+            path: {
+                'name': name,
+            },
+            errors: {
+                404: `Not Found`,
+            },
+        });
+    }
+
+    /**
+     * @returns any Success
      * @throws ApiError
      */
     public static postHealthCheckExecuteAction({
         requestBody,
     }: {
-        requestBody?: HealthCheckAction,
-    }): CancelablePromise<HealthCheckResult> {
+        requestBody?: HealthCheckActionModel,
+    }): CancelablePromise<HealthCheckResultModel> {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/umbraco/management/api/v1/health-check/execute-action',

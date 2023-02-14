@@ -2,11 +2,8 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html } from 'lit';
 import { ifDefined } from 'lit-html/directives/if-defined.js';
 import { customElement, property, state } from 'lit/decorators.js';
-
-import {  UMB_DATA_TYPE_DETAIL_STORE_CONTEXT_TOKEN } from '../../../settings/data-types/data-type.detail.store';
-import type { UmbDataTypeDetailStore } from '../../../settings/data-types/data-type.detail.store';
-import type { ContentProperty, DataTypeDetails, DataTypePropertyData } from '@umbraco-cms/models';
-
+import { UmbDataTypeRepository } from '../../../settings/data-types/repository/data-type.repository';
+import type { DataTypeModel, DataTypePropertyModel, DocumentTypePropertyTypeModel } from '@umbraco-cms/backend-api';
 import '../workspace-property/workspace-property.element';
 import { UmbLitElement } from '@umbraco-cms/element';
 import { UmbObserverController } from '@umbraco-cms/observable-api';
@@ -23,12 +20,13 @@ export class UmbContentPropertyElement extends UmbLitElement {
 	];
 
 	// TODO: Consider if we just need to get the DataType Key?..
-	private _property?: ContentProperty;
+	// TODO: consider if we should make a base type of the DocumentTypePropertyType, which could become the ContentProperty. A shared common type for all properties.
+	private _property?: DocumentTypePropertyTypeModel;
 	@property({ type: Object, attribute: false })
-	public get property(): ContentProperty | undefined {
+	public get property(): DocumentTypePropertyTypeModel | undefined {
 		return this._property;
 	}
-	public set property(value: ContentProperty | undefined) {
+	public set property(value: DocumentTypePropertyTypeModel | undefined) {
 		const oldProperty = this._property;
 		this._property = value;
 		if (this._property?.dataTypeKey !== oldProperty?.dataTypeKey) {
@@ -40,31 +38,22 @@ export class UmbContentPropertyElement extends UmbLitElement {
 	value?: object | string;
 
 	@state()
-	private _propertyEditorUIAlias?: string;
+	private _propertyEditorUiAlias?: string;
 
 	@state()
-	private _dataTypeData: DataTypePropertyData[] = [];
+	private _dataTypeData: DataTypePropertyModel[] = [];
 
-	private _dataTypeStore?: UmbDataTypeDetailStore;
-	private _dataTypeObserver?: UmbObserverController<DataTypeDetails | null>;
+	private _dataTypeRepository: UmbDataTypeRepository = new UmbDataTypeRepository(this);
+	private _dataTypeObserver?: UmbObserverController<DataTypeModel | null>;
 
-	constructor() {
-		super();
-
-		this.consumeContext(UMB_DATA_TYPE_DETAIL_STORE_CONTEXT_TOKEN, (instance) => {
-			this._dataTypeStore = instance;
-			this._observeDataType(this._property?.dataTypeKey);
-		});
-	}
-
-	private _observeDataType(dataTypeKey?: string) {
-		if (!this._dataTypeStore) return;
-
+	private async _observeDataType(dataTypeKey?: string) {
 		this._dataTypeObserver?.destroy();
 		if (dataTypeKey) {
-			this._dataTypeObserver = this.observe(this._dataTypeStore.getByKey(dataTypeKey), (dataType) => {
+			// We do not need to have await here, this is only to ensure that the data is loaded before we try to observe it, and thereby update the DOM with it.
+			await this._dataTypeRepository.requestByKey(dataTypeKey);
+			this._dataTypeObserver = this.observe(await this._dataTypeRepository.byKey(dataTypeKey), (dataType) => {
 				this._dataTypeData = dataType?.data || [];
-				this._propertyEditorUIAlias = dataType?.propertyEditorUIAlias || undefined;
+				this._propertyEditorUiAlias = dataType?.propertyEditorUiAlias || undefined;
 			});
 		}
 	}
@@ -72,9 +61,9 @@ export class UmbContentPropertyElement extends UmbLitElement {
 	render() {
 		return html`<umb-workspace-property
 			alias=${ifDefined(this._property?.alias)}
-			label=${ifDefined(this._property?.label)}
-			description=${ifDefined(this._property?.description)}
-			property-editor-ui-alias="${ifDefined(this._propertyEditorUIAlias)}"
+			label=${ifDefined(this._property?.name)}
+			description=${ifDefined(this._property?.description || undefined)}
+			property-editor-ui-alias=${ifDefined(this._propertyEditorUiAlias)}
 			.value=${this.value}
 			.config=${this._dataTypeData}></umb-workspace-property>`;
 	}

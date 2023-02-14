@@ -1,14 +1,14 @@
-import type { ManifestTree, ManifestTreeItemAction } from '@umbraco-cms/models';
+import { UmbMemberRepository } from '../repository/member.repository';
+import type { ManifestTree } from '@umbraco-cms/models';
 
 const tree: ManifestTree = {
 	type: 'tree',
 	alias: 'Umb.Tree.Members',
 	name: 'Members Tree',
+	weight: 10,
 	meta: {
-		storeAlias: 'umbMemberTypesStore',
+		repository: UmbMemberRepository,
 	},
 };
 
-const treeItemActions: Array<ManifestTreeItemAction> = [];
-
-export const manifests = [tree, ...treeItemActions];
+export const manifests = [tree];

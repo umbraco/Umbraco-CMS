@@ -1,13 +1,13 @@
 import { rest } from 'msw';
-import { RuntimeLevel, ServerStatus, Version } from '@umbraco-cms/backend-api';
+import { RuntimeLevelModel, ServerStatusModel, VersionModel } from '@umbraco-cms/backend-api';
 import { umbracoPath } from '@umbraco-cms/utils';
 
 export const serverRunningHandler = rest.get(umbracoPath('/server/status'), (_req, res, ctx) => {
 	return res(
 		// Respond with a 200 status code
 		ctx.status(200),
-		ctx.json<ServerStatus>({
-			serverStatus: RuntimeLevel.RUN,
+		ctx.json<ServerStatusModel>({
+			serverStatus: RuntimeLevelModel.RUN,
 		})
 	);
 });
@@ -16,8 +16,8 @@ export const serverMustInstallHandler = rest.get(umbracoPath('/server/status'), 
 	return res(
 		// Respond with a 200 status code
 		ctx.status(200),
-		ctx.json<ServerStatus>({
-			serverStatus: RuntimeLevel.INSTALL,
+		ctx.json<ServerStatusModel>({
+			serverStatus: RuntimeLevelModel.INSTALL,
 		})
 	);
 });
@@ -26,8 +26,8 @@ export const serverMustUpgradeHandler = rest.get(umbracoPath('/server/status'), 
 	return res(
 		// Respond with a 200 status code
 		ctx.status(200),
-		ctx.json<ServerStatus>({
-			serverStatus: RuntimeLevel.UPGRADE,
+		ctx.json<ServerStatusModel>({
+			serverStatus: RuntimeLevelModel.UPGRADE,
 		})
 	);
 });
@@ -36,7 +36,7 @@ export const serverVersionHandler = rest.get(umbracoPath('/server/version'), (_r
 	return res(
 		// Respond with a 200 status code
 		ctx.status(200),
-		ctx.json<Version>({
+		ctx.json<VersionModel>({
 			version: '13.0.0',
 		})
 	);

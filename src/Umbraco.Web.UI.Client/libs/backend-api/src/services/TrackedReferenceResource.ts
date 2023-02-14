@@ -1,7 +1,7 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-import type { PagedRelationItem } from '../models/PagedRelationItem';
+import type { PagedRelationItemModel } from '../models/PagedRelationItemModel';
 
 import type { CancelablePromise } from '../core/CancelablePromise';
 import { OpenAPI } from '../core/OpenAPI';
@@ -10,7 +10,7 @@ import { request as __request } from '../core/request';
 export class TrackedReferenceResource {
 
     /**
-     * @returns PagedRelationItem Success
+     * @returns PagedRelationItemModel Success
      * @throws ApiError
      */
     public static getTrackedReferenceById({
@@ -23,7 +23,7 @@ export class TrackedReferenceResource {
         skip?: number,
         take?: number,
         filterMustBeIsDependency?: boolean,
-    }): CancelablePromise<PagedRelationItem> {
+    }): CancelablePromise<PagedRelationItemModel> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/tracked-reference/{id}',
@@ -39,7 +39,7 @@ export class TrackedReferenceResource {
     }
 
     /**
-     * @returns PagedRelationItem Success
+     * @returns PagedRelationItemModel Success
      * @throws ApiError
      */
     public static getTrackedReferenceDescendantsByParentId({
@@ -52,7 +52,7 @@ export class TrackedReferenceResource {
         skip?: number,
         take?: number,
         filterMustBeIsDependency?: boolean,
-    }): CancelablePromise<PagedRelationItem> {
+    }): CancelablePromise<PagedRelationItemModel> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/tracked-reference/descendants/{parentId}',
@@ -68,7 +68,7 @@ export class TrackedReferenceResource {
     }
 
     /**
-     * @returns PagedRelationItem Success
+     * @returns PagedRelationItemModel Success
      * @throws ApiError
      */
     public static getTrackedReferenceItem({
@@ -81,7 +81,7 @@ export class TrackedReferenceResource {
         skip?: number,
         take?: number,
         filterMustBeIsDependency?: boolean,
-    }): CancelablePromise<PagedRelationItem> {
+    }): CancelablePromise<PagedRelationItemModel> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/tracked-reference/item',

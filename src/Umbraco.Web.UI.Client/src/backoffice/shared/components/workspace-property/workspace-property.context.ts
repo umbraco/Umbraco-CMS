@@ -1,5 +1,5 @@
 import { UmbWorkspaceEntityContextInterface } from '../workspace/workspace-context/workspace-entity-context.interface';
-import type { DataTypeDetails } from '@umbraco-cms/models';
+import type { DataTypeModel } from '@umbraco-cms/backend-api';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 import { ObjectState } from '@umbraco-cms/observable-api';
 import { UmbContextConsumerController, UmbContextProviderController } from '@umbraco-cms/context-api';
@@ -10,7 +10,7 @@ export type WorkspacePropertyData<ValueType> = {
 	label?: string;
 	description?: string;
 	value?: ValueType | null;
-	config?: DataTypeDetails['data']; // This could potentially then come from hardcoded JS object and not the DataType store.
+	config?: DataTypeModel['data']; // This could potentially then come from hardcoded JS object and not the DataType store.
 };
 
 export class UmbWorkspacePropertyContext<ValueType = unknown> {
@@ -28,9 +28,13 @@ export class UmbWorkspacePropertyContext<ValueType = unknown> {
 
 	constructor(host: UmbControllerHostInterface) {
 		// TODO: Figure out how to get the magic string in a better way.
-		new UmbContextConsumerController<UmbWorkspaceEntityContextInterface>(host, 'umbWorkspaceContext', (workspaceContext) => {
-			this._workspaceContext = workspaceContext;
-		});
+		new UmbContextConsumerController<UmbWorkspaceEntityContextInterface>(
+			host,
+			'umbWorkspaceContext',
+			(workspaceContext) => {
+				this._workspaceContext = workspaceContext;
+			}
+		);
 
 		this._providerController = new UmbContextProviderController(host, 'umbPropertyContext', this);
 	}

@@ -1,8 +1,8 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-import type { PagedRelation } from '../models/PagedRelation';
-import type { Relation } from '../models/Relation';
+import type { PagedRelationModel } from '../models/PagedRelationModel';
+import type { RelationModel } from '../models/RelationModel';
 
 import type { CancelablePromise } from '../core/CancelablePromise';
 import { OpenAPI } from '../core/OpenAPI';
@@ -11,14 +11,14 @@ import { request as __request } from '../core/request';
 export class RelationResource {
 
     /**
-     * @returns Relation Success
+     * @returns any Success
      * @throws ApiError
      */
     public static getRelationById({
         id,
     }: {
         id: number,
-    }): CancelablePromise<Relation> {
+    }): CancelablePromise<RelationModel> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/relation/{id}',
@@ -32,7 +32,7 @@ export class RelationResource {
     }
 
     /**
-     * @returns PagedRelation Success
+     * @returns PagedRelationModel Success
      * @throws ApiError
      */
     public static getRelationChildRelationByChildId({
@@ -45,7 +45,7 @@ export class RelationResource {
         skip?: number,
         take?: number,
         relationTypeAlias?: string,
-    }): CancelablePromise<PagedRelation> {
+    }): CancelablePromise<PagedRelationModel> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/relation/child-relation/{childId}',

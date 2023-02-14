@@ -1,15 +1,15 @@
-import { BehaviorSubject, Observable } from 'rxjs';
-import { HealthCheckResource, HealthCheckWithResult } from '@umbraco-cms/backend-api';
-import { tryExecuteAndNotify } from '@umbraco-cms/resources';
-import { UmbControllerHostInterface } from '@umbraco-cms/controller';
+import { BehaviorSubject } from 'rxjs';
+import { HealthCheckGroupModel, HealthCheckGroupWithResultModel, HealthCheckResource } from '@umbraco-cms/backend-api';
 import { UmbContextToken } from '@umbraco-cms/context-api';
+import { UmbControllerHostInterface } from '@umbraco-cms/controller';
+import { tryExecuteAndNotify } from '@umbraco-cms/resources';
 
 export class UmbHealthCheckContext {
-	private _checks: BehaviorSubject<Array<any>> = new BehaviorSubject(<Array<any>>[]);
-	public readonly checks: Observable<Array<any>> = this._checks.asObservable();
+	private _checks = new BehaviorSubject<HealthCheckGroupModel | undefined>(undefined);
+	public readonly checks = this._checks.asObservable();
 
-	private _results: BehaviorSubject<Array<any>> = new BehaviorSubject(<Array<any>>[]);
-	public readonly results: Observable<Array<any>> = this._results.asObservable();
+	private _results = new BehaviorSubject<HealthCheckGroupWithResultModel | undefined>(undefined);
+	public readonly results = this._results.asObservable();
 
 	public host: UmbControllerHostInterface;
 
@@ -17,32 +17,26 @@ export class UmbHealthCheckContext {
 		this.host = host;
 	}
 
-	//TODO: Is this how we want to it?
-
 	async getGroupChecks(name: string) {
 		const { data } = await tryExecuteAndNotify(this.host, HealthCheckResource.getHealthCheckGroupByName({ name }));
 
 		if (data) {
-			data.checks?.forEach((check) => {
-				delete check.results;
-			});
-			this._checks.next(data.checks as HealthCheckWithResult[]);
+			this._checks.next(data);
+		} else {
+			this._checks.next(undefined);
 		}
 	}
 
 	async checkGroup(name: string) {
-		const { data } = await tryExecuteAndNotify(this.host, HealthCheckResource.getHealthCheckGroupByName({ name }));
+		const { data } = await tryExecuteAndNotify(
+			this.host,
+			HealthCheckResource.postHealthCheckGroupByNameCheck({ name })
+		);
 
 		if (data) {
-			const results =
-				data.checks?.map((check) => {
-					return {
-						key: check.key,
-						results: check.results,
-					};
-				}) || [];
-
-			this._results.next(results);
+			this._results.next(data);
+		} else {
+			this._results.next(undefined);
 		}
 	}
 }

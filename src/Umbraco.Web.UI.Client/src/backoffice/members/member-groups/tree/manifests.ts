@@ -1,5 +1,5 @@
-import { UMB_MEMBER_GROUP_STORE_CONTEXT_TOKEN } from '../member-group.details.store';
-import type { ManifestTree, ManifestTreeItemAction } from '@umbraco-cms/models';
+import { UmbMemberGroupRepository } from '../repository/member-group.repository';
+import type { ManifestTree } from '@umbraco-cms/models';
 
 const treeAlias = 'Umb.Tree.MemberGroups';
 
@@ -7,11 +7,10 @@ const tree: ManifestTree = {
 	type: 'tree',
 	alias: treeAlias,
 	name: 'Member Groups Tree',
+	weight: 100,
 	meta: {
-		storeAlias: UMB_MEMBER_GROUP_STORE_CONTEXT_TOKEN.toString(),
+		repository: UmbMemberGroupRepository,
 	},
 };
 
-const treeItemActions: Array<ManifestTreeItemAction> = [];
-
-export const manifests = [tree, ...treeItemActions];
+export const manifests = [tree];

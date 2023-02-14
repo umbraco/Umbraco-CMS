@@ -1,6 +1,7 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
-import { css, CSSResultGroup, html, LitElement } from 'lit';
+import {css, CSSResultGroup, html, LitElement, unsafeCSS} from 'lit';
 import { customElement } from 'lit/decorators.js';
+import logoImg from '/umbraco_logomark_white.svg';
 
 import './backoffice-header-sections.element';
 import './backoffice-header-apps.element';
@@ -44,7 +45,7 @@ export class UmbBackofficeHeader extends LitElement {
 		return html`
 			<div id="appHeader">
 				<uui-button id="logo" look="primary" label="Umbraco" compact>
-					<img src="umbraco_logomark_white.svg" alt="Umbraco" />
+					<img src="${logoImg}" alt="Umbraco" />
 				</uui-button>
 
 				<umb-backoffice-header-sections id="sections"></umb-backoffice-header-sections>

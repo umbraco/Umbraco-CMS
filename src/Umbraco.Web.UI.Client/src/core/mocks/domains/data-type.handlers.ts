@@ -1,32 +1,14 @@
 import { rest } from 'msw';
 import { umbDataTypeData } from '../data/data-type.data';
-import type { DataTypeDetails } from '@umbraco-cms/models';
+import { umbracoPath } from '@umbraco-cms/utils';
 
 // TODO: add schema
 export const handlers = [
-	rest.get('/umbraco/backoffice/data-type/details/:key', (req, res, ctx) => {
+	rest.delete<string[]>('/umbraco/backoffice/data-type/:key', async (req, res, ctx) => {
 		const key = req.params.key as string;
 		if (!key) return;
 
-		const dataType = umbDataTypeData.getByKey(key);
-
-		return res(ctx.status(200), ctx.json([dataType]));
-	}),
-
-	rest.post<DataTypeDetails[]>('/umbraco/backoffice/data-type/save', async (req, res, ctx) => {
-		const data = await req.json();
-		if (!data) return;
-
-		const saved = umbDataTypeData.save(data);
-
-		return res(ctx.status(200), ctx.json(saved));
-	}),
-
-	rest.post<string[]>('/umbraco/backoffice/data-type/delete', async (req, res, ctx) => {
-		console.warn('Please move to schema');
-		const keys = await req.json();
-
-		umbDataTypeData.delete(keys);
+		umbDataTypeData.delete([key]);
 
 		return res(ctx.status(200));
 	}),
@@ -59,5 +41,32 @@ export const handlers = [
 		if (!keys) return;
 		const items = umbDataTypeData.getTreeItem(keys);
 		return res(ctx.status(200), ctx.json(items));
+	}),
+
+	rest.get(umbracoPath('/data-type/:key'), (req, res, ctx) => {
+		const key = req.params.key as string;
+		if (!key) return;
+
+		const dataType = umbDataTypeData.getByKey(key);
+
+		return res(ctx.status(200), ctx.json(dataType));
+	}),
+
+	rest.post(umbracoPath('/data-type/:key'), async (req, res, ctx) => {
+		const data = await req.json();
+		if (!data) return;
+
+		const saved = umbDataTypeData.save(data);
+
+		return res(ctx.status(200), ctx.json(saved));
+	}),
+
+	rest.put(umbracoPath('/data-type/:key'), async (req, res, ctx) => {
+		const data = await req.json();
+		if (!data) return;
+
+		const saved = umbDataTypeData.save(data);
+
+		return res(ctx.status(200), ctx.json(saved));
 	}),
 ];

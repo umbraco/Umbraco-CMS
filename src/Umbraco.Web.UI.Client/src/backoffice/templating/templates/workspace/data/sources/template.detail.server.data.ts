@@ -1,7 +1,7 @@
 import { v4 as uuid } from 'uuid';
 import { TemplateDetailDataSource } from '.';
-import { ProblemDetails, Template, TemplateResource } from '@umbraco-cms/backend-api';
-import { UmbControllerHostInterface } from '@umbraco-cms/controller';
+import { ProblemDetailsModel, TemplateModel, TemplateResource } from '@umbraco-cms/backend-api';
+import type { UmbControllerHostInterface } from '@umbraco-cms/controller';
 import { tryExecuteAndNotify } from '@umbraco-cms/resources';
 
 /**
@@ -38,10 +38,9 @@ export class UmbTemplateDetailServerDataSource implements TemplateDetailDataSour
 	 * @return {*}
 	 * @memberof UmbTemplateDetailServerDataSource
 	 */
-	async createScaffold(parentKey: string | null) {
-		let masterTemplateAlias: string | undefined = undefined;
-		let error = undefined;
-		const data: Template = {
+	async createScaffold() {
+		const error = undefined;
+		const data: TemplateModel = {
 			key: uuid(),
 			name: '',
 			alias: '',
@@ -49,22 +48,16 @@ export class UmbTemplateDetailServerDataSource implements TemplateDetailDataSour
 		};
 
 		// TODO: update when backend is updated so we don't have to do two calls
-		if (parentKey) {
-			const { data: parentData, error: parentError } = await tryExecuteAndNotify(
-				this.#host,
-				TemplateResource.getTemplateByKey({ key: parentKey })
-			);
-			masterTemplateAlias = parentData?.alias;
-			error = parentError;
-		}
-
+		/*
+		// TODO: Revisit template models, masterTemplateAlias is not here anymore?
 		const { data: scaffoldData, error: scaffoldError } = await tryExecuteAndNotify(
 			this.#host,
-			TemplateResource.getTemplateScaffold({ masterTemplateAlias })
+			TemplateResource.getTemplateScaffold()
 		);
+		*/
 
-		error = scaffoldError;
-		data.content = scaffoldData?.content || '';
+		//error = scaffoldError;
+		//data.content = scaffoldData?.content || '';
 
 		return { data, error };
 	}
@@ -75,7 +68,7 @@ export class UmbTemplateDetailServerDataSource implements TemplateDetailDataSour
 	 * @return {*}
 	 * @memberof UmbTemplateDetailServerDataSource
 	 */
-	async insert(template: Template) {
+	async insert(template: TemplateModel) {
 		const payload = { requestBody: template };
 		return tryExecuteAndNotify(this.#host, TemplateResource.postTemplate(payload));
 	}
@@ -86,9 +79,9 @@ export class UmbTemplateDetailServerDataSource implements TemplateDetailDataSour
 	 * @return {*}
 	 * @memberof UmbTemplateDetailServerDataSource
 	 */
-	async update(template: Template) {
+	async update(template: TemplateModel) {
 		if (!template.key) {
-			const error: ProblemDetails = { title: 'Template key is missing' };
+			const error: ProblemDetailsModel = { title: 'Template key is missing' };
 			return { error };
 		}
 
@@ -104,7 +97,7 @@ export class UmbTemplateDetailServerDataSource implements TemplateDetailDataSour
 	 */
 	async delete(key: string) {
 		if (!key) {
-			const error: ProblemDetails = { title: 'Key is missing' };
+			const error: ProblemDetailsModel = { title: 'Key is missing' };
 			return { error };
 		}
 

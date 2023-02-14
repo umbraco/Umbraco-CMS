@@ -1,9 +1,10 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-import type { ContentTreeItem } from '../models/ContentTreeItem';
-import type { PagedContentTreeItem } from '../models/PagedContentTreeItem';
-import type { PagedRecycleBinItem } from '../models/PagedRecycleBinItem';
+import type { ContentTreeItemModel } from '../models/ContentTreeItemModel';
+import type { DocumentTreeItemModel } from '../models/DocumentTreeItemModel';
+import type { PagedContentTreeItemModel } from '../models/PagedContentTreeItemModel';
+import type { PagedRecycleBinItemModel } from '../models/PagedRecycleBinItemModel';
 
 import type { CancelablePromise } from '../core/CancelablePromise';
 import { OpenAPI } from '../core/OpenAPI';
@@ -12,7 +13,7 @@ import { request as __request } from '../core/request';
 export class MediaResource {
 
     /**
-     * @returns PagedRecycleBinItem Success
+     * @returns PagedRecycleBinItemModel Success
      * @throws ApiError
      */
     public static getRecycleBinMediaChildren({
@@ -23,7 +24,7 @@ export class MediaResource {
         parentKey?: string,
         skip?: number,
         take?: number,
-    }): CancelablePromise<PagedRecycleBinItem> {
+    }): CancelablePromise<PagedRecycleBinItemModel> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/recycle-bin/media/children',
@@ -39,7 +40,7 @@ export class MediaResource {
     }
 
     /**
-     * @returns PagedRecycleBinItem Success
+     * @returns PagedRecycleBinItemModel Success
      * @throws ApiError
      */
     public static getRecycleBinMediaRoot({
@@ -48,7 +49,7 @@ export class MediaResource {
     }: {
         skip?: number,
         take?: number,
-    }): CancelablePromise<PagedRecycleBinItem> {
+    }): CancelablePromise<PagedRecycleBinItemModel> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/recycle-bin/media/root',
@@ -63,7 +64,7 @@ export class MediaResource {
     }
 
     /**
-     * @returns PagedContentTreeItem Success
+     * @returns PagedContentTreeItemModel Success
      * @throws ApiError
      */
     public static getTreeMediaChildren({
@@ -76,7 +77,7 @@ export class MediaResource {
         skip?: number,
         take?: number,
         dataTypeKey?: string,
-    }): CancelablePromise<PagedContentTreeItem> {
+    }): CancelablePromise<PagedContentTreeItemModel> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/tree/media/children',
@@ -90,7 +91,7 @@ export class MediaResource {
     }
 
     /**
-     * @returns ContentTreeItem Success
+     * @returns any Success
      * @throws ApiError
      */
     public static getTreeMediaItem({
@@ -99,7 +100,7 @@ export class MediaResource {
     }: {
         key?: Array<string>,
         dataTypeKey?: string,
-    }): CancelablePromise<Array<ContentTreeItem>> {
+    }): CancelablePromise<Array<(ContentTreeItemModel | DocumentTreeItemModel)>> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/tree/media/item',
@@ -111,7 +112,7 @@ export class MediaResource {
     }
 
     /**
-     * @returns PagedContentTreeItem Success
+     * @returns PagedContentTreeItemModel Success
      * @throws ApiError
      */
     public static getTreeMediaRoot({
@@ -122,7 +123,7 @@ export class MediaResource {
         skip?: number,
         take?: number,
         dataTypeKey?: string,
-    }): CancelablePromise<PagedContentTreeItem> {
+    }): CancelablePromise<PagedContentTreeItemModel> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/tree/media/root',

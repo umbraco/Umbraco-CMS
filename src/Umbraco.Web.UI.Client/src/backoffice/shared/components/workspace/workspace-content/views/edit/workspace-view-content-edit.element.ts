@@ -3,9 +3,8 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, state } from 'lit/decorators.js';
 import { repeat } from 'lit/directives/repeat.js';
 import type { UmbWorkspaceEntityContextInterface } from '../../../workspace-context/workspace-entity-context.interface';
-import type { ContentProperty, ContentPropertyData, DocumentDetails, MediaDetails } from '@umbraco-cms/models';
+import type { ContentProperty, ContentPropertyData, MediaTypeDetails } from '@umbraco-cms/models';
 
-import '../../../../content-property/content-property.element';
 import { UmbLitElement } from '@umbraco-cms/element';
 
 @customElement('umb-workspace-view-content-edit')
@@ -26,13 +25,13 @@ export class UmbWorkspaceViewContentEditElement extends UmbLitElement {
 	@state()
 	_data: ContentPropertyData[] = [];
 
-	private _workspaceContext?: UmbWorkspaceEntityContextInterface<DocumentDetails | MediaDetails>;
+	private _workspaceContext?: UmbWorkspaceEntityContextInterface<MediaTypeDetails>;
 
 	constructor() {
 		super();
 
 		// TODO: Figure out how to get the magic string for the workspace context.
-		this.consumeContext<UmbWorkspaceEntityContextInterface<DocumentDetails | MediaDetails>>(
+		this.consumeContext<UmbWorkspaceEntityContextInterface<MediaTypeDetails>>(
 			'umbWorkspaceContext',
 			(workspaceContext) => {
 				this._workspaceContext = workspaceContext;
@@ -51,16 +50,22 @@ export class UmbWorkspaceViewContentEditElement extends UmbLitElement {
 
 		Should use a Observable for example: this._workspaceContext.properties
 		*/
-		this.observe(this._workspaceContext.data, (content) => {
 
-			this._properties = content?.properties || [];
-			this._data = content?.data || [];
+		/*
+		// TODO: broken for now, as we need to transfer into the repository way:
+		this.observe(
+			this._workspaceContext.data,
+			(content) => {
+				// TODO: Should be adapted to new models, maybe a shared 'Content' solution is not the right thing here.
+				this._properties = content?.properties || [];
+				console.log('content', content);
 
-			/*
-				Maybe we should not give the value(Data), but the umb-content-property should get the context and observe its own data.
-				This would become a more specific Observer therefor better performance?.. Note to self: Debate with Mads how he sees this perspective.
-				*/
-		}, 'observeWorkspaceContextData');
+				//Maybe we should not give the value(Data), but the umb-content-property should get the context and observe its own data.
+				//This would become a more specific Observer therefor better performance?.. Note to self: Debate with Mads how he sees this perspective.
+			},
+			'observeWorkspaceContextData'
+		);
+		*/
 	}
 
 	render() {
@@ -70,9 +75,7 @@ export class UmbWorkspaceViewContentEditElement extends UmbLitElement {
 					this._properties,
 					(property) => property.alias,
 					(property) =>
-						html`<umb-content-property
-							.property=${property}
-							.value=${this._data.find((data) => data.alias === property.alias)?.value}></umb-content-property> `
+						html`<umb-content-property .property=${property} .value=${property.label}></umb-content-property> `
 				)}
 			</uui-box>
 		`;

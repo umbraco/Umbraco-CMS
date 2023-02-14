@@ -46,7 +46,7 @@ export class UmbPropertyActionMenuElement extends UmbLitElement {
 	public value?: string;
 
 	@property()
-	set propertyEditorUIAlias(alias: string) {
+	set propertyEditorUiAlias(alias: string) {
 		this._observeActions(alias);
 	}
 

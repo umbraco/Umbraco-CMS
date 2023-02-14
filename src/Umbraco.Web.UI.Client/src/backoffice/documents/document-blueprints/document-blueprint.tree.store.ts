@@ -1,13 +1,13 @@
-import { DocumentBlueprintResource, DocumentTreeItem } from '@umbraco-cms/backend-api';
+import { DocumentBlueprintResource, DocumentTreeItemModel } from '@umbraco-cms/backend-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/resources';
 import { UmbContextToken } from '@umbraco-cms/context-api';
 import { ArrayState } from '@umbraco-cms/observable-api';
 import { UmbStoreBase } from '@umbraco-cms/store';
-import { UmbControllerHostInterface } from '@umbraco-cms/controller';
+import type { UmbControllerHostInterface } from '@umbraco-cms/controller';
 
-
-export const UMB_DocumentBlueprint_TREE_STORE_CONTEXT_TOKEN = new UmbContextToken<UmbDocumentBlueprintTreeStore>('UmbDocumentBlueprintTreeStore');
-
+export const UMB_DocumentBlueprint_TREE_STORE_CONTEXT_TOKEN = new UmbContextToken<UmbDocumentBlueprintTreeStore>(
+	'UmbDocumentBlueprintTreeStore'
+);
 
 /**
  * @export
@@ -16,10 +16,7 @@ export const UMB_DocumentBlueprint_TREE_STORE_CONTEXT_TOKEN = new UmbContextToke
  * @description - Tree Data Store for Document Blueprints
  */
 export class UmbDocumentBlueprintTreeStore extends UmbStoreBase {
-
-
-	#data = new ArrayState<DocumentTreeItem>([], (x) => x.key);
-
+	#data = new ArrayState<DocumentTreeItemModel>([], (x) => x.key);
 
 	constructor(host: UmbControllerHostInterface) {
 		super(host, UMB_DocumentBlueprint_TREE_STORE_CONTEXT_TOKEN.toString());

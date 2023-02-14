@@ -1,11 +1,37 @@
 import { esbuildPlugin } from '@web/dev-server-esbuild';
 import { playwrightLauncher } from '@web/test-runner-playwright';
 import { importMapsPlugin } from '@web/dev-server-import-maps';
+import rollupUrl from 'rollup-plugin-url';
+import { fromRollup } from '@web/dev-server-rollup';
 
+const url = fromRollup(rollupUrl);
+
+/** @type {import('@web/dev-server').DevServerConfig} */
 export default {
 	nodeResolve: true,
-	files: ['src/**/*.test.ts', 'apps/**/*.test.ts', 'libs/**/*.test.ts'],
+	files: ['src/**/*.test.ts', 'libs/**/*.test.ts'],
+	mimeTypes: {
+		'./public/**/*': 'js'
+	},
 	plugins: [
+		{
+			name: 'resolve-umbraco-and-vite-imports',
+			// Rewrite Vite's root imports to the public folder
+			transformImport(args) {
+				if (args.source.match(/^\/.*?\.(png|gif|jpg|jpeg|svg)$/is)) {
+					return `/public${args.source}`;
+				}
+			},
+
+			// Serve Umbraco's API imports (msw does not work in web-test-runner)
+			serve(context) {
+				if (context.path.startsWith('/umbraco/management/api')) {
+					return '';
+				}
+			}
+		},
+		// Serve images from the public folder as JS modules
+		url({ include: ['public/**/*'] }),
 		esbuildPlugin({ ts: true, target: 'auto', json: true }),
 		importMapsPlugin({
 			inject: {
@@ -26,6 +52,7 @@ export default {
 						'@umbraco-cms/utils': './libs/utils/index.ts',
 						'@umbraco-cms/test-utils': './libs/test-utils/index.ts',
 						'@umbraco-cms/resources': './libs/resources/index.ts',
+						"@umbraco-cms/repository": './libs/repository',
 						'@umbraco-cms/router': './libs/router/index.ts'
 					},
 				},

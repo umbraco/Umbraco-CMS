@@ -1,15 +1,18 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-import type { DataType } from '../models/DataType';
+import type { DataTypeCopyModel } from '../models/DataTypeCopyModel';
 import type { DataTypeCreateModel } from '../models/DataTypeCreateModel';
-import type { DataTypeReference } from '../models/DataTypeReference';
+import type { DataTypeModel } from '../models/DataTypeModel';
+import type { DataTypeMoveModel } from '../models/DataTypeMoveModel';
+import type { DataTypeReferenceModel } from '../models/DataTypeReferenceModel';
 import type { DataTypeUpdateModel } from '../models/DataTypeUpdateModel';
-import type { Folder } from '../models/Folder';
+import type { DocumentTypeTreeItemModel } from '../models/DocumentTypeTreeItemModel';
 import type { FolderCreateModel } from '../models/FolderCreateModel';
-import type { FolderTreeItem } from '../models/FolderTreeItem';
+import type { FolderModel } from '../models/FolderModel';
+import type { FolderTreeItemModel } from '../models/FolderTreeItemModel';
 import type { FolderUpdateModel } from '../models/FolderUpdateModel';
-import type { PagedFolderTreeItem } from '../models/PagedFolderTreeItem';
+import type { PagedFolderTreeItemModel } from '../models/PagedFolderTreeItemModel';
 
 import type { CancelablePromise } from '../core/CancelablePromise';
 import { OpenAPI } from '../core/OpenAPI';
@@ -32,20 +35,21 @@ export class DataTypeResource {
             body: requestBody,
             mediaType: 'application/json',
             errors: {
+                400: `Bad Request`,
                 404: `Not Found`,
             },
         });
     }
 
     /**
-     * @returns DataType Success
+     * @returns any Success
      * @throws ApiError
      */
     public static getDataTypeByKey({
         key,
     }: {
         key: string,
-    }): CancelablePromise<DataType> {
+    }): CancelablePromise<DataTypeModel> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/data-type/{key}',
@@ -74,6 +78,7 @@ export class DataTypeResource {
                 'key': key,
             },
             errors: {
+                400: `Bad Request`,
                 404: `Not Found`,
             },
         });
@@ -99,20 +104,71 @@ export class DataTypeResource {
             body: requestBody,
             mediaType: 'application/json',
             errors: {
+                400: `Bad Request`,
                 404: `Not Found`,
             },
         });
     }
 
     /**
-     * @returns DataTypeReference Success
+     * @returns any Created
+     * @throws ApiError
+     */
+    public static postDataTypeByKeyCopy({
+        key,
+        requestBody,
+    }: {
+        key: string,
+        requestBody?: DataTypeCopyModel,
+    }): CancelablePromise<any> {
+        return __request(OpenAPI, {
+            method: 'POST',
+            url: '/umbraco/management/api/v1/data-type/{key}/copy',
+            path: {
+                'key': key,
+            },
+            body: requestBody,
+            mediaType: 'application/json',
+            errors: {
+                404: `Not Found`,
+            },
+        });
+    }
+
+    /**
+     * @returns any Success
+     * @throws ApiError
+     */
+    public static postDataTypeByKeyMove({
+        key,
+        requestBody,
+    }: {
+        key: string,
+        requestBody?: DataTypeMoveModel,
+    }): CancelablePromise<any> {
+        return __request(OpenAPI, {
+            method: 'POST',
+            url: '/umbraco/management/api/v1/data-type/{key}/move',
+            path: {
+                'key': key,
+            },
+            body: requestBody,
+            mediaType: 'application/json',
+            errors: {
+                404: `Not Found`,
+            },
+        });
+    }
+
+    /**
+     * @returns any Success
      * @throws ApiError
      */
     public static getDataTypeByKeyReferences({
         key,
     }: {
         key: string,
-    }): CancelablePromise<Array<DataTypeReference>> {
+    }): CancelablePromise<Array<DataTypeReferenceModel>> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/data-type/{key}/references',
@@ -143,14 +199,14 @@ export class DataTypeResource {
     }
 
     /**
-     * @returns Folder Success
+     * @returns any Success
      * @throws ApiError
      */
     public static getDataTypeFolderByKey({
         key,
     }: {
         key: string,
-    }): CancelablePromise<Folder> {
+    }): CancelablePromise<FolderModel> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/data-type/folder/{key}',
@@ -210,7 +266,7 @@ export class DataTypeResource {
     }
 
     /**
-     * @returns PagedFolderTreeItem Success
+     * @returns PagedFolderTreeItemModel Success
      * @throws ApiError
      */
     public static getTreeDataTypeChildren({
@@ -223,7 +279,7 @@ export class DataTypeResource {
         skip?: number,
         take?: number,
         foldersOnly?: boolean,
-    }): CancelablePromise<PagedFolderTreeItem> {
+    }): CancelablePromise<PagedFolderTreeItemModel> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/tree/data-type/children',
@@ -237,14 +293,14 @@ export class DataTypeResource {
     }
 
     /**
-     * @returns FolderTreeItem Success
+     * @returns any Success
      * @throws ApiError
      */
     public static getTreeDataTypeItem({
         key,
     }: {
         key?: Array<string>,
-    }): CancelablePromise<Array<FolderTreeItem>> {
+    }): CancelablePromise<Array<(FolderTreeItemModel | DocumentTypeTreeItemModel)>> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/tree/data-type/item',
@@ -255,7 +311,7 @@ export class DataTypeResource {
     }
 
     /**
-     * @returns PagedFolderTreeItem Success
+     * @returns PagedFolderTreeItemModel Success
      * @throws ApiError
      */
     public static getTreeDataTypeRoot({
@@ -266,7 +322,7 @@ export class DataTypeResource {
         skip?: number,
         take?: number,
         foldersOnly?: boolean,
-    }): CancelablePromise<PagedFolderTreeItem> {
+    }): CancelablePromise<PagedFolderTreeItemModel> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/tree/data-type/root',

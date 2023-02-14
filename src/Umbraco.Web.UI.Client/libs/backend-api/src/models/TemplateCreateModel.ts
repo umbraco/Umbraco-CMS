@@ -2,9 +2,7 @@
 /* tslint:disable */
 /* eslint-disable */
 
-export type TemplateCreateModel = {
-    name?: string;
-    alias?: string;
-    content?: string | null;
-};
+import type { TemplateModelBaseModel } from './TemplateModelBaseModel';
+
+export type TemplateCreateModel = TemplateModelBaseModel;
 

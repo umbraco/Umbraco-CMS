@@ -1,5 +1,7 @@
-import { css, CSSResultGroup, html, LitElement } from 'lit';
+import { css, CSSResultGroup, html, LitElement, unsafeCSS } from 'lit';
 import { customElement } from 'lit/decorators.js';
+import logoImg from '/umbraco_logomark_white.svg';
+import installerImg from '/installer.jpg';
 
 @customElement('umb-installer-layout')
 export class UmbInstallerLayoutElement extends LitElement {
@@ -11,7 +13,7 @@ export class UmbInstallerLayoutElement extends LitElement {
 				background-position: 50%;
 				background-repeat: no-repeat;
 				background-size: cover;
-				background-image: url('installer.jpg');
+				background-image: url('${unsafeCSS(installerImg)}');
 				width: 100vw;
 				height: 100vh;
 			}
@@ -53,7 +55,7 @@ export class UmbInstallerLayoutElement extends LitElement {
 			<div id="background" aria-hidden="true"></div>
 
 			<div id="logo" aria-hidden="true">
-				<img src="umbraco_logo_white.svg" alt="Umbraco" />
+				<img src="${logoImg}" alt="Umbraco" />
 			</div>
 
 			<main id="container">

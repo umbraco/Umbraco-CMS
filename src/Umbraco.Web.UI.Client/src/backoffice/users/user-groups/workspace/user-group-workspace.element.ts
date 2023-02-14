@@ -186,8 +186,6 @@ export class UmbUserGroupWorkspaceElement extends UmbLitElement implements UmbWo
 
 	private _userStore?: UmbUserStore;
 
-
-
 	private _workspaceContext: UmbWorkspaceUserGroupContext = new UmbWorkspaceUserGroupContext(this);
 
 	@state()
@@ -206,7 +204,7 @@ export class UmbUserGroupWorkspaceElement extends UmbLitElement implements UmbWo
 			this._observeUsers();
 		});
 
-		this.observe(this._workspaceContext.data.pipe(distinctUntilChanged()), (userGroup) => {
+		this.observe(this._workspaceContext.data, (userGroup) => {
 			this._userGroup = userGroup;
 		});
 	}
@@ -225,7 +223,8 @@ export class UmbUserGroupWorkspaceElement extends UmbLitElement implements UmbWo
 				type: 'workspaceAction',
 				alias: 'Umb.WorkspaceAction.UserGroup.Save',
 				name: 'Save User Group Workspace Action',
-				loader: () => import('../../../shared/components/workspace/actions/save/workspace-action-node-save.element'),
+				loader: () =>
+					import('../../../shared/components/workspace/workspace-action/save/workspace-action-node-save.element'),
 				meta: {
 					workspaces: ['Umb.Workspace.UserGroup'],
 					look: 'primary',
@@ -263,7 +262,6 @@ export class UmbUserGroupWorkspaceElement extends UmbLitElement implements UmbWo
 		//this._workspaceContext.setUsers();
 	}
 
-
 	private _updatePermission(permission: { name: string; description: string; value: boolean }) {
 		if (!this._workspaceContext) return;
 
@@ -294,7 +292,7 @@ export class UmbUserGroupWorkspaceElement extends UmbLitElement implements UmbWo
 	}
 
 	private _updateSections(value: string[]) {
-		console.log("To be done");
+		console.log('To be done');
 		//this._workspaceContext.setSections(value);
 	}
 

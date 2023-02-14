@@ -4,6 +4,8 @@ import { customElement, state } from 'lit/decorators.js';
 import { UmbSectionContext, UMB_SECTION_CONTEXT_TOKEN } from '../section.context';
 
 import '../../tree/context-menu/tree-context-menu.service';
+import '../section-sidebar-context-menu/section-sidebar-context-menu.element';
+import { UmbSectionSidebarContext, UMB_SECTION_SIDEBAR_CONTEXT_TOKEN } from './section-sidebar.context';
 import { UmbLitElement } from '@umbraco-cms/element';
 
 @customElement('umb-section-sidebar')
@@ -34,6 +36,7 @@ export class UmbSectionSidebarElement extends UmbLitElement {
 	private _sectionPathname = '';
 
 	private _sectionContext?: UmbSectionContext;
+	#sectionSidebarContext = new UmbSectionSidebarContext(this);
 
 	constructor() {
 		super();
@@ -42,6 +45,8 @@ export class UmbSectionSidebarElement extends UmbLitElement {
 			this._sectionContext = sectionContext;
 			this._observeSectionContext();
 		});
+
+		this.provideContext(UMB_SECTION_SIDEBAR_CONTEXT_TOKEN, this.#sectionSidebarContext);
 	}
 
 	private _observeSectionContext() {
@@ -57,7 +62,7 @@ export class UmbSectionSidebarElement extends UmbLitElement {
 
 	render() {
 		return html`
-			<umb-tree-context-menu-service>
+			<umb-section-sidebar-context-menu>
 				<uui-scroll-container>
 					<a href="${`section/${this._sectionPathname}`}">
 						<h3>${this._sectionLabel}</h3>
@@ -65,7 +70,7 @@ export class UmbSectionSidebarElement extends UmbLitElement {
 
 					<slot></slot>
 				</uui-scroll-container>
-			</umb-tree-context-menu-service>
+			</umb-section-sidebar-context-menu>
 		`;
 	}
 }

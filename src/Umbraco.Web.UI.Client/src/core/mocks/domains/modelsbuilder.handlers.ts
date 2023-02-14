@@ -1,7 +1,12 @@
 import { rest } from 'msw';
 
 import { umbracoPath } from '@umbraco-cms/utils';
-import { CreatedResult, ModelsBuilder, ModelsMode, OutOfDateStatus } from '@umbraco-cms/backend-api';
+import {
+	CreatedResultModel,
+	ModelsBuilderModel,
+	ModelsModeModel,
+	OutOfDateStatusModel,
+} from '@umbraco-cms/backend-api';
 
 export const handlers = [
 	rest.post(umbracoPath('/models-builder/build'), async (_req, res, ctx) => {
@@ -10,26 +15,26 @@ export const handlers = [
 		return res(
 			// Respond with a 200 status code
 			ctx.status(200),
-			ctx.json<CreatedResult>({})
+			ctx.json<CreatedResultModel>({})
 		);
 	}),
 
 	rest.get(umbracoPath('/models-builder/dashboard'), async (_req, res, ctx) => {
-		return res(ctx.status(200), ctx.json<ModelsBuilder>(model));
+		return res(ctx.status(200), ctx.json<ModelsBuilderModel>(model));
 	}),
 
 	rest.get(umbracoPath('/models-builder/status'), async (_req, res, ctx) => {
 		return res(
 			// Respond with a 200 status code
 			ctx.status(200),
-			ctx.json<OutOfDateStatus>({})
+			ctx.json<OutOfDateStatusModel>({})
 		);
 	}),
 ];
 
 // Mock Data for now
-const modelBeforeBuild: ModelsBuilder = {
-	mode: ModelsMode.IN_MEMORY_AUTO,
+const modelBeforeBuild: ModelsBuilderModel = {
+	mode: ModelsModeModel.IN_MEMORY_AUTO,
 	canGenerate: true,
 	outOfDateModels: true,
 	lastError: `[plugin:vite:import-analysis] Missing "./directives/unsafe-html.js" export in "lit" package
@@ -49,8 +54,8 @@ at async TransformContext.transform (file:///C:/Users/Umbraco/Documents/Umbraco.
 	trackingOutOfDateModels: true,
 };
 
-const modelAfterBuild: ModelsBuilder = {
-	mode: ModelsMode.IN_MEMORY_AUTO,
+const modelAfterBuild: ModelsBuilderModel = {
+	mode: ModelsModeModel.IN_MEMORY_AUTO,
 	canGenerate: true,
 	outOfDateModels: false,
 	lastError: '',

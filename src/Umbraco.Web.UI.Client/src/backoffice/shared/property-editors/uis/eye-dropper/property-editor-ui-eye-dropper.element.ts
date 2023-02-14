@@ -1,7 +1,10 @@
 import { html } from 'lit';
-import { customElement, property } from 'lit/decorators.js';
+import { customElement, property, state } from 'lit/decorators.js';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
+import { UUIColorPickerChangeEvent } from '@umbraco-ui/uui';
 import { UmbLitElement } from '@umbraco-cms/element';
+import '../../../components/eye-dropper/eye-dropper.element';
+import type { DataTypePropertyModel } from '@umbraco-cms/backend-api';
 
 /**
  * @element umb-property-editor-ui-eye-dropper
@@ -13,11 +16,31 @@ export class UmbPropertyEditorUIEyeDropperElement extends UmbLitElement {
 	@property()
 	value = '';
 
+	@state()
+	private _opacity = false;
+
+	@state()
+	private _swatches: string[] = [];
+
 	@property({ type: Array, attribute: false })
-	public config = [];
+	public set config(config: Array<DataTypePropertyModel>) {
+		const showAlpha = config.find((x) => x.alias === 'showAlpha');
+		if (showAlpha) this._opacity = showAlpha.value;
+
+		const colorSwatches = config.find((x) => x.alias === 'palette');
+		if (colorSwatches) this._swatches = colorSwatches.value;
+	}
+
+	private _onChange(event: UUIColorPickerChangeEvent) {
+		this.value = event.target.value;
+		this.dispatchEvent(new CustomEvent('property-value-change'));
+	}
 
 	render() {
-		return html`<div>umb-property-editor-ui-eye-dropper</div>`;
+		return html`<umb-eye-dropper
+			@change="${this._onChange}"
+			.swatches=${this._swatches}
+			.opacity="${this._opacity}"></umb-eye-dropper>`;
 	}
 }
 

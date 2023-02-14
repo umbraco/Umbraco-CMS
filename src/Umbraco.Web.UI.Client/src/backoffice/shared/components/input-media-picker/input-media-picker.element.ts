@@ -4,13 +4,9 @@ import { customElement, property, state } from 'lit/decorators.js';
 import { ifDefined } from 'lit-html/directives/if-defined.js';
 import { FormControlMixin } from '@umbraco-ui/uui-base/lib/mixins';
 import { UmbModalService, UMB_MODAL_SERVICE_CONTEXT_TOKEN } from '../../../../core/modal';
-import {
-	MediaTreeItem,
-	UmbMediaTreeStore,
-	UMB_MEDIA_TREE_STORE_CONTEXT_TOKEN,
-} from '../../../../backoffice/media/media/media.tree.store';
+import { UmbMediaRepository } from '../../../media/media/repository/media.repository';
 import { UmbLitElement } from '@umbraco-cms/element';
-import type { FolderTreeItem } from '@umbraco-cms/backend-api';
+import type { EntityTreeItemModel, FolderTreeItemModel } from '@umbraco-cms/backend-api';
 import type { UmbObserverController } from '@umbraco-cms/observable-api';
 
 @customElement('umb-input-media-picker')
@@ -89,11 +85,11 @@ export class UmbInputMediaPickerElement extends FormControlMixin(UmbLitElement) 
 	}
 
 	@state()
-	private _items?: Array<MediaTreeItem>;
+	private _items?: Array<EntityTreeItemModel>;
 
 	private _modalService?: UmbModalService;
-	private _mediaStore?: UmbMediaTreeStore;
-	private _pickedItemsObserver?: UmbObserverController<FolderTreeItem>;
+	private _pickedItemsObserver?: UmbObserverController<FolderTreeItemModel>;
+	private _repository = new UmbMediaRepository(this);
 
 	constructor() {
 		super();
@@ -109,26 +105,29 @@ export class UmbInputMediaPickerElement extends FormControlMixin(UmbLitElement) 
 			() => !!this.max && this._selectedKeys.length > this.max
 		);
 
-		this.consumeContext(UMB_MEDIA_TREE_STORE_CONTEXT_TOKEN, (instance) => {
-			this._mediaStore = instance;
-			this._observePickedMedias();
-		});
 		this.consumeContext(UMB_MODAL_SERVICE_CONTEXT_TOKEN, (instance) => {
 			this._modalService = instance;
 		});
+	}
+
+	connectedCallback(): void {
+		super.connectedCallback();
+		this._observePickedMedias();
 	}
 
 	protected getFormElement() {
 		return undefined;
 	}
 
-	private _observePickedMedias() {
+	private async _observePickedMedias() {
 		this._pickedItemsObserver?.destroy();
 
-		if (!this._mediaStore) return;
-
 		// TODO: consider changing this to the list data endpoint when it is available
-		this._pickedItemsObserver = this.observe(this._mediaStore.getTreeItems(this._selectedKeys), (items) => {
+		const { asObservable } = await this._repository.requestTreeItems(this._selectedKeys);
+
+		if (!asObservable) return;
+
+		this._pickedItemsObserver = this.observe(asObservable(), (items) => {
 			this._items = items;
 		});
 	}
@@ -144,7 +143,7 @@ export class UmbInputMediaPickerElement extends FormControlMixin(UmbLitElement) 
 		});
 	}
 
-	private _removeItem(item: FolderTreeItem) {
+	private _removeItem(item: FolderTreeItemModel) {
 		const modalHandler = this._modalService?.confirm({
 			color: 'danger',
 			headline: `Remove ${item.name}?`,
@@ -163,7 +162,6 @@ export class UmbInputMediaPickerElement extends FormControlMixin(UmbLitElement) 
 	private _setSelection(newSelection: Array<string>) {
 		this.selectedKeys = newSelection;
 		this.dispatchEvent(new CustomEvent('change', { bubbles: true, composed: true }));
-		console.log(this._items);
 	}
 
 	render() {
@@ -177,9 +175,9 @@ export class UmbInputMediaPickerElement extends FormControlMixin(UmbLitElement) 
 		</uui-button>`;
 	}
 
-	private _renderItem(item: FolderTreeItem) {
+	private _renderItem(item: FolderTreeItemModel) {
 		// TODO: remove when we have a way to handle trashed items
-		const tempItem = item as FolderTreeItem & { isTrashed: boolean };
+		const tempItem = item as FolderTreeItemModel & { isTrashed: boolean };
 
 		return html`
 			<uui-card-media

@@ -1,9 +1,9 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-import type { PagedRedirectUrl } from '../models/PagedRedirectUrl';
-import type { RedirectStatus } from '../models/RedirectStatus';
-import type { RedirectUrlStatus } from '../models/RedirectUrlStatus';
+import type { PagedRedirectUrlModel } from '../models/PagedRedirectUrlModel';
+import type { RedirectStatusModel } from '../models/RedirectStatusModel';
+import type { RedirectUrlStatusModel } from '../models/RedirectUrlStatusModel';
 
 import type { CancelablePromise } from '../core/CancelablePromise';
 import { OpenAPI } from '../core/OpenAPI';
@@ -12,7 +12,7 @@ import { request as __request } from '../core/request';
 export class RedirectManagementResource {
 
     /**
-     * @returns PagedRedirectUrl Success
+     * @returns PagedRedirectUrlModel Success
      * @throws ApiError
      */
     public static getRedirectManagement({
@@ -23,7 +23,7 @@ export class RedirectManagementResource {
         filter?: string,
         skip?: number,
         take?: number,
-    }): CancelablePromise<PagedRedirectUrl> {
+    }): CancelablePromise<PagedRedirectUrlModel> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/redirect-management',
@@ -39,7 +39,7 @@ export class RedirectManagementResource {
     }
 
     /**
-     * @returns PagedRedirectUrl Success
+     * @returns PagedRedirectUrlModel Success
      * @throws ApiError
      */
     public static getRedirectManagementByKey({
@@ -50,7 +50,7 @@ export class RedirectManagementResource {
         key: string,
         skip?: number,
         take?: number,
-    }): CancelablePromise<PagedRedirectUrl> {
+    }): CancelablePromise<PagedRedirectUrlModel> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/redirect-management/{key}',
@@ -83,10 +83,10 @@ export class RedirectManagementResource {
     }
 
     /**
-     * @returns RedirectUrlStatus Success
+     * @returns any Success
      * @throws ApiError
      */
-    public static getRedirectManagementStatus(): CancelablePromise<RedirectUrlStatus> {
+    public static getRedirectManagementStatus(): CancelablePromise<RedirectUrlStatusModel> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/redirect-management/status',
@@ -100,7 +100,7 @@ export class RedirectManagementResource {
     public static postRedirectManagementStatus({
         status,
     }: {
-        status?: RedirectStatus,
+        status?: RedirectStatusModel,
     }): CancelablePromise<any> {
         return __request(OpenAPI, {
             method: 'POST',

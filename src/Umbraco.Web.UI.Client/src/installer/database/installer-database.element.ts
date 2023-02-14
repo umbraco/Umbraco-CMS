@@ -3,7 +3,12 @@ import { css, CSSResultGroup, html, nothing } from 'lit';
 import { customElement, property, query, state } from 'lit/decorators.js';
 
 import { UmbInstallerContext, UMB_INSTALLER_CONTEXT_TOKEN } from '../installer.context';
-import { DatabaseInstall, DatabaseSettings, InstallResource, ProblemDetails } from '@umbraco-cms/backend-api';
+import {
+	DatabaseInstallModel,
+	DatabaseSettingsModel,
+	InstallResource,
+	ProblemDetailsModel,
+} from '@umbraco-cms/backend-api';
 import { UmbLitElement } from '@umbraco-cms/element';
 import { tryExecute } from '@umbraco-cms/resources';
 
@@ -77,16 +82,16 @@ export class UmbInstallerDatabaseElement extends UmbLitElement {
 	private _installButton!: UUIButtonElement;
 
 	@property({ attribute: false })
-	public databaseFormData!: DatabaseInstall;
+	public databaseFormData!: DatabaseInstallModel;
 
 	@state()
 	private _options: Option[] = [];
 
 	@state()
-	private _databases: DatabaseSettings[] = [];
+	private _databases: DatabaseSettingsModel[] = [];
 
 	@state()
-	private _preConfiguredDatabase?: DatabaseSettings;
+	private _preConfiguredDatabase?: DatabaseSettingsModel;
 
 	@state()
 	private _validationErrorMessage = '';
@@ -134,7 +139,7 @@ export class UmbInstallerDatabaseElement extends UmbLitElement {
 		if (!this._installerContext) return;
 
 		this.observe(this._installerContext.data, (data) => {
-			this.databaseFormData = data?.database ?? ({} as DatabaseInstall);
+			this.databaseFormData = data?.database ?? {};
 			this._options.forEach((x, i) => (x.selected = data?.database?.id === x.value || i === 0));
 		});
 	}
@@ -146,7 +151,7 @@ export class UmbInstallerDatabaseElement extends UmbLitElement {
 		value[target.name] = target.checked ?? target.value; // handle boolean and text inputs
 
 		// TODO: Mark id and providerName as non-optional in schema
-		const database: DatabaseInstall = {
+		const database: DatabaseInstallModel = {
 			id: '0',
 			providerName: '',
 			...this._installerContext?.getData().database,
@@ -156,7 +161,7 @@ export class UmbInstallerDatabaseElement extends UmbLitElement {
 		this._setDatabase(database);
 	}
 
-	private _setDatabase(database: DatabaseInstall) {
+	private _setDatabase(database: DatabaseInstallModel) {
 		this._installerContext?.appendData({ database });
 	}
 
@@ -194,7 +199,7 @@ export class UmbInstallerDatabaseElement extends UmbLitElement {
 			}
 
 			if (selectedDatabase.requiresConnectionTest) {
-				const databaseDetails: DatabaseInstall = {
+				const databaseDetails: DatabaseInstallModel = {
 					id,
 					username,
 					password,
@@ -216,7 +221,7 @@ export class UmbInstallerDatabaseElement extends UmbLitElement {
 				}
 			}
 
-			const database: DatabaseInstall = {
+			const database: DatabaseInstallModel = {
 				...this._installerContext?.getData().database,
 				id,
 				username,
@@ -251,7 +256,7 @@ export class UmbInstallerDatabaseElement extends UmbLitElement {
 		history.replaceState(null, '', '/content');
 	}
 
-	private _handleRejected(e: ProblemDetails) {
+	private _handleRejected(e: ProblemDetailsModel) {
 		this._installerContext?.setInstallStatus(e);
 	}
 
@@ -392,7 +397,7 @@ export class UmbInstallerDatabaseElement extends UmbLitElement {
 		${this._renderSettings()}
 	`;
 
-	private _renderPreConfiguredDatabase = (database: DatabaseSettings) => html`
+	private _renderPreConfiguredDatabase = (database: DatabaseSettingsModel) => html`
 		<p>A database has already been pre-configured on the server and will be used:</p>
 		<p>
 			Type: <strong>${database.displayName}</strong>

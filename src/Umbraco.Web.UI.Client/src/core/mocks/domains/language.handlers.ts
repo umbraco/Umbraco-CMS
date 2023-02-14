@@ -1,7 +1,7 @@
 import { rest } from 'msw';
 import { v4 as uuidv4 } from 'uuid';
 import { umbLanguagesData } from '../data/languages.data';
-import { Language } from '@umbraco-cms/backend-api';
+import { LanguageModel } from '@umbraco-cms/backend-api';
 import { umbracoPath } from '@umbraco-cms/utils';
 
 // TODO: add schema
@@ -31,7 +31,7 @@ export const handlers = [
 		return res(ctx.status(200), ctx.json(item));
 	}),
 
-	rest.post<Language>(umbracoPath('/language'), async (req, res, ctx) => {
+	rest.post<LanguageModel>(umbracoPath('/language'), async (req, res, ctx) => {
 		const data = await req.json();
 
 		if (!data) return;
@@ -44,7 +44,7 @@ export const handlers = [
 		return res(ctx.status(200), ctx.json(saved[0]));
 	}),
 
-	rest.put<Language>(umbracoPath('/language/:key'), async (req, res, ctx) => {
+	rest.put<LanguageModel>(umbracoPath('/language/:key'), async (req, res, ctx) => {
 		const data = await req.json();
 
 		if (!data) return;
