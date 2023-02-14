@@ -2643,11 +2643,12 @@ public class ContentService : RepositoryService, IContentService
     /// </summary>
     /// <param name="content">The <see cref="IContent" /> to copy</param>
     /// <param name="parentId">Id of the Content's new Parent</param>
+    /// <param name="parentKey">Key of the Content's new Parent</param>
     /// <param name="relateToOriginal">Boolean indicating whether the copy should be related to the original</param>
     /// <param name="recursive">A value indicating whether to recursively copy children.</param>
     /// <param name="userId">Optional Id of the User copying the Content</param>
     /// <returns>The newly created <see cref="IContent" /> object</returns>
-    public IContent? Copy(IContent content, int parentId, bool relateToOriginal, bool recursive, int userId = Constants.Security.SuperUserId)
+    public IContent? Copy(IContent content, int parentId, Guid? parentKey, bool relateToOriginal, bool recursive, int userId = Constants.Security.SuperUserId)
     {
         EventMessages eventMessages = EventMessagesFactory.Get();
 
@@ -2657,7 +2658,7 @@ public class ContentService : RepositoryService, IContentService
         using (ICoreScope scope = ScopeProvider.CreateCoreScope())
         {
             if (scope.Notifications.PublishCancelable(
-                    new ContentCopyingNotification(content, copy, parentId, eventMessages)))
+                    new ContentCopyingNotification(content, copy, parentId, parentKey, eventMessages)))
             {
                 scope.Complete();
                 return null;
@@ -2720,7 +2721,7 @@ public class ContentService : RepositoryService, IContentService
                         descendantCopy.ParentId = parentId;
 
                         if (scope.Notifications.PublishCancelable(
-                                new ContentCopyingNotification(descendant, descendantCopy, parentId, eventMessages)))
+                                new ContentCopyingNotification(descendant, descendantCopy, parentId, parentKey, eventMessages)))
                         {
                             continue;
                         }
@@ -2760,6 +2761,15 @@ public class ContentService : RepositoryService, IContentService
         }
 
         return copy;
+    }
+
+    public IContent? Copy(IContent content, int parentId, bool relateToOriginal, bool recursive, int userId = Constants.Security.SuperUserId)
+    {
+        IEntityService entityService = StaticServiceProvider.Instance.GetRequiredService<IEntityService>();
+        Attempt<Guid> result = entityService.GetKey(parentId, UmbracoObjectTypes.Document);
+        return result.Success
+            ? Copy(content, parentId, result.Result, relateToOriginal, true, userId)
+            : Copy(content, parentId, null, relateToOriginal, true, userId);
     }
 
     /// <summary>

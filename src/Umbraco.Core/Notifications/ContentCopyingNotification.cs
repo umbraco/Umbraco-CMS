@@ -8,7 +8,7 @@ namespace Umbraco.Cms.Core.Notifications;
 
 public sealed class ContentCopyingNotification : CopyingNotification<IContent>
 {
-    public ContentCopyingNotification(IContent original, IContent copy, int parentId, Guid parentKey, EventMessages messages)
+    public ContentCopyingNotification(IContent original, IContent copy, int parentId, Guid? parentKey, EventMessages messages)
         : base(original, copy, parentId, parentKey, messages)
     {
     }
