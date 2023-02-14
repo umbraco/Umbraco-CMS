@@ -6,4 +6,3 @@ export type SavedLogSearchModel = {
     name?: string;
     query?: string;
 };
-
