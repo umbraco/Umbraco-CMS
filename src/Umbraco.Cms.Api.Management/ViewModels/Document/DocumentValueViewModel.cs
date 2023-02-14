@@ -2,6 +2,6 @@
 
 namespace Umbraco.Cms.Api.Management.ViewModels.Document;
 
-public class DocumentPropertyViewModel : PropertyViewModelBase
+public class DocumentValueViewModel : ValueViewModelBase
 {
 }

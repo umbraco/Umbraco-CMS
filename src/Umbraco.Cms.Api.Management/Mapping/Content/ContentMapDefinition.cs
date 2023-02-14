@@ -5,20 +5,20 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Mapping.Content;
 
-public abstract class ContentMapDefinition<TContent, TPropertyViewModel, TVariantViewModel>
+public abstract class ContentMapDefinition<TContent, TValueViewModel, TVariantViewModel>
     where TContent : IContentBase
-    where TPropertyViewModel : PropertyViewModelBase, new()
+    where TValueViewModel : ValueViewModelBase, new()
     where TVariantViewModel : VariantViewModelBase, new()
 {
     private readonly PropertyEditorCollection _propertyEditorCollection;
 
     protected ContentMapDefinition(PropertyEditorCollection propertyEditorCollection) => _propertyEditorCollection = propertyEditorCollection;
 
-    protected delegate void PropertyViewModelMapping(IDataEditor propertyEditor, TPropertyViewModel variantViewModel);
+    protected delegate void ValueViewModelMapping(IDataEditor propertyEditor, TValueViewModel variantViewModel);
 
     protected delegate void VariantViewModelMapping(string? culture, string? segment, TVariantViewModel variantViewModel);
 
-    protected IEnumerable<TPropertyViewModel> MapPropertyViewModels(TContent source, PropertyViewModelMapping? additionalPropertyMapping = null) =>
+    protected IEnumerable<TValueViewModel> MapValueViewModels(TContent source, ValueViewModelMapping? additionalPropertyMapping = null) =>
         source
             .Properties
             .SelectMany(property => property
@@ -31,15 +31,15 @@ public abstract class ContentMapDefinition<TContent, TPropertyViewModel, TVarian
                         return null;
                     }
 
-                    var propertyViewModel = new TPropertyViewModel
+                    var variantViewModel = new TValueViewModel
                     {
                         Culture = propertyValue.Culture,
                         Segment = propertyValue.Segment,
                         Alias = property.Alias,
                         Value = propertyEditor.GetValueEditor().ToEditor(property, propertyValue.Culture, propertyValue.Segment)
                     };
-                    additionalPropertyMapping?.Invoke(propertyEditor, propertyViewModel);
-                    return propertyViewModel;
+                    additionalPropertyMapping?.Invoke(propertyEditor, variantViewModel);
+                    return variantViewModel;
                 }))
             .WhereNotNull()
             .ToArray();

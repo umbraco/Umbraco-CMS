@@ -1,6 +1,6 @@
 ﻿namespace Umbraco.Cms.Api.Management.ViewModels.Content;
 
-public abstract class PropertyViewModelBase
+public abstract class ValueViewModelBase
 {
     public string? Culture { get; set; }
 
