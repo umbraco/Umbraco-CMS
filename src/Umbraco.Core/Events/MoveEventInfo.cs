@@ -1,19 +1,23 @@
 namespace Umbraco.Cms.Core.Events;
 
-public class MoveEventInfo<TEntity> : IEquatable<MoveEventInfo<TEntity>>
+public class MoveEventInfo<TEntity> : MoveEventInfoBase<TEntity>
 {
-    public MoveEventInfo(TEntity entity, string originalPath, int newParentId)
+    public MoveEventInfo(TEntity entity, string originalPath, int newParentId, Guid? newParentKey)
+        : base(entity, originalPath)
     {
-        Entity = entity;
-        OriginalPath = originalPath;
         NewParentId = newParentId;
+        NewParentKey = newParentKey;
     }
 
-    public TEntity Entity { get; set; }
+    public MoveEventInfo(TEntity entity, string originalPath, int newParentId) : this(entity, originalPath, newParentId,
+        null)
+    {
+    }
 
-    public string OriginalPath { get; set; }
-
+    [Obsolete("Please use NewParentKey instead, scheduled for removal in V15")]
     public int NewParentId { get; set; }
+
+    public Guid? NewParentKey { get; }
 
     public static bool operator ==(MoveEventInfo<TEntity> left, MoveEventInfo<TEntity> right) => Equals(left, right);
 
@@ -29,7 +33,11 @@ public class MoveEventInfo<TEntity> : IEquatable<MoveEventInfo<TEntity>>
             return true;
         }
 
-        return EqualityComparer<TEntity>.Default.Equals(Entity, other.Entity) && NewParentId == other.NewParentId &&
+        return EqualityComparer<TEntity>.Default.Equals(
+                   Entity,
+                   other.Entity) &&
+               NewParentId == other.NewParentId &&
+               NewParentKey == other.NewParentKey &&
                string.Equals(OriginalPath, other.OriginalPath);
     }
 
