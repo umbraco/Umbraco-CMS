@@ -2404,8 +2404,8 @@ public class ContentService : RepositoryService, IContentService
             scope.Notifications.Publish(
                 new ContentTreeChangeNotification(content, TreeChangeTypes.RefreshBranch, eventMessages));
 
-            MoveEventInfo<IContent>[] moveInfo = moves
-                .Select(x => new MoveEventInfo<IContent>(x.Item1, x.Item2, x.Item1.ParentId))
+            MoveToRecycleBinEventInfo<IContent>[] moveInfo = moves
+                .Select(x => new MoveToRecycleBinEventInfo<IContent>(x.Item1, x.Item2))
                 .ToArray();
 
             scope.Notifications.Publish(
@@ -3445,8 +3445,8 @@ public class ContentService : RepositoryService, IContentService
                 changes.Add(new TreeChange<IContent>(content, TreeChangeTypes.Remove));
             }
 
-            MoveEventInfo<IContent>[] moveInfos = moves
-                .Select(x => new MoveEventInfo<IContent>(x.Item1, x.Item2, x.Item1.ParentId))
+            MoveToRecycleBinEventInfo<IContent>[] moveInfos = moves
+                .Select(x => new MoveToRecycleBinEventInfo<IContent>(x.Item1, x.Item2))
                 .ToArray();
             if (moveInfos.Length > 0)
             {
