@@ -62,7 +62,7 @@ public class UserMapDefinition : IMapDefinition
         _userGroupService = userGroupService;
     }
 
-    [Obsolete("User constructor that takes IUserGroupService, scheduled for removal in V15.")]
+    [Obsolete("Use constructor that takes IUserGroupService, scheduled for removal in V15.")]
     public UserMapDefinition(
         ILocalizedTextService textService,
         IUserService userService,
