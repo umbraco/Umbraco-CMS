@@ -52,20 +52,19 @@ public class SliderValueConverter : PropertyValueConverterBase
         bool isRange = IsRange(propertyType);
 
         var sourceString = source?.ToString();
-        if (string.IsNullOrEmpty(sourceString))
-        {
-            return isRange
-                ? new Range<decimal>()
-                : default(decimal);
-        }
 
         return isRange
             ? HandleRange(sourceString)
             : HandleDecimal(sourceString);
     }
 
-    private static object? HandleRange(string sourceString)
+    private static Range<decimal> HandleRange(string? sourceString)
     {
+        if (sourceString is null)
+        {
+            return new Range<decimal>();
+        }
+
         string[] rangeRawValues = sourceString.Split(Constants.CharArrays.Comma);
 
         if (TryParseDecimal(rangeRawValues[0], out var minimum))
@@ -93,8 +92,12 @@ public class SliderValueConverter : PropertyValueConverterBase
         return new Range<decimal>();
     }
 
-    private static object? HandleDecimal(string sourceString)
+    private static decimal HandleDecimal(string? sourceString)
     {
+        if (string.IsNullOrEmpty(sourceString))
+        {
+            return default;
+        }
 
         // This used to be a range slider, so we'll assign the minimum value as the new value
         if (sourceString.Contains(','))
@@ -111,7 +114,7 @@ public class SliderValueConverter : PropertyValueConverterBase
             return value;
         }
 
-        return default(decimal);
+        return default;
     }
 
     /// <summary>
