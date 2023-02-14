@@ -11,7 +11,7 @@ import { html } from 'lit-html';
 import { initialize, mswDecorator } from 'msw-storybook-addon';
 import { setCustomElements } from '@storybook/web-components';
 
-import { UmbDataTypeStore } from '../src/backoffice/settings/data-types/repository/data-type.store.ts';
+import { UMB_DATA_TYPE_STORE_CONTEXT_TOKEN, UmbDataTypeStore } from '../src/backoffice/settings/data-types/repository/data-type.store.ts';
 import {
 	UMB_DOCUMENT_TYPE_STORE_CONTEXT_TOKEN,
 	UmbDocumentTypeStore,
