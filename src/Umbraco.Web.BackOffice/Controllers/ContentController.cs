@@ -2297,12 +2297,12 @@ public class ContentController : ContentControllerBase
         ILanguage[] languages = _localizationService.GetAllLanguages().ToArray();
 
         // Process language
-        var language = model.Language > 0 ? languages.FirstOrDefault(l => l.Id == model.Language) : null;
+        ILanguage? language = model.Language > 0 ? languages.FirstOrDefault(l => l.Id == model.Language) : null;
         if (language is not null)
         {
             // Update or create language on wildcard domain
-            var assignedWildcardDomain = assignedDomains.FirstOrDefault(d => d.IsWildcard);
-            if (assignedWildcardDomain != null)
+            IDomain? assignedWildcardDomain = assignedDomains.FirstOrDefault(d => d.IsWildcard);
+            if (assignedWildcardDomain is not null)
             {
                 assignedWildcardDomain.LanguageId = language.Id;
             }

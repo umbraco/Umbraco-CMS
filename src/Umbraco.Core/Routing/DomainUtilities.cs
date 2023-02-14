@@ -173,7 +173,7 @@ namespace Umbraco.Cms.Core.Routing
             // sanitize the list to have proper uris for comparison (scheme, path end with /)
             // we need to end with / because example.com/foo cannot match example.com/foobar
             // we need to order so example.com/foo matches before example.com/
-            var domainsAndUris = SelectDomains(domains, uri)?.ToArray();
+            DomainAndUri[]? domainsAndUris = SelectDomains(domains, uri)?.ToArray();
 
             // nothing = no magic, return null
             if (domainsAndUris is null || domainsAndUris.Length == 0)
@@ -316,7 +316,7 @@ namespace Umbraco.Cms.Core.Routing
         /// <param name="uri">The uri, or null.</param>
         /// <returns>The domains and their normalized uris, that match the specified uri.</returns>
         [return: NotNullIfNotNull(nameof(domains))]
-        internal static IEnumerable<DomainAndUri>? SelectDomains(IEnumerable<Domain>? domains, Uri uri)
+        private static IEnumerable<DomainAndUri>? SelectDomains(IEnumerable<Domain>? domains, Uri uri)
             // TODO: where are we matching ?!!?
             => domains?.Where(d => d.IsWildcard == false).Select(d => new DomainAndUri(d, uri));
 
