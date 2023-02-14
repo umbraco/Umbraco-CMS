@@ -16,6 +16,7 @@ public abstract class CopyingNotification<T> : CancelableObjectNotification<T>
         ParentKey = parentKey;
     }
 
+    [Obsolete("Please use constructor that takes a parent key, scheduled for removal in V15")]
     protected CopyingNotification(T original, T copy, int parentId, EventMessages messages)
         : this(original, copy, parentId, null, messages)
     {

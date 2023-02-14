@@ -14,7 +14,7 @@ public sealed class ContentCopyingNotification : CopyingNotification<IContent>
     }
 
     public ContentCopyingNotification(IContent original, IContent copy, int parentId, EventMessages messages)
-        : base(original, copy, parentId, messages)
+        : this(original, copy, parentId, null, messages)
     {
     }
 }
