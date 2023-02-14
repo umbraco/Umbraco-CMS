@@ -1,6 +1,6 @@
 ﻿namespace Umbraco.Cms.Api.Management.ViewModels.Tree;
 
-public class EntityTreeItemViewModel : TreeItemViewModel
+public class EntityTreeItemViewModel : TreeItemViewModel, INamedEntityViewModel
 {
     public Guid Key { get; set; }
 
