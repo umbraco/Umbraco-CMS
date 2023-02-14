@@ -158,6 +158,9 @@
                     items: ".umb-group-builder__property-sortable",
                     stop: (e, ui) => {
                         updatePropertiesSortOrder();
+
+                        // when a property is dropped we need to reset the requested tab hover alias
+                        scope.sortableRequestedTabAlias = undefined;
                     }
                 };
 

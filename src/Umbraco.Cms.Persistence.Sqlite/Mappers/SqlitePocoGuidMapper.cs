@@ -1,3 +1,4 @@
+using System.Globalization;
 using NPoco;
 
 namespace Umbraco.Cms.Persistence.Sqlite.Mappers;
@@ -25,6 +26,24 @@ public class SqlitePocoGuidMapper : DefaultMapper
                 }
 
                 return default(Guid?);
+            };
+        }
+
+        if (destType == typeof(decimal))
+        {
+            return value =>
+            {
+                var result = Convert.ToDecimal(value, CultureInfo.InvariantCulture);
+                return result;
+            };
+        }
+
+        if (destType == typeof(decimal?))
+        {
+            return value =>
+            {
+                var result = Convert.ToDecimal(value, CultureInfo.InvariantCulture);
+                return result;
             };
         }
 

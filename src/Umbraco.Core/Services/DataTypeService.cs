@@ -36,7 +36,7 @@ namespace Umbraco.Cms.Core.Services.Implement
         private readonly IJsonSerializer _jsonSerializer;
         private readonly IEditorConfigurationParser _editorConfigurationParser;
 
-        [Obsolete("Please use constructor that takes an ")]
+        [Obsolete("Please use constructor that takes an IEditorConfigurationParser. Will be removed in V13.")]
         public DataTypeService(
             IDataValueEditorFactory dataValueEditorFactory,
             ICoreScopeProvider provider,
