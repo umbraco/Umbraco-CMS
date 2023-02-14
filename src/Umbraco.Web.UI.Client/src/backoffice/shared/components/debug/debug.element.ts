@@ -1,7 +1,7 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html, LitElement, nothing } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
-import { UmbContextRequestEventImplementation, umbContextRequestEventType } from '@umbraco-cms/context-api';
+import { UmbContextDebugRequest, UmbContextRequestEventImplementation, umbContextRequestEventType } from '@umbraco-cms/context-api';
 
 
 @customElement('umb-debug')
@@ -27,7 +27,7 @@ export class UmbDebug extends LitElement {
 			}
 
 			.events.open {
-				height:200px;
+				height:auto;
 			}
 
 			.events > div {
@@ -43,8 +43,8 @@ export class UmbDebug extends LitElement {
     @property({reflect: true, type: Boolean})
     enabled = false;
 
-	@property({type: Array<String>})
-	contextAliases = ['UmbTemplateDetailStore', 'umbLanguageStore'];
+	@property()
+	contextAliases = new Map();
 
     @state()
 	private _debugPaneOpen = false;
@@ -55,15 +55,13 @@ export class UmbDebug extends LitElement {
 
 	connectedCallback(): void {
 		super.connectedCallback();
-
-		// Create event that bubbles up through the DOM
-		const event = new CustomEvent('umb:debug-contexts', {
-			bubbles: true,
-			composed: true			
-		});
-
+		
 		// Dispatch it
-		this.dispatchEvent(event);
+		this.dispatchEvent(new UmbContextDebugRequest((instances)=> {
+			console.log('I have contexts now', instances);
+
+			this.contextAliases = instances;
+		}));
 	}
 
 	render() {
@@ -80,9 +78,7 @@ export class UmbDebug extends LitElement {
 						<div>
 							<h4>Context Aliases to consume</h4>
 							<ul>
-								${this.contextAliases.map((ctxAlias) =>
-									html`<li>${ctxAlias}</li>`
-								)}
+								${this._renderContextAliases()}
 							</ul>
 						</div>						
 					</div>
@@ -91,6 +87,37 @@ export class UmbDebug extends LitElement {
         }
 
         return nothing;
+	}
+
+	private _renderContextAliases() {
+		const aliases = [];
+
+		for (const [alias, instance] of this.contextAliases) {
+			aliases.push(
+				html`
+					<li>
+						${alias}
+						<ul>
+							${this._renderInstance(instance)}
+						</ul>
+					</li>`
+				);
+		}
+
+		return aliases;
+	}
+
+	private _renderInstance(instance: any) {
+		const instanceKeys = [];
+
+		for(const key in instance) {
+			// Goes KABOOM - if try to loop over the class/object
+			// instanceKeys.push(html`<li>${key} = ${instance[key]}</li>`);
+
+			instanceKeys.push(html`<li>${key}</li>`);
+		}
+
+		return instanceKeys;
 	}
 }
 
