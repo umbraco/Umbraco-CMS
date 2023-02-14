@@ -6,7 +6,7 @@ export interface UmbDetailRepository<DetailType> {
 		error?: ProblemDetailsModel;
 	}>;
 
-	requestDetails(key: string): Promise<{
+	requestByKey(key: string): Promise<{
 		data?: DetailType;
 		error?: ProblemDetailsModel;
 	}>;

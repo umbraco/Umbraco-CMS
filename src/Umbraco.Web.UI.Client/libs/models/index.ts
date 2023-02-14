@@ -1,14 +1,9 @@
-import { Observable } from 'rxjs';
 import {
 	ContentTreeItemModel,
-	DocumentTreeItemModel,
-	DocumentTypeTreeItemModel,
 	EntityTreeItemModel,
 	FolderTreeItemModel,
-	PagedEntityTreeItemModel,
 	ProblemDetailsModel,
 } from '@umbraco-cms/backend-api';
-import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 
 // Extension Manifests
 export * from '@umbraco-cms/extensions-registry';
@@ -67,25 +62,20 @@ export interface UserGroupDetails extends UserGroupEntity {
 	permissions: Array<string>;
 }
 
+/*
 // Data Types
 export interface DataTypeDetails extends FolderTreeItemModel {
 	key: string; // TODO: Remove this when the backend is fixed
-	propertyEditorModelAlias: string | null;
-	propertyEditorUIAlias: string | null;
-	data: Array<DataTypePropertyData>;
+	propertyEditorAlias: string | null;
+	propertyEditorUiAlias: string | null;
+	data: Array<DataTypeProperty>;
 }
 
-export interface DataTypePropertyData {
+export interface DataTypeProperty {
 	alias: string;
 	value: any;
 }
-
-// Document Types
-export interface DocumentTypeDetails extends DocumentTypeTreeItemModel {
-	key: string; // TODO: Remove this when the backend is fixed
-	alias: string;
-	properties: [];
-}
+*/
 
 // TODO: Make sure Entity Type/interface.
 export interface MemberTypeDetails extends EntityTreeItemModel {
@@ -105,16 +95,6 @@ export interface ContentProperty {
 export interface ContentPropertyData {
 	alias: string;
 	value: any;
-}
-
-// Documents
-export interface DocumentDetails extends DocumentTreeItemModel {
-	key: string; // TODO: Remove this when the backend is fixed
-	isTrashed: boolean; // TODO: remove only temp part of refactor
-	properties: Array<ContentProperty>;
-	data: Array<ContentPropertyData>;
-	variants: Array<any>; // TODO: define variant data
-	//layout?: any; // TODO: define layout type - make it non-optional
 }
 
 // Media

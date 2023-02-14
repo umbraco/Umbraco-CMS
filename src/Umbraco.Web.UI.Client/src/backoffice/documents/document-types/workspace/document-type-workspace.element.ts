@@ -1,13 +1,12 @@
 import { UUIInputElement, UUIInputEvent } from '@umbraco-ui/uui';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html } from 'lit';
-import { customElement, property, state } from 'lit/decorators.js';
-import { distinctUntilChanged } from 'rxjs';
+import { customElement, state } from 'lit/decorators.js';
+import type { UmbWorkspaceEntityElement } from '../../../shared/components/workspace/workspace-entity-element.interface';
 import { UmbWorkspaceDocumentTypeContext } from './document-type-workspace.context';
-import type { DocumentTypeDetails } from '@umbraco-cms/models';
-import { UmbModalService, UMB_MODAL_SERVICE_CONTEXT_TOKEN } from 'src/core/modal';
+import type { DocumentTypeModel } from '@umbraco-cms/backend-api';
 import { UmbLitElement } from '@umbraco-cms/element';
-import type { UmbWorkspaceEntityElement } from 'src/backoffice/shared/components/workspace/workspace-entity-element.interface';
+import { UmbModalService, UMB_MODAL_SERVICE_CONTEXT_TOKEN } from '@umbraco-cms/modal';
 
 @customElement('umb-document-type-workspace')
 export class UmbDocumentTypeWorkspaceElement extends UmbLitElement implements UmbWorkspaceEntityElement {
@@ -46,11 +45,10 @@ export class UmbDocumentTypeWorkspaceElement extends UmbLitElement implements Um
 		name: 'umb:document-dashed-line',
 	};
 
-
 	private _workspaceContext: UmbWorkspaceDocumentTypeContext = new UmbWorkspaceDocumentTypeContext(this);
 
 	@state()
-	private _documentType?: DocumentTypeDetails;
+	private _documentType?: DocumentTypeModel;
 
 	private _modalService?: UmbModalService;
 
@@ -61,9 +59,9 @@ export class UmbDocumentTypeWorkspaceElement extends UmbLitElement implements Um
 			this._modalService = instance;
 		});
 
-		this.observe(this._workspaceContext.data.pipe(distinctUntilChanged()), (data) => {
-			// TODO: make method to identify if data is of type DocumentTypeDetails
-			this._documentType = data as DocumentTypeDetails;
+		this.observe(this._workspaceContext.data, (data) => {
+			// TODO: make method to identify if data is of type DocumentType
+			this._documentType = data as DocumentType;
 		});
 	}
 

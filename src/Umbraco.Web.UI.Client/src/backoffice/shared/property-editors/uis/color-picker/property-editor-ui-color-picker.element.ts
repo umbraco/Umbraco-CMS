@@ -1,11 +1,10 @@
 import { html } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
-import { ifDefined } from 'lit/directives/if-defined';
 import { UUIColorSwatchesEvent } from '@umbraco-ui/uui';
+import '../../../../shared/components/color-picker/color-picker.element';
 import { UmbLitElement } from '@umbraco-cms/element';
-import type { DataTypePropertyData } from '@umbraco-cms/models';
-import type { UmbColorPickerElement } from 'src/backoffice/shared/components/color-picker/color-picker.element';
+import type { DataTypePropertyModel } from '@umbraco-cms/backend-api';
 
 /**
  * @element umb-property-editor-ui-color-picker
@@ -24,7 +23,7 @@ export class UmbPropertyEditorUIColorPickerElement extends UmbLitElement {
 	private _colorSwatches: string[] = [];
 
 	@property({ type: Array, attribute: false })
-	public set config(config: Array<DataTypePropertyData>) {
+	public set config(config: Array<DataTypePropertyModel>) {
 		const includeLabels = config.find((x) => x.alias === 'includeLabels');
 		if (includeLabels) this._includeLabels = includeLabels.value;
 

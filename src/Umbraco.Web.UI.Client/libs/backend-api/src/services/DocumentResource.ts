@@ -1,6 +1,7 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
+import type { DocumentModel } from '../models/DocumentModel';
 import type { DocumentTreeItemModel } from '../models/DocumentTreeItemModel';
 import type { PagedDocumentTreeItemModel } from '../models/PagedDocumentTreeItemModel';
 import type { PagedRecycleBinItemModel } from '../models/PagedRecycleBinItemModel';
@@ -10,6 +11,27 @@ import { OpenAPI } from '../core/OpenAPI';
 import { request as __request } from '../core/request';
 
 export class DocumentResource {
+
+    /**
+     * @returns any Success
+     * @throws ApiError
+     */
+    public static getDocumentByKey({
+        key,
+    }: {
+        key: string,
+    }): CancelablePromise<DocumentModel> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/umbraco/management/api/v1/document/{key}',
+            path: {
+                'key': key,
+            },
+            errors: {
+                404: `Not Found`,
+            },
+        });
+    }
 
     /**
      * @returns PagedRecycleBinItemModel Success

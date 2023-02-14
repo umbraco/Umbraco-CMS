@@ -52,7 +52,7 @@ export class UmbMediaWorkspaceContext
 	}
 
 	async load(entityKey: string) {
-		const { data } = await this.#detailRepository.requestDetails(entityKey);
+		const { data } = await this.#detailRepository.requestByKey(entityKey);
 		if (data) {
 			this.#isNew = false;
 			this.#data.next(data);

@@ -50,23 +50,23 @@ export class UmbVariantSelectorElement extends UmbLitElement {
 		super();
 
 		// TODO: Figure out how to get the magic string for the workspace context.
-		this.consumeContext<UmbWorkspaceEntityContextInterface<ContentTreeItemModel>>(
-			'umbWorkspaceContext',
-			(instance) => {
-				this._workspaceContext = instance;
-				this._observeWorkspace();
-			}
-		);
+		this.consumeContext<UmbWorkspaceEntityContextInterface<ContentTreeItemModel>>('umbWorkspaceContext', (instance) => {
+			this._workspaceContext = instance;
+			this._observeWorkspace();
+		});
 	}
 
 	private async _observeWorkspace() {
 		if (!this._workspaceContext) return;
 
+		/*
+		// TODO: update this with nre repository and document types.
 		this.observe(this._workspaceContext.data, (data) => {
 			if(data) {
 				this._content = data;
 			}
 		});
+		*/
 	}
 
 	// TODO. find a way where we don't have to do this for all workspaces.

@@ -7,7 +7,6 @@ import {
 	UMB_COLLECTION_CONTEXT_TOKEN,
 } from '../../../../../../shared/collection/collection.context';
 
-import '../../../../../../shared/components/content-property/content-property.element';
 import '../../../../../../shared/collection/dashboards/dashboard-collection.element';
 import type { UmbWorkspaceEntityContextInterface } from '../../../workspace-context/workspace-entity-context.interface';
 import { UmbLitElement } from '@umbraco-cms/element';

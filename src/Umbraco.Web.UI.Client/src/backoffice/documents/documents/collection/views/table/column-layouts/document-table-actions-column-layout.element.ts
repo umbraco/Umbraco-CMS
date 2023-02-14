@@ -1,8 +1,8 @@
 import { css, html, LitElement, nothing } from 'lit';
 import { ifDefined } from 'lit-html/directives/if-defined.js';
 import { customElement, property, state } from 'lit/decorators.js';
-import { UmbExecutedEvent } from 'src/core/events';
 import type { UmbTableColumn, UmbTableItem } from '../../../../../../shared/components/table';
+import { UmbExecutedEvent } from 'src/core/events';
 
 // TODO: this could be done more generic, but for now we just need it for the document table
 @customElement('umb-document-table-actions-column-layout')
