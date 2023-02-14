@@ -1,6 +1,4 @@
-﻿using System.Text.Json;
-using System.Text.Json.Serialization;
-using Umbraco.Cms.Core.Serialization;
+﻿using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Web;
 
 namespace Umbraco.Cms.Infrastructure.Serialization;
@@ -46,24 +44,6 @@ public class ContextualJsonSerializer : IJsonSerializer
         }
 
         return _jsonNetSerializer;
-    }
-
-    private class SystemTextJsonSerializer : IJsonSerializer
-    {
-        private JsonSerializerOptions _jsonSerializerOptions;
-
-        public SystemTextJsonSerializer()
-        {
-            _jsonSerializerOptions = new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase };
-            _jsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
-            _jsonSerializerOptions.Converters.Add(new JsonObjectConverter());
-        }
-
-        public string Serialize(object? input) => JsonSerializer.Serialize(input, _jsonSerializerOptions);
-
-        public T? Deserialize<T>(string input) => JsonSerializer.Deserialize<T>(input, _jsonSerializerOptions);
-
-        public T? DeserializeSubset<T>(string input, string key) => throw new NotSupportedException();
     }
 }
 
