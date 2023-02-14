@@ -96,7 +96,7 @@ export class UmbDebug extends LitElement {
 			aliases.push(
 				html`
 					<li>
-						${alias}
+						Context: <strong>${alias}</strong>
 						<ul>
 							${this._renderInstance(instance)}
 						</ul>
@@ -114,7 +114,15 @@ export class UmbDebug extends LitElement {
 			// Goes KABOOM - if try to loop over the class/object
 			// instanceKeys.push(html`<li>${key} = ${instance[key]}</li>`);
 
-			instanceKeys.push(html`<li>${key}</li>`);
+			// console.log(`key: ${key} = ${value} TYPEOF: ${typeof value}`);
+
+			const value = instance[key];
+			if(typeof value === 'string'){
+				instanceKeys.push(html`<li>${key} = ${instance[key]}</li>`);
+			}
+			else {
+				instanceKeys.push(html`<li>${key}</li>`);
+			}
 		}
 
 		return instanceKeys;
