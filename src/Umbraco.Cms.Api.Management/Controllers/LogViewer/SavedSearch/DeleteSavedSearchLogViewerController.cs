@@ -20,7 +20,7 @@ public class DeleteSavedSearchLogViewerController : SavedSearchLogViewerControll
     /// <returns>The result of the deletion.</returns>
     [HttpDelete("{name}")]
     [MapToApiVersion("1.0")]
-    [ProducesResponseType(typeof(NotFoundResult), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<IActionResult> Delete(string name)
     {

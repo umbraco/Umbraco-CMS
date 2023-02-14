@@ -25,7 +25,7 @@ public class ByNameSavedSearchLogViewerController : SavedSearchLogViewerControll
     /// <returns>The saved log search or not found result.</returns>
     [HttpGet("{name}")]
     [MapToApiVersion("1.0")]
-    [ProducesResponseType(typeof(NotFoundResult), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(SavedLogSearchViewModel), StatusCodes.Status200OK)]
     public async Task<ActionResult<SavedLogSearchViewModel>> ByName(string name)
     {
