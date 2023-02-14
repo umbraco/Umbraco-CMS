@@ -41,7 +41,6 @@ public class SetupInstallController : InstallControllerBase
         InstallData data = _mapper.Map<InstallData>(installData)!;
         await _installService.Install(data);
 
-        var backOfficePath = _globalSettings.GetBackOfficePath(_hostingEnvironment);
-        return Created(backOfficePath, null);
+        return Ok();
     }
 }
