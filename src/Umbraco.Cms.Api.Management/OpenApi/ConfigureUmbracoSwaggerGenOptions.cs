@@ -72,6 +72,7 @@ internal sealed class ConfigureUmbracoSwaggerGenOptions : IConfigureOptions<Swag
         swaggerGenOptions.CustomSchemaIds(SchemaIdGenerator.Generate);
         swaggerGenOptions.SupportNonNullableReferenceTypes();
 
+        swaggerGenOptions.OperationFilter<ReponseHeaderOperationFilter>();
         swaggerGenOptions.UseOneOfForPolymorphism();
         swaggerGenOptions.UseAllOfForInheritance();
         swaggerGenOptions.SelectSubTypesUsing(_umbracoJsonTypeInfoResolver.FindSubTypes);
