@@ -34,7 +34,7 @@ import { UmbDictionaryTreeStore } from './translation/dictionary/repository/dict
 import { UmbDocumentBlueprintDetailStore } from './documents/document-blueprints/document-blueprint.detail.store';
 import { UmbDocumentBlueprintTreeStore } from './documents/document-blueprints/document-blueprint.tree.store';
 import { UmbDataTypeStore } from './settings/data-types/repository/data-type.store';
-import { UmbDataTypeTreeStore } from './settings/data-types/tree/data-type.tree.store';
+import { UmbDataTypeTreeStore } from './settings/data-types/repository/data-type.tree.store';
 import { UmbTemplateTreeStore } from './templating/templates/tree/data/template.tree.store';
 import { UmbTemplateDetailStore } from './templating/templates/workspace/data/template.detail.store';
 import { UmbThemeContext } from './themes/theme.context';
