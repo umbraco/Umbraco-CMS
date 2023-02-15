@@ -110,30 +110,32 @@ export class UmbDebug extends LitElement {
 	private _renderInstance(instance: any) {
 		const instanceKeys: TemplateResult[] = [];
 
-		if (typeof instance !== 'object') {
-			return instanceKeys;
-		}
-
-		const methodNames = this.getClassMethodNames(instance);
-		if (methodNames.length) {
-			instanceKeys.push(html`<li>Methods - ${methodNames.join(', ')}</li>`);
-		}
-
-		for (const key in instance) {
-			if (key.startsWith('_')) {
-				continue;
+		if (typeof instance === 'function') {
+			return instanceKeys.push(html`<li>Callable Function</li>`);
+		} else if (typeof instance === 'object') {
+			const methodNames = this.getClassMethodNames(instance);
+			if (methodNames.length) {
+				instanceKeys.push(html`<li>Methods - ${methodNames.join(', ')}</li>`);
 			}
-			// Goes KABOOM - if try to loop over the class/object
-			// instanceKeys.push(html`<li>${key} = ${instance[key]}</li>`);
 
-			// console.log(`key: ${key} = ${value} TYPEOF: ${typeof value}`);
+			for (const key in instance) {
+				if (key.startsWith('_')) {
+					continue;
+				}
+				// Goes KABOOM - if try to loop over the class/object
+				// instanceKeys.push(html`<li>${key} = ${instance[key]}</li>`);
 
-			const value = instance[key];
-			if (typeof value === 'string') {
-				instanceKeys.push(html`<li>${key} = ${value}</li>`);
-			} else {
-				instanceKeys.push(html`<li>${key} (${typeof value})</li>`);
+				// console.log(`key: ${key} = ${value} TYPEOF: ${typeof value}`);
+
+				const value = instance[key];
+				if (typeof value === 'string') {
+					instanceKeys.push(html`<li>${key} = ${value}</li>`);
+				} else {
+					instanceKeys.push(html`<li>${key} (${typeof value})</li>`);
+				}
 			}
+		} else {
+			instanceKeys.push(html`<li>Context is a primitive with value: ${instance}</li>`);
 		}
 
 		return instanceKeys;
