@@ -27,8 +27,8 @@
   </Target>
 
   <Target Name="BuildBelle">
-    <Exec WorkingDirectory="$(ProjectDir)..\Umbraco.Web.UI.Client\" Command="npm ci --no-fund --no-audit --prefer-offline" />
-    <Exec WorkingDirectory="$(ProjectDir)..\Umbraco.Web.UI.Client\" Command="npm run build:skip-tests" />
+    <Exec WorkingDirectory="$(ProjectDir)..\Umbraco.Web.UI.New.Client\" Command="npm ci --no-fund --no-audit --prefer-offline" />
+    <Exec WorkingDirectory="$(ProjectDir)..\Umbraco.Web.UI.New.Client\" Command="npm run build:for:cms" />
   </Target>
 
   <Target Name="CleanBellePreconditions" AfterTargets="Clean" Condition="'$(UmbracoBuild)' == ''">
