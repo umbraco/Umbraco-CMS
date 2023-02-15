@@ -26,12 +26,12 @@ public class GetAllUserGroupController : UserGroupsControllerBase
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedViewModel<UserGroupViewModel>), StatusCodes.Status200OK)]
     public async Task<ActionResult<PagedViewModel<UserGroupViewModel>>> GetAll(int skip = 0, int take = 100)
-
     {
         // FIXME: In the old controller this endpoint had a switch "onlyCurrentUserGroup"
         // If this was enabled we'd only return the groups the current user was in
-        // and even if it was set to false we'd still remove the admin group
-        // This cannot be implemented until auth is further implemented (currently there's no way to get the current user)
+        // and even if it was set to false we'd still remove the admin group.
+        // We still need to have this functionality, however, it does not belong here.
+        // Instead we should implement this functionality on the CurrentUserController
         PagedModel<IUserGroup> userGroups = await _userGroupService.GetAllAsync(skip, take);
 
         var viewModels = _userViewModelFactory.CreateMultiple(userGroups.Items).ToList();
