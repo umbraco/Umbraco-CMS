@@ -215,7 +215,7 @@ public sealed class AuditService : RepositoryService, IAuditService
             {
                 var entityId = _entityRepository.Get(entityKey)!.Id;
                 IQuery<IAuditItem> query = Query<IAuditItem>().Where(x => x.Id == entityId);
-                IQuery<IAuditItem> customFilter = Query<IAuditItem>().Where(x => x.CreateDate == sinceDate);
+                IQuery<IAuditItem>? customFilter = sinceDate.HasValue ? Query<IAuditItem>().Where(x => x.CreateDate >= sinceDate) : null;
 
                 PaginationHelper.ConvertSkipTakeToPaging(skip, take, out var pageNumber, out var pageSize);
 
