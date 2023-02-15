@@ -13,6 +13,7 @@ public sealed class AuditService : RepositoryService, IAuditService
 {
     private readonly IAuditEntryRepository _auditEntryRepository;
     private readonly IUserService _userService;
+    private readonly IEntityRepository _entityRepository;
     private readonly IAuditRepository _auditRepository;
     private readonly Lazy<bool> _isAvailable;
 
@@ -22,12 +23,14 @@ public sealed class AuditService : RepositoryService, IAuditService
         IEventMessagesFactory eventMessagesFactory,
         IAuditRepository auditRepository,
         IAuditEntryRepository auditEntryRepository,
-        IUserService userService)
+        IUserService userService,
+        IEntityRepository entityRepository)
         : base(provider, loggerFactory, eventMessagesFactory)
     {
         _auditRepository = auditRepository;
         _auditEntryRepository = auditEntryRepository;
         _userService = userService;
+        _entityRepository = entityRepository;
         _isAvailable = new Lazy<bool>(DetermineIsAvailable);
     }
 
@@ -210,7 +213,8 @@ public sealed class AuditService : RepositoryService, IAuditService
 
             using (ScopeProvider.CreateCoreScope(autoComplete: true))
             {
-                IQuery<IAuditItem> query = Query<IAuditItem>().Where(x => x.Key == entityKey);
+                var entityId = _entityRepository.Get(entityKey)!.Id;
+                IQuery<IAuditItem> query = Query<IAuditItem>().Where(x => x.Id == entityId);
                 IQuery<IAuditItem> customFilter = Query<IAuditItem>().Where(x => x.CreateDate == sinceDate);
 
                 PaginationHelper.ConvertSkipTakeToPaging(skip, take, out var pageNumber, out var pageSize);
