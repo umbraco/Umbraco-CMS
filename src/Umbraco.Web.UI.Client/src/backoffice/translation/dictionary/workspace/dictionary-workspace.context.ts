@@ -61,7 +61,7 @@ export class UmbWorkspaceDictionaryContext
 	}
 
 	async load(entityKey: string) {
-		const { data } = await this.#repo.requestDetails(entityKey);
+		const { data } = await this.#repo.requestByKey(entityKey);
 		if (data) {
 			this.#data.next(data);
 		}
