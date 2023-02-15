@@ -5,5 +5,5 @@ namespace Umbraco.Cms.Api.Management.Factories;
 
 public interface IAuditLogViewModelFactory
 {
-    IEnumerable<AuditLogByTypeViewModel> CreateAuditLogByTypeViewModel(IEnumerable<IAuditItem> auditItems);
+    IEnumerable<AuditLogByTypeViewModel> CreateAuditLogViewModel(IEnumerable<IAuditItem> auditItems);
 }

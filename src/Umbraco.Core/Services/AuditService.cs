@@ -1,15 +1,18 @@
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Scoping;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Services.Implement;
 
 public sealed class AuditService : RepositoryService, IAuditService
 {
     private readonly IAuditEntryRepository _auditEntryRepository;
+    private readonly IUserService _userService;
     private readonly IAuditRepository _auditRepository;
     private readonly Lazy<bool> _isAvailable;
 
@@ -18,11 +21,13 @@ public sealed class AuditService : RepositoryService, IAuditService
         ILoggerFactory loggerFactory,
         IEventMessagesFactory eventMessagesFactory,
         IAuditRepository auditRepository,
-        IAuditEntryRepository auditEntryRepository)
+        IAuditEntryRepository auditEntryRepository,
+        IUserService userService)
         : base(provider, loggerFactory, eventMessagesFactory)
     {
         _auditRepository = auditRepository;
         _auditEntryRepository = auditEntryRepository;
+        _userService = userService;
         _isAvailable = new Lazy<bool>(DetermineIsAvailable);
     }
 
@@ -181,6 +186,72 @@ public sealed class AuditService : RepositoryService, IAuditService
             IQuery<IAuditItem> query = Query<IAuditItem>().Where(x => x.UserId == userId);
 
             return _auditRepository.GetPagedResultsByQuery(query, pageIndex, pageSize, out totalRecords, orderDirection, auditTypeFilter, customFilter);
+        }
+    }
+
+    public IEnumerable<IAuditItem> GetItemsByKey(
+        Guid entityKey,
+        int skip,
+        int take,
+        out long totalRecords,
+        Direction orderDirection = Direction.Descending,
+        DateTime? sinceDate = null,
+        AuditType[]? auditTypeFilter = null)
+        {
+            if (skip < 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof(skip));
+            }
+
+            if (take <= 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof(take));
+            }
+
+            using (ScopeProvider.CreateCoreScope(autoComplete: true))
+            {
+                IQuery<IAuditItem> query = Query<IAuditItem>().Where(x => x.Key == entityKey);
+                IQuery<IAuditItem> customFilter = Query<IAuditItem>().Where(x => x.CreateDate == sinceDate);
+
+                PaginationHelper.ConvertSkipTakeToPaging(skip, take, out var pageNumber, out var pageSize);
+
+                return _auditRepository.GetPagedResultsByQuery(query, pageNumber, pageSize, out totalRecords, orderDirection, auditTypeFilter, customFilter);
+            }
+        }
+
+    public IEnumerable<IAuditItem> GetPagedItemsByUser(
+        Guid userKey,
+        int skip,
+        int take,
+        out long totalRecords,
+        Direction orderDirection = Direction.Descending,
+        AuditType[]? auditTypeFilter = null,
+        DateTime? sinceDate = null)
+    {
+        if (skip < 0)
+        {
+            throw new ArgumentOutOfRangeException(nameof(skip));
+        }
+
+        if (take <= 0)
+        {
+            throw new ArgumentOutOfRangeException(nameof(take));
+        }
+
+        IUser? user = _userService.GetByKey(userKey);
+
+        if (user is null)
+        {
+            totalRecords = 0;
+            return Enumerable.Empty<IAuditItem>();
+        }
+
+        using (ScopeProvider.CreateCoreScope(autoComplete: true))
+        {
+            IQuery<IAuditItem> query = Query<IAuditItem>().Where(x => x.UserId == user.Id);
+            IQuery<IAuditItem> customFilter = Query<IAuditItem>().Where(x => x.CreateDate == sinceDate);
+
+            return _auditRepository.GetPagedResultsByQuery(query, skip, take, out totalRecords, orderDirection, auditTypeFilter, customFilter);
         }
     }
 

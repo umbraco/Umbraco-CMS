@@ -75,6 +75,62 @@ public interface IAuditService : IService
         IQuery<IAuditItem>? customFilter = null);
 
     /// <summary>
+    ///     Returns paged items in the audit trail for a given user
+    /// </summary>
+    /// <param name="entityKey">The key of the user</param>
+    /// <param name="skip">The amount of entries to skip</param>
+    /// <param name="take">The amount of entiries to take</param>
+    /// <param name="totalRecords">The total amount of entires</param>
+    /// <param name="orderDirection">
+    ///     By default this will always be ordered descending (newest first)
+    /// </param>
+    /// <param name="auditTypeFilter">
+    ///     Since we currently do not have enum support with our expression parser, we cannot query on AuditType in the query
+    ///     or the custom filter
+    ///     so we need to do that here
+    /// </param>
+    /// <param name="sinceDate">
+    ///     If populated, will only return entries after this time.
+    /// </param>
+    /// <returns></returns>
+    IEnumerable<IAuditItem> GetItemsByKey(
+        Guid entityKey,
+        int skip,
+        int take,
+        out long totalRecords,
+        Direction orderDirection = Direction.Descending,
+        DateTime? sinceDate = null,
+        AuditType[]? auditTypeFilter = null) => throw new NotImplementedException();
+
+    /// <summary>
+    ///     Returns paged items in the audit trail for a given user
+    /// </summary>
+    /// <param name="userId"></param>
+    /// <param name="pageIndex"></param>
+    /// <param name="pageSize"></param>
+    /// <param name="totalRecords"></param>
+    /// <param name="orderDirection">
+    ///     By default this will always be ordered descending (newest first)
+    /// </param>
+    /// <param name="auditTypeFilter">
+    ///     Since we currently do not have enum support with our expression parser, we cannot query on AuditType in the query
+    ///     or the custom filter
+    ///     so we need to do that here
+    /// </param>
+    /// <param name="customFilter">
+    ///     Optional filter to be applied
+    /// </param>
+    /// <returns></returns>
+    IEnumerable<IAuditItem> GetPagedItemsByUser(
+        Guid userKey,
+        int skip,
+        int take,
+        out long totalRecords,
+        Direction orderDirection = Direction.Descending,
+        AuditType[]? auditTypeFilter = null,
+        DateTime? sinceDate = null) => throw new NotImplementedException();
+
+    /// <summary>
     ///     Writes an audit entry for an audited event.
     /// </summary>
     /// <param name="performingUserId">The identifier of the user triggering the audited event.</param>
