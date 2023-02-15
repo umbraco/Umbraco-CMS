@@ -2,7 +2,7 @@ using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Migrations;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services;
-
+using IScopeProvider= Umbraco.Cms.Infrastructure.Scoping.IScopeProvider;
 namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade;
 
 /// <summary>
@@ -35,7 +35,6 @@ public class Upgrader
         /// </summary>
         /// <param name="scopeProvider">A scope provider.</param>
         /// <param name="keyValueService">A key-value service.</param>
-        [Obsolete("Please use the Execute method that accepts an Umbraco.Cms.Core.Scoping.ICoreScopeProvider instead.")]
         public ExecutedMigrationPlan Execute(IMigrationPlanExecutor migrationPlanExecutor, IScopeProvider scopeProvider, IKeyValueService keyValueService)
             => Execute(migrationPlanExecutor, (ICoreScopeProvider)scopeProvider, keyValueService);
 

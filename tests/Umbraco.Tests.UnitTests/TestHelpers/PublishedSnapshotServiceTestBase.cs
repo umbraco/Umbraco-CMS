@@ -18,7 +18,6 @@ using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Routing;
-using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Core.Sync;
@@ -28,7 +27,8 @@ using Umbraco.Cms.Infrastructure.PublishedCache.DataSource;
 using Umbraco.Cms.Infrastructure.Serialization;
 using Umbraco.Cms.Tests.Common;
 using Umbraco.Extensions;
-using IScopeProvider = Umbraco.Cms.Infrastructure.Scoping.IScopeProvider;
+using Umbraco.Cms.Infrastructure.Scoping;
+using RepositoryCacheMode = Umbraco.Cms.Core.Scoping.RepositoryCacheMode;
 
 namespace Umbraco.Cms.Tests.UnitTests.TestHelpers;
 
