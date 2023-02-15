@@ -1,5 +1,7 @@
 ﻿using Umbraco.Cms.Api.Management.ViewModels.UserGroups;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models.Membership;
+using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Api.Management.Factories;
 
@@ -26,14 +28,14 @@ public interface IUserGroupViewModelFactory
     /// Creates an <see cref="IUserGroup"/> based on a <see cref="UserGroupSaveModel"/>
     /// </summary>
     /// <param name="saveModel"></param>
-    /// <returns></returns>
-    IUserGroup Create(UserGroupSaveModel saveModel);
+    /// <returns>An attempt indicating if the operation was a success as well as a more detailed <see cref="UserGroupOperationStatus"/>.</returns>
+    Attempt<IUserGroup, UserGroupOperationStatus> Create(UserGroupSaveModel saveModel);
 
     /// <summary>
     /// Converts the values of an update model to fit with the existing backoffice implementations, and maps it to an existing user group.
     /// </summary>
     /// <param name="current">Existing user group to map to.</param>
     /// <param name="update">Update model containing the new values.</param>
-    /// <returns>The updated user group.</returns>
-    IUserGroup Update(IUserGroup current, UserGroupUpdateModel update);
+    /// <returns>An attempt indicating if the operation was a success as well as a more detailed <see cref="UserGroupOperationStatus"/>.</returns>
+    Attempt<IUserGroup, UserGroupOperationStatus> Update(IUserGroup current, UserGroupUpdateModel update);
 }

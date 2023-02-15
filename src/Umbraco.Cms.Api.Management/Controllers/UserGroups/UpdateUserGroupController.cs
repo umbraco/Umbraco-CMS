@@ -35,9 +35,14 @@ public class UpdateUserGroupController : UserGroupsControllerBase
             return NotFound();
         }
 
-        IUserGroup updated = _userGroupViewModelFactory.Update(existingUserGroup, dataTypeUpdateModel);
+        Attempt<IUserGroup, UserGroupOperationStatus> userGroupUpdateAttempt = _userGroupViewModelFactory.Update(existingUserGroup, dataTypeUpdateModel);
+        if (userGroupUpdateAttempt.Success is false)
+        {
+            return UserGroupOperationStatusResult(userGroupUpdateAttempt.Status);
+        }
 
-        Attempt<IUserGroup, UserGroupOperationStatus> result = await _userGroupService.UpdateAsync(updated, -1);
+        IUserGroup userGroup = userGroupUpdateAttempt.Result;
+        Attempt<IUserGroup, UserGroupOperationStatus> result = await _userGroupService.UpdateAsync(userGroup, -1);
 
         return result.Success
             ? Ok()

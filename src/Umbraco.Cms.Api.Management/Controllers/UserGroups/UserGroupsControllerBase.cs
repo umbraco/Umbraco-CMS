@@ -54,6 +54,14 @@ public class UserGroupsControllerBase : ManagementApiControllerBase
                 .WithTitle("Cancelled by notification")
                 .WithDetail("A notification handler prevented the language operation.")
                 .Build()),
+            UserGroupOperationStatus.DocumentStartNodeKeyNotFound => NotFound(new ProblemDetailsBuilder()
+                .WithTitle("Document start node key not found")
+                .WithDetail("The assigned document start node does not exists.")
+                .Build()),
+            UserGroupOperationStatus.MediaStartNodeKeyNotFound => NotFound(new ProblemDetailsBuilder()
+                .WithTitle("Media start node key not found")
+                .WithDetail("The assigned media start node does not exists.")
+                .Build()),
             _ => StatusCode(StatusCodes.Status500InternalServerError, "Unknown dictionary status."),
         };
 }

@@ -4,6 +4,7 @@ using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Extensions;
 
@@ -24,8 +25,6 @@ public class UserGroupViewModelFactory : IUserGroupViewModelFactory
     /// <inheritdoc />
     public UserGroupViewModel Create(IUserGroup userGroup)
     {
-        // We have to get the entity of the start content node and start media node
-        // In order to be able to get the key.
         Guid? contentStartNodeKey = GetKeyFromId(userGroup.StartContentId, UmbracoObjectTypes.Document);
         Guid? mediaStartNodeKey = GetKeyFromId(userGroup.StartMediaId, UmbracoObjectTypes.Media);
 
@@ -46,11 +45,8 @@ public class UserGroupViewModelFactory : IUserGroupViewModelFactory
     public IEnumerable<UserGroupViewModel> CreateMultiple(IEnumerable<IUserGroup> userGroups) =>
         userGroups.Select(Create);
 
-    // TODO: Should we split this class out? Maybe rename it?
-    public IUserGroup Create(UserGroupSaveModel saveModel)
+    public Attempt<IUserGroup, UserGroupOperationStatus> Create(UserGroupSaveModel saveModel)
     {
-        int? contentStartNodeId = GetIdFromKey(saveModel.DocumentStartNodeKey, UmbracoObjectTypes.Document);
-        int? mediaStartNodeId = GetIdFromKey(saveModel.MediaStartNodeKey, UmbracoObjectTypes.Media);
         var cleanedName = saveModel.Name.CleanForXss('[', ']', '(', ')', ':');
 
         var group = new UserGroup(_shortStringHelper)
@@ -60,9 +56,13 @@ public class UserGroupViewModelFactory : IUserGroupViewModelFactory
             Icon = saveModel.Icon,
             HasAccessToAllLanguages = saveModel.HasAccessToAllLanguages,
             PermissionNames = saveModel.Permissions,
-            StartContentId = contentStartNodeId,
-            StartMediaId = mediaStartNodeId,
         };
+
+        Attempt<UserGroupOperationStatus> assignmentAttempt = AssignStartNodesToUserGroup(saveModel, group);
+        if (assignmentAttempt.Success is false)
+        {
+            return Attempt.FailWithStatus<IUserGroup, UserGroupOperationStatus>(assignmentAttempt.Result, group);
+        }
 
         foreach (var section in saveModel.Sections)
         {
@@ -74,16 +74,20 @@ public class UserGroupViewModelFactory : IUserGroupViewModelFactory
             group.AddAllowedLanguage(language);
         }
 
-        return group;
+        return Attempt.SucceedWithStatus<IUserGroup, UserGroupOperationStatus>(UserGroupOperationStatus.Success, group);
     }
 
-    public IUserGroup Update(IUserGroup current, UserGroupUpdateModel update)
+    public Attempt<IUserGroup, UserGroupOperationStatus> Update(IUserGroup current, UserGroupUpdateModel update)
     {
+        Attempt<UserGroupOperationStatus> assignmentAttempt = AssignStartNodesToUserGroup(update, current);
+        if (assignmentAttempt.Success is false)
+        {
+            return Attempt.FailWithStatus(assignmentAttempt.Result, current);
+        }
+
         current.Name = update.Name.CleanForXss('[', ']', '(', ')', ':');
         current.Icon = update.Icon;
         current.HasAccessToAllLanguages = update.HasAccessToAllLanguages;
-        current.StartContentId = GetIdFromKey(update.DocumentStartNodeKey, UmbracoObjectTypes.Document);
-        current.StartMediaId = GetIdFromKey(update.MediaStartNodeKey, UmbracoObjectTypes.Media);
         current.PermissionNames = update.Permissions;
 
         current.ClearAllowedLanguages();
@@ -98,7 +102,36 @@ public class UserGroupViewModelFactory : IUserGroupViewModelFactory
             current.AddAllowedSection(SectionMapper.GetAlias(sectionName));
         }
 
-        return current;
+        return Attempt.SucceedWithStatus(UserGroupOperationStatus.Success, current);
+    }
+
+    private Attempt<UserGroupOperationStatus> AssignStartNodesToUserGroup(UserGroupBase source, IUserGroup target)
+    {
+        if (source.DocumentStartNodeKey is not null)
+        {
+            var contentId = GetIdFromKey(source.DocumentStartNodeKey.Value, UmbracoObjectTypes.Document);
+
+            if (contentId is null)
+            {
+                return Attempt.Fail(UserGroupOperationStatus.DocumentStartNodeKeyNotFound);
+            }
+
+            target.StartContentId = contentId;
+        }
+
+        if (source.MediaStartNodeKey is not null)
+        {
+            var mediaId = GetIdFromKey(source.MediaStartNodeKey.Value, UmbracoObjectTypes.Media);
+
+            if (mediaId is null)
+            {
+                return Attempt.Fail(UserGroupOperationStatus.MediaStartNodeKeyNotFound);
+            }
+
+            target.StartMediaId = mediaId;
+        }
+
+        return Attempt.Succeed(UserGroupOperationStatus.Success);
     }
 
     private Guid? GetKeyFromId(int? id, UmbracoObjectTypes objectType)
@@ -117,14 +150,9 @@ public class UserGroupViewModelFactory : IUserGroupViewModelFactory
         return attempt.Result;
     }
 
-    private int? GetIdFromKey(Guid? key, UmbracoObjectTypes objectType)
+    private int? GetIdFromKey(Guid key, UmbracoObjectTypes objectType)
     {
-        if (key is null)
-        {
-            return null;
-        }
-
-        Attempt<int> attempt = _entityService.GetId(key.Value, objectType);
+        Attempt<int> attempt = _entityService.GetId(key, objectType);
 
         if (attempt.Success is false)
         {

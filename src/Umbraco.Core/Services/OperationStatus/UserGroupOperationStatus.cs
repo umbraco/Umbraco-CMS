@@ -12,5 +12,7 @@ public enum UserGroupOperationStatus
     UnauthorizedMissingSections,
     UnauthorizedStartNodes,
     UnauthorizedMissingUserGroup,
-    CancelledByNotification
+    CancelledByNotification,
+    MediaStartNodeKeyNotFound,
+    DocumentStartNodeKeyNotFound
 }

@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Events;
+using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Persistence;
@@ -18,6 +19,7 @@ internal sealed class UserGroupService : RepositoryService, IUserGroupService
     private readonly IUserGroupRepository _userGroupRepository;
     private readonly IUserGroupAuthorizationService _userGroupAuthorizationService;
     private readonly IUserService _userService;
+    private readonly IEntityService _entityService;
 
     public UserGroupService(
         ICoreScopeProvider provider,
@@ -25,12 +27,14 @@ internal sealed class UserGroupService : RepositoryService, IUserGroupService
         IEventMessagesFactory eventMessagesFactory,
         IUserGroupRepository userGroupRepository,
         IUserGroupAuthorizationService userGroupAuthorizationService,
-        IUserService userService)
+        IUserService userService,
+        IEntityService entityService)
         : base(provider, loggerFactory, eventMessagesFactory)
     {
         _userGroupRepository = userGroupRepository;
         _userGroupAuthorizationService = userGroupAuthorizationService;
         _userService = userService;
+        _entityService = entityService;
     }
 
     /// <inheritdoc/>
@@ -220,6 +224,12 @@ internal sealed class UserGroupService : RepositoryService, IUserGroupService
             return Attempt.FailWithStatus(UserGroupOperationStatus.AlreadyExists, userGroup);
         }
 
+        Attempt<UserGroupOperationStatus> startNodesValidation = ValidateStartNodesExists(userGroup);
+        if (startNodesValidation.Success is false)
+        {
+            return Attempt.FailWithStatus(startNodesValidation.Result, userGroup);
+        }
+
         return UserGroupHasUniqueAlias(userGroup) is false
             ? Attempt.FailWithStatus(UserGroupOperationStatus.DuplicateAlias, userGroup)
             : Attempt.SucceedWithStatus(UserGroupOperationStatus.Success, userGroup);
@@ -272,6 +282,12 @@ internal sealed class UserGroupService : RepositoryService, IUserGroupService
             return Attempt.FailWithStatus(UserGroupOperationStatus.NotFound, userGroup);
         }
 
+        Attempt<UserGroupOperationStatus> startNodesValidation = ValidateStartNodesExists(userGroup);
+        if (startNodesValidation.Success is false)
+        {
+            return Attempt.FailWithStatus(startNodesValidation.Result, userGroup);
+        }
+
         return Attempt.SucceedWithStatus(UserGroupOperationStatus.Success, userGroup);
     }
 
@@ -283,6 +299,23 @@ internal sealed class UserGroupService : RepositoryService, IUserGroupService
         }
 
         return await GetAsync(userGroup.Key) is null;
+    }
+
+    private Attempt<UserGroupOperationStatus> ValidateStartNodesExists(IUserGroup userGroup)
+    {
+        if (userGroup.StartContentId is not null
+            && _entityService.Exists(userGroup.StartContentId.Value, UmbracoObjectTypes.Document) is false)
+        {
+            return Attempt.Fail(UserGroupOperationStatus.DocumentStartNodeKeyNotFound);
+        }
+
+        if (userGroup.StartMediaId is not null
+            && _entityService.Exists(userGroup.StartMediaId.Value, UmbracoObjectTypes.Media) is false)
+        {
+            return Attempt.Fail(UserGroupOperationStatus.MediaStartNodeKeyNotFound);
+        }
+
+        return Attempt.Succeed(UserGroupOperationStatus.Success);
     }
 
     private bool UserGroupHasUniqueAlias(IUserGroup userGroup) => _userGroupRepository.Get(userGroup.Alias) is null;
