@@ -998,6 +998,7 @@ namespace Umbraco.Cms.Core.Services
                     throw new InvalidOperationException("Parent does not exist or is trashed."); // causes rollback
                 }
 
+                // FIXME: Use MoveEventInfo that also takes a parent key when implementing move with parentKey.
                 var moveEventInfo = new MoveEventInfo<IMedia>(media, media.Path, parentId);
                 var movingNotification = new MediaMovingNotification(moveEventInfo, messages);
                 if (scope.Notifications.PublishCancelable(movingNotification))
@@ -1015,6 +1016,7 @@ namespace Umbraco.Cms.Core.Services
                 scope.Notifications.Publish(new MediaTreeChangeNotification(media, TreeChangeTypes.RefreshBranch, messages));
 
                 MoveEventInfo<IMedia>[] moveInfo = moves //changes
+                    // FIXME: Use MoveEventInfo that also takes a parent key when implementing move with parentKey.
                     .Select(x => new MoveEventInfo<IMedia>(x.Item1, x.Item2, x.Item1.ParentId))
                     .ToArray();
                 scope.Notifications.Publish(new MediaMovedNotification(moveInfo, messages).WithStateFrom(movingNotification));

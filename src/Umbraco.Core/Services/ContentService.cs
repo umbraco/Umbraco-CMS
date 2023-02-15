@@ -2458,6 +2458,7 @@ public class ContentService : RepositoryService, IContentService
                 throw new InvalidOperationException("Parent does not exist or is trashed."); // causes rollback
             }
 
+            // FIXME: Use MoveEventInfo that also takes a parent key when implementing move with parentKey.
             var moveEventInfo = new MoveEventInfo<IContent>(content, content.Path, parentId);
 
             var movingNotification = new ContentMovingNotification(moveEventInfo, eventMessages);
@@ -2488,13 +2489,10 @@ public class ContentService : RepositoryService, IContentService
                 new ContentTreeChangeNotification(content, TreeChangeTypes.RefreshBranch, eventMessages));
 
             // changes
-            List<MoveEventInfo<IContent>> moveInfo = new ();
-
-            foreach ((IContent, string) move in moves)
-            {
-                IEntitySlim? parentEntity = _entityRepository.Get(move.Item1.ParentId);
-                moveInfo.Add(new MoveEventInfo<IContent>(move.Item1, move.Item2, move.Item1.ParentId, parentEntity?.Key));
-            }
+            // FIXME: Use MoveEventInfo that also takes a parent key when implementing move with parentKey.
+            MoveEventInfo<IContent>[] moveInfo = moves
+                .Select(x => new MoveEventInfo<IContent>(x.Item1, x.Item2, x.Item1.ParentId))
+                .ToArray();
 
             scope.Notifications.Publish(
                 new ContentMovedNotification(moveInfo, eventMessages).WithStateFrom(movingNotification));
