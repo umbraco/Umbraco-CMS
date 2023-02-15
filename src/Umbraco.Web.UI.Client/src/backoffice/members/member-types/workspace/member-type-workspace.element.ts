@@ -24,15 +24,13 @@ export class UmbMemberTypeWorkspaceElement extends UmbLitElement {
 		`,
 	];
 
-
-
 	@state()
 	private _memberTypeName = '';
 
 	@state()
 	private _unique?: string;
 
-	#workspaceContext: UmbWorkspaceMemberTypeContext = new UmbWorkspaceMemberTypeContext(this);
+	#workspaceContext = new UmbWorkspaceMemberTypeContext(this);
 
 	public load(entityKey: string) {
 		this.#workspaceContext?.load(entityKey);
@@ -45,7 +43,6 @@ export class UmbMemberTypeWorkspaceElement extends UmbLitElement {
 
 	constructor() {
 		super();
-		this.provideContext('umbWorkspaceContext', this.#workspaceContext);
 		this.observe(this.#workspaceContext.name, (memberTypeName) => {
 			if (memberTypeName !== this._memberTypeName) {
 				this._memberTypeName = memberTypeName ?? '';
