@@ -1,3 +1,4 @@
+import { BehaviorSubject } from 'rxjs';
 import { UmbWorkspaceContext } from '../../../shared/components/workspace/workspace-context/workspace-context';
 import { UmbWorkspaceEntityContextInterface } from '../../../shared/components/workspace/workspace-context/workspace-entity-context.interface';
 import { UmbDataTypeRepository } from '../repository/data-type.repository';
@@ -5,17 +6,15 @@ import type { DataTypeModel } from '@umbraco-cms/backend-api';
 import { appendToFrozenArray, ObjectState } from '@umbraco-cms/observable-api';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 
-type EntityType = DataTypeModel;
-
-export class UmbWorkspaceDataTypeContext
+export class UmbDataTypeWorkspaceContext
 	extends UmbWorkspaceContext
-	implements UmbWorkspaceEntityContextInterface<EntityType | undefined>
+	implements UmbWorkspaceEntityContextInterface<DataTypeModel | undefined>
 {
 	#isNew = false;
 	#host: UmbControllerHostInterface;
 	#dataTypeRepository: UmbDataTypeRepository;
 
-	#data = new ObjectState<EntityType | undefined>(undefined);
+	#data = new ObjectState<DataTypeModel | undefined>(undefined);
 	data = this.#data.asObservable();
 	name = this.#data.getObservablePart((data) => data?.name);
 	key = this.#data.getObservablePart((data) => data?.key);
@@ -26,11 +25,11 @@ export class UmbWorkspaceDataTypeContext
 		this.#dataTypeRepository = new UmbDataTypeRepository(this.#host);
 	}
 
-	async load(entityKey: string) {
-		const { data } = await this.#dataTypeRepository.requestByKey(entityKey);
+	async load(key: string) {
+		const { data } = await this.#dataTypeRepository.requestByKey(key);
 		if (data) {
 			this.#isNew = false;
-			this.#data.next(data);
+			this.#data.update(data);
 		}
 	}
 

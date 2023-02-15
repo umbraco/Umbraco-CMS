@@ -23,8 +23,8 @@ import { UmbDocumentStore } from './documents/documents/repository/document.stor
 import { UmbDocumentTreeStore } from './documents/documents/repository/document.tree.store';
 import { UmbMediaDetailStore } from './media/media/repository/media.detail.store';
 import { UmbMediaTreeStore } from './media/media/repository/media.tree.store';
-import { UmbMemberTypeDetailStore } from './members/member-types/member-type.detail.store';
-import { UmbMemberTypeTreeStore } from './members/member-types/member-type.tree.store';
+import { UmbMemberTypeDetailStore } from './members/member-types/repository/member-type.detail.store';
+import { UmbMemberTypeTreeStore } from './members/member-types/repository/member-type.tree.store';
 import { UmbMemberGroupDetailStore } from './members/member-groups/repository/member-group.detail.store';
 import { UmbMemberGroupTreeStore } from './members/member-groups/repository/member-group.tree.store';
 import { UmbMemberDetailStore } from './members/members/member.detail.store';

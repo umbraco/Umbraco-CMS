@@ -6,7 +6,7 @@ const tree: ManifestTree = {
 	alias: 'Umb.Tree.MediaTypes',
 	name: 'Media Types Tree',
 	meta: {
-		repository: UmbMediaTypeRepository
+		repository: UmbMediaTypeRepository,
 	},
 };
 
