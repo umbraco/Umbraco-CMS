@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Common.ViewModels.Pagination;
+using Umbraco.Cms.Api.Management.Factories;
 using Umbraco.Cms.Api.Management.ViewModels.AuditLogs;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
@@ -11,12 +12,12 @@ namespace Umbraco.Cms.Api.Management.Controllers.LogController;
 public class ByTypeAuditLogController : AuditLogControllerBase
 {
     private readonly IAuditService _auditService;
-    private readonly IUmbracoMapper _umbracoMapper;
+    private readonly IAuditLogViewModelFactory _auditLogViewModelFactory;
 
-    public ByTypeAuditLogController(IAuditService auditService, IUmbracoMapper umbracoMapper)
+    public ByTypeAuditLogController(IAuditService auditService, IAuditLogViewModelFactory auditLogViewModelFactory)
     {
         _auditService = auditService;
-        _umbracoMapper = umbracoMapper;
+        _auditLogViewModelFactory = auditLogViewModelFactory;
     }
 
     [HttpGet]
@@ -25,7 +26,7 @@ public class ByTypeAuditLogController : AuditLogControllerBase
     public async Task<ActionResult<PagedViewModel<AuditLogByTypeViewModel>>> ByType(AuditType logType, DateTime? sinceDate = null, int skip = 0, int take = 100)
     {
         IEnumerable<IAuditItem> result = _auditService.GetLogs(logType, sinceDate);
-        IEnumerable<AuditLogByTypeViewModel> mapped = _umbracoMapper.MapEnumerable<IAuditItem, AuditLogByTypeViewModel>(result.Skip(skip).Take(take));
+        IEnumerable<AuditLogByTypeViewModel> mapped = _auditLogViewModelFactory.CreateAuditLogByTypeViewModel(result.Skip(skip).Take(take));
         var viewModel = new PagedViewModel<AuditLogByTypeViewModel>
         {
             Total = result.Count(),

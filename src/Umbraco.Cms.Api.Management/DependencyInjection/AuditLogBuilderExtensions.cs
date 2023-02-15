@@ -1,4 +1,6 @@
-﻿using Umbraco.Cms.Api.Management.Mapping.AuditLog;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Umbraco.Cms.Api.Management.Factories;
+using Umbraco.Cms.Api.Management.Mapping.AuditLog;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Mapping;
 
@@ -8,6 +10,7 @@ internal static class AuditLogBuilderExtensions
 {
     internal static IUmbracoBuilder AddAuditLogs(this IUmbracoBuilder builder)
     {
+        builder.Services.AddTransient<IAuditLogViewModelFactory, AuditLogViewModelFactory>();
         builder.WithCollectionBuilder<MapDefinitionCollectionBuilder>()
             .Add<AuditLogViewModelMapDefinition>();
 
