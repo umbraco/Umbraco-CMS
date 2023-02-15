@@ -4,12 +4,12 @@ import { UmbDictionaryDetailServerDataSource } from './sources/dictionary.detail
 import { UmbDictionaryDetailStore, UMB_DICTIONARY_DETAIL_STORE_CONTEXT_TOKEN } from './dictionary.detail.store';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 import { UmbContextConsumerController } from '@umbraco-cms/context-api';
-import { RepositoryTreeDataSource, UmbTreeRepository } from '@umbraco-cms/repository';
+import { RepositoryTreeDataSource, UmbDetailRepository, UmbTreeRepository } from '@umbraco-cms/repository';
 import { ProblemDetailsModel } from '@umbraco-cms/backend-api';
 import { UmbNotificationService, UMB_NOTIFICATION_SERVICE_CONTEXT_TOKEN } from '@umbraco-cms/notification';
 import type { DictionaryDetails } from '@umbraco-cms/models';
 
-export class UmbDictionaryRepository implements UmbTreeRepository {
+export class UmbDictionaryRepository implements UmbTreeRepository, UmbDetailRepository<DictionaryDetails> {
 	#init!: Promise<unknown>;
 
 	#host: UmbControllerHostInterface;
@@ -114,7 +114,7 @@ export class UmbDictionaryRepository implements UmbTreeRepository {
 		return this.#detailSource.createScaffold(parentKey);
 	}
 
-	async requestDetails(key: string) {
+	async requestByKey(key: string) {
 		await this.#init;
 
 		// TODO: should we show a notification if the key is missing?

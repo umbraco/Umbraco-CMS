@@ -25,7 +25,7 @@ import { UmbMediaDetailStore } from './media/media/repository/media.detail.store
 import { UmbMediaTreeStore } from './media/media/repository/media.tree.store';
 import { UmbMemberTypeDetailStore } from './members/member-types/member-type.detail.store';
 import { UmbMemberTypeTreeStore } from './members/member-types/member-type.tree.store';
-import { UmbMemberGroupDetailStore } from './members/member-groups/member-group.detail.store';
+import { UmbMemberGroupDetailStore } from './members/member-groups/repository/member-group.detail.store';
 import { UmbMemberGroupTreeStore } from './members/member-groups/repository/member-group.tree.store';
 import { UmbMemberDetailStore } from './members/members/member.detail.store';
 import { UmbMemberTreeStore } from './members/members/repository/member.tree.store';
@@ -34,7 +34,7 @@ import { UmbDictionaryTreeStore } from './translation/dictionary/repository/dict
 import { UmbDocumentBlueprintDetailStore } from './documents/document-blueprints/document-blueprint.detail.store';
 import { UmbDocumentBlueprintTreeStore } from './documents/document-blueprints/document-blueprint.tree.store';
 import { UmbDataTypeStore } from './settings/data-types/repository/data-type.store';
-import { UmbDataTypeTreeStore } from './settings/data-types/tree/data-type.tree.store';
+import { UmbDataTypeTreeStore } from './settings/data-types/repository/data-type.tree.store';
 import { UmbTemplateTreeStore } from './templating/templates/tree/data/template.tree.store';
 import { UmbTemplateDetailStore } from './templating/templates/workspace/data/template.detail.store';
 import { UmbThemeContext } from './themes/theme.context';
