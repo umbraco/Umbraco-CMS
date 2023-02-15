@@ -21,12 +21,14 @@ export class UmbDebug extends LitElement {
 			.events {
 				background-color: var(--uui-color-danger);
 				color: var(--uui-color-selected-contrast);
-				height: 0;
-				transition: height 0.3s ease-out;
+				max-height: 0;
+				transition: max-height 0.15s ease-out;
+				overflow: hidden;
 			}
 
 			.events.open {
-				height: auto;
+				max-height: 500px;
+				overflow: auto;
 			}
 
 			.events > div {
