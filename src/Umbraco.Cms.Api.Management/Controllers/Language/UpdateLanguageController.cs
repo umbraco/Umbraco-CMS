@@ -29,7 +29,7 @@ public class UpdateLanguageController : LanguageControllerBase
 
     [HttpPut($"{{{nameof(isoCode)}}}")]
     [MapToApiVersion("1.0")]
-    [ProducesResponseType(typeof(NotFoundResult), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<IActionResult> Update(string isoCode, LanguageUpdateModel languageUpdateModel)
