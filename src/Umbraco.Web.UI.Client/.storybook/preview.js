@@ -11,7 +11,10 @@ import { html } from 'lit-html';
 import { initialize, mswDecorator } from 'msw-storybook-addon';
 import { setCustomElements } from '@storybook/web-components';
 
-import { UMB_DATA_TYPE_STORE_CONTEXT_TOKEN, UmbDataTypeStore } from '../src/backoffice/settings/data-types/repository/data-type.store.ts';
+import {
+	UMB_DATA_TYPE_STORE_CONTEXT_TOKEN,
+	UmbDataTypeStore,
+} from '../src/backoffice/settings/data-types/repository/data-type.store.ts';
 import {
 	UMB_DOCUMENT_TYPE_STORE_CONTEXT_TOKEN,
 	UmbDocumentTypeStore,
@@ -60,19 +63,11 @@ const storybookProvider = (story) => html` <umb-storybook>${story()}</umb-storyb
 
 // TODO: Stop using this context provider element. If we need to continue this path, then we should make a new element which just has a create method that can be used to spin up code. This is because our ContextAPIs provide them self. so no need for a provider element. just a element.
 const dataTypeStoreProvider = (story) => html`
-	<umb-context-provider
-		key=${UMB_DATA_TYPE_STORE_CONTEXT_TOKEN.toString()}
-		.create=${(host) => new UmbDataTypeStore(host)}
-		>${story()}</umb-context-provider
-	>
+	<umb-controller-host-test .create=${(host) => new UmbDataTypeStore(host)}>${story()}</umb-controller-host-test>
 `;
 
 const documentTypeStoreProvider = (story) => html`
-	<umb-context-provider
-		key=${UMB_DOCUMENT_TYPE_STORE_CONTEXT_TOKEN.toString()}
-		.create=${(host) => new UmbDocumentTypeStore(host)}
-		>${story()}</umb-context-provider
-	>
+	<umb-controller-host-test .create=${(host) => new UmbDocumentTypeStore(host)}>${story()}</umb-controller-host-test>
 `;
 
 const modalServiceProvider = (story) => html`
