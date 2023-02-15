@@ -6,17 +6,17 @@ using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.IO;
-using Umbraco.Cms.Infrastructure.Plugin;
+using Umbraco.Cms.Infrastructure.Manifest;
 using Umbraco.Cms.Infrastructure.Serialization;
 
-namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Plugin;
+namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Manifest;
 
 [TestFixture]
-public class PluginConfigurationReaderTests
+public class PackageManifestReaderTests
 {
-    private IPluginConfigurationReader _reader;
+    private IPackageManifestReader _reader;
     private Mock<IDirectoryContents> _rootDirectoryContentsMock;
-    private Mock<ILogger<PluginConfigurationReader>> _loggerMock;
+    private Mock<ILogger<PackageManifestReader>> _loggerMock;
     private Mock<IFileProvider> _fileProviderMock;
 
     [SetUp]
@@ -27,82 +27,82 @@ public class PluginConfigurationReaderTests
         _fileProviderMock
             .Setup(m => m.GetDirectoryContents(Constants.SystemDirectories.AppPlugins))
             .Returns(_rootDirectoryContentsMock.Object);
-        var fileProviderFactoryMock = new Mock<IPluginConfigurationFileProviderFactory>();
+        var fileProviderFactoryMock = new Mock<IPackageManifestFileProviderFactory>();
         fileProviderFactoryMock.Setup(m => m.Create()).Returns(_fileProviderMock.Object);
 
-        _loggerMock = new Mock<ILogger<PluginConfigurationReader>>();
-        _reader = new PluginConfigurationReader(fileProviderFactoryMock.Object, new SystemTextJsonSerializer(), _loggerMock.Object);
+        _loggerMock = new Mock<ILogger<PackageManifestReader>>();
+        _reader = new PackageManifestReader(fileProviderFactoryMock.Object, new SystemTextJsonSerializer(), _loggerMock.Object);
     }
 
     [Test]
-    public async Task Can_Read_PluginConfigurations_At_Root()
+    public async Task Can_Read_PackageManifests_At_Root()
     {
         _rootDirectoryContentsMock
             .Setup(f => f.GetEnumerator())
-            .Returns(new List<IFileInfo> { CreatePluginConfigurationFile() }.GetEnumerator());
+            .Returns(new List<IFileInfo> { CreatePackageManifestFile() }.GetEnumerator());
 
-        var result = await _reader.ReadPluginConfigurationsAsync();
+        var result = await _reader.ReadPackageManifestsAsync();
         Assert.AreEqual(1, result.Count());
 
         var first = result.First();
-        Assert.AreEqual("My Plugin Configuration", first.Name);
+        Assert.AreEqual("My Package", first.Name);
         Assert.AreEqual("1.2.3", first.Version);
         Assert.AreEqual(2, first.Extensions.Count());
         Assert.IsTrue(first.Extensions.All(e => e is JsonElement));
     }
 
     [Test]
-    public async Task Can_Read_PluginConfiguration_In_Root_Directories()
+    public async Task Can_Read_PackageManifest_In_Root_Directories()
     {
-        var plugin1 = CreateDirectoryMock("/my-extension", CreatePluginConfigurationFile(DefaultPluginConfigurationContent("Plugin One")));
-        var plugin2 = CreateDirectoryMock("/my-other-extension", CreatePluginConfigurationFile(DefaultPluginConfigurationContent("Plugin Two")));
+        var directoryOne = CreateDirectoryMock("/my-extension", CreatePackageManifestFile(DefaultPackageManifestContent("Package One")));
+        var directoryTwo = CreateDirectoryMock("/my-other-extension", CreatePackageManifestFile(DefaultPackageManifestContent("Package Two")));
         _rootDirectoryContentsMock
             .Setup(f => f.GetEnumerator())
-            .Returns(new List<IFileInfo> { plugin1, plugin2 }.GetEnumerator());
+            .Returns(new List<IFileInfo> { directoryOne, directoryTwo }.GetEnumerator());
 
-        var result = await _reader.ReadPluginConfigurationsAsync();
+        var result = await _reader.ReadPackageManifestsAsync();
         Assert.AreEqual(2, result.Count());
-        Assert.AreEqual("Plugin One", result.First().Name);
-        Assert.AreEqual("Plugin Two", result.Last().Name);
+        Assert.AreEqual("Package One", result.First().Name);
+        Assert.AreEqual("Package Two", result.Last().Name);
     }
 
     [Test]
-    public async Task Can_Read_PluginConfigurations_Recursively()
+    public async Task Can_Read_PackageManifests_Recursively()
     {
-        var childFolder = CreateDirectoryMock("/my-parent-folder/my-child-folder", CreatePluginConfigurationFile(DefaultPluginConfigurationContent("Nested Plugin")));
+        var childFolder = CreateDirectoryMock("/my-parent-folder/my-child-folder", CreatePackageManifestFile(DefaultPackageManifestContent("Nested Package")));
         var parentFolder = CreateDirectoryMock("/my-parent-folder", childFolder);
 
         _rootDirectoryContentsMock
             .Setup(f => f.GetEnumerator())
             .Returns(new List<IFileInfo> { parentFolder }.GetEnumerator());
 
-        var result = await _reader.ReadPluginConfigurationsAsync();
+        var result = await _reader.ReadPackageManifestsAsync();
         Assert.AreEqual(1, result.Count());
-        Assert.AreEqual("Nested Plugin", result.First().Name);
+        Assert.AreEqual("Nested Package", result.First().Name);
     }
 
     [Test]
     public async Task Can_Skip_Empty_Directories()
     {
-        var pluginFolder = CreateDirectoryMock("/my-plugin-folder", CreatePluginConfigurationFile(DefaultPluginConfigurationContent("My Plugin")));
+        var packageFolder = CreateDirectoryMock("/my-package-folder", CreatePackageManifestFile(DefaultPackageManifestContent("My Package")));
         var emptyFolder = CreateDirectoryMock("/my-empty-folder");
 
         _rootDirectoryContentsMock
             .Setup(f => f.GetEnumerator())
-            .Returns(new List<IFileInfo> { emptyFolder, pluginFolder }.GetEnumerator());
+            .Returns(new List<IFileInfo> { emptyFolder, packageFolder }.GetEnumerator());
 
-        var result = await _reader.ReadPluginConfigurationsAsync();
+        var result = await _reader.ReadPackageManifestsAsync();
         Assert.AreEqual(1, result.Count());
-        Assert.AreEqual("My Plugin", result.First().Name);
+        Assert.AreEqual("My Package", result.First().Name);
     }
 
     [Test]
     public async Task Can_Skip_Other_Files()
     {
-        var pluginFolder = CreateDirectoryMock(
-            "/my-plugin-folder",
+        var packageFolder = CreateDirectoryMock(
+            "/my-package-folder",
             CreateOtherFile("my.js"),
-            CreatePluginConfigurationFile(DefaultPluginConfigurationContent("My Plugin")));
+            CreatePackageManifestFile(DefaultPackageManifestContent("My Package")));
         var otherFolder = CreateDirectoryMock(
             "/my-empty-folder",
             CreateOtherFile("some.js"),
@@ -110,11 +110,11 @@ public class PluginConfigurationReaderTests
 
         _rootDirectoryContentsMock
             .Setup(f => f.GetEnumerator())
-            .Returns(new List<IFileInfo> { otherFolder, pluginFolder }.GetEnumerator());
+            .Returns(new List<IFileInfo> { otherFolder, packageFolder }.GetEnumerator());
 
-        var result = await _reader.ReadPluginConfigurationsAsync();
+        var result = await _reader.ReadPackageManifestsAsync();
         Assert.AreEqual(1, result.Count());
-        Assert.AreEqual("My Plugin", result.First().Name);
+        Assert.AreEqual("My Package", result.First().Name);
     }
 
     [Test]
@@ -126,12 +126,12 @@ public class PluginConfigurationReaderTests
             .Setup(f => f.GetEnumerator())
             .Returns(folders.GetEnumerator());
 
-        var result = await _reader.ReadPluginConfigurationsAsync();
+        var result = await _reader.ReadPackageManifestsAsync();
         Assert.AreEqual(0, result.Count());
     }
 
     [Test]
-    public async Task Cannot_Read_PluginConfiguration_Without_Name()
+    public async Task Cannot_Read_PackageManifest_Without_Name()
     {
         var content = @"{
     ""version"": ""1.2.3"",
@@ -145,16 +145,16 @@ public class PluginConfigurationReaderTests
 }";
         _rootDirectoryContentsMock
             .Setup(f => f.GetEnumerator())
-            .Returns(new List<IFileInfo> { CreatePluginConfigurationFile(content) }.GetEnumerator());
+            .Returns(new List<IFileInfo> { CreatePackageManifestFile(content) }.GetEnumerator());
 
-        var result = await _reader.ReadPluginConfigurationsAsync();
+        var result = await _reader.ReadPackageManifestsAsync();
         Assert.AreEqual(0, result.Count());
 
         EnsureLogErrorWasCalled();
     }
 
     [Test]
-    public async Task Cannot_Read_PluginConfiguration_Without_Extensions()
+    public async Task Cannot_Read_PackageManifest_Without_Extensions()
     {
         var content = @"{
     ""name"": ""Something"",
@@ -163,9 +163,9 @@ public class PluginConfigurationReaderTests
 }";
         _rootDirectoryContentsMock
             .Setup(f => f.GetEnumerator())
-            .Returns(new List<IFileInfo> { CreatePluginConfigurationFile(content) }.GetEnumerator());
+            .Returns(new List<IFileInfo> { CreatePackageManifestFile(content) }.GetEnumerator());
 
-        var result = await _reader.ReadPluginConfigurationsAsync();
+        var result = await _reader.ReadPackageManifestsAsync();
         Assert.AreEqual(0, result.Count());
 
         EnsureLogErrorWasCalled();
@@ -173,13 +173,13 @@ public class PluginConfigurationReaderTests
 
     [TestCase("This is not JSON")]
     [TestCase(@"{""name"": ""invalid-json"", ""version"": ")]
-    public async Task Cannot_Read_Invalid_PluginConfiguration(string content)
+    public async Task Cannot_Read_Invalid_PackageManifest(string content)
     {
         _rootDirectoryContentsMock
             .Setup(f => f.GetEnumerator())
-            .Returns(new List<IFileInfo> { CreatePluginConfigurationFile(content) }.GetEnumerator());
+            .Returns(new List<IFileInfo> { CreatePackageManifestFile(content) }.GetEnumerator());
 
-        var result = await _reader.ReadPluginConfigurationsAsync();
+        var result = await _reader.ReadPackageManifestsAsync();
         Assert.AreEqual(0, result.Count());
 
         EnsureLogErrorWasCalled();
@@ -213,9 +213,9 @@ public class PluginConfigurationReaderTests
         return fileInfo.Object;
     }
 
-    private IFileInfo CreatePluginConfigurationFile(string? content = null)
+    private IFileInfo CreatePackageManifestFile(string? content = null)
     {
-        content ??= DefaultPluginConfigurationContent();
+        content ??= DefaultPackageManifestContent();
 
         var fileInfo = new Mock<IFileInfo>();
         fileInfo.SetupGet(f => f.IsDirectory).Returns(false);
@@ -235,7 +235,7 @@ public class PluginConfigurationReaderTests
         return fileInfo.Object;
     }
 
-    private static string DefaultPluginConfigurationContent(string name = "My Plugin Configuration")
+    private static string DefaultPackageManifestContent(string name = "My Package")
         => @"{
     ""name"": ""##NAME##"",
     ""version"": ""1.2.3"",

@@ -25,7 +25,7 @@ public class LegacyManifestParser : ILegacyManifestParser
 
     private readonly IAppPolicyCache _cache;
     private readonly IDataValueEditorFactory _dataValueEditorFactory;
-    private readonly IManifestFileProviderFactory _manifestFileProviderFactory;
+    private readonly ILegacyPackageManifestFileProviderFactory _legacyPackageManifestFileProviderFactory;
     private readonly LegacyManifestFilterCollection _filters;
     private readonly IHostingEnvironment _hostingEnvironment;
 
@@ -52,7 +52,7 @@ public class LegacyManifestParser : ILegacyManifestParser
         ILocalizedTextService localizedTextService,
         IShortStringHelper shortStringHelper,
         IDataValueEditorFactory dataValueEditorFactory,
-        IManifestFileProviderFactory manifestFileProviderFactory)
+        ILegacyPackageManifestFileProviderFactory legacyPackageManifestFileProviderFactory)
     {
         if (appCaches == null)
         {
@@ -70,7 +70,7 @@ public class LegacyManifestParser : ILegacyManifestParser
         _localizedTextService = localizedTextService;
         _shortStringHelper = shortStringHelper;
         _dataValueEditorFactory = dataValueEditorFactory;
-        _manifestFileProviderFactory = manifestFileProviderFactory;
+        _legacyPackageManifestFileProviderFactory = legacyPackageManifestFileProviderFactory;
     }
 
     [Obsolete("Use other ctor - Will be removed in Umbraco 13")]
@@ -96,7 +96,7 @@ public class LegacyManifestParser : ILegacyManifestParser
               localizedTextService,
               shortStringHelper,
               dataValueEditorFactory,
-              StaticServiceProvider.Instance.GetRequiredService<IManifestFileProviderFactory>())
+              StaticServiceProvider.Instance.GetRequiredService<ILegacyPackageManifestFileProviderFactory>())
     {
     }
 
@@ -123,7 +123,7 @@ public class LegacyManifestParser : ILegacyManifestParser
     public IEnumerable<LegacyPackageManifest> GetManifests()
     {
         var manifests = new List<LegacyPackageManifest>();
-        IFileProvider? manifestFileProvider = _manifestFileProviderFactory.Create();
+        IFileProvider? manifestFileProvider = _legacyPackageManifestFileProviderFactory.Create();
 
         if (manifestFileProvider is null)
         {

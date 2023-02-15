@@ -1,7 +1,6 @@
 using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Configuration;
-using Umbraco.Cms.Core.Plugin;
 using Umbraco.Cms.Core.Manifest;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Semver;
@@ -24,7 +23,7 @@ public class TelemetryServiceTests
             siteIdentifierServiceMock.Object,
             usageInformationServiceMock.Object,
             Mock.Of<IMetricsConsentService>(),
-            Mock.Of<IPluginConfigurationService>());
+            Mock.Of<IPackageManifestService>());
         Guid guid;
 
         await sut.GetTelemetryReportDataAsync();
@@ -40,7 +39,7 @@ public class TelemetryServiceTests
             CreateSiteIdentifierService(false),
             Mock.Of<IUsageInformationService>(),
             Mock.Of<IMetricsConsentService>(),
-            Mock.Of<IPluginConfigurationService>());
+            Mock.Of<IPackageManifestService>());
 
         var result = await sut.GetTelemetryReportDataAsync();
         Assert.IsNull(result);
@@ -58,7 +57,7 @@ public class TelemetryServiceTests
             CreateSiteIdentifierService(),
             Mock.Of<IUsageInformationService>(),
             metricsConsentService.Object,
-            Mock.Of<IPluginConfigurationService>());
+            Mock.Of<IPackageManifestService>());
 
         var result = await sut.GetTelemetryReportDataAsync();
 
@@ -73,12 +72,12 @@ public class TelemetryServiceTests
         var versionPackageName = "VersionPackage";
         var packageVersion = "1.0.0";
         var noVersionPackageName = "NoVersionPackage";
-        PluginConfiguration[] manifests =
+        PackageManifest[] manifests =
         {
             new() { Name = versionPackageName, Version = packageVersion, Extensions = Array.Empty<object>()},
             new() { Name = noVersionPackageName, Extensions = Array.Empty<object>() },
         };
-        var extensionManifestService = CreateExtensionManifestService(manifests);
+        var packageManifestService = CreatePackageManifestService(manifests);
         var metricsConsentService = new Mock<IMetricsConsentService>();
         metricsConsentService.Setup(x => x.GetConsentLevel()).Returns(TelemetryLevel.Basic);
         var sut = new TelemetryService(
@@ -86,7 +85,7 @@ public class TelemetryServiceTests
             CreateSiteIdentifierService(),
             Mock.Of<IUsageInformationService>(),
             metricsConsentService.Object,
-            extensionManifestService);
+            packageManifestService);
 
         var result = await sut.GetTelemetryReportDataAsync();
 
@@ -108,12 +107,12 @@ public class TelemetryServiceTests
     public async Task RespectsAllowPackageTelemetry()
     {
         var version = CreateUmbracoVersion(9, 1, 1);
-        PluginConfiguration[] manifests =
+        PackageManifest[] manifests =
         {
             new() { Name = "DoNotTrack", AllowTelemetry = false, Extensions = Array.Empty<object>() },
             new() { Name = "TrackingAllowed", AllowTelemetry = true, Extensions = Array.Empty<object>() },
         };
-        var extensionManifestService = CreateExtensionManifestService(manifests);
+        var packageManifestService = CreatePackageManifestService(manifests);
         var metricsConsentService = new Mock<IMetricsConsentService>();
         metricsConsentService.Setup(x => x.GetConsentLevel()).Returns(TelemetryLevel.Basic);
         var sut = new TelemetryService(
@@ -121,7 +120,7 @@ public class TelemetryServiceTests
             CreateSiteIdentifierService(),
             Mock.Of<IUsageInformationService>(),
             metricsConsentService.Object,
-            extensionManifestService);
+            packageManifestService);
 
         var result = await sut.GetTelemetryReportDataAsync();
 
@@ -133,10 +132,10 @@ public class TelemetryServiceTests
         });
     }
 
-    private IPluginConfigurationService CreateExtensionManifestService(IEnumerable<PluginConfiguration> manifests)
+    private IPackageManifestService CreatePackageManifestService(IEnumerable<PackageManifest> manifests)
     {
-        var mock = new Mock<IPluginConfigurationService>();
-        mock.Setup(x => x.GetPluginConfigurationsAsync()).Returns(Task.FromResult(manifests));
+        var mock = new Mock<IPackageManifestService>();
+        mock.Setup(x => x.GetPackageManifestsAsync()).Returns(Task.FromResult(manifests));
         return mock.Object;
     }
 

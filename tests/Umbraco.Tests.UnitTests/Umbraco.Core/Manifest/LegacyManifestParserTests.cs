@@ -48,7 +48,7 @@ public class LegacyManifestParserTests
             Mock.Of<ILocalizedTextService>(),
             Mock.Of<IShortStringHelper>(),
             Mock.Of<IDataValueEditorFactory>(),
-            Mock.Of<IManifestFileProviderFactory>());
+            Mock.Of<ILegacyPackageManifestFileProviderFactory>());
     }
 
     private LegacyManifestParser _parser;

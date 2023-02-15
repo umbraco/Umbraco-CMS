@@ -4,7 +4,6 @@
 using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.DependencyInjection;
-using Umbraco.Cms.Core.Plugin;
 using Umbraco.Cms.Core.Manifest;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
@@ -20,7 +19,7 @@ internal class TelemetryService : ITelemetryService
     private readonly ISiteIdentifierService _siteIdentifierService;
     private readonly IUmbracoVersion _umbracoVersion;
     private readonly IUsageInformationService _usageInformationService;
-    private readonly IPluginConfigurationService _pluginConfigurationService;
+    private readonly IPackageManifestService _packageManifestService;
 
     [Obsolete("Please use the constructor that does not take an IManifestParser. Will be removed in V15.")]
     public TelemetryService(
@@ -35,7 +34,7 @@ internal class TelemetryService : ITelemetryService
             siteIdentifierService,
             usageInformationService,
             metricsConsentService,
-            StaticServiceProvider.Instance.GetRequiredService<IPluginConfigurationService>())
+            StaticServiceProvider.Instance.GetRequiredService<IPackageManifestService>())
     {
     }
 
@@ -46,13 +45,13 @@ internal class TelemetryService : ITelemetryService
         ISiteIdentifierService siteIdentifierService,
         IUsageInformationService usageInformationService,
         IMetricsConsentService metricsConsentService,
-        IPluginConfigurationService pluginConfigurationService)
+        IPackageManifestService packageManifestService)
         : this(
             umbracoVersion,
             siteIdentifierService,
             usageInformationService,
             metricsConsentService,
-            pluginConfigurationService)
+            packageManifestService)
     {
     }
 
@@ -64,13 +63,13 @@ internal class TelemetryService : ITelemetryService
         ISiteIdentifierService siteIdentifierService,
         IUsageInformationService usageInformationService,
         IMetricsConsentService metricsConsentService,
-        IPluginConfigurationService pluginConfigurationService)
+        IPackageManifestService packageManifestService)
     {
         _umbracoVersion = umbracoVersion;
         _siteIdentifierService = siteIdentifierService;
         _usageInformationService = usageInformationService;
         _metricsConsentService = metricsConsentService;
-        _pluginConfigurationService = pluginConfigurationService;
+        _packageManifestService = packageManifestService;
     }
 
     [Obsolete("Please use GetTelemetryReportDataAsync. Will be removed in V15.")]
@@ -108,7 +107,7 @@ internal class TelemetryService : ITelemetryService
             return null;
         }
 
-        IEnumerable<PluginConfiguration> manifests = await _pluginConfigurationService.GetPluginConfigurationsAsync();
+        IEnumerable<PackageManifest> manifests = await _packageManifestService.GetPackageManifestsAsync();
 
         return manifests
             .Where(manifest => manifest.AllowTelemetry)

@@ -4,7 +4,7 @@ using Umbraco.Cms.Core.IO;
 
 namespace Umbraco.Cms.Web.Common.FileProviders;
 
-public class ContentAndWebRootFileProviderFactory : IManifestFileProviderFactory, IPluginConfigurationFileProviderFactory
+public class ContentAndWebRootFileProviderFactory : ILegacyPackageManifestFileProviderFactory, IPackageManifestFileProviderFactory
 {
     private readonly IWebHostEnvironment _webHostEnvironment;
 

@@ -1,6 +1,6 @@
-﻿namespace Umbraco.Cms.Core.Plugin;
+﻿namespace Umbraco.Cms.Core.Manifest;
 
-public class PluginConfiguration
+public class PackageManifest
 {
     public required string Name { get; set; }
 

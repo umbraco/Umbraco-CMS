@@ -2,43 +2,43 @@
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core;
-using Umbraco.Cms.Core.Plugin;
 using Umbraco.Cms.Core.IO;
+using Umbraco.Cms.Core.Manifest;
 using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Extensions;
 
-namespace Umbraco.Cms.Infrastructure.Plugin;
+namespace Umbraco.Cms.Infrastructure.Manifest;
 
-internal sealed class PluginConfigurationReader : IPluginConfigurationReader
+internal sealed class PackageManifestReader : IPackageManifestReader
 {
-    private readonly IPluginConfigurationFileProviderFactory _pluginConfigurationFileProviderFactory;
+    private readonly IPackageManifestFileProviderFactory _packageManifestFileProviderFactory;
     private readonly IJsonSerializer _jsonSerializer;
-    private readonly ILogger<PluginConfigurationReader> _logger;
+    private readonly ILogger<PackageManifestReader> _logger;
 
-    public PluginConfigurationReader(
-        IPluginConfigurationFileProviderFactory pluginConfigurationFileProviderFactory,
+    public PackageManifestReader(
+        IPackageManifestFileProviderFactory packageManifestFileProviderFactory,
         IJsonSerializer jsonSerializer,
-        ILogger<PluginConfigurationReader> logger)
+        ILogger<PackageManifestReader> logger)
     {
-        _pluginConfigurationFileProviderFactory = pluginConfigurationFileProviderFactory;
+        _packageManifestFileProviderFactory = packageManifestFileProviderFactory;
         _jsonSerializer = jsonSerializer;
         _logger = logger;
     }
 
-    public async Task<IEnumerable<PluginConfiguration>> ReadPluginConfigurationsAsync()
+    public async Task<IEnumerable<PackageManifest>> ReadPackageManifestsAsync()
     {
-        IFileProvider? fileProvider = _pluginConfigurationFileProviderFactory.Create();
+        IFileProvider? fileProvider = _packageManifestFileProviderFactory.Create();
         if (fileProvider is null)
         {
             throw new ArgumentNullException(nameof(fileProvider));
         }
 
-        IFileInfo[] files = GetAllPluginConfigurationFiles(fileProvider, Constants.SystemDirectories.AppPlugins).ToArray();
-        return await ParsePluginConfigurationFiles(files);
+        IFileInfo[] files = GetAllPackageManifestFiles(fileProvider, Constants.SystemDirectories.AppPlugins).ToArray();
+        return await ParsePackageManifestFiles(files);
     }
 
-    private static IEnumerable<IFileInfo> GetAllPluginConfigurationFiles(IFileProvider fileProvider, string path)
+    private static IEnumerable<IFileInfo> GetAllPackageManifestFiles(IFileProvider fileProvider, string path)
     {
         const string extensionFileName = "umbraco-package.json";
         foreach (IFileInfo fileInfo in fileProvider.GetDirectoryContents(path))
@@ -48,7 +48,7 @@ internal sealed class PluginConfigurationReader : IPluginConfigurationReader
                 var virtualPath = WebPath.Combine(path, fileInfo.Name);
 
                 // find all extension package configuration files recursively
-                foreach (IFileInfo nested in GetAllPluginConfigurationFiles(fileProvider, virtualPath))
+                foreach (IFileInfo nested in GetAllPackageManifestFiles(fileProvider, virtualPath))
                 {
                     yield return nested;
                 }
@@ -60,9 +60,9 @@ internal sealed class PluginConfigurationReader : IPluginConfigurationReader
         }
     }
 
-    private async Task<IEnumerable<PluginConfiguration>> ParsePluginConfigurationFiles(IFileInfo[] files)
+    private async Task<IEnumerable<PackageManifest>> ParsePackageManifestFiles(IFileInfo[] files)
     {
-        var pluginConfigurations = new List<PluginConfiguration>();
+        var packageManifests = new List<PackageManifest>();
         foreach (IFileInfo fileInfo in files)
         {
             string fileContent;
@@ -81,18 +81,18 @@ internal sealed class PluginConfigurationReader : IPluginConfigurationReader
 
             try
             {
-                PluginConfiguration? pluginConfiguration = _jsonSerializer.Deserialize<PluginConfiguration>(fileContent);
-                if (pluginConfiguration != null)
+                PackageManifest? packageManifest = _jsonSerializer.Deserialize<PackageManifest>(fileContent);
+                if (packageManifest != null)
                 {
-                    pluginConfigurations.Add(pluginConfiguration);
+                    packageManifests.Add(packageManifest);
                 }
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Unable to load plugin configuration file: {FileName}", fileInfo.Name);
+                _logger.LogError(ex, "Unable to load package manifest file: {FileName}", fileInfo.Name);
             }
         }
 
-        return pluginConfigurations;
+        return packageManifests;
     }
 }

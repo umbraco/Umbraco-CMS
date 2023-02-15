@@ -8,7 +8,7 @@ internal static class PackageBuilderExtensions
 {
     internal static IUmbracoBuilder AddPackages(this IUmbracoBuilder builder)
     {
-        builder.WithCollectionBuilder<MapDefinitionCollectionBuilder>().Add<PluginConfigurationViewModelMapDefinition>();
+        builder.WithCollectionBuilder<MapDefinitionCollectionBuilder>().Add<PackageManifestViewModelMapDefinition>();
 
         return builder;
     }
