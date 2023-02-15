@@ -2,7 +2,7 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html, nothing } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { UmbModalService, UMB_MODAL_SERVICE_CONTEXT_TOKEN } from '../../../../../../core/modal';
-import { UmbWorkspaceDataTypeContext } from '../../data-type-workspace.context';
+import { UmbDataTypeWorkspaceContext } from '../../data-type-workspace.context';
 import { UmbLitElement } from '@umbraco-cms/element';
 import type { DataTypeModel } from '@umbraco-cms/backend-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-api';
@@ -40,7 +40,7 @@ export class UmbDataTypeWorkspaceViewEditElement extends UmbLitElement {
 	@state()
 	private _data: Array<any> = [];
 
-	private _workspaceContext?: UmbWorkspaceDataTypeContext;
+	private _workspaceContext?: UmbDataTypeWorkspaceContext;
 	private _modalService?: UmbModalService;
 
 	constructor() {
@@ -51,7 +51,7 @@ export class UmbDataTypeWorkspaceViewEditElement extends UmbLitElement {
 		});
 
 		// TODO: Figure out if this is the best way to consume a context or if it could be strongly typed using UmbContextToken
-		this.consumeContext<UmbWorkspaceDataTypeContext>('umbWorkspaceContext', (_instance) => {
+		this.consumeContext<UmbDataTypeWorkspaceContext>('umbWorkspaceContext', (_instance) => {
 			this._workspaceContext = _instance;
 			this._observeDataType();
 		});

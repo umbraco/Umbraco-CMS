@@ -2,7 +2,7 @@ import { UUIInputElement, UUIInputEvent } from '@umbraco-ui/uui';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
-import { UmbWorkspaceDataTypeContext } from './data-type-workspace.context';
+import { UmbDataTypeWorkspaceContext } from './data-type-workspace.context';
 import { UmbLitElement } from '@umbraco-cms/element';
 
 /**
@@ -28,7 +28,7 @@ export class UmbDataTypeWorkspaceElement extends UmbLitElement {
 		`,
 	];
 
-	#workspaceContext: UmbWorkspaceDataTypeContext = new UmbWorkspaceDataTypeContext(this);
+	#workspaceContext = new UmbDataTypeWorkspaceContext(this);
 
 	@state()
 	private _dataTypeName = '';
