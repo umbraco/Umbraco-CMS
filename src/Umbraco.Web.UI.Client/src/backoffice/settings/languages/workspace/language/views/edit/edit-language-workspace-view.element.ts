@@ -72,14 +72,8 @@ export class UmbWorkspaceViewLanguageEditElement extends UmbLitElement {
 		this.consumeContext<UmbLanguageWorkspaceContext>('umbWorkspaceContext', (instance) => {
 			this.#languageWorkspaceContext = instance;
 
-			if (!this.#languageWorkspaceContext) return;
-
 			this.observe(this.#languageWorkspaceContext.data, (language) => {
 				this.language = language;
-
-				if (this._startData === null) {
-					this._startData = language;
-				}
 			});
 			this.observe(this.#languageWorkspaceContext.getAvailableCultures(), (cultures) => {
 				this._availableCultures = cultures;
@@ -133,23 +127,21 @@ export class UmbWorkspaceViewLanguageEditElement extends UmbLitElement {
 	#handleDefaultChange(event: UUIBooleanInputEvent) {
 		if (event instanceof UUIBooleanInputEvent) {
 			const target = event.composedPath()[0] as UUIToggleElement;
-
-			this.#languageWorkspaceContext?.update({ isDefault: target.checked });
+			this.#languageWorkspaceContext?.setDefault(target.checked);
 		}
 	}
 
 	#handleMandatoryChange(event: UUIBooleanInputEvent) {
 		if (event instanceof UUIBooleanInputEvent) {
 			const target = event.composedPath()[0] as UUIToggleElement;
-
-			this.#languageWorkspaceContext?.update({ isMandatory: target.checked });
+			this.#languageWorkspaceContext?.setMandatory(target.checked);
 		}
 	}
 
 	#handleFallbackChange(event: UUIComboboxEvent) {
 		if (event instanceof UUIComboboxEvent) {
 			const target = event.composedPath()[0] as UUIComboboxElement;
-			this.#languageWorkspaceContext?.update({ fallbackIsoCode: target.value.toString() });
+			this.#languageWorkspaceContext?.setFallbackLanguage(target.value.toString());
 		}
 	}
 
