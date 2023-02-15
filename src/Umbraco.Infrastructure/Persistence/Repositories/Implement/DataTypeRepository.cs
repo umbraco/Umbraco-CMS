@@ -1,11 +1,9 @@
 using System.Data;
 using System.Globalization;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using NPoco;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Exceptions;
 using Umbraco.Cms.Core.Models;
@@ -31,23 +29,6 @@ internal class DataTypeRepository : EntityRepositoryBase<int, IDataType>, IDataT
     private readonly ILogger<IDataType> _dataTypeLogger;
     private readonly PropertyEditorCollection _editors;
     private readonly IConfigurationEditorJsonSerializer _serializer;
-    private readonly IEntityService _entityService;
-
-    public DataTypeRepository(
-        IScopeAccessor scopeAccessor,
-        AppCaches cache,
-        PropertyEditorCollection editors,
-        ILogger<DataTypeRepository> logger,
-        ILoggerFactory loggerFactory,
-        IConfigurationEditorJsonSerializer serializer,
-        IEntityService entityService)
-        : base(scopeAccessor, cache, logger)
-    {
-        _editors = editors;
-        _serializer = serializer;
-        _entityService = entityService;
-        _dataTypeLogger = loggerFactory.CreateLogger<IDataType>();
-    }
 
     public DataTypeRepository(
         IScopeAccessor scopeAccessor,
@@ -56,23 +37,18 @@ internal class DataTypeRepository : EntityRepositoryBase<int, IDataType>, IDataT
         ILogger<DataTypeRepository> logger,
         ILoggerFactory loggerFactory,
         IConfigurationEditorJsonSerializer serializer)
-        : this(
-            scopeAccessor,
-            cache,
-            editors,
-            logger,
-            loggerFactory,
-            serializer,
-            StaticServiceProvider.Instance.GetRequiredService<IEntityService>())
+        : base(scopeAccessor, cache, logger)
     {
+        _editors = editors;
+        _serializer = serializer;
+        _dataTypeLogger = loggerFactory.CreateLogger<IDataType>();
     }
 
     protected Guid NodeObjectTypeId => Constants.ObjectTypes.DataType;
 
     public IEnumerable<MoveEventInfo<IDataType>> Move(IDataType toMove, EntityContainer? container)
     {
-        var parentId = Constants.System.Root;
-        Guid? parentKey = Constants.System.RootKey;
+        var parentId = -1;
         if (container != null)
         {
             // Check on paths
@@ -84,11 +60,11 @@ internal class DataTypeRepository : EntityRepositoryBase<int, IDataType>, IDataT
             }
 
             parentId = container.Id;
-            parentKey = container.Key;
         }
 
         // used to track all the moved entities to be given to the event
-        var moveInfo = new List<MoveEventInfo<IDataType>> { new(toMove, toMove.Path, parentId, parentKey) };
+        // FIXME: Use constructor that takes parent key when this method is refactored
+        var moveInfo = new List<MoveEventInfo<IDataType>> { new(toMove, toMove.Path, parentId) };
 
         var origPath = toMove.Path;
 
@@ -106,18 +82,19 @@ internal class DataTypeRepository : EntityRepositoryBase<int, IDataType>, IDataT
             Get(Query<IDataType>().Where(type => type.Path.StartsWith(origPath + ",")));
 
         IDataType lastParent = toMove;
-        Attempt<Guid> parentKeyAttempt = _entityService.GetKey(lastParent.ParentId, UmbracoObjectTypes.DataType);
-        Guid? descendantParentKey = parentKeyAttempt.Result;
-
-        foreach (IDataType descendant in descendants.OrderBy(x => x.Level))
+        if (descendants is not null)
         {
-            moveInfo.Add(new MoveEventInfo<IDataType>(descendant, descendant.Path, descendant.ParentId, descendantParentKey));
+            foreach (IDataType descendant in descendants.OrderBy(x => x.Level))
+            {
+                // FIXME: Use constructor that takes parent key when this method is refactored
+                moveInfo.Add(new MoveEventInfo<IDataType>(descendant, descendant.Path, descendant.ParentId));
 
-            descendant.ParentId = lastParent.Id;
-            descendant.Path = string.Concat(lastParent.Path, ",", descendant.Id);
+                descendant.ParentId = lastParent.Id;
+                descendant.Path = string.Concat(lastParent.Path, ",", descendant.Id);
 
-            // schedule it for updating in the transaction
-            Save(descendant);
+                // schedule it for updating in the transaction
+                Save(descendant);
+            }
         }
 
         return moveInfo;
