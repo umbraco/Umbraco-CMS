@@ -17,8 +17,8 @@ import {
 } from './shared/components/backoffice-frame/backoffice.context';
 import { UmbDocumentTypeStore } from './documents/document-types/repository/document-type.store';
 import { UmbDocumentTypeTreeStore } from './documents/document-types/repository/document-type.tree.store';
-import { UmbMediaTypeDetailStore } from './media/media-types/media-type.detail.store';
-import { UmbMediaTypeTreeStore } from './media/media-types/media-type.tree.store';
+import { UmbMediaTypeDetailStore } from './media/media-types/repository/media-type.detail.store';
+import { UmbMediaTypeTreeStore } from './media/media-types/repository/media-type.tree.store';
 import { UmbDocumentStore } from './documents/documents/repository/document.store';
 import { UmbDocumentTreeStore } from './documents/documents/repository/document.tree.store';
 import { UmbMediaDetailStore } from './media/media/repository/media.detail.store';

@@ -1,4 +1,3 @@
-import { map } from 'rxjs';
 import { umbContextRequestEventType, isUmbContextRequestEvent, umbDebugContextEventType } from '../consume/context-request.event';
 import { UmbContextToken } from '../context-token';
 import { UmbContextProvideEventImplementation } from './context-provide.event';
@@ -12,6 +11,15 @@ export class UmbContextProvider<HostType extends EventTarget = EventTarget> {
 
 	protected _contextAlias: string;
 	#instance: unknown;
+
+	/**
+	 * Method to enable comparing the context providers by the instance they provide.
+	 * Note this method should have a unique name for the provider controller, for it not to be confused with a consumer.
+	 * @returns {*}
+	 */
+	public providerInstance() {
+		return this.#instance;
+	}
 
 	/**
 	 * Creates an instance of UmbContextProvider.
@@ -72,9 +80,8 @@ export class UmbContextProvider<HostType extends EventTarget = EventTarget> {
 		}
 	};
 
-
 	destroy(): void {
 		// I want to make sure to call this, but for now it was too overwhelming to require the destroy method on context instances.
 		(this.#instance as any).destroy?.();
-	};
+	}
 }

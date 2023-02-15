@@ -1,7 +1,7 @@
 import { DictionaryTreeServerDataSource } from './sources/dictionary.tree.server.data';
 import { UmbDictionaryTreeStore, UMB_DICTIONARY_TREE_STORE_CONTEXT_TOKEN } from './dictionary.tree.store';
-import { UmbDictionaryDetailStore, UMB_DICTIONARY_DETAIL_STORE_CONTEXT_TOKEN } from './dictionary.detail.store';
 import { UmbDictionaryDetailServerDataSource } from './sources/dictionary.detail.server.data';
+import { UmbDictionaryDetailStore, UMB_DICTIONARY_DETAIL_STORE_CONTEXT_TOKEN } from './dictionary.detail.store';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 import { UmbContextConsumerController } from '@umbraco-cms/context-api';
 import { RepositoryTreeDataSource, UmbTreeRepository } from '@umbraco-cms/repository';
