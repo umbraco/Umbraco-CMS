@@ -4,11 +4,11 @@ import { customElement, state } from 'lit/decorators.js';
 import { when } from 'lit-html/directives/when.js';
 import { UmbTableConfig, UmbTableColumn, UmbTableItem } from '../../../../backoffice/shared/components/table';
 import { UmbDictionaryRepository } from '../../dictionary/repository/dictionary.repository';
+import { UmbCreateDictionaryModalResultData } from '../../dictionary/entity-actions/create/create-dictionary-modal-layout.element';
 import { UmbLitElement } from '@umbraco-cms/element';
 import { DictionaryOverviewModel, LanguageModel } from '@umbraco-cms/backend-api';
 import { UmbModalService, UMB_MODAL_SERVICE_CONTEXT_TOKEN } from '@umbraco-cms/modal';
 import { UmbContextConsumerController } from '@umbraco-cms/context-api';
-import { UmbCreateDictionaryModalResultData } from '../../dictionary/entity-actions/create/create-dictionary-modal-layout.element';
 
 @customElement('umb-dashboard-translation-dictionary')
 export class UmbDashboardTranslationDictionaryElement extends UmbLitElement {

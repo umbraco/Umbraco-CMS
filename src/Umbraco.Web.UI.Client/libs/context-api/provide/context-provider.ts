@@ -13,6 +13,15 @@ export class UmbContextProvider<HostType extends EventTarget = EventTarget> {
 	#instance: unknown;
 
 	/**
+	 * Method to enable comparing the context providers by the instance they provide.
+	 * Note this method should have a unique name for the provider controller, for it not to be confused with a consumer.
+	 * @returns {*}
+	 */
+	public providerInstance() {
+		return this.#instance;
+	}
+
+	/**
 	 * Creates an instance of UmbContextProvider.
 	 * @param {EventTarget} host
 	 * @param {string} contextAlias
@@ -54,9 +63,8 @@ export class UmbContextProvider<HostType extends EventTarget = EventTarget> {
 		event.callback(this.#instance);
 	};
 
-
 	destroy(): void {
 		// I want to make sure to call this, but for now it was too overwhelming to require the destroy method on context instances.
 		(this.#instance as any).destroy?.();
-	};
+	}
 }

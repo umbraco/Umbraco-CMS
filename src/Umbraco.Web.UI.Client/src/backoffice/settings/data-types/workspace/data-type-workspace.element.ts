@@ -45,7 +45,6 @@ export class UmbDataTypeWorkspaceElement extends UmbLitElement {
 
 	constructor() {
 		super();
-		this.provideContext('umbWorkspaceContext', this._workspaceContext);
 		this.observe(this._workspaceContext.name, (dataTypeName) => {
 			if (dataTypeName !== this._dataTypeName) {
 				this._dataTypeName = dataTypeName ?? '';
