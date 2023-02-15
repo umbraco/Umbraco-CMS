@@ -16,7 +16,7 @@
   </ItemGroup>
 
   <PropertyGroup>
-    <BellePath>$(ProjectDir)wwwroot\umbraco\backoffice</BellePath>
+    <BellePath>$(ProjectDir)wwwroot\umbraco</BellePath>
   </PropertyGroup>
 
   <Target Name="BuildBellePreconditions" BeforeTargets="Build">
