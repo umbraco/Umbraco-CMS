@@ -1,4 +1,3 @@
-import { map } from 'rxjs';
 import { umbContextRequestEventType, isUmbContextRequestEvent, umbDebugContextEventType } from '../consume/context-request.event';
 import { UmbContextToken } from '../context-token';
 import { UmbContextProvideEventImplementation } from './context-provide.event';
@@ -72,6 +71,7 @@ export class UmbContextProvider<HostType extends EventTarget = EventTarget> {
 		if(!event.instances){
 			event.instances = new Map();
 		}
+
 		// If the event doesn't have an instance for this context, add it.
 		// Nearest to the DOM element of <umb-debug> will be added first
 		// as contexts can change/override deeper in the DOM
@@ -79,7 +79,6 @@ export class UmbContextProvider<HostType extends EventTarget = EventTarget> {
 			event.instances.set(this._contextAlias, this.#instance);
 		}
 	};
-
 
 	destroy(): void {
 		// I want to make sure to call this, but for now it was too overwhelming to require the destroy method on context instances.
