@@ -20,7 +20,7 @@ public class PackagingService : IPackagingService
     private readonly ICreatedPackagesRepository _createdPackages;
     private readonly IEventAggregator _eventAggregator;
     private readonly IKeyValueService _keyValueService;
-    private readonly IManifestParser _manifestParser;
+    private readonly ILegacyManifestParser _legacyManifestParser;
     private readonly IPackageInstallation _packageInstallation;
     private readonly PackageMigrationPlanCollection _packageMigrationPlans;
 
@@ -29,7 +29,7 @@ public class PackagingService : IPackagingService
         ICreatedPackagesRepository createdPackages,
         IPackageInstallation packageInstallation,
         IEventAggregator eventAggregator,
-        IManifestParser manifestParser,
+        ILegacyManifestParser legacyManifestParser,
         IKeyValueService keyValueService,
         PackageMigrationPlanCollection packageMigrationPlans)
     {
@@ -37,7 +37,7 @@ public class PackagingService : IPackagingService
         _createdPackages = createdPackages;
         _packageInstallation = packageInstallation;
         _eventAggregator = eventAggregator;
-        _manifestParser = manifestParser;
+        _legacyManifestParser = legacyManifestParser;
         _keyValueService = keyValueService;
         _packageMigrationPlans = packageMigrationPlans;
     }
@@ -148,7 +148,7 @@ public class PackagingService : IPackagingService
         }
 
         // Collect and merge the packages from the manifests
-        foreach (PackageManifest package in _manifestParser.GetManifests())
+        foreach (LegacyPackageManifest package in _legacyManifestParser.GetManifests())
         {
             if (package.PackageName is null)
             {

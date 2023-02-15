@@ -3,7 +3,7 @@ using Umbraco.Cms.Core.PropertyEditors;
 
 namespace Umbraco.Cms.Core.Manifest;
 
-public interface IPackageManifest
+public interface ILegacyPackageManifest
 {
     /// <summary>
     ///     Gets the source path of the manifest.
@@ -50,17 +50,17 @@ public interface IPackageManifest
     ///     Gets or sets the content apps listed in the manifest.
     /// </summary>
     [DataMember(Name = "contentApps")]
-    ManifestContentAppDefinition[] ContentApps { get; set; }
+    LegacyManifestContentAppDefinition[] ContentApps { get; set; }
 
     /// <summary>
     ///     Gets or sets the dashboards listed in the manifest.
     /// </summary>
     [DataMember(Name = "dashboards")]
-    ManifestDashboard[] Dashboards { get; set; }
+    LegacyManifestDashboard[] Dashboards { get; set; }
 
     /// <summary>
     ///     Gets or sets the sections listed in the manifest.
     /// </summary>
     [DataMember(Name = "sections")]
-    ManifestSection[] Sections { get; set; }
+    LegacyManifestSection[] Sections { get; set; }
 }

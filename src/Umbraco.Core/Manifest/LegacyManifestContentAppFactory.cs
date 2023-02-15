@@ -29,15 +29,15 @@ namespace Umbraco.Cms.Core.Manifest;
 /// <summary>
 ///     Represents a content app factory, for content apps parsed from the manifest.
 /// </summary>
-public class ManifestContentAppFactory : IContentAppFactory
+public class LegacyManifestContentAppFactory : IContentAppFactory
 {
-    private readonly ManifestContentAppDefinition _definition;
+    private readonly LegacyManifestContentAppDefinition _definition;
     private readonly IIOHelper _ioHelper;
 
     private ContentApp? _app;
     private ShowRule[]? _showRules;
 
-    public ManifestContentAppFactory(ManifestContentAppDefinition definition, IIOHelper ioHelper)
+    public LegacyManifestContentAppFactory(LegacyManifestContentAppDefinition definition, IIOHelper ioHelper)
     {
         _definition = definition;
         _ioHelper = ioHelper;

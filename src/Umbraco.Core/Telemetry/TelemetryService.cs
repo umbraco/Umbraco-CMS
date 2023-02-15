@@ -24,13 +24,13 @@ internal class TelemetryService : ITelemetryService
 
     [Obsolete("Please use the constructor that does not take an IManifestParser. Will be removed in V15.")]
     public TelemetryService(
-        IManifestParser manifestParser,
+        ILegacyManifestParser legacyManifestParser,
         IUmbracoVersion umbracoVersion,
         ISiteIdentifierService siteIdentifierService,
         IUsageInformationService usageInformationService,
         IMetricsConsentService metricsConsentService)
         : this(
-            manifestParser,
+            legacyManifestParser,
             umbracoVersion,
             siteIdentifierService,
             usageInformationService,
@@ -41,7 +41,7 @@ internal class TelemetryService : ITelemetryService
 
     [Obsolete("Please use the constructor that does not take an IManifestParser. Will be removed in V15.")]
     public TelemetryService(
-        IManifestParser manifestParser,
+        ILegacyManifestParser legacyManifestParser,
         IUmbracoVersion umbracoVersion,
         ISiteIdentifierService siteIdentifierService,
         IUsageInformationService usageInformationService,

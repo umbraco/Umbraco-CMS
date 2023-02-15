@@ -4,7 +4,7 @@ using Umbraco.Cms.Core.Dashboards;
 namespace Umbraco.Cms.Core.Manifest;
 
 [DataContract]
-public class ManifestDashboard : IDashboard
+public class LegacyManifestDashboard : IDashboard
 {
     [DataMember(Name = "weight")]
     public int Weight { get; set; } = 100;

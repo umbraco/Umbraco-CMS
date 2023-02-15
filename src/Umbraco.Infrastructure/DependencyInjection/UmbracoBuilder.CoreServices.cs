@@ -128,7 +128,7 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.AddTransient<DatabaseBuilder>();
 
         // register manifest parser, will be injected in collection builders where needed
-        builder.Services.AddSingleton<IManifestParser, ManifestParser>();
+        builder.Services.AddSingleton<ILegacyManifestParser, LegacyManifestParser>();
         builder.Services.AddSingleton<IPluginConfigurationReader, PluginConfigurationReader>();
         builder.Services.AddSingleton<IPluginConfigurationService, PluginConfigurationService>();
 

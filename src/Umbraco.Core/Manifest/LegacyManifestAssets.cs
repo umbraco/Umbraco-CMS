@@ -1,8 +1,8 @@
 namespace Umbraco.Cms.Core.Manifest;
 
-public class ManifestAssets
+public class LegacyManifestAssets
 {
-    public ManifestAssets(string? packageName, IReadOnlyList<string> assets)
+    public LegacyManifestAssets(string? packageName, IReadOnlyList<string> assets)
     {
         PackageName = packageName ?? throw new ArgumentNullException(nameof(packageName));
         Assets = assets ?? throw new ArgumentNullException(nameof(assets));

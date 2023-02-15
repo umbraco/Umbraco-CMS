@@ -24,7 +24,7 @@ using Umbraco.Cms.Tests.UnitTests.TestHelpers;
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Manifest;
 
 [TestFixture]
-public class ManifestParserTests
+public class LegacyManifestParserTests
 {
     [SetUp]
     public void Setup()
@@ -37,11 +37,11 @@ public class ManifestParserTests
         };
         _ioHelper = TestHelper.IOHelper;
         var loggerFactory = NullLoggerFactory.Instance;
-        _parser = new ManifestParser(
+        _parser = new LegacyManifestParser(
             AppCaches.Disabled,
             new ManifestValueValidatorCollection(() => validators),
-            new ManifestFilterCollection(() => Enumerable.Empty<IManifestFilter>()),
-            loggerFactory.CreateLogger<ManifestParser>(),
+            new LegacyManifestFilterCollection(() => Enumerable.Empty<ILegacyManifestFilter>()),
+            loggerFactory.CreateLogger<LegacyManifestParser>(),
             _ioHelper,
             TestHelper.GetHostingEnvironment(),
             new JsonNetSerializer(),
@@ -51,7 +51,7 @@ public class ManifestParserTests
             Mock.Of<IManifestFileProviderFactory>());
     }
 
-    private ManifestParser _parser;
+    private LegacyManifestParser _parser;
     private IIOHelper _ioHelper;
 
     [Test]
@@ -410,14 +410,14 @@ javascript: ['~/test.js',/*** some note about stuff asd09823-4**09234*/ '~/test2
         var manifest = _parser.ParseManifest(json);
         Assert.AreEqual(2, manifest.ContentApps.Length);
 
-        Assert.IsInstanceOf<ManifestContentAppDefinition>(manifest.ContentApps[0]);
+        Assert.IsInstanceOf<LegacyManifestContentAppDefinition>(manifest.ContentApps[0]);
         var app0 = manifest.ContentApps[0];
         Assert.AreEqual("myPackageApp1", app0.Alias);
         Assert.AreEqual("My App1", app0.Name);
         Assert.AreEqual("icon-foo", app0.Icon);
         Assert.AreEqual(_ioHelper.ResolveUrl("/App_Plugins/MyPackage/ContentApps/MyApp1.html"), app0.View);
 
-        Assert.IsInstanceOf<ManifestContentAppDefinition>(manifest.ContentApps[1]);
+        Assert.IsInstanceOf<LegacyManifestContentAppDefinition>(manifest.ContentApps[1]);
         var app1 = manifest.ContentApps[1];
         Assert.AreEqual("myPackageApp2", app1.Alias);
         Assert.AreEqual("My App2", app1.Name);
@@ -447,7 +447,7 @@ javascript: ['~/test.js',/*** some note about stuff asd09823-4**09234*/ '~/test2
         var manifest = _parser.ParseManifest(json);
         Assert.AreEqual(2, manifest.Dashboards.Length);
 
-        Assert.IsInstanceOf<ManifestDashboard>(manifest.Dashboards[0]);
+        Assert.IsInstanceOf<LegacyManifestDashboard>(manifest.Dashboards[0]);
         var db0 = manifest.Dashboards[0];
         Assert.AreEqual("something", db0.Alias);
         Assert.AreEqual(100, db0.Weight);
@@ -460,7 +460,7 @@ javascript: ['~/test.js',/*** some note about stuff asd09823-4**09234*/ '~/test2
         Assert.AreEqual(AccessRuleType.Deny, db0.AccessRules[1].Type);
         Assert.AreEqual("foo", db0.AccessRules[1].Value);
 
-        Assert.IsInstanceOf<ManifestDashboard>(manifest.Dashboards[1]);
+        Assert.IsInstanceOf<LegacyManifestDashboard>(manifest.Dashboards[1]);
         var db1 = manifest.Dashboards[1];
         Assert.AreEqual("something.else", db1.Alias);
         Assert.AreEqual(-1, db1.Weight);

@@ -22,9 +22,9 @@ namespace Umbraco.Cms.Core.Manifest;
 /// <summary>
 ///     Represents a content app definition, parsed from a manifest.
 /// </summary>
-/// <remarks>Is used to create an actual <see cref="ManifestContentAppFactory" />.</remarks>
+/// <remarks>Is used to create an actual <see cref="LegacyManifestContentAppFactory" />.</remarks>
 [DataContract(Name = "appdef", Namespace = "")]
-public class ManifestContentAppDefinition
+public class LegacyManifestContentAppDefinition
 {
     private readonly string? _view;
 

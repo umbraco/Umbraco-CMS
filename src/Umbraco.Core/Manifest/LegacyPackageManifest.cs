@@ -8,7 +8,7 @@ namespace Umbraco.Cms.Core.Manifest;
 ///     Represents the content of a package manifest.
 /// </summary>
 [DataContract]
-public class PackageManifest
+public class LegacyPackageManifest
 {
     private string? _packageName;
 
@@ -99,17 +99,17 @@ public class PackageManifest
     ///     Gets or sets the content apps listed in the manifest.
     /// </summary>
     [DataMember(Name = "contentApps")]
-    public ManifestContentAppDefinition[] ContentApps { get; set; } = Array.Empty<ManifestContentAppDefinition>();
+    public LegacyManifestContentAppDefinition[] ContentApps { get; set; } = Array.Empty<LegacyManifestContentAppDefinition>();
 
     /// <summary>
     ///     Gets or sets the dashboards listed in the manifest.
     /// </summary>
     [DataMember(Name = "dashboards")]
-    public ManifestDashboard[] Dashboards { get; set; } = Array.Empty<ManifestDashboard>();
+    public LegacyManifestDashboard[] Dashboards { get; set; } = Array.Empty<LegacyManifestDashboard>();
 
     /// <summary>
     ///     Gets or sets the sections listed in the manifest.
     /// </summary>
     [DataMember(Name = "sections")]
-    public ManifestSection[] Sections { get; set; } = Array.Empty<ManifestSection>();
+    public LegacyManifestSection[] Sections { get; set; } = Array.Empty<LegacyManifestSection>();
 }

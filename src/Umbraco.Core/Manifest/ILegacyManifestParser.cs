@@ -1,6 +1,6 @@
 namespace Umbraco.Cms.Core.Manifest;
 
-public interface IManifestParser
+public interface ILegacyManifestParser
 {
     string AppPluginsPath { get; set; }
 
@@ -8,16 +8,16 @@ public interface IManifestParser
     ///     Gets all manifests, merged into a single manifest object.
     /// </summary>
     /// <returns></returns>
-    CompositePackageManifest CombinedManifest { get; }
+    CompositeLegacyPackageManifest CombinedManifest { get; }
 
     /// <summary>
     ///     Parses a manifest.
     /// </summary>
-    PackageManifest ParseManifest(string text);
+    LegacyPackageManifest ParseManifest(string text);
 
     /// <summary>
     ///     Returns all package individual manifests
     /// </summary>
     /// <returns></returns>
-    IEnumerable<PackageManifest> GetManifests();
+    IEnumerable<LegacyPackageManifest> GetManifests();
 }

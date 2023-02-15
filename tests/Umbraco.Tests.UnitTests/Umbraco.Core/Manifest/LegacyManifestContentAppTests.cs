@@ -14,7 +14,7 @@ using Umbraco.Cms.Tests.UnitTests.TestHelpers;
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Manifest;
 
 [TestFixture]
-public class ManifestContentAppTests
+public class LegacyManifestContentAppTests
 {
     [Test]
     public void Test()
@@ -70,11 +70,11 @@ public class ManifestContentAppTests
 
     private void AssertDefinition(object source, bool expected, string[] show, IReadOnlyUserGroup[] groups)
     {
-        var definition = JsonConvert.DeserializeObject<ManifestContentAppDefinition>("{" +
+        var definition = JsonConvert.DeserializeObject<LegacyManifestContentAppDefinition>("{" +
             (show.Length == 0
                 ? string.Empty
                 : " \"show\": [" + string.Join(",", show.Select(x => "\"" + x + "\"")) + "] ") + "}");
-        var factory = new ManifestContentAppFactory(definition, TestHelper.IOHelper);
+        var factory = new LegacyManifestContentAppFactory(definition, TestHelper.IOHelper);
         var app = factory.GetContentAppFor(source, groups);
         if (expected)
         {
