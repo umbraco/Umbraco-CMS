@@ -14,5 +14,6 @@ public enum UserGroupOperationStatus
     UnauthorizedMissingUserGroup,
     CancelledByNotification,
     MediaStartNodeKeyNotFound,
-    DocumentStartNodeKeyNotFound
+    DocumentStartNodeKeyNotFound,
+    LanguageNotFound,
 }

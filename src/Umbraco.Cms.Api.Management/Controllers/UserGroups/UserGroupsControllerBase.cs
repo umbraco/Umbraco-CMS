@@ -62,6 +62,10 @@ public class UserGroupsControllerBase : ManagementApiControllerBase
                 .WithTitle("Media start node key not found")
                 .WithDetail("The assigned media start node does not exists.")
                 .Build()),
-            _ => StatusCode(StatusCodes.Status500InternalServerError, "Unknown dictionary status."),
+            UserGroupOperationStatus.LanguageNotFound => NotFound(new ProblemDetailsBuilder()
+                .WithTitle("Language not found")
+                .WithDetail("The specified language cannot be found.")
+                .Build()),
+            _ => StatusCode(StatusCodes.Status500InternalServerError, "Unknown user group operation status."),
         };
 }
