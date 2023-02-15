@@ -49,10 +49,6 @@ export class UmbDataTypeWorkspaceElement extends UmbLitElement {
 				this._dataTypeName = dataTypeName ?? '';
 			}
 		});
-
-		this.observe(this.#workspaceContext.test2, (hello) => {
-			console.log('hello', hello);
-		});
 	}
 
 	// TODO. find a way where we don't have to do this for all Workspaces.

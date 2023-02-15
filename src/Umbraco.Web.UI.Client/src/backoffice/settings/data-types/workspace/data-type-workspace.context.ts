@@ -19,9 +19,6 @@ export class UmbDataTypeWorkspaceContext
 	name = this.#data.getObservablePart((data) => data?.name);
 	key = this.#data.getObservablePart((data) => data?.key);
 
-	test = new BehaviorSubject<DataTypeModel>({});
-	test2 = this.test.asObservable();
-
 	constructor(host: UmbControllerHostInterface) {
 		super(host);
 		this.#host = host;
@@ -33,7 +30,6 @@ export class UmbDataTypeWorkspaceContext
 		if (data) {
 			this.#isNew = false;
 			this.#data.update(data);
-			this.test.next(data);
 		}
 	}
 
