@@ -96,7 +96,7 @@ export class UmbDebug extends LitElement {
 			aliases.push(
 				html` <li>
 					Context: <strong>${alias}</strong>
-					<span>(${instance.toString()})</span>
+					<span>(${typeof instance})</span>
 					<ul>
 						${this._renderInstance(instance)}
 					</ul>
