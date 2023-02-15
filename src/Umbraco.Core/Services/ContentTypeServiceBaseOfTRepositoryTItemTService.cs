@@ -850,12 +850,10 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
             return OperationResult.Attempt.Fail(MoveOperationStatusType.FailedNotAllowedByPath, eventMessages);
         }
 
-
         var moveInfo = new List<MoveEventInfo<TItem>>();
         using (ICoreScope scope = ScopeProvider.CreateCoreScope())
         {
-            Guid? containerKey = _containerRepository.Get(containerId)?.Key;
-            var moveEventInfo = new MoveEventInfo<TItem>(moving, moving.Path, containerId, containerKey);
+            var moveEventInfo = new MoveEventInfo<TItem>(moving, moving.Path, containerId);
             MovingNotification<TItem> movingNotification = GetMovingNotification(moveEventInfo, eventMessages);
             if (scope.Notifications.PublishCancelable(movingNotification))
             {
