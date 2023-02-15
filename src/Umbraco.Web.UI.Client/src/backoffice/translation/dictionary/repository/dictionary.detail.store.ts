@@ -8,7 +8,7 @@ import type { DictionaryDetails } from '@umbraco-cms/models';
  * @export
  * @class UmbDictionaryDetailStore
  * @extends {UmbStoreBase}
- * @description - Details Data Store for Data Types
+ * @description - Details Data Store for Dictionary
  */
 export class UmbDictionaryDetailStore
 	extends UmbStoreBase

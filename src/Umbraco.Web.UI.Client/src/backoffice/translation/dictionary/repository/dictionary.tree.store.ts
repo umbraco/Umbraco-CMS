@@ -6,7 +6,7 @@ import { UmbControllerHostInterface } from '@umbraco-cms/controller';
  * @export
  * @class UmbDictionaryTreeStore
  * @extends {UmbTreeStoreBase}
- * @description - Tree Data Store for Data Types
+ * @description - Tree Data Store for Dictionary
  */
 export class UmbDictionaryTreeStore extends UmbTreeStoreBase {
 	
