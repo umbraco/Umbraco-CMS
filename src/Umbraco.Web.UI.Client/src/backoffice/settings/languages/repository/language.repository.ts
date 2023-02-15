@@ -3,7 +3,7 @@ import { UmbLanguageStore, UMB_LANGUAGE_STORE_CONTEXT_TOKEN } from './language.s
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 import { UmbContextConsumerController } from '@umbraco-cms/context-api';
 import { UmbNotificationService, UMB_NOTIFICATION_SERVICE_CONTEXT_TOKEN } from '@umbraco-cms/notification';
-import { ProblemDetailsModel } from '@umbraco-cms/backend-api';
+import { LanguageModel, ProblemDetailsModel } from '@umbraco-cms/backend-api';
 
 export class UmbLanguageRepository {
 	#init!: Promise<unknown>;
@@ -64,5 +64,53 @@ export class UmbLanguageRepository {
 		}
 
 		return { data, error, asObservable: () => this.#languageStore!.data };
+	}
+
+	async update(language: LanguageModel) {
+		await this.#init;
+
+		const { data, error } = await this.#detailDataSource.update(language);
+
+		if (data) {
+			const notification = { data: { message: `Language saved` } };
+			this.#notificationService?.peek('positive', notification);
+			this.#languageStore?.append(data);
+		}
+
+		return { data, error };
+	}
+
+	async create(language: LanguageModel) {
+		await this.#init;
+
+		const { data, error } = await this.#detailDataSource.update(language);
+
+		if (data) {
+			this.#languageStore?.append(data);
+			const notification = { data: { message: `Language created` } };
+			this.#notificationService?.peek('positive', notification);
+		}
+
+		return { data, error };
+	}
+
+	async delete(key: string) {
+		await this.#init;
+
+		if (!key) {
+			const error: ProblemDetailsModel = { title: 'Language key is missing' };
+			return { error };
+		}
+
+		const { error } = await this.#detailDataSource.delete(key);
+
+		if (!error) {
+			const notification = { data: { message: `Language deleted` } };
+			this.#notificationService?.peek('positive', notification);
+		}
+
+		this.#languageStore?.remove([key]);
+
+		return { error };
 	}
 }
