@@ -86,4 +86,3 @@ export type TypeModel = {
     readonly containsGenericParameters?: boolean;
     readonly isVisible?: boolean;
 };
-

@@ -221,8 +221,8 @@ export class UmbTableElement extends LitElement {
 
 	private _renderHeaderCell(column: UmbTableColumn) {
 		return html`
-			<uui-table-head-cell style="--uui-table-cell-padding: 0">
-				${column.allowSorting ? html`${this._renderSortingUI(column)}` : nothing}
+			<uui-table-head-cell style="--uui-table-cell-padding: 0 var(--uui-size-5)">
+				${column.allowSorting ? html`${this._renderSortingUI(column)}` : column.name}
 			</uui-table-head-cell>
 		`;
 	}
@@ -284,9 +284,8 @@ export class UmbTableElement extends LitElement {
 	}
 
 	private _renderRowCell(column: UmbTableColumn, item: UmbTableItem) {
-		return html`<uui-table-cell style="width: ${column.width || 'auto'}"
-			>${this._renderCellContent(column, item)}</uui-table-cell
-			>
+		return html`<uui-table-cell style="--uui-table-cell-padding: 0 var(--uui-size-5); width: ${column.width || 'auto'}"
+			>${this._renderCellContent(column, item)}</uui-table-cell>
 		</uui-table-cell>`;
 	}
 

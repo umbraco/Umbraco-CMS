@@ -101,4 +101,3 @@ export type TypeInfoModel = {
     readonly declaredProperties?: Array<PropertyInfoModel>;
     readonly implementedInterfaces?: Array<TypeModel>;
 };
-

@@ -45,4 +45,3 @@ export type ConstructorInfoModel = {
     readonly isSecurityTransparent?: boolean;
     memberType?: MemberTypesModel;
 };
-
