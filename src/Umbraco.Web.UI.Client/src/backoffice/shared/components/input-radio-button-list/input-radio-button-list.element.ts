@@ -21,14 +21,14 @@ export class UmbInputRadioButtonListElement extends FormControlMixin(UmbLitEleme
 	 * List of items.
 	 */
 	@property()
-	list?: [];
+	list: Array<string> = [];
 
-	private _selectedKey = '';
+	private _selected = '';
 	public get selectedKey(): string {
-		return this._selectedKey;
+		return this._selected;
 	}
 	public set selectedKey(key: string) {
-		this._selectedKey = key;
+		this._selected = key;
 		super.value = key;
 	}
 
@@ -53,12 +53,12 @@ export class UmbInputRadioButtonListElement extends FormControlMixin(UmbLitEleme
 		if (!this.list) return nothing;
 
 		return html`<uui-radio-group .value=${this.value} @change=${this._setSelection}>
-			${repeat(this.list, (item) => item.key, this.renderRadioButton)}
+			${repeat(this.list, (value) => value, this.renderRadioButton)}
 		</uui-radio-group>`;
 	}
 
-	renderRadioButton(item: { key: string; label: string }) {
-		return html`<uui-radio value="${item.key}" label="${item.label}"></uui-radio>`;
+	renderRadioButton(value: string) {
+		return html`<uui-radio value="${value}" label="${value}"></uui-radio>`;
 	}
 }
 

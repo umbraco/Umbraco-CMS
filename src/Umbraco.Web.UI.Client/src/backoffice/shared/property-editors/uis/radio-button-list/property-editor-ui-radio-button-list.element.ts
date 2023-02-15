@@ -4,7 +4,7 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import '../../../components/input-radio-button-list/input-radio-button-list.element';
 import type { UmbInputRadioButtonListElement } from '../../../components/input-radio-button-list/input-radio-button-list.element';
 import { UmbLitElement } from '@umbraco-cms/element';
-import type { DataTypePropertyData } from '@umbraco-cms/models';
+import type { DataTypePropertyModel } from '@umbraco-cms/backend-api';
 
 /**
  * @element umb-property-editor-ui-radio-button-list
@@ -23,15 +23,29 @@ export class UmbPropertyEditorUIRadioButtonListElement extends UmbLitElement {
 	}
 
 	@property({ type: Array, attribute: false })
-	public set config(config: Array<DataTypePropertyData>) {
-		const listData = config.find((x) => x.alias === 'itemList');
+	public set config(config: Array<DataTypePropertyModel>) {
+		const listData = config.find((x) => x.alias === 'items');
 
 		if (!listData) return;
-		this._list = listData.value;
+
+		// formatting the items in the dictionary into an array
+		const sortedItems = [];
+		const values = Object.values<{ value: string; sortOrder: number }>(listData.value);
+		const keys = Object.keys(listData.value);
+		for (let i = 0; i < values.length; i++) {
+			sortedItems.push({ key: keys[i], sortOrder: values[i].sortOrder, value: values[i].value });
+		}
+
+		// ensure the items are sorted by the provided sort order
+		sortedItems.sort(function (a, b) {
+			return a.sortOrder > b.sortOrder ? 1 : b.sortOrder > a.sortOrder ? -1 : 0;
+		});
+
+		this._list = sortedItems.map((item) => item.value);
 	}
 
 	@state()
-	private _list: [] = [];
+	private _list: Array<string> = [];
 
 	private _onChange(event: CustomEvent) {
 		this.value = (event.target as UmbInputRadioButtonListElement).selectedKey;
