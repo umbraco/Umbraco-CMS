@@ -32,7 +32,7 @@ public class UpdateUserGroupController : UserGroupsControllerBase
 
         if (existingUserGroup is null)
         {
-            return NotFound();
+            return UserGroupOperationStatusResult(UserGroupOperationStatus.NotFound);
         }
 
         Attempt<IUserGroup, UserGroupOperationStatus> userGroupUpdateAttempt = _userGroupViewModelFactory.Update(existingUserGroup, dataTypeUpdateModel);
