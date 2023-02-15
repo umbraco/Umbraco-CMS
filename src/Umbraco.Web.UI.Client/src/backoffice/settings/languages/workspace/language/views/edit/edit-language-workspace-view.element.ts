@@ -5,16 +5,12 @@ import { repeat } from 'lit/directives/repeat.js';
 import { customElement, property, state } from 'lit/decorators.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
 import { UmbLanguageWorkspaceContext } from '../../language-workspace.context';
-import {
-	UmbLanguageStore,
-	UmbLanguageStoreItemType,
-	UMB_LANGUAGE_STORE_CONTEXT_TOKEN,
-} from '../../../../repository/language.store';
+import { UmbCultureRepository } from '../../../../../cultures/repository/culture.repository';
 import { UmbLitElement } from '@umbraco-cms/element';
 import { CultureModel, LanguageModel } from '@umbraco-cms/backend-api';
 
-@customElement('umb-workspace-view-language-edit')
-export class UmbWorkspaceViewLanguageEditElement extends UmbLitElement {
+@customElement('umb-edit-language-workspace-view')
+export class UmbEditLanguageWorkspaceViewElement extends UmbLitElement {
 	static styles = [
 		UUITextStyles,
 		css`
@@ -50,13 +46,13 @@ export class UmbWorkspaceViewLanguageEditElement extends UmbLitElement {
 	];
 
 	@property()
-	language?: UmbLanguageStoreItemType;
+	language?: LanguageModel;
 
 	@state()
-	private _languages: UmbLanguageStoreItemType[] = [];
+	private _languages: LanguageModel[] = [];
 
 	@state()
-	private _availableCultures: CultureModel[] = [];
+	private _cultures: CultureModel[] = [];
 
 	@state()
 	private _search = '';
@@ -65,6 +61,7 @@ export class UmbWorkspaceViewLanguageEditElement extends UmbLitElement {
 	private _startData: LanguageModel | null = null;
 
 	#languageWorkspaceContext?: UmbLanguageWorkspaceContext;
+	#cultureRepository = new UmbCultureRepository(this);
 
 	constructor() {
 		super();
@@ -75,18 +72,14 @@ export class UmbWorkspaceViewLanguageEditElement extends UmbLitElement {
 			this.observe(this.#languageWorkspaceContext.data, (language) => {
 				this.language = language;
 			});
-			this.observe(this.#languageWorkspaceContext.getAvailableCultures(), (cultures) => {
-				this._availableCultures = cultures;
-			});
 		});
+	}
 
-		this.consumeContext(UMB_LANGUAGE_STORE_CONTEXT_TOKEN, (instance: UmbLanguageStore) => {
-			if (!instance) return;
-
-			instance.getAll().subscribe((languages: Array<UmbLanguageStoreItemType>) => {
-				this._languages = languages;
-			});
-		});
+	protected async firstUpdated() {
+		const { data } = await this.#cultureRepository.requestCultures();
+		if (data) {
+			this._cultures = data.items;
+		}
 	}
 
 	#handleLanguageChange(event: Event) {
@@ -95,13 +88,13 @@ export class UmbWorkspaceViewLanguageEditElement extends UmbLitElement {
 			const isoCode = target.value.toString();
 
 			if (isoCode) {
-				this.#languageWorkspaceContext?.update({ isoCode });
+				this.#languageWorkspaceContext?.setCulture(isoCode);
 
 				// If the language name is not set, we set it to the name of the selected language.
 				if (!this.language?.name) {
-					const language = this._availableCultures.find((culture) => culture.name === isoCode);
-					if (language) {
-						this.#languageWorkspaceContext?.update({ name: language.name });
+					const culture = this._cultures.find((culture) => culture.name === isoCode);
+					if (culture && culture.englishName) {
+						this.#languageWorkspaceContext?.setName(culture.englishName);
 					}
 				}
 			} else {
@@ -141,12 +134,12 @@ export class UmbWorkspaceViewLanguageEditElement extends UmbLitElement {
 	#handleFallbackChange(event: UUIComboboxEvent) {
 		if (event instanceof UUIComboboxEvent) {
 			const target = event.composedPath()[0] as UUIComboboxElement;
-			this.#languageWorkspaceContext?.setFallbackLanguage(target.value.toString());
+			this.#languageWorkspaceContext?.setFallbackCulture(target.value.toString());
 		}
 	}
 
 	get #filteredCultures(): Array<CultureModel> {
-		return this._availableCultures.filter((culture) => {
+		return this._cultures.filter((culture) => {
 			return culture.englishName?.toLowerCase().includes(this._search.toLowerCase());
 		});
 	}
@@ -162,7 +155,7 @@ export class UmbWorkspaceViewLanguageEditElement extends UmbLitElement {
 	}
 
 	get #fromAvailableCultures() {
-		return this._availableCultures.find((culture) => culture.name === this.language?.isoCode);
+		return this._cultures.find((culture) => culture.name === this.language?.isoCode);
 	}
 
 	#renderCultureWarning() {
@@ -259,10 +252,10 @@ export class UmbWorkspaceViewLanguageEditElement extends UmbLitElement {
 	}
 }
 
-export default UmbWorkspaceViewLanguageEditElement;
+export default UmbEditLanguageWorkspaceViewElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-workspace-view-language-edit': UmbWorkspaceViewLanguageEditElement;
+		'umb-edit-language-workspace-view': UmbEditLanguageWorkspaceViewElement;
 	}
 }

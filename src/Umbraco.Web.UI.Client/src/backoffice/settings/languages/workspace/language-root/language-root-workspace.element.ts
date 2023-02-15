@@ -1,22 +1,16 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
-import {
-	UmbLanguageStore,
-	UmbLanguageStoreItemType,
-	UMB_LANGUAGE_STORE_CONTEXT_TOKEN,
-} from '../../repository/language.store';
 import { UmbTableColumn, UmbTableConfig, UmbTableItem } from '../../../../shared/components/table';
-import { UmbWorkspaceEntityElement } from '../../../../shared/components/workspace/workspace-entity-element.interface';
+import { UmbLanguageRepository } from '../../repository/language.repository';
 import { UmbLitElement } from '@umbraco-cms/element';
+import { LanguageModel } from '@umbraco-cms/backend-api';
 
-import '../language/language-workspace.element';
 import './language-root-table-delete-column-layout.element';
 import './language-root-table-name-column-layout.element';
-import { UmbLanguageRepository } from '../../repository/language.repository';
 
 @customElement('umb-language-root-workspace')
-export class UmbLanguageRootWorkspaceElement extends UmbLitElement implements UmbWorkspaceEntityElement {
+export class UmbLanguageRootWorkspaceElement extends UmbLitElement {
 	static styles = [
 		UUITextStyles,
 		css`
@@ -72,12 +66,9 @@ export class UmbLanguageRootWorkspaceElement extends UmbLitElement implements Um
 
 	#languageRepository = new UmbLanguageRepository(this);
 
-	load(): void {
+	connectedCallback() {
+		super.connectedCallback();
 		this.#observeLanguages();
-	}
-
-	create(): void {
-		// Not relevant for this workspace
 	}
 
 	async #observeLanguages() {
@@ -88,7 +79,7 @@ export class UmbLanguageRootWorkspaceElement extends UmbLitElement implements Um
 		}
 	}
 
-	#createTableItems(languages: Array<UmbLanguageStoreItemType>) {
+	#createTableItems(languages: Array<LanguageModel>) {
 		this._tableItems = languages.map((language) => {
 			return {
 				key: language.isoCode ?? '',

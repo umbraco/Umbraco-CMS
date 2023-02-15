@@ -5,7 +5,6 @@ import { UUIInputElement, UUIInputEvent } from '@umbraco-ui/uui';
 import { UmbWorkspaceEntityElement } from '../../../../shared/components/workspace/workspace-entity-element.interface';
 import { UmbLanguageWorkspaceContext } from './language-workspace.context';
 import { UmbLitElement } from '@umbraco-cms/element';
-import '../../../../shared/components/workspace/workspace-action/save/workspace-action-node-save.element.ts';
 import { LanguageModel } from '@umbraco-cms/backend-api';
 
 @customElement('umb-language-workspace')
@@ -30,20 +29,20 @@ export class UmbLanguageWorkspaceElement extends UmbLitElement implements UmbWor
 
 	#languageWorkspaceContext = new UmbLanguageWorkspaceContext(this);
 
+	constructor() {
+		super();
+
+		this.observe(this.#languageWorkspaceContext.data, (data) => {
+			this._language = data;
+		});
+	}
+
 	load(key: string): void {
 		this.#languageWorkspaceContext.load(key);
 	}
 
 	create(): void {
 		this.#languageWorkspaceContext.createScaffold();
-	}
-
-	async connectedCallback() {
-		super.connectedCallback();
-
-		this.observe(this.#languageWorkspaceContext.data, (data) => {
-			this._language = data;
-		});
 	}
 
 	#handleInput(event: UUIInputEvent) {
