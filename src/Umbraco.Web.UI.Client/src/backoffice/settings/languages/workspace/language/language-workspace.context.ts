@@ -1,70 +1,45 @@
-import { UmbLanguageStore, UmbLanguageStoreItemType, UMB_LANGUAGE_STORE_CONTEXT_TOKEN } from '../../language.store';
+import { UmbLanguageRepository } from '../../repository/language.repository';
+import type { LanguageModel } from '@umbraco-cms/backend-api';
+import { ObjectState } from '@umbraco-cms/observable-api';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
-import { ObjectState, UmbObserverController } from '@umbraco-cms/observable-api';
-import { UmbContextConsumerController } from '@umbraco-cms/context-api';
+import { UmbWorkspaceContext } from 'src/backoffice/shared/components/workspace/workspace-context/workspace-context';
 
-const DefaultLanguageData: UmbLanguageStoreItemType = {
-	name: '',
-	isoCode: '',
-	isDefault: false,
-	isMandatory: false,
-};
+export class UmbLanguageWorkspaceContext extends UmbWorkspaceContext {
+	#host: UmbControllerHostInterface;
+	#data = new ObjectState<LanguageModel | undefined>(undefined);
+	#languageRepository: UmbLanguageRepository;
+	#isNew = false;
 
-export class UmbWorkspaceLanguageContext {
-	public host: UmbControllerHostInterface;
-
-	#entityKey: string | null;
-
-	#data;
-	public readonly data;
-
-	#store: UmbLanguageStore | null = null;
-	protected _storeObserver?: UmbObserverController<UmbLanguageStoreItemType>;
-
-	constructor(host: UmbControllerHostInterface, entityKey: string | null) {
-		this.host = host;
-		this.#entityKey = entityKey;
-
-		this.#data = new ObjectState(DefaultLanguageData);
-		this.data = this.#data.asObservable();
-
-		new UmbContextConsumerController(host, UMB_LANGUAGE_STORE_CONTEXT_TOKEN, (_instance: UmbLanguageStore) => {
-			this.#store = _instance;
-			this.#observeStore();
-		});
+	constructor(host: UmbControllerHostInterface) {
+		super(host);
+		this.#host = host;
+		this.#languageRepository = new UmbLanguageRepository(this.#host);
 	}
 
-	#observeStore(): void {
-		if (!this.#store || this.#entityKey === null) {
-			return;
+	async load(isoCode: string) {
+		const { data } = await this.#languageRepository.requestByIsoCode(isoCode);
+		if (data) {
+			this.#isNew = false;
+			this.#data.update(data);
 		}
-
-		this._storeObserver?.destroy();
-		this._storeObserver = new UmbObserverController(this.host, this.#store.getByIsoCode(this.#entityKey), (content) => {
-			if (!content) return; // TODO: Handle nicely if there is no content data.
-			this.update(content);
-		});
 	}
 
-	public getData() {
+	async createScaffold() {
+		const { data } = await this.#languageRepository.createDetailsScaffold();
+		if (!data) return;
+		this.#isNew = true;
+		this.#data.update(data);
+	}
+
+	getData() {
 		return this.#data.getValue();
 	}
 
-	public getAvailableCultures() {
-		//TODO: Don't use !, however this will be changed with the introduction of repositories.
-		return this.#store!.getAvailableCultures();
+	getEntityType() {
+		return 'language';
 	}
 
-	public update(data: Partial<UmbLanguageStoreItemType>) {
-		this.#data.next({ ...this.getData(), ...data });
-	}
-
-	public save(): Promise<void> {
-		if (!this.#store) {
-			// TODO: more beautiful error:
-			console.error('Could not save cause workspace context has no store.');
-			return Promise.resolve();
-		}
-		return this.#store.save(this.getData());
+	public destroy(): void {
+		this.#data.complete();
 	}
 }

@@ -1,7 +1,11 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
-import { UmbLanguageStore, UmbLanguageStoreItemType, UMB_LANGUAGE_STORE_CONTEXT_TOKEN } from '../../language.store';
+import {
+	UmbLanguageStore,
+	UmbLanguageStoreItemType,
+	UMB_LANGUAGE_STORE_CONTEXT_TOKEN,
+} from '../../repository/language.store';
 import { UmbTableColumn, UmbTableConfig, UmbTableItem } from '../../../../shared/components/table';
 import { UmbWorkspaceEntityElement } from '../../../../shared/components/workspace/workspace-entity-element.interface';
 import { UmbLitElement } from '@umbraco-cms/element';
@@ -9,6 +13,7 @@ import { UmbLitElement } from '@umbraco-cms/element';
 import '../language/language-workspace.element';
 import './language-root-table-delete-column-layout.element';
 import './language-root-table-name-column-layout.element';
+import { UmbLanguageRepository } from '../../repository/language.repository';
 
 @customElement('umb-language-root-workspace')
 export class UmbLanguageRootWorkspaceElement extends UmbLitElement implements UmbWorkspaceEntityElement {
@@ -65,29 +70,22 @@ export class UmbLanguageRootWorkspaceElement extends UmbLitElement implements Um
 	@state()
 	private _tableItems: Array<UmbTableItem> = [];
 
-	#languageStore?: UmbLanguageStore;
-
-	constructor() {
-		super();
-
-		this.consumeContext(UMB_LANGUAGE_STORE_CONTEXT_TOKEN, (instance) => {
-			this.#languageStore = instance;
-			this.#observeLanguages();
-		});
-	}
+	#languageRepository = new UmbLanguageRepository(this);
 
 	load(): void {
-		// Not relevant for this workspace
+		this.#observeLanguages();
 	}
 
 	create(): void {
 		// Not relevant for this workspace
 	}
 
-	#observeLanguages() {
-		this.#languageStore?.getAll().subscribe((languages) => {
-			this.#createTableItems(languages);
-		});
+	async #observeLanguages() {
+		const { asObservable } = await this.#languageRepository.requestLanguages();
+
+		if (asObservable) {
+			this.observe(asObservable(), (languages) => this.#createTableItems(languages));
+		}
 	}
 
 	#createTableItems(languages: Array<UmbLanguageStoreItemType>) {

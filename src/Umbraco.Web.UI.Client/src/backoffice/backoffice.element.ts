@@ -38,7 +38,7 @@ import { UmbDataTypeTreeStore } from './settings/data-types/repository/data-type
 import { UmbTemplateTreeStore } from './templating/templates/tree/data/template.tree.store';
 import { UmbTemplateDetailStore } from './templating/templates/workspace/data/template.detail.store';
 import { UmbThemeContext } from './themes/theme.context';
-import { UmbLanguageStore } from './settings/languages/language.store';
+import { UmbLanguageStore } from './settings/languages/repository/language.store';
 import { UmbNotificationService, UMB_NOTIFICATION_SERVICE_CONTEXT_TOKEN } from '@umbraco-cms/notification';
 
 import '@umbraco-cms/router';

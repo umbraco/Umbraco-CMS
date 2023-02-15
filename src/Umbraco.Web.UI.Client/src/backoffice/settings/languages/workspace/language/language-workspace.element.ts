@@ -2,9 +2,9 @@ import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, html, nothing } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { UUIInputElement, UUIInputEvent } from '@umbraco-ui/uui';
-import { UmbLanguageStoreItemType } from '../../language.store';
+import { UmbLanguageStoreItemType } from '../../repository/language.store';
 import { UmbWorkspaceEntityElement } from '../../../../shared/components/workspace/workspace-entity-element.interface';
-import { UmbWorkspaceLanguageContext } from './language-workspace.context';
+import { UmbLanguageWorkspaceContext } from './language-workspace.context';
 import { UmbLitElement } from '@umbraco-cms/element';
 import '../../../../shared/components/workspace/workspace-action/save/workspace-action-node-save.element.ts';
 
@@ -28,7 +28,7 @@ export class UmbLanguageWorkspaceElement extends UmbLitElement implements UmbWor
 	@property()
 	language?: UmbLanguageStoreItemType;
 
-	#languageWorkspaceContext?: UmbWorkspaceLanguageContext;
+	#languageWorkspaceContext?: UmbLanguageWorkspaceContext;
 
 	load(key: string): void {
 		this.provideLanguageWorkspaceContext(key);
@@ -39,7 +39,7 @@ export class UmbLanguageWorkspaceElement extends UmbLitElement implements UmbWor
 	}
 
 	public provideLanguageWorkspaceContext(entityKey: string | null) {
-		this.#languageWorkspaceContext = new UmbWorkspaceLanguageContext(this, entityKey);
+		this.#languageWorkspaceContext = new UmbLanguageWorkspaceContext(this, entityKey);
 		this.provideContext('umbWorkspaceContext', this.#languageWorkspaceContext);
 		this.#languageWorkspaceContext.data.subscribe((language) => {
 			this.language = language;

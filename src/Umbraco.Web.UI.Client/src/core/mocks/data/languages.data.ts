@@ -1,4 +1,4 @@
-import { UmbLanguageStoreItemType } from '../../../backoffice/settings/languages/language.store';
+import { UmbLanguageStoreItemType } from '../../../backoffice/settings/languages/repository/language.store';
 import { UmbData } from './data';
 
 // Temp mocked database

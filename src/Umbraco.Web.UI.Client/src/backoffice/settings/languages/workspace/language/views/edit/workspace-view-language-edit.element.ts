@@ -4,12 +4,12 @@ import { css, html, nothing } from 'lit';
 import { repeat } from 'lit/directives/repeat.js';
 import { customElement, property, state } from 'lit/decorators.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
-import { UmbWorkspaceLanguageContext } from '../../language-workspace.context';
+import { UmbLanguageWorkspaceContext } from '../../language-workspace.context';
 import {
 	UmbLanguageStore,
 	UmbLanguageStoreItemType,
 	UMB_LANGUAGE_STORE_CONTEXT_TOKEN,
-} from '../../../../language.store';
+} from '../../../../repository/language.store';
 import { UmbLitElement } from '@umbraco-cms/element';
 import { CultureModel, LanguageModel } from '@umbraco-cms/backend-api';
 
@@ -64,12 +64,12 @@ export class UmbWorkspaceViewLanguageEditElement extends UmbLitElement {
 	@state()
 	private _startData: LanguageModel | null = null;
 
-	#languageWorkspaceContext?: UmbWorkspaceLanguageContext;
+	#languageWorkspaceContext?: UmbLanguageWorkspaceContext;
 
 	constructor() {
 		super();
 
-		this.consumeContext<UmbWorkspaceLanguageContext>('umbWorkspaceContext', (instance) => {
+		this.consumeContext<UmbLanguageWorkspaceContext>('umbWorkspaceContext', (instance) => {
 			this.#languageWorkspaceContext = instance;
 
 			if (!this.#languageWorkspaceContext) return;
