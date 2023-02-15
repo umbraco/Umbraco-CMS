@@ -1,28 +1,39 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
-import { css, html, LitElement, nothing, TemplateResult } from 'lit';
+import { css, html, nothing, TemplateResult } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { UmbContextDebugRequest } from '@umbraco-cms/context-api';
+import { UmbLitElement } from '@umbraco-cms/element';
+import { UmbModalService, UMB_MODAL_SERVICE_CONTEXT_TOKEN } from '@umbraco-cms/modal';
 
 @customElement('umb-debug')
-export class UmbDebug extends LitElement {
+export class UmbDebug extends UmbLitElement {
 	static styles = [
 		UUITextStyles,
-		css`
+		css`			
 			#container {
 				display: block;
 				font-family: monospace;
 
 				z-index: 10000;
 
+				position:relative;
 				width: 100%;
 				padding: 10px 0;
+			}
+
+			uui-badge {
+				cursor: pointer;
+			}
+
+			uui-icon {
+				font-size: 15px;
 			}
 
 			.events {
 				background-color: var(--uui-color-danger);
 				color: var(--uui-color-selected-contrast);
 				max-height: 0;
-				transition: max-height 0.15s ease-out;
+				transition: max-height 0.25s ease-out;
 				overflow: hidden;
 			}
 
@@ -44,57 +55,97 @@ export class UmbDebug extends LitElement {
 	@property({ reflect: true, type: Boolean })
 	enabled = false;
 
+	@property({ reflect: true, type: Boolean })
+	useDialog = false;
+
 	@property()
-	contextAliases = new Map();
+	contexts = new Map();
 
 	@state()
 	private _debugPaneOpen = false;
 
-	private _toggleDebugPane() {
-		this._debugPaneOpen = !this._debugPaneOpen;
-	}
+	private _modalService?: UmbModalService;
 
+	constructor() {
+		super();
+		this.consumeContext(UMB_MODAL_SERVICE_CONTEXT_TOKEN, (modalService) => {
+			this._modalService = modalService;
+		});
+	}
+	
 	connectedCallback(): void {
 		super.connectedCallback();
 
 		// Dispatch it
 		this.dispatchEvent(
-			new UmbContextDebugRequest((instances: Map<any, any>) => {
-				console.log('I have contexts now', instances);
+			new UmbContextDebugRequest((contexts: Map<any, any>) => {
 
-				this.contextAliases = instances;
+				// The Contexts are collected
+				// When travelling up through the DOM from this element
+				// to the root of <umb-app> which then uses the callback prop
+				// of the this event tha has been raised to assign the contexts
+				// back to this property of the WebComponent
+				this.contexts = contexts;
 			})
 		);
 	}
 
 	render() {
-		if (this.enabled) {
-			return html`
-				<div id="container">
-					<uui-button color="danger" look="primary" @click="${this._toggleDebugPane}">
-						<uui-icon name="umb:bug"></uui-icon>
-						Debug
-					</uui-button>
+		if (this.enabled) {			
+			return this.useDialog ? this._renderDialog() : this._renderPanel();			
+		} else {
+			return nothing;
+		}
+		
+	}
 
-					<div class="events ${this._debugPaneOpen ? 'open' : ''}">
-						<div>
-							<h4>Context Aliases to consume</h4>
-							<ul>
-								${this._renderContextAliases()}
-							</ul>
-						</div>
+	private _toggleDebugPane() {
+		this._debugPaneOpen = !this._debugPaneOpen;
+	}
+
+	private _openDialog() {
+		const modalHandler = this._modalService?.open('umb-debug-modal-layout',	{ size: 'medium', type: 'sidebar', data:{ contexts: this.contexts }});
+		
+		modalHandler?.onClose().then((data) => {
+			// if any data is supplied on close, it will be available here.
+			console.log('modal closed data', data);
+		});
+	}
+
+
+
+	private _renderDialog() {
+		return html`
+			<div id="container">
+				<uui-badge color="danger" look="primary" attention @click="${this._openDialog}">
+					<uui-icon name="umb:bug"></uui-icon> Debug
+				</uui-badge>
+			</div>`;
+	}
+
+	private _renderPanel(){
+		return html`
+			<div id="container">
+				<uui-button color="danger" look="primary" @click="${this._toggleDebugPane}">
+					<uui-icon name="umb:bug"></uui-icon>
+					Debug
+				</uui-button>
+
+				<div class="events ${this._debugPaneOpen ? 'open' : ''}">
+					<div>
+						<h4>Context Aliases to consume</h4>
+						<ul>
+							${this._renderContextAliases()}
+						</ul>
 					</div>
 				</div>
-			`;
-		}
-
-		return nothing;
+			</div>`;
 	}
 
 	private _renderContextAliases() {
 		const aliases = [];
 
-		for (const [alias, instance] of this.contextAliases) {
+		for (const [alias, instance] of this.contexts) {
 			aliases.push(
 				html` <li>
 					Context: <strong>${alias}</strong>
@@ -124,10 +175,6 @@ export class UmbDebug extends LitElement {
 				if (key.startsWith('_')) {
 					continue;
 				}
-				// Goes KABOOM - if try to loop over the class/object
-				// instanceKeys.push(html`<li>${key} = ${instance[key]}</li>`);
-
-				// console.log(`key: ${key} = ${value} TYPEOF: ${typeof value}`);
 
 				const value = instance[key];
 				if (typeof value === 'string') {
