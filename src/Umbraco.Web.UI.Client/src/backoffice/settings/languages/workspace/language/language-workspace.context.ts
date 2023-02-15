@@ -41,7 +41,23 @@ export class UmbLanguageWorkspaceContext extends UmbWorkspaceContext {
 		return 'language';
 	}
 
-	public destroy(): void {
+	setName(name: string) {
+		this.#data.update({ name });
+	}
+
+	setMandatory(isMandatory: boolean) {
+		this.#data.update({ isMandatory });
+	}
+
+	setDefault(isDefault: boolean) {
+		this.#data.update({ isDefault });
+	}
+
+	setFallbackLanguage(isoCode: string) {
+		this.#data.update({ fallbackIsoCode: isoCode });
+	}
+
+	destroy(): void {
 		this.#data.complete();
 	}
 }
