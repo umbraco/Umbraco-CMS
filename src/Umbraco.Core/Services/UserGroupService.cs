@@ -16,6 +16,9 @@ namespace Umbraco.Cms.Core.Services;
 /// <inheritdoc cref="Umbraco.Cms.Core.Services.IUserGroupService" />
 internal sealed class UserGroupService : RepositoryService, IUserGroupService
 {
+    public const int MaxUserGroupNameLength = 200;
+    public const int MaxUserGroupAliasLength = 200;
+
     private readonly IUserGroupRepository _userGroupRepository;
     private readonly IUserGroupAuthorizationService _userGroupAuthorizationService;
     private readonly IUserService _userService;
@@ -219,15 +222,15 @@ internal sealed class UserGroupService : RepositoryService, IUserGroupService
 
     private async Task<Attempt<IUserGroup, UserGroupOperationStatus>> ValidateUserGroupCreationAsync(IUserGroup userGroup)
     {
+        UserGroupOperationStatus commonValidationStatus = ValidateCommon(userGroup);
+        if (commonValidationStatus != UserGroupOperationStatus.Success)
+        {
+            return Attempt.FailWithStatus(commonValidationStatus, userGroup);
+        }
+
         if (await IsNewUserGroup(userGroup) is false)
         {
             return Attempt.FailWithStatus(UserGroupOperationStatus.AlreadyExists, userGroup);
-        }
-
-        Attempt<UserGroupOperationStatus> startNodesValidation = ValidateStartNodesExists(userGroup);
-        if (startNodesValidation.Success is false)
-        {
-            return Attempt.FailWithStatus(startNodesValidation.Result, userGroup);
         }
 
         return UserGroupHasUniqueAlias(userGroup) is false
@@ -277,18 +280,42 @@ internal sealed class UserGroupService : RepositoryService, IUserGroupService
 
     private async Task<Attempt<IUserGroup, UserGroupOperationStatus>> ValidateUserGroupUpdateAsync(IUserGroup userGroup)
     {
+        UserGroupOperationStatus commonValidationStatus = ValidateCommon(userGroup);
+        if (commonValidationStatus != UserGroupOperationStatus.Success)
+        {
+            return Attempt.FailWithStatus(commonValidationStatus, userGroup);
+        }
+
         if (await IsNewUserGroup(userGroup))
         {
             return Attempt.FailWithStatus(UserGroupOperationStatus.NotFound, userGroup);
         }
 
+        return Attempt.SucceedWithStatus(UserGroupOperationStatus.Success, userGroup);
+    }
+
+    /// <summary>
+    /// Validate common user group properties, that are shared between update, create, etc.
+    /// </summary>
+    private UserGroupOperationStatus ValidateCommon(IUserGroup userGroup)
+    {
+        if (userGroup.Name!.Length > MaxUserGroupNameLength)
+        {
+            return UserGroupOperationStatus.GroupNameTooLong;
+        }
+
+        if (userGroup.Alias.Length > MaxUserGroupAliasLength)
+        {
+            return UserGroupOperationStatus.GroupAliasTooLong;
+        }
+
         Attempt<UserGroupOperationStatus> startNodesValidation = ValidateStartNodesExists(userGroup);
         if (startNodesValidation.Success is false)
         {
-            return Attempt.FailWithStatus(startNodesValidation.Result, userGroup);
+            return startNodesValidation.Result;
         }
 
-        return Attempt.SucceedWithStatus(UserGroupOperationStatus.Success, userGroup);
+        return UserGroupOperationStatus.Success;
     }
 
     private async Task<bool> IsNewUserGroup(IUserGroup userGroup)
@@ -304,7 +331,7 @@ internal sealed class UserGroupService : RepositoryService, IUserGroupService
     private Attempt<UserGroupOperationStatus> ValidateStartNodesExists(IUserGroup userGroup)
     {
         if (userGroup.StartContentId is not null
-            && _entityService.Exists(userGroup.StartContentId.Value, UmbracoObjectTypes.Document) is false)
+        && _entityService.Exists(userGroup.StartContentId.Value, UmbracoObjectTypes.Document) is false)
         {
             return Attempt.Fail(UserGroupOperationStatus.DocumentStartNodeKeyNotFound);
         }

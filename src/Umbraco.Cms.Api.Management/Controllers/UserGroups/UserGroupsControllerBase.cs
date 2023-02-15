@@ -66,6 +66,14 @@ public class UserGroupsControllerBase : ManagementApiControllerBase
                 .WithTitle("Language not found")
                 .WithDetail("The specified language cannot be found.")
                 .Build()),
+            UserGroupOperationStatus.GroupNameTooLong => BadRequest(new ProblemDetailsBuilder()
+                .WithTitle("Name too long")
+                .WithDetail("User Group name is too long.")
+                .Build()),
+            UserGroupOperationStatus.GroupAliasTooLong => BadRequest(new ProblemDetailsBuilder()
+                .WithTitle("Alias too long")
+                .WithDetail("The user group alias is too long.")
+                .Build()),
             _ => StatusCode(StatusCodes.Status500InternalServerError, "Unknown user group operation status."),
         };
 }
