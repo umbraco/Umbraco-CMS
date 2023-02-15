@@ -1,3 +1,4 @@
+import { UmbSaveWorkspaceAction } from '../../../../shared/workspace-actions/save.action';
 import type { ManifestWorkspace, ManifestWorkspaceAction, ManifestWorkspaceView } from '@umbraco-cms/models';
 
 const workspace: ManifestWorkspace = {
@@ -9,21 +10,6 @@ const workspace: ManifestWorkspace = {
 		entityType: 'language',
 	},
 };
-
-const workspaceActions: Array<ManifestWorkspaceAction> = [
-	{
-		type: 'workspaceAction',
-		alias: 'Umb.WorkspaceAction.Language.Save',
-		name: 'Save Language Workspace Action',
-		loader: () =>
-			import('../../../../shared/components/workspace/workspace-action/save/workspace-action-node-save.element'),
-		meta: {
-			workspaces: ['Umb.Workspace.Language'],
-			look: 'primary',
-			color: 'positive',
-		},
-	},
-];
 
 const workspaceViews: Array<ManifestWorkspaceView> = [
 	{
@@ -37,6 +23,22 @@ const workspaceViews: Array<ManifestWorkspaceView> = [
 			label: 'Edit',
 			pathname: 'edit',
 			icon: 'edit',
+		},
+	},
+];
+
+const workspaceActions: Array<ManifestWorkspaceAction> = [
+	{
+		type: 'workspaceAction',
+		alias: 'Umb.WorkspaceAction.Language.Save',
+		name: 'Save Language Workspace Action',
+		meta: {
+			workspaces: ['Umb.Workspace.Language'],
+			look: 'primary',
+			color: 'positive',
+			label: 'Save',
+			repositoryAlias: 'Umb.Repository.Language',
+			api: UmbSaveWorkspaceAction,
 		},
 	},
 ];
