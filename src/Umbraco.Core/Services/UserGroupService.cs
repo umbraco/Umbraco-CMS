@@ -251,10 +251,10 @@ internal sealed class UserGroupService : RepositoryService, IUserGroupService
             return Attempt.FailWithStatus(UserGroupOperationStatus.MissingUser, userGroup);
         }
 
-        Attempt<IUserGroup, UserGroupOperationStatus> validationAttempt = await ValidateUserGroupUpdateAsync(userGroup);
-        if (validationAttempt.Success is false)
+        UserGroupOperationStatus validationStatus = await ValidateUserGroupUpdateAsync(userGroup);
+        if (validationStatus is not UserGroupOperationStatus.Success)
         {
-            return validationAttempt;
+            return Attempt.FailWithStatus(validationStatus, userGroup);
         }
 
         Attempt<UserGroupOperationStatus> authorizationAttempt = _userGroupAuthorizationService.AuthorizeUserGroupUpdate(performingUser, userGroup);
@@ -278,20 +278,20 @@ internal sealed class UserGroupService : RepositoryService, IUserGroupService
         return Attempt.SucceedWithStatus(UserGroupOperationStatus.Success, userGroup);
     }
 
-    private async Task<Attempt<IUserGroup, UserGroupOperationStatus>> ValidateUserGroupUpdateAsync(IUserGroup userGroup)
+    private async Task<UserGroupOperationStatus> ValidateUserGroupUpdateAsync(IUserGroup userGroup)
     {
         UserGroupOperationStatus commonValidationStatus = ValidateCommon(userGroup);
         if (commonValidationStatus != UserGroupOperationStatus.Success)
         {
-            return Attempt.FailWithStatus(commonValidationStatus, userGroup);
+            return commonValidationStatus;
         }
 
         if (await IsNewUserGroup(userGroup))
         {
-            return Attempt.FailWithStatus(UserGroupOperationStatus.NotFound, userGroup);
+            return UserGroupOperationStatus.NotFound;
         }
 
-        return Attempt.SucceedWithStatus(UserGroupOperationStatus.Success, userGroup);
+        return UserGroupOperationStatus.Success;
     }
 
     /// <summary>
@@ -309,10 +309,10 @@ internal sealed class UserGroupService : RepositoryService, IUserGroupService
             return UserGroupOperationStatus.GroupAliasTooLong;
         }
 
-        Attempt<UserGroupOperationStatus> startNodesValidation = ValidateStartNodesExists(userGroup);
-        if (startNodesValidation.Success is false)
+        UserGroupOperationStatus startNodesValidationStatus = ValidateStartNodesExists(userGroup);
+        if (startNodesValidationStatus is not UserGroupOperationStatus.Success)
         {
-            return startNodesValidation.Result;
+            return startNodesValidationStatus;
         }
 
         return UserGroupOperationStatus.Success;
@@ -328,21 +328,21 @@ internal sealed class UserGroupService : RepositoryService, IUserGroupService
         return await GetAsync(userGroup.Key) is null;
     }
 
-    private Attempt<UserGroupOperationStatus> ValidateStartNodesExists(IUserGroup userGroup)
+    private UserGroupOperationStatus ValidateStartNodesExists(IUserGroup userGroup)
     {
         if (userGroup.StartContentId is not null
         && _entityService.Exists(userGroup.StartContentId.Value, UmbracoObjectTypes.Document) is false)
         {
-            return Attempt.Fail(UserGroupOperationStatus.DocumentStartNodeKeyNotFound);
+            return UserGroupOperationStatus.DocumentStartNodeKeyNotFound;
         }
 
         if (userGroup.StartMediaId is not null
             && _entityService.Exists(userGroup.StartMediaId.Value, UmbracoObjectTypes.Media) is false)
         {
-            return Attempt.Fail(UserGroupOperationStatus.MediaStartNodeKeyNotFound);
+            return UserGroupOperationStatus.MediaStartNodeKeyNotFound;
         }
 
-        return Attempt.Succeed(UserGroupOperationStatus.Success);
+        return UserGroupOperationStatus.Success;
     }
 
     private bool UserGroupHasUniqueAlias(IUserGroup userGroup) => _userGroupRepository.Get(userGroup.Alias) is null;
