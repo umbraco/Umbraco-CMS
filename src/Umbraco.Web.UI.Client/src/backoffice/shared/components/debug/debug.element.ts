@@ -1,11 +1,7 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
-import { css, html, LitElement, nothing } from 'lit';
+import { css, html, LitElement, nothing, TemplateResult } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
-import {
-	UmbContextDebugRequest,
-	UmbContextRequestEventImplementation,
-	umbContextRequestEventType,
-} from '@umbraco-cms/context-api';
+import { UmbContextDebugRequest } from '@umbraco-cms/context-api';
 
 @customElement('umb-debug')
 export class UmbDebug extends LitElement {
@@ -61,7 +57,7 @@ export class UmbDebug extends LitElement {
 
 		// Dispatch it
 		this.dispatchEvent(
-			new UmbContextDebugRequest((instances) => {
+			new UmbContextDebugRequest((instances: Map<any, any>) => {
 				console.log('I have contexts now', instances);
 
 				this.contextAliases = instances;
@@ -100,6 +96,7 @@ export class UmbDebug extends LitElement {
 			aliases.push(
 				html` <li>
 					Context: <strong>${alias}</strong>
+					<span>(${instance.toString()})</span>
 					<ul>
 						${this._renderInstance(instance)}
 					</ul>
@@ -111,12 +108,15 @@ export class UmbDebug extends LitElement {
 	}
 
 	private _renderInstance(instance: any) {
-		const instanceKeys = [];
+		const instanceKeys: TemplateResult[] = [];
 
-		if (typeof instance === 'object') {
-			const methodNames = this.getClassMethodNames(instance);
+		if (typeof instance !== 'object') {
+			return instanceKeys;
+		}
+
+		const methodNames = this.getClassMethodNames(instance);
+		if (methodNames.length) {
 			instanceKeys.push(html`<li>Methods - ${methodNames.join(', ')}</li>`);
-			// instanceKeys.push(html`<li>Method - </li>`);
 		}
 
 		for (const key in instance) {
@@ -132,7 +132,7 @@ export class UmbDebug extends LitElement {
 			if (typeof value === 'string') {
 				instanceKeys.push(html`<li>${key} = ${value}</li>`);
 			} else {
-				instanceKeys.push(html`<li>${key}</li>`);
+				instanceKeys.push(html`<li>${key} (${typeof value})</li>`);
 			}
 		}
 
