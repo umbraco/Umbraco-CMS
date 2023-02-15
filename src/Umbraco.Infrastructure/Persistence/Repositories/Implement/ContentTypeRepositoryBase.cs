@@ -120,6 +120,7 @@ internal abstract class ContentTypeRepositoryBase<TEntity> : EntityRepositoryBas
 
         foreach (TEntity descendant in descendants.OrderBy(x => x.Level))
         {
+            //FIXME: Use MoveEventInfo constructor that takes a parentKey when this method is refactored
             moveInfo.Add(new MoveEventInfo<TEntity>(descendant, descendant.Path, descendant.ParentId));
 
             descendant.Path = paths[descendant.Id] = paths[descendant.ParentId] + "," + descendant.Id;
