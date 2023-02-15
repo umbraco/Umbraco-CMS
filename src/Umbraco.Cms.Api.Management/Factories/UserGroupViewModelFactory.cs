@@ -15,18 +15,24 @@ public class UserGroupViewModelFactory : IUserGroupViewModelFactory
 {
     private readonly IEntityService _entityService;
     private readonly IShortStringHelper _shortStringHelper;
+    private readonly ILanguageService _languageService;
 
-    public UserGroupViewModelFactory(IEntityService entityService, IShortStringHelper shortStringHelper)
+    public UserGroupViewModelFactory(
+        IEntityService entityService,
+        IShortStringHelper shortStringHelper,
+        ILanguageService languageService)
     {
         _entityService = entityService;
         _shortStringHelper = shortStringHelper;
+        _languageService = languageService;
     }
 
     /// <inheritdoc />
-    public UserGroupViewModel Create(IUserGroup userGroup)
+    public async Task<UserGroupViewModel> CreateAsync(IUserGroup userGroup)
     {
         Guid? contentStartNodeKey = GetKeyFromId(userGroup.StartContentId, UmbracoObjectTypes.Document);
         Guid? mediaStartNodeKey = GetKeyFromId(userGroup.StartMediaId, UmbracoObjectTypes.Media);
+        IEnumerable<string> languageIsoCodes = await MapLanguageIdsToIsoCodeAsync(userGroup.AllowedLanguages);
 
         return new UserGroupViewModel
         {
@@ -35,17 +41,27 @@ public class UserGroupViewModelFactory : IUserGroupViewModelFactory
             DocumentStartNodeKey = contentStartNodeKey,
             MediaStartNodeKey = mediaStartNodeKey,
             Icon = userGroup.Icon,
-            Languages = userGroup.AllowedLanguages,
+            Languages = languageIsoCodes,
             HasAccessToAllLanguages = userGroup.HasAccessToAllLanguages,
             Permissions = userGroup.PermissionNames,
             Sections = userGroup.AllowedSections.Select(SectionMapper.GetName),
         };
     }
 
-    public IEnumerable<UserGroupViewModel> CreateMultiple(IEnumerable<IUserGroup> userGroups) =>
-        userGroups.Select(Create);
+    /// <inheritdoc />
+    public async Task<IEnumerable<UserGroupViewModel>> CreateMultipleAsync(IEnumerable<IUserGroup> userGroups)
+    {
+        var userGroupViewModels = new List<UserGroupViewModel>();
+        foreach (IUserGroup userGroup in userGroups)
+        {
+            userGroupViewModels.Add(await CreateAsync(userGroup));
+        }
 
-    public Attempt<IUserGroup, UserGroupOperationStatus> Create(UserGroupSaveModel saveModel)
+        return userGroupViewModels;
+    }
+
+    /// <inheritdoc />
+    public async Task<Attempt<IUserGroup, UserGroupOperationStatus>> CreateAsync(UserGroupSaveModel saveModel)
     {
         var cleanedName = saveModel.Name.CleanForXss('[', ']', '(', ')', ':');
 
@@ -69,15 +85,16 @@ public class UserGroupViewModelFactory : IUserGroupViewModelFactory
             group.AddAllowedSection(SectionMapper.GetAlias(section));
         }
 
-        foreach (var language in saveModel.Languages)
+        foreach (var languageId in await MapLanguageIsoCodesToIdsAsync(saveModel.Languages))
         {
-            group.AddAllowedLanguage(language);
+            group.AddAllowedLanguage(languageId);
         }
 
         return Attempt.SucceedWithStatus<IUserGroup, UserGroupOperationStatus>(UserGroupOperationStatus.Success, group);
     }
 
-    public Attempt<IUserGroup, UserGroupOperationStatus> Update(IUserGroup current, UserGroupUpdateModel update)
+    /// <inheritdoc />
+    public async Task<Attempt<IUserGroup, UserGroupOperationStatus>> UpdateAsync(IUserGroup current, UserGroupUpdateModel update)
     {
         Attempt<UserGroupOperationStatus> assignmentAttempt = AssignStartNodesToUserGroup(update, current);
         if (assignmentAttempt.Success is false)
@@ -91,7 +108,7 @@ public class UserGroupViewModelFactory : IUserGroupViewModelFactory
         current.PermissionNames = update.Permissions;
 
         current.ClearAllowedLanguages();
-        foreach (var languageId in update.Languages)
+        foreach (var languageId in await MapLanguageIsoCodesToIdsAsync(update.Languages))
         {
             current.AddAllowedLanguage(languageId);
         }
@@ -103,6 +120,22 @@ public class UserGroupViewModelFactory : IUserGroupViewModelFactory
         }
 
         return Attempt.SucceedWithStatus(UserGroupOperationStatus.Success, current);
+    }
+
+    private async Task<IEnumerable<string>> MapLanguageIdsToIsoCodeAsync(IEnumerable<int> ids)
+    {
+        IEnumerable<ILanguage> languages = await _languageService.GetAllAsync();
+        return languages
+            .Where(x => ids.Contains(x.Id))
+            .Select(x => x.IsoCode);
+    }
+
+    private async Task<IEnumerable<int>> MapLanguageIsoCodesToIdsAsync(IEnumerable<string> isoCodes)
+    {
+        IEnumerable<ILanguage> languages = await _languageService.GetAllAsync();
+        return languages
+            .Where(x => isoCodes.Contains(x.IsoCode))
+            .Select(x => x.Id);
     }
 
     private Attempt<UserGroupOperationStatus> AssignStartNodesToUserGroup(UserGroupBase source, IUserGroup target)

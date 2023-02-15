@@ -34,7 +34,7 @@ public class GetAllUserGroupController : UserGroupsControllerBase
         // Instead we should implement this functionality on the CurrentUserController
         PagedModel<IUserGroup> userGroups = await _userGroupService.GetAllAsync(skip, take);
 
-        var viewModels = _userViewModelFactory.CreateMultiple(userGroups.Items).ToList();
+        var viewModels = (await _userViewModelFactory.CreateMultipleAsync(userGroups.Items)).ToList();
         return new PagedViewModel<UserGroupViewModel> { Total = userGroups.Total, Items = viewModels };
     }
 }

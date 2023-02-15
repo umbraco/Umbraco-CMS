@@ -34,6 +34,6 @@ public class ByKeyUserGroupController : UserGroupsControllerBase
             return NotFound();
         }
 
-        return _userGroupViewModelFactory.Create(userGroup);
+        return await _userGroupViewModelFactory.CreateAsync(userGroup);
     }
 }

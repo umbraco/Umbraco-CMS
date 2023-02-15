@@ -39,7 +39,7 @@ public class CreateUserGroupController : UserGroupsControllerBase
         //     return UserGroupOperationStatusResult(UserGroupOperationStatus.MissingUser);
         // }
 
-        Attempt<IUserGroup, UserGroupOperationStatus> userGroupCreationAttempt = _userGroupViewModelFactory.Create(userGroupSaveModel);
+        Attempt<IUserGroup, UserGroupOperationStatus> userGroupCreationAttempt = await _userGroupViewModelFactory.CreateAsync(userGroupSaveModel);
         if (userGroupCreationAttempt.Success is false)
         {
             return UserGroupOperationStatusResult(userGroupCreationAttempt.Status);

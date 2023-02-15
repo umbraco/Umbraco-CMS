@@ -15,21 +15,21 @@ public interface IUserGroupViewModelFactory
     /// </summary>
     /// <param name="userGroup"></param>
     /// <returns></returns>
-    UserGroupViewModel Create(IUserGroup userGroup);
+    Task<UserGroupViewModel> CreateAsync(IUserGroup userGroup);
 
     /// <summary>
     /// Creates multiple <see cref="UserGroupViewModel"/> base on multiple <see cref="UserGroup"/>
     /// </summary>
     /// <param name="userGroups"></param>
     /// <returns></returns>
-    IEnumerable<UserGroupViewModel> CreateMultiple(IEnumerable<IUserGroup> userGroups);
+    Task<IEnumerable<UserGroupViewModel>> CreateMultipleAsync(IEnumerable<IUserGroup> userGroups);
 
     /// <summary>
     /// Creates an <see cref="IUserGroup"/> based on a <see cref="UserGroupSaveModel"/>
     /// </summary>
     /// <param name="saveModel"></param>
     /// <returns>An attempt indicating if the operation was a success as well as a more detailed <see cref="UserGroupOperationStatus"/>.</returns>
-    Attempt<IUserGroup, UserGroupOperationStatus> Create(UserGroupSaveModel saveModel);
+    Task<Attempt<IUserGroup, UserGroupOperationStatus>> CreateAsync(UserGroupSaveModel saveModel);
 
     /// <summary>
     /// Converts the values of an update model to fit with the existing backoffice implementations, and maps it to an existing user group.
@@ -37,5 +37,5 @@ public interface IUserGroupViewModelFactory
     /// <param name="current">Existing user group to map to.</param>
     /// <param name="update">Update model containing the new values.</param>
     /// <returns>An attempt indicating if the operation was a success as well as a more detailed <see cref="UserGroupOperationStatus"/>.</returns>
-    Attempt<IUserGroup, UserGroupOperationStatus> Update(IUserGroup current, UserGroupUpdateModel update);
+    Task<Attempt<IUserGroup, UserGroupOperationStatus>> UpdateAsync(IUserGroup current, UserGroupUpdateModel update);
 }

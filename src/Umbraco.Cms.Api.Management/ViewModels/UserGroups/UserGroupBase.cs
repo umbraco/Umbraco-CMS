@@ -28,7 +28,7 @@ public class UserGroupBase
     /// <summary>
     /// The languages that the user group has access to
     /// </summary>
-    public required IEnumerable<int> Languages { get; init; }
+    public required IEnumerable<string> Languages { get; init; }
 
     /// <summary>
     /// Flag indicating if the user group gives access to all languages, regardless of <see cref="UserGroupBase.Languages"/>.
