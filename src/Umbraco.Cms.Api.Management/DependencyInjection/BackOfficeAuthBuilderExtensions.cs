@@ -59,8 +59,8 @@ public static class BackOfficeAuthBuilderExtensions
             {
                 // Enable the authorization and token endpoints.
                 options
-                    .SetAuthorizationEndpointUris(Controllers.Security.Paths.BackOfficeApiAuthorizationEndpoint)
-                    .SetTokenEndpointUris(Controllers.Security.Paths.BackOfficeApiTokenEndpoint);
+                    .SetAuthorizationEndpointUris(Controllers.Security.Paths.BackOfficeApiAuthorizationEndpoint.TrimStart('/'))
+                    .SetTokenEndpointUris(Controllers.Security.Paths.BackOfficeApiTokenEndpoint.TrimStart('/'));
 
                 // Enable authorization code flow with PKCE
                 options
