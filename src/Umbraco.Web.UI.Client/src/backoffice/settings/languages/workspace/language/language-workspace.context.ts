@@ -6,9 +6,11 @@ import { UmbWorkspaceContext } from 'src/backoffice/shared/components/workspace/
 
 export class UmbLanguageWorkspaceContext extends UmbWorkspaceContext {
 	#host: UmbControllerHostInterface;
-	#data = new ObjectState<LanguageModel | undefined>(undefined);
 	#languageRepository: UmbLanguageRepository;
 	#isNew = false;
+
+	#data = new ObjectState<LanguageModel | undefined>(undefined);
+	data = this.#data.asObservable();
 
 	constructor(host: UmbControllerHostInterface) {
 		super(host);
