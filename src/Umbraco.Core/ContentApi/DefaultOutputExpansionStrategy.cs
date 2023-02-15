@@ -11,5 +11,5 @@ public class DefaultOutputExpansionStrategy : IOutputExpansionStrategy
         => properties.ToDictionary(p => p.Alias, p => p.GetContentApiValue(true));
 
     public IDictionary<string, object?> MapContentProperties(IPublishedContent content)
-        => content.Properties.ToDictionary(p => p.Alias, p => p.GetContentApiValue(true));
+        => MapProperties(content.Properties);
 }
