@@ -4,7 +4,7 @@ import { customElement, state } from 'lit/decorators.js';
 import { FormControlMixin } from '@umbraco-ui/uui-base/lib/mixins';
 import { ifDefined } from 'lit-html/directives/if-defined.js';
 import { repeat } from 'lit/directives/repeat.js';
-import { UUIComboboxElement } from '@umbraco-ui/uui';
+import { UUIComboboxElement, UUIComboboxEvent } from '@umbraco-ui/uui';
 import { UmbCultureRepository } from '../../../settings/cultures/repository/culture.repository';
 import { UmbLitElement } from '@umbraco-cms/element';
 import { CultureModel } from '@umbraco-cms/backend-api';
@@ -35,13 +35,13 @@ export class UmbInputCultureSelectElement extends FormControlMixin(UmbLitElement
 		}
 	}
 
-	#onSearchChange(event: Event) {
+	#onSearchChange(event: UUIComboboxEvent) {
 		event.stopPropagation();
 		const target = event.composedPath()[0] as UUIComboboxElement;
 		this._search = target.search;
 	}
 
-	#onCultureChange(event: Event) {
+	#onCultureChange(event: UUIComboboxEvent) {
 		event.stopPropagation();
 		const target = event.composedPath()[0] as UUIComboboxElement;
 		this._value = target.value;
