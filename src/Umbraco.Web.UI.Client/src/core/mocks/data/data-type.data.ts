@@ -54,12 +54,58 @@ export const data: Array<DataTypeModel & { type: 'data-type' }> = [
 		propertyEditorUiAlias: 'Umb.PropertyEditorUI.ColorPicker',
 		data: [
 			{
-				alias: 'includeLabels',
-				value: false,
+				alias: 'useLabels',
+				value: true,
 			},
 			{
-				alias: 'colors',
-				value: ['#000000', '#373737', '#9e9e9e', '#607d8b', '#2196f3', '#03a9f4', '#3f51b5', '#9c27b0', '#673ab7'],
+				alias: 'items',
+				value: [
+					{
+						value: '#000000',
+						label: 'Black',
+						sortOrder: 0,
+					},
+					{
+						value: '#373737',
+						label: 'Dark',
+						sortOrder: 1,
+					},
+					{
+						value: '#9e9e9e',
+						label: 'Light',
+						sortOrder: 2,
+					},
+					{
+						value: '#607d8b',
+						label: 'Sage',
+						sortOrder: 3,
+					},
+					{
+						value: '#2196f3',
+						label: 'Sapphire',
+						sortOrder: 4,
+					},
+					{
+						value: '#03a9f4',
+						label: 'Sky',
+						sortOrder: 5,
+					},
+					{
+						value: '#3f51b5',
+						label: 'Blue',
+						sortOrder: 6,
+					},
+					{
+						value: '#9c27b0',
+						label: 'Magenta',
+						sortOrder: 8,
+					},
+					{
+						value: '#673ab7',
+						label: 'Purps',
+						sortOrder: 7,
+					},
+				],
 			},
 		],
 	},
@@ -86,6 +132,7 @@ export const data: Array<DataTypeModel & { type: 'data-type' }> = [
 		propertyEditorUiAlias: 'Umb.PropertyEditorUI.EyeDropper',
 		data: [
 			{
+				//showPalette
 				alias: 'palette',
 				value: [
 					'#d0021b',

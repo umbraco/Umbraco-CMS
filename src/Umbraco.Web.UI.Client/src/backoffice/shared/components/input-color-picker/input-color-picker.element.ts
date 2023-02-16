@@ -13,7 +13,7 @@ export class UmbInputColorPickerElement extends FormControlMixin(UmbLitElement) 
 	showLabels = false;
 
 	@property()
-	colors?: string[];
+	swatches?: any[];
 
 	constructor() {
 		super();
@@ -36,10 +36,10 @@ export class UmbInputColorPickerElement extends FormControlMixin(UmbLitElement) 
 	}
 
 	private _renderColors() {
-		return html`${this.colors?.map((color) => {
+		return html`${this.swatches?.map((swatch) => {
 			return html`<uui-color-swatch
-				label="${color}"
-				value="${color}"
+				label="${swatch.label}"
+				value="${swatch.value}"
 				.showLabel=${this.showLabels}></uui-color-swatch>`;
 		})}`;
 	}
