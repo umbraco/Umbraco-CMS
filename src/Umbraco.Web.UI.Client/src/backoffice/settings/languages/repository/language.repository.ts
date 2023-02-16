@@ -68,7 +68,7 @@ export class UmbLanguageRepository {
 		return { data, error, asObservable: () => this.#languageStore!.data };
 	}
 
-	async update(language: LanguageModel) {
+	async save(language: LanguageModel) {
 		await this.#init;
 
 		const { data, error } = await this.#detailDataSource.update(language);

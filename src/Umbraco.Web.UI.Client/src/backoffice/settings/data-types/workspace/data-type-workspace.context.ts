@@ -34,7 +34,7 @@ export class UmbDataTypeWorkspaceContext
 	}
 
 	async createScaffold(parentKey: string | null) {
-		const { data } = await this.#dataTypeRepository.createDetailsScaffold(parentKey);
+		const { data } = await this.#dataTypeRepository.createScaffold(parentKey);
 		if (!data) return;
 		this.#isNew = true;
 		this.#data.next(data);
@@ -76,9 +76,9 @@ export class UmbDataTypeWorkspaceContext
 	async save() {
 		if (!this.#data.value) return;
 		if (this.#isNew) {
-			await this.#dataTypeRepository.createDetail(this.#data.value);
+			await this.#dataTypeRepository.create(this.#data.value);
 		} else {
-			await this.#dataTypeRepository.saveDetail(this.#data.value);
+			await this.#dataTypeRepository.save(this.#data.value);
 		}
 		// If it went well, then its not new anymore?.
 		this.#isNew = false;

@@ -60,7 +60,7 @@ export class UmbMediaWorkspaceContext
 	}
 
 	async createScaffold(parentKey: string | null) {
-		const { data } = await this.#detailRepository.createDetailsScaffold(parentKey);
+		const { data } = await this.#detailRepository.createScaffold(parentKey);
 		if (!data) return;
 		this.#isNew = true;
 		this.#data.next(data);
@@ -69,9 +69,9 @@ export class UmbMediaWorkspaceContext
 	async save() {
 		if (!this.#data.value) return;
 		if (this.#isNew) {
-			await this.#detailRepository.createDetail(this.#data.value);
+			await this.#detailRepository.create(this.#data.value);
 		} else {
-			await this.#detailRepository.saveDetail(this.#data.value);
+			await this.#detailRepository.save(this.#data.value);
 		}
 		// If it went well, then its not new anymore?.
 		this.#isNew = false;

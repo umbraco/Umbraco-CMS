@@ -51,16 +51,16 @@ export class UmbWorkspaceMediaTypeContext
 	}
 
 	async createScaffold() {
-		const { data } = await this.#repo.createDetailsScaffold();
+		const { data } = await this.#repo.createScaffold();
 		if (!data) return;
 		this.#data.next(data);
 	}
 
 	async save() {
 		if (!this.#data.value) return;
-		this.#repo.saveDetail(this.#data.value);
+		this.#repo.save(this.#data.value);
 	}
-	
+
 	public destroy(): void {
 		this.#data.complete();
 	}

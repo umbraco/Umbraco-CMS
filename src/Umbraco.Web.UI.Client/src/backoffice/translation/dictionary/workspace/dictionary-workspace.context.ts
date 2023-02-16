@@ -47,7 +47,7 @@ export class UmbWorkspaceDictionaryContext
 		const updatedValue =
 			this.#data.value.translations?.map((translationItem) => {
 				if (translationItem.isoCode === isoCode) {
-					return { ...translationItem, translation};
+					return { ...translationItem, translation };
 				}
 				return translationItem;
 			}) ?? [];
@@ -57,7 +57,7 @@ export class UmbWorkspaceDictionaryContext
 			updatedValue?.push({ isoCode, translation });
 		}
 
-		this.#data.next({ ...this.#data.value, translations: updatedValue });	
+		this.#data.next({ ...this.#data.value, translations: updatedValue });
 	}
 
 	async load(entityKey: string) {
@@ -68,16 +68,16 @@ export class UmbWorkspaceDictionaryContext
 	}
 
 	async createScaffold(parentKey: string | null) {
-		const { data } = await this.#repo.createDetailsScaffold(parentKey);
+		const { data } = await this.#repo.createScaffold(parentKey);
 		if (!data) return;
 		this.#data.next(data);
 	}
 
 	async save() {
 		if (!this.#data.value) return;
-		this.#repo.saveDetail(this.#data.value);
+		this.#repo.save(this.#data.value);
 	}
-	
+
 	public destroy(): void {
 		this.#data.complete();
 	}

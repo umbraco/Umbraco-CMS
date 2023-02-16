@@ -22,7 +22,7 @@ export class UmbMemberTypeDetailServerDataSource implements UmbDetailRepository<
 	 * @return {*}
 	 * @memberof UmbMemberTypeDetailServerDataSource
 	 */
-	async createDetailsScaffold() {
+	async createScaffold() {
 		const data = {} as MemberTypeDetails;
 		return { data };
 	}
@@ -45,7 +45,7 @@ export class UmbMemberTypeDetailServerDataSource implements UmbDetailRepository<
 	 * @return {*}
 	 * @memberof UmbMemberTypeDetailServerDataSource
 	 */
-	async saveDetail(memberType: MemberTypeDetails) {
+	async save(memberType: MemberTypeDetails) {
 		if (!memberType.key) {
 			const error: ProblemDetailsModel = { title: 'MemberType key is missing' };
 			return { error };
@@ -73,7 +73,7 @@ export class UmbMemberTypeDetailServerDataSource implements UmbDetailRepository<
 	 * @return {*}
 	 * @memberof UmbMemberTypeDetailServerDataSource
 	 */
-	async createDetail(data: MemberTypeDetails) {
+	async create(data: MemberTypeDetails) {
 		const requestBody = {
 			name: data.name,
 		};
