@@ -1,6 +1,6 @@
 ﻿namespace Umbraco.Cms.Api.Management.ViewModels.RecycleBin;
 
-public class RecycleBinItemViewModel
+public class RecycleBinItemViewModel : INamedEntityViewModel
 {
     public Guid Key { get; set; }
 

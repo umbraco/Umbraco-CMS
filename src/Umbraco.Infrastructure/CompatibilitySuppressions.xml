@@ -79,6 +79,13 @@
   </Suppression>
   <Suppression>
     <DiagnosticId>CP0002</DiagnosticId>
+    <Target>M:Umbraco.Cms.Core.Security.BackOfficeUserStore.#ctor(Umbraco.Cms.Core.Scoping.ICoreScopeProvider,Umbraco.Cms.Core.Services.IUserService,Umbraco.Cms.Core.Services.IEntityService,Umbraco.Cms.Core.Services.IExternalLoginWithKeyService,Microsoft.Extensions.Options.IOptions{Umbraco.Cms.Core.Configuration.Models.GlobalSettings},Umbraco.Cms.Core.Mapping.IUmbracoMapper,Umbraco.Cms.Core.Security.BackOfficeErrorDescriber,Umbraco.Cms.Core.Cache.AppCaches)</Target>
+    <Left>lib/net7.0/Umbraco.Infrastructure.dll</Left>
+    <Right>lib/net7.0/Umbraco.Infrastructure.dll</Right>
+    <IsBaselineSuppression>true</IsBaselineSuppression>
+  </Suppression>
+  <Suppression>
+    <DiagnosticId>CP0002</DiagnosticId>
     <Target>M:Umbraco.Cms.Infrastructure.Install.PackageMigrationRunner.#ctor(Umbraco.Cms.Core.Logging.IProfilingLogger,Umbraco.Cms.Core.Scoping.ICoreScopeProvider,Umbraco.Cms.Core.Packaging.PendingPackageMigrations,Umbraco.Cms.Core.Packaging.PackageMigrationPlanCollection,Umbraco.Cms.Core.Migrations.IMigrationPlanExecutor,Umbraco.Cms.Core.Services.IKeyValueService,Umbraco.Cms.Core.Events.IEventAggregator)</Target>
     <Left>lib/net7.0/Umbraco.Infrastructure.dll</Left>
     <Right>lib/net7.0/Umbraco.Infrastructure.dll</Right>

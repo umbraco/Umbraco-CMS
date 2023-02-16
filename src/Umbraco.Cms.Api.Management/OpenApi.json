@@ -702,9 +702,6 @@
               }
             }
           },
-          "404": {
-            "description": "Not Found"
-          },
           "400": {
             "description": "Bad Request",
             "content": {
@@ -714,6 +711,9 @@
                 }
               }
             }
+          },
+          "404": {
+            "description": "Not Found"
           },
           "409": {
             "description": "Conflict",
@@ -998,7 +998,9 @@
         ],
         "operationId": "PostDictionaryUpload",
         "requestBody": {
-          "content": { }
+          "content": {
+
+          }
         },
         "responses": {
           "200": {
@@ -1418,9 +1420,6 @@
           }
         ],
         "responses": {
-          "401": {
-            "description": "Unauthorized"
-          },
           "200": {
             "description": "Success",
             "content": {
@@ -1430,6 +1429,9 @@
                 }
               }
             }
+          },
+          "401": {
+            "description": "Unauthorized"
           }
         }
       }
@@ -1461,9 +1463,6 @@
           }
         ],
         "responses": {
-          "401": {
-            "description": "Unauthorized"
-          },
           "200": {
             "description": "Success",
             "content": {
@@ -1473,6 +1472,9 @@
                 }
               }
             }
+          },
+          "401": {
+            "description": "Unauthorized"
           }
         }
       }
@@ -1707,9 +1709,6 @@
           }
         ],
         "responses": {
-          "404": {
-            "description": "Not Found"
-          },
           "200": {
             "description": "Success",
             "content": {
@@ -1723,6 +1722,9 @@
                 }
               }
             }
+          },
+          "404": {
+            "description": "Not Found"
           }
         }
       }
@@ -1744,9 +1746,6 @@
           }
         ],
         "responses": {
-          "404": {
-            "description": "Not Found"
-          },
           "200": {
             "description": "Success",
             "content": {
@@ -1760,6 +1759,9 @@
                 }
               }
             }
+          },
+          "404": {
+            "description": "Not Found"
           }
         }
       }
@@ -1784,16 +1786,6 @@
           }
         },
         "responses": {
-          "400": {
-            "description": "Bad Request",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetailsModel"
-                }
-              }
-            }
-          },
           "200": {
             "description": "Success",
             "content": {
@@ -1804,6 +1796,16 @@
                       "$ref": "#/components/schemas/HealthCheckResultModel"
                     }
                   ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetailsModel"
                 }
               }
             }
@@ -1858,22 +1860,22 @@
           }
         ],
         "responses": {
-          "400": {
-            "description": "Bad Request",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetailsModel"
-                }
-              }
-            }
-          },
           "200": {
             "description": "Success",
             "content": {
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/PagedHelpPageModel"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetailsModel"
                 }
               }
             }
@@ -1936,16 +1938,6 @@
           }
         ],
         "responses": {
-          "400": {
-            "description": "Bad Request",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetailsModel"
-                }
-              }
-            }
-          },
           "200": {
             "description": "Success",
             "content": {
@@ -1956,6 +1948,16 @@
                       "$ref": "#/components/schemas/IndexModel"
                     }
                   ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetailsModel"
                 }
               }
             }
@@ -1980,22 +1982,22 @@
           }
         ],
         "responses": {
-          "400": {
-            "description": "Bad Request",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetailsModel"
-                }
-              }
-            }
-          },
           "200": {
             "description": "Success",
             "content": {
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/OkResultModel"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetailsModel"
                 }
               }
             }
@@ -2010,6 +2012,20 @@
         ],
         "operationId": "GetInstallSettings",
         "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/InstallSettingsModel"
+                    }
+                  ]
+                }
+              }
+            }
+          },
           "400": {
             "description": "Bad Request",
             "content": {
@@ -2026,20 +2042,6 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ProblemDetailsModel"
-                }
-              }
-            }
-          },
-          "200": {
-            "description": "Success",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "oneOf": [
-                    {
-                      "$ref": "#/components/schemas/InstallSettingsModel"
-                    }
-                  ]
                 }
               }
             }
@@ -2067,6 +2069,9 @@
           }
         },
         "responses": {
+          "200": {
+            "description": "Success"
+          },
           "400": {
             "description": "Bad Request",
             "content": {
@@ -2086,9 +2091,6 @@
                 }
               }
             }
-          },
-          "200": {
-            "description": "Success"
           }
         }
       }
@@ -2113,6 +2115,9 @@
           }
         },
         "responses": {
+          "200": {
+            "description": "Success"
+          },
           "400": {
             "description": "Bad Request",
             "content": {
@@ -2122,9 +2127,6 @@
                 }
               }
             }
-          },
-          "200": {
-            "description": "Success"
           }
         }
       }
@@ -2187,19 +2189,6 @@
           }
         },
         "responses": {
-          "404": {
-            "description": "Not Found"
-          },
-          "400": {
-            "description": "Bad Request",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetailsModel"
-                }
-              }
-            }
-          },
           "201": {
             "description": "Created",
             "headers": {
@@ -2212,6 +2201,19 @@
                 }
               }
             }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetailsModel"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found"
           }
         }
       }
@@ -2233,9 +2235,6 @@
           }
         ],
         "responses": {
-          "404": {
-            "description": "Not Found"
-          },
           "200": {
             "description": "Success",
             "content": {
@@ -2249,6 +2248,9 @@
                 }
               }
             }
+          },
+          "404": {
+            "description": "Not Found"
           }
         }
       },
@@ -2268,6 +2270,9 @@
           }
         ],
         "responses": {
+          "200": {
+            "description": "Success"
+          },
           "400": {
             "description": "Bad Request",
             "content": {
@@ -2287,9 +2292,6 @@
                 }
               }
             }
-          },
-          "200": {
-            "description": "Success"
           }
         }
       },
@@ -2322,8 +2324,8 @@
           }
         },
         "responses": {
-          "404": {
-            "description": "Not Found"
+          "200": {
+            "description": "Success"
           },
           "400": {
             "description": "Bad Request",
@@ -2335,8 +2337,8 @@
               }
             }
           },
-          "200": {
-            "description": "Success"
+          "404": {
+            "description": "Not Found"
           }
         }
       }
@@ -2406,6 +2408,9 @@
           }
         ],
         "responses": {
+          "200": {
+            "description": "Success"
+          },
           "400": {
             "description": "Bad Request",
             "content": {
@@ -2415,9 +2420,6 @@
                 }
               }
             }
-          },
-          "200": {
-            "description": "Success"
           }
         }
       }
@@ -2545,22 +2547,22 @@
           }
         ],
         "responses": {
-          "400": {
-            "description": "Bad Request",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetailsModel"
-                }
-              }
-            }
-          },
           "200": {
             "description": "Success",
             "content": {
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/PagedLogTemplateModel"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetailsModel"
                 }
               }
             }
@@ -2626,16 +2628,6 @@
           }
         },
         "responses": {
-          "400": {
-            "description": "Bad Request",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetailsModel"
-                }
-              }
-            }
-          },
           "201": {
             "description": "Created",
             "headers": {
@@ -2645,6 +2637,16 @@
                   "type": "string",
                   "description": "Location of the newly created resource",
                   "format": "uri"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetailsModel"
                 }
               }
             }
@@ -2669,9 +2671,6 @@
           }
         ],
         "responses": {
-          "404": {
-            "description": "Not Found"
-          },
           "200": {
             "description": "Success",
             "content": {
@@ -2685,6 +2684,9 @@
                 }
               }
             }
+          },
+          "404": {
+            "description": "Not Found"
           }
         }
       },
@@ -2704,11 +2706,11 @@
           }
         ],
         "responses": {
-          "404": {
-            "description": "Not Found"
-          },
           "200": {
             "description": "Success"
+          },
+          "404": {
+            "description": "Not Found"
           }
         }
       }
@@ -2738,6 +2740,9 @@
           }
         ],
         "responses": {
+          "200": {
+            "description": "Success"
+          },
           "400": {
             "description": "Bad Request",
             "content": {
@@ -2747,9 +2752,6 @@
                 }
               }
             }
-          },
-          "200": {
-            "description": "Success"
           }
         }
       }
@@ -2936,9 +2938,6 @@
           }
         ],
         "responses": {
-          "401": {
-            "description": "Unauthorized"
-          },
           "200": {
             "description": "Success",
             "content": {
@@ -2948,6 +2947,9 @@
                 }
               }
             }
+          },
+          "401": {
+            "description": "Unauthorized"
           }
         }
       }
@@ -2979,9 +2981,6 @@
           }
         ],
         "responses": {
-          "401": {
-            "description": "Unauthorized"
-          },
           "200": {
             "description": "Success",
             "content": {
@@ -2991,6 +2990,9 @@
                 }
               }
             }
+          },
+          "401": {
+            "description": "Unauthorized"
           }
         }
       }
@@ -3652,22 +3654,22 @@
           }
         ],
         "responses": {
-          "400": {
-            "description": "Bad Request",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetailsModel"
-                }
-              }
-            }
-          },
           "200": {
             "description": "Success",
             "content": {
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/PagedRedirectUrlModel"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetailsModel"
                 }
               }
             }
@@ -4222,16 +4224,6 @@
         ],
         "operationId": "GetServerStatus",
         "responses": {
-          "400": {
-            "description": "Bad Request",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetailsModel"
-                }
-              }
-            }
-          },
           "200": {
             "description": "Success",
             "content": {
@@ -4242,6 +4234,16 @@
                       "$ref": "#/components/schemas/ServerStatusModel"
                     }
                   ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetailsModel"
                 }
               }
             }
@@ -4256,16 +4258,6 @@
         ],
         "operationId": "GetServerVersion",
         "responses": {
-          "400": {
-            "description": "Bad Request",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetailsModel"
-                }
-              }
-            }
-          },
           "200": {
             "description": "Success",
             "content": {
@@ -4276,6 +4268,16 @@
                       "$ref": "#/components/schemas/VersionModel"
                     }
                   ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetailsModel"
                 }
               }
             }
@@ -4615,6 +4617,9 @@
           }
         },
         "responses": {
+          "200": {
+            "description": "Success"
+          },
           "400": {
             "description": "Bad Request",
             "content": {
@@ -4624,9 +4629,6 @@
                 }
               }
             }
-          },
-          "200": {
-            "description": "Success"
           }
         }
       }
@@ -5262,6 +5264,191 @@
           }
         }
       }
+    },
+    "/umbraco/management/api/v1/user-groups": {
+      "post": {
+        "tags": [
+          "User Groups"
+        ],
+        "operationId": "PostUserGroups",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/UserGroupSaveModel"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "headers": {
+              "Location": {
+                "description": "Location of the newly created resource",
+                "schema": {
+                  "type": "string",
+                  "description": "Location of the newly created resource",
+                  "format": "uri"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetailsModel"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "User Groups"
+        ],
+        "operationId": "GetUserGroups",
+        "parameters": [
+          {
+            "name": "skip",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 0
+            }
+          },
+          {
+            "name": "take",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 100
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedUserGroupModel"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/umbraco/management/api/v1/user-groups/{key}": {
+      "get": {
+        "tags": [
+          "User Groups"
+        ],
+        "operationId": "GetUserGroupsByKey",
+        "parameters": [
+          {
+            "name": "key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/UserGroupModel"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "User Groups"
+        ],
+        "operationId": "DeleteUserGroupsByKey",
+        "parameters": [
+          {
+            "name": "key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "User Groups"
+        ],
+        "operationId": "PutUserGroupsByKey",
+        "parameters": [
+          {
+            "name": "key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/UserGroupUpdateModel"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
     }
   },
   "components": {
@@ -5279,6 +5466,9 @@
         "additionalProperties": false
       },
       "ContentTreeItemModel": {
+        "required": [
+          "$type"
+        ],
         "type": "object",
         "allOf": [
           {
@@ -5286,6 +5476,9 @@
           }
         ],
         "properties": {
+          "$type": {
+            "type": "string"
+          },
           "noAccess": {
             "type": "boolean"
           },
@@ -5293,7 +5486,14 @@
             "type": "boolean"
           }
         },
-        "additionalProperties": false
+        "additionalProperties": false,
+        "discriminator": {
+          "propertyName": "$type",
+          "mapping": {
+            "ContentTreeItemViewModel": "#/components/schemas/ContentTreeItemModel",
+            "DocumentTreeItemViewModel": "#/components/schemas/DocumentTreeItemModel"
+          }
+        }
       },
       "CultureModel": {
         "type": "object",
@@ -5335,6 +5535,9 @@
         "additionalProperties": false
       },
       "DataTypeModel": {
+        "required": [
+          "$type"
+        ],
         "type": "object",
         "allOf": [
           {
@@ -5342,6 +5545,9 @@
           }
         ],
         "properties": {
+          "$type": {
+            "type": "string"
+          },
           "key": {
             "type": "string",
             "format": "uuid"
@@ -5352,7 +5558,13 @@
             "nullable": true
           }
         },
-        "additionalProperties": false
+        "additionalProperties": false,
+        "discriminator": {
+          "propertyName": "$type",
+          "mapping": {
+            "DataTypeViewModel": "#/components/schemas/DataTypeModel"
+          }
+        }
       },
       "DataTypeModelBaseModel": {
         "type": "object",
@@ -5560,6 +5772,9 @@
         "additionalProperties": false
       },
       "DictionaryItemModel": {
+        "required": [
+          "$type"
+        ],
         "type": "object",
         "allOf": [
           {
@@ -5567,12 +5782,21 @@
           }
         ],
         "properties": {
+          "$type": {
+            "type": "string"
+          },
           "key": {
             "type": "string",
             "format": "uuid"
           }
         },
-        "additionalProperties": false
+        "additionalProperties": false,
+        "discriminator": {
+          "propertyName": "$type",
+          "mapping": {
+            "DictionaryItemViewModel": "#/components/schemas/DictionaryItemModel"
+          }
+        }
       },
       "DictionaryItemModelBaseModel": {
         "type": "object",
@@ -5698,6 +5922,9 @@
         "format": "int32"
       },
       "DocumentBlueprintTreeItemModel": {
+        "required": [
+          "$type"
+        ],
         "type": "object",
         "allOf": [
           {
@@ -5705,6 +5932,9 @@
           }
         ],
         "properties": {
+          "$type": {
+            "type": "string"
+          },
           "documentTypeKey": {
             "type": "string",
             "format": "uuid"
@@ -5717,9 +5947,18 @@
             "nullable": true
           }
         },
-        "additionalProperties": false
+        "additionalProperties": false,
+        "discriminator": {
+          "propertyName": "$type",
+          "mapping": {
+            "DocumentBlueprintTreeItemViewModel": "#/components/schemas/DocumentBlueprintTreeItemModel"
+          }
+        }
       },
       "DocumentTreeItemModel": {
+        "required": [
+          "$type"
+        ],
         "type": "object",
         "allOf": [
           {
@@ -5727,6 +5966,9 @@
           }
         ],
         "properties": {
+          "$type": {
+            "type": "string"
+          },
           "isProtected": {
             "type": "boolean"
           },
@@ -5737,9 +5979,18 @@
             "type": "boolean"
           }
         },
-        "additionalProperties": false
+        "additionalProperties": false,
+        "discriminator": {
+          "propertyName": "$type",
+          "mapping": {
+            "DocumentTreeItemViewModel": "#/components/schemas/DocumentTreeItemModel"
+          }
+        }
       },
       "DocumentTypeTreeItemModel": {
+        "required": [
+          "$type"
+        ],
         "type": "object",
         "allOf": [
           {
@@ -5747,13 +5998,25 @@
           }
         ],
         "properties": {
+          "$type": {
+            "type": "string"
+          },
           "isElement": {
             "type": "boolean"
           }
         },
-        "additionalProperties": false
+        "additionalProperties": false,
+        "discriminator": {
+          "propertyName": "$type",
+          "mapping": {
+            "DocumentTypeTreeItemViewModel": "#/components/schemas/DocumentTypeTreeItemModel"
+          }
+        }
       },
       "EntityTreeItemModel": {
+        "required": [
+          "$type"
+        ],
         "type": "object",
         "allOf": [
           {
@@ -5761,6 +6024,9 @@
           }
         ],
         "properties": {
+          "$type": {
+            "type": "string"
+          },
           "key": {
             "type": "string",
             "format": "uuid"
@@ -5774,7 +6040,18 @@
             "nullable": true
           }
         },
-        "additionalProperties": false
+        "additionalProperties": false,
+        "discriminator": {
+          "propertyName": "$type",
+          "mapping": {
+            "EntityTreeItemViewModel": "#/components/schemas/EntityTreeItemModel",
+            "ContentTreeItemViewModel": "#/components/schemas/ContentTreeItemModel",
+            "DocumentBlueprintTreeItemViewModel": "#/components/schemas/DocumentBlueprintTreeItemModel",
+            "DocumentTreeItemViewModel": "#/components/schemas/DocumentTreeItemModel",
+            "DocumentTypeTreeItemViewModel": "#/components/schemas/DocumentTypeTreeItemModel",
+            "FolderTreeItemViewModel": "#/components/schemas/FolderTreeItemModel"
+          }
+        }
       },
       "FieldModel": {
         "type": "object",
@@ -5825,6 +6102,9 @@
         "additionalProperties": false
       },
       "FolderModel": {
+        "required": [
+          "$type"
+        ],
         "type": "object",
         "allOf": [
           {
@@ -5832,6 +6112,9 @@
           }
         ],
         "properties": {
+          "$type": {
+            "type": "string"
+          },
           "key": {
             "type": "string",
             "format": "uuid"
@@ -5842,7 +6125,13 @@
             "nullable": true
           }
         },
-        "additionalProperties": false
+        "additionalProperties": false,
+        "discriminator": {
+          "propertyName": "$type",
+          "mapping": {
+            "FolderViewModel": "#/components/schemas/FolderModel"
+          }
+        }
       },
       "FolderModelBaseModel": {
         "type": "object",
@@ -5854,6 +6143,9 @@
         "additionalProperties": false
       },
       "FolderTreeItemModel": {
+        "required": [
+          "$type"
+        ],
         "type": "object",
         "allOf": [
           {
@@ -5861,11 +6153,21 @@
           }
         ],
         "properties": {
+          "$type": {
+            "type": "string"
+          },
           "isFolder": {
             "type": "boolean"
           }
         },
-        "additionalProperties": false
+        "additionalProperties": false,
+        "discriminator": {
+          "propertyName": "$type",
+          "mapping": {
+            "FolderTreeItemViewModel": "#/components/schemas/FolderTreeItemModel",
+            "DocumentTypeTreeItemViewModel": "#/components/schemas/DocumentTypeTreeItemModel"
+          }
+        }
       },
       "FolderUpdateModel": {
         "type": "object",
@@ -6099,7 +6401,9 @@
           },
           "providerProperties": {
             "type": "object",
-            "additionalProperties": { },
+            "additionalProperties": {
+
+            },
             "nullable": true
           }
         },
@@ -6979,6 +7283,30 @@
         },
         "additionalProperties": false
       },
+      "PagedUserGroupModel": {
+        "required": [
+          "items",
+          "total"
+        ],
+        "type": "object",
+        "properties": {
+          "total": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/UserGroupModel"
+                }
+              ]
+            }
+          }
+        },
+        "additionalProperties": false
+      },
       "ProblemDetailsModel": {
         "type": "object",
         "properties": {
@@ -7004,7 +7332,9 @@
             "nullable": true
           }
         },
-        "additionalProperties": { }
+        "additionalProperties": {
+
+        }
       },
       "ProfilingStatusModel": {
         "type": "object",
@@ -7016,8 +7346,14 @@
         "additionalProperties": false
       },
       "RecycleBinItemModel": {
+        "required": [
+          "$type"
+        ],
         "type": "object",
         "properties": {
+          "$type": {
+            "type": "string"
+          },
           "key": {
             "type": "string",
             "format": "uuid"
@@ -7043,7 +7379,13 @@
             "nullable": true
           }
         },
-        "additionalProperties": false
+        "additionalProperties": false,
+        "discriminator": {
+          "propertyName": "$type",
+          "mapping": {
+            "RecycleBinItemViewModel": "#/components/schemas/RecycleBinItemModel"
+          }
+        }
       },
       "RedirectStatusModel": {
         "enum": [
@@ -7271,6 +7613,9 @@
         "additionalProperties": false
       },
       "TemplateModel": {
+        "required": [
+          "$type"
+        ],
         "type": "object",
         "allOf": [
           {
@@ -7278,12 +7623,21 @@
           }
         ],
         "properties": {
+          "$type": {
+            "type": "string"
+          },
           "key": {
             "type": "string",
             "format": "uuid"
           }
         },
-        "additionalProperties": false
+        "additionalProperties": false,
+        "discriminator": {
+          "propertyName": "$type",
+          "mapping": {
+            "TemplateViewModel": "#/components/schemas/TemplateModel"
+          }
+        }
       },
       "TemplateModelBaseModel": {
         "type": "object",
@@ -7532,6 +7886,96 @@
         },
         "additionalProperties": false
       },
+      "UserGroupBaseModel": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "icon": {
+            "type": "string",
+            "nullable": true
+          },
+          "sections": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "languages": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "hasAccessToAllLanguages": {
+            "type": "boolean"
+          },
+          "documentStartNodeKey": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          },
+          "mediaStartNodeKey": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          },
+          "permissions": {
+            "uniqueItems": true,
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "additionalProperties": false
+      },
+      "UserGroupModel": {
+        "required": [
+          "$type"
+        ],
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/UserGroupBaseModel"
+          }
+        ],
+        "properties": {
+          "$type": {
+            "type": "string"
+          },
+          "key": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        "additionalProperties": false,
+        "discriminator": {
+          "propertyName": "$type",
+          "mapping": {
+            "UserGroupViewModel": "#/components/schemas/UserGroupModel"
+          }
+        }
+      },
+      "UserGroupSaveModel": {
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/UserGroupBaseModel"
+          }
+        ],
+        "additionalProperties": false
+      },
+      "UserGroupUpdateModel": {
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/UserGroupBaseModel"
+          }
+        ],
+        "additionalProperties": false
+      },
       "UserInstallModel": {
         "required": [
           "email",
@@ -7603,7 +8047,9 @@
           "authorizationCode": {
             "authorizationUrl": "/umbraco/management/api/v1.0/security/back-office/authorize",
             "tokenUrl": "/umbraco/management/api/v1.0/security/back-office/token",
-            "scopes": { }
+            "scopes": {
+
+            }
           }
         }
       }
@@ -7611,7 +8057,9 @@
   },
   "security": [
     {
-      "OAuth": [ ]
+      "OAuth": [
+
+      ]
     }
   ]
 }

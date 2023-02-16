@@ -14,6 +14,7 @@ public class UserGroupDto
     {
         UserGroup2AppDtos = new List<UserGroup2AppDto>();
         UserGroup2LanguageDtos = new List<UserGroup2LanguageDto>();
+        UserGroup2PermissionDtos = new List<UserGroup2PermissionDto>();
     }
 
     [Column("id")]
@@ -76,6 +77,10 @@ public class UserGroupDto
     [ResultColumn]
     [Reference(ReferenceType.Many, ReferenceMemberName = "UserGroupId")]
     public List<UserGroup2LanguageDto> UserGroup2LanguageDtos { get; set; }
+
+    [ResultColumn]
+    [Reference(ReferenceType.Many, ReferenceMemberName = "UserGroupId")]
+    public List<UserGroup2PermissionDto> UserGroup2PermissionDtos { get; set; }
 
     /// <summary>
     ///     This is only relevant when this column is included in the results (i.e. GetUserGroupsWithUserCounts)
