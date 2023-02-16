@@ -41,12 +41,12 @@ export class LogViewerResource {
      * @throws ApiError
      */
     public static getLogViewerLevelCount({
-        startDate,
-        endDate,
-    }: {
-        startDate?: string,
-        endDate?: string,
-    }): CancelablePromise<any> {
+startDate,
+endDate,
+}: {
+startDate?: string,
+endDate?: string,
+}): CancelablePromise<any> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/log-viewer/level-count',
@@ -193,10 +193,10 @@ export class LogViewerResource {
      * @throws ApiError
      */
     public static deleteLogViewerSavedSearchByName({
-        name,
-    }: {
-        name: string,
-    }): CancelablePromise<any> {
+name,
+}: {
+name: string,
+}): CancelablePromise<any> {
         return __request(OpenAPI, {
             method: 'DELETE',
             url: '/umbraco/management/api/v1/log-viewer/saved-search/{name}',
@@ -214,12 +214,12 @@ export class LogViewerResource {
      * @throws ApiError
      */
     public static getLogViewerValidateLogsSize({
-        startDate,
-        endDate,
-    }: {
-        startDate?: string,
-        endDate?: string,
-    }): CancelablePromise<any> {
+startDate,
+endDate,
+}: {
+startDate?: string,
+endDate?: string,
+}): CancelablePromise<any> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/log-viewer/validate-logs-size',

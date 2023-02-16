@@ -45,4 +45,3 @@ export type MethodBaseModel = {
     readonly isSecuritySafeCritical?: boolean;
     readonly isSecurityTransparent?: boolean;
 };
-

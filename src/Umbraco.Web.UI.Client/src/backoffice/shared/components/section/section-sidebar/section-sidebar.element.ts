@@ -21,6 +21,7 @@ export class UmbSectionSidebarElement extends UmbLitElement {
 				font-weight: 500;
 				display: flex;
 				flex-direction: column;
+				z-index:10;
 			}
 
 			h3 {

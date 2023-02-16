@@ -1,9 +1,11 @@
 import { UmbEntityData } from './entity.data';
 import { createFolderTreeItem } from './utils';
-import type { FolderTreeItemModel, DataTypeModel } from '@umbraco-cms/backend-api';
+import type { FolderTreeItemModel, DataTypeModel, EntityTreeItemModel } from '@umbraco-cms/backend-api';
 
-export const data: Array<DataTypeModel> = [
+// TODO: investigate why we don't get an entity type as part of the DataTypeModel
+export const data: Array<DataTypeModel & { type: 'data-type' }> = [
 	{
+		type: 'data-type',
 		key: '0cc0eba1-9960-42c9-bf9b-60e150b429ae',
 		parentKey: null,
 		name: 'Textstring',
@@ -12,6 +14,7 @@ export const data: Array<DataTypeModel> = [
 		data: [],
 	},
 	{
+		type: 'data-type',
 		name: 'Text',
 		key: 'dt-textBox',
 		parentKey: null,
@@ -25,6 +28,7 @@ export const data: Array<DataTypeModel> = [
 		],
 	},
 	{
+		type: 'data-type',
 		name: 'Text Area',
 		key: 'dt-textArea',
 		parentKey: null,
@@ -33,6 +37,7 @@ export const data: Array<DataTypeModel> = [
 		data: [],
 	},
 	{
+		type: 'data-type',
 		name: 'My JS Property Editor',
 		key: 'dt-custom',
 		parentKey: null,
@@ -41,6 +46,7 @@ export const data: Array<DataTypeModel> = [
 		data: [],
 	},
 	{
+		type: 'data-type',
 		name: 'Color Picker',
 		key: 'dt-colorPicker',
 		parentKey: null,
@@ -58,6 +64,7 @@ export const data: Array<DataTypeModel> = [
 		],
 	},
 	{
+		type: 'data-type',
 		name: 'Content Picker',
 		key: 'dt-contentPicker',
 		parentKey: null,
@@ -71,6 +78,7 @@ export const data: Array<DataTypeModel> = [
 		],
 	},
 	{
+		type: 'data-type',
 		name: 'Eye Dropper',
 		key: 'dt-eyeDropper',
 		parentKey: null,
@@ -105,6 +113,7 @@ export const data: Array<DataTypeModel> = [
 		],
 	},
 	{
+		type: 'data-type',
 		name: 'Multi URL Picker',
 		key: 'dt-multiUrlPicker',
 		parentKey: null,
@@ -113,6 +122,7 @@ export const data: Array<DataTypeModel> = [
 		data: [],
 	},
 	{
+		type: 'data-type',
 		name: 'Multi Node Tree Picker',
 		key: 'dt-multiNodeTreePicker',
 		parentKey: null,
@@ -121,6 +131,7 @@ export const data: Array<DataTypeModel> = [
 		data: [],
 	},
 	{
+		type: 'data-type',
 		name: 'Date Picker',
 		key: 'dt-datePicker',
 		parentKey: null,
@@ -129,6 +140,7 @@ export const data: Array<DataTypeModel> = [
 		data: [],
 	},
 	{
+		type: 'data-type',
 		name: 'Email',
 		key: 'dt-email',
 		parentKey: null,
@@ -137,6 +149,7 @@ export const data: Array<DataTypeModel> = [
 		data: [],
 	},
 	{
+		type: 'data-type',
 		name: 'Multiple Text String',
 		key: 'dt-multipleTextString',
 		parentKey: null,
@@ -154,6 +167,7 @@ export const data: Array<DataTypeModel> = [
 		],
 	},
 	{
+		type: 'data-type',
 		name: 'Dropdown',
 		key: 'dt-dropdown',
 		parentKey: null,
@@ -162,6 +176,7 @@ export const data: Array<DataTypeModel> = [
 		data: [],
 	},
 	{
+		type: 'data-type',
 		name: 'Slider',
 		key: 'dt-slider',
 		parentKey: null,
@@ -170,6 +185,7 @@ export const data: Array<DataTypeModel> = [
 		data: [],
 	},
 	{
+		type: 'data-type',
 		name: 'Toggle',
 		key: 'dt-toggle',
 		parentKey: null,
@@ -178,6 +194,7 @@ export const data: Array<DataTypeModel> = [
 		data: [],
 	},
 	{
+		type: 'data-type',
 		name: 'Tags',
 		key: 'dt-tags',
 		parentKey: null,
@@ -186,6 +203,7 @@ export const data: Array<DataTypeModel> = [
 		data: [],
 	},
 	{
+		type: 'data-type',
 		name: 'Markdown Editor',
 		key: 'dt-markdownEditor',
 		parentKey: null,
@@ -194,6 +212,7 @@ export const data: Array<DataTypeModel> = [
 		data: [],
 	},
 	{
+		type: 'data-type',
 		name: 'Radio Button List',
 		key: 'dt-radioButtonList',
 		parentKey: null,
@@ -211,6 +230,7 @@ export const data: Array<DataTypeModel> = [
 		],
 	},
 	{
+		type: 'data-type',
 		name: 'Checkbox List',
 		key: 'dt-checkboxList',
 		parentKey: null,
@@ -228,6 +248,7 @@ export const data: Array<DataTypeModel> = [
 		],
 	},
 	{
+		type: 'data-type',
 		name: 'Block List',
 		key: 'dt-blockList',
 		parentKey: null,
@@ -236,6 +257,7 @@ export const data: Array<DataTypeModel> = [
 		data: [],
 	},
 	{
+		type: 'data-type',
 		name: 'Media Picker',
 		key: 'dt-mediaPicker',
 		parentKey: null,
@@ -244,6 +266,7 @@ export const data: Array<DataTypeModel> = [
 		data: [],
 	},
 	{
+		type: 'data-type',
 		name: 'Image Cropper',
 		key: 'dt-imageCropper',
 		parentKey: null,
@@ -252,6 +275,7 @@ export const data: Array<DataTypeModel> = [
 		data: [],
 	},
 	{
+		type: 'data-type',
 		name: 'Upload Field',
 		key: 'dt-uploadField',
 		parentKey: null,
@@ -260,6 +284,7 @@ export const data: Array<DataTypeModel> = [
 		data: [],
 	},
 	{
+		type: 'data-type',
 		name: 'Block Grid',
 		key: 'dt-blockGrid',
 		parentKey: null,
@@ -268,6 +293,7 @@ export const data: Array<DataTypeModel> = [
 		data: [],
 	},
 	{
+		type: 'data-type',
 		name: 'Collection View',
 		key: 'dt-collectionView',
 		parentKey: null,
@@ -276,6 +302,7 @@ export const data: Array<DataTypeModel> = [
 		data: [],
 	},
 	{
+		type: 'data-type',
 		name: 'Icon Picker',
 		key: 'dt-iconPicker',
 		parentKey: null,
@@ -284,6 +311,7 @@ export const data: Array<DataTypeModel> = [
 		data: [],
 	},
 	{
+		type: 'data-type',
 		name: 'Number Range',
 		key: 'dt-numberRange',
 		parentKey: null,
@@ -292,6 +320,7 @@ export const data: Array<DataTypeModel> = [
 		data: [],
 	},
 	{
+		type: 'data-type',
 		name: 'Order Direction',
 		key: 'dt-orderDirection',
 		parentKey: null,
@@ -300,6 +329,7 @@ export const data: Array<DataTypeModel> = [
 		data: [],
 	},
 	{
+		type: 'data-type',
 		name: 'Overlay Size',
 		key: 'dt-overlaySize',
 		parentKey: null,
@@ -308,6 +338,7 @@ export const data: Array<DataTypeModel> = [
 		data: [],
 	},
 	{
+		type: 'data-type',
 		name: 'Rich Text Editor',
 		key: 'dt-richTextEditor',
 		parentKey: null,
@@ -316,6 +347,7 @@ export const data: Array<DataTypeModel> = [
 		data: [],
 	},
 	{
+		type: 'data-type',
 		name: 'Label',
 		key: 'dt-label',
 		parentKey: null,
@@ -324,6 +356,7 @@ export const data: Array<DataTypeModel> = [
 		data: [],
 	},
 	{
+		type: 'data-type',
 		name: 'Integer',
 		key: 'dt-integer',
 		parentKey: null,
@@ -332,6 +365,7 @@ export const data: Array<DataTypeModel> = [
 		data: [],
 	},
 	{
+		type: 'data-type',
 		name: 'Decimal',
 		key: 'dt-decimal',
 		parentKey: null,
@@ -340,6 +374,7 @@ export const data: Array<DataTypeModel> = [
 		data: [],
 	},
 	{
+		type: 'data-type',
 		name: 'User Picker',
 		key: 'dt-userPicker',
 		parentKey: null,
@@ -348,6 +383,7 @@ export const data: Array<DataTypeModel> = [
 		data: [],
 	},
 	{
+		type: 'data-type',
 		name: 'Member Picker',
 		key: 'dt-memberPicker',
 		parentKey: null,
@@ -356,6 +392,7 @@ export const data: Array<DataTypeModel> = [
 		data: [],
 	},
 	{
+		type: 'data-type',
 		name: 'Member Group Picker',
 		key: 'dt-memberGroupPicker',
 		parentKey: null,

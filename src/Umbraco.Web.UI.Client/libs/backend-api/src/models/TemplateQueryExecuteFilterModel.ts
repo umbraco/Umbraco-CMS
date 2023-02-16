@@ -9,4 +9,3 @@ export type TemplateQueryExecuteFilterModel = {
     constraintValue?: string;
     operator?: OperatorModel;
 };
-

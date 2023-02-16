@@ -27,10 +27,10 @@ export class TemplateResource {
      * @throws ApiError
      */
     public static postTemplate({
-        requestBody,
-    }: {
-        requestBody?: TemplateCreateModel,
-    }): CancelablePromise<any> {
+requestBody,
+}: {
+requestBody?: TemplateCreateModel,
+}): CancelablePromise<any> {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/umbraco/management/api/v1/template',
@@ -69,10 +69,10 @@ export class TemplateResource {
      * @throws ApiError
      */
     public static deleteTemplateByKey({
-        key,
-    }: {
-        key: string,
-    }): CancelablePromise<any> {
+key,
+}: {
+key: string,
+}): CancelablePromise<any> {
         return __request(OpenAPI, {
             method: 'DELETE',
             url: '/umbraco/management/api/v1/template/{key}',
@@ -91,12 +91,12 @@ export class TemplateResource {
      * @throws ApiError
      */
     public static putTemplateByKey({
-        key,
-        requestBody,
-    }: {
-        key: string,
-        requestBody?: TemplateUpdateModel,
-    }): CancelablePromise<any> {
+key,
+requestBody,
+}: {
+key: string,
+requestBody?: TemplateUpdateModel,
+}): CancelablePromise<any> {
         return __request(OpenAPI, {
             method: 'PUT',
             url: '/umbraco/management/api/v1/template/{key}',
