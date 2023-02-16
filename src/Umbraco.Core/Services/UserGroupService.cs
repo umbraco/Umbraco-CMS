@@ -299,7 +299,12 @@ internal sealed class UserGroupService : RepositoryService, IUserGroupService
     /// </summary>
     private UserGroupOperationStatus ValidateCommon(IUserGroup userGroup)
     {
-        if (userGroup.Name!.Length > MaxUserGroupNameLength)
+        if (string.IsNullOrEmpty(userGroup.Name))
+        {
+            return UserGroupOperationStatus.MissingName;
+        }
+
+        if (userGroup.Name.Length > MaxUserGroupNameLength)
         {
             return UserGroupOperationStatus.GroupNameTooLong;
         }

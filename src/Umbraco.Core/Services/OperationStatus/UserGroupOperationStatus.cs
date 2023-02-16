@@ -18,4 +18,5 @@ public enum UserGroupOperationStatus
     LanguageNotFound,
     GroupNameTooLong,
     GroupAliasTooLong,
+    MissingName,
 }

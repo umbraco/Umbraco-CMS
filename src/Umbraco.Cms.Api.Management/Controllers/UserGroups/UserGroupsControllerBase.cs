@@ -74,6 +74,10 @@ public class UserGroupsControllerBase : ManagementApiControllerBase
                 .WithTitle("Alias too long")
                 .WithDetail("The user group alias is too long.")
                 .Build()),
+            UserGroupOperationStatus.MissingName => BadRequest(new ProblemDetailsBuilder()
+                .WithTitle("Missing user group name.")
+                .WithDetail("The user group name is required, and cannot be an empty string.")
+                .Build()),
             _ => StatusCode(StatusCodes.Status500InternalServerError, "Unknown user group operation status."),
         };
 }
