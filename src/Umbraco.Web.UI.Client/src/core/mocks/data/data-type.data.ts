@@ -239,7 +239,16 @@ export const data: Array<DataTypeModel & { type: 'data-type' }> = [
 		parentKey: null,
 		propertyEditorAlias: 'Umbraco.RadioButtonList',
 		propertyEditorUiAlias: 'Umb.PropertyEditorUI.RadioButtonList',
-		data: [],
+		data: [
+			{
+				alias: 'items',
+				value: {
+					0: { sortOrder: 1, value: 'First Option' },
+					1: { sortOrder: 2, value: 'Second Option' },
+					2: { sortOrder: 3, value: 'I Am the third Option' },
+				},
+			},
+		],
 	},
 	{
 		type: 'data-type',
@@ -250,11 +259,12 @@ export const data: Array<DataTypeModel & { type: 'data-type' }> = [
 		propertyEditorUiAlias: 'Umb.PropertyEditorUI.CheckboxList',
 		data: [
 			{
-				alias: 'itemList',
-				value: [
-					{ label: 'Label 1', key: '123' },
-					{ label: 'Label 2', key: '456' },
-				],
+				alias: 'items',
+				value: {
+					0: { sortOrder: 1, value: 'First Option' },
+					1: { sortOrder: 2, value: 'Second Option' },
+					2: { sortOrder: 3, value: 'I Am the third Option' },
+				},
 			},
 		],
 	},
