@@ -327,7 +327,7 @@ export const data: Array<DataTypeDetails> = [
 		data: [
 			{
 				alias: 'validationLimit',
-				value: { max: 1 },
+				value: { max: 2 },
 			},
 		],
 	},

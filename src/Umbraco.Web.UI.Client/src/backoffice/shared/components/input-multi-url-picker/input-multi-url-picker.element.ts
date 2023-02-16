@@ -8,6 +8,11 @@ import { DocumentTreeItemModel, FolderTreeItemModel } from '@umbraco-cms/backend
 import { UmbModalService, UMB_MODAL_SERVICE_CONTEXT_TOKEN } from '@umbraco-cms/modal';
 
 export type OverlaySize = 'small' | 'medium' | 'large';
+export interface Url {
+	title: string;
+	href: string;
+	target: boolean;
+}
 
 @customElement('umb-input-multi-url-picker')
 export class UmbInputMultiUrlPickerElement extends FormControlMixin(UmbLitElement) {
@@ -90,6 +95,24 @@ export class UmbInputMultiUrlPickerElement extends FormControlMixin(UmbLitElemen
 		}
 	}
 
+	@property()
+	target = false;
+
+	@property()
+	title = '';
+
+	@property()
+	url = '';
+
+	@state()
+	private _urls?: Url[] = [
+		{
+			title: 'Cake',
+			href: 'google.com',
+			target: true,
+		},
+	];
+
 	@state()
 	private _items?: Array<DocumentTreeItemModel>;
 
@@ -115,28 +138,40 @@ export class UmbInputMultiUrlPickerElement extends FormControlMixin(UmbLitElemen
 	}
 
 	private _openPicker() {
-		const modalHandler = this._modalService?.multiUrlPicker();
+		const modalHandler = this._modalService?.multiUrlPicker({ treeItem: this._selectedKeys[0], target: this.target });
 		modalHandler?.onClose().then(({ selection }: any) => {
-			//this._setSelection(selection);
-			console.log(selection);
+			this.selectedKeys[0] = selection.treeItem;
+			this.target = selection.target;
+			this.url = selection.href;
 		});
 	}
 
 	render() {
-		return html`${this._items?.map((item) => this._renderItem(item))}
+		return html`${this._urls?.map((url) => this._renderItem(url))}
 			<uui-button look="placeholder" label="Add" @click=${this._openPicker}>Add</uui-button>`;
 	}
 
-	private _renderItem(item: FolderTreeItemModel) {
-		// TODO: remove when we have a way to handle trashed items
-		const tempItem = item as FolderTreeItemModel & { isTrashed: boolean };
+	private _renderItem(url: Url) {
+		return html`<uui-ref-node name="Title" detail="Url">
+			<uui-icon slot="icon" name="${this.target}umb:link"></uui-icon>
+			<uui-action-bar slot="actions"> </uui-action-bar>
+		</uui-ref-node>`;
 
+		// TODO: remove when we have a way to handle trashed items
+		//const tempItem = item as FolderTreeItemModel & { isTrashed: boolean };
+
+		/*
 		return html`
 			<uui-ref-node name=${ifDefined(item.name === null ? undefined : item.name)} detail=${ifDefined(item.key)}>
 				${tempItem.isTrashed ? html` <uui-tag size="s" slot="tag" color="danger">Trashed</uui-tag> ` : nothing}
 				<uui-action-bar slot="actions"> </uui-action-bar>
 			</uui-ref-node>
 		`;
+		*/
+	}
+	private _renderItemIcon(url: Url) {
+		if (url.href === 'key') return html``;
+		if (url.target === true) return html``;
 	}
 }
 
