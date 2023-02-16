@@ -4,7 +4,7 @@ import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { UmbModalHandler, UmbModalLayoutElement } from '@umbraco-cms/modal';
 
 @customElement('umb-debug-modal-layout')
-export class UmbDebugModalLayout extends UmbModalLayoutElement {
+export class UmbDebugModalLayout extends UmbModalLayoutElement<any> {
 	static styles = [
 		UUITextStyles,
 		css`
