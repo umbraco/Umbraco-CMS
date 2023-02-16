@@ -95,7 +95,7 @@ public interface IAuditService : IService
     ///     If populated, will only return entries after this time.
     /// </param>
     /// <returns></returns>
-    Task<PagedModel<IAuditItem>> GetItemsByKey(
+    Task<PagedModel<IAuditItem>> GetItemsByKeyAsync(
         Guid entityKey,
         int skip,
         int take,
@@ -122,7 +122,7 @@ public interface IAuditService : IService
     ///     Optional filter to be applied
     /// </param>
     /// <returns></returns>
-    Task<PagedModel<IAuditItem>> GetPagedItemsByUser(
+    Task<PagedModel<IAuditItem>> GetPagedItemsByUserAsync(
         Guid userKey,
         int skip,
         int take,

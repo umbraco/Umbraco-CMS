@@ -49,7 +49,7 @@ public class CurrentUserAuditLogController : AuditLogControllerBase
             throw new PanicException("Could not find current user");
         }
 
-        PagedModel<IAuditItem> result = await _auditService.GetPagedItemsByUser(
+        PagedModel<IAuditItem> result = await _auditService.GetPagedItemsByUserAsync(
             user.Key,
             skip,
             take,

@@ -196,7 +196,7 @@ public sealed class AuditService : RepositoryService, IAuditService
         }
     }
 
-    public async Task<PagedModel<IAuditItem>> GetItemsByKey(
+    public async Task<PagedModel<IAuditItem>> GetItemsByKeyAsync(
         Guid entityKey,
         int skip,
         int take,
@@ -233,7 +233,7 @@ public sealed class AuditService : RepositoryService, IAuditService
             }
         }
 
-    public async Task<PagedModel<IAuditItem>> GetPagedItemsByUser(
+    public async Task<PagedModel<IAuditItem>> GetPagedItemsByUserAsync(
         Guid userKey,
         int skip,
         int take,
