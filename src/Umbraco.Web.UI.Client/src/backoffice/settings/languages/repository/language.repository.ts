@@ -32,16 +32,7 @@ export class UmbLanguageRepository {
 		]);
 	}
 
-	/**
-	 * Creates a new Language scaffold
-	 * @param
-	 * @return {*}
-	 * @memberof UmbLanguageServerDataSource
-	 */
-	async createDetailsScaffold() {
-		return this.#detailDataSource.createScaffold();
-	}
-
+	// TODO: maybe this should be renamed to something more generic?
 	async requestByIsoCode(isoCode: string) {
 		await this.#init;
 
@@ -68,18 +59,27 @@ export class UmbLanguageRepository {
 		return { data, error, asObservable: () => this.#languageStore!.data };
 	}
 
-	async save(language: LanguageModel) {
-		await this.#init;
+	async requestItems(isoCode: Array<string>) {
+		// HACK: filter client side until we have a proper server side endpoint
+		const { data, error } = await this.requestLanguages();
 
-		const { data, error } = await this.#detailDataSource.update(language);
+		let items = undefined;
 
 		if (data) {
-			const notification = { data: { message: `Language saved` } };
-			this.#notificationService?.peek('positive', notification);
-			this.#languageStore?.append(data);
+			items = data.items = data.items.filter((x) => isoCode.includes(x.isoCode!));
 		}
 
-		return { data, error };
+		return { data: items, error };
+	}
+
+	/**
+	 * Creates a new Language scaffold
+	 * @param
+	 * @return {*}
+	 * @memberof UmbLanguageServerDataSource
+	 */
+	async createScaffold() {
+		return this.#detailDataSource.createScaffold();
 	}
 
 	async create(language: LanguageModel) {
@@ -96,17 +96,18 @@ export class UmbLanguageRepository {
 		return { data, error };
 	}
 
-	async requestItems(isoCode: Array<string>) {
-		// HACK: filter client side until we have a proper server side endpoint
-		const { data, error } = await this.requestLanguages();
+	async save(language: LanguageModel) {
+		await this.#init;
 
-		let items = undefined;
+		const { data, error } = await this.#detailDataSource.update(language);
 
 		if (data) {
-			items = data.items = data.items.filter((x) => isoCode.includes(x.isoCode!));
+			const notification = { data: { message: `Language saved` } };
+			this.#notificationService?.peek('positive', notification);
+			this.#languageStore?.append(data);
 		}
 
-		return { data: items, error };
+		return { data, error };
 	}
 
 	async delete(key: string) {
