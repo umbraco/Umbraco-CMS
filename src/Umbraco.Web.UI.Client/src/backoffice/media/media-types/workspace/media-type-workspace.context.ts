@@ -10,6 +10,7 @@ export class UmbWorkspaceMediaTypeContext
 	extends UmbWorkspaceContext
 	implements UmbWorkspaceEntityContextInterface<EntityType | undefined>
 {
+	isNew = false;
 	#host: UmbControllerHostInterface;
 	#repo: UmbMediaTypeRepository;
 

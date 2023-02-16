@@ -4,10 +4,11 @@ import { UmbWorkspaceEntityContextInterface } from '../../../shared/components/w
 import { UMB_USER_GROUP_STORE_CONTEXT_TOKEN } from '../user-group.store';
 import type { UserGroupDetails } from '@umbraco-cms/models';
 
-
-export class UmbWorkspaceUserGroupContext extends UmbWorkspaceContext implements UmbWorkspaceEntityContextInterface<UserGroupDetails | undefined> {
-
-
+export class UmbWorkspaceUserGroupContext
+	extends UmbWorkspaceContext
+	implements UmbWorkspaceEntityContextInterface<UserGroupDetails | undefined>
+{
+	isNew = false;
 
 	#manager = new UmbEntityWorkspaceManager(this._host, 'user-group', UMB_USER_GROUP_STORE_CONTEXT_TOKEN);
 
@@ -15,7 +16,7 @@ export class UmbWorkspaceUserGroupContext extends UmbWorkspaceContext implements
 	public readonly name = this.#manager.state.getObservablePart((state) => state?.name);
 
 	setName(name: string) {
-		this.#manager.state.update({name: name})
+		this.#manager.state.update({ name: name });
 	}
 	getEntityType = this.#manager.getEntityType;
 	getUnique = this.#manager.getEntityKey;

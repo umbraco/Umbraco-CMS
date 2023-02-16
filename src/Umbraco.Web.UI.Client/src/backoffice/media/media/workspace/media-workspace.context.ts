@@ -10,7 +10,7 @@ export class UmbMediaWorkspaceContext
 	extends UmbWorkspaceContext
 	implements UmbWorkspaceEntityContextInterface<EntityType | undefined>
 {
-	#isNew = false;
+	isNew = false;
 	#host: UmbControllerHostInterface;
 	#detailRepository: UmbMediaRepository;
 
@@ -54,7 +54,7 @@ export class UmbMediaWorkspaceContext
 	async load(entityKey: string) {
 		const { data } = await this.#detailRepository.requestByKey(entityKey);
 		if (data) {
-			this.#isNew = false;
+			this.isNew = false;
 			this.#data.next(data);
 		}
 	}
@@ -62,19 +62,19 @@ export class UmbMediaWorkspaceContext
 	async createScaffold(parentKey: string | null) {
 		const { data } = await this.#detailRepository.createScaffold(parentKey);
 		if (!data) return;
-		this.#isNew = true;
+		this.isNew = true;
 		this.#data.next(data);
 	}
 
 	async save() {
 		if (!this.#data.value) return;
-		if (this.#isNew) {
+		if (this.isNew) {
 			await this.#detailRepository.create(this.#data.value);
 		} else {
 			await this.#detailRepository.save(this.#data.value);
 		}
 		// If it went well, then its not new anymore?.
-		this.#isNew = false;
+		this.isNew = false;
 	}
 
 	async delete(key: string) {
