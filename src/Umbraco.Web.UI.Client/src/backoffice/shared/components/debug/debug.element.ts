@@ -5,6 +5,9 @@ import { UmbContextDebugRequest } from '@umbraco-cms/context-api';
 import { UmbLitElement } from '@umbraco-cms/element';
 import { UmbModalService, UMB_MODAL_SERVICE_CONTEXT_TOKEN } from '@umbraco-cms/modal';
 
+// TODO: Ask Jacob how to lazily load this depending on a property
+import './debug.modal.element';
+
 @customElement('umb-debug')
 export class UmbDebug extends UmbLitElement {
 	static styles = [

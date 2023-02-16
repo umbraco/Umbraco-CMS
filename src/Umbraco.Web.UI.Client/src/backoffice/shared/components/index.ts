@@ -32,4 +32,3 @@ import './empty-state/empty-state.element';
 import './color-picker/color-picker.element';
 
 import './debug/debug.element';
-import './debug/debug.modal.element';
