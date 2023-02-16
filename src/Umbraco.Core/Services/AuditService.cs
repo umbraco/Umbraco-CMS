@@ -214,14 +214,16 @@ public sealed class AuditService : RepositoryService, IAuditService
                 throw new ArgumentOutOfRangeException(nameof(take));
             }
 
-            IEntitySlim? entity = _entityRepository.Get(entityKey);
-            if (entity is null)
-            {
-                throw new ArgumentNullException($"Could not find user with key {entityKey}");
-            }
+
 
             using (ScopeProvider.CreateCoreScope(autoComplete: true))
             {
+                IEntitySlim? entity = _entityRepository.Get(entityKey);
+                if (entity is null)
+                {
+                    throw new ArgumentNullException($"Could not find user with key {entityKey}");
+                }
+
                 IQuery<IAuditItem> query = Query<IAuditItem>().Where(x => x.Id == entity.Id);
                 IQuery<IAuditItem>? customFilter = sinceDate.HasValue ? Query<IAuditItem>().Where(x => x.CreateDate >= sinceDate) : null;
                 PaginationHelper.ConvertSkipTakeToPaging(skip, take, out var pageNumber, out var pageSize);
