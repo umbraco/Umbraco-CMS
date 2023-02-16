@@ -27,6 +27,12 @@ public class UserDto
     [Constraint(Default = "0")]
     public bool Disabled { get; set; }
 
+    [Column("key")]
+    [NullSetting(NullSetting = NullSettings.NotNull)]
+    [Constraint(Default = SystemMethods.NewGuid)]
+    [Index(IndexTypes.UniqueNonClustered, Name = "IX_umbracoUser_userKey")]
+    public Guid Key { get; set; }
+
     [Column("userNoConsole")]
     [Constraint(Default = "0")]
     public bool NoConsole { get; set; }
