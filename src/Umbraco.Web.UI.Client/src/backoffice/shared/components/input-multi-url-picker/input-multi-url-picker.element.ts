@@ -3,11 +3,9 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, property } from 'lit/decorators.js';
 import { FormControlMixin } from '@umbraco-ui/uui-base/lib/mixins';
 import { UmbLitElement } from '@umbraco-cms/element';
-import { FolderTreeItemModel } from '@umbraco-cms/backend-api';
 import { UmbModalService, UMB_MODAL_SERVICE_CONTEXT_TOKEN } from '@umbraco-cms/modal';
-import { UmbObserverController } from '@umbraco-cms/observable-api';
 
-export interface Link {
+export interface MultiUrlData {
 	icon?: string;
 	name?: string;
 	published?: boolean;
@@ -86,7 +84,7 @@ export class UmbInputMultiUrlPickerElement extends FormControlMixin(UmbLitElemen
 	overlaySize?: 'small' | 'medium' | 'large' | 'full';
 
 	@property()
-	links: Array<Link> = [];
+	multiUrls: Array<MultiUrlData> = [];
 
 	private _modalService?: UmbModalService;
 
@@ -95,12 +93,12 @@ export class UmbInputMultiUrlPickerElement extends FormControlMixin(UmbLitElemen
 		this.addValidator(
 			'rangeUnderflow',
 			() => this.minMessage,
-			() => !!this.min && this.links.length < this.min
+			() => !!this.min && this.multiUrls.length < this.min
 		);
 		this.addValidator(
 			'rangeOverflow',
 			() => this.maxMessage,
-			() => !!this.max && this.links.length > this.max
+			() => !!this.max && this.multiUrls.length > this.max
 		);
 
 		this.consumeContext(UMB_MODAL_SERVICE_CONTEXT_TOKEN, (instance) => {
@@ -109,11 +107,11 @@ export class UmbInputMultiUrlPickerElement extends FormControlMixin(UmbLitElemen
 	}
 
 	private _removeItem(index: number) {
-		this.links.splice(index, 1);
+		this.multiUrls.splice(index, 1);
 		this.requestUpdate();
 	}
 
-	private _openPicker(data?: Link, index?: number) {
+	private _openPicker(data?: MultiUrlData, index?: number) {
 		const modalHandler = this._modalService?.linkPicker(
 			{
 				name: data?.name || undefined,
@@ -130,21 +128,21 @@ export class UmbInputMultiUrlPickerElement extends FormControlMixin(UmbLitElemen
 				overlaySize: this.overlaySize || 'small',
 			}
 		);
-		modalHandler?.onClose().then((newUrl: Link) => {
+		modalHandler?.onClose().then((newUrl: MultiUrlData) => {
 			if (!newUrl) return;
 
-			if (index !== undefined && index >= 0) this.links[index] = newUrl;
-			else this.links.push(newUrl);
+			if (index !== undefined && index >= 0) this.multiUrls[index] = newUrl;
+			else this.multiUrls.push(newUrl);
 			this.requestUpdate();
 		});
 	}
 
 	render() {
-		return html`${this.links?.map((link, index) => this._renderItem(link, index))}
+		return html`${this.multiUrls?.map((link, index) => this._renderItem(link, index))}
 			<uui-button look="placeholder" label="Add" @click=${this._openPicker}>Add</uui-button>`;
 	}
 
-	private _renderItem(link: Link, index: number) {
+	private _renderItem(link: MultiUrlData, index: number) {
 		return html`<uui-ref-node .name="${link.name || ''}" .detail="${(link.url || '') + (link.queryString || '')}">
 			<uui-icon slot="icon" name="${link.icon || 'umb:link'}"></uui-icon>
 			<uui-action-bar slot="actions">

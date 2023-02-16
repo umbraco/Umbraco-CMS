@@ -1,8 +1,10 @@
 import { html } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, property, state } from 'lit/decorators.js';
-import { ifDefined } from 'lit-html/directives/if-defined.js';
-import { UmbInputMultiUrlPickerElement } from '../../../components/input-multi-url-picker/input-multi-url-picker.element';
+import {
+	UmbInputMultiUrlPickerElement,
+	MultiUrlData,
+} from '../../../../shared/components/input-multi-url-picker/input-multi-url-picker.element';
 import { UmbLitElement } from '@umbraco-cms/element';
 import { DataTypePropertyModel } from '@umbraco-cms/backend-api';
 
@@ -14,14 +16,8 @@ import { DataTypePropertyModel } from '@umbraco-cms/backend-api';
 export class UmbPropertyEditorUIMultiUrlPickerElement extends UmbLitElement {
 	static styles = [UUITextStyles];
 
-	private _value: string[] = [];
-	@property({ type: Array })
-	public get value(): string[] {
-		return this._value;
-	}
-	public set value(value: string[]) {
-		this._value = value || [];
-	}
+	@property()
+	value: MultiUrlData[] = [];
 
 	@property({ type: Array, attribute: false })
 	public set config(config: DataTypePropertyModel[]) {
@@ -56,7 +52,7 @@ export class UmbPropertyEditorUIMultiUrlPickerElement extends UmbLitElement {
 	private _minNumber?: number;
 
 	private _onChange(event: CustomEvent) {
-		//this._value = (event.target as UmbInputMultiUrlPickerElement);
+		//TODO: Do something about the values
 		this.dispatchEvent(new CustomEvent('property-value-change'));
 	}
 
@@ -68,7 +64,7 @@ export class UmbPropertyEditorUIMultiUrlPickerElement extends UmbLitElement {
 			.ignoreUserStartNodes=${this._ignoreUserStartNodes}
 			.max=${this._maxNumber}
 			.min=${this._minNumber}
-			.selectedKeys="${this._value}"></umb-input-multi-url-picker>`;
+			.links="${this.value}"></umb-input-multi-url-picker>`;
 	}
 }
 
