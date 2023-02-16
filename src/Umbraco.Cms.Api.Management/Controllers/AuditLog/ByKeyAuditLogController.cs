@@ -6,6 +6,7 @@ using Umbraco.Cms.Api.Management.ViewModels.AuditLogs;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
+using Umbraco.New.Cms.Core.Models;
 
 namespace Umbraco.Cms.Api.Management.Controllers.AuditLog;
 
@@ -25,11 +26,11 @@ public class ByKeyAuditLogController : AuditLogControllerBase
     [ProducesResponseType(typeof(PagedViewModel<AuditlogViewModel>), StatusCodes.Status200OK)]
     public async Task<ActionResult<PagedViewModel<AuditlogViewModel>>> ByKey(Guid key, Direction orderDirection = Direction.Descending, DateTime? sinceDate = null, int skip = 0, int take = 100)
     {
-        IEnumerable<IAuditItem> result = _auditService.GetItemsByKey(key, skip, take, out var totalRecords, orderDirection, sinceDate);
-        IEnumerable<AuditlogViewModel> mapped = _auditLogViewModelFactory.CreateAuditLogViewModel(result.Skip(skip).Take(take));
+        PagedModel<IAuditItem> result = await _auditService.GetItemsByKey(key, skip, take, orderDirection, sinceDate);
+        IEnumerable<AuditlogViewModel> mapped = _auditLogViewModelFactory.CreateAuditLogViewModel(result.Items.Skip(skip).Take(take));
         var viewModel = new PagedViewModel<AuditlogViewModel>
         {
-            Total = totalRecords,
+            Total = result.Total,
             Items = mapped,
         };
 

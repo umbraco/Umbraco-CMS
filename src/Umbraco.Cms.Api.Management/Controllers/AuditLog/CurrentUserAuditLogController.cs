@@ -46,19 +46,18 @@ public class CurrentUserAuditLogController : AuditLogControllerBase
             throw new PanicException("Could not find current user");
         }
 
-        Attempt<PagedModel<IAuditItem>, AuditLogOperationStatus> result = await _auditService.GetPagedItemsByUser(
+        PagedModel<IAuditItem> result = await _auditService.GetPagedItemsByUser(
             user.Key,
             skip,
             take,
-            out var totalRecords,
             orderDirection,
             null,
             sinceDate);
 
-        IEnumerable<AuditLogWithUsernameViewModel> mapped = _auditLogViewModelFactory.CreateAuditLogWithUsernameViewModels(result.Result.Items.Skip(skip).Take(take));
+        IEnumerable<AuditLogWithUsernameViewModel> mapped = _auditLogViewModelFactory.CreateAuditLogWithUsernameViewModels(result.Items.Skip(skip).Take(take));
         var viewModel = new PagedViewModel<AuditLogWithUsernameViewModel>
         {
-            Total = totalRecords,
+            Total = result.Total,
             Items = mapped,
         };
 

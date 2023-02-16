@@ -95,11 +95,10 @@ public interface IAuditService : IService
     ///     If populated, will only return entries after this time.
     /// </param>
     /// <returns></returns>
-    IEnumerable<IAuditItem> GetItemsByKey(
+    Task<PagedModel<IAuditItem>> GetItemsByKey(
         Guid entityKey,
         int skip,
         int take,
-        out long totalRecords,
         Direction orderDirection = Direction.Descending,
         DateTime? sinceDate = null,
         AuditType[]? auditTypeFilter = null) => throw new NotImplementedException();
@@ -123,11 +122,10 @@ public interface IAuditService : IService
     ///     Optional filter to be applied
     /// </param>
     /// <returns></returns>
-    Task<Attempt<PagedModel<IAuditItem>, AuditLogOperationStatus>> GetPagedItemsByUser(
+    Task<PagedModel<IAuditItem>> GetPagedItemsByUser(
         Guid userKey,
         int skip,
         int take,
-        out long totalRecords,
         Direction orderDirection = Direction.Descending,
         AuditType[]? auditTypeFilter = null,
         DateTime? sinceDate = null) => throw new NotImplementedException();

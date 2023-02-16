@@ -196,11 +196,10 @@ public sealed class AuditService : RepositoryService, IAuditService
         }
     }
 
-    public IEnumerable<IAuditItem> GetItemsByKey(
+    public async Task<PagedModel<IAuditItem>> GetItemsByKey(
         Guid entityKey,
         int skip,
         int take,
-        out long totalRecords,
         Direction orderDirection = Direction.Descending,
         DateTime? sinceDate = null,
         AuditType[]? auditTypeFilter = null)
@@ -225,10 +224,10 @@ public sealed class AuditService : RepositoryService, IAuditService
             {
                 IQuery<IAuditItem> query = Query<IAuditItem>().Where(x => x.Id == entity.Id);
                 IQuery<IAuditItem>? customFilter = sinceDate.HasValue ? Query<IAuditItem>().Where(x => x.CreateDate >= sinceDate) : null;
-
                 PaginationHelper.ConvertSkipTakeToPaging(skip, take, out var pageNumber, out var pageSize);
 
-                return _auditRepository.GetPagedResultsByQuery(query, pageNumber, pageSize, out totalRecords, orderDirection, auditTypeFilter, customFilter);
+                IEnumerable<IAuditItem> auditItems = _auditRepository.GetPagedResultsByQuery(query, pageNumber, pageSize, out var totalRecords, orderDirection, auditTypeFilter, customFilter);
+                return await Task.FromResult(new PagedModel<IAuditItem> { Items = auditItems, Total = totalRecords });
             }
         }
 
@@ -261,8 +260,9 @@ public sealed class AuditService : RepositoryService, IAuditService
         {
             IQuery<IAuditItem> query = Query<IAuditItem>().Where(x => x.UserId == user.Id);
             IQuery<IAuditItem> customFilter = Query<IAuditItem>().Where(x => x.CreateDate == sinceDate);
+            PaginationHelper.ConvertSkipTakeToPaging(skip, take, out var pageNumber, out var pageSize);
 
-            IEnumerable<IAuditItem> auditItems = _auditRepository.GetPagedResultsByQuery(query, skip, take, out var totalRecords, orderDirection, auditTypeFilter, customFilter);
+            IEnumerable<IAuditItem> auditItems = _auditRepository.GetPagedResultsByQuery(query, pageNumber, pageSize, out var totalRecords, orderDirection, auditTypeFilter, customFilter);
             return await Task.FromResult(new PagedModel<IAuditItem> { Items = auditItems, Total = totalRecords });
         }
     }
