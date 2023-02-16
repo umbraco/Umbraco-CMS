@@ -1,5 +1,5 @@
 import '../../../../backoffice/shared/components/body-layout/body-layout.element';
-import './modal-layout-multi-url-picker.element';
+import './modal-layout-link-picker.element';
 
 import { Meta, Story } from '@storybook/web-components';
 import { html } from 'lit';
@@ -7,7 +7,7 @@ import { html } from 'lit';
 import type {
 	UmbModalLayoutMultiUrlPickerElement,
 	UmbModalMultiUrlPickerData,
-} from './modal-layout-multi-url-picker.element';
+} from './modal-layout-link-picker.element';
 
 export default {
 	title: 'API/Modals/Layouts/Multi Url Picker',

@@ -5,7 +5,7 @@ import './layouts/media-picker/modal-layout-media-picker.element';
 import './layouts/property-editor-ui-picker/modal-layout-property-editor-ui-picker.element';
 import './layouts/modal-layout-current-user.element';
 import './layouts/icon-picker/modal-layout-icon-picker.element';
-import './layouts/multi-url-picker/modal-layout-multi-url-picker.element';
+import './layouts/link-picker/modal-layout-link-picker.element';
 
 import { UUIModalSidebarSize } from '@umbraco-ui/uui-modal-sidebar';
 import { BehaviorSubject } from 'rxjs';
@@ -15,7 +15,7 @@ import type { UmbModalConfirmData } from './layouts/confirm/modal-layout-confirm
 import type { UmbModalContentPickerData } from './layouts/content-picker/modal-layout-content-picker.element';
 import type { UmbModalPropertyEditorUIPickerData } from './layouts/property-editor-ui-picker/modal-layout-property-editor-ui-picker.element';
 import type { UmbModalMediaPickerData } from './layouts/media-picker/modal-layout-media-picker.element';
-import type { UmbModalMultiUrlPickerData } from './layouts/multi-url-picker/modal-layout-multi-url-picker.element';
+import type { LinkPickerConfig, LinkPickerData } from './layouts/link-picker/modal-layout-link-picker.element';
 import { UmbModalHandler } from './modal-handler';
 import { UmbContextToken } from '@umbraco-cms/context-api';
 
@@ -95,8 +95,12 @@ export class UmbModalService {
 	 * @return {*}  {UmbModalHandler}
 	 * @memberof UmbModalService
 	 */
-	public multiUrlPicker(data?: UmbModalMultiUrlPickerData): UmbModalHandler {
-		return this.open('umb-modal-layout-multi-url-picker', { data, type: 'sidebar', size: 'small' });
+	public linkPicker(data?: LinkPickerData, config?: LinkPickerConfig): UmbModalHandler {
+		return this.open('umb-modal-layout-multi-url-picker', {
+			data,
+			type: 'sidebar',
+			size: config?.overlaySize || 'small',
+		});
 	}
 
 	/**

@@ -4,14 +4,19 @@ import { customElement, property, state } from 'lit/decorators.js';
 import { ifDefined } from 'lit-html/directives/if-defined.js';
 import { FormControlMixin } from '@umbraco-ui/uui-base/lib/mixins';
 import { UmbLitElement } from '@umbraco-cms/element';
-import { DocumentTreeItemModel, FolderTreeItemModel } from '@umbraco-cms/backend-api';
+import { DocumentTreeItemModel, EntityTreeItemModel, FolderTreeItemModel } from '@umbraco-cms/backend-api';
 import { UmbModalService, UMB_MODAL_SERVICE_CONTEXT_TOKEN } from '@umbraco-cms/modal';
+import { UmbObserverController } from '@umbraco-cms/observable-api';
 
-export type OverlaySize = 'small' | 'medium' | 'large';
-export interface Url {
-	title: string;
-	href: string;
-	target: boolean;
+export interface Link {
+	icon?: string;
+	name?: string;
+	published?: boolean;
+	queryString?: string;
+	target?: string;
+	trashed?: boolean;
+	udi?: string;
+	url?: string;
 }
 
 @customElement('umb-input-multi-url-picker')
@@ -70,108 +75,81 @@ export class UmbInputMultiUrlPickerElement extends FormControlMixin(UmbLitElemen
 	@property({ type: Boolean, attribute: 'hide-anchor' })
 	hideAnchor?: boolean;
 
+	@property()
+	ignoreUserStartNodes?: boolean;
+
 	/**
 	 * @type {"small" | "medium" | "large"}
 	 * @attr
 	 * @default "small"
 	 */
 	@property()
-	overlaySize: OverlaySize = 'small';
-
-	// TODO: do we need both selectedKeys and value? If we just use value we follow the same pattern as native form controls.
-	private _selectedKeys: Array<string> = [];
-	public get selectedKeys(): Array<string> {
-		return this._selectedKeys;
-	}
-	public set selectedKeys(keys: Array<string>) {
-		this._selectedKeys = keys;
-		super.value = keys.join(',');
-	}
+	overlaySize?: 'small' | 'medium' | 'large' | 'full';
 
 	@property()
-	public set value(keysString: string) {
-		if (keysString !== this._value) {
-			this.selectedKeys = keysString.split(/[ ,]+/);
-		}
-	}
-
-	@property()
-	target = false;
-
-	@property()
-	title = '';
-
-	@property()
-	url = '';
-
-	@state()
-	private _urls?: Url[] = [
-		{
-			title: 'Cake',
-			href: 'google.com',
-			target: true,
-		},
-	];
-
-	@state()
-	private _items?: Array<DocumentTreeItemModel>;
+	links: Array<Link> = [];
 
 	private _modalService?: UmbModalService;
+	private _pickedItemsObserver?: UmbObserverController<FolderTreeItemModel>;
 
 	constructor() {
 		super();
-
-		this.addValidator(
-			'rangeUnderflow',
-			() => this.minMessage,
-			() => !!this.min && this._selectedKeys.length < this.min
-		);
-		this.addValidator(
-			'rangeOverflow',
-			() => this.maxMessage,
-			() => !!this.max && this._selectedKeys.length > this.max
-		);
 
 		this.consumeContext(UMB_MODAL_SERVICE_CONTEXT_TOKEN, (instance) => {
 			this._modalService = instance;
 		});
 	}
 
-	private _openPicker() {
-		const modalHandler = this._modalService?.multiUrlPicker({ treeItem: this._selectedKeys[0], target: this.target });
-		modalHandler?.onClose().then(({ selection }: any) => {
-			this.selectedKeys[0] = selection.treeItem;
-			this.target = selection.target;
-			this.url = selection.href;
+	private async _observePickedDocumentsOrMedias() {
+		this._pickedItemsObserver?.destroy();
+	}
+
+	private _removeItem(index: number) {
+		this.links.splice(index, 1);
+		this.requestUpdate();
+	}
+
+	private _openPicker(data?: Link, index?: number) {
+		const modalHandler = this._modalService?.linkPicker(
+			{
+				name: data?.name || undefined,
+				published: data?.published || undefined,
+				queryString: data?.queryString || undefined,
+				target: data?.target || undefined,
+				trashed: data?.trashed || undefined,
+				udi: data?.udi || undefined,
+				url: data?.url || undefined,
+			},
+			{
+				hideAnchor: this.hideAnchor,
+				ignoreUserStartNodes: this.ignoreUserStartNodes,
+				overlaySize: this.overlaySize || 'small',
+			}
+		);
+		modalHandler?.onClose().then((newUrl: Link) => {
+			if (!newUrl) return;
+
+			if (index !== undefined && index >= 0) this.links[index] = newUrl;
+			else this.links.push(newUrl);
+			this.requestUpdate();
 		});
 	}
 
 	render() {
-		return html`${this._urls?.map((url) => this._renderItem(url))}
+		return html`${this.links?.map((link, index) => this._renderItem(link, index))}
 			<uui-button look="placeholder" label="Add" @click=${this._openPicker}>Add</uui-button>`;
 	}
 
-	private _renderItem(url: Url) {
-		return html`<uui-ref-node name="Title" detail="Url">
-			<uui-icon slot="icon" name="${this.target}umb:link"></uui-icon>
-			<uui-action-bar slot="actions"> </uui-action-bar>
+	private _renderItem(link: Link, index: number) {
+		return html`<uui-ref-node
+			@open="${() => this._openPicker(link, index)}"
+			.name="${link.name || ''}"
+			.detail="${(link.url || '') + (link.queryString || '')}">
+			<uui-icon slot="icon" name="${link.icon || 'umb:link'}"></uui-icon>
+			<uui-action-bar slot="actions">
+				<uui-button @click="${() => this._removeItem(index)}" label="Remove link">Remove</uui-button>
+			</uui-action-bar>
 		</uui-ref-node>`;
-
-		// TODO: remove when we have a way to handle trashed items
-		//const tempItem = item as FolderTreeItemModel & { isTrashed: boolean };
-
-		/*
-		return html`
-			<uui-ref-node name=${ifDefined(item.name === null ? undefined : item.name)} detail=${ifDefined(item.key)}>
-				${tempItem.isTrashed ? html` <uui-tag size="s" slot="tag" color="danger">Trashed</uui-tag> ` : nothing}
-				<uui-action-bar slot="actions"> </uui-action-bar>
-			</uui-ref-node>
-		`;
-		*/
-	}
-	private _renderItemIcon(url: Url) {
-		if (url.href === 'key') return html``;
-		if (url.target === true) return html``;
 	}
 }
 

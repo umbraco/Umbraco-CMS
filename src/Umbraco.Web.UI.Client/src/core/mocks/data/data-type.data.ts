@@ -119,7 +119,24 @@ export const data: Array<DataTypeModel & { type: 'data-type' }> = [
 		parentKey: null,
 		propertyEditorAlias: 'Umbraco.MultiUrlPicker',
 		propertyEditorUiAlias: 'Umb.PropertyEditorUI.MultiUrlPicker',
-		data: [],
+		data: [
+			{
+				alias: 'hideAnchor',
+				value: false,
+			},
+			{
+				alias: 'ignoreUserStartNodes',
+				value: false,
+			},
+			{
+				alias: 'maxNumber',
+				value: null,
+			},
+			{
+				alias: 'minNumber',
+				value: null,
+			},
+		],
 	},
 	{
 		type: 'data-type',

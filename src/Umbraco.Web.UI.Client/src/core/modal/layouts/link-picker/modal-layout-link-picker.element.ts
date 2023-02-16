@@ -1,23 +1,28 @@
-import { css, html } from 'lit';
+import { css, html, nothing } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, query, state } from 'lit/decorators.js';
-import { UUIBooleanInputEvent, UUIInputElement, UUIToggleElement } from '@umbraco-ui/uui';
+import { UUIBooleanInputEvent, UUIInputElement } from '@umbraco-ui/uui';
 import { UmbModalLayoutElement } from '../modal-layout.element';
-
-export interface UmbModalMultiUrlPickerData {
-	UrlString?: string;
-	anchorString?: string;
-	linkTitle?: string;
-	target?: boolean;
-	hideAnchor?: boolean;
-	treeItem?: string;
-	ignoreUserStartNodes?: boolean;
-}
-
 import { UmbTreeElement } from '../../../../backoffice/shared/components/tree/tree.element';
 
+export interface LinkPickerData {
+	icon?: string;
+	name?: string;
+	published?: boolean;
+	queryString?: string;
+	target?: string;
+	trashed?: boolean;
+	udi?: string;
+	url?: string;
+}
+
+export interface LinkPickerConfig {
+	hideAnchor?: boolean;
+	ignoreUserStartNodes?: boolean;
+	overlaySize?: 'small' | 'medium' | 'large' | 'full';
+}
 @customElement('umb-modal-layout-multi-url-picker')
-export class UmbModalLayoutMultiUrlPickerElement extends UmbModalLayoutElement<UmbModalMultiUrlPickerData> {
+export class UmbModalLayoutMultiUrlPickerElement extends UmbModalLayoutElement<LinkPickerData & LinkPickerConfig> {
 	static styles = [
 		UUITextStyles,
 		css`
@@ -53,16 +58,19 @@ export class UmbModalLayoutMultiUrlPickerElement extends UmbModalLayoutElement<U
 	];
 
 	@state()
-	_url = {
-		title: '',
-		href: '',
-		anchor: '',
-		target: false,
-		treeItem: '',
+	_link: LinkPickerData = {
+		icon: undefined,
+		name: undefined,
+		published: true,
+		queryString: undefined,
+		target: undefined,
+		trashed: false,
+		udi: undefined,
+		url: undefined,
 	};
 
 	@state()
-	_layout = {
+	_layout: LinkPickerConfig = {
 		hideAnchor: false,
 		ignoreUserStartNodes: false,
 	};
@@ -71,36 +79,45 @@ export class UmbModalLayoutMultiUrlPickerElement extends UmbModalLayoutElement<U
 	private _linkInput!: UUIInputElement;
 
 	@query('#anchor-input')
-	private _anchorInput?: UUIInputElement;
+	private _linkQueryInput?: UUIInputElement;
 
-	@query('#link-title')
+	@query('#link-title-input')
 	private _linkTitleInput!: UUIInputElement;
-
-	@query('#target-toggle')
-	private _targetToggle!: UUIToggleElement;
 
 	connectedCallback() {
 		super.connectedCallback();
-		this._url.href = this.data?.UrlString ?? '';
-		this._url.anchor = this.data?.anchorString ?? '';
-		this._url.title = this.data?.linkTitle ?? '';
-		this._url.target = this.data?.target ?? false;
-		this._url.treeItem = this.data?.treeItem ?? '';
-		this._layout.hideAnchor = this.data?.hideAnchor ?? false;
-		this._layout.ignoreUserStartNodes = this.data?.ignoreUserStartNodes ?? false;
+		this._link.icon = this.data?.icon;
+		this._link.name = this.data?.name;
+		this._link.published = this.data?.published ?? true;
+		this._link.queryString = this.data?.queryString;
+		this._link.target = this.data?.target;
+		this._link.trashed = this.data?.trashed ?? false;
+		this._link.udi = this.data?.udi;
+		this._link.url = this.data?.url;
+
+		this._layout.hideAnchor = this.data?.hideAnchor;
+		this._layout.ignoreUserStartNodes = this.data?.ignoreUserStartNodes;
+	}
+
+	private _handleQueryString() {
+		if (!this._linkQueryInput) return;
+		const query = this._linkQueryInput.value as string;
+		//TODO: Handle query strings (add # etc)
+		this._link.queryString = query;
 	}
 
 	private _handleSelectionChange(e: CustomEvent) {
 		e.stopPropagation();
 		const element = e.target as UmbTreeElement;
-		this._url.treeItem = element.selection[element.selection.length - 1];
+		const udi = element.selection[element.selection.length - 1];
+		this._link.udi = udi;
+		//TODO: Update icon, if published, if trashed, url
+		this._link.url = udi;
 		this.requestUpdate();
 	}
 
 	private _submit() {
-		this.modalHandler?.close({
-			selection: this._url,
-		});
+		this.modalHandler?.close(this._link);
 	}
 
 	private _close() {
@@ -118,15 +135,18 @@ export class UmbModalLayoutMultiUrlPickerElement extends UmbModalLayoutElement<U
 						id="link-title-input"
 						placeholder="Enter a title"
 						label="link title"
-						.value="${this._url.title}"></uui-input>
+						@input=${() => (this._link.name = this._linkTitleInput.value as string)}
+						.value="${this._link.name ?? ''}"></uui-input>
 
 					<uui-label>Target</uui-label>
 					<uui-toggle
 						id="#target-toggle"
-						.checked="${this._url.target}"
-						@change="${(e: UUIBooleanInputEvent) => (this._url.target = e.target.checked)}"
-						>Open the link in a new tab</uui-toggle
-					>
+						label="Toggle if link should open in a new tab"
+						.checked="${this._link.target === '_blank' ? true : false}"
+						@change="${(e: UUIBooleanInputEvent) =>
+							e.target.checked ? (this._link.target = '_blank') : (this._link.target = '')}">
+						Open the link in a new tab
+					</uui-toggle>
 
 					<hr />
 
@@ -147,30 +167,32 @@ export class UmbModalLayoutMultiUrlPickerElement extends UmbModalLayoutElement<U
 				id="link-input"
 				placeholder="URL"
 				label="URL"
-				.value="${this._url.treeItem}"
-				.disabled="${this._url.treeItem ? true : false}"></uui-input>
+				.value="${this._link.udi ?? this._link.url ?? ''}"
+				@input=${() => (this._link.url = this._linkInput.value as string)}
+				.disabled="${this._link.udi ? true : false}"></uui-input>
 		</span>`;
 	}
 
 	private _renderAnchorInput() {
-		if (this._layout.hideAnchor) return;
+		if (this._layout.hideAnchor) return nothing;
 		return html`<span>
 			<uui-label for="anchor-input">Anchor / querystring</uui-label>
 			<uui-input
 				id="anchor-input"
 				placeholder="#value or ?key=value"
 				label="#value or ?key=value"
-				.value="${this._url.anchor}"></uui-input>
+				@input=${this._handleQueryString}
+				.value="${this._link.queryString ?? ''}"></uui-input>
 		</span>`;
 	}
 
 	private _renderTrees() {
 		return html`<uui-label for="search-input">Link to page</uui-label>
-			<uui-input id="search-input" placeholder="Type to search"></uui-input>
+			<uui-input id="search-input" placeholder="Type to search" label="Type to search"></uui-input>
 			<umb-tree
 				alias="Umb.Tree.Documents"
 				@selected=${this._handleSelectionChange}
-				.selection=${[this._url.treeItem]}
+				.selection=${[this._link.udi ?? '']}
 				selectable></umb-tree>
 
 			<hr />
@@ -180,7 +202,7 @@ export class UmbModalLayoutMultiUrlPickerElement extends UmbModalLayoutElement<U
 			<umb-tree
 				alias="Umb.Tree.Media"
 				@selected=${this._handleSelectionChange}
-				.selection=${[this._url.treeItem]}
+				.selection=${[this._link.udi ?? '']}
 				selectable></umb-tree>`;
 	}
 }
