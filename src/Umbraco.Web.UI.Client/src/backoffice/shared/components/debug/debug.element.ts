@@ -107,11 +107,13 @@ export class UmbDebug extends UmbLitElement {
 	}
 
 	private _openDialog() {
-		const modalHandler = this._modalService?.open('umb-debug-modal-layout',	{ size: 'medium', type: 'sidebar', data:{ contexts: this.contexts }});
-		
-		modalHandler?.onClose().then((data) => {
-			// if any data is supplied on close, it will be available here.
-			console.log('modal closed data', data);
+		// Open a modal that uses the HTML component called 'umb-debug-modal-layout'
+		this._modalService?.open('umb-debug-modal-layout', { 
+			size: 'small', 
+			type: 'sidebar', 
+			data:{ 
+				content: this._renderContextAliases()
+			}
 		});
 	}
 
