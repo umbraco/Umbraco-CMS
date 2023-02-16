@@ -1,6 +1,8 @@
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Events;
+using Umbraco.Cms.Core.Exceptions;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Core.Persistence.Repositories;
@@ -211,10 +213,15 @@ public sealed class AuditService : RepositoryService, IAuditService
                 throw new ArgumentOutOfRangeException(nameof(take));
             }
 
+            IEntitySlim? entity = _entityRepository.Get(entityKey);
+            if (entity is null)
+            {
+                throw new ArgumentNullException($"Could not find user with key {entityKey}");
+            }
+
             using (ScopeProvider.CreateCoreScope(autoComplete: true))
             {
-                var entityId = _entityRepository.Get(entityKey)!.Id;
-                IQuery<IAuditItem> query = Query<IAuditItem>().Where(x => x.Id == entityId);
+                IQuery<IAuditItem> query = Query<IAuditItem>().Where(x => x.Id == entity.Id);
                 IQuery<IAuditItem>? customFilter = sinceDate.HasValue ? Query<IAuditItem>().Where(x => x.CreateDate >= sinceDate) : null;
 
                 PaginationHelper.ConvertSkipTakeToPaging(skip, take, out var pageNumber, out var pageSize);
