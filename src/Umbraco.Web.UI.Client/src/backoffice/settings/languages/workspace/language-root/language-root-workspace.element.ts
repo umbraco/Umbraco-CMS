@@ -34,7 +34,7 @@ export class UmbLanguageRootWorkspaceElement extends UmbLitElement {
 	@state()
 	private _tableColumns: Array<UmbTableColumn> = [
 		{
-			name: 'Language',
+			name: 'Name',
 			alias: 'languageName',
 			elementName: 'umb-language-root-table-name-column-layout',
 		},
@@ -43,15 +43,15 @@ export class UmbLanguageRootWorkspaceElement extends UmbLitElement {
 			alias: 'isoCode',
 		},
 		{
-			name: 'Default language',
+			name: 'Default',
 			alias: 'defaultLanguage',
 		},
 		{
-			name: 'Mandatory language',
+			name: 'Mandatory',
 			alias: 'mandatoryLanguage',
 		},
 		{
-			name: 'Fall back language',
+			name: 'Fallback',
 			alias: 'fallBackLanguage',
 		},
 		{
