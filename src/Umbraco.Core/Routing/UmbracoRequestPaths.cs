@@ -136,7 +136,7 @@ public class UmbracoRequestPaths
             }
 
             // Check last char so we can properly determine the number of parts, e.g. /url/path/ has two parts, /url/path/test has three.
-            if ((count == 3) && (chr != '/'))
+            if (count == 3)
             {
                 return true;
             }
