@@ -259,7 +259,7 @@ public sealed class AuditService : RepositoryService, IAuditService
         using (ScopeProvider.CreateCoreScope(autoComplete: true))
         {
             IQuery<IAuditItem> query = Query<IAuditItem>().Where(x => x.UserId == user.Id);
-            IQuery<IAuditItem> customFilter = Query<IAuditItem>().Where(x => x.CreateDate == sinceDate);
+            IQuery<IAuditItem>? customFilter = sinceDate.HasValue ? Query<IAuditItem>().Where(x => x.CreateDate >= sinceDate) : null;
             PaginationHelper.ConvertSkipTakeToPaging(skip, take, out var pageNumber, out var pageSize);
 
             IEnumerable<IAuditItem> auditItems = _auditRepository.GetPagedResultsByQuery(query, pageNumber, pageSize, out var totalRecords, orderDirection, auditTypeFilter, customFilter);
