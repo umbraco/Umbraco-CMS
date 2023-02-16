@@ -8,6 +8,7 @@ import './ref-property-editor-ui/ref-property-editor-ui.element';
 import './content-property/content-property.element';
 import './table/table.element';
 import './code-block/code-block.element';
+import './dropdown/dropdown.element';
 import './extension-slot/extension-slot.element';
 
 import './workspace/workspace-layout/workspace-layout.element';
