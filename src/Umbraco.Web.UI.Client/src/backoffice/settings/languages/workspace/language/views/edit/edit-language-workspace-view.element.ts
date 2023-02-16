@@ -111,7 +111,6 @@ export class UmbEditLanguageWorkspaceViewElement extends UmbLitElement {
 		}
 	}
 
-	// TODO: move some of these methods to the context
 	#handleSearchChange(event: Event) {
 		const target = event.composedPath()[0] as UUIComboboxElement;
 		this._search = target.search;
