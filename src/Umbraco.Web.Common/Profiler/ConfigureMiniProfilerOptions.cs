@@ -40,5 +40,5 @@ internal sealed class ConfigureMiniProfilerOptions : IConfigureOptions<MiniProfi
         options.ResultsListAuthorize = IsBackofficeUserAuthorized;
     }
 
-    private bool IsBackofficeUserAuthorized(HttpRequest request) => true;//_backOfficeSecurityAccessor.BackOfficeSecurity?.CurrentUser is not null;
+    private bool IsBackofficeUserAuthorized(HttpRequest request) => true;// FIXME when we can get current backoffice user, _backOfficeSecurityAccessor.BackOfficeSecurity?.CurrentUser is not null;
 }
