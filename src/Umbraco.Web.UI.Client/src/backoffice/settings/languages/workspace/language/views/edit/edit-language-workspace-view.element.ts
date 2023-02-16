@@ -188,23 +188,7 @@ export class UmbEditLanguageWorkspaceViewElement extends UmbLitElement {
 				<umb-workspace-property-layout
 					label="Fallback language"
 					description="To allow multi-lingual content to fall back to another language if not present in the requested language, select it here.">
-					<uui-combobox
-						slot="editor"
-						value=${ifDefined(this.#fallbackLanguage?.isoCode)}
-						@change=${this.#handleFallbackChange}>
-						<uui-combobox-list>
-							${repeat(
-								this.#fallbackLanguages,
-								(language) => language.isoCode,
-								(language) =>
-									html`
-										<uui-combobox-list-option value=${ifDefined(language.isoCode)}
-											>${language.name}</uui-combobox-list-option
-										>
-									`
-							)}
-						</uui-combobox-list>
-					</uui-combobox>
+					<umb-input-language-picker slot="editor"></umb-input-language-picker>
 				</umb-workspace-property-layout>
 			</uui-box>
 		`;
