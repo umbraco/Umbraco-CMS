@@ -93,4 +93,59 @@ public class UserGroupServiceValidationTests : UmbracoIntegrationTest
         Assert.IsFalse(result.Success);
         Assert.AreEqual(UserGroupOperationStatus.AlreadyExists, result.Status);
     }
+
+    [Test]
+    public async Task Cannot_create_user_group_with_duplicate_alias()
+    {
+        var alias = "duplicateAlias";
+
+        var existingUserGroup = new UserGroup(ShortStringHelper)
+        {
+            Name = "I already exist",
+            Alias = alias
+        };
+        var setupResult = await UserGroupService.CreateAsync(existingUserGroup, Constants.Security.SuperUserId);
+        Assert.IsTrue(setupResult.Success);
+
+        var newUserGroup = new UserGroup(ShortStringHelper)
+        {
+            Name = "I have a duplicate alias",
+            Alias = alias,
+        };
+        var result = await UserGroupService.CreateAsync(newUserGroup, Constants.Security.SuperUserId);
+
+        Assert.IsFalse(result.Success);
+        Assert.AreEqual(UserGroupOperationStatus.DuplicateAlias, result.Status);
+    }
+
+    [Test]
+    public async Task Cannot_update_user_group_with_duplicate_alias()
+    {
+        var alias = "duplicateAlias";
+
+        var existingUserGroup = new UserGroup(ShortStringHelper)
+        {
+            Name = "I already exist",
+            Alias = alias
+        };
+        var setupResult = await UserGroupService.CreateAsync(existingUserGroup, Constants.Security.SuperUserId);
+        Assert.IsTrue(setupResult.Success);
+
+        IUserGroup userGroupToUpdate = new UserGroup(ShortStringHelper)
+        {
+            Name = "I don't have a duplicate alias",
+            Alias = "somAlias",
+        };
+        var creationResult = await UserGroupService.CreateAsync(userGroupToUpdate, Constants.Security.SuperUserId);
+        Assert.IsTrue(creationResult.Success);
+
+
+        userGroupToUpdate = creationResult.Result;
+        userGroupToUpdate.Name = "Now I have a duplicate alias";
+        userGroupToUpdate.Alias = alias;
+
+        var updateResult = await UserGroupService.UpdateAsync(userGroupToUpdate, Constants.Security.SuperUserId);
+        Assert.IsFalse(updateResult.Success);
+        Assert.AreEqual(UserGroupOperationStatus.DuplicateAlias, updateResult.Status);
+    }
 }

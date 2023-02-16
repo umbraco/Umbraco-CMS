@@ -222,20 +222,18 @@ internal sealed class UserGroupService : RepositoryService, IUserGroupService
 
     private async Task<Attempt<IUserGroup, UserGroupOperationStatus>> ValidateUserGroupCreationAsync(IUserGroup userGroup)
     {
+        if (await IsNewUserGroup(userGroup) is false)
+        {
+            return Attempt.FailWithStatus(UserGroupOperationStatus.AlreadyExists, userGroup);
+        }
+
         UserGroupOperationStatus commonValidationStatus = ValidateCommon(userGroup);
         if (commonValidationStatus != UserGroupOperationStatus.Success)
         {
             return Attempt.FailWithStatus(commonValidationStatus, userGroup);
         }
 
-        if (await IsNewUserGroup(userGroup) is false)
-        {
-            return Attempt.FailWithStatus(UserGroupOperationStatus.AlreadyExists, userGroup);
-        }
-
-        return UserGroupHasUniqueAlias(userGroup) is false
-            ? Attempt.FailWithStatus(UserGroupOperationStatus.DuplicateAlias, userGroup)
-            : Attempt.SucceedWithStatus(UserGroupOperationStatus.Success, userGroup);
+        return Attempt.SucceedWithStatus(UserGroupOperationStatus.Success, userGroup);
     }
 
     /// <inheritdoc />
@@ -312,6 +310,11 @@ internal sealed class UserGroupService : RepositoryService, IUserGroupService
         if (userGroup.Alias.Length > MaxUserGroupAliasLength)
         {
             return UserGroupOperationStatus.AliasTooLong;
+        }
+
+        if (UserGroupHasUniqueAlias(userGroup) is false)
+        {
+            return UserGroupOperationStatus.DuplicateAlias;
         }
 
         UserGroupOperationStatus startNodesValidationStatus = ValidateStartNodesExists(userGroup);
