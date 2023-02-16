@@ -628,25 +628,6 @@ public static class StringExtensions
         s.LastIndexOf(value, StringComparison.OrdinalIgnoreCase);
 
     /// <summary>
-    ///     Checks if IHtmlEncodedString is null or only contains whitespace.
-    /// </summary>
-    /// <param name="html">The encoded html string.</param>
-    /// <returns>Returns true if the HTML string is null or has no content other than HTML tags.</returns>
-    public static bool IsNullOrWhiteSpace(this IHtmlEncodedString html)
-    {
-        var htmlString = html?.ToHtmlString();
-
-        if (htmlString == null)
-        {
-            return true;
-        }
-
-        var withoutTags = htmlString.StripHtml();
-
-        return string.IsNullOrWhiteSpace(withoutTags);
-    }
-
-    /// <summary>
     ///     Tries to parse a string into the supplied type by finding and using the Type's "Parse" method
     /// </summary>
     /// <typeparam name="T"></typeparam>
