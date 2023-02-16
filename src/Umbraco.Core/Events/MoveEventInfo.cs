@@ -32,12 +32,10 @@ public class MoveEventInfo<TEntity> : MoveEventInfoBase<TEntity>
             return true;
         }
 
-        return EqualityComparer<TEntity>.Default.Equals(
-                   Entity,
-                   other.Entity) &&
-               NewParentId == other.NewParentId &&
-               NewParentKey == other.NewParentKey &&
-               string.Equals(OriginalPath, other.OriginalPath);
+        return EqualityComparer<TEntity>.Default.Equals(Entity, other.Entity)
+               && NewParentId == other.NewParentId
+               && NewParentKey == other.NewParentKey
+               && string.Equals(OriginalPath, other.OriginalPath);
     }
 
     public override bool Equals(object? obj)
