@@ -1,10 +1,9 @@
-import { css, html, nothing } from 'lit';
+import { css, html } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
-import { customElement, property, state } from 'lit/decorators.js';
-import { ifDefined } from 'lit-html/directives/if-defined.js';
+import { customElement, property } from 'lit/decorators.js';
 import { FormControlMixin } from '@umbraco-ui/uui-base/lib/mixins';
 import { UmbLitElement } from '@umbraco-cms/element';
-import { DocumentTreeItemModel, EntityTreeItemModel, FolderTreeItemModel } from '@umbraco-cms/backend-api';
+import { FolderTreeItemModel } from '@umbraco-cms/backend-api';
 import { UmbModalService, UMB_MODAL_SERVICE_CONTEXT_TOKEN } from '@umbraco-cms/modal';
 import { UmbObserverController } from '@umbraco-cms/observable-api';
 
@@ -90,18 +89,23 @@ export class UmbInputMultiUrlPickerElement extends FormControlMixin(UmbLitElemen
 	links: Array<Link> = [];
 
 	private _modalService?: UmbModalService;
-	private _pickedItemsObserver?: UmbObserverController<FolderTreeItemModel>;
 
 	constructor() {
 		super();
+		this.addValidator(
+			'rangeUnderflow',
+			() => this.minMessage,
+			() => !!this.min && this.links.length < this.min
+		);
+		this.addValidator(
+			'rangeOverflow',
+			() => this.maxMessage,
+			() => !!this.max && this.links.length > this.max
+		);
 
 		this.consumeContext(UMB_MODAL_SERVICE_CONTEXT_TOKEN, (instance) => {
 			this._modalService = instance;
 		});
-	}
-
-	private async _observePickedDocumentsOrMedias() {
-		this._pickedItemsObserver?.destroy();
 	}
 
 	private _removeItem(index: number) {
@@ -141,12 +145,10 @@ export class UmbInputMultiUrlPickerElement extends FormControlMixin(UmbLitElemen
 	}
 
 	private _renderItem(link: Link, index: number) {
-		return html`<uui-ref-node
-			@open="${() => this._openPicker(link, index)}"
-			.name="${link.name || ''}"
-			.detail="${(link.url || '') + (link.queryString || '')}">
+		return html`<uui-ref-node .name="${link.name || ''}" .detail="${(link.url || '') + (link.queryString || '')}">
 			<uui-icon slot="icon" name="${link.icon || 'umb:link'}"></uui-icon>
 			<uui-action-bar slot="actions">
+				<uui-button @click="${() => this._openPicker(link, index)}" label="Edit link">Edit</uui-button>
 				<uui-button @click="${() => this._removeItem(index)}" label="Remove link">Remove</uui-button>
 			</uui-action-bar>
 		</uui-ref-node>`;

@@ -121,6 +121,10 @@ export const data: Array<DataTypeModel & { type: 'data-type' }> = [
 		propertyEditorUiAlias: 'Umb.PropertyEditorUI.MultiUrlPicker',
 		data: [
 			{
+				alias: 'overlaySize',
+				value: 'small',
+			},
+			{
 				alias: 'hideAnchor',
 				value: false,
 			},
@@ -130,11 +134,11 @@ export const data: Array<DataTypeModel & { type: 'data-type' }> = [
 			},
 			{
 				alias: 'maxNumber',
-				value: null,
+				value: 2,
 			},
 			{
 				alias: 'minNumber',
-				value: null,
+				value: 0,
 			},
 		],
 	},

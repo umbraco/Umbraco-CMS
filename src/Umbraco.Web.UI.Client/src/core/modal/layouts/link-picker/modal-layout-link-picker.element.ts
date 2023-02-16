@@ -5,7 +5,7 @@ import { UUIBooleanInputEvent, UUIInputElement } from '@umbraco-ui/uui';
 import { UmbModalLayoutElement } from '../modal-layout.element';
 import { UmbTreeElement } from '../../../../backoffice/shared/components/tree/tree.element';
 
-export interface LinkPickerData {
+export interface UmbModalLinkPickerData {
 	icon?: string;
 	name?: string;
 	published?: boolean;
@@ -16,13 +16,15 @@ export interface LinkPickerData {
 	url?: string;
 }
 
-export interface LinkPickerConfig {
+export interface UmbModalLinkPickerConfig {
 	hideAnchor?: boolean;
 	ignoreUserStartNodes?: boolean;
 	overlaySize?: 'small' | 'medium' | 'large' | 'full';
 }
-@customElement('umb-modal-layout-multi-url-picker')
-export class UmbModalLayoutMultiUrlPickerElement extends UmbModalLayoutElement<LinkPickerData & LinkPickerConfig> {
+@customElement('umb-modal-layout-link-picker')
+export class UmbModalLayoutLinkPickerElement extends UmbModalLayoutElement<
+	UmbModalLinkPickerData & UmbModalLinkPickerConfig
+> {
 	static styles = [
 		UUITextStyles,
 		css`
@@ -58,7 +60,7 @@ export class UmbModalLayoutMultiUrlPickerElement extends UmbModalLayoutElement<L
 	];
 
 	@state()
-	_link: LinkPickerData = {
+	_link: UmbModalLinkPickerData = {
 		icon: undefined,
 		name: undefined,
 		published: true,
@@ -70,7 +72,7 @@ export class UmbModalLayoutMultiUrlPickerElement extends UmbModalLayoutElement<L
 	};
 
 	@state()
-	_layout: LinkPickerConfig = {
+	_layout: UmbModalLinkPickerConfig = {
 		hideAnchor: false,
 		ignoreUserStartNodes: false,
 	};
@@ -209,6 +211,6 @@ export class UmbModalLayoutMultiUrlPickerElement extends UmbModalLayoutElement<L
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-modal-layout-multi-url-picker': UmbModalLayoutMultiUrlPickerElement;
+		'umb-modal-layout-link-picker': UmbModalLayoutLinkPickerElement;
 	}
 }

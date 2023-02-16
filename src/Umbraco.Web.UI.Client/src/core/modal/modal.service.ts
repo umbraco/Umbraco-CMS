@@ -15,7 +15,10 @@ import type { UmbModalConfirmData } from './layouts/confirm/modal-layout-confirm
 import type { UmbModalContentPickerData } from './layouts/content-picker/modal-layout-content-picker.element';
 import type { UmbModalPropertyEditorUIPickerData } from './layouts/property-editor-ui-picker/modal-layout-property-editor-ui-picker.element';
 import type { UmbModalMediaPickerData } from './layouts/media-picker/modal-layout-media-picker.element';
-import type { LinkPickerConfig, LinkPickerData } from './layouts/link-picker/modal-layout-link-picker.element';
+import type {
+	UmbModalLinkPickerConfig,
+	UmbModalLinkPickerData,
+} from './layouts/link-picker/modal-layout-link-picker.element';
 import { UmbModalHandler } from './modal-handler';
 import { UmbContextToken } from '@umbraco-cms/context-api';
 
@@ -89,14 +92,14 @@ export class UmbModalService {
 	}
 
 	/**
-	 * Opens an Multi URL Picker sidebar modal
+	 * Opens an Link Picker sidebar modal
 	 * @public
-	 * @param {UmbModalMultiUrlPickerData} [data]
+	 * @param {(LinkPickerData & LinkPickerConfig)} [data]
 	 * @return {*}  {UmbModalHandler}
 	 * @memberof UmbModalService
 	 */
-	public linkPicker(data?: LinkPickerData, config?: LinkPickerConfig): UmbModalHandler {
-		return this.open('umb-modal-layout-multi-url-picker', {
+	public linkPicker(data?: UmbModalLinkPickerData, config?: UmbModalLinkPickerConfig): UmbModalHandler {
+		return this.open('umb-modal-layout-link-picker', {
 			data,
 			type: 'sidebar',
 			size: config?.overlaySize || 'small',
