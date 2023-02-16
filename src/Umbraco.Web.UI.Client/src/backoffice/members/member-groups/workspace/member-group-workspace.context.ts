@@ -10,6 +10,7 @@ export class UmbWorkspaceMemberGroupContext
 	extends UmbWorkspaceContext
 	implements UmbWorkspaceEntityContextInterface<EntityType | undefined>
 {
+	isNew = false;
 	#host: UmbControllerHostInterface;
 	#repo: UmbMemberGroupRepository;
 
