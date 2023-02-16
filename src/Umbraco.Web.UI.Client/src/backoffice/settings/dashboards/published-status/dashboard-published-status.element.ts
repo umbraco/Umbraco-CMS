@@ -133,7 +133,7 @@ export class UmbDashboardPublishedStatusElement extends UmbLitElement {
 
 	render() {
 		return html`
-			<umb-debug enabled useDialog></umb-debug>
+			<umb-debug enabled dialog></umb-debug>
 			<uui-box headline="Published Cache Status">
 				<p>${this._publishedStatusText}</p>
 				<uui-button
