@@ -10,6 +10,7 @@ export class UmbWorkspaceDictionaryContext
 	extends UmbWorkspaceContext
 	implements UmbWorkspaceEntityContextInterface<EntityType | undefined>
 {
+	isNew = false;
 	#host: UmbControllerHostInterface;
 	#repo: UmbDictionaryRepository;
 

@@ -1,14 +1,14 @@
-import { UmbLanguageStoreItemType } from '../../../backoffice/settings/languages/repository/language.store';
 import { UmbData } from './data';
+import { LanguageModel } from '@umbraco-cms/backend-api';
 
 // Temp mocked database
-class UmbLanguagesData extends UmbData<UmbLanguageStoreItemType> {
-	constructor(data: UmbLanguageStoreItemType[]) {
+class UmbLanguagesData extends UmbData<LanguageModel> {
+	constructor(data: LanguageModel[]) {
 		super(data);
 	}
 
 	// skip can be number or null
-	getAll(skip = 0, take = this.data.length): Array<UmbLanguageStoreItemType> {
+	getAll(skip = 0, take = this.data.length): Array<LanguageModel> {
 		return this.data.slice(skip, take);
 	}
 
@@ -16,7 +16,7 @@ class UmbLanguagesData extends UmbData<UmbLanguageStoreItemType> {
 		return this.data.find((item) => item.isoCode === key);
 	}
 
-	save(saveItems: Array<UmbLanguageStoreItemType>) {
+	save(saveItems: Array<LanguageModel>) {
 		saveItems.forEach((saveItem) => {
 			const foundIndex = this.data.findIndex((item) => item.isoCode === saveItem.isoCode);
 			if (foundIndex !== -1) {
@@ -50,7 +50,7 @@ class UmbLanguagesData extends UmbData<UmbLanguageStoreItemType> {
 		return keys;
 	}
 
-	updateData(updateItem: UmbLanguageStoreItemType) {
+	updateData(updateItem: LanguageModel) {
 		const itemIndex = this.data.findIndex((item) => item.isoCode === updateItem.isoCode);
 		const item = this.data[itemIndex];
 		if (!item) return;
@@ -81,7 +81,7 @@ class UmbLanguagesData extends UmbData<UmbLanguageStoreItemType> {
 	}
 }
 
-export const MockData: Array<UmbLanguageStoreItemType> = [
+export const MockData: Array<LanguageModel> = [
 	{
 		name: 'English',
 		isoCode: 'en',

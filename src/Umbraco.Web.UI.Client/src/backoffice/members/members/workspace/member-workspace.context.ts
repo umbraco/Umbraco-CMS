@@ -8,6 +8,7 @@ export class UmbWorkspaceMemberContext
 	extends UmbWorkspaceContext
 	implements UmbWorkspaceEntityContextInterface<MemberDetails | undefined>
 {
+	isNew = false;
 	#manager = new UmbEntityWorkspaceManager(this._host, 'member', UMB_MEMBER_DETAIL_STORE_CONTEXT_TOKEN);
 
 	public readonly data = this.#manager.state.asObservable();
@@ -18,7 +19,7 @@ export class UmbWorkspaceMemberContext
 	}
 
 	setName(name: string) {
-		this.#manager.state.update({name});
+		this.#manager.state.update({ name });
 	}
 
 	getEntityType = this.#manager.getEntityType;
