@@ -56,7 +56,7 @@ export class UmbDebug extends UmbLitElement {
 	enabled = false;
 
 	@property({ reflect: true, type: Boolean })
-	useDialog = false;
+	dialog = false;
 
 	@property()
 	contexts = new Map();
