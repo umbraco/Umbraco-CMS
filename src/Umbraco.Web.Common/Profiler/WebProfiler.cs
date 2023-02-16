@@ -1,6 +1,7 @@
 using System.Net;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Primitives;
 using Microsoft.Net.Http.Headers;
 using StackExchange.Profiling;
@@ -14,6 +15,14 @@ namespace Umbraco.Cms.Web.Common.Profiler;
 
 public class WebProfiler : IProfiler
 {
+    private readonly IHttpContextAccessor _httpContextAccessor;
+
+    public WebProfiler(IHttpContextAccessor httpContextAccessor)
+    {
+        _httpContextAccessor = httpContextAccessor;
+    }
+
+
     public static readonly AsyncLocal<MiniProfiler> MiniProfilerContext = new(x =>
     {
         _ = x;
@@ -24,11 +33,12 @@ public class WebProfiler : IProfiler
     private int _first;
     private MiniProfiler? _startupProfiler;
 
-    public IDisposable? Step(string name) => MiniProfiler.Current?.Step(name);
+    public IDisposable? Step(string name) =>
+        MiniProfiler.Current?.Step(name);
 
     public void Start()
     {
-        MiniProfiler.StartNew();
+        MiniProfiler.StartNew(_httpContextAccessor.HttpContext?.Request.Path);
         MiniProfilerContext.Value = MiniProfiler.Current;
     }
 
@@ -75,7 +85,6 @@ public class WebProfiler : IProfiler
                     {
                         AddSubProfiler(_startupProfiler);
                     }
-
                     _startupProfiler = null;
                 }
 
@@ -102,12 +111,19 @@ public class WebProfiler : IProfiler
     private static ICookieManager GetCookieManager(HttpContext context) =>
         context.RequestServices.GetRequiredService<ICookieManager>();
 
-    private static bool ShouldProfile(HttpRequest request)
+    private bool ShouldProfile(HttpRequest request)
     {
         if (request.IsClientSideRequest())
         {
             return false;
         }
+
+        var miniprofilerOptions = _httpContextAccessor.HttpContext?.RequestServices?.GetService<IOptions<MiniProfilerOptions>>();
+        if (miniprofilerOptions is not null && miniprofilerOptions.Value.IgnoredPaths.Contains(request.Path))
+        {
+            return false;
+        }
+
 
         if (bool.TryParse(request.Query["umbDebug"], out var umbDebug))
         {
