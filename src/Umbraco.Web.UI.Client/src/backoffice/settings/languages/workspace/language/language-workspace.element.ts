@@ -2,6 +2,7 @@ import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, html, nothing } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { UUIInputElement, UUIInputEvent } from '@umbraco-ui/uui';
+import { ifDefined } from 'lit-html/directives/if-defined.js';
 import { UmbWorkspaceEntityElement } from '../../../../shared/components/workspace/workspace-entity-element.interface';
 import { UmbLanguageWorkspaceContext } from './language-workspace.context';
 import { UmbLitElement } from '@umbraco-cms/element';
@@ -64,7 +65,7 @@ export class UmbLanguageWorkspaceElement extends UmbLitElement implements UmbWor
 					<uui-button href="/section/settings/language-root" compact>
 						<uui-icon name="umb:arrow-left"></uui-icon>
 					</uui-button>
-					<uui-input .value=${this._language.name} @input="${this.#handleInput}"></uui-input>
+					<uui-input value=${ifDefined(this._language.name)} @input="${this.#handleInput}"></uui-input>
 				</div>
 			</umb-workspace-layout>
 		`;
