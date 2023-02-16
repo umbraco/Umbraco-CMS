@@ -22,12 +22,12 @@ public class ByKeyAuditLogController : AuditLogControllerBase
 
     [HttpGet("ByKey")]
     [MapToApiVersion("1.0")]
-    [ProducesResponseType(typeof(PagedViewModel<AuditLogByTypeViewModel>), StatusCodes.Status200OK)]
-    public async Task<ActionResult<PagedViewModel<AuditLogByTypeViewModel>>> ByKey(Guid key, Direction orderDirection = Direction.Descending, DateTime? sinceDate = null, int skip = 0, int take = 100)
+    [ProducesResponseType(typeof(PagedViewModel<AuditlogViewModel>), StatusCodes.Status200OK)]
+    public async Task<ActionResult<PagedViewModel<AuditlogViewModel>>> ByKey(Guid key, Direction orderDirection = Direction.Descending, DateTime? sinceDate = null, int skip = 0, int take = 100)
     {
         IEnumerable<IAuditItem> result = _auditService.GetItemsByKey(key, skip, take, out var totalRecords, orderDirection, sinceDate);
-        IEnumerable<AuditLogByTypeViewModel> mapped = _auditLogViewModelFactory.CreateAuditLogViewModel(result.Skip(skip).Take(take));
-        var viewModel = new PagedViewModel<AuditLogByTypeViewModel>
+        IEnumerable<AuditlogViewModel> mapped = _auditLogViewModelFactory.CreateAuditLogViewModel(result.Skip(skip).Take(take));
+        var viewModel = new PagedViewModel<AuditlogViewModel>
         {
             Total = totalRecords,
             Items = mapped,

@@ -22,12 +22,12 @@ public class ByTypeAuditLogController : AuditLogControllerBase
 
     [HttpGet("ByType")]
     [MapToApiVersion("1.0")]
-    [ProducesResponseType(typeof(PagedViewModel<AuditLogByTypeViewModel>), StatusCodes.Status200OK)]
-    public async Task<ActionResult<PagedViewModel<AuditLogByTypeViewModel>>> ByType(AuditType logType, DateTime? sinceDate = null, int skip = 0, int take = 100)
+    [ProducesResponseType(typeof(PagedViewModel<AuditlogViewModel>), StatusCodes.Status200OK)]
+    public async Task<ActionResult<PagedViewModel<AuditlogViewModel>>> ByType(AuditType logType, DateTime? sinceDate = null, int skip = 0, int take = 100)
     {
         IEnumerable<IAuditItem> result = _auditService.GetLogs(logType, sinceDate);
-        IEnumerable<AuditLogByTypeViewModel> mapped = _auditLogViewModelFactory.CreateAuditLogViewModel(result.Skip(skip).Take(take));
-        var viewModel = new PagedViewModel<AuditLogByTypeViewModel>
+        IEnumerable<AuditlogViewModel> mapped = _auditLogViewModelFactory.CreateAuditLogViewModel(result.Skip(skip).Take(take));
+        var viewModel = new PagedViewModel<AuditlogViewModel>
         {
             Total = result.Count(),
             Items = mapped,
