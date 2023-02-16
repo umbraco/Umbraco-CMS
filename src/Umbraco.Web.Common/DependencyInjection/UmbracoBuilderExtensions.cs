@@ -109,7 +109,7 @@ public static partial class UmbracoBuilderExtensions
         services.ConfigureOptions<ConfigureKestrelServerOptions>();
         services.ConfigureOptions<ConfigureFormOptions>();
 
-        IProfiler profiler = GetWebProfiler(config);
+        IProfiler profiler = GetWebProfiler(config, httpContextAccessor);
 
         services.AddLogger(webHostEnvironment, config);
 
@@ -200,15 +200,8 @@ public static partial class UmbracoBuilderExtensions
     {
         builder.Services.AddSingleton<WebProfilerHtml>();
 
-        builder.Services.AddMiniProfiler(options =>
-        {
-            // WebProfiler determine and start profiling. We should not use the MiniProfilerMiddleware to also profile
-            options.ShouldProfile = request => false;
-
-            // this is a default path and by default it performs a 'contains' check which will match our content controller
-            // (and probably other requests) and ignore them.
-            options.IgnoredPaths.Remove("/content/");
-        });
+        builder.Services.AddMiniProfiler();
+        builder.Services.ConfigureOptions<ConfigureMiniProfilerOptions>();
 
         builder.AddNotificationHandler<UmbracoApplicationStartingNotification, InitializeWebProfiling>();
         return builder;
@@ -385,7 +378,7 @@ public static partial class UmbracoBuilderExtensions
         return builder;
     }
 
-    private static IProfiler GetWebProfiler(IConfiguration config)
+    private static IProfiler GetWebProfiler(IConfiguration config, IHttpContextAccessor httpContextAccessor)
     {
         var isDebug = config.GetValue<bool>($"{Constants.Configuration.ConfigHosting}:Debug");
 
@@ -397,7 +390,7 @@ public static partial class UmbracoBuilderExtensions
             return new NoopProfiler();
         }
 
-        var webProfiler = new WebProfiler();
+        var webProfiler = new WebProfiler(httpContextAccessor);
         webProfiler.StartBoot();
 
         return webProfiler;
