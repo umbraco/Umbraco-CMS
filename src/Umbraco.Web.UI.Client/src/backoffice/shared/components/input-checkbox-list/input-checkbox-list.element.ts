@@ -1,6 +1,6 @@
 import { css, html, nothing } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
-import { customElement, property, state } from 'lit/decorators.js';
+import { customElement, property } from 'lit/decorators.js';
 import { FormControlMixin } from '@umbraco-ui/uui-base/lib/mixins';
 import { repeat } from 'lit/directives/repeat.js';
 import { UUIBooleanInputEvent } from '@umbraco-ui/uui';
