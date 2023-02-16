@@ -7,7 +7,7 @@ using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
 
-namespace Umbraco.Cms.Api.Management.Controllers.LogController;
+namespace Umbraco.Cms.Api.Management.Controllers.AuditLog;
 
 public class ByKeyAuditLogController : AuditLogControllerBase
 {

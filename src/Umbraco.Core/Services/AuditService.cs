@@ -7,7 +7,9 @@ using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Scoping;
+using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Extensions;
+using Umbraco.New.Cms.Core.Models;
 
 namespace Umbraco.Cms.Core.Services.Implement;
 
@@ -230,11 +232,10 @@ public sealed class AuditService : RepositoryService, IAuditService
             }
         }
 
-    public IEnumerable<IAuditItem> GetPagedItemsByUser(
+    public async Task<PagedModel<IAuditItem>> GetPagedItemsByUser(
         Guid userKey,
         int skip,
         int take,
-        out long totalRecords,
         Direction orderDirection = Direction.Descending,
         AuditType[]? auditTypeFilter = null,
         DateTime? sinceDate = null)
@@ -253,8 +254,7 @@ public sealed class AuditService : RepositoryService, IAuditService
 
         if (user is null)
         {
-            totalRecords = 0;
-            return Enumerable.Empty<IAuditItem>();
+            return await Task.FromResult(new PagedModel<IAuditItem>());
         }
 
         using (ScopeProvider.CreateCoreScope(autoComplete: true))
@@ -262,7 +262,8 @@ public sealed class AuditService : RepositoryService, IAuditService
             IQuery<IAuditItem> query = Query<IAuditItem>().Where(x => x.UserId == user.Id);
             IQuery<IAuditItem> customFilter = Query<IAuditItem>().Where(x => x.CreateDate == sinceDate);
 
-            return _auditRepository.GetPagedResultsByQuery(query, skip, take, out totalRecords, orderDirection, auditTypeFilter, customFilter);
+            IEnumerable<IAuditItem> auditItems = _auditRepository.GetPagedResultsByQuery(query, skip, take, out var totalRecords, orderDirection, auditTypeFilter, customFilter);
+            return await Task.FromResult(new PagedModel<IAuditItem> { Items = auditItems, Total = totalRecords });
         }
     }
 

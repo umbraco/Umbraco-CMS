@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Management.Routing;
 
-namespace Umbraco.Cms.Api.Management.Controllers.LogController;
+namespace Umbraco.Cms.Api.Management.Controllers.AuditLog;
 
 [ApiController]
 [VersionedApiBackOfficeRoute("auditlog")]

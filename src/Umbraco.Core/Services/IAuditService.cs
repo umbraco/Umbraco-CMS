@@ -1,5 +1,7 @@
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Querying;
+using Umbraco.Cms.Core.Services.OperationStatus;
+using Umbraco.New.Cms.Core.Models;
 
 namespace Umbraco.Cms.Core.Services;
 
@@ -121,7 +123,7 @@ public interface IAuditService : IService
     ///     Optional filter to be applied
     /// </param>
     /// <returns></returns>
-    IEnumerable<IAuditItem> GetPagedItemsByUser(
+    Task<Attempt<PagedModel<IAuditItem>, AuditLogOperationStatus>> GetPagedItemsByUser(
         Guid userKey,
         int skip,
         int take,

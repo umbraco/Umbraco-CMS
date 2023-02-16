@@ -3,11 +3,10 @@ using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Common.ViewModels.Pagination;
 using Umbraco.Cms.Api.Management.Factories;
 using Umbraco.Cms.Api.Management.ViewModels.AuditLogs;
-using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
 
-namespace Umbraco.Cms.Api.Management.Controllers.LogController;
+namespace Umbraco.Cms.Api.Management.Controllers.AuditLog;
 
 public class ByTypeAuditLogController : AuditLogControllerBase
 {

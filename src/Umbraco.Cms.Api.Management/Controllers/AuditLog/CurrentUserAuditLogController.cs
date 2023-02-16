@@ -9,8 +9,10 @@ using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Services.OperationStatus;
+using Umbraco.New.Cms.Core.Models;
 
-namespace Umbraco.Cms.Api.Management.Controllers.LogController;
+namespace Umbraco.Cms.Api.Management.Controllers.AuditLog;
 
 public class CurrentUserAuditLogController : AuditLogControllerBase
 {
@@ -44,8 +46,8 @@ public class CurrentUserAuditLogController : AuditLogControllerBase
             throw new PanicException("Could not find current user");
         }
 
-        IEnumerable<IAuditItem> result = _auditService.GetPagedItemsByUser(
-            user!.Key,
+        Attempt<PagedModel<IAuditItem>, AuditLogOperationStatus> result = await _auditService.GetPagedItemsByUser(
+            user.Key,
             skip,
             take,
             out var totalRecords,
@@ -53,13 +55,13 @@ public class CurrentUserAuditLogController : AuditLogControllerBase
             null,
             sinceDate);
 
-        IEnumerable<AuditLogWithUsernameViewModel> mapped = _auditLogViewModelFactory.CreateAuditLogWithUsernameViewModels(result.Skip(skip).Take(take));
+        IEnumerable<AuditLogWithUsernameViewModel> mapped = _auditLogViewModelFactory.CreateAuditLogWithUsernameViewModels(result.Result.Items.Skip(skip).Take(take));
         var viewModel = new PagedViewModel<AuditLogWithUsernameViewModel>
         {
             Total = totalRecords,
             Items = mapped,
         };
 
-        return viewModel;
+        return Ok(viewModel);
     }
 }
