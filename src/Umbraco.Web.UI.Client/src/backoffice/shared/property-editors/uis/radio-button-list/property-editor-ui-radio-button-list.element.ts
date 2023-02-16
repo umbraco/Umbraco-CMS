@@ -13,13 +13,13 @@ import type { DataTypePropertyModel } from '@umbraco-cms/backend-api';
 export class UmbPropertyEditorUIRadioButtonListElement extends UmbLitElement {
 	static styles = [UUITextStyles];
 
-	private _value = '';
+	#value = '';
 	@property({ type: String })
 	public get value(): string {
-		return this._value;
+		return this.#value;
 	}
 	public set value(value: string) {
-		this._value = value || '';
+		this.#value = value || '';
 	}
 
 	@property({ type: Array, attribute: false })
@@ -47,15 +47,15 @@ export class UmbPropertyEditorUIRadioButtonListElement extends UmbLitElement {
 	@state()
 	private _list: Array<{ key: string; sortOrder: number; value: string }> = [];
 
-	private _onChange(event: CustomEvent) {
+	#onChange(event: CustomEvent) {
 		this.value = (event.target as UmbInputRadioButtonListElement).selected;
 		this.dispatchEvent(new CustomEvent('property-value-change'));
 	}
 
 	render() {
 		return html`<umb-input-radio-button-list
-			@change="${this._onChange}"
-			.selectedKey="${this._value}"
+			@change="${this.#onChange}"
+			.selectedKey="${this.#value}"
 			.list="${this._list}"></umb-input-radio-button-list>`;
 	}
 }

@@ -23,12 +23,12 @@ export class UmbInputCheckboxListElement extends FormControlMixin(UmbLitElement)
 	@property()
 	public list: Array<{ key: string; checked: boolean; value: string }> = [];
 
-	private _selected: Array<string> = [];
+	#selected: Array<string> = [];
 	public get selected(): Array<string> {
-		return this._selected;
+		return this.#selected;
 	}
 	public set selected(keys: Array<string>) {
-		this._selected = keys;
+		this.#selected = keys;
 		super.value = keys.join(',');
 	}
 
@@ -43,15 +43,15 @@ export class UmbInputCheckboxListElement extends FormControlMixin(UmbLitElement)
 		return undefined;
 	}
 
-	private _setSelection(e: UUIBooleanInputEvent) {
+	#setSelection(e: UUIBooleanInputEvent) {
 		e.stopPropagation();
 		if (e.target.checked) this.selected = [...this.selected, e.target.value];
-		else this._removeFromSelection(this.selected.findIndex((key) => e.target.value === key));
+		else this.#removeFromSelection(this.selected.findIndex((key) => e.target.value === key));
 
 		this.dispatchEvent(new CustomEvent('change', { bubbles: true, composed: true }));
 	}
 
-	private _removeFromSelection(index: number) {
+	#removeFromSelection(index: number) {
 		if (index == -1) return;
 		const keys = [...this.selected];
 		keys.splice(index, 1);
@@ -61,7 +61,7 @@ export class UmbInputCheckboxListElement extends FormControlMixin(UmbLitElement)
 	render() {
 		if (!this.list) return nothing;
 		return html`<form>
-			<uui-form @change="${this._setSelection}">
+			<uui-form @change="${this.#setSelection}">
 				${repeat(this.list, (item) => item.key, this.renderCheckbox)}
 			</uui-form>
 		</form>`;
