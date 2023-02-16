@@ -1,10 +1,14 @@
-import { css, html } from 'lit';
+import { css, html, TemplateResult } from 'lit';
 import { customElement } from 'lit/decorators.js';
 import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { UmbModalLayoutElement } from '@umbraco-cms/modal';
 
+export interface UmbDebugModalData {
+	content: TemplateResult | string;
+}
+
 @customElement('umb-debug-modal-layout')
-export class UmbDebugModalLayout extends UmbModalLayoutElement<any> {
+export class UmbDebugModalLayout extends UmbModalLayoutElement<UmbDebugModalData> {
 	static styles = [
 		UUITextStyles,
 		css`
@@ -65,7 +69,7 @@ export class UmbDebugModalLayout extends UmbModalLayoutElement<any> {
 					<uui-icon name="umb:bug"></uui-icon> Debug: Contexts
 				</span>
 				<uui-scroll-container id="field-settings">
-					${this.data.content}
+					${this.data?.content}
 				</uui-scroll-container>
 				<uui-button slot="actions" look="primary" label="Close sidebar" @click="${this._handleClose}">Close</uui-button>
 			</uui-dialog-layout>
