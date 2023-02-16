@@ -21,13 +21,13 @@ export class UmbInputRadioButtonListElement extends FormControlMixin(UmbLitEleme
 	 * List of items.
 	 */
 	@property()
-	list: Array<string> = [];
+	public list: Array<{ key: string; sortOrder: number; value: string }> = [];
 
 	private _selected = '';
-	public get selectedKey(): string {
+	public get selected(): string {
 		return this._selected;
 	}
-	public set selectedKey(key: string) {
+	public set selected(key: string) {
 		this._selected = key;
 		super.value = key;
 	}
@@ -35,7 +35,7 @@ export class UmbInputRadioButtonListElement extends FormControlMixin(UmbLitEleme
 	@property()
 	public set value(key: string) {
 		if (key !== this._value) {
-			this.selectedKey = key;
+			this.selected = key;
 		}
 	}
 
@@ -45,7 +45,7 @@ export class UmbInputRadioButtonListElement extends FormControlMixin(UmbLitEleme
 
 	private _setSelection(e: UUIBooleanInputEvent) {
 		e.stopPropagation();
-		if (e.target.value) this.selectedKey = e.target.value;
+		if (e.target.value) this.selected = e.target.value;
 		this.dispatchEvent(new CustomEvent('change', { bubbles: true, composed: true }));
 	}
 
@@ -53,12 +53,12 @@ export class UmbInputRadioButtonListElement extends FormControlMixin(UmbLitEleme
 		if (!this.list) return nothing;
 
 		return html`<uui-radio-group .value=${this.value} @change=${this._setSelection}>
-			${repeat(this.list, (value) => value, this.renderRadioButton)}
+			${repeat(this.list, (item) => item, this.renderRadioButton)}
 		</uui-radio-group>`;
 	}
 
-	renderRadioButton(value: string) {
-		return html`<uui-radio value="${value}" label="${value}"></uui-radio>`;
+	renderRadioButton(item: { key: string; sortOrder: number; value: string }) {
+		return html`<uui-radio value="${item.value}" label="${item.value}"></uui-radio>`;
 	}
 }
 

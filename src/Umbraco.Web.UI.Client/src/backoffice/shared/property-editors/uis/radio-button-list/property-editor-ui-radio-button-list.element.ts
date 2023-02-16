@@ -37,18 +37,18 @@ export class UmbPropertyEditorUIRadioButtonListElement extends UmbLitElement {
 		}
 
 		// ensure the items are sorted by the provided sort order
-		sortedItems.sort(function (a, b) {
+		sortedItems.sort((a, b) => {
 			return a.sortOrder > b.sortOrder ? 1 : b.sortOrder > a.sortOrder ? -1 : 0;
 		});
 
-		this._list = sortedItems.map((item) => item.value);
+		this._list = sortedItems;
 	}
 
 	@state()
-	private _list: Array<string> = [];
+	private _list: Array<{ key: string; sortOrder: number; value: string }> = [];
 
 	private _onChange(event: CustomEvent) {
-		this.value = (event.target as UmbInputRadioButtonListElement).selectedKey;
+		this.value = (event.target as UmbInputRadioButtonListElement).selected;
 		this.dispatchEvent(new CustomEvent('property-value-change'));
 	}
 
