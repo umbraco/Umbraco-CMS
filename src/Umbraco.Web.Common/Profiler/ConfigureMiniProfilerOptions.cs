@@ -29,11 +29,10 @@ internal sealed class ConfigureMiniProfilerOptions : IConfigureOptions<MiniProfi
         // WebProfiler determine and start profiling. We should not use the MiniProfilerMiddleware to also profile
         options.ShouldProfile = request => false;
 
-        // this is a default path and by default it performs a 'contains' check which will match our content controller
-        // (and probably other requests) and ignore them.
-        options.IgnoredPaths.Remove("/content/");
+        options.IgnoredPaths.Clear();
         options.IgnoredPaths.Add(WebPath.Combine(_backOfficePath, "swagger"));
         options.IgnoredPaths.Add(WebPath.Combine(options.RouteBasePath, "results-list"));
+        options.IgnoredPaths.Add(WebPath.Combine(options.RouteBasePath, "results-index"));
         options.IgnoredPaths.Add(WebPath.Combine(options.RouteBasePath, "results"));
 
         options.ResultsAuthorize = IsBackofficeUserAuthorized;
