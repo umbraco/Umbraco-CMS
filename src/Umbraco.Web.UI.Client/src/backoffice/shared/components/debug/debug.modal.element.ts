@@ -55,10 +55,6 @@ export class UmbDebugModalLayout extends UmbModalLayoutElement<any> {
 	];
 
 
-	// the modal handler will be injected into the element when the modal is opened.
-	@property({ attribute: false })
-	modalHandler?: UmbModalHandler;
-
 	private _handleClose() {
 		/* Optional data of any type can be applied to the close method to pass it
 		   to the modal parent through the onClose promise. */
