@@ -4,8 +4,8 @@ using Umbraco.Cms.Api.Common.ViewModels.Pagination;
 using Umbraco.Cms.Api.Management.Factories;
 using Umbraco.Cms.Api.Management.ViewModels.AuditLogs;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Exceptions;
 using Umbraco.Cms.Core.Models;
-using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
@@ -33,12 +33,17 @@ public class CurrentUserAuditLogController : AuditLogControllerBase
 
     [HttpGet("ByKey")]
     [MapToApiVersion("1.0")]
-    [ProducesResponseType(typeof(PagedViewModel<AuditlogViewModel>), StatusCodes.Status200OK)]
-    public async Task<ActionResult<PagedViewModel<AuditlogViewModel>>> ByKey(Direction orderDirection = Direction.Descending, DateTime? sinceDate = null, int skip = 0, int take = 100)
+    [ProducesResponseType(typeof(PagedViewModel<AuditLogWithUsernameViewModel>), StatusCodes.Status200OK)]
+    public async Task<ActionResult<PagedViewModel<AuditLogWithUsernameViewModel>>> ByKey(Direction orderDirection = Direction.Descending, DateTime? sinceDate = null, int skip = 0, int take = 100)
     {
         var userId = _backOfficeSecurityAccessor.BackOfficeSecurity?.GetUserId().Result ?? -1;
         IUser? user = _userService.GetUserById(userId);
-        PaginationHelper.ConvertSkipTakeToPaging(skip, take, out var pageNumber, out var pageSize);
+
+        if (user is null)
+        {
+            throw new PanicException("Could not find current user");
+        }
+
         IEnumerable<IAuditItem> result = _auditService.GetPagedItemsByUser(
             user!.Key,
             skip,
@@ -48,8 +53,8 @@ public class CurrentUserAuditLogController : AuditLogControllerBase
             null,
             sinceDate);
 
-        IEnumerable<AuditlogViewModel> mapped = _auditLogViewModelFactory.CreateAuditLogViewModel(result.Skip(skip).Take(take));
-        var viewModel = new PagedViewModel<AuditlogViewModel>
+        IEnumerable<AuditLogWithUsernameViewModel> mapped = _auditLogViewModelFactory.CreateAuditLogWithUsernameViewModels(result.Skip(skip).Take(take));
+        var viewModel = new PagedViewModel<AuditLogWithUsernameViewModel>
         {
             Total = totalRecords,
             Items = mapped,

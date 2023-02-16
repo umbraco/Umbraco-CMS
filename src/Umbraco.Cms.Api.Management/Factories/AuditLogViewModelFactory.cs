@@ -25,7 +25,7 @@ public class AuditLogViewModelFactory : IAuditLogViewModelFactory
 
     public IEnumerable<AuditlogViewModel> CreateAuditLogViewModel(IEnumerable<IAuditItem> auditItems) => auditItems.Select(CreateAuditLogViewModel);
 
-    public IEnumerable<AuditLogWithUsernameViewModel> createAuditLogWithUsernameViewModels(IEnumerable<IAuditItem> auditItems) => auditItems.Select(CreateAuditLogWithUsernameViewModel);
+    public IEnumerable<AuditLogWithUsernameViewModel> CreateAuditLogWithUsernameViewModels(IEnumerable<IAuditItem> auditItems) => auditItems.Select(CreateAuditLogWithUsernameViewModel);
 
     private AuditLogWithUsernameViewModel CreateAuditLogWithUsernameViewModel(IAuditItem auditItem)
     {

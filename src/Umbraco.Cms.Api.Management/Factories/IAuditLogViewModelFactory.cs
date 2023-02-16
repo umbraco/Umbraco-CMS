@@ -7,5 +7,5 @@ public interface IAuditLogViewModelFactory
 {
     IEnumerable<AuditlogViewModel> CreateAuditLogViewModel(IEnumerable<IAuditItem> auditItems);
 
-    IEnumerable<AuditLogWithUsernameViewModel> createAuditLogWithUsernameViewModels(IEnumerable<IAuditItem> auditItems);
+    IEnumerable<AuditLogWithUsernameViewModel> CreateAuditLogWithUsernameViewModels(IEnumerable<IAuditItem> auditItems);
 }
