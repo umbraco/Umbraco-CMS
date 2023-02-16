@@ -7,20 +7,36 @@ export const data: Array<DictionaryDetails> = [
 	{
 		parentKey: null,
 		name: 'Hello',
-		key: 'b7e7d0ab-53ba-485d-b8bd-12537f9925cb',
+		key: 'aae7d0ab-53ba-485d-b8bd-12537f9925cb',
 		hasChildren: true,
-		type: 'dictionary',
+		type: 'dictionary-item',
 		isContainer: false,
-		icon: 'umb:icon-book-alt',
+		icon: 'umb:book-alt',
+		translations: [{
+			isoCode: 'en',
+			translation: 'hello in en-US'
+		},
+		{
+			isoCode: 'fr',
+			translation: '',
+		}],
 	},
 	{
-		parentKey: 'b7e7d0ab-53ba-485d-b8bd-12537f9925cb',
-		name: 'Hello',
-		key: 'b7e7d0ab-53bb-485d-b8bd-12537f9925cb',
+		parentKey: 'aae7d0ab-53ba-485d-b8bd-12537f9925cb',
+		name: 'Hello again',
+		key: 'bbe7d0ab-53bb-485d-b8bd-12537f9925cb',
 		hasChildren: false,
-		type: 'dictionary',
+		type: 'dictionary-item',
 		isContainer: false,
-		icon: 'umb:icon-book-alt',
+		icon: 'umb:book-alt',
+		translations: [{
+			isoCode: 'en',
+			translation: 'Hello again in en-US'
+		},
+		{
+			isoCode: 'fr',
+			translation: 'Hello in fr'
+		}],
 	},
 ];
 

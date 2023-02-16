@@ -1,6 +1,7 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
+import type { DocumentTypeModel } from '../models/DocumentTypeModel';
 import type { DocumentTypeTreeItemModel } from '../models/DocumentTypeTreeItemModel';
 import type { PagedDocumentTypeTreeItemModel } from '../models/PagedDocumentTypeTreeItemModel';
 
@@ -9,6 +10,27 @@ import { OpenAPI } from '../core/OpenAPI';
 import { request as __request } from '../core/request';
 
 export class DocumentTypeResource {
+
+    /**
+     * @returns any Success
+     * @throws ApiError
+     */
+    public static getDocumentTypeByKey({
+        key,
+    }: {
+        key: string,
+    }): CancelablePromise<DocumentTypeModel> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/umbraco/management/api/v1/document-type/{key}',
+            path: {
+                'key': key,
+            },
+            errors: {
+                404: `Not Found`,
+            },
+        });
+    }
 
     /**
      * @returns PagedDocumentTypeTreeItemModel Success

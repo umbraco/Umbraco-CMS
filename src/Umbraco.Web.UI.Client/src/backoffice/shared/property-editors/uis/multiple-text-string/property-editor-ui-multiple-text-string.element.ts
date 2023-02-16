@@ -8,7 +8,6 @@ import UmbInputMultipleTextStringElement, {
 import { UmbChangeEvent } from 'src/core/events/change.event';
 import { UmbLitElement } from '@umbraco-cms/element';
 
-import './input-multiple-text-string/input-multiple-text-string.element';
 
 export type MultipleTextStringConfigData = Array<{
 	alias: 'minNumber' | 'maxNumber';

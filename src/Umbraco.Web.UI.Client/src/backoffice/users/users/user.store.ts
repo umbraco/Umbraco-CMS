@@ -15,22 +15,18 @@ export const UMB_USER_STORE_CONTEXT_TOKEN = new UmbContextToken<UmbUserStore>('U
  * @description - Data Store for Users
  */
 export class UmbUserStore extends UmbStoreBase implements UmbEntityDetailStore<UserDetails> {
-
-
-	#users = new ArrayState<UserDetails>([], x => x.key);
+	#users = new ArrayState<UserDetails>([], (x) => x.key);
 	public users = this.#users.asObservable();
 
 	#totalUsers = new NumberState(0);
 	public readonly totalUsers = this.#totalUsers.asObservable();
 
-
 	constructor(host: UmbControllerHostInterface) {
 		super(host, UMB_USER_STORE_CONTEXT_TOKEN.toString());
 	}
 
-
 	getScaffold(entityType: string, parentKey: string | null) {
-		return  {
+		return {
 			key: '',
 			name: '',
 			icon: '',
@@ -49,7 +45,6 @@ export class UmbUserStore extends UmbStoreBase implements UmbEntityDetailStore<U
 		} as UserDetails;
 	}
 
-
 	getAll() {
 		// TODO: use Fetcher API.
 		// TODO: only fetch if the data type is not in the store?
@@ -66,7 +61,7 @@ export class UmbUserStore extends UmbStoreBase implements UmbEntityDetailStore<U
 	/**
 	 * @description - Request a User by key. The User is added to the store and is returned as an Observable.
 	 * @param {string} key
-	 * @return {*}  {(Observable<DataTypeDetails | null>)}
+	 * @return {*}  {(Observable<DataTypeModel | null>)}
 	 * @memberof UmbDataTypeStore
 	 */
 	getByKey(key: string) {
@@ -78,9 +73,10 @@ export class UmbUserStore extends UmbStoreBase implements UmbEntityDetailStore<U
 				this.#users.appendOne(data);
 			});
 
-		return this.#users.getObservablePart((users: Array<UmbUserStoreItemType>) => users.find((user: UmbUserStoreItemType) => user.key === key));
+		return this.#users.getObservablePart((users: Array<UmbUserStoreItemType>) =>
+			users.find((user: UmbUserStoreItemType) => user.key === key)
+		);
 	}
-
 
 	/**
 	 * @description - Request Users by keys.
@@ -96,7 +92,9 @@ export class UmbUserStore extends UmbStoreBase implements UmbEntityDetailStore<U
 				this.#users.append(data);
 			});
 
-		return this.#users.getObservablePart((users: Array<UmbUserStoreItemType>) => users.filter((user: UmbUserStoreItemType) => keys.includes(user.key)));
+		return this.#users.getObservablePart((users: Array<UmbUserStoreItemType>) =>
+			users.filter((user: UmbUserStoreItemType) => keys.includes(user.key))
+		);
 	}
 
 	getByName(name: string) {
@@ -110,7 +108,9 @@ export class UmbUserStore extends UmbStoreBase implements UmbEntityDetailStore<U
 				this.#users.append(data);
 			});
 
-		return this.#users.getObservablePart((users: Array<UmbUserStoreItemType>) => users.filter((user: UmbUserStoreItemType) => user.name.toLocaleLowerCase().includes(name)));
+		return this.#users.getObservablePart((users: Array<UmbUserStoreItemType>) =>
+			users.filter((user: UmbUserStoreItemType) => user.name.toLocaleLowerCase().includes(name))
+		);
 	}
 
 	async enableUsers(userKeys: Array<string>) {
@@ -243,12 +243,7 @@ export class UmbUserStore extends UmbStoreBase implements UmbEntityDetailStore<U
 		}
 	}
 
-	async invite(
-		name: string,
-		email: string,
-		message: string,
-		userGroups: Array<string>
-	) {
+	async invite(name: string, email: string, message: string, userGroups: Array<string>) {
 		// TODO: use Fetcher API.
 		try {
 			const res = await fetch('/umbraco/backoffice/users/invite', {

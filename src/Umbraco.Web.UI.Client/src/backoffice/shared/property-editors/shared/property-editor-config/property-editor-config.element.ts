@@ -22,15 +22,15 @@ export class UmbPropertyEditorConfigElement extends UmbLitElement {
 	 * @attr
 	 * @default ''
 	 */
-	private _propertyEditorUIAlias = '';
+	private _propertyEditorUiAlias = '';
 	@property({ type: String, attribute: 'property-editor-ui-alias' })
-	public get propertyEditorUIAlias(): string {
-		return this._propertyEditorUIAlias;
+	public get propertyEditorUiAlias(): string {
+		return this._propertyEditorUiAlias;
 	}
-	public set propertyEditorUIAlias(value: string) {
-		const oldVal = this._propertyEditorUIAlias;
-		this._propertyEditorUIAlias = value;
-		this.requestUpdate('propertyEditorUIAlias', oldVal);
+	public set propertyEditorUiAlias(value: string) {
+		const oldVal = this._propertyEditorUiAlias;
+		this._propertyEditorUiAlias = value;
+		this.requestUpdate('propertyEditorUiAlias', oldVal);
 		this._observePropertyEditorUIConfig();
 	}
 
@@ -56,10 +56,10 @@ export class UmbPropertyEditorConfigElement extends UmbLitElement {
 	private _propertyEditorUIConfigProperties: Array<PropertyEditorConfigProperty> = [];
 
 	private _observePropertyEditorUIConfig() {
-		if (!this._propertyEditorUIAlias) return;
+		if (!this._propertyEditorUiAlias) return;
 
 		this.observe(
-			umbExtensionsRegistry.getByTypeAndAlias('propertyEditorUI', this.propertyEditorUIAlias),
+			umbExtensionsRegistry.getByTypeAndAlias('propertyEditorUI', this.propertyEditorUiAlias),
 			(manifest) => {
 				this._observePropertyEditorModelConfig(manifest?.meta.propertyEditorModel);
 				this._propertyEditorUIConfigProperties = manifest?.meta.config?.properties || [];
@@ -70,18 +70,15 @@ export class UmbPropertyEditorConfigElement extends UmbLitElement {
 		);
 	}
 
-	private _observePropertyEditorModelConfig(propertyEditorModelAlias?: string) {
-		if (!propertyEditorModelAlias) return;
+	private _observePropertyEditorModelConfig(propertyEditorAlias?: string) {
+		if (!propertyEditorAlias) return;
 
-		this.observe(
-			umbExtensionsRegistry.getByTypeAndAlias('propertyEditorModel', propertyEditorModelAlias),
-			(manifest) => {
-				this._propertyEditorModelConfigProperties = manifest?.meta.config?.properties || [];
-				this._propertyEditorModelConfigDefaultData = manifest?.meta.config?.defaultData || [];
-				this._mergeConfigProperties();
-				this._mergeConfigDefaultData();
-			}
-		);
+		this.observe(umbExtensionsRegistry.getByTypeAndAlias('propertyEditorModel', propertyEditorAlias), (manifest) => {
+			this._propertyEditorModelConfigProperties = manifest?.meta.config?.properties || [];
+			this._propertyEditorModelConfigDefaultData = manifest?.meta.config?.defaultData || [];
+			this._mergeConfigProperties();
+			this._mergeConfigDefaultData();
+		});
 	}
 
 	private _mergeConfigProperties() {

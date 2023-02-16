@@ -7,7 +7,6 @@ import UmbInputMultipleTextStringItemElement from '../input-multiple-text-string
 import { UmbInputEvent, UmbChangeEvent, UmbDeleteEvent } from '../../../../../../core/events';
 import { UmbLitElement } from '@umbraco-cms/element';
 
-import '../input-multiple-text-string-item/input-multiple-text-string-item.element';
 
 export type MultipleTextStringValue = Array<MultipleTextStringValueItem>;
 

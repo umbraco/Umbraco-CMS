@@ -1,5 +1,5 @@
-import { DeepState } from "./deep-state";
-import { pushToUniqueArray } from "./push-to-unique-array.method";
+import { DeepState } from './deep-state';
+import { pushToUniqueArray } from './push-to-unique-array.method';
 
 /**
  * @export
@@ -12,14 +12,41 @@ import { pushToUniqueArray } from "./push-to-unique-array.method";
  */
 
 export class ArrayState<T> extends DeepState<T[]> {
-
-
 	constructor(initialData: T[], private _getUnique?: (entry: T) => unknown) {
 		super(initialData);
 	}
 
 	/**
-	 * @method append
+	 * @method remove
+	 * @param {unknown[]} uniques - The unique values to remove.
+	 * @return {ArrayState<T>} Reference to it self.
+	 * @description - Remove some new data of this Subject.
+	 * @example <caption>Example remove entry with key '1' and '2'</caption>
+	 * const data = [
+	 * 	{ key: 1, value: 'foo'},
+	 * 	{ key: 2, value: 'bar'}
+	 * ];
+	 * const myState = new ArrayState(data, (x) => x.key);
+	 * myState.remove([1, 2]);
+	 */
+	remove(uniques: unknown[]) {
+		let next = this.getValue();
+		if (this._getUnique) {
+			uniques.forEach((unique) => {
+				next = next.filter((x) => {
+					// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+					// @ts-ignore
+					return this._getUnique(x) !== unique;
+				});
+			});
+
+			this.next(next);
+		}
+		return this;
+	}
+
+	/**
+	 * @method removeOne
 	 * @param {unknown} unique - The unique value to remove.
 	 * @return {ArrayState<T>} Reference to it self.
 	 * @description - Remove some new data of this Subject.
@@ -29,19 +56,16 @@ export class ArrayState<T> extends DeepState<T[]> {
 	 * 	{ key: 2, value: 'bar'}
 	 * ];
 	 * const myState = new ArrayState(data, (x) => x.key);
-	 * myState.remove([1]);
+	 * myState.removeOne(1);
 	 */
-	remove(uniques: unknown[]) {
+	removeOne(unique: unknown) {
 		let next = this.getValue();
 		if (this._getUnique) {
-			uniques.forEach( unique => {
-					next = next.filter(x => {
-						// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-						// @ts-ignore
-						return this._getUnique(x) !== unique;
-					})
-				}
-			);
+			next = next.filter((x) => {
+				// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+				// @ts-ignore
+				return this._getUnique(x) !== unique;
+			});
 
 			this.next(next);
 		}
@@ -89,7 +113,7 @@ export class ArrayState<T> extends DeepState<T[]> {
 	 */
 	appendOne(entry: T) {
 		const next = [...this.getValue()];
-		if(this._getUnique) {
+		if (this._getUnique) {
 			pushToUniqueArray(next, entry, this._getUnique);
 		} else {
 			next.push(entry);
@@ -115,9 +139,9 @@ export class ArrayState<T> extends DeepState<T[]> {
 	 * ]);
 	 */
 	append(entries: T[]) {
-		if(this._getUnique) {
+		if (this._getUnique) {
 			const next = [...this.getValue()];
-			entries.forEach(entry => {
+			entries.forEach((entry) => {
 				pushToUniqueArray(next, entry, this._getUnique!);
 			});
 			this.next(next);

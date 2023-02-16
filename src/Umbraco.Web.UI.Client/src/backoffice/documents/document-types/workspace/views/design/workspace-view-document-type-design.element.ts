@@ -1,10 +1,9 @@
 import { css, html } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, state } from 'lit/decorators.js';
-import { distinctUntilChanged } from 'rxjs';
 import { UmbWorkspaceDocumentTypeContext } from '../../document-type-workspace.context';
 import { UmbLitElement } from '@umbraco-cms/element';
-import type { DocumentTypeDetails } from '@umbraco-cms/models';
+import type { DocumentTypeModel } from '@umbraco-cms/backend-api';
 import '../../../../../shared/property-creator/property-creator.element.ts';
 
 @customElement('umb-workspace-view-document-type-design')
@@ -20,7 +19,7 @@ export class UmbWorkspaceViewDocumentTypeDesignElement extends UmbLitElement {
 	];
 
 	@state()
-	_documentType?: DocumentTypeDetails | null;
+	_documentType?: DocumentTypeModel;
 
 	private _workspaceContext?: UmbWorkspaceDocumentTypeContext;
 
@@ -37,7 +36,7 @@ export class UmbWorkspaceViewDocumentTypeDesignElement extends UmbLitElement {
 	private _observeDocumentType() {
 		if (!this._workspaceContext) return;
 
-		this.observe(this._workspaceContext.data.pipe(distinctUntilChanged()), (documentType) => {
+		this.observe(this._workspaceContext.data, (documentType) => {
 			this._documentType = documentType;
 		});
 	}

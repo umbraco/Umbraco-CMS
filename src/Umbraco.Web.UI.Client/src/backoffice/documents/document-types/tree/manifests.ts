@@ -1,4 +1,4 @@
-import { UMB_DOCUMENT_TYPE_DETAIL_STORE_CONTEXT_TOKEN } from '../document-type.detail.store';
+import { UmbDocumentTypeRepository } from '../repository/document-type.repository';
 import type { ManifestTree, ManifestTreeItemAction } from '@umbraco-cms/models';
 
 const tree: ManifestTree = {
@@ -6,7 +6,7 @@ const tree: ManifestTree = {
 	alias: 'Umb.Tree.DocumentTypes',
 	name: 'Document Types Tree',
 	meta: {
-		storeAlias: UMB_DOCUMENT_TYPE_DETAIL_STORE_CONTEXT_TOKEN.toString(),
+		repository: UmbDocumentTypeRepository,
 	},
 };
 
