@@ -92,7 +92,7 @@ export class UmbDebug extends UmbLitElement {
 
 	render() {
 		if (this.enabled) {			
-			return this.useDialog ? this._renderDialog() : this._renderPanel();			
+			return this.dialog ? this._renderDialog() : this._renderPanel();			
 		} else {
 			return nothing;
 		}
