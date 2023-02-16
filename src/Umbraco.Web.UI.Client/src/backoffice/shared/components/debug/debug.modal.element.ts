@@ -1,7 +1,7 @@
-import { css, html, nothing, TemplateResult } from 'lit';
-import { customElement, property } from 'lit/decorators.js';
+import { css, html } from 'lit';
+import { customElement } from 'lit/decorators.js';
 import { UUITextStyles } from '@umbraco-ui/uui-css';
-import { UmbModalHandler, UmbModalLayoutElement } from '@umbraco-cms/modal';
+import { UmbModalLayoutElement } from '@umbraco-cms/modal';
 
 @customElement('umb-debug-modal-layout')
 export class UmbDebugModalLayout extends UmbModalLayoutElement<any> {
@@ -65,86 +65,11 @@ export class UmbDebugModalLayout extends UmbModalLayoutElement<any> {
 					<uui-icon name="umb:bug"></uui-icon> Debug: Contexts
 				</span>
 				<uui-scroll-container id="field-settings">
-					${this._renderContextAliases()}
+					${this.data.content}
 				</uui-scroll-container>
 				<uui-button slot="actions" look="primary" label="Close sidebar" @click="${this._handleClose}">Close</uui-button>
 			</uui-dialog-layout>
 		`;
-	}
-
-	private _renderContextAliases() { 
-		if(!this.data) {
-			return nothing;
-		}
-
-		const aliases = [];
-		for (const [alias, instance] of this.data.contexts) {
-			aliases.push(
-				html`
-				<div class="context">
-					<h3>${alias} <span>${typeof instance}</span></h3>
-					${this._renderInstance(instance)}
-				</div>`
-			);
-		}
-
-		return aliases;
-	}
-
-	private _renderInstance(instance: any) {
-		const instanceKeys: TemplateResult[] = [];
-
-		if (typeof instance === 'function') {
-			return instanceKeys.push(html`<li>Callable Function</li>`);
-		} else if (typeof instance === 'object') {
-			const methodNames = this.getClassMethodNames(instance);
-			if (methodNames.length) {
-				instanceKeys.push(
-					html`
-						<h4>Methods</h4>
-						<ul>
-							${methodNames.map((methodName) => html`<li>${methodName}</li>`)}
-						</ul>
-				`);
-			}
-
-			instanceKeys.push(html`<h4>Properties</h4>`);
-
-			for (const key in instance) {
-				if (key.startsWith('_')) {
-					continue;
-				}
-
-				const value = instance[key];
-				if (typeof value === 'string') {
-					instanceKeys.push(html`<li>${key} = ${value}</li>`);
-				} else {
-					instanceKeys.push(html`<li>${key} Type (${typeof value})</li>`);
-				}
-			}
-		} else {
-			instanceKeys.push(html`<li>Context is a primitive with value: ${instance}</li>`);
-		}
-
-		return instanceKeys;
-	}
-
-
-	private getClassMethodNames(klass: any) {
-		const isGetter = (x: any, name: string): boolean => !!(Object.getOwnPropertyDescriptor(x, name) || {}).get;
-		const isFunction = (x: any, name: string): boolean => typeof x[name] === 'function';
-		const deepFunctions = (x: any): any =>
-			x !== Object.prototype &&
-			Object.getOwnPropertyNames(x)
-				.filter((name) => isGetter(x, name) || isFunction(x, name))
-				.concat(deepFunctions(Object.getPrototypeOf(x)) || []);
-		const distinctDeepFunctions = (klass: any) => Array.from(new Set(deepFunctions(klass)));
-
-		const allMethods =
-			typeof klass.prototype === 'undefined'
-				? distinctDeepFunctions(klass)
-				: Object.getOwnPropertyNames(klass.prototype);
-		return allMethods.filter((name: any) => name !== 'constructor' && !name.startsWith('_'));
 	}
 }
 
