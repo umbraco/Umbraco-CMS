@@ -8,10 +8,12 @@ class MyClass {
 }
 
 describe('UmbContextProvider', () => {
+	let instance: MyClass;
 	let provider: UmbContextProvider;
 
 	beforeEach(() => {
-		provider = new UmbContextProvider(document.body, 'my-test-context', new MyClass());
+		instance = new MyClass();
+		provider = new UmbContextProvider(document.body, 'my-test-context', instance);
 		provider.hostConnected();
 	});
 

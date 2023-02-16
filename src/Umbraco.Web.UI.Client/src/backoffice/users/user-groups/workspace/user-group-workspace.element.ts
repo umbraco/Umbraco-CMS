@@ -204,7 +204,7 @@ export class UmbUserGroupWorkspaceElement extends UmbLitElement implements UmbWo
 			this._observeUsers();
 		});
 
-		this.observe(this._workspaceContext.data.pipe(distinctUntilChanged()), (userGroup) => {
+		this.observe(this._workspaceContext.data, (userGroup) => {
 			this._userGroup = userGroup;
 		});
 	}

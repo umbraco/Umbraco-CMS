@@ -3,7 +3,7 @@ import { customElement, property, state } from 'lit/decorators.js';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { UmbInputCheckboxListElement } from '../../../components/input-checkbox-list/input-checkbox-list.element';
 import { UmbLitElement } from '@umbraco-cms/element';
-import type { DataTypePropertyData } from '@umbraco-cms/models';
+import type { DataTypePropertyModel } from '@umbraco-cms/backend-api';
 
 /**
  * @element umb-property-editor-ui-checkbox-list
@@ -22,7 +22,7 @@ export class UmbPropertyEditorUICheckboxListElement extends UmbLitElement {
 	}
 
 	@property({ type: Array, attribute: false })
-	public set config(config: Array<DataTypePropertyData>) {
+	public set config(config: Array<DataTypePropertyModel>) {
 		const listData = config.find((x) => x.alias === 'itemList');
 
 		if (!listData) return;

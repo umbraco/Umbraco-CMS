@@ -5,6 +5,7 @@ import type { DictionaryImportModel } from '../models/DictionaryImportModel';
 import type { DictionaryItemCreateModel } from '../models/DictionaryItemCreateModel';
 import type { DictionaryItemModel } from '../models/DictionaryItemModel';
 import type { DictionaryItemUpdateModel } from '../models/DictionaryItemUpdateModel';
+import type { DictionaryMoveModel } from '../models/DictionaryMoveModel';
 import type { DictionaryUploadModel } from '../models/DictionaryUploadModel';
 import type { DocumentTypeTreeItemModel } from '../models/DocumentTypeTreeItemModel';
 import type { FolderTreeItemModel } from '../models/FolderTreeItemModel';
@@ -43,10 +44,10 @@ export class DictionaryResource {
      * @throws ApiError
      */
     public static postDictionary({
-        requestBody,
-    }: {
-        requestBody?: DictionaryItemCreateModel,
-    }): CancelablePromise<any> {
+requestBody,
+}: {
+requestBody?: DictionaryItemCreateModel,
+}): CancelablePromise<any> {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/umbraco/management/api/v1/dictionary',
@@ -86,10 +87,10 @@ export class DictionaryResource {
      * @throws ApiError
      */
     public static deleteDictionaryByKey({
-        key,
-    }: {
-        key: string,
-    }): CancelablePromise<any> {
+key,
+}: {
+key: string,
+}): CancelablePromise<any> {
         return __request(OpenAPI, {
             method: 'DELETE',
             url: '/umbraco/management/api/v1/dictionary/{key}',
@@ -108,12 +109,12 @@ export class DictionaryResource {
      * @throws ApiError
      */
     public static putDictionaryByKey({
-        key,
-        requestBody,
-    }: {
-        key: string,
-        requestBody?: DictionaryItemUpdateModel,
-    }): CancelablePromise<any> {
+key,
+requestBody,
+}: {
+key: string,
+requestBody?: DictionaryItemUpdateModel,
+}): CancelablePromise<any> {
         return __request(OpenAPI, {
             method: 'PUT',
             url: '/umbraco/management/api/v1/dictionary/{key}',
@@ -150,6 +151,32 @@ export class DictionaryResource {
                 'includeChildren': includeChildren,
             },
             errors: {
+                404: `Not Found`,
+            },
+        });
+    }
+
+    /**
+     * @returns any Success
+     * @throws ApiError
+     */
+    public static postDictionaryByKeyMove({
+        key,
+        requestBody,
+    }: {
+        key: string,
+        requestBody?: DictionaryMoveModel,
+    }): CancelablePromise<any> {
+        return __request(OpenAPI, {
+            method: 'POST',
+            url: '/umbraco/management/api/v1/dictionary/{key}/move',
+            path: {
+                'key': key,
+            },
+            body: requestBody,
+            mediaType: 'application/json',
+            errors: {
+                400: `Bad Request`,
                 404: `Not Found`,
             },
         });

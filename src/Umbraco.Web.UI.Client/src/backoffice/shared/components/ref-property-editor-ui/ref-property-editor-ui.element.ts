@@ -30,7 +30,7 @@ export class UmbRefPropertyEditorUIElement extends UUIRefNodeElement {
 	 * @default ''
 	 */
 	@property({ type: String, attribute: 'property-editor-model-alias' })
-	propertyEditorModelAlias = '';
+	propertyEditorAlias = '';
 
 	protected renderDetail() {
 		const details: string[] = [];
@@ -39,8 +39,8 @@ export class UmbRefPropertyEditorUIElement extends UUIRefNodeElement {
 			details.push(this.alias);
 		}
 
-		if (this.propertyEditorModelAlias !== '') {
-			details.push(this.propertyEditorModelAlias);
+		if (this.propertyEditorAlias !== '') {
+			details.push(this.propertyEditorAlias);
 		} else {
 			details.push('Property Editor Missing');
 		}

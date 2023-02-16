@@ -35,7 +35,7 @@ describe('UmbContextProvider', () => {
 	describe('Unique controllers replace each other', () => {
 		it('has a host property', () => {
 			const firstCtrl = new UmbContextProviderController(hostElement, 'my-test-context', contextInstance);
-			const secondCtrl = new UmbContextProviderController(hostElement, 'my-test-context', contextInstance);
+			const secondCtrl = new UmbContextProviderController(hostElement, 'my-test-context', new MyClass());
 
 			expect(hostElement.hasController(firstCtrl)).to.be.false;
 			expect(hostElement.hasController(secondCtrl)).to.be.true;

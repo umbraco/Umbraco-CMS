@@ -2,9 +2,9 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html, nothing } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { UmbModalService, UMB_MODAL_SERVICE_CONTEXT_TOKEN } from '../../../../../../core/modal';
-import { UmbWorkspaceDataTypeContext } from '../../data-type-workspace.context';
+import { UmbDataTypeWorkspaceContext } from '../../data-type-workspace.context';
 import { UmbLitElement } from '@umbraco-cms/element';
-import type { DataTypeDetails } from '@umbraco-cms/models';
+import type { DataTypeModel } from '@umbraco-cms/backend-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-api';
 
 import '../../../../../shared/property-editors/shared/property-editor-config/property-editor-config.element';
@@ -23,7 +23,7 @@ export class UmbDataTypeWorkspaceViewEditElement extends UmbLitElement {
 	];
 
 	@state()
-	_dataType?: DataTypeDetails;
+	_dataType?: DataTypeModel;
 
 	@state()
 	private _propertyEditorUIIcon = '';
@@ -32,15 +32,15 @@ export class UmbDataTypeWorkspaceViewEditElement extends UmbLitElement {
 	private _propertyEditorUIName = '';
 
 	@state()
-	private _propertyEditorUIAlias = '';
+	private _propertyEditorUiAlias = '';
 
 	@state()
-	private _propertyEditorModelAlias = '';
+	private _propertyEditorAlias = '';
 
 	@state()
 	private _data: Array<any> = [];
 
-	private _workspaceContext?: UmbWorkspaceDataTypeContext;
+	private _workspaceContext?: UmbDataTypeWorkspaceContext;
 	private _modalService?: UmbModalService;
 
 	constructor() {
@@ -51,7 +51,7 @@ export class UmbDataTypeWorkspaceViewEditElement extends UmbLitElement {
 		});
 
 		// TODO: Figure out if this is the best way to consume a context or if it could be strongly typed using UmbContextToken
-		this.consumeContext<UmbWorkspaceDataTypeContext>('umbWorkspaceContext', (_instance) => {
+		this.consumeContext<UmbDataTypeWorkspaceContext>('umbWorkspaceContext', (_instance) => {
 			this._workspaceContext = _instance;
 			this._observeDataType();
 		});
@@ -66,33 +66,33 @@ export class UmbDataTypeWorkspaceViewEditElement extends UmbLitElement {
 			if (!dataType) return;
 
 			// TODO: handle if model is not of the type wanted.
-			this._dataType = dataType as DataTypeDetails;
+			this._dataType = dataType;
 
-			if (this._dataType.propertyEditorUIAlias !== this._propertyEditorUIAlias) {
-				this._observePropertyEditorUI(this._dataType.propertyEditorUIAlias || undefined);
+			if (this._dataType.propertyEditorUiAlias !== this._propertyEditorUiAlias) {
+				this._observePropertyEditorUI(this._dataType.propertyEditorUiAlias || undefined);
 			}
 
-			if (this._dataType.data !== this._data) {
+			if (this._dataType.data && this._dataType.data !== this._data) {
 				this._data = this._dataType.data;
 			}
 		});
 	}
 
-	private _observePropertyEditorUI(propertyEditorUIAlias?: string) {
-		if (!propertyEditorUIAlias) return;
+	private _observePropertyEditorUI(propertyEditorUiAlias?: string) {
+		if (!propertyEditorUiAlias) return;
 
 		this.observe(
-			umbExtensionsRegistry.getByTypeAndAlias('propertyEditorUI', propertyEditorUIAlias),
+			umbExtensionsRegistry.getByTypeAndAlias('propertyEditorUI', propertyEditorUiAlias),
 			(propertyEditorUI) => {
 				// TODO: show error. We have stored a PropertyEditorUIAlias and can't find the PropertyEditorUI in the registry.
 				if (!propertyEditorUI) return;
 
 				this._propertyEditorUIName = propertyEditorUI?.meta.label ?? propertyEditorUI?.name ?? '';
-				this._propertyEditorUIAlias = propertyEditorUI?.alias ?? '';
+				this._propertyEditorUiAlias = propertyEditorUI?.alias ?? '';
 				this._propertyEditorUIIcon = propertyEditorUI?.meta.icon ?? '';
-				this._propertyEditorModelAlias = propertyEditorUI?.meta.propertyEditorModel ?? '';
+				this._propertyEditorAlias = propertyEditorUI?.meta.propertyEditorModel ?? '';
 
-				this._workspaceContext?.setPropertyEditorModelAlias(this._propertyEditorModelAlias);
+				this._workspaceContext?.setPropertyEditorAlias(this._propertyEditorAlias);
 			}
 		);
 	}
@@ -101,7 +101,7 @@ export class UmbDataTypeWorkspaceViewEditElement extends UmbLitElement {
 		if (!this._dataType) return;
 
 		const modalHandler = this._modalService?.propertyEditorUIPicker({
-			selection: this._propertyEditorUIAlias ? [this._propertyEditorUIAlias] : [],
+			selection: this._propertyEditorUiAlias ? [this._propertyEditorUiAlias] : [],
 		});
 
 		modalHandler?.onClose().then(({ selection } = {}) => {
@@ -110,10 +110,10 @@ export class UmbDataTypeWorkspaceViewEditElement extends UmbLitElement {
 		});
 	}
 
-	private _selectPropertyEditorUI(propertyEditorUIAlias: string | undefined) {
-		if (!this._dataType || this._dataType.propertyEditorUIAlias === propertyEditorUIAlias) return;
-		this._workspaceContext?.setPropertyEditorUIAlias(propertyEditorUIAlias);
-		this._observePropertyEditorUI(propertyEditorUIAlias);
+	private _selectPropertyEditorUI(propertyEditorUiAlias: string | undefined) {
+		if (!this._dataType || this._dataType.propertyEditorUiAlias === propertyEditorUiAlias) return;
+		this._workspaceContext?.setPropertyEditorUiAlias(propertyEditorUiAlias);
+		this._observePropertyEditorUI(propertyEditorUiAlias);
 	}
 
 	render() {
@@ -126,14 +126,14 @@ export class UmbDataTypeWorkspaceViewEditElement extends UmbLitElement {
 	private _renderPropertyEditorUI() {
 		return html`
 			<umb-workspace-property-layout label="Property Editor" description="Select a property editor">
-				${this._propertyEditorUIAlias
+				${this._propertyEditorUiAlias
 					? html`
 							<!-- TODO: border is a bit weird attribute name. Maybe single or standalone would be better? -->
 							<umb-ref-property-editor-ui
 								slot="editor"
 								name=${this._propertyEditorUIName}
-								alias=${this._propertyEditorUIAlias}
-								property-editor-model-alias=${this._propertyEditorModelAlias}
+								alias=${this._propertyEditorUiAlias}
+								property-editor-model-alias=${this._propertyEditorAlias}
 								border>
 								<uui-icon name="${this._propertyEditorUIIcon}" slot="icon"></uui-icon>
 								<uui-action-bar slot="actions">
@@ -155,11 +155,11 @@ export class UmbDataTypeWorkspaceViewEditElement extends UmbLitElement {
 
 	private _renderConfig() {
 		return html`
-			${this._propertyEditorModelAlias && this._propertyEditorUIAlias
+			${this._propertyEditorAlias && this._propertyEditorUiAlias
 				? html`
 						<uui-box headline="Config">
 							<umb-property-editor-config
-								property-editor-ui-alias="${this._propertyEditorUIAlias}"
+								property-editor-ui-alias="${this._propertyEditorUiAlias}"
 								.data="${this._data}"></umb-property-editor-config>
 						</uui-box>
 				  `

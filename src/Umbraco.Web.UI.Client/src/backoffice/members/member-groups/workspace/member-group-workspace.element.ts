@@ -2,7 +2,6 @@ import { UUIInputElement, UUIInputEvent } from '@umbraco-ui/uui';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
-import { distinctUntilChanged } from 'rxjs';
 import { UmbWorkspaceEntityElement } from '../../../../backoffice/shared/components/workspace/workspace-entity-element.interface';
 import { UmbWorkspaceMemberGroupContext } from './member-group-workspace.context';
 import { UmbLitElement } from '@umbraco-cms/element';
@@ -29,23 +28,28 @@ export class UmbMemberGroupWorkspaceElement extends UmbLitElement implements Umb
 			}
 		`,
 	];
-	private _workspaceContext: UmbWorkspaceMemberGroupContext = new UmbWorkspaceMemberGroupContext(this);
-
-	public load(entityKey: string) {
-		this._workspaceContext.load(entityKey);
-	}
-
-	public create(parentKey: string | null) {
-		this._workspaceContext.create(parentKey);
-	}
-
+	
+	@state()
+	_unique?: string;
+	
 	@state()
 	private _memberGroupName = '';
+	
+	#workspaceContext: UmbWorkspaceMemberGroupContext = new UmbWorkspaceMemberGroupContext(this);
 
-	constructor() {
-		super();
+	public load(entityKey: string) {
+		this.#workspaceContext.load(entityKey);
+		this._unique = entityKey;
+	}
 
-		this.observe(this._workspaceContext.data.pipe(distinctUntilChanged()), (memberGroup) => {
+	public create() {
+		this.#workspaceContext.createScaffold();
+	}
+
+	async connectedCallback() {
+		super.connectedCallback();
+
+		this.observe(this.#workspaceContext.data, (memberGroup) => {
 			if (memberGroup && memberGroup.name !== this._memberGroupName) {
 				this._memberGroupName = memberGroup.name ?? '';
 			}
@@ -58,7 +62,7 @@ export class UmbMemberGroupWorkspaceElement extends UmbLitElement implements Umb
 			const target = event.composedPath()[0] as UUIInputElement;
 
 			if (typeof target?.value === 'string') {
-				this._workspaceContext.setName(target.value);
+				this.#workspaceContext.setName(target.value);
 			}
 		}
 	}
@@ -66,7 +70,7 @@ export class UmbMemberGroupWorkspaceElement extends UmbLitElement implements Umb
 	render() {
 		return html`
 			<umb-workspace-layout alias="Umb.Workspace.MemberGroup">
-				<uui-input id="header" slot="header" .value=${this._memberGroupName} @input="${this._handleInput}"></uui-input>
+				<uui-input id="header" slot="header" .value=${this._unique} @input="${this._handleInput}"></uui-input>
 			</umb-workspace-layout>
 		`;
 	}

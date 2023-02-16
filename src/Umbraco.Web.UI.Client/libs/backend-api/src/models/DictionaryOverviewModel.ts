@@ -8,4 +8,3 @@ export type DictionaryOverviewModel = {
     parentKey?: string | null;
     translatedIsoCodes?: Array<string>;
 };
-

@@ -88,7 +88,6 @@ export class UmbUserWorkspaceElement extends UmbLitElement implements UmbWorkspa
 
 	private _languages = []; //TODO Add languages
 
-
 	private _workspaceContext: UmbWorkspaceUserContext = new UmbWorkspaceUserContext(this);
 
 	@state()
@@ -105,7 +104,7 @@ export class UmbUserWorkspaceElement extends UmbLitElement implements UmbWorkspa
 			this._observeCurrentUser();
 		});
 
-		this.observe(this._workspaceContext.data.pipe(distinctUntilChanged()), (user) => {
+		this.observe(this._workspaceContext.data, (user) => {
 			this._user = user;
 			if (user && user.name !== this._userName) {
 				this._userName = user.name;

@@ -39,7 +39,7 @@ export class UmbTemplateDetailServerDataSource implements TemplateDetailDataSour
 	 * @memberof UmbTemplateDetailServerDataSource
 	 */
 	async createScaffold() {
-		let error = undefined;
+		const error = undefined;
 		const data: TemplateModel = {
 			key: uuid(),
 			name: '',
@@ -47,13 +47,17 @@ export class UmbTemplateDetailServerDataSource implements TemplateDetailDataSour
 			content: '',
 		};
 
+		// TODO: update when backend is updated so we don't have to do two calls
+		/*
+		// TODO: Revisit template models, masterTemplateAlias is not here anymore?
 		const { data: scaffoldData, error: scaffoldError } = await tryExecuteAndNotify(
 			this.#host,
 			TemplateResource.getTemplateScaffold()
 		);
+		*/
 
-		error = scaffoldError;
-		data.content = scaffoldData?.content || '';
+		//error = scaffoldError;
+		//data.content = scaffoldData?.content || '';
 
 		return { data, error };
 	}
