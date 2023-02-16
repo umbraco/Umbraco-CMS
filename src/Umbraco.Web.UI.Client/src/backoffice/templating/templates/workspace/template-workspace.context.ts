@@ -43,13 +43,4 @@ export class UmbTemplateWorkspaceContext {
 		if (!data) return;
 		this.#data.next(data);
 	}
-
-	async save(isNew: boolean) {
-		if (!this.#data.value) return;
-		isNew ? this.#templateDetailRepo.insert(this.#data.value) : this.#templateDetailRepo.update(this.#data.value);
-	}
-
-	async delete(key: string) {
-		await this.#templateDetailRepo.delete(key);
-	}
 }
