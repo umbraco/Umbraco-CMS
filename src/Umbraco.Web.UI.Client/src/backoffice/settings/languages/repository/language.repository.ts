@@ -53,6 +53,8 @@ export class UmbLanguageRepository {
 		return this.#detailDataSource.get(isoCode);
 	}
 
+	// TODO: maybe this should be renamed to something more generic.
+	// Revisit when collection are in place
 	async requestLanguages({ skip, take } = { skip: 0, take: 1000 }) {
 		await this.#init;
 
@@ -92,6 +94,19 @@ export class UmbLanguageRepository {
 		}
 
 		return { data, error };
+	}
+
+	async requestItems(isoCode: Array<string>) {
+		// HACK: filter client side until we have a proper server side endpoint
+		const { data, error } = await this.requestLanguages();
+
+		let items = undefined;
+
+		if (data) {
+			items = data.items = data.items.filter((x) => isoCode.includes(x.isoCode!));
+		}
+
+		return { data: items, error };
 	}
 
 	async delete(key: string) {
