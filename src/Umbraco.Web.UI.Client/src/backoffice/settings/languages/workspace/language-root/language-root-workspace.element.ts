@@ -128,6 +128,7 @@ export class UmbLanguageRootWorkspaceElement extends UmbLitElement {
 							color="default"
 							href="section/settings/language/create/root"></uui-button>
 					</div>
+					<!--- TODO: investigate if it's possible to use a collection component here --->
 					<umb-table .config=${this._tableConfig} .columns=${this._tableColumns} .items=${this._tableItems}></umb-table>
 				</div>
 			</umb-body-layout>
