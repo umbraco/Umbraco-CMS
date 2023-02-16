@@ -138,7 +138,6 @@ export class UmbDebug extends UmbLitElement {
 
 				<div class="events ${this._debugPaneOpen ? 'open' : ''}">
 					<div>
-						<h4>Context Aliases to consume</h4>
 						<ul>
 							${this._renderContextAliases()}
 						</ul>
@@ -148,13 +147,14 @@ export class UmbDebug extends UmbLitElement {
 	}
 
 	private _renderContextAliases() {
-		const aliases = [];
+		const contextsTemplates: TemplateResult[] = [];
 
 		for (const [alias, instance] of this.contexts) {
-			aliases.push(
-				html` <li>
+			contextsTemplates.push(
+				html`
+				<li>
 					Context: <strong>${alias}</strong>
-					<span>(${typeof instance})</span>
+					<em>(${typeof instance})</em>
 					<ul>
 						${this._renderInstance(instance)}
 					</ul>
@@ -162,19 +162,30 @@ export class UmbDebug extends UmbLitElement {
 			);
 		}
 
-		return aliases;
+		return contextsTemplates;
 	}
 
 	private _renderInstance(instance: any) {
-		const instanceKeys: TemplateResult[] = [];
+		const instanceTemplates: TemplateResult[] = [];
 
+		// TODO: WB - Maybe make this a switch statement?
 		if (typeof instance === 'function') {
-			return instanceKeys.push(html`<li>Callable Function</li>`);
+			return instanceTemplates.push(html`<li>Callable Function</li>`);
 		} else if (typeof instance === 'object') {
 			const methodNames = this.getClassMethodNames(instance);
 			if (methodNames.length) {
-				instanceKeys.push(html`<li>Methods - ${methodNames.join(', ')}</li>`);
+				instanceTemplates.push(
+					html`
+						<li>
+							<strong>Methods</strong>
+							<ul>
+								${methodNames.map((methodName) => html`<li>${methodName}</li>`)}
+							</ul>
+						</li>
+				`);
 			}
+
+			instanceTemplates.push(html`<li><strong>Properties</strong></li>`);
 
 			for (const key in instance) {
 				if (key.startsWith('_')) {
@@ -183,16 +194,16 @@ export class UmbDebug extends UmbLitElement {
 
 				const value = instance[key];
 				if (typeof value === 'string') {
-					instanceKeys.push(html`<li>${key} = ${value}</li>`);
+					instanceTemplates.push(html`<li>${key} = ${value}</li>`);
 				} else {
-					instanceKeys.push(html`<li>${key} (${typeof value})</li>`);
+					instanceTemplates.push(html`<li>${key} <em>(${typeof value})</em></li>`);
 				}
 			}
 		} else {
-			instanceKeys.push(html`<li>Context is a primitive with value: ${instance}</li>`);
+			instanceTemplates.push(html`<li>Context is a primitive with value: ${instance}</li>`);
 		}
 
-		return instanceKeys;
+		return instanceTemplates;
 	}
 
 	private getClassMethodNames(klass: any) {
