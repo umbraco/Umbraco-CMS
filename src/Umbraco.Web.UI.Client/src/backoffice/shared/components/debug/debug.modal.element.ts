@@ -54,11 +54,7 @@ export class UmbDebugModalLayout extends UmbModalLayoutElement<any> {
 		`,
 	];
 
-
 	private _handleClose() {
-		/* Optional data of any type can be applied to the close method to pass it
-		   to the modal parent through the onClose promise. */
-		//this.modalHandler?.close('MY DATA');
 		this.modalHandler?.close();
 	}
 
