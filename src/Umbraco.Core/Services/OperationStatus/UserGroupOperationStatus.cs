@@ -16,7 +16,7 @@ public enum UserGroupOperationStatus
     MediaStartNodeKeyNotFound,
     DocumentStartNodeKeyNotFound,
     LanguageNotFound,
-    GroupNameTooLong,
-    GroupAliasTooLong,
+    NameTooLong,
+    AliasTooLong,
     MissingName,
 }

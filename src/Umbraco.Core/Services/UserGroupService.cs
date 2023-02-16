@@ -306,12 +306,12 @@ internal sealed class UserGroupService : RepositoryService, IUserGroupService
 
         if (userGroup.Name.Length > MaxUserGroupNameLength)
         {
-            return UserGroupOperationStatus.GroupNameTooLong;
+            return UserGroupOperationStatus.NameTooLong;
         }
 
         if (userGroup.Alias.Length > MaxUserGroupAliasLength)
         {
-            return UserGroupOperationStatus.GroupAliasTooLong;
+            return UserGroupOperationStatus.AliasTooLong;
         }
 
         UserGroupOperationStatus startNodesValidationStatus = ValidateStartNodesExists(userGroup);
