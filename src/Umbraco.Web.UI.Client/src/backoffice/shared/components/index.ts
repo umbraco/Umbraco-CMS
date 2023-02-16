@@ -28,6 +28,7 @@ import '../entity-actions/entity-action-list.element';
 
 import './input-media-picker/input-media-picker.element';
 import './input-document-picker/input-document-picker.element';
+import './input-culture-select/input-culture-select.element';
 
 import './empty-state/empty-state.element';
 import './color-picker/color-picker.element';

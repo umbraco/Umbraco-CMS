@@ -5,9 +5,10 @@ import { repeat } from 'lit/directives/repeat.js';
 import { customElement, property, state } from 'lit/decorators.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
 import { UmbLanguageWorkspaceContext } from '../../language-workspace.context';
-import { UmbCultureRepository } from '../../../../../cultures/repository/culture.repository';
 import { UmbLitElement } from '@umbraco-cms/element';
-import { CultureModel, LanguageModel } from '@umbraco-cms/backend-api';
+import { LanguageModel } from '@umbraco-cms/backend-api';
+import { UmbChangeEvent } from 'src/core/events';
+import UmbInputCultureSelectElement from 'src/backoffice/shared/components/input-culture-select/input-culture-select.element';
 
 @customElement('umb-edit-language-workspace-view')
 export class UmbEditLanguageWorkspaceViewElement extends UmbLitElement {
@@ -52,16 +53,9 @@ export class UmbEditLanguageWorkspaceViewElement extends UmbLitElement {
 	private _languages: LanguageModel[] = [];
 
 	@state()
-	private _cultures: CultureModel[] = [];
-
-	@state()
-	private _search = '';
-
-	@state()
 	private _startData: LanguageModel | null = null;
 
 	#languageWorkspaceContext?: UmbLanguageWorkspaceContext;
-	#cultureRepository = new UmbCultureRepository(this);
 
 	constructor() {
 		super();
@@ -75,29 +69,13 @@ export class UmbEditLanguageWorkspaceViewElement extends UmbLitElement {
 		});
 	}
 
-	protected async firstUpdated() {
-		const { data } = await this.#cultureRepository.requestCultures();
-		if (data) {
-			this._cultures = data.items;
-		}
-	}
-
-	#handleLanguageChange(event: Event) {
-		if (event instanceof UUIComboboxEvent) {
-			const target = event.composedPath()[0] as UUIComboboxElement;
+	#handleCultureChange(event: Event) {
+		if (event instanceof UmbChangeEvent) {
+			const target = event.target as UmbInputCultureSelectElement;
 			const isoCode = target.value.toString();
+			const cultureName = target.selectedCultureName;
 
-			if (isoCode) {
-				this.#languageWorkspaceContext?.setCulture(isoCode);
-
-				// If the language name is not set, we set it to the name of the selected language.
-				if (!this.language?.name) {
-					const culture = this._cultures.find((culture) => culture.name === isoCode);
-					if (culture && culture.englishName) {
-						this.#languageWorkspaceContext?.setName(culture.englishName);
-					}
-				}
-			} else {
+			if (!isoCode) {
 				// If the isoCode is empty, we reset the value to the original value.
 				// Provides a way better UX
 				//TODO: Maybe the combobox should implement something similar?
@@ -107,13 +85,16 @@ export class UmbEditLanguageWorkspaceViewElement extends UmbLitElement {
 
 				target.addEventListener('close', resetFunction, { once: true });
 				target.addEventListener('blur', resetFunction, { once: true });
+				return;
+			}
+
+			this.#languageWorkspaceContext?.setCulture(isoCode);
+
+			// If the language name is not set, we set it to the name of the selected language.
+			if (!this.language?.name && cultureName) {
+				this.#languageWorkspaceContext?.setName(cultureName);
 			}
 		}
-	}
-
-	#handleSearchChange(event: Event) {
-		const target = event.composedPath()[0] as UUIComboboxElement;
-		this._search = target.search;
 	}
 
 	#handleDefaultChange(event: UUIBooleanInputEvent) {
@@ -137,12 +118,6 @@ export class UmbEditLanguageWorkspaceViewElement extends UmbLitElement {
 		}
 	}
 
-	get #filteredCultures(): Array<CultureModel> {
-		return this._cultures.filter((culture) => {
-			return culture.englishName?.toLowerCase().includes(this._search.toLowerCase());
-		});
-	}
-
 	get #fallbackLanguages() {
 		return this._languages.filter((language) => {
 			return language.isoCode !== this.language?.isoCode;
@@ -151,10 +126,6 @@ export class UmbEditLanguageWorkspaceViewElement extends UmbLitElement {
 
 	get #fallbackLanguage() {
 		return this.#fallbackLanguages.find((language) => language.isoCode === this.language?.fallbackIsoCode);
-	}
-
-	get #fromAvailableCultures() {
-		return this._cultures.find((culture) => culture.name === this.language?.isoCode);
 	}
 
 	#renderCultureWarning() {
@@ -181,29 +152,17 @@ export class UmbEditLanguageWorkspaceViewElement extends UmbLitElement {
 			<uui-box>
 				<umb-workspace-property-layout label="Language">
 					<div slot="editor">
-						<uui-combobox
-							value=${ifDefined(this.#fromAvailableCultures?.name)}
-							@change=${this.#handleLanguageChange}
-							@search=${this.#handleSearchChange}>
-							<uui-combobox-list>
-								${repeat(
-									this.#filteredCultures,
-									(language) => language.name,
-									(language) =>
-										html`
-											<uui-combobox-list-option value=${ifDefined(language.name)}
-												>${language.englishName}</uui-combobox-list-option
-											>
-										`
-								)}
-							</uui-combobox-list>
-						</uui-combobox>
+						<umb-input-culture-select
+							value=${ifDefined(this.language.isoCode)}
+							@change=${this.#handleCultureChange}></umb-input-culture-select>
 						${this.#renderCultureWarning()}
 					</div>
 				</umb-workspace-property-layout>
+
 				<umb-workspace-property-layout label="ISO Code">
 					<div slot="editor">${this.language.isoCode}</div>
 				</umb-workspace-property-layout>
+
 				<umb-workspace-property-layout label="Settings">
 					<div slot="editor">
 						<uui-toggle
@@ -225,6 +184,7 @@ export class UmbEditLanguageWorkspaceViewElement extends UmbLitElement {
 						</uui-toggle>
 					</div>
 				</umb-workspace-property-layout>
+
 				<umb-workspace-property-layout
 					label="Fallback language"
 					description="To allow multi-lingual content to fall back to another language if not present in the requested language, select it here.">
