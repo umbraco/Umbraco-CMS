@@ -251,8 +251,22 @@ internal class UserService : RepositoryService, IUserService
     {
         using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
         {
-            IQuery<IUser> query = Query<IUser>().Where(x => x.Email.Equals(email));
-            return _userRepository.Get(query)?.FirstOrDefault();
+            try
+            {
+                IQuery<IUser> query = Query<IUser>().Where(x => x.Email.Equals(email));
+                return _userRepository.Get(query)?.FirstOrDefault();
+            }
+            catch(DbException)
+            {
+                // We also need to catch upgrade state here, because the framework will try to call this to validate the email.
+                if (IsUpgrading)
+                {
+                    return _userRepository.GetForUpgradeByEmail(email);
+                }
+
+                throw;
+            }
+
         }
     }
 
@@ -285,7 +299,7 @@ internal class UserService : RepositoryService, IUserService
                 if (IsUpgrading)
                 {
                     // NOTE: this will not be cached
-                    return _userRepository.GetByUsername(username, false);
+                    return _userRepository.GetForUpgradeByUsername(username);
                 }
 
                 throw;
@@ -802,7 +816,7 @@ internal class UserService : RepositoryService, IUserService
                 if (IsUpgrading)
                 {
                     // NOTE: this will not be cached
-                    return _userRepository.Get(id, false);
+                    return _userRepository.GetForUpgrade(id);
                 }
 
                 throw;
