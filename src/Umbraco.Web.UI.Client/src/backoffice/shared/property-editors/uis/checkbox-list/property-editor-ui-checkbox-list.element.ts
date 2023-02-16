@@ -24,21 +24,37 @@ export class UmbPropertyEditorUICheckboxListElement extends UmbLitElement {
 
 	@property({ type: Array, attribute: false })
 	public set config(config: Array<DataTypePropertyModel>) {
-		const listData = config.find((x) => x.alias === 'itemList');
+		const listData = config.find((x) => x.alias === 'items');
 
 		if (!listData) return;
-		this._list = listData.value;
+
+		// formatting the items in the dictionary into an array
+		const sortedItems = [];
+		const values = Object.values<{ value: string; sortOrder: number }>(listData.value);
+		const keys = Object.keys(listData.value);
+		for (let i = 0; i < values.length; i++) {
+			sortedItems.push({ key: keys[i], sortOrder: values[i].sortOrder, value: values[i].value });
+		}
+		// ensure the items are sorted by the provided sort order
+		sortedItems.sort((a, b) => {
+			return a.sortOrder > b.sortOrder ? 1 : b.sortOrder > a.sortOrder ? -1 : 0;
+		});
+
+		console.log('sortedItems', sortedItems, 'value', this._value);
+
+		this._list = sortedItems.map((x) => ({ key: x.key, checked: this._value.includes(x.value), value: x.value }));
 	}
 
 	@state()
-	private _list: [] = [];
+	private _list: Array<{ key: string; checked: boolean; value: string }> = [];
 
 	private _onChange(event: CustomEvent) {
-		this.value = (event.target as UmbInputCheckboxListElement).selectedKeys;
+		this.value = (event.target as UmbInputCheckboxListElement).selected;
 		this.dispatchEvent(new CustomEvent('property-value-change'));
 	}
 
 	render() {
+		console.log('list', this._list);
 		return html`<umb-input-checkbox-list
 			@change="${this._onChange}"
 			.selectedKeys="${this._value}"
