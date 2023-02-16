@@ -33,12 +33,15 @@ public class CurrentUserAuditLogController : AuditLogControllerBase
         _userService = userService;
     }
 
-    [HttpGet("ByKey")]
+    [HttpGet]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedViewModel<AuditLogWithUsernameViewModel>), StatusCodes.Status200OK)]
-    public async Task<ActionResult<PagedViewModel<AuditLogWithUsernameViewModel>>> ByKey(Direction orderDirection = Direction.Descending, DateTime? sinceDate = null, int skip = 0, int take = 100)
+    public async Task<ActionResult<PagedViewModel<AuditLogWithUsernameViewModel>>> CurrentUser(Direction orderDirection = Direction.Descending, DateTime? sinceDate = null, int skip = 0, int take = 100)
     {
-        var userId = _backOfficeSecurityAccessor.BackOfficeSecurity?.GetUserId().Result ?? -1;
+        // FIXME: Pull out current backoffice user when its implemented.
+        // var userId = _backOfficeSecurityAccessor.BackOfficeSecurity?.GetUserId().Result ?? -1;
+        var userId = Constants.Security.SuperUserId;
+
         IUser? user = _userService.GetUserById(userId);
 
         if (user is null)
