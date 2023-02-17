@@ -20,7 +20,7 @@ public class CreateRelationTypeController : RelationTypeControllerBase
 
     [HttpPost("create")]
     [MapToApiVersion("1.0")]
-    [ProducesResponseType(typeof(RelationTypeViewModel), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status201Created)]
     public async Task<IActionResult> Create(RelationTypeSavingViewModel relationTypeSavingViewModel)
     {
         Core.Models.RelationType relationTypePersisted = _relationTypeViewModelFactory.CreateRelationType(relationTypeSavingViewModel);
