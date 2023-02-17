@@ -34,6 +34,7 @@ public class ManagementApiComposer : IComposer
             .AddTrackedReferences()
             .AddDataTypes()
             .AddTemplates()
+            .AddRelationTypes()
             .AddLogViewer()
             .AddUserGroups()
             .AddBackOfficeAuthentication()
