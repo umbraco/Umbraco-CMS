@@ -14,7 +14,7 @@ import { DataTypePropertyModel } from '@umbraco-cms/backend-api';
 export class UmbPropertyEditorUIMultiUrlPickerElement extends UmbLitElement {
 	static styles = [UUITextStyles];
 
-	@property()
+	@property({ type: Array })
 	value: MultiUrlData[] = [];
 
 	@property({ type: Array, attribute: false })
