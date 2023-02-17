@@ -2770,8 +2770,8 @@ public class ContentService : RepositoryService, IContentService
         IEntityService entityService = StaticServiceProvider.Instance.GetRequiredService<IEntityService>();
         Attempt<Guid> result = entityService.GetKey(parentId, UmbracoObjectTypes.Document);
         return result.Success
-            ? Copy(content, parentId, result.Result, relateToOriginal, true, userId)
-            : Copy(content, parentId, null, relateToOriginal, true, userId);
+            ? Copy(content, parentId, result.Result, relateToOriginal, recursive, userId)
+            : Copy(content, parentId, null, relateToOriginal, recursive, userId);
     }
 
     /// <summary>
