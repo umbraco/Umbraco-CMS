@@ -1,6 +1,6 @@
 ﻿namespace Umbraco.Cms.Core;
 
-public class PaginationHelper
+public static class PaginationHelper
 {
     internal static void ConvertSkipTakeToPaging(int skip, int take, out long pageNumber, out int pageSize)
     {
