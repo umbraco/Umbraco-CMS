@@ -23,8 +23,11 @@ export class UmbDocumentWorkspaceViewEditElement extends UmbLitElement {
 	@state()
 	private _routes: IRoute[] = [];
 
+	//@state()
+	//_tabs: PropertyTypeContainerViewModelBaseModel[] = [];
+
 	@state()
-	_tabs: PropertyTypeContainerViewModelBaseModel[] = [];
+	_tabs: Array<PropertyTypeContainerViewModelBaseModel> = [];
 
 	@state()
 	private _routerPath?: string;
@@ -50,8 +53,12 @@ export class UmbDocumentWorkspaceViewEditElement extends UmbLitElement {
 		this.observe(
 			this._workspaceContext.containersOfParentKey(null, 'Tab'),
 			(tabs) => {
-				// TODO: make tabs unique based on name.
-				this._tabs = tabs || [];
+				tabs.forEach((tab) => {
+					// Only add each tab name once, as our containers merge on name:
+					if (!this._tabs.find((x) => x.name === tab.name || '')) {
+						this._tabs.push(tab);
+					}
+				});
 				this._createRoutes();
 			},
 			'_observeTabs'
@@ -63,11 +70,12 @@ export class UmbDocumentWorkspaceViewEditElement extends UmbLitElement {
 
 		if (this._tabs.length > 0) {
 			this._tabs?.forEach((tab) => {
+				const tabName = tab.name;
 				routes.push({
-					path: `tab/${encodeURI(tab.name || '').toString()}`,
+					path: `tab/${encodeURI(tabName || '').toString()}`,
 					component: () => import('./document-workspace-view-edit-tab.element'),
 					setup: (component: Promise<HTMLElement>) => {
-						(component as any).tabName = tab.name;
+						(component as any).tabName = tabName;
 					},
 				});
 			});
@@ -90,7 +98,7 @@ export class UmbDocumentWorkspaceViewEditElement extends UmbLitElement {
 			<uui-tab-group>
 				${repeat(
 					this._tabs,
-					(tab) => tab.key,
+					(tab) => tab.name,
 					(tab) => {
 						const path = this._routerPath + '/tab/' + encodeURI(tab.name || '');
 						return html`<uui-tab label=${tab.name!} .active=${path === this._activePath} href=${path}
