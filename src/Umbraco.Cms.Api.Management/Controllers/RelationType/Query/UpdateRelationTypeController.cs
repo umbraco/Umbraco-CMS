@@ -11,9 +11,9 @@ namespace Umbraco.Cms.Api.Management.Controllers.RelationType.Query;
 public class UpdateRelationTypeController : RelationTypeControllerBase
 {
     private readonly IRelationService _relationService;
-    private readonly UmbracoMapper _umbracoMapper;
+    private readonly IUmbracoMapper _umbracoMapper;
 
-    public UpdateRelationTypeController(IRelationService relationService, UmbracoMapper umbracoMapper)
+    public UpdateRelationTypeController(IRelationService relationService, IUmbracoMapper umbracoMapper)
     {
         _relationService = relationService;
         _umbracoMapper = umbracoMapper;
@@ -23,20 +23,22 @@ public class UpdateRelationTypeController : RelationTypeControllerBase
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(RelationTypeViewModel), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> Update(RelationTypeUpdatingViewModel relationTypeSavingViewModel)
+    public async Task<IActionResult> Update(Guid key, RelationTypeUpdatingViewModel relationTypeSavingViewModel)
     {
-        IRelationType? persistedRelationType = _relationService.GetRelationTypeById(relationTypeSavingViewModel.Key);
+        IRelationType? persistedRelationType = _relationService.GetRelationTypeById(key);
 
         if (persistedRelationType is null)
         {
             ProblemDetails problemDetails = new ProblemDetailsBuilder()
                 .WithTitle("Could not find relation type")
-                .WithDetail($"Relation type with key {relationTypeSavingViewModel.Key} could not be found")
+                .WithDetail($"Relation type with key {key} could not be found")
                 .Build();
             return NotFound(problemDetails);
         }
 
-        _relationService.Save(persistedRelationType);
+        IRelationType updated = _umbracoMapper.Map(relationTypeSavingViewModel, persistedRelationType);
+
+        _relationService.Save(updated);
 
         RelationTypeViewModel relationTypeViewModel = _umbracoMapper.Map<RelationTypeViewModel>(persistedRelationType)!;
 

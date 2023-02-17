@@ -5,12 +5,7 @@ public class RelationTypeUpdatingViewModel
     /// <summary>
     ///     Gets or sets the name of the model.
     /// </summary>
-    public required string Name { get; set; }
-
-    /// <summary>
-    ///     Gets or sets the key of the model.
-    /// </summary>
-    public Guid Key { get; set; }
+    public string Name { get; set; } = string.Empty;
 
     /// <summary>
     ///     Gets or sets a boolean indicating whether the RelationType is Bidirectional (true) or Parent to Child (false)
