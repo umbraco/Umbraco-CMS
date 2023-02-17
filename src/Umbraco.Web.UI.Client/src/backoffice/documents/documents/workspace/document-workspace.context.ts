@@ -2,7 +2,11 @@ import { UmbWorkspaceContext } from '../../../shared/components/workspace/worksp
 import { UmbDocumentRepository } from '../repository/document.repository';
 import type { UmbWorkspaceEntityContextInterface } from '../../../shared/components/workspace/workspace-context/workspace-entity-context.interface';
 import { UmbDocumentTypeRepository } from '../../document-types/repository/document-type.repository';
-import type { DocumentModel, DocumentTypeModel } from '@umbraco-cms/backend-api';
+import type {
+	DocumentModel,
+	DocumentTypeModel,
+	DocumentTypePropertyTypeContainerModel,
+} from '@umbraco-cms/backend-api';
 import {
 	partialUpdateFrozenArray,
 	ObjectState,
@@ -30,6 +34,10 @@ export class UmbDocumentWorkspaceContext
 
 	#documentTypes = new ArrayState<DocumentTypeModel>([], (x) => x.key);
 	documentTypes = this.#documentTypes.asObservable();
+
+	// Notice the DocumentTypePropertyTypeContainerModel is equivalent to PropertyTypeContainerViewModelBaseModel, making it easy to generalize.
+	#containers = new ArrayState<DocumentTypePropertyTypeContainerModel>([], (x) => x.key);
+	//containers = this.#containers.asObservable();
 
 	constructor(host: UmbControllerHostInterface) {
 		super(host);
@@ -69,14 +77,31 @@ export class UmbDocumentWorkspaceContext
 			}
 		});
 
-		new UmbObserverController(this._host, await this.#documentTypeRepository.byKey(key), (data) => {
-			if (data) {
-				this.#documentTypes.appendOne(data);
-				this.loadDataTypeOfDocumentType(data);
+		new UmbObserverController(this._host, await this.#documentTypeRepository.byKey(key), (docType) => {
+			if (docType) {
+				this.#documentTypes.appendOne(docType);
+				this.initDocumentTypeContainers(docType);
+				this.loadDocumentTypeCompositions(docType);
 			}
 		});
 	}
 
+	async loadDocumentTypeCompositions(documentType: DocumentTypeModel) {
+		documentType.compositions?.forEach((composition) => {
+			this.loadDocumentType(composition.key);
+		});
+	}
+
+	async initDocumentTypeContainers(documentType: DocumentTypeModel) {
+		documentType.containers?.forEach((container) => {
+			console.log('add container', container);
+			this.#containers.appendOne(container);
+		});
+	}
+
+	/*
+
+	No need for this currently. The data types are loaded by the properties.
 	async loadDataTypeOfDocumentType(documentType?: DocumentTypeModel) {
 		if (!documentType) return;
 
@@ -93,12 +118,13 @@ export class UmbDocumentWorkspaceContext
 
 		//const { data } = await this.#dataTypeRepository.requestDetails(key);
 
-		/*new UmbObserverController(this._host, await this.#documentTypeRepository.byKey(key), (data) => {
-			if (data) {
-				this.#documentTypes.appendOne(data);
-			}
-		});*/
+		// new UmbObserverController(this._host, await this.#documentTypeRepository.byKey(key), (data) => {
+		//	if (data) {
+		//		this.#documentTypes.appendOne(data);
+		//	}
+		//});
 	}
+	*/
 
 	getData() {
 		return this.#data.getValue();
@@ -150,15 +176,36 @@ export class UmbDocumentWorkspaceContext
 	}
 	*/
 
-	propertiesOf(culture: string | null, segment: string | null) {
+	propertyValuesOf(culture: string | null, segment: string | null) {
 		return this.#data.getObservablePart((data) =>
 			data?.properties?.filter((p) => (culture === p.culture || null) && (segment === p.segment || null))
 		);
 	}
 
-	propertyStructure() {
-		// TODO: handle composition of document types.
-		return this.#documentTypes.getObservablePart((data) => data[0]?.properties);
+	propertyStructuresOf(containerKey: string | null) {
+		return this.#documentTypes.getObservablePart((data) =>
+			// TODO: some merging of properties across document types here:
+			data[0]?.properties?.filter((p) => containerKey === p.containerKey || null)
+		);
+	}
+
+	rootContainers(containerType: 'Group' | 'Tab') {
+		return this.#containers.getObservablePart((data) => {
+			return data.filter((x) => x.parentKey === null && x.type === containerType);
+		});
+	}
+
+	containerByKey(key: DocumentTypePropertyTypeContainerModel['key']) {
+		return this.#containers.getObservablePart((data) => {
+			return data.filter((x) => x.key === key);
+		});
+	}
+
+	containersOf(parentKey: DocumentTypePropertyTypeContainerModel['parentKey'], containerType: 'Group' | 'Tab') {
+		return this.#containers.getObservablePart((data) => {
+			console.log(data, parentKey, containerType);
+			return data.filter((x) => x.parentKey === parentKey && x.type === containerType);
+		});
 	}
 
 	setPropertyValue(alias: string, value: unknown) {

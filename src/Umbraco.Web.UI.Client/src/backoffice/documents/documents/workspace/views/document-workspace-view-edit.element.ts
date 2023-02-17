@@ -2,13 +2,11 @@ import { css, html } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, state } from 'lit/decorators.js';
 import { repeat } from 'lit/directives/repeat.js';
+import { IRoute } from 'router-slot';
 import { UmbDocumentWorkspaceContext } from '../document-workspace.context';
 import { UmbLitElement } from '@umbraco-cms/element';
-import {
-	DocumentPropertyModel,
-	DocumentTypePropertyTypeModel,
-	PropertyTypeContainerViewModelBaseModel,
-} from '@umbraco-cms/backend-api';
+import { PropertyTypeContainerViewModelBaseModel } from '@umbraco-cms/backend-api';
+import { UmbRouterSlotChangeEvent, UmbRouterSlotInitEvent } from '@umbraco-cms/router';
 
 @customElement('umb-document-workspace-view-edit')
 export class UmbDocumentWorkspaceViewEditElement extends UmbLitElement {
@@ -23,13 +21,16 @@ export class UmbDocumentWorkspaceViewEditElement extends UmbLitElement {
 	];
 
 	@state()
-	_propertyData: DocumentPropertyModel[] = [];
-
-	@state()
-	_propertyStructures: DocumentTypePropertyTypeModel[] = [];
+	private _routes: IRoute[] = [];
 
 	@state()
 	_tabs: PropertyTypeContainerViewModelBaseModel[] = [];
+
+	@state()
+	private _routerPath?: string;
+
+	@state()
+	private _activePath = '';
 
 	private _workspaceContext?: UmbDocumentWorkspaceContext;
 
@@ -39,64 +40,75 @@ export class UmbDocumentWorkspaceViewEditElement extends UmbLitElement {
 		// TODO: Figure out how to get the magic string for the workspace context.
 		this.consumeContext<UmbDocumentWorkspaceContext>('umbWorkspaceContext', (workspaceContext) => {
 			this._workspaceContext = workspaceContext;
-			this._observeContent();
+			this._observeTabs();
 		});
 	}
 
-	private _observeContent() {
+	private _observeTabs() {
 		if (!this._workspaceContext) return;
 
-		/*
-		TODO: Property-Context: This observer gets all changes, We need to fix this. it should be simpler.
-		An idea to optimize this would be for this to only care about layout, meaning to property data should be watched here.
-		As the properties could handle their own data on their own?
-
-		Should use a Observable for example: this._workspaceContext.properties
-		*/
 		this.observe(
-			this._workspaceContext.propertyValuesOf(null, null),
-			(properties) => {
-				this._propertyData = properties || [];
-				//this._data = content?.data || [];
-
-				/*
-				Maybe we should not give the value(Data), but the umb-content-property should get the context and observe its own data.
-				This would become a more specific Observer therefor better performance?.. Note to self: Debate with Mads how he sees this perspective.
-				*/
-			},
-			'observeWorkspaceContextData'
-		);
-		/*
-		this.observe(
-			this._workspaceContext.propertyStructure(),
-			(propertyStructure) => {
-				this._propertyStructures = propertyStructure || [];
-			},
-			'observeWorkspaceContextData'
-		);
-		*/
-
-		this.observe(
-			this._workspaceContext.containersOf(null, 'tab'),
+			this._workspaceContext.containersOf(null, 'Tab'),
 			(tabs) => {
+				// TODO: make tabs unique based on name.
 				this._tabs = tabs || [];
+				this._createRoutes();
 			},
 			'observeWorkspaceContextData'
 		);
+	}
+
+	private _createRoutes() {
+		const routes: any[] = [];
+
+		if (this._tabs.length > 0) {
+			this._tabs?.forEach((tab) => {
+				routes.push({
+					path: `tab/${encodeURI(tab.name || '').toString()}`,
+					component: () => import('./document-workspace-view-edit-tab.element'),
+					setup: (component: Promise<HTMLElement>) => {
+						(component as any).tabName = tab.name;
+					},
+				});
+			});
+
+			routes.push({
+				path: '',
+				redirectTo: routes[0]?.path,
+			});
+			routes.push({
+				path: '**',
+				redirectTo: routes[0]?.path,
+			});
+		}
+
+		this._routes = routes;
 	}
 
 	render() {
 		return html`
-			<uui-box>
+			<uui-tab-group>
 				${repeat(
-					this._propertyStructures,
-					(property) => property.alias,
-					(property) =>
-						html`<umb-content-property
-							.property=${property}
-							.value=${this._propertyData.find((x) => x.alias === property.alias)?.value}></umb-content-property> `
+					this._tabs,
+					(tab) => tab.key,
+					(tab) => {
+						const path = this._routerPath + '/tab/' + encodeURI(tab.name || '');
+						return html`<uui-tab label=${tab.name!} .active=${path === this._activePath} href=${path}
+							>${tab.name}</uui-tab
+						>`;
+					}
 				)}
-			</uui-box>
+			</uui-tab-group>
+
+			<umb-router-slot
+				.routes=${this._routes}
+				@init=${(event: UmbRouterSlotInitEvent) => {
+					this._routerPath = event.target.absoluteRouterPath;
+				}}
+				@change=${(event: UmbRouterSlotChangeEvent) => {
+					this._activePath = event.target.localActiveViewPath || '';
+				}}>
+			</umb-router-slot>
 		`;
 	}
 }
