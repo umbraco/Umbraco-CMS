@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Management.Routing;
 
-namespace Umbraco.Cms.Api.Management.Controllers.RelationTypeController;
+namespace Umbraco.Cms.Api.Management.Controllers.RelationType.Query;
 
 [ApiController]
 [VersionedApiBackOfficeRoute("relationType")]

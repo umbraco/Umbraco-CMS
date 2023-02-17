@@ -6,7 +6,7 @@ using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
 
-namespace Umbraco.Cms.Api.Management.Controllers.RelationTypeController;
+namespace Umbraco.Cms.Api.Management.Controllers.RelationType.Query;
 
 public class ByKeyRelationTypeController : RelationTypeControllerBase
 {
