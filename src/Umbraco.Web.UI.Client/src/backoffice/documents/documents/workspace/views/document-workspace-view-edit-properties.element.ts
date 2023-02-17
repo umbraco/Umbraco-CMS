@@ -1,4 +1,4 @@
-import { css, html } from 'lit';
+import { html } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, property, state } from 'lit/decorators.js';
 import { repeat } from 'lit/directives/repeat.js';
@@ -14,15 +14,27 @@ import {
 export class UmbDocumentWorkspaceViewEditPropertiesElement extends UmbLitElement {
 	static styles = [UUITextStyles];
 
-	private _containerName?: string | undefined;
+	private _containerName?: string;
 
-	@property({ type: String })
+	@property({ type: String, attribute: 'container-name', reflect: false })
 	public get containerName(): string | undefined {
 		return this._containerName;
 	}
 	public set containerName(value: string | undefined) {
 		if (this._containerName === value) return;
 		this._containerName = value;
+		this._observeGroupContainers();
+	}
+
+	private _containerType?: 'Group' | 'Tab';
+
+	@property({ type: String, attribute: 'container-type', reflect: false })
+	public get containerType(): 'Group' | 'Tab' | undefined {
+		return this._containerType;
+	}
+	public set containerType(value: 'Group' | 'Tab' | undefined) {
+		if (this._containerType === value) return;
+		this._containerType = value;
 		this._observeGroupContainers();
 	}
 
@@ -48,12 +60,15 @@ export class UmbDocumentWorkspaceViewEditPropertiesElement extends UmbLitElement
 	}
 
 	private _observeGroupContainers() {
-		if (!this._workspaceContext || !this.containerName) return;
+		if (!this._workspaceContext || !this._containerName || !this._containerType) return;
+
+		console.log('_observeGroupContainers', this._containerName, this._containerType);
 
 		// TODO: Should be no need to update this observable if its already there.
 		this.observe(
-			this._workspaceContext!.containersByNameAndType(this.containerName, 'Group'),
+			this._workspaceContext!.containersByNameAndType(this._containerName, this._containerType),
 			(groupContainers) => {
+				console.log('groupContainers', groupContainers);
 				this._groupContainers = groupContainers || [];
 				groupContainers.forEach((group) => {
 					if (group.key) {
@@ -69,12 +84,11 @@ export class UmbDocumentWorkspaceViewEditPropertiesElement extends UmbLitElement
 	private _observePropertyStructureOfGroup(group: PropertyTypeContainerViewModelBaseModel) {
 		if (!this._workspaceContext || !group.key) return;
 
-		console.log('_observePropertyStructureOfGroup', group);
-
 		// TODO: Should be no need to update this observable if its already there.
 		this.observe(
 			this._workspaceContext.propertyStructuresOf(group.key),
 			(properties) => {
+				console.log('_observePropertyStructureOfGroup', group.name, group.key, properties);
 				// If this need to be able to remove properties, we need to clean out the ones of this group.key before inserting them:
 				//this._propertyStructure = this._propertyStructure.filter((x) => x.containerKey !== group.key);
 

@@ -47,7 +47,7 @@ export class UmbDocumentWorkspaceContext
 		this.#documentTypeRepository = new UmbDocumentTypeRepository(this.#host);
 		//this.#dataTypeRepository = new UmbDataTypeRepository(this.#host);
 
-		new UmbObserverController(this._host, this.documentTypeKey, (key) => this.loadDocumentType(key));
+		new UmbObserverController(this._host, this.documentTypeKey, (key) => this._loadDocumentType(key));
 	}
 
 	async load(entityKey: string) {
@@ -65,7 +65,7 @@ export class UmbDocumentWorkspaceContext
 		this.#data.next(data);
 	}
 
-	async loadDocumentType(key?: string) {
+	private async _loadDocumentType(key?: string) {
 		if (!key) return;
 
 		const { data } = await this.#documentTypeRepository.requestByKey(key);
@@ -74,28 +74,27 @@ export class UmbDocumentWorkspaceContext
 		// Load inherited and composed types:
 		await data?.compositions?.forEach(async (composition) => {
 			if (composition.key) {
-				this.loadDocumentType(composition.key);
+				this._loadDocumentType(composition.key);
 			}
 		});
 
 		new UmbObserverController(this._host, await this.#documentTypeRepository.byKey(key), (docType) => {
 			if (docType) {
 				this.#documentTypes.appendOne(docType);
-				this.initDocumentTypeContainers(docType);
-				this.loadDocumentTypeCompositions(docType);
+				this._initDocumentTypeContainers(docType);
+				this._loadDocumentTypeCompositions(docType);
 			}
 		});
 	}
 
-	async loadDocumentTypeCompositions(documentType: DocumentTypeModel) {
+	private async _loadDocumentTypeCompositions(documentType: DocumentTypeModel) {
 		documentType.compositions?.forEach((composition) => {
-			this.loadDocumentType(composition.key);
+			this._loadDocumentType(composition.key);
 		});
 	}
 
-	async initDocumentTypeContainers(documentType: DocumentTypeModel) {
+	private async _initDocumentTypeContainers(documentType: DocumentTypeModel) {
 		documentType.containers?.forEach((container) => {
-			console.log('add container', container);
 			this.#containers.appendOne(container);
 		});
 	}
