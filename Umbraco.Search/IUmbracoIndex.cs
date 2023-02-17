@@ -1,11 +1,11 @@
-using Examine;
+using Umbraco.Cms.Core.Models;
 
 namespace Umbraco.Cms.Infrastructure.Examine;
 
 /// <summary>
 ///     A Marker interface for defining an Umbraco indexer
 /// </summary>
-public interface IUmbracoIndex : IIndex, IIndexStats
+public interface IUmbracoIndex<T>
 {
     /// <summary>
     ///     When set to true Umbraco will keep the index in sync with Umbraco data automatically
@@ -21,4 +21,6 @@ public interface IUmbracoIndex : IIndex, IIndexStats
     ///     * non-published Variants
     /// </remarks>
     bool PublishedValuesOnly { get; }
+
+    void IndexItems<T>(T[] members);
 }

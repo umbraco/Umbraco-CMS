@@ -1,0 +1,23 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <PackageId>Umbraco.Search.Examine</PackageId>
+    <Title>Umbraco CMS - Search - Examine</Title>
+    <Description>Adds Examine implementation for searching to Umbraco CMS.</Description>
+    <RootNamespace>Umbraco.Search.Examine</RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Examine.Core" Version="3.1.0"/>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Umbraco.Search\Umbraco.Search.csproj"/>
+  </ItemGroup>
+  <!-- Create and pack empty file to add TFM dependency -->
+  <Target Name="PackTargetFrameworkFile" BeforeTargets="Build">
+    <WriteLinesToFile File="$(IntermediateOutputPath)_._"/>
+    <ItemGroup>
+      <None Include="$(IntermediateOutputPath)_._" Pack="true" PackagePath="lib\$(TargetFramework)"/>
+    </ItemGroup>
+  </Target>
+</Project>

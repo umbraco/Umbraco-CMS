@@ -12,7 +12,7 @@ public static partial class Constants
     {
         public static readonly string[] UmbracoCoreAssemblyNames =
         {
-            "Umbraco.Core", "Umbraco.Infrastructure", "Umbraco.PublishedCache.NuCache", "Umbraco.Examine.Lucene",
+            "Umbraco.Core", "Umbraco.Infrastructure", "Umbraco.PublishedCache.NuCache", "Umbraco.Search.Examine.Lucene",
             "Umbraco.Web.Common", "Umbraco.Web.BackOffice", "Umbraco.Web.Website",
         };
     }

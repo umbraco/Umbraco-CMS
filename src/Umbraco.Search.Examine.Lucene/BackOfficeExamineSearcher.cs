@@ -14,6 +14,7 @@ using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Models.Membership;
+using Umbraco.Cms.Core.Models.Search;
 using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
@@ -52,7 +53,7 @@ public class BackOfficeExamineSearcher : IBackOfficeExamineSearcher
         _publishedUrlProvider = publishedUrlProvider;
     }
 
-    public IEnumerable<ISearchResult> Search(
+    public IEnumerable<IUmbracoSearchResult> Search(
         string query,
         UmbracoEntityTypes entityType,
         int pageSize,

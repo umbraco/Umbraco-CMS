@@ -1,7 +1,4 @@
-using Examine;
-
 namespace Umbraco.Cms.Infrastructure.Examine;
-
 public interface IIndexPopulator
 {
     /// <summary>
@@ -9,11 +6,11 @@ public interface IIndexPopulator
     /// </summary>
     /// <param name="index"></param>
     /// <returns></returns>
-    bool IsRegistered(IIndex index);
+    bool IsRegistered(string index);
 
     /// <summary>
     ///     Populate indexers
     /// </summary>
     /// <param name="indexes"></param>
-    void Populate(params IIndex[] indexes);
+    void Populate(params string[] indexes);
 }

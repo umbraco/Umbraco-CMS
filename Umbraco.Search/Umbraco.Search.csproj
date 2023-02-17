@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+<PropertyGroup>
+    <PackageId>Umbraco.Search</PackageId>
+    <Title>Umbraco CMS - Search</Title>
+    <Description>Adds search abstraction to Umbraco CMS.</Description>
+    <RootNamespace>Umbraco.Search</RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\src\Umbraco.Core\Umbraco.Core.csproj" />
+  </ItemGroup>
+
+</Project>

@@ -1,21 +1,21 @@
-using Examine;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Search;
 
 namespace Umbraco.Cms.Infrastructure.Examine;
 
-public class MemberIndexPopulator : IndexPopulator<IUmbracoMemberIndex>
+public class MemberIndexPopulator : IndexPopulator
 {
+    private readonly ISearchProvider _provider;
     private readonly IMemberService _memberService;
-    private readonly IValueSetBuilder<IMember> _valueSetBuilder;
 
-    public MemberIndexPopulator(IMemberService memberService, IValueSetBuilder<IMember> valueSetBuilder)
+    public MemberIndexPopulator(IMemberService memberService, ISearchProvider provider)
     {
+        _provider = provider;
         _memberService = memberService;
-        _valueSetBuilder = valueSetBuilder;
     }
 
-    protected override void PopulateIndexes(IReadOnlyList<IIndex> indexes)
+    protected override void PopulateIndexes(IReadOnlyList<string> indexes)
     {
         if (indexes.Count == 0)
         {
@@ -33,9 +33,9 @@ public class MemberIndexPopulator : IndexPopulator<IUmbracoMemberIndex>
             members = _memberService.GetAll(pageIndex, pageSize, out _).ToArray();
 
             // ReSharper disable once PossibleMultipleEnumeration
-            foreach (IIndex index in indexes)
+            foreach (string index in indexes)
             {
-                index.IndexItems(_valueSetBuilder.GetValueSets(members));
+                _provider.GetIndex<IMember>(index).IndexItems(members);
             }
 
             pageIndex++;

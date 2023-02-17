@@ -1,13 +1,10 @@
 using System.Text.RegularExpressions;
-using Examine;
 using Umbraco.Extensions;
+using Umbraco.Search.Constants;
 
 namespace Umbraco.Cms.Infrastructure.Examine;
 
-/// <summary>
-///     Custom <see cref="FieldDefinitionCollection" /> allowing dynamic creation of <see cref="FieldDefinition" />
-/// </summary>
-public class UmbracoFieldDefinitionCollection : FieldDefinitionCollection
+public class UmbracoFieldDefinitionCollection
 {
     /// <summary>
     ///     A type that defines the type of index for each Umbraco field (non user defined fields)
@@ -16,24 +13,26 @@ public class UmbracoFieldDefinitionCollection : FieldDefinitionCollection
     /// </summary>
     public static readonly FieldDefinition[] UmbracoIndexFieldDefinitions =
     {
-        new("parentID", FieldDefinitionTypes.Integer), new("level", FieldDefinitionTypes.Integer),
-        new("writerID", FieldDefinitionTypes.Integer), new("creatorID", FieldDefinitionTypes.Integer),
-        new("sortOrder", FieldDefinitionTypes.Integer), new("template", FieldDefinitionTypes.Integer),
-        new("createDate", FieldDefinitionTypes.DateTime), new("updateDate", FieldDefinitionTypes.DateTime),
-        new(UmbracoExamineFieldNames.NodeKeyFieldName, FieldDefinitionTypes.InvariantCultureIgnoreCase),
-        new("version", FieldDefinitionTypes.Raw), new("nodeType", FieldDefinitionTypes.InvariantCultureIgnoreCase),
-        new("template", FieldDefinitionTypes.Raw), new("urlName", FieldDefinitionTypes.InvariantCultureIgnoreCase),
-        new("path", FieldDefinitionTypes.Raw), new("email", FieldDefinitionTypes.EmailAddress),
-        new(UmbracoExamineFieldNames.PublishedFieldName, FieldDefinitionTypes.Raw),
-        new(UmbracoExamineFieldNames.IndexPathFieldName, FieldDefinitionTypes.Raw),
-        new(UmbracoExamineFieldNames.IconFieldName, FieldDefinitionTypes.Raw),
-        new(UmbracoExamineFieldNames.VariesByCultureFieldName, FieldDefinitionTypes.Raw),
+        new(UmbracoSearchFieldNames.ParentID, UmbracoFieldType.Integer),
+        new("level", UmbracoFieldType.Integer),
+        new("writerID", UmbracoFieldType.Integer),
+        new("creatorID", UmbracoFieldType.Integer),
+        new("sortOrder", UmbracoFieldType.Integer),
+        new("template", UmbracoFieldType.Integer),
+        new("createDate", UmbracoFieldType.DateTime),
+        new("updateDate", UmbracoFieldType.DateTime),
+        new(UmbracoSearchFieldNames.NodeKeyFieldName, UmbracoFieldType.InvariantCultureIgnoreCase),
+        new("version", UmbracoFieldType.Raw),
+        new("nodeType", UmbracoFieldType.InvariantCultureIgnoreCase),
+        new("template", UmbracoFieldType.Raw),
+        new("urlName", UmbracoFieldType.InvariantCultureIgnoreCase),
+        new("path", UmbracoFieldType.Raw),
+        new("email", UmbracoFieldType.EmailAddress),
+        new(UmbracoSearchFieldNames.PublishedFieldName, UmbracoFieldType.Raw),
+        new(UmbracoSearchFieldNames.IndexPathFieldName, UmbracoFieldType.Raw),
+        new(UmbracoSearchFieldNames.IconFieldName, UmbracoFieldType.Raw),
+        new(UmbracoSearchFieldNames.VariesByCultureFieldName, UmbracoFieldType.Raw),
     };
-
-    public UmbracoFieldDefinitionCollection()
-        : base(UmbracoIndexFieldDefinitions)
-    {
-    }
 
     /// <summary>
     ///     Overridden to dynamically add field definitions for culture variations
@@ -57,13 +56,9 @@ public class UmbracoFieldDefinitionCollection : FieldDefinitionCollection
     ///     isn't going to cause any
     ///     problems and the mem will be cleared on next site restart but it's worth pointing out.
     /// </remarks>
-    public override bool TryGetValue(string fieldName, out FieldDefinition fieldDefinition)
+    public bool TryGetValue(string fieldName, out FieldDefinition? fieldDefinition)
     {
-        if (base.TryGetValue(fieldName, out fieldDefinition))
-        {
-            return true;
-        }
-
+        fieldDefinition = null;
         // before we use regex to match do some faster simple matching since this is going to execute quite a lot
         if (!fieldName.Contains("_"))
         {

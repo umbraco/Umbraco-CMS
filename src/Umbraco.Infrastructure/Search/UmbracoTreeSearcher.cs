@@ -1,10 +1,10 @@
 using System.Globalization;
-using Examine;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Models.Entities;
+using Umbraco.Cms.Core.Models.Search;
 using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Trees;
@@ -66,7 +66,7 @@ public class UmbracoTreeSearcher
         string? searchFrom = null,
         bool ignoreUserStartNodes = false)
     {
-        IEnumerable<ISearchResult> pagedResult = _backOfficeExamineSearcher.Search(query, entityType, pageSize, pageIndex, out totalFound, searchFrom, ignoreUserStartNodes);
+        IEnumerable<IUmbracoSearchResult> pagedResult = _backOfficeExamineSearcher.Search(query, entityType, pageSize, pageIndex, out totalFound, searchFrom, ignoreUserStartNodes);
 
         switch (entityType)
         {
@@ -113,10 +113,10 @@ public class UmbracoTreeSearcher
     /// </summary>
     /// <param name="results"></param>
     /// <returns></returns>
-    private IEnumerable<SearchResultEntity> MemberFromSearchResults(IEnumerable<ISearchResult> results)
+    private IEnumerable<SearchResultEntity> MemberFromSearchResults(IEnumerable<IUmbracoSearchResult> results)
     {
         // add additional data
-        foreach (ISearchResult result in results)
+        foreach (IUmbracoSearchResult result in results)
         {
             SearchResultEntity? m = _mapper.Map<SearchResultEntity>(result);
 
@@ -164,12 +164,12 @@ public class UmbracoTreeSearcher
     /// <param name="culture"></param>
     /// <returns></returns>
     private IEnumerable<SearchResultEntity> ContentFromSearchResults(
-        IEnumerable<ISearchResult> results,
+        IEnumerable<IUmbracoSearchResult> results,
         string? culture = null)
     {
         var defaultLang = _languageService.GetDefaultLanguageIsoCode();
 
-        foreach (ISearchResult result in results)
+        foreach (IUmbracoSearchResult result in results)
         {
             SearchResultEntity? entity = _mapper.Map<SearchResultEntity>(result, context =>
                 {

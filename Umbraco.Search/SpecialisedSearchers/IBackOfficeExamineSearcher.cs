@@ -1,5 +1,5 @@
-using Examine;
 using Umbraco.Cms.Core.Models.ContentEditing;
+using Umbraco.Cms.Core.Models.Search;
 
 namespace Umbraco.Cms.Infrastructure.Examine;
 
@@ -8,7 +8,7 @@ namespace Umbraco.Cms.Infrastructure.Examine;
 /// </summary>
 public interface IBackOfficeExamineSearcher
 {
-    IEnumerable<ISearchResult> Search(
+    IEnumerable<IUmbracoSearchResult> Search(
         string query,
         UmbracoEntityTypes entityType,
         int pageSize,

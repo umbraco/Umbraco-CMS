@@ -39,7 +39,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Examine.Lucene.UmbracoExamine {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Umbraco.Cms.Tests.Integration.Umbraco.Examine.Lucene.UmbracoExamine.TestFiles", typeof(TestFiles).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Umbraco.Cms.Tests.Integration.Umbraco.Search.Examine.Lucene.UmbracoExamine.TestFiles", typeof(TestFiles).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -88,7 +88,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Examine.Lucene.UmbracoExamine {
         ///&lt;!ATTLIST CWS_Gallery id ID #REQUIRED&gt;
         ///&lt;!ELEMENT CWS_Home ANY&gt;
         ///&lt;!ATTLIST CWS_Home id ID #REQUIRED&gt;
-        ///&lt;!ELEMENT CWS_NewsEventsList ANY&gt;        /// [rest of string was truncated]&quot;;.
+        ///&lt;!ELEMENT CWS_NewsEventsList ANY&gt;
+        /// [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string umbraco {
             get {
@@ -111,7 +112,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Examine.Lucene.UmbracoExamine {
         ///&lt;!ATTLIST CWS_Gallery id ID #REQUIRED&gt;
         ///&lt;!ELEMENT CWS_Home ANY&gt;
         ///&lt;!ATTLIST CWS_Home id ID #REQUIRED&gt;
-        ///&lt;!ELEMENT CWS_NewsEventsList ANY&gt;        /// [rest of string was truncated]&quot;;.
+        ///&lt;!ELEMENT CWS_NewsEventsList ANY&gt;
+        /// [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string umbraco_sort {
             get {
