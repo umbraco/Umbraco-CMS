@@ -1,4 +1,4 @@
-import { UmbLogSearchesServerDataSource } from './sources/log-viewer.server.data';
+import { UmbLogMessagesServerDataSource, UmbLogSearchesServerDataSource } from './sources/log-viewer.server.data';
 import { UmbLogSearchesStore, UMB_LOG_SEARCHES_STORE_CONTEXT_TOKEN } from './log-search.store';
 import { UmbContextConsumerController } from '@umbraco-cms/context-api';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
@@ -11,6 +11,7 @@ import { UmbNotificationService, UMB_NOTIFICATION_SERVICE_CONTEXT_TOKEN } from '
 export class UmbLogSearchRepository {
 	#host: UmbControllerHostInterface;
 	#searchDataSource: UmbLogSearchesServerDataSource;
+	#messagesDataSource: UmbLogMessagesServerDataSource;
 	#searchStore?: UmbLogSearchesStore;
 	#notificationService?: UmbNotificationService;
 	#initResolver?: () => void;
@@ -19,6 +20,7 @@ export class UmbLogSearchRepository {
 	constructor(host: UmbControllerHostInterface) {
 		this.#host = host;
 		this.#searchDataSource = new UmbLogSearchesServerDataSource(this.#host);
+		this.#messagesDataSource = new UmbLogMessagesServerDataSource(this.#host);
 
 		new UmbContextConsumerController(this.#host, UMB_LOG_SEARCHES_STORE_CONTEXT_TOKEN, (instance) => {
 			this.#searchStore = instance;
@@ -49,6 +51,12 @@ export class UmbLogSearchRepository {
 		await this.#init();
 
 		return this.#searchDataSource.getAllSavedSearches({ skip, take });
+	}
+
+	async getLogCount({ startDate, endDate }: { startDate?: string; endDate?: string }) {
+		await this.#init();
+
+		return this.#messagesDataSource.getLogViewerLevelCount({ startDate, endDate });
 	}
 
 	// async insert(template: Template) {

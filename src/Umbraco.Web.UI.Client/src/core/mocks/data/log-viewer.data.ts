@@ -1,14 +1,15 @@
-import { LogTemplate, SavedLogSearch } from '@umbraco-cms/backend-api';
+import { logs } from './logs.data';
 import { UmbData } from './data';
+import { LogMessageModel, LogTemplateModel, SavedLogSearchModel } from '@umbraco-cms/backend-api';
 
 // Temp mocked database
-class UmbLogviewerSearchesData extends UmbData<SavedLogSearch> {
-	constructor(data: SavedLogSearch[]) {
+class UmbLogviewerSearchesData extends UmbData<SavedLogSearchModel> {
+	constructor(data: SavedLogSearchModel[]) {
 		super(data);
 	}
 
 	// skip can be number or null
-	getSavedSearches(skip = 0, take = this.data.length): Array<SavedLogSearch> {
+	getSavedSearches(skip = 0, take = this.data.length): Array<SavedLogSearchModel> {
 		return this.data.slice(skip, take);
 	}
 
@@ -17,18 +18,40 @@ class UmbLogviewerSearchesData extends UmbData<SavedLogSearch> {
 	}
 }
 
-class UmbLogviewerTemplatesData extends UmbData<LogTemplate> {
-	constructor(data: LogTemplate[]) {
+class UmbLogviewerTemplatesData extends UmbData<LogTemplateModel> {
+	constructor(data: LogTemplateModel[]) {
 		super(data);
 	}
 
 	// skip can be number or null
-	getTemplates(skip = 0, take = this.data.length): Array<LogTemplate> {
+	getTemplates(skip = 0, take = this.data.length): Array<LogTemplateModel> {
 		return this.data.slice(skip, take);
 	}
 }
 
-export const savedSearches: Array<SavedLogSearch> = [
+class UmbLogviewerMessagesData extends UmbData<LogMessageModel> {
+	constructor(data: LogTemplateModel[]) {
+		super(data);
+	}
+
+	// skip can be number or null
+	getLogs(skip = 0, take = this.data.length): Array<LogMessageModel> {
+		return this.data.slice(skip, take);
+	}
+
+	getLevelCount() {
+		const levels = this.data.map((log) => log.level ?? 'unknown');
+		const counts = {};
+		levels.forEach((level: string) => {
+			//eslint-disable-next-line @typescript-eslint/ban-ts-comment
+			//@ts-ignore
+			counts[level ?? 'unknown'] = (counts[level] || 0) + 1;
+		});
+		return counts;
+	}
+}
+
+export const savedSearches: Array<SavedLogSearchModel> = [
 	{
 		name: 'Find all logs where the Level is NOT Verbose and NOT Debug',
 		query: "Not(@Level='Verbose') and Not(@Level='Debug')",
@@ -75,7 +98,7 @@ export const savedSearches: Array<SavedLogSearch> = [
 	},
 ];
 
-export const messageTemplates: LogTemplate[] = [
+export const messageTemplates: LogTemplateModel[] = [
 	{
 		messageTemplate: 'Create Foreign Key:\n {Sql}',
 		count: 90,
@@ -368,7 +391,23 @@ export const messageTemplates: LogTemplate[] = [
 	},
 ];
 
+export const logLevels = {
+	total: 2,
+	items: [
+		{
+			name: 'Global',
+			level: 'Information',
+		},
+		{
+			name: 'UmbracoFile',
+			level: 'Verbose',
+		},
+	],
+};
+
 export const umbLogviewerData = {
 	searches: new UmbLogviewerSearchesData(savedSearches),
 	templates: new UmbLogviewerTemplatesData(messageTemplates),
+	logs: new UmbLogviewerMessagesData(logs),
+	logLevels: logLevels,
 };
