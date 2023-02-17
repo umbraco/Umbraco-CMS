@@ -1,5 +1,6 @@
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
+using Umbraco.New.Cms.Core.Models;
 
 namespace Umbraco.Cms.Core.Services;
 
@@ -169,7 +170,18 @@ public interface IRelationService : IService
     /// <param name="pageSize"></param>
     /// <param name="totalChildren"></param>
     /// <returns></returns>
-    IEnumerable<IRelation> GetPagedByRelationTypeId(int relationTypeId, long pageIndex, int pageSize, out long totalRecords, Ordering? ordering = null);
+    IEnumerable<IRelation> GetPagedByRelationTypeId(int relationTypeId, long pageIndex, int pageSize, out long totalRecords, Ordering? ordering = null);/// <summary>
+
+    /// <summary>
+    ///     Gets a paged result of <see cref="IRelation" />
+    /// </summary>
+    /// <param name="key"></param>
+    /// <param name="pageIndex"></param>
+    /// <param name="pageSize"></param>
+    /// <param name="totalRecords"></param>
+    /// <param name="ordering"></param>
+    /// <returns></returns>
+    Task<PagedModel<IRelation>> GetPagedByRelationTypeId(Guid key, long pageIndex, int pageSize, Ordering? ordering = null);
 
     /// <summary>
     ///     Gets the Child object from a Relation as an <see cref="IUmbracoEntity" />

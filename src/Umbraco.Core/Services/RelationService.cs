@@ -7,6 +7,7 @@ using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Extensions;
+using Umbraco.New.Cms.Core.Models;
 
 namespace Umbraco.Cms.Core.Services;
 
@@ -236,6 +237,22 @@ public class RelationService : RepositoryService, IRelationService
         {
             IQuery<IRelation>? query = Query<IRelation>().Where(x => x.RelationTypeId == relationTypeId);
             return _relationRepository.GetPagedRelationsByQuery(query, pageIndex, pageSize, out totalRecords, ordering);
+        }
+    }
+
+    public async Task<PagedModel<IRelation>> GetPagedByRelationTypeId(Guid key, long pageIndex, int pageSize, Ordering? ordering = null)
+    {
+        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
+        {
+            IRelationType? relationType = _relationTypeRepository.Get(key);
+            if (relationType is null)
+            {
+                return await Task.FromResult(new PagedModel<IRelation>());
+            }
+
+            IQuery<IRelation> query = Query<IRelation>().Where(x => x.RelationTypeId == relationType.Id);
+            IEnumerable<IRelation> relations = _relationRepository.GetPagedRelationsByQuery(query, pageIndex, pageSize, out var totalRecords, ordering);
+            return await Task.FromResult(new PagedModel<IRelation>(totalRecords, relations));
         }
     }
 
