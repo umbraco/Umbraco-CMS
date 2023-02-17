@@ -700,6 +700,102 @@ export const data: Array<DocumentTypeModel> = [
 			keepLatestVersionPerDayForDays: null,
 		},
 	},
+	{
+		allowedTemplateKeys: ['916cfecc-3295-490c-a16d-c41fa9f72980'],
+		defaultTemplateKey: '916cfecc-3295-490c-a16d-c41fa9f72980',
+		key: '5035d7d9-0a63-415c-9e75-ee2cf931db92',
+		alias: 'masterPage',
+		name: 'Master Page',
+		description: null,
+		icon: 'icon-document',
+		allowedAsRoot: false,
+		variesByCulture: false,
+		variesBySegment: false,
+		isElement: false,
+		properties: [
+			{
+				key: '5e5f7456-c751-4846-9f2b-47965cc96ec6',
+				containerKey: '6f281e5a-0242-4649-bd9e-d6bf87f92b41',
+				alias: 'masterText',
+				name: 'Master text',
+				description: null,
+				dataTypeKey: '0cc0eba1-9960-42c9-bf9b-60e150b429ae',
+				validation: {
+					mandatory: false,
+					mandatoryMessage: null,
+					regEx: null,
+					regExMessage: null,
+				},
+				appearance: {
+					labelOnTop: false,
+				},
+			},
+		],
+		containers: [
+			{
+				key: '6f281e5a-0242-4649-bd9e-d6bf87f92b41',
+				parentKey: null,
+				name: 'Master Tab',
+				type: 'Tab',
+				sortOrder: 0,
+			},
+		],
+		allowedContentTypes: [],
+		compositions: [],
+		cleanup: {
+			preventCleanup: false,
+			keepAllVersionsNewerThanDays: null,
+			keepLatestVersionPerDayForDays: null,
+		},
+	},
+	{
+		allowedTemplateKeys: [],
+		defaultTemplateKey: null,
+		key: '8f68ba66-6fb2-4778-83b8-6ab4ca3a7c5d',
+		alias: 'baseElementType',
+		name: 'Base Element Type',
+		description: null,
+		icon: 'icon-science',
+		allowedAsRoot: false,
+		variesByCulture: false,
+		variesBySegment: false,
+		isElement: true,
+		properties: [
+			{
+				key: 'b92de6ac-1a22-4a45-a481-b6cae1cccbbf',
+				containerKey: '1e845ca8-1e3e-4b03-be1d-0b4149ce2129',
+				alias: 'pageTitle',
+				name: 'Page title',
+				description: null,
+				dataTypeKey: '0cc0eba1-9960-42c9-bf9b-60e150b429ae',
+				validation: {
+					mandatory: false,
+					mandatoryMessage: null,
+					regEx: null,
+					regExMessage: null,
+				},
+				appearance: {
+					labelOnTop: false,
+				},
+			},
+		],
+		containers: [
+			{
+				key: '1e845ca8-1e3e-4b03-be1d-0b4149ce2129',
+				parentKey: null,
+				name: 'Content',
+				type: 'Group',
+				sortOrder: 0,
+			},
+		],
+		allowedContentTypes: [],
+		compositions: [],
+		cleanup: {
+			preventCleanup: false,
+			keepAllVersionsNewerThanDays: null,
+			keepLatestVersionPerDayForDays: null,
+		},
+	},
 ];
 
 export const treeData: Array<DocumentTypeTreeItemModel> = [
