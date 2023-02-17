@@ -2,6 +2,7 @@ import { css, html } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, property } from 'lit/decorators.js';
 import { FormControlMixin } from '@umbraco-ui/uui-base/lib/mixins';
+import { UUIModalSidebarSize } from '@umbraco-ui/uui-modal-sidebar';
 import { UmbLitElement } from '@umbraco-cms/element';
 import { UmbModalService, UMB_MODAL_SERVICE_CONTEXT_TOKEN } from '@umbraco-cms/modal';
 
@@ -81,7 +82,7 @@ export class UmbInputMultiUrlPickerElement extends FormControlMixin(UmbLitElemen
 	 * @default "small"
 	 */
 	@property()
-	overlaySize?: 'small' | 'medium' | 'large' | 'full';
+	overlaySize?: UUIModalSidebarSize;
 
 	@property({ attribute: 'urls' })
 	multiUrls: Array<MultiUrlData> = [];
@@ -112,22 +113,22 @@ export class UmbInputMultiUrlPickerElement extends FormControlMixin(UmbLitElemen
 	}
 
 	private _openPicker(data?: MultiUrlData, index?: number) {
-		const modalHandler = this._modalService?.linkPicker(
-			{
-				name: data?.name || undefined,
-				published: data?.published || undefined,
-				queryString: data?.queryString || undefined,
-				target: data?.target || undefined,
-				trashed: data?.trashed || undefined,
-				udi: data?.udi || undefined,
-				url: data?.url || undefined,
+		const modalHandler = this._modalService?.linkPicker({
+			link: {
+				name: data?.name,
+				published: data?.published,
+				queryString: data?.queryString,
+				target: data?.target,
+				trashed: data?.trashed,
+				udi: data?.udi,
+				url: data?.url,
 			},
-			{
+			config: {
 				hideAnchor: this.hideAnchor,
 				ignoreUserStartNodes: this.ignoreUserStartNodes,
 				overlaySize: this.overlaySize || 'small',
-			}
-		);
+			},
+		});
 		modalHandler?.onClose().then((newUrl: MultiUrlData) => {
 			if (!newUrl) return;
 

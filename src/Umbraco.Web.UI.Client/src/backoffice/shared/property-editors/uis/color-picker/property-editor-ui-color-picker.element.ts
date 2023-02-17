@@ -16,15 +16,15 @@ export class UmbPropertyEditorUIColorPickerElement extends UmbLitElement {
 	value = '';
 
 	@state()
-	private _includeLabels = false;
+	private _showLabels = false;
 
 	@state()
 	private _swatches: any[] = [];
 
 	@property({ type: Array, attribute: false })
 	public set config(config: Array<DataTypePropertyModel>) {
-		const includeLabels = config.find((x) => x.alias === 'useLabels');
-		if (includeLabels) this._includeLabels = includeLabels.value;
+		const useLabel = config.find((x) => x.alias === 'useLabel');
+		if (useLabel) this._showLabels = useLabel.value;
 
 		const colorSwatches = config.find((x) => x.alias === 'items');
 		if (colorSwatches) this._swatches = colorSwatches.value as any[];
@@ -39,7 +39,7 @@ export class UmbPropertyEditorUIColorPickerElement extends UmbLitElement {
 		return html`<umb-input-color-picker
 			@change="${this._onChange}"
 			.swatches="${this._swatches}"
-			.showLabels="${this._includeLabels}"></umb-input-color-picker>`;
+			.showLabels="${this._showLabels}"></umb-input-color-picker>`;
 	}
 }
 

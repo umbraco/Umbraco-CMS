@@ -54,7 +54,7 @@ export const data: Array<DataTypeModel & { type: 'data-type' }> = [
 		propertyEditorUiAlias: 'Umb.PropertyEditorUI.ColorPicker',
 		data: [
 			{
-				alias: 'useLabels',
+				alias: 'useLabel',
 				value: true,
 			},
 			{

@@ -1,10 +1,8 @@
 import { html } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, property, state } from 'lit/decorators.js';
-import {
-	UmbInputMultiUrlPickerElement,
-	MultiUrlData,
-} from '../../../../shared/components/input-multi-url-picker/input-multi-url-picker.element';
+import { UUIModalSidebarSize } from '@umbraco-ui/uui-modal-sidebar';
+import { MultiUrlData } from '../../../../shared/components/input-multi-url-picker/input-multi-url-picker.element';
 import { UmbLitElement } from '@umbraco-cms/element';
 import { DataTypePropertyModel } from '@umbraco-cms/backend-api';
 
@@ -37,7 +35,7 @@ export class UmbPropertyEditorUIMultiUrlPickerElement extends UmbLitElement {
 		if (minNumber) this._minNumber = minNumber.value;
 	}
 	@state()
-	private _overlaySize?: 'small' | 'medium' | 'large' | 'full';
+	private _overlaySize?: UUIModalSidebarSize;
 
 	@state()
 	private _hideAnchor?: boolean;
