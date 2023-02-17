@@ -39,6 +39,7 @@ stages:
   ## Build
   ###############################################
   - stage: Build
+
     variables:
       npm_config_cache: $(Pipeline.Workspace)/.npm_client
     jobs:
@@ -47,6 +48,8 @@ stages:
         pool:
           vmImage: 'ubuntu-latest'
         steps:
+          - checkout: self
+            submodules: true
           - task: NodeTool@0
             displayName: Use Node.js $(nodeVersion)
             inputs:
