@@ -18,5 +18,6 @@ public class RelationTypeViewModelFactory : IRelationTypeViewModelFactory
             relationTypeSavingViewModel.IsBidirectional,
             relationTypeSavingViewModel.ParentObjectType,
             relationTypeSavingViewModel.ChildObjectType,
-            relationTypeSavingViewModel.IsDependency);
+            relationTypeSavingViewModel.IsDependency,
+            relationTypeSavingViewModel.Key);
 }

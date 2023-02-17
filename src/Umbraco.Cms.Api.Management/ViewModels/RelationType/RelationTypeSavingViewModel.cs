@@ -8,6 +8,11 @@ public class RelationTypeSavingViewModel
     public required string Name { get; set; }
 
     /// <summary>
+    ///     Gets or sets the key of the model.
+    /// </summary>
+    public Guid? Key { get; set; }
+
+    /// <summary>
     ///     Gets or sets a boolean indicating whether the RelationType is Bidirectional (true) or Parent to Child (false)
     /// </summary>
     public bool IsBidirectional { get; set; }
