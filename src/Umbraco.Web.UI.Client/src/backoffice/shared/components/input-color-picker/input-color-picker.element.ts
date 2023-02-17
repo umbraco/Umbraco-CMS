@@ -4,6 +4,7 @@ import { customElement, property } from 'lit/decorators.js';
 import { FormControlMixin } from '@umbraco-ui/uui-base/lib/mixins';
 import { UUIColorSwatchesEvent } from '@umbraco-ui/uui';
 import { UmbLitElement } from '@umbraco-cms/element';
+import type { SwatchDetails } from '@umbraco-cms/models';
 
 @customElement('umb-input-color-picker')
 export class UmbInputColorPickerElement extends FormControlMixin(UmbLitElement) {
@@ -13,7 +14,7 @@ export class UmbInputColorPickerElement extends FormControlMixin(UmbLitElement) 
 	showLabels = false;
 
 	@property()
-	swatches?: any[];
+	swatches?: SwatchDetails[];
 
 	constructor() {
 		super();

@@ -4,6 +4,7 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { UUIColorSwatchesEvent } from '@umbraco-ui/uui';
 import { UmbLitElement } from '@umbraco-cms/element';
 import type { DataTypePropertyModel } from '@umbraco-cms/backend-api';
+import type { SwatchDetails } from '@umbraco-cms/models';
 
 /**
  * @element umb-property-editor-ui-color-picker
@@ -19,7 +20,7 @@ export class UmbPropertyEditorUIColorPickerElement extends UmbLitElement {
 	private _showLabels = false;
 
 	@state()
-	private _swatches: any[] = [];
+	private _swatches: SwatchDetails[] = [];
 
 	@property({ type: Array, attribute: false })
 	public set config(config: Array<DataTypePropertyModel>) {
