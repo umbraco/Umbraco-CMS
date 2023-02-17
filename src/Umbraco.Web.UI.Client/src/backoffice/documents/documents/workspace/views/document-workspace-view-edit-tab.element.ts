@@ -5,6 +5,7 @@ import { repeat } from 'lit/directives/repeat.js';
 import { UmbDocumentWorkspaceContext } from '../document-workspace.context';
 import { UmbLitElement } from '@umbraco-cms/element';
 import { DocumentPropertyModel, PropertyTypeContainerViewModelBaseModel } from '@umbraco-cms/backend-api';
+import './document-workspace-view-edit-properties.element';
 
 @customElement('umb-document-workspace-view-edit-tab')
 export class UmbDocumentWorkspaceViewEditTabElement extends UmbLitElement {
@@ -40,7 +41,7 @@ export class UmbDocumentWorkspaceViewEditTabElement extends UmbLitElement {
 	_propertyStructure: DocumentPropertyModel[] = [];
 
 	@state()
-	_propertyValue: DocumentPropertyModel[] = [];
+	_propertyValues: DocumentPropertyModel[] = [];
 
 	//_propertiesObservables: Map<string, unknown> = new Map();
 
@@ -86,8 +87,6 @@ export class UmbDocumentWorkspaceViewEditTabElement extends UmbLitElement {
 								groups = this._groupContainersMap.get(group.name)!;
 							}
 							groups.push(group);
-							// Gather property aliases of this group, by group key.
-							this._observePropertyStructureOfGroup(group);
 						}
 					});
 				},
@@ -96,37 +95,20 @@ export class UmbDocumentWorkspaceViewEditTabElement extends UmbLitElement {
 		});
 	}
 
-	private _observePropertyStructureOfGroup(group: PropertyTypeContainerViewModelBaseModel) {
-		if (!this._workspaceContext || !group.key) return undefined;
-
-		this.observe(
-			this._workspaceContext.propertyStructuresOf(group.key),
-			(properties) => {
-				this._propertyStructure = properties || [];
-			},
-			'_observePropertyStructureOfGroup' + group.key
-		);
-
-		// cache observable
-	}
-
 	render() {
-		return repeat(
-			this._groupContainersMap,
-			(mapEntry) => mapEntry[0],
-			(mapEntry) => html` <uui-box>${mapEntry[0]}</uui-box> `
-		);
-
-		/*
-								${repeat(
-									this._propertyStructure.filter((property) => property.groupKey === group.key,
-									(property) => property.alias,
-									(property) =>
-										html`<umb-content-property
-											.property=${property}
-											.value=${this._propertyValue.find((x) => x.alias === property.alias)?.value}></umb-content-property> `
-								)}
-								*/
+		return html`
+			<umb-document-workspace-view-edit-properties
+				.containerName=${this._tabName}></umb-document-workspace-view-edit-properties>
+			<hr />
+			${repeat(
+				this._groupContainersMap,
+				(mapEntry) => mapEntry[0],
+				(mapEntry) => html`<uui-box .headline=${mapEntry[0]}>
+					<umb-document-workspace-view-edit-properties
+						.containerName=${mapEntry[0]}></umb-document-workspace-view-edit-properties>
+				</uui-box>`
+			)}
+		`;
 	}
 }
 

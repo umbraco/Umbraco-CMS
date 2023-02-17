@@ -6,6 +6,7 @@ import type {
 	DocumentModel,
 	DocumentTypeModel,
 	DocumentTypePropertyTypeContainerModel,
+	DocumentTypePropertyTypeModel,
 } from '@umbraco-cms/backend-api';
 import {
 	partialUpdateFrozenArray,
@@ -182,12 +183,29 @@ export class UmbDocumentWorkspaceContext
 		);
 	}
 
-	propertyStructuresOf(containerKey: string | null) {
-		return this.#documentTypes.getObservablePart((data) =>
-			// TODO: some merging of properties across document types here:
-			data[0]?.properties?.filter((p) => containerKey === p.containerKey || null)
+	propertyValueOfAlias(propertyAlias: string, culture: string | null, segment: string | null) {
+		return this.#data.getObservablePart((data) =>
+			data?.properties?.find(
+				(p) => propertyAlias === p.alias && (culture === p.culture || null) && (segment === p.segment || null)
+			)
 		);
 	}
+
+	propertyStructuresOf(containerKey: string) {
+		return this.#documentTypes.getObservablePart((docTypes) => {
+			const props: DocumentTypePropertyTypeModel[] = [];
+			docTypes.forEach((docType) => {
+				docType.properties?.forEach((property) => {
+					if (property.containerKey === containerKey) {
+						props.push(property);
+					}
+				});
+			});
+			return props;
+		});
+	}
+
+	// TODO: Check what of these methods I ended actually using:
 
 	rootContainers(containerType: 'Group' | 'Tab') {
 		return this.#containers.getObservablePart((data) => {
@@ -200,7 +218,6 @@ export class UmbDocumentWorkspaceContext
 		containerType: 'Group' | 'Tab'
 	) {
 		return this.#containers.getObservablePart((data) => {
-			console.log(data, parentKey, containerType);
 			return data.filter((x) => x.parentKey === parentKey && x.type === containerType);
 		});
 	}
@@ -210,13 +227,6 @@ export class UmbDocumentWorkspaceContext
 			return data.filter((x) => x.name === name && x.type === containerType);
 		});
 	}
-
-	containerByKey(key: DocumentTypePropertyTypeContainerModel['key']) {
-		return this.#containers.getObservablePart((data) => {
-			return data.filter((x) => x.key === key);
-		});
-	}
-
 	setPropertyValue(alias: string, value: unknown) {
 		const entry = { alias: alias, value: value };
 

@@ -51,7 +51,7 @@ export class UmbDocumentWorkspaceViewEditElement extends UmbLitElement {
 		if (!this._workspaceContext) return;
 
 		this.observe(
-			this._workspaceContext.containersOfParentKey(null, 'Tab'),
+			this._workspaceContext.rootContainers('Tab'),
 			(tabs) => {
 				tabs.forEach((tab) => {
 					// Only add each tab name once, as our containers merge on name:
