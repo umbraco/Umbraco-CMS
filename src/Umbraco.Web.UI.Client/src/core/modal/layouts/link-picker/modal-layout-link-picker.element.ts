@@ -4,6 +4,7 @@ import { customElement, query, state } from 'lit/decorators.js';
 import { UUIBooleanInputEvent, UUIInputElement } from '@umbraco-ui/uui';
 import { UmbModalLayoutElement } from '../modal-layout.element';
 import { UmbTreeElement } from '../../../../backoffice/shared/components/tree/tree.element';
+import { buildUdi } from '@umbraco-cms/utils';
 
 export interface UmbModalLinkPickerData {
 	icon?: string;
@@ -60,6 +61,9 @@ export class UmbModalLayoutLinkPickerElement extends UmbModalLayoutElement<
 	];
 
 	@state()
+	_selectedKey?: string;
+
+	@state()
 	_link: UmbModalLinkPickerData = {
 		icon: undefined,
 		name: undefined,
@@ -108,13 +112,16 @@ export class UmbModalLayoutLinkPickerElement extends UmbModalLayoutElement<
 		this._link.queryString = query;
 	}
 
-	private _handleSelectionChange(e: CustomEvent) {
+	private _handleSelectionChange(e: CustomEvent, entityType: string) {
+		//TODO: Update icon, published, trashed
 		e.stopPropagation();
 		const element = e.target as UmbTreeElement;
-		const udi = element.selection[element.selection.length - 1];
+		const selectedKey = element.selection[element.selection.length - 1];
+		const udi = buildUdi(entityType, selectedKey);
+
+		this._selectedKey = selectedKey;
 		this._link.udi = udi;
-		//TODO: Update icon, if published, if trashed, url
-		this._link.url = udi;
+		this._link.url = udi; // TODO
 		this.requestUpdate();
 	}
 
@@ -193,8 +200,8 @@ export class UmbModalLayoutLinkPickerElement extends UmbModalLayoutElement<
 			<uui-input id="search-input" placeholder="Type to search" label="Type to search"></uui-input>
 			<umb-tree
 				alias="Umb.Tree.Documents"
-				@selected=${this._handleSelectionChange}
-				.selection=${[this._link.udi ?? '']}
+				@selected=${(event: CustomEvent) => this._handleSelectionChange(event, 'document')}
+				.selection=${[this._selectedKey ?? '']}
 				selectable></umb-tree>
 
 			<hr />
@@ -203,8 +210,8 @@ export class UmbModalLayoutLinkPickerElement extends UmbModalLayoutElement<
 
 			<umb-tree
 				alias="Umb.Tree.Media"
-				@selected=${this._handleSelectionChange}
-				.selection=${[this._link.udi ?? '']}
+				@selected=${(event: CustomEvent) => this._handleSelectionChange(event, 'media')}
+				.selection=${[this._selectedKey ?? '']}
 				selectable></umb-tree>`;
 	}
 }
