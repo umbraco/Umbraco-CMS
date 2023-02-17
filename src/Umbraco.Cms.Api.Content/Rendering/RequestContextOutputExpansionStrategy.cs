@@ -42,9 +42,10 @@ public class RequestContextOutputExpansionStrategy : IOutputExpansionStrategy
                 property =>
                 {
                     // update state to expanding if the property should be expanded (needed for nested elements)
-                    _state = _expandAll || _expandAliases.Contains(property.Alias)
-                        ? ExpansionState.Expanding
-                        : ExpansionState.Pending;
+                    if (_expandAll || _expandAliases.Contains(property.Alias))
+                    {
+                        _state = ExpansionState.Expanding;
+                    }
 
                     var value = property.GetContentApiValue(_state == ExpansionState.Expanding);
 
