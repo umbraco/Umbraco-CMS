@@ -4,10 +4,14 @@ import { customElement, state } from 'lit/decorators.js';
 import { repeat } from 'lit/directives/repeat.js';
 import { UmbDocumentWorkspaceContext } from '../document-workspace.context';
 import { UmbLitElement } from '@umbraco-cms/element';
-import { DocumentPropertyModel, DocumentTypePropertyTypeModel } from '@umbraco-cms/backend-api';
+import {
+	DocumentPropertyModel,
+	DocumentTypePropertyTypeModel,
+	PropertyTypeContainerViewModelBaseModel,
+} from '@umbraco-cms/backend-api';
 
-@customElement('umb-workspace-view-document-edit')
-export class UmbWorkspaceViewDocumentEditElement extends UmbLitElement {
+@customElement('umb-document-workspace-view-edit')
+export class UmbDocumentWorkspaceViewEditElement extends UmbLitElement {
 	static styles = [
 		UUITextStyles,
 		css`
@@ -23,6 +27,9 @@ export class UmbWorkspaceViewDocumentEditElement extends UmbLitElement {
 
 	@state()
 	_propertyStructures: DocumentTypePropertyTypeModel[] = [];
+
+	@state()
+	_tabs: PropertyTypeContainerViewModelBaseModel[] = [];
 
 	private _workspaceContext?: UmbDocumentWorkspaceContext;
 
@@ -47,7 +54,7 @@ export class UmbWorkspaceViewDocumentEditElement extends UmbLitElement {
 		Should use a Observable for example: this._workspaceContext.properties
 		*/
 		this.observe(
-			this._workspaceContext.propertiesOf(null, null),
+			this._workspaceContext.propertyValuesOf(null, null),
 			(properties) => {
 				this._propertyData = properties || [];
 				//this._data = content?.data || [];
@@ -59,10 +66,20 @@ export class UmbWorkspaceViewDocumentEditElement extends UmbLitElement {
 			},
 			'observeWorkspaceContextData'
 		);
+		/*
 		this.observe(
 			this._workspaceContext.propertyStructure(),
 			(propertyStructure) => {
 				this._propertyStructures = propertyStructure || [];
+			},
+			'observeWorkspaceContextData'
+		);
+		*/
+
+		this.observe(
+			this._workspaceContext.containersOf(null, 'tab'),
+			(tabs) => {
+				this._tabs = tabs || [];
 			},
 			'observeWorkspaceContextData'
 		);
@@ -84,10 +101,10 @@ export class UmbWorkspaceViewDocumentEditElement extends UmbLitElement {
 	}
 }
 
-export default UmbWorkspaceViewDocumentEditElement;
+export default UmbDocumentWorkspaceViewEditElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-workspace-view-document-edit': UmbWorkspaceViewDocumentEditElement;
+		'umb-document-workspace-view-edit': UmbDocumentWorkspaceViewEditElement;
 	}
 }
