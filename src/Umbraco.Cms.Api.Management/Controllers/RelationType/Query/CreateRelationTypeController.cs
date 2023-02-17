@@ -1,21 +1,21 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Umbraco.Cms.Api.Management.Factories;
 using Umbraco.Cms.Api.Management.ViewModels.RelationType;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Cms.Core.Strings;
-using Umbraco.Extensions;
+
 
 namespace Umbraco.Cms.Api.Management.Controllers.RelationType.Query;
 
 public class CreateRelationTypeController : RelationTypeControllerBase
 {
-    private readonly IShortStringHelper _shortStringHelper;
     private readonly IRelationService _relationService;
+    private readonly IRelationTypeViewModelFactory _relationTypeViewModelFactory;
 
-    public CreateRelationTypeController(IShortStringHelper shortStringHelper, IRelationService relationService)
+    public CreateRelationTypeController(IRelationService relationService, IRelationTypeViewModelFactory relationTypeViewModelFactory)
     {
-        _shortStringHelper = shortStringHelper;
         _relationService = relationService;
+        _relationTypeViewModelFactory = relationTypeViewModelFactory;
     }
 
     [HttpPost("create")]
@@ -23,13 +23,7 @@ public class CreateRelationTypeController : RelationTypeControllerBase
     [ProducesResponseType(typeof(RelationTypeViewModel), StatusCodes.Status200OK)]
     public async Task<IActionResult> Create(RelationTypeSavingViewModel relationTypeSavingViewModel)
     {
-        var relationTypePersisted = new Core.Models.RelationType(
-            relationTypeSavingViewModel.Name,
-            relationTypeSavingViewModel.Name.ToSafeAlias(_shortStringHelper, true),
-            relationTypeSavingViewModel.IsBidirectional,
-            relationTypeSavingViewModel.ParentObjectType,
-            relationTypeSavingViewModel.ChildObjectType,
-            relationTypeSavingViewModel.IsDependency);
+        Core.Models.RelationType relationTypePersisted = _relationTypeViewModelFactory.CreateRelationType(relationTypeSavingViewModel);
 
         _relationService.Save(relationTypePersisted);
 

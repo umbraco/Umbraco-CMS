@@ -9,6 +9,7 @@ internal static class RelationTypesBuilderExtensions
     internal static IUmbracoBuilder AddRelationTypes(this IUmbracoBuilder builder)
     {
         builder.Services.AddTransient<IObjectTypeViewModelFactory, ObjectTypeViewModelFactory>();
+        builder.Services.AddTransient<IRelationTypeViewModelFactory, RelationTypeViewModelFactory>();
         return builder;
     }
 }
