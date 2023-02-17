@@ -8,7 +8,7 @@ export interface UmbDebugModalData {
 }
 
 @customElement('umb-debug-modal-layout')
-export class UmbDebugModalLayout extends UmbModalLayoutElement<UmbDebugModalData> {
+export default class UmbDebugModalLayout extends UmbModalLayoutElement<UmbDebugModalData> {
 	static styles = [
 		UUITextStyles,
 		css`
@@ -34,8 +34,8 @@ export class UmbDebugModalLayout extends UmbModalLayoutElement<UmbDebugModalData
 			}
 
 			.context {
-				padding:15px 0;
-				border-bottom:1px solid var(--uui-color-danger-emphasis);
+				padding: 15px 0;
+				border-bottom: 1px solid var(--uui-color-danger-emphasis);
 			}
 
 			h3 {
@@ -50,7 +50,6 @@ export class UmbDebugModalLayout extends UmbModalLayoutElement<UmbDebugModalData
 				padding: 8px;
 				font-size: 12px;
 			}
-			
 
 			ul {
 				margin-top: 0;
@@ -65,12 +64,8 @@ export class UmbDebugModalLayout extends UmbModalLayoutElement<UmbDebugModalData
 	render() {
 		return html`
 			<uui-dialog-layout>
-				<span slot="headline">
-					<uui-icon name="umb:bug"></uui-icon> Debug: Contexts
-				</span>
-				<uui-scroll-container id="field-settings">
-					${this.data?.content}
-				</uui-scroll-container>
+				<span slot="headline"> <uui-icon name="umb:bug"></uui-icon> Debug: Contexts </span>
+				<uui-scroll-container id="field-settings"> ${this.data?.content} </uui-scroll-container>
 				<uui-button slot="actions" look="primary" label="Close sidebar" @click="${this._handleClose}">Close</uui-button>
 			</uui-dialog-layout>
 		`;
