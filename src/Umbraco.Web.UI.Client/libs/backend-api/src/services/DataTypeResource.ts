@@ -25,10 +25,10 @@ export class DataTypeResource {
      * @throws ApiError
      */
     public static postDataType({
-        requestBody,
-    }: {
-        requestBody?: DataTypeCreateModel,
-    }): CancelablePromise<any> {
+requestBody,
+}: {
+requestBody?: DataTypeCreateModel,
+}): CancelablePromise<any> {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/umbraco/management/api/v1/data-type',
@@ -67,10 +67,10 @@ export class DataTypeResource {
      * @throws ApiError
      */
     public static deleteDataTypeByKey({
-        key,
-    }: {
-        key: string,
-    }): CancelablePromise<any> {
+key,
+}: {
+key: string,
+}): CancelablePromise<any> {
         return __request(OpenAPI, {
             method: 'DELETE',
             url: '/umbraco/management/api/v1/data-type/{key}',
@@ -89,12 +89,12 @@ export class DataTypeResource {
      * @throws ApiError
      */
     public static putDataTypeByKey({
-        key,
-        requestBody,
-    }: {
-        key: string,
-        requestBody?: DataTypeUpdateModel,
-    }): CancelablePromise<any> {
+key,
+requestBody,
+}: {
+key: string,
+requestBody?: DataTypeUpdateModel,
+}): CancelablePromise<any> {
         return __request(OpenAPI, {
             method: 'PUT',
             url: '/umbraco/management/api/v1/data-type/{key}',
@@ -186,10 +186,10 @@ export class DataTypeResource {
      * @throws ApiError
      */
     public static postDataTypeFolder({
-        requestBody,
-    }: {
-        requestBody?: FolderCreateModel,
-    }): CancelablePromise<any> {
+requestBody,
+}: {
+requestBody?: FolderCreateModel,
+}): CancelablePromise<any> {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/umbraco/management/api/v1/data-type/folder',
@@ -224,10 +224,10 @@ export class DataTypeResource {
      * @throws ApiError
      */
     public static deleteDataTypeFolderByKey({
-        key,
-    }: {
-        key: string,
-    }): CancelablePromise<any> {
+key,
+}: {
+key: string,
+}): CancelablePromise<any> {
         return __request(OpenAPI, {
             method: 'DELETE',
             url: '/umbraco/management/api/v1/data-type/folder/{key}',
@@ -245,12 +245,12 @@ export class DataTypeResource {
      * @throws ApiError
      */
     public static putDataTypeFolderByKey({
-        key,
-        requestBody,
-    }: {
-        key: string,
-        requestBody?: FolderUpdateModel,
-    }): CancelablePromise<any> {
+key,
+requestBody,
+}: {
+key: string,
+requestBody?: FolderUpdateModel,
+}): CancelablePromise<any> {
         return __request(OpenAPI, {
             method: 'PUT',
             url: '/umbraco/management/api/v1/data-type/folder/{key}',

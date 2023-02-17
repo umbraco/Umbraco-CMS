@@ -1,5 +1,6 @@
 import {
 	ContentTreeItemModel,
+	DictionaryItemTranslationModel,
 	EntityTreeItemModel,
 	FolderTreeItemModel,
 	ProblemDetailsModel,
@@ -127,6 +128,7 @@ export interface MemberDetails extends EntityTreeItemModel {
 // Dictionary
 export interface DictionaryDetails extends EntityTreeItemModel {
 	key: string; // TODO: Remove this when the backend is fixed
+	translations: DictionaryItemTranslationModel[];
 }
 
 // Document Blueprint

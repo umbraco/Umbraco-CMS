@@ -1,4 +1,4 @@
-import { UMB_DATA_TYPE_TREE_STORE_CONTEXT_TOKEN } from './data-type.tree.store';
+import { UmbDataTypeRepository } from '../repository/data-type.repository';
 import type { ManifestTree, ManifestTreeItemAction } from '@umbraco-cms/models';
 
 const tree: ManifestTree = {
@@ -6,7 +6,7 @@ const tree: ManifestTree = {
 	alias: 'Umb.Tree.DataTypes',
 	name: 'Data Types Tree',
 	meta: {
-		storeAlias: UMB_DATA_TYPE_TREE_STORE_CONTEXT_TOKEN.toString(),
+		repository: UmbDataTypeRepository,
 	},
 };
 

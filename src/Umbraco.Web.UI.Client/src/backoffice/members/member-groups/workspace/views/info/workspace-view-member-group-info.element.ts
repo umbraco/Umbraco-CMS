@@ -1,7 +1,6 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
-import { distinctUntilChanged } from 'rxjs';
 import { UmbWorkspaceMemberGroupContext } from '../../member-group-workspace.context';
 import type { MemberGroupDetails } from '@umbraco-cms/models';
 import { UmbLitElement } from '@umbraco-cms/element';
@@ -33,24 +32,25 @@ export class UmbWorkspaceViewMemberGroupInfoElement extends UmbLitElement {
 	];
 
 	@state()
-	_memberGroup?: MemberGroupDetails;
+	private _memberGroup?: MemberGroupDetails;
 
-	private _workspaceContext?: UmbWorkspaceMemberGroupContext;
+	#workspaceContext?: UmbWorkspaceMemberGroupContext;
 
 	constructor() {
 		super();
 
 		// TODO: Figure out if this is the best way to consume the context or if it can be strongly typed with an UmbContextToken
-		this.consumeContext<UmbWorkspaceMemberGroupContext>('umbWorkspaceContext', (memberGroupContext) => {
-			this._workspaceContext = memberGroupContext;
-			this._observeMemberGroup();
+		this.consumeContext<UmbWorkspaceMemberGroupContext>('umbWorkspaceContext', (instance) => {
+			this.#workspaceContext = instance;
+			console.log(instance);
+			this.#observeMemberGroup();
 		});
 	}
 
-	private _observeMemberGroup() {
-		if (!this._workspaceContext) return;
+	#observeMemberGroup() {
+		if (!this.#workspaceContext) return;
 
-		this.observe(this._workspaceContext.data.pipe(distinctUntilChanged()), (memberGroup) => {
+		this.observe(this.#workspaceContext.data, (memberGroup) => {
 			if (!memberGroup) return;
 
 			// TODO: handle if model is not of the type wanted.

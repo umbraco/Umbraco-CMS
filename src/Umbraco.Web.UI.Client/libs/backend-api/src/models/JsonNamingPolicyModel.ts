@@ -4,4 +4,3 @@
 
 export type JsonNamingPolicyModel = {
 };
-
