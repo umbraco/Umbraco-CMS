@@ -23,6 +23,7 @@ public class TrackedReferenceViewModelsMapDefinition : IMapDefinition
         target.RelationTypeIsBidirectional = source.RelationTypeIsBidirectional;
         target.RelationTypeIsDependency = source.RelationTypeIsDependency;
         target.RelationTypeName = source.RelationTypeName;
+        target.NodePublished = source.NodePublished;
     }
 
 }

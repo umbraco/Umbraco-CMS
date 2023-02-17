@@ -28,12 +28,12 @@ public class DescendantsTrackedReferenceController : TrackedReferenceControllerB
     ///     kind of relation.
     ///     This is basically finding the descending items which are children in relations.
     /// </remarks>
-    [HttpGet("descendants/{parentId:int}")]
+    [HttpGet("descendants/{parentKey:guid}")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedViewModel<RelationItemViewModel>), StatusCodes.Status200OK)]
-    public async Task<ActionResult<PagedViewModel<RelationItemViewModel>>> Descendants(int parentId, long skip, long take, bool? filterMustBeIsDependency)
+    public async Task<ActionResult<PagedViewModel<RelationItemViewModel>>> Descendants(Guid parentKey, long skip, long take, bool? filterMustBeIsDependency)
     {
-        PagedModel<RelationItemModel> relationItems = _trackedReferencesSkipTakeService.GetPagedDescendantsInReferences(parentId, skip, take, filterMustBeIsDependency ?? true);
+        PagedModel<RelationItemModel> relationItems = await _trackedReferencesSkipTakeService.GetPagedDescendantsInReferencesAsync(parentKey, skip, take, filterMustBeIsDependency ?? true);
         var pagedViewModel = new PagedViewModel<RelationItemViewModel>
         {
             Total = relationItems.Total,
