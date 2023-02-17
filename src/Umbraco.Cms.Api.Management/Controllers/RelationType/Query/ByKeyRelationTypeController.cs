@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Management.ViewModels.RelationType;
-using Umbraco.Cms.Api.Management.ViewModels.Telemetry;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
@@ -21,12 +20,12 @@ public class ByKeyRelationTypeController : RelationTypeControllerBase
 
     [HttpGet("{key:guid}")]
     [MapToApiVersion("1.0")]
-    [ProducesResponseType(typeof(TelemetryViewModel), StatusCodes.Status200OK)]
-    public async Task<RelationTypeViewModel> ByKey(Guid key)
+    [ProducesResponseType(typeof(RelationTypeViewModel), StatusCodes.Status200OK)]
+    public async Task<IActionResult> ByKey(Guid key)
     {
         IRelationType? relationType = _relationService.GetRelationTypeById(key);
         RelationTypeViewModel mappedRelationType = _mapper.Map<RelationTypeViewModel>(relationType)!;
 
-        return await Task.FromResult(mappedRelationType);
+        return await Task.FromResult(Ok(mappedRelationType));
     }
 }
