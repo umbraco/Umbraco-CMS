@@ -19,12 +19,7 @@ public static partial class UmbracoBuilderExtensions
 {
     public static IUmbracoBuilder AddExamine(this IUmbracoBuilder builder)
     {
-        // populators are not a collection: one cannot remove ours, and can only add more
-        // the container can inject IEnumerable<IIndexPopulator> and get them all
-        builder.Services.AddSingleton<IIndexPopulator, MemberIndexPopulator>();
-        builder.Services.AddSingleton<IIndexPopulator, ContentIndexPopulator>();
-        builder.Services.AddSingleton<IIndexPopulator, PublishedContentIndexPopulator>();
-        builder.Services.AddSingleton<IIndexPopulator, MediaIndexPopulator>();
+
 
         builder.Services.AddSingleton<IIndexRebuilder, ExamineIndexRebuilder>();
         builder.Services.AddSingleton<IUmbracoIndexingHandler, ExamineUmbracoIndexingHandler>();

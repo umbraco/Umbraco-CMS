@@ -4,16 +4,17 @@ using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Persistence;
+using Umbraco.Search;
 
 namespace Umbraco.Cms.Infrastructure.Examine;
 
 /// <summary>
 ///     Performs the data lookups required to rebuild a content index
 /// </summary>
-public class ContentIndexPopulator : IndexPopulator<IUmbracoContentIndex>
+public class ContentIndexPopulator : IndexPopulator
 {
+    private readonly ISearchProvider _provider;
     private readonly IContentService _contentService;
-    private readonly IValueSetBuilder<IContent> _contentValueSetBuilder;
     private readonly ILogger<ContentIndexPopulator> _logger;
     private readonly int? _parentId;
 
@@ -31,10 +32,12 @@ public class ContentIndexPopulator : IndexPopulator<IUmbracoContentIndex>
     public ContentIndexPopulator(
         ILogger<ContentIndexPopulator> logger,
         IContentService contentService,
+        ISearchProvider provider,
         IUmbracoDatabaseFactory umbracoDatabaseFactory,
         IContentValueSetBuilder contentValueSetBuilder)
         : this(logger, false, null, contentService, umbracoDatabaseFactory, contentValueSetBuilder)
     {
+        _provider = provider;
     }
 
     /// <summary>
@@ -42,6 +45,7 @@ public class ContentIndexPopulator : IndexPopulator<IUmbracoContentIndex>
     /// </summary>
     public ContentIndexPopulator(
         ILogger<ContentIndexPopulator> logger,
+        ISearchProvider provider,
         bool publishedValuesOnly,
         int? parentId,
         IContentService contentService,
@@ -52,6 +56,7 @@ public class ContentIndexPopulator : IndexPopulator<IUmbracoContentIndex>
         _umbracoDatabaseFactory = umbracoDatabaseFactory ?? throw new ArgumentNullException(nameof(umbracoDatabaseFactory));
         _contentValueSetBuilder = contentValueSetBuilder ?? throw new ArgumentNullException(nameof(contentValueSetBuilder));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+        _provider = provider;
         _publishedValuesOnly = publishedValuesOnly;
         _parentId = parentId;
     }
@@ -59,12 +64,8 @@ public class ContentIndexPopulator : IndexPopulator<IUmbracoContentIndex>
     private IQuery<IContent> PublishedQuery => _publishedQuery ??=
         _umbracoDatabaseFactory.SqlContext.Query<IContent>().Where(x => x.Published);
 
-    public override bool IsRegistered(IUmbracoContentIndex index) =>
 
-        // check if it should populate based on published values
-        _publishedValuesOnly == index.PublishedValuesOnly;
-
-    protected override void PopulateIndexes(IReadOnlyList<IIndex> indexes)
+    protected override void PopulateIndexes(IReadOnlyList<string> indexes)
     {
         if (indexes.Count == 0)
         {
@@ -91,7 +92,7 @@ public class ContentIndexPopulator : IndexPopulator<IUmbracoContentIndex>
         }
     }
 
-    protected void IndexAllContent(int contentParentId, int pageIndex, int pageSize, IReadOnlyList<IIndex> indexes)
+    protected void IndexAllContent(int contentParentId, int pageIndex, int pageSize, IReadOnlyList<string> indexes)
     {
         IContent[] content;
 
@@ -99,12 +100,12 @@ public class ContentIndexPopulator : IndexPopulator<IUmbracoContentIndex>
         {
             content = _contentService.GetPagedDescendants(contentParentId, pageIndex, pageSize, out _).ToArray();
 
-            var valueSets = _contentValueSetBuilder.GetValueSets(content).ToArray();
 
             // ReSharper disable once PossibleMultipleEnumeration
-            foreach (IIndex index in indexes)
+            // ReSharper disable once PossibleMultipleEnumeration
+            foreach (string index in indexes)
             {
-                index.IndexItems(valueSets);
+                _provider.GetIndex<IContent>(index).IndexItems(content);
             }
 
             pageIndex++;
@@ -112,7 +113,7 @@ public class ContentIndexPopulator : IndexPopulator<IUmbracoContentIndex>
         while (content.Length == pageSize);
     }
 
-    protected void IndexPublishedContent(int contentParentId, int pageIndex, int pageSize, IReadOnlyList<IIndex> indexes)
+    protected void IndexPublishedContent(int contentParentId, int pageIndex, int pageSize, IReadOnlyList<string> indexes)
     {
         IContent[] content;
 
@@ -147,9 +148,9 @@ public class ContentIndexPopulator : IndexPopulator<IUmbracoContentIndex>
 
             var valueSets = _contentValueSetBuilder.GetValueSets(indexableContent.ToArray()).ToArray();
 
-            foreach (IIndex index in indexes)
+            foreach (string index in indexes)
             {
-                index.IndexItems(valueSets);
+                _provider.GetIndex<IContent>(index).IndexItems(content);
             }
 
             pageIndex++;

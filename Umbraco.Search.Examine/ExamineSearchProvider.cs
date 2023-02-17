@@ -21,7 +21,7 @@ public class ExamineSearchProvider : ISearchProvider
     public IUmbracoSearcher<T> GetSearcher<T>(string index)
     {
         var examineIndex = _examineManager.GetIndex(index).Searcher;
-        return new UmbracoExamineSearcher(examineIndex);
+        return new UmbracoExamineSearcher<T>(examineIndex);
     }
 }
 
