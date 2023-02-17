@@ -182,10 +182,11 @@ export class UmbDebug extends UmbLitElement {
 								${methodNames.map((methodName) => html`<li>${methodName}</li>`)}
 							</ul>
 						</li>
-				`);
+					`
+				);
 			}
 
-			instanceTemplates.push(html`<li><strong>Properties</strong></li>`);
+			const props: TemplateResult[] = [];
 
 			for (const key in instance) {
 				if (key.startsWith('_')) {
@@ -194,11 +195,20 @@ export class UmbDebug extends UmbLitElement {
 
 				const value = instance[key];
 				if (typeof value === 'string') {
-					instanceTemplates.push(html`<li>${key} = ${value}</li>`);
+					props.push(html`<li>${key} = ${value}</li>`);
 				} else {
-					instanceTemplates.push(html`<li>${key} <em>(${typeof value})</em></li>`);
+					props.push(html`<li>${key} <em>(${typeof value})</em></li>`);
 				}
 			}
+
+			instanceTemplates.push(html`
+				<li>
+					<strong>Properties</strong>
+					<ul>
+						${props}
+					</ul>
+				</li>
+			`);
 		} else {
 			instanceTemplates.push(html`<li>Context is a primitive with value: ${instance}</li>`);
 		}
