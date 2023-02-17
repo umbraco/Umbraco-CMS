@@ -64,7 +64,7 @@ export class UmbPropertyEditorUIMultiUrlPickerElement extends UmbLitElement {
 			.ignoreUserStartNodes=${this._ignoreUserStartNodes}
 			.max=${this._maxNumber}
 			.min=${this._minNumber}
-			.links="${this.value}"></umb-input-multi-url-picker>`;
+			.urls="${this.value}"></umb-input-multi-url-picker>`;
 	}
 }
 

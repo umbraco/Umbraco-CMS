@@ -83,7 +83,7 @@ export class UmbInputMultiUrlPickerElement extends FormControlMixin(UmbLitElemen
 	@property()
 	overlaySize?: 'small' | 'medium' | 'large' | 'full';
 
-	@property()
+	@property({ attribute: 'urls' })
 	multiUrls: Array<MultiUrlData> = [];
 
 	private _modalService?: UmbModalService;
@@ -133,7 +133,9 @@ export class UmbInputMultiUrlPickerElement extends FormControlMixin(UmbLitElemen
 
 			if (index !== undefined && index >= 0) this.multiUrls[index] = newUrl;
 			else this.multiUrls.push(newUrl);
+
 			this.requestUpdate();
+			//TODO: onChange event?
 		});
 	}
 
