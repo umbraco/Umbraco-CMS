@@ -1,0 +1,38 @@
+import { Canvas, Meta, Story } from '@storybook/addon-docs';
+
+<Meta title="Guides/Debug" parameters={{ previewTabs: { canvas: { hidden: true } } }} />
+
+
+
+# Debugging
+
+## Debugging Contexts
+
+The component `<umb-debug>` allows you to discover the available contexts from the current DOM element, that you are able to consume and use.
+
+For example it will help you as a package developer or implementor to know you are able to consume the `DigalogService` and quickly see what properties and methods are available to use.
+
+This can help with the developer experience to quickly see what is available to use and how to use it.
+
+### Usage
+The `<umb-debug>` component can be used in two different ways
+
+
+```typescript
+// This will add 
+<umb-debug enabled></umb-debug>
+```
+
+This example uses an additional property/attribute `dialog` which adds a smaller badge to the UI as opposed to a button and will open the information in a small dialog/modal from the right hand side.
+
+```typescript
+// This will open the debug information in a small dialog/modal from the right hand side
+<umb-debug enabled dialog></umb-debug>
+```
+
+You may wish to temporarily hide or disable the debug information but return to it later on in the development process.
+
+```typescript
+// To hide or remove the button ensure you remove the enabled attribute or set the enabled property to false
+<umb-debug></umb-debug>
+```
