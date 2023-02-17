@@ -4,6 +4,7 @@ using Umbraco.Cms.Infrastructure.Persistence.DatabaseAnnotations;
 using Umbraco.Cms.Infrastructure.Persistence.DatabaseModelDefinitions;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 using Umbraco.Cms.Infrastructure.Scoping;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_13_0_0;
 
@@ -43,7 +44,13 @@ public class AddGuidsToUsers : UnscopedMigrationBase
     {
         var columns = SqlSyntax.GetColumnsInSchema(Context.Database).ToList();
         AddColumnIfNotExists<UserDto>(columns, NewColumnName);
+        List<UserDto>? dtos = Database.Fetch<UserDto>();
+        if (dtos is null)
+        {
+            return;
+        }
 
+        MigrateExternalLogins(dtos);
     }
 
     private void MigrateSqlite()
@@ -81,7 +88,7 @@ public class AddGuidsToUsers : UnscopedMigrationBase
             UpdateDate = x.UpdateDate,
             Avatar = x.Avatar,
             TourData = x.TourData,
-        });
+        }).ToList();
 
         Delete.Table(Constants.DatabaseSchema.Tables.User).Do();
         Create.Table<UserDto>().Do();
@@ -89,6 +96,18 @@ public class AddGuidsToUsers : UnscopedMigrationBase
         foreach (UserDto user in users)
         {
             Database.Insert(Constants.DatabaseSchema.Tables.User, "id", false, user);
+        }
+
+        MigrateExternalLogins(users);
+    }
+
+    private void MigrateExternalLogins(IEnumerable<UserDto> userDtos)
+    {
+        foreach (UserDto userDto in userDtos)
+        {
+            // We have to get the old fake Guid to update it to the real one.
+            var idKey = userDto.Id.ToGuid();
+            Database.Update<ExternalLoginDto>("SET userOrMemberKey = @key WHERE userOrMemberKey = @id", new { key = userDto.Key, id = idKey });
         }
     }
 
