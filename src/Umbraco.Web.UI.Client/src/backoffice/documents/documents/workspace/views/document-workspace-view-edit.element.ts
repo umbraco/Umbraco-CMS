@@ -19,6 +19,9 @@ export class UmbDocumentWorkspaceViewEditElement extends UmbLitElement {
 		`,
 	];
 
+	//private _hasRootProperties = false;
+	private _hasRootGroups = false;
+
 	@state()
 	private _routes: IRoute[] = [];
 
@@ -62,10 +65,43 @@ export class UmbDocumentWorkspaceViewEditElement extends UmbLitElement {
 			},
 			'_observeTabs'
 		);
+
+		/*
+		Impleent this, when it becomes an option to have properties directly in the root of the document.
+		this.observe(
+			this._workspaceContext.rootPropertyStructures(),
+			(rootPropertyStructure) => {
+				console.log('rootPropertyStructure', rootPropertyStructure);
+				this._hasRootProperties = rootPropertyStructure.length > 0;
+				this._createRoutes();
+			},
+			'_observeTabs'
+		);
+		*/
+
+		this.observe(
+			this._workspaceContext.containersOfParentKey(null, 'Group'),
+			(rootGroups) => {
+				this._hasRootGroups = rootGroups.length > 0;
+				console.log('this._hasRootGroups', this._hasRootGroups);
+				this._createRoutes();
+			},
+			'_observeTabs'
+		);
 	}
 
 	private _createRoutes() {
 		const routes: any[] = [];
+
+		if (this._hasRootGroups) {
+			routes.push({
+				path: 'root',
+				component: () => import('./document-workspace-view-edit-tab.element'),
+				setup: (component: Promise<HTMLElement>) => {
+					(component as any).noTabName = true;
+				},
+			});
+		}
 
 		if (this._tabs.length > 0) {
 			this._tabs?.forEach((tab) => {
@@ -78,11 +114,14 @@ export class UmbDocumentWorkspaceViewEditElement extends UmbLitElement {
 					},
 				});
 			});
+		}
 
+		if (routes.length !== 0) {
 			routes.push({
 				path: '',
 				redirectTo: routes[0]?.path,
 			});
+
 			routes.push({
 				path: '**',
 				redirectTo: routes[0]?.path,
@@ -93,8 +132,16 @@ export class UmbDocumentWorkspaceViewEditElement extends UmbLitElement {
 	}
 
 	render() {
+		// TODO: add && this._tabs.length > 0
 		return html`
 			<uui-tab-group>
+				${this._hasRootGroups
+					? html`
+							<uui-tab label="Content" .active=${this._routerPath === this._activePath} href=${this._routerPath || ''}
+								>Content</uui-tab
+							>
+					  `
+					: ''}
 				${repeat(
 					this._tabs,
 					(tab) => tab.name,

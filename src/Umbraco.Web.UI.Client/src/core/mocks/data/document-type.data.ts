@@ -22,7 +22,7 @@ export const data: Array<DocumentTypeModel> = [
 		properties: [
 			{
 				key: '2',
-				containerKey: 'c3cd2f12-b7c4-4206-8d8b-27c061589f75',
+				containerKey: 'all-properties-group-key',
 				alias: 'colorPicker',
 				name: 'Color Picker',
 				description: '',
@@ -39,7 +39,7 @@ export const data: Array<DocumentTypeModel> = [
 			},
 			{
 				key: '3',
-				containerKey: 'c3cd2f12-b7c4-4206-8d8b-27c061589f75',
+				containerKey: 'all-properties-group-key',
 				alias: 'contentPicker',
 				name: 'Content Picker',
 				description: '',
@@ -56,7 +56,7 @@ export const data: Array<DocumentTypeModel> = [
 			},
 			{
 				key: '4',
-				containerKey: 'c3cd2f12-b7c4-4206-8d8b-27c061589f75',
+				containerKey: 'all-properties-group-key',
 				alias: 'eyeDropper',
 				name: 'Eye Dropper',
 				description: '',
@@ -73,7 +73,7 @@ export const data: Array<DocumentTypeModel> = [
 			},
 			{
 				key: '5',
-				containerKey: 'c3cd2f12-b7c4-4206-8d8b-27c061589f75',
+				containerKey: 'all-properties-group-key',
 				alias: 'multiUrlPicker',
 				name: 'Multi URL Picker',
 				description: '',
@@ -90,7 +90,7 @@ export const data: Array<DocumentTypeModel> = [
 			},
 			{
 				key: '6',
-				containerKey: 'c3cd2f12-b7c4-4206-8d8b-27c061589f75',
+				containerKey: 'all-properties-group-key',
 				alias: 'multiNodeTreePicker',
 				name: 'Multi Node Tree Picker',
 				description: '',
@@ -107,7 +107,7 @@ export const data: Array<DocumentTypeModel> = [
 			},
 			{
 				key: '7',
-				containerKey: 'c3cd2f12-b7c4-4206-8d8b-27c061589f75',
+				containerKey: 'all-properties-group-key',
 				alias: 'datePicker',
 				name: 'Date Picker',
 				description: '',
@@ -124,7 +124,7 @@ export const data: Array<DocumentTypeModel> = [
 			},
 			{
 				key: '8',
-				containerKey: 'c3cd2f12-b7c4-4206-8d8b-27c061589f75',
+				containerKey: 'all-properties-group-key',
 				alias: 'email',
 				name: 'Email',
 				description: '',
@@ -141,7 +141,7 @@ export const data: Array<DocumentTypeModel> = [
 			},
 			{
 				key: '9',
-				containerKey: 'c3cd2f12-b7c4-4206-8d8b-27c061589f75',
+				containerKey: 'all-properties-group-key',
 				alias: 'textBox',
 				name: 'Text Box',
 				description: '',
@@ -158,7 +158,7 @@ export const data: Array<DocumentTypeModel> = [
 			},
 			{
 				key: '19',
-				containerKey: 'c3cd2f12-b7c4-4206-8d8b-27c061589f75',
+				containerKey: 'all-properties-group-key',
 				alias: 'dropdown',
 				name: 'Dropdown',
 				description: '',
@@ -175,7 +175,7 @@ export const data: Array<DocumentTypeModel> = [
 			},
 			{
 				key: '11',
-				containerKey: 'c3cd2f12-b7c4-4206-8d8b-27c061589f75',
+				containerKey: 'all-properties-group-key',
 				alias: 'textArea',
 				name: 'Text Area',
 				description: '',
@@ -192,7 +192,7 @@ export const data: Array<DocumentTypeModel> = [
 			},
 			{
 				key: '12',
-				containerKey: 'c3cd2f12-b7c4-4206-8d8b-27c061589f75',
+				containerKey: 'all-properties-group-key',
 				alias: 'slider',
 				name: 'Slider',
 				description: '',
@@ -209,7 +209,7 @@ export const data: Array<DocumentTypeModel> = [
 			},
 			{
 				key: '13',
-				containerKey: 'c3cd2f12-b7c4-4206-8d8b-27c061589f75',
+				containerKey: 'all-properties-group-key',
 				alias: 'toggle',
 				name: 'Toggle',
 				description: '',
@@ -226,7 +226,7 @@ export const data: Array<DocumentTypeModel> = [
 			},
 			{
 				key: '14',
-				containerKey: 'c3cd2f12-b7c4-4206-8d8b-27c061589f75',
+				containerKey: 'all-properties-group-key',
 				alias: 'tags',
 				name: 'Tags',
 				description: '',
@@ -243,7 +243,7 @@ export const data: Array<DocumentTypeModel> = [
 			},
 			{
 				key: '15',
-				containerKey: 'c3cd2f12-b7c4-4206-8d8b-27c061589f75',
+				containerKey: 'all-properties-group-key',
 				alias: 'markdownEditor',
 				name: 'MarkdownEditor',
 				description: '',
@@ -260,7 +260,7 @@ export const data: Array<DocumentTypeModel> = [
 			},
 			{
 				key: '16',
-				containerKey: 'c3cd2f12-b7c4-4206-8d8b-27c061589f75',
+				containerKey: 'all-properties-group-key',
 				alias: 'radioButtonList',
 				name: 'Radio Button List',
 				description: '',
@@ -277,7 +277,7 @@ export const data: Array<DocumentTypeModel> = [
 			},
 			{
 				key: '17',
-				containerKey: 'c3cd2f12-b7c4-4206-8d8b-27c061589f75',
+				containerKey: 'all-properties-group-key',
 				alias: 'checkboxList',
 				name: 'Checkbox List',
 				description: '',
@@ -294,7 +294,7 @@ export const data: Array<DocumentTypeModel> = [
 			},
 			{
 				key: '18',
-				containerKey: 'c3cd2f12-b7c4-4206-8d8b-27c061589f75',
+				containerKey: 'all-properties-group-key',
 				alias: 'blockList',
 				name: 'Block List',
 				description: '',
@@ -311,7 +311,7 @@ export const data: Array<DocumentTypeModel> = [
 			},
 			{
 				key: '19',
-				containerKey: 'c3cd2f12-b7c4-4206-8d8b-27c061589f75',
+				containerKey: 'all-properties-group-key',
 				alias: 'mediaPicker',
 				name: 'Media Picker',
 				description: '',
@@ -328,7 +328,7 @@ export const data: Array<DocumentTypeModel> = [
 			},
 			{
 				key: '20',
-				containerKey: 'c3cd2f12-b7c4-4206-8d8b-27c061589f75',
+				containerKey: 'all-properties-group-key',
 				alias: 'imageCropper',
 				name: 'Image Cropper',
 				description: '',
@@ -345,7 +345,7 @@ export const data: Array<DocumentTypeModel> = [
 			},
 			{
 				key: '21',
-				containerKey: 'c3cd2f12-b7c4-4206-8d8b-27c061589f75',
+				containerKey: 'all-properties-group-key',
 				alias: 'uploadField',
 				name: 'Upload Field',
 				description: '',
@@ -362,7 +362,7 @@ export const data: Array<DocumentTypeModel> = [
 			},
 			{
 				key: '22',
-				containerKey: 'c3cd2f12-b7c4-4206-8d8b-27c061589f75',
+				containerKey: 'all-properties-group-key',
 				alias: 'blockGrid',
 				name: 'Block Grid',
 				description: '',
@@ -379,7 +379,7 @@ export const data: Array<DocumentTypeModel> = [
 			},
 			{
 				key: '23',
-				containerKey: 'c3cd2f12-b7c4-4206-8d8b-27c061589f75',
+				containerKey: 'all-properties-group-key',
 				alias: 'blockGrid',
 				name: 'Icon Picker',
 				description: '',
@@ -396,7 +396,7 @@ export const data: Array<DocumentTypeModel> = [
 			},
 			{
 				key: '24',
-				containerKey: 'c3cd2f12-b7c4-4206-8d8b-27c061589f75',
+				containerKey: 'all-properties-group-key',
 				alias: 'numberRange',
 				name: 'Number Range',
 				description: '',
@@ -413,7 +413,7 @@ export const data: Array<DocumentTypeModel> = [
 			},
 			{
 				key: '25',
-				containerKey: 'c3cd2f12-b7c4-4206-8d8b-27c061589f75',
+				containerKey: 'all-properties-group-key',
 				alias: 'orderDirection',
 				name: 'Order Direction',
 				description: '',
@@ -430,7 +430,7 @@ export const data: Array<DocumentTypeModel> = [
 			},
 			{
 				key: '26',
-				containerKey: 'c3cd2f12-b7c4-4206-8d8b-27c061589f75',
+				containerKey: 'all-properties-group-key',
 				alias: 'overlaySize',
 				name: 'Overlay Size',
 				description: '',
@@ -447,7 +447,7 @@ export const data: Array<DocumentTypeModel> = [
 			},
 			{
 				key: '27',
-				containerKey: 'c3cd2f12-b7c4-4206-8d8b-27c061589f75',
+				containerKey: 'all-properties-group-key',
 				alias: 'label',
 				name: 'Label',
 				description: '',
@@ -464,7 +464,7 @@ export const data: Array<DocumentTypeModel> = [
 			},
 			{
 				key: '28',
-				containerKey: 'c3cd2f12-b7c4-4206-8d8b-27c061589f75',
+				containerKey: 'all-properties-group-key',
 				alias: 'integer',
 				name: 'Integer',
 				description: '',
@@ -481,7 +481,7 @@ export const data: Array<DocumentTypeModel> = [
 			},
 			{
 				key: '29',
-				containerKey: 'c3cd2f12-b7c4-4206-8d8b-27c061589f75',
+				containerKey: 'all-properties-group-key',
 				alias: 'decimal',
 				name: 'Decimal',
 				description: '',
@@ -498,7 +498,7 @@ export const data: Array<DocumentTypeModel> = [
 			},
 			{
 				key: '30',
-				containerKey: 'c3cd2f12-b7c4-4206-8d8b-27c061589f75',
+				containerKey: 'all-properties-group-key',
 				alias: 'memberPicker',
 				name: 'Member Picker',
 				description: '',
@@ -515,7 +515,7 @@ export const data: Array<DocumentTypeModel> = [
 			},
 			{
 				key: '31',
-				containerKey: 'c3cd2f12-b7c4-4206-8d8b-27c061589f75',
+				containerKey: 'all-properties-group-key',
 				alias: 'memberGroupPicker',
 				name: 'Member Group Picker',
 				description: '',
@@ -532,7 +532,7 @@ export const data: Array<DocumentTypeModel> = [
 			},
 			{
 				key: '32',
-				containerKey: 'c3cd2f12-b7c4-4206-8d8b-27c061589f75',
+				containerKey: 'all-properties-group-key',
 				alias: 'userPicker',
 				name: 'User Picker',
 				description: '',
@@ -550,7 +550,7 @@ export const data: Array<DocumentTypeModel> = [
 		],
 		containers: [
 			{
-				key: 'c3cd2f12-b7c4-4206-8d8b-27c061589f75',
+				key: 'all-properties-group-key',
 				parentKey: null,
 				name: 'Content',
 				type: 'Group',
@@ -652,7 +652,7 @@ export const data: Array<DocumentTypeModel> = [
 			{
 				key: 'c3cd2f12-b7c4-4206-8d8b-27c061589f75',
 				parentKey: null,
-				name: 'Content',
+				name: 'Content-group',
 				type: 'Group',
 				sortOrder: 0,
 			},
@@ -783,7 +783,7 @@ export const data: Array<DocumentTypeModel> = [
 			{
 				key: '1e845ca8-1e3e-4b03-be1d-0b4149ce2129',
 				parentKey: null,
-				name: 'Content',
+				name: 'Content-group',
 				type: 'Group',
 				sortOrder: 0,
 			},

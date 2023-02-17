@@ -190,7 +190,10 @@ export class UmbDocumentWorkspaceContext
 		);
 	}
 
-	propertyStructuresOf(containerKey: string) {
+	rootPropertyStructures() {
+		return this.propertyStructuresOf(null);
+	}
+	propertyStructuresOf(containerKey: string | null) {
 		return this.#documentTypes.getObservablePart((docTypes) => {
 			const props: DocumentTypePropertyTypeModel[] = [];
 			docTypes.forEach((docType) => {

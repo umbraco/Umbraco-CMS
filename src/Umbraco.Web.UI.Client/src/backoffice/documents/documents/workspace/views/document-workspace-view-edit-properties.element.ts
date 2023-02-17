@@ -62,13 +62,10 @@ export class UmbDocumentWorkspaceViewEditPropertiesElement extends UmbLitElement
 	private _observeGroupContainers() {
 		if (!this._workspaceContext || !this._containerName || !this._containerType) return;
 
-		console.log('_observeGroupContainers', this._containerName, this._containerType);
-
 		// TODO: Should be no need to update this observable if its already there.
 		this.observe(
 			this._workspaceContext!.containersByNameAndType(this._containerName, this._containerType),
 			(groupContainers) => {
-				console.log('groupContainers', groupContainers);
 				this._groupContainers = groupContainers || [];
 				groupContainers.forEach((group) => {
 					if (group.key) {
@@ -88,9 +85,8 @@ export class UmbDocumentWorkspaceViewEditPropertiesElement extends UmbLitElement
 		this.observe(
 			this._workspaceContext.propertyStructuresOf(group.key),
 			(properties) => {
-				console.log('_observePropertyStructureOfGroup', group.name, group.key, properties);
 				// If this need to be able to remove properties, we need to clean out the ones of this group.key before inserting them:
-				//this._propertyStructure = this._propertyStructure.filter((x) => x.containerKey !== group.key);
+				this._propertyStructure = this._propertyStructure.filter((x) => x.containerKey !== group.key);
 
 				properties?.forEach((property) => {
 					if (!this._propertyStructure.find((x) => x.alias === property.alias)) {
@@ -98,6 +94,11 @@ export class UmbDocumentWorkspaceViewEditPropertiesElement extends UmbLitElement
 						this._observePropertyValueOfAlias(property.alias!);
 					}
 				});
+
+				if (this._propertyStructure.length > 0) {
+					// TODO: Missing sort order?
+					//this._propertyStructure.sort((a, b) => (a.sortOrder || 0) - (b.sortOrder || 0));
+				}
 			},
 			'_observePropertyStructureOfGroup' + group.key
 		);

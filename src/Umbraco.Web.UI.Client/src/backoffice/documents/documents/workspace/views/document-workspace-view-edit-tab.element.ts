@@ -37,19 +37,29 @@ export class UmbDocumentWorkspaceViewEditTabElement extends UmbLitElement {
 		this.requestUpdate('tabName', oldValue);
 	}
 
+	private _noTabName = false;
+
+	@property({ type: Boolean })
+	public get noTabName(): boolean {
+		return this._noTabName;
+	}
+	public set noTabName(value: boolean) {
+		console.log('noTabName', value);
+		const oldValue = this._noTabName;
+		if (oldValue === value) return;
+		this._noTabName = value;
+		if (this._noTabName) {
+			this._tabName = undefined;
+		}
+		this._observeTabContainers();
+		this.requestUpdate('noTabName', oldValue);
+	}
+
 	@state()
 	_tabContainers: PropertyTypeContainerViewModelBaseModel[] = [];
 
 	@state()
-	_groupContainersMap: Map<string, Array<PropertyTypeContainerViewModelBaseModel>> = new Map();
-
-	@state()
-	_propertyStructure: DocumentPropertyModel[] = [];
-
-	@state()
-	_propertyValues: DocumentPropertyModel[] = [];
-
-	//_propertiesObservables: Map<string, unknown> = new Map();
+	_groups: Array<PropertyTypeContainerViewModelBaseModel> = [];
 
 	private _workspaceContext?: UmbDocumentWorkspaceContext;
 
@@ -64,16 +74,24 @@ export class UmbDocumentWorkspaceViewEditTabElement extends UmbLitElement {
 	}
 
 	private _observeTabContainers() {
-		if (!this._workspaceContext || !this._tabName) return;
+		if (!this._workspaceContext) return;
 
-		this.observe(
-			this._workspaceContext.containersByNameAndType(this._tabName, 'Tab'),
-			(tabContainers) => {
-				this._tabContainers = tabContainers || [];
-				this._observeGroups();
-			},
-			'_observeTabContainers'
-		);
+		if (this._tabName) {
+			this._groups = [];
+			this.observe(
+				this._workspaceContext.containersByNameAndType(this._tabName, 'Tab'),
+				(tabContainers) => {
+					this._tabContainers = tabContainers || [];
+					if (this._tabContainers.length > 0) {
+						this._observeGroups();
+					}
+				},
+				'_observeTabContainers'
+			);
+		} else if (this._noTabName) {
+			this._groups = [];
+			this._observeRootGroups();
+		}
 	}
 
 	private _observeGroups() {
@@ -82,27 +100,32 @@ export class UmbDocumentWorkspaceViewEditTabElement extends UmbLitElement {
 		this._tabContainers.forEach((container) => {
 			this.observe(
 				this._workspaceContext!.containersOfParentKey(container.key, 'Group'),
-				(groupContainers) => {
-					groupContainers.forEach((group) => {
-						if (group.name) {
-							let groups: PropertyTypeContainerViewModelBaseModel[];
-							if (!this._groupContainersMap.has(group.name)) {
-								groups = [];
-								this._groupContainersMap.set(group.name, groups);
-							} else {
-								groups = this._groupContainersMap.get(group.name)!;
-							}
-							groups.push(group);
-						}
-					});
-				},
+				this._insertGroupContainers,
 				'_observeGroupsOf_' + container.key
 			);
 		});
 	}
 
+	private _observeRootGroups() {
+		if (!this._workspaceContext || !this._noTabName) return;
+
+		// This is where we potentially could observe root properties as well.
+		this.observe(this._workspaceContext!.rootContainers('Group'), this._insertGroupContainers, '_observeRootGroups');
+	}
+
+	private _insertGroupContainers = (groupContainers: PropertyTypeContainerViewModelBaseModel[]) => {
+		groupContainers.forEach((group) => {
+			if (group.name) {
+				if (!this._groups.find((x) => x.name === group.name)) {
+					this._groups.push(group);
+					this._groups.sort((a, b) => (a.sortOrder || 0) - (b.sortOrder || 0));
+				}
+			}
+		});
+	};
+
 	render() {
-		// TODO: only show tab properties if there was any. We need some event to tell us when the properties is empty.
+		// TODO: only show tab properties if there was any. We need some event? to tell us when the properties is empty.
 		return html`
 			<uui-box>
 				<umb-document-workspace-view-edit-properties
@@ -110,12 +133,12 @@ export class UmbDocumentWorkspaceViewEditTabElement extends UmbLitElement {
 					container-name=${this.tabName || ''}></umb-document-workspace-view-edit-properties>
 			</uui-box>
 			${repeat(
-				this._groupContainersMap,
-				(mapEntry) => mapEntry[0],
-				(mapEntry) => html`<uui-box .headline=${mapEntry[0]}>
+				this._groups,
+				(group) => group.name,
+				(group) => html`<uui-box .headline=${group.name || ''}>
 					<umb-document-workspace-view-edit-properties
 						container-type="Group"
-						container-name=${mapEntry[0]}></umb-document-workspace-view-edit-properties>
+						container-name=${group.name || ''}></umb-document-workspace-view-edit-properties>
 				</uui-box>`
 			)}
 		`;
