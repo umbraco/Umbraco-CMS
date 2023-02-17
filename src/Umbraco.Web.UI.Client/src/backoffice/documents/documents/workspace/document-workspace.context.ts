@@ -195,16 +195,25 @@ export class UmbDocumentWorkspaceContext
 		});
 	}
 
-	containerByKey(key: DocumentTypePropertyTypeContainerModel['key']) {
-		return this.#containers.getObservablePart((data) => {
-			return data.filter((x) => x.key === key);
-		});
-	}
-
-	containersOf(parentKey: DocumentTypePropertyTypeContainerModel['parentKey'], containerType: 'Group' | 'Tab') {
+	containersOfParentKey(
+		parentKey: DocumentTypePropertyTypeContainerModel['parentKey'],
+		containerType: 'Group' | 'Tab'
+	) {
 		return this.#containers.getObservablePart((data) => {
 			console.log(data, parentKey, containerType);
 			return data.filter((x) => x.parentKey === parentKey && x.type === containerType);
+		});
+	}
+
+	containersByNameAndType(name: string, containerType: 'Group' | 'Tab') {
+		return this.#containers.getObservablePart((data) => {
+			return data.filter((x) => x.name === name && x.type === containerType);
+		});
+	}
+
+	containerByKey(key: DocumentTypePropertyTypeContainerModel['key']) {
+		return this.#containers.getObservablePart((data) => {
+			return data.filter((x) => x.key === key);
 		});
 	}
 

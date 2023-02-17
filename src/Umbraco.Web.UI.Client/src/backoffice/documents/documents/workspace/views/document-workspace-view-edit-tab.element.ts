@@ -27,16 +27,22 @@ export class UmbDocumentWorkspaceViewEditTabElement extends UmbLitElement {
 	public set tabName(value: string | undefined) {
 		if (this._tabName === value) return;
 		this._tabName = value;
-		this._observeContainers();
+		this._observeTabContainers();
 	}
 
 	@state()
-	_propertyData: DocumentPropertyModel[] = [];
+	_tabContainers: PropertyTypeContainerViewModelBaseModel[] = [];
 
 	@state()
-	_groups: PropertyTypeContainerViewModelBaseModel[] = [];
+	_groupContainersMap: Map<string, Array<PropertyTypeContainerViewModelBaseModel>> = new Map();
 
-	_propertiesObservables: Map<string, unknown> = new Map();
+	@state()
+	_propertyStructure: DocumentPropertyModel[] = [];
+
+	@state()
+	_propertyValue: DocumentPropertyModel[] = [];
+
+	//_propertiesObservables: Map<string, unknown> = new Map();
 
 	private _workspaceContext?: UmbDocumentWorkspaceContext;
 
@@ -46,84 +52,81 @@ export class UmbDocumentWorkspaceViewEditTabElement extends UmbLitElement {
 		// TODO: Figure out how to get the magic string for the workspace context.
 		this.consumeContext<UmbDocumentWorkspaceContext>('umbWorkspaceContext', (workspaceContext) => {
 			this._workspaceContext = workspaceContext;
-			this._observeContainers();
-			//this._observeContent();
+			this._observeTabContainers();
 		});
 	}
 
-	private _observeProperties() {
-		if (!this._workspaceContext) return;
+	private _observeTabContainers() {
+		if (!this._workspaceContext || !this.tabName) return;
 
-		/*
-		Just get the properties for the current containers. (and eventually variants later)
-		*/
 		this.observe(
-			this._workspaceContext.propertyValuesOf(null, null),
-			(properties) => {
-				this._propertyData = properties || [];
-				//this._data = content?.data || [];
-
-				/*
-				Maybe we should not give the value(Data), but the umb-content-property should get the context and observe its own data.
-				This would become a more specific Observer therefor better performance?.. Note to self: Debate with Mads how he sees this perspective.
-				*/
+			this._workspaceContext.containersByNameAndType(this.tabName, 'Tab'),
+			(tabContainers) => {
+				this._tabContainers = tabContainers || [];
+				this._observeGroups();
 			},
-			'observeWorkspaceContextData'
+			'_observeTabContainers'
 		);
 	}
 
-	private _observeContainers() {
-		if (!this._workspaceContext) return;
+	private _observeGroups() {
+		if (!this._workspaceContext || !this.tabName) return;
 
-		this.observe(
-			this._workspaceContext.containersOf(this.tabName, 'Group'),
-			(groups) => {
-				this._groups = groups || [];
-			},
-			'observeWorkspaceContextData'
-		);
+		this._tabContainers.forEach((container) => {
+			this.observe(
+				this._workspaceContext!.containersOfParentKey(container.key, 'Group'),
+				(groupContainers) => {
+					groupContainers.forEach((group) => {
+						if (group.name) {
+							let groups: PropertyTypeContainerViewModelBaseModel[];
+							if (!this._groupContainersMap.has(group.name)) {
+								groups = [];
+								this._groupContainersMap.set(group.name, groups);
+							} else {
+								groups = this._groupContainersMap.get(group.name)!;
+							}
+							groups.push(group);
+							// Gather property aliases of this group, by group key.
+							this._observePropertyStructureOfGroup(group);
+						}
+					});
+				},
+				'_observeGroupsOf_' + container.key
+			);
+		});
 	}
 
-	private _getPropertiesOfGroup(group: PropertyTypeContainerViewModelBaseModel) {
-		if (!this._workspaceContext) return undefined;
+	private _observePropertyStructureOfGroup(group: PropertyTypeContainerViewModelBaseModel) {
+		if (!this._workspaceContext || !group.key) return undefined;
 
 		this.observe(
-			this._workspaceContext.propertyValuesOf(null, null),
+			this._workspaceContext.propertyStructuresOf(group.key),
 			(properties) => {
-				this._propertyData = properties || [];
-				//this._data = content?.data || [];
-
-				/*
-				Maybe we should not give the value(Data), but the umb-content-property should get the context and observe its own data.
-				This would become a more specific Observer therefor better performance?.. Note to self: Debate with Mads how he sees this perspective.
-				*/
+				this._propertyStructure = properties || [];
 			},
-			'observeWorkspaceContextData'
+			'_observePropertyStructureOfGroup' + group.key
 		);
 
 		// cache observable
 	}
 
 	render() {
-		return 'hello worlds' + this._tabName;
-		/*repeat(
-					this._groups,
-					(group) => group.key,
-					(group) =>
-						html`
-							<uui-box>
+		return repeat(
+			this._groupContainersMap,
+			(mapEntry) => mapEntry[0],
+			(mapEntry) => html` <uui-box>${mapEntry[0]}</uui-box> `
+		);
+
+		/*
 								${repeat(
-									this._getPropertiesOfGroup(group),
+									this._propertyStructure.filter((property) => property.groupKey === group.key,
 									(property) => property.alias,
 									(property) =>
 										html`<umb-content-property
 											.property=${property}
-											.value=${this._propertyData.find((x) => x.alias === property.alias)?.value}></umb-content-property> `
+											.value=${this._propertyValue.find((x) => x.alias === property.alias)?.value}></umb-content-property> `
 								)}
-							</uui-box>
-						`
-					)
-		);*/
+								*/
 	}
 }
 

@@ -48,13 +48,13 @@ export class UmbDocumentWorkspaceViewEditElement extends UmbLitElement {
 		if (!this._workspaceContext) return;
 
 		this.observe(
-			this._workspaceContext.containersOf(null, 'Tab'),
+			this._workspaceContext.containersOfParentKey(null, 'Tab'),
 			(tabs) => {
 				// TODO: make tabs unique based on name.
 				this._tabs = tabs || [];
 				this._createRoutes();
 			},
-			'observeWorkspaceContextData'
+			'_observeTabs'
 		);
 	}
 
