@@ -19,7 +19,7 @@ public class ByKeyRelationTypeController : RelationTypeControllerBase
         _mapper = mapper;
     }
 
-    [HttpGet("ByKey")]
+    [HttpGet("{key:guid}")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(TelemetryViewModel), StatusCodes.Status200OK)]
     public async Task<RelationTypeViewModel> ByKey(Guid key)
