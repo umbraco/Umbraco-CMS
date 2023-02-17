@@ -58,7 +58,6 @@ using Umbraco.Cms.Infrastructure.Serialization;
 using Umbraco.Cms.Infrastructure.Services.Implement;
 using Umbraco.Extensions;
 using IScopeProvider = Umbraco.Cms.Infrastructure.Scoping.IScopeProvider;
-using PropertyMapper = Umbraco.Cms.Core.ContentApi.PropertyMapper;
 
 namespace Umbraco.Cms.Infrastructure.DependencyInjection;
 
@@ -222,12 +221,11 @@ public static partial class UmbracoBuilderExtensions
 
         builder.Services.AddTransient<IFireAndForgetRunner, FireAndForgetRunner>();
 
-        builder.Services.AddSingleton<IPropertyMapper, PropertyMapper>();
         builder.Services.AddSingleton<IApiElementBuilder, ApiElementBuilder>();
         builder.Services.AddSingleton<IApiContentBuilder, ApiContentBuilder>();
         builder.Services.AddSingleton<IApiMediaBuilder, ApiMediaBuilder>();
         builder.Services.AddSingleton<IPublishedContentNameProvider, PublishedContentNameProvider>();
-        builder.Services.AddSingleton<IOutputExpansionStrategy, DefaultOutputExpansionStrategy>();
+        builder.Services.AddSingleton<IOutputExpansionStrategyAccessor, DefaultOutputExpansionStrategyAccessor>();
 
         return builder;
     }

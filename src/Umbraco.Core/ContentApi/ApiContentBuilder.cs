@@ -6,23 +6,31 @@ namespace Umbraco.Cms.Core.ContentApi;
 
 public class ApiContentBuilder : IApiContentBuilder
 {
-    private readonly IPropertyMapper _propertyMapper;
     private readonly IPublishedContentNameProvider _publishedContentNameProvider;
     private readonly IPublishedUrlProvider _publishedUrlProvider;
+    private readonly IOutputExpansionStrategyAccessor _outputExpansionStrategyAccessor;
 
-    public ApiContentBuilder(IPropertyMapper propertyMapper, IPublishedContentNameProvider publishedContentNameProvider, IPublishedUrlProvider publishedUrlProvider)
+    public ApiContentBuilder(IPublishedContentNameProvider publishedContentNameProvider, IPublishedUrlProvider publishedUrlProvider, IOutputExpansionStrategyAccessor outputExpansionStrategyAccessor)
     {
-        _propertyMapper = propertyMapper;
         _publishedContentNameProvider = publishedContentNameProvider;
         _publishedUrlProvider = publishedUrlProvider;
+        _outputExpansionStrategyAccessor = outputExpansionStrategyAccessor;
     }
 
-    public IApiContent Build(IPublishedContent content, bool expand = true) => new ApiContent(
-        content.Key,
-        _publishedContentNameProvider.GetName(content),
-        content.ContentType.Alias,
-        Url(content),
-        expand ? _propertyMapper.Map(content) : new Dictionary<string, object?>());
+    public IApiContent Build(IPublishedContent content)
+    {
+        IDictionary<string, object?> properties =
+            _outputExpansionStrategyAccessor.TryGetValue(out IOutputExpansionStrategy? outputExpansionStrategy)
+                ? outputExpansionStrategy.MapContentProperties(content)
+                : new Dictionary<string, object?>();
+
+        return new ApiContent(
+            content.Key,
+            _publishedContentNameProvider.GetName(content),
+            content.ContentType.Alias,
+            Url(content),
+            properties);
+    }
 
     private string Url(IPublishedContent content)
         => content.ItemType == PublishedItemType.Content

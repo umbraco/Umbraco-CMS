@@ -23,10 +23,10 @@ public class MediaPickerWithCropsValueConverterTests : PropertyValueConverterTes
             publishedValueFallback,
             serializer,
             new ApiMediaBuilder(
-                new PropertyMapper(),
                 new PublishedContentNameProvider(),
                 PublishedUrlProvider,
-                publishedValueFallback));
+                publishedValueFallback,
+                CreateOutputExpansionStrategyAccessor()));
     }
 
     [Test]
@@ -248,7 +248,7 @@ public class MediaPickerWithCropsValueConverterTests : PropertyValueConverterTes
             property.SetupGet(p => p.Alias).Returns(alias);
             property.Setup(p => p.HasValue(It.IsAny<string?>(), It.IsAny<string?>())).Returns(true);
             property.Setup(p => p.GetValue(It.IsAny<string?>(), It.IsAny<string?>())).Returns(value);
-            property.Setup(p => p.GetContentApiValue(It.IsAny<string?>(), It.IsAny<string?>())).Returns(value);
+            property.Setup(p => p.GetContentApiValue(It.IsAny<bool>(), It.IsAny<string?>(), It.IsAny<string?>())).Returns(value);
             media.Setup(m => m.GetProperty(alias)).Returns(property.Object);
             mediaProperties.Add(property.Object);
         }

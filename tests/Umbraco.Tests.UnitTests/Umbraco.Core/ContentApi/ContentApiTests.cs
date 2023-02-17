@@ -1,6 +1,6 @@
-using System;
 using Moq;
 using NUnit.Framework;
+using Umbraco.Cms.Core.ContentApi;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PropertyEditors;
@@ -10,32 +10,32 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.ContentApi;
 
 public class ContentApiTests
 {
-    protected Mock<IContentApiPropertyValueConverter> ContentApiPropertyValueConverter { get; private set; }
     protected IPublishedPropertyType ContentApiPropertyType { get; private set; }
+
     protected IPublishedPropertyType DefaultPropertyType { get; private set; }
 
     [SetUp]
     public virtual void Setup()
     {
-        ContentApiPropertyValueConverter = new Mock<IContentApiPropertyValueConverter>();
-        ContentApiPropertyValueConverter.Setup(p => p.ConvertIntermediateToContentApiObject(
+        var contentApiPropertyValueConverter = new Mock<IContentApiPropertyValueConverter>();
+        contentApiPropertyValueConverter.Setup(p => p.ConvertIntermediateToContentApiObject(
             It.IsAny<IPublishedElement>(),
             It.IsAny<IPublishedPropertyType>(),
             It.IsAny<PropertyCacheLevel>(),
             It.IsAny<object?>(),
             It.IsAny<bool>())
         ).Returns("Content API value");
-        ContentApiPropertyValueConverter.Setup(p => p.ConvertIntermediateToObject(
+        contentApiPropertyValueConverter.Setup(p => p.ConvertIntermediateToObject(
             It.IsAny<IPublishedElement>(),
             It.IsAny<IPublishedPropertyType>(),
             It.IsAny<PropertyCacheLevel>(),
             It.IsAny<object?>(),
             It.IsAny<bool>())
         ).Returns("Default value");
-        ContentApiPropertyValueConverter.Setup(p => p.IsConverter(It.IsAny<IPublishedPropertyType>())).Returns(true);
-        ContentApiPropertyValueConverter.Setup(p => p.GetPropertyCacheLevel(It.IsAny<IPublishedPropertyType>())).Returns(PropertyCacheLevel.None);
+        contentApiPropertyValueConverter.Setup(p => p.IsConverter(It.IsAny<IPublishedPropertyType>())).Returns(true);
+        contentApiPropertyValueConverter.Setup(p => p.GetPropertyCacheLevel(It.IsAny<IPublishedPropertyType>())).Returns(PropertyCacheLevel.None);
 
-        ContentApiPropertyType = SetupPublishedPropertyType(ContentApiPropertyValueConverter.Object, "contentApi");
+        ContentApiPropertyType = SetupPublishedPropertyType(contentApiPropertyValueConverter.Object, "contentApi", "Content.Api.Editor");
 
         var defaultPropertyValueConverter = new Mock<IPropertyValueConverter>();
         defaultPropertyValueConverter.Setup(p => p.ConvertIntermediateToObject(
@@ -48,17 +48,17 @@ public class ContentApiTests
         defaultPropertyValueConverter.Setup(p => p.IsConverter(It.IsAny<IPublishedPropertyType>())).Returns(true);
         defaultPropertyValueConverter.Setup(p => p.GetPropertyCacheLevel(It.IsAny<IPublishedPropertyType>())).Returns(PropertyCacheLevel.None);
 
-        DefaultPropertyType = SetupPublishedPropertyType(defaultPropertyValueConverter.Object, "default");
+        DefaultPropertyType = SetupPublishedPropertyType(defaultPropertyValueConverter.Object, "default", "Default.Editor");
     }
 
-    private IPublishedPropertyType SetupPublishedPropertyType(IPropertyValueConverter valueConverter, string alias)
+    protected IPublishedPropertyType SetupPublishedPropertyType(IPropertyValueConverter valueConverter, string propertyTypeAlias, string editorAlias)
     {
         var mockPublishedContentTypeFactory = new Mock<IPublishedContentTypeFactory>();
         mockPublishedContentTypeFactory.Setup(x => x.GetDataType(It.IsAny<int>()))
-            .Returns(new PublishedDataType(123, "test", new Lazy<object>()));
+            .Returns(new PublishedDataType(123, editorAlias, new Lazy<object>()));
 
         var publishedPropType = new PublishedPropertyType(
-            alias,
+            propertyTypeAlias,
             123,
             true,
             ContentVariation.Nothing,
@@ -68,4 +68,6 @@ public class ContentApiTests
 
         return publishedPropType;
     }
+
+    protected IOutputExpansionStrategyAccessor CreateOutputExpansionStrategyAccessor() => new DefaultOutputExpansionStrategyAccessor();
 }

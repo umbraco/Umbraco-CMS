@@ -119,9 +119,11 @@ public class BlockListPropertyValueConverter : BlockPropertyValueConverterBase<B
 
         return new ApiBlockListModel(
             model != null
-                ? model.Select(item => new ApiBlockItem(
-                    _apiElementBuilder.Build(item.Content),
-                    item.Settings != null ? _apiElementBuilder.Build(item.Settings) : null))
+                ? model
+                    .Select(item => new ApiBlockItem(
+                        _apiElementBuilder.Build(item.Content),
+                        item.Settings != null ? _apiElementBuilder.Build(item.Settings) : null))
+                    .ToArray()
                 : Array.Empty<ApiBlockItem>());
     }
 
