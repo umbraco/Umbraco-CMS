@@ -15,7 +15,6 @@ export class UmbDocumentWorkspaceViewEditElement extends UmbLitElement {
 		css`
 			:host {
 				display: block;
-				margin: var(--uui-size-layout-1);
 			}
 		`,
 	];
