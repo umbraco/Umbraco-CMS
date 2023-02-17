@@ -19,7 +19,7 @@ public class UpdateRelationTypeController : RelationTypeControllerBase
         _umbracoMapper = umbracoMapper;
     }
 
-    [HttpPut("update")]
+    [HttpPut("{key:guid}")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(RelationTypeViewModel), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]

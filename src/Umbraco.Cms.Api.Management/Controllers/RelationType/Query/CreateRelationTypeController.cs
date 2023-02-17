@@ -18,7 +18,7 @@ public class CreateRelationTypeController : RelationTypeControllerBase
         _relationTypeViewModelFactory = relationTypeViewModelFactory;
     }
 
-    [HttpPost("create")]
+    [HttpPost]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(StatusCodes.Status201Created)]
     public async Task<IActionResult> Create(RelationTypeSavingViewModel relationTypeSavingViewModel)
