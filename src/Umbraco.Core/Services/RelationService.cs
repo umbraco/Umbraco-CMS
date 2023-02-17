@@ -6,6 +6,7 @@ using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Scoping;
+using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Extensions;
 using Umbraco.New.Cms.Core.Models;
 
@@ -240,19 +241,21 @@ public class RelationService : RepositoryService, IRelationService
         }
     }
 
-    public async Task<PagedModel<IRelation>> GetPagedByRelationTypeId(Guid key, long pageIndex, int pageSize, Ordering? ordering = null)
+    public async Task<Attempt<PagedModel<IRelation>, RelationOperationStatus>> GetPagedByRelationTypeId(Guid key, int skip, int take, Ordering? ordering = null)
     {
         using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
         {
             IRelationType? relationType = _relationTypeRepository.Get(key);
             if (relationType is null)
             {
-                return await Task.FromResult(new PagedModel<IRelation>());
+                return await Task.FromResult(Attempt.FailWithStatus<PagedModel<IRelation>, RelationOperationStatus>(RelationOperationStatus.NotFound, null!));
             }
 
+            PaginationHelper.ConvertSkipTakeToPaging(skip, take, out var pageNumber, out var pageSize);
+
             IQuery<IRelation> query = Query<IRelation>().Where(x => x.RelationTypeId == relationType.Id);
-            IEnumerable<IRelation> relations = _relationRepository.GetPagedRelationsByQuery(query, pageIndex, pageSize, out var totalRecords, ordering);
-            return await Task.FromResult(new PagedModel<IRelation>(totalRecords, relations));
+            IEnumerable<IRelation> relations = _relationRepository.GetPagedRelationsByQuery(query, pageNumber, pageSize, out var totalRecords, ordering);
+            return await Task.FromResult(Attempt.SucceedWithStatus(RelationOperationStatus.Success, new PagedModel<IRelation>(totalRecords, relations)));
         }
     }
 
