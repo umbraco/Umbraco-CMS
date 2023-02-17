@@ -5,21 +5,18 @@ import { UmbContextDebugRequest } from '@umbraco-cms/context-api';
 import { UmbLitElement } from '@umbraco-cms/element';
 import { UmbModalService, UMB_MODAL_SERVICE_CONTEXT_TOKEN } from '@umbraco-cms/modal';
 
-// TODO: Ask Jacob how to lazily load this depending on a property
-import './debug.modal.element';
-
 @customElement('umb-debug')
 export class UmbDebug extends UmbLitElement {
 	static styles = [
 		UUITextStyles,
-		css`			
+		css`
 			#container {
 				display: block;
 				font-family: monospace;
 
 				z-index: 10000;
 
-				position:relative;
+				position: relative;
 				width: 100%;
 				padding: 10px 0;
 			}
@@ -75,14 +72,13 @@ export class UmbDebug extends UmbLitElement {
 			this._modalService = modalService;
 		});
 	}
-	
+
 	connectedCallback(): void {
 		super.connectedCallback();
 
 		// Dispatch it
 		this.dispatchEvent(
 			new UmbContextDebugRequest((contexts: Map<any, any>) => {
-
 				// The Contexts are collected
 				// When travelling up through the DOM from this element
 				// to the root of <umb-app> which then uses the callback prop
@@ -94,56 +90,52 @@ export class UmbDebug extends UmbLitElement {
 	}
 
 	render() {
-		if (this.enabled) {			
-			return this.dialog ? this._renderDialog() : this._renderPanel();			
+		if (this.enabled) {
+			return this.dialog ? this._renderDialog() : this._renderPanel();
 		} else {
 			return nothing;
 		}
-		
 	}
 
 	private _toggleDebugPane() {
 		this._debugPaneOpen = !this._debugPaneOpen;
 	}
 
-	private _openDialog() {
+	private async _openDialog() {
 		// Open a modal that uses the HTML component called 'umb-debug-modal-layout'
-		this._modalService?.open('umb-debug-modal-layout', { 
-			size: 'small', 
-			type: 'sidebar', 
-			data:{ 
-				content: this._renderContextAliases()
-			}
+		await import('./debug.modal.element.js');
+		this._modalService?.open('umb-debug-modal-layout', {
+			size: 'medium',
+			type: 'sidebar',
+			data: {
+				content: this._renderContextAliases(),
+			},
 		});
 	}
 
-
-
 	private _renderDialog() {
-		return html`
-			<div id="container">
-				<uui-badge color="danger" look="primary" attention @click="${this._openDialog}">
-					<uui-icon name="umb:bug"></uui-icon> Debug
-				</uui-badge>
-			</div>`;
+		return html` <div id="container">
+			<uui-badge color="danger" look="primary" attention @click="${this._openDialog}">
+				<uui-icon name="umb:bug"></uui-icon> Debug
+			</uui-badge>
+		</div>`;
 	}
 
-	private _renderPanel(){
-		return html`
-			<div id="container">
-				<uui-button color="danger" look="primary" @click="${this._toggleDebugPane}">
-					<uui-icon name="umb:bug"></uui-icon>
-					Debug
-				</uui-button>
+	private _renderPanel() {
+		return html` <div id="container">
+			<uui-button color="danger" look="primary" @click="${this._toggleDebugPane}">
+				<uui-icon name="umb:bug"></uui-icon>
+				Debug
+			</uui-button>
 
-				<div class="events ${this._debugPaneOpen ? 'open' : ''}">
-					<div>
-						<ul>
-							${this._renderContextAliases()}
-						</ul>
-					</div>
+			<div class="events ${this._debugPaneOpen ? 'open' : ''}">
+				<div>
+					<ul>
+						${this._renderContextAliases()}
+					</ul>
 				</div>
-			</div>`;
+			</div>
+		</div>`;
 	}
 
 	private _renderContextAliases() {
@@ -151,8 +143,7 @@ export class UmbDebug extends UmbLitElement {
 
 		for (const [alias, instance] of this.contexts) {
 			contextsTemplates.push(
-				html`
-				<li>
+				html` <li>
 					Context: <strong>${alias}</strong>
 					<em>(${typeof instance})</em>
 					<ul>
