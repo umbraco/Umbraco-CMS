@@ -105,7 +105,7 @@ export class UmbDebug extends UmbLitElement {
 		// Open a modal that uses the HTML component called 'umb-debug-modal-layout'
 		await import('./debug.modal.element.js');
 		this._modalService?.open('umb-debug-modal-layout', {
-			size: 'medium',
+			size: 'small',
 			type: 'sidebar',
 			data: {
 				content: this._renderContextAliases(),
