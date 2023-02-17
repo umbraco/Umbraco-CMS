@@ -65,7 +65,7 @@ public class AddGuidsToUsers : UnscopedMigrationBase
         Database.Execute("PRAGMA foreign_keys=off;");
         Database.Execute("BEGIN TRANSACTION;");
 
-        IEnumerable<UserDto> users = Database.Fetch<OldUserDto>().Select(x => new UserDto
+        List<UserDto> users = Database.Fetch<OldUserDto>().Select(x => new UserDto
         {
             Id = x.Id,
             Key = Guid.NewGuid(),
@@ -101,13 +101,24 @@ public class AddGuidsToUsers : UnscopedMigrationBase
         MigrateExternalLogins(users);
     }
 
-    private void MigrateExternalLogins(IEnumerable<UserDto> userDtos)
+    private void MigrateExternalLogins(List<UserDto> userDtos)
     {
-        foreach (UserDto userDto in userDtos)
+        List<ExternalLoginDto>? externalLogins = Database.Fetch<ExternalLoginDto>();
+        if (externalLogins is null)
         {
-            // We have to get the old fake Guid to update it to the real one.
-            var idKey = userDto.Id.ToGuid();
-            Database.Update<ExternalLoginDto>("SET userOrMemberKey = @key WHERE userOrMemberKey = @id", new { key = userDto.Key, id = idKey });
+            return;
+        }
+
+        foreach (ExternalLoginDto externalLogin in externalLogins)
+        {
+            UserDto? associatedUser = userDtos.FirstOrDefault(x => x.Id.ToGuid() == externalLogin.UserOrMemberKey);
+            if (associatedUser is null)
+            {
+                continue;
+            }
+
+            externalLogin.UserOrMemberKey = associatedUser.Key;
+            Database.Update(externalLogin);
         }
     }
 

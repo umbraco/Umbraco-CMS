@@ -286,13 +286,46 @@ public class BackOfficeUserStore : UmbracoUserStore<BackOfficeIdentityUser, Iden
         cancellationToken.ThrowIfCancellationRequested();
         ThrowIfDisposed();
 
-        IUser? user = _userService.GetUserById(UserIdToInt(userId));
+        IUser? user = FindUserFromString(userId);
         if (user == null)
         {
             return Task.FromResult((BackOfficeIdentityUser?)null)!;
         }
 
         return Task.FromResult(AssignLoginsCallback(_mapper.Map<BackOfficeIdentityUser>(user)))!;
+    }
+
+    private IUser? FindUserFromString(string userId)
+    {
+        // The userId can in this case be one of three things
+        // 1. An int - this means that the user logged in normally, this is fine, we parse it and return it.
+        // 2. A fake Guid - this means that the user logged in using an external login provider, but we haven't migrated the users to have a key yet, so we need to convert it to an int.
+        // 3. A Guid - this means that the user logged in using an external login provider, so we have to resolve the user by key.
+        // ffffffff
+        // 9E684BE6-32D8-486E-B632-CCF09F683F4A
+        // Case 1
+        if(int.TryParse(userId, NumberStyles.Integer, CultureInfo.InvariantCulture, out var result))
+        {
+            return _userService.GetUserById(result);
+        }
+
+        // Case 2: A fake GUID will always be in the format XXXXXXXX-0000-0000-0000-000000000000 where X is numbers
+        // TODO: Handle this properly
+        if (userId.Substring(9) == "-0000-0000-0000-000000000000")
+        {
+            if (Guid.TryParse(userId, out Guid fakeKey))
+            {
+                var id = BitConverter.ToInt32(fakeKey.ToByteArray(), 0);
+                return _userService.GetUserById(id);
+            }
+        }
+
+        if (Guid.TryParse(userId, out Guid key))
+        {
+            return _userService.Get(key);
+        }
+
+        throw new InvalidOperationException($"Unable to resolve user with ID {userId}");
     }
 
     /// <inheritdoc />

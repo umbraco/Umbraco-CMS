@@ -9,7 +9,11 @@ internal static class UserFactory
 {
     public static IUser BuildEntity(GlobalSettings globalSettings, UserDto dto)
     {
-        var guidId = dto.Id.ToGuid();
+        Guid key = dto.Key;
+        if (key == Guid.Empty)
+        {
+            key = dto.Id.ToGuid();
+        }
 
         var user = new User(globalSettings, dto.Id, dto.UserName, dto.Email, dto.Login, dto.Password,
             dto.PasswordConfig,
@@ -23,7 +27,7 @@ internal static class UserFactory
         {
             user.DisableChangeTracking();
 
-            user.Key = guidId;
+            user.Key = key;
             user.IsLockedOut = dto.NoConsole;
             user.IsApproved = dto.Disabled == false;
             user.Language = dto.UserLanguage;

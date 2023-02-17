@@ -120,6 +120,13 @@ public interface IUserService : IMembershipUserService
     IProfile? GetProfileByUserName(string username);
 
     /// <summary>
+    /// Get a user by its key.
+    /// </summary>
+    /// <param name="key">The GUID key of the user.</param>
+    /// <returns>The found user, or null if nothing was found.</returns>
+    IUser? Get(Guid key);
+
+    /// <summary>
     ///     Gets a user by Id
     /// </summary>
     /// <param name="id">Id of the user to retrieve</param>
