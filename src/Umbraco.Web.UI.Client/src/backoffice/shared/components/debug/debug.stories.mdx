@@ -3,7 +3,6 @@ import { Canvas, Meta, Story } from '@storybook/addon-docs';
 <Meta title="Guides/Debug" parameters={{ previewTabs: { canvas: { hidden: true } } }} />
 
 
-
 # Debugging
 
 ## Debugging Contexts
@@ -19,11 +18,11 @@ The `<umb-debug>` component can be used in two different ways
 
 
 ```typescript
-// This will add 
+// This will add a Debug button to the UI and once clicked the information about avilable contextes will slide down
 <umb-debug enabled></umb-debug>
 ```
 
-This example uses an additional property/attribute `dialog` which adds a smaller badge to the UI as opposed to a button and will open the information in a small dialog/modal from the right hand side.
+This example uses an additional property/attribute `dialog` which adds a smaller badge to the UI as opposed to a button and will open the information in a small dialog/modal from the right hand side, this may be more useful to use when space is limited in the UI to add a button and pane of information directly to where the element is placed.
 
 ```typescript
 // This will open the debug information in a small dialog/modal from the right hand side
