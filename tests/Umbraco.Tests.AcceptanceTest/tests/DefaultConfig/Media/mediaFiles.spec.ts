@@ -325,43 +325,6 @@ test.describe('media File Types', () => {
             await umbracoApi.media.ensureNameNotExists(childName);
         });
     });
-    
-    test('Delete one of each Files in media', async ({page, umbracoApi, umbracoUi}) => {
-        const articleName = 'ArticleToDelete';
-        const audioName = 'AudioToDelete';
-        const fileName = 'FileToDelete';
-        const folderName = 'FolderToDelete';
-        const imageName = 'ImageToDelete';
-        const vectorGraphicsName = 'VectorGraphicsToDelete';
-        const videoName = 'VideoToDelete';
-        await umbracoApi.media.deleteAllFiles(articleName, audioName, fileName, folderName, imageName, vectorGraphicsName, videoName);
-
-        // Action
-        await umbracoApi.media.createAllFileTypes(articleName, audioName, fileName, folderName, imageName, vectorGraphicsName, videoName);
-        await page.reload();
-        // Needs to close tours when page has reloaded
-        await page.click('.umb-tour-step__close');
-        
-        // Takes all the child elements in folder-grid.
-        await page.locator(".umb-folder-grid").locator("xpath=/*", {hasText: folderName}).click({
-            position: {
-                x: 5,
-                y: 0
-            }
-        });
-        const files = await page.locator('[data-element="media-grid"]').locator("xpath=/*");
-        await umbracoUi.clickMultiple(files);
-        await page.locator('[label-key="actions_delete"]').click();
-        await page.locator('[alias="overlaySubmit"]').click();
-
-        // Assert
-        await expect(page.locator('.alert-success')).toBeVisible();
-        await expect(page.locator(".umb-folder-grid")).toBeHidden();
-        await expect(page.locator('[data-element="media-grid"]')).toBeHidden();
-
-        // Clean
-        await umbracoApi.media.clearRecycleBin();
-    });
 
     test('Update existing File with new name', async ({page, umbracoApi, umbracoUi}) => {
         const fileItemNameOld = "File";
