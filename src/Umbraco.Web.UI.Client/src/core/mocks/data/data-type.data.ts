@@ -63,47 +63,38 @@ export const data: Array<DataTypeModel & { type: 'data-type' }> = [
 					{
 						value: '#000000',
 						label: 'Black',
-						sortOrder: 0,
 					},
 					{
 						value: '#373737',
 						label: 'Dark',
-						sortOrder: 1,
 					},
 					{
 						value: '#9e9e9e',
 						label: 'Light',
-						sortOrder: 2,
 					},
 					{
 						value: '#607d8b',
 						label: 'Sage',
-						sortOrder: 3,
 					},
 					{
 						value: '#2196f3',
 						label: 'Sapphire',
-						sortOrder: 4,
 					},
 					{
 						value: '#03a9f4',
 						label: 'Sky',
-						sortOrder: 5,
 					},
 					{
 						value: '#3f51b5',
 						label: 'Blue',
-						sortOrder: 6,
 					},
 					{
 						value: '#9c27b0',
 						label: 'Magenta',
-						sortOrder: 8,
 					},
 					{
 						value: '#673ab7',
 						label: 'Purps',
-						sortOrder: 7,
 					},
 				],
 			},

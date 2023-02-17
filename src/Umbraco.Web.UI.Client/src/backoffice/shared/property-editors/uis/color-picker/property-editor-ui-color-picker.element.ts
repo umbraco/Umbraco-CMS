@@ -27,8 +27,7 @@ export class UmbPropertyEditorUIColorPickerElement extends UmbLitElement {
 		if (includeLabels) this._includeLabels = includeLabels.value;
 
 		const colorSwatches = config.find((x) => x.alias === 'items');
-		if (colorSwatches)
-			this._swatches = (colorSwatches.value as any[]).slice().sort((a, b) => a.sortOrder - b.sortOrder);
+		if (colorSwatches) this._swatches = colorSwatches.value as any[];
 	}
 
 	private _onChange(event: UUIColorSwatchesEvent) {
