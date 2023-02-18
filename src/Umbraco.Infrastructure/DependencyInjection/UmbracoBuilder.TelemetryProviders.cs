@@ -11,7 +11,6 @@ public static class UmbracoBuilder_TelemetryProviders
     {
         builder.Services.AddTransient<IDetailedTelemetryProvider, ContentTelemetryProvider>();
         builder.Services.AddTransient<IDetailedTelemetryProvider, DomainTelemetryProvider>();
-        builder.Services.AddTransient<IDetailedTelemetryProvider, ExamineTelemetryProvider>();
         builder.Services.AddTransient<IDetailedTelemetryProvider, LanguagesTelemetryProvider>();
         builder.Services.AddTransient<IDetailedTelemetryProvider, MacroTelemetryProvider>();
         builder.Services.AddTransient<IDetailedTelemetryProvider, MediaTelemetryProvider>();

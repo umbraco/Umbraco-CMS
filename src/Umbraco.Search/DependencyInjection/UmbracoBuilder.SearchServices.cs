@@ -1,10 +1,14 @@
 
 using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core.DependencyInjection;
+using Umbraco.Cms.Core.Mapping;
+using Umbraco.Cms.Infrastructure.Telemetry.Interfaces;
 using Umbraco.Search.Configuration;
 using Umbraco.Search.Indexing.Populators;
+using Umbraco.Search.Services;
 using Umbraco.Search.SpecialisedSearchers;
 using Umbraco.Search.SpecialisedSearchers.Tree;
+using Umbraco.Search.Telemetry;
 
 namespace Umbraco.Search.DependencyInjection;
 
@@ -26,8 +30,9 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.AddSingleton<IIndexPopulator, ContentIndexPopulator>();
         builder.Services.AddSingleton<IIndexPopulator, PublishedContentIndexPopulator>();
         builder.Services.AddSingleton<IIndexPopulator, MediaIndexPopulator>();
-        builder.Services.AddTransient<IExamineIndexCountService, ExamineIndexCountService>();
-
+        builder.Services.AddTransient<IIndexCountService, IndexCountService>();
+        builder.Services.AddTransient<IDetailedTelemetryProvider, SearchTelemetryProvider>();
+        builder.WithCollectionBuilder<MapDefinitionCollectionBuilder>().Add<SearchMapper>();
         return builder;
     }
 }
