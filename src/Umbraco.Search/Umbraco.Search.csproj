@@ -21,6 +21,8 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="Constants" />
+    <Folder Include="Properties" />
     <Folder Include="Search" />
   </ItemGroup>
 

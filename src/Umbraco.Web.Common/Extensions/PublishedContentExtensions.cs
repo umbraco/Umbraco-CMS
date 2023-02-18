@@ -80,7 +80,7 @@ public static class PublishedContentExtensions
         // var t = term.Escape().Value;
         // var luceneQuery = "+__Path:(" + content.Path.Replace("-", "\\-") + "*) +" + t;
         IBooleanOperation? query = index.Searcher.CreateQuery()
-            .Field(UmbracoExamineFieldNames.IndexPathFieldName, (content.Path + ",").MultipleCharacterWildcard())
+            .Field(UmbracoSearchFieldNames.IndexPathFieldName, (content.Path + ",").MultipleCharacterWildcard())
             .And()
             .ManagedQuery(term);
         IUmbracoContext umbracoContext = umbracoContextAccessor.GetRequiredUmbracoContext();

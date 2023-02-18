@@ -5,6 +5,7 @@ using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Runtime;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Infrastructure.HostedServices;
 using Umbraco.Search.Indexing;
 
 namespace Umbraco.Search;

@@ -241,7 +241,7 @@ public class BackOfficeExamineSearcher : IBackOfficeExamineSearcher
                     var queryWordsReplaced = new string[querywords.Length];
 
                     // when searching file names containing hyphens we need to replace the hyphens with spaces
-                    if (f.Equals(UmbracoExamineFieldNames.UmbracoFileFieldName))
+                    if (f.Equals(UmbracoSearchFieldNames.UmbracoFileFieldName))
                     {
                         for (var index = 0; index < querywords.Length; index++)
                         {

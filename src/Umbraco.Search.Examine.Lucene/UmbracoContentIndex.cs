@@ -132,7 +132,7 @@ public class UmbracoContentIndex : UmbracoExamineIndex, IUmbracoContentIndex
 
             //find all descendants based on path
             var descendantPath = $@"\-1\,*{nodeId}\,*";
-            var rawQuery = $"{UmbracoExamineFieldNames.IndexPathFieldName}:{descendantPath}";
+            var rawQuery = $"{UmbracoSearchFieldNames.IndexPathFieldName}:{descendantPath}";
             IQuery? c = Searcher.CreateQuery();
             IBooleanOperation? filtered = c.NativeQuery(rawQuery);
             IOrdering? selectedFields = filtered.SelectFields(_idOnlyFieldSet);

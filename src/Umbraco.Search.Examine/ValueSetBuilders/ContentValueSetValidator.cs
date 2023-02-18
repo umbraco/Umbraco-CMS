@@ -122,7 +122,7 @@ public class ContentValueSetValidator : ValueSetValidator, IContentValueSetValid
         //check for published content
         if (valueSet.Category == IndexTypes.Content && PublishedValuesOnly)
         {
-            if (!valueSet.Values.TryGetValue(UmbracoExamineFieldNames.PublishedFieldName, out IReadOnlyList<object>? published))
+            if (!valueSet.Values.TryGetValue(UmbracoSearchFieldNames.PublishedFieldName, out IReadOnlyList<object>? published))
             {
                 return new ValueSetValidationResult(ValueSetValidationStatus.Failed, valueSet);
             }
@@ -133,11 +133,11 @@ public class ContentValueSetValidator : ValueSetValidator, IContentValueSetValid
             }
 
             //deal with variants, if there are unpublished variants than we need to remove them from the value set
-            if (valueSet.Values.TryGetValue(UmbracoExamineFieldNames.VariesByCultureFieldName, out IReadOnlyList<object>? variesByCulture)
+            if (valueSet.Values.TryGetValue(UmbracoSearchFieldNames.VariesByCultureFieldName, out IReadOnlyList<object>? variesByCulture)
                 && variesByCulture.Count > 0 && variesByCulture[0].Equals("y"))
             {
                 //so this valueset is for a content that varies by culture, now check for non-published cultures and remove those values
-                foreach (KeyValuePair<string, IReadOnlyList<object>> publishField in valueSet.Values.Where(x => x.Key.StartsWith($"{UmbracoExamineFieldNames.PublishedFieldName}_")).ToList())
+                foreach (KeyValuePair<string, IReadOnlyList<object>> publishField in valueSet.Values.Where(x => x.Key.StartsWith($"{UmbracoSearchFieldNames.PublishedFieldName}_")).ToList())
                 {
                     if (publishField.Value.Count <= 0 || !publishField.Value[0].Equals("y"))
                     {

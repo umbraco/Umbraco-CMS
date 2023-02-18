@@ -1,5 +1,6 @@
 using System.Text;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Search;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Extensions;
 
@@ -62,10 +63,10 @@ internal abstract class NestedPropertyIndexValueFactoryBase<TSerialized, TItem> 
         foreach (KeyValuePair<string, IEnumerable<object?>> indexedKeyValuePair in indexContent)
         {
             // Tests if key includes the RawFieldPrefix and it is not in the start
-            if (indexedKeyValuePair.Key.Substring(1).Contains(UmbracoExamineFieldNames.RawFieldPrefix))
+            if (indexedKeyValuePair.Key.Substring(1).Contains(UmbracoSearchFieldNames.RawFieldPrefix))
             {
-                var newKey = UmbracoExamineFieldNames.RawFieldPrefix +
-                             indexedKeyValuePair.Key.Replace(UmbracoExamineFieldNames.RawFieldPrefix, string.Empty);
+                var newKey = UmbracoSearchFieldNames.RawFieldPrefix +
+                             indexedKeyValuePair.Key.Replace(UmbracoSearchFieldNames.RawFieldPrefix, string.Empty);
                 yield return new KeyValuePair<string, IEnumerable<object?>>(newKey, indexedKeyValuePair.Value);
             }
             else
@@ -116,7 +117,7 @@ internal abstract class NestedPropertyIndexValueFactoryBase<TSerialized, TItem> 
         foreach ((var indexKey, IEnumerable<object?>? indexedValue) in indexedContent)
         {
             // Ignore Raw fields
-            if (indexKey.Contains(UmbracoExamineFieldNames.RawFieldPrefix))
+            if (indexKey.Contains(UmbracoSearchFieldNames.RawFieldPrefix))
             {
                 continue;
             }

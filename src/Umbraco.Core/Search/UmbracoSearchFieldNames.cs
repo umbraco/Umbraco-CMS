@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Search.Constants;
+﻿namespace Umbraco.Cms.Core.Search;
 
 public class UmbracoSearchFieldNames
 {

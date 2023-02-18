@@ -1,4 +1,4 @@
-namespace Umbraco.Search.Constants;
+namespace Umbraco.Cms.Core.Search;
 
 /// <summary>
 ///     The index types stored in the Lucene Index

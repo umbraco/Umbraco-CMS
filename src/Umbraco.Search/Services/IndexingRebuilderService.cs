@@ -1,6 +1,6 @@
-﻿using Examine;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Cache;
+using Umbraco.Search.Indexing;
 
 namespace Umbraco.New.Cms.Infrastructure.Services;
 
@@ -23,14 +23,8 @@ public class IndexingRebuilderService : IIndexingRebuilderService
 
     public bool CanRebuild(string indexName) => _indexRebuilder.CanRebuild(indexName);
 
-    public bool TryRebuild(IIndex index, string indexName)
+    public bool TryRebuild(string index, string indexName)
     {
-        // Remove it in case there's a handler there already
-        index.IndexOperationComplete -= Indexer_IndexOperationComplete;
-
-        // Now add a single handler
-        index.IndexOperationComplete += Indexer_IndexOperationComplete;
-
         try
         {
             Set(indexName);
@@ -40,7 +34,6 @@ public class IndexingRebuilderService : IIndexingRebuilderService
         catch(Exception exception)
         {
             // Ensure it's not listening
-            index.IndexOperationComplete -= Indexer_IndexOperationComplete;
             _logger.LogError(exception, "An error occurred rebuilding index");
             return false;
         }
@@ -64,22 +57,5 @@ public class IndexingRebuilderService : IIndexingRebuilderService
     {
         var cacheKey = "temp_indexing_op_" + indexName;
         return _runtimeCache.Get(cacheKey) is not null;
-    }
-
-    private void Indexer_IndexOperationComplete(object? sender, EventArgs e)
-    {
-        var indexer = (IIndex?)sender;
-
-        _logger.LogDebug("Logging operation completed for index {IndexName}", indexer?.Name);
-
-        if (indexer is not null)
-        {
-            //ensure it's not listening anymore
-            indexer.IndexOperationComplete -= Indexer_IndexOperationComplete;
-        }
-
-        _logger.LogInformation($"Rebuilding index '{indexer?.Name}' done.");
-
-        Clear(indexer?.Name);
     }
 }

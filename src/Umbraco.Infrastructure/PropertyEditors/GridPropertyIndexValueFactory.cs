@@ -5,6 +5,7 @@ using System.Text;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Search;
 using Umbraco.Cms.Core.Xml;
 using Umbraco.Extensions;
 
@@ -60,7 +61,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
                     }
 
                     //First save the raw value to a raw field
-                    result.Add(new KeyValuePair<string, IEnumerable<object?>>($"{UmbracoExamineFieldNames.RawFieldPrefix}{property.Alias}", new[] { rawVal }));
+                    result.Add(new KeyValuePair<string, IEnumerable<object?>>($"{UmbracoSearchFieldNames.RawFieldPrefix}{property.Alias}", new[] { rawVal }));
 
                     if (sb.Length > 0)
                     {

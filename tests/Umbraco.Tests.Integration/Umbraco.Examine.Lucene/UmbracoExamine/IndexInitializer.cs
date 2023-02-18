@@ -113,9 +113,9 @@ public class IndexInitializer
                     m.SortOrder == (int)xmlElement.Attribute("sortOrder") &&
                     m.CreateDate == (DateTime)xmlElement.Attribute("createDate") &&
                     m.UpdateDate == (DateTime)xmlElement.Attribute("updateDate") &&
-                    m.Name == (string)xmlElement.Attribute(UmbracoExamineFieldNames.NodeNameFieldName) &&
+                    m.Name == (string)xmlElement.Attribute(UmbracoSearchFieldNames.NodeNameFieldName) &&
                     m.GetCultureName(It.IsAny<string>()) ==
-                    (string)xmlElement.Attribute(UmbracoExamineFieldNames.NodeNameFieldName) &&
+                    (string)xmlElement.Attribute(UmbracoSearchFieldNames.NodeNameFieldName) &&
                     m.Path == (string)xmlElement.Attribute("path") &&
                     m.Properties == new PropertyCollection() &&
                     m.ContentType == Mock.Of<ISimpleContentType>(mt =>
@@ -151,9 +151,9 @@ public class IndexInitializer
                     m.SortOrder == (int)x.Attribute("sortOrder") &&
                     m.CreateDate == (DateTime)x.Attribute("createDate") &&
                     m.UpdateDate == (DateTime)x.Attribute("updateDate") &&
-                    m.Name == (string)x.Attribute(UmbracoExamineFieldNames.NodeNameFieldName) &&
+                    m.Name == (string)x.Attribute(UmbracoSearchFieldNames.NodeNameFieldName) &&
                     m.GetCultureName(It.IsAny<string>()) ==
-                    (string)x.Attribute(UmbracoExamineFieldNames.NodeNameFieldName) &&
+                    (string)x.Attribute(UmbracoSearchFieldNames.NodeNameFieldName) &&
                     m.Path == (string)x.Attribute("path") &&
                     m.Properties == new PropertyCollection() &&
                     m.ContentType == Mock.Of<ISimpleContentType>(mt =>

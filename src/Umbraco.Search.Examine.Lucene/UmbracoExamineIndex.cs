@@ -97,7 +97,7 @@ public abstract class UmbracoExamineIndex : LuceneIndex, IUmbracoExamineIndex, I
         Document? d = docArgs.Document;
 
         foreach (KeyValuePair<string, IReadOnlyList<object>> f in docArgs.ValueSet.Values
-                     .Where(x => x.Key.StartsWith(UmbracoExamineFieldNames.RawFieldPrefix)).ToArray())
+                     .Where(x => x.Key.StartsWith(UmbracoSearchFieldNames.RawFieldPrefix)).ToArray())
         {
             if (f.Value.Count > 0)
             {
@@ -121,14 +121,14 @@ public abstract class UmbracoExamineIndex : LuceneIndex, IUmbracoExamineIndex, I
         var path = e.ValueSet.GetValue("path");
         if (path != null)
         {
-            updatedValues[UmbracoExamineFieldNames.IndexPathFieldName] = path.Yield();
+            updatedValues[UmbracoSearchFieldNames.IndexPathFieldName] = path.Yield();
         }
 
         //icon
         if (e.ValueSet.Values.TryGetValue("icon", out IReadOnlyList<object>? icon) &&
-            e.ValueSet.Values.ContainsKey(UmbracoExamineFieldNames.IconFieldName) == false)
+            e.ValueSet.Values.ContainsKey(UmbracoSearchFieldNames.IconFieldName) == false)
         {
-            updatedValues[UmbracoExamineFieldNames.IconFieldName] = icon;
+            updatedValues[UmbracoSearchFieldNames.IconFieldName] = icon;
         }
 
         e.SetValues(updatedValues);

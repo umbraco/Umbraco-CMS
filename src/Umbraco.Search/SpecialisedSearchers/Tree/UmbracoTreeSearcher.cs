@@ -5,6 +5,7 @@ using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Models.Search;
 using Umbraco.Cms.Core.Routing;
+using Umbraco.Cms.Core.Search;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Trees;
 using Umbraco.Cms.Infrastructure.Persistence;
@@ -134,10 +135,10 @@ public class UmbracoTreeSearcher
                 m.AdditionalData["Email"] = result.Values["email"];
             }
 
-            if (result.Values.ContainsKey(UmbracoExamineFieldNames.NodeKeyFieldName) &&
-                result.Values[UmbracoExamineFieldNames.NodeKeyFieldName] != null)
+            if (result.Values.ContainsKey(UmbracoSearchFieldNames.NodeKeyFieldName) &&
+                result.Values[UmbracoSearchFieldNames.NodeKeyFieldName] != null)
             {
-                if (Guid.TryParse(result.Values[UmbracoExamineFieldNames.NodeKeyFieldName], out Guid key))
+                if (Guid.TryParse(result.Values[UmbracoSearchFieldNames.NodeKeyFieldName], out Guid key))
                 {
                     m.Key = key;
                 }
@@ -185,7 +186,7 @@ public class UmbracoTreeSearcher
             if (int.TryParse(entity.Id?.ToString(), NumberStyles.Integer, CultureInfo.InvariantCulture, out var intId))
             {
                 // if it varies by culture, return the default language URL
-                if (result.Values.TryGetValue(UmbracoExamineFieldNames.VariesByCultureFieldName, out var varies) &&
+                if (result.Values.TryGetValue(UmbracoSearchFieldNames.VariesByCultureFieldName, out var varies) &&
                     varies == "y")
                 {
                     entity.AdditionalData["Url"] = _publishedUrlProvider.GetUrl(intId, culture: culture ?? defaultLang);

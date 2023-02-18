@@ -75,10 +75,10 @@ public class ContentValueSetBuilder : BaseValueSetBuilder<IContent>, IContentVal
             {
                 { "icon", c.ContentType.Icon?.Yield() ?? Enumerable.Empty<string>() },
                 {
-                    UmbracoExamineFieldNames.PublishedFieldName, c.Published ? YesValue : NoValue
+                    UmbracoSearchFieldNames.PublishedFieldName, c.Published ? YesValue : NoValue
                 }, // Always add invariant published value
                 { "id", new object[] { c.Id } },
-                { UmbracoExamineFieldNames.NodeKeyFieldName, new object[] { c.Key } },
+                { UmbracoSearchFieldNames.NodeKeyFieldName, new object[] { c.Key } },
                 { "parentID", new object[] { c.Level > 1 ? c.ParentId : -1 } },
                 { "level", new object[] { c.Level } },
                 { "creatorID", new object[] { c.CreatorId } },
@@ -86,7 +86,7 @@ public class ContentValueSetBuilder : BaseValueSetBuilder<IContent>, IContentVal
                 { "createDate", new object[] { c.CreateDate } }, // Always add invariant createDate
                 { "updateDate", new object[] { c.UpdateDate } }, // Always add invariant updateDate
                 {
-                    UmbracoExamineFieldNames.NodeNameFieldName, (PublishedValuesOnly // Always add invariant nodeName
+                    UmbracoSearchFieldNames.NodeNameFieldName, (PublishedValuesOnly // Always add invariant nodeName
                         ? c.PublishName?.Yield()
                         : c.Name?.Yield()) ?? Enumerable.Empty<string>()
                 },
@@ -105,12 +105,12 @@ public class ContentValueSetBuilder : BaseValueSetBuilder<IContent>, IContentVal
                 },
                 { "writerID", new object[] { c.WriterId } },
                 { "templateID", new object[] { c.TemplateId ?? 0 } },
-                { UmbracoExamineFieldNames.VariesByCultureFieldName, NoValue },
+                { UmbracoSearchFieldNames.VariesByCultureFieldName, NoValue },
             };
 
             if (isVariant)
             {
-                values[UmbracoExamineFieldNames.VariesByCultureFieldName] = YesValue;
+                values[UmbracoSearchFieldNames.VariesByCultureFieldName] = YesValue;
 
                 foreach (var culture in c.AvailableCultures)
                 {
@@ -120,7 +120,7 @@ public class ContentValueSetBuilder : BaseValueSetBuilder<IContent>, IContentVal
                     values[$"nodeName_{lowerCulture}"] = (PublishedValuesOnly
                         ? c.GetPublishName(culture)?.Yield()
                         : c.GetCultureName(culture)?.Yield()) ?? Enumerable.Empty<string>();
-                    values[$"{UmbracoExamineFieldNames.PublishedFieldName}_{lowerCulture}"] =
+                    values[$"{UmbracoSearchFieldNames.PublishedFieldName}_{lowerCulture}"] =
                         (c.IsCulturePublished(culture) ? "y" : "n").Yield<object>();
                     values[$"updateDate_{lowerCulture}"] = (PublishedValuesOnly
                         ? c.GetPublishDate(culture)

@@ -9,8 +9,8 @@ public class MemberValueSetValidator : ValueSetValidator
     /// </summary>
     public static readonly string[] DefaultMemberIndexFields =
     {
-        "id", UmbracoExamineFieldNames.NodeNameFieldName, "updateDate", "loginName", "email",
-        UmbracoExamineFieldNames.NodeKeyFieldName,
+        "id", UmbracoSearchFieldNames.NodeNameFieldName, "updateDate", "loginName", "email",
+        UmbracoSearchFieldNames.NodeKeyFieldName,
     };
 
     private static readonly IEnumerable<string> _validCategories = new[] { IndexTypes.Member };

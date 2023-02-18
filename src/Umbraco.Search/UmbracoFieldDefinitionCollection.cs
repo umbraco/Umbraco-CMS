@@ -1,5 +1,5 @@
 using System.Text.RegularExpressions;
-using Umbraco.Search.Constants;
+using Umbraco.Cms.Core.Search;
 using Umbraco.Search.Enums;
 
 namespace Umbraco.Search;

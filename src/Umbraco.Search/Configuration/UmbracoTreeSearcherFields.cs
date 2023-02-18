@@ -1,3 +1,4 @@
+using Umbraco.Cms.Core.Search;
 using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Search.Configuration;
@@ -5,33 +6,33 @@ namespace Umbraco.Search.Configuration;
 public class UmbracoTreeSearcherFields : IUmbracoTreeSearcherFields
 {
     private readonly ISet<string> _backOfficeDocumentFieldsToLoad =
-        new HashSet<string> { UmbracoExamineFieldNames.VariesByCultureFieldName };
+        new HashSet<string> { UmbracoSearchFieldNames.VariesByCultureFieldName };
 
     private readonly ISet<string> _backOfficeFieldsToLoad = new HashSet<string>
     {
         "id",
-        UmbracoExamineFieldNames.ItemIdFieldName,
-        UmbracoExamineFieldNames.NodeKeyFieldName,
+        UmbracoSearchFieldNames.ItemIdFieldName,
+        UmbracoSearchFieldNames.NodeKeyFieldName,
         "nodeName",
-        UmbracoExamineFieldNames.IconFieldName,
-        UmbracoExamineFieldNames.CategoryFieldName,
+        UmbracoSearchFieldNames.IconFieldName,
+        UmbracoSearchFieldNames.CategoryFieldName,
         "parentID",
-        UmbracoExamineFieldNames.ItemTypeFieldName,
+        UmbracoSearchFieldNames.ItemTypeFieldName,
     };
 
     private readonly ISet<string> _backOfficeMediaFieldsToLoad =
-        new HashSet<string> { UmbracoExamineFieldNames.UmbracoFileFieldName };
+        new HashSet<string> { UmbracoSearchFieldNames.UmbracoFileFieldName };
 
     private readonly ISet<string> _backOfficeMembersFieldsToLoad = new HashSet<string> { "email", "loginName" };
     private readonly ILocalizationService _localizationService;
 
     private readonly IReadOnlyList<string> _backOfficeFields = new List<string>
     {
-        "id", UmbracoExamineFieldNames.ItemIdFieldName, UmbracoExamineFieldNames.NodeKeyFieldName,
+        "id", UmbracoSearchFieldNames.ItemIdFieldName, UmbracoSearchFieldNames.NodeKeyFieldName,
     };
 
     private readonly IReadOnlyList<string> _backOfficeMediaFields =
-        new List<string> { UmbracoExamineFieldNames.UmbracoFileFieldName };
+        new List<string> { UmbracoSearchFieldNames.UmbracoFileFieldName };
 
     private readonly IReadOnlyList<string> _backOfficeMembersFields = new List<string> { "email", "loginName" };
 

@@ -7,6 +7,7 @@ using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Media;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Editors;
+using Umbraco.Cms.Core.Search;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
@@ -320,7 +321,7 @@ public class RichTextPropertyEditor : DataEditor
 
             // store the raw value
             yield return new KeyValuePair<string, IEnumerable<object?>>(
-                $"{UmbracoExamineFieldNames.RawFieldPrefix}{property.Alias}", new object[] { strVal });
+                $"{UmbracoSearchFieldNames.RawFieldPrefix}{property.Alias}", new object[] { strVal });
         }
     }
 }

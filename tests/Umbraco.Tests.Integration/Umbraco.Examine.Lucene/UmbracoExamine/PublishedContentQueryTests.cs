@@ -52,7 +52,7 @@ public class PublishedContentQueryTests : ExamineBaseTest
                 new Dictionary<string, object>
                 {
                     [fieldNames[0]] = "Hello world, there are products here",
-                    [UmbracoExamineFieldNames.VariesByCultureFieldName] = "n"
+                    [UmbracoSearchFieldNames.VariesByCultureFieldName] = "n"
                 }));
             index.IndexItem(new ValueSet(
                 "2",
@@ -60,7 +60,7 @@ public class PublishedContentQueryTests : ExamineBaseTest
                 new Dictionary<string, object>
                 {
                     [fieldNames[1]] = "Hello world, there are products here",
-                    [UmbracoExamineFieldNames.VariesByCultureFieldName] = "y"
+                    [UmbracoSearchFieldNames.VariesByCultureFieldName] = "y"
                 }));
             index.IndexItem(new ValueSet(
                 "3",
@@ -68,7 +68,7 @@ public class PublishedContentQueryTests : ExamineBaseTest
                 new Dictionary<string, object>
                 {
                     [fieldNames[2]] = "Hello world, there are products here",
-                    [UmbracoExamineFieldNames.VariesByCultureFieldName] = "y"
+                    [UmbracoSearchFieldNames.VariesByCultureFieldName] = "y"
                 }));
         }
 
