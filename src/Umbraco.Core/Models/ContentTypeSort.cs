@@ -21,7 +21,8 @@ public class ContentTypeSort : IValueObject, IDeepCloneable
         SortOrder = sortOrder;
     }
 
-    public ContentTypeSort(Lazy<int> id, int sortOrder, string alias, Guid key)
+    // FIXME: remove integer ID in constructor
+    public ContentTypeSort(Lazy<int> id, Guid key, int sortOrder, string alias)
     {
         Id = id;
         SortOrder = sortOrder;

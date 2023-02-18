@@ -53,6 +53,6 @@ public class ContentTypeSortBuilder
         var sortOrder = _sortOrder ?? 0;
         var key = Guid.NewGuid();
 
-        return new ContentTypeSort(new Lazy<int>(() => id), sortOrder, alias, key);
+        return new ContentTypeSort(new Lazy<int>(() => id), key, sortOrder, alias);
     }
 }

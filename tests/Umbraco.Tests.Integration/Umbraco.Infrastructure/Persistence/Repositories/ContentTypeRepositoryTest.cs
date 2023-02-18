@@ -809,8 +809,8 @@ public class ContentTypeRepositoryTest : UmbracoIntegrationTest
             var contentType = repository.Get(_simpleContentType.Id);
             contentType.AllowedContentTypes = new List<ContentTypeSort>
             {
-                new(new Lazy<int>(() => subpageContentType.Id), 0, subpageContentType.Alias, subpageContentType.Key),
-                new(new Lazy<int>(() => simpleSubpageContentType.Id), 1, simpleSubpageContentType.Alias, simpleSubpageContentType.Key)
+                new(new Lazy<int>(() => subpageContentType.Id), subpageContentType.Key, 0, subpageContentType.Alias),
+                new(new Lazy<int>(() => simpleSubpageContentType.Id), simpleSubpageContentType.Key, 1, simpleSubpageContentType.Alias)
             };
             repository.Save(contentType);
 
