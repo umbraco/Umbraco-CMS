@@ -1,6 +1,10 @@
+
 using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core.DependencyInjection;
+using Umbraco.Search.Configuration;
 using Umbraco.Search.Indexing.Populators;
+using Umbraco.Search.SpecialisedSearchers;
+using Umbraco.Search.SpecialisedSearchers.Tree;
 
 namespace Umbraco.Search.DependencyInjection;
 
@@ -13,10 +17,17 @@ public static partial class UmbracoBuilderExtensions
     {
         // populators are not a collection: one cannot remove ours, and can only add more
         // the container can inject IEnumerable<IIndexPopulator> and get them all
+
+        builder.Services.AddSingleton<IUmbracoTreeSearcherFields, UmbracoTreeSearcherFields>();
+
+        builder.Services.AddSingleton<IBackOfficeExamineSearcher, NoopBackOfficeExamineSearcher>();
+        builder.Services.AddScoped<UmbracoTreeSearcher>();
         builder.Services.AddSingleton<IIndexPopulator, MemberIndexPopulator>();
         builder.Services.AddSingleton<IIndexPopulator, ContentIndexPopulator>();
         builder.Services.AddSingleton<IIndexPopulator, PublishedContentIndexPopulator>();
         builder.Services.AddSingleton<IIndexPopulator, MediaIndexPopulator>();
+        builder.Services.AddTransient<IExamineIndexCountService, ExamineIndexCountService>();
+
         return builder;
     }
 }

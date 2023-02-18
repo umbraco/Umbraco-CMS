@@ -6,9 +6,10 @@ using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.Changes;
 using Umbraco.Cms.Core.Sync;
+using Umbraco.Cms.Infrastructure;
 using Umbraco.Extensions;
 
-namespace Umbraco.Cms.Infrastructure.Search;
+namespace Umbraco.Search.NotificationHandlers;
 
 public sealed class ContentTypeIndexingNotificationHandler : INotificationHandler<ContentTypeCacheRefresherNotification>
 {

@@ -1,4 +1,3 @@
-using Examine;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -50,7 +49,6 @@ using Umbraco.Cms.Infrastructure.Persistence.Mappers;
 using Umbraco.Cms.Infrastructure.Runtime;
 using Umbraco.Cms.Infrastructure.Runtime.RuntimeModeValidators;
 using Umbraco.Cms.Infrastructure.Scoping;
-using Umbraco.Cms.Infrastructure.Search;
 using Umbraco.Cms.Infrastructure.Serialization;
 using Umbraco.Cms.Infrastructure.Services.Implement;
 using Umbraco.Extensions;
@@ -168,7 +166,6 @@ public static partial class UmbracoBuilderExtensions
 
         builder.Services.AddSingleton<IContentLastChanceFinder, ContentFinderByConfigured404>();
 
-        builder.Services.AddScoped<UmbracoTreeSearcher>();
 
         // replace
         builder.Services.AddSingleton<IEmailSender, EmailSender>(
@@ -179,20 +176,17 @@ public static partial class UmbracoBuilderExtensions
                 services.GetService<INotificationHandler<SendEmailNotification>>(),
                 services.GetService<INotificationAsyncHandler<SendEmailNotification>>()));
 
-        builder.Services.AddSingleton<IExamineManager, ExamineManager>();
 
         builder.Services.AddScoped<ITagQuery, TagQuery>();
-
-        builder.Services.AddSingleton<IUmbracoTreeSearcherFields, UmbracoTreeSearcherFields>();
         builder.Services.AddSingleton<IPublishedContentQueryAccessor, PublishedContentQueryAccessor>(sp =>
             new PublishedContentQueryAccessor(sp.GetRequiredService<IScopedServiceProvider>()));
         builder.Services.AddScoped<IPublishedContentQuery>(factory =>
         {
             IUmbracoContextAccessor umbCtx = factory.GetRequiredService<IUmbracoContextAccessor>();
+            IVariationContextAccessor variationContext = factory.GetRequiredService<IVariationContextAccessor>();
             IUmbracoContext umbracoContext = umbCtx.GetRequiredUmbracoContext();
             return new PublishedContentQuery(
-                umbracoContext.PublishedSnapshot,
-                factory.GetRequiredService<IVariationContextAccessor>(), factory.GetRequiredService<IExamineManager>());
+                umbracoContext.PublishedSnapshot,variationContext);
         });
 
         // register accessors for cultures
@@ -201,8 +195,6 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.AddSingleton<IFilePermissionHelper, FilePermissionHelper>();
 
         builder.Services.AddSingleton<IUmbracoComponentRenderer, UmbracoComponentRenderer>();
-
-        builder.Services.AddSingleton<IBackOfficeExamineSearcher, NoopBackOfficeExamineSearcher>();
 
         builder.Services.AddSingleton<UploadAutoFillProperties>();
         builder.Services.AddSingleton<IImageDimensionExtractor, NoopImageDimensionExtractor>();

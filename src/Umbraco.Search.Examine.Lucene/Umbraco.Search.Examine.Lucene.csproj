@@ -11,7 +11,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Umbraco.Search.Examine\Umbraco.Search.Examine.csproj" />
+    <ProjectReference Include="..\Umbraco.Search.Examine\Umbraco.Search.Examine.csproj" />
     <ProjectReference Include="..\Umbraco.Core\Umbraco.Core.csproj" />
     <ProjectReference Include="..\Umbraco.Infrastructure\Umbraco.Infrastructure.csproj" />
   </ItemGroup>

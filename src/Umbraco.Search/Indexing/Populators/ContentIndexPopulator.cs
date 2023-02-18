@@ -2,6 +2,7 @@ using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Infrastructure.Persistence;
 
 namespace Umbraco.Search.Indexing.Populators;
 
@@ -30,9 +31,8 @@ public class ContentIndexPopulator : IndexPopulator
         ILogger<ContentIndexPopulator> logger,
         IContentService contentService,
         ISearchProvider provider,
-        IUmbracoDatabaseFactory umbracoDatabaseFactory,
-        IContentValueSetBuilder contentValueSetBuilder)
-        : this(logger, false, null, contentService, umbracoDatabaseFactory, contentValueSetBuilder)
+        IUmbracoDatabaseFactory umbracoDatabaseFactory)
+        : this(logger,provider, false, null, contentService, umbracoDatabaseFactory)
     {
         _provider = provider;
     }
@@ -46,12 +46,10 @@ public class ContentIndexPopulator : IndexPopulator
         bool publishedValuesOnly,
         int? parentId,
         IContentService contentService,
-        IUmbracoDatabaseFactory umbracoDatabaseFactory,
-        IValueSetBuilder<IContent> contentValueSetBuilder)
+        IUmbracoDatabaseFactory umbracoDatabaseFactory)
     {
         _contentService = contentService ?? throw new ArgumentNullException(nameof(contentService));
         _umbracoDatabaseFactory = umbracoDatabaseFactory ?? throw new ArgumentNullException(nameof(umbracoDatabaseFactory));
-        _contentValueSetBuilder = contentValueSetBuilder ?? throw new ArgumentNullException(nameof(contentValueSetBuilder));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         _provider = provider;
         _publishedValuesOnly = publishedValuesOnly;
@@ -143,7 +141,6 @@ public class ContentIndexPopulator : IndexPopulator
                 }
             }
 
-            var valueSets = _contentValueSetBuilder.GetValueSets(indexableContent.ToArray()).ToArray();
 
             foreach (string index in indexes)
             {

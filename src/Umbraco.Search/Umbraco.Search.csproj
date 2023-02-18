@@ -1,12 +1,27 @@
 <Project Sdk="Microsoft.NET.Sdk">
-<PropertyGroup>
+  <PropertyGroup>
     <PackageId>Umbraco.Search</PackageId>
     <Title>Umbraco CMS - Search</Title>
-    <Description>Adds search abstraction to Umbraco CMS.</Description>
+    <Description>Contains the infrastructure assembly needed to run Umbraco CMS.</Description>
     <RootNamespace>Umbraco.Search</RootNamespace>
+    <IsPackable>false</IsPackable>
   </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)' == 'Debug'">
+    <DefineConstants>$(DefineConstants);TRACE_SCOPES</DefineConstants>
+  </PropertyGroup>
+
   <ItemGroup>
     <ProjectReference Include="..\Umbraco.Core\Umbraco.Core.csproj" />
+    <ProjectReference Include="..\Umbraco.Infrastructure\Umbraco.Infrastructure.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="7.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Search" />
   </ItemGroup>
 
 </Project>

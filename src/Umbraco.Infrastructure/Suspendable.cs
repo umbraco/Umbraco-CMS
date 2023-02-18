@@ -81,21 +81,7 @@ public static class Suspendable
             _suspended = true;
         }
 
-        public static void ResumeIndexers(ExamineIndexRebuilder backgroundIndexRebuilder)
-        {
-            _suspended = false;
 
-            StaticApplicationLogging.Logger.LogInformation("Resume indexers (rebuild:{Tried}).", _tried);
-
-            if (_tried == false)
-            {
-                return;
-            }
-
-            _tried = false;
-
-            backgroundIndexRebuilder.RebuildIndexes(false);
-        }
     }
 
     public static class ScheduledPublishing

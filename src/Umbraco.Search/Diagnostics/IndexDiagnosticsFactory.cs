@@ -1,8 +1,4 @@
-
-using Umbraco.Search;
-using Umbraco.Search.Diagnostics;
-
-namespace Umbraco.Cms.Infrastructure.Examine;
+namespace Umbraco.Search.Diagnostics;
 
 /// <summary>
 ///     Default implementation of <see cref="IIndexDiagnosticsFactory" /> which returns

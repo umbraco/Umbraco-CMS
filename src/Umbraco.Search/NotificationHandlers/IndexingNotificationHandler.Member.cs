@@ -4,8 +4,9 @@ using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Sync;
+using Umbraco.Cms.Infrastructure;
 
-namespace Umbraco.Cms.Infrastructure.Search;
+namespace Umbraco.Search.NotificationHandlers;
 
 public sealed class MemberIndexingNotificationHandler : INotificationHandler<MemberCacheRefresherNotification>
 {

@@ -19,6 +19,7 @@ using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Extensions;
+using Umbraco.Search.Configuration;
 using Umbraco.Search.SpecialisedSearchers;
 
 namespace Umbraco.Cms.Infrastructure.Examine;

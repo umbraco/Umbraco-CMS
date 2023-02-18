@@ -1,6 +1,6 @@
 using Umbraco.Cms.Core.Models;
 
-namespace Umbraco.Cms.Infrastructure.Search;
+namespace Umbraco.Search.NotificationHandlers;
 
 public interface IUmbracoIndexingHandler
 {

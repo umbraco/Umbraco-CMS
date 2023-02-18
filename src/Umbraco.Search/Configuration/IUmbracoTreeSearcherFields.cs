@@ -1,4 +1,4 @@
-namespace Umbraco.Cms.Infrastructure.Examine;
+namespace Umbraco.Search.Configuration;
 
 /// <summary>
 ///     Used to propagate hardcoded internal Field lists

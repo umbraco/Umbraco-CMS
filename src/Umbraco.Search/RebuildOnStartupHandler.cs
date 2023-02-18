@@ -1,11 +1,10 @@
 using Umbraco.Cms.Core;
-using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Sync;
 using Umbraco.Search.Indexing;
 
-namespace Umbraco.Cms.Infrastructure.Examine;
+namespace Umbraco.Search;
 
 /// <summary>
 ///     Handles how the indexes are rebuilt on startup

@@ -6,6 +6,10 @@
     <Description>Adds Examine implementation for searching to Umbraco CMS.</Description>
     <RootNamespace>Umbraco.Search.Examine</RootNamespace>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)' == 'Debug'">
+    <DefineConstants>$(DefineConstants);TRACE_SCOPES</DefineConstants>
+  </PropertyGroup>
+
   <ItemGroup>
     <PackageReference Include="Examine.Core" Version="3.1.0" />
   </ItemGroup>

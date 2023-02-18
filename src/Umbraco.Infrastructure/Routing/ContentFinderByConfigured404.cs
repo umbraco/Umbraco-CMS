@@ -1,5 +1,4 @@
 using System.Globalization;
-using Examine;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
@@ -16,7 +15,6 @@ namespace Umbraco.Cms.Core.Routing;
 public class ContentFinderByConfigured404 : IContentLastChanceFinder
 {
     private readonly IEntityService _entityService;
-    private readonly IExamineManager _examineManager;
     private readonly ILogger<ContentFinderByConfigured404> _logger;
     private readonly IUmbracoContextAccessor _umbracoContextAccessor;
     private readonly IVariationContextAccessor _variationContextAccessor;
@@ -29,14 +27,12 @@ public class ContentFinderByConfigured404 : IContentLastChanceFinder
         ILogger<ContentFinderByConfigured404> logger,
         IEntityService entityService,
         IOptionsMonitor<ContentSettings> contentSettings,
-        IExamineManager examineManager,
         IVariationContextAccessor variationContextAccessor,
         IUmbracoContextAccessor umbracoContextAccessor)
     {
         _logger = logger;
         _entityService = entityService;
         _contentSettings = contentSettings.CurrentValue;
-        _examineManager = examineManager;
         _variationContextAccessor = variationContextAccessor;
         _umbracoContextAccessor = umbracoContextAccessor;
 
@@ -100,7 +96,7 @@ public class ContentFinderByConfigured404 : IContentLastChanceFinder
         var error404 = NotFoundHandlerHelper.GetCurrentNotFoundPageId(
             _contentSettings.Error404Collection.ToArray(),
             _entityService,
-            new PublishedContentQuery(umbracoContext.PublishedSnapshot, _variationContextAccessor, _examineManager),
+            new PublishedContentQuery(umbracoContext.PublishedSnapshot, _variationContextAccessor),
             errorCulture,
             domainContentId);
 

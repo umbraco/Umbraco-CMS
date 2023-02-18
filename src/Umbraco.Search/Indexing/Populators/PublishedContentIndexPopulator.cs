@@ -1,5 +1,6 @@
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Infrastructure.Persistence;
 
 namespace Umbraco.Search.Indexing.Populators;
 
@@ -17,9 +18,9 @@ public class PublishedContentIndexPopulator : ContentIndexPopulator
     public PublishedContentIndexPopulator(
         ILogger<PublishedContentIndexPopulator> logger,
         IContentService contentService,
-        IUmbracoDatabaseFactory umbracoDatabaseFactory,
-        IPublishedContentValueSetBuilder contentValueSetBuilder)
-        : base(logger, true, null, contentService, umbracoDatabaseFactory, contentValueSetBuilder)
+        ISearchProvider provider,
+        IUmbracoDatabaseFactory umbracoDatabaseFactory)
+        : base(logger,provider, true, null, contentService, umbracoDatabaseFactory)
     {
     }
 }

@@ -1,6 +1,6 @@
 using Umbraco.Cms.Core.Services;
 
-namespace Umbraco.Cms.Infrastructure.Search;
+namespace Umbraco.Search.Configuration;
 
 public class UmbracoTreeSearcherFields : IUmbracoTreeSearcherFields
 {

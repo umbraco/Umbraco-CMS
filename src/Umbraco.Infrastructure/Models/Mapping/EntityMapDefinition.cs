@@ -1,9 +1,9 @@
 using System.Globalization;
-using Examine;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Models.Membership;
+using Umbraco.Cms.Core.Models.Search;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Models.Mapping;
@@ -20,11 +20,11 @@ public class EntityMapDefinition : IMapDefinition
         mapper.Define<EntityBasic, ContentTypeSort>((source, context) => new ContentTypeSort(), Map);
         mapper.Define<IContentTypeComposition, EntityBasic>((source, context) => new EntityBasic(), Map);
         mapper.Define<IEntitySlim, SearchResultEntity>((source, context) => new SearchResultEntity(), Map);
-        mapper.Define<ISearchResult, SearchResultEntity>((source, context) => new SearchResultEntity(), Map);
-        mapper.Define<ISearchResults, IEnumerable<SearchResultEntity>>((source, context) =>
-            context.MapEnumerable<ISearchResult, SearchResultEntity>(source).WhereNotNull());
-        mapper.Define<IEnumerable<ISearchResult>, IEnumerable<SearchResultEntity>>((source, context) =>
-            context.MapEnumerable<ISearchResult, SearchResultEntity>(source).WhereNotNull());
+        mapper.Define<IUmbracoSearchResult, SearchResultEntity>((source, context) => new SearchResultEntity(), Map);
+        mapper.Define<IUmbracoSearchResults, IEnumerable<SearchResultEntity>>((source, context) =>
+            context.MapEnumerable<IUmbracoSearchResult, SearchResultEntity>(source).WhereNotNull());
+        mapper.Define<IEnumerable<IUmbracoSearchResult>, IEnumerable<SearchResultEntity>>((source, context) =>
+            context.MapEnumerable<IUmbracoSearchResult, SearchResultEntity>(source).WhereNotNull());
     }
 
     // Umbraco.Code.MapAll -Alias
@@ -195,7 +195,7 @@ public class EntityMapDefinition : IMapDefinition
     }
 
     // Umbraco.Code.MapAll -Alias -Trashed
-    private static void Map(ISearchResult source, SearchResultEntity target, MapperContext context)
+    private static void Map(IUmbracoSearchResult source, SearchResultEntity target, MapperContext context)
     {
         target.Id = source.Id;
         target.Score = source.Score;
@@ -215,7 +215,7 @@ public class EntityMapDefinition : IMapDefinition
         if (culture.IsNullOrWhiteSpace() == false)
         {
             target.Name = source.Values.ContainsKey($"nodeName_{culture}")
-                ? source.Values[$"nodeName_{culture}"]
+                ? source.Values[$"nodeName_{culture}"].FirstOrDefault().ToString()
                 : target.Name;
         }
 

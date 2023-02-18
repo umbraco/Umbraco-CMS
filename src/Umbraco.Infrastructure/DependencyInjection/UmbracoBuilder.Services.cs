@@ -55,7 +55,6 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.AddSingleton(CreatePackageDataInstallation);
         builder.Services.AddUnique<IPackageInstallation, PackageInstallation>();
         builder.Services.AddUnique<IHtmlMacroParameterParser, HtmlMacroParameterParser>();
-        builder.Services.AddTransient<IExamineIndexCountService, ExamineIndexCountService>();
         builder.Services.AddUnique<IUserDataService, SystemInformationTelemetryProvider>();
         builder.Services.AddTransient<IUsageInformationService, UsageInformationService>();
         builder.Services.AddSingleton<IEditorConfigurationParser, EditorConfigurationParser>();

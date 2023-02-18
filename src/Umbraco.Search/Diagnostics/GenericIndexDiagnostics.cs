@@ -1,8 +1,9 @@
 using System.Reflection;
-using Umbraco.Search;
-using Umbraco.Search.Diagnostics;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Composing;
+using Umbraco.Extensions;
 
-namespace Umbraco.Cms.Infrastructure.Examine;
+namespace Umbraco.Search.Diagnostics;
 
 /// <summary>
 ///     Used to return diagnostic data for any index

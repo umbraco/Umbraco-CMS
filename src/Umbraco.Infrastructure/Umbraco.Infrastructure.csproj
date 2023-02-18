@@ -42,7 +42,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Umbraco.Search\Umbraco.Search.csproj" />
     <ProjectReference Include="..\Umbraco.Core\Umbraco.Core.csproj" />
   </ItemGroup>
 

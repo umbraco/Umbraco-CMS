@@ -1,5 +1,4 @@
 using System.Globalization;
-using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
@@ -10,9 +9,8 @@ using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Trees;
 using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Extensions;
-using Umbraco.Search.SpecialisedSearchers;
 
-namespace Umbraco.Cms.Infrastructure.Search;
+namespace Umbraco.Search.SpecialisedSearchers.Tree;
 
 /// <summary>
 ///     Used for internal Umbraco implementations of <see cref="ISearchableTree" />
@@ -73,7 +71,7 @@ public class UmbracoTreeSearcher
             case UmbracoEntityTypes.Member:
                 return MemberFromSearchResults(pagedResult.ToArray());
             case UmbracoEntityTypes.Media:
-                return MediaFromSearchResults(pagedResult);
+                return MediaFromSearchResults(pagedResult.ToArray());
             case UmbracoEntityTypes.Document:
                 return ContentFromSearchResults(pagedResult, culture);
             default:
@@ -126,9 +124,9 @@ public class UmbracoTreeSearcher
             }
 
             // if no icon could be mapped, it will be set to document, so change it to picture
-            if (m.Icon == Constants.Icons.DefaultIcon)
+            if (m.Icon == Cms.Core.Constants.Icons.DefaultIcon)
             {
-                m.Icon = Constants.Icons.Member;
+                m.Icon = Cms.Core.Constants.Icons.Member;
             }
 
             if (result.Values.ContainsKey("email") && result.Values["email"] != null)
@@ -154,7 +152,7 @@ public class UmbracoTreeSearcher
     /// </summary>
     /// <param name="results"></param>
     /// <returns></returns>
-    private IEnumerable<SearchResultEntity> MediaFromSearchResults(IEnumerable<ISearchResult> results)
+    private IEnumerable<SearchResultEntity> MediaFromSearchResults(IEnumerable<IUmbracoSearchResult> results)
         => _mapper.Map<IEnumerable<SearchResultEntity>>(results) ?? Enumerable.Empty<SearchResultEntity>();
 
     /// <summary>

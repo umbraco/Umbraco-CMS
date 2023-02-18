@@ -1,6 +1,7 @@
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Infrastructure.Examine;
+using Umbraco.Search.Configuration;
 
 namespace Umbraco.Extensions;
 
