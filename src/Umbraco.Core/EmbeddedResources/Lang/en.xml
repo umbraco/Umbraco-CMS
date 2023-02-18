@@ -2774,7 +2774,7 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="propertyEditorNotSupported">Property '%0%' uses editor '%1%' which is not supported in blocks.</key>
     <key alias="focusParentBlock">Set focus on the container block</key>
     <key alias="areaIdentification">Identification</key>
-    <key alias="areaValidation">Validation</key
+    <key alias="areaValidation">Validation</key>
     <key alias="areaValidationEntriesShort"><![CDATA[<strong>%0%</strong> must be present at least <strong>%2%</strong> time(s).]]></key>
     <key alias="areaValidationEntriesExceed"><![CDATA[<strong>%0%</strong> must maximum be present <strong>%3%</strong> time(s).]]></key>
     <key alias="areaNumberOfBlocks">Number of blocks</key>
