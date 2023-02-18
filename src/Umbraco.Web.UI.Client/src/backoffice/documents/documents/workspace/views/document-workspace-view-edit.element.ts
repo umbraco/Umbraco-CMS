@@ -131,27 +131,31 @@ export class UmbDocumentWorkspaceViewEditElement extends UmbLitElement {
 	}
 
 	render() {
-		// TODO: add && this._tabs.length > 0
 		return html`
-			<uui-tab-group>
-				${this._hasRootGroups
-					? html`
-							<uui-tab label="Content" .active=${this._routerPath === this._activePath} href=${this._routerPath || ''}
-								>Content</uui-tab
-							>
-					  `
-					: ''}
-				${repeat(
-					this._tabs,
-					(tab) => tab.name,
-					(tab) => {
-						const path = this._routerPath + '/tab/' + encodeURI(tab.name || '');
-						return html`<uui-tab label=${tab.name!} .active=${path === this._activePath} href=${path}
-							>${tab.name}</uui-tab
-						>`;
-					}
-				)}
-			</uui-tab-group>
+			${this._tabs.length > 1
+				? html` <uui-tab-group>
+						${this._hasRootGroups && this._tabs.length > 1
+							? html`
+									<uui-tab
+										label="Content"
+										.active=${this._routerPath === this._activePath}
+										href=${this._routerPath || ''}
+										>Content</uui-tab
+									>
+							  `
+							: ''}
+						${repeat(
+							this._tabs,
+							(tab) => tab.name,
+							(tab) => {
+								const path = this._routerPath + '/tab/' + encodeURI(tab.name || '');
+								return html`<uui-tab label=${tab.name!} .active=${path === this._activePath} href=${path}
+									>${tab.name}</uui-tab
+								>`;
+							}
+						)}
+				  </uui-tab-group>`
+				: ''}
 
 			<umb-router-slot
 				.routes=${this._routes}
