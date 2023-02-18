@@ -44,6 +44,11 @@ export class UmbDocumentWorkspaceViewEditPropertiesElement extends UmbLitElement
 	@state()
 	_propertyStructure: Array<DocumentTypePropertyTypeModel> = [];
 
+	// TODO: we should not get the values here, as its too hard to keep track of variants.
+	// Instead wrap each property in a variant aware component.
+	// As well we need to wrap the whole 'workspace' thing in a variant aware component.
+	// Remember that the other views should also differentiate, or be able to differentiate based on the selected variant.
+	// Also consider wrapping the variant data in a variant object. So we only need to parse one object every time we work with variants.
 	@state()
 	_propertyValueMap: Map<string, DocumentPropertyModel> = new Map();
 
