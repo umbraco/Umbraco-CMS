@@ -6,7 +6,7 @@
     <RootNamespace>Umbraco.Search</RootNamespace>
   </PropertyGroup>
   <ItemGroup>
-    <ProjectReference Include="..\src\Umbraco.Core\Umbraco.Core.csproj" />
+    <ProjectReference Include="..\..\src\Umbraco.Core\Umbraco.Core.csproj" />
   </ItemGroup>
 
 </Project>

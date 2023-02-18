@@ -1,10 +1,10 @@
 using Examine;
-using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Search.Examine.ValueSetBuilders;
 
-namespace Umbraco.Cms.Infrastructure.Examine;
+namespace Umbraco.Search.Examine;
 
-public class UmbracoIndexConfig : IUmbracoIndexConfig
+public class UmbracoIndexConfig : IUmbracoExamineIndexConfig
 {
     public UmbracoIndexConfig(IPublicAccessService publicAccessService, IScopeProvider scopeProvider)
     {

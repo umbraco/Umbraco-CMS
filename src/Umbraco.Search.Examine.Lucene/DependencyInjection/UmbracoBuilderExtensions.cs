@@ -3,6 +3,8 @@ using Examine.Lucene.Directories;
 using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.DependencyInjection;
+using Umbraco.Search.Diagnostics;
+using Umbraco.Search.SpecialisedSearchers;
 
 namespace Umbraco.Cms.Infrastructure.Examine.DependencyInjection;
 

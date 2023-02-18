@@ -1,12 +1,9 @@
-using Examine;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Cms.Infrastructure.Persistence;
-using Umbraco.Search;
 
-namespace Umbraco.Cms.Infrastructure.Examine;
+namespace Umbraco.Search.Indexing.Populators;
 
 /// <summary>
 ///     Performs the data lookups required to rebuild a content index

@@ -1,9 +1,9 @@
 using System.Runtime.Serialization;
 
-namespace Umbraco.Cms.Infrastructure.Examine;
+namespace Umbraco.Cms.Core.Models.Search;
 
 [DataContract(Name = "searcher", Namespace = "")]
-public class ExamineSearcherModel
+public class SearcherModel
 {
     [DataMember(Name = "name")]
     public string? Name { get; set; }

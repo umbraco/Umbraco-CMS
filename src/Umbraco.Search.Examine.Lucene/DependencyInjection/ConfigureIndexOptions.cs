@@ -6,6 +6,8 @@ using Lucene.Net.Index;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Search;
+using Umbraco.Search.Examine;
 
 namespace Umbraco.Cms.Infrastructure.Examine.DependencyInjection;
 
@@ -15,10 +17,10 @@ namespace Umbraco.Cms.Infrastructure.Examine.DependencyInjection;
 public sealed class ConfigureIndexOptions : IConfigureNamedOptions<LuceneDirectoryIndexOptions>
 {
     private readonly IndexCreatorSettings _settings;
-    private readonly IUmbracoIndexConfig _umbracoIndexConfig;
+    private readonly IUmbracoExamineIndexConfig _umbracoIndexConfig;
 
     public ConfigureIndexOptions(
-        IUmbracoIndexConfig umbracoIndexConfig,
+        IUmbracoExamineIndexConfig umbracoIndexConfig,
         IOptions<IndexCreatorSettings> settings)
     {
         _umbracoIndexConfig = umbracoIndexConfig;

@@ -1,7 +1,7 @@
 using Examine;
 using Umbraco.Extensions;
 
-namespace Umbraco.Cms.Infrastructure.Examine;
+namespace Umbraco.Search.Examine;
 
 /// <summary>
 ///     Performing basic validation of a value set

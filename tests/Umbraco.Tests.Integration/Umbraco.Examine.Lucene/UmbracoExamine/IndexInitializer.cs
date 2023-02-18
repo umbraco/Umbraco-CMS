@@ -18,6 +18,10 @@ using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Infrastructure.Examine;
 using Umbraco.Cms.Infrastructure.Persistence;
+using Umbraco.Search;
+using Umbraco.Search.Examine;
+using Umbraco.Search.Examine.ValueSetBuilders;
+using Umbraco.Search.Indexing.Populators;
 using Directory = Lucene.Net.Store.Directory;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Examine.Lucene.UmbracoExamine;

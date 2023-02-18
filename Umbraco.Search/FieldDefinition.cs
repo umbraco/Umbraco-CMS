@@ -1,4 +1,6 @@
-﻿namespace Umbraco.Cms.Infrastructure.Examine;
+﻿using Umbraco.Search.Enums;
+
+namespace Umbraco.Search;
 
 public class FieldDefinition : IEquatable<FieldDefinition>
 {

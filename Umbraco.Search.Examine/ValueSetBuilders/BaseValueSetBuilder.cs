@@ -3,7 +3,7 @@ using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Extensions;
 
-namespace Umbraco.Cms.Infrastructure.Examine;
+namespace Umbraco.Search.Examine.ValueSetBuilders;
 
 /// <inheritdoc />
 public abstract class BaseValueSetBuilder<TContent> : IValueSetBuilder<TContent>

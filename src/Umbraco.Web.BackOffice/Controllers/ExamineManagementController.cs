@@ -6,9 +6,13 @@ using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models.ContentEditing;
+using Umbraco.Cms.Core.Models.Search;
 using Umbraco.Cms.Infrastructure.Examine;
 using Umbraco.Cms.Web.Common.Attributes;
 using Umbraco.Extensions;
+using Umbraco.Search;
+using Umbraco.Search.Diagnostics;
+using Umbraco.Search.Indexing;
 using SearchResult = Umbraco.Cms.Core.Models.ContentEditing.SearchResult;
 
 namespace Umbraco.Cms.Web.BackOffice.Controllers;
@@ -40,7 +44,7 @@ public class ExamineManagementController : UmbracoAuthorizedJsonController
     ///     Get the details for indexers
     /// </summary>
     /// <returns></returns>
-    public IEnumerable<ExamineIndexModel> GetIndexerDetails()
+    public IEnumerable<SearchIndexModel> GetIndexerDetails()
         => _examineManager.Indexes
             .Select(index => CreateModel(index))
             .OrderBy(examineIndexModel => examineIndexModel.Name?.TrimEnd("Indexer"));
@@ -49,10 +53,10 @@ public class ExamineManagementController : UmbracoAuthorizedJsonController
     ///     Get the details for searchers
     /// </summary>
     /// <returns></returns>
-    public IEnumerable<ExamineSearcherModel> GetSearcherDetails()
+    public IEnumerable<SearcherModel> GetSearcherDetails()
     {
-        var model = new List<ExamineSearcherModel>(
-            _examineManager.RegisteredSearchers.Select(searcher => new ExamineSearcherModel { Name = searcher.Name })
+        var model = new List<SearcherModel>(
+            _examineManager.RegisteredSearchers.Select(searcher => new SearcherModel { Name = searcher.Name })
                 .OrderBy(x =>
                     x.Name?.TrimEnd("Searcher"))); //order by name , but strip the "Searcher" from the end if it exists
         return model;
@@ -110,7 +114,7 @@ public class ExamineManagementController : UmbracoAuthorizedJsonController
     ///     This is kind of rudimentary since there's no way we can know that the index has rebuilt, we
     ///     have a listener for the index op complete so we'll just check if that key is no longer there in the runtime cache
     /// </remarks>
-    public ActionResult<ExamineIndexModel?> PostCheckRebuildIndex(string indexName)
+    public ActionResult<SearchIndexModel?> PostCheckRebuildIndex(string indexName)
     {
         ActionResult validate = ValidateIndex(indexName, out IIndex? index);
 
@@ -184,7 +188,7 @@ public class ExamineManagementController : UmbracoAuthorizedJsonController
         }
     }
 
-    private ExamineIndexModel CreateModel(IIndex index)
+    private SearchIndexModel CreateModel(IIndex index)
     {
         var indexName = index.Name;
 
@@ -203,7 +207,7 @@ public class ExamineManagementController : UmbracoAuthorizedJsonController
             properties[p.Key] = p.Value;
         }
 
-        var indexerModel = new ExamineIndexModel
+        var indexerModel = new SearchIndexModel
         {
             Name = indexName,
             HealthStatus = isHealth.Success ? isHealth.Result ?? "Healthy" : isHealth.Result ?? "Unhealthy",

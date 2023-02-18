@@ -1,12 +1,15 @@
-using Examine;
 using Umbraco.Cms.Core;
 
-namespace Umbraco.Cms.Infrastructure.Examine;
+namespace Umbraco.Search.Diagnostics;
 
 /// <summary>
 ///     Exposes diagnostic information about an index
 /// </summary>
-public interface IIndexDiagnostics : IIndexStats
+public interface IIndexDiagnostics<T> : IIndexDiagnostics
+{
+
+}
+public interface IIndexDiagnostics
 {
     /// <summary>
     ///     A key/value collection of diagnostic properties for the index

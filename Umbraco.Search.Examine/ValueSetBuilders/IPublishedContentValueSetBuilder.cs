@@ -1,7 +1,8 @@
 using Examine;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Search.Examine.ValueSetBuilders;
 
-namespace Umbraco.Cms.Infrastructure.Examine;
+namespace Umbraco.Search.Examine;
 
 /// <summary>
 ///     Marker interface for a <see cref="ValueSet" /> builder for only published content

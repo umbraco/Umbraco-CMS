@@ -5,6 +5,7 @@ using Examine;
 using Examine.Lucene.Providers;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Hosting;
+using Umbraco.Search.Diagnostics;
 
 namespace Umbraco.Cms.Infrastructure.Examine;
 

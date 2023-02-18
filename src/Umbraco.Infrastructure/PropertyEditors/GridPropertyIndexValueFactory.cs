@@ -6,7 +6,6 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Xml;
-using Umbraco.Cms.Infrastructure.Examine;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.PropertyEditors

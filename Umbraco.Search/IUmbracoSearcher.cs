@@ -1,6 +1,8 @@
-﻿namespace Umbraco.Search;
+﻿using Umbraco.Cms.Core.Models.Search;
 
-public class IUmbracoSearcher<T>
+namespace Umbraco.Search;
+
+public interface IUmbracoSearcher<T>
 {
-
+    public IUmbracoSearchResult Search(string term, int page, int pageSize);
 }

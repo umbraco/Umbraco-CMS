@@ -1,8 +1,7 @@
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Search;
 
-namespace Umbraco.Cms.Infrastructure.Examine;
+namespace Umbraco.Search.Indexing.Populators;
 
 public class MemberIndexPopulator : IndexPopulator
 {

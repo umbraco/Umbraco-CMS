@@ -1,6 +1,6 @@
 using Umbraco.Cms.Core.Collections;
 
-namespace Umbraco.Cms.Infrastructure.Examine;
+namespace Umbraco.Search.Indexing.Populators;
 
 /// <summary>
 ///     An <see cref="IIndexPopulator" /> that is automatically associated to any index of type <see cref="TIndex" />

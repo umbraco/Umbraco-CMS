@@ -1,40 +1,39 @@
-using Examine;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
 
-namespace Umbraco.Cms.Infrastructure.Examine;
+namespace Umbraco.Search.Indexing.Populators;
 
 /// <summary>
 ///     Performs the data lookups required to rebuild a media index
 /// </summary>
-public class MediaIndexPopulator : IndexPopulator<IUmbracoContentIndex>
+public class MediaIndexPopulator : IndexPopulator
 {
     private readonly ILogger<MediaIndexPopulator> _logger;
     private readonly IMediaService _mediaService;
-    private readonly IValueSetBuilder<IMedia> _mediaValueSetBuilder;
+    private readonly ISearchProvider _provider;
     private readonly int? _parentId;
 
     /// <summary>
     ///     Default constructor to lookup all content data
     /// </summary>
-    public MediaIndexPopulator(ILogger<MediaIndexPopulator> logger, IMediaService mediaService, IValueSetBuilder<IMedia> mediaValueSetBuilder)
-        : this(logger, null, mediaService, mediaValueSetBuilder)
+    public MediaIndexPopulator(ILogger<MediaIndexPopulator> logger, IMediaService mediaService, ISearchProvider provider)
+        : this(logger, null, mediaService, provider)
     {
     }
 
     /// <summary>
     ///     Optional constructor allowing specifying custom query parameters
     /// </summary>
-    public MediaIndexPopulator(ILogger<MediaIndexPopulator> logger, int? parentId, IMediaService mediaService, IValueSetBuilder<IMedia> mediaValueSetBuilder)
+    public MediaIndexPopulator(ILogger<MediaIndexPopulator> logger, int? parentId, IMediaService mediaService, ISearchProvider provider)
     {
         _logger = logger;
         _parentId = parentId;
         _mediaService = mediaService;
-        _mediaValueSetBuilder = mediaValueSetBuilder;
+        _provider = provider;
     }
 
-    protected override void PopulateIndexes(IReadOnlyList<IIndex> indexes)
+    protected override void PopulateIndexes(IReadOnlyList<string> indexes)
     {
         if (indexes.Count == 0)
         {
@@ -60,9 +59,9 @@ public class MediaIndexPopulator : IndexPopulator<IUmbracoContentIndex>
             media = _mediaService.GetPagedDescendants(mediaParentId, pageIndex, pageSize, out _).ToArray();
 
             // ReSharper disable once PossibleMultipleEnumeration
-            foreach (IIndex index in indexes)
+            foreach (string index in indexes)
             {
-                index.IndexItems(_mediaValueSetBuilder.GetValueSets(media));
+                _provider.GetIndex<IMedia>(index).IndexItems(media);
             }
 
             pageIndex++;

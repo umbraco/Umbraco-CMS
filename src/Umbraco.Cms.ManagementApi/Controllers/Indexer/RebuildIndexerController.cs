@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Infrastructure.Examine;
 using Umbraco.New.Cms.Infrastructure.Services;
+using Umbraco.Search;
 
 namespace Umbraco.Cms.ManagementApi.Controllers.Indexer;
 

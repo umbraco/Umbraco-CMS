@@ -4,7 +4,6 @@ using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Models.Membership;
-using Umbraco.Cms.Infrastructure.Examine;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Models.Mapping;

@@ -11,13 +11,15 @@ using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Extensions;
+using Umbraco.Search.Diagnostics;
+using Umbraco.Search.Examine;
 
 namespace Umbraco.Cms.Infrastructure.Examine;
 
 /// <summary>
 ///     An abstract provider containing the basic functionality to be able to query against Umbraco data.
 /// </summary>
-public abstract class UmbracoExamineIndex : LuceneIndex, IUmbracoIndex, IIndexDiagnostics
+public abstract class UmbracoExamineIndex : LuceneIndex, IUmbracoExamineIndex, IIndexDiagnostics
 {
     private readonly UmbracoExamineIndexDiagnostics _diagnostics;
     private readonly ILogger<UmbracoExamineIndex> _logger;

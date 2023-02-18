@@ -8,9 +8,9 @@ using Umbraco.Cms.Core.Models.Search;
 using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Trees;
-using Umbraco.Cms.Infrastructure.Examine;
 using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Extensions;
+using Umbraco.Search.SpecialisedSearchers;
 
 namespace Umbraco.Cms.Infrastructure.Search;
 

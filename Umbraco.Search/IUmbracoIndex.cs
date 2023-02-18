@@ -1,6 +1,4 @@
-using Umbraco.Cms.Core.Models;
-
-namespace Umbraco.Cms.Infrastructure.Examine;
+namespace Umbraco.Search;
 
 /// <summary>
 ///     A Marker interface for defining an Umbraco indexer
@@ -23,4 +21,6 @@ public interface IUmbracoIndex<T>
     bool PublishedValuesOnly { get; }
 
     void IndexItems<T>(T[] members);
+    bool Exists();
+    long GetDocumentCount();
 }

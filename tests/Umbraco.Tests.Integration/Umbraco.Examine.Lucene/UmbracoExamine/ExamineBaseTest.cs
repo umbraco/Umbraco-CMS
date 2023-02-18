@@ -14,6 +14,9 @@ using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Examine;
 using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Tests.Integration.Testing;
+using Umbraco.Search.Examine;
+using Umbraco.Search.Examine.ValueSetBuilders;
+using Umbraco.Search.Indexing.Populators;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Examine.Lucene.UmbracoExamine;
 

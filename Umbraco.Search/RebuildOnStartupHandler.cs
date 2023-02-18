@@ -3,6 +3,7 @@ using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Sync;
+using Umbraco.Search.Indexing;
 
 namespace Umbraco.Cms.Infrastructure.Examine;
 
@@ -13,8 +14,7 @@ namespace Umbraco.Cms.Infrastructure.Examine;
 ///     On the first HTTP request this will rebuild the Examine indexes if they are empty.
 ///     If it is a cold boot, they are all rebuilt.
 /// </remarks>
-public sealed class RebuildOnStartupHandler : INotificationHandler<UmbracoRequestBeginNotification>
-{
+public class RebuildOnStartupHandler{
     // These must be static because notification handlers are transient.
     // this does unfortunatley mean that one RebuildOnStartupHandler instance
     // will be created for each front-end request even though we only use the first one.
@@ -24,13 +24,13 @@ public sealed class RebuildOnStartupHandler : INotificationHandler<UmbracoReques
     private static bool _isReady;
     private static bool _isReadSet;
     private static object? _isReadyLock;
-    private readonly ExamineIndexRebuilder _backgroundIndexRebuilder;
+    private readonly IIndexRebuilder _backgroundIndexRebuilder;
     private readonly IRuntimeState _runtimeState;
     private readonly ISyncBootStateAccessor _syncBootStateAccessor;
 
     public RebuildOnStartupHandler(
         ISyncBootStateAccessor syncBootStateAccessor,
-        ExamineIndexRebuilder backgroundIndexRebuilder,
+        IIndexRebuilder backgroundIndexRebuilder,
         IRuntimeState runtimeState)
     {
         _syncBootStateAccessor = syncBootStateAccessor;

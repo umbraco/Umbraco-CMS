@@ -1,8 +1,9 @@
 using Examine;
+using Umbraco.Search.Examine.ValueSetBuilders;
 
-namespace Umbraco.Cms.Infrastructure.Examine;
+namespace Umbraco.Search.Examine;
 
-public interface IUmbracoIndexConfig
+public interface IUmbracoExamineIndexConfig
 {
     IContentValueSetValidator GetContentValueSetValidator();
 

@@ -1,52 +1,46 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using Examine;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Runtime;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Cms.Infrastructure.HostedServices;
+using Umbraco.Search.Indexing;
 
-namespace Umbraco.Cms.Infrastructure.Examine;
+namespace Umbraco.Search;
 
-public class ExamineIndexRebuilder : IIndexRebuilder
+public class IndexRebuilder : IIndexRebuilder
 {
     private readonly IBackgroundTaskQueue _backgroundTaskQueue;
-    private readonly IExamineManager _examineManager;
-    private readonly ILogger<ExamineIndexRebuilder> _logger;
+    private readonly ILogger<IndexRebuilder> _logger;
     private readonly IMainDom _mainDom;
     private readonly IEnumerable<IIndexPopulator> _populators;
     private readonly object _rebuildLocker = new();
     private readonly IRuntimeState _runtimeState;
+    private readonly ISearchProvider _provider;
 
     /// <summary>
-    ///     Initializes a new instance of the <see cref="ExamineIndexRebuilder" /> class.
+    ///     Initializes a new instance of the <see cref="IndexRebuilder" /> class.
     /// </summary>
-    public ExamineIndexRebuilder(
+    public IndexRebuilder(
         IMainDom mainDom,
         IRuntimeState runtimeState,
-        ILogger<ExamineIndexRebuilder> logger,
-        IExamineManager examineManager,
+        ISearchProvider provider,
+        ILogger<IndexRebuilder> logger,
         IEnumerable<IIndexPopulator> populators,
         IBackgroundTaskQueue backgroundTaskQueue)
     {
         _mainDom = mainDom;
         _runtimeState = runtimeState;
+        _provider = provider;
         _logger = logger;
-        _examineManager = examineManager;
         _populators = populators;
         _backgroundTaskQueue = backgroundTaskQueue;
     }
 
     public bool CanRebuild(string indexName)
     {
-        if (!_examineManager.TryGetIndex(indexName, out IIndex index))
-        {
-            throw new InvalidOperationException("No index found by name " + indexName);
-        }
-
-        return _populators.Any(x => x.IsRegistered(index));
+        return _populators.Any(x => x.IsRegistered(indexName));
     }
 
     public virtual void RebuildIndex(string indexName, TimeSpan? delay = null, bool useBackgroundThread = true)
@@ -66,11 +60,11 @@ public class ExamineIndexRebuilder : IIndexRebuilder
             _logger.LogInformation("Starting async background thread for rebuilding index {indexName}.", indexName);
 
             _backgroundTaskQueue.QueueBackgroundWorkItem(
-                cancellationToken => Task.Run(() => RebuildIndex(indexName, delay.Value, cancellationToken)));
+                cancellationToken => Task.Run(() => RebuildIndexInt(indexName, delay.Value, cancellationToken)));
         }
         else
         {
-            RebuildIndex(indexName, delay.Value, CancellationToken.None);
+            RebuildIndexInt(indexName, delay.Value, CancellationToken.None);
         }
     }
 
@@ -95,7 +89,7 @@ public class ExamineIndexRebuilder : IIndexRebuilder
                 {
                     // This is a fire/forget task spawned by the background thread queue (which means we
                     // don't need to worry about ExecutionContext flowing).
-                    Task.Run(() => RebuildIndexes(onlyEmptyIndexes, delay.Value, cancellationToken));
+                    Task.Run(() => RebuildIndexesINT(delay.Value, cancellationToken));
 
                     // immediately return so the queue isn't waiting.
                     return Task.CompletedTask;
@@ -103,13 +97,13 @@ public class ExamineIndexRebuilder : IIndexRebuilder
         }
         else
         {
-            RebuildIndexes(onlyEmptyIndexes, delay.Value, CancellationToken.None);
+            RebuildIndexesINT(delay.Value, CancellationToken.None);
         }
     }
 
     private bool CanRun() => _mainDom.IsMainDom && _runtimeState.Level == RuntimeLevel.Run;
 
-    private void RebuildIndex(string indexName, TimeSpan delay, CancellationToken cancellationToken)
+    private void RebuildIndexInt(string indexName, TimeSpan delay, CancellationToken cancellationToken)
     {
         if (delay > TimeSpan.Zero)
         {
@@ -125,12 +119,10 @@ public class ExamineIndexRebuilder : IIndexRebuilder
             }
             else
             {
-                if (!_examineManager.TryGetIndex(indexName, out IIndex index))
-                {
-                    throw new InvalidOperationException($"No index found with name {indexName}");
-                }
 
-                index.CreateIndex(); // clear the index
+                    _provider.CreateIndex(indexName);
+
+                // run each populator over the indexes
                 foreach (IIndexPopulator populator in _populators)
                 {
                     if (cancellationToken.IsCancellationRequested)
@@ -138,7 +130,14 @@ public class ExamineIndexRebuilder : IIndexRebuilder
                         return;
                     }
 
-                    populator.Populate(index);
+                    try
+                    {
+                        populator.Populate(indexName);
+                    }
+                    catch (Exception e)
+                    {
+                        _logger.LogError(e, "Index populating failed for populator {Populator}", populator.GetType());
+                    }
                 }
             }
         }
@@ -151,7 +150,7 @@ public class ExamineIndexRebuilder : IIndexRebuilder
         }
     }
 
-    private void RebuildIndexes(bool onlyEmptyIndexes, TimeSpan delay, CancellationToken cancellationToken)
+    private void RebuildIndexesINT(TimeSpan delay, CancellationToken cancellationToken)
     {
         if (delay > TimeSpan.Zero)
         {
@@ -168,19 +167,15 @@ public class ExamineIndexRebuilder : IIndexRebuilder
             else
             {
                 // If an index exists but it has zero docs we'll consider it empty and rebuild
-                IIndex[] indexes = (onlyEmptyIndexes
-                    ? _examineManager.Indexes.Where(x =>
-                        !x.IndexExists() || (x is IIndexStats stats && stats.GetDocumentCount() == 0))
-                    : _examineManager.Indexes).ToArray();
-
-                if (indexes.Length == 0)
+                IEnumerable<string> indexes = _provider.GetUnhealthyIndexes();
+                if (!indexes.Any())
                 {
                     return;
                 }
 
-                foreach (IIndex index in indexes)
+                foreach (var index in indexes)
                 {
-                    index.CreateIndex(); // clear the index
+                    _provider.CreateIndex(index);
                 }
 
                 // run each populator over the indexes
@@ -193,7 +188,7 @@ public class ExamineIndexRebuilder : IIndexRebuilder
 
                     try
                     {
-                        populator.Populate(indexes);
+                        populator.Populate(indexes.ToArray());
                     }
                     catch (Exception e)
                     {

@@ -1,8 +1,8 @@
 using System.Text.RegularExpressions;
-using Umbraco.Extensions;
 using Umbraco.Search.Constants;
+using Umbraco.Search.Enums;
 
-namespace Umbraco.Cms.Infrastructure.Examine;
+namespace Umbraco.Search;
 
 public class UmbracoFieldDefinitionCollection
 {

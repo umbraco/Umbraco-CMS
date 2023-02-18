@@ -3,14 +3,13 @@ using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.PropertyEditors;
-using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
-using Umbraco.Cms.Infrastructure.Examine;
-using Umbraco.Cms.Infrastructure.Search;
 using Umbraco.Extensions;
+using Umbraco.Search.Diagnostics;
+using Umbraco.Search.Examine.ValueSetBuilders;
 
-namespace Umbraco.Cms.Infrastructure.DependencyInjection;
+namespace Umbraco.Search.Examine;
 
 /// <summary>
 ///     Provides extension methods to the <see cref="IUmbracoBuilder" /> class.
@@ -21,9 +20,9 @@ public static partial class UmbracoBuilderExtensions
     {
 
 
-        builder.Services.AddSingleton<IIndexRebuilder, ExamineIndexRebuilder>();
+        builder.Services.AddSingleton<IIndexRebuilder, IndexRebuilder>();
         builder.Services.AddSingleton<IUmbracoIndexingHandler, ExamineUmbracoIndexingHandler>();
-        builder.Services.AddUnique<IUmbracoIndexConfig, UmbracoIndexConfig>();
+        builder.Services.AddUnique<IUmbracoExamineIndexConfig, UmbracoIndexConfig>();
         builder.Services.AddUnique<IIndexDiagnosticsFactory, IndexDiagnosticsFactory>();
         builder.Services.AddUnique<IPublishedContentValueSetBuilder>(factory =>
             new ContentValueSetBuilder(
@@ -43,7 +42,7 @@ public static partial class UmbracoBuilderExtensions
                 false));
         builder.Services.AddUnique<IValueSetBuilder<IMedia>, MediaValueSetBuilder>();
         builder.Services.AddUnique<IValueSetBuilder<IMember>, MemberValueSetBuilder>();
-        builder.Services.AddSingleton<ExamineIndexRebuilder>();
+        builder.Services.AddSingleton<IndexRebuilder>();
 
         builder.AddNotificationHandler<ContentCacheRefresherNotification, ContentIndexingNotificationHandler>();
         builder.AddNotificationHandler<ContentTypeCacheRefresherNotification, ContentTypeIndexingNotificationHandler>();

@@ -1,3 +1,5 @@
+using Umbraco.Search.Examine;
+
 namespace Umbraco.Cms.Infrastructure.Examine;
 
 public class MemberValueSetValidator : ValueSetValidator

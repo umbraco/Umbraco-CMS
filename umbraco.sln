@@ -160,8 +160,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tools", "Tools", "{05878304
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Umbraco.Search", "Umbraco.Search\Umbraco.Search.csproj", "{91FE383E-C049-4E69-A889-3883072C4D3C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "temp", "temp\temp.csproj", "{47A03528-09B3-4462-A337-3E03443EF110}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Umbraco.Search.Examine", "Umbraco.Search.Examine\Umbraco.Search.Examine.csproj", "{0E0CCEC2-5329-4536-89EE-6906835CFC79}"
 EndProject
 Global
@@ -328,12 +326,6 @@ Global
 		{91FE383E-C049-4E69-A889-3883072C4D3C}.Release|Any CPU.Build.0 = Release|Any CPU
 		{91FE383E-C049-4E69-A889-3883072C4D3C}.SkipTests|Any CPU.ActiveCfg = Debug|Any CPU
 		{91FE383E-C049-4E69-A889-3883072C4D3C}.SkipTests|Any CPU.Build.0 = Debug|Any CPU
-		{47A03528-09B3-4462-A337-3E03443EF110}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{47A03528-09B3-4462-A337-3E03443EF110}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{47A03528-09B3-4462-A337-3E03443EF110}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{47A03528-09B3-4462-A337-3E03443EF110}.Release|Any CPU.Build.0 = Release|Any CPU
-		{47A03528-09B3-4462-A337-3E03443EF110}.SkipTests|Any CPU.ActiveCfg = Debug|Any CPU
-		{47A03528-09B3-4462-A337-3E03443EF110}.SkipTests|Any CPU.Build.0 = Debug|Any CPU
 		{0E0CCEC2-5329-4536-89EE-6906835CFC79}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{0E0CCEC2-5329-4536-89EE-6906835CFC79}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0E0CCEC2-5329-4536-89EE-6906835CFC79}.Release|Any CPU.ActiveCfg = Release|Any CPU

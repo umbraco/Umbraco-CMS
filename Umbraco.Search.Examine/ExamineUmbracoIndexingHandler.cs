@@ -6,11 +6,9 @@ using Umbraco.Cms.Core.Logging;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Runtime;
 using Umbraco.Cms.Core.Scoping;
-using Umbraco.Cms.Infrastructure.HostedServices;
-using Umbraco.Cms.Infrastructure.Search;
 using Umbraco.Extensions;
 
-namespace Umbraco.Cms.Infrastructure.Examine;
+namespace Umbraco.Search.Examine;
 
 /// <summary>
 ///     Indexing handler for Examine indexes

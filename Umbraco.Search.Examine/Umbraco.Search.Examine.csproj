@@ -11,6 +11,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\src\Umbraco.Infrastructure\Umbraco.Infrastructure.csproj" />
     <ProjectReference Include="..\Umbraco.Search\Umbraco.Search.csproj" />
   </ItemGroup>
   <!-- Create and pack empty file to add TFM dependency -->

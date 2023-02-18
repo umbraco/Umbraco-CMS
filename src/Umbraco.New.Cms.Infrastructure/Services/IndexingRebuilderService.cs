@@ -1,7 +1,6 @@
 ﻿using Examine;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Cache;
-using Umbraco.Cms.Infrastructure.Examine;
 
 namespace Umbraco.New.Cms.Infrastructure.Services;
 
