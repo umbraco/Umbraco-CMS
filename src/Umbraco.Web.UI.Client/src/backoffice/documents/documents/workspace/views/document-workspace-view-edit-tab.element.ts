@@ -44,7 +44,6 @@ export class UmbDocumentWorkspaceViewEditTabElement extends UmbLitElement {
 		return this._noTabName;
 	}
 	public set noTabName(value: boolean) {
-		console.log('noTabName', value);
 		const oldValue = this._noTabName;
 		if (oldValue === value) return;
 		this._noTabName = value;
