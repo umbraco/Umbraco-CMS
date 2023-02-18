@@ -1475,7 +1475,7 @@ Da upravljate svojom web lokacijom, jednostavno otvorite Umbraco backoffice i po
     <key alias="member">Članovi</key>
     <key alias="newsletters">Bilteni</key>
     <key alias="packages">Paketi</key>
-    <key alias="marketplace">Trgovina</key>
+    <key alias="marketplace">Marketplace</key>
     <key alias="settings">Postavke</key>
     <key alias="statistics">Statistika</key>
     <key alias="translation">Prevodi</key>
