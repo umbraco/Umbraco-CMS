@@ -80,10 +80,9 @@ export class UmbDocumentWorkspaceViewEditElement extends UmbLitElement {
 		*/
 
 		this.observe(
-			this._workspaceContext.containersOfParentKey(null, 'Group'),
-			(rootGroups) => {
-				this._hasRootGroups = rootGroups.length > 0;
-				console.log('this._hasRootGroups', this._hasRootGroups);
+			this._workspaceContext.hasRootContainers('Group'),
+			(hasRootGroups) => {
+				this._hasRootGroups = hasRootGroups;
 				this._createRoutes();
 			},
 			'_observeTabs'

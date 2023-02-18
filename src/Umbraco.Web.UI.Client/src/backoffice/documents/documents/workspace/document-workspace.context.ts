@@ -190,6 +190,19 @@ export class UmbDocumentWorkspaceContext
 		);
 	}
 
+	hasPropertyStructuresOf(containerKey: string | null) {
+		return this.#documentTypes.getObservablePart((docTypes) => {
+			return (
+				docTypes.find((docType) => {
+					return docType.properties?.find((property) => {
+						if (property.containerKey === containerKey) {
+							return true;
+						}
+					});
+				}) !== undefined
+			);
+		});
+	}
 	rootPropertyStructures() {
 		return this.propertyStructuresOf(null);
 	}
@@ -212,6 +225,12 @@ export class UmbDocumentWorkspaceContext
 	rootContainers(containerType: 'Group' | 'Tab') {
 		return this.#containers.getObservablePart((data) => {
 			return data.filter((x) => x.parentKey === null && x.type === containerType);
+		});
+	}
+
+	hasRootContainers(containerType: 'Group' | 'Tab') {
+		return this.#containers.getObservablePart((data) => {
+			return data.filter((x) => x.parentKey === null && x.type === containerType).length > 0;
 		});
 	}
 

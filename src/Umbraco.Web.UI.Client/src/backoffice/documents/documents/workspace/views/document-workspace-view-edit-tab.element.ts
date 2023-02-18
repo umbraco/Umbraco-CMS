@@ -59,6 +59,9 @@ export class UmbDocumentWorkspaceViewEditTabElement extends UmbLitElement {
 	_tabContainers: PropertyTypeContainerViewModelBaseModel[] = [];
 
 	@state()
+	_hasTabProperties = false;
+
+	@state()
 	_groups: Array<PropertyTypeContainerViewModelBaseModel> = [];
 
 	private _workspaceContext?: UmbDocumentWorkspaceContext;
@@ -73,6 +76,20 @@ export class UmbDocumentWorkspaceViewEditTabElement extends UmbLitElement {
 		});
 	}
 
+	private _observeHasTabProperties() {
+		if (!this._workspaceContext) return;
+
+		this._tabContainers.forEach((container) => {
+			this.observe(
+				this._workspaceContext!.hasPropertyStructuresOf(container.key!),
+				(hasTabProperties) => {
+					this._hasTabProperties = hasTabProperties;
+				},
+				'_observeHasTabProperties_' + container.key
+			);
+		});
+	}
+
 	private _observeTabContainers() {
 		if (!this._workspaceContext) return;
 
@@ -83,6 +100,7 @@ export class UmbDocumentWorkspaceViewEditTabElement extends UmbLitElement {
 				(tabContainers) => {
 					this._tabContainers = tabContainers || [];
 					if (this._tabContainers.length > 0) {
+						this._observeHasTabProperties();
 						this._observeGroups();
 					}
 				},
@@ -127,11 +145,15 @@ export class UmbDocumentWorkspaceViewEditTabElement extends UmbLitElement {
 	render() {
 		// TODO: only show tab properties if there was any. We need some event? to tell us when the properties is empty.
 		return html`
-			<uui-box>
-				<umb-document-workspace-view-edit-properties
-					container-type="Tab"
-					container-name=${this.tabName || ''}></umb-document-workspace-view-edit-properties>
-			</uui-box>
+			${this._hasTabProperties
+				? html`
+						<uui-box>
+							<umb-document-workspace-view-edit-properties
+								container-type="Tab"
+								container-name=${this.tabName || ''}></umb-document-workspace-view-edit-properties>
+						</uui-box>
+				  `
+				: ''}
 			${repeat(
 				this._groups,
 				(group) => group.name,
