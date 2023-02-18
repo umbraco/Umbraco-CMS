@@ -41,7 +41,7 @@ public static class UrlProviderExtensions
     /// <remarks>
     ///     <para>Use when displaying URLs. If errors occur when generating the URLs, they will show in the list.</para>
     ///     <para>Contains all the URLs that we can figure out (based upon domains, etc).</para>
-    /// </rema
+    /// </remarks>
     public static async Task<IEnumerable<UrlInfo>> GetContentUrlsAsync(
         this IContent content,
         IPublishedRouter publishedRouter,
