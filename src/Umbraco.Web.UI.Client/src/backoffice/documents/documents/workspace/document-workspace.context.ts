@@ -30,11 +30,15 @@ export class UmbDocumentWorkspaceContext
 	#documentTypeRepository: UmbDocumentTypeRepository;
 	//#dataTypeRepository: UmbDataTypeRepository;
 
-	#data = new ObjectState<EntityType | undefined>(undefined);
-	documentTypeKey = this.#data.getObservablePart((data) => data?.contentTypeKey);
+	#draft = new ObjectState<EntityType | undefined>(undefined);
+	documentTypeKey = this.#draft.getObservablePart((data) => data?.contentTypeKey);
+
+	variants = this.#draft.getObservablePart((data) => data?.variants || []);
 
 	#documentTypes = new ArrayState<DocumentTypeModel>([], (x) => x.key);
 	documentTypes = this.#documentTypes.asObservable();
+
+	mainDocumentType = this.#documentTypes.asObservable();
 
 	// Notice the DocumentTypePropertyTypeContainerModel is equivalent to PropertyTypeContainerViewModelBaseModel, making it easy to generalize.
 	#containers = new ArrayState<DocumentTypePropertyTypeContainerModel>([], (x) => x.key);
@@ -54,7 +58,7 @@ export class UmbDocumentWorkspaceContext
 		const { data } = await this.#documentRepository.requestByKey(entityKey);
 		if (data) {
 			this.#isNew = false;
-			this.#data.next(data);
+			this.#draft.next(data);
 		}
 	}
 
@@ -62,7 +66,7 @@ export class UmbDocumentWorkspaceContext
 		const { data } = await this.#documentRepository.createDetailsScaffold(parentKey);
 		if (!data) return;
 		this.#isNew = true;
-		this.#data.next(data);
+		this.#draft.next(data);
 	}
 
 	private async _loadDocumentType(key?: string) {
@@ -127,7 +131,7 @@ export class UmbDocumentWorkspaceContext
 	*/
 
 	getData() {
-		return this.#data.getValue();
+		return this.#draft.getValue() || {};
 	}
 
 	/*
@@ -137,7 +141,7 @@ export class UmbDocumentWorkspaceContext
 	*/
 
 	getEntityKey() {
-		return this.getData()?.key || '';
+		return this.getData().key;
 	}
 
 	getEntityType() {
@@ -145,13 +149,13 @@ export class UmbDocumentWorkspaceContext
 	}
 
 	setName(name: string, culture?: string | null, segment?: string | null) {
-		const variants = this.#data.getValue()?.variants || [];
+		const variants = this.#draft.getValue()?.variants || [];
 		const newVariants = partialUpdateFrozenArray(
 			variants,
 			{ name },
 			(v) => v.culture == culture && v.segment == segment
 		);
-		this.#data.update({ variants: newVariants });
+		this.#draft.update({ variants: newVariants });
 	}
 	/*
 	getEntityType = this.#manager.getEntityType;
@@ -177,13 +181,13 @@ export class UmbDocumentWorkspaceContext
 	*/
 
 	propertyValuesOf(culture: string | null, segment: string | null) {
-		return this.#data.getObservablePart((data) =>
+		return this.#draft.getObservablePart((data) =>
 			data?.properties?.filter((p) => (culture === p.culture || null) && (segment === p.segment || null))
 		);
 	}
 
 	propertyValueOfAlias(propertyAlias: string, culture: string | null, segment: string | null) {
-		return this.#data.getObservablePart((data) =>
+		return this.#draft.getObservablePart((data) =>
 			data?.properties?.find(
 				(p) => propertyAlias === p.alias && (culture === p.culture || null) && (segment === p.segment || null)
 			)
@@ -251,20 +255,20 @@ export class UmbDocumentWorkspaceContext
 	setPropertyValue(alias: string, value: unknown) {
 		const entry = { alias: alias, value: value };
 
-		const currentData = this.#data.value;
+		const currentData = this.#draft.value;
 		if (currentData) {
 			// TODO: make a partial update method for array of data, (idea/concept, use if this case is getting common)
 			const newDataSet = appendToFrozenArray(currentData.properties || [], entry, (x) => x.alias);
-			this.#data.update({ properties: newDataSet });
+			this.#draft.update({ properties: newDataSet });
 		}
 	}
 
 	async save() {
-		if (!this.#data.value) return;
+		if (!this.#draft.value) return;
 		if (this.#isNew) {
-			await this.#documentRepository.createDetail(this.#data.value);
+			await this.#documentRepository.createDetail(this.#draft.value);
 		} else {
-			await this.#documentRepository.saveDetail(this.#data.value);
+			await this.#documentRepository.saveDetail(this.#draft.value);
 		}
 		// If it went well, then its not new anymore?.
 		this.#isNew = false;
@@ -287,6 +291,6 @@ export class UmbDocumentWorkspaceContext
 	*/
 
 	public destroy(): void {
-		this.#data.complete();
+		this.#draft.complete();
 	}
 }
