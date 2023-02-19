@@ -35,6 +35,7 @@ export class UmbDocumentWorkspaceContext
 
 	variants = this.#draft.getObservablePart((data) => data?.variants || []);
 	urls = this.#draft.getObservablePart((data) => data?.urls || []);
+	templateKey = this.#draft.getObservablePart((data) => data?.templateKey || null);
 
 	#documentTypes = new ArrayState<DocumentTypeModel>([], (x) => x.key);
 	documentTypes = this.#documentTypes.asObservable();
