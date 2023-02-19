@@ -9,47 +9,53 @@ namespace Umbraco.Search.Examine;
 
 public class ExamineSearchProvider : ISearchProvider
 {
-    private readonly IExamineManager _examineManager;
-    private readonly IValueSetBuilderFactory _factory;
+    public IEnumerable<IUmbracoIndex> Indexes => _indexers;
 
     private readonly ILogger<ExamineSearchProvider> _logger;
+    private readonly IEnumerable<IUmbracoIndex> _indexers;
+    private IEnumerable<IUmbracoSearcher> _searchers;
 
     //todo: make valuesetbuilders easier to manage
-    public ExamineSearchProvider(IExamineManager examineManager, IValueSetBuilderFactory factory, ILogger<ExamineSearchProvider> logger)
+    public ExamineSearchProvider(ILogger<ExamineSearchProvider> logger, IEnumerable<IUmbracoIndex> indexes, IEnumerable<IUmbracoSearcher> searchers)
     {
-        _examineManager = examineManager;
-        _factory = factory;
         _logger = logger;
+        _indexers = indexes;
+        _searchers = searchers;
     }
 
-    public IUmbracoIndex<T> GetIndex<T>(string index)
+    public IUmbracoIndex? GetIndex(string index)
     {
-        var examineIndex = _examineManager.GetIndex(index);
-        return new UmbracoExamineIndex<T>(examineIndex, _factory.Retrieve<T>());
+        return _indexers.FirstOrDefault(x => x.Name == index);
     }
 
-    public IUmbracoSearcher<T> GetSearcher<T>(string index)
+    public IUmbracoIndex<T>? GetIndex<T>(string index)
     {
-        var examineIndex = _examineManager.GetIndex(index).Searcher;
-        return new UmbracoExamineSearcher<T>(examineIndex);
+        return GetIndex(index) as IUmbracoIndex<T>;
+    }
+
+    public IUmbracoSearcher? GetSearcher(string index) => _searchers.FirstOrDefault(x => x.Name == index);
+
+    public IUmbracoSearcher<T>? GetSearcher<T>(string index)
+    {
+        return GetSearcher(index) as IUmbracoSearcher<T>;
     }
 
     public IEnumerable<string> GetAllIndexes()
     {
-        return _examineManager.Indexes.Select(x => x.Name);
+        return _indexers.Select(x => x.Name);
     }
 
     public IEnumerable<string> GetUnhealthyIndexes()
     {
-        return _examineManager.Indexes.Where(x => !x.IndexExists() || ( x is IIndexDiagnostics indexProvider &&  !indexProvider.IsHealthy())).Select(x=>x.Name);
+        return _indexers.Where(x => !x.IndexExists() || ( x is IIndexDiagnostics indexProvider &&  !indexProvider.IsHealthy())).Select(x=>x.Name);
     }
 
-    public OperationResult CreateIndex(string indexName, Type indexValue)
+    public OperationResult CreateIndex(string indexName)
     {
         var messages = new EventMessages();
 
-        var getIndex = _examineManager.TryGetIndex(indexName, out var index);
-        if (!getIndex)
+        var index = _indexers.FirstOrDefault(x=>x.Name==indexName);
+        if (index == null)
         {
             messages.Add(new EventMessage("Examine Search provider", "Examine has no registration for index", EventMessageType.Error));
             return OperationResult.Cancel(messages);
@@ -57,7 +63,7 @@ public class ExamineSearchProvider : ISearchProvider
 
         try
         {
-            index.CreateIndex();
+            index.Create();
             return OperationResult.Succeed(messages);
         }
         catch (Exception e)

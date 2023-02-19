@@ -3,7 +3,7 @@
 public interface IIndexingRebuilderService
 {
     bool CanRebuild(string indexName);
-    bool TryRebuild(string index, string indexName);
+    bool TryRebuild(string index);
 
     bool IsRebuilding(string indexName);
 }

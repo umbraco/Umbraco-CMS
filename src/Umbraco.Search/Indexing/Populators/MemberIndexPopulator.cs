@@ -34,7 +34,7 @@ public class MemberIndexPopulator : IndexPopulator
             // ReSharper disable once PossibleMultipleEnumeration
             foreach (string index in indexes)
             {
-                _provider.GetIndex<IMember>(index).IndexItems(members);
+                _provider.GetIndex<IMember>(index)?.IndexItems(members);
             }
 
             pageIndex++;

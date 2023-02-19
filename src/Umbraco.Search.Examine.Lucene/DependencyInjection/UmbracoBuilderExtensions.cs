@@ -1,15 +1,30 @@
 using Examine;
 using Examine.Lucene.Directories;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.DependencyInjection;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Search;
 using Umbraco.Search.Diagnostics;
+using Umbraco.Search.Examine;
+using Umbraco.Search.Examine.ValueSetBuilders;
 using Umbraco.Search.SpecialisedSearchers;
 
 namespace Umbraco.Cms.Infrastructure.Examine.DependencyInjection;
 
 public static class UmbracoBuilderExtensions
 {
+    public static IServiceCollection RegisterIndex<T>(this IServiceCollection services, string indexName)
+    {
+        services.AddExamineLuceneIndex<UmbracoExamineIndex, ConfigurationEnabledDirectoryFactory>(indexName)
+            .AddSingleton<IUmbracoIndex<T>>(services => new UmbracoExamineIndex<T>(services
+                .GetRequiredService<IExamineManager>().GetIndex(indexName), services.GetRequiredService<IValueSetBuilder<T>>()))
+            .AddSingleton<IUmbracoSearcher<T>>(services => new UmbracoExamineSearcher<T>(services
+            .GetRequiredService<IExamineManager>().GetIndex(indexName).Searcher));
+
+        return services;
+    }
     /// <summary>
     ///     Adds the Examine indexes for Umbraco
     /// </summary>
@@ -26,11 +41,11 @@ public static class UmbracoBuilderExtensions
 
         // Create the indexes
         services
-            .AddExamineLuceneIndex<UmbracoContentIndex, ConfigurationEnabledDirectoryFactory>(Constants.UmbracoIndexes
+            .RegisterIndex<IContent>(Constants.UmbracoIndexes
                 .InternalIndexName)
-            .AddExamineLuceneIndex<UmbracoContentIndex, ConfigurationEnabledDirectoryFactory>(Constants.UmbracoIndexes
+            .RegisterIndex<IContent>(Constants.UmbracoIndexes
                 .ExternalIndexName)
-            .AddExamineLuceneIndex<UmbracoMemberIndex, ConfigurationEnabledDirectoryFactory>(Constants.UmbracoIndexes
+            .RegisterIndex<IContent>(Constants.UmbracoIndexes
                 .MembersIndexName)
             .ConfigureOptions<ConfigureIndexOptions>();
 

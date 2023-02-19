@@ -18,22 +18,20 @@ using SearchResult = Umbraco.Cms.Core.Models.ContentEditing.SearchResult;
 namespace Umbraco.Cms.Web.BackOffice.Controllers;
 
 [PluginController(Constants.Web.Mvc.BackOfficeApiArea)]
-public class ExamineManagementController : UmbracoAuthorizedJsonController
+public class SearchManagementController : UmbracoAuthorizedJsonController
 {
-    private readonly IExamineManager _examineManager;
     private readonly IIndexDiagnosticsFactory _indexDiagnosticsFactory;
     private readonly IIndexRebuilder _indexRebuilder;
-    private readonly ILogger<ExamineManagementController> _logger;
+    private readonly ILogger<SearchManagementController> _logger;
     private readonly IAppPolicyCache _runtimeCache;
 
-    public ExamineManagementController(
-        IExamineManager examineManager,
-        ILogger<ExamineManagementController> logger,
+    public SearchManagementController(
+        ISearchProvider provider,
+        ILogger<SearchManagementController> logger,
         IIndexDiagnosticsFactory indexDiagnosticsFactory,
         AppCaches appCaches,
         IIndexRebuilder indexRebuilder)
     {
-        _examineManager = examineManager;
         _logger = logger;
         _indexDiagnosticsFactory = indexDiagnosticsFactory;
         _runtimeCache = appCaches.RuntimeCache;
@@ -188,11 +186,10 @@ public class ExamineManagementController : UmbracoAuthorizedJsonController
         }
     }
 
-    private SearchIndexModel CreateModel(IIndex index)
+    private SearchIndexModel CreateModel(string indexName)
     {
-        var indexName = index.Name;
 
-        IIndexDiagnostics indexDiag = _indexDiagnosticsFactory.Create(index);
+        IIndexDiagnostics indexDiag = _indexDiagnosticsFactory.Create(indexName);
 
         Attempt<string?> isHealth = indexDiag.IsHealthy();
 

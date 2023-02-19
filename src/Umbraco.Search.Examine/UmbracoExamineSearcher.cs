@@ -1,4 +1,5 @@
 ﻿using Examine;
+using Umbraco.Cms.Core.Models.Search;
 
 namespace Umbraco.Search.Examine;
 
@@ -10,8 +11,8 @@ public class UmbracoExamineSearcher<T> : IUmbracoSearcher<T>
         _examineIndex = examineIndex;
     }
 
-    public object Search(Action<object> action)
-    {
 
-    }
+    public IUmbracoSearchResult Search(string term, int page, int pageSize) => throw new NotImplementedException();
+
+    public string Name => _examineIndex.Name;
 }

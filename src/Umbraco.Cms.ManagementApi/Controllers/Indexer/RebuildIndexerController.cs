@@ -36,26 +36,14 @@ public class RebuildIndexerController : IndexerControllerBase
     [ProducesResponseType(typeof(OkResult), StatusCodes.Status200OK)]
     public async Task<IActionResult> Rebuild(string indexName)
     {
-        if (!_examineManager.TryGetIndex(indexName, out var index))
-        {
-            var invalidModelProblem = new ProblemDetails
-            {
-                Title = "Index Not Found",
-                Detail = $"No index found with name = {indexName}",
-                Status = StatusCodes.Status400BadRequest,
-                Type = "Error",
-            };
 
-            return await Task.FromResult(BadRequest(invalidModelProblem));
-        }
-
-        if (!_indexingRebuilderService.CanRebuild(index.Name))
+        if (!_indexingRebuilderService.CanRebuild(indexName))
         {
             var invalidModelProblem = new ProblemDetails
             {
                 Title = "Could not validate the populator",
                 Detail =
-                    $"The index {index?.Name} could not be rebuilt because we could not validate its associated {typeof(IIndexPopulator)}",
+                    $"The index {indexName} could not be rebuilt because we could not validate its associated {typeof(IIndexPopulator)}",
                 Status = StatusCodes.Status400BadRequest,
                 Type = "Error",
             };
@@ -65,7 +53,7 @@ public class RebuildIndexerController : IndexerControllerBase
 
         _logger.LogInformation("Rebuilding index '{IndexName}'", indexName);
 
-        if (_indexingRebuilderService.TryRebuild(index, indexName))
+        if (_indexingRebuilderService.TryRebuild(indexName))
         {
             return await Task.FromResult(Ok());
         }
@@ -73,7 +61,7 @@ public class RebuildIndexerController : IndexerControllerBase
         var problemDetails = new ProblemDetails
         {
             Title = "Index could not be rebuilt",
-            Detail = $"The index {index.Name} could not be rebuild. Check the log for details on this error.",
+            Detail = $"The index {indexName} could not be rebuild. Check the log for details on this error.",
             Status = StatusCodes.Status400BadRequest,
             Type = "Error",
         };

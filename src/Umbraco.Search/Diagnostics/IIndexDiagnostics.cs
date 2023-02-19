@@ -26,4 +26,7 @@ public interface IIndexDiagnostics
     ///     A successful attempt if it is healthy, else a failed attempt with a message if unhealthy
     /// </returns>
     Attempt<string?> IsHealthy();
+
+    long GetDocumentCount();
+    IEnumerable<string> GetFieldNames();
 }

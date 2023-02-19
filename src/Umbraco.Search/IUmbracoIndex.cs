@@ -3,7 +3,13 @@ namespace Umbraco.Search;
 /// <summary>
 ///     A Marker interface for defining an Umbraco indexer
 /// </summary>
-public interface IUmbracoIndex<T>
+public interface IUmbracoIndex<T> : IUmbracoIndex
+{
+    void IndexItems(T[] members);
+
+}
+
+public interface IUmbracoIndex
 {
     /// <summary>
     ///     When set to true Umbraco will keep the index in sync with Umbraco data automatically
@@ -20,7 +26,9 @@ public interface IUmbracoIndex<T>
     /// </remarks>
     bool PublishedValuesOnly { get; }
 
-    void IndexItems<T>(T[] members);
+    string Name { get; }
     bool Exists();
     long GetDocumentCount();
+    bool IndexExists();
+    void Create();
 }

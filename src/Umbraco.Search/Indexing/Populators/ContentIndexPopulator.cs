@@ -100,7 +100,7 @@ public class ContentIndexPopulator : IndexPopulator
             // ReSharper disable once PossibleMultipleEnumeration
             foreach (string index in indexes)
             {
-                _provider.GetIndex<IContent>(index).IndexItems(content);
+                _provider.GetIndex<IContent>(index)?.IndexItems(content);
             }
 
             pageIndex++;
@@ -144,7 +144,7 @@ public class ContentIndexPopulator : IndexPopulator
 
             foreach (string index in indexes)
             {
-                _provider.GetIndex<IContent>(index).IndexItems(content);
+                _provider.GetIndex<IContent>(index)?.IndexItems(content);
             }
 
             pageIndex++;

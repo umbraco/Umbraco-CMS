@@ -4,8 +4,10 @@ namespace Umbraco.Search;
 
 public interface ISearchProvider
 {
-    IUmbracoIndex<T> GetIndex<T>(string index);
-    IUmbracoSearcher<T> GetSearcher<T>(string index);
+    IUmbracoIndex? GetIndex(string index);
+
+    IUmbracoIndex<T>? GetIndex<T>(string index);
+    IUmbracoSearcher? GetSearcher(string index);
     IEnumerable<string> GetAllIndexes();
     IEnumerable<string> GetUnhealthyIndexes();
     OperationResult CreateIndex(string indexName);

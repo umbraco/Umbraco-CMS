@@ -503,7 +503,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                                 controller => controller.GetTags(string.Empty, string.Empty, null))
                         },
                         {
-                            "examineMgmtBaseUrl", _linkGenerator.GetUmbracoApiServiceBaseUrl<ExamineManagementController>(
+                            "examineMgmtBaseUrl", _linkGenerator.GetUmbracoApiServiceBaseUrl<SearchManagementController>(
                                 controller => controller.GetIndexerDetails())
                         },
                         {

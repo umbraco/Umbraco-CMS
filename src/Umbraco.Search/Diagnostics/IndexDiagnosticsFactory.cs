@@ -4,7 +4,7 @@ namespace Umbraco.Search.Diagnostics;
 ///     Default implementation of <see cref="IIndexDiagnosticsFactory" /> which returns
 ///     <see cref="GenericIndexDiagnostics" /> for indexes that don't have an implementation
 /// </summary>
-public class IndexDiagnosticsFactory<T>: IIndexDiagnosticsFactory<T>
+public class IndexDiagnosticsFactory : IIndexDiagnosticsFactory
 {
     private readonly ISearchProvider _provider;
 
@@ -13,14 +13,11 @@ public class IndexDiagnosticsFactory<T>: IIndexDiagnosticsFactory<T>
         _provider = provider;
     }
 
-    public virtual IIndexDiagnostics<T> Create<T>(string index)
+    public virtual IIndexDiagnostics Create(string index)
     {
-        if (index is not IIndexDiagnostics<T> indexDiag)
-        {
-            indexDiag = new GenericIndexDiagnostics<T>(_provider.GetIndex<T>(index), _provider.GetSearcher<T>(index));
-        }
 
-        return indexDiag;
+        return new GenericIndexDiagnostics(_provider.GetIndex(index), _provider.GetSearcher(index));
+
     }
 
 }

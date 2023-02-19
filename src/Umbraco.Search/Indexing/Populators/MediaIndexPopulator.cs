@@ -61,7 +61,7 @@ public class MediaIndexPopulator : IndexPopulator
             // ReSharper disable once PossibleMultipleEnumeration
             foreach (string index in indexes)
             {
-                _provider.GetIndex<IMedia>(index).IndexItems(media);
+                _provider.GetIndex<IMedia>(index)?.IndexItems(media);
             }
 
             pageIndex++;

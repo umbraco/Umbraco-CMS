@@ -1,5 +1,4 @@
-﻿using Examine;
-using Umbraco.Cms.Core;
+﻿using Umbraco.Cms.Core;
 using Umbraco.Cms.Infrastructure.Examine;
 using Umbraco.Cms.ManagementApi.ViewModels.Search;
 using Umbraco.New.Cms.Infrastructure.Services;
@@ -21,15 +20,15 @@ public class IndexViewModelFactory : IIndexViewModelFactory
         _indexingRebuilderService = indexingRebuilderService;
     }
 
-    public IndexViewModel Create(IIndex index)
+    public IndexViewModel Create(string index)
     {
-        if (_indexingRebuilderService.IsRebuilding(index.Name))
+        if (_indexingRebuilderService.IsRebuilding(index))
         {
             return new IndexViewModel
             {
-                Name = index.Name,
+                Name = index,
                 HealthStatus = "Rebuilding",
-                SearcherName = index.Searcher.Name,
+                SearcherName = index,
                 DocumentCount = 0,
                 FieldCount = 0,
             };
@@ -56,10 +55,10 @@ public class IndexViewModelFactory : IIndexViewModelFactory
 
         var indexerModel = new IndexViewModel
         {
-            Name = index.Name,
+            Name = index,
             HealthStatus = isHealthy.Success ? isHealthy.Result ?? "Healthy" : isHealthy.Result ?? "Unhealthy",
-            CanRebuild = _indexRebuilder.CanRebuild(index.Name),
-            SearcherName = index.Searcher.Name,
+            CanRebuild = _indexRebuilder.CanRebuild(index),
+            SearcherName = index,
             DocumentCount = indexDiag.GetDocumentCount(),
             FieldCount = indexDiag.GetFieldNames().Count(),
             ProviderProperties = properties,

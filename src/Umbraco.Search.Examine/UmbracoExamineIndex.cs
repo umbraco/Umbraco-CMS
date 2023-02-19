@@ -16,12 +16,21 @@ public class UmbracoExamineIndex<T> : IUmbracoIndex<T>
 
     public bool EnableDefaultEventHandler { get; }
     public bool PublishedValuesOnly { get; }
+    public string Name => _examineIndex.Name;
+    public bool Exists() => _examineIndex.IndexExists();
+
+    public long GetDocumentCount() => throw new NotImplementedException();
+
+    public bool IndexExists() => throw new NotImplementedException();
+
+    public void Create() => throw new NotImplementedException();
+
     /// <summary>
     ///
     /// </summary>
     /// <param name="items"></param>
     /// <typeparam name="T"></typeparam>
-    public void IndexItems<T>(T[] items)
+    public void IndexItems(T[] items)
     {
         var valueSet = _valueSetBuilder.GetValueSets(items);
         _examineIndex.IndexItems(valueSet);

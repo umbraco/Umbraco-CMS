@@ -23,7 +23,7 @@ public class IndexingRebuilderService : IIndexingRebuilderService
 
     public bool CanRebuild(string indexName) => _indexRebuilder.CanRebuild(indexName);
 
-    public bool TryRebuild(string index, string indexName)
+    public bool TryRebuild(string indexName)
     {
         try
         {

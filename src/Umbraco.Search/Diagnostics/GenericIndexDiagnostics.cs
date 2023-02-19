@@ -8,14 +8,14 @@ namespace Umbraco.Search.Diagnostics;
 /// <summary>
 ///     Used to return diagnostic data for any index
 /// </summary>
-public class GenericIndexDiagnostics<T> : IIndexDiagnostics<T>
+public class GenericIndexDiagnostics : IIndexDiagnostics
 {
     private static readonly string[] _ignoreProperties = { "Description" };
 
     private readonly ISet<string> _idOnlyFieldSet = new HashSet<string> { "id" };
-    private readonly IUmbracoIndex<T> _index;
-    private readonly IUmbracoSearcher<T> _searcher;
-    public GenericIndexDiagnostics(IUmbracoIndex<T> getIndex, IUmbracoSearcher<T> getSearcher)
+    private readonly IUmbracoIndex? _index;
+    private readonly IUmbracoSearcher? _searcher;
+    public GenericIndexDiagnostics(IUmbracoIndex? getIndex, IUmbracoSearcher? getSearcher)
     {
         _index = getIndex;
         _searcher = getSearcher;
@@ -32,7 +32,7 @@ public class GenericIndexDiagnostics<T> : IIndexDiagnostics<T>
             var result = new Dictionary<string, object?>();
 
             IOrderedEnumerable<PropertyInfo> props = TypeHelper
-                .CachedDiscoverableProperties(_index.GetType(), mustWrite: false)
+                .CachedDiscoverableProperties(_index?.GetType() ?? typeof(IUmbracoIndex<>), mustWrite: false)
                 .Where(x => _ignoreProperties.InvariantContains(x.Name) == false)
                 .OrderBy(x => x.Name);
 
@@ -49,14 +49,14 @@ public class GenericIndexDiagnostics<T> : IIndexDiagnostics<T>
 
     public Attempt<string?> IsHealthy()
     {
-        if (!_index.Exists())
+        if (!_index?.Exists() ?? false)
         {
             return Attempt.Fail("Does not exist");
         }
 
         try
         {
-           var result= _searcher.Search("test", 0,1);
+           var result= _searcher?.Search("test", 0,1);
             return Attempt<string?>.Succeed(); // if we can search we'll assume it's healthy
         }
         catch (Exception e)
@@ -65,7 +65,7 @@ public class GenericIndexDiagnostics<T> : IIndexDiagnostics<T>
         }
     }
 
-    public long GetDocumentCount() => _index.GetDocumentCount();
+    public long GetDocumentCount() => _index?.GetDocumentCount() ?? 0;
 
     public IEnumerable<string> GetFieldNames() => Enumerable.Empty<string>();
 }
