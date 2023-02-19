@@ -28,7 +28,6 @@ export class UmbDocumentWorkspaceContext
 	#host: UmbControllerHostInterface;
 	#documentRepository: UmbDocumentRepository;
 	#documentTypeRepository: UmbDocumentTypeRepository;
-	//#dataTypeRepository: UmbDataTypeRepository;
 
 	/**
 	 * The document is the current stored version of the document.
