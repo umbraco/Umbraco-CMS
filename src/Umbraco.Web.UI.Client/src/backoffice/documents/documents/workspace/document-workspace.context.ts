@@ -30,6 +30,16 @@ export class UmbDocumentWorkspaceContext
 	#documentTypeRepository: UmbDocumentTypeRepository;
 	//#dataTypeRepository: UmbDataTypeRepository;
 
+	/**
+	 * The document is the current stored version of the document.
+	 * For now lets not share this publicly as it can become confusing.
+	 * TODO: Use this to compare, for variants with changes.
+	 */
+	#document = new ObjectState<EntityType | undefined>(undefined);
+
+	/**
+	 * The document is the current state/draft version of the document.
+	 */
 	#draft = new ObjectState<EntityType | undefined>(undefined);
 	documentTypeKey = this.#draft.getObservablePart((data) => data?.contentTypeKey);
 
@@ -60,6 +70,7 @@ export class UmbDocumentWorkspaceContext
 		const { data } = await this.#documentRepository.requestByKey(entityKey);
 		if (data) {
 			this.#isNew = false;
+			this.#document.next(data);
 			this.#draft.next(data);
 		}
 	}
@@ -68,6 +79,7 @@ export class UmbDocumentWorkspaceContext
 		const { data } = await this.#documentRepository.createDetailsScaffold(parentKey);
 		if (!data) return;
 		this.#isNew = true;
+		this.#document.next(data);
 		this.#draft.next(data);
 	}
 
