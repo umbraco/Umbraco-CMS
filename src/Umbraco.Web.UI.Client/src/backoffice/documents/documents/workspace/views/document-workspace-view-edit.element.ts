@@ -19,14 +19,13 @@ export class UmbDocumentWorkspaceViewEditElement extends UmbLitElement {
 		`,
 	];
 
+	// TODO: get variant information via properties?
+
 	//private _hasRootProperties = false;
 	private _hasRootGroups = false;
 
 	@state()
 	private _routes: IRoute[] = [];
-
-	//@state()
-	//_tabs: PropertyTypeContainerViewModelBaseModel[] = [];
 
 	@state()
 	_tabs: Array<PropertyTypeContainerViewModelBaseModel> = [];
