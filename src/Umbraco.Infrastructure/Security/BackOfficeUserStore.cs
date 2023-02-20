@@ -320,7 +320,7 @@ public class BackOfficeUserStore : UmbracoUserStore<BackOfficeIdentityUser, Iden
                 return _userService.GetUserById(id);
             }
 
-            return _userService.Get(key);
+            return _userService.GetAsync(key).GetAwaiter().GetResult();
         }
 
         throw new InvalidOperationException($"Unable to resolve user with ID {userId}");

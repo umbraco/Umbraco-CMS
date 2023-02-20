@@ -824,13 +824,12 @@ internal class UserService : RepositoryService, IUserService
         }
     }
 
-    public IUser? Get(Guid key)
+    public Task<IUser?> GetAsync(Guid key)
     {
         using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
         {
-            // TODO: Should probably create a proper get by key method on the repository
             IQuery<IUser> query = Query<IUser>().Where(x => x.Key == key);
-            return _userRepository.Get(query).FirstOrDefault();
+            return Task.FromResult(_userRepository.Get(query).FirstOrDefault());
         }
     }
 

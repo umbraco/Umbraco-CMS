@@ -308,7 +308,8 @@ SELECT 4 AS [Key], COUNT(id) AS [Value] FROM umbracoUser WHERE userDisabled = 0 
         if (DateTime.UtcNow - found.LastValidatedUtc > _globalSettings.TimeOut)
         {
             //timeout detected, update the record
-            Logger.LogDebug("ClearLoginSession for sessionId {sessionId}", sessionId);ClearLoginSession(sessionId);
+            Logger.LogDebug("ClearLoginSession for sessionId {sessionId}", sessionId);
+            ClearLoginSession(sessionId);
             return false;
         }
 
