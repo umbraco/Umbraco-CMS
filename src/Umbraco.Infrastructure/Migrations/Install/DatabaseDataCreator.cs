@@ -1152,6 +1152,7 @@ internal class DatabaseDataCreator
         new UserDto
         {
             Id = Constants.Security.SuperUserId,
+            Key = new Guid("1E70F841-C261-413B-ABB2-2D68CDB96094"),
             Disabled = false,
             NoConsole = false,
             UserName = "Administrator",
