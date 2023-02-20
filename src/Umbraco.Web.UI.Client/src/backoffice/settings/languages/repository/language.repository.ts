@@ -59,17 +59,20 @@ export class UmbLanguageRepository {
 		return { data, error, asObservable: () => this.#languageStore!.data };
 	}
 
-	async requestItems(isoCode: Array<string>) {
+	async requestItems(isoCodes: Array<string>) {
 		// HACK: filter client side until we have a proper server side endpoint
+		// TODO: we will get a different size model here, how do we handle that in the store?
 		const { data, error } = await this.requestLanguages();
 
 		let items = undefined;
 
 		if (data) {
-			items = data.items = data.items.filter((x) => isoCode.includes(x.isoCode!));
+			// TODO: how do we best handle this? They might have a smaller data set than the details
+			items = data.items = data.items.filter((x) => isoCodes.includes(x.isoCode!));
+			data.items.forEach((x) => this.#languageStore?.append(x));
 		}
 
-		return { data: items, error };
+		return { data: items, error, asObservable: () => this.#languageStore!.items(isoCodes) };
 	}
 
 	/**

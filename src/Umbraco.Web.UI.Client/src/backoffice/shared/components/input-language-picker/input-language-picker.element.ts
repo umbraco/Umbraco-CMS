@@ -1,12 +1,11 @@
-import { css, html, nothing } from 'lit';
+import { css, html } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, property, state } from 'lit/decorators.js';
 import { ifDefined } from 'lit-html/directives/if-defined.js';
 import { FormControlMixin } from '@umbraco-ui/uui-base/lib/mixins';
 import { UmbModalService, UMB_MODAL_SERVICE_CONTEXT_TOKEN } from '../../../../core/modal';
-import { UMB_DOCUMENT_TREE_STORE_CONTEXT_TOKEN } from '../../../documents/documents/repository/document.tree.store';
 import { UmbLitElement } from '@umbraco-cms/element';
-import type { FolderTreeItemModel, LanguageModel } from '@umbraco-cms/backend-api';
+import type { LanguageModel } from '@umbraco-cms/backend-api';
 import type { UmbObserverController } from '@umbraco-cms/observable-api';
 import { UmbLanguageRepository } from 'src/backoffice/settings/languages/repository/language.repository';
 
@@ -77,7 +76,7 @@ export class UmbInputLanguagePickerElement extends FormControlMixin(UmbLitElemen
 	private _items?: Array<LanguageModel>;
 
 	private _modalService?: UmbModalService;
-	private _repository?: UmbLanguageRepository;
+	private _repository = new UmbLanguageRepository(this);
 	private _pickedItemsObserver?: UmbObserverController<LanguageModel>;
 
 	constructor() {
@@ -88,17 +87,12 @@ export class UmbInputLanguagePickerElement extends FormControlMixin(UmbLitElemen
 			() => this.minMessage,
 			() => !!this.min && this._selectedIsoCodes.length < this.min
 		);
+
 		this.addValidator(
 			'rangeOverflow',
 			() => this.maxMessage,
 			() => !!this.max && this._selectedIsoCodes.length > this.max
 		);
-
-		this.consumeContext('UmbLanguageRepository', (instance) => {
-			debugger;
-			this._repository = instance;
-			this._observePickedItems();
-		});
 
 		this.consumeContext(UMB_MODAL_SERVICE_CONTEXT_TOKEN, (instance) => {
 			this._modalService = instance;
@@ -125,12 +119,13 @@ export class UmbInputLanguagePickerElement extends FormControlMixin(UmbLitElemen
 			multiple: this.max === 1 ? false : true,
 			selection: [...this._selectedIsoCodes],
 		});
+
 		modalHandler?.onClose().then(({ selection }: any) => {
 			this._setSelection(selection);
 		});
 	}
 
-	private _removeItem(item: FolderTreeItemModel) {
+	private _removeItem(item: LanguageModel) {
 		const modalHandler = this._modalService?.confirm({
 			color: 'danger',
 			headline: `Remove ${item.name}?`,
@@ -140,7 +135,7 @@ export class UmbInputLanguagePickerElement extends FormControlMixin(UmbLitElemen
 
 		modalHandler?.onClose().then(({ confirmed }) => {
 			if (confirmed) {
-				const newSelection = this._selectedIsoCodes.filter((value) => value !== item.key);
+				const newSelection = this._selectedIsoCodes.filter((value) => value !== item.isoCode);
 				this._setSelection(newSelection);
 			}
 		});
@@ -154,13 +149,20 @@ export class UmbInputLanguagePickerElement extends FormControlMixin(UmbLitElemen
 	render() {
 		return html`
 			${this._items?.map((item) => this._renderItem(item))}
-			<uui-button id="add-button" look="placeholder" @click=${this._openPicker} label="open">Add</uui-button>
+			<uui-button
+				id="add-button"
+				look="placeholder"
+				@click=${this._openPicker}
+				label="open"
+				?disabled="${this._selectedIsoCodes.length === this.max}"
+				>Add</uui-button
+			>
 		`;
 	}
 
-	private _renderItem(item: FolderTreeItemModel) {
+	private _renderItem(item: LanguageModel) {
 		return html`
-			<!-- TODO: add ref language -->
+			<!-- TODO: add language ref element -->
 			<uui-ref-node name=${ifDefined(item.name === null ? undefined : item.name)} detail=${ifDefined(item.key)}>
 				<uui-action-bar slot="actions">
 					<uui-button @click=${() => this._removeItem(item)} label="Remove ${item.name}">Remove</uui-button>

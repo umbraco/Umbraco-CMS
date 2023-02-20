@@ -188,7 +188,7 @@ export class UmbEditLanguageWorkspaceViewElement extends UmbLitElement {
 				<umb-workspace-property-layout
 					label="Fallback language"
 					description="To allow multi-lingual content to fall back to another language if not present in the requested language, select it here.">
-					<umb-input-language-picker slot="editor"></umb-input-language-picker>
+					<umb-input-language-picker slot="editor" max="1"></umb-input-language-picker>
 				</umb-workspace-property-layout>
 			</uui-box>
 		`;

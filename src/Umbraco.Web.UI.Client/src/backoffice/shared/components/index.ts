@@ -1,4 +1,5 @@
 //TODO: we need to figure out what components should be available for extensions and load them upfront
+// TODO: we need to move these files into their respective folders/silos. We then need a way for a silo to globally register a component
 import './backoffice-frame/backoffice-header.element';
 import './backoffice-frame/backoffice-main.element';
 import './backoffice-frame/backoffice-modal-container.element';

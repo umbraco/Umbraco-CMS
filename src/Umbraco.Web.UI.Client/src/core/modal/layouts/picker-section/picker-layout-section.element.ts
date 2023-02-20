@@ -73,9 +73,9 @@ export class UmbPickerLayoutSectionElement extends UmbModalLayoutPickerBase {
 						${this._sections.map(
 							(item) => html`
 								<div
-									@click=${() => this._handleItemClick(item.alias)}
+									@click=${() => this.handleSelection(item.alias)}
 									@keydown=${(e: KeyboardEvent) => this._handleKeydown(e, item.alias)}
-									class=${this._isSelected(item.alias) ? 'item selected' : 'item'}>
+									class=${this.isSelected(item.alias) ? 'item selected' : 'item'}>
 									<span>${item.meta.label}</span>
 								</div>
 							`
@@ -83,8 +83,8 @@ export class UmbPickerLayoutSectionElement extends UmbModalLayoutPickerBase {
 					</div>
 				</uui-box>
 				<div slot="actions">
-					<uui-button label="Close" @click=${this._close}></uui-button>
-					<uui-button label="Submit" look="primary" color="positive" @click=${this._submit}></uui-button>
+					<uui-button label="Close" @click=${this.close}></uui-button>
+					<uui-button label="Submit" look="primary" color="positive" @click=${this.submit}></uui-button>
 				</div>
 			</umb-workspace-layout>
 		`;

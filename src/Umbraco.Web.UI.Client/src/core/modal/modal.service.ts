@@ -5,6 +5,7 @@ import './layouts/media-picker/modal-layout-media-picker.element';
 import './layouts/property-editor-ui-picker/modal-layout-property-editor-ui-picker.element';
 import './layouts/modal-layout-current-user.element';
 import './layouts/icon-picker/modal-layout-icon-picker.element';
+import '../../backoffice/settings/languages/language-picker/language-picker-modal-layout.element';
 
 import { UUIModalSidebarSize } from '@umbraco-ui/uui-modal-sidebar';
 import { BehaviorSubject } from 'rxjs';
@@ -16,6 +17,7 @@ import type { UmbModalPropertyEditorUIPickerData } from './layouts/property-edit
 import type { UmbModalMediaPickerData } from './layouts/media-picker/modal-layout-media-picker.element';
 import { UmbModalHandler } from './modal-handler';
 import { UmbContextToken } from '@umbraco-cms/context-api';
+import { UmbLanguagePickerModalData } from '../../backoffice/settings/languages/language-picker/language-picker-modal-layout.element';
 
 export type UmbModalType = 'dialog' | 'sidebar';
 
@@ -25,7 +27,9 @@ export interface UmbModalOptions<UmbModalData> {
 	data?: UmbModalData;
 }
 
-// TODO: Should this be called UmbModalContext ? as we don't have 'services' as a term.
+// TODO: rename to UmbModalContext
+// TODO: we should find a way to easily open a modal without adding custom methods to this context. It would result in a better separation of concerns.
+// TODO: move all layouts into their correct "silo" folders. User picker should live with users etc.
 export class UmbModalService {
 	// TODO: Investigate if we can get rid of HTML elements in our store, so we can use one of our states.
 	#modals = new BehaviorSubject(<Array<UmbModalHandler>>[]);
@@ -104,6 +108,16 @@ export class UmbModalService {
 	 */
 	public changePassword(data: UmbModalChangePasswordData): UmbModalHandler {
 		return this.open('umb-modal-layout-change-password', { data, type: 'dialog' });
+	}
+
+	/**
+	 * Opens a language picker sidebar modal
+	 * @public
+	 * @return {*}  {UmbModalHandler}
+	 * @memberof UmbModalService
+	 */
+	public languagePicker(data: UmbLanguagePickerModalData): UmbModalHandler {
+		return this.open('umb-language-picker-modal-layout', { data, type: 'sidebar' });
 	}
 
 	/**
