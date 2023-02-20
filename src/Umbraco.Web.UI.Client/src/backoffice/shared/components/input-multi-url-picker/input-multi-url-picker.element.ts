@@ -146,7 +146,10 @@ export class UmbInputMultiUrlPickerElement extends FormControlMixin(UmbLitElemen
 	}
 
 	private _renderItem(link: MultiUrlData, index: number) {
-		return html`<uui-ref-node .name="${link.name || ''}" .detail="${(link.url || '') + (link.queryString || '')}">
+		return html`<uui-ref-node
+			.name="${link.name || ''}"
+			.detail="${(link.url || '') + (link.queryString || '')}"
+			@open="${() => this._openPicker(link, index)}">
 			<uui-icon slot="icon" name="${link.icon || 'umb:link'}"></uui-icon>
 			<uui-action-bar slot="actions">
 				<uui-button @click="${() => this._openPicker(link, index)}" label="Edit link">Edit</uui-button>

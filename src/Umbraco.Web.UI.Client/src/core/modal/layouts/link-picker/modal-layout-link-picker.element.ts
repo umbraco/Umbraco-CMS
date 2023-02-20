@@ -5,7 +5,7 @@ import { UUIBooleanInputEvent, UUIInputElement } from '@umbraco-ui/uui';
 import { UUIModalSidebarSize } from '@umbraco-ui/uui-modal-sidebar';
 import { UmbModalLayoutElement } from '../modal-layout.element';
 import { UmbTreeElement } from '../../../../backoffice/shared/components/tree/tree.element';
-import { buildUdi } from '@umbraco-cms/utils';
+import { buildUdi, getKeyFromUdi } from '@umbraco-cms/utils';
 
 export interface UmbModalLinkPickerData {
 	link: LinkPickerData;
@@ -13,14 +13,14 @@ export interface UmbModalLinkPickerData {
 }
 
 export interface LinkPickerData {
-	icon?: string;
-	name?: string;
-	published?: boolean;
-	queryString?: string;
-	target?: string;
-	trashed?: boolean;
-	udi?: string;
-	url?: string;
+	icon?: string | null;
+	name?: string | null;
+	published?: boolean | null;
+	queryString?: string | null;
+	target?: string | null;
+	trashed?: boolean | null;
+	udi?: string | null;
+	url?: string | null;
 }
 
 export interface LinkPickerConfig {
@@ -70,14 +70,14 @@ export class UmbModalLayoutLinkPickerElement extends UmbModalLayoutElement<UmbMo
 
 	@state()
 	_link: LinkPickerData = {
-		icon: undefined,
-		name: undefined,
+		icon: null,
+		name: null,
 		published: true,
-		queryString: undefined,
-		target: undefined,
+		queryString: null,
+		target: null,
 		trashed: false,
-		udi: undefined,
-		url: undefined,
+		udi: null,
+		url: null,
 	};
 
 	@state()
@@ -100,6 +100,9 @@ export class UmbModalLayoutLinkPickerElement extends UmbModalLayoutElement<UmbMo
 		if (!this.data) return;
 		this._link = this.data?.link;
 		this._layout = this.data?.config;
+
+		if (!this._link.udi) return;
+		this._selectedKey = getKeyFromUdi(this._link.udi);
 	}
 
 	private _handleQueryString() {
