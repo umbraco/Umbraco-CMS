@@ -560,11 +560,10 @@ public class BackOfficeUserStore : UmbracoUserStore<BackOfficeIdentityUser, Iden
     {
         if (user != null)
         {
-            var userId = UserIdToInt(user.Id).ToGuid();
             user.SetLoginsCallback(
-                new Lazy<IEnumerable<IIdentityUserLogin>?>(() => _externalLoginService.GetExternalLogins(userId)));
+                new Lazy<IEnumerable<IIdentityUserLogin>?>(() => _externalLoginService.GetExternalLogins(user.Key)));
             user.SetTokensCallback(
-                new Lazy<IEnumerable<IIdentityUserToken>?>(() => _externalLoginService.GetExternalLoginTokens(userId)));
+                new Lazy<IEnumerable<IIdentityUserToken>?>(() => _externalLoginService.GetExternalLoginTokens(user.Key)));
         }
 
         return user;
