@@ -19,6 +19,12 @@ import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 
 // TODO: should this context be called DocumentDraft instead of workspace? or should the draft be part of this?
 
+export type ActiveVariant = {
+	index: number;
+	culture: string | null;
+	segment: string | null;
+};
+
 type EntityType = DocumentModel;
 export class UmbDocumentWorkspaceContext
 	extends UmbWorkspaceContext
@@ -46,6 +52,9 @@ export class UmbDocumentWorkspaceContext
 	urls = this.#draft.getObservablePart((data) => data?.urls || []);
 	templateKey = this.#draft.getObservablePart((data) => data?.templateKey || null);
 
+	#activeVariants = new ArrayState<ActiveVariant>([], (x) => x.index);
+	activeVariants = this.#activeVariants.asObservable();
+
 	#documentTypes = new ArrayState<DocumentTypeModel>([], (x) => x.key);
 	documentTypes = this.#documentTypes.asObservable();
 
@@ -65,19 +74,22 @@ export class UmbDocumentWorkspaceContext
 
 	async load(entityKey: string) {
 		const { data } = await this.#documentRepository.requestByKey(entityKey);
-		if (data) {
-			this.#isNew = false;
-			this.#document.next(data);
-			this.#draft.next(data);
-		}
+		if (!data) return undefined;
+
+		this.#isNew = false;
+		this.#document.next(data);
+		this.#draft.next(data);
+		return data || undefined;
 	}
 
 	async createScaffold(parentKey: string | null) {
 		const { data } = await this.#documentRepository.createDetailsScaffold(parentKey);
-		if (!data) return;
+		if (!data) return undefined;
+
 		this.#isNew = true;
 		this.#document.next(data);
 		this.#draft.next(data);
+		return data || undefined;
 	}
 
 	private async _loadDocumentType(key?: string) {
@@ -130,6 +142,16 @@ export class UmbDocumentWorkspaceContext
 
 	getEntityType() {
 		return 'document';
+	}
+
+	setActiveVariant(index: number, culture: string | null, segment: string | null) {
+		const activeVariants = [...(this.#activeVariants.getValue() || [])];
+		if (index < activeVariants.length) {
+			activeVariants[index] = { index, culture, segment };
+		} else {
+			activeVariants.push({ index, culture, segment });
+		}
+		this.#activeVariants.next(activeVariants);
 	}
 
 	setName(name: string, culture?: string | null, segment?: string | null) {

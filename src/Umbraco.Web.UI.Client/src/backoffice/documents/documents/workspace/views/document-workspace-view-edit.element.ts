@@ -19,7 +19,7 @@ export class UmbDocumentWorkspaceViewEditElement extends UmbLitElement {
 		`,
 	];
 
-	// TODO: get variant information via properties?
+	// TODO: get variant information via variant-content?
 
 	//private _hasRootProperties = false;
 	private _hasRootGroups = false;
