@@ -182,7 +182,32 @@ export const data: Array<DataTypeModel & { type: 'data-type' }> = [
 		parentKey: null,
 		propertyEditorAlias: 'Umbraco.Slider',
 		propertyEditorUiAlias: 'Umb.PropertyEditorUI.Slider',
-		data: [],
+		data: [
+			{
+				alias: 'enableRange',
+				value: false,
+			},
+			{
+				alias: 'initVal1',
+				value: 10,
+			},
+			{
+				alias: 'initVal2',
+				value: 20,
+			},
+			{
+				alias: 'maxVal',
+				value: 50,
+			},
+			{
+				alias: 'minVal',
+				value: 0,
+			},
+			{
+				alias: 'step',
+				value: 10,
+			},
+		],
 	},
 	{
 		type: 'data-type',
