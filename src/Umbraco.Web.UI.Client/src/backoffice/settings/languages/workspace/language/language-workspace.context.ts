@@ -27,9 +27,9 @@ export class UmbLanguageWorkspaceContext extends UmbWorkspaceContext {
 	}
 
 	async createScaffold() {
+		this.isNew = true;
 		const { data } = await this.#languageRepository.createScaffold();
 		if (!data) return;
-		this.isNew = true;
 		this.#data.update(data);
 	}
 

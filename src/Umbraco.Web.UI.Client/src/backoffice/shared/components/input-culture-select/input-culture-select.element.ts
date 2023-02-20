@@ -1,6 +1,6 @@
 import { css, html } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
-import { customElement, state } from 'lit/decorators.js';
+import { customElement, property, state } from 'lit/decorators.js';
 import { FormControlMixin } from '@umbraco-ui/uui-base/lib/mixins';
 import { ifDefined } from 'lit-html/directives/if-defined.js';
 import { repeat } from 'lit/directives/repeat.js';
@@ -13,6 +13,24 @@ import { UmbChangeEvent } from 'src/core/events';
 @customElement('umb-input-culture-select')
 export class UmbInputCultureSelectElement extends FormControlMixin(UmbLitElement) {
 	static styles = [UUITextStyles, css``];
+
+	/**
+	 * Disables the input
+	 * @type {boolean}
+	 * @attr
+	 * @default false
+	 */
+	@property({ type: Boolean, reflect: true })
+	disabled = false;
+
+	/**
+	 * Disables the input
+	 * @type {boolean}
+	 * @attr
+	 * @default false
+	 */
+	@property({ type: Boolean, reflect: true })
+	readonly = false;
 
 	@state()
 	private _cultures: CultureModel[] = [];
@@ -50,7 +68,7 @@ export class UmbInputCultureSelectElement extends FormControlMixin(UmbLitElement
 		this.dispatchEvent(new UmbChangeEvent());
 	}
 
-	get #filteredCultures(): Array<CultureModel> {
+	get #filteredCultures() {
 		return this._cultures.filter((culture) => {
 			return culture.englishName?.toLowerCase().includes(this._search.toLowerCase());
 		});
@@ -61,23 +79,30 @@ export class UmbInputCultureSelectElement extends FormControlMixin(UmbLitElement
 	}
 
 	render() {
-		return html`<uui-combobox
-			value=${ifDefined(this.#fromAvailableCultures?.name)}
-			@change=${this.#onCultureChange}
-			@search=${this.#onSearchChange}>
-			<uui-combobox-list>
-				${repeat(
-					this.#filteredCultures,
-					(culture) => culture.name,
-					(culture) =>
-						html`
-							<uui-combobox-list-option value=${ifDefined(culture.name)}
-								>${culture.englishName}</uui-combobox-list-option
-							>
-						`
-				)}
-			</uui-combobox-list>
-		</uui-combobox> `;
+		return html`
+			<!-- TODO: comboxbox doesn't support disabled or readonly mode yet. This is a temp solution -->
+			${this.disabled || this.readonly
+				? html`${this.#fromAvailableCultures?.englishName}`
+				: html`
+						<uui-combobox
+							value=${ifDefined(this.#fromAvailableCultures?.name)}
+							@change=${this.#onCultureChange}
+							@search=${this.#onSearchChange}>
+							<uui-combobox-list>
+								${repeat(
+									this.#filteredCultures,
+									(culture) => culture.name,
+									(culture) =>
+										html`
+											<uui-combobox-list-option value=${ifDefined(culture.name)}
+												>${culture.englishName}</uui-combobox-list-option
+											>
+										`
+								)}
+							</uui-combobox-list>
+						</uui-combobox>
+				  `}
+		`;
 	}
 }
 

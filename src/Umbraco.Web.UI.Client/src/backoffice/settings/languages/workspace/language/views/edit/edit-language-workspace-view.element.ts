@@ -128,7 +128,8 @@ export class UmbEditLanguageWorkspaceViewElement extends UmbLitElement {
 					<div slot="editor">
 						<umb-input-culture-select
 							value=${ifDefined(this._language.isoCode)}
-							@change=${this.#handleCultureChange}></umb-input-culture-select>
+							@change=${this.#handleCultureChange}
+							?readonly=${!this.#languageWorkspaceContext?.isNew}></umb-input-culture-select>
 					</div>
 				</umb-workspace-property-layout>
 
