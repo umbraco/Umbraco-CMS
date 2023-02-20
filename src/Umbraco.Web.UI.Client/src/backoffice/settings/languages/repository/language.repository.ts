@@ -10,7 +10,7 @@ export class UmbLanguageRepository {
 
 	#host: UmbControllerHostInterface;
 
-	#detailDataSource: UmbLanguageServerDataSource;
+	#dataSource: UmbLanguageServerDataSource;
 	#languageStore?: UmbLanguageStore;
 
 	#notificationService?: UmbNotificationService;
@@ -18,8 +18,7 @@ export class UmbLanguageRepository {
 	constructor(host: UmbControllerHostInterface) {
 		this.#host = host;
 
-		// TODO: figure out how spin up get the correct data source
-		this.#detailDataSource = new UmbLanguageServerDataSource(this.#host);
+		this.#dataSource = new UmbLanguageServerDataSource(this.#host);
 
 		this.#init = Promise.all([
 			new UmbContextConsumerController(this.#host, UMB_NOTIFICATION_SERVICE_CONTEXT_TOKEN, (instance) => {
@@ -41,7 +40,7 @@ export class UmbLanguageRepository {
 			return { error };
 		}
 
-		return this.#detailDataSource.get(isoCode);
+		return this.#dataSource.get(isoCode);
 	}
 
 	// TODO: maybe this should be renamed to something more generic.
@@ -49,7 +48,7 @@ export class UmbLanguageRepository {
 	async requestLanguages({ skip, take } = { skip: 0, take: 1000 }) {
 		await this.#init;
 
-		const { data, error } = await this.#detailDataSource.getCollection({ skip, take });
+		const { data, error } = await this.#dataSource.getCollection({ skip, take });
 
 		if (data) {
 			// TODO: allow to append an array of items to the store
@@ -79,16 +78,16 @@ export class UmbLanguageRepository {
 	 * Creates a new Language scaffold
 	 * @param
 	 * @return {*}
-	 * @memberof UmbLanguageServerDataSource
+	 * @memberof UmbLanguageRepository
 	 */
 	async createScaffold() {
-		return this.#detailDataSource.createScaffold();
+		return this.#dataSource.createScaffold();
 	}
 
 	async create(language: LanguageModel) {
 		await this.#init;
 
-		const { data, error } = await this.#detailDataSource.update(language);
+		const { data, error } = await this.#dataSource.update(language);
 
 		if (data) {
 			this.#languageStore?.append(data);
@@ -99,10 +98,16 @@ export class UmbLanguageRepository {
 		return { data, error };
 	}
 
+	/**
+	 * Saves a language
+	 * @param {LanguageModel} language
+	 * @return {*}
+	 * @memberof UmbLanguageRepository
+	 */
 	async save(language: LanguageModel) {
 		await this.#init;
 
-		const { data, error } = await this.#detailDataSource.update(language);
+		const { data, error } = await this.#dataSource.update(language);
 
 		if (data) {
 			const notification = { data: { message: `Language saved` } };
@@ -113,22 +118,28 @@ export class UmbLanguageRepository {
 		return { data, error };
 	}
 
-	async delete(key: string) {
+	/**
+	 * Deletes a language
+	 * @param {string} isoCode
+	 * @return {*}
+	 * @memberof UmbLanguageRepository
+	 */
+	async delete(isoCode: string) {
 		await this.#init;
 
-		if (!key) {
-			const error: ProblemDetailsModel = { title: 'Language key is missing' };
+		if (!isoCode) {
+			const error: ProblemDetailsModel = { title: 'Language iso code is missing' };
 			return { error };
 		}
 
-		const { error } = await this.#detailDataSource.delete(key);
+		const { error } = await this.#dataSource.delete(isoCode);
 
 		if (!error) {
 			const notification = { data: { message: `Language deleted` } };
 			this.#notificationService?.peek('positive', notification);
 		}
 
-		this.#languageStore?.remove([key]);
+		this.#languageStore?.remove([isoCode]);
 
 		return { error };
 	}

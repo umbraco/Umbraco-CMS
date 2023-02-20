@@ -1,0 +1,130 @@
+import { UUITextStyles } from '@umbraco-ui/uui-css';
+import { css, html } from 'lit';
+import { customElement, state } from 'lit/decorators.js';
+import { repeat } from 'lit/directives/repeat.js';
+import { ifDefined } from 'lit-html/directives/if-defined.js';
+import { UUIMenuItemEvent } from '@umbraco-ui/uui';
+import { UmbLanguageRepository } from './repository/language.repository';
+import { UMB_APP_LANGUAGE_CONTEXT_TOKEN, UmbAppLanguageContext } from './app-language.context';
+import { UmbLitElement } from '@umbraco-cms/element';
+import { LanguageModel } from '@umbraco-cms/backend-api';
+
+@customElement('umb-app-language-select')
+export class UmbAppLanguageSelectElement extends UmbLitElement {
+	static styles = [
+		UUITextStyles,
+		css`
+			:host {
+				display: block;
+				position: relative;
+				z-index: 10;
+			}
+
+			#selected {
+				display: block;
+				width: 100%;
+				text-align: left;
+				background: none;
+				border: none;
+				padding: 20px 10px;
+				font-size: 1rem;
+				font-weight: bold;
+			}
+		`,
+	];
+
+	@state()
+	private _languages: Array<LanguageModel> = [];
+
+	@state()
+	private _appLanguage?: LanguageModel;
+
+	@state()
+	private _isOpen = false;
+
+	#repository = new UmbLanguageRepository(this);
+	#appLanguageContext?: UmbAppLanguageContext;
+	#languagesObserver?: any;
+
+	constructor() {
+		super();
+
+		this.consumeContext(UMB_APP_LANGUAGE_CONTEXT_TOKEN, (instance) => {
+			this.#appLanguageContext = instance;
+			this.#observeAppLanguage();
+		});
+	}
+
+	async #observeAppLanguage() {
+		if (!this.#appLanguageContext) return;
+
+		this.observe(this.#appLanguageContext.appLanguage, (isoCode) => {
+			this._appLanguage = isoCode;
+		});
+	}
+
+	async #observeLanguages() {
+		const { asObservable } = await this.#repository.requestLanguages();
+
+		this.#languagesObserver = this.observe(asObservable(), (languages) => {
+			this._languages = languages;
+		});
+	}
+
+	#onClick() {
+		this.#toggleDropdown();
+	}
+
+	#onClose() {
+		this.#closeDropdown();
+	}
+
+	#toggleDropdown() {
+		this._isOpen = !this._isOpen;
+
+		// first start observing the languages when the dropdown is opened
+		if (this._isOpen && !this.#languagesObserver) {
+			this.#observeLanguages();
+		}
+	}
+
+	#closeDropdown() {
+		this._isOpen = false;
+	}
+
+	#onLabelClick(event: UUIMenuItemEvent) {
+		const menuItem = event.target;
+		const isoCode = menuItem.dataset.isoCode;
+
+		// TODO: handle error
+		if (!isoCode) return;
+
+		this.#appLanguageContext?.setLanguage(isoCode);
+		this._isOpen = false;
+	}
+
+	render() {
+		return html` <umb-dropdown .open="${this._isOpen}" @close=${this.#onClose}>
+			<button id="selected" slot="trigger" @click=${this.#onClick}>${this._appLanguage?.name}</button>
+			<div slot="dropdown">
+				${repeat(
+					this._languages,
+					(language) => language.isoCode,
+					(language) =>
+						html`
+							<uui-menu-item
+								label=${ifDefined(language.name)}
+								@click-label=${this.#onLabelClick}
+								data-iso-code=${ifDefined(language.isoCode)}></uui-menu-item>
+						`
+				)}
+			</div>
+		</umb-dropdown>`;
+	}
+}
+
+declare global {
+	interface HTMLElementTagNameMap {
+		'umb-app-language-select': UmbAppLanguageSelectElement;
+	}
+}
