@@ -1,4 +1,5 @@
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-api';
+import { UUISelectEvent } from '@umbraco-ui/uui';
 import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, html, nothing } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
@@ -89,23 +90,43 @@ export class UmbModalLayoutPropertySettingsElement extends UmbModalLayoutElement
 		`,
 	];
 
-	@state()
-	private _propertyEditorUIIcon = '';
+	@state() private _propertyEditorUIIcon = '';
+	@state() private _propertyEditorUIName = '';
+	@state() private _propertyEditorUiAlias = '';
+	@state() private _propertyEditorAlias = '';
 
-	@state()
-	private _propertyEditorUIName = '';
+	@state() private _appearanceIsLeft = true;
 
-	@state()
-	private _propertyEditorUiAlias = '';
+	@state() private _customValidationOptions = [
+		{
+			name: 'No validation',
+			value: 'no-validation',
+			selected: true,
+		},
+		{
+			name: 'Validate as an email address',
+			value: 'email',
+			validation: '[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+.[a-zA-Z0-9-.]+',
+		},
+		{
+			name: 'Validate as a number',
+			value: 'number',
+			validation: '^[0-9]*$',
+		},
+		{
+			name: 'Validate as an URL',
+			value: 'url',
+			validation: 'https?://[a-zA-Z0-9-.]+.[a-zA-Z]{2,}',
+		},
+		{
+			name: '...or enter a custom validation',
+			value: 'custom',
+		},
+	];
+	@state() private _customValidation = this._customValidationOptions[0];
+	@state() private _customValidationErrorMessage = '';
 
-	@state()
-	private _propertyEditorAlias = '';
-
-	@state()
-	private _appearanceIsLeft = true;
-
-	@state()
-	private _aliasLocked = true;
+	@state() private _aliasLocked = true;
 
 	#modalService?: UmbModalService;
 
@@ -122,11 +143,36 @@ export class UmbModalLayoutPropertySettingsElement extends UmbModalLayoutElement
 		this.#observePropertyEditorUI();
 	}
 
-	#close() {
+	#observePropertyEditorUI() {
+		if (!this._propertyEditorUiAlias) return;
+
+		this.observe(
+			umbExtensionsRegistry.getByTypeAndAlias('propertyEditorUI', this._propertyEditorUiAlias),
+			(propertyEditorUI) => {
+				if (!propertyEditorUI) return;
+
+				this._propertyEditorUIName = propertyEditorUI?.meta.label ?? propertyEditorUI?.name ?? '';
+				this._propertyEditorUiAlias = propertyEditorUI?.alias ?? '';
+				this._propertyEditorUIIcon = propertyEditorUI?.meta.icon ?? '';
+				this._propertyEditorAlias = propertyEditorUI?.meta.propertyEditorModel ?? '';
+			}
+		);
+	}
+
+	#onCustomValidationChange(event: UUISelectEvent) {
+		const value = event.target.value;
+
+		this._customValidation =
+			this._customValidationOptions.find((option) => option.value === value) ?? this._customValidationOptions[0];
+
+		console.log('custom validation changed to: ', this._customValidationOptions);
+	}
+
+	#onClose() {
 		this.modalHandler?.close();
 	}
 
-	#submit() {
+	#onSubmit() {
 		this.modalHandler?.close();
 	}
 
@@ -141,7 +187,7 @@ export class UmbModalLayoutPropertySettingsElement extends UmbModalLayoutElement
 		console.log('appearance changed to: ', this._appearanceIsLeft ? 'left' : 'top');
 	}
 
-	#openPropertyEditorUIPicker() {
+	#onOpenPropertyEditorUIPicker() {
 		const modalHandler = this.#modalService?.propertyEditorUIPicker({
 			selection: [],
 		});
@@ -154,6 +200,48 @@ export class UmbModalLayoutPropertySettingsElement extends UmbModalLayoutElement
 			this._propertyEditorUiAlias = selection[0];
 			this.#observePropertyEditorUI();
 		});
+	}
+
+	#onToggleAliasLock() {
+		this._aliasLocked = !this._aliasLocked;
+	}
+
+	render() {
+		return html` <umb-workspace-layout headline="Property settings">
+			<div id="content">
+				<uui-box>
+					<div class="container">
+						<uui-input id="name-input" placeholder="Enter a name..."> </uui-input>
+						<uui-input id="alias-input" placeholder="Enter alias..." ?disabled=${this._aliasLocked}>
+							<div @click=${this.#onToggleAliasLock} @keydown=${() => ''} id="alias-lock" slot="prepend">
+								<uui-icon name=${this._aliasLocked ? 'umb:lock' : 'umb:unlocked'}></uui-icon>
+							</div>
+						</uui-input>
+						<uui-textarea id="description-input" placeholder="Enter description..."></uui-textarea>
+					</div>
+					${this.#renderPropertyUIPicker()}
+					<hr />
+					<div class="container">
+						<b>Validation</b>
+						<div style="display: flex; justify-content: space-between">
+							<label for="mandatory">Field is mandatory</label>
+							<uui-toggle id="mandatory" slot="editor"></uui-toggle>
+						</div>
+						<p style="margin-bottom: 0">Custom validation</p>
+						${this.#renderCustomValidation()}
+					</div>
+					<hr />
+					<div class="container">
+						<b style="margin-bottom: var(--uui-size-space-3)">Appearance</b>
+						<div id="appearances">${this.#renderLeftSVG()} ${this.#renderTopSVG()}</div>
+					</div>
+				</uui-box>
+			</div>
+			<div slot="actions">
+				<uui-button label="Close" @click=${this.#onClose}></uui-button>
+				<uui-button label="Submit" look="primary" color="positive" @click=${this.#onSubmit}></uui-button>
+			</div>
+		</umb-workspace-layout>`;
 	}
 
 	#renderLeftSVG() {
@@ -196,7 +284,7 @@ export class UmbModalLayoutPropertySettingsElement extends UmbModalLayoutElement
 						border>
 						<uui-icon name="${this._propertyEditorUIIcon}" slot="icon"></uui-icon>
 						<uui-action-bar slot="actions">
-							<uui-button label="Change" @click=${this.#openPropertyEditorUIPicker}></uui-button>
+							<uui-button label="Change" @click=${this.#onOpenPropertyEditorUIPicker}></uui-button>
 						</uui-action-bar>
 					</umb-ref-property-editor-ui>
 			  `
@@ -206,66 +294,23 @@ export class UmbModalLayoutPropertySettingsElement extends UmbModalLayoutElement
 						label="Select Property Editor"
 						look="placeholder"
 						color="default"
-						@click=${this.#openPropertyEditorUIPicker}></uui-button>
+						@click=${this.#onOpenPropertyEditorUIPicker}></uui-button>
 			  `;
 	}
 
-	#toggleAliasLock() {
-		this._aliasLocked = !this._aliasLocked;
-	}
+	#renderCustomValidation() {
+		return html`<uui-select
+				@change=${this.#onCustomValidationChange}
+				.options=${this._customValidationOptions}></uui-select>
 
-	#observePropertyEditorUI() {
-		if (!this._propertyEditorUiAlias) return;
-
-		this.observe(
-			umbExtensionsRegistry.getByTypeAndAlias('propertyEditorUI', this._propertyEditorUiAlias),
-			(propertyEditorUI) => {
-				if (!propertyEditorUI) return;
-
-				this._propertyEditorUIName = propertyEditorUI?.meta.label ?? propertyEditorUI?.name ?? '';
-				this._propertyEditorUiAlias = propertyEditorUI?.alias ?? '';
-				this._propertyEditorUIIcon = propertyEditorUI?.meta.icon ?? '';
-				this._propertyEditorAlias = propertyEditorUI?.meta.propertyEditorModel ?? '';
-			}
-		);
-	}
-
-	render() {
-		return html` <umb-workspace-layout headline="Property settings">
-			<div id="content">
-				<uui-box>
-					<div class="container">
-						<uui-input id="name-input" placeholder="Enter a name..."> </uui-input>
-						<uui-input id="alias-input" placeholder="Enter alias..." ?disabled=${this._aliasLocked}>
-							<div @click=${this.#toggleAliasLock} @keydown=${() => ''} id="alias-lock" slot="prepend">
-								<uui-icon name=${this._aliasLocked ? 'umb:lock' : 'umb:unlocked'}></uui-icon>
-							</div>
-						</uui-input>
-						<uui-textarea id="description-input" placeholder="Enter description..."></uui-textarea>
-					</div>
-					${this.#renderPropertyUIPicker()}
-					<hr />
-					<div class="container">
-						<b>Validation</b>
-						<div style="display: flex; justify-content: space-between">
-							<label for="mandatory">Field is mandatory</label>
-							<uui-toggle id="mandatory" slot="editor"></uui-toggle>
-						</div>
-						<p style="margin-bottom: 0">Custom validation</p>
-						<uui-select></uui-select>
-					</div>
-					<hr />
-					<div class="container">
-						<b style="margin-bottom: var(--uui-size-space-3)">Appearance</b>
-						<div id="appearances">${this.#renderLeftSVG()} ${this.#renderTopSVG()}</div>
-					</div>
-				</uui-box>
-			</div>
-			<div slot="actions">
-				<uui-button label="Close" @click=${this.#close}></uui-button>
-				<uui-button label="Submit" look="primary" color="positive" @click=${this.#submit}></uui-button>
-			</div>
-		</umb-workspace-layout>`;
+			${this._customValidation.value !== 'no-validation'
+				? html`
+						<uui-input
+							style="margin-bottom: var(--uui-size-space-1); margin-top: var(--uui-size-space-5);"
+							value=${this._customValidation.validation ?? ''}></uui-input>
+						<uui-textarea value=${this._customValidationErrorMessage}></uui-textarea>
+				  `
+				: nothing} `;
 	}
 }
 
