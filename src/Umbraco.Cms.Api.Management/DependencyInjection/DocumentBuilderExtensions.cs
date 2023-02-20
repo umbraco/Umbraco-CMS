@@ -12,6 +12,7 @@ internal static class DocumentBuilderExtensions
     {
         builder.Services.AddTransient<IDocumentViewModelFactory, DocumentViewModelFactory>();
         builder.Services.AddTransient<IContentUrlFactory, ContentUrlFactory>();
+        builder.Services.AddTransient<IDocumentEditingFactory, DocumentEditingFactory>();
 
         builder.WithCollectionBuilder<MapDefinitionCollectionBuilder>().Add<DocumentMapDefinition>();
 

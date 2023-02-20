@@ -1,6 +1,6 @@
 ﻿namespace Umbraco.Cms.Api.Management.ViewModels.Content;
 
-public abstract class ValueViewModelBase
+public abstract class ValueModelBase : IHasCultureAndSegment
 {
     public string? Culture { get; set; }
 

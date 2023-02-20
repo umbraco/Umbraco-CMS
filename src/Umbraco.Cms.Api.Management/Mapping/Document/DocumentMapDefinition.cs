@@ -7,7 +7,7 @@ using Umbraco.Cms.Core.PropertyEditors;
 
 namespace Umbraco.Cms.Api.Management.Mapping.Document;
 
-public class DocumentMapDefinition : ContentMapDefinition<IContent, DocumentValueViewModel, DocumentVariantViewModel>, IMapDefinition
+public class DocumentMapDefinition : ContentMapDefinition<IContent, DocumentValueModel, DocumentVariantViewModel>, IMapDefinition
 {
     public DocumentMapDefinition(PropertyEditorCollection propertyEditorCollection)
         : base(propertyEditorCollection)

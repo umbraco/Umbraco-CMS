@@ -7,7 +7,7 @@ namespace Umbraco.Cms.Api.Management.Mapping.Content;
 
 public abstract class ContentMapDefinition<TContent, TValueViewModel, TVariantViewModel>
     where TContent : IContentBase
-    where TValueViewModel : ValueViewModelBase, new()
+    where TValueViewModel : ValueModelBase, new()
     where TVariantViewModel : VariantViewModelBase, new()
 {
     private readonly PropertyEditorCollection _propertyEditorCollection;
