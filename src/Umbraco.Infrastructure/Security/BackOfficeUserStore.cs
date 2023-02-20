@@ -87,14 +87,16 @@ public class BackOfficeUserStore : UmbracoUserStore<BackOfficeIdentityUser, Iden
     }
 
     /// <inheritdoc />
-    public Task<bool> ValidateSessionIdAsync(string? userId, string? sessionId)
+    public async Task<bool> ValidateSessionIdAsync(string? userId, string? sessionId)
     {
         if (Guid.TryParse(sessionId, out Guid guidSessionId))
         {
-            return Task.FromResult(_userService.ValidateLoginSession(UserIdToInt(userId), guidSessionId));
+            // We need to resolve the id from the key here...
+            var id = await ResolveEntityIdFromIdentityId(userId);
+            return _userService.ValidateLoginSession(id, guidSessionId);
         }
 
-        return Task.FromResult(false);
+        return false;
     }
 
     /// <inheritdoc />
@@ -252,14 +254,13 @@ public class BackOfficeUserStore : UmbracoUserStore<BackOfficeIdentityUser, Iden
             throw new ArgumentNullException(nameof(user));
         }
 
-        var userId = UserIdToInt(user.Id);
-        IUser? found = _userService.GetUserById(userId);
-        if (found != null)
+        IUser? found = FindUserFromString(user.Id);
+        if (found is not null)
         {
             _userService.Delete(found);
         }
 
-        _externalLoginService.DeleteUserLogins(userId.ToGuid());
+        _externalLoginService.DeleteUserLogins(user.Key);
 
         return Task.FromResult(IdentityResult.Success);
     }
@@ -297,33 +298,41 @@ public class BackOfficeUserStore : UmbracoUserStore<BackOfficeIdentityUser, Iden
 
     private IUser? FindUserFromString(string userId)
     {
-        // The userId can in this case be one of three things
-        // 1. An int - this means that the user logged in normally, this is fine, we parse it and return it.
-        // 2. A fake Guid - this means that the user logged in using an external login provider, but we haven't migrated the users to have a key yet, so we need to convert it to an int.
-        // 3. A Guid - this means that the user logged in using an external login provider, so we have to resolve the user by key.
-
-        // Case 1
-        if(int.TryParse(userId, NumberStyles.Integer, CultureInfo.InvariantCulture, out var result))
+        // We could use ResolveEntityIdFromIdentityId here, but that would require multiple DB calls, so let's not.
+        if (TryConvertIdentityIdToInt(userId, out var id))
         {
-            return _userService.GetUserById(result);
+            return _userService.GetUserById(id);
         }
 
+        // We couldn't directly convert the ID to an int, this is because the user logged in with external login.
+        // So we need to look up the user by key.
         if (Guid.TryParse(userId, out Guid key))
         {
-            var bytes = key.ToByteArray();
-
-            // Our fake guid is a 32 bit int, converted to a byte representation,
-            // so we can check if everything but the first 4 bytes are 0, if so, we know it's a fake guid.
-            if (bytes[4..].All(x => x == 0))
-            {
-                var id = BitConverter.ToInt32(bytes);
-                return _userService.GetUserById(id);
-            }
-
             return _userService.GetAsync(key).GetAwaiter().GetResult();
         }
 
         throw new InvalidOperationException($"Unable to resolve user with ID {userId}");
+    }
+
+    protected override async Task<int> ResolveEntityIdFromIdentityId(string? identityId)
+    {
+        if (TryConvertIdentityIdToInt(identityId, out var result))
+        {
+            return result;
+        }
+
+        // We couldn't directly convert the ID to an int, this is because the user logged in with external login.
+        // So we need to look up the user by key, and then get the ID.
+        if (Guid.TryParse(identityId, out Guid key))
+        {
+            IUser? user = await _userService.GetAsync(key);
+            if (user is not null)
+            {
+                return user.Id;
+            }
+        }
+
+        throw new InvalidOperationException($"Unable to resolve a user id from {identityId}");
     }
 
     /// <inheritdoc />
