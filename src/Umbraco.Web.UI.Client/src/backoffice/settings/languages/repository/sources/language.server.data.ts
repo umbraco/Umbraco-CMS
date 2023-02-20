@@ -48,6 +48,10 @@ export class UmbLanguageServerDataSource implements UmbLanguageServerDataSource 
 	 */
 	async createScaffold() {
 		const data: LanguageModel = {
+			name: '',
+			isDefault: false,
+			isMandatory: false,
+			fallbackIsoCode: '',
 			isoCode: '',
 		};
 
