@@ -53,14 +53,12 @@ export class UmbDocumentWorkspaceContext
 
 	// Notice the DocumentTypePropertyTypeContainerModel is equivalent to PropertyTypeContainerViewModelBaseModel, making it easy to generalize.
 	#containers = new ArrayState<DocumentTypePropertyTypeContainerModel>([], (x) => x.key);
-	//containers = this.#containers.asObservable();
 
 	constructor(host: UmbControllerHostInterface) {
 		super(host);
 		this.#host = host;
 		this.#documentRepository = new UmbDocumentRepository(this.#host);
 		this.#documentTypeRepository = new UmbDocumentTypeRepository(this.#host);
-		//this.#dataTypeRepository = new UmbDataTypeRepository(this.#host);
 
 		new UmbObserverController(this._host, this.documentTypeKey, (key) => this._loadDocumentType(key));
 	}
@@ -116,33 +114,6 @@ export class UmbDocumentWorkspaceContext
 		});
 	}
 
-	/*
-
-	No need for this currently. The data types are loaded by the properties.
-	async loadDataTypeOfDocumentType(documentType?: DocumentTypeModel) {
-		if (!documentType) return;
-
-		// Load inherited and composed types:
-		await documentType?.properties?.forEach(async (property) => {
-			if (property.dataTypeKey) {
-				this.loadDataType(property.dataTypeKey);
-			}
-		});
-	}
-
-	async loadDataType(key?: string) {
-		if (!key) return;
-
-		//const { data } = await this.#dataTypeRepository.requestDetails(key);
-
-		// new UmbObserverController(this._host, await this.#documentTypeRepository.byKey(key), (data) => {
-		//	if (data) {
-		//		this.#documentTypes.appendOne(data);
-		//	}
-		//});
-	}
-	*/
-
 	getData() {
 		return this.#draft.getValue() || {};
 	}
@@ -170,28 +141,6 @@ export class UmbDocumentWorkspaceContext
 		);
 		this.#draft.update({ variants: newVariants });
 	}
-	/*
-	getEntityType = this.#manager.getEntityType;
-	getUnique = this.#manager.getEntityKey;
-	getEntityKey = this.#manager.getEntityKey;
-
-	*/
-
-	/**
-	 * Concept for Repository impl.:
-
-	load(entityKey: string) {
-		this.#repository.load(entityKey).then((data) => {
-			this.#draft.next(data)
-		})
-	}
-
-	create(parentKey: string | undefined) {
-		this.#repository.create(parentKey).then((data) => {
-			this.#draft.next(data)
-		})
-	}
-	*/
 
 	propertyValuesOf(culture: string | null, segment: string | null) {
 		return this.#draft.getObservablePart((data) =>
