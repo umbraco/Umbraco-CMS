@@ -43,6 +43,8 @@ export class UmbWorkspaceContentElement extends UmbLitElement {
 	@property()
 	alias!: string;
 
+	// TODO: For variants and split view, we need to be able to repeat, either this element or make this element render multiple `umb-workspace-layout`
+
 	render() {
 		return html`
 			<umb-workspace-layout alias=${this.alias}>
