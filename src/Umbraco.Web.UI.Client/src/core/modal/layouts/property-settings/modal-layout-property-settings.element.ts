@@ -1,3 +1,4 @@
+import { umbExtensionsRegistry } from '@umbraco-cms/extensions-api';
 import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, html, nothing } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
@@ -18,6 +19,8 @@ export class UmbModalLayoutPropertySettingsElement extends UmbModalLayoutElement
 			#appearances {
 				display: flex;
 				gap: var(--uui-size-space-6);
+				max-width: 350px;
+				margin: 0 auto;
 			}
 			.appearance {
 				position: relative;
@@ -74,12 +77,29 @@ export class UmbModalLayoutPropertySettingsElement extends UmbModalLayoutElement
 			#alias-lock uui-icon {
 				margin-bottom: 2px;
 			}
+			#property-editor-ui-picker {
+				width: 100%;
+				--uui-button-padding-top-factor: 4;
+				--uui-button-padding-bottom-factor: 4;
+			}
 			.container {
 				display: flex;
 				flex-direction: column;
 			}
 		`,
 	];
+
+	@state()
+	private _propertyEditorUIIcon = '';
+
+	@state()
+	private _propertyEditorUIName = '';
+
+	@state()
+	private _propertyEditorUiAlias = '';
+
+	@state()
+	private _propertyEditorAlias = '';
 
 	@state()
 	private _appearanceIsLeft = true;
@@ -98,6 +118,8 @@ export class UmbModalLayoutPropertySettingsElement extends UmbModalLayoutElement
 		this.consumeContext(UMB_MODAL_SERVICE_CONTEXT_TOKEN, (instance) => {
 			this.#modalService = instance;
 		});
+
+		this.#observePropertyEditorUI();
 	}
 
 	#close() {
@@ -119,12 +141,18 @@ export class UmbModalLayoutPropertySettingsElement extends UmbModalLayoutElement
 		console.log('appearance changed to: ', this._appearanceIsLeft ? 'left' : 'top');
 	}
 
-	#onSelectEditor() {
-		console.log('select editor', this.#modalService);
-		const modalHandler = this.#modalService?.propertyEditorUIPicker();
+	#openPropertyEditorUIPicker() {
+		const modalHandler = this.#modalService?.propertyEditorUIPicker({
+			selection: [],
+		});
 
-		modalHandler?.close((what) => {
-			console.log('closed', what);
+		if (!modalHandler) return;
+
+		modalHandler?.onClose().then(({ selection } = {}) => {
+			if (!selection) return;
+
+			this._propertyEditorUiAlias = selection[0];
+			this.#observePropertyEditorUI();
 		});
 	}
 
@@ -158,8 +186,48 @@ export class UmbModalLayoutPropertySettingsElement extends UmbModalLayoutElement
 		`;
 	}
 
+	#renderPropertyUIPicker() {
+		return this._propertyEditorUiAlias
+			? html`
+					<umb-ref-property-editor-ui
+						name=${this._propertyEditorUIName}
+						alias=${this._propertyEditorUiAlias}
+						property-editor-model-alias=${this._propertyEditorAlias}
+						border>
+						<uui-icon name="${this._propertyEditorUIIcon}" slot="icon"></uui-icon>
+						<uui-action-bar slot="actions">
+							<uui-button label="Change" @click=${this.#openPropertyEditorUIPicker}></uui-button>
+						</uui-action-bar>
+					</umb-ref-property-editor-ui>
+			  `
+			: html`
+					<uui-button
+						id="property-editor-ui-picker"
+						label="Select Property Editor"
+						look="placeholder"
+						color="default"
+						@click=${this.#openPropertyEditorUIPicker}></uui-button>
+			  `;
+	}
+
 	#toggleAliasLock() {
 		this._aliasLocked = !this._aliasLocked;
+	}
+
+	#observePropertyEditorUI() {
+		if (!this._propertyEditorUiAlias) return;
+
+		this.observe(
+			umbExtensionsRegistry.getByTypeAndAlias('propertyEditorUI', this._propertyEditorUiAlias),
+			(propertyEditorUI) => {
+				if (!propertyEditorUI) return;
+
+				this._propertyEditorUIName = propertyEditorUI?.meta.label ?? propertyEditorUI?.name ?? '';
+				this._propertyEditorUiAlias = propertyEditorUI?.alias ?? '';
+				this._propertyEditorUIIcon = propertyEditorUI?.meta.icon ?? '';
+				this._propertyEditorAlias = propertyEditorUI?.meta.propertyEditorModel ?? '';
+			}
+		);
 	}
 
 	render() {
@@ -175,7 +243,7 @@ export class UmbModalLayoutPropertySettingsElement extends UmbModalLayoutElement
 						</uui-input>
 						<uui-textarea id="description-input" placeholder="Enter description..."></uui-textarea>
 					</div>
-					<uui-button @click=${this.#onSelectEditor} label="Select editor" look="outline"></uui-button>
+					${this.#renderPropertyUIPicker()}
 					<hr />
 					<div class="container">
 						<b>Validation</b>
