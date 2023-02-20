@@ -154,6 +154,10 @@ export class UmbDocumentWorkspaceContext
 		this.#activeVariants.next(activeVariants);
 	}
 
+	activeVariantWithIndex(index: number) {
+		return this.#activeVariants.getObservablePart((data) => data[index] || undefined);
+	}
+
 	setName(name: string, culture?: string | null, segment?: string | null) {
 		const variants = this.#draft.getValue()?.variants || [];
 		const newVariants = partialUpdateFrozenArray(

@@ -1,8 +1,12 @@
-import { UmbDocumentWorkspaceContext } from '../../../../documents/documents/workspace/document-workspace.context';
+import {
+	ActiveVariant,
+	UmbDocumentWorkspaceContext,
+} from '../../../../documents/documents/workspace/document-workspace.context';
 //import { DocumentModel } from '@umbraco-cms/backend-api';
 import { UmbContextConsumerController, UmbContextProviderController } from '@umbraco-cms/context-api';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
-import { NumberState, StringState } from '@umbraco-cms/observable-api';
+import { NumberState, ObjectState, UmbObserverController } from '@umbraco-cms/observable-api';
+import { DocumentVariantModel } from '@umbraco-cms/backend-api';
 
 //type EntityType = DocumentModel;
 
@@ -14,11 +18,13 @@ export class UmbVariantContentContext {
 	#index = new NumberState(undefined);
 	index = this.#index.asObservable();
 
-	#culture = new StringState<string | null | undefined>(undefined);
-	culture = this.#culture.asObservable();
+	#currentVariant = new ObjectState<DocumentVariantModel | undefined>(undefined);
+	currentVariant = this.#currentVariant.asObservable();
 
-	#segment = new StringState<string | null | undefined>(undefined);
-	segment = this.#segment.asObservable();
+	culture = this.#currentVariant.getObservablePart((x) => x?.culture);
+	segment = this.#currentVariant.getObservablePart((x) => x?.segment);
+
+	private _variantObserver?: UmbObserverController<ActiveVariant>;
 
 	constructor(host: UmbControllerHostInterface) {
 		this.#host = host;
@@ -29,7 +35,30 @@ export class UmbVariantContentContext {
 		// TODO: Figure out if this is the best way to consume the context or if it can be strongly typed with an UmbContextToken
 		new UmbContextConsumerController(host, 'umbWorkspaceContext', (context) => {
 			this.#workspaceContext = context as UmbDocumentWorkspaceContext;
+			this._observeVariant();
 		});
+
+		this.#index.subscribe(() => {
+			this._observeVariant();
+		});
+	}
+
+	private _observeVariant() {
+		if (!this.#workspaceContext) return;
+
+		const index = this.#index.getValue();
+		if (index === undefined) return;
+
+		this._variantObserver?.destroy();
+		this._variantObserver = new UmbObserverController(
+			this.#host,
+			this.#workspaceContext.activeVariantWithIndex(index),
+			(variant) => {
+				if (variant) {
+					this.#currentVariant.next(variant);
+				}
+			}
+		);
 	}
 
 	/*
