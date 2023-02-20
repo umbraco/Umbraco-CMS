@@ -21,13 +21,17 @@ public class RelationTypeViewModelFactory : IRelationTypeViewModelFactory
             relationTypeSavingViewModel.IsDependency,
             relationTypeSavingViewModel.Key);
 
-    public IRelationType MapUpdateModelToRelationType(RelationTypeUpdatingViewModel relationTypeUpdatingViewModel, Guid key) =>
-        new RelationType(
-            relationTypeUpdatingViewModel.Name,
-            relationTypeUpdatingViewModel.Name.ToSafeAlias(_shortStringHelper, true),
-            relationTypeUpdatingViewModel.IsBidirectional,
-            relationTypeUpdatingViewModel.ParentObjectType,
-            relationTypeUpdatingViewModel.ChildObjectType,
-            relationTypeUpdatingViewModel.IsDependency,
-            key);
+    public void MapUpdateModelToRelationType(RelationTypeUpdatingViewModel relationTypeUpdatingViewModel, IRelationType target)
+    {
+        target.Name = relationTypeUpdatingViewModel.Name;
+        target.Alias = relationTypeUpdatingViewModel.Name.ToSafeAlias(_shortStringHelper, true);
+        target.ChildObjectType = relationTypeUpdatingViewModel.ChildObjectType;
+        target.IsBidirectional = relationTypeUpdatingViewModel.IsBidirectional;
+        if (target is IRelationTypeWithIsDependency targetWithIsDependency)
+        {
+            targetWithIsDependency.IsDependency = relationTypeUpdatingViewModel.IsDependency;
+        }
+
+        target.ParentObjectType = relationTypeUpdatingViewModel.ParentObjectType;
+    }
 }

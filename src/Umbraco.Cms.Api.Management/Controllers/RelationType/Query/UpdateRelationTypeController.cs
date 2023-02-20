@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Common.Builders;
+using Umbraco.Cms.Api.Management.Factories;
 using Umbraco.Cms.Api.Management.ViewModels.RelationType;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
@@ -12,11 +13,13 @@ public class UpdateRelationTypeController : RelationTypeControllerBase
 {
     private readonly IRelationService _relationService;
     private readonly IUmbracoMapper _umbracoMapper;
+    private readonly IRelationTypeViewModelFactory _relationTypeViewModelFactory;
 
-    public UpdateRelationTypeController(IRelationService relationService, IUmbracoMapper umbracoMapper)
+    public UpdateRelationTypeController(IRelationService relationService, IUmbracoMapper umbracoMapper, IRelationTypeViewModelFactory relationTypeViewModelFactory)
     {
         _relationService = relationService;
         _umbracoMapper = umbracoMapper;
+        _relationTypeViewModelFactory = relationTypeViewModelFactory;
     }
 
     [HttpPut("{key:guid}")]
@@ -36,12 +39,10 @@ public class UpdateRelationTypeController : RelationTypeControllerBase
             return NotFound(problemDetails);
         }
 
-        IRelationType updated = _umbracoMapper.Map(relationTypeSavingViewModel, persistedRelationType);
+        _relationTypeViewModelFactory.MapUpdateModelToRelationType(relationTypeSavingViewModel, persistedRelationType);
 
-        _relationService.Save(updated);
+        _relationService.Save(persistedRelationType);
 
-        RelationTypeViewModel relationTypeViewModel = _umbracoMapper.Map<RelationTypeViewModel>(persistedRelationType)!;
-
-        return await Task.FromResult(Ok(relationTypeViewModel));
+        return await Task.FromResult(Ok());
     }
 }

@@ -7,5 +7,5 @@ public interface IRelationTypeViewModelFactory
 {
     IRelationType CreateRelationType(RelationTypeSavingViewModel relationTypeSavingViewModel);
 
-    IRelationType MapUpdateModelToRelationType(RelationTypeUpdatingViewModel relationTypeUpdatingViewModel, Guid key);
+    void MapUpdateModelToRelationType(RelationTypeUpdatingViewModel relationTypeUpdatingViewModel, IRelationType target);
 }
