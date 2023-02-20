@@ -33,3 +33,6 @@ import './input-checkbox-list/input-checkbox-list.element';
 import './input-multi-url-picker/input-multi-url-picker.element';
 
 import './empty-state/empty-state.element';
+
+import './debug/debug.element';
+

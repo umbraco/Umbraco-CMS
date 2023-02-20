@@ -1,4 +1,4 @@
-import { umbContextRequestEventType, isUmbContextRequestEvent } from '../consume/context-request.event';
+import { umbContextRequestEventType, isUmbContextRequestEvent, umbDebugContextEventType } from '../consume/context-request.event';
 import { UmbContextToken } from '../context-token';
 import { UmbContextProvideEventImplementation } from './context-provide.event';
 
@@ -40,6 +40,9 @@ export class UmbContextProvider<HostType extends EventTarget = EventTarget> {
 	public hostConnected() {
 		this.host.addEventListener(umbContextRequestEventType, this._handleContextRequest);
 		this.host.dispatchEvent(new UmbContextProvideEventImplementation(this._contextAlias));
+
+		// Listen to our debug event 'umb:debug-contexts'
+		this.host.addEventListener(umbDebugContextEventType, this._handleDebugContextRequest);
 	}
 
 	/**
@@ -61,6 +64,20 @@ export class UmbContextProvider<HostType extends EventTarget = EventTarget> {
 
 		event.stopPropagation();
 		event.callback(this.#instance);
+	};
+
+	private _handleDebugContextRequest = (event: any) => {
+		// If the event doesn't have an instances property, create it.
+		if(!event.instances){
+			event.instances = new Map();
+		}
+
+		// If the event doesn't have an instance for this context, add it.
+		// Nearest to the DOM element of <umb-debug> will be added first
+		// as contexts can change/override deeper in the DOM
+		if(!event.instances.has(this._contextAlias)){
+			event.instances.set(this._contextAlias, this.#instance);
+		}
 	};
 
 	destroy(): void {
