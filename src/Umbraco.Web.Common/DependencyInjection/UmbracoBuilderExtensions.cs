@@ -31,6 +31,7 @@ using Umbraco.Cms.Core.Logging;
 using Umbraco.Cms.Core.Macros;
 using Umbraco.Cms.Core.Net;
 using Umbraco.Cms.Core.Notifications;
+using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Telemetry;
@@ -55,6 +56,7 @@ using Umbraco.Cms.Web.Common.Middleware;
 using Umbraco.Cms.Web.Common.ModelBinders;
 using Umbraco.Cms.Web.Common.Mvc;
 using Umbraco.Cms.Web.Common.Profiler;
+using Umbraco.Cms.Web.Common.Repositories;
 using Umbraco.Cms.Web.Common.RuntimeMinification;
 using Umbraco.Cms.Web.Common.Security;
 using Umbraco.Cms.Web.Common.Templates;
@@ -202,6 +204,8 @@ public static partial class UmbracoBuilderExtensions
 
         builder.Services.AddMiniProfiler();
         builder.Services.ConfigureOptions<ConfigureMiniProfilerOptions>();
+
+        builder.Services.AddSingleton<IWebProfilerRepository, WebProfilerRepository>();
 
         builder.AddNotificationHandler<UmbracoApplicationStartingNotification, InitializeWebProfiling>();
         return builder;
