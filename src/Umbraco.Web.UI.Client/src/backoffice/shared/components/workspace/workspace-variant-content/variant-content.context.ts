@@ -21,6 +21,7 @@ export class UmbVariantContentContext {
 	#currentVariant = new ObjectState<DocumentVariantModel | undefined>(undefined);
 	currentVariant = this.#currentVariant.asObservable();
 
+	name = this.#currentVariant.getObservablePart((x) => x?.name);
 	culture = this.#currentVariant.getObservablePart((x) => x?.culture);
 	segment = this.#currentVariant.getObservablePart((x) => x?.segment);
 
@@ -66,6 +67,13 @@ export class UmbVariantContentContext {
 	*/
 	public setSplitViewIndex(index: number) {
 		this.#index.next(index);
+	}
+
+	public setName(newName: string) {
+		if (!this.#workspaceContext) return;
+		const currentVariant = this.#currentVariant.getValue();
+		if (!currentVariant) return;
+		this.#workspaceContext.setName(newName, currentVariant.culture, currentVariant.segment);
 	}
 
 	/**

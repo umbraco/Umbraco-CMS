@@ -2,11 +2,11 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html, nothing } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { UUIInputElement, UUIInputEvent } from '@umbraco-ui/uui';
-import type { UmbWorkspaceEntityContextInterface } from '../workspace/workspace-context/workspace-entity-context.interface';
-import { UmbLitElement } from '@umbraco-cms/element';
-import type { ContentTreeItemModel, DocumentVariantModel } from '@umbraco-cms/backend-api';
-import { UmbDocumentWorkspaceContext } from 'src/backoffice/documents/documents/workspace/document-workspace.context';
+import { repeat } from 'lit-html/directives/repeat.js';
 import { UmbVariantContentContext } from '../workspace/workspace-variant-content/variant-content.context';
+import { UmbDocumentWorkspaceContext } from '../../../documents/documents/workspace/document-workspace.context';
+import { UmbLitElement } from '@umbraco-cms/element';
+import type { DocumentVariantModel } from '@umbraco-cms/backend-api';
 
 @customElement('umb-variant-selector')
 export class UmbVariantSelectorElement extends UmbLitElement {
@@ -45,14 +45,17 @@ export class UmbVariantSelectorElement extends UmbLitElement {
 	@state()
 	_variants: Array<DocumentVariantModel> = [];
 
-	@state()
-	_currentVariant?: DocumentVariantModel;
-
 	private _workspaceContext?: UmbDocumentWorkspaceContext;
 	private _variantContext?: UmbVariantContentContext;
 
+	@state()
+	private _name?: string;
+
 	private _culture?: string | null;
 	private _segment?: string | null;
+
+	@state()
+	private _variantDisplayName?: string;
 
 	constructor() {
 		super();
@@ -82,23 +85,34 @@ export class UmbVariantSelectorElement extends UmbLitElement {
 	private async _observeVariantContext() {
 		if (!this._variantContext) return;
 
-		this.observe(this._variantContext.culture, (culture) => {
-			this._culture = culture;
-			this._observeCurrentVariant();
-		});
-		this.observe(this._variantContext.segment, (segment) => {
-			this._segment = segment;
-			this._observeCurrentVariant();
-		});
+		this.observe(
+			this._variantContext.name,
+			(name) => {
+				this._name = name;
+			},
+			'_name'
+		);
+		this.observe(
+			this._variantContext.culture,
+			(culture) => {
+				this._culture = culture;
+				this.updateVariantDisplayName();
+			},
+			'_culture'
+		);
+		this.observe(
+			this._variantContext.segment,
+			(segment) => {
+				this._segment = segment;
+				this.updateVariantDisplayName();
+			},
+			'_segment'
+		);
 	}
 
-	private async _observeCurrentVariant() {
-		if (!this._workspaceContext) return;
-		if (this._culture === undefined || this._segment === undefined) return;
-
-		this.observe(this._workspaceContext.variantOf(this._culture, this._segment), (variant) => {
-			this._currentVariant = variant;
-		});
+	private updateVariantDisplayName() {
+		if (!this._culture && !this._segment) return;
+		this._variantDisplayName = this._culture + (this._segment ? ' - ' + this._segment : '');
 	}
 
 	// TODO. find a way where we don't have to do this for all workspaces.
@@ -108,7 +122,7 @@ export class UmbVariantSelectorElement extends UmbLitElement {
 
 			if (typeof target?.value === 'string') {
 				// TODO: create a setName method on EntityWorkspace:
-				this._workspaceContext?.setName(target.value, this._culture, this._segment);
+				this._variantContext?.setName(target.value);
 			}
 		}
 	}
@@ -126,14 +140,13 @@ export class UmbVariantSelectorElement extends UmbLitElement {
 
 	render() {
 		return html`
-			<uui-input id="name-input" .value=${this._currentVariant?.name} @input="${this._handleInput}">
-				<!-- Implement Variant Selector -->
+			<uui-input id="name-input" .value=${this._name} @input="${this._handleInput}">
 				${
 					this._variants && this._variants.length > 0
 						? html`
 								<div slot="append">
 									<uui-button id="variant-selector-toggle" @click=${this._toggleVariantSelector}>
-										English (United States)
+										${this._variantDisplayName}
 										<uui-caret></uui-caret>
 									</uui-button>
 								</div>
@@ -148,9 +161,9 @@ export class UmbVariantSelectorElement extends UmbLitElement {
 							<uui-popover id="variant-selector-popover" .open=${this._variantSelectorIsOpen} @close=${this._close}>
 								<div id="variant-selector-dropdown" slot="popover">
 									<uui-scroll-container>
-										<ul>
-											<li>Implement variants</li>
-										</ul>
+										${this._variants.map(
+											(variant) => html`<ul><li>${variant.name} ${variant.culture} ${variant.segment}</ul></li>`
+										)}
 									</uui-scroll-container>
 								</div>
 							</uui-popover>
