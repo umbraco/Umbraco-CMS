@@ -173,8 +173,8 @@ export class UmbDocumentWorkspaceContext
 	}
 
 	propertyValueByAlias(propertyAlias: string, variantId = new UmbVariantId()) {
-		return this.#draft.getObservablePart((data) =>
-			data?.properties?.find((x) => x?.alias === propertyAlias && variantId.compare(x))
+		return this.#draft.getObservablePart(
+			(data) => data?.properties?.find((x) => x?.alias === propertyAlias && variantId.compare(x))?.value
 		);
 	}
 

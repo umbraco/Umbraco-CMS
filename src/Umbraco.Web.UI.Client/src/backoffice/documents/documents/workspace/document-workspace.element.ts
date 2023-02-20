@@ -6,6 +6,7 @@ import type { UmbWorkspaceEntityElement } from '../../../shared/components/works
 import { UmbVariantId } from '../../../shared/variants/variant-id.class';
 import { ActiveVariant, UmbDocumentWorkspaceContext } from './document-workspace.context';
 import { UmbLitElement } from '@umbraco-cms/element';
+import '../../../shared/components/workspace/workspace-variant-content/workspace-variant-content.element';
 
 @customElement('umb-document-workspace')
 export class UmbDocumentWorkspaceElement extends UmbLitElement implements UmbWorkspaceEntityElement {

@@ -57,11 +57,14 @@ export class UmbPropertyTypeBasedPropertyElement extends UmbLitElement {
 	}
 
 	private _observeProperty() {
-		if (!this.property || !this._propertySetContext || !this._property?.alias) return;
+		if (!this._propertySetContext || !this.property || !this._property?.alias) return;
+
+		console.log('_observeProperty');
 
 		this.observe(
 			this._propertySetContext.propertyValueByAlias(this._property.alias),
 			(value) => {
+				console.log('got value', value);
 				this._value = value;
 			},
 			'observeValue'

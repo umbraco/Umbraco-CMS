@@ -3,12 +3,9 @@ import { css, html } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 
 import '../workspace-layout/workspace-layout.element';
-import '../../variant-selector/variant-selector.element';
 
 // Lazy load
 // TODO: Make this dynamic, use load-extensions method to loop over extensions for this node.
-import './views/edit/workspace-view-content-edit.element';
-import './views/info/workspace-view-content-info.element';
 import { UmbVariantContentContext } from './variant-content.context';
 import { UmbLitElement } from '@umbraco-cms/element';
 

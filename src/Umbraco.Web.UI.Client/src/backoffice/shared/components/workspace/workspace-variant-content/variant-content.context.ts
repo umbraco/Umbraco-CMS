@@ -53,7 +53,8 @@ export class UmbVariantContentContext {
 	}
 
 	private _providePropertySetContext() {
-		if (!this.#propertySetContext || !this.#workspaceContext || !this._variantId) return;
+		if (this.#propertySetContext || !this.#workspaceContext || !this._variantId) return;
+
 		this.#propertySetContext = new UmbWorkspaceVariantPropertySetContext(
 			this.#host,
 			this.#workspaceContext,
