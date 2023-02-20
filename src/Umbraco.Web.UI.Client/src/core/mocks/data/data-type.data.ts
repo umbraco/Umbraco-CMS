@@ -193,7 +193,7 @@ export const data: Array<DataTypeModel & { type: 'data-type' }> = [
 			},
 			{
 				alias: 'initVal2',
-				value: 20,
+				value: 40,
 			},
 			{
 				alias: 'maxVal',

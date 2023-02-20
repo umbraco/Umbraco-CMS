@@ -38,7 +38,6 @@ export class UmbInputSliderElement extends FormControlMixin(UmbLitElement) {
 	}
 
 	render() {
-		console.log(this.initVal1);
 		if (this.enableRange) return this.#renderRangeSlider();
 		else return this.#renderSlider();
 	}
@@ -56,7 +55,8 @@ export class UmbInputSliderElement extends FormControlMixin(UmbLitElement) {
 			.min="${this.min}"
 			.max="${this.max}"
 			.step="${this.step}"
-			.value="${this.initVal1.toString()},${this.initVal2.toString()}"
+			.valueLow="${this.initVal1}"
+			.valueHigh="${this.initVal2}"
 			@change="${this.#onChange}"></uui-range-slider>`;
 	}
 }
