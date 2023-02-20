@@ -20,9 +20,8 @@ export class UmbInputToggleElement extends FormControlMixin(UmbLitElement) {
 	@property({ type: Boolean })
 	public set checked(toggle: boolean) {
 		this._checked = toggle;
+		super.value = toggle.toString();
 		this.#updateLabel();
-
-		//TODO: do we set value to true/false as strings?
 	}
 	public get checked(): boolean {
 		return this._checked;
