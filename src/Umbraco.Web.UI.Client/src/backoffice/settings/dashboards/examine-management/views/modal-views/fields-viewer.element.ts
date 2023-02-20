@@ -16,11 +16,7 @@ export class UmbModalLayoutFieldsViewerElement extends UmbModalLayoutElement<Sea
 				display: flex;
 				flex-direction: column;
 				height: 100%;
-				background-color: var(--uui-color-surface);
-				box-shadow: var(--uui-shadow-depth-1, 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24));
-				border-radius: var(--uui-border-radius);
-				padding: var(--uui-size-space-5);
-				box-sizing: border-box;
+				
 			}
 
 			span {
