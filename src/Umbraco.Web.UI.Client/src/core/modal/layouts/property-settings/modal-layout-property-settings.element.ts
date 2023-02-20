@@ -129,7 +129,6 @@ export class UmbModalLayoutPropertySettingsElement extends UmbModalLayoutElement
 		},
 	];
 	@state() private _customValidation = this._customValidationOptions[0];
-	@state() private _customValidationErrorMessage = '';
 
 	@state() private _aliasLocked = true;
 	@state() private _name = '';
@@ -187,26 +186,29 @@ export class UmbModalLayoutPropertySettingsElement extends UmbModalLayoutElement
 
 		const formData = new FormData(form);
 
-		const name = formData.get('name') as string;
-		const alias = formData.get('alias') as string;
-		const description = formData.get('description') as string;
+		const label = this._name || null;
+		const alias = this._alias || null;
+		const description = formData.get('description');
+		const propertyEditorUI = this._selectedPropertyEditorUIAlias || null;
+		const labelOnTop = this._appearanceIsTop;
+		const mandatory = this._mandatory;
+		const mandatoryMessage = formData.get('mandatory-message');
+		const pattern = formData.get('pattern');
+		const patternMessage = formData.get('pattern-message');
 
-		//console.log all the values
-		console.log(name, alias, description);
-
-		// this.modalHandler?.close({
-		// 	label: '',
-		// 	alias: '',
-		// 	description: '',
-		// 	labelOnTop: this._appearanceIsTop,
-		// 	propertyEditor: this._selectedPropertyEditorUIAlias,
-		// 	validation: {
-		// 		mandatory: false,
-		// 		mandatoryMessage: null,
-		// 		pattern: null,
-		// 		patternMessage: null,
-		// 	},
-		// });
+		this.modalHandler?.close({
+			label,
+			alias,
+			description,
+			propertyEditorUI,
+			labelOnTop,
+			validation: {
+				mandatory,
+				mandatoryMessage,
+				pattern,
+				patternMessage,
+			},
+		});
 	}
 
 	#onNameChange(event: UUIInputEvent) {
@@ -353,6 +355,7 @@ export class UmbModalLayoutPropertySettingsElement extends UmbModalLayoutElement
 			</div>
 			${this._mandatory
 				? html`<uui-input
+						name="mandatory-message"
 						style="margin-top: var(--uui-size-space-1)"
 						id="mandatory-message"
 						placeholder="Enter a custom validation error message (optional)"></uui-input>`
@@ -392,9 +395,10 @@ export class UmbModalLayoutPropertySettingsElement extends UmbModalLayoutElement
 			${this._customValidation.value !== 'no-validation'
 				? html`
 						<uui-input
+							name="pattern"
 							style="margin-bottom: var(--uui-size-space-1); margin-top: var(--uui-size-space-5);"
 							value=${this._customValidation.validation ?? ''}></uui-input>
-						<uui-textarea value=${this._customValidationErrorMessage}></uui-textarea>
+						<uui-textarea name="pattern-message"></uui-textarea>
 				  `
 				: nothing} `;
 	}
