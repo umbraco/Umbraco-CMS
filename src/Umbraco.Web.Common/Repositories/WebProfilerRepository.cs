@@ -6,8 +6,11 @@ namespace Umbraco.Cms.Web.Common.Repositories;
 
 internal class WebProfilerRepository : IWebProfilerRepository
 {
-    private readonly IHttpContextAccessor _httpContextAccessor;
     private const string CookieName = "UMB-DEBUG";
+    private const string HeaderName = "X-UMB-DEBUG";
+    private const string QueryName = "umbDebug";
+
+    private readonly IHttpContextAccessor _httpContextAccessor;
 
     public WebProfilerRepository(IHttpContextAccessor httpContextAccessor)
     {
@@ -26,5 +29,20 @@ internal class WebProfilerRepository : IWebProfilerRepository
         }
     }
 
-    public bool GetStatus(int userId) => _httpContextAccessor.GetRequiredHttpContext().Request.Cookies.ContainsKey(CookieName);
+    public bool GetStatus(int userId)
+    {
+
+        var request = _httpContextAccessor.GetRequiredHttpContext().Request;
+        if (bool.TryParse(request.Query[QueryName], out var umbDebug))
+        {
+            return umbDebug;
+        }
+
+        if (bool.TryParse(request.Headers[HeaderName], out var xUmbDebug))
+        {
+            return xUmbDebug;
+        }
+
+        return request.Cookies.ContainsKey(CookieName);
+    }
 }

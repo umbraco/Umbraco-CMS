@@ -5,6 +5,7 @@ using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Cms.Core.Web;
 using Umbraco.Extensions;
 
@@ -134,12 +135,7 @@ _cleanedUmbracoUrl ??= _uriUtility.UriToUmbraco(OriginalRequestUrl);
                 return true;
             }
 
-            if(string.IsNullOrEmpty(_httpContextAccessor.HttpContext?.GetRequestValue("umbdebug")) == false)
-            {
-                return true;
-            }
-
-            var webProfilerStatusAttempt = _webProfilerService.GetStatus().GetAwaiter().GetResult();
+            Attempt<bool, WebProfilerOperationStatus> webProfilerStatusAttempt = _webProfilerService.GetStatus().GetAwaiter().GetResult();
 
             if (webProfilerStatusAttempt.Success)
             {

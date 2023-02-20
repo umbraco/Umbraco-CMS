@@ -130,18 +130,7 @@ public class WebProfiler : IProfiler
             return false;
         }
 
-
-        if (bool.TryParse(request.Query["umbDebug"], out var umbDebug))
-        {
-            return umbDebug;
-        }
-
-        if (bool.TryParse(request.Headers["X-UMB-DEBUG"], out var xUmbDebug))
-        {
-            return xUmbDebug;
-        }
-
-        var webProfilerService = _httpContextAccessor.HttpContext?.RequestServices?.GetService<IWebProfilerService>();
+        IWebProfilerService? webProfilerService = _httpContextAccessor.HttpContext?.RequestServices?.GetService<IWebProfilerService>();
 
         if (webProfilerService is not null)
         {
