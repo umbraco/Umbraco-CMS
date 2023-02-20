@@ -87,15 +87,15 @@ export class UmbLanguageRepository {
 	async create(language: LanguageModel) {
 		await this.#init;
 
-		const { data, error } = await this.#dataSource.update(language);
+		const { error } = await this.#dataSource.insert(language);
 
-		if (data) {
-			this.#languageStore?.append(data);
+		if (!error) {
+			this.#languageStore?.append(language);
 			const notification = { data: { message: `Language created` } };
 			this.#notificationService?.peek('positive', notification);
 		}
 
-		return { data, error };
+		return { error };
 	}
 
 	/**
@@ -107,15 +107,15 @@ export class UmbLanguageRepository {
 	async save(language: LanguageModel) {
 		await this.#init;
 
-		const { data, error } = await this.#dataSource.update(language);
+		const { error } = await this.#dataSource.update(language);
 
-		if (data) {
+		if (!error) {
 			const notification = { data: { message: `Language saved` } };
 			this.#notificationService?.peek('positive', notification);
-			this.#languageStore?.append(data);
+			this.#languageStore?.append(language);
 		}
 
-		return { data, error };
+		return { error };
 	}
 
 	/**
@@ -135,11 +135,10 @@ export class UmbLanguageRepository {
 		const { error } = await this.#dataSource.delete(isoCode);
 
 		if (!error) {
+			this.#languageStore?.remove([isoCode]);
 			const notification = { data: { message: `Language deleted` } };
 			this.#notificationService?.peek('positive', notification);
 		}
-
-		this.#languageStore?.remove([isoCode]);
 
 		return { error };
 	}
