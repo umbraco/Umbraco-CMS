@@ -123,16 +123,16 @@ public class BackOfficeUserStore : UmbracoUserStore<BackOfficeIdentityUser, Iden
         }
 
         if (user.Email is null || user.UserName is null)
-            {
-                throw new InvalidOperationException("Email and UserName is required.");
-            }
+        {
+            throw new InvalidOperationException("Email and UserName is required.");
+        }
 
-            // the password must be 'something' it could be empty if authenticating
-            // with an external provider so we'll just generate one and prefix it, the
-            // prefix will help us determine if the password hasn't actually been specified yet.
-            // this will hash the guid with a salt so should be nicely random
-            var aspHasher = new PasswordHasher<BackOfficeIdentityUser>();
-            var emptyPasswordValue = Constants.Security.EmptyPasswordPrefix +
+        // the password must be 'something' it could be empty if authenticating
+        // with an external provider so we'll just generate one and prefix it, the
+        // prefix will help us determine if the password hasn't actually been specified yet.
+        // this will hash the guid with a salt so should be nicely random
+        var aspHasher = new PasswordHasher<BackOfficeIdentityUser>();
+        var emptyPasswordValue = Constants.Security.EmptyPasswordPrefix +
                                  aspHasher.HashPassword(user, Guid.NewGuid().ToString("N"));
 
         var userEntity = new User(_globalSettings, user.Name, user.Email, user.UserName, emptyPasswordValue)
@@ -301,27 +301,25 @@ public class BackOfficeUserStore : UmbracoUserStore<BackOfficeIdentityUser, Iden
         // 1. An int - this means that the user logged in normally, this is fine, we parse it and return it.
         // 2. A fake Guid - this means that the user logged in using an external login provider, but we haven't migrated the users to have a key yet, so we need to convert it to an int.
         // 3. A Guid - this means that the user logged in using an external login provider, so we have to resolve the user by key.
-        // ffffffff
-        // 9E684BE6-32D8-486E-B632-CCF09F683F4A
+
         // Case 1
         if(int.TryParse(userId, NumberStyles.Integer, CultureInfo.InvariantCulture, out var result))
         {
             return _userService.GetUserById(result);
         }
 
-        // Case 2: A fake GUID will always be in the format XXXXXXXX-0000-0000-0000-000000000000 where X is numbers
-        // TODO: Handle this properly
-        if (userId.Substring(9) == "-0000-0000-0000-000000000000")
-        {
-            if (Guid.TryParse(userId, out Guid fakeKey))
-            {
-                var id = BitConverter.ToInt32(fakeKey.ToByteArray(), 0);
-                return _userService.GetUserById(id);
-            }
-        }
-
         if (Guid.TryParse(userId, out Guid key))
         {
+            var bytes = key.ToByteArray();
+
+            // Our fake guid is a 32 bit int, converted to a byte representation,
+            // so we can check if everything but the first 4 bytes are 0, if so, we know it's a fake guid.
+            if (bytes[4..].All(x => x == 0))
+            {
+                var id = BitConverter.ToInt32(bytes);
+                return _userService.GetUserById(id);
+            }
+
             return _userService.Get(key);
         }
 
