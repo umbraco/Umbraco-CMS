@@ -1,6 +1,7 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, html, nothing } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
+import { UmbModalService, UMB_MODAL_SERVICE_CONTEXT_TOKEN } from '../../modal.service';
 import { UmbModalLayoutElement } from '../modal-layout.element';
 
 @customElement('umb-modal-layout-property-settings')
@@ -8,6 +9,9 @@ export class UmbModalLayoutPropertySettingsElement extends UmbModalLayoutElement
 	static styles = [
 		UUITextStyles,
 		css`
+			:host {
+				color: var(--uui-color-text);
+			}
 			#content {
 				padding: var(--uui-size-space-6);
 			}
@@ -83,6 +87,19 @@ export class UmbModalLayoutPropertySettingsElement extends UmbModalLayoutElement
 	@state()
 	private _aliasLocked = true;
 
+	#modalService?: UmbModalService;
+
+	/**
+	 *
+	 */
+	constructor() {
+		super();
+
+		this.consumeContext(UMB_MODAL_SERVICE_CONTEXT_TOKEN, (instance) => {
+			this.#modalService = instance;
+		});
+	}
+
 	#close() {
 		this.modalHandler?.close();
 	}
@@ -100,6 +117,15 @@ export class UmbModalLayoutPropertySettingsElement extends UmbModalLayoutElement
 		this._appearanceIsLeft = !this._appearanceIsLeft;
 
 		console.log('appearance changed to: ', this._appearanceIsLeft ? 'left' : 'top');
+	}
+
+	#onSelectEditor() {
+		console.log('select editor', this.#modalService);
+		const modalHandler = this.#modalService?.propertyEditorUIPicker();
+
+		modalHandler?.close((what) => {
+			console.log('closed', what);
+		});
 	}
 
 	#renderLeftSVG() {
@@ -149,7 +175,7 @@ export class UmbModalLayoutPropertySettingsElement extends UmbModalLayoutElement
 						</uui-input>
 						<uui-textarea id="description-input" placeholder="Enter description..."></uui-textarea>
 					</div>
-					<uui-button label="Select editor" look="outline"></uui-button>
+					<uui-button @click=${this.#onSelectEditor} label="Select editor" look="outline"></uui-button>
 					<hr />
 					<div class="container">
 						<b>Validation</b>
