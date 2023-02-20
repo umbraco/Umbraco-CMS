@@ -1,4 +1,4 @@
-import { UmbWorkspaceContextInterface } from './workspace-context.interface';
+import type { UmbWorkspaceContextInterface } from './workspace-context.interface';
 
 export interface UmbWorkspaceEntityContextInterface<T = unknown> extends UmbWorkspaceContextInterface<T> {
 	//readonly name: Observable<string | undefined>;
@@ -7,8 +7,6 @@ export interface UmbWorkspaceEntityContextInterface<T = unknown> extends UmbWork
 	getEntityType(): string;
 
 	getData(): T;
-
-	//setPropertyValue(alias: string, value: unknown): void;
 
 	save(): Promise<void>;
 }

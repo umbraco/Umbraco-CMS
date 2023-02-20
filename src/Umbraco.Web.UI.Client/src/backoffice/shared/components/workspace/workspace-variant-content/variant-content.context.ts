@@ -7,6 +7,9 @@ import { UmbContextConsumerController, UmbContextProviderController } from '@umb
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 import { NumberState, ObjectState, UmbObserverController } from '@umbraco-cms/observable-api';
 import { DocumentVariantModel } from '@umbraco-cms/backend-api';
+import { UmbWorkspaceVariantableEntityContextInterface } from '../workspace-context/workspace-variantable-entity-context.interface';
+import { UmbWorkspaceVariantPropertySetContext } from '../workspace-context/workspace-variant-property-set.context';
+import { UmbVariantId } from 'src/backoffice/shared/variants/variant-id.class';
 
 //type EntityType = DocumentModel;
 
@@ -27,6 +30,10 @@ export class UmbVariantContentContext {
 
 	private _variantObserver?: UmbObserverController<ActiveVariant>;
 
+	private _variantId?: UmbVariantId;
+
+	#propertySetContext?: UmbWorkspaceVariantPropertySetContext;
+
 	constructor(host: UmbControllerHostInterface) {
 		this.#host = host;
 
@@ -36,12 +43,22 @@ export class UmbVariantContentContext {
 		// TODO: Figure out if this is the best way to consume the context or if it can be strongly typed with an UmbContextToken
 		new UmbContextConsumerController(host, 'umbWorkspaceContext', (context) => {
 			this.#workspaceContext = context as UmbDocumentWorkspaceContext;
+			this._providePropertySetContext();
 			this._observeVariant();
 		});
 
 		this.#index.subscribe(() => {
 			this._observeVariant();
 		});
+	}
+
+	private _providePropertySetContext() {
+		if (!this.#propertySetContext || !this.#workspaceContext || !this._variantId) return;
+		this.#propertySetContext = new UmbWorkspaceVariantPropertySetContext(
+			this.#host,
+			this.#workspaceContext,
+			this._variantId
+		);
 	}
 
 	private _observeVariant() {
@@ -53,10 +70,14 @@ export class UmbVariantContentContext {
 		this._variantObserver?.destroy();
 		this._variantObserver = new UmbObserverController(
 			this.#host,
-			this.#workspaceContext.activeVariantWithIndex(index),
-			(variant) => {
-				this.#currentVariant.next(variant);
-			}
+			this.#workspaceContext.activeVariantInfoByIndex(index),
+			async (activeVariantInfo) => {
+				this._variantId = activeVariantInfo.variantId;
+				const currentVariant = await this.#workspaceContext?.getVariant(this._variantId);
+				this.#currentVariant.next(currentVariant);
+				this._providePropertySetContext();
+			},
+			'_observeVariant'
 		);
 	}
 
@@ -70,15 +91,13 @@ export class UmbVariantContentContext {
 	}
 
 	public setName(newName: string) {
-		if (!this.#workspaceContext) return;
-		const currentVariant = this.#currentVariant.getValue();
-		if (!currentVariant) return;
-		this.#workspaceContext.setName(newName, currentVariant.culture, currentVariant.segment);
+		if (!this.#workspaceContext || !this._variantId) return;
+		this.#workspaceContext.setName(newName, this._variantId);
 	}
 
 	/**
 	 *
-	 * concept this clas could have methods to set and get the culture and segment of the active variant? just by using the index.
+	 * concept this class could have methods to set and get the culture and segment of the active variant? just by using the index.
 	 */
 
 	/*

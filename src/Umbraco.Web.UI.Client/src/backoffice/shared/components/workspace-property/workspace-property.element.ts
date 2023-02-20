@@ -28,7 +28,7 @@ export class UmbWorkspacePropertyElement extends UmbLitElement {
 			}
 
 			:host(:last-child) umb-workspace-property-layout {
-				border-bottom:0;
+				border-bottom: 0;
 			}
 
 			p {
@@ -108,7 +108,7 @@ export class UmbWorkspacePropertyElement extends UmbLitElement {
 	}
 
 	/**
-	 * Property Editor UI Alias. Render the Property Editor UI registered for this alias.
+	 * Property Value, this is the value stored in the property.
 	 * @public
 	 * @type {unknown}
 	 * @attr

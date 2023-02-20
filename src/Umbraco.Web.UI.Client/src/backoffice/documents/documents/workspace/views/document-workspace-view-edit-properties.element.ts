@@ -44,14 +44,6 @@ export class UmbDocumentWorkspaceViewEditPropertiesElement extends UmbLitElement
 	@state()
 	_propertyStructure: Array<DocumentTypePropertyTypeModel> = [];
 
-	// TODO: we should not get the values here, as its too hard to keep track of variants.
-	// Instead wrap each property in a variant aware component.
-	// As well we need to wrap the whole 'workspace' thing in a variant aware component.
-	// Remember that the other views should also differentiate, or be able to differentiate based on the selected variant.
-	// Also consider wrapping the variant data in a variant object. So we only need to parse one object every time we work with variants.
-	@state()
-	_propertyValueMap: Map<string, DocumentPropertyModel> = new Map();
-
 	private _workspaceContext?: UmbDocumentWorkspaceContext;
 
 	constructor() {
@@ -96,7 +88,6 @@ export class UmbDocumentWorkspaceViewEditPropertiesElement extends UmbLitElement
 				properties?.forEach((property) => {
 					if (!this._propertyStructure.find((x) => x.alias === property.alias)) {
 						this._propertyStructure.push(property);
-						this._observePropertyValueOfAlias(property.alias!);
 					}
 				});
 
@@ -111,31 +102,11 @@ export class UmbDocumentWorkspaceViewEditPropertiesElement extends UmbLitElement
 		// cache observable
 	}
 
-	private _observePropertyValueOfAlias(propertyAlias: string) {
-		if (!this._workspaceContext || !propertyAlias) return;
-
-		// TODO: Should be no need to update this observable if its already there.
-		this.observe(
-			this._workspaceContext.propertyValueOfAlias(propertyAlias, null, null),
-			(propertyValue) => {
-				if (propertyValue) {
-					this._propertyValueMap.set(propertyAlias, propertyValue);
-				} else {
-					this._propertyValueMap.delete(propertyAlias);
-				}
-			},
-			'_observePropertyValueOfAlias' + propertyAlias
-		);
-	}
-
 	render() {
 		return repeat(
 			this._propertyStructure,
 			(property) => property.alias,
-			(property) =>
-				html`<umb-datatype-based-property
-					.property=${property}
-					.value=${this._propertyValueMap.get(property.alias!)?.value}></umb-datatype-based-property> `
+			(property) => html`<umb-variant-property .property=${property}></umb-variant-property> `
 		);
 	}
 }

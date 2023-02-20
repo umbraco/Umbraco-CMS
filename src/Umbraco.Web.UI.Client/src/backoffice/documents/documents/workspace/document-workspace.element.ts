@@ -3,6 +3,7 @@ import { css, html, nothing } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { repeat } from 'lit/directives/repeat.js';
 import type { UmbWorkspaceEntityElement } from '../../../shared/components/workspace/workspace-entity-element.interface';
+import { UmbVariantId } from '../../../shared/variants/variant-id.class';
 import { ActiveVariant, UmbDocumentWorkspaceContext } from './document-workspace.context';
 import { UmbLitElement } from '@umbraco-cms/element';
 
@@ -29,7 +30,7 @@ export class UmbDocumentWorkspaceElement extends UmbLitElement implements UmbWor
 
 	constructor() {
 		super();
-		this.observe(this._workspaceContext.activeVariants, (variants) => {
+		this.observe(this._workspaceContext.activeVariantsInfo, (variants) => {
 			this._workspaceSplitViews = variants;
 		});
 	}
@@ -46,7 +47,8 @@ export class UmbDocumentWorkspaceElement extends UmbLitElement implements UmbWor
 
 	private _gotDocumentData(data: any) {
 		if (data && data.variants && data.variants.length > 0) {
-			this._workspaceContext.setActiveVariant(0, data.variants[0].culture || null, data.variants[0].segment || null);
+			// TODO: consider making a DocumentVariant object for this VariantId:
+			this._workspaceContext.setActiveVariant(0, new UmbVariantId(data.variants[0]));
 			this._unique = data.key;
 		} else {
 			// Fail beautifully?

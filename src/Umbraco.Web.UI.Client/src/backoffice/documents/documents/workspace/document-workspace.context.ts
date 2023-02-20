@@ -1,34 +1,28 @@
 import { UmbWorkspaceContext } from '../../../shared/components/workspace/workspace-context/workspace-context';
 import { UmbDocumentRepository } from '../repository/document.repository';
-import type { UmbWorkspaceEntityContextInterface } from '../../../shared/components/workspace/workspace-context/workspace-entity-context.interface';
 import { UmbDocumentTypeRepository } from '../../document-types/repository/document-type.repository';
+import { UmbWorkspaceVariantableEntityContextInterface } from '../../../shared/components/workspace/workspace-context/workspace-variantable-entity-context.interface';
+import { UmbVariantId } from '../../../shared/variants/variant-id.class';
 import type {
 	DocumentModel,
 	DocumentTypeModel,
 	DocumentTypePropertyTypeContainerModel,
 	DocumentTypePropertyTypeModel,
 } from '@umbraco-cms/backend-api';
-import {
-	partialUpdateFrozenArray,
-	ObjectState,
-	ArrayState,
-	UmbObserverController,
-	appendToFrozenArray,
-} from '@umbraco-cms/observable-api';
+import { partialUpdateFrozenArray, ObjectState, ArrayState, UmbObserverController } from '@umbraco-cms/observable-api';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 
 // TODO: should this context be called DocumentDraft instead of workspace? or should the draft be part of this?
 
 export type ActiveVariant = {
 	index: number;
-	culture: string | null;
-	segment: string | null;
+	variantId: UmbVariantId;
 };
 
 type EntityType = DocumentModel;
 export class UmbDocumentWorkspaceContext
 	extends UmbWorkspaceContext
-	implements UmbWorkspaceEntityContextInterface<EntityType | undefined>
+	implements UmbWorkspaceVariantableEntityContextInterface<EntityType | undefined>
 {
 	#isNew = false;
 	#host: UmbControllerHostInterface;
@@ -52,8 +46,8 @@ export class UmbDocumentWorkspaceContext
 	urls = this.#draft.getObservablePart((data) => data?.urls || []);
 	templateKey = this.#draft.getObservablePart((data) => data?.templateKey || null);
 
-	#activeVariants = new ArrayState<ActiveVariant>([], (x) => x.index);
-	activeVariants = this.#activeVariants.asObservable();
+	#activeVariantsInfo = new ArrayState<ActiveVariant>([], (x) => x.index);
+	activeVariantsInfo = this.#activeVariantsInfo.asObservable();
 
 	#documentTypes = new ArrayState<DocumentTypeModel>([], (x) => x.key);
 	documentTypes = this.#documentTypes.asObservable();
@@ -144,41 +138,43 @@ export class UmbDocumentWorkspaceContext
 		return 'document';
 	}
 
-	setActiveVariant(index: number, culture: string | null, segment: string | null) {
-		const activeVariants = [...(this.#activeVariants.getValue() || [])];
+	setActiveVariant(index: number, variantId: UmbVariantId) {
+		const activeVariants = [...this.#activeVariantsInfo.getValue()];
 		if (index < activeVariants.length) {
-			activeVariants[index] = { index, culture, segment };
+			activeVariants[index] = { index, variantId: variantId };
 		} else {
-			activeVariants.push({ index, culture, segment });
+			activeVariants.push({ index, variantId: variantId });
 		}
-		this.#activeVariants.next(activeVariants);
+		this.#activeVariantsInfo.next(activeVariants);
 	}
 
-	activeVariantWithIndex(index: number) {
-		return this.#activeVariants.getObservablePart((data) => data[index] || undefined);
+	getVariant(variantId: UmbVariantId) {
+		return this.#draft.getValue()?.variants?.find((x) => variantId.compare(x));
 	}
 
-	setName(name: string, culture?: string | null, segment?: string | null) {
-		const variants = this.#draft.getValue()?.variants || [];
-		const newVariants = partialUpdateFrozenArray(
-			variants,
-			{ name },
-			(v) => v.culture == culture && v.segment == segment
-		);
-		this.#draft.update({ variants: newVariants });
+	activeVariantInfoByIndex(index: number) {
+		return this.#activeVariantsInfo.getObservablePart((data) => data[index] || undefined);
 	}
 
-	propertyValuesOf(culture: string | null, segment: string | null) {
+	getName(variantId = new UmbVariantId()) {
+		const variants = this.#draft.getValue()?.variants;
+		if (!variants) return;
+		return variants.find((x) => variantId.compare(x))?.name;
+	}
+
+	setName(name: string, variantId = new UmbVariantId()) {
+		const oldVariants = this.#draft.getValue()?.variants || [];
+		const variants = partialUpdateFrozenArray(oldVariants, { name }, (x) => variantId.compare(x));
+		this.#draft.update({ variants });
+	}
+
+	propertyValuesOf(variantId = new UmbVariantId()) {
+		return this.#draft.getObservablePart((data) => data?.properties?.filter((x) => variantId.compare(x)));
+	}
+
+	propertyValueByAlias(propertyAlias: string, variantId = new UmbVariantId()) {
 		return this.#draft.getObservablePart((data) =>
-			data?.properties?.filter((p) => (culture === p.culture || null) && (segment === p.segment || null))
-		);
-	}
-
-	propertyValueOfAlias(propertyAlias: string, culture: string | null, segment: string | null) {
-		return this.#draft.getObservablePart((data) =>
-			data?.properties?.find(
-				(p) => propertyAlias === p.alias && (culture === p.culture || null) && (segment === p.segment || null)
-			)
+			data?.properties?.find((x) => x?.alias === propertyAlias && variantId.compare(x))
 		);
 	}
 
@@ -236,14 +232,25 @@ export class UmbDocumentWorkspaceContext
 			return data.filter((x) => x.name === name && x.type === containerType);
 		});
 	}
-	setPropertyValue(alias: string, value: unknown, culture: string | null, segment: string | null) {
-		const entry = { alias, value, culture, segment };
+
+	getPropertyValue(alias: string, variantId: UmbVariantId = new UmbVariantId()): void {
+		const currentData = this.#draft.value;
+		if (currentData) {
+			const newDataSet = currentData.properties?.find((x) => x.alias === alias && variantId.compare(x));
+			return newDataSet?.value;
+		}
+	}
+	setPropertyValue(alias: string, value: unknown, variantId = new UmbVariantId()) {
+		const partialEntry = { value };
 
 		const currentData = this.#draft.value;
 		if (currentData) {
-			// TODO: make a partial update method for array of data, (idea/concept, use if this case is getting common)
-			const newDataSet = appendToFrozenArray(currentData.properties || [], entry, (x) => x.alias);
-			this.#draft.update({ properties: newDataSet });
+			const properties = partialUpdateFrozenArray(
+				currentData.properties || [],
+				partialEntry,
+				(x) => x.alias === alias && variantId.compare(x)
+			);
+			this.#draft.update({ properties });
 		}
 	}
 

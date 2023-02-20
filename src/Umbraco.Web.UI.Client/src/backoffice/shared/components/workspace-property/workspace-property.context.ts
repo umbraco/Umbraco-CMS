@@ -3,6 +3,7 @@ import type { DataTypeModel } from '@umbraco-cms/backend-api';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 import { ObjectState } from '@umbraco-cms/observable-api';
 import { UmbContextConsumerController, UmbContextProviderController } from '@umbraco-cms/context-api';
+import { UmbWorkspacePropertySetContextInterface } from '../workspace/workspace-context/workspace-property-set-context.interface';
 
 // If we get this from the server then we can consider using TypeScripts Partial<> around the model from the Management-API.
 export type WorkspacePropertyData<ValueType> = {
@@ -24,18 +25,15 @@ export class UmbWorkspacePropertyContext<ValueType = unknown> {
 	public readonly value = this._data.getObservablePart((data) => data.value);
 	public readonly config = this._data.getObservablePart((data) => data.config);
 
-	// culture
-	// segment
-
-	private _workspaceContext?: UmbWorkspaceEntityContextInterface;
+	private _propertySetContext?: UmbWorkspacePropertySetContextInterface;
 
 	constructor(host: UmbControllerHostInterface) {
 		// TODO: Figure out how to get the magic string in a better way.
-		new UmbContextConsumerController<UmbWorkspaceEntityContextInterface>(
+		new UmbContextConsumerController<UmbWorkspacePropertySetContextInterface>(
 			host,
-			'umbWorkspaceContext',
+			'umbWorkspacePropertySetContext',
 			(workspaceContext) => {
-				this._workspaceContext = workspaceContext;
+				this._propertySetContext = workspaceContext;
 			}
 		);
 
@@ -58,7 +56,7 @@ export class UmbWorkspacePropertyContext<ValueType = unknown> {
 
 		const alias = this._data.getValue().alias;
 		if (alias) {
-			this._workspaceContext?.setPropertyValue(alias, value);
+			this._propertySetContext?.setPropertyValue(alias, value);
 		}
 	}
 	public setConfig(config: WorkspacePropertyData<ValueType>['config']) {
@@ -69,7 +67,6 @@ export class UmbWorkspacePropertyContext<ValueType = unknown> {
 		this.setValue(null); // TODO: Consider if this can be configured/provided from Property Editor or DataType Configuration or even locally specified in DocumentType.
 	}
 
-	// TODO: how can we make sure to call this.
 	public destroy(): void {
 		this._data.unsubscribe();
 		this._providerController.destroy(); // This would also be handled by the controller host, but if someone wanted to replace/remove this context without the host being destroyed. Then we have clean up out selfs here.

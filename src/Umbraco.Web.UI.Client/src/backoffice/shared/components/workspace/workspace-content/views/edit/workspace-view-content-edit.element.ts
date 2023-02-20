@@ -60,7 +60,7 @@ export class UmbWorkspaceViewContentEditElement extends UmbLitElement {
 				this._properties = content?.properties || [];
 				console.log('content', content);
 
-				//Maybe we should not give the value(Data), but the umb-datatype-based-property should get the context and observe its own data.
+				//Maybe we should not give the value(Data), but the umb-property-type-based-property should get the context and observe its own data.
 				//This would become a more specific Observer therefor better performance?.. Note to self: Debate with Mads how he sees this perspective.
 			},
 			'observeWorkspaceContextData'
@@ -75,9 +75,9 @@ export class UmbWorkspaceViewContentEditElement extends UmbLitElement {
 					this._properties,
 					(property) => property.alias,
 					(property) =>
-						html`<umb-datatype-based-property
+						html`<umb-property-type-based-property
 							.property=${property}
-							.value=${property.label}></umb-datatype-based-property> `
+							.value=${property.label}></umb-property-type-based-property> `
 				)}
 			</uui-box>
 		`;
