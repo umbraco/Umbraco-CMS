@@ -51,6 +51,7 @@ public class AddGuidsToUsers : UnscopedMigrationBase
         }
 
         MigrateExternalLogins(dtos);
+        MigrateTwoFactorLogins(dtos);
     }
 
     private void MigrateSqlite()
@@ -99,6 +100,7 @@ public class AddGuidsToUsers : UnscopedMigrationBase
         }
 
         MigrateExternalLogins(users);
+        MigrateTwoFactorLogins(users);
     }
 
     private void MigrateExternalLogins(List<UserDto> userDtos)
@@ -119,6 +121,29 @@ public class AddGuidsToUsers : UnscopedMigrationBase
 
             externalLogin.UserOrMemberKey = associatedUser.Key;
             Database.Update(externalLogin);
+        }
+    }
+
+    private void MigrateTwoFactorLogins(List<UserDto> userDtos)
+    {
+        // TODO: TEST ME!
+        List<TwoFactorLoginDto>? twoFactorLoginDtos = Database.Fetch<TwoFactorLoginDto>();
+        if (twoFactorLoginDtos is null)
+        {
+            return;
+        }
+
+        foreach (TwoFactorLoginDto twoFactorLoginDto in twoFactorLoginDtos)
+        {
+            UserDto? associatedUser = userDtos.FirstOrDefault(x => x.Id.ToGuid() == twoFactorLoginDto.UserOrMemberKey);
+
+            if (associatedUser is null)
+            {
+                continue;
+            }
+
+            twoFactorLoginDto.UserOrMemberKey = associatedUser.Key;
+            Database.Update(twoFactorLoginDto);
         }
     }
 
