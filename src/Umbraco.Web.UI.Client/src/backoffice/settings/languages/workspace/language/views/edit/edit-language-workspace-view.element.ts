@@ -1,8 +1,7 @@
-import { UUIBooleanInputEvent, UUIComboboxElement, UUIComboboxEvent, UUIToggleElement } from '@umbraco-ui/uui';
+import { UUIBooleanInputEvent, UUIToggleElement } from '@umbraco-ui/uui';
 import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, html, nothing } from 'lit';
-import { repeat } from 'lit/directives/repeat.js';
-import { customElement, property, state } from 'lit/decorators.js';
+import { customElement, state } from 'lit/decorators.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
 import { UmbLanguageWorkspaceContext } from '../../language-workspace.context';
 import { UmbLitElement } from '@umbraco-cms/element';
@@ -49,9 +48,6 @@ export class UmbEditLanguageWorkspaceViewElement extends UmbLitElement {
 
 	@state()
 	_language?: LanguageModel;
-
-	@state()
-	private _languages: LanguageModel[] = [];
 
 	@state()
 	private _startData: LanguageModel | null = null;
