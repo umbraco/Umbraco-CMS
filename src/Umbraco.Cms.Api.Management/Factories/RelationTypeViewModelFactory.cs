@@ -11,8 +11,8 @@ public class RelationTypeViewModelFactory : IRelationTypeViewModelFactory
 
     public RelationTypeViewModelFactory(IShortStringHelper shortStringHelper) => _shortStringHelper = shortStringHelper;
 
-    public RelationType CreateRelationType(RelationTypeSavingViewModel relationTypeSavingViewModel) =>
-        new(
+    public IRelationType CreateRelationType(RelationTypeSavingViewModel relationTypeSavingViewModel) =>
+        new RelationType(
             relationTypeSavingViewModel.Name,
             relationTypeSavingViewModel.Name.ToSafeAlias(_shortStringHelper, true),
             relationTypeSavingViewModel.IsBidirectional,
@@ -20,4 +20,14 @@ public class RelationTypeViewModelFactory : IRelationTypeViewModelFactory
             relationTypeSavingViewModel.ChildObjectType,
             relationTypeSavingViewModel.IsDependency,
             relationTypeSavingViewModel.Key);
+
+    public IRelationType MapUpdateModelToRelationType(RelationTypeUpdatingViewModel relationTypeUpdatingViewModel, Guid key) =>
+        new RelationType(
+            relationTypeUpdatingViewModel.Name,
+            relationTypeUpdatingViewModel.Name.ToSafeAlias(_shortStringHelper, true),
+            relationTypeUpdatingViewModel.IsBidirectional,
+            relationTypeUpdatingViewModel.ParentObjectType,
+            relationTypeUpdatingViewModel.ChildObjectType,
+            relationTypeUpdatingViewModel.IsDependency,
+            key);
 }

@@ -9,7 +9,7 @@ public class RelationTypeViewModelsMapDefinition : IMapDefinition
 {
     public void DefineMaps(IUmbracoMapper mapper)
     {
-        mapper.Define<IRelationType, RelationTypeViewModel>((source, context) => new RelationTypeViewModel(), Map);
+        mapper.Define<IRelationType, RelationTypeViewModel>((_, _) => new RelationTypeViewModel(), Map);
     }
 
     // Umbraco.Code.MapAll

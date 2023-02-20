@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Management.Factories;
 using Umbraco.Cms.Api.Management.ViewModels.RelationType;
+using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
 
 
@@ -23,7 +24,7 @@ public class CreateRelationTypeController : RelationTypeControllerBase
     [ProducesResponseType(StatusCodes.Status201Created)]
     public async Task<IActionResult> Create(RelationTypeSavingViewModel relationTypeSavingViewModel)
     {
-        Core.Models.RelationType relationTypePersisted = _relationTypeViewModelFactory.CreateRelationType(relationTypeSavingViewModel);
+        IRelationType relationTypePersisted = _relationTypeViewModelFactory.CreateRelationType(relationTypeSavingViewModel);
 
         _relationService.Save(relationTypePersisted);
 

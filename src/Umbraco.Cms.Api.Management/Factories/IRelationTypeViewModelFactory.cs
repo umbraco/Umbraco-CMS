@@ -5,5 +5,7 @@ namespace Umbraco.Cms.Api.Management.Factories;
 
 public interface IRelationTypeViewModelFactory
 {
-    RelationType CreateRelationType(RelationTypeSavingViewModel relationTypeSavingViewModel);
+    IRelationType CreateRelationType(RelationTypeSavingViewModel relationTypeSavingViewModel);
+
+    IRelationType MapUpdateModelToRelationType(RelationTypeUpdatingViewModel relationTypeUpdatingViewModel, Guid key);
 }
