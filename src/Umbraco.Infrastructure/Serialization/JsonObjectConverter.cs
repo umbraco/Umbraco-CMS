@@ -46,7 +46,11 @@ public class JsonObjectConverter : JsonConverter<object>
                 items.Add(ParseObject(ref reader));
             }
 
-            return items.ToArray();
+            // if the list of items consists solely of JsonNodes, we are parsing an array of complex objects and should return a JsonArray.
+            // otherwise we are parsing an array of simple or mixed types (i.e. an array or strings or integers) and should return an object array.
+            return items.All(i => i is JsonNode)
+                ? new JsonArray(items.OfType<JsonNode>().ToArray())
+                : items.ToArray();
         }
 
         if (reader.TokenType == JsonTokenType.StartObject)
