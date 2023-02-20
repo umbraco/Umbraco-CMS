@@ -9,6 +9,7 @@ import { UmbLitElement } from '@umbraco-cms/element';
 import { LanguageModel } from '@umbraco-cms/backend-api';
 import { UmbChangeEvent } from 'src/core/events';
 import UmbInputCultureSelectElement from 'src/backoffice/shared/components/input-culture-select/input-culture-select.element';
+import UmbInputLanguagePickerElement from 'src/backoffice/shared/components/input-language-picker/input-language-picker.element';
 
 @customElement('umb-edit-language-workspace-view')
 export class UmbEditLanguageWorkspaceViewElement extends UmbLitElement {
@@ -111,21 +112,12 @@ export class UmbEditLanguageWorkspaceViewElement extends UmbLitElement {
 		}
 	}
 
-	#handleFallbackChange(event: UUIComboboxEvent) {
-		if (event instanceof UUIComboboxEvent) {
-			const target = event.composedPath()[0] as UUIComboboxElement;
-			this.#languageWorkspaceContext?.setFallbackCulture(target.value.toString());
+	#handleFallbackChange(event: UmbChangeEvent) {
+		if (event instanceof UmbChangeEvent) {
+			const target = event.target as UmbInputLanguagePickerElement;
+			const selectedLanguageIsoCode = target.selectedIsoCodes?.[0];
+			this.#languageWorkspaceContext?.setFallbackCulture(selectedLanguageIsoCode);
 		}
-	}
-
-	get #fallbackLanguages() {
-		return this._languages.filter((language) => {
-			return language.isoCode !== this.language?.isoCode;
-		});
-	}
-
-	get #fallbackLanguage() {
-		return this.#fallbackLanguages.find((language) => language.isoCode === this.language?.fallbackIsoCode);
 	}
 
 	#renderCultureWarning() {
@@ -188,7 +180,10 @@ export class UmbEditLanguageWorkspaceViewElement extends UmbLitElement {
 				<umb-workspace-property-layout
 					label="Fallback language"
 					description="To allow multi-lingual content to fall back to another language if not present in the requested language, select it here.">
-					<umb-input-language-picker slot="editor" max="1"></umb-input-language-picker>
+					<umb-input-language-picker
+						slot="editor"
+						max="1"
+						@change=${this.#handleFallbackChange}></umb-input-language-picker>
 				</umb-workspace-property-layout>
 			</uui-box>
 		`;

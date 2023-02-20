@@ -8,6 +8,7 @@ import { UmbLitElement } from '@umbraco-cms/element';
 import type { LanguageModel } from '@umbraco-cms/backend-api';
 import type { UmbObserverController } from '@umbraco-cms/observable-api';
 import { UmbLanguageRepository } from 'src/backoffice/settings/languages/repository/language.repository';
+import { UmbChangeEvent } from 'src/core/events';
 
 @customElement('umb-input-language-picker')
 export class UmbInputLanguagePickerElement extends FormControlMixin(UmbLitElement) {
@@ -143,7 +144,7 @@ export class UmbInputLanguagePickerElement extends FormControlMixin(UmbLitElemen
 
 	private _setSelection(newSelection: Array<string>) {
 		this.selectedIsoCodes = newSelection;
-		this.dispatchEvent(new CustomEvent('change', { bubbles: true, composed: true }));
+		this.dispatchEvent(new UmbChangeEvent());
 	}
 
 	render() {
