@@ -25,6 +25,7 @@ export class UmbSectionSidebarElement extends UmbLitElement {
 
 			#scroll-container {
 				height: 100%;
+				overflow-y: auto;
 			}
 		`,
 	];
