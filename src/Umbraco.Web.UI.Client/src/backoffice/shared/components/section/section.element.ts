@@ -30,6 +30,10 @@ export class UmbSectionElement extends UmbLitElement {
 				overflow: auto;
 				height: 100%;
 			}
+
+			h3 {
+				padding: var(--uui-size-4) var(--uui-size-8);
+			}
 		`,
 	];
 
@@ -40,11 +44,16 @@ export class UmbSectionElement extends UmbLitElement {
 	@state()
 	private _menuItems?: Array<ManifestSidebarMenuItem>;
 
-	private _workspaces?: Array<ManifestWorkspace>;
-
 	@state()
 	private _views?: Array<ManifestSectionView>;
 
+	@state()
+	private _sectionLabel = '';
+
+	@state()
+	private _sectionPathname = '';
+
+	private _workspaces?: Array<ManifestWorkspace>;
 	private _sectionContext?: UmbSectionContext;
 	private _sectionAlias?: string;
 
@@ -148,6 +157,14 @@ export class UmbSectionElement extends UmbLitElement {
 			this._sectionAlias = alias;
 			this._observeViews();
 		});
+
+		this.observe(this._sectionContext.pathname, (pathname) => {
+			this._sectionPathname = pathname || '';
+		});
+
+		this.observe(this._sectionContext.label, (label) => {
+			this._sectionLabel = label || '';
+		});
 	}
 
 	private _observeViews() {
@@ -194,6 +211,11 @@ export class UmbSectionElement extends UmbLitElement {
 				? html`
 						<umb-section-sidebar>
 							<umb-app-language-select></umb-app-language-select>
+
+							<!-- TODO: this should be part of a sidebar menu element instead -->
+							<a href="${`section/${this._sectionPathname}`}">
+								<h3>${this._sectionLabel}</h3>
+							</a>
 							<umb-section-sidebar-menu></umb-section-sidebar-menu>
 						</umb-section-sidebar>
 				  `

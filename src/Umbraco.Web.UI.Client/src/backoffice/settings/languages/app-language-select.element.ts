@@ -20,13 +20,14 @@ export class UmbAppLanguageSelectElement extends UmbLitElement {
 				z-index: 10;
 			}
 
-			#selected {
+			#toggle {
 				display: block;
 				width: 100%;
 				text-align: left;
 				background: none;
 				border: none;
-				padding: var(--uui-size-4) var(--uui-size-8);
+				height: 70px;
+				padding: 0 var(--uui-size-8);
 				border-bottom: 1px solid var(--uui-color-border);
 				font-size: 1rem;
 				font-weight: bold;
@@ -106,7 +107,7 @@ export class UmbAppLanguageSelectElement extends UmbLitElement {
 
 	render() {
 		return html` <umb-dropdown .open="${this._isOpen}" @close=${this.#onClose}>
-			<button id="selected" slot="trigger" @click=${this.#onClick}>${this._appLanguage?.name}</button>
+			<button id="toggle" slot="trigger" @click=${this.#onClick}>${this._appLanguage?.name}</button>
 			<div slot="dropdown">
 				${repeat(
 					this._languages,
