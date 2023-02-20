@@ -64,7 +64,7 @@ export class UmbWorkspacePropertyContext<ValueType = unknown> {
 	}
 
 	public resetValue() {
-		this.setValue(null); // TODO: Consider if this can be configured/provided from Property Editor or DataType Configuration or even locally specified in DocumentType.
+		this.setValue(null); // TODO: We should get the default value from Property Editor maybe even later the DocumentType, as that would hold the default value for the property.
 	}
 
 	public destroy(): void {
