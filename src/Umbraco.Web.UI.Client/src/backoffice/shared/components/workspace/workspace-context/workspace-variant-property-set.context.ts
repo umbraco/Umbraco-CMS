@@ -22,6 +22,9 @@ export class UmbWorkspaceVariantPropertySetContext implements UmbWorkspaceProper
 		this.variantId = variantId;
 	}
 
+	propertyDataByAlias(alias: string) {
+		return this.workspaceContext.propertyDataByAlias(alias, this.variantId);
+	}
 	propertyValueByAlias(alias: string) {
 		return this.workspaceContext.propertyValueByAlias(alias, this.variantId);
 	}

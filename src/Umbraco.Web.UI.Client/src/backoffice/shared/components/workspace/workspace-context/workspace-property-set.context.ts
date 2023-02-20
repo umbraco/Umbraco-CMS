@@ -11,6 +11,9 @@ export class UmbWorkspacePropertySetContext implements UmbWorkspacePropertySetCo
 		new UmbContextProviderController(host, 'umbWorkspacePropertySetContext', this);
 	}
 
+	propertyDataByAlias(alias: string) {
+		return this.workspaceContext.propertyDataByAlias(alias);
+	}
 	propertyValueByAlias(alias: string) {
 		return this.workspaceContext.propertyValueByAlias(alias);
 	}
