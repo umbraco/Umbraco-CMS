@@ -7,7 +7,7 @@ export interface UmbWorkspaceInvariantableEntityContextInterface<T = unknown>
 	getName(): void;
 	setName(name: string): void;
 
-	propertyInfoByAlias(alias: string): Observable<PropertyViewModelBaseModel | undefined>;
+	propertyDataByAlias(alias: string): Observable<PropertyViewModelBaseModel | undefined>;
 	propertyValueByAlias(alias: string): Observable<any | undefined>;
 	getPropertyValue(alias: string): void;
 	setPropertyValue(alias: string, value: unknown): void;

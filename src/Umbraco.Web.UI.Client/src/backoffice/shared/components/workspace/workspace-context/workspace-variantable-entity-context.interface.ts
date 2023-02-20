@@ -8,7 +8,7 @@ export interface UmbWorkspaceVariantableEntityContextInterface<T = unknown>
 	getName(variantId?: UmbVariantId): void;
 	setName(name: string, variantId?: UmbVariantId): void;
 
-	propertyInfoByAlias(alias: string, variantId?: UmbVariantId): Observable<PropertyViewModelBaseModel | undefined>;
+	propertyDataByAlias(alias: string, variantId?: UmbVariantId): Observable<PropertyViewModelBaseModel | undefined>;
 	propertyValueByAlias(alias: string, variantId?: UmbVariantId): Observable<any | undefined>;
 	getPropertyValue(alias: string, variantId?: UmbVariantId): void;
 	setPropertyValue(alias: string, value: unknown, variantId?: UmbVariantId): void;
