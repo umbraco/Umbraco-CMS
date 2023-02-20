@@ -47,8 +47,8 @@ export class UmbEditLanguageWorkspaceViewElement extends UmbLitElement {
 		`,
 	];
 
-	@property()
-	language?: LanguageModel;
+	@state()
+	_language?: LanguageModel;
 
 	@state()
 	private _languages: LanguageModel[] = [];
@@ -65,7 +65,7 @@ export class UmbEditLanguageWorkspaceViewElement extends UmbLitElement {
 			this.#languageWorkspaceContext = instance;
 
 			this.observe(this.#languageWorkspaceContext.data, (language) => {
-				this.language = language;
+				this._language = language;
 			});
 		});
 	}
@@ -81,7 +81,7 @@ export class UmbEditLanguageWorkspaceViewElement extends UmbLitElement {
 				// Provides a way better UX
 				//TODO: Maybe the combobox should implement something similar?
 				const resetFunction = () => {
-					target.value = this.language?.isoCode ?? '';
+					target.value = this._language?.isoCode ?? '';
 				};
 
 				target.addEventListener('close', resetFunction, { once: true });
@@ -92,7 +92,7 @@ export class UmbEditLanguageWorkspaceViewElement extends UmbLitElement {
 			this.#languageWorkspaceContext?.setCulture(isoCode);
 
 			// If the language name is not set, we set it to the name of the selected language.
-			if (!this.language?.name && cultureName) {
+			if (!this._language?.name && cultureName) {
 				this.#languageWorkspaceContext?.setName(cultureName);
 			}
 		}
@@ -121,7 +121,7 @@ export class UmbEditLanguageWorkspaceViewElement extends UmbLitElement {
 	}
 
 	#renderCultureWarning() {
-		if (!this._startData?.isoCode || this._startData?.isoCode === this.language?.isoCode) return nothing;
+		if (!this._startData?.isoCode || this._startData?.isoCode === this._language?.isoCode) return nothing;
 
 		return html`<div id="culture-warning">
 			Changing the culture for a language may be an expensive operation and will result in the content cache and indexes
@@ -130,7 +130,7 @@ export class UmbEditLanguageWorkspaceViewElement extends UmbLitElement {
 	}
 
 	#renderDefaultLanguageWarning() {
-		if (this._startData?.isDefault || this.language?.isDefault !== true) return nothing;
+		if (this._startData?.isDefault || this._language?.isDefault !== true) return nothing;
 
 		return html`<div id="default-language-warning">
 			Switching default language may result in default content missing.
@@ -138,28 +138,28 @@ export class UmbEditLanguageWorkspaceViewElement extends UmbLitElement {
 	}
 
 	render() {
-		if (!this.language) return nothing;
+		if (!this._language) return nothing;
 
 		return html`
 			<uui-box>
 				<umb-workspace-property-layout label="Language">
 					<div slot="editor">
 						<umb-input-culture-select
-							value=${ifDefined(this.language.isoCode)}
+							value=${ifDefined(this._language.isoCode)}
 							@change=${this.#handleCultureChange}></umb-input-culture-select>
 						${this.#renderCultureWarning()}
 					</div>
 				</umb-workspace-property-layout>
 
 				<umb-workspace-property-layout label="ISO Code">
-					<div slot="editor">${this.language.isoCode}</div>
+					<div slot="editor">${this._language.isoCode}</div>
 				</umb-workspace-property-layout>
 
 				<umb-workspace-property-layout label="Settings">
 					<div slot="editor">
 						<uui-toggle
 							?disabled=${this._startData?.isDefault}
-							?checked=${this.language.isDefault || false}
+							?checked=${this._language.isDefault || false}
 							@change=${this.#handleDefaultChange}>
 							<div>
 								<b>Default language</b>
@@ -168,7 +168,7 @@ export class UmbEditLanguageWorkspaceViewElement extends UmbLitElement {
 						</uui-toggle>
 						${this.#renderDefaultLanguageWarning()}
 						<hr />
-						<uui-toggle ?checked=${this.language.isMandatory || false} @change=${this.#handleMandatoryChange}>
+						<uui-toggle ?checked=${this._language.isMandatory || false} @change=${this.#handleMandatoryChange}>
 							<div>
 								<b>Mandatory language</b>
 								<div>Properties on this language have to be filled out before the node can be published.</div>
@@ -181,6 +181,7 @@ export class UmbEditLanguageWorkspaceViewElement extends UmbLitElement {
 					label="Fallback language"
 					description="To allow multi-lingual content to fall back to another language if not present in the requested language, select it here.">
 					<umb-input-language-picker
+						value=${ifDefined(this._language.fallbackIsoCode === null ? undefined : this._language.fallbackIsoCode)}
 						slot="editor"
 						max="1"
 						@change=${this.#handleFallbackChange}></umb-input-language-picker>
