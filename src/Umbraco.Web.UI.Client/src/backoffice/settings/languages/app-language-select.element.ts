@@ -26,7 +26,8 @@ export class UmbAppLanguageSelectElement extends UmbLitElement {
 				text-align: left;
 				background: none;
 				border: none;
-				padding: 20px 10px;
+				padding: var(--uui-size-4) var(--uui-size-8);
+				border-bottom: 1px solid var(--uui-color-border);
 				font-size: 1rem;
 				font-weight: bold;
 			}
