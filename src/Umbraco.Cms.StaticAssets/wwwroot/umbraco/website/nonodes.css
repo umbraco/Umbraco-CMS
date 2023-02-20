@@ -25,7 +25,12 @@ a {
   box-sizing: border-box;
 }
 
-body {
+html {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale
+}
+
+body, html {
   color: #fff;
   font-family: Lato, Helvetica Neue, Helvetica, Arial, sans-serif;
   font-size: .9375em;
@@ -144,7 +149,7 @@ section article > div {
 }
 
 section .logo {
-  background-image: url(/umbraco/assets/umbraco_logomark_white.png);
+  background-image: url(/umbraco/website/logo.png);
   background-repeat: no-repeat;
   height: 91px;
   margin: 0 auto;
@@ -165,7 +170,7 @@ section .row .col:nth-child(2) {
 }
 
 @media screen and (min-width: 48em) {
-  body {
+  body, html {
     font-size: 1em;
   }
 
