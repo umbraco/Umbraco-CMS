@@ -19,29 +19,24 @@ export class UmbEditLanguageWorkspaceViewElement extends UmbLitElement {
 				display: block;
 				padding: var(--uui-size-space-6);
 			}
+
 			uui-combobox {
 				width: 100%;
 			}
+
 			hr {
 				border: none;
 				border-bottom: 1px solid var(--uui-color-divider);
 			}
-			#culture-warning,
-			#default-language-warning {
-				padding: var(--uui-size-space-4) var(--uui-size-space-5);
-				border: 1px solid;
-				margin-top: var(--uui-size-space-4);
-				border-radius: var(--uui-border-radius);
-			}
-			#culture-warning {
-				background-color: var(--uui-color-danger);
-				color: var(--uui-color-danger-contrast);
-				border-color: var(--uui-color-danger-standalone);
-			}
+
 			#default-language-warning {
 				background-color: var(--uui-color-warning);
 				color: var(--uui-color-warning-contrast);
 				border-color: var(--uui-color-warning-standalone);
+				padding: var(--uui-size-space-4) var(--uui-size-space-5);
+				border: 1px solid;
+				margin-top: var(--uui-size-space-4);
+				border-radius: var(--uui-border-radius);
 			}
 		`,
 	];
@@ -116,15 +111,6 @@ export class UmbEditLanguageWorkspaceViewElement extends UmbLitElement {
 		}
 	}
 
-	#renderCultureWarning() {
-		if (!this._startData?.isoCode || this._startData?.isoCode === this._language?.isoCode) return nothing;
-
-		return html`<div id="culture-warning">
-			Changing the culture for a language may be an expensive operation and will result in the content cache and indexes
-			being rebuilt.
-		</div>`;
-	}
-
 	#renderDefaultLanguageWarning() {
 		if (this._startData?.isDefault || this._language?.isDefault !== true) return nothing;
 
@@ -143,7 +129,6 @@ export class UmbEditLanguageWorkspaceViewElement extends UmbLitElement {
 						<umb-input-culture-select
 							value=${ifDefined(this._language.isoCode)}
 							@change=${this.#handleCultureChange}></umb-input-culture-select>
-						${this.#renderCultureWarning()}
 					</div>
 				</umb-workspace-property-layout>
 
