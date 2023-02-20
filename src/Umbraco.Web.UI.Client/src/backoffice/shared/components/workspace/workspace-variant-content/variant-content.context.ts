@@ -54,9 +54,7 @@ export class UmbVariantContentContext {
 			this.#host,
 			this.#workspaceContext.activeVariantWithIndex(index),
 			(variant) => {
-				if (variant) {
-					this.#currentVariant.next(variant);
-				}
+				this.#currentVariant.next(variant);
 			}
 		);
 	}
