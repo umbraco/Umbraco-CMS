@@ -10,6 +10,7 @@ internal static class UserFactory
     public static IUser BuildEntity(GlobalSettings globalSettings, UserDto dto)
     {
         Guid key = dto.Key;
+        // This should only happen if the user is still not migrated to have a true key.
         if (key == Guid.Empty)
         {
             key = dto.Id.ToGuid();
