@@ -1,5 +1,6 @@
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-api';
-import { UUISelectEvent } from '@umbraco-ui/uui';
+import { ManifestPropertyEditorUI } from '@umbraco-cms/extensions-registry';
+import { UUIBooleanInputEvent, UUISelectEvent } from '@umbraco-ui/uui';
 import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, html, nothing } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
@@ -90,12 +91,11 @@ export class UmbModalLayoutPropertySettingsElement extends UmbModalLayoutElement
 		`,
 	];
 
-	@state() private _propertyEditorUIIcon = '';
-	@state() private _propertyEditorUIName = '';
-	@state() private _propertyEditorUiAlias = '';
-	@state() private _propertyEditorAlias = '';
+	@state() private _selectedPropertyEditorUI?: ManifestPropertyEditorUI;
+	@state() private _selectedPropertyEditorUIAlias = '';
 
-	@state() private _appearanceIsLeft = true;
+	@state() private _appearanceIsTop = false;
+	@state() private _mandatory = false;
 
 	@state() private _customValidationOptions = [
 		{
@@ -128,6 +128,8 @@ export class UmbModalLayoutPropertySettingsElement extends UmbModalLayoutElement
 
 	@state() private _aliasLocked = true;
 
+	//
+
 	#modalService?: UmbModalService;
 
 	/**
@@ -144,17 +146,14 @@ export class UmbModalLayoutPropertySettingsElement extends UmbModalLayoutElement
 	}
 
 	#observePropertyEditorUI() {
-		if (!this._propertyEditorUiAlias) return;
+		if (!this._selectedPropertyEditorUIAlias) return;
 
 		this.observe(
-			umbExtensionsRegistry.getByTypeAndAlias('propertyEditorUI', this._propertyEditorUiAlias),
+			umbExtensionsRegistry.getByTypeAndAlias('propertyEditorUI', this._selectedPropertyEditorUIAlias),
 			(propertyEditorUI) => {
 				if (!propertyEditorUI) return;
 
-				this._propertyEditorUIName = propertyEditorUI?.meta.label ?? propertyEditorUI?.name ?? '';
-				this._propertyEditorUiAlias = propertyEditorUI?.alias ?? '';
-				this._propertyEditorUIIcon = propertyEditorUI?.meta.icon ?? '';
-				this._propertyEditorAlias = propertyEditorUI?.meta.propertyEditorModel ?? '';
+				this._selectedPropertyEditorUI = propertyEditorUI;
 			}
 		);
 	}
@@ -164,8 +163,11 @@ export class UmbModalLayoutPropertySettingsElement extends UmbModalLayoutElement
 
 		this._customValidation =
 			this._customValidationOptions.find((option) => option.value === value) ?? this._customValidationOptions[0];
+	}
 
-		console.log('custom validation changed to: ', this._customValidationOptions);
+	#onMandatoryChange(event: UUIBooleanInputEvent) {
+		const value = event.target.checked;
+		this._mandatory = value;
 	}
 
 	#onClose() {
@@ -173,18 +175,28 @@ export class UmbModalLayoutPropertySettingsElement extends UmbModalLayoutElement
 	}
 
 	#onSubmit() {
-		this.modalHandler?.close();
+		this.modalHandler?.close({
+			label: '',
+			alias: '',
+			description: '',
+			labelOnTop: this._appearanceIsTop,
+			propertyEditor: this._selectedPropertyEditorUIAlias,
+			validation: {
+				mandatory: false,
+				mandatoryMessage: null,
+				pattern: null,
+				patternMessage: null,
+			},
+		});
 	}
 
 	#onAppearanceChange(event: MouseEvent) {
 		const target = event.target as HTMLElement;
-		const alreadySelected = target.classList.contains(this._appearanceIsLeft ? 'left' : 'top');
+		const alreadySelected = target.classList.contains(this._appearanceIsTop ? 'top' : 'left');
 
 		if (alreadySelected) return;
 
-		this._appearanceIsLeft = !this._appearanceIsLeft;
-
-		console.log('appearance changed to: ', this._appearanceIsLeft ? 'left' : 'top');
+		this._appearanceIsTop = !this._appearanceIsTop;
 	}
 
 	#onOpenPropertyEditorUIPicker() {
@@ -197,7 +209,7 @@ export class UmbModalLayoutPropertySettingsElement extends UmbModalLayoutElement
 		modalHandler?.onClose().then(({ selection } = {}) => {
 			if (!selection) return;
 
-			this._propertyEditorUiAlias = selection[0];
+			this._selectedPropertyEditorUIAlias = selection[0];
 			this.#observePropertyEditorUI();
 		});
 	}
@@ -225,7 +237,7 @@ export class UmbModalLayoutPropertySettingsElement extends UmbModalLayoutElement
 						<b>Validation</b>
 						<div style="display: flex; justify-content: space-between">
 							<label for="mandatory">Field is mandatory</label>
-							<uui-toggle id="mandatory" slot="editor"></uui-toggle>
+							<uui-toggle @change=${this.#onMandatoryChange} id="mandatory" slot="editor"></uui-toggle>
 						</div>
 						<p style="margin-bottom: 0">Custom validation</p>
 						${this.#renderCustomValidation()}
@@ -248,7 +260,7 @@ export class UmbModalLayoutPropertySettingsElement extends UmbModalLayoutElement
 		return html`<div
 			@click=${this.#onAppearanceChange}
 			@keydown=${() => ''}
-			class="appearance left ${this._appearanceIsLeft ? 'selected' : ''}">
+			class="appearance left ${this._appearanceIsTop ? '' : 'selected'}">
 			<svg width="260" height="60" viewBox="0 0 260 60" fill="none" xmlns="http://www.w3.org/2000/svg">
 				<rect width="89" height="14" rx="7" fill="currentColor" />
 				<rect x="121" width="139" height="10" rx="5" fill="currentColor" fill-opacity="0.4" />
@@ -263,7 +275,7 @@ export class UmbModalLayoutPropertySettingsElement extends UmbModalLayoutElement
 			<div
 				@click=${this.#onAppearanceChange}
 				@keydown=${() => ''}
-				class="appearance top ${this._appearanceIsLeft ? '' : 'selected'}">
+				class="appearance top ${this._appearanceIsTop ? 'selected' : ''}">
 				<svg width="139" height="90" viewBox="0 0 139 90" fill="none" xmlns="http://www.w3.org/2000/svg">
 					<rect width="89" height="14" rx="7" fill="currentColor" />
 					<rect y="30" width="139" height="10" rx="5" fill="currentColor" fill-opacity="0.4" />
@@ -275,14 +287,14 @@ export class UmbModalLayoutPropertySettingsElement extends UmbModalLayoutElement
 	}
 
 	#renderPropertyUIPicker() {
-		return this._propertyEditorUiAlias
+		return this._selectedPropertyEditorUI
 			? html`
 					<umb-ref-property-editor-ui
-						name=${this._propertyEditorUIName}
-						alias=${this._propertyEditorUiAlias}
-						property-editor-model-alias=${this._propertyEditorAlias}
+						name=${this._selectedPropertyEditorUI.meta.label}
+						alias=${this._selectedPropertyEditorUI.alias}
+						property-editor-model-alias=${this._selectedPropertyEditorUI.meta.propertyEditorModel}
 						border>
-						<uui-icon name="${this._propertyEditorUIIcon}" slot="icon"></uui-icon>
+						<uui-icon name="${this._selectedPropertyEditorUI.meta.icon}" slot="icon"></uui-icon>
 						<uui-action-bar slot="actions">
 							<uui-button label="Change" @click=${this.#onOpenPropertyEditorUIPicker}></uui-button>
 						</uui-action-bar>
