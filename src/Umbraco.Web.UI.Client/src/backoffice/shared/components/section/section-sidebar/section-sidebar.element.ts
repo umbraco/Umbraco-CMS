@@ -27,6 +27,10 @@ export class UmbSectionSidebarElement extends UmbLitElement {
 			h3 {
 				padding: var(--uui-size-4) var(--uui-size-8);
 			}
+
+			#scroll-container {
+				height: 100%;
+			}
 		`,
 	];
 
@@ -64,7 +68,7 @@ export class UmbSectionSidebarElement extends UmbLitElement {
 	render() {
 		return html`
 			<umb-section-sidebar-context-menu>
-				<uui-scroll-container>
+				<uui-scroll-container id="scroll-container">
 					<a href="${`section/${this._sectionPathname}`}">
 						<h3>${this._sectionLabel}</h3>
 					</a>
