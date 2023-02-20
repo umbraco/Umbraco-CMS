@@ -41,18 +41,18 @@ export class UmbWorkspacePropertyContext<ValueType = unknown> {
 	}
 
 	public setAlias(alias: WorkspacePropertyData<ValueType>['alias']) {
-		this._data.update({ alias: alias });
+		this._data.update({ alias });
 	}
 	public setLabel(label: WorkspacePropertyData<ValueType>['label']) {
-		this._data.update({ label: label });
+		this._data.update({ label });
 	}
 	public setDescription(description: WorkspacePropertyData<ValueType>['description']) {
-		this._data.update({ description: description });
+		this._data.update({ description });
 	}
 	public setValue(value: WorkspacePropertyData<ValueType>['value']) {
 		// Note: Do not try to compare new / old value, as it can of any type. We trust the ObjectState in doing such.
 
-		this._data.update({ value: value });
+		this._data.update({ value });
 
 		const alias = this._data.getValue().alias;
 		if (alias) {
@@ -60,7 +60,7 @@ export class UmbWorkspacePropertyContext<ValueType = unknown> {
 		}
 	}
 	public setConfig(config: WorkspacePropertyData<ValueType>['config']) {
-		this._data.update({ config: config });
+		this._data.update({ config });
 	}
 
 	public resetValue() {
