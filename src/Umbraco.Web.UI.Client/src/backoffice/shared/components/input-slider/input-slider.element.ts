@@ -38,6 +38,7 @@ export class UmbInputSliderElement extends FormControlMixin(UmbLitElement) {
 	}
 
 	render() {
+		console.log(this.initVal1);
 		if (this.enableRange) return this.#renderRangeSlider();
 		else return this.#renderSlider();
 	}

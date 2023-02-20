@@ -185,7 +185,7 @@ export const data: Array<DataTypeModel & { type: 'data-type' }> = [
 		data: [
 			{
 				alias: 'enableRange',
-				value: false,
+				value: true,
 			},
 			{
 				alias: 'initVal1',
@@ -216,7 +216,24 @@ export const data: Array<DataTypeModel & { type: 'data-type' }> = [
 		parentKey: null,
 		propertyEditorAlias: 'Umbraco.TrueFalse',
 		propertyEditorUiAlias: 'Umb.PropertyEditorUI.Toggle',
-		data: [],
+		data: [
+			{
+				alias: 'default',
+				value: false,
+			},
+			{
+				alias: 'labelOff',
+				value: 'Not activated',
+			},
+			{
+				alias: 'labelOn',
+				value: 'Activated',
+			},
+			{
+				alias: 'showLabels',
+				value: true,
+			},
+		],
 	},
 	{
 		type: 'data-type',
