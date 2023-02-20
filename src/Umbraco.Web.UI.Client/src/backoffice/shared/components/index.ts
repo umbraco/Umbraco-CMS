@@ -5,7 +5,7 @@ import './backoffice-frame/backoffice-modal-container.element';
 import './backoffice-frame/backoffice-notification-container.element';
 
 import './ref-property-editor-ui/ref-property-editor-ui.element';
-import './content-property/content-property.element';
+import './data-type-based-property/data-type-based-property.element';
 import './table/table.element';
 import './code-block/code-block.element';
 import './extension-slot/extension-slot.element';

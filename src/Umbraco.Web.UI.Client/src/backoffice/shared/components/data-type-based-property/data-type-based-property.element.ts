@@ -8,8 +8,8 @@ import '../workspace-property/workspace-property.element';
 import { UmbLitElement } from '@umbraco-cms/element';
 import { UmbObserverController } from '@umbraco-cms/observable-api';
 
-@customElement('umb-content-property')
-export class UmbContentPropertyElement extends UmbLitElement {
+@customElement('umb-datatype-based-property')
+export class UmbDataTypeBasedPropertyElement extends UmbLitElement {
 	static styles = [
 		UUITextStyles,
 		css`
@@ -71,6 +71,6 @@ export class UmbContentPropertyElement extends UmbLitElement {
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-content-property': UmbContentPropertyElement;
+		'umb-datatype-based-property': UmbDataTypeBasedPropertyElement;
 	}
 }

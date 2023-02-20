@@ -133,9 +133,9 @@ export class UmbDocumentWorkspaceViewEditPropertiesElement extends UmbLitElement
 			this._propertyStructure,
 			(property) => property.alias,
 			(property) =>
-				html`<umb-content-property
+				html`<umb-datatype-based-property
 					.property=${property}
-					.value=${this._propertyValueMap.get(property.alias!)?.value}></umb-content-property> `
+					.value=${this._propertyValueMap.get(property.alias!)?.value}></umb-datatype-based-property> `
 		);
 	}
 }

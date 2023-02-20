@@ -24,6 +24,9 @@ export class UmbWorkspacePropertyContext<ValueType = unknown> {
 	public readonly value = this._data.getObservablePart((data) => data.value);
 	public readonly config = this._data.getObservablePart((data) => data.config);
 
+	// culture
+	// segment
+
 	private _workspaceContext?: UmbWorkspaceEntityContextInterface;
 
 	constructor(host: UmbControllerHostInterface) {

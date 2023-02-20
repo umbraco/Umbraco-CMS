@@ -236,8 +236,8 @@ export class UmbDocumentWorkspaceContext
 			return data.filter((x) => x.name === name && x.type === containerType);
 		});
 	}
-	setPropertyValue(alias: string, value: unknown) {
-		const entry = { alias: alias, value: value };
+	setPropertyValue(alias: string, value: unknown, culture: string | null, segment: string | null) {
+		const entry = { alias, value, culture, segment };
 
 		const currentData = this.#draft.value;
 		if (currentData) {
