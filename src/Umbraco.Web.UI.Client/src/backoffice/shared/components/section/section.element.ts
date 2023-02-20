@@ -210,6 +210,7 @@ export class UmbSectionElement extends UmbLitElement {
 			${this._menuItems && this._menuItems.length > 0
 				? html`
 						<umb-section-sidebar>
+							<!-- TODO: this should be an extension point and only shown in the content section sidebar -->
 							<umb-app-language-select></umb-app-language-select>
 
 							<!-- TODO: this should be part of a sidebar menu element instead -->
