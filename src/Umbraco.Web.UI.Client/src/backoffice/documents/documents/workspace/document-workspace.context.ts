@@ -182,11 +182,7 @@ export class UmbDocumentWorkspaceContext
 		return this.#documentTypes.getObservablePart((docTypes) => {
 			return (
 				docTypes.find((docType) => {
-					return docType.properties?.find((property) => {
-						if (property.containerKey === containerKey) {
-							return true;
-						}
-					});
+					return docType.properties?.find((property) => property.containerKey === containerKey);
 				}) !== undefined
 			);
 		});
