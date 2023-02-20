@@ -17,6 +17,12 @@ export interface MultiUrlData {
 	url?: string;
 }
 
+/**
+ * @element umb-input-multi-url-picker
+ * @fires change - when the value of the input changes
+ * @fires blur - when the input loses focus
+ * @fires focus - when the input gains focus
+ */
 @customElement('umb-input-multi-url-picker')
 export class UmbInputMultiUrlPickerElement extends FormControlMixin(UmbLitElement) {
 	static styles = [
@@ -77,16 +83,28 @@ export class UmbInputMultiUrlPickerElement extends FormControlMixin(UmbLitElemen
 	ignoreUserStartNodes?: boolean;
 
 	/**
-	 * @type {"small" | "medium" | "large"}
+	 * @type {UUIModalSidebarSize}
 	 * @attr
 	 * @default "small"
 	 */
 	@property()
 	overlaySize?: UUIModalSidebarSize;
 
-	@property({ attribute: 'urls' })
-	multiUrls: Array<MultiUrlData> = [];
+	/**
+	 * @type {Array<MultiUrlData>}
+	 * @default []
+	 */
+	@property({ attribute: false })
+	set urls(data: Array<MultiUrlData>) {
+		this._urls = data;
+		super.value = this._urls.map((x) => x.url).join(',');
+	}
 
+	get urls() {
+		return this._urls;
+	}
+
+	private _urls: Array<MultiUrlData> = [];
 	private _modalService?: UmbModalService;
 
 	constructor() {
@@ -94,12 +112,12 @@ export class UmbInputMultiUrlPickerElement extends FormControlMixin(UmbLitElemen
 		this.addValidator(
 			'rangeUnderflow',
 			() => this.minMessage,
-			() => !!this.min && this.multiUrls.length < this.min
+			() => !!this.min && this.urls.length < this.min
 		);
 		this.addValidator(
 			'rangeOverflow',
 			() => this.maxMessage,
-			() => !!this.max && this.multiUrls.length > this.max
+			() => !!this.max && this.urls.length > this.max
 		);
 
 		this.consumeContext(UMB_MODAL_SERVICE_CONTEXT_TOKEN, (instance) => {
@@ -108,8 +126,20 @@ export class UmbInputMultiUrlPickerElement extends FormControlMixin(UmbLitElemen
 	}
 
 	private _removeItem(index: number) {
-		this.multiUrls.splice(index, 1);
+		this.urls.splice(index, 1);
+		this._dispatchChangeEvent();
+	}
+
+	private _setSelection(selection: MultiUrlData, index?: number) {
+		if (index !== undefined && index >= 0) this.urls[index] = selection;
+		else this.urls.push(selection);
+
+		this._dispatchChangeEvent();
+	}
+
+	private _dispatchChangeEvent() {
 		this.requestUpdate();
+		this.dispatchEvent(new CustomEvent('change', { composed: true, bubbles: true }));
 	}
 
 	private _openPicker(data?: MultiUrlData, index?: number) {
@@ -131,17 +161,12 @@ export class UmbInputMultiUrlPickerElement extends FormControlMixin(UmbLitElemen
 		});
 		modalHandler?.onClose().then((newUrl: MultiUrlData) => {
 			if (!newUrl) return;
-
-			if (index !== undefined && index >= 0) this.multiUrls[index] = newUrl;
-			else this.multiUrls.push(newUrl);
-
-			this.requestUpdate();
-			//TODO: onChange event?
+			this._setSelection(newUrl, index);
 		});
 	}
 
 	render() {
-		return html`${this.multiUrls?.map((link, index) => this._renderItem(link, index))}
+		return html`${this.urls?.map((link, index) => this._renderItem(link, index))}
 			<uui-button look="placeholder" label="Add" @click=${this._openPicker}>Add</uui-button>`;
 	}
 
@@ -158,8 +183,6 @@ export class UmbInputMultiUrlPickerElement extends FormControlMixin(UmbLitElemen
 		</uui-ref-node>`;
 	}
 }
-
-export default UmbInputMultiUrlPickerElement;
 
 declare global {
 	interface HTMLElementTagNameMap {

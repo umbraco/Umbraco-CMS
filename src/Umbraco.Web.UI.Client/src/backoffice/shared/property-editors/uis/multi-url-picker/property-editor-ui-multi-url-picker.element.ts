@@ -2,7 +2,10 @@ import { html } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, property, state } from 'lit/decorators.js';
 import { UUIModalSidebarSize } from '@umbraco-ui/uui-modal-sidebar';
-import { MultiUrlData } from '../../../../shared/components/input-multi-url-picker/input-multi-url-picker.element';
+import {
+	UmbInputMultiUrlPickerElement,
+	MultiUrlData,
+} from '../../../../shared/components/input-multi-url-picker/input-multi-url-picker.element';
 import { UmbLitElement } from '@umbraco-cms/element';
 import { DataTypePropertyModel } from '@umbraco-cms/backend-api';
 
@@ -50,7 +53,7 @@ export class UmbPropertyEditorUIMultiUrlPickerElement extends UmbLitElement {
 	private _minNumber?: number;
 
 	private _onChange(event: CustomEvent) {
-		//TODO: Do something about the values
+		this.value = (event.target as UmbInputMultiUrlPickerElement).urls;
 		this.dispatchEvent(new CustomEvent('property-value-change'));
 	}
 
