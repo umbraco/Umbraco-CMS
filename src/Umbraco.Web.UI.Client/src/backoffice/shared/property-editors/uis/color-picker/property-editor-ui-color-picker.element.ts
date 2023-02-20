@@ -2,9 +2,9 @@ import { html } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { UUIColorSwatchesEvent } from '@umbraco-ui/uui';
-import '../../../../shared/components/color-picker/color-picker.element';
 import { UmbLitElement } from '@umbraco-cms/element';
 import type { DataTypePropertyModel } from '@umbraco-cms/backend-api';
+import type { SwatchDetails } from '@umbraco-cms/models';
 
 /**
  * @element umb-property-editor-ui-color-picker
@@ -17,18 +17,18 @@ export class UmbPropertyEditorUIColorPickerElement extends UmbLitElement {
 	value = '';
 
 	@state()
-	private _includeLabels = false;
+	private _showLabels = false;
 
 	@state()
-	private _colorSwatches: string[] = [];
+	private _swatches: SwatchDetails[] = [];
 
 	@property({ type: Array, attribute: false })
 	public set config(config: Array<DataTypePropertyModel>) {
-		const includeLabels = config.find((x) => x.alias === 'includeLabels');
-		if (includeLabels) this._includeLabels = includeLabels.value;
+		const useLabel = config.find((x) => x.alias === 'useLabel');
+		if (useLabel) this._showLabels = useLabel.value;
 
-		const colorSwatches = config.find((x) => x.alias === 'colors');
-		if (colorSwatches) this._colorSwatches = colorSwatches.value;
+		const colorSwatches = config.find((x) => x.alias === 'items');
+		if (colorSwatches) this._swatches = colorSwatches.value as any[];
 	}
 
 	private _onChange(event: UUIColorSwatchesEvent) {
@@ -37,10 +37,10 @@ export class UmbPropertyEditorUIColorPickerElement extends UmbLitElement {
 	}
 
 	render() {
-		return html`<umb-color-picker
+		return html`<umb-input-color-picker
 			@change="${this._onChange}"
-			.colors="${this._colorSwatches}"
-			.showLabels="${this._includeLabels}"></umb-color-picker>`;
+			.swatches="${this._swatches}"
+			.showLabels="${this._showLabels}"></umb-input-color-picker>`;
 	}
 }
 

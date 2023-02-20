@@ -1,15 +1,15 @@
 import { expect, fixture, html } from '@open-wc/testing';
-import { UmbEyeDropperElement } from './eye-dropper.element';
+import { UmbInputEyeDropperElement } from './input-eye-dropper.element';
 import { defaultA11yConfig } from '@umbraco-cms/test-utils';
-describe('UmbEyeDropperElement', () => {
-	let element: UmbEyeDropperElement;
+describe('UmbInputEyeDropperElement', () => {
+	let element: UmbInputEyeDropperElement;
 
 	beforeEach(async () => {
-		element = await fixture(html` <umb-eye-dropper></umb-eye-dropper> `);
+		element = await fixture(html` <umb-input-eye-dropper></umb-input-eye-dropper> `);
 	});
 
 	it('is defined with its own instance', () => {
-		expect(element).to.be.instanceOf(UmbEyeDropperElement);
+		expect(element).to.be.instanceOf(UmbInputEyeDropperElement);
 	});
 
 	it('passes the a11y audit', async () => {
