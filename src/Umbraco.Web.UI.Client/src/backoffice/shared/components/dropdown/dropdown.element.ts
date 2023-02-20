@@ -22,7 +22,6 @@ export class UmbDropdownElement extends UmbLitElement {
 				height: 100%;
 				box-sizing: border-box;
 				box-shadow: var(--uui-shadow-depth-3);
-				width: 500px;
 			}
 		`,
 	];
