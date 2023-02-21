@@ -73,4 +73,11 @@ internal static class UmbracoDatabaseExtensions
     /// <returns></returns>
     public static bool IsDatabaseEmpty(this IUmbracoDatabase database)
         => database.SqlContext.SqlSyntax.GetTablesInSchema(database).Any() == false;
+
+    public static long Count(this IUmbracoDatabase database, Sql sql)
+    {
+        var query = new Sql().Select("COUNT(*)").From().Append("(").Append(sql).Append(")");
+
+        return database.ExecuteScalar<long>(query);
+    }
 }
