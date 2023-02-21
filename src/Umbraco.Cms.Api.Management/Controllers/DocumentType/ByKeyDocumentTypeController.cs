@@ -24,6 +24,7 @@ public class ByKeyDocumentTypeController : DocumentTypeControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> ByKey(Guid key)
     {
+        // FIXME: create and use an async get method here.
         IContentType? contentType = _contentTypeService.Get(key);
         if (contentType == null)
         {
