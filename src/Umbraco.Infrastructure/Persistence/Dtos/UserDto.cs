@@ -18,7 +18,6 @@ public class UserDto
         UserStartNodeDtos = new HashSet<UserStartNodeDto>();
     }
 
-    // TODO: We need to add a GUID for users and track external logins with that instead of the INT
     [Column("id")]
     [PrimaryKeyColumn(Name = "PK_user")]
     public int Id { get; set; }
