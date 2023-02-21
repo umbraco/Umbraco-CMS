@@ -44,12 +44,6 @@ export class UmbWorkspacePropertyElement extends UmbLitElement {
 		`,
 	];
 
-	@state()
-	private _label?: string;
-
-	@state()
-	private _description?: string;
-
 	/**
 	 * Label. Name of the property
 	 * @type {string}
@@ -139,6 +133,15 @@ export class UmbWorkspacePropertyElement extends UmbLitElement {
 	@state()
 	private _element?: { value?: any; config?: any } & HTMLElement; // TODO: invent interface for propertyEditorUI.
 
+	@state()
+	private _alias?: string;
+
+	@state()
+	private _label?: string;
+
+	@state()
+	private _description?: string;
+
 	private _propertyContext = new UmbWorkspacePropertyContext(this);
 
 	private propertyEditorUIObserver?: UmbObserverController<ManifestTypes>;
@@ -149,6 +152,9 @@ export class UmbWorkspacePropertyElement extends UmbLitElement {
 	constructor() {
 		super();
 
+		this.observe(this._propertyContext.alias, (alias) => {
+			this._alias = alias;
+		});
 		this.observe(this._propertyContext.label, (label) => {
 			this._label = label;
 		});
