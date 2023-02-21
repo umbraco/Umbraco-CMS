@@ -49,7 +49,7 @@ export class UmbWorkspaceVariantContext {
 	}
 
 	private _setVariantId(culture: string | null, segment: string | null) {
-		const variantId = new UmbVariantId(culture, segment);
+		const variantId = UmbVariantId.Create(culture, segment);
 		this.#variantId.next(variantId);
 		return variantId;
 	}

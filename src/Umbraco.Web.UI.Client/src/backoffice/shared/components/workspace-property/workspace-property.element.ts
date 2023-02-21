@@ -102,7 +102,6 @@ export class UmbWorkspacePropertyElement extends UmbLitElement {
 	 */
 	@property({ attribute: false })
 	public set value(value: unknown) {
-		console.log('workspace-property.element.ts: set value', value);
 		this._propertyContext.setValue(value);
 	}
 
@@ -174,7 +173,8 @@ export class UmbWorkspacePropertyElement extends UmbLitElement {
 	private _onPropertyEditorChange = (e: CustomEvent) => {
 		const target = e.composedPath()[0] as any;
 
-		this.value = target.value; // Sets value in context.
+		//this.value = target.value; // Sets value in context.
+		this._propertyContext.changeValue(target.value);
 		e.stopPropagation();
 	};
 

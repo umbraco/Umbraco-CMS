@@ -250,22 +250,24 @@ export class UmbDocumentWorkspaceContext
 		});
 	}
 
-	getPropertyValue(alias: string, variantId: UmbVariantId = new UmbVariantId()): void {
+	getPropertyValue(alias: string, variantId?: UmbVariantId): void {
 		const currentData = this.#draft.value;
 		if (currentData) {
-			const newDataSet = currentData.values?.find((x) => x.alias === alias && variantId.compare(x));
+			const newDataSet = currentData.values?.find(
+				(x) => x.alias === alias && (variantId ? variantId.compare(x) : true)
+			);
 			return newDataSet?.value;
 		}
 	}
-	setPropertyValue(alias: string, value: unknown, variantId = new UmbVariantId()) {
+	setPropertyValue(alias: string, value: unknown, variantId?: UmbVariantId) {
 		const partialEntry = { value };
-
+		console.log('€€€€€setPropertyValue', alias, value, variantId?.toString());
 		const currentData = this.#draft.value;
 		if (currentData) {
 			const values = partialUpdateFrozenArray(
 				currentData.values || [],
 				partialEntry,
-				(x) => x.alias === alias && variantId.compare(x)
+				(x) => x.alias === alias && (variantId ? variantId.compare(x) : true)
 			);
 			this.#draft.update({ values });
 		}

@@ -24,8 +24,8 @@ export class UmbVariantablePropertyElement extends UmbLitElement {
 	public get property(): PropertyTypeViewModelBaseModel | undefined {
 		return this._property;
 	}
-	public set property(value: PropertyTypeViewModelBaseModel | undefined) {
-		this._property = value;
+	public set property(property: PropertyTypeViewModelBaseModel | undefined) {
+		this._property = property;
 		this._updatePropertyVariantId();
 	}
 
@@ -55,7 +55,7 @@ export class UmbVariantablePropertyElement extends UmbLitElement {
 
 	private _updatePropertyVariantId() {
 		if (this._workspaceVariantId && this.property) {
-			const newVariantId = new UmbVariantId(
+			const newVariantId = UmbVariantId.Create(
 				this.property.variesByCulture ? this._workspaceVariantId.culture : null,
 				this.property.variesBySegment ? this._workspaceVariantId.segment : null
 			);

@@ -222,7 +222,6 @@ export const data: Array<DocumentModel> = [
 				createDate: '2023-02-06T15:31:46.876902',
 				updateDate: '2023-02-06T15:31:51.354764',
 			},
-			,
 		],
 	},
 	{
@@ -279,6 +278,18 @@ export const data: Array<DocumentModel> = [
 				value: 'denne er under en anden gruppe i tab B',
 			},
 			{
+				culture: 'no-no',
+				segment: null,
+				alias: 'blogTextStringUnderMasterTab',
+				value: 'Norsk på master dokument tab B',
+			},
+			{
+				culture: 'no-no',
+				segment: null,
+				alias: 'blogTextStringUnderGroupUnderMasterTab',
+				value: 'Norsk denne er under en anden gruppe i tab B',
+			},
+			{
 				culture: null,
 				segment: null,
 				alias: 'localBlogTabString',
@@ -301,6 +312,15 @@ export const data: Array<DocumentModel> = [
 				culture: 'da-dk',
 				segment: null,
 				name: 'Artikel på Dansk',
+				createDate: '2023-02-06T15:31:46.876902',
+				updateDate: '2023-02-06T15:31:51.354764',
+			},
+			{
+				state: ContentStateModel.PUBLISHED,
+				publishDate: '2023-02-06T15:31:51.354764',
+				culture: 'no-no',
+				segment: null,
+				name: 'Artikel på Norsk',
 				createDate: '2023-02-06T15:31:46.876902',
 				updateDate: '2023-02-06T15:31:51.354764',
 			},

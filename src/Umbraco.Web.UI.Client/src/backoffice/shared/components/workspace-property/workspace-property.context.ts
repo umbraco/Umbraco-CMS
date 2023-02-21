@@ -53,8 +53,10 @@ export class UmbWorkspacePropertyContext<ValueType = unknown> {
 	}
 	public setValue(value: WorkspacePropertyData<ValueType>['value']) {
 		// Note: Do not try to compare new / old value, as it can of any type. We trust the ObjectState in doing such.
-
 		this._data.update({ value });
+	}
+	public changeValue(value: WorkspacePropertyData<ValueType>['value']) {
+		this.setValue(value);
 
 		const alias = this._data.getValue().alias;
 		if (alias) {
