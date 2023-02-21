@@ -164,7 +164,7 @@ export class UmbInputLanguagePickerElement extends FormControlMixin(UmbLitElemen
 	private _renderItem(item: LanguageModel) {
 		return html`
 			<!-- TODO: add language ref element -->
-			<uui-ref-node name=${ifDefined(item.name === null ? undefined : item.name)} detail=${ifDefined(item.key)}>
+			<uui-ref-node name=${ifDefined(item.name === null ? undefined : item.name)} detail=${ifDefined(item.isoCode)}>
 				<uui-action-bar slot="actions">
 					<uui-button @click=${() => this._removeItem(item)} label="Remove ${item.name}">Remove</uui-button>
 				</uui-action-bar>
