@@ -1,8 +1,6 @@
 name: pr-first-response
 
-on:
-  pull_request_target:
-    types: [opened]
+on: [pull_request]
 
 jobs:
   send-response:
