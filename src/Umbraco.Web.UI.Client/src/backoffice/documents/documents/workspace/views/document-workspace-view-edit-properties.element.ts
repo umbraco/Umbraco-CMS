@@ -1,4 +1,4 @@
-import { html } from 'lit';
+import { css, html } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, property, state } from 'lit/decorators.js';
 import { repeat } from 'lit/directives/repeat.js';
@@ -8,7 +8,17 @@ import { DocumentTypePropertyTypeModel, PropertyTypeContainerViewModelBaseModel 
 
 @customElement('umb-document-workspace-view-edit-properties')
 export class UmbDocumentWorkspaceViewEditPropertiesElement extends UmbLitElement {
-	static styles = [UUITextStyles];
+	static styles = [
+		UUITextStyles,
+		css`
+			.property {
+				border-bottom: 1px solid var(--uui-color-divider);
+			}
+			.property:last-child {
+				border-bottom: 0;
+			}
+		`,
+	];
 
 	private _containerName?: string;
 
@@ -102,7 +112,10 @@ export class UmbDocumentWorkspaceViewEditPropertiesElement extends UmbLitElement
 		return repeat(
 			this._propertyStructure,
 			(property) => property.alias,
-			(property) => html`<umb-property-type-based-property .property=${property}></umb-property-type-based-property> `
+			(property) =>
+				html`<umb-property-type-based-property
+					class="property"
+					.property=${property}></umb-property-type-based-property> `
 		);
 	}
 }

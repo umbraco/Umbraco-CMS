@@ -28,10 +28,6 @@ export class UmbWorkspacePropertyElement extends UmbLitElement {
 				display: block;
 			}
 
-			:host(:last-child) umb-workspace-property-layout {
-				border-bottom: 0;
-			}
-
 			p {
 				color: var(--uui-color-text-alt);
 			}
@@ -44,11 +40,6 @@ export class UmbWorkspacePropertyElement extends UmbLitElement {
 			#layout:hover #property-action-menu,
 			#property-action-menu[open] {
 				opacity: 1;
-			}
-
-			hr {
-				border: 0;
-				border-top: 1px solid var(--uui-color-border);
 			}
 		`,
 	];
