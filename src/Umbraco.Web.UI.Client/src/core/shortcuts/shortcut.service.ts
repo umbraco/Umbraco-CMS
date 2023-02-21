@@ -1,7 +1,7 @@
 export type Shortcut = {
 	name: string;
 	alias: string;
-	callback(): void;
+	action(): void;
 	combinations: Array<{
 		key: string;
 		altKey?: boolean;
@@ -16,7 +16,7 @@ export class UmbShortcutService {
 		{
 			name: 'Open search',
 			alias: 'Shortcut.OpenSearch',
-			callback: () => console.log('Open search'),
+			action: () => console.log('Open search'),
 			combinations: [
 				{
 					key: 'k',
@@ -46,15 +46,9 @@ export class UmbShortcutService {
 				});
 			});
 
-			shortcut?.callback();
+			shortcut?.action();
 		});
 	}
 }
 
 export default UmbShortcutService;
-
-declare global {
-	interface HTMLElementTagNameMap {
-		'umb-shortcut': UmbShortcutService;
-	}
-}
