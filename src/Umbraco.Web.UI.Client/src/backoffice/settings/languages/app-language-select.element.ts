@@ -33,6 +33,11 @@ export class UmbAppLanguageSelectElement extends UmbLitElement {
 				display: flex;
 				align-items: center;
 				justify-content: space-between;
+				cursor: pointer;
+			}
+
+			#toggle:hover {
+				background-color: var(--uui-color-surface-emphasis);
 			}
 		`,
 	];
