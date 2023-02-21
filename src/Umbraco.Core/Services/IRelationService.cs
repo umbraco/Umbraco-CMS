@@ -375,6 +375,14 @@ public interface IRelationService : IService
     void Delete(IRelationType relationType);
 
     /// <summary>
+    ///     Deletes a <see cref="IRelationType" />
+    /// </summary>
+    /// <param name="key">Key of the relation type to delete</param>
+    /// <param name="userId">Id of the user that is deleting the relation type</param>
+    /// <returns><placeholder>A <see cref="Task"/> representing the asynchronous operation.</placeholder></returns>
+    Task<Attempt<IRelationType?, RelationTypeOperationStatus>> DeleteAsync(Guid key, int userId) => throw new NotImplementedException();
+
+    /// <summary>
     ///     Deletes all <see cref="IRelation" /> objects based on the passed in <see cref="IRelationType" />
     /// </summary>
     /// <param name="relationType"><see cref="IRelationType" /> to Delete Relations for</param>

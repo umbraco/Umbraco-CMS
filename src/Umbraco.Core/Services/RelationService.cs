@@ -623,6 +623,32 @@ public class RelationService : RepositoryService, IRelationService
         }
     }
 
+    public async Task<Attempt<IRelationType?, RelationTypeOperationStatus>> DeleteAsync(Guid key, int userId)
+    {
+        using (ICoreScope scope = ScopeProvider.CreateCoreScope())
+        {
+            IRelationType? relationType = _relationTypeRepository.Get(key);
+            if (relationType is null)
+            {
+                return Attempt.FailWithStatus<IRelationType?, RelationTypeOperationStatus>(RelationTypeOperationStatus.NotFound, null);
+            }
+
+            EventMessages eventMessages = EventMessagesFactory.Get();
+            var deletingNotification = new RelationTypeDeletingNotification(relationType, eventMessages);
+            if (scope.Notifications.PublishCancelable(deletingNotification))
+            {
+                scope.Complete();
+                return Attempt.FailWithStatus<IRelationType?, RelationTypeOperationStatus>(RelationTypeOperationStatus.CancelledByNotification, null);
+            }
+
+            _relationTypeRepository.Delete(relationType);
+            Audit(AuditType.Delete, userId, relationType.Id, "Deleted relation type");
+            scope.Notifications.Publish(new RelationTypeDeletedNotification(relationType, eventMessages).WithStateFrom(deletingNotification));
+            scope.Complete();
+            return await Task.FromResult(Attempt.SucceedWithStatus<IRelationType?, RelationTypeOperationStatus>(RelationTypeOperationStatus.Success, relationType));
+        }
+    }
+
     /// <inheritdoc />
     public void DeleteRelationsOfType(IRelationType relationType)
     {
