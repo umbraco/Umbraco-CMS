@@ -13,3 +13,4 @@ export type RelationItemModel = {
     relationTypeIsBidirectional?: boolean;
     relationTypeIsDependency?: boolean;
 };
+

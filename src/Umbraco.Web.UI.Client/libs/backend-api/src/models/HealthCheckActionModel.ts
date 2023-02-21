@@ -12,3 +12,4 @@ export type HealthCheckActionModel = {
     providedValueValidation?: string | null;
     providedValueValidationRegex?: string | null;
 };
+

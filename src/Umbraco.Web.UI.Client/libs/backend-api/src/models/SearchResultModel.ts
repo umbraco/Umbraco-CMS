@@ -10,3 +10,4 @@ export type SearchResultModel = {
     readonly fieldCount?: number;
     fields?: Array<FieldModel>;
 };
+

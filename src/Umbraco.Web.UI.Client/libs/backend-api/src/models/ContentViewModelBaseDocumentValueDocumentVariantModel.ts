@@ -2,13 +2,13 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import type { DocumentPropertyModel } from './DocumentPropertyModel';
+import type { DocumentValueModel } from './DocumentValueModel';
 import type { DocumentVariantModel } from './DocumentVariantModel';
 
-export type ContentViewModelBaseDocumentPropertyDocumentVariantModel = {
+export type ContentViewModelBaseDocumentValueDocumentVariantModel = {
     key?: string;
     contentTypeKey?: string;
-    properties?: Array<DocumentPropertyModel>;
+    values?: Array<DocumentValueModel>;
     variants?: Array<DocumentVariantModel>;
 };
 

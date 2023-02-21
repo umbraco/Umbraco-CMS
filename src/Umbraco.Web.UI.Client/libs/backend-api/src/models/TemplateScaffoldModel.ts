@@ -5,3 +5,4 @@
 export type TemplateScaffoldModel = {
     content?: string;
 };
+
