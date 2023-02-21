@@ -4,7 +4,7 @@ import { customElement, property, state } from 'lit/decorators.js';
 import { repeat } from 'lit/directives/repeat.js';
 import { UmbDocumentWorkspaceContext } from '../document-workspace.context';
 import { UmbLitElement } from '@umbraco-cms/element';
-import { DocumentPropertyModel, PropertyTypeContainerViewModelBaseModel } from '@umbraco-cms/backend-api';
+import { PropertyTypeContainerViewModelBaseModel } from '@umbraco-cms/backend-api';
 import './document-workspace-view-edit-properties.element';
 
 @customElement('umb-document-workspace-view-edit-tab')
