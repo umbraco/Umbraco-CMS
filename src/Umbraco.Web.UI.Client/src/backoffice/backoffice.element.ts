@@ -55,6 +55,7 @@ import './search';
 import './templating';
 import './shared';
 import { UmbLitElement } from '@umbraco-cms/element';
+import UmbShortcutService from 'src/core/shortcuts/shortcut.service';
 
 @defineElement('umb-backoffice')
 export class UmbBackofficeElement extends UmbLitElement {
@@ -107,6 +108,7 @@ export class UmbBackofficeElement extends UmbLitElement {
 		new UmbTemplateTreeStore(this);
 		new UmbTemplateDetailStore(this);
 		new UmbLanguageStore(this);
+		new UmbShortcutService();
 
 		this.provideContext(UMB_BACKOFFICE_CONTEXT_TOKEN, new UmbBackofficeContext());
 		this.provideContext(UMB_CURRENT_USER_HISTORY_STORE_CONTEXT_TOKEN, new UmbCurrentUserHistoryStore());
