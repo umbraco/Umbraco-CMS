@@ -6,6 +6,8 @@ namespace Umbraco.Cms.Core.Services;
 
 public interface IContentEditingService
 {
+    Task<IContent?> GetAsync(Guid id);
+
     Task<Attempt<IContent?, ContentEditingOperationStatus>> CreateAsync(ContentCreateModel createModel, int userId);
 
     Task<Attempt<IContent, ContentEditingOperationStatus>> UpdateAsync(IContent content, ContentUpdateModel updateMode, int userId);

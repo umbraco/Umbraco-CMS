@@ -9,12 +9,12 @@ namespace Umbraco.Cms.Api.Management.Controllers.Document;
 
 public class ByKeyDocumentController : DocumentControllerBase
 {
-    private readonly IContentService _contentService;
+    private readonly IContentEditingService _contentEditingService;
     private readonly IDocumentViewModelFactory _documentViewModelFactory;
 
-    public ByKeyDocumentController(IContentService contentService, IDocumentViewModelFactory documentViewModelFactory)
+    public ByKeyDocumentController(IContentEditingService contentEditingService, IDocumentViewModelFactory documentViewModelFactory)
     {
-        _contentService = contentService;
+        _contentEditingService = contentEditingService;
         _documentViewModelFactory = documentViewModelFactory;
     }
 
@@ -24,8 +24,7 @@ public class ByKeyDocumentController : DocumentControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> ByKey(Guid key)
     {
-        // FIXME: create and use an async get method here.
-        IContent? content = _contentService.GetById(key);
+        IContent? content = await _contentEditingService.GetAsync(key);
         if (content == null)
         {
             return NotFound();

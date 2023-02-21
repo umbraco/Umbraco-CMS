@@ -29,6 +29,12 @@ internal sealed class ContentEditingService
         _scopeProvider = scopeProvider;
     }
 
+    public async Task<IContent?> GetAsync(Guid id)
+    {
+        IContent? content = ContentService.GetById(id);
+        return await Task.FromResult(content);
+    }
+
     public async Task<Attempt<IContent?, ContentEditingOperationStatus>> CreateAsync(ContentCreateModel createModel, int userId)
     {
         Attempt<IContent?, ContentEditingOperationStatus> result = await MapCreate(createModel);
