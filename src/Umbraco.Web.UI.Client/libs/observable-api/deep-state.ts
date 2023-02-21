@@ -1,5 +1,5 @@
 import { BehaviorSubject } from 'rxjs';
-import { createObservablePart } from './create-observable-part.method';
+import { createObservablePart } from './create-observable-part.function';
 import { deepFreeze } from './deep-freeze.function';
 
 export function naiveObjectComparison(objOne: any, objTwo: any): boolean {
