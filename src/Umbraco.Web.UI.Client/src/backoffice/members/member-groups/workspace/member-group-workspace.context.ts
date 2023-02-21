@@ -39,8 +39,9 @@ export class UmbWorkspaceMemberGroupContext
 		this.#data.update({ name });
 	}
 
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	setPropertyValue(alias: string, value: string) {
-		// Not implemented for this context - member groups have no properties
+		// Not implemented for this context - member groups have no properties for editing
 		return;
 	}
 
