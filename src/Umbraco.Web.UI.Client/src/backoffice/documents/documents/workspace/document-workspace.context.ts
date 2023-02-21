@@ -170,17 +170,17 @@ export class UmbDocumentWorkspaceContext
 	}
 
 	propertyValuesOf(variantId = new UmbVariantId()) {
-		return this.#draft.getObservablePart((data) => data?.properties?.filter((x) => variantId.compare(x)));
+		return this.#draft.getObservablePart((data) => data?.values?.filter((x) => variantId.compare(x)));
 	}
 
 	propertyDataByAlias(propertyAlias: string, variantId = new UmbVariantId()) {
 		return this.#draft.getObservablePart((data) =>
-			data?.properties?.find((x) => x?.alias === propertyAlias && variantId.compare(x))
+			data?.values?.find((x) => x?.alias === propertyAlias && variantId.compare(x))
 		);
 	}
 	propertyValueByAlias(propertyAlias: string, variantId = new UmbVariantId()) {
 		return this.#draft.getObservablePart(
-			(data) => data?.properties?.find((x) => x?.alias === propertyAlias && variantId.compare(x))?.value
+			(data) => data?.values?.find((x) => x?.alias === propertyAlias && variantId.compare(x))?.value
 		);
 	}
 
@@ -242,7 +242,7 @@ export class UmbDocumentWorkspaceContext
 	getPropertyValue(alias: string, variantId: UmbVariantId = new UmbVariantId()): void {
 		const currentData = this.#draft.value;
 		if (currentData) {
-			const newDataSet = currentData.properties?.find((x) => x.alias === alias && variantId.compare(x));
+			const newDataSet = currentData.values?.find((x) => x.alias === alias && variantId.compare(x));
 			return newDataSet?.value;
 		}
 	}
@@ -251,12 +251,12 @@ export class UmbDocumentWorkspaceContext
 
 		const currentData = this.#draft.value;
 		if (currentData) {
-			const properties = partialUpdateFrozenArray(
-				currentData.properties || [],
+			const values = partialUpdateFrozenArray(
+				currentData.values || [],
 				partialEntry,
 				(x) => x.alias === alias && variantId.compare(x)
 			);
-			this.#draft.update({ properties });
+			this.#draft.update({ values });
 		}
 	}
 
