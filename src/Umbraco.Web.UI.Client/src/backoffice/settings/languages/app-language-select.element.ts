@@ -29,8 +29,10 @@ export class UmbAppLanguageSelectElement extends UmbLitElement {
 				height: 70px;
 				padding: 0 var(--uui-size-8);
 				border-bottom: 1px solid var(--uui-color-border);
-				font-size: 1rem;
-				font-weight: bold;
+				font-size: 14px;
+				display: flex;
+				align-items: center;
+				justify-content: space-between;
 			}
 		`,
 	];
@@ -107,21 +109,30 @@ export class UmbAppLanguageSelectElement extends UmbLitElement {
 
 	render() {
 		return html` <umb-dropdown .open="${this._isOpen}" @close=${this.#onClose}>
-			<button id="toggle" slot="trigger" @click=${this.#onClick}>${this._appLanguage?.name}</button>
-			<div slot="dropdown">
-				${repeat(
-					this._languages,
-					(language) => language.isoCode,
-					(language) =>
-						html`
-							<uui-menu-item
-								label=${ifDefined(language.name)}
-								@click-label=${this.#onLabelClick}
-								data-iso-code=${ifDefined(language.isoCode)}></uui-menu-item>
-						`
-				)}
-			</div>
+			${this.#renderTrigger()} ${this.#renderContent()}
 		</umb-dropdown>`;
+	}
+
+	#renderTrigger() {
+		return html`<button id="toggle" slot="trigger" @click=${this.#onClick}>
+			${this._appLanguage?.name} <uui-caret></uui-caret>
+		</button>`;
+	}
+
+	#renderContent() {
+		return html`<div slot="dropdown">
+			${repeat(
+				this._languages,
+				(language) => language.isoCode,
+				(language) =>
+					html`
+						<uui-menu-item
+							label=${ifDefined(language.name)}
+							@click-label=${this.#onLabelClick}
+							data-iso-code=${ifDefined(language.isoCode)}></uui-menu-item>
+					`
+			)}
+		</div>`;
 	}
 }
 
