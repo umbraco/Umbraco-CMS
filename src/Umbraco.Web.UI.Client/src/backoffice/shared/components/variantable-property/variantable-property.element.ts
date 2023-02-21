@@ -55,8 +55,8 @@ export class UmbVariantablePropertyElement extends UmbLitElement {
 	private _updatePropertyVariantId() {
 		if (this._workspaceVariantId && this.property) {
 			const newVariantId = new UmbVariantId(
-				this.property.varyByCulture ? this._workspaceVariantId.culture : null,
-				this.property.varyBySegment ? this._workspaceVariantId.segment : null
+				this.property.variesByCulture ? this._workspaceVariantId.culture : null,
+				this.property.variesBySegment ? this._workspaceVariantId.segment : null
 			);
 			if (!this._propertyVariantId || !newVariantId.equal(this._propertyVariantId)) {
 				this._propertyVariantId = newVariantId;

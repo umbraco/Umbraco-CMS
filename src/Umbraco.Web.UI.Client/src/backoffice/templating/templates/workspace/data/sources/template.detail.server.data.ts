@@ -41,6 +41,7 @@ export class UmbTemplateDetailServerDataSource implements TemplateDetailDataSour
 	async createScaffold() {
 		const error = undefined;
 		const data: TemplateModel = {
+			$type: '',
 			key: uuid(),
 			name: '',
 			alias: '',
