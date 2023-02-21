@@ -125,12 +125,12 @@ _cleanedUmbracoUrl ??= _uriUtility.UriToUmbraco(OriginalRequestUrl);
     {
         get
         {
-            if (!_hostingEnvironment.IsDebugMode)
+            if (_hostingEnvironment.IsDebugMode is false)
             {
                 return false;
             }
 
-            if(string.IsNullOrEmpty(_httpContextAccessor.HttpContext?.GetRequestValue("umbdebugshowtrace")) == false)
+            if(string.IsNullOrEmpty(_httpContextAccessor.HttpContext?.GetRequestValue("umbdebugshowtrace")) is false)
             {
                 return true;
             }
