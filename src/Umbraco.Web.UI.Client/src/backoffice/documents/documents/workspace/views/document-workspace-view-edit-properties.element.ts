@@ -4,14 +4,7 @@ import { customElement, property, state } from 'lit/decorators.js';
 import { repeat } from 'lit/directives/repeat.js';
 import { UmbDocumentWorkspaceContext } from '../document-workspace.context';
 import { UmbLitElement } from '@umbraco-cms/element';
-import {
-	DocumentPropertyModel,
-	DocumentTypePropertyTypeModel,
-	PropertyTypeContainerViewModelBaseModel,
-} from '@umbraco-cms/backend-api';
-import UmbWorkspaceVariantContentElement from 'src/backoffice/shared/components/workspace/workspace-variant/workspace-variant.element';
-import { UmbWorkspaceVariantContext } from 'src/backoffice/shared/components/workspace/workspace-variant/workspace-variant.context';
-import { UmbVariantId } from 'src/backoffice/shared/variants/variant-id.class';
+import { DocumentTypePropertyTypeModel, PropertyTypeContainerViewModelBaseModel } from '@umbraco-cms/backend-api';
 
 @customElement('umb-document-workspace-view-edit-properties')
 export class UmbDocumentWorkspaceViewEditPropertiesElement extends UmbLitElement {
