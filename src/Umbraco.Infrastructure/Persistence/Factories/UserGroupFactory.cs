@@ -27,6 +27,7 @@ internal static class UserGroupFactory
             userGroup.UpdateDate = dto.UpdateDate;
             userGroup.StartContentId = dto.StartContentId;
             userGroup.StartMediaId = dto.StartMediaId;
+            userGroup.PermissionNames = dto.UserGroup2PermissionDtos.Select(x => x.Permission).ToHashSet();
             userGroup.HasAccessToAllLanguages = dto.HasAccessToAllLanguages;
             if (dto.UserGroup2AppDtos != null)
             {
@@ -80,7 +81,7 @@ internal static class UserGroupFactory
 
         if (entity.HasIdentity)
         {
-            dto.Id = short.Parse(entity.Id.ToString());
+            dto.Id = entity.Id;
         }
 
         return dto;

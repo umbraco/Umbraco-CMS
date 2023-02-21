@@ -28,6 +28,7 @@ public class BackOfficeUserStore : UmbracoUserStore<BackOfficeIdentityUser, Iden
     private readonly IUmbracoMapper _mapper;
     private readonly ICoreScopeProvider _scopeProvider;
     private readonly ITwoFactorLoginService _twoFactorLoginService;
+    private readonly IUserGroupService _userGroupService;
     private readonly IUserService _userService;
 
     /// <summary>
@@ -43,7 +44,8 @@ public class BackOfficeUserStore : UmbracoUserStore<BackOfficeIdentityUser, Iden
         IUmbracoMapper mapper,
         BackOfficeErrorDescriber describer,
         AppCaches appCaches,
-        ITwoFactorLoginService twoFactorLoginService)
+        ITwoFactorLoginService twoFactorLoginService,
+        IUserGroupService userGroupService)
         : base(describer)
     {
         _scopeProvider = scopeProvider;
@@ -54,30 +56,33 @@ public class BackOfficeUserStore : UmbracoUserStore<BackOfficeIdentityUser, Iden
         _mapper = mapper;
         _appCaches = appCaches;
         _twoFactorLoginService = twoFactorLoginService;
+        _userGroupService = userGroupService;
         _userService = userService;
         _externalLoginService = externalLoginService;
     }
 
-    [Obsolete("Use non obsolete ctor")]
+    [Obsolete("Use constructor that takes IUserGroupService, scheduled for removal in V15.")]
     public BackOfficeUserStore(
         ICoreScopeProvider scopeProvider,
         IUserService userService,
         IEntityService entityService,
         IExternalLoginWithKeyService externalLoginService,
-        IOptions<GlobalSettings> globalSettings,
+        IOptionsSnapshot<GlobalSettings> globalSettings,
         IUmbracoMapper mapper,
         BackOfficeErrorDescriber describer,
-        AppCaches appCaches)
+        AppCaches appCaches,
+        ITwoFactorLoginService twoFactorLoginService)
         : this(
             scopeProvider,
             userService,
             entityService,
             externalLoginService,
-            StaticServiceProvider.Instance.GetRequiredService<IOptionsSnapshot<GlobalSettings>>(),
+            globalSettings,
             mapper,
             describer,
             appCaches,
-            StaticServiceProvider.Instance.GetRequiredService<ITwoFactorLoginService>())
+            twoFactorLoginService,
+            StaticServiceProvider.Instance.GetRequiredService<IUserGroupService>())
     {
     }
 
@@ -390,7 +395,7 @@ public class BackOfficeUserStore : UmbracoUserStore<BackOfficeIdentityUser, Iden
             throw new ArgumentNullException(nameof(normalizedRoleName));
         }
 
-        IUserGroup? userGroup = _userService.GetUserGroupByAlias(normalizedRoleName);
+        IUserGroup? userGroup = _userGroupService.GetAsync(normalizedRoleName).GetAwaiter().GetResult();
 
         IEnumerable<IUser> users = _userService.GetAllInGroup(userGroup?.Id);
         IList<BackOfficeIdentityUser> backOfficeIdentityUsers =
@@ -495,7 +500,7 @@ public class BackOfficeUserStore : UmbracoUserStore<BackOfficeIdentityUser, Iden
         string normalizedRoleName,
         CancellationToken cancellationToken)
     {
-        IUserGroup? group = _userService.GetUserGroupByAlias(normalizedRoleName);
+        IUserGroup? group = _userGroupService.GetAsync(normalizedRoleName).GetAwaiter().GetResult();
         if (group?.Name is null)
         {
             return Task.FromResult<IdentityRole<string>?>(null);
@@ -670,7 +675,7 @@ public class BackOfficeUserStore : UmbracoUserStore<BackOfficeIdentityUser, Iden
             user.ClearGroups();
 
             // go lookup all these groups
-            IReadOnlyUserGroup[] groups = _userService.GetUserGroupsByAlias(identityUserRoles)
+            IReadOnlyUserGroup[] groups = _userGroupService.GetAsync(identityUserRoles).GetAwaiter().GetResult()
                 .Select(x => x.ToReadOnlyGroup()).ToArray();
 
             // use all of the ones assigned and add them

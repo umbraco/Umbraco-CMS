@@ -54,6 +54,7 @@ public static partial class Constants
             public const string User2NodeNotify = TableNamePrefix + "User2NodeNotify";
             public const string UserGroup2App = TableNamePrefix + "UserGroup2App";
             public const string UserGroup2Node = TableNamePrefix + "UserGroup2Node";
+            public const string UserGroup2Permission = TableNamePrefix + "UserGroup2Permission";
             public const string UserGroup2NodePermission = TableNamePrefix + "UserGroup2NodePermission";
             public const string UserGroup2Language = TableNamePrefix + "UserGroup2Language";
             public const string ExternalLogin = TableNamePrefix + "ExternalLogin";

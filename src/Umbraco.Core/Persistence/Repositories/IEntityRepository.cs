@@ -49,6 +49,22 @@ public interface IEntityRepository : IRepository
     bool Exists(Guid key);
 
     /// <summary>
+    /// Asserts if an entity with the given object type exists.
+    /// </summary>
+    /// <param name="key">The Key of the entity to find.</param>
+    /// <param name="objectType">The object type key of the entity.</param>
+    /// <returns>True if an entity with the given key and object type exists.</returns>
+    bool Exists(Guid key, Guid objectType) => throw new NotImplementedException();
+
+    /// <summary>
+    /// Asserts if an entity with the given object type exists.
+    /// </summary>
+    /// <param name="id">The id of the entity to find.</param>
+    /// <param name="objectType">The object type key of the entity.</param>
+    /// <returns>True if an entity with the given id and object type exists.</returns>
+    bool Exists(int id, Guid objectType) => throw new NotImplementedException();
+
+    /// <summary>
     ///     Gets paged entities for a query and a specific object type
     /// </summary>
     /// <param name="query"></param>
