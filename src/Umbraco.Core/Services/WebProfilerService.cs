@@ -19,7 +19,7 @@ internal sealed class WebProfilerService : IWebProfilerService
     {
         Attempt<int> userIdAttempt = GetExecutingUserId();
 
-        if (!userIdAttempt.Success)
+        if (userIdAttempt.Success is false)
         {
             return Attempt.FailWithStatus(WebProfilerOperationStatus.ExecutingUserNotFound, false);
         }
@@ -32,7 +32,7 @@ internal sealed class WebProfilerService : IWebProfilerService
     {
         Attempt<int> userIdAttempt = GetExecutingUserId();
 
-        if (!userIdAttempt.Success)
+        if (userIdAttempt.Success is false)
         {
             return Attempt.FailWithStatus(WebProfilerOperationStatus.ExecutingUserNotFound, false);
         }
