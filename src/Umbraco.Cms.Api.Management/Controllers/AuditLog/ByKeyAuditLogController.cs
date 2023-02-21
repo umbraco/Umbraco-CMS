@@ -21,13 +21,13 @@ public class ByKeyAuditLogController : AuditLogControllerBase
         _auditLogViewModelFactory = auditLogViewModelFactory;
     }
 
-    [HttpGet("ByKey")]
+    [HttpGet("{key:guid}")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedViewModel<AuditlogViewModel>), StatusCodes.Status200OK)]
     public async Task<IActionResult> ByKey(Guid key, Direction orderDirection = Direction.Descending, DateTime? sinceDate = null, int skip = 0, int take = 100)
     {
         PagedModel<IAuditItem> result = await _auditService.GetItemsByKeyAsync(key, skip, take, orderDirection, sinceDate);
-        IEnumerable<AuditlogViewModel> mapped = _auditLogViewModelFactory.CreateAuditLogViewModel(result.Items.Skip(skip).Take(take));
+        IEnumerable<AuditlogViewModel> mapped = _auditLogViewModelFactory.CreateAuditLogViewModel(result.Items);
         var viewModel = new PagedViewModel<AuditlogViewModel>
         {
             Total = result.Total,

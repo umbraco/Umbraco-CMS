@@ -214,8 +214,6 @@ public sealed class AuditService : RepositoryService, IAuditService
                 throw new ArgumentOutOfRangeException(nameof(take));
             }
 
-
-
             using (ScopeProvider.CreateCoreScope(autoComplete: true))
             {
                 IEntitySlim? entity = _entityRepository.Get(entityKey);
