@@ -47,6 +47,9 @@ export class UmbEditLanguageWorkspaceViewElement extends UmbLitElement {
 	@state()
 	_isDefaultLanguage = false;
 
+	@state()
+	_isNew = false;
+
 	#languageWorkspaceContext?: UmbLanguageWorkspaceContext;
 
 	constructor() {
@@ -67,6 +70,10 @@ export class UmbEditLanguageWorkspaceViewElement extends UmbLitElement {
 					this._isDefaultLanguage = language?.isDefault ?? false;
 					initialStateSet = true;
 				}
+			});
+
+			this.observe(this.#languageWorkspaceContext.isNew, (value) => {
+				this._isNew = value;
 			});
 		});
 	}
@@ -131,7 +138,7 @@ export class UmbEditLanguageWorkspaceViewElement extends UmbLitElement {
 						<umb-input-culture-select
 							value=${ifDefined(this._language.isoCode)}
 							@change=${this.#handleCultureChange}
-							?readonly=${!this.#languageWorkspaceContext?.isNew}></umb-input-culture-select>
+							?readonly=${this._isNew === false}></umb-input-culture-select>
 					</div>
 				</umb-workspace-property-layout>
 
