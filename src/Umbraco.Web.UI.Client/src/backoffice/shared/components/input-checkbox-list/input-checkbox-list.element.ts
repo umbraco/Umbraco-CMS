@@ -1,6 +1,6 @@
 import { css, html, nothing } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
-import { customElement, property, state } from 'lit/decorators.js';
+import { customElement, property } from 'lit/decorators.js';
 import { FormControlMixin } from '@umbraco-ui/uui-base/lib/mixins';
 import { repeat } from 'lit/directives/repeat.js';
 import { UUIBooleanInputEvent } from '@umbraco-ui/uui';
@@ -21,21 +21,21 @@ export class UmbInputCheckboxListElement extends FormControlMixin(UmbLitElement)
 	 * List of items.
 	 */
 	@property()
-	list?: [];
+	public list: Array<{ key: string; checked: boolean; value: string }> = [];
 
-	private _selectedKeys: Array<string> = [];
-	public get selectedKeys(): Array<string> {
-		return this._selectedKeys;
+	#selected: Array<string> = [];
+	public get selected(): Array<string> {
+		return this.#selected;
 	}
-	public set selectedKeys(keys: Array<string>) {
-		this._selectedKeys = keys;
+	public set selected(keys: Array<string>) {
+		this.#selected = keys;
 		super.value = keys.join(',');
 	}
 
 	@property()
 	public set value(keysString: string) {
 		if (keysString !== this._value) {
-			this.selectedKeys = keysString.split(/[ ,]+/);
+			this.selected = keysString.split(/[ ,]+/);
 		}
 	}
 
@@ -43,32 +43,32 @@ export class UmbInputCheckboxListElement extends FormControlMixin(UmbLitElement)
 		return undefined;
 	}
 
-	private _setSelection(e: UUIBooleanInputEvent) {
+	#setSelection(e: UUIBooleanInputEvent) {
 		e.stopPropagation();
-		if (e.target.checked) this.selectedKeys = [...this.selectedKeys, e.target.value];
-		else this._removeFromSelection(this.selectedKeys.findIndex((key) => e.target.value === key));
+		if (e.target.checked) this.selected = [...this.selected, e.target.value];
+		else this.#removeFromSelection(this.selected.findIndex((key) => e.target.value === key));
 
 		this.dispatchEvent(new CustomEvent('change', { bubbles: true, composed: true }));
 	}
 
-	private _removeFromSelection(index: number) {
+	#removeFromSelection(index: number) {
 		if (index == -1) return;
-		const keys = [...this.selectedKeys];
+		const keys = [...this.selected];
 		keys.splice(index, 1);
-		this.selectedKeys = keys;
+		this.selected = keys;
 	}
 
 	render() {
 		if (!this.list) return nothing;
 		return html`<form>
-			<uui-form @change="${this._setSelection}">
+			<uui-form @change="${this.#setSelection}">
 				${repeat(this.list, (item) => item.key, this.renderCheckbox)}
 			</uui-form>
 		</form>`;
 	}
 
-	renderCheckbox(item: any) {
-		return html`<uui-checkbox value="${item.key}" label="${item.label}"></uui-checkbox>`;
+	renderCheckbox(item: { key: string; checked: boolean; value: string }) {
+		return html`<uui-checkbox value="${item.value}" label="${item.value}" ?checked="${item.checked}"></uui-checkbox>`;
 	}
 }
 
