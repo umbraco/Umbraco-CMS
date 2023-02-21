@@ -45,18 +45,28 @@ export class UmbEditLanguageWorkspaceViewElement extends UmbLitElement {
 	_language?: LanguageModel;
 
 	@state()
-	private _startData: LanguageModel | null = null;
+	_isDefaultLanguage = false;
 
 	#languageWorkspaceContext?: UmbLanguageWorkspaceContext;
 
 	constructor() {
 		super();
 
+		let initialStateSet = false;
+
 		this.consumeContext<UmbLanguageWorkspaceContext>('umbWorkspaceContext', (instance) => {
 			this.#languageWorkspaceContext = instance;
 
 			this.observe(this.#languageWorkspaceContext.data, (language) => {
 				this._language = language;
+
+				/* Store the initial value of the default language.
+				 When we change the default language we get notified of the change,
+				and we need the initial value to compare against */
+				if (initialStateSet === false) {
+					this._isDefaultLanguage = language?.isDefault ?? false;
+					initialStateSet = true;
+				}
 			});
 		});
 	}
@@ -111,14 +121,6 @@ export class UmbEditLanguageWorkspaceViewElement extends UmbLitElement {
 		}
 	}
 
-	#renderDefaultLanguageWarning() {
-		if (this._startData?.isDefault || this._language?.isDefault !== true) return nothing;
-
-		return html`<div id="default-language-warning">
-			Switching default language may result in default content missing.
-		</div>`;
-	}
-
 	render() {
 		if (!this._language) return nothing;
 
@@ -140,7 +142,7 @@ export class UmbEditLanguageWorkspaceViewElement extends UmbLitElement {
 				<umb-workspace-property-layout label="Settings">
 					<div slot="editor">
 						<uui-toggle
-							?disabled=${this._startData?.isDefault}
+							?disabled=${this._isDefaultLanguage}
 							?checked=${this._language.isDefault || false}
 							@change=${this.#handleDefaultChange}>
 							<div>
@@ -148,7 +150,14 @@ export class UmbEditLanguageWorkspaceViewElement extends UmbLitElement {
 								<div>An Umbraco site can only have one default language set.</div>
 							</div>
 						</uui-toggle>
-						${this.#renderDefaultLanguageWarning()}
+
+						<!-- 	TODO: we need a UUI component for this -->
+						${this._language.isDefault !== this._isDefaultLanguage
+							? html`<div id="default-language-warning">
+									Switching default language may result in default content missing.
+							  </div>`
+							: nothing}
+
 						<hr />
 						<uui-toggle ?checked=${this._language.isMandatory || false} @change=${this.#handleMandatoryChange}>
 							<div>
