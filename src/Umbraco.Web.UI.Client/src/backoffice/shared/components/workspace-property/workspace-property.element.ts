@@ -209,7 +209,6 @@ export class UmbWorkspacePropertyElement extends UmbLitElement {
 					this._element.addEventListener('property-value-change', this._onPropertyEditorChange as any as EventListener);
 
 					this._valueObserver = this.observe(this._propertyContext.value, (value) => {
-						console.log('workspace property this._valueObserver', value);
 						this._value = value;
 						if (this._element) {
 							this._element.value = value;
