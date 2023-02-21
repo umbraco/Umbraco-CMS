@@ -102,6 +102,7 @@ export class UmbModalLayoutPropertySettingsElement extends UmbModalLayoutElement
 	@state() private _appearanceIsTop = false;
 	@state() private _mandatory = false;
 
+	//TODO: Should these options come from the server?
 	@state() private _customValidationOptions = [
 		{
 			name: 'No validation',
@@ -224,7 +225,8 @@ export class UmbModalLayoutPropertySettingsElement extends UmbModalLayoutElement
 		this._alias = this._name
 			.replace(/\s+/g, '-')
 			.replace(/[^a-zA-Z0-9_-]+/g, '')
-			.replace(/[-_]{2,}/g, (match) => match[0]);
+			.replace(/[-_]{2,}/g, (match) => match[0])
+			.toLowerCase();
 	}
 
 	#onAliasChange(event: UUIInputEvent) {
