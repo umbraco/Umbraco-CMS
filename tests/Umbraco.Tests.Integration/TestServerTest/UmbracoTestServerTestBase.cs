@@ -79,6 +79,8 @@ namespace Umbraco.Cms.Tests.Integration.TestServerTest
                 // Executes after the standard ConfigureServices method
                 builder.ConfigureTestServices(services =>
                 {
+                    services.AddSingleton<IWebProfilerRepository, TestWebProfilerRepository>();
+                    
                     // Add a test auth scheme with a test auth handler to authn and assign the user
                     services.AddAuthentication(TestAuthHandler.TestAuthenticationScheme)
                         .AddScheme<AuthenticationSchemeOptions, TestAuthHandler>(
