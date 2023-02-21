@@ -14,6 +14,10 @@ public abstract class PropertyTypeViewModelBase
 
     public Guid DataTypeKey { get; set; }
 
+    public bool VariesByCulture { get; set; }
+
+    public bool VariesBySegment { get; set; }
+
     public PropertyTypeValidation Validation { get; set; } = new();
 
     public PropertyTypeAppearance Appearance { get; set; } = new();

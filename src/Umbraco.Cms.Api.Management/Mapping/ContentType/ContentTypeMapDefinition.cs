@@ -1,6 +1,7 @@
 ﻿using Umbraco.Cms.Api.Management.ViewModels.ContentType;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Mapping.ContentType;
 
@@ -29,6 +30,8 @@ public abstract class ContentTypeMapDefinition<TContentType, TPropertyTypeViewMo
                     Alias = propertyType.Alias,
                     Description = propertyType.Description,
                     DataTypeKey = propertyType.DataTypeKey,
+                    VariesByCulture = propertyType.VariesByCulture(),
+                    VariesBySegment = propertyType.VariesBySegment(),
                     Validation = new PropertyTypeValidation
                     {
                         Mandatory = propertyType.Mandatory,

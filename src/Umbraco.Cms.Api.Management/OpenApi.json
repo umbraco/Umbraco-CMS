@@ -7461,6 +7461,12 @@
             "type": "string",
             "format": "uuid"
           },
+          "variesByCulture": {
+            "type": "boolean"
+          },
+          "variesBySegment": {
+            "type": "boolean"
+          },
           "validation": {
             "oneOf": [
               {
