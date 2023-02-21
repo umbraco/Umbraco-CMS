@@ -2650,7 +2650,7 @@ public class ContentService : RepositoryService, IContentService
     /// <param name="recursive">A value indicating whether to recursively copy children.</param>
     /// <param name="userId">Optional Id of the User copying the Content</param>
     /// <returns>The newly created <see cref="IContent" /> object</returns>
-    public IContent? Copy(IContent content, int parentId, Guid? parentKey, bool relateToOriginal, bool recursive, int userId = Constants.Security.SuperUserId)
+    public IContent? Copy(IContent content, int parentId, bool relateToOriginal, bool recursive, int userId = Constants.Security.SuperUserId)
     {
         EventMessages eventMessages = EventMessagesFactory.Get();
 
@@ -2659,8 +2659,8 @@ public class ContentService : RepositoryService, IContentService
 
         using (ICoreScope scope = ScopeProvider.CreateCoreScope())
         {
-            if (scope.Notifications.PublishCancelable(
-                    new ContentCopyingNotification(content, copy, parentId, parentKey, eventMessages)))
+            // FIXME: Pass parent key in constructor too when proper Copy method is implemented
+            if (scope.Notifications.PublishCancelable(new ContentCopyingNotification(content, copy, parentId, eventMessages)))
             {
                 scope.Complete();
                 return null;
@@ -2722,8 +2722,8 @@ public class ContentService : RepositoryService, IContentService
                         IContent descendantCopy = descendant.DeepCloneWithResetIdentities();
                         descendantCopy.ParentId = parentId;
 
-                        if (scope.Notifications.PublishCancelable(
-                                new ContentCopyingNotification(descendant, descendantCopy, parentId, parentKey, eventMessages)))
+                        // FIXME: Pass parent key in constructor too when proper Copy method is implemented
+                        if (scope.Notifications.PublishCancelable(new ContentCopyingNotification(descendant, descendantCopy, parentId, eventMessages)))
                         {
                             continue;
                         }
@@ -2754,7 +2754,8 @@ public class ContentService : RepositoryService, IContentService
                 new ContentTreeChangeNotification(copy, TreeChangeTypes.RefreshBranch, eventMessages));
             foreach (Tuple<IContent, IContent> x in copies)
             {
-                scope.Notifications.Publish(new ContentCopiedNotification(x.Item1, x.Item2, parentId, parentKey, relateToOriginal, eventMessages));
+                // FIXME: Pass parent key in constructor too when proper Copy method is implemented
+                scope.Notifications.Publish(new ContentCopiedNotification(x.Item1, x.Item2, parentId, relateToOriginal, eventMessages));
             }
 
             Audit(AuditType.Copy, userId, content.Id);
@@ -2763,15 +2764,6 @@ public class ContentService : RepositoryService, IContentService
         }
 
         return copy;
-    }
-
-    public IContent? Copy(IContent content, int parentId, bool relateToOriginal, bool recursive, int userId = Constants.Security.SuperUserId)
-    {
-        IEntityService entityService = StaticServiceProvider.Instance.GetRequiredService<IEntityService>();
-        Attempt<Guid> result = entityService.GetKey(parentId, UmbracoObjectTypes.Document);
-        return result.Success
-            ? Copy(content, parentId, result.Result, relateToOriginal, recursive, userId)
-            : Copy(content, parentId, null, relateToOriginal, recursive, userId);
     }
 
     /// <summary>
