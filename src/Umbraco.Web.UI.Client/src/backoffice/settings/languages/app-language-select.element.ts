@@ -134,7 +134,8 @@ export class UmbAppLanguageSelectElement extends UmbLitElement {
 						<uui-menu-item
 							label=${ifDefined(language.name)}
 							@click-label=${this.#onLabelClick}
-							data-iso-code=${ifDefined(language.isoCode)}></uui-menu-item>
+							data-iso-code=${ifDefined(language.isoCode)}
+							?active=${language.isoCode === this._appLanguage?.isoCode}></uui-menu-item>
 					`
 			)}
 		</div>`;
