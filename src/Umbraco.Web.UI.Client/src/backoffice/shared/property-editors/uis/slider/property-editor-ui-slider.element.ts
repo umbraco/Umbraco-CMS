@@ -13,7 +13,10 @@ export class UmbPropertyEditorUISliderElement extends UmbLitElement {
 	static styles = [UUITextStyles];
 
 	@property()
-	value = '';
+	value: {
+		to?: number;
+		from?: number;
+	} = {};
 
 	@state()
 	_enableRange?: boolean;
@@ -54,8 +57,16 @@ export class UmbPropertyEditorUISliderElement extends UmbLitElement {
 		if (max) this._max = max.value as number;
 	}
 
+	#getValueObject(val: string) {
+		if (!val.includes(',')) return { from: parseInt(val), to: parseInt(val) };
+		const from = val.slice(0, val.indexOf(','));
+		const to = val.slice(val.indexOf(',') + 1);
+		return { from: parseInt(from), to: parseInt(to) };
+	}
+
 	private _onChange(event: CustomEvent) {
-		this.value = (event.target as UmbInputSliderElement).value as string;
+		const eventVal = this.#getValueObject((event.target as UmbInputSliderElement).value as string);
+		this.value = eventVal;
 		this.dispatchEvent(new CustomEvent('property-value-change'));
 	}
 

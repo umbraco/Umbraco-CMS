@@ -244,7 +244,7 @@ export const data: Array<DataTypeModel & { type: 'data-type' }> = [
 		data: [
 			{
 				alias: 'enableRange',
-				value: false,
+				value: true,
 			},
 			{
 				alias: 'initVal1',
