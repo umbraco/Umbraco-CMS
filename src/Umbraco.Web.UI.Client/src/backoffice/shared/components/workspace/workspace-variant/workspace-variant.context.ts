@@ -74,6 +74,12 @@ export class UmbWorkspaceVariantContext {
 		);
 	}
 
+	public changeVariant(culture: string | null, segment: string | null) {
+		const index = this.#index.getValue();
+		if (index === undefined) return;
+		this.#workspaceContext?.setActiveVariant(index, culture, segment);
+	}
+
 	/*
 	public getSplitViewIndex() {
 		return this.#index.getValue();

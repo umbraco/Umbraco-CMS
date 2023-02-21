@@ -17,9 +17,9 @@ export class ClassState<T extends ClassStateData | undefined | null> extends Beh
 	}
 
 	next(newData: T): void {
-		const currentValue = this.getValue();
-		if (newData && currentValue ? currentValue.equal(newData) : true) {
-			super.next(newData);
-		}
+		const oldValue = this.getValue();
+
+		if (newData && oldValue?.equal(newData)) return;
+		super.next(newData);
 	}
 }

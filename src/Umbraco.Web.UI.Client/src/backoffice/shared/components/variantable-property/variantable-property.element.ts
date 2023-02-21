@@ -46,16 +46,15 @@ export class UmbVariantablePropertyElement extends UmbLitElement {
 	}
 
 	private _observeVariantContext() {
-		console.log('_observeVariantContext');
 		if (!this._variantContext || !this.property) return;
 		this.observe(this._variantContext.variantId, (variantId) => {
+			console.log('property got variantId: ', variantId);
 			this._workspaceVariantId = variantId;
 			this._updatePropertyVariantId();
 		});
 	}
 
 	private _updatePropertyVariantId() {
-		console.log('_updatePropertyVariantId');
 		if (this._workspaceVariantId && this.property) {
 			const newVariantId = new UmbVariantId(
 				this.property.variesByCulture ? this._workspaceVariantId.culture : null,

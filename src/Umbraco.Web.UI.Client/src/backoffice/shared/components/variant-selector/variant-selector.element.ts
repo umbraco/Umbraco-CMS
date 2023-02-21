@@ -2,7 +2,7 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html, nothing } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { UUIInputElement, UUIInputEvent } from '@umbraco-ui/uui';
-import { repeat } from 'lit-html/directives/repeat.js';
+import { ifDefined } from 'lit-html/directives/if-defined.js';
 import { UmbWorkspaceVariantContext } from '../workspace/workspace-variant/workspace-variant.context';
 import { UmbDocumentWorkspaceContext } from '../../../documents/documents/workspace/document-workspace.context';
 import { UmbLitElement } from '@umbraco-cms/element';
@@ -56,6 +56,12 @@ export class UmbVariantSelectorElement extends UmbLitElement {
 
 	@state()
 	private _variantDisplayName?: string;
+
+	@state()
+	private _variantTitleName?: string;
+
+	// TODO: make adapt to backoffice locale.
+	private _cultureNames = new Intl.DisplayNames('en', { type: 'language' });
 
 	constructor() {
 		super();
@@ -112,7 +118,11 @@ export class UmbVariantSelectorElement extends UmbLitElement {
 
 	private updateVariantDisplayName() {
 		if (!this._culture && !this._segment) return;
-		this._variantDisplayName = this._culture + (this._segment ? ' — ' + this._segment : '');
+		this._variantTitleName =
+			(this._culture ? this._cultureNames.of(this._culture) + ` (${this._culture})` : '') +
+			(this._segment ? ' — ' + this._segment : '');
+		this._variantDisplayName =
+			(this._culture ? this._cultureNames.of(this._culture) : '') + (this._segment ? ' — ' + this._segment : '');
 	}
 
 	// TODO. find a way where we don't have to do this for all workspaces.
@@ -138,6 +148,12 @@ export class UmbVariantSelectorElement extends UmbLitElement {
 		this._variantSelectorIsOpen = false;
 	}
 
+	private _switchVariant(variant: DocumentVariantModel) {
+		if (variant.culture === undefined || variant.segment === undefined) return;
+		this._variantContext?.changeVariant(variant.culture, variant.segment);
+		this._variantSelectorIsOpen = false;
+	}
+
 	render() {
 		return html`
 			<uui-input id="name-input" .value=${this._name} @input="${this._handleInput}">
@@ -145,7 +161,10 @@ export class UmbVariantSelectorElement extends UmbLitElement {
 					this._variants && this._variants.length > 0
 						? html`
 								<div slot="append">
-									<uui-button id="variant-selector-toggle" @click=${this._toggleVariantSelector}>
+									<uui-button
+										id="variant-selector-toggle"
+										@click=${this._toggleVariantSelector}
+										title=${ifDefined(this._variantTitleName)}>
 										${this._variantDisplayName}
 										<uui-caret></uui-caret>
 									</uui-button>
@@ -162,7 +181,14 @@ export class UmbVariantSelectorElement extends UmbLitElement {
 								<div id="variant-selector-dropdown" slot="popover">
 									<uui-scroll-container>
 										${this._variants.map(
-											(variant) => html`<ul><li>${variant.name} ${variant.culture} ${variant.segment}</ul></li>`
+											(variant) =>
+												html`<ul>
+													<li>
+														<uui-button @click=${() => this._switchVariant(variant)}>
+															${variant.name} ${variant.culture} ${variant.segment}
+														</uui-button>
+													</li>
+												</ul>`
 										)}
 									</uui-scroll-container>
 								</div>

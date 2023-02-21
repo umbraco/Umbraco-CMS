@@ -21,7 +21,6 @@ export class UmbPropertyTypeBasedPropertyElement extends UmbLitElement {
 		`,
 	];
 
-	private _property?: PropertyTypeViewModelBaseModel;
 	@property({ type: Object, attribute: false })
 	public get property(): PropertyTypeViewModelBaseModel | undefined {
 		return this._property;
@@ -34,6 +33,7 @@ export class UmbPropertyTypeBasedPropertyElement extends UmbLitElement {
 			this._observeProperty();
 		}
 	}
+	private _property?: PropertyTypeViewModelBaseModel;
 
 	@state()
 	private _propertyEditorUiAlias?: string;
@@ -55,7 +55,17 @@ export class UmbPropertyTypeBasedPropertyElement extends UmbLitElement {
 	 * @default undefined
 	 */
 	@property({ type: Object, attribute: false })
-	private variantId?: UmbVariantId;
+	public get variantId(): UmbVariantId | undefined {
+		return this._variantId;
+	}
+	public set variantId(value: UmbVariantId | undefined) {
+		const oldValue = this._variantId;
+		if (value && oldValue?.equal(value)) return;
+		this._variantId = value;
+		this._observeProperty();
+		this.requestUpdate('variantId', oldValue);
+	}
+	private _variantId?: UmbVariantId | undefined;
 
 	private _workspaceContext?: UmbDocumentWorkspaceContext;
 
@@ -70,8 +80,10 @@ export class UmbPropertyTypeBasedPropertyElement extends UmbLitElement {
 	private _observeProperty() {
 		if (!this._workspaceContext || !this.property || !this._property?.alias) return;
 
+		console.log('_observeProperty', this._property.alias);
+
 		this.observe(
-			this._workspaceContext.propertyValueByAlias(this._property.alias, this.variantId),
+			this._workspaceContext.propertyValueByAlias(this._property.alias, this._variantId),
 			(value) => {
 				this._value = value;
 			},

@@ -127,7 +127,11 @@ export class UmbWorkspacePropertyElement extends UmbLitElement {
 	@property({ type: Object, attribute: false })
 	public set variantId(value: UmbVariantId | undefined) {
 		this._propertyContext.setVariantId(value);
+		this._variantDisplayName = value?.toString();
 	}
+
+	@state()
+	private _variantDisplayName?: string;
 
 	// TODO: make interface for UMBPropertyEditorElement
 	@state()
@@ -227,7 +231,7 @@ export class UmbWorkspacePropertyElement extends UmbLitElement {
 				label="${ifDefined(this._label)}"
 				description="${ifDefined(this._description)}">
 				${this._renderPropertyActionMenu()}
-				<p slot="description">${this._propertyContext.getVariantId()?.toString()}</p>
+				<p slot="description">${this._variantDisplayName}</p>
 				<div slot="editor">${this._element}</div>
 			</umb-workspace-property-layout>
 		`;
