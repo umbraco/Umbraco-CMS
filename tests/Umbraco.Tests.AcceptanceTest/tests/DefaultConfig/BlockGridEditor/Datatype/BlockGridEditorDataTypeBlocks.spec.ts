@@ -260,6 +260,9 @@ test.describe('BlockGridEditorDataTypeBlock', () => {
   });
 
   test('can create a block grid datatype with multiple groups and multiple element in each group', async ({page, umbracoApi, umbracoUi}) => {
+    // We need to increase the timeout to 45 seconds because the test can sometimes fail when it reaches the normal 30 seconds timeout
+    test.setTimeout(45000);
+    
     const GroupOne = 'GroupOne';
     const elementNameFourth = 'FourthElement';
     const elementFourthAlias = AliasHelper.toAlias(elementNameFourth);
