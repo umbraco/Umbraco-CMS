@@ -13,7 +13,7 @@ jobs:
     steps:
       - name: Install dependencies
         run: |
-          npm install node-fetch@2
+          npm install node-fetch
       - name: Fetch random comment 🗣️ and add it to the PR
         uses: actions/github-script@v6
         with:
