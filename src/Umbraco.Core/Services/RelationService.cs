@@ -543,7 +543,8 @@ public class RelationService : RepositoryService, IRelationService
             relationType,
             () => _relationTypeRepository.Get(relationType.Key) is not null ? RelationTypeOperationStatus.KeyAlreadyExists : RelationTypeOperationStatus.Success,
             AuditType.New,
-            $"Created relation type: {relationType.Name}");
+            $"Created relation type: {relationType.Name}",
+            userId);
     }
 
     public async Task<Attempt<IRelationType, RelationTypeOperationStatus>> UpdateAsync(IRelationType relationType, int userId) =>
@@ -551,9 +552,10 @@ public class RelationService : RepositoryService, IRelationService
             relationType,
             () => _relationTypeRepository.Get(relationType.Key) is null ? RelationTypeOperationStatus.NotFound : RelationTypeOperationStatus.Success,
             AuditType.Save,
-            $"Created relation type: {relationType.Name}");
+            $"Created relation type: {relationType.Name}",
+            userId);
 
-    private async Task<Attempt<IRelationType, RelationTypeOperationStatus>> SaveAsync(IRelationType relationType, Func<RelationTypeOperationStatus> operationValidation, AuditType auditType, string auditMessage)
+    private async Task<Attempt<IRelationType, RelationTypeOperationStatus>> SaveAsync(IRelationType relationType, Func<RelationTypeOperationStatus> operationValidation, AuditType auditType, string auditMessage, int userId)
     {
         using (ICoreScope scope = ScopeProvider.CreateCoreScope())
         {
@@ -572,7 +574,7 @@ public class RelationService : RepositoryService, IRelationService
             }
 
             _relationTypeRepository.Save(relationType);
-            Audit(auditType, Constants.Security.SuperUserId, relationType.Id, auditMessage);
+            Audit(auditType, userId, relationType.Id, auditMessage);
             scope.Complete();
             scope.Notifications.Publish(
                 new RelationTypeSavedNotification(relationType, eventMessages).WithStateFrom(savingNotification));
