@@ -80,7 +80,7 @@ export class UmbPropertyTypeBasedPropertyElement extends UmbLitElement {
 	private _observeProperty() {
 		if (!this._workspaceContext || !this.property || !this._property?.alias) return;
 
-		console.log('_observeProperty', this._property.alias, this._variantId);
+		console.log('!!!!!!_observeProperty', this._property.alias, this._variantId);
 
 		this.observe(
 			this._workspaceContext.propertyValueByAlias(this._property.alias, this._variantId),
