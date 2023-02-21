@@ -135,8 +135,6 @@ export class UmbWorkspacePropertyElement extends UmbLitElement {
 		this._propertyContext.setVariantId(value);
 	}
 
-	// TODO: property for setting variantId.
-
 	// TODO: make interface for UMBPropertyEditorElement
 	@state()
 	private _element?: { value?: any; config?: any } & HTMLElement; // TODO: invent interface for propertyEditorUI.
@@ -219,6 +217,7 @@ export class UmbWorkspacePropertyElement extends UmbLitElement {
 		return html`
 			<umb-workspace-property-layout
 				id="layout"
+				alias="${ifDefined(this._alias)}"
 				label="${ifDefined(this._label)}"
 				description="${ifDefined(this._description)}">
 				${this._renderPropertyActionMenu()}
