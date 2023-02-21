@@ -22,8 +22,9 @@ public class ByKeyDocumentController : DocumentControllerBase
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(DocumentViewModel), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<ActionResult<DocumentViewModel>> ByKey(Guid key)
+    public async Task<IActionResult> ByKey(Guid key)
     {
+        // FIXME: create and use an async get method here.
         IContent? content = _contentService.GetById(key);
         if (content == null)
         {

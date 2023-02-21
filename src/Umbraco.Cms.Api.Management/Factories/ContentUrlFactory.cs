@@ -45,11 +45,7 @@ public class ContentUrlFactory : IContentUrlFactory
 
     public async Task<IEnumerable<ContentUrlInfo>> GetUrlsAsync(IContent content)
     {
-        if (_umbracoContextAccessor.TryGetUmbracoContext(out IUmbracoContext? umbracoContext) == false)
-        {
-            _loggerFactory.CreateLogger<ContentUrlFactory>().LogWarning($"Unable to create an Umbraco context while attempting to get URLs for content: {content.Key}");
-            return Array.Empty<ContentUrlInfo>();
-        }
+        IUmbracoContext umbracoContext = _umbracoContextAccessor.GetRequiredUmbracoContext();
 
         UrlInfo[] urlInfos = (await content.GetContentUrlsAsync(
             _publishedRouter,
