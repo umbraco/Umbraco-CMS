@@ -20,43 +20,9 @@ public class MoveEventInfo<TEntity> : MoveEventInfoBase<TEntity>
 
     public static bool operator ==(MoveEventInfo<TEntity> left, MoveEventInfo<TEntity> right) => Equals(left, right);
 
-    public bool Equals(MoveEventInfo<TEntity>? other)
-    {
-        if (ReferenceEquals(null, other))
-        {
-            return false;
-        }
+    public override bool Equals(object? obj) => Equals((MoveEventInfoBase<TEntity>?)obj) && base.Equals(obj);
 
-        if (ReferenceEquals(this, other))
-        {
-            return true;
-        }
-
-        return EqualityComparer<TEntity>.Default.Equals(Entity, other.Entity)
-               && NewParentId == other.NewParentId
-               && NewParentKey == other.NewParentKey
-               && string.Equals(OriginalPath, other.OriginalPath);
-    }
-
-    public override bool Equals(object? obj)
-    {
-        if (ReferenceEquals(null, obj))
-        {
-            return false;
-        }
-
-        if (ReferenceEquals(this, obj))
-        {
-            return true;
-        }
-
-        if (obj.GetType() != GetType())
-        {
-            return false;
-        }
-
-        return Equals((MoveEventInfo<TEntity>)obj);
-    }
+    public bool Equals(MoveEventInfo<TEntity>? other) => NewParentId == other?.NewParentId && NewParentKey == other.NewParentKey;
 
     public override int GetHashCode()
     {
