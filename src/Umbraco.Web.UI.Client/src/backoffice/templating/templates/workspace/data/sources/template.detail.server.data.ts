@@ -71,7 +71,8 @@ export class UmbTemplateDetailServerDataSource implements TemplateDetailDataSour
 	 */
 	async insert(template: TemplateModel) {
 		const payload = { requestBody: template };
-		return tryExecuteAndNotify(this.#host, TemplateResource.postTemplate(payload));
+		// TODO: fix type mismatch
+		return tryExecuteAndNotify(this.#host, TemplateResource.postTemplate(payload) as any) as any;
 	}
 
 	/**

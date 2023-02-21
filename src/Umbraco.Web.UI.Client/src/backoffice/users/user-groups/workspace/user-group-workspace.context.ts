@@ -20,7 +20,7 @@ export class UmbWorkspaceUserGroupContext
 	getUnique = this.#manager.getEntityKey;
 	getEntityKey = this.#manager.getEntityKey;
 	getStore = this.#manager.getStore;
-	getData = this.#manager.getData;
+	getData = this.#manager.getData as any; // TODO: fix type mismatch, but this will be done when we move to repositories.
 	load = this.#manager.load;
 	create = this.#manager.create;
 	save = this.#manager.save;
