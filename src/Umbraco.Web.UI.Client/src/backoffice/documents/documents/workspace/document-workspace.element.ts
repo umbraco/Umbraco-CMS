@@ -6,7 +6,8 @@ import type { UmbWorkspaceEntityElement } from '../../../shared/components/works
 import { UmbVariantId } from '../../../shared/variants/variant-id.class';
 import { ActiveVariant, UmbDocumentWorkspaceContext } from './document-workspace.context';
 import { UmbLitElement } from '@umbraco-cms/element';
-import '../../../shared/components/workspace/workspace-variant-content/workspace-variant-content.element';
+import '../../../shared/components/workspace/workspace-variant/workspace-variant.element';
+import { DocumentModel } from '@umbraco-cms/backend-api';
 
 @customElement('umb-document-workspace')
 export class UmbDocumentWorkspaceElement extends UmbLitElement implements UmbWorkspaceEntityElement {
@@ -46,10 +47,9 @@ export class UmbDocumentWorkspaceElement extends UmbLitElement implements UmbWor
 		this._gotDocumentData(data);
 	}
 
-	private _gotDocumentData(data: any) {
+	private _gotDocumentData(data: DocumentModel | undefined) {
 		if (data && data.variants && data.variants.length > 0) {
-			// TODO: consider making a DocumentVariant object for this VariantId:
-			this._workspaceContext.setActiveVariant(0, new UmbVariantId(data.variants[0]));
+			this._workspaceContext.setActiveVariant(0, data.variants[0].culture || null, data.variants[0].segment || null);
 			this._unique = data.key;
 		} else {
 			// Fail beautifully?
@@ -62,12 +62,12 @@ export class UmbDocumentWorkspaceElement extends UmbLitElement implements UmbWor
 					this._workspaceSplitViews,
 					(view) => view.index,
 					(view) => html`
-						<umb-workspace-variant-content alias="Umb.Workspace.Document" .splitViewIndex=${view.index}>
+						<umb-workspace-variant alias="Umb.Workspace.Document" .splitViewIndex=${view.index}>
 							<umb-workspace-action-menu
 								slot="action-menu"
 								entity-type="document"
 								unique="${this._unique!}"></umb-workspace-action-menu>
-						</umb-workspace-variant-content>
+						</umb-workspace-variant>
 					`
 			  )
 			: nothing;

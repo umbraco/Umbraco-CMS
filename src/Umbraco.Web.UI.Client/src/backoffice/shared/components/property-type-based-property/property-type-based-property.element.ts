@@ -3,7 +3,8 @@ import { css, html } from 'lit';
 import { ifDefined } from 'lit-html/directives/if-defined.js';
 import { customElement, property, state } from 'lit/decorators.js';
 import { UmbDataTypeRepository } from '../../../settings/data-types/repository/data-type.repository';
-import { UmbWorkspacePropertySetContext } from '../workspace/workspace-context/workspace-property-set.context';
+import { UmbVariantId } from '../../variants/variant-id.class';
+import { UmbDocumentWorkspaceContext } from '../../../documents/documents/workspace/document-workspace.context';
 import type { DataTypeModel, DataTypePropertyModel, PropertyTypeViewModelBaseModel } from '@umbraco-cms/backend-api';
 import '../workspace-property/workspace-property.element';
 import { UmbLitElement } from '@umbraco-cms/element';
@@ -46,28 +47,35 @@ export class UmbPropertyTypeBasedPropertyElement extends UmbLitElement {
 	@state()
 	private _value?: unknown;
 
-	private _propertySetContext?: UmbWorkspacePropertySetContext;
+	/**
+	 * VariantId. A Variant Configuration to identify which the variant of its value.
+	 * @public
+	 * @type {UmbVariantId}
+	 * @attr
+	 * @default undefined
+	 */
+	@property({ type: Object, attribute: false })
+	private _variantId?: UmbVariantId;
+
+	private _workspaceContext?: UmbDocumentWorkspaceContext;
 
 	constructor() {
 		super();
-		this.consumeContext('umbWorkspacePropertySetContext', (propertySetContext: UmbWorkspacePropertySetContext) => {
-			this._propertySetContext = propertySetContext;
+		this.consumeContext('umbWorkspaceContext', (workspaceContext: UmbDocumentWorkspaceContext) => {
+			this._workspaceContext = workspaceContext;
 			this._observeProperty();
 		});
 	}
 
 	private _observeProperty() {
-		if (!this._propertySetContext || !this.property || !this._property?.alias) return;
-
-		console.log('_observeProperty');
+		if (!this._workspaceContext || !this.property || !this._property?.alias) return;
 
 		this.observe(
-			this._propertySetContext.propertyValueByAlias(this._property.alias),
+			this._workspaceContext.propertyValueByAlias(this._property.alias, this._variantId),
 			(value) => {
-				console.log('got value', value);
 				this._value = value;
 			},
-			'observeValue'
+			'_observePropertyValueByAlias'
 		);
 	}
 
@@ -94,6 +102,7 @@ export class UmbPropertyTypeBasedPropertyElement extends UmbLitElement {
 			description=${ifDefined(this._property?.description || undefined)}
 			property-editor-ui-alias=${ifDefined(this._propertyEditorUiAlias)}
 			.value=${this._value}
+			.variantId=${this._variantId}
 			.config=${this._dataTypeData}></umb-workspace-property>`;
 	}
 }

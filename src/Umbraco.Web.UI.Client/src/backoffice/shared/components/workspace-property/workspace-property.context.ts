@@ -1,4 +1,5 @@
-import { UmbWorkspacePropertySetContextInterface } from '../workspace/workspace-context/workspace-property-set-context.interface';
+import { UmbVariantId } from '../../variants/variant-id.class';
+import { UmbWorkspaceVariableEntityContextInterface } from '../workspace/workspace-context/workspace-variable-entity-context.interface';
 import type { DataTypeModel } from '@umbraco-cms/backend-api';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 import { ObjectState } from '@umbraco-cms/observable-api';
@@ -24,15 +25,17 @@ export class UmbWorkspacePropertyContext<ValueType = unknown> {
 	public readonly value = this._data.getObservablePart((data) => data.value);
 	public readonly config = this._data.getObservablePart((data) => data.config);
 
-	private _propertySetContext?: UmbWorkspacePropertySetContextInterface;
+	private _variantId?: UmbVariantId;
+
+	private _workspaceContext?: UmbWorkspaceVariableEntityContextInterface;
 
 	constructor(host: UmbControllerHostInterface) {
 		// TODO: Figure out how to get the magic string in a better way.
-		new UmbContextConsumerController<UmbWorkspacePropertySetContextInterface>(
+		new UmbContextConsumerController<UmbWorkspaceVariableEntityContextInterface>(
 			host,
-			'umbWorkspacePropertySetContext',
+			'umbWorkspaceContext',
 			(workspaceContext) => {
-				this._propertySetContext = workspaceContext;
+				this._workspaceContext = workspaceContext;
 			}
 		);
 
@@ -55,11 +58,14 @@ export class UmbWorkspacePropertyContext<ValueType = unknown> {
 
 		const alias = this._data.getValue().alias;
 		if (alias) {
-			this._propertySetContext?.setPropertyValue(alias, value);
+			this._workspaceContext?.setPropertyValue(alias, value, this._variantId);
 		}
 	}
 	public setConfig(config: WorkspacePropertyData<ValueType>['config']) {
 		this._data.update({ config });
+	}
+	public setVariantId(variantId: UmbVariantId | undefined) {
+		this._variantId = variantId;
 	}
 
 	public resetValue() {

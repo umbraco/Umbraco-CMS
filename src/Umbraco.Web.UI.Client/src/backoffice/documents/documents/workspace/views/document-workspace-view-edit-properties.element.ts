@@ -9,6 +9,9 @@ import {
 	DocumentTypePropertyTypeModel,
 	PropertyTypeContainerViewModelBaseModel,
 } from '@umbraco-cms/backend-api';
+import UmbWorkspaceVariantContentElement from 'src/backoffice/shared/components/workspace/workspace-variant/workspace-variant.element';
+import { UmbWorkspaceVariantContext } from 'src/backoffice/shared/components/workspace/workspace-variant/workspace-variant.context';
+import { UmbVariantId } from 'src/backoffice/shared/variants/variant-id.class';
 
 @customElement('umb-document-workspace-view-edit-properties')
 export class UmbDocumentWorkspaceViewEditPropertiesElement extends UmbLitElement {

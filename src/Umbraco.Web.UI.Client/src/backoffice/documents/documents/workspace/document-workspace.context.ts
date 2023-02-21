@@ -1,7 +1,7 @@
 import { UmbWorkspaceContext } from '../../../shared/components/workspace/workspace-context/workspace-context';
 import { UmbDocumentRepository } from '../repository/document.repository';
 import { UmbDocumentTypeRepository } from '../../document-types/repository/document-type.repository';
-import { UmbWorkspaceVariantableEntityContextInterface } from '../../../shared/components/workspace/workspace-context/workspace-variantable-entity-context.interface';
+import { UmbWorkspaceVariableEntityContextInterface } from '../../../shared/components/workspace/workspace-context/workspace-variable-entity-context.interface';
 import { UmbVariantId } from '../../../shared/variants/variant-id.class';
 import type {
 	DocumentModel,
@@ -16,13 +16,14 @@ import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 
 export type ActiveVariant = {
 	index: number;
-	variantId: UmbVariantId;
+	culture: string | null;
+	segment: string | null;
 };
 
 type EntityType = DocumentModel;
 export class UmbDocumentWorkspaceContext
 	extends UmbWorkspaceContext
-	implements UmbWorkspaceVariantableEntityContextInterface<EntityType | undefined>
+	implements UmbWorkspaceVariableEntityContextInterface<EntityType | undefined>
 {
 	#isNew = false;
 	#host: UmbControllerHostInterface;
@@ -138,12 +139,12 @@ export class UmbDocumentWorkspaceContext
 		return 'document';
 	}
 
-	setActiveVariant(index: number, variantId: UmbVariantId) {
+	setActiveVariant(index: number, culture: string | null, segment: string | null) {
 		const activeVariants = [...this.#activeVariantsInfo.getValue()];
 		if (index < activeVariants.length) {
-			activeVariants[index] = { index, variantId: variantId };
+			activeVariants[index] = { index, culture, segment };
 		} else {
-			activeVariants.push({ index, variantId: variantId });
+			activeVariants.push({ index, culture, segment });
 		}
 		this.#activeVariantsInfo.next(activeVariants);
 	}

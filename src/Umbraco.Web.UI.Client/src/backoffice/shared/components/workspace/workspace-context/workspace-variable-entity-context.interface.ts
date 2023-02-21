@@ -3,8 +3,7 @@ import { UmbVariantId } from '../../../variants/variant-id.class';
 import type { UmbWorkspaceEntityContextInterface } from './workspace-entity-context.interface';
 import type { PropertyViewModelBaseModel } from '@umbraco-cms/backend-api';
 
-export interface UmbWorkspaceVariantableEntityContextInterface<T = unknown>
-	extends UmbWorkspaceEntityContextInterface<T> {
+export interface UmbWorkspaceVariableEntityContextInterface<T = unknown> extends UmbWorkspaceEntityContextInterface<T> {
 	getName(variantId?: UmbVariantId): void;
 	setName(name: string, variantId?: UmbVariantId): void;
 

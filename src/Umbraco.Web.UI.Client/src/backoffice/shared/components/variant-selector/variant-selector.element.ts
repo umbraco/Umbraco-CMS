@@ -3,7 +3,7 @@ import { css, html, nothing } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { UUIInputElement, UUIInputEvent } from '@umbraco-ui/uui';
 import { repeat } from 'lit-html/directives/repeat.js';
-import { UmbVariantContentContext } from '../workspace/workspace-variant-content/variant-content.context';
+import { UmbWorkspaceVariantContext } from '../workspace/workspace-variant/workspace-variant.context';
 import { UmbDocumentWorkspaceContext } from '../../../documents/documents/workspace/document-workspace.context';
 import { UmbLitElement } from '@umbraco-cms/element';
 import type { DocumentVariantModel } from '@umbraco-cms/backend-api';
@@ -46,7 +46,7 @@ export class UmbVariantSelectorElement extends UmbLitElement {
 	_variants: Array<DocumentVariantModel> = [];
 
 	private _workspaceContext?: UmbDocumentWorkspaceContext;
-	private _variantContext?: UmbVariantContentContext;
+	private _variantContext?: UmbWorkspaceVariantContext;
 
 	@state()
 	private _name?: string;
@@ -66,7 +66,7 @@ export class UmbVariantSelectorElement extends UmbLitElement {
 			this._observeVariants();
 		});
 
-		this.consumeContext<UmbVariantContentContext>('umbVariantContext', (instance) => {
+		this.consumeContext<UmbWorkspaceVariantContext>('umbWorkspaceVariantContext', (instance) => {
 			this._variantContext = instance;
 			this._observeVariantContext();
 		});

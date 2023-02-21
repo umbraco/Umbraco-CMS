@@ -6,7 +6,7 @@ import '../workspace-layout/workspace-layout.element';
 
 // Lazy load
 // TODO: Make this dynamic, use load-extensions method to loop over extensions for this node.
-import { UmbVariantContentContext } from './variant-content.context';
+import { UmbWorkspaceVariantContext } from './workspace-variant.context';
 import { UmbLitElement } from '@umbraco-cms/element';
 
 /**
@@ -15,7 +15,7 @@ import { UmbLitElement } from '@umbraco-cms/element';
  * As well breadcrumbs etc.
  *
  */
-@customElement('umb-workspace-variant-content')
+@customElement('umb-workspace-variant')
 export class UmbWorkspaceVariantContentElement extends UmbLitElement {
 	static styles = [
 		UUITextStyles,
@@ -47,7 +47,7 @@ export class UmbWorkspaceVariantContentElement extends UmbLitElement {
 		this.variantContext.setSplitViewIndex(index);
 	}
 
-	variantContext = new UmbVariantContentContext(this);
+	variantContext = new UmbWorkspaceVariantContext(this);
 
 	render() {
 		return html`
@@ -68,6 +68,6 @@ export default UmbWorkspaceVariantContentElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-workspace-variant-content': UmbWorkspaceVariantContentElement;
+		'umb-workspace-variant': UmbWorkspaceVariantContentElement;
 	}
 }
