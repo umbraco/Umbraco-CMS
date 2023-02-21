@@ -1,15 +1,12 @@
 import { UmbLanguageRepository } from '../../repository/language.repository';
 import { UmbWorkspaceContext } from '../../../../shared/components/workspace/workspace-context/workspace-context';
 import type { LanguageModel } from '@umbraco-cms/backend-api';
-import { DeepState, ObjectState } from '@umbraco-cms/observable-api';
+import { ObjectState } from '@umbraco-cms/observable-api';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 
 export class UmbLanguageWorkspaceContext extends UmbWorkspaceContext {
 	#host: UmbControllerHostInterface;
 	#languageRepository: UmbLanguageRepository;
-
-	#isNew = new DeepState<boolean>(false);
-	isNew = this.#isNew.asObservable();
 
 	#data = new ObjectState<LanguageModel | undefined>(undefined);
 	data = this.#data.asObservable();
@@ -23,7 +20,7 @@ export class UmbLanguageWorkspaceContext extends UmbWorkspaceContext {
 	async load(isoCode: string) {
 		const { data } = await this.#languageRepository.requestByIsoCode(isoCode);
 		if (data) {
-			this.#isNew.next(false);
+			this.setIsNew(false);
 			this.#data.update(data);
 		}
 	}
@@ -31,7 +28,7 @@ export class UmbLanguageWorkspaceContext extends UmbWorkspaceContext {
 	async createScaffold() {
 		const { data } = await this.#languageRepository.createScaffold();
 		if (!data) return;
-		this.#isNew.next(true);
+		this.setIsNew(true);
 		this.#data.update(data);
 	}
 
@@ -41,14 +38,6 @@ export class UmbLanguageWorkspaceContext extends UmbWorkspaceContext {
 
 	getEntityType() {
 		return 'language';
-	}
-
-	getIsNew() {
-		return this.#isNew.getValue();
-	}
-
-	setIsNew(isNew: boolean) {
-		this.#isNew.next(isNew);
 	}
 
 	setName(name: string) {

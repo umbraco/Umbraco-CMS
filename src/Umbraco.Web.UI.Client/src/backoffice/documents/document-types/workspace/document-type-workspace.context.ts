@@ -8,7 +8,6 @@ export class UmbWorkspaceDocumentTypeContext
 	extends UmbWorkspaceContext
 	implements UmbWorkspaceEntityContextInterface<DocumentTypeModel | undefined>
 {
-	isNew = false;
 	#manager = new UmbEntityWorkspaceManager(this._host, 'document-type', UMB_DOCUMENT_TYPE_STORE_CONTEXT_TOKEN);
 
 	public readonly data = this.#manager.state.asObservable();

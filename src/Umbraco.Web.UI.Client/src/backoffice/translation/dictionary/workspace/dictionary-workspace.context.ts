@@ -10,7 +10,6 @@ export class UmbWorkspaceDictionaryContext
 	extends UmbWorkspaceContext
 	implements UmbWorkspaceEntityContextInterface<EntityType | undefined>
 {
-	isNew = false;
 	#host: UmbControllerHostInterface;
 	#repo: UmbDictionaryRepository;
 
@@ -64,6 +63,7 @@ export class UmbWorkspaceDictionaryContext
 	async load(entityKey: string) {
 		const { data } = await this.#repo.requestByKey(entityKey);
 		if (data) {
+			this.setIsNew(false);
 			this.#data.next(data);
 		}
 	}
@@ -71,12 +71,14 @@ export class UmbWorkspaceDictionaryContext
 	async createScaffold(parentKey: string | null) {
 		const { data } = await this.#repo.createScaffold(parentKey);
 		if (!data) return;
+		this.setIsNew(true);
 		this.#data.next(data);
 	}
 
 	async save() {
 		if (!this.#data.value) return;
-		this.#repo.save(this.#data.value);
+		await this.#repo.save(this.#data.value);
+		this.setIsNew(false);
 	}
 
 	public destroy(): void {

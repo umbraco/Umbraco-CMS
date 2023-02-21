@@ -11,7 +11,6 @@ export class UmbWorkspaceMemberTypeContext
 	extends UmbWorkspaceContext
 	implements UmbWorkspaceEntityContextInterface<EntityType | undefined>
 {
-	isNew = false;
 	#host: UmbControllerHostInterface;
 	#dataTypeRepository: UmbMemberTypeRepository;
 
@@ -27,7 +26,7 @@ export class UmbWorkspaceMemberTypeContext
 	async load(entityKey: string) {
 		const { data } = await this.#dataTypeRepository.requestByKey(entityKey);
 		if (data) {
-			this.isNew = false;
+			this.setIsNew(false);
 			this.#data.next(data);
 		}
 	}
@@ -35,7 +34,7 @@ export class UmbWorkspaceMemberTypeContext
 	async createScaffold() {
 		const { data } = await this.#dataTypeRepository.createScaffold();
 		if (!data) return;
-		this.isNew = true;
+		this.setIsNew(true);
 		this.#data.next(data);
 	}
 
@@ -67,7 +66,7 @@ export class UmbWorkspaceMemberTypeContext
 			await this.#dataTypeRepository.save(this.#data.value);
 		}
 		// If it went well, then its not new anymore?.
-		this.isNew = false;
+		this.setIsNew(false);
 	}
 
 	async delete(key: string) {

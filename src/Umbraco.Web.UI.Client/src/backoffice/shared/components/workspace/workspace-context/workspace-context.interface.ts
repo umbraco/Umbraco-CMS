@@ -1,9 +1,7 @@
 import { Observable } from 'rxjs';
 
 export interface UmbWorkspaceContextInterface<T = unknown> {
-	//readonly data: Observable<T>;
-	//getUnique(): string | undefined;
-	isNew: Observable<T>;
+	isNew: Observable<boolean>;
 	getIsNew(): boolean;
 	setIsNew(value: boolean): void;
 	getEntityType(): string;
