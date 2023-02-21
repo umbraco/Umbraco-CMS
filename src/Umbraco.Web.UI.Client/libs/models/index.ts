@@ -146,3 +146,8 @@ export interface DataSourceResponse<T = undefined> {
 	data?: T;
 	error?: ProblemDetailsModel;
 }
+
+export interface SwatchDetails {
+	label: string;
+	value: string;
+}
