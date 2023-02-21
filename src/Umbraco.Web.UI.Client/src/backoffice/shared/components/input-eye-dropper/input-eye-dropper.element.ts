@@ -5,8 +5,8 @@ import { FormControlMixin } from '@umbraco-ui/uui-base/lib/mixins';
 import { UUIColorPickerChangeEvent } from '@umbraco-ui/uui';
 import { UmbLitElement } from '@umbraco-cms/element';
 
-@customElement('umb-eye-dropper')
-export class UmbEyeDropperElement extends FormControlMixin(UmbLitElement) {
+@customElement('umb-input-eye-dropper')
+export class UmbInputEyeDropperElement extends FormControlMixin(UmbLitElement) {
 	static styles = [UUITextStyles, css``];
 
 	protected getFormElement() {
@@ -36,10 +36,10 @@ export class UmbEyeDropperElement extends FormControlMixin(UmbLitElement) {
 	}
 }
 
-export default UmbEyeDropperElement;
+export default UmbInputEyeDropperElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-eye-dropper': UmbEyeDropperElement;
+		'umb-input-eye-dropper': UmbInputEyeDropperElement;
 	}
 }

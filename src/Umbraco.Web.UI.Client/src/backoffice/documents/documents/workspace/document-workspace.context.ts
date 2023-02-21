@@ -2,7 +2,12 @@ import { UmbWorkspaceContext } from '../../../shared/components/workspace/worksp
 import { UmbDocumentRepository } from '../repository/document.repository';
 import type { UmbWorkspaceEntityContextInterface } from '../../../shared/components/workspace/workspace-context/workspace-entity-context.interface';
 import { UmbDocumentTypeRepository } from '../../document-types/repository/document-type.repository';
-import type { DocumentModel, DocumentTypeModel } from '@umbraco-cms/backend-api';
+import type {
+	DocumentModel,
+	DocumentTypeModel,
+	DocumentTypePropertyTypeContainerModel,
+	DocumentTypePropertyTypeModel,
+} from '@umbraco-cms/backend-api';
 import {
 	partialUpdateFrozenArray,
 	ObjectState,
@@ -14,6 +19,8 @@ import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 
 // TODO: should this context be called DocumentDraft instead of workspace? or should the draft be part of this?
 
+// TODO: Should we have a DocumentStructureContext and maybe even a DocumentDraftContext?
+
 type EntityType = DocumentModel;
 export class UmbDocumentWorkspaceContext
 	extends UmbWorkspaceContext
@@ -22,29 +29,47 @@ export class UmbDocumentWorkspaceContext
 	#host: UmbControllerHostInterface;
 	#documentRepository: UmbDocumentRepository;
 	#documentTypeRepository: UmbDocumentTypeRepository;
-	//#dataTypeRepository: UmbDataTypeRepository;
 
-	#data = new ObjectState<EntityType | undefined>(undefined);
-	documentTypeKey = this.#data.getObservablePart((data) => data?.contentTypeKey);
+	/**
+	 * The document is the current stored version of the document.
+	 * For now lets not share this publicly as it can become confusing.
+	 * TODO: Use this to compare, for variants with changes.
+	 */
+	#document = new ObjectState<EntityType | undefined>(undefined);
+
+	/**
+	 * The document is the current state/draft version of the document.
+	 */
+	#draft = new ObjectState<EntityType | undefined>(undefined);
+	documentTypeKey = this.#draft.getObservablePart((data) => data?.contentTypeKey);
+
+	variants = this.#draft.getObservablePart((data) => data?.variants || []);
+	urls = this.#draft.getObservablePart((data) => data?.urls || []);
+	templateKey = this.#draft.getObservablePart((data) => data?.templateKey || null);
 
 	#documentTypes = new ArrayState<DocumentTypeModel>([], (x) => x.key);
 	documentTypes = this.#documentTypes.asObservable();
+
+	mainDocumentType = this.#documentTypes.asObservable();
+
+	// Notice the DocumentTypePropertyTypeContainerModel is equivalent to PropertyTypeContainerViewModelBaseModel, making it easy to generalize.
+	#containers = new ArrayState<DocumentTypePropertyTypeContainerModel>([], (x) => x.key);
 
 	constructor(host: UmbControllerHostInterface) {
 		super(host);
 		this.#host = host;
 		this.#documentRepository = new UmbDocumentRepository(this.#host);
 		this.#documentTypeRepository = new UmbDocumentTypeRepository(this.#host);
-		//this.#dataTypeRepository = new UmbDataTypeRepository(this.#host);
 
-		new UmbObserverController(this._host, this.documentTypeKey, (key) => this.loadDocumentType(key));
+		new UmbObserverController(this._host, this.documentTypeKey, (key) => this._loadDocumentType(key));
 	}
 
 	async load(entityKey: string) {
 		const { data } = await this.#documentRepository.requestByKey(entityKey);
 		if (data) {
 			this.setIsNew(false);
-			this.#data.next(data);
+			this.#document.next(data);
+			this.#draft.next(data);
 		}
 	}
 
@@ -52,10 +77,11 @@ export class UmbDocumentWorkspaceContext
 		const { data } = await this.#documentRepository.createScaffold(parentKey);
 		if (!data) return;
 		this.setIsNew(true);
-		this.#data.next(data);
+		this.#document.next(data);
+		this.#draft.next(data);
 	}
 
-	async loadDocumentType(key?: string) {
+	private async _loadDocumentType(key?: string) {
 		if (!key) return;
 
 		const { data } = await this.#documentTypeRepository.requestByKey(key);
@@ -64,43 +90,33 @@ export class UmbDocumentWorkspaceContext
 		// Load inherited and composed types:
 		await data?.compositions?.forEach(async (composition) => {
 			if (composition.key) {
-				this.loadDocumentType(composition.key);
+				this._loadDocumentType(composition.key);
 			}
 		});
 
-		new UmbObserverController(this._host, await this.#documentTypeRepository.byKey(key), (data) => {
-			if (data) {
-				this.#documentTypes.appendOne(data);
-				this.loadDataTypeOfDocumentType(data);
-			}
-		});
-	}
-
-	async loadDataTypeOfDocumentType(documentType?: DocumentTypeModel) {
-		if (!documentType) return;
-
-		// Load inherited and composed types:
-		await documentType?.properties?.forEach(async (property) => {
-			if (property.dataTypeKey) {
-				this.loadDataType(property.dataTypeKey);
+		new UmbObserverController(this._host, await this.#documentTypeRepository.byKey(key), (docType) => {
+			if (docType) {
+				this.#documentTypes.appendOne(docType);
+				this._initDocumentTypeContainers(docType);
+				this._loadDocumentTypeCompositions(docType);
 			}
 		});
 	}
 
-	async loadDataType(key?: string) {
-		if (!key) return;
+	private async _loadDocumentTypeCompositions(documentType: DocumentTypeModel) {
+		documentType.compositions?.forEach((composition) => {
+			this._loadDocumentType(composition.key);
+		});
+	}
 
-		//const { data } = await this.#dataTypeRepository.requestDetails(key);
-
-		/*new UmbObserverController(this._host, await this.#documentTypeRepository.byKey(key), (data) => {
-			if (data) {
-				this.#documentTypes.appendOne(data);
-			}
-		});*/
+	private async _initDocumentTypeContainers(documentType: DocumentTypeModel) {
+		documentType.containers?.forEach((container) => {
+			this.#containers.appendOne(container);
+		});
 	}
 
 	getData() {
-		return this.#data.getValue();
+		return this.#draft.getValue() || {};
 	}
 
 	/*
@@ -110,7 +126,7 @@ export class UmbDocumentWorkspaceContext
 	*/
 
 	getEntityKey() {
-		return this.getData()?.key || '';
+		return this.getData().key;
 	}
 
 	getEntityType() {
@@ -118,65 +134,100 @@ export class UmbDocumentWorkspaceContext
 	}
 
 	setName(name: string, culture?: string | null, segment?: string | null) {
-		const variants = this.#data.getValue()?.variants || [];
+		const variants = this.#draft.getValue()?.variants || [];
 		const newVariants = partialUpdateFrozenArray(
 			variants,
 			{ name },
 			(v) => v.culture == culture && v.segment == segment
 		);
-		this.#data.update({ variants: newVariants });
-	}
-	/*
-	getEntityType = this.#manager.getEntityType;
-	getUnique = this.#manager.getEntityKey;
-	getEntityKey = this.#manager.getEntityKey;
-
-	*/
-
-	/**
-	 * Concept for Repository impl.:
-
-	load(entityKey: string) {
-		this.#repository.load(entityKey).then((data) => {
-			this.#draft.next(data)
-		})
+		this.#draft.update({ variants: newVariants });
 	}
 
-	create(parentKey: string | undefined) {
-		this.#repository.create(parentKey).then((data) => {
-			this.#draft.next(data)
-		})
-	}
-	*/
-
-	propertiesOf(culture: string | null, segment: string | null) {
-		return this.#data.getObservablePart((data) =>
+	propertyValuesOf(culture: string | null, segment: string | null) {
+		return this.#draft.getObservablePart((data) =>
 			data?.properties?.filter((p) => (culture === p.culture || null) && (segment === p.segment || null))
 		);
 	}
 
-	propertyStructure() {
-		// TODO: handle composition of document types.
-		return this.#documentTypes.getObservablePart((data) => data[0]?.properties);
+	propertyValueOfAlias(propertyAlias: string, culture: string | null, segment: string | null) {
+		return this.#draft.getObservablePart((data) =>
+			data?.properties?.find(
+				(p) => propertyAlias === p.alias && (culture === p.culture || null) && (segment === p.segment || null)
+			)
+		);
 	}
 
+	hasPropertyStructuresOf(containerKey: string | null) {
+		return this.#documentTypes.getObservablePart((docTypes) => {
+			return (
+				docTypes.find((docType) => {
+					return docType.properties?.find((property) => property.containerKey === containerKey);
+				}) !== undefined
+			);
+		});
+	}
+	rootPropertyStructures() {
+		return this.propertyStructuresOf(null);
+	}
+	propertyStructuresOf(containerKey: string | null) {
+		return this.#documentTypes.getObservablePart((docTypes) => {
+			const props: DocumentTypePropertyTypeModel[] = [];
+			docTypes.forEach((docType) => {
+				docType.properties?.forEach((property) => {
+					if (property.containerKey === containerKey) {
+						props.push(property);
+					}
+				});
+			});
+			return props;
+		});
+	}
+
+	// TODO: Check what of these methods I ended actually using:
+
+	rootContainers(containerType: 'Group' | 'Tab') {
+		return this.#containers.getObservablePart((data) => {
+			return data.filter((x) => x.parentKey === null && x.type === containerType);
+		});
+	}
+
+	hasRootContainers(containerType: 'Group' | 'Tab') {
+		return this.#containers.getObservablePart((data) => {
+			return data.filter((x) => x.parentKey === null && x.type === containerType).length > 0;
+		});
+	}
+
+	containersOfParentKey(
+		parentKey: DocumentTypePropertyTypeContainerModel['parentKey'],
+		containerType: 'Group' | 'Tab'
+	) {
+		return this.#containers.getObservablePart((data) => {
+			return data.filter((x) => x.parentKey === parentKey && x.type === containerType);
+		});
+	}
+
+	containersByNameAndType(name: string, containerType: 'Group' | 'Tab') {
+		return this.#containers.getObservablePart((data) => {
+			return data.filter((x) => x.name === name && x.type === containerType);
+		});
+	}
 	setPropertyValue(alias: string, value: unknown) {
 		const entry = { alias: alias, value: value };
 
-		const currentData = this.#data.value;
+		const currentData = this.#draft.value;
 		if (currentData) {
 			// TODO: make a partial update method for array of data, (idea/concept, use if this case is getting common)
 			const newDataSet = appendToFrozenArray(currentData.properties || [], entry, (x) => x.alias);
-			this.#data.update({ properties: newDataSet });
+			this.#draft.update({ properties: newDataSet });
 		}
 	}
 
 	async save() {
-		if (!this.#data.value) return;
-		if (this.isNew) {
-			await this.#documentRepository.create(this.#data.value);
+		if (!this.#draft.value) return;
+		if (this.getIsNew()) {
+			await this.#documentRepository.create(this.#draft.value);
 		} else {
-			await this.#documentRepository.save(this.#data.value);
+			await this.#documentRepository.save(this.#draft.value);
 		}
 		// If it went well, then its not new anymore?.
 		this.setIsNew(false);
@@ -199,6 +250,6 @@ export class UmbDocumentWorkspaceContext
 	*/
 
 	public destroy(): void {
-		this.#data.complete();
+		this.#draft.complete();
 	}
 }

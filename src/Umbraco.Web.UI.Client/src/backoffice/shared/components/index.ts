@@ -31,6 +31,11 @@ import './input-media-picker/input-media-picker.element';
 import './input-document-picker/input-document-picker.element';
 import './input-language-picker/input-language-picker.element';
 import './input-culture-select/input-culture-select.element';
+import './input-color-picker/input-color-picker.element';
+import './input-eye-dropper/input-eye-dropper.element';
+import './input-checkbox-list/input-checkbox-list.element';
+import './input-multi-url-picker/input-multi-url-picker.element';
 
 import './empty-state/empty-state.element';
-import './color-picker/color-picker.element';
+
+import './debug/debug.element';

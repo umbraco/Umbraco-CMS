@@ -1,6 +1,7 @@
 import { UmbContextToken } from '../context-token';
 
 export const umbContextRequestEventType = 'umb:context-request';
+export const umbDebugContextEventType = 'umb:debug-contexts';
 
 export type UmbContextCallback<T> = (instance: T) => void;
 
@@ -31,3 +32,10 @@ export class UmbContextRequestEventImplementation<T = unknown> extends Event imp
 export const isUmbContextRequestEvent = (event: Event): event is UmbContextRequestEventImplementation => {
 	return event.type === umbContextRequestEventType;
 };
+
+
+export class UmbContextDebugRequest extends Event {
+	public constructor(public readonly callback:any) {
+		super(umbDebugContextEventType, { bubbles: true, composed: true, cancelable: false });
+	}
+}

@@ -11,15 +11,10 @@ jobs:
       issues: write
       pull-requests: write
     steps:
-      - name: Install dependencies
-        run: |
-          npm install node-fetch@2
       - name: Fetch random comment 🗣️ and add it to the PR
         uses: actions/github-script@v6
         with:
           script: |
-            const fetch = require('node-fetch')
-
             const response = await fetch('https://collaboratorsv2.euwest01.umbraco.io/umbraco/api/comments/PostComment', {
               method: 'post',
               body: JSON.stringify({

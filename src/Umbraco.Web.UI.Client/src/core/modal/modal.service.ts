@@ -6,18 +6,20 @@ import './layouts/property-editor-ui-picker/modal-layout-property-editor-ui-pick
 import './layouts/modal-layout-current-user.element';
 import './layouts/icon-picker/modal-layout-icon-picker.element';
 import '../../backoffice/settings/languages/language-picker/language-picker-modal-layout.element';
+import './layouts/link-picker/modal-layout-link-picker.element';
 
 import { UUIModalSidebarSize } from '@umbraco-ui/uui-modal-sidebar';
 import { BehaviorSubject } from 'rxjs';
+import type { UmbLanguagePickerModalData } from '../../backoffice/settings/languages/language-picker/language-picker-modal-layout.element';
 import { UmbModalChangePasswordData } from './layouts/modal-layout-change-password.element';
 import type { UmbModalIconPickerData } from './layouts/icon-picker/modal-layout-icon-picker.element';
 import type { UmbModalConfirmData } from './layouts/confirm/modal-layout-confirm.element';
 import type { UmbModalContentPickerData } from './layouts/content-picker/modal-layout-content-picker.element';
 import type { UmbModalPropertyEditorUIPickerData } from './layouts/property-editor-ui-picker/modal-layout-property-editor-ui-picker.element';
 import type { UmbModalMediaPickerData } from './layouts/media-picker/modal-layout-media-picker.element';
+import type { UmbModalLinkPickerData } from './layouts/link-picker/modal-layout-link-picker.element';
 import { UmbModalHandler } from './modal-handler';
 import { UmbContextToken } from '@umbraco-cms/context-api';
-import { UmbLanguagePickerModalData } from '../../backoffice/settings/languages/language-picker/language-picker-modal-layout.element';
 
 export type UmbModalType = 'dialog' | 'sidebar';
 
@@ -88,6 +90,21 @@ export class UmbModalService {
 	 */
 	public iconPicker(data?: UmbModalIconPickerData): UmbModalHandler {
 		return this.open('umb-modal-layout-icon-picker', { data, type: 'sidebar', size: 'small' });
+	}
+
+	/**
+	 * Opens an Link Picker sidebar modal
+	 * @public
+	 * @param {(LinkPickerData & LinkPickerConfig)} [data]
+	 * @return {*}  {UmbModalHandler}
+	 * @memberof UmbModalService
+	 */
+	public linkPicker(data?: UmbModalLinkPickerData): UmbModalHandler {
+		return this.open('umb-modal-layout-link-picker', {
+			data,
+			type: 'sidebar',
+			size: data?.config?.overlaySize || 'small',
+		});
 	}
 
 	/**
