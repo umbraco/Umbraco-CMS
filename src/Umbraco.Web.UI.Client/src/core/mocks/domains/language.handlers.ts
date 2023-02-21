@@ -39,9 +39,9 @@ export const handlers = [
 		data.id = umbLanguagesData.getAll().length + 1;
 		data.key = uuidv4();
 
-		const saved = umbLanguagesData.save([data]);
+		umbLanguagesData.save([data]);
 
-		return res(ctx.status(200), ctx.json(saved[0]));
+		return res(ctx.status(201));
 	}),
 
 	rest.put<LanguageModel>(umbracoPath('/language/:key'), async (req, res, ctx) => {
@@ -49,9 +49,9 @@ export const handlers = [
 
 		if (!data) return;
 
-		const saved = umbLanguagesData.save([data]);
+		umbLanguagesData.save([data]);
 
-		return res(ctx.status(200), ctx.json(saved[0]));
+		return res(ctx.status(200));
 	}),
 
 	rest.delete(umbracoPath('/language/:key'), async (req, res, ctx) => {

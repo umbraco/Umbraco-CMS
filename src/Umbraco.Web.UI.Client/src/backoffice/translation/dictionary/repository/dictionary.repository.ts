@@ -103,7 +103,7 @@ export class UmbDictionaryRepository implements UmbTreeRepository, UmbDetailRepo
 
 	// DETAILS
 
-	async createDetailsScaffold(parentKey: string | null) {
+	async createScaffold(parentKey: string | null) {
 		await this.#init;
 
 		if (!parentKey) {
@@ -141,7 +141,7 @@ export class UmbDictionaryRepository implements UmbTreeRepository, UmbDetailRepo
 		return this.#detailSource.delete(key);
 	}
 
-	async saveDetail(dictionary: DictionaryDetails) {
+	async save(dictionary: DictionaryDetails) {
 		await this.#init;
 
 		// TODO: should we show a notification if the dictionary is missing?
@@ -168,7 +168,7 @@ export class UmbDictionaryRepository implements UmbTreeRepository, UmbDetailRepo
 		return { error };
 	}
 
-	async createDetail(detail: DictionaryDetails) {
+	async create(detail: DictionaryDetails) {
 		await this.#init;
 
 		if (!detail.name) {

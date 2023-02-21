@@ -14,6 +14,12 @@ export class UmbSaveWorkspaceAction extends UmbWorkspaceAction<any, UmbWorkspace
 		const data = this.workspaceContext.getData();
 		// TODO: handle errors
 		if (!data) return;
-		this.repository?.saveDetail(data);
+
+		if (this.workspaceContext.getIsNew()) {
+			await this.repository?.create(data);
+			this.workspaceContext.setIsNew(false);
+		} else {
+			await this.repository?.save(data);
+		}
 	}
 }

@@ -59,12 +59,49 @@ export const data: Array<DataTypeModel & { type: 'data-type' }> = [
 		propertyEditorUiAlias: 'Umb.PropertyEditorUI.ColorPicker',
 		data: [
 			{
-				alias: 'includeLabels',
-				value: false,
+				alias: 'useLabel',
+				value: true,
 			},
 			{
-				alias: 'colors',
-				value: ['#000000', '#373737', '#9e9e9e', '#607d8b', '#2196f3', '#03a9f4', '#3f51b5', '#9c27b0', '#673ab7'],
+				alias: 'items',
+				value: [
+					{
+						value: '#000000',
+						label: 'Black',
+					},
+					{
+						value: '#373737',
+						label: 'Dark',
+					},
+					{
+						value: '#9e9e9e',
+						label: 'Light',
+					},
+					{
+						value: '#607d8b',
+						label: 'Sage',
+					},
+					{
+						value: '#2196f3',
+						label: 'Sapphire',
+					},
+					{
+						value: '#03a9f4',
+						label: 'Sky',
+					},
+					{
+						value: '#3f51b5',
+						label: 'Blue',
+					},
+					{
+						value: '#9c27b0',
+						label: 'Magenta',
+					},
+					{
+						value: '#673ab7',
+						label: 'Purps',
+					},
+				],
 			},
 		],
 	},
@@ -93,6 +130,7 @@ export const data: Array<DataTypeModel & { type: 'data-type' }> = [
 		propertyEditorUiAlias: 'Umb.PropertyEditorUI.EyeDropper',
 		data: [
 			{
+				//showPalette
 				alias: 'palette',
 				value: [
 					'#d0021b',
@@ -127,7 +165,28 @@ export const data: Array<DataTypeModel & { type: 'data-type' }> = [
 		parentKey: null,
 		propertyEditorAlias: 'Umbraco.MultiUrlPicker',
 		propertyEditorUiAlias: 'Umb.PropertyEditorUI.MultiUrlPicker',
-		data: [],
+		data: [
+			{
+				alias: 'overlaySize',
+				value: 'small',
+			},
+			{
+				alias: 'hideAnchor',
+				value: false,
+			},
+			{
+				alias: 'ignoreUserStartNodes',
+				value: false,
+			},
+			{
+				alias: 'maxNumber',
+				value: 2,
+			},
+			{
+				alias: 'minNumber',
+				value: 0,
+			},
+		],
 	},
 	{
 		$type: 'data-type',

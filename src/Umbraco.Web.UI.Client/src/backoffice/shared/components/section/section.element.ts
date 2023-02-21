@@ -11,6 +11,8 @@ import { UmbLitElement } from '@umbraco-cms/element';
 
 import './section-sidebar-menu/section-sidebar-menu.element.ts';
 import './section-views/section-views.element.ts';
+import '../../../settings/languages/app-language-select.element.ts';
+
 import { UmbRouterSlotChangeEvent } from '@umbraco-cms/router';
 
 @customElement('umb-section')
@@ -28,6 +30,10 @@ export class UmbSectionElement extends UmbLitElement {
 				overflow: auto;
 				height: 100%;
 			}
+
+			h3 {
+				padding: var(--uui-size-4) var(--uui-size-8);
+			}
 		`,
 	];
 
@@ -38,11 +44,16 @@ export class UmbSectionElement extends UmbLitElement {
 	@state()
 	private _menuItems?: Array<ManifestSidebarMenuItem>;
 
-	private _workspaces?: Array<ManifestWorkspace>;
-
 	@state()
 	private _views?: Array<ManifestSectionView>;
 
+	@state()
+	private _sectionLabel = '';
+
+	@state()
+	private _sectionPathname = '';
+
+	private _workspaces?: Array<ManifestWorkspace>;
 	private _sectionContext?: UmbSectionContext;
 	private _sectionAlias?: string;
 
@@ -89,7 +100,6 @@ export class UmbSectionElement extends UmbLitElement {
 	}
 
 	private _createMenuRoutes() {
-
 		// TODO: find a way to make this reuseable across:
 		const workspaceRoutes = this._workspaces?.map((workspace: ManifestWorkspace) => {
 			return [
@@ -140,35 +150,38 @@ export class UmbSectionElement extends UmbLitElement {
 		];
 	}
 
-
-
 	private _observeSection() {
 		if (!this._sectionContext) return;
 
-		this.observe(
-			this._sectionContext.alias, (alias) => {
-				this._sectionAlias = alias;
-				this._observeViews();
-			}
-		);
+		this.observe(this._sectionContext.alias, (alias) => {
+			this._sectionAlias = alias;
+			this._observeViews();
+		});
+
+		this.observe(this._sectionContext.pathname, (pathname) => {
+			this._sectionPathname = pathname || '';
+		});
+
+		this.observe(this._sectionContext.label, (label) => {
+			this._sectionLabel = label || '';
+		});
 	}
 
 	private _observeViews() {
-
 		this.observe(umbExtensionsRegistry?.extensionsOfType('sectionView'), (views) => {
-				const sectionViews = views.filter((view) => {
-					return this._sectionAlias ? view.meta.sections.includes(this._sectionAlias) : false
-				}).sort((a, b) => b.meta.weight - a.meta.weight);
-				if(sectionViews.length > 0) {
-					this._views = sectionViews;
-					this._createViewRoutes();
-				}
+			const sectionViews = views
+				.filter((view) => {
+					return this._sectionAlias ? view.meta.sections.includes(this._sectionAlias) : false;
+				})
+				.sort((a, b) => b.meta.weight - a.meta.weight);
+			if (sectionViews.length > 0) {
+				this._views = sectionViews;
+				this._createViewRoutes();
 			}
-		);
+		});
 	}
 
 	private _createViewRoutes() {
-
 		this._routes =
 			this._views?.map((view) => {
 				return {
@@ -190,13 +203,20 @@ export class UmbSectionElement extends UmbLitElement {
 		const view = this._views?.find((view) => 'view/' + view.meta.pathname === currentPath);
 		if (!view) return;
 		this._sectionContext?.setActiveView(view);
-	}
+	};
 
 	render() {
 		return html`
 			${this._menuItems && this._menuItems.length > 0
 				? html`
 						<umb-section-sidebar>
+							<!-- TODO: this should be an extension point and only shown in the content section sidebar -->
+							<umb-app-language-select></umb-app-language-select>
+
+							<!-- TODO: this should be part of a sidebar menu element instead -->
+							<a href="${`section/${this._sectionPathname}`}">
+								<h3>${this._sectionLabel}</h3>
+							</a>
 							<umb-section-sidebar-menu></umb-section-sidebar-menu>
 						</umb-section-sidebar>
 				  `
@@ -204,7 +224,10 @@ export class UmbSectionElement extends UmbLitElement {
 			<umb-section-main>
 				${this._views && this._views.length > 0 ? html`<umb-section-views></umb-section-views>` : nothing}
 				${this._routes && this._routes.length > 0
-					? html`<umb-router-slot id="router-slot" .routes="${this._routes}" @change=${this._onRouteChange}></umb-router-slot>`
+					? html`<umb-router-slot
+							id="router-slot"
+							.routes="${this._routes}"
+							@change=${this._onRouteChange}></umb-router-slot>`
 					: nothing}
 				<slot></slot>
 			</umb-section-main>

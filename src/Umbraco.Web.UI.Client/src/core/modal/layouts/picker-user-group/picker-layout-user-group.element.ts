@@ -82,9 +82,9 @@ export class UmbPickerLayoutUserGroupElement extends UmbModalLayoutPickerBase {
 						${this._userGroups.map(
 							(item) => html`
 								<div
-									@click=${() => this._handleItemClick(item.key)}
+									@click=${() => this.handleSelection(item.key)}
 									@keydown=${(e: KeyboardEvent) => this._handleKeydown(e, item.key)}
-									class=${this._isSelected(item.key) ? 'item selected' : 'item'}>
+									class=${this.isSelected(item.key) ? 'item selected' : 'item'}>
 									<uui-icon .name=${item.icon}></uui-icon>
 									<span>${item.name}</span>
 								</div>
@@ -93,8 +93,8 @@ export class UmbPickerLayoutUserGroupElement extends UmbModalLayoutPickerBase {
 					</div>
 				</uui-box>
 				<div slot="actions">
-					<uui-button label="Close" @click=${this._close}></uui-button>
-					<uui-button label="Submit" look="primary" color="positive" @click=${this._submit}></uui-button>
+					<uui-button label="Close" @click=${this.close}></uui-button>
+					<uui-button label="Submit" look="primary" color="positive" @click=${this.submit}></uui-button>
 				</div>
 			</umb-workspace-layout>
 		`;

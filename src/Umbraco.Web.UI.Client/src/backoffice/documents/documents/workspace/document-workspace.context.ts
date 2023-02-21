@@ -19,13 +19,13 @@ export type ActiveVariant = {
 	culture: string | null;
 	segment: string | null;
 };
+// TODO: Should we have a DocumentStructureContext and maybe even a DocumentDraftContext?
 
 type EntityType = DocumentModel;
 export class UmbDocumentWorkspaceContext
 	extends UmbWorkspaceContext
 	implements UmbWorkspaceVariableEntityContextInterface<EntityType | undefined>
 {
-	#isNew = false;
 	#host: UmbControllerHostInterface;
 	#documentRepository: UmbDocumentRepository;
 	#documentTypeRepository: UmbDocumentTypeRepository;
@@ -71,17 +71,17 @@ export class UmbDocumentWorkspaceContext
 		const { data } = await this.#documentRepository.requestByKey(entityKey);
 		if (!data) return undefined;
 
-		this.#isNew = false;
+		this.setIsNew(false);
 		this.#document.next(data);
 		this.#draft.next(data);
 		return data || undefined;
 	}
 
 	async createScaffold(parentKey: string | null) {
-		const { data } = await this.#documentRepository.createDetailsScaffold(parentKey);
+		const { data } = await this.#documentRepository.createScaffold(parentKey);
 		if (!data) return undefined;
 
-		this.#isNew = true;
+		this.setIsNew(true);
 		this.#document.next(data);
 		this.#draft.next(data);
 		return data || undefined;
@@ -262,13 +262,13 @@ export class UmbDocumentWorkspaceContext
 
 	async save() {
 		if (!this.#draft.value) return;
-		if (this.#isNew) {
-			await this.#documentRepository.createDetail(this.#draft.value);
+		if (this.getIsNew()) {
+			await this.#documentRepository.create(this.#draft.value);
 		} else {
-			await this.#documentRepository.saveDetail(this.#draft.value);
+			await this.#documentRepository.save(this.#draft.value);
 		}
 		// If it went well, then its not new anymore?.
-		this.#isNew = false;
+		this.setIsNew(false);
 	}
 
 	async delete(key: string) {

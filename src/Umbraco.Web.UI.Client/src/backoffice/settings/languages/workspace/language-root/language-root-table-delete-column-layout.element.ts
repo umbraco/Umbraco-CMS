@@ -1,64 +1,47 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, html, nothing } from 'lit';
-import { customElement, property } from 'lit/decorators.js';
-import { UmbLanguageStore, UmbLanguageStoreItemType, UMB_LANGUAGE_STORE_CONTEXT_TOKEN } from '../../language.store';
-import { UmbModalService, UMB_MODAL_SERVICE_CONTEXT_TOKEN } from '../../../../../core/modal';
+import { customElement, property, state } from 'lit/decorators.js';
+import { ifDefined } from 'lit-html/directives/if-defined.js';
 import { UmbLitElement } from '@umbraco-cms/element';
+import { LanguageModel } from '@umbraco-cms/backend-api';
 
 @customElement('umb-language-root-table-delete-column-layout')
 export class UmbLanguageRootTableDeleteColumnLayoutElement extends UmbLitElement {
 	static styles = [UUITextStyles, css``];
 
 	@property({ attribute: false })
-	value!: UmbLanguageStoreItemType;
+	value!: LanguageModel;
 
-	#languageStore?: UmbLanguageStore;
-	#modalService?: UmbModalService;
+	@state()
+	_isOpen = false;
 
-	constructor() {
-		super();
-		this.consumeContext(UMB_LANGUAGE_STORE_CONTEXT_TOKEN, (instance) => {
-			this.#languageStore = instance;
-		});
-
-		this.consumeContext(UMB_MODAL_SERVICE_CONTEXT_TOKEN, (instance) => {
-			this.#modalService = instance;
-		});
+	#onActionExecuted() {
+		this._isOpen = false;
 	}
 
-	#handleDelete(event: MouseEvent) {
-		event.stopImmediatePropagation();
-		if (!this.#languageStore) return;
+	#onClick() {
+		this._isOpen = !this._isOpen;
+	}
 
-		const modalHandler = this.#modalService?.confirm({
-			headline: 'Delete language',
-			content: html`
-				<div
-					style="padding: var(--uui-size-space-4); background-color: var(--uui-color-danger); color: var(--uui-color-danger-contrast); border: 1px solid var(--uui-color-danger-standalone); border-radius: var(--uui-border-radius)">
-					This will delete language <b>${this.value.name}</b>.
-				</div>
-				Are you sure you want to delete?
-			`,
-			color: 'danger',
-			confirmLabel: 'Delete',
-		});
-
-		modalHandler?.onClose().then(({ confirmed }) => {
-			if (confirmed) {
-				this.#languageStore?.delete([this.value.isoCode!]);
-			}
-		});
+	#onClose() {
+		this._isOpen = false;
 	}
 
 	render() {
+		// TODO: we need to use conditionals on each action here. But until we have that in place
+		// we'll just remove all actions on the default language.
 		if (this.value.isDefault) return nothing;
 
-		return html`<uui-button
-			@click=${this.#handleDelete}
-			color="danger"
-			look="default"
-			compact
-			label="delete"></uui-button>`;
+		return html`
+			<umb-dropdown .open="${this._isOpen}" @close=${this.#onClose}>
+				<uui-button slot="trigger" compact @click=${this.#onClick}><uui-symbol-more></uui-symbol-more></uui-button>
+				<umb-entity-action-list
+					slot="dropdown"
+					@executed=${this.#onActionExecuted}
+					entity-type="language"
+					unique=${ifDefined(this.value.isoCode)}></umb-entity-action-list>
+			</umb-dropdown>
+		`;
 	}
 }
 
