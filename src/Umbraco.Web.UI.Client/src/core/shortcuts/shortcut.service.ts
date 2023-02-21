@@ -1,18 +1,32 @@
 export type Shortcut = {
-	key: string;
-	altKey?: boolean;
-	ctrlKey?: boolean;
-	shiftKey?: boolean;
-	metaKey?: boolean;
+	name: string;
+	alias: string;
 	callback(): void;
+	combinations: Array<{
+		key: string;
+		altKey?: boolean;
+		ctrlKey?: boolean;
+		shiftKey?: boolean;
+		metaKey?: boolean;
+	}>;
 };
 
 export class UmbShortcutService {
 	#shortcuts: Array<Shortcut> = [
 		{
-			key: 'k',
-			metaKey: true,
+			name: 'Open search',
+			alias: 'Shortcut.OpenSearch',
 			callback: () => console.log('Open search'),
+			combinations: [
+				{
+					key: 'k',
+					metaKey: true,
+				},
+				{
+					key: 'k',
+					ctrlKey: true,
+				},
+			],
 		},
 	];
 
@@ -22,12 +36,14 @@ export class UmbShortcutService {
 			if (event.key === 'Shift' || event.key === 'Control' || event.key === 'Alt' || event.key === 'Meta') return;
 
 			const shortcut = this.#shortcuts.find((x) => {
-				if (x.key !== event.key) return false;
-				if ((x.altKey ? true : false) !== event.altKey) return false;
-				if ((x.ctrlKey ? true : false) !== event.ctrlKey) return false;
-				if ((x.shiftKey ? true : false) !== event.shiftKey) return false;
-				if ((x.metaKey ? true : false) !== event.metaKey) return false;
-				return true;
+				return x.combinations.find((y) => {
+					if (y.key !== event.key) return false;
+					if ((y.altKey ? true : false) !== event.altKey) return false;
+					if ((y.ctrlKey ? true : false) !== event.ctrlKey) return false;
+					if ((y.shiftKey ? true : false) !== event.shiftKey) return false;
+					if ((y.metaKey ? true : false) !== event.metaKey) return false;
+					return true;
+				});
 			});
 
 			shortcut?.callback();
