@@ -112,7 +112,7 @@ public interface IUserRepository : IReadWriteQueryRepository<int, IUser>
     /// </remarks>
     /// <param name="id">The id to find the user by.</param>
     /// <returns>An uncached <see cref="IUser"/> instance.</returns>
-    IUser? GetForUpgrade(int id);
+    IUser? GetForUpgrade(int id) => Get(id, false);
 
     /// <summary>
     ///     Returns a user by id

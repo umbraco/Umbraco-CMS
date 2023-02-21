@@ -124,7 +124,7 @@ public interface IUserService : IMembershipUserService
     /// </summary>
     /// <param name="key">The GUID key of the user.</param>
     /// <returns>The found user, or null if nothing was found.</returns>
-    Task<IUser?> GetAsync(Guid key);
+    Task<IUser?> GetAsync(Guid key) => throw new NotImplementedException();
 
     /// <summary>
     ///     Gets a user by Id
