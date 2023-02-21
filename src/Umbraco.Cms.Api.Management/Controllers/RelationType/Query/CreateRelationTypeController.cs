@@ -29,6 +29,7 @@ public class CreateRelationTypeController : RelationTypeControllerBase
     [HttpPost]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(StatusCodes.Status201Created)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> Create(RelationTypeSavingViewModel relationTypeSavingViewModel)
     {
         IRelationType relationTypePersisted = _relationTypeViewModelFactory.CreateRelationType(relationTypeSavingViewModel);

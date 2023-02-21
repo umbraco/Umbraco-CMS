@@ -14,8 +14,8 @@ public class DeleteRelationTypeController : RelationTypeControllerBase
 
     [HttpDelete("{key:guid}")]
     [MapToApiVersion("1.0")]
-    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Delete(Guid key)
     {
         IRelationType? relationType = _relationService.GetRelationTypeById(key);
