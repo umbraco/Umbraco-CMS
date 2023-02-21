@@ -31,9 +31,9 @@ public class DescendantsTrackedReferenceController : TrackedReferenceControllerB
     [HttpGet("descendants/{parentKey:guid}")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedViewModel<RelationItemViewModel>), StatusCodes.Status200OK)]
-    public async Task<ActionResult<PagedViewModel<RelationItemViewModel>>> Descendants(Guid parentKey, long skip, long take, bool? filterMustBeIsDependency)
+    public async Task<ActionResult<PagedViewModel<RelationItemViewModel>>> Descendants(Guid parentKey, long skip, long take, bool filterMustBeIsDependency = true)
     {
-        PagedModel<RelationItemModel> relationItems = await _trackedReferencesSkipTakeService.GetPagedDescendantsInReferencesAsync(parentKey, skip, take, filterMustBeIsDependency ?? true);
+        PagedModel<RelationItemModel> relationItems = await _trackedReferencesSkipTakeService.GetPagedDescendantsInReferencesAsync(parentKey, skip, take, filterMustBeIsDependency);
         var pagedViewModel = new PagedViewModel<RelationItemViewModel>
         {
             Total = relationItems.Total,
