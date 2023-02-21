@@ -346,6 +346,8 @@ public interface IRelationService : IService
     /// <param name="relationType">RelationType to Save</param>
     void Save(IRelationType relationType);
 
+    Task<Attempt<IRelationType, RelationTypeOperationStatus>> CreateAsync(IRelationType relationType, int userId);
+
     /// <summary>
     ///     Deletes a <see cref="IRelation" />
     /// </summary>

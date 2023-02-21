@@ -532,6 +532,48 @@ public class RelationService : RepositoryService, IRelationService
         }
     }
 
+    public async Task<Attempt<IRelationType, RelationTypeOperationStatus>> CreateAsync(IRelationType relationType, int userId)
+    {
+        if (relationType.Id != 0)
+        {
+            return Attempt.FailWithStatus(RelationTypeOperationStatus.InvalidId, relationType);
+        }
+
+        return await SaveAsync(
+            relationType,
+            () => _relationTypeRepository.Get(relationType.Key) is not null ? RelationTypeOperationStatus.KeyAlreadyExists : RelationTypeOperationStatus.Success,
+            AuditType.New,
+            $"Created relation type: {relationType.Name}");
+    }
+
+    private async Task<Attempt<IRelationType, RelationTypeOperationStatus>> SaveAsync(IRelationType relationType, Func<RelationTypeOperationStatus> operationValidation, AuditType auditType, string auditMessage)
+    {
+        using (ICoreScope scope = ScopeProvider.CreateCoreScope())
+        {
+            RelationTypeOperationStatus status = operationValidation();
+            if (status != RelationTypeOperationStatus.Success)
+            {
+                return Attempt.FailWithStatus(status, relationType);
+            }
+
+            EventMessages eventMessages = EventMessagesFactory.Get();
+            var savingNotification = new RelationTypeSavingNotification(relationType, eventMessages);
+            if (scope.Notifications.PublishCancelable(savingNotification))
+            {
+                scope.Complete();
+                return Attempt.FailWithStatus(RelationTypeOperationStatus.CancelledByNotification, relationType);
+            }
+
+            _relationTypeRepository.Save(relationType);
+            Audit(auditType, Constants.Security.SuperUserId, relationType.Id, auditMessage);
+            scope.Complete();
+            scope.Notifications.Publish(
+                new RelationTypeSavedNotification(relationType, eventMessages).WithStateFrom(savingNotification));
+        }
+
+        return await Task.FromResult(Attempt.SucceedWithStatus(RelationTypeOperationStatus.Success, relationType));
+    }
+
     /// <inheritdoc />
     public void Delete(IRelation relation)
     {
