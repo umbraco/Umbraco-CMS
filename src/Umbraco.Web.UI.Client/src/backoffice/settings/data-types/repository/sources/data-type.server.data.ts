@@ -79,9 +79,12 @@ export class UmbDataTypeServerDataSource implements RepositoryDetailDataSource<D
 		return tryExecuteAndNotify<DataTypeModel>(
 			this.#host,
 			// TODO: avoid this any?..
-			tryExecuteAndNotify(this, DataTypeResource.postDataType({
-				requestBody,
-			})) as any
+			tryExecuteAndNotify(
+				this.#host,
+				DataTypeResource.postDataType({
+					requestBody,
+				})
+			) as any
 		);
 	}
 
