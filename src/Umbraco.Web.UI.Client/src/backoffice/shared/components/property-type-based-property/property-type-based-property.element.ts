@@ -55,7 +55,7 @@ export class UmbPropertyTypeBasedPropertyElement extends UmbLitElement {
 	 * @default undefined
 	 */
 	@property({ type: Object, attribute: false })
-	private _variantId?: UmbVariantId;
+	private variantId?: UmbVariantId;
 
 	private _workspaceContext?: UmbDocumentWorkspaceContext;
 
@@ -71,7 +71,7 @@ export class UmbPropertyTypeBasedPropertyElement extends UmbLitElement {
 		if (!this._workspaceContext || !this.property || !this._property?.alias) return;
 
 		this.observe(
-			this._workspaceContext.propertyValueByAlias(this._property.alias, this._variantId),
+			this._workspaceContext.propertyValueByAlias(this._property.alias, this.variantId),
 			(value) => {
 				this._value = value;
 			},
@@ -102,7 +102,7 @@ export class UmbPropertyTypeBasedPropertyElement extends UmbLitElement {
 			description=${ifDefined(this._property?.description || undefined)}
 			property-editor-ui-alias=${ifDefined(this._propertyEditorUiAlias)}
 			.value=${this._value}
-			.variantId=${this._variantId}
+			.variantId=${this.variantId}
 			.config=${this._dataTypeData}></umb-workspace-property>`;
 	}
 }

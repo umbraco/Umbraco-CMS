@@ -5,6 +5,7 @@ import { UmbVariantId } from '../../variants/variant-id.class';
 import type { PropertyTypeViewModelBaseModel } from '@umbraco-cms/backend-api';
 import '../workspace-property/workspace-property.element';
 import { UmbLitElement } from '@umbraco-cms/element';
+// eslint-disable-next-line import/order
 import { UmbWorkspaceVariantContext } from '../workspace/workspace-variant/workspace-variant.context';
 
 @customElement('umb-variantable-property')
@@ -45,6 +46,7 @@ export class UmbVariantablePropertyElement extends UmbLitElement {
 	}
 
 	private _observeVariantContext() {
+		console.log('_observeVariantContext');
 		if (!this._variantContext || !this.property) return;
 		this.observe(this._variantContext.variantId, (variantId) => {
 			this._workspaceVariantId = variantId;
@@ -53,6 +55,7 @@ export class UmbVariantablePropertyElement extends UmbLitElement {
 	}
 
 	private _updatePropertyVariantId() {
+		console.log('_updatePropertyVariantId');
 		if (this._workspaceVariantId && this.property) {
 			const newVariantId = new UmbVariantId(
 				this.property.variesByCulture ? this._workspaceVariantId.culture : null,

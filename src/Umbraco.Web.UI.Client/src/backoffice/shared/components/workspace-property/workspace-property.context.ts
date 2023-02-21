@@ -67,6 +67,9 @@ export class UmbWorkspacePropertyContext<ValueType = unknown> {
 	public setVariantId(variantId: UmbVariantId | undefined) {
 		this._variantId = variantId;
 	}
+	public getVariantId() {
+		return this._variantId;
+	}
 
 	public resetValue() {
 		this.setValue(null); // TODO: We should get the default value from Property Editor maybe even later the DocumentType, as that would hold the default value for the property.

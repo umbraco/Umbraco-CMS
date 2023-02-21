@@ -112,7 +112,7 @@ export class UmbVariantSelectorElement extends UmbLitElement {
 
 	private updateVariantDisplayName() {
 		if (!this._culture && !this._segment) return;
-		this._variantDisplayName = this._culture + (this._segment ? ' - ' + this._segment : '');
+		this._variantDisplayName = this._culture + (this._segment ? ' — ' + this._segment : '');
 	}
 
 	// TODO. find a way where we don't have to do this for all workspaces.

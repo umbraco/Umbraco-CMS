@@ -12,4 +12,8 @@ export class UmbVariantId {
 	public equal(variantId: UmbVariantId): boolean {
 		return this.culture === variantId.culture && this.segment === variantId.segment;
 	}
+
+	public toString(): string {
+		return (this.culture || 'invariant') + (this.segment ? `_${this.segment}` : '');
+	}
 }

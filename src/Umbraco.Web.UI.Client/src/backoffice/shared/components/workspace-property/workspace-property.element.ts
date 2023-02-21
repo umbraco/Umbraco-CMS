@@ -227,6 +227,7 @@ export class UmbWorkspacePropertyElement extends UmbLitElement {
 				label="${ifDefined(this._label)}"
 				description="${ifDefined(this._description)}">
 				${this._renderPropertyActionMenu()}
+				<p slot="description">${this._propertyContext.getVariantId()?.toString()}</p>
 				<div slot="editor">${this._element}</div>
 			</umb-workspace-property-layout>
 		`;

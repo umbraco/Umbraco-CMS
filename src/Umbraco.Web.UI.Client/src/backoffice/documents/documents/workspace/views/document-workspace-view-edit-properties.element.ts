@@ -112,10 +112,7 @@ export class UmbDocumentWorkspaceViewEditPropertiesElement extends UmbLitElement
 		return repeat(
 			this._propertyStructure,
 			(property) => property.alias,
-			(property) =>
-				html`<umb-property-type-based-property
-					class="property"
-					.property=${property}></umb-property-type-based-property> `
+			(property) => html`<umb-variantable-property class="property" .property=${property}></umb-variantable-property> `
 		);
 	}
 }

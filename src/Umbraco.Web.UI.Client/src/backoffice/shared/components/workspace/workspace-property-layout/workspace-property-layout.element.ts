@@ -85,11 +85,13 @@ export class UmbWorkspacePropertyLayoutElement extends LitElement {
 	public description = '';
 
 	render() {
+		// TODO: Only show alias on label if user has access to DocumentType within settings:
 		return html`
 			<div id="header">
-				<uui-label>${this.label}</uui-label>
+				<uui-label title=${this.alias}>${this.label}</uui-label>
 				<slot name="property-action-menu"></slot>
 				<p>${this.description}</p>
+				<slot name="description"></slot>
 			</div>
 			<div>
 				<uui-form-validation-message>
