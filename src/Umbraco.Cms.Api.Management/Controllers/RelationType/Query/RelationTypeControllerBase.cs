@@ -26,5 +26,9 @@ public class RelationTypeControllerBase : ManagementApiControllerBase
                 .WithTitle("Key already exists")
                 .WithDetail("An entity with the given key already exists")
                 .Build()),
+            RelationTypeOperationStatus.NotFound => BadRequest(new ProblemDetailsBuilder()
+                .WithTitle("Relation type not found")
+                .WithDetail("A relation type with the given key does not exist")
+                .Build()),
         };
 }

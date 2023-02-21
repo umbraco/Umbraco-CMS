@@ -3,6 +3,7 @@
 public enum RelationTypeOperationStatus
 {
     Success,
+    NotFound,
     KeyAlreadyExists,
     CancelledByNotification,
     InvalidId

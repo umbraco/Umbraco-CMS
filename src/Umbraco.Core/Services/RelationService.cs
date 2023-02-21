@@ -546,6 +546,13 @@ public class RelationService : RepositoryService, IRelationService
             $"Created relation type: {relationType.Name}");
     }
 
+    public async Task<Attempt<IRelationType, RelationTypeOperationStatus>> UpdateAsync(IRelationType relationType, int userId) =>
+        await SaveAsync(
+            relationType,
+            () => _relationTypeRepository.Get(relationType.Key) is null ? RelationTypeOperationStatus.NotFound : RelationTypeOperationStatus.Success,
+            AuditType.Save,
+            $"Created relation type: {relationType.Name}");
+
     private async Task<Attempt<IRelationType, RelationTypeOperationStatus>> SaveAsync(IRelationType relationType, Func<RelationTypeOperationStatus> operationValidation, AuditType auditType, string auditMessage)
     {
         using (ICoreScope scope = ScopeProvider.CreateCoreScope())

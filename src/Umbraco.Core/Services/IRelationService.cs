@@ -346,7 +346,21 @@ public interface IRelationService : IService
     /// <param name="relationType">RelationType to Save</param>
     void Save(IRelationType relationType);
 
+    /// <summary>
+    ///     Saves a <see cref="IRelationType" />
+    /// </summary>
+    /// <param name="relationType">RelationType to Save</param>
+    /// <param name="userId">Id of the user thats saving the relation type</param>
+    /// <returns>A <see cref="Attempt"/> with a status of whether the operations was a success or failure</returns>
     Task<Attempt<IRelationType, RelationTypeOperationStatus>> CreateAsync(IRelationType relationType, int userId);
+
+    /// <summary>
+    ///     Saves a <see cref="IRelationType" />
+    /// </summary>
+    /// <param name="relationType">RelationType to Save</param>
+    /// <param name="userId">Id of the user thats saving the relation type</param>
+    /// <returns>A <see cref="Attempt"/> with a status of whether the operations was a success or failure</returns>
+    Task<Attempt<IRelationType, RelationTypeOperationStatus>> UpdateAsync(IRelationType relationType, int userId);
 
     /// <summary>
     ///     Deletes a <see cref="IRelation" />
