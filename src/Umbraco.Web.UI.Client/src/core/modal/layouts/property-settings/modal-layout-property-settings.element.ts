@@ -216,13 +216,13 @@ export class UmbModalLayoutPropertySettingsElement extends UmbModalLayoutElement
 		//TODO: Generate alias
 		this._name = event.target.value.toString();
 		if (this._aliasLocked) {
-			this.#generateAlias();
+			this._alias = this.#generateAlias(this._name);
 		}
 	}
 
-	#generateAlias() {
+	#generateAlias(text: string) {
 		//replace all spaces characters with a dash and remove all non-alphanumeric characters, except underscore. Allow a maximum of 1 dashes or underscores in a row.
-		this._alias = this._name
+		return text
 			.replace(/\s+/g, '-')
 			.replace(/[^a-zA-Z0-9_-]+/g, '')
 			.replace(/[-_]{2,}/g, (match) => match[0])
@@ -230,8 +230,9 @@ export class UmbModalLayoutPropertySettingsElement extends UmbModalLayoutElement
 	}
 
 	#onAliasChange(event: UUIInputEvent) {
+		const alias = this.#generateAlias(event.target.value.toString());
 		if (!this._aliasLocked) {
-			this._alias = event.target.value.toString();
+			this._alias = alias;
 		} else {
 			event.target.value = this._alias;
 		}
@@ -265,7 +266,7 @@ export class UmbModalLayoutPropertySettingsElement extends UmbModalLayoutElement
 		this._aliasLocked = !this._aliasLocked;
 
 		if (this._aliasLocked) {
-			this.#generateAlias();
+			this._alias = this.#generateAlias(this._name);
 		}
 	}
 
