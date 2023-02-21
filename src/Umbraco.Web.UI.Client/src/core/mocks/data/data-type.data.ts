@@ -1,6 +1,6 @@
 import { UmbEntityData } from './entity.data';
 import { createFolderTreeItem } from './utils';
-import type { FolderTreeItemModel, DataTypeModel, EntityTreeItemModel } from '@umbraco-cms/backend-api';
+import type { FolderTreeItemModel, DataTypeModel } from '@umbraco-cms/backend-api';
 
 // TODO: investigate why we don't get an entity type as part of the DataTypeModel
 export const data: Array<DataTypeModel & { type: 'data-type' }> = [
