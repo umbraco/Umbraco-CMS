@@ -48,7 +48,6 @@ export class UmbVariantablePropertyElement extends UmbLitElement {
 	private _observeVariantContext() {
 		if (!this._variantContext || !this.property) return;
 		this.observe(this._variantContext.variantId, (variantId) => {
-			console.log('property got variantId: ', variantId);
 			this._workspaceVariantId = variantId;
 			this._updatePropertyVariantId();
 		});

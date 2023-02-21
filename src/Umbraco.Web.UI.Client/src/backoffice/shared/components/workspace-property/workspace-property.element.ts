@@ -102,6 +102,7 @@ export class UmbWorkspacePropertyElement extends UmbLitElement {
 	 */
 	@property({ attribute: false })
 	public set value(value: unknown) {
+		console.log('workspace-property.element.ts: set value', value);
 		this._propertyContext.setValue(value);
 	}
 
@@ -136,6 +137,9 @@ export class UmbWorkspacePropertyElement extends UmbLitElement {
 	// TODO: make interface for UMBPropertyEditorElement
 	@state()
 	private _element?: { value?: any; config?: any } & HTMLElement; // TODO: invent interface for propertyEditorUI.
+
+	@state()
+	private _value?: unknown;
 
 	@state()
 	private _alias?: string;
@@ -205,6 +209,8 @@ export class UmbWorkspacePropertyElement extends UmbLitElement {
 					this._element.addEventListener('property-value-change', this._onPropertyEditorChange as any as EventListener);
 
 					this._valueObserver = this.observe(this._propertyContext.value, (value) => {
+						console.log('workspace property this._valueObserver', value);
+						this._value = value;
 						if (this._element) {
 							this._element.value = value;
 						}
@@ -243,7 +249,7 @@ export class UmbWorkspacePropertyElement extends UmbLitElement {
 					slot="property-action-menu"
 					id="property-action-menu"
 					.propertyEditorUiAlias="${this._propertyEditorUiAlias}"
-					.value="${this.value}"></umb-property-action-menu>`
+					.value="${this._value}"></umb-property-action-menu>`
 			: ''}`;
 	}
 }

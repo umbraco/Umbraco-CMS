@@ -267,6 +267,18 @@ export const data: Array<DocumentModel> = [
 				value: 'which is under another group in the tab',
 			},
 			{
+				culture: 'da-dk',
+				segment: null,
+				alias: 'blogTextStringUnderMasterTab',
+				value: 'på master dokument tab B',
+			},
+			{
+				culture: 'da-dk',
+				segment: null,
+				alias: 'blogTextStringUnderGroupUnderMasterTab',
+				value: 'denne er under en anden gruppe i tab B',
+			},
+			{
 				culture: null,
 				segment: null,
 				alias: 'localBlogTabString',
@@ -329,6 +341,18 @@ export const data: Array<DocumentModel> = [
 				segment: null,
 				alias: 'blogTextStringUnderGroupUnderMasterTab',
 				value: 'which is under another group in the tab B',
+			},
+			{
+				culture: 'da-dk',
+				segment: null,
+				alias: 'blogTextStringUnderMasterTab',
+				value: 'på master dokument tab B',
+			},
+			{
+				culture: 'da-dk',
+				segment: null,
+				alias: 'blogTextStringUnderGroupUnderMasterTab',
+				value: 'denne er under en anden gruppe i tab B',
 			},
 			{
 				culture: null,

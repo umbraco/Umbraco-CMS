@@ -157,30 +157,41 @@ export class UmbDocumentWorkspaceContext
 		return this.#activeVariantsInfo.getObservablePart((data) => data[index] || undefined);
 	}
 
-	getName(variantId = new UmbVariantId()) {
+	getName(variantId?: UmbVariantId) {
 		const variants = this.#draft.getValue()?.variants;
 		if (!variants) return;
-		return variants.find((x) => variantId.compare(x))?.name;
+		if (variantId) {
+			return variants.find((x) => variantId.compare(x))?.name;
+		} else {
+			return variants[0]?.name;
+		}
 	}
 
-	setName(name: string, variantId = new UmbVariantId()) {
+	setName(name: string, variantId?: UmbVariantId) {
 		const oldVariants = this.#draft.getValue()?.variants || [];
-		const variants = partialUpdateFrozenArray(oldVariants, { name }, (x) => variantId.compare(x));
+		const variants = partialUpdateFrozenArray(
+			oldVariants,
+			{ name },
+			variantId ? (x) => variantId.compare(x) : () => true
+		);
 		this.#draft.update({ variants });
 	}
 
-	propertyValuesOf(variantId = new UmbVariantId()) {
-		return this.#draft.getObservablePart((data) => data?.values?.filter((x) => variantId.compare(x)));
-	}
-
-	propertyDataByAlias(propertyAlias: string, variantId = new UmbVariantId()) {
+	propertyValuesOf(variantId?: UmbVariantId) {
 		return this.#draft.getObservablePart((data) =>
-			data?.values?.find((x) => x?.alias === propertyAlias && variantId.compare(x))
+			variantId ? data?.values?.filter((x) => variantId.compare(x)) : data?.values
 		);
 	}
-	propertyValueByAlias(propertyAlias: string, variantId = new UmbVariantId()) {
+
+	propertyDataByAlias(propertyAlias: string, variantId?: UmbVariantId) {
+		return this.#draft.getObservablePart((data) =>
+			data?.values?.find((x) => x?.alias === propertyAlias && (variantId ? variantId.compare(x) : true))
+		);
+	}
+	propertyValueByAlias(propertyAlias: string, variantId?: UmbVariantId) {
 		return this.#draft.getObservablePart(
-			(data) => data?.values?.find((x) => x?.alias === propertyAlias && variantId.compare(x))?.value
+			(data) =>
+				data?.values?.find((x) => x?.alias === propertyAlias && (variantId ? variantId.compare(x) : true))?.value
 		);
 	}
 
