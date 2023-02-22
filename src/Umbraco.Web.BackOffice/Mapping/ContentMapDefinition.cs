@@ -298,6 +298,7 @@ internal class ContentMapDefinition : IMapDefinition
         target.Updater = _commonMapper.GetCreator(source, context);
         target.Urls = GetUrls(source);
         target.Variants = _contentVariantMapper.Map<TVariant>(source, context);
+
         target.ContentDto = new ContentPropertyCollectionDto
         {
             Properties = context.MapEnumerable<IProperty, ContentPropertyDto>(source.Properties).WhereNotNull()
