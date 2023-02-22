@@ -8,7 +8,7 @@ import { UmbNotificationService, UMB_NOTIFICATION_SERVICE_CONTEXT_TOKEN } from '
 /* We need to create a new instance of the repository from within the element context. We want the notifications to be displayed in the right context. */
 // element -> context -> repository -> (store) -> data source
 // All methods should be async and return a promise. Some methods might return an observable as part of the promise response.
-export class UmbLogSearchRepository {
+export class UmbLogViewerRepository {
 	#host: UmbControllerHostInterface;
 	#searchDataSource: UmbLogSearchesServerDataSource;
 	#messagesDataSource: UmbLogMessagesServerDataSource;
@@ -51,6 +51,12 @@ export class UmbLogSearchRepository {
 		await this.#init();
 
 		return this.#searchDataSource.getAllSavedSearches({ skip, take });
+	}
+
+	async getMessageTemplates({ skip, take }: { skip: number; take: number }) {
+		await this.#init();
+
+		return this.#messagesDataSource.getLogViewerMessageTemplate({ skip, take });
 	}
 
 	async getLogCount({ startDate, endDate }: { startDate?: string; endDate?: string }) {

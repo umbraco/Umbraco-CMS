@@ -6,6 +6,8 @@ import { UmbDonutSliceElement } from './donut-slice';
 export interface Circle {
 	percent: number;
 	color: string;
+	name: string;
+	tooltipText: string;
 }
 
 interface CircleWithCommands extends Circle {
@@ -18,15 +20,18 @@ export class UmbDonutChartElement extends LitElement {
 	static styles = [
 		UUITextStyles,
 		css`
-			.slice {
-				stroke-linecap: round;
-				stroke-width: 2;
-				fill: none;
-				cursor: pointer;
+			path {
+				filter: url(#erode);
 			}
 
-			.do-shit-on-hover:hover {
-				fill: pink;
+			.highlight {
+				transition: opacity 200ms linear;
+				filter: url(#filter);
+				opacity: 0;
+			}
+
+			.highlight:hover {
+				opacity: 0.5;
 			}
 		`,
 	];
@@ -44,7 +49,7 @@ export class UmbDonutChartElement extends LitElement {
 	circles: CircleWithCommands[] = [];
 
 	@state()
-	radius = 50;
+	radius = 45;
 
 	@state()
 	viewBox = 100;
@@ -54,12 +59,15 @@ export class UmbDonutChartElement extends LitElement {
 
 	@state() svgSize = 100;
 
-	#printCircles() {
+	#printCircles(event: Event) {
+		event.stopPropagation();
 		this.circles = this.#addCommands(
 			this.slices.map((slice) => {
 				return {
 					percent: slice.percent,
 					color: slice.color,
+					name: slice.name,
+					tooltipText: slice.tooltipText,
 				};
 			})
 		);
@@ -104,16 +112,45 @@ export class UmbDonutChartElement extends LitElement {
 	}
 
 	#renderCircles() {
+		const highlightFactor = 4;
+
 		return svg`
-        	<svg viewBox="0 0 ${this.viewBox} ${this.viewBox}">
+        	<svg viewBox="0 0 ${this.viewBox} ${this.viewBox}" role="list">
+			<filter id="erode" x="-20%" y="-20%" width="140%" height="140%" filterUnits="objectBoundingBox" primitiveUnits="userSpaceOnUse" color-interpolation-filters="linearRGB">
+	<feMorphology operator="erode" radius="0.5 0.5" x="0%" y="0%" width="100%" height="100%" in="SourceGraphic" result="morphology"/>
+</filter>
+<filter id="filter" x="-20%" y="-20%" width="140%" height="140%" filterUnits="objectBoundingBox" primitiveUnits="userSpaceOnUse" color-interpolation-filters="linearRGB">
+	<feColorMatrix type="matrix" values="1.8 0 0 0 0
+0 1.8 0 0 0
+0 0 1.8 0 0
+0 0 0 500 -20" x="0%" y="0%" width="100%" height="100%" in="merge1" result="colormatrix2"/>
+	<feMorphology operator="erode" radius="0.5 0.5" x="0%" y="0%" width="100%" height="100%" in="colormatrix2" result="morphology2"/>
+	<feFlood flood-color="#ffffff" flood-opacity="0.3" x="0%" y="0%" width="100%" height="100%" result="flood3"/>
+	<feComposite in="flood3" in2="SourceAlpha" operator="in" x="0%" y="0%" width="100%" height="100%" result="composite3"/>
+	<feMorphology operator="erode" radius="1 1" x="0%" y="0%" width="100%" height="100%" in="composite3" result="morphology1"/>
+	<feMerge x="0%" y="0%" width="100%" height="100%" result="merge1">
+    		<feMergeNode in="morphology2"/>
+		<feMergeNode in="morphology1"/>
+  	</feMerge>
+	  <feDropShadow stdDeviation="1 1" in="merge1" dx="0" dy="0" flood-color="#000" flood-opacity="0.8" x="0%" y="0%" width="100%" height="100%" result="dropShadow1"/>
+</filter>
+				<desc>In chosen date range you have this number of log message of type: </desc>
 				${this.circles.map(
 					(circle) => svg`
 						<path 
-							class="do-shit-on-hover" 
 							fill="${circle.color}" 
+							role="listitem"
 							d="${circle.commands}" 
 							transform="rotate(${circle.offset} ${this.viewBox / 2} ${this.viewBox / 2})">
-							<title>${circle.color}</title>
+							<title>${circle.tooltipText}</title>
+						</path>
+						<path 
+							class="highlight" 
+							fill="${circle.color}" 
+							role="listitem"
+							d="${circle.commands}" 
+							transform="rotate(${circle.offset} ${this.viewBox / 2} ${this.viewBox / 2})">
+							<title>${circle.tooltipText}</title>
 						</path>`
 				)}
 		</svg>
@@ -122,7 +159,7 @@ export class UmbDonutChartElement extends LitElement {
 
 	render() {
 		return html` <div style="width: 200px">${this.#renderCircles()}</div>
-			<slot @slotchange=${this.#printCircles}></slot>`;
+			<slot @slotchange=${this.#printCircles} @slice-update=${this.#printCircles}></slot>`;
 	}
 }
 

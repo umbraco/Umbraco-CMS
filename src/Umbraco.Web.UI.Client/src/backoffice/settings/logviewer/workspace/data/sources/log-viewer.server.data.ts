@@ -4,7 +4,7 @@ import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 import { tryExecuteAndNotify } from '@umbraco-cms/resources';
 
 /**
- * A data source for the Template detail that fetches data from the server
+ * A data source for the log saved searches
  * @export
  * @class UmbLogSearchesServerDataSource
  * @implements {TemplateDetailDataSource}
@@ -63,7 +63,13 @@ export class UmbLogSearchesServerDataSource implements LogSearchDataSource {
 		return await tryExecuteAndNotify(this.#host, LogViewerResource.deleteLogViewerSavedSearchByName({ name }));
 	}
 }
-
+/**
+ * A data source for the log messages and levels 
+ *
+ * @export
+ * @class UmbLogMessagesServerDataSource
+ * @implements {LogMessagesDataSource}
+ */
 export class UmbLogMessagesServerDataSource implements LogMessagesDataSource {
 	#host: UmbControllerHostInterface;
 

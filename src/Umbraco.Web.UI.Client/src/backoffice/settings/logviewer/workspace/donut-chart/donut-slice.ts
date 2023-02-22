@@ -10,11 +10,20 @@ export class UmbDonutSliceElement extends LitElement {
 	percent = 0;
 
 	@property()
+	tooltipText = '';
+
+	@property()
 	color = 'red';
 
 	@property()
 	name = '';
+
+	willUpdate() {
+		this.dispatchEvent(new CustomEvent('slice-update', { composed: true, bubbles: true }));
+	}
 }
+
+
 
 declare global {
 	interface HTMLElementTagNameMap {

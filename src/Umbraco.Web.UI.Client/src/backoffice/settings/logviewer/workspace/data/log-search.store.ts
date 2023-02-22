@@ -1,8 +1,8 @@
 import { UmbContextToken } from '@umbraco-cms/context-api';
 import { ArrayState } from '@umbraco-cms/observable-api';
 import { UmbStoreBase } from '@umbraco-cms/store';
-import { SavedLogSearch } from '@umbraco-cms/backend-api';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
+import { SavedLogSearchModel } from '@umbraco-cms/backend-api';
 
 /**
  * @export
@@ -11,7 +11,7 @@ import { UmbControllerHostInterface } from '@umbraco-cms/controller';
  * @description - Data Store for log searches
  */
 export class UmbLogSearchesStore extends UmbStoreBase {
-	#data = new ArrayState<SavedLogSearch>([], (x) => x.name);
+	#data = new ArrayState<SavedLogSearchModel>([], (x) => x.name);
 
 	/**
 	 * Creates an instance of UmbLogSearchesStore.
@@ -27,7 +27,7 @@ export class UmbLogSearchesStore extends UmbStoreBase {
 	 * @param {SavedLogSearch} search
 	 * @memberof UmbLogSearchesStore
 	 */
-	append(search: SavedLogSearch) {
+	append(search: SavedLogSearchModel) {
 		this.#data.append([search]);
 	}
 
