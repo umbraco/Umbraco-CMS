@@ -71,7 +71,7 @@ public class RelationServiceTests : UmbracoIntegrationTest
     [TestCase("E7524E34-F84F-43DE-92E2-25999785B7EA", Constants.ObjectTypes.Strings.DataType, RelationTypeOperationStatus.InvalidParentObjectType)]
     [TestCase("00000000-0000-0000-0000-000000000000", Constants.ObjectTypes.Strings.Document, RelationTypeOperationStatus.InvalidParentObjectType)]
     [TestCase(Constants.ObjectTypes.Strings.IdReservation, Constants.ObjectTypes.Strings.Document, RelationTypeOperationStatus.InvalidParentObjectType)]
-    public async Task Cannot_Create_Relation_Types_With_Disallowed_Object_Types(string childObjectTypeGuid, string parentObjectTypeGuid, RelationTypeOperationStatus relationTypeOperationStatus)
+    public async Task Cannot_Create_Relation_Types_With_Disallowed_Object_Types(string parentObjectTypeGuid, string childObjectTypeGuid, RelationTypeOperationStatus relationTypeOperationStatus)
     {
         IRelationTypeWithIsDependency relationType = new RelationTypeBuilder()
             .WithChildObjectType(new Guid(childObjectTypeGuid))
