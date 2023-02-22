@@ -2,7 +2,7 @@ import { css, html } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import type { UUIButtonState } from '@umbraco-ui/uui';
-import { UmbExecutedEvent } from '../../../../../core/events';
+import { UmbExecutedEvent } from '@umbraco-cms/events';
 import { UmbLitElement } from '@umbraco-cms/element';
 import type { ManifestWorkspaceAction } from '@umbraco-cms/models';
 

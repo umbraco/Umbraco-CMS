@@ -2,11 +2,11 @@ import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, html, nothing } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { map } from 'rxjs';
-import { UmbExecutedEvent } from '../../../core/events';
 import { UmbCollectionContext, UMB_COLLECTION_CONTEXT_TOKEN } from './collection.context';
 import type { ManifestEntityBulkAction, MediaDetails } from '@umbraco-cms/models';
 import { UmbLitElement } from '@umbraco-cms/element';
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-api';
+import { UmbExecutedEvent } from '@umbraco-cms/events';
 
 import '../entity-bulk-actions/entity-bulk-action.element';
 

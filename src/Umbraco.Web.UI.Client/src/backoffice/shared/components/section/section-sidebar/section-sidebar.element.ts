@@ -22,11 +22,6 @@ export class UmbSectionSidebarElement extends UmbLitElement {
 				flex-direction: column;
 				z-index: 10;
 			}
-
-			#scroll-container {
-				height: 100%;
-				overflow-y: auto;
-			}
 		`,
 	];
 
@@ -40,7 +35,7 @@ export class UmbSectionSidebarElement extends UmbLitElement {
 	render() {
 		return html`
 			<umb-section-sidebar-context-menu>
-				<uui-scroll-container id="scroll-container">
+				<uui-scroll-container>
 					<slot></slot>
 				</uui-scroll-container>
 			</umb-section-sidebar-context-menu>

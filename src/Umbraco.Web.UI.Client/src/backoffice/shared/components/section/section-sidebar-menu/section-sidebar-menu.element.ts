@@ -1,43 +1,32 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
-import { html } from 'lit';
-import { customElement, state } from 'lit/decorators.js';
-import { UmbSectionContext, UMB_SECTION_CONTEXT_TOKEN } from '../section.context';
-import { ManifestSidebarMenuItem } from '@umbraco-cms/extensions-registry';
+import { css, html } from 'lit';
+import { customElement, property } from 'lit/decorators.js';
+import { ManifestSidebarMenu, ManifestSidebarMenuItem } from '@umbraco-cms/extensions-registry';
 import { UmbLitElement } from '@umbraco-cms/element';
 
 import './sidebar-menu-item.element.ts';
 
 @customElement('umb-section-sidebar-menu')
 export class UmbSectionSidebarMenuElement extends UmbLitElement {
-	static styles = [UUITextStyles];
+	static styles = [
+		UUITextStyles,
+		css`
+			h3 {
+				padding: var(--uui-size-4) var(--uui-size-8);
+			}
+		`,
+	];
 
-	@state()
-	private _currentSectionAlias?: string;
-
-	private _sectionContext?: UmbSectionContext;
-
-	constructor() {
-		super();
-
-		this.consumeContext(UMB_SECTION_CONTEXT_TOKEN, (instance) => {
-			this._sectionContext = instance;
-			this._observeCurrentSection();
-		});
-	}
-
-	private _observeCurrentSection() {
-		if (!this._sectionContext) return;
-
-		this.observe(this._sectionContext.alias, (alias) => {
-			this._currentSectionAlias = alias;
-		});
-	}
+	@property()
+	manifest?: ManifestSidebarMenu;
 
 	render() {
-		return html` <umb-extension-slot
-			type="sidebarMenuItem"
-			.filter=${(items: ManifestSidebarMenuItem) => items.meta.sections.includes(this._currentSectionAlias || '')}
-			default-element="umb-sidebar-menu-item"></umb-extension-slot>`;
+		// TODO: link to dashboards when clicking on the menu item header
+		return html` <h3>${this.manifest?.meta.label}</h3>
+			<umb-extension-slot
+				type="sidebarMenuItem"
+				.filter=${(items: ManifestSidebarMenuItem) => items.meta.sidebarMenus.includes(this.manifest!.alias)}
+				default-element="umb-sidebar-menu-item"></umb-extension-slot>`;
 	}
 }
 
