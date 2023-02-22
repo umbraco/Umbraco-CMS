@@ -3487,6 +3487,46 @@
         }
       }
     },
+    "/umbraco/management/api/v1/object-types": {
+      "get": {
+        "tags": [
+          "Object Types"
+        ],
+        "operationId": "GetObjectTypes",
+        "parameters": [
+          {
+            "name": "skip",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 0
+            }
+          },
+          {
+            "name": "take",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 100
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedObjectTypeResponseModel"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/umbraco/management/api/v1/tree/partial-view/children": {
       "get": {
         "tags": [
@@ -3888,6 +3928,188 @@
         }
       }
     },
+    "/umbraco/management/api/v1/relation-type": {
+      "post": {
+        "tags": [
+          "Relation Type"
+        ],
+        "operationId": "PostRelationType",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/CreateRelationTypeRequestModel"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "headers": {
+              "Location": {
+                "description": "Location of the newly created resource",
+                "schema": {
+                  "type": "string",
+                  "description": "Location of the newly created resource",
+                  "format": "uri"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetailsModel"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/umbraco/management/api/v1/relation-type/{key}": {
+      "get": {
+        "tags": [
+          "Relation Type"
+        ],
+        "operationId": "GetRelationTypeByKey",
+        "parameters": [
+          {
+            "name": "key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/RelationTypeResponseModel"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Relation Type"
+        ],
+        "operationId": "DeleteRelationTypeByKey",
+        "parameters": [
+          {
+            "name": "key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetailsModel"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Relation Type"
+        ],
+        "operationId": "PutRelationTypeByKey",
+        "parameters": [
+          {
+            "name": "key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/UpdateRelationTypeRequestModel"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/RelationTypeResponseModel"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetailsModel"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetailsModel"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/umbraco/management/api/v1/tree/relation-type/item": {
       "get": {
         "tags": [
@@ -4047,6 +4269,55 @@
             "schema": {
               "type": "string",
               "default": ""
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedRelationModel"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/umbraco/management/api/v1/relation/type/{key}": {
+      "get": {
+        "tags": [
+          "Relation"
+        ],
+        "operationId": "GetRelationTypeByKey",
+        "parameters": [
+          {
+            "name": "key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "skip",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 0
+            }
+          },
+          {
+            "name": "take",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 100
             }
           }
         ],
@@ -5225,7 +5496,8 @@
             "name": "filterMustBeIsDependency",
             "in": "query",
             "schema": {
-              "type": "boolean"
+              "type": "boolean",
+              "default": true
             }
           }
         ],
@@ -5789,6 +6061,36 @@
                 }
               ]
             }
+          }
+        },
+        "additionalProperties": false
+      },
+      "CreateRelationTypeRequestModel": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "key": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          },
+          "isBidirectional": {
+            "type": "boolean"
+          },
+          "parentObjectType": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          },
+          "childObjectType": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          },
+          "isDependency": {
+            "type": "boolean"
           }
         },
         "additionalProperties": false
@@ -7032,6 +7334,20 @@
         "type": "integer",
         "format": "int32"
       },
+      "ObjectTypeResponseModel": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "nullable": true
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        "additionalProperties": false
+      },
       "OkResultModel": {
         "type": "object",
         "properties": {
@@ -7475,6 +7791,30 @@
               "oneOf": [
                 {
                   "$ref": "#/components/schemas/LoggerModel"
+                }
+              ]
+            }
+          }
+        },
+        "additionalProperties": false
+      },
+      "PagedObjectTypeResponseModel": {
+        "required": [
+          "items",
+          "total"
+        ],
+        "type": "object",
+        "properties": {
+          "total": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/ObjectTypeResponseModel"
                 }
               ]
             }
@@ -8003,6 +8343,54 @@
         },
         "additionalProperties": false
       },
+      "RelationTypeResponseModel": {
+        "type": "object",
+        "properties": {
+          "key": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string",
+            "nullable": true
+          },
+          "alias": {
+            "type": "string",
+            "nullable": true
+          },
+          "path": {
+            "type": "string"
+          },
+          "isSystemRelationType": {
+            "type": "boolean"
+          },
+          "isBidirectional": {
+            "type": "boolean"
+          },
+          "parentObjectType": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          },
+          "parentObjectTypeName": {
+            "type": "string",
+            "nullable": true
+          },
+          "childObjectType": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          },
+          "childObjectTypeName": {
+            "type": "string",
+            "nullable": true
+          },
+          "isDependency": {
+            "type": "boolean"
+          }
+        },
+        "additionalProperties": false
+      },
       "RuntimeLevelModel": {
         "enum": [
           "Unknown",
@@ -8357,6 +8745,31 @@
             "type": "string"
           },
           "hasChildren": {
+            "type": "boolean"
+          }
+        },
+        "additionalProperties": false
+      },
+      "UpdateRelationTypeRequestModel": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "isBidirectional": {
+            "type": "boolean"
+          },
+          "parentObjectType": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          },
+          "childObjectType": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          },
+          "isDependency": {
             "type": "boolean"
           }
         },
