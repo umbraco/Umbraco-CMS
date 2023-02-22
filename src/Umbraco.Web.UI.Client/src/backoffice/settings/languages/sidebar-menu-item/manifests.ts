@@ -8,8 +8,8 @@ const sidebarMenuItem: ManifestSidebarMenuItem = {
 	meta: {
 		label: 'Languages',
 		icon: 'umb:globe',
-		sections: ['Umb.Section.Settings'],
 		entityType: 'language-root',
+		sidebarMenus: ['Umb.SidebarMenu.Settings'],
 	},
 };
 

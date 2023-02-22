@@ -1,3 +1,4 @@
+import { manifests as menuManifests } from './manifests';
 import { manifests as templateManifests } from './templates/manifests';
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-api';
 import { ManifestTypes } from '@umbraco-cms/extensions-registry';
@@ -9,4 +10,4 @@ const registerExtensions = (manifests: Array<ManifestTypes>) => {
 	});
 };
 
-registerExtensions([...templateManifests]);
+registerExtensions([...menuManifests, ...templateManifests]);

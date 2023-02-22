@@ -9,7 +9,7 @@ const sidebarMenuItem: ManifestSidebarMenuItem = {
 	meta: {
 		label: 'Member Groups',
 		icon: 'umb:folder',
-		sections: ['Umb.Section.Members'],
+		sidebarMenus: ['Umb.SidebarMenu.Members'],
 	},
 };
 
