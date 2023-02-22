@@ -101,7 +101,7 @@ public interface IUserRepository : IReadWriteQueryRepository<int, IUser>
     /// </remarks>
     /// <param name="email">The email to find the user by.</param>
     /// <returns>An uncached <see cref="IUser"/> instance.</returns>
-    IUser? GetForUpgradeByEmail(string email) => throw new NotImplementedException();
+    IUser? GetForUpgradeByEmail(string email) => GetMany().FirstOrDefault(x=>x.Email == email);
 
     /// <summary>
     /// Gets a user for upgrade purposes, this will only return a result if the current runtime state is upgrade.
