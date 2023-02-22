@@ -3,6 +3,7 @@ using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Media;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Services;
 
@@ -14,13 +15,15 @@ public class AuditLogViewModelFactory : IAuditLogViewModelFactory
     private readonly AppCaches _appCaches;
     private readonly MediaFileManager _mediaFileManager;
     private readonly IImageUrlGenerator _imageUrlGenerator;
+    private readonly IEntityService _entityService;
 
-    public AuditLogViewModelFactory(IUserService userService, AppCaches appCaches, MediaFileManager mediaFileManager, IImageUrlGenerator imageUrlGenerator)
+    public AuditLogViewModelFactory(IUserService userService, AppCaches appCaches, MediaFileManager mediaFileManager, IImageUrlGenerator imageUrlGenerator, IEntityService entityService)
     {
         _userService = userService;
         _appCaches = appCaches;
         _mediaFileManager = mediaFileManager;
         _imageUrlGenerator = imageUrlGenerator;
+        _entityService = entityService;
     }
 
     public IEnumerable<AuditlogViewModel> CreateAuditLogViewModel(IEnumerable<IAuditItem> auditItems) => auditItems.Select(CreateAuditLogViewModel);
@@ -52,10 +55,12 @@ public class AuditLogViewModelFactory : IAuditLogViewModelFactory
 
     private AuditlogViewModel CreateAuditLogViewModel(IAuditItem auditItem)
     {
+        IEntitySlim? entitySlim = _entityService.Get(auditItem.Id);
         var target = new AuditlogViewModel
             {
                 Comment = auditItem.Comment,
                 EntityType = auditItem.EntityType,
+                EntityKey = entitySlim?.Key,
                 LogType = auditItem.AuditType,
                 Parameters = auditItem.Parameters,
                 Timestamp = auditItem.CreateDate,

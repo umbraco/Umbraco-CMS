@@ -39,6 +39,7 @@ stages:
   ## Build
   ###############################################
   - stage: Build
+
     variables:
       npm_config_cache: $(Pipeline.Workspace)/.npm_client
     jobs:
@@ -47,6 +48,8 @@ stages:
         pool:
           vmImage: 'ubuntu-latest'
         steps:
+          - checkout: self
+            submodules: true
           - task: NodeTool@0
             displayName: Use Node.js $(nodeVersion)
             inputs:
@@ -110,7 +113,7 @@ stages:
                   }
                 }
 
-                foreach($csproj in Get-ChildItem –Path "src/" -Recurse -Filter *.csproj)
+                foreach($csproj in Get-ChildItem -Recurse -Filter *.csproj)
                 {
                   dotnet pack $csproj --configuration $(buildConfiguration) --no-build --output $(Build.ArtifactStagingDirectory)/nupkg
                 }

@@ -120,6 +120,13 @@ public interface IUserService : IMembershipUserService
     IProfile? GetProfileByUserName(string username);
 
     /// <summary>
+    /// Get a user by its key.
+    /// </summary>
+    /// <param name="key">The GUID key of the user.</param>
+    /// <returns>The found user, or null if nothing was found.</returns>
+    Task<IUser?> GetAsync(Guid key) => Task.FromResult(GetAll(0, int.MaxValue, out _).FirstOrDefault(x=>x.Key == key));
+
+    /// <summary>
     ///     Gets a user by Id
     /// </summary>
     /// <param name="id">Id of the user to retrieve</param>
@@ -240,6 +247,7 @@ public interface IUserService : IMembershipUserService
     /// </summary>
     /// <param name="ids">Optional Ids of UserGroups to retrieve</param>
     /// <returns>An enumerable list of <see cref="IUserGroup" /></returns>
+    [Obsolete("Use IUserGroupService.GetAsync instead, scheduled for removal in V15.")]
     IEnumerable<IUserGroup> GetAllUserGroups(params int[] ids);
 
     /// <summary>
@@ -249,6 +257,7 @@ public interface IUserService : IMembershipUserService
     /// <returns>
     ///     <see cref="IUserGroup" />
     /// </returns>
+    [Obsolete("Use IUserGroupService.GetAsync instead, scheduled for removal in V15.")]
     IEnumerable<IUserGroup> GetUserGroupsByAlias(params string[] alias);
 
     /// <summary>
@@ -258,6 +267,7 @@ public interface IUserService : IMembershipUserService
     /// <returns>
     ///     <see cref="IUserGroup" />
     /// </returns>
+    [Obsolete("Use IUserGroupService.GetAsync instead, scheduled for removal in V15.")]
     IUserGroup? GetUserGroupByAlias(string name);
 
     /// <summary>
@@ -267,6 +277,7 @@ public interface IUserService : IMembershipUserService
     /// <returns>
     ///     <see cref="IUserGroup" />
     /// </returns>
+    [Obsolete("Use IUserGroupService.GetAsync instead, scheduled for removal in V15.")]
     IUserGroup? GetUserGroupById(int id);
 
     /// <summary>
@@ -277,12 +288,14 @@ public interface IUserService : IMembershipUserService
     ///     If null than no changes are made to the users who are assigned to this group, however if a value is passed in
     ///     than all users will be removed from this group and only these users will be added
     /// </param>
+    [Obsolete("Use IUserGroupService.CreateAsync and IUserGroupService.UpdateAsync instead, scheduled for removal in V15.")]
     void Save(IUserGroup userGroup, int[]? userIds = null);
 
     /// <summary>
     ///     Deletes a UserGroup
     /// </summary>
     /// <param name="userGroup">UserGroup to delete</param>
+    [Obsolete("Use IUserGroupService.DeleteAsync instead, scheduled for removal in V15.")]
     void DeleteUserGroup(IUserGroup userGroup);
 
     #endregion

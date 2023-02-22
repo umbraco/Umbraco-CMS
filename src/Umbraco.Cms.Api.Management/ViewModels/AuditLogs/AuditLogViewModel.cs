@@ -6,6 +6,8 @@ public class AuditlogViewModel
 {
     public Guid UserKey { get; set; }
 
+    public Guid? EntityKey { get; set; }
+
     public DateTime Timestamp { get; set; }
 
     public AuditType LogType { get; set; }

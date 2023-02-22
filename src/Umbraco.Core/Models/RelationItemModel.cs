@@ -8,6 +8,8 @@ public class RelationItemModel
 
     public string? NodeType { get; set; }
 
+    public bool? NodePublished { get; set; }
+
     public string? ContentTypeIcon { get; set; }
 
     public string? ContentTypeAlias { get; set; }

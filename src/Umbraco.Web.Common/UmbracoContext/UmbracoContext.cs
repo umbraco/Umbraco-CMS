@@ -4,6 +4,8 @@ using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Routing;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Cms.Core.Web;
 using Umbraco.Extensions;
 
@@ -17,6 +19,7 @@ public class UmbracoContext : DisposableObjectSlim, IUmbracoContext
     private readonly ICookieManager _cookieManager;
     private readonly IHostingEnvironment _hostingEnvironment;
     private readonly IHttpContextAccessor _httpContextAccessor;
+    private readonly IWebProfilerService _webProfilerService;
     private readonly Lazy<IPublishedSnapshot> _publishedSnapshot;
     private readonly UmbracoRequestPaths _umbracoRequestPaths;
     private readonly UriUtility _uriUtility;
@@ -36,7 +39,8 @@ public class UmbracoContext : DisposableObjectSlim, IUmbracoContext
         IHostingEnvironment hostingEnvironment,
         UriUtility uriUtility,
         ICookieManager cookieManager,
-        IHttpContextAccessor httpContextAccessor)
+        IHttpContextAccessor httpContextAccessor,
+        IWebProfilerService webProfilerService)
     {
         if (publishedSnapshotService == null)
         {
@@ -47,6 +51,7 @@ public class UmbracoContext : DisposableObjectSlim, IUmbracoContext
         _hostingEnvironment = hostingEnvironment;
         _cookieManager = cookieManager;
         _httpContextAccessor = httpContextAccessor;
+        _webProfilerService = webProfilerService;
         ObjectCreated = DateTime.Now;
         UmbracoRequestId = Guid.NewGuid();
         _umbracoRequestPaths = umbracoRequestPaths;
@@ -116,11 +121,30 @@ _cleanedUmbracoUrl ??= _uriUtility.UriToUmbraco(OriginalRequestUrl);
     public IPublishedRequest? PublishedRequest { get; set; }
 
     /// <inheritdoc />
-    public bool IsDebug => // NOTE: the request can be null during app startup!
-        _hostingEnvironment.IsDebugMode
-        && (string.IsNullOrEmpty(_httpContextAccessor.HttpContext?.GetRequestValue("umbdebugshowtrace")) == false
-            || string.IsNullOrEmpty(_httpContextAccessor.HttpContext?.GetRequestValue("umbdebug")) == false
-            || string.IsNullOrEmpty(_cookieManager.GetCookieValue("UMB-DEBUG")) == false);
+    public bool IsDebug
+    {
+        get
+        {
+            if (_hostingEnvironment.IsDebugMode is false)
+            {
+                return false;
+            }
+
+            if(string.IsNullOrEmpty(_httpContextAccessor.HttpContext?.GetRequestValue("umbdebugshowtrace")) is false)
+            {
+                return true;
+            }
+
+            Attempt<bool, WebProfilerOperationStatus> webProfilerStatusAttempt = _webProfilerService.GetStatus().GetAwaiter().GetResult();
+
+            if (webProfilerStatusAttempt.Success)
+            {
+                return webProfilerStatusAttempt.Result;
+            }
+
+            return true;
+        }
+    }
 
     /// <inheritdoc />
     public bool InPreviewMode

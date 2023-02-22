@@ -21,16 +21,19 @@ public class ContentTypeSort : IValueObject, IDeepCloneable
         SortOrder = sortOrder;
     }
 
-    public ContentTypeSort(Lazy<int> id, int sortOrder, string alias)
+    // FIXME: remove integer ID in constructor
+    public ContentTypeSort(Lazy<int> id, Guid key, int sortOrder, string alias)
     {
         Id = id;
         SortOrder = sortOrder;
         Alias = alias;
+        Key = key;
     }
 
     /// <summary>
     ///     Gets or sets the Id of the ContentType
     /// </summary>
+    // FIXME: remove this in favor of Key (Id should only be used at repository level)
     public Lazy<int> Id { get; set; } = new(() => 0);
 
     /// <summary>
@@ -42,6 +45,11 @@ public class ContentTypeSort : IValueObject, IDeepCloneable
     ///     Gets or sets the Alias of the ContentType
     /// </summary>
     public string Alias { get; set; } = string.Empty;
+
+    /// <summary>
+    ///     Gets or sets the unique Key of the ContentType
+    /// </summary>
+    public Guid Key { get; set; }
 
     public object DeepClone()
     {

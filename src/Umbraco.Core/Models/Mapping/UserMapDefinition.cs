@@ -1,5 +1,4 @@
 using System.Globalization;
-using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Actions;
@@ -33,6 +32,7 @@ public class UserMapDefinition : IMapDefinition
     private readonly ILocalizedTextService _textService;
     private readonly IUserService _userService;
     private readonly ILocalizationService _localizationService;
+    private readonly IUserGroupService _userGroupService;
 
     public UserMapDefinition(
         ILocalizedTextService textService,
@@ -45,7 +45,8 @@ public class UserMapDefinition : IMapDefinition
         MediaFileManager mediaFileManager,
         IShortStringHelper shortStringHelper,
         IImageUrlGenerator imageUrlGenerator,
-        ILocalizationService localizationService)
+        ILocalizationService localizationService,
+        IUserGroupService userGroupService)
     {
         _sectionService = sectionService;
         _entityService = entityService;
@@ -58,9 +59,10 @@ public class UserMapDefinition : IMapDefinition
         _shortStringHelper = shortStringHelper;
         _imageUrlGenerator = imageUrlGenerator;
         _localizationService = localizationService;
+        _userGroupService = userGroupService;
     }
 
-    [Obsolete("Please use constructor that takes an ILocalizationService instead")]
+    [Obsolete("Use constructor that takes IUserGroupService, scheduled for removal in V15.")]
     public UserMapDefinition(
         ILocalizedTextService textService,
         IUserService userService,
@@ -71,19 +73,21 @@ public class UserMapDefinition : IMapDefinition
         IOptions<GlobalSettings> globalSettings,
         MediaFileManager mediaFileManager,
         IShortStringHelper shortStringHelper,
-        IImageUrlGenerator imageUrlGenerator)
-    : this(
-        textService,
-        userService,
-        entityService,
-        sectionService,
-        appCaches,
-        actions,
-        globalSettings,
-        mediaFileManager,
-        shortStringHelper,
-        imageUrlGenerator,
-        StaticServiceProvider.Instance.GetRequiredService<ILocalizationService>())
+        IImageUrlGenerator imageUrlGenerator,
+        ILocalizationService localizationService)
+        : this(
+            textService,
+            userService,
+            entityService,
+            sectionService,
+            appCaches,
+            actions,
+            globalSettings,
+            mediaFileManager,
+            shortStringHelper,
+            imageUrlGenerator,
+            localizationService,
+            StaticServiceProvider.Instance.GetRequiredService<IUserGroupService>())
     {
     }
 
@@ -135,6 +139,7 @@ public class UserMapDefinition : IMapDefinition
         target.Permissions = source.DefaultPermissions;
         target.Key = source.Key;
         target.HasAccessToAllLanguages = source.HasAccessToAllLanguages;
+        target.PermissionNames = source.Permissions ?? new HashSet<string>();
 
         var id = GetIntId(source.Id);
         if (id > 0)
@@ -222,7 +227,7 @@ public class UserMapDefinition : IMapDefinition
         target.IsApproved = false;
 
         target.ClearGroups();
-        IEnumerable<IUserGroup> groups = _userService.GetUserGroupsByAlias(source.UserGroups.ToArray());
+        IEnumerable<IUserGroup> groups = _userGroupService.GetAsync(source.UserGroups.ToArray()).GetAwaiter().GetResult();
         foreach (IUserGroup group in groups)
         {
             target.AddGroup(group.ToReadOnlyGroup());
@@ -247,7 +252,7 @@ public class UserMapDefinition : IMapDefinition
         target.Id = source.Id;
 
         target.ClearGroups();
-        IEnumerable<IUserGroup> groups = _userService.GetUserGroupsByAlias(source.UserGroups.ToArray());
+        IEnumerable<IUserGroup> groups = _userGroupService.GetAsync(source.UserGroups.ToArray()).GetAwaiter().GetResult();
         foreach (IUserGroup group in groups)
         {
             target.AddGroup(group.ToReadOnlyGroup());

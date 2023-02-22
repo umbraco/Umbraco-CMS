@@ -1239,6 +1239,44 @@
         }
       }
     },
+    "/umbraco/management/api/v1/document-type/{key}": {
+      "get": {
+        "tags": [
+          "Document Type"
+        ],
+        "operationId": "GetDocumentTypeByKey",
+        "parameters": [
+          {
+            "name": "key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/DocumentTypeModel"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    },
     "/umbraco/management/api/v1/tree/document-type/children": {
       "get": {
         "tags": [
@@ -1379,6 +1417,44 @@
                 }
               }
             }
+          }
+        }
+      }
+    },
+    "/umbraco/management/api/v1/document/{key}": {
+      "get": {
+        "tags": [
+          "Document"
+        ],
+        "operationId": "GetDocumentByKey",
+        "parameters": [
+          {
+            "name": "key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/DocumentModel"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found"
           }
         }
       }
@@ -3559,6 +3635,30 @@
             }
           }
         }
+      },
+      "put": {
+        "tags": [
+          "Profiling"
+        ],
+        "operationId": "PutProfilingStatus",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/ProfilingStatusModel"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
       }
     },
     "/umbraco/management/api/v1/published-cache/collect": {
@@ -5032,20 +5132,20 @@
         }
       }
     },
-    "/umbraco/management/api/v1/tracked-reference/{id}": {
+    "/umbraco/management/api/v1/tracked-reference/{key}": {
       "get": {
         "tags": [
           "Tracked Reference"
         ],
-        "operationId": "GetTrackedReferenceById",
+        "operationId": "GetTrackedReferenceByKey",
         "parameters": [
           {
-            "name": "id",
+            "name": "key",
             "in": "path",
             "required": true,
             "schema": {
-              "type": "integer",
-              "format": "int32"
+              "type": "string",
+              "format": "uuid"
             }
           },
           {
@@ -5053,7 +5153,8 @@
             "in": "query",
             "schema": {
               "type": "integer",
-              "format": "int64"
+              "format": "int64",
+              "default": 0
             }
           },
           {
@@ -5061,14 +5162,16 @@
             "in": "query",
             "schema": {
               "type": "integer",
-              "format": "int64"
+              "format": "int64",
+              "default": 20
             }
           },
           {
             "name": "filterMustBeIsDependency",
             "in": "query",
             "schema": {
-              "type": "boolean"
+              "type": "boolean",
+              "default": false
             }
           }
         ],
@@ -5086,20 +5189,20 @@
         }
       }
     },
-    "/umbraco/management/api/v1/tracked-reference/descendants/{parentId}": {
+    "/umbraco/management/api/v1/tracked-reference/descendants/{parentKey}": {
       "get": {
         "tags": [
           "Tracked Reference"
         ],
-        "operationId": "GetTrackedReferenceDescendantsByParentId",
+        "operationId": "GetTrackedReferenceDescendantsByParentKey",
         "parameters": [
           {
-            "name": "parentId",
+            "name": "parentKey",
             "in": "path",
             "required": true,
             "schema": {
-              "type": "integer",
-              "format": "int32"
+              "type": "string",
+              "format": "uuid"
             }
           },
           {
@@ -5148,13 +5251,14 @@
         "operationId": "GetTrackedReferenceItem",
         "parameters": [
           {
-            "name": "ids",
+            "name": "key",
             "in": "query",
             "schema": {
+              "uniqueItems": true,
               "type": "array",
               "items": {
-                "type": "integer",
-                "format": "int32"
+                "type": "string",
+                "format": "uuid"
               }
             }
           },
@@ -5163,7 +5267,8 @@
             "in": "query",
             "schema": {
               "type": "integer",
-              "format": "int64"
+              "format": "int64",
+              "default": 0
             }
           },
           {
@@ -5171,14 +5276,16 @@
             "in": "query",
             "schema": {
               "type": "integer",
-              "format": "int64"
+              "format": "int64",
+              "default": 20
             }
           },
           {
             "name": "filterMustBeIsDependency",
             "in": "query",
             "schema": {
-              "type": "boolean"
+              "type": "boolean",
+              "default": true
             }
           }
         ],
@@ -5262,6 +5369,191 @@
           }
         }
       }
+    },
+    "/umbraco/management/api/v1/user-groups": {
+      "post": {
+        "tags": [
+          "User Groups"
+        ],
+        "operationId": "PostUserGroups",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/UserGroupSaveModel"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetailsModel"
+                }
+              }
+            }
+          },
+          "201": {
+            "description": "Created",
+            "headers": {
+              "Location": {
+                "description": "Location of the newly created resource",
+                "schema": {
+                  "type": "string",
+                  "description": "Location of the newly created resource",
+                  "format": "uri"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "User Groups"
+        ],
+        "operationId": "GetUserGroups",
+        "parameters": [
+          {
+            "name": "skip",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 0
+            }
+          },
+          {
+            "name": "take",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 100
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedUserGroupModel"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/umbraco/management/api/v1/user-groups/{key}": {
+      "get": {
+        "tags": [
+          "User Groups"
+        ],
+        "operationId": "GetUserGroupsByKey",
+        "parameters": [
+          {
+            "name": "key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/UserGroupModel"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "User Groups"
+        ],
+        "operationId": "DeleteUserGroupsByKey",
+        "parameters": [
+          {
+            "name": "key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "User Groups"
+        ],
+        "operationId": "PutUserGroupsByKey",
+        "parameters": [
+          {
+            "name": "key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/UserGroupUpdateModel"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
     }
   },
   "components": {
@@ -5278,7 +5570,20 @@
         },
         "additionalProperties": false
       },
+      "ContentStateModel": {
+        "enum": [
+          "NotCreated",
+          "Draft",
+          "Published",
+          "PublishedPendingChanges"
+        ],
+        "type": "integer",
+        "format": "int32"
+      },
       "ContentTreeItemModel": {
+        "required": [
+          "$type"
+        ],
         "type": "object",
         "allOf": [
           {
@@ -5286,11 +5591,204 @@
           }
         ],
         "properties": {
+          "$type": {
+            "type": "string"
+          },
           "noAccess": {
             "type": "boolean"
           },
           "isTrashed": {
             "type": "boolean"
+          }
+        },
+        "additionalProperties": false,
+        "discriminator": {
+          "propertyName": "$type",
+          "mapping": {
+            "ContentTreeItemViewModel": "#/components/schemas/ContentTreeItemModel",
+            "DocumentTreeItemViewModel": "#/components/schemas/DocumentTreeItemModel"
+          }
+        }
+      },
+      "ContentTypeCleanupModel": {
+        "type": "object",
+        "properties": {
+          "preventCleanup": {
+            "type": "boolean"
+          },
+          "keepAllVersionsNewerThanDays": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "keepLatestVersionPerDayForDays": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "ContentTypeCompositionModel": {
+        "type": "object",
+        "properties": {
+          "key": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "compositionType": {
+            "$ref": "#/components/schemas/ContentTypeCompositionTypeModel"
+          }
+        },
+        "additionalProperties": false
+      },
+      "ContentTypeCompositionTypeModel": {
+        "enum": [
+          "Composition",
+          "Inheritance"
+        ],
+        "type": "integer",
+        "format": "int32"
+      },
+      "ContentTypeSortModel": {
+        "type": "object",
+        "properties": {
+          "key": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "sortOrder": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "additionalProperties": false
+      },
+      "ContentTypeViewModelBaseDocumentTypePropertyTypeDocumentTypePropertyTypeContainerModel": {
+        "type": "object",
+        "properties": {
+          "key": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "alias": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "icon": {
+            "type": "string"
+          },
+          "allowedAsRoot": {
+            "type": "boolean"
+          },
+          "variesByCulture": {
+            "type": "boolean"
+          },
+          "variesBySegment": {
+            "type": "boolean"
+          },
+          "isElement": {
+            "type": "boolean"
+          },
+          "properties": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/DocumentTypePropertyTypeModel"
+                }
+              ]
+            }
+          },
+          "containers": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/DocumentTypePropertyTypeContainerModel"
+                }
+              ]
+            }
+          },
+          "allowedContentTypes": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/ContentTypeSortModel"
+                }
+              ]
+            }
+          },
+          "compositions": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/ContentTypeCompositionModel"
+                }
+              ]
+            }
+          },
+          "cleanup": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/ContentTypeCleanupModel"
+              }
+            ]
+          }
+        },
+        "additionalProperties": false
+      },
+      "ContentUrlInfoModel": {
+        "type": "object",
+        "properties": {
+          "culture": {
+            "type": "string",
+            "nullable": true
+          },
+          "url": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "ContentViewModelBaseDocumentValueDocumentVariantModel": {
+        "type": "object",
+        "properties": {
+          "key": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "contentTypeKey": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "values": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/DocumentValueModel"
+                }
+              ]
+            }
+          },
+          "variants": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/DocumentVariantModel"
+                }
+              ]
+            }
           }
         },
         "additionalProperties": false
@@ -5335,6 +5833,9 @@
         "additionalProperties": false
       },
       "DataTypeModel": {
+        "required": [
+          "$type"
+        ],
         "type": "object",
         "allOf": [
           {
@@ -5342,6 +5843,9 @@
           }
         ],
         "properties": {
+          "$type": {
+            "type": "string"
+          },
           "key": {
             "type": "string",
             "format": "uuid"
@@ -5352,7 +5856,13 @@
             "nullable": true
           }
         },
-        "additionalProperties": false
+        "additionalProperties": false,
+        "discriminator": {
+          "propertyName": "$type",
+          "mapping": {
+            "DataTypeViewModel": "#/components/schemas/DataTypeModel"
+          }
+        }
       },
       "DataTypeModelBaseModel": {
         "type": "object",
@@ -5560,6 +6070,9 @@
         "additionalProperties": false
       },
       "DictionaryItemModel": {
+        "required": [
+          "$type"
+        ],
         "type": "object",
         "allOf": [
           {
@@ -5567,12 +6080,21 @@
           }
         ],
         "properties": {
+          "$type": {
+            "type": "string"
+          },
           "key": {
             "type": "string",
             "format": "uuid"
           }
         },
-        "additionalProperties": false
+        "additionalProperties": false,
+        "discriminator": {
+          "propertyName": "$type",
+          "mapping": {
+            "DictionaryItemViewModel": "#/components/schemas/DictionaryItemModel"
+          }
+        }
       },
       "DictionaryItemModelBaseModel": {
         "type": "object",
@@ -5698,6 +6220,9 @@
         "format": "int32"
       },
       "DocumentBlueprintTreeItemModel": {
+        "required": [
+          "$type"
+        ],
         "type": "object",
         "allOf": [
           {
@@ -5705,6 +6230,9 @@
           }
         ],
         "properties": {
+          "$type": {
+            "type": "string"
+          },
           "documentTypeKey": {
             "type": "string",
             "format": "uuid"
@@ -5717,9 +6245,44 @@
             "nullable": true
           }
         },
+        "additionalProperties": false,
+        "discriminator": {
+          "propertyName": "$type",
+          "mapping": {
+            "DocumentBlueprintTreeItemViewModel": "#/components/schemas/DocumentBlueprintTreeItemModel"
+          }
+        }
+      },
+      "DocumentModel": {
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ContentViewModelBaseDocumentValueDocumentVariantModel"
+          }
+        ],
+        "properties": {
+          "urls": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/ContentUrlInfoModel"
+                }
+              ]
+            }
+          },
+          "templateKey": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          }
+        },
         "additionalProperties": false
       },
       "DocumentTreeItemModel": {
+        "required": [
+          "$type"
+        ],
         "type": "object",
         "allOf": [
           {
@@ -5727,6 +6290,9 @@
           }
         ],
         "properties": {
+          "$type": {
+            "type": "string"
+          },
           "isProtected": {
             "type": "boolean"
           },
@@ -5737,9 +6303,59 @@
             "type": "boolean"
           }
         },
+        "additionalProperties": false,
+        "discriminator": {
+          "propertyName": "$type",
+          "mapping": {
+            "DocumentTreeItemViewModel": "#/components/schemas/DocumentTreeItemModel"
+          }
+        }
+      },
+      "DocumentTypeModel": {
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ContentTypeViewModelBaseDocumentTypePropertyTypeDocumentTypePropertyTypeContainerModel"
+          }
+        ],
+        "properties": {
+          "allowedTemplateKeys": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          "defaultTemplateKey": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "DocumentTypePropertyTypeContainerModel": {
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/PropertyTypeContainerViewModelBaseModel"
+          }
+        ],
+        "additionalProperties": false
+      },
+      "DocumentTypePropertyTypeModel": {
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/PropertyTypeViewModelBaseModel"
+          }
+        ],
         "additionalProperties": false
       },
       "DocumentTypeTreeItemModel": {
+        "required": [
+          "$type"
+        ],
         "type": "object",
         "allOf": [
           {
@@ -5747,13 +6363,53 @@
           }
         ],
         "properties": {
+          "$type": {
+            "type": "string"
+          },
           "isElement": {
             "type": "boolean"
+          }
+        },
+        "additionalProperties": false,
+        "discriminator": {
+          "propertyName": "$type",
+          "mapping": {
+            "DocumentTypeTreeItemViewModel": "#/components/schemas/DocumentTypeTreeItemModel"
+          }
+        }
+      },
+      "DocumentValueModel": {
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ValueViewModelBaseModel"
+          }
+        ],
+        "additionalProperties": false
+      },
+      "DocumentVariantModel": {
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/VariantViewModelBaseModel"
+          }
+        ],
+        "properties": {
+          "state": {
+            "$ref": "#/components/schemas/ContentStateModel"
+          },
+          "publishDate": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
           }
         },
         "additionalProperties": false
       },
       "EntityTreeItemModel": {
+        "required": [
+          "$type"
+        ],
         "type": "object",
         "allOf": [
           {
@@ -5761,6 +6417,9 @@
           }
         ],
         "properties": {
+          "$type": {
+            "type": "string"
+          },
           "key": {
             "type": "string",
             "format": "uuid"
@@ -5774,7 +6433,18 @@
             "nullable": true
           }
         },
-        "additionalProperties": false
+        "additionalProperties": false,
+        "discriminator": {
+          "propertyName": "$type",
+          "mapping": {
+            "EntityTreeItemViewModel": "#/components/schemas/EntityTreeItemModel",
+            "ContentTreeItemViewModel": "#/components/schemas/ContentTreeItemModel",
+            "DocumentBlueprintTreeItemViewModel": "#/components/schemas/DocumentBlueprintTreeItemModel",
+            "DocumentTreeItemViewModel": "#/components/schemas/DocumentTreeItemModel",
+            "DocumentTypeTreeItemViewModel": "#/components/schemas/DocumentTypeTreeItemModel",
+            "FolderTreeItemViewModel": "#/components/schemas/FolderTreeItemModel"
+          }
+        }
       },
       "FieldModel": {
         "type": "object",
@@ -5825,6 +6495,9 @@
         "additionalProperties": false
       },
       "FolderModel": {
+        "required": [
+          "$type"
+        ],
         "type": "object",
         "allOf": [
           {
@@ -5832,6 +6505,9 @@
           }
         ],
         "properties": {
+          "$type": {
+            "type": "string"
+          },
           "key": {
             "type": "string",
             "format": "uuid"
@@ -5842,7 +6518,13 @@
             "nullable": true
           }
         },
-        "additionalProperties": false
+        "additionalProperties": false,
+        "discriminator": {
+          "propertyName": "$type",
+          "mapping": {
+            "FolderViewModel": "#/components/schemas/FolderModel"
+          }
+        }
       },
       "FolderModelBaseModel": {
         "type": "object",
@@ -5854,6 +6536,9 @@
         "additionalProperties": false
       },
       "FolderTreeItemModel": {
+        "required": [
+          "$type"
+        ],
         "type": "object",
         "allOf": [
           {
@@ -5861,11 +6546,21 @@
           }
         ],
         "properties": {
+          "$type": {
+            "type": "string"
+          },
           "isFolder": {
             "type": "boolean"
           }
         },
-        "additionalProperties": false
+        "additionalProperties": false,
+        "discriminator": {
+          "propertyName": "$type",
+          "mapping": {
+            "FolderTreeItemViewModel": "#/components/schemas/FolderTreeItemModel",
+            "DocumentTypeTreeItemViewModel": "#/components/schemas/DocumentTypeTreeItemModel"
+          }
+        }
       },
       "FolderUpdateModel": {
         "type": "object",
@@ -6979,6 +7674,30 @@
         },
         "additionalProperties": false
       },
+      "PagedUserGroupModel": {
+        "required": [
+          "items",
+          "total"
+        ],
+        "type": "object",
+        "properties": {
+          "total": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/UserGroupModel"
+                }
+              ]
+            }
+          }
+        },
+        "additionalProperties": false
+      },
       "ProblemDetailsModel": {
         "type": "object",
         "properties": {
@@ -7015,9 +7734,120 @@
         },
         "additionalProperties": false
       },
-      "RecycleBinItemModel": {
+      "PropertyTypeAppearanceModel": {
         "type": "object",
         "properties": {
+          "labelOnTop": {
+            "type": "boolean"
+          }
+        },
+        "additionalProperties": false
+      },
+      "PropertyTypeContainerViewModelBaseModel": {
+        "type": "object",
+        "properties": {
+          "key": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "parentKey": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          },
+          "name": {
+            "type": "string",
+            "nullable": true
+          },
+          "type": {
+            "type": "string"
+          },
+          "sortOrder": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "additionalProperties": false
+      },
+      "PropertyTypeValidationModel": {
+        "type": "object",
+        "properties": {
+          "mandatory": {
+            "type": "boolean"
+          },
+          "mandatoryMessage": {
+            "type": "string",
+            "nullable": true
+          },
+          "regEx": {
+            "type": "string",
+            "nullable": true
+          },
+          "regExMessage": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "PropertyTypeViewModelBaseModel": {
+        "type": "object",
+        "properties": {
+          "key": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "containerKey": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          },
+          "alias": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "dataTypeKey": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "variesByCulture": {
+            "type": "boolean"
+          },
+          "variesBySegment": {
+            "type": "boolean"
+          },
+          "validation": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/PropertyTypeValidationModel"
+              }
+            ]
+          },
+          "appearance": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/PropertyTypeAppearanceModel"
+              }
+            ]
+          }
+        },
+        "additionalProperties": false
+      },
+      "RecycleBinItemModel": {
+        "required": [
+          "$type"
+        ],
+        "type": "object",
+        "properties": {
+          "$type": {
+            "type": "string"
+          },
           "key": {
             "type": "string",
             "format": "uuid"
@@ -7043,7 +7873,13 @@
             "nullable": true
           }
         },
-        "additionalProperties": false
+        "additionalProperties": false,
+        "discriminator": {
+          "propertyName": "$type",
+          "mapping": {
+            "RecycleBinItemViewModel": "#/components/schemas/RecycleBinItemModel"
+          }
+        }
       },
       "RedirectStatusModel": {
         "enum": [
@@ -7106,6 +7942,10 @@
           },
           "nodeType": {
             "type": "string",
+            "nullable": true
+          },
+          "nodePublished": {
+            "type": "boolean",
             "nullable": true
           },
           "contentTypeIcon": {
@@ -7271,6 +8111,9 @@
         "additionalProperties": false
       },
       "TemplateModel": {
+        "required": [
+          "$type"
+        ],
         "type": "object",
         "allOf": [
           {
@@ -7278,12 +8121,21 @@
           }
         ],
         "properties": {
+          "$type": {
+            "type": "string"
+          },
           "key": {
             "type": "string",
             "format": "uuid"
           }
         },
-        "additionalProperties": false
+        "additionalProperties": false,
+        "discriminator": {
+          "propertyName": "$type",
+          "mapping": {
+            "TemplateViewModel": "#/components/schemas/TemplateModel"
+          }
+        }
       },
       "TemplateModelBaseModel": {
         "type": "object",
@@ -7532,6 +8384,96 @@
         },
         "additionalProperties": false
       },
+      "UserGroupBaseModel": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "icon": {
+            "type": "string",
+            "nullable": true
+          },
+          "sections": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "languages": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "hasAccessToAllLanguages": {
+            "type": "boolean"
+          },
+          "documentStartNodeKey": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          },
+          "mediaStartNodeKey": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          },
+          "permissions": {
+            "uniqueItems": true,
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "additionalProperties": false
+      },
+      "UserGroupModel": {
+        "required": [
+          "$type"
+        ],
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/UserGroupBaseModel"
+          }
+        ],
+        "properties": {
+          "$type": {
+            "type": "string"
+          },
+          "key": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        "additionalProperties": false,
+        "discriminator": {
+          "propertyName": "$type",
+          "mapping": {
+            "UserGroupViewModel": "#/components/schemas/UserGroupModel"
+          }
+        }
+      },
+      "UserGroupSaveModel": {
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/UserGroupBaseModel"
+          }
+        ],
+        "additionalProperties": false
+      },
+      "UserGroupUpdateModel": {
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/UserGroupBaseModel"
+          }
+        ],
+        "additionalProperties": false
+      },
       "UserInstallModel": {
         "required": [
           "email",
@@ -7581,6 +8523,51 @@
                 }
               ]
             }
+          }
+        },
+        "additionalProperties": false
+      },
+      "ValueViewModelBaseModel": {
+        "type": "object",
+        "properties": {
+          "culture": {
+            "type": "string",
+            "nullable": true
+          },
+          "segment": {
+            "type": "string",
+            "nullable": true
+          },
+          "alias": {
+            "type": "string"
+          },
+          "value": {
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "VariantViewModelBaseModel": {
+        "type": "object",
+        "properties": {
+          "culture": {
+            "type": "string",
+            "nullable": true
+          },
+          "segment": {
+            "type": "string",
+            "nullable": true
+          },
+          "name": {
+            "type": "string"
+          },
+          "createDate": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updateDate": {
+            "type": "string",
+            "format": "date-time"
           }
         },
         "additionalProperties": false
