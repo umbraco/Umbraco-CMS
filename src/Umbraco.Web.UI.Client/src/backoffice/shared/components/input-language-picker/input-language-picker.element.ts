@@ -116,6 +116,8 @@ export class UmbInputLanguagePickerElement extends FormControlMixin(UmbLitElemen
 	}
 
 	private _openPicker() {
+		/*
+		TODO: re implement when language picker PR is merged
 		const modalHandler = this._modalService?.languagePicker({
 			multiple: this.max === 1 ? false : true,
 			selection: [...this._selectedIsoCodes],
@@ -124,6 +126,7 @@ export class UmbInputLanguagePickerElement extends FormControlMixin(UmbLitElemen
 		modalHandler?.onClose().then(({ selection }: any) => {
 			this._setSelection(selection);
 		});
+		*/
 	}
 
 	private _removeItem(item: LanguageModel) {
