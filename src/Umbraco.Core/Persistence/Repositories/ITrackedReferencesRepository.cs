@@ -17,6 +17,7 @@ public interface ITrackedReferencesRepository
     /// </param>
     /// <param name="totalRecords">The total count of the items with reference to the current item.</param>
     /// <returns>An enumerable list of <see cref="RelationItem" /> objects.</returns>
+    [Obsolete("Use overload that takes key instead of id. This will be removed in Umbraco 15.")]
     IEnumerable<RelationItem> GetPagedRelationsForItem(int id, long pageIndex, int pageSize, bool filterMustBeIsDependency, out long totalRecords);
 
     /// <summary>
@@ -31,6 +32,7 @@ public interface ITrackedReferencesRepository
     /// </param>
     /// <param name="totalRecords">The total count of the items in any kind of relation.</param>
     /// <returns>An enumerable list of <see cref="RelationItem" /> objects.</returns>
+    [Obsolete("Use overload that takes key instead of id. This will be removed in Umbraco 15.")]
     IEnumerable<RelationItem> GetPagedItemsWithRelations(int[] ids, long pageIndex, int pageSize, bool filterMustBeIsDependency, out long totalRecords);
 
     /// <summary>
@@ -45,6 +47,7 @@ public interface ITrackedReferencesRepository
     /// </param>
     /// <param name="totalRecords">The total count of descending items.</param>
     /// <returns>An enumerable list of <see cref="RelationItem" /> objects.</returns>
+    [Obsolete("Use overload that takes key instead of id. This will be removed in Umbraco 15.")]
     IEnumerable<RelationItem> GetPagedDescendantsInReferences(int parentId, long pageIndex, int pageSize, bool filterMustBeIsDependency, out long totalRecords);
 
     /// <summary>
@@ -60,6 +63,15 @@ public interface ITrackedReferencesRepository
     /// </param>
     /// <param name="totalRecords">The total count of the items with reference to the current item.</param>
     /// <returns>An enumerable list of <see cref="RelationItem" /> objects.</returns>
+    IEnumerable<RelationItemModel> GetPagedRelationsForItem(
+        Guid key,
+        long skip,
+        long take,
+        bool filterMustBeIsDependency,
+        out long totalRecords) =>
+        throw new NotImplementedException();
+
+    [Obsolete("Use overload that takes key instead of id. This will be removed in Umbraco 15.")]
     IEnumerable<RelationItemModel> GetPagedRelationsForItem(
         int id,
         long skip,
@@ -81,17 +93,24 @@ public interface ITrackedReferencesRepository
     /// <param name="totalRecords">The total count of the items in any kind of relation.</param>
     /// <returns>An enumerable list of <see cref="RelationItem" /> objects.</returns>
     IEnumerable<RelationItemModel> GetPagedItemsWithRelations(
+        ISet<Guid> keys,
+        long skip,
+        long take,
+        bool filterMustBeIsDependency,
+        out long totalRecords);
+
+    [Obsolete("Use overload that takes key instead of id. This will be removed in Umbraco 15.")]
+    IEnumerable<RelationItemModel> GetPagedItemsWithRelations(
         int[] ids,
         long skip,
         long take,
         bool filterMustBeIsDependency,
-        out long totalRecords) =>
-        throw new NotImplementedException();
+        out long totalRecords);
 
     /// <summary>
     ///     Gets a page of the descending items that have any references, given a parent id.
     /// </summary>
-    /// <param name="parentId">The unique identifier of the parent to retrieve descendants for.</param>
+    /// <param name="parentKey">The unique identifier of the parent to retrieve descendants for.</param>
     /// <param name="skip">The amount of items to skip.</param>
     /// <param name="take">The amount of items to take.</param>
     /// <param name="filterMustBeIsDependency">
@@ -101,10 +120,17 @@ public interface ITrackedReferencesRepository
     /// <param name="totalRecords">The total count of descending items.</param>
     /// <returns>An enumerable list of <see cref="RelationItem" /> objects.</returns>
     IEnumerable<RelationItemModel> GetPagedDescendantsInReferences(
+        Guid parentKey,
+        long skip,
+        long take,
+        bool filterMustBeIsDependency,
+        out long totalRecords);
+
+    [Obsolete("Use overload that takes key instead of id. This will be removed in Umbraco 15.")]
+    IEnumerable<RelationItemModel> GetPagedDescendantsInReferences(
         int parentId,
         long skip,
         long take,
         bool filterMustBeIsDependency,
-        out long totalRecords) =>
-        throw new NotImplementedException();
+        out long totalRecords);
 }

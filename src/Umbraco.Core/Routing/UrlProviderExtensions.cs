@@ -1,5 +1,7 @@
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Routing;
@@ -10,13 +12,7 @@ namespace Umbraco.Extensions;
 
 public static class UrlProviderExtensions
 {
-    /// <summary>
-    ///     Gets the URLs of the content item.
-    /// </summary>
-    /// <remarks>
-    ///     <para>Use when displaying URLs. If errors occur when generating the URLs, they will show in the list.</para>
-    ///     <para>Contains all the URLs that we can figure out (based upon domains, etc).</para>
-    /// </remarks>
+    [Obsolete("Use GetContentUrlsAsync that takes ILanguageService instead of ILocalizationService. Will be removed in V15.")]
     public static async Task<IEnumerable<UrlInfo>> GetContentUrlsAsync(
         this IContent content,
         IPublishedRouter publishedRouter,
@@ -28,11 +24,40 @@ public static class UrlProviderExtensions
         ILogger<IContent> logger,
         UriUtility uriUtility,
         IPublishedUrlProvider publishedUrlProvider)
+        => await content.GetContentUrlsAsync(
+            publishedRouter,
+            umbracoContext,
+            StaticServiceProvider.Instance.GetRequiredService<ILanguageService>(),
+            textService,
+            contentService,
+            variationContextAccessor,
+            logger,
+            uriUtility,
+            publishedUrlProvider);
+
+    /// <summary>
+    ///     Gets the URLs of the content item.
+    /// </summary>
+    /// <remarks>
+    ///     <para>Use when displaying URLs. If errors occur when generating the URLs, they will show in the list.</para>
+    ///     <para>Contains all the URLs that we can figure out (based upon domains, etc).</para>
+    /// </remarks>
+    public static async Task<IEnumerable<UrlInfo>> GetContentUrlsAsync(
+        this IContent content,
+        IPublishedRouter publishedRouter,
+        IUmbracoContext umbracoContext,
+        ILanguageService languageService,
+        ILocalizedTextService textService,
+        IContentService contentService,
+        IVariationContextAccessor variationContextAccessor,
+        ILogger<IContent> logger,
+        UriUtility uriUtility,
+        IPublishedUrlProvider publishedUrlProvider)
     {
         ArgumentNullException.ThrowIfNull(content);
         ArgumentNullException.ThrowIfNull(publishedRouter);
         ArgumentNullException.ThrowIfNull(umbracoContext);
-        ArgumentNullException.ThrowIfNull(localizationService);
+        ArgumentNullException.ThrowIfNull(languageService);
         ArgumentNullException.ThrowIfNull(textService);
         ArgumentNullException.ThrowIfNull(contentService);
         ArgumentNullException.ThrowIfNull(variationContextAccessor);
@@ -60,7 +85,7 @@ public static class UrlProviderExtensions
         // and, not only for those assigned to domains in the branch, because we want
         // to show what GetUrl() would return, for every culture.
         var urls = new HashSet<UrlInfo>();
-        var cultures = localizationService.GetAllLanguages().Select(x => x.IsoCode).ToList();
+        var cultures = (await languageService.GetAllAsync()).Select(x => x.IsoCode).ToList();
 
         // get all URLs for all cultures
         // in a HashSet, so de-duplicates too

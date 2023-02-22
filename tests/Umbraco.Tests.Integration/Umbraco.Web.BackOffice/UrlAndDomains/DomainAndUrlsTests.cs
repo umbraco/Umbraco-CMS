@@ -139,7 +139,7 @@ public class DomainAndUrlsTests : UmbracoIntegrationTest
         root.GetContentUrlsAsync(
             GetRequiredService<IPublishedRouter>(),
             GetRequiredService<IUmbracoContextAccessor>().GetRequiredUmbracoContext(),
-            GetRequiredService<ILocalizationService>(),
+            GetRequiredService<ILanguageService>(),
             GetRequiredService<ILocalizedTextService>(),
             ContentService,
             GetRequiredService<IVariationContextAccessor>(),
