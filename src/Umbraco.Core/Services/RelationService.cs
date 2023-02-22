@@ -19,7 +19,14 @@ public class RelationService : RepositoryService, IRelationService
     private readonly IRelationRepository _relationRepository;
     private readonly IRelationTypeRepository _relationTypeRepository;
 
-    public RelationService(ICoreScopeProvider uowProvider, ILoggerFactory loggerFactory, IEventMessagesFactory eventMessagesFactory, IEntityService entityService, IRelationRepository relationRepository, IRelationTypeRepository relationTypeRepository, IAuditRepository auditRepository)
+    public RelationService(
+        ICoreScopeProvider uowProvider,
+        ILoggerFactory loggerFactory,
+        IEventMessagesFactory eventMessagesFactory,
+        IEntityService entityService,
+        IRelationRepository relationRepository,
+        IRelationTypeRepository relationTypeRepository,
+        IAuditRepository auditRepository)
         : base(uowProvider, loggerFactory, eventMessagesFactory)
     {
         _relationRepository = relationRepository;
@@ -539,6 +546,21 @@ public class RelationService : RepositoryService, IRelationService
             return Attempt.FailWithStatus(RelationTypeOperationStatus.InvalidId, relationType);
         }
 
+        // Validate that parent & child object types are allowed
+        UmbracoObjectTypes[] allowedObjectTypes = GetAllowedObjectTypes().ToArray();
+        var childObjectTypeAllowed = allowedObjectTypes.Any(x => x.GetGuid() == relationType.ParentObjectType);
+        if (childObjectTypeAllowed is false)
+        {
+            return Attempt.FailWithStatus(RelationTypeOperationStatus.InvalidChildObjectType, relationType);
+        }
+
+        var parentObjectTypeAllowed = allowedObjectTypes.Any(x => x.GetGuid() == relationType.ChildObjectType);
+
+        if (parentObjectTypeAllowed is false)
+        {
+            return Attempt.FailWithStatus(RelationTypeOperationStatus.InvalidParentObjectType, relationType);
+        }
+
         return await SaveAsync(
             relationType,
             () => _relationTypeRepository.Get(relationType.Key) is not null ? RelationTypeOperationStatus.KeyAlreadyExists : RelationTypeOperationStatus.Success,
@@ -680,6 +702,21 @@ public class RelationService : RepositoryService, IRelationService
             return _relationRepository.Get(query).Any();
         }
     }
+
+    public IEnumerable<UmbracoObjectTypes> GetAllowedObjectTypes() =>
+        new[]
+        {
+            UmbracoObjectTypes.Document,
+            UmbracoObjectTypes.Media,
+            UmbracoObjectTypes.Member,
+            UmbracoObjectTypes.DocumentType,
+            UmbracoObjectTypes.MediaType,
+            UmbracoObjectTypes.MemberType,
+            UmbracoObjectTypes.DataType,
+            UmbracoObjectTypes.MemberGroup,
+            UmbracoObjectTypes.ROOT,
+            UmbracoObjectTypes.RecycleBin,
+        };
 
     #region Private Methods
 

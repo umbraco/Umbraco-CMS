@@ -6,5 +6,7 @@ public enum RelationTypeOperationStatus
     NotFound,
     KeyAlreadyExists,
     CancelledByNotification,
-    InvalidId
+    InvalidId,
+    InvalidChildObjectType,
+    InvalidParentObjectType,
 }

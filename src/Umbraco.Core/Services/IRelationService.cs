@@ -387,4 +387,10 @@ public interface IRelationService : IService
     /// </summary>
     /// <param name="relationType"><see cref="IRelationType" /> to Delete Relations for</param>
     void DeleteRelationsOfType(IRelationType relationType);
+
+    /// <summary>
+    ///     Gets all allowed parent/child object types for a given <see cref="IRelationType" /> />
+    /// </summary>
+    /// <returns>All of the allowed <see cref="UmbracoObjectTypes"/>.</returns>
+    IEnumerable<UmbracoObjectTypes> GetAllowedObjectTypes();
 }

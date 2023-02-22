@@ -6,13 +6,16 @@ namespace Umbraco.Cms.Api.Management.Factories;
 
 public class ObjectTypeViewModelFactory : IObjectTypeViewModelFactory
 {
-    private readonly IAllowedRelationObjectTypesService _allowedRelationObjectTypesService;
+    private readonly IRelationService _relationService;
 
-    public ObjectTypeViewModelFactory(IAllowedRelationObjectTypesService allowedRelationObjectTypesService) => _allowedRelationObjectTypesService = allowedRelationObjectTypesService;
+    public ObjectTypeViewModelFactory(IRelationService relationService)
+    {
+        _relationService = relationService;
+    }
 
     public IEnumerable<ObjectTypeResponseModel> Create()
-        => _allowedRelationObjectTypesService
-            .Get()
+        => _relationService
+            .GetAllowedObjectTypes()
             .Select(umbracoObjectType => new ObjectTypeResponseModel
             {
                 Id = umbracoObjectType.GetGuid(),
