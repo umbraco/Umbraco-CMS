@@ -62,7 +62,7 @@ public class AddGuidsToUsers : UnscopedMigrationBase
         }
 
         /*
-         * We commit the initial transaction start be the scope. This is required in order to disable the foreign keys.
+         * We commit the initial transaction started by the scope. This is required in order to disable the foreign keys.
          * We then begin a new transaction, this transaction will be committed or rolled back by the scope, like normal.
          * We don't have to worry about re-enabling the foreign keys, since these are enabled by default every time a connection is established.
          *
