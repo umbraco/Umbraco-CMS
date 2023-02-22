@@ -31,7 +31,9 @@ public class AuditLogViewModelFactory : IAuditLogViewModelFactory
     {
         var target = new AuditLogWithUsernameViewModel
         {
-            Comment = auditItem.Comment, EntityType = auditItem.EntityType, LogType = auditItem.AuditType,
+            Comment = auditItem.Comment,
+            EntityType = auditItem.EntityType,
+            LogType = auditItem.AuditType,
             Parameters = auditItem.Parameters,
             Timestamp = auditItem.CreateDate,
         };
@@ -52,7 +54,9 @@ public class AuditLogViewModelFactory : IAuditLogViewModelFactory
     {
         var target = new AuditlogViewModel
             {
-                Comment = auditItem.Comment, EntityType = auditItem.EntityType, LogType = auditItem.AuditType,
+                Comment = auditItem.Comment,
+                EntityType = auditItem.EntityType,
+                LogType = auditItem.AuditType,
                 Parameters = auditItem.Parameters,
                 Timestamp = auditItem.CreateDate,
             };
