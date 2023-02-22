@@ -22,16 +22,16 @@ public class RelationServiceTests : UmbracoIntegrationTest
     [TestCase(false, true)]
     [TestCase(true, false)]
     [TestCase(false, false)]
-    public async Task Can_Create_RelationTypes_With_BiDirectional_And_IsDependency(bool isBiDirectional, bool isDependency)
+    public async Task Can_Create_Relation_Types_With_Bi_Directional_And_Is_Dependency(bool isBiDirectional, bool isDependency)
     {
-        var relationType = new RelationTypeBuilder()
+        IRelationTypeWithIsDependency relationType = new RelationTypeBuilder()
             .WithChildObjectType(Constants.ObjectTypes.DocumentType)
             .WithParentObjectType(Constants.ObjectTypes.MediaType)
             .WithIsBidirectional(isBiDirectional)
             .WithIsDependency(isDependency)
             .Build();
 
-        var result = await RelationService.CreateAsync(relationType, Constants.Security.SuperUserId);
+        Attempt<IRelationType, RelationTypeOperationStatus> result = await RelationService.CreateAsync(relationType, Constants.Security.SuperUserId);
 
         Assert.Multiple(() =>
         {
@@ -40,10 +40,6 @@ public class RelationServiceTests : UmbracoIntegrationTest
         });
 
         AssertRelationTypesAreSame(relationType, result.Result);
-
-        var persistedRelationType = RelationService.GetRelationTypeById(result.Result.Key);
-
-        Assert.AreEqual(result.Result, persistedRelationType);
     }
 
 
@@ -54,14 +50,14 @@ public class RelationServiceTests : UmbracoIntegrationTest
     [TestCase(Constants.ObjectTypes.Strings.DataType, Constants.ObjectTypes.Strings.MemberGroup)]
     [TestCase(Constants.ObjectTypes.Strings.Document, Constants.ObjectTypes.Strings.ContentRecycleBin)]
     [TestCase(Constants.ObjectTypes.Strings.Document, Constants.ObjectTypes.Strings.SystemRoot)]
-    public async Task Can_Create_RelationTypes_With_Allowed_ObjectTypes(string childObjectTypeGuid, string parentObjectTypeGuid)
+    public async Task Can_Create_Relation_Types_With_Allowed_Object_Types(string childObjectTypeGuid, string parentObjectTypeGuid)
     {
-        var relationType = new RelationTypeBuilder()
+        IRelationTypeWithIsDependency relationType = new RelationTypeBuilder()
             .WithChildObjectType(new Guid(childObjectTypeGuid))
             .WithParentObjectType(new Guid(parentObjectTypeGuid))
             .Build();
 
-        var result = await RelationService.CreateAsync(relationType, Constants.Security.SuperUserId);
+        Attempt<IRelationType, RelationTypeOperationStatus> result = await RelationService.CreateAsync(relationType, Constants.Security.SuperUserId);
 
         Assert.Multiple(() =>
         {
@@ -69,10 +65,6 @@ public class RelationServiceTests : UmbracoIntegrationTest
             Assert.AreEqual(RelationTypeOperationStatus.Success, result.Status);
         });
         AssertRelationTypesAreSame(relationType, result.Result);
-
-        var persistedRelationType = RelationService.GetRelationTypeById(result.Result.Key);
-
-        Assert.AreEqual(result.Result, persistedRelationType);
     }
 
     [Test]
@@ -80,14 +72,14 @@ public class RelationServiceTests : UmbracoIntegrationTest
     [TestCase("E7524E34-F84F-43DE-92E2-25999785B7EA", Constants.ObjectTypes.Strings.DataType, RelationTypeOperationStatus.InvalidParentObjectType)]
     [TestCase("00000000-0000-0000-0000-000000000000", Constants.ObjectTypes.Strings.Document, RelationTypeOperationStatus.InvalidParentObjectType)]
     [TestCase(Constants.ObjectTypes.Strings.IdReservation, Constants.ObjectTypes.Strings.Document, RelationTypeOperationStatus.InvalidParentObjectType)]
-    public async Task Cannot_Create_RelationTypes_With_Disallowed_ObjectTypes(string childObjectTypeGuid, string parentObjectTypeGuid, RelationTypeOperationStatus relationTypeOperationStatus)
+    public async Task Cannot_Create_Relation_Types_With_Disallowed_Object_Types(string childObjectTypeGuid, string parentObjectTypeGuid, RelationTypeOperationStatus relationTypeOperationStatus)
     {
-        var relationType = new RelationTypeBuilder()
+        IRelationTypeWithIsDependency relationType = new RelationTypeBuilder()
             .WithChildObjectType(new Guid(childObjectTypeGuid))
             .WithParentObjectType(new Guid(parentObjectTypeGuid))
             .Build();
 
-        var result = await RelationService.CreateAsync(relationType, Constants.Security.SuperUserId);
+        Attempt<IRelationType, RelationTypeOperationStatus> result = await RelationService.CreateAsync(relationType, Constants.Security.SuperUserId);
 
         Assert.Multiple(() =>
         {
@@ -96,7 +88,30 @@ public class RelationServiceTests : UmbracoIntegrationTest
         });
     }
 
-    private void AssertRelationTypesAreSame(IRelationTypeWithIsDependency relationType, IRelationType result) =>
+    [Test]
+    public async Task Can_Create_Relation_Type_With_Key()
+    {
+        string key = "82E7631C-0417-460C-91C1-F65784627143";
+        IRelationTypeWithIsDependency relationType = new RelationTypeBuilder()
+            .WithChildObjectType(Constants.ObjectTypes.DocumentType)
+            .WithParentObjectType(Constants.ObjectTypes.DocumentType)
+            .WithKey(new Guid(key))
+            .Build();
+
+        Attempt<IRelationType, RelationTypeOperationStatus> result = await RelationService.CreateAsync(relationType, Constants.Security.SuperUserId);
+
+        Assert.Multiple(() =>
+        {
+            Assert.IsTrue(result.Success);
+            Assert.AreEqual(RelationTypeOperationStatus.Success, result.Status);
+            Assert.IsTrue(string.Equals(key, result.Result.Key.ToString(), StringComparison.OrdinalIgnoreCase));
+        });
+
+        AssertRelationTypesAreSame(relationType, result.Result);
+    }
+
+    private void AssertRelationTypesAreSame(IRelationTypeWithIsDependency relationType, IRelationType result)
+    {
         Assert.Multiple(() =>
         {
             Assert.AreEqual(relationType.Name, result.Name);
@@ -106,4 +121,9 @@ public class RelationServiceTests : UmbracoIntegrationTest
             var asWithDependency = (IRelationTypeWithIsDependency)result;
             Assert.AreEqual(relationType.IsDependency, asWithDependency.IsDependency);
         });
+        var persistedRelationType = RelationService.GetRelationTypeById(result.Key);
+
+        Assert.AreEqual(result, persistedRelationType);
+    }
+
 }
