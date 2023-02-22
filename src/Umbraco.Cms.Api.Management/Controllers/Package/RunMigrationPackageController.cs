@@ -25,13 +25,10 @@ public class RunMigrationPackageController : PackageControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<IActionResult> RunMigrations(string name)
     {
-        Attempt<bool, PackageMigrationOperationStatus> result = await _packageMigrationRunner.RunningPendingPackageMigrationsSucceeded(name);
+        Attempt<bool, PackageMigrationOperationStatus> result = await _packageMigrationRunner.RunPendingPackageMigrations(name);
 
-        if (result.Success)
-        {
-            return Ok();
-        }
-
-        return PackageMigrationOperationStatusResult(result.Status);
+        return result.Success
+            ? Ok()
+            : PackageMigrationOperationStatusResult(result.Status);
     }
 }

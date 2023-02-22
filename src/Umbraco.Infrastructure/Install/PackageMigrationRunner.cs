@@ -93,7 +93,7 @@ public class PackageMigrationRunner
     /// <summary>
     ///     Checks if all executed package migrations succeeded for a package.
     /// </summary>
-    public async Task<Attempt<bool, PackageMigrationOperationStatus>> RunningPendingPackageMigrationsSucceeded(string packageName)
+    public async Task<Attempt<bool, PackageMigrationOperationStatus>> RunPendingPackageMigrations(string packageName)
     {
         // Check if there are any migrations
         if (_packageMigrationPlans.ContainsKey(packageName) == false)
