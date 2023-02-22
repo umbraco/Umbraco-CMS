@@ -249,7 +249,7 @@ public sealed class AuditService : RepositoryService, IAuditService
             throw new ArgumentOutOfRangeException(nameof(take));
         }
 
-        IUser? user = _userService.GetByKey(userKey);
+        IUser? user = await _userService.GetAsync(userKey);
 
         if (user is null)
         {
