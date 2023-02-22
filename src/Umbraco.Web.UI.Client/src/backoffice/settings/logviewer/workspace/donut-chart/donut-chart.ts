@@ -112,7 +112,7 @@ export class UmbDonutChartElement extends LitElement {
 	}
 
 	#renderCircles() {
-		const highlightFactor = 4;
+
 
 		return svg`
         	<svg viewBox="0 0 ${this.viewBox} ${this.viewBox}" role="list">

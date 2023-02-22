@@ -1,9 +1,10 @@
 import '../donut-chart';
-import { css, html } from 'lit';
+import { css, html, PropertyValueMap } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { LogLevel, UmbLogViewerWorkspaceContext } from './logviewer-root.context';
 import { UmbLitElement } from '@umbraco-cms/element';
 import { LogLevelModel, PagedLogTemplateModel, SavedLogSearchModel } from '@umbraco-cms/backend-api';
+import { clamp } from 'lodash-es';
 
 //TODO make uui-input accept min and max values
 @customElement('umb-logviewer-root-workspace')
@@ -14,11 +15,11 @@ export class UmbLogViewerRootWorkspaceElement extends UmbLitElement {
 				display: block;
 
 				--umb-log-viewer-debug-color: var(--uui-color-default-emphasis);
-				--umb-log-viewer-information-color: var(--uui-color-positive-standalone);
-				--umb-log-viewer-warning-color: var(--uui-color-warning-standalone);
-				--umb-log-viewer-error-color: var(--uui-color-danger-standalone);
-				--umb-log-viewer-fatal-color: var(--uui-color-default-standalone);
-				--umb-log-viewer-verbose-color: var(--uui-color-current-standalone);
+				--umb-log-viewer-information-color: var(--uui-color-positive);
+				--umb-log-viewer-warning-color: var(--uui-color-warning);
+				--umb-log-viewer-error-color: var(--uui-color-danger);
+				--umb-log-viewer-fatal-color: var(--uui-color-default);
+				--umb-log-viewer-verbose-color: var(--uui-color-current);
 			}
 
 			#header {
@@ -146,6 +147,21 @@ export class UmbLogViewerRootWorkspaceElement extends UmbLitElement {
 				margin-top: var(--uui-size-space-5);
 			}
 
+			button {
+				all: unset;
+				display: flex;
+				align-items: center;
+				cursor: pointer;
+			}
+
+			button:focus {
+				outline: 1px solid var(--uui-color-focus);
+			}
+
+			button.active {
+				text-decoration: line-through;
+			}
+
 			#chart {
 				width: 150px;
 				aspect-ratio: 1;
@@ -196,6 +212,12 @@ export class UmbLogViewerRootWorkspaceElement extends UmbLitElement {
 	private _totalLogCount = 0;
 
 	@state()
+	private _logLevelCountFilter: string[] = [];
+
+	@state()
+	private logLevelCount: [string, number][] = [];
+
+	@state()
 	private _logLevelCount: LogLevel | null = null;
 
 	@state()
@@ -203,6 +225,12 @@ export class UmbLogViewerRootWorkspaceElement extends UmbLitElement {
 
 	@state()
 	private _endDate = this.yesterday;
+
+	setLogLevelCount() {
+		this.logLevelCount = this._logLevelCount
+			? Object.entries(this._logLevelCount).filter(([level, number]) => !this._logLevelCountFilter.includes(level))
+			: [];
+	}
 
 	load(): void {
 		// Not relevant for this workspace -added to prevent the error from popping up
@@ -225,6 +253,7 @@ export class UmbLogViewerRootWorkspaceElement extends UmbLitElement {
 
 		this.observe(this.#logViewerContext.logCount, (logLevel) => {
 			this._logLevelCount = logLevel ?? null;
+			this.setLogLevelCount();
 		});
 		await this.#logViewerContext.getLogCount(this.today, this.yesterday);
 
@@ -234,14 +263,23 @@ export class UmbLogViewerRootWorkspaceElement extends UmbLitElement {
 		await this.#logViewerContext.getMessageTemplates(0, 10);
 
 		this._totalLogCount = this._logLevelCount
-			? Object.values(this._logLevelCount).reduce((acc, count) => acc + count, 0)
+			? this.logLevelCount.flatMap((arr) => arr[1]).reduce((acc, count) => acc + count, 0)
 			: 0;
+	}
+
+	protected willUpdate(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
+		if (_changedProperties.has('_logLevelCountFilter')) {
+			this.setLogLevelCount();
+			this._totalLogCount = this._logLevelCount
+				? this.logLevelCount.flatMap((arr) => arr[1]).reduce((acc, count) => acc + count, 0)
+				: 0;
+		}
 	}
 
 	#calculatePercentage(partialValue: number) {
 		if (this._totalLogCount === 0) return 0;
 		const percent = Math.round((100 * partialValue) / this._totalLogCount);
-		return percent;
+		return clamp(percent, 0, 99);
 	}
 
 	#setDates(event: Event) {
@@ -263,6 +301,15 @@ export class UmbLogViewerRootWorkspaceElement extends UmbLitElement {
 				><uui-icon name="umb:search"></uui-icon>${searchListItem.name}</uui-button
 			>
 		</li>`;
+	}
+
+	#setCountFilter(level: string) {
+		if (this._logLevelCountFilter.includes(level)) {
+			this._logLevelCountFilter = this._logLevelCountFilter.filter((item) => item !== level);
+			return;
+		}
+
+		this._logLevelCountFilter = [...this._logLevelCountFilter, level];
 	}
 
 	render() {
@@ -305,10 +352,16 @@ export class UmbLogViewerRootWorkspaceElement extends UmbLitElement {
 											? Object.keys(this._logLevelCount).map(
 													(level) =>
 														html`<li>
-															<uui-icon
-																name="umb:record"
-																style="color: var(--umb-log-viewer-${level.toLowerCase()}-color);"></uui-icon
-															>${level}
+															<button
+																@click=${(e: Event) => {
+																	(e.target as HTMLElement)?.classList.toggle('active');
+																	this.#setCountFilter(level);
+																}}>
+																<uui-icon
+																	name="umb:record"
+																	style="color: var(--umb-log-viewer-${level.toLowerCase()}-color);"></uui-icon
+																>${level}
+															</button>
 														</li>`
 											  )
 											: ''
@@ -318,12 +371,12 @@ export class UmbLogViewerRootWorkspaceElement extends UmbLitElement {
 							<umb-donut-chart>
 							${
 								this._logLevelCount
-									? Object.entries(this._logLevelCount).map(
+									? this.logLevelCount.map(
 											([level, number]) =>
 												html`<umb-donut-slice
 													tooltiptext="${level} - ${number}"
-													percent="${this.#calculatePercentage(number)}"
-													color="${`var(--umb-log-viewer-${level.toLowerCase()}-color)`}"></umb-donut-slice> `
+													.percent=${this.#calculatePercentage(number)}
+													.color="${`var(--umb-log-viewer-${level.toLowerCase()}-color)`}"></umb-donut-slice> `
 									  )
 									: ''
 							}
