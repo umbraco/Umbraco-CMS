@@ -31,7 +31,7 @@ export class UmbSearchElement extends LitElement {
 				aspect-ratio: 1;
 				height: 100%;
 			}
-			#close-icon > div {
+			#close-icon > button {
 				background: var(--uui-color-surface-alt);
 				border: 1px solid var(--uui-color-border);
 				padding: 3px 6px 4px 6px;
@@ -41,10 +41,9 @@ export class UmbSearchElement extends LitElement {
 				font-weight: 800;
 				font-size: 12px;
 			}
-			#close-icon > div:hover {
+			#close-icon > button:hover {
 				border-color: var(--uui-color-focus);
 				color: var(--uui-color-focus);
-				cursor: pointer;
 			}
 			#top {
 				background-color: var(--uui-color-surface);
@@ -83,9 +82,17 @@ export class UmbSearchElement extends LitElement {
 				background-color: var(--uui-color-surface-emphasis);
 				color: var(--uui-color-interactive-emphasis);
 			}
+			.result:hover span {
+				font-weight: unset;
+				opacity: unset;
+			}
 			a {
 				text-decoration: none;
 				color: inherit;
+			}
+			a span {
+				opacity: 0.5;
+				font-weight: 100;
 			}
 		`,
 	];
@@ -106,7 +113,7 @@ export class UmbSearchElement extends LitElement {
                 </div>
 				<input type="text" placeholder="Search..." autocomplete="off"></input>
                 <div id="close-icon">
-                    <div>esc</div>
+                    <button>esc</button>
                 </div>
 			</div>
 			<div id="main">
@@ -115,10 +122,11 @@ export class UmbSearchElement extends LitElement {
                     <div class="results">
                         <a href="#" class="result">
                             Article Controls
-                            <span style="opacity: 0.5; font-weight: 100">></span>
+                            <span>></span>
                         </a>
                         <a href="#" class="result">
                             Article
+                            <span>></span>
                         </a>
                     </div>
                 </div>
@@ -127,6 +135,7 @@ export class UmbSearchElement extends LitElement {
                     <div class="results">
                         <a href="#" class="result">
                             Article
+                            <span>></span>
                         </a>
                     </div>
                 </div>
