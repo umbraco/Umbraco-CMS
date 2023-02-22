@@ -19,7 +19,6 @@ public abstract class PackageControllerBase : ManagementApiControllerBase
             PackageOperationStatus.DuplicateItemName => Conflict(new ProblemDetailsBuilder()
                 .WithTitle("Duplicate package name")
                 .WithDetail("Another package already exists with the attempted name.")
-                .WithStatus(StatusCodes.Status409Conflict)
                 .Build()),
             PackageOperationStatus.InvalidName => BadRequest(new ProblemDetailsBuilder()
                 .WithTitle("Invalid package name")
@@ -35,7 +34,6 @@ public abstract class PackageControllerBase : ManagementApiControllerBase
             PackageMigrationOperationStatus.CancelledByFailedMigration => Conflict(new ProblemDetailsBuilder()
                 .WithTitle("Package migration failed")
                 .WithDetail("Check log for full details about the failed migration.")
-                .WithStatus(StatusCodes.Status409Conflict)
                 .Build()),
             _ => StatusCode(StatusCodes.Status500InternalServerError, "Unknown package migration operation status")
         };

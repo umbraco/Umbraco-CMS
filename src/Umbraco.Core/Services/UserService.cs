@@ -11,7 +11,9 @@ using Umbraco.Cms.Core.Persistence;
 using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Scoping;
+using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Extensions;
+using UserProfile = Umbraco.Cms.Core.Models.Membership.UserProfile;
 
 namespace Umbraco.Cms.Core.Services;
 
@@ -25,6 +27,7 @@ internal class UserService : RepositoryService, IUserService
     private readonly ILogger<UserService> _logger;
     private readonly IRuntimeState _runtimeState;
     private readonly IUserGroupRepository _userGroupRepository;
+    private readonly IUserGroupAuthorizationService _userGroupAuthorizationService;
     private readonly IUserRepository _userRepository;
 
     public UserService(
@@ -34,12 +37,14 @@ internal class UserService : RepositoryService, IUserService
         IRuntimeState runtimeState,
         IUserRepository userRepository,
         IUserGroupRepository userGroupRepository,
-        IOptions<GlobalSettings> globalSettings)
+        IOptions<GlobalSettings> globalSettings,
+        IUserGroupAuthorizationService userGroupAuthorizationService)
         : base(provider, loggerFactory, eventMessagesFactory)
     {
         _runtimeState = runtimeState;
         _userRepository = userRepository;
         _userGroupRepository = userGroupRepository;
+        _userGroupAuthorizationService = userGroupAuthorizationService;
         _globalSettings = globalSettings.Value;
         _logger = loggerFactory.CreateLogger<UserService>();
     }
@@ -246,8 +251,22 @@ internal class UserService : RepositoryService, IUserService
     {
         using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
         {
-            IQuery<IUser> query = Query<IUser>().Where(x => x.Email.Equals(email));
-            return _userRepository.Get(query)?.FirstOrDefault();
+            try
+            {
+                IQuery<IUser> query = Query<IUser>().Where(x => x.Email.Equals(email));
+                return _userRepository.Get(query)?.FirstOrDefault();
+            }
+            catch(DbException)
+            {
+                // We also need to catch upgrade state here, because the framework will try to call this to validate the email.
+                if (IsUpgrading)
+                {
+                    return _userRepository.GetForUpgradeByEmail(email);
+                }
+
+                throw;
+            }
+
         }
     }
 
@@ -280,7 +299,7 @@ internal class UserService : RepositoryService, IUserService
                 if (IsUpgrading)
                 {
                     // NOTE: this will not be cached
-                    return _userRepository.GetByUsername(username, false);
+                    return _userRepository.GetForUpgradeByUsername(username);
                 }
 
                 throw;
@@ -797,11 +816,20 @@ internal class UserService : RepositoryService, IUserService
                 if (IsUpgrading)
                 {
                     // NOTE: this will not be cached
-                    return _userRepository.Get(id, false);
+                    return _userRepository.GetForUpgrade(id);
                 }
 
                 throw;
             }
+        }
+    }
+
+    public Task<IUser?> GetAsync(Guid key)
+    {
+        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
+        {
+            IQuery<IUser> query = Query<IUser>().Where(x => x.Key == key);
+            return Task.FromResult(_userRepository.Get(query).FirstOrDefault());
         }
     }
 
@@ -884,6 +912,7 @@ internal class UserService : RepositoryService, IUserService
     /// </summary>
     /// <param name="ids">Optional Ids of UserGroups to retrieve</param>
     /// <returns>An enumerable list of <see cref="IUserGroup" /></returns>
+    [Obsolete("Use IUserGroupService.GetAsync instead, scheduled for removal in V15.")]
     public IEnumerable<IUserGroup> GetAllUserGroups(params int[] ids)
     {
         using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
@@ -892,6 +921,7 @@ internal class UserService : RepositoryService, IUserService
         }
     }
 
+    [Obsolete("Use IUserGroupService.GetAsync instead, scheduled for removal in V15.")]
     public IEnumerable<IUserGroup> GetUserGroupsByAlias(params string[] aliases)
     {
         if (aliases.Length == 0)
@@ -914,6 +944,7 @@ internal class UserService : RepositoryService, IUserService
     /// <returns>
     ///     <see cref="IUserGroup" />
     /// </returns>
+    [Obsolete("Use IUserGroupService.GetAsync instead, scheduled for removal in V15.")]
     public IUserGroup? GetUserGroupByAlias(string alias)
     {
         if (string.IsNullOrWhiteSpace(alias))
@@ -936,6 +967,7 @@ internal class UserService : RepositoryService, IUserService
     /// <returns>
     ///     <see cref="IUserGroup" />
     /// </returns>
+    [Obsolete("Use IUserGroupService.GetAsync instead, scheduled for removal in V15.")]
     public IUserGroup? GetUserGroupById(int id)
     {
         using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
@@ -958,6 +990,7 @@ internal class UserService : RepositoryService, IUserService
     /// <c>False</c>
     /// to not raise events
     /// </param>
+    [Obsolete("Use IUserGroupService.CreateAsync and IUserGroupService.UpdateAsync instead, scheduled for removal in V15.")]
     public void Save(IUserGroup userGroup, int[]? userIds = null)
     {
         EventMessages evtMsgs = EventMessagesFactory.Get();
@@ -965,7 +998,7 @@ internal class UserService : RepositoryService, IUserService
         using (ICoreScope scope = ScopeProvider.CreateCoreScope())
         {
             // we need to figure out which users have been added / removed, for audit purposes
-            var empty = new IUser[0];
+            IUser[] empty = Array.Empty<IUser>();
             IUser[] addedUsers = empty;
             IUser[] removedUsers = empty;
 
@@ -1018,6 +1051,7 @@ internal class UserService : RepositoryService, IUserService
     ///     Deletes a UserGroup
     /// </summary>
     /// <param name="userGroup">UserGroup to delete</param>
+    [Obsolete("Use IUserGroupService.DeleteAsync instead, scheduled for removal in V15.")]
     public void DeleteUserGroup(IUserGroup userGroup)
     {
         EventMessages evtMsgs = EventMessagesFactory.Get();

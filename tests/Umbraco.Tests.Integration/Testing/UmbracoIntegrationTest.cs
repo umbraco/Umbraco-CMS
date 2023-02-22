@@ -8,6 +8,7 @@ using NUnit.Framework;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.IO;
+using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Core.Web;
@@ -19,6 +20,7 @@ using Umbraco.Cms.Persistence.SqlServer;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Integration.DependencyInjection;
 using Umbraco.Cms.Tests.Integration.Extensions;
+using Umbraco.Cms.Tests.Integration.TestServerTest;
 using Constants = Umbraco.Cms.Core.Constants;
 
 namespace Umbraco.Cms.Tests.Integration.Testing;
@@ -129,7 +131,9 @@ public abstract class UmbracoIntegrationTest : UmbracoIntegrationTestBase
 
         // We register this service because we need it for IRuntimeState, if we don't this breaks 900 tests
         services.AddSingleton<IConflictingRouteService, TestConflictingRouteService>();
+        services.AddSingleton<IWebProfilerRepository, TestWebProfilerRepository>();
 
+        
         services.AddLogger(webHostEnvironment, Configuration);
 
         // Add it!

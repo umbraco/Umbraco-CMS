@@ -1,6 +1,8 @@
 using System.Text;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
@@ -30,6 +32,7 @@ public sealed class AuditNotificationsHandler :
     private readonly GlobalSettings _globalSettings;
     private readonly IIpResolver _ipResolver;
     private readonly IMemberService _memberService;
+    private readonly IUserGroupService _userGroupService;
     private readonly IUserService _userService;
 
     public AuditNotificationsHandler(
@@ -39,7 +42,8 @@ public sealed class AuditNotificationsHandler :
         IIpResolver ipResolver,
         IOptionsMonitor<GlobalSettings> globalSettings,
         IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
-        IMemberService memberService)
+        IMemberService memberService,
+        IUserGroupService userGroupService)
     {
         _auditService = auditService;
         _userService = userService;
@@ -47,7 +51,30 @@ public sealed class AuditNotificationsHandler :
         _ipResolver = ipResolver;
         _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
         _memberService = memberService;
+        _userGroupService = userGroupService;
         _globalSettings = globalSettings.CurrentValue;
+    }
+
+    [Obsolete("Use constructor that takes IUserGroupService, scheduled for removal in V15.")]
+    public AuditNotificationsHandler(
+        IAuditService auditService,
+        IUserService userService,
+        IEntityService entityService,
+        IIpResolver ipResolver,
+        IOptionsMonitor<GlobalSettings> globalSettings,
+        IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
+        IMemberService memberService)
+        : this(
+            auditService,
+            userService,
+            entityService,
+            ipResolver,
+            globalSettings,
+            backOfficeSecurityAccessor,
+            memberService,
+            StaticServiceProvider.Instance.GetRequiredService<IUserGroupService>()
+        )
+    {
     }
 
     private IUser CurrentPerformingUser
@@ -95,7 +122,7 @@ public sealed class AuditNotificationsHandler :
         IEnumerable<EntityPermission> perms = notification.EntityPermissions;
         foreach (EntityPermission perm in perms)
         {
-            IUserGroup? group = _userService.GetUserGroupById(perm.UserGroupId);
+            IUserGroup? group = _userGroupService.GetAsync(perm.UserGroupId).Result;
             var assigned = string.Join(", ", perm.AssignedPermissions ?? Array.Empty<string>());
             IEntitySlim? entity = _entityService.Get(perm.EntityId);
 

@@ -1,6 +1,6 @@
 ﻿namespace Umbraco.Cms.Api.Management.ViewModels.DataType;
 
-public class DataTypeViewModel : DataTypeModelBase
+public class DataTypeViewModel : DataTypeModelBase, INamedEntityViewModel
 {
     public Guid Key { get; set; }
 

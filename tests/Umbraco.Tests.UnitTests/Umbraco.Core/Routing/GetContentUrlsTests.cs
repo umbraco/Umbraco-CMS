@@ -1,7 +1,4 @@
-using System.Collections.Generic;
 using System.Globalization;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
@@ -58,16 +55,16 @@ public class GetContentUrlsTests : PublishedSnapshotServiceTestBase
         return textService.Object;
     }
 
-    private ILocalizationService GetLangService(params string[] isoCodes)
+    private ILanguageService GetLangService(params string[] isoCodes)
     {
         var allLangs = isoCodes
             .Select(CultureInfo.GetCultureInfo)
             .Select(culture => new Language(culture.Name, culture.EnglishName) { IsDefault = true, IsMandatory = true })
             .ToArray();
 
-        var langServiceMock = new Mock<ILocalizationService>();
-        langServiceMock.Setup(x => x.GetAllLanguages()).Returns(allLangs);
-        langServiceMock.Setup(x => x.GetDefaultLanguageIsoCode()).Returns(allLangs.First(x => x.IsDefault).IsoCode);
+        var langServiceMock = new Mock<ILanguageService>();
+        langServiceMock.Setup(x => x.GetAllAsync()).ReturnsAsync(allLangs);
+        langServiceMock.Setup(x => x.GetDefaultIsoCodeAsync()).ReturnsAsync(allLangs.First(x => x.IsDefault).IsoCode);
 
         return langServiceMock.Object;
     }

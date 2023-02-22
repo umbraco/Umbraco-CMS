@@ -29,6 +29,7 @@ public abstract class DataTypeControllerBase : ManagementApiControllerBase
                 .WithTitle("Cancelled by notification")
                 .WithDetail("A notification handler prevented the data type operation.")
                 .Build()),
+            DataTypeOperationStatus.ParentNotFound => NotFound("The targeted parent for the data type operation was not found."),
             _ => StatusCode(StatusCodes.Status500InternalServerError, "Unknown data type operation status")
         };
 }
