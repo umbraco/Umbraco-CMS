@@ -1,6 +1,8 @@
 using System.Xml.Linq;
+using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Packaging;
 using Umbraco.Cms.Core.Packaging;
+using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Core.Services;
 
@@ -31,7 +33,7 @@ public interface IPackagingService : IService
     /// <summary>
     ///     Returns installed packages collected from the package migration plans.
     /// </summary>
-    IEnumerable<InstalledPackage> GetInstalledPackagesFromMigrationPlans();
+    Task<IEnumerable<InstalledPackage>> GetInstalledPackagesFromMigrationPlansAsync();
 
     InstalledPackage? GetInstalledPackageByName(string packageName);
 
@@ -53,19 +55,46 @@ public interface IPackagingService : IService
     /// </summary>
     /// <param name="key">The key of the package.</param>
     /// <returns>The package or null if the package was not found.</returns>
-    PackageDefinition? GetCreatedPackageByKey(Guid key);
+    Task<PackageDefinition?> GetCreatedPackageByKeyAsync(Guid key);
 
+    [Obsolete("Use DeleteCreatedPackageAsync instead. Scheduled for removal in Umbraco 15.")]
     void DeleteCreatedPackage(int id, int userId = Constants.Security.SuperUserId);
+
+    /// <summary>
+    ///     Deletes a created package by key.
+    /// </summary>
+    /// <param name="key">The key of the package.</param>
+    /// <param name="userId">Optional id of the user deleting the package.</param>
+    Task<Attempt<PackageDefinition?, PackageOperationStatus>> DeleteCreatedPackageAsync(Guid key, int userId = Constants.Security.SuperUserId);
 
     /// <summary>
     ///     Persists a package definition to storage
     /// </summary>
     /// <returns></returns>
+    [Obsolete("Use CreateCreatedPackageAsync or UpdateCreatedPackageAsync instead. Scheduled for removal in Umbraco 15.")]
     bool SaveCreatedPackage(PackageDefinition definition);
+
+    /// <summary>
+    ///     Creates a new package.
+    /// </summary>
+    /// <param name="package"><see cref="PackageDefinition" />model for the package to create.</param>
+    Task<Attempt<PackageDefinition, PackageOperationStatus>> CreateCreatedPackageAsync(PackageDefinition package);
+
+    /// <summary>
+    ///     Updates a created package.
+    /// </summary>
+    /// <param name="package"><see cref="PackageDefinition" />model for the package to update.</param>
+    Task<Attempt<PackageDefinition, PackageOperationStatus>> UpdateCreatedPackageAsync(PackageDefinition package);
 
     /// <summary>
     ///     Creates the package file and returns it's physical path
     /// </summary>
     /// <param name="definition"></param>
     string ExportCreatedPackage(PackageDefinition definition);
+
+    /// <summary>
+    ///     Gets the package file stream.
+    /// </summary>
+    /// <param name="definition"></param>
+    Stream? GetPackageFileStream(PackageDefinition definition) => null;
 }
