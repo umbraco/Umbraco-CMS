@@ -4025,7 +4025,7 @@
               "schema": {
                 "oneOf": [
                   {
-                    "$ref": "#/components/schemas/RelationTypeSavingModel"
+                    "$ref": "#/components/schemas/CreateRelationTypeRequestModel"
                   }
                 ]
               }
@@ -4084,12 +4084,15 @@
                 "schema": {
                   "oneOf": [
                     {
-                      "$ref": "#/components/schemas/RelationTypeModel"
+                      "$ref": "#/components/schemas/RelationTypeResponseModel"
                     }
                   ]
                 }
               }
             }
+          },
+          "404": {
+            "description": "Not Found"
           }
         }
       },
@@ -4147,7 +4150,7 @@
               "schema": {
                 "oneOf": [
                   {
-                    "$ref": "#/components/schemas/RelationTypeUpdatingModel"
+                    "$ref": "#/components/schemas/UpdateRelationTypeRequestModel"
                   }
                 ]
               }
@@ -4162,7 +4165,7 @@
                 "schema": {
                   "oneOf": [
                     {
-                      "$ref": "#/components/schemas/RelationTypeModel"
+                      "$ref": "#/components/schemas/RelationTypeResponseModel"
                     }
                   ]
                 }
@@ -4224,7 +4227,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PagedObjectTypeModel"
+                  "$ref": "#/components/schemas/PagedObjectTypeResponseModel"
                 }
               }
             }
@@ -5761,6 +5764,36 @@
           }
         }
       },
+      "CreateRelationTypeRequestModel": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "key": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          },
+          "isBidirectional": {
+            "type": "boolean"
+          },
+          "parentObjectType": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          },
+          "childObjectType": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          },
+          "isDependency": {
+            "type": "boolean"
+          }
+        },
+        "additionalProperties": false
+      },
       "CultureModel": {
         "type": "object",
         "properties": {
@@ -6907,7 +6940,7 @@
         "type": "integer",
         "format": "int32"
       },
-      "ObjectTypeModel": {
+      "ObjectTypeResponseModel": {
         "type": "object",
         "properties": {
           "name": {
@@ -7371,7 +7404,7 @@
         },
         "additionalProperties": false
       },
-      "PagedObjectTypeModel": {
+      "PagedObjectTypeResponseModel": {
         "required": [
           "items",
           "total"
@@ -7387,7 +7420,7 @@
             "items": {
               "oneOf": [
                 {
-                  "$ref": "#/components/schemas/ObjectTypeModel"
+                  "$ref": "#/components/schemas/ObjectTypeResponseModel"
                 }
               ]
             }
@@ -7809,7 +7842,7 @@
         },
         "additionalProperties": false
       },
-      "RelationTypeModel": {
+      "RelationTypeResponseModel": {
         "type": "object",
         "properties": {
           "key": {
@@ -7849,61 +7882,6 @@
           },
           "childObjectTypeName": {
             "type": "string",
-            "nullable": true
-          },
-          "isDependency": {
-            "type": "boolean"
-          }
-        },
-        "additionalProperties": false
-      },
-      "RelationTypeSavingModel": {
-        "type": "object",
-        "properties": {
-          "name": {
-            "type": "string"
-          },
-          "key": {
-            "type": "string",
-            "format": "uuid",
-            "nullable": true
-          },
-          "isBidirectional": {
-            "type": "boolean"
-          },
-          "parentObjectType": {
-            "type": "string",
-            "format": "uuid",
-            "nullable": true
-          },
-          "childObjectType": {
-            "type": "string",
-            "format": "uuid",
-            "nullable": true
-          },
-          "isDependency": {
-            "type": "boolean"
-          }
-        },
-        "additionalProperties": false
-      },
-      "RelationTypeUpdatingModel": {
-        "type": "object",
-        "properties": {
-          "name": {
-            "type": "string"
-          },
-          "isBidirectional": {
-            "type": "boolean"
-          },
-          "parentObjectType": {
-            "type": "string",
-            "format": "uuid",
-            "nullable": true
-          },
-          "childObjectType": {
-            "type": "string",
-            "format": "uuid",
             "nullable": true
           },
           "isDependency": {
@@ -8266,6 +8244,31 @@
             "type": "string"
           },
           "hasChildren": {
+            "type": "boolean"
+          }
+        },
+        "additionalProperties": false
+      },
+      "UpdateRelationTypeRequestModel": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "isBidirectional": {
+            "type": "boolean"
+          },
+          "parentObjectType": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          },
+          "childObjectType": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          },
+          "isDependency": {
             "type": "boolean"
           }
         },
