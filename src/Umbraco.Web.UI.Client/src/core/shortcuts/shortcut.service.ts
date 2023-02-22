@@ -1,3 +1,7 @@
+import { UmbContextProviderController, UmbContextToken } from '@umbraco-cms/context-api';
+import { UmbControllerHostInterface } from '@umbraco-cms/controller';
+import { UmbSearchService } from 'src/backoffice/search/search.service';
+
 export type Shortcut = {
 	name: string;
 	alias: string;
@@ -12,11 +16,12 @@ export type Shortcut = {
 };
 
 export class UmbShortcutService {
+	#host: UmbControllerHostInterface;
 	#shortcuts: Array<Shortcut> = [
 		{
 			name: 'Open search',
 			alias: 'Shortcut.OpenSearch',
-			action: () => console.log('Open search'),
+			action: () => UmbSearchService.Open(),
 			combinations: [
 				{
 					key: 'k',
@@ -30,7 +35,11 @@ export class UmbShortcutService {
 		},
 	];
 
-	constructor() {
+	constructor(host: UmbControllerHostInterface) {
+		this.#host = host;
+
+		new UmbContextProviderController(host, UMB_SHORTCUT_CONTEXT_TOKEN, this);
+
 		addEventListener('keydown', (event: KeyboardEvent) => {
 			if (!event.altKey && !event.ctrlKey && !event.shiftKey && !event.metaKey) return;
 			if (event.key === 'Shift' || event.key === 'Control' || event.key === 'Alt' || event.key === 'Meta') return;
@@ -51,4 +60,4 @@ export class UmbShortcutService {
 	}
 }
 
-export default UmbShortcutService;
+export const UMB_SHORTCUT_CONTEXT_TOKEN = new UmbContextToken<UmbShortcutService>(UmbShortcutService.name);
