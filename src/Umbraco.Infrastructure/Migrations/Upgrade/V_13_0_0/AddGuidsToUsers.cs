@@ -61,7 +61,16 @@ public class AddGuidsToUsers : UnscopedMigrationBase
             return;
         }
 
-        // See AddGuidsToUserGroups for more information on why we're doing this.
+        /*
+         * We commit the initial transaction start be the scope. This is required in order to disable the foreign keys.
+         * We then begin a new transaction, this transaction will be committed or rolled back by the scope, like normal.
+         * We don't have to worry about re-enabling the foreign keys, since these are enabled by default every time a connection is established.
+         *
+         * Ideally we'd want to do this with the unscoped database we get, however, this cannot be done,
+         * since our scoped database cannot share a connection with the unscoped database, so a new one will be created, which enables the foreign keys.
+         * Similarly we cannot use Database.CompleteTransaction(); since this also closes the connection,
+         * so starting a new transaction would re-enable foreign keys.
+         */
         Database.Execute("COMMIT;");
         Database.Execute("PRAGMA foreign_keys=off;");
         Database.Execute("BEGIN TRANSACTION;");
