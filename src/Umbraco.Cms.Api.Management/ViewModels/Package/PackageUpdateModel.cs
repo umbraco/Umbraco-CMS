@@ -2,13 +2,8 @@ using System.ComponentModel;
 
 namespace Umbraco.Cms.Api.Management.ViewModels.Package;
 
-public class PackageDefinitionViewModel : PackageModelBase
+public class PackageUpdateModel : PackageModelBase
 {
-    /// <summary>
-    ///     Gets or sets the key.
-    /// </summary>
-    public Guid Key { get; set; }
-
     /// <summary>
     ///     Gets or sets the full path to the package's XML file.
     /// </summary>
