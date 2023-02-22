@@ -31,5 +31,13 @@ public class RelationTypeControllerBase : ManagementApiControllerBase
                 .WithTitle("Relation type not found")
                 .WithDetail("A relation type with the given key does not exist")
                 .Build()),
+            RelationTypeOperationStatus.InvalidChildObjectType => BadRequest(new ProblemDetailsBuilder()
+                .WithTitle("Invalid child object type")
+                .WithDetail("The child object type is not allowed")
+                .Build()),
+            RelationTypeOperationStatus.InvalidParentObjectType => BadRequest(new ProblemDetailsBuilder()
+                .WithTitle("Invalid parent object type")
+                .WithDetail("The parent object type is not allowed")
+                .Build()),
         };
 }

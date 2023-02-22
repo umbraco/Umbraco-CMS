@@ -546,21 +546,6 @@ public class RelationService : RepositoryService, IRelationService
             return Attempt.FailWithStatus(RelationTypeOperationStatus.InvalidId, relationType);
         }
 
-        // Validate that parent & child object types are allowed
-        UmbracoObjectTypes[] allowedObjectTypes = GetAllowedObjectTypes().ToArray();
-        var childObjectTypeAllowed = allowedObjectTypes.Any(x => x.GetGuid() == relationType.ParentObjectType);
-        if (childObjectTypeAllowed is false)
-        {
-            return Attempt.FailWithStatus(RelationTypeOperationStatus.InvalidChildObjectType, relationType);
-        }
-
-        var parentObjectTypeAllowed = allowedObjectTypes.Any(x => x.GetGuid() == relationType.ChildObjectType);
-
-        if (parentObjectTypeAllowed is false)
-        {
-            return Attempt.FailWithStatus(RelationTypeOperationStatus.InvalidParentObjectType, relationType);
-        }
-
         return await SaveAsync(
             relationType,
             () => _relationTypeRepository.Get(relationType.Key) is not null ? RelationTypeOperationStatus.KeyAlreadyExists : RelationTypeOperationStatus.Success,
@@ -579,6 +564,21 @@ public class RelationService : RepositoryService, IRelationService
 
     private async Task<Attempt<IRelationType, RelationTypeOperationStatus>> SaveAsync(IRelationType relationType, Func<RelationTypeOperationStatus> operationValidation, AuditType auditType, string auditMessage, int userId)
     {
+        // Validate that parent & child object types are allowed
+        UmbracoObjectTypes[] allowedObjectTypes = GetAllowedObjectTypes().ToArray();
+        var childObjectTypeAllowed = allowedObjectTypes.Any(x => x.GetGuid() == relationType.ChildObjectType);
+        if (childObjectTypeAllowed is false)
+        {
+            return Attempt.FailWithStatus(RelationTypeOperationStatus.InvalidChildObjectType, relationType);
+        }
+
+        var parentObjectTypeAllowed = allowedObjectTypes.Any(x => x.GetGuid() == relationType.ParentObjectType);
+
+        if (parentObjectTypeAllowed is false)
+        {
+            return Attempt.FailWithStatus(RelationTypeOperationStatus.InvalidParentObjectType, relationType);
+        }
+
         using (ICoreScope scope = ScopeProvider.CreateCoreScope())
         {
             RelationTypeOperationStatus status = operationValidation();
