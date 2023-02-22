@@ -1950,6 +1950,7 @@ public class ContentController : ContentControllerBase
         }
 
         PublishResult publishResult = _contentService.SaveAndPublish(foundContent, userId: _backofficeSecurityAccessor.BackOfficeSecurity?.GetUserId().Result ?? 0);
+
         if (publishResult.Success == false)
         {
             var notificationModel = new SimpleNotificationModel();
@@ -1972,17 +1973,19 @@ public class ContentController : ContentControllerBase
     [Authorize(Policy = AuthorizationPolicies.ContentPermissionPublishById)]
     public IActionResult PostPublishByIdAndCulture(PublishContent model)
     {
+        var languageCount = _allLangs.Value.Count();
+
+        // If there is no culture specified or the cultures specified are equal to the total amount of languages, publish the content in all cultures.
+        if (model.Cultures == null || !model.Cultures.Any() || model.Cultures.Length == languageCount)
+        {
+            return PostPublishById(model.Id);
+        }
+
         IContent? foundContent = GetObjectFromRequest(() => _contentService.GetById(model.Id));
 
         if (foundContent == null)
         {
             return HandleContentNotFound(model.Id);
-        }
-
-        var languageCount = _allLangs.Value.Count();
-        if (model.Cultures == null || !model.Cultures.Any() || model.Cultures.Length == languageCount)
-        {
-            return PostPublishById(model.Id);
         }
 
         var results = new Dictionary<string, PublishResult>();
@@ -1993,17 +1996,13 @@ public class ContentController : ContentControllerBase
             results[culture] = publishResult;
         }
 
-
         if (results.Any(x => x.Value.Success == false))
         {
             var notificationModel = new SimpleNotificationModel();
 
-            foreach (var culture in results)
+            foreach (var culture in results.Where(x => x.Value.Success == false))
             {
-                if (culture.Value.Success == false)
-                {
-                    AddMessageForPublishStatus(new[] { culture.Value }, notificationModel);
-                }
+                AddMessageForPublishStatus(new[] { culture.Value }, notificationModel);
             }
 
             return ValidationProblem(notificationModel);
