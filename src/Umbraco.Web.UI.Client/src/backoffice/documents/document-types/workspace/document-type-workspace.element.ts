@@ -28,6 +28,7 @@ export class UmbDocumentTypeWorkspaceElement extends UmbLitElement implements Um
 			#name {
 				width: 100%;
 				flex: 1 1 auto;
+				align-items: center;
 			}
 
 			#alias {
@@ -70,7 +71,7 @@ export class UmbDocumentTypeWorkspaceElement extends UmbLitElement implements Um
 	}
 
 	public create(parentKey: string | null) {
-		this._workspaceContext.create(parentKey);
+		this._workspaceContext.createScaffold(parentKey);
 	}
 
 	// TODO. find a way where we don't have to do this for all workspaces.
@@ -89,7 +90,6 @@ export class UmbDocumentTypeWorkspaceElement extends UmbLitElement implements Um
 
 		modalHandler?.onClose().then((saved) => {
 			if (saved) this._workspaceContext?.setIcon(saved.icon);
-			console.log(saved);
 			// TODO save color ALIAS as well
 		});
 	}
@@ -100,7 +100,7 @@ export class UmbDocumentTypeWorkspaceElement extends UmbLitElement implements Um
 				<div id="header" slot="header">
 					<uui-button id="icon" @click=${this._handleIconClick} compact>
 						<uui-icon
-							name="${this._documentType?.icon || 'umb:document-dashed-line'}"
+							name="${this._documentType?.icon || this._icon.name}"
 							style="color: ${this._icon.color}"></uui-icon>
 					</uui-button>
 
