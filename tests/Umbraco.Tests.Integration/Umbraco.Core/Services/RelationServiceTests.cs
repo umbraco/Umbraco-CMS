@@ -110,6 +110,28 @@ public class RelationServiceTests : UmbracoIntegrationTest
         AssertRelationTypesAreSame(relationType, result.Result);
     }
 
+    [Test]
+    [TestCase(-1000000)]
+    [TestCase(-1)]
+    [TestCase(100)]
+    [TestCase(10000000)]
+    public async Task Cannot_Create_Relation_Types_With_Id(int id)
+    {
+        IRelationTypeWithIsDependency relationType = new RelationTypeBuilder()
+            .WithChildObjectType(Constants.ObjectTypes.DocumentType)
+            .WithParentObjectType(Constants.ObjectTypes.DocumentType)
+            .WithId(id)
+            .Build();
+
+        Attempt<IRelationType, RelationTypeOperationStatus> result = await RelationService.CreateAsync(relationType, Constants.Security.SuperUserId);
+
+        Assert.Multiple(() =>
+        {
+            Assert.IsFalse(result.Success);
+            Assert.AreEqual(RelationTypeOperationStatus.InvalidId, result.Status);
+        });
+    }
+
     private void AssertRelationTypesAreSame(IRelationTypeWithIsDependency relationType, IRelationType result)
     {
         Assert.Multiple(() =>
