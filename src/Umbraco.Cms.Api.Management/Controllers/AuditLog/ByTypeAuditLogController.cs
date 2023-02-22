@@ -19,7 +19,7 @@ public class ByTypeAuditLogController : AuditLogControllerBase
         _auditLogViewModelFactory = auditLogViewModelFactory;
     }
 
-    [HttpGet("{logType}")]
+    [HttpGet("type/{logType}")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedViewModel<AuditlogViewModel>), StatusCodes.Status200OK)]
     public async Task<IActionResult> ByType(AuditType logType, DateTime? sinceDate = null, int skip = 0, int take = 100)
