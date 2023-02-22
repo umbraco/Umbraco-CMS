@@ -8,7 +8,7 @@ import { UUIComboboxElement, UUIComboboxEvent } from '@umbraco-ui/uui';
 import { UmbCultureRepository } from '../../../settings/cultures/repository/culture.repository';
 import { UmbLitElement } from '@umbraco-cms/element';
 import { CultureModel } from '@umbraco-cms/backend-api';
-import { UmbChangeEvent } from 'src/core/events';
+import { UmbChangeEvent } from '@umbraco-cms/events';
 
 @customElement('umb-input-culture-select')
 export class UmbInputCultureSelectElement extends FormControlMixin(UmbLitElement) {

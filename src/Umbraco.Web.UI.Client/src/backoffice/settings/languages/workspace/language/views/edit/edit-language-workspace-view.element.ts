@@ -6,7 +6,7 @@ import { ifDefined } from 'lit/directives/if-defined.js';
 import { UmbLanguageWorkspaceContext } from '../../language-workspace.context';
 import { UmbLitElement } from '@umbraco-cms/element';
 import { LanguageModel } from '@umbraco-cms/backend-api';
-import { UmbChangeEvent } from 'src/core/events';
+import { UmbChangeEvent } from '@umbraco-cms/events';
 import UmbInputCultureSelectElement from 'src/backoffice/shared/components/input-culture-select/input-culture-select.element';
 import UmbInputLanguagePickerElement from 'src/backoffice/shared/components/input-language-picker/input-language-picker.element';
 
