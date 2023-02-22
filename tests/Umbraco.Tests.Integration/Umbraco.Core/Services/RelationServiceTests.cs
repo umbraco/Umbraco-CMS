@@ -42,7 +42,6 @@ public class RelationServiceTests : UmbracoIntegrationTest
         AssertRelationTypesAreSame(relationType, result.Result);
     }
 
-
     [Test]
     [TestCase(Constants.ObjectTypes.Strings.Document, Constants.ObjectTypes.Strings.Media)]
     [TestCase(Constants.ObjectTypes.Strings.Member, Constants.ObjectTypes.Strings.DocumentType)]
@@ -91,7 +90,7 @@ public class RelationServiceTests : UmbracoIntegrationTest
     [Test]
     public async Task Can_Create_Relation_Type_With_Key()
     {
-        string key = "82E7631C-0417-460C-91C1-F65784627143";
+        const string key = "82E7631C-0417-460C-91C1-F65784627143";
         IRelationTypeWithIsDependency relationType = new RelationTypeBuilder()
             .WithChildObjectType(Constants.ObjectTypes.DocumentType)
             .WithParentObjectType(Constants.ObjectTypes.DocumentType)
