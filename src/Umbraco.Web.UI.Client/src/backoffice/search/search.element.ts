@@ -108,38 +108,41 @@ export class UmbSearchElement extends LitElement {
 	render() {
 		return html`
 			<div id="top">
-                <div id="search-icon">
-                    <uui-icon name="search"></uui-icon>
-                </div>
-				<input type="text" placeholder="Search..." autocomplete="off"></input>
-                <div id="close-icon">
-                    <button>esc</button>
-                </div>
+				<div id="search-icon">
+					<uui-icon name="search"></uui-icon>
+				</div>
+				<input type="text" placeholder="Search..." autocomplete="off" />
+				<div id="close-icon">
+					<button>esc</button>
+				</div>
 			</div>
 			<div id="main">
-                <div class="group">
-                    <div class="group-name">Document Types</div>
-                    <div class="results">
-                        <a href="#" class="result">
-                            Article Controls
-                            <span>></span>
-                        </a>
-                        <a href="#" class="result">
-                            Article
-                            <span>></span>
-                        </a>
-                    </div>
-                </div>
-                <div class="group">
-                    <div class="group-name">Media Types</div>
-                    <div class="results">
-                        <a href="#" class="result">
-                            Article
-                            <span>></span>
-                        </a>
-                    </div>
-                </div>
-            </div>
+				<div class="group">
+					<div class="group-name">Document Types</div>
+					<div class="results">
+						<a href="#" class="result">
+							<div>
+								<span style="margin-right: 4px">#</span>
+								Article Controls
+							</div>
+							<span>></span>
+						</a>
+						<a href="#" class="result">
+							Article
+							<span>></span>
+						</a>
+					</div>
+				</div>
+				<div class="group">
+					<div class="group-name">Media Types</div>
+					<div class="results">
+						<a href="#" class="result">
+							Article
+							<span>></span>
+						</a>
+					</div>
+				</div>
+			</div>
 		`;
 	}
 }
