@@ -1,6 +1,6 @@
 ﻿namespace Umbraco.Cms.Api.Management.ViewModels.RelationType;
 
-public class RelationTypeViewModel
+public class RelationTypeResponseModel
 {
     public Guid Key { get; set; }
 

@@ -1,6 +1,6 @@
 ﻿namespace Umbraco.Cms.Api.Management.ViewModels.RelationType;
 
-public class RelationTypeSavingViewModel
+public class CreateRelationTypeRequestModel
 {
     /// <summary>
     ///     Gets or sets the name of the model.

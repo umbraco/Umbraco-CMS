@@ -11,27 +11,27 @@ public class RelationTypeViewModelFactory : IRelationTypeViewModelFactory
 
     public RelationTypeViewModelFactory(IShortStringHelper shortStringHelper) => _shortStringHelper = shortStringHelper;
 
-    public IRelationType CreateRelationType(RelationTypeSavingViewModel relationTypeSavingViewModel) =>
+    public IRelationType CreateRelationType(CreateRelationTypeRequestModel createRelationTypeRequestModel) =>
         new RelationType(
-            relationTypeSavingViewModel.Name,
-            relationTypeSavingViewModel.Name.ToSafeAlias(_shortStringHelper, true),
-            relationTypeSavingViewModel.IsBidirectional,
-            relationTypeSavingViewModel.ParentObjectType,
-            relationTypeSavingViewModel.ChildObjectType,
-            relationTypeSavingViewModel.IsDependency,
-            relationTypeSavingViewModel.Key);
+            createRelationTypeRequestModel.Name,
+            createRelationTypeRequestModel.Name.ToSafeAlias(_shortStringHelper, true),
+            createRelationTypeRequestModel.IsBidirectional,
+            createRelationTypeRequestModel.ParentObjectType,
+            createRelationTypeRequestModel.ChildObjectType,
+            createRelationTypeRequestModel.IsDependency,
+            createRelationTypeRequestModel.Key);
 
-    public void MapUpdateModelToRelationType(RelationTypeUpdatingViewModel relationTypeUpdatingViewModel, IRelationType target)
+    public void MapUpdateModelToRelationType(UpdateRelationTypeRequestModel updateRelationTypeRequestModel, IRelationType target)
     {
-        target.Name = relationTypeUpdatingViewModel.Name;
-        target.Alias = relationTypeUpdatingViewModel.Name.ToSafeAlias(_shortStringHelper, true);
-        target.ChildObjectType = relationTypeUpdatingViewModel.ChildObjectType;
-        target.IsBidirectional = relationTypeUpdatingViewModel.IsBidirectional;
+        target.Name = updateRelationTypeRequestModel.Name;
+        target.Alias = updateRelationTypeRequestModel.Name.ToSafeAlias(_shortStringHelper, true);
+        target.ChildObjectType = updateRelationTypeRequestModel.ChildObjectType;
+        target.IsBidirectional = updateRelationTypeRequestModel.IsBidirectional;
         if (target is IRelationTypeWithIsDependency targetWithIsDependency)
         {
-            targetWithIsDependency.IsDependency = relationTypeUpdatingViewModel.IsDependency;
+            targetWithIsDependency.IsDependency = updateRelationTypeRequestModel.IsDependency;
         }
 
-        target.ParentObjectType = relationTypeUpdatingViewModel.ParentObjectType;
+        target.ParentObjectType = updateRelationTypeRequestModel.ParentObjectType;
     }
 }

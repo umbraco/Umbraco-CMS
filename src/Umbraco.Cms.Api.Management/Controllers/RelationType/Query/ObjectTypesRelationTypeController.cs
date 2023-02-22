@@ -15,12 +15,12 @@ public class ObjectTypesRelationTypeController : RelationTypeControllerBase
 
     [HttpGet("object-types")]
     [MapToApiVersion("1.0")]
-    [ProducesResponseType(typeof(PagedViewModel<ObjectTypeViewModel>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(PagedViewModel<ObjectTypeResponseModel>), StatusCodes.Status200OK)]
     public async Task<IActionResult> ObjectTypes(int skip = 0, int take = 100)
     {
-        IEnumerable<ObjectTypeViewModel> objectTypes = _objectTypeViewModelFactory.Create().ToArray();
+        IEnumerable<ObjectTypeResponseModel> objectTypes = _objectTypeViewModelFactory.Create().ToArray();
 
-        return await Task.FromResult(Ok(new PagedViewModel<ObjectTypeViewModel>
+        return await Task.FromResult(Ok(new PagedViewModel<ObjectTypeResponseModel>
         {
             Total = objectTypes.Count(),
             Items = objectTypes.Skip(skip).Take(take),

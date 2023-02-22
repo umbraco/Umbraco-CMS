@@ -9,11 +9,11 @@ public class RelationTypeViewModelsMapDefinition : IMapDefinition
 {
     public void DefineMaps(IUmbracoMapper mapper)
     {
-        mapper.Define<IRelationType, RelationTypeViewModel>((_, _) => new RelationTypeViewModel(), Map);
+        mapper.Define<IRelationType, RelationTypeResponseModel>((_, _) => new RelationTypeResponseModel(), Map);
     }
 
     // Umbraco.Code.MapAll
-    private void Map(IRelationType source, RelationTypeViewModel target, MapperContext context)
+    private void Map(IRelationType source, RelationTypeResponseModel target, MapperContext context)
     {
         target.ChildObjectType = source.ChildObjectType;
         target.IsBidirectional = source.IsBidirectional;

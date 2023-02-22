@@ -1,6 +1,6 @@
 ﻿namespace Umbraco.Cms.Api.Management.ViewModels.RelationType;
 
-public class RelationTypeUpdatingViewModel
+public class UpdateRelationTypeRequestModel
 {
     /// <summary>
     ///     Gets or sets the name of the model.

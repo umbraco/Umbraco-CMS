@@ -4,5 +4,5 @@ namespace Umbraco.Cms.Api.Management.Factories;
 
 public interface IObjectTypeViewModelFactory
 {
-    IEnumerable<ObjectTypeViewModel> Create();
+    IEnumerable<ObjectTypeResponseModel> Create();
 }

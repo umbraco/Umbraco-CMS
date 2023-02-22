@@ -20,7 +20,7 @@ public class ByKeyRelationTypeController : RelationTypeControllerBase
 
     [HttpGet("{key:guid}")]
     [MapToApiVersion("1.0")]
-    [ProducesResponseType(typeof(RelationTypeViewModel), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(RelationTypeResponseModel), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> ByKey(Guid key)
     {
@@ -30,7 +30,7 @@ public class ByKeyRelationTypeController : RelationTypeControllerBase
             return NotFound();
         }
 
-        RelationTypeViewModel mappedRelationType = _mapper.Map<RelationTypeViewModel>(relationType)!;
+        RelationTypeResponseModel mappedRelationType = _mapper.Map<RelationTypeResponseModel>(relationType)!;
 
         return await Task.FromResult(Ok(mappedRelationType));
     }

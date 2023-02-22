@@ -5,8 +5,8 @@ namespace Umbraco.Cms.Api.Management.Factories;
 
 public class ObjectTypeViewModelFactory : IObjectTypeViewModelFactory
 {
-    public IEnumerable<ObjectTypeViewModel> Create() =>
-        new ObjectTypeViewModel[]
+    public IEnumerable<ObjectTypeResponseModel> Create() =>
+        new ObjectTypeResponseModel[]
         {
             new()
             {

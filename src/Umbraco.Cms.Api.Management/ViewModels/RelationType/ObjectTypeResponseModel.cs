@@ -1,6 +1,6 @@
 ﻿namespace Umbraco.Cms.Api.Management.ViewModels.RelationType;
 
-public class ObjectTypeViewModel
+public class ObjectTypeResponseModel
 {
     public string? Name { get; set; }
 

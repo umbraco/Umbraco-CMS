@@ -29,10 +29,10 @@ public class UpdateRelationTypeController : RelationTypeControllerBase
 
     [HttpPut("{key:guid}")]
     [MapToApiVersion("1.0")]
-    [ProducesResponseType(typeof(RelationTypeViewModel), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(RelationTypeResponseModel), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> Update(Guid key, RelationTypeUpdatingViewModel relationTypeSavingViewModel)
+    public async Task<IActionResult> Update(Guid key, UpdateRelationTypeRequestModel updateRelationTypeSavingViewModel)
     {
         IRelationType? persistedRelationType = _relationService.GetRelationTypeById(key);
 
@@ -45,7 +45,7 @@ public class UpdateRelationTypeController : RelationTypeControllerBase
             return NotFound(problemDetails);
         }
 
-        _relationTypeViewModelFactory.MapUpdateModelToRelationType(relationTypeSavingViewModel, persistedRelationType);
+        _relationTypeViewModelFactory.MapUpdateModelToRelationType(updateRelationTypeSavingViewModel, persistedRelationType);
 
         Attempt<IRelationType, RelationTypeOperationStatus> result = await _relationService.UpdateAsync(persistedRelationType, CurrentUserId(_backOfficeSecurityAccessor));
 
