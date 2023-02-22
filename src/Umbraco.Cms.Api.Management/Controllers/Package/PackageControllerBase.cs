@@ -12,6 +12,22 @@ namespace Umbraco.Cms.Api.Management.Controllers.Package;
 [ApiVersion("1.0")]
 public abstract class PackageControllerBase : ManagementApiControllerBase
 {
+    protected IActionResult PackageOperationStatusResult(PackageOperationStatus status) =>
+        status switch
+        {
+            PackageOperationStatus.NotFound => NotFound("The package could not be found"),
+            PackageOperationStatus.DuplicateItemName => Conflict(new ProblemDetailsBuilder()
+                .WithTitle("Duplicate package name")
+                .WithDetail("Another package already exists with the attempted name.")
+                .WithStatus(StatusCodes.Status409Conflict)
+                .Build()),
+            PackageOperationStatus.InvalidName => BadRequest(new ProblemDetailsBuilder()
+                .WithTitle("Invalid package name")
+                .WithDetail("The attempted package name does not represent a valid name for a package.")
+                .Build()),
+            _ => StatusCode(StatusCodes.Status500InternalServerError, "Unknown package operation status")
+        };
+
     protected IActionResult PackageMigrationOperationStatusResult(PackageMigrationOperationStatus status) =>
         status switch
         {
