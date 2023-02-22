@@ -1,7 +1,6 @@
 using System.Net;
 using System.Net.Mime;
 using System.Text;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Net.Http.Headers;
@@ -13,13 +12,8 @@ namespace Umbraco.Cms.Api.Management.Controllers.Package.Created;
 public class DownloadCreatedPackageController : CreatedPackageControllerBase
 {
     private readonly IPackagingService _packagingService;
-    private readonly IWebHostEnvironment _webHostEnvironment;
 
-    public DownloadCreatedPackageController(IPackagingService packagingService, IWebHostEnvironment webHostEnvironment)
-    {
-        _packagingService = packagingService;
-        _webHostEnvironment = webHostEnvironment;
-    }
+    public DownloadCreatedPackageController(IPackagingService packagingService) => _packagingService = packagingService;
 
     /// <summary>
     ///     Downloads a package XML or ZIP file.
@@ -32,20 +26,20 @@ public class DownloadCreatedPackageController : CreatedPackageControllerBase
     [ProducesResponseType(typeof(FileContentResult), StatusCodes.Status200OK)]
     public async Task<IActionResult> Download(Guid key)
     {
-        PackageDefinition? package = _packagingService.GetCreatedPackageByKey(key);
+        PackageDefinition? package = await _packagingService.GetCreatedPackageByKeyAsync(key);
 
         if (package is null)
         {
             return NotFound();
         }
 
-        var filePath = package.PackagePath;
-        if (_webHostEnvironment.ContentRootFileProvider.GetFileInfo(filePath) is null)
+        Stream? fileStream = _packagingService.GetPackageFileStream(package);
+        if (fileStream is null)
         {
-            return ValidationProblem("No file found for path " + filePath);
+            return NotFound();
         }
 
-        var fileName = Path.GetFileName(filePath);
+        var fileName = Path.GetFileName(package.PackagePath);
         Encoding encoding = Encoding.UTF8;
 
         var contentDisposition = new ContentDisposition
@@ -56,13 +50,10 @@ public class DownloadCreatedPackageController : CreatedPackageControllerBase
 
         Response.Headers.Add("Content-Disposition", contentDisposition.ToString());
 
-        // Set custom header so umbRequestHelper.downloadFile can save the correct filename
-        HttpContext.Response.Headers.Add("x-filename", fileName);
-
         var result = new FileStreamResult(
-            System.IO.File.OpenRead(package.PackagePath),
+            fileStream,
             new MediaTypeHeaderValue(MediaTypeNames.Application.Octet) { Charset = encoding.WebName });
 
-        return await Task.FromResult(result);
+        return result;
     }
 }
