@@ -19,8 +19,6 @@ export class UmbDocumentWorkspaceViewEditElement extends UmbLitElement {
 		`,
 	];
 
-	// TODO: get variant information via variant-content?
-
 	//private _hasRootProperties = false;
 	private _hasRootGroups = false;
 
@@ -52,7 +50,7 @@ export class UmbDocumentWorkspaceViewEditElement extends UmbLitElement {
 		if (!this._workspaceContext) return;
 
 		this.observe(
-			this._workspaceContext.rootContainers('Tab'),
+			this._workspaceContext.structure.rootContainers('Tab'),
 			(tabs) => {
 				tabs.forEach((tab) => {
 					// Only add each tab name once, as our containers merge on name:
@@ -79,7 +77,7 @@ export class UmbDocumentWorkspaceViewEditElement extends UmbLitElement {
 		*/
 
 		this.observe(
-			this._workspaceContext.hasRootContainers('Group'),
+			this._workspaceContext.structure.hasRootContainers('Group'),
 			(hasRootGroups) => {
 				this._hasRootGroups = hasRootGroups;
 				this._createRoutes();

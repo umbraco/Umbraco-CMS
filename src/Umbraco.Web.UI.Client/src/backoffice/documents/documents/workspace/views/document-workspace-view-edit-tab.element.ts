@@ -80,7 +80,7 @@ export class UmbDocumentWorkspaceViewEditTabElement extends UmbLitElement {
 
 		this._tabContainers.forEach((container) => {
 			this.observe(
-				this._workspaceContext!.hasPropertyStructuresOf(container.key!),
+				this._workspaceContext!.structure.hasPropertyStructuresOf(container.key!),
 				(hasTabProperties) => {
 					this._hasTabProperties = hasTabProperties;
 				},
@@ -95,7 +95,7 @@ export class UmbDocumentWorkspaceViewEditTabElement extends UmbLitElement {
 		if (this._tabName) {
 			this._groups = [];
 			this.observe(
-				this._workspaceContext.containersByNameAndType(this._tabName, 'Tab'),
+				this._workspaceContext.structure.containersByNameAndType(this._tabName, 'Tab'),
 				(tabContainers) => {
 					this._tabContainers = tabContainers || [];
 					if (this._tabContainers.length > 0) {
@@ -116,7 +116,7 @@ export class UmbDocumentWorkspaceViewEditTabElement extends UmbLitElement {
 
 		this._tabContainers.forEach((container) => {
 			this.observe(
-				this._workspaceContext!.containersOfParentKey(container.key, 'Group'),
+				this._workspaceContext!.structure.containersOfParentKey(container.key, 'Group'),
 				this._insertGroupContainers,
 				'_observeGroupsOf_' + container.key
 			);
@@ -127,7 +127,11 @@ export class UmbDocumentWorkspaceViewEditTabElement extends UmbLitElement {
 		if (!this._workspaceContext || !this._noTabName) return;
 
 		// This is where we potentially could observe root properties as well.
-		this.observe(this._workspaceContext!.rootContainers('Group'), this._insertGroupContainers, '_observeRootGroups');
+		this.observe(
+			this._workspaceContext!.structure.rootContainers('Group'),
+			this._insertGroupContainers,
+			'_observeRootGroups'
+		);
 	}
 
 	private _insertGroupContainers = (groupContainers: PropertyTypeContainerViewModelBaseModel[]) => {

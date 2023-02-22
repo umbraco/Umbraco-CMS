@@ -67,7 +67,7 @@ export class UmbDocumentWorkspaceViewEditPropertiesElement extends UmbLitElement
 
 		// TODO: Should be no need to update this observable if its already there.
 		this.observe(
-			this._workspaceContext!.containersByNameAndType(this._containerName, this._containerType),
+			this._workspaceContext!.structure.containersByNameAndType(this._containerName, this._containerType),
 			(groupContainers) => {
 				this._groupContainers = groupContainers || [];
 				groupContainers.forEach((group) => {
@@ -86,7 +86,7 @@ export class UmbDocumentWorkspaceViewEditPropertiesElement extends UmbLitElement
 
 		// TODO: Should be no need to update this observable if its already there.
 		this.observe(
-			this._workspaceContext.propertyStructuresOf(group.key),
+			this._workspaceContext.structure.propertyStructuresOf(group.key),
 			(properties) => {
 				// If this need to be able to remove properties, we need to clean out the ones of this group.key before inserting them:
 				this._propertyStructure = this._propertyStructure.filter((x) => x.containerKey !== group.key);

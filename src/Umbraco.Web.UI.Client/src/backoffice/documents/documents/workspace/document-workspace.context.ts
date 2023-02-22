@@ -3,12 +3,8 @@ import { UmbDocumentRepository } from '../repository/document.repository';
 import { UmbDocumentTypeRepository } from '../../document-types/repository/document-type.repository';
 import { UmbWorkspaceVariableEntityContextInterface } from '../../../shared/components/workspace/workspace-context/workspace-variable-entity-context.interface';
 import { UmbVariantId } from '../../../shared/variants/variant-id.class';
-import type {
-	DocumentModel,
-	DocumentTypeModel,
-	DocumentTypePropertyTypeContainerModel,
-	DocumentTypePropertyTypeModel,
-} from '@umbraco-cms/backend-api';
+import { UmbWorkspacePropertyStructureManager } from '../../../shared/components/workspace/workspace-context/workspace-property-structure-manager.class';
+import type { DocumentModel } from '@umbraco-cms/backend-api';
 import { partialUpdateFrozenArray, ObjectState, ArrayState, UmbObserverController } from '@umbraco-cms/observable-api';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 
@@ -28,7 +24,6 @@ export class UmbDocumentWorkspaceContext
 {
 	#host: UmbControllerHostInterface;
 	#documentRepository: UmbDocumentRepository;
-	#documentTypeRepository: UmbDocumentTypeRepository;
 
 	/**
 	 * The document is the current stored version of the document.
@@ -50,19 +45,17 @@ export class UmbDocumentWorkspaceContext
 	#activeVariantsInfo = new ArrayState<ActiveVariant>([], (x) => x.index);
 	activeVariantsInfo = this.#activeVariantsInfo.asObservable();
 
-	#documentTypes = new ArrayState<DocumentTypeModel>([], (x) => x.key);
-	documentTypes = this.#documentTypes.asObservable();
-
-	// Notice the DocumentTypePropertyTypeContainerModel is equivalent to PropertyTypeContainerViewModelBaseModel, making it easy to generalize.
-	#containers = new ArrayState<DocumentTypePropertyTypeContainerModel>([], (x) => x.key);
+	readonly structure;
 
 	constructor(host: UmbControllerHostInterface) {
 		super(host);
 		this.#host = host;
-		this.#documentRepository = new UmbDocumentRepository(this.#host);
-		this.#documentTypeRepository = new UmbDocumentTypeRepository(this.#host);
 
-		new UmbObserverController(this._host, this.documentTypeKey, (key) => this._loadDocumentType(key));
+		this.#documentRepository = new UmbDocumentRepository(this.#host);
+
+		this.structure = new UmbWorkspacePropertyStructureManager(this.#host, new UmbDocumentTypeRepository(this.#host));
+
+		new UmbObserverController(this._host, this.documentTypeKey, (key) => this.structure.loadType(key));
 	}
 
 	async load(entityKey: string) {
@@ -83,40 +76,6 @@ export class UmbDocumentWorkspaceContext
 		this.#document.next(data);
 		this.#draft.next(data);
 		return data || undefined;
-	}
-
-	private async _loadDocumentType(key?: string) {
-		if (!key) return;
-
-		const { data } = await this.#documentTypeRepository.requestByKey(key);
-		if (!data) return;
-
-		// Load inherited and composed types:
-		await data?.compositions?.forEach(async (composition) => {
-			if (composition.key) {
-				this._loadDocumentType(composition.key);
-			}
-		});
-
-		new UmbObserverController(this._host, await this.#documentTypeRepository.byKey(key), (docType) => {
-			if (docType) {
-				this.#documentTypes.appendOne(docType);
-				this._initDocumentTypeContainers(docType);
-				this._loadDocumentTypeCompositions(docType);
-			}
-		});
-	}
-
-	private async _loadDocumentTypeCompositions(documentType: DocumentTypeModel) {
-		documentType.compositions?.forEach((composition) => {
-			this._loadDocumentType(composition.key);
-		});
-	}
-
-	private async _initDocumentTypeContainers(documentType: DocumentTypeModel) {
-		documentType.containers?.forEach((container) => {
-			this.#containers.appendOne(container);
-		});
 	}
 
 	getData() {
@@ -193,61 +152,6 @@ export class UmbDocumentWorkspaceContext
 		);
 	}
 
-	// TODO: Structure methods:
-
-	hasPropertyStructuresOf(containerKey: string | null) {
-		return this.#documentTypes.getObservablePart((docTypes) => {
-			return (
-				docTypes.find((docType) => {
-					return docType.properties?.find((property) => property.containerKey === containerKey);
-				}) !== undefined
-			);
-		});
-	}
-	rootPropertyStructures() {
-		return this.propertyStructuresOf(null);
-	}
-	propertyStructuresOf(containerKey: string | null) {
-		return this.#documentTypes.getObservablePart((docTypes) => {
-			const props: DocumentTypePropertyTypeModel[] = [];
-			docTypes.forEach((docType) => {
-				docType.properties?.forEach((property) => {
-					if (property.containerKey === containerKey) {
-						props.push(property);
-					}
-				});
-			});
-			return props;
-		});
-	}
-
-	rootContainers(containerType: 'Group' | 'Tab') {
-		return this.#containers.getObservablePart((data) => {
-			return data.filter((x) => x.parentKey === null && x.type === containerType);
-		});
-	}
-
-	hasRootContainers(containerType: 'Group' | 'Tab') {
-		return this.#containers.getObservablePart((data) => {
-			return data.filter((x) => x.parentKey === null && x.type === containerType).length > 0;
-		});
-	}
-
-	containersOfParentKey(
-		parentKey: DocumentTypePropertyTypeContainerModel['parentKey'],
-		containerType: 'Group' | 'Tab'
-	) {
-		return this.#containers.getObservablePart((data) => {
-			return data.filter((x) => x.parentKey === parentKey && x.type === containerType);
-		});
-	}
-
-	containersByNameAndType(name: string, containerType: 'Group' | 'Tab') {
-		return this.#containers.getObservablePart((data) => {
-			return data.filter((x) => x.name === name && x.type === containerType);
-		});
-	}
-
 	getPropertyValue(alias: string, variantId?: UmbVariantId): void {
 		const currentData = this.#draft.value;
 		if (currentData) {
@@ -259,7 +163,6 @@ export class UmbDocumentWorkspaceContext
 	}
 	setPropertyValue(alias: string, value: unknown, variantId?: UmbVariantId) {
 		const partialEntry = { value };
-		console.log('€€€€€setPropertyValue', alias, value, variantId?.toString());
 		const currentData = this.#draft.value;
 		if (currentData) {
 			const values = partialUpdateFrozenArray(
