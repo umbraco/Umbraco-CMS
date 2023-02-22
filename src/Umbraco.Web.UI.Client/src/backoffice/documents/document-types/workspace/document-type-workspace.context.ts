@@ -56,14 +56,14 @@ export class UmbWorkspaceDocumentTypeContext
 	}
 
 	async createScaffold(parentKey: string | null) {
-		const { data } = await this.#repo.createDetailsScaffold(parentKey);
+		const { data } = await this.#repo.createScaffold(parentKey);
 		if (!data) return;
 		this.#data.next(data);
 	}
 
 	async save() {
 		if (!this.#data.value) return;
-		this.#repo.saveDetail(this.#data.value);
+		this.#repo.save(this.#data.value);
 	}
 
 	public destroy(): void {
