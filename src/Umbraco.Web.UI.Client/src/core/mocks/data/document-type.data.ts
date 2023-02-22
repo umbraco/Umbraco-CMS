@@ -14,7 +14,7 @@ export const data: Array<DocumentTypeModel> = [
 		alias: 'blogPost',
 		name: 'Blog Post',
 		description: null,
-		icon: 'icon-item-arrangement',
+		icon: 'umb:item-arrangement',
 		allowedAsRoot: true,
 		variesByCulture: true,
 		variesBySegment: false,
@@ -635,7 +635,7 @@ export const data: Array<DocumentTypeModel> = [
 		alias: 'blogPost',
 		name: 'Blog Post',
 		description: null,
-		icon: 'icon-item-arrangement',
+		icon: 'umb:item-arrangement',
 		allowedAsRoot: true,
 		variesByCulture: true,
 		variesBySegment: false,
@@ -777,7 +777,7 @@ export const data: Array<DocumentTypeModel> = [
 		alias: 'masterPage',
 		name: 'Master Page',
 		description: null,
-		icon: 'icon-document',
+		icon: 'umb:document',
 		allowedAsRoot: false,
 		variesByCulture: false,
 		variesBySegment: false,
@@ -827,7 +827,7 @@ export const data: Array<DocumentTypeModel> = [
 		alias: 'baseElementType',
 		name: 'Base Element Type',
 		description: null,
-		icon: 'icon-science',
+		icon: 'umb:science',
 		allowedAsRoot: false,
 		variesByCulture: false,
 		variesBySegment: false,
@@ -873,6 +873,16 @@ export const data: Array<DocumentTypeModel> = [
 ];
 
 export const treeData: Array<DocumentTypeTreeItemModel> = [
+	{
+		$type: 'DocumentTypeTreeItemViewModel',
+		name: 'All property editors document type',
+		type: 'document-type',
+		hasChildren: false,
+		key: 'all-property-editors-document-type-key',
+		isContainer: false,
+		parentKey: null,
+		icon: '',
+	},
 	{
 		$type: 'DocumentTypeTreeItemViewModel',
 		name: 'Document Type 1',
