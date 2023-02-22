@@ -22,21 +22,6 @@ export class UmbWorkspaceDocumentTypeContext
 		this.#host = host;
 		this.#repo = new UmbDocumentTypeRepository(this.#host);
 	}
-<<<<<<< HEAD
-	setIcon(icon: string) {
-		this.#manager.state.update({ icon: icon });
-	}
-	getEntityType = this.#manager.getEntityType;
-	getUnique = this.#manager.getEntityKey;
-	getEntityKey = this.#manager.getEntityKey;
-	getStore = this.#manager.getStore;
-	getData = this.#manager.getData as any; // TODO: fix this type mismatch, but this will be done when we move to repositories.
-	load = this.#manager.load;
-	create = this.#manager.create;
-	save = this.#manager.save;
-	destroy = this.#manager.destroy;
-=======
->>>>>>> origin/feature/mocks-for-doc-types
 
 	public setPropertyValue(alias: string, value: unknown) {
 		throw new Error('setPropertyValue is not implemented for UmbWorkspaceDocumentTypeContext');
