@@ -24,7 +24,7 @@ public class RelationTypeViewModelsMapDefinition : IMapDefinition
         }
 
         target.Key = source.Key;
-        target.Name = source.Name;
+        target.Name = source.Name ?? string.Empty;
         target.Alias = source.Alias;
         target.ParentObjectType = source.ParentObjectType;
         target.Path = "-1," + source.Id;
