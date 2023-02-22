@@ -6,6 +6,8 @@ public class AuditLogWithUsernameViewModel
 {
     public Guid UserKey { get; set; }
 
+    public Guid? EntityKey { get; set; }
+
     public string? UserName { get; set; }
 
     public string[]? UserAvatars { get; set; }

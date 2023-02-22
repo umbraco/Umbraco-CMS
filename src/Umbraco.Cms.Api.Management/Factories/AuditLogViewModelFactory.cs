@@ -32,10 +32,13 @@ public class AuditLogViewModelFactory : IAuditLogViewModelFactory
 
     private AuditLogWithUsernameViewModel CreateAuditLogWithUsernameViewModel(IAuditItem auditItem)
     {
+        IEntitySlim? entitySlim = _entityService.Get(auditItem.Id);
+
         var target = new AuditLogWithUsernameViewModel
         {
             Comment = auditItem.Comment,
             EntityType = auditItem.EntityType,
+            EntityKey = entitySlim?.Key,
             LogType = auditItem.AuditType,
             Parameters = auditItem.Parameters,
             Timestamp = auditItem.CreateDate,
