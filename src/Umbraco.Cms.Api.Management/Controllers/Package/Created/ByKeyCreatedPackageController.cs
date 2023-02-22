@@ -29,13 +29,13 @@ public class ByKeyCreatedPackageController : CreatedPackageControllerBase
     [ProducesResponseType(typeof(PackageDefinitionViewModel), StatusCodes.Status200OK)]
     public async Task<ActionResult<PackageDefinitionViewModel>> ByKey(Guid key)
     {
-        PackageDefinition? package = _packagingService.GetCreatedPackageByKey(key);
+        PackageDefinition? package = await _packagingService.GetCreatedPackageByKeyAsync(key);
 
         if (package is null)
         {
             return NotFound();
         }
 
-        return await Task.FromResult(Ok(_umbracoMapper.Map<PackageDefinitionViewModel>(package)));
+        return Ok(_umbracoMapper.Map<PackageDefinitionViewModel>(package));
     }
 }
