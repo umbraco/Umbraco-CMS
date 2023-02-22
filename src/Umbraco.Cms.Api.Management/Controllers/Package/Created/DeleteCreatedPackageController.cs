@@ -1,20 +1,22 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Packaging;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Package.Created;
 
 public class DeleteCreatedPackageController : CreatedPackageControllerBase
 {
     private readonly IPackagingService _packagingService;
-    private readonly IBackOfficeSecurityAccessor _backofficeSecurityAccessor;
+    private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
 
-    public DeleteCreatedPackageController(IPackagingService packagingService, IBackOfficeSecurityAccessor backofficeSecurityAccessor)
+    public DeleteCreatedPackageController(IPackagingService packagingService, IBackOfficeSecurityAccessor backOfficeSecurityAccessor)
     {
         _packagingService = packagingService;
-        _backofficeSecurityAccessor = backofficeSecurityAccessor;
+        _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
     }
 
     /// <summary>
@@ -28,17 +30,11 @@ public class DeleteCreatedPackageController : CreatedPackageControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<IActionResult> Delete(Guid key)
     {
-        PackageDefinition? package = _packagingService.GetCreatedPackageByKey(key);
+        Attempt<PackageDefinition?, PackageOperationStatus> result =
+            await _packagingService.DeleteCreatedPackageAsync(key, CurrentUserId(_backOfficeSecurityAccessor));
 
-        if (package is null)
-        {
-            return NotFound();
-        }
-
-        _packagingService.DeleteCreatedPackage(
-            package.Id,
-            _backofficeSecurityAccessor.BackOfficeSecurity?.GetUserId().Result ?? -1);
-
-        return await Task.FromResult(Ok());
+        return result.Success
+            ? Ok()
+            : PackageOperationStatusResult(result.Status);
     }
 }
