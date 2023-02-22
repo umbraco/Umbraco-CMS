@@ -35,7 +35,7 @@ public class CurrentUserAuditLogController : AuditLogControllerBase
 
     [HttpGet]
     [MapToApiVersion("1.0")]
-    [ProducesResponseType(typeof(PagedViewModel<AuditLogWithUsernameViewModel>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(PagedViewModel<AuditLogWithUsernameResponseModel>), StatusCodes.Status200OK)]
     public async Task<IActionResult> CurrentUser(Direction orderDirection = Direction.Descending, DateTime? sinceDate = null, int skip = 0, int take = 100)
     {
         // FIXME: Pull out current backoffice user when its implemented.
@@ -57,8 +57,8 @@ public class CurrentUserAuditLogController : AuditLogControllerBase
             null,
             sinceDate);
 
-        IEnumerable<AuditLogWithUsernameViewModel> mapped = _auditLogViewModelFactory.CreateAuditLogWithUsernameViewModels(result.Items.Skip(skip).Take(take));
-        var viewModel = new PagedViewModel<AuditLogWithUsernameViewModel>
+        IEnumerable<AuditLogWithUsernameResponseModel> mapped = _auditLogViewModelFactory.CreateAuditLogWithUsernameViewModels(result.Items.Skip(skip).Take(take));
+        var viewModel = new PagedViewModel<AuditLogWithUsernameResponseModel>
         {
             Total = result.Total,
             Items = mapped,

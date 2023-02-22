@@ -26,15 +26,15 @@ public class AuditLogViewModelFactory : IAuditLogViewModelFactory
         _entityService = entityService;
     }
 
-    public IEnumerable<AuditlogViewModel> CreateAuditLogViewModel(IEnumerable<IAuditItem> auditItems) => auditItems.Select(CreateAuditLogViewModel);
+    public IEnumerable<AuditLogResponseModel> CreateAuditLogViewModel(IEnumerable<IAuditItem> auditItems) => auditItems.Select(CreateAuditLogViewModel);
 
-    public IEnumerable<AuditLogWithUsernameViewModel> CreateAuditLogWithUsernameViewModels(IEnumerable<IAuditItem> auditItems) => auditItems.Select(CreateAuditLogWithUsernameViewModel);
+    public IEnumerable<AuditLogWithUsernameResponseModel> CreateAuditLogWithUsernameViewModels(IEnumerable<IAuditItem> auditItems) => auditItems.Select(CreateAuditLogWithUsernameViewModel);
 
-    private AuditLogWithUsernameViewModel CreateAuditLogWithUsernameViewModel(IAuditItem auditItem)
+    private AuditLogWithUsernameResponseModel CreateAuditLogWithUsernameViewModel(IAuditItem auditItem)
     {
         IEntitySlim? entitySlim = _entityService.Get(auditItem.Id);
 
-        var target = new AuditLogWithUsernameViewModel
+        var target = new AuditLogWithUsernameResponseModel
         {
             Comment = auditItem.Comment,
             EntityType = auditItem.EntityType,
@@ -56,10 +56,10 @@ public class AuditLogViewModelFactory : IAuditLogViewModelFactory
         return target;
     }
 
-    private AuditlogViewModel CreateAuditLogViewModel(IAuditItem auditItem)
+    private AuditLogResponseModel CreateAuditLogViewModel(IAuditItem auditItem)
     {
         IEntitySlim? entitySlim = _entityService.Get(auditItem.Id);
-        var target = new AuditlogViewModel
+        var target = new AuditLogResponseModel
             {
                 Comment = auditItem.Comment,
                 EntityType = auditItem.EntityType,

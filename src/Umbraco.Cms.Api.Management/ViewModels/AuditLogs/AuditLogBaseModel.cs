@@ -2,7 +2,7 @@
 
 namespace Umbraco.Cms.Api.Management.ViewModels.AuditLogs;
 
-public class AuditlogViewModel
+public class AuditLogBaseModel
 {
     public Guid UserKey { get; set; }
 
