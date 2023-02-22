@@ -5,9 +5,8 @@ import {
 import { UmbVariantId } from '../../../variants/variant-id.class';
 import { UmbContextConsumerController, UmbContextProviderController } from '@umbraco-cms/context-api';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
-import { NumberState, ObjectState, UmbObserverController } from '@umbraco-cms/observable-api';
+import { ClassState, NumberState, ObjectState, UmbObserverController } from '@umbraco-cms/observable-api';
 import { DocumentVariantModel } from '@umbraco-cms/backend-api';
-import { ClassState } from 'libs/observable-api/class-state';
 
 //type EntityType = DocumentModel;
 
