@@ -53,8 +53,6 @@ export class UmbDocumentWorkspaceContext
 	#documentTypes = new ArrayState<DocumentTypeModel>([], (x) => x.key);
 	documentTypes = this.#documentTypes.asObservable();
 
-	mainDocumentType = this.#documentTypes.asObservable();
-
 	// Notice the DocumentTypePropertyTypeContainerModel is equivalent to PropertyTypeContainerViewModelBaseModel, making it easy to generalize.
 	#containers = new ArrayState<DocumentTypePropertyTypeContainerModel>([], (x) => x.key);
 
@@ -195,6 +193,8 @@ export class UmbDocumentWorkspaceContext
 		);
 	}
 
+	// TODO: Structure methods:
+
 	hasPropertyStructuresOf(containerKey: string | null) {
 		return this.#documentTypes.getObservablePart((docTypes) => {
 			return (
@@ -220,8 +220,6 @@ export class UmbDocumentWorkspaceContext
 			return props;
 		});
 	}
-
-	// TODO: Check what of these methods I ended actually using:
 
 	rootContainers(containerType: 'Group' | 'Tab') {
 		return this.#containers.getObservablePart((data) => {
