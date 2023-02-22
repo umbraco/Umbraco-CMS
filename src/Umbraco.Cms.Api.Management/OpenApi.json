@@ -3635,6 +3635,30 @@
             }
           }
         }
+      },
+      "put": {
+        "tags": [
+          "Profiling"
+        ],
+        "operationId": "PutProfilingStatus",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/ProfilingStatusModel"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
       }
     },
     "/umbraco/management/api/v1/published-cache/collect": {

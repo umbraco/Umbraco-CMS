@@ -20,8 +20,10 @@
 @inject IProfilerHtml profilerHtml
 @inject IIconService IconService
 @inject IBackOfficeExternalLoginProviders externalLogins
+@inject IWebProfilerService WebProfilerService
 @{
-    bool.TryParse(Context.Request.Query["umbDebug"], out bool isDebug);
+    var webProfilingStatus = await WebProfilerService.GetStatus();
+    var isDebug = (webProfilingStatus.Success && webProfilingStatus.Result) ? true : false;
     var backOfficePath = globalSettings.Value.GetBackOfficePath(hostingEnvironment);
 }
 
