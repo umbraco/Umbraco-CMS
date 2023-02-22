@@ -75,6 +75,27 @@ public class RelationServiceTests : UmbracoIntegrationTest
         Assert.AreEqual(result.Result, persistedRelationType);
     }
 
+    [Test]
+    [TestCase(Constants.ObjectTypes.Strings.Document, "53E492BD-F242-40A7-8F21-7D649463DD23")]
+    [TestCase("E7524E34-F84F-43DE-92E2-25999785B7EA", Constants.ObjectTypes.Strings.DataType)]
+    [TestCase("00000000-0000-0000-0000-000000000000", "5AFB3AAE-5626-4195-9251-0D35F1E995D3")]
+    [TestCase(Constants.ObjectTypes.Strings.IdReservation, Constants.ObjectTypes.Strings.LockObject)]
+    public async Task Cannot_Create_RelationTypes_With_Disallowed_ObjectTypes(string childObjectTypeGuid, string parentObjectTypeGuid)
+    {
+        var relationType = new RelationTypeBuilder()
+            .WithChildObjectType(new Guid(childObjectTypeGuid))
+            .WithParentObjectType(new Guid(parentObjectTypeGuid))
+            .Build();
+
+        var result = await RelationService.CreateAsync(relationType, Constants.Security.SuperUserId);
+
+        Assert.Multiple(() =>
+        {
+            Assert.IsFalse(result.Success);
+            Assert.AreNotEqual(RelationTypeOperationStatus.Success, result.Status);
+        });
+    }
+
     private void AssertRelationTypesAreSame(IRelationTypeWithIsDependency relationType, IRelationType result) =>
         Assert.Multiple(() =>
         {
