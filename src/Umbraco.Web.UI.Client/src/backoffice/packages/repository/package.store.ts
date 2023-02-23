@@ -2,7 +2,8 @@ import { ReplaySubject } from 'rxjs';
 import { UmbContextToken } from '@umbraco-cms/context-api';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 import { UmbStoreBase } from '@umbraco-cms/store';
-import type { UmbPackage } from '@umbraco-cms/models';
+import type { ManifestBase, UmbPackage } from '@umbraco-cms/models';
+import { ArrayState } from '@umbraco-cms/observable-api';
 
 /**
  * Store for Packages
@@ -14,12 +15,16 @@ export class UmbPackageStore extends UmbStoreBase {
 	 * Array of packages with extensions
 	 * @private
 	 */
-	#data = new ReplaySubject<Array<UmbPackage>>(1);
+	#packages = new ReplaySubject<Array<UmbPackage>>(1);
+
+	#extensions = new ArrayState<ManifestBase>([], (e) => e.alias);
 
 	/**
 	 * Observable of packages with extensions
 	 */
-	rootItems = this.#data.asObservable();
+	rootItems = this.#packages.asObservable();
+
+	extensions = this.#extensions.asObservable();
 
 	/**
 	 * Creates an instance of PackageStore.
@@ -34,7 +39,11 @@ export class UmbPackageStore extends UmbStoreBase {
 	 * Append items to the store
 	 */
 	appendItems(packages: Array<UmbPackage>) {
-		this.#data.next(packages);
+		this.#packages.next(packages);
+	}
+
+	appendExtensions(extensions: ManifestBase[]) {
+		this.#extensions.append(extensions);
 	}
 }
 
