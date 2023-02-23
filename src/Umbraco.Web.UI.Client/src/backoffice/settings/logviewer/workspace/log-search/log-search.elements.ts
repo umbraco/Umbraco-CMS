@@ -2,9 +2,9 @@ import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, html } from 'lit';
 import { customElement } from 'lit/decorators.js';
 import { UmbLitElement } from '@umbraco-cms/element';
-import '../../../../shared/components/workspace/actions/save/workspace-action-node-save.element.ts';
+import { UmbRouterSlotInitEvent } from '@umbraco-cms/router';
 
-@customElement('umb-log-search-workspace')
+@customElement('umb-log-search-workspace-search')
 export class UmbLogSearchWorkspaceElement extends UmbLitElement {
 	static styles = [
 		UUITextStyles,
@@ -15,6 +15,7 @@ export class UmbLogSearchWorkspaceElement extends UmbLitElement {
 
 			#header {
 				display: flex;
+				align-items: center;
 				padding: 0 var(--uui-size-space-6);
 				gap: var(--uui-size-space-4);
 				width: 100%;
@@ -22,19 +23,10 @@ export class UmbLogSearchWorkspaceElement extends UmbLitElement {
 		`,
 	];
 
+	private _routerPath?: string;
+
 	render() {
-		return html`
-			<umb-workspace-layout alias="Umb.Workspace.LogSearch">
-				<div id="header" slot="header">
-					<a href="/section/settings/language-root">
-						<uui-button compact>
-							<uui-icon name="umb:arrow-left"></uui-icon>
-						</uui-button>
-					</a>
-					<uui-input></uui-input>
-				</div>
-			</umb-workspace-layout>
-		`;
+		return html` <h1>Search</h1> `;
 	}
 }
 
