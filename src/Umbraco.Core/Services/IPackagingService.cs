@@ -33,7 +33,7 @@ public interface IPackagingService : IService
     /// <summary>
     ///     Returns installed packages collected from the package migration plans.
     /// </summary>
-    Task<IEnumerable<InstalledPackage>> GetInstalledPackagesFromMigrationPlansAsync();
+    Task<IEnumerable<InstalledPackage>> GetInstalledPackagesFromMigrationPlansAsync(int skip, int take);
 
     InstalledPackage? GetInstalledPackageByName(string packageName);
 

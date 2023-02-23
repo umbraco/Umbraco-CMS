@@ -192,7 +192,7 @@ public class PackagingService : IPackagingService
     public IEnumerable<InstalledPackage> GetAllInstalledPackages()
     {
         // Collect the packages from the package migration plans
-        var installedPackages = GetInstalledPackagesFromMigrationPlansAsync().GetAwaiter().GetResult()
+        var installedPackages = GetInstalledPackagesFromMigrationPlansAsync(0, int.MaxValue).GetAwaiter().GetResult()
             .ToDictionary(package => package.PackageName!, package => package); // PackageName cannot be null here
 
         // Collect and merge the packages from the manifests
@@ -224,7 +224,7 @@ public class PackagingService : IPackagingService
     #endregion
 
     /// <inheritdoc/>
-    public async Task<IEnumerable<InstalledPackage>> GetInstalledPackagesFromMigrationPlansAsync()
+    public async Task<IEnumerable<InstalledPackage>> GetInstalledPackagesFromMigrationPlansAsync(int skip, int take)
     {
         IReadOnlyDictionary<string, string?>? keyValues =
             _keyValueService.FindByKeyPrefix(Constants.Conventions.Migrations.KeyValuePrefix);
@@ -249,7 +249,9 @@ public class PackagingService : IPackagingService
                     });
 
                 return package;
-            });
+            })
+            .Skip(skip)
+            .Take(take);
 
         return await Task.FromResult(installedPackages);
     }

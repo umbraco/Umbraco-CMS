@@ -30,10 +30,7 @@ public class AllMigrationStatusPackageController : PackageControllerBase
     [ProducesResponseType(typeof(PagedViewModel<PackageMigrationStatusViewModel>), StatusCodes.Status200OK)]
     public async Task<ActionResult<PagedViewModel<PackageMigrationStatusViewModel>>> AllMigrationStatuses(int skip = 0, int take = 100)
     {
-        IEnumerable<InstalledPackage> migrationPlans = (await _packagingService
-            .GetInstalledPackagesFromMigrationPlansAsync())
-            .Skip(skip)
-            .Take(take);
+        IEnumerable<InstalledPackage> migrationPlans = await _packagingService.GetInstalledPackagesFromMigrationPlansAsync(skip, take);
 
         return Ok(_umbracoMapper.Map<PagedViewModel<PackageMigrationStatusViewModel>>(migrationPlans));
     }
