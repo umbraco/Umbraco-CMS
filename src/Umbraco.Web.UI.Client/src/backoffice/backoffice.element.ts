@@ -3,7 +3,6 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html } from 'lit';
 
 import { UmbModalService, UMB_MODAL_SERVICE_CONTEXT_TOKEN } from '../core/modal';
-import { UmbShortcutService } from '../core/shortcuts/shortcut.service';
 import { UmbUserStore } from './users/users/user.store';
 import { UmbUserGroupStore } from './users/user-groups/user-group.store';
 import { UmbCurrentUserStore, UMB_CURRENT_USER_STORE_CONTEXT_TOKEN } from './users/current-user/current-user.store';
@@ -40,7 +39,6 @@ import { UmbTemplateTreeStore } from './templating/templates/tree/data/template.
 import { UmbTemplateDetailStore } from './templating/templates/workspace/data/template.detail.store';
 import { UmbThemeContext } from './themes/theme.context';
 import { UmbLanguageStore } from './settings/languages/language.store';
-import { UmbSearchService } from './search/search.service';
 import { UmbNotificationService, UMB_NOTIFICATION_SERVICE_CONTEXT_TOKEN } from '@umbraco-cms/notification';
 
 import '@umbraco-cms/router';
@@ -109,8 +107,6 @@ export class UmbBackofficeElement extends UmbLitElement {
 		new UmbTemplateTreeStore(this);
 		new UmbTemplateDetailStore(this);
 		new UmbLanguageStore(this);
-		new UmbShortcutService(this);
-		new UmbSearchService();
 
 		this.provideContext(UMB_BACKOFFICE_CONTEXT_TOKEN, new UmbBackofficeContext());
 		this.provideContext(UMB_CURRENT_USER_HISTORY_STORE_CONTEXT_TOKEN, new UmbCurrentUserHistoryStore());
