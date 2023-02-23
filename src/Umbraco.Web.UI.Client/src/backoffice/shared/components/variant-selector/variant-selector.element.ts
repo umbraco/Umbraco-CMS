@@ -172,7 +172,7 @@ export class UmbVariantSelectorElement extends UmbLitElement {
 										@click=${this._toggleVariantSelector}
 										title=${ifDefined(this._variantTitleName)}>
 										${this._variantDisplayName}
-										<uui-caret></uui-caret>
+										<uui-symbol-expand></uui-symbol-expand>
 									</uui-button>
 								</div>
 						  `
