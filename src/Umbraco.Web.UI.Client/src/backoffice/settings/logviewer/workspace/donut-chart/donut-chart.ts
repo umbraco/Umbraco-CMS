@@ -25,6 +25,9 @@ export class UmbDonutChartElement extends LitElement {
 		UUITextStyles,
 		css`
 			path {
+				pointer-events: visibleFill;
+			}
+			.circle {
 				filter: url(#erode);
 			}
 
@@ -44,13 +47,18 @@ export class UmbDonutChartElement extends LitElement {
 			}
 
 			#details-box {
-				background: #f00;
-				width: 20px;
-				height: 20px;
+				background: #ffffffe6;
+				border: 1px solid var(--uui-color-border-standalone);
+				border-radius: var(--uui-border-radius);
+				box-sizing: border-box;
 				top: 0;
 				left: 0;
 				position: absolute;
 				opacity: 0;
+				padding: 0.5em;
+				line-height: 1.5;
+				font-size: var(--uui-type-small-size);
+				box-shadow: var(--uui-shadow-depth-1);
 				transform: translate3d(var(--pos-x), var(--pos-y), 0);
 				transition: transform 0.2s cubic-bezier(0.02, 1.23, 0.79, 1.08);
 				transition: opacity 150ms linear;
@@ -58,6 +66,18 @@ export class UmbDonutChartElement extends LitElement {
 
 			#details-box.show {
 				opacity: 1;
+			}
+
+			#details-box uui-icon {
+				/* optically correct alignment */
+				color: var(--umb-donut-detail-color);
+				margin-right: 0.2em;
+			}
+
+			#details-title {
+				font-weight: bold;
+				display: flex;
+				align-items: center;
 			}
 		`,
 	];
@@ -97,6 +117,18 @@ export class UmbDonutChartElement extends LitElement {
 
 	@state()
 	posX = 0;
+
+	@state()
+	detailName = '';
+
+	@state()
+	detailAmount = 0;
+
+	@state()
+	detailPercent = 0;
+
+	@state()
+	detailColor = 'red';
 
 	#printCircles(event: Event) {
 		event.stopPropagation();
@@ -150,11 +182,22 @@ export class UmbDonutChartElement extends LitElement {
 		const rect = this.container.getBoundingClientRect();
 		const x = event.clientX - rect.left;
 		const y = event.clientY - rect.top;
-		this.posX = x;
-		this.posY = y - 30;
+		this.posX = x - 10;
+		this.posY = y - 70;
+	}
+
+	#setDetailsBoxData(event: MouseEvent) {
+		const target = event.target as SVGPathElement;
+		const index = target.dataset.index as unknown as number;
+		const circle = this.circles[index];
+		this.detailName = circle.name;
+		this.detailAmount = circle.percent;
+		this.detailPercent = circle.percent;
+		this.detailColor = circle.color;
 	}
 
 	#showDetailsBox(event: MouseEvent) {
+		this.#setDetailsBoxData(event);
 		this.detailsBox.classList.add('show');
 	}
 
@@ -164,7 +207,6 @@ export class UmbDonutChartElement extends LitElement {
 
 	#renderCircles() {
 		return svg`
-        	<svg viewBox="0 0 ${this.viewBox} ${this.viewBox}" role="list" >
 				<filter id="erode" x="-20%" y="-20%" width="140%" height="140%" filterUnits="objectBoundingBox" primitiveUnits="userSpaceOnUse" color-interpolation-filters="linearRGB">
 					<feMorphology operator="erode" radius="0.5 0.5" x="0%" y="0%" width="100%" height="100%" in="SourceGraphic" result="morphology"/>
 				</filter>
@@ -187,15 +229,18 @@ export class UmbDonutChartElement extends LitElement {
 				</filter>
 				<desc>In chosen date range you have this number of log message of type: </desc>
 					${this.circles.map(
-						(circle) => svg`
+						(circle, i) => svg`
 								<path
+								class="circle"
+
+								data-index="${i}"
 									fill="${circle.color}"
 									role="listitem"
 									d="${circle.commands}"
 									transform="rotate(${circle.offset} ${this.viewBox / 2} ${this.viewBox / 2})">
-									<title>${circle.tooltipText}</title>
 								</path>
-								<path
+								<path 
+								data-index="${i}"
 								@mouseenter=${this.#showDetailsBox}
 								@mouseleave=${this.#hideDetailsBox}
 									class="highlight"
@@ -203,17 +248,21 @@ export class UmbDonutChartElement extends LitElement {
 									role="listitem"
 									d="${circle.commands}"
 									transform="rotate(${circle.offset} ${this.viewBox / 2} ${this.viewBox / 2})">
-									<title>${circle.tooltipText}</title>
 								</path>`
 					)}
-			</svg>
+		
         `;
 	}
 
 	render() {
 		return html` <div id="container" @mousemove=${this.#calculateDetailsBoxPosition}>
-				${this.#renderCircles()}
-				<div id="details-box" style="--pos-y: ${this.posY}px; --pos-x: ${this.posX}px"></div>
+				<svg viewBox="0 0 ${this.viewBox} ${this.viewBox}" role="list">${this.#renderCircles()}</svg>
+				<div
+					id="details-box"
+					style="--pos-y: ${this.posY}px; --pos-x: ${this.posX}px; --umb-donut-detail-color: ${this.detailColor}">
+					<div id="details-title"><uui-icon name="umb:record"></uui-icon>${this.detailName}</div>
+					<span>${this.detailAmount} messages</span>
+				</div>
 			</div>
 			<slot @slotchange=${this.#printCircles} @slice-update=${this.#printCircles}></slot>`;
 	}

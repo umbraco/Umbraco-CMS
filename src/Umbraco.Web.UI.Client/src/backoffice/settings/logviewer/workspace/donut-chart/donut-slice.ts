@@ -9,8 +9,8 @@ export class UmbDonutSliceElement extends LitElement {
 	@property({ type: Number })
 	percent = 0;
 
-	@property()
-	tooltipText = '';
+	@property({ type: Number })
+	amount = 0;
 
 	@property()
 	color = 'red';

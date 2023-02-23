@@ -374,7 +374,8 @@ export class UmbLogViewerRootWorkspaceElement extends UmbLitElement {
 									? this.logLevelCount.map(
 											([level, number]) =>
 												html`<umb-donut-slice
-													tooltiptext="${level} - ${number}"
+													.name=${level}
+													.amount=${number}
 													.percent=${this.#calculatePercentage(number)}
 													.color="${`var(--umb-log-viewer-${level.toLowerCase()}-color)`}"></umb-donut-slice> `
 									  )
