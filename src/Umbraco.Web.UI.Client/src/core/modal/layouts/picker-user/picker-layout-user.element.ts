@@ -6,7 +6,7 @@ import { UmbUserStore, UMB_USER_STORE_CONTEXT_TOKEN } from '../../../../backoffi
 import type { UserDetails } from '@umbraco-cms/models';
 
 @customElement('umb-picker-layout-user')
-export class UmbPickerLayoutUserElement extends UmbModalLayoutPickerBase {
+export class UmbPickerLayoutUserElement extends UmbModalLayoutPickerBase<UserDetails> {
 	static styles = [
 		UUITextStyles,
 		css`

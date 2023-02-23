@@ -7,4 +7,6 @@ export interface UmbWorkspaceContextInterface<T = unknown> {
 	getEntityType(): string;
 	getData(): T;
 	destroy(): void;
+	// TODO: temp solution to bubble validation errors to the UI
+	setValidationErrors?(errorMap: any): void;
 }

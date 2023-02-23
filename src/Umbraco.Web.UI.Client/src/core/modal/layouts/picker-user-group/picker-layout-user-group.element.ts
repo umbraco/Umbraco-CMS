@@ -7,7 +7,7 @@ import type { UmbUserGroupStore } from '../../../../backoffice/users/user-groups
 import type { UserGroupDetails } from '@umbraco-cms/models';
 
 @customElement('umb-picker-layout-user-group')
-export class UmbPickerLayoutUserGroupElement extends UmbModalLayoutPickerBase {
+export class UmbPickerLayoutUserGroupElement extends UmbModalLayoutPickerBase<UserGroupDetails> {
 	static styles = [
 		UUITextStyles,
 		css`

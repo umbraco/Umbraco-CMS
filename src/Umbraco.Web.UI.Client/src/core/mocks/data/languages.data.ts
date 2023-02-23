@@ -16,6 +16,16 @@ class UmbLanguagesData extends UmbData<LanguageModel> {
 		return this.data.find((item) => item.isoCode === key);
 	}
 
+	insert(language: LanguageModel) {
+		const foundIndex = this.data.findIndex((item) => item.isoCode === language.isoCode);
+
+		if (foundIndex !== -1) {
+			throw new Error('Language with same iso code already exists');
+		}
+
+		this.data.push(language);
+	}
+
 	save(saveItems: Array<LanguageModel>) {
 		saveItems.forEach((saveItem) => {
 			const foundIndex = this.data.findIndex((item) => item.isoCode === saveItem.isoCode);

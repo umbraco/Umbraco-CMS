@@ -4,8 +4,8 @@ import { customElement, state } from 'lit/decorators.js';
 import { repeat } from 'lit-html/directives/repeat.js';
 import { UUIMenuItemElement, UUIMenuItemEvent } from '@umbraco-ui/uui';
 import { ifDefined } from 'lit-html/directives/if-defined.js';
-import { UmbModalLayoutPickerBase } from '../../../../core/modal/layouts/modal-layout-picker-base';
 import { UmbLanguageRepository } from '../repository/language.repository';
+import { UmbModalLayoutPickerBase } from '../../../../core/modal/layouts/modal-layout-picker-base';
 import { LanguageModel } from '@umbraco-cms/backend-api';
 
 export interface UmbLanguagePickerModalData {
@@ -14,7 +14,7 @@ export interface UmbLanguagePickerModalData {
 }
 
 @customElement('umb-language-picker-modal-layout')
-export class UmbLanguagePickerModalLayoutElement extends UmbModalLayoutPickerBase {
+export class UmbLanguagePickerModalLayoutElement extends UmbModalLayoutPickerBase<LanguageModel> {
 	static styles = [UUITextStyles, css``];
 
 	@state()
@@ -35,11 +35,19 @@ export class UmbLanguagePickerModalLayoutElement extends UmbModalLayoutPickerBas
 		this.handleSelection(isoCode);
 	}
 
+	get #filteredLanguages() {
+		if (this.data?.filter) {
+			return this._languages.filter(this.data.filter);
+		} else {
+			return this._languages;
+		}
+	}
+
 	render() {
 		return html`<umb-body-layout headline="Select languages">
 			<uui-box>
 				${repeat(
-					this._languages,
+					this.#filteredLanguages,
 					(item) => item.isoCode,
 					(item) => html`
 						<uui-menu-item

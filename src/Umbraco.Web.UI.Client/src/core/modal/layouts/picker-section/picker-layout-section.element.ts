@@ -6,7 +6,7 @@ import { umbExtensionsRegistry } from '@umbraco-cms/extensions-api';
 import type { ManifestSection } from '@umbraco-cms/models';
 
 @customElement('umb-picker-layout-section')
-export class UmbPickerLayoutSectionElement extends UmbModalLayoutPickerBase {
+export class UmbPickerLayoutSectionElement extends UmbModalLayoutPickerBase<ManifestSection> {
 	static styles = [
 		UUITextStyles,
 		css`

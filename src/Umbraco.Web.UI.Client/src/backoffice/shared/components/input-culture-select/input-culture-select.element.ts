@@ -5,8 +5,8 @@ import { FormControlMixin } from '@umbraco-ui/uui-base/lib/mixins';
 import { ifDefined } from 'lit-html/directives/if-defined.js';
 import { repeat } from 'lit/directives/repeat.js';
 import { UUIComboboxElement, UUIComboboxEvent } from '@umbraco-ui/uui';
-import { UmbCultureRepository } from '../../../settings/cultures/repository/culture.repository';
 import { UmbChangeEvent } from '@umbraco-cms/events';
+import { UmbCultureRepository } from '../../../settings/cultures/repository/culture.repository';
 import { UmbLitElement } from '@umbraco-cms/element';
 import { CultureModel } from '@umbraco-cms/backend-api';
 

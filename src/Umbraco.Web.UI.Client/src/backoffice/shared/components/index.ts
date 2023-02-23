@@ -8,6 +8,7 @@ import './backoffice-frame/backoffice-main.element';
 import './backoffice-frame/backoffice-modal-container.element';
 import './backoffice-frame/backoffice-notification-container.element';
 import './code-block/code-block.element';
+import './debug/debug.element';
 import './dropdown/dropdown.element';
 import './empty-state/empty-state.element';
 import './extension-slot/extension-slot.element';
@@ -31,5 +32,3 @@ import './workspace/workspace-action-menu/workspace-action-menu.element';
 import './workspace/workspace-action/workspace-action.element';
 import './workspace/workspace-content/workspace-content.element';
 import './workspace/workspace-layout/workspace-layout.element';
-
-import './debug/debug.element';

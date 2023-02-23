@@ -32,11 +32,14 @@ export class UmbEditLanguageWorkspaceViewElement extends UmbLitElement {
 			#default-language-warning {
 				background-color: var(--uui-color-warning);
 				color: var(--uui-color-warning-contrast);
-				border-color: var(--uui-color-warning-standalone);
 				padding: var(--uui-size-space-4) var(--uui-size-space-5);
-				border: 1px solid;
+				border: 1px solid var(--uui-color-warning-standalone);
 				margin-top: var(--uui-size-space-4);
 				border-radius: var(--uui-border-radius);
+			}
+
+			.validation-message {
+				color: var(--uui-color-danger);
 			}
 		`,
 	];
@@ -50,11 +53,16 @@ export class UmbEditLanguageWorkspaceViewElement extends UmbLitElement {
 	@state()
 	_isNew = false;
 
+	@state()
+	_validationErrors?: { [key: string]: Array<any> };
+
 	#languageWorkspaceContext?: UmbLanguageWorkspaceContext;
 
 	constructor() {
 		super();
 
+		/* TODO: we will need some system to notify about an action has been executed.
+		 In the language workspace we want to clear a default language change warning and reset the initial state after a save action has been executed. */
 		let initialStateSet = false;
 
 		this.consumeContext<UmbLanguageWorkspaceContext>('umbWorkspaceContext', (instance) => {
@@ -74,6 +82,11 @@ export class UmbEditLanguageWorkspaceViewElement extends UmbLitElement {
 
 			this.observe(this.#languageWorkspaceContext.isNew, (value) => {
 				this._isNew = value;
+			});
+
+			this.observe(this.#languageWorkspaceContext.validationErrors, (value) => {
+				this._validationErrors = value;
+				this.requestUpdate('_validationErrors');
 			});
 		});
 	}
@@ -99,8 +112,8 @@ export class UmbEditLanguageWorkspaceViewElement extends UmbLitElement {
 
 			this.#languageWorkspaceContext?.setCulture(isoCode);
 
-			// If the language name is not set, we set it to the name of the selected language.
-			if (!this._language?.name && cultureName) {
+			// to improve UX, we set the name to the culture name if it's a new language
+			if (this._isNew && cultureName) {
 				this.#languageWorkspaceContext?.setName(cultureName);
 			}
 		}
@@ -135,10 +148,16 @@ export class UmbEditLanguageWorkspaceViewElement extends UmbLitElement {
 			<uui-box>
 				<umb-workspace-property-layout label="Language">
 					<div slot="editor">
+						<!-- TODO: disable already created cultures in the select -->
 						<umb-input-culture-select
 							value=${ifDefined(this._language.isoCode)}
 							@change=${this.#handleCultureChange}
 							?readonly=${this._isNew === false}></umb-input-culture-select>
+
+						<!-- TEMP VALIDATION ERROR -->
+						${this._validationErrors?.isoCode.map(
+							(isoCodeError) => html`<div class="validation-message">${isoCodeError}</div>`
+						)}
 					</div>
 				</umb-workspace-property-layout>
 
@@ -157,7 +176,6 @@ export class UmbEditLanguageWorkspaceViewElement extends UmbLitElement {
 								<div>An Umbraco site can only have one default language set.</div>
 							</div>
 						</uui-toggle>
-
 						<!-- 	TODO: we need a UUI component for this -->
 						${this._language.isDefault !== this._isDefaultLanguage
 							? html`<div id="default-language-warning">
@@ -182,7 +200,9 @@ export class UmbEditLanguageWorkspaceViewElement extends UmbLitElement {
 						value=${ifDefined(this._language.fallbackIsoCode === null ? undefined : this._language.fallbackIsoCode)}
 						slot="editor"
 						max="1"
-						@change=${this.#handleFallbackChange}></umb-input-language-picker>
+						@change=${this.#handleFallbackChange}
+						.filter=${(language: LanguageModel) =>
+							language.isoCode !== this._language?.isoCode}></umb-input-language-picker>
 				</umb-workspace-property-layout>
 			</uui-box>
 		`;

@@ -45,6 +45,12 @@ export class UmbSectionElement extends UmbLitElement {
 	@state()
 	private _views?: Array<ManifestSectionView>;
 
+	@state()
+	private _sectionLabel = '';
+
+	@state()
+	private _sectionPathname = '';
+
 	private _workspaces?: Array<ManifestWorkspace>;
 	private _sectionContext?: UmbSectionContext;
 	private _sectionAlias?: string;
@@ -194,6 +200,8 @@ export class UmbSectionElement extends UmbLitElement {
 			${this._menus && this._menus.length > 0
 				? html`
 						<umb-section-sidebar>
+							<!-- TODO: this should be an extension point and only shown in the content section sidebar -->
+							<umb-app-language-select></umb-app-language-select>
 							<umb-extension-slot
 								type="sidebarMenu"
 								.filter=${(items: ManifestSidebarMenu) => items.meta.sections.includes(this._sectionAlias || '')}

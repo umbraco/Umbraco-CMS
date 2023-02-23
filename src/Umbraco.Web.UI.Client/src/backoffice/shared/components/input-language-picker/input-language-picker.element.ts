@@ -3,9 +3,9 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, property, state } from 'lit/decorators.js';
 import { ifDefined } from 'lit-html/directives/if-defined.js';
 import { FormControlMixin } from '@umbraco-ui/uui-base/lib/mixins';
+import { UmbChangeEvent } from '@umbraco-cms/events';
 import { UmbModalService, UMB_MODAL_SERVICE_CONTEXT_TOKEN } from '../../../../core/modal';
 import { UmbLanguageRepository } from '../../../settings/languages/repository/language.repository';
-import { UmbChangeEvent } from '@umbraco-cms/events';
 import { UmbLitElement } from '@umbraco-cms/element';
 import type { LanguageModel } from '@umbraco-cms/backend-api';
 import type { UmbObserverController } from '@umbraco-cms/observable-api';
@@ -55,6 +55,9 @@ export class UmbInputLanguagePickerElement extends FormControlMixin(UmbLitElemen
 	 */
 	@property({ type: String, attribute: 'min-message' })
 	maxMessage = 'This field exceeds the allowed amount of items';
+
+	@property({ type: Object, attribute: false })
+	public filter: (language: LanguageModel) => boolean = () => true;
 
 	private _selectedIsoCodes: Array<string> = [];
 	public get selectedIsoCodes(): Array<string> {
@@ -116,17 +119,15 @@ export class UmbInputLanguagePickerElement extends FormControlMixin(UmbLitElemen
 	}
 
 	private _openPicker() {
-		/*
-		TODO: re implement when language picker PR is merged
 		const modalHandler = this._modalService?.languagePicker({
 			multiple: this.max === 1 ? false : true,
 			selection: [...this._selectedIsoCodes],
+			filter: this.filter,
 		});
 
 		modalHandler?.onClose().then(({ selection }: any) => {
 			this._setSelection(selection);
 		});
-		*/
 	}
 
 	private _removeItem(item: LanguageModel) {

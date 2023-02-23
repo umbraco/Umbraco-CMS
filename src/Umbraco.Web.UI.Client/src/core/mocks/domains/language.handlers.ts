@@ -1,7 +1,6 @@
 import { rest } from 'msw';
-import { v4 as uuidv4 } from 'uuid';
 import { umbLanguagesData } from '../data/languages.data';
-import { LanguageModel } from '@umbraco-cms/backend-api';
+import { LanguageModel, ProblemDetailsModel } from '@umbraco-cms/backend-api';
 import { umbracoPath } from '@umbraco-cms/utils';
 
 // TODO: add schema
@@ -36,12 +35,22 @@ export const handlers = [
 
 		if (!data) return;
 
-		data.id = umbLanguagesData.getAll().length + 1;
-		data.key = uuidv4();
-
-		umbLanguagesData.save([data]);
-
-		return res(ctx.status(201));
+		try {
+			umbLanguagesData.insert(data);
+			return res(ctx.status(201));
+		} catch (error) {
+			return res(
+				ctx.status(400),
+				ctx.json<ProblemDetailsModel>({
+					status: 400,
+					type: 'validation',
+					detail: 'Something went wrong',
+					errors: {
+						isoCode: ['Language with same iso code already exists'],
+					},
+				})
+			);
+		}
 	}),
 
 	rest.put<LanguageModel>(umbracoPath('/language/:key'), async (req, res, ctx) => {

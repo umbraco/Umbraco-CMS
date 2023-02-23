@@ -1,11 +1,11 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html } from 'lit';
 import { customElement } from 'lit/decorators.js';
+import { UmbSectionSidebarContext, UMB_SECTION_SIDEBAR_CONTEXT_TOKEN } from './section-sidebar.context';
+import { UmbLitElement } from '@umbraco-cms/element';
 
 import '../../tree/context-menu/tree-context-menu.service';
 import '../section-sidebar-context-menu/section-sidebar-context-menu.element';
-import { UmbSectionSidebarContext, UMB_SECTION_SIDEBAR_CONTEXT_TOKEN } from './section-sidebar.context';
-import { UmbLitElement } from '@umbraco-cms/element';
 
 @customElement('umb-section-sidebar')
 export class UmbSectionSidebarElement extends UmbLitElement {
@@ -22,6 +22,11 @@ export class UmbSectionSidebarElement extends UmbLitElement {
 				flex-direction: column;
 				z-index: 10;
 			}
+
+			#scroll-container {
+				height: 100%;
+				overflow-y: auto;
+			}
 		`,
 	];
 
@@ -35,7 +40,7 @@ export class UmbSectionSidebarElement extends UmbLitElement {
 	render() {
 		return html`
 			<umb-section-sidebar-context-menu>
-				<uui-scroll-container>
+				<uui-scroll-container id="scroll-container">
 					<slot></slot>
 				</uui-scroll-container>
 			</umb-section-sidebar-context-menu>

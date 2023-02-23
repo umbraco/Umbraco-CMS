@@ -11,6 +11,10 @@ export class UmbLanguageWorkspaceContext extends UmbWorkspaceContext {
 	#data = new ObjectState<LanguageModel | undefined>(undefined);
 	data = this.#data.asObservable();
 
+	// TODO: this is a temp solution to bubble validation errors to the UI
+	#validationErrors = new ObjectState<any | undefined>(undefined);
+	validationErrors = this.#validationErrors.asObservable();
+
 	constructor(host: UmbControllerHostInterface) {
 		super(host);
 		this.#host = host;
@@ -58,6 +62,12 @@ export class UmbLanguageWorkspaceContext extends UmbWorkspaceContext {
 
 	setFallbackCulture(isoCode: string) {
 		this.#data.update({ fallbackIsoCode: isoCode });
+	}
+
+	// TODO: this is a temp solution to bubble validation errors to the UI
+	setValidationErrors(errorMap: any) {
+		// TODO: I can't use the update method to set the value to undefined
+		this.#validationErrors.next(errorMap);
 	}
 
 	destroy(): void {
