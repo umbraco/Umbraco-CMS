@@ -5,7 +5,7 @@ namespace Umbraco.Cms.Api.Management.Factories;
 
 public interface IDocumentEditingFactory
 {
-    ContentCreateModel MapCreateModel(DocumentCreateModel createModel);
+    ContentCreateModel MapCreateModel(DocumentCreateRequestModel createRequestModel);
 
-    ContentUpdateModel MapUpdateModel(DocumentUpdateModel updateModel);
+    ContentUpdateModel MapUpdateModel(DocumentUpdateRequestModel updateRequestModel);
 }
