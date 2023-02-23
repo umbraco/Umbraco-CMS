@@ -76,7 +76,8 @@ export type ManifestTypes =
 	| ManifestWorkspace
 	| ManifestWorkspaceAction
 	| ManifestWorkspaceView
-	| ManifestWorkspaceViewCollection;
+	| ManifestWorkspaceViewCollection
+	| ManifestBase;
 
 export type ManifestStandardTypes = ManifestTypes['type'];
 
@@ -112,7 +113,7 @@ export interface ManifestElement extends ManifestWithLoader<object | HTMLElement
 	js?: string;
 	elementName?: string;
 	//loader?: () => Promise<object | HTMLElement>;
-	meta?: any;
+	meta?: unknown;
 }
 
 export interface ManifestWithView extends ManifestElement {
@@ -131,11 +132,11 @@ export interface ManifestElementWithElementName extends ManifestElement {
 
 export interface ManifestCustom extends ManifestBase {
 	type: 'custom';
-	meta?: any;
+	meta?: unknown;
 }
 
 export interface ManifestWithMeta extends ManifestBase {
-	meta: any;
+	meta: unknown;
 }
 
 export interface ManifestEntrypoint extends ManifestBase {
