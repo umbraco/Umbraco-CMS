@@ -39,7 +39,7 @@ export class UmbMemberGroupRepository implements UmbTreeRepository, UmbDetailRep
 
 		new UmbContextConsumerController(this.#host, UMB_NOTIFICATION_SERVICE_CONTEXT_TOKEN, (instance) => {
 			this.#notificationService = instance;
-		});	
+		});
 	}
 
 	async requestRootTreeItems() {
@@ -89,9 +89,9 @@ export class UmbMemberGroupRepository implements UmbTreeRepository, UmbDetailRep
 
 	// DETAIL
 
-	async createDetailsScaffold() {
+	async createScaffold() {
 		await this.#init;
-		return this.#detailSource.createScaffold();	
+		return this.#detailSource.createScaffold();
 	}
 
 	async requestByKey(key: string) {
@@ -111,7 +111,7 @@ export class UmbMemberGroupRepository implements UmbTreeRepository, UmbDetailRep
 		return { data, error };
 	}
 
-	async createDetail(detail: MemberGroupDetails) {
+	async create(detail: MemberGroupDetails) {
 		await this.#init;
 
 		if (!detail.name) {
@@ -129,9 +129,9 @@ export class UmbMemberGroupRepository implements UmbTreeRepository, UmbDetailRep
 		return { data, error };
 	}
 
-	async saveDetail(memberGroup: MemberGroupDetails) {
+	async save(memberGroup: MemberGroupDetails) {
 		await this.#init;
-		
+
 		if (!memberGroup || !memberGroup.name) {
 			const error: ProblemDetailsModel = { title: 'Member group is missing' };
 			return { error };
@@ -140,7 +140,7 @@ export class UmbMemberGroupRepository implements UmbTreeRepository, UmbDetailRep
 		const { error } = await this.#detailSource.update(memberGroup);
 
 		if (!error) {
-			const notification = { data: { message: `Member group '${memberGroup.name} saved`}};
+			const notification = { data: { message: `Member group '${memberGroup.name} saved` } };
 			this.#notificationService?.peek('positive', notification);
 		}
 
@@ -149,7 +149,7 @@ export class UmbMemberGroupRepository implements UmbTreeRepository, UmbDetailRep
 
 		return { error };
 	}
-	
+
 	async delete(key: string) {
 		await this.#init;
 

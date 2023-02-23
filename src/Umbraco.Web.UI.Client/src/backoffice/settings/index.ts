@@ -2,6 +2,7 @@ import { manifests as settingsSectionManifests } from './section.manifests';
 import { manifests as dashboardManifests } from './dashboards/manifests';
 import { manifests as dataTypeManifests } from './data-types/manifests';
 import { manifests as extensionManifests } from './extensions/manifests';
+import { manifests as cultureManifests } from './cultures/manifests';
 import { manifests as languageManifests } from './languages/manifests';
 import { manifests as logviewerManifests } from './logviewer/manifests';
 
@@ -20,6 +21,7 @@ registerExtensions([
 	...dashboardManifests,
 	...dataTypeManifests,
 	...extensionManifests,
+	...cultureManifests,
 	...languageManifests,
 	...logviewerManifests,
 ]);

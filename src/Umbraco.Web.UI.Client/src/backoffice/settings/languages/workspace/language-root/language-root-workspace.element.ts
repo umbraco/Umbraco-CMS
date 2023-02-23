@@ -1,17 +1,16 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
-import { UmbLanguageStore, UmbLanguageStoreItemType, UMB_LANGUAGE_STORE_CONTEXT_TOKEN } from '../../language.store';
 import { UmbTableColumn, UmbTableConfig, UmbTableItem } from '../../../../shared/components/table';
-import { UmbWorkspaceEntityElement } from '../../../../shared/components/workspace/workspace-entity-element.interface';
+import { UmbLanguageRepository } from '../../repository/language.repository';
 import { UmbLitElement } from '@umbraco-cms/element';
+import { LanguageModel } from '@umbraco-cms/backend-api';
 
-import '../language/language-workspace.element';
 import './language-root-table-delete-column-layout.element';
 import './language-root-table-name-column-layout.element';
 
 @customElement('umb-language-root-workspace')
-export class UmbLanguageRootWorkspaceElement extends UmbLitElement implements UmbWorkspaceEntityElement {
+export class UmbLanguageRootWorkspaceElement extends UmbLitElement {
 	static styles = [
 		UUITextStyles,
 		css`
@@ -35,7 +34,7 @@ export class UmbLanguageRootWorkspaceElement extends UmbLitElement implements Um
 	@state()
 	private _tableColumns: Array<UmbTableColumn> = [
 		{
-			name: 'Language',
+			name: 'Name',
 			alias: 'languageName',
 			elementName: 'umb-language-root-table-name-column-layout',
 		},
@@ -44,15 +43,15 @@ export class UmbLanguageRootWorkspaceElement extends UmbLitElement implements Um
 			alias: 'isoCode',
 		},
 		{
-			name: 'Default language',
+			name: 'Default',
 			alias: 'defaultLanguage',
 		},
 		{
-			name: 'Mandatory language',
+			name: 'Mandatory',
 			alias: 'mandatoryLanguage',
 		},
 		{
-			name: 'Fall back language',
+			name: 'Fallback',
 			alias: 'fallBackLanguage',
 		},
 		{
@@ -65,32 +64,22 @@ export class UmbLanguageRootWorkspaceElement extends UmbLitElement implements Um
 	@state()
 	private _tableItems: Array<UmbTableItem> = [];
 
-	#languageStore?: UmbLanguageStore;
+	#languageRepository = new UmbLanguageRepository(this);
 
-	constructor() {
-		super();
-
-		this.consumeContext(UMB_LANGUAGE_STORE_CONTEXT_TOKEN, (instance) => {
-			this.#languageStore = instance;
-			this.#observeLanguages();
-		});
+	connectedCallback() {
+		super.connectedCallback();
+		this.#observeLanguages();
 	}
 
-	load(): void {
-		// Not relevant for this workspace
+	async #observeLanguages() {
+		const { asObservable } = await this.#languageRepository.requestLanguages();
+
+		if (asObservable) {
+			this.observe(asObservable(), (languages) => this.#createTableItems(languages));
+		}
 	}
 
-	create(): void {
-		// Not relevant for this workspace
-	}
-
-	#observeLanguages() {
-		this.#languageStore?.getAll().subscribe((languages) => {
-			this.#createTableItems(languages);
-		});
-	}
-
-	#createTableItems(languages: Array<UmbLanguageStoreItemType>) {
+	#createTableItems(languages: Array<LanguageModel>) {
 		this._tableItems = languages.map((language) => {
 			return {
 				key: language.isoCode ?? '',
@@ -139,6 +128,7 @@ export class UmbLanguageRootWorkspaceElement extends UmbLitElement implements Um
 							color="default"
 							href="section/settings/language/create/root"></uui-button>
 					</div>
+					<!--- TODO: investigate if it's possible to use a collection component here --->
 					<umb-table .config=${this._tableConfig} .columns=${this._tableColumns} .items=${this._tableItems}></umb-table>
 				</div>
 			</umb-body-layout>

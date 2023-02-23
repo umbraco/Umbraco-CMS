@@ -8,12 +8,37 @@ export class UmbSaveWorkspaceAction extends UmbWorkspaceAction<any, UmbWorkspace
 		super(host, repositoryAlias);
 	}
 
+	/* TODO: we need a solution for all actions to notify the system that is has been executed.
+		There might be cases where we need to do something after the action has been executed.
+		Ex. "reset" a workspace after a save action has been executed.
+	*/
 	async execute() {
 		if (!this.workspaceContext) return;
 		// TODO: it doesn't get the updated value
 		const data = this.workspaceContext.getData();
 		// TODO: handle errors
 		if (!data) return;
-		this.repository?.saveDetail(data);
+
+		this.workspaceContext.getIsNew() ? this.#create(data) : this.#update(data);
+	}
+
+	async #create(data: any) {
+		if (!this.workspaceContext) return;
+
+		const { error } = await this.repository.create(data);
+
+		// TODO: this is temp solution to bubble validation errors to the UI
+		if (error) {
+			if (error.type === 'validation') {
+				this.workspaceContext.setValidationErrors?.(error.errors);
+			}
+		} else {
+			this.workspaceContext.setValidationErrors?.(undefined);
+			this.workspaceContext.setIsNew(false);
+		}
+	}
+
+	#update(data: any) {
+		this.repository?.save(data);
 	}
 }
