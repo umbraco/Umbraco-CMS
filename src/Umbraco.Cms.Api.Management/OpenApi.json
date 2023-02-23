@@ -6,6 +6,181 @@
     "version": "1.0"
   },
   "paths": {
+    "/umbraco/management/api/v1/audit-log": {
+      "get": {
+        "tags": [
+          "Audit Log"
+        ],
+        "operationId": "GetAuditLog",
+        "parameters": [
+          {
+            "name": "orderDirection",
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/DirectionModel"
+            }
+          },
+          {
+            "name": "sinceDate",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "skip",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 0
+            }
+          },
+          {
+            "name": "take",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 100
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedAuditLogWithUsernameResponseModel"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/umbraco/management/api/v1/audit-log/{key}": {
+      "get": {
+        "tags": [
+          "Audit Log"
+        ],
+        "operationId": "GetAuditLogByKey",
+        "parameters": [
+          {
+            "name": "key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "orderDirection",
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/DirectionModel"
+            }
+          },
+          {
+            "name": "sinceDate",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "skip",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 0
+            }
+          },
+          {
+            "name": "take",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 100
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedAuditLogResponseModel"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/umbraco/management/api/v1/audit-log/type/{logType}": {
+      "get": {
+        "tags": [
+          "Audit Log"
+        ],
+        "operationId": "GetAuditLogTypeByLogType",
+        "parameters": [
+          {
+            "name": "logType",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/AuditTypeModel"
+            }
+          },
+          {
+            "name": "sinceDate",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "skip",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 0
+            }
+          },
+          {
+            "name": "take",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 100
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedAuditLogResponseModel"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/umbraco/management/api/v1/culture": {
       "get": {
         "tags": [
@@ -5225,7 +5400,8 @@
             "name": "filterMustBeIsDependency",
             "in": "query",
             "schema": {
-              "type": "boolean"
+              "type": "boolean",
+              "default": true
             }
           }
         ],
@@ -5558,6 +5734,101 @@
   },
   "components": {
     "schemas": {
+      "AuditLogBaseModel": {
+        "type": "object",
+        "properties": {
+          "userKey": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "entityKey": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "logType": {
+            "$ref": "#/components/schemas/AuditTypeModel"
+          },
+          "entityType": {
+            "type": "string",
+            "nullable": true
+          },
+          "comment": {
+            "type": "string",
+            "nullable": true
+          },
+          "parameters": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "AuditLogResponseModel": {
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/AuditLogBaseModel"
+          }
+        ],
+        "additionalProperties": false
+      },
+      "AuditLogWithUsernameResponseModel": {
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/AuditLogBaseModel"
+          }
+        ],
+        "properties": {
+          "userName": {
+            "type": "string",
+            "nullable": true
+          },
+          "userAvatars": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "AuditTypeModel": {
+        "enum": [
+          "New",
+          "Save",
+          "SaveVariant",
+          "Open",
+          "Delete",
+          "Publish",
+          "PublishVariant",
+          "SendToPublish",
+          "SendToPublishVariant",
+          "Unpublish",
+          "UnpublishVariant",
+          "Move",
+          "Copy",
+          "AssignDomain",
+          "PublicAccess",
+          "Sort",
+          "Notify",
+          "System",
+          "RollBack",
+          "PackagerInstall",
+          "PackagerUninstall",
+          "Custom",
+          "ContentVersionPreventCleanup",
+          "ContentVersionEnableCleanup"
+        ],
+        "type": "integer",
+        "format": "int32"
+      },
       "ConsentLevelModel": {
         "type": "object",
         "properties": {
@@ -7073,6 +7344,54 @@
         ],
         "type": "integer",
         "format": "int32"
+      },
+      "PagedAuditLogResponseModel": {
+        "required": [
+          "items",
+          "total"
+        ],
+        "type": "object",
+        "properties": {
+          "total": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/AuditLogResponseModel"
+                }
+              ]
+            }
+          }
+        },
+        "additionalProperties": false
+      },
+      "PagedAuditLogWithUsernameResponseModel": {
+        "required": [
+          "items",
+          "total"
+        ],
+        "type": "object",
+        "properties": {
+          "total": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/AuditLogWithUsernameResponseModel"
+                }
+              ]
+            }
+          }
+        },
+        "additionalProperties": false
       },
       "PagedContentTreeItemModel": {
         "required": [
