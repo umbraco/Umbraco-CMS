@@ -1,5 +1,6 @@
 using System.Net;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Primitives;
@@ -8,6 +9,8 @@ using StackExchange.Profiling;
 using StackExchange.Profiling.Internal;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Logging;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Cms.Core.Web;
 using Umbraco.Extensions;
 
@@ -38,7 +41,10 @@ public class WebProfiler : IProfiler
 
     public void Start()
     {
-        MiniProfiler.StartNew(_httpContextAccessor.HttpContext?.Request.Path);
+        var name = $"{_httpContextAccessor.HttpContext?.Request.Method} {_httpContextAccessor.HttpContext?.Request.GetDisplayUrl()}";
+
+        MiniProfiler.StartNew(name);
+
         MiniProfilerContext.Value = MiniProfiler.Current;
     }
 
@@ -124,20 +130,16 @@ public class WebProfiler : IProfiler
             return false;
         }
 
+        IWebProfilerService? webProfilerService = _httpContextAccessor.HttpContext?.RequestServices?.GetService<IWebProfilerService>();
 
-        if (bool.TryParse(request.Query["umbDebug"], out var umbDebug))
+        if (webProfilerService is not null)
         {
-            return umbDebug;
-        }
+            Attempt<bool, WebProfilerOperationStatus> shouldProfile = webProfilerService.GetStatus().GetAwaiter().GetResult();
 
-        if (bool.TryParse(request.Headers["X-UMB-DEBUG"], out var xUmbDebug))
-        {
-            return xUmbDebug;
-        }
-
-        if (bool.TryParse(request.Cookies["UMB-DEBUG"], out var cUmbDebug))
-        {
-            return cUmbDebug;
+            if (shouldProfile.Success)
+            {
+                return shouldProfile.Result;
+            }
         }
 
         return false;

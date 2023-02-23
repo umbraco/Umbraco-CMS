@@ -21,7 +21,7 @@ public class ItemsTrackedReferenceController : TrackedReferenceControllerBase
     }
 
     /// <summary>
-    ///     Gets a page list of the items used in any kind of relation from selected integer ids.
+    ///     Gets a page list of the items used in any kind of relation from selected keys.
     /// </summary>
     /// <remarks>
     ///     Used when bulk deleting content/media and bulk unpublishing content (delete and unpublish on List view).
@@ -30,9 +30,9 @@ public class ItemsTrackedReferenceController : TrackedReferenceControllerBase
     [HttpGet("item")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedViewModel<RelationItemViewModel>), StatusCodes.Status200OK)]
-    public async Task<ActionResult<PagedViewModel<RelationItemViewModel>>> GetPagedReferencedItems([FromQuery]int[] ids, long skip, long take, bool? filterMustBeIsDependency)
+    public async Task<ActionResult<PagedViewModel<RelationItemViewModel>>> GetPagedReferencedItems([FromQuery(Name="key")]SortedSet<Guid> keys, long skip = 0, long take = 20, bool filterMustBeIsDependency = true)
     {
-        PagedModel<RelationItemModel> relationItems = _trackedReferencesSkipTakeService.GetPagedItemsWithRelations(ids, skip, take, filterMustBeIsDependency ?? true);
+        PagedModel<RelationItemModel> relationItems = await _trackedReferencesSkipTakeService.GetPagedItemsWithRelationsAsync(keys, skip, take, filterMustBeIsDependency);
         var pagedViewModel = new PagedViewModel<RelationItemViewModel>
         {
             Total = relationItems.Total,
