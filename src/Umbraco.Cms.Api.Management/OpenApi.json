@@ -2668,7 +2668,18 @@
             }
           },
           "200": {
-            "description": "Success"
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/LogLevelCountsModel"
+                    }
+                  ]
+                }
+              }
+            }
           }
         }
       }
@@ -3655,6 +3666,305 @@
                       "$ref": "#/components/schemas/OutOfDateStatusModel"
                     }
                   ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/umbraco/management/api/v1/package/{name}/run-migration": {
+      "post": {
+        "tags": [
+          "Package"
+        ],
+        "operationId": "PostPackageByNameRunMigration",
+        "parameters": [
+          {
+            "name": "name",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "404": {
+            "description": "Not Found"
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetailsModel"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/umbraco/management/api/v1/package/created": {
+      "get": {
+        "tags": [
+          "Package"
+        ],
+        "operationId": "GetPackageCreated",
+        "parameters": [
+          {
+            "name": "skip",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 0
+            }
+          },
+          {
+            "name": "take",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 100
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedPackageDefinitionModel"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Package"
+        ],
+        "operationId": "PostPackageCreated",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/PackageCreateModel"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "404": {
+            "description": "Not Found"
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetailsModel"
+                }
+              }
+            }
+          },
+          "201": {
+            "description": "Created",
+            "headers": {
+              "Location": {
+                "description": "Location of the newly created resource",
+                "schema": {
+                  "type": "string",
+                  "description": "Location of the newly created resource",
+                  "format": "uri"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/umbraco/management/api/v1/package/created/{key}": {
+      "get": {
+        "tags": [
+          "Package"
+        ],
+        "operationId": "GetPackageCreatedByKey",
+        "parameters": [
+          {
+            "name": "key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "404": {
+            "description": "Not Found"
+          },
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/PackageDefinitionModel"
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Package"
+        ],
+        "operationId": "DeletePackageCreatedByKey",
+        "parameters": [
+          {
+            "name": "key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "404": {
+            "description": "Not Found"
+          },
+          "200": {
+            "description": "Success"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Package"
+        ],
+        "operationId": "PutPackageCreatedByKey",
+        "parameters": [
+          {
+            "name": "key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/PackageUpdateModel"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "404": {
+            "description": "Not Found"
+          },
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/umbraco/management/api/v1/package/created/{key}/download": {
+      "get": {
+        "tags": [
+          "Package"
+        ],
+        "operationId": "GetPackageCreatedByKeyDownload",
+        "parameters": [
+          {
+            "name": "key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "404": {
+            "description": "Not Found"
+          },
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/umbraco/management/api/v1/package/migration-status": {
+      "get": {
+        "tags": [
+          "Package"
+        ],
+        "operationId": "GetPackageMigrationStatus",
+        "parameters": [
+          {
+            "name": "skip",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 0
+            }
+          },
+          {
+            "name": "take",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 100
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedPackageMigrationStatusModel"
                 }
               }
             }
@@ -7177,6 +7487,32 @@
         ],
         "additionalProperties": false
       },
+      "LogLevelCountsModel": {
+        "type": "object",
+        "properties": {
+          "information": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "debug": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "warning": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "error": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "fatal": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "additionalProperties": false
+      },
       "LogLevelModel": {
         "enum": [
           "Verbose",
@@ -7344,6 +7680,139 @@
         ],
         "type": "integer",
         "format": "int32"
+      },
+      "PackageCreateModel": {
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/PackageModelBaseModel"
+          }
+        ],
+        "additionalProperties": false
+      },
+      "PackageDefinitionModel": {
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/PackageModelBaseModel"
+          }
+        ],
+        "properties": {
+          "key": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "packagePath": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "PackageMigrationStatusModel": {
+        "type": "object",
+        "properties": {
+          "packageName": {
+            "type": "string"
+          },
+          "hasPendingMigrations": {
+            "type": "boolean"
+          }
+        },
+        "additionalProperties": false
+      },
+      "PackageModelBaseModel": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "contentNodeId": {
+            "type": "string",
+            "nullable": true
+          },
+          "contentLoadChildNodes": {
+            "type": "boolean"
+          },
+          "mediaKeys": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          "mediaLoadChildNodes": {
+            "type": "boolean"
+          },
+          "documentTypes": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "mediaTypes": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "dataTypes": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "templates": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "partialViews": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "stylesheets": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "scripts": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "languages": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "dictionaryItems": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "additionalProperties": false
+      },
+      "PackageUpdateModel": {
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/PackageModelBaseModel"
+          }
+        ],
+        "properties": {
+          "packagePath": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
       },
       "PagedAuditLogResponseModel": {
         "required": [
@@ -7794,6 +8263,54 @@
               "oneOf": [
                 {
                   "$ref": "#/components/schemas/LoggerModel"
+                }
+              ]
+            }
+          }
+        },
+        "additionalProperties": false
+      },
+      "PagedPackageDefinitionModel": {
+        "required": [
+          "items",
+          "total"
+        ],
+        "type": "object",
+        "properties": {
+          "total": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/PackageDefinitionModel"
+                }
+              ]
+            }
+          }
+        },
+        "additionalProperties": false
+      },
+      "PagedPackageMigrationStatusModel": {
+        "required": [
+          "items",
+          "total"
+        ],
+        "type": "object",
+        "properties": {
+          "total": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/PackageMigrationStatusModel"
                 }
               ]
             }

@@ -1,11 +1,17 @@
 using System.Xml.Linq;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.FileProviders;
+using Microsoft.Extensions.Hosting;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Manifest;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Packaging;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Packaging;
+using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Extensions;
+using Umbraco.New.Cms.Core.Models;
 using File = System.IO.File;
 
 namespace Umbraco.Cms.Core.Services.Implement;
@@ -23,6 +29,7 @@ public class PackagingService : IPackagingService
     private readonly IManifestParser _manifestParser;
     private readonly IPackageInstallation _packageInstallation;
     private readonly PackageMigrationPlanCollection _packageMigrationPlans;
+    private readonly IHostEnvironment _hostEnvironment;
 
     public PackagingService(
         IAuditService auditService,
@@ -31,7 +38,8 @@ public class PackagingService : IPackagingService
         IEventAggregator eventAggregator,
         IManifestParser manifestParser,
         IKeyValueService keyValueService,
-        PackageMigrationPlanCollection packageMigrationPlans)
+        PackageMigrationPlanCollection packageMigrationPlans,
+        IHostEnvironment hostEnvironment)
     {
         _auditService = auditService;
         _createdPackages = createdPackages;
@@ -40,6 +48,28 @@ public class PackagingService : IPackagingService
         _manifestParser = manifestParser;
         _keyValueService = keyValueService;
         _packageMigrationPlans = packageMigrationPlans;
+        _hostEnvironment = hostEnvironment;
+    }
+
+    [Obsolete("Use constructor that also takes an IHostEnvironment instead. Scheduled for removal in V15")]
+    public PackagingService(
+        IAuditService auditService,
+        ICreatedPackagesRepository createdPackages,
+        IPackageInstallation packageInstallation,
+        IEventAggregator eventAggregator,
+        IManifestParser manifestParser,
+        IKeyValueService keyValueService,
+        PackageMigrationPlanCollection packageMigrationPlans)
+        : this(
+              auditService,
+              createdPackages,
+              packageInstallation,
+              eventAggregator,
+              manifestParser,
+              keyValueService,
+              packageMigrationPlans,
+              StaticServiceProvider.Instance.GetRequiredService<IHostEnvironment>())
+    {
     }
 
     #region Installation
@@ -91,23 +121,69 @@ public class PackagingService : IPackagingService
 
     #region Created/Installed Package Repositories
 
+    [Obsolete("Use DeleteCreatedPackageAsync instead. Scheduled for removal in Umbraco 15.")]
     public void DeleteCreatedPackage(int id, int userId = Constants.Security.SuperUserId)
     {
         PackageDefinition? package = GetCreatedPackageById(id);
+        Guid key = package?.PackageId ?? Guid.Empty;
+
+        DeleteCreatedPackageAsync(key, userId).GetAwaiter().GetResult();
+    }
+
+    /// <inheritdoc/>
+    public async Task<Attempt<PackageDefinition?, PackageOperationStatus>> DeleteCreatedPackageAsync(Guid key, int userId = Constants.Security.SuperUserId)
+    {
+        PackageDefinition? package = await GetCreatedPackageByKeyAsync(key);
         if (package == null)
         {
-            return;
+            return Attempt.FailWithStatus<PackageDefinition?, PackageOperationStatus>(PackageOperationStatus.NotFound, null);
         }
 
-        _auditService.Add(AuditType.PackagerUninstall, userId, -1, "Package", $"Created package '{package.Name}' deleted. Package id: {package.Id}");
-        _createdPackages.Delete(id);
+        _auditService.Add(AuditType.Delete, userId, -1, "Package", $"Created package '{package.Name}' deleted. Package key: {key}");
+        _createdPackages.Delete(package.Id);
+
+        return Attempt.SucceedWithStatus<PackageDefinition?, PackageOperationStatus>(PackageOperationStatus.Success, package);
     }
 
     public IEnumerable<PackageDefinition?> GetAllCreatedPackages() => _createdPackages.GetAll();
 
     public PackageDefinition? GetCreatedPackageById(int id) => _createdPackages.GetById(id);
 
+    /// <inheritdoc/>
+    public Task<PackageDefinition?> GetCreatedPackageByKeyAsync(Guid key) => Task.FromResult(_createdPackages.GetByKey(key));
+
+    [Obsolete("Use CreateCreatedPackageAsync or UpdateCreatedPackageAsync instead. Scheduled for removal in Umbraco 15.")]
     public bool SaveCreatedPackage(PackageDefinition definition) => _createdPackages.SavePackage(definition);
+
+    /// <inheritdoc/>
+    public async Task<Attempt<PackageDefinition, PackageOperationStatus>> CreateCreatedPackageAsync(PackageDefinition package, int userId)
+    {
+        if (_createdPackages.SavePackage(package) == false)
+        {
+            if (string.IsNullOrEmpty(package.Name))
+            {
+                return Attempt.FailWithStatus(PackageOperationStatus.InvalidName, package);
+            }
+
+            return Attempt.FailWithStatus(PackageOperationStatus.DuplicateItemName, package);
+        }
+
+        _auditService.Add(AuditType.New, userId, -1, "Package", $"Created package '{package.Name}' created. Package key: {package.PackageId}");
+        return await Task.FromResult(Attempt.SucceedWithStatus(PackageOperationStatus.Success, package));
+
+    }
+
+    /// <inheritdoc/>
+    public async Task<Attempt<PackageDefinition, PackageOperationStatus>> UpdateCreatedPackageAsync(PackageDefinition package, int userId)
+    {
+        if (_createdPackages.SavePackage(package) == false)
+        {
+            return Attempt.FailWithStatus(PackageOperationStatus.NotFound, package);
+        }
+
+        _auditService.Add(AuditType.New, userId, -1, "Package", $"Created package '{package.Name}' updated. Package key: {package.PackageId}");
+        return await Task.FromResult(Attempt.SucceedWithStatus(PackageOperationStatus.Success, package));
+    }
 
     public string ExportCreatedPackage(PackageDefinition definition) => _createdPackages.ExportPackage(definition);
 
@@ -116,36 +192,11 @@ public class PackagingService : IPackagingService
 
     public IEnumerable<InstalledPackage> GetAllInstalledPackages()
     {
-        IReadOnlyDictionary<string, string?>? keyValues =
-            _keyValueService.FindByKeyPrefix(Constants.Conventions.Migrations.KeyValuePrefix);
-
-        var installedPackages = new Dictionary<string, InstalledPackage>();
-
-        // Collect the package from the package migration plans
-        foreach (PackageMigrationPlan plan in _packageMigrationPlans)
-        {
-            if (!installedPackages.TryGetValue(plan.PackageName, out InstalledPackage? installedPackage))
-            {
-                installedPackage = new InstalledPackage { PackageName = plan.PackageName };
-                installedPackages.Add(plan.PackageName, installedPackage);
-            }
-
-            var currentPlans = installedPackage.PackageMigrationPlans.ToList();
-            if (keyValues is null || keyValues.TryGetValue(
-                Constants.Conventions.Migrations.KeyValuePrefix + plan.Name,
-                out var currentState) is false)
-            {
-                currentState = null;
-            }
-
-            currentPlans.Add(new InstalledPackageMigrationPlans
-            {
-                CurrentMigrationId = currentState,
-                FinalMigrationId = plan.FinalState,
-            });
-
-            installedPackage.PackageMigrationPlans = currentPlans;
-        }
+        // Collect the packages from the package migration plans
+        var installedPackages = GetInstalledPackagesFromMigrationPlansAsync(0, int.MaxValue)
+            .GetAwaiter()
+            .GetResult()
+            .Items.ToDictionary(package => package.PackageName!, package => package); // PackageName cannot be null here
 
         // Collect and merge the packages from the manifests
         foreach (PackageManifest package in _manifestParser.GetManifests())
@@ -157,7 +208,8 @@ public class PackagingService : IPackagingService
 
             if (!installedPackages.TryGetValue(package.PackageName, out InstalledPackage? installedPackage))
             {
-                installedPackage = new InstalledPackage {
+                installedPackage = new InstalledPackage
+                {
                     PackageName = package.PackageName,
                     Version = string.IsNullOrEmpty(package.Version) ? "Unknown" : package.Version,
                 };
@@ -173,4 +225,55 @@ public class PackagingService : IPackagingService
     }
 
     #endregion
+
+    /// <inheritdoc/>
+    public async Task<PagedModel<InstalledPackage>> GetInstalledPackagesFromMigrationPlansAsync(int skip, int take)
+    {
+        IReadOnlyDictionary<string, string?>? keyValues =
+            _keyValueService.FindByKeyPrefix(Constants.Conventions.Migrations.KeyValuePrefix);
+
+        InstalledPackage[] installedPackages = _packageMigrationPlans
+            .GroupBy(plan => plan.PackageName)
+            .Select(group =>
+            {
+                var package = new InstalledPackage
+                {
+                    PackageName = group.Key,
+                };
+
+                var currentState = keyValues?
+                    .GetValueOrDefault(Constants.Conventions.Migrations.KeyValuePrefix + package.PackageName);
+
+                package.PackageMigrationPlans = group
+                    .Select(plan => new InstalledPackageMigrationPlans
+                    {
+                        CurrentMigrationId = currentState,
+                        FinalMigrationId = plan.FinalState,
+                    });
+
+                return package;
+            }).ToArray();
+
+        return await Task.FromResult(new PagedModel<InstalledPackage>
+        {
+            Total = installedPackages.Count(),
+            Items = installedPackages.Skip(skip).Take(take),
+        });
+    }
+
+    /// <inheritdoc/>
+    public Stream? GetPackageFileStream(PackageDefinition definition)
+    {
+        // Removing the ContentRootPath from the package path as a sub path is required for GetFileInfo()
+        var subPath = definition.PackagePath.Replace(_hostEnvironment.ContentRootPath, string.Empty);
+
+        IFileInfo packageFile = _hostEnvironment.ContentRootFileProvider.GetFileInfo(subPath);
+
+        if (packageFile.Exists == false)
+        {
+            return null;
+        }
+
+        return packageFile.CreateReadStream();
+    }
 }
