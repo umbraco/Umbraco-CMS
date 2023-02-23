@@ -23,13 +23,6 @@
   </Suppression>
   <Suppression>
     <DiagnosticId>CP0001</DiagnosticId>
-    <Target>T:Umbraco.Cms.Core.Manifest.ManifestParser</Target>
-    <Left>lib/net7.0/Umbraco.Infrastructure.dll</Left>
-    <Right>lib/net7.0/Umbraco.Infrastructure.dll</Right>
-    <IsBaselineSuppression>true</IsBaselineSuppression>
-  </Suppression>
-  <Suppression>
-    <DiagnosticId>CP0001</DiagnosticId>
     <Target>T:Umbraco.Cms.Infrastructure.Migrations.PostMigrations.ClearCsrfCookies</Target>
     <Left>lib/net7.0/Umbraco.Infrastructure.dll</Left>
     <Right>lib/net7.0/Umbraco.Infrastructure.dll</Right>
@@ -86,7 +79,7 @@
   </Suppression>
   <Suppression>
     <DiagnosticId>CP0002</DiagnosticId>
-    <Target>M:Umbraco.Cms.Core.Services.Implement.PackagingService.#ctor(Umbraco.Cms.Core.Services.IAuditService,Umbraco.Cms.Core.Packaging.ICreatedPackagesRepository,Umbraco.Cms.Core.Packaging.IPackageInstallation,Umbraco.Cms.Core.Events.IEventAggregator,Umbraco.Cms.Core.Manifest.IManifestParser,Umbraco.Cms.Core.Services.IKeyValueService,Umbraco.Cms.Core.Packaging.PackageMigrationPlanCollection)</Target>
+    <Target>M:Umbraco.Cms.Core.Security.BackOfficeUserStore.#ctor(Umbraco.Cms.Core.Scoping.ICoreScopeProvider,Umbraco.Cms.Core.Services.IUserService,Umbraco.Cms.Core.Services.IEntityService,Umbraco.Cms.Core.Services.IExternalLoginWithKeyService,Microsoft.Extensions.Options.IOptions{Umbraco.Cms.Core.Configuration.Models.GlobalSettings},Umbraco.Cms.Core.Mapping.IUmbracoMapper,Umbraco.Cms.Core.Security.BackOfficeErrorDescriber,Umbraco.Cms.Core.Cache.AppCaches)</Target>
     <Left>lib/net7.0/Umbraco.Infrastructure.dll</Left>
     <Right>lib/net7.0/Umbraco.Infrastructure.dll</Right>
     <IsBaselineSuppression>true</IsBaselineSuppression>
@@ -143,20 +136,6 @@
   <Suppression>
     <DiagnosticId>CP0002</DiagnosticId>
     <Target>M:Umbraco.Cms.Infrastructure.Migrations.Upgrade.Upgrader.Execute(Umbraco.Cms.Core.Migrations.IMigrationPlanExecutor,Umbraco.Cms.Core.Scoping.IScopeProvider,Umbraco.Cms.Core.Services.IKeyValueService)</Target>
-    <Left>lib/net7.0/Umbraco.Infrastructure.dll</Left>
-    <Right>lib/net7.0/Umbraco.Infrastructure.dll</Right>
-    <IsBaselineSuppression>true</IsBaselineSuppression>
-  </Suppression>
-  <Suppression>
-    <DiagnosticId>CP0002</DiagnosticId>
-    <Target>M:Umbraco.Cms.Infrastructure.WebAssets.BackOfficeWebAssets.#ctor(Umbraco.Cms.Core.WebAssets.IRuntimeMinifier,Umbraco.Cms.Core.Manifest.IManifestParser,Umbraco.Cms.Core.PropertyEditors.PropertyEditorCollection,Umbraco.Cms.Core.Hosting.IHostingEnvironment,Microsoft.Extensions.Options.IOptionsMonitor{Umbraco.Cms.Core.Configuration.Models.GlobalSettings},Umbraco.Cms.Core.WebAssets.CustomBackOfficeAssetsCollection)</Target>
-    <Left>lib/net7.0/Umbraco.Infrastructure.dll</Left>
-    <Right>lib/net7.0/Umbraco.Infrastructure.dll</Right>
-    <IsBaselineSuppression>true</IsBaselineSuppression>
-  </Suppression>
-  <Suppression>
-    <DiagnosticId>CP0002</DiagnosticId>
-    <Target>M:Umbraco.Cms.Infrastructure.WebAssets.BackOfficeWebAssets.GetIndependentPackageBundleName(Umbraco.Cms.Core.Manifest.ManifestAssets,Umbraco.Cms.Core.WebAssets.AssetType)</Target>
     <Left>lib/net7.0/Umbraco.Infrastructure.dll</Left>
     <Right>lib/net7.0/Umbraco.Infrastructure.dll</Right>
     <IsBaselineSuppression>true</IsBaselineSuppression>

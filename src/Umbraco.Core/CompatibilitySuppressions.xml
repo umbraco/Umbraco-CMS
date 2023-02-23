@@ -1,97 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Suppressions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
   <Suppression>
-    <DiagnosticId>CP0001</DiagnosticId>
-    <Target>T:Umbraco.Cms.Core.Manifest.CompositePackageManifest</Target>
-    <Left>lib/net7.0/Umbraco.Core.dll</Left>
-    <Right>lib/net7.0/Umbraco.Core.dll</Right>
-    <IsBaselineSuppression>true</IsBaselineSuppression>
-  </Suppression>
-  <Suppression>
-    <DiagnosticId>CP0001</DiagnosticId>
-    <Target>T:Umbraco.Cms.Core.Manifest.IManifestFilter</Target>
-    <Left>lib/net7.0/Umbraco.Core.dll</Left>
-    <Right>lib/net7.0/Umbraco.Core.dll</Right>
-    <IsBaselineSuppression>true</IsBaselineSuppression>
-  </Suppression>
-  <Suppression>
-    <DiagnosticId>CP0001</DiagnosticId>
-    <Target>T:Umbraco.Cms.Core.Manifest.IManifestParser</Target>
-    <Left>lib/net7.0/Umbraco.Core.dll</Left>
-    <Right>lib/net7.0/Umbraco.Core.dll</Right>
-    <IsBaselineSuppression>true</IsBaselineSuppression>
-  </Suppression>
-  <Suppression>
-    <DiagnosticId>CP0001</DiagnosticId>
-    <Target>T:Umbraco.Cms.Core.Manifest.IPackageManifest</Target>
-    <Left>lib/net7.0/Umbraco.Core.dll</Left>
-    <Right>lib/net7.0/Umbraco.Core.dll</Right>
-    <IsBaselineSuppression>true</IsBaselineSuppression>
-  </Suppression>
-  <Suppression>
-    <DiagnosticId>CP0001</DiagnosticId>
-    <Target>T:Umbraco.Cms.Core.Manifest.ManifestAssets</Target>
-    <Left>lib/net7.0/Umbraco.Core.dll</Left>
-    <Right>lib/net7.0/Umbraco.Core.dll</Right>
-    <IsBaselineSuppression>true</IsBaselineSuppression>
-  </Suppression>
-  <Suppression>
-    <DiagnosticId>CP0001</DiagnosticId>
-    <Target>T:Umbraco.Cms.Core.Manifest.ManifestContentAppDefinition</Target>
-    <Left>lib/net7.0/Umbraco.Core.dll</Left>
-    <Right>lib/net7.0/Umbraco.Core.dll</Right>
-    <IsBaselineSuppression>true</IsBaselineSuppression>
-  </Suppression>
-  <Suppression>
-    <DiagnosticId>CP0001</DiagnosticId>
-    <Target>T:Umbraco.Cms.Core.Manifest.ManifestContentAppFactory</Target>
-    <Left>lib/net7.0/Umbraco.Core.dll</Left>
-    <Right>lib/net7.0/Umbraco.Core.dll</Right>
-    <IsBaselineSuppression>true</IsBaselineSuppression>
-  </Suppression>
-  <Suppression>
-    <DiagnosticId>CP0001</DiagnosticId>
-    <Target>T:Umbraco.Cms.Core.Manifest.ManifestDashboard</Target>
-    <Left>lib/net7.0/Umbraco.Core.dll</Left>
-    <Right>lib/net7.0/Umbraco.Core.dll</Right>
-    <IsBaselineSuppression>true</IsBaselineSuppression>
-  </Suppression>
-  <Suppression>
-    <DiagnosticId>CP0001</DiagnosticId>
-    <Target>T:Umbraco.Cms.Core.Manifest.ManifestFilterCollection</Target>
-    <Left>lib/net7.0/Umbraco.Core.dll</Left>
-    <Right>lib/net7.0/Umbraco.Core.dll</Right>
-    <IsBaselineSuppression>true</IsBaselineSuppression>
-  </Suppression>
-  <Suppression>
-    <DiagnosticId>CP0001</DiagnosticId>
-    <Target>T:Umbraco.Cms.Core.Manifest.ManifestFilterCollectionBuilder</Target>
-    <Left>lib/net7.0/Umbraco.Core.dll</Left>
-    <Right>lib/net7.0/Umbraco.Core.dll</Right>
-    <IsBaselineSuppression>true</IsBaselineSuppression>
-  </Suppression>
-  <Suppression>
-    <DiagnosticId>CP0001</DiagnosticId>
-    <Target>T:Umbraco.Cms.Core.Manifest.ManifestSection</Target>
-    <Left>lib/net7.0/Umbraco.Core.dll</Left>
-    <Right>lib/net7.0/Umbraco.Core.dll</Right>
-    <IsBaselineSuppression>true</IsBaselineSuppression>
-  </Suppression>
-  <Suppression>
-    <DiagnosticId>CP0001</DiagnosticId>
-    <Target>T:Umbraco.Cms.Core.Manifest.PackageManifest</Target>
-    <Left>lib/net7.0/Umbraco.Core.dll</Left>
-    <Right>lib/net7.0/Umbraco.Core.dll</Right>
-    <IsBaselineSuppression>true</IsBaselineSuppression>
-  </Suppression>
-  <Suppression>
-    <DiagnosticId>CP0002</DiagnosticId>
-    <Target>M:Umbraco.Cms.Core.Configuration.Grid.GridConfig.#ctor(Umbraco.Cms.Core.Cache.AppCaches,Umbraco.Cms.Core.Manifest.IManifestParser,Umbraco.Cms.Core.Serialization.IJsonSerializer,Umbraco.Cms.Core.Hosting.IHostingEnvironment,Microsoft.Extensions.Logging.ILoggerFactory)</Target>
-    <Left>lib/net7.0/Umbraco.Core.dll</Left>
-    <Right>lib/net7.0/Umbraco.Core.dll</Right>
-    <IsBaselineSuppression>true</IsBaselineSuppression>
-  </Suppression>
-  <Suppression>
     <DiagnosticId>CP0002</DiagnosticId>
     <Target>M:Umbraco.Cms.Core.Models.Blocks.BlockGridItem.get_ForceLeft</Target>
     <Left>lib/net7.0/Umbraco.Core.dll</Left>
@@ -143,6 +52,13 @@
   <Suppression>
     <DiagnosticId>CP0002</DiagnosticId>
     <Target>M:Umbraco.Cms.Core.Models.ContentEditing.Language.set_FallbackLanguageId(System.Nullable{System.Int32})</Target>
+    <Left>lib/net7.0/Umbraco.Core.dll</Left>
+    <Right>lib/net7.0/Umbraco.Core.dll</Right>
+    <IsBaselineSuppression>true</IsBaselineSuppression>
+  </Suppression>
+  <Suppression>
+    <DiagnosticId>CP0002</DiagnosticId>
+    <Target>M:Umbraco.Cms.Core.Models.ContentTypeSort.#ctor(System.Lazy{System.Int32},System.Int32,System.String)</Target>
     <Left>lib/net7.0/Umbraco.Core.dll</Left>
     <Right>lib/net7.0/Umbraco.Core.dll</Right>
     <IsBaselineSuppression>true</IsBaselineSuppression>
@@ -296,6 +212,13 @@
   </Suppression>
   <Suppression>
     <DiagnosticId>CP0002</DiagnosticId>
+    <Target>M:Umbraco.Cms.Core.Models.Mapping.UserMapDefinition.#ctor(Umbraco.Cms.Core.Services.ILocalizedTextService,Umbraco.Cms.Core.Services.IUserService,Umbraco.Cms.Core.Services.IEntityService,Umbraco.Cms.Core.Services.ISectionService,Umbraco.Cms.Core.Cache.AppCaches,Umbraco.Cms.Core.Actions.ActionCollection,Microsoft.Extensions.Options.IOptions{Umbraco.Cms.Core.Configuration.Models.GlobalSettings},Umbraco.Cms.Core.IO.MediaFileManager,Umbraco.Cms.Core.Strings.IShortStringHelper,Umbraco.Cms.Core.Media.IImageUrlGenerator)</Target>
+    <Left>lib/net7.0/Umbraco.Core.dll</Left>
+    <Right>lib/net7.0/Umbraco.Core.dll</Right>
+    <IsBaselineSuppression>true</IsBaselineSuppression>
+  </Suppression>
+  <Suppression>
+    <DiagnosticId>CP0002</DiagnosticId>
     <Target>M:Umbraco.Cms.Core.Models.Membership.ReadOnlyUserGroup.#ctor(System.Int32,System.String,System.String,System.Nullable{System.Int32},System.Nullable{System.Int32},System.String,System.Collections.Generic.IEnumerable{System.Int32},System.Collections.Generic.IEnumerable{System.String},System.Collections.Generic.IEnumerable{System.String},System.Boolean)</Target>
     <Left>lib/net7.0/Umbraco.Core.dll</Left>
     <Right>lib/net7.0/Umbraco.Core.dll</Right>
@@ -436,20 +359,6 @@
   </Suppression>
   <Suppression>
     <DiagnosticId>CP0002</DiagnosticId>
-    <Target>M:Umbraco.Cms.Core.PropertyEditors.ParameterEditorCollection.#ctor(Umbraco.Cms.Core.PropertyEditors.DataEditorCollection,Umbraco.Cms.Core.Manifest.IManifestParser)</Target>
-    <Left>lib/net7.0/Umbraco.Core.dll</Left>
-    <Right>lib/net7.0/Umbraco.Core.dll</Right>
-    <IsBaselineSuppression>true</IsBaselineSuppression>
-  </Suppression>
-  <Suppression>
-    <DiagnosticId>CP0002</DiagnosticId>
-    <Target>M:Umbraco.Cms.Core.PropertyEditors.PropertyEditorCollection.#ctor(Umbraco.Cms.Core.PropertyEditors.DataEditorCollection,Umbraco.Cms.Core.Manifest.IManifestParser)</Target>
-    <Left>lib/net7.0/Umbraco.Core.dll</Left>
-    <Right>lib/net7.0/Umbraco.Core.dll</Right>
-    <IsBaselineSuppression>true</IsBaselineSuppression>
-  </Suppression>
-  <Suppression>
-    <DiagnosticId>CP0002</DiagnosticId>
     <Target>M:Umbraco.Cms.Core.Services.Implement.DataTypeService.#ctor(Umbraco.Cms.Core.PropertyEditors.IDataValueEditorFactory,Umbraco.Cms.Core.Scoping.ICoreScopeProvider,Microsoft.Extensions.Logging.ILoggerFactory,Umbraco.Cms.Core.Events.IEventMessagesFactory,Umbraco.Cms.Core.Persistence.Repositories.IDataTypeRepository,Umbraco.Cms.Core.Persistence.Repositories.IDataTypeContainerRepository,Umbraco.Cms.Core.Persistence.Repositories.IAuditRepository,Umbraco.Cms.Core.Persistence.Repositories.IEntityRepository,Umbraco.Cms.Core.Persistence.Repositories.IContentTypeRepository,Umbraco.Cms.Core.IO.IIOHelper,Umbraco.Cms.Core.Services.ILocalizedTextService,Umbraco.Cms.Core.Services.ILocalizationService,Umbraco.Cms.Core.Strings.IShortStringHelper,Umbraco.Cms.Core.Serialization.IJsonSerializer)</Target>
     <Left>lib/net7.0/Umbraco.Core.dll</Left>
     <Right>lib/net7.0/Umbraco.Core.dll</Right>
@@ -507,6 +416,13 @@
   <Suppression>
     <DiagnosticId>CP0006</DiagnosticId>
     <Target>M:Umbraco.Cms.Core.Deploy.IValueConnector.ToArtifact(System.Object,Umbraco.Cms.Core.Models.IPropertyType,System.Collections.Generic.ICollection{Umbraco.Cms.Core.Deploy.ArtifactDependency},Umbraco.Cms.Core.Deploy.IContextCache)</Target>
+    <Left>lib/net7.0/Umbraco.Core.dll</Left>
+    <Right>lib/net7.0/Umbraco.Core.dll</Right>
+    <IsBaselineSuppression>true</IsBaselineSuppression>
+  </Suppression>
+  <Suppression>
+    <DiagnosticId>CP0006</DiagnosticId>
+    <Target>M:Umbraco.Cms.Core.Packaging.IPackageDefinitionRepository.GetByKey(System.Guid)</Target>
     <Left>lib/net7.0/Umbraco.Core.dll</Left>
     <Right>lib/net7.0/Umbraco.Core.dll</Right>
     <IsBaselineSuppression>true</IsBaselineSuppression>
@@ -674,7 +590,14 @@
   </Suppression>
   <Suppression>
     <DiagnosticId>CP0006</DiagnosticId>
-    <Target>M:Umbraco.Cms.Core.Telemetry.ITelemetryService.GetTelemetryReportDataAsync</Target>
+    <Target>M:Umbraco.Cms.Core.Services.IPackagingService.GetCreatedPackageByKey(System.Guid)</Target>
+    <Left>lib/net7.0/Umbraco.Core.dll</Left>
+    <Right>lib/net7.0/Umbraco.Core.dll</Right>
+    <IsBaselineSuppression>true</IsBaselineSuppression>
+  </Suppression>
+  <Suppression>
+    <DiagnosticId>CP0006</DiagnosticId>
+    <Target>M:Umbraco.Cms.Core.Services.IPackagingService.GetInstalledPackagesFromMigrationPlans</Target>
     <Left>lib/net7.0/Umbraco.Core.dll</Left>
     <Right>lib/net7.0/Umbraco.Core.dll</Right>
     <IsBaselineSuppression>true</IsBaselineSuppression>
@@ -710,6 +633,13 @@
   <Suppression>
     <DiagnosticId>CP0006</DiagnosticId>
     <Target>P:Umbraco.Cms.Core.Models.ILanguage.FallbackIsoCode</Target>
+    <Left>lib/net7.0/Umbraco.Core.dll</Left>
+    <Right>lib/net7.0/Umbraco.Core.dll</Right>
+    <IsBaselineSuppression>true</IsBaselineSuppression>
+  </Suppression>
+  <Suppression>
+    <DiagnosticId>CP0006</DiagnosticId>
+    <Target>P:Umbraco.Cms.Core.Models.Membership.IUserGroup.PermissionNames</Target>
     <Left>lib/net7.0/Umbraco.Core.dll</Left>
     <Right>lib/net7.0/Umbraco.Core.dll</Right>
     <IsBaselineSuppression>true</IsBaselineSuppression>

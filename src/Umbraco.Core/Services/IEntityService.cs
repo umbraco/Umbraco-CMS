@@ -61,6 +61,22 @@ public interface IEntityService
     bool Exists(Guid key);
 
     /// <summary>
+    /// Determines whether and entity of a certain object type exists.
+    /// </summary>
+    /// <param name="key">The unique key of the entity.</param>
+    /// <param name="objectType">The object type to look for.</param>
+    /// <returns>True if the entity exists, false if it does not.</returns>
+    bool Exists(Guid key, UmbracoObjectTypes objectType) => throw new NotImplementedException();
+
+    /// <summary>
+    /// Determines whether and entity of a certain object type exists.
+    /// </summary>
+    /// <param name="id">The id of the entity.</param>
+    /// <param name="objectType">The object type to look for.</param>
+    /// <returns>True if the entity exists, false if it does not.</returns>
+    bool Exists(int id, UmbracoObjectTypes objectType) => throw new NotImplementedException();
+
+    /// <summary>
     ///     Gets entities of a given object type.
     /// </summary>
     /// <typeparam name="T">The type used to determine the object type of the entities.</typeparam>

@@ -1,4 +1,4 @@
-using NPoco;
+﻿using NPoco;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Infrastructure.Persistence.DatabaseAnnotations;
 using Umbraco.Cms.Infrastructure.Persistence.DatabaseModelDefinitions;
@@ -36,6 +36,11 @@ public class AddGuidsToUserGroups : UnscopedMigrationBase
         using IScope scope = _scopeProvider.CreateScope();
         using IDisposable notificationSuppression = scope.Notifications.Suppress();
         ScopeDatabase(scope);
+
+        if (ColumnExists(Constants.DatabaseSchema.Tables.UserGroup, NewColumnName))
+        {
+            return;
+        }
 
         var columns = SqlSyntax.GetColumnsInSchema(Context.Database).ToList();
         AddColumnIfNotExists<UserGroupDto>(columns, NewColumnName);

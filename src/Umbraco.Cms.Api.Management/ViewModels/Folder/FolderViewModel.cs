@@ -1,6 +1,6 @@
 ﻿namespace Umbraco.Cms.Api.Management.ViewModels.Folder;
 
-public class FolderViewModel : FolderModelBase
+public class FolderViewModel : FolderModelBase, INamedEntityViewModel
 {
     public Guid Key { get; set; }
 

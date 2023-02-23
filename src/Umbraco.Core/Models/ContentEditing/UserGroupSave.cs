@@ -38,6 +38,16 @@ public class UserGroupSave : EntityBasic, IValidatableObject
     public bool HasAccessToAllLanguages { get; set; }
 
     /// <summary>
+    /// A set of ad-hoc permissions provided by the frontend.
+    /// </summary>
+    /// <remarks>
+    /// By default the server has no concept of what these strings mean, we simple store them and return them to the UI.
+    /// FIXME: Permissions already exists in the form of "DefaultPermissions", but is subject to change in the future
+    /// when we know more about how we want to handle permissions, potentially those will be migrated in the these "soft" permissions.
+    /// </remarks>
+    public ISet<string>? Permissions { get; set; }
+
+    /// <summary>
     ///     The list of letters (permission codes) to assign as the default for the user group
     /// </summary>
     [DataMember(Name = "defaultPermissions")]

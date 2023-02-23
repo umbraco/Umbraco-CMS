@@ -28,6 +28,7 @@ public class BackOfficeUserStore : UmbracoUserStore<BackOfficeIdentityUser, Iden
     private readonly IUmbracoMapper _mapper;
     private readonly ICoreScopeProvider _scopeProvider;
     private readonly ITwoFactorLoginService _twoFactorLoginService;
+    private readonly IUserGroupService _userGroupService;
     private readonly IUserService _userService;
 
     /// <summary>
@@ -43,7 +44,8 @@ public class BackOfficeUserStore : UmbracoUserStore<BackOfficeIdentityUser, Iden
         IUmbracoMapper mapper,
         BackOfficeErrorDescriber describer,
         AppCaches appCaches,
-        ITwoFactorLoginService twoFactorLoginService)
+        ITwoFactorLoginService twoFactorLoginService,
+        IUserGroupService userGroupService)
         : base(describer)
     {
         _scopeProvider = scopeProvider;
@@ -54,42 +56,47 @@ public class BackOfficeUserStore : UmbracoUserStore<BackOfficeIdentityUser, Iden
         _mapper = mapper;
         _appCaches = appCaches;
         _twoFactorLoginService = twoFactorLoginService;
+        _userGroupService = userGroupService;
         _userService = userService;
         _externalLoginService = externalLoginService;
     }
 
-    [Obsolete("Use non obsolete ctor")]
+    [Obsolete("Use constructor that takes IUserGroupService, scheduled for removal in V15.")]
     public BackOfficeUserStore(
         ICoreScopeProvider scopeProvider,
         IUserService userService,
         IEntityService entityService,
         IExternalLoginWithKeyService externalLoginService,
-        IOptions<GlobalSettings> globalSettings,
+        IOptionsSnapshot<GlobalSettings> globalSettings,
         IUmbracoMapper mapper,
         BackOfficeErrorDescriber describer,
-        AppCaches appCaches)
+        AppCaches appCaches,
+        ITwoFactorLoginService twoFactorLoginService)
         : this(
             scopeProvider,
             userService,
             entityService,
             externalLoginService,
-            StaticServiceProvider.Instance.GetRequiredService<IOptionsSnapshot<GlobalSettings>>(),
+            globalSettings,
             mapper,
             describer,
             appCaches,
-            StaticServiceProvider.Instance.GetRequiredService<ITwoFactorLoginService>())
+            twoFactorLoginService,
+            StaticServiceProvider.Instance.GetRequiredService<IUserGroupService>())
     {
     }
 
     /// <inheritdoc />
-    public Task<bool> ValidateSessionIdAsync(string? userId, string? sessionId)
+    public async Task<bool> ValidateSessionIdAsync(string? userId, string? sessionId)
     {
         if (Guid.TryParse(sessionId, out Guid guidSessionId))
         {
-            return Task.FromResult(_userService.ValidateLoginSession(UserIdToInt(userId), guidSessionId));
+            // We need to resolve the id from the key here...
+            var id = await ResolveEntityIdFromIdentityId(userId);
+            return _userService.ValidateLoginSession(id, guidSessionId);
         }
 
-        return Task.FromResult(false);
+        return false;
     }
 
     /// <inheritdoc />
@@ -118,16 +125,16 @@ public class BackOfficeUserStore : UmbracoUserStore<BackOfficeIdentityUser, Iden
         }
 
         if (user.Email is null || user.UserName is null)
-            {
-                throw new InvalidOperationException("Email and UserName is required.");
-            }
+        {
+            throw new InvalidOperationException("Email and UserName is required.");
+        }
 
-            // the password must be 'something' it could be empty if authenticating
-            // with an external provider so we'll just generate one and prefix it, the
-            // prefix will help us determine if the password hasn't actually been specified yet.
-            // this will hash the guid with a salt so should be nicely random
-            var aspHasher = new PasswordHasher<BackOfficeIdentityUser>();
-            var emptyPasswordValue = Constants.Security.EmptyPasswordPrefix +
+        // the password must be 'something' it could be empty if authenticating
+        // with an external provider so we'll just generate one and prefix it, the
+        // prefix will help us determine if the password hasn't actually been specified yet.
+        // this will hash the guid with a salt so should be nicely random
+        var aspHasher = new PasswordHasher<BackOfficeIdentityUser>();
+        var emptyPasswordValue = Constants.Security.EmptyPasswordPrefix +
                                  aspHasher.HashPassword(user, Guid.NewGuid().ToString("N"));
 
         var userEntity = new User(_globalSettings, user.Name, user.Email, user.UserName, emptyPasswordValue)
@@ -247,14 +254,13 @@ public class BackOfficeUserStore : UmbracoUserStore<BackOfficeIdentityUser, Iden
             throw new ArgumentNullException(nameof(user));
         }
 
-        var userId = UserIdToInt(user.Id);
-        IUser? found = _userService.GetUserById(userId);
-        if (found != null)
+        IUser? found = FindUserFromString(user.Id);
+        if (found is not null)
         {
             _userService.Delete(found);
         }
 
-        _externalLoginService.DeleteUserLogins(userId.ToGuid());
+        _externalLoginService.DeleteUserLogins(user.Key);
 
         return Task.FromResult(IdentityResult.Success);
     }
@@ -281,13 +287,52 @@ public class BackOfficeUserStore : UmbracoUserStore<BackOfficeIdentityUser, Iden
         cancellationToken.ThrowIfCancellationRequested();
         ThrowIfDisposed();
 
-        IUser? user = _userService.GetUserById(UserIdToInt(userId));
+        IUser? user = FindUserFromString(userId);
         if (user == null)
         {
             return Task.FromResult((BackOfficeIdentityUser?)null)!;
         }
 
         return Task.FromResult(AssignLoginsCallback(_mapper.Map<BackOfficeIdentityUser>(user)))!;
+    }
+
+    private IUser? FindUserFromString(string userId)
+    {
+        // We could use ResolveEntityIdFromIdentityId here, but that would require multiple DB calls, so let's not.
+        if (TryConvertIdentityIdToInt(userId, out var id))
+        {
+            return _userService.GetUserById(id);
+        }
+
+        // We couldn't directly convert the ID to an int, this is because the user logged in with external login.
+        // So we need to look up the user by key.
+        if (Guid.TryParse(userId, out Guid key))
+        {
+            return _userService.GetAsync(key).GetAwaiter().GetResult();
+        }
+
+        throw new InvalidOperationException($"Unable to resolve user with ID {userId}");
+    }
+
+    protected override async Task<int> ResolveEntityIdFromIdentityId(string? identityId)
+    {
+        if (TryConvertIdentityIdToInt(identityId, out var result))
+        {
+            return result;
+        }
+
+        // We couldn't directly convert the ID to an int, this is because the user logged in with external login.
+        // So we need to look up the user by key, and then get the ID.
+        if (Guid.TryParse(identityId, out Guid key))
+        {
+            IUser? user = await _userService.GetAsync(key);
+            if (user is not null)
+            {
+                return user.Id;
+            }
+        }
+
+        throw new InvalidOperationException($"Unable to resolve a user id from {identityId}");
     }
 
     /// <inheritdoc />
@@ -390,7 +435,7 @@ public class BackOfficeUserStore : UmbracoUserStore<BackOfficeIdentityUser, Iden
             throw new ArgumentNullException(nameof(normalizedRoleName));
         }
 
-        IUserGroup? userGroup = _userService.GetUserGroupByAlias(normalizedRoleName);
+        IUserGroup? userGroup = _userGroupService.GetAsync(normalizedRoleName).GetAwaiter().GetResult();
 
         IEnumerable<IUser> users = _userService.GetAllInGroup(userGroup?.Id);
         IList<BackOfficeIdentityUser> backOfficeIdentityUsers =
@@ -495,7 +540,7 @@ public class BackOfficeUserStore : UmbracoUserStore<BackOfficeIdentityUser, Iden
         string normalizedRoleName,
         CancellationToken cancellationToken)
     {
-        IUserGroup? group = _userService.GetUserGroupByAlias(normalizedRoleName);
+        IUserGroup? group = _userGroupService.GetAsync(normalizedRoleName).GetAwaiter().GetResult();
         if (group?.Name is null)
         {
             return Task.FromResult<IdentityRole<string>?>(null);
@@ -524,11 +569,10 @@ public class BackOfficeUserStore : UmbracoUserStore<BackOfficeIdentityUser, Iden
     {
         if (user != null)
         {
-            var userId = UserIdToInt(user.Id).ToGuid();
             user.SetLoginsCallback(
-                new Lazy<IEnumerable<IIdentityUserLogin>?>(() => _externalLoginService.GetExternalLogins(userId)));
+                new Lazy<IEnumerable<IIdentityUserLogin>?>(() => _externalLoginService.GetExternalLogins(user.Key)));
             user.SetTokensCallback(
-                new Lazy<IEnumerable<IIdentityUserToken>?>(() => _externalLoginService.GetExternalLoginTokens(userId)));
+                new Lazy<IEnumerable<IIdentityUserToken>?>(() => _externalLoginService.GetExternalLoginTokens(user.Key)));
         }
 
         return user;
@@ -670,7 +714,7 @@ public class BackOfficeUserStore : UmbracoUserStore<BackOfficeIdentityUser, Iden
             user.ClearGroups();
 
             // go lookup all these groups
-            IReadOnlyUserGroup[] groups = _userService.GetUserGroupsByAlias(identityUserRoles)
+            IReadOnlyUserGroup[] groups = _userGroupService.GetAsync(identityUserRoles).GetAwaiter().GetResult()
                 .Select(x => x.ToReadOnlyGroup()).ToArray();
 
             // use all of the ones assigned and add them
