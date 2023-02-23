@@ -1,4 +1,4 @@
-import { BehaviorSubject } from 'rxjs';
+import { ReplaySubject } from 'rxjs';
 import { UmbContextToken } from '@umbraco-cms/context-api';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 import { UmbStoreBase } from '@umbraco-cms/store';
@@ -14,7 +14,7 @@ export class UmbPackageStore extends UmbStoreBase {
 	 * Array of packages with extensions
 	 * @private
 	 */
-	#data = new BehaviorSubject<Array<UmbPackage>>([]);
+	#data = new ReplaySubject<Array<UmbPackage>>(1);
 
 	/**
 	 * Observable of packages with extensions
