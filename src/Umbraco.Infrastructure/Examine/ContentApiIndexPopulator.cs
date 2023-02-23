@@ -1,4 +1,6 @@
 using Examine;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Infrastructure.Examine;
@@ -12,20 +14,22 @@ public class ContentApiIndexPopulator : IndexPopulator<IUmbracoContentIndex>
     {
         _contentService = contentService;
         _contentApiValueSetBuilder = contentApiValueSetBuilder;
-        RegisterIndex("ContentAPIIndex");
+        RegisterIndex(Constants.UmbracoIndexes.ContentAPIIndexName);
     }
 
     protected override void PopulateIndexes(IReadOnlyList<IIndex> indexes)
     {
-        foreach (var index in indexes)
+        foreach (IIndex index in indexes)
         {
-            var rootNodes = _contentService.GetRootContent();
+            IEnumerable<IContent> rootNodes = _contentService.GetRootContent();
 
             index.IndexItems(_contentApiValueSetBuilder.GetValueSets(rootNodes.ToArray()));
 
-            foreach (var root in rootNodes)
+            foreach (IContent root in rootNodes)
             {
-                var valueSets = _contentApiValueSetBuilder.GetValueSets(_contentService.GetPagedDescendants(root.Id, 0, Int32.MaxValue, out _).ToArray());
+                IEnumerable<ValueSet> valueSets = _contentApiValueSetBuilder.GetValueSets(
+                    _contentService.GetPagedDescendants(root.Id, 0, int.MaxValue, out _).ToArray());
+
                 index.IndexItems(valueSets);
             }
         }

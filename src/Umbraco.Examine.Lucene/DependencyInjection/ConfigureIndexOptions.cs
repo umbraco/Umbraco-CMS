@@ -46,12 +46,7 @@ public sealed class ConfigureIndexOptions : IConfigureNamedOptions<LuceneDirecto
                 break;
             case Constants.UmbracoIndexes.ContentAPIIndexName:
                 options.Analyzer = new StandardAnalyzer(LuceneInfo.CurrentVersion);
-                options.Validator = _umbracoIndexConfig.GetContentValueSetValidator(); // Change?
-                //options.Validator = new ContentValueSetValidator(true, false, null, null, excludeItemTypes: new List<string> { "__Id" });
-                //options.FieldDefinitions = new UmbracoFieldDefinitionCollection(); // Change
-                options.FieldDefinitions = new(
-                    new("id", FieldDefinitionTypes.Raw), //InvariantCultureIgnoreCase
-                    new("path", FieldDefinitionTypes.Raw));
+                options.FieldDefinitions = new ContentAPIFieldDefinitionCollection();
                 break;
         }
 
