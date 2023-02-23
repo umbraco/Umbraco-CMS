@@ -17,6 +17,10 @@ interface CircleWithCommands extends Circle {
 
 @customElement('umb-donut-chart')
 export class UmbDonutChartElement extends LitElement {
+	static percentToDegrees(percent: number): number {
+		return percent * 3.6;
+	}
+
 	static styles = [
 		UUITextStyles,
 		css`
@@ -33,6 +37,28 @@ export class UmbDonutChartElement extends LitElement {
 			.highlight:hover {
 				opacity: 0.5;
 			}
+
+			#container {
+				position: relative;
+				width: 200px;
+			}
+
+			#details-box {
+				background: #f00;
+				width: 20px;
+				height: 20px;
+				top: 0;
+				left: 0;
+				position: absolute;
+				opacity: 0;
+				transform: translate3d(var(--pos-x), var(--pos-y), 0);
+				transition: transform 0.2s cubic-bezier(0.02, 1.23, 0.79, 1.08);
+				transition: opacity 150ms linear;
+			}
+
+			#details-box.show {
+				opacity: 1;
+			}
 		`,
 	];
 
@@ -44,6 +70,12 @@ export class UmbDonutChartElement extends LitElement {
 
 	@query('#circle-container')
 	circleContainer!: HTMLSlotElement;
+
+	@query('#container')
+	container!: HTMLDivElement;
+
+	@query('#details-box')
+	detailsBox!: HTMLDivElement;
 
 	@state()
 	circles: CircleWithCommands[] = [];
@@ -58,6 +90,12 @@ export class UmbDonutChartElement extends LitElement {
 	borderSize = 20;
 
 	@state() svgSize = 100;
+
+	@state()
+	posY = 0;
+
+	@state()
+	posX = 0;
 
 	#printCircles(event: Event) {
 		event.stopPropagation();
@@ -107,58 +145,75 @@ export class UmbDonutChartElement extends LitElement {
 		return [coordX, coordY].join(' ');
 	}
 
-	static percentToDegrees(percent: number): number {
-		return percent * 3.6;
+	#calculateDetailsBoxPosition(event: MouseEvent) {
+		const rect = this.container.getBoundingClientRect();
+		const x = event.clientX - rect.left;
+		const y = event.clientY - rect.top;
+		this.posX = x;
+		this.posY = y - 30;
+	}
+
+	#showDetailsBox(event: MouseEvent) {
+		this.detailsBox.classList.add('show');
+	}
+
+	#hideDetailsBox(event: MouseEvent) {
+		this.detailsBox.classList.remove('show');
 	}
 
 	#renderCircles() {
-
-
 		return svg`
-        	<svg viewBox="0 0 ${this.viewBox} ${this.viewBox}" role="list">
-			<filter id="erode" x="-20%" y="-20%" width="140%" height="140%" filterUnits="objectBoundingBox" primitiveUnits="userSpaceOnUse" color-interpolation-filters="linearRGB">
-	<feMorphology operator="erode" radius="0.5 0.5" x="0%" y="0%" width="100%" height="100%" in="SourceGraphic" result="morphology"/>
-</filter>
-<filter id="filter" x="-20%" y="-20%" width="140%" height="140%" filterUnits="objectBoundingBox" primitiveUnits="userSpaceOnUse" color-interpolation-filters="linearRGB">
-	<feColorMatrix type="matrix" values="1.8 0 0 0 0
-0 1.8 0 0 0
-0 0 1.8 0 0
-0 0 0 500 -20" x="0%" y="0%" width="100%" height="100%" in="merge1" result="colormatrix2"/>
-	<feMorphology operator="erode" radius="0.5 0.5" x="0%" y="0%" width="100%" height="100%" in="colormatrix2" result="morphology2"/>
-	<feFlood flood-color="#ffffff" flood-opacity="0.3" x="0%" y="0%" width="100%" height="100%" result="flood3"/>
-	<feComposite in="flood3" in2="SourceAlpha" operator="in" x="0%" y="0%" width="100%" height="100%" result="composite3"/>
-	<feMorphology operator="erode" radius="1 1" x="0%" y="0%" width="100%" height="100%" in="composite3" result="morphology1"/>
-	<feMerge x="0%" y="0%" width="100%" height="100%" result="merge1">
-    		<feMergeNode in="morphology2"/>
-		<feMergeNode in="morphology1"/>
-  	</feMerge>
-	  <feDropShadow stdDeviation="1 1" in="merge1" dx="0" dy="0" flood-color="#000" flood-opacity="0.8" x="0%" y="0%" width="100%" height="100%" result="dropShadow1"/>
-</filter>
+        	<svg viewBox="0 0 ${this.viewBox} ${this.viewBox}" role="list" >
+				<filter id="erode" x="-20%" y="-20%" width="140%" height="140%" filterUnits="objectBoundingBox" primitiveUnits="userSpaceOnUse" color-interpolation-filters="linearRGB">
+					<feMorphology operator="erode" radius="0.5 0.5" x="0%" y="0%" width="100%" height="100%" in="SourceGraphic" result="morphology"/>
+				</filter>
+				<filter id="filter" x="-20%" y="-20%" width="140%" height="140%" filterUnits="objectBoundingBox" primitiveUnits="userSpaceOnUse" color-interpolation-filters="linearRGB">
+					<feColorMatrix 
+						type="matrix" 
+						values="1.8 0 0 0 0
+						0 1.8 0 0 0
+						0 0 1.8 0 0
+						0 0 0 500 -20" x="0%" y="0%" width="100%" height="100%" in="merge1" result="colormatrix2"/>
+					<feMorphology operator="erode" radius="0.5 0.5" x="0%" y="0%" width="100%" height="100%" in="colormatrix2" result="morphology2"/>
+					<feFlood flood-color="#ffffff" flood-opacity="0.3" x="0%" y="0%" width="100%" height="100%" result="flood3"/>
+					<feComposite in="flood3" in2="SourceAlpha" operator="in" x="0%" y="0%" width="100%" height="100%" result="composite3"/>
+					<feMorphology operator="erode" radius="1 1" x="0%" y="0%" width="100%" height="100%" in="composite3" result="morphology1"/>
+					<feMerge x="0%" y="0%" width="100%" height="100%" result="merge1">
+						<feMergeNode in="morphology2"/>
+						<feMergeNode in="morphology1"/>
+					</feMerge>
+					<feDropShadow stdDeviation="1 1" in="merge1" dx="0" dy="0" flood-color="#000" flood-opacity="0.8" x="0%" y="0%" width="100%" height="100%" result="dropShadow1"/>
+				</filter>
 				<desc>In chosen date range you have this number of log message of type: </desc>
-				${this.circles.map(
-					(circle) => svg`
-						<path 
-							fill="${circle.color}" 
-							role="listitem"
-							d="${circle.commands}" 
-							transform="rotate(${circle.offset} ${this.viewBox / 2} ${this.viewBox / 2})">
-							<title>${circle.tooltipText}</title>
-						</path>
-						<path 
-							class="highlight" 
-							fill="${circle.color}" 
-							role="listitem"
-							d="${circle.commands}" 
-							transform="rotate(${circle.offset} ${this.viewBox / 2} ${this.viewBox / 2})">
-							<title>${circle.tooltipText}</title>
-						</path>`
-				)}
-		</svg>
+					${this.circles.map(
+						(circle) => svg`
+								<path
+									fill="${circle.color}"
+									role="listitem"
+									d="${circle.commands}"
+									transform="rotate(${circle.offset} ${this.viewBox / 2} ${this.viewBox / 2})">
+									<title>${circle.tooltipText}</title>
+								</path>
+								<path
+								@mouseenter=${this.#showDetailsBox}
+								@mouseleave=${this.#hideDetailsBox}
+									class="highlight"
+									fill="${circle.color}"
+									role="listitem"
+									d="${circle.commands}"
+									transform="rotate(${circle.offset} ${this.viewBox / 2} ${this.viewBox / 2})">
+									<title>${circle.tooltipText}</title>
+								</path>`
+					)}
+			</svg>
         `;
 	}
 
 	render() {
-		return html` <div style="width: 200px">${this.#renderCircles()}</div>
+		return html` <div id="container" @mousemove=${this.#calculateDetailsBoxPosition}>
+				${this.#renderCircles()}
+				<div id="details-box" style="--pos-y: ${this.posY}px; --pos-x: ${this.posX}px"></div>
+			</div>
 			<slot @slotchange=${this.#printCircles} @slice-update=${this.#printCircles}></slot>`;
 	}
 }
