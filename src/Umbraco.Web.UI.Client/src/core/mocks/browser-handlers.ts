@@ -34,7 +34,6 @@ const handlers = [
 	...mediaHandlers,
 	...dataTypeHandlers,
 	...documentTypeHandlers,
-	...manifestsHandlers.default,
 	...telemetryHandlers,
 	...publishedStatusHandlers,
 	...usersHandlers,

@@ -23,7 +23,6 @@ export const handlers = [
 	...userHandlers,
 	...dataTypeHandlers,
 	...documentTypeHandlers,
-	...manifestsHandlers.default,
 	...telemetryHandlers,
 	...publishedStatusHandlers,
 	...examineManagementHandlers,
