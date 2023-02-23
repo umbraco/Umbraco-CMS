@@ -11,6 +11,7 @@ import './layouts/search/modal-layout-search.element.ts';
 
 import { UUIModalSidebarSize } from '@umbraco-ui/uui-modal-sidebar';
 import { BehaviorSubject } from 'rxjs';
+import type { UUIModalDialogElement } from '@umbraco-ui/uui-modal-dialog';
 import { UmbModalChangePasswordData } from './layouts/modal-layout-change-password.element';
 import type { UmbModalIconPickerData } from './layouts/icon-picker/modal-layout-icon-picker.element';
 import type { UmbModalConfirmData } from './layouts/confirm/modal-layout-confirm.element';
@@ -21,7 +22,6 @@ import type { UmbModalLinkPickerData } from './layouts/link-picker/modal-layout-
 import { UmbModalHandler } from './modal-handler';
 import type { UmbBasicModalData } from './layouts/basic/modal-layout-basic.element';
 import { UmbContextToken } from '@umbraco-cms/context-api';
-import { UUIModalDialogElement } from '@umbraco-ui/uui-modal-dialog';
 
 export type UmbModalType = 'dialog' | 'sidebar';
 
