@@ -13,7 +13,7 @@ export class UmbSearchElement extends LitElement {
 				height: 100%;
 				width: 100%;
 				height: 100%;
-				background-color: var(--uui-color-surface-alt);
+				background-color: var(--uui-color-background);
 				box-sizing: border-box;
 				color: var(--uui-color-text);
 				font-size: 1rem;
@@ -121,8 +121,8 @@ export class UmbSearchElement extends LitElement {
 					<div class="group-name">Document Types</div>
 					<div class="results">
 						<a href="#" class="result">
-							<div>
-								<span style="margin-right: 4px">#</span>
+							<div class="result-left">
+								<span class="result-icon">#</span>
 								Article Controls
 							</div>
 							<span>></span>
