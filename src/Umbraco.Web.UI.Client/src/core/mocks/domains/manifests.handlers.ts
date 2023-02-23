@@ -1,21 +1,14 @@
 import { rest } from 'msw';
 
 import { umbracoPath } from '@umbraco-cms/utils';
-import { ManifestTypes } from '@umbraco-cms/extensions-registry';
-
-// TODO: Update to server API types when they are available & rename endpoint when we know what it is called
-type Package = {
-	name?: string;
-	version?: string;
-	extensions?: ManifestTypes[];
-};
-type ManifestsResponse = { items: Package[] };
+import type { PagedManifestsResponse } from '@umbraco-cms/models';
 
 export const manifestDevelopmentHandler = rest.get(umbracoPath('/manifests'), (_req, res, ctx) => {
 	return res(
 		// Respond with a 200 status code
 		ctx.status(200),
-		ctx.json<ManifestsResponse>({
+		ctx.json<PagedManifestsResponse>({
+			total: 3,
 			items: [
 				{
 					name: 'Named Package',
@@ -67,7 +60,7 @@ export const manifestDevelopmentHandler = rest.get(umbracoPath('/manifests'), (_
 							name: 'My Custom Package View',
 							js: '/App_Plugins/package-view.js',
 							meta: {
-								packageAlias: 'my.package',
+								packageName: 'my.package',
 							},
 						},
 					],
@@ -81,6 +74,6 @@ export const manifestEmptyHandler = rest.get(umbracoPath('/manifests'), (_req, r
 	return res(
 		// Respond with a 200 status code
 		ctx.status(200),
-		ctx.json<ManifestsResponse>({ items: [] })
+		ctx.json<PagedManifestsResponse>({ total: 0, items: [] })
 	);
 });
