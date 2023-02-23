@@ -149,9 +149,9 @@ test.describe('BlockListEditorDataType', () => {
     await expect(page.locator('[block-config-model="block"]')).toHaveCount(1);
   });  
 
-  test('can edit a block list editor', async ({page, umbracoApi, umbracoUi}) => {
+  test('can edit a block list editor', async ({page, umbracoApi, umbracoUi}, testInfo) => {
     // We need to increase the timeout because the test is taking too long to end
-    await page.setDefaultTimeout(60000);
+    await testInfo.slow()
     
     const elementNameTwo = 'SecondElement';
     const elementTwoAlias = AliasHelper.toAlias(elementNameTwo);
