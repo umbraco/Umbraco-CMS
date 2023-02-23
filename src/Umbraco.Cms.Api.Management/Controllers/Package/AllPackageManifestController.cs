@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Umbraco.Cms.Api.Common.ViewModels.Pagination;
 using Umbraco.Cms.Api.Management.ViewModels.Package;
 using Umbraco.Cms.Core.Manifest;
 using Umbraco.Cms.Core.Mapping;
@@ -18,17 +17,13 @@ public class AllPackageManifestController : PackageControllerBase
         _umbracoMapper = umbracoMapper;
     }
 
+    // NOTE: this endpoint is deliberately created as non-paginated to ensure the fastest possible client initialization
     [HttpGet("manifest")]
     [MapToApiVersion("1.0")]
-    [ProducesResponseType(typeof(PagedViewModel<PackageManifestViewModel>), StatusCodes.Status200OK)]
-    public async Task<ActionResult<PagedViewModel<PackageManifestViewModel>>> AllPackageManifests(int skip = 0, int take = 100)
+    [ProducesResponseType(typeof(IEnumerable<PackageManifestViewModel>), StatusCodes.Status200OK)]
+    public async Task<IActionResult> AllPackageManifests()
     {
         PackageManifest[] packageManifests = (await _packageManifestService.GetPackageManifestsAsync()).ToArray();
-        return Ok(
-            new PagedViewModel<PackageManifestViewModel>
-            {
-                Items = _umbracoMapper.MapEnumerable<PackageManifest, PackageManifestViewModel>(packageManifests.Skip(skip).Take(take)),
-                Total = packageManifests.Length
-            });
+        return Ok(_umbracoMapper.MapEnumerable<PackageManifest, PackageManifestViewModel>(packageManifests));
     }
 }
