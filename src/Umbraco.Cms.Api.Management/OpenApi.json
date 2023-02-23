@@ -6067,30 +6067,16 @@
       },
       "CreateRelationTypeRequestModel": {
         "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/RelationTypeBaseModel"
+          }
+        ],
         "properties": {
-          "name": {
-            "type": "string"
-          },
           "key": {
             "type": "string",
             "format": "uuid",
             "nullable": true
-          },
-          "isBidirectional": {
-            "type": "boolean"
-          },
-          "parentObjectType": {
-            "type": "string",
-            "format": "uuid",
-            "nullable": true
-          },
-          "childObjectType": {
-            "type": "string",
-            "format": "uuid",
-            "nullable": true
-          },
-          "isDependency": {
-            "type": "boolean"
           }
         },
         "additionalProperties": false
@@ -8343,16 +8329,42 @@
         },
         "additionalProperties": false
       },
+      "RelationTypeBaseModel": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "isBidirectional": {
+            "type": "boolean"
+          },
+          "parentObjectType": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          },
+          "childObjectType": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          },
+          "isDependency": {
+            "type": "boolean"
+          }
+        },
+        "additionalProperties": false
+      },
       "RelationTypeResponseModel": {
         "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/RelationTypeBaseModel"
+          }
+        ],
         "properties": {
           "key": {
             "type": "string",
             "format": "uuid"
-          },
-          "name": {
-            "type": "string",
-            "nullable": true
           },
           "alias": {
             "type": "string",
@@ -8364,29 +8376,13 @@
           "isSystemRelationType": {
             "type": "boolean"
           },
-          "isBidirectional": {
-            "type": "boolean"
-          },
-          "parentObjectType": {
-            "type": "string",
-            "format": "uuid",
-            "nullable": true
-          },
           "parentObjectTypeName": {
             "type": "string",
-            "nullable": true
-          },
-          "childObjectType": {
-            "type": "string",
-            "format": "uuid",
             "nullable": true
           },
           "childObjectTypeName": {
             "type": "string",
             "nullable": true
-          },
-          "isDependency": {
-            "type": "boolean"
           }
         },
         "additionalProperties": false
@@ -8752,27 +8748,11 @@
       },
       "UpdateRelationTypeRequestModel": {
         "type": "object",
-        "properties": {
-          "name": {
-            "type": "string"
-          },
-          "isBidirectional": {
-            "type": "boolean"
-          },
-          "parentObjectType": {
-            "type": "string",
-            "format": "uuid",
-            "nullable": true
-          },
-          "childObjectType": {
-            "type": "string",
-            "format": "uuid",
-            "nullable": true
-          },
-          "isDependency": {
-            "type": "boolean"
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/RelationTypeBaseModel"
           }
-        },
+        ],
         "additionalProperties": false
       },
       "UpgradeSettingsModel": {
