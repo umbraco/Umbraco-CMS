@@ -1,7 +1,7 @@
 import { html } from 'lit';
 import { property } from 'lit/decorators.js';
 import { UUIModalSidebarSize } from '@umbraco-ui/uui-modal-sidebar';
-import { UmbPickerData } from '../../../../core/modal/layouts/modal-layout-picker-base';
+import { UmbPickerModalData } from '../../../../core/modal/layouts/modal-layout-picker-base';
 import { UmbModalService, UmbModalType, UMB_MODAL_SERVICE_CONTEXT_TOKEN } from '../../../../core/modal';
 
 //TODO: These should probably be imported dynamically.
@@ -45,7 +45,7 @@ export class UmbInputListBase extends UmbLitElement {
 				selection: this.value,
 			},
 		});
-		modalHandler?.onClose().then((data: UmbPickerData<string>) => {
+		modalHandler?.onClose().then((data: UmbPickerModalData<string>) => {
 			if (data) {
 				this.value = data.selection;
 				this.selectionUpdated();

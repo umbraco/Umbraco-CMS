@@ -181,22 +181,30 @@ export class UmbMediaDetailServerDataSource implements RepositoryDetailDataSourc
 	 * @return {*}
 	 * @memberof UmbTemplateDetailServerDataSource
 	 */
-	// TODO: Error mistake in this:
 	async delete(key: string) {
 		if (!key) {
 			const error: ProblemDetailsModel = { title: 'Key is missing' };
 			return { error };
 		}
 
-		return tryExecuteAndNotify(
-			this.#host,
-			fetch('/umbraco/management/api/v1/media/delete', {
+		let problemDetails: ProblemDetailsModel | undefined = undefined;
+
+		try {
+			await fetch('/umbraco/management/api/v1/media/delete', {
 				method: 'POST',
 				body: JSON.stringify([key]),
 				headers: {
 					'Content-Type': 'application/json',
 				},
-			})
-		);
+			});
+		} catch (error) {
+			problemDetails = { title: 'Delete document Failed' };
+		}
+
+		return { error: problemDetails };
+
+		/* TODO: use backend cli when available.
+		return tryExecuteAndNotify(this.#host);
+		*/
 	}
 }

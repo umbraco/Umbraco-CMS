@@ -20,7 +20,7 @@ export class UmbBodyLayout extends LitElement {
 				align-items: center;
 				justify-content: space-between;
 				width: 100%;
-				min-height: 60px;
+				height: 70px;
 				background-color: var(--uui-color-surface);
 				border-bottom: 1px solid var(--uui-color-border);
 				box-sizing: border-box;
