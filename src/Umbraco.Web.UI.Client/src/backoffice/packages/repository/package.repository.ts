@@ -30,6 +30,10 @@ export class UmbPackageRepository {
 	 * @private
 	 */
 	async #requestRootItems(store: UmbPackageStore) {
+		if (store.isPackagesLoaded) {
+			return;
+		}
+
 		const { data } = await this.#packageSource.getRootItems();
 
 		if (data) {

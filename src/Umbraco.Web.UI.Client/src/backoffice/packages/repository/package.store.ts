@@ -26,6 +26,8 @@ export class UmbPackageStore extends UmbStoreBase {
 
 	extensions = this.#extensions.asObservable();
 
+	isPackagesLoaded = false;
+
 	/**
 	 * Creates an instance of PackageStore.
 	 * @param {UmbControllerHostInterface} host
@@ -40,6 +42,7 @@ export class UmbPackageStore extends UmbStoreBase {
 	 */
 	appendItems(packages: Array<UmbPackage>) {
 		this.#packages.next(packages);
+		this.isPackagesLoaded = true;
 	}
 
 	appendExtensions(extensions: ManifestBase[]) {
