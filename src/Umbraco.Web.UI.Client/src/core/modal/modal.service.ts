@@ -7,6 +7,7 @@ import './layouts/modal-layout-current-user.element';
 import './layouts/icon-picker/modal-layout-icon-picker.element';
 import './layouts/link-picker/modal-layout-link-picker.element';
 import './layouts/basic/modal-layout-basic.element';
+import './layouts/search/modal-layout-search.element.ts';
 
 import { UUIModalSidebarSize } from '@umbraco-ui/uui-modal-sidebar';
 import { BehaviorSubject } from 'rxjs';
@@ -18,8 +19,9 @@ import type { UmbModalPropertyEditorUIPickerData } from './layouts/property-edit
 import type { UmbModalMediaPickerData } from './layouts/media-picker/modal-layout-media-picker.element';
 import type { UmbModalLinkPickerData } from './layouts/link-picker/modal-layout-link-picker.element';
 import { UmbModalHandler } from './modal-handler';
+import type { UmbBasicModalData } from './layouts/basic/modal-layout-basic.element';
 import { UmbContextToken } from '@umbraco-cms/context-api';
-import { UmbBasicModalData } from './layouts/basic/modal-layout-basic.element';
+import { UUIModalDialogElement } from '@umbraco-ui/uui-modal-dialog';
 
 export type UmbModalType = 'dialog' | 'sidebar';
 
@@ -137,6 +139,40 @@ export class UmbModalService {
 			type: 'sidebar',
 			size: data?.overlaySize || 'small',
 		});
+	}
+
+	public search(): UmbModalHandler {
+		const modalHandler = new UmbModalHandler('umb-modal-layout-search');
+
+		//TODO START: This is a hack to get the search modal layout to look like i want it to.
+		//TODO: Remove from here to END when the modal system is more flexible
+		const topDistance = '128px';
+		const margin = '16px';
+		const maxHeight = '600px';
+		const maxWidth = '500px';
+		const dialog = document.createElement('dialog') as HTMLDialogElement;
+		dialog.style.top = `min(${topDistance}, 10vh)`;
+		dialog.style.margin = '0 auto';
+		dialog.style.maxHeight = `min(${maxHeight}, calc(100vh - ${margin}))`;
+		dialog.style.width = `min(${maxWidth}, calc(100vw - ${margin}))`;
+		dialog.style.boxSizing = 'border-box';
+		dialog.style.background = 'none';
+		dialog.style.border = 'none';
+		dialog.style.padding = '0';
+		dialog.style.boxShadow = 'var(--uui-shadow-depth-5)';
+		dialog.style.borderRadius = '9px';
+		const search = document.createElement('umb-modal-layout-search');
+		dialog.appendChild(search);
+		requestAnimationFrame(() => {
+			dialog.showModal();
+		});
+		modalHandler.element = dialog as unknown as UUIModalDialogElement;
+		//TODO END
+
+		modalHandler.element.addEventListener('close-end', () => this._handleCloseEnd(modalHandler));
+
+		this.#modals.next([...this.#modals.getValue(), modalHandler]);
+		return modalHandler;
 	}
 
 	/**
