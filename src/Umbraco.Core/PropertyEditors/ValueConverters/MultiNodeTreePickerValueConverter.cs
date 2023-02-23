@@ -30,7 +30,6 @@ public class MultiNodeTreePickerValueConverter : PropertyValueConverterBase, ICo
     private readonly IUmbracoContextAccessor _umbracoContextAccessor;
     private readonly IApiContentBuilder _apiContentBuilder;
     private readonly IApiMediaBuilder _apiMediaBuilder;
-    private readonly IOutputExpansionStrategy _outputExpansionStrategy;
 
     [Obsolete("Use constructor that takes all parameters, scheduled for removal in V14")]
     public MultiNodeTreePickerValueConverter(
@@ -42,8 +41,7 @@ public class MultiNodeTreePickerValueConverter : PropertyValueConverterBase, ICo
             umbracoContextAccessor,
             memberService,
             StaticServiceProvider.Instance.GetRequiredService<IApiContentBuilder>(),
-            StaticServiceProvider.Instance.GetRequiredService<IApiMediaBuilder>(),
-            StaticServiceProvider.Instance.GetRequiredService<IOutputExpansionStrategy>())
+            StaticServiceProvider.Instance.GetRequiredService<IApiMediaBuilder>())
     {
     }
 
@@ -52,8 +50,7 @@ public class MultiNodeTreePickerValueConverter : PropertyValueConverterBase, ICo
         IUmbracoContextAccessor umbracoContextAccessor,
         IMemberService memberService,
         IApiContentBuilder apiContentBuilder,
-        IApiMediaBuilder apiMediaBuilder,
-        IOutputExpansionStrategy outputExpansionStrategy)
+        IApiMediaBuilder apiMediaBuilder)
     {
         _publishedSnapshotAccessor = publishedSnapshotAccessor ??
                                      throw new ArgumentNullException(nameof(publishedSnapshotAccessor));
@@ -61,7 +58,6 @@ public class MultiNodeTreePickerValueConverter : PropertyValueConverterBase, ICo
         _memberService = memberService;
         _apiContentBuilder = apiContentBuilder;
         _apiMediaBuilder = apiMediaBuilder;
-        _outputExpansionStrategy = outputExpansionStrategy;
     }
 
     public override bool IsConverter(IPublishedPropertyType propertyType) =>
@@ -213,7 +209,7 @@ public class MultiNodeTreePickerValueConverter : PropertyValueConverterBase, ICo
             {
                 IPublishedContent? content = publishedSnapshot.Content?.GetById(udi.Guid);
                 return content != null
-                    ? _apiContentBuilder.Build(content, _outputExpansionStrategy.ShouldExpand(propertyType))
+                    ? _apiContentBuilder.Build(content)
                     : null;
             }).WhereNotNull().ToArray(),
             Constants.UdiEntityType.Media => entityTypeUdis.Select(udi =>

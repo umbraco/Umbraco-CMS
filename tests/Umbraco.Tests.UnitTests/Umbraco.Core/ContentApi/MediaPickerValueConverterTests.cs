@@ -96,8 +96,8 @@ public class MediaPickerValueConverterTests : PropertyValueConverterTests
         PublishedSnapshotAccessor,
         Mock.Of<IPublishedModelFactory>(),
         new ApiMediaBuilder(
-            new PropertyMapper(),
             new PublishedContentNameProvider(),
             PublishedUrlProvider,
-            Mock.Of<IPublishedValueFallback>()));
+            Mock.Of<IPublishedValueFallback>(),
+            CreateOutputExpansionStrategyAccessor()));
 }

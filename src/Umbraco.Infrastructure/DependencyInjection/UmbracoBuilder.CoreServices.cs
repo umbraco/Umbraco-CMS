@@ -12,7 +12,6 @@ using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.DistributedLocking;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Handlers;
-using Umbraco.Cms.Core.Models.ContentApi;
 using Umbraco.Cms.Core.HealthChecks.NotificationMethods;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Install;
@@ -58,7 +57,6 @@ using Umbraco.Cms.Infrastructure.Serialization;
 using Umbraco.Cms.Infrastructure.Services.Implement;
 using Umbraco.Extensions;
 using IScopeProvider = Umbraco.Cms.Infrastructure.Scoping.IScopeProvider;
-using PropertyMapper = Umbraco.Cms.Core.ContentApi.PropertyMapper;
 
 namespace Umbraco.Cms.Infrastructure.DependencyInjection;
 
@@ -222,12 +220,18 @@ public static partial class UmbracoBuilderExtensions
 
         builder.Services.AddTransient<IFireAndForgetRunner, FireAndForgetRunner>();
 
-        builder.Services.AddSingleton<IPropertyMapper, PropertyMapper>();
-        builder.Services.AddSingleton<IApiElementBuilder, ApiElementBuilder>();
-        builder.Services.AddSingleton<IApiContentBuilder, ApiContentBuilder>();
-        builder.Services.AddSingleton<IApiMediaBuilder, ApiMediaBuilder>();
-        builder.Services.AddSingleton<IPublishedContentNameProvider, PublishedContentNameProvider>();
-        builder.Services.AddSingleton<IOutputExpansionStrategy, DefaultOutputExpansionStrategy>();
+        builder.AddPropertyIndexValueFactories();
+
+        builder.AddContentApi();
+
+        return builder;
+    }
+
+    public static IUmbracoBuilder AddPropertyIndexValueFactories(this IUmbracoBuilder builder)
+    {
+        builder.Services.AddSingleton<IBlockValuePropertyIndexValueFactory, BlockValuePropertyIndexValueFactory>();
+        builder.Services.AddSingleton<INestedContentPropertyIndexValueFactory, NestedContentPropertyIndexValueFactory>();
+        builder.Services.AddSingleton<ITagPropertyIndexValueFactory, TagPropertyIndexValueFactory>();
 
         return builder;
     }
@@ -407,6 +411,17 @@ public static partial class UmbracoBuilderExtensions
             .AddNotificationHandler<UserDeletedNotification, AuditNotificationsHandler>()
             .AddNotificationHandler<UserGroupWithUsersSavedNotification, AuditNotificationsHandler>()
             .AddNotificationHandler<AssignedUserGroupPermissionsNotification, AuditNotificationsHandler>();
+
+        return builder;
+    }
+
+    private static IUmbracoBuilder AddContentApi(this IUmbracoBuilder builder)
+    {
+        builder.Services.AddSingleton<IApiElementBuilder, ApiElementBuilder>();
+        builder.Services.AddSingleton<IApiContentBuilder, ApiContentBuilder>();
+        builder.Services.AddSingleton<IApiMediaBuilder, ApiMediaBuilder>();
+        builder.Services.AddSingleton<IPublishedContentNameProvider, PublishedContentNameProvider>();
+        builder.Services.AddSingleton<IOutputExpansionStrategyAccessor, DefaultOutputExpansionStrategyAccessor>();
 
         return builder;
     }

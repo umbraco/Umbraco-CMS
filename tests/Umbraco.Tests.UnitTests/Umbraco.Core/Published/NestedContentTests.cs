@@ -36,7 +36,11 @@ public class NestedContentTests
         var localizationService = Mock.Of<ILocalizationService>();
 
         PropertyEditorCollection editors = null;
-        var editor = new NestedContentPropertyEditor(Mock.Of<IDataValueEditorFactory>(), Mock.Of<IIOHelper>(), Mock.Of<IEditorConfigurationParser>());
+        var editor = new NestedContentPropertyEditor(
+            Mock.Of<IDataValueEditorFactory>(),
+            Mock.Of<IIOHelper>(), 
+            Mock.Of<IEditorConfigurationParser>(),
+            Mock.Of<INestedContentPropertyIndexValueFactory>());
         editors = new PropertyEditorCollection(new DataEditorCollection(() => new DataEditor[] { editor }));
 
         var serializer = new ConfigurationEditorJsonSerializer();
@@ -275,7 +279,7 @@ public class NestedContentTests
         public override object GetXPathValue(string culture = null, string? segment = null) =>
             throw new InvalidOperationException("This method won't be implemented.");
 
-        public override object GetContentApiValue(string culture = null, string segment = null) =>
+        public override object GetContentApiValue(bool expanding, string culture = null, string segment = null) =>
             PropertyType.ConvertInterToContentApiObject(_owner, ReferenceCacheLevel, InterValue, _preview);
     }
 }

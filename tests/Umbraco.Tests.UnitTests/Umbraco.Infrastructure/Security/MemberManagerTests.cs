@@ -1,7 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
@@ -46,7 +42,8 @@ public class MemberManagerTests
                 Mock.Of<ILocalizedTextService>(),
                 Mock.Of<IEntityService>(),
                 new TestOptionsSnapshot<GlobalSettings>(new GlobalSettings()),
-                AppCaches.Disabled),
+                AppCaches.Disabled,
+                Mock.Of<ITwoFactorLoginService>())
         };
 
         _fakeMemberStore = new MemberUserStore(

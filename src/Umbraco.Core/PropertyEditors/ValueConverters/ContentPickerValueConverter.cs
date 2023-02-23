@@ -19,25 +19,21 @@ internal class ContentPickerValueConverter : PropertyValueConverterBase, IConten
     };
 
     private readonly IPublishedSnapshotAccessor _publishedSnapshotAccessor;
-    private readonly IOutputExpansionStrategy _outputExpansionStrategy;
     private readonly IApiContentBuilder _apiContentBuilder;
 
     [Obsolete("Use constructor that takes all parameters, scheduled for removal in V14")]
     public ContentPickerValueConverter(IPublishedSnapshotAccessor publishedSnapshotAccessor)
         : this(
             publishedSnapshotAccessor,
-            StaticServiceProvider.Instance.GetRequiredService<IOutputExpansionStrategy>(),
             StaticServiceProvider.Instance.GetRequiredService<IApiContentBuilder>())
     {
     }
 
     public ContentPickerValueConverter(
         IPublishedSnapshotAccessor publishedSnapshotAccessor,
-        IOutputExpansionStrategy outputExpansionStrategyAccessor,
         IApiContentBuilder apiContentBuilder)
     {
         _publishedSnapshotAccessor = publishedSnapshotAccessor;
-        _outputExpansionStrategy = outputExpansionStrategyAccessor;
         _apiContentBuilder = apiContentBuilder;
     }
 
@@ -110,7 +106,7 @@ internal class ContentPickerValueConverter : PropertyValueConverterBase, IConten
             return null;
         }
 
-        return _apiContentBuilder.Build(content, _outputExpansionStrategy.ShouldExpand(propertyType));
+        return _apiContentBuilder.Build(content);
     }
 
     private IPublishedContent? GetContent(IPublishedPropertyType propertyType, object? inter)

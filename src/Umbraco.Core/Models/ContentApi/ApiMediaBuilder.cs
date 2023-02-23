@@ -7,21 +7,21 @@ namespace Umbraco.Cms.Core.ContentApi;
 
 public class ApiMediaBuilder : IApiMediaBuilder
 {
-    private readonly IPropertyMapper _propertyMapper;
     private readonly IPublishedContentNameProvider _publishedContentNameProvider;
     private readonly IPublishedUrlProvider _publishedUrlProvider;
     private readonly IPublishedValueFallback _publishedValueFallback;
+    private readonly IOutputExpansionStrategyAccessor _outputExpansionStrategyAccessor;
 
     public ApiMediaBuilder(
-        IPropertyMapper propertyMapper,
         IPublishedContentNameProvider publishedContentNameProvider,
         IPublishedUrlProvider publishedUrlProvider,
-        IPublishedValueFallback publishedValueFallback)
+        IPublishedValueFallback publishedValueFallback,
+        IOutputExpansionStrategyAccessor outputExpansionStrategyAccessor)
     {
-        _propertyMapper = propertyMapper;
         _publishedContentNameProvider = publishedContentNameProvider;
         _publishedUrlProvider = publishedUrlProvider;
         _publishedValueFallback = publishedValueFallback;
+        _outputExpansionStrategyAccessor = outputExpansionStrategyAccessor;
     }
 
     public IApiMedia Build(IPublishedContent media) =>
@@ -46,8 +46,14 @@ public class ApiMediaBuilder : IApiMediaBuilder
 
     private IDictionary<string, object?> CustomProperties(IPublishedContent media)
     {
-        IDictionary<string, object?> customProperties = _propertyMapper
-            .Map(media.Properties.Where(p => p.Alias.StartsWith("umbraco") == false));
-        return customProperties;
+        IPublishedProperty[] customProperties = media
+            .Properties
+            .Where(p => p.Alias.StartsWith("umbraco") == false)
+            .ToArray();
+
+        return customProperties.Any() &&
+               _outputExpansionStrategyAccessor.TryGetValue(out IOutputExpansionStrategy? outputExpansionStrategy)
+            ? outputExpansionStrategy.MapProperties(customProperties)
+            : new Dictionary<string, object?>();
     }
 }

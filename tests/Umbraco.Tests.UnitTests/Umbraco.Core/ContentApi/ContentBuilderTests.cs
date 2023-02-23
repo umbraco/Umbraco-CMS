@@ -1,7 +1,6 @@
 using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core.ContentApi;
-using Umbraco.Cms.Core.Models.ContentApi;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.PublishedCache;
@@ -36,7 +35,7 @@ public class ContentBuilderTests : ContentApiTests
             .Setup(p => p.GetUrl(It.IsAny<IPublishedContent>(), It.IsAny<UrlMode>(), It.IsAny<string?>(), It.IsAny<Uri?>()))
             .Returns((IPublishedContent content, UrlMode mode, string? culture, Uri? current) => $"url:{content.UrlSegment}");
 
-        var builder = new ApiContentBuilder(new PropertyMapper(), new PublishedContentNameProvider(), publishedUrlProvider.Object);
+        var builder = new ApiContentBuilder(new PublishedContentNameProvider(), publishedUrlProvider.Object, CreateOutputExpansionStrategyAccessor());
         var result = builder.Build(content.Object);
 
         Assert.NotNull(result);
@@ -64,7 +63,7 @@ public class ContentBuilderTests : ContentApiTests
         var customNameProvider = new Mock<IPublishedContentNameProvider>();
         customNameProvider.Setup(n => n.GetName(content.Object)).Returns($"Custom name for: {content.Object.Name}");
 
-        var builder = new ApiContentBuilder(new PropertyMapper(), customNameProvider.Object, Mock.Of<IPublishedUrlProvider>());
+        var builder = new ApiContentBuilder(customNameProvider.Object, Mock.Of<IPublishedUrlProvider>(), CreateOutputExpansionStrategyAccessor());
         var result = builder.Build(content.Object);
 
         Assert.NotNull(result);
@@ -92,7 +91,7 @@ public class ContentBuilderTests : ContentApiTests
             .Setup(p => p.GetMediaUrl(It.IsAny<IPublishedContent>(), It.IsAny<UrlMode>(), It.IsAny<string?>(), It.IsAny<string?>(), It.IsAny<Uri?>()))
             .Returns((IPublishedContent content, UrlMode mode, string? culture, string? propertyAlias, Uri? current) => $"media-url:{content.UrlSegment}");
 
-        var builder = new ApiContentBuilder(new PropertyMapper(), new PublishedContentNameProvider(), publishedUrlProvider.Object);
+        var builder = new ApiContentBuilder(new PublishedContentNameProvider(), publishedUrlProvider.Object, CreateOutputExpansionStrategyAccessor());
         var result = builder.Build(media.Object);
 
         Assert.NotNull(result);
