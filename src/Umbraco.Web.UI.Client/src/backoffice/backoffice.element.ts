@@ -39,9 +39,11 @@ import { UmbTemplateTreeStore } from './templating/templates/tree/data/template.
 import { UmbTemplateDetailStore } from './templating/templates/workspace/data/template.detail.store';
 import { UmbThemeContext } from './themes/theme.context';
 import { UmbLanguageStore } from './settings/languages/repository/language.store';
+import { UMB_APP_LANGUAGE_CONTEXT_TOKEN, UmbAppLanguageContext } from './settings/languages/app-language.context';
+import { UmbPackageStore } from './packages/repository/package.store';
+import { UmbServerPackageController } from './packages/repository/server-package.controller';
 import { UmbNotificationService, UMB_NOTIFICATION_SERVICE_CONTEXT_TOKEN } from '@umbraco-cms/notification';
 import { UmbLitElement } from '@umbraco-cms/element';
-import { UMB_APP_LANGUAGE_CONTEXT_TOKEN, UmbAppLanguageContext } from './settings/languages/app-language.context';
 
 import '@umbraco-cms/router';
 
@@ -56,6 +58,7 @@ import './packages';
 import './search';
 import './templating';
 import './shared';
+import { umbExtensionsRegistry } from '@umbraco-cms/extensions-api';
 
 @defineElement('umb-backoffice')
 export class UmbBackofficeElement extends UmbLitElement {
@@ -113,6 +116,9 @@ export class UmbBackofficeElement extends UmbLitElement {
 		this.provideContext(UMB_BACKOFFICE_CONTEXT_TOKEN, new UmbBackofficeContext());
 		this.provideContext(UMB_CURRENT_USER_HISTORY_STORE_CONTEXT_TOKEN, new UmbCurrentUserHistoryStore());
 		new UmbThemeContext(this);
+
+		new UmbPackageStore(this);
+		new UmbServerPackageController(this, umbExtensionsRegistry);
 	}
 
 	render() {
