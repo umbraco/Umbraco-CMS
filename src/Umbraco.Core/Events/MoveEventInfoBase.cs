@@ -24,27 +24,17 @@ public abstract class MoveEventInfoBase<TEntity> : IEquatable<MoveEventInfoBase<
             return true;
         }
 
+        if (other.GetType() != this.GetType())
+        {
+            return false;
+        }
+
         return EqualityComparer<TEntity>.Default.Equals(Entity, other.Entity) && OriginalPath == other.OriginalPath;
     }
 
     public override bool Equals(object? obj)
     {
-        if (ReferenceEquals(null, obj))
-        {
-            return false;
-        }
-
-        if (ReferenceEquals(this, obj))
-        {
-            return true;
-        }
-
-        if (obj.GetType() != this.GetType())
-        {
-            return false;
-        }
-
-        return Equals((MoveEventInfoBase<TEntity>) obj);
+        return Equals((MoveEventInfoBase<TEntity>?) obj);
     }
 
     public override int GetHashCode() => HashCode.Combine(Entity, OriginalPath);
