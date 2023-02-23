@@ -8,22 +8,8 @@ Registering UI extensions happens through the global extension registry.
 
 There are two ways to register UI extensions:
 
-1. Directly through a manifest file
-2. Referencing a "Start up" resource in the manifest where full control over registration can take place.
-
-## Manifest files
-
-```json
-{
-	"type": "", // type of extension
-	"alias": "", // unique alias for the extension
-	"elementName": "", // unique name of the custom element
-	"js": "", // path to the javascript resource
-	"meta": {
-		// additional props for the extension type
-	}
-}
-```
+1. Reference an entry point resource in the manifest where full control over registration can take place.
+2. Directly through a manifest file
 
 ## Entry Point Files
 
@@ -55,4 +41,18 @@ const manifest = {
 };
 
 extensionRegistry.register(extension);
+```
+
+## Manifest JSON files
+
+```json
+{
+	"type": "", // type of extension
+	"alias": "", // unique alias for the extension
+	"elementName": "", // unique name of the custom element
+	"js": "", // path to the javascript resource
+	"meta": {
+		// additional props for the extension type
+	}
+}
 ```

@@ -3,3 +3,74 @@ import { Meta } from '@storybook/addon-docs';
 <Meta title="Guides/Extending the Backoffice/Sections" parameters={{ previewTabs: { canvas: { hidden: true } } }} />
 
 # Sections
+
+TODO: Introduction to sections
+
+<img src="docs/section.svg" width="300" />
+
+The section manifest:
+
+TODO: can we get a typescript interface here?
+
+```json
+{
+	"type": "section",
+	"alias": "My.Section",
+	"name": "My Section",
+	"weight": 10,
+	"meta": {
+		"label": "My Section",
+		"pathname": "my-section"
+	}
+}
+```
+
+The Backoffice ships with the following sections:
+Content, Media, Members, Packages, Users, Settings.
+
+## Section Sidebar
+
+TODO: Introduction to section sidebar
+
+<img src="docs/section-sidebar.svg" width="300" />
+
+### Sidebar Items
+
+TODO: Introduction to section sidebar items
+
+<img src="docs/section-sidebar-item.svg" width="300" />
+
+#### Manifest
+
+TODO: not implemented yet
+
+#### Sidebar Menu
+
+```json
+{
+	"type": "sidebarMenu",
+	"alias": "My.SidebarMenu.Something",
+	"name": "Something Sidebar Menu",
+	"weight": 10,
+	"meta": {
+		"label": "My Something Sidebar Menu",
+		"sections": ["My.Section"]
+	}
+}
+```
+
+#### Sidebar Menu Item
+
+```json
+{
+  "type": "sidebarMenuItem",
+	"alias": "Umb.SidebarMenuItem.Documents",
+	"name": "Documents Sidebar Menu Item",
+	"weight": 10,
+	"meta": {
+		"label": "Documents",
+		"icon": "umb:folder",
+		"sidebarMenus": ["Umb.SidebarMenu.Content"],
+	},
+};
+```

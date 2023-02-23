@@ -1,8 +1,11 @@
 import { Meta } from '@storybook/addon-docs';
 
-<Meta title="Guides/Extending the Backoffice/Actions" parameters={{ previewTabs: { canvas: { hidden: true } } }} />
+<Meta
+	title="Guides/Extending the Backoffice/Entity Actions"
+	parameters={{ previewTabs: { canvas: { hidden: true } } }}
+/>
 
-# Actions
+# Entity Actions
 
 TODO: introduction to actions
 
@@ -12,10 +15,7 @@ TODO: introduction to actions
 - **Entity Bulk Action:**
   Relates to an entity type: document, media, etc. Performs the action on a selection of items.
 
-- **Workspace Action:**
-  Relates to a workspace alias (Umb.Workspace.Document). Performs the action on the workspace draft state.
-
-TODO: graphically show the different types of actions
+<img src="entity-action-sidebar-context.svg" width="400" />
 
 ### Registering an Entity Action
 
