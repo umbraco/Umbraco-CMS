@@ -1,4 +1,5 @@
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
+import type { DataSourceResponse, UmbPackage } from '@umbraco-cms/models';
 import { tryExecuteAndNotify } from '@umbraco-cms/resources';
 import { umbracoPath } from '@umbraco-cms/utils';
 
@@ -13,7 +14,7 @@ export class UmbPackageServerDataSource {
 	 * Get the root items from the server
 	 * @memberof UmbPackageServerDataSource
 	 */
-	getRootItems() {
+	getRootItems(): Promise<DataSourceResponse<{ items: UmbPackage[] }>> {
 		// TODO: Use real resource when available
 		return tryExecuteAndNotify(
 			this.host,
