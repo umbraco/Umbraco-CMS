@@ -8,6 +8,7 @@ export type SearchItem = {
 	icon?: string;
 	href: string;
 	parent: string;
+	url?: string;
 };
 export type SearchGroupItem = {
 	name: string;
@@ -103,9 +104,22 @@ export class UmbModalLayoutSearchElement extends LitElement {
 				font-weight: unset;
 				opacity: 1;
 			}
+			.item-icon {
+				margin-bottom: auto;
+				margin-top: 5px;
+			}
 			.item-icon,
 			.item-symbol {
 				opacity: 0.4;
+			}
+			.item-url {
+				font-size: 0.8rem;
+				line-height: 1.2;
+				font-weight: 100;
+			}
+			.item-name {
+				display: flex;
+				flex-direction: column;
 			}
 			.item-icon > * {
 				height: 1rem;
@@ -229,7 +243,9 @@ export class UmbModalLayoutSearchElement extends LitElement {
 				<span class="item-icon">
 					${item.icon ? html`<uui-icon name="${item.icon}"></uui-icon>` : this.#renderHashTag()}
 				</span>
-				<span class="item-name">${item.name}</span>
+				<span class="item-name">
+					${item.name} ${item.url ? html`<span class="item-url">${item.url}</span>` : nothing}
+				</span>
 				<span class="item-symbol">></span>
 			</a>
 		`;
@@ -252,12 +268,21 @@ export class UmbModalLayoutSearchElement extends LitElement {
 			href: '#',
 			icon: 'umb:thumbnail-list',
 			parent: 'Content',
+			url: '/blog/',
 		},
 		{
 			name: 'Popular blogs',
 			href: '#',
 			icon: 'umb:article',
 			parent: 'Content',
+			url: '/blog/popular-blogs/',
+		},
+		{
+			name: 'How to write a blog',
+			href: '#',
+			icon: 'umb:article',
+			parent: 'Content',
+			url: '/blog/how-to-write-a-blog/',
 		},
 		{
 			name: 'Blog hero',
