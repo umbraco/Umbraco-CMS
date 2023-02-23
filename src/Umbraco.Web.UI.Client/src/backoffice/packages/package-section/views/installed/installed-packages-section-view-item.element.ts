@@ -9,8 +9,8 @@ import { createExtensionElement, umbExtensionsRegistry } from '@umbraco-cms/exte
 import type { ManifestPackageView, UmbPackage } from '@umbraco-cms/models';
 import { UmbLitElement } from '@umbraco-cms/element';
 
-@customElement('umb-packages-installed-item')
-export class UmbPackagesInstalledItem extends UmbLitElement {
+@customElement('umb-installed-packages-section-view-item')
+export class UmbInstalledPackagesSectionViewItemElement extends UmbLitElement {
 	@property({ type: Object })
 	package!: UmbPackage;
 
@@ -87,6 +87,6 @@ export class UmbPackagesInstalledItem extends UmbLitElement {
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-packages-installed-item': UmbPackagesInstalledItem;
+		'umb-installed-packages-section-view-item': UmbInstalledPackagesSectionViewItemElement;
 	}
 }
