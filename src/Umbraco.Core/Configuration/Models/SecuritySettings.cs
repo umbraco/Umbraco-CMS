@@ -68,11 +68,13 @@ public class SecuritySettings
     /// <summary>
     ///     Gets or sets a value for the user password settings.
     /// </summary>
+    [Obsolete("This no longer works. You can now inject this by using IOptions<UserPasswordConfigurationSettings> instead, scheduled for removal in v13")]
     public UserPasswordConfigurationSettings? UserPassword { get; set; }
 
     /// <summary>
     ///     Gets or sets a value for the member password settings.
     /// </summary>
+    [Obsolete("This no longer works. You can now inject this by using IOptions<MemberPasswordConfigurationSettings> instead, scheduled for removal in v13")]
     public MemberPasswordConfigurationSettings? MemberPassword { get; set; }
 
     /// <summary>

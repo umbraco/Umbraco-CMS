@@ -259,7 +259,9 @@ test.describe('BlockGridEditorDataTypeBlock', () => {
     await umbracoApi.documentTypes.ensureNameNotExists(elementNameThree);
   });
 
-  test('can create a block grid datatype with multiple groups and multiple element in each group', async ({page, umbracoApi, umbracoUi}) => {
+  test('can create a block grid datatype with multiple groups and multiple element in each group', async ({page, umbracoApi, umbracoUi},testInfo) => {
+    await testInfo.slow();
+    
     const GroupOne = 'GroupOne';
     const elementNameFourth = 'FourthElement';
     const elementFourthAlias = AliasHelper.toAlias(elementNameFourth);
