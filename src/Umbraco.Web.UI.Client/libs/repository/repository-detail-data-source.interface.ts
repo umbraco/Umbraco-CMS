@@ -5,5 +5,5 @@ export interface RepositoryDetailDataSource<DetailType> {
 	get(key: string): Promise<DataSourceResponse<DetailType>>;
 	insert(data: DetailType): Promise<DataSourceResponse<DetailType>>;
 	update(data: DetailType): Promise<DataSourceResponse<DetailType>>;
-	trash(key: string): Promise<DataSourceResponse<DetailType>>;
+	delete(key: string): Promise<DataSourceResponse<DetailType>>;
 }

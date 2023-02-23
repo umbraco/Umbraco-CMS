@@ -26,7 +26,6 @@ export class UmbDocumentWorkspaceContext
 	extends UmbWorkspaceContext
 	implements UmbWorkspaceEntityContextInterface<EntityType | undefined>
 {
-	#isNew = false;
 	#host: UmbControllerHostInterface;
 	#documentRepository: UmbDocumentRepository;
 	#documentTypeRepository: UmbDocumentTypeRepository;
@@ -68,16 +67,16 @@ export class UmbDocumentWorkspaceContext
 	async load(entityKey: string) {
 		const { data } = await this.#documentRepository.requestByKey(entityKey);
 		if (data) {
-			this.#isNew = false;
+			this.setIsNew(false);
 			this.#document.next(data);
 			this.#draft.next(data);
 		}
 	}
 
 	async createScaffold(parentKey: string | null) {
-		const { data } = await this.#documentRepository.createDetailsScaffold(parentKey);
+		const { data } = await this.#documentRepository.createScaffold(parentKey);
 		if (!data) return;
-		this.#isNew = true;
+		this.setIsNew(true);
 		this.#document.next(data);
 		this.#draft.next(data);
 	}
@@ -225,13 +224,13 @@ export class UmbDocumentWorkspaceContext
 
 	async save() {
 		if (!this.#draft.value) return;
-		if (this.#isNew) {
-			await this.#documentRepository.createDetail(this.#draft.value);
+		if (this.getIsNew()) {
+			await this.#documentRepository.create(this.#draft.value);
 		} else {
-			await this.#documentRepository.saveDetail(this.#draft.value);
+			await this.#documentRepository.save(this.#draft.value);
 		}
 		// If it went well, then its not new anymore?.
-		this.#isNew = false;
+		this.setIsNew(false);
 	}
 
 	async delete(key: string) {
