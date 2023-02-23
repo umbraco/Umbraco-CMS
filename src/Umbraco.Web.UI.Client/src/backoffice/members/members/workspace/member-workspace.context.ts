@@ -18,7 +18,7 @@ export class UmbWorkspaceMemberContext
 	}
 
 	setName(name: string) {
-		this.#manager.state.update({name});
+		this.#manager.state.update({ name });
 	}
 
 	getEntityType = this.#manager.getEntityType;

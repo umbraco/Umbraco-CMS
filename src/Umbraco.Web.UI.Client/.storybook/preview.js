@@ -11,21 +11,15 @@ import { html } from 'lit-html';
 import { initialize, mswDecorator } from 'msw-storybook-addon';
 import { setCustomElements } from '@storybook/web-components';
 
-import {
-	UMB_DATA_TYPE_STORE_CONTEXT_TOKEN,
-	UmbDataTypeStore,
-} from '../src/backoffice/settings/data-types/repository/data-type.store.ts';
-import {
-	UMB_DOCUMENT_TYPE_STORE_CONTEXT_TOKEN,
-	UmbDocumentTypeStore,
-} from '../src/backoffice/documents/document-types/repository/document-type.store.ts';
+import { UmbDataTypeStore } from '../src/backoffice/settings/data-types/repository/data-type.store.ts';
+import { UmbDocumentTypeStore } from '../src/backoffice/documents/document-types/repository/document-type.store.ts';
 
 import customElementManifests from '../custom-elements.json';
 import { UmbIconStore } from '../libs/store/icon/icon.store';
 import { onUnhandledRequest } from '../src/core/mocks/browser';
 import { handlers } from '../src/core/mocks/browser-handlers';
 import { LitElement } from 'lit';
-import { UmbModalService } from '../src/core/modal';
+import { UMB_MODAL_SERVICE_CONTEXT_TOKEN, UmbModalService } from '../src/core/modal';
 
 // TODO: Fix storybook manifest registrations.
 
@@ -71,7 +65,10 @@ const documentTypeStoreProvider = (story) => html`
 `;
 
 const modalServiceProvider = (story) => html`
-	<umb-context-provider style="display: block; padding: 32px;" key="umbModalService" .value=${new UmbModalService()}>
+	<umb-context-provider
+		style="display: block; padding: 32px;"
+		key="${UMB_MODAL_SERVICE_CONTEXT_TOKEN}"
+		.value=${new UmbModalService()}>
 		${story()}
 		<umb-backoffice-modal-container></umb-backoffice-modal-container>
 	</umb-context-provider>
@@ -94,6 +91,7 @@ export const parameters = {
 		storySort: {
 			method: 'alphabetical',
 			includeNames: true,
+			order: ['Guides', ['Getting started'], '*'],
 		},
 	},
 	actions: { argTypesRegex: '^on.*' },

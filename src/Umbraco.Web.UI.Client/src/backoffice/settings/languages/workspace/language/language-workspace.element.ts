@@ -1,12 +1,12 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, html, nothing } from 'lit';
-import { customElement, property } from 'lit/decorators.js';
+import { customElement, state } from 'lit/decorators.js';
 import { UUIInputElement, UUIInputEvent } from '@umbraco-ui/uui';
-import { UmbLanguageStoreItemType } from '../../language.store';
+import { ifDefined } from 'lit-html/directives/if-defined.js';
 import { UmbWorkspaceEntityElement } from '../../../../shared/components/workspace/workspace-entity-element.interface';
-import { UmbWorkspaceLanguageContext } from './language-workspace.context';
+import { UmbLanguageWorkspaceContext } from './language-workspace.context';
 import { UmbLitElement } from '@umbraco-cms/element';
-import '../../../../shared/components/workspace/workspace-action/save/workspace-action-node-save.element.ts';
+import { LanguageModel } from '@umbraco-cms/backend-api';
 
 @customElement('umb-language-workspace')
 export class UmbLanguageWorkspaceElement extends UmbLitElement implements UmbWorkspaceEntityElement {
@@ -25,25 +25,25 @@ export class UmbLanguageWorkspaceElement extends UmbLitElement implements UmbWor
 		`,
 	];
 
-	@property()
-	language?: UmbLanguageStoreItemType;
+	@state()
+	_language?: LanguageModel;
 
-	#languageWorkspaceContext?: UmbWorkspaceLanguageContext;
+	#languageWorkspaceContext = new UmbLanguageWorkspaceContext(this);
+
+	constructor() {
+		super();
+
+		this.observe(this.#languageWorkspaceContext.data, (data) => {
+			this._language = data;
+		});
+	}
 
 	load(key: string): void {
-		this.provideLanguageWorkspaceContext(key);
+		this.#languageWorkspaceContext.load(key);
 	}
 
-	create(parentKey: string | null): void {
-		this.provideLanguageWorkspaceContext(parentKey);
-	}
-
-	public provideLanguageWorkspaceContext(entityKey: string | null) {
-		this.#languageWorkspaceContext = new UmbWorkspaceLanguageContext(this, entityKey);
-		this.provideContext('umbWorkspaceContext', this.#languageWorkspaceContext);
-		this.#languageWorkspaceContext.data.subscribe((language) => {
-			this.language = language;
-		});
+	create(): void {
+		this.#languageWorkspaceContext.createScaffold();
 	}
 
 	#handleInput(event: UUIInputEvent) {
@@ -51,13 +51,13 @@ export class UmbLanguageWorkspaceElement extends UmbLitElement implements UmbWor
 			const target = event.composedPath()[0] as UUIInputElement;
 
 			if (typeof target?.value === 'string') {
-				this.#languageWorkspaceContext?.update({ name: target.value });
+				this.#languageWorkspaceContext?.setName(target.value);
 			}
 		}
 	}
 
 	render() {
-		if (!this.language) return nothing;
+		if (!this._language) return nothing;
 
 		return html`
 			<umb-workspace-layout alias="Umb.Workspace.Language">
@@ -65,7 +65,7 @@ export class UmbLanguageWorkspaceElement extends UmbLitElement implements UmbWor
 					<uui-button href="/section/settings/language-root" compact>
 						<uui-icon name="umb:arrow-left"></uui-icon>
 					</uui-button>
-					<uui-input .value=${this.language.name} @input="${this.#handleInput}"></uui-input>
+					<uui-input value=${ifDefined(this._language.name)} @input="${this.#handleInput}"></uui-input>
 				</div>
 			</umb-workspace-layout>
 		`;

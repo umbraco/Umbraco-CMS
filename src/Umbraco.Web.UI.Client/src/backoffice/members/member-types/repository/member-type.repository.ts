@@ -106,9 +106,9 @@ export class UmbMemberTypeRepository implements UmbTreeRepository, UmbDetailRepo
 
 	// DETAILS
 
-	async createDetailsScaffold() {
+	async createScaffold() {
 		await this.#init;
-		return this.#detailSource.createDetailsScaffold();
+		return this.#detailSource.createScaffold();
 	}
 
 	async requestByKey(key: string) {
@@ -153,7 +153,7 @@ export class UmbMemberTypeRepository implements UmbTreeRepository, UmbDetailRepo
 		return { error };
 	}
 
-	async saveDetail(detail: ItemType) {
+	async save(detail: ItemType) {
 		await this.#init;
 
 		// TODO: should we show a notification if the MemberType is missing?
@@ -163,7 +163,7 @@ export class UmbMemberTypeRepository implements UmbTreeRepository, UmbDetailRepo
 			return { error };
 		}
 
-		const { error } = await this.#detailSource.saveDetail(detail);
+		const { error } = await this.#detailSource.save(detail);
 
 		if (!error) {
 			const notification = { data: { message: `Member type '${detail.name}' saved` } };
@@ -180,7 +180,7 @@ export class UmbMemberTypeRepository implements UmbTreeRepository, UmbDetailRepo
 		return { error };
 	}
 
-	async createDetail(detail: MemberTypeDetails) {
+	async create(detail: MemberTypeDetails) {
 		await this.#init;
 
 		if (!detail.name) {
@@ -188,7 +188,7 @@ export class UmbMemberTypeRepository implements UmbTreeRepository, UmbDetailRepo
 			return { error };
 		}
 
-		const { data, error } = await this.#detailSource.createDetail(detail);
+		const { data, error } = await this.#detailSource.create(detail);
 
 		if (!error) {
 			const notification = { data: { message: `Member type '${detail.name}' created` } };

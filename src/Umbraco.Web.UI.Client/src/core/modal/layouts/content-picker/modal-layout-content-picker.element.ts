@@ -72,7 +72,7 @@ export class UmbModalLayoutContentPickerElement extends UmbModalLayoutElement<Um
 	}
 
 	private _close() {
-		this.modalHandler?.close({ selection: this._selection });
+		this.modalHandler?.close();
 	}
 
 	render() {

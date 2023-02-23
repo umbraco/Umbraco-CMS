@@ -21,8 +21,9 @@ export class UmbInputMediaPickerElement extends FormControlMixin(UmbLitElement) 
 			}
 			#add-button {
 				text-align: center;
-				min-height: 160px;
+				height: 202px;
 			}
+
 			uui-icon {
 				display: block;
 				margin: 0 auto;
@@ -168,7 +169,7 @@ export class UmbInputMediaPickerElement extends FormControlMixin(UmbLitElement) 
 		return html` ${this._items?.map((item) => this._renderItem(item))} ${this._renderButton()} `;
 	}
 	private _renderButton() {
-		if (this.max == 1 && this._items && this._items.length > 0) return;
+		if (this._items && this.max && this._items.length >= this.max) return;
 		return html`<uui-button id="add-button" look="placeholder" @click=${this._openPicker} label="open">
 			<uui-icon name="umb:add"></uui-icon>
 			Add

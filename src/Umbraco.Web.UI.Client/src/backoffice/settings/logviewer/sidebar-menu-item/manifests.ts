@@ -8,8 +8,8 @@ const sidebarMenuItem: ManifestSidebarMenuItem = {
 	meta: {
 		label: 'Log Viewer',
 		icon: 'umb:box-alt',
-		sections: ['Umb.Section.Settings'],
 		entityType: 'logviewer-root',
+		sidebarMenus: ['Umb.SidebarMenu.Settings'],
 	},
 };
 

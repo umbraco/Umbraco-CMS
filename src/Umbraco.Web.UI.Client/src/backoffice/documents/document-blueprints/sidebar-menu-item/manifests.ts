@@ -8,7 +8,7 @@ const sidebarMenuItem: ManifestSidebarMenuItem = {
 	meta: {
 		label: 'Document Blueprints',
 		icon: 'umb:blueprint',
-		sections: ['Umb.Section.Settings'],
+		sidebarMenus: ['Umb.SidebarMenu.Settings'],
 		entityType: 'document-blueprint-root',
 	},
 };

@@ -9,8 +9,8 @@ const sidebarMenuItem: ManifestSidebarMenuItem = {
 	meta: {
 		label: 'Dictionary',
 		icon: 'umb:book-alt',
-		sections: ['Umb.Section.Translation'],
-		entityType: 'dictionary-item'
+		entityType: 'dictionary-item',
+		sidebarMenus: ['Umb.SidebarMenu.Translation'],
 	},
 };
 

@@ -1,4 +1,3 @@
-import { BehaviorSubject } from 'rxjs';
 import { UmbWorkspaceContext } from '../../../shared/components/workspace/workspace-context/workspace-context';
 import { UmbWorkspaceEntityContextInterface } from '../../../shared/components/workspace/workspace-context/workspace-entity-context.interface';
 import { UmbDataTypeRepository } from '../repository/data-type.repository';
@@ -10,7 +9,6 @@ export class UmbDataTypeWorkspaceContext
 	extends UmbWorkspaceContext
 	implements UmbWorkspaceEntityContextInterface<DataTypeModel | undefined>
 {
-	#isNew = false;
 	#host: UmbControllerHostInterface;
 	#dataTypeRepository: UmbDataTypeRepository;
 
@@ -28,24 +26,26 @@ export class UmbDataTypeWorkspaceContext
 	async load(key: string) {
 		const { data } = await this.#dataTypeRepository.requestByKey(key);
 		if (data) {
-			this.#isNew = false;
+			this.setIsNew(false);
 			this.#data.update(data);
 		}
 	}
 
 	async createScaffold(parentKey: string | null) {
-		const { data } = await this.#dataTypeRepository.createDetailsScaffold(parentKey);
+		const { data } = await this.#dataTypeRepository.createScaffold(parentKey);
 		if (!data) return;
-		this.#isNew = true;
+		this.setIsNew(true);
 		this.#data.next(data);
 	}
 
 	getData() {
 		return this.#data.getValue();
 	}
+
 	getEntityKey() {
 		return this.getData()?.key || '';
 	}
+
 	getEntityType() {
 		return 'data-type';
 	}
@@ -75,13 +75,13 @@ export class UmbDataTypeWorkspaceContext
 
 	async save() {
 		if (!this.#data.value) return;
-		if (this.#isNew) {
-			await this.#dataTypeRepository.createDetail(this.#data.value);
+		if (this.isNew) {
+			await this.#dataTypeRepository.create(this.#data.value);
 		} else {
-			await this.#dataTypeRepository.saveDetail(this.#data.value);
+			await this.#dataTypeRepository.save(this.#data.value);
 		}
 		// If it went well, then its not new anymore?.
-		this.#isNew = false;
+		this.setIsNew(false);
 	}
 
 	async delete(key: string) {

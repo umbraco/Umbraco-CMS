@@ -1,8 +1,7 @@
 import { html } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
-import '../../../components/input-checkbox-list/input-checkbox-list.element';
-import type { UmbInputCheckboxListElement } from '../../../components/input-checkbox-list/input-checkbox-list.element';
+import { UmbInputCheckboxListElement } from '../../../components/input-checkbox-list/input-checkbox-list.element';
 import { UmbLitElement } from '@umbraco-cms/element';
 import type { DataTypePropertyModel } from '@umbraco-cms/backend-api';
 
