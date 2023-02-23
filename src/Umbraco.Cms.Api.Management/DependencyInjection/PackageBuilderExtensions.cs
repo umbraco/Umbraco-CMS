@@ -12,7 +12,10 @@ internal static class PackageBuilderExtensions
     {
         builder.Services.AddTransient<IPackageDefinitionFactory, PackageDefinitionFactory>();
 
-        builder.WithCollectionBuilder<MapDefinitionCollectionBuilder>().Add<PackageViewModelMapDefinition>();
+        builder
+            .WithCollectionBuilder<MapDefinitionCollectionBuilder>()
+            .Add<PackageViewModelMapDefinition>()
+            .Add<PackageManifestViewModelMapDefinition>();
 
         return builder;
     }

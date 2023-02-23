@@ -57,7 +57,7 @@ public class PackagingService : IPackagingService
         ICreatedPackagesRepository createdPackages,
         IPackageInstallation packageInstallation,
         IEventAggregator eventAggregator,
-        IManifestParser manifestParser,
+        ILegacyManifestParser manifestParser,
         IKeyValueService keyValueService,
         PackageMigrationPlanCollection packageMigrationPlans)
         : this(
