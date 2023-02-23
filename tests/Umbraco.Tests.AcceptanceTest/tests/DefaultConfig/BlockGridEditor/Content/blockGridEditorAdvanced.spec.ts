@@ -4,7 +4,6 @@ import {ContentBuilder, DocumentTypeBuilder} from "@umbraco/json-models-builders
 import {expect} from "@playwright/test";
 
 test.describe('BlockGridEditorAdvancedContent', () => {
-
   const documentName = 'DocumentTest';
   const blockGridName = 'BlockGridTest';
   const elementName = 'ElementTitle';
@@ -28,7 +27,7 @@ test.describe('BlockGridEditorAdvancedContent', () => {
   });
 
   test.describe('Advanced', () => {
-    test('can see custom view', async ({page, umbracoApi, umbracoUi}) => {
+    test('can see custom view in content for a block grid editor', async ({page, umbracoApi, umbracoUi}) => {
       // CustomView
       const customViewItemName = "Image";
       const customViewFileName = "Image.html";
@@ -114,7 +113,7 @@ test.describe('BlockGridEditorAdvancedContent', () => {
       await umbracoApi.media.ensureNameNotExists(imageName);
     });
 
-    test('can see custom stylesheet', async ({page, umbracoApi, umbracoUi}) => {
+    test('can see custom stylesheet in content for a block grid editor', async ({page, umbracoApi, umbracoUi}) => {
       const stylesheetName = "StylesheetBlockGrid.css";
       const stylesheetPath = "stylesheet/" + stylesheetName;
       const stylesheetMimeType = "text/css";
@@ -147,7 +146,7 @@ test.describe('BlockGridEditorAdvancedContent', () => {
       await umbracoApi.media.ensureNameNotExists(stylesheetName);
     });
 
-    test('can see changed overlay editor size', async ({page, umbracoApi, umbracoUi}) => {
+    test('can see changed overlay editor size in content for a block grid editor', async ({page, umbracoApi, umbracoUi}) => {
       const editorSize = 'large';
 
       const element = await umbracoApi.documentTypes.createDefaultElementType(elementName, elementAlias);
@@ -173,7 +172,7 @@ test.describe('BlockGridEditorAdvancedContent', () => {
       await expect(page.locator('.umb-editor--' + editorSize).locator('[id="sub-view-0"]')).toBeVisible();
     });
 
-    test('can use inline editing mode', async ({page, umbracoApi, umbracoUi}) => {
+    test('can use inline editing mode in content for a block grid editor', async ({page, umbracoApi, umbracoUi}) => {
       const newText = 'UpdatedText';
 
       const element = await umbracoApi.documentTypes.createDefaultElementType(elementName, elementAlias);
@@ -228,7 +227,7 @@ test.describe('BlockGridEditorAdvancedContent', () => {
   });
 
   test.describe('Catalogue appearance', () => {
-    test('can see background color', async ({page, umbracoApi, umbracoUi}) => {
+    test('can see background color in content for a block grid editor', async ({page, umbracoApi, umbracoUi}) => {
       const elementTwoName = 'TheSecondElement';
       const elementTwoAlias = AliasHelper.toAlias(elementTwoName);
 
@@ -266,7 +265,7 @@ test.describe('BlockGridEditorAdvancedContent', () => {
       await umbracoApi.documentTypes.ensureNameNotExists(elementTwoName);
     });
 
-    test('can see icon color', async ({page, umbracoApi, umbracoUi}) => {
+    test('can see icon color in content for a block grid editor', async ({page, umbracoApi, umbracoUi}) => {
       const elementTwoName = 'TheSecondElement';
       const elementTwoAlias = AliasHelper.toAlias(elementTwoName);
 
@@ -304,7 +303,7 @@ test.describe('BlockGridEditorAdvancedContent', () => {
       await umbracoApi.documentTypes.ensureNameNotExists(elementTwoName);
     });
 
-    test('can see thumbnail', async ({page, umbracoApi, umbracoUi}) => {
+    test('can see thumbnail in content for a block grid editor', async ({page, umbracoApi, umbracoUi}) => {
       // Thumbnail
       const imageName = "Umbraco";
       const umbracoFileValue = {"src": "Umbraco.png"};
