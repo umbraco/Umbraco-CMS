@@ -146,14 +146,15 @@ export class UmbModalService {
 
 		//TODO START: This is a hack to get the search modal layout to look like i want it to.
 		//TODO: Remove from here to END when the modal system is more flexible
-		const topDistance = '128px';
+		const topDistance = '50%';
 		const margin = '16px';
 		const maxHeight = '600px';
 		const maxWidth = '500px';
 		const dialog = document.createElement('dialog') as HTMLDialogElement;
-		dialog.style.top = `min(${topDistance}, 10vh)`;
+		dialog.style.top = `max(${margin}, calc(${topDistance} - ${maxHeight} / 2))`;
 		dialog.style.margin = '0 auto';
-		dialog.style.maxHeight = `min(${maxHeight}, calc(100vh - ${margin}))`;
+		dialog.style.transform = `translateY(${-maxHeight})`;
+		dialog.style.maxHeight = `min(${maxHeight}, calc(100% - ${margin}px * 2))`;
 		dialog.style.width = `min(${maxWidth}, calc(100vw - ${margin}))`;
 		dialog.style.boxSizing = 'border-box';
 		dialog.style.background = 'none';

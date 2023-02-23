@@ -65,13 +65,13 @@ export class UmbModalLayoutSearchElement extends LitElement {
 				background-color: var(--uui-color-surface);
 				display: flex;
 				height: 48px;
-				border-bottom: 1px solid var(--uui-color-border);
 			}
 			#main {
 				display: flex;
 				flex-direction: column;
 				padding: 0px var(--uui-size-space-6) var(--uui-size-space-5) var(--uui-size-space-6);
 				height: 100%;
+				border-top: 1px solid var(--uui-color-border);
 			}
 			.group {
 				margin-top: var(--uui-size-space-4);
