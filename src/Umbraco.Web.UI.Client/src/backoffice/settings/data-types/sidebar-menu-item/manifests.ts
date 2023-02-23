@@ -9,8 +9,8 @@ const sidebarMenuItem: ManifestSidebarMenuItem = {
 	meta: {
 		label: 'Data Types',
 		icon: 'umb:folder',
-		sections: ['Umb.Section.Settings'],
 		entityType: 'data-type',
+		sidebarMenus: ['Umb.SidebarMenu.Settings'],
 	},
 };
 

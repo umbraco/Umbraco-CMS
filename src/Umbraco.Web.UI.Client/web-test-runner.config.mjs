@@ -11,7 +11,7 @@ export default {
 	nodeResolve: true,
 	files: ['src/**/*.test.ts', 'libs/**/*.test.ts'],
 	mimeTypes: {
-		'./public/**/*': 'js'
+		'./public/**/*': 'js',
 	},
 	plugins: [
 		{
@@ -28,7 +28,7 @@ export default {
 				if (context.path.startsWith('/umbraco/management/api')) {
 					return '';
 				}
-			}
+			},
 		},
 		// Serve images from the public folder as JS modules
 		url({ include: ['public/**/*'] }),
@@ -48,21 +48,19 @@ export default {
 						'@umbraco-cms/extensions-registry': './libs/extensions-registry/index.ts',
 						'@umbraco-cms/notification': './libs/notification/index.ts',
 						'@umbraco-cms/observable-api': './libs/observable-api/index.ts',
+						'@umbraco-cms/events': './libs/events/index.ts',
 						'@umbraco-cms/store': './libs/store/index.ts',
 						'@umbraco-cms/utils': './libs/utils/index.ts',
 						'@umbraco-cms/test-utils': './libs/test-utils/index.ts',
 						'@umbraco-cms/resources': './libs/resources/index.ts',
-						"@umbraco-cms/repository": './libs/repository',
-						'@umbraco-cms/router': './libs/router/index.ts'
+						'@umbraco-cms/repository': './libs/repository',
+						'@umbraco-cms/router': './libs/router/index.ts',
 					},
 				},
 			},
 		}),
 	],
-	browsers: [
-		playwrightLauncher({ product: 'firefox' }),
-		playwrightLauncher({ product: 'webkit' }),
-	],
+	browsers: [playwrightLauncher({ product: 'firefox' }), playwrightLauncher({ product: 'webkit' })],
 	coverageConfig: {
 		reporters: ['lcovonly', 'text-summary'],
 	},

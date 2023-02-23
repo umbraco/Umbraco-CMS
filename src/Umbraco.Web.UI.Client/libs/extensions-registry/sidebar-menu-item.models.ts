@@ -8,6 +8,6 @@ export interface ManifestSidebarMenuItem extends ManifestElement {
 export interface MetaSidebarMenuItem {
 	label: string;
 	icon: string;
-	sections: Array<string>;
+	sidebarMenus: Array<string>;
 	entityType?: string;
 }

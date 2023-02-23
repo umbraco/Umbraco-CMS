@@ -21,11 +21,7 @@ export class UmbSectionSidebarElement extends UmbLitElement {
 				font-weight: 500;
 				display: flex;
 				flex-direction: column;
-				z-index:10;
-			}
-
-			h3 {
-				padding: var(--uui-size-4) var(--uui-size-8);
+				z-index: 10;
 			}
 		`,
 	];
@@ -65,10 +61,6 @@ export class UmbSectionSidebarElement extends UmbLitElement {
 		return html`
 			<umb-section-sidebar-context-menu>
 				<uui-scroll-container>
-					<a href="${`section/${this._sectionPathname}`}">
-						<h3>${this._sectionLabel}</h3>
-					</a>
-
 					<slot></slot>
 				</uui-scroll-container>
 			</umb-section-sidebar-context-menu>

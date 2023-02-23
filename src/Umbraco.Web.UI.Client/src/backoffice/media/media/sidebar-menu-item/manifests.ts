@@ -9,7 +9,7 @@ const sidebarMenuItem: ManifestSidebarMenuItem = {
 	meta: {
 		label: 'Media',
 		icon: 'umb:folder',
-		sections: ['Umb.Section.Media'],
+		sidebarMenus: ['Umb.SidebarMenu.Media'],
 	},
 };
 
