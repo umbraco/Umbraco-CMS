@@ -156,6 +156,19 @@ public abstract class ContentEditingServiceBase<TContent, TContentType, TContent
             return null;
         }
 
+        if (parent != null)
+        {
+            TContentType? parentContentType = ContentTypeService.Get(parent.ContentType.Key);
+            Guid[] allowedContentTypeKeys = parentContentType?.AllowedContentTypes?.Select(c => c.Key).ToArray()
+                                            ?? Array.Empty<Guid>();
+
+            if (allowedContentTypeKeys.Contains(contentType.Key) == false)
+            {
+                operationStatus = ContentEditingOperationStatus.NotAllowed;
+                return null;
+            }
+        }
+
         operationStatus = ContentEditingOperationStatus.Success;
         return parent;
     }

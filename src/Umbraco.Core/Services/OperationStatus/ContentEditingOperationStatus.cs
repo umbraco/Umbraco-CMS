@@ -10,7 +10,7 @@ public enum ContentEditingOperationStatus
     ParentNotFound,
     NotAllowed,
     TemplateNotFound,
+    TemplateNotAllowed,
     PropertyTypeNotFound,
-    Unknown,
-    TemplateNotAllowed
+    Unknown
 }

@@ -35,7 +35,7 @@ internal sealed class ContentEditingService
         return await Task.FromResult(content);
     }
 
-    public async Task<Attempt<IContent?, ContentEditingOperationStatus>> CreateAsync(ContentCreateModel createModel, int userId)
+    public async Task<Attempt<IContent?, ContentEditingOperationStatus>> CreateAsync(ContentCreateModel createModel, int userId = Constants.Security.SuperUserId)
     {
         Attempt<IContent?, ContentEditingOperationStatus> result = await MapCreate(createModel);
         if (result.Success == false)
@@ -56,7 +56,7 @@ internal sealed class ContentEditingService
             : Attempt.FailWithStatus<IContent?, ContentEditingOperationStatus>(operationStatus, content);
     }
 
-    public async Task<Attempt<IContent, ContentEditingOperationStatus>> UpdateAsync(IContent content, ContentUpdateModel updateModel, int userId)
+    public async Task<Attempt<IContent, ContentEditingOperationStatus>> UpdateAsync(IContent content, ContentUpdateModel updateModel, int userId = Constants.Security.SuperUserId)
     {
         Attempt<ContentEditingOperationStatus> result = await MapUpdate(content, updateModel);
         if (result.Success == false)
@@ -76,10 +76,10 @@ internal sealed class ContentEditingService
             : Attempt.FailWithStatus(operationStatus, content);
     }
 
-    public async Task<Attempt<IContent?, ContentEditingOperationStatus>> MoveToRecycleBinAsync(Guid id, int userId)
+    public async Task<Attempt<IContent?, ContentEditingOperationStatus>> MoveToRecycleBinAsync(Guid id, int userId = Constants.Security.SuperUserId)
         => await HandleDeletionAsync(id, content => ContentService.MoveToRecycleBin(content, userId));
 
-    public async Task<Attempt<IContent?, ContentEditingOperationStatus>> DeleteAsync(Guid id, int userId)
+    public async Task<Attempt<IContent?, ContentEditingOperationStatus>> DeleteAsync(Guid id, int userId = Constants.Security.SuperUserId)
         => await HandleDeletionAsync(id, content => ContentService.Delete(content, userId));
 
     protected override IContent Create(string? name, int parentId, IContentType contentType) => new Content(name, parentId, contentType);
