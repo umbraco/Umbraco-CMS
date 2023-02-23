@@ -89,7 +89,8 @@ export class UmbDonutChartElement extends LitElement {
 	@state()
 	borderSize = 20;
 
-	@state() svgSize = 100;
+	@state()
+	svgSize = 100;
 
 	@state()
 	posY = 0;
