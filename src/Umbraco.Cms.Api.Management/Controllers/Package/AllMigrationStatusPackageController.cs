@@ -5,6 +5,7 @@ using Umbraco.Cms.Api.Management.ViewModels.Package;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Packaging;
 using Umbraco.Cms.Core.Services;
+using Umbraco.New.Cms.Core.Models;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Package;
 
@@ -30,8 +31,14 @@ public class AllMigrationStatusPackageController : PackageControllerBase
     [ProducesResponseType(typeof(PagedViewModel<PackageMigrationStatusViewModel>), StatusCodes.Status200OK)]
     public async Task<ActionResult<PagedViewModel<PackageMigrationStatusViewModel>>> AllMigrationStatuses(int skip = 0, int take = 100)
     {
-        IEnumerable<InstalledPackage> migrationPlans = await _packagingService.GetInstalledPackagesFromMigrationPlansAsync(skip, take);
+        PagedModel<InstalledPackage> migrationPlans = await _packagingService.GetInstalledPackagesFromMigrationPlansAsync(skip, take);
 
-        return Ok(_umbracoMapper.Map<PagedViewModel<PackageMigrationStatusViewModel>>(migrationPlans));
+        IEnumerable<PackageMigrationStatusViewModel> viewModels = _umbracoMapper.MapEnumerable<InstalledPackage, PackageMigrationStatusViewModel>(migrationPlans.Items);
+
+        return Ok(new PagedViewModel<PackageMigrationStatusViewModel>()
+        {
+            Total = migrationPlans.Total,
+            Items = viewModels,
+        });
     }
 }

@@ -20,7 +20,6 @@ public class PackageViewModelMapDefinition : IMapDefinition
             Map);
         mapper.Define<InstalledPackage, PackageMigrationStatusViewModel>((_, _) => new PackageMigrationStatusViewModel { PackageName = string.Empty }, Map);
         mapper.Define<IEnumerable<PackageDefinition>, PagedViewModel<PackageDefinitionViewModel>>((_, _) => new PagedViewModel<PackageDefinitionViewModel>(), Map);
-        mapper.Define<IEnumerable<InstalledPackage>, PagedViewModel<PackageMigrationStatusViewModel>>((_, _) => new PagedViewModel<PackageMigrationStatusViewModel>(), Map);
     }
 
     // Umbraco.Code.MapAll -Id -PackageId -PackagePath -Macros
@@ -80,13 +79,5 @@ public class PackageViewModelMapDefinition : IMapDefinition
         PackageDefinition[] definitions = source.ToArray();
         target.Items = context.MapEnumerable<PackageDefinition, PackageDefinitionViewModel>(definitions);
         target.Total = definitions.Length;
-    }
-
-    // Umbraco.Code.MapAll
-    private static void Map(IEnumerable<InstalledPackage> source, PagedViewModel<PackageMigrationStatusViewModel> target, MapperContext context)
-    {
-        InstalledPackage[] installedPackages = source.ToArray();
-        target.Items = context.MapEnumerable<InstalledPackage, PackageMigrationStatusViewModel>(installedPackages);
-        target.Total = installedPackages.Length;
     }
 }
