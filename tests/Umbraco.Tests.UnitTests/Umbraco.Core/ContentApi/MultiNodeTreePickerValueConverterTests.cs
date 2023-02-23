@@ -2,6 +2,7 @@ using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.ContentApi;
+using Umbraco.Cms.Core.ContentApi.Accessors;
 using Umbraco.Cms.Core.Models.ContentApi;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PropertyEditors;
@@ -19,13 +20,14 @@ public class MultiNodeTreePickerValueConverterTests : PropertyValueConverterTest
     {
         var expansionStrategyAccessor = CreateOutputExpansionStrategyAccessor();
 
-        var contentNameProvider = new PublishedContentNameProvider();
+        var contentNameProvider = new ApiContentNameProvider();
+        var apiUrProvider = new ApiUrlProvider(PublishedUrlProvider, new DefaultRequestStartNodeServiceAccessor());
         return new MultiNodeTreePickerValueConverter(
             PublishedSnapshotAccessor,
             Mock.Of<IUmbracoContextAccessor>(),
             Mock.Of<IMemberService>(),
-            new ApiContentBuilder(contentNameProvider, PublishedUrlProvider, expansionStrategyAccessor),
-            new ApiMediaBuilder(contentNameProvider, PublishedUrlProvider, Mock.Of<IPublishedValueFallback>(), expansionStrategyAccessor));
+            new ApiContentBuilder(contentNameProvider, apiUrProvider, expansionStrategyAccessor),
+            new ApiMediaBuilder(contentNameProvider, apiUrProvider, Mock.Of<IPublishedValueFallback>(), expansionStrategyAccessor));
     }
 
     private PublishedDataType MultiNodePickerPublishedDataType(bool multiSelect, string entityType) =>
