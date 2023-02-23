@@ -4,6 +4,7 @@ using Umbraco.Cms.Api.Management.Factories;
 using Umbraco.Cms.Api.Management.ViewModels.Package;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Packaging;
+using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.OperationStatus;
 
@@ -13,13 +14,16 @@ public class CreateCreatedPackageController : CreatedPackageControllerBase
 {
     private readonly IPackagingService _packagingService;
     private readonly IPackageDefinitionFactory _packageDefinitionFactory;
+    private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
 
     public CreateCreatedPackageController(
         IPackagingService packagingService,
-        IPackageDefinitionFactory packageDefinitionFactory)
+        IPackageDefinitionFactory packageDefinitionFactory,
+        IBackOfficeSecurityAccessor backOfficeSecurityAccessor)
     {
         _packagingService = packagingService;
         _packageDefinitionFactory = packageDefinitionFactory;
+        _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
     }
 
     /// <summary>
@@ -36,7 +40,7 @@ public class CreateCreatedPackageController : CreatedPackageControllerBase
     {
         PackageDefinition packageDefinition = _packageDefinitionFactory.CreatePackageDefinition(packageCreateModel);
 
-        Attempt<PackageDefinition, PackageOperationStatus> result = await _packagingService.CreateCreatedPackageAsync(packageDefinition);
+        Attempt<PackageDefinition, PackageOperationStatus> result = await _packagingService.CreateCreatedPackageAsync(packageDefinition, CurrentUserId(_backOfficeSecurityAccessor));
 
         return result.Success
             ? CreatedAtAction<ByKeyCreatedPackageController>(controller => nameof(controller.ByKey), packageDefinition.PackageId)

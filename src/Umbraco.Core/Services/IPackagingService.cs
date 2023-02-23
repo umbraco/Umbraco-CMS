@@ -78,13 +78,13 @@ public interface IPackagingService : IService
     ///     Creates a new package.
     /// </summary>
     /// <param name="package"><see cref="PackageDefinition" />model for the package to create.</param>
-    Task<Attempt<PackageDefinition, PackageOperationStatus>> CreateCreatedPackageAsync(PackageDefinition package);
+    Task<Attempt<PackageDefinition, PackageOperationStatus>> CreateCreatedPackageAsync(PackageDefinition package, int userId);
 
     /// <summary>
     ///     Updates a created package.
     /// </summary>
     /// <param name="package"><see cref="PackageDefinition" />model for the package to update.</param>
-    Task<Attempt<PackageDefinition, PackageOperationStatus>> UpdateCreatedPackageAsync(PackageDefinition package);
+    Task<Attempt<PackageDefinition, PackageOperationStatus>> UpdateCreatedPackageAsync(PackageDefinition package, int userId);
 
     /// <summary>
     ///     Creates the package file and returns it's physical path

@@ -4,6 +4,7 @@ using Umbraco.Cms.Api.Management.ViewModels.Package;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Packaging;
+using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.OperationStatus;
 
@@ -13,13 +14,16 @@ public class UpdateCreatedPackageController : CreatedPackageControllerBase
 {
     private readonly IPackagingService _packagingService;
     private readonly IUmbracoMapper _umbracoMapper;
+    private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
 
     public UpdateCreatedPackageController(
         IPackagingService packagingService,
-        IUmbracoMapper umbracoMapper)
+        IUmbracoMapper umbracoMapper,
+        IBackOfficeSecurityAccessor backOfficeSecurityAccessor)
     {
         _packagingService = packagingService;
         _umbracoMapper = umbracoMapper;
+        _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
     }
 
     /// <summary>
@@ -44,7 +48,7 @@ public class UpdateCreatedPackageController : CreatedPackageControllerBase
         // Macros are not included!
         PackageDefinition packageDefinition = _umbracoMapper.Map(packageUpdateModel, package);
 
-        Attempt<PackageDefinition, PackageOperationStatus> result = await _packagingService.UpdateCreatedPackageAsync(packageDefinition);
+        Attempt<PackageDefinition, PackageOperationStatus> result = await _packagingService.UpdateCreatedPackageAsync(packageDefinition, CurrentUserId(_backOfficeSecurityAccessor));
 
         return result.Success
             ? Ok()

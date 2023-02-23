@@ -138,7 +138,7 @@ public class PackagingService : IPackagingService
             return Attempt.FailWithStatus<PackageDefinition?, PackageOperationStatus>(PackageOperationStatus.NotFound, null);
         }
 
-        _auditService.Add(AuditType.PackagerUninstall, userId, -1, "Package", $"Created package '{package.Name}' deleted. Package key: {key}");
+        _auditService.Add(AuditType.Delete, userId, -1, "Package", $"Created package '{package.Name}' deleted. Package key: {key}");
         _createdPackages.Delete(package.Id);
 
         return Attempt.SucceedWithStatus<PackageDefinition?, PackageOperationStatus>(PackageOperationStatus.Success, package);
@@ -155,7 +155,7 @@ public class PackagingService : IPackagingService
     public bool SaveCreatedPackage(PackageDefinition definition) => _createdPackages.SavePackage(definition);
 
     /// <inheritdoc/>
-    public async Task<Attempt<PackageDefinition, PackageOperationStatus>> CreateCreatedPackageAsync(PackageDefinition package)
+    public async Task<Attempt<PackageDefinition, PackageOperationStatus>> CreateCreatedPackageAsync(PackageDefinition package, int userId)
     {
         if (_createdPackages.SavePackage(package) == false)
         {
@@ -167,19 +167,21 @@ public class PackagingService : IPackagingService
             return Attempt.FailWithStatus(PackageOperationStatus.DuplicateItemName, package);
         }
 
-        return Attempt.SucceedWithStatus(PackageOperationStatus.Success, package);
+        _auditService.Add(AuditType.New, userId, -1, "Package", $"Created package '{package.Name}' created. Package key: {package.PackageId}");
+        return await Task.FromResult(Attempt.SucceedWithStatus(PackageOperationStatus.Success, package));
 
     }
 
     /// <inheritdoc/>
-    public async Task<Attempt<PackageDefinition, PackageOperationStatus>> UpdateCreatedPackageAsync(PackageDefinition package)
+    public async Task<Attempt<PackageDefinition, PackageOperationStatus>> UpdateCreatedPackageAsync(PackageDefinition package, int userId)
     {
         if (_createdPackages.SavePackage(package) == false)
         {
             return Attempt.FailWithStatus(PackageOperationStatus.NotFound, package);
         }
 
-        return Attempt.SucceedWithStatus(PackageOperationStatus.Success, package);
+        _auditService.Add(AuditType.New, userId, -1, "Package", $"Created package '{package.Name}' updated. Package key: {package.PackageId}");
+        return await Task.FromResult(Attempt.SucceedWithStatus(PackageOperationStatus.Success, package));
     }
 
     public string ExportCreatedPackage(PackageDefinition definition) => _createdPackages.ExportPackage(definition);
@@ -249,7 +251,7 @@ public class PackagingService : IPackagingService
                 return package;
             });
 
-        return installedPackages;
+        return await Task.FromResult(installedPackages);
     }
 
     /// <inheritdoc/>
