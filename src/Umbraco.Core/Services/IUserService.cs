@@ -1,5 +1,7 @@
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Persistence.Querying;
+using Umbraco.Cms.Core.Services.OperationStatus;
+using Umbraco.New.Cms.Core.Models;
 
 namespace Umbraco.Cms.Core.Services;
 
@@ -41,6 +43,13 @@ public interface IUserService : IMembershipUserService
     ///     This is basically facets of UserStates key = state, value = count
     /// </summary>
     IDictionary<UserState, int> GetUserStates();
+
+    /// <summary>
+    /// Gets all users that the requesting user is allowed to see.
+    /// </summary>
+    /// <param name="requestingUserId">The ID of the user requesting the users.</param>
+    /// <returns></returns>
+    Task<Attempt<PagedModel<IUser>?, UserOperationStatus>> GetAllAsync(int requestingUserId, int skip, int take) => throw new NotImplementedException();
 
     /// <summary>
     ///     Get paged users

@@ -1,9 +1,11 @@
 using System.Data.Common;
 using System.Globalization;
 using System.Linq.Expressions;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Notifications;
@@ -13,6 +15,7 @@ using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Extensions;
+using Umbraco.New.Cms.Core.Models;
 using UserProfile = Umbraco.Cms.Core.Models.Membership.UserProfile;
 
 namespace Umbraco.Cms.Core.Services;
@@ -24,6 +27,7 @@ namespace Umbraco.Cms.Core.Services;
 internal class UserService : RepositoryService, IUserService
 {
     private readonly GlobalSettings _globalSettings;
+    private readonly SecuritySettings _securitySettings;
     private readonly ILogger<UserService> _logger;
     private readonly IRuntimeState _runtimeState;
     private readonly IUserGroupRepository _userGroupRepository;
@@ -38,7 +42,9 @@ internal class UserService : RepositoryService, IUserService
         IUserRepository userRepository,
         IUserGroupRepository userGroupRepository,
         IOptions<GlobalSettings> globalSettings,
-        IUserGroupAuthorizationService userGroupAuthorizationService)
+        IUserGroupAuthorizationService userGroupAuthorizationService,
+        IOptions<SecuritySettings> securitySettings
+        )
         : base(provider, loggerFactory, eventMessagesFactory)
     {
         _runtimeState = runtimeState;
@@ -46,7 +52,31 @@ internal class UserService : RepositoryService, IUserService
         _userGroupRepository = userGroupRepository;
         _userGroupAuthorizationService = userGroupAuthorizationService;
         _globalSettings = globalSettings.Value;
+        _securitySettings = securitySettings.Value;
         _logger = loggerFactory.CreateLogger<UserService>();
+    }
+
+    [Obsolete("User constructor that takes SecuritySettings and ISqlContext")]
+    public UserService(
+        ICoreScopeProvider provider,
+        ILoggerFactory loggerFactory,
+        IEventMessagesFactory eventMessagesFactory,
+        IRuntimeState runtimeState,
+        IUserRepository userRepository,
+        IUserGroupRepository userGroupRepository,
+        IOptions<GlobalSettings> globalSettings,
+        IUserGroupAuthorizationService userGroupAuthorizationService)
+        : this(
+            provider,
+            loggerFactory,
+            eventMessagesFactory,
+            runtimeState,
+            userRepository,
+            userGroupRepository,
+            globalSettings,
+            userGroupAuthorizationService,
+            StaticServiceProvider.Instance.GetRequiredService<IOptions<SecuritySettings>>())
+    {
     }
 
     private bool IsUpgrading =>
@@ -625,6 +655,48 @@ internal class UserService : RepositoryService, IUserService
         {
             return _userRepository.GetUserStates();
         }
+    }
+
+    public async Task<Attempt<PagedModel<IUser>?, UserOperationStatus>> GetAllAsync(int requestingUserId, int skip, int take)
+    {
+        IUser? requestingUser = GetById(requestingUserId);
+
+        if (requestingUser is null)
+        {
+            return Attempt.FailWithStatus<PagedModel<IUser>?, UserOperationStatus>(UserOperationStatus.MissingUser, null);
+        }
+
+        // Only admins can see all admins
+        var excludedUserGroups = requestingUser.IsAdmin()
+            ? Array.Empty<string>()
+            : new[] { Constants.Security.AdminGroupAlias };
+
+        // Only the super user can see itself, but we can't use IsSuper in the query, since that cannot be mapped to SQL
+        IQuery<IUser>? noSuperfilter = requestingUser.IsSuper()
+            ? null
+            : Query<IUser>().Where(x => x.Id != Constants.Security.SuperUserId);
+
+        UserState[]? userStates = _securitySettings.HideDisabledUsersInBackOffice
+            ? new[] { UserState.Active, UserState.Invited, UserState.LockedOut, UserState.Inactive }
+            : null;
+
+        PaginationHelper.ConvertSkipTakeToPaging(skip, take, out long pageNumber, out int pageSize);
+
+        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+        IEnumerable<IUser> result = _userRepository.GetPagedResultsByQuery(
+            null,
+            pageNumber,
+            pageSize,
+            out long totalRecords,
+            x => x.Id,
+            excludeUserGroups: excludedUserGroups,
+            filter: noSuperfilter,
+            userState: userStates);
+
+        var pagedResult = new PagedModel<IUser> { Items = result, Total = totalRecords };
+
+        scope.Complete();
+        return Attempt.SucceedWithStatus<PagedModel<IUser>?, UserOperationStatus>(UserOperationStatus.Success, pagedResult);
     }
 
     public IEnumerable<IUser> GetAll(long pageIndex, int pageSize, out long totalRecords, string orderBy, Direction orderDirection, UserState[]? userState = null, string[]? userGroups = null, string? filter = null)
