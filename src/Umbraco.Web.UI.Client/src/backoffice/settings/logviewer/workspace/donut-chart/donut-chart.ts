@@ -201,7 +201,7 @@ export class UmbDonutChartElement extends LitElement {
 		this.detailsBox.classList.add('show');
 	}
 
-	#hideDetailsBox(event: MouseEvent) {
+	#hideDetailsBox() {
 		this.detailsBox.classList.remove('show');
 	}
 

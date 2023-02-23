@@ -1,10 +1,10 @@
 import '../donut-chart';
+import { clamp } from 'lodash-es';
 import { css, html, PropertyValueMap } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { LogLevel, UmbLogViewerWorkspaceContext } from './logviewer-root.context';
 import { UmbLitElement } from '@umbraco-cms/element';
-import { LogLevelModel, PagedLogTemplateModel, SavedLogSearchModel } from '@umbraco-cms/backend-api';
-import { clamp } from 'lodash-es';
+import { PagedLogTemplateModel, SavedLogSearchModel } from '@umbraco-cms/backend-api';
 
 //TODO make uui-input accept min and max values
 @customElement('umb-logviewer-root-workspace')
@@ -228,7 +228,7 @@ export class UmbLogViewerRootWorkspaceElement extends UmbLitElement {
 
 	setLogLevelCount() {
 		this.logLevelCount = this._logLevelCount
-			? Object.entries(this._logLevelCount).filter(([level, number]) => !this._logLevelCountFilter.includes(level))
+			? Object.entries(this._logLevelCount).filter(([level]) => !this._logLevelCountFilter.includes(level))
 			: [];
 	}
 
@@ -267,7 +267,7 @@ export class UmbLogViewerRootWorkspaceElement extends UmbLitElement {
 			: 0;
 	}
 
-	protected willUpdate(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
+	protected willUpdate(_changedProperties: Map<PropertyKey, unknown>): void {
 		if (_changedProperties.has('_logLevelCountFilter')) {
 			this.setLogLevelCount();
 			this._totalLogCount = this._logLevelCount

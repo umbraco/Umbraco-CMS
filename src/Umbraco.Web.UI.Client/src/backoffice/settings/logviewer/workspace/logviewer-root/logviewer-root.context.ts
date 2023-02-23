@@ -1,6 +1,6 @@
 import { UmbLogViewerRepository } from '../data/log-viewer.repository';
 import { createObservablePart, DeepState } from '@umbraco-cms/observable-api';
-import { LogTemplateModel, PagedLogTemplateModel, PagedSavedLogSearchModel } from '@umbraco-cms/backend-api';
+import { PagedLogTemplateModel, PagedSavedLogSearchModel } from '@umbraco-cms/backend-api';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 
 const logLevels = {
