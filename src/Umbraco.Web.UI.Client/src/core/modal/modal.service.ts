@@ -22,7 +22,9 @@ import type { UmbModalMediaPickerData } from './layouts/media-picker/modal-layou
 import type { UmbModalLinkPickerData } from './layouts/link-picker/modal-layout-link-picker.element';
 import { UmbModalHandler } from './modal-handler';
 import type { UmbBasicModalData } from './layouts/basic/modal-layout-basic.element';
+import { UmbPickerModalData } from './layouts/modal-layout-picker-base';
 import { UmbContextToken } from '@umbraco-cms/context-api';
+import { LanguageModel } from '@umbraco-cms/backend-api';
 
 export type UmbModalType = 'dialog' | 'sidebar';
 
