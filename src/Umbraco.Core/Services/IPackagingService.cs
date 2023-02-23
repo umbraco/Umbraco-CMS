@@ -1,8 +1,8 @@
 using System.Xml.Linq;
-using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Packaging;
 using Umbraco.Cms.Core.Packaging;
 using Umbraco.Cms.Core.Services.OperationStatus;
+using Umbraco.New.Cms.Core.Models;
 
 namespace Umbraco.Cms.Core.Services;
 
@@ -33,7 +33,7 @@ public interface IPackagingService : IService
     /// <summary>
     ///     Returns installed packages collected from the package migration plans.
     /// </summary>
-    Task<IEnumerable<InstalledPackage>> GetInstalledPackagesFromMigrationPlansAsync(int skip, int take);
+    Task<PagedModel<InstalledPackage>> GetInstalledPackagesFromMigrationPlansAsync(int skip, int take);
 
     InstalledPackage? GetInstalledPackageByName(string packageName);
 

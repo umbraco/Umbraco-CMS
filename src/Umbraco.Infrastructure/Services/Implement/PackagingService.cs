@@ -11,6 +11,7 @@ using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Packaging;
 using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Extensions;
+using Umbraco.New.Cms.Core.Models;
 using File = System.IO.File;
 
 namespace Umbraco.Cms.Core.Services.Implement;
@@ -192,8 +193,10 @@ public class PackagingService : IPackagingService
     public IEnumerable<InstalledPackage> GetAllInstalledPackages()
     {
         // Collect the packages from the package migration plans
-        var installedPackages = GetInstalledPackagesFromMigrationPlansAsync(0, int.MaxValue).GetAwaiter().GetResult()
-            .ToDictionary(package => package.PackageName!, package => package); // PackageName cannot be null here
+        var installedPackages = GetInstalledPackagesFromMigrationPlansAsync(0, int.MaxValue)
+            .GetAwaiter()
+            .GetResult()
+            .Items.ToDictionary(package => package.PackageName!, package => package); // PackageName cannot be null here
 
         // Collect and merge the packages from the manifests
         foreach (PackageManifest package in _manifestParser.GetManifests())
@@ -224,12 +227,12 @@ public class PackagingService : IPackagingService
     #endregion
 
     /// <inheritdoc/>
-    public async Task<IEnumerable<InstalledPackage>> GetInstalledPackagesFromMigrationPlansAsync(int skip, int take)
+    public async Task<PagedModel<InstalledPackage>> GetInstalledPackagesFromMigrationPlansAsync(int skip, int take)
     {
         IReadOnlyDictionary<string, string?>? keyValues =
             _keyValueService.FindByKeyPrefix(Constants.Conventions.Migrations.KeyValuePrefix);
 
-        IEnumerable<InstalledPackage> installedPackages = _packageMigrationPlans
+        InstalledPackage[] installedPackages = _packageMigrationPlans
             .GroupBy(plan => plan.PackageName)
             .Select(group =>
             {
@@ -249,11 +252,13 @@ public class PackagingService : IPackagingService
                     });
 
                 return package;
-            })
-            .Skip(skip)
-            .Take(take);
+            }).ToArray();
 
-        return await Task.FromResult(installedPackages);
+        return await Task.FromResult(new PagedModel<InstalledPackage>
+        {
+            Total = installedPackages.Count(),
+            Items = installedPackages.Skip(skip).Take(take),
+        });
     }
 
     /// <inheritdoc/>
