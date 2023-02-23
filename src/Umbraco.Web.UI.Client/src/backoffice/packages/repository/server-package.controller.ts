@@ -27,7 +27,7 @@ export class UmbServerPackageController extends UmbController {
 
 		package$.pipe(takeUntil(this.#unobserve)).subscribe((packages) => {
 			// Go through packages and register their extensions
-			packages.forEach((p: any) => {
+			packages.forEach((p) => {
 				const { extensions } = p;
 				if (extensions?.length) {
 					extensions.forEach((extension: any) => {

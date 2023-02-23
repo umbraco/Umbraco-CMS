@@ -2,6 +2,7 @@ import { BehaviorSubject } from 'rxjs';
 import { UmbContextToken } from '@umbraco-cms/context-api';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 import { UmbStoreBase } from '@umbraco-cms/store';
+import type { UmbPackage } from '@umbraco-cms/models';
 
 /**
  * Store for Packages
@@ -13,7 +14,7 @@ export class UmbPackageStore extends UmbStoreBase {
 	 * Array of packages with extensions
 	 * @private
 	 */
-	#data = new BehaviorSubject<any[]>([]); // TODO: Replace with PackageModel
+	#data = new BehaviorSubject<Array<UmbPackage>>([]);
 
 	/**
 	 * Observable of packages with extensions
@@ -29,11 +30,10 @@ export class UmbPackageStore extends UmbStoreBase {
 		super(host, UmbPackageStore.name);
 	}
 
-	// TODO: Add model for packages when available
 	/**
 	 * Append items to the store
 	 */
-	appendItems(packages: Array<any>) {
+	appendItems(packages: Array<UmbPackage>) {
 		this.#data.next(packages);
 	}
 }

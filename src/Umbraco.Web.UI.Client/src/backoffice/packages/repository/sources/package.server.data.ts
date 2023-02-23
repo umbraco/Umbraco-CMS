@@ -14,6 +14,7 @@ export class UmbPackageServerDataSource {
 	 * @memberof UmbPackageServerDataSource
 	 */
 	getRootItems() {
+		// TODO: Use real resource when available
 		return tryExecuteAndNotify(
 			this.host,
 			fetch(umbracoPath('/manifests')).then((res) => res.json())
