@@ -7,12 +7,12 @@ using Umbraco.Cms.Core.Mapping;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Package;
 
-public class AllPackageManifestsController : PackageControllerBase
+public class AllPackageManifestController : PackageControllerBase
 {
     private readonly IPackageManifestService _packageManifestService;
     private readonly IUmbracoMapper _umbracoMapper;
 
-    public AllPackageManifestsController(IPackageManifestService packageManifestService, IUmbracoMapper umbracoMapper)
+    public AllPackageManifestController(IPackageManifestService packageManifestService, IUmbracoMapper umbracoMapper)
     {
         _packageManifestService = packageManifestService;
         _umbracoMapper = umbracoMapper;
