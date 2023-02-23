@@ -44,7 +44,7 @@ export class UmbModalLayoutSearchElement extends LitElement {
 				height: 100%;
 			}
 			#close-icon {
-				padding: 0 var(--uui-size-space-3);
+				padding: 0 var(--uui-size-space-4);
 			}
 			#close-icon > button {
 				background: var(--uui-color-surface-alt);
