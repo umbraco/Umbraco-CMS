@@ -14,7 +14,7 @@ export class UmbDocumentWorkspaceElement extends UmbLitElement implements UmbWor
 		UUITextStyles,
 		css`
 			:host {
-				display: block;
+				display: flex;
 				width: 100%;
 				height: 100%;
 			}
@@ -33,6 +33,7 @@ export class UmbDocumentWorkspaceElement extends UmbLitElement implements UmbWor
 		super();
 		this.observe(this._workspaceContext.activeVariantsInfo, (variants) => {
 			this._workspaceSplitViews = variants;
+			console.log('variants', variants);
 		});
 	}
 
