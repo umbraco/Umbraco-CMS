@@ -82,9 +82,5 @@ public static class UserServiceExtensions
     }
 
     [Obsolete("Use IUserService.Get that takes a Guid instead. Scheduled for removal in V15.")]
-    public static IUser? GetByKey(this IUserService userService, Guid key)
-    {
-        var id = BitConverter.ToInt32(key.ToByteArray(), 0);
-        return userService.GetUserById(id);
-    }
+    public static IUser? GetByKey(this IUserService userService, Guid key) => userService.GetAsync(key).GetAwaiter().GetResult();
 }
