@@ -142,7 +142,7 @@ test.describe('BlockGridEditorRending', () => {
     
     // Assert
     await page.goto("https://localhost:44331");
-    await expect(page).toHaveScreenshot();
+    await expect(page).toHaveScreenshot('Block-grid-editor.png');
   });
 
   test('can render content with a block grid editor with two elements', async ({page, umbracoApi, umbracoUi}) => {
@@ -212,7 +212,7 @@ test.describe('BlockGridEditorRending', () => {
     
     // Assert
     await page.goto("https://localhost:44331");
-    await expect(page).toHaveScreenshot();
+    await expect(page).toHaveScreenshot('Block-grid-editor-with-two-elements.png');
 
     // Clean 
     await umbracoApi.documentTypes.ensureNameNotExists(elementBodyName);
@@ -293,7 +293,7 @@ test.describe('BlockGridEditorRending', () => {
       
       // Assert
       await page.goto("https://localhost:44331");
-      await expect(page).toHaveScreenshot();
+      await expect(page).toHaveScreenshot('Block-grid-editor-with-area.png');
       
       // Clean 
       await umbracoApi.documentTypes.ensureNameNotExists(elementBodyName);
@@ -394,7 +394,7 @@ test.describe('BlockGridEditorRending', () => {
       
       // Assert
       await page.goto("https://localhost:44331");
-      await expect(page).toHaveScreenshot();
+      await expect(page).toHaveScreenshot('Block-grid-editor-with-multiple-areas.png');
 
       // Clean
       await umbracoApi.documentTypes.ensureNameNotExists(elementBodyName);
@@ -502,7 +502,7 @@ test.describe('BlockGridEditorRending', () => {
 
       // Assert
       await page.goto("https://localhost:44331");
-      await expect(page).toHaveScreenshot();
+      await expect(page).toHaveScreenshot('Block-grid-editor-with-area-with-area.png');
 
       // Clean
       await umbracoApi.documentTypes.ensureNameNotExists(elementBodyName);
@@ -577,7 +577,7 @@ test.describe('BlockGridEditorRending', () => {
 
       // Assert
       await page.goto("https://localhost:44331");
-      await expect(page).toHaveScreenshot();
+      await expect(page).toHaveScreenshot('Block-grid-editor-with-custom-stylesheet.png');
 
       // Clean
       await umbracoApi.media.ensureNameNotExists(stylesheetName);
@@ -693,7 +693,7 @@ test.describe('BlockGridEditorRending', () => {
 
       // Assert
       await page.goto("https://localhost:44331");
-      await expect(page).toHaveScreenshot();
+      await expect(page).toHaveScreenshot('Block-grid-editor-with-two-custom-stylesheets.png');
       
       // Clean
       await umbracoApi.documentTypes.ensureNameNotExists(elementBodyName);
@@ -782,7 +782,7 @@ test.describe('BlockGridEditorRending', () => {
       
       // Assert
       await page.goto("https://localhost:44331");
-      await expect(page).toHaveScreenshot();
+      await expect(page).toHaveScreenshot('Block-grid-editor-with-image.png');
       
       // Clean 
       await umbracoApi.media.ensureNameNotExists(imageName);
