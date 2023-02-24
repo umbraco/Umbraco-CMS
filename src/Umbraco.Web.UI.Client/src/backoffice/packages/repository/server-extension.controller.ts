@@ -3,12 +3,12 @@ import { UmbPackageRepository } from './package.repository';
 import { UmbController, UmbControllerHostInterface } from '@umbraco-cms/controller';
 import { isManifestJSType, UmbExtensionRegistry } from '@umbraco-cms/extensions-api';
 
-export class UmbServerPackageController extends UmbController {
+export class UmbServerExtensionController extends UmbController {
 	#unobserve = new Subject<void>();
 	#repository: UmbPackageRepository;
 
 	constructor(host: UmbControllerHostInterface, private readonly extensionRegistry: UmbExtensionRegistry) {
-		super(host, UmbServerPackageController.name);
+		super(host, UmbServerExtensionController.name);
 
 		this.#repository = new UmbPackageRepository(host);
 	}
