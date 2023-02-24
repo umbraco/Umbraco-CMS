@@ -158,7 +158,16 @@ public class ComponentTests
                 {
                     return Mock.Of<ILogger<ComponentCollection>>();
                 }
+                
+                if (type == typeof(ILogger<ComponentCollection>))
+                {
+                    return Mock.Of<ILogger<ComponentCollection>>();
+                }
 
+                if (type == typeof(IServiceProviderIsService))
+                {
+                    return Mock.Of<IServiceProviderIsService>();
+                }
                 throw new NotSupportedException(type.FullName);
             });
         });
@@ -315,6 +324,11 @@ public class ComponentTests
                 if (type == typeof(ILogger<ComponentCollection>))
                 {
                     return Mock.Of<ILogger<ComponentCollection>>();
+                }
+                
+                if (type == typeof(IServiceProviderIsService))
+                {
+                    return Mock.Of<IServiceProviderIsService>();
                 }
 
                 throw new NotSupportedException(type.FullName);

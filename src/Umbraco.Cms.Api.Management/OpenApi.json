@@ -489,7 +489,7 @@
         ],
         "operationId": "PostDictionaryUpload",
         "requestBody": {
-          "content": {}
+          "content": { }
         },
         "responses": {
           "200": {
@@ -5318,7 +5318,7 @@
           },
           "providerProperties": {
             "type": "object",
-            "additionalProperties": {},
+            "additionalProperties": { },
             "nullable": true
           }
         },
@@ -5478,8 +5478,8 @@
       },
       "MethodAttributes": {
         "enum": [
-          "ReuseSlot",
           "PrivateScope",
+          "ReuseSlot",
           "Private",
           "FamANDAssem",
           "Assembly",
@@ -5644,10 +5644,10 @@
           "Managed",
           "Native",
           "OPTIL",
-          "Runtime",
           "CodeTypeMask",
-          "Unmanaged",
+          "Runtime",
           "ManagedMask",
+          "Unmanaged",
           "NoInlining",
           "ForwardRef",
           "Synchronized",
@@ -6464,7 +6464,7 @@
             "nullable": true
           }
         },
-        "additionalProperties": {}
+        "additionalProperties": { }
       },
       "ProfilingStatus": {
         "type": "object",
@@ -6717,12 +6717,12 @@
       },
       "RuntimeLevel": {
         "enum": [
+          "BootFailed",
           "Unknown",
           "Boot",
           "Install",
           "Upgrade",
-          "Run",
-          "BootFailed"
+          "Run"
         ],
         "type": "integer",
         "format": "int32"
@@ -7144,8 +7144,8 @@
           "NestedFamily",
           "NestedAssembly",
           "NestedFamANDAssem",
-          "NestedFamORAssem",
           "VisibilityMask",
+          "NestedFamORAssem",
           "SequentialLayout",
           "ExplicitLayout",
           "LayoutMask",
@@ -7160,8 +7160,8 @@
           "WindowsRuntime",
           "UnicodeClass",
           "AutoClass",
-          "CustomFormatClass",
           "StringFormatMask",
+          "CustomFormatClass",
           "HasSecurity",
           "ReservedMask",
           "BeforeFieldInit",
@@ -7630,7 +7630,7 @@
           "authorizationCode": {
             "authorizationUrl": "/umbraco/management/api/v1.0/security/back-office/authorize",
             "tokenUrl": "/umbraco/management/api/v1.0/security/back-office/token",
-            "scopes": {}
+            "scopes": { }
           }
         }
       }
@@ -7638,7 +7638,7 @@
   },
   "security": [
     {
-      "OAuth": []
+      "OAuth": [ ]
     }
   ]
 }
