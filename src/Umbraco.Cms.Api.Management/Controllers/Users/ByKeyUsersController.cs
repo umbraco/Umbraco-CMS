@@ -7,12 +7,12 @@ using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Users;
 
-public class ByKeyUserController : UsersControllerBase
+public class ByKeyUsersController : UsersControllerBase
 {
     private readonly IUserService _userService;
     private readonly IUserPresentationFactory _userPresentationFactory;
 
-    public ByKeyUserController(
+    public ByKeyUsersController(
         IUserService userService,
         IUserPresentationFactory userPresentationFactory)
     {
