@@ -10,8 +10,8 @@ import type { UmbWorkspaceViewMemberGroupInfoElement } from './workspace-view-me
 
 export default {
 	title: 'Workspaces/Data Type/Views/Info',
-	component: 'umb-workspace-view-data-type-info',
-	id: 'umb-workspace-view-data-type-info',
+	component: 'umb-workspace-view-member-group-info',
+	id: 'umb-workspace-view-member-group-info',
 	decorators: [
 		(story) => {
 			return html`TODO: make use of mocked workspace context??`;
