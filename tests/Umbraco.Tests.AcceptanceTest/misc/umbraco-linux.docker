@@ -2,7 +2,7 @@
 ## Build
 ############################################
 
-FROM mcr.microsoft.com/dotnet/nightly/sdk:.0 AS build
+FROM mcr.microsoft.com/dotnet/nightly/sdk:8.0 AS build
 
 COPY nuget.config .
 
