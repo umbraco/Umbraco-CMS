@@ -6,7 +6,7 @@ using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Infrastructure.Examine;
 
-public class ContentApiIndex : UmbracoExamineIndex
+public class ContentApiIndex : UmbracoExamineIndex, IUmbracoContentIndex
 {
     public ContentApiIndex(
         ILoggerFactory loggerFactory,

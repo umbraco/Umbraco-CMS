@@ -8,12 +8,12 @@ namespace Umbraco.Cms.Infrastructure.Examine;
 public class ContentApiIndexPopulator : IndexPopulator<IUmbracoContentIndex>
 {
     private readonly IContentService _contentService;
-    private readonly ContentApiValueSetBuilder _contentApiValueSetBuilder;
+    private readonly IValueSetBuilder<IContent> _valueSetBuilder;
 
-    public ContentApiIndexPopulator(IContentService contentService, ContentApiValueSetBuilder contentApiValueSetBuilder)
+    public ContentApiIndexPopulator(IContentService contentService, IValueSetBuilder<IContent> valueSetBuilder)
     {
         _contentService = contentService;
-        _contentApiValueSetBuilder = contentApiValueSetBuilder;
+        _valueSetBuilder = valueSetBuilder;
         RegisterIndex(Constants.UmbracoIndexes.ContentAPIIndexName);
     }
 
@@ -23,11 +23,11 @@ public class ContentApiIndexPopulator : IndexPopulator<IUmbracoContentIndex>
         {
             IEnumerable<IContent> rootNodes = _contentService.GetRootContent();
 
-            index.IndexItems(_contentApiValueSetBuilder.GetValueSets(rootNodes.ToArray()));
+            index.IndexItems(_valueSetBuilder.GetValueSets(rootNodes.ToArray()));
 
             foreach (IContent root in rootNodes)
             {
-                IEnumerable<ValueSet> valueSets = _contentApiValueSetBuilder.GetValueSets(
+                IEnumerable<ValueSet> valueSets = _valueSetBuilder.GetValueSets(
                     _contentService.GetPagedDescendants(root.Id, 0, int.MaxValue, out _).ToArray());
 
                 index.IndexItems(valueSets);
