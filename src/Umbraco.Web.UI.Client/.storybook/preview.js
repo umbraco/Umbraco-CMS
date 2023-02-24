@@ -91,7 +91,7 @@ export const parameters = {
 		storySort: {
 			method: 'alphabetical',
 			includeNames: true,
-			order: ['Guides', ['Getting started'], '*'],
+			order: ['Guides', ['Getting Started'], '*'],
 		},
 	},
 	actions: { argTypesRegex: '^on.*' },

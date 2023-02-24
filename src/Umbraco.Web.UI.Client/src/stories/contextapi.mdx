@@ -1,6 +1,7 @@
-import { Meta } from '@storybook/addon-docs';
+import { Meta } from '@storybook/blocks';
 
-<Meta title="Guides/Context API" parameters={{ previewTabs: { canvas: { hidden: true } } }} />
+<Meta title="Guides/Context API" />
+
 
 # Context API
 
@@ -14,31 +15,31 @@ The methods are (*note this can be out of date, we need to look into how we can 
 ### Consume a Context API.
 
 From a Umbraco Element:
-````
+```typescript
 this.consumeContext('requestThisContextAlias', (context) => {
 	// Notice this is a subscription, as context might change or a new one appears.
 	console.log("I've got the context", context);
 });
-````
+```
 
 Or with a Controller using a Controller Host(Umbraco Element):
 
-````
+```typescript
 new UmbContextConsumerController(hostElement, 'requestThisContextAlias', (context) => {
 	// Notice this is a subscription, as context might change or a new one appears.
 	console.log("I've got the context", context);
 });
-````
+```
 
 ### Provide a Context API.
 
 From a Umbraco Element:
-````
+```typescript
 this.provideContext('myContextAlias', new MyContextApi());
-````
+```
 
 Or with a Controller using a Controller Host(Umbraco Element):
 
-````
+```typescript
 new UmbContextProviderController(hostElement, 'myContextAlias', new MyContextApi());
-````
+```
