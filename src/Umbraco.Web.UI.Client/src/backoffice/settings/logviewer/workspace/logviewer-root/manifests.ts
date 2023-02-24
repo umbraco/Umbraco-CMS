@@ -17,7 +17,7 @@ const workspaceViews: Array<ManifestWorkspaceView> = [
 		type: 'workspaceView',
 		alias: 'Umb.WorkspaceView.Logviewer.Overview',
 		name: 'LogViewer Root Workspace Overview View',
-		loader: () => import('../log-search/log-search.elements.copy'),
+		loader: () => import('../views/log-overview.element'),
 		weight: 300,
 		meta: {
 			workspaces: [workspaceAlias],
@@ -30,7 +30,7 @@ const workspaceViews: Array<ManifestWorkspaceView> = [
 		type: 'workspaceView',
 		alias: 'Umb.WorkspaceView.Logviewer.Search',
 		name: 'LogViewer Root Workspace Search View',
-		loader: () => import('../log-search/log-search.elements'),
+		loader: () => import('../views/log-search.element'),
 		weight: 200,
 		meta: {
 			workspaces: [workspaceAlias],

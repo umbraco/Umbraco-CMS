@@ -1,12 +1,10 @@
-import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
-import { UmbLitElement } from '@umbraco-cms/element';
-import { UmbRouterSlotInitEvent } from '@umbraco-cms/router';
-import { SavedLogSearchModel, PagedLogTemplateModel } from '@umbraco-cms/backend-api';
 import { clamp } from 'lodash-es';
 import { LogLevel } from 'vite';
 import { UmbLogViewerWorkspaceContext } from '../logviewer-root/logviewer-root.context';
+import { SavedLogSearchModel, PagedLogTemplateModel } from '@umbraco-cms/backend-api';
+import { UmbLitElement } from '@umbraco-cms/element';
 
 @customElement('umb-log-search-workspace-overview')
 export class UmbLogSearchWorkspaceElement extends UmbLitElement {
@@ -222,7 +220,7 @@ export class UmbLogSearchWorkspaceElement extends UmbLitElement {
 
 	setLogLevelCount() {
 		this.logLevelCount = this._logLevelCount
-			? Object.entries(this._logLevelCount).filter(([level]) => !this._logLevelCountFilter.includes(level))
+			? Object.entries(this._logLevelCount).filter(([level, number]) => !this._logLevelCountFilter.includes(level))
 			: [];
 	}
 
@@ -291,7 +289,7 @@ export class UmbLogSearchWorkspaceElement extends UmbLitElement {
 			<uui-button
 				label="${searchListItem.name}"
 				title="${searchListItem.name}"
-				href=${'/section/settings/logviewer/search'}
+				href=${'/section/settings/logviewer/search' + searchListItem.query}
 				><uui-icon name="umb:search"></uui-icon>${searchListItem.name}</uui-button
 			>
 		</li>`;
