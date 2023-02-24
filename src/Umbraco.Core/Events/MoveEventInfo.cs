@@ -22,7 +22,7 @@ public class MoveEventInfo<TEntity> : MoveEventInfoBase<TEntity>
 
     public override bool Equals(object? obj) => Equals((MoveEventInfo<TEntity>?)obj) && base.Equals(obj);
 
-    private bool Equals(MoveEventInfo<TEntity>? other) => NewParentId == other?.NewParentId && NewParentKey == other.NewParentKey;
+    public bool Equals(MoveEventInfo<TEntity>? other) => NewParentId == other?.NewParentId && NewParentKey == other.NewParentKey && base.Equals(other);
 
     public override int GetHashCode()
     {
