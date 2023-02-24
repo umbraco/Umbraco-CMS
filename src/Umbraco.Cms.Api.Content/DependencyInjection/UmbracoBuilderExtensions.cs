@@ -19,6 +19,7 @@ public static class UmbracoBuilderExtensions
         builder.Services.AddScoped<IStartNodeService, StartNodeService>();
         builder.Services.AddScoped<IOutputExpansionStrategy, RequestContextOutputExpansionStrategy>();
         builder.Services.AddSingleton<IOutputExpansionStrategyAccessor, RequestContextOutputExpansionStrategyAccessor>();
+        builder.Services.AddSingleton<IApiQueryService, ApiQueryService>();
 
         builder
             .Services

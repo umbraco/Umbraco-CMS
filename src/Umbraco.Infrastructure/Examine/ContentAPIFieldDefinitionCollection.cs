@@ -2,7 +2,7 @@ using Examine;
 
 namespace Umbraco.Cms.Infrastructure.Examine;
 
-public class ContentAPIFieldDefinitionCollection : FieldDefinitionCollection
+public class ContentApiFieldDefinitionCollection : FieldDefinitionCollection
 {
     public static readonly FieldDefinition[] ContentDeliveryAPIIndexFieldDefinitions =
 {
@@ -11,7 +11,7 @@ public class ContentAPIFieldDefinitionCollection : FieldDefinitionCollection
         new("ancestorKeys", FieldDefinitionTypes.Raw)
     };
 
-    public ContentAPIFieldDefinitionCollection()
+    public ContentApiFieldDefinitionCollection()
     : base(ContentDeliveryAPIIndexFieldDefinitions)
     {
     }

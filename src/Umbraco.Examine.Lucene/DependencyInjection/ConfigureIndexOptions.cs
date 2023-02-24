@@ -46,7 +46,7 @@ public sealed class ConfigureIndexOptions : IConfigureNamedOptions<LuceneDirecto
                 break;
             case Constants.UmbracoIndexes.ContentAPIIndexName:
                 options.Analyzer = new StandardAnalyzer(LuceneInfo.CurrentVersion);
-                options.FieldDefinitions = new ContentAPIFieldDefinitionCollection();
+                options.FieldDefinitions = new ContentApiFieldDefinitionCollection();
                 break;
         }
 
