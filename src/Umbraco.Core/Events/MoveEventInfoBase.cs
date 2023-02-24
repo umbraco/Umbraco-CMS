@@ -32,10 +32,7 @@ public abstract class MoveEventInfoBase<TEntity> : IEquatable<MoveEventInfoBase<
         return EqualityComparer<TEntity>.Default.Equals(Entity, other.Entity) && OriginalPath == other.OriginalPath;
     }
 
-    public override bool Equals(object? obj)
-    {
-        return Equals((MoveEventInfoBase<TEntity>?) obj);
-    }
+    public override bool Equals(object? obj) => Equals((MoveEventInfoBase<TEntity>?) obj);
 
     public override int GetHashCode() => HashCode.Combine(Entity, OriginalPath);
 }
