@@ -688,7 +688,7 @@ internal class UserService : RepositoryService, IUserService
             pageNumber,
             pageSize,
             out long totalRecords,
-            x => x.Id,
+            x => x.Username,
             excludeUserGroups: excludedUserGroups,
             filter: noSuperFilter,
             userState: userStates);
