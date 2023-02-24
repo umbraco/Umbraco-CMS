@@ -2,6 +2,7 @@ import {AliasHelper, ConstantHelper, test} from "@umbraco/playwright-testhelpers
 import {ContentBuilder, DocumentTypeBuilder, PartialViewBuilder,} from "@umbraco/json-models-builders";
 import {expect} from "@playwright/test";
 import {BlockGridDataTypeBuilder} from "@umbraco/json-models-builders/dist/lib/builders/dataTypes";
+import {umbracoConfig} from "@umbraco/playwright-testhelpers/dist/umbraco.config";
 
 test.describe('BlockGridEditorRending', () => {
   const documentName = 'DocumentTest';
@@ -141,7 +142,7 @@ test.describe('BlockGridEditorRending', () => {
     await umbracoApi.content.save(rootContentNode);
     
     // Assert
-    await page.goto("https://localhost:44331");
+    await page.goto(umbracoConfig.environment.baseUrl);
     await expect(page).toHaveScreenshot('Block-grid-editor.png');
   });
 
@@ -211,7 +212,7 @@ test.describe('BlockGridEditorRending', () => {
     await umbracoApi.content.save(rootContentNode);
     
     // Assert
-    await page.goto("https://localhost:44331");
+    await page.goto(umbracoConfig.environment.baseUrl);
     await expect(page).toHaveScreenshot('Block-grid-editor-with-two-elements.png');
 
     // Clean 
@@ -292,7 +293,7 @@ test.describe('BlockGridEditorRending', () => {
       await umbracoApi.content.save(rootContentNode);
       
       // Assert
-      await page.goto("https://localhost:44331");
+      await page.goto(umbracoConfig.environment.baseUrl);
       await expect(page).toHaveScreenshot('Block-grid-editor-with-area.png');
       
       // Clean 
@@ -393,7 +394,7 @@ test.describe('BlockGridEditorRending', () => {
       await umbracoApi.content.save(rootContentNode);
       
       // Assert
-      await page.goto("https://localhost:44331");
+      await page.goto(umbracoConfig.environment.baseUrl);
       await expect(page).toHaveScreenshot('Block-grid-editor-with-multiple-areas.png');
 
       // Clean
@@ -501,7 +502,7 @@ test.describe('BlockGridEditorRending', () => {
       await umbracoApi.content.save(rootContentNode);
 
       // Assert
-      await page.goto("https://localhost:44331");
+      await page.goto(umbracoConfig.environment.baseUrl);
       await expect(page).toHaveScreenshot('Block-grid-editor-with-area-with-area.png');
 
       // Clean
@@ -576,7 +577,7 @@ test.describe('BlockGridEditorRending', () => {
       await umbracoApi.content.save(rootContentNode);
 
       // Assert
-      await page.goto("https://localhost:44331");
+      await page.goto(umbracoConfig.environment.baseUrl);
       await expect(page).toHaveScreenshot('Block-grid-editor-with-custom-stylesheet.png');
 
       // Clean
@@ -692,7 +693,7 @@ test.describe('BlockGridEditorRending', () => {
       await umbracoApi.content.save(rootContentNode);
 
       // Assert
-      await page.goto("https://localhost:44331");
+      await page.goto(umbracoConfig.environment.baseUrl);
       await expect(page).toHaveScreenshot('Block-grid-editor-with-two-custom-stylesheets.png');
       
       // Clean
@@ -781,7 +782,7 @@ test.describe('BlockGridEditorRending', () => {
       await umbracoApi.content.save(rootContentNode);
       
       // Assert
-      await page.goto("https://localhost:44331");
+      await page.goto(umbracoConfig.environment.baseUrl);
       await expect(page).toHaveScreenshot('Block-grid-editor-with-image.png');
       
       // Clean 
