@@ -34,13 +34,13 @@ export class UmbPackageRepository {
 			return;
 		}
 
-		const { data } = await this.#packageSource.getRootItems();
+		const { data: packages } = await this.#packageSource.getRootItems();
 
-		if (data) {
-			store.appendItems(data.items);
+		if (packages) {
+			store.appendItems(packages);
 			const extensions: ManifestBase[] = [];
 
-			data.items.forEach((p) => {
+			packages.forEach((p) => {
 				p.extensions?.forEach((e) => {
 					// Crudely validate that the extension at least follows a basic manifest structure
 					// Idea: Use `Zod` to validate the manifest

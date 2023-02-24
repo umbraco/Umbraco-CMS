@@ -14,7 +14,7 @@ export class UmbPackageServerDataSource {
 	 * Get the root items from the server
 	 * @memberof UmbPackageServerDataSource
 	 */
-	getRootItems(): Promise<DataSourceResponse<{ items: UmbPackage[] }>> {
+	getRootItems(): Promise<DataSourceResponse<UmbPackage[]>> {
 		// TODO: Use real resource when available
 		return tryExecuteAndNotify(
 			this.host,
