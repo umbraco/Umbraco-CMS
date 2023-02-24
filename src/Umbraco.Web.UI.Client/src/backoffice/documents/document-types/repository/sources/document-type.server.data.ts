@@ -80,7 +80,7 @@ export class UmbDocumentTypeServerDataSource implements RepositoryDetailDataSour
 		// TODO: use resources when end point is ready:
 		return tryExecuteAndNotify<DocumentTypeModel>(
 			this.#host,
-			fetch('/umbraco/management/api/v1/document/save', {
+			fetch('/umbraco/management/api/v1/document-type', {
 				method: 'POST',
 				body: body,
 				headers: {
@@ -116,8 +116,8 @@ export class UmbDocumentTypeServerDataSource implements RepositoryDetailDataSour
 		// TODO: use resources when end point is ready:
 		return tryExecuteAndNotify<DocumentTypeModel>(
 			this.#host,
-			fetch('/umbraco/management/api/v1/document-type/save', {
-				method: 'POST',
+			fetch(`/umbraco/management/api/v1/document-type/${document.key}`, {
+				method: 'PUT',
 				body: body,
 				headers: {
 					'Content-Type': 'application/json',
@@ -141,8 +141,8 @@ export class UmbDocumentTypeServerDataSource implements RepositoryDetailDataSour
 		// TODO: use resources when end point is ready:
 		return tryExecuteAndNotify<DocumentTypeModel>(
 			this.#host,
-			fetch('/umbraco/management/api/v1/document-type/trash', {
-				method: 'POST',
+			fetch(`/umbraco/management/api/v1/document-type/${key}`, {
+				method: 'DELETE',
 				body: JSON.stringify([key]),
 				headers: {
 					'Content-Type': 'application/json',

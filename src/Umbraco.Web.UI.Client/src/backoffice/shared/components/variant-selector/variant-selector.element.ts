@@ -2,9 +2,11 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html, nothing } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { UUIInputElement, UUIInputEvent } from '@umbraco-ui/uui';
-import type { UmbWorkspaceEntityContextInterface } from '../workspace/workspace-context/workspace-entity-context.interface';
+import { ifDefined } from 'lit-html/directives/if-defined.js';
+import { UmbWorkspaceVariantContext } from '../workspace/workspace-variant/workspace-variant.context';
+import { UmbDocumentWorkspaceContext } from '../../../documents/documents/workspace/document-workspace.context';
 import { UmbLitElement } from '@umbraco-cms/element';
-import type { ContentTreeItemModel } from '@umbraco-cms/backend-api';
+import type { DocumentVariantModel } from '@umbraco-cms/backend-api';
 
 @customElement('umb-variant-selector')
 export class UmbVariantSelectorElement extends UmbLitElement {
@@ -40,33 +42,87 @@ export class UmbVariantSelectorElement extends UmbLitElement {
 	@property()
 	alias!: string;
 
-	// TODO: use a more specific type here, something with variants.
 	@state()
-	_content?: ContentTreeItemModel;
+	_variants: Array<DocumentVariantModel> = [];
 
-	private _workspaceContext?: UmbWorkspaceEntityContextInterface<ContentTreeItemModel>;
+	private _workspaceContext?: UmbDocumentWorkspaceContext;
+	private _variantContext?: UmbWorkspaceVariantContext;
+
+	@state()
+	private _name?: string;
+
+	private _culture?: string | null;
+	private _segment?: string | null;
+
+	@state()
+	private _variantDisplayName?: string;
+
+	@state()
+	private _variantTitleName?: string;
+
+	// TODO: make adapt to backoffice locale.
+	private _cultureNames = new Intl.DisplayNames('en', { type: 'language' });
 
 	constructor() {
 		super();
 
 		// TODO: Figure out how to get the magic string for the workspace context.
-		this.consumeContext<UmbWorkspaceEntityContextInterface<ContentTreeItemModel>>('umbWorkspaceContext', (instance) => {
+		this.consumeContext<UmbDocumentWorkspaceContext>('umbWorkspaceContext', (instance) => {
 			this._workspaceContext = instance;
-			this._observeWorkspace();
+			this._observeVariants();
+		});
+
+		this.consumeContext<UmbWorkspaceVariantContext>('umbWorkspaceVariantContext', (instance) => {
+			this._variantContext = instance;
+			this._observeVariantContext();
 		});
 	}
 
-	private async _observeWorkspace() {
+	private async _observeVariants() {
 		if (!this._workspaceContext) return;
 
-		/*
-		// TODO: update this with nre repository and document types.
-		this.observe(this._workspaceContext.data, (data) => {
-			if(data) {
-				this._content = data;
+		this.observe(this._workspaceContext.variants, (variants) => {
+			if (variants) {
+				this._variants = variants;
 			}
 		});
-		*/
+	}
+
+	private async _observeVariantContext() {
+		if (!this._variantContext) return;
+
+		this.observe(
+			this._variantContext.name,
+			(name) => {
+				this._name = name;
+			},
+			'_name'
+		);
+		this.observe(
+			this._variantContext.culture,
+			(culture) => {
+				this._culture = culture;
+				this.updateVariantDisplayName();
+			},
+			'_culture'
+		);
+		this.observe(
+			this._variantContext.segment,
+			(segment) => {
+				this._segment = segment;
+				this.updateVariantDisplayName();
+			},
+			'_segment'
+		);
+	}
+
+	private updateVariantDisplayName() {
+		if (!this._culture && !this._segment) return;
+		this._variantTitleName =
+			(this._culture ? this._cultureNames.of(this._culture) + ` (${this._culture})` : '') +
+			(this._segment ? ' — ' + this._segment : '');
+		this._variantDisplayName =
+			(this._culture ? this._cultureNames.of(this._culture) : '') + (this._segment ? ' — ' + this._segment : '');
 	}
 
 	// TODO. find a way where we don't have to do this for all workspaces.
@@ -76,7 +132,7 @@ export class UmbVariantSelectorElement extends UmbLitElement {
 
 			if (typeof target?.value === 'string') {
 				// TODO: create a setName method on EntityWorkspace:
-				//this._workspaceContext?.update({ name: target.value });
+				this._variantContext?.setName(target.value);
 			}
 		}
 	}
@@ -92,16 +148,24 @@ export class UmbVariantSelectorElement extends UmbLitElement {
 		this._variantSelectorIsOpen = false;
 	}
 
+	private _switchVariant(variant: DocumentVariantModel) {
+		if (variant.culture === undefined || variant.segment === undefined) return;
+		this._variantContext?.changeVariant(variant.culture, variant.segment);
+		this._variantSelectorIsOpen = false;
+	}
+
 	render() {
 		return html`
-			<uui-input id="name-input" .value=${this._content?.name} @input="${this._handleInput}">
-				<!-- Implement Variant Selector -->
+			<uui-input id="name-input" .value=${this._name} @input="${this._handleInput}">
 				${
-					this._content && (this._content as any).variants?.length > 0
+					this._variants && this._variants.length > 0
 						? html`
 								<div slot="append">
-									<uui-button id="variant-selector-toggle" @click=${this._toggleVariantSelector}>
-										English (United States)
+									<uui-button
+										id="variant-selector-toggle"
+										@click=${this._toggleVariantSelector}
+										title=${ifDefined(this._variantTitleName)}>
+										${this._variantDisplayName}
 										<uui-caret></uui-caret>
 									</uui-button>
 								</div>
@@ -111,14 +175,21 @@ export class UmbVariantSelectorElement extends UmbLitElement {
 			</uui-input>
 
 			${
-				this._content && (this._content as any).variants?.length > 0
+				this._variants && this._variants.length > 0
 					? html`
 							<uui-popover id="variant-selector-popover" .open=${this._variantSelectorIsOpen} @close=${this._close}>
 								<div id="variant-selector-dropdown" slot="popover">
 									<uui-scroll-container>
-										<ul>
-											<li>Implement variants</li>
-										</ul>
+										${this._variants.map(
+											(variant) =>
+												html`<ul>
+													<li>
+														<uui-button @click=${() => this._switchVariant(variant)}>
+															${variant.name} ${variant.culture} ${variant.segment}
+														</uui-button>
+													</li>
+												</ul>`
+										)}
 									</uui-scroll-container>
 								</div>
 							</uui-popover>

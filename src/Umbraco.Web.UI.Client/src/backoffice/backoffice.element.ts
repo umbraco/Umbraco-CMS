@@ -39,9 +39,9 @@ import { UmbTemplateTreeStore } from './templating/templates/tree/data/template.
 import { UmbTemplateDetailStore } from './templating/templates/workspace/data/template.detail.store';
 import { UmbThemeContext } from './themes/theme.context';
 import { UmbLanguageStore } from './settings/languages/repository/language.store';
+import { UMB_APP_LANGUAGE_CONTEXT_TOKEN, UmbAppLanguageContext } from './settings/languages/app-language.context';
 import { UmbNotificationService, UMB_NOTIFICATION_SERVICE_CONTEXT_TOKEN } from '@umbraco-cms/notification';
 import { UmbLitElement } from '@umbraco-cms/element';
-import { UMB_APP_LANGUAGE_CONTEXT_TOKEN, UmbAppLanguageContext } from './settings/languages/app-language.context';
 
 import '@umbraco-cms/router';
 

@@ -69,10 +69,10 @@ export class RedirectManagementResource {
      * @throws ApiError
      */
     public static deleteRedirectManagementByKey({
-key,
-}: {
-key: string,
-}): CancelablePromise<any> {
+        key,
+    }: {
+        key: string,
+    }): CancelablePromise<any> {
         return __request(OpenAPI, {
             method: 'DELETE',
             url: '/umbraco/management/api/v1/redirect-management/{key}',

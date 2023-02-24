@@ -7,215 +7,6 @@ import {
 	PagedDocumentTreeItemModel,
 } from '@umbraco-cms/backend-api';
 
-/*
-
-{
-		name: 'All Property Editors',
-		type: 'document',
-		icon: 'favorite',
-		hasChildren: false,
-		key: '6f31e382-458c-4f96-97ea-cc26c41009d4',
-		isContainer: false,
-		parentKey: null,
-		noAccess: false,
-		isProtected: false,
-		isPublished: false,
-		isEdited: false,
-		isTrashed: false,
-		properties: [
-			{
-				alias: 'colorPicker',
-				label: 'Color Picker',
-				description: '',
-				dataTypeKey: 'dt-colorPicker',
-			},
-			{
-				alias: 'contentPicker',
-				label: 'Content Picker',
-				description: '',
-				dataTypeKey: 'dt-contentPicker',
-			},
-			{
-				alias: 'eyeDropper',
-				label: 'Eye Dropper',
-				description: '',
-				dataTypeKey: 'dt-eyeDropper',
-			},
-			{
-				alias: 'multiUrlPicker',
-				label: 'Multi URL Picker',
-				description: '',
-				dataTypeKey: 'dt-multiUrlPicker',
-			},
-			{
-				alias: 'multiNodeTreePicker',
-				label: 'Multi Node Tree Picker',
-				description: '',
-				dataTypeKey: 'dt-multiNodeTreePicker',
-			},
-			{
-				alias: 'datePicker',
-				label: 'Date Picker',
-				description: '',
-				dataTypeKey: 'dt-datePicker',
-			},
-			{
-				alias: 'email',
-				label: 'Email',
-				description: '',
-				dataTypeKey: 'dt-email',
-			},
-			{
-				alias: 'textBox',
-				label: 'Text Box',
-				description: '',
-				dataTypeKey: 'dt-textBox',
-			},
-			{
-				alias: 'dropdown',
-				label: 'Dropdown',
-				description: '',
-				dataTypeKey: 'dt-dropdown',
-			},
-			{
-				alias: 'textArea',
-				label: 'Text Area',
-				description: '',
-				dataTypeKey: 'dt-textArea',
-			},
-			{
-				alias: 'slider',
-				label: 'Slider',
-				description: '',
-				dataTypeKey: 'dt-slider',
-			},
-			{
-				alias: 'toggle',
-				label: 'Toggle',
-				description: '',
-				dataTypeKey: 'dt-toggle',
-			},
-			{
-				alias: 'tags',
-				label: 'Tags',
-				description: '',
-				dataTypeKey: 'dt-tags',
-			},
-			{
-				alias: 'markdownEditor',
-				label: 'MarkdownEditor',
-				description: '',
-				dataTypeKey: 'dt-markdownEditor',
-			},
-			{
-				alias: 'radioButtonList',
-				label: 'Radio Button List',
-				description: '',
-				dataTypeKey: 'dt-radioButtonList',
-			},
-			{
-				alias: 'checkboxList',
-				label: 'Checkbox List',
-				description: '',
-				dataTypeKey: 'dt-checkboxList',
-			},
-			{
-				alias: 'blockList',
-				label: 'Block List',
-				description: '',
-				dataTypeKey: 'dt-blockList',
-			},
-			{
-				alias: 'mediaPicker',
-				label: 'Media Picker',
-				description: '',
-				dataTypeKey: 'dt-mediaPicker',
-			},
-			{
-				alias: 'imageCropper',
-				label: 'Image Cropper',
-				description: '',
-				dataTypeKey: 'dt-imageCropper',
-			},
-			{
-				alias: 'uploadField',
-				label: 'Upload Field',
-				description: '',
-				dataTypeKey: 'dt-uploadField',
-			},
-			{
-				alias: 'blockGrid',
-				label: 'Block Grid',
-				description: '',
-				dataTypeKey: 'dt-blockGrid',
-			},
-			{
-				alias: 'blockGrid',
-				label: 'Icon Picker',
-				description: '',
-				dataTypeKey: 'dt-iconPicker',
-			},
-			{
-				alias: 'numberRange',
-				label: 'Number Range',
-				description: '',
-				dataTypeKey: 'dt-numberRange',
-			},
-			{
-				alias: 'orderDirection',
-				label: 'Order Direction',
-				description: '',
-				dataTypeKey: 'dt-orderDirection',
-			},
-			{
-				alias: 'overlaySize',
-				label: 'Overlay Size',
-				description: '',
-				dataTypeKey: 'dt-overlaySize',
-			},
-			{
-				alias: 'label',
-				label: 'Label',
-				description: '',
-				dataTypeKey: 'dt-label',
-			},
-			{
-				alias: 'integer',
-				label: 'Integer',
-				description: '',
-				dataTypeKey: 'dt-integer',
-			},
-			{
-				alias: 'decimal',
-				label: 'Decimal',
-				description: '',
-				dataTypeKey: 'dt-decimal',
-			},
-			{
-				alias: 'memberPicker',
-				label: 'Member Picker',
-				description: '',
-				dataTypeKey: 'dt-memberPicker',
-			},
-			{
-				alias: 'memberGroupPicker',
-				label: 'Member Group Picker',
-				description: '',
-				dataTypeKey: 'dt-memberGroupPicker',
-			},
-			{
-				alias: 'userPicker',
-				label: 'User Picker',
-				description: '',
-				dataTypeKey: 'dt-userPicker',
-			},
-		],
-		data: [],
-		variants: [],
-	},
-
-*/
-
 export const data: Array<DocumentModel> = [
 	{
 		urls: [
@@ -227,8 +18,7 @@ export const data: Array<DocumentModel> = [
 		templateKey: null,
 		key: 'all-property-editors-document-key',
 		contentTypeKey: 'all-property-editors-document-type-key',
-		properties: [
-			// TODO: is 'properties' the correct name for this? The property comes from the doc type, and this only holds the values.
+		values: [
 			{
 				alias: 'email',
 				culture: null,
@@ -428,7 +218,7 @@ export const data: Array<DocumentModel> = [
 				publishDate: '2023-02-06T15:31:51.354764',
 				culture: 'en-us',
 				segment: null,
-				name: 'Blog post A',
+				name: 'All properties',
 				createDate: '2023-02-06T15:31:46.876902',
 				updateDate: '2023-02-06T15:31:51.354764',
 			},
@@ -444,7 +234,7 @@ export const data: Array<DocumentModel> = [
 		templateKey: null,
 		key: 'c05da24d-7740-447b-9cdc-bd8ce2172e38',
 		contentTypeKey: '29643452-cff9-47f2-98cd-7de4b6807681',
-		properties: [
+		values: [
 			{
 				culture: null,
 				segment: null,
@@ -476,6 +266,30 @@ export const data: Array<DocumentModel> = [
 				value: 'which is under another group in the tab',
 			},
 			{
+				culture: 'da-dk',
+				segment: null,
+				alias: 'blogTextStringUnderMasterTab',
+				value: 'på master dokument tab B',
+			},
+			{
+				culture: 'da-dk',
+				segment: null,
+				alias: 'blogTextStringUnderGroupUnderMasterTab',
+				value: 'denne er under en anden gruppe i tab B',
+			},
+			{
+				culture: 'no-no',
+				segment: null,
+				alias: 'blogTextStringUnderMasterTab',
+				value: 'Norsk på master dokument tab B',
+			},
+			{
+				culture: 'no-no',
+				segment: null,
+				alias: 'blogTextStringUnderGroupUnderMasterTab',
+				value: 'Norsk denne er under en anden gruppe i tab B',
+			},
+			{
 				culture: null,
 				segment: null,
 				alias: 'localBlogTabString',
@@ -488,7 +302,25 @@ export const data: Array<DocumentModel> = [
 				publishDate: '2023-02-06T15:31:51.354764',
 				culture: 'en-us',
 				segment: null,
-				name: 'Blog post A',
+				name: 'Article in english',
+				createDate: '2023-02-06T15:31:46.876902',
+				updateDate: '2023-02-06T15:31:51.354764',
+			},
+			{
+				state: ContentStateModel.PUBLISHED,
+				publishDate: '2023-02-06T15:31:51.354764',
+				culture: 'da-dk',
+				segment: null,
+				name: 'Artikel på Dansk',
+				createDate: '2023-02-06T15:31:46.876902',
+				updateDate: '2023-02-06T15:31:51.354764',
+			},
+			{
+				state: ContentStateModel.PUBLISHED,
+				publishDate: '2023-02-06T15:31:51.354764',
+				culture: 'no-no',
+				segment: null,
+				name: 'Artikel på Norsk',
 				createDate: '2023-02-06T15:31:46.876902',
 				updateDate: '2023-02-06T15:31:51.354764',
 			},
@@ -499,7 +331,7 @@ export const data: Array<DocumentModel> = [
 		templateKey: null,
 		key: 'fd56a0b5-01a0-4da2-b428-52773bfa9cc4',
 		contentTypeKey: '29643452-cff9-47f2-98cd-7de4b6807681',
-		properties: [
+		values: [
 			{
 				culture: null,
 				segment: null,
@@ -531,6 +363,18 @@ export const data: Array<DocumentModel> = [
 				value: 'which is under another group in the tab B',
 			},
 			{
+				culture: 'da-dk',
+				segment: null,
+				alias: 'blogTextStringUnderMasterTab',
+				value: 'på master dokument tab B',
+			},
+			{
+				culture: 'da-dk',
+				segment: null,
+				alias: 'blogTextStringUnderGroupUnderMasterTab',
+				value: 'denne er under en anden gruppe i tab B',
+			},
+			{
 				culture: null,
 				segment: null,
 				alias: 'localBlogTabString',
@@ -551,9 +395,9 @@ export const data: Array<DocumentModel> = [
 	},
 ];
 
-// TODO: make tree data:
 export const treeData: Array<DocumentTreeItemModel> = [
 	{
+		$type: 'DocumentTreeItemViewModel',
 		isProtected: false,
 		isPublished: true,
 		isEdited: false,
@@ -568,6 +412,7 @@ export const treeData: Array<DocumentTreeItemModel> = [
 		hasChildren: true,
 	},
 	{
+		$type: 'DocumentTreeItemViewModel',
 		isProtected: false,
 		isPublished: true,
 		isEdited: false,
@@ -576,12 +421,13 @@ export const treeData: Array<DocumentTreeItemModel> = [
 		key: 'c05da24d-7740-447b-9cdc-bd8ce2172e38',
 		isContainer: false,
 		parentKey: null,
-		name: 'Blog post A',
+		name: 'Article in english',
 		type: 'document',
 		icon: 'icon-item-arrangement',
 		hasChildren: true,
 	},
 	{
+		$type: 'DocumentTreeItemViewModel',
 		isProtected: false,
 		isPublished: false,
 		isEdited: false,
@@ -596,6 +442,7 @@ export const treeData: Array<DocumentTreeItemModel> = [
 		hasChildren: false,
 	},
 	{
+		$type: 'DocumentTreeItemViewModel',
 		name: 'Document 5',
 		type: 'document',
 		icon: 'document',

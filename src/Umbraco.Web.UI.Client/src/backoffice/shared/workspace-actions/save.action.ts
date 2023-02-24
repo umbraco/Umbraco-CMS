@@ -25,6 +25,7 @@ export class UmbSaveWorkspaceAction extends UmbWorkspaceAction<any, UmbWorkspace
 	async #create(data: any) {
 		if (!this.workspaceContext) return;
 
+		// TODO: preferably the actions dont talk directly with repository, but instead with its context.
 		const { error } = await this.repository.create(data);
 
 		// TODO: this is temp solution to bubble validation errors to the UI
@@ -34,6 +35,7 @@ export class UmbSaveWorkspaceAction extends UmbWorkspaceAction<any, UmbWorkspace
 			}
 		} else {
 			this.workspaceContext.setValidationErrors?.(undefined);
+			// TODO: do not make it the buttons responsibility to set the workspace to not new.
 			this.workspaceContext.setIsNew(false);
 		}
 	}

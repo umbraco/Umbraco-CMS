@@ -12,6 +12,8 @@ export type PropertyTypeViewModelBaseModel = {
     name?: string;
     description?: string | null;
     dataTypeKey?: string;
+    variesByCulture?: boolean;
+    variesBySegment?: boolean;
     validation?: PropertyTypeValidationModel;
     appearance?: PropertyTypeAppearanceModel;
 };

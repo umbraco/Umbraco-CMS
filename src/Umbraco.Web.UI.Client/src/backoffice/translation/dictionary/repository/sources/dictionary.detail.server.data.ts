@@ -85,7 +85,8 @@ export class UmbDictionaryDetailServerDataSource implements DictionaryDetailData
 			name: data.name,
 		};
 
-		return tryExecuteAndNotify(this.#host, DictionaryResource.postDictionary({ requestBody }));
+		// TODO: fix type mismatch:
+		return tryExecuteAndNotify(this.#host, DictionaryResource.postDictionary({ requestBody })) as any;
 	}
 
 	/**

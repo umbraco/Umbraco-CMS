@@ -41,12 +41,12 @@ export class LogViewerResource {
      * @throws ApiError
      */
     public static getLogViewerLevelCount({
-startDate,
-endDate,
-}: {
-startDate?: string,
-endDate?: string,
-}): CancelablePromise<any> {
+        startDate,
+        endDate,
+    }: {
+        startDate?: string,
+        endDate?: string,
+    }): CancelablePromise<any> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/log-viewer/level-count',
@@ -148,19 +148,20 @@ endDate?: string,
     }
 
     /**
-     * @returns any Created
+     * @returns string Created
      * @throws ApiError
      */
     public static postLogViewerSavedSearch({
         requestBody,
     }: {
         requestBody?: SavedLogSearchModel,
-    }): CancelablePromise<any> {
+    }): CancelablePromise<string> {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/umbraco/management/api/v1/log-viewer/saved-search',
             body: requestBody,
             mediaType: 'application/json',
+            responseHeader: 'Location',
             errors: {
                 400: `Bad Request`,
             },
@@ -193,10 +194,10 @@ endDate?: string,
      * @throws ApiError
      */
     public static deleteLogViewerSavedSearchByName({
-name,
-}: {
-name: string,
-}): CancelablePromise<any> {
+        name,
+    }: {
+        name: string,
+    }): CancelablePromise<any> {
         return __request(OpenAPI, {
             method: 'DELETE',
             url: '/umbraco/management/api/v1/log-viewer/saved-search/{name}',
@@ -214,12 +215,12 @@ name: string,
      * @throws ApiError
      */
     public static getLogViewerValidateLogsSize({
-startDate,
-endDate,
-}: {
-startDate?: string,
-endDate?: string,
-}): CancelablePromise<any> {
+        startDate,
+        endDate,
+    }: {
+        startDate?: string,
+        endDate?: string,
+    }): CancelablePromise<any> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/log-viewer/validate-logs-size',
