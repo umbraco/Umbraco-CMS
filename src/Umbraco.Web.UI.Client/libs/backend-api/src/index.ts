@@ -224,6 +224,7 @@ export { MediaTypeResource } from './services/MediaTypeResource';
 export { MemberGroupResource } from './services/MemberGroupResource';
 export { MemberTypeResource } from './services/MemberTypeResource';
 export { ModelsBuilderResource } from './services/ModelsBuilderResource';
+export { PackageResource } from './services/PackageResource';
 export { PartialViewResource } from './services/PartialViewResource';
 export { ProfilingResource } from './services/ProfilingResource';
 export { PublishedCacheResource } from './services/PublishedCacheResource';
@@ -240,3 +241,6 @@ export { TelemetryResource } from './services/TelemetryResource';
 export { TemplateResource } from './services/TemplateResource';
 export { TrackedReferenceResource } from './services/TrackedReferenceResource';
 export { UpgradeResource } from './services/UpgradeResource';
+
+export type { PackageMigrationStatusModel } from './models/PackageMigrationStatusModel';
+export type { PagedPackageMigrationStatusModel } from './models/PagedPackageMigrationStatusModel';

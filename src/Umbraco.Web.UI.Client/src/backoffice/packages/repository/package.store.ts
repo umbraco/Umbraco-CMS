@@ -3,6 +3,7 @@ import { UmbContextToken } from '@umbraco-cms/context-api';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 import { UmbStoreBase } from '@umbraco-cms/store';
 import type { ManifestBase, UmbPackage } from '@umbraco-cms/models';
+import type { PackageMigrationStatusModel } from '@umbraco-cms/backend-api';
 import { ArrayState } from '@umbraco-cms/observable-api';
 
 /**
@@ -19,12 +20,16 @@ export class UmbPackageStore extends UmbStoreBase {
 
 	#extensions = new ArrayState<ManifestBase>([], (e) => e.alias);
 
+	#migrations = new ArrayState<PackageMigrationStatusModel>([], (e) => e.packageName);
+
 	/**
 	 * Observable of packages with extensions
 	 */
 	rootItems = this.#packages.asObservable();
 
 	extensions = this.#extensions.asObservable();
+
+	migrations = this.#migrations.asObservable();
 
 	isPackagesLoaded = false;
 
@@ -47,6 +52,10 @@ export class UmbPackageStore extends UmbStoreBase {
 
 	appendExtensions(extensions: ManifestBase[]) {
 		this.#extensions.append(extensions);
+	}
+
+	appendMigrations(migrations: PackageMigrationStatusModel[]) {
+		this.#migrations.append(migrations);
 	}
 }
 

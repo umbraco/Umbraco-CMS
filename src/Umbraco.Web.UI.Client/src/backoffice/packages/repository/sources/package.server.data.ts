@@ -1,3 +1,4 @@
+import { PackageResource } from '@umbraco-cms/backend-api';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 import type { DataSourceResponse, UmbPackage } from '@umbraco-cms/models';
 import { tryExecuteAndNotify } from '@umbraco-cms/resources';
@@ -20,5 +21,13 @@ export class UmbPackageServerDataSource {
 			this.host,
 			fetch(umbracoPath('/manifests')).then((res) => res.json())
 		);
+	}
+
+	/**
+	 * Get the package migrations from the server
+	 * @memberof UmbPackageServerDataSource
+	 */
+	getPackageMigrations() {
+		return tryExecuteAndNotify(this.host, PackageResource.getPackageMigrationStatus({ skip: 0, take: 9999 }));
 	}
 }

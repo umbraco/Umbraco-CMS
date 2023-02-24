@@ -19,6 +19,7 @@ export class UmbPackageRepository {
 			new UmbContextConsumerController(host, UMB_PACKAGE_STORE_TOKEN, (instance) => {
 				this.#packageStore = instance;
 				this.#requestRootItems(instance);
+				this.#requestPackageMigrations(instance);
 				res();
 			});
 		});
@@ -54,6 +55,14 @@ export class UmbPackageRepository {
 		}
 	}
 
+	async #requestPackageMigrations(store: UmbPackageStore) {
+		const { data: migrations } = await this.#packageSource.getPackageMigrations();
+
+		if (migrations) {
+			store.appendMigrations(migrations.items);
+		}
+	}
+
 	/**
 	 * Observable of root items
 	 * @memberOf UmbPackageRepository
@@ -70,6 +79,15 @@ export class UmbPackageRepository {
 	async extensions() {
 		await this.#init;
 		return this.#packageStore!.extensions;
+	}
+
+	/**
+	 * Observable of migrations
+	 * @memberOf UmbPackageRepository
+	 */
+	async migrations() {
+		await this.#init;
+		return this.#packageStore!.migrations;
 	}
 
 	private isManifestBase(x: unknown): x is ManifestBase {
