@@ -53,8 +53,8 @@
 		"check": "npm run lint && npm run compile && npm run build-storybook"
 	},
 	"engines": {
-		"node": ">=18.14.2 <19",
-		"npm": ">=9.5.0 < 10"
+		"node": ">=18.14 <19",
+		"npm": ">=9.5 < 10"
 	},
 	"dependencies": {
 		"@umbraco-ui/uui": "^1.2.0-rc.0",
