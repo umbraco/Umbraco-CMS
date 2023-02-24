@@ -1,8 +1,11 @@
 import { css, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { clamp } from 'lodash-es';
-import { LogLevel } from 'vite';
-import { UmbLogViewerWorkspaceContext } from '../logviewer-root/logviewer-root.context';
+import {
+	LogLevel,
+	UmbLogViewerWorkspaceContext,
+	UMB_APP_LOG_VIEWER_CONTEXT_TOKEN,
+} from '../logviewer-root/logviewer-root.context';
 import { SavedLogSearchModel, PagedLogTemplateModel } from '@umbraco-cms/backend-api';
 import { UmbLitElement } from '@umbraco-cms/element';
 
@@ -173,6 +176,14 @@ export class UmbLogSearchWorkspaceElement extends UmbLitElement {
 			#show-more-templates-btn {
 				margin-top: var(--uui-size-space-5);
 			}
+
+			a {
+				display: flex;
+				align-items: center;
+				justify-content: space-between;
+				text-decoration: none;
+				color: inherit;
+			}
 		`,
 	];
 
@@ -216,12 +227,17 @@ export class UmbLogSearchWorkspaceElement extends UmbLitElement {
 	private _startDate = this.yesterday;
 
 	@state()
-	private _endDate = this.yesterday;
+	private _endDate = this.today;
+
+	#logViewerContext?: UmbLogViewerWorkspaceContext;
 
 	setLogLevelCount() {
 		this.logLevelCount = this._logLevelCount
 			? Object.entries(this._logLevelCount).filter(([level, number]) => !this._logLevelCountFilter.includes(level))
 			: [];
+		this._totalLogCount = this._logLevelCount
+			? this.logLevelCount.flatMap((arr) => arr[1]).reduce((acc, count) => acc + count, 0)
+			: 0;
 	}
 
 	load(): void {
@@ -233,30 +249,44 @@ export class UmbLogSearchWorkspaceElement extends UmbLitElement {
 		// Not relevant for this workspace
 	}
 
-	#logViewerContext = new UmbLogViewerWorkspaceContext(this);
+	constructor() {
+		super();
+		this.consumeContext(UMB_APP_LOG_VIEWER_CONTEXT_TOKEN, (instance) => {
+			this.#logViewerContext = instance;
+			this.#observeStuff();
+			this.getData();
+		});
+	}
 
-	async connectedCallback() {
-		super.connectedCallback();
-
+	#observeStuff() {
+		if (!this.#logViewerContext) return;
 		this.observe(this.#logViewerContext.savedSearches, (savedSearches) => {
 			this._savedSearches = savedSearches ?? [];
 		});
-		await this.#logViewerContext.getSavedSearches();
 
 		this.observe(this.#logViewerContext.logCount, (logLevel) => {
 			this._logLevelCount = logLevel ?? null;
+
 			this.setLogLevelCount();
 		});
-		await this.#logViewerContext.getLogCount(this.today, this.yesterday);
 
 		this.observe(this.#logViewerContext.messageTemplates, (templates) => {
 			this._messageTemplates = templates ?? null;
 		});
-		await this.#logViewerContext.getMessageTemplates(0, 10);
+	}
 
-		this._totalLogCount = this._logLevelCount
-			? this.logLevelCount.flatMap((arr) => arr[1]).reduce((acc, count) => acc + count, 0)
-			: 0;
+	async getData() {
+		if (!this.#logViewerContext) return;
+
+		try {
+			await Promise.all([
+				this.#logViewerContext.getSavedSearches(),
+				this.#logViewerContext.getLogCount(this.today, this.yesterday),
+				this.#logViewerContext.getMessageTemplates(0, 10),
+			]);
+		} catch (e) {
+			console.error(e);
+		}
 	}
 
 	protected willUpdate(_changedProperties: Map<PropertyKey, unknown>): void {
@@ -289,7 +319,7 @@ export class UmbLogSearchWorkspaceElement extends UmbLitElement {
 			<uui-button
 				label="${searchListItem.name}"
 				title="${searchListItem.name}"
-				href=${'/section/settings/logviewer/search' + searchListItem.query}
+				href=${'/section/settings/logviewer/search?lq=' + searchListItem.query}
 				><uui-icon name="umb:search"></uui-icon>${searchListItem.name}</uui-button
 			>
 		</li>`;
@@ -393,8 +423,13 @@ export class UmbLogSearchWorkspaceElement extends UmbLitElement {
 							? this._messageTemplates.items.map(
 									(template) =>
 										html`<uui-table-row
-											><uui-table-cell>${template.messageTemplate}</uui-table-cell>
-											<uui-table-cell>${template.count}</uui-table-cell>
+											><uui-table-cell>
+												<a
+													href=${'/section/settings/logviewer/search?lg=@MessageTemplate%3D' +
+													template.messageTemplate}>
+													<span>${template.messageTemplate}</span> <span>${template.count}</span>
+												</a>
+											</uui-table-cell>
 										</uui-table-row>`
 							  )
 							: ''

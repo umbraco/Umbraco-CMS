@@ -2,6 +2,7 @@ import { UmbLogViewerRepository } from '../data/log-viewer.repository';
 import { createObservablePart, DeepState } from '@umbraco-cms/observable-api';
 import { PagedLogTemplateModel, PagedSavedLogSearchModel } from '@umbraco-cms/backend-api';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
+import { UmbContextToken } from '@umbraco-cms/context-api';
 
 const logLevels = {
 	information: 171,
@@ -55,3 +56,7 @@ export class UmbLogViewerWorkspaceContext {
 		}
 	}
 }
+
+export const UMB_APP_LOG_VIEWER_CONTEXT_TOKEN = new UmbContextToken<UmbLogViewerWorkspaceContext>(
+	UmbLogViewerWorkspaceContext.name
+);

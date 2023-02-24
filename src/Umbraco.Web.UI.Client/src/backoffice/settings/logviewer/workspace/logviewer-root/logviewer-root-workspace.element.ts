@@ -1,14 +1,14 @@
 import '../donut-chart';
 import { map } from 'rxjs';
-import { css, html, nothing, PropertyValueMap } from 'lit';
+import { css, html, nothing } from 'lit';
 import { customElement, state, property } from 'lit/decorators.js';
-import { UmbLitElement } from '@umbraco-cms/element';
-import { PagedLogTemplateModel, SavedLogSearchModel } from '@umbraco-cms/backend-api';
+import { IRoutingInfo } from 'router-slot';
 import { UUITextStyles } from '@umbraco-ui/uui-css';
+import { UmbLitElement } from '@umbraco-cms/element';
 import { umbExtensionsRegistry, createExtensionElement } from '@umbraco-cms/extensions-api';
 import { ManifestWorkspaceView, ManifestWorkspaceViewCollection } from '@umbraco-cms/extensions-registry';
 import { UmbRouterSlotInitEvent, UmbRouterSlotChangeEvent } from '@umbraco-cms/router';
-import { IRoutingInfo } from 'router-slot';
+import { UmbLogViewerWorkspaceContext, UMB_APP_LOG_VIEWER_CONTEXT_TOKEN } from './logviewer-root.context';
 
 //TODO make uui-input accept min and max values
 @customElement('umb-logviewer-root-workspace')
@@ -151,14 +151,17 @@ export class UmbLogViewerRootWorkspaceElement extends UmbLitElement {
 	private _routes: any[] = [];
 
 	@state()
-	private _routerPath?: string;
+	private _activePath?: string;
 
 	@state()
-	private _activePath?: string;
+	private _routerPath?: string;
+
+	#logViewerContext = new UmbLogViewerWorkspaceContext(this);
 
 	connectedCallback() {
 		super.connectedCallback();
 		this._observeWorkspaceViews();
+		this.provideContext(UMB_APP_LOG_VIEWER_CONTEXT_TOKEN, this.#logViewerContext);
 	}
 
 	load(): void {

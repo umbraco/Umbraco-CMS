@@ -2,7 +2,6 @@ import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, html } from 'lit';
 import { customElement } from 'lit/decorators.js';
 import { UmbLitElement } from '@umbraco-cms/element';
-import { UmbRouterSlotInitEvent } from '@umbraco-cms/router';
 
 @customElement('umb-log-search-workspace-search')
 export class UmbLogSearchWorkspaceElement extends UmbLitElement {
@@ -22,8 +21,6 @@ export class UmbLogSearchWorkspaceElement extends UmbLitElement {
 			}
 		`,
 	];
-
-	private _routerPath?: string;
 
 	render() {
 		return html` <h1>Search</h1> `;
