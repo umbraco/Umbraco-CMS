@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Umbraco.Cms.Api.Common.ViewModels.Pagination;
 using Umbraco.Cms.Api.Management.Factories;
 using Umbraco.Cms.Api.Management.ViewModels.Users;
 using Umbraco.Cms.Core;
@@ -30,7 +31,7 @@ public class GetAllUserController : UsersControllerBase
 
     [HttpGet]
     [MapToApiVersion("1.0")]
-    [ProducesResponseType(typeof(IEnumerable<UserResponseModel>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(PagedViewModel<UserResponseModel>), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetAll(int skip = 0, int take = 100)
     {
         var userId = CurrentUserId(_backOfficeSecurityAccessor);
@@ -48,10 +49,10 @@ public class GetAllUserController : UsersControllerBase
             throw new PanicException("Get all attempt succeeded, but result was null");
         }
 
-        var users = new PagedModel<UserResponseModel>
+        var users = new PagedViewModel<UserResponseModel>
         {
             Total = result.Total,
-            Items = result.Items.Select(x => _userPresentationFactory.CreateResponseModel(x)),
+            Items = result.Items.Select(x => _userPresentationFactory.CreateResponseModel(x))
         };
 
         return Ok(users);

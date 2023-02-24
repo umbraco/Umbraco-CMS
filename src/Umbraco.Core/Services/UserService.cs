@@ -672,7 +672,7 @@ internal class UserService : RepositoryService, IUserService
             : new[] { Constants.Security.AdminGroupAlias };
 
         // Only the super user can see itself, but we can't use IsSuper in the query, since that cannot be mapped to SQL
-        IQuery<IUser>? noSuperfilter = requestingUser.IsSuper()
+        IQuery<IUser>? noSuperFilter = requestingUser.IsSuper()
             ? null
             : Query<IUser>().Where(x => x.Id != Constants.Security.SuperUserId);
 
@@ -690,7 +690,7 @@ internal class UserService : RepositoryService, IUserService
             out long totalRecords,
             x => x.Id,
             excludeUserGroups: excludedUserGroups,
-            filter: noSuperfilter,
+            filter: noSuperFilter,
             userState: userStates);
 
         var pagedResult = new PagedModel<IUser> { Items = result, Total = totalRecords };
