@@ -8,8 +8,8 @@ const sidebarMenuItem: ManifestSidebarMenuItem = {
 	meta: {
 		label: 'Extensions',
 		icon: 'umb:wand',
-		sections: ['Umb.Section.Settings'],
 		entityType: 'extension-root',
+		sidebarMenus: ['Umb.SidebarMenu.Settings'],
 	},
 };
 

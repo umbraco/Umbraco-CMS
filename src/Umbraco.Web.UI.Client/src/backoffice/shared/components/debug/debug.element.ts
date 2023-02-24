@@ -101,15 +101,11 @@ export class UmbDebug extends UmbLitElement {
 		this._debugPaneOpen = !this._debugPaneOpen;
 	}
 
-	private async _openDialog() {
-		// Open a modal that uses the HTML component called 'umb-debug-modal-layout'
-		await import('./debug.modal.element.js');
-		this._modalService?.open('umb-debug-modal-layout', {
-			size: 'small',
-			type: 'sidebar',
-			data: {
-				content: this._renderContextAliases(),
-			},
+	private _openDialog() {
+		this._modalService?.openBasic({
+			header: html`<uui-icon name="umb:bug"></uui-icon> Debug: Contexts`,
+			content: this._htmlContent(),
+			overlaySize: 'small'
 		});
 	}
 
@@ -130,12 +126,18 @@ export class UmbDebug extends UmbLitElement {
 
 			<div class="events ${this._debugPaneOpen ? 'open' : ''}">
 				<div>
-					<ul>
-						${this._renderContextAliases()}
-					</ul>
+					${this._htmlContent()}
 				</div>
 			</div>
 		</div>`;
+	}
+
+	private _htmlContent() {
+		return html `
+			<ul>
+				${this._renderContextAliases()}
+			</ul>
+		`;
 	}
 
 	private _renderContextAliases() {

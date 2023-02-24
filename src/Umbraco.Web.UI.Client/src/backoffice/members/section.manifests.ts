@@ -1,4 +1,4 @@
-import type { ManifestDashboard, ManifestSection } from '@umbraco-cms/models';
+import type { ManifestDashboard, ManifestSection, ManifestSidebarMenu } from '@umbraco-cms/models';
 
 const sectionAlias = 'Umb.Section.Members';
 
@@ -28,4 +28,15 @@ const dashboards: Array<ManifestDashboard> = [
 	},
 ];
 
-export const manifests = [section, ...dashboards];
+const sidebarMenu: ManifestSidebarMenu = {
+	type: 'sidebarMenu',
+	alias: 'Umb.SidebarMenu.Members',
+	name: 'Members Sidebar Menu',
+	weight: 100,
+	meta: {
+		label: 'Members',
+		sections: [sectionAlias],
+	},
+};
+
+export const manifests = [section, sidebarMenu, ...dashboards];

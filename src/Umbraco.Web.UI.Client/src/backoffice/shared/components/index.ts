@@ -1,4 +1,5 @@
 //TODO: we need to figure out what components should be available for extensions and load them upfront
+// TODO: we need to move these files into their respective folders/silos. We then need a way for a silo to globally register a component
 import './backoffice-frame/backoffice-header.element';
 import './backoffice-frame/backoffice-main.element';
 import './backoffice-frame/backoffice-modal-container.element';
@@ -8,6 +9,7 @@ import './ref-property-editor-ui/ref-property-editor-ui.element';
 import './content-property/content-property.element';
 import './table/table.element';
 import './code-block/code-block.element';
+import './dropdown/dropdown.element';
 import './extension-slot/extension-slot.element';
 
 import './workspace/workspace-layout/workspace-layout.element';
@@ -29,6 +31,8 @@ import './input-media-picker/input-media-picker.element';
 import './input-document-picker/input-document-picker.element';
 import './input-slider/input-slider.element';
 import './input-toggle/input-toggle-element';
+import './input-language-picker/input-language-picker.element';
+import './input-culture-select/input-culture-select.element';
 import './input-color-picker/input-color-picker.element';
 import './input-eye-dropper/input-eye-dropper.element';
 import './input-checkbox-list/input-checkbox-list.element';

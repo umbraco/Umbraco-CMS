@@ -13,6 +13,8 @@ export class UmbTemplateWorkspaceContext {
 	name = createObservablePart(this.#data, (data) => data?.name);
 	content = createObservablePart(this.#data, (data) => data?.content);
 
+	isNew = false;
+
 	constructor(host: UmbControllerHostInterface) {
 		this.#host = host;
 		this.#templateDetailRepo = new UmbTemplateDetailRepository(this.#host);
@@ -39,17 +41,9 @@ export class UmbTemplateWorkspaceContext {
 	}
 
 	async createScaffold(parentKey: string | null) {
+		this.isNew = true;
 		const { data } = await this.#templateDetailRepo.createScaffold(parentKey);
 		if (!data) return;
 		this.#data.next(data);
-	}
-
-	async save(isNew: boolean) {
-		if (!this.#data.value) return;
-		isNew ? this.#templateDetailRepo.insert(this.#data.value) : this.#templateDetailRepo.update(this.#data.value);
-	}
-
-	async delete(key: string) {
-		await this.#templateDetailRepo.delete(key);
 	}
 }

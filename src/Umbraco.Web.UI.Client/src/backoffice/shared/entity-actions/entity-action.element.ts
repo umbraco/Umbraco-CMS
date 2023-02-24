@@ -2,7 +2,7 @@ import { html, nothing } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
 import { UUIMenuItemEvent } from '@umbraco-ui/uui';
-import { UmbExecutedEvent } from '../../../core/events';
+import { UmbExecutedEvent } from '@umbraco-cms/events';
 import { UmbLitElement } from '@umbraco-cms/element';
 import { ManifestEntityAction } from 'libs/extensions-registry/entity-action.models';
 

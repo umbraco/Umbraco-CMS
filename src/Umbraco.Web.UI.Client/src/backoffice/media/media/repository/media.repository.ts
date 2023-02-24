@@ -111,7 +111,7 @@ export class UmbMediaRepository implements UmbTreeRepository, UmbDetailRepositor
 
 	// DETAILS:
 
-	async createDetailsScaffold(parentKey: string | null) {
+	async createScaffold(parentKey: string | null) {
 		await this.#init;
 
 		if (!parentKey) {
@@ -141,7 +141,7 @@ export class UmbMediaRepository implements UmbTreeRepository, UmbDetailRepositor
 
 	// Could potentially be general methods:
 
-	async createDetail(template: ItemDetailType) {
+	async create(template: ItemDetailType) {
 		await this.#init;
 
 		if (!template || !template.key) {
@@ -163,7 +163,7 @@ export class UmbMediaRepository implements UmbTreeRepository, UmbDetailRepositor
 		return { error };
 	}
 
-	async saveDetail(document: ItemDetailType) {
+	async save(document: ItemDetailType) {
 		await this.#init;
 
 		if (!document || !document.key) {

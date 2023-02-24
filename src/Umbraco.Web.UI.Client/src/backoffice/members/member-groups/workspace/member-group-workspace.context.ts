@@ -52,16 +52,18 @@ export class UmbWorkspaceMemberGroupContext
 	}
 
 	async createScaffold() {
-		const { data } = await this.#repo.createDetailsScaffold();
+		const { data } = await this.#repo.createScaffold();
 		if (!data) return;
+		this.setIsNew(true);
 		this.#data.next(data);
 	}
 
 	async save() {
 		if (!this.#data.value) return;
-		this.#repo.saveDetail(this.#data.value);
+		await this.#repo.save(this.#data.value);
+		this.setIsNew(true);
 	}
-	
+
 	public destroy(): void {
 		this.#data.complete();
 	}
