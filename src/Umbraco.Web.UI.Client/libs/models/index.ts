@@ -158,7 +158,4 @@ export type UmbPackage = {
 	extensions?: unknown[];
 };
 
-export type PagedManifestsResponse = {
-	total: number;
-	items: UmbPackage[];
-};
+export type PagedManifestsResponse = UmbPackage[];
