@@ -20,6 +20,10 @@ public class UsersControllerBase : ManagementApiControllerBase
                 .WithTitle("Missing user")
                 .WithDetail("A performing user is required for the operation, but none was found.")
                 .Build()),
+            UserOperationStatus.MissingUserGroup => NotFound(new ProblemDetailsBuilder()
+                .WithTitle("Missing user group")
+                .WithDetail("The specified user group was not found.")
+                .Build()),
             _ =>StatusCode(StatusCodes.Status500InternalServerError, "Unknown user group operation status."),
         };
 }

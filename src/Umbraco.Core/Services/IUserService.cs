@@ -51,6 +51,14 @@ public interface IUserService : IMembershipUserService
     /// <returns></returns>
     Task<Attempt<PagedModel<IUser>?, UserOperationStatus>> GetAllAsync(int requestingUserId, int skip, int take) => throw new NotImplementedException();
 
+    public Task<Attempt<PagedModel<IUser>, UserOperationStatus>> FilterAsync(
+        int requestingUserId,
+        UserFilter filter,
+        int skip = 0,
+        int take = 100,
+        UserOrder orderBy = UserOrder.UserName,
+        Direction orderDirection = Direction.Ascending) => throw new NotImplementedException();
+
     /// <summary>
     ///     Get paged users
     /// </summary>

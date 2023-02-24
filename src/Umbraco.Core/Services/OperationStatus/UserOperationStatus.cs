@@ -4,4 +4,5 @@ public enum UserOperationStatus
 {
     Success,
     MissingUser,
+    MissingUserGroup,
 }

@@ -1,12 +1,14 @@
 using System.Data.Common;
 using System.Globalization;
 using System.Linq.Expressions;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Events;
+using Umbraco.Cms.Core.Exceptions;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Persistence;
@@ -657,46 +659,184 @@ internal class UserService : RepositoryService, IUserService
         }
     }
 
-    public async Task<Attempt<PagedModel<IUser>?, UserOperationStatus>> GetAllAsync(int requestingUserId, int skip, int take)
+    public Task<Attempt<PagedModel<IUser>?, UserOperationStatus>> GetAllAsync(int requestingUserId, int skip, int take)
     {
+        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+
         IUser? requestingUser = GetById(requestingUserId);
 
         if (requestingUser is null)
         {
-            return Attempt.FailWithStatus<PagedModel<IUser>?, UserOperationStatus>(UserOperationStatus.MissingUser, null);
+            return Task.FromResult(Attempt.FailWithStatus<PagedModel<IUser>?, UserOperationStatus>(UserOperationStatus.MissingUser, null));
         }
 
-        // Only admins can see all admins
-        var excludedUserGroups = requestingUser.IsAdmin()
-            ? Array.Empty<string>()
-            : new[] { Constants.Security.AdminGroupAlias };
-
-        // Only the super user can see itself, but we can't use IsSuper in the query, since that cannot be mapped to SQL
-        IQuery<IUser>? noSuperFilter = requestingUser.IsSuper()
-            ? null
-            : Query<IUser>().Where(x => x.Id != Constants.Security.SuperUserId);
-
-        UserState[]? userStates = _securitySettings.HideDisabledUsersInBackOffice
-            ? new[] { UserState.Active, UserState.Invited, UserState.LockedOut, UserState.Inactive }
-            : null;
+        UserFilter baseFilter = CreateBaseUserFilter(requestingUser, out IQuery<IUser> query);
 
         PaginationHelper.ConvertSkipTakeToPaging(skip, take, out long pageNumber, out int pageSize);
 
-        using ICoreScope scope = ScopeProvider.CreateCoreScope();
         IEnumerable<IUser> result = _userRepository.GetPagedResultsByQuery(
             null,
             pageNumber,
             pageSize,
             out long totalRecords,
             x => x.Username,
-            excludeUserGroups: excludedUserGroups,
-            filter: noSuperFilter,
-            userState: userStates);
+            excludeUserGroups: baseFilter.ExcludedUserGroupAliases?.ToArray(),
+            filter: query,
+            userState: baseFilter.IncludeUserStates?.ToArray());
 
         var pagedResult = new PagedModel<IUser> { Items = result, Total = totalRecords };
 
         scope.Complete();
-        return Attempt.SucceedWithStatus<PagedModel<IUser>?, UserOperationStatus>(UserOperationStatus.Success, pagedResult);
+        return Task.FromResult(Attempt.SucceedWithStatus<PagedModel<IUser>?, UserOperationStatus>(UserOperationStatus.Success, pagedResult));
+    }
+
+    public Task<Attempt<PagedModel<IUser>, UserOperationStatus>> FilterAsync(
+        int requestingUserId,
+        UserFilter filter,
+        int skip = 0,
+        int take = 100,
+        UserOrder orderBy = UserOrder.UserName,
+        Direction orderDirection = Direction.Ascending)
+    {
+        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+
+        IUser? requestingUser = GetById(requestingUserId);
+
+        if (requestingUser is null)
+        {
+            return Task.FromResult(Attempt.FailWithStatus(UserOperationStatus.MissingUser, new PagedModel<IUser>()));
+        }
+
+        UserFilter baseFilter = CreateBaseUserFilter(requestingUser, out IQuery<IUser> baseQuery);
+
+        UserFilter mergedFilter = baseFilter.Merge(filter);
+
+        SortedSet<string> excludedUserGroupAliases = mergedFilter.ExcludedUserGroupAliases ?? new SortedSet<string>();
+        if (mergedFilter.ExcludeUserGroups is not null)
+        {
+            Attempt<IEnumerable<string>, UserOperationStatus> userGroupKeyConversionAttempt =
+                GetUserGroupAliasesFromKeys(mergedFilter.ExcludeUserGroups);
+
+
+            if (userGroupKeyConversionAttempt.Success is false)
+            {
+                return Task.FromResult(Attempt.FailWithStatus(UserOperationStatus.MissingUserGroup, new PagedModel<IUser>()));
+            }
+
+            excludedUserGroupAliases.UnionWith(userGroupKeyConversionAttempt.Result);
+        }
+
+        string[]? includedUserGroupAliases = null;
+        if (mergedFilter.IncludedUserGroups is not null)
+        {
+            Attempt<IEnumerable<string>, UserOperationStatus> userGroupKeyConversionAttempt = GetUserGroupAliasesFromKeys(mergedFilter.IncludedUserGroups);
+
+            if (userGroupKeyConversionAttempt.Success is false)
+            {
+                return Task.FromResult(Attempt.FailWithStatus(UserOperationStatus.MissingUserGroup, new PagedModel<IUser>()));
+            }
+
+            includedUserGroupAliases = userGroupKeyConversionAttempt.Result.ToArray();
+        }
+
+
+        if (mergedFilter.NameFilters is not null)
+        {
+            foreach (var nameFilter in mergedFilter.NameFilters)
+            {
+                baseQuery.Where(x => x.Name!.Contains(nameFilter) || x.Username.Contains(nameFilter));
+            }
+        }
+
+        PaginationHelper.ConvertSkipTakeToPaging(skip, take, out long pageNumber, out int pageSize);
+        Expression<Func<IUser, object?>> orderByExpression = GetOrderByExpression(orderBy);
+
+        // TODO: We should create a Query method on the repo that allows to filter by aliases.
+        IEnumerable<IUser> result = _userRepository.GetPagedResultsByQuery(
+            null,
+            pageNumber,
+            pageSize,
+            out long totalRecords,
+            orderByExpression,
+            orderDirection,
+            includedUserGroupAliases?.ToArray(),
+            excludedUserGroupAliases.ToArray(),
+            mergedFilter.IncludeUserStates?.ToArray(),
+            baseQuery);
+
+        scope.Complete();
+
+        var model = new PagedModel<IUser> {Items = result, Total = totalRecords};
+
+        return Task.FromResult(Attempt.SucceedWithStatus(UserOperationStatus.Success, model));
+    }
+
+    /// <summary>
+    /// Creates a base user filter which ensures our rules are followed, I.E. Only admins can se other admins.
+    /// </summary>
+    /// <remarks>
+    /// We return the query as an out parameter instead of having it in the intermediate object because a two queries cannot be merged into one.
+    /// </remarks>
+    /// <returns></returns>
+    private UserFilter CreateBaseUserFilter(IUser performingUser, out IQuery<IUser> baseQuery)
+    {
+        var filter = new UserFilter();
+        baseQuery = Query<IUser>();
+
+        // Only super can see super
+        if (performingUser.IsSuper() is false)
+        {
+            baseQuery.Where(x => x.Id != Constants.Security.SuperUserId);
+        }
+
+        // Only admins can see admins
+        if (performingUser.IsAdmin() is false)
+        {
+            filter.ExcludedUserGroupAliases = new SortedSet<string> { Constants.Security.AdminGroupAlias };
+        }
+
+        if (_securitySettings.HideDisabledUsersInBackOffice)
+        {
+            filter.IncludeUserStates = new SortedSet<UserState> { UserState.Active, UserState.Invited, UserState.LockedOut, UserState.Inactive };
+        }
+
+        return filter;
+    }
+
+    private Attempt<IEnumerable<string>, UserOperationStatus> GetUserGroupAliasesFromKeys(IEnumerable<Guid> userGroupKeys)
+    {
+        var aliases = new List<string>();
+
+        foreach (Guid key in userGroupKeys)
+        {
+            IUserGroup? group = _userGroupRepository.Get(Query<IUserGroup>().Where(x => x.Key == key)).FirstOrDefault();
+            if (group is null)
+            {
+                return Attempt.FailWithStatus(UserOperationStatus.MissingUserGroup, Enumerable.Empty<string>());
+            }
+
+            aliases.Add(group.Alias);
+        }
+
+        return Attempt.SucceedWithStatus<IEnumerable<string>, UserOperationStatus>(UserOperationStatus.Success, aliases);
+    }
+
+    private Expression<Func<IUser, object?>> GetOrderByExpression(UserOrder orderBy)
+    {
+        return orderBy switch
+        {
+            UserOrder.UserName => x => x.Username,
+            UserOrder.Language => x => x.Language,
+            UserOrder.Name => x => x.Name,
+            UserOrder.Email => x => x.Email,
+            UserOrder.Id => x => x.Id,
+            UserOrder.CreateDate => x => x.CreateDate,
+            UserOrder.UpdateDate => x => x.UpdateDate,
+            UserOrder.IsApproved => x => x.IsApproved,
+            UserOrder.IsLockedOut => x => x.IsLockedOut,
+            UserOrder.LastLoginDate => x => x.LastLoginDate,
+            _ => throw new ArgumentOutOfRangeException(nameof(orderBy), orderBy, null)
+        };
     }
 
     public IEnumerable<IUser> GetAll(long pageIndex, int pageSize, out long totalRecords, string orderBy, Direction orderDirection, UserState[]? userState = null, string[]? userGroups = null, string? filter = null)
