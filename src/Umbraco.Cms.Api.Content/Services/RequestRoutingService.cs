@@ -35,6 +35,8 @@ public class RequestRoutingService : IRequestRoutingService
 
         requestedPath = AppendRequestedStartNodePath(requestedPath);
 
+        // construct the (assumed) absolute URL for the requested content, and use that
+        // to look for a domain configuration that would match the URL
         var contentRoute = new Uri($"{request.Scheme}://{request.Host}{requestedPath}", UriKind.Absolute);
         DomainAndUri? domainAndUri = GetDomainAndUriForRoute(contentRoute);
         if (domainAndUri == null)
@@ -48,6 +50,8 @@ public class RequestRoutingService : IRequestRoutingService
             _requestCultureService.SetRequestCulture(domainAndUri.Culture);
         }
 
+        // when resolving content from a configured domain, the content cache expects the content route
+        // to be "{domain content ID}/{content path}", which is what we construct here
         return $"{domainAndUri.ContentId}{DomainUtilities.PathRelativeToDomain(domainAndUri.Uri, contentRoute.AbsolutePath)}";
     }
 
