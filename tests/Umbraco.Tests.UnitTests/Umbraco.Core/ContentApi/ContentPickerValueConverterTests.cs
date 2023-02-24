@@ -40,7 +40,7 @@ public class ContentPickerValueConverterTests : PropertyValueConverterTests
         Assert.NotNull(result);
         Assert.AreEqual("The page", result.Name);
         Assert.AreEqual(PublishedContent.Key, result.Id);
-        Assert.AreEqual("the-page-url", result.Url);
+        Assert.AreEqual("the-page-url", result.Path);
         Assert.AreEqual("TheContentType", result.ContentType);
         Assert.IsEmpty(result.Properties);
     }
@@ -104,7 +104,7 @@ public class ContentPickerValueConverterTests : PropertyValueConverterTests
         Assert.NotNull(result);
         Assert.AreEqual("The page", result.Name);
         Assert.AreEqual(content.Object.Key, result.Id);
-        Assert.AreEqual("page-url-segment", result.Url);
+        Assert.AreEqual("page-url-segment", result.Path);
         Assert.AreEqual("TheContentType", result.ContentType);
         Assert.AreEqual(2, result.Properties.Count);
         Assert.AreEqual("Content API value", result.Properties[ContentApiPropertyType.Alias]);

@@ -57,7 +57,7 @@ public class MultiNodeTreePickerValueConverterTests : PropertyValueConverterTest
         Assert.AreEqual(1, result.Count());
         Assert.AreEqual(PublishedContent.Name, result.First().Name);
         Assert.AreEqual(PublishedContent.Key, result.First().Id);
-        Assert.AreEqual("the-page-url", result.First().Url);
+        Assert.AreEqual("the-page-url", result.First().Path);
         Assert.AreEqual("TheContentType", result.First().ContentType);
         Assert.IsEmpty(result.First().Properties);
     }
@@ -86,7 +86,7 @@ public class MultiNodeTreePickerValueConverterTests : PropertyValueConverterTest
 
         Assert.AreEqual(PublishedContent.Name, result.First().Name);
         Assert.AreEqual(PublishedContent.Key, result.First().Id);
-        Assert.AreEqual("the-page-url", result.First().Url);
+        Assert.AreEqual("the-page-url", result.First().Path);
         Assert.AreEqual("TheContentType", result.First().ContentType);
 
         Assert.AreEqual("The other page", result.Last().Name);
@@ -131,7 +131,7 @@ public class MultiNodeTreePickerValueConverterTests : PropertyValueConverterTest
         Assert.AreEqual(1, result.Count());
         Assert.AreEqual("The page", result.First().Name);
         Assert.AreEqual(key, result.First().Id);
-        Assert.AreEqual("page-url-segment", result.First().Url);
+        Assert.AreEqual("page-url-segment", result.First().Path);
         Assert.AreEqual("TheContentType", result.First().ContentType);
         Assert.AreEqual(2, result.First().Properties.Count);
         Assert.AreEqual("Content API value", result.First().Properties[ContentApiPropertyType.Alias]);
@@ -207,7 +207,7 @@ public class MultiNodeTreePickerValueConverterTests : PropertyValueConverterTest
         Assert.AreEqual(1, result.Count());
         Assert.AreEqual(PublishedContent.Name, result.First().Name);
         Assert.AreEqual(PublishedContent.Key, result.First().Id);
-        Assert.AreEqual("the-page-url", result.First().Url);
+        Assert.AreEqual("the-page-url", result.First().Path);
         Assert.AreEqual("TheContentType", result.First().ContentType);
     }
 
