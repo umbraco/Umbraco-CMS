@@ -64,8 +64,8 @@ switch (import.meta.env.VITE_UMBRACO_INSTALL_STATUS) {
 		handlers.push(serverHandlers.serverRunningHandler);
 }
 
-switch (import.meta.env.MODE) {
-	case 'development':
+switch (import.meta.env.VITE_UMBRACO_EXTENSION_MOCKS) {
+	case 'on':
 		handlers.push(manifestsHandlers.manifestDevelopmentHandler);
 		break;
 

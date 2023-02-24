@@ -17,7 +17,7 @@ import { handlers as redirectManagementHandlers } from './domains/redirect-manag
 export const handlers = [
 	serverHandlers.serverRunningHandler,
 	serverHandlers.serverVersionHandler,
-	manifestsHandlers.manifestDevelopmentHandler,
+	manifestsHandlers.manifestEmptyHandler,
 	...installHandlers,
 	...upgradeHandlers,
 	...userHandlers,
