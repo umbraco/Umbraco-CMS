@@ -94,7 +94,7 @@ stages:
               echo "##vso[task.setvariable variable=majorVersion;isOutput=true]$major"
             displayName: Set major version
             name: determineMajorVersion
-          - script: dotnet pack $(solution) --configuration $(buildConfiguration) --no-build --output $(Build.ArtifactStagingDirectory)/nupkg
+          - script: dotnet pack $(solution) --configuration $(buildConfiguration) --no-build --property:PackageOutputPath=$(Build.ArtifactStagingDirectory)/nupkg
             displayName: Run dotnet pack
           - script: |
               sha="$(Build.SourceVersion)"
@@ -131,7 +131,7 @@ stages:
             inputs:
               targetType: inline
               script: |
-                choco install docfx --version=2.59.2 -y
+                choco install docfx --version=2.59.4 -y
                 if ($lastexitcode -ne 0){
                     throw ("Error installing DocFX")
                 }

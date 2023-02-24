@@ -53,7 +53,7 @@ test.describe('Media', () => {
   
         // Assert
         // Needs to wait before refreshing the media tree, otherwise the media files wont be moved to the folder yet
-        await page.waitForTimeout(1000);
+        await page.waitForTimeout(2500);
         await umbracoUi.refreshMediaTree();
         await page.locator('[data-element="tree-item-' + folderToMoveTooName + '"]').click();
         for (const names of mediaFileTypes) {

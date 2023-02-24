@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <Title>Umbraco CMS</Title>
     <Description>Installs Umbraco CMS with all default dependencies in your ASP.NET Core project.</Description>
@@ -12,4 +12,12 @@
     <ProjectReference Include="..\Umbraco.Cms.Persistence.Sqlite\Umbraco.Cms.Persistence.Sqlite.csproj" />
     <ProjectReference Include="..\Umbraco.Cms.Persistence.SqlServer\Umbraco.Cms.Persistence.SqlServer.csproj" />
   </ItemGroup>
+
+  <!-- Create and pack empty file to add TFM dependency -->
+  <Target Name="PackTargetFrameworkFile" BeforeTargets="Build">
+    <WriteLinesToFile File="$(IntermediateOutputPath)_._" />
+    <ItemGroup>
+      <None Include="$(IntermediateOutputPath)_._" Pack="true" PackagePath="lib\$(TargetFramework)" />
+    </ItemGroup>
+  </Target>
 </Project>

@@ -63,6 +63,33 @@ public class ImageSharpImageUrlGeneratorTests
             urlString);
     }
 
+    [Test]
+    public void GetImageUrlFurtherOptionsModeAndQualityTest()
+    {
+        var urlString = s_generator.GetImageUrl(new ImageUrlGenerationOptions(MediaPath)
+        {
+            Quality = 10,
+            FurtherOptions = "format=webp",
+        });
+        Assert.AreEqual(
+            MediaPath +
+            "?format=webp&quality=10",
+            urlString);
+    }
+
+    [Test]
+    public void GetImageUrlFurtherOptionsWithModeAndQualityTest()
+    {
+        var urlString = s_generator.GetImageUrl(new ImageUrlGenerationOptions(MediaPath)
+        {
+            FurtherOptions = "quality=10&format=webp",
+        });
+        Assert.AreEqual(
+            MediaPath +
+            "?format=webp&quality=10",
+            urlString);
+    }
+
     /// <summary>
     ///     Test that if options is null, the generated image URL is also null.
     /// </summary>

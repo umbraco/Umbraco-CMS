@@ -2,7 +2,7 @@
 <language alias="no" intName="Norwegian" localName="norsk" lcid="20" culture="nb-NO">
   <creator>
     <name>The Umbraco community</name>
-    <link>https://our.umbraco.com/documentation/Extending-Umbraco/Language-Files</link>
+    <link>https://docs.umbraco.com/umbraco-cms/extending/language-files</link>
   </creator>
   <area alias="actions">
     <key alias="assigndomain">Angi domene</key>
@@ -621,7 +621,6 @@ Vennlig hilsen Umbraco roboten
     <key alias="reset">Nullstill</key>
   </area>
   <area alias="rollback">
-    <key alias="currentVersion">Gjeldende versjon</key>
     <key alias="diffHelp"><![CDATA[Dette viser forskjellene mellom den gjeldende og den valgte versjonen<br /><del>Rød</del> tekst vil ikke bli vist i den valgte versjonen. , <ins>grønn betyr lagt til</ins>]]></key>
     <key alias="documentRolledBack">Dokumentet er tilbakeført til en tidligere versjon</key>
     <key alias="htmlHelp">Dette viser den valgte versjonen som HTML, bruk avviksvisningen hvis du ønsker å se forksjellene mellom to versjoner samtidig.</key>

@@ -7,13 +7,14 @@
                 <div class="umb-healthcheck-help-text">
                     <localize key="healthcheck_helpText">
                         <p>The health checker evaluates various areas of your site for best practice settings, configuration, potential problems, etc. You can easily fix problems by pressing a button.
-                            You can add your own health checks, have a look at <a href="https://our.umbraco.com/documentation/Extending/Healthcheck/" target="_blank" rel="noopener" class="btn-link -underline">the documentation for more information</a> about custom health checks.</p>
+                            You can add your own health checks, have a look at <a href="https://docs.umbraco.com/umbraco-cms/extending/health-check" target="_blank" rel="noopener" class="btn-link -underline">the documentation for more information</a> about custom health checks.</p>
                     </localize>
                 </div>
                 <div class="umb-panel-group__details-status-actions">
                         <umb-button type="button"
                                     button-style="success"
                                     label="Check All Groups"
+                                    data-element="healthchecks-checkall-btn"
                                     action="vm.checkAllGroups(vm.groups)">
                         </umb-button>
                 </div>

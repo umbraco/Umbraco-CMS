@@ -455,6 +455,7 @@ var app = angular.module("umbraco.preview", ['umbraco.resources', 'umbraco.servi
 
     $scope.onFrameLoaded = function (iframe) {
 
+      iframe.title = "Page preview";
       $scope.frameLoaded = true;
       configureSignalR(iframe);
       fixExternalLinks(iframe);

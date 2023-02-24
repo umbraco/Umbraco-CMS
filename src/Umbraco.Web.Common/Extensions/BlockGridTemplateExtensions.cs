@@ -30,7 +30,7 @@ public static class BlockGridTemplateExtensions
     /// The partial views are found in "/src/Umbraco.Cms.StaticAssets/Views/Partials/blockgrid/" on GitHub and should
     /// be copied to "Views/Partials/BlockGrid/" on your local disk.
     /// </remarks>
-    /// <seealso href="https://our.umbraco.com/documentation/Fundamentals/Backoffice/Property-Editors/Built-in-Property-Editors/Block-Editor/Block-Grid-Editor/#1-default-rendering"/>
+    /// <seealso href="https://docs.umbraco.com/umbraco-cms/fundamentals/backoffice/property-editors/built-in-umbraco-property-editors/block-editor/block-grid-editor#1.-default-rendering"/>
     public static async Task<IHtmlContent> GetBlockGridHtmlAsync(this IHtmlHelper html, BlockGridModel? model, string template = DefaultTemplate)
     {
         if (model?.Count == 0)

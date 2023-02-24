@@ -309,9 +309,9 @@
                                 </p>
                             </div>
                             <div ng-if="vm.usersViewState === 'createUser'">
-                                <h3 class="bold" style="margin-bottom: 0;">
+                                <h2 class="h3 bold" style="margin-bottom: 0;">
                                     <localize key="user_createUser">Create user</localize>
-                                </h3>
+                                </h2>
                                 <p style="line-height: 1.6em; margin-bottom: 15px;">
                                     <localize key="user_createUserHelp">Create new users to give them access to Umbraco. When a new user is created a password will be generated that you can share with the user.</localize>
                                 </p>
@@ -319,7 +319,7 @@
                         </div>
 
                         <umb-control-group label="@general_name" label-for="name" required="true">
-                            <input type="text" name="name" localize="placeholder" placeholder="@placeholders_entername" class="input-block-level" ng-model="vm.newUser.name"
+                            <input type="text" name="name" id="name" localize="placeholder" placeholder="@placeholders_entername" class="input-block-level" ng-model="vm.newUser.name"
                                    umb-auto-focus required val-server-field="Name" />
                             <span ng-messages="addUserForm.name.$error" show-validation-on-submit>
                               <span class="help-inline" ng-message="required"><localize key="user_nameRequired">Required</localize></span>
@@ -329,7 +329,7 @@
                         </umb-control-group>
 
                         <umb-control-group label="@general_username" label-for="username" required="true" ng-if="!vm.usernameIsEmail">
-                            <input type="text" name="username" localize="placeholder" placeholder="@placeholders_enterusername" class="input-block-level"
+                            <input type="text" name="username" id="username" localize="placeholder" placeholder="@placeholders_enterusername" class="input-block-level"
                                    ng-model="vm.newUser.username" val-server-field="Username" ng-required="vm.usernameIsEmail" />
                             <span ng-messages="addUserForm.username.$error" show-validation-on-submit >
                                 <span class="help-inline" ng-message="required"><localize key="general_required">Required</localize></span>
@@ -339,7 +339,7 @@
                         </umb-control-group>
 
                         <umb-control-group label="@general_email" label-for="email" required="true">
-                            <input type="email" name="email" localize="placeholder" placeholder="@placeholders_enteremail" class="input-block-level"
+                            <input type="email" name="email" id="email" localize="placeholder" placeholder="@placeholders_enteremail" class="input-block-level"
                                    ng-model="vm.newUser.email" required val-email val-server-field="Email" />
                             <span ng-messages="addUserForm.email.$error" show-validation-on-submit>
                               <span class="help-inline" ng-message="required"><localize key="user_emailRequired">Required</localize></span>

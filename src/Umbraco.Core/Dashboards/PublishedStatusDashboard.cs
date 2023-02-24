@@ -7,7 +7,7 @@ public class PublishedStatusDashboard : IDashboard
 {
     public string Alias => "settingsPublishedStatus";
 
-    public string[] Sections => new[] { "settings" };
+    public string[] Sections => new[] { Constants.Applications.Settings };
 
     public string View => "views/dashboard/settings/publishedstatus.html";
 

@@ -56,7 +56,7 @@ public class AddPropertyTypeGroupColumns : MigrationBase
         AddColumn<PropertyTypeGroupDto>("alias", out IEnumerable<string> sqls);
 
         // Populate non-null alias column
-        List<PropertyTypeGroupDto>? dtos = Database.Fetch<PropertyTypeGroupDto>();
+        List<PropertyTypeGroupDto>? dtos = Database.Query<PropertyTypeGroupDto>().Where(x => x.Alias == null).ToList();
         foreach (PropertyTypeGroupDto dto in PopulateAliases(dtos))
         {
             Database.Update(dto, x => new { x.Alias });
