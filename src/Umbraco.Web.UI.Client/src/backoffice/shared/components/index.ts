@@ -29,6 +29,8 @@ import '../entity-actions/entity-action-list.element';
 
 import './input-media-picker/input-media-picker.element';
 import './input-document-picker/input-document-picker.element';
+import './input-slider/input-slider.element';
+import './input-toggle/input-toggle-element';
 import './input-language-picker/input-language-picker.element';
 import './input-culture-select/input-culture-select.element';
 import './input-color-picker/input-color-picker.element';

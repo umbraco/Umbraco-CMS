@@ -96,6 +96,7 @@ export class UmbInputMultiUrlPickerElement extends FormControlMixin(UmbLitElemen
 	 */
 	@property({ attribute: false })
 	set urls(data: Array<MultiUrlData>) {
+		if (!data) return;
 		this._urls = data;
 		super.value = this._urls.map((x) => x.url).join(',');
 	}

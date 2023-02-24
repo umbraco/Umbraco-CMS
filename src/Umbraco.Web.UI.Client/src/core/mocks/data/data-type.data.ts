@@ -241,7 +241,32 @@ export const data: Array<DataTypeModel & { type: 'data-type' }> = [
 		parentKey: null,
 		propertyEditorAlias: 'Umbraco.Slider',
 		propertyEditorUiAlias: 'Umb.PropertyEditorUI.Slider',
-		data: [],
+		data: [
+			{
+				alias: 'enableRange',
+				value: true,
+			},
+			{
+				alias: 'initVal1',
+				value: 10,
+			},
+			{
+				alias: 'initVal2',
+				value: 40,
+			},
+			{
+				alias: 'maxVal',
+				value: 50,
+			},
+			{
+				alias: 'minVal',
+				value: 0,
+			},
+			{
+				alias: 'step',
+				value: 10,
+			},
+		],
 	},
 	{
 		type: 'data-type',
@@ -250,7 +275,24 @@ export const data: Array<DataTypeModel & { type: 'data-type' }> = [
 		parentKey: null,
 		propertyEditorAlias: 'Umbraco.TrueFalse',
 		propertyEditorUiAlias: 'Umb.PropertyEditorUI.Toggle',
-		data: [],
+		data: [
+			{
+				alias: 'default',
+				value: false,
+			},
+			{
+				alias: 'labelOff',
+				value: 'Not activated',
+			},
+			{
+				alias: 'labelOn',
+				value: 'Activated',
+			},
+			{
+				alias: 'showLabels',
+				value: true,
+			},
+		],
 	},
 	{
 		type: 'data-type',

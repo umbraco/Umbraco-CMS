@@ -11,5 +11,9 @@ export default {
 } as Meta;
 
 export const AAAOverview: Story<UmbPropertyEditorUISliderElement> = () =>
-	html`<umb-property-editor-ui-slider></umb-property-editor-ui-slider>`;
+	html`<umb-property-editor-ui-slider
+		.config="${[
+			{ alias: 'maxVal', value: 50 },
+			{ alias: 'step', value: 5 },
+		]}"></umb-property-editor-ui-slider>`;
 AAAOverview.storyName = 'Overview';
