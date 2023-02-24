@@ -33,7 +33,7 @@ public class ByRouteContentApiController : ContentApiControllerBase
     [ProducesResponseType(typeof(IApiContent), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> ByRoute(string path)
+    public async Task<IActionResult> ByRoute(string path = "/")
     {
         IPublishedContentCache? contentCache = GetContentCache();
 
