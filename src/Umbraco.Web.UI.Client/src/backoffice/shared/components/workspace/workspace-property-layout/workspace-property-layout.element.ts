@@ -29,6 +29,10 @@ export class UmbWorkspacePropertyLayoutElement extends LitElement {
 				border-bottom:none;
 			}
 
+			:host(:first-of-type) {
+				padding-top:0;
+			}
+
 			p {
 				margin-bottom: 0;
 			}
