@@ -709,7 +709,7 @@ internal class UserService : RepositoryService, IUserService
 
         UserFilter baseFilter = CreateBaseUserFilter(requestingUser, out IQuery<IUser> baseQuery);
 
-        UserFilter mergedFilter = baseFilter.Merge(filter);
+        UserFilter mergedFilter = filter.Merge(baseFilter);
 
         SortedSet<string> excludedUserGroupAliases = mergedFilter.ExcludedUserGroupAliases ?? new SortedSet<string>();
         if (mergedFilter.ExcludeUserGroups is not null)
@@ -748,6 +748,22 @@ internal class UserService : RepositoryService, IUserService
             }
         }
 
+        SortedSet<UserState>? includeUserStates = null;
+
+        // TODO: Refactor this into the UserFilter
+        // The issue is that this is a limiting filter we have to ensure that it still follows our rules
+        // So I'm not allowed to ask for the disabled users if the setting has been flipped
+        if (baseFilter.IncludeUserStates is null || baseFilter.IncludeUserStates.IsCollectionEmpty())
+        {
+            includeUserStates = filter.IncludeUserStates;
+        }
+        else if(filter.IncludeUserStates is not null)
+        {
+            includeUserStates = new SortedSet<UserState>(filter.IncludeUserStates);
+            includeUserStates.IntersectWith(baseFilter.IncludeUserStates);
+        }
+
+
         PaginationHelper.ConvertSkipTakeToPaging(skip, take, out long pageNumber, out int pageSize);
         Expression<Func<IUser, object?>> orderByExpression = GetOrderByExpression(orderBy);
 
@@ -761,7 +777,7 @@ internal class UserService : RepositoryService, IUserService
             orderDirection,
             includedUserGroupAliases?.ToArray(),
             excludedUserGroupAliases.ToArray(),
-            mergedFilter.IncludeUserStates?.ToArray(),
+            includeUserStates?.ToArray(),
             baseQuery);
 
         scope.Complete();
