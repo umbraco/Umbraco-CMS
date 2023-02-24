@@ -63,10 +63,10 @@ export class UmbWorkspaceDictionaryElement extends UmbLitElement implements UmbW
 		return html`
 			<umb-workspace-layout alias="Umb.Workspace.Dictionary">
 				<div id="header" slot="header">
-					<uui-button href="/section/translation/dashboard" compact>
+					<uui-button href="/section/translation/dashboard" label="Back to list" compact>
 						<uui-icon name="umb:arrow-left"></uui-icon>
 					</uui-button>
-					<uui-input .value=${this._name} @input="${this.#handleInput}"></uui-input>
+					<uui-input .value=${this._name} @input="${this.#handleInput}" label="Dictionary name"></uui-input>
 				</div>
 			</umb-workspace-layout>
 		`;
