@@ -1,19 +1,18 @@
 using Umbraco.Cms.Core.Models.ContentApi;
 using Umbraco.Cms.Core.Models.PublishedContent;
-using Umbraco.Cms.Core.Routing;
 
 namespace Umbraco.Cms.Core.ContentApi;
 
 public class ApiContentBuilder : IApiContentBuilder
 {
-    private readonly IPublishedContentNameProvider _publishedContentNameProvider;
-    private readonly IPublishedUrlProvider _publishedUrlProvider;
+    private readonly IApiContentNameProvider _apiContentNameProvider;
+    private readonly IApiUrlProvider _apiUrlProvider;
     private readonly IOutputExpansionStrategyAccessor _outputExpansionStrategyAccessor;
 
-    public ApiContentBuilder(IPublishedContentNameProvider publishedContentNameProvider, IPublishedUrlProvider publishedUrlProvider, IOutputExpansionStrategyAccessor outputExpansionStrategyAccessor)
+    public ApiContentBuilder(IApiContentNameProvider apiContentNameProvider, IApiUrlProvider apiUrlProvider, IOutputExpansionStrategyAccessor outputExpansionStrategyAccessor)
     {
-        _publishedContentNameProvider = publishedContentNameProvider;
-        _publishedUrlProvider = publishedUrlProvider;
+        _apiContentNameProvider = apiContentNameProvider;
+        _apiUrlProvider = apiUrlProvider;
         _outputExpansionStrategyAccessor = outputExpansionStrategyAccessor;
     }
 
@@ -26,14 +25,9 @@ public class ApiContentBuilder : IApiContentBuilder
 
         return new ApiContent(
             content.Key,
-            _publishedContentNameProvider.GetName(content),
+            _apiContentNameProvider.GetName(content),
             content.ContentType.Alias,
-            Url(content),
+            _apiUrlProvider.Url(content),
             properties);
     }
-
-    private string Url(IPublishedContent content)
-        => content.ItemType == PublishedItemType.Content
-            ? _publishedUrlProvider.GetUrl(content, UrlMode.Relative)
-            : _publishedUrlProvider.GetMediaUrl(content, UrlMode.Relative);
 }

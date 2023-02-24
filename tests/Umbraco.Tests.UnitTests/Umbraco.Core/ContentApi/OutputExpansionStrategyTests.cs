@@ -5,6 +5,7 @@ using NUnit.Framework;
 using Umbraco.Cms.Api.Content.Rendering;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.ContentApi;
+using Umbraco.Cms.Core.ContentApi.Accessors;
 using Umbraco.Cms.Core.Models.ContentApi;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PropertyEditors;
@@ -37,7 +38,7 @@ public class OutputExpansionStrategyTests : PropertyValueConverterTests
     public void OutputExpansionStrategy_ExpandsNothingByDefault()
     {
         var accessor = CreateOutputExpansionStrategyAccessor();
-        var apiContentBuilder = new ApiContentBuilder(new PublishedContentNameProvider(), PublishedUrlProvider, accessor);
+        var apiContentBuilder = new ApiContentBuilder(new ApiContentNameProvider(), ApiUrlProvider(), accessor);
 
         var content = new Mock<IPublishedContent>();
         var prop1 = new PublishedElementPropertyBase(ContentApiPropertyType, content.Object, false, PropertyCacheLevel.None);
@@ -46,8 +47,7 @@ public class OutputExpansionStrategyTests : PropertyValueConverterTests
         var contentPickerContent = CreateSimplePickedContent(123, 456);
         var contentPickerProperty = CreateContentPickerProperty(content.Object, contentPickerContent.Key, "contentPicker", apiContentBuilder);
 
-        content.SetupGet(c => c.Properties).Returns(new[] { prop1, prop2, contentPickerProperty });
-        content.SetupGet(c => c.ContentType).Returns(_contentType);
+        SetupContentMock(content, prop1, prop2, contentPickerProperty);
 
         var result = apiContentBuilder.Build(content.Object);
 
@@ -64,7 +64,7 @@ public class OutputExpansionStrategyTests : PropertyValueConverterTests
     public void OutputExpansionStrategy_CanExpandSpecificContent()
     {
         var accessor = CreateOutputExpansionStrategyAccessor(false, new[] { "contentPickerTwo" });
-        var apiContentBuilder = new ApiContentBuilder(new PublishedContentNameProvider(), PublishedUrlProvider, accessor);
+        var apiContentBuilder = new ApiContentBuilder(new ApiContentNameProvider(), ApiUrlProvider(), accessor);
 
         var content = new Mock<IPublishedContent>();
 
@@ -73,8 +73,7 @@ public class OutputExpansionStrategyTests : PropertyValueConverterTests
         var contentPickerTwoContent = CreateSimplePickedContent(56, 78);
         var contentPickerTwoProperty = CreateContentPickerProperty(content.Object, contentPickerTwoContent.Key, "contentPickerTwo", apiContentBuilder);
 
-        content.SetupGet(c => c.Properties).Returns(new[] { contentPickerOneProperty, contentPickerTwoProperty });
-        content.SetupGet(c => c.ContentType).Returns(_contentType);
+        SetupContentMock(content, contentPickerOneProperty, contentPickerTwoProperty);
 
         var result = apiContentBuilder.Build(content.Object);
 
@@ -97,7 +96,7 @@ public class OutputExpansionStrategyTests : PropertyValueConverterTests
     public void OutputExpansionStrategy_CanExpandAllContent()
     {
         var accessor = CreateOutputExpansionStrategyAccessor(true);
-        var apiContentBuilder = new ApiContentBuilder(new PublishedContentNameProvider(), PublishedUrlProvider, accessor);
+        var apiContentBuilder = new ApiContentBuilder(new ApiContentNameProvider(), ApiUrlProvider(), accessor);
 
         var content = new Mock<IPublishedContent>();
 
@@ -106,8 +105,7 @@ public class OutputExpansionStrategyTests : PropertyValueConverterTests
         var contentPickerTwoContent = CreateSimplePickedContent(56, 78);
         var contentPickerTwoProperty = CreateContentPickerProperty(content.Object, contentPickerTwoContent.Key, "contentPickerTwo", apiContentBuilder);
 
-        content.SetupGet(c => c.Properties).Returns(new[] { contentPickerOneProperty, contentPickerTwoProperty });
-        content.SetupGet(c => c.ContentType).Returns(_contentType);
+        SetupContentMock(content, contentPickerOneProperty, contentPickerTwoProperty);
 
         var result = apiContentBuilder.Build(content.Object);
 
@@ -133,7 +131,7 @@ public class OutputExpansionStrategyTests : PropertyValueConverterTests
     public void OutputExpansionStrategy_DoesNotExpandNestedContentPicker(string rootPropertyTypeAlias, string nestedPropertyTypeAlias)
     {
         var accessor = CreateOutputExpansionStrategyAccessor(false, new[] { rootPropertyTypeAlias, nestedPropertyTypeAlias });
-        var apiContentBuilder = new ApiContentBuilder(new PublishedContentNameProvider(), PublishedUrlProvider, accessor);
+        var apiContentBuilder = new ApiContentBuilder(new ApiContentNameProvider(), ApiUrlProvider(), accessor);
 
         var content = new Mock<IPublishedContent>();
 
@@ -141,8 +139,7 @@ public class OutputExpansionStrategyTests : PropertyValueConverterTests
         var contentPickerContent = CreateMultiLevelPickedContent(123, nestedContentPickerContent, nestedPropertyTypeAlias, apiContentBuilder);
         var contentPickerContentProperty = CreateContentPickerProperty(content.Object, contentPickerContent.Key, rootPropertyTypeAlias, apiContentBuilder);
 
-        content.SetupGet(c => c.Properties).Returns(new[] { contentPickerContentProperty });
-        content.SetupGet(c => c.ContentType).Returns(_contentType);
+        SetupContentMock(content, contentPickerContentProperty);
 
         var result = apiContentBuilder.Build(content.Object);
 
@@ -164,20 +161,18 @@ public class OutputExpansionStrategyTests : PropertyValueConverterTests
     public void OutputExpansionStrategy_DoesNotExpandElementsByDefault()
     {
         var accessor = CreateOutputExpansionStrategyAccessor();
-        var apiContentBuilder = new ApiContentBuilder(new PublishedContentNameProvider(), PublishedUrlProvider, accessor);
+        var apiContentBuilder = new ApiContentBuilder(new ApiContentNameProvider(), ApiUrlProvider(), accessor);
         var apiElementBuilder = new ApiElementBuilder(accessor);
 
         var contentPickerValue = CreateSimplePickedContent(111, 222);
         var contentPicker2Value = CreateSimplePickedContent(666, 777);
 
         var content = new Mock<IPublishedContent>();
-        content.SetupGet(c => c.ContentType).Returns(_contentType);
-        content.SetupGet(c => c.Properties).Returns(new[]
-        {
+        SetupContentMock(
+            content,
             CreateNumberProperty(content.Object, 444, "number"),
             CreateElementProperty(content.Object, "element", 333, contentPickerValue.Key, "contentPicker", apiContentBuilder, apiElementBuilder),
-            CreateElementProperty(content.Object, "element2", 555, contentPicker2Value.Key, "contentPicker", apiContentBuilder, apiElementBuilder)
-        });
+            CreateElementProperty(content.Object, "element2", 555, contentPicker2Value.Key, "contentPicker", apiContentBuilder, apiElementBuilder));
 
         var result = apiContentBuilder.Build(content.Object);
 
@@ -217,20 +212,18 @@ public class OutputExpansionStrategyTests : PropertyValueConverterTests
     public void OutputExpansionStrategy_CanExpandSpecifiedElement()
     {
         var accessor = CreateOutputExpansionStrategyAccessor(false, new[] { "element" });
-        var apiContentBuilder = new ApiContentBuilder(new PublishedContentNameProvider(), PublishedUrlProvider, accessor);
+        var apiContentBuilder = new ApiContentBuilder(new ApiContentNameProvider(), ApiUrlProvider(), accessor);
         var apiElementBuilder = new ApiElementBuilder(accessor);
 
         var contentPickerValue = CreateSimplePickedContent(111, 222);
         var contentPicker2Value = CreateSimplePickedContent(666, 777);
 
         var content = new Mock<IPublishedContent>();
-        content.SetupGet(c => c.ContentType).Returns(_contentType);
-        content.SetupGet(c => c.Properties).Returns(new[]
-        {
+        SetupContentMock(
+            content,
             CreateNumberProperty(content.Object, 444, "number"),
             CreateElementProperty(content.Object, "element", 333, contentPickerValue.Key, "contentPicker", apiContentBuilder, apiElementBuilder),
-            CreateElementProperty(content.Object, "element2", 555, contentPicker2Value.Key, "contentPicker", apiContentBuilder, apiElementBuilder)
-        });
+            CreateElementProperty(content.Object, "element2", 555, contentPicker2Value.Key, "contentPicker", apiContentBuilder, apiElementBuilder));
 
         var result = apiContentBuilder.Build(content.Object);
 
@@ -262,20 +255,18 @@ public class OutputExpansionStrategyTests : PropertyValueConverterTests
     public void OutputExpansionStrategy_CanExpandAllElements()
     {
         var accessor = CreateOutputExpansionStrategyAccessor(true );
-        var apiContentBuilder = new ApiContentBuilder(new PublishedContentNameProvider(), PublishedUrlProvider, accessor);
+        var apiContentBuilder = new ApiContentBuilder(new ApiContentNameProvider(), ApiUrlProvider(), accessor);
         var apiElementBuilder = new ApiElementBuilder(accessor);
 
         var contentPickerValue = CreateSimplePickedContent(111, 222);
         var contentPicker2Value = CreateSimplePickedContent(666, 777);
 
         var content = new Mock<IPublishedContent>();
-        content.SetupGet(c => c.ContentType).Returns(_contentType);
-        content.SetupGet(c => c.Properties).Returns(new[]
-        {
+        SetupContentMock(
+            content,
             CreateNumberProperty(content.Object, 444, "number"),
             CreateElementProperty(content.Object, "element", 333, contentPickerValue.Key, "contentPicker", apiContentBuilder, apiElementBuilder),
-            CreateElementProperty(content.Object, "element2", 555, contentPicker2Value.Key, "contentPicker", apiContentBuilder, apiElementBuilder)
-        });
+            CreateElementProperty(content.Object, "element2", 555, contentPicker2Value.Key, "contentPicker", apiContentBuilder, apiElementBuilder));
 
         var result = apiContentBuilder.Build(content.Object);
 
@@ -321,18 +312,14 @@ public class OutputExpansionStrategyTests : PropertyValueConverterTests
     public void OutputExpansionStrategy_DoesNotExpandElementNestedContentPicker()
     {
         var accessor = CreateOutputExpansionStrategyAccessor(false, new[] { "element" });
-        var apiContentBuilder = new ApiContentBuilder(new PublishedContentNameProvider(), PublishedUrlProvider, accessor);
+        var apiContentBuilder = new ApiContentBuilder(new ApiContentNameProvider(), ApiUrlProvider(), accessor);
         var apiElementBuilder = new ApiElementBuilder(accessor);
 
         var nestedContentPickerValue = CreateSimplePickedContent(111, 222);
         var contentPickerValue = CreateMultiLevelPickedContent(987, nestedContentPickerValue, "contentPicker", apiContentBuilder);
 
         var content = new Mock<IPublishedContent>();
-        content.SetupGet(c => c.ContentType).Returns(_contentType);
-        content.SetupGet(c => c.Properties).Returns(new[]
-        {
-            CreateElementProperty(content.Object, "element", 333, contentPickerValue.Key, "contentPicker", apiContentBuilder, apiElementBuilder),
-        });
+        SetupContentMock(content, CreateElementProperty(content.Object, "element", 333, contentPickerValue.Key, "contentPicker", apiContentBuilder, apiElementBuilder));
 
         var result = apiContentBuilder.Build(content.Object);
 
@@ -374,18 +361,22 @@ public class OutputExpansionStrategyTests : PropertyValueConverterTests
         return outputExpansionStrategyAccessorMock.Object;
     }
 
-    private IPublishedContent CreateSimplePickedContent(int numberOneValue, int numberTwoValue)
+    private void SetupContentMock(Mock<IPublishedContent> content, params IPublishedProperty[] properties)
     {
         var key = Guid.NewGuid();
-        var content = new Mock<IPublishedContent>();
-
         content.SetupGet(c => c.Key).Returns(key);
+        content.SetupGet(c => c.Properties).Returns(properties);
         content.SetupGet(c => c.ContentType).Returns(_contentType);
-        content.SetupGet(c => c.Properties).Returns(new[]
-        {
+        content.SetupGet(c => c.ItemType).Returns(PublishedItemType.Content);
+    }
+
+    private IPublishedContent CreateSimplePickedContent(int numberOneValue, int numberTwoValue)
+    {
+        var content = new Mock<IPublishedContent>();
+        SetupContentMock(
+            content,
             CreateNumberProperty(content.Object, numberOneValue, "numberOne"),
-            CreateNumberProperty(content.Object, numberTwoValue, "numberTwo")
-        });
+            CreateNumberProperty(content.Object, numberTwoValue, "numberTwo"));
 
         RegisterContentWithProviders(content.Object);
         return content.Object;
@@ -393,16 +384,11 @@ public class OutputExpansionStrategyTests : PropertyValueConverterTests
 
     private IPublishedContent CreateMultiLevelPickedContent(int numberValue, IPublishedContent nestedContentPickerValue, string nestedContentPickerPropertyTypeAlias, ApiContentBuilder apiContentBuilder)
     {
-        var key = Guid.NewGuid();
         var content = new Mock<IPublishedContent>();
-
-        content.SetupGet(c => c.Key).Returns(key);
-        content.SetupGet(c => c.ContentType).Returns(_contentType);
-        content.SetupGet(c => c.Properties).Returns(new[]
-        {
+        SetupContentMock(
+            content,
             CreateNumberProperty(content.Object, numberValue, "number"),
-            CreateContentPickerProperty(content.Object, nestedContentPickerValue.Key, nestedContentPickerPropertyTypeAlias, apiContentBuilder)
-        });
+            CreateContentPickerProperty(content.Object, nestedContentPickerValue.Key, nestedContentPickerPropertyTypeAlias, apiContentBuilder));
 
         RegisterContentWithProviders(content.Object);
         return content.Object;
@@ -464,4 +450,6 @@ public class OutputExpansionStrategyTests : PropertyValueConverterTests
         var elementPropertyType = SetupPublishedPropertyType(elementValueConverter.Object, elementPropertyAlias, "My.Element.Property");
         return new PublishedElementPropertyBase(elementPropertyType, parent, false, PropertyCacheLevel.None);
     }
+
+    private IApiUrlProvider ApiUrlProvider() => new ApiUrlProvider(PublishedUrlProvider, new DefaultRequestStartNodeServiceAccessor());
 }
