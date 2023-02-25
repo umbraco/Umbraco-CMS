@@ -5,11 +5,11 @@ import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 import { UmbContextToken } from '@umbraco-cms/context-api';
 
 const logLevels = {
-	information: 171,
-	debug: 39,
-	warning: 31,
-	error: 1,
-	fatal: 0,
+	Information: 171,
+	Debug: 39,
+	Warning: 31,
+	Error: 1,
+	Fatal: 0,
 };
 
 export type LogLevel = Record<keyof typeof logLevels, number>;
@@ -47,6 +47,7 @@ export class UmbLogViewerWorkspaceContext {
 			this.#logCount.next(data);
 		}
 	}
+
 
 	async getMessageTemplates(skip: number, take: number) {
 		const { data } = await this.#repository.getMessageTemplates({ skip, take });

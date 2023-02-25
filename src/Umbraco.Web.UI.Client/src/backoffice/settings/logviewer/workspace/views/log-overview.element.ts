@@ -53,15 +53,17 @@ export class UmbLogSearchWorkspaceElement extends UmbLitElement {
 				grid-area: 1 / 1 / 2 / 3;
 			}
 
-			#date-input-container {
-			}
-
 			#errors {
 				grid-area: 2 / 1 / 3 / 2;
 			}
 
 			#level {
 				grid-area: 2 / 2 / 3 / 3;
+			}
+
+			#log-lever {
+				color: var(--uui-color-positive);
+				text-align: center;
 			}
 
 			#types {
@@ -184,6 +186,12 @@ export class UmbLogSearchWorkspaceElement extends UmbLitElement {
 				text-decoration: none;
 				color: inherit;
 			}
+
+			#error-count {
+				font-size: 4rem;
+				text-align: center;
+				color: var(--uui-color-danger);
+			}
 		`,
 	];
 
@@ -213,6 +221,9 @@ export class UmbLogSearchWorkspaceElement extends UmbLitElement {
 
 	@state()
 	private _totalLogCount = 0;
+
+	@state()
+	private _errorCount = 0;
 
 	@state()
 	private _logLevelCountFilter: string[] = [];
@@ -266,7 +277,7 @@ export class UmbLogSearchWorkspaceElement extends UmbLitElement {
 
 		this.observe(this.#logViewerContext.logCount, (logLevel) => {
 			this._logLevelCount = logLevel ?? null;
-
+			this._errorCount = this._logLevelCount?.Error ?? 0;
 			this.setLogLevelCount();
 		});
 
@@ -296,6 +307,11 @@ export class UmbLogSearchWorkspaceElement extends UmbLitElement {
 				? this.logLevelCount.flatMap((arr) => arr[1]).reduce((acc, count) => acc + count, 0)
 				: 0;
 		}
+	}
+
+	async #getMessageTemplates() {
+		const take = this._messageTemplates?.items?.length ?? 0;
+		await this.#logViewerContext?.getMessageTemplates(0, take + 10);
 	}
 
 	#calculatePercentage(partialValue: number) {
@@ -344,6 +360,7 @@ export class UmbLogSearchWorkspaceElement extends UmbLitElement {
 						<div id="date-input-container" @input=${this.#setDates}>
 							<uui-label for="start-date">From:</uui-label> 
 							<input 
+							@click=${(e: Event) => {(e.target as HTMLInputElement).showPicker()}}
 								id="start-date" 
 								type="date" 
 								label="From" 
@@ -352,6 +369,8 @@ export class UmbLogSearchWorkspaceElement extends UmbLitElement {
 							</input>
 							<uui-label for="end-date">To: </uui-label>
 							<input 
+							@click=${(e: Event) => {(e.target as HTMLInputElement).showPicker()}}
+
 								id="end-date" 
 								type="date" 
 								label="To" 
@@ -361,9 +380,14 @@ export class UmbLogSearchWorkspaceElement extends UmbLitElement {
 						</div>
 					</uui-box>
 
-					<uui-box id="errors" headline="Number of Errors"></uui-box>
+					<uui-box id="errors" headline="Number of Errors">
+						<h1 id="error-count">${this._errorCount ? this._errorCount : ''}</h1>
+					</uui-box>
 
-					<uui-box id="level" headline="Log level"></uui-box>
+					<uui-box id="level" headline="Log level">
+					<h1 id="log-lever">Info</h1>
+
+					</uui-box>
 
 					<uui-box id="types" headline="Log types">
 						<div id="log-types-container">
@@ -417,25 +441,27 @@ export class UmbLogSearchWorkspaceElement extends UmbLitElement {
 				<div id="common-messages-container">
 					<uui-box headline="Common Log Messages" id="saved-searches">
 						<p style="font-style: italic;">Total Unique Message types: ${this._messageTemplates?.total}</p>
-					<uui-table>
-					${
-						this._messageTemplates
-							? this._messageTemplates.items.map(
-									(template) =>
-										html`<uui-table-row
-											><uui-table-cell>
-												<a
-													href=${'/section/settings/logviewer/search?lg=@MessageTemplate%3D' +
-													template.messageTemplate}>
-													<span>${template.messageTemplate}</span> <span>${template.count}</span>
-												</a>
-											</uui-table-cell>
-										</uui-table-row>`
-							  )
-							: ''
-					}
-			</uui-table>
-					<uui-button id="show-more-templates-btn" look="primary">Show more</uui-button>
+
+						<uui-table>
+						${
+							this._messageTemplates
+								? this._messageTemplates.items.map(
+										(template) =>
+											html`<uui-table-row
+												><uui-table-cell>
+													<a
+														href=${'/section/settings/logviewer/search?lg=@MessageTemplate%3D' +
+														template.messageTemplate}>
+														<span>${template.messageTemplate}</span> <span>${template.count}</span>
+													</a>
+												</uui-table-cell>
+											</uui-table-row>`
+								  )
+								: ''
+						}
+									</uui-table>
+
+					<uui-button id="show-more-templates-btn" look="primary" @click=${this.#getMessageTemplates}>Show more</uui-button>
 					</uui-box>
 				</div>
 			</div>

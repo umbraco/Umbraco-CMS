@@ -65,28 +65,4 @@ export class UmbLogViewerRepository {
 		return this.#messagesDataSource.getLogViewerLevelCount({ startDate, endDate });
 	}
 
-	// async insert(template: Template) {
-	// 	await this.#init();
-
-	// 	// TODO: should we show a notification if the template is missing?
-	// 	// Investigate what is best for Acceptance testing, cause in that perspective a thrown error might be the best choice?
-	// 	if (!template) {
-	// 		const error: ProblemDetails = { title: 'Template is missing' };
-	// 		return { error };
-	// 	}
-
-	// 	const { error } = await this.#dataSource.insert(template);
-
-	// 	if (!error) {
-	// 		const notification = { data: { message: `Template created` } };
-	// 		this.#notificationService?.peek('positive', notification);
-	// 	}
-
-	// 	// TODO: we currently don't use the detail store for anything.
-	// 	// Consider to look up the data before fetching from the server
-	// 	this.#searchStore?.append(template);
-	// 	// TODO: Update tree store with the new item?
-
-	// 	return { error };
-	// }
 }
