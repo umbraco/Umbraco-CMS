@@ -253,7 +253,6 @@ export class UmbLogSearchWorkspaceElement extends UmbLitElement {
 
 	load(): void {
 		// Not relevant for this workspace -added to prevent the error from popping up
-		console.log('Loading something from somewhere');
 	}
 
 	create(): void {
@@ -327,7 +326,6 @@ export class UmbLogSearchWorkspaceElement extends UmbLitElement {
 		} else if (target.id === 'end-date') {
 			this._endDate = target.value;
 		}
-		console.log('start date: ' + this._startDate);
 	}
 
 	#renderSearchItem(searchListItem: SavedLogSearchModel) {
