@@ -1,10 +1,11 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, html } from 'lit';
 import { customElement } from 'lit/decorators.js';
+import { UmbLogViewerWorkspaceContext, UMB_APP_LOG_VIEWER_CONTEXT_TOKEN } from '../logviewer.context';
 import { UmbLitElement } from '@umbraco-cms/element';
 
-@customElement('umb-log-search-workspace-search')
-export class UmbLogSearchWorkspaceElement extends UmbLitElement {
+@customElement('umb-log-viewer-search-view')
+export class UmbLogViewerSearchViewElement extends UmbLitElement {
 	static styles = [
 		UUITextStyles,
 		css`
@@ -22,15 +23,24 @@ export class UmbLogSearchWorkspaceElement extends UmbLitElement {
 		`,
 	];
 
+	#logViewerContext?: UmbLogViewerWorkspaceContext;
+
+	constructor() {
+		super();
+		this.consumeContext(UMB_APP_LOG_VIEWER_CONTEXT_TOKEN, (instance) => {
+			this.#logViewerContext = instance;
+		});
+	}
+
 	render() {
 		return html` <h1>Search</h1> `;
 	}
 }
 
-export default UmbLogSearchWorkspaceElement;
+export default UmbLogViewerSearchViewElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-log-search-workspace': UmbLogSearchWorkspaceElement;
+		'umb-log-viewer-search-view': UmbLogViewerSearchViewElement;
 	}
 }

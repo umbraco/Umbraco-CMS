@@ -8,11 +8,11 @@ import { UmbLitElement } from '@umbraco-cms/element';
 import { umbExtensionsRegistry, createExtensionElement } from '@umbraco-cms/extensions-api';
 import { ManifestWorkspaceView, ManifestWorkspaceViewCollection } from '@umbraco-cms/extensions-registry';
 import { UmbRouterSlotInitEvent, UmbRouterSlotChangeEvent } from '@umbraco-cms/router';
-import { UmbLogViewerWorkspaceContext, UMB_APP_LOG_VIEWER_CONTEXT_TOKEN } from './logviewer-root.context';
+import { UmbLogViewerWorkspaceContext, UMB_APP_LOG_VIEWER_CONTEXT_TOKEN } from '../logviewer.context';
 
 //TODO make uui-input accept min and max values
-@customElement('umb-logviewer-root-workspace')
-export class UmbLogViewerRootWorkspaceElement extends UmbLitElement {
+@customElement('umb-logviewer-workspace')
+export class UmbLogViewerWorkspaceElement extends UmbLitElement {
 	// render() {
 	// 	return html`
 	// 	<umb-body-layout headline="Log Overview for today">
@@ -253,10 +253,10 @@ export class UmbLogViewerRootWorkspaceElement extends UmbLitElement {
 	}
 }
 
-export default UmbLogViewerRootWorkspaceElement;
+export default UmbLogViewerWorkspaceElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-logviewer-root-workspace': UmbLogViewerRootWorkspaceElement;
+		'umb-logviewer-workspace': UmbLogViewerWorkspaceElement;
 	}
 }

@@ -1,16 +1,12 @@
 import { css, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { clamp } from 'lodash-es';
-import {
-	LogLevel,
-	UmbLogViewerWorkspaceContext,
-	UMB_APP_LOG_VIEWER_CONTEXT_TOKEN,
-} from '../logviewer-root/logviewer-root.context';
+import { LogLevel, UmbLogViewerWorkspaceContext, UMB_APP_LOG_VIEWER_CONTEXT_TOKEN } from '../logviewer.context';
 import { SavedLogSearchModel, PagedLogTemplateModel } from '@umbraco-cms/backend-api';
 import { UmbLitElement } from '@umbraco-cms/element';
 
-@customElement('umb-log-search-workspace-overview')
-export class UmbLogSearchWorkspaceElement extends UmbLitElement {
+@customElement('umb-log-viewer-overview-view')
+export class UmbLogViewerOverviewViewElement extends UmbLitElement {
 	static styles = [
 		css`
 			:host {
@@ -358,7 +354,9 @@ export class UmbLogSearchWorkspaceElement extends UmbLitElement {
 						<div id="date-input-container" @input=${this.#setDates}>
 							<uui-label for="start-date">From:</uui-label> 
 							<input 
-							@click=${(e: Event) => {(e.target as HTMLInputElement).showPicker()}}
+							@click=${(e: Event) => {
+								(e.target as HTMLInputElement).showPicker();
+							}}
 								id="start-date" 
 								type="date" 
 								label="From" 
@@ -367,7 +365,9 @@ export class UmbLogSearchWorkspaceElement extends UmbLitElement {
 							</input>
 							<uui-label for="end-date">To: </uui-label>
 							<input 
-							@click=${(e: Event) => {(e.target as HTMLInputElement).showPicker()}}
+							@click=${(e: Event) => {
+								(e.target as HTMLInputElement).showPicker();
+							}}
 
 								id="end-date" 
 								type="date" 
@@ -467,10 +467,10 @@ export class UmbLogSearchWorkspaceElement extends UmbLitElement {
 	}
 }
 
-export default UmbLogSearchWorkspaceElement;
+export default UmbLogViewerOverviewViewElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-log-search-workspace-overview': UmbLogSearchWorkspaceElement;
+		'umb-log-viewer-overview-view': UmbLogViewerOverviewViewElement;
 	}
 }

@@ -1,4 +1,4 @@
-import { UmbLogViewerRepository } from '../data/log-viewer.repository';
+import { UmbLogViewerRepository } from './data/log-viewer.repository';
 import { createObservablePart, DeepState } from '@umbraco-cms/observable-api';
 import { PagedLogTemplateModel, PagedSavedLogSearchModel } from '@umbraco-cms/backend-api';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
@@ -47,7 +47,6 @@ export class UmbLogViewerWorkspaceContext {
 			this.#logCount.next(data);
 		}
 	}
-
 
 	async getMessageTemplates(skip: number, take: number) {
 		const { data } = await this.#repository.getMessageTemplates({ skip, take });
