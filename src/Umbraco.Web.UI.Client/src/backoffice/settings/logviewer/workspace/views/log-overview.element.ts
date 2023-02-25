@@ -22,9 +22,6 @@ export class UmbLogViewerOverviewViewElement extends UmbLitElement {
 
 			#logviewer-layout {
 				margin: 20px;
-			}
-
-			#logviewer-layout {
 				height: calc(100vh - 160px);
 				display: grid;
 				grid-template-columns: 7fr 2fr;
