@@ -1,7 +1,7 @@
 import { css, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { clamp } from 'lodash-es';
-import { LogLevel, UmbLogViewerWorkspaceContext, UMB_APP_LOG_VIEWER_CONTEXT_TOKEN } from '../logviewer.context';
+import { LogLevel, LogViewerDateRange, UmbLogViewerWorkspaceContext, UMB_APP_LOG_VIEWER_CONTEXT_TOKEN } from '../logviewer.context';
 import { SavedLogSearchModel, PagedLogTemplateModel } from '@umbraco-cms/backend-api';
 import { UmbLitElement } from '@umbraco-cms/element';
 
@@ -188,24 +188,6 @@ export class UmbLogViewerOverviewViewElement extends UmbLitElement {
 		`,
 	];
 
-	get today() {
-		const today = new Date();
-		const dd = String(today.getDate()).padStart(2, '0');
-		const mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
-		const yyyy = today.getFullYear();
-
-		return yyyy + '-' + mm + '-' + dd;
-	}
-
-	get yesterday() {
-		const today = new Date();
-		const dd = String(today.getDate() - 1).padStart(2, '0');
-		const mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
-		const yyyy = today.getFullYear();
-
-		return yyyy + '-' + mm + '-' + dd;
-	}
-
 	@state()
 	private _savedSearches: SavedLogSearchModel[] = [];
 
@@ -228,10 +210,10 @@ export class UmbLogViewerOverviewViewElement extends UmbLitElement {
 	private _logLevelCount: LogLevel | null = null;
 
 	@state()
-	private _startDate = this.yesterday;
+	private _startDate = '';
 
 	@state()
-	private _endDate = this.today;
+	private _endDate = '';
 
 	#logViewerContext?: UmbLogViewerWorkspaceContext;
 
@@ -244,20 +226,12 @@ export class UmbLogViewerOverviewViewElement extends UmbLitElement {
 			: 0;
 	}
 
-	load(): void {
-		// Not relevant for this workspace -added to prevent the error from popping up
-	}
-
-	create(): void {
-		// Not relevant for this workspace
-	}
-
 	constructor() {
 		super();
 		this.consumeContext(UMB_APP_LOG_VIEWER_CONTEXT_TOKEN, (instance) => {
 			this.#logViewerContext = instance;
 			this.#observeStuff();
-			this.getData();
+			
 		});
 	}
 
@@ -276,20 +250,11 @@ export class UmbLogViewerOverviewViewElement extends UmbLitElement {
 		this.observe(this.#logViewerContext.messageTemplates, (templates) => {
 			this._messageTemplates = templates ?? null;
 		});
-	}
 
-	async getData() {
-		if (!this.#logViewerContext) return;
-
-		try {
-			await Promise.all([
-				this.#logViewerContext.getSavedSearches(),
-				this.#logViewerContext.getLogCount(this.today, this.yesterday),
-				this.#logViewerContext.getMessageTemplates(0, 10),
-			]);
-		} catch (e) {
-			console.error(e);
-		}
+		this.observe(this.#logViewerContext.dateRange, (dateRange: LogViewerDateRange) => {
+			this._startDate = dateRange?.startDate;
+			this._endDate = dateRange?.endDate;
+		})
 	}
 
 	protected willUpdate(_changedProperties: Map<PropertyKey, unknown>): void {
@@ -319,6 +284,8 @@ export class UmbLogViewerOverviewViewElement extends UmbLitElement {
 		} else if (target.id === 'end-date') {
 			this._endDate = target.value;
 		}
+		const newDateRange: LogViewerDateRange = { startDate: this._startDate, endDate: this._endDate };
+		this.#logViewerContext?.setDateRange(newDateRange);
 	}
 
 	#renderSearchItem(searchListItem: SavedLogSearchModel) {
