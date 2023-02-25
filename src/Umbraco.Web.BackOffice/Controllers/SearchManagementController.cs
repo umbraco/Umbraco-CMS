@@ -22,6 +22,7 @@ public class SearchManagementController : UmbracoAuthorizedJsonController
 {
     private readonly IIndexDiagnosticsFactory _indexDiagnosticsFactory;
     private readonly IIndexRebuilder _indexRebuilder;
+    private readonly ISearchProvider _provider;
     private readonly ILogger<SearchManagementController> _logger;
     private readonly IAppPolicyCache _runtimeCache;
 
@@ -32,6 +33,7 @@ public class SearchManagementController : UmbracoAuthorizedJsonController
         AppCaches appCaches,
         IIndexRebuilder indexRebuilder)
     {
+        _provider = provider;
         _logger = logger;
         _indexDiagnosticsFactory = indexDiagnosticsFactory;
         _runtimeCache = appCaches.RuntimeCache;
@@ -43,7 +45,7 @@ public class SearchManagementController : UmbracoAuthorizedJsonController
     /// </summary>
     /// <returns></returns>
     public IEnumerable<SearchIndexModel> GetIndexerDetails()
-        => _examineManager.Indexes
+        => _provider.GetAllIndexes()
             .Select(index => CreateModel(index))
             .OrderBy(examineIndexModel => examineIndexModel.Name?.TrimEnd("Indexer"));
 
@@ -54,53 +56,44 @@ public class SearchManagementController : UmbracoAuthorizedJsonController
     public IEnumerable<SearcherModel> GetSearcherDetails()
     {
         var model = new List<SearcherModel>(
-            _examineManager.RegisteredSearchers.Select(searcher => new SearcherModel { Name = searcher.Name })
+            _provider.GetAllSearchers().Select(searcher => new SearcherModel { Name = searcher })
                 .OrderBy(x =>
                     x.Name?.TrimEnd("Searcher"))); //order by name , but strip the "Searcher" from the end if it exists
         return model;
     }
 
-    public ActionResult<SearchResults> GetSearchResults(string searcherName, string? query, int pageIndex = 0, int pageSize = 20)
+    public ActionResult<UmbracoSearchResults?> GetSearchResults(string searcherName, string? query, int pageIndex = 0,
+        int pageSize = 20)
     {
         query = query?.Trim();
 
         if (query.IsNullOrWhiteSpace())
         {
-            return SearchResults.Empty();
+            return UmbracoSearchResults.Empty();
         }
 
-        ActionResult msg = ValidateSearcher(searcherName, out ISearcher searcher);
+        ActionResult msg = ValidateSearcher(searcherName, out IUmbracoSearcher? searcher);
         if (!msg.IsSuccessStatusCode())
         {
             return msg;
         }
 
-        ISearchResults results;
+        UmbracoSearchResults? results;
 
         // NativeQuery will work for a single word/phrase too (but depends on the implementation) the lucene one will work.
         try
         {
-            results = searcher
-                .CreateQuery()
-                .NativeQuery(query)
-                .Execute(QueryOptions.SkipTake(pageSize * pageIndex, pageSize));
+            results = searcher?
+                .NativeQuery(query,pageIndex, pageSize);
         }
         catch (ParseException)
         {
             // will occur if the query parser cannot parse this (i.e. starts with a *)
-            return SearchResults.Empty();
+            return UmbracoSearchResults.Empty();
         }
 
-        return new SearchResults
-        {
-            TotalRecords = results.TotalItemCount,
-            Results = results.Select(x => new SearchResult
-            {
-                Id = x.Id,
-                Score = x.Score,
-                Values = x.AllValues.OrderBy(y => y.Key).ToDictionary(y => y.Key, y => y.Value)
-            })
-        };
+        return results;
+
     }
 
     /// <summary>
@@ -114,7 +107,7 @@ public class SearchManagementController : UmbracoAuthorizedJsonController
     /// </remarks>
     public ActionResult<SearchIndexModel?> PostCheckRebuildIndex(string indexName)
     {
-        ActionResult validate = ValidateIndex(indexName, out IIndex? index);
+        ActionResult validate = ValidateIndex(indexName, out IUmbracoIndex? index);
 
         if (!validate.IsSuccessStatusCode())
         {
@@ -133,7 +126,7 @@ public class SearchManagementController : UmbracoAuthorizedJsonController
         //if its still there then it's not done
         return found != null
             ? null
-            : CreateModel(index!);
+            : CreateModel(indexName!);
     }
 
     /// <summary>
@@ -143,7 +136,7 @@ public class SearchManagementController : UmbracoAuthorizedJsonController
     /// <returns></returns>
     public IActionResult PostRebuildIndex(string indexName)
     {
-        ActionResult validate = ValidateIndex(indexName, out IIndex? index);
+        ActionResult validate = ValidateIndex(indexName, out IUmbracoIndex? index);
         if (!validate.IsSuccessStatusCode())
         {
             return validate;
@@ -188,15 +181,13 @@ public class SearchManagementController : UmbracoAuthorizedJsonController
 
     private SearchIndexModel CreateModel(string indexName)
     {
-
         IIndexDiagnostics indexDiag = _indexDiagnosticsFactory.Create(indexName);
 
         Attempt<string?> isHealth = indexDiag.IsHealthy();
 
         var properties = new Dictionary<string, object?>
         {
-            ["DocumentCount"] = indexDiag.GetDocumentCount(),
-            ["FieldCount"] = indexDiag.GetFieldNames().Count()
+            ["DocumentCount"] = indexDiag.GetDocumentCount(), ["FieldCount"] = indexDiag.GetFieldNames().Count()
         };
 
         foreach (KeyValuePair<string, object?> p in indexDiag.Metadata)
@@ -209,33 +200,27 @@ public class SearchManagementController : UmbracoAuthorizedJsonController
             Name = indexName,
             HealthStatus = isHealth.Success ? isHealth.Result ?? "Healthy" : isHealth.Result ?? "Unhealthy",
             ProviderProperties = properties,
-            CanRebuild = _indexRebuilder.CanRebuild(index.Name)
+            CanRebuild = _indexRebuilder.CanRebuild(indexName)
         };
 
         return indexerModel;
     }
 
-    private ActionResult ValidateSearcher(string searcherName, out ISearcher searcher)
+    private ActionResult ValidateSearcher(string searcherName, out IUmbracoSearcher? searcher)
     {
-        //try to get the searcher from the indexes
-        if (_examineManager.TryGetIndex(searcherName, out IIndex index))
+        searcher = _provider.GetSearcher(searcherName);
+        if (searcher != null)
         {
-            searcher = index.Searcher;
             return new OkResult();
         }
 
-        //if we didn't find anything try to find it by an explicitly declared searcher
-        if (_examineManager.TryGetSearcher(searcherName, out searcher))
-        {
-            return new OkResult();
-        }
 
         var response1 = new BadRequestObjectResult($"No searcher found with name = {searcherName}");
         HttpContext.SetReasonPhrase("Searcher Not Found");
         return response1;
     }
 
-    private ActionResult ValidatePopulator(IIndex index)
+    private ActionResult ValidatePopulator(IUmbracoIndex index)
     {
         if (_indexRebuilder.CanRebuild(index.Name))
         {
@@ -248,11 +233,11 @@ public class SearchManagementController : UmbracoAuthorizedJsonController
         return response;
     }
 
-    private ActionResult ValidateIndex(string indexName, out IIndex? index)
+    private ActionResult ValidateIndex(string indexName, out IUmbracoIndex? index)
     {
-        index = null;
+        index = _provider.GetIndex(indexName);
 
-        if (_examineManager.TryGetIndex(indexName, out index))
+        if (index != null)
         {
             //return Ok!
             return new OkResult();
@@ -265,13 +250,18 @@ public class SearchManagementController : UmbracoAuthorizedJsonController
 
     private void Indexer_IndexOperationComplete(object? sender, EventArgs e)
     {
-        var indexer = (IIndex?)sender;
+        if (sender == null)
+        {
+            return;
+        }
+        var indexer = (IUmbracoIndex)sender;
 
         _logger.LogDebug("Logging operation completed for index {IndexName}", indexer?.Name);
 
-        if (indexer is not null)
+
+        //ensure it's not listening anymore
+        if (indexer?.IndexOperationComplete != null)
         {
-            //ensure it's not listening anymore
             indexer.IndexOperationComplete -= Indexer_IndexOperationComplete;
         }
 

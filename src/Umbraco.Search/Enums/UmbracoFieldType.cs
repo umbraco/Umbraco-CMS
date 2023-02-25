@@ -6,5 +6,14 @@ public enum UmbracoFieldType
     DateTime,
     Raw,
     InvariantCultureIgnoreCase,
-    EmailAddress
+    EmailAddress,
+    Double,
+    FullTextSortable,
+    FullText,
+    DateHour,
+    DateDay,
+    DateMonth,
+    DateYear,
+    Long,
+    Float
 }

@@ -1,6 +1,9 @@
 using Examine;
+using Examine.Lucene.Analyzers;
+using Lucene.Net.Analysis;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Infrastructure.Examine;
 using Umbraco.Search.Examine.ValueSetBuilders;
 
 namespace Umbraco.Search.Examine;
@@ -28,4 +31,8 @@ public class UmbracoIndexConfig : IUmbracoExamineIndexConfig
     /// </summary>
     /// <returns></returns>
     public IValueSetValidator GetMemberValueSetValidator() => new MemberValueSetValidator();
+
+    public bool PublishedValuesOnly { get; set; }
+    public bool EnableDefaultEventHandler { get; set; }
+    public Analyzer Analyzer { get; set; }  = new CultureInvariantWhitespaceAnalyzer();
 }

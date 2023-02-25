@@ -2,8 +2,11 @@ using System.Globalization;
 using Examine;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Scoping;
+using Umbraco.Cms.Core.Search;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Extensions;
+using Umbraco.Search.Examine;
+using Umbraco.Search.Examine.ValueSetBuilders;
 
 namespace Umbraco.Cms.Infrastructure.Examine;
 

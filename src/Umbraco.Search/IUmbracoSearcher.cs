@@ -11,4 +11,5 @@ public interface IUmbracoSearcher
     public IUmbracoSearchResult Search(string term, int page, int pageSize);
 
     string Name { get;  }
+    UmbracoSearchResults? NativeQuery(string query, int page, int pageSize);
 }

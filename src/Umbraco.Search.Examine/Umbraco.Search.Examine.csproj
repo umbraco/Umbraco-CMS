@@ -12,6 +12,8 @@
 
   <ItemGroup>
     <PackageReference Include="Examine.Core" Version="3.1.0" />
+    <PackageReference Include="Examine.Lucene" Version="3.1.0" />
+    <PackageReference Include="Lucene.Net" Version="4.8.0-beta00016" />
   </ItemGroup>
 
   <ItemGroup>

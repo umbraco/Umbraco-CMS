@@ -17,13 +17,13 @@ public class UmbracoExamineIndex<T> : IUmbracoIndex<T>
     public bool EnableDefaultEventHandler { get; }
     public bool PublishedValuesOnly { get; }
     public string Name => _examineIndex.Name;
+    public Action<object?, EventArgs>? IndexOperationComplete { get; set; }
     public bool Exists() => _examineIndex.IndexExists();
 
     public long GetDocumentCount() => throw new NotImplementedException();
 
-    public bool IndexExists() => throw new NotImplementedException();
-
-    public void Create() => throw new NotImplementedException();
+    public void Create() => _examineIndex.CreateIndex();
+    public IEnumerable<string> GetFieldNames() => _examineIndex.FieldDefinitions.Select(x=>x.Name);
 
     /// <summary>
     ///

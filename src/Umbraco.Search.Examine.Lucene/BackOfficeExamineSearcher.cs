@@ -16,6 +16,7 @@ using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Models.Search;
 using Umbraco.Cms.Core.Routing;
+using Umbraco.Cms.Core.Search;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Extensions;
@@ -147,7 +148,7 @@ public class BackOfficeExamineSearcher : IBackOfficeExamineSearcher
         if (!BuildQuery(sb, query, searchFrom, fields, type))
         {
             totalFound = 0;
-            return Enumerable.Empty<ISearchResult>();
+            return Enumerable.Empty<IUmbracoSearchResult>();
         }
 
         ISearchResults? result = index.Searcher
@@ -159,7 +160,7 @@ public class BackOfficeExamineSearcher : IBackOfficeExamineSearcher
 
         totalFound = result.TotalItemCount;
 
-        return result;
+        return result.ToUmbracoResults();
     }
 
     private bool BuildQuery(StringBuilder sb, string query, string? searchFrom, List<string> fields, string type)

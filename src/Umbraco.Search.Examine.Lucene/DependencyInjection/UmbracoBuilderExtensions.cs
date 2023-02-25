@@ -35,7 +35,8 @@ public static class UmbracoBuilderExtensions
         IServiceCollection services = umbracoBuilder.Services;
 
         services.AddSingleton<IBackOfficeExamineSearcher, BackOfficeExamineSearcher>();
-        services.AddSingleton<IIndexDiagnosticsFactory, LuceneIndexDiagnosticsFactory>();
+        //todo: restore when indexes are working
+        //services.AddSingleton<IIndexDiagnosticsFactory, LuceneIndexDiagnosticsFactory>();
 
         services.AddExamine();
 

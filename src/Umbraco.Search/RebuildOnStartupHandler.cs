@@ -1,4 +1,5 @@
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Sync;
@@ -13,7 +14,8 @@ namespace Umbraco.Search;
 ///     On the first HTTP request this will rebuild the Examine indexes if they are empty.
 ///     If it is a cold boot, they are all rebuilt.
 /// </remarks>
-public class RebuildOnStartupHandler{
+public class RebuildOnStartupHandler : INotificationHandler<UmbracoRequestBeginNotification>
+{
     // These must be static because notification handlers are transient.
     // this does unfortunatley mean that one RebuildOnStartupHandler instance
     // will be created for each front-end request even though we only use the first one.

@@ -52,10 +52,11 @@ namespace Umbraco.Cms.Web.UI
             app.UseHttpsRedirection();
 #endif
 
-            app.UseUmbraco()
+            app.UseUmbraco(u)
                 .WithMiddleware(u =>
                 {
                     u.UseBackOffice();
+
                     u.UseWebsite();
                 })
                 .WithEndpoints(u =>

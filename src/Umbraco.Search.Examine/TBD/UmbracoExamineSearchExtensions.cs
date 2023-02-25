@@ -1,46 +1,16 @@
 using System.Text.RegularExpressions;
 using Examine;
 using Examine.Search;
+using Umbraco.Cms.Core.Search;
 using Umbraco.Cms.Infrastructure.Examine;
+using Umbraco.Search;
+using Umbraco.Search.Extensions;
 
 namespace Umbraco.Extensions;
 
-public static class UmbracoExamineExtensions
+public static class UmbracoExamineSearchExtensions
 {
-    /// <summary>
-    ///     Matches a culture iso name suffix
-    /// </summary>
-    /// <remarks>
-    ///     myFieldName_en-us will match the "en-us"
-    /// </remarks>
-    internal static readonly Regex _cultureIsoCodeFieldNameMatchExpression = new(
-        "^(?<FieldName>[_\\w]+)_(?<CultureName>[a-z]{2,3}(-[a-z0-9]{2,4})?)$",
-        RegexOptions.Compiled | RegexOptions.ExplicitCapture);
 
-    // TODO: We need a public method here to just match a field name against CultureIsoCodeFieldNameMatchExpression
-
-    /// <summary>
-    ///     Returns all index fields that are culture specific (suffixed)
-    /// </summary>
-    /// <param name="index"></param>
-    /// <param name="culture"></param>
-    /// <returns></returns>
-    public static IEnumerable<string> GetCultureFields(this IUmbracoIndex index, string culture)
-    {
-        IEnumerable<string> allFields = index.GetFieldNames();
-
-        var results = new List<string>();
-        foreach (var field in allFields)
-        {
-            Match match = _cultureIsoCodeFieldNameMatchExpression.Match(field);
-            if (match.Success && culture.InvariantEquals(match.Groups["CultureName"].Value))
-            {
-                results.Add(field);
-            }
-        }
-
-        return results;
-    }
 
     /// <summary>
     ///     Returns all index fields that are culture specific (suffixed) or invariant
@@ -54,7 +24,7 @@ public static class UmbracoExamineExtensions
 
         foreach (var field in allFields)
         {
-            Match match = _cultureIsoCodeFieldNameMatchExpression.Match(field);
+            Match match = UmbracoSearchExtensions._cultureIsoCodeFieldNameMatchExpression.Match(field);
             if (match.Success && culture.InvariantEquals(match.Groups["CultureName"].Value))
             {
                 yield return field; // matches this culture field

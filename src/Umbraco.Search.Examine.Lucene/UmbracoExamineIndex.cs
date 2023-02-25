@@ -9,6 +9,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Hosting;
+using Umbraco.Cms.Core.Search;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Extensions;
 using Umbraco.Search.Diagnostics;

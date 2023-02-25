@@ -3,9 +3,11 @@ using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.PropertyEditors;
+using Umbraco.Cms.Core.Search;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Extensions;
+using Umbraco.Search.Examine.ValueSetBuilders;
 
 namespace Umbraco.Cms.Infrastructure.Examine;
 

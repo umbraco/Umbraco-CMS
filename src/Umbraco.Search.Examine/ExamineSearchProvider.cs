@@ -47,7 +47,7 @@ public class ExamineSearchProvider : ISearchProvider
 
     public IEnumerable<string> GetUnhealthyIndexes()
     {
-        return _indexers.Where(x => !x.IndexExists() || ( x is IIndexDiagnostics indexProvider &&  !indexProvider.IsHealthy())).Select(x=>x.Name);
+        return _indexers.Where(x => !x.Exists() || ( x is IIndexDiagnostics indexProvider &&  !indexProvider.IsHealthy())).Select(x=>x.Name);
     }
 
     public OperationResult CreateIndex(string indexName)
@@ -72,5 +72,10 @@ public class ExamineSearchProvider : ISearchProvider
             messages.Add(new EventMessage("Examine Search provider", "Examine failed to created index", EventMessageType.Error));
             return OperationResult.Cancel(messages);
         }
+    }
+
+    public IEnumerable<string> GetAllSearchers()
+    {
+        return _searchers.Select(x => x.Name);
     }
 }

@@ -138,7 +138,8 @@ public class UmbracoTreeSearcher
             if (result.Values.ContainsKey(UmbracoSearchFieldNames.NodeKeyFieldName) &&
                 result.Values[UmbracoSearchFieldNames.NodeKeyFieldName] != null)
             {
-                if (Guid.TryParse(result.Values[UmbracoSearchFieldNames.NodeKeyFieldName], out Guid key))
+                var keyValue = result.Values[UmbracoSearchFieldNames.NodeKeyFieldName].FirstOrDefault()?.ToString();
+                if (Guid.TryParse(keyValue, out Guid key))
                 {
                     m.Key = key;
                 }
@@ -187,7 +188,7 @@ public class UmbracoTreeSearcher
             {
                 // if it varies by culture, return the default language URL
                 if (result.Values.TryGetValue(UmbracoSearchFieldNames.VariesByCultureFieldName, out var varies) &&
-                    varies == "y")
+                    varies.FirstOrDefault()?.ToString() == "y")
                 {
                     entity.AdditionalData["Url"] = _publishedUrlProvider.GetUrl(intId, culture: culture ?? defaultLang);
                 }

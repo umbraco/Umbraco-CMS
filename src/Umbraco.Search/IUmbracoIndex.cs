@@ -27,8 +27,9 @@ public interface IUmbracoIndex
     bool PublishedValuesOnly { get; }
 
     string Name { get; }
-    bool Exists();
+    Action<object?, EventArgs>? IndexOperationComplete { get; set; }
     long GetDocumentCount();
-    bool IndexExists();
+    bool Exists();
     void Create();
+    IEnumerable<string> GetFieldNames();
 }

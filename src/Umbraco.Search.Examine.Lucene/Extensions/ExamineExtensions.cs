@@ -7,6 +7,7 @@ using Examine.Lucene.Providers;
 using Lucene.Net.Analysis.Core;
 using Lucene.Net.QueryParsers.Classic;
 using Lucene.Net.Search;
+using Umbraco.Cms.Core.Search;
 using Umbraco.Cms.Infrastructure.Examine;
 
 namespace Umbraco.Extensions;

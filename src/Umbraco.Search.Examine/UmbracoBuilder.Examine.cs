@@ -5,9 +5,13 @@ using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
+using Umbraco.Cms.Infrastructure.Examine;
+using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Extensions;
 using Umbraco.Search.Diagnostics;
 using Umbraco.Search.Examine.ValueSetBuilders;
+using Umbraco.Search.Indexing;
+using Umbraco.Search.NotificationHandlers;
 
 namespace Umbraco.Search.Examine;
 

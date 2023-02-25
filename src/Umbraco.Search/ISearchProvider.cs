@@ -11,4 +11,5 @@ public interface ISearchProvider
     IEnumerable<string> GetAllIndexes();
     IEnumerable<string> GetUnhealthyIndexes();
     OperationResult CreateIndex(string indexName);
+    IEnumerable<string> GetAllSearchers();
 }

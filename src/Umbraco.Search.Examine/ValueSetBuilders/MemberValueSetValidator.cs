@@ -1,3 +1,4 @@
+using Umbraco.Cms.Core.Search;
 using Umbraco.Search.Examine;
 
 namespace Umbraco.Cms.Infrastructure.Examine;

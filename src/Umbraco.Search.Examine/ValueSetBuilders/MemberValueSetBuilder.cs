@@ -1,6 +1,7 @@
 using Examine;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.PropertyEditors;
+using Umbraco.Cms.Core.Search;
 using Umbraco.Extensions;
 
 namespace Umbraco.Search.Examine.ValueSetBuilders;

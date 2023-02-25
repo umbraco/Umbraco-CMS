@@ -5,20 +5,21 @@ using Umbraco.Cms.ManagementApi.Factories;
 using Umbraco.Cms.ManagementApi.ViewModels.Pagination;
 using Umbraco.Cms.ManagementApi.ViewModels.Search;
 using Umbraco.Extensions;
+using Umbraco.Search;
 
 namespace Umbraco.Cms.ManagementApi.Controllers.Indexer;
 
 [ApiVersion("1.0")]
 public class AllIndexerController : IndexerControllerBase
 {
-    private readonly IExamineManager _examineManager;
+    private readonly ISearchProvider _searchProvider;
     private readonly IIndexViewModelFactory _indexViewModelFactory;
 
     public AllIndexerController(
-        IExamineManager examineManager,
+       ISearchProvider searchProvider,
         IIndexViewModelFactory indexViewModelFactory)
     {
-        _examineManager = examineManager;
+        _searchProvider = searchProvider;
         _indexViewModelFactory = indexViewModelFactory;
     }
 
@@ -31,7 +32,7 @@ public class AllIndexerController : IndexerControllerBase
     [ProducesResponseType(typeof(PagedViewModel<IndexViewModel>), StatusCodes.Status200OK)]
     public Task<PagedViewModel<IndexViewModel>> All(int skip, int take)
     {
-        IndexViewModel[] indexes = _examineManager.Indexes
+        IndexViewModel[] indexes = _searchProvider.GetAllIndexes()
             .Select(_indexViewModelFactory.Create)
             .OrderBy(indexModel => indexModel.Name.TrimEnd("Indexer")).ToArray();
 

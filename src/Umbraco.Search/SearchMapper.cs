@@ -29,40 +29,41 @@ public class SearchMapper : IMapDefinition
 
         // get the icon if there is one
         target.Icon = source.Values.ContainsKey(UmbracoSearchFieldNames.IconFieldName)
-            ? source.Values[UmbracoSearchFieldNames.IconFieldName]
+            ? source.Values[UmbracoSearchFieldNames.IconFieldName].FirstOrDefault()?.ToString()
             : Constants.Icons.DefaultIcon;
 
         target.Name = source.Values.ContainsKey(UmbracoSearchFieldNames.NodeNameFieldName)
-            ? source.Values[UmbracoSearchFieldNames.NodeNameFieldName]
+            ? source.Values[UmbracoSearchFieldNames.NodeNameFieldName].FirstOrDefault()?.ToString()
             : "[no name]";
 
         var culture = context.GetCulture()?.ToLowerInvariant();
         if (culture.IsNullOrWhiteSpace() == false)
         {
             target.Name = source.Values.ContainsKey($"nodeName_{culture}")
-                ? source.Values[$"nodeName_{culture}"].FirstOrDefault().ToString()
+                ? source.Values[$"nodeName_{culture}"].FirstOrDefault()?.ToString()
                 : target.Name;
         }
 
         if (source.Values.TryGetValue(UmbracoSearchFieldNames.UmbracoFileFieldName, out var umbracoFile) &&
-            umbracoFile.IsNullOrWhiteSpace() == false)
+            string.IsNullOrWhiteSpace(umbracoFile.FirstOrDefault()?.ToString()) == false)
         {
             if (umbracoFile != null)
             {
-                target.Name = $"{target.Name} ({umbracoFile})";
+                target.Name = $"{target.Name} ({umbracoFile.FirstOrDefault()?.ToString()})";
             }
         }
 
         if (source.Values.ContainsKey(UmbracoSearchFieldNames.NodeKeyFieldName))
         {
-            if (Guid.TryParse(source.Values[UmbracoSearchFieldNames.NodeKeyFieldName], out Guid key))
+            var keyValue = source.Values[UmbracoSearchFieldNames.NodeKeyFieldName].FirstOrDefault();
+            if (keyValue!= null && Guid.TryParse(keyValue.ToString(), out Guid key))
             {
                 target.Key = key;
 
                 // need to set the UDI
-                if (source.Values.ContainsKey(ExamineFieldNames.CategoryFieldName))
+                if (source.Values.ContainsKey(UmbracoSearchFieldNames.CategoryFieldName))
                 {
-                    switch (source.Values[ExamineFieldNames.CategoryFieldName].FirstOrDefault())
+                    switch (source.Values[UmbracoSearchFieldNames.CategoryFieldName].FirstOrDefault())
                     {
                         case IndexTypes.Member:
                             target.Udi = new GuidUdi(Constants.UdiEntityType.Member, target.Key);
@@ -80,7 +81,8 @@ public class SearchMapper : IMapDefinition
 
         if (source.Values.ContainsKey("parentID"))
         {
-            if (int.TryParse(source.Values["parentID"].FirstOrDefault(), NumberStyles.Integer, CultureInfo.InvariantCulture,
+            var parent = source.Values["parentID"].FirstOrDefault()?.ToString();
+            if (!string.IsNullOrWhiteSpace(parent) && int.TryParse(parent, NumberStyles.Integer, CultureInfo.InvariantCulture,
                     out var parentId))
             {
                 target.ParentId = parentId;
@@ -92,12 +94,12 @@ public class SearchMapper : IMapDefinition
         }
 
         target.Path = source.Values.ContainsKey(UmbracoSearchFieldNames.IndexPathFieldName)
-            ? source.Values[UmbracoSearchFieldNames.IndexPathFieldName]
+            ? source.Values[UmbracoSearchFieldNames.IndexPathFieldName].FirstOrDefault()?.ToString() ?? string.Empty
             : string.Empty;
 
-        if (source.Values.ContainsKey(ExamineFieldNames.ItemTypeFieldName))
+        if (source.Values.ContainsKey(UmbracoSearchFieldNames.ItemTypeFieldName))
         {
-            target.AdditionalData.Add("contentType", source.Values[ExamineFieldNames.ItemTypeFieldName]);
+            target.AdditionalData.Add("contentType", source.Values[UmbracoSearchFieldNames.ItemTypeFieldName]);
         }
     }
 

@@ -6,6 +6,7 @@ using Lucene.Net.Index;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Extensions;
 using Umbraco.Search;
 using Umbraco.Search.Examine;
 
@@ -16,37 +17,30 @@ namespace Umbraco.Cms.Infrastructure.Examine.DependencyInjection;
 /// </summary>
 public sealed class ConfigureIndexOptions : IConfigureNamedOptions<LuceneDirectoryIndexOptions>
 {
+    private readonly IExamineIndexConfiguration _examineIndexConfiguration;
     private readonly IndexCreatorSettings _settings;
     private readonly IUmbracoExamineIndexConfig _umbracoIndexConfig;
 
     public ConfigureIndexOptions(
-        IUmbracoExamineIndexConfig umbracoIndexConfig,
-        IOptions<IndexCreatorSettings> settings)
+        IExamineIndexConfiguration examineIndexConfiguration,
+        IOptions<IndexCreatorSettings> settings, IUmbracoExamineIndexConfig umbracoIndexConfig)
     {
+        _examineIndexConfiguration = examineIndexConfiguration;
         _umbracoIndexConfig = umbracoIndexConfig;
         _settings = settings.Value;
     }
 
     public void Configure(string? name, LuceneDirectoryIndexOptions options)
     {
-        switch (name)
+        if (string.IsNullOrWhiteSpace(name))
         {
-            case Constants.UmbracoIndexes.InternalIndexName:
-                options.Analyzer = new CultureInvariantWhitespaceAnalyzer();
-                options.Validator = _umbracoIndexConfig.GetContentValueSetValidator();
-                options.FieldDefinitions = new UmbracoFieldDefinitionCollection();
-                break;
-            case Constants.UmbracoIndexes.ExternalIndexName:
-                options.Analyzer = new StandardAnalyzer(LuceneInfo.CurrentVersion);
-                options.Validator = _umbracoIndexConfig.GetPublishedContentValueSetValidator();
-                options.FieldDefinitions = new UmbracoFieldDefinitionCollection();
-                break;
-            case Constants.UmbracoIndexes.MembersIndexName:
-                options.Analyzer = new CultureInvariantWhitespaceAnalyzer();
-                options.Validator = _umbracoIndexConfig.GetMemberValueSetValidator();
-                options.FieldDefinitions = new UmbracoFieldDefinitionCollection();
-                break;
+            return;
         }
+        var configuration = _examineIndexConfiguration.Configuration(name);
+        options.Analyzer = configuration.Analyzer;
+        options.Validator = configuration.GetContentValueSetValidator();
+        options.FieldDefinitions = new UmbracoFieldDefinitionCollection().toExamineFieldDefinitionCollection();
+
 
         // ensure indexes are unlocked on startup
         options.UnlockIndex = true;

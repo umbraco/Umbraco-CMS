@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.ManagementApi.Factories;
 using Umbraco.Cms.ManagementApi.ViewModels.Search;
+using Umbraco.Search;
 
 namespace Umbraco.Cms.ManagementApi.Controllers.Indexer;
 
@@ -10,14 +11,10 @@ namespace Umbraco.Cms.ManagementApi.Controllers.Indexer;
 public class DetailsIndexerController : IndexerControllerBase
 {
     private readonly IIndexViewModelFactory _indexViewModelFactory;
-    private readonly IExamineManager _examineManager;
-
     public DetailsIndexerController(
-        IIndexViewModelFactory indexViewModelFactory,
-        IExamineManager examineManager)
+        IIndexViewModelFactory indexViewModelFactory)
     {
         _indexViewModelFactory = indexViewModelFactory;
-        _examineManager = examineManager;
     }
 
     /// <summary>
@@ -35,20 +32,7 @@ public class DetailsIndexerController : IndexerControllerBase
     [ProducesResponseType(typeof(IndexViewModel), StatusCodes.Status200OK)]
     public async Task<ActionResult<IndexViewModel?>> Details(string indexName)
     {
-        if (_examineManager.TryGetIndex(indexName, out IIndex? index))
-        {
-            return await Task.FromResult(_indexViewModelFactory.Create(index!));
-        }
 
-        var invalidModelProblem = new ProblemDetails
-        {
-            Title = "Index Not Found",
-            Detail = $"No index found with name = {indexName}",
-            Status = StatusCodes.Status400BadRequest,
-            Type = "Error",
-        };
-
-        return await Task.FromResult(BadRequest(invalidModelProblem));
-
+            return await Task.FromResult(_indexViewModelFactory.Create(indexName!));
     }
 }
