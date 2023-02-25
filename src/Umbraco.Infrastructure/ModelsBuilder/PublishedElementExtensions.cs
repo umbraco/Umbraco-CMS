@@ -26,28 +26,7 @@ public static class PublishedElementExtensions
         where TModel : IPublishedElement
     {
         var alias = GetAlias(model, property);
-        return model.Value(CheckVariationContext(publishedValueFallback,culture,segment), alias, culture, segment, fallback, defaultValue);
-    }
-
-    /// <summary>
-    /// Method to check if VariationContext culture differs from culture parameter, if so it will update the VariationContext for the PublishedValueFallback.
-    /// </summary>
-    /// <param name="publishedValueFallback">The requested PublishedValueFallback.</param>
-    /// <param name="culture">The requested culture.</param>
-    /// <param name="segment">The requested segment.</param>
-    /// <returns></returns>
-    private static IPublishedValueFallback CheckVariationContext(IPublishedValueFallback publishedValueFallback, string? culture, string? segment)
-    {
-        IVariationContextAccessor? variationContextAccessor = publishedValueFallback.VariationContextAccessor;
-
-        //If there is a difference in requested culture and the culture that is set in the VariationContext, it will pick wrong localized content.
-        //This happens for example using links to localized content in a RichText Editor.
-        if (!string.IsNullOrEmpty(culture) && variationContextAccessor?.VariationContext?.Culture != culture)
-        {
-            variationContextAccessor!.VariationContext = new VariationContext(culture, segment);
-        }
-
-        return publishedValueFallback!;
+        return model.Value(publishedValueFallback, alias, culture, segment, fallback, defaultValue);
     }
 
     // fixme that one should be public so ppl can use it
