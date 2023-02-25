@@ -26,7 +26,20 @@ public static class PublishedElementExtensions
         where TModel : IPublishedElement
     {
         var alias = GetAlias(model, property);
-        return model.Value(publishedValueFallback, alias, culture, segment, fallback, defaultValue);
+        return model.Value(CheckVariationContext(publishedValueFallback,culture,segment), alias, culture, segment, fallback, defaultValue);
+    }
+
+    private static IPublishedValueFallback CheckVariationContext(IPublishedValueFallback publishedValueFallback, string? culture, string? segment)
+    {
+        var variationContextAccessor = (IVariationContextAccessor?)publishedValueFallback?.GetType()?.GetField("_variationContextAccessor", BindingFlags.Instance | BindingFlags.NonPublic)?.GetValue(publishedValueFallback);
+        PropertyInfo? variationContext = variationContextAccessor?.GetType()?.GetProperty("Value", BindingFlags.Instance | BindingFlags.NonPublic);
+
+        if (!string.IsNullOrEmpty(culture) && variationContextAccessor?.VariationContext?.Culture != culture)
+        {
+            variationContext?.SetValue(variationContextAccessor, new VariationContext(culture, segment));
+        }
+
+        return publishedValueFallback!;
     }
 
     // fixme that one should be public so ppl can use it
