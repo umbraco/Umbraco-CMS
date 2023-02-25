@@ -3,6 +3,7 @@
 /* eslint-disable */
 
 export type RecycleBinItemModel = {
+    $type: string;
     key?: string;
     name?: string;
     type?: string;
@@ -11,3 +12,4 @@ export type RecycleBinItemModel = {
     isContainer?: boolean;
     parentKey?: string | null;
 };
+

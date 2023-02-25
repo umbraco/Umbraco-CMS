@@ -106,7 +106,8 @@ export class UmbTemplateDetailRepository {
 		this.#detailStore?.append(template);
 		// TODO: Update tree store with the new item?
 
-		return { error };
+		// TODO: fix type issue:
+		return { error } as any;
 	}
 
 	// Could potentially be named differently. could be:  Save

@@ -34,19 +34,20 @@ export class LanguageResource {
     }
 
     /**
-     * @returns any Created
+     * @returns string Created
      * @throws ApiError
      */
     public static postLanguage({
         requestBody,
     }: {
         requestBody?: LanguageCreateModel,
-    }): CancelablePromise<any> {
+    }): CancelablePromise<string> {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/umbraco/management/api/v1/language',
             body: requestBody,
             mediaType: 'application/json',
+            responseHeader: 'Location',
             errors: {
                 400: `Bad Request`,
                 404: `Not Found`,

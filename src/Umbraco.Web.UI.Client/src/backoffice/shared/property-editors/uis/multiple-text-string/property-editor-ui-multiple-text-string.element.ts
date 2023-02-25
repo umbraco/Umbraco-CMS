@@ -1,11 +1,11 @@
 import { html } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { ifDefined } from 'lit-html/directives/if-defined.js';
-import { UmbChangeEvent } from '@umbraco-cms/events';
 import { UmbPropertyValueChangeEvent } from '../..';
 import UmbInputMultipleTextStringElement, {
 	MultipleTextStringValue,
 } from './input-multiple-text-string/input-multiple-text-string.element';
+import { UmbChangeEvent } from '@umbraco-cms/events';
 import { UmbLitElement } from '@umbraco-cms/element';
 
 export type MultipleTextStringConfigData = Array<{

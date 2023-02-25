@@ -1,5 +1,5 @@
 import { DeepState } from './deep-state';
-import { pushToUniqueArray } from './push-to-unique-array.method';
+import { pushToUniqueArray } from './push-to-unique-array.function';
 
 /**
  * @export

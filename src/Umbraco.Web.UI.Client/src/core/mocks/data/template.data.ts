@@ -13,6 +13,7 @@ type TemplateDBItem = TemplateModel & EntityTreeItemModel;
 
 const createTemplate = (dbItem: TemplateDBItem): TemplateModel => {
 	return {
+		$type: '',
 		key: dbItem.key,
 		name: dbItem.name,
 		alias: dbItem.alias,
@@ -22,6 +23,7 @@ const createTemplate = (dbItem: TemplateDBItem): TemplateModel => {
 
 export const data: Array<TemplateDBItem> = [
 	{
+		$type: '',
 		key: '2bf464b6-3aca-4388-b043-4eb439cc2643',
 		isContainer: false,
 		parentKey: null,
@@ -34,6 +36,7 @@ export const data: Array<TemplateDBItem> = [
 			'@using Umbraco.Cms.Web.Common.PublishedModels;\n@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<ContentModels.Doc1>\r\n@using ContentModels = Umbraco.Cms.Web.Common.PublishedModels;\r\n@{\r\n\tLayout = null;\r\n}',
 	},
 	{
+		$type: '',
 		key: '9a84c0b3-03b4-4dd4-84ac-706740ac0f71',
 		isContainer: false,
 		parentKey: null,
@@ -46,6 +49,7 @@ export const data: Array<TemplateDBItem> = [
 			'@using Umbraco.Cms.Web.Common.PublishedModels;\n@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<ContentModels.Test>\r\n@using ContentModels = Umbraco.Cms.Web.Common.PublishedModels;\r\n@{\r\n\tLayout = null;\r\n}',
 	},
 	{
+		$type: '',
 		key: '9a84c0b3-03b4-4dd4-84ac-706740ac0f72',
 		isContainer: false,
 		parentKey: '9a84c0b3-03b4-4dd4-84ac-706740ac0f71',
@@ -85,6 +89,7 @@ class UmbTemplateData extends UmbEntityData<TemplateDBItem> {
 
 	create(templateData: TemplateCreateModel) {
 		const template = {
+			$type: '',
 			key: uuid(),
 			...templateData,
 		};

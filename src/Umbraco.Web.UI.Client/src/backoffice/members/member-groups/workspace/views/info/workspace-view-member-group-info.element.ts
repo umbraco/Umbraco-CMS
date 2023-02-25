@@ -42,7 +42,6 @@ export class UmbWorkspaceViewMemberGroupInfoElement extends UmbLitElement {
 		// TODO: Figure out if this is the best way to consume the context or if it can be strongly typed with an UmbContextToken
 		this.consumeContext<UmbWorkspaceMemberGroupContext>('umbWorkspaceContext', (instance) => {
 			this.#workspaceContext = instance;
-			console.log(instance);
 			this.#observeMemberGroup();
 		});
 	}
@@ -69,11 +68,10 @@ export class UmbWorkspaceViewMemberGroupInfoElement extends UmbLitElement {
 		`;
 	}
 
-	// TODO => should use umb-empty-state when it exists
 	private _renderMemberGroupInfo() {
 		return html`
 			<uui-box headline="Member Group">
-				<p>Member groups have no additional properties for editing.</p>
+				<umb-empty-state size="small">Member groups have no additional properties for editing.</umb-empty-state>
 			</uui-box>
 		`;
 	}

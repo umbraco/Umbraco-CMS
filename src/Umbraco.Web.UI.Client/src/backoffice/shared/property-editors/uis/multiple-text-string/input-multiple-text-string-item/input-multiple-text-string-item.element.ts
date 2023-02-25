@@ -4,8 +4,8 @@ import { customElement, property, query } from 'lit/decorators.js';
 import { FormControlMixin } from '@umbraco-ui/uui-base/lib/mixins';
 import { UUIInputEvent } from '@umbraco-ui/uui-input';
 import { UUIInputElement } from '@umbraco-ui/uui';
-import { UmbChangeEvent, UmbInputEvent, UmbDeleteEvent } from '@umbraco-cms/events';
 import { UmbModalService, UMB_MODAL_SERVICE_CONTEXT_TOKEN } from '../../../../../../core/modal';
+import { UmbChangeEvent, UmbInputEvent, UmbDeleteEvent } from '@umbraco-cms/events';
 import { UmbLitElement } from '@umbraco-cms/element';
 
 /**

@@ -14,7 +14,7 @@ export const data: Array<DocumentTypeModel> = [
 		alias: 'blogPost',
 		name: 'Blog Post',
 		description: null,
-		icon: 'icon-item-arrangement',
+		icon: 'umb:item-arrangement',
 		allowedAsRoot: true,
 		variesByCulture: true,
 		variesBySegment: false,
@@ -27,6 +27,8 @@ export const data: Array<DocumentTypeModel> = [
 				name: 'Color Picker',
 				description: '',
 				dataTypeKey: 'dt-colorPicker',
+				variesByCulture: false,
+				variesBySegment: false,
 				validation: {
 					mandatory: true,
 					mandatoryMessage: null,
@@ -44,6 +46,8 @@ export const data: Array<DocumentTypeModel> = [
 				name: 'Content Picker',
 				description: '',
 				dataTypeKey: 'dt-contentPicker',
+				variesByCulture: false,
+				variesBySegment: false,
 				validation: {
 					mandatory: true,
 					mandatoryMessage: null,
@@ -61,6 +65,8 @@ export const data: Array<DocumentTypeModel> = [
 				name: 'Eye Dropper',
 				description: '',
 				dataTypeKey: 'dt-eyeDropper',
+				variesByCulture: false,
+				variesBySegment: false,
 				validation: {
 					mandatory: true,
 					mandatoryMessage: null,
@@ -78,6 +84,8 @@ export const data: Array<DocumentTypeModel> = [
 				name: 'Multi URL Picker',
 				description: '',
 				dataTypeKey: 'dt-multiUrlPicker',
+				variesByCulture: false,
+				variesBySegment: false,
 				validation: {
 					mandatory: true,
 					mandatoryMessage: null,
@@ -95,6 +103,8 @@ export const data: Array<DocumentTypeModel> = [
 				name: 'Multi Node Tree Picker',
 				description: '',
 				dataTypeKey: 'dt-multiNodeTreePicker',
+				variesByCulture: false,
+				variesBySegment: false,
 				validation: {
 					mandatory: true,
 					mandatoryMessage: null,
@@ -112,6 +122,8 @@ export const data: Array<DocumentTypeModel> = [
 				name: 'Date Picker',
 				description: '',
 				dataTypeKey: 'dt-datePicker',
+				variesByCulture: false,
+				variesBySegment: false,
 				validation: {
 					mandatory: true,
 					mandatoryMessage: null,
@@ -129,6 +141,8 @@ export const data: Array<DocumentTypeModel> = [
 				name: 'Email',
 				description: '',
 				dataTypeKey: 'dt-email',
+				variesByCulture: false,
+				variesBySegment: false,
 				validation: {
 					mandatory: true,
 					mandatoryMessage: null,
@@ -146,6 +160,8 @@ export const data: Array<DocumentTypeModel> = [
 				name: 'Text Box',
 				description: '',
 				dataTypeKey: 'dt-textBox',
+				variesByCulture: false,
+				variesBySegment: false,
 				validation: {
 					mandatory: true,
 					mandatoryMessage: null,
@@ -163,6 +179,8 @@ export const data: Array<DocumentTypeModel> = [
 				name: 'Dropdown',
 				description: '',
 				dataTypeKey: 'dt-dropdown',
+				variesByCulture: false,
+				variesBySegment: false,
 				validation: {
 					mandatory: true,
 					mandatoryMessage: null,
@@ -180,6 +198,8 @@ export const data: Array<DocumentTypeModel> = [
 				name: 'Text Area',
 				description: '',
 				dataTypeKey: 'dt-textArea',
+				variesByCulture: false,
+				variesBySegment: false,
 				validation: {
 					mandatory: true,
 					mandatoryMessage: null,
@@ -197,6 +217,8 @@ export const data: Array<DocumentTypeModel> = [
 				name: 'Slider',
 				description: '',
 				dataTypeKey: 'dt-slider',
+				variesByCulture: false,
+				variesBySegment: false,
 				validation: {
 					mandatory: true,
 					mandatoryMessage: null,
@@ -214,6 +236,8 @@ export const data: Array<DocumentTypeModel> = [
 				name: 'Toggle',
 				description: '',
 				dataTypeKey: 'dt-toggle',
+				variesByCulture: false,
+				variesBySegment: false,
 				validation: {
 					mandatory: true,
 					mandatoryMessage: null,
@@ -231,6 +255,8 @@ export const data: Array<DocumentTypeModel> = [
 				name: 'Tags',
 				description: '',
 				dataTypeKey: 'dt-tags',
+				variesByCulture: false,
+				variesBySegment: false,
 				validation: {
 					mandatory: true,
 					mandatoryMessage: null,
@@ -248,6 +274,8 @@ export const data: Array<DocumentTypeModel> = [
 				name: 'MarkdownEditor',
 				description: '',
 				dataTypeKey: 'dt-markdownEditor',
+				variesByCulture: false,
+				variesBySegment: false,
 				validation: {
 					mandatory: true,
 					mandatoryMessage: null,
@@ -265,6 +293,8 @@ export const data: Array<DocumentTypeModel> = [
 				name: 'Radio Button List',
 				description: '',
 				dataTypeKey: 'dt-radioButtonList',
+				variesByCulture: false,
+				variesBySegment: false,
 				validation: {
 					mandatory: true,
 					mandatoryMessage: null,
@@ -282,6 +312,8 @@ export const data: Array<DocumentTypeModel> = [
 				name: 'Checkbox List',
 				description: '',
 				dataTypeKey: 'dt-checkboxList',
+				variesByCulture: false,
+				variesBySegment: false,
 				validation: {
 					mandatory: true,
 					mandatoryMessage: null,
@@ -299,6 +331,8 @@ export const data: Array<DocumentTypeModel> = [
 				name: 'Block List',
 				description: '',
 				dataTypeKey: 'dt-blockList',
+				variesByCulture: false,
+				variesBySegment: false,
 				validation: {
 					mandatory: true,
 					mandatoryMessage: null,
@@ -316,6 +350,8 @@ export const data: Array<DocumentTypeModel> = [
 				name: 'Media Picker',
 				description: '',
 				dataTypeKey: 'dt-mediaPicker',
+				variesByCulture: false,
+				variesBySegment: false,
 				validation: {
 					mandatory: true,
 					mandatoryMessage: null,
@@ -333,6 +369,8 @@ export const data: Array<DocumentTypeModel> = [
 				name: 'Image Cropper',
 				description: '',
 				dataTypeKey: 'dt-imageCropper',
+				variesByCulture: false,
+				variesBySegment: false,
 				validation: {
 					mandatory: true,
 					mandatoryMessage: null,
@@ -350,6 +388,8 @@ export const data: Array<DocumentTypeModel> = [
 				name: 'Upload Field',
 				description: '',
 				dataTypeKey: 'dt-uploadField',
+				variesByCulture: false,
+				variesBySegment: false,
 				validation: {
 					mandatory: true,
 					mandatoryMessage: null,
@@ -367,6 +407,8 @@ export const data: Array<DocumentTypeModel> = [
 				name: 'Block Grid',
 				description: '',
 				dataTypeKey: 'dt-blockGrid',
+				variesByCulture: false,
+				variesBySegment: false,
 				validation: {
 					mandatory: true,
 					mandatoryMessage: null,
@@ -384,6 +426,8 @@ export const data: Array<DocumentTypeModel> = [
 				name: 'Icon Picker',
 				description: '',
 				dataTypeKey: 'dt-iconPicker',
+				variesByCulture: false,
+				variesBySegment: false,
 				validation: {
 					mandatory: true,
 					mandatoryMessage: null,
@@ -401,6 +445,8 @@ export const data: Array<DocumentTypeModel> = [
 				name: 'Number Range',
 				description: '',
 				dataTypeKey: 'dt-numberRange',
+				variesByCulture: false,
+				variesBySegment: false,
 				validation: {
 					mandatory: true,
 					mandatoryMessage: null,
@@ -418,6 +464,8 @@ export const data: Array<DocumentTypeModel> = [
 				name: 'Order Direction',
 				description: '',
 				dataTypeKey: 'dt-orderDirection',
+				variesByCulture: false,
+				variesBySegment: false,
 				validation: {
 					mandatory: true,
 					mandatoryMessage: null,
@@ -435,6 +483,8 @@ export const data: Array<DocumentTypeModel> = [
 				name: 'Overlay Size',
 				description: '',
 				dataTypeKey: 'dt-overlaySize',
+				variesByCulture: false,
+				variesBySegment: false,
 				validation: {
 					mandatory: true,
 					mandatoryMessage: null,
@@ -452,6 +502,8 @@ export const data: Array<DocumentTypeModel> = [
 				name: 'Label',
 				description: '',
 				dataTypeKey: 'dt-label',
+				variesByCulture: false,
+				variesBySegment: false,
 				validation: {
 					mandatory: true,
 					mandatoryMessage: null,
@@ -469,6 +521,8 @@ export const data: Array<DocumentTypeModel> = [
 				name: 'Integer',
 				description: '',
 				dataTypeKey: 'dt-integer',
+				variesByCulture: false,
+				variesBySegment: false,
 				validation: {
 					mandatory: true,
 					mandatoryMessage: null,
@@ -486,6 +540,8 @@ export const data: Array<DocumentTypeModel> = [
 				name: 'Decimal',
 				description: '',
 				dataTypeKey: 'dt-decimal',
+				variesByCulture: false,
+				variesBySegment: false,
 				validation: {
 					mandatory: true,
 					mandatoryMessage: null,
@@ -503,6 +559,8 @@ export const data: Array<DocumentTypeModel> = [
 				name: 'Member Picker',
 				description: '',
 				dataTypeKey: 'dt-memberPicker',
+				variesByCulture: false,
+				variesBySegment: false,
 				validation: {
 					mandatory: true,
 					mandatoryMessage: null,
@@ -520,6 +578,8 @@ export const data: Array<DocumentTypeModel> = [
 				name: 'Member Group Picker',
 				description: '',
 				dataTypeKey: 'dt-memberGroupPicker',
+				variesByCulture: false,
+				variesBySegment: false,
 				validation: {
 					mandatory: true,
 					mandatoryMessage: null,
@@ -537,6 +597,8 @@ export const data: Array<DocumentTypeModel> = [
 				name: 'User Picker',
 				description: '',
 				dataTypeKey: 'dt-userPicker',
+				variesByCulture: false,
+				variesBySegment: false,
 				validation: {
 					mandatory: true,
 					mandatoryMessage: null,
@@ -573,7 +635,7 @@ export const data: Array<DocumentTypeModel> = [
 		alias: 'blogPost',
 		name: 'Blog Post',
 		description: null,
-		icon: 'icon-item-arrangement',
+		icon: 'umb:item-arrangement',
 		allowedAsRoot: true,
 		variesByCulture: true,
 		variesBySegment: false,
@@ -586,6 +648,8 @@ export const data: Array<DocumentTypeModel> = [
 				name: 'Blog Post Text',
 				description: null,
 				dataTypeKey: '0cc0eba1-9960-42c9-bf9b-60e150b429ae',
+				variesByCulture: false,
+				variesBySegment: false,
 				validation: {
 					mandatory: true,
 					mandatoryMessage: null,
@@ -603,6 +667,8 @@ export const data: Array<DocumentTypeModel> = [
 				name: 'Blog text string under master tab',
 				description: null,
 				dataTypeKey: '0cc0eba1-9960-42c9-bf9b-60e150b429ae',
+				variesByCulture: true,
+				variesBySegment: false,
 				validation: {
 					mandatory: false,
 					mandatoryMessage: null,
@@ -620,6 +686,8 @@ export const data: Array<DocumentTypeModel> = [
 				name: 'Blog text string under group under master tab',
 				description: null,
 				dataTypeKey: '0cc0eba1-9960-42c9-bf9b-60e150b429ae',
+				variesByCulture: true,
+				variesBySegment: false,
 				validation: {
 					mandatory: false,
 					mandatoryMessage: null,
@@ -637,6 +705,8 @@ export const data: Array<DocumentTypeModel> = [
 				name: 'Local Blog Tab String',
 				description: null,
 				dataTypeKey: '0cc0eba1-9960-42c9-bf9b-60e150b429ae',
+				variesByCulture: false,
+				variesBySegment: false,
 				validation: {
 					mandatory: true,
 					mandatoryMessage: null,
@@ -707,7 +777,7 @@ export const data: Array<DocumentTypeModel> = [
 		alias: 'masterPage',
 		name: 'Master Page',
 		description: null,
-		icon: 'icon-document',
+		icon: 'umb:document',
 		allowedAsRoot: false,
 		variesByCulture: false,
 		variesBySegment: false,
@@ -720,6 +790,8 @@ export const data: Array<DocumentTypeModel> = [
 				name: 'Master text',
 				description: null,
 				dataTypeKey: '0cc0eba1-9960-42c9-bf9b-60e150b429ae',
+				variesByCulture: false,
+				variesBySegment: false,
 				validation: {
 					mandatory: false,
 					mandatoryMessage: null,
@@ -755,7 +827,7 @@ export const data: Array<DocumentTypeModel> = [
 		alias: 'baseElementType',
 		name: 'Base Element Type',
 		description: null,
-		icon: 'icon-science',
+		icon: 'umb:science',
 		allowedAsRoot: false,
 		variesByCulture: false,
 		variesBySegment: false,
@@ -768,6 +840,8 @@ export const data: Array<DocumentTypeModel> = [
 				name: 'Page title',
 				description: null,
 				dataTypeKey: '0cc0eba1-9960-42c9-bf9b-60e150b429ae',
+				variesByCulture: false,
+				variesBySegment: false,
 				validation: {
 					mandatory: false,
 					mandatoryMessage: null,
@@ -800,6 +874,17 @@ export const data: Array<DocumentTypeModel> = [
 
 export const treeData: Array<DocumentTypeTreeItemModel> = [
 	{
+		$type: 'DocumentTypeTreeItemViewModel',
+		name: 'All property editors document type',
+		type: 'document-type',
+		hasChildren: false,
+		key: 'all-property-editors-document-type-key',
+		isContainer: false,
+		parentKey: null,
+		icon: '',
+	},
+	{
+		$type: 'DocumentTypeTreeItemViewModel',
 		name: 'Document Type 1',
 		type: 'document-type',
 		hasChildren: false,
@@ -809,6 +894,7 @@ export const treeData: Array<DocumentTypeTreeItemModel> = [
 		icon: '',
 	},
 	{
+		$type: 'DocumentTypeTreeItemViewModel',
 		name: 'Document Type 2',
 		type: 'document-type',
 		hasChildren: false,
@@ -823,7 +909,7 @@ export const treeData: Array<DocumentTypeTreeItemModel> = [
 // TODO: all properties are optional in the server schema. I don't think this is correct.
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
-class UmbDocumentTypeData extends UmbEntityData<DocumentTypeTreeItemModel> {
+class UmbDocumentTypeData extends UmbEntityData<DocumentTypeModel> {
 	private treeData = treeData;
 
 	constructor() {

@@ -47,7 +47,13 @@ export default class UmbCreateDictionaryEntityAction extends UmbEntityActionBase
 		const { name }: UmbCreateDictionaryModalResultData = await modalHandler.onClose();
 		if (!name) return;
 
-		const result = await this.repository?.create({ name, parentKey: this.unique, translations: [], key: '' });
+		const result = await this.repository?.create({
+			$type: '',
+			name,
+			parentKey: this.unique,
+			translations: [],
+			key: '',
+		});
 
 		// TODO => get location header to route to new item
 		console.log(result);

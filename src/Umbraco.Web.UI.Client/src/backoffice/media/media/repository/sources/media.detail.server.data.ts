@@ -51,6 +51,7 @@ export class UmbMediaDetailServerDataSource implements RepositoryDetailDataSourc
 	 */
 	async createScaffold(parentKey: string | null) {
 		const data: MediaDetails = {
+			$type: '',
 			key: '',
 			name: '',
 			icon: '',
