@@ -57,14 +57,36 @@ export class UmbLogViewerSearchViewElement extends UmbLitElement {
 			.saved-search-item {
 				display: flex;
 				justify-content: space-between;
+				align-items: stretch;
+				border-bottom: 1px solid #e9e9eb;
 			}
 
 			.saved-search-item-button {
+				display: flex;
+				font-family: inherit;
 				flex: 1;
+				background: 0 0;
+				padding: 0 0;
+				border: 0;
+				clear: both;
+				cursor: pointer;
+				display: flex;
+				font-weight: 400;
+				line-height: 20px;
+				text-align: left;
+				align-items: center;
+				white-space: nowrap;
+				color: var(--uui-color-interactive);
+			}
+
+			.saved-search-item-button:hover {
+				background-color: var(--uui-color-surface-emphasis, rgb(250, 250, 250));
+				color: var(--color-standalone);
 			}
 
 			.saved-search-item-name {
 				font-weight: 600;
+				margin: 0 var(--uui-size-space-3);
 			}
 		`,
 	];
@@ -154,15 +176,17 @@ export class UmbLogViewerSearchViewElement extends UmbLitElement {
 					></uui-button>
 				</uui-input>
 
-				<uui-scroll-container slot="popover" id="saved-searches-container">
+				<uui-scroll-container slot="popover" id="saved-searches-container" role="list">
 					${this._savedSearches.map(
 						(search) =>
-							html`<div class="saved-search-item">
-								<uui-button label="Search for ${search.name}" class="saved-search-item-button"
-									><span class="saved-search-item-name">${search.name}</span
-									><span class="saved-search-item-query">${search.query}</span></uui-button
-								><uui-button label="Remove saved search"><uui-icon name="umb:trash"></uui-icon></uui-button>
-							</div>`
+							html`<li class="saved-search-item">
+								<button label="Search for ${search.name}" class="saved-search-item-button">
+									<span class="saved-search-item-name">${search.name}</span>
+									<span class="saved-search-item-query">${search.query}</span></button
+								><uui-button label="Remove saved search" color="danger"
+									><uui-icon name="umb:trash"></uui-icon
+								></uui-button>
+							</li>`
 					)}
 				</uui-scroll-container>
 			</uui-popover>
