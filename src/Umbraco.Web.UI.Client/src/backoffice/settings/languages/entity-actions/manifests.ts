@@ -1,4 +1,4 @@
-import { UmbDeleteEntityAction } from '../../../shared/entity-actions/delete/delete.action';
+import { UmbDeleteEntityAction } from '@umbraco-cms/entity-action';
 import { ManifestEntityAction } from '@umbraco-cms/extensions-registry';
 
 const entityType = 'language';

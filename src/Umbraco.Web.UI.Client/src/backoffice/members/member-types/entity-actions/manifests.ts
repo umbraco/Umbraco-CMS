@@ -1,4 +1,4 @@
-import { UmbDeleteEntityAction } from '../../../../backoffice/shared/entity-actions/delete/delete.action';
+import { UmbDeleteEntityAction } from '@umbraco-cms/entity-action';
 import { MEMBER_TYPES_REPOSITORY_ALIAS } from '../repository/manifests';
 import type { ManifestEntityAction } from '@umbraco-cms/models';
 
