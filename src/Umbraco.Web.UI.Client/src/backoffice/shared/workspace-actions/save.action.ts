@@ -1,4 +1,4 @@
-import { UmbWorkspaceAction } from '../components/workspace/workspace-action';
+import { UmbWorkspaceAction } from '../../../../libs/workspace';
 import { UmbWorkspaceContextInterface } from '../components/workspace/workspace-context/workspace-context.interface';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 
