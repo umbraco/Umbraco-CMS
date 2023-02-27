@@ -7,7 +7,7 @@ using Umbraco.Cms.Core.PropertyEditors;
 
 namespace Umbraco.Cms.Api.Management.Mapping.Document;
 
-public class DocumentMapDefinition : ContentMapDefinition<IContent, DocumentValueModel, DocumentVariantViewModel>, IMapDefinition
+public class DocumentMapDefinition : ContentMapDefinition<IContent, DocumentValueModel, DocumentVariantResponseModel>, IMapDefinition
 {
     public DocumentMapDefinition(PropertyEditorCollection propertyEditorCollection)
         : base(propertyEditorCollection)
@@ -15,10 +15,10 @@ public class DocumentMapDefinition : ContentMapDefinition<IContent, DocumentValu
     }
 
     public void DefineMaps(IUmbracoMapper mapper)
-        => mapper.Define<IContent, DocumentViewModel>((_, _) => new DocumentViewModel(), Map);
+        => mapper.Define<IContent, DocumentResponseModel>((_, _) => new DocumentResponseModel(), Map);
 
     // Umbraco.Code.MapAll -Urls -TemplateKey
-    private void Map(IContent source, DocumentViewModel target, MapperContext context)
+    private void Map(IContent source, DocumentResponseModel target, MapperContext context)
     {
         target.Key = source.Key;
         target.ContentTypeKey = source.ContentType.Key;

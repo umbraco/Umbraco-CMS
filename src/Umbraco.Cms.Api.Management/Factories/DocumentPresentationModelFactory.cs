@@ -5,13 +5,13 @@ using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Api.Management.Factories;
 
-public class DocumentViewModelFactory : IDocumentViewModelFactory
+public class DocumentPresentationModelFactory : IDocumentPresentationModelFactory
 {
     private readonly IUmbracoMapper _umbracoMapper;
     private readonly IContentUrlFactory _contentUrlFactory;
     private readonly IFileService _fileService;
 
-    public DocumentViewModelFactory(
+    public DocumentPresentationModelFactory(
         IUmbracoMapper umbracoMapper,
         IContentUrlFactory contentUrlFactory,
         IFileService fileService)
@@ -21,16 +21,16 @@ public class DocumentViewModelFactory : IDocumentViewModelFactory
         _fileService = fileService;
     }
 
-    public async Task<DocumentViewModel> CreateViewModelAsync(IContent content)
+    public async Task<DocumentResponseModel> CreateResponseModelAsync(IContent content)
     {
-        DocumentViewModel viewModel = _umbracoMapper.Map<DocumentViewModel>(content)!;
+        DocumentResponseModel responseModel = _umbracoMapper.Map<DocumentResponseModel>(content)!;
 
-        viewModel.Urls = await _contentUrlFactory.GetUrlsAsync(content);
+        responseModel.Urls = await _contentUrlFactory.GetUrlsAsync(content);
 
-        viewModel.TemplateKey = content.TemplateId.HasValue
+        responseModel.TemplateKey = content.TemplateId.HasValue
             ? _fileService.GetTemplate(content.TemplateId.Value)?.Key
             : null;
 
-        return viewModel;
+        return responseModel;
     }
 }

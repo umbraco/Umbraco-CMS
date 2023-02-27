@@ -1,6 +1,6 @@
 ﻿namespace Umbraco.Cms.Api.Management.ViewModels.Content;
 
-public abstract class VariantViewModelBase : VariantModelBase
+public abstract class VariantResponseModelBase : VariantModelBase
 {
     public DateTime CreateDate { get; set; }
 

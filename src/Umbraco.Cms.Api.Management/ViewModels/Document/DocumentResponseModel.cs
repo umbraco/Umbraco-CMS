@@ -2,7 +2,7 @@
 
 namespace Umbraco.Cms.Api.Management.ViewModels.Document;
 
-public class DocumentViewModel : ContentViewModelBase<DocumentValueModel, DocumentVariantViewModel>
+public class DocumentResponseModel : ContentResponseModelBase<DocumentValueModel, DocumentVariantResponseModel>
 {
     public IEnumerable<ContentUrlInfo> Urls { get; set; } = Array.Empty<ContentUrlInfo>();
 
