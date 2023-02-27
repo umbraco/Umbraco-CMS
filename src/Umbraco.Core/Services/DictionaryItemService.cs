@@ -212,7 +212,7 @@ internal sealed class DictionaryItemService : RepositoryService, IDictionaryItem
             dictionaryItem.ParentId = parentId;
 
             EventMessages eventMessages = EventMessagesFactory.Get();
-            var moveEventInfo = new MoveEventInfo<IDictionaryItem>(dictionaryItem, string.Empty, parent?.Id ?? Constants.System.Root);
+            var moveEventInfo = new MoveEventInfo<IDictionaryItem>(dictionaryItem, string.Empty, parent?.Id ?? Constants.System.Root, parentId);
             var movingNotification = new DictionaryItemMovingNotification(moveEventInfo, eventMessages);
             if (await scope.Notifications.PublishCancelableAsync(movingNotification))
             {
