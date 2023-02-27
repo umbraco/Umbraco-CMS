@@ -1,5 +1,5 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css';
-import { UmbEntityActionBase } from '../../../../../libs/entity-action';
+import { UmbEntityActionBase } from '../../../../../libs/entity-action/entity-action';
 import { UmbMediaTypeRepository } from '../repository/media-type.repository';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 
