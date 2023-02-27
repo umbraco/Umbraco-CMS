@@ -29,7 +29,7 @@ internal class ExamineUmbracoIndexingHandler : IUmbracoIndexingHandler
     private readonly IMainDom _mainDom;
     private readonly IValueSetBuilder<IMedia> _mediaValueSetBuilder;
     private readonly IValueSetBuilder<IMember> _memberValueSetBuilder;
-    private readonly IValueSetBuilder<IContent> _contentAPIValueSetBuilder;
+    private readonly IValueSetBuilder<IContent> _contentApiValueSetBuilder;
     private readonly IProfilingLogger _profilingLogger;
     private readonly IPublishedContentValueSetBuilder _publishedContentValueSetBuilder;
     private readonly ICoreScopeProvider _scopeProvider;
@@ -45,7 +45,7 @@ internal class ExamineUmbracoIndexingHandler : IUmbracoIndexingHandler
         IPublishedContentValueSetBuilder publishedContentValueSetBuilder,
         IValueSetBuilder<IMedia> mediaValueSetBuilder,
         IValueSetBuilder<IMember> memberValueSetBuilder,
-        IValueSetBuilder<IContent> contentAPIValueSetBuilder)
+        IValueSetBuilder<IContent> contentApiValueSetBuilder)
     {
         _mainDom = mainDom;
         _logger = logger;
@@ -57,7 +57,7 @@ internal class ExamineUmbracoIndexingHandler : IUmbracoIndexingHandler
         _publishedContentValueSetBuilder = publishedContentValueSetBuilder;
         _mediaValueSetBuilder = mediaValueSetBuilder;
         _memberValueSetBuilder = memberValueSetBuilder;
-        _contentAPIValueSetBuilder = contentAPIValueSetBuilder;
+        _contentApiValueSetBuilder = contentApiValueSetBuilder;
         _enabled = new Lazy<bool>(IsEnabled);
     }
 
@@ -286,7 +286,7 @@ internal class ExamineUmbracoIndexingHandler : IUmbracoIndexingHandler
                 var unpublishedValueSet = new Lazy<List<ValueSet>>(() =>
                 {
                     IEnumerable<ValueSet> contentValueSet = examineUmbracoIndexingHandler._contentValueSetBuilder.GetValueSets(content);
-                    IEnumerable<ValueSet> contentApiValueSet = examineUmbracoIndexingHandler._contentAPIValueSetBuilder.GetValueSets(content);
+                    IEnumerable<ValueSet> contentApiValueSet = examineUmbracoIndexingHandler._contentApiValueSetBuilder.GetValueSets(content);
 
                     return contentValueSet.Concat(contentApiValueSet).ToList();
                 });
