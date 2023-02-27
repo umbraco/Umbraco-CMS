@@ -3,9 +3,9 @@ import { UmbWorkspaceContextInterface } from '../components/workspace/workspace-
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 
 // TODO: add interface for repo/partial repo/save-repo
-export class UmbSaveWorkspaceAction extends UmbWorkspaceAction<any, UmbWorkspaceContextInterface> {
-	constructor(host: UmbControllerHostInterface, repositoryAlias: string) {
-		super(host, repositoryAlias);
+export class UmbSaveWorkspaceAction extends UmbWorkspaceAction<UmbWorkspaceContextInterface> {
+	constructor(host: UmbControllerHostInterface) {
+		super(host);
 	}
 
 	/* TODO: we need a solution for all actions to notify the system that is has been executed.
@@ -26,7 +26,8 @@ export class UmbSaveWorkspaceAction extends UmbWorkspaceAction<any, UmbWorkspace
 		if (!this.workspaceContext) return;
 
 		// TODO: preferably the actions dont talk directly with repository, but instead with its context.
-		const { error } = await this.repository.create(data);
+		// We just need to consider how third parties can extend the system.
+		const { error } = await this.workspaceContext.repository.create(data);
 
 		// TODO: this is temp solution to bubble validation errors to the UI
 		if (error) {
@@ -41,6 +42,7 @@ export class UmbSaveWorkspaceAction extends UmbWorkspaceAction<any, UmbWorkspace
 	}
 
 	#update(data: any) {
-		this.repository?.save(data);
+		if (!this.workspaceContext) return;
+		this.workspaceContext.repository?.save(data);
 	}
 }

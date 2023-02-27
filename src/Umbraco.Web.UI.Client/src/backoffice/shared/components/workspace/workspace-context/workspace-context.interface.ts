@@ -1,6 +1,7 @@
 import { Observable } from 'rxjs';
 
 export interface UmbWorkspaceContextInterface<T = unknown> {
+	repository: any; // TODO: add type
 	isNew: Observable<boolean>;
 	getIsNew(): boolean;
 	setIsNew(value: boolean): void;
