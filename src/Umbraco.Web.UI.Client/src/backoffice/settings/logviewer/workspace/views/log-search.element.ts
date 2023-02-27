@@ -222,6 +222,15 @@ export class UmbLogViewerSearchViewElement extends UmbLitElement {
 				<div id="input-container">${this.#renderSearchInput()}</div>
 				<uui-box>
 					<p>Total items: 234</p>
+					${this._logs.map(
+						(log) => html`<umb-log-viewer-message
+							.timestamp=${log.timestamp ?? ''}
+							.level=${log.level ?? ''}
+							.renderedMessage=${log.renderedMessage ?? ''}
+							.properties=${log.properties ?? []}
+							.exception=${log.exception ?? ''}
+							.messageTemplate=${log.messageTemplate ?? ''}></umb-log-viewer-message>`
+					)}
 				</uui-box>
 			</div>
 		`;
