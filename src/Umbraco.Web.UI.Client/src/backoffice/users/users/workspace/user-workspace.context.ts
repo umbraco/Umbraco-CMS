@@ -5,10 +5,10 @@ import { UmbEntityWorkspaceManager } from '../../../shared/components/workspace/
 import type { UserDetails } from '@umbraco-cms/models';
 
 export class UmbWorkspaceUserContext
-	extends UmbWorkspaceContext
+	extends UmbWorkspaceContext<any>
 	implements UmbWorkspaceEntityContextInterface<UserDetails | undefined>
 {
-	#manager = new UmbEntityWorkspaceManager(this._host, 'user', UMB_USER_STORE_CONTEXT_TOKEN);
+	#manager = new UmbEntityWorkspaceManager(this.host, 'user', UMB_USER_STORE_CONTEXT_TOKEN);
 
 	public readonly data = this.#manager.state.asObservable();
 	public readonly name = this.#manager.state.getObservablePart((state) => state?.name);

@@ -5,10 +5,10 @@ import { UMB_USER_GROUP_STORE_CONTEXT_TOKEN } from '../user-group.store';
 import type { UserGroupDetails } from '@umbraco-cms/models';
 
 export class UmbWorkspaceUserGroupContext
-	extends UmbWorkspaceContext
+	extends UmbWorkspaceContext<any>
 	implements UmbWorkspaceEntityContextInterface<UserGroupDetails | undefined>
 {
-	#manager = new UmbEntityWorkspaceManager(this._host, 'user-group', UMB_USER_GROUP_STORE_CONTEXT_TOKEN);
+	#manager = new UmbEntityWorkspaceManager(this.host, 'user-group', UMB_USER_GROUP_STORE_CONTEXT_TOKEN);
 
 	public readonly data = this.#manager.state.asObservable();
 	public readonly name = this.#manager.state.getObservablePart((state) => state?.name);
