@@ -920,7 +920,7 @@ test.describe('BlockGridEditorAreasContent', () => {
       // Drags and drops the ElementBody to another element
       const dragFrom = await page.locator('[data-element-udi="' + ElementMoveFromUdi + '"]').locator('[data-content-element-type-alias="' + elementBodyAlias + '"]');
       const dragTo = await page.locator('[data-element-udi="' + ElementMoveToUdi + '"]').locator('[data-area-alias="' + titleArea + '"]').getByRole('button', {name: 'Add content'});
-      await umbracoUi.dragAndDrop(dragFrom, dragTo, 0, 0, 10);
+      await umbracoUi.dragAndDrop(dragFrom, dragTo, -10, 0, 10);
 
       // Assert
       // Expects the element MoveFrom to have 0 entries
