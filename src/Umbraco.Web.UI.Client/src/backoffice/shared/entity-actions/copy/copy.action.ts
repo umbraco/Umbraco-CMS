@@ -1,4 +1,4 @@
-import { UmbEntityActionBase } from '../../../../../libs/entity-action/entity-action';
+import { UmbEntityActionBase } from '@umbraco-cms/entity-action';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 
 export class UmbCopyEntityAction<T extends { copy(): Promise<void> }> extends UmbEntityActionBase<T> {
