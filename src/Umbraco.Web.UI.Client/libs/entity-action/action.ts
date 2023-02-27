@@ -2,7 +2,7 @@ import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 import { umbExtensionsRegistry, createExtensionClass } from '@umbraco-cms/extensions-api';
 import { UmbObserverController } from '@umbraco-cms/observable-api';
 
-export interface UmbAction<RepositoryType> {
+export interface UmbAction<RepositoryType = unknown> {
 	host: UmbControllerHostInterface;
 	repository: RepositoryType;
 	execute(): Promise<void>;
