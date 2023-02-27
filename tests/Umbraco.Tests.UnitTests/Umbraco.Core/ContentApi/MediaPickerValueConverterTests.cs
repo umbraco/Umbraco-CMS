@@ -98,7 +98,7 @@ public class MediaPickerValueConverterTests : PropertyValueConverterTests
         Mock.Of<IPublishedModelFactory>(),
         new ApiMediaBuilder(
             new ApiContentNameProvider(),
-            new ApiUrlProvider(PublishedUrlProvider, new DefaultRequestStartNodeServiceAccessor()),
+            new ApiUrlProvider(PublishedUrlProvider, new NoopRequestStartNodeServiceAccessor()),
             Mock.Of<IPublishedValueFallback>(),
             CreateOutputExpansionStrategyAccessor()));
 }

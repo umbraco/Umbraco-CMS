@@ -19,7 +19,7 @@ public class ContentPickerValueConverterTests : PropertyValueConverterTests
             PublishedSnapshotAccessor,
             new ApiContentBuilder(
                 nameProvider ?? new ApiContentNameProvider(),
-                new ApiUrlProvider(PublishedUrlProvider, new DefaultRequestStartNodeServiceAccessor()),
+                new ApiUrlProvider(PublishedUrlProvider, new NoopRequestStartNodeServiceAccessor()),
                 CreateOutputExpansionStrategyAccessor()));
 
     [Test]

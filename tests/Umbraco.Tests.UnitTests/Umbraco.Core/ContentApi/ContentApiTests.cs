@@ -70,5 +70,5 @@ public class ContentApiTests
         return publishedPropType;
     }
 
-    protected IOutputExpansionStrategyAccessor CreateOutputExpansionStrategyAccessor() => new DefaultOutputExpansionStrategyAccessor();
+    protected IOutputExpansionStrategyAccessor CreateOutputExpansionStrategyAccessor() => new NoopOutputExpansionStrategyAccessor();
 }
