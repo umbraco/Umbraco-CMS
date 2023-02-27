@@ -1,25 +1,19 @@
 import { html } from 'lit';
+import { UmbEntityBulkActionBase } from '@umbraco-cms/entity-action';
 import type { UmbMediaRepository } from '../../repository/media.repository';
-import { UmbActionBase } from '../../../../shared/action';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 import { UmbContextConsumerController } from '@umbraco-cms/context-api';
 import { UmbModalService, UMB_MODAL_SERVICE_CONTEXT_TOKEN } from '@umbraco-cms/modal';
 
-export class UmbMediaTrashEntityBulkAction extends UmbActionBase<UmbMediaRepository> {
-	#selection: Array<string>;
+export class UmbMediaTrashEntityBulkAction extends UmbEntityBulkActionBase<UmbMediaRepository> {
 	#modalService?: UmbModalService;
 
 	constructor(host: UmbControllerHostInterface, repositoryAlias: string, selection: Array<string>) {
-		super(host, repositoryAlias);
-		this.#selection = selection;
+		super(host, repositoryAlias, selection);
 
 		new UmbContextConsumerController(host, UMB_MODAL_SERVICE_CONTEXT_TOKEN, (instance) => {
 			this.#modalService = instance;
 		});
-	}
-
-	setSelection(selection: Array<string>) {
-		this.#selection = selection;
 	}
 
 	async execute() {
@@ -27,12 +21,12 @@ export class UmbMediaTrashEntityBulkAction extends UmbActionBase<UmbMediaReposit
 		if (!this.#modalService || !this.repository) return;
 
 		// TODO: should we subscribe in cases like this?
-		const { data } = await this.repository.requestTreeItems(this.#selection);
+		const { data } = await this.repository.requestTreeItems(this.selection);
 
 		if (data) {
 			// TODO: use correct markup
 			const modalHandler = this.#modalService?.confirm({
-				headline: `Deleting ${this.#selection.length} items`,
+				headline: `Deleting ${this.selection.length} items`,
 				content: html`
 					This will delete the following files:
 					<ul style="list-style-type: none; padding: 0; margin: 0; margin-top: var(--uui-size-space-2);">
@@ -45,7 +39,7 @@ export class UmbMediaTrashEntityBulkAction extends UmbActionBase<UmbMediaReposit
 
 			const { confirmed } = await modalHandler.onClose();
 			if (confirmed) {
-				await this.repository?.trash(this.#selection);
+				await this.repository?.trash(this.selection);
 			}
 		}
 	}
