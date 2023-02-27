@@ -8,13 +8,13 @@ namespace Umbraco.Cms.Infrastructure.Examine;
 public class ContentApiIndexPopulator : IndexPopulator<IUmbracoContentIndex>
 {
     private readonly IContentService _contentService;
-    private readonly IValueSetBuilder<IContent> _valueSetBuilder;
+    private readonly IValueSetBuilder<IContent> _contentValueSetBuilder;
 
-    public ContentApiIndexPopulator(IContentService contentService, IValueSetBuilder<IContent> valueSetBuilder)
+    public ContentApiIndexPopulator(IContentService contentService, IValueSetBuilder<IContent> contentValueSetBuilder)
     {
         _contentService = contentService;
-        _valueSetBuilder = valueSetBuilder;
-        RegisterIndex(Constants.UmbracoIndexes.ContentAPIIndexName);
+        _contentValueSetBuilder = contentValueSetBuilder;
+        //RegisterIndex(Constants.UmbracoIndexes.ContentAPIIndexName);
     }
 
     protected override void PopulateIndexes(IReadOnlyList<IIndex> indexes)
@@ -23,11 +23,11 @@ public class ContentApiIndexPopulator : IndexPopulator<IUmbracoContentIndex>
         {
             IEnumerable<IContent> rootNodes = _contentService.GetRootContent();
 
-            index.IndexItems(_valueSetBuilder.GetValueSets(rootNodes.ToArray()));
+            index.IndexItems(_contentValueSetBuilder.GetValueSets(rootNodes.ToArray()));
 
             foreach (IContent root in rootNodes)
             {
-                IEnumerable<ValueSet> valueSets = _valueSetBuilder.GetValueSets(
+                IEnumerable<ValueSet> valueSets = _contentValueSetBuilder.GetValueSets(
                     _contentService.GetPagedDescendants(root.Id, 0, int.MaxValue, out _).ToArray());
 
                 index.IndexItems(valueSets);

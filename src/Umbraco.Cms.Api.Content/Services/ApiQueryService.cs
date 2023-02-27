@@ -9,7 +9,7 @@ public class ApiQueryService : IApiQueryService
 
     public ApiQueryService(IExamineManager examineManager) => _examineManager = examineManager;
 
-    public IEnumerable<Guid> GetChildren(Guid id)
+    public IEnumerable<Guid> GetChildrenIds(Guid id)
     {
         if (!_examineManager.TryGetIndex(Constants.UmbracoIndexes.ContentAPIIndexName, out IIndex? apiIndex))
         {

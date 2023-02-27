@@ -3,7 +3,9 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Primitives;
 using Umbraco.Cms.Core.ContentApi;
 using Umbraco.Cms.Core.Models.ContentApi;
+using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PublishedCache;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Content.Controllers;
 
@@ -52,7 +54,19 @@ public class QueryContentApiController : ContentApiControllerBase
             return BadRequest("Invalid GUID format.");
         }
 
-        IEnumerable<Guid> results = _apiQueryService.GetChildren(id);
+        IEnumerable<Guid> ids = _apiQueryService.GetChildrenIds(id);
+
+        IPublishedContentCache? contentCache = GetContentCache();
+
+        if (contentCache is null)
+        {
+            return BadRequest(ContentCacheNotFoundProblemDetails());
+        }
+
+        IEnumerable<IPublishedContent> contentItems = ids.Select(contentCache.GetById).WhereNotNull();
+
+        IEnumerable<IApiContent> results = contentItems.Select(ApiContentBuilder.Build);
+
         return Ok(results);
     }
 }

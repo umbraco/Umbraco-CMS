@@ -5,5 +5,5 @@ public interface IApiQueryService
     /// <summary>
     ///     Gets children by querying.
     /// </summary>
-    IEnumerable<Guid> GetChildren(Guid id);
+    IEnumerable<Guid> GetChildrenIds(Guid id);
 }
