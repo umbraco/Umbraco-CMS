@@ -173,7 +173,7 @@ export class UmbDashboardTranslationDictionaryElement extends UmbLitElement {
 
 	render() {
 		return html` <div id="dictionary-top-bar">
-				<uui-button type="button" look="outline" @click=${this.#create}>Create dictionary item</uui-button>
+				<uui-button type="button" look="outline" label="Create dictionary item" @click=${this.#create}>Create dictionary item</uui-button>
 				<uui-input
 					@keyup="${this.#filter}"
 					placeholder="Type to filter..."

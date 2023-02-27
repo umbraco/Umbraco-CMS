@@ -16,7 +16,7 @@ export class UmbWorkspaceViewDictionaryEditElement extends UmbLitElement {
 		css`
 			:host {
 				display: block;
-				margin: var(--uui-size-layout-1);
+				padding: var(--uui-size-space-6);
 			}
 		`,
 	];

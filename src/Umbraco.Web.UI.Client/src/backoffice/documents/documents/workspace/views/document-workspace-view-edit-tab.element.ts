@@ -146,7 +146,7 @@ export class UmbDocumentWorkspaceViewEditTabElement extends UmbLitElement {
 	};
 
 	render() {
-		// TODO: only show tab properties if there was any. We need some event? to tell us when the properties is empty.
+		// TODO: only show tab properties if there was any. We might do this with an event? to tell us when the properties is empty.
 		return html`
 			${this._hasTabProperties
 				? html`

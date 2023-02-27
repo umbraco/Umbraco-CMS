@@ -6,6 +6,7 @@ import { customElement, property } from 'lit/decorators.js';
  *  @element umb-workspace-property-layout
  *  @description - Element for displaying a property in an workspace.
  *  @slot editor - Slot for rendering the Property Editor
+ *  @slot description - Slot for rendering things below the label.
  *  @slot property-action-menu - Slot for rendering the Property Action Menu
  */
 @customElement('umb-workspace-property-layout')
@@ -34,6 +35,10 @@ export class UmbWorkspacePropertyLayoutElement extends LitElement {
 
 			:host(:last-of-type) {
 				border-bottom: none;
+			}
+
+			:host(:first-of-type) {
+				padding-top: 0;
 			}
 
 			:host(:first-of-type) {
