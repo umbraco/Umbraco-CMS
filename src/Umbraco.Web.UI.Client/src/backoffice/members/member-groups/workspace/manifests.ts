@@ -1,5 +1,5 @@
+import { UmbSaveWorkspaceAction } from '@umbraco-cms/workspace';
 import { MEMBER_GROUP_REPOSITORY_ALIAS } from '../repository/manifests';
-import { UmbSaveWorkspaceAction } from '../../../shared/workspace-actions/save.action';
 import type { ManifestWorkspace, ManifestWorkspaceAction, ManifestWorkspaceView } from '@umbraco-cms/models';
 
 const workspace: ManifestWorkspace = {

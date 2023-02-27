@@ -1,4 +1,4 @@
-import { UmbSaveWorkspaceAction } from '../../../../shared/workspace-actions/save.action';
+import { UmbSaveWorkspaceAction } from '@umbraco-cms/workspace';
 import { LANGUAGE_REPOSITORY_ALIAS } from '../../repository/manifests';
 import type { ManifestWorkspace, ManifestWorkspaceAction, ManifestWorkspaceView } from '@umbraco-cms/models';
 

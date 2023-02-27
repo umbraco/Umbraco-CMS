@@ -1,5 +1,5 @@
 import { UmbWorkspaceActionBase } from '@umbraco-cms/workspace';
-import { UmbWorkspaceContextInterface } from '../components/workspace/workspace-context/workspace-context.interface';
+import { UmbWorkspaceContextInterface } from '../../../../src/backoffice/shared/components/workspace/workspace-context/workspace-context.interface';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 
 // TODO: add interface for repo/partial repo/save-repo
