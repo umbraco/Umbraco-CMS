@@ -1663,7 +1663,7 @@
                 "schema": {
                   "oneOf": [
                     {
-                      "$ref": "#/components/schemas/DocumentModel"
+                      "$ref": "#/components/schemas/DocumentResponseModel"
                     }
                   ]
                 }
@@ -6293,6 +6293,40 @@
         },
         "additionalProperties": false
       },
+      "ContentResponseModelBaseDocumentValueModelDocumentVariantResponseModel": {
+        "type": "object",
+        "properties": {
+          "values": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/DocumentValueModel"
+                }
+              ]
+            }
+          },
+          "variants": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/DocumentVariantResponseModel"
+                }
+              ]
+            }
+          },
+          "key": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "contentTypeKey": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        "additionalProperties": false
+      },
       "ContentStateModel": {
         "enum": [
           "NotCreated",
@@ -6504,40 +6538,6 @@
           },
           "url": {
             "type": "string"
-          }
-        },
-        "additionalProperties": false
-      },
-      "ContentViewModelBaseDocumentValueModelDocumentVariantModel": {
-        "type": "object",
-        "properties": {
-          "values": {
-            "type": "array",
-            "items": {
-              "oneOf": [
-                {
-                  "$ref": "#/components/schemas/DocumentValueModel"
-                }
-              ]
-            }
-          },
-          "variants": {
-            "type": "array",
-            "items": {
-              "oneOf": [
-                {
-                  "$ref": "#/components/schemas/DocumentVariantModel"
-                }
-              ]
-            }
-          },
-          "key": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "contentTypeKey": {
-            "type": "string",
-            "format": "uuid"
           }
         },
         "additionalProperties": false
@@ -7022,11 +7022,11 @@
         },
         "additionalProperties": false
       },
-      "DocumentModel": {
+      "DocumentResponseModel": {
         "type": "object",
         "allOf": [
           {
-            "$ref": "#/components/schemas/ContentViewModelBaseDocumentValueModelDocumentVariantModel"
+            "$ref": "#/components/schemas/ContentResponseModelBaseDocumentValueModelDocumentVariantResponseModel"
           }
         ],
         "properties": {
@@ -7186,37 +7186,6 @@
           }
         }
       },
-      "DocumentVariantModel": {
-        "required": [
-          "$type"
-        ],
-        "type": "object",
-        "allOf": [
-          {
-            "$ref": "#/components/schemas/VariantViewModelBaseModel"
-          }
-        ],
-        "properties": {
-          "$type": {
-            "type": "string"
-          },
-          "state": {
-            "$ref": "#/components/schemas/ContentStateModel"
-          },
-          "publishDate": {
-            "type": "string",
-            "format": "date-time",
-            "nullable": true
-          }
-        },
-        "additionalProperties": false,
-        "discriminator": {
-          "propertyName": "$type",
-          "mapping": {
-            "DocumentVariantViewModel": "#/components/schemas/DocumentVariantModel"
-          }
-        }
-      },
       "DocumentVariantRequestModel": {
         "required": [
           "$type"
@@ -7237,6 +7206,37 @@
           "propertyName": "$type",
           "mapping": {
             "DocumentVariantRequestModel": "#/components/schemas/DocumentVariantRequestModel"
+          }
+        }
+      },
+      "DocumentVariantResponseModel": {
+        "required": [
+          "$type"
+        ],
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/VariantResponseModelBaseModel"
+          }
+        ],
+        "properties": {
+          "$type": {
+            "type": "string"
+          },
+          "state": {
+            "$ref": "#/components/schemas/ContentStateModel"
+          },
+          "publishDate": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false,
+        "discriminator": {
+          "propertyName": "$type",
+          "mapping": {
+            "DocumentVariantResponseModel": "#/components/schemas/DocumentVariantResponseModel"
           }
         }
       },
@@ -9674,11 +9674,11 @@
           "propertyName": "$type",
           "mapping": {
             "DocumentVariantRequestModel": "#/components/schemas/DocumentVariantRequestModel",
-            "DocumentVariantViewModel": "#/components/schemas/DocumentVariantModel"
+            "DocumentVariantResponseModel": "#/components/schemas/DocumentVariantResponseModel"
           }
         }
       },
-      "VariantViewModelBaseModel": {
+      "VariantResponseModelBaseModel": {
         "required": [
           "$type"
         ],
@@ -9711,7 +9711,7 @@
         "discriminator": {
           "propertyName": "$type",
           "mapping": {
-            "DocumentVariantViewModel": "#/components/schemas/DocumentVariantModel"
+            "DocumentVariantResponseModel": "#/components/schemas/DocumentVariantResponseModel"
           }
         }
       },
