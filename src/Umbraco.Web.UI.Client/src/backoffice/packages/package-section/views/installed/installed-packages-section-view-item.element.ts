@@ -1,17 +1,18 @@
 import { html, nothing } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
+import { ifDefined } from 'lit/directives/if-defined.js';
 import { firstValueFrom, map } from 'rxjs';
 
 import { UmbModalService, UMB_MODAL_SERVICE_CONTEXT_TOKEN } from '../../../../../core/modal';
-import { createExtensionElement , umbExtensionsRegistry } from '@umbraco-cms/extensions-api';
+import { createExtensionElement, umbExtensionsRegistry } from '@umbraco-cms/extensions-api';
 
-import type { ManifestPackageView } from '@umbraco-cms/models';
+import type { ManifestPackageView, UmbPackage } from '@umbraco-cms/models';
 import { UmbLitElement } from '@umbraco-cms/element';
 
-@customElement('umb-packages-installed-item')
-export class UmbPackagesInstalledItem extends UmbLitElement {
+@customElement('umb-installed-packages-section-view-item')
+export class UmbInstalledPackagesSectionViewItemElement extends UmbLitElement {
 	@property({ type: Object })
-	package!: any; // TODO: Use real type
+	package!: UmbPackage;
 
 	@state()
 	private _packageView?: ManifestPackageView;
@@ -28,13 +29,16 @@ export class UmbPackagesInstalledItem extends UmbLitElement {
 
 	connectedCallback(): void {
 		super.connectedCallback();
-		this.findPackageView(this.package.alias);
+
+		if (this.package.name?.length) {
+			this.findPackageView(this.package.name);
+		}
 	}
 
 	private async findPackageView(alias: string) {
 		const observable = umbExtensionsRegistry
 			?.extensionsOfType('packageView')
-			.pipe(map((e) => e.filter((m) => m.meta.packageAlias === alias)));
+			.pipe(map((e) => e.filter((m) => m.meta.packageName === alias)));
 
 		if (!observable) {
 			return;
@@ -50,7 +54,7 @@ export class UmbPackagesInstalledItem extends UmbLitElement {
 
 	render() {
 		return html`
-			<uui-ref-node-package name=${this.package.name} version=${this.package.version} @open=${this._onClick}>
+			<uui-ref-node-package name=${ifDefined(this.package.name)} version=${ifDefined(this.package.version)}>
 				<uui-action-bar slot="actions">
 					${this._packageView
 						? html`<uui-button
@@ -79,14 +83,10 @@ export class UmbPackagesInstalledItem extends UmbLitElement {
 
 		this._umbModalService?.open(element, { data: this.package, size: 'small', type: 'sidebar' });
 	}
-
-	private _onClick() {
-		window.history.pushState({}, '', `/section/packages/view/installed/package/${this.package.id}`);
-	}
 }
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-packages-installed-item': UmbPackagesInstalledItem;
+		'umb-installed-packages-section-view-item': UmbInstalledPackagesSectionViewItemElement;
 	}
 }
