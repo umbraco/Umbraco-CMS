@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Api.Content.Services;
+﻿namespace Umbraco.Cms.Core.ContentApi;
 
 public interface IRequestRoutingService
 {

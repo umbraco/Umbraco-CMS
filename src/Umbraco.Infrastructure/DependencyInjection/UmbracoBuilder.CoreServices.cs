@@ -424,6 +424,7 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.AddSingleton<IApiContentNameProvider, ApiContentNameProvider>();
         builder.Services.AddSingleton<IOutputExpansionStrategyAccessor, NoopOutputExpansionStrategyAccessor>();
         builder.Services.AddSingleton<IRequestStartNodeServiceAccessor, NoopRequestStartNodeServiceAccessor>();
+        builder.Services.AddSingleton<IRequestRoutingService, NoopRequestRoutingService>();
         builder.Services.AddSingleton<IApiUrlProvider, ApiUrlProvider>();
 
         return builder;
