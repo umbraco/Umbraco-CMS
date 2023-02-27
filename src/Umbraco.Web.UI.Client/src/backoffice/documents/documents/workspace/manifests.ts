@@ -81,7 +81,6 @@ const workspaceActions: Array<ManifestWorkspaceAction> = [
 			label: 'Save And Publish',
 			look: 'primary',
 			color: 'positive',
-			repositoryAlias: DOCUMENT_REPOSITORY_ALIAS,
 			api: UmbDocumentSaveAndPublishWorkspaceAction,
 		},
 	},
@@ -94,7 +93,6 @@ const workspaceActions: Array<ManifestWorkspaceAction> = [
 			workspaces: ['Umb.Workspace.Document'],
 			label: 'Save',
 			look: 'secondary',
-			repositoryAlias: DOCUMENT_REPOSITORY_ALIAS,
 			api: UmbSaveWorkspaceAction,
 		},
 	},
@@ -106,7 +104,6 @@ const workspaceActions: Array<ManifestWorkspaceAction> = [
 		meta: {
 			workspaces: ['Umb.Workspace.Document'],
 			label: 'Save And Preview',
-			repositoryAlias: DOCUMENT_REPOSITORY_ALIAS,
 			api: UmbDocumentSaveAndPreviewWorkspaceAction,
 		},
 	},
@@ -118,7 +115,6 @@ const workspaceActions: Array<ManifestWorkspaceAction> = [
 		meta: {
 			workspaces: ['Umb.Workspace.Document'],
 			label: 'Save And Schedule',
-			repositoryAlias: DOCUMENT_REPOSITORY_ALIAS,
 			api: UmbSaveAndScheduleDocumentWorkspaceAction,
 		},
 	},

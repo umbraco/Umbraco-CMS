@@ -19,6 +19,7 @@ const workspaceActions: Array<ManifestWorkspaceAction> = [
 		name: 'Save User Workspace Action',
 		meta: {
 			workspaces: ['Umb.Workspace.User'],
+			label: 'Save',
 			look: 'primary',
 			color: 'positive',
 			api: UmbSaveWorkspaceAction,

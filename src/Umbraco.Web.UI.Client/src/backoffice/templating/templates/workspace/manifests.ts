@@ -25,7 +25,6 @@ const workspaceActions: Array<ManifestWorkspaceAction> = [
 			color: 'positive',
 			workspaces: ['Umb.Workspace.Template'],
 			label: 'Save',
-			repositoryAlias: TEMPLATE_REPOSITORY_ALIAS,
 			api: UmbSaveWorkspaceAction,
 		},
 	},

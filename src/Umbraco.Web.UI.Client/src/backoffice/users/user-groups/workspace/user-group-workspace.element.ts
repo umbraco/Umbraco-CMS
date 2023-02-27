@@ -226,6 +226,7 @@ export class UmbUserGroupWorkspaceElement extends UmbLitElement implements UmbWo
 				name: 'Save User Group Workspace Action',
 				meta: {
 					workspaces: ['Umb.Workspace.UserGroup'],
+					label: 'Save',
 					look: 'primary',
 					color: 'positive',
 					api: UmbSaveWorkspaceAction,

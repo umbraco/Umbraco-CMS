@@ -34,6 +34,7 @@ const workspaceActions: Array<ManifestWorkspaceAction> = [
 		name: 'Save Document Type Workspace Action',
 		meta: {
 			workspaces: ['Umb.Workspace.DocumentType'],
+			label: 'Save',
 			look: 'primary',
 			color: 'positive',
 			api: UmbSaveWorkspaceAction,

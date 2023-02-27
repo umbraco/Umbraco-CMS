@@ -41,7 +41,6 @@ const workspaceActions: Array<ManifestWorkspaceAction> = [
 			label: 'Save',
 			look: 'primary',
 			color: 'positive',
-			repositoryAlias: DICTIONARY_REPOSITORY_ALIAS,
 			api: UmbSaveWorkspaceAction,
 		},
 	},

@@ -38,7 +38,6 @@ const workspaceActions: Array<ManifestWorkspaceAction> = [
 			label: 'Save',
 			look: 'primary',
 			color: 'positive',
-			repositoryAlias: MEMBER_GROUP_REPOSITORY_ALIAS,
 			api: UmbSaveWorkspaceAction,
 		},
 	},

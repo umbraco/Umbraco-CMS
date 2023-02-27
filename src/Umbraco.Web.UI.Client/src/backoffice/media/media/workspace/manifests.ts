@@ -71,6 +71,7 @@ const workspaceActions: Array<ManifestWorkspaceAction> = [
 		name: 'Save Media Workspace Action',
 		meta: {
 			workspaces: ['Umb.Workspace.Media'],
+			label: 'Save',
 			look: 'primary',
 			color: 'positive',
 			api: UmbSaveWorkspaceAction,

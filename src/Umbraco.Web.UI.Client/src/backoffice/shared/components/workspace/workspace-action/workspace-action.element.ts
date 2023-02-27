@@ -31,7 +31,7 @@ export class UmbWorkspaceActionElement extends UmbLitElement {
 
 	#createApi() {
 		if (!this._manifest?.meta.api) return;
-		this.#api = new this._manifest.meta.api(this, this._manifest.meta.repositoryAlias);
+		this.#api = new this._manifest.meta.api(this);
 	}
 
 	#api?: UmbWorkspaceAction;
