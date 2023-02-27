@@ -3,7 +3,7 @@ import { rest } from 'msw';
 import { umbracoPath } from '@umbraco-cms/utils';
 import type { PagedManifestsResponse } from '@umbraco-cms/models';
 
-export const manifestDevelopmentHandler = rest.get(umbracoPath('/manifests'), (_req, res, ctx) => {
+export const manifestDevelopmentHandler = rest.get(umbracoPath('/package/manifest'), (_req, res, ctx) => {
 	return res(
 		// Respond with a 200 status code
 		ctx.status(200),
@@ -67,7 +67,7 @@ export const manifestDevelopmentHandler = rest.get(umbracoPath('/manifests'), (_
 	);
 });
 
-export const manifestEmptyHandler = rest.get(umbracoPath('/manifests'), (_req, res, ctx) => {
+export const manifestEmptyHandler = rest.get(umbracoPath('/package/manifest'), (_req, res, ctx) => {
 	return res(
 		// Respond with a 200 status code
 		ctx.status(200),

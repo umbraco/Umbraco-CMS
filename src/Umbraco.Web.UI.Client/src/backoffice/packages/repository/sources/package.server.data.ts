@@ -19,7 +19,7 @@ export class UmbPackageServerDataSource {
 		// TODO: Use real resource when available
 		return tryExecuteAndNotify(
 			this.host,
-			fetch(umbracoPath('/manifests')).then((res) => res.json())
+			fetch(umbracoPath('/package/manifest')).then((res) => res.json())
 		);
 	}
 
