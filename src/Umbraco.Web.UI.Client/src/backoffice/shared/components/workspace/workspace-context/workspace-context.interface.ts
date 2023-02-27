@@ -1,6 +1,8 @@
 import { Observable } from 'rxjs';
+import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 
 export interface UmbWorkspaceContextInterface<T = unknown> {
+	host: UmbControllerHostInterface;
 	repository: any; // TODO: add type
 	isNew: Observable<boolean>;
 	getIsNew(): boolean;
