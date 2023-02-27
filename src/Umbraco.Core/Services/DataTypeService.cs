@@ -405,7 +405,7 @@ namespace Umbraco.Cms.Core.Services.Implement
                     return Attempt.SucceedWithStatus(DataTypeOperationStatus.Success, toMove);
                 }
 
-                var moveEventInfo = new MoveEventInfo<IDataType>(toMove, toMove.Path, parentId);
+                var moveEventInfo = new MoveEventInfo<IDataType>(toMove, toMove.Path, parentId, containerKey);
                 var movingDataTypeNotification = new DataTypeMovingNotification(moveEventInfo, eventMessages);
                 if (scope.Notifications.PublishCancelable(movingDataTypeNotification))
                 {
