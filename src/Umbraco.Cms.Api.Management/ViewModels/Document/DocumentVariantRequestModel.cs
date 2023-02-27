@@ -2,6 +2,6 @@
 
 namespace Umbraco.Cms.Api.Management.ViewModels.Document;
 
-public abstract class DocumentVariantModelBase : VariantModelBase
+public class DocumentVariantRequestModel : VariantModelBase
 {
 }
