@@ -23,7 +23,8 @@ public class MultiUrlPickerValueConverter : PropertyValueConverterBase, IContent
     private readonly IProfilingLogger _proflog;
     private readonly IPublishedSnapshotAccessor _publishedSnapshotAccessor;
     private readonly IPublishedUrlProvider _publishedUrlProvider;
-    private readonly IPublishedContentNameProvider _publishedContentNameProvider;
+    private readonly IApiContentNameProvider _apiContentNameProvider;
+    private readonly IApiUrlProvider _apiUrlProvider;
 
     [Obsolete("Use constructor that takes all parameters, scheduled for removal in V14")]
     public MultiUrlPickerValueConverter(
@@ -38,7 +39,8 @@ public class MultiUrlPickerValueConverter : PropertyValueConverterBase, IContent
             jsonSerializer,
             umbracoContextAccessor,
             publishedUrlProvider,
-            StaticServiceProvider.Instance.GetRequiredService<IPublishedContentNameProvider>())
+            StaticServiceProvider.Instance.GetRequiredService<IApiContentNameProvider>(),
+            StaticServiceProvider.Instance.GetRequiredService<IApiUrlProvider>())
     {
     }
 
@@ -48,14 +50,16 @@ public class MultiUrlPickerValueConverter : PropertyValueConverterBase, IContent
         IJsonSerializer jsonSerializer,
         IUmbracoContextAccessor umbracoContextAccessor,
         IPublishedUrlProvider publishedUrlProvider,
-        IPublishedContentNameProvider publishedContentNameProvider)
+        IApiContentNameProvider apiContentNameProvider,
+        IApiUrlProvider apiUrlProvider)
     {
         _publishedSnapshotAccessor = publishedSnapshotAccessor ??
                                      throw new ArgumentNullException(nameof(publishedSnapshotAccessor));
         _proflog = proflog ?? throw new ArgumentNullException(nameof(proflog));
         _jsonSerializer = jsonSerializer;
         _publishedUrlProvider = publishedUrlProvider;
-        _publishedContentNameProvider = publishedContentNameProvider;
+        _apiContentNameProvider = apiContentNameProvider;
+        _apiUrlProvider = apiUrlProvider;
     }
 
     public override bool IsConverter(IPublishedPropertyType propertyType) =>
@@ -172,12 +176,12 @@ public class MultiUrlPickerValueConverter : PropertyValueConverterBase, IContent
                 }
                 : null;
 
-            var url = content?.Url(_publishedUrlProvider) ?? item.Url;
+            var url = content != null ? _apiUrlProvider.Url(content) : item.Url;
             return url.IsNullOrWhiteSpace()
                 ? null
                 : new ApiLink(
                     $"{url}{item.QueryString}",
-                    item.Name ?? (content != null ? _publishedContentNameProvider.GetName(content) : null),
+                    item.Name ?? (content != null ? _apiContentNameProvider.GetName(content) : null),
                     item.Target,
                     content?.Key,
                     content?.ContentType.Alias,

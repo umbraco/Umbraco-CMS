@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
-using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Cms.Core.ContentApi;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Content.Filters;
@@ -14,20 +14,20 @@ public class LocalizeFromAcceptLanguageHeaderAttribute : TypeFilterAttribute
 
     private class LocalizeFromAcceptLanguageHeaderAttributeFilter : IActionFilter
     {
-        private readonly IVariationContextAccessor _variationContextAccessor;
+        private readonly IRequestCultureService _requestCultureService;
 
-        public LocalizeFromAcceptLanguageHeaderAttributeFilter(IVariationContextAccessor variationContextAccessor)
-            => _variationContextAccessor = variationContextAccessor;
+        public LocalizeFromAcceptLanguageHeaderAttributeFilter(IRequestCultureService requestCultureService)
+            => _requestCultureService = requestCultureService;
 
         public void OnActionExecuting(ActionExecutingContext context)
         {
-            var acceptLanguage = context.HttpContext.Request.Headers.AcceptLanguage.ToString();
-            if (acceptLanguage.IsNullOrWhiteSpace() || _variationContextAccessor.VariationContext?.Culture == acceptLanguage)
+            var requestedCulture = _requestCultureService.GetRequestedCulture();
+            if (requestedCulture.IsNullOrWhiteSpace())
             {
                 return;
             }
 
-            _variationContextAccessor.VariationContext = new VariationContext(acceptLanguage);
+            _requestCultureService.SetRequestCulture(requestedCulture);
         }
 
         public void OnActionExecuted(ActionExecutedContext context)

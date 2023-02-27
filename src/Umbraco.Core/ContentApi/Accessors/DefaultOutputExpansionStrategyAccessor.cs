@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 
-namespace Umbraco.Cms.Core.ContentApi;
+namespace Umbraco.Cms.Core.ContentApi.Accessors;
 
 public class DefaultOutputExpansionStrategyAccessor : IOutputExpansionStrategyAccessor
 {

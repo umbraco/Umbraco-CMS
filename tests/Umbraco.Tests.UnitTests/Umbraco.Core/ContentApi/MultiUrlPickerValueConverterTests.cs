@@ -1,10 +1,8 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.ContentApi;
+using Umbraco.Cms.Core.ContentApi.Accessors;
 using Umbraco.Cms.Core.Logging;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentApi;
@@ -27,7 +25,7 @@ public class MultiUrlPickerValueConverterTests : PropertyValueConverterTests
         publishedPropertyType.SetupGet(p => p.DataType).Returns(publishedDataType);
 
         var serializer = new JsonNetSerializer();
-        var valueConverter = new MultiUrlPickerValueConverter(PublishedSnapshotAccessor, Mock.Of<IProfilingLogger>(), serializer, Mock.Of<IUmbracoContextAccessor>(), PublishedUrlProvider, new PublishedContentNameProvider());
+        var valueConverter = new MultiUrlPickerValueConverter(PublishedSnapshotAccessor, Mock.Of<IProfilingLogger>(), serializer, Mock.Of<IUmbracoContextAccessor>(), PublishedUrlProvider, new ApiContentNameProvider(), ApiUrlProvider());
         Assert.AreEqual(typeof(IEnumerable<ApiLink>), valueConverter.GetContentApiPropertyValueType(publishedPropertyType.Object));
 
         var inter = serializer.Serialize(new[]
@@ -56,7 +54,7 @@ public class MultiUrlPickerValueConverterTests : PropertyValueConverterTests
         publishedPropertyType.SetupGet(p => p.DataType).Returns(publishedDataType);
 
         var serializer = new JsonNetSerializer();
-        var valueConverter = new MultiUrlPickerValueConverter(PublishedSnapshotAccessor, Mock.Of<IProfilingLogger>(), serializer, Mock.Of<IUmbracoContextAccessor>(), PublishedUrlProvider, new PublishedContentNameProvider());
+        var valueConverter = new MultiUrlPickerValueConverter(PublishedSnapshotAccessor, Mock.Of<IProfilingLogger>(), serializer, Mock.Of<IUmbracoContextAccessor>(), PublishedUrlProvider, new ApiContentNameProvider(), ApiUrlProvider());
         Assert.AreEqual(typeof(IEnumerable<ApiLink>), valueConverter.GetContentApiPropertyValueType(publishedPropertyType.Object));
 
         var inter = serializer.Serialize(new[]
@@ -97,7 +95,7 @@ public class MultiUrlPickerValueConverterTests : PropertyValueConverterTests
         publishedPropertyType.SetupGet(p => p.DataType).Returns(publishedDataType);
 
         var serializer = new JsonNetSerializer();
-        var valueConverter = new MultiUrlPickerValueConverter(PublishedSnapshotAccessor, Mock.Of<IProfilingLogger>(), serializer, Mock.Of<IUmbracoContextAccessor>(), PublishedUrlProvider, new PublishedContentNameProvider());
+        var valueConverter = new MultiUrlPickerValueConverter(PublishedSnapshotAccessor, Mock.Of<IProfilingLogger>(), serializer, Mock.Of<IUmbracoContextAccessor>(), PublishedUrlProvider, new ApiContentNameProvider(), ApiUrlProvider());
 
         var inter = serializer.Serialize(new[]
         {
@@ -127,7 +125,7 @@ public class MultiUrlPickerValueConverterTests : PropertyValueConverterTests
         publishedPropertyType.SetupGet(p => p.DataType).Returns(publishedDataType);
 
         var serializer = new JsonNetSerializer();
-        var valueConverter = new MultiUrlPickerValueConverter(PublishedSnapshotAccessor, Mock.Of<IProfilingLogger>(), serializer, Mock.Of<IUmbracoContextAccessor>(), PublishedUrlProvider, new PublishedContentNameProvider());
+        var valueConverter = new MultiUrlPickerValueConverter(PublishedSnapshotAccessor, Mock.Of<IProfilingLogger>(), serializer, Mock.Of<IUmbracoContextAccessor>(), PublishedUrlProvider, new ApiContentNameProvider(), ApiUrlProvider());
 
         var inter = serializer.Serialize(new[]
         {
@@ -157,7 +155,7 @@ public class MultiUrlPickerValueConverterTests : PropertyValueConverterTests
         publishedPropertyType.SetupGet(p => p.DataType).Returns(publishedDataType);
 
         var serializer = new JsonNetSerializer();
-        var valueConverter = new MultiUrlPickerValueConverter(PublishedSnapshotAccessor, Mock.Of<IProfilingLogger>(), serializer, Mock.Of<IUmbracoContextAccessor>(), PublishedUrlProvider, new PublishedContentNameProvider());
+        var valueConverter = new MultiUrlPickerValueConverter(PublishedSnapshotAccessor, Mock.Of<IProfilingLogger>(), serializer, Mock.Of<IUmbracoContextAccessor>(), PublishedUrlProvider, new ApiContentNameProvider(), ApiUrlProvider());
 
         var inter = serializer.Serialize(new[]
         {
@@ -188,7 +186,7 @@ public class MultiUrlPickerValueConverterTests : PropertyValueConverterTests
         publishedPropertyType.SetupGet(p => p.DataType).Returns(publishedDataType);
 
         var serializer = new JsonNetSerializer();
-        var valueConverter = new MultiUrlPickerValueConverter(PublishedSnapshotAccessor, Mock.Of<IProfilingLogger>(), serializer, Mock.Of<IUmbracoContextAccessor>(), PublishedUrlProvider, new PublishedContentNameProvider());
+        var valueConverter = new MultiUrlPickerValueConverter(PublishedSnapshotAccessor, Mock.Of<IProfilingLogger>(), serializer, Mock.Of<IUmbracoContextAccessor>(), PublishedUrlProvider, new ApiContentNameProvider(), ApiUrlProvider());
 
         var result = valueConverter.ConvertIntermediateToContentApiObject(Mock.Of<IPublishedElement>(), publishedPropertyType.Object, PropertyCacheLevel.Element, inter, false) as IEnumerable<ApiLink>;
         Assert.NotNull(result);
@@ -205,10 +203,12 @@ public class MultiUrlPickerValueConverterTests : PropertyValueConverterTests
         publishedPropertyType.SetupGet(p => p.DataType).Returns(publishedDataType);
 
         var serializer = new JsonNetSerializer();
-        var valueConverter = new MultiUrlPickerValueConverter(PublishedSnapshotAccessor, Mock.Of<IProfilingLogger>(), serializer, Mock.Of<IUmbracoContextAccessor>(), PublishedUrlProvider, new PublishedContentNameProvider());
+        var valueConverter = new MultiUrlPickerValueConverter(PublishedSnapshotAccessor, Mock.Of<IProfilingLogger>(), serializer, Mock.Of<IUmbracoContextAccessor>(), PublishedUrlProvider, new ApiContentNameProvider(), ApiUrlProvider());
 
         var result = valueConverter.ConvertIntermediateToContentApiObject(Mock.Of<IPublishedElement>(), publishedPropertyType.Object, PropertyCacheLevel.Element, inter, false) as IEnumerable<ApiLink>;
         Assert.NotNull(result);
         Assert.IsEmpty(result);
     }
+
+    private IApiUrlProvider ApiUrlProvider() => new ApiUrlProvider(PublishedUrlProvider, new DefaultRequestStartNodeServiceAccessor());
 }

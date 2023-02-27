@@ -2,6 +2,7 @@ using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.ContentApi;
+using Umbraco.Cms.Core.ContentApi.Accessors;
 using Umbraco.Cms.Core.Models.ContentApi;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PropertyEditors;
@@ -96,8 +97,8 @@ public class MediaPickerValueConverterTests : PropertyValueConverterTests
         PublishedSnapshotAccessor,
         Mock.Of<IPublishedModelFactory>(),
         new ApiMediaBuilder(
-            new PublishedContentNameProvider(),
-            PublishedUrlProvider,
+            new ApiContentNameProvider(),
+            new ApiUrlProvider(PublishedUrlProvider, new DefaultRequestStartNodeServiceAccessor()),
             Mock.Of<IPublishedValueFallback>(),
             CreateOutputExpansionStrategyAccessor()));
 }

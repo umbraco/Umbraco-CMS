@@ -8,6 +8,7 @@ using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.ContentApi;
+using Umbraco.Cms.Core.ContentApi.Accessors;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.DistributedLocking;
 using Umbraco.Cms.Core.Events;
@@ -420,8 +421,10 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.AddSingleton<IApiElementBuilder, ApiElementBuilder>();
         builder.Services.AddSingleton<IApiContentBuilder, ApiContentBuilder>();
         builder.Services.AddSingleton<IApiMediaBuilder, ApiMediaBuilder>();
-        builder.Services.AddSingleton<IPublishedContentNameProvider, PublishedContentNameProvider>();
+        builder.Services.AddSingleton<IApiContentNameProvider, ApiContentNameProvider>();
         builder.Services.AddSingleton<IOutputExpansionStrategyAccessor, DefaultOutputExpansionStrategyAccessor>();
+        builder.Services.AddSingleton<IRequestStartNodeServiceAccessor, DefaultRequestStartNodeServiceAccessor>();
+        builder.Services.AddSingleton<IApiUrlProvider, ApiUrlProvider>();
 
         return builder;
     }
