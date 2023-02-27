@@ -1,1 +1,1 @@
-export * from './workspace-action';
+export * from './actions';
