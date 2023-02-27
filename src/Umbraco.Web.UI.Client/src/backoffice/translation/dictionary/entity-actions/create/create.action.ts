@@ -1,5 +1,5 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css';
-import { UmbEntityActionBase } from '../../../../shared/entity-actions';
+import { UmbEntityActionBase } from '../../../../../../libs/entity-action';
 import { UmbDictionaryRepository } from '../../repository/dictionary.repository';
 import {
 	UmbSectionSidebarContext,

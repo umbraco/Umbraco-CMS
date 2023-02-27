@@ -1,5 +1,5 @@
 import { UmbMediaTypeRepository } from '../repository/media-type.repository';
-import { UmbEntityActionBase } from '../../../shared/entity-actions';
+import { UmbEntityActionBase } from '../../../../../libs/entity-action';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 
 export class UmbCreateMediaTypeEntityAction extends UmbEntityActionBase<UmbMediaTypeRepository> {

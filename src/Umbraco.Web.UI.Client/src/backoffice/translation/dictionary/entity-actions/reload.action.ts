@@ -1,5 +1,5 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css';
-import { UmbEntityActionBase } from '../../../shared/entity-actions';
+import { UmbEntityActionBase } from '../../../../../libs/entity-action';
 import { UmbDictionaryRepository } from '../repository/dictionary.repository';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 
@@ -11,6 +11,6 @@ export default class UmbReloadDictionaryEntityAction extends UmbEntityActionBase
 	}
 
 	async execute() {
-		alert('refresh')
+		alert('refresh');
 	}
 }
