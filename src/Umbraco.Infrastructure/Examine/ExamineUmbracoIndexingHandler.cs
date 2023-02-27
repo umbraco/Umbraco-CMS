@@ -1,4 +1,7 @@
+using System.Collections.Generic;
+using System;
 using System.Globalization;
+using System.Linq;
 using Examine;
 using Examine.Search;
 using Microsoft.Extensions.Logging;
@@ -6,6 +9,7 @@ using Umbraco.Cms.Core.Logging;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Runtime;
 using Umbraco.Cms.Core.Scoping;
+using Umbraco.Cms.Core.Strings.Css;
 using Umbraco.Cms.Infrastructure.HostedServices;
 using Umbraco.Cms.Infrastructure.Search;
 using Umbraco.Extensions;
@@ -29,6 +33,7 @@ internal class ExamineUmbracoIndexingHandler : IUmbracoIndexingHandler
     private readonly IMainDom _mainDom;
     private readonly IValueSetBuilder<IMedia> _mediaValueSetBuilder;
     private readonly IValueSetBuilder<IMember> _memberValueSetBuilder;
+    private readonly IValueSetBuilder<IContent> _contentAPIValueSetBuilder;
     private readonly IProfilingLogger _profilingLogger;
     private readonly IPublishedContentValueSetBuilder _publishedContentValueSetBuilder;
     private readonly ICoreScopeProvider _scopeProvider;
@@ -43,7 +48,8 @@ internal class ExamineUmbracoIndexingHandler : IUmbracoIndexingHandler
         IContentValueSetBuilder contentValueSetBuilder,
         IPublishedContentValueSetBuilder publishedContentValueSetBuilder,
         IValueSetBuilder<IMedia> mediaValueSetBuilder,
-        IValueSetBuilder<IMember> memberValueSetBuilder)
+        IValueSetBuilder<IMember> memberValueSetBuilder,
+        IValueSetBuilder<IContent> contentAPIValueSetBuilder)
     {
         _mainDom = mainDom;
         _logger = logger;
@@ -55,6 +61,7 @@ internal class ExamineUmbracoIndexingHandler : IUmbracoIndexingHandler
         _publishedContentValueSetBuilder = publishedContentValueSetBuilder;
         _mediaValueSetBuilder = mediaValueSetBuilder;
         _memberValueSetBuilder = memberValueSetBuilder;
+        _contentAPIValueSetBuilder = contentAPIValueSetBuilder;
         _enabled = new Lazy<bool>(IsEnabled);
     }
 
@@ -285,8 +292,19 @@ internal class ExamineUmbracoIndexingHandler : IUmbracoIndexingHandler
                 var builders = new Dictionary<bool, Lazy<List<ValueSet>>>
                 {
                     [true] = new(() => examineUmbracoIndexingHandler._publishedContentValueSetBuilder.GetValueSets(content).ToList()),
-                    [false] = new(() => examineUmbracoIndexingHandler._contentValueSetBuilder.GetValueSets(content).ToList())
+                    [false] = new(() => examineUmbracoIndexingHandler._contentValueSetBuilder.GetValueSets(content).ToList()),
+                    //[false] = new(() => examineUmbracoIndexingHandler._contentAPIValueSetBuilder.GetValueSets(content).ToList())
                 };
+
+                //var test = new Lazy<List<ValueSet>>(() =>
+                //{
+                //    var result = examineUmbracoIndexingHandler._contentValueSetBuilder.GetValueSets(content).ToList();
+                //    var resultAPI = examineUmbracoIndexingHandler._contentAPIValueSetBuilder.GetValueSets(content).ToList();
+
+                //    result.AddRange(resultAPI);
+
+                //    return result;
+                //});
 
                 // This is only for content - so only index items for IUmbracoContentIndex (to exlude members)
                 foreach (IUmbracoIndex index in examineUmbracoIndexingHandler._examineManager.Indexes
