@@ -132,7 +132,7 @@ export class UmbLogMessagesServerDataSource implements LogMessagesDataSource {
 	 * @return {*}
 	 * @memberof UmbLogMessagesServerDataSource
 	 */
-	async getLogViewerLog({
+	async getLogViewerLogs({
 		skip = 0,
 		take = 100,
 		orderDirection,

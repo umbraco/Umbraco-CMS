@@ -43,7 +43,7 @@ export interface LogMessagesDataSource {
 		startDate?: string;
 		endDate?: string;
 	}): Promise<DataSourceResponse<LogLevelCountsModel>>;
-	getLogViewerLog({
+	getLogViewerLogs({
 		skip,
 		take = 100,
 		orderDirection,

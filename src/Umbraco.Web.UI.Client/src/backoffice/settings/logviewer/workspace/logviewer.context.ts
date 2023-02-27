@@ -1,6 +1,14 @@
 import { UmbLogViewerRepository } from './data/log-viewer.repository';
-import { createObservablePart, DeepState } from '@umbraco-cms/observable-api';
-import { PagedLogTemplateModel, PagedSavedLogSearchModel } from '@umbraco-cms/backend-api';
+import { ArrayState, createObservablePart, DeepState, StringState } from '@umbraco-cms/observable-api';
+import {
+	DirectionModel,
+	LoggerModel,
+	LogLevelModel,
+	PagedLoggerModel,
+	PagedLogMessageModel,
+	PagedLogTemplateModel,
+	PagedSavedLogSearchModel,
+} from '@umbraco-cms/backend-api';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 import { UmbContextToken } from '@umbraco-cms/context-api';
 
@@ -55,8 +63,17 @@ export class UmbLogViewerWorkspaceContext {
 	#dateRange = new DeepState<LogViewerDateRange>(this.defaultDateRange);
 	dateRange = createObservablePart(this.#dateRange, (data) => data);
 
+	#currentQuery = new StringState<string>('');
+	currentQuery = createObservablePart(this.#currentQuery, (data) => data);
+
 	#messageTemplates = new DeepState<PagedLogTemplateModel | null>(null);
 	messageTemplates = createObservablePart(this.#messageTemplates, (data) => data);
+
+	#logLevel = new ArrayState<LogLevelModel>([]);
+	logLevel = createObservablePart(this.#logLevel, (data) => data);
+
+	#logs = new DeepState<PagedLogMessageModel | null>(null);
+	logs = createObservablePart(this.#logs, (data) => data?.items);
 
 	constructor(host: UmbControllerHostInterface) {
 		this.#host = host;
@@ -66,7 +83,7 @@ export class UmbLogViewerWorkspaceContext {
 	async init() {
 		try {
 			await Promise.all([
-				this.getMessageTemplates(0, 100),
+				this.getMessageTemplates(0, 10),
 				this.getLogCount(this.defaultDateRange),
 				this.getSavedSearches(),
 			]);
@@ -101,6 +118,25 @@ export class UmbLogViewerWorkspaceContext {
 		if (data) {
 			this.#messageTemplates.next(data);
 		}
+	}
+
+	async getLogs() {
+		const options = {
+			orderDirection: DirectionModel.ASCENDING,
+			filterExpression: this.#currentQuery.getValue(),
+			logLevel: this.#logLevel.getValue(),
+			...this.#dateRange.getValue(),
+		};
+
+		const { data } = await this.#repository.getLogs(options);
+
+		if (data) {
+			this.#logs.next(data);
+		}
+	}
+
+	setCurrentQuery(query: string) {
+		this.#currentQuery.next(query);
 	}
 }
 

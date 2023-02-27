@@ -231,7 +231,6 @@ export class UmbLogViewerOverviewViewElement extends UmbLitElement {
 		this.consumeContext(UMB_APP_LOG_VIEWER_CONTEXT_TOKEN, (instance) => {
 			this.#logViewerContext = instance;
 			this.#observeStuff();
-			
 		});
 	}
 
@@ -254,7 +253,7 @@ export class UmbLogViewerOverviewViewElement extends UmbLitElement {
 		this.observe(this.#logViewerContext.dateRange, (dateRange: LogViewerDateRange) => {
 			this._startDate = dateRange?.startDate;
 			this._endDate = dateRange?.endDate;
-		})
+		});
 	}
 
 	protected willUpdate(_changedProperties: Map<PropertyKey, unknown>): void {
@@ -288,16 +287,19 @@ export class UmbLogViewerOverviewViewElement extends UmbLitElement {
 		this.#logViewerContext?.setDateRange(newDateRange);
 	}
 
-	#renderSearchItem(searchListItem: SavedLogSearchModel) {
+	renderSearchItem = (searchListItem: SavedLogSearchModel) => {
 		return html` <li>
 			<uui-button
+				@click=${() => {
+					this.setCurrentQuery(searchListItem.query ?? '');
+				}}
 				label="${searchListItem.name}"
 				title="${searchListItem.name}"
 				href=${'/section/settings/logviewer/search?lq=' + searchListItem.query}
 				><uui-icon name="umb:search"></uui-icon>${searchListItem.name}</uui-button
 			>
 		</li>`;
-	}
+	};
 
 	#setCountFilter(level: string) {
 		if (this._logLevelCountFilter.includes(level)) {
@@ -306,6 +308,10 @@ export class UmbLogViewerOverviewViewElement extends UmbLitElement {
 		}
 
 		this._logLevelCountFilter = [...this._logLevelCountFilter, level];
+	}
+
+	setCurrentQuery(query: string) {
+		this.#logViewerContext?.setCurrentQuery(query);
 	}
 
 	render() {
@@ -324,7 +330,7 @@ export class UmbLogViewerOverviewViewElement extends UmbLitElement {
 								id="start-date" 
 								type="date" 
 								label="From" 
-								max="${this.today}"
+								.max=${this.#logViewerContext?.today ?? ''}
 								.value=${this._startDate}>
 							</input>
 							<uui-label for="end-date">To: </uui-label>
@@ -336,7 +342,7 @@ export class UmbLogViewerOverviewViewElement extends UmbLitElement {
 								id="end-date" 
 								type="date" 
 								label="To" 
-								max="${this.today}" 
+								.max=${this.#logViewerContext?.today ?? ''}
 								.value=${this._endDate}>
 							</input>
 						</div>
@@ -396,7 +402,19 @@ export class UmbLogViewerOverviewViewElement extends UmbLitElement {
 
 				<div id="saved-searches-container">
 					<uui-box id="saved-searches" headline="Saved searches">
-						<ul>${this._savedSearches.map(this.#renderSearchItem)}</ul>
+						<ul>
+						<li>
+							<uui-button
+								@click=${() => {
+									this.setCurrentQuery('');
+								}}
+								label="All logs"
+								title="All logs"
+								href="/section/settings/logviewer/search"
+								><uui-icon name="umb:search"></uui-icon>All logs</uui-button
+							>
+						</li>
+						${this._savedSearches.map(this.renderSearchItem)}</ul>
 					</uui-box>
 				</div>
 
@@ -412,6 +430,9 @@ export class UmbLogViewerOverviewViewElement extends UmbLitElement {
 											html`<uui-table-row
 												><uui-table-cell>
 													<a
+														@click=${() => {
+															this.setCurrentQuery(`@MessageTemplate='${template.messageTemplate}'` ?? '');
+														}}
 														href=${'/section/settings/logviewer/search?lg=@MessageTemplate%3D' +
 														template.messageTemplate}>
 														<span>${template.messageTemplate}</span> <span>${template.count}</span>

@@ -3,6 +3,7 @@ import { UmbLogSearchesStore, UMB_LOG_SEARCHES_STORE_CONTEXT_TOKEN } from './log
 import { UmbContextConsumerController } from '@umbraco-cms/context-api';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 import { UmbNotificationService, UMB_NOTIFICATION_SERVICE_CONTEXT_TOKEN } from '@umbraco-cms/notification';
+import { DirectionModel, LogLevelModel } from '@umbraco-cms/backend-api';
 
 // Move to documentation / JSdoc
 /* We need to create a new instance of the repository from within the element context. We want the notifications to be displayed in the right context. */
@@ -65,4 +66,33 @@ export class UmbLogViewerRepository {
 		return this.#messagesDataSource.getLogViewerLevelCount({ startDate, endDate });
 	}
 
+	async getLogs({
+		skip = 0,
+		take = 100,
+		orderDirection,
+		filterExpression,
+		logLevel,
+		startDate,
+		endDate,
+	}: {
+		skip?: number;
+		take?: number;
+		orderDirection?: DirectionModel;
+		filterExpression?: string;
+		logLevel?: Array<LogLevelModel>;
+		startDate?: string;
+		endDate?: string;
+	}) {
+		await this.#init();
+
+		return this.#messagesDataSource.getLogViewerLogs({
+			skip,
+			take,
+			orderDirection,
+			filterExpression,
+			logLevel,
+			startDate,
+			endDate,
+		});
+	}
 }

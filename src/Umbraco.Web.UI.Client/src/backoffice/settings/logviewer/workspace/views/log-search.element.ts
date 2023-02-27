@@ -7,7 +7,7 @@ import {
 	UMB_APP_LOG_VIEWER_CONTEXT_TOKEN,
 } from '../logviewer.context';
 import { UmbLitElement } from '@umbraco-cms/element';
-import { SavedLogSearchModel } from '@umbraco-cms/backend-api';
+import { LogMessageModel, SavedLogSearchModel } from '@umbraco-cms/backend-api';
 import { UUIInputElement, UUIPopoverElement, UUISymbolExpandElement } from '@umbraco-ui/uui';
 
 @customElement('umb-log-viewer-search-view')
@@ -88,6 +88,10 @@ export class UmbLogViewerSearchViewElement extends UmbLitElement {
 				font-weight: 600;
 				margin: 0 var(--uui-size-space-3);
 			}
+
+			uui-symbol-expand:not(#polling-symbol-expand) {
+				margin-left: var(--uui-size-space-3);
+			}
 		`,
 	];
 
@@ -109,6 +113,9 @@ export class UmbLogViewerSearchViewElement extends UmbLitElement {
 	@state()
 	private _inputQuery = '';
 
+	@state()
+	private _logs: LogMessageModel[] = [];
+
 	#logViewerContext?: UmbLogViewerWorkspaceContext;
 
 	constructor() {
@@ -116,6 +123,7 @@ export class UmbLogViewerSearchViewElement extends UmbLitElement {
 		this.consumeContext(UMB_APP_LOG_VIEWER_CONTEXT_TOKEN, (instance) => {
 			this.#logViewerContext = instance;
 			this.#observeStuff();
+			this.#logViewerContext.getLogs();
 		});
 	}
 
@@ -128,6 +136,14 @@ export class UmbLogViewerSearchViewElement extends UmbLitElement {
 		this.observe(this.#logViewerContext.dateRange, (dateRange: LogViewerDateRange) => {
 			this._startDate = dateRange?.startDate;
 			this._endDate = dateRange?.endDate;
+		});
+
+		this.observe(this.#logViewerContext.currentQuery, (query) => {
+			this._inputQuery = query;
+		});
+
+		this.observe(this.#logViewerContext.logs, (logs) => {
+			this._logs = logs ?? [];
 		});
 	}
 
@@ -200,7 +216,7 @@ export class UmbLogViewerSearchViewElement extends UmbLitElement {
 					<uui-button>Log level: All <uui-symbol-expand></uui-symbol-expand></uui-button>
 					<uui-button-group>
 						<uui-button>Polling</uui-button>
-						<uui-button compact><uui-symbol-expand></uui-symbol-expand></uui-button>
+						<uui-button compact><uui-symbol-expand id="polling-symbol-expand"></uui-symbol-expand></uui-button>
 					</uui-button-group>
 				</div>
 				<div id="input-container">${this.#renderSearchInput()}</div>
