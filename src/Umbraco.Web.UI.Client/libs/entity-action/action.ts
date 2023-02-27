@@ -3,6 +3,7 @@ import { umbExtensionsRegistry, createExtensionClass } from '@umbraco-cms/extens
 import { UmbObserverController } from '@umbraco-cms/observable-api';
 
 export interface UmbAction<RepositoryType> {
+	host: UmbControllerHostInterface;
 	repository: RepositoryType;
 	execute(): Promise<void>;
 }

@@ -1,5 +1,9 @@
+import { UmbAction, UmbActionBase } from './action';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
-import { UmbActionBase } from 'src/backoffice/shared/action';
+
+export interface UmbEntityBulkAction<RepositoryType> extends UmbAction<RepositoryType> {
+	selection: Array<string>;
+}
 
 export class UmbEntityBulkActionBase<T> extends UmbActionBase<T> {
 	selection: Array<string>;
