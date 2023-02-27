@@ -27,7 +27,7 @@ export const manifest: ManifestPropertyEditorUI = {
 				{
 					alias: 'initVal2',
 					label: 'Initial value 2',
-					description: '',
+					description: 'Used when range is enabled',
 					propertyEditorUI: 'Umb.PropertyEditorUI.Number',
 				},
 				{

@@ -5,6 +5,7 @@ import type { MemberTypeDetails } from '@umbraco-cms/models';
 
 export const data: Array<MemberTypeDetails> = [
 	{
+		$type: '',
 		name: 'Member Type 1',
 		type: 'member-type',
 		icon: 'icon-user',

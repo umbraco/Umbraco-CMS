@@ -6,6 +6,7 @@ export type RelationItemModel = {
     nodeKey?: string;
     nodeName?: string | null;
     nodeType?: string | null;
+    nodePublished?: boolean | null;
     contentTypeIcon?: string | null;
     contentTypeAlias?: string | null;
     contentTypeName?: string | null;
@@ -13,3 +14,4 @@ export type RelationItemModel = {
     relationTypeIsBidirectional?: boolean;
     relationTypeIsDependency?: boolean;
 };
+

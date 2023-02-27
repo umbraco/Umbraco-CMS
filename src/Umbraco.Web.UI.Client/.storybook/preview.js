@@ -30,6 +30,7 @@ import '../libs/element/context-provider.element';
 import '../src/backoffice/shared/components/backoffice-frame/backoffice-modal-container.element';
 import '../src/backoffice/shared/components/code-block/code-block.element';
 import '../src/backoffice/shared/components/workspace/workspace-layout/workspace-layout.element';
+import '../src/backoffice/shared/components';
 
 class UmbStoryBookElement extends LitElement {
 	_umbIconStore = new UmbIconStore();
@@ -91,7 +92,7 @@ export const parameters = {
 		storySort: {
 			method: 'alphabetical',
 			includeNames: true,
-			order: ['Guides', ['Getting started'], '*'],
+			order: ['Guides', ['Getting Started'], '*'],
 		},
 	},
 	actions: { argTypesRegex: '^on.*' },

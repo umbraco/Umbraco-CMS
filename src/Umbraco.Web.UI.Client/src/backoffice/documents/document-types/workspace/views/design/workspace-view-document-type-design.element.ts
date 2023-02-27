@@ -7,7 +7,15 @@ import type { DocumentTypeModel } from '@umbraco-cms/backend-api';
 
 @customElement('umb-workspace-view-document-type-design')
 export class UmbWorkspaceViewDocumentTypeDesignElement extends UmbLitElement {
-	static styles = [UUITextStyles, css``];
+	static styles = [
+		UUITextStyles,
+		css`
+			:host {
+				display: block;
+				padding: var(--uui-size-space-6);
+			}
+		`,
+	];
 
 	@state()
 	_documentType?: DocumentTypeModel;
@@ -33,7 +41,7 @@ export class UmbWorkspaceViewDocumentTypeDesignElement extends UmbLitElement {
 	}
 
 	render() {
-		return html`<div>Design of ${this._documentType?.name}</div>`;
+		return html`Design of ${this._documentType?.name}`;
 	}
 }
 

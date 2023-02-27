@@ -105,9 +105,10 @@ export class UmbUserWorkspaceElement extends UmbLitElement implements UmbWorkspa
 		});
 
 		this.observe(this._workspaceContext.data, (user) => {
-			this._user = user;
+			// TODO: fix type mismatch:
+			this._user = user as any;
 			if (user && user.name !== this._userName) {
-				this._userName = user.name;
+				this._userName = user.name || '';
 			}
 		});
 	}
@@ -133,17 +134,19 @@ export class UmbUserWorkspaceElement extends UmbLitElement implements UmbWorkspa
 		if (!this._user || !this._workspaceContext) return;
 
 		const isDisabled = this._user.status === 'disabled';
-		// TODO: make sure we use store /workspace right, maybe move function to workspace, or store reference to store?
+		// TODO: make sure we use the workspace for this:
+		/*
 		isDisabled
 			? this._workspaceContext.getStore()?.enableUsers([this._user.key])
 			: this._workspaceContext.getStore()?.disableUsers([this._user.key]);
+			*/
 	}
 
 	private _deleteUser() {
 		if (!this._user || !this._workspaceContext) return;
 
-		// TODO: make sure we use store /workspace right, maybe move function to workspace, or store reference to store?
-		this._workspaceContext.getStore()?.deleteUsers([this._user.key]);
+		// TODO: make sure we use the workspace for this:
+		//this._workspaceContext.getStore()?.deleteUsers([this._user.key]);
 
 		history.pushState(null, '', 'section/users/view/users/overview');
 	}

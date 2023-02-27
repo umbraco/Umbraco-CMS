@@ -8,3 +8,4 @@ export type UserInstallModel = {
     password: string;
     readonly subscribeToNewsletter?: boolean;
 };
+

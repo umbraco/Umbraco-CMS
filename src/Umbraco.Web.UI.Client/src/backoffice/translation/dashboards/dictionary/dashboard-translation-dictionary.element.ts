@@ -165,7 +165,7 @@ export class UmbDashboardTranslationDictionaryElement extends UmbLitElement {
 		const { name }: UmbCreateDictionaryModalResultData = await modalHandler.onClose();
 		if (!name) return;
 
-		const result = await this.#repo?.create({ name, parentKey: null, translations: [], key: '' });
+		const result = await this.#repo?.create({ $type: '', name, parentKey: null, translations: [], key: '' });
 
 		// TODO => get location header to route to new item
 		console.log(result);
@@ -173,7 +173,7 @@ export class UmbDashboardTranslationDictionaryElement extends UmbLitElement {
 
 	render() {
 		return html` <div id="dictionary-top-bar">
-				<uui-button type="button" look="outline" @click=${this.#create}>Create dictionary item</uui-button>
+				<uui-button type="button" look="outline" label="Create dictionary item" @click=${this.#create}>Create dictionary item</uui-button>
 				<uui-input
 					@keyup="${this.#filter}"
 					placeholder="Type to filter..."

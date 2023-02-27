@@ -55,6 +55,7 @@ export class UmbDataTypeServerDataSource implements RepositoryDetailDataSource<D
 	 */
 	async createScaffold(parentKey: string | null) {
 		const data: DataTypeModel = {
+			$type: '',
 			parentKey: parentKey,
 		};
 
@@ -77,9 +78,13 @@ export class UmbDataTypeServerDataSource implements RepositoryDetailDataSource<D
 		// TODO: use resources when end point is ready:
 		return tryExecuteAndNotify<DataTypeModel>(
 			this.#host,
-			DataTypeResource.postDataType({
-				requestBody,
-			})
+			// TODO: avoid this any?..
+			tryExecuteAndNotify(
+				this.#host,
+				DataTypeResource.postDataType({
+					requestBody,
+				})
+			) as any
 		);
 	}
 

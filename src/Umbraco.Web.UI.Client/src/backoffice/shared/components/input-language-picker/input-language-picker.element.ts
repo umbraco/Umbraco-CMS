@@ -5,10 +5,10 @@ import { ifDefined } from 'lit-html/directives/if-defined.js';
 import { FormControlMixin } from '@umbraco-ui/uui-base/lib/mixins';
 import { UmbChangeEvent } from '@umbraco-cms/events';
 import { UmbModalService, UMB_MODAL_SERVICE_CONTEXT_TOKEN } from '../../../../core/modal';
+import { UmbLanguageRepository } from '../../../settings/languages/repository/language.repository';
 import { UmbLitElement } from '@umbraco-cms/element';
 import type { LanguageModel } from '@umbraco-cms/backend-api';
 import type { UmbObserverController } from '@umbraco-cms/observable-api';
-import { UmbLanguageRepository } from 'src/backoffice/settings/languages/repository/language.repository';
 
 @customElement('umb-input-language-picker')
 export class UmbInputLanguagePickerElement extends FormControlMixin(UmbLitElement) {

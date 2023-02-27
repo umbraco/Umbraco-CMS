@@ -189,7 +189,7 @@ export class UmbUserGroupWorkspaceElement extends UmbLitElement implements UmbWo
 	private _workspaceContext: UmbWorkspaceUserGroupContext = new UmbWorkspaceUserGroupContext(this);
 
 	@state()
-	private _userGroup?: UserGroupDetails | null;
+	private _userGroup?: UserGroupDetails;
 
 	@state()
 	private _userKeys?: Array<string>;
@@ -205,7 +205,8 @@ export class UmbUserGroupWorkspaceElement extends UmbLitElement implements UmbWo
 		});
 
 		this.observe(this._workspaceContext.data, (userGroup) => {
-			this._userGroup = userGroup;
+			// TODO: Fix type mismatch
+			this._userGroup = userGroup as any;
 		});
 	}
 

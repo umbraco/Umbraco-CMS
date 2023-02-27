@@ -26,11 +26,11 @@ export class UmbTemplateWorkspaceContext {
 	}
 
 	setName(value: string) {
-		this.#data.next({ ...this.#data.value, name: value });
+		this.#data.next({ ...this.#data.value, $type: this.#data.value?.$type || '', name: value });
 	}
 
 	setContent(value: string) {
-		this.#data.next({ ...this.#data.value, content: value });
+		this.#data.next({ ...this.#data.value, $type: this.#data.value?.$type || '', content: value });
 	}
 
 	async load(entityKey: string) {

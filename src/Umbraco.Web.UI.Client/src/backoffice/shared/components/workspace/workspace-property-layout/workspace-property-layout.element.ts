@@ -6,6 +6,7 @@ import { customElement, property } from 'lit/decorators.js';
  *  @element umb-workspace-property-layout
  *  @description - Element for displaying a property in an workspace.
  *  @slot editor - Slot for rendering the Property Editor
+ *  @slot description - Slot for rendering things below the label.
  *  @slot property-action-menu - Slot for rendering the Property Action Menu
  */
 @customElement('umb-workspace-property-layout')
@@ -15,18 +16,33 @@ export class UmbWorkspacePropertyLayoutElement extends LitElement {
 		css`
 			:host {
 				display: grid;
-				grid-template-columns: 200px 600px;
-				gap: var(--uui-size-layout-2);
+				grid-template-columns: 200px auto;
+				column-gap: var(--uui-size-layout-2);
 				border-bottom: 1px solid var(--uui-color-divider);
 				padding: var(--uui-size-space-6) 0;
+				container-type: inline-size;
 			}
 
-			:host([orientation="vertical"]) {
-				display:block;
+			:host > div {
+				grid-column: span 2;
+			}
+
+			@container (width > 600px) {
+				:host(:not([orientation='vertical'])) > div {
+					grid-column: span 1;
+				}
 			}
 
 			:host(:last-of-type) {
-				border-bottom:none;
+				border-bottom: none;
+			}
+
+			:host(:first-of-type) {
+				padding-top: 0;
+			}
+
+			:host(:first-of-type) {
+				padding-top:0;
 			}
 
 			p {
@@ -41,6 +57,15 @@ export class UmbWorkspacePropertyLayoutElement extends LitElement {
 	];
 
 	/**
+	 * Alias. The technical name of the property.
+	 * @type {string}
+	 * @attr
+	 * @default ''
+	 */
+	@property({ type: String })
+	public alias = '';
+
+	/**
 	 * Label. Name of the property.
 	 * @type {string}
 	 * @attr
@@ -49,6 +74,13 @@ export class UmbWorkspacePropertyLayoutElement extends LitElement {
 	@property({ type: String })
 	public label = '';
 
+	/**
+	 * Orientation: Horizontal is the default where label goes left and editor right.
+	 * Vertical is where label goes above the editor.
+	 * @type {string}
+	 * @attr
+	 * @default ''
+	 */
 	@property({ type: String })
 	public orientation: 'horizontal' | 'vertical' = 'horizontal';
 
@@ -62,11 +94,13 @@ export class UmbWorkspacePropertyLayoutElement extends LitElement {
 	public description = '';
 
 	render() {
+		// TODO: Only show alias on label if user has access to DocumentType within settings:
 		return html`
 			<div id="header">
-				<uui-label>${this.label}</uui-label>
+				<uui-label title=${this.alias}>${this.label}</uui-label>
 				<slot name="property-action-menu"></slot>
 				<p>${this.description}</p>
+				<slot name="description"></slot>
 			</div>
 			<div>
 				<uui-form-validation-message>

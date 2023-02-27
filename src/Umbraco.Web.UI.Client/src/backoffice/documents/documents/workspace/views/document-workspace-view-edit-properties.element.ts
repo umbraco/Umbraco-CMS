@@ -1,18 +1,24 @@
-import { html } from 'lit';
+import { css, html } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, property, state } from 'lit/decorators.js';
 import { repeat } from 'lit/directives/repeat.js';
 import { UmbDocumentWorkspaceContext } from '../document-workspace.context';
 import { UmbLitElement } from '@umbraco-cms/element';
-import {
-	DocumentPropertyModel,
-	DocumentTypePropertyTypeModel,
-	PropertyTypeContainerViewModelBaseModel,
-} from '@umbraco-cms/backend-api';
+import { DocumentTypePropertyTypeModel, PropertyTypeContainerViewModelBaseModel } from '@umbraco-cms/backend-api';
 
 @customElement('umb-document-workspace-view-edit-properties')
 export class UmbDocumentWorkspaceViewEditPropertiesElement extends UmbLitElement {
-	static styles = [UUITextStyles];
+	static styles = [
+		UUITextStyles,
+		css`
+			.property {
+				border-bottom: 1px solid var(--uui-color-divider);
+			}
+			.property:last-child {
+				border-bottom: 0;
+			}
+		`,
+	];
 
 	private _containerName?: string;
 
@@ -44,14 +50,6 @@ export class UmbDocumentWorkspaceViewEditPropertiesElement extends UmbLitElement
 	@state()
 	_propertyStructure: Array<DocumentTypePropertyTypeModel> = [];
 
-	// TODO: we should not get the values here, as its too hard to keep track of variants.
-	// Instead wrap each property in a variant aware component.
-	// As well we need to wrap the whole 'workspace' thing in a variant aware component.
-	// Remember that the other views should also differentiate, or be able to differentiate based on the selected variant.
-	// Also consider wrapping the variant data in a variant object. So we only need to parse one object every time we work with variants.
-	@state()
-	_propertyValueMap: Map<string, DocumentPropertyModel> = new Map();
-
 	private _workspaceContext?: UmbDocumentWorkspaceContext;
 
 	constructor() {
@@ -69,7 +67,7 @@ export class UmbDocumentWorkspaceViewEditPropertiesElement extends UmbLitElement
 
 		// TODO: Should be no need to update this observable if its already there.
 		this.observe(
-			this._workspaceContext!.containersByNameAndType(this._containerName, this._containerType),
+			this._workspaceContext!.structure.containersByNameAndType(this._containerName, this._containerType),
 			(groupContainers) => {
 				this._groupContainers = groupContainers || [];
 				groupContainers.forEach((group) => {
@@ -88,7 +86,7 @@ export class UmbDocumentWorkspaceViewEditPropertiesElement extends UmbLitElement
 
 		// TODO: Should be no need to update this observable if its already there.
 		this.observe(
-			this._workspaceContext.propertyStructuresOf(group.key),
+			this._workspaceContext.structure.propertyStructuresOf(group.key),
 			(properties) => {
 				// If this need to be able to remove properties, we need to clean out the ones of this group.key before inserting them:
 				this._propertyStructure = this._propertyStructure.filter((x) => x.containerKey !== group.key);
@@ -96,7 +94,6 @@ export class UmbDocumentWorkspaceViewEditPropertiesElement extends UmbLitElement
 				properties?.forEach((property) => {
 					if (!this._propertyStructure.find((x) => x.alias === property.alias)) {
 						this._propertyStructure.push(property);
-						this._observePropertyValueOfAlias(property.alias!);
 					}
 				});
 
@@ -111,31 +108,11 @@ export class UmbDocumentWorkspaceViewEditPropertiesElement extends UmbLitElement
 		// cache observable
 	}
 
-	private _observePropertyValueOfAlias(propertyAlias: string) {
-		if (!this._workspaceContext || !propertyAlias) return;
-
-		// TODO: Should be no need to update this observable if its already there.
-		this.observe(
-			this._workspaceContext.propertyValueOfAlias(propertyAlias, null, null),
-			(propertyValue) => {
-				if (propertyValue) {
-					this._propertyValueMap.set(propertyAlias, propertyValue);
-				} else {
-					this._propertyValueMap.delete(propertyAlias);
-				}
-			},
-			'_observePropertyValueOfAlias' + propertyAlias
-		);
-	}
-
 	render() {
 		return repeat(
 			this._propertyStructure,
 			(property) => property.alias,
-			(property) =>
-				html`<umb-content-property
-					.property=${property}
-					.value=${this._propertyValueMap.get(property.alias!)?.value}></umb-content-property> `
+			(property) => html`<umb-variantable-property class="property" .property=${property}></umb-variantable-property> `
 		);
 	}
 }

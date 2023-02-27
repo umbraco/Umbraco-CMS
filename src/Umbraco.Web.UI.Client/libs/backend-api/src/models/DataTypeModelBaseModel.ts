@@ -10,3 +10,4 @@ export type DataTypeModelBaseModel = {
     propertyEditorUiAlias?: string | null;
     data?: Array<DataTypePropertyModel>;
 };
+
