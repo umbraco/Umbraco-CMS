@@ -1,7 +1,4 @@
-using System.Collections.Generic;
-using System;
 using System.Globalization;
-using System.Linq;
 using Examine;
 using Examine.Search;
 using Microsoft.Extensions.Logging;
@@ -9,7 +6,6 @@ using Umbraco.Cms.Core.Logging;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Runtime;
 using Umbraco.Cms.Core.Scoping;
-using Umbraco.Cms.Core.Strings.Css;
 using Umbraco.Cms.Infrastructure.HostedServices;
 using Umbraco.Cms.Infrastructure.Search;
 using Umbraco.Extensions;
@@ -287,24 +283,22 @@ internal class ExamineUmbracoIndexingHandler : IUmbracoIndexingHandler
                 using ICoreScope scope =
                     examineUmbracoIndexingHandler._scopeProvider.CreateCoreScope(autoComplete: true);
 
+                var unpublishedValueSet = new Lazy<List<ValueSet>>(() =>
+                {
+                    IEnumerable<ValueSet> contentValueSet = examineUmbracoIndexingHandler._contentValueSetBuilder.GetValueSets(content);
+                    IEnumerable<ValueSet> contentApiValueSet = examineUmbracoIndexingHandler._contentAPIValueSetBuilder.GetValueSets(content);
+
+                    return contentValueSet.Concat(contentApiValueSet).ToList();
+                });
+
                 // for content we have a different builder for published vs unpublished
                 // we don't want to build more value sets than is needed so we'll lazily build 2 one for published one for non-published
                 var builders = new Dictionary<bool, Lazy<List<ValueSet>>>
                 {
                     [true] = new(() => examineUmbracoIndexingHandler._publishedContentValueSetBuilder.GetValueSets(content).ToList()),
-                    [false] = new(() => examineUmbracoIndexingHandler._contentValueSetBuilder.GetValueSets(content).ToList()),
-                    //[false] = new(() => examineUmbracoIndexingHandler._contentAPIValueSetBuilder.GetValueSets(content).ToList())
+                    //[false] = new(() => examineUmbracoIndexingHandler._contentValueSetBuilder.GetValueSets(content).ToList()),
+                    [false] = unpublishedValueSet
                 };
-
-                //var test = new Lazy<List<ValueSet>>(() =>
-                //{
-                //    var result = examineUmbracoIndexingHandler._contentValueSetBuilder.GetValueSets(content).ToList();
-                //    var resultAPI = examineUmbracoIndexingHandler._contentAPIValueSetBuilder.GetValueSets(content).ToList();
-
-                //    result.AddRange(resultAPI);
-
-                //    return result;
-                //});
 
                 // This is only for content - so only index items for IUmbracoContentIndex (to exlude members)
                 foreach (IUmbracoIndex index in examineUmbracoIndexingHandler._examineManager.Indexes
