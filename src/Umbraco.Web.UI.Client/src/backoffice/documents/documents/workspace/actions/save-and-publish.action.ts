@@ -1,8 +1,8 @@
-import { UmbWorkspaceAction } from '@umbraco-cms/workspace';
+import { UmbWorkspaceActionBase } from '@umbraco-cms/workspace';
 import { UmbDocumentWorkspaceContext } from '../document-workspace.context';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 
-export class UmbDocumentSaveAndPublishWorkspaceAction extends UmbWorkspaceAction<UmbDocumentWorkspaceContext> {
+export class UmbDocumentSaveAndPublishWorkspaceAction extends UmbWorkspaceActionBase<UmbDocumentWorkspaceContext> {
 	constructor(host: UmbControllerHostInterface) {
 		super(host);
 	}

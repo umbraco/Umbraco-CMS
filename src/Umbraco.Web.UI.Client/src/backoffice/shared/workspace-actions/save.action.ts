@@ -1,9 +1,9 @@
-import { UmbWorkspaceAction } from '@umbraco-cms/workspace';
+import { UmbWorkspaceActionBase } from '@umbraco-cms/workspace';
 import { UmbWorkspaceContextInterface } from '../components/workspace/workspace-context/workspace-context.interface';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 
 // TODO: add interface for repo/partial repo/save-repo
-export class UmbSaveWorkspaceAction extends UmbWorkspaceAction<UmbWorkspaceContextInterface> {
+export class UmbSaveWorkspaceAction extends UmbWorkspaceActionBase<UmbWorkspaceContextInterface> {
 	constructor(host: UmbControllerHostInterface) {
 		super(host);
 	}

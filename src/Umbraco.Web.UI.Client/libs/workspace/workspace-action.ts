@@ -1,7 +1,12 @@
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 import { UmbContextConsumerController } from '@umbraco-cms/context-api';
 
-export class UmbWorkspaceAction<WorkspaceType> {
+export interface UmbWorkspaceAction<T> {
+	host: UmbControllerHostInterface;
+	workspaceContext?: T;
+}
+
+export class UmbWorkspaceActionBase<WorkspaceType> implements UmbWorkspaceAction<WorkspaceType> {
 	host: UmbControllerHostInterface;
 	workspaceContext?: WorkspaceType;
 	constructor(host: UmbControllerHostInterface) {
