@@ -4,6 +4,8 @@ import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 import { UmbContextConsumerController } from '@umbraco-cms/context-api';
 import { ManifestBase } from '@umbraco-cms/extensions-registry';
 
+// TODO: Figure out if we should base stores like this on something more generic for "collections" rather than trees.
+
 /**
  * A repository for Packages which mimicks a tree store.
  * @export
