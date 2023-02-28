@@ -15,7 +15,40 @@ TODO: introduction to actions
 - **Entity Bulk Action:**
   Relates to an entity type: document, media, etc. Performs the action on a selection of items.
 
-<img src="docs/entity-action-sidebar-context.svg" width="400" />
+## Entity Actions in the UI
+
+<table>
+	<tbody>
+		<tr>
+			<td>
+				<div>
+					<strong>Sidebar Context Menu</strong>
+				</div>
+				<img src="docs/entity-action-sidebar-context.svg" width="400" />
+			</td>
+			<td>
+				<div>
+					<strong>Workspace Action Menu</strong>
+				</div>
+				<img src="docs/entity-action-workspace-menu.svg" width="400" />
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<div>
+					<strong>Collection</strong>
+				</div>
+				<img src="docs/entity-action-collection-menu.svg" width="400" />
+			</td>
+			<td>
+				<div>
+					<strong>Pickers</strong>
+				</div>
+				<img src="docs/entity-action-picker-context-menu.svg" width="400" />
+			</td>
+		</tr>
+	</tbody>
+</table>
 
 ### Registering an Entity Action
 
@@ -85,6 +118,21 @@ export class MyEntityAction extends UmbEntityActionBase<MyRepository> {
 We currently have a couple of generic actions that can be used across silos, so we don't have to write the same logic again: copy, move, trash, delete, etc. We can add more as we discover the needs.
 
 TODO: List generic actions + List what alias' they are registered under.
+
+## Entity Bulk Actions in the UI
+
+<table>
+	<tbody>
+		<tr>
+			<td>
+				<div>
+					<strong>Collection</strong>
+				</div>
+				<img src="docs/entity-bulk-action-collection-menu.svg" width="400" />
+			</td>
+		</tr>
+	</tbody>
+</table>
 
 ### Registering an Entity Bulk Action
 
