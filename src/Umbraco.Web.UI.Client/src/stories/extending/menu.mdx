@@ -1,0 +1,35 @@
+import { Meta } from '@storybook/addon-docs';
+
+<Meta title="Guides/Extending the Backoffice/Menu" parameters={{ previewTabs: { canvas: { hidden: true } } }} />
+
+# Menu
+
+TODO: introduction to the menu
+
+<img src="docs/section.svg" width="400" />
+
+```json
+{
+	"type": "menu",
+	"alias": "My.Menu",
+	"name": "My Menu"
+}
+```
+
+### Menu Item
+
+TODO: introduction to the menu item
+
+<img src="docs/section.svg" width="400" />
+
+```json
+{
+	"type": "menuItem",
+	"alias": "My.MenuItem",
+	"name": "My Menu Item",
+	"meta": {
+		"label": "My Menu Item",
+		"menus": ["My.Menu"]
+	}
+}
+```

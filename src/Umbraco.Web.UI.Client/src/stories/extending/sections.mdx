@@ -15,7 +15,6 @@ TODO: can we get a typescript interface here?
 	"type": "section",
 	"alias": "My.Section",
 	"name": "My Section",
-	"weight": 10,
 	"meta": {
 		"label": "My Section",
 		"pathname": "my-section"
@@ -29,43 +28,31 @@ TODO: Introduction to section sidebar
 
 <img src="docs/section-sidebar.svg" width="400" />
 
-### Sidebar Items
+### Section Sidebar Items
 
-TODO: Introduction to section sidebar items
+TODO: Introduction to Section Sidebar Items
 
 <img src="docs/section-sidebar-item.svg" width="400" />
 
 #### Manifest
 
-TODO: not implemented yet
+### Section Sidebar Menu
 
-#### Sidebar Menu
+TODO: Introduction to the section sidebar menu
+
+<img src="docs/section-sidebar-menu.svg" width="400" />
 
 ```json
 {
-	"type": "sidebarMenu",
-	"alias": "My.SidebarMenu.Something",
-	"name": "Something Sidebar Menu",
-	"weight": 10,
+	"type": "sectionSidebarMenu",
+	"alias": "My.SectionSidebarMenu",
+	"name": "My Section Sidebar Menu",
 	"meta": {
-		"label": "My Something Sidebar Menu",
-		"sections": ["My.Section"]
+		"label": "My Section Sidebar Menu",
+		"sections": ["My.Section"],
+		"menu": "My.Menu"
 	}
 }
 ```
 
-#### Sidebar Menu Item
-
-```json
-{
-  "type": "sidebarMenuItem",
-	"alias": "Umb.SidebarMenuItem.Documents",
-	"name": "Documents Sidebar Menu Item",
-	"weight": 10,
-	"meta": {
-		"label": "Documents",
-		"icon": "umb:folder",
-		"sidebarMenus": ["Umb.SidebarMenu.Content"],
-	},
-};
-```
+TODO: link to menu docs
