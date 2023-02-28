@@ -25,6 +25,7 @@ public class ManagementApiComposer : IComposer
             .AddUpgrader()
             .AddSearchManagement()
             .AddTrees()
+            .AddAuditLogs()
             .AddDocuments()
             .AddDocumentTypes()
             .AddLanguages()
@@ -39,6 +40,7 @@ public class ManagementApiComposer : IComposer
             .AddRelationTypes()
             .AddLogViewer()
             .AddUserGroups()
+            .AddPackages()
             .AddBackOfficeAuthentication()
             .AddApiVersioning()
             .AddSwaggerGen();

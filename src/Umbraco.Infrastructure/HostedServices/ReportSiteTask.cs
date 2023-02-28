@@ -40,18 +40,20 @@ public class ReportSiteTask : RecurringHostedServiceBase
     {
     }
 
-        /// <summary>
-        /// Runs the background task to send the anonymous ID
-        /// to telemetry service
-        /// </summary>
-        public override async Task PerformExecuteAsync(object? state){
+    /// <summary>
+    /// Runs the background task to send the anonymous ID
+    /// to telemetry service
+    /// </summary>
+    public override async Task PerformExecuteAsync(object? state)
+    {
         if (_runtimeState.Level is not RuntimeLevel.Run)
         {
             // We probably haven't installed yet, so we can't get telemetry.
             return;
         }
 
-        if (_telemetryService.TryGetTelemetryReportData(out TelemetryReportData? telemetryReportData) is false)
+        TelemetryReportData? telemetryReportData = await _telemetryService.GetTelemetryReportDataAsync();
+        if (telemetryReportData is null)
         {
             _logger.LogWarning("No telemetry marker found");
 
