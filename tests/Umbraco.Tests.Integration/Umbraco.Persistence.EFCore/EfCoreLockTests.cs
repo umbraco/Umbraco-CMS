@@ -173,11 +173,12 @@ public class EfCoreLockTests : UmbracoIntegrationTest
             return;
         }
 
-        const int threadCount = 8;
+        const int threadCount = 3;
         var threads = new Thread[threadCount];
         var exceptions = new Exception[threadCount];
         var locker = new object();
         var acquired = 0;
+        int triedAcquiringWriteLock = 0;
         var entered = 0;
         var ms = new AutoResetEvent[threadCount];
         for (var i = 0; i < threadCount; i++)
@@ -186,6 +187,7 @@ public class EfCoreLockTests : UmbracoIntegrationTest
         }
 
         var m1 = new ManualResetEventSlim(false);
+        var m2 = new ManualResetEventSlim(false);
 
         for (var i = 0; i < threadCount; i++)
         {
@@ -206,7 +208,19 @@ public class EfCoreLockTests : UmbracoIntegrationTest
                         }
 
                         ms[ic].WaitOne();
+
+                        lock (locker)
+                        {
+                            triedAcquiringWriteLock++;
+                            if (triedAcquiringWriteLock == threadCount)
+                            {
+                                m2.Set();
+                            }
+                        }
+
                         scope.EagerWriteLock(Constants.Locks.Servers);
+
+
                         lock (locker)
                         {
                             acquired++;
@@ -247,8 +261,7 @@ public class EfCoreLockTests : UmbracoIntegrationTest
             ms[i].Set(); // let others go
         }
 
-        // TODO: This timing is flaky
-        Thread.Sleep(500);
+        m2.Wait();
         // only 1 thread has locked
         Assert.AreEqual(1, acquired);
         for (var i = 0; i < threadCount; i++)
