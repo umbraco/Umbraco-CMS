@@ -128,7 +128,7 @@ public static partial class UmbracoBuilderExtensions
 
         // register manifest parser, will be injected in collection builders where needed
         builder.Services.AddSingleton<ILegacyManifestParser, LegacyManifestParser>();
-        builder.Services.AddSingleton<IPackageManifestReader, PackageManifestReader>();
+        builder.Services.AddSingleton<IPackageManifestReader, AppPluginsFileProviderPackageManifestReader>();
         builder.Services.AddSingleton<IPackageManifestService, PackageManifestService>();
 
         // register the manifest filter collection builder (collection is empty by default)

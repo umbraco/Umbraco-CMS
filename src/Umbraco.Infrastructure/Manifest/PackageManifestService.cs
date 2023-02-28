@@ -1,4 +1,6 @@
-﻿using Umbraco.Cms.Core.Cache;
+﻿using Microsoft.Extensions.Options;
+using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Manifest;
 using Umbraco.Extensions;
 
@@ -8,10 +10,15 @@ internal sealed class PackageManifestService : IPackageManifestService
 {
     private readonly IEnumerable<IPackageManifestReader> _packageManifestReaders;
     private readonly IAppPolicyCache _cache;
+    private readonly PackageManifestSettings _packageManifestSettings;
 
-    public PackageManifestService(IEnumerable<IPackageManifestReader> packageManifestReaders, AppCaches appCaches)
+    public PackageManifestService(
+        IEnumerable<IPackageManifestReader> packageManifestReaders,
+        AppCaches appCaches,
+        IOptions<PackageManifestSettings> packageManifestSettings)
     {
         _packageManifestReaders = packageManifestReaders;
+        _packageManifestSettings = packageManifestSettings.Value;
         _cache = appCaches.RuntimeCache;
     }
 
@@ -20,13 +27,13 @@ internal sealed class PackageManifestService : IPackageManifestService
                $"{nameof(PackageManifestService)}-PackageManifests",
                async () =>
                {
-                   var tasks = _packageManifestReaders
+                   Task<IEnumerable<PackageManifest>>[] tasks = _packageManifestReaders
                        .Select(x => x.ReadPackageManifestsAsync())
                        .ToArray();
                    await Task.WhenAll(tasks);
 
                    return tasks.SelectMany(x => x.Result);
                },
-               TimeSpan.FromMinutes(10))
+               _packageManifestSettings.CacheTimeout)
            ?? Array.Empty<PackageManifest>();
 }

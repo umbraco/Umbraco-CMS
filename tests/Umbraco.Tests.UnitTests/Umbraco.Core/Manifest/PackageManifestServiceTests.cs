@@ -1,6 +1,8 @@
-﻿using Moq;
+﻿using Microsoft.Extensions.Options;
+using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Manifest;
 using Umbraco.Cms.Infrastructure.Manifest;
 
@@ -29,7 +31,7 @@ public class PackageManifestServiceTests
                 NoAppCache.Instance,
                 new IsolatedCaches(type => NoAppCache.Instance));
 
-        _service = new PackageManifestService(_readerMock.Object, appCaches);
+        _service = new PackageManifestService(new[] { _readerMock.Object }, appCaches, new OptionsWrapper<PackageManifestSettings>(new PackageManifestSettings()));
     }
 
     [Test]

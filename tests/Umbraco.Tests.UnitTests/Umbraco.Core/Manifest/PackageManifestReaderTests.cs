@@ -16,7 +16,7 @@ public class PackageManifestReaderTests
 {
     private IPackageManifestReader _reader;
     private Mock<IDirectoryContents> _rootDirectoryContentsMock;
-    private Mock<ILogger<PackageManifestReader>> _loggerMock;
+    private Mock<ILogger<AppPluginsFileProviderPackageManifestReader>> _loggerMock;
     private Mock<IFileProvider> _fileProviderMock;
 
     [SetUp]
@@ -30,8 +30,8 @@ public class PackageManifestReaderTests
         var fileProviderFactoryMock = new Mock<IPackageManifestFileProviderFactory>();
         fileProviderFactoryMock.Setup(m => m.Create()).Returns(_fileProviderMock.Object);
 
-        _loggerMock = new Mock<ILogger<PackageManifestReader>>();
-        _reader = new PackageManifestReader(fileProviderFactoryMock.Object, new SystemTextJsonSerializer(), _loggerMock.Object);
+        _loggerMock = new Mock<ILogger<AppPluginsFileProviderPackageManifestReader>>();
+        _reader = new AppPluginsFileProviderPackageManifestReader(fileProviderFactoryMock.Object, new SystemTextJsonSerializer(), _loggerMock.Object);
     }
 
     [Test]
@@ -147,9 +147,7 @@ public class PackageManifestReaderTests
             .Setup(f => f.GetEnumerator())
             .Returns(new List<IFileInfo> { CreatePackageManifestFile(content) }.GetEnumerator());
 
-        var result = await _reader.ReadPackageManifestsAsync();
-        Assert.AreEqual(0, result.Count());
-
+        Assert.ThrowsAsync<JsonException>(() => _reader.ReadPackageManifestsAsync());
         EnsureLogErrorWasCalled();
     }
 
@@ -165,9 +163,7 @@ public class PackageManifestReaderTests
             .Setup(f => f.GetEnumerator())
             .Returns(new List<IFileInfo> { CreatePackageManifestFile(content) }.GetEnumerator());
 
-        var result = await _reader.ReadPackageManifestsAsync();
-        Assert.AreEqual(0, result.Count());
-
+        Assert.ThrowsAsync<JsonException>(() => _reader.ReadPackageManifestsAsync());
         EnsureLogErrorWasCalled();
     }
 
@@ -179,9 +175,7 @@ public class PackageManifestReaderTests
             .Setup(f => f.GetEnumerator())
             .Returns(new List<IFileInfo> { CreatePackageManifestFile(content) }.GetEnumerator());
 
-        var result = await _reader.ReadPackageManifestsAsync();
-        Assert.AreEqual(0, result.Count());
-
+        Assert.ThrowsAsync<JsonException>(() => _reader.ReadPackageManifestsAsync());
         EnsureLogErrorWasCalled();
     }
 

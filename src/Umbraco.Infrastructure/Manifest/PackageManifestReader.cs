@@ -14,12 +14,12 @@ internal sealed class AppPluginsFileProviderPackageManifestReader : IPackageMani
 {
     private readonly IPackageManifestFileProviderFactory _packageManifestFileProviderFactory;
     private readonly IJsonSerializer _jsonSerializer;
-    private readonly ILogger<PackageManifestReader> _logger;
+    private readonly ILogger<AppPluginsFileProviderPackageManifestReader> _logger;
 
-    public PackageManifestReader(
+    public AppPluginsFileProviderPackageManifestReader(
         IPackageManifestFileProviderFactory packageManifestFileProviderFactory,
         IJsonSerializer jsonSerializer,
-        ILogger<PackageManifestReader> logger)
+        ILogger<AppPluginsFileProviderPackageManifestReader> logger)
     {
         _packageManifestFileProviderFactory = packageManifestFileProviderFactory;
         _jsonSerializer = jsonSerializer;
@@ -90,6 +90,7 @@ internal sealed class AppPluginsFileProviderPackageManifestReader : IPackageMani
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Unable to load package manifest file: {FileName}", fileInfo.Name);
+                throw;
             }
         }
 
