@@ -19,8 +19,7 @@ public class UserPresentationFactory : IUserPresentationFactory
         IEntityService entityService,
         AppCaches appCaches,
         MediaFileManager mediaFileManager,
-        IImageUrlGenerator imageUrlGenerator
-        )
+        IImageUrlGenerator imageUrlGenerator)
     {
         _entityService = entityService;
         _appCaches = appCaches;

@@ -1,0 +1,10 @@
+﻿namespace Umbraco.Cms.Core.Models;
+
+public class UserCreateModel
+{
+    public string Email { get; set; } = string.Empty;
+
+    public string UserName { get; set; } = string.Empty;
+
+    public SortedSet<Guid> UserGroups { get; set; } = new();
+}
