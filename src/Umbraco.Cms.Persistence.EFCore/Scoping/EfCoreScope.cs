@@ -177,7 +177,7 @@ internal class EfCoreScope : IEfCoreScope
 
     public void EagerReadLock(params int[] lockIds) => EagerReadLockInner(InstanceId, null, lockIds);
 
-    public void EagerWriteLock(params int[] lockIds) => EagerReadLockInner(InstanceId, null, lockIds);
+    public void EagerWriteLock(params int[] lockIds) => EagerWriteLockInner(InstanceId, null, lockIds);
 
     /// <summary>
     ///     Handles acquiring a write lock with a specified timeout, will delegate it to the parent if there are any.
@@ -226,9 +226,8 @@ internal class EfCoreScope : IEfCoreScope
                 $"Cannot obtain a write lock as the {nameof(_acquiredLocks)} queue is null.");
         }
 
-        _acquiredLocks.Enqueue(
-            _efCoreScopeProvider.DistributedLockingMechanismFactory.DistributedLockingMechanism.WriteLock(lockId,
-                timeout));
+
+        _acquiredLocks.Enqueue(_efCoreScopeProvider.DistributedLockingMechanismFactory.DistributedLockingMechanism.WriteLock(lockId, timeout));
     }
 
     /// <summary>
