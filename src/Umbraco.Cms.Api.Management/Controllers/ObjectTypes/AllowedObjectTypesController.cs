@@ -8,16 +8,16 @@ namespace Umbraco.Cms.Api.Management.Controllers.ObjectTypes;
 
 public class AllowedObjectTypesController : ObjectTypesControllerBase
 {
-    private readonly IObjectTypeViewModelFactory _objectTypeViewModelFactory;
+    private readonly IObjectTypePresentationFactory _objectTypePresentationFactory;
 
-    public AllowedObjectTypesController(IObjectTypeViewModelFactory objectTypeViewModelFactory) => _objectTypeViewModelFactory = objectTypeViewModelFactory;
+    public AllowedObjectTypesController(IObjectTypePresentationFactory objectTypePresentationFactory) => _objectTypePresentationFactory = objectTypePresentationFactory;
 
     [HttpGet]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedViewModel<ObjectTypeResponseModel>), StatusCodes.Status200OK)]
     public async Task<IActionResult> Allowed(int skip = 0, int take = 100)
     {
-        ObjectTypeResponseModel[] objectTypes = _objectTypeViewModelFactory.Create().ToArray();
+        ObjectTypeResponseModel[] objectTypes = _objectTypePresentationFactory.Create().ToArray();
 
         return await Task.FromResult(Ok(new PagedViewModel<ObjectTypeResponseModel>
         {

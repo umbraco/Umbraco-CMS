@@ -2,7 +2,7 @@
 
 namespace Umbraco.Cms.Api.Management.Factories;
 
-public interface IObjectTypeViewModelFactory
+public interface IObjectTypePresentationFactory
 {
     IEnumerable<ObjectTypeResponseModel> Create();
 }

@@ -4,11 +4,11 @@ using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Api.Management.Factories;
 
-public class ObjectTypeViewModelFactory : IObjectTypeViewModelFactory
+public class ObjectTypePresentationFactory : IObjectTypePresentationFactory
 {
     private readonly IRelationService _relationService;
 
-    public ObjectTypeViewModelFactory(IRelationService relationService)
+    public ObjectTypePresentationFactory(IRelationService relationService)
     {
         _relationService = relationService;
     }
