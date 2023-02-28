@@ -1,5 +1,5 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css';
-import { UmbEntityActionBase } from '../../../../shared/entity-actions';
+import { UmbEntityActionBase } from '@umbraco-cms/entity-action';
 import { UmbDictionaryRepository } from '../../repository/dictionary.repository';
 import type { UmbExportDictionaryModalResultData } from './export-dictionary-modal-layout.element';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';

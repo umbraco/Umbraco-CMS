@@ -1,5 +1,7 @@
+import { UmbWorkspaceAction } from '@umbraco-cms/workspace';
 import type { InterfaceColor, InterfaceLook } from '@umbraco-ui/uui-base/lib/types/index';
 import type { ManifestElement } from './models';
+import type { ClassConstructor } from '@umbraco-cms/models';
 
 export interface ManifestWorkspaceAction extends ManifestElement {
 	type: 'workspaceAction';
@@ -11,6 +13,5 @@ export interface MetaWorkspaceAction {
 	label?: string; //TODO: Use or implement additional label-key
 	look?: InterfaceLook;
 	color?: InterfaceColor;
-	repositoryAlias?: string; // TODO: make mandatory when repositories are fully implemented
-	api?: any; //TODO: Implement UmbEntityAction
+	api: ClassConstructor<UmbWorkspaceAction>;
 }

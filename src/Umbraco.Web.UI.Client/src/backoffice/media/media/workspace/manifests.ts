@@ -1,3 +1,4 @@
+import { UmbSaveWorkspaceAction } from '@umbraco-cms/workspace';
 import type {
 	ManifestWorkspace,
 	ManifestWorkspaceAction,
@@ -68,12 +69,12 @@ const workspaceActions: Array<ManifestWorkspaceAction> = [
 		type: 'workspaceAction',
 		alias: 'Umb.WorkspaceAction.Media.Save',
 		name: 'Save Media Workspace Action',
-		loader: () =>
-			import('src/backoffice/shared/components/workspace/workspace-action/save/workspace-action-node-save.element'),
 		meta: {
 			workspaces: ['Umb.Workspace.Media'],
+			label: 'Save',
 			look: 'primary',
 			color: 'positive',
+			api: UmbSaveWorkspaceAction,
 		},
 	},
 ];

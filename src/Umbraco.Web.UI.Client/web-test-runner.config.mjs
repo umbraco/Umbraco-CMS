@@ -49,6 +49,8 @@ export default {
 						'@umbraco-cms/notification': './libs/notification/index.ts',
 						'@umbraco-cms/observable-api': './libs/observable-api/index.ts',
 						'@umbraco-cms/events': './libs/events/index.ts',
+						'@umbraco-cms/entity-action': './libs/entity-action/index.ts',
+						'@umbraco-cms/workspace': './libs/workspace/index.ts',
 						'@umbraco-cms/store': './libs/store/index.ts',
 						'@umbraco-cms/utils': './libs/utils/index.ts',
 						'@umbraco-cms/test-utils': './libs/test-utils/index.ts',

@@ -1,7 +1,5 @@
-import { UmbDeleteEntityAction } from '../../../../backoffice/shared/entity-actions/delete/delete.action';
-import { UmbMoveEntityAction } from '../../../../backoffice/shared/entity-actions/move/move.action';
+import { UmbDeleteEntityAction, UmbMoveEntityAction, UmbCopyEntityAction } from '@umbraco-cms/entity-action';
 import { MEDIA_TYPE_REPOSITORY_ALIAS } from '../repository/manifests';
-import { UmbCopyEntityAction } from '../../../../backoffice/shared/entity-actions/copy/copy.action';
 import { UmbCreateMediaTypeEntityAction } from './create.action';
 import UmbReloadMediaTypeEntityAction from './reload.action';
 import type { ManifestEntityAction } from '@umbraco-cms/models';
@@ -62,7 +60,7 @@ const entityActions: Array<ManifestEntityAction> = [
 			api: UmbDeleteEntityAction,
 		},
 	},
-    {
+	{
 		type: 'entityAction',
 		alias: 'Umb.EntityAction.MediaType.Reload',
 		name: 'Reload Media Type Entity Action',

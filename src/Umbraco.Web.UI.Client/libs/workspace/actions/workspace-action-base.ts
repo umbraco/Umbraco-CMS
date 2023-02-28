@@ -1,11 +1,17 @@
-import { UmbActionBase } from '../../../action';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 import { UmbContextConsumerController } from '@umbraco-cms/context-api';
 
-export class UmbWorkspaceAction<RepositoryType, WorkspaceType> extends UmbActionBase<RepositoryType> {
+export interface UmbWorkspaceAction<T = unknown> {
+	host: UmbControllerHostInterface;
+	workspaceContext?: T;
+	execute(): Promise<void>;
+}
+
+export class UmbWorkspaceActionBase<WorkspaceType> {
+	host: UmbControllerHostInterface;
 	workspaceContext?: WorkspaceType;
-	constructor(host: UmbControllerHostInterface, repositoryAlias: string) {
-		super(host, repositoryAlias);
+	constructor(host: UmbControllerHostInterface) {
+		this.host = host;
 
 		new UmbContextConsumerController(this.host, 'umbWorkspaceContext', (instance: WorkspaceType) => {
 			this.workspaceContext = instance;

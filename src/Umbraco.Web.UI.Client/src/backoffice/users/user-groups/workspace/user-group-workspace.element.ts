@@ -3,7 +3,7 @@ import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, html, nothing } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { repeat } from 'lit/directives/repeat.js';
-import { distinctUntilChanged } from 'rxjs';
+import { UmbSaveWorkspaceAction } from '@umbraco-cms/workspace';
 import { UmbUserStore, UMB_USER_STORE_CONTEXT_TOKEN } from '../../../users/users/user.store';
 import { UmbWorkspaceEntityElement } from '../../../shared/components/workspace/workspace-entity-element.interface';
 import { UmbWorkspaceUserGroupContext } from './user-group-workspace.context';
@@ -224,12 +224,12 @@ export class UmbUserGroupWorkspaceElement extends UmbLitElement implements UmbWo
 				type: 'workspaceAction',
 				alias: 'Umb.WorkspaceAction.UserGroup.Save',
 				name: 'Save User Group Workspace Action',
-				loader: () =>
-					import('../../../shared/components/workspace/workspace-action/save/workspace-action-node-save.element'),
 				meta: {
 					workspaces: ['Umb.Workspace.UserGroup'],
+					label: 'Save',
 					look: 'primary',
 					color: 'positive',
+					api: UmbSaveWorkspaceAction,
 				},
 			},
 		];

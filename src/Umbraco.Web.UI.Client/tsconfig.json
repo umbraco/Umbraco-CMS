@@ -32,6 +32,8 @@
 			"@umbraco-cms/notification": ["libs/notification"],
 			"@umbraco-cms/observable-api": ["libs/observable-api"],
 			"@umbraco-cms/events": ["libs/events"],
+			"@umbraco-cms/entity-action": ["libs/entity-action"],
+			"@umbraco-cms/workspace": ["libs/workspace"],
 			"@umbraco-cms/utils": ["libs/utils"],
 			"@umbraco-cms/router": ["libs/router"],
 			"@umbraco-cms/test-utils": ["libs/test-utils"],

@@ -1,4 +1,4 @@
-import { UmbTrashEntityAction } from '../../../shared/entity-actions/trash/trash.action';
+import { UmbTrashEntityAction } from '@umbraco-cms/entity-action';
 import { ManifestEntityAction } from 'libs/extensions-registry/entity-action.models';
 
 const entityActions: Array<ManifestEntityAction> = [

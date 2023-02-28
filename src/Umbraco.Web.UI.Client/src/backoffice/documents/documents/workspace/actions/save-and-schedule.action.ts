@@ -1,14 +1,10 @@
-import { UmbWorkspaceAction } from '../../../../shared/components/workspace/workspace-action';
-import { UmbDocumentRepository } from '../../repository/document.repository';
+import { UmbWorkspaceActionBase } from '@umbraco-cms/workspace';
 import { UmbDocumentWorkspaceContext } from '../document-workspace.context';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 
-export class UmbSaveAndScheduleDocumentWorkspaceAction extends UmbWorkspaceAction<
-	UmbDocumentRepository,
-	UmbDocumentWorkspaceContext
-> {
-	constructor(host: UmbControllerHostInterface, repositoryAlias: string) {
-		super(host, repositoryAlias);
+export class UmbSaveAndScheduleDocumentWorkspaceAction extends UmbWorkspaceActionBase<UmbDocumentWorkspaceContext> {
+	constructor(host: UmbControllerHostInterface) {
+		super(host);
 	}
 
 	async execute() {
@@ -17,6 +13,6 @@ export class UmbSaveAndScheduleDocumentWorkspaceAction extends UmbWorkspaceActio
 		const document = this.workspaceContext.getData();
 		// TODO: handle errors
 		if (!document) return;
-		this.repository?.saveAndSchedule();
+		this.workspaceContext.repository.saveAndSchedule();
 	}
 }

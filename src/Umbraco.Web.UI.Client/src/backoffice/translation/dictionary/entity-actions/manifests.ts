@@ -1,5 +1,4 @@
-import { UmbDeleteEntityAction } from '../../../../backoffice/shared/entity-actions/delete/delete.action';
-import { UmbMoveEntityAction } from '../../../../backoffice/shared/entity-actions/move/move.action';
+import { UmbDeleteEntityAction, UmbMoveEntityAction } from '@umbraco-cms/entity-action';
 import { DICTIONARY_REPOSITORY_ALIAS } from '../repository/manifests';
 import UmbReloadDictionaryEntityAction from './reload.action';
 import UmbImportDictionaryEntityAction from './import/import.action';
