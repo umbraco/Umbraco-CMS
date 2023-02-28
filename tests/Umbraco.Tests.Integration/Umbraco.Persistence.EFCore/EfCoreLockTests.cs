@@ -142,22 +142,24 @@ public class EfCoreLockTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public void GivenNonEagerLocking_WhenNoDbIsAccessed_ThenNoSqlIsExecuted()
+    public async Task GivenNonEagerLocking_WhenNoDbIsAccessed_ThenNoSqlIsExecuted()
     {
         var sqlCount = 0;
 
         using (var scope = EFScopeProvider.CreateScope())
         {
-            // Issue a lock request, but we are using non-eager
-            // locks so this only queues the request.
-            // The lock will not be issued unless we resolve
-            // scope.Database
-            scope.WriteLock(Constants.Locks.Servers);
-
-            scope.ExecuteWithContextAsync<Task>(async db =>
+            await scope.ExecuteWithContextAsync<Task>(async db =>
             {
+                // Issue a lock request, but we are using non-eager
+                // locks so this only queues the request.
+                // The lock will not be issued unless we resolve
+                // scope.Database
+                scope.WriteLock(Constants.Locks.Servers);
+
                 sqlCount = db.ChangeTracker.Entries().Count();
             });
+
+            scope.Complete();
         }
 
         Assert.AreEqual(0, sqlCount);
