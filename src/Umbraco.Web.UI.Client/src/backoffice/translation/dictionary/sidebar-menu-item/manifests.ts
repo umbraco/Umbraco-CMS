@@ -10,7 +10,7 @@ const menuItem: ManifestMenuItem = {
 		label: 'Dictionary',
 		icon: 'umb:book-alt',
 		entityType: 'dictionary-item',
-		menus: ['Umb.Menu.Translation'],
+		menus: ['Umb.Menu.Dictionary'],
 	},
 };
 

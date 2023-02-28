@@ -1,4 +1,4 @@
-import { ManifestMenu } from 'libs/extensions-registry/menu.models';
+import { ManifestMenu } from '@umbraco-cms/extensions-registry';
 
 const menu: ManifestMenu = {
 	type: 'menu',

@@ -2,10 +2,10 @@ import { ManifestMenu } from '@umbraco-cms/extensions-registry';
 
 const menu: ManifestMenu = {
 	type: 'menu',
-	alias: 'Umb.Menu.Content',
-	name: 'Content Menu',
+	alias: 'Umb.Menu.Dictionary',
+	name: 'Dictionary Menu',
 	meta: {
-		label: 'Content',
+		label: 'Dictionary',
 	},
 };
 
