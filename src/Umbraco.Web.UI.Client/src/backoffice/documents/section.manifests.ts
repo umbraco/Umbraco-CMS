@@ -21,6 +21,7 @@ const sectionSidebarMenu: ManifestSectionSidebarMenu = {
 	meta: {
 		label: 'Content',
 		sections: [sectionAlias],
+		menu: 'Umb.Menu.Content',
 	},
 };
 

@@ -8,4 +8,5 @@ export interface ManifestSectionSidebarMenu extends ManifestElement {
 export interface MetaSectionSidebarMenu {
 	label: string;
 	sections: Array<string>;
+	menu: string;
 }

@@ -5,8 +5,8 @@ import { customElement, property } from 'lit/decorators.js';
 import { UmbLitElement } from '@umbraco-cms/element';
 import type { ManifestMenuItem } from '@umbraco-cms/models';
 
-@customElement('umb-sidebar-menu-item')
-export class UmbSidebarMenuItem extends UmbLitElement {
+@customElement('umb-menu-item')
+export class UmbMenuItem extends UmbLitElement {
 	static styles = [UUITextStyles, css``];
 
 	private _key = uuidv4();
@@ -19,12 +19,12 @@ export class UmbSidebarMenuItem extends UmbLitElement {
 			.key="${this._key}"
 			.label=${this.manifest.meta.label || this.manifest.name}
 			.icon=${this.manifest.meta.icon}
-			.entityType=${this.manifest.meta.entityType}></umb-tree-item>`;
+			.entityType=${this.manifest.meta.entityType || ''}></umb-tree-item>`;
 	}
 }
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-sidebar-menu-item': UmbSidebarMenuItem;
+		'umb-menu-item': UmbMenuItem;
 	}
 }
