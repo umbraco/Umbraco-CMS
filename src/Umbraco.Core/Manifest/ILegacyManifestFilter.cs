@@ -3,7 +3,7 @@ namespace Umbraco.Cms.Core.Manifest;
 /// <summary>
 ///     Provides filtering for package manifests.
 /// </summary>
-public interface IManifestFilter
+public interface ILegacyManifestFilter
 {
     /// <summary>
     ///     Filters package manifests.
@@ -12,5 +12,5 @@ public interface IManifestFilter
     /// <remarks>
     ///     <para>It is possible to remove, change, or add manifests.</para>
     /// </remarks>
-    void Filter(List<PackageManifest> manifests);
+    void Filter(List<LegacyPackageManifest> manifests);
 }

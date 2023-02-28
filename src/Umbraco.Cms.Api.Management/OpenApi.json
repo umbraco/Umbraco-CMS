@@ -3932,6 +3932,33 @@
         }
       }
     },
+    "/umbraco/management/api/v1/package/manifest": {
+      "get": {
+        "tags": [
+          "Package"
+        ],
+        "operationId": "GetPackageManifest",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "oneOf": [
+                      {
+                        "$ref": "#/components/schemas/PackageManifestModel"
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/umbraco/management/api/v1/package/migration-status": {
       "get": {
         "tags": [
@@ -7704,6 +7731,23 @@
           },
           "packagePath": {
             "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "PackageManifestModel": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "version": {
+            "type": "string",
+            "nullable": true
+          },
+          "extensions": {
+            "type": "array",
+            "items": { }
           }
         },
         "additionalProperties": false

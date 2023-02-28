@@ -19,40 +19,40 @@ namespace Umbraco.Cms.Core.Manifest;
 /// <summary>
 ///     Parses the Main.js file and replaces all tokens accordingly.
 /// </summary>
-public class ManifestParser : IManifestParser
+public class LegacyManifestParser : ILegacyManifestParser
 {
     private static readonly string _utf8Preamble = Encoding.UTF8.GetString(Encoding.UTF8.GetPreamble());
 
     private readonly IAppPolicyCache _cache;
     private readonly IDataValueEditorFactory _dataValueEditorFactory;
-    private readonly IManifestFileProviderFactory _manifestFileProviderFactory;
-    private readonly ManifestFilterCollection _filters;
+    private readonly ILegacyPackageManifestFileProviderFactory _legacyPackageManifestFileProviderFactory;
+    private readonly LegacyManifestFilterCollection _filters;
     private readonly IHostingEnvironment _hostingEnvironment;
 
     private readonly IIOHelper _ioHelper;
     private readonly IJsonSerializer _jsonSerializer;
     private readonly ILocalizedTextService _localizedTextService;
-    private readonly ILogger<ManifestParser> _logger;
+    private readonly ILogger<LegacyManifestParser> _logger;
     private readonly IShortStringHelper _shortStringHelper;
     private readonly ManifestValueValidatorCollection _validators;
 
     private string _path = null!;
 
     /// <summary>
-    ///     Initializes a new instance of the <see cref="ManifestParser" /> class.
+    ///     Initializes a new instance of the <see cref="LegacyManifestParser" /> class.
     /// </summary>
-    public ManifestParser(
+    public LegacyManifestParser(
         AppCaches appCaches,
         ManifestValueValidatorCollection validators,
-        ManifestFilterCollection filters,
-        ILogger<ManifestParser> logger,
+        LegacyManifestFilterCollection filters,
+        ILogger<LegacyManifestParser> logger,
         IIOHelper ioHelper,
         IHostingEnvironment hostingEnvironment,
         IJsonSerializer jsonSerializer,
         ILocalizedTextService localizedTextService,
         IShortStringHelper shortStringHelper,
         IDataValueEditorFactory dataValueEditorFactory,
-        IManifestFileProviderFactory manifestFileProviderFactory)
+        ILegacyPackageManifestFileProviderFactory legacyPackageManifestFileProviderFactory)
     {
         if (appCaches == null)
         {
@@ -70,15 +70,15 @@ public class ManifestParser : IManifestParser
         _localizedTextService = localizedTextService;
         _shortStringHelper = shortStringHelper;
         _dataValueEditorFactory = dataValueEditorFactory;
-        _manifestFileProviderFactory = manifestFileProviderFactory;
+        _legacyPackageManifestFileProviderFactory = legacyPackageManifestFileProviderFactory;
     }
 
     [Obsolete("Use other ctor - Will be removed in Umbraco 13")]
-    public ManifestParser(
+    public LegacyManifestParser(
         AppCaches appCaches,
         ManifestValueValidatorCollection validators,
-        ManifestFilterCollection filters,
-        ILogger<ManifestParser> logger,
+        LegacyManifestFilterCollection filters,
+        ILogger<LegacyManifestParser> logger,
         IIOHelper ioHelper,
         IHostingEnvironment hostingEnvironment,
         IJsonSerializer jsonSerializer,
@@ -96,7 +96,7 @@ public class ManifestParser : IManifestParser
               localizedTextService,
               shortStringHelper,
               dataValueEditorFactory,
-              StaticServiceProvider.Instance.GetRequiredService<IManifestFileProviderFactory>())
+              StaticServiceProvider.Instance.GetRequiredService<ILegacyPackageManifestFileProviderFactory>())
     {
     }
 
@@ -110,20 +110,20 @@ public class ManifestParser : IManifestParser
     ///     Gets all manifests, merged into a single manifest object.
     /// </summary>
     /// <returns></returns>
-    public CompositePackageManifest CombinedManifest
+    public CompositeLegacyPackageManifest CombinedManifest
         => _cache.GetCacheItem("Umbraco.Core.Manifest.ManifestParser::Manifests", () =>
         {
-            IEnumerable<PackageManifest> manifests = GetManifests();
+            IEnumerable<LegacyPackageManifest> manifests = GetManifests();
             return MergeManifests(manifests);
         }, new TimeSpan(0, 4, 0))!;
 
     /// <summary>
     ///     Gets all manifests.
     /// </summary>
-    public IEnumerable<PackageManifest> GetManifests()
+    public IEnumerable<LegacyPackageManifest> GetManifests()
     {
-        var manifests = new List<PackageManifest>();
-        IFileProvider? manifestFileProvider = _manifestFileProviderFactory.Create();
+        var manifests = new List<LegacyPackageManifest>();
+        IFileProvider? manifestFileProvider = _legacyPackageManifestFileProviderFactory.Create();
 
         if (manifestFileProvider is null)
         {
@@ -143,7 +143,7 @@ public class ManifestParser : IManifestParser
                     continue;
                 }
 
-                PackageManifest manifest = ParseManifest(text);
+                LegacyPackageManifest manifest = ParseManifest(text);
                 manifest.Source = file.PhysicalPath!; // We assure that the PhysicalPath is not null in GetManifestFiles()
                 manifests.Add(manifest);
             }
@@ -161,7 +161,7 @@ public class ManifestParser : IManifestParser
     /// <summary>
     ///     Parses a manifest.
     /// </summary>
-    public PackageManifest ParseManifest(string text)
+    public LegacyPackageManifest ParseManifest(string text)
     {
         if (text == null)
         {
@@ -173,7 +173,7 @@ public class ManifestParser : IManifestParser
             throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(text));
         }
 
-        PackageManifest? manifest = JsonConvert.DeserializeObject<PackageManifest>(
+        LegacyPackageManifest? manifest = JsonConvert.DeserializeObject<LegacyPackageManifest>(
             text,
             new DataEditorConverter(_dataValueEditorFactory, _ioHelper, _localizedTextService, _shortStringHelper, _jsonSerializer),
             new ValueValidatorConverter(_validators),
@@ -190,12 +190,12 @@ public class ManifestParser : IManifestParser
             manifest.Stylesheets[i] = _ioHelper.ResolveRelativeOrVirtualUrl(manifest.Stylesheets[i])!;
         }
 
-        foreach (ManifestContentAppDefinition contentApp in manifest.ContentApps)
+        foreach (LegacyManifestContentAppDefinition contentApp in manifest.ContentApps)
         {
             contentApp.View = _ioHelper.ResolveRelativeOrVirtualUrl(contentApp.View);
         }
 
-        foreach (ManifestDashboard dashboard in manifest.Dashboards)
+        foreach (LegacyManifestDashboard dashboard in manifest.Dashboards)
         {
             dashboard.View = _ioHelper.ResolveRelativeOrVirtualUrl(dashboard.View)!;
         }
@@ -220,34 +220,34 @@ public class ManifestParser : IManifestParser
     /// <summary>
     ///     Merges all manifests into one.
     /// </summary>
-    private static CompositePackageManifest MergeManifests(IEnumerable<PackageManifest> manifests)
+    private static CompositeLegacyPackageManifest MergeManifests(IEnumerable<LegacyPackageManifest> manifests)
     {
-        var scripts = new Dictionary<BundleOptions, List<ManifestAssets>>();
-        var stylesheets = new Dictionary<BundleOptions, List<ManifestAssets>>();
+        var scripts = new Dictionary<BundleOptions, List<LegacyManifestAssets>>();
+        var stylesheets = new Dictionary<BundleOptions, List<LegacyManifestAssets>>();
         var propertyEditors = new List<IDataEditor>();
         var parameterEditors = new List<IDataEditor>();
         var gridEditors = new List<GridEditor>();
-        var contentApps = new List<ManifestContentAppDefinition>();
-        var dashboards = new List<ManifestDashboard>();
-        var sections = new List<ManifestSection>();
+        var contentApps = new List<LegacyManifestContentAppDefinition>();
+        var dashboards = new List<LegacyManifestDashboard>();
+        var sections = new List<LegacyManifestSection>();
 
-        foreach (PackageManifest manifest in manifests)
+        foreach (LegacyPackageManifest manifest in manifests)
         {
-            if (!scripts.TryGetValue(manifest.BundleOptions, out List<ManifestAssets>? scriptsPerBundleOption))
+            if (!scripts.TryGetValue(manifest.BundleOptions, out List<LegacyManifestAssets>? scriptsPerBundleOption))
             {
-                scriptsPerBundleOption = new List<ManifestAssets>();
+                scriptsPerBundleOption = new List<LegacyManifestAssets>();
                 scripts[manifest.BundleOptions] = scriptsPerBundleOption;
             }
 
-            scriptsPerBundleOption.Add(new ManifestAssets(manifest.PackageName, manifest.Scripts));
+            scriptsPerBundleOption.Add(new LegacyManifestAssets(manifest.PackageName, manifest.Scripts));
 
-            if (!stylesheets.TryGetValue(manifest.BundleOptions, out List<ManifestAssets>? stylesPerBundleOption))
+            if (!stylesheets.TryGetValue(manifest.BundleOptions, out List<LegacyManifestAssets>? stylesPerBundleOption))
             {
-                stylesPerBundleOption = new List<ManifestAssets>();
+                stylesPerBundleOption = new List<LegacyManifestAssets>();
                 stylesheets[manifest.BundleOptions] = stylesPerBundleOption;
             }
 
-            stylesPerBundleOption.Add(new ManifestAssets(manifest.PackageName, manifest.Stylesheets));
+            stylesPerBundleOption.Add(new LegacyManifestAssets(manifest.PackageName, manifest.Stylesheets));
 
             propertyEditors.AddRange(manifest.PropertyEditors);
 
@@ -262,15 +262,15 @@ public class ManifestParser : IManifestParser
             sections.AddRange(manifest.Sections.DistinctBy(x => x.Alias, StringComparer.OrdinalIgnoreCase));
         }
 
-        return new CompositePackageManifest(
+        return new CompositeLegacyPackageManifest(
             propertyEditors,
             parameterEditors,
             gridEditors,
             contentApps,
             dashboards,
             sections,
-            scripts.ToDictionary(x => x.Key, x => (IReadOnlyList<ManifestAssets>)x.Value),
-            stylesheets.ToDictionary(x => x.Key, x => (IReadOnlyList<ManifestAssets>)x.Value));
+            scripts.ToDictionary(x => x.Key, x => (IReadOnlyList<LegacyManifestAssets>)x.Value),
+            stylesheets.ToDictionary(x => x.Key, x => (IReadOnlyList<LegacyManifestAssets>)x.Value));
     }
 
     private static string TrimPreamble(string text)

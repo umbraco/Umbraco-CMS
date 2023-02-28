@@ -3,10 +3,10 @@ using Umbraco.Cms.Core.Composing;
 
 namespace Umbraco.Cms.Core.Manifest;
 
-public class ManifestFilterCollectionBuilder : OrderedCollectionBuilderBase<ManifestFilterCollectionBuilder,
-    ManifestFilterCollection, IManifestFilter>
+public class LegacyManifestFilterCollectionBuilder : OrderedCollectionBuilderBase<LegacyManifestFilterCollectionBuilder,
+    LegacyManifestFilterCollection, ILegacyManifestFilter>
 {
-    protected override ManifestFilterCollectionBuilder This => this;
+    protected override LegacyManifestFilterCollectionBuilder This => this;
 
     // do NOT cache this, it's only used once
     protected override ServiceLifetime CollectionLifetime => ServiceLifetime.Transient;

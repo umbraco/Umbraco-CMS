@@ -26,7 +26,7 @@ public class PackagingService : IPackagingService
     private readonly ICreatedPackagesRepository _createdPackages;
     private readonly IEventAggregator _eventAggregator;
     private readonly IKeyValueService _keyValueService;
-    private readonly IManifestParser _manifestParser;
+    private readonly ILegacyManifestParser _legacyManifestParser;
     private readonly IPackageInstallation _packageInstallation;
     private readonly PackageMigrationPlanCollection _packageMigrationPlans;
     private readonly IHostEnvironment _hostEnvironment;
@@ -36,7 +36,7 @@ public class PackagingService : IPackagingService
         ICreatedPackagesRepository createdPackages,
         IPackageInstallation packageInstallation,
         IEventAggregator eventAggregator,
-        IManifestParser manifestParser,
+        ILegacyManifestParser legacyManifestParser,
         IKeyValueService keyValueService,
         PackageMigrationPlanCollection packageMigrationPlans,
         IHostEnvironment hostEnvironment)
@@ -45,7 +45,7 @@ public class PackagingService : IPackagingService
         _createdPackages = createdPackages;
         _packageInstallation = packageInstallation;
         _eventAggregator = eventAggregator;
-        _manifestParser = manifestParser;
+        _legacyManifestParser = legacyManifestParser;
         _keyValueService = keyValueService;
         _packageMigrationPlans = packageMigrationPlans;
         _hostEnvironment = hostEnvironment;
@@ -57,7 +57,7 @@ public class PackagingService : IPackagingService
         ICreatedPackagesRepository createdPackages,
         IPackageInstallation packageInstallation,
         IEventAggregator eventAggregator,
-        IManifestParser manifestParser,
+        ILegacyManifestParser manifestParser,
         IKeyValueService keyValueService,
         PackageMigrationPlanCollection packageMigrationPlans)
         : this(
@@ -199,7 +199,7 @@ public class PackagingService : IPackagingService
             .Items.ToDictionary(package => package.PackageName!, package => package); // PackageName cannot be null here
 
         // Collect and merge the packages from the manifests
-        foreach (PackageManifest package in _manifestParser.GetManifests())
+        foreach (LegacyPackageManifest package in _legacyManifestParser.GetManifests())
         {
             if (package.PackageName is null)
             {

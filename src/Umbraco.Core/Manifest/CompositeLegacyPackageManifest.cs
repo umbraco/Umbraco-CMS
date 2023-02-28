@@ -5,17 +5,17 @@ namespace Umbraco.Cms.Core.Manifest;
 /// <summary>
 ///     A package manifest made up of all combined manifests
 /// </summary>
-public class CompositePackageManifest
+public class CompositeLegacyPackageManifest
 {
-    public CompositePackageManifest(
+    public CompositeLegacyPackageManifest(
         IReadOnlyList<IDataEditor> propertyEditors,
         IReadOnlyList<IDataEditor> parameterEditors,
         IReadOnlyList<GridEditor> gridEditors,
-        IReadOnlyList<ManifestContentAppDefinition> contentApps,
-        IReadOnlyList<ManifestDashboard> dashboards,
-        IReadOnlyList<ManifestSection> sections,
-        IReadOnlyDictionary<BundleOptions, IReadOnlyList<ManifestAssets>> scripts,
-        IReadOnlyDictionary<BundleOptions, IReadOnlyList<ManifestAssets>> stylesheets)
+        IReadOnlyList<LegacyManifestContentAppDefinition> contentApps,
+        IReadOnlyList<LegacyManifestDashboard> dashboards,
+        IReadOnlyList<LegacyManifestSection> sections,
+        IReadOnlyDictionary<BundleOptions, IReadOnlyList<LegacyManifestAssets>> scripts,
+        IReadOnlyDictionary<BundleOptions, IReadOnlyList<LegacyManifestAssets>> stylesheets)
     {
         PropertyEditors = propertyEditors ?? throw new ArgumentNullException(nameof(propertyEditors));
         ParameterEditors = parameterEditors ?? throw new ArgumentNullException(nameof(parameterEditors));
@@ -45,19 +45,19 @@ public class CompositePackageManifest
     /// <summary>
     ///     Gets or sets the content apps listed in the manifest.
     /// </summary>
-    public IReadOnlyList<ManifestContentAppDefinition> ContentApps { get; }
+    public IReadOnlyList<LegacyManifestContentAppDefinition> ContentApps { get; }
 
     /// <summary>
     ///     Gets or sets the dashboards listed in the manifest.
     /// </summary>
-    public IReadOnlyList<ManifestDashboard> Dashboards { get; }
+    public IReadOnlyList<LegacyManifestDashboard> Dashboards { get; }
 
     /// <summary>
     ///     Gets or sets the sections listed in the manifest.
     /// </summary>
-    public IReadOnlyCollection<ManifestSection> Sections { get; }
+    public IReadOnlyCollection<LegacyManifestSection> Sections { get; }
 
-    public IReadOnlyDictionary<BundleOptions, IReadOnlyList<ManifestAssets>> Scripts { get; }
+    public IReadOnlyDictionary<BundleOptions, IReadOnlyList<LegacyManifestAssets>> Scripts { get; }
 
-    public IReadOnlyDictionary<BundleOptions, IReadOnlyList<ManifestAssets>> Stylesheets { get; }
+    public IReadOnlyDictionary<BundleOptions, IReadOnlyList<LegacyManifestAssets>> Stylesheets { get; }
 }

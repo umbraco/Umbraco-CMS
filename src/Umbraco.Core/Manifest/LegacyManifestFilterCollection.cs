@@ -5,9 +5,9 @@ namespace Umbraco.Cms.Core.Manifest;
 /// <summary>
 ///     Contains the manifest filters.
 /// </summary>
-public class ManifestFilterCollection : BuilderCollectionBase<IManifestFilter>
+public class LegacyManifestFilterCollection : BuilderCollectionBase<ILegacyManifestFilter>
 {
-    public ManifestFilterCollection(Func<IEnumerable<IManifestFilter>> items)
+    public LegacyManifestFilterCollection(Func<IEnumerable<ILegacyManifestFilter>> items)
         : base(items)
     {
     }
@@ -16,9 +16,9 @@ public class ManifestFilterCollection : BuilderCollectionBase<IManifestFilter>
     ///     Filters package manifests.
     /// </summary>
     /// <param name="manifests">The package manifests.</param>
-    public void Filter(List<PackageManifest> manifests)
+    public void Filter(List<LegacyPackageManifest> manifests)
     {
-        foreach (IManifestFilter filter in this)
+        foreach (ILegacyManifestFilter filter in this)
         {
             filter.Filter(manifests);
         }

@@ -13,17 +13,17 @@ public class DashboardCollectionBuilder : WeightedCollectionBuilderBase<Dashboar
         // get the manifest parser just-in-time - injecting it in the ctor would mean that
         // simply getting the builder in order to configure the collection, would require
         // its dependencies too, and that can create cycles or other oddities
-        IManifestParser manifestParser = factory.GetRequiredService<IManifestParser>();
+        ILegacyManifestParser legacyManifestParser = factory.GetRequiredService<ILegacyManifestParser>();
 
         IEnumerable<IDashboard> dashboardSections =
-            Merge(base.CreateItems(factory), manifestParser.CombinedManifest.Dashboards);
+            Merge(base.CreateItems(factory), legacyManifestParser.CombinedManifest.Dashboards);
 
         return dashboardSections;
     }
 
     private IEnumerable<IDashboard> Merge(
         IEnumerable<IDashboard> dashboardsFromCode,
-        IReadOnlyList<ManifestDashboard> dashboardFromManifest) =>
+        IReadOnlyList<LegacyManifestDashboard> dashboardFromManifest) =>
         dashboardsFromCode.Concat(dashboardFromManifest)
             .Where(x => !string.IsNullOrEmpty(x.Alias))
             .OrderBy(GetWeight);
@@ -32,7 +32,7 @@ public class DashboardCollectionBuilder : WeightedCollectionBuilderBase<Dashboar
     {
         switch (dashboard)
         {
-            case ManifestDashboard manifestDashboardDefinition:
+            case LegacyManifestDashboard manifestDashboardDefinition:
                 return manifestDashboardDefinition.Weight;
 
             default:

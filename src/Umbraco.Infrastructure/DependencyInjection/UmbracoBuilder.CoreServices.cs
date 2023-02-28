@@ -43,6 +43,7 @@ using Umbraco.Cms.Infrastructure.HealthChecks;
 using Umbraco.Cms.Infrastructure.HostedServices;
 using Umbraco.Cms.Infrastructure.Install;
 using Umbraco.Cms.Infrastructure.Mail;
+using Umbraco.Cms.Infrastructure.Manifest;
 using Umbraco.Cms.Infrastructure.Migrations;
 using Umbraco.Cms.Infrastructure.Migrations.Install;
 using Umbraco.Cms.Infrastructure.Migrations.PostMigrations;
@@ -126,7 +127,9 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.AddTransient<DatabaseBuilder>();
 
         // register manifest parser, will be injected in collection builders where needed
-        builder.Services.AddSingleton<IManifestParser, ManifestParser>();
+        builder.Services.AddSingleton<ILegacyManifestParser, LegacyManifestParser>();
+        builder.Services.AddSingleton<IPackageManifestReader, AppPluginsFileProviderPackageManifestReader>();
+        builder.Services.AddSingleton<IPackageManifestService, PackageManifestService>();
 
         // register the manifest filter collection builder (collection is empty by default)
         builder.ManifestFilters();
