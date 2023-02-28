@@ -11,6 +11,7 @@ import type { ManifestPropertyAction } from './property-action.models';
 import type { ManifestPropertyEditorUI, ManifestPropertyEditorModel } from './property-editor.models';
 import type { ManifestSection } from './section.models';
 import type { ManifestSectionView } from './section-view.models';
+import type { ManifestSectionSidebarItem } from './section-sidebar-item.models';
 import type { ManifestSidebarMenu } from './sidebar-menu.models';
 import type { ManifestSidebarMenuItem } from './sidebar-menu-item.models';
 import type { ManifestTheme } from './theme.models';
@@ -37,6 +38,7 @@ export * from './property-action.models';
 export * from './property-editor.models';
 export * from './section-view.models';
 export * from './section.models';
+export * from './section-sidebar-item.models';
 export * from './sidebar-menu.models';
 export * from './sidebar-menu-item.models';
 export * from './theme.models';
@@ -66,6 +68,7 @@ export type ManifestTypes =
 	| ManifestPropertyEditorUI
 	| ManifestRepository
 	| ManifestSection
+	| ManifestSectionSidebarItem
 	| ManifestSectionView
 	| ManifestSidebarMenu
 	| ManifestSidebarMenuItem
