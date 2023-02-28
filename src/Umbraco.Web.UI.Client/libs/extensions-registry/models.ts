@@ -12,7 +12,7 @@ import type { ManifestPropertyEditorUI, ManifestPropertyEditorModel } from './pr
 import type { ManifestSection } from './section.models';
 import type { ManifestSectionView } from './section-view.models';
 import type { ManifestSectionSidebarItem } from './section-sidebar-item.models';
-import type { ManifestSidebarMenu } from './sidebar-menu.models';
+import type { ManifestSectionSidebarMenu } from './section-sidebar-menu.models';
 import type { ManifestSidebarMenuItem } from './sidebar-menu-item.models';
 import type { ManifestTheme } from './theme.models';
 import type { ManifestTree } from './tree.models';
@@ -39,7 +39,7 @@ export * from './property-editor.models';
 export * from './section-view.models';
 export * from './section.models';
 export * from './section-sidebar-item.models';
-export * from './sidebar-menu.models';
+export * from './section-sidebar-menu.models';
 export * from './sidebar-menu-item.models';
 export * from './theme.models';
 export * from './tree-item-action.models';
@@ -70,7 +70,7 @@ export type ManifestTypes =
 	| ManifestSection
 	| ManifestSectionSidebarItem
 	| ManifestSectionView
-	| ManifestSidebarMenu
+	| ManifestSectionSidebarMenu
 	| ManifestSidebarMenuItem
 	| ManifestTheme
 	| ManifestTree

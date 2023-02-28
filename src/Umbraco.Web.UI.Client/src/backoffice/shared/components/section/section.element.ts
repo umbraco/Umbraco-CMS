@@ -5,7 +5,7 @@ import { map } from 'rxjs';
 import { IRoutingInfo } from 'router-slot';
 import type { UmbWorkspaceEntityElement } from '../workspace/workspace-entity-element.interface';
 import { UmbSectionContext, UMB_SECTION_CONTEXT_TOKEN } from './section.context';
-import type { ManifestSectionView, ManifestWorkspace, ManifestSidebarMenu } from '@umbraco-cms/models';
+import type { ManifestSectionView, ManifestWorkspace, ManifestSectionSidebarMenu } from '@umbraco-cms/models';
 import { umbExtensionsRegistry, createExtensionElement } from '@umbraco-cms/extensions-api';
 import { UmbLitElement } from '@umbraco-cms/element';
 
@@ -40,7 +40,7 @@ export class UmbSectionElement extends UmbLitElement {
 	private _routes: Array<any> = [];
 
 	@state()
-	private _menus?: Array<ManifestSidebarMenu>;
+	private _menus?: Array<ManifestSectionSidebarMenu>;
 
 	@state()
 	private _views?: Array<ManifestSectionView>;
@@ -84,7 +84,7 @@ export class UmbSectionElement extends UmbLitElement {
 		if (sectionAlias) {
 			this.observe(
 				umbExtensionsRegistry
-					?.extensionsOfType('sidebarMenu')
+					?.extensionsOfType('sectionSidebarMenu')
 					.pipe(map((manifests) => manifests.filter((manifest) => manifest.meta.sections.includes(sectionAlias)))),
 				(manifests) => {
 					this._menus = manifests;
@@ -202,12 +202,12 @@ export class UmbSectionElement extends UmbLitElement {
 						<umb-section-sidebar>
 							<umb-extension-slot
 								type="sectionSidebarItem"
-								.filter=${(items: ManifestSidebarMenu) =>
+								.filter=${(items: ManifestSectionSidebarMenu) =>
 									items.meta.sections.includes(this._sectionAlias || '')}></umb-extension-slot>
 
 							<umb-extension-slot
-								type="sidebarMenu"
-								.filter=${(items: ManifestSidebarMenu) => items.meta.sections.includes(this._sectionAlias || '')}
+								type="sectionSidebarMenu"
+								.filter=${(items: ManifestSectionSidebarMenu) => items.meta.sections.includes(this._sectionAlias || '')}
 								default-element="umb-section-sidebar-menu"></umb-extension-slot>
 						</umb-section-sidebar>
 				  `
