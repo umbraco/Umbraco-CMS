@@ -6,13 +6,9 @@ public class UserResponseModel : UserPresentationBase, INamedEntityViewModel
 {
     public Guid Key { get; set; }
 
-    public string Email { get; set; } = string.Empty;
-
-    public string UserName { get; set; } = string.Empty;
+    public string Name { get; set; } = string.Empty;
 
     public string? Language { get; set; }
-
-    public SortedSet<Guid> UserGroups { get; set; } = new();
 
     public SortedSet<Guid> ContentStartNodeKeys { get; set; } = new();
 
