@@ -27,7 +27,7 @@ public class ByRelationTypeKeyRelationController : RelationControllerBase
     [ProducesResponseType(typeof(PagedViewModel<RelationViewModel>), StatusCodes.Status200OK)]
     public async Task<IActionResult> ByRelationTypeKey(Guid key, int skip = 0, int take = 100)
     {
-        Attempt<PagedModel<IRelation>, RelationOperationStatus> relationsAttempt = await _relationService.GetPagedByRelationTypeId(key, skip, take);
+        Attempt<PagedModel<IRelation>, RelationOperationStatus> relationsAttempt = await _relationService.GetPagedByRelationTypeKey(key, skip, take);
 
         if (relationsAttempt.Success is false)
         {
