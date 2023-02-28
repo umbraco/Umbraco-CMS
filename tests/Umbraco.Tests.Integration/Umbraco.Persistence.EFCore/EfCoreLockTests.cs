@@ -23,8 +23,6 @@ public class EfCoreLockTests : UmbracoIntegrationTest
     private IEfCoreScopeProvider EFScopeProvider =>
         GetRequiredService<IEfCoreScopeProvider>();
 
-    private EFCoreScopeAccessor EFScopeAccessor => (EFCoreScopeAccessor)GetRequiredService<IEFCoreScopeAccessor>();
-
     [SetUp]
     protected async Task SetUp()
     {
