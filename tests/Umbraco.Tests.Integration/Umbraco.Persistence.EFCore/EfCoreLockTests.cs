@@ -329,7 +329,6 @@ public class EfCoreLockTests : UmbracoIntegrationTest
                     Console.WriteLine($"[{id1}] WAIT {id1}");
                     scope.EagerWriteLock(id1);
                     Console.WriteLine($"[{id1}] GRANT {id1}");
-                    // WriteLocks(scope);
                     myEv.Set();
 
                     if (id1 == 1)
@@ -344,7 +343,6 @@ public class EfCoreLockTests : UmbracoIntegrationTest
                     Console.WriteLine($"[{id1}] WAIT {id2}");
                     scope.EagerWriteLock(id2);
                     Console.WriteLine($"[{id1}] GRANT {id2}");
-                    // WriteLocks(scope);
                 }).GetAwaiter().GetResult();
             }
             catch (Exception e)
@@ -357,27 +355,4 @@ public class EfCoreLockTests : UmbracoIntegrationTest
             }
         }
     }
-
-    // private void WriteLocks(IEfCoreScope scope)
-    // {
-    //     Console.WriteLine("LOCKS:");
-    //     List<dynamic> info = new List<dynamic>();
-    //     scope.ExecuteWithContextAsync<Task>(async db =>
-    //     {
-    //         info = await db.Database.ExecuteScalarAsync<List<dynamic>>("SELECT * FROM sys.dm_tran_locks;");
-    //     });
-    //
-    //     var sb = new StringBuilder("> ");
-    //     foreach (var row in info)
-    //     {
-    //         if (row is IDictionary<string, object> values)
-    //         {
-    //             sb.AppendJoin(", ", values);
-    //         }
-    //
-    //         sb.AppendLine(string.Empty);
-    //     }
-    //
-    //     Console.WriteLine(sb.ToString());
-    // }
 }
