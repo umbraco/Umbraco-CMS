@@ -67,6 +67,9 @@ public class LocalDbTestDatabaseConfiguration : ITestDatabaseConfiguration
 
     public void Teardown(string key)
     {
+        s_localDbInstance.KillConnections(key);
         s_localDbInstance.DropDatabase(key);
+        _localDb.StopInstance(InstanceName);
+        _localDb.DropInstance(InstanceName);
     }
 }

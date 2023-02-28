@@ -177,7 +177,7 @@ public class SqlServerEFCoreDistributedLockingMechanism : IDistributedLockingMec
                     // ensure we are actually locking!
                     throw new ArgumentException($"LockObject with id={LockId} does not exist.");
                 }
-            }).GetAwaiter().GetResult();;
+            }).GetAwaiter().GetResult();
         }
     }
 }
