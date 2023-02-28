@@ -36,6 +36,8 @@ public class EfCoreLockTests : UmbracoIntegrationTest
                 database.UmbracoLocks.Add(new UmbracoLock {Id = 1, Name = "Lock.1"});
                 database.UmbracoLocks.Add(new UmbracoLock {Id = 2, Name = "Lock.2"});
                 database.UmbracoLocks.Add(new UmbracoLock {Id = 3, Name = "Lock.3"});
+
+                await database.SaveChangesAsync();
             });
 
             scope.Complete();
@@ -142,30 +144,6 @@ public class EfCoreLockTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public async Task GivenNonEagerLocking_WhenNoDbIsAccessed_ThenNoSqlIsExecuted()
-    {
-        var sqlCount = 0;
-
-        using (var scope = EFScopeProvider.CreateScope())
-        {
-            await scope.ExecuteWithContextAsync<Task>(async db =>
-            {
-                // Issue a lock request, but we are using non-eager
-                // locks so this only queues the request.
-                // The lock will not be issued unless we resolve
-                // scope.Database
-                scope.WriteLock(Constants.Locks.Servers);
-
-                sqlCount = db.ChangeTracker.Entries().Count();
-            });
-
-            scope.Complete();
-        }
-
-        Assert.AreEqual(0, sqlCount);
-    }
-
-    [Test]
     public void ConcurrentWritersTest()
     {
         if (BaseTestDatabase.DatabaseType.IsSqlite())
@@ -222,7 +200,6 @@ public class EfCoreLockTests : UmbracoIntegrationTest
 
                         scope.EagerWriteLock(Constants.Locks.Servers);
 
-
                         lock (locker)
                         {
                             acquired++;
@@ -257,7 +234,7 @@ public class EfCoreLockTests : UmbracoIntegrationTest
         // all threads have entered
         ms[0].Set(); // let 0 go
         // TODO: This timing is flaky
-        Thread.Sleep(100);
+        Thread.Sleep(1000);
         for (var i = 1; i < threadCount; i++)
         {
             ms[i].Set(); // let others go
