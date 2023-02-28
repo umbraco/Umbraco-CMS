@@ -12,14 +12,14 @@ namespace Umbraco.Cms.Api.Management.Controllers.Relation;
 public class ByChildRelationController : RelationControllerBase
 {
     private readonly IRelationService _relationService;
-    private readonly IRelationViewModelFactory _relationViewModelFactory;
+    private readonly IRelationPresentationFactory _relationPresentationFactory;
 
     public ByChildRelationController(
         IRelationService relationService,
-        IRelationViewModelFactory relationViewModelFactory)
+        IRelationPresentationFactory relationPresentationFactory)
     {
         _relationService = relationService;
-        _relationViewModelFactory = relationViewModelFactory;
+        _relationPresentationFactory = relationPresentationFactory;
     }
 
     [HttpGet("child-relation/{childId:int}")]
@@ -34,12 +34,12 @@ public class ByChildRelationController : RelationControllerBase
         {
             if (string.IsNullOrWhiteSpace(relationTypeAlias) == false)
             {
-                result = _relationViewModelFactory.CreateMultiple(relations.Where(x =>
+                result = _relationPresentationFactory.CreateMultiple(relations.Where(x =>
                     x.RelationType.Alias.InvariantEquals(relationTypeAlias))).ToArray();
             }
             else
             {
-                result = _relationViewModelFactory.CreateMultiple(relations).ToArray();
+                result = _relationPresentationFactory.CreateMultiple(relations).ToArray();
             }
         }
 

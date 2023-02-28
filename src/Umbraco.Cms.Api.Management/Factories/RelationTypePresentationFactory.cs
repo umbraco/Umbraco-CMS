@@ -5,11 +5,11 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Factories;
 
-public class RelationTypeViewModelFactory : IRelationTypeViewModelFactory
+public class RelationTypePresentationFactory : IRelationTypePresentationFactory
 {
     private readonly IShortStringHelper _shortStringHelper;
 
-    public RelationTypeViewModelFactory(IShortStringHelper shortStringHelper) => _shortStringHelper = shortStringHelper;
+    public RelationTypePresentationFactory(IShortStringHelper shortStringHelper) => _shortStringHelper = shortStringHelper;
 
     public IRelationType CreateRelationType(CreateRelationTypeRequestModel createRelationTypeRequestModel) =>
         new RelationType(
