@@ -3,7 +3,7 @@ import { css, html } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, property } from 'lit/decorators.js';
 import { UmbLitElement } from '@umbraco-cms/element';
-import type { ManifestSidebarMenuItem } from '@umbraco-cms/models';
+import type { ManifestMenuItem } from '@umbraco-cms/models';
 
 @customElement('umb-sidebar-menu-item')
 export class UmbSidebarMenuItem extends UmbLitElement {
@@ -12,7 +12,7 @@ export class UmbSidebarMenuItem extends UmbLitElement {
 	private _key = uuidv4();
 
 	@property({ type: Object, attribute: false })
-	manifest!: ManifestSidebarMenuItem;
+	manifest!: ManifestMenuItem;
 
 	render() {
 		return html`<umb-tree-item

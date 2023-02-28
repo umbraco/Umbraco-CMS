@@ -13,7 +13,7 @@ import type { ManifestSection } from './section.models';
 import type { ManifestSectionView } from './section-view.models';
 import type { ManifestSectionSidebarItem } from './section-sidebar-item.models';
 import type { ManifestSectionSidebarMenu } from './section-sidebar-menu.models';
-import type { ManifestSidebarMenuItem } from './sidebar-menu-item.models';
+import type { ManifestMenuItem } from './sidebar-menu-item.models';
 import type { ManifestTheme } from './theme.models';
 import type { ManifestTree } from './tree.models';
 import type { ManifestTreeItemAction } from './tree-item-action.models';
@@ -71,7 +71,7 @@ export type ManifestTypes =
 	| ManifestSectionSidebarItem
 	| ManifestSectionView
 	| ManifestSectionSidebarMenu
-	| ManifestSidebarMenuItem
+	| ManifestMenuItem
 	| ManifestTheme
 	| ManifestTree
 	| ManifestTreeItemAction

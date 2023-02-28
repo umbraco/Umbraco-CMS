@@ -1,7 +1,7 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
-import { ManifestSectionSidebarMenu, ManifestSidebarMenuItem } from '@umbraco-cms/extensions-registry';
+import { ManifestSectionSidebarMenu, ManifestMenuItem } from '@umbraco-cms/extensions-registry';
 import { UmbLitElement } from '@umbraco-cms/element';
 
 import './sidebar-menu-item.element.ts';
@@ -24,8 +24,8 @@ export class UmbSectionSidebarMenuElement extends UmbLitElement {
 		// TODO: link to dashboards when clicking on the menu item header
 		return html` <h3>${this.manifest?.meta.label}</h3>
 			<umb-extension-slot
-				type="sidebarMenuItem"
-				.filter=${(items: ManifestSidebarMenuItem) => items.meta.sidebarMenus.includes(this.manifest!.alias)}
+				type="menuItem"
+				.filter=${(items: ManifestMenuItem) => items.meta.menus.includes(this.manifest!.alias)}
 				default-element="umb-sidebar-menu-item"></umb-extension-slot>`;
 	}
 }

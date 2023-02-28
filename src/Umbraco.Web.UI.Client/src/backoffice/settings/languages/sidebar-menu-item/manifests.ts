@@ -1,16 +1,16 @@
-import type { ManifestSidebarMenuItem } from '@umbraco-cms/models';
+import type { ManifestMenuItem } from '@umbraco-cms/models';
 
-const sidebarMenuItem: ManifestSidebarMenuItem = {
-	type: 'sidebarMenuItem',
-	alias: 'Umb.SidebarMenuItem.Languages',
-	name: 'Languages Sidebar Menu Item',
+const menuItem: ManifestMenuItem = {
+	type: 'menuItem',
+	alias: 'Umb.MenuItem.Languages',
+	name: 'Languages Menu Item',
 	weight: 80,
 	meta: {
 		label: 'Languages',
 		icon: 'umb:globe',
 		entityType: 'language-root',
-		sidebarMenus: ['Umb.SidebarMenu.Settings'],
+		menus: ['Umb.Menu.Settings'],
 	},
 };
 
-export const manifests = [sidebarMenuItem];
+export const manifests = [menuItem];

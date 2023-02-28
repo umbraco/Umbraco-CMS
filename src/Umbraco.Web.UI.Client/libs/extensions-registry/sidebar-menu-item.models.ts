@@ -1,13 +1,13 @@
 import type { ManifestElement } from './models';
 
-export interface ManifestSidebarMenuItem extends ManifestElement {
-	type: 'sidebarMenuItem';
-	meta: MetaSidebarMenuItem;
+export interface ManifestMenuItem extends ManifestElement {
+	type: 'menuItem';
+	meta: MetaMenuItem;
 }
 
-export interface MetaSidebarMenuItem {
+export interface MetaMenuItem {
 	label: string;
 	icon: string;
-	sidebarMenus: Array<string>;
+	menus: Array<string>;
 	entityType?: string;
 }

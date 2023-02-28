@@ -1,16 +1,16 @@
-import type { ManifestSidebarMenuItem } from '@umbraco-cms/models';
+import type { ManifestMenuItem } from '@umbraco-cms/models';
 
-const sidebarMenuItem: ManifestSidebarMenuItem = {
-	type: 'sidebarMenuItem',
+const menuItem: ManifestMenuItem = {
+	type: 'menuItem',
 	alias: 'Umb.SidebarMenuItem.DocumentBlueprints',
 	name: 'Document Blueprints Sidebar Menu Item',
 	weight: 90,
 	meta: {
 		label: 'Document Blueprints',
 		icon: 'umb:blueprint',
-		sidebarMenus: ['Umb.SidebarMenu.Settings'],
+		menus: ['Umb.Menu.Settings'],
 		entityType: 'document-blueprint-root',
 	},
 };
 
-export const manifests = [sidebarMenuItem];
+export const manifests = [menuItem];
