@@ -1,6 +1,9 @@
+using System.IO;
+using Examine.Search;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Primitives;
+using Umbraco.Cms.Api.Content.Services;
 using Umbraco.Cms.Core.ContentApi;
 using Umbraco.Cms.Core.Models.ContentApi;
 using Umbraco.Cms.Core.Models.PublishedContent;
@@ -13,16 +16,19 @@ public class QueryContentApiController : ContentApiControllerBase
 {
     private readonly IHttpContextAccessor _httpContextAccessor;
     private readonly IApiQueryService _apiQueryService;
+    private readonly IRequestRoutingService _requestRoutingService;
 
     public QueryContentApiController(
         IPublishedSnapshotAccessor publishedSnapshotAccessor,
         IApiContentBuilder apiContentBuilder,
         IHttpContextAccessor httpContextAccessor,
-        IApiQueryService apiQueryService)
+        IApiQueryService apiQueryService,
+        IRequestRoutingService requestRoutingService)
         : base(publishedSnapshotAccessor, apiContentBuilder)
     {
         _httpContextAccessor = httpContextAccessor;
         _apiQueryService = apiQueryService;
+        _requestRoutingService = requestRoutingService;
     }
 
     /// <summary>
@@ -48,25 +54,47 @@ public class QueryContentApiController : ContentApiControllerBase
             return BadRequest("Invalid value for 'fetch' query parameter.");
         }
 
-        Guid? id = _apiQueryService.GetGuidFromFetch(queryOption);
-        if (id is null)
-        {
-            return BadRequest("Invalid GUID format.");
-        }
-
-        IEnumerable<Guid> ids = _apiQueryService.GetGuidsFromQuery((Guid)id, queryType);
-
         IPublishedContentCache? contentCache = GetContentCache();
-
         if (contentCache is null)
         {
             return BadRequest(ContentCacheNotFoundProblemDetails());
         }
+
+        //Guid? id = _apiQueryService.GetGuidFromFetch(queryOption); // Remove
+        Guid? id = GetGuidFromQuery(queryOption, contentCache);
+        if (id is null)
+        {
+            return BadRequest("Invalid query value format.");
+        }
+
+        IEnumerable<Guid> ids = _apiQueryService.GetGuidsFromQuery((Guid)id, queryType);
 
         IEnumerable<IPublishedContent> contentItems = ids.Select(contentCache.GetById).WhereNotNull();
 
         IEnumerable<IApiContent> results = contentItems.Select(ApiContentBuilder.Build);
 
         return Ok(results);
+    }
+
+    private Guid? GetGuidFromQuery(string fetchQuery, IPublishedContentCache contentCache)
+    {
+        var queryStringValue = fetchQuery.Substring(fetchQuery.IndexOf(':', StringComparison.Ordinal) + 1);
+
+        if (Guid.TryParse(queryStringValue, out Guid id))
+        {
+            return id;
+        }
+
+        // Check if the passed value is a path of a content item
+        var contentRoute = _requestRoutingService.GetContentRoute(queryStringValue);
+
+        IPublishedContent? contentItem = contentCache.GetByRoute(contentRoute);
+
+        if (contentItem is not null)
+        {
+            return contentItem.Key;
+        }
+
+        return null;
     }
 }
