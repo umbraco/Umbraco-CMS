@@ -8,8 +8,6 @@ using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.DistributedLocking;
 using Umbraco.Cms.Core.DistributedLocking.Exceptions;
 using Umbraco.Cms.Core.Exceptions;
-using Umbraco.Cms.Infrastructure.Persistence;
-using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Cms.Persistence.EFCore.Scoping;
 using Umbraco.Extensions;
 
@@ -136,17 +134,16 @@ public class SqlServerEFCoreDistributedLockingMechanism : IDistributedLockingMec
                         "A transaction with minimum ReadCommitted isolation level is required.");
                 }
 
-                // dbContext.Database.ExecuteSql($"SET LOCK_TIMEOUT {_timeout.TotalMilliseconds};");
+                await dbContext.Database.ExecuteSqlAsync($"SET LOCK_TIMEOUT 60000;");
 
-                var i = await dbContext.Database.ExecuteScalarAsync<int?>(
-                    $"SELECT value FROM umbracoLock WITH (REPEATABLEREAD)  WHERE id={LockId}");
+                int? number = dbContext.UmbracoLocks.FromSqlRaw($"SELECT * FROM dbo.umbracoLock WITH (REPEATABLEREAD)").Select(x => x.Value).FirstOrDefault();
 
-                if (i == null)
+                if (number == null)
                 {
                     // ensure we are actually locking!
                     throw new ArgumentException(@$"LockObject with id={LockId} does not exist.", nameof(LockId));
                 }
-            });
+            }).GetAwaiter().GetResult();
         }
 
         private void ObtainWriteLock()
@@ -171,18 +168,16 @@ public class SqlServerEFCoreDistributedLockingMechanism : IDistributedLockingMec
                         "A transaction with minimum ReadCommitted isolation level is required.");
                 }
 
-                string query = @$"UPDATE umbracoLock WITH (REPEATABLEREAD) SET value = (CASE WHEN (value=1) THEN -1 ELSE 1 END) WHERE id={LockId}";
+                await dbContext.Database.ExecuteSqlAsync($"SET LOCK_TIMEOUT 60000;");
 
-                // dbContext.Database.ExecuteSql($"SET LOCK_TIMEOUT {_timeout.TotalMilliseconds};");
+                var rowsAffected = await dbContext.Database.ExecuteSqlAsync(@$"UPDATE umbracoLock WITH (REPEATABLEREAD) SET value = (CASE WHEN (value=1) THEN -1 ELSE 1 END) WHERE id={LockId}");
 
-                var i = await dbContext.Database.ExecuteScalarAsync<int>(query);
-
-                if (i == 0)
+                if (rowsAffected == 0)
                 {
                     // ensure we are actually locking!
                     throw new ArgumentException($"LockObject with id={LockId} does not exist.");
                 }
-            });
+            }).GetAwaiter().GetResult();;
         }
     }
 }
