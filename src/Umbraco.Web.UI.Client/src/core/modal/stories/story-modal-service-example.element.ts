@@ -1,20 +1,8 @@
-import { Meta, Story } from '@storybook/web-components';
 import { html } from 'lit-html';
 import { customElement, property, state } from 'lit/decorators.js';
-
-import { UmbModalService, UMB_MODAL_SERVICE_CONTEXT_TOKEN } from '.';
+import { UmbModalService, UMB_MODAL_SERVICE_CONTEXT_TOKEN } from '..';
 import { UmbLitElement } from '@umbraco-cms/element';
 
-export default {
-	title: 'API/Modals',
-	id: 'umb-modal-service',
-	argTypes: {
-		modalLayout: {
-			control: 'select',
-			options: ['Confirm', 'Content Picker', 'Property Editor UI Picker', 'Icon Picker'],
-		},
-	},
-} as Meta;
 
 @customElement('story-modal-service-example')
 export class StoryModalServiceExampleElement extends UmbLitElement {
@@ -61,9 +49,3 @@ export class StoryModalServiceExampleElement extends UmbLitElement {
 		`;
 	}
 }
-
-const Template: Story = (props) => {
-	return html` <story-modal-service-example .modalLayout=${props.modalLayout}></story-modal-service-example> `;
-};
-
-export const Overview = Template.bind({});
