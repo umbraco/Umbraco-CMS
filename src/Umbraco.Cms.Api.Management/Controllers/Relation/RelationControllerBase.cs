@@ -15,9 +15,9 @@ public abstract class RelationControllerBase : ManagementApiControllerBase
     protected IActionResult RelationOperationStatusResult(RelationOperationStatus status) =>
         status switch
         {
-            RelationOperationStatus.NotFound => BadRequest(new ProblemDetailsBuilder()
-                .WithTitle("Invalid fallback language")
-                .WithDetail("The fallback language could not be applied. This may be caused if the fallback language causes cyclic fallbacks.")
+            RelationOperationStatus.RelationTypeNotFound => BadRequest(new ProblemDetailsBuilder()
+                .WithTitle("Relation type not found")
+                .WithDetail("The relation type could not be found.")
                 .Build()),
         };
 }

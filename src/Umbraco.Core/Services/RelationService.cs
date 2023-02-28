@@ -255,7 +255,7 @@ public class RelationService : RepositoryService, IRelationService
             IRelationType? relationType = _relationTypeRepository.Get(key);
             if (relationType is null)
             {
-                return await Task.FromResult(Attempt.FailWithStatus<PagedModel<IRelation>, RelationOperationStatus>(RelationOperationStatus.NotFound, null!));
+                return await Task.FromResult(Attempt.FailWithStatus<PagedModel<IRelation>, RelationOperationStatus>(RelationOperationStatus.RelationTypeNotFound, null!));
             }
 
             PaginationHelper.ConvertSkipTakeToPaging(skip, take, out var pageNumber, out var pageSize);

@@ -3,5 +3,5 @@
 public enum RelationOperationStatus
 {
     Success,
-    NotFound,
+    RelationTypeNotFound,
 }
