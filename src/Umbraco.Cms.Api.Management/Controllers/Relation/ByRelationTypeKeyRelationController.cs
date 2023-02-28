@@ -14,12 +14,12 @@ namespace Umbraco.Cms.Api.Management.Controllers.Relation;
 public class ByRelationTypeKeyRelationController : RelationControllerBase
 {
     private readonly IRelationService _relationService;
-    private readonly IRelationViewModelFactory _relationViewModelFactory;
+    private readonly IRelationPresentationFactory _relationPresentationFactory;
 
-    public ByRelationTypeKeyRelationController(IRelationService relationService, IRelationViewModelFactory relationViewModelFactory)
+    public ByRelationTypeKeyRelationController(IRelationService relationService, IRelationPresentationFactory relationPresentationFactory)
     {
         _relationService = relationService;
-        _relationViewModelFactory = relationViewModelFactory;
+        _relationPresentationFactory = relationPresentationFactory;
     }
 
     [HttpGet("type/{key:guid}")]
@@ -34,7 +34,7 @@ public class ByRelationTypeKeyRelationController : RelationControllerBase
             return await Task.FromResult(RelationOperationStatusResult(relationsAttempt.Status));
         }
 
-        IEnumerable<RelationViewModel> mappedRelations = relationsAttempt.Result.Items.Select(_relationViewModelFactory.Create);
+        IEnumerable<RelationViewModel> mappedRelations = relationsAttempt.Result.Items.Select(_relationPresentationFactory.Create);
 
         return await Task.FromResult(Ok(new PagedViewModel<RelationViewModel>
         {
