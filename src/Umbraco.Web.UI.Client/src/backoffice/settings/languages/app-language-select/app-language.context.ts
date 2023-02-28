@@ -1,4 +1,4 @@
-import { UmbLanguageRepository } from './repository/language.repository';
+import { UmbLanguageRepository } from '../repository/language.repository';
 import { ObjectState, UmbObserverController } from '@umbraco-cms/observable-api';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 import { UmbContextToken } from '@umbraco-cms/context-api';

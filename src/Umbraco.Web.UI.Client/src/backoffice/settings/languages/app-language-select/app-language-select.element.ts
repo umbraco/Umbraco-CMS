@@ -4,7 +4,7 @@ import { customElement, state } from 'lit/decorators.js';
 import { repeat } from 'lit/directives/repeat.js';
 import { ifDefined } from 'lit-html/directives/if-defined.js';
 import { UUIMenuItemEvent } from '@umbraco-ui/uui';
-import { UmbLanguageRepository } from './repository/language.repository';
+import { UmbLanguageRepository } from '../repository/language.repository';
 import { UMB_APP_LANGUAGE_CONTEXT_TOKEN, UmbAppLanguageContext } from './app-language.context';
 import { UmbLitElement } from '@umbraco-cms/element';
 import { LanguageModel } from '@umbraco-cms/backend-api';
@@ -141,6 +141,8 @@ export class UmbAppLanguageSelectElement extends UmbLitElement {
 		</div>`;
 	}
 }
+
+export default UmbAppLanguageSelectElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
