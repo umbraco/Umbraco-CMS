@@ -10,7 +10,7 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Manifest;
 
-internal sealed class PackageManifestReader : IPackageManifestReader
+internal sealed class AppPluginsFileProviderPackageManifestReader : IPackageManifestReader
 {
     private readonly IPackageManifestFileProviderFactory _packageManifestFileProviderFactory;
     private readonly IJsonSerializer _jsonSerializer;
