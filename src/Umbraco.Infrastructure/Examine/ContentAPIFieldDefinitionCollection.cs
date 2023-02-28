@@ -8,7 +8,7 @@ public class ContentApiFieldDefinitionCollection : FieldDefinitionCollection
 {
         new("id", FieldDefinitionTypes.Raw),
         new("parentKey", FieldDefinitionTypes.Raw),
-        new("ancestorKeys", FieldDefinitionTypes.Raw)
+        new("ancestorKeys", FieldDefinitionTypes.FullText)
     };
 
     public ContentApiFieldDefinitionCollection()

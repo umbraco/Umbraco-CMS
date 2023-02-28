@@ -31,7 +31,7 @@ public class ContentApiValueSetBuilder : BaseValueSetBuilder<IContent>
             {
                 ["id"] = content.Key,
                 ["parentKey"] = ancestorKeys.LastOrDefault(),
-                ["ancestorKeys"] = string.Join(",", ancestorKeys) // ToDo: Store as array if it is faster to search
+                ["ancestorKeys"] = ancestorKeys.Any() ? string.Join(",", ancestorKeys) : default(Guid) // ToDo: Store as array if it is faster to search
             };
 
             yield return new ValueSet(content.Id.ToString(), IndexTypes.Content, content.ContentType.Alias, indexValues);
