@@ -33,9 +33,14 @@ public class DateTimeConfigurationEditor : ConfigurationEditor<DateTimeConfigura
     {
         IDictionary<string, object> config = base.ToValueEditor(configuration);
 
-        var format = config["format"].ToString()!;
+        // FIXME: all this belongs clientside, this needs to go
+        var pickTime = true;
+        if (config.TryGetValue("format", out object? formatValue) && formatValue is string format)
+        {
+            pickTime = format.ContainsAny(new[] { "H", "m", "s" });
+        }
 
-        config["pickTime"] = format.ContainsAny(new[] { "H", "m", "s" });
+        config["pickTime"] = pickTime;
 
         return config;
     }

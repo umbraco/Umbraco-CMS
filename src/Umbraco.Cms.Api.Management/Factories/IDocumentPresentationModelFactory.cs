@@ -3,7 +3,7 @@ using Umbraco.Cms.Core.Models;
 
 namespace Umbraco.Cms.Api.Management.Factories;
 
-public interface IDocumentViewModelFactory
+public interface IDocumentPresentationModelFactory
 {
-    Task<DocumentViewModel> CreateViewModelAsync(IContent content);
+    Task<DocumentResponseModel> CreateResponseModelAsync(IContent content);
 }
