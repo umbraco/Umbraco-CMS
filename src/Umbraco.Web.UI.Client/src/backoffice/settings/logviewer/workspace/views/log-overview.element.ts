@@ -12,12 +12,6 @@ export class UmbLogViewerOverviewViewElement extends UmbLitElement {
 			:host {
 				display: block;
 
-				--umb-log-viewer-debug-color: var(--uui-color-default-emphasis);
-				--umb-log-viewer-information-color: var(--uui-color-positive);
-				--umb-log-viewer-warning-color: var(--uui-color-warning);
-				--umb-log-viewer-error-color: var(--uui-color-danger);
-				--umb-log-viewer-fatal-color: var(--uui-color-default);
-				--umb-log-viewer-verbose-color: var(--uui-color-current);
 			}
 
 			#logviewer-layout {

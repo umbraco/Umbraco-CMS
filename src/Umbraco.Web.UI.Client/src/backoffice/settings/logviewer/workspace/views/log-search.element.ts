@@ -89,8 +89,34 @@ export class UmbLogViewerSearchViewElement extends UmbLitElement {
 				margin: 0 var(--uui-size-space-3);
 			}
 
-			uui-symbol-expand:not(#polling-symbol-expand) {
+			uui-symbol-expand:not(#polling-symbol-expand),
+			uui-symbol-sort {
 				margin-left: var(--uui-size-space-3);
+			}
+
+			#message-list-header {
+				display: flex;
+				font-weight: 600;
+			}
+
+			#message-list-header > div {
+				box-sizing: border-box;
+				padding: 10px 20px;
+				display: flex;
+				align-items: center;
+			}
+
+			#timestamp {
+				flex: 1 0 14ch;
+			}
+
+			#level,
+			#machine {
+				flex: 1 0 14ch;
+			}
+
+			#message {
+				flex: 6 0 14ch;
 			}
 		`,
 	];
@@ -221,7 +247,13 @@ export class UmbLogViewerSearchViewElement extends UmbLitElement {
 				</div>
 				<div id="input-container">${this.#renderSearchInput()}</div>
 				<uui-box>
-					<p>Total items: 234</p>
+					<p>Total items: ${this._logs.length}</p>
+					<div id="message-list-header">
+						<div id="timestamp">Timestamp <uui-symbol-sort active></uui-symbol-sort></div>
+						<div id="level">Level</div>
+						<div id="machine">Machine name</div>
+						<div id="message">Message</div>
+					</div>
 					${this._logs.map(
 						(log) => html`<umb-log-viewer-message
 							.timestamp=${log.timestamp ?? ''}

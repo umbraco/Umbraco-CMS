@@ -14,109 +14,6 @@ import { UmbLogViewerWorkspaceContext, UMB_APP_LOG_VIEWER_CONTEXT_TOKEN } from '
 //TODO make uui-input accept min and max values
 @customElement('umb-logviewer-workspace')
 export class UmbLogViewerWorkspaceElement extends UmbLitElement {
-	// render() {
-	// 	return html`
-	// 	<umb-body-layout headline="Log Overview for today">
-	// 		<div id="logviewer-layout">
-	// 			<div id="info">
-
-	// 				<uui-box id="time-period" headline="Time Period">
-	// 					<div id="date-input-container" @input=${this.#setDates}>
-	// 						<uui-label for="start-date">From:</uui-label>
-	// 						<input
-	// 							id="start-date"
-	// 							type="date"
-	// 							label="From"
-	// 							max="${this.today}"
-	// 							.value=${this._startDate}>
-	// 						</input>
-	// 						<uui-label for="end-date">To: </uui-label>
-	// 						<input
-	// 							id="end-date"
-	// 							type="date"
-	// 							label="To"
-	// 							max="${this.today}"
-	// 							.value=${this._endDate}>
-	// 						</input>
-	// 					</div>
-	// 				</uui-box>
-
-	// 				<uui-box id="errors" headline="Number of Errors"></uui-box>
-
-	// 				<uui-box id="level" headline="Log level"></uui-box>
-
-	// 				<uui-box id="types" headline="Log types">
-	// 					<div id="log-types-container">
-	// 						<div id="legend">
-	// 							<ul>
-	// 								${
-	// 									this._logLevelCount
-	// 										? Object.keys(this._logLevelCount).map(
-	// 												(level) =>
-	// 													html`<li>
-	// 														<button
-	// 															@click=${(e: Event) => {
-	// 																(e.target as HTMLElement)?.classList.toggle('active');
-	// 																this.#setCountFilter(level);
-	// 															}}>
-	// 															<uui-icon
-	// 																name="umb:record"
-	// 																style="color: var(--umb-log-viewer-${level.toLowerCase()}-color);"></uui-icon
-	// 															>${level}
-	// 														</button>
-	// 													</li>`
-	// 										  )
-	// 										: ''
-	// 								}
-	// 							</ul>
-	// 						</div>
-	// 						<umb-donut-chart>
-	// 						${
-	// 							this._logLevelCount
-	// 								? this.logLevelCount.map(
-	// 										([level, number]) =>
-	// 											html`<umb-donut-slice
-	// 												.name=${level}
-	// 												.amount=${number}
-	// 												.percent=${this.#calculatePercentage(number)}
-	// 												.color="${`var(--umb-log-viewer-${level.toLowerCase()}-color)`}"></umb-donut-slice> `
-	// 								  )
-	// 								: ''
-	// 						}
-	// 						</umb-donut-chart>
-	// 					</div>
-	// 				</uui-box>
-	// 			</div>
-
-	// 			<div id="saved-searches-container">
-	// 				<uui-box id="saved-searches" headline="Saved searches">
-	// 					<ul>${this._savedSearches.map(this.#renderSearchItem)}</ul>
-	// 				</uui-box>
-	// 			</div>
-
-	// 			<div id="common-messages-container">
-	// 				<uui-box headline="Common Log Messages" id="saved-searches">
-	// 					<p style="font-style: italic;">Total Unique Message types: ${this._messageTemplates?.total}</p>
-	// 				<uui-table>
-	// 				${
-	// 					this._messageTemplates
-	// 						? this._messageTemplates.items.map(
-	// 								(template) =>
-	// 									html`<uui-table-row
-	// 										><uui-table-cell>${template.messageTemplate}</uui-table-cell>
-	// 										<uui-table-cell>${template.count}</uui-table-cell>
-	// 									</uui-table-row>`
-	// 						  )
-	// 						: ''
-	// 				}
-	// 		</uui-table>
-	// 				<uui-button id="show-more-templates-btn" look="primary">Show more</uui-button>
-	// 				</uui-box>
-	// 			</div>
-	// 		</div>
-	// 	</umb-body-layout>`;
-	// }
-
 	static styles = [
 		UUITextStyles,
 		css`
@@ -124,6 +21,13 @@ export class UmbLogViewerWorkspaceElement extends UmbLitElement {
 				display: block;
 				width: 100%;
 				height: 100%;
+
+				--umb-log-viewer-debug-color: var(--uui-color-default-emphasis);
+				--umb-log-viewer-information-color: var(--uui-color-positive);
+				--umb-log-viewer-warning-color: var(--uui-color-warning);
+				--umb-log-viewer-error-color: var(--uui-color-danger);
+				--umb-log-viewer-fatal-color: var(--uui-color-default);
+				--umb-log-viewer-verbose-color: var(--uui-color-current);
 			}
 
 			#header {

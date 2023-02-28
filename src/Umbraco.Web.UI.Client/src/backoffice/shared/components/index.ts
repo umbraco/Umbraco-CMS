@@ -7,6 +7,7 @@ import './backoffice-frame/backoffice-header.element';
 import './backoffice-frame/backoffice-main.element';
 import './backoffice-frame/backoffice-modal-container.element';
 import './backoffice-frame/backoffice-notification-container.element';
+import './button-with-dropdown/button-with-dropdown.element';
 import './code-block/code-block.element';
 import './debug/debug.element';
 import './dropdown/dropdown.element';
