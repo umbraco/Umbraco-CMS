@@ -35,26 +35,26 @@ public class QueryContentApiController : ContentApiControllerBase
     public async Task<IActionResult> Query()
     {
         HttpContext? context = _httpContextAccessor.HttpContext;
-        const string childrenSpecifier = "children:";
-
         if (context is null || !context.Request.Query.TryGetValue("fetch", out StringValues queryValue))
         {
             return BadRequest("Missing 'fetch' query parameter.");
         }
 
         var queryOption = queryValue.ToString();
-        if (!queryOption.StartsWith(childrenSpecifier, StringComparison.OrdinalIgnoreCase))
+
+        ApiQueryType queryType = _apiQueryService.GetQueryType(queryOption);
+        if (queryType == ApiQueryType.Unknown)
         {
             return BadRequest("Invalid value for 'fetch' query parameter.");
         }
 
-        var guidString = queryOption.Substring(childrenSpecifier.Length);
-        if (!Guid.TryParse(guidString, out Guid id))
+        Guid? id = _apiQueryService.GetGuidFromFetch(queryOption);
+        if (id is null)
         {
             return BadRequest("Invalid GUID format.");
         }
 
-        IEnumerable<Guid> ids = _apiQueryService.GetChildrenIds(id);
+        IEnumerable<Guid> ids = _apiQueryService.GetGuidsFromQuery((Guid)id, queryType);
 
         IPublishedContentCache? contentCache = GetContentCache();
 
