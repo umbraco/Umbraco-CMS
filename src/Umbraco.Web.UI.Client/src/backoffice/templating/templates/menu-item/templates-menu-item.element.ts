@@ -2,8 +2,8 @@ import { html, nothing } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { UmbLitElement } from '@umbraco-cms/element';
 
-@customElement('umb-data-types-sidebar-menu-item')
-export class UmbDataTypesSidebarMenuItemElement extends UmbLitElement {
+@customElement('umb-templates-menu-item')
+export class UmbTemplatesMenuItemElement extends UmbLitElement {
 	@state()
 	private _renderTree = false;
 
@@ -20,21 +20,21 @@ export class UmbDataTypesSidebarMenuItemElement extends UmbLitElement {
 	// TODO: can we make this reusable?
 	render() {
 		return html`<umb-tree-item
-			label="Data Types"
+			label="Templates"
 			icon="umb:folder"
-			entity-type="data-type"
+			entity-type="template"
 			@show-children=${this._onShowChildren}
 			@hide-children=${this._onHideChildren}
 			has-children>
-			${this._renderTree ? html`<umb-tree alias="Umb.Tree.DataTypes"></umb-tree>` : nothing}
+			${this._renderTree ? html`<umb-tree alias="Umb.Tree.Templates"></umb-tree>` : nothing}
 		</umb-tree-item> `;
 	}
 }
 
-export default UmbDataTypesSidebarMenuItemElement;
+export default UmbTemplatesMenuItemElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-data-types-sidebar-menu-item': UmbDataTypesSidebarMenuItemElement;
+		'umb-templates-menu-item': UmbTemplatesMenuItemElement;
 	}
 }

@@ -2,14 +2,14 @@ import type { ManifestMenuItem } from '@umbraco-cms/models';
 
 const menuItem: ManifestMenuItem = {
 	type: 'menuItem',
-	alias: 'Umb.MenuItem.Media',
-	name: 'Media Menu Item',
-	weight: 100,
-	loader: () => import('./media-sidebar-menu-item.element'),
+	alias: 'Umb.MenuItem.MediaTypes',
+	name: 'Media Types Menu Item',
+	weight: 20,
+	loader: () => import('./media-types-menu-item.element'),
 	meta: {
-		label: 'Media',
+		label: 'Media Types',
 		icon: 'umb:folder',
-		menus: ['Umb.Menu.Media'],
+		menus: ['Umb.Menu.Settings'],
 	},
 };
 

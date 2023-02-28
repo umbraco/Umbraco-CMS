@@ -2,8 +2,8 @@ import { html, nothing } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { UmbLitElement } from '@umbraco-cms/element';
 
-@customElement('umb-member-groups-sidebar-menu-item')
-export class UmbMemberGroupsSidebarMenuItemElement extends UmbLitElement {
+@customElement('umb-member-types-menu-item')
+export class UmbMemberTypesMenuItemElement extends UmbLitElement {
 	@state()
 	private _renderTree = false;
 
@@ -20,20 +20,20 @@ export class UmbMemberGroupsSidebarMenuItemElement extends UmbLitElement {
 	// TODO: can we make this reusable?
 	render() {
 		return html`<umb-tree-item
-			label="Member Groups"
+			label="Member Types"
 			icon="umb:folder"
 			@show-children=${this._onShowChildren}
 			@hide-children=${this._onHideChildren}
 			has-children>
-			${this._renderTree ? html`<umb-tree alias="Umb.Tree.MemberGroups"></umb-tree>` : nothing}
+			${this._renderTree ? html`<umb-tree alias="Umb.Tree.MemberTypes"></umb-tree>` : nothing}
 		</umb-tree-item> `;
 	}
 }
 
-export default UmbMemberGroupsSidebarMenuItemElement;
+export default UmbMemberTypesMenuItemElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-member-groups-sidebar-menu-item': UmbMemberGroupsSidebarMenuItemElement;
+		'umb-member-types-menu-item': UmbMemberTypesMenuItemElement;
 	}
 }

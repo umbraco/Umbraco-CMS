@@ -5,7 +5,7 @@ const menuItem: ManifestMenuItem = {
 	alias: 'Umb.MenuItem.Members',
 	name: 'Members Menu Item',
 	weight: 400,
-	loader: () => import('./members-sidebar-menu-item.element'),
+	loader: () => import('./members-menu-item.element'),
 	meta: {
 		label: 'Members',
 		icon: 'umb:folder',

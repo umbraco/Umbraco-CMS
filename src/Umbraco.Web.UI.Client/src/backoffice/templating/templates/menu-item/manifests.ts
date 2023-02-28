@@ -5,7 +5,7 @@ const menuItem: ManifestMenuItem = {
 	alias: 'Umb.MenuItem.Templates',
 	name: 'Templates Menu Item',
 	weight: 40,
-	loader: () => import('./templates-sidebar-menu-item.element'),
+	loader: () => import('./templates-menu-item.element'),
 	meta: {
 		label: 'Templates',
 		icon: 'umb:folder',

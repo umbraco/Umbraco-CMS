@@ -5,7 +5,7 @@ const menuItem: ManifestMenuItem = {
 	alias: 'Umb.MenuItem.Dictionary',
 	name: 'Dictionary Menu Item',
 	weight: 400,
-	loader: () => import('./dictionary-sidebar-menu-item.element'),
+	loader: () => import('./dictionary-menu-item.element'),
 	meta: {
 		label: 'Dictionary',
 		icon: 'umb:book-alt',
