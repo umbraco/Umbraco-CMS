@@ -1,4 +1,5 @@
-﻿using Umbraco.Cms.Core.Collections;
+﻿using Microsoft.EntityFrameworkCore.Storage;
+using Umbraco.Cms.Core.Collections;
 using Umbraco.Cms.Core.DistributedLocking;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Persistence.EFCore.Entities;
@@ -524,14 +525,19 @@ internal class EfCoreScope : IEfCoreScope
         var completed = _completed.HasValue && _completed.Value;
         if (_umbracoEfCoreDatabase is not null)
         {
-            if (completed)
+            // Transaction connection can be null here if we get chosen as the deadlock victim.
+            if (_umbracoEfCoreDatabase.UmbracoEFContext.Database.CurrentTransaction?.GetDbTransaction().Connection is not null)
             {
-                _umbracoEfCoreDatabase.UmbracoEFContext.Database.CommitTransaction();
+                if (completed)
+                {
+                    _umbracoEfCoreDatabase.UmbracoEFContext.Database.CommitTransaction();
+                }
+                else
+                {
+                    _umbracoEfCoreDatabase.UmbracoEFContext.Database.RollbackTransaction();
+                }
             }
-            else
-            {
-                _umbracoEfCoreDatabase.UmbracoEFContext.Database.RollbackTransaction();
-            }
+
 
             _umbracoEfCoreDatabase.Dispose();
         }
