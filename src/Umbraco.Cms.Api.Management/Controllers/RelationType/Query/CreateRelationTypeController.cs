@@ -14,15 +14,15 @@ namespace Umbraco.Cms.Api.Management.Controllers.RelationType.Query;
 public class CreateRelationTypeController : RelationTypeControllerBase
 {
     private readonly IRelationService _relationService;
-    private readonly IRelationTypeViewModelFactory _relationTypeViewModelFactory;
+    private readonly IRelationTypePresentationFactory _relationTypePresentationFactory;
     private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
 
     public CreateRelationTypeController(IRelationService relationService,
-        IRelationTypeViewModelFactory relationTypeViewModelFactory,
+        IRelationTypePresentationFactory relationTypePresentationFactory,
         IBackOfficeSecurityAccessor backOfficeSecurityAccessor)
     {
         _relationService = relationService;
-        _relationTypeViewModelFactory = relationTypeViewModelFactory;
+        _relationTypePresentationFactory = relationTypePresentationFactory;
         _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
     }
 
@@ -32,7 +32,7 @@ public class CreateRelationTypeController : RelationTypeControllerBase
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> Create(CreateRelationTypeRequestModel createRelationTypeRequestModel)
     {
-        IRelationType relationTypePersisted = _relationTypeViewModelFactory.CreateRelationType(createRelationTypeRequestModel);
+        IRelationType relationTypePersisted = _relationTypePresentationFactory.CreateRelationType(createRelationTypeRequestModel);
 
         Attempt<IRelationType, RelationTypeOperationStatus> result = await _relationService.CreateAsync(relationTypePersisted, CurrentUserId(_backOfficeSecurityAccessor));
 
