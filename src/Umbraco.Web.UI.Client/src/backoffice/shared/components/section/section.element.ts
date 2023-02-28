@@ -11,7 +11,7 @@ import { UmbLitElement } from '@umbraco-cms/element';
 
 import './section-sidebar-menu/section-sidebar-menu.element.ts';
 import './section-views/section-views.element.ts';
-import '../../../settings/languages/app-language-select.element.ts';
+import '../../../settings/languages/app-language-select/app-language-select.element.ts';
 import { UmbRouterSlotChangeEvent } from '@umbraco-cms/router';
 
 @customElement('umb-section')
@@ -200,8 +200,11 @@ export class UmbSectionElement extends UmbLitElement {
 			${this._menus && this._menus.length > 0
 				? html`
 						<umb-section-sidebar>
-							<!-- TODO: this should be an extension point and only shown in the content section sidebar -->
-							<umb-app-language-select></umb-app-language-select>
+							<umb-extension-slot
+								type="sectionSidebarItem"
+								.filter=${(items: ManifestSidebarMenu) =>
+									items.meta.sections.includes(this._sectionAlias || '')}></umb-extension-slot>
+
 							<umb-extension-slot
 								type="sidebarMenu"
 								.filter=${(items: ManifestSidebarMenu) => items.meta.sections.includes(this._sectionAlias || '')}
