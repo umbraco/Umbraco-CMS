@@ -195,8 +195,7 @@ internal class CompilationOptionsProvider
 
         if (string.IsNullOrEmpty(dependencyContextOptions.LanguageVersion))
         {
-            // If the user does not specify a LanguageVersion, assume CSharp 8.0. This matches the language version Razor 3.0 targets by default.
-            parseOptions = parseOptions.WithLanguageVersion(LanguageVersion.CSharp8);
+            parseOptions = parseOptions.WithLanguageVersion(LanguageVersion.Latest);
         }
         else if (LanguageVersionFacts.TryParse(dependencyContextOptions.LanguageVersion, out var languageVersion))
         {
