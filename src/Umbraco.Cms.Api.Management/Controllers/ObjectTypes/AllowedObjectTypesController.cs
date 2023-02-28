@@ -17,11 +17,11 @@ public class AllowedObjectTypesController : ObjectTypesControllerBase
     [ProducesResponseType(typeof(PagedViewModel<ObjectTypeResponseModel>), StatusCodes.Status200OK)]
     public async Task<IActionResult> Allowed(int skip = 0, int take = 100)
     {
-        IEnumerable<ObjectTypeResponseModel> objectTypes = _objectTypeViewModelFactory.Create().ToArray();
+        ObjectTypeResponseModel[] objectTypes = _objectTypeViewModelFactory.Create().ToArray();
 
         return await Task.FromResult(Ok(new PagedViewModel<ObjectTypeResponseModel>
         {
-            Total = objectTypes.Count(),
+            Total = objectTypes.Length,
             Items = objectTypes.Skip(skip).Take(take),
         }));
     }
