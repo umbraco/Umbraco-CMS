@@ -18,6 +18,8 @@ public class UserResponseModel : UserPresentationBase, INamedEntityViewModel
 
     public SortedSet<Guid> MediaStartNodeKeys { get; set; } = new();
 
+    public IEnumerable<string> AvatarUrls { get; set; } = Enumerable.Empty<string>();
+
     public UserState State { get; set; }
 
     public int FailedLoginAttempts { get; set; }
