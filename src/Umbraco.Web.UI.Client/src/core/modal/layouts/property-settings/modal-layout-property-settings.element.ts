@@ -28,10 +28,20 @@ export class UmbModalLayoutPropertySettingsElement extends UmbModalLayoutElement
 				position: relative;
 				display: flex;
 				border: 2px solid var(--uui-color-border-standalone);
-				padding: 0 16px;
+				padding: var(--uui-size-space-4) var(--uui-size-space-5);
 				align-items: center;
 				border-radius: 6px;
 				opacity: 0.8;
+				flex-direction: column;
+				justify-content: space-between;
+				gap: var(--uui-size-space-3);
+			}
+			.appearance-label {
+				font-size: 0.8rem;
+				line-height: 1;
+			}
+			.appearance.selected .appearance-label {
+				font-weight: bold;
 			}
 			.appearance:not(.selected):hover {
 				border-color: var(--uui-color-border-emphasis);
@@ -307,7 +317,7 @@ export class UmbModalLayoutPropertySettingsElement extends UmbModalLayoutElement
 								<hr />
 								<div class="container">
 									<b style="margin-bottom: var(--uui-size-space-3)">Appearance</b>
-									<div id="appearances">${this.#renderLeftSVG()} ${this.#renderTopSVG()}</div>
+									<div id="appearances">${this.#renderAlignLeftIcon()} ${this.#renderAlignTopIcon()}</div>
 								</div>
 							</uui-box>
 						</div>
@@ -321,32 +331,34 @@ export class UmbModalLayoutPropertySettingsElement extends UmbModalLayoutElement
 		`;
 	}
 
-	#renderLeftSVG() {
+	#renderAlignLeftIcon() {
 		return html`<div
 			@click=${this.#onAppearanceChange}
 			@keydown=${() => ''}
 			class="appearance left ${this._appearanceIsTop ? '' : 'selected'}">
-			<svg width="260" height="60" viewBox="0 0 260 60" fill="none" xmlns="http://www.w3.org/2000/svg">
+			<svg width="260" height="32" viewBox="0 0 260 60" fill="none" xmlns="http://www.w3.org/2000/svg">
 				<rect width="89" height="14" rx="7" fill="currentColor" />
 				<rect x="121" width="139" height="10" rx="5" fill="currentColor" fill-opacity="0.4" />
 				<rect x="121" y="46" width="108" height="10" rx="5" fill="currentColor" fill-opacity="0.4" />
 				<rect x="121" y="23" width="139" height="10" rx="5" fill="currentColor" fill-opacity="0.4" />
 			</svg>
+			<label class="appearance-label"> Label on the left </label>
 		</div>`;
 	}
 
-	#renderTopSVG() {
+	#renderAlignTopIcon() {
 		return html`
 			<div
 				@click=${this.#onAppearanceChange}
 				@keydown=${() => ''}
 				class="appearance top ${this._appearanceIsTop ? 'selected' : ''}">
-				<svg width="139" height="90" viewBox="0 0 139 90" fill="none" xmlns="http://www.w3.org/2000/svg">
+				<svg width="139" height="48" viewBox="0 0 139 90" fill="none" xmlns="http://www.w3.org/2000/svg">
 					<rect width="89" height="14" rx="7" fill="currentColor" />
 					<rect y="30" width="139" height="10" rx="5" fill="currentColor" fill-opacity="0.4" />
 					<rect y="76" width="108" height="10" rx="5" fill="currentColor" fill-opacity="0.4" />
 					<rect y="53" width="139" height="10" rx="5" fill="currentColor" fill-opacity="0.4" />
 				</svg>
+				<label class="appearance-label"> Label on top </label>
 			</div>
 		`;
 	}
