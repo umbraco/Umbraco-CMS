@@ -536,6 +536,6 @@ internal class EfCoreScope : IEfCoreScope
             _umbracoEfCoreDatabase.Dispose();
         }
 
-        // _efCoreDatabaseFactory.Dispose();
+        _efCoreDatabaseFactory.Dispose();
     }
 }
