@@ -105,6 +105,7 @@ export const parameters = {
 						'Section Sidebar Items',
 						'Entity Actions',
 						'Workspaces',
+						['Intro', 'Views', 'Actions', '*'],
 						'Property Editors',
 						'Repositories',
 						'*',

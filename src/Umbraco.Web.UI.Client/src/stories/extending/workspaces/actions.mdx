@@ -1,0 +1,40 @@
+import { Meta } from '@storybook/addon-docs';
+
+<Meta
+	title="Guides/Extending the Backoffice/Workspaces/Actions"
+	parameters={{ previewTabs: { canvas: { hidden: true } } }}
+/>
+
+# Workspace Actions
+
+// TODO: intro to workspace actions
+
+- Relates to a workspace alias (Umb.Workspace.Document).
+- Performs the action on the workspace draft state.
+- Has Access to the workspace context.
+
+<img src="docs/workspace-actions.svg" width="400" />
+
+**Manifest**
+
+```json
+	{
+		"type": "workspaceAction",
+		"alias": "My.WorkspaceAction.Workspace.Action",
+		"name": "My Workspace Action",
+		"meta": {
+			"workspaces": ["My.Workspace"],
+      "label": "Run",
+			"look": "primary",
+			"color": "positive",
+		},
+	},
+
+```
+
+**Default Element**
+
+```ts
+// TODO: get interface
+interface UmbWorkspaceActionElement {}
+```

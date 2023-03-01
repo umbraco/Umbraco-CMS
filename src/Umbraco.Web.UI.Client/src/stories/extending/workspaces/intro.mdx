@@ -1,6 +1,9 @@
 import { Meta } from '@storybook/addon-docs';
 
-<Meta title="Guides/Extending the Backoffice/Workspaces" parameters={{ previewTabs: { canvas: { hidden: true } } }} />
+<Meta
+	title="Guides/Extending the Backoffice/Workspaces/Intro"
+	parameters={{ previewTabs: { canvas: { hidden: true } } }}
+/>
 
 # Workspaces
 
@@ -19,22 +22,6 @@ TODO: add description of a workspace
 interface UmbWorkspaceElement {}
 ```
 
-## Workspace Views
-
-TODO: descrtibe workspace views
-
-<img src="docs/workspace-views.svg" width="400" />
-
-```ts
-// TODO: get typescript interface
-```
-
-## Workspace Actions
-
-<img src="docs/workspace-actions.svg" width="400" />
-
-Relates to a workspace alias (Umb.Workspace.Document). Performs the action on the workspace draft state.
-
 ## The Workspace Context
 
 ```ts
@@ -42,6 +29,6 @@ Relates to a workspace alias (Umb.Workspace.Document). Performs the action on th
 interface UmbWorkspaceContext {}
 ```
 
-#### Examples of workspaces:
+## Examples of workspaces:
 
 TODO: link to all workspaces in storybook. Can we somehow auto-generate this list?
