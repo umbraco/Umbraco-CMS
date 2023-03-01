@@ -88,3 +88,47 @@ If no Property Editor is specified in the manifest, the Propety Editor will use 
 	},
 };
 ```
+
+## The Property Editor UI Element
+
+```ts
+// TODO: get interface
+interface UmbPropertyEditorUIElement {}
+```
+
+**Example with LitElement**
+
+```ts
+import { LitElement, html, css } from 'lit';
+import { customElement, property } from 'lit/decorators.js';
+import { UUITextStyles } from '@umbraco-ui/uui-base/lib/styles';
+import { UmbElement } from '@umbraco-cms/element';
+
+// TODO: should we make examples with LitElement or just vanilla JS? or should we have for more libraries?
+@customElement('my-text-box')
+export class UmbPropertyEditorUITextBoxElement extends UmbElement(LitElement) {
+	static styles = [
+		UUITextStyles,
+		css`
+			uui-input {
+				width: 100%;
+			}
+		`,
+	];
+
+	@property()
+	value = '';
+
+	@property({ type: Array, attribute: false })
+	public config = [];
+
+	private onInput(e: InputEvent) {
+		this.value = (e.target as HTMLInputElement).value;
+		this.dispatchEvent(new CustomEvent('property-value-change'));
+	}
+
+	render() {
+		return html`<uui-input .value=${this.value} type="text" @input=${this.onInput}></uui-input>`;
+	}
+}
+```
