@@ -1,8 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore.Storage;
-using Umbraco.Cms.Core.DistributedLocking;
 using Umbraco.Cms.Core.Scoping;
-using Umbraco.Cms.Persistence.EFCore.Entities;
-using Umbraco.Cms.Persistence.EFCore.Services;
 
 namespace Umbraco.Cms.Persistence.EFCore.Scoping;
 
@@ -17,12 +14,24 @@ internal class EfCoreScope : IEfCoreScope
 
     public Guid InstanceId { get; }
 
+    public IUmbracoEfCoreDatabase Database
+    {
+        get
+        {
+            if (_umbracoEfCoreDatabase is null)
+            {
+                InitializeDatabase();
+            }
+
+            return _umbracoEfCoreDatabase!;
+        }
+    }
+
     public EfCoreScope? ParentScope { get; }
 
     public IScopeContext? ScopeContext { get; set; }
 
     public EfCoreScope(
-        IDistributedLockingMechanismFactory distributedLockingMechanismFactory,
         IUmbracoEfCoreDatabaseFactory efCoreDatabaseFactory,
         IEFCoreScopeAccessor efCoreScopeAccessor,
         IEfCoreScopeProvider efCoreScopeProvider,
@@ -32,20 +41,17 @@ internal class EfCoreScope : IEfCoreScope
         _efCoreScopeAccessor = efCoreScopeAccessor;
         _efCoreScopeProvider = (EfCoreScopeProvider)efCoreScopeProvider;
         InstanceId = Guid.NewGuid();
-        Locks = ParentScope is null ? new LockingMechanism(distributedLockingMechanismFactory) : ResolveLockingMechanism();
 
         ScopeContext = scopeContext;
     }
 
     public EfCoreScope(
-        IDistributedLockingMechanismFactory distributedLockingMechanismFactory,
         IUmbracoEfCoreDatabaseFactory efCoreDatabaseFactory,
         IEFCoreScopeAccessor efCoreScopeAccessor,
         IEfCoreScopeProvider efCoreScopeProvider,
         EfCoreScope parentScope,
         IScopeContext? scopeContext)
         : this(
-            distributedLockingMechanismFactory,
             efCoreDatabaseFactory,
             efCoreScopeAccessor,
             efCoreScopeProvider,
@@ -67,10 +73,6 @@ internal class EfCoreScope : IEfCoreScope
 
         return await method(_umbracoEfCoreDatabase!);
     }
-
-    public ILockingMechanism Locks { get; }
-
-    private ILockingMechanism ResolveLockingMechanism() => ParentScope is not null ? ParentScope.ResolveLockingMechanism() : Locks;
 
     public async Task ExecuteWithContextAsync<T>(Func<IUmbracoEfCoreDatabase, Task> method) =>
         await ExecuteWithContextAsync(async db =>
@@ -99,7 +101,7 @@ internal class EfCoreScope : IEfCoreScope
         }
 
         // Decrement the lock counters on the parent if any.
-        Locks.ClearLocks(InstanceId);
+        _umbracoEfCoreDatabase?.Locks.ClearLocks(InstanceId);
 
         if (ParentScope is null)
         {
@@ -137,7 +139,7 @@ internal class EfCoreScope : IEfCoreScope
         // Check if we are already in a transaction before starting one
         if (_umbracoEfCoreDatabase.UmbracoEFContext.Database.CurrentTransaction is null)
         {
-            Locks.EnsureDbLocks(InstanceId);
+            _umbracoEfCoreDatabase.Locks.EnsureDbLocks(InstanceId);
             _umbracoEfCoreDatabase.UmbracoEFContext.Database.BeginTransaction();
         }
     }

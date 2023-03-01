@@ -1,9 +1,12 @@
 ﻿using Umbraco.Cms.Persistence.EFCore.Entities;
+using Umbraco.Cms.Persistence.EFCore.Services;
 
 namespace Umbraco.Cms.Persistence.EFCore;
 
 public interface IUmbracoEfCoreDatabase : IDisposable
 {
+    public ILockingMechanism Locks { get; }
+
     /// <summary>
     ///     Gets the Sql context.
     /// </summary>

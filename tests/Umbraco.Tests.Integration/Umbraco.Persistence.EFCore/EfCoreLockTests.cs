@@ -50,7 +50,7 @@ public class EfCoreLockTests : UmbracoIntegrationTest
     public void SingleEagerReadLockTest()
     {
         using var scope = EFScopeProvider.CreateScope();
-        scope.Locks.EagerReadLock(scope.InstanceId, Constants.Locks.Servers);
+        scope.Database.Locks.EagerReadLock(scope.InstanceId, Constants.Locks.Servers);
         scope.Complete();
     }
 
@@ -58,7 +58,7 @@ public class EfCoreLockTests : UmbracoIntegrationTest
     public void SingleReadLockTest()
     {
         using var scope = EFScopeProvider.CreateScope();
-        scope.Locks.ReadLock(scope.InstanceId, Constants.Locks.Servers);
+        scope.Database.Locks.ReadLock(scope.InstanceId, Constants.Locks.Servers);
         scope.Complete();
     }
 
@@ -66,7 +66,7 @@ public class EfCoreLockTests : UmbracoIntegrationTest
     public void SingleWriteLockTest()
     {
         using var scope = EFScopeProvider.CreateScope();
-        scope.Locks.WriteLock(scope.InstanceId, Constants.Locks.Servers);
+        scope.Database.Locks.WriteLock(scope.InstanceId, Constants.Locks.Servers);
         scope.Complete();
     }
 
@@ -74,7 +74,7 @@ public class EfCoreLockTests : UmbracoIntegrationTest
     public void SingleEagerWriteLockTest()
     {
         using var scope = EFScopeProvider.CreateScope();
-        scope.Locks.EagerWriteLock(scope.InstanceId, Constants.Locks.Servers);
+        scope.Database.Locks.EagerWriteLock(scope.InstanceId, Constants.Locks.Servers);
         scope.Complete();
     }
 
@@ -83,13 +83,13 @@ public class EfCoreLockTests : UmbracoIntegrationTest
     {
         using (var scope = EFScopeProvider.CreateScope())
         {
-            scope.Locks.EagerReadLock(scope.InstanceId, Constants.Locks.Servers);
+            scope.Database.Locks.EagerReadLock(scope.InstanceId, Constants.Locks.Servers);
             scope.Complete();
         }
 
         using (var scope = EFScopeProvider.CreateScope())
         {
-            scope.Locks.EagerReadLock(scope.InstanceId, Constants.Locks.Servers);
+            scope.Database.Locks.EagerReadLock(scope.InstanceId, Constants.Locks.Servers);
             scope.Complete();
         }
     }
@@ -99,13 +99,13 @@ public class EfCoreLockTests : UmbracoIntegrationTest
     {
         using (var scope = EFScopeProvider.CreateScope())
         {
-            scope.Locks.EagerWriteLock(scope.InstanceId, Constants.Locks.Servers);
+            scope.Database.Locks.EagerWriteLock(scope.InstanceId, Constants.Locks.Servers);
             scope.Complete();
         }
 
         using (var scope = EFScopeProvider.CreateScope())
         {
-            scope.Locks.EagerWriteLock(scope.InstanceId, Constants.Locks.Servers);
+            scope.Database.Locks.EagerWriteLock(scope.InstanceId, Constants.Locks.Servers);
             scope.Complete();
         }
     }
@@ -137,7 +137,7 @@ public class EfCoreLockTests : UmbracoIntegrationTest
                 {
                     try
                     {
-                        scope.Locks.EagerReadLock(scope.InstanceId, Constants.Locks.Servers);
+                        scope.Database.Locks.EagerReadLock(scope.InstanceId, Constants.Locks.Servers);
                         lock (locker)
                         {
                             acquired++;
@@ -246,7 +246,7 @@ public class EfCoreLockTests : UmbracoIntegrationTest
                             }
                         }
 
-                        scope.Locks.EagerWriteLock(scope.InstanceId, Constants.Locks.Servers);
+                        scope.Database.Locks.EagerWriteLock(scope.InstanceId, Constants.Locks.Servers);
 
                         lock (locker)
                         {
@@ -372,7 +372,7 @@ public class EfCoreLockTests : UmbracoIntegrationTest
         {
             otherEv.WaitOne();
             Console.WriteLine($"[{id1}] WAIT {id1}");
-            scope.Locks.EagerWriteLock(scope.InstanceId, id1);
+            scope.Database.Locks.EagerWriteLock(scope.InstanceId, id1);
             Console.WriteLine($"[{id1}] GRANT {id1}");
             myEv.Set();
 
@@ -386,7 +386,7 @@ public class EfCoreLockTests : UmbracoIntegrationTest
             }
 
             Console.WriteLine($"[{id1}] WAIT {id2}");
-            scope.Locks.EagerWriteLock(scope.InstanceId, id2);
+            scope.Database.Locks.EagerWriteLock(scope.InstanceId, id2);
             Console.WriteLine($"[{id1}] GRANT {id2}");
         }
         catch (Exception e)
