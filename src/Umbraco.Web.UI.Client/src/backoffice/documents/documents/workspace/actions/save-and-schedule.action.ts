@@ -1,5 +1,5 @@
-import { UmbWorkspaceActionBase } from '@umbraco-cms/workspace';
 import { UmbDocumentWorkspaceContext } from '../document-workspace.context';
+import { UmbWorkspaceActionBase } from '@umbraco-cms/workspace';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 
 export class UmbSaveAndScheduleDocumentWorkspaceAction extends UmbWorkspaceActionBase<UmbDocumentWorkspaceContext> {
