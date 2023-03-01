@@ -23,19 +23,20 @@ import { request as __request } from '../core/request';
 export class TemplateResource {
 
     /**
-     * @returns any Created
+     * @returns string Created
      * @throws ApiError
      */
     public static postTemplate({
-requestBody,
-}: {
-requestBody?: TemplateCreateModel,
-}): CancelablePromise<any> {
+        requestBody,
+    }: {
+        requestBody?: TemplateCreateModel,
+    }): CancelablePromise<string> {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/umbraco/management/api/v1/template',
             body: requestBody,
             mediaType: 'application/json',
+            responseHeader: 'Location',
             errors: {
                 400: `Bad Request`,
                 404: `Not Found`,
@@ -69,10 +70,10 @@ requestBody?: TemplateCreateModel,
      * @throws ApiError
      */
     public static deleteTemplateByKey({
-key,
-}: {
-key: string,
-}): CancelablePromise<any> {
+        key,
+    }: {
+        key: string,
+    }): CancelablePromise<any> {
         return __request(OpenAPI, {
             method: 'DELETE',
             url: '/umbraco/management/api/v1/template/{key}',
@@ -91,12 +92,12 @@ key: string,
      * @throws ApiError
      */
     public static putTemplateByKey({
-key,
-requestBody,
-}: {
-key: string,
-requestBody?: TemplateUpdateModel,
-}): CancelablePromise<any> {
+        key,
+        requestBody,
+    }: {
+        key: string,
+        requestBody?: TemplateUpdateModel,
+    }): CancelablePromise<any> {
         return __request(OpenAPI, {
             method: 'PUT',
             url: '/umbraco/management/api/v1/template/{key}',

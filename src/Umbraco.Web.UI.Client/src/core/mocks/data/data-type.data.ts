@@ -1,10 +1,11 @@
 import { UmbEntityData } from './entity.data';
 import { createFolderTreeItem } from './utils';
-import type { FolderTreeItemModel, DataTypeModel, EntityTreeItemModel } from '@umbraco-cms/backend-api';
+import type { FolderTreeItemModel, DataTypeModel } from '@umbraco-cms/backend-api';
 
 // TODO: investigate why we don't get an entity type as part of the DataTypeModel
 export const data: Array<DataTypeModel & { type: 'data-type' }> = [
 	{
+		$type: 'data-type',
 		type: 'data-type',
 		key: '0cc0eba1-9960-42c9-bf9b-60e150b429ae',
 		parentKey: null,
@@ -14,6 +15,7 @@ export const data: Array<DataTypeModel & { type: 'data-type' }> = [
 		data: [],
 	},
 	{
+		$type: 'data-type',
 		type: 'data-type',
 		name: 'Text',
 		key: 'dt-textBox',
@@ -28,6 +30,7 @@ export const data: Array<DataTypeModel & { type: 'data-type' }> = [
 		],
 	},
 	{
+		$type: 'data-type',
 		type: 'data-type',
 		name: 'Text Area',
 		key: 'dt-textArea',
@@ -37,6 +40,7 @@ export const data: Array<DataTypeModel & { type: 'data-type' }> = [
 		data: [],
 	},
 	{
+		$type: 'data-type',
 		type: 'data-type',
 		name: 'My JS Property Editor',
 		key: 'dt-custom',
@@ -46,6 +50,7 @@ export const data: Array<DataTypeModel & { type: 'data-type' }> = [
 		data: [],
 	},
 	{
+		$type: 'data-type',
 		type: 'data-type',
 		name: 'Color Picker',
 		key: 'dt-colorPicker',
@@ -101,6 +106,7 @@ export const data: Array<DataTypeModel & { type: 'data-type' }> = [
 		],
 	},
 	{
+		$type: 'data-type',
 		type: 'data-type',
 		name: 'Content Picker',
 		key: 'dt-contentPicker',
@@ -115,6 +121,7 @@ export const data: Array<DataTypeModel & { type: 'data-type' }> = [
 		],
 	},
 	{
+		$type: 'data-type',
 		type: 'data-type',
 		name: 'Eye Dropper',
 		key: 'dt-eyeDropper',
@@ -151,6 +158,7 @@ export const data: Array<DataTypeModel & { type: 'data-type' }> = [
 		],
 	},
 	{
+		$type: 'data-type',
 		type: 'data-type',
 		name: 'Multi URL Picker',
 		key: 'dt-multiUrlPicker',
@@ -181,6 +189,7 @@ export const data: Array<DataTypeModel & { type: 'data-type' }> = [
 		],
 	},
 	{
+		$type: 'data-type',
 		type: 'data-type',
 		name: 'Multi Node Tree Picker',
 		key: 'dt-multiNodeTreePicker',
@@ -190,6 +199,7 @@ export const data: Array<DataTypeModel & { type: 'data-type' }> = [
 		data: [],
 	},
 	{
+		$type: 'data-type',
 		type: 'data-type',
 		name: 'Date Picker',
 		key: 'dt-datePicker',
@@ -199,6 +209,7 @@ export const data: Array<DataTypeModel & { type: 'data-type' }> = [
 		data: [],
 	},
 	{
+		$type: 'data-type',
 		type: 'data-type',
 		name: 'Email',
 		key: 'dt-email',
@@ -208,6 +219,7 @@ export const data: Array<DataTypeModel & { type: 'data-type' }> = [
 		data: [],
 	},
 	{
+		$type: 'data-type',
 		type: 'data-type',
 		name: 'Multiple Text String',
 		key: 'dt-multipleTextString',
@@ -226,6 +238,7 @@ export const data: Array<DataTypeModel & { type: 'data-type' }> = [
 		],
 	},
 	{
+		$type: 'data-type',
 		type: 'data-type',
 		name: 'Dropdown',
 		key: 'dt-dropdown',
@@ -235,24 +248,69 @@ export const data: Array<DataTypeModel & { type: 'data-type' }> = [
 		data: [],
 	},
 	{
+		$type: 'data-type',
 		type: 'data-type',
 		name: 'Slider',
 		key: 'dt-slider',
 		parentKey: null,
 		propertyEditorAlias: 'Umbraco.Slider',
 		propertyEditorUiAlias: 'Umb.PropertyEditorUI.Slider',
-		data: [],
+		data: [
+			{
+				alias: 'enableRange',
+				value: true,
+			},
+			{
+				alias: 'initVal1',
+				value: 10,
+			},
+			{
+				alias: 'initVal2',
+				value: 40,
+			},
+			{
+				alias: 'maxVal',
+				value: 50,
+			},
+			{
+				alias: 'minVal',
+				value: 0,
+			},
+			{
+				alias: 'step',
+				value: 10,
+			},
+		],
 	},
 	{
+		$type: 'data-type',
 		type: 'data-type',
 		name: 'Toggle',
 		key: 'dt-toggle',
 		parentKey: null,
 		propertyEditorAlias: 'Umbraco.TrueFalse',
 		propertyEditorUiAlias: 'Umb.PropertyEditorUI.Toggle',
-		data: [],
+		data: [
+			{
+				alias: 'default',
+				value: false,
+			},
+			{
+				alias: 'labelOff',
+				value: 'Not activated',
+			},
+			{
+				alias: 'labelOn',
+				value: 'Activated',
+			},
+			{
+				alias: 'showLabels',
+				value: true,
+			},
+		],
 	},
 	{
+		$type: 'data-type',
 		type: 'data-type',
 		name: 'Tags',
 		key: 'dt-tags',
@@ -262,6 +320,7 @@ export const data: Array<DataTypeModel & { type: 'data-type' }> = [
 		data: [],
 	},
 	{
+		$type: 'data-type',
 		type: 'data-type',
 		name: 'Markdown Editor',
 		key: 'dt-markdownEditor',
@@ -271,6 +330,7 @@ export const data: Array<DataTypeModel & { type: 'data-type' }> = [
 		data: [],
 	},
 	{
+		$type: 'data-type',
 		type: 'data-type',
 		name: 'Radio Button List',
 		key: 'dt-radioButtonList',
@@ -289,6 +349,7 @@ export const data: Array<DataTypeModel & { type: 'data-type' }> = [
 		],
 	},
 	{
+		$type: 'data-type',
 		type: 'data-type',
 		name: 'Checkbox List',
 		key: 'dt-checkboxList',
@@ -307,6 +368,7 @@ export const data: Array<DataTypeModel & { type: 'data-type' }> = [
 		],
 	},
 	{
+		$type: 'data-type',
 		type: 'data-type',
 		name: 'Block List',
 		key: 'dt-blockList',
@@ -316,6 +378,7 @@ export const data: Array<DataTypeModel & { type: 'data-type' }> = [
 		data: [],
 	},
 	{
+		$type: 'data-type',
 		type: 'data-type',
 		name: 'Media Picker',
 		key: 'dt-mediaPicker',
@@ -325,6 +388,7 @@ export const data: Array<DataTypeModel & { type: 'data-type' }> = [
 		data: [],
 	},
 	{
+		$type: 'data-type',
 		type: 'data-type',
 		name: 'Image Cropper',
 		key: 'dt-imageCropper',
@@ -334,6 +398,7 @@ export const data: Array<DataTypeModel & { type: 'data-type' }> = [
 		data: [],
 	},
 	{
+		$type: 'data-type',
 		type: 'data-type',
 		name: 'Upload Field',
 		key: 'dt-uploadField',
@@ -343,6 +408,7 @@ export const data: Array<DataTypeModel & { type: 'data-type' }> = [
 		data: [],
 	},
 	{
+		$type: 'data-type',
 		type: 'data-type',
 		name: 'Block Grid',
 		key: 'dt-blockGrid',
@@ -352,6 +418,7 @@ export const data: Array<DataTypeModel & { type: 'data-type' }> = [
 		data: [],
 	},
 	{
+		$type: 'data-type',
 		type: 'data-type',
 		name: 'Collection View',
 		key: 'dt-collectionView',
@@ -361,6 +428,7 @@ export const data: Array<DataTypeModel & { type: 'data-type' }> = [
 		data: [],
 	},
 	{
+		$type: 'data-type',
 		type: 'data-type',
 		name: 'Icon Picker',
 		key: 'dt-iconPicker',
@@ -370,6 +438,7 @@ export const data: Array<DataTypeModel & { type: 'data-type' }> = [
 		data: [],
 	},
 	{
+		$type: 'data-type',
 		type: 'data-type',
 		name: 'Number Range',
 		key: 'dt-numberRange',
@@ -379,6 +448,7 @@ export const data: Array<DataTypeModel & { type: 'data-type' }> = [
 		data: [],
 	},
 	{
+		$type: 'data-type',
 		type: 'data-type',
 		name: 'Order Direction',
 		key: 'dt-orderDirection',
@@ -388,6 +458,7 @@ export const data: Array<DataTypeModel & { type: 'data-type' }> = [
 		data: [],
 	},
 	{
+		$type: 'data-type',
 		type: 'data-type',
 		name: 'Overlay Size',
 		key: 'dt-overlaySize',
@@ -397,6 +468,7 @@ export const data: Array<DataTypeModel & { type: 'data-type' }> = [
 		data: [],
 	},
 	{
+		$type: 'data-type',
 		type: 'data-type',
 		name: 'Rich Text Editor',
 		key: 'dt-richTextEditor',
@@ -406,6 +478,7 @@ export const data: Array<DataTypeModel & { type: 'data-type' }> = [
 		data: [],
 	},
 	{
+		$type: 'data-type',
 		type: 'data-type',
 		name: 'Label',
 		key: 'dt-label',
@@ -415,6 +488,7 @@ export const data: Array<DataTypeModel & { type: 'data-type' }> = [
 		data: [],
 	},
 	{
+		$type: 'data-type',
 		type: 'data-type',
 		name: 'Integer',
 		key: 'dt-integer',
@@ -424,6 +498,7 @@ export const data: Array<DataTypeModel & { type: 'data-type' }> = [
 		data: [],
 	},
 	{
+		$type: 'data-type',
 		type: 'data-type',
 		name: 'Decimal',
 		key: 'dt-decimal',
@@ -433,6 +508,7 @@ export const data: Array<DataTypeModel & { type: 'data-type' }> = [
 		data: [],
 	},
 	{
+		$type: 'data-type',
 		type: 'data-type',
 		name: 'User Picker',
 		key: 'dt-userPicker',
@@ -442,6 +518,7 @@ export const data: Array<DataTypeModel & { type: 'data-type' }> = [
 		data: [],
 	},
 	{
+		$type: 'data-type',
 		type: 'data-type',
 		name: 'Member Picker',
 		key: 'dt-memberPicker',
@@ -451,6 +528,7 @@ export const data: Array<DataTypeModel & { type: 'data-type' }> = [
 		data: [],
 	},
 	{
+		$type: 'data-type',
 		type: 'data-type',
 		name: 'Member Group Picker',
 		key: 'dt-memberGroupPicker',

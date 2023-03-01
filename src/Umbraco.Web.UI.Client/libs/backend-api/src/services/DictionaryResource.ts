@@ -40,19 +40,20 @@ export class DictionaryResource {
     }
 
     /**
-     * @returns any Created
+     * @returns string Created
      * @throws ApiError
      */
     public static postDictionary({
-requestBody,
-}: {
-requestBody?: DictionaryItemCreateModel,
-}): CancelablePromise<any> {
+        requestBody,
+    }: {
+        requestBody?: DictionaryItemCreateModel,
+    }): CancelablePromise<string> {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/umbraco/management/api/v1/dictionary',
             body: requestBody,
             mediaType: 'application/json',
+            responseHeader: 'Location',
             errors: {
                 400: `Bad Request`,
                 404: `Not Found`,
@@ -87,10 +88,10 @@ requestBody?: DictionaryItemCreateModel,
      * @throws ApiError
      */
     public static deleteDictionaryByKey({
-key,
-}: {
-key: string,
-}): CancelablePromise<any> {
+        key,
+    }: {
+        key: string,
+    }): CancelablePromise<any> {
         return __request(OpenAPI, {
             method: 'DELETE',
             url: '/umbraco/management/api/v1/dictionary/{key}',
@@ -109,12 +110,12 @@ key: string,
      * @throws ApiError
      */
     public static putDictionaryByKey({
-key,
-requestBody,
-}: {
-key: string,
-requestBody?: DictionaryItemUpdateModel,
-}): CancelablePromise<any> {
+        key,
+        requestBody,
+    }: {
+        key: string,
+        requestBody?: DictionaryItemUpdateModel,
+    }): CancelablePromise<any> {
         return __request(OpenAPI, {
             method: 'PUT',
             url: '/umbraco/management/api/v1/dictionary/{key}',
@@ -183,19 +184,20 @@ requestBody?: DictionaryItemUpdateModel,
     }
 
     /**
-     * @returns any Created
+     * @returns string Created
      * @throws ApiError
      */
     public static postDictionaryImport({
         requestBody,
     }: {
         requestBody?: DictionaryImportModel,
-    }): CancelablePromise<any> {
+    }): CancelablePromise<string> {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/umbraco/management/api/v1/dictionary/import',
             body: requestBody,
             mediaType: 'application/json',
+            responseHeader: 'Location',
             errors: {
                 400: `Bad Request`,
                 404: `Not Found`,

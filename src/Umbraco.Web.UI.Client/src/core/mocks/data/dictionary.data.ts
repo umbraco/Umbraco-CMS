@@ -5,6 +5,7 @@ import type { DictionaryDetails } from '@umbraco-cms/models';
 
 export const data: Array<DictionaryDetails> = [
 	{
+		$type: '',
 		parentKey: null,
 		name: 'Hello',
 		key: 'aae7d0ab-53ba-485d-b8bd-12537f9925cb',
@@ -12,16 +13,19 @@ export const data: Array<DictionaryDetails> = [
 		type: 'dictionary-item',
 		isContainer: false,
 		icon: 'umb:book-alt',
-		translations: [{
-			isoCode: 'en',
-			translation: 'hello in en-US'
-		},
-		{
-			isoCode: 'fr',
-			translation: '',
-		}],
+		translations: [
+			{
+				isoCode: 'en',
+				translation: 'hello in en-US',
+			},
+			{
+				isoCode: 'fr',
+				translation: '',
+			},
+		],
 	},
 	{
+		$type: '',
 		parentKey: 'aae7d0ab-53ba-485d-b8bd-12537f9925cb',
 		name: 'Hello again',
 		key: 'bbe7d0ab-53bb-485d-b8bd-12537f9925cb',
@@ -29,14 +33,16 @@ export const data: Array<DictionaryDetails> = [
 		type: 'dictionary-item',
 		isContainer: false,
 		icon: 'umb:book-alt',
-		translations: [{
-			isoCode: 'en',
-			translation: 'Hello again in en-US'
-		},
-		{
-			isoCode: 'fr',
-			translation: 'Hello in fr'
-		}],
+		translations: [
+			{
+				isoCode: 'en',
+				translation: 'Hello again in en-US',
+			},
+			{
+				isoCode: 'fr',
+				translation: 'Hello in fr',
+			},
+		],
 	},
 ];
 

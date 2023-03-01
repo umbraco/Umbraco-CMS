@@ -5,3 +5,4 @@
 export type SearcherModel = {
     name?: string;
 };
+

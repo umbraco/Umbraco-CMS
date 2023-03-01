@@ -8,7 +8,7 @@ import { UmbLitElement } from '@umbraco-cms/element';
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-api';
 import { UmbExecutedEvent } from '@umbraco-cms/events';
 
-import '../entity-bulk-actions/entity-bulk-action.element';
+import '../components/entity-bulk-action/entity-bulk-action.element';
 
 @customElement('umb-collection-selection-actions')
 export class UmbCollectionSelectionActionsElement extends UmbLitElement {

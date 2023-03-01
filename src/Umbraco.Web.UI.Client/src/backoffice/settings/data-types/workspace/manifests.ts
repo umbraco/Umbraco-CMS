@@ -1,3 +1,4 @@
+import { UmbSaveWorkspaceAction } from '@umbraco-cms/workspace';
 import type { ManifestWorkspace, ManifestWorkspaceAction, ManifestWorkspaceView } from '@umbraco-cms/models';
 
 const workspace: ManifestWorkspace = {
@@ -44,12 +45,12 @@ const workspaceActions: Array<ManifestWorkspaceAction> = [
 		type: 'workspaceAction',
 		alias: 'Umb.WorkspaceAction.DataType.Save',
 		name: 'Save Data Type Workspace Action',
-		loader: () =>
-			import('src/backoffice/shared/components/workspace/workspace-action/save/workspace-action-node-save.element'),
 		meta: {
 			workspaces: ['Umb.Workspace.DataType'],
+			label: 'Save',
 			look: 'primary',
 			color: 'positive',
+			api: UmbSaveWorkspaceAction,
 		},
 	},
 ];

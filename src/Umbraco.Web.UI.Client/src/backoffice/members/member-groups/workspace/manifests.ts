@@ -1,5 +1,5 @@
 import { MEMBER_GROUP_REPOSITORY_ALIAS } from '../repository/manifests';
-import { UmbSaveWorkspaceAction } from '../../../shared/workspace-actions/save.action';
+import { UmbSaveWorkspaceAction } from '@umbraco-cms/workspace';
 import type { ManifestWorkspace, ManifestWorkspaceAction, ManifestWorkspaceView } from '@umbraco-cms/models';
 
 const workspace: ManifestWorkspace = {
@@ -38,7 +38,6 @@ const workspaceActions: Array<ManifestWorkspaceAction> = [
 			label: 'Save',
 			look: 'primary',
 			color: 'positive',
-			repositoryAlias: MEMBER_GROUP_REPOSITORY_ALIAS,
 			api: UmbSaveWorkspaceAction,
 		},
 	},

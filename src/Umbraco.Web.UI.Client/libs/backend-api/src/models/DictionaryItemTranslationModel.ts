@@ -6,3 +6,4 @@ export type DictionaryItemTranslationModel = {
     isoCode?: string;
     translation?: string;
 };
+

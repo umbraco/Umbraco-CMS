@@ -1,4 +1,5 @@
 import { manifests as settingsSectionManifests } from './section.manifests';
+import { manifests as settingsMenuManifests } from './menu.manifests';
 import { manifests as dashboardManifests } from './dashboards/manifests';
 import { manifests as dataTypeManifests } from './data-types/manifests';
 import { manifests as extensionManifests } from './extensions/manifests';
@@ -18,6 +19,7 @@ const registerExtensions = (manifests: Array<ManifestTypes>) => {
 
 registerExtensions([
 	...settingsSectionManifests,
+	...settingsMenuManifests,
 	...dashboardManifests,
 	...dataTypeManifests,
 	...extensionManifests,

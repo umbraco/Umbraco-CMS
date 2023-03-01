@@ -7,20 +7,15 @@ import type { MediaTypeDetails } from '@umbraco-cms/models';
 
 type EntityType = MediaTypeDetails;
 export class UmbWorkspaceMediaTypeContext
-	extends UmbWorkspaceContext
+	extends UmbWorkspaceContext<UmbMediaTypeRepository>
 	implements UmbWorkspaceEntityContextInterface<EntityType | undefined>
 {
-	#host: UmbControllerHostInterface;
-	#repo: UmbMediaTypeRepository;
-
 	#data = new ObjectState<MediaTypeDetails | undefined>(undefined);
 	data = this.#data.asObservable();
 	name = this.#data.getObservablePart((data) => data?.name);
 
 	constructor(host: UmbControllerHostInterface) {
-		super(host);
-		this.#host = host;
-		this.#repo = new UmbMediaTypeRepository(this.#host);
+		super(host, new UmbMediaTypeRepository(host));
 	}
 
 	getData() {
@@ -44,14 +39,14 @@ export class UmbWorkspaceMediaTypeContext
 	}
 
 	async load(entityKey: string) {
-		const { data } = await this.#repo.requestDetails(entityKey);
+		const { data } = await this.repository.requestDetails(entityKey);
 		if (data) {
 			this.#data.next(data);
 		}
 	}
 
 	async createScaffold() {
-		const { data } = await this.#repo.createScaffold();
+		const { data } = await this.repository.createScaffold();
 		if (!data) return;
 		this.setIsNew(true);
 		this.#data.next(data);
@@ -59,7 +54,7 @@ export class UmbWorkspaceMediaTypeContext
 
 	async save() {
 		if (!this.#data.value) return;
-		await this.#repo.save(this.#data.value);
+		await this.repository.save(this.#data.value);
 		this.setIsNew(false);
 	}
 

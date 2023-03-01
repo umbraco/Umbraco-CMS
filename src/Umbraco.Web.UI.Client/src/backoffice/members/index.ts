@@ -1,4 +1,5 @@
 import { manifests as memberSectionManifests } from './section.manifests';
+import { manifests as menuSectionManifests } from './menu.manifests';
 import { manifests as memberGroupManifests } from './member-groups/manifests';
 import { manifests as memberTypeManifests } from './member-types/manifests';
 import { manifests as memberManifests } from './members/manifests';
@@ -13,4 +14,10 @@ const registerExtensions = (manifests: Array<ManifestTypes>) => {
 	});
 };
 
-registerExtensions([...memberSectionManifests, ...memberGroupManifests, ...memberTypeManifests, ...memberManifests]);
+registerExtensions([
+	...memberSectionManifests,
+	...menuSectionManifests,
+	...memberGroupManifests,
+	...memberTypeManifests,
+	...memberManifests,
+]);

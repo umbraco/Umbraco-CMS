@@ -5,6 +5,7 @@ import type { EntityTreeItemModel, PagedEntityTreeItemModel } from '@umbraco-cms
 
 export const data: Array<MemberDetails> = [
 	{
+		$type: '',
 		name: 'Member AAA',
 		type: 'member',
 		icon: 'umb:user',
