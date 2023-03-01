@@ -199,9 +199,10 @@ export class UmbSectionElement extends UmbLitElement {
 		return html`
 			${this._menus && this._menus.length > 0
 				? html`
+						<!-- TODO: these extensions should be combined into one type: sectionSidebarApp with a "subtype" -->
 						<umb-section-sidebar>
 							<umb-extension-slot
-								type="sectionSidebarItem"
+								type="sectionSidebarApp"
 								.filter=${(items: ManifestSectionSidebarMenu) =>
 									items.meta.sections.includes(this._sectionAlias || '')}></umb-extension-slot>
 

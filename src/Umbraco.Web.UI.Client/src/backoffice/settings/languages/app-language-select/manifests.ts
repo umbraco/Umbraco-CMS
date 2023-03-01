@@ -1,8 +1,8 @@
-import { ManifestSectionSidebarItem } from '@umbraco-cms/extensions-registry';
+import { ManifestSectionSidebarApp } from '@umbraco-cms/extensions-registry';
 
-const entityActions: Array<ManifestSectionSidebarItem> = [
+const entityActions: Array<ManifestSectionSidebarApp> = [
 	{
-		type: 'sectionSidebarItem',
+		type: 'sectionSidebarApp',
 		alias: 'Umb.SectionSidebarItem.LanguageSelect',
 		name: 'App Language Select Section Sidebar Item',
 		loader: () => import('./app-language-select.element'),

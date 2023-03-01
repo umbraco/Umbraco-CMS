@@ -1,10 +1,10 @@
 import type { ManifestElement } from './models';
 
-export interface ManifestSectionSidebarItem extends ManifestElement {
-	type: 'sectionSidebarItem';
-	meta: MetaSectionSidebarItem;
+export interface ManifestSectionSidebarApp extends ManifestElement {
+	type: 'sectionSidebarApp';
+	meta: MetaSectionSidebarApp;
 }
 
-export interface MetaSectionSidebarItem {
+export interface MetaSectionSidebarApp {
 	sections: Array<string>;
 }
