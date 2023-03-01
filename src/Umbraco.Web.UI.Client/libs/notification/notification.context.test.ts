@@ -1,12 +1,12 @@
 import { expect } from '@open-wc/testing';
 
-import { UmbNotificationHandler, UmbNotificationService } from '.';
+import { UmbNotificationHandler, UmbNotificationContext } from '.';
 
 describe('UCPNotificationService', () => {
-	let notificationService: UmbNotificationService;
+	let notificationService: UmbNotificationContext;
 
 	beforeEach(async () => {
-		notificationService = new UmbNotificationService();
+		notificationService = new UmbNotificationContext();
 	});
 
 	describe('Public API', () => {

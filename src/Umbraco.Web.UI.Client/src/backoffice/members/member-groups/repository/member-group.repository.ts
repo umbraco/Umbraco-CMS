@@ -3,7 +3,7 @@ import { UmbMemberGroupDetailServerDataSource } from './sources/member-group.det
 import { UmbMemberGroupDetailStore, UMB_MEMBER_GROUP_DETAIL_STORE_CONTEXT_TOKEN } from './member-group.detail.store';
 import { MemberGroupTreeServerDataSource } from './sources/member-group.tree.server.data';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
-import { UmbNotificationService, UMB_NOTIFICATION_SERVICE_CONTEXT_TOKEN } from '@umbraco-cms/notification';
+import { UmbNotificationContext, UMB_NOTIFICATION_SERVICE_CONTEXT_TOKEN } from '@umbraco-cms/notification';
 import { UmbContextConsumerController } from '@umbraco-cms/context-api';
 import type { MemberGroupDetails } from '@umbraco-cms/models';
 import { ProblemDetailsModel } from '@umbraco-cms/backend-api';
@@ -21,7 +21,7 @@ export class UmbMemberGroupRepository implements UmbTreeRepository, UmbDetailRep
 	#detailSource: UmbMemberGroupDetailServerDataSource;
 	#detailStore?: UmbMemberGroupDetailStore;
 
-	#notificationService?: UmbNotificationService;
+	#notificationService?: UmbNotificationContext;
 
 	constructor(host: UmbControllerHostInterface) {
 		this.#host = host;

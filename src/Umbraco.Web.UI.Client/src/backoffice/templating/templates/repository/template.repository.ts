@@ -6,7 +6,7 @@ import {
 } from '../workspace/data/template.detail.store';
 import { UmbTemplateTreeStore, UMB_TEMPLATE_TREE_STORE_CONTEXT_TOKEN } from '../tree/data/template.tree.store';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
-import { UmbNotificationService, UMB_NOTIFICATION_SERVICE_CONTEXT_TOKEN } from '@umbraco-cms/notification';
+import { UmbNotificationContext, UMB_NOTIFICATION_SERVICE_CONTEXT_TOKEN } from '@umbraco-cms/notification';
 import { UmbContextConsumerController } from '@umbraco-cms/context-api';
 import { ProblemDetailsModel, TemplateModel } from '@umbraco-cms/backend-api';
 import { UmbDetailRepository } from 'libs/repository/detail-repository.interface';
@@ -26,7 +26,7 @@ export class UmbTemplateRepository implements UmbTreeRepository, UmbDetailReposi
 	#treeStore?: UmbTemplateTreeStore;
 	#detailStore?: UmbTemplateDetailStore;
 
-	#notificationService?: UmbNotificationService;
+	#notificationService?: UmbNotificationContext;
 
 	constructor(host: UmbControllerHostInterface) {
 		this.#host = host;

@@ -4,7 +4,7 @@ import { UmbTemplateDetailServerDataSource } from './sources/template.detail.ser
 import type { ProblemDetailsModel, TemplateModel } from '@umbraco-cms/backend-api';
 import { UmbContextConsumerController } from '@umbraco-cms/context-api';
 import type { UmbControllerHostInterface } from '@umbraco-cms/controller';
-import { UmbNotificationService, UMB_NOTIFICATION_SERVICE_CONTEXT_TOKEN } from '@umbraco-cms/notification';
+import { UmbNotificationContext, UMB_NOTIFICATION_SERVICE_CONTEXT_TOKEN } from '@umbraco-cms/notification';
 
 // Move to documentation / JSdoc
 /* We need to create a new instance of the repository from within the element context. We want the notifications to be displayed in the right context. */
@@ -15,7 +15,7 @@ export class UmbTemplateDetailRepository {
 	#dataSource: UmbTemplateDetailServerDataSource;
 	#detailStore?: UmbTemplateDetailStore;
 	#treeStore?: UmbTemplateTreeStore;
-	#notificationService?: UmbNotificationService;
+	#notificationService?: UmbNotificationContext;
 	#initResolver?: () => void;
 	#initialized = false;
 

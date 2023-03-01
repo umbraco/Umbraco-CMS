@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import {
 	UmbNotificationOptions,
-	UmbNotificationService,
+	UmbNotificationContext,
 	UmbNotificationDefaultData,
 	UMB_NOTIFICATION_SERVICE_CONTEXT_TOKEN,
 } from '@umbraco-cms/notification';
@@ -13,7 +13,7 @@ import type { DataSourceResponse } from '@umbraco-cms/models';
 export class UmbResourceController extends UmbController {
 	#promise: Promise<any>;
 
-	#notificationService?: UmbNotificationService;
+	#notificationService?: UmbNotificationContext;
 
 	constructor(host: UmbControllerHostInterface, promise: Promise<any>, alias?: string) {
 		super(host, alias);

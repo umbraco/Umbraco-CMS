@@ -6,7 +6,7 @@ import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 import { UmbContextConsumerController } from '@umbraco-cms/context-api';
 import { RepositoryTreeDataSource, UmbDetailRepository, UmbTreeRepository } from '@umbraco-cms/repository';
 import { ProblemDetailsModel } from '@umbraco-cms/backend-api';
-import { UmbNotificationService, UMB_NOTIFICATION_SERVICE_CONTEXT_TOKEN } from '@umbraco-cms/notification';
+import { UmbNotificationContext, UMB_NOTIFICATION_SERVICE_CONTEXT_TOKEN } from '@umbraco-cms/notification';
 import type { DictionaryDetails } from '@umbraco-cms/models';
 
 export class UmbDictionaryRepository implements UmbTreeRepository, UmbDetailRepository<DictionaryDetails> {
@@ -20,7 +20,7 @@ export class UmbDictionaryRepository implements UmbTreeRepository, UmbDetailRepo
 	#detailSource: UmbDictionaryDetailServerDataSource;
 	#detailStore?: UmbDictionaryDetailStore;
 
-	#notificationService?: UmbNotificationService;
+	#notificationService?: UmbNotificationContext;
 
 	constructor(host: UmbControllerHostInterface) {
 		this.#host = host;

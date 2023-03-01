@@ -8,7 +8,7 @@ import { UmbUserStore, UMB_USER_STORE_CONTEXT_TOKEN } from '../../../users/user.
 import type { UserDetails } from '@umbraco-cms/models';
 import {
 	UmbNotificationDefaultData,
-	UmbNotificationService,
+	UmbNotificationContext,
 	UMB_NOTIFICATION_SERVICE_CONTEXT_TOKEN,
 } from '@umbraco-cms/notification';
 
@@ -61,7 +61,7 @@ export class UmbWorkspaceViewUsersCreateElement extends UmbModalLayoutElement {
 	private _createdUser?: UserDetails;
 
 	protected _userStore?: UmbUserStore;
-	private _notificationService?: UmbNotificationService;
+	private _notificationService?: UmbNotificationContext;
 
 	connectedCallback(): void {
 		super.connectedCallback();

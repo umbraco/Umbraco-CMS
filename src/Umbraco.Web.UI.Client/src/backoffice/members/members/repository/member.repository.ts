@@ -1,7 +1,7 @@
 import { UmbMemberTreeStore, UMB_MEMBER_TREE_STORE_CONTEXT_TOKEN } from './member.tree.store';
 import { MemberTreeServerDataSource } from './sources/member.tree.server.data';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
-import { UmbNotificationService, UMB_NOTIFICATION_SERVICE_CONTEXT_TOKEN } from '@umbraco-cms/notification';
+import { UmbNotificationContext, UMB_NOTIFICATION_SERVICE_CONTEXT_TOKEN } from '@umbraco-cms/notification';
 import { UmbContextConsumerController } from '@umbraco-cms/context-api';
 import { UmbTreeRepository } from '@umbraco-cms/repository';
 import { ProblemDetailsModel } from '@umbraco-cms/backend-api';
@@ -10,7 +10,7 @@ export class UmbMemberRepository implements UmbTreeRepository {
 	#host: UmbControllerHostInterface;
 	#dataSource: MemberTreeServerDataSource;
 	#treeStore?: UmbMemberTreeStore;
-	#notificationService?: UmbNotificationService;
+	#notificationService?: UmbNotificationContext;
 	#initResolver?: () => void;
 	#initialized = false;
 

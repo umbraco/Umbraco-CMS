@@ -6,7 +6,7 @@ import { ProblemDetailsModel } from '@umbraco-cms/backend-api';
 import { UmbContextConsumerController } from '@umbraco-cms/context-api';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 import type { MediaTypeDetails } from '@umbraco-cms/models';
-import { UmbNotificationService, UMB_NOTIFICATION_SERVICE_CONTEXT_TOKEN } from '@umbraco-cms/notification';
+import { UmbNotificationContext, UMB_NOTIFICATION_SERVICE_CONTEXT_TOKEN } from '@umbraco-cms/notification';
 import { UmbTreeRepository, RepositoryTreeDataSource } from '@umbraco-cms/repository';
 
 export class UmbMediaTypeRepository implements UmbTreeRepository {
@@ -20,7 +20,7 @@ export class UmbMediaTypeRepository implements UmbTreeRepository {
 	#detailSource: UmbMediaTypeDetailServerDataSource;
 	#detailStore?: UmbMediaTypeDetailStore;
 
-	#notificationService?: UmbNotificationService;
+	#notificationService?: UmbNotificationContext;
 
 	constructor(host: UmbControllerHostInterface) {
 		this.#host = host;

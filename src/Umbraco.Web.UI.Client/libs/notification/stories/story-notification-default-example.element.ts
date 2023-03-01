@@ -4,15 +4,14 @@ import { UmbNotificationDefaultData } from '../layouts/default';
 import {
 	UmbNotificationColor,
 	UmbNotificationOptions,
-	UmbNotificationService,
-	UMB_NOTIFICATION_SERVICE_CONTEXT_TOKEN
+	UmbNotificationContext,
+	UMB_NOTIFICATION_SERVICE_CONTEXT_TOKEN,
 } from '..';
 import { UmbLitElement } from '@umbraco-cms/element';
 
-
 @customElement('story-notification-default-example')
 export class StoryNotificationDefaultExampleElement extends UmbLitElement {
-	private _notificationService?: UmbNotificationService;
+	private _notificationService?: UmbNotificationContext;
 
 	connectedCallback(): void {
 		super.connectedCallback();

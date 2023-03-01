@@ -2,7 +2,7 @@ import { UmbLanguageServerDataSource } from './sources/language.server.data';
 import { UmbLanguageStore, UMB_LANGUAGE_STORE_CONTEXT_TOKEN } from './language.store';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 import { UmbContextConsumerController } from '@umbraco-cms/context-api';
-import { UmbNotificationService, UMB_NOTIFICATION_SERVICE_CONTEXT_TOKEN } from '@umbraco-cms/notification';
+import { UmbNotificationContext, UMB_NOTIFICATION_SERVICE_CONTEXT_TOKEN } from '@umbraco-cms/notification';
 import { LanguageModel, ProblemDetailsModel } from '@umbraco-cms/backend-api';
 
 export class UmbLanguageRepository {
@@ -13,7 +13,7 @@ export class UmbLanguageRepository {
 	#dataSource: UmbLanguageServerDataSource;
 	#languageStore?: UmbLanguageStore;
 
-	#notificationService?: UmbNotificationService;
+	#notificationService?: UmbNotificationContext;
 
 	constructor(host: UmbControllerHostInterface) {
 		this.#host = host;

@@ -1,7 +1,7 @@
 import { UmbCultureServerDataSource } from './sources/culture.server.data';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 import { UmbContextConsumerController } from '@umbraco-cms/context-api';
-import { UmbNotificationService, UMB_NOTIFICATION_SERVICE_CONTEXT_TOKEN } from '@umbraco-cms/notification';
+import { UmbNotificationContext, UMB_NOTIFICATION_SERVICE_CONTEXT_TOKEN } from '@umbraco-cms/notification';
 
 export class UmbCultureRepository {
 	#init!: Promise<unknown>;
@@ -9,7 +9,7 @@ export class UmbCultureRepository {
 
 	#dataSource: UmbCultureServerDataSource;
 
-	#notificationService?: UmbNotificationService;
+	#notificationService?: UmbNotificationContext;
 
 	constructor(host: UmbControllerHostInterface) {
 		this.#host = host;

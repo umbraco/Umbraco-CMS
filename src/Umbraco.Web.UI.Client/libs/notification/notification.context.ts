@@ -18,7 +18,7 @@ export interface UmbNotificationOptions<UmbNotificationData> {
 
 export type UmbNotificationColor = '' | 'default' | 'positive' | 'warning' | 'danger';
 
-export class UmbNotificationService {
+export class UmbNotificationContext {
 	// Notice this cannot use UniqueBehaviorSubject as it holds a HTML Element. which cannot be Serialized to JSON (it has some circular references)
 	private _notifications = new BehaviorSubject(<Array<UmbNotificationHandler>>[]);
 	public readonly notifications = this._notifications.asObservable();
@@ -27,7 +27,7 @@ export class UmbNotificationService {
 	 * @private
 	 * @param {UmbNotificationOptions<UmbNotificationData>} options
 	 * @return {*}  {UmbNotificationHandler}
-	 * @memberof UmbNotificationService
+	 * @memberof UmbNotificationContext
 	 */
 	private _open(options: UmbNotificationOptions<UmbNotificationData>): UmbNotificationHandler {
 		const notificationHandler = new UmbNotificationHandler(options);
@@ -41,7 +41,7 @@ export class UmbNotificationService {
 	/**
 	 * @private
 	 * @param {string} key
-	 * @memberof UmbNotificationService
+	 * @memberof UmbNotificationContext
 	 */
 	private _close(key: string) {
 		this._notifications.next(this._notifications.getValue().filter((notification) => notification.key !== key));
@@ -50,7 +50,7 @@ export class UmbNotificationService {
 	/**
 	 * @private
 	 * @param {string} key
-	 * @memberof UmbNotificationService
+	 * @memberof UmbNotificationContext
 	 */
 	private _handleClosed(notificationHandler: UmbNotificationHandler) {
 		notificationHandler.element.removeEventListener('closed', () => this._handleClosed(notificationHandler));
@@ -62,7 +62,7 @@ export class UmbNotificationService {
 	 * @param {UmbNotificationColor} color
 	 * @param {UmbNotificationOptions<UmbNotificationData>} options
 	 * @return {*}
-	 * @memberof UmbNotificationService
+	 * @memberof UmbNotificationContext
 	 */
 	public peek(
 		color: UmbNotificationColor,
@@ -76,7 +76,7 @@ export class UmbNotificationService {
 	 * @param {UmbNotificationColor} color
 	 * @param {UmbNotificationOptions<UmbNotificationData>} options
 	 * @return {*}
-	 * @memberof UmbNotificationService
+	 * @memberof UmbNotificationContext
 	 */
 	public stay(
 		color: UmbNotificationColor,
@@ -86,6 +86,6 @@ export class UmbNotificationService {
 	}
 }
 
-export const UMB_NOTIFICATION_SERVICE_CONTEXT_TOKEN = new UmbContextToken<UmbNotificationService>(
-	UmbNotificationService.name
+export const UMB_NOTIFICATION_SERVICE_CONTEXT_TOKEN = new UmbContextToken<UmbNotificationContext>(
+	UmbNotificationContext.name
 );

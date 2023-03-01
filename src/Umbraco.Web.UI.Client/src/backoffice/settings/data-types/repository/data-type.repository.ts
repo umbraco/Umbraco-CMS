@@ -8,7 +8,7 @@ import { UmbContextConsumerController } from '@umbraco-cms/context-api';
 import { ProblemDetailsModel, DataTypeModel } from '@umbraco-cms/backend-api';
 import type { UmbTreeRepository } from 'libs/repository/tree-repository.interface';
 import { UmbDetailRepository } from '@umbraco-cms/repository';
-import { UmbNotificationService, UMB_NOTIFICATION_SERVICE_CONTEXT_TOKEN } from '@umbraco-cms/notification';
+import { UmbNotificationContext, UMB_NOTIFICATION_SERVICE_CONTEXT_TOKEN } from '@umbraco-cms/notification';
 
 type ItemType = DataTypeModel;
 
@@ -27,7 +27,7 @@ export class UmbDataTypeRepository implements UmbTreeRepository, UmbDetailReposi
 	#detailDataSource: UmbDataTypeServerDataSource;
 	#detailStore?: UmbDataTypeStore;
 
-	#notificationService?: UmbNotificationService;
+	#notificationService?: UmbNotificationContext;
 
 	constructor(host: UmbControllerHostInterface) {
 		this.#host = host;

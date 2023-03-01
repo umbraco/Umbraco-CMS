@@ -3,14 +3,14 @@ import '../layouts/default';
 import { Meta, Story } from '@storybook/web-components';
 import { html } from 'lit';
 
-import { UmbNotificationService } from '..';
+import { UmbNotificationContext } from '..';
 
 export default {
 	title: 'API/Notifications/Overview',
 	component: 'ucp-notification-layout-default',
 	decorators: [
 		(story) =>
-			html`<umb-context-provider key="umbNotificationService" .value=${new UmbNotificationService()}>
+			html`<umb-context-provider key="umbNotificationService" .value=${new UmbNotificationContext()}>
 				${story()}
 			</umb-context-provider>`,
 	],

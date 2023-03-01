@@ -1,28 +1,29 @@
 import { v4 as uuidv4 } from 'uuid';
-import { UmbContextConsumerController, UmbContextToken } from "@umbraco-cms/context-api";
-import { UmbControllerHostInterface } from "@umbraco-cms/controller";
-import { UmbNotificationDefaultData, UmbNotificationService, UMB_NOTIFICATION_SERVICE_CONTEXT_TOKEN } from "@umbraco-cms/notification";
-import { ObjectState, UmbObserverController } from "@umbraco-cms/observable-api";
+import { UmbContextConsumerController, UmbContextToken } from '@umbraco-cms/context-api';
+import { UmbControllerHostInterface } from '@umbraco-cms/controller';
+import {
+	UmbNotificationDefaultData,
+	UmbNotificationContext,
+	UMB_NOTIFICATION_SERVICE_CONTEXT_TOKEN,
+} from '@umbraco-cms/notification';
+import { ObjectState, UmbObserverController } from '@umbraco-cms/observable-api';
 import type { EntityTreeItemModel } from '@umbraco-cms/backend-api';
 import { UmbEntityDetailStore } from '@umbraco-cms/store';
 
-
 // Extend entityType base type?, so we are sure to have parentKey?
 // TODO: switch to use EntityDetailItem ? if we can have such type?
-export class UmbEntityWorkspaceManager<StoreType extends UmbEntityDetailStore<EntityDetailsType>, EntityDetailsType extends EntityTreeItemModel = ReturnType<StoreType['getScaffold']>> {
-
-
+export class UmbEntityWorkspaceManager<
+	StoreType extends UmbEntityDetailStore<EntityDetailsType>,
+	EntityDetailsType extends EntityTreeItemModel = ReturnType<StoreType['getScaffold']>
+> {
 	private _host;
 
 	state = new ObjectState<EntityDetailsType | undefined>(undefined);
 
-
-
 	protected _storeSubscription?: UmbObserverController;
 
-	private _notificationService?: UmbNotificationService;
+	private _notificationService?: UmbNotificationContext;
 	private _store?: StoreType;
-
 
 	#isNew = false;
 	private _entityType;
@@ -30,12 +31,7 @@ export class UmbEntityWorkspaceManager<StoreType extends UmbEntityDetailStore<En
 
 	private _createAtParentKey?: string | null;
 
-
-	constructor(
-		host: UmbControllerHostInterface,
-		entityType:string,
-		storeToken: UmbContextToken<StoreType>
-	) {
+	constructor(host: UmbControllerHostInterface, entityType: string, storeToken: UmbContextToken<StoreType>) {
 		this._host = host;
 		this._entityType = entityType;
 
@@ -73,33 +69,32 @@ export class UmbEntityWorkspaceManager<StoreType extends UmbEntityDetailStore<En
 
 	getEntityType = () => {
 		return this._entityType;
-	}
+	};
 	getEntityKey = (): string => {
 		return this._entityKey;
-	}
+	};
 
 	getStore = () => {
 		return this._store;
-	}
+	};
 
 	getData = () => {
 		return this.state.getValue();
-	}
+	};
 
 	load = (entityKey: string) => {
 		this.#isNew = false;
 		this._entityKey = entityKey;
 		this._observeStore();
-	}
+	};
 
 	create = (parentKey: string | null) => {
 		this.#isNew = true;
 		this._entityKey = uuidv4();
 		this._createAtParentKey = parentKey;
-	}
+	};
 
 	save = (): Promise<void> => {
-
 		if (!this._store) {
 			// TODO: add a more beautiful error:
 			console.error('Could not save cause workspace context has no store.');
@@ -107,7 +102,7 @@ export class UmbEntityWorkspaceManager<StoreType extends UmbEntityDetailStore<En
 		}
 
 		const documentData = this.getData();
-		if(!documentData) {
+		if (!documentData) {
 			console.error('Could not save cause workspace context has no data.');
 			return Promise.resolve();
 		}
@@ -122,12 +117,9 @@ export class UmbEntityWorkspaceManager<StoreType extends UmbEntityDetailStore<En
 				const data: UmbNotificationDefaultData = { message: 'Failed to save Document' };
 				this._notificationService?.peek('danger', { data });
 			});
-	}
-
+	};
 
 	public destroy = (): void => {
 		this.state.unsubscribe();
-	}
-
-
+	};
 }

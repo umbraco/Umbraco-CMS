@@ -9,7 +9,7 @@ import { ProblemDetailsModel } from '@umbraco-cms/backend-api';
 import type { UmbTreeRepository } from 'libs/repository/tree-repository.interface';
 import { UmbDetailRepository } from '@umbraco-cms/repository';
 import type { MediaDetails } from '@umbraco-cms/models';
-import { UmbNotificationService, UMB_NOTIFICATION_SERVICE_CONTEXT_TOKEN } from '@umbraco-cms/notification';
+import { UmbNotificationContext, UMB_NOTIFICATION_SERVICE_CONTEXT_TOKEN } from '@umbraco-cms/notification';
 
 type ItemDetailType = MediaDetails;
 
@@ -28,7 +28,7 @@ export class UmbMediaRepository implements UmbTreeRepository, UmbDetailRepositor
 	#detailDataSource: UmbMediaDetailServerDataSource;
 	#detailStore?: UmbMediaDetailStore;
 
-	#notificationService?: UmbNotificationService;
+	#notificationService?: UmbNotificationContext;
 
 	constructor(host: UmbControllerHostInterface) {
 		this.#host = host;
