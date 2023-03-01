@@ -480,10 +480,10 @@ export const data: Array<DataTypeModel & { type: 'data-type' }> = [
 				alias: 'hideLabel',
 				value: true,
 			},
-			{ alias: 'dimensions', value: { width: 400, height: 500 } },
+			{ alias: 'dimensions', value: { width: 800, height: 500 } },
 			{ alias: 'maxImageSize', value: 500 },
 			{ alias: 'mode', value: 'classic' },
-			{ alias: 'stylesheets', value: [] },
+			{ alias: 'stylesheets', value: ['/css/dropdownStyles.css'] },
 			{
 				alias: 'toolbar',
 				value: [
@@ -501,6 +501,7 @@ export const data: Array<DataTypeModel & { type: 'data-type' }> = [
 					'outdent',
 					'indent',
 					'link',
+					'table',
 					'umbmediapicker',
 					'umbmacro',
 					'umbembeddialog',
