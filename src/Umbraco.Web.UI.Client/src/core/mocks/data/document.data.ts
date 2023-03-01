@@ -23,7 +23,7 @@ export const data: Array<DocumentModel> = [
 				alias: 'richTextEditor',
 				culture: null,
 				segment: null,
-				value: null,
+				value: 'Some value for the RTE with an <a href="http://foo.com">external link</a> and an <a href="/{localLink:umb://document/c05da24d7740447b9cdcbd8ce2172e38}">internal link</a>',
 			},
 			{
 				alias: 'email',

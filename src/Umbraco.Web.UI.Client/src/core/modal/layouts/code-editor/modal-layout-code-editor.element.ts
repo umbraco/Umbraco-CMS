@@ -24,7 +24,7 @@ export class UmbModalLayoutCodeEditorElement extends UmbModalLayoutElement<UmbMo
 
 	render() {
 		return html`
-			<umb-workspace-layout .headline=${this.data?.headline ?? "Edit Source Code"}>
+			<umb-workspace-layout .headline=${this.data?.headline ?? "Edit source code"}>
 				<uui-code-block>${this.data?.content}</uui-code-block>
 				<div slot="actions">
 					<uui-button slot="actions" id="cancel" label="Cancel" @click="${this._handleCancel}">Cancel</uui-button>
