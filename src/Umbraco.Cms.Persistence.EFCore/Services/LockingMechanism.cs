@@ -1,12 +1,11 @@
 ﻿using Umbraco.Cms.Core.Collections;
 using Umbraco.Cms.Core.DistributedLocking;
-using Umbraco.Cms.Core.Exceptions;
-using Umbraco.Cms.Persistence.EFCore.Scoping;
 
 namespace Umbraco.Cms.Persistence.EFCore.Services;
 
 public class LockingMechanism : ILockingMechanism
 {
+    private readonly IDistributedLockingMechanismFactory _distributedLockingMechanismFactory;
     private readonly object _lockQueueLocker = new();
     private readonly object _dictionaryLocker = new();
     private StackQueue<(DistributedLockType lockType, TimeSpan timeout, Guid instanceId, int lockId)>? _queuedLocks;
@@ -16,11 +15,9 @@ public class LockingMechanism : ILockingMechanism
     private Dictionary<Guid, Dictionary<int, int>>? _writeLocksDictionary;
     private Queue<IDistributedLock>? _acquiredLocks;
 
-    private readonly EfCoreScopeProvider _efCoreScopeProvider;
-
-    public LockingMechanism(IEfCoreScopeProvider efCoreScopeProvider)
+    public LockingMechanism(IDistributedLockingMechanismFactory distributedLockingMechanismFactory)
     {
-        _efCoreScopeProvider = (EfCoreScopeProvider)efCoreScopeProvider;
+        _distributedLockingMechanismFactory = distributedLockingMechanismFactory;
         _acquiredLocks = new Queue<IDistributedLock>();
     }
 
@@ -71,9 +68,7 @@ public class LockingMechanism : ILockingMechanism
                 $"Cannot obtain a write lock as the {nameof(_acquiredLocks)} queue is null.");
         }
 
-        _acquiredLocks.Enqueue(
-            _efCoreScopeProvider.DistributedLockingMechanismFactory.DistributedLockingMechanism.WriteLock(lockId,
-                timeout));
+        _acquiredLocks.Enqueue(_distributedLockingMechanismFactory.DistributedLockingMechanism.WriteLock(lockId, timeout));
     }
 
     /// <summary>
@@ -116,8 +111,7 @@ public class LockingMechanism : ILockingMechanism
         }
 
         _acquiredLocks.Enqueue(
-            _efCoreScopeProvider.DistributedLockingMechanismFactory.DistributedLockingMechanism.ReadLock(lockId,
-                timeout));
+            _distributedLockingMechanismFactory.DistributedLockingMechanism.ReadLock(lockId, timeout));
     }
 
     /// <summary>

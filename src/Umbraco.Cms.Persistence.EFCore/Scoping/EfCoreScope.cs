@@ -1,5 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore.Storage;
-using Umbraco.Cms.Core.Collections;
 using Umbraco.Cms.Core.DistributedLocking;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Persistence.EFCore.Entities;
@@ -23,6 +22,7 @@ internal class EfCoreScope : IEfCoreScope
     public IScopeContext? ScopeContext { get; set; }
 
     public EfCoreScope(
+        IDistributedLockingMechanismFactory distributedLockingMechanismFactory,
         IUmbracoEfCoreDatabaseFactory efCoreDatabaseFactory,
         IEFCoreScopeAccessor efCoreScopeAccessor,
         IEfCoreScopeProvider efCoreScopeProvider,
@@ -32,18 +32,20 @@ internal class EfCoreScope : IEfCoreScope
         _efCoreScopeAccessor = efCoreScopeAccessor;
         _efCoreScopeProvider = (EfCoreScopeProvider)efCoreScopeProvider;
         InstanceId = Guid.NewGuid();
-        Locks = ParentScope is null ? new LockingMechanism(_efCoreScopeProvider) : ResolveLockingMechanism();
+        Locks = ParentScope is null ? new LockingMechanism(distributedLockingMechanismFactory) : ResolveLockingMechanism();
 
         ScopeContext = scopeContext;
     }
 
     public EfCoreScope(
+        IDistributedLockingMechanismFactory distributedLockingMechanismFactory,
         IUmbracoEfCoreDatabaseFactory efCoreDatabaseFactory,
         IEFCoreScopeAccessor efCoreScopeAccessor,
         IEfCoreScopeProvider efCoreScopeProvider,
         EfCoreScope parentScope,
         IScopeContext? scopeContext)
         : this(
+            distributedLockingMechanismFactory,
             efCoreDatabaseFactory,
             efCoreScopeAccessor,
             efCoreScopeProvider,
