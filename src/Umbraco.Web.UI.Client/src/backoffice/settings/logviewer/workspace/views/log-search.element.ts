@@ -217,6 +217,15 @@ export class UmbLogViewerSearchViewElement extends UmbLitElement {
 	#setQuery(event: Event) {
 		const target = event.target as UUIInputElement;
 		this._inputQuery = target.value as string;
+		this.#logViewerContext?.setFilterExpression(this._inputQuery);
+	}
+
+	#setQueryFromSavedSearch(query: string) {
+		this._inputQuery = query;
+		this.#logViewerContext?.setFilterExpression(query);
+		this.#logViewerContext?.getLogs();
+		this._savedSearchesPopover.open = false;
+
 	}
 
 	#clearQuery() {
@@ -252,7 +261,10 @@ export class UmbLogViewerSearchViewElement extends UmbLitElement {
 					${this._savedSearches.map(
 						(search) =>
 							html`<li class="saved-search-item">
-								<button label="Search for ${search.name}" class="saved-search-item-button">
+								<button
+									label="Search for ${search.name}"
+									class="saved-search-item-button"
+									@click=${() => this.#setQueryFromSavedSearch(search.query ?? '')}>
 									<span class="saved-search-item-name">${search.name}</span>
 									<span class="saved-search-item-query">${search.query}</span></button
 								><uui-button label="Remove saved search" color="danger"
