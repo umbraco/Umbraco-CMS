@@ -2,7 +2,7 @@
 
 namespace Umbraco.Cms.Persistence.EFCore.Services;
 
-public interface ILockingMechanism
+public interface ILockingMechanism : IDisposable
 {
     /// <summary>
     ///     Read-locks some lock objects.

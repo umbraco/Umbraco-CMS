@@ -1,8 +1,12 @@
 ﻿using Umbraco.Cms.Core.Collections;
 using Umbraco.Cms.Core.DistributedLocking;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Persistence.EFCore.Services;
 
+/// <summary>
+/// Mechanism for handling read and write locks
+/// </summary>
 public class LockingMechanism : ILockingMechanism
 {
     private readonly IDistributedLockingMechanismFactory _distributedLockingMechanismFactory;
@@ -74,7 +78,7 @@ public class LockingMechanism : ILockingMechanism
     /// <summary>
     ///     Handles acquiring a read lock, will delegate it to the parent if there are any.
     /// </summary>
-    /// <param name="scope">The scope requesting the lock.</param>
+    /// <param name="instanceId">The id of the scope requesting the lock.</param>
     /// <param name="timeout">Optional database timeout in milliseconds.</param>
     /// <param name="lockIds">Array of lock object identifiers.</param>
     private void EagerReadLockInner(Guid instanceId, TimeSpan? timeout, params int[] lockIds)
@@ -277,12 +281,14 @@ public class LockingMechanism : ILockingMechanism
                         switch (currentType)
                         {
                             case DistributedLockType.ReadLock:
-                                EagerReadLockInner(currentInstanceId,
+                                EagerReadLockInner(
+                                    currentInstanceId,
                                     currentTimeout == TimeSpan.Zero ? null : currentTimeout,
                                     collectedIds.ToArray());
                                 break;
                             case DistributedLockType.WriteLock:
-                                EagerWriteLockInner(currentInstanceId,
+                                EagerWriteLockInner(
+                                    currentInstanceId,
                                     currentTimeout == TimeSpan.Zero ? null : currentTimeout,
                                     collectedIds.ToArray());
                                 break;
@@ -303,15 +309,34 @@ public class LockingMechanism : ILockingMechanism
                 switch (currentType)
                 {
                     case DistributedLockType.ReadLock:
-                        EagerReadLockInner(currentInstanceId,
-                            currentTimeout == TimeSpan.Zero ? null : currentTimeout, collectedIds.ToArray());
+                        EagerReadLockInner(
+                            currentInstanceId,
+                            currentTimeout == TimeSpan.Zero ? null : currentTimeout,
+                            collectedIds.ToArray());
                         break;
                     case DistributedLockType.WriteLock:
-                        EagerWriteLockInner(currentInstanceId,
-                            currentTimeout == TimeSpan.Zero ? null : currentTimeout, collectedIds.ToArray());
+                        EagerWriteLockInner(
+                            currentInstanceId,
+                            currentTimeout == TimeSpan.Zero ? null : currentTimeout,
+                            collectedIds.ToArray());
                         break;
                 }
             }
+        }
+    }
+
+    public void Dispose()
+    {
+        while (!_acquiredLocks?.IsCollectionEmpty() ?? false)
+        {
+            _acquiredLocks?.Dequeue().Dispose();
+        }
+
+        // We're the parent scope, make sure that locks of all scopes has been cleared
+        // Since we're only reading we don't have to be in a lock
+        if (_readLocksDictionary?.Count > 0 || _writeLocksDictionary?.Count > 0)
+        {
+            throw new InvalidOperationException($"All scopes has not been disposed from parent scope.");
         }
     }
 }

@@ -1,5 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore.Storage;
+using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.DistributedLocking;
+using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Persistence.EFCore.Entities;
 using Umbraco.Cms.Persistence.EFCore.Services;
@@ -10,26 +12,28 @@ internal class EfCoreScope : IEfCoreScope
 {
     private readonly IUmbracoEfCoreDatabaseFactory _efCoreDatabaseFactory;
     private readonly IEFCoreScopeAccessor _efCoreScopeAccessor;
+    private readonly IEventAggregator _eventAggregator;
+    private IsolatedCaches? _isolatedCaches;
     private readonly EfCoreScopeProvider _efCoreScopeProvider;
     private IUmbracoEfCoreDatabase? _umbracoEfCoreDatabase;
+    private IScopedNotificationPublisher? _notificationPublisher;
+    private readonly RepositoryCacheMode _repositoryCacheMode;
     private bool? _completed;
     private bool _disposed;
-
-    public Guid InstanceId { get; }
-
-    public EfCoreScope? ParentScope { get; }
-
-    public IScopeContext? ScopeContext { get; set; }
 
     public EfCoreScope(
         IDistributedLockingMechanismFactory distributedLockingMechanismFactory,
         IUmbracoEfCoreDatabaseFactory efCoreDatabaseFactory,
         IEFCoreScopeAccessor efCoreScopeAccessor,
         IEfCoreScopeProvider efCoreScopeProvider,
-        IScopeContext? scopeContext)
+        IScopeContext? scopeContext,
+        IEventAggregator eventAggregator,
+        RepositoryCacheMode repositoryCacheMode = RepositoryCacheMode.Unspecified)
     {
         _efCoreDatabaseFactory = efCoreDatabaseFactory;
         _efCoreScopeAccessor = efCoreScopeAccessor;
+        _eventAggregator = eventAggregator;
+        _repositoryCacheMode = repositoryCacheMode;
         _efCoreScopeProvider = (EfCoreScopeProvider)efCoreScopeProvider;
         InstanceId = Guid.NewGuid();
         Locks = ParentScope is null ? new LockingMechanism(distributedLockingMechanismFactory) : ResolveLockingMechanism();
@@ -43,14 +47,86 @@ internal class EfCoreScope : IEfCoreScope
         IEFCoreScopeAccessor efCoreScopeAccessor,
         IEfCoreScopeProvider efCoreScopeProvider,
         EfCoreScope parentScope,
-        IScopeContext? scopeContext)
+        IScopeContext? scopeContext,
+        IEventAggregator eventAggregator,
+        RepositoryCacheMode repositoryCacheMode = RepositoryCacheMode.Unspecified)
         : this(
             distributedLockingMechanismFactory,
             efCoreDatabaseFactory,
             efCoreScopeAccessor,
             efCoreScopeProvider,
-            scopeContext) =>
+            scopeContext,
+            eventAggregator,
+            repositoryCacheMode) =>
         ParentScope = parentScope;
+
+    public Guid InstanceId { get; }
+
+    public EfCoreScope? ParentScope { get; }
+
+    public IScopeContext? ScopeContext { get; set; }
+
+    public ILockingMechanism Locks { get; }
+
+    public int Depth
+    {
+        get
+        {
+            if (ParentScope == null)
+            {
+                return 0;
+            }
+
+            return ParentScope.Depth + 1;
+        }
+    }
+
+    public IScopedNotificationPublisher Notifications
+    {
+        get
+        {
+            EnsureNotDisposed();
+            if (ParentScope != null)
+            {
+                return ParentScope.Notifications;
+            }
+
+            return _notificationPublisher ??= new ScopedNotificationPublisher(_eventAggregator);
+        }
+    }
+
+    public RepositoryCacheMode RepositoryCacheMode
+    {
+        get
+        {
+            if (_repositoryCacheMode != RepositoryCacheMode.Unspecified)
+            {
+                return _repositoryCacheMode;
+            }
+
+            if (ParentScope != null)
+            {
+                return ParentScope.RepositoryCacheMode;
+            }
+
+            return RepositoryCacheMode.Default;
+        }
+    }
+
+    public IsolatedCaches IsolatedCaches
+    {
+        get
+        {
+            if (ParentScope != null)
+            {
+                return ParentScope.IsolatedCaches;
+            }
+
+            return _isolatedCaches ??= new IsolatedCaches(_ => new DeepCloneAppCache(new ObjectCacheAppCache()));
+        }
+    }
+
+    private ILockingMechanism ResolveLockingMechanism() => ParentScope is not null ? ParentScope.ResolveLockingMechanism() : Locks;
 
     public async Task<T> ExecuteWithContextAsync<T>(Func<UmbracoEFContext, Task<T>> method)
     {
@@ -67,10 +143,6 @@ internal class EfCoreScope : IEfCoreScope
 
         return await method(_umbracoEfCoreDatabase!.UmbracoEFContext);
     }
-
-    public ILockingMechanism Locks { get; }
-
-    private ILockingMechanism ResolveLockingMechanism() => ParentScope is not null ? ParentScope.ResolveLockingMechanism() : Locks;
 
     public async Task ExecuteWithContextAsync<T>(Func<UmbracoEFContext, Task> method) =>
         await ExecuteWithContextAsync(async db =>
@@ -116,6 +188,21 @@ internal class EfCoreScope : IEfCoreScope
         HandleScopeContext();
 
         _disposed = true;
+    }
+
+    private void EnsureNotDisposed()
+    {
+        // We can't be disposed
+        if (_disposed)
+        {
+            throw new ObjectDisposedException($"The {nameof(IEfCoreScope)} with ID ({InstanceId}) is already disposed");
+        }
+
+        // And neither can our ancestors if we're trying to be disposed since
+        // a child must always be disposed before it's parent.
+        // This is a safety check, it's actually not entirely possible that a parent can be
+        // disposed before the child since that will end up with a "not the Ambient" exception.
+        ParentScope?.EnsureNotDisposed();
     }
 
     public void ChildCompleted(bool? completed)
