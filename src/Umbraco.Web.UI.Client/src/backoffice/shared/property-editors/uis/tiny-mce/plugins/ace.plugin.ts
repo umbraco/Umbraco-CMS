@@ -19,7 +19,7 @@ export class AcePlugin {
 	async #showCodeEditor() {
 		const modalHandler = this.#modalService?.codeEditor({
 			headline: 'Edit source code',
-			content: 'Pretend I am the value from the RTE displayed in a pretty code editor', //this.editor.getContent(),
+			content: this.editor.getContent(),
 		});
 
 		if (!modalHandler) return;

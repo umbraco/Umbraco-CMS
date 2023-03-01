@@ -1,16 +1,39 @@
 import { css, html } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, property } from 'lit/decorators.js';
-
+import { LinkPickerPlugin } from './plugins/linkpicker.plugin';
+import { AcePlugin } from './plugins/ace.plugin';
 import { UmbLitElement } from '@umbraco-cms/element';
 import { DataTypePropertyModel } from '@umbraco-cms/backend-api';
+
+/// TINY MCE
 import '@tinymce/tinymce-webcomponent';
-import { AcePlugin } from './plugins/ace.plugin';
+// import 'tinymce';
+// /* Default icons are required. After that, import custom icons if applicable */
+// import 'tinymce/icons/default';
+
+// /* Required TinyMCE components */
+// import 'tinymce/themes/silver';
+// import 'tinymce/models/dom';
+
+// /* Import a skin (can be a custom skin instead of the default) */
+// import 'tinymce/skins/ui/oxide/skin.css';
+
+// /* Import plugins */
+// import 'tinymce/plugins/advlist';
+// import 'tinymce/plugins/code';
+// import 'tinymce/plugins/emoticons';
+// import 'tinymce/plugins/emoticons/js/emojis';
+// import 'tinymce/plugins/link';
+// import 'tinymce/plugins/lists';
+// import 'tinymce/plugins/table';
+
 import { UmbModalService, UMB_MODAL_SERVICE_CONTEXT_TOKEN } from '@umbraco-cms/modal';
 
 declare global {
 	interface Window {
 		tinyConfig: any;
+		tinymce: any;
 	}
 }
 
@@ -59,8 +82,11 @@ export class UmbPropertyEditorUITinyMceElement extends UmbLitElement {
 	@property({ type: Array<string> })
 	private _stylesheets: Array<string> = [];
 
+	configuration?: Array<DataTypePropertyModel> = [];
+
 	@property({ type: Array, attribute: false })
 	public set config(config: Array<DataTypePropertyModel>) {
+		this.configuration = config;
 		this._dimensions = config.find((x) => x.alias === 'dimensions')?.value as { [key: string]: number };
 		this._toolbar = config.find((x) => x.alias === 'toolbar')?.value;
 		this._plugins = config.find((x) => x.alias === 'plugins')?.value.map((x: { [key: string]: string }) => x.name);
@@ -69,7 +95,7 @@ export class UmbPropertyEditorUITinyMceElement extends UmbLitElement {
 
 	// TODO => setup runs before rendering, here we can add any custom plugins
 	// TODO => fix TinyMCE type definitions
-	#setTinyConfig() {	
+	#setTinyConfig() {
 		window.tinyConfig = {
 			statusbar: false,
 			menubar: false,
@@ -78,6 +104,12 @@ export class UmbPropertyEditorUITinyMceElement extends UmbLitElement {
 			style_formats: this._styleFormats,
 			setup: (editor: any) => {
 				new AcePlugin(editor, this.modalService);
+				new LinkPickerPlugin(editor, this.modalService, this.configuration);
+
+				// TODO => the editor frame catches Ctrl+S and handles it with the system save dialog
+				// - we want to handle it in the content controller, so we'll emit an event instead
+				editor.addShortcut('Ctrl+S', '', () => window.dispatchEvent(new CustomEvent('rte.shortcut.save')));
+				editor.addShortcut('Ctrl+P', '', () => window.dispatchEvent(new CustomEvent('rte.shortcut.saveAndPublish')));
 			},
 		};
 	}
@@ -89,7 +121,7 @@ export class UmbPropertyEditorUITinyMceElement extends UmbLitElement {
 
 		this.consumeContext(UMB_MODAL_SERVICE_CONTEXT_TOKEN, (instance) => {
 			this.modalService = instance;
-            this.#setTinyConfig();
+			this.#setTinyConfig();
 		});
 	}
 
@@ -97,8 +129,8 @@ export class UmbPropertyEditorUITinyMceElement extends UmbLitElement {
 		return html`<div>
 			<tinymce-editor
 				config="tinyConfig"
-				width=${this._dimensions.width}
-				height=${this._dimensions.height}
+				width=${this._dimensions?.width ?? 600}
+				height=${this._dimensions?.height ?? 400}
 				plugins=${this._plugins.join(' ')}
 				toolbar=${this._toolbar.join(' ')}
 				content_css=${this._stylesheets.join(',')}
