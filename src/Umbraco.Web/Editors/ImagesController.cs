@@ -114,8 +114,6 @@ namespace Umbraco.Web.Editors
                 }
             }
 
-
-
             return false;
         }
     }
