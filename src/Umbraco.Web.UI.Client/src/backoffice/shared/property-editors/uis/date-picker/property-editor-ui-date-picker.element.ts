@@ -37,7 +37,7 @@ export class UmbPropertyEditorUIDatePickerElement extends UmbLitElement {
 		return undefined;
 	}
 
-	private updateValue(e: InputEvent) {
+	private _onInput(e: InputEvent) {
 		const dateField = e.target as HTMLInputElement;
 		this.value = dateField.value;
 		this.dispatchEvent(new UmbPropertyValueChangeEvent());
@@ -76,7 +76,7 @@ export class UmbPropertyEditorUIDatePickerElement extends UmbLitElement {
 
 	render() {
 		return html`
-			<uui-input .type=${this._inputType} @input=${this.updateValue} .value=${this._valueString} label="Pick a date or time"></uui-input>`;
+			<uui-input .type=${this._inputType} @input=${this._onInput} .value=${this._valueString} label="Pick a date or time"></uui-input>`;
 	}
 }
 
