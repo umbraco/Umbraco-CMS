@@ -1,5 +1,5 @@
-import { UmbEntityBulkActionBase } from '@umbraco-cms/entity-action';
 import type { UmbMediaRepository } from '../../repository/media.repository';
+import { UmbEntityBulkActionBase } from '@umbraco-cms/entity-action';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 import { UmbContextConsumerController } from '@umbraco-cms/context-api';
 import { UmbModalService, UMB_MODAL_SERVICE_CONTEXT_TOKEN } from '@umbraco-cms/modal';
