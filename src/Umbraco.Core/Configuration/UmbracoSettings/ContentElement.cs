@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Configuration;
 using Umbraco.Core.Macros;
 
@@ -34,6 +35,9 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
         [ConfigurationProperty("disallowedUploadFiles")]
         internal CommaDelimitedConfigurationElement DisallowedUploadFiles => GetOptionalDelimitedElement("disallowedUploadFiles", new[] {"ashx", "aspx", "ascx", "config", "cshtml", "vbhtml", "asmx", "air", "axd", "xamlx"});
 
+        [ConfigurationProperty("allowedMediaHosts")]
+        internal CommaDelimitedConfigurationElement AllowedMediaHosts => GetOptionalDelimitedElement("allowedMediaHosts", new string[0]);
+
         [ConfigurationProperty("allowedUploadFiles")]
         internal CommaDelimitedConfigurationElement AllowedUploadFiles => GetOptionalDelimitedElement("allowedUploadFiles", new string[0]);
 
@@ -48,6 +52,7 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
 
         [ConfigurationProperty("hideBackofficeLogo")]
         internal InnerTextConfigurationElement<bool> HideBackOfficeLogo => GetOptionalTextElement("hideBackofficeLogo", false);
+
 
         string IContentSection.NotificationEmailAddress => Notifications.NotificationEmailAddress;
 

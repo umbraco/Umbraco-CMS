@@ -6,10 +6,8 @@ using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.IO;
 using Umbraco.Core.Models;
-using Umbraco.Web.Media;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi;
-using Constants = Umbraco.Core.Constants;
 
 namespace Umbraco.Web.Editors
 {
@@ -62,18 +60,23 @@ namespace Umbraco.Web.Editors
         {
             var ext = Path.GetExtension(imagePath);
 
+            // check if imagePath is local to prevent open redirect
+            if (!IsAllowed(imagePath))
+            {
+                return Request.CreateResponse(HttpStatusCode.Unauthorized);
+            }
+
             // we need to check if it is an image by extension
             if (_contentSection.IsImageFile(ext) == false)
                 return Request.CreateResponse(HttpStatusCode.NotFound);
 
             //redirect to ImageProcessor thumbnail with rnd generated from last modified time of original media file
-            var response = Request.CreateResponse(HttpStatusCode.Found);
 
             DateTimeOffset? imageLastModified = null;
             try
             {
                 imageLastModified = _mediaFileSystem.GetLastModified(imagePath);
-                
+
             }
             catch (Exception)
             {
@@ -86,9 +89,34 @@ namespace Umbraco.Web.Editors
             var rnd = imageLastModified.HasValue ? $"&rnd={imageLastModified:yyyyMMddHHmmss}" : null;
             var imageUrl = _imageUrlGenerator.GetImageUrl(new ImageUrlGenerationOptions(imagePath) { UpScale = false, Width = width, AnimationProcessMode = "first", ImageCropMode = "max", CacheBusterValue = rnd });
 
+            var response = Request.CreateResponse(HttpStatusCode.Found);
             response.Headers.Location = new Uri(imageUrl, UriKind.RelativeOrAbsolute);
             return response;
         }
-        
+
+        private bool IsAllowed(string imagePath)
+        {
+            if(Uri.IsWellFormedUriString(imagePath, UriKind.Relative))
+            {
+                return true;
+            }
+
+            if (_contentSection is ContentElement contentElement)
+            {
+                var builder = new UriBuilder(imagePath);
+
+                foreach (var allowedMediaHost in contentElement.AllowedMediaHosts)
+                {
+                    if (string.Equals(builder.Host, allowedMediaHost, StringComparison.InvariantCultureIgnoreCase))
+                    {
+                        return true;
+                    }
+                }
+            }
+
+
+
+            return false;
+        }
     }
 }
