@@ -1,4 +1,4 @@
-import type { ManifestSection, ManifestSectionSidebarMenu } from '@umbraco-cms/models';
+import type { ManifestSection, ManifestMenuSectionSidebarApp } from '@umbraco-cms/models';
 
 const sectionAlias = 'Umb.Section.Content';
 
@@ -13,8 +13,8 @@ const section: ManifestSection = {
 	},
 };
 
-const sectionSidebarMenu: ManifestSectionSidebarMenu = {
-	type: 'sectionSidebarMenu',
+const menuSectionSidebarApp: ManifestMenuSectionSidebarApp = {
+	type: 'menuSectionSidebarApp',
 	alias: 'Umb.SidebarMenu.Content',
 	name: 'Content Sidebar Menu',
 	weight: 100,
@@ -25,4 +25,4 @@ const sectionSidebarMenu: ManifestSectionSidebarMenu = {
 	},
 };
 
-export const manifests = [section, sectionSidebarMenu];
+export const manifests = [section, menuSectionSidebarApp];
