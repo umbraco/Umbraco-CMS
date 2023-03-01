@@ -17,26 +17,22 @@ import { Meta } from '@storybook/addon-docs';
 
 **Manifest**
 
-```json
-	{
-		"type": "workspaceAction",
-		"alias": "My.WorkspaceAction.Workspace.Action",
-		"name": "My Workspace Action",
-		"meta": {
-			"workspaces": ["My.Workspace"],
-      "label": "Run",
-			"look": "primary",
-			"color": "positive",
-		},
+```javascript
+import { extensionRegistry } from '@umbraco-cms/extension-registry';
+import { MyWorkspaceAction } from './my-workspace-action';
+
+const manifest = {
+	type: 'workspaceAction',
+	alias: 'My.WorkspaceAction',
+	name: 'My Workspace Action',
+	meta: {
+		workspaces: ['My.Workspace'],
+		label: 'My Action',
+		api: MyWorkspaceAction,
 	},
+};
 
-```
-
-**Default Element**
-
-```ts
-// TODO: get interface
-interface UmbWorkspaceActionElement {}
+extensionRegistry.register(manifest);
 ```
 
 ### The Workspace Action Class
@@ -57,4 +53,11 @@ export class MyWorkspaceAction extends UmbWorkspaceActionBase {
 		await this.workspaceContext.repository?.myAction(this.selection);
 	}
 }
+```
+
+**Default Element**
+
+```ts
+// TODO: get interface
+interface UmbWorkspaceActionElement {}
 ```
