@@ -10,7 +10,11 @@ export class UmbWorkspaceUserContext
 	extends UmbWorkspaceContext<UmbUserRepository>
 	implements UmbWorkspaceEntityContextInterface<UserDetails | undefined>
 {
-	#manager = new UmbEntityWorkspaceManager(this.host, 'user', UMB_USER_STORE_CONTEXT_TOKEN);
+	#manager = new UmbEntityWorkspaceManager<typeof UMB_USER_STORE_CONTEXT_TOKEN.TYPE>(
+		this.host,
+		'user',
+		UMB_USER_STORE_CONTEXT_TOKEN
+	);
 
 	public readonly data = this.#manager.state.asObservable();
 	public readonly name = this.#manager.state.getObservablePart((state) => state?.name);
