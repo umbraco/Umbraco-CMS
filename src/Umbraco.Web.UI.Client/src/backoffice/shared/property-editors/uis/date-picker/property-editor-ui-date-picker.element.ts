@@ -52,9 +52,7 @@ export class UmbPropertyEditorUIDatePickerElement extends UmbLitElement {
 
 	@property({ type: Array, attribute: false })
 	public set config(config: Array<PropertyEditorConfigDefaultData>) {
-
-		console.log('config', config);
-
+		
 		// Format string prevalue/config
 		this._format = config.find((x) => x.alias === 'format')?.value;
 		const pickTime = this._format?.includes('H') || this._format?.includes('m');
