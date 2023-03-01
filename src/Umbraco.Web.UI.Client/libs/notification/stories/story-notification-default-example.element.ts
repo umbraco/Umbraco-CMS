@@ -1,28 +1,14 @@
-import './layouts/default';
-
-import { Meta, Story } from '@storybook/web-components';
 import { html } from 'lit';
 import { customElement } from 'lit/decorators.js';
-
-import type { UmbNotificationDefaultData } from './layouts/default';
+import { UmbNotificationDefaultData } from '../layouts/default';
 import {
 	UmbNotificationColor,
 	UmbNotificationOptions,
 	UmbNotificationService,
-	UMB_NOTIFICATION_SERVICE_CONTEXT_TOKEN,
-} from '.';
+	UMB_NOTIFICATION_SERVICE_CONTEXT_TOKEN
+} from '..';
 import { UmbLitElement } from '@umbraco-cms/element';
 
-export default {
-	title: 'API/Notifications/Overview',
-	component: 'ucp-notification-layout-default',
-	decorators: [
-		(story) =>
-			html`<umb-context-provider key="umbNotificationService" .value=${new UmbNotificationService()}>
-				${story()}
-			</umb-context-provider>`,
-	],
-} as Meta;
 
 @customElement('story-notification-default-example')
 export class StoryNotificationDefaultExampleElement extends UmbLitElement {
@@ -69,24 +55,3 @@ export class StoryNotificationDefaultExampleElement extends UmbLitElement {
 		`;
 	}
 }
-
-const Template: Story = () => html`<story-notification-default-example></story-notification-default-example>`;
-
-export const Default = Template.bind({});
-Default.parameters = {
-	docs: {
-		source: {
-			language: 'js',
-			code: `
-const options: UmbNotificationOptions<UmbNotificationDefaultData> = {
-  data: {
-	headline: 'Headline',
-	message: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit'
-  }
-};
-
-this._notificationService?.peek('positive', options);
-`,
-		},
-	},
-};
