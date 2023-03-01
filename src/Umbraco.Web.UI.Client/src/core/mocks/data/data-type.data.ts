@@ -475,7 +475,67 @@ export const data: Array<DataTypeModel & { type: 'data-type' }> = [
 		parentKey: null,
 		propertyEditorAlias: 'Umbraco.TinyMCE',
 		propertyEditorUiAlias: 'Umb.PropertyEditorUI.TinyMCE',
-		data: [],
+		data: [
+			{
+				alias: 'hideLabel',
+				value: true,
+			},
+			{ alias: 'dimensions', value: { width: 400, height: 500 } },
+			{ alias: 'maxImageSize', value: 500 },
+			{ alias: 'mode', value: 'classic' },
+			{ alias: 'stylesheets', value: [] },
+			{
+				alias: 'toolbar',
+				value: [
+					'ace',
+					'undo',
+					'redo',
+					'styles',
+					'bold',
+					'italic',
+					'alignleft',
+					'aligncenter',
+					'alignright',
+					'bullist',
+					'numlist',
+					'outdent',
+					'indent',
+					'link',
+					'umbmediapicker',
+					'umbmacro',
+					'umbembeddialog',
+				],
+			},
+			{
+				alias: 'plugins',
+				value: [
+					{
+						name: 'anchor',
+					},
+					{
+						name: 'charmap',
+					},
+					{
+						name: 'table',
+					},
+					{
+						name: 'lists',
+					},
+					{
+						name: 'advlist',
+					},
+					{
+						name: 'autolink',
+					},
+					{
+						name: 'directionality',
+					},
+					{
+						name: 'searchreplace',
+					},
+				],
+			},
+		],
 	},
 	{
 		$type: 'data-type',

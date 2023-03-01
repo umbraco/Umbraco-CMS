@@ -57,6 +57,7 @@
 		"npm": ">=9.5 < 10"
 	},
 	"dependencies": {
+		"@tinymce/tinymce-webcomponent": "^2.0.1",
 		"@umbraco-ui/uui": "^1.2.0-rc.0",
 		"@umbraco-ui/uui-css": "^1.2.0-rc.0",
 		"@umbraco-ui/uui-modal": "file:umbraco-ui-uui-modal-0.0.0.tgz",

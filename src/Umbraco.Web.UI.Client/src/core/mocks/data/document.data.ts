@@ -20,6 +20,12 @@ export const data: Array<DocumentModel> = [
 		contentTypeKey: 'all-property-editors-document-type-key',
 		values: [
 			{
+				alias: 'richTextEditor',
+				culture: null,
+				segment: null,
+				value: null,
+			},
+			{
 				alias: 'email',
 				culture: null,
 				segment: null,

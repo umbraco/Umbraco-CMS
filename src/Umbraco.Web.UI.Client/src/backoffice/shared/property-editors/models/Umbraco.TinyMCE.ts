@@ -10,6 +10,7 @@ export const manifest: ManifestPropertyEditorModel = {
 				{
 					alias: 'mediaParentId',
 					label: 'Image Upload Folder',
+					description: 'Choose the upload location of pasted images',
 					propertyEditorUI: 'Umb.PropertyEditorUI.TreePicker',
 				},
 				{

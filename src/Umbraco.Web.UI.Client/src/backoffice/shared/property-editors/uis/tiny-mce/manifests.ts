@@ -1,4 +1,4 @@
-import { manifest as configuration } from './config/configuration/manifests';
+import { manifest as toolbar } from './config/configuration/manifests';
 import type { ManifestPropertyEditorUI } from '@umbraco-cms/models';
 
 const manifest: ManifestPropertyEditorUI = {
@@ -21,6 +21,7 @@ const manifest: ManifestPropertyEditorUI = {
 				{
 					alias: 'overlaySize',
 					label: 'Overlay Size',
+					description: 'Select the width of the overlay (link picker)',
 					propertyEditorUI: 'Umb.PropertyEditorUI.OverlaySize',
 				},
 				{
@@ -33,6 +34,6 @@ const manifest: ManifestPropertyEditorUI = {
 	},
 };
 
-const config = [configuration];
+const config = [toolbar];
 
 export const manifests = [manifest, ...config];
