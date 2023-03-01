@@ -2,7 +2,7 @@
 
 namespace Umbraco.Cms.Api.Management.ViewModels.Document;
 
-public class DocumentVariantViewModel : VariantViewModelBase
+public class DocumentVariantResponseModel : VariantResponseModelBase
 {
     public ContentState State { get; set; }
 

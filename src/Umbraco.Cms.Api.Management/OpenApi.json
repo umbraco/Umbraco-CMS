@@ -1596,6 +1596,48 @@
         }
       }
     },
+    "/umbraco/management/api/v1/document": {
+      "post": {
+        "tags": [
+          "Document"
+        ],
+        "operationId": "PostDocument",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/DocumentCreateRequestModel"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "headers": {
+              "Location": {
+                "description": "Location of the newly created resource",
+                "schema": {
+                  "type": "string",
+                  "description": "Location of the newly created resource",
+                  "format": "uri"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    },
     "/umbraco/management/api/v1/document/{key}": {
       "get": {
         "tags": [
@@ -1621,12 +1663,81 @@
                 "schema": {
                   "oneOf": [
                     {
-                      "$ref": "#/components/schemas/DocumentModel"
+                      "$ref": "#/components/schemas/DocumentResponseModel"
                     }
                   ]
                 }
               }
             }
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Document"
+        ],
+        "operationId": "DeleteDocumentByKey",
+        "parameters": [
+          {
+            "name": "key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Document"
+        ],
+        "operationId": "PutDocumentByKey",
+        "parameters": [
+          {
+            "name": "key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/DocumentUpdateRequestModel"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "400": {
+            "description": "Bad Request"
           },
           "404": {
             "description": "Not Found"
@@ -3673,46 +3784,6 @@
         }
       }
     },
-    "/umbraco/management/api/v1/object-types": {
-      "get": {
-        "tags": [
-          "Object Types"
-        ],
-        "operationId": "GetObjectTypes",
-        "parameters": [
-          {
-            "name": "skip",
-            "in": "query",
-            "schema": {
-              "type": "integer",
-              "format": "int32",
-              "default": 0
-            }
-          },
-          {
-            "name": "take",
-            "in": "query",
-            "schema": {
-              "type": "integer",
-              "format": "int32",
-              "default": 100
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Success",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PagedObjectTypeResponseModel"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
     "/umbraco/management/api/v1/package/{name}/run-migration": {
       "post": {
         "tags": [
@@ -4440,188 +4511,6 @@
         }
       }
     },
-    "/umbraco/management/api/v1/relation-type": {
-      "post": {
-        "tags": [
-          "Relation Type"
-        ],
-        "operationId": "PostRelationType",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "oneOf": [
-                  {
-                    "$ref": "#/components/schemas/CreateRelationTypeRequestModel"
-                  }
-                ]
-              }
-            }
-          }
-        },
-        "responses": {
-          "201": {
-            "description": "Created",
-            "headers": {
-              "Location": {
-                "description": "Location of the newly created resource",
-                "schema": {
-                  "type": "string",
-                  "description": "Location of the newly created resource",
-                  "format": "uri"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Bad Request",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetailsModel"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/umbraco/management/api/v1/relation-type/{key}": {
-      "get": {
-        "tags": [
-          "Relation Type"
-        ],
-        "operationId": "GetRelationTypeByKey",
-        "parameters": [
-          {
-            "name": "key",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Success",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "oneOf": [
-                    {
-                      "$ref": "#/components/schemas/RelationTypeResponseModel"
-                    }
-                  ]
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Not Found"
-          }
-        }
-      },
-      "delete": {
-        "tags": [
-          "Relation Type"
-        ],
-        "operationId": "DeleteRelationTypeByKey",
-        "parameters": [
-          {
-            "name": "key",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Success"
-          },
-          "404": {
-            "description": "Not Found",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetailsModel"
-                }
-              }
-            }
-          }
-        }
-      },
-      "put": {
-        "tags": [
-          "Relation Type"
-        ],
-        "operationId": "PutRelationTypeByKey",
-        "parameters": [
-          {
-            "name": "key",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "oneOf": [
-                  {
-                    "$ref": "#/components/schemas/UpdateRelationTypeRequestModel"
-                  }
-                ]
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Success",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "oneOf": [
-                    {
-                      "$ref": "#/components/schemas/RelationTypeResponseModel"
-                    }
-                  ]
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Bad Request",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetailsModel"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Not Found",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetailsModel"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
     "/umbraco/management/api/v1/tree/relation-type/item": {
       "get": {
         "tags": [
@@ -4781,55 +4670,6 @@
             "schema": {
               "type": "string",
               "default": ""
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Success",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PagedRelationModel"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/umbraco/management/api/v1/relation/type/{key}": {
-      "get": {
-        "tags": [
-          "Relation"
-        ],
-        "operationId": "GetRelationTypeByKey",
-        "parameters": [
-          {
-            "name": "key",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          },
-          {
-            "name": "skip",
-            "in": "query",
-            "schema": {
-              "type": "integer",
-              "format": "int32",
-              "default": 0
-            }
-          },
-          {
-            "name": "take",
-            "in": "query",
-            "schema": {
-              "type": "integer",
-              "format": "int32",
-              "default": 100
             }
           }
         ],
@@ -6449,6 +6289,71 @@
         },
         "additionalProperties": false
       },
+      "ContentCreateRequestModelBaseDocumentValueModelDocumentVariantRequestModel": {
+        "type": "object",
+        "properties": {
+          "values": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/DocumentValueModel"
+                }
+              ]
+            }
+          },
+          "variants": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/DocumentVariantRequestModel"
+                }
+              ]
+            }
+          },
+          "parentKey": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "ContentResponseModelBaseDocumentValueModelDocumentVariantResponseModel": {
+        "type": "object",
+        "properties": {
+          "values": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/DocumentValueModel"
+                }
+              ]
+            }
+          },
+          "variants": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/DocumentVariantResponseModel"
+                }
+              ]
+            }
+          },
+          "key": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "contentTypeKey": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        "additionalProperties": false
+      },
       "ContentStateModel": {
         "enum": [
           "NotCreated",
@@ -6625,30 +6530,9 @@
         },
         "additionalProperties": false
       },
-      "ContentUrlInfoModel": {
+      "ContentUpdateRequestModelBaseDocumentValueModelDocumentVariantRequestModel": {
         "type": "object",
         "properties": {
-          "culture": {
-            "type": "string",
-            "nullable": true
-          },
-          "url": {
-            "type": "string"
-          }
-        },
-        "additionalProperties": false
-      },
-      "ContentViewModelBaseDocumentValueDocumentVariantModel": {
-        "type": "object",
-        "properties": {
-          "key": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "contentTypeKey": {
-            "type": "string",
-            "format": "uuid"
-          },
           "values": {
             "type": "array",
             "items": {
@@ -6664,7 +6548,7 @@
             "items": {
               "oneOf": [
                 {
-                  "$ref": "#/components/schemas/DocumentVariantModel"
+                  "$ref": "#/components/schemas/DocumentVariantRequestModel"
                 }
               ]
             }
@@ -6672,18 +6556,15 @@
         },
         "additionalProperties": false
       },
-      "CreateRelationTypeRequestModel": {
+      "ContentUrlInfoModel": {
         "type": "object",
-        "allOf": [
-          {
-            "$ref": "#/components/schemas/RelationTypeBaseModel"
-          }
-        ],
         "properties": {
-          "key": {
+          "culture": {
             "type": "string",
-            "format": "uuid",
             "nullable": true
+          },
+          "url": {
+            "type": "string"
           }
         },
         "additionalProperties": false
@@ -7148,11 +7029,31 @@
           }
         }
       },
-      "DocumentModel": {
+      "DocumentCreateRequestModel": {
         "type": "object",
         "allOf": [
           {
-            "$ref": "#/components/schemas/ContentViewModelBaseDocumentValueDocumentVariantModel"
+            "$ref": "#/components/schemas/ContentCreateRequestModelBaseDocumentValueModelDocumentVariantRequestModel"
+          }
+        ],
+        "properties": {
+          "contentTypeKey": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "templateKey": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "DocumentResponseModel": {
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ContentResponseModelBaseDocumentValueModelDocumentVariantResponseModel"
           }
         ],
         "properties": {
@@ -7273,23 +7174,82 @@
           }
         }
       },
-      "DocumentValueModel": {
+      "DocumentUpdateRequestModel": {
         "type": "object",
         "allOf": [
           {
-            "$ref": "#/components/schemas/ValueViewModelBaseModel"
-          }
-        ],
-        "additionalProperties": false
-      },
-      "DocumentVariantModel": {
-        "type": "object",
-        "allOf": [
-          {
-            "$ref": "#/components/schemas/VariantViewModelBaseModel"
+            "$ref": "#/components/schemas/ContentUpdateRequestModelBaseDocumentValueModelDocumentVariantRequestModel"
           }
         ],
         "properties": {
+          "templateKey": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "DocumentValueModel": {
+        "required": [
+          "$type"
+        ],
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ValueModelBaseModel"
+          }
+        ],
+        "properties": {
+          "$type": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false,
+        "discriminator": {
+          "propertyName": "$type",
+          "mapping": {
+            "DocumentValueModel": "#/components/schemas/DocumentValueModel"
+          }
+        }
+      },
+      "DocumentVariantRequestModel": {
+        "required": [
+          "$type"
+        ],
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/VariantModelBaseModel"
+          }
+        ],
+        "properties": {
+          "$type": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false,
+        "discriminator": {
+          "propertyName": "$type",
+          "mapping": {
+            "DocumentVariantRequestModel": "#/components/schemas/DocumentVariantRequestModel"
+          }
+        }
+      },
+      "DocumentVariantResponseModel": {
+        "required": [
+          "$type"
+        ],
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/VariantResponseModelBaseModel"
+          }
+        ],
+        "properties": {
+          "$type": {
+            "type": "string"
+          },
           "state": {
             "$ref": "#/components/schemas/ContentStateModel"
           },
@@ -7299,7 +7259,13 @@
             "nullable": true
           }
         },
-        "additionalProperties": false
+        "additionalProperties": false,
+        "discriminator": {
+          "propertyName": "$type",
+          "mapping": {
+            "DocumentVariantResponseModel": "#/components/schemas/DocumentVariantResponseModel"
+          }
+        }
       },
       "EntityTreeItemModel": {
         "required": [
@@ -7953,20 +7919,6 @@
         "type": "integer",
         "format": "int32"
       },
-      "ObjectTypeResponseModel": {
-        "type": "object",
-        "properties": {
-          "name": {
-            "type": "string",
-            "nullable": true
-          },
-          "id": {
-            "type": "string",
-            "format": "uuid"
-          }
-        },
-        "additionalProperties": false
-      },
       "OkResultModel": {
         "type": "object",
         "properties": {
@@ -8615,30 +8567,6 @@
         },
         "additionalProperties": false
       },
-      "PagedObjectTypeResponseModel": {
-        "required": [
-          "items",
-          "total"
-        ],
-        "type": "object",
-        "properties": {
-          "total": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "items": {
-            "type": "array",
-            "items": {
-              "oneOf": [
-                {
-                  "$ref": "#/components/schemas/ObjectTypeResponseModel"
-                }
-              ]
-            }
-          }
-        },
-        "additionalProperties": false
-      },
       "PagedPackageDefinitionModel": {
         "required": [
           "items",
@@ -9208,64 +9136,6 @@
         },
         "additionalProperties": false
       },
-      "RelationTypeBaseModel": {
-        "type": "object",
-        "properties": {
-          "name": {
-            "type": "string"
-          },
-          "isBidirectional": {
-            "type": "boolean"
-          },
-          "parentObjectType": {
-            "type": "string",
-            "format": "uuid",
-            "nullable": true
-          },
-          "childObjectType": {
-            "type": "string",
-            "format": "uuid",
-            "nullable": true
-          },
-          "isDependency": {
-            "type": "boolean"
-          }
-        },
-        "additionalProperties": false
-      },
-      "RelationTypeResponseModel": {
-        "type": "object",
-        "allOf": [
-          {
-            "$ref": "#/components/schemas/RelationTypeBaseModel"
-          }
-        ],
-        "properties": {
-          "key": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "alias": {
-            "type": "string",
-            "nullable": true
-          },
-          "path": {
-            "type": "string"
-          },
-          "isSystemRelationType": {
-            "type": "boolean"
-          },
-          "parentObjectTypeName": {
-            "type": "string",
-            "nullable": true
-          },
-          "childObjectTypeName": {
-            "type": "string",
-            "nullable": true
-          }
-        },
-        "additionalProperties": false
-      },
       "RuntimeLevelModel": {
         "enum": [
           "Unknown",
@@ -9625,15 +9495,6 @@
         },
         "additionalProperties": false
       },
-      "UpdateRelationTypeRequestModel": {
-        "type": "object",
-        "allOf": [
-          {
-            "$ref": "#/components/schemas/RelationTypeBaseModel"
-          }
-        ],
-        "additionalProperties": false
-      },
       "UpgradeSettingsModel": {
         "type": "object",
         "properties": {
@@ -9799,9 +9660,15 @@
         },
         "additionalProperties": false
       },
-      "ValueViewModelBaseModel": {
+      "ValueModelBaseModel": {
+        "required": [
+          "$type"
+        ],
         "type": "object",
         "properties": {
+          "$type": {
+            "type": "string"
+          },
           "culture": {
             "type": "string",
             "nullable": true
@@ -9817,11 +9684,53 @@
             "nullable": true
           }
         },
-        "additionalProperties": false
+        "additionalProperties": false,
+        "discriminator": {
+          "propertyName": "$type",
+          "mapping": {
+            "DocumentValueModel": "#/components/schemas/DocumentValueModel"
+          }
+        }
       },
-      "VariantViewModelBaseModel": {
+      "VariantModelBaseModel": {
+        "required": [
+          "$type"
+        ],
         "type": "object",
         "properties": {
+          "$type": {
+            "type": "string"
+          },
+          "culture": {
+            "type": "string",
+            "nullable": true
+          },
+          "segment": {
+            "type": "string",
+            "nullable": true
+          },
+          "name": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false,
+        "discriminator": {
+          "propertyName": "$type",
+          "mapping": {
+            "DocumentVariantRequestModel": "#/components/schemas/DocumentVariantRequestModel",
+            "DocumentVariantResponseModel": "#/components/schemas/DocumentVariantResponseModel"
+          }
+        }
+      },
+      "VariantResponseModelBaseModel": {
+        "required": [
+          "$type"
+        ],
+        "type": "object",
+        "properties": {
+          "$type": {
+            "type": "string"
+          },
           "culture": {
             "type": "string",
             "nullable": true
@@ -9842,7 +9751,13 @@
             "format": "date-time"
           }
         },
-        "additionalProperties": false
+        "additionalProperties": false,
+        "discriminator": {
+          "propertyName": "$type",
+          "mapping": {
+            "DocumentVariantResponseModel": "#/components/schemas/DocumentVariantResponseModel"
+          }
+        }
       },
       "VersionModel": {
         "type": "object",
