@@ -1,9 +1,7 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
-using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Persistence.SqlServer;
 using Umbraco.Cms.Tests.Integration.Implementations;
 
@@ -68,8 +66,33 @@ public class LocalDbTestDatabaseConfiguration : ITestDatabaseConfiguration
     public void Teardown(string key)
     {
         s_localDbInstance.KillConnections(key);
-        s_localDbInstance.DropDatabase(key);
-        _localDb.StopInstance(InstanceName);
-        _localDb.DropInstance(InstanceName);
+        s_localDbInstance.DropDatabases();
+
+        var filePath = Path.Combine(_testHelper.WorkingDirectory, "databases", key);
+
+        // This can sometimes fail if a thread is hanging and Sqlite file is therefore in use
+        // which is why we need retry logic that swallows the exceptions.
+        const int maxRetries = 5;
+        var retries = 0;
+        var retry = true;
+        do
+        {
+            try
+            {
+                File.Delete(filePath);
+                retry = false;
+            }
+            catch (IOException)
+            {
+                retries++;
+                if (retries >= maxRetries)
+                {
+                    throw;
+                }
+
+                Thread.Sleep(500);
+            }
+        }
+        while (retry);
     }
 }
