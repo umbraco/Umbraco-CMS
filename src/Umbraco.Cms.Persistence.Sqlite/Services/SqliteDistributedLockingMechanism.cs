@@ -35,7 +35,7 @@ public class SqliteDistributedLockingMechanism : IDistributedLockingMechanism
 
     /// <inheritdoc />
     public bool Enabled => _connectionStrings.CurrentValue.IsConnectionStringConfigured() &&
-                           string.Equals(_connectionStrings.CurrentValue.ProviderName, Constants.ProviderName, StringComparison.InvariantCultureIgnoreCase);
+                           string.Equals(_connectionStrings.CurrentValue.ProviderName, Constants.ProviderName, StringComparison.InvariantCultureIgnoreCase) && _scopeAccessor.Value.AmbientScope is not null;
 
     // With journal_mode=wal we can always read a snapshot.
     public IDistributedLock ReadLock(int lockId, TimeSpan? obtainLockTimeout = null)

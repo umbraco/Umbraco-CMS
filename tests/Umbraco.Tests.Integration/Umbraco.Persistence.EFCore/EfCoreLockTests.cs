@@ -38,13 +38,9 @@ public class EfCoreLockTests : UmbracoIntegrationTest
         scope.Complete();
     }
 
-    protected override void ConfigureTestServices(IServiceCollection services)
-    {
+    protected override void ConfigureTestServices(IServiceCollection services) =>
         // SQLite + retry policy makes tests fail, we retry before throwing distributed locking timeout.
         services.RemoveAll(x => x.ImplementationType == typeof(SqliteAddRetryPolicyInterceptor));
-        services.AddUnique<IDistributedLockingMechanism, SqlServerEFCoreDistributedLockingMechanism>();
-        services.AddSingleton<IDistributedLockingMechanism, SqliteEFCoreDistributedLockingMechanism>();
-    }
 
 
     [Test]

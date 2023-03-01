@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Umbraco.Cms.Core.DistributedLocking;
 using Umbraco.Cms.Core.Persistence;
 using Umbraco.Cms.Infrastructure.Migrations.Install;
 using Umbraco.Cms.Persistence.EFCore;
@@ -48,7 +49,8 @@ public static class UmbracoEFCoreServiceCollectionExtensions
         services.AddUnique<IEfCoreScopeProvider, EfCoreScopeProvider>();
         services.AddUnique<IHttpEFCoreScopeReference, HttpEFCoreScopeReference>();
         services.AddUnique<IAmbientEFCoreScopeContextStack, AmbientEFCoreScopeContextStack>();
-
+        services.AddSingleton<IDistributedLockingMechanism, SqlServerEFCoreDistributedLockingMechanism>();
+        services.AddSingleton<IDistributedLockingMechanism, SqliteEFCoreDistributedLockingMechanism>();
         return services;
     }
 

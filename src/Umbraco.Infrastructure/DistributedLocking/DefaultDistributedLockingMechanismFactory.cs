@@ -40,8 +40,7 @@ public class DefaultDistributedLockingMechanismFactory : IDistributedLockingMech
 
         if (!string.IsNullOrEmpty(configured))
         {
-            IDistributedLockingMechanism? value = _distributedLockingMechanisms
-                .FirstOrDefault(x => x.GetType().FullName?.EndsWith(configured) ?? false);
+            IDistributedLockingMechanism? value = _distributedLockingMechanisms.FirstOrDefault(x => x.GetType().FullName?.EndsWith(configured) ?? false);
 
             if (value == null)
             {

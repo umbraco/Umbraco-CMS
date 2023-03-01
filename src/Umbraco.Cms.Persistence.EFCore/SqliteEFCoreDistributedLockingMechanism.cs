@@ -33,7 +33,7 @@ public class SqliteEFCoreDistributedLockingMechanism : IDistributedLockingMechan
 
     /// <inheritdoc />
     public bool Enabled => _connectionStrings.CurrentValue.IsConnectionStringConfigured() &&
-                           string.Equals(_connectionStrings.CurrentValue.ProviderName, "Microsoft.Data.Sqlite", StringComparison.InvariantCultureIgnoreCase);
+                           string.Equals(_connectionStrings.CurrentValue.ProviderName, "Microsoft.Data.Sqlite", StringComparison.InvariantCultureIgnoreCase) && _efCoreScopeAccessor.Value.AmbientScope is not null;
 
     // With journal_mode=wal we can always read a snapshot.
     public IDistributedLock ReadLock(int lockId, TimeSpan? obtainLockTimeout = null)
