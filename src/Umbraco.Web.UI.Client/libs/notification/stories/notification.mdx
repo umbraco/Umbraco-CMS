@@ -18,7 +18,7 @@ Stays on the screen until dismissed by the user or custom code. Stay notificatio
 
 The UmbNotification service can be used to open notifications.
 
-```typescript
+```ts
 import { html, LitElement } from 'lit';
 import { UmbLitElement } from '@umbraco-cms/element';
 import type { UmbNotificationService, UMB_NOTIFICATION_SERVICE_CONTEXT_ALIAS } from './core/services/notification';
@@ -41,7 +41,7 @@ class MyElement extends UmbLitElement {
 
 A notification is opened by calling one of the helper methods on the UmbNotificationService. The methods will return an instance of UmbNotificationHandler.
 
-```typescript
+```ts
 import { html, LitElement } from 'lit';
 import { state } from 'lit/decorators.js';
 import { UmbLitElement } from '@umbraco-cms/element';
@@ -84,7 +84,7 @@ The default layout will cover most cases, but there might be situations where we
 
 ### Custom layout element
 
-```typescript
+```ts
 import { html, LitElement } from 'lit';
 import { property } from 'lit/decorators.js';
 import { UUITextStyles } from '@umbraco-ui/uui-css';
@@ -123,7 +123,7 @@ export class UmbNotificationLayoutCustom extends LitElement {
 
 ### Open notification with custom layout
 
-```typescript
+```ts
 import { html, LitElement } from 'lit';
 import { UmbContextInjectMixin } from '@umbraco-cms/context-api';
 import type {
