@@ -102,6 +102,7 @@ export class UmbPropertyEditorUITinyMceElement extends UmbLitElement {
 			contextMenu: false,
 			resize: false,
 			style_formats: this._styleFormats,
+			convert_urls: false,
 			setup: (editor: any) => {
 				new AcePlugin(editor, this.modalService);
 				new LinkPickerPlugin(editor, this.modalService, this.configuration);
