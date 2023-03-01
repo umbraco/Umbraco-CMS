@@ -230,7 +230,7 @@ test.describe('BlockGridEditorContent', () => {
       // Drag and Drop
       const dragFromLocator = await page.locator('[data-content-element-type-key="' + element['key'] + '"]', {hasText: bottomBlock});
       const dragToLocator = await page.locator('[data-content-element-type-key="' + element['key'] + '"]', {hasText: topBlock});
-      await umbracoUi.dragAndDrop(dragFromLocator, dragToLocator, 10, 0, 10);
+      await umbracoUi.dragAndDrop(dragFromLocator, dragToLocator, 10, -5, 15);
 
       // Assert
       // Checks if the BottomBlock is moved to be under TopBlock
@@ -289,7 +289,7 @@ test.describe('BlockGridEditorContent', () => {
       // Drag and Drop
       const dragFromLocator = await page.locator('[data-content-element-type-key="' + element['key'] + '"]', {hasText: rightBlock});
       const dragToLocator = await page.locator('[data-content-element-type-key="' + element['key'] + '"]', {hasText: leftBlock});
-      await umbracoUi.dragAndDrop(dragFromLocator, dragToLocator, 0, 20, 10);
+      await umbracoUi.dragAndDrop(dragFromLocator, dragToLocator, -5, 20, 15);
 
       // Assert
       // Checks if the rightBlock is moved to the right side of the blocks
