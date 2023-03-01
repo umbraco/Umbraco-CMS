@@ -22,6 +22,9 @@ public class SecuritySettings
     internal const string StaticAllowedUserNameCharacters =
         "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+\\";
 
+    internal const int StaticMemberDefaultLockoutTimeInMinutes = 30 * 24 * 60;
+    internal const int StaticUserDefaultLockoutTimeInMinutes = 30 * 24 * 60;
+
     /// <summary>
     ///     Gets or sets a value indicating whether to keep the user logged in.
     /// </summary>
@@ -65,11 +68,13 @@ public class SecuritySettings
     /// <summary>
     ///     Gets or sets a value for the user password settings.
     /// </summary>
+    [Obsolete("This no longer works. You can now inject this by using IOptions<UserPasswordConfigurationSettings> instead, scheduled for removal in v13")]
     public UserPasswordConfigurationSettings? UserPassword { get; set; }
 
     /// <summary>
     ///     Gets or sets a value for the member password settings.
     /// </summary>
+    [Obsolete("This no longer works. You can now inject this by using IOptions<MemberPasswordConfigurationSettings> instead, scheduled for removal in v13")]
     public MemberPasswordConfigurationSettings? MemberPassword { get; set; }
 
     /// <summary>
@@ -85,6 +90,18 @@ public class SecuritySettings
     /// </summary>
     [DefaultValue(StaticUserBypassTwoFactorForExternalLogins)]
     public bool UserBypassTwoFactorForExternalLogins { get; set; } = StaticUserBypassTwoFactorForExternalLogins;
+
+    /// <summary>
+    ///     Gets or sets a value for how long (in minutes) a member is locked out when a lockout occurs.
+    /// </summary>
+    [DefaultValue(StaticMemberDefaultLockoutTimeInMinutes)]
+    public int MemberDefaultLockoutTimeInMinutes { get; set; } = StaticMemberDefaultLockoutTimeInMinutes;
+
+    /// <summary>
+    ///     Gets or sets a value for how long (in minutes) a user is locked out when a lockout occurs.
+    /// </summary>
+    [DefaultValue(StaticUserDefaultLockoutTimeInMinutes)]
+    public int UserDefaultLockoutTimeInMinutes { get; set; } = StaticUserDefaultLockoutTimeInMinutes;
 
     /// <summary>
     /// Gets or sets a value indicating whether to allow editing invariant properties from a non-default language variation.
