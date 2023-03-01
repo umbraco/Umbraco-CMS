@@ -1,4 +1,5 @@
 ﻿using Umbraco.Cms.Core.DistributedLocking;
+using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Scoping;
 
 namespace Umbraco.Cms.Persistence.EFCore.Scoping;
@@ -13,13 +14,15 @@ internal class EfCoreDetachableScope : EfCoreScope
         IUmbracoEfCoreDatabaseFactory efCoreDatabaseFactory,
         IEFCoreScopeAccessor efCoreScopeAccessor,
         IEfCoreScopeProvider efCoreScopeProvider,
-        IScopeContext? scopeContext)
+        IScopeContext? scopeContext,
+        IEventAggregator eventAggregator)
         : base(
             distributedLockingMechanismFactory,
             efCoreDatabaseFactory,
             efCoreScopeAccessor,
             efCoreScopeProvider,
-            scopeContext)
+            scopeContext,
+            eventAggregator)
     {
         if (scopeContext is not null)
         {
@@ -40,14 +43,16 @@ internal class EfCoreDetachableScope : EfCoreScope
         IEFCoreScopeAccessor efCoreScopeAccessor,
         IEfCoreScopeProvider efCoreScopeProvider,
         EfCoreScope parentScope,
-        IScopeContext? scopeContext)
+        IScopeContext? scopeContext,
+        IEventAggregator eventAggregator)
         : base(
             distributedLockingMechanismFactory,
             efCoreDatabaseFactory,
             efCoreScopeAccessor,
             efCoreScopeProvider,
             parentScope,
-            scopeContext) =>
+            scopeContext,
+            eventAggregator) =>
         throw new NotImplementedException();
 
     public EfCoreScope? OriginalScope { get; set; }
