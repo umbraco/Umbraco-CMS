@@ -10,7 +10,7 @@ export default {
 	component: 'ucp-notification-layout-default',
 	decorators: [
 		(story) =>
-			html`<umb-context-provider key="umbNotificationService" .value=${new UmbNotificationContext()}>
+			html`<umb-context-provider key="UmbNotificationContext" .value=${new UmbNotificationContext()}>
 				${story()}
 			</umb-context-provider>`,
 	],
@@ -31,7 +31,7 @@ const options: UmbNotificationOptions<UmbNotificationDefaultData> = {
   }
 };
 
-this._notificationService?.peek('positive', options);
+this._notificationContext?.peek('positive', options);
 `,
 		},
 	},

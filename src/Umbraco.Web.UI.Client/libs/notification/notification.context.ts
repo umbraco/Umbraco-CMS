@@ -86,6 +86,4 @@ export class UmbNotificationContext {
 	}
 }
 
-export const UMB_NOTIFICATION_SERVICE_CONTEXT_TOKEN = new UmbContextToken<UmbNotificationContext>(
-	UmbNotificationContext.name
-);
+export const UMB_NOTIFICATION_CONTEXT_TOKEN = new UmbContextToken<UmbNotificationContext>(UmbNotificationContext.name);

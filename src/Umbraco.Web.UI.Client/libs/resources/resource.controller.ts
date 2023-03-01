@@ -3,7 +3,7 @@ import {
 	UmbNotificationOptions,
 	UmbNotificationContext,
 	UmbNotificationDefaultData,
-	UMB_NOTIFICATION_SERVICE_CONTEXT_TOKEN,
+	UMB_NOTIFICATION_CONTEXT_TOKEN,
 } from '@umbraco-cms/notification';
 import { ApiError, CancelablePromise, ProblemDetailsModel } from '@umbraco-cms/backend-api';
 import { UmbController, UmbControllerHostInterface } from '@umbraco-cms/controller';
@@ -13,15 +13,15 @@ import type { DataSourceResponse } from '@umbraco-cms/models';
 export class UmbResourceController extends UmbController {
 	#promise: Promise<any>;
 
-	#notificationService?: UmbNotificationContext;
+	#notificationContext?: UmbNotificationContext;
 
 	constructor(host: UmbControllerHostInterface, promise: Promise<any>, alias?: string) {
 		super(host, alias);
 
 		this.#promise = promise;
 
-		new UmbContextConsumerController(host, UMB_NOTIFICATION_SERVICE_CONTEXT_TOKEN, (_instance) => {
-			this.#notificationService = _instance;
+		new UmbContextConsumerController(host, UMB_NOTIFICATION_CONTEXT_TOKEN, (_instance) => {
+			this.#notificationContext = _instance;
 		});
 	}
 
@@ -76,8 +76,8 @@ export class UmbResourceController extends UmbController {
 				message: error.detail ?? 'Something went wrong',
 			};
 
-			if (this.#notificationService) {
-				this.#notificationService?.peek('danger', { data, ...options });
+			if (this.#notificationContext) {
+				this.#notificationContext?.peek('danger', { data, ...options });
 			} else {
 				console.group('UmbResourceController');
 				console.error(error);

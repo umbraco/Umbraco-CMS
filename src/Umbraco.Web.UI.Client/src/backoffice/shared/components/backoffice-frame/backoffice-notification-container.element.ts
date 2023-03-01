@@ -5,7 +5,7 @@ import { repeat } from 'lit/directives/repeat.js';
 import {
 	UmbNotificationHandler,
 	UmbNotificationContext,
-	UMB_NOTIFICATION_SERVICE_CONTEXT_TOKEN,
+	UMB_NOTIFICATION_CONTEXT_TOKEN,
 } from '@umbraco-cms/notification';
 import { UmbLitElement } from '@umbraco-cms/element';
 
@@ -29,21 +29,21 @@ export class UmbBackofficeNotificationContainer extends UmbLitElement {
 	@state()
 	private _notifications?: UmbNotificationHandler[];
 
-	private _notificationService?: UmbNotificationContext;
+	private _notificationContext?: UmbNotificationContext;
 
 	constructor() {
 		super();
 
-		this.consumeContext(UMB_NOTIFICATION_SERVICE_CONTEXT_TOKEN, (notificationService) => {
-			this._notificationService = notificationService;
+		this.consumeContext(UMB_NOTIFICATION_CONTEXT_TOKEN, (instance) => {
+			this._notificationContext = instance;
 			this._observeNotifications();
 		});
 	}
 
 	private _observeNotifications() {
-		if (!this._notificationService) return;
+		if (!this._notificationContext) return;
 
-		this.observe(this._notificationService.notifications, (notifications) => {
+		this.observe(this._notificationContext.notifications, (notifications) => {
 			this._notifications = notifications;
 		});
 	}

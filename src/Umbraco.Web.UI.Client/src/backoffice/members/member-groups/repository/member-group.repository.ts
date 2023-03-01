@@ -3,7 +3,7 @@ import { UmbMemberGroupDetailServerDataSource } from './sources/member-group.det
 import { UmbMemberGroupDetailStore, UMB_MEMBER_GROUP_DETAIL_STORE_CONTEXT_TOKEN } from './member-group.detail.store';
 import { MemberGroupTreeServerDataSource } from './sources/member-group.tree.server.data';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
-import { UmbNotificationContext, UMB_NOTIFICATION_SERVICE_CONTEXT_TOKEN } from '@umbraco-cms/notification';
+import { UmbNotificationContext, UMB_NOTIFICATION_CONTEXT_TOKEN } from '@umbraco-cms/notification';
 import { UmbContextConsumerController } from '@umbraco-cms/context-api';
 import type { MemberGroupDetails } from '@umbraco-cms/models';
 import { ProblemDetailsModel } from '@umbraco-cms/backend-api';
@@ -21,7 +21,7 @@ export class UmbMemberGroupRepository implements UmbTreeRepository, UmbDetailRep
 	#detailSource: UmbMemberGroupDetailServerDataSource;
 	#detailStore?: UmbMemberGroupDetailStore;
 
-	#notificationService?: UmbNotificationContext;
+	#notificationContext?: UmbNotificationContext;
 
 	constructor(host: UmbControllerHostInterface) {
 		this.#host = host;
@@ -37,8 +37,8 @@ export class UmbMemberGroupRepository implements UmbTreeRepository, UmbDetailRep
 			this.#detailStore = instance;
 		});
 
-		new UmbContextConsumerController(this.#host, UMB_NOTIFICATION_SERVICE_CONTEXT_TOKEN, (instance) => {
-			this.#notificationService = instance;
+		new UmbContextConsumerController(this.#host, UMB_NOTIFICATION_CONTEXT_TOKEN, (instance) => {
+			this.#notificationContext = instance;
 		});
 	}
 
@@ -123,7 +123,7 @@ export class UmbMemberGroupRepository implements UmbTreeRepository, UmbDetailRep
 
 		if (!error) {
 			const notification = { data: { message: `Member group '${detail.name}' created` } };
-			this.#notificationService?.peek('positive', notification);
+			this.#notificationContext?.peek('positive', notification);
 		}
 
 		return { data, error };
@@ -141,7 +141,7 @@ export class UmbMemberGroupRepository implements UmbTreeRepository, UmbDetailRep
 
 		if (!error) {
 			const notification = { data: { message: `Member group '${memberGroup.name} saved` } };
-			this.#notificationService?.peek('positive', notification);
+			this.#notificationContext?.peek('positive', notification);
 		}
 
 		this.#detailStore?.append(memberGroup);
@@ -162,7 +162,7 @@ export class UmbMemberGroupRepository implements UmbTreeRepository, UmbDetailRep
 
 		if (!error) {
 			const notification = { data: { message: `Document deleted` } };
-			this.#notificationService?.peek('positive', notification);
+			this.#notificationContext?.peek('positive', notification);
 		}
 
 		// TODO: we currently don't use the detail store for anything.

@@ -4,7 +4,7 @@ import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 import {
 	UmbNotificationDefaultData,
 	UmbNotificationContext,
-	UMB_NOTIFICATION_SERVICE_CONTEXT_TOKEN,
+	UMB_NOTIFICATION_CONTEXT_TOKEN,
 } from '@umbraco-cms/notification';
 import { ObjectState, UmbObserverController } from '@umbraco-cms/observable-api';
 import type { EntityTreeItemModel } from '@umbraco-cms/backend-api';
@@ -22,7 +22,7 @@ export class UmbEntityWorkspaceManager<
 
 	protected _storeSubscription?: UmbObserverController;
 
-	private _notificationService?: UmbNotificationContext;
+	private _notificationContext?: UmbNotificationContext;
 	private _store?: StoreType;
 
 	#isNew = false;
@@ -35,8 +35,8 @@ export class UmbEntityWorkspaceManager<
 		this._host = host;
 		this._entityType = entityType;
 
-		new UmbContextConsumerController(this._host, UMB_NOTIFICATION_SERVICE_CONTEXT_TOKEN, (_instance) => {
-			this._notificationService = _instance;
+		new UmbContextConsumerController(this._host, UMB_NOTIFICATION_CONTEXT_TOKEN, (_instance) => {
+			this._notificationContext = _instance;
 		});
 
 		// Create controller holding Token?
@@ -111,11 +111,11 @@ export class UmbEntityWorkspaceManager<
 			.save([documentData])
 			.then(() => {
 				const data: UmbNotificationDefaultData = { message: 'Document Saved' };
-				this._notificationService?.peek('positive', { data });
+				this._notificationContext?.peek('positive', { data });
 			})
 			.catch(() => {
 				const data: UmbNotificationDefaultData = { message: 'Failed to save Document' };
-				this._notificationService?.peek('danger', { data });
+				this._notificationContext?.peek('danger', { data });
 			});
 	};
 

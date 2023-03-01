@@ -6,7 +6,7 @@ import { ProblemDetailsModel } from '@umbraco-cms/backend-api';
 import { UmbContextConsumerController } from '@umbraco-cms/context-api';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 import type { MediaTypeDetails } from '@umbraco-cms/models';
-import { UmbNotificationContext, UMB_NOTIFICATION_SERVICE_CONTEXT_TOKEN } from '@umbraco-cms/notification';
+import { UmbNotificationContext, UMB_NOTIFICATION_CONTEXT_TOKEN } from '@umbraco-cms/notification';
 import { UmbTreeRepository, RepositoryTreeDataSource } from '@umbraco-cms/repository';
 
 export class UmbMediaTypeRepository implements UmbTreeRepository {
@@ -20,7 +20,7 @@ export class UmbMediaTypeRepository implements UmbTreeRepository {
 	#detailSource: UmbMediaTypeDetailServerDataSource;
 	#detailStore?: UmbMediaTypeDetailStore;
 
-	#notificationService?: UmbNotificationContext;
+	#notificationContext?: UmbNotificationContext;
 
 	constructor(host: UmbControllerHostInterface) {
 		this.#host = host;
@@ -38,8 +38,8 @@ export class UmbMediaTypeRepository implements UmbTreeRepository {
 				this.#treeStore = instance;
 			}),
 
-			new UmbContextConsumerController(this.#host, UMB_NOTIFICATION_SERVICE_CONTEXT_TOKEN, (instance) => {
-				this.#notificationService = instance;
+			new UmbContextConsumerController(this.#host, UMB_NOTIFICATION_CONTEXT_TOKEN, (instance) => {
+				this.#notificationContext = instance;
 			}),
 		]);
 	}
@@ -144,7 +144,7 @@ export class UmbMediaTypeRepository implements UmbTreeRepository {
 
 		if (!error) {
 			const notification = { data: { message: `Media type '${mediaType.name}' saved` } };
-			this.#notificationService?.peek('positive', notification);
+			this.#notificationContext?.peek('positive', notification);
 		}
 
 		// TODO: we currently don't use the detail store for anything.
@@ -169,7 +169,7 @@ export class UmbMediaTypeRepository implements UmbTreeRepository {
 
 		if (!error) {
 			const notification = { data: { message: `Media type '${mediaType.name}' created` } };
-			this.#notificationService?.peek('positive', notification);
+			this.#notificationContext?.peek('positive', notification);
 		}
 
 		return { data, error };

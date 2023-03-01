@@ -2,27 +2,27 @@ import { expect } from '@open-wc/testing';
 
 import { UmbNotificationHandler, UmbNotificationContext } from '.';
 
-describe('UCPNotificationService', () => {
-	let notificationService: UmbNotificationContext;
+describe('UmbNotificationContext', () => {
+	let notificationContext: UmbNotificationContext;
 
 	beforeEach(async () => {
-		notificationService = new UmbNotificationContext();
+		notificationContext = new UmbNotificationContext();
 	});
 
 	describe('Public API', () => {
 		describe('properties', () => {
 			it('has a dialog property', () => {
-				expect(notificationService).to.have.property('notifications');
+				expect(notificationContext).to.have.property('notifications');
 			});
 		});
 
 		describe('methods', () => {
 			it('has a peek method', () => {
-				expect(notificationService).to.have.property('peek').that.is.a('function');
+				expect(notificationContext).to.have.property('peek').that.is.a('function');
 			});
 
 			it('has a stay method', () => {
-				expect(notificationService).to.have.property('stay').that.is.a('function');
+				expect(notificationContext).to.have.property('stay').that.is.a('function');
 			});
 		});
 	});
@@ -36,7 +36,7 @@ describe('UCPNotificationService', () => {
 				data: { headline: 'Peek notification headline', message: 'Peek notification message' },
 			};
 
-			peekNotificationHandler = notificationService.peek('positive', peekOptions);
+			peekNotificationHandler = notificationContext.peek('positive', peekOptions);
 			layoutElement = peekNotificationHandler.element.querySelector('umb-notification-layout-default');
 		});
 
@@ -64,7 +64,7 @@ describe('UCPNotificationService', () => {
 				data: { headline: 'Stay notification headline', message: 'Stay notification message' },
 			};
 
-			stayNotificationHandler = notificationService.stay('danger', stayOptions);
+			stayNotificationHandler = notificationContext.stay('danger', stayOptions);
 			layoutElement = stayNotificationHandler.element.querySelector('umb-notification-layout-default');
 		});
 

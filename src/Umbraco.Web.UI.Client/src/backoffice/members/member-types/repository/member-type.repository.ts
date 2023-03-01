@@ -6,7 +6,7 @@ import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 import { UmbContextConsumerController } from '@umbraco-cms/context-api';
 import { RepositoryTreeDataSource, UmbDetailRepository, UmbTreeRepository } from '@umbraco-cms/repository';
 import { ProblemDetailsModel } from '@umbraco-cms/backend-api';
-import { UmbNotificationContext, UMB_NOTIFICATION_SERVICE_CONTEXT_TOKEN } from '@umbraco-cms/notification';
+import { UmbNotificationContext, UMB_NOTIFICATION_CONTEXT_TOKEN } from '@umbraco-cms/notification';
 import type { MemberTypeDetails } from '@umbraco-cms/models';
 
 // TODO => use correct type when available
@@ -23,7 +23,7 @@ export class UmbMemberTypeRepository implements UmbTreeRepository, UmbDetailRepo
 	#detailSource: UmbMemberTypeDetailServerDataSource;
 	#detailStore?: UmbMemberTypeDetailStore;
 
-	#notificationService?: UmbNotificationContext;
+	#notificationContext?: UmbNotificationContext;
 
 	constructor(host: UmbControllerHostInterface) {
 		this.#host = host;
@@ -41,8 +41,8 @@ export class UmbMemberTypeRepository implements UmbTreeRepository, UmbDetailRepo
 				this.#treeStore = instance;
 			}),
 
-			new UmbContextConsumerController(this.#host, UMB_NOTIFICATION_SERVICE_CONTEXT_TOKEN, (instance) => {
-				this.#notificationService = instance;
+			new UmbContextConsumerController(this.#host, UMB_NOTIFICATION_CONTEXT_TOKEN, (instance) => {
+				this.#notificationContext = instance;
 			}),
 		]);
 	}
@@ -140,7 +140,7 @@ export class UmbMemberTypeRepository implements UmbTreeRepository, UmbDetailRepo
 
 		if (!error) {
 			const notification = { data: { message: `Member type deleted` } };
-			this.#notificationService?.peek('positive', notification);
+			this.#notificationContext?.peek('positive', notification);
 		}
 
 		// TODO: we currently don't use the detail store for anything.
@@ -167,7 +167,7 @@ export class UmbMemberTypeRepository implements UmbTreeRepository, UmbDetailRepo
 
 		if (!error) {
 			const notification = { data: { message: `Member type '${detail.name}' saved` } };
-			this.#notificationService?.peek('positive', notification);
+			this.#notificationContext?.peek('positive', notification);
 		}
 
 		// TODO: we currently don't use the detail store for anything.
@@ -192,7 +192,7 @@ export class UmbMemberTypeRepository implements UmbTreeRepository, UmbDetailRepo
 
 		if (!error) {
 			const notification = { data: { message: `Member type '${detail.name}' created` } };
-			this.#notificationService?.peek('positive', notification);
+			this.#notificationContext?.peek('positive', notification);
 		}
 
 		return { data, error };

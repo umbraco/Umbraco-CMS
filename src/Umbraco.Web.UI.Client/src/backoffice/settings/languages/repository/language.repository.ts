@@ -2,7 +2,7 @@ import { UmbLanguageServerDataSource } from './sources/language.server.data';
 import { UmbLanguageStore, UMB_LANGUAGE_STORE_CONTEXT_TOKEN } from './language.store';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 import { UmbContextConsumerController } from '@umbraco-cms/context-api';
-import { UmbNotificationContext, UMB_NOTIFICATION_SERVICE_CONTEXT_TOKEN } from '@umbraco-cms/notification';
+import { UmbNotificationContext, UMB_NOTIFICATION_CONTEXT_TOKEN } from '@umbraco-cms/notification';
 import { LanguageModel, ProblemDetailsModel } from '@umbraco-cms/backend-api';
 
 export class UmbLanguageRepository {
@@ -13,7 +13,7 @@ export class UmbLanguageRepository {
 	#dataSource: UmbLanguageServerDataSource;
 	#languageStore?: UmbLanguageStore;
 
-	#notificationService?: UmbNotificationContext;
+	#notificationContext?: UmbNotificationContext;
 
 	constructor(host: UmbControllerHostInterface) {
 		this.#host = host;
@@ -21,8 +21,8 @@ export class UmbLanguageRepository {
 		this.#dataSource = new UmbLanguageServerDataSource(this.#host);
 
 		this.#init = Promise.all([
-			new UmbContextConsumerController(this.#host, UMB_NOTIFICATION_SERVICE_CONTEXT_TOKEN, (instance) => {
-				this.#notificationService = instance;
+			new UmbContextConsumerController(this.#host, UMB_NOTIFICATION_CONTEXT_TOKEN, (instance) => {
+				this.#notificationContext = instance;
 			}),
 
 			new UmbContextConsumerController(this.#host, UMB_LANGUAGE_STORE_CONTEXT_TOKEN, (instance) => {
@@ -92,7 +92,7 @@ export class UmbLanguageRepository {
 		if (!error) {
 			this.#languageStore?.append(language);
 			const notification = { data: { message: `Language created` } };
-			this.#notificationService?.peek('positive', notification);
+			this.#notificationContext?.peek('positive', notification);
 		}
 
 		return { error };
@@ -111,7 +111,7 @@ export class UmbLanguageRepository {
 
 		if (!error) {
 			const notification = { data: { message: `Language saved` } };
-			this.#notificationService?.peek('positive', notification);
+			this.#notificationContext?.peek('positive', notification);
 			this.#languageStore?.append(language);
 		}
 
@@ -137,7 +137,7 @@ export class UmbLanguageRepository {
 		if (!error) {
 			this.#languageStore?.remove([isoCode]);
 			const notification = { data: { message: `Language deleted` } };
-			this.#notificationService?.peek('positive', notification);
+			this.#notificationContext?.peek('positive', notification);
 		}
 
 		return { error };

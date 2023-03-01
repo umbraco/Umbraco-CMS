@@ -8,7 +8,7 @@ import { UmbContextConsumerController } from '@umbraco-cms/context-api';
 import { ProblemDetailsModel, DataTypeModel } from '@umbraco-cms/backend-api';
 import type { UmbTreeRepository } from 'libs/repository/tree-repository.interface';
 import { UmbDetailRepository } from '@umbraco-cms/repository';
-import { UmbNotificationContext, UMB_NOTIFICATION_SERVICE_CONTEXT_TOKEN } from '@umbraco-cms/notification';
+import { UmbNotificationContext, UMB_NOTIFICATION_CONTEXT_TOKEN } from '@umbraco-cms/notification';
 
 type ItemType = DataTypeModel;
 
@@ -27,7 +27,7 @@ export class UmbDataTypeRepository implements UmbTreeRepository, UmbDetailReposi
 	#detailDataSource: UmbDataTypeServerDataSource;
 	#detailStore?: UmbDataTypeStore;
 
-	#notificationService?: UmbNotificationContext;
+	#notificationContext?: UmbNotificationContext;
 
 	constructor(host: UmbControllerHostInterface) {
 		this.#host = host;
@@ -45,8 +45,8 @@ export class UmbDataTypeRepository implements UmbTreeRepository, UmbDetailReposi
 				this.#detailStore = instance;
 			}),
 
-			new UmbContextConsumerController(this.#host, UMB_NOTIFICATION_SERVICE_CONTEXT_TOKEN, (instance) => {
-				this.#notificationService = instance;
+			new UmbContextConsumerController(this.#host, UMB_NOTIFICATION_CONTEXT_TOKEN, (instance) => {
+				this.#notificationContext = instance;
 			}),
 		]);
 	}
@@ -159,7 +159,7 @@ export class UmbDataTypeRepository implements UmbTreeRepository, UmbDetailReposi
 
 		if (!error) {
 			const notification = { data: { message: `Document created` } };
-			this.#notificationService?.peek('positive', notification);
+			this.#notificationContext?.peek('positive', notification);
 		}
 
 		// TODO: we currently don't use the detail store for anything.
@@ -181,7 +181,7 @@ export class UmbDataTypeRepository implements UmbTreeRepository, UmbDetailReposi
 
 		if (!error) {
 			const notification = { data: { message: `Document saved` } };
-			this.#notificationService?.peek('positive', notification);
+			this.#notificationContext?.peek('positive', notification);
 		}
 
 		// TODO: we currently don't use the detail store for anything.
@@ -207,7 +207,7 @@ export class UmbDataTypeRepository implements UmbTreeRepository, UmbDetailReposi
 
 		if (!error) {
 			const notification = { data: { message: `Document deleted` } };
-			this.#notificationService?.peek('positive', notification);
+			this.#notificationContext?.peek('positive', notification);
 		}
 
 		// TODO: we currently don't use the detail store for anything.

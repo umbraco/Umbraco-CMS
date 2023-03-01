@@ -9,7 +9,7 @@ import type { UserDetails } from '@umbraco-cms/models';
 import {
 	UmbNotificationDefaultData,
 	UmbNotificationContext,
-	UMB_NOTIFICATION_SERVICE_CONTEXT_TOKEN,
+	UMB_NOTIFICATION_CONTEXT_TOKEN,
 } from '@umbraco-cms/notification';
 
 export type UsersViewType = 'list' | 'grid';
@@ -61,13 +61,13 @@ export class UmbWorkspaceViewUsersCreateElement extends UmbModalLayoutElement {
 	private _createdUser?: UserDetails;
 
 	protected _userStore?: UmbUserStore;
-	private _notificationService?: UmbNotificationContext;
+	private _notificationContext?: UmbNotificationContext;
 
 	connectedCallback(): void {
 		super.connectedCallback();
 
-		this.consumeContext(UMB_NOTIFICATION_SERVICE_CONTEXT_TOKEN, (_instance) => {
-			this._notificationService = _instance;
+		this.consumeContext(UMB_NOTIFICATION_CONTEXT_TOKEN, (_instance) => {
+			this._notificationContext = _instance;
 		});
 
 		this.consumeContext(UMB_USER_STORE_CONTEXT_TOKEN, (_instance) => {
@@ -107,7 +107,7 @@ export class UmbWorkspaceViewUsersCreateElement extends UmbModalLayoutElement {
 
 		navigator.clipboard.writeText(passwordInput.value);
 		const data: UmbNotificationDefaultData = { message: 'Password copied' };
-		this._notificationService?.peek('positive', { data });
+		this._notificationContext?.peek('positive', { data });
 	}
 
 	private _submitForm() {
