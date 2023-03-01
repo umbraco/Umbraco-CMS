@@ -11,8 +11,6 @@ public interface IEfCoreScope : IDisposable
     /// </summary>
     Guid InstanceId { get; }
 
-    IUmbracoEfCoreDatabase Database { get; }
-
     /// <summary>
     /// Executes the given function on the database.
     /// </summary>
@@ -22,6 +20,8 @@ public interface IEfCoreScope : IDisposable
     Task<T> ExecuteWithContextAsync<T>(Func<IUmbracoEfCoreDatabase, Task<T>> method);
 
     public IScopeContext? ScopeContext { get; set; }
+
+    public ILockingMechanism Locks { get; }
 
     /// <summary>
     /// Executes the given function on the database.

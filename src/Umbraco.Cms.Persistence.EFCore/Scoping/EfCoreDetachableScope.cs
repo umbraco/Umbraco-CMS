@@ -9,11 +9,13 @@ internal class EfCoreDetachableScope : EfCoreScope
     private readonly EfCoreScopeProvider _efCoreScopeProvider;
 
     public EfCoreDetachableScope(
+        IDistributedLockingMechanismFactory distributedLockingMechanismFactory,
         IUmbracoEfCoreDatabaseFactory efCoreDatabaseFactory,
         IEFCoreScopeAccessor efCoreScopeAccessor,
         IEfCoreScopeProvider efCoreScopeProvider,
         IScopeContext? scopeContext)
         : base(
+            distributedLockingMechanismFactory,
             efCoreDatabaseFactory,
             efCoreScopeAccessor,
             efCoreScopeProvider,
@@ -33,12 +35,14 @@ internal class EfCoreDetachableScope : EfCoreScope
     }
 
     public EfCoreDetachableScope(
+        IDistributedLockingMechanismFactory distributedLockingMechanismFactory,
         IUmbracoEfCoreDatabaseFactory efCoreDatabaseFactory,
         IEFCoreScopeAccessor efCoreScopeAccessor,
         IEfCoreScopeProvider efCoreScopeProvider,
         EfCoreScope parentScope,
         IScopeContext? scopeContext)
         : base(
+            distributedLockingMechanismFactory,
             efCoreDatabaseFactory,
             efCoreScopeAccessor,
             efCoreScopeProvider,

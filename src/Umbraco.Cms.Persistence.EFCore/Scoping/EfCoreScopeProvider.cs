@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core.DependencyInjection;
+using Umbraco.Cms.Core.DistributedLocking;
 using Umbraco.Cms.Core.Scoping;
 
 namespace Umbraco.Cms.Persistence.EFCore.Scoping;
@@ -10,6 +11,7 @@ public class EfCoreScopeProvider : IEfCoreScopeProvider
     private readonly IUmbracoEfCoreDatabaseFactory _umbracoEfCoreDatabaseFactory;
     private readonly IEFCoreScopeAccessor _efCoreScopeAccessor;
     private readonly IAmbientEFCoreScopeContextStack _ambientEfCoreScopeContextStack;
+    private readonly IDistributedLockingMechanismFactory _distributedLockingMechanismFactory;
 
     // Needed for DI as IAmbientEfCoreScopeStack is internal
     public EfCoreScopeProvider()
@@ -17,7 +19,8 @@ public class EfCoreScopeProvider : IEfCoreScopeProvider
             StaticServiceProvider.Instance.GetRequiredService<IAmbientEfCoreScopeStack>(),
             StaticServiceProvider.Instance.GetRequiredService<IUmbracoEfCoreDatabaseFactory>(),
             StaticServiceProvider.Instance.GetRequiredService<IEFCoreScopeAccessor>(),
-            StaticServiceProvider.Instance.GetRequiredService<IAmbientEFCoreScopeContextStack>())
+            StaticServiceProvider.Instance.GetRequiredService<IAmbientEFCoreScopeContextStack>(),
+            StaticServiceProvider.Instance.GetRequiredService<IDistributedLockingMechanismFactory>())
     {
     }
 
@@ -25,15 +28,17 @@ public class EfCoreScopeProvider : IEfCoreScopeProvider
         IAmbientEfCoreScopeStack ambientEfCoreScopeStack,
         IUmbracoEfCoreDatabaseFactory umbracoEfCoreDatabaseFactory,
         IEFCoreScopeAccessor efCoreScopeAccessor,
-        IAmbientEFCoreScopeContextStack ambientEfCoreScopeContextStack)
+        IAmbientEFCoreScopeContextStack ambientEfCoreScopeContextStack,
+        IDistributedLockingMechanismFactory distributedLockingMechanismFactory)
     {
         _ambientEfCoreScopeStack = ambientEfCoreScopeStack;
         _umbracoEfCoreDatabaseFactory = umbracoEfCoreDatabaseFactory;
         _efCoreScopeAccessor = efCoreScopeAccessor;
         _ambientEfCoreScopeContextStack = ambientEfCoreScopeContextStack;
+        _distributedLockingMechanismFactory = distributedLockingMechanismFactory;
     }
 
-    public IEfCoreScope CreateDetachedScope() => new EfCoreDetachableScope(_umbracoEfCoreDatabaseFactory, _efCoreScopeAccessor, this, null);
+    public IEfCoreScope CreateDetachedScope() => new EfCoreDetachableScope(_distributedLockingMechanismFactory, _umbracoEfCoreDatabaseFactory, _efCoreScopeAccessor, this, null);
 
     public void AttachScope(IEfCoreScope other)
     {
@@ -108,7 +113,7 @@ public class EfCoreScopeProvider : IEfCoreScopeProvider
         if (_ambientEfCoreScopeStack.AmbientScope is null)
         {
             ScopeContext? newContext = _ambientEfCoreScopeContextStack.AmbientContext == null ? new ScopeContext() : null;
-            var ambientScope = new EfCoreScope(_umbracoEfCoreDatabaseFactory, _efCoreScopeAccessor, this, newContext);
+            var ambientScope = new EfCoreScope(_distributedLockingMechanismFactory, _umbracoEfCoreDatabaseFactory, _efCoreScopeAccessor, this, newContext);
 
             if (newContext != null)
             {
@@ -120,6 +125,7 @@ public class EfCoreScopeProvider : IEfCoreScopeProvider
         }
 
         var efCoreScope = new EfCoreScope(
+            _distributedLockingMechanismFactory,
             _umbracoEfCoreDatabaseFactory,
             _efCoreScopeAccessor,
             this,
