@@ -1,8 +1,8 @@
-import { UmbSaveWorkspaceAction } from '@umbraco-cms/workspace';
 import { DOCUMENT_REPOSITORY_ALIAS } from '../repository/manifests';
 import { UmbDocumentSaveAndPublishWorkspaceAction } from './actions/save-and-publish.action';
 import { UmbDocumentSaveAndPreviewWorkspaceAction } from './actions/save-and-preview.action';
 import { UmbSaveAndScheduleDocumentWorkspaceAction } from './actions/save-and-schedule.action';
+import { UmbSaveWorkspaceAction } from '@umbraco-cms/workspace';
 import type {
 	ManifestWorkspace,
 	ManifestWorkspaceAction,

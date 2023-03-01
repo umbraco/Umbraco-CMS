@@ -3,10 +3,10 @@ import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, html, nothing } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { repeat } from 'lit/directives/repeat.js';
-import { UmbSaveWorkspaceAction } from '@umbraco-cms/workspace';
 import { UmbUserStore, UMB_USER_STORE_CONTEXT_TOKEN } from '../../../users/users/user.store';
 import { UmbWorkspaceEntityElement } from '../../../shared/components/workspace/workspace-entity-element.interface';
 import { UmbWorkspaceUserGroupContext } from './user-group-workspace.context';
+import { UmbSaveWorkspaceAction } from '@umbraco-cms/workspace';
 import type { ManifestWorkspaceAction, UserGroupDetails } from '@umbraco-cms/models';
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-api';
 

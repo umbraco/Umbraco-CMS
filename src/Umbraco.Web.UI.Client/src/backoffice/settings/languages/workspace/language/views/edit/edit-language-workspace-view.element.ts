@@ -3,10 +3,10 @@ import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, html, nothing } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
-import { UmbChangeEvent } from '@umbraco-cms/events';
 import { UmbLanguageWorkspaceContext } from '../../language-workspace.context';
 import UmbInputCultureSelectElement from '../../../../../../shared/components/input-culture-select/input-culture-select.element';
 import UmbInputLanguagePickerElement from '../../../../../../shared/components/input-language-picker/input-language-picker.element';
+import { UmbChangeEvent } from '@umbraco-cms/events';
 import { UmbLitElement } from '@umbraco-cms/element';
 import { LanguageModel } from '@umbraco-cms/backend-api';
 
