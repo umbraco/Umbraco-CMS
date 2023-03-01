@@ -7,7 +7,7 @@ import { Meta } from '@storybook/addon-docs';
 TODO: introduction to the menu
 The menu is still work in progress
 
-<img src="docs/section.svg" width="400" />
+<img src="docs/menu.svg" width="150" />
 
 ```json
 {
@@ -21,7 +21,7 @@ The menu is still work in progress
 
 TODO: introduction to the menu item
 
-<img src="docs/section.svg" width="400" />
+<img src="docs/menu-item.svg" width="150" />
 
 ```json
 {
@@ -33,6 +33,33 @@ TODO: introduction to the menu item
 		"menus": ["My.Menu"]
 	}
 }
+```
+
+#### Tree Menu Item
+
+// TODO adds docs when we have extension kinds
+
+**Manifest**
+
+```json
+// it will be something like this
+{
+	"type": "menuItem",
+	"kind": "tree",
+	"alias": "My.TreeMenuItem",
+	"name": "My Tree Menu Item",
+	"meta": {
+		"label": "My Tree Menu Item",
+		"menus": ["My.Menu"]
+	}
+}
+```
+
+**Default Element**
+
+```ts
+// get interface
+interface UmbTreeMenuItemElement {}
 ```
 
 #### Adding menu items to an existing menu
