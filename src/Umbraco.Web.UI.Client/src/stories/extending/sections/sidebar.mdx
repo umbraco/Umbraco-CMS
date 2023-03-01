@@ -31,7 +31,7 @@ TODO: Introduction to Section Sidebar Apps
 }
 ```
 
-**Element**
+**Default Element**
 
 ```ts
 // TODO: get interface
@@ -48,22 +48,31 @@ TODO: Introduction to the sidebar menu
 - To register a new menu sidebar app, add the following to your manifest
 - The menu sidebar app will reference a menu that you have registered in the menu with a menu manifest
 
-[See Menu Docs](?path=/docs/guides-extending-the-backoffice-menu--docs)
+<img src="docs/section-menu-sidebar-app.svg" width="400" />
 
-<img src="docs/section-sidebar-menu.svg" width="400" />
+**Manifest**
 
 ```json
 {
-	"type": "sectionSidebarMenu",
-	"alias": "My.SectionSidebarMenu",
-	"name": "My Section Sidebar Menu",
+	"type": "menuSectionSidebarApp",
+	"alias": "My.SectionSidebarApp.MyMenu",
+	"name": "My Menu Section Sidebar App",
 	"meta": {
-		"label": "My Section Sidebar Menu",
+		"label": "My Sidebar Menu",
 		"sections": ["My.Section"],
 		"menu": "My.Menu"
 	}
 }
 ```
+
+**Default Element**
+
+```ts
+// TODO: get interface
+interface UmbMenuSectionSidebarAppElement {}
+```
+
+[See Menu Docs](?path=/docs/guides-extending-the-backoffice-menu--docs)
 
 #### Adding Items to an existing menu
 
