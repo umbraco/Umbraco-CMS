@@ -6,12 +6,12 @@ using Umbraco.Cms.Api.Management.ViewModels.Relation;
 
 namespace Umbraco.Cms.Api.Management.Factories;
 
-public class RelationViewModelFactory : IRelationViewModelFactory
+public class RelationPresentationFactory : IRelationPresentationFactory
 {
     private readonly IRelationService _relationService;
     private readonly IUmbracoMapper _umbracoMapper;
 
-    public RelationViewModelFactory(IRelationService relationService, IUmbracoMapper umbracoMapper)
+    public RelationPresentationFactory(IRelationService relationService, IUmbracoMapper umbracoMapper)
     {
         _relationService = relationService;
         _umbracoMapper = umbracoMapper;

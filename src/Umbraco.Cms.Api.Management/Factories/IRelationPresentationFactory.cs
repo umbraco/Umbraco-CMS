@@ -3,7 +3,7 @@ using Umbraco.Cms.Api.Management.ViewModels.Relation;
 
 namespace Umbraco.Cms.Api.Management.Factories;
 
-public interface IRelationViewModelFactory
+public interface IRelationPresentationFactory
 {
     RelationViewModel Create(IRelation relation);
 
