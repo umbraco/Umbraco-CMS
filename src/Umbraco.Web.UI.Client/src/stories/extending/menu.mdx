@@ -34,3 +34,23 @@ TODO: introduction to the menu item
 	}
 }
 ```
+
+#### Adding menu items to an existing menu
+
+The backoffice comes with a couple of menus.
+
+- Content, Media, Settings, Templating, Dictionary, etc.
+
+To add a menu item to an existing menu, you can use the `meta.menus` property.
+
+```json
+{
+	"type": "menuItem",
+	"alias": "My.MenuItem",
+	"name": "My Menu Item",
+	"meta": {
+		"label": "My Menu Item",
+		"menus": ["Umb.Menu.Content"]
+	}
+}
+```
