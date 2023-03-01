@@ -1,6 +1,4 @@
-﻿using System.Text;
-using System.Transactions;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.DistributedLocking;
@@ -9,7 +7,6 @@ using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Persistence.EFCore;
 using Umbraco.Cms.Persistence.EFCore.Entities;
 using Umbraco.Cms.Persistence.EFCore.Scoping;
-using Umbraco.Cms.Persistence.EFCore.Services;
 using Umbraco.Cms.Persistence.Sqlite.Interceptors;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
@@ -28,19 +25,17 @@ public class EfCoreLockTests : UmbracoIntegrationTest
     protected async Task SetUp()
     {
         // create a few lock objects
-        using (var scope = EFScopeProvider.CreateScope())
+        using var scope = EFScopeProvider.CreateScope();
+        await scope.ExecuteWithContextAsync<Task>(async database =>
         {
-            await scope.ExecuteWithContextAsync<Task>(async database =>
-            {
-                database.UmbracoLocks.Add(new UmbracoLock {Id = 1, Name = "Lock.1"});
-                database.UmbracoLocks.Add(new UmbracoLock {Id = 2, Name = "Lock.2"});
-                database.UmbracoLocks.Add(new UmbracoLock {Id = 3, Name = "Lock.3"});
+            database.UmbracoLocks.Add(new UmbracoLock { Id = 1, Name = "Lock.1" });
+            database.UmbracoLocks.Add(new UmbracoLock { Id = 2, Name = "Lock.2" });
+            database.UmbracoLocks.Add(new UmbracoLock { Id = 3, Name = "Lock.3" });
 
-                await database.SaveChangesAsync();
-            });
+            await database.SaveChangesAsync();
+        });
 
-            scope.Complete();
-        }
+        scope.Complete();
     }
 
     protected override void ConfigureTestServices(IServiceCollection services)
@@ -54,11 +49,17 @@ public class EfCoreLockTests : UmbracoIntegrationTest
     [Test]
     public void SingleReadLockTest()
     {
-        using (var scope = EFScopeProvider.CreateScope())
-        {
-            scope.Locks.EagerReadLock(scope.InstanceId, Constants.Locks.Servers);
-            scope.Complete();
-        }
+        using var scope = EFScopeProvider.CreateScope();
+        scope.Locks.EagerReadLock(scope.InstanceId, Constants.Locks.Servers);
+        scope.Complete();
+    }
+
+    [Test]
+    public void SingleWriteLockTest()
+    {
+        using var scope = EFScopeProvider.CreateScope();
+        scope.Locks.EagerWriteLock(scope.InstanceId, Constants.Locks.Servers);
+        scope.Complete();
     }
 
     [Test]
@@ -308,7 +309,7 @@ public class EfCoreLockTests : UmbracoIntegrationTest
         thread1.Join();
         thread2.Join();
 
-        //Assert.IsNotNull(e1);
+        Assert.IsNotNull(e1);
         if (e1 != null)
         {
             AssertIsDistributedLockingTimeoutException(e1);
@@ -334,40 +335,35 @@ public class EfCoreLockTests : UmbracoIntegrationTest
 
     private void DeadLockTestThread(int id1, int id2, EventWaitHandle myEv, WaitHandle otherEv, ref Exception exception)
     {
-        using (var scope = EFScopeProvider.CreateScope())
+        using var scope = EFScopeProvider.CreateScope();
+        try
         {
-            try
-            {
-                scope.ExecuteWithContextAsync<Task>(async dbContext =>
-                {
-                    otherEv.WaitOne();
-                    Console.WriteLine($"[{id1}] WAIT {id1}");
-                    scope.Locks.EagerWriteLock(scope.InstanceId, id1);
-                    Console.WriteLine($"[{id1}] GRANT {id1}");
-                    myEv.Set();
+            otherEv.WaitOne();
+            Console.WriteLine($"[{id1}] WAIT {id1}");
+            scope.Locks.EagerWriteLock(scope.InstanceId, id1);
+            Console.WriteLine($"[{id1}] GRANT {id1}");
+            myEv.Set();
 
-                    if (id1 == 1)
-                    {
-                        otherEv.WaitOne();
-                    }
-                    else
-                    {
-                        Thread.Sleep(5200); // wait for deadlock...
-                    }
+            if (id1 == 1)
+            {
+                otherEv.WaitOne();
+            }
+            else
+            {
+                Thread.Sleep(5200); // wait for deadlock...
+            }
 
-                    Console.WriteLine($"[{id1}] WAIT {id2}");
-                    scope.Locks.EagerWriteLock(scope.InstanceId, id2);
-                    Console.WriteLine($"[{id1}] GRANT {id2}");
-                }).GetAwaiter().GetResult();
-            }
-            catch (Exception e)
-            {
-                exception = e;
-            }
-            finally
-            {
-                scope.Complete();
-            }
+            Console.WriteLine($"[{id1}] WAIT {id2}");
+            scope.Locks.EagerWriteLock(scope.InstanceId, id2);
+            Console.WriteLine($"[{id1}] GRANT {id2}");
+        }
+        catch (Exception e)
+        {
+            exception = e;
+        }
+        finally
+        {
+            scope.Complete();
         }
     }
 }
