@@ -316,9 +316,9 @@ export class UmbLogViewerOverviewViewElement extends UmbLitElement {
 						<div id="date-input-container" @input=${this.#setDates}>
 							<uui-label for="start-date">From:</uui-label> 
 							<input 
-							@click=${(e: Event) => {
-								(e.target as HTMLInputElement).showPicker();
-							}}
+								@click=${(e: Event) => {
+									(e.target as HTMLInputElement).showPicker();
+								}}
 								id="start-date" 
 								type="date" 
 								label="From" 
@@ -327,10 +327,9 @@ export class UmbLogViewerOverviewViewElement extends UmbLitElement {
 							</input>
 							<uui-label for="end-date">To: </uui-label>
 							<input 
-							@click=${(e: Event) => {
-								(e.target as HTMLInputElement).showPicker();
-							}}
-
+								@click=${(e: Event) => {
+									(e.target as HTMLInputElement).showPicker();
+								}}
 								id="end-date" 
 								type="date" 
 								label="To" 
@@ -436,7 +435,9 @@ export class UmbLogViewerOverviewViewElement extends UmbLitElement {
 						}
 									</uui-table>
 
-					<uui-button id="show-more-templates-btn" look="primary" @click=${this.#getMessageTemplates}>Show more</uui-button>
+					<uui-button id="show-more-templates-btn" look="primary" @click=${
+						this.#getMessageTemplates
+					} label="Show more templates">Show more</uui-button>
 					</uui-box>
 				</div>
 			</div>

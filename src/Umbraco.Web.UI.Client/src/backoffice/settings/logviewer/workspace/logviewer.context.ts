@@ -1,5 +1,5 @@
 import { UmbLogViewerRepository } from './data/log-viewer.repository';
-import { ArrayState, createObservablePart, DeepState, StringState } from '@umbraco-cms/observable-api';
+import { ArrayState, createObservablePart, DeepState, ObjectState, StringState } from '@umbraco-cms/observable-api';
 import {
 	DirectionModel,
 	LoggerModel,
@@ -22,6 +22,11 @@ const logLevels = {
 
 export type LogLevel = Record<keyof typeof logLevels, number>;
 
+export type PoolingInterval = 0 | 2000 | 5000 | 10000 | 20000 | 30000;
+export interface PoolingCOnfig {
+	enabled: boolean;
+	interval: PoolingInterval;
+}
 export interface LogViewerDateRange {
 	startDate: string;
 	endDate: string;
@@ -74,6 +79,11 @@ export class UmbLogViewerWorkspaceContext {
 
 	#logs = new DeepState<PagedLogMessageModel | null>(null);
 	logs = createObservablePart(this.#logs, (data) => data?.items);
+
+	#polling = new ObjectState<PoolingCOnfig>({ enabled: false, interval: 2000 });
+	polling = createObservablePart(this.#polling, (data) => data);
+
+	#intervalID: number | null = null;
 
 	constructor(host: UmbControllerHostInterface) {
 		this.#host = host;
@@ -141,6 +151,26 @@ export class UmbLogViewerWorkspaceContext {
 
 	setLogLevels(logLevels: LogLevelModel[]) {
 		this.#logLevel.next(logLevels);
+	}
+
+	togglePolling() {
+		const isEnabled = !this.#polling.getValue().enabled;
+		this.#polling.update({
+			enabled: isEnabled,
+		});
+
+		if (isEnabled) {
+			this.#intervalID = setInterval(() => {
+				this.getLogs();
+			}, this.#polling.getValue().interval) as unknown as number;
+			return;
+		}
+
+		clearInterval(this.#intervalID as number);
+	}
+
+	setPollingInterval(interval: PoolingInterval) {
+		this.#polling.update({ interval, enabled: true });
 	}
 }
 

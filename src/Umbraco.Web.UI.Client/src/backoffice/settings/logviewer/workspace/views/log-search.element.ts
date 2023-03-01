@@ -3,6 +3,8 @@ import { css, html } from 'lit';
 import { customElement, state, query, queryAll } from 'lit/decorators.js';
 import {
 	LogViewerDateRange,
+	PoolingCOnfig,
+	PoolingInterval,
 	UmbLogViewerWorkspaceContext,
 	UMB_APP_LOG_VIEWER_CONTEXT_TOKEN,
 } from '../logviewer.context';
@@ -89,7 +91,8 @@ export class UmbLogViewerSearchViewElement extends UmbLitElement {
 				margin: 0 var(--uui-size-space-3);
 			}
 
-			uui-symbol-expand:not(#polling-symbol-expand),
+			#polling-symbol-expand,
+			#saved-search-expand-symbol,
 			uui-symbol-sort {
 				margin-left: var(--uui-size-space-3);
 			}
@@ -136,11 +139,28 @@ export class UmbLogViewerSearchViewElement extends UmbLitElement {
 			.log-level-button-indicator:not(:last-of-type)::after {
 				content: ', ';
 			}
+
+			#polling-interval-menu {
+				margin: 0;
+				padding: 0;
+				width: 20ch;
+				background-color: var(--uui-color-surface);
+				box-shadow: var(--uui-shadow-depth-3);
+				display: flex;
+				flex-direction: column;
+				transform: translateX(calc((100% - 33px) * -1));
+			}
 		`,
 	];
 
 	@query('#saved-searches-popover')
 	private _savedSearchesPopover!: UUIPopoverElement;
+
+	@query('#polling-popover')
+	private _pollingPopover!: UUIPopoverElement;
+
+	@query('#polling-expand-symbol')
+	private _polingExpandSymbol!: UUISymbolExpandElement;
 
 	@query('#saved-search-expand-symbol')
 	private _savedSearchesExpandSymbol!: UUISymbolExpandElement;
@@ -165,6 +185,9 @@ export class UmbLogViewerSearchViewElement extends UmbLitElement {
 
 	@state()
 	private _logLevel: LogLevelModel[] = [];
+
+	@state()
+	private _poolingConfig: PoolingCOnfig = {pooling: false, interval: 0};
 
 	#logViewerContext?: UmbLogViewerWorkspaceContext;
 
@@ -199,6 +222,11 @@ export class UmbLogViewerSearchViewElement extends UmbLitElement {
 		this.observe(this.#logViewerContext.logLevel, (levels) => {
 			this._logLevel = levels ?? [];
 		});
+
+		
+		this.observe(this.#logViewerContext.polling, (poolingConfig) => {
+			this._poolingConfig = {...poolingConfig};
+		});
 	}
 
 	#toggleSavedSearchesPopover() {
@@ -209,7 +237,7 @@ export class UmbLogViewerSearchViewElement extends UmbLitElement {
 		this._savedSearchesExpandSymbol.open = !this._savedSearchesExpandSymbol.open;
 	}
 
-	#openPopover() {
+	#openSavedSearchesPopover() {
 		this.#toggleSavedSearchesPopover();
 		this.#toggleSavedSearchesExpandSymbol();
 	}
@@ -225,7 +253,6 @@ export class UmbLogViewerSearchViewElement extends UmbLitElement {
 		this.#logViewerContext?.setFilterExpression(query);
 		this.#logViewerContext?.getLogs();
 		this._savedSearchesPopover.open = false;
-
 	}
 
 	#clearQuery() {
@@ -241,6 +268,7 @@ export class UmbLogViewerSearchViewElement extends UmbLitElement {
 				@close=${this.#toggleSavedSearchesExpandSymbol}>
 				<uui-input
 					id="search-input"
+					label="Search logs"
 					.placeholder=${'Search logs...'}
 					slot="trigger"
 					@input=${this.#setQuery}
@@ -252,7 +280,12 @@ export class UmbLogViewerSearchViewElement extends UmbLitElement {
 									><uui-icon name="umb:delete"></uui-icon
 								></uui-button>`
 						: html``}
-					<uui-button compact slot="append" id="saved-searches-button" @click=${this.#openPopover}
+					<uui-button
+						compact
+						slot="append"
+						id="saved-searches-button"
+						@click=${this.#openSavedSearchesPopover}
+						label="Saved searches"
 						>Saved searches <uui-symbol-expand id="saved-search-expand-symbol"></uui-symbol-expand
 					></uui-button>
 				</uui-input>
@@ -300,31 +333,73 @@ export class UmbLogViewerSearchViewElement extends UmbLitElement {
 			<div slot="dropdown" id="log-level-selector" @change=${this.#setLogLevel}>
 				${Object.values(LogLevelModel).map(
 					(logLevel) =>
-						html`<uui-checkbox class="log-level-menu-item" .value=${logLevel}
+						html`<uui-checkbox class="log-level-menu-item" .value=${logLevel} label="${logLevel}"
 							><umb-log-viewer-level-tag .level=${logLevel}></umb-log-viewer-level-tag
 						></uui-checkbox>`
 				)}
-				<uui-button class="log-level-menu-item" @click=${this.#selectAllLogLevels}>Select all</uui-button>
-				<uui-button class="log-level-menu-item" @click=${this.#deselectAllLogLevels}>Deselect all</uui-button>
+				<uui-button class="log-level-menu-item" @click=${this.#selectAllLogLevels} label="Select all"
+					>Select all</uui-button
+				>
+				<uui-button class="log-level-menu-item" @click=${this.#deselectAllLogLevels} label="Deselect all"
+					>Deselect all</uui-button
+				>
 			</div>
 		`;
+	}
+
+	#togglePolling() {
+		this.#logViewerContext?.togglePolling();
+	}
+
+	#setPolingInterval(interval: PoolingInterval) {
+		this.#logViewerContext?.setPollingInterval(interval);
+		this.#closePoolingPopover();
+	}
+
+	#openPoolingPopover() {
+		this._pollingPopover.open = true;
+		this._polingExpandSymbol.open = true;
+	}
+
+	#closePoolingPopover() {
+		this._pollingPopover.open = false;
+		this._polingExpandSymbol.open = false;
+	}
+
+	#pollingIntervals: PoolingInterval[] = [2000, 5000, 10000, 20000, 30000];
+
+	#renderPolingTimeSelector() {
+		return html` <uui-button-group>
+			<uui-button label="Start pooling" @click=${this.#togglePolling}>${this._poolingConfig.enabled ? html`Polling ${this._poolingConfig.interval/1000} seconds` : 'Pooling'}</uui-button>
+			<uui-popover placement="bottom-end" id="polling-popover" @close=${() => (this._polingExpandSymbol.open = false)}>
+				<uui-button slot="trigger" compact label="Choose pooling time" @click=${this.#openPoolingPopover}>
+					<uui-symbol-expand id="polling-expand-symbol"></uui-symbol-expand>
+				</uui-button>
+
+				<ul id="polling-interval-menu" slot="popover">
+					${this.#pollingIntervals.map(
+						(interval: PoolingInterval) =>
+							html`<uui-menu-item
+								label="Every ${interval/1000} seconds"
+								@click-label=${() => this.#setPolingInterval(interval)}></uui-menu-item>`
+					)}
+				</ul>
+			</uui-popover>
+		</uui-button-group>`;
 	}
 
 	render() {
 		return html`
 			<div id="layout">
 				<div id="levels-container">
-					<umb-button-with-dropdown
+					<umb-button-with-dropdown label="Select log levels"
 						>Log Level:
 						${this._logLevel.length > 0
 							? this._logLevel.map((level) => html`<span class="log-level-button-indicator">${level}</span>`)
 							: 'All'}
 						${this.#renderLogLevelSelector()}
 					</umb-button-with-dropdown>
-					<uui-button-group>
-						<uui-button>Polling</uui-button>
-						<uui-button compact><uui-symbol-expand id="polling-symbol-expand"></uui-symbol-expand></uui-button>
-					</uui-button-group>
+					${this.#renderPolingTimeSelector()}
 				</div>
 				<div id="input-container">${this.#renderSearchInput()}</div>
 				<uui-box>
