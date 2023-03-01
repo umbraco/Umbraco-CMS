@@ -1,5 +1,6 @@
 ﻿using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Persistence.EFCore.Entities;
+using Umbraco.Cms.Persistence.EFCore.Services;
 
 namespace Umbraco.Cms.Persistence.EFCore.Scoping;
 
@@ -20,6 +21,8 @@ public interface IEfCoreScope : IDisposable
 
     public IScopeContext? ScopeContext { get; set; }
 
+    public ILockingMechanism Locks { get; }
+
     /// <summary>
     /// Executes the given function on the database.
     /// </summary>
@@ -32,20 +35,4 @@ public interface IEfCoreScope : IDisposable
     /// Completes the scope, if this is not call, the transaction will be rolled back.
     /// </summary>
     void Complete();
-
-    /// <summary>
-    ///     Read-locks some lock objects.
-    /// </summary>
-    /// <param name="lockIds">Array of lock object identifiers.</param>
-    void ReadLock(params int[] lockIds);
-
-    /// <summary>
-    ///     Write-locks some lock objects.
-    /// </summary>
-    /// <param name="lockIds">Array of object identifiers.</param>
-    void WriteLock(params int[] lockIds);
-
-    void EagerReadLock(params int[] lockIds);
-
-    void EagerWriteLock(params int[] lockIds);
 }

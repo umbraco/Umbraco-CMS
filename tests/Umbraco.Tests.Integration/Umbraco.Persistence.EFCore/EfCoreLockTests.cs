@@ -9,6 +9,7 @@ using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Persistence.EFCore;
 using Umbraco.Cms.Persistence.EFCore.Entities;
 using Umbraco.Cms.Persistence.EFCore.Scoping;
+using Umbraco.Cms.Persistence.EFCore.Services;
 using Umbraco.Cms.Persistence.Sqlite.Interceptors;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
@@ -55,7 +56,23 @@ public class EfCoreLockTests : UmbracoIntegrationTest
     {
         using (var scope = EFScopeProvider.CreateScope())
         {
-            scope.EagerReadLock(Constants.Locks.Servers);
+            scope.Locks.EagerReadLock(scope.InstanceId, Constants.Locks.Servers);
+            scope.Complete();
+        }
+    }
+
+    [Test]
+    public void Can_Reacquire_Read_Lock()
+    {
+        using (var scope = EFScopeProvider.CreateScope())
+        {
+            scope.Locks.EagerReadLock(scope.InstanceId, Constants.Locks.Servers);
+            scope.Complete();
+        }
+
+        using (var scope = EFScopeProvider.CreateScope())
+        {
+            scope.Locks.EagerReadLock(scope.InstanceId, Constants.Locks.Servers);
             scope.Complete();
         }
     }
@@ -87,7 +104,7 @@ public class EfCoreLockTests : UmbracoIntegrationTest
                 {
                     try
                     {
-                        scope.EagerReadLock(Constants.Locks.Servers);
+                        scope.Locks.EagerReadLock(scope.InstanceId, Constants.Locks.Servers);
                         lock (locker)
                         {
                             acquired++;
@@ -196,7 +213,7 @@ public class EfCoreLockTests : UmbracoIntegrationTest
                             }
                         }
 
-                        scope.EagerWriteLock(Constants.Locks.Servers);
+                        scope.Locks.EagerWriteLock(scope.InstanceId, Constants.Locks.Servers);
 
                         lock (locker)
                         {
@@ -325,7 +342,7 @@ public class EfCoreLockTests : UmbracoIntegrationTest
                 {
                     otherEv.WaitOne();
                     Console.WriteLine($"[{id1}] WAIT {id1}");
-                    scope.EagerWriteLock(id1);
+                    scope.Locks.EagerWriteLock(scope.InstanceId, id1);
                     Console.WriteLine($"[{id1}] GRANT {id1}");
                     myEv.Set();
 
@@ -339,7 +356,7 @@ public class EfCoreLockTests : UmbracoIntegrationTest
                     }
 
                     Console.WriteLine($"[{id1}] WAIT {id2}");
-                    scope.EagerWriteLock(id2);
+                    scope.Locks.EagerWriteLock(scope.InstanceId, id2);
                     Console.WriteLine($"[{id1}] GRANT {id2}");
                 }).GetAwaiter().GetResult();
             }

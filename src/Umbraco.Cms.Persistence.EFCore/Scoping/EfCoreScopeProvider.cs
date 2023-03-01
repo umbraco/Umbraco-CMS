@@ -129,6 +129,7 @@ public class EfCoreScopeProvider : IEfCoreScopeProvider
         return efCoreScope;
     }
 
+    //TODO: Move to ILockingMechanism
     public IDistributedLockingMechanismFactory DistributedLockingMechanismFactory { get; }
 
     public void PopAmbientScope() => _ambientEfCoreScopeStack.Pop();
