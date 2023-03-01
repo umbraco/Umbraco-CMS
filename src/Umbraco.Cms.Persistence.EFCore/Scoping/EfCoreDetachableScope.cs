@@ -1,5 +1,6 @@
 ﻿using Umbraco.Cms.Core.DistributedLocking;
 using Umbraco.Cms.Core.Events;
+using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Scoping;
 
 namespace Umbraco.Cms.Persistence.EFCore.Scoping;
@@ -13,6 +14,7 @@ internal class EfCoreDetachableScope : EfCoreScope
         IDistributedLockingMechanismFactory distributedLockingMechanismFactory,
         IUmbracoEfCoreDatabaseFactory efCoreDatabaseFactory,
         IEFCoreScopeAccessor efCoreScopeAccessor,
+        FileSystems fileSystems,
         IEfCoreScopeProvider efCoreScopeProvider,
         IScopeContext? scopeContext,
         IEventAggregator eventAggregator)
@@ -20,6 +22,7 @@ internal class EfCoreDetachableScope : EfCoreScope
             distributedLockingMechanismFactory,
             efCoreDatabaseFactory,
             efCoreScopeAccessor,
+            fileSystems,
             efCoreScopeProvider,
             scopeContext,
             eventAggregator)
@@ -41,6 +44,7 @@ internal class EfCoreDetachableScope : EfCoreScope
         IDistributedLockingMechanismFactory distributedLockingMechanismFactory,
         IUmbracoEfCoreDatabaseFactory efCoreDatabaseFactory,
         IEFCoreScopeAccessor efCoreScopeAccessor,
+        FileSystems fileSystems,
         IEfCoreScopeProvider efCoreScopeProvider,
         EfCoreScope parentScope,
         IScopeContext? scopeContext,
@@ -49,6 +53,7 @@ internal class EfCoreDetachableScope : EfCoreScope
             distributedLockingMechanismFactory,
             efCoreDatabaseFactory,
             efCoreScopeAccessor,
+            fileSystems,
             efCoreScopeProvider,
             parentScope,
             scopeContext,
