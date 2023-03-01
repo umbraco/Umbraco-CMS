@@ -33,7 +33,6 @@ export class UmbDocumentWorkspaceElement extends UmbLitElement implements UmbWor
 		super();
 		this.observe(this._workspaceContext.activeVariantsInfo, (variants) => {
 			this._workspaceSplitViews = variants;
-			console.log('variants', variants);
 		});
 	}
 

@@ -77,7 +77,7 @@ export class UmbBackofficeMain extends UmbLitElement {
 	}
 
 	private _onRouteChange = (event: UmbRouterSlotChangeEvent) => {
-		const currentPath = event.target.localActiveViewPath || ''
+		const currentPath = event.target.localActiveViewPath || '';
 		const section = this._sections.find((s) => this._routePrefix + s.meta.pathname === currentPath);
 		if (!section) return;
 		this._backofficeContext?.setActiveSectionAlias(section.alias);
@@ -94,11 +94,11 @@ export class UmbBackofficeMain extends UmbLitElement {
 	}
 
 	render() {
-		return html`
-			<umb-router-slot
-				.routes=${this._routes}
-				@change=${this._onRouteChange}
-			></umb-router-slot>`;
+		return html` <umb-router-slot
+			.routes=${this._routes}
+			@change=${(event: any) => {
+				this._onRouteChange(event);
+			}}></umb-router-slot>`;
 	}
 }
 

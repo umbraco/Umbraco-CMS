@@ -37,19 +37,13 @@ export class UmbSectionElement extends UmbLitElement {
 	];
 
 	@state()
-	private _routes: Array<any> = [];
+	private _routes?: Array<any>;
 
 	@state()
 	private _menus?: Array<ManifestSidebarMenu>;
 
 	@state()
 	private _views?: Array<ManifestSectionView>;
-
-	@state()
-	private _sectionLabel = '';
-
-	@state()
-	private _sectionPathname = '';
 
 	private _workspaces?: Array<ManifestWorkspace>;
 	private _sectionContext?: UmbSectionContext;
@@ -76,7 +70,7 @@ export class UmbSectionElement extends UmbLitElement {
 
 		this.observe(umbExtensionsRegistry.extensionsOfType('workspace'), (workspaceExtensions) => {
 			this._workspaces = workspaceExtensions;
-			this._createMenuRoutes();
+			this._createWorkspaceRoutes();
 		});
 	}
 
@@ -88,16 +82,15 @@ export class UmbSectionElement extends UmbLitElement {
 					.pipe(map((manifests) => manifests.filter((manifest) => manifest.meta.sections.includes(sectionAlias)))),
 				(manifests) => {
 					this._menus = manifests;
-					this._createMenuRoutes();
 				}
 			);
 		} else {
-			this._menus = undefined;
-			this._createMenuRoutes();
+			this._menus = [];
 		}
 	}
 
-	private _createMenuRoutes() {
+	private _createWorkspaceRoutes() {
+		if (!this._workspaces) return;
 		// TODO: find a way to make this reuseable across:
 		const workspaceRoutes = this._workspaces?.map((workspace: ManifestWorkspace) => {
 			return [
@@ -172,6 +165,7 @@ export class UmbSectionElement extends UmbLitElement {
 	}
 
 	private _createViewRoutes() {
+		this._routes = [];
 		this._routes =
 			this._views?.map((view) => {
 				return {

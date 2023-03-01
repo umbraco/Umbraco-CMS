@@ -88,9 +88,9 @@ export class UmbApp extends UmbLitElement {
 		// Listen for the debug event from the <umb-debug> component
 		this.addEventListener(umbDebugContextEventType, (event: any) => {
 			// Once we got to the outter most component <umb-app>
-			// we can send the event containing all the contexts 
+			// we can send the event containing all the contexts
 			// we have collected whilst coming up through the DOM
-			// and pass it back down to the callback in 
+			// and pass it back down to the callback in
 			// the <umb-debug> component that originally fired the event
 			event.callback(event.instances);
 		});

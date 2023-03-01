@@ -1,7 +1,7 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html, nothing } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
-import { IRoutingInfo } from 'router-slot';
+import { IRoutingInfo, matchRoutes } from 'router-slot';
 import { map } from 'rxjs';
 import { repeat } from 'lit/directives/repeat.js';
 
@@ -89,7 +89,7 @@ export class UmbWorkspaceLayout extends UmbLitElement {
 	private _workspaceViews: Array<ManifestWorkspaceView | ManifestWorkspaceViewCollection> = [];
 
 	@state()
-	private _routes: any[] = [];
+	private _routes?: any[];
 
 	@state()
 	private _routerPath?: string;
@@ -119,7 +119,7 @@ export class UmbWorkspaceLayout extends UmbLitElement {
 					component: () => {
 						if (view.type === 'workspaceViewCollection') {
 							return import(
-								'src/backoffice/shared/components/workspace/workspace-content/views/collection/workspace-view-collection.element'
+								'../../../../shared/components/workspace/workspace-content/views/collection/workspace-view-collection.element'
 							);
 						}
 						return createExtensionElement(view);
@@ -183,7 +183,7 @@ export class UmbWorkspaceLayout extends UmbLitElement {
 
 	#renderRoutes() {
 		return html`
-			${this._routes.length > 0
+			${this._routes && this._routes.length > 0
 				? html`
 						<umb-router-slot
 							id="router-slot"
