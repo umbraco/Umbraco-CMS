@@ -1,11 +1,11 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css';
-import { UmbEntityActionBase } from '../../../../shared/entity-actions';
 import { UmbDictionaryRepository } from '../../repository/dictionary.repository';
 import {
 	UmbSectionSidebarContext,
 	UMB_SECTION_SIDEBAR_CONTEXT_TOKEN,
 } from '../../../../../backoffice/shared/components/section/section-sidebar/section-sidebar.context';
 import type { UmbCreateDictionaryModalResultData } from './create-dictionary-modal-layout.element';
+import { UmbEntityActionBase } from '@umbraco-cms/entity-action';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 import { UmbContextConsumerController } from '@umbraco-cms/context-api';
 import { UmbModalService, UMB_MODAL_SERVICE_CONTEXT_TOKEN } from '@umbraco-cms/modal';

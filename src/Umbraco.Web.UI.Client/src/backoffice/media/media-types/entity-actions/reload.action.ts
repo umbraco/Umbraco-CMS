@@ -1,6 +1,6 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css';
-import { UmbEntityActionBase } from '../../../shared/entity-actions';
 import { UmbMediaTypeRepository } from '../repository/media-type.repository';
+import { UmbEntityActionBase } from '@umbraco-cms/entity-action';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 
 export default class UmbReloadMediaTypeEntityAction extends UmbEntityActionBase<UmbMediaTypeRepository> {
@@ -11,6 +11,6 @@ export default class UmbReloadMediaTypeEntityAction extends UmbEntityActionBase<
 	}
 
 	async execute() {
-		alert('refresh')
+		alert('refresh');
 	}
 }

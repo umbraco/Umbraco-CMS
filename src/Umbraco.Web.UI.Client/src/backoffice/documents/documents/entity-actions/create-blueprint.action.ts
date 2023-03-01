@@ -1,5 +1,5 @@
 import { UmbDocumentRepository } from '../repository/document.repository';
-import { UmbEntityActionBase } from '../../../shared/entity-actions';
+import { UmbEntityActionBase } from '@umbraco-cms/entity-action';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 
 export class UmbCreateDocumentBlueprintEntityAction extends UmbEntityActionBase<UmbDocumentRepository> {
