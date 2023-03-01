@@ -23,11 +23,11 @@ export class UmbLanguageRepository {
 		this.#init = Promise.all([
 			new UmbContextConsumerController(this.#host, UMB_NOTIFICATION_SERVICE_CONTEXT_TOKEN, (instance) => {
 				this.#notificationService = instance;
-			}),
+			}).asPromise(),
 
 			new UmbContextConsumerController(this.#host, UMB_LANGUAGE_STORE_CONTEXT_TOKEN, (instance) => {
 				this.#languageStore = instance;
-			}),
+			}).asPromise(),
 		]);
 	}
 
@@ -55,7 +55,7 @@ export class UmbLanguageRepository {
 			data.items.forEach((x) => this.#languageStore?.append(x));
 		}
 
-		return { data, error, asObservable: () => this.#languageStore!.data };
+		return { data, error, asObservable: () => this.#languageStore?.data };
 	}
 
 	async requestItems(isoCodes: Array<string>) {
