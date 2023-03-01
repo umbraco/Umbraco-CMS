@@ -5,6 +5,8 @@ import { customElement, property } from 'lit/decorators.js';
 import { UmbLitElement } from '@umbraco-cms/element';
 import { DataTypePropertyModel } from '@umbraco-cms/backend-api';
 import '@tinymce/tinymce-webcomponent';
+import { AcePlugin } from './plugins/ace.plugin';
+import { UmbModalService, UMB_MODAL_SERVICE_CONTEXT_TOKEN } from '@umbraco-cms/modal';
 
 declare global {
 	interface Window {
@@ -20,10 +22,10 @@ export class UmbPropertyEditorUITinyMceElement extends UmbLitElement {
 	static styles = [UUITextStyles, css``];
 
 	@property()
-	value: string;
+	value?: string;
 
 	@property()
-	private _dimensions: { [key: string]: number };
+	private _dimensions?: { [key: string]: number };
 
 	@property()
 	private _styleFormats = [
@@ -65,18 +67,30 @@ export class UmbPropertyEditorUITinyMceElement extends UmbLitElement {
 		this._stylesheets = config.find((x) => x.alias === 'stylesheets')?.value;
 	}
 
-	constructor() {
-		super();
-
-		this.value = 'A default value';
-
+	// TODO => setup runs before rendering, here we can add any custom plugins
+	// TODO => fix TinyMCE type definitions
+	#setTinyConfig() {	
 		window.tinyConfig = {
 			statusbar: false,
 			menubar: false,
 			contextMenu: false,
 			resize: false,
 			style_formats: this._styleFormats,
+			setup: (editor: any) => {
+				new AcePlugin(editor, this.modalService);
+			},
 		};
+	}
+
+	modalService?: UmbModalService;
+
+	constructor() {
+		super();
+
+		this.consumeContext(UMB_MODAL_SERVICE_CONTEXT_TOKEN, (instance) => {
+			this.modalService = instance;
+            this.#setTinyConfig();
+		});
 	}
 
 	render() {
