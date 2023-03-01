@@ -1,10 +1,13 @@
-import { LogLevelModel, LogMessagePropertyModel } from '@umbraco-cms/backend-api';
 import { UUITextStyles } from '@umbraco-ui/uui-css';
-import { css, html, LitElement } from 'lit';
+import { css, html } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
+import { UmbLogViewerWorkspaceContext, UMB_APP_LOG_VIEWER_CONTEXT_TOKEN } from '../../logviewer.context';
+import { LogLevelModel, LogMessagePropertyModel } from '@umbraco-cms/backend-api';
+import { UmbLitElement } from '@umbraco-cms/element';
 
+//TODO: check how to display EventId field in the message properties
 @customElement('umb-log-viewer-message')
-export class UmbLogViewerMessageElement extends LitElement {
+export class UmbLogViewerMessageElement extends UmbLitElement {
 	static styles = [
 		UUITextStyles,
 		css`
@@ -62,6 +65,12 @@ export class UmbLogViewerMessageElement extends LitElement {
 				flex: 6 0 14ch;
 			}
 
+			.property-name,
+			.property-value {
+				display: flex;
+				align-items: center;
+			}
+
 			.property-name {
 				font-weight: 600;
 				flex: 1 1 20ch;
@@ -86,6 +95,20 @@ export class UmbLogViewerMessageElement extends LitElement {
 
 			.search-item {
 				width: 100%;
+			}
+
+			pre {
+				background-color: var(--uui-color-background);
+				border-top: 1px solid #d8d7d9;
+				border-left: 4px solid #d42054;
+				color: #303033;
+				display: block;
+				font-family: Lato, Helvetica Neue, Helvetica, Arial, sans-serif;
+				line-height: 20px;
+				margin: 0;
+				overflow-x: auto;
+				padding: 9.5px;
+				white-space: pre-wrap;
 			}
 		`,
 	];
@@ -115,6 +138,14 @@ export class UmbLogViewerMessageElement extends LitElement {
 		if (changedProperties.has('timestamp')) {
 			this.date = new Date(this.timestamp);
 		}
+	}
+
+	#logViewerContext?: UmbLogViewerWorkspaceContext;
+	constructor() {
+		super();
+		this.consumeContext(UMB_APP_LOG_VIEWER_CONTEXT_TOKEN, (instance) => {
+			this.#logViewerContext = instance;
+		});
 	}
 
 	private _searchMenuData: Array<{ label: string; href: () => string; icon: string; title: string }> = [
@@ -165,6 +196,21 @@ export class UmbLogViewerMessageElement extends LitElement {
 		},
 	];
 
+	private _propertiesWithSearchMenu: Array<string> = ['HttpRequestNumber', 'SourceContext', 'MachineName'];
+
+	private _findLogsWithProperty({ name, value }: LogMessagePropertyModel) {
+		let queryString = '';
+
+		if (isNaN(+(value ?? ''))) {
+			queryString = name + "='" + value + "'";
+		} else {
+			queryString = name + '=' + value;
+		}
+
+		this.#logViewerContext?.setFilterExpression(queryString);
+		this.#logViewerContext?.getLogs();
+	}
+
 	render() {
 		return html`
 			<details>
@@ -176,6 +222,7 @@ export class UmbLogViewerMessageElement extends LitElement {
 					<div id="machine">${this.properties.find((property) => property.name === 'MachineName')?.value}</div>
 					<div id="message">${this.renderedMessage}</div>
 				</summary>
+				${this.exception ? html`<pre id="exception">${this.exception}</pre>` : ''}
 				<ul id="properties-list">
 					<li class="property">
 						<div class="property-name">Timestamp</div>
@@ -189,11 +236,23 @@ export class UmbLogViewerMessageElement extends LitElement {
 						(property) =>
 							html`<li class="property">
 								<div class="property-name">${property.name}:</div>
-								<div class="property-value">${property.value}</div>
+								<div class="property-value">
+									${property.value}
+									${this._propertiesWithSearchMenu.includes(property.name ?? '')
+										? html`<uui-button
+												compact
+												@click=${() => this._findLogsWithProperty(property)}
+												look="secondary"
+												label="Find logs with ${property.name}"
+												title="Find logs with ${property.name}"
+												><uui-icon name="umb:search"></uui-icon
+										  ></uui-button>`
+										: ''}
+								</div>
 							</li>`
 					)}
 				</ul>
-				<umb-button-with-dropdown look="secondary" placement="bottom-start" id="search-button">
+				<umb-button-with-dropdown look="secondary" placement="bottom-start" id="search-button" label="Search">
 					<uui-icon name="umb:search"></uui-icon>Search
 					<ul id="search-menu" slot="dropdown">
 						${this._searchMenuData.map(

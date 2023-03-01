@@ -34,17 +34,17 @@ export class UmbLogViewerWorkspaceContext {
 	get today() {
 		const today = new Date();
 		const dd = String(today.getDate()).padStart(2, '0');
-		const mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
+		const mm = String(today.getMonth() + 1).padStart(2, '0');
 		const yyyy = today.getFullYear();
 
 		return yyyy + '-' + mm + '-' + dd;
 	}
 
 	get yesterday() {
-		const today = new Date();
-		const dd = String(today.getDate() - 1).padStart(2, '0');
-		const mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
-		const yyyy = today.getFullYear();
+		const yesterday = new Date(new Date().setDate(new Date().getDate() - 1));
+		const dd = String(yesterday.getDate()).padStart(2, '0');
+		const mm = String(yesterday.getMonth() + 1).padStart(2, '0');
+		const yyyy = yesterday.getFullYear();
 
 		return yyyy + '-' + mm + '-' + dd;
 	}
@@ -63,8 +63,8 @@ export class UmbLogViewerWorkspaceContext {
 	#dateRange = new DeepState<LogViewerDateRange>(this.defaultDateRange);
 	dateRange = createObservablePart(this.#dateRange, (data) => data);
 
-	#currentQuery = new StringState<string>('');
-	currentQuery = createObservablePart(this.#currentQuery, (data) => data);
+	#filterExpression = new StringState<string>('');
+	filterExpression = createObservablePart(this.#filterExpression, (data) => data);
 
 	#messageTemplates = new DeepState<PagedLogTemplateModel | null>(null);
 	messageTemplates = createObservablePart(this.#messageTemplates, (data) => data);
@@ -123,7 +123,7 @@ export class UmbLogViewerWorkspaceContext {
 	async getLogs() {
 		const options = {
 			orderDirection: DirectionModel.ASCENDING,
-			filterExpression: this.#currentQuery.getValue(),
+			filterExpression: this.#filterExpression.getValue(),
 			logLevel: this.#logLevel.getValue(),
 			...this.#dateRange.getValue(),
 		};
@@ -135,8 +135,12 @@ export class UmbLogViewerWorkspaceContext {
 		}
 	}
 
-	setCurrentQuery(query: string) {
-		this.#currentQuery.next(query);
+	setFilterExpression(query: string) {
+		this.#filterExpression.next(query);
+	}
+
+	setLogLevels(logLevels: LogLevelModel[]) {
+		this.#logLevel.next(logLevels);
 	}
 }
 

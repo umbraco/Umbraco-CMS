@@ -7310,8 +7310,41 @@ const randomEnumValue = (enumeration: any): LogLevelModel => {
 };
 
 export const logs: LogMessageModel[] = allLogs.map((log) => {
+
+	const randomLevel = randomEnumValue(LogLevelModel);
+
 	return {
 		...log,
-		level: randomEnumValue(LogLevelModel),
+		level: randomLevel,
+		eventId: {
+			TypeTag: null,
+			Properties: [
+				{
+					Name: 'Id',
+					Value: {
+						Value: 17,
+					},
+				},
+				{
+					Name: 'Name',
+					Value: {
+						Value: 'ExceptionProcessingMessage',
+					},
+				},
+			],
+		},
+		exception:
+			randomLevel === LogLevelModel.ERROR
+				? `System.InvalidOperationException: The identity did not contain requried claim name
+		at Umbraco.Cloud.Identity.Cms.PrincipalExtensions.GetRequiredFirstValue(ClaimsIdentity identity, String claimType)
+		at Umbraco.Cloud.Identity.Cms.ClaimsIdentityExtensions.ApplyNameClaim(ClaimsIdentity identity)
+		at Umbraco.Cloud.Identity.Cms.ClaimsIdentityExtensions.ValidateAndTransformClaims(ClaimsIdentity identity, String currentPolicy, String[] userRoles, String passwordChangePolicy, String profilePolicy, String passwordResetPolicy)
+		at Umbraco.Cloud.Identity.Cms.ClaimsIdentityExtensions.ValidateAndTransformClaims(ClaimsPrincipal principal, String currentPolicy, String[] userRoles, String passwordChangePolicy, String profilePolicy, String passwordResetPolicy)
+		at Umbraco.Cloud.Identity.Cms.V10.OpenIdConnectEventHandler.OnAuthorizationCodeReceived(AuthorizationCodeReceivedContext context)
+		at Microsoft.Identity.Web.MicrosoftIdentityWebAppAuthenticationBuilder.<>c__DisplayClass11_1.<<WebAppCallsWebApiImplementation>b__1>d.MoveNext()
+	 --- End of stack trace from previous location ---
+		at Microsoft.AspNetCore.Authentication.OpenIdConnect.OpenIdConnectHandler.RunAuthorizationCodeReceivedEventAsync(OpenIdConnectMessage authorizationResponse, ClaimsPrincipal user, AuthenticationProperties properties, JwtSecurityToken jwt)
+		at Microsoft.AspNetCore.Authentication.OpenIdConnect.OpenIdConnectHandler.HandleRemoteAuthenticateAsync()`
+				: undefined,
 	};
 });

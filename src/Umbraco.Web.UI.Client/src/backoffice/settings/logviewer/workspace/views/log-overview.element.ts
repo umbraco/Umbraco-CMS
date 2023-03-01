@@ -11,7 +11,6 @@ export class UmbLogViewerOverviewViewElement extends UmbLitElement {
 		css`
 			:host {
 				display: block;
-
 			}
 
 			#logviewer-layout {
@@ -209,8 +208,6 @@ export class UmbLogViewerOverviewViewElement extends UmbLitElement {
 	@state()
 	private _endDate = '';
 
-	#logViewerContext?: UmbLogViewerWorkspaceContext;
-
 	setLogLevelCount() {
 		this.logLevelCount = this._logLevelCount
 			? Object.entries(this._logLevelCount).filter(([level, number]) => !this._logLevelCountFilter.includes(level))
@@ -220,6 +217,7 @@ export class UmbLogViewerOverviewViewElement extends UmbLitElement {
 			: 0;
 	}
 
+	#logViewerContext?: UmbLogViewerWorkspaceContext;
 	constructor() {
 		super();
 		this.consumeContext(UMB_APP_LOG_VIEWER_CONTEXT_TOKEN, (instance) => {
@@ -305,7 +303,7 @@ export class UmbLogViewerOverviewViewElement extends UmbLitElement {
 	}
 
 	setCurrentQuery(query: string) {
-		this.#logViewerContext?.setCurrentQuery(query);
+		this.#logViewerContext?.setFilterExpression(query);
 	}
 
 	render() {
