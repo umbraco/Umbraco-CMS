@@ -43,11 +43,12 @@ public class EfCoreLockTests : UmbracoIntegrationTest
         // SQLite + retry policy makes tests fail, we retry before throwing distributed locking timeout.
         services.RemoveAll(x => x.ImplementationType == typeof(SqliteAddRetryPolicyInterceptor));
         services.AddUnique<IDistributedLockingMechanism, SqlServerEFCoreDistributedLockingMechanism>();
+        services.AddUnique<IDistributedLockingMechanism, SqliteEFCoreDistributedLockingMechanism>();
     }
 
 
     [Test]
-    public void SingleReadLockTest()
+    public void SingleEagerReadLockTest()
     {
         using var scope = EFScopeProvider.CreateScope();
         scope.Locks.EagerReadLock(scope.InstanceId, Constants.Locks.Servers);
@@ -55,7 +56,23 @@ public class EfCoreLockTests : UmbracoIntegrationTest
     }
 
     [Test]
+    public void SingleReadLockTest()
+    {
+        using var scope = EFScopeProvider.CreateScope();
+        scope.Locks.ReadLock(scope.InstanceId, Constants.Locks.Servers);
+        scope.Complete();
+    }
+
+    [Test]
     public void SingleWriteLockTest()
+    {
+        using var scope = EFScopeProvider.CreateScope();
+        scope.Locks.WriteLock(scope.InstanceId, Constants.Locks.Servers);
+        scope.Complete();
+    }
+
+    [Test]
+    public void SingleEagerWriteLockTest()
     {
         using var scope = EFScopeProvider.CreateScope();
         scope.Locks.EagerWriteLock(scope.InstanceId, Constants.Locks.Servers);
@@ -74,6 +91,22 @@ public class EfCoreLockTests : UmbracoIntegrationTest
         using (var scope = EFScopeProvider.CreateScope())
         {
             scope.Locks.EagerReadLock(scope.InstanceId, Constants.Locks.Servers);
+            scope.Complete();
+        }
+    }
+
+    [Test]
+    public void Can_Reacquire_Write_Lock()
+    {
+        using (var scope = EFScopeProvider.CreateScope())
+        {
+            scope.Locks.EagerWriteLock(scope.InstanceId, Constants.Locks.Servers);
+            scope.Complete();
+        }
+
+        using (var scope = EFScopeProvider.CreateScope())
+        {
+            scope.Locks.EagerWriteLock(scope.InstanceId, Constants.Locks.Servers);
             scope.Complete();
         }
     }

@@ -21,5 +21,6 @@ public interface ILockingMechanism
     void EagerWriteLock(Guid instanceId, params int[] lockIds);
 
     void ClearLocks(Guid instanceId);
+
     void EnsureDbLocks(Guid scopeInstanceId);
 }
