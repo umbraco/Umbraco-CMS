@@ -38,3 +38,23 @@ import { Meta } from '@storybook/addon-docs';
 // TODO: get interface
 interface UmbWorkspaceActionElement {}
 ```
+
+### The Workspace Action Class
+
+As part of the Extension Manifest you can attach a class that will be instanciated as part of the action. It will have access to the host element, the Workspace Context, and an array of uniques (key etc). When the action is clicked the `execute` method on the api class will be run. When the action is completed, an event on the host element will be dispatched to notify any surrounding elements.
+
+```ts
+import { UmbEntityBulkActionBase } from '@umbraco-cms/entity-action';
+import { UmbControllerHostInterface } from '@umbraco-cms/controller';
+import { MyRepository } from './my-repository';
+
+export class MyWorkspaceAction extends UmbWorkspaceActionBase {
+	constructor(host: UmbControllerHostInterface, selection: Array<string>) {
+		super(host, selection);
+	}
+
+	async execute() {
+		await this.workspaceContext.repository?.myAction(this.selection);
+	}
+}
+```
