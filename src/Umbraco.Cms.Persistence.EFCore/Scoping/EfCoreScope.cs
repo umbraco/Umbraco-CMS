@@ -52,7 +52,7 @@ internal class EfCoreScope : IEfCoreScope
             scopeContext) =>
         ParentScope = parentScope;
 
-    public async Task<T> ExecuteWithContextAsync<T>(Func<IUmbracoEfCoreDatabase, Task<T>> method)
+    public async Task<T> ExecuteWithContextAsync<T>(Func<UmbracoEFContext, Task<T>> method)
     {
         if (_disposed)
         {
@@ -65,14 +65,14 @@ internal class EfCoreScope : IEfCoreScope
             InitializeDatabase();
         }
 
-        return await method(_umbracoEfCoreDatabase!);
+        return await method(_umbracoEfCoreDatabase!.UmbracoEFContext);
     }
 
     public ILockingMechanism Locks { get; }
 
     private ILockingMechanism ResolveLockingMechanism() => ParentScope is not null ? ParentScope.ResolveLockingMechanism() : Locks;
 
-    public async Task ExecuteWithContextAsync<T>(Func<IUmbracoEfCoreDatabase, Task> method) =>
+    public async Task ExecuteWithContextAsync<T>(Func<UmbracoEFContext, Task> method) =>
         await ExecuteWithContextAsync(async db =>
         {
             await method(db);

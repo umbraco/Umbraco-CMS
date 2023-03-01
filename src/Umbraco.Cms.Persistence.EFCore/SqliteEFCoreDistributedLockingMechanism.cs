@@ -119,7 +119,7 @@ public class SqliteEFCoreDistributedLockingMechanism : IDistributedLockingMechan
 
             efCoreScope.ExecuteWithContextAsync<Task>(async database =>
             {
-                if (database.UmbracoEFContext.Database.CurrentTransaction is null)
+                if (database.Database.CurrentTransaction is null)
                 {
                     throw new InvalidOperationException(
                         "SqliteDistributedLockingMechanism requires a transaction to function.");
@@ -140,7 +140,7 @@ public class SqliteEFCoreDistributedLockingMechanism : IDistributedLockingMechan
 
             efCoreScope.ExecuteWithContextAsync<Task>(async database =>
             {
-                if (database.UmbracoEFContext.Database.CurrentTransaction is null)
+                if (database.Database.CurrentTransaction is null)
                 {
                     throw new InvalidOperationException(
                         "SqliteDistributedLockingMechanism requires a transaction to function.");
@@ -152,7 +152,7 @@ public class SqliteEFCoreDistributedLockingMechanism : IDistributedLockingMechan
 
                 try
                 {
-                    var i = await database.UmbracoEFContext.Database.ExecuteScalarAsync<int>(query);
+                    var i = await database.Database.ExecuteScalarAsync<int>(query);
 
                     if (i == 0)
                     {

@@ -28,11 +28,11 @@ public class EfCoreLockTests : UmbracoIntegrationTest
         using var scope = EFScopeProvider.CreateScope();
         await scope.ExecuteWithContextAsync<Task>(async database =>
         {
-            database.UmbracoEFContext.UmbracoLocks.Add(new UmbracoLock { Id = 1, Name = "Lock.1" });
-            database.UmbracoEFContext.UmbracoLocks.Add(new UmbracoLock { Id = 2, Name = "Lock.2" });
-            database.UmbracoEFContext.UmbracoLocks.Add(new UmbracoLock { Id = 3, Name = "Lock.3" });
+            database.UmbracoLocks.Add(new UmbracoLock { Id = 1, Name = "Lock.1" });
+            database.UmbracoLocks.Add(new UmbracoLock { Id = 2, Name = "Lock.2" });
+            database.UmbracoLocks.Add(new UmbracoLock { Id = 3, Name = "Lock.3" });
 
-            await database.UmbracoEFContext.SaveChangesAsync();
+            await database.SaveChangesAsync();
         });
 
         scope.Complete();
@@ -43,6 +43,7 @@ public class EfCoreLockTests : UmbracoIntegrationTest
         // SQLite + retry policy makes tests fail, we retry before throwing distributed locking timeout.
         services.RemoveAll(x => x.ImplementationType == typeof(SqliteAddRetryPolicyInterceptor));
         services.AddUnique<IDistributedLockingMechanism, SqlServerEFCoreDistributedLockingMechanism>();
+        services.AddUnique<IDistributedLockingMechanism, SqliteEFCoreDistributedLockingMechanism>();
     }
 
 
