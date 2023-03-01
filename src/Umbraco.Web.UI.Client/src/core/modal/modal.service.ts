@@ -9,6 +9,7 @@ import '../../backoffice/settings/languages/language-picker/language-picker-moda
 import './layouts/link-picker/modal-layout-link-picker.element';
 import './layouts/basic/modal-layout-basic.element';
 import './layouts/search/modal-layout-search.element.ts';
+import './layouts/code-editor/modal-layout-code-editor.element.ts';
 
 import { UUIModalSidebarSize } from '@umbraco-ui/uui-modal-sidebar';
 import { BehaviorSubject } from 'rxjs';
@@ -23,6 +24,7 @@ import type { UmbModalLinkPickerData } from './layouts/link-picker/modal-layout-
 import { UmbModalHandler } from './modal-handler';
 import type { UmbBasicModalData } from './layouts/basic/modal-layout-basic.element';
 import { UmbPickerModalData } from './layouts/modal-layout-picker-base';
+import type { UmbModalCodeEditorData } from './layouts/code-editor/modal-layout-code-editor.element';
 import { UmbContextToken } from '@umbraco-cms/context-api';
 import { LanguageModel } from '@umbraco-cms/backend-api';
 
@@ -51,6 +53,17 @@ export class UmbModalService {
 	 */
 	public confirm(data: UmbModalConfirmData): UmbModalHandler {
 		return this.open('umb-modal-layout-confirm', { data, type: 'dialog' });
+	}
+
+	/**
+	 * Opens a Code Editor modal
+	 * @public
+	 * @param {UmbModalCodeEditorData} data
+	 * @return {*}  {UmbModalHandler}
+	 * @memberof UmbModalService
+	 */
+	public codeEditor(data: UmbModalCodeEditorData): UmbModalHandler {
+		return this.open('umb-modal-layout-code-editor', { data, type: 'sidebar', size: 'large' });
 	}
 
 	/**
