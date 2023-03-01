@@ -68,9 +68,8 @@ export class UmbPropertyEditorUIDatePickerElement extends UmbLitElement {
 			this._inputType = "time";
 		}
 
-		// TODO: Warren - could this be handled in the C# server side code?
-		// When this is set to true then you need to check the Umbraco.Sys.ServerVariables that comes from C# server in a global JS obejct
-		// How do we handle this ?
+		// TODO: Warren - Need to deal with offSetTime prevalue/config
+		// Currently the date picker in uui-iinput does not change based on this config
 		this._offsetTime = config.find((x) => x.alias === 'offsetTime')?.value;
 	}
 
