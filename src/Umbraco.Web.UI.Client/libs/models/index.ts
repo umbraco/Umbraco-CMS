@@ -159,3 +159,7 @@ export type UmbPackage = {
 };
 
 export type PagedManifestsResponse = UmbPackage[];
+
+export type UmbPackageWithMigrationStatus = UmbPackage & {
+	hasPendingMigrations: boolean;
+};

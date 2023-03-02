@@ -39,7 +39,8 @@ export class UmbPackageRepository {
 		const { data: packages } = await this.#packageSource.getRootItems();
 
 		if (packages) {
-			store.appendItems(packages);
+			// Append packages to the store but only if they have a name
+			store.appendItems(packages.filter((p) => p.name?.length));
 			const extensions: ManifestBase[] = [];
 
 			packages.forEach((p) => {
