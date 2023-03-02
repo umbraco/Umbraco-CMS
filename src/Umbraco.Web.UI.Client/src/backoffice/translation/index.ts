@@ -4,10 +4,7 @@ import type { ManifestTypes } from '@umbraco-cms/models';
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-api';
 
 const registerExtensions = (manifests: Array<ManifestTypes>) => {
-	manifests.forEach((manifest) => {
-		if (umbExtensionsRegistry.isRegistered(manifest.alias)) return;
-		umbExtensionsRegistry.register(manifest);
-	});
+	manifests.forEach((manifest) => umbExtensionsRegistry.register(manifest));
 };
 
 registerExtensions([...translationSectionManifests, ...dictionaryManifests]);
