@@ -262,4 +262,9 @@ public class ContentSettings
     /// </summary>
     [DefaultValue(StaticDisallowedUploadFiles)]
     public string[] DisallowedUploadedFileExtensions { get; set; } = StaticDisallowedUploadFiles.Split(',');
+
+    /// <summary>
+    /// Gets or sets the allowed external host for media. If empty only relative paths are allowed.
+    /// </summary>
+    public string[] AllowedMediaHosts { get; set; } = Array.Empty<string>();
 }
