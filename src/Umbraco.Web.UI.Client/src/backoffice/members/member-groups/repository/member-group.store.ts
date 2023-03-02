@@ -14,7 +14,7 @@ export class UmbMemberGroupStore extends UmbStoreBase {
 	#data = new ArrayState<MemberGroupDetails>([], (x) => x.key);
 
 	constructor(host: UmbControllerHostInterface) {
-		super(host, UmbMemberGroupStore.name);
+		super(host, UMB_MEMBER_GROUP_STORE_CONTEXT_TOKEN.toString());
 	}
 
 	append(memberGroup: MemberGroupDetails) {
@@ -26,6 +26,4 @@ export class UmbMemberGroupStore extends UmbStoreBase {
 	}
 }
 
-export const UMB_MEMBER_GROUP_DETAIL_STORE_CONTEXT_TOKEN = new UmbContextToken<UmbMemberGroupStore>(
-	UmbMemberGroupStore.name
-);
+export const UMB_MEMBER_GROUP_STORE_CONTEXT_TOKEN = new UmbContextToken<UmbMemberGroupStore>('UmbMemberGroupStore');

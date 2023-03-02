@@ -4,6 +4,8 @@ import { ArrayState } from '@umbraco-cms/observable-api';
 import { UmbTreeStoreBase } from '@umbraco-cms/store';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 
+export const UMB_MEDIA_TREE_STORE_CONTEXT_TOKEN = new UmbContextToken<UmbMediaTreeStore>('UmbMediaTreeStore');
+
 /**
  * @export
  * @class UmbMediaTreeStore
@@ -22,5 +24,3 @@ export class UmbMediaTreeStore extends UmbTreeStoreBase {
 		super(host, UMB_MEDIA_TREE_STORE_CONTEXT_TOKEN.toString());
 	}
 }
-
-export const UMB_MEDIA_TREE_STORE_CONTEXT_TOKEN = new UmbContextToken<UmbMediaTreeStore>(UmbMediaTreeStore.name);

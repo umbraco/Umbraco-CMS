@@ -1,7 +1,9 @@
 import { BehaviorSubject, map, Observable } from 'rxjs';
-import type { ManifestTypes, ManifestTypeMap, ManifestBase, ManifestWithLoader, ManifestEntrypoint, HTMLElementConstructor } from '../../models';
-import { hasDefaultExport } from '../has-default-export.function';
+import { UmbContextToken } from "@umbraco-cms/context-api";
+import type { UmbControllerHostInterface } from "@umbraco-cms/controller";
+import type { ManifestTypes, ManifestTypeMap, ManifestBase, ManifestEntrypoint } from '../../models';
 import { loadExtension } from '../load-extension.function';
+import { hasInitExport } from "../has-init-export.function";
 
 type SpecificManifestTypeOrManifestBase<T extends keyof ManifestTypeMap | string> = T extends keyof ManifestTypeMap
 	? ManifestTypeMap[T]
@@ -13,7 +15,7 @@ export class UmbExtensionRegistry {
 	private _extensions = new BehaviorSubject<Array<ManifestBase>>([]);
 	public readonly extensions = this._extensions.asObservable();
 
-	register(manifest: ManifestTypes): void {
+	register(manifest: ManifestTypes, rootHost?: UmbControllerHostInterface): void {
 		const extensionsValues = this._extensions.getValue();
 		const extension = extensionsValues.find((extension) => extension.alias === manifest.alias);
 
@@ -27,12 +29,9 @@ export class UmbExtensionRegistry {
 		// If entrypoint extension, we should load and run it immediately
 		if (manifest.type === 'entrypoint') {
 			loadExtension(manifest as ManifestEntrypoint).then((js) => {
-				if (hasDefaultExport<HTMLElementConstructor>(js)) {
-					new js.default();
-				} else {
-					console.error(
-						`Extension with alias '${manifest.alias}' of type 'entrypoint' must have a default export of its JavaScript module.`
-					);
+				// If the extension has an onInit export, be sure to run that or else let the module handle itself
+				if (hasInitExport(js)) {
+					js.onInit(rootHost!, this);
 				}
 			});
 		}
@@ -96,3 +95,5 @@ export class UmbExtensionRegistry {
 		) as Observable<Array<ExtensionType>>;
 	}
 }
+
+export const UMB_EXTENSION_REGISTRY_TOKEN = new UmbContextToken<UmbExtensionRegistry>('UmbExtensionRegistry');

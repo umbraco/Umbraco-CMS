@@ -14,7 +14,7 @@ export class UmbMediaTypeStore extends UmbStoreBase {
 	#data = new ArrayState<MediaTypeDetails>([], (x) => x.key);
 
 	constructor(host: UmbControllerHostInterface) {
-		super(host, UmbMediaTypeStore.name);
+		super(host, UMB_MEDIA_TYPE_STORE_CONTEXT_TOKEN.toString());
 	}
 
 	append(mediaType: MediaTypeDetails) {
@@ -26,4 +26,4 @@ export class UmbMediaTypeStore extends UmbStoreBase {
 	}
 }
 
-export const UMB_MEDIA_TYPE_DETAIL_STORE_CONTEXT_TOKEN = new UmbContextToken<UmbMediaTypeStore>(UmbMediaTypeStore.name);
+export const UMB_MEDIA_TYPE_STORE_CONTEXT_TOKEN = new UmbContextToken<UmbMediaTypeStore>('UmbMediaTypeStore');

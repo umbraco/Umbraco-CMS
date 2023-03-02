@@ -91,6 +91,7 @@ export type { OutOfDateStatusModel } from './models/OutOfDateStatusModel';
 export { OutOfDateTypeModel } from './models/OutOfDateTypeModel';
 export type { PackageCreateModel } from './models/PackageCreateModel';
 export type { PackageDefinitionModel } from './models/PackageDefinitionModel';
+export type { PackageManifestModel } from './models/PackageManifestModel';
 export type { PackageMigrationStatusModel } from './models/PackageMigrationStatusModel';
 export type { PackageModelBaseModel } from './models/PackageModelBaseModel';
 export type { PackageUpdateModel } from './models/PackageUpdateModel';

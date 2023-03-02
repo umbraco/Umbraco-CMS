@@ -20,5 +20,5 @@ export class UmbDictionaryTreeStore extends UmbTreeStoreBase {
 }
 
 export const UMB_DICTIONARY_TREE_STORE_CONTEXT_TOKEN = new UmbContextToken<UmbDictionaryTreeStore>(
-	UmbDictionaryTreeStore.name
+	'UmbDictionaryTreeStore'
 );

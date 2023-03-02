@@ -19,7 +19,7 @@ export class UmbMediaStore extends UmbStoreBase {
 	 * @memberof UmbMediaStore
 	 */
 	constructor(host: UmbControllerHostInterface) {
-		super(host, UmbMediaStore.name);
+		super(host, UMB_MEDIA_STORE_CONTEXT_TOKEN.toString());
 	}
 
 	/**
@@ -41,4 +41,4 @@ export class UmbMediaStore extends UmbStoreBase {
 	}
 }
 
-export const UMB_MEDIA_DETAIL_STORE_CONTEXT_TOKEN = new UmbContextToken<UmbMediaStore>(UmbMediaStore.name);
+export const UMB_MEDIA_STORE_CONTEXT_TOKEN = new UmbContextToken<UmbMediaStore>('UmbMediaStore');

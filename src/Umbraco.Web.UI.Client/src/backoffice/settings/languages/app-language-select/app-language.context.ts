@@ -47,4 +47,4 @@ export class UmbAppLanguageContext {
 	}
 }
 
-export const UMB_APP_LANGUAGE_CONTEXT_TOKEN = new UmbContextToken<UmbAppLanguageContext>(UmbAppLanguageContext.name);
+export const UMB_APP_LANGUAGE_CONTEXT_TOKEN = new UmbContextToken<UmbAppLanguageContext>('UmbAppLanguageContext');
