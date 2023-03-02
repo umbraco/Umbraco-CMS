@@ -4,7 +4,7 @@ import { UmbDocumentTreeStore } from './document.tree.store';
 import { ManifestRepository } from 'libs/extensions-registry/repository.models';
 import { ManifestStore, ManifestTreeStore } from '@umbraco-cms/extensions-registry';
 
-export const DOCUMENT_REPOSITORY_ALIAS = 'Umb.Repository.Documents';
+export const DOCUMENT_REPOSITORY_ALIAS = 'Umb.Repository.Document';
 
 const repository: ManifestRepository = {
 	type: 'repository',
