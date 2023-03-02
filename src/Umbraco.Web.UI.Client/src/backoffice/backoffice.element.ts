@@ -17,8 +17,6 @@ import {
 } from './shared/components/backoffice-frame/backoffice.context';
 import { UmbMemberTypeDetailStore } from './members/member-types/repository/member-type.detail.store';
 import { UmbMemberTypeTreeStore } from './members/member-types/repository/member-type.tree.store';
-import { UmbMemberGroupDetailStore } from './members/member-groups/repository/member-group.detail.store';
-import { UmbMemberGroupTreeStore } from './members/member-groups/repository/member-group.tree.store';
 import { UmbMemberDetailStore } from './members/members/member.detail.store';
 import { UmbMemberTreeStore } from './members/members/repository/member.tree.store';
 import { UmbDictionaryDetailStore } from './translation/dictionary/repository/dictionary.detail.store';
@@ -87,8 +85,6 @@ export class UmbBackofficeElement extends UmbLitElement {
 		new UmbMemberTypeDetailStore(this);
 		new UmbMemberTypeTreeStore(this);
 		new UmbUserGroupStore(this);
-		new UmbMemberGroupDetailStore(this);
-		new UmbMemberGroupTreeStore(this);
 		new UmbMemberDetailStore(this);
 		new UmbMemberTreeStore(this);
 		new UmbDictionaryDetailStore(this);

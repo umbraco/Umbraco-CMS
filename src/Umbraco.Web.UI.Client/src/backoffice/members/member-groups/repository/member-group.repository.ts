@@ -1,6 +1,6 @@
 import { UmbMemberGroupTreeStore, UMB_MEMBER_GROUP_TREE_STORE_CONTEXT_TOKEN } from './member-group.tree.store';
 import { UmbMemberGroupDetailServerDataSource } from './sources/member-group.detail.server.data';
-import { UmbMemberGroupDetailStore, UMB_MEMBER_GROUP_DETAIL_STORE_CONTEXT_TOKEN } from './member-group.detail.store';
+import { UmbMemberGroupStore, UMB_MEMBER_GROUP_DETAIL_STORE_CONTEXT_TOKEN } from './member-group.store';
 import { MemberGroupTreeServerDataSource } from './sources/member-group.tree.server.data';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 import { UmbNotificationContext, UMB_NOTIFICATION_CONTEXT_TOKEN } from '@umbraco-cms/notification';
@@ -19,7 +19,7 @@ export class UmbMemberGroupRepository implements UmbTreeRepository, UmbDetailRep
 	#treeStore?: UmbMemberGroupTreeStore;
 
 	#detailSource: UmbMemberGroupDetailServerDataSource;
-	#detailStore?: UmbMemberGroupDetailStore;
+	#detailStore?: UmbMemberGroupStore;
 
 	#notificationContext?: UmbNotificationContext;
 
@@ -74,7 +74,7 @@ export class UmbMemberGroupRepository implements UmbTreeRepository, UmbDetailRep
 
 	async rootTreeItems() {
 		await this.#init;
-		return this.#treeStore!.rootItems();
+		return this.#treeStore!.rootItems;
 	}
 
 	async treeItemsOf(parentKey: string | null) {

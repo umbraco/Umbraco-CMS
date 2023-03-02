@@ -6,17 +6,15 @@ import { UmbStoreBase } from '@umbraco-cms/store';
 
 /**
  * @export
- * @class UmbMemberGroupDetailStore
+ * @class UmbMemberGroupStore
  * @extends {UmbStoreBase}
- * @description - Details Data Store for Member Groups
+ * @description - Data Store for Member Groups
  */
-export class UmbMemberGroupDetailStore
-	extends UmbStoreBase
-{
+export class UmbMemberGroupStore extends UmbStoreBase {
 	#data = new ArrayState<MemberGroupDetails>([], (x) => x.key);
 
 	constructor(host: UmbControllerHostInterface) {
-		super(host, UmbMemberGroupDetailStore.name);
+		super(host, UmbMemberGroupStore.name);
 	}
 
 	append(memberGroup: MemberGroupDetails) {
@@ -25,9 +23,9 @@ export class UmbMemberGroupDetailStore
 
 	remove(uniques: string[]) {
 		this.#data.remove(uniques);
-	}	
+	}
 }
 
-export const UMB_MEMBER_GROUP_DETAIL_STORE_CONTEXT_TOKEN = new UmbContextToken<UmbMemberGroupDetailStore>(
-	UmbMemberGroupDetailStore.name
+export const UMB_MEMBER_GROUP_DETAIL_STORE_CONTEXT_TOKEN = new UmbContextToken<UmbMemberGroupStore>(
+	UmbMemberGroupStore.name
 );
