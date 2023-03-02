@@ -1,7 +1,7 @@
 import { css, html } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, property } from 'lit/decorators.js';
-import UmbInputTinyMceElement from 'src/backoffice/shared/components/input-tiny-mce/input-tiny-mce.element';
+import { UmbInputTinyMceElement } from '../../../../shared/components/input-tiny-mce/input-tiny-mce.element';
 import { UmbLitElement } from '@umbraco-cms/element';
 import { DataTypePropertyModel } from '@umbraco-cms/backend-api';
 
