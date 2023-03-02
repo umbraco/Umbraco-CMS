@@ -41,4 +41,4 @@ export class UmbHealthCheckContext {
 	}
 }
 
-export const UMB_HEALTHCHECK_CONTEXT_TOKEN = new UmbContextToken<UmbHealthCheckContext>(UmbHealthCheckContext.name);
+export const UMB_HEALTHCHECK_CONTEXT_TOKEN = new UmbContextToken<UmbHealthCheckContext>('UmbHealthCheckContext');

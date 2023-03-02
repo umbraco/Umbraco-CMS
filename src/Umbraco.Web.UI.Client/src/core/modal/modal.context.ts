@@ -34,7 +34,6 @@ export interface UmbModalOptions<UmbModalData> {
 	data?: UmbModalData;
 }
 
-// TODO: rename to UmbModalContext
 // TODO: we should find a way to easily open a modal without adding custom methods to this context. It would result in a better separation of concerns.
 // TODO: move all layouts into their correct "silo" folders. User picker should live with users etc.
 export class UmbModalContext {
@@ -230,4 +229,4 @@ export class UmbModalContext {
 	}
 }
 
-export const UMB_MODAL_CONTEXT_TOKEN = new UmbContextToken<UmbModalContext>(UmbModalContext.name);
+export const UMB_MODAL_CONTEXT_TOKEN = new UmbContextToken<UmbModalContext>('UmbModalContext');

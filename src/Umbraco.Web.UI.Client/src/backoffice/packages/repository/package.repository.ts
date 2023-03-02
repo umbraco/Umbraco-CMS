@@ -3,6 +3,8 @@ import { UmbPackageServerDataSource } from './sources/package.server.data';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 import { UmbContextConsumerController } from '@umbraco-cms/context-api';
 import { ManifestBase } from '@umbraco-cms/extensions-registry';
+import { isManifestJSType } from "@umbraco-cms/extensions-api";
+import { OpenAPI } from "@umbraco-cms/backend-api";
 
 // TODO: Figure out if we should base stores like this on something more generic for "collections" rather than trees.
 
@@ -14,6 +16,7 @@ export class UmbPackageRepository {
 	#init!: Promise<void>;
 	#packageStore?: UmbPackageStore;
 	#packageSource: UmbPackageServerDataSource;
+	#apiBaseUrl = OpenAPI.BASE;
 
 	constructor(host: UmbControllerHostInterface) {
 		this.#packageSource = new UmbPackageServerDataSource(host);
@@ -48,6 +51,18 @@ export class UmbPackageRepository {
 					// Crudely validate that the extension at least follows a basic manifest structure
 					// Idea: Use `Zod` to validate the manifest
 					if (this.isManifestBase(e)) {
+
+						/**
+						 * Crude check to see if extension is of type "js" since it is safe to assume we do not
+						 * need to load any other types of extensions in the backoffice (we need a js file to load)
+						 */
+						if (isManifestJSType(e)) {
+							// Add API base url if the js path is relative
+							if (!e.js.startsWith('http')) {
+								e.js = `${this.#apiBaseUrl}${e.js}`;
+							}
+						}
+
 						extensions.push(e);
 					}
 				});

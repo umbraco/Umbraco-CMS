@@ -16,5 +16,5 @@ export class UmbMemberTypeTreeStore extends UmbTreeStoreBase {
 }
 
 export const UMB_MEMBER_TYPE_TREE_STORE_CONTEXT_TOKEN = new UmbContextToken<UmbMemberTypeTreeStore>(
-	UmbMemberTypeTreeStore.name
+	'UmbMemberTypeTreeStore'
 );

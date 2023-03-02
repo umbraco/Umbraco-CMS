@@ -4,6 +4,8 @@ import { ArrayState } from '@umbraco-cms/observable-api';
 import { UmbStoreBase } from '@umbraco-cms/store';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 
+export const UMB_MEDIA_DETAIL_STORE_CONTEXT_TOKEN = new UmbContextToken<UmbMediaDetailStore>('UmbMediaDetailStore');
+
 /**
  * @export
  * @class UmbMediaDetailStore
@@ -19,7 +21,7 @@ export class UmbMediaDetailStore extends UmbStoreBase {
 	 * @memberof UmbMediaDetailStore
 	 */
 	constructor(host: UmbControllerHostInterface) {
-		super(host, UmbMediaDetailStore.name);
+		super(host, UMB_MEDIA_DETAIL_STORE_CONTEXT_TOKEN.toString());
 	}
 
 	/**
@@ -40,5 +42,3 @@ export class UmbMediaDetailStore extends UmbStoreBase {
 		this.#data.remove(uniques);
 	}
 }
-
-export const UMB_MEDIA_DETAIL_STORE_CONTEXT_TOKEN = new UmbContextToken<UmbMediaDetailStore>(UmbMediaDetailStore.name);

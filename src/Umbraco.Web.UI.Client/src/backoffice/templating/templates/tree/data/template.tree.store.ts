@@ -2,6 +2,10 @@ import { UmbContextToken } from '@umbraco-cms/context-api';
 import { UmbTreeStoreBase } from '@umbraco-cms/store';
 import type { UmbControllerHostInterface } from '@umbraco-cms/controller';
 
+export const UMB_TEMPLATE_TREE_STORE_CONTEXT_TOKEN = new UmbContextToken<UmbTemplateTreeStore>(
+	'UmbTemplateTreeStore'
+);
+
 /**
  * @export
  * @class UmbTemplateTreeStore
@@ -18,7 +22,3 @@ export class UmbTemplateTreeStore extends UmbTreeStoreBase {
 		super(host, UMB_TEMPLATE_TREE_STORE_CONTEXT_TOKEN.toString());
 	}
 }
-
-export const UMB_TEMPLATE_TREE_STORE_CONTEXT_TOKEN = new UmbContextToken<UmbTemplateTreeStore>(
-	UmbTemplateTreeStore.name
-);

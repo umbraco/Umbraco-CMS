@@ -4,6 +4,10 @@ import { ArrayState } from '@umbraco-cms/observable-api';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 import { UmbStoreBase } from '@umbraco-cms/store';
 
+export const UMB_MEMBER_GROUP_DETAIL_STORE_CONTEXT_TOKEN = new UmbContextToken<UmbMemberGroupDetailStore>(
+	'UmbMemberGroupDetailStore'
+);
+
 /**
  * @export
  * @class UmbMemberGroupDetailStore
@@ -16,7 +20,7 @@ export class UmbMemberGroupDetailStore
 	#data = new ArrayState<MemberGroupDetails>([], (x) => x.key);
 
 	constructor(host: UmbControllerHostInterface) {
-		super(host, UmbMemberGroupDetailStore.name);
+		super(host, UMB_MEMBER_GROUP_DETAIL_STORE_CONTEXT_TOKEN.toString());
 	}
 
 	append(memberGroup: MemberGroupDetails) {
@@ -25,9 +29,5 @@ export class UmbMemberGroupDetailStore
 
 	remove(uniques: string[]) {
 		this.#data.remove(uniques);
-	}	
+	}
 }
-
-export const UMB_MEMBER_GROUP_DETAIL_STORE_CONTEXT_TOKEN = new UmbContextToken<UmbMemberGroupDetailStore>(
-	UmbMemberGroupDetailStore.name
-);
