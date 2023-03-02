@@ -4,12 +4,12 @@ import { UmbMediaTypeTreeStore } from './media-type.tree.store';
 import { ManifestRepository } from 'libs/extensions-registry/repository.models';
 import { ManifestStore, ManifestTreeStore } from '@umbraco-cms/extensions-registry';
 
-export const MEDIA_TYPE_REPOSITORY_ALIAS = 'Umb.Repository.MediaTypes';
+export const MEDIA_TYPE_REPOSITORY_ALIAS = 'Umb.Repository.MediaType';
 
 const repository: ManifestRepository = {
 	type: 'repository',
 	alias: MEDIA_TYPE_REPOSITORY_ALIAS,
-	name: 'Media Types Repository',
+	name: 'Media Type Repository',
 	class: UmbMediaTypeRepository,
 };
 
