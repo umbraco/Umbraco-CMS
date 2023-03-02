@@ -310,4 +310,3 @@ export class TempRouterSlot extends HTMLElement {
 	}
 }
 window.customElements.define(ROUTER_SLOT_TAG_NAME, TempRouterSlot);
-//# sourceMappingURL=router-slot.js.map
