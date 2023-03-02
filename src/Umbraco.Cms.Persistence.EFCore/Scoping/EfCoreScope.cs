@@ -44,7 +44,9 @@ internal class EfCoreScope : IEfCoreScope
         _scopeFileSystems = scopeFileSystems;
         _efCoreScopeProvider = (EfCoreScopeProvider)efCoreScopeProvider;
         InstanceId = Guid.NewGuid();
-        Locks = ParentScope is null ? new LockingMechanism(distributedLockingMechanismFactory) : ResolveLockingMechanism();
+        Locks = ParentScope is null
+            ? new LockingMechanism(distributedLockingMechanismFactory)
+            : ResolveLockingMechanism();
         ScopeContext = scopeContext;
 
         if (scopeFileSystems is true)
@@ -79,7 +81,9 @@ internal class EfCoreScope : IEfCoreScope
         // can be 'true' only on outer scope (and false does not make much sense)
         if (scopeFileSystems != null && ParentScope?._scopeFileSystems != _scopeFileSystems)
         {
-            throw new ArgumentException($"Value '{scopeFileSystems.Value}' be different from parent value '{ParentScope?._scopeFileSystems}'.", nameof(scopeFileSystems));
+            throw new ArgumentException(
+                $"Value '{scopeFileSystems.Value}' be different from parent value '{ParentScope?._scopeFileSystems}'.",
+                nameof(scopeFileSystems));
         }
 
         ParentScope = parentScope;
@@ -165,7 +169,8 @@ internal class EfCoreScope : IEfCoreScope
         }
     }
 
-    private ILockingMechanism ResolveLockingMechanism() => ParentScope is not null ? ParentScope.ResolveLockingMechanism() : Locks;
+    private ILockingMechanism ResolveLockingMechanism() =>
+        ParentScope is not null ? ParentScope.ResolveLockingMechanism() : Locks;
 
     public async Task<T> ExecuteWithContextAsync<T>(Func<UmbracoEFContext, Task<T>> method)
     {
@@ -214,10 +219,7 @@ internal class EfCoreScope : IEfCoreScope
 
         if (ParentScope is null)
         {
-            DisposeEfCoreDatabase();
-            HandleScopedFileSystems(_completed.HasValue && _completed.Value);
-            HandleScopedNotifications();
-        }
+            DisposeEfCoreDatabase(); }
         else
         {
             ParentScope.ChildCompleted(_completed);
@@ -311,30 +313,51 @@ internal class EfCoreScope : IEfCoreScope
         }
     }
 
-    private void HandleScopedNotifications() => _notificationPublisher?.ScopeExit(_completed.HasValue && _completed.Value);
+    private void HandleScopedNotifications(bool databaseException)
+    {
+        if (databaseException is false)
+        {
+            _notificationPublisher?.ScopeExit(_completed.HasValue && _completed.Value);
+        }
+    }
+
 
     private void DisposeEfCoreDatabase()
     {
         var completed = _completed.HasValue && _completed.Value;
-        if (_umbracoEfCoreDatabase is not null)
         {
-            // Transaction connection can be null here if we get chosen as the deadlock victim.
-            if (_umbracoEfCoreDatabase.UmbracoEFContext.Database.CurrentTransaction?.GetDbTransaction().Connection is not null)
+            bool databaseException = false;
+            try
             {
-                if (completed)
+                if (_umbracoEfCoreDatabase is not null)
                 {
-                    _umbracoEfCoreDatabase.UmbracoEFContext.Database.CommitTransaction();
-                }
-                else
-                {
-                    _umbracoEfCoreDatabase.UmbracoEFContext.Database.RollbackTransaction();
+                    // Transaction connection can be null here if we get chosen as the deadlock victim.
+                    if (_umbracoEfCoreDatabase.UmbracoEFContext.Database.CurrentTransaction?.GetDbTransaction()
+                            .Connection is not null)
+                    {
+                        if (completed)
+                        {
+                            _umbracoEfCoreDatabase.UmbracoEFContext.Database.CommitTransaction();
+                        }
+                        else
+                        {
+                            _umbracoEfCoreDatabase.UmbracoEFContext.Database.RollbackTransaction();
+                        }
+                    }
                 }
             }
-
-
-            _umbracoEfCoreDatabase.Dispose();
+            catch
+            {
+                databaseException = true;
+            }
+            finally
+            {
+                _umbracoEfCoreDatabase?.Dispose();
+                _umbracoEfCoreDatabase = null;
+                _efCoreDatabaseFactory.Dispose();
+                HandleScopedFileSystems(_completed.HasValue && _completed.Value);
+                HandleScopedNotifications(databaseException);
+            }
         }
-
-        _efCoreDatabaseFactory.Dispose();
     }
 }
