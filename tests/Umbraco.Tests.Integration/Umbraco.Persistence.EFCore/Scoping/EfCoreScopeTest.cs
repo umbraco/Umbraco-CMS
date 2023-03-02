@@ -9,7 +9,7 @@ using Umbraco.Cms.Tests.Common;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
 
-namespace Umbraco.Cms.Tests.Integration.Umbraco.Persistence.EFCore;
+namespace Umbraco.Cms.Tests.Integration.Umbraco.Persistence.EFCore.Scoping;
 
 [TestFixture]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewEmptyPerTest)]

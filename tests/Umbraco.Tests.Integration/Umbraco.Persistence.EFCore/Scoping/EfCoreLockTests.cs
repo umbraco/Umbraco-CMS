@@ -1,17 +1,15 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
-using Umbraco.Cms.Core.DistributedLocking;
 using Umbraco.Cms.Core.DistributedLocking.Exceptions;
 using Umbraco.Cms.Infrastructure.Persistence;
-using Umbraco.Cms.Persistence.EFCore;
 using Umbraco.Cms.Persistence.EFCore.Entities;
 using Umbraco.Cms.Persistence.EFCore.Scoping;
 using Umbraco.Cms.Persistence.Sqlite.Interceptors;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
 
-namespace Umbraco.Cms.Tests.Integration.Umbraco.Persistence.EFCore;
+namespace Umbraco.Cms.Tests.Integration.Umbraco.Persistence.EFCore.Scoping;
 
 [TestFixture]
 [Timeout(60000)]
