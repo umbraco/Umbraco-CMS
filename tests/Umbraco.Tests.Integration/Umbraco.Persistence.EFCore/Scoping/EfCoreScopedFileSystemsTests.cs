@@ -26,7 +26,7 @@ public class EfCoreScopedFileSystemsTests : UmbracoIntegrationTest
     private IHostingEnvironment HostingEnvironment => GetRequiredService<IHostingEnvironment>();
 
     private IEfCoreScopeProvider EfCoreScopeProvider => GetRequiredService<IEfCoreScopeProvider>();
-    private IEFCoreScopeAccessor EfCoreScopeAccessor=> GetRequiredService<IEFCoreScopeAccessor>();
+    private IEFCoreScopeAccessor EfCoreScopeAccessor => GetRequiredService<IEFCoreScopeAccessor>();
 
     private void ClearFiles(IIOHelper ioHelper)
     {
@@ -60,7 +60,7 @@ public class EfCoreScopedFileSystemsTests : UmbracoIntegrationTest
         Assert.IsFalse(mediaFileManager.FileSystem.FileExists("f1.txt"));
         Assert.IsFalse(physMediaFileSystem.FileExists("f1.txt"));
     }
-    
+
     [Test]
     public void MediaFileManager_writes_to_physical_file_system_when_scoped_and_scope_is_completed()
     {
@@ -91,7 +91,7 @@ public class EfCoreScopedFileSystemsTests : UmbracoIntegrationTest
         Assert.IsTrue(mediaFileManager.FileSystem.FileExists("f1.txt"));
         Assert.IsTrue(physMediaFileSystem.FileExists("f1.txt"));
     }
-    
+
     [Test]
     public void MultiThread()
     {
@@ -101,7 +101,7 @@ public class EfCoreScopedFileSystemsTests : UmbracoIntegrationTest
         var mediaFileManager = MediaFileManager;
         var taskHelper = new TaskHelper(Mock.Of<ILogger<TaskHelper>>());
 
-        using (var scope = EfCoreScopeProvider.CreateScope(scopeFileSystems: true))
+        using (EfCoreScopeProvider.CreateScope(scopeFileSystems: true))
         {
             using (var ms = new MemoryStream("foo"u8.ToArray()))
             {
@@ -127,7 +127,7 @@ public class EfCoreScopedFileSystemsTests : UmbracoIntegrationTest
                 return Task.CompletedTask;
             });
 
-            Task.WaitAll(t);
+            t.Wait();
 
             Assert.IsTrue(mediaFileManager.FileSystem.FileExists("f2.txt"));
             Assert.IsTrue(physMediaFileSystem.FileExists("f2.txt"));
@@ -139,7 +139,7 @@ public class EfCoreScopedFileSystemsTests : UmbracoIntegrationTest
     {
         var taskHelper = new TaskHelper(Mock.Of<ILogger<TaskHelper>>());
         var isThrown = false;
-        using (var scope = EfCoreScopeProvider.CreateScope(scopeFileSystems: true))
+        using (EfCoreScopeProvider.CreateScope(scopeFileSystems: true))
         {
             // This is testing when another thread concurrently tries to create a scoped file system
             // because at the moment we don't support concurrent scoped filesystems.
@@ -163,7 +163,7 @@ public class EfCoreScopedFileSystemsTests : UmbracoIntegrationTest
                 return Task.CompletedTask;
             });
 
-            Task.WaitAll(t);
+            t.Wait();
         }
 
         Assert.IsTrue(isThrown);
@@ -191,7 +191,7 @@ public class EfCoreScopedFileSystemsTests : UmbracoIntegrationTest
                 return Task.CompletedTask;
             });
 
-            Task.WaitAll(t);
+            t.Wait();
         }
 
         var detached = EfCoreScopeProvider.CreateDetachedScope(scopeFileSystems: true);
