@@ -17,8 +17,6 @@ import {
 } from './shared/components/backoffice-frame/backoffice.context';
 import { UmbMediaTypeDetailStore } from './media/media-types/repository/media-type.detail.store';
 import { UmbMediaTypeTreeStore } from './media/media-types/repository/media-type.tree.store';
-import { UmbMediaDetailStore } from './media/media/repository/media.detail.store';
-import { UmbMediaTreeStore } from './media/media/repository/media.tree.store';
 import { UmbMemberTypeDetailStore } from './members/member-types/repository/member-type.detail.store';
 import { UmbMemberTypeTreeStore } from './members/member-types/repository/member-type.tree.store';
 import { UmbMemberGroupDetailStore } from './members/member-groups/repository/member-group.detail.store';
@@ -85,8 +83,6 @@ export class UmbBackofficeElement extends UmbLitElement {
 		// TODO: find a way this is possible outside this element. It needs to be possible to register stores in extensions
 		this.provideContext(UMB_CURRENT_USER_STORE_CONTEXT_TOKEN, new UmbCurrentUserStore());
 
-		new UmbMediaDetailStore(this);
-		new UmbMediaTreeStore(this);
 		new UmbDataTypeStore(this);
 		new UmbDataTypeTreeStore(this);
 		new UmbUserStore(this);

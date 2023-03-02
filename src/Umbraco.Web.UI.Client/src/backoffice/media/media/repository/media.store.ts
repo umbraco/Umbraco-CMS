@@ -6,26 +6,26 @@ import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 
 /**
  * @export
- * @class UmbMediaDetailStore
+ * @class UmbMediaStore
  * @extends {UmbStoreBase}
  * @description - Data Store for Template Details
  */
-export class UmbMediaDetailStore extends UmbStoreBase {
+export class UmbMediaStore extends UmbStoreBase {
 	#data = new ArrayState<MediaDetails>([], (x) => x.key);
 
 	/**
-	 * Creates an instance of UmbMediaDetailStore.
+	 * Creates an instance of UmbMediaStore.
 	 * @param {UmbControllerHostInterface} host
-	 * @memberof UmbMediaDetailStore
+	 * @memberof UmbMediaStore
 	 */
 	constructor(host: UmbControllerHostInterface) {
-		super(host, UmbMediaDetailStore.name);
+		super(host, UmbMediaStore.name);
 	}
 
 	/**
 	 * Append a media to the store
 	 * @param {MediaDetails} media
-	 * @memberof UmbMediaDetailStore
+	 * @memberof UmbMediaStore
 	 */
 	append(media: MediaDetails) {
 		this.#data.append([media]);
@@ -34,11 +34,11 @@ export class UmbMediaDetailStore extends UmbStoreBase {
 	/**
 	 * Removes media in the store with the given uniques
 	 * @param {string[]} uniques
-	 * @memberof UmbMediaDetailStore
+	 * @memberof UmbMediaStore
 	 */
 	remove(uniques: string[]) {
 		this.#data.remove(uniques);
 	}
 }
 
-export const UMB_MEDIA_DETAIL_STORE_CONTEXT_TOKEN = new UmbContextToken<UmbMediaDetailStore>(UmbMediaDetailStore.name);
+export const UMB_MEDIA_DETAIL_STORE_CONTEXT_TOKEN = new UmbContextToken<UmbMediaStore>(UmbMediaStore.name);

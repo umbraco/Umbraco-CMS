@@ -1,7 +1,7 @@
 import type { RepositoryTreeDataSource } from '../../../../../libs/repository/repository-tree-data-source.interface';
 import { MediaTreeServerDataSource } from './sources/media.tree.server.data';
 import { UmbMediaTreeStore, UMB_MEDIA_TREE_STORE_CONTEXT_TOKEN } from './media.tree.store';
-import { UmbMediaDetailStore, UMB_MEDIA_DETAIL_STORE_CONTEXT_TOKEN } from './media.detail.store';
+import { UmbMediaStore, UMB_MEDIA_DETAIL_STORE_CONTEXT_TOKEN } from './media.store';
 import { UmbMediaDetailServerDataSource } from './sources/media.detail.server.data';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 import { UmbContextConsumerController } from '@umbraco-cms/context-api';
@@ -26,7 +26,7 @@ export class UmbMediaRepository implements UmbTreeRepository, UmbDetailRepositor
 	#treeStore?: UmbMediaTreeStore;
 
 	#detailDataSource: UmbMediaDetailServerDataSource;
-	#detailStore?: UmbMediaDetailStore;
+	#detailStore?: UmbMediaStore;
 
 	#notificationContext?: UmbNotificationContext;
 
