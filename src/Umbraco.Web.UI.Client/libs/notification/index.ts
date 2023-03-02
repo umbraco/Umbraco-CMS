@@ -1,3 +1,3 @@
-export * from './notification.service';
+export * from './notification.context';
 export * from './notification-handler';
 export * from './layouts/default';
