@@ -29,7 +29,6 @@ import {
 	UMB_APP_LANGUAGE_CONTEXT_TOKEN,
 	UmbAppLanguageContext,
 } from './settings/languages/app-language-select/app-language.context';
-import { UmbPackageStore } from './packages/repository/package.store';
 import { UmbServerExtensionController } from './packages/repository/server-extension.controller';
 import { createExtensionClass, umbExtensionsRegistry } from '@umbraco-cms/extensions-api';
 import { UmbNotificationContext, UMB_NOTIFICATION_CONTEXT_TOKEN } from '@umbraco-cms/notification';
@@ -92,7 +91,6 @@ export class UmbBackofficeElement extends UmbLitElement {
 		this.provideContext(UMB_CURRENT_USER_HISTORY_STORE_CONTEXT_TOKEN, new UmbCurrentUserHistoryStore());
 		new UmbThemeContext(this);
 
-		new UmbPackageStore(this);
 		new UmbServerExtensionController(this, umbExtensionsRegistry);
 
 		// Register All Stores

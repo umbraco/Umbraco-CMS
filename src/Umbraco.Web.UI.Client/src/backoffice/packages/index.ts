@@ -1,3 +1,4 @@
+import { manifests as repositoryManifests } from './repository/manifests';
 import { manifests as packageBuilderManifests } from './package-builder/manifests';
 import { manifests as packageRepoManifests } from './package-repo/manifests';
 import { manifests as packageSectionManifests } from './package-section/manifests';
@@ -9,4 +10,9 @@ const registerExtensions = (manifests: Array<ManifestTypes>) => {
 	manifests.forEach((manifest) => umbExtensionsRegistry.register(manifest));
 };
 
-registerExtensions([...packageBuilderManifests, ...packageRepoManifests, ...packageSectionManifests]);
+registerExtensions([
+	...repositoryManifests,
+	...packageBuilderManifests,
+	...packageRepoManifests,
+	...packageSectionManifests,
+]);
