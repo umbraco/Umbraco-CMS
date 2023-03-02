@@ -18,6 +18,7 @@ import {
 	UUIScrollContainerElement,
 	UUISymbolExpandElement,
 } from '@umbraco-ui/uui';
+import _ from 'lodash';
 
 @customElement('umb-log-viewer-search-view')
 export class UmbLogViewerSearchViewElement extends UmbLitElement {
@@ -377,12 +378,15 @@ export class UmbLogViewerSearchViewElement extends UmbLitElement {
 	}
 
 	#setLogLevel() {
+		if (!this.#logViewerContext) return;
 		const logLevels = Array.from(this._logLevelSelectorCheckboxes)
 			.filter((checkbox) => checkbox.checked)
 			.map((checkbox) => checkbox.value as LogLevelModel);
 		this.#logViewerContext?.setLogLevels(logLevels);
-		this.#logViewerContext?.getLogs();
+		this.#logViewerContext.getLogs();
 	}
+
+	setLogLevelDebounce = _.debounce(this.#setLogLevel, 300);
 
 	#selectAllLogLevels() {
 		this._logLevelSelectorCheckboxes.forEach((checkbox) => (checkbox.checked = true));
@@ -396,7 +400,7 @@ export class UmbLogViewerSearchViewElement extends UmbLitElement {
 
 	#renderLogLevelSelector() {
 		return html`
-			<div slot="dropdown" id="log-level-selector" @change=${this.#setLogLevel}>
+			<div slot="dropdown" id="log-level-selector" @change=${this.setLogLevelDebounce}>
 				${Object.values(LogLevelModel).map(
 					(logLevel) =>
 						html`<uui-checkbox class="log-level-menu-item" .value=${logLevel} label="${logLevel}"

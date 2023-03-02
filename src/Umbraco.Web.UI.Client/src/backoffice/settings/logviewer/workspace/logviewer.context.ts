@@ -88,7 +88,7 @@ export class UmbLogViewerWorkspaceContext {
 
 	#intervalID: number | null = null;
 
-	#currentPage = 1;
+	currentPage = 1;
 
 	constructor(host: UmbControllerHostInterface) {
 		this.#host = host;
@@ -136,11 +136,11 @@ export class UmbLogViewerWorkspaceContext {
 	}
 
 	setCurrentPage(page: number) {
-		this.#currentPage = page;
+		this.currentPage = page;
 	}
 
-	async getLogs() {
-		const skip = (this.#currentPage - 1) * 100;
+	getLogs = async () => {
+		const skip = (this.currentPage - 1) * 100;
 		const take = 100;
 
 		const options = {
@@ -157,7 +157,7 @@ export class UmbLogViewerWorkspaceContext {
 		if (data) {
 			this.#logs.next(data);
 		}
-	}
+	};
 
 	setFilterExpression(query: string) {
 		this.#filterExpression.next(query);
