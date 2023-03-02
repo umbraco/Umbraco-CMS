@@ -9,6 +9,7 @@ using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Exceptions;
+using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Persistence;
@@ -657,6 +658,38 @@ internal class UserService : RepositoryService, IUserService
         {
             return _userRepository.GetUserStates();
         }
+    }
+
+    /// <inheritdoc/>
+    public Task<Attempt<IUser, UserOperationStatus>> CreateAsync(UserCreateModel model)
+    {
+        UserOperationStatus result = ValidateUserCreateModel(model);
+        if (result != UserOperationStatus.Success)
+        {
+            return Task.FromResult(Attempt.FailWithStatus<IUser, UserOperationStatus>(result, new User(_globalSettings)));
+        }
+
+        throw new NotImplementedException();
+    }
+
+    private UserOperationStatus ValidateUserCreateModel(UserCreateModel model)
+    {
+        if (_securitySettings.UsernameIsEmail && model.UserName != model.Email)
+        {
+            return UserOperationStatus.UserNameIsNotEmail;
+        }
+
+        if (GetByEmail(model.Email) is not null)
+        {
+            return UserOperationStatus.DuplicateEmail;
+        }
+
+        if (GetByUsername(model.UserName) is not null)
+        {
+            return UserOperationStatus.DuplicateUserName;
+        }
+
+        return UserOperationStatus.Success;
     }
 
     public Task<Attempt<PagedModel<IUser>?, UserOperationStatus>> GetAllAsync(int requestingUserId, int skip, int take)

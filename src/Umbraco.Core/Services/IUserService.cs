@@ -1,3 +1,4 @@
+using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Core.Services.OperationStatus;
@@ -43,6 +44,16 @@ public interface IUserService : IMembershipUserService
     ///     This is basically facets of UserStates key = state, value = count
     /// </summary>
     IDictionary<UserState, int> GetUserStates();
+
+    /// <summary>
+    /// Creates a user based in a create model and persists it to the database.
+    /// </summary>
+    /// <remarks>
+    /// This creates both the Umbraco user and the identity user.
+    /// </remarks>
+    /// <param name="model">Model to create the user from.</param>
+    /// <returns>An attempt indicating if the operation was a success as well as a more detailed <see cref="UserOperationStatus"/>.</returns>
+    Task<Attempt<IUser, UserOperationStatus>> CreateAsync(UserCreateModel model);
 
     /// <summary>
     /// Gets all users that the requesting user is allowed to see.
