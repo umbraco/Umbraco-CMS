@@ -216,6 +216,7 @@ internal class EfCoreScope : IEfCoreScope
         {
             DisposeEfCoreDatabase();
             HandleScopedFileSystems(_completed.HasValue && _completed.Value);
+            HandleScopedNotifications();
         }
         else
         {
@@ -309,6 +310,8 @@ internal class EfCoreScope : IEfCoreScope
             _scopedFileSystem = null;
         }
     }
+
+    private void HandleScopedNotifications() => _notificationPublisher?.ScopeExit(_completed.HasValue && _completed.Value);
 
     private void DisposeEfCoreDatabase()
     {
