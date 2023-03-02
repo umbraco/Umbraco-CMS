@@ -15,8 +15,6 @@ import {
 	UmbBackofficeContext,
 	UMB_BACKOFFICE_CONTEXT_TOKEN,
 } from './shared/components/backoffice-frame/backoffice.context';
-import { UmbDocumentTypeStore } from './documents/document-types/repository/document-type.store';
-import { UmbDocumentTypeTreeStore } from './documents/document-types/repository/document-type.tree.store';
 import { UmbMediaTypeDetailStore } from './media/media-types/repository/media-type.detail.store';
 import { UmbMediaTypeTreeStore } from './media/media-types/repository/media-type.tree.store';
 import { UmbDocumentStore } from './documents/documents/repository/document.store';
@@ -45,7 +43,7 @@ import {
 } from './settings/languages/app-language-select/app-language.context';
 import { UmbPackageStore } from './packages/repository/package.store';
 import { UmbServerExtensionController } from './packages/repository/server-extension.controller';
-import { umbExtensionsRegistry } from '@umbraco-cms/extensions-api';
+import { createExtensionClass, umbExtensionsRegistry } from '@umbraco-cms/extensions-api';
 import { UmbNotificationContext, UMB_NOTIFICATION_CONTEXT_TOKEN } from '@umbraco-cms/notification';
 import { UmbLitElement } from '@umbraco-cms/element';
 
@@ -98,8 +96,6 @@ export class UmbBackofficeElement extends UmbLitElement {
 		new UmbUserStore(this);
 		new UmbMediaTypeDetailStore(this);
 		new UmbMediaTypeTreeStore(this);
-		new UmbDocumentTypeStore(this);
-		new UmbDocumentTypeTreeStore(this);
 		new UmbMemberTypeDetailStore(this);
 		new UmbMemberTypeTreeStore(this);
 		new UmbUserGroupStore(this);
@@ -122,6 +118,11 @@ export class UmbBackofficeElement extends UmbLitElement {
 
 		new UmbPackageStore(this);
 		new UmbServerExtensionController(this, umbExtensionsRegistry);
+
+		// Register All Stores
+		this.observe(umbExtensionsRegistry.extensionsOfTypes(['store', 'treeStore']), (stores) => {
+			stores.forEach((store) => createExtensionClass(store, [this]));
+		});
 	}
 
 	render() {
