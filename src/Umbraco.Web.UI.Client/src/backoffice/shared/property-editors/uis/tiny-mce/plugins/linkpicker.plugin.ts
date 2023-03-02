@@ -119,6 +119,7 @@ export class LinkPickerPlugin {
 		editor.addShortcut('Ctrl+K', '', showDialog);
 	}
 
+	// TODO => get anchors to provide to link picker?
 	async #openLinkPicker(currentTarget: CurrentTargetData, anchorElement?: HTMLAnchorElement) {
 		const modalHandler = this.#modalService?.linkPicker({
 			config: {

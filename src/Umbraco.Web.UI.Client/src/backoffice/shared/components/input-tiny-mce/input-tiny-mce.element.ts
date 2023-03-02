@@ -3,16 +3,17 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, property } from 'lit/decorators.js';
 import { ifDefined } from 'lit-html/directives/if-defined.js';
 import { FormControlMixin } from '@umbraco-ui/uui-base/lib/mixins';
+import { AstNode } from 'tinymce';
+import { UmbMediaHelper } from '../../property-editors/uis/tiny-mce/media-helper.service';
 import { AcePlugin } from '../../property-editors/uis/tiny-mce/plugins/ace.plugin';
 import { LinkPickerPlugin } from '../../property-editors/uis/tiny-mce/plugins/linkpicker.plugin';
+import { MacroPlugin } from '../../property-editors/uis/tiny-mce/plugins/macro.plugin';
 import { UmbLitElement } from '@umbraco-cms/element';
 import { UmbModalService, UMB_MODAL_SERVICE_CONTEXT_TOKEN } from '@umbraco-cms/modal';
 
 /// TINY MCE
 // import 'tinymce';
 import '@tinymce/tinymce-webcomponent';
-import { MacroPlugin } from '../../property-editors/uis/tiny-mce/plugins/macro.plugin';
-import { UMB_MACRO_SERVICE_CONTEXT_TOKEN } from 'libs/macro/macro.service';
 
 // /* Default icons are required. After that, import custom icons if applicable */
 // import 'tinymce/icons/default';
@@ -44,6 +45,7 @@ declare global {
 	interface Window {
 		tinyConfig: any;
 		tinymce: any;
+		Umbraco: any;
 	}
 }
 
@@ -93,10 +95,15 @@ export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
 	// private _contentStyle: string = contentUiSkinCss.toString() + '\n' + contentCss.toString();
 
 	modalService?: UmbModalService;
+	mediaHelper = new UmbMediaHelper();
+
+	protected getFormElement() {
+		return undefined;
+	}
 
 	constructor() {
 		super();
-		
+
 		this.consumeContext(UMB_MODAL_SERVICE_CONTEXT_TOKEN, (instance) => {
 			this.modalService = instance;
 			this.#setTinyConfig();
@@ -112,6 +119,11 @@ export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
 			.find((x) => x.alias === 'plugins')
 			?.value.map((x: { [key: string]: string }) => x.name);
 		this._stylesheets = this.configuration.find((x) => x.alias === 'stylesheets')?.value;
+
+		// no auto resize when a fixed height is set
+		if (!this._dimensions.height) {
+			this._plugins.splice(this._plugins.indexOf('autoresize'), 1);
+		}
 	}
 
 	// TODO => setup runs before rendering, here we can add any custom plugins
@@ -126,29 +138,239 @@ export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
 			//skin: false,
 			statusbar: false,
 			style_formats: this._styleFormats,
-
-			setup: (editor: any) => {
-				new AcePlugin(editor, this.modalService);
-				new LinkPickerPlugin(editor, this.modalService, this.configuration);
-				new MacroPlugin(editor, this.modalService);
-
-				// TODO => the editor frame catches Ctrl+S and handles it with the system save dialog
-				// - we want to handle it in the content controller, so we'll emit an event instead
-				editor.addShortcut('Ctrl+S', '', () => this.dispatchEvent(new CustomEvent('rte.shortcut.save')));
-				editor.addShortcut('Ctrl+P', '', () => this.dispatchEvent(new CustomEvent('rte.shortcut.saveAndPublish')));
-
-				editor.on('Change', () => this.#onChange(editor.getContent()));
-			},
+			setup: (editor: any) => this.#editorSetup(editor),
 		};
 	}
 
-	protected getFormElement() {
-		return undefined;
+	#editorSetup(editor: any) {
+		// initialise core plugins
+		new AcePlugin(editor, this.modalService);
+		new LinkPickerPlugin(editor, this.modalService, this.configuration);
+		new MacroPlugin(editor, this.modalService);
+
+		// register custom option maxImageSize
+		editor.options.register('maxImageSize', { processor: 'number', default: 500 });
+
+		// If we can not find the insert image/media toolbar button
+		// Then we need to add an event listener to the editor
+		// That will update native browser drag & drop events
+		// To update the icon to show you can NOT drop something into the editor
+		if (this._toolbar && !this.#isMediaPickerEnabled()) {
+			// Wire up the event listener
+			editor.on('dragstart dragend dragover draggesture dragdrop drop drag', (e: any) => {
+				e.preventDefault();
+				e.dataTransfer.effectAllowed = 'none';
+				e.dataTransfer.dropEffect = 'none';
+				e.stopPropagation();
+			});
+		}
+
+		editor.addShortcut('Ctrl+S', '', () => this.dispatchEvent(new CustomEvent('rte.shortcut.save')));
+		editor.addShortcut('Ctrl+P', '', () => this.dispatchEvent(new CustomEvent('rte.shortcut.saveAndPublish')));
+
+		editor.on('init', () => this.#onInit(editor));
+		editor.on('focus', () => this.dispatchEvent(new CustomEvent('umb-rte-focus', { composed: true, bubbles: true })));
+		editor.on('blur', () => {
+			this.#onChange(editor.getContent());
+			this.dispatchEvent(new CustomEvent('umb-rte-blur', { composed: true, bubbles: true }));
+		});
+		editor.on('Change', () => this.#onChange(editor.getContent()));
+		editor.on('Dirty', () => this.#onChange(editor.getContent()));
+		editor.on('Keyup', () => this.#onChange(editor.getContent()));
+		editor.on('SetContent', () => this.#uploadBlobImages(editor));
+		editor.on('ObjectResized', (e: any) => {
+			this.#onResize(e); 
+			this.#onChange(editor.getContent());
+		});
+
+	}
+
+	async #onResize(e: any) {
+		const srcAttr = e.target.getAttribute('src');
+
+        if (!srcAttr) {
+          return;
+        }
+
+        const path = srcAttr.split('?')[0];
+        const resizedPath = await this.mediaHelper.getProcessedImageUrl(path, {
+          width: e.width,
+          height: e.height,
+          mode: 'max',
+        });
+		
+		e.target.setAttribute('data-mce-src', resizedPath);
+	}
+
+	#onInit(editor: any) {
+		//enable browser based spell checking
+		editor.getBody().setAttribute('spellcheck', true);
+
+		/** Setup sanitization for preventing injecting arbitrary JavaScript execution in attributes:
+		 * https://github.com/advisories/GHSA-w7jx-j77m-wp65
+		 * https://github.com/advisories/GHSA-5vm8-hhgr-jcjp
+		 */
+		const uriAttributesToSanitize = [
+			'src',
+			'href',
+			'data',
+			'background',
+			'action',
+			'formaction',
+			'poster',
+			'xlink:href',
+		];
+
+		const parseUri = (function () {
+			// Encapsulated JS logic.
+			const safeSvgDataUrlElements = ['img', 'video'];
+			const scriptUriRegExp = /((java|vb)script|mhtml):/i;
+			// eslint-disable-next-line no-control-regex
+			const trimRegExp = /[\s\u0000-\u001F]+/g;
+
+			const isInvalidUri = (uri: string, tagName: string) => {
+				if (/^data:image\//i.test(uri)) {
+					return safeSvgDataUrlElements.indexOf(tagName) !== -1 && /^data:image\/svg\+xml/i.test(uri);
+				} else {
+					return /^data:/i.test(uri);
+				}
+			};
+
+			return function parseUri(uri: string, tagName: string) {
+				uri = uri.replace(trimRegExp, '');
+				try {
+					// Might throw malformed URI sequence
+					uri = decodeURIComponent(uri);
+				} catch (ex) {
+					// Fallback to non UTF-8 decoder
+					uri = unescape(uri);
+				}
+
+				if (scriptUriRegExp.test(uri)) {
+					return;
+				}
+
+				if (isInvalidUri(uri, tagName)) {
+					return;
+				}
+
+				return uri;
+			};
+		})();
+
+		if (window.Umbraco?.Sys.ServerVariables.umbracoSettings.sanitizeTinyMce) {
+			editor.serializer.addAttributeFilter(uriAttributesToSanitize, (nodes: AstNode[]) => {
+				nodes.forEach((node: AstNode) => {
+					node.attributes?.forEach((attr) => {
+						const attrName = attr.name.toLowerCase();
+						if (uriAttributesToSanitize.indexOf(attrName) !== -1) {
+							attr.value = parseUri(attr.value, node.name) ?? '';
+						}
+					});
+				});
+			});
+		}
+	}
+
+	async #uploadBlobImages(editor: any) {
+		const content = editor.getContent();
+
+		// Upload BLOB images (dragged/pasted ones)
+		// find src attribute where value starts with `blob:`
+		// search is case-insensitive and allows single or double quotes
+		if (content.search(/src=["']blob:.*?["']/gi) !== -1) {
+			const data = await editor.uploadImages();
+			// Once all images have been uploaded
+			data.forEach((item: any) => {
+				// Skip items that failed upload
+				if (item.status === false) {
+					return;
+				}
+
+				// Select img element
+				const img = item.element;
+
+				// Get img src
+				const imgSrc = img.getAttribute('src');
+				const tmpLocation = localStorage.get(`tinymce__${imgSrc}`);
+
+				// Select the img & add new attr which we can search for
+				// When its being persisted in RTE property editor
+				// To create a media item & delete this tmp one etc
+				editor.dom.setAttrib(img, 'data-tmpimg', tmpLocation);
+
+				// Resize the image to the max size configured
+				// NOTE: no imagesrc passed into func as the src is blob://...
+				// We will append ImageResizing Querystrings on perist to DB with node save
+				this.#sizeImageInEditor(editor, img);
+			});
+
+			// Get all img where src starts with blob: AND does NOT have a data=tmpimg attribute
+			// This is most likely seen as a duplicate image that has already been uploaded
+			// editor.uploadImages() does not give us any indiciation that the image been uploaded already
+			const blobImageWithNoTmpImgAttribute = editor.dom.select('img[src^="blob:"]:not([data-tmpimg])');
+
+			//For each of these selected items
+			blobImageWithNoTmpImgAttribute.forEach((imageElement: any) => {
+				const blobSrcUri = editor.dom.getAttrib(imageElement, 'src');
+
+				// Find the same image uploaded (Should be in LocalStorage)
+				// May already exist in the editor as duplicate image
+				// OR added to the RTE, deleted & re-added again
+				// So lets fetch the tempurl out of localstorage for that blob URI item
+
+				const tmpLocation = localStorage.get(`tinymce__${blobSrcUri}`);
+				if (tmpLocation) {
+					this.#sizeImageInEditor(editor, imageElement);
+					editor.dom.setAttrib(imageElement, 'data-tmpimg', tmpLocation);
+				}
+			});
+		}
+
+		if (window.Umbraco?.Sys.ServerVariables.umbracoSettings.sanitizeTinyMce) {
+			/** prevent injecting arbitrary JavaScript execution in on-attributes. */
+			const allNodes = Array.prototype.slice.call(editor.dom.doc.getElementsByTagName('*'));
+			allNodes.forEach((node) => {
+				for (let i = 0; i < node.attributes.length; i++) {
+					if (node.attributes[i].name.startsWith('on')) {
+						node.removeAttribute(node.attributes[i].name);
+					}
+				}
+			});
+		}
+	}
+
+	async #sizeImageInEditor(editor: any, imageDomElement: HTMLElement, imgUrl?: string) {
+		const size = editor.dom.getSize(imageDomElement);
+		const maxImageSize = editor.options.get('maxImageSize');
+
+		if (maxImageSize && maxImageSize > 0) {
+			const newSize = this.mediaHelper.scaleToMaxSize(maxImageSize, size.w, size.h);
+
+			editor.dom.setAttribs(imageDomElement, { width: Math.round(newSize.width), height: Math.round(newSize.height) });
+
+			// Images inserted via Media Picker will have a URL we can use for ImageResizer QueryStrings
+			// Images pasted/dragged in are not persisted to media until saved & thus will need to be added
+			if (imgUrl) {
+				const resizedImgUrl = await this.mediaHelper.getProcessedImageUrl(imgUrl, {
+					width: newSize.width,
+					height: newSize.height,
+				});
+
+				editor.dom.setAttrib(imageDomElement, 'data-mce-src', resizedImgUrl);
+			}
+
+			editor.execCommand('mceAutoResize', false, null, null);
+		}
 	}
 
 	#onChange(value: string) {
 		super.value = value;
 		this.dispatchEvent(new CustomEvent('change', { bubbles: true, composed: true }));
+	}
+
+	#isMediaPickerEnabled() {
+		return this._toolbar.includes('umbmediapicker');
 	}
 
 	render() {
