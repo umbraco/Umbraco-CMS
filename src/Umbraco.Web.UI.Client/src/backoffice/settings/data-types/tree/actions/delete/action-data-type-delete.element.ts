@@ -1,26 +1,26 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, html } from 'lit';
 import { customElement } from 'lit/decorators.js';
-import { UmbModalService, UMB_MODAL_SERVICE_CONTEXT_TOKEN } from '../../../../../../core/modal';
+import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN } from '../../../../../../core/modal';
 import UmbTreeItemActionElement from '../../../../../shared/components/tree/action/tree-item-action.element';
 
 @customElement('umb-tree-action-data-type-delete')
 export default class UmbTreeActionDataTypeDeleteElement extends UmbTreeItemActionElement {
 	static styles = [UUITextStyles, css``];
 
-	private _modalService?: UmbModalService;
+	private _modalContext?: UmbModalContext;
 	//private _dataTypeStore?: UmbDataTypeStore;
 
 	connectedCallback(): void {
 		super.connectedCallback();
 
-		this.consumeContext(UMB_MODAL_SERVICE_CONTEXT_TOKEN, (modalService) => {
-			this._modalService = modalService;
+		this.consumeContext(UMB_MODAL_CONTEXT_TOKEN, (instance) => {
+			this._modalContext = instance;
 		});
 	}
 
 	private _handleLabelClick() {
-		const modalHandler = this._modalService?.confirm({
+		const modalHandler = this._modalContext?.confirm({
 			headline: `Delete ${this._activeTreeItem?.name ?? 'item'}`,
 			content: 'Are you sure you want to delete this item?',
 			color: 'danger',

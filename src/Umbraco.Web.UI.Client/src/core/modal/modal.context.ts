@@ -37,7 +37,7 @@ export interface UmbModalOptions<UmbModalData> {
 // TODO: rename to UmbModalContext
 // TODO: we should find a way to easily open a modal without adding custom methods to this context. It would result in a better separation of concerns.
 // TODO: move all layouts into their correct "silo" folders. User picker should live with users etc.
-export class UmbModalService {
+export class UmbModalContext {
 	// TODO: Investigate if we can get rid of HTML elements in our store, so we can use one of our states.
 	#modals = new BehaviorSubject(<Array<UmbModalHandler>>[]);
 	public readonly modals = this.#modals.asObservable();
@@ -47,7 +47,7 @@ export class UmbModalService {
 	 * @public
 	 * @param {UmbModalConfirmData} data
 	 * @return {*}  {UmbModalHandler}
-	 * @memberof UmbModalService
+	 * @memberof UmbModalContext
 	 */
 	public confirm(data: UmbModalConfirmData): UmbModalHandler {
 		return this.open('umb-modal-layout-confirm', { data, type: 'dialog' });
@@ -58,7 +58,7 @@ export class UmbModalService {
 	 * @public
 	 * @param {UmbModalContentPickerData} [data]
 	 * @return {*}  {UmbModalHandler}
-	 * @memberof UmbModalService
+	 * @memberof UmbModalContext
 	 */
 	public contentPicker(data?: UmbModalContentPickerData): UmbModalHandler {
 		return this.open('umb-modal-layout-content-picker', { data, type: 'sidebar', size: 'small' });
@@ -69,7 +69,7 @@ export class UmbModalService {
 	 * @public
 	 * @param {UmbModalMediaPickerData} [data]
 	 * @return {*}  {UmbModalHandler}
-	 * @memberof UmbModalService
+	 * @memberof UmbModalContext
 	 */
 	public mediaPicker(data?: UmbModalMediaPickerData): UmbModalHandler {
 		return this.open('umb-modal-layout-media-picker', { data, type: 'sidebar', size: 'small' });
@@ -80,7 +80,7 @@ export class UmbModalService {
 	 * @public
 	 * @param {UmbModalPropertyEditorUIPickerData} [data]
 	 * @return {*}  {UmbModalHandler}
-	 * @memberof UmbModalService
+	 * @memberof UmbModalContext
 	 */
 	public propertyEditorUIPicker(data?: UmbModalPropertyEditorUIPickerData): UmbModalHandler {
 		return this.open('umb-modal-layout-property-editor-ui-picker', { data, type: 'sidebar', size: 'small' });
@@ -91,7 +91,7 @@ export class UmbModalService {
 	 * @public
 	 * @param {UmbModalIconPickerData} [data]
 	 * @return {*}  {UmbModalHandler}
-	 * @memberof UmbModalService
+	 * @memberof UmbModalContext
 	 */
 	public iconPicker(data?: UmbModalIconPickerData): UmbModalHandler {
 		return this.open('umb-modal-layout-icon-picker', { data, type: 'sidebar', size: 'small' });
@@ -102,7 +102,7 @@ export class UmbModalService {
 	 * @public
 	 * @param {(LinkPickerData & LinkPickerConfig)} [data]
 	 * @return {*}  {UmbModalHandler}
-	 * @memberof UmbModalService
+	 * @memberof UmbModalContext
 	 */
 	public linkPicker(data?: UmbModalLinkPickerData): UmbModalHandler {
 		return this.open('umb-modal-layout-link-picker', {
@@ -116,7 +116,7 @@ export class UmbModalService {
 	 * Opens the user settings sidebar modal
 	 * @public
 	 * @return {*}  {UmbModalHandler}
-	 * @memberof UmbModalService
+	 * @memberof UmbModalContext
 	 */
 	public userSettings(): UmbModalHandler {
 		return this.open('umb-modal-layout-current-user', { type: 'sidebar', size: 'small' });
@@ -126,7 +126,7 @@ export class UmbModalService {
 	 * Opens the change password sidebar modal
 	 * @public
 	 * @return {*}  {UmbModalHandler}
-	 * @memberof UmbModalService
+	 * @memberof UmbModalContext
 	 */
 	public changePassword(data: UmbModalChangePasswordData): UmbModalHandler {
 		return this.open('umb-modal-layout-change-password', { data, type: 'dialog' });
@@ -136,7 +136,7 @@ export class UmbModalService {
 	 * Opens a language picker sidebar modal
 	 * @public
 	 * @return {*}  {UmbModalHandler}
-	 * @memberof UmbModalService
+	 * @memberof UmbModalContext
 	 */
 	public languagePicker(data: UmbPickerModalData<LanguageModel>): UmbModalHandler {
 		return this.open('umb-language-picker-modal-layout', { data, type: 'sidebar' });
@@ -146,7 +146,7 @@ export class UmbModalService {
 	 * Opens a basic sidebar modal to display readonly information
 	 * @public
 	 * @return {*}  {UmbModalHandler}
-	 * @memberof UmbModalService
+	 * @memberof UmbModalContext
 	 */
 	public openBasic(data: UmbBasicModalData): UmbModalHandler {
 		return this.open('umb-modal-layout-basic', {
@@ -197,7 +197,7 @@ export class UmbModalService {
 	 * @param {(string | HTMLElement)} element
 	 * @param {UmbModalOptions<unknown>} [options]
 	 * @return {*}  {UmbModalHandler}
-	 * @memberof UmbModalService
+	 * @memberof UmbModalContext
 	 */
 	public open(element: string | HTMLElement, options?: UmbModalOptions<unknown>): UmbModalHandler {
 		const modalHandler = new UmbModalHandler(element, options);
@@ -212,7 +212,7 @@ export class UmbModalService {
 	 * Closes a modal or sidebar modal
 	 * @private
 	 * @param {string} key
-	 * @memberof UmbModalService
+	 * @memberof UmbModalContext
 	 */
 	private _close(key: string) {
 		this.#modals.next(this.#modals.getValue().filter((modal) => modal.key !== key));
@@ -222,7 +222,7 @@ export class UmbModalService {
 	 * Handles the close-end event
 	 * @private
 	 * @param {UmbModalHandler} modalHandler
-	 * @memberof UmbModalService
+	 * @memberof UmbModalContext
 	 */
 	private _handleCloseEnd(modalHandler: UmbModalHandler) {
 		modalHandler.element.removeEventListener('close-end', () => this._handleCloseEnd(modalHandler));
@@ -230,4 +230,4 @@ export class UmbModalService {
 	}
 }
 
-export const UMB_MODAL_SERVICE_CONTEXT_TOKEN = new UmbContextToken<UmbModalService>(UmbModalService.name);
+export const UMB_MODAL_CONTEXT_TOKEN = new UmbContextToken<UmbModalContext>(UmbModalContext.name);

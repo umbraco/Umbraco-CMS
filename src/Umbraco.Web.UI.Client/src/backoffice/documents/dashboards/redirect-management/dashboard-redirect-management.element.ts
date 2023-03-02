@@ -2,7 +2,7 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html, nothing } from 'lit';
 import { customElement, state, query, property } from 'lit/decorators.js';
 import { UUIButtonState, UUIPaginationElement, UUIPaginationEvent } from '@umbraco-ui/uui';
-import { UmbModalService, UMB_MODAL_SERVICE_CONTEXT_TOKEN } from '../../../../core/modal';
+import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN } from '../../../../core/modal';
 import { UmbLitElement } from '@umbraco-cms/element';
 import { RedirectManagementResource, RedirectStatusModel, RedirectUrlModel } from '@umbraco-cms/backend-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/resources';
@@ -105,12 +105,12 @@ export class UmbDashboardRedirectManagementElement extends UmbLitElement {
 	@query('uui-pagination')
 	private _pagination?: UUIPaginationElement;
 
-	private _modalService?: UmbModalService;
+	private _modalContext?: UmbModalContext;
 
 	constructor() {
 		super();
-		this.consumeContext(UMB_MODAL_SERVICE_CONTEXT_TOKEN, (_instance) => {
-			this._modalService = _instance;
+		this.consumeContext(UMB_MODAL_CONTEXT_TOKEN, (_instance) => {
+			this._modalContext = _instance;
 		});
 	}
 
@@ -126,7 +126,7 @@ export class UmbDashboardRedirectManagementElement extends UmbLitElement {
 	}
 
 	private _removeRedirectHandler(data: RedirectUrlModel) {
-		const modalHandler = this._modalService?.confirm({
+		const modalHandler = this._modalContext?.confirm({
 			headline: 'Delete',
 			content: html`
 				<div style="width:300px">
@@ -157,7 +157,7 @@ export class UmbDashboardRedirectManagementElement extends UmbLitElement {
 	}
 
 	private _disableRedirectHandler() {
-		const modalHandler = this._modalService?.confirm({
+		const modalHandler = this._modalContext?.confirm({
 			headline: 'Disable URL tracker',
 			content: html`Are you sure you want to disable the URL tracker?`,
 			color: 'danger',

@@ -3,7 +3,7 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, property, state } from 'lit/decorators.js';
 import { ifDefined } from 'lit-html/directives/if-defined.js';
 import { FormControlMixin } from '@umbraco-ui/uui-base/lib/mixins';
-import { UmbModalService, UMB_MODAL_SERVICE_CONTEXT_TOKEN } from '../../../../core/modal';
+import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN } from '../../../../core/modal';
 import { UmbLanguageRepository } from '../../../settings/languages/repository/language.repository';
 import { UmbChangeEvent } from '@umbraco-cms/events';
 import { UmbLitElement } from '@umbraco-cms/element';
@@ -79,7 +79,7 @@ export class UmbInputLanguagePickerElement extends FormControlMixin(UmbLitElemen
 	@state()
 	private _items?: Array<LanguageModel>;
 
-	private _modalService?: UmbModalService;
+	private _modalContext?: UmbModalContext;
 	private _repository = new UmbLanguageRepository(this);
 	private _pickedItemsObserver?: UmbObserverController<LanguageModel>;
 
@@ -98,8 +98,8 @@ export class UmbInputLanguagePickerElement extends FormControlMixin(UmbLitElemen
 			() => !!this.max && this._selectedIsoCodes.length > this.max
 		);
 
-		this.consumeContext(UMB_MODAL_SERVICE_CONTEXT_TOKEN, (instance) => {
-			this._modalService = instance;
+		this.consumeContext(UMB_MODAL_CONTEXT_TOKEN, (instance) => {
+			this._modalContext = instance;
 		});
 	}
 
@@ -119,7 +119,7 @@ export class UmbInputLanguagePickerElement extends FormControlMixin(UmbLitElemen
 	}
 
 	private _openPicker() {
-		const modalHandler = this._modalService?.languagePicker({
+		const modalHandler = this._modalContext?.languagePicker({
 			multiple: this.max === 1 ? false : true,
 			selection: [...this._selectedIsoCodes],
 			filter: this.filter,
@@ -131,7 +131,7 @@ export class UmbInputLanguagePickerElement extends FormControlMixin(UmbLitElemen
 	}
 
 	private _removeItem(item: LanguageModel) {
-		const modalHandler = this._modalService?.confirm({
+		const modalHandler = this._modalContext?.confirm({
 			color: 'danger',
 			headline: `Remove ${item.name}?`,
 			content: 'Are you sure you want to remove this item',

@@ -8,7 +8,7 @@ import { repeat } from 'lit/directives/repeat.js';
 import { distinctUntilChanged } from 'rxjs';
 
 import { UmbCurrentUserStore, UMB_CURRENT_USER_STORE_CONTEXT_TOKEN } from '../../current-user/current-user.store';
-import type { UmbModalService } from '../../../../core/modal';
+import type { UmbModalContext } from '../../../../core/modal';
 import type { UmbWorkspaceEntityElement } from '../../../shared/components/workspace/workspace-entity-element.interface';
 import { UmbWorkspaceUserContext } from './user-workspace.context';
 import { getLookAndColorFromUserStatus } from '@umbraco-cms/utils';
@@ -84,7 +84,7 @@ export class UmbUserWorkspaceElement extends UmbLitElement implements UmbWorkspa
 	private _currentUser?: UserDetails;
 
 	private _currentUserStore?: UmbCurrentUserStore;
-	private _modalService?: UmbModalService;
+	private _modalContext?: UmbModalContext;
 
 	private _languages = []; //TODO Add languages
 
@@ -191,7 +191,7 @@ export class UmbUserWorkspaceElement extends UmbLitElement implements UmbWorkspa
 	}
 
 	private _changePassword() {
-		this._modalService?.changePassword({ requireOldPassword: this._currentUserStore?.isAdmin === false });
+		this._modalContext?.changePassword({ requireOldPassword: this._currentUserStore?.isAdmin === false });
 	}
 
 	private _renderActionButtons() {

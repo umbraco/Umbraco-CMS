@@ -3,7 +3,7 @@ import { customElement, property, state } from 'lit/decorators.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
 import { firstValueFrom, map } from 'rxjs';
 
-import { UmbModalService, UMB_MODAL_SERVICE_CONTEXT_TOKEN } from '../../../../../core/modal';
+import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN } from '../../../../../core/modal';
 import { createExtensionElement, umbExtensionsRegistry } from '@umbraco-cms/extensions-api';
 
 import type { ManifestPackageView, UmbPackage } from '@umbraco-cms/models';
@@ -17,13 +17,13 @@ export class UmbInstalledPackagesSectionViewItemElement extends UmbLitElement {
 	@state()
 	private _packageView?: ManifestPackageView;
 
-	private _umbModalService?: UmbModalService;
+	private _modalContext?: UmbModalContext;
 
 	constructor() {
 		super();
 
-		this.consumeContext(UMB_MODAL_SERVICE_CONTEXT_TOKEN, (modalService) => {
-			this._umbModalService = modalService;
+		this.consumeContext(UMB_MODAL_CONTEXT_TOKEN, (instance) => {
+			this._modalContext = instance;
 		});
 	}
 
@@ -81,7 +81,7 @@ export class UmbInstalledPackagesSectionViewItemElement extends UmbLitElement {
 			return;
 		}
 
-		this._umbModalService?.open(element, { data: this.package, size: 'small', type: 'sidebar' });
+		this._modalContext?.open(element, { data: this.package, size: 'small', type: 'sidebar' });
 	}
 }
 

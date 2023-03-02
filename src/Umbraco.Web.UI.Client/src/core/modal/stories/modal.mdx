@@ -18,21 +18,22 @@ A modal is a popup that darkens the background and has focus lock. There are two
 
 ## Basic Usage
 
-### Consume UmbModalService from an element
+### Consume UmbModalContext from an element
 
-The UmbModal service can be used to open modals.
+The UmbModal context can be used to open modals.
 
 ```typescript
 import { html, LitElement } from 'lit';
 import { UmbLitElement } from '@umbraco-cms/element';
-import { UmbModalService, UMB_MODAL_SERVICE_CONTEXT_ALIAS } from './core/services/modal';
+import { UmbModalContext, UMB_MODAL_CONTEXT_ALIAS } from '@umbraco-cms/modal';
 class MyElement extends UmbLitElement {
-	private _modalService_?: UmbModalService;
+	#modalContext?: UmbModalContext;
+
 	constructor() {
 		super();
-		this.consumeContext(UMB_MODAL_SERVICE_CONTEXT_ALIAS, (modalService) => {
-			this._modalService = modalService;
-			// modalService is now ready to be used.
+		this.consumeContext(UMB_MODAL_CONTEXT_ALIAS, (instance) => {
+			this.#modalContext = instance;
+			// modalContext is now ready to be used.
 		});
 	}
 }
@@ -40,30 +41,33 @@ class MyElement extends UmbLitElement {
 
 ### Open a modal
 
-A modal is opened by calling one of the helper methods on the UmbModalService. The methods will accept an element template and modal options and return an instance of UmbModalHandler.
+A modal is opened by calling one of the helper methods on the UmbModalContext. The methods will accept an element template and modal options and return an instance of UmbModalHandler.
 
 ```typescript
 import { html, LitElement } from 'lit';
 import { UmbLitElement } from '@umbraco-cms/element';
-import { UmbModalService, UMB_MODAL_SERVICE_CONTEXT_ALIAS } from './core/services/modal';
+import { UmbModalContext, UMB_MODAL_CONTEXT_ALIAS } from './core/services/modal';
 class MyElement extends UmbLitElement {
-	private _modalService?: UmbModalService;
+	#modalContext?: UmbModalContext;
+
 	constructor() {
 		super();
-		this.consumeContext(UMB_MODAL_SERVICE_CONTEXT_ALIAS, (modalService) => {
-			this._modalService = modalService;
-			// modalService is now ready to be used
+		this.consumeContext(UMB_MODAL_CONTEXT_ALIAS, (instance) => {
+			this.#modalContext = instance;
+			// modalContext is now ready to be used
 		});
 	}
-	private _handleClick() {
+
+	#onClick() {
 		const options = {'options goes here'}
-		const modalHandler = this._modalService?.openDialog('my-dialog'), options);
+		const modalHandler = this.#modalContext?.openDialog('my-dialog'), options);
 		modalHandler.onClose().then((data) => {
 			// if any data is supplied on close, it will be available here.
 		});
 	}
+
 	render() {
-		return html`<button @click=${this._handleClick}>Open modal</button>`;
+		return html`<button @click=${this.#onClick}>Open modal</button>`;
 	}
 }
 ```
@@ -73,6 +77,7 @@ The dialog template to open:
 ```typescript
 import { html, LitElement } from 'lit';
 import type { UmbModalHandler } from './core/services/modal';
+
 class MyDialog extends LitElement {
 	// the modal handler will be injected into the element when the modal is opened.
 	@property({ attribute: false })

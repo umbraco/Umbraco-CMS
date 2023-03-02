@@ -3,21 +3,21 @@ import { customElement, state } from 'lit/decorators.js';
 import { isManifestElementNameType, umbExtensionsRegistry } from '@umbraco-cms/extensions-api';
 import type { ManifestBase } from '@umbraco-cms/models';
 import { UmbLitElement } from '@umbraco-cms/element';
-import { UmbModalService, UMB_MODAL_SERVICE_CONTEXT_TOKEN } from '@umbraco-cms/modal';
+import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN } from '@umbraco-cms/modal';
 
 @customElement('umb-extension-root-workspace')
 export class UmbExtensionRootWorkspaceElement extends UmbLitElement {
 	@state()
 	private _extensions?: Array<ManifestBase> = undefined;
 
-	private _modalService?: UmbModalService;
+	private _modalContext?: UmbModalContext;
 
 	connectedCallback(): void {
 		super.connectedCallback();
 		this._observeExtensions();
 
-		this.consumeContext(UMB_MODAL_SERVICE_CONTEXT_TOKEN, (modalService) => {
-			this._modalService = modalService;
+		this.consumeContext(UMB_MODAL_CONTEXT_TOKEN, (instance) => {
+			this._modalContext = instance;
 		});
 	}
 
@@ -28,7 +28,7 @@ export class UmbExtensionRootWorkspaceElement extends UmbLitElement {
 	}
 
 	#removeExtension(extension: ManifestBase) {
-		const modalHandler = this._modalService?.confirm({
+		const modalHandler = this._modalContext?.confirm({
 			headline: 'Unload extension',
 			confirmLabel: 'Unload',
 			content: html`<p>Are you sure you want to unload the extension <strong>${extension.alias}</strong>?</p>`,
