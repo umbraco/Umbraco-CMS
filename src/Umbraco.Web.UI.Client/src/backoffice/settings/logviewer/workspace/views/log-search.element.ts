@@ -150,6 +150,34 @@ export class UmbLogViewerSearchViewElement extends UmbLitElement {
 				flex-direction: column;
 				transform: translateX(calc((100% - 33px) * -1));
 			}
+
+			#polling-enabled-icon {
+				margin-right: var(--uui-size-space-3);
+				margin-bottom: 1px;
+				-webkit-animation: rotate-center 0.8s ease-in-out infinite both;
+				animation: rotate-center 0.8s ease-in-out infinite both;
+			}
+
+			@-webkit-keyframes rotate-center {
+				0% {
+					-webkit-transform: rotate(0);
+					transform: rotate(0);
+				}
+				100% {
+					-webkit-transform: rotate(360deg);
+					transform: rotate(360deg);
+				}
+			}
+			@keyframes rotate-center {
+				0% {
+					-webkit-transform: rotate(0);
+					transform: rotate(0);
+				}
+				100% {
+					-webkit-transform: rotate(360deg);
+					transform: rotate(360deg);
+				}
+			}
 		`,
 	];
 
@@ -371,7 +399,8 @@ export class UmbLogViewerSearchViewElement extends UmbLitElement {
 		return html` <uui-button-group>
 			<uui-button label="Start pooling" @click=${this.#togglePolling}
 				>${this._poolingConfig.enabled
-					? html`Polling ${this._poolingConfig.interval / 1000} seconds`
+					? html`<uui-icon name="umb:axis-rotation" id="polling-enabled-icon"></uui-icon>Polling
+							${this._poolingConfig.interval / 1000} seconds`
 					: 'Pooling'}</uui-button
 			>
 			<uui-popover placement="bottom-end" id="polling-popover" @close=${() => (this._polingExpandSymbol.open = false)}>
