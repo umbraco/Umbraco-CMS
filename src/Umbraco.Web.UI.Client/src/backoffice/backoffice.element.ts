@@ -3,8 +3,6 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html } from 'lit';
 
 import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN } from '../core/modal';
-import { UmbUserStore } from './users/users/repository/user.store';
-import { UmbUserGroupStore } from './users/user-groups/repository/user-group.store';
 import { UmbCurrentUserStore, UMB_CURRENT_USER_STORE_CONTEXT_TOKEN } from './users/current-user/current-user.store';
 import {
 	UmbCurrentUserHistoryStore,
@@ -70,8 +68,6 @@ export class UmbBackofficeElement extends UmbLitElement {
 		new UmbThemeContext(this);
 		new UmbServerExtensionController(this, umbExtensionsRegistry);
 
-		new UmbUserStore(this);
-		new UmbUserGroupStore(this);
 		new UmbDocumentBlueprintDetailStore(this);
 		new UmbDocumentBlueprintTreeStore(this);
 		this.provideContext(UMB_CURRENT_USER_HISTORY_STORE_CONTEXT_TOKEN, new UmbCurrentUserHistoryStore());
