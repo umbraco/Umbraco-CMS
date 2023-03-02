@@ -100,6 +100,10 @@ export class UmbDocumentWorkspaceContext
 		this.#activeVariantsInfo.next(activeVariants);
 	}
 
+	openSplitView(culture: string | null, segment: string | null) {
+		this.setActiveVariant(1, culture, segment);
+	}
+
 	getVariant(variantId: UmbVariantId) {
 		return this.#draft.getValue()?.variants?.find((x) => variantId.compare(x));
 	}
