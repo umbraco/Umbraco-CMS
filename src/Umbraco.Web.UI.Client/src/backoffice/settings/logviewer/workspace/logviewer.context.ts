@@ -108,6 +108,14 @@ export class UmbLogViewerWorkspaceContext {
 	}
 
 	setDateRange(dateRange: LogViewerDateRange) {
+		const { startDate, endDate } = dateRange;
+
+		const isAnyDateInTheFuture = new Date(startDate) > new Date() || new Date(endDate) > new Date();
+		const isStartDateBiggerThenEndDate = new Date(startDate) > new Date(endDate);
+		if (isAnyDateInTheFuture || isStartDateBiggerThenEndDate) {
+			return;
+		}
+
 		this.#dateRange.next(dateRange);
 		this.getLogCount(dateRange);
 	}

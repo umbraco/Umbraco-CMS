@@ -92,6 +92,13 @@ export class UmbLogViewerOverviewViewElement extends UmbLitElement {
 				width: 100%;
 				text-align: inherit;
 				outline: none;
+				position: relative;
+				border-bottom: 2px solid transparent;
+			}
+
+			/* find out better validation for that  */
+			input:out-of-range {
+				border-color: var(--uui-color-danger);
 			}
 
 			ul {
@@ -334,6 +341,7 @@ export class UmbLogViewerOverviewViewElement extends UmbLitElement {
 								id="end-date" 
 								type="date" 
 								label="To" 
+								.min=${this._startDate}
 								.max=${this.#logViewerContext?.today ?? ''}
 								.value=${this._endDate}>
 							</input>
