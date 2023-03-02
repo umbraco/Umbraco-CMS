@@ -23,6 +23,7 @@ import type { ManifestWorkspaceAction } from './workspace-action.models';
 import type { ManifestWorkspaceView } from './workspace-view.models';
 import type { ManifestWorkspaceViewCollection } from './workspace-view-collection.models';
 import type { ManifestRepository } from './repository.models';
+import type { ManifestStore, ManifestTreeStore } from './store.models';
 import type { ClassConstructor } from '@umbraco-cms/models';
 
 export * from './collection-view.models';
@@ -49,6 +50,7 @@ export * from './workspace-action.models';
 export * from './workspace-view-collection.models';
 export * from './workspace-view.models';
 export * from './repository.models';
+export * from './store.models';
 export * from './workspace.models';
 
 export type ManifestTypes =
@@ -81,6 +83,8 @@ export type ManifestTypes =
 	| ManifestWorkspaceAction
 	| ManifestWorkspaceView
 	| ManifestWorkspaceViewCollection
+	| ManifestStore
+	| ManifestTreeStore
 	| ManifestBase;
 
 export type ManifestStandardTypes = ManifestTypes['type'];
@@ -100,11 +104,11 @@ export interface ManifestWithLoader<LoaderReturnType> extends ManifestBase {
 	loader?: () => Promise<LoaderReturnType>;
 }
 
-export interface ManifestClass extends ManifestWithLoader<object> {
+export interface ManifestClass<T = unknown> extends ManifestWithLoader<object> {
 	type: ManifestStandardTypes;
 	js?: string;
 	className?: string;
-	class?: ClassConstructor<unknown>;
+	class?: ClassConstructor<T>;
 	//loader?: () => Promise<object | HTMLElement>;
 }
 
