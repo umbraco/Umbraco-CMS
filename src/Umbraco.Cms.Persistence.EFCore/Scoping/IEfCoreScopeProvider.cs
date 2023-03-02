@@ -4,9 +4,9 @@ namespace Umbraco.Cms.Persistence.EFCore.Scoping;
 
 public interface IEfCoreScopeProvider
 {
-    IEfCoreScope CreateScope();
+    IEfCoreScope CreateScope(RepositoryCacheMode repositoryCacheMode = RepositoryCacheMode.Unspecified, bool? scopeFileSystems = null);
 
-    IEfCoreScope CreateDetachedScope();
+    IEfCoreScope CreateDetachedScope(RepositoryCacheMode repositoryCacheMode = RepositoryCacheMode.Unspecified, bool? scopeFileSystems = null);
 
     void AttachScope(IEfCoreScope other);
 

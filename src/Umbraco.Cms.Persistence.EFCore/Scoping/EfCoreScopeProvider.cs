@@ -49,7 +49,17 @@ public class EfCoreScopeProvider : IEfCoreScopeProvider
         _fileSystems.IsScoped = () => efCoreScopeAccessor.AmbientScope != null && ((EfCoreScope)efCoreScopeAccessor.AmbientScope).ScopedFileSystems;
     }
 
-    public IEfCoreScope CreateDetachedScope() => new EfCoreDetachableScope(_distributedLockingMechanismFactory, _umbracoEfCoreDatabaseFactory, _efCoreScopeAccessor, _fileSystems, this, null, _eventAggregator);
+    public IEfCoreScope CreateDetachedScope(
+        RepositoryCacheMode repositoryCacheMode = RepositoryCacheMode.Unspecified,
+        bool? scopeFileSystems = null) =>
+        new EfCoreDetachableScope(
+            _distributedLockingMechanismFactory,
+            _umbracoEfCoreDatabaseFactory,
+            _efCoreScopeAccessor,
+            _fileSystems,
+            this,
+            null,
+            _eventAggregator);
 
     public void AttachScope(IEfCoreScope other)
     {
@@ -119,12 +129,22 @@ public class EfCoreScopeProvider : IEfCoreScopeProvider
 
     public IScopeContext? AmbientScopeContext => _ambientEfCoreScopeContextStack.AmbientContext;
 
-    public IEfCoreScope CreateScope()
+    public IEfCoreScope CreateScope(
+        RepositoryCacheMode repositoryCacheMode = RepositoryCacheMode.Unspecified, bool? scopeFileSystems = null)
     {
         if (_ambientEfCoreScopeStack.AmbientScope is null)
         {
             ScopeContext? newContext = _ambientEfCoreScopeContextStack.AmbientContext == null ? new ScopeContext() : null;
-            var ambientScope = new EfCoreScope(_distributedLockingMechanismFactory, _umbracoEfCoreDatabaseFactory, _efCoreScopeAccessor, _fileSystems, this, newContext, _eventAggregator);
+            var ambientScope = new EfCoreScope(
+                _distributedLockingMechanismFactory,
+                _umbracoEfCoreDatabaseFactory,
+                _efCoreScopeAccessor,
+                _fileSystems,
+                this,
+                newContext,
+                _eventAggregator,
+                repositoryCacheMode,
+                scopeFileSystems);
 
             if (newContext != null)
             {
@@ -143,7 +163,9 @@ public class EfCoreScopeProvider : IEfCoreScopeProvider
             this,
             (EfCoreScope)_ambientEfCoreScopeStack.AmbientScope,
             null,
-            _eventAggregator);
+            _eventAggregator,
+            repositoryCacheMode,
+            scopeFileSystems);
 
         _ambientEfCoreScopeStack.Push(efCoreScope);
         return efCoreScope;

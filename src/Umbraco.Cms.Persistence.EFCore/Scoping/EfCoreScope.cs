@@ -47,13 +47,6 @@ internal class EfCoreScope : IEfCoreScope
         Locks = ParentScope is null ? new LockingMechanism(distributedLockingMechanismFactory) : ResolveLockingMechanism();
         ScopeContext = scopeContext;
 
-        // cannot specify a different fs scope!
-        // can be 'true' only on outer scope (and false does not make much sense)
-        if (scopeFileSystems != null && ParentScope?._scopeFileSystems != _scopeFileSystems)
-        {
-            throw new ArgumentException($"Value '{scopeFileSystems.Value}' be different from parent value '{ParentScope?._scopeFileSystems}'.", nameof(scopeFileSystems));
-        }
-
         if (scopeFileSystems is true)
         {
             _scopedFileSystem = scopedFileSystem.Shadow();
@@ -69,7 +62,8 @@ internal class EfCoreScope : IEfCoreScope
         EfCoreScope parentScope,
         IScopeContext? scopeContext,
         IEventAggregator eventAggregator,
-        RepositoryCacheMode repositoryCacheMode = RepositoryCacheMode.Unspecified)
+        RepositoryCacheMode repositoryCacheMode = RepositoryCacheMode.Unspecified,
+        bool? scopeFileSystems = null)
         : this(
             distributedLockingMechanismFactory,
             efCoreDatabaseFactory,
@@ -78,8 +72,19 @@ internal class EfCoreScope : IEfCoreScope
             efCoreScopeProvider,
             scopeContext,
             eventAggregator,
-            repositoryCacheMode) =>
+            repositoryCacheMode,
+            scopeFileSystems)
+    {
+        // cannot specify a different fs scope!
+        // can be 'true' only on outer scope (and false does not make much sense)
+        if (scopeFileSystems != null && ParentScope?._scopeFileSystems != _scopeFileSystems)
+        {
+            throw new ArgumentException($"Value '{scopeFileSystems.Value}' be different from parent value '{ParentScope?._scopeFileSystems}'.", nameof(scopeFileSystems));
+        }
+
         ParentScope = parentScope;
+    }
+
 
     public Guid InstanceId { get; }
 
