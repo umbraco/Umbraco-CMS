@@ -17,8 +17,6 @@ import {
 } from './shared/components/backoffice-frame/backoffice.context';
 import { UmbDocumentBlueprintDetailStore } from './documents/document-blueprints/document-blueprint.detail.store';
 import { UmbDocumentBlueprintTreeStore } from './documents/document-blueprints/document-blueprint.tree.store';
-import { UmbTemplateTreeStore } from './templating/templates/tree/data/template.tree.store';
-import { UmbTemplateDetailStore } from './templating/templates/workspace/data/template.detail.store';
 import { UmbThemeContext } from './themes/theme.context';
 import { UmbLanguageStore } from './settings/languages/repository/language.store';
 import {
@@ -74,8 +72,6 @@ export class UmbBackofficeElement extends UmbLitElement {
 		new UmbUserGroupStore(this);
 		new UmbDocumentBlueprintDetailStore(this);
 		new UmbDocumentBlueprintTreeStore(this);
-		new UmbTemplateTreeStore(this);
-		new UmbTemplateDetailStore(this);
 		new UmbLanguageStore(this);
 
 		this.provideContext(UMB_APP_LANGUAGE_CONTEXT_TOKEN, new UmbAppLanguageContext(this));

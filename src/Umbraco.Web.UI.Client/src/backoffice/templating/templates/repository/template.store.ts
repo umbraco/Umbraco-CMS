@@ -6,26 +6,26 @@ import type { UmbControllerHostInterface } from '@umbraco-cms/controller';
 
 /**
  * @export
- * @class UmbTemplateDetailStore
+ * @class UmbTemplateStore
  * @extends {UmbStoreBase}
- * @description - Data Store for Template Details
+ * @description - Data Store for Templates
  */
-export class UmbTemplateDetailStore extends UmbStoreBase {
+export class UmbTemplateStore extends UmbStoreBase {
 	#data = new ArrayState<TemplateModel>([], (x) => x.key);
 
 	/**
-	 * Creates an instance of UmbTemplateDetailStore.
+	 * Creates an instance of UmbTemplateStore.
 	 * @param {UmbControllerHostInterface} host
-	 * @memberof UmbTemplateDetailStore
+	 * @memberof UmbTemplateStore
 	 */
 	constructor(host: UmbControllerHostInterface) {
-		super(host, UmbTemplateDetailStore.name);
+		super(host, UmbTemplateStore.name);
 	}
 
 	/**
 	 * Append a template to the store
 	 * @param {Template} template
-	 * @memberof UmbTemplateDetailStore
+	 * @memberof UmbTemplateStore
 	 */
 	append(template: TemplateModel) {
 		this.#data.append([template]);
@@ -34,13 +34,11 @@ export class UmbTemplateDetailStore extends UmbStoreBase {
 	/**
 	 * Removes templates in the store with the given uniques
 	 * @param {string[]} uniques
-	 * @memberof UmbTemplateDetailStore
+	 * @memberof UmbTemplateStore
 	 */
 	remove(uniques: string[]) {
 		this.#data.remove(uniques);
 	}
 }
 
-export const UMB_TEMPLATE_DETAIL_STORE_CONTEXT_TOKEN = new UmbContextToken<UmbTemplateDetailStore>(
-	UmbTemplateDetailStore.name
-);
+export const UMB_TEMPLATE_STORE_CONTEXT_TOKEN = new UmbContextToken<UmbTemplateStore>(UmbTemplateStore.name);
