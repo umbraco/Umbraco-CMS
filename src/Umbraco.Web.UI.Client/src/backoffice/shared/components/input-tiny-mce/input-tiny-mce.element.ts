@@ -1,6 +1,7 @@
 import { html } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, property } from 'lit/decorators.js';
+import { ifDefined } from 'lit-html/directives/if-defined.js';
 import { FormControlMixin } from '@umbraco-ui/uui-base/lib/mixins';
 import { AcePlugin } from '../../property-editors/uis/tiny-mce/plugins/ace.plugin';
 import { LinkPickerPlugin } from '../../property-editors/uis/tiny-mce/plugins/linkpicker.plugin';
@@ -8,8 +9,9 @@ import { UmbLitElement } from '@umbraco-cms/element';
 import { UmbModalService, UMB_MODAL_SERVICE_CONTEXT_TOKEN } from '@umbraco-cms/modal';
 
 /// TINY MCE
-import '@tinymce/tinymce-webcomponent';
 // import 'tinymce';
+import '@tinymce/tinymce-webcomponent';
+
 // /* Default icons are required. After that, import custom icons if applicable */
 // import 'tinymce/icons/default';
 
@@ -18,15 +20,22 @@ import '@tinymce/tinymce-webcomponent';
 // import 'tinymce/models/dom';
 
 // /* Import a skin (can be a custom skin instead of the default) */
-// import 'tinymce/skins/ui/oxide/skin.css';
+// import 'tinymce/skins/ui/oxide/skin.shadowdom.css';
+
+// /* content UI CSS is required */
+// import contentUiSkinCss from 'tinymce/skins/ui/oxide/content.css';
+
+// /* The default content CSS can be changed or replaced with appropriate CSS for the editor content. */
+// import contentCss from 'tinymce/skins/content/default/content.css';
 
 // /* Import plugins */
 // import 'tinymce/plugins/advlist';
-// import 'tinymce/plugins/code';
-// import 'tinymce/plugins/emoticons';
-// import 'tinymce/plugins/emoticons/js/emojis';
-// import 'tinymce/plugins/link';
+// import 'tinymce/plugins/anchor';
+// import 'tinymce/plugins/autolink';
+// import 'tinymce/plugins/charmap';
+// import 'tinymce/plugins/directionality';
 // import 'tinymce/plugins/lists';
+// import 'tinymce/plugins/searchreplace';
 // import 'tinymce/plugins/table';
 
 declare global {
@@ -78,6 +87,9 @@ export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
 	@property({ type: Array<string> })
 	private _stylesheets: Array<string> = [];
 
+	// @property({ type: String })
+	// private _contentStyle: string = contentUiSkinCss.toString() + '\n' + contentCss.toString();
+
 	modalService?: UmbModalService;
 
 	constructor() {
@@ -90,9 +102,7 @@ export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
 	}
 
 	connectedCallback() {
-		super.connectedCallback();	
-
-		console.log(this.value);
+		super.connectedCallback();
 
 		this._dimensions = this.configuration.find((x) => x.alias === 'dimensions')?.value as { [key: string]: number };
 		this._toolbar = this.configuration.find((x) => x.alias === 'toolbar')?.value;
@@ -106,12 +116,15 @@ export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
 	// TODO => fix TinyMCE type definitions
 	#setTinyConfig() {
 		window.tinyConfig = {
-			statusbar: false,
-			menubar: false,
+			//content_css: false,
 			contextMenu: false,
-			resize: false,
-			style_formats: this._styleFormats,
 			convert_urls: false,
+			menubar: false,
+			resize: false,
+			//skin: false,
+			statusbar: false,
+			style_formats: this._styleFormats,
+
 			setup: (editor: any) => {
 				new AcePlugin(editor, this.modalService);
 				new LinkPickerPlugin(editor, this.modalService, this.configuration);
@@ -138,12 +151,10 @@ export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
 	render() {
 		return html` <tinymce-editor
 			config="tinyConfig"
-			width=${this._dimensions?.width ?? 600}
-			height=${this._dimensions?.height ?? 400}
+			width=${ifDefined(this._dimensions?.width)}
+			height=${ifDefined(this._dimensions?.height)}
 			plugins=${this._plugins.join(' ')}
 			toolbar=${this._toolbar.join(' ')}
-			content_css=${this._stylesheets.join(',')}
-			.style_formats=${this._styleFormats}
 			>${this.value}</tinymce-editor
 		>`;
 	}
