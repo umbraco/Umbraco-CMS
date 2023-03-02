@@ -17,7 +17,9 @@ internal class EfCoreDetachableScope : EfCoreScope
         FileSystems fileSystems,
         IEfCoreScopeProvider efCoreScopeProvider,
         IScopeContext? scopeContext,
-        IEventAggregator eventAggregator)
+        IEventAggregator eventAggregator,
+        RepositoryCacheMode repositoryCacheMode = RepositoryCacheMode.Unspecified,
+        bool? scopeFileSystems = null)
         : base(
             distributedLockingMechanismFactory,
             efCoreDatabaseFactory,
@@ -25,7 +27,9 @@ internal class EfCoreDetachableScope : EfCoreScope
             fileSystems,
             efCoreScopeProvider,
             scopeContext,
-            eventAggregator)
+            eventAggregator,
+            repositoryCacheMode,
+            scopeFileSystems)
     {
         if (scopeContext is not null)
         {

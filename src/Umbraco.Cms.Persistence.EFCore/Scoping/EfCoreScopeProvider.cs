@@ -59,7 +59,9 @@ public class EfCoreScopeProvider : IEfCoreScopeProvider
             _fileSystems,
             this,
             null,
-            _eventAggregator);
+            _eventAggregator,
+            repositoryCacheMode,
+            scopeFileSystems);
 
     public void AttachScope(IEfCoreScope other)
     {
