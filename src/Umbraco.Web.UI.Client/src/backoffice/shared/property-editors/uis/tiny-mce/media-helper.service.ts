@@ -1,6 +1,30 @@
 // TODO => very much temporary
 
 export class UmbMediaHelper {
+	async sizeImageInEditor(editor: any, imageDomElement: HTMLElement, imgUrl?: string) {
+		const size = editor.dom.getSize(imageDomElement);
+		const maxImageSize = editor.options.get('maxImageSize');
+
+		if (maxImageSize && maxImageSize > 0) {
+			const newSize = this.scaleToMaxSize(maxImageSize, size.w, size.h);
+
+			editor.dom.setAttribs(imageDomElement, { width: Math.round(newSize.width), height: Math.round(newSize.height) });
+
+			// Images inserted via Media Picker will have a URL we can use for ImageResizer QueryStrings
+			// Images pasted/dragged in are not persisted to media until saved & thus will need to be added
+			if (imgUrl) {
+				const resizedImgUrl = await this.getProcessedImageUrl(imgUrl, {
+					width: newSize.width,
+					height: newSize.height,
+				});
+
+				editor.dom.setAttrib(imageDomElement, 'data-mce-src', resizedImgUrl);
+			}
+
+			editor.execCommand('mceAutoResize', false, null, null);
+		}
+	}
+
     // Transplanted from mediahelper
 	scaleToMaxSize(maxSize: number, width: number, height: number) {
 		const retval = { width, height };

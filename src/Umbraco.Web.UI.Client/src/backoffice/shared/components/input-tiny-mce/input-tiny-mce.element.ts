@@ -14,6 +14,9 @@ import { UmbModalService, UMB_MODAL_SERVICE_CONTEXT_TOKEN } from '@umbraco-cms/m
 /// TINY MCE
 // import 'tinymce';
 import '@tinymce/tinymce-webcomponent';
+import { MediaPickerPlugin } from '../../property-editors/uis/tiny-mce/plugins/mediapicker.plugin';
+import { UmbCurrentUserStore, UMB_CURRENT_USER_STORE_CONTEXT_TOKEN } from 'src/backoffice/users/current-user/current-user.store';
+import type { UserDetails } from '@umbraco-cms/models';
 
 // /* Default icons are required. After that, import custom icons if applicable */
 // import 'tinymce/icons/default';
@@ -94,8 +97,10 @@ export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
 	// @property({ type: String })
 	// private _contentStyle: string = contentUiSkinCss.toString() + '\n' + contentCss.toString();
 
+	#currentUserStore?: UmbCurrentUserStore;
 	modalService?: UmbModalService;
-	mediaHelper = new UmbMediaHelper();
+	#mediaHelper = new UmbMediaHelper();
+	currentUser?: UserDetails;
 
 	protected getFormElement() {
 		return undefined;
@@ -107,6 +112,19 @@ export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
 		this.consumeContext(UMB_MODAL_SERVICE_CONTEXT_TOKEN, (instance) => {
 			this.modalService = instance;
 			this.#setTinyConfig();
+		});
+
+		this.consumeContext(UMB_CURRENT_USER_STORE_CONTEXT_TOKEN, (instance) => {
+			this.#currentUserStore = instance;
+			this.#observeCurrentUser();
+		});
+	}
+
+	async #observeCurrentUser() {
+		if (!this.#currentUserStore) return;
+
+		this.observe(this.#currentUserStore.currentUser, (currentUser) => {
+			this.currentUser = currentUser;
 		});
 	}
 
@@ -147,6 +165,7 @@ export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
 		new AcePlugin(editor, this.modalService);
 		new LinkPickerPlugin(editor, this.modalService, this.configuration);
 		new MacroPlugin(editor, this.modalService);
+		new MediaPickerPlugin(editor, this.configuration, this.modalService, this.currentUser);
 
 		// register custom option maxImageSize
 		editor.options.register('maxImageSize', { processor: 'number', default: 500 });
@@ -193,7 +212,7 @@ export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
         }
 
         const path = srcAttr.split('?')[0];
-        const resizedPath = await this.mediaHelper.getProcessedImageUrl(path, {
+        const resizedPath = await this.#mediaHelper.getProcessedImageUrl(path, {
           width: e.width,
           height: e.height,
           mode: 'max',
@@ -302,7 +321,7 @@ export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
 				// Resize the image to the max size configured
 				// NOTE: no imagesrc passed into func as the src is blob://...
 				// We will append ImageResizing Querystrings on perist to DB with node save
-				this.#sizeImageInEditor(editor, img);
+				this.#mediaHelper.sizeImageInEditor(editor, img);
 			});
 
 			// Get all img where src starts with blob: AND does NOT have a data=tmpimg attribute
@@ -321,7 +340,7 @@ export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
 
 				const tmpLocation = localStorage.get(`tinymce__${blobSrcUri}`);
 				if (tmpLocation) {
-					this.#sizeImageInEditor(editor, imageElement);
+					this.#mediaHelper.sizeImageInEditor(editor, imageElement);
 					editor.dom.setAttrib(imageElement, 'data-tmpimg', tmpLocation);
 				}
 			});
@@ -340,29 +359,6 @@ export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
 		}
 	}
 
-	async #sizeImageInEditor(editor: any, imageDomElement: HTMLElement, imgUrl?: string) {
-		const size = editor.dom.getSize(imageDomElement);
-		const maxImageSize = editor.options.get('maxImageSize');
-
-		if (maxImageSize && maxImageSize > 0) {
-			const newSize = this.mediaHelper.scaleToMaxSize(maxImageSize, size.w, size.h);
-
-			editor.dom.setAttribs(imageDomElement, { width: Math.round(newSize.width), height: Math.round(newSize.height) });
-
-			// Images inserted via Media Picker will have a URL we can use for ImageResizer QueryStrings
-			// Images pasted/dragged in are not persisted to media until saved & thus will need to be added
-			if (imgUrl) {
-				const resizedImgUrl = await this.mediaHelper.getProcessedImageUrl(imgUrl, {
-					width: newSize.width,
-					height: newSize.height,
-				});
-
-				editor.dom.setAttrib(imageDomElement, 'data-mce-src', resizedImgUrl);
-			}
-
-			editor.execCommand('mceAutoResize', false, null, null);
-		}
-	}
 
 	#onChange(value: string) {
 		super.value = value;
