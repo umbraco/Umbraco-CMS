@@ -18,7 +18,6 @@ import {
 import { UmbDocumentBlueprintDetailStore } from './documents/document-blueprints/document-blueprint.detail.store';
 import { UmbDocumentBlueprintTreeStore } from './documents/document-blueprints/document-blueprint.tree.store';
 import { UmbThemeContext } from './themes/theme.context';
-import { UmbLanguageStore } from './settings/languages/repository/language.store';
 import {
 	UMB_APP_LANGUAGE_CONTEXT_TOKEN,
 	UmbAppLanguageContext,
@@ -72,7 +71,6 @@ export class UmbBackofficeElement extends UmbLitElement {
 		new UmbUserGroupStore(this);
 		new UmbDocumentBlueprintDetailStore(this);
 		new UmbDocumentBlueprintTreeStore(this);
-		new UmbLanguageStore(this);
 
 		this.provideContext(UMB_APP_LANGUAGE_CONTEXT_TOKEN, new UmbAppLanguageContext(this));
 		this.provideContext(UMB_BACKOFFICE_CONTEXT_TOKEN, new UmbBackofficeContext());
