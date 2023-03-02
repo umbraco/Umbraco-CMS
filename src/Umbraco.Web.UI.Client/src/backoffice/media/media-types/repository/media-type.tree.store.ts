@@ -9,7 +9,6 @@ import type { UmbControllerHostInterface } from '@umbraco-cms/controller';
  * @description - Tree Data Store for Media Types
  */
 export class UmbMediaTypeTreeStore extends UmbTreeStoreBase {
-
 	/**
 	 * Creates an instance of UmbMediaTypeTreeStore.
 	 * @param {UmbControllerHostInterface} host

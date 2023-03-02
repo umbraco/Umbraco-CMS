@@ -1,6 +1,6 @@
 import { UmbMediaTypeTreeStore, UMB_MEDIA_TYPE_TREE_STORE_CONTEXT_TOKEN } from './media-type.tree.store';
 import { UmbMediaTypeDetailServerDataSource } from './sources/media-type.detail.server.data';
-import { UmbMediaTypeDetailStore, UMB_MEDIA_TYPE_DETAIL_STORE_CONTEXT_TOKEN } from './media-type.detail.store';
+import { UmbMediaTypeStore, UMB_MEDIA_TYPE_DETAIL_STORE_CONTEXT_TOKEN } from './media-type.detail.store';
 import { MediaTypeTreeServerDataSource } from './sources/media-type.tree.server.data';
 import { ProblemDetailsModel } from '@umbraco-cms/backend-api';
 import { UmbContextConsumerController } from '@umbraco-cms/context-api';
@@ -18,7 +18,7 @@ export class UmbMediaTypeRepository implements UmbTreeRepository {
 	#treeStore?: UmbMediaTypeTreeStore;
 
 	#detailSource: UmbMediaTypeDetailServerDataSource;
-	#detailStore?: UmbMediaTypeDetailStore;
+	#detailStore?: UmbMediaTypeStore;
 
 	#notificationContext?: UmbNotificationContext;
 
