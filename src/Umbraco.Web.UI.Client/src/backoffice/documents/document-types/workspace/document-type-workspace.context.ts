@@ -7,20 +7,15 @@ import { ObjectState } from '@umbraco-cms/observable-api';
 
 type EntityType = DocumentTypeModel;
 export class UmbWorkspaceDocumentTypeContext
-	extends UmbWorkspaceContext
+	extends UmbWorkspaceContext<UmbDocumentTypeRepository>
 	implements UmbWorkspaceEntityContextInterface<EntityType | undefined>
 {
-	#host: UmbControllerHostInterface;
-	#repo: UmbDocumentTypeRepository;
-
 	#data = new ObjectState<EntityType | undefined>(undefined);
 	data = this.#data.asObservable();
 	name = this.#data.getObservablePart((data) => data?.name);
 
 	constructor(host: UmbControllerHostInterface) {
-		super(host);
-		this.#host = host;
-		this.#repo = new UmbDocumentTypeRepository(this.#host);
+		super(host, new UmbDocumentTypeRepository(host));
 	}
 
 	public setPropertyValue(alias: string, value: unknown) {
@@ -49,21 +44,21 @@ export class UmbWorkspaceDocumentTypeContext
 	}
 
 	async load(entityKey: string) {
-		const { data } = await this.#repo.requestByKey(entityKey);
+		const { data } = await this.repository.requestByKey(entityKey);
 		if (data) {
 			this.#data.next(data);
 		}
 	}
 
 	async createScaffold(parentKey: string | null) {
-		const { data } = await this.#repo.createScaffold(parentKey);
+		const { data } = await this.repository.createScaffold(parentKey);
 		if (!data) return;
 		this.#data.next(data);
 	}
 
 	async save() {
 		if (!this.#data.value) return;
-		this.#repo.save(this.#data.value);
+		this.repository.save(this.#data.value);
 	}
 
 	public destroy(): void {

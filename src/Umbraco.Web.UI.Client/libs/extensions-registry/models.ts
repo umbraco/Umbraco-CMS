@@ -11,8 +11,9 @@ import type { ManifestPropertyAction } from './property-action.models';
 import type { ManifestPropertyEditorUI, ManifestPropertyEditorModel } from './property-editor.models';
 import type { ManifestSection } from './section.models';
 import type { ManifestSectionView } from './section-view.models';
-import type { ManifestSidebarMenu } from './sidebar-menu.models';
-import type { ManifestSidebarMenuItem } from './sidebar-menu-item.models';
+import type { ManifestSectionSidebarApp, ManifestMenuSectionSidebarApp } from './section-sidebar-app.models';
+import type { ManifestMenu } from './menu.models';
+import type { ManifestMenuItem } from './menu-item.models';
 import type { ManifestTheme } from './theme.models';
 import type { ManifestTree } from './tree.models';
 import type { ManifestTreeItemAction } from './tree-item-action.models';
@@ -37,8 +38,9 @@ export * from './property-action.models';
 export * from './property-editor.models';
 export * from './section-view.models';
 export * from './section.models';
-export * from './sidebar-menu.models';
-export * from './sidebar-menu-item.models';
+export * from './section-sidebar-app.models';
+export * from './menu.models';
+export * from './menu-item.models';
 export * from './theme.models';
 export * from './tree-item-action.models';
 export * from './tree.models';
@@ -66,9 +68,11 @@ export type ManifestTypes =
 	| ManifestPropertyEditorUI
 	| ManifestRepository
 	| ManifestSection
+	| ManifestSectionSidebarApp
 	| ManifestSectionView
-	| ManifestSidebarMenu
-	| ManifestSidebarMenuItem
+	| ManifestMenuSectionSidebarApp
+	| ManifestMenu
+	| ManifestMenuItem
 	| ManifestTheme
 	| ManifestTree
 	| ManifestTreeItemAction
@@ -76,7 +80,8 @@ export type ManifestTypes =
 	| ManifestWorkspace
 	| ManifestWorkspaceAction
 	| ManifestWorkspaceView
-	| ManifestWorkspaceViewCollection;
+	| ManifestWorkspaceViewCollection
+	| ManifestBase;
 
 export type ManifestStandardTypes = ManifestTypes['type'];
 
@@ -112,7 +117,7 @@ export interface ManifestElement extends ManifestWithLoader<object | HTMLElement
 	js?: string;
 	elementName?: string;
 	//loader?: () => Promise<object | HTMLElement>;
-	meta?: any;
+	meta?: unknown;
 }
 
 export interface ManifestWithView extends ManifestElement {
@@ -131,11 +136,11 @@ export interface ManifestElementWithElementName extends ManifestElement {
 
 export interface ManifestCustom extends ManifestBase {
 	type: 'custom';
-	meta?: any;
+	meta?: unknown;
 }
 
 export interface ManifestWithMeta extends ManifestBase {
-	meta: any;
+	meta: unknown;
 }
 
 export interface ManifestEntrypoint extends ManifestBase {

@@ -1,21 +1,14 @@
 import type { UmbMediaRepository } from '../../repository/media.repository';
-import { UmbActionBase } from '../../../../shared/action';
+import { UmbEntityBulkActionBase } from '@umbraco-cms/entity-action';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 
-export class UmbMediaCopyEntityBulkAction extends UmbActionBase<UmbMediaRepository> {
-	#selection: Array<string>;
-
+export class UmbMediaCopyEntityBulkAction extends UmbEntityBulkActionBase<UmbMediaRepository> {
 	constructor(host: UmbControllerHostInterface, repositoryAlias: string, selection: Array<string>) {
-		super(host, repositoryAlias);
-		this.#selection = selection;
-	}
-
-	setSelection(selection: Array<string>) {
-		this.#selection = selection;
+		super(host, repositoryAlias, selection);
 	}
 
 	async execute() {
-		console.log(`execute copy for: ${this.#selection}`);
+		console.log(`execute copy for: ${this.selection}`);
 		await this.repository?.copy([], '');
 	}
 }

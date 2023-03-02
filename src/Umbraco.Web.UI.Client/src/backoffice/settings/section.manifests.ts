@@ -1,4 +1,4 @@
-import type { ManifestSection, ManifestSidebarMenu } from '@umbraco-cms/models';
+import type { ManifestSection, ManifestMenuSectionSidebarApp } from '@umbraco-cms/models';
 
 const sectionAlias = 'Umb.Section.Settings';
 
@@ -13,15 +13,16 @@ const section: ManifestSection = {
 	},
 };
 
-const sidebarMenu: ManifestSidebarMenu = {
-	type: 'sidebarMenu',
-	alias: 'Umb.SidebarMenu.Settings',
-	name: 'Settings Sidebar Menu',
+const menuSectionSidebarApp: ManifestMenuSectionSidebarApp = {
+	type: 'menuSectionSidebarApp',
+	alias: 'Umb.SectionSidebarMenu.Settings',
+	name: 'Settings Section Sidebar Menu',
 	weight: 100,
 	meta: {
 		label: 'Settings',
 		sections: [sectionAlias],
+		menu: 'Umb.Menu.Settings',
 	},
 };
 
-export const manifests = [section, sidebarMenu];
+export const manifests = [section, menuSectionSidebarApp];

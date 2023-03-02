@@ -151,3 +151,15 @@ export interface SwatchDetails {
 	label: string;
 	value: string;
 }
+
+export type UmbPackage = {
+	name?: string;
+	version?: string;
+	extensions?: unknown[];
+};
+
+export type PagedManifestsResponse = UmbPackage[];
+
+export type UmbPackageWithMigrationStatus = UmbPackage & {
+	hasPendingMigrations: boolean;
+};

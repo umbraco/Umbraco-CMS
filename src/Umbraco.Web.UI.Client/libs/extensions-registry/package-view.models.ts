@@ -6,5 +6,5 @@ export interface ManifestPackageView extends ManifestElement {
 }
 
 export interface MetaPackageView {
-	packageAlias: string;
+	packageName: string;
 }

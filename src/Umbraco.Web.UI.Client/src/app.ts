@@ -19,7 +19,7 @@ import { UmbLitElement } from '@umbraco-cms/element';
 import { tryExecuteAndNotify } from '@umbraco-cms/resources';
 import { OpenAPI, RuntimeLevelModel, ServerResource } from '@umbraco-cms/backend-api';
 import { UmbIconStore } from '@umbraco-cms/store';
-import { UmbContextDebugRequest, umbDebugContextEventType } from '@umbraco-cms/context-api';
+import { umbDebugContextEventType } from '@umbraco-cms/context-api';
 
 @customElement('umb-app')
 export class UmbApp extends UmbLitElement {
@@ -82,7 +82,6 @@ export class UmbApp extends UmbLitElement {
 		this.provideContext('UMBRACOBASE', OpenAPI.BASE);
 
 		await this._setInitStatus();
-		await this._registerExtensionManifestsFromServer();
 		this._redirect();
 
 		// Listen for the debug event from the <umb-debug> component
@@ -150,13 +149,6 @@ export class UmbApp extends UmbLitElement {
 			location.href = returnPath;
 			return false;
 		};
-	}
-
-	private async _registerExtensionManifestsFromServer() {
-		// TODO: Implement once manifest endpoint exists
-		// const res = await getManifests({});
-		// const { manifests } = res.data as unknown as { manifests: ManifestTypes[] };
-		// manifests.forEach((manifest) => umbExtensionsRegistry.register(manifest));
 	}
 
 	render() {

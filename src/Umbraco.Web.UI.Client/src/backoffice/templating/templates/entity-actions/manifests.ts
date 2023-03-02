@@ -1,5 +1,5 @@
-import { UmbDeleteEntityAction } from '../../../shared/entity-actions/delete/delete.action';
 import { UmbCreateEntityAction } from './create/create.action';
+import { UmbDeleteEntityAction } from '@umbraco-cms/entity-action';
 import { ManifestEntityAction } from 'libs/extensions-registry/entity-action.models';
 
 const entityActions: Array<ManifestEntityAction> = [

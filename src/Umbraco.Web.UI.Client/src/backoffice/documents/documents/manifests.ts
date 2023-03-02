@@ -1,5 +1,5 @@
 import { manifests as collectionManifests } from './collection/manifests';
-import { manifests as sidebarMenuItemManifests } from './sidebar-menu-item/manifests';
+import { manifests as menuItemManifests } from './sidebar-menu-item/manifests';
 import { manifests as repositoryManifests } from './repository/manifests';
 import { manifests as treeManifests } from './tree/manifests';
 import { manifests as workspaceManifests } from './workspace/manifests';
@@ -8,7 +8,7 @@ import { manifests as entityBulkActionManifests } from './entity-bulk-actions/ma
 
 export const manifests = [
 	...collectionManifests,
-	...sidebarMenuItemManifests,
+	...menuItemManifests,
 	...treeManifests,
 	...repositoryManifests,
 	...workspaceManifests,
