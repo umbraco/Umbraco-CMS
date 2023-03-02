@@ -15,8 +15,6 @@ import {
 	UmbBackofficeContext,
 	UMB_BACKOFFICE_CONTEXT_TOKEN,
 } from './shared/components/backoffice-frame/backoffice.context';
-import { UmbMemberDetailStore } from './members/members/member.detail.store';
-import { UmbMemberTreeStore } from './members/members/repository/member.tree.store';
 import { UmbDictionaryDetailStore } from './translation/dictionary/repository/dictionary.detail.store';
 import { UmbDictionaryTreeStore } from './translation/dictionary/repository/dictionary.tree.store';
 import { UmbDocumentBlueprintDetailStore } from './documents/document-blueprints/document-blueprint.detail.store';
@@ -81,8 +79,6 @@ export class UmbBackofficeElement extends UmbLitElement {
 		new UmbDataTypeTreeStore(this);
 		new UmbUserStore(this);
 		new UmbUserGroupStore(this);
-		new UmbMemberDetailStore(this);
-		new UmbMemberTreeStore(this);
 		new UmbDictionaryDetailStore(this);
 		new UmbDictionaryTreeStore(this);
 		new UmbDocumentBlueprintDetailStore(this);
