@@ -1,13 +1,14 @@
+
 import { rest } from 'msw';
 
 import { umbracoPath } from '@umbraco-cms/utils';
-import type { PagedManifestsResponse } from '@umbraco-cms/models';
+import type { PackageManifestResponse } from '@umbraco-cms/models';
 
 export const manifestDevelopmentHandler = rest.get(umbracoPath('/package/manifest'), (_req, res, ctx) => {
 	return res(
 		// Respond with a 200 status code
 		ctx.status(200),
-		ctx.json<PagedManifestsResponse>([
+		ctx.json<PackageManifestResponse>([
 			{
 				name: 'Named Package',
 				version: '1.0.0',
@@ -71,6 +72,6 @@ export const manifestEmptyHandler = rest.get(umbracoPath('/package/manifest'), (
 	return res(
 		// Respond with a 200 status code
 		ctx.status(200),
-		ctx.json<PagedManifestsResponse>([])
+		ctx.json<PackageManifestResponse>([])
 	);
 });

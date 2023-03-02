@@ -151,7 +151,13 @@ export class UmbVariantSelectorElement extends UmbLitElement {
 	private _switchVariant(variant: DocumentVariantModel) {
 		if (variant.culture === undefined || variant.segment === undefined) return;
 		this._variantContext?.changeVariant(variant.culture, variant.segment);
-		this._variantSelectorIsOpen = false;
+		this._close();
+	}
+
+	private _openSplitView(variant: DocumentVariantModel) {
+		if (variant.culture === undefined || variant.segment === undefined) return;
+		this._workspaceContext?.openSplitView(variant.culture, variant.segment);
+		this._close();
 	}
 
 	render() {
@@ -166,7 +172,7 @@ export class UmbVariantSelectorElement extends UmbLitElement {
 										@click=${this._toggleVariantSelector}
 										title=${ifDefined(this._variantTitleName)}>
 										${this._variantDisplayName}
-										<uui-caret></uui-caret>
+										<uui-symbol-expand></uui-symbol-expand>
 									</uui-button>
 								</div>
 						  `
@@ -187,6 +193,8 @@ export class UmbVariantSelectorElement extends UmbLitElement {
 														<uui-button @click=${() => this._switchVariant(variant)}>
 															${variant.name} ${variant.culture} ${variant.segment}
 														</uui-button>
+
+														<uui-button @click=${() => this._openSplitView(variant)}> Split view </uui-button>
 													</li>
 												</ul>`
 										)}

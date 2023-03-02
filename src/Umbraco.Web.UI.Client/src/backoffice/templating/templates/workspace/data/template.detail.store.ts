@@ -19,7 +19,7 @@ export class UmbTemplateDetailStore extends UmbStoreBase {
 	 * @memberof UmbTemplateDetailStore
 	 */
 	constructor(host: UmbControllerHostInterface) {
-		super(host, UmbTemplateDetailStore.name);
+		super(host, UMB_TEMPLATE_DETAIL_STORE_CONTEXT_TOKEN.toString());
 	}
 
 	/**
@@ -42,5 +42,5 @@ export class UmbTemplateDetailStore extends UmbStoreBase {
 }
 
 export const UMB_TEMPLATE_DETAIL_STORE_CONTEXT_TOKEN = new UmbContextToken<UmbTemplateDetailStore>(
-	UmbTemplateDetailStore.name
+	'UmbTemplateDetailStore'
 );

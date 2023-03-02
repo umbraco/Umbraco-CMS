@@ -21,5 +21,5 @@ export class UmbMediaTypeTreeStore extends UmbTreeStoreBase {
 }
 
 export const UMB_MEDIA_TYPE_TREE_STORE_CONTEXT_TOKEN = new UmbContextToken<UmbMediaTypeTreeStore>(
-	UmbMediaTypeTreeStore.name
+	'UmbMediaTypeTreeStore'
 );

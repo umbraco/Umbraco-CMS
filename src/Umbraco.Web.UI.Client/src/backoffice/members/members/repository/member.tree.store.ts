@@ -4,6 +4,8 @@ import { ArrayState } from '@umbraco-cms/observable-api';
 import { UmbStoreBase } from '@umbraco-cms/store';
 import type { UmbControllerHostInterface } from '@umbraco-cms/controller';
 
+export const UMB_MEMBER_TREE_STORE_CONTEXT_TOKEN = new UmbContextToken<UmbMemberTreeStore>('UmbMemberTreeStore');
+
 /**
  * @export
  * @class UmbMemberTreeStore
@@ -89,5 +91,3 @@ export class UmbMemberTreeStore extends UmbStoreBase {
 		return this.#data.getObservablePart((items) => items.filter((item) => keys.includes(item.key ?? '')));
 	}
 }
-
-export const UMB_MEMBER_TREE_STORE_CONTEXT_TOKEN = new UmbContextToken<UmbMemberTreeStore>(UmbMemberTreeStore.name);

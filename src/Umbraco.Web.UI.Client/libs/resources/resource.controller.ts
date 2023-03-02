@@ -1,9 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import {
 	UmbNotificationOptions,
-	UmbNotificationService,
-	UmbNotificationDefaultData,
-	UMB_NOTIFICATION_SERVICE_CONTEXT_TOKEN,
+	UmbNotificationContext,
+	UMB_NOTIFICATION_CONTEXT_TOKEN,
 } from '@umbraco-cms/notification';
 import { ApiError, CancelablePromise, ProblemDetailsModel } from '@umbraco-cms/backend-api';
 import { UmbController, UmbControllerHostInterface } from '@umbraco-cms/controller';
@@ -13,15 +12,15 @@ import type { DataSourceResponse } from '@umbraco-cms/models';
 export class UmbResourceController extends UmbController {
 	#promise: Promise<any>;
 
-	#notificationService?: UmbNotificationService;
+	#notificationContext?: UmbNotificationContext;
 
 	constructor(host: UmbControllerHostInterface, promise: Promise<any>, alias?: string) {
 		super(host, alias);
 
 		this.#promise = promise;
 
-		new UmbContextConsumerController(host, UMB_NOTIFICATION_SERVICE_CONTEXT_TOKEN, (_instance) => {
-			this.#notificationService = _instance;
+		new UmbContextConsumerController(host, UMB_NOTIFICATION_CONTEXT_TOKEN, (_instance) => {
+			this.#notificationContext = _instance;
 		});
 	}
 
@@ -57,9 +56,9 @@ export class UmbResourceController extends UmbController {
 	 */
 	static async tryExecute<T>(promise: Promise<T>): Promise<DataSourceResponse<T>> {
 		try {
-			return { data: await promise };
+			return {data: await promise};
 		} catch (e) {
-			return { error: UmbResourceController.toProblemDetailsModel(e) };
+			return {error: UmbResourceController.toProblemDetailsModel(e)};
 		}
 	}
 
@@ -67,17 +66,17 @@ export class UmbResourceController extends UmbController {
 	 * Wrap the {execute} function in a try/catch block and return the result.
 	 * If the executor function throws an error, then show the details in a notification.
 	 */
-	async tryExecuteAndNotify<T>(options?: UmbNotificationOptions<any>): Promise<DataSourceResponse<T>> {
-		const { data, error } = await UmbResourceController.tryExecute<T>(this.#promise);
+	async tryExecuteAndNotify<T>(options?: UmbNotificationOptions): Promise<DataSourceResponse<T>> {
+		const {data, error} = await UmbResourceController.tryExecute<T>(this.#promise);
 
 		if (error) {
-			const data: UmbNotificationDefaultData = {
-				headline: error.title ?? 'Server Error',
-				message: error.detail ?? 'Something went wrong',
-			};
-
-			if (this.#notificationService) {
-				this.#notificationService?.peek('danger', { data, ...options });
+			if (this.#notificationContext) {
+				this.#notificationContext?.peek('danger', {
+					data: {
+						headline: error.title ?? 'Server Error',
+						message: error.detail ?? 'Something went wrong'
+					}, ...options
+				});
 			} else {
 				console.group('UmbResourceController');
 				console.error(error);
@@ -85,7 +84,7 @@ export class UmbResourceController extends UmbController {
 			}
 		}
 
-		return { data, error };
+		return {data, error};
 	}
 
 	/**

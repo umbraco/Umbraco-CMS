@@ -94,7 +94,7 @@ export class UmbTreeContextMenuService extends UmbLitElement {
 }
 
 export const UMB_TREE_CONTEXT_MENU_SERVICE_CONTEXT_TOKEN = new UmbContextToken<UmbTreeContextMenuService>(
-	UmbTreeContextMenuService.name
+	'UmbTreeContextMenuService'
 );
 
 declare global {
