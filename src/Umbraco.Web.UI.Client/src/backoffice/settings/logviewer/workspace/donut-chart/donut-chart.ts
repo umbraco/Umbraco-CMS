@@ -7,7 +7,6 @@ export interface Circle {
 	percent: number;
 	color: string;
 	name: string;
-	tooltipText: string;
 }
 
 interface CircleWithCommands extends Circle {
@@ -138,7 +137,6 @@ export class UmbDonutChartElement extends LitElement {
 					percent: slice.percent,
 					color: slice.color,
 					name: slice.name,
-					tooltipText: slice.tooltipText,
 				};
 			})
 		);

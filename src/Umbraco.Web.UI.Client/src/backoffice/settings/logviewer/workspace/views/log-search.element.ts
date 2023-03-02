@@ -187,7 +187,7 @@ export class UmbLogViewerSearchViewElement extends UmbLitElement {
 	private _logLevel: LogLevelModel[] = [];
 
 	@state()
-	private _poolingConfig: PoolingCOnfig = {pooling: false, interval: 0};
+	private _poolingConfig: PoolingCOnfig = { enabled: false, interval: 0 };
 
 	#logViewerContext?: UmbLogViewerWorkspaceContext;
 
@@ -223,9 +223,8 @@ export class UmbLogViewerSearchViewElement extends UmbLitElement {
 			this._logLevel = levels ?? [];
 		});
 
-		
 		this.observe(this.#logViewerContext.polling, (poolingConfig) => {
-			this._poolingConfig = {...poolingConfig};
+			this._poolingConfig = { ...poolingConfig };
 		});
 	}
 
@@ -370,7 +369,11 @@ export class UmbLogViewerSearchViewElement extends UmbLitElement {
 
 	#renderPolingTimeSelector() {
 		return html` <uui-button-group>
-			<uui-button label="Start pooling" @click=${this.#togglePolling}>${this._poolingConfig.enabled ? html`Polling ${this._poolingConfig.interval/1000} seconds` : 'Pooling'}</uui-button>
+			<uui-button label="Start pooling" @click=${this.#togglePolling}
+				>${this._poolingConfig.enabled
+					? html`Polling ${this._poolingConfig.interval / 1000} seconds`
+					: 'Pooling'}</uui-button
+			>
 			<uui-popover placement="bottom-end" id="polling-popover" @close=${() => (this._polingExpandSymbol.open = false)}>
 				<uui-button slot="trigger" compact label="Choose pooling time" @click=${this.#openPoolingPopover}>
 					<uui-symbol-expand id="polling-expand-symbol"></uui-symbol-expand>
@@ -380,7 +383,7 @@ export class UmbLogViewerSearchViewElement extends UmbLitElement {
 					${this.#pollingIntervals.map(
 						(interval: PoolingInterval) =>
 							html`<uui-menu-item
-								label="Every ${interval/1000} seconds"
+								label="Every ${interval / 1000} seconds"
 								@click-label=${() => this.#setPolingInterval(interval)}></uui-menu-item>`
 					)}
 				</ul>
