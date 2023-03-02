@@ -55,7 +55,7 @@ export class UmbLanguageRepository {
 			data.items.forEach((x) => this.#languageStore?.append(x));
 		}
 
-		return { data, error, asObservable: () => this.#languageStore?.data };
+		return { data, error, asObservable: () => this.#languageStore!.data };
 	}
 
 	async requestItems(isoCodes: Array<string>) {
