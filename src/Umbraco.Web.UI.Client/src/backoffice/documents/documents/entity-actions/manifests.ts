@@ -147,18 +147,6 @@ const entityActions: Array<ManifestEntityAction> = [
 	},
 	{
 		type: 'entityAction',
-		alias: 'Umb.EntityAction.Document.Publish',
-		name: 'Publish Document Entity Action',
-		meta: {
-			entityType,
-			icon: 'umb:globe',
-			label: 'Publish',
-			repositoryAlias,
-			api: UmbPublishDocumentEntityAction,
-		},
-	},
-	{
-		type: 'entityAction',
 		alias: 'Umb.EntityAction.Document.Unpublish',
 		name: 'Unpublish Document Entity Action',
 		meta: {
