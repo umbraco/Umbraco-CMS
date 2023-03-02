@@ -10,7 +10,14 @@ import {
 } from '../logviewer.context';
 import { UmbLitElement } from '@umbraco-cms/element';
 import { DirectionModel, LogLevelModel, LogMessageModel, SavedLogSearchModel } from '@umbraco-cms/backend-api';
-import { UUICheckboxElement, UUIInputElement, UUIPopoverElement, UUISymbolExpandElement } from '@umbraco-ui/uui';
+import {
+	UUICheckboxElement,
+	UUIInputElement,
+	UUIPaginationElement,
+	UUIPopoverElement,
+	UUIScrollContainerElement,
+	UUISymbolExpandElement,
+} from '@umbraco-ui/uui';
 
 @customElement('umb-log-viewer-search-view')
 export class UmbLogViewerSearchViewElement extends UmbLitElement {
@@ -165,6 +172,10 @@ export class UmbLogViewerSearchViewElement extends UmbLitElement {
 				gap: var(--uui-size-space-3);
 			}
 
+			#pagination {
+				margin: var(--uui-size-space-5, 18px) 0;
+			}
+
 			@-webkit-keyframes rotate-center {
 				0% {
 					-webkit-transform: rotate(0);
@@ -200,6 +211,9 @@ export class UmbLogViewerSearchViewElement extends UmbLitElement {
 	@query('#saved-search-expand-symbol')
 	private _savedSearchesExpandSymbol!: UUISymbolExpandElement;
 
+	@query('#logs-scroll-container')
+	private _logsScrollContainer!: UUIScrollContainerElement;
+
 	@queryAll('#log-level-selector > uui-checkbox')
 	private _logLevelSelectorCheckboxes!: NodeListOf<UUICheckboxElement>;
 
@@ -220,6 +234,9 @@ export class UmbLogViewerSearchViewElement extends UmbLitElement {
 
 	@state()
 	private _logs: LogMessageModel[] = [];
+
+	@state()
+	private _logsTotal = 0;
 
 	@state()
 	private _logLevel: LogLevelModel[] = [];
@@ -255,6 +272,10 @@ export class UmbLogViewerSearchViewElement extends UmbLitElement {
 
 		this.observe(this.#logViewerContext.logs, (logs) => {
 			this._logs = logs ?? [];
+		});
+
+		this.observe(this.#logViewerContext.logsTotal, (total) => {
+			this._logsTotal = total ?? 0;
 		});
 
 		this.observe(this.#logViewerContext.logLevel, (levels) => {
@@ -458,22 +479,23 @@ export class UmbLogViewerSearchViewElement extends UmbLitElement {
 				</div>
 				<div id="input-container">${this.#renderSearchInput()}</div>
 				<uui-box>
-					<p>Total items: ${this._logs.length}</p>
-					${this._logs.length > 0
-						? html` <div id="message-list-header">
-									<div id="timestamp">
-										Timestamp
-										<uui-button compact @click=${this.#sortLogs}>
-											<uui-symbol-sort
-												?descending=${this._sortingDirection === DirectionModel.DESCENDING}
-												active></uui-symbol-sort>
-										</uui-button>
-									</div>
-									<div id="level">Level</div>
-									<div id="machine">Machine name</div>
-									<div id="message">Message</div>
-								</div>
-								${this._logs.map(
+					<p style="font-weight: bold;">Total items: ${this._logsTotal}</p>
+					<div id="message-list-header">
+						<div id="timestamp">
+							Timestamp
+							<uui-button compact @click=${this.#sortLogs}>
+								<uui-symbol-sort
+									?descending=${this._sortingDirection === DirectionModel.DESCENDING}
+									active></uui-symbol-sort>
+							</uui-button>
+						</div>
+						<div id="level">Level</div>
+						<div id="machine">Machine name</div>
+						<div id="message">Message</div>
+					</div>
+					<uui-scroll-container id="logs-scroll-container" style="max-height: calc(100vh - 490px)">
+						${this._logs.length > 0
+							? html` ${this._logs.map(
 									(log) => html`<umb-log-viewer-message
 										.timestamp=${log.timestamp ?? ''}
 										.level=${log.level ?? ''}
@@ -481,15 +503,36 @@ export class UmbLogViewerSearchViewElement extends UmbLitElement {
 										.properties=${log.properties ?? []}
 										.exception=${log.exception ?? ''}
 										.messageTemplate=${log.messageTemplate ?? ''}></umb-log-viewer-message>`
-								)}`
-						: html`<umb-empty-state size="small"
-								><span id="empty">
-									<uui-icon name="umb:search"></uui-icon>Sorry, we cannot find what you are looking for.
-								</span></umb-empty-state
-						  >`}
+							  )}`
+							: html`<umb-empty-state size="small"
+									><span id="empty">
+										<uui-icon name="umb:search"></uui-icon>Sorry, we cannot find what you are looking for.
+									</span></umb-empty-state
+							  >`}
+					</uui-scroll-container>
+					${this._renderPagination()}
 				</uui-box>
 			</div>
 		`;
+	}
+
+	_onPageChange(event: Event): void {
+		const current = (event.target as UUIPaginationElement).current;
+		this.#logViewerContext?.setCurrentPage(current);
+		this.#logViewerContext?.getLogs();
+		this._logsScrollContainer.scrollTop = 0;
+	}
+
+	private _renderPagination() {
+		if (!this._logsTotal) return '';
+
+		const totalPages = Math.ceil(this._logsTotal / 100);
+
+		if (totalPages <= 1) return '';
+
+		return html`<div id="pagination">
+			<uui-pagination .total=${totalPages} @change="${this._onPageChange}"></uui-pagination>
+		</div>`;
 	}
 }
 

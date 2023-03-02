@@ -78,6 +78,7 @@ export class UmbLogViewerWorkspaceContext {
 
 	#logs = new DeepState<PagedLogMessageModel | null>(null);
 	logs = createObservablePart(this.#logs, (data) => data?.items);
+	logsTotal = createObservablePart(this.#logs, (data) => data?.total);
 
 	#polling = new ObjectState<PoolingCOnfig>({ enabled: false, interval: 2000 });
 	polling = createObservablePart(this.#polling, (data) => data);
@@ -86,6 +87,8 @@ export class UmbLogViewerWorkspaceContext {
 	sortingDirection = createObservablePart(this.#sortingDirection, (data) => data);
 
 	#intervalID: number | null = null;
+
+	#currentPage = 1;
 
 	constructor(host: UmbControllerHostInterface) {
 		this.#host = host;
@@ -132,8 +135,17 @@ export class UmbLogViewerWorkspaceContext {
 		}
 	}
 
+	setCurrentPage(page: number) {
+		this.#currentPage = page;
+	}
+
 	async getLogs() {
+		const skip = (this.#currentPage - 1) * 100;
+		const take = 100;
+
 		const options = {
+			skip,
+			take,
 			orderDirection: this.#sortingDirection.getValue(),
 			filterExpression: this.#filterExpression.getValue(),
 			logLevel: this.#logLevel.getValue(),

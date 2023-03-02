@@ -5,6 +5,7 @@ import { LogLevel, LogViewerDateRange, UmbLogViewerWorkspaceContext, UMB_APP_LOG
 import { SavedLogSearchModel, PagedLogTemplateModel } from '@umbraco-cms/backend-api';
 import { UmbLitElement } from '@umbraco-cms/element';
 
+//TODO: add a disabled attribute to the show more button when the total number of items is correctly returned from the endpoint
 @customElement('umb-log-viewer-overview-view')
 export class UmbLogViewerOverviewViewElement extends UmbLitElement {
 	static styles = [
