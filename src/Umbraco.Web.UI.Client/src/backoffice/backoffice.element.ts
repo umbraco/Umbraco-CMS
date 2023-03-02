@@ -19,8 +19,6 @@ import { UmbDictionaryDetailStore } from './translation/dictionary/repository/di
 import { UmbDictionaryTreeStore } from './translation/dictionary/repository/dictionary.tree.store';
 import { UmbDocumentBlueprintDetailStore } from './documents/document-blueprints/document-blueprint.detail.store';
 import { UmbDocumentBlueprintTreeStore } from './documents/document-blueprints/document-blueprint.tree.store';
-import { UmbDataTypeStore } from './settings/data-types/repository/data-type.store';
-import { UmbDataTypeTreeStore } from './settings/data-types/repository/data-type.tree.store';
 import { UmbTemplateTreeStore } from './templating/templates/tree/data/template.tree.store';
 import { UmbTemplateDetailStore } from './templating/templates/workspace/data/template.detail.store';
 import { UmbThemeContext } from './themes/theme.context';
@@ -74,8 +72,6 @@ export class UmbBackofficeElement extends UmbLitElement {
 		// TODO: find a way this is possible outside this element. It needs to be possible to register stores in extensions
 		this.provideContext(UMB_CURRENT_USER_STORE_CONTEXT_TOKEN, new UmbCurrentUserStore());
 
-		new UmbDataTypeStore(this);
-		new UmbDataTypeTreeStore(this);
 		new UmbUserStore(this);
 		new UmbUserGroupStore(this);
 		new UmbDictionaryDetailStore(this);
