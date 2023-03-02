@@ -33,107 +33,11 @@ export class LinkPickerPlugin {
 		});
 	}
 
-	#createLinkPicker(editor: any, createLinkPickerCallback: any) {
-		function createLinkList(createLinkListCallback: any) {
-			return function () {
-				const linkList = editor.options.get('link_list');
-
-				if (linkList && typeof linkList === 'string') {
-					fetch(linkList)
-						.then((response) => {
-							createLinkListCallback(response.json());
-						})
-						.catch(function (error) {
-							console.log(error);
-						});
-				} else {
-					createLinkListCallback(linkList);
-				}
-			};
-		}
-
-		async function showDialog(linkList: any) {
+	#createLinkPicker(editor: any, createLinkPickerCallback: any) {	
+		async function showDialog() {
 			const data: { text?: string; href?: string; target?: string; rel?: string } = {};
 			const selection = editor.selection;
 			const dom = editor.dom;
-
-			// function linkListChangeHandler(e) {
-			// 	const textCtrl = win.find('#text');
-
-			// 	if (!textCtrl.value() || (e.lastControl && textCtrl.value() === e.lastControl.text())) {
-			// 		textCtrl.value(e.control.text());
-			// 	}
-
-			// 	win.find('#href').value(e.control.value());
-			// }
-
-			// function buildLinkList() {
-			// 	const linkListItems: Array<LinkListItem> = [
-			// 		{
-			// 			text: 'None',
-			// 			value: '',
-			// 		},
-			// 	];
-
-			// 	window.tinymce.each(linkList, (link: any) => {
-			// 		linkListItems.push({
-			// 			text: link.text || link.title,
-			// 			value: link.value || link.url,
-			// 			menu: link.menu,
-			// 		});
-			// 	});
-
-			// 	return linkListItems;
-			// }
-
-			// function buildRelList(relValue: any) {
-			// 	const relListItems: Array<LinkListItem> = [
-			// 		{
-			// 			text: 'None',
-			// 			value: '',
-			// 		},
-			// 	];
-
-			// 	const linkRelList = editor.options.get('link_rel_list');
-			// 	if (linkRelList) {
-			// 		window.tinymce.each(linkRelList, (rel: any) => {
-			// 			relListItems.push({
-			// 				text: rel.text || rel.title,
-			// 				value: rel.value,
-			// 				selected: relValue === rel.value,
-			// 			});
-			// 		});
-			// 	}
-
-			// 	return relListItems;
-			// }
-
-			// function buildTargetList(targetValue: any) {
-			// 	const targetListItems: Array<LinkListItem> = [
-			// 		{
-			// 			text: 'None',
-			// 			value: '',
-			// 		},
-			// 	];
-
-			// 	const linkList = editor.options.get('link_list');
-			// 	if (linkList) {
-			// 		window.tinymce.each(linkList, (target: any) => {
-			// 			targetListItems.push({
-			// 				text: target.text || target.title,
-			// 				value: target.value,
-			// 				selected: targetValue === target.value,
-			// 			});
-			// 		});
-			// 	} else {
-			// 		targetListItems.push({
-			// 			text: 'New window',
-			// 			value: '_blank',
-			// 		});
-			// 	}
-
-			// 	return targetListItems;
-			// }
 
 			const selectedElm: HTMLElement = selection.getNode();
 			const anchorElm: HTMLAnchorElement = dom.getParent(selectedElm, 'a[href]');
@@ -147,39 +51,6 @@ export class LinkPickerPlugin {
 			if (selectedElm.nodeName === 'IMG') {
 				data.text = ' ';
 			}
-
-			// let linkListCtrl;
-			// let targetListCtrl;
-			// let relListCtrl;
-
-			// if (linkList) {
-			// 	linkListCtrl = {
-			// 		type: 'listbox',
-			// 		label: 'Link list',
-			// 		values: buildLinkList(),
-			// 		onselect: linkListChangeHandler,
-			// 	};
-			// }
-
-			// const optionsLinkList = editor.options.get('link_list');
-			// if (optionsLinkList !== false) {
-			// 	targetListCtrl = {
-			// 		name: 'target',
-			// 		type: 'listbox',
-			// 		label: 'Target',
-			// 		values: buildTargetList(data.target),
-			// 	};
-			// }
-
-			// const linkRelList = editor.options.get('link_rel_list');
-			// if (linkRelList) {
-			// 	relListCtrl = {
-			// 		name: 'rel',
-			// 		type: 'listbox',
-			// 		label: 'Rel',
-			// 		values: buildRelList(data.rel),
-			// 	};
-			// }
 
 			let currentTarget: CurrentTargetData = {};
 
@@ -224,7 +95,7 @@ export class LinkPickerPlugin {
 			icon: 'link',
 			tooltip: 'Insert/edit link',
 			shortcut: 'Ctrl+K',
-			onAction: createLinkList(showDialog),
+			onAction: showDialog,
 			stateSelector: 'a[href]',
 		});
 
@@ -239,13 +110,13 @@ export class LinkPickerPlugin {
 			icon: 'link',
 			text: 'Insert link',
 			shortcut: 'Ctrl+K',
-			onAction: createLinkList(showDialog),
+			onAction: showDialog,
 			stateSelector: 'a[href]',
 			context: 'insert',
 			prependToContext: true,
 		});
 
-		editor.addShortcut('Ctrl+K', '', createLinkList(showDialog));
+		editor.addShortcut('Ctrl+K', '', showDialog);
 	}
 
 	async #openLinkPicker(currentTarget: CurrentTargetData, anchorElement?: HTMLAnchorElement) {
