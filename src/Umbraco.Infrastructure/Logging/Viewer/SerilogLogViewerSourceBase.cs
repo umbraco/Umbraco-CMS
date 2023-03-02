@@ -111,8 +111,6 @@ public abstract class SerilogLogViewerSourceBase : ILogViewer
         // Order By, Skip, Take & Select
         IEnumerable<LogMessage> logMessages = filteredLogs
             .OrderBy(l => l.Timestamp, orderDirection)
-            .Skip(skip)
-            .Take(take)
             .Select(x => new LogMessage
             {
                 Timestamp = x.Timestamp,
@@ -123,7 +121,7 @@ public abstract class SerilogLogViewerSourceBase : ILogViewer
                 RenderedMessage = x.RenderMessage(),
             });
 
-        return new PagedModel<LogMessage>(logMessages.Count(), logMessages);
+        return new PagedModel<LogMessage>(logMessages.Count(), logMessages.Skip(skip).Take(take));
     }
 
     /// <summary>
