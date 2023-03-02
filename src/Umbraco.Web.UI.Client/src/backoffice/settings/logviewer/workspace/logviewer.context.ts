@@ -9,6 +9,7 @@ import {
 } from '@umbraco-cms/backend-api';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 import { UmbContextToken } from '@umbraco-cms/context-api';
+import { BasicState } from 'libs/observable-api/basic-state';
 
 const logLevels = {
 	Information: 171,
@@ -81,6 +82,9 @@ export class UmbLogViewerWorkspaceContext {
 	#polling = new ObjectState<PoolingCOnfig>({ enabled: false, interval: 2000 });
 	polling = createObservablePart(this.#polling, (data) => data);
 
+	#sortingDirection = new BasicState<DirectionModel>(DirectionModel.ASCENDING);
+	sortingDirection = createObservablePart(this.#sortingDirection, (data) => data);
+
 	#intervalID: number | null = null;
 
 	constructor(host: UmbControllerHostInterface) {
@@ -130,7 +134,7 @@ export class UmbLogViewerWorkspaceContext {
 
 	async getLogs() {
 		const options = {
-			orderDirection: DirectionModel.ASCENDING,
+			orderDirection: this.#sortingDirection.getValue(),
 			filterExpression: this.#filterExpression.getValue(),
 			logLevel: this.#logLevel.getValue(),
 			...this.#dateRange.getValue(),
@@ -169,6 +173,12 @@ export class UmbLogViewerWorkspaceContext {
 
 	setPollingInterval(interval: PoolingInterval) {
 		this.#polling.update({ interval, enabled: true });
+	}
+
+	toggleSortOrder() {
+		const direction = this.#sortingDirection.getValue();
+		const newDirection = direction === DirectionModel.ASCENDING ? DirectionModel.DESCENDING : DirectionModel.ASCENDING;
+		this.#sortingDirection.next(newDirection);
 	}
 }
 

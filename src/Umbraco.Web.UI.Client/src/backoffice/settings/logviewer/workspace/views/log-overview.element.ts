@@ -340,7 +340,7 @@ export class UmbLogViewerOverviewViewElement extends UmbLitElement {
 					</uui-box>
 
 					<uui-box id="errors" headline="Number of Errors">
-						<h1 id="error-count">${this._errorCount ? this._errorCount : ''}</h1>
+						<h1 id="error-count">${this._errorCount}</h1>
 					</uui-box>
 
 					<uui-box id="level" headline="Log level">

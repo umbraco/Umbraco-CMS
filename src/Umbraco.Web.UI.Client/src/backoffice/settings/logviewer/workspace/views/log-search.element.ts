@@ -9,7 +9,7 @@ import {
 	UMB_APP_LOG_VIEWER_CONTEXT_TOKEN,
 } from '../logviewer.context';
 import { UmbLitElement } from '@umbraco-cms/element';
-import { LogLevelModel, LogMessageModel, SavedLogSearchModel } from '@umbraco-cms/backend-api';
+import { DirectionModel, LogLevelModel, LogMessageModel, SavedLogSearchModel } from '@umbraco-cms/backend-api';
 import { UUICheckboxElement, UUIInputElement, UUIPopoverElement, UUISymbolExpandElement } from '@umbraco-ui/uui';
 
 @customElement('umb-log-viewer-search-view')
@@ -158,6 +158,13 @@ export class UmbLogViewerSearchViewElement extends UmbLitElement {
 				animation: rotate-center 0.8s ease-in-out infinite both;
 			}
 
+			#empty {
+				display: flex;
+				justify-content: center;
+				align-items: center;
+				gap: var(--uui-size-space-3);
+			}
+
 			@-webkit-keyframes rotate-center {
 				0% {
 					-webkit-transform: rotate(0);
@@ -209,6 +216,9 @@ export class UmbLogViewerSearchViewElement extends UmbLitElement {
 	private _inputQuery = '';
 
 	@state()
+	private _sortingDirection: DirectionModel = DirectionModel.ASCENDING;
+
+	@state()
 	private _logs: LogMessageModel[] = [];
 
 	@state()
@@ -254,6 +264,10 @@ export class UmbLogViewerSearchViewElement extends UmbLitElement {
 		this.observe(this.#logViewerContext.polling, (poolingConfig) => {
 			this._poolingConfig = { ...poolingConfig };
 		});
+
+		this.observe(this.#logViewerContext.sortingDirection, (direction) => {
+			this._sortingDirection = direction;
+		});
 	}
 
 	#toggleSavedSearchesPopover() {
@@ -285,6 +299,10 @@ export class UmbLogViewerSearchViewElement extends UmbLitElement {
 	#clearQuery() {
 		this._inputQuery = '';
 		this.#logViewerContext?.setFilterExpression('');
+		this.#logViewerContext?.getLogs();
+	}
+
+	#search() {
 		this.#logViewerContext?.getLogs();
 	}
 
@@ -334,7 +352,7 @@ export class UmbLogViewerSearchViewElement extends UmbLitElement {
 					)}
 				</uui-scroll-container>
 			</uui-popover>
-			<uui-button look="primary">Search</uui-button>`;
+			<uui-button look="primary" @click=${this.#search} label="Search">Search</uui-button>`;
 	}
 
 	#setLogLevel() {
@@ -420,6 +438,11 @@ export class UmbLogViewerSearchViewElement extends UmbLitElement {
 		</uui-button-group>`;
 	}
 
+	#sortLogs() {
+		this.#logViewerContext?.toggleSortOrder();
+		this.#logViewerContext?.getLogs();
+	}
+
 	render() {
 		return html`
 			<div id="layout">
@@ -436,21 +459,34 @@ export class UmbLogViewerSearchViewElement extends UmbLitElement {
 				<div id="input-container">${this.#renderSearchInput()}</div>
 				<uui-box>
 					<p>Total items: ${this._logs.length}</p>
-					<div id="message-list-header">
-						<div id="timestamp">Timestamp <uui-symbol-sort active></uui-symbol-sort></div>
-						<div id="level">Level</div>
-						<div id="machine">Machine name</div>
-						<div id="message">Message</div>
-					</div>
-					${this._logs.map(
-						(log) => html`<umb-log-viewer-message
-							.timestamp=${log.timestamp ?? ''}
-							.level=${log.level ?? ''}
-							.renderedMessage=${log.renderedMessage ?? ''}
-							.properties=${log.properties ?? []}
-							.exception=${log.exception ?? ''}
-							.messageTemplate=${log.messageTemplate ?? ''}></umb-log-viewer-message>`
-					)}
+					${this._logs.length > 0
+						? html` <div id="message-list-header">
+									<div id="timestamp">
+										Timestamp
+										<uui-button compact @click=${this.#sortLogs}>
+											<uui-symbol-sort
+												?descending=${this._sortingDirection === DirectionModel.DESCENDING}
+												active></uui-symbol-sort>
+										</uui-button>
+									</div>
+									<div id="level">Level</div>
+									<div id="machine">Machine name</div>
+									<div id="message">Message</div>
+								</div>
+								${this._logs.map(
+									(log) => html`<umb-log-viewer-message
+										.timestamp=${log.timestamp ?? ''}
+										.level=${log.level ?? ''}
+										.renderedMessage=${log.renderedMessage ?? ''}
+										.properties=${log.properties ?? []}
+										.exception=${log.exception ?? ''}
+										.messageTemplate=${log.messageTemplate ?? ''}></umb-log-viewer-message>`
+								)}`
+						: html`<umb-empty-state size="small"
+								><span id="empty">
+									<uui-icon name="umb:search"></uui-icon>Sorry, we cannot find what you are looking for.
+								</span></umb-empty-state
+						  >`}
 				</uui-box>
 			</div>
 		`;
