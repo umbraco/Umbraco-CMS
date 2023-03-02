@@ -36,12 +36,7 @@ public class ContentFinderByUrl : IContentFinder
     /// <returns>A value indicating whether an Umbraco document was found and assigned.</returns>
     public virtual Task<bool> TryFindContent(IPublishedRequestBuilder frequest)
     {
-        if (!UmbracoContextAccessor.TryGetUmbracoContext(out IUmbracoContext? umbracoContext))
-        {
-            return Task.FromResult(false);
-        }
-
-        if (umbracoContext.InPreviewMode)
+        if (!UmbracoContextAccessor.TryGetUmbracoContext(out IUmbracoContext? _))
         {
             return Task.FromResult(false);
         }
