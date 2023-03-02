@@ -2,7 +2,7 @@ import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { UmbModalLayoutPickerBase } from '../modal-layout-picker-base';
-import { UmbUserStore, UMB_USER_STORE_CONTEXT_TOKEN } from '../../../../backoffice/users/users/user.store';
+import { UmbUserStore, UMB_USER_STORE_CONTEXT_TOKEN } from '../../../../backoffice/users/users/repository/user.store';
 import type { UserDetails } from '@umbraco-cms/models';
 
 @customElement('umb-picker-layout-user')

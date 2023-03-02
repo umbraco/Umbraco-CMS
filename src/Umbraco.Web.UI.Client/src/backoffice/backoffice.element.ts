@@ -3,8 +3,8 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html } from 'lit';
 
 import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN } from '../core/modal';
-import { UmbUserStore } from './users/users/user.store';
-import { UmbUserGroupStore } from './users/user-groups/user-group.store';
+import { UmbUserStore } from './users/users/repository/user.store';
+import { UmbUserGroupStore } from './users/user-groups/repository/user-group.store';
 import { UmbCurrentUserStore, UMB_CURRENT_USER_STORE_CONTEXT_TOKEN } from './users/current-user/current-user.store';
 import {
 	UmbCurrentUserHistoryStore,
@@ -61,23 +61,20 @@ export class UmbBackofficeElement extends UmbLitElement {
 	constructor() {
 		super();
 
+		// TODO: find a way this is possible outside this element.
 		this.provideContext(UMB_MODAL_CONTEXT_TOKEN, new UmbModalContext());
 		this.provideContext(UMB_NOTIFICATION_CONTEXT_TOKEN, new UmbNotificationContext());
-
-		// TODO: find a way this is possible outside this element. It needs to be possible to register stores in extensions
 		this.provideContext(UMB_CURRENT_USER_STORE_CONTEXT_TOKEN, new UmbCurrentUserStore());
+		this.provideContext(UMB_APP_LANGUAGE_CONTEXT_TOKEN, new UmbAppLanguageContext(this));
+		this.provideContext(UMB_BACKOFFICE_CONTEXT_TOKEN, new UmbBackofficeContext());
+		new UmbThemeContext(this);
+		new UmbServerExtensionController(this, umbExtensionsRegistry);
 
 		new UmbUserStore(this);
 		new UmbUserGroupStore(this);
 		new UmbDocumentBlueprintDetailStore(this);
 		new UmbDocumentBlueprintTreeStore(this);
-
-		this.provideContext(UMB_APP_LANGUAGE_CONTEXT_TOKEN, new UmbAppLanguageContext(this));
-		this.provideContext(UMB_BACKOFFICE_CONTEXT_TOKEN, new UmbBackofficeContext());
 		this.provideContext(UMB_CURRENT_USER_HISTORY_STORE_CONTEXT_TOKEN, new UmbCurrentUserHistoryStore());
-		new UmbThemeContext(this);
-
-		new UmbServerExtensionController(this, umbExtensionsRegistry);
 
 		// Register All Stores
 		this.observe(umbExtensionsRegistry.extensionsOfTypes(['store', 'treeStore']), (stores) => {
