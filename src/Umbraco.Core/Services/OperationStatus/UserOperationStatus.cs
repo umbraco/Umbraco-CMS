@@ -8,4 +8,5 @@ public enum UserOperationStatus
     UserNameIsNotEmail,
     DuplicateUserName,
     DuplicateEmail,
+    Unauthorized,
 }

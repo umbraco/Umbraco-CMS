@@ -51,9 +51,10 @@ public interface IUserService : IMembershipUserService
     /// <remarks>
     /// This creates both the Umbraco user and the identity user.
     /// </remarks>
+    /// <param name="performingUserId">The id of the user performing the operation.</param>
     /// <param name="model">Model to create the user from.</param>
     /// <returns>An attempt indicating if the operation was a success as well as a more detailed <see cref="UserOperationStatus"/>.</returns>
-    Task<Attempt<IUser, UserOperationStatus>> CreateAsync(UserCreateModel model);
+    Task<Attempt<IUser, UserOperationStatus>> CreateAsync(int performingUserId, UserCreateModel model);
 
     /// <summary>
     /// Gets all users that the requesting user is allowed to see.

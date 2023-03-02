@@ -7,6 +7,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.DependencyInjection;
+using Umbraco.Cms.Core.Editors;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Exceptions;
 using Umbraco.Cms.Core.Models;
@@ -35,6 +36,7 @@ internal class UserService : RepositoryService, IUserService
     private readonly IRuntimeState _runtimeState;
     private readonly IUserGroupRepository _userGroupRepository;
     private readonly IUserGroupAuthorizationService _userGroupAuthorizationService;
+    private readonly UserEditorAuthorizationHelper _userEditorAuthorizationHelper;
     private readonly IUserRepository _userRepository;
 
     public UserService(
@@ -46,7 +48,8 @@ internal class UserService : RepositoryService, IUserService
         IUserGroupRepository userGroupRepository,
         IOptions<GlobalSettings> globalSettings,
         IUserGroupAuthorizationService userGroupAuthorizationService,
-        IOptions<SecuritySettings> securitySettings
+        IOptions<SecuritySettings> securitySettings,
+        UserEditorAuthorizationHelper userEditorAuthorizationHelper
         )
         : base(provider, loggerFactory, eventMessagesFactory)
     {
@@ -54,6 +57,7 @@ internal class UserService : RepositoryService, IUserService
         _userRepository = userRepository;
         _userGroupRepository = userGroupRepository;
         _userGroupAuthorizationService = userGroupAuthorizationService;
+        _userEditorAuthorizationHelper = userEditorAuthorizationHelper;
         _globalSettings = globalSettings.Value;
         _securitySettings = securitySettings.Value;
         _logger = loggerFactory.CreateLogger<UserService>();
@@ -78,7 +82,8 @@ internal class UserService : RepositoryService, IUserService
             userGroupRepository,
             globalSettings,
             userGroupAuthorizationService,
-            StaticServiceProvider.Instance.GetRequiredService<IOptions<SecuritySettings>>())
+            StaticServiceProvider.Instance.GetRequiredService<IOptions<SecuritySettings>>(),
+            StaticServiceProvider.Instance.GetRequiredService<UserEditorAuthorizationHelper>())
     {
     }
 
@@ -661,14 +666,42 @@ internal class UserService : RepositoryService, IUserService
     }
 
     /// <inheritdoc/>
-    public Task<Attempt<IUser, UserOperationStatus>> CreateAsync(UserCreateModel model)
+    public Task<Attempt<IUser, UserOperationStatus>> CreateAsync(int performingUserId, UserCreateModel model)
     {
+        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+
+        IUser? performingUser = GetById(performingUserId);
+
+        if (performingUser is null)
+        {
+            return Task.FromResult(Attempt.FailWithStatus<IUser, UserOperationStatus>(UserOperationStatus.MissingUser, new User(_globalSettings)));
+        }
+
         UserOperationStatus result = ValidateUserCreateModel(model);
         if (result != UserOperationStatus.Success)
         {
             return Task.FromResult(Attempt.FailWithStatus<IUser, UserOperationStatus>(result, new User(_globalSettings)));
         }
 
+        Attempt<IEnumerable<string>, UserOperationStatus> userGroupAliasesAttempt = GetUserGroupAliasesFromKeys(model.UserGroups);
+        if (userGroupAliasesAttempt.Success is false)
+        {
+            return Task.FromResult(Attempt.FailWithStatus<IUser, UserOperationStatus>(result, new User(_globalSettings)));
+        }
+
+        Attempt<string?> authorizationAttempt = _userEditorAuthorizationHelper.IsAuthorized(
+            performingUser,
+            null,
+            null,
+            null,
+            userGroupAliasesAttempt.Result);
+
+        if (authorizationAttempt.Success is false)
+        {
+            return Task.FromResult(Attempt.FailWithStatus<IUser, UserOperationStatus>(UserOperationStatus.Unauthorized, new User(_globalSettings)));
+        }
+
+        scope.Complete();
         throw new NotImplementedException();
     }
 
