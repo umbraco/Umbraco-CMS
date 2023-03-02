@@ -13,8 +13,6 @@ import {
 	UmbBackofficeContext,
 	UMB_BACKOFFICE_CONTEXT_TOKEN,
 } from './shared/components/backoffice-frame/backoffice.context';
-import { UmbDocumentBlueprintStore } from './documents/document-blueprints/document-blueprint.detail.store';
-import { UmbDocumentBlueprintTreeStore } from './documents/document-blueprints/document-blueprint.tree.store';
 import { UmbThemeContext } from './themes/theme.context';
 import {
 	UMB_APP_LANGUAGE_CONTEXT_TOKEN,
@@ -67,9 +65,6 @@ export class UmbBackofficeElement extends UmbLitElement {
 		this.provideContext(UMB_BACKOFFICE_CONTEXT_TOKEN, new UmbBackofficeContext());
 		new UmbThemeContext(this);
 		new UmbServerExtensionController(this, umbExtensionsRegistry);
-
-		new UmbDocumentBlueprintStore(this);
-		new UmbDocumentBlueprintTreeStore(this);
 		this.provideContext(UMB_CURRENT_USER_HISTORY_STORE_CONTEXT_TOKEN, new UmbCurrentUserHistoryStore());
 
 		// Register All Stores
