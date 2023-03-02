@@ -1758,7 +1758,7 @@ internal class DatabaseDataCreator
             // Insert the specified languages, ensuring the first is marked as default.
             bool isDefault = true;
             short id = 1;
-            foreach(var isoCode in languageInstallDefaultDataSettings.Values)
+            foreach (var isoCode in languageInstallDefaultDataSettings.Values)
             {
                 if (!TryCreateCulture(isoCode, out CultureInfo? culture))
                 {
