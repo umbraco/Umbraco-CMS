@@ -108,6 +108,19 @@ export const parameters = {
 			global: handlers,
 		},
 	},
+	backgrounds: {
+		default: 'Greyish',
+		values: [
+			{
+				name: 'Greyish',
+				value: '#F3F3F5',
+			},
+			{
+				name: 'White',
+				value: '#ffffff',
+			},		  
+		],
+	  },
 };
 
 setCustomElements(customElementManifests);
