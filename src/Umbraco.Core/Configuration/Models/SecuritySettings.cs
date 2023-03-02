@@ -69,13 +69,13 @@ public class SecuritySettings
     ///     Gets or sets a value for the user password settings.
     /// </summary>
     [Obsolete("This no longer works. You can now inject this by using IOptions<UserPasswordConfigurationSettings> instead, scheduled for removal in v13")]
-    public UserPasswordConfigurationSettings? UserPassword { get; set; }
+    public UserPasswordConfigurationSettings? UserPassword { get; set; } = new();
 
     /// <summary>
     ///     Gets or sets a value for the member password settings.
     /// </summary>
     [Obsolete("This no longer works. You can now inject this by using IOptions<MemberPasswordConfigurationSettings> instead, scheduled for removal in v13")]
-    public MemberPasswordConfigurationSettings? MemberPassword { get; set; }
+    public MemberPasswordConfigurationSettings? MemberPassword { get; set; } = new();
 
     /// <summary>
     ///     Gets or sets a value indicating whether to bypass the two factor requirement in Umbraco when using external login
