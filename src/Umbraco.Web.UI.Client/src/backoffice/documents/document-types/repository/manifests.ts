@@ -13,7 +13,7 @@ const repository: ManifestRepository = {
 };
 
 export const DOCUMENT_TYPE_STORE_ALIAS = 'Umb.Store.DocumentType';
-export const DOCUMENT_TYPE_TREE_STORE_ALIAS = 'Umb.Store.Tree.DocumentType';
+export const DOCUMENT_TYPE_TREE_STORE_ALIAS = 'Umb.Store.DocumentTypeTree';
 
 const store: ManifestStore = {
 	type: 'store',
