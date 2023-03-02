@@ -4,21 +4,20 @@ import { UmbNotificationDefaultData } from '../layouts/default';
 import {
 	UmbNotificationColor,
 	UmbNotificationOptions,
-	UmbNotificationService,
-	UMB_NOTIFICATION_SERVICE_CONTEXT_TOKEN
+	UmbNotificationContext,
+	UMB_NOTIFICATION_CONTEXT_TOKEN,
 } from '..';
 import { UmbLitElement } from '@umbraco-cms/element';
 
-
 @customElement('story-notification-default-example')
 export class StoryNotificationDefaultExampleElement extends UmbLitElement {
-	private _notificationService?: UmbNotificationService;
+	private _notificationContext?: UmbNotificationContext;
 
 	connectedCallback(): void {
 		super.connectedCallback();
 
-		this.consumeContext(UMB_NOTIFICATION_SERVICE_CONTEXT_TOKEN, (notificationService) => {
-			this._notificationService = notificationService;
+		this.consumeContext(UMB_NOTIFICATION_CONTEXT_TOKEN, (instance) => {
+			this._notificationContext = instance;
 		});
 	}
 
@@ -29,7 +28,7 @@ export class StoryNotificationDefaultExampleElement extends UmbLitElement {
 				message: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit',
 			},
 		};
-		this._notificationService?.peek(color, options);
+		this._notificationContext?.peek(color, options);
 	};
 
 	render() {
