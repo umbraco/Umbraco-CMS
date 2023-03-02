@@ -1757,22 +1757,24 @@ internal class DatabaseDataCreator
         {
             // Insert the specified languages, ensuring the first is marked as default.
             bool isDefault = true;
-            for (short i = 0; i < languageInstallDefaultDataSettings.Values.Count; i++)
+            short id = 1;
+            foreach(var isoCode in languageInstallDefaultDataSettings.Values)
             {
-                if (!TryCreateCulture(languageInstallDefaultDataSettings.Values[i], out CultureInfo? culture))
+                if (!TryCreateCulture(isoCode, out CultureInfo? culture))
                 {
                     continue;
                 }
 
                 var dto = new LanguageDto
                 {
-                    Id = i++,
+                    Id = id,
                     IsoCode = culture.Name,
                     CultureName = culture.EnglishName,
                     IsDefault = isDefault,
                 };
                 _database.Insert(Constants.DatabaseSchema.Tables.Language, "id", true, dto);
                 isDefault = false;
+                id++;
             }
         }
         else
