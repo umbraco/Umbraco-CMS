@@ -3,7 +3,7 @@ import { UmbDocumentTypeStore } from './document-type.store';
 import { UmbDocumentTypeTreeStore } from './document-type.tree.store';
 import { ManifestRepository, ManifestStore, ManifestTreeStore } from '@umbraco-cms/extensions-registry';
 
-export const DOCUMENT_TYPE_REPOSITORY_ALIAS = 'Umb.Repository.DocumentTypes';
+export const DOCUMENT_TYPE_REPOSITORY_ALIAS = 'Umb.Repository.DocumentType';
 
 const repository: ManifestRepository = {
 	type: 'repository',
