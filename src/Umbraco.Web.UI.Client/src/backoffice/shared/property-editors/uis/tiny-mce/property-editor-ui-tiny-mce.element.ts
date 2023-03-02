@@ -12,14 +12,8 @@ import { DataTypePropertyModel } from '@umbraco-cms/backend-api';
 export class UmbPropertyEditorUITinyMceElement extends UmbLitElement {
 	static styles = [UUITextStyles, css``];
 
-	#value = '';
-	@property({ type: Array })
-	public get value(): string {
-		return this.#value;
-	}
-	public set value(value: string) {
-		this.#value = value || '';
-	}
+	@property({ type: String })
+	value = '';
 
 	configuration: Array<DataTypePropertyModel> = [];
 
