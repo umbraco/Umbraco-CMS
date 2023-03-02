@@ -14,7 +14,7 @@ const repository: ManifestRepository = {
 };
 
 export const MEMBER_GROUP_STORE_ALIAS = 'Umb.Store.MemberGroup';
-export const MEMBER_GROUP_TREE_STORE_ALIAS = 'Umb.Store.MediaGroupTree';
+export const MEMBER_GROUP_TREE_STORE_ALIAS = 'Umb.Store.MemberGroupTree';
 
 const store: ManifestStore = {
 	type: 'store',

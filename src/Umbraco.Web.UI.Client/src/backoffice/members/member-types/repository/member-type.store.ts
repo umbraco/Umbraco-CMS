@@ -6,17 +6,15 @@ import type { MemberTypeDetails } from '@umbraco-cms/models';
 
 /**
  * @export
- * @class UmbMemberTypeDetailStore
+ * @class UmbMemberTypeStore
  * @extends {UmbStoreBase}
- * @description - Details Data Store for Member Types
+ * @description - Data Store for Member Types
  */
-export class UmbMemberTypeDetailStore
-	extends UmbStoreBase
-{
+export class UmbMemberTypeStore extends UmbStoreBase {
 	#data = new ArrayState<MemberTypeDetails>([], (x) => x.key);
 
 	constructor(host: UmbControllerHostInterface) {
-		super(host, UmbMemberTypeDetailStore.name);
+		super(host, UmbMemberTypeStore.name);
 	}
 
 	append(MemberType: MemberTypeDetails) {
@@ -25,9 +23,9 @@ export class UmbMemberTypeDetailStore
 
 	remove(uniques: string[]) {
 		this.#data.remove(uniques);
-	}	
+	}
 }
 
-export const UMB_MEMBER_TYPE_DETAIL_STORE_CONTEXT_TOKEN = new UmbContextToken<UmbMemberTypeDetailStore>(
-	UmbMemberTypeDetailStore.name
+export const UMB_MEMBER_TYPE_DETAIL_STORE_CONTEXT_TOKEN = new UmbContextToken<UmbMemberTypeStore>(
+	UmbMemberTypeStore.name
 );
