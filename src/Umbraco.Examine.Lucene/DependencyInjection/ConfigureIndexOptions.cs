@@ -46,6 +46,8 @@ public sealed class ConfigureIndexOptions : IConfigureNamedOptions<LuceneDirecto
                 break;
             case Constants.UmbracoIndexes.ContentAPIIndexName:
                 options.Analyzer = new StandardAnalyzer(LuceneInfo.CurrentVersion);
+                // FIXME: either create a dedicated validator to this index or make sure the populator handles any validation rules (i.e. published content only)
+                // options.Validator = _umbracoIndexConfig.GetPublishedContentValueSetValidator();
                 options.FieldDefinitions = new ContentApiFieldDefinitionCollection();
                 break;
         }

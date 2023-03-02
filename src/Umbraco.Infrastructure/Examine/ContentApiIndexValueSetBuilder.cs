@@ -1,22 +1,20 @@
 using Examine;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
-using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Examine;
 
-public class ContentApiValueSetBuilder : BaseValueSetBuilder<IContent>
+public class ContentApiValueSetBuilder : IContentApiValueSetBuilder
 {
     private readonly IEntityService _entityService;
 
-    public ContentApiValueSetBuilder(PropertyEditorCollection propertyEditors, IEntityService entityService)
-    : base(propertyEditors, false)
+    public ContentApiValueSetBuilder(IEntityService entityService)
         => _entityService = entityService;
 
     /// <inheritdoc />
-    public override IEnumerable<ValueSet> GetValueSets(params IContent[] contents)
+    public IEnumerable<ValueSet> GetValueSets(params IContent[] contents)
     {
         foreach (IContent content in contents)
         {

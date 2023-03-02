@@ -49,7 +49,7 @@ public static partial class UmbracoBuilderExtensions
                 false));
         builder.Services.AddUnique<IValueSetBuilder<IMedia>, MediaValueSetBuilder>();
         builder.Services.AddUnique<IValueSetBuilder<IMember>, MemberValueSetBuilder>();
-        builder.Services.AddUnique<IValueSetBuilder<IContent>, ContentApiValueSetBuilder>();
+        builder.Services.AddSingleton<IContentApiValueSetBuilder, ContentApiValueSetBuilder>();
         builder.Services.AddSingleton<ExamineIndexRebuilder>();
 
         builder.AddNotificationHandler<ContentCacheRefresherNotification, ContentIndexingNotificationHandler>();

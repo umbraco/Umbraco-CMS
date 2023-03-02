@@ -29,7 +29,6 @@ internal class ExamineUmbracoIndexingHandler : IUmbracoIndexingHandler
     private readonly IMainDom _mainDom;
     private readonly IValueSetBuilder<IMedia> _mediaValueSetBuilder;
     private readonly IValueSetBuilder<IMember> _memberValueSetBuilder;
-    private readonly IValueSetBuilder<IContent> _contentApiValueSetBuilder;
     private readonly IProfilingLogger _profilingLogger;
     private readonly IPublishedContentValueSetBuilder _publishedContentValueSetBuilder;
     private readonly ICoreScopeProvider _scopeProvider;
@@ -44,8 +43,7 @@ internal class ExamineUmbracoIndexingHandler : IUmbracoIndexingHandler
         IContentValueSetBuilder contentValueSetBuilder,
         IPublishedContentValueSetBuilder publishedContentValueSetBuilder,
         IValueSetBuilder<IMedia> mediaValueSetBuilder,
-        IValueSetBuilder<IMember> memberValueSetBuilder,
-        IValueSetBuilder<IContent> contentApiValueSetBuilder)
+        IValueSetBuilder<IMember> memberValueSetBuilder)
     {
         _mainDom = mainDom;
         _logger = logger;
@@ -57,7 +55,6 @@ internal class ExamineUmbracoIndexingHandler : IUmbracoIndexingHandler
         _publishedContentValueSetBuilder = publishedContentValueSetBuilder;
         _mediaValueSetBuilder = mediaValueSetBuilder;
         _memberValueSetBuilder = memberValueSetBuilder;
-        _contentApiValueSetBuilder = contentApiValueSetBuilder;
         _enabled = new Lazy<bool>(IsEnabled);
     }
 
@@ -276,6 +273,7 @@ internal class ExamineUmbracoIndexingHandler : IUmbracoIndexingHandler
         public override void Execute() =>
             Execute(_backgroundTaskQueue, _examineUmbracoIndexingHandler, _content, _isPublished);
 
+        // FIXME: Content API index needs updating here
         public static void Execute(IBackgroundTaskQueue backgroundTaskQueue,
             ExamineUmbracoIndexingHandler examineUmbracoIndexingHandler, IContent content, bool isPublished)
             => backgroundTaskQueue.QueueBackgroundWorkItem(cancellationToken =>
@@ -283,21 +281,12 @@ internal class ExamineUmbracoIndexingHandler : IUmbracoIndexingHandler
                 using ICoreScope scope =
                     examineUmbracoIndexingHandler._scopeProvider.CreateCoreScope(autoComplete: true);
 
-                var unpublishedValueSet = new Lazy<List<ValueSet>>(() =>
-                {
-                    IEnumerable<ValueSet> contentValueSet = examineUmbracoIndexingHandler._contentValueSetBuilder.GetValueSets(content);
-                    IEnumerable<ValueSet> contentApiValueSet = examineUmbracoIndexingHandler._contentApiValueSetBuilder.GetValueSets(content);
-
-                    return contentValueSet.Concat(contentApiValueSet).ToList();
-                });
-
                 // for content we have a different builder for published vs unpublished
                 // we don't want to build more value sets than is needed so we'll lazily build 2 one for published one for non-published
                 var builders = new Dictionary<bool, Lazy<List<ValueSet>>>
                 {
                     [true] = new(() => examineUmbracoIndexingHandler._publishedContentValueSetBuilder.GetValueSets(content).ToList()),
-                    //[false] = new(() => examineUmbracoIndexingHandler._contentValueSetBuilder.GetValueSets(content).ToList()),
-                    [false] = unpublishedValueSet
+                    [false] = new(() => examineUmbracoIndexingHandler._contentValueSetBuilder.GetValueSets(content).ToList())
                 };
 
                 // This is only for content - so only index items for IUmbracoContentIndex (to exlude members)

@@ -5,16 +5,16 @@ using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Infrastructure.Examine;
 
-public class ContentApiIndexPopulator : IndexPopulator<IUmbracoContentIndex>
+public class ContentApiIndexPopulator : IndexPopulator
 {
     private readonly IContentService _contentService;
-    private readonly IValueSetBuilder<IContent> _contentValueSetBuilder;
+    private readonly IContentApiValueSetBuilder _contentValueSetBuilder;
 
-    public ContentApiIndexPopulator(IContentService contentService, IValueSetBuilder<IContent> contentValueSetBuilder)
+    public ContentApiIndexPopulator(IContentService contentService, IContentApiValueSetBuilder contentValueSetBuilder)
     {
         _contentService = contentService;
         _contentValueSetBuilder = contentValueSetBuilder;
-        //RegisterIndex(Constants.UmbracoIndexes.ContentAPIIndexName);
+        RegisterIndex(Constants.UmbracoIndexes.ContentAPIIndexName);
     }
 
     protected override void PopulateIndexes(IReadOnlyList<IIndex> indexes)
