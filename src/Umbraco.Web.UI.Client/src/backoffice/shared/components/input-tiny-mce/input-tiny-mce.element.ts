@@ -11,6 +11,8 @@ import { UmbModalService, UMB_MODAL_SERVICE_CONTEXT_TOKEN } from '@umbraco-cms/m
 /// TINY MCE
 // import 'tinymce';
 import '@tinymce/tinymce-webcomponent';
+import { MacroPlugin } from '../../property-editors/uis/tiny-mce/plugins/macro.plugin';
+import { UMB_MACRO_SERVICE_CONTEXT_TOKEN } from 'libs/macro/macro.service';
 
 // /* Default icons are required. After that, import custom icons if applicable */
 // import 'tinymce/icons/default';
@@ -94,7 +96,7 @@ export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
 
 	constructor() {
 		super();
-
+		
 		this.consumeContext(UMB_MODAL_SERVICE_CONTEXT_TOKEN, (instance) => {
 			this.modalService = instance;
 			this.#setTinyConfig();
@@ -116,7 +118,7 @@ export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
 	// TODO => fix TinyMCE type definitions
 	#setTinyConfig() {
 		window.tinyConfig = {
-			//content_css: false,
+			content_css: false,
 			contextMenu: false,
 			convert_urls: false,
 			menubar: false,
@@ -128,6 +130,7 @@ export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
 			setup: (editor: any) => {
 				new AcePlugin(editor, this.modalService);
 				new LinkPickerPlugin(editor, this.modalService, this.configuration);
+				new MacroPlugin(editor, this.modalService);
 
 				// TODO => the editor frame catches Ctrl+S and handles it with the system save dialog
 				// - we want to handle it in the content controller, so we'll emit an event instead
@@ -155,6 +158,7 @@ export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
 			height=${ifDefined(this._dimensions?.height)}
 			plugins=${this._plugins.join(' ')}
 			toolbar=${this._toolbar.join(' ')}
+			content_css=${this._stylesheets.join(',')}
 			>${this.value}</tinymce-editor
 		>`;
 	}
