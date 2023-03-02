@@ -94,11 +94,7 @@ export class UmbBackofficeMain extends UmbLitElement {
 	}
 
 	render() {
-		return html` <umb-router-slot
-			.routes=${this._routes}
-			@change=${(event: any) => {
-				this._onRouteChange(event);
-			}}></umb-router-slot>`;
+		return html` <umb-router-slot .routes=${this._routes} @change=${this._onRouteChange}></umb-router-slot>`;
 	}
 }
 
