@@ -18,6 +18,10 @@ export default defineConfig({
 					src: 'public-assets/App_Plugins/*.js',
 					dest: 'App_Plugins',
 				},
+				{
+					src: 'public-assets/tiny-mce/**.*',
+					dest: 'tiny-mce',
+				},
 			],
 		}),
 		viteTSConfigPaths(),
