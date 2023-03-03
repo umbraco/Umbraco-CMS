@@ -1,12 +1,13 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, html, LitElement, svg } from 'lit';
 import { customElement, query, queryAssignedElements, state } from 'lit/decorators.js';
+import { clamp } from 'lodash-es';
 import { UmbDonutSliceElement } from './donut-slice';
 
 export interface Circle {
-	percent: number;
 	color: string;
 	name: string;
+	percent: number;
 }
 
 interface CircleWithCommands extends Circle {
@@ -129,12 +130,22 @@ export class UmbDonutChartElement extends LitElement {
 	@state()
 	detailColor = 'red';
 
+	@state()
+	_totalAmount = 0;
+
+	#calculatePercentage(partialValue: number) {
+		if (this._totalAmount === 0) return 0;
+		const percent = Math.round((100 * partialValue) / this._totalAmount);
+		return clamp(percent, 0, 99);
+	}
+
 	#printCircles(event: Event) {
+		this._totalAmount = this.slices.reduce((acc, slice) => acc + slice.amount, 0);
 		event.stopPropagation();
 		this.circles = this.#addCommands(
 			this.slices.map((slice) => {
 				return {
-					percent: slice.percent,
+					percent: this.#calculatePercentage(slice.amount),
 					color: slice.color,
 					name: slice.name,
 				};

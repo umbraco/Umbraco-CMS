@@ -61,14 +61,6 @@ export class UmbLogViewerOverviewViewElement extends UmbLitElement {
 				grid-area: 3 / 1 / 5 / 3;
 			}
 
-			#log-types-container {
-				display: flex;
-				gap: var(--uui-size-space-4);
-				flex-direction: column-reverse;
-				align-items: center;
-				justify-content: space-between;
-			}
-
 			#saved-searches-container {
 				grid-area: saved-searches;
 			}
@@ -88,37 +80,6 @@ export class UmbLogViewerOverviewViewElement extends UmbLitElement {
 				margin-top: var(--uui-size-space-5);
 			}
 
-			button {
-				all: unset;
-				display: flex;
-				align-items: center;
-				cursor: pointer;
-			}
-
-			button:focus {
-				outline: 1px solid var(--uui-color-focus);
-			}
-
-			button.active {
-				text-decoration: line-through;
-			}
-
-			#chart {
-				width: 150px;
-				aspect-ratio: 1;
-				background: radial-gradient(white 40%, transparent 41%),
-					conic-gradient(
-						var(--umb-log-viewer-debug-color) 0% 20%,
-						var(--umb-log-viewer-information-color) 20% 40%,
-						var(--umb-log-viewer-warning-color) 40% 60%,
-						var(--umb-log-viewer-error-color) 60% 80%,
-						var(--umb-log-viewer-fatal-color) 80% 100%
-					);
-				margin: 10px;
-				display: inline-block;
-				border-radius: 50%;
-			}
-
 			#error-count {
 				font-size: 4rem;
 				text-align: center;
@@ -126,9 +87,6 @@ export class UmbLogViewerOverviewViewElement extends UmbLitElement {
 			}
 		`,
 	];
-
-	@state()
-	private _totalLogCount = 0;
 
 	@state()
 	private _errorCount = 0;
@@ -141,21 +99,6 @@ export class UmbLogViewerOverviewViewElement extends UmbLitElement {
 
 	@state()
 	private _logLevelCount: LogLevelCountsModel | null = null;
-
-	@state()
-	private _startDate = '';
-
-	@state()
-	private _endDate = '';
-
-	setLogLevelCount() {
-		this.logLevelCount = this._logLevelCount
-			? Object.entries(this._logLevelCount).filter(([level, number]) => !this._logLevelCountFilter.includes(level))
-			: [];
-		this._totalLogCount = this._logLevelCount
-			? this.logLevelCount.flatMap((arr) => arr[1]).reduce((acc, count) => acc + count, 0)
-			: 0;
-	}
 
 	#logViewerContext?: UmbLogViewerWorkspaceContext;
 	constructor() {
@@ -170,54 +113,8 @@ export class UmbLogViewerOverviewViewElement extends UmbLitElement {
 		if (!this.#logViewerContext) return;
 
 		this.observe(this.#logViewerContext.logCount, (logLevel) => {
-			this._logLevelCount = logLevel ?? null;
 			this._errorCount = this._logLevelCount?.error ?? 0;
-			this.setLogLevelCount();
 		});
-
-		this.observe(this.#logViewerContext.dateRange, (dateRange: LogViewerDateRange) => {
-			this._startDate = dateRange?.startDate;
-			this._endDate = dateRange?.endDate;
-		});
-	}
-
-	protected willUpdate(_changedProperties: Map<PropertyKey, unknown>): void {
-		if (_changedProperties.has('_logLevelCountFilter')) {
-			this.setLogLevelCount();
-			this._totalLogCount = this._logLevelCount
-				? this.logLevelCount.flatMap((arr) => arr[1]).reduce((acc, count) => acc + count, 0)
-				: 0;
-		}
-	}
-
-	#calculatePercentage(partialValue: number) {
-		if (this._totalLogCount === 0) return 0;
-		const percent = Math.round((100 * partialValue) / this._totalLogCount);
-		return clamp(percent, 0, 99);
-	}
-
-	#setDates(event: Event) {
-		const target = event.target as HTMLInputElement;
-		if (target.id === 'start-date') {
-			this._startDate = target.value;
-		} else if (target.id === 'end-date') {
-			this._endDate = target.value;
-		}
-		const newDateRange: LogViewerDateRange = { startDate: this._startDate, endDate: this._endDate };
-		this.#logViewerContext?.setDateRange(newDateRange);
-	}
-
-	#setCountFilter(level: string) {
-		if (this._logLevelCountFilter.includes(level)) {
-			this._logLevelCountFilter = this._logLevelCountFilter.filter((item) => item !== level);
-			return;
-		}
-
-		this._logLevelCountFilter = [...this._logLevelCountFilter, level];
-	}
-
-	setCurrentQuery(query: string) {
-		this.#logViewerContext?.setFilterExpression(query);
 	}
 
 	render() {
@@ -236,43 +133,7 @@ export class UmbLogViewerOverviewViewElement extends UmbLitElement {
 						<h1 id="log-lever">Info</h1>
 					</uui-box>
 
-					<uui-box id="types" headline="Log types">
-						<div id="log-types-container">
-							<div id="legend">
-								<ul>
-									${this._logLevelCount
-										? Object.keys(this._logLevelCount).map(
-												(level) =>
-													html`<li>
-														<button
-															@click=${(e: Event) => {
-																(e.target as HTMLElement)?.classList.toggle('active');
-																this.#setCountFilter(level);
-															}}>
-															<uui-icon
-																name="umb:record"
-																style="color: var(--umb-log-viewer-${level.toLowerCase()}-color);"></uui-icon
-															>${level}
-														</button>
-													</li>`
-										  )
-										: ''}
-								</ul>
-							</div>
-							<umb-donut-chart>
-								${this._logLevelCount
-									? this.logLevelCount.map(
-											([level, number]) =>
-												html`<umb-donut-slice
-													.name=${level}
-													.amount=${number}
-													.percent=${this.#calculatePercentage(number)}
-													.color="${`var(--umb-log-viewer-${level.toLowerCase()}-color)`}"></umb-donut-slice> `
-									  )
-									: ''}
-							</umb-donut-chart>
-						</div>
-					</uui-box>
+					<umb-log-viewer-log-types-chart id="types"></umb-log-viewer-log-types-chart>
 				</div>
 
 				<div id="saved-searches-container">
