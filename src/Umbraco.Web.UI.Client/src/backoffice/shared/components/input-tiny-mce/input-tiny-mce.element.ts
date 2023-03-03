@@ -20,34 +20,8 @@ import type { UserDetails } from '@umbraco-cms/models';
 import { DataTypePropertyModel } from '@umbraco-cms/backend-api';
 
 /// TINY MCE
-// import 'tinymce';
+import '../../../../../public-assets/tiny-mce/tinymce.min.js';
 import '@tinymce/tinymce-webcomponent';
-
-// /* Default icons are required. After that, import custom icons if applicable */
-// import 'tinymce/icons/default';
-
-// /* Required TinyMCE components */
-// import 'tinymce/themes/silver';
-// import 'tinymce/models/dom';
-
-// /* Import a skin (can be a custom skin instead of the default) */
-// import 'tinymce/skins/ui/oxide/skin.shadowdom.css';
-
-// /* content UI CSS is required */
-// import contentUiSkinCss from 'tinymce/skins/ui/oxide/content.css';
-
-// /* The default content CSS can be changed or replaced with appropriate CSS for the editor content. */
-// import contentCss from 'tinymce/skins/content/default/content.css';
-
-// /* Import plugins */
-// import 'tinymce/plugins/advlist';
-// import 'tinymce/plugins/anchor';
-// import 'tinymce/plugins/autolink';
-// import 'tinymce/plugins/charmap';
-// import 'tinymce/plugins/directionality';
-// import 'tinymce/plugins/lists';
-// import 'tinymce/plugins/searchreplace';
-// import 'tinymce/plugins/table';
 
 declare global {
 	interface Window {
@@ -217,7 +191,6 @@ export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
 
 		this.consumeContext(UMB_MODAL_CONTEXT_TOKEN, (instance) => {
 			this.modalContext = instance;
-			this.#setTinyConfig();
 		});
 
 		this.consumeContext(UMB_CURRENT_USER_STORE_CONTEXT_TOKEN, (instance) => {
@@ -245,16 +218,19 @@ export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
 		if (!this._configObject.dimensions?.height) {
 			this._configObject.plugins.splice(this._configObject.plugins.indexOf('autoresize'), 1);
 		}
+
+		this.#setTinyConfig();
 	}
 
 	// TODO => setup runs before rendering, here we can add any custom plugins
 	#setTinyConfig() {
+		// set the default values that will not be modified via configuration
 		window.tinyConfig = {
 			autoresize_bottom_margin: 10,
+			base_url: '/public-assets/tiny-mce',
 			body_class: 'umb-rte',
 			//see https://www.tiny.cloud/docs/tinymce/6/editor-important-options/#cache_suffix
 			cache_suffix: '?umb__rnd=' + window.Umbraco?.Sys.ServerVariables.application.cacheBuster,
-			content_css: false,
 			contextMenu: false,
 			language: () => this.#getLanguage(),
 			menubar: false,
@@ -262,21 +238,36 @@ export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
 			paste_preprocess: (_: Editor, args: { content: string }) => this.#cleanupPasteData(args),
 			relative_urls: false,
 			resize: false,
-			//skin: false,
 			statusbar: false,
 			setup: (editor: Editor) => this.#editorSetup(editor),
 		};
 
+		// extend with configuration values
+		Object.assign(window.tinyConfig, {
+			content_css: this._configObject.stylesheets.join(','),
+			extended_valid_elements: this.#extendedValidElements,
+			height: ifDefined(this._configObject.dimensions?.height),
+			invalid_elements: this._configObject.invalidElements,
+			plugins: this._configObject.plugins.map((x: any) => x.name).join(' '),
+			quickbars_insert_toolbar: this._configObject.toolbar.join(' '),
+			quickbars_selection_toolbar: this._configObject.toolbar.join(' '),
+			style_formats: this._styleFormats,
+			toolbar: this._configObject.toolbar.join(' '),
+			valid_elements: this._configObject.validElements,
+			width: ifDefined(this._configObject.dimensions?.width),
+		});
+
 		// Need to check if we are allowed to UPLOAD images
 		// This is done by checking if the insert image toolbar button is available
 		if (this.#isMediaPickerEnabled()) {
-			// Update the TinyMCE Config object to allow pasting
-			window.tinyConfig.images_upload_handler = this.#mediaHelper.uploadImageHandler;
-			window.tinyConfig.automatic_uploads = false;
-			window.tinyConfig.images_replace_blob_uris = false;
-
-			// This allows images to be pasted in & stored as Base64 until they get uploaded to server
-			window.tinyConfig.paste_data_images = true;
+			Object.assign(window.tinyConfig, {
+				// Update the TinyMCE Config object to allow pasting
+				images_upload_handler: this.#mediaHelper.uploadImageHandler,
+				automatic_uploads: false,
+				images_replace_blob_uris: false,
+				// This allows images to be pasted in & stored as Base64 until they get uploaded to server
+				paste_data_images: true,
+			});
 		}
 	}
 
@@ -314,6 +305,8 @@ export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
 		new TinyMceMacroPlugin(editor, this.modalContext);
 		new TinyMceMediaPickerPlugin(editor, this.modalContext, this.configuration, this.currentUser);
 		new TinyMceEmbeddedMediaPlugin(editor, this.modalContext);
+
+		editor.suffix = '.min';
 
 		// register custom option maxImageSize
 		editor.options.register('maxImageSize', { processor: 'number', default: this.#fallbackConfig.maxImageSize });
@@ -434,21 +427,7 @@ export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
 	}
 
 	render() {
-		return html` <tinymce-editor
-			config="tinyConfig"
-			content_css=${this._configObject.stylesheets.join(',')}
-			extended_valid_elements=${this.#extendedValidElements}
-			height=${ifDefined(this._configObject.dimensions?.height)}
-			invalid_elements=${this._configObject.invalidElements}
-			plugins=${this._configObject.plugins.map((x: any) => x.name).join(' ')}
-			quickbars_insert_toolbar=${this._configObject.toolbar.join(' ')}
-			quickbars_selection_toolbar=${this._configObject.toolbar.join(' ')}
-			.style_formats=${this._styleFormats}
-			toolbar=${this._configObject.toolbar.join(' ')}
-			valid_elements=${this._configObject.validElements}
-			width=${ifDefined(this._configObject.dimensions?.width)}
-			>${this.value}</tinymce-editor
-		>`;
+		return html` <tinymce-editor config="tinyConfig">${this.value}</tinymce-editor>`;
 	}
 }
 
