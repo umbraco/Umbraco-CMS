@@ -1,19 +1,6 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, html } from 'lit';
-import { customElement, state, query } from 'lit/decorators.js';
-import {
-	UUIInputElement,
-	UUIPaginationElement,
-	UUIPopoverElement,
-	UUIScrollContainerElement,
-	UUISymbolExpandElement,
-} from '@umbraco-ui/uui';
-import {
-	LogViewerDateRange,
-	UmbLogViewerWorkspaceContext,
-	UMB_APP_LOG_VIEWER_CONTEXT_TOKEN,
-} from '../logviewer.context';
-import { DirectionModel, LogMessageModel, SavedLogSearchModel } from '@umbraco-cms/backend-api';
+import { customElement } from 'lit/decorators.js';
 import { UmbLitElement } from '@umbraco-cms/element';
 
 @customElement('umb-log-viewer-search-view')
@@ -58,8 +45,6 @@ export class UmbLogViewerSearchViewElement extends UmbLitElement {
 		`;
 	}
 }
-
-export default UmbLogViewerSearchViewElement;
 
 declare global {
 	interface HTMLElementTagNameMap {

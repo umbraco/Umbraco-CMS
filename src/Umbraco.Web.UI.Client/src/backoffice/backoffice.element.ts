@@ -38,7 +38,6 @@ import { UmbDataTypeTreeStore } from './settings/data-types/repository/data-type
 import { UmbTemplateTreeStore } from './templating/templates/tree/data/template.tree.store';
 import { UmbTemplateDetailStore } from './templating/templates/workspace/data/template.detail.store';
 import { UmbThemeContext } from './themes/theme.context';
-import { UmbLogSearchesStore } from './settings/logviewer/workspace/data/log-search.store';
 import { UmbLanguageStore } from './settings/languages/repository/language.store';
 import {
 	UMB_APP_LANGUAGE_CONTEXT_TOKEN,
@@ -115,7 +114,6 @@ export class UmbBackofficeElement extends UmbLitElement {
 		new UmbTemplateTreeStore(this);
 		new UmbTemplateDetailStore(this);
 		new UmbLanguageStore(this);
-		new UmbLogSearchesStore(this);
 
 		this.provideContext(UMB_APP_LANGUAGE_CONTEXT_TOKEN, new UmbAppLanguageContext(this));
 		this.provideContext(UMB_BACKOFFICE_CONTEXT_TOKEN, new UmbBackofficeContext());

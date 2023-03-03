@@ -2,6 +2,7 @@ import { UmbLogViewerRepository } from './data/log-viewer.repository';
 import { ArrayState, createObservablePart, DeepState, ObjectState, StringState } from '@umbraco-cms/observable-api';
 import {
 	DirectionModel,
+	LogLevelCountsModel,
 	LogLevelModel,
 	PagedLogMessageModel,
 	PagedLogTemplateModel,
@@ -10,16 +11,6 @@ import {
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 import { UmbContextToken } from '@umbraco-cms/context-api';
 import { BasicState } from 'libs/observable-api/basic-state';
-
-const logLevels = {
-	Information: 171,
-	Debug: 39,
-	Warning: 31,
-	Error: 1,
-	Fatal: 0,
-};
-
-export type LogLevel = Record<keyof typeof logLevels, number>;
 
 export type PoolingInterval = 0 | 2000 | 5000 | 10000 | 20000 | 30000;
 export interface PoolingCOnfig {
@@ -61,7 +52,7 @@ export class UmbLogViewerWorkspaceContext {
 	#savedSearches = new DeepState<PagedSavedLogSearchModel | undefined>(undefined);
 	savedSearches = createObservablePart(this.#savedSearches, (data) => data?.items);
 
-	#logCount = new DeepState<LogLevel | null>(null);
+	#logCount = new DeepState<LogLevelCountsModel | null>(null);
 	logCount = createObservablePart(this.#logCount, (data) => data);
 
 	#dateRange = new DeepState<LogViewerDateRange>(this.defaultDateRange);
@@ -96,15 +87,8 @@ export class UmbLogViewerWorkspaceContext {
 	}
 
 	async init() {
-		try {
-			await Promise.all([
-				this.getMessageTemplates(0, 10),
-				this.getLogCount(this.defaultDateRange),
-				this.getSavedSearches(),
-			]);
-		} catch (error) {
-			console.error(error);
-		}
+		this.getMessageTemplates(0, 10);
+		this.getLogCount(this.defaultDateRange);
 	}
 
 	setDateRange(dateRange: LogViewerDateRange) {

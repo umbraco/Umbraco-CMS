@@ -10,6 +10,7 @@ import './backoffice-frame/backoffice-notification-container.element';
 import './button-with-dropdown/button-with-dropdown.element';
 import './code-block/code-block.element';
 import './debug/debug.element';
+import './donut-chart';
 import './dropdown/dropdown.element';
 import './empty-state/empty-state.element';
 import './extension-slot/extension-slot.element';

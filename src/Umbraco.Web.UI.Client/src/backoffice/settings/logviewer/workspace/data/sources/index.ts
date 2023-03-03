@@ -1,5 +1,6 @@
 import {
 	DirectionModel,
+	LogLevelCountsModel,
 	LogLevelModel,
 	PagedLoggerModel,
 	PagedLogMessageModel,
@@ -9,13 +10,7 @@ import {
 } from '@umbraco-cms/backend-api';
 import type { DataSourceResponse } from '@umbraco-cms/models';
 
-interface LogLevelCountsModel {
-	information: number;
-	debug: number;
-	warning: number;
-	error: number;
-	fatal: number;
-}
+
 
 export interface LogSearchDataSource {
 	getAllSavedSearches({

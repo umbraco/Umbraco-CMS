@@ -1,4 +1,3 @@
-import '../donut-chart';
 import '../views/components';
 import { map } from 'rxjs';
 import { css, html, nothing } from 'lit';
@@ -50,9 +49,6 @@ export class UmbLogViewerWorkspaceElement extends UmbLitElement {
 		`,
 	];
 
-	@property()
-	public headline = 'Log Overview for Selected Time Period';
-
 	private _alias = 'Umb.Workspace.LogviewerRoot';
 
 	@state()
@@ -69,10 +65,15 @@ export class UmbLogViewerWorkspaceElement extends UmbLitElement {
 
 	#logViewerContext = new UmbLogViewerWorkspaceContext(this);
 
+	constructor() {
+		super();
+		console.log('LogViewerWorkspaceElement constructor');
+		this.#logViewerContext.init();
+	}
+
 	connectedCallback() {
 		super.connectedCallback();
 		this._observeWorkspaceViews();
-		this.#logViewerContext.init();
 		this.provideContext(UMB_APP_LOG_VIEWER_CONTEXT_TOKEN, this.#logViewerContext);
 	}
 

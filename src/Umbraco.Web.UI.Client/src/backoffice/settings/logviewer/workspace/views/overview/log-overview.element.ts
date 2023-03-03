@@ -1,7 +1,12 @@
 import { css, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { clamp } from 'lodash-es';
-import { LogLevel, LogViewerDateRange, UmbLogViewerWorkspaceContext, UMB_APP_LOG_VIEWER_CONTEXT_TOKEN } from '../logviewer.context';
+import {
+	LogLevel,
+	LogViewerDateRange,
+	UmbLogViewerWorkspaceContext,
+	UMB_APP_LOG_VIEWER_CONTEXT_TOKEN,
+} from '../../logviewer.context';
 import { SavedLogSearchModel, PagedLogTemplateModel } from '@umbraco-cms/backend-api';
 import { UmbLitElement } from '@umbraco-cms/element';
 
@@ -75,7 +80,6 @@ export class UmbLogViewerOverviewViewElement extends UmbLitElement {
 					var(--uui-size-space-5, 18px);
 			}
 
-			#saved-searches-container > uui-box,
 			#common-messages-container > uui-box {
 				height: 100%;
 			}
@@ -99,25 +103,6 @@ export class UmbLogViewerOverviewViewElement extends UmbLitElement {
 			/* find out better validation for that  */
 			input:out-of-range {
 				border-color: var(--uui-color-danger);
-			}
-
-			ul {
-				list-style: none;
-				margin: 0;
-				padding: 0;
-				border: 0;
-				font-size: 100%;
-				font: inherit;
-				vertical-align: baseline;
-			}
-
-			li {
-				display: flex;
-				align-items: center;
-			}
-
-			li uui-icon {
-				margin-right: 1em;
 			}
 
 			uui-table-cell {
@@ -401,21 +386,7 @@ export class UmbLogViewerOverviewViewElement extends UmbLitElement {
 				</div>
 
 				<div id="saved-searches-container">
-					<uui-box id="saved-searches" headline="Saved searches">
-						<ul>
-						<li>
-							<uui-button
-								@click=${() => {
-									this.setCurrentQuery('');
-								}}
-								label="All logs"
-								title="All logs"
-								href="/section/settings/logviewer/search"
-								><uui-icon name="umb:search"></uui-icon>All logs</uui-button
-							>
-						</li>
-						${this._savedSearches.map(this.renderSearchItem)}</ul>
-					</uui-box>
+							<umb-log-viewer-saved-searches-overview></umb-log-viewer-saved-searches-overview>
 				</div>
 
 				<div id="common-messages-container">
@@ -453,8 +424,6 @@ export class UmbLogViewerOverviewViewElement extends UmbLitElement {
 `;
 	}
 }
-
-export default UmbLogViewerOverviewViewElement;
 
 declare global {
 	interface HTMLElementTagNameMap {

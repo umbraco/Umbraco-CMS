@@ -1,5 +1,4 @@
 import { UmbLogMessagesServerDataSource, UmbLogSearchesServerDataSource } from './sources/log-viewer.server.data';
-import { UmbLogSearchesStore, UMB_LOG_SEARCHES_STORE_CONTEXT_TOKEN } from './log-search.store';
 import { UmbContextConsumerController } from '@umbraco-cms/context-api';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 import { UmbNotificationContext, UMB_NOTIFICATION_CONTEXT_TOKEN } from '@umbraco-cms/notification';
@@ -13,7 +12,6 @@ export class UmbLogViewerRepository {
 	#host: UmbControllerHostInterface;
 	#searchDataSource: UmbLogSearchesServerDataSource;
 	#messagesDataSource: UmbLogMessagesServerDataSource;
-	#searchStore?: UmbLogSearchesStore;
 	#notificationService?: UmbNotificationContext;
 	#initResolver?: () => void;
 	#initialized = false;
@@ -22,11 +20,6 @@ export class UmbLogViewerRepository {
 		this.#host = host;
 		this.#searchDataSource = new UmbLogSearchesServerDataSource(this.#host);
 		this.#messagesDataSource = new UmbLogMessagesServerDataSource(this.#host);
-
-		new UmbContextConsumerController(this.#host, UMB_LOG_SEARCHES_STORE_CONTEXT_TOKEN, (instance) => {
-			this.#searchStore = instance;
-			this.#checkIfInitialized();
-		});
 
 		new UmbContextConsumerController(this.#host, UMB_NOTIFICATION_CONTEXT_TOKEN, (instance) => {
 			this.#notificationService = instance;
@@ -42,7 +35,7 @@ export class UmbLogViewerRepository {
 	}
 
 	#checkIfInitialized() {
-		if (this.#searchStore && this.#notificationService) {
+		if (this.#notificationService) {
 			this.#initialized = true;
 			this.#initResolver?.();
 		}
