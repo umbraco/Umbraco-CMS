@@ -3,20 +3,24 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, property } from 'lit/decorators.js';
 import { ifDefined } from 'lit-html/directives/if-defined.js';
 import { FormControlMixin } from '@umbraco-ui/uui-base/lib/mixins';
-import { AstNode } from 'tinymce';
+import { AstNode, Editor, EditorEvent, TinyMCE } from 'tinymce';
 import { UmbMediaHelper } from '../../property-editors/uis/tiny-mce/media-helper.service';
 import { AcePlugin } from '../../property-editors/uis/tiny-mce/plugins/ace.plugin';
 import { LinkPickerPlugin } from '../../property-editors/uis/tiny-mce/plugins/linkpicker.plugin';
 import { MacroPlugin } from '../../property-editors/uis/tiny-mce/plugins/macro.plugin';
+import { MediaPickerPlugin } from '../../property-editors/uis/tiny-mce/plugins/mediapicker.plugin';
+import {
+	UmbCurrentUserStore,
+	UMB_CURRENT_USER_STORE_CONTEXT_TOKEN,
+} from '../../../users/current-user/current-user.store';
 import { UmbLitElement } from '@umbraco-cms/element';
-import { UmbModalService, UMB_MODAL_SERVICE_CONTEXT_TOKEN } from '@umbraco-cms/modal';
+import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN } from '@umbraco-cms/modal';
+import type { UserDetails } from '@umbraco-cms/models';
+import { DataTypePropertyModel } from '@umbraco-cms/backend-api';
 
 /// TINY MCE
 // import 'tinymce';
 import '@tinymce/tinymce-webcomponent';
-import { MediaPickerPlugin } from '../../property-editors/uis/tiny-mce/plugins/mediapicker.plugin';
-import { UmbCurrentUserStore, UMB_CURRENT_USER_STORE_CONTEXT_TOKEN } from 'src/backoffice/users/current-user/current-user.store';
-import type { UserDetails } from '@umbraco-cms/models';
 
 // /* Default icons are required. After that, import custom icons if applicable */
 // import 'tinymce/icons/default';
@@ -46,8 +50,8 @@ import type { UserDetails } from '@umbraco-cms/models';
 
 declare global {
 	interface Window {
-		tinyConfig: any;
-		tinymce: any;
+		tinyConfig: { [key: string]: string | number | boolean | object | (() => void) };
+		tinymce: TinyMCE;
 		Umbraco: any;
 	}
 }
@@ -57,7 +61,7 @@ export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
 	static styles = [UUITextStyles];
 
 	@property()
-	configuration: Array<any> = [];
+	configuration: Array<DataTypePropertyModel> = [];
 
 	@property()
 	private _dimensions?: { [key: string]: number };
@@ -98,7 +102,7 @@ export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
 	// private _contentStyle: string = contentUiSkinCss.toString() + '\n' + contentCss.toString();
 
 	#currentUserStore?: UmbCurrentUserStore;
-	modalService?: UmbModalService;
+	modalContext?: UmbModalContext;
 	#mediaHelper = new UmbMediaHelper();
 	currentUser?: UserDetails;
 
@@ -109,8 +113,8 @@ export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
 	constructor() {
 		super();
 
-		this.consumeContext(UMB_MODAL_SERVICE_CONTEXT_TOKEN, (instance) => {
-			this.modalService = instance;
+		this.consumeContext(UMB_MODAL_CONTEXT_TOKEN, (instance) => {
+			this.modalContext = instance;
 			this.#setTinyConfig();
 		});
 
@@ -156,16 +160,16 @@ export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
 			//skin: false,
 			statusbar: false,
 			style_formats: this._styleFormats,
-			setup: (editor: any) => this.#editorSetup(editor),
+			setup: (editor: Editor) => this.#editorSetup(editor),
 		};
 	}
 
-	#editorSetup(editor: any) {
+	#editorSetup(editor: Editor) {
 		// initialise core plugins
-		new AcePlugin(editor, this.modalService);
-		new LinkPickerPlugin(editor, this.modalService, this.configuration);
-		new MacroPlugin(editor, this.modalService);
-		new MediaPickerPlugin(editor, this.configuration, this.modalService, this.currentUser);
+		new AcePlugin(editor, this.modalContext);
+		new LinkPickerPlugin(editor, this.modalContext, this.configuration);
+		new MacroPlugin(editor, this.modalContext);
+		new MediaPickerPlugin(editor, this.configuration, this.modalContext, this.currentUser);
 
 		// register custom option maxImageSize
 		editor.options.register('maxImageSize', { processor: 'number', default: 500 });
@@ -176,10 +180,12 @@ export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
 		// To update the icon to show you can NOT drop something into the editor
 		if (this._toolbar && !this.#isMediaPickerEnabled()) {
 			// Wire up the event listener
-			editor.on('dragstart dragend dragover draggesture dragdrop drop drag', (e: any) => {
+			editor.on('dragstart dragend dragover draggesture dragdrop drop drag', (e: EditorEvent<InputEvent>) => {
 				e.preventDefault();
-				e.dataTransfer.effectAllowed = 'none';
-				e.dataTransfer.dropEffect = 'none';
+				if (e.dataTransfer) {
+					e.dataTransfer.effectAllowed = 'none';
+					e.dataTransfer.dropEffect = 'none';
+				}
 				e.stopPropagation();
 			});
 		}
@@ -197,33 +203,39 @@ export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
 		editor.on('Dirty', () => this.#onChange(editor.getContent()));
 		editor.on('Keyup', () => this.#onChange(editor.getContent()));
 		editor.on('SetContent', () => this.#uploadBlobImages(editor));
-		editor.on('ObjectResized', (e: any) => {
-			this.#onResize(e); 
+		editor.on('ObjectResized', (e) => {
+			this.#onResize(e);
 			this.#onChange(editor.getContent());
 		});
-
 	}
 
-	async #onResize(e: any) {
+	async #onResize(
+		e: EditorEvent<{
+			target: HTMLElement;
+			width: number;
+			height: number;
+			origin: string;
+		}>
+	) {
 		const srcAttr = e.target.getAttribute('src');
 
-        if (!srcAttr) {
-          return;
-        }
+		if (!srcAttr) {
+			return;
+		}
 
-        const path = srcAttr.split('?')[0];
-        const resizedPath = await this.#mediaHelper.getProcessedImageUrl(path, {
-          width: e.width,
-          height: e.height,
-          mode: 'max',
-        });
-		
+		const path = srcAttr.split('?')[0];
+		const resizedPath = await this.#mediaHelper.getProcessedImageUrl(path, {
+			width: e.width,
+			height: e.height,
+			mode: 'max',
+		});
+
 		e.target.setAttribute('data-mce-src', resizedPath);
 	}
 
-	#onInit(editor: any) {
+	#onInit(editor: Editor) {
 		//enable browser based spell checking
-		editor.getBody().setAttribute('spellcheck', true);
+		editor.getBody().setAttribute('spellcheck', 'true');
 
 		/** Setup sanitization for preventing injecting arbitrary JavaScript execution in attributes:
 		 * https://github.com/advisories/GHSA-w7jx-j77m-wp65
@@ -278,20 +290,21 @@ export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
 		})();
 
 		if (window.Umbraco?.Sys.ServerVariables.umbracoSettings.sanitizeTinyMce) {
-			editor.serializer.addAttributeFilter(uriAttributesToSanitize, (nodes: AstNode[]) => {
-				nodes.forEach((node: AstNode) => {
-					node.attributes?.forEach((attr) => {
-						const attrName = attr.name.toLowerCase();
-						if (uriAttributesToSanitize.indexOf(attrName) !== -1) {
-							attr.value = parseUri(attr.value, node.name) ?? '';
-						}
+			uriAttributesToSanitize.forEach((attribute) => {
+				editor.serializer.addAttributeFilter(attribute, (nodes: AstNode[]) => {
+					nodes.forEach((node: AstNode) => {
+						node.attributes?.forEach((attr) => {
+							if (uriAttributesToSanitize.includes(attr.name.toLowerCase())) {
+								attr.value = parseUri(attr.value, node.name) ?? '';
+							}
+						});
 					});
 				});
 			});
 		}
 	}
 
-	async #uploadBlobImages(editor: any) {
+	async #uploadBlobImages(editor: Editor) {
 		const content = editor.getContent();
 
 		// Upload BLOB images (dragged/pasted ones)
@@ -300,7 +313,7 @@ export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
 		if (content.search(/src=["']blob:.*?["']/gi) !== -1) {
 			const data = await editor.uploadImages();
 			// Once all images have been uploaded
-			data.forEach((item: any) => {
+			data.forEach((item) => {
 				// Skip items that failed upload
 				if (item.status === false) {
 					return;
@@ -330,7 +343,7 @@ export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
 			const blobImageWithNoTmpImgAttribute = editor.dom.select('img[src^="blob:"]:not([data-tmpimg])');
 
 			//For each of these selected items
-			blobImageWithNoTmpImgAttribute.forEach((imageElement: any) => {
+			blobImageWithNoTmpImgAttribute.forEach((imageElement) => {
 				const blobSrcUri = editor.dom.getAttrib(imageElement, 'src');
 
 				// Find the same image uploaded (Should be in LocalStorage)
@@ -348,7 +361,7 @@ export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
 
 		if (window.Umbraco?.Sys.ServerVariables.umbracoSettings.sanitizeTinyMce) {
 			/** prevent injecting arbitrary JavaScript execution in on-attributes. */
-			const allNodes = Array.prototype.slice.call(editor.dom.doc.getElementsByTagName('*'));
+			const allNodes = Array.from(editor.dom.doc.getElementsByTagName('*'));
 			allNodes.forEach((node) => {
 				for (let i = 0; i < node.attributes.length; i++) {
 					if (node.attributes[i].name.startsWith('on')) {
@@ -358,7 +371,6 @@ export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
 			});
 		}
 	}
-
 
 	#onChange(value: string) {
 		super.value = value;
