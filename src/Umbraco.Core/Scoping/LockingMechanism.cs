@@ -19,18 +19,26 @@ public class LockingMechanism : ILockingMechanism
     private Dictionary<Guid, Dictionary<int, int>>? _writeLocksDictionary;
     private Queue<IDistributedLock>? _acquiredLocks;
 
+    /// <summary>
+    /// Constructs an instance of LockingMechanism
+    /// </summary>
+    /// <param name="distributedLockingMechanismFactory"></param>
     public LockingMechanism(IDistributedLockingMechanismFactory distributedLockingMechanismFactory)
     {
         _distributedLockingMechanismFactory = distributedLockingMechanismFactory;
         _acquiredLocks = new Queue<IDistributedLock>();
     }
 
+    /// <inheritdoc />
     public void ReadLock(Guid instanceId, params int[] lockIds) => LazyReadLockInner(instanceId, lockIds);
 
+    /// <inheritdoc />
     public void WriteLock(Guid instanceId, params int[] lockIds) => LazyWriteLockInner(instanceId, lockIds);
 
+    /// <inheritdoc />
     public void EagerReadLock(Guid instanceId, params int[] lockIds) => EagerReadLockInner(instanceId, null, lockIds);
 
+    /// <inheritdoc />
     public void EagerWriteLock(Guid instanceId, params int[] lockIds) => EagerWriteLockInner(instanceId, null, lockIds);
 
     /// <summary>
