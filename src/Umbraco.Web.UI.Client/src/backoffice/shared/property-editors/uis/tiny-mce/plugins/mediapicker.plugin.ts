@@ -1,7 +1,8 @@
-import { DataTypePropertyModel } from '@umbraco-cms/backend-api';
-import { UmbModalService } from '@umbraco-cms/modal';
-import type { UserDetails } from '@umbraco-cms/models';
+import { Editor } from 'tinymce';
 import { UmbMediaHelper } from '../media-helper.service';
+import { DataTypePropertyModel } from '@umbraco-cms/backend-api';
+import { UmbModalContext } from '@umbraco-cms/modal';
+import type { UserDetails } from '@umbraco-cms/models';
 
 interface MediaPickerTargetData {
 	altText?: string;
@@ -22,19 +23,19 @@ interface MediaPickerResultData {
 
 // TODO => TinyMCE type definitions
 export class MediaPickerPlugin {
-	#modalService?: UmbModalService;
+	#modalService?: UmbModalContext;
 	#mediaHelper = new UmbMediaHelper();
 	#config?: Array<DataTypePropertyModel> = [];
-	editor?: any;
+	editor: Editor;
     #userDetails?: UserDetails;
 
 	constructor(
-		editor: any,
+		editor: Editor,
 		configuration?: Array<DataTypePropertyModel>,
-		modalService?: UmbModalService,
+		modalContext?: UmbModalContext,
 		userDetails?: UserDetails
 	) {
-		this.#modalService = modalService;
+		this.#modalService = modalContext;
 		this.#config = configuration;
 		this.editor = editor;
         this.#userDetails = userDetails;
@@ -42,13 +43,13 @@ export class MediaPickerPlugin {
 		editor.ui.registry.addButton('umbmediapicker', {
 			icon: 'image',
 			tooltip: 'Media Picker',
-			stateSelector: 'img[data-udi]',
+			//stateSelector: 'img[data-udi]', TODO => Investigate where stateselector has gone, or if it is still needed
 			onAction: () => this.#onAction(),
 		});
 	}
 
 	async #onAction() {
-		const selectedElm = this.editor.selection.getNode() as HTMLElement;
+		const selectedElm = this.editor.selection.getNode();
 		let currentTarget: MediaPickerTargetData = {};
 
 		if (selectedElm.nodeName === 'IMG') {
@@ -91,7 +92,7 @@ export class MediaPickerPlugin {
 			}
 		}
 
-		// TODO => how are additional props provided?
+		// TODO => how are additional props provided? Need to send startNodeId and startNodeIsVirtual props
 		const modalHandler = this.#modalService?.mediaPicker({
 			selection: currentTarget.udi ? [currentTarget.udi] : [],
             multiple: false,
@@ -106,7 +107,8 @@ export class MediaPickerPlugin {
 		this.editor.dispatch('Change');
 	}
 
-	#insertMediaInEditor(img: any) {
+	// TODO => mediaPicker returns a UDI, so need to fetch it. Wait for backend CLI before implementing
+	async #insertMediaInEditor(img: any) {
 		if (!img) return;
 
 		// We need to create a NEW DOM <img> element to insert
@@ -118,10 +120,10 @@ export class MediaPickerPlugin {
 			'data-udi': img.udi,
 			'data-caption': img.caption,
 		};
-		const newImage = this.editor.dom.createHTML('img', data);
+		const newImage = this.editor.dom.createHTML('img', data as Record<string, string | null>);
 		const parentElement = this.editor.selection.getNode().parentElement;
 
-		if (img.caption) {
+		if (img.caption && parentElement) {
 			const figCaption = this.editor.dom.createHTML('figcaption', {}, img.caption);
 			const combined = newImage + figCaption;
 
@@ -133,7 +135,7 @@ export class MediaPickerPlugin {
 			}
 		} else {
 			//if caption is removed, remove the figure element
-			if (parentElement.nodeName === 'FIGURE') {
+			if (parentElement?.nodeName === 'FIGURE' && parentElement.parentElement) {
 				parentElement.parentElement.innerHTML = newImage;
 			} else {
 				this.editor.selection.setContent(newImage);
@@ -142,7 +144,9 @@ export class MediaPickerPlugin {
 
 		// Using settimeout to wait for a DoM-render, so we can find the new element by ID.
 		setTimeout(() => {
-			const imgElm = this.editor.dom.get('__mcenew');
+			const imgElm = this.editor.dom.get('__mcenew') as HTMLImageElement;
+			if (!imgElm) return;
+
 			this.editor.dom.setAttrib(imgElm, 'id', null);
 
 			// When image is loaded we are ready to call sizeImageInEditor.
