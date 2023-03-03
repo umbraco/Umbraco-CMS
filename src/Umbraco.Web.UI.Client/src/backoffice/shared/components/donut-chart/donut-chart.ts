@@ -252,7 +252,6 @@ export class UmbDonutChartElement extends LitElement {
 		const circle = this.circles[index];
 		this._detailName = circle.name;
 		this._detailAmount = circle.percent;
-		this.detailPercent = circle.percent;
 		this._detailColor = circle.color;
 		this._detailKind = circle.kind;
 	}
