@@ -10,6 +10,7 @@ import { umbExtensionsRegistry, createExtensionElement } from '@umbraco-cms/exte
 import { ManifestWorkspaceView, ManifestWorkspaceViewCollection } from '@umbraco-cms/extensions-registry';
 import { UmbRouterSlotInitEvent, UmbRouterSlotChangeEvent } from '@umbraco-cms/router';
 import { UmbLogViewerWorkspaceContext, UMB_APP_LOG_VIEWER_CONTEXT_TOKEN } from '../logviewer.context';
+import { repeat } from 'lit-html/directives/repeat.js';
 
 //TODO make uui-input accept min and max values
 @customElement('umb-logviewer-workspace')
@@ -34,12 +35,17 @@ export class UmbLogViewerWorkspaceElement extends UmbLitElement {
 				display: flex;
 				padding: 0 var(--uui-size-space-6);
 				gap: var(--uui-size-space-4);
-				width: 100%;
 				align-items: center;
 			}
 
 			#router-slot {
 				height: 100%;
+			}
+
+			uui-tab-group {
+				--uui-tab-divider: var(--uui-color-border);
+				border-left: 1px solid var(--uui-color-border);
+				border-right: 1px solid var(--uui-color-border);
 			}
 		`,
 	];
@@ -137,22 +143,39 @@ export class UmbLogViewerWorkspaceElement extends UmbLitElement {
 		`;
 	}
 
+	#renderViews() {
+		return html`
+			${this._workspaceViews.length > 1
+				? html`
+						<uui-tab-group slot="tabs">
+							${repeat(
+								this._workspaceViews,
+								(view) => view.alias,
+								(view) => html`
+									<uui-tab
+										.label="${view.meta.label || view.name}"
+										href="${this._routerPath}/${view.meta.pathname}"
+										?active="${view.meta.pathname === this._activePath}">
+										<uui-icon slot="icon" name="${view.meta.icon}"></uui-icon>
+										${view.meta.label || view.name}
+									</uui-tab>
+								`
+							)}
+						</uui-tab-group>
+				  `
+				: nothing}
+		`;
+	}
+
 	render() {
 		return html`
 			<umb-body-layout>
 				<div id="header" slot="header">
-					${this._activePath === 'search'
-						? html`<a href="/section/settings/logviewer">
-								<uui-button compact>
-									<uui-icon name="umb:arrow-left"></uui-icon>
-								</uui-button>
-						  </a>`
-						: ''}
 					<h3 id="headline">
 						${this._activePath === 'overview' ? 'Log Overview for Selected Time Period' : 'Log search'}
 					</h3>
 				</div>
-				${this.#renderRoutes()}
+				${this.#renderViews()} ${this.#renderRoutes()}
 				<slot></slot>
 			</umb-body-layout>
 		`;

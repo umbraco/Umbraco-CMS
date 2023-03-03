@@ -21,9 +21,9 @@ const workspaceViews: Array<ManifestWorkspaceView> = [
 		weight: 300,
 		meta: {
 			workspaces: [workspaceAlias],
-			label: '',
+			label: 'Overview',
 			pathname: 'overview',
-			icon: '',
+			icon: 'umb:box-alt',
 		},
 	},
 	{
@@ -34,9 +34,9 @@ const workspaceViews: Array<ManifestWorkspaceView> = [
 		weight: 200,
 		meta: {
 			workspaces: [workspaceAlias],
-			label: '',
+			label: 'Search',
 			pathname: 'search',
-			icon: '',
+			icon: 'umb:search',
 		},
 	},
 ];
