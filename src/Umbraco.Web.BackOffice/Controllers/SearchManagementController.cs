@@ -151,14 +151,14 @@ public class SearchManagementController : UmbracoAuthorizedJsonController
         _logger.LogInformation("Rebuilding index '{IndexName}'", indexName);
 
         //remove it in case there's a handler there already
-        index!.IndexOperationComplete -= Indexer_IndexOperationComplete;
+   //     index!.IndexOperationComplete -= Indexer_IndexOperationComplete;
 
         //now add a single handler
-        index.IndexOperationComplete += Indexer_IndexOperationComplete;
+     //   index.IndexOperationComplete += Indexer_IndexOperationComplete;
 
         try
         {
-            var cacheKey = "temp_indexing_op_" + index.Name;
+            var cacheKey = "temp_indexing_op_" + index?.Name;
             //put temp val in cache which is used as a rudimentary way to know when the indexing is done
             _runtimeCache.Insert(cacheKey, () => "tempValue", TimeSpan.FromMinutes(5));
 
@@ -169,7 +169,7 @@ public class SearchManagementController : UmbracoAuthorizedJsonController
         catch (Exception ex)
         {
             //ensure it's not listening
-            index.IndexOperationComplete -= Indexer_IndexOperationComplete;
+           // index.IndexOperationComplete -= Indexer_IndexOperationComplete;
             _logger.LogError(ex, "An error occurred rebuilding index");
             var response = new ConflictObjectResult(
                 "The index could not be rebuilt at this time, most likely there is another thread currently writing to the index. Error: {ex}");

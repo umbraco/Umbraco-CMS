@@ -1,3 +1,4 @@
+using Examine;
 using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models;
@@ -23,7 +24,15 @@ public static partial class UmbracoBuilderExtensions
     public static IUmbracoBuilder AddExamine(this IUmbracoBuilder builder)
     {
 
-
+        builder.Services.AddSingleton<IExamineManager, ExamineManager>();
+        builder.Services.AddSingleton<ISearchProvider, ExamineSearchProvider>();
+        builder.Services.AddUnique(typeof(IExamineIndexConfiguration), typeof(ExamineIndexConfiguration));
+        builder.Services.AddSingleton<IExamineIndexConfigurationFactory, ExamineIndexConfigurationFactory>();
+        builder.Services.AddUnique(services =>
+        {
+            var factory = services.GetRequiredService<IExamineIndexConfigurationFactory>();
+            return factory.GetConfiguration();
+        });
         builder.Services.AddSingleton<IIndexRebuilder, IndexRebuilder>();
         builder.Services.AddSingleton<IUmbracoIndexingHandler, ExamineUmbracoIndexingHandler>();
         builder.Services.AddUnique<IUmbracoExamineIndexConfig, UmbracoIndexConfig>();

@@ -29,7 +29,7 @@ public static class UmbracoBuilderExtensions
             .AddSingleton<IUmbracoIndex>(services => new UmbracoExamineIndex<IContent>(services
                 .GetRequiredService<IExamineManager>().GetIndex(Constants.UmbracoIndexes
                     .ExternalIndexName), services.GetRequiredService<IPublishedContentValueSetBuilder>()))
-            .AddSingleton<IUmbracoSearcher<IContent>>(services => new UmbracoExamineSearcher<IContent>(services
+            .AddSingleton<IUmbracoSearcher>(services => new UmbracoExamineSearcher<IContent>(services
                 .GetRequiredService<IExamineManager>().GetIndex(Constants.UmbracoIndexes
                     .ExternalIndexName).Searcher));
 
@@ -44,7 +44,7 @@ public static class UmbracoBuilderExtensions
             .AddSingleton<IUmbracoIndex>(services => new UmbracoExamineIndex<IContent>(services
                 .GetRequiredService<IExamineManager>().GetIndex(Constants.UmbracoIndexes
                     .InternalIndexName), services.GetRequiredService<IContentValueSetBuilder>()))
-            .AddSingleton<IUmbracoSearcher<IContent>>(services => new UmbracoExamineSearcher<IContent>(services
+            .AddSingleton<IUmbracoSearcher>(services => new UmbracoExamineSearcher<IContent>(services
                 .GetRequiredService<IExamineManager>().GetIndex(Constants.UmbracoIndexes
                     .InternalIndexName).Searcher));
 
@@ -104,7 +104,7 @@ public static class UmbracoBuilderExtensions
             .AddSingleton<IUmbracoIndex>(services => new UmbracoExamineIndex<IMember>(services
                 .GetRequiredService<IExamineManager>().GetIndex(Constants.UmbracoIndexes
                     .MembersIndexName), services.GetRequiredService<IValueSetBuilder<IMember>>()))
-            .AddSingleton<IUmbracoSearcher<IMember>>(services => new UmbracoExamineSearcher<IMember>(services
+            .AddSingleton<IUmbracoSearcher>(services => new UmbracoExamineSearcher<IMember>(services
                 .GetRequiredService<IExamineManager>().GetIndex(Constants.UmbracoIndexes
                     .MembersIndexName).Searcher));
 

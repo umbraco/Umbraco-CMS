@@ -1,4 +1,5 @@
 using Umbraco.Search.DependencyInjection;
+using Umbraco.Search.Examine;
 using Umbraco.Search.Examine.TBD;
 
 namespace Umbraco.Cms.Web.UI
@@ -34,7 +35,7 @@ namespace Umbraco.Cms.Web.UI
         {
             services.AddUmbraco(_env, _config)
                 .AddSearchServices()
-                .AddExamineSearchServices()
+                .AddExamine()
                 .AddBackOffice()
                 .AddWebsite()
                 .AddComposers()

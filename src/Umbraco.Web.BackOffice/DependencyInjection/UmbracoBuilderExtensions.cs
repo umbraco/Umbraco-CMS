@@ -53,7 +53,6 @@ public static partial class UmbracoBuilderExtensions
             .AddUnattendedInstallInstallCreateUser()
             .AddCoreNotifications()
             .AddLogViewer()
-            .AddExamine()
             .AddExamineIndexes()
             .AddControllersWithAmbiguousConstructors()
             .AddSupplemenataryLocalizedTextFileSources();
