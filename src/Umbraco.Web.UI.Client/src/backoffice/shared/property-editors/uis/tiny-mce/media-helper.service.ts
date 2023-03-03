@@ -1,7 +1,24 @@
 // TODO => very much temporary
 
+import { Editor, EditorEvent } from "tinymce";
+import { UmbLitElement } from "@umbraco-cms/element";
+
 export class UmbMediaHelper {
-	async sizeImageInEditor(editor: any, imageDomElement: HTMLElement, imgUrl?: string) {
+
+	#host: UmbLitElement;
+
+	constructor(host: UmbLitElement) {
+		this.#host = host;
+	}
+
+	
+	/**
+	 * 
+	 * @param editor 
+	 * @param imageDomElement 
+	 * @param imgUrl 
+	 */
+	async sizeImageInEditor(editor: Editor, imageDomElement: HTMLElement, imgUrl?: string) {
 		const size = editor.dom.getSize(imageDomElement);
 		const maxImageSize = editor.options.get('maxImageSize');
 
@@ -21,11 +38,17 @@ export class UmbMediaHelper {
 				editor.dom.setAttrib(imageDomElement, 'data-mce-src', resizedImgUrl);
 			}
 
-			editor.execCommand('mceAutoResize', false, null, null);
+			editor.execCommand('mceAutoResize', false);
 		}
 	}
 
-    // Transplanted from mediahelper
+    /**
+	 * 
+	 * @param maxSize 
+	 * @param width 
+	 * @param height 
+	 * @returns 
+	 */
 	scaleToMaxSize(maxSize: number, width: number, height: number) {
 		const retval = { width, height };
 
@@ -56,6 +79,12 @@ export class UmbMediaHelper {
 		return retval;
 	}
 
+	/**
+	 * 
+	 * @param imagePath 
+	 * @param options 
+	 * @returns 
+	 */
 	async getProcessedImageUrl(imagePath: string, options: any) {
 		if (!options) {
 			return imagePath;
@@ -63,6 +92,170 @@ export class UmbMediaHelper {
 
 		const result = await fetch('/umbraco/management/api/v1/images/GetProcessedImageUrl');
 
-		return result;
+		return result as any;
+	}
+
+	/**
+	 * 
+	 * @param editor 
+	 */
+	async uploadBlobImages(editor: Editor) {
+		const content = editor.getContent();
+
+		// Upload BLOB images (dragged/pasted ones)
+		// find src attribute where value starts with `blob:`
+		// search is case-insensitive and allows single or double quotes
+		if (content.search(/src=["']blob:.*?["']/gi) !== -1) {
+			const data = await editor.uploadImages();
+			// Once all images have been uploaded
+			data.forEach((item) => {
+				// Skip items that failed upload
+				if (item.status === false) {
+					return;
+				}
+
+				// Select img element
+				const img = item.element;
+
+				// Get img src
+				const imgSrc = img.getAttribute('src');
+				const tmpLocation = localStorage.get(`tinymce__${imgSrc}`);
+
+				// Select the img & add new attr which we can search for
+				// When its being persisted in RTE property editor
+				// To create a media item & delete this tmp one etc
+				editor.dom.setAttrib(img, 'data-tmpimg', tmpLocation);
+
+				// Resize the image to the max size configured
+				// NOTE: no imagesrc passed into func as the src is blob://...
+				// We will append ImageResizing Querystrings on perist to DB with node save
+				this.sizeImageInEditor(editor, img);
+			});
+
+			// Get all img where src starts with blob: AND does NOT have a data=tmpimg attribute
+			// This is most likely seen as a duplicate image that has already been uploaded
+			// editor.uploadImages() does not give us any indiciation that the image been uploaded already
+			const blobImageWithNoTmpImgAttribute = editor.dom.select('img[src^="blob:"]:not([data-tmpimg])');
+
+			//For each of these selected items
+			blobImageWithNoTmpImgAttribute.forEach((imageElement) => {
+				const blobSrcUri = editor.dom.getAttrib(imageElement, 'src');
+
+				// Find the same image uploaded (Should be in LocalStorage)
+				// May already exist in the editor as duplicate image
+				// OR added to the RTE, deleted & re-added again
+				// So lets fetch the tempurl out of localstorage for that blob URI item
+
+				const tmpLocation = localStorage.get(`tinymce__${blobSrcUri}`);
+				if (tmpLocation) {
+					this.sizeImageInEditor(editor, imageElement);
+					editor.dom.setAttrib(imageElement, 'data-tmpimg', tmpLocation);
+				}
+			});
+		}
+
+		if (window.Umbraco?.Sys.ServerVariables.umbracoSettings.sanitizeTinyMce) {
+			/** prevent injecting arbitrary JavaScript execution in on-attributes. */
+			const allNodes = Array.from(editor.dom.doc.getElementsByTagName('*'));
+			allNodes.forEach((node) => {
+				for (let i = 0; i < node.attributes.length; i++) {
+					if (node.attributes[i].name.startsWith('on')) {
+						node.removeAttribute(node.attributes[i].name);
+					}
+				}
+			});
+		}
+	}
+
+	/**
+	 * 
+	 * @param e 
+	 * @returns 
+	 */
+	async onResize(
+		e: EditorEvent<{
+			target: HTMLElement;
+			width: number;
+			height: number;
+			origin: string;
+		}>
+	) {
+		const srcAttr = e.target.getAttribute('src');
+
+		if (!srcAttr) {
+			return;
+		}
+
+		const path = srcAttr.split('?')[0];
+		const resizedPath = await this.getProcessedImageUrl(path, {
+			width: e.width,
+			height: e.height,
+			mode: 'max',
+		});
+
+		e.target.setAttribute('data-mce-src', resizedPath);
+	}
+
+	/**
+	 * 
+	 * @param blobInfo 
+	 * @param progress 
+	 * @returns 
+	 */
+	uploadImageHandler(blobInfo: any, progress: any) {
+		return new Promise((resolve, reject) => {
+			const xhr = new XMLHttpRequest();
+			xhr.open('POST', window.Umbraco?.Sys.ServerVariables.umbracoUrls.tinyMceApiBaseUrl + 'UploadImage');
+
+			xhr.onloadstart = () => this.#host.dispatchEvent(new CustomEvent('rte.file.uploading'));
+
+			xhr.onloadend = () => this.#host.dispatchEvent(new CustomEvent('rte.file.uploaded'));
+
+			xhr.upload.onprogress = (e) => progress((e.loaded / e.total) * 100);
+
+			xhr.onerror = () => reject('Image upload failed due to a XHR Transport error. Code: ' + xhr.status);
+
+			xhr.onload = () => {
+				if (xhr.status < 200 || xhr.status >= 300) {
+					reject('HTTP Error: ' + xhr.status);
+					return;
+				}
+
+				// TODO => confirm this is required given no more Angular handling XHR/HTTP
+				const data = xhr.responseText.split('\n');
+
+				if (data.length <= 1) {
+					reject('Unrecognized text string: ' + data);
+					return;
+				}
+
+				let json: { [key: string]: string } = {};
+
+				try {
+					json = JSON.parse(data[1]);
+				} catch (e: any) {
+					reject('Invalid JSON: ' + data + ' - ' + e.message);
+					return;
+				}
+
+				if (!json || typeof json.tmpLocation !== 'string') {
+					reject('Invalid JSON: ' + data);
+					return;
+				}
+
+				// Put temp location into localstorage (used to update the img with data-tmpimg later on)
+				localStorage.set(`tinymce__${blobInfo.blobUri()}`, json.tmpLocation);
+
+				// We set the img src url to be the same as we started
+				// The Blob URI is stored in TinyMce's cache
+				// so the img still shows in the editor
+				resolve(blobInfo.blobUri());
+			};
+
+			const formData = new FormData();
+			formData.append('file', blobInfo.blob(), blobInfo.blob().name);
+
+			xhr.send(formData);
+		});
 	}
 }

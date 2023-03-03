@@ -97,37 +97,25 @@ export class TinyMceLinkPickerPlugin {
 			createLinkPickerCallback(currentTarget, anchorElm);
 		}
 
-		const editorEventSetupCallback = (buttonApi: { setEnabled: (state: boolean) => void }) => {
-			const editorEventCallback = (eventApi: { element: Element}) => {
-				buttonApi.setEnabled(eventApi.element.nodeName.toLowerCase() === 'a' && eventApi.element.hasAttribute('href'));
-			};
+		// const editorEventSetupCallback = (buttonApi: { setEnabled: (state: boolean) => void }) => {
+		// 	const editorEventCallback = (eventApi: { element: Element}) => {
+		// 		buttonApi.setEnabled(eventApi.element.nodeName.toLowerCase() === 'a' && eventApi.element.hasAttribute('href'));
+		// 	};
 
-			editor.on('NodeChange', editorEventCallback);
-			return () => editor.off('NodeChange', editorEventCallback);
-		};
+		// 	editor.on('NodeChange', editorEventCallback);
+		// 	return () => editor.off('NodeChange', editorEventCallback);
+		// };
 
 		editor.ui.registry.addButton('link', {
 			icon: 'link',
 			tooltip: 'Insert/edit link',
 			onAction: showDialog,
-			onSetup: editorEventSetupCallback,
 		});
 
 		editor.ui.registry.addButton('unlink', {
 			icon: 'unlink',
 			tooltip: 'Remove link',
 			onAction: () => editor.execCommand('unlink'),
-			onSetup: editorEventSetupCallback,
-		});
-
-		editor.ui.registry.addMenuItem('link', {
-			icon: 'link',
-			text: 'Insert link',
-			shortcut: 'Ctrl+K',
-			onAction: showDialog,
-			onSetup: editorEventSetupCallback,
-			//context: 'insert',
-			//prependToContext: true,
 		});
 	}
 

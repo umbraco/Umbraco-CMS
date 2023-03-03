@@ -126,7 +126,7 @@ export class TinyMceMacroPlugin {
 		// });
 	}
 
-	#insertMacroInEditor(macroObject: MacroSyntaxData, activeMacroElement?: HTMLElement) {
+	#insertInEditor(macroObject: MacroSyntaxData, activeMacroElement?: HTMLElement) {
 		//Important note: the TinyMce plugin "noneditable" is used here so that the macro cannot be edited,
 		// for this to work the mceNonEditable class needs to come last and we also need to use the attribute contenteditable = false
 		// (even though all the docs and examples say that is not necessary)
@@ -196,7 +196,7 @@ export class TinyMceMacroPlugin {
 		const { confirmed } = await modalHandler.onClose();
 		if (!confirmed) return;
 
-		this.#insertMacroInEditor({} as MacroSyntaxData, dialogData.activeMacroElement);
+		this.#insertInEditor({} as MacroSyntaxData, dialogData.activeMacroElement);
 		this.editor.dispatch('Change');
 	}
 }

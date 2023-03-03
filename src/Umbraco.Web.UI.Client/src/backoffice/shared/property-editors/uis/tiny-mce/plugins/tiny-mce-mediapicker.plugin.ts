@@ -102,12 +102,12 @@ export class TinyMceMediaPickerPlugin {
 		const { selection } = await modalHandler.onClose();
 		if (!selection.length) return;
 
-		this.#insertMediaInEditor(selection[0]);
+		this.#insertInEditor(selection[0]);
 		this.editor.dispatch('Change');
 	}
 
 	// TODO => mediaPicker returns a UDI, so need to fetch it. Wait for backend CLI before implementing
-	async #insertMediaInEditor(img: any) {
+	async #insertInEditor(img: any) {
 		if (!img) return;
 
 		// We need to create a NEW DOM <img> element to insert
