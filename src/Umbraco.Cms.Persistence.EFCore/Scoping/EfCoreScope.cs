@@ -266,7 +266,7 @@ internal class EfCoreScope : IEfCoreScope
         // Check if we are already in a transaction before starting one
         if (_umbracoEfCoreDatabase.UmbracoEFContext.Database.CurrentTransaction is null)
         {
-            Locks.EnsureDbLocks(InstanceId);
+            Locks.EnsureLocks(InstanceId);
             _umbracoEfCoreDatabase.UmbracoEFContext.Database.BeginTransaction();
         }
     }
