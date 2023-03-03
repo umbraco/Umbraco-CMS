@@ -210,9 +210,9 @@ export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
 	connectedCallback() {
 		super.connectedCallback();
 
-		this._configObject = Object.fromEntries(
-			(this.configuration ?? this.#fallbackConfig).map((x) => [x.alias, x.value])
-		);
+		this._configObject = this.configuration
+			? Object.fromEntries(this.configuration.map((x) => [x.alias, x.value]))
+			: this.#fallbackConfig;
 
 		// no auto resize when a fixed height is set
 		if (!this._configObject.dimensions?.height) {
