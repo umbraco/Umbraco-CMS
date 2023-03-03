@@ -174,8 +174,14 @@ export class UmbDonutChartElement extends LitElement {
 
 	protected willUpdate(_changedProperties: Map<PropertyKey, unknown>): void {
 		if (_changedProperties.has('radius') || _changedProperties.has('borderSize') || _changedProperties.has('svgSize')) {
+			if (this.borderSize > this.radius) {
+				throw new Error('Border size cannot be bigger than radius');
+			}
+
 			this.#printCircles();
 		}
+
+
 	}
 
 	#calculatePercentage(partialValue: number) {
