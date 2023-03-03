@@ -2,7 +2,7 @@
 using Umbraco.Cms.Core.DistributedLocking;
 using Umbraco.Extensions;
 
-namespace Umbraco.Cms.Persistence.EFCore.Services;
+namespace Umbraco.Cms.Core.Scoping;
 
 /// <summary>
 /// Mechanism for handling read and write locks

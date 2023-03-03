@@ -2,7 +2,6 @@
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Persistence.EFCore.Entities;
-using Umbraco.Cms.Persistence.EFCore.Services;
 
 namespace Umbraco.Cms.Persistence.EFCore.Scoping;
 
