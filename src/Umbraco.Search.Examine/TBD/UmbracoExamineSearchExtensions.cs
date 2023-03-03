@@ -2,11 +2,10 @@ using System.Text.RegularExpressions;
 using Examine;
 using Examine.Search;
 using Umbraco.Cms.Core.Search;
-using Umbraco.Cms.Infrastructure.Examine;
-using Umbraco.Search;
+using Umbraco.Extensions;
 using Umbraco.Search.Extensions;
 
-namespace Umbraco.Extensions;
+namespace Umbraco.Search.Examine.TBD;
 
 public static class UmbracoExamineSearchExtensions
 {

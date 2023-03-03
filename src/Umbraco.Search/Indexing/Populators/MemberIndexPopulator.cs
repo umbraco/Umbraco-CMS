@@ -13,7 +13,21 @@ public class MemberIndexPopulator : IndexPopulator
         _provider = provider;
         _memberService = memberService;
     }
+    public override bool IsRegistered(string index)
+    {
+        if (base.IsRegistered(index))
+        {
+            return true;
+        }
 
+        var indexer = _provider.GetIndex(index);
+        if (!(indexer is IUmbracoIndex<IMember> casted))
+        {
+            return false;
+        }
+
+        return true;
+    }
     protected override void PopulateIndexes(IReadOnlyList<string> indexes)
     {
         if (indexes.Count == 0)

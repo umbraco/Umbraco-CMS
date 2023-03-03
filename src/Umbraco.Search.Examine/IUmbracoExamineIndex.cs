@@ -1,6 +1,8 @@
-﻿namespace Umbraco.Search.Examine;
+﻿using Examine;
 
-public interface IUmbracoExamineIndex
+namespace Umbraco.Search.Examine;
+
+public interface IUmbracoExamineIndex : IIndex
 {
-
+    bool EnableDefaultEventHandler { get; set; }
 }

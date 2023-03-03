@@ -3,8 +3,8 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Infrastructure.Examine;
-using Umbraco.New.Cms.Infrastructure.Services;
 using Umbraco.Search;
+using Umbraco.Search.Services;
 
 namespace Umbraco.Cms.ManagementApi.Controllers.Indexer;
 
@@ -13,16 +13,13 @@ public class RebuildIndexerController : IndexerControllerBase
 {
     private readonly ILogger<RebuildIndexerController> _logger;
     private readonly IIndexingRebuilderService _indexingRebuilderService;
-    private readonly IExamineManager _examineManager;
 
     public RebuildIndexerController(
         ILogger<RebuildIndexerController> logger,
-        IIndexingRebuilderService indexingRebuilderService,
-        IExamineManager examineManager)
+        IIndexingRebuilderService indexingRebuilderService)
     {
         _logger = logger;
         _indexingRebuilderService = indexingRebuilderService;
-        _examineManager = examineManager;
     }
 
     /// <summary>

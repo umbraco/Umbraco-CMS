@@ -4,11 +4,9 @@ using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Models.Search;
 using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Search;
-using Umbraco.Cms.Infrastructure.Examine;
-using Umbraco.Search;
 using Umbraco.Search.Enums;
 
-namespace Umbraco.Extensions;
+namespace Umbraco.Search.Examine.TBD;
 
 /// <summary>
 ///     Extension methods for Examine.
@@ -24,7 +22,7 @@ public static class ExamineExtensions
         this UmbracoFieldDefinitionCollection collection)
     {
         return new FieldDefinitionCollection(collection
-            .Select(x => new Examine.FieldDefinition(x.Name, x.Type.ToExamineType())).ToArray());
+            .Select(x => new global::Examine.FieldDefinition(x.Name, x.Type.ToExamineType())).ToArray());
     }
 
     public static string ToExamineType(this UmbracoFieldType fieldType)
@@ -33,45 +31,32 @@ public static class ExamineExtensions
         {
             case UmbracoFieldType.Integer:
                 return FieldDefinitionTypes.Integer;
-                break;
             case UmbracoFieldType.Raw:
                 return FieldDefinitionTypes.Raw;
-                break;
             case UmbracoFieldType.DateTime:
                 return FieldDefinitionTypes.DateTime;
-                break;
             case UmbracoFieldType.EmailAddress:
                 return FieldDefinitionTypes.EmailAddress;
-                break;
             case UmbracoFieldType.InvariantCultureIgnoreCase:
                 return FieldDefinitionTypes.InvariantCultureIgnoreCase;
             case UmbracoFieldType.Double:
                 return FieldDefinitionTypes.Double;
-                break;
             case UmbracoFieldType.Float:
                 return FieldDefinitionTypes.Float;
-                break;
             case UmbracoFieldType.Long:
                 return FieldDefinitionTypes.Long;
-                break;
             case UmbracoFieldType.DateYear:
                 return FieldDefinitionTypes.DateYear;
-                break;
             case UmbracoFieldType.DateMonth:
                 return FieldDefinitionTypes.DateMonth;
-                break;
             case UmbracoFieldType.DateDay:
                 return FieldDefinitionTypes.DateDay;
-                break;
             case UmbracoFieldType.DateHour:
                 return FieldDefinitionTypes.DateDay;
-                break;
             case UmbracoFieldType.FullText :
                 return FieldDefinitionTypes.DateDay;
-                break;
             case UmbracoFieldType.FullTextSortable:
                 return FieldDefinitionTypes.DateDay;
-                break;
         }
 
         //if type unknown return RAW

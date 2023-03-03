@@ -6,20 +6,21 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Search.Examine;
+using Umbraco.Search.Examine.ValueSetBuilders;
 
 namespace Umbraco.Cms.Infrastructure.Examine;
 
 public class UmbracoExamineIndexDiagnostics : LuceneIndexDiagnostics
 {
-    private readonly UmbracoExamineIndex _index;
+    private readonly UmbracoExamineLuceneIndex _luceneIndex;
 
     public UmbracoExamineIndexDiagnostics(
-        UmbracoExamineIndex index,
+        UmbracoExamineLuceneIndex luceneIndex,
         ILogger<UmbracoExamineIndexDiagnostics> logger,
         IHostingEnvironment hostingEnvironment,
         IOptionsMonitor<LuceneDirectoryIndexOptions> indexOptions)
-        : base(index, logger, hostingEnvironment, indexOptions) =>
-        _index = index;
+        : base(luceneIndex, logger, hostingEnvironment, indexOptions) =>
+        _luceneIndex = luceneIndex;
 
     public override IReadOnlyDictionary<string, object?> Metadata
     {
@@ -27,10 +28,10 @@ public class UmbracoExamineIndexDiagnostics : LuceneIndexDiagnostics
         {
             var d = base.Metadata.ToDictionary(x => x.Key, x => x.Value);
 
-            d[nameof(UmbracoExamineIndex.EnableDefaultEventHandler)] = _index.EnableDefaultEventHandler;
-            d[nameof(UmbracoExamineIndex.PublishedValuesOnly)] = _index.PublishedValuesOnly;
+            d[nameof(UmbracoExamineLuceneIndex.EnableDefaultEventHandler)] = _luceneIndex.EnableDefaultEventHandler;
+            d[nameof(UmbracoExamineLuceneIndex.PublishedValuesOnly)] = _luceneIndex.PublishedValuesOnly;
 
-            if (_index.ValueSetValidator is ValueSetValidator vsv)
+            if (_luceneIndex.ValueSetValidator is ValueSetValidator vsv)
             {
                 d[nameof(ValueSetValidator.IncludeItemTypes)] = vsv.IncludeItemTypes;
                 d[nameof(ContentValueSetValidator.ExcludeItemTypes)] = vsv.ExcludeItemTypes;
@@ -38,7 +39,7 @@ public class UmbracoExamineIndexDiagnostics : LuceneIndexDiagnostics
                 d[nameof(ContentValueSetValidator.ExcludeFields)] = vsv.ExcludeFields;
             }
 
-            if (_index.ValueSetValidator is ContentValueSetValidator cvsv)
+            if (_luceneIndex.ValueSetValidator is ContentValueSetValidator cvsv)
             {
                 d[nameof(ContentValueSetValidator.PublishedValuesOnly)] = cvsv.PublishedValuesOnly;
                 d[nameof(ContentValueSetValidator.SupportProtectedContent)] = cvsv.SupportProtectedContent;

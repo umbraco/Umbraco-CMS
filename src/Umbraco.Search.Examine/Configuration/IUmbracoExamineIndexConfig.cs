@@ -2,7 +2,7 @@ using Examine;
 using Lucene.Net.Analysis;
 using Umbraco.Search.Examine.ValueSetBuilders;
 
-namespace Umbraco.Search.Examine;
+namespace Umbraco.Search.Examine.Configuration;
 
 public interface IUmbracoExamineIndexConfig
 {

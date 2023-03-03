@@ -1,3 +1,6 @@
+using Umbraco.Search.DependencyInjection;
+using Umbraco.Search.Examine.TBD;
+
 namespace Umbraco.Cms.Web.UI
 {
     public class Startup
@@ -30,6 +33,8 @@ namespace Umbraco.Cms.Web.UI
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddUmbraco(_env, _config)
+                .AddSearchServices()
+                .AddExamineSearchServices()
                 .AddBackOffice()
                 .AddWebsite()
                 .AddComposers()
@@ -52,7 +57,7 @@ namespace Umbraco.Cms.Web.UI
             app.UseHttpsRedirection();
 #endif
 
-            app.UseUmbraco(u)
+            app.UseUmbraco()
                 .WithMiddleware(u =>
                 {
                     u.UseBackOffice();

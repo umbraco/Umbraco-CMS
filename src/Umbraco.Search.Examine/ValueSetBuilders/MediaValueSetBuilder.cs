@@ -7,9 +7,8 @@ using Umbraco.Cms.Core.Search;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Extensions;
-using Umbraco.Search.Examine.ValueSetBuilders;
 
-namespace Umbraco.Cms.Infrastructure.Examine;
+namespace Umbraco.Search.Examine.ValueSetBuilders;
 
 public class MediaValueSetBuilder : BaseValueSetBuilder<IMedia>
 {

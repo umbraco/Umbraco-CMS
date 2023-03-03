@@ -9,6 +9,8 @@ using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Extensions;
 using Umbraco.Search;
 using Umbraco.Search.Examine;
+using Umbraco.Search.Examine.Configuration;
+using Umbraco.Search.Examine.TBD;
 
 namespace Umbraco.Cms.Infrastructure.Examine.DependencyInjection;
 

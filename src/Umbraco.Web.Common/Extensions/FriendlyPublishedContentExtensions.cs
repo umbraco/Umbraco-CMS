@@ -1,5 +1,4 @@
 using System.Data;
-using Examine;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core;
@@ -33,8 +32,7 @@ public static class FriendlyPublishedContentExtensions
     private static ISiteDomainMapper SiteDomainHelper { get; } =
         StaticServiceProvider.Instance.GetRequiredService<ISiteDomainMapper>();
 
-    private static IExamineManager ExamineManager { get; } =
-        StaticServiceProvider.Instance.GetRequiredService<IExamineManager>();
+
 
     private static IFileService FileService { get; } =
         StaticServiceProvider.Instance.GetRequiredService<IFileService>();
@@ -591,15 +589,5 @@ public static class FriendlyPublishedContentExtensions
         Uri? current = null)
         => content.GetCultureFromDomains(UmbracoContextAccessor, SiteDomainHelper, current);
 
-    public static IEnumerable<PublishedSearchResult> SearchDescendants(
-        this IPublishedContent content,
-        string term,
-        string? indexName = null)
-        => content.SearchDescendants(ExamineManager, UmbracoContextAccessor, term, indexName);
 
-    public static IEnumerable<PublishedSearchResult> SearchChildren(
-        this IPublishedContent content,
-        string term,
-        string? indexName = null)
-        => content.SearchChildren(ExamineManager, UmbracoContextAccessor, term, indexName);
 }

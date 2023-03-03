@@ -1,4 +1,4 @@
-﻿namespace Umbraco.New.Cms.Infrastructure.Services;
+﻿namespace Umbraco.Search.Services;
 
 public interface IIndexingRebuilderService
 {

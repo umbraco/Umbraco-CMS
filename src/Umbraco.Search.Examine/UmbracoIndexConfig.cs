@@ -1,9 +1,9 @@
 using Examine;
 using Examine.Lucene.Analyzers;
 using Lucene.Net.Analysis;
-using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Cms.Infrastructure.Examine;
+using Umbraco.Cms.Infrastructure.Scoping;
+using Umbraco.Search.Examine.Configuration;
 using Umbraco.Search.Examine.ValueSetBuilders;
 
 namespace Umbraco.Search.Examine;

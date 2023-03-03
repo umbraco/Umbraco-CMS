@@ -1,9 +1,9 @@
 ﻿using Umbraco.Cms.Core;
 using Umbraco.Cms.Infrastructure.Examine;
 using Umbraco.Cms.ManagementApi.ViewModels.Search;
-using Umbraco.New.Cms.Infrastructure.Services;
 using Umbraco.Search.Diagnostics;
 using Umbraco.Search.Indexing;
+using Umbraco.Search.Services;
 
 namespace Umbraco.Cms.ManagementApi.Factories;
 

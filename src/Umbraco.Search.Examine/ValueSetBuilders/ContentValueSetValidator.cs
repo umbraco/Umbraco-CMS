@@ -1,14 +1,12 @@
 using System.Globalization;
 using Examine;
 using Umbraco.Cms.Core;
-using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Search;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Extensions;
-using Umbraco.Search.Examine;
-using Umbraco.Search.Examine.ValueSetBuilders;
 
-namespace Umbraco.Cms.Infrastructure.Examine;
+namespace Umbraco.Search.Examine.ValueSetBuilders;
 
 /// <summary>
 ///     Used to validate a ValueSet for content/media - based on permissions, parent id, etc....

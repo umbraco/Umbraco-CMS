@@ -3,11 +3,11 @@ using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Infrastructure.Examine;
 using Umbraco.Cms.ManagementApi.Factories;
 using Umbraco.Cms.ManagementApi.Services;
-using Umbraco.New.Cms.Infrastructure.Services;
 using Umbraco.Search;
 using Umbraco.Search.Diagnostics;
 using Umbraco.Search.Examine;
 using Umbraco.Search.Indexing;
+using Umbraco.Search.Services;
 
 namespace Umbraco.Cms.ManagementApi.DependencyInjection;
 

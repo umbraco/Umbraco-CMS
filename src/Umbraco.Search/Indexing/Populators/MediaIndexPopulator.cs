@@ -21,7 +21,21 @@ public class MediaIndexPopulator : IndexPopulator
         : this(logger, null, mediaService, provider)
     {
     }
+    public override bool IsRegistered(string index)
+    {
+        if (base.IsRegistered(index))
+        {
+            return true;
+        }
 
+        var indexer = _provider.GetIndex(index);
+        if (!(indexer is IUmbracoIndex<IContent> casted))
+        {
+            return false;
+        }
+
+        return true;
+    }
     /// <summary>
     ///     Optional constructor allowing specifying custom query parameters
     /// </summary>

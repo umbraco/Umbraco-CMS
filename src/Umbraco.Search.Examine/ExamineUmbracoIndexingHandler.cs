@@ -9,6 +9,7 @@ using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Infrastructure;
 using Umbraco.Cms.Infrastructure.HostedServices;
 using Umbraco.Extensions;
+using Umbraco.Search.Examine.Configuration;
 using Umbraco.Search.Examine.ValueSetBuilders;
 using Umbraco.Search.NotificationHandlers;
 
@@ -200,7 +201,7 @@ internal class ExamineUmbracoIndexingHandler : IUmbracoIndexingHandler
         _logger.LogDebug("Examine shutdown registered with MainDom");
 
         var registeredIndexers =
-            _examineManager.Indexes.OfType<IUmbracoIndex>().Count(x => x.EnableDefaultEventHandler);
+            _examineManager.Indexes.OfType<IUmbracoExamineIndex>().Count(x => x.EnableDefaultEventHandler);
 
         _logger.LogInformation("Adding examine event handlers for {RegisteredIndexers} index providers.",
             registeredIndexers);

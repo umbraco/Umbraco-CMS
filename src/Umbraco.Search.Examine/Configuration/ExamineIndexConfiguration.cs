@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Search.Examine;
+﻿namespace Umbraco.Search.Examine.Configuration;
 
 public class ExamineIndexConfiguration : IExamineIndexConfiguration
 {
@@ -17,9 +17,4 @@ public class ExamineIndexConfiguration : IExamineIndexConfiguration
     {
         return configurationObjects[name];
     }
-}
-
-public interface IExamineIndexConfiguration
-{
-    IUmbracoExamineIndexConfig Configuration(string name);
 }
