@@ -262,77 +262,80 @@ public class LockingMechanism : ILockingMechanism
     {
         lock (_lockQueueLocker)
         {
-            if (_queuedLocks?.Count > 0)
+            if (!(_queuedLocks?.Count > 0))
             {
-                DistributedLockType currentType = DistributedLockType.ReadLock;
-                TimeSpan currentTimeout = TimeSpan.Zero;
-                Guid currentInstanceId = scopeInstanceId;
-                var collectedIds = new HashSet<int>();
+                return;
+            }
 
-                var i = 0;
-                while (_queuedLocks.Count > 0)
+            DistributedLockType currentType = DistributedLockType.ReadLock;
+            TimeSpan currentTimeout = TimeSpan.Zero;
+            Guid currentInstanceId = scopeInstanceId;
+            var collectedIds = new HashSet<int>();
+
+            var i = 0;
+            while (_queuedLocks.Count > 0)
+            {
+                (DistributedLockType lockType, TimeSpan timeout, Guid instanceId, var lockId) =
+                    _queuedLocks.Dequeue();
+
+                if (i == 0)
                 {
-                    (DistributedLockType lockType, TimeSpan timeout, Guid instanceId, var lockId) =
-                        _queuedLocks.Dequeue();
-
-                    if (i == 0)
+                    currentType = lockType;
+                    currentTimeout = timeout;
+                    currentInstanceId = instanceId;
+                }
+                else if (lockType != currentType || timeout != currentTimeout ||
+                         instanceId != currentInstanceId)
+                {
+                    // the lock type, instanceId or timeout switched.
+                    // process the lock ids collected
+                    switch (currentType)
                     {
-                        currentType = lockType;
-                        currentTimeout = timeout;
-                        currentInstanceId = instanceId;
-                    }
-                    else if (lockType != currentType || timeout != currentTimeout ||
-                             instanceId != currentInstanceId)
-                    {
-                        // the lock type, instanceId or timeout switched.
-                        // process the lock ids collected
-                        switch (currentType)
-                        {
-                            case DistributedLockType.ReadLock:
-                                EagerReadLockInner(
-                                    currentInstanceId,
-                                    currentTimeout == TimeSpan.Zero ? null : currentTimeout,
-                                    collectedIds.ToArray());
-                                break;
-                            case DistributedLockType.WriteLock:
-                                EagerWriteLockInner(
-                                    currentInstanceId,
-                                    currentTimeout == TimeSpan.Zero ? null : currentTimeout,
-                                    collectedIds.ToArray());
-                                break;
-                        }
-
-                        // clear the collected and set new type
-                        collectedIds.Clear();
-                        currentType = lockType;
-                        currentTimeout = timeout;
-                        currentInstanceId = instanceId;
+                        case DistributedLockType.ReadLock:
+                            EagerReadLockInner(
+                                currentInstanceId,
+                                currentTimeout == TimeSpan.Zero ? null : currentTimeout,
+                                collectedIds.ToArray());
+                            break;
+                        case DistributedLockType.WriteLock:
+                            EagerWriteLockInner(
+                                currentInstanceId,
+                                currentTimeout == TimeSpan.Zero ? null : currentTimeout,
+                                collectedIds.ToArray());
+                            break;
                     }
 
-                    collectedIds.Add(lockId);
-                    i++;
+                    // clear the collected and set new type
+                    collectedIds.Clear();
+                    currentType = lockType;
+                    currentTimeout = timeout;
+                    currentInstanceId = instanceId;
                 }
 
-                // process the remaining
-                switch (currentType)
-                {
-                    case DistributedLockType.ReadLock:
-                        EagerReadLockInner(
-                            currentInstanceId,
-                            currentTimeout == TimeSpan.Zero ? null : currentTimeout,
-                            collectedIds.ToArray());
-                        break;
-                    case DistributedLockType.WriteLock:
-                        EagerWriteLockInner(
-                            currentInstanceId,
-                            currentTimeout == TimeSpan.Zero ? null : currentTimeout,
-                            collectedIds.ToArray());
-                        break;
-                }
+                collectedIds.Add(lockId);
+                i++;
+            }
+
+            // process the remaining
+            switch (currentType)
+            {
+                case DistributedLockType.ReadLock:
+                    EagerReadLockInner(
+                        currentInstanceId,
+                        currentTimeout == TimeSpan.Zero ? null : currentTimeout,
+                        collectedIds.ToArray());
+                    break;
+                case DistributedLockType.WriteLock:
+                    EagerWriteLockInner(
+                        currentInstanceId,
+                        currentTimeout == TimeSpan.Zero ? null : currentTimeout,
+                        collectedIds.ToArray());
+                    break;
             }
         }
     }
 
+    /// <inheritdoc />
     public void Dispose()
     {
         while (!_acquiredLocks?.IsCollectionEmpty() ?? false)
