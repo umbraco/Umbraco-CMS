@@ -2,11 +2,11 @@ import { Editor } from 'tinymce';
 import { UmbModalContext } from '@umbraco-cms/modal';
 
 export class TinyMceCodeEditorPlugin {
-	#modalService: UmbModalContext;
+	#modalContext: UmbModalContext;
 	editor: Editor;
 
-	constructor(editor: Editor, modalService: UmbModalContext) {
-		this.#modalService = modalService;
+	constructor(editor: Editor, modalContext: UmbModalContext) {
+		this.#modalContext = modalContext;
 		this.editor = editor;
 
 		editor.ui.registry.addButton('ace', {
@@ -17,7 +17,7 @@ export class TinyMceCodeEditorPlugin {
 	}
 
 	async #showCodeEditor() {
-		const modalHandler = this.#modalService?.codeEditor({
+		const modalHandler = this.#modalContext?.codeEditor({
 			headline: 'Edit source code',
 			content: this.editor.getContent(),
 		});
