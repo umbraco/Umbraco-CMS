@@ -60,8 +60,6 @@ function findAndCopyTypesForLib(libName) {
 
 function wrapLibTypeContent(libName) {
 	return `
-	import * as lib from './types';
-	declare module "@umbraco-cms/${libName}" {
-		export = lib;
-	}`;
+	declare module "@umbraco-cms/${libName}";
+	`;
 }
