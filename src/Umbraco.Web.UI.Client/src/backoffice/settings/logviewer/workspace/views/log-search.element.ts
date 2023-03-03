@@ -148,24 +148,6 @@ export class UmbLogViewerSearchViewElement extends UmbLitElement {
 				content: ', ';
 			}
 
-			#polling-interval-menu {
-				margin: 0;
-				padding: 0;
-				width: 20ch;
-				background-color: var(--uui-color-surface);
-				box-shadow: var(--uui-shadow-depth-3);
-				display: flex;
-				flex-direction: column;
-				transform: translateX(calc((100% - 33px) * -1));
-			}
-
-			#polling-enabled-icon {
-				margin-right: var(--uui-size-space-3);
-				margin-bottom: 1px;
-				-webkit-animation: rotate-center 0.8s ease-in-out infinite both;
-				animation: rotate-center 0.8s ease-in-out infinite both;
-			}
-
 			#empty {
 				display: flex;
 				justify-content: center;
@@ -175,27 +157,6 @@ export class UmbLogViewerSearchViewElement extends UmbLitElement {
 
 			#pagination {
 				margin: var(--uui-size-space-5, 18px) 0;
-			}
-
-			@-webkit-keyframes rotate-center {
-				0% {
-					-webkit-transform: rotate(0);
-					transform: rotate(0);
-				}
-				100% {
-					-webkit-transform: rotate(360deg);
-					transform: rotate(360deg);
-				}
-			}
-			@keyframes rotate-center {
-				0% {
-					-webkit-transform: rotate(0);
-					transform: rotate(0);
-				}
-				100% {
-					-webkit-transform: rotate(360deg);
-					transform: rotate(360deg);
-				}
 			}
 		`,
 	];
@@ -423,50 +384,8 @@ export class UmbLogViewerSearchViewElement extends UmbLitElement {
 		`;
 	}
 
-	#togglePolling() {
-		this.#logViewerContext?.togglePolling();
-	}
-
-	#setPolingInterval(interval: PoolingInterval) {
-		this.#logViewerContext?.setPollingInterval(interval);
-		this.#closePoolingPopover();
-	}
-
-	#openPoolingPopover() {
-		this._pollingPopover.open = true;
-		this._polingExpandSymbol.open = true;
-	}
-
-	#closePoolingPopover() {
-		this._pollingPopover.open = false;
-		this._polingExpandSymbol.open = false;
-	}
-
-	#pollingIntervals: PoolingInterval[] = [2000, 5000, 10000, 20000, 30000];
-
 	#renderPolingTimeSelector() {
-		return html` <uui-button-group>
-			<uui-button label="Start pooling" @click=${this.#togglePolling}
-				>${this._poolingConfig.enabled
-					? html`<uui-icon name="umb:axis-rotation" id="polling-enabled-icon"></uui-icon>Polling
-							${this._poolingConfig.interval / 1000} seconds`
-					: 'Pooling'}</uui-button
-			>
-			<uui-popover placement="bottom-end" id="polling-popover" @close=${() => (this._polingExpandSymbol.open = false)}>
-				<uui-button slot="trigger" compact label="Choose pooling time" @click=${this.#openPoolingPopover}>
-					<uui-symbol-expand id="polling-expand-symbol"></uui-symbol-expand>
-				</uui-button>
-
-				<ul id="polling-interval-menu" slot="popover">
-					${this.#pollingIntervals.map(
-						(interval: PoolingInterval) =>
-							html`<uui-menu-item
-								label="Every ${interval / 1000} seconds"
-								@click-label=${() => this.#setPolingInterval(interval)}></uui-menu-item>`
-					)}
-				</ul>
-			</uui-popover>
-		</uui-button-group>`;
+		return html` <umb-log-viewer-polling-button> </umb-log-viewer-polling-button>`;
 	}
 
 	#sortLogs() {

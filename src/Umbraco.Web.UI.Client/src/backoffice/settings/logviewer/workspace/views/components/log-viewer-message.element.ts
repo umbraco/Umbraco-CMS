@@ -1,6 +1,6 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css';
-import { css, html } from 'lit';
-import { customElement, property, state } from 'lit/decorators.js';
+import { css, html, PropertyValueMap } from 'lit';
+import { customElement, property, query, state } from 'lit/decorators.js';
 import { UmbLogViewerWorkspaceContext, UMB_APP_LOG_VIEWER_CONTEXT_TOKEN } from '../../logviewer.context';
 import { LogLevelModel, LogMessagePropertyModel } from '@umbraco-cms/backend-api';
 import { UmbLitElement } from '@umbraco-cms/element';
@@ -113,6 +113,9 @@ export class UmbLogViewerMessageElement extends UmbLitElement {
 		`,
 	];
 
+	@query('details')
+	details!: HTMLDetailsElement;
+
 	@property()
 	timestamp = '';
 
@@ -131,12 +134,21 @@ export class UmbLogViewerMessageElement extends UmbLitElement {
 	@property({ attribute: false })
 	properties: Array<LogMessagePropertyModel> = [];
 
+	@property({ type: Boolean })
+	open = false;
+
 	@property()
 	exception = '';
 
 	willUpdate(changedProperties: Map<string | number | symbol, unknown>) {
 		if (changedProperties.has('timestamp')) {
 			this.date = new Date(this.timestamp);
+		}
+	}
+
+	protected updated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
+		if (_changedProperties.has('open')) {
+			this.open ? this.details.setAttribute('open', 'true') : this.details.removeAttribute('open');
 		}
 	}
 
@@ -208,12 +220,18 @@ export class UmbLogViewerMessageElement extends UmbLitElement {
 		}
 
 		this.#logViewerContext?.setFilterExpression(queryString);
+		this.#logViewerContext?.setCurrentPage(1);
+		this.details.removeAttribute('open');
 		this.#logViewerContext?.getLogs();
+	}
+
+	#setOpen(event: Event) {
+		this.open = (event.target as HTMLDetailsElement).open;
 	}
 
 	render() {
 		return html`
-			<details>
+			<details @open=${this.#setOpen}>
 				<summary>
 					<div id="timestamp">${this.date?.toLocaleString()}</div>
 					<div id="level">
@@ -241,7 +259,9 @@ export class UmbLogViewerMessageElement extends UmbLitElement {
 									${this._propertiesWithSearchMenu.includes(property.name ?? '')
 										? html`<uui-button
 												compact
-												@click=${() => this._findLogsWithProperty(property)}
+												@click=${() => {
+													this._findLogsWithProperty(property);
+												}}
 												look="secondary"
 												label="Find logs with ${property.name}"
 												title="Find logs with ${property.name}"

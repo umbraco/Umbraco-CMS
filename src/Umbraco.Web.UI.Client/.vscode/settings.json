@@ -1,4 +1,5 @@
 {
 	"cssVariables.lookupFiles": ["node_modules/@umbraco-ui/uui-css/dist/custom-properties.css"],
-	"cSpell.words": ["combobox", "variantable"]
+	"cSpell.words": ["combobox", "variantable"],
+	"exportall.config.folderListener": ["/src/backoffice/settings/logviewer/workspace/views/components"]
 }
