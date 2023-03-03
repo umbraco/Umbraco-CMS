@@ -65,9 +65,9 @@ export class UmbLogViewerPollingButtonElement extends UmbLitElement {
 	@state()
 	private _poolingConfig: PoolingCOnfig = { enabled: false, interval: 0 };
 
-	#logViewerContext?: UmbLogViewerWorkspaceContext;
-
 	#pollingIntervals: PoolingInterval[] = [2000, 5000, 10000, 20000, 30000];
+
+	#logViewerContext?: UmbLogViewerWorkspaceContext;
 
 	constructor() {
 		super();

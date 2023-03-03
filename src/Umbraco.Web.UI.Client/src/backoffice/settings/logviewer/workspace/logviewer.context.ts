@@ -73,8 +73,8 @@ export class UmbLogViewerWorkspaceContext {
 	#messageTemplates = new DeepState<PagedLogTemplateModel | null>(null);
 	messageTemplates = createObservablePart(this.#messageTemplates, (data) => data);
 
-	#logLevel = new ArrayState<LogLevelModel>([]);
-	logLevel = createObservablePart(this.#logLevel, (data) => data);
+	#logLevelsFilter = new ArrayState<LogLevelModel>([]);
+	logLevelsFilter = createObservablePart(this.#logLevelsFilter, (data) => data);
 
 	#logs = new DeepState<PagedLogMessageModel | null>(null);
 	logs = createObservablePart(this.#logs, (data) => data?.items);
@@ -187,7 +187,7 @@ export class UmbLogViewerWorkspaceContext {
 			take,
 			orderDirection: this.#sortingDirection.getValue(),
 			filterExpression: this.#filterExpression.getValue(),
-			logLevel: this.#logLevel.getValue(),
+			logLevel: this.#logLevelsFilter.getValue(),
 			...this.#dateRange.getValue(),
 		};
 
@@ -202,12 +202,11 @@ export class UmbLogViewerWorkspaceContext {
 		this.#filterExpression.next(query);
 	}
 
-	setLogLevels(logLevels: LogLevelModel[]) {
-		this.#logLevel.next(logLevels);
+	setLogLevelsFilter(logLevels: LogLevelModel[]) {
+		this.#logLevelsFilter.next(logLevels);
 	}
 
 	togglePolling() {
-
 		const isEnabled = !this.#polling.getValue().enabled;
 		this.#polling.update({
 			enabled: isEnabled,

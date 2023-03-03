@@ -1,24 +1,20 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, html } from 'lit';
-import { customElement, state, query, queryAll } from 'lit/decorators.js';
+import { customElement, state, query } from 'lit/decorators.js';
 import {
-	LogViewerDateRange,
-	PoolingCOnfig,
-	PoolingInterval,
-	UmbLogViewerWorkspaceContext,
-	UMB_APP_LOG_VIEWER_CONTEXT_TOKEN,
-} from '../logviewer.context';
-import { UmbLitElement } from '@umbraco-cms/element';
-import { DirectionModel, LogLevelModel, LogMessageModel, SavedLogSearchModel } from '@umbraco-cms/backend-api';
-import {
-	UUICheckboxElement,
 	UUIInputElement,
 	UUIPaginationElement,
 	UUIPopoverElement,
 	UUIScrollContainerElement,
 	UUISymbolExpandElement,
 } from '@umbraco-ui/uui';
-import _ from 'lodash';
+import {
+	LogViewerDateRange,
+	UmbLogViewerWorkspaceContext,
+	UMB_APP_LOG_VIEWER_CONTEXT_TOKEN,
+} from '../logviewer.context';
+import { DirectionModel, LogMessageModel, SavedLogSearchModel } from '@umbraco-cms/backend-api';
+import { UmbLitElement } from '@umbraco-cms/element';
 
 @customElement('umb-log-viewer-search-view')
 export class UmbLogViewerSearchViewElement extends UmbLitElement {
@@ -130,24 +126,6 @@ export class UmbLogViewerSearchViewElement extends UmbLitElement {
 				flex: 6 0 14ch;
 			}
 
-			#log-level-selector {
-				padding: var(--uui-box-default-padding, var(--uui-size-space-5, 18px));
-				width: 150px;
-				background-color: var(--uui-color-surface);
-				box-shadow: var(--uui-shadow-depth-3);
-				display: flex;
-				flex-direction: column;
-				gap: var(--uui-size-space-3);
-			}
-
-			.log-level-button-indicator {
-				font-weight: 600;
-			}
-
-			.log-level-button-indicator:not(:last-of-type)::after {
-				content: ', ';
-			}
-
 			#empty {
 				display: flex;
 				justify-content: center;
@@ -164,20 +142,11 @@ export class UmbLogViewerSearchViewElement extends UmbLitElement {
 	@query('#saved-searches-popover')
 	private _savedSearchesPopover!: UUIPopoverElement;
 
-	@query('#polling-popover')
-	private _pollingPopover!: UUIPopoverElement;
-
-	@query('#polling-expand-symbol')
-	private _polingExpandSymbol!: UUISymbolExpandElement;
-
 	@query('#saved-search-expand-symbol')
 	private _savedSearchesExpandSymbol!: UUISymbolExpandElement;
 
 	@query('#logs-scroll-container')
 	private _logsScrollContainer!: UUIScrollContainerElement;
-
-	@queryAll('#log-level-selector > uui-checkbox')
-	private _logLevelSelectorCheckboxes!: NodeListOf<UUICheckboxElement>;
 
 	@state()
 	private _savedSearches: SavedLogSearchModel[] = [];
@@ -200,11 +169,6 @@ export class UmbLogViewerSearchViewElement extends UmbLitElement {
 	@state()
 	private _logsTotal = 0;
 
-	@state()
-	private _logLevel: LogLevelModel[] = [];
-
-	@state()
-	private _poolingConfig: PoolingCOnfig = { enabled: false, interval: 0 };
 
 	#logViewerContext?: UmbLogViewerWorkspaceContext;
 
@@ -238,14 +202,6 @@ export class UmbLogViewerSearchViewElement extends UmbLitElement {
 
 		this.observe(this.#logViewerContext.logsTotal, (total) => {
 			this._logsTotal = total ?? 0;
-		});
-
-		this.observe(this.#logViewerContext.logLevel, (levels) => {
-			this._logLevel = levels ?? [];
-		});
-
-		this.observe(this.#logViewerContext.polling, (poolingConfig) => {
-			this._poolingConfig = { ...poolingConfig };
 		});
 
 		this.observe(this.#logViewerContext.sortingDirection, (direction) => {
@@ -342,47 +298,6 @@ export class UmbLogViewerSearchViewElement extends UmbLitElement {
 			<uui-button look="primary" @click=${this.#search} label="Search">Search</uui-button>`;
 	}
 
-	#setLogLevel() {
-		if (!this.#logViewerContext) return;
-		this.#logViewerContext?.setCurrentPage(1);
-
-		const logLevels = Array.from(this._logLevelSelectorCheckboxes)
-			.filter((checkbox) => checkbox.checked)
-			.map((checkbox) => checkbox.value as LogLevelModel);
-		this.#logViewerContext?.setLogLevels(logLevels);
-		this.#logViewerContext.getLogs();
-	}
-
-	setLogLevelDebounce = _.debounce(this.#setLogLevel, 300);
-
-	#selectAllLogLevels() {
-		this._logLevelSelectorCheckboxes.forEach((checkbox) => (checkbox.checked = true));
-		this.#setLogLevel();
-	}
-
-	#deselectAllLogLevels() {
-		this._logLevelSelectorCheckboxes.forEach((checkbox) => (checkbox.checked = false));
-		this.#setLogLevel();
-	}
-
-	#renderLogLevelSelector() {
-		return html`
-			<div slot="dropdown" id="log-level-selector" @change=${this.setLogLevelDebounce}>
-				${Object.values(LogLevelModel).map(
-					(logLevel) =>
-						html`<uui-checkbox class="log-level-menu-item" .value=${logLevel} label="${logLevel}"
-							><umb-log-viewer-level-tag .level=${logLevel}></umb-log-viewer-level-tag
-						></uui-checkbox>`
-				)}
-				<uui-button class="log-level-menu-item" @click=${this.#selectAllLogLevels} label="Select all"
-					>Select all</uui-button
-				>
-				<uui-button class="log-level-menu-item" @click=${this.#deselectAllLogLevels} label="Deselect all"
-					>Deselect all</uui-button
-				>
-			</div>
-		`;
-	}
 
 	#renderPolingTimeSelector() {
 		return html` <umb-log-viewer-polling-button> </umb-log-viewer-polling-button>`;
@@ -398,13 +313,7 @@ export class UmbLogViewerSearchViewElement extends UmbLitElement {
 		return html`
 			<div id="layout">
 				<div id="levels-container">
-					<umb-button-with-dropdown label="Select log levels"
-						>Log Level:
-						${this._logLevel.length > 0
-							? this._logLevel.map((level) => html`<span class="log-level-button-indicator">${level}</span>`)
-							: 'All'}
-						${this.#renderLogLevelSelector()}
-					</umb-button-with-dropdown>
+					<umb-log-viewer-log-level-filter-menu></umb-log-viewer-log-level-filter-menu>
 					${this.#renderPolingTimeSelector()}
 				</div>
 				<div id="input-container">${this.#renderSearchInput()}</div>
