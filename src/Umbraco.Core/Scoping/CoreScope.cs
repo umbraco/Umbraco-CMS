@@ -15,7 +15,7 @@ public class CoreScope : ICoreScope
     private readonly bool? _shouldScopeFileSystems;
     private readonly IEventAggregator _eventAggregator;
 
-    private bool? _completed;
+    protected bool? _completed;
     private bool _disposed;
 
     public CoreScope(
@@ -33,10 +33,41 @@ public class CoreScope : ICoreScope
             : ResolveLockingMechanism();
         _repositoryCacheMode = repositoryCacheMode;
         _shouldScopeFileSystems = shouldScopeFileSystems;
+
         if (_shouldScopeFileSystems is true)
         {
+            // // cannot specify a different fs scope!
+            // // can be 'true' only on outer scope (and false does not make much sense)
+            // if (_shouldScopeFileSystems != null && ParentScope?._shouldScopeFileSystems != _shouldScopeFileSystems)
+            // {
+            //     throw new ArgumentException(
+            //         $"Value '{_shouldScopeFileSystems.Value}' be different from parent value '{ParentScope?._shouldScopeFileSystems}'.",
+            //         nameof(_shouldScopeFileSystems));
+            // }
+
             _scopedFileSystem = scopedFileSystem.Shadow();
         }
+    }
+
+    public CoreScope(
+        CoreScope parentScope,
+        IDistributedLockingMechanismFactory distributedLockingMechanismFactory,
+        FileSystems scopedFileSystem,
+        IEventAggregator eventAggregator,
+        RepositoryCacheMode repositoryCacheMode = RepositoryCacheMode.Unspecified,
+        bool? shouldScopeFileSystems = null)
+    : this(distributedLockingMechanismFactory, scopedFileSystem, eventAggregator, repositoryCacheMode, shouldScopeFileSystems)
+    {
+        // cannot specify a different fs scope!
+        // can be 'true' only on outer scope (and false does not make much sense)
+        if (_shouldScopeFileSystems != null && ParentScope?._shouldScopeFileSystems != _shouldScopeFileSystems)
+        {
+            throw new ArgumentException(
+                $"Value '{_shouldScopeFileSystems.Value}' be different from parent value '{ParentScope?._shouldScopeFileSystems}'.",
+                nameof(_shouldScopeFileSystems));
+        }
+
+        ParentScope = parentScope;
     }
 
     private CoreScope? ParentScope { get; }
@@ -100,6 +131,19 @@ public class CoreScope : ICoreScope
         }
     }
 
+    public bool ScopedFileSystems
+    {
+        get
+        {
+            if (ParentScope != null)
+            {
+                return ParentScope.ScopedFileSystems;
+            }
+
+            return _scopedFileSystem != null;
+        }
+    }
+
     /// <summary>
     /// Completes a scope
     /// </summary>
@@ -130,11 +174,12 @@ public class CoreScope : ICoreScope
 
     public void EagerReadLock(params int[] lockIds) => Locks.EagerReadLock(InstanceId, lockIds);
 
-    public void Dispose()
+    public virtual void Dispose()
     {
         if (ParentScope is null)
         {
             HandleScopedFileSystems();
+            HandleScopedNotifications();
         }
         else
         {
@@ -169,6 +214,8 @@ public class CoreScope : ICoreScope
             _scopedFileSystem = null;
         }
     }
+
+    private void HandleScopedNotifications() => _notificationPublisher?.ScopeExit(_completed.HasValue && _completed.Value);
 
     private void EnsureNotDisposed()
     {

@@ -1,6 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore.Storage;
-using Umbraco.Cms.Core;
-using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.DistributedLocking;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.IO;
@@ -9,20 +7,12 @@ using Umbraco.Cms.Persistence.EFCore.Entities;
 
 namespace Umbraco.Cms.Persistence.EFCore.Scoping;
 
-internal class EfCoreScope : IEfCoreScope
+internal class EfCoreScope : CoreScope, IEfCoreScope
 {
     private readonly IUmbracoEfCoreDatabaseFactory _efCoreDatabaseFactory;
     private readonly IEFCoreScopeAccessor _efCoreScopeAccessor;
     private readonly EfCoreScopeProvider _efCoreScopeProvider;
-    private readonly IEventAggregator _eventAggregator;
-    private readonly RepositoryCacheMode _repositoryCacheMode;
-    private readonly bool? _scopeFileSystems;
-
-    private ICompletable? _scopedFileSystem;
-    private IsolatedCaches? _isolatedCaches;
     private IUmbracoEfCoreDatabase? _umbracoEfCoreDatabase;
-    private IScopedNotificationPublisher? _notificationPublisher;
-    private bool? _completed;
     private bool _disposed;
 
     public EfCoreScope(
@@ -35,141 +25,37 @@ internal class EfCoreScope : IEfCoreScope
         IEventAggregator eventAggregator,
         RepositoryCacheMode repositoryCacheMode = RepositoryCacheMode.Unspecified,
         bool? scopeFileSystems = null)
+        : base(distributedLockingMechanismFactory, scopedFileSystem, eventAggregator, repositoryCacheMode, scopeFileSystems)
     {
         _efCoreDatabaseFactory = efCoreDatabaseFactory;
         _efCoreScopeAccessor = efCoreScopeAccessor;
-        _eventAggregator = eventAggregator;
-        _repositoryCacheMode = repositoryCacheMode;
-        _scopeFileSystems = scopeFileSystems;
         _efCoreScopeProvider = (EfCoreScopeProvider)efCoreScopeProvider;
-        InstanceId = Guid.NewGuid();
-        Locks = ParentScope is null
-            ? new LockingMechanism(distributedLockingMechanismFactory)
-            : ResolveLockingMechanism();
         ScopeContext = scopeContext;
-
-        if (scopeFileSystems is true)
-        {
-            _scopedFileSystem = scopedFileSystem.Shadow();
-        }
     }
 
     public EfCoreScope(
+        EfCoreScope parentScope,
         IDistributedLockingMechanismFactory distributedLockingMechanismFactory,
         IUmbracoEfCoreDatabaseFactory efCoreDatabaseFactory,
         IEFCoreScopeAccessor efCoreScopeAccessor,
         FileSystems scopedFileSystem,
         IEfCoreScopeProvider efCoreScopeProvider,
-        EfCoreScope parentScope,
         IScopeContext? scopeContext,
         IEventAggregator eventAggregator,
         RepositoryCacheMode repositoryCacheMode = RepositoryCacheMode.Unspecified,
         bool? scopeFileSystems = null)
-        : this(
-            distributedLockingMechanismFactory,
-            efCoreDatabaseFactory,
-            efCoreScopeAccessor,
-            scopedFileSystem,
-            efCoreScopeProvider,
-            scopeContext,
-            eventAggregator,
-            repositoryCacheMode,
-            scopeFileSystems)
+        : base(parentScope, distributedLockingMechanismFactory, scopedFileSystem, eventAggregator, repositoryCacheMode, scopeFileSystems)
     {
-        // cannot specify a different fs scope!
-        // can be 'true' only on outer scope (and false does not make much sense)
-        if (scopeFileSystems != null && ParentScope?._scopeFileSystems != _scopeFileSystems)
-        {
-            throw new ArgumentException(
-                $"Value '{scopeFileSystems.Value}' be different from parent value '{ParentScope?._scopeFileSystems}'.",
-                nameof(scopeFileSystems));
-        }
-
+        _efCoreDatabaseFactory = efCoreDatabaseFactory;
+        _efCoreScopeAccessor = efCoreScopeAccessor;
+        _efCoreScopeProvider = (EfCoreScopeProvider)efCoreScopeProvider;
+        ScopeContext = scopeContext;
         ParentScope = parentScope;
     }
-
-
-    public Guid InstanceId { get; }
 
     public EfCoreScope? ParentScope { get; }
 
     public IScopeContext? ScopeContext { get; set; }
-
-    public ILockingMechanism Locks { get; }
-
-    public int Depth
-    {
-        get
-        {
-            if (ParentScope == null)
-            {
-                return 0;
-            }
-
-            return ParentScope.Depth + 1;
-        }
-    }
-
-    public IScopedNotificationPublisher Notifications
-    {
-        get
-        {
-            EnsureNotDisposed();
-            if (ParentScope != null)
-            {
-                return ParentScope.Notifications;
-            }
-
-            return _notificationPublisher ??= new ScopedNotificationPublisher(_eventAggregator);
-        }
-    }
-
-    public RepositoryCacheMode RepositoryCacheMode
-    {
-        get
-        {
-            if (_repositoryCacheMode != RepositoryCacheMode.Unspecified)
-            {
-                return _repositoryCacheMode;
-            }
-
-            if (ParentScope != null)
-            {
-                return ParentScope.RepositoryCacheMode;
-            }
-
-            return RepositoryCacheMode.Default;
-        }
-    }
-
-    public IsolatedCaches IsolatedCaches
-    {
-        get
-        {
-            if (ParentScope != null)
-            {
-                return ParentScope.IsolatedCaches;
-            }
-
-            return _isolatedCaches ??= new IsolatedCaches(_ => new DeepCloneAppCache(new ObjectCacheAppCache()));
-        }
-    }
-
-    public bool ScopedFileSystems
-    {
-        get
-        {
-            if (ParentScope != null)
-            {
-                return ParentScope.ScopedFileSystems;
-            }
-
-            return _scopedFileSystem != null;
-        }
-    }
-
-    private ILockingMechanism ResolveLockingMechanism() =>
-        ParentScope is not null ? ParentScope.ResolveLockingMechanism() : Locks;
 
     public async Task<T> ExecuteWithContextAsync<T>(Func<UmbracoEFContext, Task<T>> method)
     {
@@ -194,17 +80,9 @@ internal class EfCoreScope : IEfCoreScope
             return true; // Do nothing
         });
 
-    public void Complete()
-    {
-        if (_completed.HasValue == false)
-        {
-            _completed = true;
-        }
-    }
-
     public void Reset() => _completed = null;
 
-    public void Dispose()
+    public override void Dispose()
     {
         if (this != _efCoreScopeAccessor.AmbientScope)
         {
@@ -213,47 +91,17 @@ internal class EfCoreScope : IEfCoreScope
             throw new InvalidOperationException(failedMessage);
         }
 
-        // Decrement the lock counters on the parent if any.
-        Locks.ClearLocks(InstanceId);
-
         if (ParentScope is null)
         {
-            DisposeEfCoreDatabase(); }
-        else
-        {
-            ParentScope.ChildCompleted(_completed);
+            DisposeEfCoreDatabase();
         }
 
         _efCoreScopeProvider.PopAmbientScope();
 
-
         HandleScopeContext();
+        base.Dispose();
 
         _disposed = true;
-    }
-
-    private void EnsureNotDisposed()
-    {
-        // We can't be disposed
-        if (_disposed)
-        {
-            throw new ObjectDisposedException($"The {nameof(IEfCoreScope)} with ID ({InstanceId}) is already disposed");
-        }
-
-        // And neither can our ancestors if we're trying to be disposed since
-        // a child must always be disposed before it's parent.
-        // This is a safety check, it's actually not entirely possible that a parent can be
-        // disposed before the child since that will end up with a "not the Ambient" exception.
-        ParentScope?.EnsureNotDisposed();
-    }
-
-    public void ChildCompleted(bool? completed)
-    {
-        // if child did not complete we cannot complete
-        if (completed.HasValue == false || completed.Value == false)
-        {
-            _completed = false;
-        }
     }
 
     private void InitializeDatabase()
@@ -298,29 +146,6 @@ internal class EfCoreScope : IEfCoreScope
         }
     }
 
-    private void HandleScopedFileSystems(bool completed)
-    {
-        if (_scopeFileSystems == true)
-        {
-            if (completed)
-            {
-                _scopedFileSystem?.Complete();
-            }
-
-            _scopedFileSystem?.Dispose();
-            _scopedFileSystem = null;
-        }
-    }
-
-    private void HandleScopedNotifications(bool databaseException)
-    {
-        if (databaseException is false)
-        {
-            _notificationPublisher?.ScopeExit(_completed.HasValue && _completed.Value);
-        }
-    }
-
-
     private void DisposeEfCoreDatabase()
     {
         var completed = _completed.HasValue && _completed.Value;
@@ -354,8 +179,6 @@ internal class EfCoreScope : IEfCoreScope
                 _umbracoEfCoreDatabase?.Dispose();
                 _umbracoEfCoreDatabase = null;
                 _efCoreDatabaseFactory.Dispose();
-                HandleScopedFileSystems(_completed.HasValue && _completed.Value);
-                HandleScopedNotifications(databaseException);
             }
         }
     }

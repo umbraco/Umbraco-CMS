@@ -158,12 +158,12 @@ public class EfCoreScopeProvider : IEfCoreScopeProvider
         }
 
         var efCoreScope = new EfCoreScope(
+            (EfCoreScope)_ambientEfCoreScopeStack.AmbientScope,
             _distributedLockingMechanismFactory,
             _umbracoEfCoreDatabaseFactory,
             _efCoreScopeAccessor,
             _fileSystems,
             this,
-            (EfCoreScope)_ambientEfCoreScopeStack.AmbientScope,
             null,
             _eventAggregator,
             repositoryCacheMode,

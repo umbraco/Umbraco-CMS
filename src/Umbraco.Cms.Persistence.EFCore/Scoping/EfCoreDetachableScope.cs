@@ -54,12 +54,12 @@ internal class EfCoreDetachableScope : EfCoreScope
         IScopeContext? scopeContext,
         IEventAggregator eventAggregator)
         : base(
+            parentScope,
             distributedLockingMechanismFactory,
             efCoreDatabaseFactory,
             efCoreScopeAccessor,
             fileSystems,
             efCoreScopeProvider,
-            parentScope,
             scopeContext,
             eventAggregator) =>
         throw new NotImplementedException();
