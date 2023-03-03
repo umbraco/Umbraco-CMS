@@ -258,7 +258,7 @@ public class LockingMechanism : ILockingMechanism
     ///     This executes the queue of requested locks in order in an efficient way lazily whenever the database instance is
     ///     resolved.
     /// </summary>
-    public void EnsureDbLocks(Guid scopeInstanceId)
+    public void EnsureLocks(Guid scopeInstanceId)
     {
         lock (_lockQueueLocker)
         {

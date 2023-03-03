@@ -40,5 +40,5 @@ public interface ILockingMechanism : IDisposable
     /// Acquires all the non-eagerly requested locks.
     /// </summary>
     /// <param name="scopeInstanceId"></param>
-    void EnsureDbLocks(Guid scopeInstanceId);
+    void EnsureLocks(Guid scopeInstanceId);
 }
