@@ -46,7 +46,7 @@ export class TrackedReferenceResource {
         parentKey,
         skip,
         take,
-        filterMustBeIsDependency,
+        filterMustBeIsDependency = true,
     }: {
         parentKey: string,
         skip?: number,

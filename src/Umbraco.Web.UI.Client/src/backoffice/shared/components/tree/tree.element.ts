@@ -8,10 +8,8 @@ import { umbExtensionsRegistry } from '@umbraco-cms/extensions-api';
 import { UmbLitElement } from '@umbraco-cms/element';
 
 import './tree-item.element';
-import './context-menu/tree-context-menu-page-action-list.element';
 import './context-menu/tree-context-menu-page.service';
 import './context-menu/tree-context-menu.service';
-import './action/tree-item-action-extension.element';
 
 @customElement('umb-tree')
 export class UmbTreeElement extends UmbLitElement {

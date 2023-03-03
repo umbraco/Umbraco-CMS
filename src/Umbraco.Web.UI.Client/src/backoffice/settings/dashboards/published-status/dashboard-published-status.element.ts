@@ -3,7 +3,7 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 
-import { UmbModalService, UMB_MODAL_SERVICE_CONTEXT_TOKEN } from '../../../../core/modal';
+import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN } from '../../../../core/modal';
 
 import { PublishedCacheResource } from '@umbraco-cms/backend-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/resources';
@@ -38,13 +38,13 @@ export class UmbDashboardPublishedStatusElement extends UmbLitElement {
 	@state()
 	private _buttonStateCollect: UUIButtonState = undefined;
 
-	private _modalService?: UmbModalService;
+	private _modalContext?: UmbModalContext;
 
 	constructor() {
 		super();
 
-		this.consumeContext(UMB_MODAL_SERVICE_CONTEXT_TOKEN, (_instance) => {
-			this._modalService = _instance;
+		this.consumeContext(UMB_MODAL_CONTEXT_TOKEN, (instance) => {
+			this._modalContext = instance;
 		});
 	}
 
@@ -82,7 +82,7 @@ export class UmbDashboardPublishedStatusElement extends UmbLitElement {
 		}
 	}
 	private async _onReloadCacheHandler() {
-		const modalHandler = this._modalService?.confirm({
+		const modalHandler = this._modalContext?.confirm({
 			headline: 'Reload',
 			content: html` Trigger a in-memory and local file cache reload on all servers. `,
 			color: 'danger',
@@ -105,7 +105,7 @@ export class UmbDashboardPublishedStatusElement extends UmbLitElement {
 	}
 
 	private async _onRebuildCacheHandler() {
-		const modalHandler = this._modalService?.confirm({
+		const modalHandler = this._modalContext?.confirm({
 			headline: 'Rebuild',
 			content: html` Rebuild content in cmsContentNu database table. Expensive.`,
 			color: 'danger',

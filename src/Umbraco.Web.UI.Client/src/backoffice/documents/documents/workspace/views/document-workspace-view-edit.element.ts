@@ -160,7 +160,7 @@ export class UmbDocumentWorkspaceViewEditElement extends UmbLitElement {
 					this._routerPath = event.target.absoluteRouterPath;
 				}}
 				@change=${(event: UmbRouterSlotChangeEvent) => {
-					this._activePath = event.target.localActiveViewPath || '';
+					this._activePath = event.target.absoluteActiveViewPath || '';
 				}}>
 			</umb-router-slot>
 		`;

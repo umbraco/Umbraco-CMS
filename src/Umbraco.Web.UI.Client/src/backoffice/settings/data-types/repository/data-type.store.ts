@@ -4,6 +4,8 @@ import { ArrayState } from '@umbraco-cms/observable-api';
 import { UmbStoreBase } from '@umbraco-cms/store';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 
+export const UMB_DATA_TYPE_STORE_CONTEXT_TOKEN = new UmbContextToken<UmbDataTypeStore>('UmbDataTypeStore');
+
 /**
  * @export
  * @class UmbDataTypeStore
@@ -19,7 +21,7 @@ export class UmbDataTypeStore extends UmbStoreBase {
 	 * @memberof UmbDataTypeStore
 	 */
 	constructor(host: UmbControllerHostInterface) {
-		super(host, UmbDataTypeStore.name);
+		super(host, UMB_DATA_TYPE_STORE_CONTEXT_TOKEN.toString());
 	}
 
 	/**
@@ -49,5 +51,3 @@ export class UmbDataTypeStore extends UmbStoreBase {
 		this.#data.remove(uniques);
 	}
 }
-
-export const UMB_DATA_TYPE_STORE_CONTEXT_TOKEN = new UmbContextToken<UmbDataTypeStore>(UmbDataTypeStore.name);

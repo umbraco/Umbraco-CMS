@@ -2,7 +2,7 @@ import { defineElement } from '@umbraco-ui/uui-base/lib/registration';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html } from 'lit';
 
-import { UmbModalService, UMB_MODAL_SERVICE_CONTEXT_TOKEN } from '../core/modal';
+import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN } from '../core/modal';
 import { UmbUserStore } from './users/users/user.store';
 import { UmbUserGroupStore } from './users/user-groups/user-group.store';
 import { UmbCurrentUserStore, UMB_CURRENT_USER_STORE_CONTEXT_TOKEN } from './users/current-user/current-user.store';
@@ -46,9 +46,9 @@ import {
 } from './settings/languages/app-language-select/app-language.context';
 import { UmbPackageStore } from './packages/repository/package.store';
 import { UmbServerExtensionController } from './packages/repository/server-extension.controller';
+import { umbExtensionsRegistry } from '@umbraco-cms/extensions-api';
 import { UmbNotificationContext, UMB_NOTIFICATION_CONTEXT_TOKEN } from '@umbraco-cms/notification';
 import { UmbLitElement } from '@umbraco-cms/element';
-import { umbExtensionsRegistry } from '@umbraco-cms/extensions-api';
 
 import '@umbraco-cms/router';
 
@@ -84,7 +84,7 @@ export class UmbBackofficeElement extends UmbLitElement {
 	constructor() {
 		super();
 
-		this.provideContext(UMB_MODAL_SERVICE_CONTEXT_TOKEN, new UmbModalService());
+		this.provideContext(UMB_MODAL_CONTEXT_TOKEN, new UmbModalContext());
 		this.provideContext(UMB_NOTIFICATION_CONTEXT_TOKEN, new UmbNotificationContext());
 
 		// TODO: find a way this is possible outside this element. It needs to be possible to register stores in extensions

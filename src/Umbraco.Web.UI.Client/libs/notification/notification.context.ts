@@ -2,14 +2,22 @@ import { BehaviorSubject } from 'rxjs';
 import { UmbNotificationHandler } from './notification-handler';
 import { UmbContextToken } from '@umbraco-cms/context-api';
 
-export type UmbNotificationData = any;
+/**
+ * The default data of notifications
+ * @export
+ * @interface UmbNotificationDefaultData
+ */
+export interface UmbNotificationDefaultData {
+	message: string;
+	headline?: string;
+}
 
 /**
  * @export
  * @interface UmbNotificationOptions
  * @template UmbNotificationData
  */
-export interface UmbNotificationOptions<UmbNotificationData> {
+export interface UmbNotificationOptions<UmbNotificationData = UmbNotificationDefaultData> {
 	color?: UmbNotificationColor;
 	duration?: number | null;
 	elementName?: string;
@@ -29,7 +37,7 @@ export class UmbNotificationContext {
 	 * @return {*}  {UmbNotificationHandler}
 	 * @memberof UmbNotificationContext
 	 */
-	private _open(options: UmbNotificationOptions<UmbNotificationData>): UmbNotificationHandler {
+	private _open(options: UmbNotificationOptions): UmbNotificationHandler {
 		const notificationHandler = new UmbNotificationHandler(options);
 		notificationHandler.element.addEventListener('closed', () => this._handleClosed(notificationHandler));
 
@@ -66,7 +74,7 @@ export class UmbNotificationContext {
 	 */
 	public peek(
 		color: UmbNotificationColor,
-		options: UmbNotificationOptions<UmbNotificationData>
+		options: UmbNotificationOptions
 	): UmbNotificationHandler {
 		return this._open({ color, ...options });
 	}
@@ -80,10 +88,10 @@ export class UmbNotificationContext {
 	 */
 	public stay(
 		color: UmbNotificationColor,
-		options: UmbNotificationOptions<UmbNotificationData>
+		options: UmbNotificationOptions
 	): UmbNotificationHandler {
 		return this._open({ ...options, color, duration: null });
 	}
 }
 
-export const UMB_NOTIFICATION_CONTEXT_TOKEN = new UmbContextToken<UmbNotificationContext>(UmbNotificationContext.name);
+export const UMB_NOTIFICATION_CONTEXT_TOKEN = new UmbContextToken<UmbNotificationContext>('UmbNotificationContext');

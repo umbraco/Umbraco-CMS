@@ -4,6 +4,8 @@ import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 import { ArrayState } from '@umbraco-cms/observable-api';
 import { LanguageModel } from '@umbraco-cms/backend-api';
 
+export const UMB_LANGUAGE_STORE_CONTEXT_TOKEN = new UmbContextToken<UmbLanguageStore>('UmbLanguageStore');
+
 /**
  * @export
  * @class UmbLanguageStore
@@ -15,7 +17,7 @@ export class UmbLanguageStore extends UmbStoreBase {
 	data = this.#data.asObservable();
 
 	constructor(host: UmbControllerHostInterface) {
-		super(host, UmbLanguageStore.name);
+		super(host, UMB_LANGUAGE_STORE_CONTEXT_TOKEN.toString());
 	}
 
 	append(language: LanguageModel) {
@@ -32,4 +34,3 @@ export class UmbLanguageStore extends UmbStoreBase {
 	}
 }
 
-export const UMB_LANGUAGE_STORE_CONTEXT_TOKEN = new UmbContextToken<UmbLanguageStore>(UmbLanguageStore.name);

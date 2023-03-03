@@ -1,8 +1,8 @@
-import { html } from 'lit';
+import { css, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { IRoute, IRoutingInfo } from 'router-slot';
-import type { ManifestWorkspace } from '@umbraco-cms/models';
-import { createExtensionElement , umbExtensionsRegistry } from '@umbraco-cms/extensions-api';
+import type { ManifestTree, ManifestWorkspace } from '@umbraco-cms/models';
+import { createExtensionElement, umbExtensionsRegistry } from '@umbraco-cms/extensions-api';
 import { UmbLitElement } from '@umbraco-cms/element';
 
 @customElement('umb-created-packages-section-view')
@@ -12,9 +12,10 @@ export class UmbCreatedPackagesSectionViewElement extends UmbLitElement {
 
 	private _workspaces: Array<ManifestWorkspace> = [];
 
+	private _trees: Array<ManifestTree> = [];
+
 	constructor() {
 		super();
-
 		this.observe(umbExtensionsRegistry?.extensionsOfType('workspace'), (workspaceExtensions) => {
 			this._workspaces = workspaceExtensions;
 			this._createRoutes();
@@ -48,7 +49,7 @@ export class UmbCreatedPackagesSectionViewElement extends UmbLitElement {
 
 		routes.push({
 			path: '**',
-			redirectTo: 'section/packages/view/created/overview', //TODO: this should be dynamic
+			redirectTo: 'overview',
 		});
 		this._routes = routes;
 	}

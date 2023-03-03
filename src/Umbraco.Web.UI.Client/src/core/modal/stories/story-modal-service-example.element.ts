@@ -1,39 +1,38 @@
 import { html } from 'lit-html';
 import { customElement, property, state } from 'lit/decorators.js';
-import { UmbModalService, UMB_MODAL_SERVICE_CONTEXT_TOKEN } from '..';
+import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN } from '..';
 import { UmbLitElement } from '@umbraco-cms/element';
 
-
-@customElement('story-modal-service-example')
-export class StoryModalServiceExampleElement extends UmbLitElement {
+@customElement('story-modal-context-example')
+export class StoryModalContextExampleElement extends UmbLitElement {
 	@property()
 	modalLayout = 'confirm';
 
 	@state()
 	value = '';
 
-	private _modalService?: UmbModalService;
+	private _modalContext?: UmbModalContext;
 
 	constructor() {
 		super();
-		this.consumeContext(UMB_MODAL_SERVICE_CONTEXT_TOKEN, (modalService) => {
-			this._modalService = modalService;
+		this.consumeContext(UMB_MODAL_CONTEXT_TOKEN, (instance) => {
+			this._modalContext = instance;
 		});
 	}
 
 	private _open() {
 		switch (this.modalLayout) {
 			case 'Content Picker':
-				this._modalService?.contentPicker();
+				this._modalContext?.contentPicker();
 				break;
 			case 'Property Editor UI Picker':
-				this._modalService?.propertyEditorUIPicker();
+				this._modalContext?.propertyEditorUIPicker();
 				break;
 			case 'Icon Picker':
-				this._modalService?.iconPicker();
+				this._modalContext?.iconPicker();
 				break;
 			default:
-				this._modalService?.confirm({
+				this._modalContext?.confirm({
 					headline: 'Headline',
 					content: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit',
 				});

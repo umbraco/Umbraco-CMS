@@ -1,8 +1,6 @@
 import { PackageResource } from '@umbraco-cms/backend-api';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
-import type { DataSourceResponse, UmbPackage } from '@umbraco-cms/models';
 import { tryExecuteAndNotify } from '@umbraco-cms/resources';
-import { umbracoPath } from '@umbraco-cms/utils';
 
 /**
  * Data source for packages from the server
@@ -15,11 +13,10 @@ export class UmbPackageServerDataSource {
 	 * Get the root items from the server
 	 * @memberof UmbPackageServerDataSource
 	 */
-	getRootItems(): Promise<DataSourceResponse<UmbPackage[]>> {
-		// TODO: Use real resource when available
+	getRootItems() {
 		return tryExecuteAndNotify(
 			this.host,
-			fetch(umbracoPath('/package/manifest')).then((res) => res.json())
+			PackageResource.getPackageManifest()
 		);
 	}
 

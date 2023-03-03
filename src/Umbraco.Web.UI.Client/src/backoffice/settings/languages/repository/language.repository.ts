@@ -27,7 +27,7 @@ export class UmbLanguageRepository {
 
 			new UmbContextConsumerController(this.#host, UMB_LANGUAGE_STORE_CONTEXT_TOKEN, (instance) => {
 				this.#languageStore = instance;
-			}),
+			}).asPromise(),
 		]);
 	}
 
