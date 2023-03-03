@@ -67,7 +67,6 @@ export class UmbLogViewerWorkspaceElement extends UmbLitElement {
 
 	constructor() {
 		super();
-		console.log('LogViewerWorkspaceElement constructor');
 		this.#logViewerContext.init();
 	}
 

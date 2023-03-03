@@ -24,8 +24,17 @@ export class UmbLogViewerSearchViewElement extends UmbLitElement {
 				justify-content: space-between;
 			}
 
+			#dates-polling-container {
+				display: flex;
+				align-items: baseline;
+			}
+
 			umb-log-viewer-search-input {
 				flex: 1;
+			}
+
+			umb-log-viewer-date-range-selector {
+				flex-direction: row;
 			}
 		`,
 	];
@@ -35,7 +44,10 @@ export class UmbLogViewerSearchViewElement extends UmbLitElement {
 			<div id="layout">
 				<div id="levels-container">
 					<umb-log-viewer-log-level-filter-menu></umb-log-viewer-log-level-filter-menu>
-					<umb-log-viewer-polling-button> </umb-log-viewer-polling-button>
+					<div id="dates-polling-container">
+						<umb-log-viewer-date-range-selector horizontal></umb-log-viewer-date-range-selector>
+						<umb-log-viewer-polling-button> </umb-log-viewer-polling-button>
+					</div>
 				</div>
 				<div id="input-container">
 					<umb-log-viewer-search-input></umb-log-viewer-search-input>

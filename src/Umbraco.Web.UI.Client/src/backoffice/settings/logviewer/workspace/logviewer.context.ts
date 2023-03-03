@@ -87,7 +87,6 @@ export class UmbLogViewerWorkspaceContext {
 	}
 
 	async init() {
-		this.getMessageTemplates(0, 10);
 		this.getLogCount(this.defaultDateRange);
 	}
 

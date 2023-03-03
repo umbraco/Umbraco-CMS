@@ -2,12 +2,11 @@ import { css, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { clamp } from 'lodash-es';
 import {
-	LogLevel,
 	LogViewerDateRange,
 	UmbLogViewerWorkspaceContext,
 	UMB_APP_LOG_VIEWER_CONTEXT_TOKEN,
 } from '../../logviewer.context';
-import { SavedLogSearchModel, PagedLogTemplateModel } from '@umbraco-cms/backend-api';
+import { LogLevelCountsModel } from '@umbraco-cms/backend-api';
 import { UmbLitElement } from '@umbraco-cms/element';
 
 //TODO: add a disabled attribute to the show more button when the total number of items is correctly returned from the endpoint
@@ -84,40 +83,6 @@ export class UmbLogViewerOverviewViewElement extends UmbLitElement {
 				height: 100%;
 			}
 
-			input {
-				font-family: inherit;
-				padding: var(--uui-size-1) var(--uui-size-space-3);
-				font-size: inherit;
-				color: inherit;
-				border-radius: 0;
-				box-sizing: border-box;
-				border: none;
-				background: none;
-				width: 100%;
-				text-align: inherit;
-				outline: none;
-				position: relative;
-				border-bottom: 2px solid transparent;
-			}
-
-			/* find out better validation for that  */
-			input:out-of-range {
-				border-color: var(--uui-color-danger);
-			}
-
-			uui-table-cell {
-				padding: 10px 20px;
-				height: unset;
-			}
-
-			uui-table-row {
-				cursor: pointer;
-			}
-
-			uui-table-row:hover > uui-table-cell {
-				background-color: var(--uui-color-surface-alt);
-			}
-
 			uui-label:nth-of-type(2) {
 				display: block;
 				margin-top: var(--uui-size-space-5);
@@ -154,18 +119,6 @@ export class UmbLogViewerOverviewViewElement extends UmbLitElement {
 				border-radius: 50%;
 			}
 
-			#show-more-templates-btn {
-				margin-top: var(--uui-size-space-5);
-			}
-
-			a {
-				display: flex;
-				align-items: center;
-				justify-content: space-between;
-				text-decoration: none;
-				color: inherit;
-			}
-
 			#error-count {
 				font-size: 4rem;
 				text-align: center;
@@ -173,12 +126,6 @@ export class UmbLogViewerOverviewViewElement extends UmbLitElement {
 			}
 		`,
 	];
-
-	@state()
-	private _savedSearches: SavedLogSearchModel[] = [];
-
-	@state()
-	private _messageTemplates: PagedLogTemplateModel | null = null;
 
 	@state()
 	private _totalLogCount = 0;
@@ -193,7 +140,7 @@ export class UmbLogViewerOverviewViewElement extends UmbLitElement {
 	private logLevelCount: [string, number][] = [];
 
 	@state()
-	private _logLevelCount: LogLevel | null = null;
+	private _logLevelCount: LogLevelCountsModel | null = null;
 
 	@state()
 	private _startDate = '';
@@ -221,18 +168,11 @@ export class UmbLogViewerOverviewViewElement extends UmbLitElement {
 
 	#observeStuff() {
 		if (!this.#logViewerContext) return;
-		this.observe(this.#logViewerContext.savedSearches, (savedSearches) => {
-			this._savedSearches = savedSearches ?? [];
-		});
 
 		this.observe(this.#logViewerContext.logCount, (logLevel) => {
 			this._logLevelCount = logLevel ?? null;
-			this._errorCount = this._logLevelCount?.Error ?? 0;
+			this._errorCount = this._logLevelCount?.error ?? 0;
 			this.setLogLevelCount();
-		});
-
-		this.observe(this.#logViewerContext.messageTemplates, (templates) => {
-			this._messageTemplates = templates ?? null;
 		});
 
 		this.observe(this.#logViewerContext.dateRange, (dateRange: LogViewerDateRange) => {
@@ -248,11 +188,6 @@ export class UmbLogViewerOverviewViewElement extends UmbLitElement {
 				? this.logLevelCount.flatMap((arr) => arr[1]).reduce((acc, count) => acc + count, 0)
 				: 0;
 		}
-	}
-
-	async #getMessageTemplates() {
-		const take = this._messageTemplates?.items?.length ?? 0;
-		await this.#logViewerContext?.getMessageTemplates(0, take + 10);
 	}
 
 	#calculatePercentage(partialValue: number) {
@@ -272,20 +207,6 @@ export class UmbLogViewerOverviewViewElement extends UmbLitElement {
 		this.#logViewerContext?.setDateRange(newDateRange);
 	}
 
-	renderSearchItem = (searchListItem: SavedLogSearchModel) => {
-		return html` <li>
-			<uui-button
-				@click=${() => {
-					this.setCurrentQuery(searchListItem.query ?? '');
-				}}
-				label="${searchListItem.name}"
-				title="${searchListItem.name}"
-				href=${'/section/settings/logviewer/search?lq=' + searchListItem.query}
-				><uui-icon name="umb:search"></uui-icon>${searchListItem.name}</uui-button
-			>
-		</li>`;
-	};
-
 	#setCountFilter(level: string) {
 		if (this._logLevelCountFilter.includes(level)) {
 			this._logLevelCountFilter = this._logLevelCountFilter.filter((item) => item !== level);
@@ -300,37 +221,11 @@ export class UmbLogViewerOverviewViewElement extends UmbLitElement {
 	}
 
 	render() {
-		return html` 
-
+		return html`
 			<div id="logviewer-layout">
 				<div id="info">
-
 					<uui-box id="time-period" headline="Time Period">
-						<div id="date-input-container" @input=${this.#setDates}>
-							<uui-label for="start-date">From:</uui-label> 
-							<input 
-								@click=${(e: Event) => {
-									(e.target as HTMLInputElement).showPicker();
-								}}
-								id="start-date" 
-								type="date" 
-								label="From" 
-								.max=${this.#logViewerContext?.today ?? ''}
-								.value=${this._startDate}>
-							</input>
-							<uui-label for="end-date">To: </uui-label>
-							<input 
-								@click=${(e: Event) => {
-									(e.target as HTMLInputElement).showPicker();
-								}}
-								id="end-date" 
-								type="date" 
-								label="To" 
-								.min=${this._startDate}
-								.max=${this.#logViewerContext?.today ?? ''}
-								.value=${this._endDate}>
-							</input>
-						</div>
+						<umb-log-viewer-date-range-selector></umb-log-viewer-date-range-selector>
 					</uui-box>
 
 					<uui-box id="errors" headline="Number of Errors">
@@ -338,38 +233,34 @@ export class UmbLogViewerOverviewViewElement extends UmbLitElement {
 					</uui-box>
 
 					<uui-box id="level" headline="Log level">
-					<h1 id="log-lever">Info</h1>
-
+						<h1 id="log-lever">Info</h1>
 					</uui-box>
 
 					<uui-box id="types" headline="Log types">
 						<div id="log-types-container">
 							<div id="legend">
 								<ul>
-									${
-										this._logLevelCount
-											? Object.keys(this._logLevelCount).map(
-													(level) =>
-														html`<li>
-															<button
-																@click=${(e: Event) => {
-																	(e.target as HTMLElement)?.classList.toggle('active');
-																	this.#setCountFilter(level);
-																}}>
-																<uui-icon
-																	name="umb:record"
-																	style="color: var(--umb-log-viewer-${level.toLowerCase()}-color);"></uui-icon
-																>${level}
-															</button>
-														</li>`
-											  )
-											: ''
-									}
+									${this._logLevelCount
+										? Object.keys(this._logLevelCount).map(
+												(level) =>
+													html`<li>
+														<button
+															@click=${(e: Event) => {
+																(e.target as HTMLElement)?.classList.toggle('active');
+																this.#setCountFilter(level);
+															}}>
+															<uui-icon
+																name="umb:record"
+																style="color: var(--umb-log-viewer-${level.toLowerCase()}-color);"></uui-icon
+															>${level}
+														</button>
+													</li>`
+										  )
+										: ''}
 								</ul>
 							</div>
 							<umb-donut-chart>
-							${
-								this._logLevelCount
+								${this._logLevelCount
 									? this.logLevelCount.map(
 											([level, number]) =>
 												html`<umb-donut-slice
@@ -378,50 +269,21 @@ export class UmbLogViewerOverviewViewElement extends UmbLitElement {
 													.percent=${this.#calculatePercentage(number)}
 													.color="${`var(--umb-log-viewer-${level.toLowerCase()}-color)`}"></umb-donut-slice> `
 									  )
-									: ''
-							}
+									: ''}
 							</umb-donut-chart>
 						</div>
 					</uui-box>
 				</div>
 
 				<div id="saved-searches-container">
-							<umb-log-viewer-saved-searches-overview></umb-log-viewer-saved-searches-overview>
+					<umb-log-viewer-saved-searches-overview></umb-log-viewer-saved-searches-overview>
 				</div>
 
 				<div id="common-messages-container">
-					<uui-box headline="Common Log Messages" id="saved-searches">
-						<p style="font-style: italic;">Total Unique Message types: ${this._messageTemplates?.total}</p>
-
-						<uui-table>
-						${
-							this._messageTemplates
-								? this._messageTemplates.items.map(
-										(template) =>
-											html`<uui-table-row
-												><uui-table-cell>
-													<a
-														@click=${() => {
-															this.setCurrentQuery(`@MessageTemplate='${template.messageTemplate}'` ?? '');
-														}}
-														href=${'/section/settings/logviewer/search?lg=@MessageTemplate%3D' +
-														template.messageTemplate}>
-														<span>${template.messageTemplate}</span> <span>${template.count}</span>
-													</a>
-												</uui-table-cell>
-											</uui-table-row>`
-								  )
-								: ''
-						}
-									</uui-table>
-
-					<uui-button id="show-more-templates-btn" look="primary" @click=${
-						this.#getMessageTemplates
-					} label="Show more templates">Show more</uui-button>
-					</uui-box>
+					<umb-log-viewer-message-templates-overview></umb-log-viewer-message-templates-overview>
 				</div>
 			</div>
-`;
+		`;
 	}
 }
 
