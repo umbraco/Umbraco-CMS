@@ -10,7 +10,6 @@ export class UmbMediaHelper {
 	constructor(host: UmbLitElement) {
 		this.#host = host;
 	}
-
 	
 	/**
 	 * 

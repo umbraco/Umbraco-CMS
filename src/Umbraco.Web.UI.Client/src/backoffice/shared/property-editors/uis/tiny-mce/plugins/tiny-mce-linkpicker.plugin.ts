@@ -1,5 +1,6 @@
 import { Editor } from 'tinymce';
 import { LinkPickerData } from '../../../../../../core/modal/layouts/link-picker/modal-layout-link-picker.element';
+import { TinyMcePluginArguments } from '../../../../components/input-tiny-mce/input-tiny-mce.element';
 import { DataTypePropertyModel } from '@umbraco-cms/backend-api';
 import { UmbModalContext } from '@umbraco-cms/modal';
 
@@ -20,16 +21,16 @@ export interface LinkListItem {
 }
 
 export class TinyMceLinkPickerPlugin {
-	#modalService: UmbModalContext;
-	#config: Array<DataTypePropertyModel> = [];
 	#editor: Editor;
+	#modalContext?: UmbModalContext;
+	#configuration?: Array<DataTypePropertyModel> = [];
 
-	constructor(editor: Editor, modalService: UmbModalContext, config: Array<DataTypePropertyModel>) {
-		this.#modalService = modalService;
-		this.#config = config;
-		this.#editor = editor;
+	constructor(args: TinyMcePluginArguments) {
+		this.#modalContext = args.modalContext;
+		this.#configuration = args.configuration;
+		this.#editor = args.editor;
 
-		this.#createLinkPicker(editor, (currentTarget: CurrentTargetData, anchorElement: HTMLAnchorElement) => {
+		this.#createLinkPicker(args.editor, (currentTarget: CurrentTargetData, anchorElement: HTMLAnchorElement) => {
 			this.#openLinkPicker(currentTarget, anchorElement);
 		});
 	}
@@ -121,9 +122,9 @@ export class TinyMceLinkPickerPlugin {
 
 	// TODO => get anchors to provide to link picker?
 	async #openLinkPicker(currentTarget: CurrentTargetData, anchorElement?: HTMLAnchorElement) {
-		const modalHandler = this.#modalService?.linkPicker({
+		const modalHandler = this.#modalContext?.linkPicker({
 			config: {
-				ignoreUserStartNodes: this.#config?.find((x) => x.alias === 'ignoreUserStartNodes')?.value,
+				ignoreUserStartNodes: this.#configuration?.find((x) => x.alias === 'ignoreUserStartNodes')?.value,
 			},
 			link: currentTarget,
 		});

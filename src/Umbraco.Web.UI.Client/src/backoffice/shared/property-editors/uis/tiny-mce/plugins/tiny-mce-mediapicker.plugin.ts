@@ -1,5 +1,6 @@
 import { Editor } from 'tinymce';
 import { UmbMediaHelper } from '../media-helper.service';
+import { TinyMcePluginArguments } from '../../../../components/input-tiny-mce/input-tiny-mce.element';
 import { DataTypePropertyModel } from '@umbraco-cms/backend-api';
 import { UmbModalContext } from '@umbraco-cms/modal';
 import type { UserDetails } from '@umbraco-cms/models';
@@ -22,24 +23,20 @@ interface MediaPickerResultData {
 }
 
 export class TinyMceMediaPickerPlugin {
-	#modalService?: UmbModalContext;
-	#mediaHelper = new UmbMediaHelper();
+	#editor: Editor;
+	#modalContext?: UmbModalContext;
+	#mediaHelper?: UmbMediaHelper;
 	#config?: Array<DataTypePropertyModel> = [];
-	editor: Editor;
-    #userDetails?: UserDetails;
+    #currentUser?: UserDetails;
 
-	constructor(
-		editor: Editor,
-		modalContext?: UmbModalContext,
-		configuration?: Array<DataTypePropertyModel>,
-		userDetails?: UserDetails
-	) {
-		this.#modalService = modalContext;
-		this.#config = configuration;
-		this.editor = editor;
-        this.#userDetails = userDetails;
+	constructor(args: TinyMcePluginArguments) {
+		this.#modalContext = args.modalContext;
+		this.#config = args.configuration;
+		this.#editor = args.editor;
+        this.#currentUser = args.currentUser;
+		this.#mediaHelper = args.mediaHelper;
 
-		editor.ui.registry.addButton('umbmediapicker', {
+		this.#editor.ui.registry.addButton('umbmediapicker', {
 			icon: 'image',
 			tooltip: 'Media Picker',
 			//stateSelector: 'img[data-udi]', TODO => Investigate where stateselector has gone, or if it is still needed
@@ -48,7 +45,7 @@ export class TinyMceMediaPickerPlugin {
 	}
 
 	async #onAction() {
-		const selectedElm = this.editor.selection.getNode();
+		const selectedElm = this.#editor.selection.getNode();
 		let currentTarget: MediaPickerTargetData = {};
 
 		if (selectedElm.nodeName === 'IMG') {
@@ -86,13 +83,13 @@ export class TinyMceMediaPickerPlugin {
 				startNodeId = -1;
 				startNodeIsVirtual = true;
 			} else {
-				startNodeId = this.#userDetails?.mediaStartNodes.length !== 1 ? -1 : this.#userDetails?.mediaStartNodes[0];
-				startNodeIsVirtual = this.#userDetails?.mediaStartNodes.length !== 1;
+				startNodeId = this.#currentUser?.mediaStartNodes.length !== 1 ? -1 : this.#currentUser?.mediaStartNodes[0];
+				startNodeIsVirtual = this.#currentUser?.mediaStartNodes.length !== 1;
 			}
 		}
 
 		// TODO => how are additional props provided? Need to send startNodeId and startNodeIsVirtual props
-		const modalHandler = this.#modalService?.mediaPicker({
+		const modalHandler = this.#modalContext?.mediaPicker({
 			selection: currentTarget.udi ? [currentTarget.udi] : [],
             multiple: false,
 		});
@@ -103,7 +100,7 @@ export class TinyMceMediaPickerPlugin {
 		if (!selection.length) return;
 
 		this.#insertInEditor(selection[0]);
-		this.editor.dispatch('Change');
+		this.#editor.dispatch('Change');
 	}
 
 	// TODO => mediaPicker returns a UDI, so need to fetch it. Wait for backend CLI before implementing
@@ -119,16 +116,16 @@ export class TinyMceMediaPickerPlugin {
 			'data-udi': img.udi,
 			'data-caption': img.caption,
 		};
-		const newImage = this.editor.dom.createHTML('img', data as Record<string, string | null>);
-		const parentElement = this.editor.selection.getNode().parentElement;
+		const newImage = this.#editor.dom.createHTML('img', data as Record<string, string | null>);
+		const parentElement = this.#editor.selection.getNode().parentElement;
 
 		if (img.caption && parentElement) {
-			const figCaption = this.editor.dom.createHTML('figcaption', {}, img.caption);
+			const figCaption = this.#editor.dom.createHTML('figcaption', {}, img.caption);
 			const combined = newImage + figCaption;
 
 			if (parentElement.nodeName !== 'FIGURE') {
-				const fragment = this.editor.dom.createHTML('figure', {}, combined);
-				this.editor.selection.setContent(fragment);
+				const fragment = this.#editor.dom.createHTML('figure', {}, combined);
+				this.#editor.selection.setContent(fragment);
 			} else {
 				parentElement.innerHTML = combined;
 			}
@@ -137,21 +134,21 @@ export class TinyMceMediaPickerPlugin {
 			if (parentElement?.nodeName === 'FIGURE' && parentElement.parentElement) {
 				parentElement.parentElement.innerHTML = newImage;
 			} else {
-				this.editor.selection.setContent(newImage);
+				this.#editor.selection.setContent(newImage);
 			}
 		}
 
 		// Using settimeout to wait for a DoM-render, so we can find the new element by ID.
 		setTimeout(() => {
-			const imgElm = this.editor.dom.get('__mcenew') as HTMLImageElement;
+			const imgElm = this.#editor.dom.get('__mcenew') as HTMLImageElement;
 			if (!imgElm) return;
 
-			this.editor.dom.setAttrib(imgElm, 'id', null);
+			this.#editor.dom.setAttrib(imgElm, 'id', null);
 
 			// When image is loaded we are ready to call sizeImageInEditor.
 			const onImageLoaded = () => {
-				this.#mediaHelper.sizeImageInEditor(this.editor, imgElm, img.url);
-				this.editor.dispatch('Change');
+				this.#mediaHelper?.sizeImageInEditor(this.#editor, imgElm, img.url);
+				this.#editor.dispatch('Change');
 			};
 
 			// Check if image already is loaded.

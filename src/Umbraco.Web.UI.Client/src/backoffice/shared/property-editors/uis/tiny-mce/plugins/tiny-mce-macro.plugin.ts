@@ -1,4 +1,5 @@
 import { AstNode, Editor } from 'tinymce';
+import { TinyMcePluginArguments } from '../../../../components/input-tiny-mce/input-tiny-mce.element';
 import { UmbModalContext } from '@umbraco-cms/modal';
 import { MacroSyntaxData, UmbMacroService } from 'libs/macro/macro.service';
 
@@ -11,21 +12,21 @@ interface DialogData {
 // TODO => This is a quick transplant of the existing macro plugin - needs to be finished, and need to
 // determine how to replicate the existing macro service (backend doens')
 export class TinyMceMacroPlugin {
-	#modalService: UmbModalContext;
-    #macroService = new UmbMacroService();
 	editor: Editor;
+	#modalContext?: UmbModalContext;
+    #macroService = new UmbMacroService();
 
-	constructor(editor: Editor, modalService: UmbModalContext) {
-		this.#modalService = modalService;
-		this.editor = editor;
+	constructor(args: TinyMcePluginArguments) {
+		this.editor = args.editor;
+		this.#modalContext = args.modalContext;
 
 		/** Adds custom rules for the macro plugin and custom serialization */
-		editor.on('preInit', () => {
+		this.editor.on('preInit', () => {
 			//this is requires so that we tell the serializer that a 'div' is actually allowed in the root, otherwise the cleanup will strip it out
-			editor.serializer.addRules('div');
+			this.editor.serializer.addRules('div');
 
 			/** This checks if the div is a macro container, if so, checks if its wrapped in a p tag and then unwraps it (removes p tag) */
-			editor.serializer.addNodeFilter('div', (nodes: AstNode[]) => {
+			this.editor.serializer.addNodeFilter('div', (nodes: AstNode[]) => {
 				for (let i = 0; i < nodes.length; i++) {
 					if (
 						nodes[i].attr('class') === 'umb-macro-holder' &&
@@ -38,15 +39,15 @@ export class TinyMceMacroPlugin {
 		});
 
 		/** when the contents load we need to find any macros declared and load in their content */
-		editor.on('SetContent', () => {
+		this.editor.on('SetContent', () => {
 			//get all macro divs and load their content
-			editor.dom.select('.umb-macro-holder.mceNonEditable').forEach((macroElement) => {
+			this.editor.dom.select('.umb-macro-holder.mceNonEditable').forEach((macroElement) => {
 				this.#loadMacroContent(macroElement as HTMLDivElement, null);
 			});
 		});
 
 		/** Adds the button instance */
-		editor.ui.registry.addButton('umbmacro', {
+		this.editor.ui.registry.addButton('umbmacro', {
 			icon: 'preferences',
 			tooltip: 'Insert macro',
 
@@ -186,7 +187,7 @@ export class TinyMceMacroPlugin {
 
 	// TODO => depends on macro picker, which doesn't exist
 	async #showMacroPicker(dialogData: DialogData) {
-		const modalHandler = this.#modalService?.openBasic({
+		const modalHandler = this.#modalContext?.openBasic({
 			header: 'I am a macro picker',
 			content: 'content content content',
 		});

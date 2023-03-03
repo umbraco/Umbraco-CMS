@@ -1,15 +1,16 @@
 import { Editor } from 'tinymce';
+import { TinyMcePluginArguments } from '../../../../components/input-tiny-mce/input-tiny-mce.element';
 import { UmbModalContext } from '@umbraco-cms/modal';
 
 export class TinyMceCodeEditorPlugin {
-	#modalContext: UmbModalContext;
 	editor: Editor;
+	#modalContext?: UmbModalContext;
 
-	constructor(editor: Editor, modalContext: UmbModalContext) {
-		this.#modalContext = modalContext;
-		this.editor = editor;
+	constructor(args: TinyMcePluginArguments) {
+		this.#modalContext = args.modalContext;
+		this.editor = args.editor;
 
-		editor.ui.registry.addButton('ace', {
+		this.editor.ui.registry.addButton('ace', {
 			icon: 'sourcecode',
 			tooltip: 'View Source Code',
 			onAction: () => this.#showCodeEditor(),

@@ -1,4 +1,5 @@
 import { Editor } from 'tinymce';
+import { TinyMcePluginArguments } from '../../../../components/input-tiny-mce/input-tiny-mce.element';
 import { UmbModalContext } from '@umbraco-cms/modal';
 
 interface EmbeddedMediaModalData {
@@ -9,14 +10,14 @@ interface EmbeddedMediaModalData {
 }
 
 export class TinyMceEmbeddedMediaPlugin {
-	#modalContext: UmbModalContext;
 	editor: Editor;
+	#modalContext?: UmbModalContext;
 
-	constructor(editor: Editor, modalContext: UmbModalContext) {
-		this.#modalContext = modalContext;
-		this.editor = editor;
+	constructor(args: TinyMcePluginArguments) {
+		this.editor = args.editor;
+		this.#modalContext = args.modalContext;
 
-		editor.ui.registry.addButton('umbembeddialog', {
+		this.editor.ui.registry.addButton('umbembeddialog', {
 			icon: 'embed',
 			tooltip: 'Embed',
 			onAction: () => this.#onAction(),
