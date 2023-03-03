@@ -1,4 +1,4 @@
-import { UmbLogViewerRepository } from './data/log-viewer.repository';
+import { UmbLogViewerRepository } from '../repository/log-viewer.repository';
 import { ArrayState, createObservablePart, DeepState, ObjectState, StringState } from '@umbraco-cms/observable-api';
 import {
 	DirectionModel,
