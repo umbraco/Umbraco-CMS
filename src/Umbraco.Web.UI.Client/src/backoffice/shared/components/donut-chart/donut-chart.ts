@@ -1,6 +1,6 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, html, LitElement, svg } from 'lit';
-import { customElement, query, queryAssignedElements, state } from 'lit/decorators.js';
+import { customElement, property, query, queryAssignedElements, state } from 'lit/decorators.js';
 import { clamp } from 'lodash-es';
 import { UmbDonutSliceElement } from './donut-slice';
 
@@ -8,13 +8,21 @@ export interface Circle {
 	color: string;
 	name: string;
 	percent: number;
+	kind: string;
 }
 
 interface CircleWithCommands extends Circle {
 	offset: number;
 	commands: string;
 }
-
+//TODO: maybe move to UI Library
+/**
+ * This is a donut chart component that can be used to display data in a circular way.
+ *
+ * @export
+ * @class UmbDonutChartElement
+ * @extends {LitElement}
+ */
 @customElement('umb-donut-chart')
 export class UmbDonutChartElement extends LitElement {
 	static percentToDegrees(percent: number): number {
@@ -82,56 +90,93 @@ export class UmbDonutChartElement extends LitElement {
 		`,
 	];
 
-	@query('slot')
-	slicesSlot!: HTMLSlotElement;
-
-	@queryAssignedElements({ selector: 'umb-donut-slice' })
-	slices!: UmbDonutSliceElement[];
-
-	@query('#circle-container')
-	circleContainer!: HTMLSlotElement;
-
-	@query('#container')
-	container!: HTMLDivElement;
-
-	@query('#details-box')
-	detailsBox!: HTMLDivElement;
-
-	@state()
-	circles: CircleWithCommands[] = [];
-
-	@state()
+	/**
+	 * Circle radius in pixels
+	 *
+	 * @memberof UmbDonutChartElement
+	 */
+	@property({ type: Number })
 	radius = 45;
 
-	@state()
-	viewBox = 100;
-
-	@state()
+	/**
+	 * The circle thickness in pixels
+	 *
+	 * @memberof UmbDonutChartElement
+	 */
+	@property({ type: Number, attribute: 'border-size' })
 	borderSize = 20;
 
-	@state()
+	/**
+	 * The size of SVG element in pixels
+	 *
+	 * @memberof UmbDonutChartElement
+	 */
+	@property({ type: Number, attribute: 'svg-size' })
 	svgSize = 100;
 
-	@state()
-	posY = 0;
+	/**
+	 * Description of the graph, added for accessibility purposes
+	 *
+	 * @memberof UmbDonutChartElement
+	 */
+	@property()
+	description = '';
+
+	/**
+	 * Hides the box that appears oh hover with the details of the slice
+	 *
+	 * @memberof UmbDonutChartElement
+	 */
+	@property({ type: Boolean })
+	hideDetailBox = false;
+
+	@queryAssignedElements({ selector: 'umb-donut-slice' })
+	private _slices!: UmbDonutSliceElement[];
+
+	@query('#container')
+	private _container!: HTMLDivElement;
+
+	@query('#details-box')
+	private _detailsBox!: HTMLDivElement;
 
 	@state()
-	posX = 0;
+	private circles: CircleWithCommands[] = [];
 
 	@state()
-	detailName = '';
+	private viewBox = 100;
 
 	@state()
-	detailAmount = 0;
+	private _posY = 0;
 
 	@state()
-	detailPercent = 0;
+	private _posX = 0;
 
 	@state()
-	detailColor = 'red';
+	private _detailName = '';
 
 	@state()
-	_totalAmount = 0;
+	private _detailAmount = 0;
+
+	@state()
+	private _detailColor = 'black';
+
+	@state()
+	private _totalAmount = 0;
+
+	@state()
+	private _detailKind = '';
+
+	#containerBounds: DOMRect | undefined;
+
+	firstUpdated() {
+		this.#containerBounds = this._container.getBoundingClientRect();
+	}
+
+	protected willUpdate(_changedProperties: Map<PropertyKey, unknown>): void {
+		if (_changedProperties.has('radius') || _changedProperties.has('borderSize') || _changedProperties.has('svgSize')) {
+			this.#printCircles();
+		}
+	}
 
 	#calculatePercentage(partialValue: number) {
 		if (this._totalAmount === 0) return 0;
@@ -139,15 +184,16 @@ export class UmbDonutChartElement extends LitElement {
 		return clamp(percent, 0, 99);
 	}
 
-	#printCircles(event: Event) {
-		this._totalAmount = this.slices.reduce((acc, slice) => acc + slice.amount, 0);
-		event.stopPropagation();
+	#printCircles(event: Event | null = null) {
+		this._totalAmount = this._slices.reduce((acc, slice) => acc + slice.amount, 0);
+		event?.stopPropagation();
 		this.circles = this.#addCommands(
-			this.slices.map((slice) => {
+			this._slices.map((slice) => {
 				return {
 					percent: this.#calculatePercentage(slice.amount),
 					color: slice.color,
 					name: slice.name,
+					kind: slice.kind,
 				};
 			})
 		);
@@ -187,31 +233,33 @@ export class UmbDonutChartElement extends LitElement {
 		return [coordX, coordY].join(' ');
 	}
 
-	#calculateDetailsBoxPosition(event: MouseEvent) {
-		const rect = this.container.getBoundingClientRect();
-		const x = event.clientX - rect.left;
-		const y = event.clientY - rect.top;
-		this.posX = x - 10;
-		this.posY = y - 70;
-	}
+	#calculateDetailsBoxPosition = (event: MouseEvent) => {
+		const x = this.#containerBounds ? event.clientX - this.#containerBounds?.left : 0;
+		const y = this.#containerBounds ? event.clientY - this.#containerBounds?.top : 0;
+		this._posX = x - 10;
+		this._posY = y - 70;
+	};
 
 	#setDetailsBoxData(event: MouseEvent) {
 		const target = event.target as SVGPathElement;
 		const index = target.dataset.index as unknown as number;
 		const circle = this.circles[index];
-		this.detailName = circle.name;
-		this.detailAmount = circle.percent;
+		this._detailName = circle.name;
+		this._detailAmount = circle.percent;
 		this.detailPercent = circle.percent;
-		this.detailColor = circle.color;
+		this._detailColor = circle.color;
+		this._detailKind = circle.kind;
 	}
 
 	#showDetailsBox(event: MouseEvent) {
+		if (this.hideDetailBox) return;
 		this.#setDetailsBoxData(event);
-		this.detailsBox.classList.add('show');
+		this._detailsBox.classList.add('show');
 	}
 
 	#hideDetailsBox() {
-		this.detailsBox.classList.remove('show');
+		if (this.hideDetailBox) return;
+		this._detailsBox.classList.remove('show');
 	}
 
 	#renderCircles() {
@@ -236,7 +284,7 @@ export class UmbDonutChartElement extends LitElement {
 					</feMerge>
 					<feDropShadow stdDeviation="1 1" in="merge1" dx="0" dy="0" flood-color="#000" flood-opacity="0.8" x="0%" y="0%" width="100%" height="100%" result="dropShadow1"/>
 				</filter>
-				<desc>In chosen date range you have this number of log message of type: </desc>
+				<desc>${this.description}</desc>
 					${this.circles.map(
 						(circle, i) => svg`
 								<path
@@ -268,9 +316,9 @@ export class UmbDonutChartElement extends LitElement {
 				<svg viewBox="0 0 ${this.viewBox} ${this.viewBox}" role="list">${this.#renderCircles()}</svg>
 				<div
 					id="details-box"
-					style="--pos-y: ${this.posY}px; --pos-x: ${this.posX}px; --umb-donut-detail-color: ${this.detailColor}">
-					<div id="details-title"><uui-icon name="umb:record"></uui-icon>${this.detailName}</div>
-					<span>${this.detailAmount} messages</span>
+					style="--pos-y: ${this._posY}px; --pos-x: ${this._posX}px; --umb-donut-detail-color: ${this._detailColor}">
+					<div id="details-title"><uui-icon name="umb:record"></uui-icon>${this._detailName}</div>
+					<span>${this._detailAmount} ${this._detailKind}</span>
 				</div>
 			</div>
 			<slot @slotchange=${this.#printCircles} @slice-update=${this.#printCircles}></slot>`;

@@ -15,6 +15,9 @@ export class UmbDonutSliceElement extends LitElement {
 	@property()
 	name = '';
 
+	@property()
+	kind = '';
+
 	willUpdate() {
 		this.dispatchEvent(new CustomEvent('slice-update', { composed: true, bubbles: true }));
 	}

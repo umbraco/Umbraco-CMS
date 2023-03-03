@@ -144,13 +144,14 @@ export class UmbLogViewerLogTypesChartElement extends UmbLitElement {
 								: ''}
 						</ul>
 					</div>
-					<umb-donut-chart>
+					<umb-donut-chart .description=${'In chosen date range you have this number of log message of type:'}>
 						${this._logLevelCount
 							? this.logLevelCount.map(
 									([level, number]) =>
 										html`<umb-donut-slice
 											.name=${level}
 											.amount=${number}
+											.kind=${'messages'}
 											.color="${`var(--umb-log-viewer-${level.toLowerCase()}-color)`}"></umb-donut-slice> `
 							  )
 							: ''}

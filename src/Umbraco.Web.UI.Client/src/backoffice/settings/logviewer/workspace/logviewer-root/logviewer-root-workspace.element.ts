@@ -1,4 +1,4 @@
-import '../views/components';
+import './components';
 import { map } from 'rxjs';
 import { css, html, nothing } from 'lit';
 import { customElement, state, property } from 'lit/decorators.js';
