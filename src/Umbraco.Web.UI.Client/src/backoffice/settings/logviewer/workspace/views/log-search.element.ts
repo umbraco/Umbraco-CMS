@@ -314,6 +314,8 @@ export class UmbLogViewerSearchViewElement extends UmbLitElement {
 	#setQueryFromSavedSearch(query: string) {
 		this._inputQuery = query;
 		this.#logViewerContext?.setFilterExpression(query);
+		this.#logViewerContext?.setCurrentPage(1);
+
 		this.#logViewerContext?.getLogs();
 		this._savedSearchesPopover.open = false;
 	}
@@ -325,6 +327,8 @@ export class UmbLogViewerSearchViewElement extends UmbLitElement {
 	}
 
 	#search() {
+		this.#logViewerContext?.setCurrentPage(1);
+
 		this.#logViewerContext?.getLogs();
 	}
 
@@ -379,6 +383,8 @@ export class UmbLogViewerSearchViewElement extends UmbLitElement {
 
 	#setLogLevel() {
 		if (!this.#logViewerContext) return;
+		this.#logViewerContext?.setCurrentPage(1);
+
 		const logLevels = Array.from(this._logLevelSelectorCheckboxes)
 			.filter((checkbox) => checkbox.checked)
 			.map((checkbox) => checkbox.value as LogLevelModel);
@@ -465,6 +471,7 @@ export class UmbLogViewerSearchViewElement extends UmbLitElement {
 
 	#sortLogs() {
 		this.#logViewerContext?.toggleSortOrder();
+		this.#logViewerContext?.setCurrentPage(1);
 		this.#logViewerContext?.getLogs();
 	}
 

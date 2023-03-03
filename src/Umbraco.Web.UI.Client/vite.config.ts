@@ -7,9 +7,6 @@ export default defineConfig({
 	build: {
 		sourcemap: true,
 	},
-	server: {
-		open: '/backoffice',
-	},
 	plugins: [
 		viteStaticCopy({
 			targets: [

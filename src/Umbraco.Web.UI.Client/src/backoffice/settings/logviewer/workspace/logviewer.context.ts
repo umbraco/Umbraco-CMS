@@ -124,6 +124,37 @@ export class UmbLogViewerWorkspaceContext {
 		const { data } = await this.#repository.getSavedSearches({ skip: 0, take: 100 });
 		if (data) {
 			this.#savedSearches.next(data);
+		} else {
+			//falback to some default searches like in the old backoffice
+			this.#savedSearches.next({
+				items: [
+					{
+						name: 'Find all logs where the Level is NOT Verbose and NOT Debug',
+						query: "Not(@Level='Verbose') and Not(@Level='Debug')",
+					},
+					{
+						name: 'Find all logs that has an exception property (Warning, Error & Fatal with Exceptions)',
+						query: 'Has(@Exception)',
+					},
+					{
+						name: "Find all logs that have the property 'Duration'",
+						query: 'Has(Duration)',
+					},
+					{
+						name: "Find all logs that have the property 'Duration' and the duration is greater than 1000ms",
+						query: 'Has(Duration) and Duration > 1000',
+					},
+					{
+						name: "Find all logs that are from the namespace 'Umbraco.Core'",
+						query: "StartsWith(SourceContext, 'Umbraco.Core')",
+					},
+					{
+						name: 'Find all logs that use a specific log message template',
+						query: "@MessageTemplate = '[Timing {TimingId}] {EndMessage} ({TimingDuration}ms)'",
+					},
+				],
+				total: 6,
+			});
 		}
 	}
 
@@ -176,6 +207,7 @@ export class UmbLogViewerWorkspaceContext {
 	}
 
 	togglePolling() {
+
 		const isEnabled = !this.#polling.getValue().enabled;
 		this.#polling.update({
 			enabled: isEnabled,
@@ -183,6 +215,7 @@ export class UmbLogViewerWorkspaceContext {
 
 		if (isEnabled) {
 			this.#intervalID = setInterval(() => {
+				this.currentPage = 1;
 				this.getLogs();
 			}, this.#polling.getValue().interval) as unknown as number;
 			return;
