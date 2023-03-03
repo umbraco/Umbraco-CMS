@@ -31,6 +31,14 @@ declare global {
 	}
 }
 
+export interface TinyMcePluginArguments {
+	editor: Editor;
+	modalContext?: UmbModalContext;
+	configuration?: Array<DataTypePropertyModel>;
+	currentUser?: UserDetails;
+	mediaHelper?: UmbMediaHelper;
+}
+
 @customElement('umb-input-tiny-mce')
 export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
 	static styles = [UUITextStyles];
@@ -197,6 +205,11 @@ export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
 			this.#currentUserStore = instance;
 			this.#observeCurrentUser();
 		});
+
+		// TODO => Register plugin using the add method
+		window.tinymce.PluginManager.add('example', (ed) => {
+			ed.on('click', () => ed.windowManager.alert('Hello World!'));
+		});
 	}
 
 	async #observeCurrentUser() {
@@ -242,13 +255,24 @@ export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
 			setup: (editor: Editor) => this.#editorSetup(editor),
 		};
 
+		// TODO => set editor mode
+
+		// get any pre-loaded plugins, and append their names to the config set
+		// TODO => below loads the plugin, but it's not available in the editor...
+		//window.tinymce.PluginManager.add('example', (editor, url) => {})
+		const registeredPlugins = Object.keys(window.tinymce.PluginManager.lookup);
+		const configPlugins = this._configObject.plugins.map((x: any) => x.name);
+		const plugins = registeredPlugins.concat(configPlugins).join(' ');
+
+		console.log(plugins);
+
 		// extend with configuration values
 		Object.assign(window.tinyConfig, {
 			content_css: this._configObject.stylesheets.join(','),
 			extended_valid_elements: this.#extendedValidElements,
 			height: ifDefined(this._configObject.dimensions?.height),
 			invalid_elements: this._configObject.invalidElements,
-			plugins: this._configObject.plugins.map((x: any) => x.name).join(' '),
+			plugins: plugins,
 			quickbars_insert_toolbar: this._configObject.toolbar.join(' '),
 			quickbars_selection_toolbar: this._configObject.toolbar.join(' '),
 			style_formats: this._styleFormats,
@@ -300,11 +324,17 @@ export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
 
 	#editorSetup(editor: Editor) {
 		// initialise core plugins
-		new TinyMceCodeEditorPlugin(editor, this.modalContext);
-		new TinyMceLinkPickerPlugin(editor, this.modalContext, this.configuration);
-		new TinyMceMacroPlugin(editor, this.modalContext);
-		new TinyMceMediaPickerPlugin(editor, this.modalContext, this.configuration, this.currentUser);
-		new TinyMceEmbeddedMediaPlugin(editor, this.modalContext);
+		new TinyMceCodeEditorPlugin({ editor, modalContext: this.modalContext });
+		new TinyMceLinkPickerPlugin({ editor, modalContext: this.modalContext, configuration: this.configuration });
+		new TinyMceMacroPlugin({ editor, modalContext: this.modalContext });
+		new TinyMceMediaPickerPlugin({
+			editor,
+			modalContext: this.modalContext,
+			configuration: this.configuration,
+			currentUser: this.currentUser,
+			mediaHelper: this.#mediaHelper,
+		});
+		new TinyMceEmbeddedMediaPlugin({ editor, modalContext: this.modalContext });
 
 		editor.suffix = '.min';
 
