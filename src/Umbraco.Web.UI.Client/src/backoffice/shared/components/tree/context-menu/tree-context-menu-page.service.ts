@@ -1,8 +1,6 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, nothing, PropertyValueMap } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
-import UmbTreeItemActionElement, { ActionPageEntity } from '../action/tree-item-action.element';
-import { UmbTreeContextMenuService } from './tree-context-menu.service';
 import { UmbLitElement } from '@umbraco-cms/element';
 import { DeepState } from '@umbraco-cms/observable-api';
 import { UmbContextToken } from '@umbraco-cms/context-api';
@@ -13,9 +11,9 @@ export class UmbTreeContextMenuPageService extends UmbLitElement {
 	static styles = [UUITextStyles, css``];
 
 	@property({ type: Object })
-	public actionEntity: ActionPageEntity = { key: '', name: '' };
+	public actionEntity: any = { key: '', name: '' };
 
-	#entity = new DeepState({ key: '', name: '' } as ActionPageEntity);
+	#entity = new DeepState({ key: '', name: '' } as any);
 	public readonly entity = this.#entity.asObservable();
 
 	@state()
@@ -38,7 +36,7 @@ export class UmbTreeContextMenuPageService extends UmbLitElement {
 	}
 
 	public openPage(elementName: string) {
-		const element = document.createElement(elementName) as UmbTreeItemActionElement;
+		const element = document.createElement(elementName) as any;
 		this._pages.push(element);
 		this.requestUpdate('_pages');
 	}
