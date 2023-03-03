@@ -1,38 +1,37 @@
-import { UmbModalService } from '@umbraco-cms/modal';
+import { AstNode, Editor } from 'tinymce';
+import { UmbModalContext } from '@umbraco-cms/modal';
 import { MacroSyntaxData, UmbMacroService } from 'libs/macro/macro.service';
 
 interface DialogData {
 	richTextEditor: boolean;
-	macroData?: MacroSyntaxData | null | undefined;
+	macroData?: MacroSyntaxData | null;
 	activeMacroElement?: HTMLElement;
 }
 
 // TODO => This is a quick transplant of the existing macro plugin - needs to be finished, and need to
 // determine how to replicate the existing macro service (backend doens')
-export class MacroPlugin {
-	#modalService?: UmbModalService;
-    #macroService?: UmbMacroService;
-	editor?: any;
+export class TinyMceMacroPlugin {
+	#modalService: UmbModalContext;
+    #macroService = new UmbMacroService();
+	editor: Editor;
 
-	constructor(editor: any, modalService?: UmbModalService) {
+	constructor(editor: Editor, modalService: UmbModalContext) {
 		this.#modalService = modalService;
 		this.editor = editor;
-        this.#macroService = new UmbMacroService();
 
 		/** Adds custom rules for the macro plugin and custom serialization */
-		editor.on('preInit', (args: any) => {
+		editor.on('preInit', () => {
 			//this is requires so that we tell the serializer that a 'div' is actually allowed in the root, otherwise the cleanup will strip it out
 			editor.serializer.addRules('div');
 
 			/** This checks if the div is a macro container, if so, checks if its wrapped in a p tag and then unwraps it (removes p tag) */
-			editor.serializer.addNodeFilter('div', (nodes: any) => {
+			editor.serializer.addNodeFilter('div', (nodes: AstNode[]) => {
 				for (let i = 0; i < nodes.length; i++) {
 					if (
 						nodes[i].attr('class') === 'umb-macro-holder' &&
-						nodes[i].parent &&
-						nodes[i].parent.name.toUpperCase() === 'P'
+						nodes[i].parent?.name.toLowerCase() === 'p'
 					) {
-						nodes[i].parent.unwrap();
+						nodes[i].parent?.unwrap();
 					}
 				}
 			});
@@ -41,8 +40,8 @@ export class MacroPlugin {
 		/** when the contents load we need to find any macros declared and load in their content */
 		editor.on('SetContent', () => {
 			//get all macro divs and load their content
-			editor.dom.select('.umb-macro-holder.mceNonEditable').forEach((macroElement: HTMLElement) => {
-				this.#loadMacroContent(macroElement, null);
+			editor.dom.select('.umb-macro-holder.mceNonEditable').forEach((macroElement) => {
+				this.#loadMacroContent(macroElement as HTMLDivElement, null);
 			});
 		});
 
@@ -84,7 +83,7 @@ export class MacroPlugin {
 	}
 
 	/** loads in the macro content async from the server */
-	#loadMacroContent(macroDiv?: HTMLElement, macroData?: any) {
+	#loadMacroContent(macroDiv?: HTMLDivElement, macroData?: MacroSyntaxData | null) {
 		//if we don't have the macroData, then we'll need to parse it from the macro div
 		if (!macroData && macroDiv) {
 			const comment = Array.from(macroDiv.childNodes).find((x) => x.nodeType === 8);
@@ -127,7 +126,7 @@ export class MacroPlugin {
 		// });
 	}
 
-	#insertMacroInEditor(macroObject: any, activeMacroElement?: HTMLElement) {
+	#insertMacroInEditor(macroObject: MacroSyntaxData, activeMacroElement?: HTMLElement) {
 		//Important note: the TinyMce plugin "noneditable" is used here so that the macro cannot be edited,
 		// for this to work the mceNonEditable class needs to come last and we also need to use the attribute contenteditable = false
 		// (even though all the docs and examples say that is not necessary)
@@ -153,7 +152,7 @@ export class MacroPlugin {
 			this.editor.selection.setNode(macroDiv);
 		}
 
-		macroDiv = this.editor.dom.select('div.umb-macro-holder.' + uniqueId);
+		macroDiv = this.editor.dom.select('div.umb-macro-holder.' + uniqueId)[0] as HTMLDivElement;
 		this.editor.setDirty(true);
 
 		//async load the macro content
@@ -185,8 +184,8 @@ export class MacroPlugin {
 		return e as HTMLElement;
 	}
 
+	// TODO => depends on macro picker, which doesn't exist
 	async #showMacroPicker(dialogData: DialogData) {
-		console.log(dialogData);
 		const modalHandler = this.#modalService?.openBasic({
 			header: 'I am a macro picker',
 			content: 'content content content',
@@ -197,7 +196,7 @@ export class MacroPlugin {
 		const { confirmed } = await modalHandler.onClose();
 		if (!confirmed) return;
 
-		this.#insertMacroInEditor({}, dialogData.activeMacroElement);
+		this.#insertMacroInEditor({} as MacroSyntaxData, dialogData.activeMacroElement);
 		this.editor.dispatch('Change');
 	}
 }

@@ -5,10 +5,10 @@ import { ifDefined } from 'lit-html/directives/if-defined.js';
 import { FormControlMixin } from '@umbraco-ui/uui-base/lib/mixins';
 import { AstNode, Editor, EditorEvent, TinyMCE } from 'tinymce';
 import { UmbMediaHelper } from '../../property-editors/uis/tiny-mce/media-helper.service';
-import { AcePlugin } from '../../property-editors/uis/tiny-mce/plugins/ace.plugin';
-import { LinkPickerPlugin } from '../../property-editors/uis/tiny-mce/plugins/linkpicker.plugin';
-import { MacroPlugin } from '../../property-editors/uis/tiny-mce/plugins/macro.plugin';
-import { MediaPickerPlugin } from '../../property-editors/uis/tiny-mce/plugins/mediapicker.plugin';
+import { TinyMceCodeEditorPlugin } from '../../property-editors/uis/tiny-mce/plugins/tiny-mce-code-editor.plugin';
+import { TinyMceLinkPickerPlugin } from '../../property-editors/uis/tiny-mce/plugins/tiny-mce-linkpicker.plugin';
+import { TinyMceMacroPlugin } from '../../property-editors/uis/tiny-mce/plugins/tiny-mce-macro.plugin';
+import { TinyMceMediaPickerPlugin } from '../../property-editors/uis/tiny-mce/plugins/tiny-mce-mediapicker.plugin';
 import {
 	UmbCurrentUserStore,
 	UMB_CURRENT_USER_STORE_CONTEXT_TOKEN,
@@ -102,7 +102,7 @@ export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
 	// private _contentStyle: string = contentUiSkinCss.toString() + '\n' + contentCss.toString();
 
 	#currentUserStore?: UmbCurrentUserStore;
-	modalContext?: UmbModalContext;
+	modalContext!: UmbModalContext;
 	#mediaHelper = new UmbMediaHelper();
 	currentUser?: UserDetails;
 
@@ -166,10 +166,10 @@ export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
 
 	#editorSetup(editor: Editor) {
 		// initialise core plugins
-		new AcePlugin(editor, this.modalContext);
-		new LinkPickerPlugin(editor, this.modalContext, this.configuration);
-		new MacroPlugin(editor, this.modalContext);
-		new MediaPickerPlugin(editor, this.configuration, this.modalContext, this.currentUser);
+		new TinyMceCodeEditorPlugin(editor, this.modalContext);
+		new TinyMceLinkPickerPlugin(editor, this.modalContext, this.configuration);
+		new TinyMceMacroPlugin(editor, this.modalContext);
+		new TinyMceMediaPickerPlugin(editor, this.modalContext, this.configuration, this.currentUser);
 
 		// register custom option maxImageSize
 		editor.options.register('maxImageSize', { processor: 'number', default: 500 });

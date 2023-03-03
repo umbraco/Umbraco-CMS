@@ -21,8 +21,7 @@ interface MediaPickerResultData {
 	'data-caption'?: string;
 }
 
-// TODO => TinyMCE type definitions
-export class MediaPickerPlugin {
+export class TinyMceMediaPickerPlugin {
 	#modalService?: UmbModalContext;
 	#mediaHelper = new UmbMediaHelper();
 	#config?: Array<DataTypePropertyModel> = [];
@@ -31,8 +30,8 @@ export class MediaPickerPlugin {
 
 	constructor(
 		editor: Editor,
-		configuration?: Array<DataTypePropertyModel>,
 		modalContext?: UmbModalContext,
+		configuration?: Array<DataTypePropertyModel>,
 		userDetails?: UserDetails
 	) {
 		this.#modalService = modalContext;

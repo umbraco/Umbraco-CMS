@@ -11,7 +11,7 @@ export class UmbMacroService {
 
         //This regex will match an alias of anything except characters that are quotes or new lines (for legacy reasons, when new macros are created
         // their aliases are cleaned an invalid chars are stripped)
-        const expression = /(<\?UMBRACO_MACRO (?:.+?)?macroAlias=["']([^\"\'\n\r]+?)["'][\s\S]+?)(\/>|>.*?<\/\?UMBRACO_MACRO>)/i;
+        const expression = /(<\?UMBRACO_MACRO (?:.+?)?macroAlias=["']([^"'\n\r]+?)["'][\s\S]+?)(\/>|>.*?<\/\?UMBRACO_MACRO>)/i;
         const match = expression.exec(syntax);
         
         if (!match || match.length < 3) {
@@ -21,8 +21,8 @@ export class UmbMacroService {
         const macroAlias = match[2];
 
         //this will leave us with just the parameters
-        const paramsChunk = match[1].trim().replace(new RegExp("UMBRACO_MACRO macroAlias=[\"']" + macroAlias + "[\"']"), "").trim();
-        const paramExpression = /(\w+?)=['\"]([\s\S]*?)['\"]/g;
+        const paramsChunk = match[1].trim().replace(new RegExp(`UMBRACO_MACRO macroAlias=["']${macroAlias}["']`), '').trim();
+        const paramExpression = /(\w+?)=['"]([\s\S]*?)['"]/g;
 
         const returnVal: MacroSyntaxData = {
             macroAlias,
@@ -42,7 +42,6 @@ export class UmbMacroService {
      * @param {MacroSyntaxData} args an object containing the macro alias and it's parameter values
      */
     generateMacroSyntax(args: MacroSyntaxData) {
-
         let macroString = `<?UMBRACO_MACRO macroAlias="${args.macroAlias}" `;
 
         for (const [key, val] of Object.entries(args.macroParamsDictionary)) {
@@ -74,11 +73,10 @@ export class UmbMacroService {
      * @param {object} args an object containing the macro alias and it's parameter values
      */
     generateMvcSyntax(args: MacroSyntaxData) {
-
         let macroString = `@await Umbraco.RenderMacroAsync("${args.macroAlias}"`;
-
         let hasParams = false;
         let paramString = '';
+
         if (args.macroParamsDictionary) {
 
             paramString = ', new {';
@@ -106,14 +104,11 @@ export class UmbMacroService {
     }
 
     collectValueData(macro: any, macroParams: any, renderingEngine: any) {
-
         const macroParamsDictionary: { [key: string]: string} = {};
         const macroAlias = macro.alias;
         if (!macroAlias) {
             throw "The macro object does not contain an alias";
         }
-
-        let syntax;
 
         macroParams.forEach((item: any) => {
             let val = item.value;
@@ -130,6 +125,8 @@ export class UmbMacroService {
             macroParamsDictionary[item.alias] = encodeURIComponent(val);
         });
 
+        let syntax;
+
         //get the syntax based on the rendering engine
         if (renderingEngine && renderingEngine.toLowerCase() === 'mvc') {
             syntax = this.generateMvcSyntax({ macroAlias, macroParamsDictionary });
@@ -142,7 +139,7 @@ export class UmbMacroService {
             macroParamsDictionary,
             macroAlias,
             syntax,
-        };
+        } as MacroSyntaxData;
     }
 }
 

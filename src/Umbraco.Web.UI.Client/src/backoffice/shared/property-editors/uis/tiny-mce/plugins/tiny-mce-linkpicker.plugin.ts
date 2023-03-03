@@ -1,6 +1,7 @@
+import { Editor } from 'tinymce';
+import { LinkPickerData } from '../../../../../../core/modal/layouts/link-picker/modal-layout-link-picker.element';
 import { DataTypePropertyModel } from '@umbraco-cms/backend-api';
-import { UmbModalService } from '@umbraco-cms/modal';
-import { LinkPickerData } from 'src/core/modal/layouts/link-picker/modal-layout-link-picker.element';
+import { UmbModalContext } from '@umbraco-cms/modal';
 
 export interface CurrentTargetData {
 	name?: string;
@@ -18,12 +19,12 @@ export interface LinkListItem {
 	menu?: unknown;
 }
 
-export class LinkPickerPlugin {
-	#modalService?: UmbModalService;
-	#config?: Array<DataTypePropertyModel> = [];
-	#editor?: any;
+export class TinyMceLinkPickerPlugin {
+	#modalService: UmbModalContext;
+	#config: Array<DataTypePropertyModel> = [];
+	#editor: Editor;
 
-	constructor(editor: any, modalService?: UmbModalService, config?: Array<DataTypePropertyModel>) {
+	constructor(editor: Editor, modalService: UmbModalContext, config: Array<DataTypePropertyModel>) {
 		this.#modalService = modalService;
 		this.#config = config;
 		this.#editor = editor;
@@ -33,16 +34,21 @@ export class LinkPickerPlugin {
 		});
 	}
 
-	#createLinkPicker(editor: any, createLinkPickerCallback: any) {	
+	#createLinkPicker(
+		editor: Editor,
+		createLinkPickerCallback: (currentTarget: CurrentTargetData, anchorElement: HTMLAnchorElement) => void
+	) {
 		async function showDialog() {
 			const data: { text?: string; href?: string; target?: string; rel?: string } = {};
 			const selection = editor.selection;
 			const dom = editor.dom;
 
-			const selectedElm: HTMLElement = selection.getNode();
-			const anchorElm: HTMLAnchorElement = dom.getParent(selectedElm, 'a[href]');
+			const selectedElm = selection.getNode();
+			const anchorElm = dom.getParent(selectedElm, 'a[href]') as HTMLAnchorElement;
 
-			data.text = anchorElm ? anchorElm.innerText || anchorElm.textContent : selection.getContent({ format: 'text' });
+			data.text = anchorElm
+				? anchorElm.innerText || (anchorElm.textContent ?? '')
+				: selection.getContent({ format: 'text' });
 
 			data.href = anchorElm?.getAttribute('href') ?? '';
 			data.target = anchorElm?.target ?? '';
@@ -91,19 +97,27 @@ export class LinkPickerPlugin {
 			createLinkPickerCallback(currentTarget, anchorElm);
 		}
 
+		const editorEventSetupCallback = (buttonApi: { setEnabled: (state: boolean) => void }) => {
+			const editorEventCallback = (eventApi: { element: Element}) => {
+				buttonApi.setEnabled(eventApi.element.nodeName.toLowerCase() === 'a' && eventApi.element.hasAttribute('href'));
+			};
+
+			editor.on('NodeChange', editorEventCallback);
+			return () => editor.off('NodeChange', editorEventCallback);
+		};
+
 		editor.ui.registry.addButton('link', {
 			icon: 'link',
 			tooltip: 'Insert/edit link',
-			shortcut: 'Ctrl+K',
 			onAction: showDialog,
-			stateSelector: 'a[href]',
+			onSetup: editorEventSetupCallback,
 		});
 
 		editor.ui.registry.addButton('unlink', {
 			icon: 'unlink',
 			tooltip: 'Remove link',
 			onAction: () => editor.execCommand('unlink'),
-			stateSelector: 'a[href]',
+			onSetup: editorEventSetupCallback,
 		});
 
 		editor.ui.registry.addMenuItem('link', {
@@ -111,12 +125,10 @@ export class LinkPickerPlugin {
 			text: 'Insert link',
 			shortcut: 'Ctrl+K',
 			onAction: showDialog,
-			stateSelector: 'a[href]',
-			context: 'insert',
-			prependToContext: true,
+			onSetup: editorEventSetupCallback,
+			//context: 'insert',
+			//prependToContext: true,
 		});
-
-		editor.addShortcut('Ctrl+K', '', showDialog);
 	}
 
 	// TODO => get anchors to provide to link picker?
@@ -205,8 +217,12 @@ export class LinkPickerPlugin {
 						typeof linkPickerData.name !== 'undefined' && linkPickerData.name !== ''
 							? linkPickerData.name
 							: linkPickerData.url;
-					const domElement = editor.dom.createHTML('a', createElemAttributes(), linkContent);
-					editor.execCommand('mceInsertContent', false, domElement);
+
+					// only insert if link has content
+					if (linkContent) {
+						const domElement = editor.dom.createHTML('a', createElemAttributes(), linkContent);
+						editor.execCommand('mceInsertContent', false, domElement);
+					}
 				}
 			}
 		}

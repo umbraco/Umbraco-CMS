@@ -1,12 +1,12 @@
-import { UmbModalService } from '@umbraco-cms/modal';
+import { Editor } from 'tinymce';
+import { UmbModalContext } from '@umbraco-cms/modal';
 
-// TODO => TinyMCE type definitions
-export class AcePlugin {
-	#modalService?: UmbModalService;
-	editor?: any;
+export class TinyMceEmbeddedMediaPlugin {
+	#modalContext: UmbModalContext;
+	editor: Editor;
 
-	constructor(editor: any, modalService?: UmbModalService) {
-		this.#modalService = modalService;
+	constructor(editor: Editor, modalContext: UmbModalContext) {
+		this.#modalContext = modalContext;
 		this.editor = editor;
 
 		editor.ui.registry.addButton('ace', {
@@ -17,7 +17,7 @@ export class AcePlugin {
 	}
 
 	async #showCodeEditor() {
-		const modalHandler = this.#modalService?.codeEditor({
+		const modalHandler = this.#modalContext?.codeEditor({
 			headline: 'Edit source code',
 			content: this.editor.getContent(),
 		});
