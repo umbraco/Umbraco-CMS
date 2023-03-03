@@ -30,16 +30,26 @@ public class LockingMechanism : ILockingMechanism
     }
 
     /// <inheritdoc />
-    public void ReadLock(Guid instanceId, params int[] lockIds) => LazyReadLockInner(instanceId, lockIds);
+    public void ReadLock(Guid instanceId, TimeSpan? timeout = null, params int[] lockIds) => LazyReadLockInner(instanceId, timeout, lockIds);
+
+    public void ReadLock(Guid instanceId, params int[] lockIds) => ReadLock(instanceId, TimeSpan.Zero, lockIds);
 
     /// <inheritdoc />
-    public void WriteLock(Guid instanceId, params int[] lockIds) => LazyWriteLockInner(instanceId, lockIds);
+    public void WriteLock(Guid instanceId, TimeSpan? timeout = null, params int[] lockIds) => LazyWriteLockInner(instanceId, timeout, lockIds);
+
+    public void WriteLock(Guid instanceId, params int[] lockIds) => WriteLock(instanceId, TimeSpan.Zero, lockIds);
 
     /// <inheritdoc />
-    public void EagerReadLock(Guid instanceId, params int[] lockIds) => EagerReadLockInner(instanceId, null, lockIds);
+    public void EagerReadLock(Guid instanceId, TimeSpan? timeout = null, params int[] lockIds) => EagerReadLockInner(instanceId, timeout, lockIds);
+
+    public void EagerReadLock(Guid instanceId, params int[] lockIds) =>
+        EagerReadLock(instanceId, TimeSpan.Zero, lockIds);
 
     /// <inheritdoc />
-    public void EagerWriteLock(Guid instanceId, params int[] lockIds) => EagerWriteLockInner(instanceId, null, lockIds);
+    public void EagerWriteLock(Guid instanceId, TimeSpan? timeout = null, params int[] lockIds) => EagerWriteLockInner(instanceId, timeout, lockIds);
+
+    public void EagerWriteLock(Guid instanceId, params int[] lockIds) =>
+        EagerWriteLock(instanceId, TimeSpan.Zero, lockIds);
 
     /// <summary>
     ///     Handles acquiring a write lock with a specified timeout, will delegate it to the parent if there are any.
@@ -196,13 +206,13 @@ public class LockingMechanism : ILockingMechanism
         }
     }
 
-    private void LazyWriteLockInner(Guid instanceId, params int[] lockIds) =>
-        LazyLockInner(DistributedLockType.WriteLock, instanceId, lockIds);
+    private void LazyWriteLockInner(Guid instanceId, TimeSpan? timeout = null, params int[] lockIds) =>
+        LazyLockInner(DistributedLockType.WriteLock, instanceId, timeout, lockIds);
 
-    private void LazyReadLockInner(Guid instanceId, params int[] lockIds) =>
-        LazyLockInner(DistributedLockType.ReadLock, instanceId, lockIds);
+    private void LazyReadLockInner(Guid instanceId, TimeSpan? timeout = null, params int[] lockIds) =>
+        LazyLockInner(DistributedLockType.ReadLock, instanceId, timeout, lockIds);
 
-    private void LazyLockInner(DistributedLockType lockType, Guid instanceId, params int[] lockIds)
+    private void LazyLockInner(DistributedLockType lockType, Guid instanceId, TimeSpan? timeout = null, params int[] lockIds)
     {
         lock (_lockQueueLocker)
         {
@@ -213,7 +223,7 @@ public class LockingMechanism : ILockingMechanism
 
             foreach (var lockId in lockIds)
             {
-                _queuedLocks.Enqueue((lockType, TimeSpan.Zero, instanceId, lockId));
+                _queuedLocks.Enqueue((lockType, timeout ?? TimeSpan.Zero, instanceId, lockId));
             }
         }
     }
@@ -334,6 +344,11 @@ public class LockingMechanism : ILockingMechanism
             }
         }
     }
+
+
+    public Dictionary<Guid, Dictionary<int, int>>? GetReadLocks() => _readLocksDictionary;
+
+    public Dictionary<Guid, Dictionary<int, int>>? GetWriteLocks() => _writeLocksDictionary;
 
     /// <inheritdoc />
     public void Dispose()

@@ -7,6 +7,8 @@ public interface ILockingMechanism : IDisposable
     /// </summary>
     /// <param name="instanceId">Instance id of the scope who is requesting the lock</param>
     /// <param name="lockIds">Array of lock object identifiers.</param>
+    void ReadLock(Guid instanceId, TimeSpan? timeout = null, params int[] lockIds);
+
     void ReadLock(Guid instanceId, params int[] lockIds);
 
     /// <summary>
@@ -14,6 +16,7 @@ public interface ILockingMechanism : IDisposable
     /// </summary>
     /// <param name="instanceId">Instance id of the scope who is requesting the lock</param>
     /// <param name="lockIds">Array of object identifiers.</param>
+    void WriteLock(Guid instanceId, TimeSpan? timeout = null, params int[] lockIds);
     void WriteLock(Guid instanceId, params int[] lockIds);
 
     /// <summary>
@@ -21,6 +24,7 @@ public interface ILockingMechanism : IDisposable
     /// </summary>
     /// <param name="instanceId"></param>
     /// <param name="lockIds"></param>
+    void EagerReadLock(Guid instanceId, TimeSpan? timeout = null, params int[] lockIds);
     void EagerReadLock(Guid instanceId, params int[] lockIds);
 
     /// <summary>
@@ -28,6 +32,7 @@ public interface ILockingMechanism : IDisposable
     /// </summary>
     /// <param name="instanceId"></param>
     /// <param name="lockIds"></param>
+    void EagerWriteLock(Guid instanceId, TimeSpan? timeout = null, params int[] lockIds);
     void EagerWriteLock(Guid instanceId, params int[] lockIds);
 
     /// <summary>
@@ -41,4 +46,8 @@ public interface ILockingMechanism : IDisposable
     /// </summary>
     /// <param name="scopeInstanceId"></param>
     void EnsureLocks(Guid scopeInstanceId);
+
+    public Dictionary<Guid, Dictionary<int, int>>? GetReadLocks();
+
+    public Dictionary<Guid, Dictionary<int, int>>? GetWriteLocks();
 }

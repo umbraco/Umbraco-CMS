@@ -37,9 +37,11 @@ public class SqlServerDistributedLockingMechanism : IDistributedLockingMechanism
         _connectionStrings = connectionStrings;
     }
 
+    public bool HasActiveRelatedScope => _scopeAccessor.Value.AmbientScope is not null;
+
     /// <inheritdoc />
     public bool Enabled => _connectionStrings.CurrentValue.IsConnectionStringConfigured() &&
-                           string.Equals(_connectionStrings.CurrentValue.ProviderName,Constants.ProviderName, StringComparison.InvariantCultureIgnoreCase) && _scopeAccessor.Value.AmbientScope is not null;
+                           string.Equals(_connectionStrings.CurrentValue.ProviderName,Constants.ProviderName, StringComparison.InvariantCultureIgnoreCase);
 
     /// <inheritdoc />
     public IDistributedLock ReadLock(int lockId, TimeSpan? obtainLockTimeout = null)

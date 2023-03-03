@@ -49,7 +49,13 @@ public class DefaultDistributedLockingMechanismFactory : IDistributedLockingMech
             }
         }
 
-        IDistributedLockingMechanism? defaultMechanism = _distributedLockingMechanisms.FirstOrDefault(x => x.Enabled);
+        IDistributedLockingMechanism? defaultMechanism = null;
+        if (_distributedLockingMechanisms.Count() > 1)
+        {
+            defaultMechanism = _distributedLockingMechanisms.FirstOrDefault(x => x.Enabled && x.HasActiveRelatedScope);
+        }
+
+        defaultMechanism ??= _distributedLockingMechanisms.FirstOrDefault(x => x.Enabled);
         if (defaultMechanism != null)
         {
             return defaultMechanism;

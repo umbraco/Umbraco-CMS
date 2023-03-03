@@ -23,7 +23,8 @@ public class CoreScope : ICoreScope
         FileSystems scopedFileSystem,
         IEventAggregator eventAggregator,
         RepositoryCacheMode repositoryCacheMode = RepositoryCacheMode.Unspecified,
-        bool? shouldScopeFileSystems = null)
+        bool? shouldScopeFileSystems = null,
+        IScopedNotificationPublisher? notificationPublisher = null)
     {
         _eventAggregator = eventAggregator;
         InstanceId = Guid.NewGuid();
@@ -33,31 +34,29 @@ public class CoreScope : ICoreScope
             : ResolveLockingMechanism();
         _repositoryCacheMode = repositoryCacheMode;
         _shouldScopeFileSystems = shouldScopeFileSystems;
+        _notificationPublisher = notificationPublisher;
 
         if (_shouldScopeFileSystems is true)
         {
-            // // cannot specify a different fs scope!
-            // // can be 'true' only on outer scope (and false does not make much sense)
-            // if (_shouldScopeFileSystems != null && ParentScope?._shouldScopeFileSystems != _shouldScopeFileSystems)
-            // {
-            //     throw new ArgumentException(
-            //         $"Value '{_shouldScopeFileSystems.Value}' be different from parent value '{ParentScope?._shouldScopeFileSystems}'.",
-            //         nameof(_shouldScopeFileSystems));
-            // }
-
             _scopedFileSystem = scopedFileSystem.Shadow();
         }
     }
 
     public CoreScope(
-        CoreScope parentScope,
+        CoreScope? parentScope,
         IDistributedLockingMechanismFactory distributedLockingMechanismFactory,
         FileSystems scopedFileSystem,
         IEventAggregator eventAggregator,
         RepositoryCacheMode repositoryCacheMode = RepositoryCacheMode.Unspecified,
-        bool? shouldScopeFileSystems = null)
-    : this(distributedLockingMechanismFactory, scopedFileSystem, eventAggregator, repositoryCacheMode, shouldScopeFileSystems)
+        bool? shouldScopeFileSystems = null,
+        IScopedNotificationPublisher? notificationPublisher = null)
+    : this(distributedLockingMechanismFactory, scopedFileSystem, eventAggregator, repositoryCacheMode, shouldScopeFileSystems, notificationPublisher)
     {
+        if (parentScope is null)
+        {
+            return;
+        }
+
         // cannot specify a different fs scope!
         // can be 'true' only on outer scope (and false does not make much sense)
         if (_shouldScopeFileSystems != null && ParentScope?._shouldScopeFileSystems != _shouldScopeFileSystems)
@@ -66,6 +65,23 @@ public class CoreScope : ICoreScope
                 $"Value '{_shouldScopeFileSystems.Value}' be different from parent value '{ParentScope?._shouldScopeFileSystems}'.",
                 nameof(_shouldScopeFileSystems));
         }
+
+        // cannot specify a different mode!
+        // TODO: means that it's OK to go from L2 to None for reading purposes, but writing would be BAD!
+        // this is for XmlStore that wants to bypass caches when rebuilding XML (same for NuCache)
+        if (repositoryCacheMode != RepositoryCacheMode.Unspecified &&
+            parentScope.RepositoryCacheMode > repositoryCacheMode)
+        {
+            throw new ArgumentException(
+                $"Value '{repositoryCacheMode}' cannot be lower than parent value '{parentScope.RepositoryCacheMode}'.", nameof(repositoryCacheMode));
+        }
+
+        // Only the outermost scope can specify the notification publisher
+        if (_notificationPublisher != null)
+        {
+            throw new ArgumentException("Value cannot be specified on nested scope.", nameof(_notificationPublisher));
+        }
+
 
         ParentScope = parentScope;
     }
@@ -158,21 +174,21 @@ public class CoreScope : ICoreScope
         return _completed.Value;
     }
 
-    public void ReadLock(params int[] lockIds) => Locks.ReadLock(InstanceId, lockIds);
+    public void ReadLock(params int[] lockIds) => Locks.ReadLock(InstanceId, TimeSpan.Zero, lockIds);
 
-    public void WriteLock(params int[] lockIds) => Locks.WriteLock(InstanceId, lockIds);
+    public void WriteLock(params int[] lockIds) => Locks.WriteLock(InstanceId, TimeSpan.Zero, lockIds);
 
-    public void WriteLock(TimeSpan timeout, int lockId) => Locks.ReadLock(InstanceId, lockId);
+    public void WriteLock(TimeSpan timeout, int lockId) => Locks.ReadLock(InstanceId, timeout, lockId);
 
-    public void ReadLock(TimeSpan timeout, int lockId) => Locks.WriteLock(InstanceId, lockId);
+    public void ReadLock(TimeSpan timeout, int lockId) => Locks.WriteLock(InstanceId, timeout, lockId);
 
-    public void EagerWriteLock(params int[] lockIds) => Locks.EagerWriteLock(InstanceId, lockIds);
+    public void EagerWriteLock(params int[] lockIds) => Locks.EagerWriteLock(InstanceId, TimeSpan.Zero, lockIds);
 
-    public void EagerWriteLock(TimeSpan timeout, int lockId) => Locks.EagerWriteLock(InstanceId, lockId);
+    public void EagerWriteLock(TimeSpan timeout, int lockId) => Locks.EagerWriteLock(InstanceId, timeout, lockId);
 
-    public void EagerReadLock(TimeSpan timeout, int lockId) => Locks.EagerReadLock(InstanceId, lockId);
+    public void EagerReadLock(TimeSpan timeout, int lockId) => Locks.EagerReadLock(InstanceId, timeout, lockId);
 
-    public void EagerReadLock(params int[] lockIds) => Locks.EagerReadLock(InstanceId, lockIds);
+    public void EagerReadLock(params int[] lockIds) => Locks.EagerReadLock(InstanceId, TimeSpan.Zero, lockIds);
 
     public virtual void Dispose()
     {
@@ -192,7 +208,7 @@ public class CoreScope : ICoreScope
         _disposed = true;
     }
 
-    private void ChildCompleted(bool? completed)
+    protected void ChildCompleted(bool? completed)
     {
         // if child did not complete we cannot complete
         if (completed.HasValue == false || completed.Value == false)

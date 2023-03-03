@@ -26,6 +26,8 @@ namespace Umbraco.Cms.Core.DistributedLocking;
 /// </remarks>
 public interface IDistributedLockingMechanism
 {
+    bool HasActiveRelatedScope { get; }
+
     /// <summary>
     ///     Gets a value indicating whether this distributed locking mechanism can be used.
     /// </summary>

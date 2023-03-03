@@ -35,6 +35,8 @@ public class SqlServerEFCoreDistributedLockingMechanism : IDistributedLockingMec
         _connectionStrings = connectionStrings;
     }
 
+    public bool HasActiveRelatedScope => _scopeAccessor.Value.AmbientScope is not null;
+
     /// <inheritdoc />
     public bool Enabled => _connectionStrings.CurrentValue.IsConnectionStringConfigured() &&
                            string.Equals(_connectionStrings.CurrentValue.ProviderName, "Microsoft.Data.SqlClient", StringComparison.InvariantCultureIgnoreCase) && _scopeAccessor.Value.AmbientScope is not null;

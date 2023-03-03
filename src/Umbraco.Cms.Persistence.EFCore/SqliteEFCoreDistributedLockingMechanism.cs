@@ -31,6 +31,8 @@ public class SqliteEFCoreDistributedLockingMechanism : IDistributedLockingMechan
         _globalSettings = globalSettings;
     }
 
+    public bool HasActiveRelatedScope => _efCoreScopeAccessor.Value.AmbientScope is not null;
+
     /// <inheritdoc />
     public bool Enabled => _connectionStrings.CurrentValue.IsConnectionStringConfigured() &&
                            string.Equals(_connectionStrings.CurrentValue.ProviderName, "Microsoft.Data.Sqlite", StringComparison.InvariantCultureIgnoreCase) && _efCoreScopeAccessor.Value.AmbientScope is not null;
