@@ -14,6 +14,7 @@ using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Examine;
 using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Tests.Integration.Testing;
+using Umbraco.Search;
 using Umbraco.Search.Examine;
 using Umbraco.Search.Examine.ValueSetBuilders;
 using Umbraco.Search.Indexing.Populators;
@@ -45,6 +46,7 @@ public abstract class ExamineBaseTest : UmbracoIntegrationTest
     protected IDisposable GetSynchronousContentIndex(
         bool publishedValuesOnly,
         out UmbracoContentIndex index,
+        out IUmbracoSearcher searcher,
         out ContentIndexPopulator contentRebuilder,
         out ContentValueSetBuilder contentValueSetBuilder,
         int? parentId = null,

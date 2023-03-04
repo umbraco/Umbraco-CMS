@@ -50,4 +50,25 @@
     <EmbeddedResource Include="Umbraco.Web.BackOffice\UrlAndDomains\package.xml" />
     <Content Include="appsettings.Tests.json" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove="Umbraco.Examine.Lucene\UmbracoExamine\ExamineBaseTest.cs" />
+    <None Include="Umbraco.Examine.Lucene\UmbracoExamine\ExamineBaseTest.cs" />
+    <Compile Remove="Umbraco.Examine.Lucene\UmbracoExamine\ExamineDemoDataContentService.cs" />
+    <None Include="Umbraco.Examine.Lucene\UmbracoExamine\ExamineDemoDataContentService.cs" />
+    <Compile Remove="Umbraco.Examine.Lucene\UmbracoExamine\ExamineDemoDataMediaService.cs" />
+    <None Include="Umbraco.Examine.Lucene\UmbracoExamine\ExamineDemoDataMediaService.cs" />
+    <Compile Remove="Umbraco.Examine.Lucene\UmbracoExamine\ExamineExtensions.cs" />
+    <None Include="Umbraco.Examine.Lucene\UmbracoExamine\ExamineExtensions.cs" />
+    <Compile Remove="Umbraco.Examine.Lucene\UmbracoExamine\IndexInitializer.cs" />
+    <None Include="Umbraco.Examine.Lucene\UmbracoExamine\IndexInitializer.cs" />
+    <Compile Remove="Umbraco.Examine.Lucene\UmbracoExamine\IndexTest.cs" />
+    <None Include="Umbraco.Examine.Lucene\UmbracoExamine\IndexTest.cs" />
+    <Compile Remove="Umbraco.Examine.Lucene\UmbracoExamine\PublishedContentQueryTests.cs" />
+    <None Include="Umbraco.Examine.Lucene\UmbracoExamine\PublishedContentQueryTests.cs" />
+    <Compile Remove="Umbraco.Examine.Lucene\UmbracoExamine\RandomIdRAMDirectory.cs" />
+    <None Include="Umbraco.Examine.Lucene\UmbracoExamine\RandomIdRAMDirectory.cs" />
+    <Compile Remove="Umbraco.Examine.Lucene\UmbracoExamine\SearchTests.cs" />
+    <None Include="Umbraco.Examine.Lucene\UmbracoExamine\SearchTests.cs" />
+  </ItemGroup>
 </Project>

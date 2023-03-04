@@ -7,6 +7,7 @@ using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Querying;
+using Umbraco.Cms.Core.Search;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Examine;
 using Umbraco.Cms.Tests.Common.Testing;
@@ -54,10 +55,10 @@ public class SearchTests : ExamineBaseTest
 
         using (GetSynchronousContentIndex(false, out var index, out var contentRebuilder, out _, null, contentService))
         {
-            index.CreateIndex();
+            index.Create();
             contentRebuilder.Populate(index);
 
-            var searcher = index.Searcher;
+            var searcher = index;
 
             Assert.Greater(searcher.CreateQuery().All().Execute().TotalItemCount, 0);
 

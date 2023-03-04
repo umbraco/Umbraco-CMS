@@ -5,8 +5,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using Examine;
-using Examine.Lucene.Directories;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Logging;
@@ -22,14 +20,12 @@ using Umbraco.Cms.Core.Runtime;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Sync;
 using Umbraco.Cms.Core.WebAssets;
-using Umbraco.Cms.Infrastructure.Examine;
 using Umbraco.Cms.Infrastructure.HostedServices;
 using Umbraco.Cms.Infrastructure.PublishedCache;
 using Umbraco.Cms.Tests.Common.TestHelpers.Stubs;
 using Umbraco.Cms.Tests.Integration.Implementations;
 using Umbraco.Extensions;
 using Umbraco.Search;
-using Umbraco.Search.Examine;
 
 namespace Umbraco.Cms.Tests.Integration.DependencyInjection;
 
@@ -109,15 +105,15 @@ public static class UmbracoBuilderExtensions
         public TestBackgroundIndexRebuilder(
             IMainDom mainDom,
             IRuntimeState runtimeState,
+            ISearchProvider provider,
             ILogger<IndexRebuilder> logger,
-            IExamineManager examineManager,
             IEnumerable<IIndexPopulator> populators,
             IBackgroundTaskQueue backgroundTaskQueue)
             : base(
             mainDom,
             runtimeState,
+            provider,
             logger,
-            examineManager,
             populators,
             backgroundTaskQueue)
         {

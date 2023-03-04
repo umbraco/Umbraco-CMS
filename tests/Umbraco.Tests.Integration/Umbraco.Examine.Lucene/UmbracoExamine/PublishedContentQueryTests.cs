@@ -5,11 +5,16 @@ using Examine.Lucene.Providers;
 using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
+using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PublishedCache;
+using Umbraco.Cms.Core.Search;
 using Umbraco.Cms.Infrastructure;
 using Umbraco.Cms.Infrastructure.Examine;
 using Umbraco.Cms.Tests.Common.Testing;
+using Umbraco.Search;
+using Umbraco.Search.Examine;
+using Umbraco.Search.Examine.ValueSetBuilders;
 using Directory = Lucene.Net.Store.Directory;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Examine.Lucene.UmbracoExamine;
@@ -18,21 +23,19 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Examine.Lucene.UmbracoExamine;
 [UmbracoTest(Database = UmbracoTestOptions.Database.None)]
 public class PublishedContentQueryTests : ExamineBaseTest
 {
-    private class TestIndex : LuceneIndex, IUmbracoIndex
+    private class TestIndex : UmbracoExamineIndex<IContent>
     {
         private readonly string[] _fieldNames;
 
         public TestIndex(ILoggerFactory loggerFactory, string name, Directory luceneDirectory, string[] fieldNames)
-            : base(
-                loggerFactory,
+            : base(new LuceneIndex(loggerFactory,
                 name,
                 IndexInitializer.GetOptions(
                     name,
                     new LuceneDirectoryIndexOptions
                     {
                         DirectoryFactory = new GenericDirectoryFactory(s => luceneDirectory)
-                    })) =>
-            _fieldNames = fieldNames;
+                    })), new ContentValueSetBuilder());
 
         public bool EnableDefaultEventHandler => throw new NotImplementedException();
         public bool PublishedValuesOnly => throw new NotImplementedException();

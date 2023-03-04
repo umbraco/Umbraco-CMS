@@ -1,6 +1,7 @@
 using Examine;
 using Examine.Lucene;
 using Examine.Lucene.Directories;
+using Examine.Lucene.Providers;
 using Lucene.Net.Analysis;
 using Lucene.Net.Analysis.Standard;
 using Microsoft.Extensions.Logging;
@@ -14,6 +15,7 @@ using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Scoping;
+using Umbraco.Cms.Core.Search;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Infrastructure.Examine;
@@ -36,6 +38,7 @@ public class IndexInitializer
     private readonly MediaUrlGeneratorCollection _mediaUrlGenerators;
     private readonly PropertyEditorCollection _propertyEditors;
     private readonly IScopeProvider _scopeProvider;
+    private readonly ISearchProvider _provider;
     private readonly IShortStringHelper _shortStringHelper;
 
     public IndexInitializer(
@@ -43,6 +46,7 @@ public class IndexInitializer
         PropertyEditorCollection propertyEditors,
         MediaUrlGeneratorCollection mediaUrlGenerators,
         IScopeProvider scopeProvider,
+        ISearchProvider provider,
         ILoggerFactory loggerFactory,
         IOptions<ContentSettings> contentSettings)
     {
@@ -50,6 +54,7 @@ public class IndexInitializer
         _propertyEditors = propertyEditors;
         _mediaUrlGenerators = mediaUrlGenerators;
         _scopeProvider = scopeProvider;
+        _provider = provider;
         _loggerFactory = loggerFactory;
         _contentSettings = contentSettings;
     }
@@ -234,16 +239,12 @@ public class IndexInitializer
                 Analyzer = analyzer,
                 Validator = validator,
                 DirectoryFactory = new GenericDirectoryFactory(s => luceneDir),
-                FieldDefinitions = new UmbracoFieldDefinitionCollection()
+                FieldDefinitions = new UmbracoFieldDefinitionCollection().toExamineFieldDefinitionCollection()
             });
 
-        var i = new UmbracoContentIndex(
-            _loggerFactory,
+        var i = new UmbracoContentIndex(_loggerFactory, new LuceneIndex(  _loggerFactory,
             "testIndexer",
-            options,
-            hostingEnvironment,
-            runtimeState,
-            languageService);
+            options),new ContentValueSetBuilder());
 
         i.IndexingError += IndexingError;
         i.IndexOperationComplete += I_IndexOperationComplete;
