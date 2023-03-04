@@ -1,10 +1,9 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
+using System.Text.Json.Nodes;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
@@ -26,6 +25,7 @@ internal class ImageCropperPropertyValueEditor : DataValueEditor // TODO: core v
     private readonly IDataTypeService _dataTypeService;
     private readonly ILogger<ImageCropperPropertyValueEditor> _logger;
     private readonly MediaFileManager _mediaFileManager;
+    private readonly IJsonSerializer _jsonSerializer;
     private ContentSettings _contentSettings;
 
     public ImageCropperPropertyValueEditor(
@@ -42,6 +42,7 @@ internal class ImageCropperPropertyValueEditor : DataValueEditor // TODO: core v
     {
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         _mediaFileManager = mediaFileSystem ?? throw new ArgumentNullException(nameof(mediaFileSystem));
+        _jsonSerializer = jsonSerializer;
         _contentSettings = contentSettings.CurrentValue;
         _dataTypeService = dataTypeService;
         contentSettings.OnChange(x => _contentSettings = x);
@@ -62,7 +63,7 @@ internal class ImageCropperPropertyValueEditor : DataValueEditor // TODO: core v
         ImageCropperValue? value;
         try
         {
-            value = JsonConvert.DeserializeObject<ImageCropperValue>(val.ToString()!);
+            value = _jsonSerializer.Deserialize<ImageCropperValue>(val.ToString()!);
         }
         catch
         {
@@ -97,17 +98,16 @@ internal class ImageCropperPropertyValueEditor : DataValueEditor // TODO: core v
         var currentPath = string.Empty;
         try
         {
-            var svalue = currentValue as string;
-            JObject? currentJson = string.IsNullOrWhiteSpace(svalue) ? null : JObject.Parse(svalue);
-            if (currentJson != null && currentJson.TryGetValue("src", out JToken? src))
+            if (currentValue is string currentStringValue)
             {
-                currentPath = src.Value<string>();
+                ImageCropperValue? currentImageCropperValue = _jsonSerializer.Deserialize<ImageCropperValue>(currentStringValue);
+                currentPath = currentImageCropperValue?.Src;
             }
         }
         catch (Exception ex)
         {
             // For some reason the value is invalid so continue as if there was no value there
-            _logger.LogWarning(ex, "Could not parse current db value to a JObject.");
+            _logger.LogWarning(ex, "Could not parse current db value to an ImageCropperValue object.");
         }
 
         if (string.IsNullOrWhiteSpace(currentPath) == false)
@@ -115,23 +115,21 @@ internal class ImageCropperPropertyValueEditor : DataValueEditor // TODO: core v
             currentPath = _mediaFileManager.FileSystem.GetRelativePath(currentPath);
         }
 
-        // Get the new JSON and file path
-        var editorFile = string.Empty;
-        var editorJson = (JObject?)editorValue.Value;
-        if (editorJson is not null)
-        {
-            // Populate current file
-            if (editorJson["src"] != null)
-            {
-                editorFile = editorJson["src"]?.Value<string>();
-            }
+        ImageCropperValue? editorImageCropperValue = null;
 
-            // Clean up redundant/default data
-            ImageCropperValue.Prune(editorJson);
-        }
-        else
+        // FIXME: consider creating an object deserialization method on IJsonSerializer instead of relying on deserializing serialized JSON here (and likely other places as well)
+        if (editorValue.Value is JsonObject jsonObject)
         {
-            editorJson = null;
+            try
+            {
+                editorImageCropperValue = _jsonSerializer.Deserialize<ImageCropperValue>(jsonObject.ToJsonString());
+                editorImageCropperValue?.Prune();
+            }
+            catch (Exception ex)
+            {
+                // For some reason the value is invalid - log error and continue as if no value was saved
+                _logger.LogWarning(ex, "Could not parse editor value to an ImageCropperValue object.");
+            }
         }
 
         // ensure we have the required guids
@@ -163,17 +161,17 @@ internal class ImageCropperPropertyValueEditor : DataValueEditor // TODO: core v
             // if editorFile is empty then either there was nothing to begin with,
             // or it has been cleared and we need to remove the file - else the
             // value is unchanged.
-            if (string.IsNullOrWhiteSpace(editorFile) && string.IsNullOrWhiteSpace(currentPath) == false)
+            if (string.IsNullOrWhiteSpace(editorImageCropperValue?.Src) && string.IsNullOrWhiteSpace(currentPath) == false)
             {
                 _mediaFileManager.FileSystem.DeleteFile(currentPath);
                 return null; // clear
             }
 
-            return editorJson?.ToString(Formatting.None); // unchanged
+            return _jsonSerializer.Serialize(editorImageCropperValue); // unchanged
         }
 
         // process the file
-        var filepath = editorJson == null ? null : ProcessFile(file, cuid, puid);
+        var filepath = editorImageCropperValue == null ? null : ProcessFile(file, cuid, puid);
 
         // remove all temp files
         foreach (ContentPropertyFile f in uploads)
@@ -188,13 +186,13 @@ internal class ImageCropperPropertyValueEditor : DataValueEditor // TODO: core v
         }
 
         // update json and return
-        if (editorJson == null)
+        if (editorImageCropperValue == null)
         {
             return null;
         }
 
-        editorJson["src"] = filepath == null ? string.Empty : _mediaFileManager.FileSystem.GetUrl(filepath);
-        return editorJson.ToString(Formatting.None);
+        editorImageCropperValue.Src = filepath == null ? string.Empty : _mediaFileManager.FileSystem.GetUrl(filepath);
+        return _jsonSerializer.Serialize(editorImageCropperValue);
     }
 
     public override string ConvertDbToString(IPropertyType propertyType, object? value)
@@ -216,9 +214,7 @@ internal class ImageCropperPropertyValueEditor : DataValueEditor // TODO: core v
             ?.ConfigurationAs<ImageCropperConfiguration>();
         ImageCropperConfiguration.Crop[] crops = configuration?.Crops ?? Array.Empty<ImageCropperConfiguration.Crop>();
 
-        return JsonConvert.SerializeObject(
-            new { src = val, crops },
-            new JsonSerializerSettings { Formatting = Formatting.None, NullValueHandling = NullValueHandling.Ignore });
+        return _jsonSerializer.Serialize(new { src = val, crops });
     }
 
     private string? ProcessFile(ContentPropertyFile file, Guid cuid, Guid puid)
