@@ -31,6 +31,8 @@ public class ImageCropperValue : IHtmlEncodedString, IEquatable<ImageCropperValu
     /// <inheritdoc />
     public string? ToHtmlString() => Src;
 
+    public override string? ToString() => Src;
+
     /// <summary>
     ///     Gets a crop.
     /// </summary>
