@@ -1,5 +1,4 @@
-﻿using Examine;
-using Umbraco.Cms.ManagementApi.ViewModels.Search;
+﻿using Umbraco.Cms.ManagementApi.ViewModels.Search;
 
 namespace Umbraco.Cms.ManagementApi.Factories;
 

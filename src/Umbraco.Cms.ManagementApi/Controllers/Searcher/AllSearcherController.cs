@@ -1,18 +1,18 @@
-﻿using Examine;
-using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.ManagementApi.ViewModels.Pagination;
 using Umbraco.Cms.ManagementApi.ViewModels.Search;
 using Umbraco.Extensions;
+using Umbraco.Search;
 
 namespace Umbraco.Cms.ManagementApi.Controllers.Searcher;
 
 [ApiVersion("1.0")]
 public class AllSearcherController : SearcherControllerBase
 {
-    private readonly IExamineManager _examineManager;
+    private readonly ISearchProvider _searchProvider;
 
-    public AllSearcherController(IExamineManager examineManager) => _examineManager = examineManager;
+    public AllSearcherController(ISearchProvider searchProvider) => _searchProvider = searchProvider;
 
     /// <summary>
     ///     Get the details for searchers
@@ -24,7 +24,7 @@ public class AllSearcherController : SearcherControllerBase
     public async Task<ActionResult<PagedViewModel<SearcherViewModel>>> All(int skip, int take)
     {
         var searchers = new List<SearcherViewModel>(
-            _examineManager.RegisteredSearchers.Select(searcher => new SearcherViewModel { Name = searcher.Name })
+            _searchProvider.GetAllSearchers().Select(searcher => new SearcherViewModel { Name = searcher })
                 .OrderBy(x =>
                     x.Name.TrimEnd("Searcher"))); // order by name , but strip the "Searcher" from the end if it exists
         var viewModel = new PagedViewModel<SearcherViewModel>

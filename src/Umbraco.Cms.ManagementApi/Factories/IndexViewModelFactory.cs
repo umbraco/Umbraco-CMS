@@ -1,5 +1,4 @@
 ﻿using Umbraco.Cms.Core;
-using Umbraco.Cms.Infrastructure.Examine;
 using Umbraco.Cms.ManagementApi.ViewModels.Search;
 using Umbraco.Search.Diagnostics;
 using Umbraco.Search.Indexing;

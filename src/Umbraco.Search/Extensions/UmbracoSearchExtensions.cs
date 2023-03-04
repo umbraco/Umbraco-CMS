@@ -39,4 +39,5 @@ public static class UmbracoSearchExtensions
 
         return results;
     }
+
 }

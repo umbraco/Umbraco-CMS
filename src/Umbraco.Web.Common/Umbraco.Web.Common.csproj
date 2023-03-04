@@ -21,7 +21,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Umbraco.Core\Umbraco.Core.csproj" />
-    <ProjectReference Include="..\Umbraco.Search.Examine.Lucene\Umbraco.Search.Examine.Lucene.csproj" />
     <ProjectReference Include="..\Umbraco.Infrastructure\Umbraco.Infrastructure.csproj" />
     <ProjectReference Include="..\Umbraco.PublishedCache.NuCache\Umbraco.PublishedCache.NuCache.csproj" />
   </ItemGroup>

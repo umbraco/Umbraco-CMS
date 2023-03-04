@@ -116,8 +116,9 @@ public static class UmbracoBuilderExtensions
     /// </summary>
     /// <param name="umbracoBuilder"></param>
     /// <returns></returns>
-    public static IUmbracoBuilder AddExamineIndexes(this IUmbracoBuilder umbracoBuilder)
+    public static IUmbracoBuilder AddExamineLuceneIndexes(this IUmbracoBuilder umbracoBuilder)
     {
+        umbracoBuilder.AddExamine();
         IServiceCollection services = umbracoBuilder.Services;
 
         services.AddSingleton<IBackOfficeExamineSearcher, BackOfficeExamineSearcher>();

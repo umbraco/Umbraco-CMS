@@ -3,6 +3,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Infrastructure.Telemetry.Interfaces;
+using Umbraco.Extensions;
 using Umbraco.Search.Configuration;
 using Umbraco.Search.Indexing;
 using Umbraco.Search.Indexing.Populators;
@@ -35,6 +36,41 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.AddTransient<IIndexCountService, IndexCountService>();
         builder.Services.AddTransient<IDetailedTelemetryProvider, SearchTelemetryProvider>();
         builder.WithCollectionBuilder<MapDefinitionCollectionBuilder>().Add<SearchMapper>();
+        return builder;
+    }
+    /// <summary>
+    ///     Sets the UmbracoTreeSearcherFields to change fields that can be searched in the backoffice.
+    /// </summary>
+    /// <typeparam name="T">The type of the Umbraco tree searcher fields.</typeparam>
+    /// <param name="builder">The builder.</param>
+    public static IUmbracoBuilder SetTreeSearcherFields<T>(this IUmbracoBuilder builder)
+        where T : class, IUmbracoTreeSearcherFields
+    {
+        builder.Services.AddUnique<IUmbracoTreeSearcherFields, T>();
+        return builder;
+    }
+
+    /// <summary>
+    ///     Sets the UmbracoTreeSearcherFields to change fields that can be searched in the backoffice.
+    /// </summary>
+    /// <param name="builder">The builder.</param>
+    /// <param name="factory">A function creating a TreeSearcherFields</param>
+    public static IUmbracoBuilder SetTreeSearcherFields(
+        this IUmbracoBuilder builder,
+        Func<IServiceProvider, IUmbracoTreeSearcherFields> factory)
+    {
+        builder.Services.AddUnique(factory);
+        return builder;
+    }
+
+    /// <summary>
+    ///     Sets the UmbracoTreeSearcherFields to change fields that can be searched in the backoffice.
+    /// </summary>
+    /// <param name="builder">The builder.</param>
+    /// <param name="treeSearcherFields">An UmbracoTreeSearcherFields.</param>
+    public static IUmbracoBuilder SetTreeSearcherFields(this IUmbracoBuilder builder, IUmbracoTreeSearcherFields treeSearcherFields)
+    {
+        builder.Services.AddUnique(treeSearcherFields);
         return builder;
     }
 }

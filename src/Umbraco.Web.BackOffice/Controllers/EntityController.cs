@@ -5,7 +5,6 @@ using System.IO;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Security.Cryptography;
-using Examine.Search;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Infrastructure;

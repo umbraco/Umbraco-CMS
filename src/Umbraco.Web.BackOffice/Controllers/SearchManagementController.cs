@@ -1,13 +1,10 @@
-using Examine;
-using Examine.Search;
-using Lucene.Net.QueryParsers.Classic;
+
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Models.Search;
-using Umbraco.Cms.Infrastructure.Examine;
 using Umbraco.Cms.Web.Common.Attributes;
 using Umbraco.Extensions;
 using Umbraco.Search;
@@ -86,7 +83,7 @@ public class SearchManagementController : UmbracoAuthorizedJsonController
             results = searcher?
                 .NativeQuery(query,pageIndex, pageSize);
         }
-        catch (ParseException)
+        catch (Exception)
         {
             // will occur if the query parser cannot parse this (i.e. starts with a *)
             return UmbracoSearchResults.Empty();

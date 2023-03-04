@@ -1,21 +1,21 @@
-﻿using Examine;
-using Examine.Search;
-using Lucene.Net.QueryParsers.Classic;
+﻿
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Umbraco.Cms.Core.Models.Search;
 using Umbraco.Cms.ManagementApi.Services;
 using Umbraco.Cms.ManagementApi.ViewModels.Pagination;
 using Umbraco.Cms.ManagementApi.ViewModels.Search;
 using Umbraco.Extensions;
+using Umbraco.Search;
 
 namespace Umbraco.Cms.ManagementApi.Controllers.Searcher;
 
 [ApiVersion("1.0")]
 public class QuerySearcherController : SearcherControllerBase
 {
-    private readonly IExamineManagerService _examineManagerService;
+    private readonly ISearchProvider _examineManagerService;
 
-    public QuerySearcherController(IExamineManagerService examineManagerService) => _examineManagerService = examineManagerService;
+    public QuerySearcherController(ISearchProvider examineManagerService) => _examineManagerService = examineManagerService;
 
     [HttpGet("{searcherName}/query")]
     [MapToApiVersion("1.0")]
@@ -30,7 +30,8 @@ public class QuerySearcherController : SearcherControllerBase
             return new PagedViewModel<SearchResultViewModel>();
         }
 
-        if (!_examineManagerService.TryFindSearcher(searcherName, out ISearcher searcher))
+        IUmbracoSearcher? searcher = _examineManagerService.GetSearcher(searcherName);
+        if (searcher == null)
         {
             var invalidModelProblem = new ProblemDetails
             {
@@ -43,22 +44,20 @@ public class QuerySearcherController : SearcherControllerBase
             return NotFound(invalidModelProblem);
         }
 
-        ISearchResults results;
+        UmbracoSearchResults? results;
 
         // NativeQuery will work for a single word/phrase too (but depends on the implementation) the lucene one will work.
         try
         {
             results = searcher
-                .CreateQuery()
-                .NativeQuery(term)
-                .Execute(QueryOptions.SkipTake(skip, take));
+                .NativeQuery(term, skip/take, take);
         }
-        catch (ParseException)
+        catch (Exception)
         {
             var invalidModelProblem = new ProblemDetails
             {
                 Title = "Could not parse the query",
-                Detail = "Parser could not parse the query. Please double check if the query is valid. Sometimes this can also happen if your query starts with a wildcard (*)",
+                Detail = "Search provider could not parse the query. Please double check if the query is valid. Sometimes this can also happen if your query starts with a wildcard (*)",
                 Status = StatusCodes.Status404NotFound,
                 Type = "Error",
             };
@@ -68,13 +67,13 @@ public class QuerySearcherController : SearcherControllerBase
 
         return await Task.FromResult(new PagedViewModel<SearchResultViewModel>
         {
-            Total = results.TotalItemCount,
-            Items = results.Select(x => new SearchResultViewModel
+            Total = results?.TotalRecords ?? 0,
+            Items = results?.Results?.Select(x => new SearchResultViewModel
             {
                 Id = x.Id,
                 Score = x.Score,
-                Fields = x.AllValues.OrderBy(y => y.Key).Select(y => new FieldViewModel { Name = y.Key, Values = y.Value }),
-            }),
+                Fields = x.Values.OrderBy(y => y.Key).Select(y => new FieldViewModel { Name = y.Key, Values =  y.Value.Select(x=>x?.ToString() ?? String.Empty) }),
+            }) ?? new List<SearchResultViewModel>()
         });
     }
 }

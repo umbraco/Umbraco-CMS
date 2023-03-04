@@ -1,8 +1,6 @@
-﻿using Examine;
-using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using Umbraco.Cms.Infrastructure.Examine;
 using Umbraco.Search;
 using Umbraco.Search.Services;
 
