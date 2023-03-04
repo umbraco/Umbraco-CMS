@@ -10,6 +10,7 @@
     <ProjectReference Include="..\Umbraco.Cms\Umbraco.Cms.csproj" />
     <ProjectReference Include="..\Umbraco.Cms.ManagementApi\Umbraco.Cms.ManagementApi.csproj" />
     <ProjectReference Include="..\Umbraco.Search.Examine.Lucene\Umbraco.Search.Examine.Lucene.csproj" />
+    <ProjectReference Include="..\Umbraco.Search.Examine\Umbraco.Search.Examine.csproj" />
   </ItemGroup>
 
   <ItemGroup>
