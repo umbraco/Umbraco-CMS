@@ -148,10 +148,10 @@ public class SearchManagementController : UmbracoAuthorizedJsonController
         _logger.LogInformation("Rebuilding index '{IndexName}'", indexName);
 
         //remove it in case there's a handler there already
-   //     index!.IndexOperationComplete -= Indexer_IndexOperationComplete;
+        index!.IndexOperationComplete -= Indexer_IndexOperationComplete;
 
         //now add a single handler
-     //   index.IndexOperationComplete += Indexer_IndexOperationComplete;
+       index.IndexOperationComplete += Indexer_IndexOperationComplete;
 
         try
         {
@@ -166,7 +166,7 @@ public class SearchManagementController : UmbracoAuthorizedJsonController
         catch (Exception ex)
         {
             //ensure it's not listening
-           // index.IndexOperationComplete -= Indexer_IndexOperationComplete;
+            index!.IndexOperationComplete -= Indexer_IndexOperationComplete;
             _logger.LogError(ex, "An error occurred rebuilding index");
             var response = new ConflictObjectResult(
                 "The index could not be rebuilt at this time, most likely there is another thread currently writing to the index. Error: {ex}");

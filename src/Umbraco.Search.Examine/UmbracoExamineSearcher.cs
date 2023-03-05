@@ -13,8 +13,13 @@ public class UmbracoExamineSearcher<T> : IUmbracoSearcher<T>
     }
 
 
-    public IUmbracoSearchResult Search(string term, int page, int pageSize) => throw new NotImplementedException();
+    public UmbracoSearchResults Search(string term, int page, int pageSize)
+    {
+        var searchResult=  _examineIndex.CreateQuery().ManagedQuery(term).Execute(QueryOptions.SkipTake(pageSize * page, pageSize));
+        return new UmbracoSearchResults(searchResult.TotalItemCount,
+            searchResult.Select(x => new UmbracoSearchResult(x.Id, x.Score, x.Values)));
 
+    }
     public string Name => _examineIndex.Name;
 
     public UmbracoSearchResults? NativeQuery(string query, int page, int pageSize)

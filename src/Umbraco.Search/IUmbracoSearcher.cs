@@ -8,7 +8,7 @@ public interface IUmbracoSearcher<T> : IUmbracoSearcher
 
 public interface IUmbracoSearcher
 {
-    public IUmbracoSearchResult Search(string term, int page, int pageSize);
+    public UmbracoSearchResults Search(string term, int page, int pageSize);
 
     string Name { get;  }
     UmbracoSearchResults? NativeQuery(string query, int page, int pageSize);

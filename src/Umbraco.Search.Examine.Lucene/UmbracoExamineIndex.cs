@@ -13,6 +13,12 @@ public class UmbracoExamineIndex<T> : IUmbracoIndex<T>
     {
         _examineIndex = (UmbracoExamineLuceneIndex)examineIndex;
         _valueSetBuilder = valueSetBuilder;
+        examineIndex.IndexOperationComplete += runIndexOperationComplete;
+    }
+
+    private void runIndexOperationComplete(object? sender, IndexOperationEventArgs e)
+    {
+        IndexOperationComplete?.Invoke(this, e);
     }
 
     public bool EnableDefaultEventHandler { get; } = true;
