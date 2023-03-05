@@ -12,6 +12,7 @@ using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Extensions;
 using Umbraco.Search.Diagnostics;
+using Umbraco.Search.Examine.Configuration;
 using Umbraco.Search.Examine.ValueSetBuilders;
 using Umbraco.Search.SpecialisedSearchers;
 
@@ -87,9 +88,11 @@ public static class UmbracoBuilderExtensions
                 = services.GetRequiredService<IHostingEnvironment>();
             IRuntimeState runtimeState
                 = services.GetRequiredService<IRuntimeState>();
+            IUmbracoIndexesConfiguration configuration
+                = services.GetRequiredService<IUmbracoIndexesConfiguration>();
             TIndex index = ActivatorUtilities.CreateInstance<TIndex>(
                 services,
-                new object[] { loggerFactory, name, options, hostingEnvironment, runtimeState, publishedOnly });
+                new object[] { loggerFactory, name,options,configuration,  hostingEnvironment, runtimeState});
 
             return index;
         });
