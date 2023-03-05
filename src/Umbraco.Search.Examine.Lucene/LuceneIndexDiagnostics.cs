@@ -8,12 +8,12 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Hosting;
-using Umbraco.Cms.Infrastructure.Examine.Extensions;
 using Umbraco.Extensions;
 using Umbraco.Search.Diagnostics;
+using Umbraco.Search.Examine.Lucene.Extensions;
 using Directory = Lucene.Net.Store.Directory;
 
-namespace Umbraco.Cms.Infrastructure.Examine;
+namespace Umbraco.Search.Examine.Lucene;
 
 public class LuceneIndexDiagnostics : IIndexDiagnostics
 {

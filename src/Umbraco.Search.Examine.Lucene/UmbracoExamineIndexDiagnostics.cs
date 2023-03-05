@@ -5,10 +5,9 @@ using Examine.Lucene;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Hosting;
-using Umbraco.Search.Examine;
 using Umbraco.Search.Examine.ValueSetBuilders;
 
-namespace Umbraco.Cms.Infrastructure.Examine;
+namespace Umbraco.Search.Examine.Lucene;
 
 public class UmbracoExamineIndexDiagnostics : LuceneIndexDiagnostics
 {

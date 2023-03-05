@@ -1,8 +1,7 @@
 ﻿using Examine;
-using Umbraco.Cms.Infrastructure.Examine;
 using Umbraco.Search.Examine.ValueSetBuilders;
 
-namespace Umbraco.Search.Examine;
+namespace Umbraco.Search.Examine.Lucene;
 
 public class UmbracoExamineIndex
 {

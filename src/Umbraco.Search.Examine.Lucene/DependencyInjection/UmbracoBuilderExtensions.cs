@@ -1,7 +1,6 @@
 using Examine;
 using Examine.Lucene;
 using Examine.Lucene.Directories;
-using Examine.Lucene.Providers;
 using Lucene.Net.Analysis;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -12,13 +11,11 @@ using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Extensions;
-using Umbraco.Search;
 using Umbraco.Search.Diagnostics;
-using Umbraco.Search.Examine;
 using Umbraco.Search.Examine.ValueSetBuilders;
 using Umbraco.Search.SpecialisedSearchers;
 
-namespace Umbraco.Cms.Infrastructure.Examine.DependencyInjection;
+namespace Umbraco.Search.Examine.Lucene.DependencyInjection;
 
 public static class UmbracoBuilderExtensions
 {

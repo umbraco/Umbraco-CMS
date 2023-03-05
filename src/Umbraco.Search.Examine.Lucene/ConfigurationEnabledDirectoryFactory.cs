@@ -9,7 +9,7 @@ using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
 using Directory = Lucene.Net.Store.Directory;
 
-namespace Umbraco.Cms.Infrastructure.Examine;
+namespace Umbraco.Search.Examine.Lucene;
 
 /// <summary>
 ///     An Examine directory factory implementation based on configured values

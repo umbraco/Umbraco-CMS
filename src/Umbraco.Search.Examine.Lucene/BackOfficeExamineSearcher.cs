@@ -24,7 +24,7 @@ using Umbraco.Search.Configuration;
 using Umbraco.Search.Examine.TBD;
 using Umbraco.Search.SpecialisedSearchers;
 
-namespace Umbraco.Cms.Infrastructure.Examine;
+namespace Umbraco.Search.Examine.Lucene;
 
 public class BackOfficeExamineSearcher : IBackOfficeExamineSearcher
 {

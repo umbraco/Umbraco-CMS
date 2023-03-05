@@ -13,9 +13,8 @@ using Umbraco.Cms.Core.Search;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Extensions;
 using Umbraco.Search.Diagnostics;
-using Umbraco.Search.Examine;
 
-namespace Umbraco.Cms.Infrastructure.Examine;
+namespace Umbraco.Search.Examine.Lucene;
 
 /// <summary>
 ///     An abstract provider containing the basic functionality to be able to query against Umbraco data.

@@ -2,7 +2,7 @@ using Examine;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Hosting;
 
-namespace Umbraco.Cms.Infrastructure.Examine;
+namespace Umbraco.Search.Examine.Lucene;
 
 /// <summary>
 ///     Sets the Examine <see cref="IApplicationRoot" /> to be ExamineIndexes sub directory of the Umbraco TEMP folder

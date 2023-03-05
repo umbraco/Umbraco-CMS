@@ -1,6 +1,6 @@
-using Umbraco.Cms.Infrastructure.Examine.DependencyInjection;
 using Umbraco.Search.DependencyInjection;
 using Umbraco.Search.Examine;
+using Umbraco.Search.Examine.Lucene.DependencyInjection;
 using Umbraco.Search.Examine.TBD;
 
 namespace Umbraco.Cms.Web.UI

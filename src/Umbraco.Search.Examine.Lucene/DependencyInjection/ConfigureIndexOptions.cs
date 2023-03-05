@@ -1,18 +1,11 @@
-using Examine;
 using Examine.Lucene;
-using Examine.Lucene.Analyzers;
-using Lucene.Net.Analysis.Standard;
 using Lucene.Net.Index;
 using Microsoft.Extensions.Options;
-using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
-using Umbraco.Extensions;
-using Umbraco.Search;
-using Umbraco.Search.Examine;
 using Umbraco.Search.Examine.Configuration;
 using Umbraco.Search.Examine.TBD;
 
-namespace Umbraco.Cms.Infrastructure.Examine.DependencyInjection;
+namespace Umbraco.Search.Examine.Lucene.DependencyInjection;
 
 /// <summary>
 ///     Configures the index options to construct the Examine indexes

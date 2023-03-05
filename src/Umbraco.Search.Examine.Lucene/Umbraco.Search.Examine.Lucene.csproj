@@ -3,7 +3,7 @@
     <PackageId>Umbraco.Cms.Examine.Lucene</PackageId>
     <Title>Umbraco CMS - Examine - Lucene</Title>
     <Description>Adds Examine searching support using Lucene to Umbraco CMS.</Description>
-    <RootNamespace>Umbraco.Cms.Infrastructure.Examine</RootNamespace>
+    <RootNamespace>Umbraco.Search.Examine.Lucene</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>

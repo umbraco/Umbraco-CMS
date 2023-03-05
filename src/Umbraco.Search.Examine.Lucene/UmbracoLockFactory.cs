@@ -4,7 +4,7 @@
 using Examine.Lucene.Directories;
 using Lucene.Net.Store;
 
-namespace Umbraco.Cms.Infrastructure.Examine;
+namespace Umbraco.Search.Examine.Lucene;
 
 public class UmbracoLockFactory : ILockFactory
 {

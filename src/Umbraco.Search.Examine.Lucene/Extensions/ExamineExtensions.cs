@@ -9,7 +9,7 @@ using Lucene.Net.QueryParsers.Classic;
 using Lucene.Net.Search;
 using Umbraco.Cms.Core.Search;
 
-namespace Umbraco.Cms.Infrastructure.Examine.Extensions;
+namespace Umbraco.Search.Examine.Lucene.Extensions;
 
 /// <summary>
 ///     Extension methods for the LuceneIndex

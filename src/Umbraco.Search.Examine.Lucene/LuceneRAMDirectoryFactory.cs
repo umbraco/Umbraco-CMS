@@ -6,7 +6,7 @@ using Examine.Lucene.Providers;
 using Lucene.Net.Store;
 using Directory = Lucene.Net.Store.Directory;
 
-namespace Umbraco.Cms.Infrastructure.Examine;
+namespace Umbraco.Search.Examine.Lucene;
 
 public class LuceneRAMDirectoryFactory : DirectoryFactoryBase
 {

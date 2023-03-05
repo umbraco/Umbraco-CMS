@@ -2,10 +2,9 @@ using Examine.Lucene;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Hosting;
-using Umbraco.Cms.Infrastructure.Examine;
-using Umbraco.Search.Examine;
+using Umbraco.Search.Diagnostics;
 
-namespace Umbraco.Search.Diagnostics;
+namespace Umbraco.Search.Examine.Lucene;
 
 /// <summary>
 ///     Creates <see cref="IIndexDiagnostics" /> for an index if it doesn't implement <see cref="IIndexDiagnostics" />
