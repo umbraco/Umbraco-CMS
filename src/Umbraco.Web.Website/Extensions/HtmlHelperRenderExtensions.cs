@@ -767,6 +767,12 @@ public static class HtmlHelperRenderExtensions
                 nameof(controllerName));
         }
 
+        // Push the new FormContext; MvcForm.GenerateEndForm() does the corresponding pop.
+        html.ViewContext.FormContext = new FormContext
+        {
+            CanRenderAtEndOfForm = true
+        };
+
         IUmbracoContextAccessor umbracoContextAccessor = GetRequiredService<IUmbracoContextAccessor>(html);
         IUmbracoContext umbracoContext = umbracoContextAccessor.GetRequiredUmbracoContext();
         var formAction = umbracoContext.OriginalRequestUrl.PathAndQuery;
