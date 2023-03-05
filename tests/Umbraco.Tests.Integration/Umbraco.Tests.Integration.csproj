@@ -26,12 +26,12 @@
   </ItemGroup>
 
   <ItemGroup>
-    <EmbeddedResource Update="Umbraco.Examine.Lucene\UmbracoExamine\TestFiles.resx">
+    <EmbeddedResource Update="Umbraco.Search.Examine.Lucene\UmbracoExamine\TestFiles.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <SubType>Designer</SubType>
       <LastGenOutput>TestFiles.Designer.cs</LastGenOutput>
     </EmbeddedResource>
-    <Compile Update="Umbraco.Examine.Lucene\UmbracoExamine\TestFiles.Designer.cs">
+    <Compile Update="Umbraco.Search.Examine.Lucene\UmbracoExamine\TestFiles.Designer.cs">
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
       <DependentUpon>TestFiles.resx</DependentUpon>
@@ -52,23 +52,23 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Remove="Umbraco.Examine.Lucene\UmbracoExamine\ExamineBaseTest.cs" />
-    <None Include="Umbraco.Examine.Lucene\UmbracoExamine\ExamineBaseTest.cs" />
-    <Compile Remove="Umbraco.Examine.Lucene\UmbracoExamine\ExamineDemoDataContentService.cs" />
-    <None Include="Umbraco.Examine.Lucene\UmbracoExamine\ExamineDemoDataContentService.cs" />
-    <Compile Remove="Umbraco.Examine.Lucene\UmbracoExamine\ExamineDemoDataMediaService.cs" />
-    <None Include="Umbraco.Examine.Lucene\UmbracoExamine\ExamineDemoDataMediaService.cs" />
-    <Compile Remove="Umbraco.Examine.Lucene\UmbracoExamine\ExamineExtensions.cs" />
-    <None Include="Umbraco.Examine.Lucene\UmbracoExamine\ExamineExtensions.cs" />
-    <Compile Remove="Umbraco.Examine.Lucene\UmbracoExamine\IndexInitializer.cs" />
-    <None Include="Umbraco.Examine.Lucene\UmbracoExamine\IndexInitializer.cs" />
-    <Compile Remove="Umbraco.Examine.Lucene\UmbracoExamine\IndexTest.cs" />
-    <None Include="Umbraco.Examine.Lucene\UmbracoExamine\IndexTest.cs" />
-    <Compile Remove="Umbraco.Examine.Lucene\UmbracoExamine\PublishedContentQueryTests.cs" />
-    <None Include="Umbraco.Examine.Lucene\UmbracoExamine\PublishedContentQueryTests.cs" />
-    <Compile Remove="Umbraco.Examine.Lucene\UmbracoExamine\RandomIdRAMDirectory.cs" />
-    <None Include="Umbraco.Examine.Lucene\UmbracoExamine\RandomIdRAMDirectory.cs" />
-    <Compile Remove="Umbraco.Examine.Lucene\UmbracoExamine\SearchTests.cs" />
-    <None Include="Umbraco.Examine.Lucene\UmbracoExamine\SearchTests.cs" />
+    <Compile Remove="Umbraco.Search.Examine.Lucene\UmbracoExamine\ExamineBaseTest.cs" />
+    <None Include="Umbraco.Search.Examine.Lucene\UmbracoExamine\ExamineBaseTest.cs" />
+    <Compile Remove="Umbraco.Search.Examine.Lucene\UmbracoExamine\ExamineDemoDataContentService.cs" />
+    <None Include="Umbraco.Search.Examine.Lucene\UmbracoExamine\ExamineDemoDataContentService.cs" />
+    <Compile Remove="Umbraco.Search.Examine.Lucene\UmbracoExamine\ExamineDemoDataMediaService.cs" />
+    <None Include="Umbraco.Search.Examine.Lucene\UmbracoExamine\ExamineDemoDataMediaService.cs" />
+    <Compile Remove="Umbraco.Search.Examine.Lucene\UmbracoExamine\ExamineExtensions.cs" />
+    <None Include="Umbraco.Search.Examine.Lucene\UmbracoExamine\ExamineExtensions.cs" />
+    <Compile Remove="Umbraco.Search.Examine.Lucene\UmbracoExamine\IndexInitializer.cs" />
+    <None Include="Umbraco.Search.Examine.Lucene\UmbracoExamine\IndexInitializer.cs" />
+    <Compile Remove="Umbraco.Search.Examine.Lucene\UmbracoExamine\IndexTest.cs" />
+    <None Include="Umbraco.Search.Examine.Lucene\UmbracoExamine\IndexTest.cs" />
+    <Compile Remove="Umbraco.Search.Examine.Lucene\UmbracoExamine\PublishedContentQueryTests.cs" />
+    <None Include="Umbraco.Search.Examine.Lucene\UmbracoExamine\PublishedContentQueryTests.cs" />
+    <Compile Remove="Umbraco.Search.Examine.Lucene\UmbracoExamine\RandomIdRAMDirectory.cs" />
+    <None Include="Umbraco.Search.Examine.Lucene\UmbracoExamine\RandomIdRAMDirectory.cs" />
+    <Compile Remove="Umbraco.Search.Examine.Lucene\UmbracoExamine\SearchTests.cs" />
+    <None Include="Umbraco.Search.Examine.Lucene\UmbracoExamine\SearchTests.cs" />
   </ItemGroup>
 </Project>

@@ -26,7 +26,7 @@ using Umbraco.Search.Examine.ValueSetBuilders;
 using Umbraco.Search.Indexing.Populators;
 using Directory = Lucene.Net.Store.Directory;
 
-namespace Umbraco.Cms.Tests.Integration.Umbraco.Examine.Lucene.UmbracoExamine;
+namespace Umbraco.Cms.Tests.Integration.Umbraco.Search.Examine.Lucene.UmbracoExamine;
 
 /// <summary>
 ///     Used internally by test classes to initialize a new index from the template
