@@ -205,7 +205,7 @@ public class SearchManagementController : UmbracoAuthorizedJsonController
 
     private ActionResult ValidateSearcher(string searcherName, out IUmbracoSearcher? searcher)
     {
-        searcher = _provider.GetSearcher(searcherName);
+        searcher = _provider.GetSearcher(searcherName.Replace("Index","Searcher"));
         if (searcher != null)
         {
             return new OkResult();
