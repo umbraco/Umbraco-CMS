@@ -31,7 +31,7 @@ public class MemberValueSetBuilder : BaseValueSetBuilder<IMember>
                 { "updateDate", new object[] { m.UpdateDate } },
                 { UmbracoSearchFieldNames.NodeNameFieldName, m.Name?.Yield() ?? Enumerable.Empty<string>() },
                 { "path", m.Path.Yield() },
-                { "searchablePath", m.Path.Split(',').Yield() },
+                { "searchablePath", m.Path?.Split(',') ?? Enumerable.Empty<string>()},
                 { "nodeType", m.ContentType.Id.ToString().Yield() },
                 { "loginName", m.Username.Yield() },
                 { "email", m.Email.Yield() },

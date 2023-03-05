@@ -16,8 +16,9 @@ public class UmbracoExamineIndex<T> : UmbracoExamineIndex,IUmbracoIndex<T>
 
     private readonly IValueSetBuilder<T> _valueSetBuilder;
 
-    public UmbracoExamineIndex(IIndex examineIndex, IValueSetBuilder<T> valueSetBuilder): base((UmbracoExamineLuceneIndex)examineIndex)
+    public UmbracoExamineIndex(IIndex examineIndex, IValueSetBuilder<T> valueSetBuilder, bool publishedValuesOnly = false): base((UmbracoExamineLuceneIndex)examineIndex)
     {
+        this.PublishedValuesOnly = publishedValuesOnly;
         _valueSetBuilder = valueSetBuilder;
         examineIndex.IndexOperationComplete += runIndexOperationComplete;
     }
@@ -27,8 +28,8 @@ public class UmbracoExamineIndex<T> : UmbracoExamineIndex,IUmbracoIndex<T>
         IndexOperationComplete?.Invoke(this, e);
     }
 
-    public bool EnableDefaultEventHandler { get; } = true;
-    public bool PublishedValuesOnly { get; }
+    public bool EnableDefaultEventHandler { get; set; } = true;
+    public bool PublishedValuesOnly { get; set; }
     public string Name => ExamineIndex.Name;
     public Action<object?, EventArgs>? IndexOperationComplete { get; set; }
     public bool Exists() => ExamineIndex.IndexExists();

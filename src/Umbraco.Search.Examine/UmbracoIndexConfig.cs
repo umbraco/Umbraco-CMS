@@ -33,6 +33,6 @@ public class UmbracoIndexConfig : IUmbracoExamineIndexConfig
     public IValueSetValidator GetMemberValueSetValidator() => new MemberValueSetValidator();
 
     public bool PublishedValuesOnly { get; set; }
-    public bool EnableDefaultEventHandler { get; set; }
+    public bool EnableDefaultEventHandler { get; set; } = true;
     public Analyzer Analyzer { get; set; }  = new CultureInvariantWhitespaceAnalyzer();
 }

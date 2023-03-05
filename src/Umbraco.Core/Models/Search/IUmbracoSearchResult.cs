@@ -26,6 +26,7 @@ public class UmbracoSearchResult : IUmbracoSearchResult
 
     public string Id { get; set; }
     public float Score { get; set; }
+    public int FieldCount => Values.Count();
     public IReadOnlyDictionary<string, IList<object>> Values { get; set; }
 }
 

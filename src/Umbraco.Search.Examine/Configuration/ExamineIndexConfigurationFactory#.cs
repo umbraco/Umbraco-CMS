@@ -13,7 +13,7 @@ public class ExamineIndexConfigurationFactory : IExamineIndexConfigurationFactor
         configurationObjects = new Dictionary<string, IUmbracoExamineIndexConfig>()
         {
             { Constants.UmbracoIndexes.InternalIndexName, new UmbracoIndexConfig(publicAccessService, provider) },
-            { Constants.UmbracoIndexes.ExternalIndexName, new UmbracoIndexConfig(publicAccessService, provider) },
+            { Constants.UmbracoIndexes.ExternalIndexName, new UmbracoIndexConfig(publicAccessService, provider) { PublishedValuesOnly = true}},
             { Constants.UmbracoIndexes.MembersIndexName, new UmbracoIndexConfig(publicAccessService, provider) }
         };
     }

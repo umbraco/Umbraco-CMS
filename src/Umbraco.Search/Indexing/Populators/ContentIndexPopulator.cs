@@ -32,7 +32,7 @@ public class ContentIndexPopulator : IndexPopulator
         IContentService contentService,
         ISearchProvider provider,
         IUmbracoDatabaseFactory umbracoDatabaseFactory)
-        : this(logger,provider, false, null, contentService, umbracoDatabaseFactory)
+        : this(logger, provider, false, null, contentService, umbracoDatabaseFactory)
     {
         _provider = provider;
     }
@@ -50,8 +50,9 @@ public class ContentIndexPopulator : IndexPopulator
             return false;
         }
 
-        return true;
+        return casted.PublishedValuesOnly == _publishedValuesOnly;
     }
+
     /// <summary>
     ///     Optional constructor allowing specifying custom query parameters
     /// </summary>
@@ -64,7 +65,8 @@ public class ContentIndexPopulator : IndexPopulator
         IUmbracoDatabaseFactory umbracoDatabaseFactory)
     {
         _contentService = contentService ?? throw new ArgumentNullException(nameof(contentService));
-        _umbracoDatabaseFactory = umbracoDatabaseFactory ?? throw new ArgumentNullException(nameof(umbracoDatabaseFactory));
+        _umbracoDatabaseFactory =
+            umbracoDatabaseFactory ?? throw new ArgumentNullException(nameof(umbracoDatabaseFactory));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         _provider = provider;
         _publishedValuesOnly = publishedValuesOnly;
@@ -79,7 +81,8 @@ public class ContentIndexPopulator : IndexPopulator
     {
         if (indexes.Count == 0)
         {
-            _logger.LogDebug($"{nameof(PopulateIndexes)} called with no indexes to populate. Typically means no index is registered with this populator.");
+            _logger.LogDebug(
+                $"{nameof(PopulateIndexes)} called with no indexes to populate. Typically means no index is registered with this populator.");
             return;
         }
 
@@ -119,11 +122,11 @@ public class ContentIndexPopulator : IndexPopulator
             }
 
             pageIndex++;
-        }
-        while (content.Length == pageSize);
+        } while (content.Length == pageSize);
     }
 
-    protected void IndexPublishedContent(int contentParentId, int pageIndex, int pageSize, IReadOnlyList<string> indexes)
+    protected void IndexPublishedContent(int contentParentId, int pageIndex, int pageSize,
+        IReadOnlyList<string> indexes)
     {
         IContent[] content;
 
@@ -133,7 +136,8 @@ public class ContentIndexPopulator : IndexPopulator
         {
             // add the published filter
             // note: We will filter for published variants in the validator
-            content = _contentService.GetPagedDescendants(contentParentId, pageIndex, pageSize, out _, PublishedQuery, Ordering.By("Path")).ToArray();
+            content = _contentService.GetPagedDescendants(contentParentId, pageIndex, pageSize, out _, PublishedQuery,
+                Ordering.By("Path")).ToArray();
 
             var indexableContent = new List<IContent>();
 
@@ -163,7 +167,6 @@ public class ContentIndexPopulator : IndexPopulator
             }
 
             pageIndex++;
-        }
-        while (content.Length == pageSize);
+        } while (content.Length == pageSize);
     }
 }

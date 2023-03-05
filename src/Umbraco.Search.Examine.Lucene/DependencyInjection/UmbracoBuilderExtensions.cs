@@ -29,7 +29,7 @@ public static class UmbracoBuilderExtensions
                 .ExternalIndexName)
             .AddSingleton<IUmbracoIndex>(services => new UmbracoExamineIndex<IContent>(services
                 .GetRequiredService<IExamineManager>().GetIndex(Constants.UmbracoIndexes
-                    .ExternalIndexName), services.GetRequiredService<IPublishedContentValueSetBuilder>()))
+                    .ExternalIndexName), services.GetRequiredService<IPublishedContentValueSetBuilder>(), true))
             .AddSingleton<IUmbracoSearcher>(services => new UmbracoExamineSearcher<IContent>(services
                 .GetRequiredService<IExamineManager>().GetIndex(Constants.UmbracoIndexes
                     .ExternalIndexName).Searcher));
@@ -61,8 +61,9 @@ public static class UmbracoBuilderExtensions
         FieldDefinitionCollection? fieldDefinitions = null,
         Analyzer? analyzer = null,
         IValueSetValidator? validator = null,
-        IReadOnlyDictionary<string, IFieldValueTypeFactory>? indexValueTypesFactory = null)
-        where TIndex : LuceneIndex
+        IReadOnlyDictionary<string, IFieldValueTypeFactory>? indexValueTypesFactory = null,
+        bool publishedOnly = false)
+        where TIndex : UmbracoExamineLuceneIndex
         where TDirectoryFactory : class, IDirectoryFactory
     {
         // This is the long way to add IOptions but gives us access to the
@@ -91,7 +92,7 @@ public static class UmbracoBuilderExtensions
                 = services.GetRequiredService<IRuntimeState>();
             TIndex index = ActivatorUtilities.CreateInstance<TIndex>(
                 services,
-                new object[] { loggerFactory, name, options, hostingEnvironment, runtimeState });
+                new object[] { loggerFactory, name, options, hostingEnvironment, runtimeState, publishedOnly });
 
             return index;
         });

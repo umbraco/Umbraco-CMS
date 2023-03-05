@@ -32,9 +32,10 @@ public class UmbracoExamineLuceneIndex : LuceneIndex, IUmbracoExamineIndex, IInd
         string name,
         IOptionsMonitor<LuceneDirectoryIndexOptions> indexOptions,
         IHostingEnvironment hostingEnvironment,
-        IRuntimeState runtimeState)
+        IRuntimeState runtimeState, bool publishedValuesOnly)
         : base(loggerFactory, name, indexOptions)
     {
+        PublishedValuesOnly = publishedValuesOnly;
         _runtimeState = runtimeState;
         _diagnostics = new UmbracoExamineIndexDiagnostics(this, loggerFactory.CreateLogger<UmbracoExamineIndexDiagnostics>(), hostingEnvironment, indexOptions);
         _logger = loggerFactory.CreateLogger<UmbracoExamineLuceneIndex>();
