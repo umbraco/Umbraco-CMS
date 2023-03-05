@@ -94,6 +94,7 @@ public class ContentValueSetBuilder : BaseValueSetBuilder<IContent>, IContentVal
                 },
                 { "urlName", urlValue?.Yield() ?? Enumerable.Empty<string>() }, // Always add invariant urlName
                 { "path", c.Path.Yield() },
+                { "searchablePath", c.Path.Split(',').Yield() },
                 { "nodeType", c.ContentType.Id.ToString().Yield() },
                 {
                     "creatorName",
