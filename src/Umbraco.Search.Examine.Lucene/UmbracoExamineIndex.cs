@@ -4,14 +4,20 @@ using Umbraco.Search.Examine.ValueSetBuilders;
 
 namespace Umbraco.Search.Examine;
 
-public class UmbracoExamineIndex<T> : IUmbracoIndex<T>
+public class UmbracoExamineIndex
 {
-    private readonly UmbracoExamineLuceneIndex _examineIndex;
+    public UmbracoExamineLuceneIndex ExamineIndex;
+
+    public UmbracoExamineIndex(UmbracoExamineLuceneIndex examineIndex) => ExamineIndex = examineIndex;
+};
+
+public class UmbracoExamineIndex<T> : UmbracoExamineIndex,IUmbracoIndex<T>
+{
+
     private readonly IValueSetBuilder<T> _valueSetBuilder;
 
-    public UmbracoExamineIndex(IIndex examineIndex, IValueSetBuilder<T> valueSetBuilder)
+    public UmbracoExamineIndex(IIndex examineIndex, IValueSetBuilder<T> valueSetBuilder): base((UmbracoExamineLuceneIndex)examineIndex)
     {
-        _examineIndex = (UmbracoExamineLuceneIndex)examineIndex;
         _valueSetBuilder = valueSetBuilder;
         examineIndex.IndexOperationComplete += runIndexOperationComplete;
     }
@@ -23,14 +29,14 @@ public class UmbracoExamineIndex<T> : IUmbracoIndex<T>
 
     public bool EnableDefaultEventHandler { get; } = true;
     public bool PublishedValuesOnly { get; }
-    public string Name => _examineIndex.Name;
+    public string Name => ExamineIndex.Name;
     public Action<object?, EventArgs>? IndexOperationComplete { get; set; }
-    public bool Exists() => _examineIndex.IndexExists();
+    public bool Exists() => ExamineIndex.IndexExists();
 
-    public long GetDocumentCount() => _examineIndex.GetDocumentCount();
+    public long GetDocumentCount() => ExamineIndex.GetDocumentCount();
 
-    public void Create() => _examineIndex.CreateIndex();
-    public IEnumerable<string> GetFieldNames() => _examineIndex.FieldDefinitions.Select(x=>x.Name);
+    public void Create() => ExamineIndex.CreateIndex();
+    public IEnumerable<string> GetFieldNames() => ExamineIndex.FieldDefinitions.Select(x=>x.Name);
 
     /// <summary>
     ///
@@ -40,6 +46,6 @@ public class UmbracoExamineIndex<T> : IUmbracoIndex<T>
     public void IndexItems(T[] items)
     {
         var valueSet = _valueSetBuilder.GetValueSets(items);
-        _examineIndex.IndexItems(valueSet);
+        ExamineIndex.IndexItems(valueSet);
     }
 }

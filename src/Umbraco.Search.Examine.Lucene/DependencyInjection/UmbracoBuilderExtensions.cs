@@ -11,6 +11,7 @@ using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Extensions;
 using Umbraco.Search;
 using Umbraco.Search.Diagnostics;
 using Umbraco.Search.Examine;
@@ -123,7 +124,7 @@ public static class UmbracoBuilderExtensions
 
         services.AddSingleton<IBackOfficeExamineSearcher, BackOfficeExamineSearcher>();
         //todo: restore when indexes are working
-        //services.AddSingleton<IIndexDiagnosticsFactory, LuceneIndexDiagnosticsFactory>();
+       services.AddUnique<IIndexDiagnosticsFactory, ExamineLuceneIndexDiagnosticsFactory>();
 
         services.AddExamine();
 

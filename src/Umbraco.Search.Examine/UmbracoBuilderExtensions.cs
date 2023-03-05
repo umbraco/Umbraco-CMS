@@ -36,7 +36,7 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.AddSingleton<IIndexRebuilder, IndexRebuilder>();
         builder.Services.AddSingleton<IUmbracoIndexingHandler, ExamineUmbracoIndexingHandler>();
         builder.Services.AddUnique<IUmbracoExamineIndexConfig, UmbracoIndexConfig>();
-        builder.Services.AddUnique<IIndexDiagnosticsFactory, IndexDiagnosticsFactory>();
+
         builder.Services.AddUnique<IPublishedContentValueSetBuilder>(factory =>
             new ContentValueSetBuilder(
                 factory.GetRequiredService<PropertyEditorCollection>(),

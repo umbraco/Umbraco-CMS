@@ -7,6 +7,7 @@ using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Extensions;
+using Umbraco.Search.Examine.Configuration;
 using IScope = Umbraco.Cms.Infrastructure.Scoping.IScope;
 
 namespace Umbraco.Search.Examine.ValueSetBuilders;

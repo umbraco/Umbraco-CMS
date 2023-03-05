@@ -35,10 +35,10 @@ namespace Umbraco.Cms.Web.UI
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddUmbraco(_env, _config)
-                .AddSearchServices()
-                .AddExamineLuceneIndexes()
                 .AddBackOffice()
                 .AddWebsite()
+                .AddSearchServices()
+                .AddExamineLuceneIndexes()
                 .AddComposers()
                 .Build();
         }
