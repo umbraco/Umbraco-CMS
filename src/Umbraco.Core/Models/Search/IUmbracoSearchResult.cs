@@ -31,13 +31,8 @@ public class UmbracoSearchResult : IUmbracoSearchResult
 
 public interface IUmbracoSearchResult
 {
-    [DataMember(Name = "id")]
-
-    public string Id { get; set; }
-    [DataMember(Name = "score")]
-
-    public float Score { get; set; }
-    [DataMember(Name = "values")]
-
-    public IReadOnlyDictionary<string, IList<object>> Values { get; set; }
+    [DataMember(Name = "id")] public string Id { get; set; }
+    [DataMember(Name = "fieldCount")] public int FieldCount => Values.Count();
+    [DataMember(Name = "score")] public float Score { get; set; }
+    [DataMember(Name = "values")] public IReadOnlyDictionary<string, IList<object>> Values { get; set; }
 }
