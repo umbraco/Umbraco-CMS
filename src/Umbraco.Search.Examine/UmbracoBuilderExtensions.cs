@@ -26,7 +26,7 @@ public static partial class UmbracoBuilderExtensions
 
         builder.Services.AddSingleton<IExamineManager, ExamineManager>();
         builder.Services.AddSingleton<ISearchProvider, ExamineSearchProvider>();
-        builder.Services.AddUnique(typeof(IExamineIndexConfiguration), typeof(ExamineIndexConfiguration));
+        builder.Services.AddUnique(typeof(IUmbracoIndexesConfiguration), typeof(UmbracoIndexesConfiguration));
         builder.Services.AddSingleton<IExamineIndexConfigurationFactory, ExamineIndexConfigurationFactory>();
         builder.Services.AddUnique(services =>
         {

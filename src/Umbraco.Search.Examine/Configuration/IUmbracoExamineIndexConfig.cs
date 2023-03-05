@@ -1,17 +1,18 @@
 using Examine;
 using Lucene.Net.Analysis;
+using Umbraco.Search.Configuration;
 using Umbraco.Search.Examine.ValueSetBuilders;
 
 namespace Umbraco.Search.Examine.Configuration;
 
-public interface IUmbracoExamineIndexConfig
+public interface IUmbracoExamineIndexConfig : IUmbracoIndexConfiguration
 {
     IContentValueSetValidator GetContentValueSetValidator();
 
     IContentValueSetValidator GetPublishedContentValueSetValidator();
 
     IValueSetValidator GetMemberValueSetValidator();
-    bool PublishedValuesOnly { get; set; }
-    bool EnableDefaultEventHandler { get; set; }
     Analyzer Analyzer { get; set; }
+
+
 }

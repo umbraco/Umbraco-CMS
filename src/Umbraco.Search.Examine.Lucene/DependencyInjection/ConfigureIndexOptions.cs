@@ -1,5 +1,7 @@
 using Examine.Lucene;
+using Lucene.Net.Analysis.Standard;
 using Lucene.Net.Index;
+using Lucene.Net.Util;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Search.Examine.Configuration;
@@ -12,16 +14,14 @@ namespace Umbraco.Search.Examine.Lucene.DependencyInjection;
 /// </summary>
 public sealed class ConfigureIndexOptions : IConfigureNamedOptions<LuceneDirectoryIndexOptions>
 {
-    private readonly IExamineIndexConfiguration _examineIndexConfiguration;
+    private readonly IUmbracoIndexesConfiguration _umbracoIndexesConfiguration;
     private readonly IndexCreatorSettings _settings;
-    private readonly IUmbracoExamineIndexConfig _umbracoIndexConfig;
 
     public ConfigureIndexOptions(
-        IExamineIndexConfiguration examineIndexConfiguration,
-        IOptions<IndexCreatorSettings> settings, IUmbracoExamineIndexConfig umbracoIndexConfig)
+        IUmbracoIndexesConfiguration umbracoIndexesConfiguration,
+        IOptions<IndexCreatorSettings> settings)
     {
-        _examineIndexConfiguration = examineIndexConfiguration;
-        _umbracoIndexConfig = umbracoIndexConfig;
+        _umbracoIndexesConfiguration = umbracoIndexesConfiguration;
         _settings = settings.Value;
     }
 
@@ -31,9 +31,9 @@ public sealed class ConfigureIndexOptions : IConfigureNamedOptions<LuceneDirecto
         {
             return;
         }
-        var configuration = _examineIndexConfiguration.Configuration(name);
-        options.Analyzer = configuration.Analyzer;
-        options.Validator = configuration.GetContentValueSetValidator();
+        var configuration = _umbracoIndexesConfiguration.Configuration(name) as IUmbracoExamineIndexConfig;
+        options.Analyzer = configuration?.Analyzer ?? new StandardAnalyzer(LuceneVersion.LUCENE_48);
+        options.Validator = configuration?.GetContentValueSetValidator();
         options.FieldDefinitions = new UmbracoFieldDefinitionCollection().toExamineFieldDefinitionCollection();
 
 

@@ -5,6 +5,7 @@ using Examine.Lucene;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Hosting;
+using Umbraco.Search.Examine.Configuration;
 using Umbraco.Search.Examine.ValueSetBuilders;
 
 namespace Umbraco.Search.Examine.Lucene;
@@ -12,23 +13,28 @@ namespace Umbraco.Search.Examine.Lucene;
 public class UmbracoExamineIndexDiagnostics : LuceneIndexDiagnostics
 {
     private readonly UmbracoExamineLuceneIndex _luceneIndex;
+    private readonly IUmbracoIndexesConfiguration _configuration;
 
     public UmbracoExamineIndexDiagnostics(
         UmbracoExamineLuceneIndex luceneIndex,
+        IUmbracoIndexesConfiguration configuration,
         ILogger<UmbracoExamineIndexDiagnostics> logger,
         IHostingEnvironment hostingEnvironment,
         IOptionsMonitor<LuceneDirectoryIndexOptions> indexOptions)
-        : base(luceneIndex, logger, hostingEnvironment, indexOptions) =>
+        : base(luceneIndex, logger, hostingEnvironment, indexOptions)
+    {
         _luceneIndex = luceneIndex;
+        _configuration = configuration;
+    }
 
     public override IReadOnlyDictionary<string, object?> Metadata
     {
         get
         {
             var d = base.Metadata.ToDictionary(x => x.Key, x => x.Value);
-
-            d[nameof(UmbracoExamineLuceneIndex.EnableDefaultEventHandler)] = _luceneIndex.EnableDefaultEventHandler;
-            d[nameof(UmbracoExamineLuceneIndex.PublishedValuesOnly)] = _luceneIndex.PublishedValuesOnly;
+            var configuration = _configuration.Configuration(_luceneIndex.Name);
+            d[nameof(configuration.EnableDefaultEventHandler)] = configuration.EnableDefaultEventHandler;
+            d[nameof(configuration.PublishedValuesOnly)] = configuration.PublishedValuesOnly;
 
             if (_luceneIndex.ValueSetValidator is ValueSetValidator vsv)
             {

@@ -3,6 +3,7 @@ using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Persistence;
+using Umbraco.Search.Examine.Configuration;
 
 namespace Umbraco.Search.Indexing.Populators;
 
@@ -12,6 +13,7 @@ namespace Umbraco.Search.Indexing.Populators;
 public class ContentIndexPopulator : IndexPopulator
 {
     private readonly ISearchProvider _provider;
+    private readonly IUmbracoIndexesConfiguration _configuration;
     private readonly IContentService _contentService;
     private readonly ILogger<ContentIndexPopulator> _logger;
     private readonly int? _parentId;
@@ -31,10 +33,12 @@ public class ContentIndexPopulator : IndexPopulator
         ILogger<ContentIndexPopulator> logger,
         IContentService contentService,
         ISearchProvider provider,
+        IUmbracoIndexesConfiguration configuration,
         IUmbracoDatabaseFactory umbracoDatabaseFactory)
-        : this(logger, provider, false, null, contentService, umbracoDatabaseFactory)
+        : this(logger, provider, false, null, contentService,configuration, umbracoDatabaseFactory)
     {
         _provider = provider;
+        _configuration = configuration;
     }
 
     public override bool IsRegistered(string index)
@@ -50,7 +54,8 @@ public class ContentIndexPopulator : IndexPopulator
             return false;
         }
 
-        return casted.PublishedValuesOnly == _publishedValuesOnly;
+        var configuration = _configuration.Configuration(index);
+        return configuration.PublishedValuesOnly == _publishedValuesOnly;
     }
 
     /// <summary>
@@ -62,9 +67,11 @@ public class ContentIndexPopulator : IndexPopulator
         bool publishedValuesOnly,
         int? parentId,
         IContentService contentService,
+        IUmbracoIndexesConfiguration configuration,
         IUmbracoDatabaseFactory umbracoDatabaseFactory)
     {
         _contentService = contentService ?? throw new ArgumentNullException(nameof(contentService));
+        _configuration = configuration;
         _umbracoDatabaseFactory =
             umbracoDatabaseFactory ?? throw new ArgumentNullException(nameof(umbracoDatabaseFactory));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));

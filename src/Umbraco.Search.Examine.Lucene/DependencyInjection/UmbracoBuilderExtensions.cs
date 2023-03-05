@@ -26,7 +26,7 @@ public static class UmbracoBuilderExtensions
                 .ExternalIndexName)
             .AddSingleton<IUmbracoIndex>(services => new UmbracoExamineIndex<IContent>(services
                 .GetRequiredService<IExamineManager>().GetIndex(Constants.UmbracoIndexes
-                    .ExternalIndexName), services.GetRequiredService<IPublishedContentValueSetBuilder>(), true))
+                    .ExternalIndexName), services.GetRequiredService<IPublishedContentValueSetBuilder>()))
             .AddSingleton<IUmbracoSearcher>(services => new UmbracoExamineSearcher<IContent>(services
                 .GetRequiredService<IExamineManager>().GetIndex(Constants.UmbracoIndexes
                     .ExternalIndexName).Searcher));

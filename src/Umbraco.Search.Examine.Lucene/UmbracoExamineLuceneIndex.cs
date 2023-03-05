@@ -12,7 +12,9 @@ using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Search;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Extensions;
+using Umbraco.Search.Configuration;
 using Umbraco.Search.Diagnostics;
+using Umbraco.Search.Examine.Configuration;
 
 namespace Umbraco.Search.Examine.Lucene;
 
@@ -30,25 +32,18 @@ public class UmbracoExamineLuceneIndex : LuceneIndex, IUmbracoExamineIndex, IInd
         ILoggerFactory loggerFactory,
         string name,
         IOptionsMonitor<LuceneDirectoryIndexOptions> indexOptions,
+        IUmbracoIndexesConfiguration configuration,
         IHostingEnvironment hostingEnvironment,
-        IRuntimeState runtimeState, bool publishedValuesOnly)
+        IRuntimeState runtimeState)
         : base(loggerFactory, name, indexOptions)
     {
-        PublishedValuesOnly = publishedValuesOnly;
         _runtimeState = runtimeState;
-        _diagnostics = new UmbracoExamineIndexDiagnostics(this, loggerFactory.CreateLogger<UmbracoExamineIndexDiagnostics>(), hostingEnvironment, indexOptions);
+        _diagnostics = new UmbracoExamineIndexDiagnostics(this,configuration,  loggerFactory.CreateLogger<UmbracoExamineIndexDiagnostics>(), hostingEnvironment, indexOptions);
         _logger = loggerFactory.CreateLogger<UmbracoExamineLuceneIndex>();
     }
 
     public Attempt<string?> IsHealthy() => _diagnostics.IsHealthy();
     public virtual IReadOnlyDictionary<string, object?> Metadata => _diagnostics.Metadata;
-
-    /// <summary>
-    ///     When set to true Umbraco will keep the index in sync with Umbraco data automatically
-    /// </summary>
-    public bool EnableDefaultEventHandler { get; set; } = true;
-
-    public bool PublishedValuesOnly { get; protected set; } = false;
 
     /// <summary>
     ///     override to check if we can actually initialize.
