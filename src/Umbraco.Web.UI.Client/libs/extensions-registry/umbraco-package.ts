@@ -57,7 +57,6 @@ export type ManifestJSONTypes =
 
 /**
  * Umbraco package manifest JSON
- * @additionalProperties false
  */
 export class UmbracoPackage {
 
