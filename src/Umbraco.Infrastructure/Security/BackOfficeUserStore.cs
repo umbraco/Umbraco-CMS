@@ -287,7 +287,7 @@ public class BackOfficeUserStore :
 
         using (ICoreScope scope = _scopeProvider.CreateCoreScope())
         {
-            IUser? found = _userService.GetUserById(asInt);
+            IUser? found = GetAsync(asInt).GetAwaiter().GetResult();
             if (found != null)
             {
                 // we have to remember whether Logins property is dirty, since the UpdateMemberProperties will reset it.
@@ -385,14 +385,14 @@ public class BackOfficeUserStore :
         // We could use ResolveEntityIdFromIdentityId here, but that would require multiple DB calls, so let's not.
         if (TryConvertIdentityIdToInt(userId, out var id))
         {
-            return _userService.GetUserById(id);
+            return GetAsync(id).GetAwaiter().GetResult();
         }
 
         // We couldn't directly convert the ID to an int, this is because the user logged in with external login.
         // So we need to look up the user by key.
         if (Guid.TryParse(userId, out Guid key))
         {
-            return _userService.GetAsync(key).GetAwaiter().GetResult();
+            return GetAsync(key).GetAwaiter().GetResult();
         }
 
         throw new InvalidOperationException($"Unable to resolve user with ID {userId}");
