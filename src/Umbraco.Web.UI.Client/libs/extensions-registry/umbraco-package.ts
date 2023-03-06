@@ -55,8 +55,24 @@ export type ManifestJSONTypes =
 	| ManifestWorkspaceView
 	| ManifestWorkspaceViewCollection;
 
+/**
+ * Umbraco package manifest JSON
+ * @additionalProperties false
+ */
 export class UmbracoPackage {
+
+	/**
+	 * @title The name of the Umbraco package
+	 */
 	name?: string;
+
+	/**
+	 * @title The version of the Umbraco package
+	 */
 	version?: string;
+
+	/**
+	 * @title An array of Umbraco package manifest types that will be installed
+	 */
 	extensions?: ManifestJSONTypes[];
 }
