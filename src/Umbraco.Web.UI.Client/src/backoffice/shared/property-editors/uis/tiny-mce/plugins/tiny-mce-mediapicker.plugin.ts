@@ -75,7 +75,7 @@ export class TinyMceMediaPickerPlugin extends TinyMcePluginBase {
 
 		// TODO => how are additional props provided? Need to send startNodeId and startNodeIsVirtual props
 		const modalHandler = this.modalContext?.mediaPicker({
-			selection: currentTarget.udi ? [currentTarget.udi] : [],
+			selection: currentTarget.udi ? [...currentTarget.udi] : [],
             multiple: false,
 		});
 
