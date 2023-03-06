@@ -93,6 +93,10 @@ export interface ManifestBase {
 }
 
 export interface ManifestWithLoader<LoaderReturnType> extends ManifestBase {
+	/**
+	 * Ignore this property when serializing to JSON Schema
+	 * @ignore
+	 */
 	loader?: () => Promise<LoaderReturnType>;
 }
 
