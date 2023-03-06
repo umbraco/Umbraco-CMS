@@ -207,14 +207,6 @@ public class CoreScope : ICoreScope
             ParentScope.ChildCompleted(_completed);
         }
 
-        // Decrement the lock counters on the parent if any.
-        Locks.ClearLocks(InstanceId);
-
-        if (ParentScope is null)
-        {
-            Locks.EnsureLocksCleared(InstanceId);
-        }
-
         _disposed = true;
     }
 
@@ -227,7 +219,7 @@ public class CoreScope : ICoreScope
         }
     }
 
-    private void HandleScopedFileSystems()
+    internal void HandleScopedFileSystems()
     {
         if (_shouldScopeFileSystems == true)
         {
@@ -241,7 +233,7 @@ public class CoreScope : ICoreScope
         }
     }
 
-    private void HandleScopedNotifications() => _notificationPublisher?.ScopeExit(_completed.HasValue && _completed.Value);
+    internal void HandleScopedNotifications() => _notificationPublisher?.ScopeExit(_completed.HasValue && _completed.Value);
 
     private void EnsureNotDisposed()
     {

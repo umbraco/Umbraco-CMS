@@ -380,7 +380,12 @@ namespace Umbraco.Cms.Infrastructure.Scoping
 #endif
             }
 
-            base.Dispose();
+            Locks.ClearLocks(InstanceId);
+
+            if (ParentScope is null)
+            {
+                Locks.EnsureLocksCleared(InstanceId);
+            }
 
             _scopeProvider.PopAmbientScope(); // might be null = this is how scopes are removed from context objects
 
@@ -401,6 +406,8 @@ namespace Umbraco.Cms.Infrastructure.Scoping
             {
                 DisposeLastScope();
             }
+
+            base.Dispose();
 
             _disposed = true;
         }
