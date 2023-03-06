@@ -4,6 +4,7 @@ import {
 	DirectionModel,
 	LogLevelCountsModel,
 	LogLevelModel,
+	PagedLoggerModel,
 	PagedLogMessageModel,
 	PagedLogTemplateModel,
 	PagedSavedLogSearchModel,
@@ -57,6 +58,9 @@ export class UmbLogViewerWorkspaceContext {
 
 	#dateRange = new DeepState<LogViewerDateRange>(this.defaultDateRange);
 	dateRange = createObservablePart(this.#dateRange, (data) => data);
+
+	#loggers = new DeepState<PagedLoggerModel | null>(null);
+	loggers = createObservablePart(this.#loggers, (data) => data?.items);
 
 	#filterExpression = new StringState<string>('');
 	filterExpression = createObservablePart(this.#filterExpression, (data) => data);
@@ -154,6 +158,14 @@ export class UmbLogViewerWorkspaceContext {
 
 		if (data) {
 			this.#messageTemplates.next(data);
+		}
+	}
+
+	async getLogLevels(skip: number, take: number) {
+		const { data } = await this.#repository.getLogLevels({ skip, take });
+
+		if (data) {
+			this.#loggers.next(data);
 		}
 	}
 

@@ -88,4 +88,9 @@ export class UmbLogViewerRepository {
 			endDate,
 		});
 	}
+
+	async getLogLevels({ skip = 0, take = 100 }: { skip: number; take: number }) {
+		await this.#init();
+		return this.#messagesDataSource.getLogViewerLevel({ skip, take });
+	}
 }

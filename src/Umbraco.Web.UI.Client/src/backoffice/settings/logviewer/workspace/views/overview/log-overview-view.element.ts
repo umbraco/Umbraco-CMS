@@ -1,11 +1,6 @@
 import { css, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
-import { clamp } from 'lodash-es';
-import {
-	LogViewerDateRange,
-	UmbLogViewerWorkspaceContext,
-	UMB_APP_LOG_VIEWER_CONTEXT_TOKEN,
-} from '../../logviewer.context';
+import { UmbLogViewerWorkspaceContext, UMB_APP_LOG_VIEWER_CONTEXT_TOKEN } from '../../logviewer.context';
 import { LogLevelCountsModel } from '@umbraco-cms/backend-api';
 import { UmbLitElement } from '@umbraco-cms/element';
 
@@ -106,13 +101,14 @@ export class UmbLogViewerOverviewViewElement extends UmbLitElement {
 		this.consumeContext(UMB_APP_LOG_VIEWER_CONTEXT_TOKEN, (instance) => {
 			this.#logViewerContext = instance;
 			this.#observeStuff();
+			this.#logViewerContext?.getLogLevels(0, 100);
 		});
 	}
 
 	#observeStuff() {
 		if (!this.#logViewerContext) return;
 
-		this.observe(this.#logViewerContext.logCount, (logLevel) => {
+		this.observe(this.#logViewerContext.logCount, () => {
 			this._errorCount = this._logLevelCount?.error ?? 0;
 		});
 	}
@@ -130,7 +126,7 @@ export class UmbLogViewerOverviewViewElement extends UmbLitElement {
 					</uui-box>
 
 					<uui-box id="level" headline="Log level">
-						<h1 id="log-lever">Info</h1>
+						<h1 id="log-lever"><umb-log-viewer-log-level-overview></umb-log-viewer-log-level-overview></h1>
 					</uui-box>
 
 					<umb-log-viewer-log-types-chart id="types"></umb-log-viewer-log-types-chart>

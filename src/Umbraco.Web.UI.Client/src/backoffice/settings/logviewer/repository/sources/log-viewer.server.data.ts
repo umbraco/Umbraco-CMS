@@ -63,14 +63,14 @@ export class UmbLogSearchesServerDataSource implements LogSearchDataSource {
 		return await tryExecuteAndNotify(this.#host, LogViewerResource.deleteLogViewerSavedSearchByName({ name }));
 	}
 }
-/**
- * A data source for the log messages and levels 
- *
- * @export
- * @class UmbLogMessagesServerDataSource
- * @implements {LogMessagesDataSource}
- */
-export class UmbLogMessagesServerDataSource implements LogMessagesDataSource {
+	/**
+	 * A data source for the log messages and levels 
+	 *
+	 * @export
+	 * @class UmbLogMessagesServerDataSource
+	 * @implements {LogMessagesDataSource}
+	 */
+	export class UmbLogMessagesServerDataSource implements LogMessagesDataSource {
 	#host: UmbControllerHostInterface;
 
 	/**

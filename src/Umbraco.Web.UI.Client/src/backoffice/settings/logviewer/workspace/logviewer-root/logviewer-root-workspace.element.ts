@@ -78,7 +78,6 @@ export class UmbLogViewerWorkspaceElement extends UmbLitElement {
 
 	load(): void {
 		// Not relevant for this workspace -added to prevent the error from popping up
-		console.log('Loading something from somewhere');
 	}
 
 	private _observeWorkspaceViews() {
