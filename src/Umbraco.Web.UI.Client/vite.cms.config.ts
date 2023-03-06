@@ -1,9 +1,9 @@
 import { defineConfig } from 'vite';
+import { viteStaticCopy } from 'vite-plugin-static-copy';
 
-import config from './vite.config';
+import { plugins } from './vite.config';
 
 export default defineConfig({
-	...config,
 	build: {
 		lib: {
 			entry: 'src/app.ts',
@@ -15,5 +15,16 @@ export default defineConfig({
 		sourcemap: true,
 	},
 	base: '/umbraco/backoffice/',
-	mode: 'production'
+	mode: 'production',
+	plugins: [
+		...plugins,
+		viteStaticCopy({
+			targets: [
+				{
+					src: 'types/umbraco-package-schema.json',
+					dest: '../../../../Umbraco.Web.UI.New',
+				},
+			],
+		}),
+	],
 });
