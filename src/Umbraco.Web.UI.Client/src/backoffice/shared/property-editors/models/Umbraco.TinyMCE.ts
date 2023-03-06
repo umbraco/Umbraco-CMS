@@ -8,6 +8,36 @@ export const manifest: ManifestPropertyEditorModel = {
 		config: {
 			properties: [
 				{
+					alias: 'toolbar',
+					label: 'Toolbar',
+					description: 'Pick the toolbar options that should be available when editing',
+					propertyEditorUI: 'Umb.PropertyEditorUI.TinyMCE.ToolbarConfiguration',
+				},
+				{
+					alias: 'stylesheets',
+					label: 'Stylesheets',
+					description: 'Pick the stylesheets whose editor styles should be available when editing',
+					propertyEditorUI: 'Umb.PropertyEditorUI.TinyMCE.StylesheetsConfiguration',
+				},
+				{
+					alias: 'dimensions',
+					label: 'Dimensions',
+					description: 'Set the editor dimensions',
+					propertyEditorUI: 'Umb.PropertyEditorUI.TinyMCE.DimensionsConfiguration',
+				},
+				{
+					alias: 'maxImageSize',
+					label: 'Maximum size for inserted images',
+					description: 'Maximum width or height - enter 0 to disable resizing',
+					propertyEditorUI: 'Umb.PropertyEditorUI.TinyMCE.MaxImageSizeConfiguration',
+				},
+				{
+					alias: 'mode',
+					label: 'Mode',
+					description: 'Select mode',
+					propertyEditorUI: 'Umb.PropertyEditorUI.TinyMCE.ModeConfiguration',
+				},
+				{
 					alias: 'mediaParentId',
 					label: 'Image Upload Folder',
 					description: 'Choose the upload location of pasted images',
