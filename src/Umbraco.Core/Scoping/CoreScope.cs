@@ -57,6 +57,8 @@ public class CoreScope : ICoreScope
             return;
         }
 
+        Locks = parentScope.Locks;
+
         // cannot specify a different fs scope!
         // can be 'true' only on outer scope (and false does not make much sense)
         if (_shouldScopeFileSystems != null && ParentScope?._shouldScopeFileSystems != _shouldScopeFileSystems)
@@ -204,6 +206,11 @@ public class CoreScope : ICoreScope
 
         // Decrement the lock counters on the parent if any.
         Locks.ClearLocks(InstanceId);
+
+        if (ParentScope is null)
+        {
+            Locks.EnsureLocksCleared(InstanceId);
+        }
 
         _disposed = true;
     }

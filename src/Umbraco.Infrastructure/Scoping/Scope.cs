@@ -13,7 +13,6 @@ using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Extensions;
-using StaticServiceProvider = Umbraco.Cms.Web.Common.DependencyInjection.StaticServiceProvider;
 
 namespace Umbraco.Cms.Infrastructure.Scoping
 {
@@ -381,6 +380,8 @@ namespace Umbraco.Cms.Infrastructure.Scoping
 #endif
             }
 
+            base.Dispose();
+
             _scopeProvider.PopAmbientScope(); // might be null = this is how scopes are removed from context objects
 
 #if DEBUG_SCOPES
@@ -400,8 +401,6 @@ namespace Umbraco.Cms.Infrastructure.Scoping
             {
                 DisposeLastScope();
             }
-
-            base.Dispose();
 
             _disposed = true;
         }

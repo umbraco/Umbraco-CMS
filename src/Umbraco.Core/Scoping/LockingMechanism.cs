@@ -1,4 +1,5 @@
-﻿using Umbraco.Cms.Core.Collections;
+﻿using System.Text;
+using Umbraco.Cms.Core.Collections;
 using Umbraco.Cms.Core.DistributedLocking;
 using Umbraco.Extensions;
 
@@ -256,6 +257,25 @@ public class LockingMechanism : ILockingMechanism
                 }
             }
         }
+    }
+
+    public void EnsureLocksCleared(Guid instanceId)
+    {
+        while (!_acquiredLocks?.IsCollectionEmpty() ?? false)
+        {
+            _acquiredLocks?.Dequeue().Dispose();
+        }
+
+        // We're the parent scope, make sure that locks of all scopes has been cleared
+        // Since we're only reading we don't have to be in a lock
+        if (!(_readLocksDictionary?.Count > 0) && !(_writeLocksDictionary?.Count > 0))
+        {
+            return;
+        }
+
+        var exception = new InvalidOperationException(
+            $"All scopes has not been disposed from parent scope: {instanceId}, see log for more details.");
+        throw exception;
     }
 
     /// <summary>
