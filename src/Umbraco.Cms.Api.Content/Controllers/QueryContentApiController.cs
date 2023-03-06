@@ -1,5 +1,3 @@
-using System.IO;
-using Examine.Search;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Primitives;
@@ -43,7 +41,7 @@ public class QueryContentApiController : ContentApiControllerBase
         HttpContext? context = _httpContextAccessor.HttpContext;
         if (context is null || !context.Request.Query.TryGetValue("fetch", out StringValues queryValue))
         {
-            return BadRequest("Missing 'fetch' query parameter.");
+            return BadRequest("Missing 'fetch' query parameter. Alternatives are not implemented yet.");
         }
 
         var queryOption = queryValue.ToString();
@@ -69,7 +67,10 @@ public class QueryContentApiController : ContentApiControllerBase
 
         IEnumerable<Guid> ids = _apiQueryService.GetGuidsFromQuery((Guid)id, queryType);
 
-        IEnumerable<IPublishedContent> contentItems = ids.Select(contentCache.GetById).WhereNotNull();
+        IEnumerable<IPublishedContent> contentItems = ids.Select(contentCache.GetById)
+                                                         .WhereNotNull()
+                                                         .OrderBy(x => x.Path)
+                                                         .ThenBy(c => c.SortOrder);
 
         IEnumerable<IApiContent> results = contentItems.Select(ApiContentBuilder.Build);
 
