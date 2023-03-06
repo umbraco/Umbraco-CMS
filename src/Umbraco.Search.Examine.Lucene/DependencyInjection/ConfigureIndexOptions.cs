@@ -33,7 +33,7 @@ public sealed class ConfigureIndexOptions : IConfigureNamedOptions<LuceneDirecto
         }
         var configuration = _umbracoIndexesConfiguration.Configuration(name) as IUmbracoExamineIndexConfig;
         options.Analyzer = configuration?.Analyzer ?? new StandardAnalyzer(LuceneVersion.LUCENE_48);
-        options.Validator = configuration?.GetContentValueSetValidator();
+        options.Validator = configuration?.PublishedValuesOnly ?? false ? configuration.GetPublishedContentValueSetValidator() : configuration?.GetContentValueSetValidator();
         options.FieldDefinitions = new UmbracoFieldDefinitionCollection().toExamineFieldDefinitionCollection();
 
 
