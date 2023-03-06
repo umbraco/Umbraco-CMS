@@ -1,0 +1,75 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "title": "Umbraco Package",
+    "description": "JSON schema for creating an Umbraco pacakge with different manifest types",
+    "type": "object",
+    "properties": {
+        "name": {
+            "type": "string",
+            "description": "The name of the package"
+        },
+        "version": {
+            "type": "string",
+            "description": "The version of the package"
+        },
+        "extensions": {
+            "type": "array",
+            "description": "The extensions that are part of the package",
+            "minItems": 1,
+            "items": {
+                "type": "object",
+                "oneOf": [ 
+                    { "$ref": "#/definitions/rootManifest" }
+                ]
+            }         
+        }
+    },    
+    "required": [
+        "name",
+        "version",
+        "extensions"
+    ],
+    "additionalProperties": false,
+    "definitions": {
+        "manifesTypes":{
+            "enum": [ 
+                "collectionView",
+                "dashboardCollection",
+                "dashboard"
+            ]
+        },
+        "rootManifest": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string",
+                    "description": "The name of the extension"
+                },
+                "alias": {
+                    "type": "string",
+                    "description": "The alias of the extension"
+                },
+                "weight": {
+                    "type": "integer",
+                    "description": "The weight of the extension"
+                },
+                "type": {
+                    "$ref": "#/definitions/manifesTypes"
+                },
+                "js": {
+                    "type": "string",
+                    "description": "The path to the javascript file"
+                },
+                "elementName": {
+                    "type": "string",
+                    "description": "The name of the HTML web component element"
+                },
+                "meta": {
+                    "type": "object",
+                    "description": "NOTE: This object & properties change depending on the ENUM type of extension"
+                }
+            },
+            "required": [ "name", "alias", "type", "js" ]
+        }
+    }
+}
