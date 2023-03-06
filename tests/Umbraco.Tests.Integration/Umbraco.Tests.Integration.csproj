@@ -79,7 +79,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Examine.Lucene" Version="3.0.1" />
+    <PackageReference Include="Examine.Lucene" Version="3.1.0" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="7.0.0-7.0.0-rc.2.*" />
     <PackageReference Include="Microsoft.AspNet.WebApi.Client" Version="5.2.9" />
     <PackageReference Include="Bogus" Version="34.0.2" />
