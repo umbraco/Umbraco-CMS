@@ -1,7 +1,6 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, html, nothing } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
-import { ActionPageEntity } from '../action/tree-item-action.element';
 import { UmbLitElement } from '@umbraco-cms/element';
 import { UmbContextToken } from '@umbraco-cms/context-api';
 
@@ -60,7 +59,7 @@ export class UmbTreeContextMenuService extends UmbLitElement {
 		this.provideContext(UMB_TREE_CONTEXT_MENU_SERVICE_CONTEXT_TOKEN, this);
 	}
 
-	public open(entity: ActionPageEntity) {
+	public open(entity: any) {
 		this.entity = entity;
 		this._modalOpen = true;
 	}
