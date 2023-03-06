@@ -9,6 +9,7 @@ using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Membership;
+using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Extensions;
@@ -29,6 +30,7 @@ public class BackOfficeUserStore : UmbracoUserStore<BackOfficeIdentityUser, Iden
     private readonly ICoreScopeProvider _scopeProvider;
     private readonly ITwoFactorLoginService _twoFactorLoginService;
     private readonly IUserGroupService _userGroupService;
+    private readonly IUserRepository _userRepository;
     private readonly IUserService _userService;
 
     /// <summary>
@@ -45,7 +47,8 @@ public class BackOfficeUserStore : UmbracoUserStore<BackOfficeIdentityUser, Iden
         BackOfficeErrorDescriber describer,
         AppCaches appCaches,
         ITwoFactorLoginService twoFactorLoginService,
-        IUserGroupService userGroupService)
+        IUserGroupService userGroupService,
+        IUserRepository userRepository)
         : base(describer)
     {
         _scopeProvider = scopeProvider;
@@ -57,46 +60,27 @@ public class BackOfficeUserStore : UmbracoUserStore<BackOfficeIdentityUser, Iden
         _appCaches = appCaches;
         _twoFactorLoginService = twoFactorLoginService;
         _userGroupService = userGroupService;
-        _userService = userService;
+        _userRepository = userRepository;
         _externalLoginService = externalLoginService;
-    }
-
-    [Obsolete("Use constructor that takes IUserGroupService, scheduled for removal in V15.")]
-    public BackOfficeUserStore(
-        ICoreScopeProvider scopeProvider,
-        IUserService userService,
-        IEntityService entityService,
-        IExternalLoginWithKeyService externalLoginService,
-        IOptionsSnapshot<GlobalSettings> globalSettings,
-        IUmbracoMapper mapper,
-        BackOfficeErrorDescriber describer,
-        AppCaches appCaches,
-        ITwoFactorLoginService twoFactorLoginService)
-        : this(
-            scopeProvider,
-            userService,
-            entityService,
-            externalLoginService,
-            globalSettings,
-            mapper,
-            describer,
-            appCaches,
-            twoFactorLoginService,
-            StaticServiceProvider.Instance.GetRequiredService<IUserGroupService>())
-    {
     }
 
     /// <inheritdoc />
     public async Task<bool> ValidateSessionIdAsync(string? userId, string? sessionId)
     {
-        if (Guid.TryParse(sessionId, out Guid guidSessionId))
+        if (!Guid.TryParse(sessionId, out Guid guidSessionId))
         {
-            // We need to resolve the id from the key here...
-            var id = await ResolveEntityIdFromIdentityId(userId);
-            return _userService.ValidateLoginSession(id, guidSessionId);
+            return false;
         }
 
-        return false;
+        using ICoreScope scope = _scopeProvider.CreateCoreScope();
+
+        // We need to resolve the id from the key here...
+        var id = await ResolveEntityIdFromIdentityId(userId);
+
+        var sessionIsValid = _userRepository.ValidateLoginSession(id, guidSessionId);
+        scope.Complete();
+
+        return sessionIsValid;
     }
 
     /// <inheritdoc />
