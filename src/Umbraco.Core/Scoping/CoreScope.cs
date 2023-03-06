@@ -1,4 +1,5 @@
-﻿using Umbraco.Cms.Core.Cache;
+﻿using Microsoft.Extensions.Logging;
+using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.DistributedLocking;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.IO;
@@ -7,6 +8,7 @@ namespace Umbraco.Cms.Core.Scoping;
 
 public class CoreScope : ICoreScope
 {
+    protected bool? _completed;
     private ICompletable? _scopedFileSystem;
     private IScopedNotificationPublisher? _notificationPublisher;
     private IsolatedCaches? _isolatedCaches;
@@ -15,11 +17,11 @@ public class CoreScope : ICoreScope
     private readonly bool? _shouldScopeFileSystems;
     private readonly IEventAggregator _eventAggregator;
 
-    protected bool? _completed;
     private bool _disposed;
 
     public CoreScope(
         IDistributedLockingMechanismFactory distributedLockingMechanismFactory,
+        ILoggerFactory loggerFactory,
         FileSystems scopedFileSystem,
         IEventAggregator eventAggregator,
         RepositoryCacheMode repositoryCacheMode = RepositoryCacheMode.Unspecified,
@@ -30,7 +32,7 @@ public class CoreScope : ICoreScope
         InstanceId = Guid.NewGuid();
         CreatedThreadId = Environment.CurrentManagedThreadId;
         Locks = ParentScope is null
-            ? new LockingMechanism(distributedLockingMechanismFactory)
+            ? new LockingMechanism(distributedLockingMechanismFactory, loggerFactory.CreateLogger<LockingMechanism>())
             : ResolveLockingMechanism();
         _repositoryCacheMode = repositoryCacheMode;
         _shouldScopeFileSystems = shouldScopeFileSystems;
@@ -45,12 +47,13 @@ public class CoreScope : ICoreScope
     public CoreScope(
         CoreScope? parentScope,
         IDistributedLockingMechanismFactory distributedLockingMechanismFactory,
+        ILoggerFactory loggerFactory,
         FileSystems scopedFileSystem,
         IEventAggregator eventAggregator,
         RepositoryCacheMode repositoryCacheMode = RepositoryCacheMode.Unspecified,
         bool? shouldScopeFileSystems = null,
         IScopedNotificationPublisher? notificationPublisher = null)
-    : this(distributedLockingMechanismFactory, scopedFileSystem, eventAggregator, repositoryCacheMode, shouldScopeFileSystems, notificationPublisher)
+    : this(distributedLockingMechanismFactory, loggerFactory, scopedFileSystem, eventAggregator, repositoryCacheMode, shouldScopeFileSystems, notificationPublisher)
     {
         if (parentScope is null)
         {

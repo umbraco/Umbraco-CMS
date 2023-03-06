@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore.Storage;
+using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.DistributedLocking;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.IO;
@@ -17,6 +18,7 @@ internal class EfCoreScope : CoreScope, IEfCoreScope
 
     public EfCoreScope(
         IDistributedLockingMechanismFactory distributedLockingMechanismFactory,
+        ILoggerFactory loggerFactory,
         IUmbracoEfCoreDatabaseFactory efCoreDatabaseFactory,
         IEFCoreScopeAccessor efCoreScopeAccessor,
         FileSystems scopedFileSystem,
@@ -25,7 +27,7 @@ internal class EfCoreScope : CoreScope, IEfCoreScope
         IEventAggregator eventAggregator,
         RepositoryCacheMode repositoryCacheMode = RepositoryCacheMode.Unspecified,
         bool? scopeFileSystems = null)
-        : base(distributedLockingMechanismFactory, scopedFileSystem, eventAggregator, repositoryCacheMode, scopeFileSystems)
+        : base(distributedLockingMechanismFactory, loggerFactory, scopedFileSystem, eventAggregator, repositoryCacheMode, scopeFileSystems)
     {
         _efCoreDatabaseFactory = efCoreDatabaseFactory;
         _efCoreScopeAccessor = efCoreScopeAccessor;
@@ -36,6 +38,7 @@ internal class EfCoreScope : CoreScope, IEfCoreScope
     public EfCoreScope(
         EfCoreScope parentScope,
         IDistributedLockingMechanismFactory distributedLockingMechanismFactory,
+        ILoggerFactory loggerFactory,
         IUmbracoEfCoreDatabaseFactory efCoreDatabaseFactory,
         IEFCoreScopeAccessor efCoreScopeAccessor,
         FileSystems scopedFileSystem,
@@ -44,7 +47,7 @@ internal class EfCoreScope : CoreScope, IEfCoreScope
         IEventAggregator eventAggregator,
         RepositoryCacheMode repositoryCacheMode = RepositoryCacheMode.Unspecified,
         bool? scopeFileSystems = null)
-        : base(parentScope, distributedLockingMechanismFactory, scopedFileSystem, eventAggregator, repositoryCacheMode, scopeFileSystems)
+        : base(parentScope, distributedLockingMechanismFactory, loggerFactory, scopedFileSystem, eventAggregator, repositoryCacheMode, scopeFileSystems)
     {
         _efCoreDatabaseFactory = efCoreDatabaseFactory;
         _efCoreScopeAccessor = efCoreScopeAccessor;

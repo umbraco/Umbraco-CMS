@@ -1,12 +1,7 @@
 using System.Data;
 using System.Text;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Umbraco.Cms.Core;
-using Umbraco.Cms.Core.Cache;
-using Umbraco.Cms.Core.Collections;
 using Umbraco.Cms.Core.Configuration.Models;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.DistributedLocking;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.IO;
@@ -41,6 +36,7 @@ namespace Umbraco.Cms.Infrastructure.Scoping
             ScopeProvider scopeProvider,
             CoreDebugSettings coreDebugSettings,
             IDistributedLockingMechanismFactory distributedLockingMechanismFactory,
+            ILoggerFactory loggerFactory,
             MediaFileManager mediaFileManager,
             IEventAggregator eventAggregator,
             ILogger<Scope> logger,
@@ -58,6 +54,7 @@ namespace Umbraco.Cms.Infrastructure.Scoping
             : base(
                 parent,
                 distributedLockingMechanismFactory,
+                loggerFactory,
                 fileSystems,
                 eventAggregator,
                 repositoryCacheMode,
@@ -121,6 +118,7 @@ namespace Umbraco.Cms.Infrastructure.Scoping
             CoreDebugSettings coreDebugSettings,
             MediaFileManager mediaFileManager,
             IDistributedLockingMechanismFactory distributedLockingMechanismFactory,
+            ILoggerFactory loggerFactory,
             IEventAggregator eventAggregator,
             ILogger<Scope> logger,
             FileSystems fileSystems,
@@ -137,6 +135,7 @@ namespace Umbraco.Cms.Infrastructure.Scoping
                 scopeProvider,
                 coreDebugSettings,
                 distributedLockingMechanismFactory,
+                loggerFactory,
                 mediaFileManager,
                 eventAggregator,
                 logger,
@@ -160,6 +159,7 @@ namespace Umbraco.Cms.Infrastructure.Scoping
             CoreDebugSettings coreDebugSettings,
             MediaFileManager mediaFileManager,
             IDistributedLockingMechanismFactory distributedLockingMechanismFactory,
+            ILoggerFactory loggerFactory,
             IEventAggregator eventAggregator,
             ILogger<Scope> logger,
             FileSystems fileSystems,
@@ -175,7 +175,7 @@ namespace Umbraco.Cms.Infrastructure.Scoping
                 scopeProvider,
                 coreDebugSettings,
                 distributedLockingMechanismFactory,
-
+                loggerFactory,
                 mediaFileManager,
                 eventAggregator,
                 logger,
@@ -444,28 +444,6 @@ namespace Umbraco.Cms.Infrastructure.Scoping
             // TODO: safer?
             //if (Interlocked.CompareExchange(ref _disposed, 1, 0) != 0)
             //    throw new ObjectDisposedException(GetType().FullName);
-        }
-
-        /// <summary>
-        ///     Writes a locks dictionary to a <see cref="StringBuilder" /> for logging purposes.
-        /// </summary>
-        /// <param name="dict">Lock dictionary to report on.</param>
-        /// <param name="builder">String builder to write to.</param>
-        /// <param name="dictName">The name to report the dictionary as.</param>
-        private void WriteLockDictionaryToString(Dictionary<Guid, Dictionary<int, int>> dict, StringBuilder builder, string dictName)
-        {
-            if (dict?.Count > 0)
-            {
-                builder.AppendLine($"Remaining {dictName}:");
-                foreach (KeyValuePair<Guid, Dictionary<int, int>> instance in dict)
-                {
-                    builder.AppendLine($"Scope {instance.Key}");
-                    foreach (KeyValuePair<int, int> lockCounter in instance.Value)
-                    {
-                        builder.AppendLine($"\tLock ID: {lockCounter.Key} - times requested: {lockCounter.Value}");
-                    }
-                }
-            }
         }
 
         private void DisposeLastScope()

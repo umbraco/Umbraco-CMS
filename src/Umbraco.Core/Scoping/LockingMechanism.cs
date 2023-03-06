@@ -1,4 +1,5 @@
 ﻿using System.Text;
+using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Collections;
 using Umbraco.Cms.Core.DistributedLocking;
 using Umbraco.Extensions;
@@ -11,6 +12,7 @@ namespace Umbraco.Cms.Core.Scoping;
 public class LockingMechanism : ILockingMechanism
 {
     private readonly IDistributedLockingMechanismFactory _distributedLockingMechanismFactory;
+    private readonly ILogger<LockingMechanism> _logger;
     private readonly object _lockQueueLocker = new();
     private readonly object _dictionaryLocker = new();
     private StackQueue<(DistributedLockType lockType, TimeSpan timeout, Guid instanceId, int lockId)>? _queuedLocks;
@@ -24,9 +26,11 @@ public class LockingMechanism : ILockingMechanism
     /// Constructs an instance of LockingMechanism
     /// </summary>
     /// <param name="distributedLockingMechanismFactory"></param>
-    public LockingMechanism(IDistributedLockingMechanismFactory distributedLockingMechanismFactory)
+    /// <param name="logger"></param>
+    public LockingMechanism(IDistributedLockingMechanismFactory distributedLockingMechanismFactory, ILogger<LockingMechanism> logger)
     {
         _distributedLockingMechanismFactory = distributedLockingMechanismFactory;
+        _logger = logger;
         _acquiredLocks = new Queue<IDistributedLock>();
     }
 
@@ -382,7 +386,48 @@ public class LockingMechanism : ILockingMechanism
         // Since we're only reading we don't have to be in a lock
         if (_readLocksDictionary?.Count > 0 || _writeLocksDictionary?.Count > 0)
         {
-            throw new InvalidOperationException($"All scopes has not been disposed from parent scope.");
+            var exception = new InvalidOperationException(
+                $"All locks have not been cleared, this usually means that all scopes have not been disposed from the parent scope");
+            _logger.LogError(exception, GenerateUnclearedScopesLogMessage());
+            throw exception;
+        }
+    }
+
+    /// <summary>
+    ///     Generates a log message with all scopes that hasn't cleared their locks, including how many, and what locks they
+    ///     have requested.
+    /// </summary>
+    /// <returns>Log message.</returns>
+    private string GenerateUnclearedScopesLogMessage()
+    {
+        // Dump the dicts into a message for the locks.
+        var builder = new StringBuilder();
+        builder.AppendLine(
+            $"Lock counters aren't empty, suggesting a scope hasn't been properly disposed");
+        WriteLockDictionaryToString(_readLocksDictionary!, builder, "read locks");
+        WriteLockDictionaryToString(_writeLocksDictionary!, builder, "write locks");
+        return builder.ToString();
+    }
+
+    /// <summary>
+    ///     Writes a locks dictionary to a <see cref="StringBuilder" /> for logging purposes.
+    /// </summary>
+    /// <param name="dict">Lock dictionary to report on.</param>
+    /// <param name="builder">String builder to write to.</param>
+    /// <param name="dictName">The name to report the dictionary as.</param>
+    private void WriteLockDictionaryToString(Dictionary<Guid, Dictionary<int, int>> dict, StringBuilder builder, string dictName)
+    {
+        if (dict?.Count > 0)
+        {
+            builder.AppendLine($"Remaining {dictName}:");
+            foreach (KeyValuePair<Guid, Dictionary<int, int>> instance in dict)
+            {
+                builder.AppendLine($"Scope {instance.Key}");
+                foreach (KeyValuePair<int, int> lockCounter in instance.Value)
+                {
+                    builder.AppendLine($"\tLock ID: {lockCounter.Key} - times requested: {lockCounter.Value}");
+                }
+            }
         }
     }
 }

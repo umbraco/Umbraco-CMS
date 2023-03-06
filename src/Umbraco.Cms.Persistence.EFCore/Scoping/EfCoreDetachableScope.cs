@@ -1,4 +1,5 @@
-﻿using Umbraco.Cms.Core.DistributedLocking;
+﻿using Microsoft.Extensions.Logging;
+using Umbraco.Cms.Core.DistributedLocking;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Scoping;
@@ -12,6 +13,7 @@ internal class EfCoreDetachableScope : EfCoreScope
 
     public EfCoreDetachableScope(
         IDistributedLockingMechanismFactory distributedLockingMechanismFactory,
+        ILoggerFactory loggerFactory,
         IUmbracoEfCoreDatabaseFactory efCoreDatabaseFactory,
         IEFCoreScopeAccessor efCoreScopeAccessor,
         FileSystems fileSystems,
@@ -22,6 +24,7 @@ internal class EfCoreDetachableScope : EfCoreScope
         bool? scopeFileSystems = null)
         : base(
             distributedLockingMechanismFactory,
+            loggerFactory,
             efCoreDatabaseFactory,
             efCoreScopeAccessor,
             fileSystems,
@@ -46,6 +49,7 @@ internal class EfCoreDetachableScope : EfCoreScope
 
     public EfCoreDetachableScope(
         IDistributedLockingMechanismFactory distributedLockingMechanismFactory,
+        ILoggerFactory loggerFactory,
         IUmbracoEfCoreDatabaseFactory efCoreDatabaseFactory,
         IEFCoreScopeAccessor efCoreScopeAccessor,
         FileSystems fileSystems,
@@ -56,6 +60,7 @@ internal class EfCoreDetachableScope : EfCoreScope
         : base(
             parentScope,
             distributedLockingMechanismFactory,
+            loggerFactory,
             efCoreDatabaseFactory,
             efCoreScopeAccessor,
             fileSystems,

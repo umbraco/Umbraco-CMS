@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.DistributedLocking;
 using Umbraco.Cms.Core.Events;
@@ -11,6 +12,7 @@ public class EfCoreScopeProvider : IEfCoreScopeProvider
 {
     private readonly IAmbientEfCoreScopeStack _ambientEfCoreScopeStack;
     private readonly IUmbracoEfCoreDatabaseFactory _umbracoEfCoreDatabaseFactory;
+    private readonly ILoggerFactory _loggerFactory;
     private readonly IEFCoreScopeAccessor _efCoreScopeAccessor;
     private readonly IAmbientEFCoreScopeContextStack _ambientEfCoreScopeContextStack;
     private readonly IDistributedLockingMechanismFactory _distributedLockingMechanismFactory;
@@ -22,6 +24,7 @@ public class EfCoreScopeProvider : IEfCoreScopeProvider
         : this(
             StaticServiceProvider.Instance.GetRequiredService<IAmbientEfCoreScopeStack>(),
             StaticServiceProvider.Instance.GetRequiredService<IUmbracoEfCoreDatabaseFactory>(),
+            StaticServiceProvider.Instance.GetRequiredService<ILoggerFactory>(),
             StaticServiceProvider.Instance.GetRequiredService<IEFCoreScopeAccessor>(),
             StaticServiceProvider.Instance.GetRequiredService<IAmbientEFCoreScopeContextStack>(),
             StaticServiceProvider.Instance.GetRequiredService<IDistributedLockingMechanismFactory>(),
@@ -33,6 +36,7 @@ public class EfCoreScopeProvider : IEfCoreScopeProvider
     internal EfCoreScopeProvider(
         IAmbientEfCoreScopeStack ambientEfCoreScopeStack,
         IUmbracoEfCoreDatabaseFactory umbracoEfCoreDatabaseFactory,
+        ILoggerFactory loggerFactory,
         IEFCoreScopeAccessor efCoreScopeAccessor,
         IAmbientEFCoreScopeContextStack ambientEfCoreScopeContextStack,
         IDistributedLockingMechanismFactory distributedLockingMechanismFactory,
@@ -41,6 +45,7 @@ public class EfCoreScopeProvider : IEfCoreScopeProvider
     {
         _ambientEfCoreScopeStack = ambientEfCoreScopeStack;
         _umbracoEfCoreDatabaseFactory = umbracoEfCoreDatabaseFactory;
+        _loggerFactory = loggerFactory;
         _efCoreScopeAccessor = efCoreScopeAccessor;
         _ambientEfCoreScopeContextStack = ambientEfCoreScopeContextStack;
         _distributedLockingMechanismFactory = distributedLockingMechanismFactory;
@@ -54,6 +59,7 @@ public class EfCoreScopeProvider : IEfCoreScopeProvider
         bool? scopeFileSystems = null) =>
         new EfCoreDetachableScope(
             _distributedLockingMechanismFactory,
+            _loggerFactory,
             _umbracoEfCoreDatabaseFactory,
             _efCoreScopeAccessor,
             _fileSystems,
@@ -139,6 +145,7 @@ public class EfCoreScopeProvider : IEfCoreScopeProvider
             ScopeContext? newContext = _ambientEfCoreScopeContextStack.AmbientContext == null ? new ScopeContext() : null;
             var ambientScope = new EfCoreScope(
                 _distributedLockingMechanismFactory,
+                _loggerFactory,
                 _umbracoEfCoreDatabaseFactory,
                 _efCoreScopeAccessor,
                 _fileSystems,
@@ -160,6 +167,7 @@ public class EfCoreScopeProvider : IEfCoreScopeProvider
         var efCoreScope = new EfCoreScope(
             (EfCoreScope)_ambientEfCoreScopeStack.AmbientScope,
             _distributedLockingMechanismFactory,
+            _loggerFactory,
             _umbracoEfCoreDatabaseFactory,
             _efCoreScopeAccessor,
             _fileSystems,
