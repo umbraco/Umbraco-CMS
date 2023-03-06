@@ -37,11 +37,7 @@ export class UmbWorkspacePropertyLayoutElement extends LitElement {
 				border-bottom: none;
 			}
 
-			:host(:first-of-type) {
-				padding-top: 0;
-			}
-
-			:host(:first-of-type) {
+			:host-context(umb-variantable-property:first-of-type) {
 				padding-top:0;
 			}
 

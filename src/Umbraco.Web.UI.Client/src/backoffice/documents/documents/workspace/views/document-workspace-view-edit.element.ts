@@ -15,6 +15,7 @@ export class UmbDocumentWorkspaceViewEditElement extends UmbLitElement {
 		css`
 			:host {
 				display: block;
+				--uui-tab-background: var(--uui-color-surface);
 			}
 		`,
 	];
@@ -135,7 +136,7 @@ export class UmbDocumentWorkspaceViewEditElement extends UmbLitElement {
 							? html`
 									<uui-tab
 										label="Content"
-										.active=${this._routerPath === this._activePath}
+										.active=${this._routerPath + '/root' === this._activePath}
 										href=${this._routerPath || ''}
 										>Content</uui-tab
 									>
