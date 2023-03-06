@@ -83,7 +83,7 @@ internal class EfCoreScope : CoreScope, IEfCoreScope
             return true; // Do nothing
         });
 
-    public void Reset() => _completed = null;
+    public void Reset() => Completed = null;
 
     public override void Dispose()
     {
@@ -146,7 +146,7 @@ internal class EfCoreScope : CoreScope, IEfCoreScope
         {
             try
             {
-                _efCoreScopeProvider.AmbientScopeContext?.ScopeExit(_completed.HasValue && _completed.Value);
+                _efCoreScopeProvider.AmbientScopeContext?.ScopeExit(Completed.HasValue && Completed.Value);
             }
             finally
             {
@@ -158,7 +158,7 @@ internal class EfCoreScope : CoreScope, IEfCoreScope
 
     private void DisposeEfCoreDatabase()
     {
-        var completed = _completed.HasValue && _completed.Value;
+        var completed = Completed.HasValue && Completed.Value;
         {
             bool databaseException = false;
             try

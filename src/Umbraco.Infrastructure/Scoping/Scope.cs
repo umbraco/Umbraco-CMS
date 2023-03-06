@@ -393,14 +393,14 @@ namespace Umbraco.Cms.Infrastructure.Scoping
             _scopeProvider.Disposed(this);
 #endif
 
-            if (_autoComplete && _completed == null)
+            if (_autoComplete && Completed == null)
             {
-                _completed = true;
+                Completed = true;
             }
 
             if (ParentScope != null)
             {
-                ParentScope.ChildCompleted(_completed);
+                ParentScope.ChildCompleted(Completed);
             }
             else
             {
@@ -432,7 +432,7 @@ namespace Umbraco.Cms.Infrastructure.Scoping
             return ((LockingMechanism)Locks).GetWriteLocks();
         }
 
-        public void Reset() => _completed = null;
+        public void Reset() => Completed = null;
 
         internal void EnsureNotDisposed()
         {
@@ -456,7 +456,7 @@ namespace Umbraco.Cms.Infrastructure.Scoping
         private void DisposeLastScope()
         {
             // figure out completed
-            var completed = _completed.HasValue && _completed.Value;
+            var completed = Completed.HasValue && Completed.Value;
 
             // deal with database
             var databaseException = false;
