@@ -22,7 +22,6 @@ import type { ManifestWorkspaceAction } from './workspace-action.models';
 import type { ManifestWorkspaceView } from './workspace-view.models';
 import type { ManifestWorkspaceViewCollection } from './workspace-view-collection.models';
 import type { ManifestRepository } from './repository.models';
-import type { ClassConstructor } from '@umbraco-cms/models';
 
 export * from './collection-view.models';
 export * from './dashboard-collection.models';
@@ -139,6 +138,8 @@ export interface ManifestCustom extends ManifestBase {
 export interface ManifestWithMeta extends ManifestBase {
 	meta: unknown;
 }
+
+export type ClassConstructor<T> = new (...args: any[]) => T;
 
 export interface ManifestEntrypoint extends ManifestBase {
 	type: 'entrypoint';

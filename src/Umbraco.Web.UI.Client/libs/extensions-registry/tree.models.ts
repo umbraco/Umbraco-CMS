@@ -1,5 +1,4 @@
-import type { ManifestBase } from './models';
-import type { ClassConstructor } from '@umbraco-cms/models';
+import type { ClassConstructor, ManifestBase } from './models';
 
 export interface ManifestTree extends ManifestBase {
 	type: 'tree';
