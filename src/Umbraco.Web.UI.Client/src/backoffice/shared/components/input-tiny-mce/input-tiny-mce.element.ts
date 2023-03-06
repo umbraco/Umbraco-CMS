@@ -4,20 +4,19 @@ import { customElement, property, state } from 'lit/decorators.js';
 import { ifDefined } from 'lit-html/directives/if-defined.js';
 import { FormControlMixin } from '@umbraco-ui/uui-base/lib/mixins';
 import { AstNode, Editor, EditorEvent, TinyMCE } from 'tinymce';
+import { firstValueFrom } from 'rxjs';
 import { UmbMediaHelper } from '../../property-editors/uis/tiny-mce/media-helper.service';
-import { TinyMceCodeEditorPlugin } from '../../property-editors/uis/tiny-mce/plugins/tiny-mce-code-editor.plugin';
-import { TinyMceLinkPickerPlugin } from '../../property-editors/uis/tiny-mce/plugins/tiny-mce-linkpicker.plugin';
-import { TinyMceMacroPlugin } from '../../property-editors/uis/tiny-mce/plugins/tiny-mce-macro.plugin';
-import { TinyMceMediaPickerPlugin } from '../../property-editors/uis/tiny-mce/plugins/tiny-mce-mediapicker.plugin';
-import { TinyMceEmbeddedMediaPlugin } from '../../property-editors/uis/tiny-mce/plugins/tiny-mce-embeddedmedia.plugin';
 import {
 	UmbCurrentUserStore,
 	UMB_CURRENT_USER_STORE_CONTEXT_TOKEN,
 } from '../../../users/current-user/current-user.store';
+import { TinyMcePluginArguments } from '../../property-editors/uis/tiny-mce/plugins/tiny-mce-plugin';
 import { UmbLitElement } from '@umbraco-cms/element';
 import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN } from '@umbraco-cms/modal';
 import type { UserDetails } from '@umbraco-cms/models';
 import { DataTypePropertyModel } from '@umbraco-cms/backend-api';
+import { umbExtensionsRegistry } from '@umbraco-cms/extensions-api';
+import { ManifestTinyMcePlugin } from 'libs/extensions-registry/tinymce-plugin.model';
 
 /// TINY MCE
 import '../../../../../public-assets/tiny-mce/tinymce.min.js';
@@ -29,14 +28,6 @@ declare global {
 		tinymce: TinyMCE;
 		Umbraco: any;
 	}
-}
-
-export interface TinyMcePluginArguments {
-	editor: Editor;
-	modalContext?: UmbModalContext;
-	configuration?: Array<DataTypePropertyModel>;
-	currentUser?: UserDetails;
-	mediaHelper?: UmbMediaHelper;
 }
 
 @customElement('umb-input-tiny-mce')
@@ -205,11 +196,6 @@ export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
 			this.#currentUserStore = instance;
 			this.#observeCurrentUser();
 		});
-
-		// TODO => Register plugin using the add method
-		window.tinymce.PluginManager.add('example', (ed) => {
-			ed.on('click', () => ed.windowManager.alert('Hello World!'));
-		});
 	}
 
 	async #observeCurrentUser() {
@@ -236,7 +222,7 @@ export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
 	}
 
 	// TODO => setup runs before rendering, here we can add any custom plugins
-	#setTinyConfig() {
+	async #setTinyConfig() {
 		// set the default values that will not be modified via configuration
 		window.tinyConfig = {
 			autoresize_bottom_margin: 10,
@@ -255,16 +241,10 @@ export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
 			setup: (editor: Editor) => this.#editorSetup(editor),
 		};
 
-		// TODO => set editor mode
+		// TODO => set editor mode from configuration?
 
-		// get any pre-loaded plugins, and append their names to the config set
-		// TODO => below loads the plugin, but it's not available in the editor...
-		//window.tinymce.PluginManager.add('example', (editor, url) => {})
-		const registeredPlugins = Object.keys(window.tinymce.PluginManager.lookup);
-		const configPlugins = this._configObject.plugins.map((x: any) => x.name);
-		const plugins = registeredPlugins.concat(configPlugins).join(' ');
 
-		console.log(plugins);
+		const toolbar = this._configObject.toolbar.join(' ');
 
 		// extend with configuration values
 		Object.assign(window.tinyConfig, {
@@ -272,11 +252,11 @@ export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
 			extended_valid_elements: this.#extendedValidElements,
 			height: ifDefined(this._configObject.dimensions?.height),
 			invalid_elements: this._configObject.invalidElements,
-			plugins: plugins,
-			quickbars_insert_toolbar: this._configObject.toolbar.join(' '),
-			quickbars_selection_toolbar: this._configObject.toolbar.join(' '),
+			plugins: this._configObject.plugins.map((x: any) => x.name),
+			quickbars_insert_toolbar: toolbar,
+			quickbars_selection_toolbar: toolbar,
 			style_formats: this._styleFormats,
-			toolbar: this._configObject.toolbar.join(' '),
+			toolbar,
 			valid_elements: this._configObject.validElements,
 			width: ifDefined(this._configObject.dimensions?.width),
 		});
@@ -322,21 +302,22 @@ export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
 		return languageMatch ?? this.#defaultLanguage;
 	}
 
-	#editorSetup(editor: Editor) {
-		// initialise core plugins
-		new TinyMceCodeEditorPlugin({ editor, modalContext: this.modalContext });
-		new TinyMceLinkPickerPlugin({ editor, modalContext: this.modalContext, configuration: this.configuration });
-		new TinyMceMacroPlugin({ editor, modalContext: this.modalContext });
-		new TinyMceMediaPickerPlugin({
-			editor,
+	async #editorSetup(editor: Editor) {
+		editor.suffix = '.min';
+
+		const pluginArgs: TinyMcePluginArguments = {
+			editor: editor,
 			modalContext: this.modalContext,
 			configuration: this.configuration,
 			currentUser: this.currentUser,
 			mediaHelper: this.#mediaHelper,
-		});
-		new TinyMceEmbeddedMediaPlugin({ editor, modalContext: this.modalContext });
+		};
 
-		editor.suffix = '.min';
+		const observable = umbExtensionsRegistry
+		?.extensionsOfType('tinyMcePlugin');
+
+		const plugins = (await firstValueFrom(observable)) as ManifestTinyMcePlugin[];
+		plugins.forEach(p => new p.meta.api(pluginArgs));
 
 		// register custom option maxImageSize
 		editor.options.register('maxImageSize', { processor: 'number', default: this.#fallbackConfig.maxImageSize });

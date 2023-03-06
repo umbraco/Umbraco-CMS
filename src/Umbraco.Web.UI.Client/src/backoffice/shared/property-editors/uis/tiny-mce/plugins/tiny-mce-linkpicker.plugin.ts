@@ -1,8 +1,6 @@
 import { Editor } from 'tinymce';
 import { LinkPickerData } from '../../../../../../core/modal/layouts/link-picker/modal-layout-link-picker.element';
-import { TinyMcePluginArguments } from '../../../../components/input-tiny-mce/input-tiny-mce.element';
-import { DataTypePropertyModel } from '@umbraco-cms/backend-api';
-import { UmbModalContext } from '@umbraco-cms/modal';
+import { TinyMcePluginArguments, TinyMcePluginBase } from './tiny-mce-plugin';
 
 export interface CurrentTargetData {
 	name?: string;
@@ -20,17 +18,11 @@ export interface LinkListItem {
 	menu?: unknown;
 }
 
-export class TinyMceLinkPickerPlugin {
-	#editor: Editor;
-	#modalContext?: UmbModalContext;
-	#configuration?: Array<DataTypePropertyModel> = [];
-
+export class TinyMceLinkPickerPlugin extends TinyMcePluginBase {
 	constructor(args: TinyMcePluginArguments) {
-		this.#modalContext = args.modalContext;
-		this.#configuration = args.configuration;
-		this.#editor = args.editor;
+		super(args);
 
-		this.#createLinkPicker(args.editor, (currentTarget: CurrentTargetData, anchorElement: HTMLAnchorElement) => {
+		this.#createLinkPicker(this.editor, (currentTarget: CurrentTargetData, anchorElement: HTMLAnchorElement) => {
 			this.#openLinkPicker(currentTarget, anchorElement);
 		});
 	}
@@ -122,9 +114,9 @@ export class TinyMceLinkPickerPlugin {
 
 	// TODO => get anchors to provide to link picker?
 	async #openLinkPicker(currentTarget: CurrentTargetData, anchorElement?: HTMLAnchorElement) {
-		const modalHandler = this.#modalContext?.linkPicker({
+		const modalHandler = this.modalContext?.linkPicker({
 			config: {
-				ignoreUserStartNodes: this.#configuration?.find((x) => x.alias === 'ignoreUserStartNodes')?.value,
+				ignoreUserStartNodes: this.configuration?.find((x) => x.alias === 'ignoreUserStartNodes')?.value,
 			},
 			link: currentTarget,
 		});
@@ -138,8 +130,7 @@ export class TinyMceLinkPickerPlugin {
 	}
 
 	#updateLink(linkPickerData: LinkPickerData, anchorElement?: HTMLAnchorElement) {
-		console.log(linkPickerData, anchorElement);
-		const editor = this.#editor;
+		const editor = this.editor;
 		let href = linkPickerData.url;
 
 		// if an anchor exists, check that it is appropriately prefixed

@@ -1,6 +1,5 @@
-import { AstNode, Editor } from 'tinymce';
-import { TinyMcePluginArguments } from '../../../../components/input-tiny-mce/input-tiny-mce.element';
-import { UmbModalContext } from '@umbraco-cms/modal';
+import { AstNode } from 'tinymce';
+import { TinyMcePluginArguments, TinyMcePluginBase } from './tiny-mce-plugin';
 import { MacroSyntaxData, UmbMacroService } from 'libs/macro/macro.service';
 
 interface DialogData {
@@ -11,14 +10,11 @@ interface DialogData {
 
 // TODO => This is a quick transplant of the existing macro plugin - needs to be finished, and need to
 // determine how to replicate the existing macro service (backend doens')
-export class TinyMceMacroPlugin {
-	editor: Editor;
-	#modalContext?: UmbModalContext;
+export class TinyMceMacroPickerPlugin extends TinyMcePluginBase {
     #macroService = new UmbMacroService();
 
 	constructor(args: TinyMcePluginArguments) {
-		this.editor = args.editor;
-		this.#modalContext = args.modalContext;
+		super(args);
 
 		/** Adds custom rules for the macro plugin and custom serialization */
 		this.editor.on('preInit', () => {
@@ -167,7 +163,7 @@ export class TinyMceMacroPlugin {
 	 */
 	#getRealMacroElem() {
 		// Ask the editor for the currently selected element
-		const element = this.editor.selection.getNode() as HTMLElement;
+		const element = this.editor?.selection.getNode() as HTMLElement;
 		if (!element) {
 			return null;
 		}
@@ -187,7 +183,7 @@ export class TinyMceMacroPlugin {
 
 	// TODO => depends on macro picker, which doesn't exist
 	async #showMacroPicker(dialogData: DialogData) {
-		const modalHandler = this.#modalContext?.openBasic({
+		const modalHandler = this.modalContext?.openBasic({
 			header: 'I am a macro picker',
 			content: 'content content content',
 		});

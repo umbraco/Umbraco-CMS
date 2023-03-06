@@ -8,6 +8,8 @@ import { manifests as collectionViewManifests } from './collection/views/manifes
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-api';
 import { ManifestTypes } from '@umbraco-cms/extensions-registry';
 
+import { manifests as tinyMcePluginManifests } from './property-editors/uis/tiny-mce/plugins/manifests'; 
+
 const registerExtensions = (manifests: Array<ManifestTypes>) => {
 	manifests.forEach((manifest) => {
 		if (umbExtensionsRegistry.isRegistered(manifest.alias)) return;
@@ -20,4 +22,5 @@ registerExtensions([
 	...propertyEditorModelManifests,
 	...propertyEditorUIManifests,
 	...collectionViewManifests,
+	...tinyMcePluginManifests,
 ]);
