@@ -58,8 +58,9 @@ export class UmbPropertyEditorUITinyMceModeConfigurationElement extends UmbLitEl
 		this.value = event.target.value.toString();
 	}
 
+	// TODO => workspace-property should link the label to the input to resolve A11Y failures 
 	render() {
-		return html`<uui-select .options=${this.options} @change=${this.#onChange}></uui-select>`;
+		return html`<uui-select .options=${this.options} @change=${this.#onChange} name="Mode"></uui-select>`;
 	}
 }
 
