@@ -1,10 +1,8 @@
 using Examine;
 using Examine.Search;
-using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Api.Content.Routing;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.ContentApi;
-using Umbraco.Cms.Core.DependencyInjection;
 
 namespace Umbraco.Cms.Api.Content.Services;
 public class ApiQueryService : IApiQueryService
@@ -13,12 +11,13 @@ public class ApiQueryService : IApiQueryService
     private readonly List<IQueryOptionHandler> _queryOptionHandlers; // change to collect handlers from scope
     private readonly IExamineManager _examineManager;
 
+    // ToDo: Create QueryOptionHandlerCollection
     //public ApiQueryService(IApiQueryExtensionService apiQueryExtensionService, List<IQueryOptionHandler> queryOptionHandlers, IExamineManager examineManager)
-    public ApiQueryService(IApiQueryExtensionService apiQueryExtensionService)
+    public ApiQueryService(IApiQueryExtensionService apiQueryExtensionService, IExamineManager examineManager)
     {
         _apiQueryExtensionService = apiQueryExtensionService;
         _queryOptionHandlers = new List<IQueryOptionHandler> { new ChildrenQueryOption(), new DescendantsQueryOption() };
-        _examineManager = StaticServiceProvider.Instance.GetRequiredService<IExamineManager>();
+        _examineManager = examineManager;
     }
 
     /// <inheritdoc/>
@@ -46,9 +45,9 @@ public class ApiQueryService : IApiQueryService
         }
     }
 
-    public IEnumerable<Guid> ExecuteQuery(string query, string fieldValue)
+    public IEnumerable<Guid> ExecuteQuery(Dictionary<string, string> queryParams, string fieldValue)
     {
-        IQueryOptionHandler? queryHandler = _queryOptionHandlers.FirstOrDefault(h => h.CanHandle(query));
+        IQueryOptionHandler? queryHandler = _queryOptionHandlers.FirstOrDefault(h => h.CanHandle(queryParams["fetch"]));
 
         if (queryHandler is null)
         {
@@ -61,9 +60,22 @@ public class ApiQueryService : IApiQueryService
         }
 
         IQuery baseQuery = apiIndex.Searcher.CreateQuery();
-        ISearchResults results = queryHandler
-            .BuildApiIndexQuery(baseQuery, fieldValue)
-            .Execute();
+        IBooleanOperation queryOperation = queryHandler
+            .BuildApiIndexQuery(baseQuery, fieldValue);
+
+        if (queryParams.ContainsKey("filter"))
+        {
+            var alias = GetContentTypeAliasFromFilter(queryParams["filter"]);
+
+            if (alias is not null)
+            {
+                queryOperation = queryOperation
+                    .And()
+                    .Field("__NodeTypeAlias", alias);
+            }
+        }
+
+        ISearchResults results = queryOperation.Execute();
 
         return results.Select(x => Guid.Parse(x.Id));
     }
@@ -80,4 +92,14 @@ public class ApiQueryService : IApiQueryService
 
             return guids;
         });
+
+    private string? GetContentTypeAliasFromFilter(string filterValue)
+    {
+        if (!filterValue.StartsWith("contentType", StringComparison.OrdinalIgnoreCase))
+        {
+            return null;
+        }
+
+        return filterValue.Substring(filterValue.IndexOf(':', StringComparison.Ordinal) + 1);
+    }
 }

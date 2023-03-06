@@ -12,7 +12,7 @@ public interface IApiQueryService
     /// </summary>
     IEnumerable<Guid> GetGuidsFromQuery(Guid id, ApiQueryType queryType);
 
-    IEnumerable<Guid> ExecuteQuery(string query, string fieldValue);
+    IEnumerable<Guid> ExecuteQuery(Dictionary<string, string> queryParams, string fieldValue);
 }
 
 /// <summary>
