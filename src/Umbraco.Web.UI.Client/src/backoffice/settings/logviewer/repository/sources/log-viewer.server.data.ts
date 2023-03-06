@@ -71,133 +71,143 @@ export class UmbLogSearchesServerDataSource implements LogSearchDataSource {
 	 * @implements {LogMessagesDataSource}
 	 */
 	export class UmbLogMessagesServerDataSource implements LogMessagesDataSource {
-	#host: UmbControllerHostInterface;
+		#host: UmbControllerHostInterface;
 
-	/**
-	 * Creates an instance of UmbLogMessagesServerDataSource.
-	 * @param {UmbControllerHostInterface} host
-	 * @memberof UmbLogMessagesServerDataSource
-	 */
-	constructor(host: UmbControllerHostInterface) {
-		this.#host = host;
-	}
+		/**
+		 * Creates an instance of UmbLogMessagesServerDataSource.
+		 * @param {UmbControllerHostInterface} host
+		 * @memberof UmbLogMessagesServerDataSource
+		 */
+		constructor(host: UmbControllerHostInterface) {
+			this.#host = host;
+		}
 
-	/**
-	 * Grabs all the loggers from the server
-	 *
-	 * @param {{ skip?: number; take?: number }} { skip = 0, take = 100 }
-	 * @return {*}
-	 * @memberof UmbLogMessagesServerDataSource
-	 */
-	async getLogViewerLevel({ skip = 0, take = 100 }: { skip?: number; take?: number }) {
-		return await tryExecuteAndNotify(this.#host, LogViewerResource.getLogViewerLevel({ skip, take }));
-	}
+		/**
+		 * Grabs all the loggers from the server
+		 *
+		 * @param {{ skip?: number; take?: number }} { skip = 0, take = 100 }
+		 * @return {*}
+		 * @memberof UmbLogMessagesServerDataSource
+		 */
+		async getLogViewerLevel({ skip = 0, take = 100 }: { skip?: number; take?: number }) {
+			return await tryExecuteAndNotify(this.#host, LogViewerResource.getLogViewerLevel({ skip, take }));
+		}
 
-	/**
-	 * Grabs all the number of different log messages from the server
-	 *
-	 * @param {{ skip?: number; take?: number }} { skip = 0, take = 100 }
-	 * @return {*}
-	 * @memberof UmbLogMessagesServerDataSource
-	 */
-	async getLogViewerLevelCount({ startDate, endDate }: { startDate?: string; endDate?: string }) {
-		return await tryExecuteAndNotify(
-			this.#host,
-			LogViewerResource.getLogViewerLevelCount({
-				startDate,
-				endDate,
-			})
-		);
+		/**
+		 * Grabs all the number of different log messages from the server
+		 *
+		 * @param {{ skip?: number; take?: number }} { skip = 0, take = 100 }
+		 * @return {*}
+		 * @memberof UmbLogMessagesServerDataSource
+		 */
+		async getLogViewerLevelCount({ startDate, endDate }: { startDate?: string; endDate?: string }) {
+			return await tryExecuteAndNotify(
+				this.#host,
+				LogViewerResource.getLogViewerLevelCount({
+					startDate,
+					endDate,
+				})
+			);
+		}
+		/**
+		 *	Grabs all the log messages from the server
+		 *
+		 * @param {{
+		 * 		skip?: number;
+		 * 		take?: number;
+		 * 		orderDirection?: DirectionModel;
+		 * 		filterExpression?: string;
+		 * 		logLevel?: Array<LogLevelModel>;
+		 * 		startDate?: string;
+		 * 		endDate?: string;
+		 * 	}} {
+		 * 		skip = 0,
+		 * 		take = 100,
+		 * 		orderDirection,
+		 * 		filterExpression,
+		 * 		logLevel,
+		 * 		startDate,
+		 * 		endDate,
+		 * 	}
+		 * @return {*}
+		 * @memberof UmbLogMessagesServerDataSource
+		 */
+		async getLogViewerLogs({
+			skip = 0,
+			take = 100,
+			orderDirection,
+			filterExpression,
+			logLevel,
+			startDate,
+			endDate,
+		}: {
+			skip?: number;
+			take?: number;
+			orderDirection?: DirectionModel;
+			filterExpression?: string;
+			logLevel?: Array<LogLevelModel>;
+			startDate?: string;
+			endDate?: string;
+		}) {
+			return await tryExecuteAndNotify(
+				this.#host,
+				LogViewerResource.getLogViewerLog({
+					skip,
+					take,
+					orderDirection,
+					filterExpression,
+					logLevel,
+					startDate,
+					endDate,
+				})
+			);
+		}
+		/**
+		 * Grabs all the log message templates from the server
+		 *
+		 * @param {{
+		 * 		skip?: number;
+		 * 		take?: number;
+		 * 		startDate?: string;
+		 * 		endDate?: string;
+		 * 	}} {
+		 * 		skip,
+		 * 		take = 100,
+		 * 		startDate,
+		 * 		endDate,
+		 * 	}
+		 * @return {*}
+		 * @memberof UmbLogMessagesServerDataSource
+		 */
+		async getLogViewerMessageTemplate({
+			skip,
+			take = 100,
+			startDate,
+			endDate,
+		}: {
+			skip?: number;
+			take?: number;
+			startDate?: string;
+			endDate?: string;
+		}) {
+			return await tryExecuteAndNotify(
+				this.#host,
+				LogViewerResource.getLogViewerMessageTemplate({
+					skip,
+					take,
+					startDate,
+					endDate,
+				})
+			);
+		}
+
+		async getLogViewerValidateLogsSize({ startDate, endDate }: { startDate?: string; endDate?: string }) {
+			return await tryExecuteAndNotify(
+				this.#host,
+				LogViewerResource.getLogViewerValidateLogsSize({
+					startDate,
+					endDate,
+				})
+			);
+		}
 	}
-	/**
-	 *	Grabs all the log messages from the server
-	 *
-	 * @param {{
-	 * 		skip?: number;
-	 * 		take?: number;
-	 * 		orderDirection?: DirectionModel;
-	 * 		filterExpression?: string;
-	 * 		logLevel?: Array<LogLevelModel>;
-	 * 		startDate?: string;
-	 * 		endDate?: string;
-	 * 	}} {
-	 * 		skip = 0,
-	 * 		take = 100,
-	 * 		orderDirection,
-	 * 		filterExpression,
-	 * 		logLevel,
-	 * 		startDate,
-	 * 		endDate,
-	 * 	}
-	 * @return {*}
-	 * @memberof UmbLogMessagesServerDataSource
-	 */
-	async getLogViewerLogs({
-		skip = 0,
-		take = 100,
-		orderDirection,
-		filterExpression,
-		logLevel,
-		startDate,
-		endDate,
-	}: {
-		skip?: number;
-		take?: number;
-		orderDirection?: DirectionModel;
-		filterExpression?: string;
-		logLevel?: Array<LogLevelModel>;
-		startDate?: string;
-		endDate?: string;
-	}) {
-		return await tryExecuteAndNotify(
-			this.#host,
-			LogViewerResource.getLogViewerLog({
-				skip,
-				take,
-				orderDirection,
-				filterExpression,
-				logLevel,
-				startDate,
-				endDate,
-			})
-		);
-	}
-	/**
-	 * Grabs all the log message templates from the server
-	 *
-	 * @param {{
-	 * 		skip?: number;
-	 * 		take?: number;
-	 * 		startDate?: string;
-	 * 		endDate?: string;
-	 * 	}} {
-	 * 		skip,
-	 * 		take = 100,
-	 * 		startDate,
-	 * 		endDate,
-	 * 	}
-	 * @return {*}
-	 * @memberof UmbLogMessagesServerDataSource
-	 */
-	async getLogViewerMessageTemplate({
-		skip,
-		take = 100,
-		startDate,
-		endDate,
-	}: {
-		skip?: number;
-		take?: number;
-		startDate?: string;
-		endDate?: string;
-	}) {
-		return await tryExecuteAndNotify(
-			this.#host,
-			LogViewerResource.getLogViewerMessageTemplate({
-				skip,
-				take,
-				startDate,
-				endDate,
-			})
-		);
-	}
-}

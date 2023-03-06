@@ -93,4 +93,9 @@ export class UmbLogViewerRepository {
 		await this.#init();
 		return this.#messagesDataSource.getLogViewerLevel({ skip, take });
 	}
+
+	async getLogViewerValidateLogsSize({ startDate, endDate }: { startDate?: string; endDate?: string }) {
+		await this.#init();
+		return this.#messagesDataSource.getLogViewerValidateLogsSize({ startDate, endDate });
+	}
 }

@@ -62,6 +62,9 @@ export class UmbLogViewerWorkspaceContext {
 	#loggers = new DeepState<PagedLoggerModel | null>(null);
 	loggers = createObservablePart(this.#loggers, (data) => data?.items);
 
+	#canShowLogs = new DeepState<unknown>(null);
+	canShowLogs = createObservablePart(this.#canShowLogs, (data) => data);
+
 	#filterExpression = new StringState<string>('');
 	filterExpression = createObservablePart(this.#filterExpression, (data) => data);
 
@@ -167,6 +170,16 @@ export class UmbLogViewerWorkspaceContext {
 		if (data) {
 			this.#loggers.next(data);
 		}
+	}
+
+	async validateLogSize() {
+		const { data, error } = await this.#repository.getLogViewerValidateLogsSize({ ...this.#dateRange.getValue() });
+		debugger;
+		if (error) {
+			this.#canShowLogs.next(false);
+			return;
+		}
+		this.#canShowLogs.next(true);
 	}
 
 	setCurrentPage(page: number) {

@@ -102,6 +102,7 @@ export class UmbLogViewerOverviewViewElement extends UmbLitElement {
 			this.#logViewerContext = instance;
 			this.#observeStuff();
 			this.#logViewerContext?.getLogLevels(0, 100);
+			this.#logViewerContext?.validateLogSize();
 		});
 	}
 
