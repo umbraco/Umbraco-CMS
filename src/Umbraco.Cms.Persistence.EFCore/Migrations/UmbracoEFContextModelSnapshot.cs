@@ -1309,6 +1309,10 @@ namespace Umbraco.Cms.Persistence.EFCore.Migrations
                         .HasColumnType("int")
                         .HasColumnName("domainDefaultLanguage");
 
+                    b.Property<int>("SortOrder")
+                        .HasColumnType("int")
+                        .HasColumnName("sortOrder");
+
                     b.Property<string>("DomainName")
                         .IsRequired()
                         .HasMaxLength(255)

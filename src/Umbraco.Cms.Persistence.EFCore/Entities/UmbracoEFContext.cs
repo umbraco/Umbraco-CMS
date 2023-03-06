@@ -1162,6 +1162,8 @@ namespace Umbraco.Cms.Persistence.EFCore.Entities
                     .HasMaxLength(255)
                     .HasColumnName("domainName");
 
+                entity.Property(e => e.SortOrder).HasColumnName("sortOrder");
+
                 entity.Property(e => e.DomainRootStructureId).HasColumnName("domainRootStructureID");
 
                 entity.HasOne(d => d.DomainRootStructure)

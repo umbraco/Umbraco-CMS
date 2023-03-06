@@ -10,6 +10,7 @@ namespace Umbraco.Cms.Persistence.EFCore.Entities
         public int? DomainRootStructureId { get; set; }
         public string DomainName { get; set; } = null!;
 
+        public int SortOrder { get; set; }
         public virtual UmbracoNode? DomainRootStructure { get; set; }
     }
 }

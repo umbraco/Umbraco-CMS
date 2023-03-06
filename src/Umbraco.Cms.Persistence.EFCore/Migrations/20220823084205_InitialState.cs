@@ -621,7 +621,8 @@ namespace Umbraco.Cms.Persistence.EFCore.Migrations
                         .Annotation("Sqlite:Autoincrement", true),
                     domainDefaultLanguage = table.Column<int>(type: "INTEGER", nullable: true),
                     domainRootStructureID = table.Column<int>(type: "INTEGER", nullable: true),
-                    domainName = table.Column<string>(type: "TEXT", maxLength: 255, nullable: false)
+                    domainName = table.Column<string>(type: "TEXT", maxLength: 255, nullable: false),
+                    sortOrder = table.Column<int>(type: "INTEGER", nullable: true),
                 },
                 constraints: table =>
                 {
@@ -2481,7 +2482,8 @@ namespace Umbraco.Cms.Persistence.EFCore.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     domainDefaultLanguage = table.Column<int>(type: "int", nullable: true),
                     domainRootStructureID = table.Column<int>(type: "int", nullable: true),
-                    domainName = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: false)
+                    domainName = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: false),
+                    sortOrder = table.Column<int>(type: "int", nullable: true),
                 },
                 constraints: table =>
                 {
