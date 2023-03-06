@@ -1,6 +1,6 @@
+using System.Web;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Primitives;
 using Umbraco.Cms.Api.Content.Services;
 using Umbraco.Cms.Core.ContentApi;
 using Umbraco.Cms.Core.Models.ContentApi;
@@ -36,20 +36,12 @@ public class QueryContentApiController : ContentApiControllerBase
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(IApiContent), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> Query()
+    public async Task<IActionResult> Query(string? fetch, string? filter, string? sort)
     {
         HttpContext? context = _httpContextAccessor.HttpContext;
-        if (context is null || !context.Request.Query.TryGetValue("fetch", out StringValues queryValue))
+        if (context is null || (fetch is null && filter is null && sort is null))
         {
-            return BadRequest("Missing 'fetch' query parameter. Alternatives are not implemented yet.");
-        }
-
-        var queryOption = queryValue.ToString();
-
-        ApiQueryType queryType = _apiQueryService.GetQueryType(queryOption);
-        if (queryType == ApiQueryType.Unknown)
-        {
-            return BadRequest("Invalid value for 'fetch' query parameter.");
+            return BadRequest("Not implemented yet.");
         }
 
         IPublishedContentCache? contentCache = GetContentCache();
@@ -58,19 +50,48 @@ public class QueryContentApiController : ContentApiControllerBase
             return BadRequest(ContentCacheNotFoundProblemDetails());
         }
 
-        //Guid? id = _apiQueryService.GetGuidFromFetch(queryOption); // Remove
-        Guid? id = GetGuidFromQuery(queryOption, contentCache);
+        Guid? id = GetGuidFromQuery(fetch!, contentCache);
         if (id is null)
         {
             return BadRequest("Invalid query value format.");
         }
 
-        IEnumerable<Guid> ids = _apiQueryService.GetGuidsFromQuery((Guid)id, queryType);
+        IEnumerable<Guid> ids = Enumerable.Empty<Guid>();
+
+        // ToDo: Should be removed
+        ApiQueryType queryType = _apiQueryService.GetQueryType(fetch!);
+        if (queryType == ApiQueryType.Ancestors)
+        {
+            ids = _apiQueryService.GetGuidsFromQuery((Guid)id, queryType);
+        }
+        else
+        {
+            string query = HttpUtility.UrlDecode(context.Request.QueryString.Value!.Substring(1));
+            var queryParams = query.Split('&')
+                .Select(p => p.Split('='))
+                .ToDictionary(p => p[0], p => p[1]);
+            ids = _apiQueryService.ExecuteQuery(queryParams, ((Guid)id).ToString());
+        }
 
         IEnumerable<IPublishedContent> contentItems = ids.Select(contentCache.GetById)
                                                          .WhereNotNull()
                                                          .OrderBy(x => x.Path)
                                                          .ThenBy(c => c.SortOrder);
+
+        // Currently sorting is not supported through the ContentAPI index
+        // So we need to add the name to it
+        if (sort is not null && sort.StartsWith("name"))
+        {
+            string sortValue = sort.Substring(sort.IndexOf(':', StringComparison.Ordinal) + 1);
+            if (sortValue.StartsWith("asc"))
+            {
+                contentItems = contentItems.OrderBy(x => x.Name);
+            }
+            else
+            {
+                contentItems = contentItems.OrderByDescending(x => x.Name);
+            }
+        }
 
         IEnumerable<IApiContent> results = contentItems.Select(ApiContentBuilder.Build);
 
