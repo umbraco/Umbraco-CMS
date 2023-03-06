@@ -1,4 +1,4 @@
-import { manifest as toolbar } from './config/configuration/manifests';
+import { manifests as configuration } from './config/configuration/manifests';
 import type { ManifestPropertyEditorUI } from '@umbraco-cms/models';
 
 const manifest: ManifestPropertyEditorUI = {
@@ -13,11 +13,6 @@ const manifest: ManifestPropertyEditorUI = {
 		group: 'richText',
 		config: {
 			properties: [
-				{
-					alias: 'editor',
-					label: 'Editor',
-					propertyEditorUI: 'Umb.PropertyEditorUI.TinyMCE.Configuration',
-				},
 				{
 					alias: 'overlaySize',
 					label: 'Overlay Size',
@@ -34,6 +29,4 @@ const manifest: ManifestPropertyEditorUI = {
 	},
 };
 
-const config = [toolbar];
-
-export const manifests = [manifest, ...config];
+export const manifests = [manifest, ...configuration];
