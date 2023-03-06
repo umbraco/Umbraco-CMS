@@ -21,7 +21,7 @@ public class MultiNodeTreePickerValueConverterTests : PropertyValueConverterTest
         var expansionStrategyAccessor = CreateOutputExpansionStrategyAccessor();
 
         var contentNameProvider = new ApiContentNameProvider();
-        var apiUrProvider = new ApiUrlProvider(PublishedUrlProvider, new DefaultRequestStartNodeServiceAccessor());
+        var apiUrProvider = new ApiUrlProvider(PublishedUrlProvider, new NoopRequestStartNodeServiceAccessor());
         return new MultiNodeTreePickerValueConverter(
             PublishedSnapshotAccessor,
             Mock.Of<IUmbracoContextAccessor>(),

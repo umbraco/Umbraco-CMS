@@ -1,6 +1,6 @@
 ﻿namespace Umbraco.Cms.Core.ContentApi;
 
-public class DefaultRequestStartNodeService : IRequestStartNodeService
+public class NoopRequestStartNodeService : IRequestStartNodeService
 {
     public string? GetRequestedStartNodePath() => null;
 }

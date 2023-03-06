@@ -36,7 +36,7 @@ public class ContentBuilderTests : ContentApiTests
             .Setup(p => p.GetUrl(It.IsAny<IPublishedContent>(), It.IsAny<UrlMode>(), It.IsAny<string?>(), It.IsAny<Uri?>()))
             .Returns((IPublishedContent content, UrlMode mode, string? culture, Uri? current) => $"url:{content.UrlSegment}");
 
-        var builder = new ApiContentBuilder(new ApiContentNameProvider(), new ApiUrlProvider(publishedUrlProvider.Object, new DefaultRequestStartNodeServiceAccessor()), CreateOutputExpansionStrategyAccessor());
+        var builder = new ApiContentBuilder(new ApiContentNameProvider(), new ApiUrlProvider(publishedUrlProvider.Object, new NoopRequestStartNodeServiceAccessor()), CreateOutputExpansionStrategyAccessor());
         var result = builder.Build(content.Object);
 
         Assert.NotNull(result);
@@ -92,7 +92,7 @@ public class ContentBuilderTests : ContentApiTests
             .Setup(p => p.GetMediaUrl(It.IsAny<IPublishedContent>(), It.IsAny<UrlMode>(), It.IsAny<string?>(), It.IsAny<string?>(), It.IsAny<Uri?>()))
             .Returns((IPublishedContent content, UrlMode mode, string? culture, string? propertyAlias, Uri? current) => $"media-url:{content.UrlSegment}");
 
-        var builder = new ApiContentBuilder(new ApiContentNameProvider(), new ApiUrlProvider(publishedUrlProvider.Object, new DefaultRequestStartNodeServiceAccessor()), CreateOutputExpansionStrategyAccessor());
+        var builder = new ApiContentBuilder(new ApiContentNameProvider(), new ApiUrlProvider(publishedUrlProvider.Object, new NoopRequestStartNodeServiceAccessor()), CreateOutputExpansionStrategyAccessor());
         var result = builder.Build(media.Object);
 
         Assert.NotNull(result);

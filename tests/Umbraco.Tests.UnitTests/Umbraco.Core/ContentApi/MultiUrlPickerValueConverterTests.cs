@@ -210,5 +210,5 @@ public class MultiUrlPickerValueConverterTests : PropertyValueConverterTests
         Assert.IsEmpty(result);
     }
 
-    private IApiUrlProvider ApiUrlProvider() => new ApiUrlProvider(PublishedUrlProvider, new DefaultRequestStartNodeServiceAccessor());
+    private IApiUrlProvider ApiUrlProvider() => new ApiUrlProvider(PublishedUrlProvider, new NoopRequestStartNodeServiceAccessor());
 }

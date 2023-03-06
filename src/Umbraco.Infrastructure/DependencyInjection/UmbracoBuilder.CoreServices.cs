@@ -223,7 +223,7 @@ public static partial class UmbracoBuilderExtensions
 
         builder.AddPropertyIndexValueFactories();
 
-        builder.AddContentApi();
+        builder.AddContentApiCoreServices();
 
         return builder;
     }
@@ -416,14 +416,15 @@ public static partial class UmbracoBuilderExtensions
         return builder;
     }
 
-    private static IUmbracoBuilder AddContentApi(this IUmbracoBuilder builder)
+    private static IUmbracoBuilder AddContentApiCoreServices(this IUmbracoBuilder builder)
     {
         builder.Services.AddSingleton<IApiElementBuilder, ApiElementBuilder>();
         builder.Services.AddSingleton<IApiContentBuilder, ApiContentBuilder>();
         builder.Services.AddSingleton<IApiMediaBuilder, ApiMediaBuilder>();
         builder.Services.AddSingleton<IApiContentNameProvider, ApiContentNameProvider>();
-        builder.Services.AddSingleton<IOutputExpansionStrategyAccessor, DefaultOutputExpansionStrategyAccessor>();
-        builder.Services.AddSingleton<IRequestStartNodeServiceAccessor, DefaultRequestStartNodeServiceAccessor>();
+        builder.Services.AddSingleton<IOutputExpansionStrategyAccessor, NoopOutputExpansionStrategyAccessor>();
+        builder.Services.AddSingleton<IRequestStartNodeServiceAccessor, NoopRequestStartNodeServiceAccessor>();
+        builder.Services.AddSingleton<IRequestRoutingService, NoopRequestRoutingService>();
         builder.Services.AddSingleton<IApiUrlProvider, ApiUrlProvider>();
 
         return builder;

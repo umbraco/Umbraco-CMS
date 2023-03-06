@@ -2,11 +2,11 @@
 
 namespace Umbraco.Cms.Core.ContentApi.Accessors;
 
-public class DefaultRequestStartNodeServiceAccessor : IRequestStartNodeServiceAccessor
+public class NoopRequestStartNodeServiceAccessor : IRequestStartNodeServiceAccessor
 {
     public bool TryGetValue([NotNullWhen(true)] out IRequestStartNodeService? requestStartNodeService)
     {
-        requestStartNodeService = new DefaultRequestStartNodeService();
+        requestStartNodeService = new NoopRequestStartNodeService();
         return true;
     }
 }
