@@ -1,15 +1,11 @@
 using System.Data.Common;
 using System.Globalization;
 using System.Linq.Expressions;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Editors;
 using Umbraco.Cms.Core.Events;
-using Umbraco.Cms.Core.Exceptions;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Notifications;
@@ -35,8 +31,8 @@ internal class UserService : RepositoryService, IUserService
     private readonly ILogger<UserService> _logger;
     private readonly IRuntimeState _runtimeState;
     private readonly IUserGroupRepository _userGroupRepository;
-    private readonly IUserGroupAuthorizationService _userGroupAuthorizationService;
     private readonly UserEditorAuthorizationHelper _userEditorAuthorizationHelper;
+    private readonly IBackofficeUserStore _userStore;
     private readonly IUserRepository _userRepository;
 
     public UserService(
@@ -47,45 +43,44 @@ internal class UserService : RepositoryService, IUserService
         IUserRepository userRepository,
         IUserGroupRepository userGroupRepository,
         IOptions<GlobalSettings> globalSettings,
-        IUserGroupAuthorizationService userGroupAuthorizationService,
         IOptions<SecuritySettings> securitySettings,
-        UserEditorAuthorizationHelper userEditorAuthorizationHelper
-        )
+        UserEditorAuthorizationHelper userEditorAuthorizationHelper,
+        IBackofficeUserStore userStore)
         : base(provider, loggerFactory, eventMessagesFactory)
     {
         _runtimeState = runtimeState;
         _userRepository = userRepository;
         _userGroupRepository = userGroupRepository;
-        _userGroupAuthorizationService = userGroupAuthorizationService;
         _userEditorAuthorizationHelper = userEditorAuthorizationHelper;
+        _userStore = userStore;
         _globalSettings = globalSettings.Value;
         _securitySettings = securitySettings.Value;
         _logger = loggerFactory.CreateLogger<UserService>();
     }
 
-    [Obsolete("User constructor that takes SecuritySettings and ISqlContext")]
-    public UserService(
-        ICoreScopeProvider provider,
-        ILoggerFactory loggerFactory,
-        IEventMessagesFactory eventMessagesFactory,
-        IRuntimeState runtimeState,
-        IUserRepository userRepository,
-        IUserGroupRepository userGroupRepository,
-        IOptions<GlobalSettings> globalSettings,
-        IUserGroupAuthorizationService userGroupAuthorizationService)
-        : this(
-            provider,
-            loggerFactory,
-            eventMessagesFactory,
-            runtimeState,
-            userRepository,
-            userGroupRepository,
-            globalSettings,
-            userGroupAuthorizationService,
-            StaticServiceProvider.Instance.GetRequiredService<IOptions<SecuritySettings>>(),
-            StaticServiceProvider.Instance.GetRequiredService<UserEditorAuthorizationHelper>())
-    {
-    }
+    // [Obsolete("User constructor that takes SecuritySettings and ISqlContext")]
+    // public UserService(
+    //     ICoreScopeProvider provider,
+    //     ILoggerFactory loggerFactory,
+    //     IEventMessagesFactory eventMessagesFactory,
+    //     IRuntimeState runtimeState,
+    //     IUserRepository userRepository,
+    //     IUserGroupRepository userGroupRepository,
+    //     IOptions<GlobalSettings> globalSettings,
+    //     IUserGroupAuthorizationService userGroupAuthorizationService)
+    //     : this(
+    //         provider,
+    //         loggerFactory,
+    //         eventMessagesFactory,
+    //         runtimeState,
+    //         userRepository,
+    //         userGroupRepository,
+    //         globalSettings,
+    //         userGroupAuthorizationService,
+    //         StaticServiceProvider.Instance.GetRequiredService<IOptions<SecuritySettings>>(),
+    //         StaticServiceProvider.Instance.GetRequiredService<UserEditorAuthorizationHelper>())
+    // {
+    // }
 
     private bool IsUpgrading =>
         _runtimeState.Level == RuntimeLevel.Install || _runtimeState.Level == RuntimeLevel.Upgrade;
@@ -394,54 +389,7 @@ internal class UserService : RepositoryService, IUserService
     /// Saves an <see cref="IUser" />
     /// </summary>
     /// <param name="entity"><see cref="IUser" /> to Save</param>
-    public void Save(IUser entity)
-    {
-        EventMessages evtMsgs = EventMessagesFactory.Get();
-
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope())
-        {
-            var savingNotification = new UserSavingNotification(entity, evtMsgs);
-            if (scope.Notifications.PublishCancelable(savingNotification))
-            {
-                scope.Complete();
-                return;
-            }
-
-            if (string.IsNullOrWhiteSpace(entity.Username))
-            {
-                throw new ArgumentException("Empty username.", nameof(entity));
-            }
-
-            if (string.IsNullOrWhiteSpace(entity.Name))
-            {
-                throw new ArgumentException("Empty name.", nameof(entity));
-            }
-
-            try
-            {
-                _userRepository.Save(entity);
-                scope.Notifications.Publish(
-                    new UserSavedNotification(entity, evtMsgs).WithStateFrom(savingNotification));
-
-                scope.Complete();
-            }
-            catch (DbException ex)
-            {
-                // if we are upgrading and an exception occurs, log and swallow it
-                if (IsUpgrading == false)
-                {
-                    throw;
-                }
-
-                _logger.LogWarning(
-                    ex,
-                    "An error occurred attempting to save a user instance during upgrade, normally this warning can be ignored");
-
-                // we don't want the uow to rollback its scope!
-                scope.Complete();
-            }
-        }
-    }
+    public void Save(IUser entity) => _userStore.SaveAsync(entity).GetAwaiter().GetResult();
 
     /// <summary>
     ///     Saves a list of <see cref="IUser" /> objects
@@ -1094,38 +1042,10 @@ internal class UserService : RepositoryService, IUserService
     ///     <see cref="IUser" />
     /// </returns>
     public IUser? GetUserById(int id)
-    {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
-        {
-            try
-            {
-                return _userRepository.Get(id);
-            }
-            catch (DbException)
-            {
-                // TODO: refactor users/upgrade
-                // currently kinda accepting anything on upgrade, but that won't deal with all cases
-                // so we need to do it differently, see the custom UmbracoPocoDataBuilder which should
-                // be better BUT requires that the app restarts after the upgrade!
-                if (IsUpgrading)
-                {
-                    // NOTE: this will not be cached
-                    return _userRepository.GetForUpgrade(id);
-                }
-
-                throw;
-            }
-        }
-    }
+        => _userStore.GetAsync(id).GetAwaiter().GetResult();
 
     public Task<IUser?> GetAsync(Guid key)
-    {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
-        {
-            IQuery<IUser> query = Query<IUser>().Where(x => x.Key == key);
-            return Task.FromResult(_userRepository.Get(query).FirstOrDefault());
-        }
-    }
+        => _userStore.GetAsync(key);
 
     public IEnumerable<IUser> GetUsersById(params int[]? ids)
     {

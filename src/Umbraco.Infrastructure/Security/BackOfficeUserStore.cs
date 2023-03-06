@@ -1,17 +1,22 @@
 using System.Data;
+using System.Data.Common;
 using System.Globalization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Configuration.Models;
-using Umbraco.Cms.Core.DependencyInjection;
+using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Membership;
+using Umbraco.Cms.Core.Notifications;
+using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Security;
@@ -19,8 +24,10 @@ namespace Umbraco.Cms.Core.Security;
 /// <summary>
 ///     The user store for back office users
 /// </summary>
-public class BackOfficeUserStore : UmbracoUserStore<BackOfficeIdentityUser, IdentityRole<string>>,
-    IUserSessionStore<BackOfficeIdentityUser>
+public class BackOfficeUserStore :
+    UmbracoUserStore<BackOfficeIdentityUser, IdentityRole<string>>,
+    IUserSessionStore<BackOfficeIdentityUser>,
+    IBackofficeUserStore
 {
     private readonly AppCaches _appCaches;
     private readonly IEntityService _entityService;
@@ -31,6 +38,9 @@ public class BackOfficeUserStore : UmbracoUserStore<BackOfficeIdentityUser, Iden
     private readonly ITwoFactorLoginService _twoFactorLoginService;
     private readonly IUserGroupService _userGroupService;
     private readonly IUserRepository _userRepository;
+    private readonly IRuntimeState _runtimeState;
+    private readonly IEventMessagesFactory _eventMessagesFactory;
+    private readonly ILogger<BackOfficeUserStore> _logger;
     private readonly IUserService _userService;
 
     /// <summary>
@@ -48,7 +58,10 @@ public class BackOfficeUserStore : UmbracoUserStore<BackOfficeIdentityUser, Iden
         AppCaches appCaches,
         ITwoFactorLoginService twoFactorLoginService,
         IUserGroupService userGroupService,
-        IUserRepository userRepository)
+        IUserRepository userRepository,
+        IRuntimeState runtimeState,
+        IEventMessagesFactory eventMessagesFactory,
+        ILogger<BackOfficeUserStore> logger)
         : base(describer)
     {
         _scopeProvider = scopeProvider;
@@ -61,6 +74,9 @@ public class BackOfficeUserStore : UmbracoUserStore<BackOfficeIdentityUser, Iden
         _twoFactorLoginService = twoFactorLoginService;
         _userGroupService = userGroupService;
         _userRepository = userRepository;
+        _runtimeState = runtimeState;
+        _eventMessagesFactory = eventMessagesFactory;
+        _logger = logger;
         _externalLoginService = externalLoginService;
     }
 
@@ -135,7 +151,7 @@ public class BackOfficeUserStore : UmbracoUserStore<BackOfficeIdentityUser, Iden
 
         UpdateMemberProperties(userEntity, user);
 
-        _userService.Save(userEntity);
+        SaveAsync(userEntity).GetAwaiter().GetResult();
 
         if (!userEntity.HasIdentity)
         {
@@ -167,6 +183,90 @@ public class BackOfficeUserStore : UmbracoUserStore<BackOfficeIdentityUser, Iden
 
         return Task.FromResult(IdentityResult.Success);
     }
+
+    public Task<UserOperationStatus> SaveAsync(IUser user)
+    {
+        EventMessages eventMessages = _eventMessagesFactory.Get();
+
+        using ICoreScope scope = _scopeProvider.CreateCoreScope();
+
+        var savingNotification = new UserSavingNotification(user, eventMessages);
+        if (scope.Notifications.PublishCancelable(savingNotification))
+        {
+            scope.Complete();
+            return Task.FromResult(UserOperationStatus.CancelledByNotifications);
+        }
+
+        if (string.IsNullOrWhiteSpace(user.Username))
+        {
+            throw new ArgumentException("Empty username.", nameof(user));
+        }
+
+        if (string.IsNullOrWhiteSpace(user.Name))
+        {
+            throw new ArgumentException("Empty name.", nameof(user));
+        }
+
+        try
+        {
+            _userRepository.Save(user);
+            scope.Notifications.Publish(
+                new UserSavedNotification(user, eventMessages).WithStateFrom(savingNotification));
+
+            scope.Complete();
+        }
+        catch (DbException ex)
+        {
+            // if we are upgrading and an exception occurs, log and swallow it
+            if (IsUpgrading == false)
+            {
+                throw;
+            }
+
+            _logger.LogWarning(
+                ex,
+                "An error occurred attempting to save a user instance during upgrade, normally this warning can be ignored");
+
+            // we don't want the uow to rollback its scope!
+            scope.Complete();
+        }
+
+        return Task.FromResult(UserOperationStatus.Success);
+    }
+
+    public Task<IUser?> GetAsync(int id)
+    {
+        using ICoreScope scope = _scopeProvider.CreateCoreScope(autoComplete: true);
+
+        try
+        {
+            return Task.FromResult(_userRepository.Get(id));
+        }
+        catch (DbException)
+        {
+            // TODO: refactor users/upgrade
+            // currently kinda accepting anything on upgrade, but that won't deal with all cases
+            // so we need to do it differently, see the custom UmbracoPocoDataBuilder which should
+            // be better BUT requires that the app restarts after the upgrade!
+            if (IsUpgrading)
+            {
+                // NOTE: this will not be cached
+                return Task.FromResult(_userRepository.GetForUpgrade(id));
+            }
+
+            throw;
+        }
+    }
+
+    public Task<IUser?> GetAsync(Guid key)
+    {
+        using ICoreScope scope = _scopeProvider.CreateCoreScope(autoComplete: true);
+        IQuery<IUser> query = _scopeProvider.CreateQuery<IUser>().Where(x => x.Key == key);
+        return Task.FromResult(_userRepository.Get(query).FirstOrDefault());
+    }
+
+    private bool IsUpgrading =>
+        _runtimeState.Level == RuntimeLevel.Install || _runtimeState.Level == RuntimeLevel.Upgrade;
 
     /// <inheritdoc />
     public override Task<IdentityResult> UpdateAsync(
