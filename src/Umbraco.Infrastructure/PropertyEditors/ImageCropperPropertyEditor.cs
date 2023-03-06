@@ -97,6 +97,8 @@ public class ImageCropperPropertyEditor : DataEditor, IMediaUrlGenerator,
         SupportsReadOnly = true;
     }
 
+    public override IPropertyIndexValueFactory PropertyIndexValueFactory { get; } = new NoopPropertyIndexValueFactory();
+
     public bool TryGetMediaPath(string? propertyEditorAlias, object? value, out string? mediaPath)
     {
         if (propertyEditorAlias == Alias &&

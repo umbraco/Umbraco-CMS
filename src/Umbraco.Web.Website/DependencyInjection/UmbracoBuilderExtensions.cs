@@ -5,6 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Services;
@@ -55,7 +56,8 @@ public static partial class UmbracoBuilderExtensions
             x.GetRequiredService<IDataProtectionProvider>(),
             x.GetRequiredService<IControllerActionSearcher>(),
             x.GetRequiredService<IPublicAccessRequestHandler>(),
-            x.GetRequiredService<IUmbracoVirtualPageRoute>()
+            x.GetRequiredService<IUmbracoVirtualPageRoute>(),
+            x.GetRequiredService<IOptionsMonitor<GlobalSettings>>()
             ));
         builder.Services.AddSingleton<IControllerActionSearcher, ControllerActionSearcher>();
         builder.Services.TryAddEnumerable(Singleton<MatcherPolicy, NotFoundSelectorPolicy>());

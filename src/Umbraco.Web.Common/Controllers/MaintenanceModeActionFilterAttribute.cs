@@ -10,9 +10,8 @@ namespace Umbraco.Cms.Web.Common.Controllers;
 
 internal sealed class MaintenanceModeActionFilterAttribute : TypeFilterAttribute
 {
-    public MaintenanceModeActionFilterAttribute() : base(typeof(MaintenanceModeActionFilter))
-    {
-    }
+
+    public MaintenanceModeActionFilterAttribute() : base(typeof(MaintenanceModeActionFilter)) => Order = int.MinValue; // Ensures this run as the first filter.
 
     private sealed class MaintenanceModeActionFilter : IActionFilter
     {
