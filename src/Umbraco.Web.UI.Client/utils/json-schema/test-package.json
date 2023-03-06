@@ -1,17 +1,10 @@
 {
-    "$schema": "manual-schema.json",
+    "$schema": "../../types/umbraco-package-schema.json",
     "name": "My Package",
     "version": "1.0.0",
     "extensions": [
         {
-            "name": "My Extension",
-            "alias": "myextension",
-            "js": "myextension.js",
-            "type": "dashboard",
-            "weight": 10,
-            "meta": {
-                
-            }
+
         }
     ]
 }
