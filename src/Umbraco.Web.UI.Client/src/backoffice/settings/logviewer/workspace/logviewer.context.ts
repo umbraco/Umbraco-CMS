@@ -174,7 +174,6 @@ export class UmbLogViewerWorkspaceContext {
 
 	async validateLogSize() {
 		const { data, error } = await this.#repository.getLogViewerValidateLogsSize({ ...this.#dateRange.getValue() });
-		debugger;
 		if (error) {
 			this.#canShowLogs.next(false);
 			return;
