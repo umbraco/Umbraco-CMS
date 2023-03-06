@@ -1,24 +1,30 @@
+using Examine;
+using Examine.Search;
+using Microsoft.Extensions.DependencyInjection;
+using Umbraco.Cms.Api.Content.Routing;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.ContentApi;
+using Umbraco.Cms.Core.DependencyInjection;
 
 namespace Umbraco.Cms.Api.Content.Services;
 public class ApiQueryService : IApiQueryService
 {
     private readonly IApiQueryExtensionService _apiQueryExtensionService;
+    private readonly List<IQueryOptionHandler> _queryOptionHandlers; // change to collect handlers from scope
+    private readonly IExamineManager _examineManager;
 
-    public ApiQueryService(IApiQueryExtensionService apiQueryExtensionService) => _apiQueryExtensionService = apiQueryExtensionService;
+    //public ApiQueryService(IApiQueryExtensionService apiQueryExtensionService, List<IQueryOptionHandler> queryOptionHandlers, IExamineManager examineManager)
+    public ApiQueryService(IApiQueryExtensionService apiQueryExtensionService)
+    {
+        _apiQueryExtensionService = apiQueryExtensionService;
+        _queryOptionHandlers = new List<IQueryOptionHandler> { new ChildrenQueryOption(), new DescendantsQueryOption() };
+        _examineManager = StaticServiceProvider.Instance.GetRequiredService<IExamineManager>();
+    }
 
     /// <inheritdoc/>
     public ApiQueryType GetQueryType(string queryOption)
     {
-        if (queryOption.StartsWith("children:", StringComparison.OrdinalIgnoreCase))
-        {
-            return ApiQueryType.Children;
-        }
-        else if (queryOption.StartsWith("descendants:", StringComparison.OrdinalIgnoreCase))
-        {
-            return ApiQueryType.Descendants;
-        }
-        else if (queryOption.StartsWith("ancestors:", StringComparison.OrdinalIgnoreCase))
+        if (queryOption.StartsWith("ancestors:", StringComparison.OrdinalIgnoreCase))
         {
             return ApiQueryType.Ancestors;
         }
@@ -29,27 +35,10 @@ public class ApiQueryService : IApiQueryService
     }
 
     /// <inheritdoc/>
-    public Guid? GetGuidFromFetch(string fetchQuery)
-    {
-        var guidString = fetchQuery.Substring(fetchQuery.IndexOf(':', StringComparison.Ordinal) + 1);
-
-        if (Guid.TryParse(guidString, out Guid id))
-        {
-            return id;
-        }
-
-        return null;
-    }
-
-    /// <inheritdoc/>
     public IEnumerable<Guid> GetGuidsFromQuery(Guid id, ApiQueryType queryType)
     {
         switch (queryType)
         {
-            case ApiQueryType.Children:
-                return GetChildrenIds(id);
-            case ApiQueryType.Descendants:
-                return GetDescendantIds(id);
             case ApiQueryType.Ancestors:
                 return GetAncestorIds(id);
             default:
@@ -57,11 +46,27 @@ public class ApiQueryService : IApiQueryService
         }
     }
 
-    private IEnumerable<Guid> GetChildrenIds(Guid id)
-        => _apiQueryExtensionService.GetGuidsFromResults("parentKey", id, results => results.Select(x => Guid.Parse(x.Id)));
+    public IEnumerable<Guid> ExecuteQuery(string query, string fieldValue)
+    {
+        IQueryOptionHandler? queryHandler = _queryOptionHandlers.FirstOrDefault(h => h.CanHandle(query));
 
-    private IEnumerable<Guid> GetDescendantIds(Guid id)
-        => _apiQueryExtensionService.GetGuidsFromResults("ancestorKeys", id, results => results.Select(x => Guid.Parse(x.Id)));
+        if (queryHandler is null)
+        {
+            return Enumerable.Empty<Guid>();
+        }
+
+        if (!_examineManager.TryGetIndex(Constants.UmbracoIndexes.ContentAPIIndexName, out IIndex? apiIndex))
+        {
+            return Enumerable.Empty<Guid>();
+        }
+
+        IQuery baseQuery = apiIndex.Searcher.CreateQuery();
+        ISearchResults results = queryHandler
+            .BuildApiIndexQuery(baseQuery, fieldValue)
+            .Execute();
+
+        return results.Select(x => Guid.Parse(x.Id));
+    }
 
     private IEnumerable<Guid> GetAncestorIds(Guid id)
         => _apiQueryExtensionService.GetGuidsFromResults("id", id, results =>
