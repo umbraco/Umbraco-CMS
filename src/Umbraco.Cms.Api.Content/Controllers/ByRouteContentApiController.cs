@@ -28,7 +28,7 @@ public class ByRouteContentApiController : ContentApiControllerBase
     ///     can be added through a "start-node" header.
     /// </remarks>
     /// <returns>The content item or not found result.</returns>
-    [HttpGet("{*path}")]
+    [HttpGet("item/{*path}")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(IApiContent), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
