@@ -304,7 +304,13 @@ export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
 
 	async #editorSetup(editor: Editor) {
 		editor.suffix = '.min';
+		// register custom option maxImageSize
+		editor.options.register('maxImageSize', { processor: 'number', default: this.#fallbackConfig.maxImageSize });
 
+		// register all plugins from manifests
+		// these receive the default args below, but can also
+		// provide their own args. Generally though, the additional
+		// args would be managed in the plugin
 		const pluginArgs: TinyMcePluginArguments = {
 			editor: editor,
 			modalContext: this.modalContext,
@@ -317,10 +323,31 @@ export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
 		?.extensionsOfType('tinyMcePlugin');
 
 		const plugins = (await firstValueFrom(observable)) as ManifestTinyMcePlugin[];
-		plugins.forEach(p => new p.meta.api(pluginArgs));
+		plugins.forEach(p => new p.meta.api(pluginArgs, p.meta.args));
 
-		// register custom option maxImageSize
-		editor.options.register('maxImageSize', { processor: 'number', default: this.#fallbackConfig.maxImageSize });
+		// define keyboard shortcuts
+		editor.addShortcut('Ctrl+S', '', () => this.dispatchEvent(new CustomEvent('rte.shortcut.save')));
+		editor.addShortcut('Ctrl+P', '', () => this.dispatchEvent(new CustomEvent('rte.shortcut.saveAndPublish')));
+
+		// bind editor events
+		editor.on('init', () => this.#onInit(editor));
+		editor.on('Change', () => this.#onChange(editor.getContent()));
+		editor.on('Dirty', () => this.#onChange(editor.getContent()));
+		editor.on('Keyup', () => this.#onChange(editor.getContent()));
+		editor.on('SetContent', () => this.#mediaHelper.uploadBlobImages(editor));
+
+		editor.on('focus', () => 
+			this.dispatchEvent(new CustomEvent('umb-rte-focus', { composed: true, bubbles: true })));
+
+		editor.on('blur', () => {
+			this.#onChange(editor.getContent());
+			this.dispatchEvent(new CustomEvent('umb-rte-blur', { composed: true, bubbles: true }));
+		});
+
+		editor.on('ObjectResized', (e) => {
+			this.#mediaHelper.onResize(e);
+			this.#onChange(editor.getContent());
+		});
 
 		// If we can not find the insert image/media toolbar button
 		// Then we need to add an event listener to the editor
@@ -337,24 +364,6 @@ export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
 				e.stopPropagation();
 			});
 		}
-
-		editor.addShortcut('Ctrl+S', '', () => this.dispatchEvent(new CustomEvent('rte.shortcut.save')));
-		editor.addShortcut('Ctrl+P', '', () => this.dispatchEvent(new CustomEvent('rte.shortcut.saveAndPublish')));
-
-		editor.on('init', () => this.#onInit(editor));
-		editor.on('focus', () => this.dispatchEvent(new CustomEvent('umb-rte-focus', { composed: true, bubbles: true })));
-		editor.on('blur', () => {
-			this.#onChange(editor.getContent());
-			this.dispatchEvent(new CustomEvent('umb-rte-blur', { composed: true, bubbles: true }));
-		});
-		editor.on('Change', () => this.#onChange(editor.getContent()));
-		editor.on('Dirty', () => this.#onChange(editor.getContent()));
-		editor.on('Keyup', () => this.#onChange(editor.getContent()));
-		editor.on('SetContent', () => this.#mediaHelper.uploadBlobImages(editor));
-		editor.on('ObjectResized', (e) => {
-			this.#mediaHelper.onResize(e);
-			this.#onChange(editor.getContent());
-		});
 	}
 
 	#onInit(editor: Editor) {

@@ -9,4 +9,5 @@ export interface ManifestTinyMcePlugin extends ManifestBase {
 
 export interface MetaTinyMcePlugin {
 	api: ClassConstructor<TinyMcePluginBase>;
+	args?: any[];
 }
