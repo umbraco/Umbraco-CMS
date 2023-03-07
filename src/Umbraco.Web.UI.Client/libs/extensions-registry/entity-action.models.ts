@@ -2,7 +2,7 @@ import type { ManifestElement } from './models';
 
 /**
  * An action to perform on an entity
- * For example for content you may wish to create a new document or move a document etc
+ * For example for content you may wish to create a new document etc
  */
 export interface ManifestEntityAction extends ManifestElement {
 	type: 'entityAction';
@@ -19,7 +19,6 @@ export interface MetaEntityAction {
 
 	/**
 	 * The friendly name of the action to perform
-	 * @example 'Move'
 	 * @example 'Create'
 	 * @example 'Create Content Template'
 	 */
