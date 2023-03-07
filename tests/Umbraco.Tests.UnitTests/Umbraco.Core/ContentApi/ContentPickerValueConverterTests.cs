@@ -2,7 +2,6 @@ using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.ContentApi;
-using Umbraco.Cms.Core.ContentApi.Accessors;
 using Umbraco.Cms.Core.Models.ContentApi;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PropertyEditors;
@@ -19,7 +18,7 @@ public class ContentPickerValueConverterTests : PropertyValueConverterTests
             PublishedSnapshotAccessor,
             new ApiContentBuilder(
                 nameProvider ?? new ApiContentNameProvider(),
-                new ApiUrlProvider(PublishedUrlProvider, new NoopRequestStartNodeServiceAccessor()),
+                new ApiContentRouteBuilder(PublishedUrlProvider),
                 CreateOutputExpansionStrategyAccessor()));
 
     [Test]
@@ -40,7 +39,7 @@ public class ContentPickerValueConverterTests : PropertyValueConverterTests
         Assert.NotNull(result);
         Assert.AreEqual("The page", result.Name);
         Assert.AreEqual(PublishedContent.Key, result.Id);
-        Assert.AreEqual("the-page-url", result.Path);
+        Assert.AreEqual("/the-page-url", result.Route.Path);
         Assert.AreEqual("TheContentType", result.ContentType);
         Assert.IsEmpty(result.Properties);
     }
@@ -104,7 +103,7 @@ public class ContentPickerValueConverterTests : PropertyValueConverterTests
         Assert.NotNull(result);
         Assert.AreEqual("The page", result.Name);
         Assert.AreEqual(content.Object.Key, result.Id);
-        Assert.AreEqual("page-url-segment", result.Path);
+        Assert.AreEqual("/page-url-segment", result.Route.Path);
         Assert.AreEqual("TheContentType", result.ContentType);
         Assert.AreEqual(2, result.Properties.Count);
         Assert.AreEqual("Content API value", result.Properties[ContentApiPropertyType.Alias]);

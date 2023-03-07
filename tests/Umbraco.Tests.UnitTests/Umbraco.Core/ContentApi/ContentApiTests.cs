@@ -71,4 +71,13 @@ public class ContentApiTests
     }
 
     protected IOutputExpansionStrategyAccessor CreateOutputExpansionStrategyAccessor() => new NoopOutputExpansionStrategyAccessor();
+
+    // might come in handy later, let's keep this around for now
+    // protected IOptions<GlobalSettings> CreateGlobalSettings(bool hideTopLevelNodeFromPath = true)
+    // {
+    //     var globalSettings = new GlobalSettings { HideTopLevelNodeFromPath = hideTopLevelNodeFromPath };
+    //     var globalSettingsOptionsMock = new Mock<IOptions<GlobalSettings>>();
+    //     globalSettingsOptionsMock.SetupGet(s => s.Value).Returns(globalSettings);
+    //     return globalSettingsOptionsMock.Object;
+    // }
 }
