@@ -1,13 +1,10 @@
 import '../../../../shared/components/body-layout/body-layout.element';
-import './modal-layout-content-picker.element';
+import './document-picker-modal.element';
 
 import { Meta, Story } from '@storybook/web-components';
 import { html } from 'lit';
 
-import type {
-	UmbModalLayoutContentPickerElement,
-	UmbModalContentPickerData,
-} from './modal-layout-content-picker.element';
+import type { UmbModalLayoutContentPickerElement, UmbModalContentPickerData } from './document-picker-modal.element';
 
 export default {
 	title: 'API/Modals/Layouts/Content Picker',

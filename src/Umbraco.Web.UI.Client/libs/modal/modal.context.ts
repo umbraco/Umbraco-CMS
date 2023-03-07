@@ -1,6 +1,6 @@
 // TODO: lazy load
 import './layouts/confirm/modal-layout-confirm.element';
-import '../../src/backoffice/documents/documents/modals/content-picker/modal-layout-content-picker.element';
+import '../../src/backoffice/documents/documents/modals/content-picker/document-picker-modal.element';
 import './layouts/media-picker/modal-layout-media-picker.element';
 import './layouts/property-editor-ui-picker/modal-layout-property-editor-ui-picker.element';
 import './layouts/modal-layout-current-user.element';
@@ -16,7 +16,7 @@ import type { UUIModalDialogElement } from '@umbraco-ui/uui-modal-dialog';
 import { UmbModalChangePasswordData } from './layouts/modal-layout-change-password.element';
 import type { UmbModalIconPickerData } from './layouts/icon-picker/modal-layout-icon-picker.element';
 import type { UmbModalConfirmData } from './layouts/confirm/modal-layout-confirm.element';
-import type { UmbModalContentPickerData } from '../../src/backoffice/documents/documents/modals/content-picker/modal-layout-content-picker.element';
+import type { UmbModalContentPickerData } from '../../src/backoffice/documents/documents/modals/content-picker/document-picker-modal.element';
 import type { UmbModalPropertyEditorUIPickerData } from './layouts/property-editor-ui-picker/modal-layout-property-editor-ui-picker.element';
 import type { UmbModalMediaPickerData } from './layouts/media-picker/modal-layout-media-picker.element';
 import type { UmbModalLinkPickerData } from './layouts/link-picker/modal-layout-link-picker.element';
