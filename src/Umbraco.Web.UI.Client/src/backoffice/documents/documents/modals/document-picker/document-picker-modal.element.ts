@@ -2,17 +2,16 @@ import { css, html } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, state } from 'lit/decorators.js';
 import { UmbModalLayoutElement } from '../../../../../../libs/modal/layouts/modal-layout.element';
+import type { UmbTreeElement } from 'src/backoffice/shared/components/tree/tree.element';
 
 export interface UmbModalContentPickerData {
 	multiple?: boolean;
 	selection?: Array<string>;
 }
 
-import { UmbTreeElement } from '../../../../shared/components/tree/tree.element';
-
 // TODO: make use of UmbPickerLayoutBase
-@customElement('umb-modal-layout-content-picker')
-export class UmbModalLayoutContentPickerElement extends UmbModalLayoutElement<UmbModalContentPickerData> {
+@customElement('umb-document-picker-modal')
+export class UmbDocumentPickerModalElement extends UmbModalLayoutElement<UmbModalContentPickerData> {
 	static styles = [
 		UUITextStyles,
 		css`
@@ -96,8 +95,10 @@ export class UmbModalLayoutContentPickerElement extends UmbModalLayoutElement<Um
 	}
 }
 
+export default UmbDocumentPickerModalElement;
+
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-modal-layout-content-picker': UmbModalLayoutContentPickerElement;
+		'umb-document-picker-modal': UmbDocumentPickerModalElement;
 	}
 }

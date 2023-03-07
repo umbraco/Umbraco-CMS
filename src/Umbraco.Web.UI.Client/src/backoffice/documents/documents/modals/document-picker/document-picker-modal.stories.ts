@@ -4,12 +4,12 @@ import './document-picker-modal.element';
 import { Meta, Story } from '@storybook/web-components';
 import { html } from 'lit';
 
-import type { UmbModalLayoutContentPickerElement, UmbModalContentPickerData } from './document-picker-modal.element';
+import type { UmbDocumentPickerModalElement, UmbModalContentPickerData } from './document-picker-modal.element';
 
 export default {
 	title: 'API/Modals/Layouts/Content Picker',
-	component: 'umb-modal-layout-content-picker',
-	id: 'modal-layout-content-picker',
+	component: 'umb-document-picker-modal',
+	id: 'umb-document-picker-modal',
 } as Meta;
 
 const data: UmbModalContentPickerData = {
@@ -17,9 +17,9 @@ const data: UmbModalContentPickerData = {
 	selection: [],
 };
 
-export const Overview: Story<UmbModalLayoutContentPickerElement> = () => html`
+export const Overview: Story<UmbDocumentPickerModalElement> = () => html`
 	<!-- TODO: figure out if generics are allowed for properties:
 	https://github.com/runem/lit-analyzer/issues/149
 	https://github.com/runem/lit-analyzer/issues/163 -->
-	<umb-modal-layout-content-picker .data=${data as any}></umb-modal-layout-content-picker>
+	<umb-document-picker-modal .data=${data as any}></umb-document-picker-modal>
 `;

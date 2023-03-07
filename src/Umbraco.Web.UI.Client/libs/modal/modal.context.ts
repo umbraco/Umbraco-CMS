@@ -59,8 +59,8 @@ export class UmbModalContext {
 	 * @return {*}  {UmbModalHandler}
 	 * @memberof UmbModalContext
 	 */
-	public contentPicker(data?: UmbModalContentPickerData): UmbModalHandler {
-		return this.open('umb-modal-layout-content-picker', { data, type: 'sidebar', size: 'small' });
+	public documentPicker(data?: UmbModalContentPickerData): UmbModalHandler {
+		return this.open('umb-document-picker-modal', { data, type: 'sidebar', size: 'small' });
 	}
 
 	/**

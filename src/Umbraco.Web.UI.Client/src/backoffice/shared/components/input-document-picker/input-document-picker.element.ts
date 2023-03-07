@@ -121,7 +121,7 @@ export class UmbInputDocumentPickerElement extends FormControlMixin(UmbLitElemen
 
 	private _openPicker() {
 		// We send a shallow copy(good enough as its just an array of keys) of our this._selectedKeys, as we don't want the modal to manipulate our data:
-		const modalHandler = this._modalContext?.contentPicker({
+		const modalHandler = this._modalContext?.documentPicker({
 			multiple: this.max === 1 ? false : true,
 			selection: [...this._selectedKeys],
 		});

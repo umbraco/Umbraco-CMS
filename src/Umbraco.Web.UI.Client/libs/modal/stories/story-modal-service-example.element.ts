@@ -23,7 +23,7 @@ export class StoryModalContextExampleElement extends UmbLitElement {
 	private _open() {
 		switch (this.modalLayout) {
 			case 'Content Picker':
-				this._modalContext?.contentPicker();
+				this._modalContext?.documentPicker();
 				break;
 			case 'Property Editor UI Picker':
 				this._modalContext?.propertyEditorUIPicker();
