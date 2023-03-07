@@ -5,6 +5,7 @@ import { manifests as treeManifests } from './tree/manifests';
 import { manifests as workspaceManifests } from './workspace/manifests';
 import { manifests as entityActionManifests } from './entity-actions/manifests';
 import { manifests as entityBulkActionManifests } from './entity-bulk-actions/manifests';
+import { manifests as modalManifests } from './modals/manifests';
 
 export const manifests = [
 	...collectionManifests,
@@ -14,4 +15,5 @@ export const manifests = [
 	...workspaceManifests,
 	...entityActionManifests,
 	...entityBulkActionManifests,
+	...modalManifests,
 ];
