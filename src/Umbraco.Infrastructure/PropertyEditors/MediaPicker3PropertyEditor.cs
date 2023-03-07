@@ -130,7 +130,7 @@ public class MediaPicker3PropertyEditor : DataEditor
             }
 
             List<MediaWithCropsDto>? mediaWithCropsDtos = _jsonSerializer.Deserialize<List<MediaWithCropsDto>>(jsonArray.ToJsonString());
-            if (mediaWithCropsDtos == null)
+            if (mediaWithCropsDtos is null)
             {
                 return base.FromEditor(editorValue, currentValue);
             }
