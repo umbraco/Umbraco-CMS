@@ -1772,7 +1772,7 @@ internal class DatabaseDataCreator
                     CultureName = culture.EnglishName,
                     IsDefault = isDefault,
                 };
-                _database.Insert(Constants.DatabaseSchema.Tables.Language, "id", true, dto);
+                _database.Insert(Constants.DatabaseSchema.Tables.Language, "id", false, dto);
                 isDefault = false;
                 id++;
             }
