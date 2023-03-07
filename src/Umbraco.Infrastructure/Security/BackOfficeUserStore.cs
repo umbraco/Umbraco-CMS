@@ -181,6 +181,7 @@ public class BackOfficeUserStore :
         return Task.FromResult(IdentityResult.Success);
     }
 
+    /// <inheritdoc />
     public Task<UserOperationStatus> SaveAsync(IUser user)
     {
         EventMessages eventMessages = _eventMessagesFactory.Get();
@@ -231,7 +232,8 @@ public class BackOfficeUserStore :
         return Task.FromResult(UserOperationStatus.Success);
     }
 
-    public Task<UserOperationStatus> DeleteAsync(IUser user)
+    /// <inheritdoc />
+    public Task<UserOperationStatus> DisableAsync(IUser user)
     {
         // disable
         user.IsApproved = false;
@@ -263,6 +265,7 @@ public class BackOfficeUserStore :
         }
     }
 
+    /// <inheritdoc />
     public Task<IUser?> GetAsync(Guid key)
     {
         using ICoreScope scope = _scopeProvider.CreateCoreScope(autoComplete: true);
@@ -270,6 +273,7 @@ public class BackOfficeUserStore :
         return Task.FromResult(_userRepository.Get(query).FirstOrDefault());
     }
 
+    /// <inheritdoc />
     public Task<IUser?> GetByUserNameAsync(string username)
     {
         using ICoreScope scope = _scopeProvider.CreateCoreScope(autoComplete: true);
@@ -296,6 +300,7 @@ public class BackOfficeUserStore :
         }
     }
 
+    /// <inheritdoc />
     public Task<IUser?> GetByEmailAsync(string email)
     {
         using ICoreScope scope = _scopeProvider.CreateCoreScope(autoComplete: true);
@@ -319,6 +324,7 @@ public class BackOfficeUserStore :
         }
     }
 
+    /// <inheritdoc />
     public Task<IEnumerable<IUser>> GetAllInGroupAsync(int groupId)
     {
         using ICoreScope scope = _scopeProvider.CreateCoreScope(autoComplete: true);
@@ -402,7 +408,7 @@ public class BackOfficeUserStore :
         IUser? found = FindUserFromString(user.Id);
         if (found is not null)
         {
-            DeleteAsync(found).GetAwaiter().GetResult();
+            DisableAsync(found).GetAwaiter().GetResult();
         }
 
         _externalLoginService.DeleteUserLogins(user.Key);

@@ -304,7 +304,7 @@ internal class UserService : RepositoryService, IUserService
     /// </summary>
     /// <param name="membershipUser"><see cref="IUser" /> to disable</param>
     public void Delete(IUser membershipUser)
-        => _userStore.DeleteAsync(membershipUser).GetAwaiter().GetResult();
+        => _userStore.DisableAsync(membershipUser).GetAwaiter().GetResult();
 
     /// <summary>
     ///     Deletes or disables a User
@@ -988,13 +988,18 @@ internal class UserService : RepositoryService, IUserService
     /// <summary>
     ///     Gets a user by Id
     /// </summary>
-    /// <param name="id">Id of the user to retrieve</param>
+    /// <param name="id">Id of the user to retrieve.</param>
     /// <returns>
     ///     <see cref="IUser" />
     /// </returns>
     public IUser? GetUserById(int id)
         => _userStore.GetAsync(id).GetAwaiter().GetResult();
 
+    /// <summary>
+    ///     Gets a user by it's key.
+    /// </summary>
+    /// <param name="key">Key of the user to retrieve.</param>
+    /// <returns>Task resolving into an <see cref="IUser"/>.</returns>
     public Task<IUser?> GetAsync(Guid key)
         => _userStore.GetAsync(key);
 
