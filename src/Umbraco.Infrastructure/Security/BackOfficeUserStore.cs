@@ -36,7 +36,7 @@ public class BackOfficeUserStore :
     private readonly IUmbracoMapper _mapper;
     private readonly ICoreScopeProvider _scopeProvider;
     private readonly ITwoFactorLoginService _twoFactorLoginService;
-    private readonly Lazy<IUserGroupService> _userGroupService;
+    private readonly IUserGroupService _userGroupService;
     private readonly IUserRepository _userRepository;
     private readonly IRuntimeState _runtimeState;
     private readonly IEventMessagesFactory _eventMessagesFactory;
@@ -55,7 +55,7 @@ public class BackOfficeUserStore :
         BackOfficeErrorDescriber describer,
         AppCaches appCaches,
         ITwoFactorLoginService twoFactorLoginService,
-        Lazy<IUserGroupService> userGroupService,
+        IUserGroupService userGroupService,
         IUserRepository userRepository,
         IRuntimeState runtimeState,
         IEventMessagesFactory eventMessagesFactory,
@@ -599,7 +599,7 @@ public class BackOfficeUserStore :
             throw new ArgumentNullException(nameof(normalizedRoleName));
         }
 
-        IUserGroup? userGroup = _userGroupService.Value.GetAsync(normalizedRoleName).GetAwaiter().GetResult();
+        IUserGroup? userGroup = _userGroupService.GetAsync(normalizedRoleName).GetAwaiter().GetResult();
 
         if (userGroup is null)
         {
@@ -709,7 +709,7 @@ public class BackOfficeUserStore :
         string normalizedRoleName,
         CancellationToken cancellationToken)
     {
-        IUserGroup? group = _userGroupService.Value.GetAsync(normalizedRoleName).GetAwaiter().GetResult();
+        IUserGroup? group = _userGroupService.GetAsync(normalizedRoleName).GetAwaiter().GetResult();
         if (group?.Name is null)
         {
             return Task.FromResult<IdentityRole<string>?>(null);
@@ -883,7 +883,7 @@ public class BackOfficeUserStore :
             user.ClearGroups();
 
             // go lookup all these groups
-            IReadOnlyUserGroup[] groups = _userGroupService.Value.GetAsync(identityUserRoles).GetAwaiter().GetResult()
+            IReadOnlyUserGroup[] groups = _userGroupService.GetAsync(identityUserRoles).GetAwaiter().GetResult()
                 .Select(x => x.ToReadOnlyGroup()).ToArray();
 
             // use all of the ones assigned and add them

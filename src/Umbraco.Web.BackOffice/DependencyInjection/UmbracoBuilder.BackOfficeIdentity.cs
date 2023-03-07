@@ -45,7 +45,7 @@ public static partial class UmbracoBuilderExtensions
                 factory.GetRequiredService<BackOfficeErrorDescriber>(),
                 factory.GetRequiredService<AppCaches>(),
                 factory.GetRequiredService<ITwoFactorLoginService>(),
-                factory.GetRequiredService<Lazy<IUserGroupService>>(),
+                factory.GetRequiredService<IUserGroupService>(),
                 factory.GetRequiredService<IUserRepository>(),
                 factory.GetRequiredService<IRuntimeState>(),
                 factory.GetRequiredService<IEventMessagesFactory>(),
