@@ -191,7 +191,7 @@ internal class ImageCropperPropertyValueEditor : DataValueEditor // TODO: core v
             return null;
         }
 
-        editorImageCropperValue.Src = filepath == null ? string.Empty : _mediaFileManager.FileSystem.GetUrl(filepath);
+        editorImageCropperValue.Src = filepath is null ? string.Empty : _mediaFileManager.FileSystem.GetUrl(filepath);
         return _jsonSerializer.Serialize(editorImageCropperValue);
     }
 
