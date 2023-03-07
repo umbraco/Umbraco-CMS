@@ -116,7 +116,7 @@ public class TagsPropertyEditor : DataEditor
             TagConfiguration tagConfiguration = ConfigurationEditor.ConfigurationAs<TagConfiguration>(dataTypeConfiguration) ?? new TagConfiguration();
 
             var tags = ParseTags(value, tagConfiguration);
-            if (tags.Any() == false)
+            if (tags.Any() is false)
             {
                 return Enumerable.Empty<ITag>();
             }
