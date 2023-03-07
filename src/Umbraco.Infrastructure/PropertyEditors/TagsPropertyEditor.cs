@@ -176,7 +176,7 @@ public class TagsPropertyEditor : DataEditor
         public override object? ToEditor(IProperty property, string? culture = null, string? segment = null)
         {
             var val = property.GetValue(culture, segment);
-            if (val == null)
+            if (val is null)
             {
                 return null;
             }
