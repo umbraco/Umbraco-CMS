@@ -25,8 +25,9 @@ import { UMB_MODAL_CONTEXT_TOKEN, UmbModalContext } from '../src/core/modal';
 
 import { umbExtensionsRegistry } from '../libs/extensions-api';
 
+import '../src/core/context-provider/context-provider.element';
+import '../src/core/controller-host/controller-host-test.element';
 import '../src/backoffice/shared/components/backoffice-frame/backoffice-notification-container.element';
-import '../libs/element/context-provider.element';
 import '../src/backoffice/shared/components/backoffice-frame/backoffice-modal-container.element';
 import '../src/backoffice/shared/components/code-block/code-block.element';
 import '../src/backoffice/shared/components/workspace/workspace-layout/workspace-layout.element';
@@ -68,7 +69,7 @@ const documentTypeStoreProvider = (story) => html`
 const modalContextProvider = (story) => html`
 	<umb-context-provider
 		style="display: block; padding: 32px;"
-		key="${UMB_MODAL_CONTEXT_TOKEN}"
+		.key="${UMB_MODAL_CONTEXT_TOKEN}"
 		.value=${new UmbModalContext()}>
 		${story()}
 		<umb-backoffice-modal-container></umb-backoffice-modal-container>
@@ -118,9 +119,9 @@ export const parameters = {
 			{
 				name: 'White',
 				value: '#ffffff',
-			},		  
+			},
 		],
-	  },
+	},
 };
 
 setCustomElements(customElementManifests);
