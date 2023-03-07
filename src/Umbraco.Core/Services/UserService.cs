@@ -280,28 +280,7 @@ internal class UserService : RepositoryService, IUserService
     /// <returns>
     ///     <see cref="IUser" />
     /// </returns>
-    public IUser? GetByEmail(string email)
-    {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
-        {
-            try
-            {
-                IQuery<IUser> query = Query<IUser>().Where(x => x.Email.Equals(email));
-                return _userRepository.Get(query)?.FirstOrDefault();
-            }
-            catch(DbException)
-            {
-                // We also need to catch upgrade state here, because the framework will try to call this to validate the email.
-                if (IsUpgrading)
-                {
-                    return _userRepository.GetForUpgradeByEmail(email);
-                }
-
-                throw;
-            }
-
-        }
-    }
+    public IUser? GetByEmail(string email) => _userStore.GetByEmailAsync(email).GetAwaiter().GetResult();
 
     /// <summary>
     ///     Get an <see cref="IUser" /> by username
@@ -317,27 +296,7 @@ internal class UserService : RepositoryService, IUserService
             return null;
         }
 
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
-        {
-            try
-            {
-                return _userRepository.GetByUsername(username, true);
-            }
-            catch (DbException)
-            {
-                // TODO: refactor users/upgrade
-                // currently kinda accepting anything on upgrade, but that won't deal with all cases
-                // so we need to do it differently, see the custom UmbracoPocoDataBuilder which should
-                // be better BUT requires that the app restarts after the upgrade!
-                if (IsUpgrading)
-                {
-                    // NOTE: this will not be cached
-                    return _userRepository.GetForUpgradeByUsername(username);
-                }
-
-                throw;
-            }
-        }
+        return _userStore.GetByUserNameAsync(username).GetAwaiter().GetResult();
     }
 
     /// <summary>
@@ -345,12 +304,7 @@ internal class UserService : RepositoryService, IUserService
     /// </summary>
     /// <param name="membershipUser"><see cref="IUser" /> to disable</param>
     public void Delete(IUser membershipUser)
-    {
-        // disable
-        membershipUser.IsApproved = false;
-
-        Save(membershipUser);
-    }
+        => _userStore.DeleteAsync(membershipUser).GetAwaiter().GetResult();
 
     /// <summary>
     ///     Deletes or disables a User
@@ -974,10 +928,7 @@ internal class UserService : RepositoryService, IUserService
             return Array.Empty<IUser>();
         }
 
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
-        {
-            return _userRepository.GetAllInGroup(groupId.Value);
-        }
+        return _userStore.GetAllInGroupAsync(groupId.Value).GetAwaiter().GetResult();
     }
 
     /// <summary>

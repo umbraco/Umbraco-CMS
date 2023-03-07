@@ -41,7 +41,6 @@ public class BackOfficeUserStore :
     private readonly IRuntimeState _runtimeState;
     private readonly IEventMessagesFactory _eventMessagesFactory;
     private readonly ILogger<BackOfficeUserStore> _logger;
-    private readonly IUserService _userService;
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="BackOfficeUserStore" /> class.
@@ -49,7 +48,6 @@ public class BackOfficeUserStore :
     [ActivatorUtilitiesConstructor]
     public BackOfficeUserStore(
         ICoreScopeProvider scopeProvider,
-        IUserService userService,
         IEntityService entityService,
         IExternalLoginWithKeyService externalLoginService,
         IOptionsSnapshot<GlobalSettings> globalSettings,
@@ -65,7 +63,6 @@ public class BackOfficeUserStore :
         : base(describer)
     {
         _scopeProvider = scopeProvider;
-        _userService = userService ?? throw new ArgumentNullException(nameof(userService));
         _entityService = entityService;
         _externalLoginService = externalLoginService ?? throw new ArgumentNullException(nameof(externalLoginService));
         _globalSettings = globalSettings.Value;
@@ -234,6 +231,14 @@ public class BackOfficeUserStore :
         return Task.FromResult(UserOperationStatus.Success);
     }
 
+    public Task<UserOperationStatus> DeleteAsync(IUser user)
+    {
+        // disable
+        user.IsApproved = false;
+
+        return SaveAsync(user);
+    }
+
     public Task<IUser?> GetAsync(int id)
     {
         using ICoreScope scope = _scopeProvider.CreateCoreScope(autoComplete: true);
@@ -263,6 +268,62 @@ public class BackOfficeUserStore :
         using ICoreScope scope = _scopeProvider.CreateCoreScope(autoComplete: true);
         IQuery<IUser> query = _scopeProvider.CreateQuery<IUser>().Where(x => x.Key == key);
         return Task.FromResult(_userRepository.Get(query).FirstOrDefault());
+    }
+
+    public Task<IUser?> GetByUserNameAsync(string username)
+    {
+        using ICoreScope scope = _scopeProvider.CreateCoreScope(autoComplete: true);
+
+        try
+        {
+            IUser? user = _userRepository.GetByUsername(username, true);
+            return Task.FromResult(user);
+        }
+        catch (DbException)
+        {
+            // TODO: refactor users/upgrade
+            // currently kinda accepting anything on upgrade, but that won't deal with all cases
+            // so we need to do it differently, see the custom UmbracoPocoDataBuilder which should
+            // be better BUT requires that the app restarts after the upgrade!
+            if (IsUpgrading)
+            {
+                // NOTE: this will not be cached
+                IUser? upgradeUser =  _userRepository.GetForUpgradeByUsername(username);
+                return Task.FromResult(upgradeUser);
+            }
+
+            throw;
+        }
+    }
+
+    public Task<IUser?> GetByEmailAsync(string email)
+    {
+        using ICoreScope scope = _scopeProvider.CreateCoreScope(autoComplete: true);
+
+        try
+        {
+            IQuery<IUser> query = _scopeProvider.CreateQuery<IUser>().Where(x => x.Email.Equals(email));
+            IUser? user = _userRepository.Get(query).FirstOrDefault();
+            return Task.FromResult(user);
+        }
+        catch(DbException)
+        {
+            // We also need to catch upgrade state here, because the framework will try to call this to validate the email.
+            if (IsUpgrading)
+            {
+                IUser? upgradeUser = _userRepository.GetForUpgradeByEmail(email);
+                return Task.FromResult(upgradeUser);
+            }
+
+            throw;
+        }
+    }
+
+    public Task<IEnumerable<IUser>> GetAllInGroupAsync(int groupId)
+    {
+        using ICoreScope scope = _scopeProvider.CreateCoreScope(autoComplete: true);
+        IEnumerable<IUser> usersInGroup = _userRepository.GetAllInGroup(groupId);
+        return Task.FromResult(usersInGroup);
     }
 
     private bool IsUpgrading =>
@@ -296,7 +357,7 @@ public class BackOfficeUserStore :
 
                 if (UpdateMemberProperties(found, user))
                 {
-                    _userService.Save(found);
+                    SaveAsync(found).GetAwaiter().GetResult();
                 }
 
                 if (isLoginsPropertyDirty)
@@ -341,7 +402,7 @@ public class BackOfficeUserStore :
         IUser? found = FindUserFromString(user.Id);
         if (found is not null)
         {
-            _userService.Delete(found);
+            DeleteAsync(found).GetAwaiter().GetResult();
         }
 
         _externalLoginService.DeleteUserLogins(user.Key);
@@ -350,19 +411,19 @@ public class BackOfficeUserStore :
     }
 
     /// <inheritdoc />
-    public override Task<BackOfficeIdentityUser?> FindByNameAsync(string userName, CancellationToken cancellationToken = default)
+    public override async Task<BackOfficeIdentityUser?> FindByNameAsync(string userName, CancellationToken cancellationToken = default)
     {
         cancellationToken.ThrowIfCancellationRequested();
         ThrowIfDisposed();
-        IUser? user = _userService.GetByUsername(userName);
+        IUser? user = await GetByUserNameAsync(userName);
         if (user == null)
         {
-            return Task.FromResult<BackOfficeIdentityUser?>(null);
+            return null;
         }
 
         BackOfficeIdentityUser? result = AssignLoginsCallback(_mapper.Map<BackOfficeIdentityUser>(user));
 
-        return Task.FromResult(result)!;
+        return result;
     }
 
     /// <inheritdoc />
@@ -409,7 +470,7 @@ public class BackOfficeUserStore :
         // So we need to look up the user by key, and then get the ID.
         if (Guid.TryParse(identityId, out Guid key))
         {
-            IUser? user = await _userService.GetAsync(key);
+            IUser? user = await GetAsync(key);
             if (user is not null)
             {
                 return user.Id;
@@ -420,18 +481,18 @@ public class BackOfficeUserStore :
     }
 
     /// <inheritdoc />
-    public override Task<BackOfficeIdentityUser?> FindByEmailAsync(
+    public override async Task<BackOfficeIdentityUser?> FindByEmailAsync(
         string email,
         CancellationToken cancellationToken = default)
     {
         cancellationToken.ThrowIfCancellationRequested();
         ThrowIfDisposed();
-        IUser? user = _userService.GetByEmail(email);
+        IUser? user = await GetByEmailAsync(email);
         BackOfficeIdentityUser? result = user == null
             ? null
             : _mapper.Map<BackOfficeIdentityUser>(user);
 
-        return Task.FromResult(AssignLoginsCallback(result));
+        return AssignLoginsCallback(result);
     }
 
     /// <inheritdoc />
@@ -508,7 +569,7 @@ public class BackOfficeUserStore :
     /// <remarks>
     ///     Identity Role names are equal to Umbraco UserGroup alias.
     /// </remarks>
-    public override Task<IList<BackOfficeIdentityUser>> GetUsersInRoleAsync(
+    public override async Task<IList<BackOfficeIdentityUser>> GetUsersInRoleAsync(
         string normalizedRoleName,
         CancellationToken cancellationToken = default)
     {
@@ -521,11 +582,16 @@ public class BackOfficeUserStore :
 
         IUserGroup? userGroup = _userGroupService.GetAsync(normalizedRoleName).GetAwaiter().GetResult();
 
-        IEnumerable<IUser> users = _userService.GetAllInGroup(userGroup?.Id);
+        if (userGroup is null)
+        {
+            return new List<BackOfficeIdentityUser>();
+        }
+
+        IEnumerable<IUser> users = await GetAllInGroupAsync(userGroup.Id);
         IList<BackOfficeIdentityUser> backOfficeIdentityUsers =
             users.Select(x => _mapper.Map<BackOfficeIdentityUser>(x)).Where(x => x != null).ToList()!;
 
-        return Task.FromResult(backOfficeIdentityUsers);
+        return backOfficeIdentityUsers;
     }
 
     /// <summary>
