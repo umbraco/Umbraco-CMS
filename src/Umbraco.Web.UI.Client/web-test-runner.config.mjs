@@ -55,8 +55,8 @@ export default {
 						'@umbraco-cms/utils': './libs/utils/index.ts',
 						'@umbraco-cms/test-utils': './libs/test-utils/index.ts',
 						'@umbraco-cms/resources': './libs/resources/index.ts',
-						'@umbraco-cms/repository': './libs/repository',
-						'@umbraco-cms/router': './libs/router/index.ts',
+						'@umbraco-cms/repository': './libs/repository/index.ts',
+						'@umbraco-cms/router': './src/core/router/index.ts',
 					},
 				},
 			},
@@ -82,7 +82,6 @@ export default {
         <script type="module">
 					import 'element-internals-polyfill';
 					import '@umbraco-ui/uui';
-					import 'router-slot';
         </script>
       </body>
     </html>`,

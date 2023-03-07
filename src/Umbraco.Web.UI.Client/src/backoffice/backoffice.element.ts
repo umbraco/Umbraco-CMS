@@ -49,8 +49,6 @@ import { umbExtensionsRegistry } from '@umbraco-cms/extensions-api';
 import { UmbNotificationContext, UMB_NOTIFICATION_CONTEXT_TOKEN } from '@umbraco-cms/notification';
 import { UmbLitElement } from '@umbraco-cms/element';
 
-import '@umbraco-cms/router';
-
 // Domains
 import './settings';
 import './documents';
