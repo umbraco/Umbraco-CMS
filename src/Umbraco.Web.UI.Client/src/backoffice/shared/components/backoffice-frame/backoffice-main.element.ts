@@ -2,12 +2,12 @@ import { defineElement } from '@umbraco-ui/uui-base/lib/registration';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html } from 'lit';
 import { state } from 'lit/decorators.js';
+import type { UmbRouterSlotChangeEvent } from '@umbraco-cms/router';
 import { UmbSectionContext, UMB_SECTION_CONTEXT_TOKEN } from '../section/section.context';
 import { UmbBackofficeContext, UMB_BACKOFFICE_CONTEXT_TOKEN } from './backoffice.context';
 import type { ManifestSection } from '@umbraco-cms/models';
 import { UmbLitElement } from '@umbraco-cms/element';
 import { createExtensionElementOrFallback } from '@umbraco-cms/extensions-api';
-import { UmbRouterSlotChangeEvent } from '@umbraco-cms/router';
 
 @defineElement('umb-backoffice-main')
 export class UmbBackofficeMain extends UmbLitElement {

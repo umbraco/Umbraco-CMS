@@ -1,6 +1,6 @@
-import { css, html } from 'lit';
+import { html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
-import { IRoute, IRoutingInfo } from 'router-slot';
+import type { IRoute, IRoutingInfo } from '@umbraco-cms/router';
 import type { ManifestTree, ManifestWorkspace } from '@umbraco-cms/models';
 import { createExtensionElement, umbExtensionsRegistry } from '@umbraco-cms/extensions-api';
 import { UmbLitElement } from '@umbraco-cms/element';

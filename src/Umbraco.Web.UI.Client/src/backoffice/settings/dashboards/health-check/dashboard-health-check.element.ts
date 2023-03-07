@@ -1,6 +1,6 @@
 import { html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
-import type { IRoute, IRoutingInfo } from 'router-slot';
+import type { IRoute, IRoutingInfo } from '@umbraco-cms/router';
 import { UmbDashboardHealthCheckGroupElement } from './views/health-check-group.element';
 import {
 	UmbHealthCheckDashboardContext,

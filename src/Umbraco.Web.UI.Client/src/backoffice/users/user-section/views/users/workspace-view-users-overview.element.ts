@@ -1,12 +1,12 @@
 import { css, html, nothing } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, state } from 'lit/decorators.js';
-import { IRoute } from 'router-slot';
+import type { IRoute } from '@umbraco-cms/router';
 import { UUIPopoverElement } from '@umbraco-ui/uui';
 
+import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN } from '../../../../../core/modal';
 import type { UmbSectionViewUsersElement } from './section-view-users.element';
 import { UmbLitElement } from '@umbraco-cms/element';
-import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN } from 'src/core/modal';
 
 import './list-view-layouts/table/workspace-view-users-table.element';
 import './list-view-layouts/grid/workspace-view-users-grid.element';
