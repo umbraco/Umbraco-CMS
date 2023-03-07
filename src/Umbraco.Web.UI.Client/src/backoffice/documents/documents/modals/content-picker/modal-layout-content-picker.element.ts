@@ -1,14 +1,14 @@
 import { css, html } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, state } from 'lit/decorators.js';
-import { UmbModalLayoutElement } from '../modal-layout.element';
+import { UmbModalLayoutElement } from '../../../../../../libs/modal/layouts/modal-layout.element';
 
 export interface UmbModalContentPickerData {
 	multiple?: boolean;
 	selection?: Array<string>;
 }
 
-import { UmbTreeElement } from '../../../../src/backoffice/shared/components/tree/tree.element';
+import { UmbTreeElement } from '../../../../shared/components/tree/tree.element';
 
 // TODO: make use of UmbPickerLayoutBase
 @customElement('umb-modal-layout-content-picker')
