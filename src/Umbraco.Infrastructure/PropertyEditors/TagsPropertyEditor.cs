@@ -197,7 +197,7 @@ public class TagsPropertyEditor : DataEditor
             }
 
             var trimmedTags = stringValues.Select(s => s.Trim()).Where(s => s.IsNullOrWhiteSpace() == false).ToArray();
-            if (trimmedTags.Any() == false)
+            if (trimmedTags.Any() is false)
             {
                 return null;
             }
