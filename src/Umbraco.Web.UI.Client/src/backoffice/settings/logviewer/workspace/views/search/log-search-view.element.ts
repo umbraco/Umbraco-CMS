@@ -1,7 +1,8 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, html } from 'lit';
-import { customElement } from 'lit/decorators.js';
+import { customElement, state } from 'lit/decorators.js';
 import { UmbLitElement } from '@umbraco-cms/element';
+import { UmbLogViewerWorkspaceContext, UMB_APP_LOG_VIEWER_CONTEXT_TOKEN } from '../../logviewer.context';
 
 @customElement('umb-log-viewer-search-view')
 export class UmbLogViewerSearchViewElement extends UmbLitElement {
@@ -39,6 +40,25 @@ export class UmbLogViewerSearchViewElement extends UmbLitElement {
 		`,
 	];
 
+	@state()
+	private _canShowLogs = false;
+
+	#logViewerContext?: UmbLogViewerWorkspaceContext;
+	constructor() {
+		super();
+		this.consumeContext(UMB_APP_LOG_VIEWER_CONTEXT_TOKEN, (instance) => {
+			this.#logViewerContext = instance;
+			this.#observeCanShowLogs();
+		});
+	}
+
+	#observeCanShowLogs() {
+		if (!this.#logViewerContext) return;
+		this.observe(this.#logViewerContext.canShowLogs, (canShowLogs) => {
+			this._canShowLogs = canShowLogs ?? false;
+		});
+	}
+
 	render() {
 		return html`
 			<div id="layout">
@@ -52,7 +72,9 @@ export class UmbLogViewerSearchViewElement extends UmbLitElement {
 				<div id="input-container">
 					<umb-log-viewer-search-input></umb-log-viewer-search-input>
 				</div>
-				<umb-log-viewer-messages-list></umb-log-viewer-messages-list>
+				${this._canShowLogs
+					? html`<umb-log-viewer-messages-list></umb-log-viewer-messages-list>`
+					: html`<umb-log-viewer-to-many-logs-warning id="to-many-logs-warning"></umb-log-viewer-to-many-logs-warning>`}
 			</div>
 		`;
 	}

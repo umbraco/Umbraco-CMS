@@ -1,7 +1,6 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
-import { clamp } from 'lodash-es';
 import { UmbLogViewerWorkspaceContext, UMB_APP_LOG_VIEWER_CONTEXT_TOKEN } from '../../../logviewer.context';
 import { UmbLitElement } from '@umbraco-cms/element';
 import { LogLevelCountsModel } from '@umbraco-cms/backend-api';
@@ -9,7 +8,6 @@ import { LogLevelCountsModel } from '@umbraco-cms/backend-api';
 @customElement('umb-log-viewer-log-types-chart')
 export class UmbLogViewerLogTypesChartElement extends UmbLitElement {
 	static styles = [
-		UUITextStyles,
 		css`
 			#log-types-container {
 				display: flex;
@@ -76,7 +74,7 @@ export class UmbLogViewerLogTypesChartElement extends UmbLitElement {
 		super();
 		this.consumeContext(UMB_APP_LOG_VIEWER_CONTEXT_TOKEN, (instance) => {
 			this.#logViewerContext = instance;
-			this.#logViewerContext?.getMessageTemplates(0, 10);
+			this.#logViewerContext?.getLogCount();
 			this.#observeStuff();
 		});
 	}

@@ -62,7 +62,7 @@ export class UmbLogViewerWorkspaceContext {
 	#loggers = new DeepState<PagedLoggerModel | null>(null);
 	loggers = createObservablePart(this.#loggers, (data) => data?.items);
 
-	#canShowLogs = new DeepState<unknown>(null);
+	#canShowLogs = new BasicState<boolean | null>(null);
 	canShowLogs = createObservablePart(this.#canShowLogs, (data) => data);
 
 	#filterExpression = new StringState<string>('');
@@ -94,7 +94,7 @@ export class UmbLogViewerWorkspaceContext {
 	}
 
 	async init() {
-		this.getLogCount(this.defaultDateRange);
+		this.validateLogSize();
 	}
 
 	setDateRange(dateRange: LogViewerDateRange) {
@@ -107,7 +107,8 @@ export class UmbLogViewerWorkspaceContext {
 		}
 
 		this.#dateRange.next(dateRange);
-		this.getLogCount(dateRange);
+		this.validateLogSize();
+		this.getLogCount();
 	}
 
 	async getSavedSearches() {
@@ -148,8 +149,8 @@ export class UmbLogViewerWorkspaceContext {
 		}
 	}
 
-	async getLogCount({ startDate, endDate }: LogViewerDateRange) {
-		const { data } = await this.#repository.getLogCount({ startDate, endDate });
+	async getLogCount() {
+		const { data } = await this.#repository.getLogCount({ ...this.#dateRange.getValue() });
 
 		if (data) {
 			this.#logCount.next(data);
@@ -176,9 +177,11 @@ export class UmbLogViewerWorkspaceContext {
 		const { data, error } = await this.#repository.getLogViewerValidateLogsSize({ ...this.#dateRange.getValue() });
 		if (error) {
 			this.#canShowLogs.next(false);
+			console.info('LogViewer: ', error);
 			return;
 		}
 		this.#canShowLogs.next(true);
+		console.info('LogViewer:showinfg logs');
 	}
 
 	setCurrentPage(page: number) {
@@ -186,6 +189,10 @@ export class UmbLogViewerWorkspaceContext {
 	}
 
 	getLogs = async () => {
+		if (!this.#canShowLogs.getValue()) {
+			return;
+		}
+
 		const skip = (this.currentPage - 1) * 100;
 		const take = 100;
 

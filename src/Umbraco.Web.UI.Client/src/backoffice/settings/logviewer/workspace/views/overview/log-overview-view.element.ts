@@ -56,7 +56,8 @@ export class UmbLogViewerOverviewViewElement extends UmbLitElement {
 				grid-area: 3 / 1 / 5 / 3;
 			}
 
-			#saved-searches-container {
+			#saved-searches-container,
+			to-many-logs-warning {
 				grid-area: saved-searches;
 			}
 
@@ -87,30 +88,34 @@ export class UmbLogViewerOverviewViewElement extends UmbLitElement {
 	private _errorCount = 0;
 
 	@state()
-	private _logLevelCountFilter: string[] = [];
-
-	@state()
-	private logLevelCount: [string, number][] = [];
-
-	@state()
 	private _logLevelCount: LogLevelCountsModel | null = null;
+
+	@state()
+	private _canShowLogs = false;
 
 	#logViewerContext?: UmbLogViewerWorkspaceContext;
 	constructor() {
 		super();
 		this.consumeContext(UMB_APP_LOG_VIEWER_CONTEXT_TOKEN, (instance) => {
 			this.#logViewerContext = instance;
-			this.#observeStuff();
+			this.#observeErrorCount();
+			this.#observeCanShowLogs();
 			this.#logViewerContext?.getLogLevels(0, 100);
-			this.#logViewerContext?.validateLogSize();
 		});
 	}
 
-	#observeStuff() {
+	#observeErrorCount() {
 		if (!this.#logViewerContext) return;
 
 		this.observe(this.#logViewerContext.logCount, () => {
 			this._errorCount = this._logLevelCount?.error ?? 0;
+		});
+	}
+
+	#observeCanShowLogs() {
+		if (!this.#logViewerContext) return;
+		this.observe(this.#logViewerContext.canShowLogs, (canShowLogs) => {
+			this._canShowLogs = canShowLogs ?? false;
 		});
 	}
 
@@ -133,13 +138,15 @@ export class UmbLogViewerOverviewViewElement extends UmbLitElement {
 					<umb-log-viewer-log-types-chart id="types"></umb-log-viewer-log-types-chart>
 				</div>
 
-				<div id="saved-searches-container">
-					<umb-log-viewer-saved-searches-overview></umb-log-viewer-saved-searches-overview>
-				</div>
+				${this._canShowLogs
+					? html`<div id="saved-searches-container">
+								<umb-log-viewer-saved-searches-overview></umb-log-viewer-saved-searches-overview>
+							</div>
 
-				<div id="common-messages-container">
-					<umb-log-viewer-message-templates-overview></umb-log-viewer-message-templates-overview>
-				</div>
+							<div id="common-messages-container">
+								<umb-log-viewer-message-templates-overview></umb-log-viewer-message-templates-overview>
+							</div>`
+					: html`<umb-log-viewer-to-many-logs-warning id="to-many-logs-warning"></umb-log-viewer-to-many-logs-warning>`}
 			</div>
 		`;
 	}
