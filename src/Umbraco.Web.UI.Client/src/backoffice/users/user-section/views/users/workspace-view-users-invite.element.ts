@@ -2,7 +2,7 @@ import { css, html, nothing } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, query, state } from 'lit/decorators.js';
 import { UmbInputPickerUserGroupElement } from '../../../../shared/components/input-user-group/input-user-group.element';
-import { UmbModalLayoutElement } from '../../../../../core/modal';
+import { UmbModalLayoutElement } from '../../../../../../libs/modal';
 import { UmbUserStore, UMB_USER_STORE_CONTEXT_TOKEN } from '../../../users/user.store';
 import type { UserDetails } from '@umbraco-cms/models';
 

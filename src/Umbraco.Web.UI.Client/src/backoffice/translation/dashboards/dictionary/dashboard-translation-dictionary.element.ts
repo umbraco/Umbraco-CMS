@@ -7,7 +7,7 @@ import { UmbDictionaryRepository } from '../../dictionary/repository/dictionary.
 import { UmbCreateDictionaryModalResultData } from '../../dictionary/entity-actions/create/create-dictionary-modal-layout.element';
 import { UmbLitElement } from '@umbraco-cms/element';
 import { DictionaryOverviewModel, LanguageModel } from '@umbraco-cms/backend-api';
-import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN } from '@umbraco-cms/modal';
+import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN } from 'libs/modal';
 import { UmbContextConsumerController } from '@umbraco-cms/context-api';
 
 @customElement('umb-dashboard-translation-dictionary')

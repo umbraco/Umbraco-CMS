@@ -6,7 +6,7 @@ import { customElement, property, state } from 'lit/decorators.js';
 import { styleMap } from 'lit/directives/style-map.js';
 import { UmbModalLayoutElement } from '../modal-layout.element';
 
-import icons from '../../../../../public-assets/icons/icons.json';
+import icons from '../../../../public-assets/icons/icons.json';
 
 export interface UmbModalIconPickerData {
 	multiple: boolean;

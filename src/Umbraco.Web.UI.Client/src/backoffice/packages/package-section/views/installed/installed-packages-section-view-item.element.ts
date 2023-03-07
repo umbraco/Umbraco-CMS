@@ -4,7 +4,7 @@ import { customElement, property, state } from 'lit/decorators.js';
 import { firstValueFrom, map } from 'rxjs';
 import { UUIButtonState } from '@umbraco-ui/uui';
 
-import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN } from '../../../../../core/modal';
+import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN } from '../../../../../../libs/modal';
 import { createExtensionElement, umbExtensionsRegistry } from '@umbraco-cms/extensions-api';
 
 import type { ManifestPackageView } from '@umbraco-cms/models';

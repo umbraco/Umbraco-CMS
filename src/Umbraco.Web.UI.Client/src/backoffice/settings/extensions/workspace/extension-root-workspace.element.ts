@@ -3,7 +3,7 @@ import { customElement, state } from 'lit/decorators.js';
 import { isManifestElementNameType, umbExtensionsRegistry } from '@umbraco-cms/extensions-api';
 import type { ManifestBase } from '@umbraco-cms/models';
 import { UmbLitElement } from '@umbraco-cms/element';
-import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN } from '@umbraco-cms/modal';
+import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN } from 'libs/modal';
 
 @customElement('umb-extension-root-workspace')
 export class UmbExtensionRootWorkspaceElement extends UmbLitElement {

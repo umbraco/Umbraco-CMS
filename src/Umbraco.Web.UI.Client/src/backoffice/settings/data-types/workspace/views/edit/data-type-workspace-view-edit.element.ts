@@ -1,7 +1,7 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html, nothing } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
-import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN } from '../../../../../../core/modal';
+import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN } from '../../../../../../../libs/modal';
 import { UmbDataTypeWorkspaceContext } from '../../data-type-workspace.context';
 import { UmbLitElement } from '@umbraco-cms/element';
 import type { DataTypeModel } from '@umbraco-cms/backend-api';

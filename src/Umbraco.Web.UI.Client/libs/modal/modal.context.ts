@@ -5,7 +5,7 @@ import './layouts/media-picker/modal-layout-media-picker.element';
 import './layouts/property-editor-ui-picker/modal-layout-property-editor-ui-picker.element';
 import './layouts/modal-layout-current-user.element';
 import './layouts/icon-picker/modal-layout-icon-picker.element';
-import '../../backoffice/settings/languages/language-picker/language-picker-modal-layout.element';
+import '../../src/backoffice/settings/languages/language-picker/language-picker-modal-layout.element';
 import './layouts/link-picker/modal-layout-link-picker.element';
 import './layouts/basic/modal-layout-basic.element';
 import './layouts/search/modal-layout-search.element.ts';

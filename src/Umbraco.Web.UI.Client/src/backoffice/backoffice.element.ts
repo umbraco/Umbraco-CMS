@@ -2,7 +2,7 @@ import { defineElement } from '@umbraco-ui/uui-base/lib/registration';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html } from 'lit';
 
-import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN } from '../core/modal';
+import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN } from '../../libs/modal';
 import { UmbUserStore } from './users/users/user.store';
 import { UmbUserGroupStore } from './users/user-groups/user-group.store';
 import { UmbCurrentUserStore, UMB_CURRENT_USER_STORE_CONTEXT_TOKEN } from './users/current-user/current-user.store';

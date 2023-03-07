@@ -1,7 +1,7 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, CSSResultGroup, html } from 'lit';
 import { customElement } from 'lit/decorators.js';
-import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN } from '@umbraco-cms/modal';
+import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN } from 'libs/modal';
 import { UmbLitElement } from '@umbraco-cms/element';
 
 @customElement('umb-search-header-app')

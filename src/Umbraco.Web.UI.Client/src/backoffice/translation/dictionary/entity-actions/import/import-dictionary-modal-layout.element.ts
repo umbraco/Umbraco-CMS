@@ -6,7 +6,7 @@ import { repeat } from 'lit/directives/repeat.js';
 import { UmbTreeElement } from '../../../../shared/components/tree/tree.element';
 import { UmbDictionaryRepository } from '../../repository/dictionary.repository';
 import { DictionaryUploadModel } from '@umbraco-cms/backend-api';
-import { UmbModalLayoutElement } from '@umbraco-cms/modal';
+import { UmbModalLayoutElement } from 'libs/modal';
 
 export interface UmbImportDictionaryModalData {
 	unique: string | null;
@@ -138,7 +138,12 @@ export class UmbImportDictionaryModalLayoutElement extends UmbModalLayoutElement
 				selectable></umb-tree>
 
 			<uui-button slot="actions" type="button" label="Cancel" @click=${this.#handleClose}></uui-button>
-			<uui-button slot="actions" type="button" label="Import" look="primary" @click=${this.#importDictionary}></uui-button>
+			<uui-button
+				slot="actions"
+				type="button"
+				label="Import"
+				look="primary"
+				@click=${this.#importDictionary}></uui-button>
 		`;
 	}
 

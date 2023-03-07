@@ -2,18 +2,18 @@ import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { UmbModalLayoutPickerBase } from '../modal-layout-picker-base';
-import { UmbUserStore, UMB_USER_STORE_CONTEXT_TOKEN } from '../../../../backoffice/users/users/user.store';
-import type { UserDetails } from '@umbraco-cms/models';
+import { UMB_USER_GROUP_STORE_CONTEXT_TOKEN } from '../../../../src/backoffice/users/user-groups/user-group.store';
+import type { UmbUserGroupStore } from '../../../../src/backoffice/users/user-groups/user-group.store';
+import type { UserGroupDetails } from '@umbraco-cms/models';
 
-@customElement('umb-picker-layout-user')
-export class UmbPickerLayoutUserElement extends UmbModalLayoutPickerBase<UserDetails> {
+@customElement('umb-picker-layout-user-group')
+export class UmbPickerLayoutUserGroupElement extends UmbModalLayoutPickerBase<UserGroupDetails> {
 	static styles = [
 		UUITextStyles,
 		css`
 			uui-input {
 				width: 100%;
 			}
-
 			hr {
 				border: none;
 				border-bottom: 1px solid var(--uui-color-divider);
@@ -23,17 +23,16 @@ export class UmbPickerLayoutUserElement extends UmbModalLayoutPickerBase<UserDet
 				display: flex;
 				flex-direction: column;
 				gap: var(--uui-size-1);
-				font-size: 1rem;
 			}
 			.item {
 				color: var(--uui-color-interactive);
-				display: flex;
-				align-items: center;
-				padding: var(--uui-size-2);
+				display: grid;
+				grid-template-columns: var(--uui-size-8) 1fr;
+				padding: var(--uui-size-4) var(--uui-size-2);
 				gap: var(--uui-size-space-5);
-				cursor: pointer;
-				position: relative;
+				align-items: center;
 				border-radius: var(--uui-border-radius);
+				cursor: pointer;
 			}
 			.item.selected {
 				background-color: var(--uui-color-selected);
@@ -46,50 +45,47 @@ export class UmbPickerLayoutUserElement extends UmbModalLayoutPickerBase<UserDet
 			.item.selected:hover {
 				background-color: var(--uui-color-selected-emphasis);
 			}
-			.item:hover uui-avatar {
-				border-color: var(--uui-color-surface-emphasis);
-			}
-			.item.selected uui-avatar {
-				border-color: var(--uui-color-selected-contrast);
-			}
-			uui-avatar {
-				border: 2px solid var(--uui-color-surface);
+			.item uui-icon {
+				width: 100%;
+				box-sizing: border-box;
+				display: flex;
+				height: fit-content;
 			}
 		`,
 	];
 
 	@state()
-	private _users: Array<UserDetails> = [];
+	private _userGroups: Array<UserGroupDetails> = [];
 
-	private _userStore?: UmbUserStore;
+	private _userGroupStore?: UmbUserGroupStore;
 
 	connectedCallback(): void {
 		super.connectedCallback();
-		this.consumeContext(UMB_USER_STORE_CONTEXT_TOKEN, (userStore) => {
-			this._userStore = userStore;
-			this._observeUsers();
+		this.consumeContext(UMB_USER_GROUP_STORE_CONTEXT_TOKEN, (userGroupStore) => {
+			this._userGroupStore = userGroupStore;
+			this._observeUserGroups();
 		});
 	}
 
-	private _observeUsers() {
-		if (!this._userStore) return;
-		this.observe(this._userStore.getAll(), (users) => (this._users = users));
+	private _observeUserGroups() {
+		if (!this._userGroupStore) return;
+		this.observe(this._userGroupStore.getAll(), (userGroups) => (this._userGroups = userGroups));
 	}
 
 	render() {
 		return html`
-			<umb-workspace-layout headline="Select users">
+			<umb-workspace-layout headline="Select user groups">
 				<uui-box>
 					<uui-input label="search"></uui-input>
 					<hr />
 					<div id="item-list">
-						${this._users.map(
+						${this._userGroups.map(
 							(item) => html`
 								<div
 									@click=${() => this.handleSelection(item.key)}
 									@keydown=${(e: KeyboardEvent) => this._handleKeydown(e, item.key)}
 									class=${this.isSelected(item.key) ? 'item selected' : 'item'}>
-									<uui-avatar .name=${item.name}></uui-avatar>
+									<uui-icon .name=${item.icon}></uui-icon>
 									<span>${item.name}</span>
 								</div>
 							`
@@ -107,6 +103,6 @@ export class UmbPickerLayoutUserElement extends UmbModalLayoutPickerBase<UserDet
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-picker-layout-user': UmbPickerLayoutUserElement;
+		'umb-picker-layout-user-group': UmbPickerLayoutUserGroupElement;
 	}
 }

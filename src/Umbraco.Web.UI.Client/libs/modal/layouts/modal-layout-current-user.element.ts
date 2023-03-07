@@ -6,11 +6,11 @@ import {
 	UmbCurrentUserHistoryStore,
 	UmbCurrentUserHistoryItem,
 	UMB_CURRENT_USER_HISTORY_STORE_CONTEXT_TOKEN,
-} from '../../../backoffice/users/current-user/current-user-history.store';
+} from '../../../src/backoffice/users/current-user/current-user-history.store';
 import {
 	UmbCurrentUserStore,
 	UMB_CURRENT_USER_STORE_CONTEXT_TOKEN,
-} from '../../../backoffice/users/current-user/current-user.store';
+} from '../../../src/backoffice/users/current-user/current-user.store';
 import type { UserDetails } from '@umbraco-cms/models';
 import { UmbLitElement } from '@umbraco-cms/element';
 

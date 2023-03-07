@@ -1,7 +1,7 @@
 import { UmbEntityActionBase } from '@umbraco-cms/entity-action';
 import { UmbContextConsumerController } from '@umbraco-cms/context-api';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
-import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN } from '@umbraco-cms/modal';
+import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN } from 'libs/modal';
 
 export class UmbTrashEntityAction<
 	T extends { trash(unique: Array<string>): Promise<void>; requestTreeItems(uniques: Array<string>): any }

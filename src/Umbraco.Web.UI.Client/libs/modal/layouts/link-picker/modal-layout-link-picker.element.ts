@@ -4,7 +4,7 @@ import { customElement, query, state } from 'lit/decorators.js';
 import { UUIBooleanInputEvent, UUIInputElement } from '@umbraco-ui/uui';
 import { UUIModalSidebarSize } from '@umbraco-ui/uui-modal-sidebar';
 import { UmbModalLayoutElement } from '../modal-layout.element';
-import { UmbTreeElement } from '../../../../backoffice/shared/components/tree/tree.element';
+import { UmbTreeElement } from '../../../../src/backoffice/shared/components/tree/tree.element';
 import { buildUdi, getKeyFromUdi } from '@umbraco-cms/utils';
 
 export interface UmbModalLinkPickerData {

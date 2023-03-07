@@ -2,7 +2,7 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html, nothing } from 'lit';
 import { customElement, state, query, property } from 'lit/decorators.js';
 
-import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN } from '../../../../../core/modal';
+import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN } from '../../../../../../libs/modal';
 
 import { SearchResultModel, SearcherResource, FieldModel } from '@umbraco-cms/backend-api';
 import { UmbLitElement } from '@umbraco-cms/element';

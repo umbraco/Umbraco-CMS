@@ -8,7 +8,7 @@ import type { UmbCreateDictionaryModalResultData } from './create-dictionary-mod
 import { UmbEntityActionBase } from '@umbraco-cms/entity-action';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 import { UmbContextConsumerController } from '@umbraco-cms/context-api';
-import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN } from '@umbraco-cms/modal';
+import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN } from 'libs/modal';
 
 // TODO: temp import
 import './create-dictionary-modal-layout.element';

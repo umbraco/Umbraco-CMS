@@ -8,7 +8,7 @@ import { repeat } from 'lit/directives/repeat.js';
 import { distinctUntilChanged } from 'rxjs';
 
 import { UmbCurrentUserStore, UMB_CURRENT_USER_STORE_CONTEXT_TOKEN } from '../../current-user/current-user.store';
-import type { UmbModalContext } from '../../../../core/modal';
+import type { UmbModalContext } from '../../../../../libs/modal';
 import type { UmbWorkspaceEntityElement } from '../../../shared/components/workspace/workspace-entity-element.interface';
 import { UmbWorkspaceUserContext } from './user-workspace.context';
 import { getLookAndColorFromUserStatus } from '@umbraco-cms/utils';

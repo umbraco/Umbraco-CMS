@@ -8,7 +8,7 @@ export interface UmbModalMediaPickerData {
 	selection: Array<string>;
 }
 
-import { UmbTreeElement } from '../../../../backoffice/shared/components/tree/tree.element';
+import { UmbTreeElement } from '../../../../src/backoffice/shared/components/tree/tree.element';
 
 @customElement('umb-modal-layout-media-picker')
 export class UmbModalLayoutMediaPickerElement extends UmbModalLayoutElement<UmbModalMediaPickerData> {

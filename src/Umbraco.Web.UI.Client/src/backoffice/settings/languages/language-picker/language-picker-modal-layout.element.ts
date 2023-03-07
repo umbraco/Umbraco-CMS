@@ -5,7 +5,7 @@ import { repeat } from 'lit-html/directives/repeat.js';
 import { UUIMenuItemElement, UUIMenuItemEvent } from '@umbraco-ui/uui';
 import { ifDefined } from 'lit-html/directives/if-defined.js';
 import { UmbLanguageRepository } from '../repository/language.repository';
-import { UmbModalLayoutPickerBase } from '../../../../core/modal/layouts/modal-layout-picker-base';
+import { UmbModalLayoutPickerBase } from '../../../../../libs/modal/layouts/modal-layout-picker-base';
 import { LanguageModel } from '@umbraco-cms/backend-api';
 
 export interface UmbLanguagePickerModalData {

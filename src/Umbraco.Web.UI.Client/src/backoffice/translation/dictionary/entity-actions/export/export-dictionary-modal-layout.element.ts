@@ -1,7 +1,7 @@
 import { html } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, query } from 'lit/decorators.js';
-import { UmbModalLayoutElement } from '@umbraco-cms/modal';
+import { UmbModalLayoutElement } from 'libs/modal';
 
 export interface UmbExportDictionaryModalData {
 	unique: string | null;

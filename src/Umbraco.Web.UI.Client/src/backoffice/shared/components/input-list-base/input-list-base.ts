@@ -1,13 +1,13 @@
 import { html } from 'lit';
 import { property } from 'lit/decorators.js';
 import { UUIModalSidebarSize } from '@umbraco-ui/uui-modal-sidebar';
-import { UmbPickerModalData } from '../../../../core/modal/layouts/modal-layout-picker-base';
-import { UmbModalContext, UmbModalType, UMB_MODAL_CONTEXT_TOKEN } from '../../../../core/modal';
+import { UmbPickerModalData } from '../../../../../libs/modal/layouts/modal-layout-picker-base';
+import { UmbModalContext, UmbModalType, UMB_MODAL_CONTEXT_TOKEN } from '../../../../../libs/modal';
 
 //TODO: These should probably be imported dynamically.
-import '../../../../core/modal/layouts/picker-section/picker-layout-section.element';
-import '../../../../core/modal/layouts/picker-user-group/picker-layout-user-group.element';
-import '../../../../core/modal/layouts/picker-user/picker-layout-user.element';
+import '../../../../../libs/modal/layouts/picker-section/picker-layout-section.element';
+import '../../../../../libs/modal/layouts/picker-user-group/picker-layout-user-group.element';
+import '../../../../../libs/modal/layouts/picker-user/picker-layout-user.element';
 import { UmbLitElement } from '@umbraco-cms/element';
 
 /** TODO: Make use of UUI FORM Mixin, to make it easily take part of a form. */
