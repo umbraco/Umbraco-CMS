@@ -441,5 +441,5 @@ public class OutputExpansionStrategyTests : PropertyValueConverterTests
         return new PublishedElementPropertyBase(elementPropertyType, parent, false, PropertyCacheLevel.None);
     }
 
-    private IApiContentRouteBuilder ApiContentRouteBuilder() => new ApiContentRouteBuilder(PublishedUrlProvider);
+    private IApiContentRouteBuilder ApiContentRouteBuilder() => new ApiContentRouteBuilder(PublishedUrlProvider, CreateGlobalSettings());
 }
