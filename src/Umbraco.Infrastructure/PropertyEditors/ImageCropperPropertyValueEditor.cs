@@ -161,7 +161,7 @@ internal class ImageCropperPropertyValueEditor : DataValueEditor // TODO: core v
             // if editorFile is empty then either there was nothing to begin with,
             // or it has been cleared and we need to remove the file - else the
             // value is unchanged.
-            if (string.IsNullOrWhiteSpace(editorImageCropperValue?.Src) && string.IsNullOrWhiteSpace(currentPath) == false)
+            if (string.IsNullOrWhiteSpace(editorImageCropperValue?.Src) && string.IsNullOrWhiteSpace(currentPath) is false)
             {
                 _mediaFileManager.FileSystem.DeleteFile(currentPath);
                 return null; // clear
