@@ -1,11 +1,14 @@
-import { expect, fixture, html } from '@open-wc/testing';
+import { expect, fixture, defineCE } from '@open-wc/testing';
 import { UmbContextConsumer } from '../consume/context-consumer';
 import { UmbContextProviderController } from './context-provider.controller';
-import { UmbControllerHostTestElement, UmbLitElement } from '@umbraco-cms/element';
+import { UmbLitElement } from '@umbraco-cms/element';
 
 class MyClass {
 	prop = 'value from provider';
 }
+
+class ControllerHostElement extends UmbLitElement {}
+const controllerHostElement = defineCE(ControllerHostElement);
 
 describe('UmbContextProviderController', () => {
 	let instance: MyClass;
@@ -13,13 +16,9 @@ describe('UmbContextProviderController', () => {
 	let element: UmbLitElement;
 
 	beforeEach(async () => {
-		element = await fixture(html`<umb-controller-host-test></umb-controller-host-test>`);
+		element = await fixture(`<${controllerHostElement}></${controllerHostElement}>`);
 		instance = new MyClass();
 		provider = new UmbContextProviderController(element, 'my-test-context', instance);
-	});
-
-	it('is defined with its own instance', () => {
-		expect(element).to.be.instanceOf(UmbControllerHostTestElement);
 	});
 
 	describe('Public API', () => {
