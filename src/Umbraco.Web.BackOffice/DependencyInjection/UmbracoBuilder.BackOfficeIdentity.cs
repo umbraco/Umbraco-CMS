@@ -45,7 +45,7 @@ public static partial class UmbracoBuilderExtensions
                 factory.GetRequiredService<BackOfficeErrorDescriber>(),
                 factory.GetRequiredService<AppCaches>(),
                 factory.GetRequiredService<ITwoFactorLoginService>(),
-                factory.GetRequiredService<IUserGroupService>(),
+                factory.GetRequiredService<Lazy<IUserGroupService>>(),
                 factory.GetRequiredService<IUserRepository>(),
                 factory.GetRequiredService<IRuntimeState>(),
                 factory.GetRequiredService<IEventMessagesFactory>(),
@@ -56,7 +56,8 @@ public static partial class UmbracoBuilderExtensions
             .AddClaimsPrincipalFactory<BackOfficeClaimsPrincipalFactory>()
             .AddErrorDescriber<BackOfficeErrorDescriber>();
 
-        services.AddSingleton<IBackofficeUserStore, BackOfficeUserStore>();
+        // We also need to register the store as a core-friendly interface that doesn't leak technology.
+        services.AddScoped<IBackofficeUserStore, BackOfficeUserStore>();
 
         services.TryAddSingleton<IBackOfficeUserPasswordChecker, NoopBackOfficeUserPasswordChecker>();
 

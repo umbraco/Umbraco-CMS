@@ -32,7 +32,7 @@ internal class UserService : RepositoryService, IUserService
     private readonly IRuntimeState _runtimeState;
     private readonly IUserGroupRepository _userGroupRepository;
     private readonly UserEditorAuthorizationHelper _userEditorAuthorizationHelper;
-    private readonly IBackofficeUserStore _userStore;
+    private readonly IBackOfficeUserStoreAccessor _userStoreAccessor;
     private readonly IUserRepository _userRepository;
 
     public UserService(
@@ -45,14 +45,14 @@ internal class UserService : RepositoryService, IUserService
         IOptions<GlobalSettings> globalSettings,
         IOptions<SecuritySettings> securitySettings,
         UserEditorAuthorizationHelper userEditorAuthorizationHelper,
-        IBackofficeUserStore userStore)
+        IBackOfficeUserStoreAccessor userStoreAccessor)
         : base(provider, loggerFactory, eventMessagesFactory)
     {
         _runtimeState = runtimeState;
         _userRepository = userRepository;
         _userGroupRepository = userGroupRepository;
         _userEditorAuthorizationHelper = userEditorAuthorizationHelper;
-        _userStore = userStore;
+        _userStoreAccessor = userStoreAccessor;
         _globalSettings = globalSettings.Value;
         _securitySettings = securitySettings.Value;
         _logger = loggerFactory.CreateLogger<UserService>();
@@ -81,6 +81,9 @@ internal class UserService : RepositoryService, IUserService
     //         StaticServiceProvider.Instance.GetRequiredService<UserEditorAuthorizationHelper>())
     // {
     // }
+
+    private IBackofficeUserStore BackofficeUserStore => _userStoreAccessor.BackOfficeUserStore
+                                                        ?? throw new InvalidOperationException("Could not resolve the BackofficeUserStore");
 
     private bool IsUpgrading =>
         _runtimeState.Level == RuntimeLevel.Install || _runtimeState.Level == RuntimeLevel.Upgrade;
@@ -280,7 +283,7 @@ internal class UserService : RepositoryService, IUserService
     /// <returns>
     ///     <see cref="IUser" />
     /// </returns>
-    public IUser? GetByEmail(string email) => _userStore.GetByEmailAsync(email).GetAwaiter().GetResult();
+    public IUser? GetByEmail(string email) => BackofficeUserStore.GetByEmailAsync(email).GetAwaiter().GetResult();
 
     /// <summary>
     ///     Get an <see cref="IUser" /> by username
@@ -296,7 +299,7 @@ internal class UserService : RepositoryService, IUserService
             return null;
         }
 
-        return _userStore.GetByUserNameAsync(username).GetAwaiter().GetResult();
+        return BackofficeUserStore.GetByUserNameAsync(username).GetAwaiter().GetResult();
     }
 
     /// <summary>
@@ -304,7 +307,7 @@ internal class UserService : RepositoryService, IUserService
     /// </summary>
     /// <param name="membershipUser"><see cref="IUser" /> to disable</param>
     public void Delete(IUser membershipUser)
-        => _userStore.DisableAsync(membershipUser).GetAwaiter().GetResult();
+        => BackofficeUserStore.DisableAsync(membershipUser).GetAwaiter().GetResult();
 
     /// <summary>
     ///     Deletes or disables a User
@@ -343,7 +346,7 @@ internal class UserService : RepositoryService, IUserService
     /// Saves an <see cref="IUser" />
     /// </summary>
     /// <param name="entity"><see cref="IUser" /> to Save</param>
-    public void Save(IUser entity) => _userStore.SaveAsync(entity).GetAwaiter().GetResult();
+    public void Save(IUser entity) => BackofficeUserStore.SaveAsync(entity).GetAwaiter().GetResult();
 
     /// <summary>
     ///     Saves a list of <see cref="IUser" /> objects
@@ -928,7 +931,7 @@ internal class UserService : RepositoryService, IUserService
             return Array.Empty<IUser>();
         }
 
-        return _userStore.GetAllInGroupAsync(groupId.Value).GetAwaiter().GetResult();
+        return BackofficeUserStore.GetAllInGroupAsync(groupId.Value).GetAwaiter().GetResult();
     }
 
     /// <summary>
@@ -993,7 +996,7 @@ internal class UserService : RepositoryService, IUserService
     ///     <see cref="IUser" />
     /// </returns>
     public IUser? GetUserById(int id)
-        => _userStore.GetAsync(id).GetAwaiter().GetResult();
+        => BackofficeUserStore.GetAsync(id).GetAwaiter().GetResult();
 
     /// <summary>
     ///     Gets a user by it's key.
@@ -1001,20 +1004,10 @@ internal class UserService : RepositoryService, IUserService
     /// <param name="key">Key of the user to retrieve.</param>
     /// <returns>Task resolving into an <see cref="IUser"/>.</returns>
     public Task<IUser?> GetAsync(Guid key)
-        => _userStore.GetAsync(key);
+        => BackofficeUserStore.GetAsync(key);
 
     public IEnumerable<IUser> GetUsersById(params int[]? ids)
-    {
-        if (ids?.Length <= 0)
-        {
-            return Enumerable.Empty<IUser>();
-        }
-
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
-        {
-            return _userRepository.GetMany(ids);
-        }
-    }
+        => BackofficeUserStore.GetUsersAsync(ids).GetAwaiter().GetResult();
 
     /// <summary>
     ///     Replaces the same permission set for a single group to any number of entities

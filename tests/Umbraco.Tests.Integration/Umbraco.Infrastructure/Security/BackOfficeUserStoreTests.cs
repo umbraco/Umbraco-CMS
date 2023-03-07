@@ -30,7 +30,7 @@ public class BackOfficeUserStoreTests : UmbracoIntegrationTest
 
     private ITwoFactorLoginService TwoFactorLoginService => GetRequiredService<ITwoFactorLoginService>();
 
-    private IUserGroupService UserGroupService => GetRequiredService<IUserGroupService>();
+    private Lazy<IUserGroupService> UserGroupService => GetRequiredService<Lazy<IUserGroupService>>();
 
     private IUserRepository UserRepository => GetRequiredService<IUserRepository>();
 

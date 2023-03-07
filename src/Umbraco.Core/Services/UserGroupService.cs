@@ -21,8 +21,8 @@ internal sealed class UserGroupService : RepositoryService, IUserGroupService
 
     private readonly IUserGroupRepository _userGroupRepository;
     private readonly IUserGroupAuthorizationService _userGroupAuthorizationService;
-    private readonly IUserService _userService;
     private readonly IEntityService _entityService;
+    private readonly IBackOfficeUserStoreAccessor _userStoreAccessor;
 
     public UserGroupService(
         ICoreScopeProvider provider,
@@ -30,15 +30,18 @@ internal sealed class UserGroupService : RepositoryService, IUserGroupService
         IEventMessagesFactory eventMessagesFactory,
         IUserGroupRepository userGroupRepository,
         IUserGroupAuthorizationService userGroupAuthorizationService,
-        IUserService userService,
-        IEntityService entityService)
+        IEntityService entityService,
+        IBackOfficeUserStoreAccessor backOfficeUserStoreAccessor)
         : base(provider, loggerFactory, eventMessagesFactory)
     {
         _userGroupRepository = userGroupRepository;
         _userGroupAuthorizationService = userGroupAuthorizationService;
-        _userService = userService;
         _entityService = entityService;
+        _userStoreAccessor = backOfficeUserStoreAccessor;
     }
+
+    private IBackofficeUserStore BackofficeUserStore => _userStoreAccessor.BackOfficeUserStore
+                                                        ?? throw new InvalidOperationException("Could not resolve the BackofficeUserStore");
 
     /// <inheritdoc/>
     public Task<PagedModel<IUserGroup>> GetAllAsync(int skip, int take)
@@ -175,7 +178,7 @@ internal sealed class UserGroupService : RepositoryService, IUserGroupService
     {
         using ICoreScope scope = ScopeProvider.CreateCoreScope();
 
-        IUser? performingUser = _userService.GetUserById(performingUserId);
+        IUser? performingUser = await BackofficeUserStore.GetAsync(performingUserId);
         if (performingUser is null)
         {
             return Attempt.FailWithStatus(UserGroupOperationStatus.MissingUser, userGroup);
@@ -202,7 +205,7 @@ internal sealed class UserGroupService : RepositoryService, IUserGroupService
         }
 
         var checkedGroupMembers = EnsureNonAdminUserIsInSavedUserGroup(performingUser, groupMembersUserIds ?? Enumerable.Empty<int>()).ToArray();
-        IEnumerable<IUser> usersToAdd = _userService.GetUsersById(checkedGroupMembers);
+        IEnumerable<IUser> usersToAdd = await BackofficeUserStore.GetUsersAsync(checkedGroupMembers);
 
         // Since this is a brand new creation we don't have to be worried about what users were added and removed
         // simply put all members that are requested to be in the group will be "added"
@@ -243,7 +246,7 @@ internal sealed class UserGroupService : RepositoryService, IUserGroupService
     {
         using ICoreScope scope = ScopeProvider.CreateCoreScope();
 
-        IUser? performingUser = _userService.GetUserById(performingUserId);
+        IUser? performingUser = await BackofficeUserStore.GetAsync(performingUserId);
         if (performingUser is null)
         {
             return Attempt.FailWithStatus(UserGroupOperationStatus.MissingUser, userGroup);

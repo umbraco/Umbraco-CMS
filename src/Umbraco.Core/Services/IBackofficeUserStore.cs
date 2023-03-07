@@ -56,6 +56,9 @@ public interface IBackofficeUserStore
     /// <returns>Task resolving into an <see cref="IUser"/>.</returns>
     Task<IUser?> GetAsync(Guid key);
 
+    Task<IEnumerable<IUser>> GetUsersAsync(params int[]? ids);
+
+
     /// <summary>
     ///     Gets a list of <see cref="IUser" /> objects associated with a given group
     /// </summary>
@@ -64,4 +67,5 @@ public interface IBackofficeUserStore
     ///     A task resolving into an  <see cref="IEnumerable{IUser}" />
     /// </returns>
     Task<IEnumerable<IUser>> GetAllInGroupAsync(int groupId);
+
 }
