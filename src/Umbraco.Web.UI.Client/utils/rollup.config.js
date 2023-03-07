@@ -17,7 +17,7 @@ export default [
 	},
 	{
 		input: 'index.ts',
-		external: [/^@umbraco-cms\//, /^lit/],
+		external: [/^@umbraco-cms\//],
 		output: {
 			file: './dist/index.d.ts',
 			format: 'es'
