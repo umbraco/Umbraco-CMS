@@ -569,7 +569,7 @@ internal class UserService : RepositoryService, IUserService
         UserOperationStatus result = ValidateUserCreateModel(model);
         if (result != UserOperationStatus.Success)
         {
-            return Attempt.FailWithStatus<UserCreationResult, UserOperationStatus>(result, new UserCreationResult());
+            return Attempt.FailWithStatus(result, new UserCreationResult());
         }
 
         Attempt<IEnumerable<string>, UserOperationStatus> userGroupAliasesAttempt = GetUserGroupAliasesFromKeys(model.UserGroups);
