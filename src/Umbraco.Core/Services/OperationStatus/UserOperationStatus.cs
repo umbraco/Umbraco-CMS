@@ -10,4 +10,5 @@ public enum UserOperationStatus
     DuplicateEmail,
     Unauthorized,
     CancelledByNotifications,
+    UnknownFailure,
 }

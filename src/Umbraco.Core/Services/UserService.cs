@@ -6,6 +6,7 @@ using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Editors;
 using Umbraco.Cms.Core.Events;
+using Umbraco.Cms.Core.Exceptions;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Notifications;
@@ -13,6 +14,7 @@ using Umbraco.Cms.Core.Persistence;
 using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Scoping;
+using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Extensions;
 using Umbraco.New.Cms.Core.Models;
@@ -33,6 +35,7 @@ internal class UserService : RepositoryService, IUserService
     private readonly IUserGroupRepository _userGroupRepository;
     private readonly UserEditorAuthorizationHelper _userEditorAuthorizationHelper;
     private readonly IBackOfficeUserStoreAccessor _userStoreAccessor;
+    private readonly ICoreBackOfficeUserManagerAccessor _userManagerAccessor;
     private readonly IUserRepository _userRepository;
 
     public UserService(
@@ -45,7 +48,8 @@ internal class UserService : RepositoryService, IUserService
         IOptions<GlobalSettings> globalSettings,
         IOptions<SecuritySettings> securitySettings,
         UserEditorAuthorizationHelper userEditorAuthorizationHelper,
-        IBackOfficeUserStoreAccessor userStoreAccessor)
+        IBackOfficeUserStoreAccessor userStoreAccessor,
+        ICoreBackOfficeUserManagerAccessor userManagerAccessor)
         : base(provider, loggerFactory, eventMessagesFactory)
     {
         _runtimeState = runtimeState;
@@ -53,6 +57,7 @@ internal class UserService : RepositoryService, IUserService
         _userGroupRepository = userGroupRepository;
         _userEditorAuthorizationHelper = userEditorAuthorizationHelper;
         _userStoreAccessor = userStoreAccessor;
+        _userManagerAccessor = userManagerAccessor;
         _globalSettings = globalSettings.Value;
         _securitySettings = securitySettings.Value;
         _logger = loggerFactory.CreateLogger<UserService>();
@@ -60,6 +65,9 @@ internal class UserService : RepositoryService, IUserService
 
     private IBackofficeUserStore BackofficeUserStore => _userStoreAccessor.BackOfficeUserStore
                                                         ?? throw new InvalidOperationException("Could not resolve the BackofficeUserStore");
+
+    private ICoreBackofficeUserManager BackofficeUserManager => _userManagerAccessor.BackofficeUserManager
+                                                        ?? throw new InvalidOperationException("Could not resolve the BackofficeUserManager");
 
     private bool IsUpgrading =>
         _runtimeState.Level == RuntimeLevel.Install || _runtimeState.Level == RuntimeLevel.Upgrade;
@@ -547,7 +555,7 @@ internal class UserService : RepositoryService, IUserService
     }
 
     /// <inheritdoc/>
-    public Task<Attempt<IUser, UserOperationStatus>> CreateAsync(int performingUserId, UserCreateModel model)
+    public async Task<Attempt<UserCreationResult, UserOperationStatus>> CreateAsync(int performingUserId, UserCreateModel model, bool approveUser = false)
     {
         using ICoreScope scope = ScopeProvider.CreateCoreScope();
 
@@ -555,19 +563,19 @@ internal class UserService : RepositoryService, IUserService
 
         if (performingUser is null)
         {
-            return Task.FromResult(Attempt.FailWithStatus<IUser, UserOperationStatus>(UserOperationStatus.MissingUser, new User(_globalSettings)));
+            return Attempt.FailWithStatus(UserOperationStatus.MissingUser, new UserCreationResult());
         }
 
         UserOperationStatus result = ValidateUserCreateModel(model);
         if (result != UserOperationStatus.Success)
         {
-            return Task.FromResult(Attempt.FailWithStatus<IUser, UserOperationStatus>(result, new User(_globalSettings)));
+            return Attempt.FailWithStatus<UserCreationResult, UserOperationStatus>(result, new UserCreationResult());
         }
 
         Attempt<IEnumerable<string>, UserOperationStatus> userGroupAliasesAttempt = GetUserGroupAliasesFromKeys(model.UserGroups);
         if (userGroupAliasesAttempt.Success is false)
         {
-            return Task.FromResult(Attempt.FailWithStatus<IUser, UserOperationStatus>(result, new User(_globalSettings)));
+            return Attempt.FailWithStatus(result, new UserCreationResult());
         }
 
         Attempt<string?> authorizationAttempt = _userEditorAuthorizationHelper.IsAuthorized(
@@ -579,11 +587,45 @@ internal class UserService : RepositoryService, IUserService
 
         if (authorizationAttempt.Success is false)
         {
-            return Task.FromResult(Attempt.FailWithStatus<IUser, UserOperationStatus>(UserOperationStatus.Unauthorized, new User(_globalSettings)));
+            return Attempt.FailWithStatus(UserOperationStatus.Unauthorized, new UserCreationResult());
+        }
+
+        IdentityCreationResult identityCreationResult = await BackofficeUserManager.CreateAsync(model);
+
+        if (identityCreationResult.Succeded is false)
+        {
+            // If we fail from something in Identity we can't know exactly why, so we have to resolve to returning an unknown failure.
+            // But there should be more information in the message.
+            return Attempt.FailWithStatus(
+                UserOperationStatus.UnknownFailure,
+                new UserCreationResult { ErrorMessage = identityCreationResult.ErrorMessage });
+        }
+
+        // The user is now created, so we can fetch it to map it to a result model with our generated password.
+        // and set it to being approved
+        IUser? createdUser = await BackofficeUserStore.GetByEmailAsync(model.Email);
+
+        if (createdUser is null)
+        {
+            // This really shouldn't happen, we literally just created the user
+            throw new PanicException("Was unable to get user after creating it");
+        }
+
+        if (approveUser)
+        {
+            createdUser.IsApproved = true;
+            await BackofficeUserStore.SaveAsync(createdUser);
         }
 
         scope.Complete();
-        throw new NotImplementedException();
+
+        var creationResult = new UserCreationResult
+        {
+            CreatedUser = createdUser,
+            GeneratedPassword = identityCreationResult.InitialPassword
+        };
+
+        return Attempt.SucceedWithStatus(UserOperationStatus.Success, creationResult);
     }
 
     private UserOperationStatus ValidateUserCreateModel(UserCreateModel model)

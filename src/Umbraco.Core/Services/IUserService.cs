@@ -53,8 +53,9 @@ public interface IUserService : IMembershipUserService
     /// </remarks>
     /// <param name="performingUserId">The id of the user performing the operation.</param>
     /// <param name="model">Model to create the user from.</param>
+    /// <param name="approveUser">Specifies if the user should be enabled be default. Defaults to false.</param>
     /// <returns>An attempt indicating if the operation was a success as well as a more detailed <see cref="UserOperationStatus"/>.</returns>
-    Task<Attempt<IUser, UserOperationStatus>> CreateAsync(int performingUserId, UserCreateModel model);
+    Task<Attempt<UserCreationResult, UserOperationStatus>> CreateAsync(int performingUserId, UserCreateModel model, bool approveUser = false);
 
     /// <summary>
     /// Gets all users that the requesting user is allowed to see.
