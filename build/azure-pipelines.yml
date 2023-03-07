@@ -110,7 +110,7 @@ stages:
                   }
                 }
 
-                foreach($csproj in Get-ChildItem –Path "src/" -Recurse -Filter *.csproj)
+                foreach($csproj in Get-ChildItem -Recurse -Filter *.csproj)
                 {
                   dotnet pack $csproj --configuration $(buildConfiguration) --no-build --output $(Build.ArtifactStagingDirectory)/nupkg
                 }

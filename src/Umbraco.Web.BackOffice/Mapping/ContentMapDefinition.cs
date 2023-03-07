@@ -167,6 +167,11 @@ internal class ContentMapDefinition : IMapDefinition
         target.Updater = source.Updater;
         target.Urls = source.Urls;
         target.Variants = context.MapEnumerable<ContentVariantDisplay, ContentVariantScheduleDisplay>(source.Variants);
+
+        foreach (BackOfficeNotification backOfficeNotification in source.Notifications)
+        {
+            target.Notifications.Add(backOfficeNotification);
+        }
     }
 
     // Umbraco.Code.MapAll
