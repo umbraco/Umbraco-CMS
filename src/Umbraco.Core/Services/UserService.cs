@@ -58,30 +58,6 @@ internal class UserService : RepositoryService, IUserService
         _logger = loggerFactory.CreateLogger<UserService>();
     }
 
-    // [Obsolete("User constructor that takes SecuritySettings and ISqlContext")]
-    // public UserService(
-    //     ICoreScopeProvider provider,
-    //     ILoggerFactory loggerFactory,
-    //     IEventMessagesFactory eventMessagesFactory,
-    //     IRuntimeState runtimeState,
-    //     IUserRepository userRepository,
-    //     IUserGroupRepository userGroupRepository,
-    //     IOptions<GlobalSettings> globalSettings,
-    //     IUserGroupAuthorizationService userGroupAuthorizationService)
-    //     : this(
-    //         provider,
-    //         loggerFactory,
-    //         eventMessagesFactory,
-    //         runtimeState,
-    //         userRepository,
-    //         userGroupRepository,
-    //         globalSettings,
-    //         userGroupAuthorizationService,
-    //         StaticServiceProvider.Instance.GetRequiredService<IOptions<SecuritySettings>>(),
-    //         StaticServiceProvider.Instance.GetRequiredService<UserEditorAuthorizationHelper>())
-    // {
-    // }
-
     private IBackofficeUserStore BackofficeUserStore => _userStoreAccessor.BackOfficeUserStore
                                                         ?? throw new InvalidOperationException("Could not resolve the BackofficeUserStore");
 
