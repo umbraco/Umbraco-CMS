@@ -1,5 +1,4 @@
 import config from '../../utils/rollup.config.js';
-export default {
+export default [
 	...config,
-	input: 'index.out.ts'
-};
+];
