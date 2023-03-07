@@ -86,25 +86,52 @@ export type ManifestTypeMap = {
 };
 
 export interface ManifestBase {
+
+	/**
+	 * The type of extension such as dashboard etc...
+	 */
 	type: string;
+
+	/**
+	 * The alias of the extension, ensure it is unique
+	 */
 	alias: string;
+
+	/**
+	 * The friendly name of the extension
+	 */
 	name: string;
+
+	/**
+	 * Extensions such as dashboards are ordered by weight with lower numbers being first in the list
+	 */
 	weight?: number;
 }
 
 export interface ManifestWithLoader<LoaderReturnType> extends ManifestBase {
 	/**
 	 * Ignore this property when serializing to JSON Schema
+	 * found at /types/umbraco-package-schema.json
 	 * @ignore
 	 */
 	loader?: () => Promise<LoaderReturnType>;
 }
 
 export interface ManifestClass extends ManifestWithLoader<object> {
+	/**
+	 * The type of extension such as dashboard etc...
+	 */
 	type: ManifestStandardTypes;
+
+	/**
+	 * The file location of the javascript file to load
+	 */
 	js?: string;
+
 	className?: string;
+
 	class?: ClassConstructor<unknown>;
+
 	//loader?: () => Promise<object | HTMLElement>;
 }
 
@@ -113,10 +140,26 @@ export interface ManifestClassWithClassConstructor extends ManifestClass {
 }
 
 export interface ManifestElement extends ManifestWithLoader<object | HTMLElement> {
+	
+	/**
+	 * The type of extension such as dashboard etc...
+	 */
 	type: ManifestStandardTypes;
+
+	/**
+	 * The file location of the javascript file to load
+	 */
 	js?: string;
+
+	/**
+	 * The HTML web component name to use such as 'my-dashboard'
+	 * Note it is NOT <my-dashboard></my-dashboard> but just the name
+	 */
 	elementName?: string;
-	//loader?: () => Promise<object | HTMLElement>;
+
+	/**
+	 * This contains properties specific to the type of extension
+	 */
 	meta?: unknown;
 }
 
@@ -131,21 +174,41 @@ export interface MetaManifestWithView {
 }
 
 export interface ManifestElementWithElementName extends ManifestElement {
+	/**
+	 * The HTML web component name to use such as 'my-dashboard'
+	 * Note it is NOT <my-dashboard></my-dashboard> but just the name
+	 */
 	elementName: string;
 }
 
 export interface ManifestCustom extends ManifestBase {
 	type: 'custom';
+
+	/**
+	 * This contains properties specific to the type of extension
+	 */
 	meta?: unknown;
 }
 
 export interface ManifestWithMeta extends ManifestBase {
+	/**
+	 * This contains properties specific to the type of extension
+	 */
 	meta: unknown;
 }
 
 export type ClassConstructor<T> = new (...args: any[]) => T;
 
+/**
+ * This type of extension gives full control and will simply load the specified JS file
+ * You could have custom logic to decide which extensions to load/register by using extensionRegistry
+ */
 export interface ManifestEntrypoint extends ManifestBase {
+	
 	type: 'entrypoint';
+
+	/** 
+	 * The file location of the javascript file to load in the backoffice
+	 */
 	js: string;
 }
