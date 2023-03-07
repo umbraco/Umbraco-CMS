@@ -7,10 +7,6 @@ export const userDashboards: Array<ManifestUserDashboard> = [
 		name: 'Themes User Dashboard',
 		loader: () => import('./user-dashboard-themes.element'),
 		weight: 1,
-		meta: {
-			label: 'Themes User Dashboard',
-			pathname: 'themes',
-		},
 	},
 ];
 
