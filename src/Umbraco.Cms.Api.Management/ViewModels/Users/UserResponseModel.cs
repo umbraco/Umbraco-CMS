@@ -6,8 +6,6 @@ public class UserResponseModel : UserPresentationBase, INamedEntityViewModel
 {
     public Guid Key { get; set; }
 
-    public string Name { get; set; } = string.Empty;
-
     public string? Language { get; set; }
 
     public SortedSet<Guid> ContentStartNodeKeys { get; set; } = new();

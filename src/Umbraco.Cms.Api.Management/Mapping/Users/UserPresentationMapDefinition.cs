@@ -16,5 +16,6 @@ public class UserPresentationMapDefinition : IMapDefinition
         target.Email = source.Email;
         target.UserName = source.UserName;
         target.UserGroups = source.UserGroups;
+        target.Name = source.Name;
     }
 }

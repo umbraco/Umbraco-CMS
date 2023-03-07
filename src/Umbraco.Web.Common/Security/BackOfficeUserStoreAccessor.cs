@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
+using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Web.Common.Security;
@@ -14,5 +15,5 @@ public class BackOfficeUserStoreAccessor : IBackOfficeUserStoreAccessor
     }
 
     public IBackofficeUserStore? BackOfficeUserStore
-    => _httpContextAccessor.HttpContext?.RequestServices.GetService<IBackofficeUserStore>();
+        => _httpContextAccessor.HttpContext?.RequestServices.GetService<IBackofficeUserStore>();
 }

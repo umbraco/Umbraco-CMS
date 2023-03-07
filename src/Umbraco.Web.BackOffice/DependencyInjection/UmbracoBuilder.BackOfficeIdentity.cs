@@ -58,8 +58,10 @@ public static partial class UmbracoBuilderExtensions
 
         // We also need to register the store as a core-friendly interface that doesn't leak technology.
         services.AddScoped<IBackofficeUserStore, BackOfficeUserStore>();
+        services.AddScoped<ICoreBackofficeUserManager, BackOfficeUserManager>();
 
-        services.TryAddSingleton<IBackOfficeUserPasswordChecker, NoopBackOfficeUserPasswordChecker>();
+        services.AddSingleton<IBackOfficeUserPasswordChecker, NoopBackOfficeUserPasswordChecker>();
+        services.AddSingleton<ICoreBackOfficeUserManagerAccessor, CoreBackofficeUserManagerAccessor>();
 
         // Configure the options specifically for the UmbracoBackOfficeIdentityOptions instance
         services.ConfigureOptions<ConfigureBackOfficeIdentityOptions>();

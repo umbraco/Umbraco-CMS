@@ -6,6 +6,8 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Events;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Net;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Security;
@@ -15,9 +17,11 @@ using Umbraco.Extensions;
 namespace Umbraco.Cms.Web.Common.Security;
 
 public class BackOfficeUserManager : UmbracoUserManager<BackOfficeIdentityUser, UserPasswordConfigurationSettings>,
-    IBackOfficeUserManager
+    IBackOfficeUserManager,
+    ICoreBackofficeUserManager
 {
     private readonly IBackOfficeUserPasswordChecker _backOfficeUserPasswordChecker;
+    private readonly GlobalSettings _globalSettings;
     private readonly IEventAggregator _eventAggregator;
     private readonly IHttpContextAccessor _httpContextAccessor;
 
@@ -34,7 +38,8 @@ public class BackOfficeUserManager : UmbracoUserManager<BackOfficeIdentityUser, 
         ILogger<UserManager<BackOfficeIdentityUser>> logger,
         IOptions<UserPasswordConfigurationSettings> passwordConfiguration,
         IEventAggregator eventAggregator,
-        IBackOfficeUserPasswordChecker backOfficeUserPasswordChecker)
+        IBackOfficeUserPasswordChecker backOfficeUserPasswordChecker,
+        IOptions<GlobalSettings> globalSettings)
         : base(
             ipResolver,
             store,
@@ -50,6 +55,7 @@ public class BackOfficeUserManager : UmbracoUserManager<BackOfficeIdentityUser, 
         _httpContextAccessor = httpContextAccessor;
         _eventAggregator = eventAggregator;
         _backOfficeUserPasswordChecker = backOfficeUserPasswordChecker;
+        _globalSettings = globalSettings.Value;
     }
 
     /// <summary>
@@ -245,5 +251,33 @@ public class BackOfficeUserManager : UmbracoUserManager<BackOfficeIdentityUser, 
         T notification = createNotification(currentUserId, ip);
         _eventAggregator.Publish(notification);
         return notification;
+    }
+
+    public async Task<IdentityCreationResult> CreateAsync(UserCreateModel createModel)
+    {
+        var identityUser = BackOfficeIdentityUser.CreateNew(
+            _globalSettings,
+            createModel.UserName,
+            createModel.Email,
+            _globalSettings.DefaultUILanguage);
+
+        identityUser.Name = createModel.Name;
+
+        IdentityResult created = await CreateAsync(identityUser);
+
+        if (created.Succeeded is false)
+        {
+            return IdentityCreationResult.Fail(created.Errors.ToErrorMessage());
+        }
+
+        var password = GeneratePassword();
+
+        IdentityResult passwordAdded = await AddPasswordAsync(identityUser, password);
+        if (passwordAdded.Succeeded is false)
+        {
+            return IdentityCreationResult.Fail(passwordAdded.Errors.ToErrorMessage());
+        }
+
+        return new IdentityCreationResult { Succeded = true, InitialPassword = password };
     }
 }
