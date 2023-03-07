@@ -1,8 +1,8 @@
-import type { RepositoryTreeDataSource } from '../../../../../libs/repository/repository-tree-data-source.interface';
 import { MediaTreeServerDataSource } from './sources/media.tree.server.data';
 import { UmbMediaTreeStore, UMB_MEDIA_TREE_STORE_CONTEXT_TOKEN } from './media.tree.store';
 import { UmbMediaDetailStore, UMB_MEDIA_DETAIL_STORE_CONTEXT_TOKEN } from './media.detail.store';
 import { UmbMediaDetailServerDataSource } from './sources/media.detail.server.data';
+import type { RepositoryTreeDataSource } from '@umbraco-cms/repository';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 import { UmbContextConsumerController } from '@umbraco-cms/context-api';
 import { ProblemDetailsModel } from '@umbraco-cms/backend-api';
