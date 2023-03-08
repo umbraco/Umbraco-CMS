@@ -16,10 +16,11 @@ internal class EfCoreScope : CoreScope, IEfCoreScope
     private readonly IUmbracoEfCoreDatabaseFactory _efCoreDatabaseFactory;
     private readonly IEFCoreScopeAccessor _efCoreScopeAccessor;
     private readonly EfCoreScopeProvider _efCoreScopeProvider;
+    private readonly IScope? _innerScope;
     private IUmbracoEfCoreDatabase? _umbracoEfCoreDatabase;
     private bool _disposed;
 
-    public EfCoreScope(
+    protected EfCoreScope(
         IDistributedLockingMechanismFactory distributedLockingMechanismFactory,
         ILoggerFactory loggerFactory,
         IUmbracoEfCoreDatabaseFactory efCoreDatabaseFactory,
@@ -56,7 +57,7 @@ internal class EfCoreScope : CoreScope, IEfCoreScope
         _efCoreScopeAccessor = efCoreScopeAccessor;
         _efCoreScopeProvider = (EfCoreScopeProvider)efCoreScopeProvider;
         ScopeContext = scopeContext;
-        ParentInfrastructureScope = parentScope;
+        _innerScope = parentScope;
     }
 
     public EfCoreScope(
@@ -80,7 +81,6 @@ internal class EfCoreScope : CoreScope, IEfCoreScope
         ParentScope = parentScope;
     }
 
-    public IScope? ParentInfrastructureScope { get; }
 
     public EfCoreScope? ParentScope { get; }
 
@@ -142,10 +142,10 @@ internal class EfCoreScope : CoreScope, IEfCoreScope
         {
             if (Completed.HasValue && Completed.Value)
             {
-                ParentInfrastructureScope?.Complete();
+                _innerScope?.Complete();
             }
 
-            ParentInfrastructureScope?.Dispose();
+            _innerScope?.Dispose();
         }
     }
 
@@ -159,7 +159,7 @@ internal class EfCoreScope : CoreScope, IEfCoreScope
         // Check if we are already in a transaction before starting one
         if (_umbracoEfCoreDatabase.UmbracoEFContext.Database.CurrentTransaction is null)
         {
-            DbTransaction? transaction = ParentInfrastructureScope?.Database.Transaction;
+            DbTransaction? transaction = _innerScope?.Database.Transaction;
             Locks.EnsureLocks(InstanceId);
             _umbracoEfCoreDatabase.UmbracoEFContext.Database.SetDbConnection(transaction?.Connection);
 
@@ -207,7 +207,7 @@ internal class EfCoreScope : CoreScope, IEfCoreScope
         {
             try
             {
-                if (_umbracoEfCoreDatabase is null || ParentInfrastructureScope is not null)
+                if (_umbracoEfCoreDatabase is null || _innerScope is not null)
                 {
                     return;
                 }

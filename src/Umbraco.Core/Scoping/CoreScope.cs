@@ -20,7 +20,7 @@ public class CoreScope : ICoreScope
 
     private bool _disposed;
 
-    public CoreScope(
+    protected CoreScope(
         IDistributedLockingMechanismFactory distributedLockingMechanismFactory,
         ILoggerFactory loggerFactory,
         FileSystems scopedFileSystem,
@@ -45,7 +45,7 @@ public class CoreScope : ICoreScope
         }
     }
 
-    public CoreScope(
+    protected CoreScope(
         ICoreScope? parentScope,
         IDistributedLockingMechanismFactory distributedLockingMechanismFactory,
         ILoggerFactory loggerFactory,
