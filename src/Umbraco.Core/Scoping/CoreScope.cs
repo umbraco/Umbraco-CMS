@@ -191,15 +191,15 @@ public class CoreScope : ICoreScope
         return Completed.Value;
     }
 
-    public void ReadLock(params int[] lockIds) => Locks.ReadLock(InstanceId, TimeSpan.Zero, lockIds);
+    public void ReadLock(params int[] lockIds) => Locks.ReadLock(InstanceId, null, lockIds);
 
-    public void WriteLock(params int[] lockIds) => Locks.WriteLock(InstanceId, TimeSpan.Zero, lockIds);
+    public void WriteLock(params int[] lockIds) => Locks.WriteLock(InstanceId, null, lockIds);
 
     public void WriteLock(TimeSpan timeout, int lockId) => Locks.ReadLock(InstanceId, timeout, lockId);
 
     public void ReadLock(TimeSpan timeout, int lockId) => Locks.WriteLock(InstanceId, timeout, lockId);
 
-    public void EagerWriteLock(params int[] lockIds) => Locks.EagerWriteLock(InstanceId, TimeSpan.Zero, lockIds);
+    public void EagerWriteLock(params int[] lockIds) => Locks.EagerWriteLock(InstanceId, null, lockIds);
 
     public void EagerWriteLock(TimeSpan timeout, int lockId) => Locks.EagerWriteLock(InstanceId, timeout, lockId);
 
