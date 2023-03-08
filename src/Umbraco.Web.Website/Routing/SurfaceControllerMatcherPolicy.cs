@@ -40,30 +40,16 @@ internal class SurfaceControllerMatcherPolicy : MatcherPolicy, IEndpointSelector
             return Task.CompletedTask;
         }
 
-        var surfaceControllerIndex = -1;
-        var surfaceControllerAllowedHttpMethods = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-        for (var i = 0; i < candidates.Count; i++)
-        {
-            CandidateState candidate = candidates[i];
-
-            ControllerActionDescriptor? controllerActionDescriptor =
-                candidate.Endpoint?.Metadata.GetMetadata<ControllerActionDescriptor>();
-
-            if (controllerActionDescriptor?.ControllerTypeInfo.IsType<SurfaceController>() == true)
-            {
-                surfaceControllerIndex = i;
-                PopulateAllowedHttpMethods(candidate, surfaceControllerAllowedHttpMethods);
-                break;
-            }
-        }
-
+        int surfaceControllerIndex = GetSurfaceControllerCandidateIndex(candidates);
         if (surfaceControllerIndex >= 0)
         {
-            if (surfaceControllerAllowedHttpMethods.Any()
-                && surfaceControllerAllowedHttpMethods.Contains(httpContext.Request.Method) is false)
+            HashSet<string> allowedHttpMethods = GetAllowedHttpMethods(candidates[surfaceControllerIndex]);
+
+            if (allowedHttpMethods.Any()
+                && allowedHttpMethods.Contains(httpContext.Request.Method) is false)
             {
                 // We need to handle this as a 405 like the HttpMethodMatcherPolicy would do.
-                httpContext.SetEndpoint(CreateRejectEndpoint(surfaceControllerAllowedHttpMethods));
+                httpContext.SetEndpoint(CreateRejectEndpoint(allowedHttpMethods));
                 httpContext.Request.RouteValues = null!;
             }
             else
@@ -76,19 +62,10 @@ internal class SurfaceControllerMatcherPolicy : MatcherPolicy, IEndpointSelector
         return Task.CompletedTask;
     }
 
-    private static void InvalidateAllCandidatesExceptIndex(CandidateSet candidates, int index)
-    {
-        for (var i = 0; i < candidates.Count; i++)
-        {
-            if (i != index)
-            {
-                candidates.SetValidity(i, false);
-            }
-        }
-    }
 
-    private static void PopulateAllowedHttpMethods(CandidateState candidate, ISet<string> surfaceControllerAllowedHttpMethods)
+    private static HashSet<string> GetAllowedHttpMethods(CandidateState candidate)
     {
+        var surfaceControllerAllowedHttpMethods = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
         IHttpMethodMetadata? httpMethodMetadata = candidate.Endpoint?.Metadata.GetMetadata<IHttpMethodMetadata>();
         if (httpMethodMetadata is not null)
@@ -99,6 +76,36 @@ internal class SurfaceControllerMatcherPolicy : MatcherPolicy, IEndpointSelector
             }
         }
 
+        return surfaceControllerAllowedHttpMethods;
+    }
+
+    private static int GetSurfaceControllerCandidateIndex(CandidateSet candidates)
+    {
+        for (var i = 0; i < candidates.Count; i++)
+        {
+            CandidateState candidate = candidates[i];
+
+            ControllerActionDescriptor? controllerActionDescriptor =
+                candidate.Endpoint?.Metadata.GetMetadata<ControllerActionDescriptor>();
+
+            if (controllerActionDescriptor?.ControllerTypeInfo.IsType<SurfaceController>() == true)
+            {
+                return i;
+            }
+        }
+
+        return -1;
+    }
+
+    private static void InvalidateAllCandidatesExceptIndex(CandidateSet candidates, int index)
+    {
+        for (var i = 0; i < candidates.Count; i++)
+        {
+            if (i != index)
+            {
+                candidates.SetValidity(i, false);
+            }
+        }
     }
 
     private static Endpoint CreateRejectEndpoint(ISet<string> allowedHttpMethods) =>
