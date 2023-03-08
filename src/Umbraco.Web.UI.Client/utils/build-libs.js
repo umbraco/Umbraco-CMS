@@ -2,6 +2,7 @@ import * as fs from 'fs';
 import { exec } from 'child_process';
 
 const libsDistFolder = '../Umbraco.Cms.StaticAssets/wwwroot/umbraco/backoffice/libs';
+const typesDistFolder = '../Umbraco.Web.UI.New';
 const libs = fs.readdirSync('./libs');
 
 for (let i = 0; i < libs.length; i++) {
@@ -29,37 +30,49 @@ for (let i = 0; i < libs.length; i++) {
 
 function copyDistFromLib(libName, distPath) {
 	console.log(`Copying ${libName} to StaticAssets`);
-	const targetFolder = `${libsDistFolder}/${libName}`;
 
-	fs.cp(distPath, targetFolder, { recursive: true }, function (err) {
-		if (err) {
-			console.error(`Error copying ${libName}`);
-			console.error(err);
-		} else {
-			console.log(`Copied ${libName}`);
-			findAndCopyTypesForLib(libName);
-		}
-	});
-}
+	const sourceFile = `${distPath}/index.js`;
+	const destFile = `${libsDistFolder}/${libName}.js`;
 
-/**
- * Look in the ./types/libs folder for a folder with the same name as the {libName} parameter
- * and copy those types into the `${libsDistFolder}/${libName}` folder.
- * Wrap the types from the index.d.ts file as a new module called "@umbraco-cms/{libName}".
- */
-function findAndCopyTypesForLib(libName) {
-	console.log('Installing types for', libName);
-	const typesFolder = './types/libs';
-	const libTypesFolder = `${typesFolder}/${libName}`;
-	if (fs.existsSync(libTypesFolder)) {
-		const libTypesTargetFolder = `${libsDistFolder}/${libName}`;
-		fs.cpSync(libTypesFolder, `${libTypesTargetFolder}/types`, { recursive: true });
-		fs.writeFileSync(`${libTypesTargetFolder}/index.d.ts`, wrapLibTypeContent(libName), {});
+	try {
+		fs.copyFileSync(sourceFile, destFile);
+		console.log(`Copied ${libName}`);
+		findAndCopyTypesForLib(libName, distPath);
+	} catch (err) {
+		console.error(`Error copying ${libName}`);
+		console.error(err);
 	}
 }
 
-function wrapLibTypeContent(libName) {
+/**
+ * This function copies the content of the index.d.ts file from the lib into
+ * the ${typesDistFolder}/global.d.ts file and wrap it with
+ * a declare module statement using the lib name.
+ */
+function findAndCopyTypesForLib(libName, distPath) {
+	console.log(`Copying ${libName} types to ${typesDistFolder}`);
+
+	const sourceFile = `${distPath}/index.d.ts`;
+	const destFile = `${typesDistFolder}/global.d.ts`;
+
+	try {
+		// Take the content of sourceFile and wrap it with a declare module statement in destFile
+		const content = fs.readFileSync(sourceFile, 'utf8');
+		if (!content) {
+			return;
+		}
+		fs.writeFileSync(destFile, wrapLibTypeContent(libName, content) + "\n", { flag: 'a' });
+		console.log(`Copied ${libName} types`);
+	} catch (err) {
+		console.error(`Error copying ${libName} types`);
+		console.error(err);
+	}
+}
+
+function wrapLibTypeContent(libName, content) {
 	return `
-	declare module "@umbraco-cms/${libName}";
+	declare module "@umbraco-cms/${libName}" {
+		${content}
+	};
 	`;
 }
