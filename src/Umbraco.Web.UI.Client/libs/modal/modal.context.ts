@@ -1,5 +1,5 @@
 // TODO: lazy load
-import './layouts/confirm/modal-layout-confirm.element';
+import '../../src/backoffice/shared/modals/confirm/confirm-modal.element';
 import '../../src/backoffice/documents/documents/modals/document-picker/document-picker-modal.element';
 import '../../src/backoffice/media/media/modals/media-picker/media-picker-modal.element';
 import './layouts/property-editor-ui-picker/modal-layout-property-editor-ui-picker.element';
@@ -19,7 +19,7 @@ import { UmbIconPickerModalData } from '../../src/backoffice/shared/modals/icon-
 import { UmbMediaPickerModalData } from '../../src/backoffice/media/media/modals/media-picker';
 import type { UmbBasicModalData } from '../../src/backoffice/shared/modals/basic';
 import type { UmbLinkPickerModalData } from '../../src/backoffice/shared/modals/link-picker';
-import type { UmbModalConfirmData } from './layouts/confirm/modal-layout-confirm.element';
+import type { UmbModalConfirmData } from '../../src/backoffice/shared/modals/confirm/confirm-modal.element';
 import type { UmbModalPropertyEditorUIPickerData } from './layouts/property-editor-ui-picker/modal-layout-property-editor-ui-picker.element';
 import { UmbModalHandler } from './modal-handler';
 import { UmbPickerModalData } from './layouts/modal-layout-picker-base';
