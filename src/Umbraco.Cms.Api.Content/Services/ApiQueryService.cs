@@ -3,20 +3,23 @@ using Examine.Search;
 using Umbraco.Cms.Api.Content.Routing;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.ContentApi;
+using Umbraco.Cms.Core.PublishedCache;
 
 namespace Umbraco.Cms.Api.Content.Services;
 public class ApiQueryService : IApiQueryService
 {
+    private readonly QueryHandlerCollection _queryHandlers;
     private readonly IApiQueryExtensionService _apiQueryExtensionService;
-    private readonly List<IQueryOptionHandler> _queryOptionHandlers; // change to collect handlers from scope
+    //private readonly List<IQueryOptionHandler> _queryOptionHandlers; // change to collect handlers from scope
     private readonly IExamineManager _examineManager;
 
     // ToDo: Create QueryOptionHandlerCollection
     //public ApiQueryService(IApiQueryExtensionService apiQueryExtensionService, List<IQueryOptionHandler> queryOptionHandlers, IExamineManager examineManager)
-    public ApiQueryService(IApiQueryExtensionService apiQueryExtensionService, IExamineManager examineManager)
+    public ApiQueryService(QueryHandlerCollection queryHandlers, IPublishedSnapshotAccessor publishedSnapshotAccessor, IApiQueryExtensionService apiQueryExtensionService, IExamineManager examineManager)
     {
+        _queryHandlers = queryHandlers;
         _apiQueryExtensionService = apiQueryExtensionService;
-        _queryOptionHandlers = new List<IQueryOptionHandler> { new ChildrenQueryOption(), new DescendantsQueryOption() };
+        //_queryOptionHandlers = new List<IQueryOptionHandler> { new ChildrenQueryOption(), new DescendantsQueryOption(), new AncestorsQueryOption(publishedSnapshotAccessor) };
         _examineManager = examineManager;
     }
 
@@ -47,7 +50,8 @@ public class ApiQueryService : IApiQueryService
 
     public IEnumerable<Guid> ExecuteQuery(Dictionary<string, string> queryParams, string fieldValue)
     {
-        IQueryOptionHandler? queryHandler = _queryOptionHandlers.FirstOrDefault(h => h.CanHandle(queryParams["fetch"]));
+        var queryHandler = _queryHandlers.FirstOrDefault(h => h.CanHandle(queryParams["fetch"])) as IQueryOptionHandler;
+        //IQueryOptionHandler? queryHandler = _queryOptionHandlers.FirstOrDefault(h => h.CanHandle(queryParams["fetch"]));
 
         if (queryHandler is null)
         {
@@ -60,8 +64,13 @@ public class ApiQueryService : IApiQueryService
         }
 
         IQuery baseQuery = apiIndex.Searcher.CreateQuery();
-        IBooleanOperation queryOperation = queryHandler
+        IBooleanOperation? queryOperation = queryHandler
             .BuildApiIndexQuery(baseQuery, fieldValue);
+
+        if (queryOperation is null)
+        {
+            return Enumerable.Empty<Guid>();
+        }
 
         if (queryParams.ContainsKey("filter"))
         {

@@ -1,7 +1,6 @@
 using System.Web;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Umbraco.Cms.Api.Content.Services;
 using Umbraco.Cms.Core.ContentApi;
 using Umbraco.Cms.Core.Models.ContentApi;
 using Umbraco.Cms.Core.Models.PublishedContent;
@@ -58,20 +57,11 @@ public class QueryContentApiController : ContentApiControllerBase
 
         IEnumerable<Guid> ids = Enumerable.Empty<Guid>();
 
-        // ToDo: Should be removed
-        ApiQueryType queryType = _apiQueryService.GetQueryType(fetch!);
-        if (queryType == ApiQueryType.Ancestors)
-        {
-            ids = _apiQueryService.GetGuidsFromQuery((Guid)id, queryType);
-        }
-        else
-        {
-            string query = HttpUtility.UrlDecode(context.Request.QueryString.Value!.Substring(1));
-            var queryParams = query.Split('&')
-                .Select(p => p.Split('='))
-                .ToDictionary(p => p[0], p => p[1]);
-            ids = _apiQueryService.ExecuteQuery(queryParams, ((Guid)id).ToString());
-        }
+        string query = HttpUtility.UrlDecode(context.Request.QueryString.Value!.Substring(1));
+        var queryParams = query.Split('&')
+            .Select(p => p.Split('='))
+            .ToDictionary(p => p[0], p => p[1]);
+        ids = _apiQueryService.ExecuteQuery(queryParams, ((Guid)id).ToString());
 
         IEnumerable<IPublishedContent> contentItems = ids.Select(contentCache.GetById)
                                                          .WhereNotNull()

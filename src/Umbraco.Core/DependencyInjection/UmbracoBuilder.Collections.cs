@@ -1,6 +1,7 @@
 using Umbraco.Cms.Core.Actions;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Composing;
+using Umbraco.Cms.Core.ContentApi;
 using Umbraco.Cms.Core.ContentApps;
 using Umbraco.Cms.Core.Dashboards;
 using Umbraco.Cms.Core.Editors;
@@ -123,6 +124,7 @@ public static partial class UmbracoBuilderExtensions
             .Append<LottieFiles>();
         builder.SearchableTrees().Add(() => builder.TypeLoader.GetTypes<ISearchableTree>());
         builder.BackOfficeAssets();
+        builder.QueryHandlers().Add(() => builder.TypeLoader.GetTypes<IQueryHandler>());
     }
 
     /// <summary>
@@ -298,4 +300,10 @@ public static partial class UmbracoBuilderExtensions
     /// </summary>
     public static CustomBackOfficeAssetsCollectionBuilder BackOfficeAssets(this IUmbracoBuilder builder)
         => builder.WithCollectionBuilder<CustomBackOfficeAssetsCollectionBuilder>();
+
+    /// <summary>
+    /// Gets the Delivery API query handler collection builder
+    /// </summary>
+    public static QueryHandlerCollectionBuilder QueryHandlers(this IUmbracoBuilder builder)
+        => builder.WithCollectionBuilder<QueryHandlerCollectionBuilder>();
 }

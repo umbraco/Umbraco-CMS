@@ -10,6 +10,6 @@ public class ChildrenQueryOption : IQueryOptionHandler
         return queryString.StartsWith(childrenSpecifier, StringComparison.OrdinalIgnoreCase);
     }
 
-    public IBooleanOperation BuildApiIndexQuery(IQuery query, string fieldValue)
+    public IBooleanOperation? BuildApiIndexQuery(IQuery query, string fieldValue)
         => query.Field("parentKey", fieldValue);
 }

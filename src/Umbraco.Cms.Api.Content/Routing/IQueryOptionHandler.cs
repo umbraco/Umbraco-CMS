@@ -1,10 +1,9 @@
 using Examine.Search;
+using Umbraco.Cms.Core.ContentApi;
 
 namespace Umbraco.Cms.Api.Content.Routing;
 
-public interface IQueryOptionHandler
+public interface IQueryOptionHandler : IQueryHandler
 {
-    bool CanHandle(string queryString);
-
-    IBooleanOperation BuildApiIndexQuery(IQuery query, string fieldValue);
+    IBooleanOperation? BuildApiIndexQuery(IQuery query, string fieldValue);
 }
