@@ -171,8 +171,6 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.AddUnique<IApplicationShutdownRegistry, AspNetCoreApplicationShutdownRegistry>();
         builder.Services.AddTransient<IIpAddressUtilities, IpAddressUtilities>();
 
-        builder.Services.AddSingleton<IBackOfficeUserStoreAccessor, BackOfficeUserStoreAccessor>();
-
         return builder;
     }
 

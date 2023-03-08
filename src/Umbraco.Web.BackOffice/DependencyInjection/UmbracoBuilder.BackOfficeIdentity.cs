@@ -60,8 +60,7 @@ public static partial class UmbracoBuilderExtensions
         services.AddScoped<IBackofficeUserStore, BackOfficeUserStore>();
         services.AddScoped<ICoreBackofficeUserManager, BackOfficeUserManager>();
 
-        services.AddSingleton<IBackOfficeUserPasswordChecker, NoopBackOfficeUserPasswordChecker>();
-        services.AddSingleton<ICoreBackOfficeUserManagerAccessor, CoreBackofficeUserManagerAccessor>();
+        services.AddSingleton<IBackOfficeUserPasswordChecker, NoopBackOfficeUserPasswordChecker>(); ;
 
         // Configure the options specifically for the UmbracoBackOfficeIdentityOptions instance
         services.ConfigureOptions<ConfigureBackOfficeIdentityOptions>();
