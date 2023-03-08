@@ -7,8 +7,8 @@ import { UmbTreeElement } from '../../components/tree/tree.element';
 import { UmbLinkPickerConfig, UmbLinkPickerLink, UmbLinkPickerModalData } from '.';
 import { buildUdi, getKeyFromUdi } from '@umbraco-cms/utils';
 
-@customElement('umb-modal-layout-link-picker')
-export class UmbModalLayoutLinkPickerElement extends UmbModalLayoutElement<UmbLinkPickerModalData> {
+@customElement('umb-link-picker-modal')
+export class UmbLinkPickerModalElement extends UmbModalLayoutElement<UmbLinkPickerModalData> {
 	static styles = [
 		UUITextStyles,
 		css`
@@ -197,6 +197,6 @@ export class UmbModalLayoutLinkPickerElement extends UmbModalLayoutElement<UmbLi
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-modal-layout-link-picker': UmbModalLayoutLinkPickerElement;
+		'umb-link-picker-modal': UmbLinkPickerModalElement;
 	}
 }
