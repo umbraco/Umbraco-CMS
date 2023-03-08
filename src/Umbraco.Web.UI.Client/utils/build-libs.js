@@ -2,7 +2,7 @@ import * as fs from 'fs';
 import { exec } from 'child_process';
 
 const libsDistFolder = '../Umbraco.Cms.StaticAssets/wwwroot/umbraco/backoffice/libs';
-const typesDistFolder = '../Umbraco.Web.UI.New';
+const typesDistFolder = '../Umbraco.Web.UI.New/dts';
 const libs = fs.readdirSync('./libs');
 
 for (let i = 0; i < libs.length; i++) {
@@ -35,7 +35,7 @@ function copyDistFromLib(libName, distPath) {
 	const destFile = `${libsDistFolder}/${libName}.js`;
 
 	try {
-		fs.copyFileSync(sourceFile, destFile);
+		fs.cpSync(sourceFile, destFile, { recursive: true });
 		console.log(`Copied ${libName}`);
 		findAndCopyTypesForLib(libName, distPath);
 	} catch (err) {
@@ -53,15 +53,12 @@ function findAndCopyTypesForLib(libName, distPath) {
 	console.log(`Copying ${libName} types to ${typesDistFolder}`);
 
 	const sourceFile = `${distPath}/index.d.ts`;
-	const destFile = `${typesDistFolder}/global.d.ts`;
+	const destFile = `${typesDistFolder}/${libName}.d.ts`;
 
 	try {
-		// Take the content of sourceFile and wrap it with a declare module statement in destFile
-		const content = fs.readFileSync(sourceFile, 'utf8');
-		if (!content) {
-			return;
-		}
-		fs.writeFileSync(destFile, wrapLibTypeContent(libName, content) + "\n", { flag: 'a' });
+		fs.cpSync(sourceFile, destFile, { recursive: true });
+		const content = fs.readFileSync(destFile, 'utf-8');
+		fs.writeFileSync(destFile, wrapLibTypeContent(libName, content));
 		console.log(`Copied ${libName} types`);
 	} catch (err) {
 		console.error(`Error copying ${libName} types`);
@@ -70,9 +67,8 @@ function findAndCopyTypesForLib(libName, distPath) {
 }
 
 function wrapLibTypeContent(libName, content) {
-	return `
-	declare module "@umbraco-cms/${libName}" {
-		${content}
-	};
-	`;
+	return `declare module "@umbraco-cms/${libName}" {
+	${content.replace(/declare/g, '')}
+}
+`;
 }
