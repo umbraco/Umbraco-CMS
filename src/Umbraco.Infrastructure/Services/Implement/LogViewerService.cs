@@ -1,14 +1,13 @@
-using Serilog.Events;
 using System.Collections.ObjectModel;
-using System.Text.Json;
+using Serilog.Events;
 using Umbraco.Cms.Core.Logging.Viewer;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services.OperationStatus;
-using Umbraco.Extensions;
 using Umbraco.New.Cms.Core.Models;
-using LogLevel = Umbraco.Cms.Core.Logging.LogLevel;
+using Umbraco.Cms.Core.Logging;
+using Umbraco.Cms.Core.Serialization;
 
 namespace Umbraco.Cms.Core.Services.Implement;
 
@@ -20,17 +19,20 @@ public class LogViewerService : ILogViewerService
     private readonly ILogViewer _logViewer;
     private readonly ILogLevelLoader _logLevelLoader;
     private readonly ICoreScopeProvider _provider;
+    private readonly IJsonSerializer _jsonSerializer;
 
     public LogViewerService(
         ILogViewerQueryRepository logViewerQueryRepository,
         ILogViewer logViewer,
         ILogLevelLoader logLevelLoader,
-        ICoreScopeProvider provider)
+        ICoreScopeProvider provider,
+        IJsonSerializer jsonSerializer)
     {
         _logViewerQueryRepository = logViewerQueryRepository;
         _logViewer = logViewer;
         _logLevelLoader = logLevelLoader;
         _provider = provider;
+        _jsonSerializer = jsonSerializer;
     }
 
     /// <inheritdoc/>
@@ -241,14 +243,20 @@ public class LogViewerService : ILogViewerService
             {
                 string? value;
 
+
                 if (property.Value is ScalarValue scalarValue)
                 {
                     value = scalarValue.Value?.ToString();
                 }
+                else if (property.Value is StructureValue structureValue)
+                {
+                    var textWriter = new StringWriter();
+                    structureValue.Render(textWriter);
+                    value = textWriter.ToString();
+                }
                 else
                 {
-                    // When polymorphism is implemented, this should be changed
-                    value = JsonSerializer.Serialize(property.Value as object);
+                    value = _jsonSerializer.Serialize(property.Value);
                 }
 
                 result.Add(property.Key, value);
