@@ -43,18 +43,20 @@ export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
 				min-height: 100px;
 			}
 
+			/* TODO => this should be served from rte-content.css via Tiny, so that
+			 the styles are applied inside the iframe 
 			.umb-macro-holder {
-				border: 3px dotted var(---uui-palette-spanish-pink-light);
+				border: 3px dotted var(--uui-palette-spanish-pink-light);
 				padding: 7px;
 				display: block;
 				margin: 3px;
 			}
-			/* TODO => alternate background loader
+			 TODO => alternate background loader
 			.umb-macro-holder.loading {
 				background: url(assets/img/loader.gif) right no-repeat;
 				background-size: 18px;
 				background-position-x: 99%;
-			} */
+			}
 
 			.embeditem {
 				position: relative;
@@ -66,7 +68,7 @@ export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
 			}
 
 			.embeditem[data-mce-selected] {
-				outline: 2px solid var(---uui-palette-spanish-pink-light);
+				outline: 2px solid var(--uui-palette-spanish-pink-light);
 			}
 
 			.embeditem::before {
@@ -83,8 +85,8 @@ export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
 
 			*[data-mce-selected='inline-boundary'] {
 				background: rgba(0, 0, 0, 0.025);
-				outline: 2px solid var(---uui-palette-spanish-pink-light);
-			}
+				outline: 2px solid var(--uui-palette-spanish-pink-light);
+			} */
 
 			.tox-tinymce-aux {
 				z-index: 9000;
@@ -293,7 +295,6 @@ export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
 		this.#setTinyConfig();
 	}
 
-	// TODO => setup runs before rendering, here we can add any custom plugins
 	#setTinyConfig() {
 		const target = document.createElement('div');
 		target.id = 'editor';
@@ -328,32 +329,34 @@ export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
 			height: ifDefined(this._configObject.dimensions?.height),
 			invalid_elements: this._configObject.invalidElements,
 			plugins,
+			toolbar,
 			style_formats: this._styleFormats,
 			valid_elements: this._configObject.validElements,
 			width: ifDefined(this._configObject.dimensions?.width),
 		});
 
+		// FIXME => one day in the future it might be nice to offer inline mode
 		// configure correct toolbars based on editor mode
-		const editorMode = this._configObject.mode?.toLowerCase();
+		// const editorMode = this._configObject.mode?.toLowerCase();
 
-		if (editorMode === EditorMode[EditorMode.classic]) {
-			Object.assign(tinyConfig, {
-				toolbar,
-			});
-		} else if (editorMode === EditorMode[EditorMode.inline]) {
-			Object.assign(tinyConfig, {
-				inline: true,
-				toolbar,
-			});
+		// if (editorMode === EditorMode[EditorMode.classic]) {
+		// 	Object.assign(tinyConfig, {
+		// 		toolbar,
+		// 	});
+		// } else if (editorMode === EditorMode[EditorMode.inline]) {
+		// 	Object.assign(tinyConfig, {
+		// 		inline: true,
+		// 		toolbar,
+		// 	});
 
-			tinyConfig.plugins.push('quickbars');
-		} else if (editorMode === EditorMode[EditorMode['distraction-free']]) {
-			Object.assign(tinyConfig, {
-				inline: true,
-				quickbars_insert_toolbar: toolbar,
-				quickbars_selection_toolbar: toolbar,
-			});
-		}
+		// 	tinyConfig.plugins.push('quickbars');
+		// } else if (editorMode === EditorMode[EditorMode['distraction-free']]) {
+		// 	Object.assign(tinyConfig, {
+		// 		inline: true,
+		// 		quickbars_insert_toolbar: toolbar,
+		// 		quickbars_selection_toolbar: toolbar,
+		// 	});
+		// }
 
 		// Need to check if we are allowed to UPLOAD images
 		// This is done by checking if the insert image toolbar button is available

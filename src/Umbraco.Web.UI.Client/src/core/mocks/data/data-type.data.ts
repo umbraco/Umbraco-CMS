@@ -482,7 +482,6 @@ export const data: Array<DataTypeModel & { type: 'data-type' }> = [
 			},
 			{ alias: 'dimensions', value: { height: 500 } },
 			{ alias: 'maxImageSize', value: 500 },
-			{ alias: 'mode', value: 'classic' },
 			{ alias: 'ignoreUserStartNodes', value: false },
 			{
 				alias: 'validElements',
