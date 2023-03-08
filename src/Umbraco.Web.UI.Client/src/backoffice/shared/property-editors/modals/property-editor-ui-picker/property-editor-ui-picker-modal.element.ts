@@ -17,10 +17,8 @@ export interface UmbModalPropertyEditorUIPickerData {
 interface GroupedPropertyEditorUIs {
 	[key: string]: Array<ManifestPropertyEditorUI>;
 }
-
-// TODO: make use of UmbPickerLayoutBase
-@customElement('umb-modal-layout-property-editor-ui-picker')
-export class UmbModalLayoutPropertyEditorUIPickerElement extends UmbLitElement {
+@customElement('umb-property-editor-ui-picker-modal')
+export class UmbPropertyEditorUIPickerModalElement extends UmbLitElement {
 	static styles = [
 		UUITextStyles,
 		css`
@@ -198,8 +196,10 @@ export class UmbModalLayoutPropertyEditorUIPickerElement extends UmbLitElement {
 	}
 }
 
+export default UmbPropertyEditorUIPickerModalElement;
+
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-modal-layout-property-editor-ui-picker': UmbModalLayoutPropertyEditorUIPickerElement;
+		'umb-property-editor-ui-picker-modal': UmbPropertyEditorUIPickerModalElement;
 	}
 }
