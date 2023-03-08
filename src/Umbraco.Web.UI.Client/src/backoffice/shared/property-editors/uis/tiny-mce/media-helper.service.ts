@@ -89,9 +89,11 @@ export class UmbMediaHelper {
 			return imagePath;
 		}
 
+		// TODO => use backend cli when available
 		const result = await fetch('/umbraco/management/api/v1/images/GetProcessedImageUrl');
+		const url = await result.json() as string;
 
-		return result as any;
+		return url;
 	}
 
 	/**

@@ -1,9 +1,9 @@
-import { html } from 'lit';
+import { css, html } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, property, state } from 'lit/decorators.js';
 import { ifDefined } from 'lit-html/directives/if-defined.js';
 import { FormControlMixin } from '@umbraco-ui/uui-base/lib/mixins';
-import { AstNode, Editor, EditorEvent, TinyMCE } from 'tinymce';
+import { AstNode, Editor, EditorEvent } from 'tinymce';
 import { firstValueFrom } from 'rxjs';
 import { UmbMediaHelper } from '../../property-editors/uis/tiny-mce/media-helper.service';
 import {
@@ -17,22 +17,93 @@ import type { UserDetails } from '@umbraco-cms/models';
 import { DataTypePropertyModel } from '@umbraco-cms/backend-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-api';
 import { ManifestTinyMcePlugin } from 'libs/extensions-registry/tinymce-plugin.model';
-
-/// TINY MCE
 import '../../../../../public-assets/tiny-mce/tinymce.min.js';
-import '@tinymce/tinymce-webcomponent';
 
 declare global {
 	interface Window {
-		tinyConfig: { [key: string]: string | number | boolean | object | (() => void) };
-		tinymce: TinyMCE;
+		//tinyConfig: { [key: string]: string | number | boolean | object | (() => void) };
+		tinymce: any;
 		Umbraco: any;
 	}
 }
 
+enum EditorMode {
+	'classic',
+	'inline',
+	'distraction-free', // ?? probably not needed - not exposed in current backoffice
+}
+
 @customElement('umb-input-tiny-mce')
 export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
-	static styles = [UUITextStyles];
+	static styles = [
+		UUITextStyles,
+		css`
+			#editor {
+				position: relative;
+				min-height: 100px;
+			}
+
+			.umb-macro-holder {
+				border: 3px dotted var(---uui-palette-spanish-pink-light);
+				padding: 7px;
+				display: block;
+				margin: 3px;
+			}
+			/* TODO => alternate background loader
+			.umb-macro-holder.loading {
+				background: url(assets/img/loader.gif) right no-repeat;
+				background-size: 18px;
+				background-position-x: 99%;
+			} */
+
+			.embeditem {
+				position: relative;
+			}
+
+			.embeditem > * {
+				user-select: none;
+				pointer-events: none;
+			}
+
+			.embeditem[data-mce-selected] {
+				outline: 2px solid var(---uui-palette-spanish-pink-light);
+			}
+
+			.embeditem::before {
+				z-index: 1000;
+				width: 100%;
+				height: 100%;
+				position: absolute;
+				content: ' ';
+			}
+
+			.embeditem[data-mce-selected]::before {
+				background: rgba(0, 0, 0, 0.025);
+			}
+
+			*[data-mce-selected='inline-boundary'] {
+				background: rgba(0, 0, 0, 0.025);
+				outline: 2px solid var(---uui-palette-spanish-pink-light);
+			}
+
+			.tox-tinymce-aux {
+				z-index: 9000;
+			}
+
+			.tox-tinymce-inline {
+				z-index: 900;
+			}
+
+			.tox-tinymce-fullscreen {
+				position: absolute;
+			}
+
+			/* FIXME: Remove this workaround when https://github.com/tinymce/tinymce/issues/6431 has been fixed */
+			.tox .tox-collection__item-label {
+				line-height: 1 !important;
+			}
+		`,
+	];
 
 	@property()
 	configuration: Array<DataTypePropertyModel> = [];
@@ -169,12 +240,10 @@ export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
 			'umbmacro',
 			'umbembeddialog',
 		],
+		mode: 'classic',
 		stylesheets: [],
 		maxImageSize: 500,
 	};
-
-	// @property({ type: String })
-	// private _contentStyle: string = contentUiSkinCss.toString() + '\n' + contentCss.toString();
 
 	#currentUserStore?: UmbCurrentUserStore;
 	modalContext!: UmbModalContext;
@@ -209,9 +278,12 @@ export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
 	connectedCallback() {
 		super.connectedCallback();
 
-		this._configObject = this.configuration
-			? Object.fromEntries(this.configuration.map((x) => [x.alias, x.value]))
-			: this.#fallbackConfig;
+		// create an object by merging the configuration onto the fallback config
+		Object.assign(
+			this._configObject,
+			this.#fallbackConfig,
+			this.configuration ? Object.fromEntries(this.configuration.map((x) => [x.alias, x.value])) : {}
+		);
 
 		// no auto resize when a fixed height is set
 		if (!this._configObject.dimensions?.height) {
@@ -222,9 +294,13 @@ export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
 	}
 
 	// TODO => setup runs before rendering, here we can add any custom plugins
-	async #setTinyConfig() {
+	#setTinyConfig() {
+		const target = document.createElement('div');
+		target.id = 'editor';
+		this.shadowRoot?.appendChild(target);
+
 		// set the default values that will not be modified via configuration
-		window.tinyConfig = {
+		const tinyConfig: { [key: string]: any } = {
 			autoresize_bottom_margin: 10,
 			base_url: '/public-assets/tiny-mce',
 			body_class: 'umb-rte',
@@ -237,34 +313,52 @@ export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
 			paste_preprocess: (_: Editor, args: { content: string }) => this.#cleanupPasteData(args),
 			relative_urls: false,
 			resize: false,
+			target,
 			statusbar: false,
 			setup: (editor: Editor) => this.#editorSetup(editor),
 		};
 
-		// TODO => set editor mode from configuration?
-
-
+		const plugins: Array<string> = this._configObject.plugins.map((x: any) => x.name);
 		const toolbar = this._configObject.toolbar.join(' ');
 
 		// extend with configuration values
-		Object.assign(window.tinyConfig, {
+		Object.assign(tinyConfig, {
 			content_css: this._configObject.stylesheets.join(','),
 			extended_valid_elements: this.#extendedValidElements,
 			height: ifDefined(this._configObject.dimensions?.height),
 			invalid_elements: this._configObject.invalidElements,
-			plugins: this._configObject.plugins.map((x: any) => x.name),
-			quickbars_insert_toolbar: toolbar,
-			quickbars_selection_toolbar: toolbar,
+			plugins,
 			style_formats: this._styleFormats,
-			toolbar,
 			valid_elements: this._configObject.validElements,
 			width: ifDefined(this._configObject.dimensions?.width),
 		});
 
+		// configure correct toolbars based on editor mode
+		const editorMode = this._configObject.mode?.toLowerCase();
+
+		if (editorMode === EditorMode[EditorMode.classic]) {
+			Object.assign(tinyConfig, {
+				toolbar,
+			});
+		} else if (editorMode === EditorMode[EditorMode.inline]) {
+			Object.assign(tinyConfig, {
+				inline: true,
+				toolbar,
+			});
+
+			tinyConfig.plugins.push('quickbars');
+		} else if (editorMode === EditorMode[EditorMode['distraction-free']]) {
+			Object.assign(tinyConfig, {
+				inline: true,
+				quickbars_insert_toolbar: toolbar,
+				quickbars_selection_toolbar: toolbar,
+			});
+		}
+
 		// Need to check if we are allowed to UPLOAD images
 		// This is done by checking if the insert image toolbar button is available
 		if (this.#isMediaPickerEnabled()) {
-			Object.assign(window.tinyConfig, {
+			Object.assign(tinyConfig, {
 				// Update the TinyMCE Config object to allow pasting
 				images_upload_handler: this.#mediaHelper.uploadImageHandler,
 				automatic_uploads: false,
@@ -273,6 +367,8 @@ export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
 				paste_data_images: true,
 			});
 		}
+
+		window.tinymce.init(tinyConfig);
 	}
 
 	#cleanupPasteData(args: { content: string }) {
@@ -302,8 +398,9 @@ export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
 		return languageMatch ?? this.#defaultLanguage;
 	}
 
-	async #editorSetup(editor: Editor) {
+	#editorSetup(editor: Editor) {
 		editor.suffix = '.min';
+
 		// register custom option maxImageSize
 		editor.options.register('maxImageSize', { processor: 'number', default: this.#fallbackConfig.maxImageSize });
 
@@ -311,19 +408,19 @@ export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
 		// these receive the default args below, but can also
 		// provide their own args. Generally though, the additional
 		// args would be managed in the plugin
-		const pluginArgs: TinyMcePluginArguments = {
-			editor: editor,
-			modalContext: this.modalContext,
-			configuration: this.configuration,
-			currentUser: this.currentUser,
-			mediaHelper: this.#mediaHelper,
-		};
+		(async () => {
+			const pluginArgs: TinyMcePluginArguments = {
+				editor,
+				modalContext: this.modalContext,
+				configuration: this.configuration,
+				currentUser: this.currentUser,
+				mediaHelper: this.#mediaHelper,
+			};
 
-		const observable = umbExtensionsRegistry
-		?.extensionsOfType('tinyMcePlugin');
-
-		const plugins = (await firstValueFrom(observable)) as ManifestTinyMcePlugin[];
-		plugins.forEach(p => new p.meta.api(pluginArgs, p.meta.args));
+			const observable = umbExtensionsRegistry?.extensionsOfType('tinyMcePlugin');
+			const plugins = (await firstValueFrom(observable)) as ManifestTinyMcePlugin[];
+			plugins.forEach((p) => new p.meta.api(pluginArgs, p.meta.args));
+		})();
 
 		// define keyboard shortcuts
 		editor.addShortcut('Ctrl+S', '', () => this.dispatchEvent(new CustomEvent('rte.shortcut.save')));
@@ -336,8 +433,7 @@ export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
 		editor.on('Keyup', () => this.#onChange(editor.getContent()));
 		editor.on('SetContent', () => this.#mediaHelper.uploadBlobImages(editor));
 
-		editor.on('focus', () => 
-			this.dispatchEvent(new CustomEvent('umb-rte-focus', { composed: true, bubbles: true })));
+		editor.on('focus', () => this.dispatchEvent(new CustomEvent('umb-rte-focus', { composed: true, bubbles: true })));
 
 		editor.on('blur', () => {
 			this.#onChange(editor.getContent());
@@ -348,6 +444,8 @@ export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
 			this.#mediaHelper.onResize(e);
 			this.#onChange(editor.getContent());
 		});
+
+		editor.on('init', () => editor.setContent(this.value.toString()));
 
 		// If we can not find the insert image/media toolbar button
 		// Then we need to add an event listener to the editor
@@ -447,7 +545,7 @@ export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
 	}
 
 	render() {
-		return html` <tinymce-editor config="tinyConfig">${this.value}</tinymce-editor>`;
+		return html``;
 	}
 }
 
