@@ -8,8 +8,8 @@ export interface UmbModalChangePasswordData {
 	requireOldPassword: boolean;
 }
 
-@customElement('umb-modal-layout-change-password')
-export class UmbModalLayoutChangePasswordElement extends UmbLitElement {
+@customElement('umb-change-password-modal')
+export class UmbChangePasswordModalElement extends UmbLitElement {
 	static styles: CSSResultGroup = [
 		UUITextStyles,
 		css`
@@ -107,6 +107,6 @@ export class UmbModalLayoutChangePasswordElement extends UmbLitElement {
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-modal-layout-change-password': UmbModalLayoutChangePasswordElement;
+		'umb-change-password-modal': UmbChangePasswordModalElement;
 	}
 }
