@@ -40,10 +40,10 @@ internal class SurfaceControllerMatcherPolicy : MatcherPolicy, IEndpointSelector
             return Task.CompletedTask;
         }
 
-        int surfaceControllerIndex = GetSurfaceControllerCandidateIndex(candidates);
-        if (surfaceControllerIndex >= 0)
+        int? surfaceControllerIndex = GetSurfaceControllerCandidateIndex(candidates);
+        if (surfaceControllerIndex.HasValue)
         {
-            HashSet<string> allowedHttpMethods = GetAllowedHttpMethods(candidates[surfaceControllerIndex]);
+            HashSet<string> allowedHttpMethods = GetAllowedHttpMethods(candidates[surfaceControllerIndex.Value]);
 
             if (allowedHttpMethods.Any()
                 && allowedHttpMethods.Contains(httpContext.Request.Method) is false)
@@ -55,7 +55,7 @@ internal class SurfaceControllerMatcherPolicy : MatcherPolicy, IEndpointSelector
             else
             {
                 // Otherwise we invalidate all other endpoints than the surface controller that matched.
-                InvalidateAllCandidatesExceptIndex(candidates, surfaceControllerIndex);
+                InvalidateAllCandidatesExceptIndex(candidates, surfaceControllerIndex.Value);
             }
         }
 
@@ -79,7 +79,7 @@ internal class SurfaceControllerMatcherPolicy : MatcherPolicy, IEndpointSelector
         return surfaceControllerAllowedHttpMethods;
     }
 
-    private static int GetSurfaceControllerCandidateIndex(CandidateSet candidates)
+    private static int? GetSurfaceControllerCandidateIndex(CandidateSet candidates)
     {
         for (var i = 0; i < candidates.Count; i++)
         {
@@ -94,7 +94,7 @@ internal class SurfaceControllerMatcherPolicy : MatcherPolicy, IEndpointSelector
             }
         }
 
-        return -1;
+        return null;
     }
 
     private static void InvalidateAllCandidatesExceptIndex(CandidateSet candidates, int index)
