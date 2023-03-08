@@ -12,6 +12,7 @@ public class CoreScope : ICoreScope
     private ICompletable? _scopedFileSystem;
     private IScopedNotificationPublisher? _notificationPublisher;
     private IsolatedCaches? _isolatedCaches;
+    private ICoreScope? _parentScope;
 
     private readonly RepositoryCacheMode _repositoryCacheMode;
     private readonly bool? _shouldScopeFileSystems;
@@ -45,7 +46,7 @@ public class CoreScope : ICoreScope
     }
 
     public CoreScope(
-        CoreScope? parentScope,
+        ICoreScope? parentScope,
         IDistributedLockingMechanismFactory distributedLockingMechanismFactory,
         ILoggerFactory loggerFactory,
         FileSystems scopedFileSystem,
@@ -53,23 +54,26 @@ public class CoreScope : ICoreScope
         RepositoryCacheMode repositoryCacheMode = RepositoryCacheMode.Unspecified,
         bool? shouldScopeFileSystems = null,
         IScopedNotificationPublisher? notificationPublisher = null)
-    : this(distributedLockingMechanismFactory, loggerFactory, scopedFileSystem, eventAggregator, repositoryCacheMode, shouldScopeFileSystems, notificationPublisher)
     {
+        _eventAggregator = eventAggregator;
+        InstanceId = Guid.NewGuid();
+        CreatedThreadId = Environment.CurrentManagedThreadId;
+        _repositoryCacheMode = repositoryCacheMode;
+        _shouldScopeFileSystems = shouldScopeFileSystems;
+        _notificationPublisher = notificationPublisher;
+
         if (parentScope is null)
         {
+            Locks = new LockingMechanism(distributedLockingMechanismFactory, loggerFactory.CreateLogger<LockingMechanism>());
+            if (_shouldScopeFileSystems is true)
+            {
+                _scopedFileSystem = scopedFileSystem.Shadow();
+            }
+
             return;
         }
 
         Locks = parentScope.Locks;
-
-        // cannot specify a different fs scope!
-        // can be 'true' only on outer scope (and false does not make much sense)
-        if (_shouldScopeFileSystems != null && ParentScope?._shouldScopeFileSystems != _shouldScopeFileSystems)
-        {
-            throw new ArgumentException(
-                $"Value '{_shouldScopeFileSystems.Value}' be different from parent value '{ParentScope?._shouldScopeFileSystems}'.",
-                nameof(_shouldScopeFileSystems));
-        }
 
         // cannot specify a different mode!
         // TODO: means that it's OK to go from L2 to None for reading purposes, but writing would be BAD!
@@ -87,11 +91,19 @@ public class CoreScope : ICoreScope
             throw new ArgumentException("Value cannot be specified on nested scope.", nameof(_notificationPublisher));
         }
 
+        _parentScope = parentScope;
 
-        ParentScope = parentScope;
+        // cannot specify a different fs scope!
+        // can be 'true' only on outer scope (and false does not make much sense)
+        if (_shouldScopeFileSystems != null && ParentScope?._shouldScopeFileSystems != _shouldScopeFileSystems)
+        {
+            throw new ArgumentException(
+                $"Value '{_shouldScopeFileSystems.Value}' be different from parent value '{ParentScope?._shouldScopeFileSystems}'.",
+                nameof(_shouldScopeFileSystems));
+        }
     }
 
-    private CoreScope? ParentScope { get; }
+    private CoreScope? ParentScope => (CoreScope?)_parentScope;
 
     public int Depth
     {
@@ -219,7 +231,7 @@ public class CoreScope : ICoreScope
         }
     }
 
-    internal void HandleScopedFileSystems()
+    private void HandleScopedFileSystems()
     {
         if (_shouldScopeFileSystems == true)
         {
@@ -233,7 +245,12 @@ public class CoreScope : ICoreScope
         }
     }
 
-    internal void HandleScopedNotifications() => _notificationPublisher?.ScopeExit(Completed.HasValue && Completed.Value);
+    protected void SetParentScope(ICoreScope coreScope)
+    {
+        _parentScope = coreScope;
+    }
+
+    private void HandleScopedNotifications() => _notificationPublisher?.ScopeExit(Completed.HasValue && Completed.Value);
 
     private void EnsureNotDisposed()
     {

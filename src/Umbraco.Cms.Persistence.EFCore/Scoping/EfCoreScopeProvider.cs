@@ -1,10 +1,12 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using System.Data;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.DistributedLocking;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Scoping;
+using IScope = Umbraco.Cms.Infrastructure.Scoping.IScope;
 using IScopeProvider = Umbraco.Cms.Infrastructure.Scoping.IScopeProvider;
 
 namespace Umbraco.Cms.Persistence.EFCore.Scoping;
@@ -63,6 +65,7 @@ public class EfCoreScopeProvider : IEfCoreScopeProvider
         RepositoryCacheMode repositoryCacheMode = RepositoryCacheMode.Unspecified,
         bool? scopeFileSystems = null) =>
         new EfCoreDetachableScope(
+            _scopeProvider.CreateDetachedScope(IsolationLevel.Unspecified, repositoryCacheMode, null, null, scopeFileSystems),
             _distributedLockingMechanismFactory,
             _loggerFactory,
             _umbracoEfCoreDatabaseFactory,
@@ -71,7 +74,6 @@ public class EfCoreScopeProvider : IEfCoreScopeProvider
             this,
             null,
             _eventAggregator,
-            _scopeProvider,
             repositoryCacheMode,
             scopeFileSystems);
 
@@ -94,6 +96,7 @@ public class EfCoreScopeProvider : IEfCoreScopeProvider
             throw new InvalidOperationException("Already attached.");
         }
 
+        _scopeProvider.AttachScope(otherScope.ParentInfrastructureScope!);
         otherScope.Attached = true;
         otherScope.OriginalScope = (EfCoreScope)_ambientEfCoreScopeStack.AmbientScope!;
         otherScope.OriginalContext = AmbientScopeContext;
@@ -149,7 +152,9 @@ public class EfCoreScopeProvider : IEfCoreScopeProvider
         if (_ambientEfCoreScopeStack.AmbientScope is null)
         {
             ScopeContext? newContext = _ambientEfCoreScopeContextStack.AmbientContext == null ? new ScopeContext() : null;
+            IScope parentScope = _scopeProvider.CreateScope(IsolationLevel.Unspecified, repositoryCacheMode, null, null, scopeFileSystems);
             var ambientScope = new EfCoreScope(
+                parentScope,
                 _distributedLockingMechanismFactory,
                 _loggerFactory,
                 _umbracoEfCoreDatabaseFactory,
@@ -158,7 +163,6 @@ public class EfCoreScopeProvider : IEfCoreScopeProvider
                 this,
                 newContext,
                 _eventAggregator,
-                _scopeProvider,
                 repositoryCacheMode,
                 scopeFileSystems);
 
