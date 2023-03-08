@@ -11,7 +11,7 @@ export interface UmbModalConfirmData {
 }
 
 @customElement('umb-confirm-modal')
-export class UmbModalLayoutConfirmElement extends UmbModalLayoutElement<UmbModalConfirmData> {
+export class UmbConfirmModalElement extends UmbModalLayoutElement<UmbModalConfirmData> {
 	static styles = [UUITextStyles];
 
 	private _handleConfirm() {
@@ -42,6 +42,6 @@ export class UmbModalLayoutConfirmElement extends UmbModalLayoutElement<UmbModal
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-confirm-modal': UmbModalLayoutConfirmElement;
+		'umb-confirm-modal': UmbConfirmModalElement;
 	}
 }

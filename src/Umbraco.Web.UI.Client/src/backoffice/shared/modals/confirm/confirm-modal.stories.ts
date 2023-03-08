@@ -3,7 +3,7 @@ import './confirm-modal.element';
 import { Meta, Story } from '@storybook/web-components';
 import { html } from 'lit';
 
-import type { UmbModalLayoutConfirmElement, UmbModalConfirmData } from './confirm-modal.element';
+import type { UmbConfirmModalElement, UmbModalConfirmData } from './confirm-modal.element';
 
 export default {
 	title: 'API/Modals/Layouts/Confirm',
@@ -18,7 +18,7 @@ const positiveData: UmbModalConfirmData = {
 	confirmLabel: 'Publish',
 };
 
-export const Positive: Story<UmbModalLayoutConfirmElement> = () => html`
+export const Positive: Story<UmbConfirmModalElement> = () => html`
 	<!-- TODO: figure out if generics are allowed for properties:
 	https://github.com/runem/lit-analyzer/issues/149
 	https://github.com/runem/lit-analyzer/issues/163 -->
@@ -32,7 +32,7 @@ const dangerData: UmbModalConfirmData = {
 	confirmLabel: 'Delete',
 };
 
-export const Danger: Story<UmbModalLayoutConfirmElement> = () => html`
+export const Danger: Story<UmbConfirmModalElement> = () => html`
 	<!-- TODO: figure out if generics are allowed for properties:
 	https://github.com/runem/lit-analyzer/issues/149
 	https://github.com/runem/lit-analyzer/issues/163 -->
