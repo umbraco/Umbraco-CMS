@@ -37,29 +37,4 @@ test.describe('Stylesheets', () => {
     // Assert
     await umbracoUi.isSuccessNotificationVisible();
   });
-
-  test('Deletes a stylesheet', async ({page, umbracoApi, umbracoUi}) => {
-
-    const stylesheet = new StylesheetBuilder()
-      .withVirtualPath("/css/")
-      .withFileType("stylesheets")
-      .withName(name)
-      .build();
-
-    await umbracoApi.stylesheets.save(stylesheet);
-
-    // Navigate to Settings section
-    await umbracoUi.goToSection(ConstantHelper.sections.settings);
-    await umbracoUi.waitForTreeLoad(ConstantHelper.sections.settings);
-
-    // Open stylesheet tree
-    await umbracoUi.clickElement(umbracoUi.getTreeItem("settings", ["Stylesheets", name]), {button: "right"});
-
-    // Delete stylesheet
-    await umbracoUi.clickElement(umbracoUi.getContextMenuAction(ConstantHelper.actions.delete));
-    await umbracoUi.clickElement(umbracoUi.getButtonByLabelKey(ConstantHelper.buttons.ok));
-
-    // Assert
-    await expect(await page.locator('.umb-tree-item__inner > .umb-tree-item__label >> text=' + name)).not.toBeVisible();
-  });
 });

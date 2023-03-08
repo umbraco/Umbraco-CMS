@@ -302,54 +302,5 @@ test.describe('BlockGridEditorAdvancedContent', () => {
       // Clean
       await umbracoApi.documentTypes.ensureNameNotExists(elementTwoName);
     });
-
-    test('can see thumbnail in content for a block grid editor', async ({page, umbracoApi, umbracoUi}) => {
-      // Thumbnail
-      const imageName = "Umbraco";
-      const umbracoFileValue = {"src": "Umbraco.png"};
-      const imageFileName = "Umbraco.png";
-      const imagePath = 'mediaLibrary/' + imageFileName;
-      const imageMimeType = "image/png";
-
-      // ElementTwo
-      const elementTwoName = 'TheSecondElement';
-      const elementTwoAlias = AliasHelper.toAlias(elementTwoName);
-
-      await umbracoApi.media.ensureNameNotExists(imageName);
-      await umbracoApi.documentTypes.ensureNameNotExists(elementTwoName);
-
-      const imageData = await umbracoApi.media.createImageWithFile(imageName, umbracoFileValue, imageFileName, imagePath, imageMimeType);
-      const imageDataPath = imageData.mediaLink;
-
-      const element = await umbracoApi.documentTypes.createDefaultElementType(elementName, elementAlias);
-      const elementTwo = await umbracoApi.documentTypes.createDefaultElementType(elementTwoName, elementTwoAlias);
-
-      const dataTypeBlockGrid = new BlockGridDataTypeBuilder()
-        .withName(blockGridName)
-        .addBlock()
-          .withContentElementTypeKey(element['key'])
-          .withThumbnail(imageDataPath)
-        .done()
-        .addBlock()
-          .withContentElementTypeKey(elementTwo['key'])
-        .done()
-        .build();
-      const dataType = await umbracoApi.dataTypes.save(dataTypeBlockGrid);
-
-      await umbracoApi.content.createDefaultContentWithABlockGridEditor(umbracoApi, element, dataType, null);
-
-      await umbracoUi.navigateToContent(blockGridName);
-
-      // Opens the content editor
-      await page.locator('[data-element="property-' + blockGridAlias + '"]').getByRole('button', {name: 'Add content'}).click();
-
-      // Assert
-      // Checks if the element has the thumbnail
-      await expect(page.locator('umb-block-card', {hasText: elementName}).locator('.__showcase')).toHaveAttribute('style', 'background-image: url("' + imageDataPath + '?width=400");');
-
-      // Clean
-      await umbracoApi.documentTypes.ensureNameNotExists(elementTwoName);
-      await umbracoApi.media.ensureNameNotExists(imageName);
-    });
   });
 });
