@@ -25,6 +25,7 @@ import type { UmbBasicModalData } from './layouts/basic/modal-layout-basic.eleme
 import { UmbPickerModalData } from './layouts/modal-layout-picker-base';
 import { UmbContextToken } from '@umbraco-cms/context-api';
 import { LanguageModel } from '@umbraco-cms/backend-api';
+import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 
 export type UmbModalType = 'dialog' | 'sidebar';
 
@@ -37,9 +38,14 @@ export interface UmbModalOptions<UmbModalData> {
 // TODO: we should find a way to easily open a modal without adding custom methods to this context. It would result in a better separation of concerns.
 // TODO: move all layouts into their correct "silo" folders. User picker should live with users etc.
 export class UmbModalContext {
+	host: UmbControllerHostInterface;
 	// TODO: Investigate if we can get rid of HTML elements in our store, so we can use one of our states.
 	#modals = new BehaviorSubject(<Array<UmbModalHandler>>[]);
 	public readonly modals = this.#modals.asObservable();
+
+	constructor(host: UmbControllerHostInterface) {
+		this.host = host;
+	}
 
 	/**
 	 * Opens a Confirm modal
@@ -184,7 +190,7 @@ export class UmbModalContext {
 		modalHandler.element = dialog as unknown as UUIModalDialogElement;
 		//TODO END
 
-		modalHandler.element.addEventListener('close-end', () => this._handleCloseEnd(modalHandler));
+		modalHandler.element.addEventListener('close-end', () => this.#onCloseEnd(modalHandler));
 
 		this.#modals.next([...this.#modals.getValue(), modalHandler]);
 		return modalHandler;
@@ -198,10 +204,10 @@ export class UmbModalContext {
 	 * @return {*}  {UmbModalHandler}
 	 * @memberof UmbModalContext
 	 */
-	public open(element: string | HTMLElement, options?: UmbModalOptions<unknown>): UmbModalHandler {
-		const modalHandler = new UmbModalHandler(element, options);
+	public open(modalAlias: string, options?: UmbModalOptions<unknown>): UmbModalHandler {
+		const modalHandler = new UmbModalHandler(this.host, modalAlias, options);
 
-		modalHandler.element.addEventListener('close-end', () => this._handleCloseEnd(modalHandler));
+		modalHandler.containerElement.addEventListener('close-end', () => this.#onCloseEnd(modalHandler));
 
 		this.#modals.next([...this.#modals.getValue(), modalHandler]);
 		return modalHandler;
@@ -223,8 +229,8 @@ export class UmbModalContext {
 	 * @param {UmbModalHandler} modalHandler
 	 * @memberof UmbModalContext
 	 */
-	private _handleCloseEnd(modalHandler: UmbModalHandler) {
-		modalHandler.element.removeEventListener('close-end', () => this._handleCloseEnd(modalHandler));
+	#onCloseEnd(modalHandler: UmbModalHandler) {
+		modalHandler.containerElement.removeEventListener('close-end', () => this.#onCloseEnd(modalHandler));
 		this._close(modalHandler.key);
 	}
 }

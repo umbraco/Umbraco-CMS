@@ -83,7 +83,7 @@ export class UmbBackofficeElement extends UmbLitElement {
 	constructor() {
 		super();
 
-		this.provideContext(UMB_MODAL_CONTEXT_TOKEN, new UmbModalContext());
+		this.provideContext(UMB_MODAL_CONTEXT_TOKEN, new UmbModalContext(this));
 		this.provideContext(UMB_NOTIFICATION_CONTEXT_TOKEN, new UmbNotificationContext());
 
 		// TODO: find a way this is possible outside this element. It needs to be possible to register stores in extensions

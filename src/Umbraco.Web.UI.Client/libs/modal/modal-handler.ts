@@ -2,56 +2,63 @@ import type { UUIDialogElement } from '@umbraco-ui/uui';
 import type { UUIModalDialogElement } from '@umbraco-ui/uui-modal-dialog';
 import type { UUIModalSidebarElement, UUIModalSidebarSize } from '@umbraco-ui/uui-modal-sidebar';
 import { v4 as uuidv4 } from 'uuid';
-
+import { BehaviorSubject } from 'rxjs';
 import { UmbModalOptions } from './modal.context';
+import { createExtensionElement, umbExtensionsRegistry } from '@umbraco-cms/extensions-api';
+import { UmbObserverController } from '@umbraco-cms/observable-api';
+import { UmbControllerHostInterface } from '@umbraco-cms/controller';
+import { ManifestModal } from '@umbraco-cms/extensions-registry';
 
 //TODO consider splitting this into two separate handlers
 export class UmbModalHandler {
 	private _closeResolver: any;
 	private _closePromise: any;
+	#host: UmbControllerHostInterface;
 
-	public element: UUIModalDialogElement | UUIModalSidebarElement;
+	public containerElement: UUIModalDialogElement | UUIModalSidebarElement;
+
+	#element = new BehaviorSubject<unknown | undefined>(undefined);
+	public readonly element = this.#element.asObservable();
+
 	public key: string;
 	public type: string;
 	public size: UUIModalSidebarSize;
 
-	constructor(element: string | HTMLElement, options?: UmbModalOptions<unknown>) {
+	constructor(host: UmbControllerHostInterface, modalAlias: string, options?: UmbModalOptions<unknown>) {
+		this.#host = host;
 		this.key = uuidv4();
 
 		this.type = options?.type || 'dialog';
 		this.size = options?.size || 'small';
-		this.element = this._createElement(element, options);
 
 		// TODO: Consider if its right to use Promises, or use another event based system? Would we need to be able to cancel an event, to then prevent the closing..?
 		this._closePromise = new Promise((resolve) => {
 			this._closeResolver = resolve;
 		});
+
+		this.containerElement = this.#createContainerElement();
+		this.#observeModal(modalAlias, options?.data);
 	}
 
-	private _createElement(element: string | HTMLElement, options?: UmbModalOptions<unknown>) {
-		const layoutElement = this._createLayoutElement(element, options?.data);
-		return this.type === 'sidebar'
-			? this._createSidebarElement(layoutElement)
-			: this._createDialogElement(layoutElement);
+	#createContainerElement() {
+		return this.type === 'sidebar' ? this.#createSidebarElement() : this.#createDialogElement();
 	}
 
-	private _createSidebarElement(layoutElement: HTMLElement) {
+	#createSidebarElement() {
 		const sidebarElement = document.createElement('uui-modal-sidebar');
-		sidebarElement.appendChild(layoutElement);
 		sidebarElement.size = this.size;
 		return sidebarElement;
 	}
 
-	private _createDialogElement(layoutElement: HTMLElement) {
+	#createDialogElement() {
 		const modalDialogElement = document.createElement('uui-modal-dialog');
 		const dialogElement: UUIDialogElement = document.createElement('uui-dialog');
 		modalDialogElement.appendChild(dialogElement);
-		dialogElement.appendChild(layoutElement);
 		return modalDialogElement;
 	}
 
-	private _createLayoutElement(element: string | HTMLElement, data: unknown) {
-		const layoutElement: any = element instanceof HTMLElement ? element : document.createElement(element);
+	async #createLayoutElement(manifest: ManifestModal, data: unknown) {
+		const layoutElement = (await createExtensionElement(manifest)) as any;
 		layoutElement.data = data;
 		layoutElement.modalHandler = this;
 		return layoutElement;
@@ -59,10 +66,30 @@ export class UmbModalHandler {
 
 	public close(...args: any) {
 		this._closeResolver(...args);
-		this.element.close();
+		this.containerElement.close();
 	}
 
 	public onClose(): Promise<any> {
 		return this._closePromise;
+	}
+
+	/* TODO: modals being part of the extension registry know means that a modal element can change over time.
+	 It makes this code a bit more complex. The main idea is to have the element as part of the modalHandler so it is possible to dispatch events from within the modal element to the one that opened it.
+	 Now when the element is an observable it makes it more complex because this host needs to subscribe to updates to the element, instead of just having a reference to it.
+	 If we find a better generic solution to communicate between the modal and the host, then we can remove the element as part of the modalHandler. */
+	#observeModal(modalAlias: string, data: unknown) {
+		new UmbObserverController(
+			this.#host,
+			umbExtensionsRegistry.getByTypeAndAlias('modal', modalAlias),
+			async (manifest) => {
+				if (manifest) {
+					const element = await this.#createLayoutElement(manifest, data);
+					this.#element.next(element);
+					this.containerElement.appendChild(element);
+				} else {
+					this.#element.next(undefined);
+				}
+			}
+		);
 	}
 }
