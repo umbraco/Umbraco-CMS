@@ -1,10 +1,10 @@
 import '../../components/body-layout/body-layout.element';
-import './modal-layout-link-picker.element';
+import './link-picker-modal.element';
 
 import { Meta, Story } from '@storybook/web-components';
 import { html } from 'lit';
 
-import type { UmbLinkPickerModalElement } from './modal-layout-link-picker.element';
+import type { UmbLinkPickerModalElement } from './link-picker-modal.element';
 
 export default {
 	title: 'API/Modals/Layouts/Link Picker',
