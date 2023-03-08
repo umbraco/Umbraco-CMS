@@ -7,7 +7,7 @@ import '../../src/backoffice/users/current-user/modals/current-user/current-user
 import '../../src/backoffice/shared/modals/icon-picker/icon-picker-modal.element';
 import '../../src/backoffice/settings/languages/language-picker/language-picker-modal-layout.element';
 import '../../src/backoffice/shared/modals/link-picker/link-picker-modal.element';
-import '../../src/backoffice/shared/modals/basic/modal-layout-basic.element';
+import '../../src/backoffice/shared/modals/basic/basic-modal.element';
 import './layouts/search/modal-layout-search.element.ts';
 
 import { UUIModalSidebarSize } from '@umbraco-ui/uui-modal-sidebar';
@@ -21,7 +21,7 @@ import type { UmbModalPropertyEditorUIPickerData } from './layouts/property-edit
 import { UmbMediaPickerModalData } from '../../src/backoffice/media/media/modals/media-picker';
 import type { UmbLinkPickerModalData } from '../../src/backoffice/shared/modals/link-picker/link-picker-modal.element';
 import { UmbModalHandler } from './modal-handler';
-import type { UmbBasicModalData } from '../../src/backoffice/shared/modals/basic/modal-layout-basic.element';
+import type { UmbBasicModalData } from '../../src/backoffice/shared/modals/basic/basic-modal.element';
 import { UmbPickerModalData } from './layouts/modal-layout-picker-base';
 import { UmbModalToken } from './token/modal-token';
 import { UmbContextToken } from '@umbraco-cms/context-api';
