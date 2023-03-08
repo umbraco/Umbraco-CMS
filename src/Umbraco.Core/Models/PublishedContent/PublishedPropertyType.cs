@@ -190,13 +190,7 @@ namespace Umbraco.Cms.Core.Models.PublishedContent
             }
 
             _cacheLevel = _converter?.GetPropertyCacheLevel(this) ?? PropertyCacheLevel.Snapshot;
-            Type modelClrType = _converter == null ? typeof (object) : _converter.GetPropertyValueType(this);
-            if(modelClrType == null)
-            {
-                throw new ArgumentNullException($"Unable to map DataType with Id {DataType.Id} to a C# type.");
-            }
-
-            _modelClrType= modelClrType;
+            _modelClrType = _converter?.GetPropertyValueType(this) ?? typeof(object);
         }
 
         /// <inheritdoc />
