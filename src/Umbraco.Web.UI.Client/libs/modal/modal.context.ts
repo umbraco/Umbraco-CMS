@@ -13,26 +13,26 @@ import './layouts/search/modal-layout-search.element.ts';
 import { UUIModalSidebarSize } from '@umbraco-ui/uui-modal-sidebar';
 import { BehaviorSubject } from 'rxjs';
 import type { UUIModalDialogElement } from '@umbraco-ui/uui-modal-dialog';
+import type { UmbModalDocumentPickerData } from '../../src/backoffice/documents/documents/modals/document-picker';
 import { UmbModalChangePasswordData } from './layouts/modal-layout-change-password.element';
 import type { UmbModalIconPickerData } from './layouts/icon-picker/modal-layout-icon-picker.element';
 import type { UmbModalConfirmData } from './layouts/confirm/modal-layout-confirm.element';
-import type { UmbModalContentPickerData } from '../../src/backoffice/documents/documents/modals/document-picker/document-picker-modal.element';
 import type { UmbModalPropertyEditorUIPickerData } from './layouts/property-editor-ui-picker/modal-layout-property-editor-ui-picker.element';
 import type { UmbModalMediaPickerData } from './layouts/media-picker/modal-layout-media-picker.element';
 import type { UmbModalLinkPickerData } from './layouts/link-picker/modal-layout-link-picker.element';
 import { UmbModalHandler } from './modal-handler';
 import type { UmbBasicModalData } from './layouts/basic/modal-layout-basic.element';
 import { UmbPickerModalData } from './layouts/modal-layout-picker-base';
+import { UmbModalToken } from './token/modal-token';
 import { UmbContextToken } from '@umbraco-cms/context-api';
 import { LanguageModel } from '@umbraco-cms/backend-api';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 
 export type UmbModalType = 'dialog' | 'sidebar';
 
-export interface UmbModalOptions<UmbModalData> {
+export interface UmbModalConfig {
 	type?: UmbModalType;
 	size?: UUIModalSidebarSize;
-	data?: UmbModalData;
 }
 
 // TODO: we should find a way to easily open a modal without adding custom methods to this context. It would result in a better separation of concerns.
@@ -61,11 +61,11 @@ export class UmbModalContext {
 	/**
 	 * Opens a Content Picker sidebar modal
 	 * @public
-	 * @param {UmbModalContentPickerData} [data]
+	 * @param {UmbModalDocumentPickerData} [data]
 	 * @return {*}  {UmbModalHandler}
 	 * @memberof UmbModalContext
 	 */
-	public documentPicker(data?: UmbModalContentPickerData): UmbModalHandler {
+	public documentPicker(data?: UmbModalDocumentPickerData): UmbModalHandler {
 		return this.open('umb-document-picker-modal', { data, type: 'sidebar', size: 'small' });
 	}
 
@@ -204,8 +204,8 @@ export class UmbModalContext {
 	 * @return {*}  {UmbModalHandler}
 	 * @memberof UmbModalContext
 	 */
-	public open(modalAlias: string, options?: UmbModalOptions<unknown>): UmbModalHandler {
-		const modalHandler = new UmbModalHandler(this.host, modalAlias, options);
+	public open<T = unknown>(modalAlias: string | UmbModalToken<T>, data: T, config?: UmbModalConfig): UmbModalHandler {
+		const modalHandler = new UmbModalHandler(this.host, modalAlias, data, config);
 
 		modalHandler.containerElement.addEventListener('close-end', () => this.#onCloseEnd(modalHandler));
 

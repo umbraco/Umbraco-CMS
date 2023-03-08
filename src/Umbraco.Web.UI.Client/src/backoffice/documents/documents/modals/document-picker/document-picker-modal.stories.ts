@@ -4,7 +4,8 @@ import './document-picker-modal.element';
 import { Meta, Story } from '@storybook/web-components';
 import { html } from 'lit';
 
-import type { UmbDocumentPickerModalElement, UmbModalContentPickerData } from './document-picker-modal.element';
+import type { UmbDocumentPickerModalElement } from './document-picker-modal.element';
+import type { UmbModalDocumentPickerData } from './index';
 
 export default {
 	title: 'API/Modals/Layouts/Content Picker',
@@ -12,7 +13,7 @@ export default {
 	id: 'umb-document-picker-modal',
 } as Meta;
 
-const data: UmbModalContentPickerData = {
+const data: UmbModalDocumentPickerData = {
 	multiple: true,
 	selection: [],
 };

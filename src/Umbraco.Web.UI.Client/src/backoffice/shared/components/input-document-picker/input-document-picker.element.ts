@@ -9,6 +9,7 @@ import type { UmbDocumentTreeStore } from '../../../documents/documents/reposito
 import { UmbLitElement } from '@umbraco-cms/element';
 import type { DocumentTreeItemModel, FolderTreeItemModel } from '@umbraco-cms/backend-api';
 import type { UmbObserverController } from '@umbraco-cms/observable-api';
+import { UMB_DOCUMENT_PICKER_MODAL_TOKEN } from 'src/backoffice/documents/documents/modals/document-picker';
 
 @customElement('umb-input-document-picker')
 export class UmbInputDocumentPickerElement extends FormControlMixin(UmbLitElement) {
@@ -121,13 +122,9 @@ export class UmbInputDocumentPickerElement extends FormControlMixin(UmbLitElemen
 
 	private _openPicker() {
 		// We send a shallow copy(good enough as its just an array of keys) of our this._selectedKeys, as we don't want the modal to manipulate our data:
-		const modalHandler = this._modalContext?.open('Umb.Modal.DocumentPicker', {
-			data: {
-				multiple: this.max === 1 ? false : true,
-				selection: [...this._selectedKeys],
-			},
-			type: 'sidebar',
-			size: 'small',
+		const modalHandler = this._modalContext?.open(UMB_DOCUMENT_PICKER_MODAL_TOKEN, {
+			multiple: this.max === 1 ? false : true,
+			selection: [...this._selectedKeys],
 		});
 
 		modalHandler?.onClose().then(({ selection }: any) => {

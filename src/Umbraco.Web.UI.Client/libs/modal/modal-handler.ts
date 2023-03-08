@@ -3,7 +3,8 @@ import type { UUIModalDialogElement } from '@umbraco-ui/uui-modal-dialog';
 import type { UUIModalSidebarElement, UUIModalSidebarSize } from '@umbraco-ui/uui-modal-sidebar';
 import { v4 as uuidv4 } from 'uuid';
 import { BehaviorSubject } from 'rxjs';
-import { UmbModalOptions } from './modal.context';
+import { UmbModalConfig, UmbModalType } from './modal.context';
+import { UmbModalToken } from './token/modal-token';
 import { createExtensionElement, umbExtensionsRegistry } from '@umbraco-cms/extensions-api';
 import { UmbObserverController } from '@umbraco-cms/observable-api';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
@@ -21,15 +22,25 @@ export class UmbModalHandler {
 	public readonly element = this.#element.asObservable();
 
 	public key: string;
-	public type: string;
-	public size: UUIModalSidebarSize;
+	public type: UmbModalType = 'dialog';
+	public size: UUIModalSidebarSize = 'small';
 
-	constructor(host: UmbControllerHostInterface, modalAlias: string, options?: UmbModalOptions<unknown>) {
+	constructor(
+		host: UmbControllerHostInterface,
+		modalAlias: string | UmbModalToken,
+		data: unknown,
+		config?: UmbModalConfig
+	) {
 		this.#host = host;
 		this.key = uuidv4();
 
-		this.type = options?.type || 'dialog';
-		this.size = options?.size || 'small';
+		if (modalAlias instanceof UmbModalToken) {
+			this.type = modalAlias.getDefaultConfig().type || this.type;
+			this.size = modalAlias.getDefaultConfig().size || this.size;
+		}
+
+		this.type = config?.type || this.type;
+		this.size = config?.size || this.size;
 
 		// TODO: Consider if its right to use Promises, or use another event based system? Would we need to be able to cancel an event, to then prevent the closing..?
 		this._closePromise = new Promise((resolve) => {
@@ -37,7 +48,7 @@ export class UmbModalHandler {
 		});
 
 		this.containerElement = this.#createContainerElement();
-		this.#observeModal(modalAlias, options?.data);
+		this.#observeModal(modalAlias.toString(), data);
 	}
 
 	#createContainerElement() {
