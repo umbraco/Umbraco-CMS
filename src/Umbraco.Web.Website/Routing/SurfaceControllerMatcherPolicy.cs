@@ -25,15 +25,8 @@ internal class SurfaceControllerMatcherPolicy : MatcherPolicy, IEndpointSelector
 
     public Task ApplyAsync(HttpContext httpContext, CandidateSet candidates)
     {
-        if (httpContext == null)
-        {
-            throw new ArgumentNullException(nameof(httpContext));
-        }
-
-        if (candidates == null)
-        {
-            throw new ArgumentNullException(nameof(candidates));
-        }
+        ArgumentNullException.ThrowIfNull(nameof(httpContext));
+        ArgumentNullException.ThrowIfNull(nameof(candidates));
 
         if (candidates.Count < 2)
         {
@@ -83,14 +76,16 @@ internal class SurfaceControllerMatcherPolicy : MatcherPolicy, IEndpointSelector
     {
         for (var i = 0; i < candidates.Count; i++)
         {
-            CandidateState candidate = candidates[i];
-
-            ControllerActionDescriptor? controllerActionDescriptor =
-                candidate.Endpoint?.Metadata.GetMetadata<ControllerActionDescriptor>();
-
-            if (controllerActionDescriptor?.ControllerTypeInfo.IsType<SurfaceController>() == true)
+            if (candidates.IsValidCandidate(i))
             {
-                return i;
+                CandidateState candidate = candidates[i];
+                ControllerActionDescriptor? controllerActionDescriptor =
+                    candidate.Endpoint?.Metadata.GetMetadata<ControllerActionDescriptor>();
+
+                if (controllerActionDescriptor?.ControllerTypeInfo.IsType<SurfaceController>() == true)
+                {
+                    return i;
+                }
             }
         }
 
