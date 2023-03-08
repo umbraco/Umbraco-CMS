@@ -1,10 +1,10 @@
 import '../../components/body-layout/body-layout.element';
-import './modal-layout-icon-picker.element';
+import './icon-picker-modal.element';
 
 import { Meta, Story } from '@storybook/web-components';
 import { html } from 'lit';
 
-import type { UmbModalLayoutIconPickerElement, UmbModalIconPickerData } from './modal-layout-icon-picker.element';
+import type { UmbModalLayoutIconPickerElement, UmbModalIconPickerData } from './icon-picker-modal.element';
 
 export default {
 	title: 'API/Modals/Layouts/Icon Picker',

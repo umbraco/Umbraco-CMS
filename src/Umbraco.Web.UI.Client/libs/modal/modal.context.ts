@@ -4,7 +4,7 @@ import '../../src/backoffice/documents/documents/modals/document-picker/document
 import './layouts/media-picker/modal-layout-media-picker.element';
 import './layouts/property-editor-ui-picker/modal-layout-property-editor-ui-picker.element';
 import '../../src/backoffice/users/current-user/modals/current-user/current-user-modal.element';
-import '../../src/backoffice/shared/modals/icon-picker/modal-layout-icon-picker.element';
+import '../../src/backoffice/shared/modals/icon-picker/icon-picker-modal.element';
 import '../../src/backoffice/settings/languages/language-picker/language-picker-modal-layout.element';
 import './layouts/link-picker/modal-layout-link-picker.element';
 import './layouts/basic/modal-layout-basic.element';
@@ -15,7 +15,7 @@ import { BehaviorSubject } from 'rxjs';
 import type { UUIModalDialogElement } from '@umbraco-ui/uui-modal-dialog';
 import type { UmbModalDocumentPickerData } from '../../src/backoffice/documents/documents/modals/document-picker';
 import { UmbModalChangePasswordData } from './layouts/modal-layout-change-password.element';
-import type { UmbModalIconPickerData } from '../../src/backoffice/shared/modals/icon-picker/modal-layout-icon-picker.element';
+import type { UmbModalIconPickerData } from '../../src/backoffice/shared/modals/icon-picker/icon-picker-modal.element';
 import type { UmbModalConfirmData } from './layouts/confirm/modal-layout-confirm.element';
 import type { UmbModalPropertyEditorUIPickerData } from './layouts/property-editor-ui-picker/modal-layout-property-editor-ui-picker.element';
 import type { UmbModalMediaPickerData } from './layouts/media-picker/modal-layout-media-picker.element';
