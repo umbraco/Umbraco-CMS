@@ -9,6 +9,7 @@ import { UmbChangeEvent } from '@umbraco-cms/events';
 import { UmbLitElement } from '@umbraco-cms/element';
 import type { LanguageModel } from '@umbraco-cms/backend-api';
 import type { UmbObserverController } from '@umbraco-cms/observable-api';
+import { UMB_CONFIRM_MODAL_TOKEN } from '../../modals/confirm';
 
 @customElement('umb-input-language-picker')
 export class UmbInputLanguagePickerElement extends FormControlMixin(UmbLitElement) {
@@ -131,7 +132,7 @@ export class UmbInputLanguagePickerElement extends FormControlMixin(UmbLitElemen
 	}
 
 	private _removeItem(item: LanguageModel) {
-		const modalHandler = this._modalContext?.confirm({
+		const modalHandler = this._modalContext?.open(UMB_CONFIRM_MODAL_TOKEN, {
 			color: 'danger',
 			headline: `Remove ${item.name}?`,
 			content: 'Are you sure you want to remove this item',

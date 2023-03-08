@@ -8,6 +8,7 @@ import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN } from '../../../../../libs/mo
 import { PublishedCacheResource } from '@umbraco-cms/backend-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/resources';
 import { UmbLitElement } from '@umbraco-cms/element';
+import { UMB_CONFIRM_MODAL_TOKEN } from 'src/backoffice/shared/modals/confirm';
 
 @customElement('umb-dashboard-published-status')
 export class UmbDashboardPublishedStatusElement extends UmbLitElement {
@@ -82,7 +83,7 @@ export class UmbDashboardPublishedStatusElement extends UmbLitElement {
 		}
 	}
 	private async _onReloadCacheHandler() {
-		const modalHandler = this._modalContext?.confirm({
+		const modalHandler = this._modalContext?.open(UMB_CONFIRM_MODAL_TOKEN, {
 			headline: 'Reload',
 			content: html` Trigger a in-memory and local file cache reload on all servers. `,
 			color: 'danger',
@@ -105,7 +106,7 @@ export class UmbDashboardPublishedStatusElement extends UmbLitElement {
 	}
 
 	private async _onRebuildCacheHandler() {
-		const modalHandler = this._modalContext?.confirm({
+		const modalHandler = this._modalContext?.open(UMB_CONFIRM_MODAL_TOKEN, {
 			headline: 'Rebuild',
 			content: html` Rebuild content in cmsContentNu database table. Expensive.`,
 			color: 'danger',

@@ -4,6 +4,7 @@ import { isManifestElementNameType, umbExtensionsRegistry } from '@umbraco-cms/e
 import type { ManifestBase } from '@umbraco-cms/models';
 import { UmbLitElement } from '@umbraco-cms/element';
 import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN } from 'libs/modal';
+import { UMB_CONFIRM_MODAL_TOKEN } from 'src/backoffice/shared/modals/confirm';
 
 @customElement('umb-extension-root-workspace')
 export class UmbExtensionRootWorkspaceElement extends UmbLitElement {
@@ -28,7 +29,7 @@ export class UmbExtensionRootWorkspaceElement extends UmbLitElement {
 	}
 
 	#removeExtension(extension: ManifestBase) {
-		const modalHandler = this._modalContext?.confirm({
+		const modalHandler = this._modalContext?.open(UMB_CONFIRM_MODAL_TOKEN, {
 			headline: 'Unload extension',
 			confirmLabel: 'Unload',
 			content: html`<p>Are you sure you want to unload the extension <strong>${extension.alias}</strong>?</p>`,

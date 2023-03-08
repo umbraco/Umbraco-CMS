@@ -11,6 +11,7 @@ import './section-view-examine-searchers';
 import { HealthStatusModel, IndexModel, IndexerResource } from '@umbraco-cms/backend-api';
 import { UmbLitElement } from '@umbraco-cms/element';
 import { tryExecuteAndNotify } from '@umbraco-cms/resources';
+import { UMB_CONFIRM_MODAL_TOKEN } from 'src/backoffice/shared/modals/confirm';
 
 @customElement('umb-dashboard-examine-index')
 export class UmbDashboardExamineIndexElement extends UmbLitElement {
@@ -120,7 +121,7 @@ export class UmbDashboardExamineIndexElement extends UmbLitElement {
 	}
 
 	private async _onRebuildHandler() {
-		const modalHandler = this._modalContext?.confirm({
+		const modalHandler = this._modalContext?.open(UMB_CONFIRM_MODAL_TOKEN, {
 			headline: `Rebuild ${this.indexName}`,
 			content: html`
 				This will cause the index to be rebuilt.<br />

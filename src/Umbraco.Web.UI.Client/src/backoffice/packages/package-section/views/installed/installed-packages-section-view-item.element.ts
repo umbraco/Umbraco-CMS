@@ -12,6 +12,7 @@ import { UmbLitElement } from '@umbraco-cms/element';
 import { tryExecuteAndNotify } from '@umbraco-cms/resources';
 import { PackageResource } from '@umbraco-cms/backend-api';
 import { UmbNotificationContext, UMB_NOTIFICATION_CONTEXT_TOKEN } from '@umbraco-cms/notification';
+import { UMB_CONFIRM_MODAL_TOKEN } from 'src/backoffice/shared/modals/confirm';
 
 @customElement('umb-installed-packages-section-view-item')
 export class UmbInstalledPackagesSectionViewItem extends UmbLitElement {
@@ -81,7 +82,7 @@ export class UmbInstalledPackagesSectionViewItem extends UmbLitElement {
 
 	async _onMigration() {
 		if (!this.name) return;
-		const modalHandler = this._modalContext?.confirm({
+		const modalHandler = this._modalContext?.open(UMB_CONFIRM_MODAL_TOKEN, {
 			color: 'positive',
 			headline: `Run migrations for ${this.name}?`,
 			content: `Do you want to start run migrations for ${this.name}`,

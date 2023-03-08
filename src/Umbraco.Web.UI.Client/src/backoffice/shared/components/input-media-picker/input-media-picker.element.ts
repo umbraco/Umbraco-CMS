@@ -9,6 +9,7 @@ import { UmbLitElement } from '@umbraco-cms/element';
 import type { EntityTreeItemModel, FolderTreeItemModel } from '@umbraco-cms/backend-api';
 import type { UmbObserverController } from '@umbraco-cms/observable-api';
 import { UMB_MEDIA_PICKER_MODAL_TOKEN } from 'src/backoffice/media/media/modals/media-picker';
+import { UMB_CONFIRM_MODAL_TOKEN } from '../../modals/confirm';
 
 @customElement('umb-input-media-picker')
 export class UmbInputMediaPickerElement extends FormControlMixin(UmbLitElement) {
@@ -147,7 +148,7 @@ export class UmbInputMediaPickerElement extends FormControlMixin(UmbLitElement) 
 	}
 
 	private _removeItem(item: FolderTreeItemModel) {
-		const modalHandler = this._modalContext?.confirm({
+		const modalHandler = this._modalContext?.open(UMB_CONFIRM_MODAL_TOKEN, {
 			color: 'danger',
 			headline: `Remove ${item.name}?`,
 			content: 'Are you sure you want to remove this item',

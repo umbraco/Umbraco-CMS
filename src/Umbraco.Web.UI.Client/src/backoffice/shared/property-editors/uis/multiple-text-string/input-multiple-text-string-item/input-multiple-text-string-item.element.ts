@@ -7,6 +7,7 @@ import { UUIInputElement } from '@umbraco-ui/uui';
 import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN } from '../../../../../../../libs/modal';
 import { UmbChangeEvent, UmbInputEvent, UmbDeleteEvent } from '@umbraco-cms/events';
 import { UmbLitElement } from '@umbraco-cms/element';
+import { UMB_CONFIRM_MODAL_TOKEN } from 'src/backoffice/shared/modals/confirm';
 
 /**
  * @element umb-input-multiple-text-string-item
@@ -65,7 +66,7 @@ export class UmbInputMultipleTextStringItemElement extends FormControlMixin(UmbL
 	}
 
 	#onDelete() {
-		const modalHandler = this._modalContext?.confirm({
+		const modalHandler = this._modalContext?.open(UMB_CONFIRM_MODAL_TOKEN, {
 			headline: `Delete ${this.value || 'item'}`,
 			content: 'Are you sure you want to delete this item?',
 			color: 'danger',

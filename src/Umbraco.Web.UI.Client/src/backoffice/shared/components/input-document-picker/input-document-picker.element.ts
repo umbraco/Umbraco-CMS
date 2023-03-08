@@ -10,6 +10,7 @@ import { UmbLitElement } from '@umbraco-cms/element';
 import type { DocumentTreeItemModel, FolderTreeItemModel } from '@umbraco-cms/backend-api';
 import type { UmbObserverController } from '@umbraco-cms/observable-api';
 import { UMB_DOCUMENT_PICKER_MODAL_TOKEN } from 'src/backoffice/documents/documents/modals/document-picker';
+import { UMB_CONFIRM_MODAL_TOKEN } from '../../modals/confirm';
 
 @customElement('umb-input-document-picker')
 export class UmbInputDocumentPickerElement extends FormControlMixin(UmbLitElement) {
@@ -133,7 +134,7 @@ export class UmbInputDocumentPickerElement extends FormControlMixin(UmbLitElemen
 	}
 
 	private _removeItem(item: FolderTreeItemModel) {
-		const modalHandler = this._modalContext?.confirm({
+		const modalHandler = this._modalContext?.open(UMB_CONFIRM_MODAL_TOKEN, {
 			color: 'danger',
 			headline: `Remove ${item.name}?`,
 			content: 'Are you sure you want to remove this item',

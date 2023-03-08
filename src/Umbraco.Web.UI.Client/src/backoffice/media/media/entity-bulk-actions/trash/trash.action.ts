@@ -4,6 +4,7 @@ import { UmbEntityBulkActionBase } from '@umbraco-cms/entity-action';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 import { UmbContextConsumerController } from '@umbraco-cms/context-api';
 import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN } from 'libs/modal';
+import { UMB_CONFIRM_MODAL_TOKEN } from 'src/backoffice/shared/modals/confirm';
 
 export class UmbMediaTrashEntityBulkAction extends UmbEntityBulkActionBase<UmbMediaRepository> {
 	#modalContext?: UmbModalContext;
@@ -25,7 +26,7 @@ export class UmbMediaTrashEntityBulkAction extends UmbEntityBulkActionBase<UmbMe
 
 		if (data) {
 			// TODO: use correct markup
-			const modalHandler = this.#modalContext?.confirm({
+			const modalHandler = this.#modalContext?.open(UMB_CONFIRM_MODAL_TOKEN, {
 				headline: `Deleting ${this.selection.length} items`,
 				content: html`
 					This will delete the following files:
