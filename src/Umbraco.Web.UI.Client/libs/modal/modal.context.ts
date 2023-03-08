@@ -18,7 +18,7 @@ import { UmbModalChangePasswordData } from './layouts/modal-layout-change-passwo
 import { UmbIconPickerModalData } from '../../src/backoffice/shared/modals/icon-picker';
 import type { UmbModalConfirmData } from './layouts/confirm/modal-layout-confirm.element';
 import type { UmbModalPropertyEditorUIPickerData } from './layouts/property-editor-ui-picker/modal-layout-property-editor-ui-picker.element';
-import type { UmbModalMediaPickerData } from '../../src/backoffice/media/media/modals/media-picker/media-picker-modal.element';
+import { UmbMediaPickerModalData } from '../../src/backoffice/media/media/modals/media-picker';
 import type { UmbModalLinkPickerData } from './layouts/link-picker/modal-layout-link-picker.element';
 import { UmbModalHandler } from './modal-handler';
 import type { UmbBasicModalData } from './layouts/basic/modal-layout-basic.element';
@@ -72,11 +72,11 @@ export class UmbModalContext {
 	/**
 	 * Opens a Media Picker sidebar modal
 	 * @public
-	 * @param {UmbModalMediaPickerData} [data]
+	 * @param {UmbMediaPickerModalData} [data]
 	 * @return {*}  {UmbModalHandler}
 	 * @memberof UmbModalContext
 	 */
-	public mediaPicker(data?: UmbModalMediaPickerData): UmbModalHandler {
+	public mediaPicker(data?: UmbMediaPickerModalData): UmbModalHandler {
 		return this.open('umb-modal-layout-media-picker', { data, type: 'sidebar', size: 'small' });
 	}
 

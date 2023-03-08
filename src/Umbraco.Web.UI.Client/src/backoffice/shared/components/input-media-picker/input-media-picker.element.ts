@@ -8,6 +8,7 @@ import { UmbMediaRepository } from '../../../media/media/repository/media.reposi
 import { UmbLitElement } from '@umbraco-cms/element';
 import type { EntityTreeItemModel, FolderTreeItemModel } from '@umbraco-cms/backend-api';
 import type { UmbObserverController } from '@umbraco-cms/observable-api';
+import { UMB_MEDIA_PICKER_MODAL_TOKEN } from 'src/backoffice/media/media/modals/media-picker';
 
 @customElement('umb-input-media-picker')
 export class UmbInputMediaPickerElement extends FormControlMixin(UmbLitElement) {
@@ -135,10 +136,11 @@ export class UmbInputMediaPickerElement extends FormControlMixin(UmbLitElement) 
 
 	private _openPicker() {
 		// We send a shallow copy(good enough as its just an array of keys) of our this._selectedKeys, as we don't want the modal to manipulate our data:
-		const modalHandler = this._modalContext?.mediaPicker({
+		const modalHandler = this._modalContext?.open(UMB_MEDIA_PICKER_MODAL_TOKEN, {
 			multiple: this.max === 1 ? false : true,
 			selection: [...this._selectedKeys],
 		});
+
 		modalHandler?.onClose().then(({ selection }: any) => {
 			this._setSelection(selection);
 		});
