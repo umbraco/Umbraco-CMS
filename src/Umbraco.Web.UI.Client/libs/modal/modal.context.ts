@@ -14,7 +14,7 @@ import { UUIModalSidebarSize } from '@umbraco-ui/uui-modal-sidebar';
 import { BehaviorSubject } from 'rxjs';
 import type { UUIModalDialogElement } from '@umbraco-ui/uui-modal-dialog';
 import type { UmbModalDocumentPickerData } from '../../src/backoffice/documents/documents/modals/document-picker';
-import { UmbModalChangePasswordData } from './layouts/modal-layout-change-password.element';
+import { UmbModalChangePasswordData } from '../../src/backoffice/users/current-user/modals/change-password/modal-layout-change-password.element';
 import { UmbIconPickerModalData } from '../../src/backoffice/shared/modals/icon-picker';
 import type { UmbModalConfirmData } from './layouts/confirm/modal-layout-confirm.element';
 import type { UmbModalPropertyEditorUIPickerData } from './layouts/property-editor-ui-picker/modal-layout-property-editor-ui-picker.element';
