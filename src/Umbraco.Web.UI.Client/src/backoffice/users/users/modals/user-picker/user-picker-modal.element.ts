@@ -5,8 +5,8 @@ import { UmbModalLayoutPickerBase } from '../../../../../../libs/modal/layouts/m
 import { UmbUserStore, UMB_USER_STORE_CONTEXT_TOKEN } from '../../user.store';
 import type { UserDetails } from '@umbraco-cms/models';
 
-@customElement('umb-picker-layout-user')
-export class UmbPickerLayoutUserElement extends UmbModalLayoutPickerBase<UserDetails> {
+@customElement('umb-user-picker-modal')
+export class UmbUserPickerModalElement extends UmbModalLayoutPickerBase<UserDetails> {
 	static styles = [
 		UUITextStyles,
 		css`
@@ -105,8 +105,10 @@ export class UmbPickerLayoutUserElement extends UmbModalLayoutPickerBase<UserDet
 	}
 }
 
+export default UmbUserPickerModalElement;
+
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-picker-layout-user': UmbPickerLayoutUserElement;
+		'umb-user-picker-modal': UmbUserPickerModalElement;
 	}
 }
