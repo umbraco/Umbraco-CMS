@@ -1,14 +1,14 @@
 import { css, html } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, state } from 'lit/decorators.js';
-import { UmbModalLayoutElement } from '../modal-layout.element';
+import { UmbModalLayoutElement } from '../../../../../../libs/modal/layouts/modal-layout.element';
 
 export interface UmbModalMediaPickerData {
 	multiple?: boolean;
 	selection: Array<string>;
 }
 
-import { UmbTreeElement } from '../../../../src/backoffice/shared/components/tree/tree.element';
+import { UmbTreeElement } from '../../../../shared/components/tree/tree.element';
 
 @customElement('umb-modal-layout-media-picker')
 export class UmbModalLayoutMediaPickerElement extends UmbModalLayoutElement<UmbModalMediaPickerData> {
