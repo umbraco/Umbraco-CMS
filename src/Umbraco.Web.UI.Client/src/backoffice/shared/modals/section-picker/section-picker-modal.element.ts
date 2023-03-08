@@ -5,8 +5,8 @@ import { UmbModalLayoutPickerBase } from '../../../../../libs/modal/layouts/moda
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-api';
 import type { ManifestSection } from '@umbraco-cms/models';
 
-@customElement('umb-picker-layout-section')
-export class UmbPickerLayoutSectionElement extends UmbModalLayoutPickerBase<ManifestSection> {
+@customElement('umb-section-picker-modal')
+export class UmbSectionPickerModalElement extends UmbModalLayoutPickerBase<ManifestSection> {
 	static styles = [
 		UUITextStyles,
 		css`
@@ -91,10 +91,10 @@ export class UmbPickerLayoutSectionElement extends UmbModalLayoutPickerBase<Mani
 	}
 }
 
-export default UmbPickerLayoutSectionElement;
+export default UmbSectionPickerModalElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-picker-layout-section': UmbPickerLayoutSectionElement;
+		'umb-section-picker-modal': UmbSectionPickerModalElement;
 	}
 }

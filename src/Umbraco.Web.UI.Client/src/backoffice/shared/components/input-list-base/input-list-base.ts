@@ -2,7 +2,7 @@ import { html } from 'lit';
 import { property } from 'lit/decorators.js';
 import { UUIModalSidebarSize } from '@umbraco-ui/uui-modal-sidebar';
 import { UmbPickerModalData } from '../../../../../libs/modal/layouts/modal-layout-picker-base';
-import { UmbModalContext, UmbModalType, UMB_MODAL_CONTEXT_TOKEN } from '../../../../../libs/modal';
+import { UmbModalContext, UmbModalToken, UmbModalType, UMB_MODAL_CONTEXT_TOKEN } from '../../../../../libs/modal';
 
 //TODO: These should probably be imported dynamically.
 import '../../modals/section-picker/section-picker-modal.element';
@@ -24,7 +24,7 @@ export class UmbInputListBase extends UmbLitElement {
 	@property({ type: String })
 	public modalSize: UUIModalSidebarSize = 'small';
 
-	protected pickerLayout?: string;
+	protected pickerToken?: UmbModalToken;
 	private _modalContext?: UmbModalContext;
 
 	constructor() {
@@ -35,16 +35,13 @@ export class UmbInputListBase extends UmbLitElement {
 	}
 
 	private _openPicker() {
-		if (!this.pickerLayout) return;
+		if (!this.pickerToken) return;
 
-		const modalHandler = this._modalContext?.open(this.pickerLayout, {
-			type: this.modalType,
-			size: this.modalSize,
-			data: {
-				multiple: this.multiple,
-				selection: this.value,
-			},
+		const modalHandler = this._modalContext?.open(this.pickerToken, {
+			multiple: this.multiple,
+			selection: this.value,
 		});
+
 		modalHandler?.onClose().then((data: UmbPickerModalData<string>) => {
 			if (data) {
 				this.value = data.selection;
