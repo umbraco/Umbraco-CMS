@@ -20,6 +20,25 @@ internal class EfCoreScope : CoreScope, IEfCoreScope
     private bool _disposed;
 
     public EfCoreScope(
+        IDistributedLockingMechanismFactory distributedLockingMechanismFactory,
+        ILoggerFactory loggerFactory,
+        IUmbracoEfCoreDatabaseFactory efCoreDatabaseFactory,
+        IEFCoreScopeAccessor efCoreScopeAccessor,
+        FileSystems scopedFileSystem,
+        IEfCoreScopeProvider efCoreScopeProvider,
+        IScopeContext? scopeContext,
+        IEventAggregator eventAggregator,
+        RepositoryCacheMode repositoryCacheMode = RepositoryCacheMode.Unspecified,
+        bool? scopeFileSystems = null)
+        : base(distributedLockingMechanismFactory, loggerFactory, scopedFileSystem, eventAggregator, repositoryCacheMode, scopeFileSystems)
+    {
+        _efCoreDatabaseFactory = efCoreDatabaseFactory;
+        _efCoreScopeAccessor = efCoreScopeAccessor;
+        _efCoreScopeProvider = (EfCoreScopeProvider)efCoreScopeProvider;
+        ScopeContext = scopeContext;
+    }
+
+    public EfCoreScope(
         IScope parentScope,
         IDistributedLockingMechanismFactory distributedLockingMechanismFactory,
         ILoggerFactory loggerFactory,

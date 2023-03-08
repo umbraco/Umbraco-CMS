@@ -65,7 +65,6 @@ public class EfCoreScopeProvider : IEfCoreScopeProvider
         RepositoryCacheMode repositoryCacheMode = RepositoryCacheMode.Unspecified,
         bool? scopeFileSystems = null) =>
         new EfCoreDetachableScope(
-            _scopeProvider.CreateDetachedScope(IsolationLevel.Unspecified, repositoryCacheMode, null, null, scopeFileSystems),
             _distributedLockingMechanismFactory,
             _loggerFactory,
             _umbracoEfCoreDatabaseFactory,
@@ -96,7 +95,6 @@ public class EfCoreScopeProvider : IEfCoreScopeProvider
             throw new InvalidOperationException("Already attached.");
         }
 
-        _scopeProvider.AttachScope(otherScope.ParentInfrastructureScope!);
         otherScope.Attached = true;
         otherScope.OriginalScope = (EfCoreScope)_ambientEfCoreScopeStack.AmbientScope!;
         otherScope.OriginalContext = AmbientScopeContext;
@@ -136,8 +134,6 @@ public class EfCoreScopeProvider : IEfCoreScopeProvider
         {
             throw new InvalidOperationException($"The detatched scope context does not match the original");
         }
-
-        _scopeProvider.DetachScope();
 
         ambientScope.OriginalScope = null;
         ambientScope.OriginalContext = null;

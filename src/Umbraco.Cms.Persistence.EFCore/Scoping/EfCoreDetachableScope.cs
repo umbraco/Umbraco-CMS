@@ -3,7 +3,6 @@ using Umbraco.Cms.Core.DistributedLocking;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Scoping;
-using IScope = Umbraco.Cms.Infrastructure.Scoping.IScope;
 
 namespace Umbraco.Cms.Persistence.EFCore.Scoping;
 
@@ -13,7 +12,6 @@ internal class EfCoreDetachableScope : EfCoreScope
     private readonly EfCoreScopeProvider _efCoreScopeProvider;
 
     public EfCoreDetachableScope(
-        IScope parentScope,
         IDistributedLockingMechanismFactory distributedLockingMechanismFactory,
         ILoggerFactory loggerFactory,
         IUmbracoEfCoreDatabaseFactory efCoreDatabaseFactory,
@@ -25,7 +23,6 @@ internal class EfCoreDetachableScope : EfCoreScope
         RepositoryCacheMode repositoryCacheMode = RepositoryCacheMode.Unspecified,
         bool? scopeFileSystems = null)
         : base(
-            parentScope,
             distributedLockingMechanismFactory,
             loggerFactory,
             efCoreDatabaseFactory,
