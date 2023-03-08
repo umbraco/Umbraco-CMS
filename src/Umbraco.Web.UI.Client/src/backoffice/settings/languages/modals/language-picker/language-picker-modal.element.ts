@@ -4,17 +4,12 @@ import { customElement, state } from 'lit/decorators.js';
 import { repeat } from 'lit-html/directives/repeat.js';
 import { UUIMenuItemElement, UUIMenuItemEvent } from '@umbraco-ui/uui';
 import { ifDefined } from 'lit-html/directives/if-defined.js';
-import { UmbLanguageRepository } from '../repository/language.repository';
-import { UmbModalLayoutPickerBase } from '../../../../../libs/modal/layouts/modal-layout-picker-base';
+import { UmbLanguageRepository } from '../../repository/language.repository';
+import { UmbModalLayoutPickerBase } from '../../../../../../libs/modal/layouts/modal-layout-picker-base';
 import { LanguageModel } from '@umbraco-cms/backend-api';
 
-export interface UmbLanguagePickerModalData {
-	multiple: boolean;
-	selection: string[];
-}
-
-@customElement('umb-language-picker-modal-layout')
-export class UmbLanguagePickerModalLayoutElement extends UmbModalLayoutPickerBase<LanguageModel> {
+@customElement('umb-language-picker-modal')
+export class UmbLanguagePickerModalElement extends UmbModalLayoutPickerBase<LanguageModel> {
 	static styles = [UUITextStyles, css``];
 
 	@state()
@@ -72,6 +67,6 @@ export class UmbLanguagePickerModalLayoutElement extends UmbModalLayoutPickerBas
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-language-picker-modal-layout': UmbLanguagePickerModalLayoutElement;
+		'umb-language-picker-modal': UmbLanguagePickerModalElement;
 	}
 }

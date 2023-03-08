@@ -1,5 +1,5 @@
 import './layouts/property-editor-ui-picker/modal-layout-property-editor-ui-picker.element';
-import '../../src/backoffice/settings/languages/language-picker/language-picker-modal-layout.element';
+import '../../src/backoffice/settings/languages/modals/language-picker/language-picker-modal.element';
 import './layouts/search/modal-layout-search.element.ts';
 
 import { UUIModalSidebarSize } from '@umbraco-ui/uui-modal-sidebar';
@@ -7,10 +7,8 @@ import { BehaviorSubject } from 'rxjs';
 import type { UUIModalDialogElement } from '@umbraco-ui/uui-modal-dialog';
 import type { UmbModalPropertyEditorUIPickerData } from './layouts/property-editor-ui-picker/modal-layout-property-editor-ui-picker.element';
 import { UmbModalHandler } from './modal-handler';
-import { UmbPickerModalData } from './layouts/modal-layout-picker-base';
 import type { UmbModalToken } from './token/modal-token';
 import { UmbContextToken } from '@umbraco-cms/context-api';
-import { LanguageModel } from '@umbraco-cms/backend-api';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 
 export type UmbModalType = 'dialog' | 'sidebar';
@@ -41,16 +39,6 @@ export class UmbModalContext {
 	 */
 	public propertyEditorUIPicker(data?: UmbModalPropertyEditorUIPickerData): UmbModalHandler {
 		return this.open('umb-modal-layout-property-editor-ui-picker', { data, type: 'sidebar', size: 'small' });
-	}
-
-	/**
-	 * Opens a language picker sidebar modal
-	 * @public
-	 * @return {*}  {UmbModalHandler}
-	 * @memberof UmbModalContext
-	 */
-	public languagePicker(data: UmbPickerModalData<LanguageModel>): UmbModalHandler {
-		return this.open('umb-language-picker-modal-layout', { data, type: 'sidebar' });
 	}
 
 	public search(): UmbModalHandler {

@@ -10,6 +10,7 @@ import { UmbLitElement } from '@umbraco-cms/element';
 import type { LanguageModel } from '@umbraco-cms/backend-api';
 import type { UmbObserverController } from '@umbraco-cms/observable-api';
 import { UMB_CONFIRM_MODAL_TOKEN } from '../../modals/confirm';
+import { UMB_LANGUAGE_PICKER_MODAL_TOKEN } from 'src/backoffice/settings/languages/modals/language-picker';
 
 @customElement('umb-input-language-picker')
 export class UmbInputLanguagePickerElement extends FormControlMixin(UmbLitElement) {
@@ -120,13 +121,13 @@ export class UmbInputLanguagePickerElement extends FormControlMixin(UmbLitElemen
 	}
 
 	private _openPicker() {
-		const modalHandler = this._modalContext?.languagePicker({
+		const modalHandler = this._modalContext?.open(UMB_LANGUAGE_PICKER_MODAL_TOKEN, {
 			multiple: this.max === 1 ? false : true,
 			selection: [...this._selectedIsoCodes],
 			filter: this.filter,
 		});
 
-		modalHandler?.onClose().then(({ selection }: any) => {
+		modalHandler?.onClose().then(({ selection }) => {
 			this._setSelection(selection);
 		});
 	}
