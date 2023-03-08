@@ -23,6 +23,7 @@ for (let i = 0; i < libs.length; i++) {
 				console.log('Installed ' + lib + '.');
 
 				copyDistFromLib(lib, `${libFolder}/dist`);
+				findAndCopyTypesForLib(lib);
 			}
 		});
 	}
@@ -31,13 +32,11 @@ for (let i = 0; i < libs.length; i++) {
 function copyDistFromLib(libName, distPath) {
 	console.log(`Copying ${libName} to StaticAssets`);
 
-	const sourceFile = `${distPath}/index.js`;
-	const destFile = `${libsDistFolder}/${libName}.js`;
+	const destPath = `${libsDistFolder}/${libName}`;
 
 	try {
-		fs.cpSync(sourceFile, destFile, { recursive: true });
+		fs.readdirSync(distPath).forEach(file => fs.cpSync(`${distPath}/${file}`, `${destPath}/${file}`, { recursive: true }));
 		console.log(`Copied ${libName}`);
-		findAndCopyTypesForLib(libName, distPath);
 	} catch (err) {
 		console.error(`Error copying ${libName}`);
 		console.error(err);
@@ -49,16 +48,16 @@ function copyDistFromLib(libName, distPath) {
  * the ${typesDistFolder}/global.d.ts file and wrap it with
  * a declare module statement using the lib name.
  */
-function findAndCopyTypesForLib(libName, distPath) {
+function findAndCopyTypesForLib(libName) {
 	console.log(`Copying ${libName} types to ${typesDistFolder}`);
 
-	const sourceFile = `${distPath}/index.d.ts`;
-	const destFile = `${typesDistFolder}/${libName}.d.ts`;
+	const sourceFile = `${libsDistFolder}/${libName}/index.d.ts`;
+	const destPath = `${typesDistFolder}/${libName}/index.d.ts`;
 
 	try {
-		fs.cpSync(sourceFile, destFile, { recursive: true });
-		const content = fs.readFileSync(destFile, 'utf-8');
-		fs.writeFileSync(destFile, wrapLibTypeContent(libName, content));
+		fs.cpSync(sourceFile, destPath, { recursive: true });
+		const content = fs.readFileSync(destPath, 'utf-8');
+		fs.writeFileSync(destPath, wrapLibTypeContent(libName, content));
 		console.log(`Copied ${libName} types`);
 	} catch (err) {
 		console.error(`Error copying ${libName} types`);
