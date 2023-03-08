@@ -8,7 +8,6 @@ using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Persistence.EFCore.Entities;
 using IScope = Umbraco.Cms.Infrastructure.Scoping.IScope;
-using IScopeProvider = Umbraco.Cms.Infrastructure.Scoping.IScopeProvider;
 
 namespace Umbraco.Cms.Persistence.EFCore.Scoping;
 
