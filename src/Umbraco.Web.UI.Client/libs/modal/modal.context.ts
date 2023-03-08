@@ -3,7 +3,7 @@ import './layouts/confirm/modal-layout-confirm.element';
 import '../../src/backoffice/documents/documents/modals/document-picker/document-picker-modal.element';
 import './layouts/media-picker/modal-layout-media-picker.element';
 import './layouts/property-editor-ui-picker/modal-layout-property-editor-ui-picker.element';
-import './layouts/modal-layout-current-user.element';
+import '../../src/backoffice/users/current-user/modals/current-user/current-user-modal.element';
 import './layouts/icon-picker/modal-layout-icon-picker.element';
 import '../../src/backoffice/settings/languages/language-picker/language-picker-modal-layout.element';
 import './layouts/link-picker/modal-layout-link-picker.element';
@@ -204,7 +204,7 @@ export class UmbModalContext {
 	 * @return {*}  {UmbModalHandler}
 	 * @memberof UmbModalContext
 	 */
-	public open<T = unknown>(modalAlias: string | UmbModalToken<T>, data: T, config?: UmbModalConfig): UmbModalHandler {
+	public open<T = unknown>(modalAlias: string | UmbModalToken<T>, data?: T, config?: UmbModalConfig): UmbModalHandler {
 		const modalHandler = new UmbModalHandler(this.host, modalAlias, data, config);
 
 		modalHandler.containerElement.addEventListener('close-end', () => this.#onCloseEnd(modalHandler));

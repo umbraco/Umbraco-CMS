@@ -1,21 +1,18 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, CSSResultGroup, html, nothing } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
-import { UmbModalHandler, UmbModalContext, UMB_MODAL_CONTEXT_TOKEN } from '..';
+import { UmbModalHandler, UmbModalContext, UMB_MODAL_CONTEXT_TOKEN } from '../../../../../../libs/modal';
 import {
 	UmbCurrentUserHistoryStore,
 	UmbCurrentUserHistoryItem,
 	UMB_CURRENT_USER_HISTORY_STORE_CONTEXT_TOKEN,
-} from '../../../src/backoffice/users/current-user/current-user-history.store';
-import {
-	UmbCurrentUserStore,
-	UMB_CURRENT_USER_STORE_CONTEXT_TOKEN,
-} from '../../../src/backoffice/users/current-user/current-user.store';
+} from '../../current-user-history.store';
+import { UmbCurrentUserStore, UMB_CURRENT_USER_STORE_CONTEXT_TOKEN } from '../../current-user.store';
 import type { UserDetails } from '@umbraco-cms/models';
 import { UmbLitElement } from '@umbraco-cms/element';
 
-@customElement('umb-modal-layout-current-user')
-export class UmbModalLayoutCurrentUserElement extends UmbLitElement {
+@customElement('umb-current-user-modal')
+export class UmbCurrentUserModalElement extends UmbLitElement {
 	static styles: CSSResultGroup = [
 		UUITextStyles,
 		css`
@@ -202,8 +199,10 @@ export class UmbModalLayoutCurrentUserElement extends UmbLitElement {
 	}
 }
 
+export default UmbCurrentUserModalElement;
+
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-modal-layout-current-user': UmbModalLayoutCurrentUserElement;
+		'umb-current-user-modal': UmbCurrentUserModalElement;
 	}
 }

@@ -28,7 +28,7 @@ export class UmbModalHandler {
 	constructor(
 		host: UmbControllerHostInterface,
 		modalAlias: string | UmbModalToken,
-		data: unknown,
+		data?: unknown,
 		config?: UmbModalConfig
 	) {
 		this.#host = host;
@@ -68,10 +68,15 @@ export class UmbModalHandler {
 		return modalDialogElement;
 	}
 
-	async #createLayoutElement(manifest: ManifestModal, data: unknown) {
+	async #createLayoutElement(manifest: ManifestModal, data?: unknown) {
+		// TODO: add fallback element if no layout is found
 		const layoutElement = (await createExtensionElement(manifest)) as any;
-		layoutElement.data = data;
-		layoutElement.modalHandler = this;
+
+		if (layoutElement) {
+			layoutElement.data = data;
+			layoutElement.modalHandler = this;
+		}
+
 		return layoutElement;
 	}
 
@@ -88,7 +93,7 @@ export class UmbModalHandler {
 	 It makes this code a bit more complex. The main idea is to have the element as part of the modalHandler so it is possible to dispatch events from within the modal element to the one that opened it.
 	 Now when the element is an observable it makes it more complex because this host needs to subscribe to updates to the element, instead of just having a reference to it.
 	 If we find a better generic solution to communicate between the modal and the host, then we can remove the element as part of the modalHandler. */
-	#observeModal(modalAlias: string, data: unknown) {
+	#observeModal(modalAlias: string, data?: unknown) {
 		new UmbObserverController(
 			this.#host,
 			umbExtensionsRegistry.getByTypeAndAlias('modal', modalAlias),
