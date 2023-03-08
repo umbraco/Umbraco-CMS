@@ -10,8 +10,8 @@ export interface UmbModalMediaPickerData {
 
 import { UmbTreeElement } from '../../../../shared/components/tree/tree.element';
 
-@customElement('umb-modal-layout-media-picker')
-export class UmbModalLayoutMediaPickerElement extends UmbModalLayoutElement<UmbModalMediaPickerData> {
+@customElement('umb-media-picker-modal')
+export class UmbMediaPickerModalElement extends UmbModalLayoutElement<UmbModalMediaPickerData> {
 	static styles = [
 		UUITextStyles,
 		css`
@@ -97,6 +97,6 @@ export class UmbModalLayoutMediaPickerElement extends UmbModalLayoutElement<UmbM
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-modal-layout-media-picker': UmbModalLayoutMediaPickerElement;
+		'umb-media-picker-modal': UmbMediaPickerModalElement;
 	}
 }
