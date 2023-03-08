@@ -5,7 +5,7 @@ import { UmbPickerModalData } from '../../../../../libs/modal/layouts/modal-layo
 import { UmbModalContext, UmbModalType, UMB_MODAL_CONTEXT_TOKEN } from '../../../../../libs/modal';
 
 //TODO: These should probably be imported dynamically.
-import '../../../../../libs/modal/layouts/picker-section/picker-layout-section.element';
+import '../../modals/section-picker/picker-layout-section.element';
 import '../../../../../libs/modal/layouts/picker-user-group/picker-layout-user-group.element';
 import '../../../../../libs/modal/layouts/picker-user/picker-layout-user.element';
 import { UmbLitElement } from '@umbraco-cms/element';

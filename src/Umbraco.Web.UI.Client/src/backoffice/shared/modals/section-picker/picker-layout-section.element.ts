@@ -1,7 +1,7 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
-import { UmbModalLayoutPickerBase } from '../modal-layout-picker-base';
+import { UmbModalLayoutPickerBase } from '../../../../../libs/modal/layouts/modal-layout-picker-base';
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-api';
 import type { ManifestSection } from '@umbraco-cms/models';
 
