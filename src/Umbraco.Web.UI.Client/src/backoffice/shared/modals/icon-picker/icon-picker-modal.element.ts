@@ -14,6 +14,7 @@ export interface UmbModalIconPickerData {
 }
 
 // TODO: Make use of UmbPickerLayoutBase
+// TODO: to prevent element extension we need to move the Picker logic into a separate class we can reuse across all pickers
 @customElement('umb-modal-layout-icon-picker')
 export class UmbModalLayoutIconPickerElement extends UmbModalLayoutElement<UmbModalIconPickerData> {
 	static styles = [
