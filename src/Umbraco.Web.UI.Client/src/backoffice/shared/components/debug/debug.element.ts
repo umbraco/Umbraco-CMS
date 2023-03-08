@@ -1,6 +1,7 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html, nothing, TemplateResult } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
+import { UMB_BASIC_MODAL_TOKEN } from '../../modals/basic';
 import { UmbContextDebugRequest } from '@umbraco-cms/context-api';
 import { UmbLitElement } from '@umbraco-cms/element';
 import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN } from 'libs/modal';
@@ -102,11 +103,16 @@ export class UmbDebug extends UmbLitElement {
 	}
 
 	private _openDialog() {
-		this._modalContext?.openBasic({
-			header: html`<uui-icon name="umb:bug"></uui-icon> Debug: Contexts`,
-			content: this._htmlContent(),
-			overlaySize: 'small',
-		});
+		this._modalContext?.open(
+			UMB_BASIC_MODAL_TOKEN,
+			{
+				headline: 'Debug: Contexts:',
+				content: this._htmlContent(),
+			},
+			{
+				type: 'sidebar',
+			}
+		);
 	}
 
 	private _renderDialog() {

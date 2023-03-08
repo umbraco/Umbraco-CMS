@@ -29,7 +29,7 @@ export class UmbBasicModalElement extends UmbModalLayoutElement<UmbBasicModalDat
 
 	render() {
 		return html`
-			<umb-workspace-layout headline=${ifDefined(this.data?.header)}>
+			<umb-workspace-layout headline=${ifDefined(this.data?.headline)}>
 				<uui-scroll-container>${this.data?.content}</uui-scroll-container>
 				<uui-button slot="actions" look="secondary" label="Close sidebar" @click="${this._close}">Close</uui-button>
 			</umb-workspace-layout>
