@@ -1,6 +1,6 @@
-using System.Data.Common;
 using System.Globalization;
 using System.Linq.Expressions;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
@@ -31,46 +31,31 @@ internal class UserService : RepositoryService, IUserService
     private readonly GlobalSettings _globalSettings;
     private readonly SecuritySettings _securitySettings;
     private readonly ILogger<UserService> _logger;
-    private readonly IRuntimeState _runtimeState;
     private readonly IUserGroupRepository _userGroupRepository;
     private readonly UserEditorAuthorizationHelper _userEditorAuthorizationHelper;
-    private readonly IBackOfficeUserStoreAccessor _userStoreAccessor;
-    private readonly ICoreBackOfficeUserManagerAccessor _userManagerAccessor;
+    private readonly IServiceScopeFactory _serviceScopeFactory;
     private readonly IUserRepository _userRepository;
 
     public UserService(
         ICoreScopeProvider provider,
         ILoggerFactory loggerFactory,
         IEventMessagesFactory eventMessagesFactory,
-        IRuntimeState runtimeState,
         IUserRepository userRepository,
         IUserGroupRepository userGroupRepository,
         IOptions<GlobalSettings> globalSettings,
         IOptions<SecuritySettings> securitySettings,
         UserEditorAuthorizationHelper userEditorAuthorizationHelper,
-        IBackOfficeUserStoreAccessor userStoreAccessor,
-        ICoreBackOfficeUserManagerAccessor userManagerAccessor)
+        IServiceScopeFactory serviceScopeFactory)
         : base(provider, loggerFactory, eventMessagesFactory)
     {
-        _runtimeState = runtimeState;
         _userRepository = userRepository;
         _userGroupRepository = userGroupRepository;
         _userEditorAuthorizationHelper = userEditorAuthorizationHelper;
-        _userStoreAccessor = userStoreAccessor;
-        _userManagerAccessor = userManagerAccessor;
+        _serviceScopeFactory = serviceScopeFactory;
         _globalSettings = globalSettings.Value;
         _securitySettings = securitySettings.Value;
         _logger = loggerFactory.CreateLogger<UserService>();
     }
-
-    private IBackofficeUserStore BackofficeUserStore => _userStoreAccessor.BackOfficeUserStore
-                                                        ?? throw new InvalidOperationException("Could not resolve the BackofficeUserStore");
-
-    private ICoreBackofficeUserManager BackofficeUserManager => _userManagerAccessor.BackofficeUserManager
-                                                        ?? throw new InvalidOperationException("Could not resolve the BackofficeUserManager");
-
-    private bool IsUpgrading =>
-        _runtimeState.Level == RuntimeLevel.Install || _runtimeState.Level == RuntimeLevel.Upgrade;
 
     /// <summary>
     ///     Checks in a set of permissions associated with a user for those related to a given nodeId
@@ -267,7 +252,12 @@ internal class UserService : RepositoryService, IUserService
     /// <returns>
     ///     <see cref="IUser" />
     /// </returns>
-    public IUser? GetByEmail(string email) => BackofficeUserStore.GetByEmailAsync(email).GetAwaiter().GetResult();
+    public IUser? GetByEmail(string email)
+    {
+        using IServiceScope scope = _serviceScopeFactory.CreateScope();
+        IBackofficeUserStore backofficeUserStore = scope.ServiceProvider.GetRequiredService<IBackofficeUserStore>();
+        return backofficeUserStore.GetByEmailAsync(email).GetAwaiter().GetResult();
+    }
 
     /// <summary>
     ///     Get an <see cref="IUser" /> by username
@@ -282,8 +272,10 @@ internal class UserService : RepositoryService, IUserService
         {
             return null;
         }
+        using IServiceScope scope = _serviceScopeFactory.CreateScope();
+        IBackofficeUserStore backofficeUserStore = scope.ServiceProvider.GetRequiredService<IBackofficeUserStore>();
 
-        return BackofficeUserStore.GetByUserNameAsync(username).GetAwaiter().GetResult();
+        return backofficeUserStore.GetByUserNameAsync(username).GetAwaiter().GetResult();
     }
 
     /// <summary>
@@ -291,7 +283,12 @@ internal class UserService : RepositoryService, IUserService
     /// </summary>
     /// <param name="membershipUser"><see cref="IUser" /> to disable</param>
     public void Delete(IUser membershipUser)
-        => BackofficeUserStore.DisableAsync(membershipUser).GetAwaiter().GetResult();
+    {
+        using IServiceScope scope = _serviceScopeFactory.CreateScope();
+        IBackofficeUserStore backofficeUserStore = scope.ServiceProvider.GetRequiredService<IBackofficeUserStore>();
+
+        backofficeUserStore.DisableAsync(membershipUser).GetAwaiter().GetResult();
+    }
 
     /// <summary>
     ///     Deletes or disables a User
@@ -330,7 +327,13 @@ internal class UserService : RepositoryService, IUserService
     /// Saves an <see cref="IUser" />
     /// </summary>
     /// <param name="entity"><see cref="IUser" /> to Save</param>
-    public void Save(IUser entity) => BackofficeUserStore.SaveAsync(entity).GetAwaiter().GetResult();
+    public void Save(IUser entity)
+    {
+        using IServiceScope scope = _serviceScopeFactory.CreateScope();
+        IBackofficeUserStore backofficeUserStore = scope.ServiceProvider.GetRequiredService<IBackofficeUserStore>();
+
+        backofficeUserStore.SaveAsync(entity).GetAwaiter().GetResult();
+    }
 
     /// <summary>
     ///     Saves a list of <see cref="IUser" /> objects
@@ -558,6 +561,7 @@ internal class UserService : RepositoryService, IUserService
     public async Task<Attempt<UserCreationResult, UserOperationStatus>> CreateAsync(int performingUserId, UserCreateModel model, bool approveUser = false)
     {
         using ICoreScope scope = ScopeProvider.CreateCoreScope();
+        using IServiceScope serviceScope = _serviceScopeFactory.CreateScope();
 
         IUser? performingUser = GetById(performingUserId);
 
@@ -583,8 +587,9 @@ internal class UserService : RepositoryService, IUserService
         {
             return Attempt.FailWithStatus(UserOperationStatus.Unauthorized, new UserCreationResult());
         }
+        ICoreBackofficeUserManager backofficeUserManager = serviceScope.ServiceProvider.GetRequiredService<ICoreBackofficeUserManager>();
 
-        IdentityCreationResult identityCreationResult = await BackofficeUserManager.CreateAsync(model);
+        IdentityCreationResult identityCreationResult = await backofficeUserManager.CreateAsync(model);
 
         if (identityCreationResult.Succeded is false)
         {
@@ -597,7 +602,8 @@ internal class UserService : RepositoryService, IUserService
 
         // The user is now created, so we can fetch it to map it to a result model with our generated password.
         // and set it to being approved
-        IUser? createdUser = await BackofficeUserStore.GetByEmailAsync(model.Email);
+        IBackofficeUserStore backofficeUserStore = serviceScope.ServiceProvider.GetRequiredService<IBackofficeUserStore>();
+        IUser? createdUser = await backofficeUserStore.GetByEmailAsync(model.Email);
 
         if (createdUser is null)
         {
@@ -615,7 +621,7 @@ internal class UserService : RepositoryService, IUserService
             createdUser.AddGroup(userGroup.ToReadOnlyGroup());
         }
 
-        await BackofficeUserStore.SaveAsync(createdUser);
+        await backofficeUserStore.SaveAsync(createdUser);
 
         scope.Complete();
 
@@ -949,7 +955,10 @@ internal class UserService : RepositoryService, IUserService
             return Array.Empty<IUser>();
         }
 
-        return BackofficeUserStore.GetAllInGroupAsync(groupId.Value).GetAwaiter().GetResult();
+        using IServiceScope scope = _serviceScopeFactory.CreateScope();
+        IBackofficeUserStore backofficeUserStore = scope.ServiceProvider.GetRequiredService<IBackofficeUserStore>();
+
+        return backofficeUserStore.GetAllInGroupAsync(groupId.Value).GetAwaiter().GetResult();
     }
 
     /// <summary>
@@ -1014,7 +1023,12 @@ internal class UserService : RepositoryService, IUserService
     ///     <see cref="IUser" />
     /// </returns>
     public IUser? GetUserById(int id)
-        => BackofficeUserStore.GetAsync(id).GetAwaiter().GetResult();
+    {
+        using IServiceScope scope = _serviceScopeFactory.CreateScope();
+        IBackofficeUserStore backofficeUserStore = scope.ServiceProvider.GetRequiredService<IBackofficeUserStore>();
+
+        return backofficeUserStore.GetAsync(id).GetAwaiter().GetResult();
+    }
 
     /// <summary>
     ///     Gets a user by it's key.
@@ -1022,10 +1036,20 @@ internal class UserService : RepositoryService, IUserService
     /// <param name="key">Key of the user to retrieve.</param>
     /// <returns>Task resolving into an <see cref="IUser"/>.</returns>
     public Task<IUser?> GetAsync(Guid key)
-        => BackofficeUserStore.GetAsync(key);
+    {
+        using IServiceScope scope = _serviceScopeFactory.CreateScope();
+        IBackofficeUserStore backofficeUserStore = scope.ServiceProvider.GetRequiredService<IBackofficeUserStore>();
+
+        return backofficeUserStore.GetAsync(key);
+    }
 
     public IEnumerable<IUser> GetUsersById(params int[]? ids)
-        => BackofficeUserStore.GetUsersAsync(ids).GetAwaiter().GetResult();
+    {
+        using IServiceScope scope = _serviceScopeFactory.CreateScope();
+        IBackofficeUserStore backofficeUserStore = scope.ServiceProvider.GetRequiredService<IBackofficeUserStore>();
+
+        return backofficeUserStore.GetUsersAsync(ids).GetAwaiter().GetResult();
+    }
 
     /// <summary>
     ///     Replaces the same permission set for a single group to any number of entities
