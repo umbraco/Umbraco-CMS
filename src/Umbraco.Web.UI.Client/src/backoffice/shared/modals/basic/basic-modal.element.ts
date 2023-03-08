@@ -10,8 +10,8 @@ export interface UmbBasicModalData {
 	overlaySize?: UUIModalSidebarSize;
 }
 
-@customElement('umb-modal-layout-basic')
-export class UmbModalLayoutBasicElement extends UmbModalLayoutElement<UmbBasicModalData> {
+@customElement('umb-basic-modal')
+export class UmbBasicModalElement extends UmbModalLayoutElement<UmbBasicModalData> {
 	static styles = [
 		UUITextStyles,
 		css`
@@ -42,10 +42,10 @@ export class UmbModalLayoutBasicElement extends UmbModalLayoutElement<UmbBasicMo
 	}
 }
 
-export default UmbModalLayoutBasicElement;
+export default UmbBasicModalElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-modal-layout-basic': UmbModalLayoutBasicElement;
+		'umb-basic-modal': UmbBasicModalElement;
 	}
 }

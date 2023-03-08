@@ -1,11 +1,11 @@
 import { Meta, Story } from '@storybook/web-components';
 import { html } from 'lit';
-import { UmbModalLayoutBasicElement, UmbBasicModalData } from './basic-modal.element';
+import { UmbBasicModalElement, UmbBasicModalData } from './basic-modal.element';
 
 export default {
 	title: 'API/Modals/Layouts/Basic',
-	component: 'umb-modal-layout-basic',
-	id: 'modal-layout-basic',
+	component: 'umb-basic-modal',
+	id: 'umb-basic-modal',
 } as Meta;
 
 const htmlContent = html` <uui-table aria-label="Example table" aria-describedby="#some-element-id">
@@ -35,9 +35,9 @@ const data: UmbBasicModalData = {
 	overlaySize: 'small',
 };
 
-export const Overview: Story<UmbModalLayoutBasicElement> = () => html`
+export const Overview: Story<UmbBasicModalElement> = () => html`
 	<!-- TODO: figure out if generics are allowed for properties:
 	https://github.com/runem/lit-analyzer/issues/149
 	https://github.com/runem/lit-analyzer/issues/163 -->
-	<umb-modal-layout-basic .data=${data as any}></umb-modal-layout-basic>
+	<umb-basic-modal .data=${data as any}></umb-basic-modal>
 `;
