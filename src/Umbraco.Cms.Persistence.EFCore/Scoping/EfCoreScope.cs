@@ -187,10 +187,9 @@ internal class EfCoreScope : CoreScope, IEfCoreScope
     {
         var completed = Completed.HasValue && Completed.Value;
         {
-            bool databaseException = false;
             try
             {
-                if (_umbracoEfCoreDatabase is not null && ParentInfrastructureScope?.Database.Transaction is null)
+                if (_umbracoEfCoreDatabase is not null && ParentInfrastructureScope is null)
                 {
                     // Transaction connection can be null here if we get chosen as the deadlock victim.
                     if (_umbracoEfCoreDatabase.UmbracoEFContext.Database.CurrentTransaction?.GetDbTransaction()
@@ -206,10 +205,6 @@ internal class EfCoreScope : CoreScope, IEfCoreScope
                         }
                     }
                 }
-            }
-            catch
-            {
-                databaseException = true;
             }
             finally
             {
