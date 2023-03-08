@@ -2,12 +2,12 @@ import { css, html, TemplateResult } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement } from 'lit/decorators.js';
 import { UUIModalSidebarSize } from '@umbraco-ui/uui-modal-sidebar';
-import { UmbModalLayoutElement } from '../modal-layout.element';
+import { UmbModalLayoutElement } from '../../../../../libs/modal/layouts/modal-layout.element';
 
 export interface UmbBasicModalData {
-    header: TemplateResult | string;
+	header: TemplateResult | string;
 	content: TemplateResult | string;
-    overlaySize?: UUIModalSidebarSize;
+	overlaySize?: UUIModalSidebarSize;
 }
 
 @customElement('umb-modal-layout-basic')
@@ -16,15 +16,15 @@ export class UmbModalLayoutBasicElement extends UmbModalLayoutElement<UmbBasicMo
 		UUITextStyles,
 		css`
 			uui-scroll-container {
-                background-color: var(--uui-color-surface);
-            }
+				background-color: var(--uui-color-surface);
+			}
 		`,
 	];
 
 	private _close() {
-        // As this is a basic modal designed for viewing readonly info
-        // Then we don't need to pass any data back to the parent when
-        // we close/save the modal etc...
+		// As this is a basic modal designed for viewing readonly info
+		// Then we don't need to pass any data back to the parent when
+		// we close/save the modal etc...
 		this.modalHandler?.close();
 	}
 
@@ -34,12 +34,12 @@ export class UmbModalLayoutBasicElement extends UmbModalLayoutElement<UmbBasicMo
 
 	render() {
 		return html`
-            <umb-workspace-layout .headline=${this.data?.header}>
+			<umb-workspace-layout .headline=${this.data?.header}>
 				<uui-scroll-container>${this.data?.content}</uui-scroll-container>
 				<uui-button slot="actions" look="secondary" label="Close sidebar" @click="${this._close}">Close</uui-button>
 			</umb-workspace-layout>
 		`;
-	}	
+	}
 }
 
 export default UmbModalLayoutBasicElement;
