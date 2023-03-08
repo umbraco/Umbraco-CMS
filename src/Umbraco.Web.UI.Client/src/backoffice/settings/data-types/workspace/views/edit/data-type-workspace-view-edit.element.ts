@@ -9,6 +9,7 @@ import { umbExtensionsRegistry } from '@umbraco-cms/extensions-api';
 
 import '../../../../../shared/property-editors/shared/property-editor-config/property-editor-config.element';
 import '../../../../../shared/components/ref-property-editor-ui/ref-property-editor-ui.element';
+import { UMB_PROPERTY_EDITOR_UI_PICKER_MODAL_TOKEN } from 'src/backoffice/shared/property-editors/modals/property-editor-ui-picker';
 
 @customElement('umb-data-type-workspace-view-edit')
 export class UmbDataTypeWorkspaceViewEditElement extends UmbLitElement {
@@ -100,7 +101,7 @@ export class UmbDataTypeWorkspaceViewEditElement extends UmbLitElement {
 	private _openPropertyEditorUIPicker() {
 		if (!this._dataType) return;
 
-		const modalHandler = this._modalContext?.propertyEditorUIPicker({
+		const modalHandler = this._modalContext?.open(UMB_PROPERTY_EDITOR_UI_PICKER_MODAL_TOKEN, {
 			selection: this._propertyEditorUiAlias ? [this._propertyEditorUiAlias] : [],
 		});
 

@@ -8,11 +8,7 @@ import type { UmbModalHandler } from '../../../../../../libs/modal/modal-handler
 import type { ManifestPropertyEditorUI } from '@umbraco-cms/models';
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-api';
 import { UmbLitElement } from '@umbraco-cms/element';
-
-export interface UmbModalPropertyEditorUIPickerData {
-	selection?: Array<string>;
-	submitLabel?: string;
-}
+import { UmbPropertyEditorUIPickerModalData } from '.';
 
 interface GroupedPropertyEditorUIs {
 	[key: string]: Array<ManifestPropertyEditorUI>;
@@ -87,7 +83,7 @@ export class UmbPropertyEditorUIPickerModalElement extends UmbLitElement {
 	modalHandler?: UmbModalHandler;
 
 	@property({ type: Object })
-	data?: UmbModalPropertyEditorUIPickerData;
+	data?: UmbPropertyEditorUIPickerModalData;
 
 	@state()
 	private _groupedPropertyEditorUIs: GroupedPropertyEditorUIs = {};

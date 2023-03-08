@@ -1,11 +1,8 @@
-import '../../src/backoffice/shared/property-editors/modals/property-editor-ui-picker/property-editor-ui-picker-modal.element';
-import '../../src/backoffice/settings/languages/modals/language-picker/language-picker-modal.element';
 import './layouts/search/modal-layout-search.element';
 
 import { UUIModalSidebarSize } from '@umbraco-ui/uui-modal-sidebar';
 import { BehaviorSubject } from 'rxjs';
 import type { UUIModalDialogElement } from '@umbraco-ui/uui-modal-dialog';
-import type { UmbModalPropertyEditorUIPickerData } from '../../src/backoffice/shared/property-editors/modals/property-editor-ui-picker/property-editor-ui-picker-modal.element';
 import { UmbModalHandler } from './modal-handler';
 import type { UmbModalToken } from './token/modal-token';
 import { UmbContextToken } from '@umbraco-cms/context-api';
@@ -28,17 +25,6 @@ export class UmbModalContext {
 
 	constructor(host: UmbControllerHostInterface) {
 		this.host = host;
-	}
-
-	/**
-	 * Opens a Property Editor UI sidebar modal
-	 * @public
-	 * @param {UmbModalPropertyEditorUIPickerData} [data]
-	 * @return {*}  {UmbModalHandler}
-	 * @memberof UmbModalContext
-	 */
-	public propertyEditorUIPicker(data?: UmbModalPropertyEditorUIPickerData): UmbModalHandler {
-		return this.open('umb-modal-layout-property-editor-ui-picker', { data, type: 'sidebar', size: 'small' });
 	}
 
 	public search(): UmbModalHandler {
