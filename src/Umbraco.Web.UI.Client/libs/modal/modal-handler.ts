@@ -1,6 +1,6 @@
 import type { UUIDialogElement } from '@umbraco-ui/uui';
 import type { UUIModalDialogElement } from '@umbraco-ui/uui-modal-dialog';
-import type { UUIModalSidebarElement, UUIModalSidebarSize } from '@umbraco-ui/uui-modal-sidebar';
+import { UUIModalSidebarElement, UUIModalSidebarSize } from '@umbraco-ui/uui-modal-sidebar';
 import { v4 as uuidv4 } from 'uuid';
 import { BehaviorSubject } from 'rxjs';
 import { UmbModalConfig, UmbModalType } from './modal.context';
@@ -18,8 +18,10 @@ export class UmbModalHandler {
 
 	public containerElement: UUIModalDialogElement | UUIModalSidebarElement;
 
-	#element = new BehaviorSubject<unknown | undefined>(undefined);
+	#element = new BehaviorSubject<any | undefined>(undefined);
 	public readonly element = this.#element.asObservable();
+
+	#innerElement?: UUIModalSidebarElement | UUIDialogElement;
 
 	public key: string;
 	public type: UmbModalType = 'dialog';
@@ -57,6 +59,7 @@ export class UmbModalHandler {
 
 	#createSidebarElement() {
 		const sidebarElement = document.createElement('uui-modal-sidebar');
+		this.#innerElement = sidebarElement;
 		sidebarElement.size = this.size;
 		return sidebarElement;
 	}
@@ -64,6 +67,7 @@ export class UmbModalHandler {
 	#createDialogElement() {
 		const modalDialogElement = document.createElement('uui-modal-dialog');
 		const dialogElement: UUIDialogElement = document.createElement('uui-dialog');
+		this.#innerElement = dialogElement;
 		modalDialogElement.appendChild(dialogElement);
 		return modalDialogElement;
 	}
@@ -100,12 +104,23 @@ export class UmbModalHandler {
 			async (manifest) => {
 				if (manifest) {
 					const element = await this.#createLayoutElement(manifest, data);
+					this.#appendModalElement(element);
 					this.#element.next(element);
-					this.containerElement.appendChild(element);
 				} else {
+					this.#removeModalElement();
 					this.#element.next(undefined);
 				}
 			}
 		);
+	}
+
+	#appendModalElement(element: any) {
+		this.#innerElement?.appendChild(element);
+	}
+
+	#removeModalElement() {
+		if (this.#element.getValue()) {
+			this.#innerElement?.removeChild(this.#element.getValue());
+		}
 	}
 }
