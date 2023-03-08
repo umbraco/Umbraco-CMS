@@ -133,6 +133,7 @@ public class PublishedRouter : IPublishedRouter
             builder.SetDomain(request.Domain);
         }
         builder.SetCulture(request.Culture);
+        builder.SetSegment(request.Segment);
 
         // set to the new content (or null if specified)
         builder.SetPublishedContent(publishedContent);
