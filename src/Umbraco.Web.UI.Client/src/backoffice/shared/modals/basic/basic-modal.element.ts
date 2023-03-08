@@ -1,14 +1,9 @@
-import { css, html, TemplateResult } from 'lit';
+import { css, html } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement } from 'lit/decorators.js';
-import { UUIModalSidebarSize } from '@umbraco-ui/uui-modal-sidebar';
+import { ifDefined } from 'lit/directives/if-defined.js';
 import { UmbModalLayoutElement } from '../../../../../libs/modal/layouts/modal-layout.element';
-
-export interface UmbBasicModalData {
-	header: TemplateResult | string;
-	content: TemplateResult | string;
-	overlaySize?: UUIModalSidebarSize;
-}
+import { UmbBasicModalData } from '.';
 
 @customElement('umb-basic-modal')
 export class UmbBasicModalElement extends UmbModalLayoutElement<UmbBasicModalData> {
@@ -34,7 +29,7 @@ export class UmbBasicModalElement extends UmbModalLayoutElement<UmbBasicModalDat
 
 	render() {
 		return html`
-			<umb-workspace-layout .headline=${this.data?.header}>
+			<umb-workspace-layout headline=${ifDefined(this.data?.header)}>
 				<uui-scroll-container>${this.data?.content}</uui-scroll-container>
 				<uui-button slot="actions" look="secondary" label="Close sidebar" @click="${this._close}">Close</uui-button>
 			</umb-workspace-layout>
