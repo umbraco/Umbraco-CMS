@@ -14,17 +14,20 @@ public class UserPresentationFactory : IUserPresentationFactory
     private readonly AppCaches _appCaches;
     private readonly MediaFileManager _mediaFileManager;
     private readonly IImageUrlGenerator _imageUrlGenerator;
+    private readonly IUserGroupService _userGroupService;
 
     public UserPresentationFactory(
         IEntityService entityService,
         AppCaches appCaches,
         MediaFileManager mediaFileManager,
-        IImageUrlGenerator imageUrlGenerator)
+        IImageUrlGenerator imageUrlGenerator,
+        IUserGroupService userGroupService)
     {
         _entityService = entityService;
         _appCaches = appCaches;
         _mediaFileManager = mediaFileManager;
         _imageUrlGenerator = imageUrlGenerator;
+        _userGroupService = userGroupService;
     }
 
     public UserResponseModel CreateResponseModel(IUser user)
@@ -51,6 +54,28 @@ public class UserPresentationFactory : IUserPresentationFactory
 
         return responseModel;
     }
+
+    public async Task<UserCreateModel> CreateCreationModelAsync(CreateUserRequestModel requestModel)
+    {
+        IEnumerable<IUserGroup> groups = await _userGroupService.GetAsync(requestModel.UserGroups);
+
+        var createModel = new UserCreateModel
+        {
+            Email = requestModel.Email,
+            Name = requestModel.Name,
+            UserName = requestModel.UserName,
+            UserGroups = new SortedSet<IUserGroup>(groups),
+        };
+
+        return createModel;
+    }
+
+    public CreateUserResponseModel CreateCreationResponseModel(UserCreationResult creationResult)
+        => new()
+        {
+            UserKey = creationResult.CreatedUser?.Key ?? Guid.Empty,
+            InitialPassword = creationResult.InitialPassword,
+        };
 
     private SortedSet<Guid> GetKeysFromIds(IEnumerable<int>? ids, UmbracoObjectTypes type)
     {

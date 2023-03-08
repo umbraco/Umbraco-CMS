@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using System.Formats.Asn1;
+using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Membership;
@@ -117,6 +118,21 @@ internal sealed class UserGroupService : RepositoryService, IUserGroupService
         IQuery<IUserGroup> query = Query<IUserGroup>().Where(x => x.Key == key);
         IUserGroup? groups = _userGroupRepository.Get(query).FirstOrDefault();
         return Task.FromResult(groups);
+    }
+
+    public Task<IEnumerable<IUserGroup>> GetAsync(IEnumerable<Guid> keys)
+    {
+        using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+
+        IQuery<IUserGroup> query = Query<IUserGroup>().Where(x => keys.SqlIn(x.Key));
+
+        IUserGroup[] result = _userGroupRepository
+            .Get(query)
+            .WhereNotNull()
+            .OrderBy(x => x.Name)
+            .ToArray();
+
+        return Task.FromResult<IEnumerable<IUserGroup>>(result);
     }
 
     /// <inheritdoc/>

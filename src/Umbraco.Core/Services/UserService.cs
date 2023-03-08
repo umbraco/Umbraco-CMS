@@ -572,18 +572,12 @@ internal class UserService : RepositoryService, IUserService
             return Attempt.FailWithStatus(result, new UserCreationResult());
         }
 
-        Attempt<IEnumerable<string>, UserOperationStatus> userGroupAliasesAttempt = GetUserGroupAliasesFromKeys(model.UserGroups);
-        if (userGroupAliasesAttempt.Success is false)
-        {
-            return Attempt.FailWithStatus(result, new UserCreationResult());
-        }
-
         Attempt<string?> authorizationAttempt = _userEditorAuthorizationHelper.IsAuthorized(
             performingUser,
             null,
             null,
             null,
-            userGroupAliasesAttempt.Result);
+            model.UserGroups.Select(x => x.Alias));
 
         if (authorizationAttempt.Success is false)
         {
@@ -614,15 +608,21 @@ internal class UserService : RepositoryService, IUserService
         if (approveUser)
         {
             createdUser.IsApproved = true;
-            await BackofficeUserStore.SaveAsync(createdUser);
         }
+
+        foreach (IUserGroup userGroup in model.UserGroups)
+        {
+            createdUser.AddGroup(userGroup.ToReadOnlyGroup());
+        }
+
+        await BackofficeUserStore.SaveAsync(createdUser);
 
         scope.Complete();
 
         var creationResult = new UserCreationResult
         {
             CreatedUser = createdUser,
-            GeneratedPassword = identityCreationResult.InitialPassword
+            InitialPassword = identityCreationResult.InitialPassword
         };
 
         return Attempt.SucceedWithStatus(UserOperationStatus.Success, creationResult);

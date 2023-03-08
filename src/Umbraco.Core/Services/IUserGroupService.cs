@@ -60,6 +60,8 @@ public interface IUserGroupService
     /// </returns>
     Task<IUserGroup?> GetAsync(Guid key);
 
+    Task<IEnumerable<IUserGroup>> GetAsync(IEnumerable<Guid> keys);
+
     /// <summary>
     /// Persists a new user group.
     /// </summary>

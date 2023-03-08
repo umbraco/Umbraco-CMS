@@ -1,4 +1,6 @@
-﻿namespace Umbraco.Cms.Core.Models;
+﻿using Umbraco.Cms.Core.Models.Membership;
+
+namespace Umbraco.Cms.Core.Models;
 
 public class UserCreateModel
 {
@@ -8,5 +10,5 @@ public class UserCreateModel
 
     public string Name { get; set; } = string.Empty;
 
-    public SortedSet<Guid> UserGroups { get; set; } = new();
+    public SortedSet<IUserGroup> UserGroups { get; set; } = new();
 }
