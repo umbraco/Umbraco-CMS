@@ -7,11 +7,7 @@ import { styleMap } from 'lit/directives/style-map.js';
 import { UmbModalLayoutElement } from '../../../../../libs/modal/layouts/modal-layout.element';
 
 import icons from '../../../../../public-assets/icons/icons.json';
-
-export interface UmbIconPickerModalData {
-	multiple: boolean;
-	selection: string[];
-}
+import { UmbIconPickerModalData } from '.';
 
 // TODO: Make use of UmbPickerLayoutBase
 // TODO: to prevent element extension we need to move the Picker logic into a separate class we can reuse across all pickers

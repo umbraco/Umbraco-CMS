@@ -7,6 +7,7 @@ import { UmbWorkspaceDocumentTypeContext } from './document-type-workspace.conte
 import type { DocumentTypeModel } from '@umbraco-cms/backend-api';
 import { UmbLitElement } from '@umbraco-cms/element';
 import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN } from 'libs/modal';
+import { UMB_ICON_PICKER_MODAL_TOKEN } from 'src/backoffice/shared/modals/icon-picker';
 
 @customElement('umb-document-type-workspace')
 export class UmbDocumentTypeWorkspaceElement extends UmbLitElement implements UmbWorkspaceEntityElement {
@@ -86,7 +87,7 @@ export class UmbDocumentTypeWorkspaceElement extends UmbLitElement implements Um
 	}
 
 	private async _handleIconClick() {
-		const modalHandler = this._modalContext?.iconPicker();
+		const modalHandler = this._modalContext?.open(UMB_ICON_PICKER_MODAL_TOKEN);
 
 		modalHandler?.onClose().then((saved) => {
 			if (saved) this._workspaceContext?.setIcon(saved.icon);

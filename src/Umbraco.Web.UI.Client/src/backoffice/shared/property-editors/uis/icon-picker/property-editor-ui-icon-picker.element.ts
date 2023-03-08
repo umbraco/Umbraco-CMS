@@ -3,6 +3,7 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, property } from 'lit/decorators.js';
 import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN } from '../../../../../../libs/modal';
 import { UmbLitElement } from '@umbraco-cms/element';
+import { UMB_ICON_PICKER_MODAL_TOKEN } from 'src/backoffice/shared/modals/icon-picker';
 
 /**
  * @element umb-property-editor-ui-icon-picker
@@ -27,7 +28,7 @@ export class UmbPropertyEditorUIIconPickerElement extends UmbLitElement {
 	}
 
 	private _openModal() {
-		this._modalContext?.iconPicker();
+		this._modalContext?.open(UMB_ICON_PICKER_MODAL_TOKEN);
 	}
 
 	render() {
