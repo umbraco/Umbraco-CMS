@@ -1,8 +1,10 @@
-import { Meta, Story } from '@storybook/web-components';
+import { Meta } from '@storybook/web-components';
 import { html } from 'lit-html';
+import { umbDataTypeData } from 'src/core/mocks/data/data-type.data';
 
-import type { UmbPropertyEditorUITinyMceModeConfigurationElement } from './property-editor-ui-tiny-mce-mode-configuration.element';
 import './property-editor-ui-tiny-mce-mode-configuration.element';
+
+const dataTypeData = umbDataTypeData.getByKey('dt-richTextEditor');
 
 export default {
 	title: 'Property Editor UIs/Tiny Mce Mode Configuration',
@@ -10,6 +12,9 @@ export default {
 	id: 'umb-property-editor-ui-tiny-mce-mode-configuration',
 } as Meta;
 
-export const AAAOverview: Story<UmbPropertyEditorUITinyMceModeConfigurationElement> = () =>
-	html`<umb-property-editor-ui-tiny-mce-mode-configuration></umb-property-editor-ui-tiny-mce-mode-configuration>`;
+export const AAAOverview = ({ value }: any) =>
+	html`<umb-property-editor-ui-tiny-mce-mode-configuration .value=${value}></umb-property-editor-ui-tiny-mce-mode-configuration>`;
 AAAOverview.storyName = 'Overview';
+AAAOverview.args = {
+	value: dataTypeData?.data?.find((x) => x.alias === 'mode')?.value,
+};

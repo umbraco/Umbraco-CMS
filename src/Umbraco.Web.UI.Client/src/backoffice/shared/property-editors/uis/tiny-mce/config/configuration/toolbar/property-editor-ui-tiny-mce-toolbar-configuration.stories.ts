@@ -1,8 +1,10 @@
-import { Meta, Story } from '@storybook/web-components';
+import { Meta } from '@storybook/web-components';
 import { html } from 'lit-html';
+import { umbDataTypeData } from 'src/core/mocks/data/data-type.data';
 
-import type { UmbPropertyEditorUITinyMceToolbarConfigurationElement } from './property-editor-ui-tiny-mce-toolbar-configuration.element';
 import './property-editor-ui-tiny-mce-toolbar-configuration.element';
+
+const dataTypeData = umbDataTypeData.getByKey('dt-richTextEditor');
 
 export default {
 	title: 'Property Editor UIs/Tiny Mce Toolbar Configuration',
@@ -10,6 +12,11 @@ export default {
 	id: 'umb-property-editor-ui-tiny-mce-toolbar-configuration',
 } as Meta;
 
-export const AAAOverview: Story<UmbPropertyEditorUITinyMceToolbarConfigurationElement> = () =>
-	html`<umb-property-editor-ui-tiny-mce-toolbar-configuration></umb-property-editor-ui-tiny-mce-toolbar-configuration>`;
-AAAOverview.storyName = 'Overview';
+export const AAAOverview = ({ value }: any) =>
+	html`<umb-property-editor-ui-tiny-mce-toolbar-configuration .value=${value}></umb-property-editor-ui-tiny-mce-toolbar-configuration>`;
+
+	AAAOverview.storyName = 'Overview';
+
+	AAAOverview.args = {
+		value: dataTypeData?.data?.find(x => x.alias === 'toolbar')?.value ?? []
+	}
