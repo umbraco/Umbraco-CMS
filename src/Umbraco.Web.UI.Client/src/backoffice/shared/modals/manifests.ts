@@ -29,7 +29,7 @@ const modals: Array<ManifestModal> = [
 		type: 'modal',
 		alias: 'Umb.Modal.SectionPicker',
 		name: 'Section Picker Modal',
-		loader: () => import('./section-picker/picker-layout-section.element'),
+		loader: () => import('./section-picker/section-picker-modal.element'),
 	},
 ];
 
