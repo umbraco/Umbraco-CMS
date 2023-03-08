@@ -1,10 +1,15 @@
-﻿using Microsoft.EntityFrameworkCore.Storage;
+﻿using System.Data.Common;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.DistributedLocking;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Persistence.EFCore.Entities;
+using Umbraco.Extensions;
+using IScope = Umbraco.Cms.Infrastructure.Scoping.IScope;
+using IScopeProvider = Umbraco.Cms.Infrastructure.Scoping.IScopeProvider;
 
 namespace Umbraco.Cms.Persistence.EFCore.Scoping;
 
@@ -14,6 +19,7 @@ internal class EfCoreScope : CoreScope, IEfCoreScope
     private readonly IEFCoreScopeAccessor _efCoreScopeAccessor;
     private readonly EfCoreScopeProvider _efCoreScopeProvider;
     private IUmbracoEfCoreDatabase? _umbracoEfCoreDatabase;
+    private IScope? _innerScope;
     private bool _disposed;
 
     public EfCoreScope(
@@ -25,6 +31,7 @@ internal class EfCoreScope : CoreScope, IEfCoreScope
         IEfCoreScopeProvider efCoreScopeProvider,
         IScopeContext? scopeContext,
         IEventAggregator eventAggregator,
+        IScopeProvider scopeProvider,
         RepositoryCacheMode repositoryCacheMode = RepositoryCacheMode.Unspecified,
         bool? scopeFileSystems = null)
         : base(distributedLockingMechanismFactory, loggerFactory, scopedFileSystem, eventAggregator, repositoryCacheMode, scopeFileSystems)
@@ -33,6 +40,7 @@ internal class EfCoreScope : CoreScope, IEfCoreScope
         _efCoreScopeAccessor = efCoreScopeAccessor;
         _efCoreScopeProvider = (EfCoreScopeProvider)efCoreScopeProvider;
         ScopeContext = scopeContext;
+        _innerScope = scopeProvider.CreateScope();
     }
 
     public EfCoreScope(
@@ -112,6 +120,15 @@ internal class EfCoreScope : CoreScope, IEfCoreScope
         base.Dispose();
 
         _disposed = true;
+        if (ParentScope is null)
+        {
+            if (Completed.HasValue && Completed.Value)
+            {
+                _innerScope?.Complete();
+            }
+
+            _innerScope?.Dispose();
+        }
     }
 
     private void InitializeDatabase()
@@ -124,8 +141,18 @@ internal class EfCoreScope : CoreScope, IEfCoreScope
         // Check if we are already in a transaction before starting one
         if (_umbracoEfCoreDatabase.UmbracoEFContext.Database.CurrentTransaction is null)
         {
+            DbTransaction? transaction = _innerScope?.Database.Transaction;
             Locks.EnsureLocks(InstanceId);
-            _umbracoEfCoreDatabase.UmbracoEFContext.Database.BeginTransaction();
+            _umbracoEfCoreDatabase.UmbracoEFContext.Database.SetDbConnection(transaction?.Connection);
+
+            if (transaction is null)
+            {
+                _umbracoEfCoreDatabase.UmbracoEFContext.Database.BeginTransaction();
+            }
+            else
+            {
+                _umbracoEfCoreDatabase.UmbracoEFContext.Database.UseTransaction(transaction);
+            }
         }
     }
 
@@ -163,7 +190,7 @@ internal class EfCoreScope : CoreScope, IEfCoreScope
             bool databaseException = false;
             try
             {
-                if (_umbracoEfCoreDatabase is not null)
+                if (_umbracoEfCoreDatabase is not null && _innerScope?.Database.Transaction is null)
                 {
                     // Transaction connection can be null here if we get chosen as the deadlock victim.
                     if (_umbracoEfCoreDatabase.UmbracoEFContext.Database.CurrentTransaction?.GetDbTransaction()

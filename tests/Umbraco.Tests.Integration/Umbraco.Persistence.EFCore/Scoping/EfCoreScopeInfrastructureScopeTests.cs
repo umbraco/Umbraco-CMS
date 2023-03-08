@@ -12,8 +12,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Persistence.EFCore.Scoping;
 public class EfCoreScopeInfrastructureScopeTests : UmbracoIntegrationTest
 {
     private IEfCoreScopeProvider EfCoreScopeProvider =>
-        GetRequiredService<IEfCoreScopeProvider>();    
-    
+        GetRequiredService<IEfCoreScopeProvider>();
+
     private IScopeProvider InfrastructureScopeProvider =>
         GetRequiredService<IScopeProvider>();
 
@@ -33,7 +33,7 @@ public class EfCoreScopeInfrastructureScopeTests : UmbracoIntegrationTest
             Assert.AreSame(scope, EfCoreScopeAccessor.AmbientScope);
             using (var infrastructureScope = InfrastructureScopeProvider.CreateScope())
             {
-                Assert.AreNotSame(infrastructureScope, InfrastructureScopeAccessor.AmbientScope);
+                Assert.AreSame(infrastructureScope, InfrastructureScopeAccessor.AmbientScope);
             }
 
             Assert.IsNotNull(InfrastructureScopeAccessor.AmbientScope);
@@ -64,7 +64,6 @@ public class EfCoreScopeInfrastructureScopeTests : UmbracoIntegrationTest
 
             await parentScope.ExecuteWithContextAsync<Task>(async database =>
             {
-                // Should still be in transaction and not rolled back yet
                 string? result = await database.Database.ExecuteScalarAsync<string>("SELECT name FROM tmp3 WHERE id=1");
                 Assert.AreEqual("a", result);
             });
@@ -73,37 +72,17 @@ public class EfCoreScopeInfrastructureScopeTests : UmbracoIntegrationTest
             parentScope.Complete();
         }
 
-        using (IEfCoreScope parentScope = EfCoreScopeProvider.CreateScope())
-        {
-            using (IScope childScope = InfrastructureScopeProvider.CreateScope())
-            {
-                childScope.Database.Execute("INSERT INTO tmp3 (id, name) VALUES (1, 'a')");
-                string n = ScopeAccessor.AmbientScope.Database.ExecuteScalar<string>("SELECT name FROM tmp3 WHERE id=1");
-                Assert.AreEqual("a", n);
-            }
-
-            await parentScope.ExecuteWithContextAsync<Task>(async database =>
-            {
-                // Should still be in transaction and not rolled back yet
-                string? result = await database.Database.ExecuteScalarAsync<string>("SELECT name FROM tmp3 WHERE id=1");
-                Assert.AreEqual("a", result);
-            });
-
-            parentScope.Complete();
-        }
-
-        // Check that its rolled back
+        // Check that its not rolled back
         using (IEfCoreScope scope = EfCoreScopeProvider.CreateScope())
         {
             await scope.ExecuteWithContextAsync<Task>(async database =>
             {
-                // Should still be in transaction and not rolled back yet
                 string? result = await database.Database.ExecuteScalarAsync<string>("SELECT name FROM tmp3 WHERE id=1");
-                Assert.IsNull(result);
+                Assert.IsNotNull(result);
             });
         }
     }
-    
+
     [Test]
     public async Task DontCompleteWhenChildInfrastructureScopeDoesNotComplete()
     {

@@ -5,6 +5,7 @@ using Umbraco.Cms.Core.DistributedLocking;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Scoping;
+using IScopeProvider = Umbraco.Cms.Infrastructure.Scoping.IScopeProvider;
 
 namespace Umbraco.Cms.Persistence.EFCore.Scoping;
 
@@ -18,6 +19,7 @@ public class EfCoreScopeProvider : IEfCoreScopeProvider
     private readonly IDistributedLockingMechanismFactory _distributedLockingMechanismFactory;
     private readonly IEventAggregator _eventAggregator;
     private readonly FileSystems _fileSystems;
+    private readonly IScopeProvider _scopeProvider;
 
     // Needed for DI as IAmbientEfCoreScopeStack is internal
     public EfCoreScopeProvider()
@@ -29,7 +31,8 @@ public class EfCoreScopeProvider : IEfCoreScopeProvider
             StaticServiceProvider.Instance.GetRequiredService<IAmbientEFCoreScopeContextStack>(),
             StaticServiceProvider.Instance.GetRequiredService<IDistributedLockingMechanismFactory>(),
             StaticServiceProvider.Instance.GetRequiredService<IEventAggregator>(),
-            StaticServiceProvider.Instance.GetRequiredService<FileSystems>())
+            StaticServiceProvider.Instance.GetRequiredService<FileSystems>(),
+            StaticServiceProvider.Instance.GetRequiredService<IScopeProvider>())
     {
     }
 
@@ -41,7 +44,8 @@ public class EfCoreScopeProvider : IEfCoreScopeProvider
         IAmbientEFCoreScopeContextStack ambientEfCoreScopeContextStack,
         IDistributedLockingMechanismFactory distributedLockingMechanismFactory,
         IEventAggregator eventAggregator,
-        FileSystems fileSystems)
+        FileSystems fileSystems,
+        IScopeProvider scopeProvider)
     {
         _ambientEfCoreScopeStack = ambientEfCoreScopeStack;
         _umbracoEfCoreDatabaseFactory = umbracoEfCoreDatabaseFactory;
@@ -51,6 +55,7 @@ public class EfCoreScopeProvider : IEfCoreScopeProvider
         _distributedLockingMechanismFactory = distributedLockingMechanismFactory;
         _eventAggregator = eventAggregator;
         _fileSystems = fileSystems;
+        _scopeProvider = scopeProvider;
         _fileSystems.IsScoped = () => efCoreScopeAccessor.AmbientScope != null && ((EfCoreScope)efCoreScopeAccessor.AmbientScope).ScopedFileSystems;
     }
 
@@ -66,6 +71,7 @@ public class EfCoreScopeProvider : IEfCoreScopeProvider
             this,
             null,
             _eventAggregator,
+            _scopeProvider,
             repositoryCacheMode,
             scopeFileSystems);
 
@@ -152,6 +158,7 @@ public class EfCoreScopeProvider : IEfCoreScopeProvider
                 this,
                 newContext,
                 _eventAggregator,
+                _scopeProvider,
                 repositoryCacheMode,
                 scopeFileSystems);
 
