@@ -3,6 +3,7 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, property } from 'lit/decorators.js';
 import { FormControlMixin } from '@umbraco-ui/uui-base/lib/mixins';
 import { UUIModalSidebarSize } from '@umbraco-ui/uui-modal-sidebar';
+import { UMB_LINK_PICKER_MODAL_TOKEN } from '../../modals/link-picker';
 import { UmbLitElement } from '@umbraco-cms/element';
 import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN } from 'libs/modal';
 
@@ -144,7 +145,7 @@ export class UmbInputMultiUrlPickerElement extends FormControlMixin(UmbLitElemen
 	}
 
 	private _openPicker(data?: MultiUrlData, index?: number) {
-		const modalHandler = this._modalContext?.linkPicker({
+		const modalHandler = this._modalContext?.open(UMB_LINK_PICKER_MODAL_TOKEN, {
 			link: {
 				name: data?.name,
 				published: data?.published,
