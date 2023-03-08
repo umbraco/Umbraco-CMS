@@ -2,35 +2,13 @@ import { css, html, nothing } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, query, state } from 'lit/decorators.js';
 import { UUIBooleanInputEvent, UUIInputElement } from '@umbraco-ui/uui';
-import { UUIModalSidebarSize } from '@umbraco-ui/uui-modal-sidebar';
 import { UmbModalLayoutElement } from '../../../../../libs/modal/layouts/modal-layout.element';
 import { UmbTreeElement } from '../../components/tree/tree.element';
+import { UmbLinkPickerConfig, UmbLinkPickerLink, UmbLinkPickerModalData } from '.';
 import { buildUdi, getKeyFromUdi } from '@umbraco-cms/utils';
 
-export interface UmbModalLinkPickerData {
-	link: LinkPickerData;
-	config: LinkPickerConfig;
-}
-
-export interface LinkPickerData {
-	icon?: string | null;
-	name?: string | null;
-	published?: boolean | null;
-	queryString?: string | null;
-	target?: string | null;
-	trashed?: boolean | null;
-	udi?: string | null;
-	url?: string | null;
-}
-
-export interface LinkPickerConfig {
-	hideAnchor?: boolean;
-	ignoreUserStartNodes?: boolean;
-	overlaySize?: UUIModalSidebarSize;
-}
-
 @customElement('umb-modal-layout-link-picker')
-export class UmbModalLayoutLinkPickerElement extends UmbModalLayoutElement<UmbModalLinkPickerData> {
+export class UmbModalLayoutLinkPickerElement extends UmbModalLayoutElement<UmbLinkPickerModalData> {
 	static styles = [
 		UUITextStyles,
 		css`
@@ -69,7 +47,7 @@ export class UmbModalLayoutLinkPickerElement extends UmbModalLayoutElement<UmbMo
 	_selectedKey?: string;
 
 	@state()
-	_link: LinkPickerData = {
+	_link: UmbLinkPickerLink = {
 		icon: null,
 		name: null,
 		published: true,
@@ -81,7 +59,7 @@ export class UmbModalLayoutLinkPickerElement extends UmbModalLayoutElement<UmbMo
 	};
 
 	@state()
-	_layout: LinkPickerConfig = {
+	_layout: UmbLinkPickerConfig = {
 		hideAnchor: false,
 		ignoreUserStartNodes: false,
 	};

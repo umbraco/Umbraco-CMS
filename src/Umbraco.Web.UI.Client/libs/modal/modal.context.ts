@@ -19,7 +19,7 @@ import { UmbIconPickerModalData } from '../../src/backoffice/shared/modals/icon-
 import type { UmbModalConfirmData } from './layouts/confirm/modal-layout-confirm.element';
 import type { UmbModalPropertyEditorUIPickerData } from './layouts/property-editor-ui-picker/modal-layout-property-editor-ui-picker.element';
 import { UmbMediaPickerModalData } from '../../src/backoffice/media/media/modals/media-picker';
-import type { UmbModalLinkPickerData } from '../../src/backoffice/shared/modals/link-picker/modal-layout-link-picker.element';
+import type { UmbLinkPickerModalData } from '../../src/backoffice/shared/modals/link-picker/modal-layout-link-picker.element';
 import { UmbModalHandler } from './modal-handler';
 import type { UmbBasicModalData } from './layouts/basic/modal-layout-basic.element';
 import { UmbPickerModalData } from './layouts/modal-layout-picker-base';
@@ -109,7 +109,7 @@ export class UmbModalContext {
 	 * @return {*}  {UmbModalHandler}
 	 * @memberof UmbModalContext
 	 */
-	public linkPicker(data?: UmbModalLinkPickerData): UmbModalHandler {
+	public linkPicker(data?: UmbLinkPickerModalData): UmbModalHandler {
 		return this.open('umb-modal-layout-link-picker', {
 			data,
 			type: 'sidebar',
