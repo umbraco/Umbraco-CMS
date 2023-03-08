@@ -195,6 +195,8 @@ export class UmbLinkPickerModalElement extends UmbModalLayoutElement<UmbLinkPick
 	}
 }
 
+export default UmbLinkPickerModalElement;
+
 declare global {
 	interface HTMLElementTagNameMap {
 		'umb-link-picker-modal': UmbLinkPickerModalElement;
