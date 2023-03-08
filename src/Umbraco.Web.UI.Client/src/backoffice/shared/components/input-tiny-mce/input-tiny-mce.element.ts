@@ -42,52 +42,7 @@ export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
 				position: relative;
 				min-height: 100px;
 			}
-
-			/* TODO => this should be served from rte-content.css via Tiny, so that
-			 the styles are applied inside the iframe 
-			.umb-macro-holder {
-				border: 3px dotted var(--uui-palette-spanish-pink-light);
-				padding: 7px;
-				display: block;
-				margin: 3px;
-			}
-			 TODO => alternate background loader
-			.umb-macro-holder.loading {
-				background: url(assets/img/loader.gif) right no-repeat;
-				background-size: 18px;
-				background-position-x: 99%;
-			}
-
-			.embeditem {
-				position: relative;
-			}
-
-			.embeditem > * {
-				user-select: none;
-				pointer-events: none;
-			}
-
-			.embeditem[data-mce-selected] {
-				outline: 2px solid var(--uui-palette-spanish-pink-light);
-			}
-
-			.embeditem::before {
-				z-index: 1000;
-				width: 100%;
-				height: 100%;
-				position: absolute;
-				content: ' ';
-			}
-
-			.embeditem[data-mce-selected]::before {
-				background: rgba(0, 0, 0, 0.025);
-			}
-
-			*[data-mce-selected='inline-boundary'] {
-				background: rgba(0, 0, 0, 0.025);
-				outline: 2px solid var(--uui-palette-spanish-pink-light);
-			} */
-
+			
 			.tox-tinymce-aux {
 				z-index: 9000;
 			}

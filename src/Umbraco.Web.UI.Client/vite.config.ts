@@ -22,6 +22,10 @@ export default defineConfig({
 					src: 'public-assets/tiny-mce/**.*',
 					dest: 'tiny-mce',
 				},
+				{
+					src: 'public-assets/css/*.css',
+					dest: 'css',
+				}
 			],
 		}),
 		viteTSConfigPaths(),
