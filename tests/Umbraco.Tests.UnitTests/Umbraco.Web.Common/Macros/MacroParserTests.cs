@@ -396,4 +396,25 @@ asdfsdf
             @"<?UMBRACO_MACRO macroAlias=""Test"" content=""1089"" textArea=""asdfasdf"" title="""" bool=""0"" number="""" contentType="""" multiContentType="""" multiProperties="""" properties="""" tabs="""" multiTabs="""" />",
             result);
     }
+    
+    [Test]
+    public void Format_RTE_WhenMacroContainsParameter_EnableInlineMacro_WithValue_1_ItShouldBeInASpan()
+    {
+        var content = @"<p>asdfasdf</p>
+<p>asdfsadf</p>
+<?UMBRACO_MACRO macroAlias=""My.Map.isCool eh[boy!]"" test1=""value1"" enableInlineMacro=""1""/>
+<p>asdfasdf</p>";
+        var result = MacroTagParser.FormatRichTextPersistedDataForEditor(
+            content,
+            new Dictionary<string, string> { { "test1", "value1" }, { "enableInlineMacro",  "1"} });
+
+        Assert.AreEqual(
+            @"<p>asdfasdf</p>
+<p>asdfsadf</p>
+<span class=""umb-macro-holder inlined-macro mceNonEditable"" test1=""value1"" enableInlineMacro=""1"">
+<!-- <?UMBRACO_MACRO macroAlias=""My.Map.isCool eh[boy!]"" test1=""value1"" enableInlineMacro=""1"" /> -->
+<ins>Macro alias: <strong>My.Map.isCool eh[boy!]</strong></ins></span>
+<p>asdfasdf</p>".StripNewLines(),
+            result.StripNewLines());
+    }
 }
