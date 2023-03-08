@@ -3,8 +3,8 @@ import { html } from 'lit';
 import type {
 	UmbModalLayoutPropertyEditorUIPickerElement,
 	UmbModalPropertyEditorUIPickerData,
-} from './modal-layout-property-editor-ui-picker.element';
-import './modal-layout-property-editor-ui-picker.element';
+} from './property-editor-ui-picker-modal.element';
+import './property-editor-ui-picker-modal.element';
 
 import '../../../components/body-layout/body-layout.element';
 
