@@ -137,6 +137,8 @@ public class EfCoreScopeProvider : IEfCoreScopeProvider
             throw new InvalidOperationException($"The detatched scope context does not match the original");
         }
 
+        _scopeProvider.DetachScope();
+
         ambientScope.OriginalScope = null;
         ambientScope.OriginalContext = null;
         ambientScope.Attached = false;
