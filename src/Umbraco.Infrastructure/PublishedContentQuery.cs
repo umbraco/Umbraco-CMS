@@ -365,12 +365,12 @@ public class PublishedContentQuery : IPublishedContentQuery
             VariationContext? originalContext = _variationContextAccessor.VariationContext;
             if (!_culture.IsNullOrWhiteSpace() && !_culture.InvariantEquals(originalContext?.Culture))
             {
-                _variationContextAccessor.VariationContext = new VariationContext(_culture);
+                originalContext ??= new VariationContext();
+                _variationContextAccessor.VariationContext = originalContext.WithCulture(_culture);
             }
 
             // Now the IPublishedContent returned will be contextualized to the culture specified and will be reset when the enumerator is disposed
-            return new CultureContextualSearchResultsEnumerator(_wrapped.GetEnumerator(), _variationContextAccessor,
-                originalContext);
+            return new CultureContextualSearchResultsEnumerator(_wrapped.GetEnumerator(), _variationContextAccessor, originalContext);
         }
 
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();

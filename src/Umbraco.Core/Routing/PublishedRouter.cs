@@ -210,15 +210,17 @@ public class PublishedRouter : IPublishedRouter
         culture ??= string.Empty;
         segment ??= string.Empty;
 
-        VariationContext? variationContext = _variationContextAccessor.VariationContext;
-        if (variationContext != null &&
-            variationContext.Culture == culture &&
-            variationContext.Segment == segment)
+        VariationContext variationContext = _variationContextAccessor.VariationContext ?? new VariationContext();
+        if (variationContext.Culture != culture)
         {
-            return;
+            variationContext = variationContext.WithCulture(culture);
+        }
+        if (variationContext.Segment != segment)
+        {
+            variationContext = variationContext.WithSegment(segment);
         }
 
-        _variationContextAccessor.VariationContext = new VariationContext(culture, segment);
+        _variationContextAccessor.VariationContext = variationContext;
     }
 
     private async Task RouteRequestInternalAsync(IPublishedRequestBuilder builder, bool skipContentFinders = false)

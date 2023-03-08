@@ -30,4 +30,23 @@ public class VariationContext
     /// <param name="contentId"></param>
     /// <returns></returns>
     public virtual string GetSegment(int contentId) => Segment;
+
+    /// <summary>
+    /// A copy of the VariationContext with a different culture.
+    /// </summary>
+    /// <param name="culture">The new culture.</param>
+    /// <remarks>Does not modify the original VariationContext.</remarks>
+    /// <returns>A copy of the VariationContext (same segment) with the culture from <paramref name="culture"/>.</returns>
+    public VariationContext WithCulture(string? culture)
+        => new(culture, Segment);
+
+
+    /// <summary>
+    /// A copy of the VariationContext with a different segment.
+    /// </summary>
+    /// <param name="segment">The new segment.</param>
+    /// <remarks>Does not modify the original VariationContext.</remarks>
+    /// <returns>A copy of the VariationContext (same culture) with the segment from <paramref name="segment"/>.</returns>
+    public VariationContext WithSegment(string? segment)
+        => new(Culture, segment);
 }
