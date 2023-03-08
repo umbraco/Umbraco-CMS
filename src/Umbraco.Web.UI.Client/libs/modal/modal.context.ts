@@ -1,6 +1,6 @@
 import './layouts/property-editor-ui-picker/modal-layout-property-editor-ui-picker.element';
 import '../../src/backoffice/settings/languages/modals/language-picker/language-picker-modal.element';
-import './layouts/search/modal-layout-search.element.ts';
+import './layouts/search/modal-layout-search.element';
 
 import { UUIModalSidebarSize } from '@umbraco-ui/uui-modal-sidebar';
 import { BehaviorSubject } from 'rxjs';

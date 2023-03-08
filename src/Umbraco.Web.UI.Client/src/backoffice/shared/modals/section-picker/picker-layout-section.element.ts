@@ -91,6 +91,8 @@ export class UmbPickerLayoutSectionElement extends UmbModalLayoutPickerBase<Mani
 	}
 }
 
+export default UmbPickerLayoutSectionElement;
+
 declare global {
 	interface HTMLElementTagNameMap {
 		'umb-picker-layout-section': UmbPickerLayoutSectionElement;

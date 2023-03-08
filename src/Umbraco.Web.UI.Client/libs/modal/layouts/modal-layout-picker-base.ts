@@ -1,5 +1,6 @@
 import { property } from 'lit/decorators.js';
 import { UmbModalLayoutElement } from '..';
+import './modal-layout.element';
 
 export interface UmbPickerModalData<T> {
 	multiple: boolean;
