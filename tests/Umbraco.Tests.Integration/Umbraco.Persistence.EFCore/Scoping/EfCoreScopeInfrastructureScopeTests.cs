@@ -44,7 +44,7 @@ public class EfCoreScopeInfrastructureScopeTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public async Task CompleteWhenChildInfrastructureScopeDoesComplete()
+    public async Task? TransactionWithEfCoreScopeAsParent()
     {
         using (IEfCoreScope parentScope = EfCoreScopeProvider.CreateScope())
         {
@@ -57,7 +57,8 @@ public class EfCoreScopeInfrastructureScopeTests : UmbracoIntegrationTest
             using (IScope childScope = InfrastructureScopeProvider.CreateScope())
             {
                 childScope.Database.Execute("INSERT INTO tmp3 (id, name) VALUES (1, 'a')");
-                string n = ScopeAccessor.AmbientScope.Database.ExecuteScalar<string>("SELECT name FROM tmp3 WHERE id=1");
+                string n = ScopeAccessor.AmbientScope.Database.ExecuteScalar<string>(
+                    "SELECT name FROM tmp3 WHERE id=1");
                 Assert.AreEqual("a", n);
                 childScope.Complete();
             }
@@ -84,7 +85,42 @@ public class EfCoreScopeInfrastructureScopeTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public async Task DontCompleteWhenChildInfrastructureScopeDoesNotComplete()
+    public async Task? TransactionWithInfrastructureScopeAsParent()
+    {
+        using (IScope parentScope = InfrastructureScopeProvider.CreateScope())
+        {
+            parentScope.Database.Execute("CREATE TABLE tmp3 (id INT, name NVARCHAR(64))");
+
+            using (IEfCoreScope scope = EfCoreScopeProvider.CreateScope())
+            {
+                await scope.ExecuteWithContextAsync<Task>(async database =>
+                {
+                    await database.Database.ExecuteSqlAsync($"INSERT INTO tmp3 (id, name) VALUES (1, 'a')");
+
+                    string? result =
+                        await database.Database.ExecuteScalarAsync<string>("SELECT name FROM tmp3 WHERE id=1");
+                    Assert.AreEqual("a", result);
+                });
+
+                scope.Complete();
+            }
+
+            parentScope.Complete();
+        }
+
+        // Check that its not rolled back
+        using (IEfCoreScope scope = EfCoreScopeProvider.CreateScope())
+        {
+            await scope.ExecuteWithContextAsync<Task>(async database =>
+            {
+                string? result = await database.Database.ExecuteScalarAsync<string>("SELECT name FROM tmp3 WHERE id=1");
+                Assert.IsNotNull(result);
+            });
+        }
+    }
+
+    [Test]
+    public async Task EFCoreAsParent_DontCompleteWhenChildScopeDoesNotComplete()
     {
         using (IEfCoreScope scope = EfCoreScopeProvider.CreateScope())
         {
@@ -126,4 +162,46 @@ public class EfCoreScopeInfrastructureScopeTests : UmbracoIntegrationTest
         }
     }
 
+    [Test]
+    public async Task InfrastructureScopeAsParent_DontCompleteWhenChildScopeDoesNotComplete()
+    {
+        using (IEfCoreScope scope = EfCoreScopeProvider.CreateScope())
+        {
+            await scope.ExecuteWithContextAsync<Task>(async database =>
+            {
+                await database.Database.ExecuteSqlAsync($"CREATE TABLE tmp3 (id INT, name NVARCHAR(64))");
+            });
+
+            scope.Complete();
+        }
+
+        using (IScope parentScope = InfrastructureScopeProvider.CreateScope())
+        {
+            using (IEfCoreScope scope = EfCoreScopeProvider.CreateScope())
+            {
+                await scope.ExecuteWithContextAsync<Task>(async database =>
+                {
+                    await database.Database.ExecuteSqlAsync($"INSERT INTO tmp3 (id, name) VALUES (1, 'a')");
+
+                    string? result = await database.Database.ExecuteScalarAsync<string>("SELECT name FROM tmp3 WHERE id=1");
+                    Assert.AreEqual("a", result);
+                });
+
+                string n = parentScope.Database.ExecuteScalar<string>("SELECT name FROM tmp3 WHERE id=1");
+                Assert.AreEqual("a", n);
+            }
+
+            parentScope.Complete();
+        }
+
+        // Check that its rolled back
+        using (IEfCoreScope scope = EfCoreScopeProvider.CreateScope())
+        {
+            await scope.ExecuteWithContextAsync<Task>(async database =>
+            {
+                string? result = await database.Database.ExecuteScalarAsync<string>("SELECT name FROM tmp3 WHERE id=1");
+                Assert.IsNull(result);
+            });
+        }
+    }
 }
