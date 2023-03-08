@@ -8,15 +8,15 @@ import { UmbModalLayoutElement } from '../../../../../libs/modal/layouts/modal-l
 
 import icons from '../../../../../public-assets/icons/icons.json';
 
-export interface UmbModalIconPickerData {
+export interface UmbIconPickerModalData {
 	multiple: boolean;
 	selection: string[];
 }
 
 // TODO: Make use of UmbPickerLayoutBase
 // TODO: to prevent element extension we need to move the Picker logic into a separate class we can reuse across all pickers
-@customElement('umb-modal-layout-icon-picker')
-export class UmbModalLayoutIconPickerElement extends UmbModalLayoutElement<UmbModalIconPickerData> {
+@customElement('umb-icon-picker-modal')
+export class UmbIconPickerModalElement extends UmbModalLayoutElement<UmbIconPickerModalData> {
 	static styles = [
 		UUITextStyles,
 		css`
@@ -211,10 +211,10 @@ export class UmbModalLayoutIconPickerElement extends UmbModalLayoutElement<UmbMo
 	}
 }
 
-export default UmbModalLayoutIconPickerElement;
+export default UmbIconPickerModalElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-modal-layout-icon-picker': UmbModalLayoutIconPickerElement;
+		'umb-icon-picker-modal': UmbIconPickerModalElement;
 	}
 }

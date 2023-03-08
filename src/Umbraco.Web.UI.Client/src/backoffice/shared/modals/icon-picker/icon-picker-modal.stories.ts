@@ -4,22 +4,22 @@ import './icon-picker-modal.element';
 import { Meta, Story } from '@storybook/web-components';
 import { html } from 'lit';
 
-import type { UmbModalLayoutIconPickerElement, UmbModalIconPickerData } from './icon-picker-modal.element';
+import type { UmbIconPickerModalElement, UmbIconPickerModalData } from './icon-picker-modal.element';
 
 export default {
 	title: 'API/Modals/Layouts/Icon Picker',
-	component: 'umb-modal-layout-icon-picker',
-	id: 'modal-layout-icon-picker',
+	component: 'umb-icon-picker-modal',
+	id: 'umb-icon-picker-modal',
 } as Meta;
 
-const data: UmbModalIconPickerData = {
+const data: UmbIconPickerModalData = {
 	multiple: true,
 	selection: [],
 };
 
-export const Overview: Story<UmbModalLayoutIconPickerElement> = () => html`
+export const Overview: Story<UmbIconPickerModalElement> = () => html`
 	<!-- TODO: figure out if generics are allowed for properties:
 	https://github.com/runem/lit-analyzer/issues/149
 	https://github.com/runem/lit-analyzer/issues/163 -->
-	<umb-modal-layout-icon-picker .data=${data as any}></umb-modal-layout-icon-picker>
+	<umb-icon-picker-modal .data=${data as any}></umb-icon-picker-modal>
 `;

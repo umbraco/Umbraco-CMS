@@ -15,7 +15,7 @@ import { BehaviorSubject } from 'rxjs';
 import type { UUIModalDialogElement } from '@umbraco-ui/uui-modal-dialog';
 import type { UmbModalDocumentPickerData } from '../../src/backoffice/documents/documents/modals/document-picker';
 import { UmbModalChangePasswordData } from './layouts/modal-layout-change-password.element';
-import type { UmbModalIconPickerData } from '../../src/backoffice/shared/modals/icon-picker/icon-picker-modal.element';
+import type { UmbIconPickerModalData } from '../../src/backoffice/shared/modals/icon-picker/icon-picker-modal.element';
 import type { UmbModalConfirmData } from './layouts/confirm/modal-layout-confirm.element';
 import type { UmbModalPropertyEditorUIPickerData } from './layouts/property-editor-ui-picker/modal-layout-property-editor-ui-picker.element';
 import type { UmbModalMediaPickerData } from './layouts/media-picker/modal-layout-media-picker.element';
@@ -94,11 +94,11 @@ export class UmbModalContext {
 	/**
 	 * Opens an Icon Picker sidebar modal
 	 * @public
-	 * @param {UmbModalIconPickerData} [data]
+	 * @param {UmbIconPickerModalData} [data]
 	 * @return {*}  {UmbModalHandler}
 	 * @memberof UmbModalContext
 	 */
-	public iconPicker(data?: UmbModalIconPickerData): UmbModalHandler {
+	public iconPicker(data?: UmbIconPickerModalData): UmbModalHandler {
 		return this.open('umb-modal-layout-icon-picker', { data, type: 'sidebar', size: 'small' });
 	}
 
