@@ -6,7 +6,7 @@ import './layouts/property-editor-ui-picker/modal-layout-property-editor-ui-pick
 import '../../src/backoffice/users/current-user/modals/current-user/current-user-modal.element';
 import '../../src/backoffice/shared/modals/icon-picker/icon-picker-modal.element';
 import '../../src/backoffice/settings/languages/language-picker/language-picker-modal-layout.element';
-import './layouts/link-picker/modal-layout-link-picker.element';
+import '../../src/backoffice/shared/modals/link-picker/modal-layout-link-picker.element';
 import './layouts/basic/modal-layout-basic.element';
 import './layouts/search/modal-layout-search.element.ts';
 
@@ -19,7 +19,7 @@ import { UmbIconPickerModalData } from '../../src/backoffice/shared/modals/icon-
 import type { UmbModalConfirmData } from './layouts/confirm/modal-layout-confirm.element';
 import type { UmbModalPropertyEditorUIPickerData } from './layouts/property-editor-ui-picker/modal-layout-property-editor-ui-picker.element';
 import { UmbMediaPickerModalData } from '../../src/backoffice/media/media/modals/media-picker';
-import type { UmbModalLinkPickerData } from './layouts/link-picker/modal-layout-link-picker.element';
+import type { UmbModalLinkPickerData } from '../../src/backoffice/shared/modals/link-picker/modal-layout-link-picker.element';
 import { UmbModalHandler } from './modal-handler';
 import type { UmbBasicModalData } from './layouts/basic/modal-layout-basic.element';
 import { UmbPickerModalData } from './layouts/modal-layout-picker-base';

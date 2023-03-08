@@ -3,8 +3,8 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, query, state } from 'lit/decorators.js';
 import { UUIBooleanInputEvent, UUIInputElement } from '@umbraco-ui/uui';
 import { UUIModalSidebarSize } from '@umbraco-ui/uui-modal-sidebar';
-import { UmbModalLayoutElement } from '../modal-layout.element';
-import { UmbTreeElement } from '../../../../src/backoffice/shared/components/tree/tree.element';
+import { UmbModalLayoutElement } from '../../../../../libs/modal/layouts/modal-layout.element';
+import { UmbTreeElement } from '../../components/tree/tree.element';
 import { buildUdi, getKeyFromUdi } from '@umbraco-cms/utils';
 
 export interface UmbModalLinkPickerData {
