@@ -44,16 +44,6 @@ export class UmbModalContext {
 	}
 
 	/**
-	 * Opens the user settings sidebar modal
-	 * @public
-	 * @return {*}  {UmbModalHandler}
-	 * @memberof UmbModalContext
-	 */
-	public userSettings(): UmbModalHandler {
-		return this.open('umb-modal-layout-current-user', { type: 'sidebar', size: 'small' });
-	}
-
-	/**
 	 * Opens a language picker sidebar modal
 	 * @public
 	 * @return {*}  {UmbModalHandler}
