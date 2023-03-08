@@ -1,29 +1,14 @@
-// TODO: lazy load
-import '../../src/backoffice/shared/modals/confirm/confirm-modal.element';
-import '../../src/backoffice/documents/documents/modals/document-picker/document-picker-modal.element';
-import '../../src/backoffice/media/media/modals/media-picker/media-picker-modal.element';
 import './layouts/property-editor-ui-picker/modal-layout-property-editor-ui-picker.element';
-import '../../src/backoffice/users/current-user/modals/current-user/current-user-modal.element';
-import '../../src/backoffice/shared/modals/icon-picker/icon-picker-modal.element';
 import '../../src/backoffice/settings/languages/language-picker/language-picker-modal-layout.element';
-import '../../src/backoffice/shared/modals/link-picker/link-picker-modal.element';
-import '../../src/backoffice/shared/modals/basic/basic-modal.element';
 import './layouts/search/modal-layout-search.element.ts';
 
 import { UUIModalSidebarSize } from '@umbraco-ui/uui-modal-sidebar';
 import { BehaviorSubject } from 'rxjs';
 import type { UUIModalDialogElement } from '@umbraco-ui/uui-modal-dialog';
-import type { UmbDocumentPickerModalData } from '../../src/backoffice/documents/documents/modals/document-picker';
-import { UmbChangePasswordModalData } from '../../src/backoffice/users/current-user/modals/change-password';
-import { UmbIconPickerModalData } from '../../src/backoffice/shared/modals/icon-picker';
-import { UmbMediaPickerModalData } from '../../src/backoffice/media/media/modals/media-picker';
-import type { UmbBasicModalData } from '../../src/backoffice/shared/modals/basic';
-import type { UmbLinkPickerModalData } from '../../src/backoffice/shared/modals/link-picker';
-import type { UmbConfirmModalData } from '../../src/backoffice/shared/modals/confirm';
 import type { UmbModalPropertyEditorUIPickerData } from './layouts/property-editor-ui-picker/modal-layout-property-editor-ui-picker.element';
 import { UmbModalHandler } from './modal-handler';
 import { UmbPickerModalData } from './layouts/modal-layout-picker-base';
-import { UmbModalToken } from './token/modal-token';
+import type { UmbModalToken } from './token/modal-token';
 import { UmbContextToken } from '@umbraco-cms/context-api';
 import { LanguageModel } from '@umbraco-cms/backend-api';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
@@ -48,39 +33,6 @@ export class UmbModalContext {
 	}
 
 	/**
-	 * Opens a Confirm modal
-	 * @public
-	 * @param {UmbConfirmModalData} data
-	 * @return {*}  {UmbModalHandler}
-	 * @memberof UmbModalContext
-	 */
-	public confirm(data: UmbConfirmModalData): UmbModalHandler {
-		return this.open('umb-modal-layout-confirm', { data, type: 'dialog' });
-	}
-
-	/**
-	 * Opens a Content Picker sidebar modal
-	 * @public
-	 * @param {UmbDocumentPickerModalData} [data]
-	 * @return {*}  {UmbModalHandler}
-	 * @memberof UmbModalContext
-	 */
-	public documentPicker(data?: UmbDocumentPickerModalData): UmbModalHandler {
-		return this.open('umb-document-picker-modal', { data, type: 'sidebar', size: 'small' });
-	}
-
-	/**
-	 * Opens a Media Picker sidebar modal
-	 * @public
-	 * @param {UmbMediaPickerModalData} [data]
-	 * @return {*}  {UmbModalHandler}
-	 * @memberof UmbModalContext
-	 */
-	public mediaPicker(data?: UmbMediaPickerModalData): UmbModalHandler {
-		return this.open('umb-modal-layout-media-picker', { data, type: 'sidebar', size: 'small' });
-	}
-
-	/**
 	 * Opens a Property Editor UI sidebar modal
 	 * @public
 	 * @param {UmbModalPropertyEditorUIPickerData} [data]
@@ -89,32 +41,6 @@ export class UmbModalContext {
 	 */
 	public propertyEditorUIPicker(data?: UmbModalPropertyEditorUIPickerData): UmbModalHandler {
 		return this.open('umb-modal-layout-property-editor-ui-picker', { data, type: 'sidebar', size: 'small' });
-	}
-
-	/**
-	 * Opens an Icon Picker sidebar modal
-	 * @public
-	 * @param {UmbIconPickerModalData} [data]
-	 * @return {*}  {UmbModalHandler}
-	 * @memberof UmbModalContext
-	 */
-	public iconPicker(data?: UmbIconPickerModalData): UmbModalHandler {
-		return this.open('umb-modal-layout-icon-picker', { data, type: 'sidebar', size: 'small' });
-	}
-
-	/**
-	 * Opens an Link Picker sidebar modal
-	 * @public
-	 * @param {(LinkPickerData & LinkPickerConfig)} [data]
-	 * @return {*}  {UmbModalHandler}
-	 * @memberof UmbModalContext
-	 */
-	public linkPicker(data?: UmbLinkPickerModalData): UmbModalHandler {
-		return this.open('umb-modal-layout-link-picker', {
-			data,
-			type: 'sidebar',
-			size: data?.config?.overlaySize || 'small',
-		});
 	}
 
 	/**
@@ -128,16 +54,6 @@ export class UmbModalContext {
 	}
 
 	/**
-	 * Opens the change password sidebar modal
-	 * @public
-	 * @return {*}  {UmbModalHandler}
-	 * @memberof UmbModalContext
-	 */
-	public changePassword(data: UmbChangePasswordModalData): UmbModalHandler {
-		return this.open('umb-modal-layout-change-password', { data, type: 'dialog' });
-	}
-
-	/**
 	 * Opens a language picker sidebar modal
 	 * @public
 	 * @return {*}  {UmbModalHandler}
@@ -145,20 +61,6 @@ export class UmbModalContext {
 	 */
 	public languagePicker(data: UmbPickerModalData<LanguageModel>): UmbModalHandler {
 		return this.open('umb-language-picker-modal-layout', { data, type: 'sidebar' });
-	}
-
-	/**
-	 * Opens a basic sidebar modal to display readonly information
-	 * @public
-	 * @return {*}  {UmbModalHandler}
-	 * @memberof UmbModalContext
-	 */
-	public openBasic(data: UmbBasicModalData): UmbModalHandler {
-		return this.open('umb-modal-layout-basic', {
-			data,
-			type: 'sidebar',
-			size: data?.overlaySize || 'small',
-		});
 	}
 
 	public search(): UmbModalHandler {
