@@ -13,7 +13,7 @@ import './layouts/search/modal-layout-search.element.ts';
 import { UUIModalSidebarSize } from '@umbraco-ui/uui-modal-sidebar';
 import { BehaviorSubject } from 'rxjs';
 import type { UUIModalDialogElement } from '@umbraco-ui/uui-modal-dialog';
-import type { UmbModalDocumentPickerData } from '../../src/backoffice/documents/documents/modals/document-picker';
+import type { UmbDocumentPickerModalData } from '../../src/backoffice/documents/documents/modals/document-picker';
 import { UmbChangePasswordModalData } from '../../src/backoffice/users/current-user/modals/change-password';
 import { UmbIconPickerModalData } from '../../src/backoffice/shared/modals/icon-picker';
 import type { UmbModalConfirmData } from './layouts/confirm/modal-layout-confirm.element';
@@ -61,11 +61,11 @@ export class UmbModalContext {
 	/**
 	 * Opens a Content Picker sidebar modal
 	 * @public
-	 * @param {UmbModalDocumentPickerData} [data]
+	 * @param {UmbDocumentPickerModalData} [data]
 	 * @return {*}  {UmbModalHandler}
 	 * @memberof UmbModalContext
 	 */
-	public documentPicker(data?: UmbModalDocumentPickerData): UmbModalHandler {
+	public documentPicker(data?: UmbDocumentPickerModalData): UmbModalHandler {
 		return this.open('umb-document-picker-modal', { data, type: 'sidebar', size: 'small' });
 	}
 

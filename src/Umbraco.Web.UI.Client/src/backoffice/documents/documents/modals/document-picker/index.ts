@@ -1,15 +1,15 @@
 import { UmbModalToken } from 'libs/modal';
 
-export interface UmbModalDocumentPickerData {
+export interface UmbDocumentPickerModalData {
 	multiple?: boolean;
 	selection?: Array<string>;
 }
 
-export interface UmbModalDocumentPickerResponse {
+export interface UmbDocumentPickerModalResponse {
 	selection: Array<string>;
 }
 
-export const UMB_DOCUMENT_PICKER_MODAL_TOKEN = new UmbModalToken<UmbModalDocumentPickerData>(
+export const UMB_DOCUMENT_PICKER_MODAL_TOKEN = new UmbModalToken<UmbDocumentPickerModalData>(
 	'Umb.Modal.DocumentPicker',
 	{
 		type: 'sidebar',
