@@ -160,8 +160,8 @@ internal class EfCoreScope : CoreScope, IEfCoreScope
         if (_umbracoEfCoreDatabase.UmbracoEFContext.Database.CurrentTransaction is null)
         {
             DbTransaction? transaction = _innerScope?.Database.Transaction;
-            Locks.EnsureLocks(InstanceId);
             _umbracoEfCoreDatabase.UmbracoEFContext.Database.SetDbConnection(transaction?.Connection);
+            Locks.EnsureLocks(InstanceId);
 
             if (transaction is null)
             {
