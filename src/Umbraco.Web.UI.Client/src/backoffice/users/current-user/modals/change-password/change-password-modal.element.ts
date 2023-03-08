@@ -105,6 +105,8 @@ export class UmbChangePasswordModalElement extends UmbLitElement {
 	}
 }
 
+export default UmbChangePasswordModalElement;
+
 declare global {
 	interface HTMLElementTagNameMap {
 		'umb-change-password-modal': UmbChangePasswordModalElement;
