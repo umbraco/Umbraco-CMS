@@ -8,40 +8,6 @@ public class PublishedRequest : IPublishedRequest
     /// <summary>
     ///     Initializes a new instance of the <see cref="PublishedRequest" /> class.
     /// </summary>
-    [Obsolete("Use the constructor that includes a segment parameter")]
-    public PublishedRequest(
-        Uri uri,
-        string absolutePathDecoded,
-        IPublishedContent? publishedContent,
-        bool isInternalRedirect,
-        ITemplate? template,
-        DomainAndUri? domain,
-        string? culture,
-        string? redirectUrl,
-        int? responseStatusCode,
-        IReadOnlyList<string>? cacheExtensions,
-        IReadOnlyDictionary<string, string>? headers,
-        bool setNoCacheHeader,
-        bool ignorePublishedContentCollisions)
-        : this(
-            uri,
-            absolutePathDecoded,
-            publishedContent,
-            isInternalRedirect,
-            template,
-            domain,
-            culture,
-            null,
-            redirectUrl,
-            responseStatusCode,
-            cacheExtensions,
-            headers,
-            setNoCacheHeader,
-            ignorePublishedContentCollisions) { }
-
-    /// <summary>
-    ///     Initializes a new instance of the <see cref="PublishedRequest" /> class.
-    /// </summary>
     public PublishedRequest(
         Uri uri,
         string absolutePathDecoded,
