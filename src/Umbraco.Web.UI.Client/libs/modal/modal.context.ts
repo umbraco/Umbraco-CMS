@@ -14,7 +14,7 @@ import { UUIModalSidebarSize } from '@umbraco-ui/uui-modal-sidebar';
 import { BehaviorSubject } from 'rxjs';
 import type { UUIModalDialogElement } from '@umbraco-ui/uui-modal-dialog';
 import type { UmbModalDocumentPickerData } from '../../src/backoffice/documents/documents/modals/document-picker';
-import { UmbModalChangePasswordData } from '../../src/backoffice/users/current-user/modals/change-password/change-password-modal.element';
+import { UmbChangePasswordModalData } from '../../src/backoffice/users/current-user/modals/change-password';
 import { UmbIconPickerModalData } from '../../src/backoffice/shared/modals/icon-picker';
 import type { UmbModalConfirmData } from './layouts/confirm/modal-layout-confirm.element';
 import type { UmbModalPropertyEditorUIPickerData } from './layouts/property-editor-ui-picker/modal-layout-property-editor-ui-picker.element';
@@ -133,7 +133,7 @@ export class UmbModalContext {
 	 * @return {*}  {UmbModalHandler}
 	 * @memberof UmbModalContext
 	 */
-	public changePassword(data: UmbModalChangePasswordData): UmbModalHandler {
+	public changePassword(data: UmbChangePasswordModalData): UmbModalHandler {
 		return this.open('umb-modal-layout-change-password', { data, type: 'dialog' });
 	}
 

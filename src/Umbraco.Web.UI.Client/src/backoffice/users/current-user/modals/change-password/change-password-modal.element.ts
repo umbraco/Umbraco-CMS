@@ -2,11 +2,8 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, CSSResultGroup, html, nothing } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { UmbModalHandler } from '../../../../../../libs/modal';
+import { UmbChangePasswordModalData } from '.';
 import { UmbLitElement } from '@umbraco-cms/element';
-
-export interface UmbModalChangePasswordData {
-	requireOldPassword: boolean;
-}
 
 @customElement('umb-change-password-modal')
 export class UmbChangePasswordModalElement extends UmbLitElement {
@@ -32,7 +29,7 @@ export class UmbChangePasswordModalElement extends UmbLitElement {
 	modalHandler?: UmbModalHandler;
 
 	@property()
-	data?: UmbModalChangePasswordData;
+	data?: UmbChangePasswordModalData;
 
 	private _close() {
 		this.modalHandler?.close();
