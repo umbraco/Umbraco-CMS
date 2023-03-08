@@ -1,17 +1,11 @@
-import { html, TemplateResult } from 'lit';
+import { html } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement } from 'lit/decorators.js';
 import { UmbModalLayoutElement } from '../../../../../libs/modal/layouts/modal-layout.element';
-
-export interface UmbModalConfirmData {
-	headline: string;
-	content: TemplateResult | string;
-	color?: 'positive' | 'danger';
-	confirmLabel?: string;
-}
+import { UmbConfirmModalData } from '.';
 
 @customElement('umb-confirm-modal')
-export class UmbConfirmModalElement extends UmbModalLayoutElement<UmbModalConfirmData> {
+export class UmbConfirmModalElement extends UmbModalLayoutElement<UmbConfirmModalData> {
 	static styles = [UUITextStyles];
 
 	private _handleConfirm() {
@@ -39,6 +33,8 @@ export class UmbConfirmModalElement extends UmbModalLayoutElement<UmbModalConfir
 		`;
 	}
 }
+
+export default UmbConfirmModalElement;
 
 declare global {
 	interface HTMLElementTagNameMap {

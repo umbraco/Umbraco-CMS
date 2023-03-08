@@ -19,7 +19,7 @@ import { UmbIconPickerModalData } from '../../src/backoffice/shared/modals/icon-
 import { UmbMediaPickerModalData } from '../../src/backoffice/media/media/modals/media-picker';
 import type { UmbBasicModalData } from '../../src/backoffice/shared/modals/basic';
 import type { UmbLinkPickerModalData } from '../../src/backoffice/shared/modals/link-picker';
-import type { UmbModalConfirmData } from '../../src/backoffice/shared/modals/confirm/confirm-modal.element';
+import type { UmbConfirmModalData } from '../../src/backoffice/shared/modals/confirm';
 import type { UmbModalPropertyEditorUIPickerData } from './layouts/property-editor-ui-picker/modal-layout-property-editor-ui-picker.element';
 import { UmbModalHandler } from './modal-handler';
 import { UmbPickerModalData } from './layouts/modal-layout-picker-base';
@@ -50,11 +50,11 @@ export class UmbModalContext {
 	/**
 	 * Opens a Confirm modal
 	 * @public
-	 * @param {UmbModalConfirmData} data
+	 * @param {UmbConfirmModalData} data
 	 * @return {*}  {UmbModalHandler}
 	 * @memberof UmbModalContext
 	 */
-	public confirm(data: UmbModalConfirmData): UmbModalHandler {
+	public confirm(data: UmbConfirmModalData): UmbModalHandler {
 		return this.open('umb-modal-layout-confirm', { data, type: 'dialog' });
 	}
 

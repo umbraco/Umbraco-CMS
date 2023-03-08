@@ -3,7 +3,8 @@ import './confirm-modal.element';
 import { Meta, Story } from '@storybook/web-components';
 import { html } from 'lit';
 
-import type { UmbConfirmModalElement, UmbModalConfirmData } from './confirm-modal.element';
+import type { UmbConfirmModalElement } from './confirm-modal.element';
+import type { UmbConfirmModalData } from './';
 
 export default {
 	title: 'API/Modals/Layouts/Confirm',
@@ -11,7 +12,7 @@ export default {
 	id: 'umb-confirm-modal',
 } as Meta;
 
-const positiveData: UmbModalConfirmData = {
+const positiveData: UmbConfirmModalData = {
 	headline: 'Publish with descendants',
 	content: html`Publish <b>This example</b> and all content items underneath and thereby making their content publicly
 		available.`,
@@ -25,7 +26,7 @@ export const Positive: Story<UmbConfirmModalElement> = () => html`
 	<umb-confirm-modal .data=${positiveData as any}></umb-confirm-modal>
 `;
 
-const dangerData: UmbModalConfirmData = {
+const dangerData: UmbConfirmModalData = {
 	color: 'danger',
 	headline: 'Delete',
 	content: html`Delete <b>This example</b> and all items underneath.`,
