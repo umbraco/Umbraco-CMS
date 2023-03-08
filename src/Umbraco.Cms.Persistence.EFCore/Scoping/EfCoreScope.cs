@@ -189,21 +189,24 @@ internal class EfCoreScope : CoreScope, IEfCoreScope
         {
             try
             {
-                if (_umbracoEfCoreDatabase is not null && ParentInfrastructureScope is null)
+                if (_umbracoEfCoreDatabase is null || ParentInfrastructureScope is not null)
                 {
-                    // Transaction connection can be null here if we get chosen as the deadlock victim.
-                    if (_umbracoEfCoreDatabase.UmbracoEFContext.Database.CurrentTransaction?.GetDbTransaction()
-                            .Connection is not null)
-                    {
-                        if (completed)
-                        {
-                            _umbracoEfCoreDatabase.UmbracoEFContext.Database.CommitTransaction();
-                        }
-                        else
-                        {
-                            _umbracoEfCoreDatabase.UmbracoEFContext.Database.RollbackTransaction();
-                        }
-                    }
+                    return;
+                }
+
+                // Transaction connection can be null here if we get chosen as the deadlock victim.
+                if (_umbracoEfCoreDatabase.UmbracoEFContext.Database.CurrentTransaction?.GetDbTransaction().Connection is null)
+                {
+                    return;
+                }
+
+                if (completed)
+                {
+                    _umbracoEfCoreDatabase.UmbracoEFContext.Database.CommitTransaction();
+                }
+                else
+                {
+                    _umbracoEfCoreDatabase.UmbracoEFContext.Database.RollbackTransaction();
                 }
             }
             finally
