@@ -34,6 +34,8 @@ internal class UserService : RepositoryService, IUserService
     private readonly IUserGroupRepository _userGroupRepository;
     private readonly UserEditorAuthorizationHelper _userEditorAuthorizationHelper;
     private readonly IServiceScopeFactory _serviceScopeFactory;
+    private readonly IEntityService _entityService;
+    private readonly ILocalLoginSettingProvider _localLoginSettingProvider;
     private readonly IUserRepository _userRepository;
 
     public UserService(
@@ -45,13 +47,17 @@ internal class UserService : RepositoryService, IUserService
         IOptions<GlobalSettings> globalSettings,
         IOptions<SecuritySettings> securitySettings,
         UserEditorAuthorizationHelper userEditorAuthorizationHelper,
-        IServiceScopeFactory serviceScopeFactory)
+        IServiceScopeFactory serviceScopeFactory,
+        IEntityService entityService,
+        ILocalLoginSettingProvider localLoginSettingProvider)
         : base(provider, loggerFactory, eventMessagesFactory)
     {
         _userRepository = userRepository;
         _userGroupRepository = userGroupRepository;
         _userEditorAuthorizationHelper = userEditorAuthorizationHelper;
         _serviceScopeFactory = serviceScopeFactory;
+        _entityService = entityService;
+        _localLoginSettingProvider = localLoginSettingProvider;
         _globalSettings = globalSettings.Value;
         _securitySettings = securitySettings.Value;
         _logger = loggerFactory.CreateLogger<UserService>();
@@ -333,6 +339,18 @@ internal class UserService : RepositoryService, IUserService
         IBackofficeUserStore backofficeUserStore = scope.ServiceProvider.GetRequiredService<IBackofficeUserStore>();
 
         backofficeUserStore.SaveAsync(entity).GetAwaiter().GetResult();
+    }
+
+    /// <summary>
+    /// Saves an <see cref="IUser" />
+    /// </summary>
+    /// <param name="entity"><see cref="IUser" /> to Save</param>
+    public async Task<UserOperationStatus> SaveAsync(IUser entity)
+    {
+        using IServiceScope scope = _serviceScopeFactory.CreateScope();
+        IBackofficeUserStore backofficeUserStore = scope.ServiceProvider.GetRequiredService<IBackofficeUserStore>();
+
+        return await backofficeUserStore.SaveAsync(entity);
     }
 
     /// <summary>
@@ -652,6 +670,118 @@ internal class UserService : RepositoryService, IUserService
         }
 
         return UserOperationStatus.Success;
+    }
+
+    public async Task<Attempt<IUser, UserOperationStatus>> UpdateAsync(int performingUserId, UserUpdateModel model)
+    {
+        IUser? performingUser = GetById(performingUserId);
+
+        if (performingUser is null)
+        {
+            return Attempt.FailWithStatus(UserOperationStatus.MissingUser, model.ExistingUser);
+        }
+
+        // We have to resolve the keys to ids to be compatible with the repository, this could be done in the factory,
+        // but I'd rather keep the ids out of the service API as much as possible.
+        int[]? startContentIds = GetIdsFromKeys(model.ContentStartNodeKeys, UmbracoObjectTypes.Document);
+        int[]? startMediaIds = GetIdsFromKeys(model.MediaStartNodeKeys, UmbracoObjectTypes.Media);
+
+        Attempt<string?> isAuthorized = _userEditorAuthorizationHelper.IsAuthorized(
+            performingUser,
+            model.ExistingUser,
+            startContentIds,
+            startMediaIds,
+            model.UserGroups.Select(x => x.Alias));
+
+        if (isAuthorized.Success is false)
+        {
+            return Attempt.FailWithStatus(UserOperationStatus.Unauthorized, model.ExistingUser);
+        }
+
+        UserOperationStatus validationStatus = ValidateUserUpdateModel(model);
+        if (validationStatus is not UserOperationStatus.Success)
+        {
+            return Attempt.FailWithStatus(validationStatus, model.ExistingUser);
+        }
+
+        // Now that we're all authorized and validated we can actually map over changes and update the user
+        // TODO: This probably shouldn't live here, but where then?
+        // Alternatively it should be a map definition, but then we need to use entity service to resolve the IDs
+        IUser updated = MapUserUpdate(model, model.ExistingUser, startContentIds, startMediaIds);
+        UserOperationStatus saveStatus = await SaveAsync(updated);
+
+        return saveStatus is UserOperationStatus.Success
+            ? Attempt.SucceedWithStatus(UserOperationStatus.Success, updated)
+            : Attempt.FailWithStatus(saveStatus, model.ExistingUser);
+    }
+
+    private IUser MapUserUpdate(
+        UserUpdateModel source,
+        IUser target,
+        int[]? startContentIds,
+        int[]? startMediaIds)
+    {
+        target.Name = source.Name;
+        target.Language = source.Language;
+        target.Email = source.Email;
+        target.Username = source.UserName;
+        target.StartContentIds = startContentIds;
+        target.StartMediaIds = startMediaIds;
+
+        target.ClearGroups();
+        foreach (IUserGroup group in source.UserGroups)
+        {
+            target.AddGroup(group.ToReadOnlyGroup());
+        }
+
+        return target;
+    }
+
+    private UserOperationStatus ValidateUserUpdateModel(UserUpdateModel model)
+    {
+        // We need to check if there's any Deny Local login providers present, if so we need to ensure that the user's email address cannot be changed.
+        if (_localLoginSettingProvider.HasDenyLocalLogin() && model.Email != model.ExistingUser.Email)
+        {
+            return UserOperationStatus.EmailCannotBeChanged;
+        }
+
+        if (_securitySettings.UsernameIsEmail && model.UserName != model.Email)
+        {
+            return UserOperationStatus.UserNameIsNotEmail;
+        }
+
+        IUser? existing = GetByEmail(model.Email);
+        if (existing is not null && existing.Key != model.ExistingUser.Key)
+        {
+            return UserOperationStatus.DuplicateEmail;
+        }
+
+        // In case the user has updated their username to be a different email, but not their actually email
+        // we have to try and get the user by email using their username, and ensure we don't get any collisions.
+        existing = GetByEmail(model.UserName);
+        if (existing is not null && existing.Key != model.ExistingUser.Key)
+        {
+            return UserOperationStatus.DuplicateEmail;
+        }
+
+        existing = GetByUsername(model.UserName);
+        if (existing is not null && existing.Key != model.ExistingUser.Key)
+        {
+            return UserOperationStatus.DuplicateUserName;
+        }
+
+        return UserOperationStatus.Success;
+    }
+
+    private int[]? GetIdsFromKeys(IEnumerable<Guid>? guids, UmbracoObjectTypes type)
+    {
+        int[]? keys = guids?
+            .Select(x => _entityService.GetId(x, type))
+            .Where(x => x.Success)
+            .Select(x => x.Result)
+            .ToArray();
+
+        return keys;
     }
 
     public Task<Attempt<PagedModel<IUser>?, UserOperationStatus>> GetAllAsync(int requestingUserId, int skip, int take)

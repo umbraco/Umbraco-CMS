@@ -57,6 +57,8 @@ public interface IUserService : IMembershipUserService
     /// <returns>An attempt indicating if the operation was a success as well as a more detailed <see cref="UserOperationStatus"/>.</returns>
     Task<Attempt<UserCreationResult, UserOperationStatus>> CreateAsync(int performingUserId, UserCreateModel model, bool approveUser = false);
 
+    Task<Attempt<IUser, UserOperationStatus>> UpdateAsync(int performingUserId, UserUpdateModel model);
+
     /// <summary>
     /// Gets all users that the requesting user is allowed to see.
     /// </summary>

@@ -70,6 +70,25 @@ public class UserPresentationFactory : IUserPresentationFactory
         return createModel;
     }
 
+    public async Task<UserUpdateModel> CreateUpdateModelAsync(IUser existingUser, UpdateUserRequestModel updateModel)
+    {
+        var model = new UserUpdateModel
+        {
+            ExistingUser = existingUser,
+            Email = updateModel.Email,
+            Name = updateModel.Name,
+            UserName = updateModel.UserName,
+            Language = updateModel.Language,
+            ContentStartNodeKeys = updateModel.ContentStartNodeKeys,
+            MediaStartNodeKeys = updateModel.MediaStartNodeKeys,
+        };
+
+        IEnumerable<IUserGroup> userGroups = await _userGroupService.GetAsync(updateModel.UserGroups);
+        model.UserGroups = userGroups;
+
+        return model;
+    }
+
     public CreateUserResponseModel CreateCreationResponseModel(UserCreationResult creationResult)
         => new()
         {

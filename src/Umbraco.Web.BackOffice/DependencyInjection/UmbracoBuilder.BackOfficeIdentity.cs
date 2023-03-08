@@ -75,6 +75,8 @@ public static partial class UmbracoBuilderExtensions
 
         services.TryAddScoped<IIpResolver, AspNetCoreIpResolver>();
         services.TryAddSingleton<IBackOfficeExternalLoginProviders, BackOfficeExternalLoginProviders>();
+        // We need to know in the core services if local logins is denied, so we register the providers with a core friendly interface.
+        services.TryAddSingleton<ILocalLoginSettingProvider, BackOfficeExternalLoginProviders>();
         services.TryAddSingleton<IBackOfficeTwoFactorOptions, DefaultBackOfficeTwoFactorOptions>();
 
         return new BackOfficeIdentityBuilder(services);
