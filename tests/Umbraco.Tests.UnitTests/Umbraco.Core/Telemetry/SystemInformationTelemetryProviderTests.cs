@@ -1,4 +1,4 @@
-﻿using System.Globalization;
+using System.Globalization;
 using System.Linq;
 using System.Threading;
 using Microsoft.Extensions.Hosting;
@@ -32,6 +32,21 @@ public class SystemInformationTelemetryProviderTests
         var actual = usageInformation.FirstOrDefault(x => x.Name == Constants.Telemetry.ModelsBuilderMode);
         Assert.IsNotNull(actual?.Data);
         Assert.AreEqual(modelsMode.ToString(), actual.Data);
+    }
+
+    [Test]
+    [TestCase(RuntimeMode.BackofficeDevelopment)]
+    [TestCase(RuntimeMode.BackofficeDevelopment)]
+    [TestCase(RuntimeMode.BackofficeDevelopment)]
+
+    public void ReportsRuntimeModeCorrectly(RuntimeMode runtimeMode)
+    {
+        var telemetryProvider = CreateProvider(runtimeMode: runtimeMode);
+        var usageInformation = telemetryProvider.GetInformation().ToArray();
+
+        var actual = usageInformation.FirstOrDefault(x => x.Name == Constants.Telemetry.RuntimeMode);
+        Assert.IsNotNull(actual?.Data);
+        Assert.AreEqual(runtimeMode.ToString(), actual.Data);
     }
 
     [Test]
@@ -82,7 +97,8 @@ public class SystemInformationTelemetryProviderTests
     private SystemInformationTelemetryProvider CreateProvider(
         ModelsMode modelsMode = ModelsMode.InMemoryAuto,
         bool isDebug = true,
-        string environment = "")
+        string environment = "",
+        RuntimeMode runtimeMode = RuntimeMode.BackofficeDevelopment)
     {
         var hostEnvironment = new Mock<IHostEnvironment>();
         hostEnvironment.Setup(x => x.EnvironmentName).Returns(environment);
@@ -93,10 +109,11 @@ public class SystemInformationTelemetryProviderTests
         return new SystemInformationTelemetryProvider(
             Mock.Of<IUmbracoVersion>(),
             Mock.Of<ILocalizationService>(),
-            Mock.Of<IOptionsMonitor<ModelsBuilderSettings>>(x => x.CurrentValue == new ModelsBuilderSettings{ ModelsMode = modelsMode }),
+            Mock.Of<IOptionsMonitor<ModelsBuilderSettings>>(x => x.CurrentValue == new ModelsBuilderSettings { ModelsMode = modelsMode }),
             Mock.Of<IOptionsMonitor<HostingSettings>>(x => x.CurrentValue == new HostingSettings { Debug = isDebug }),
             hostEnvironment.Object,
             Mock.Of<IUmbracoDatabaseFactory>(x => x.CreateDatabase() == Mock.Of<IUmbracoDatabase>(y => y.DatabaseType == DatabaseType.SQLite)),
-            Mock.Of<IServerRoleAccessor>());
+            Mock.Of<IServerRoleAccessor>(),
+            Mock.Of<IOptionsMonitor<RuntimeSettings>>(x => x.CurrentValue == new RuntimeSettings { Mode = runtimeMode }));
     }
 }

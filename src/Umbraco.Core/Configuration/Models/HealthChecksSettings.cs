@@ -12,8 +12,8 @@ public class HealthChecksSettings
     /// <summary>
     ///     Gets or sets a value for the collection of healthchecks that are disabled.
     /// </summary>
-    public IEnumerable<DisabledHealthCheckSettings> DisabledChecks { get; set; } =
-        Enumerable.Empty<DisabledHealthCheckSettings>();
+    public List<DisabledHealthCheckSettings> DisabledChecks { get; set; } =
+        new List<DisabledHealthCheckSettings>();
 
     /// <summary>
     ///     Gets or sets a value for the healthcheck notification settings.

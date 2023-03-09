@@ -19,7 +19,7 @@ public class UmbracoPluginSettings
         ".css", // styles
         ".js", // scripts
         ".jpg", ".jpeg", ".gif", ".png", ".svg", // images
-        ".eot", ".ttf", ".woff", // fonts
+        ".eot", ".ttf", ".woff", ".woff2", // fonts
         ".xml", ".json", ".config", // configurations
         ".lic", // license
         ".map", // js map files

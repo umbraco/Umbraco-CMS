@@ -99,15 +99,12 @@ public class ContentIndexPopulator : IndexPopulator<IUmbracoContentIndex>
         {
             content = _contentService.GetPagedDescendants(contentParentId, pageIndex, pageSize, out _).ToArray();
 
-            if (content.Length > 0)
-            {
-                var valueSets = _contentValueSetBuilder.GetValueSets(content).ToList();
+            var valueSets = _contentValueSetBuilder.GetValueSets(content).ToArray();
 
-                // ReSharper disable once PossibleMultipleEnumeration
-                foreach (IIndex index in indexes)
-                {
-                    index.IndexItems(valueSets);
-                }
+            // ReSharper disable once PossibleMultipleEnumeration
+            foreach (IIndex index in indexes)
+            {
+                index.IndexItems(valueSets);
             }
 
             pageIndex++;
@@ -127,35 +124,32 @@ public class ContentIndexPopulator : IndexPopulator<IUmbracoContentIndex>
             // note: We will filter for published variants in the validator
             content = _contentService.GetPagedDescendants(contentParentId, pageIndex, pageSize, out _, PublishedQuery, Ordering.By("Path")).ToArray();
 
-            if (content.Length > 0)
+            var indexableContent = new List<IContent>();
+
+            foreach (IContent item in content)
             {
-                var indexableContent = new List<IContent>();
-
-                foreach (IContent item in content)
+                if (item.Level == 1)
                 {
-                    if (item.Level == 1)
+                    // first level pages are always published so no need to filter them
+                    indexableContent.Add(item);
+                    publishedPages.Add(item.Id);
+                }
+                else
+                {
+                    if (publishedPages.Contains(item.ParentId))
                     {
-                        // first level pages are always published so no need to filter them
-                        indexableContent.Add(item);
+                        // only index when parent is published
                         publishedPages.Add(item.Id);
-                    }
-                    else
-                    {
-                        if (publishedPages.Contains(item.ParentId))
-                        {
-                            // only index when parent is published
-                            publishedPages.Add(item.Id);
-                            indexableContent.Add(item);
-                        }
+                        indexableContent.Add(item);
                     }
                 }
+            }
 
-                var valueSets = _contentValueSetBuilder.GetValueSets(indexableContent.ToArray()).ToList();
+            var valueSets = _contentValueSetBuilder.GetValueSets(indexableContent.ToArray()).ToArray();
 
-                foreach (IIndex index in indexes)
-                {
-                    index.IndexItems(valueSets);
-                }
+            foreach (IIndex index in indexes)
+            {
+                index.IndexItems(valueSets);
             }
 
             pageIndex++;

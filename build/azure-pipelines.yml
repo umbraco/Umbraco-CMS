@@ -110,7 +110,10 @@ stages:
                   }
                 }
 
-                dotnet pack $(solution) --configuration $(buildConfiguration) --no-build --output $(Build.ArtifactStagingDirectory)/nupkg
+                foreach($csproj in Get-ChildItem -Recurse -Filter *.csproj)
+                {
+                  dotnet pack $csproj --configuration $(buildConfiguration) --no-build --output $(Build.ArtifactStagingDirectory)/nupkg
+                }
           - script: |
               sha="$(Build.SourceVersion)"
               sha=${sha:0:7}
@@ -146,7 +149,7 @@ stages:
             inputs:
               targetType: inline
               script: |
-                choco install docfx --version=2.59.2 -y
+                choco install docfx --version=2.59.4 -y
                 if ($lastexitcode -ne 0){
                     throw ("Error installing DocFX")
                 }
