@@ -27,7 +27,7 @@
     <RazorCompileOnPublish>false</RazorCompileOnPublish>
   </PropertyGroup>
   
-  <Import Project="..\PACKAGE_PROJECT_NAME_FROM_TEMPLATE\build\PACKAGE_PROJECT_NAME_FROM_TEMPLATE.targets" Condition="'$(PackageProjectName)' != ''" />
+  <Import Project="..\PACKAGE_PROJECT_NAME_FROM_TEMPLATE\buildTransitive\PACKAGE_PROJECT_NAME_FROM_TEMPLATE.targets" Condition="'$(PackageProjectName)' != ''" />
   <ItemGroup Condition="'$(PackageProjectName)' != ''">
     <ProjectReference Include="..\PACKAGE_PROJECT_NAME_FROM_TEMPLATE\PACKAGE_PROJECT_NAME_FROM_TEMPLATE.csproj" />
   </ItemGroup>
