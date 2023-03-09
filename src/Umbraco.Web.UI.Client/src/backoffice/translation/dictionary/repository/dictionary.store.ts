@@ -6,17 +6,15 @@ import type { DictionaryDetails } from '@umbraco-cms/models';
 
 /**
  * @export
- * @class UmbDictionaryDetailStore
+ * @class UmbDictionaryStore
  * @extends {UmbStoreBase}
- * @description - Details Data Store for Dictionary
+ * @description - Data Store for Dictionary
  */
-export class UmbDictionaryDetailStore
-	extends UmbStoreBase
-{
+export class UmbDictionaryStore extends UmbStoreBase {
 	#data = new ArrayState<DictionaryDetails>([], (x) => x.key);
 
 	constructor(host: UmbControllerHostInterface) {
-		super(host, UMB_DICTIONARY_DETAIL_STORE_CONTEXT_TOKEN.toString());
+		super(host, UMB_DICTIONARY_STORE_CONTEXT_TOKEN.toString());
 	}
 
 	append(dictionary: DictionaryDetails) {
@@ -28,6 +26,4 @@ export class UmbDictionaryDetailStore
 	}
 }
 
-export const UMB_DICTIONARY_DETAIL_STORE_CONTEXT_TOKEN = new UmbContextToken<UmbDictionaryDetailStore>(
-	'UmbDictionaryDetailStore'
-);
+export const UMB_DICTIONARY_STORE_CONTEXT_TOKEN = new UmbContextToken<UmbDictionaryStore>('UmbDictionaryStore');

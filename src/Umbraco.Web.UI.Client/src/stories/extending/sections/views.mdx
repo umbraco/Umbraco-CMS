@@ -1,0 +1,27 @@
+import { Meta } from '@storybook/addon-docs';
+
+<Meta
+	title="Guides/Extending the Backoffice/Sections/Views"
+	parameters={{ previewTabs: { canvas: { hidden: true } } }}
+/>
+
+# Section Views
+
+TODO: add description of section views
+
+<img src="docs/section-views.svg" width="400" />
+
+**Manifest**
+
+```json
+{
+	"type": "sectionView",
+	"alias": "My.SectionView",
+	"name": "My Section View",
+	"meta": {
+		"sections": ["My.Section"],
+		"label": "My View",
+		"pathname": "/my-view"
+	}
+}
+```

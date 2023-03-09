@@ -1,0 +1,134 @@
+import { Meta } from '@storybook/addon-docs';
+
+<Meta
+	title="Guides/Extending the Backoffice/Property Editors"
+	parameters={{ previewTabs: { canvas: { hidden: true } } }}
+/>
+
+# Property Editors
+
+// TODO: add description
+(rough notes. We have a lot on docs.umbraco.com we can use)
+
+- This section describes how to work with and create Property Editors. A property editor is the editor used to insert content into Umbraco.
+- Property editor are defined in two parts.
+- The Property Editor and the Property Editor UI.
+- The Property Editor UI is the UI that is used to edit the data in the backoffice.
+- Each Property Editor can have multiple Property Editor UIs.
+
+- Both a Property Editor and Property Editor UI can have a configuration.
+- The Property Editor configuration is used for configuration that the server needs to know about.
+- The Property Editor UI configuration is used for configuration that is related to rendering the UI in the backoffice.
+
+## Property Editor
+
+**Manifest**
+
+```json
+{
+	"type": "propertyEditorModel",
+	"name": "Text Box",
+	"alias": "Umbraco.TextBox",
+};
+```
+
+## Property Editor UI
+
+```json
+{
+	"type": "propertyEditorUI",
+	"alias": "Umb.PropertyEditorUI.TextBox",
+	"name": "Text Box Property Editor UI",
+	"elementName": "my-text-box",
+	"js": "./my-text-box.element.js",
+	"meta": {
+		"label": "My Text Box",
+		"propertyEditorModel": "Umbraco.TextBox",
+		"icon": "umb:autofill",
+		"group": "common"
+	}
+}
+```
+
+If no Property Editor is specified in the manifest, the Propety Editor will use a generic JSON Property Editor Model
+
+## Configuration
+
+// TODO: add description
+
+- Configuration for a Property Editor or Property Editor UI is defined in the manifest.
+- The both use the same configuration format.
+- It is possible to use another Property Editor UI as the editor for a configuration property.
+
+**Manifest**
+
+```json
+{
+	"type": "propertyEditorUI",
+	"alias": "My.PropertyEditorUI.TextArea",
+	//... more
+	"meta": {
+		//... more
+		"config": {
+			"properties": [
+				{
+					"alias": "rows",
+					"label": "Number of rows",
+					"description": "If empty - 10 rows would be set as the default value",
+					"propertyEditorUI": "Umb.PropertyEditorUI.Number",
+				},
+			],
+			"defaultData": [
+				{
+					"alias": "rows",
+					"value": 10,
+				},
+			],
+		},
+	},
+};
+```
+
+## The Property Editor UI Element
+
+```ts
+// TODO: get interface
+interface UmbPropertyEditorUIElement {}
+```
+
+**Example with LitElement**
+
+```ts
+import { LitElement, html, css } from 'lit';
+import { customElement, property } from 'lit/decorators.js';
+import { UUITextStyles } from '@umbraco-ui/uui-base/lib/styles';
+import { UmbElement } from '@umbraco-cms/element';
+
+// TODO: should we make examples with LitElement or just vanilla JS? or should we have for more libraries?
+@customElement('my-text-box')
+export class UmbPropertyEditorUITextBoxElement extends UmbElement(LitElement) {
+	static styles = [
+		UUITextStyles,
+		css`
+			uui-input {
+				width: 100%;
+			}
+		`,
+	];
+
+	@property()
+	value = '';
+
+	@property({ type: Array, attribute: false })
+	public config = [];
+
+	private onInput(e: InputEvent) {
+		this.value = (e.target as HTMLInputElement).value;
+		this.dispatchEvent(new CustomEvent('property-value-change'));
+	}
+
+	render() {
+		return html`<uui-input .value=${this.value} type="text" @input=${this.onInput}></uui-input>`;
+	}
+}
+```

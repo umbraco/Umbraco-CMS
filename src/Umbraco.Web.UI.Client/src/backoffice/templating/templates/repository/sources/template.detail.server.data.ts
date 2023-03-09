@@ -1,8 +1,16 @@
 import { v4 as uuid } from 'uuid';
-import { TemplateDetailDataSource } from '.';
 import { ProblemDetailsModel, TemplateModel, TemplateResource } from '@umbraco-cms/backend-api';
 import type { UmbControllerHostInterface } from '@umbraco-cms/controller';
 import { tryExecuteAndNotify } from '@umbraco-cms/resources';
+import type { DataSourceResponse } from '@umbraco-cms/models';
+
+export interface TemplateDetailDataSource {
+	createScaffold(): Promise<DataSourceResponse<TemplateModel>>;
+	get(key: string): Promise<DataSourceResponse<TemplateModel>>;
+	insert(template: TemplateModel): Promise<DataSourceResponse>;
+	update(template: TemplateModel): Promise<DataSourceResponse>;
+	delete(key: string): Promise<DataSourceResponse>;
+}
 
 /**
  * A data source for the Template detail that fetches data from the server

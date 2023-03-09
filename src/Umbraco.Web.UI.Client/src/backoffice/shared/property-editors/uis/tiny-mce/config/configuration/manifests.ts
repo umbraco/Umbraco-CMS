@@ -2,8 +2,8 @@ import type { ManifestPropertyEditorUI } from '@umbraco-cms/models';
 
 export const manifest: ManifestPropertyEditorUI = {
 	type: 'propertyEditorUI',
-	alias: 'Umb.PropertyEditorUI.TinyMCE',
-	name: 'TinyMCE Property Editor UI',
+	alias: 'Umb.PropertyEditorUI.TinyMCE.Config',
+	name: 'Tiny MCE Configuration Property Editor UI',
 	loader: () => import('./property-editor-ui-tiny-mce-configuration.element'),
 	meta: {
 		label: 'Rich Text Editor Configuration',
