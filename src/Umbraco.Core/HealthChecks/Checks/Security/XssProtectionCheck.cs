@@ -20,17 +20,14 @@ public class XssProtectionCheck : BaseHttpHeaderCheck
     ///     Initializes a new instance of the <see cref="XssProtectionCheck" /> class.
     /// </summary>
     /// <remarks>
-    ///     The check is mostly based on the instructions in the OWASP CheatSheet
-    ///     (https://www.owasp.org/index.php/HTTP_Strict_Transport_Security_Cheat_Sheet)
-    ///     and the blog post of Troy Hunt (https://www.troyhunt.com/understanding-http-strict-transport/)
-    ///     If you want do to it perfectly, you have to submit it https://hstspreload.appspot.com/,
-    ///     but then you should include subdomains and I wouldn't suggest to do that for Umbraco-sites.
+    ///     This check should not find the header in newer browsers as this can cause security vulnerabilities
+    ///     https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-XSS-Protection
     /// </remarks>
     public XssProtectionCheck(IHostingEnvironment hostingEnvironment, ILocalizedTextService textService)
-        : base(hostingEnvironment, textService, "X-XSS-Protection", "xssProtection", true)
+        : base(hostingEnvironment, textService, "X-XSS-Protection", "xssProtection", true, true)
     {
     }
 
     /// <inheritdoc />
-    protected override string ReadMoreLink => Constants.HealthChecks.DocumentationLinks.Security.XssProtectionCheck;
+    protected override string? ReadMoreLink => null;
 }
