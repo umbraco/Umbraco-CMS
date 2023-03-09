@@ -21,6 +21,7 @@ export type { ContentTypeViewModelBaseDocumentTypePropertyTypeDocumentTypeProper
 export type { ContentUrlInfoModel } from './models/ContentUrlInfoModel';
 export type { ContentViewModelBaseDocumentValueDocumentVariantModel } from './models/ContentViewModelBaseDocumentValueDocumentVariantModel';
 export type { CultureModel } from './models/CultureModel';
+export type { CreateRelationTypeRequestModel } from './models/CreateRelationTypeRequestModel';
 export type { DatabaseInstallModel } from './models/DatabaseInstallModel';
 export type { DatabaseSettingsModel } from './models/DatabaseSettingsModel';
 export type { DataTypeCopyModel } from './models/DataTypeCopyModel';
