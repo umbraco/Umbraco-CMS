@@ -191,7 +191,9 @@ export class UmbUserWorkspaceElement extends UmbLitElement implements UmbWorkspa
 	}
 
 	private _changePassword() {
-		this._modalContext?.changePassword({ requireOldPassword: this._currentUserStore?.isAdmin === false });
+		this._modalContext?.open(UMB_CHANGE_PASSWORD_MODAL_TOKEN, {
+			requireOldPassword: this._currentUserStore?.isAdmin === false,
+		});
 	}
 
 	private _renderActionButtons() {
