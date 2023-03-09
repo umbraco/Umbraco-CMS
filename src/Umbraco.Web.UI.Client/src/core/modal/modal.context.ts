@@ -3,11 +3,11 @@ import './layouts/confirm/modal-layout-confirm.element';
 import './layouts/content-picker/modal-layout-content-picker.element';
 import './layouts/media-picker/modal-layout-media-picker.element';
 import './layouts/property-editor-ui-picker/modal-layout-property-editor-ui-picker.element';
+import './layouts/property-settings/modal-layout-property-settings.element';
 import './layouts/modal-layout-current-user.element';
 import './layouts/icon-picker/modal-layout-icon-picker.element';
 import '../../backoffice/settings/languages/language-picker/language-picker-modal-layout.element';
 import './layouts/link-picker/modal-layout-link-picker.element';
-import './layouts/basic/modal-layout-basic.element';
 import './layouts/search/modal-layout-search.element.ts';
 
 import { UUIModalSidebarSize } from '@umbraco-ui/uui-modal-sidebar';
@@ -21,7 +21,6 @@ import type { UmbModalPropertyEditorUIPickerData } from './layouts/property-edit
 import type { UmbModalMediaPickerData } from './layouts/media-picker/modal-layout-media-picker.element';
 import type { UmbModalLinkPickerData } from './layouts/link-picker/modal-layout-link-picker.element';
 import { UmbModalHandler } from './modal-handler';
-import type { UmbBasicModalData } from './layouts/basic/modal-layout-basic.element';
 import { UmbPickerModalData } from './layouts/modal-layout-picker-base';
 import { UmbContextToken } from '@umbraco-cms/context-api';
 import { LanguageModel } from '@umbraco-cms/backend-api';
@@ -122,7 +121,17 @@ export class UmbModalContext {
 	}
 
 	/**
-	 * Opens the change password sidebar modal
+	 * Opens the property settings sidebar modal
+	 * @public
+	 * @return {*}  {UmbModalHandler}
+	 * @memberof UmbModalService
+	 */
+	public propertySettings(): UmbModalHandler {
+		return this.open('umb-modal-layout-property-settings', { type: 'sidebar', size: 'small' });
+	}
+
+	/**
+	 * Opens the user settings sidebar modal
 	 * @public
 	 * @return {*}  {UmbModalHandler}
 	 * @memberof UmbModalContext
@@ -139,20 +148,6 @@ export class UmbModalContext {
 	 */
 	public languagePicker(data: UmbPickerModalData<LanguageModel>): UmbModalHandler {
 		return this.open('umb-language-picker-modal-layout', { data, type: 'sidebar' });
-	}
-
-	/**
-	 * Opens a basic sidebar modal to display readonly information
-	 * @public
-	 * @return {*}  {UmbModalHandler}
-	 * @memberof UmbModalContext
-	 */
-	public openBasic(data: UmbBasicModalData): UmbModalHandler {
-		return this.open('umb-modal-layout-basic', {
-			data,
-			type: 'sidebar',
-			size: data?.overlaySize || 'small',
-		});
 	}
 
 	public search(): UmbModalHandler {

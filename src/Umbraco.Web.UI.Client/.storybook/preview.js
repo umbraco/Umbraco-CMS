@@ -13,6 +13,8 @@ import { setCustomElements } from '@storybook/web-components';
 
 import { UmbDataTypeStore } from '../src/backoffice/settings/data-types/repository/data-type.store.ts';
 import { UmbDocumentTypeStore } from '../src/backoffice/documents/document-types/repository/document-type.store.ts';
+import { UmbDocumentStore } from '../src/backoffice/documents/documents/repository/document.store.ts';
+import { UmbDocumentTreeStore } from '../src/backoffice/documents/documents/repository/document.tree.store.ts';
 
 import customElementManifests from '../custom-elements.json';
 import { UmbIconStore } from '../libs/store/icon/icon.store';
@@ -21,16 +23,12 @@ import { handlers } from '../src/core/mocks/browser-handlers';
 import { LitElement } from 'lit';
 import { UMB_MODAL_CONTEXT_TOKEN, UmbModalContext } from '../src/core/modal';
 
-// TODO: Fix storybook manifest registrations.
-
 import { umbExtensionsRegistry } from '../libs/extensions-api';
 
-import '../src/backoffice/shared/components/backoffice-frame/backoffice-notification-container.element';
 import '../libs/element/context-provider.element';
-import '../src/backoffice/shared/components/backoffice-frame/backoffice-modal-container.element';
-import '../src/backoffice/shared/components/code-block/code-block.element';
-import '../src/backoffice/shared/components/workspace/workspace-layout/workspace-layout.element';
 import '../src/backoffice/shared/components';
+
+import { manifests as documentManifests } from '../src/backoffice/documents';
 
 class UmbStoryBookElement extends LitElement {
 	_umbIconStore = new UmbIconStore();
@@ -38,6 +36,7 @@ class UmbStoryBookElement extends LitElement {
 	constructor() {
 		super();
 		this._umbIconStore.attach(this);
+		this._registerExtensions(documentManifests);
 	}
 
 	_registerExtensions(manifests) {
@@ -56,13 +55,20 @@ customElements.define('umb-storybook', UmbStoryBookElement);
 
 const storybookProvider = (story) => html` <umb-storybook>${story()}</umb-storybook> `;
 
-// TODO: Stop using this context provider element. If we need to continue this path, then we should make a new element which just has a create method that can be used to spin up code. This is because our ContextAPIs provide them self. so no need for a provider element. just a element.
 const dataTypeStoreProvider = (story) => html`
 	<umb-controller-host-test .create=${(host) => new UmbDataTypeStore(host)}>${story()}</umb-controller-host-test>
 `;
 
 const documentTypeStoreProvider = (story) => html`
 	<umb-controller-host-test .create=${(host) => new UmbDocumentTypeStore(host)}>${story()}</umb-controller-host-test>
+`;
+
+const documentStoreProvider = (story) => html`
+	<umb-controller-host-test .create=${(host) => new UmbDocumentStore(host)}>${story()}</umb-controller-host-test>
+`;
+
+const documentTreeStoreProvider = (story) => html`
+	<umb-controller-host-test .create=${(host) => new UmbDocumentTreeStore(host)}>${story()}</umb-controller-host-test>
 `;
 
 const modalContextProvider = (story) => html`
@@ -82,6 +88,8 @@ initialize({ onUnhandledRequest });
 export const decorators = [
 	mswDecorator,
 	storybookProvider,
+	documentStoreProvider,
+	documentTreeStoreProvider,
 	dataTypeStoreProvider,
 	documentTypeStoreProvider,
 	modalContextProvider,
@@ -92,7 +100,28 @@ export const parameters = {
 		storySort: {
 			method: 'alphabetical',
 			includeNames: true,
-			order: ['Guides', ['Getting Started'], '*'],
+			order: [
+				'Guides',
+				[
+					'Getting started',
+					'Extending the Backoffice',
+					[
+						'Intro',
+						'Registration',
+						'Header Apps',
+						'Sections',
+						['Intro', 'Sidebar', 'Views', '*'],
+						'Entity Actions',
+						'Workspaces',
+						['Intro', 'Views', 'Actions', '*'],
+						'Property Editors',
+						'Repositories',
+						'*',
+					],
+					'*',
+				],
+				'*',
+			],
 		},
 	},
 	actions: { argTypesRegex: '^on.*' },
@@ -118,9 +147,9 @@ export const parameters = {
 			{
 				name: 'White',
 				value: '#ffffff',
-			},		  
+			},
 		],
-	  },
+	},
 };
 
 setCustomElements(customElementManifests);

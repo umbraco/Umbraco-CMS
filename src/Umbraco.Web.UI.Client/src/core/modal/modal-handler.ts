@@ -29,32 +29,32 @@ export class UmbModalHandler {
 	}
 
 	private _createElement(element: string | HTMLElement, options?: UmbModalOptions<unknown>) {
-		const layoutElement = this._createLayoutElement(element, options?.data);
+		const layoutElement = this._createInsideElement(element, options?.data);
 		return this.type === 'sidebar'
 			? this._createSidebarElement(layoutElement)
 			: this._createDialogElement(layoutElement);
 	}
 
-	private _createSidebarElement(layoutElement: HTMLElement) {
+	private _createSidebarElement(insideElement: HTMLElement) {
 		const sidebarElement = document.createElement('uui-modal-sidebar');
-		sidebarElement.appendChild(layoutElement);
+		sidebarElement.appendChild(insideElement);
 		sidebarElement.size = this.size;
 		return sidebarElement;
 	}
 
-	private _createDialogElement(layoutElement: HTMLElement) {
+	private _createDialogElement(insideElement: HTMLElement) {
 		const modalDialogElement = document.createElement('uui-modal-dialog');
 		const dialogElement: UUIDialogElement = document.createElement('uui-dialog');
 		modalDialogElement.appendChild(dialogElement);
-		dialogElement.appendChild(layoutElement);
+		dialogElement.appendChild(insideElement);
 		return modalDialogElement;
 	}
 
-	private _createLayoutElement(element: string | HTMLElement, data: unknown) {
-		const layoutElement: any = element instanceof HTMLElement ? element : document.createElement(element);
-		layoutElement.data = data;
-		layoutElement.modalHandler = this;
-		return layoutElement;
+	private _createInsideElement(element: string | HTMLElement, data: unknown) {
+		const insideElement: any = element instanceof HTMLElement ? element : document.createElement(element);
+		insideElement.data = data;
+		insideElement.modalHandler = this;
+		return insideElement;
 	}
 
 	public close(...args: any) {

@@ -1,0 +1,187 @@
+import { Meta } from '@storybook/addon-docs';
+
+<Meta
+	title="Guides/Extending the Backoffice/Entity Actions"
+	parameters={{ previewTabs: { canvas: { hidden: true } } }}
+/>
+
+# Entity Actions
+
+TODO: introduction to actions
+
+- **Entity Action:**
+  Relates to an entity type: (document, media, etc.). Performs the action on a specific item.
+
+- **Entity Bulk Action:**
+  Relates to an entity type: document, media, etc. Performs the action on a selection of items.
+
+## Entity Actions in the UI
+
+<table>
+	<tbody>
+		<tr>
+			<td>
+				<div>
+					<strong>Sidebar Context Menu</strong>
+				</div>
+				<img src="docs/entity-action-sidebar-context.svg" width="400" />
+			</td>
+			<td>
+				<div>
+					<strong>Workspace Action Menu</strong>
+				</div>
+				<img src="docs/entity-action-workspace-menu.svg" width="400" />
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<div>
+					<strong>Collection</strong>
+				</div>
+				<img src="docs/entity-action-collection-menu.svg" width="400" />
+			</td>
+			<td>
+				<div>
+					<strong>Pickers</strong>
+				</div>
+				<img src="docs/entity-action-picker-context-menu.svg" width="400" />
+			</td>
+		</tr>
+	</tbody>
+</table>
+
+### Registering an Entity Action
+
+TODO: can we show the typescript interface for the manifest?
+
+```javascript
+import { extensionRegistry } from '@umbraco-cms/extension-registry';
+import { MyEntityAction } from './entity-action';
+
+const manifest = {
+	type: 'entityAction',
+	alias: 'My.EntityAction',
+	name: 'My Entity Action',
+	weight: 10,
+	meta: {
+		entityType: 'my-entity',
+		icon: 'umb:add',
+		label: 'My Entity Action',
+		repositoryAlias: 'My.Repository',
+		api: MyEntityAction,
+	},
+};
+
+extensionRegistry.register(manifest);
+```
+
+**Default Element**
+
+```ts
+// TODO: get interface
+interface UmbEntityActionElement {}
+```
+
+### The Entity Action Class
+
+As part of the Extension Manifest you can attach a class that will be instanciated as part of the action. It will have access to the host element, a repository with the given alias and the unique (key etc) of the entity. When the action is clicked the `execute` method on the api class will be run. When the action is completed, an event on the host element will be dispatched to notify any surrounding elements.
+
+```ts
+import { UmbEntityActionBase } from '@umbraco-cms/entity-action';
+import { UmbControllerHostInterface } from '@umbraco-cms/controller';
+import type { MyRepository } from './my-repository';
+
+export class MyEntityAction extends UmbEntityActionBase<MyRepository> {
+	constructor(host: UmbControllerHostInterface, repositoryAlias: string, unique: string) {
+		super(host, repositoryAlias, unique);
+	}
+
+	async execute() {
+		await this.repository.myAction(this.unique);
+	}
+}
+```
+
+If any additional contexts are needed, these can be consumed from the host element:
+
+```ts
+import { UmbEntityActionBase } from '@umbraco-cms/entity-action';
+import { UmbContextConsumerController } from '@umbraco-cms/controller';
+import { UMB_MODAL_SERVICE_CONTEXT_TOKEN } from '@umbraco-cms/modal';
+import { MyRepository } from './my-repository';
+
+export class MyEntityAction extends UmbEntityActionBase<MyRepository> {
+	constructor(host: UmbControllerHostInterface, repositoryAlias: string, unique: string) {
+		super(host, repositoryAlias, unique);
+
+		new UmbContextConsumerController(this.host, UMB_MODAL_SERVICE_CONTEXT_TOKEN, (instance) => {
+			this.#modalService = instance;
+		});
+	}
+  ...
+}
+```
+
+We currently have a couple of generic actions that can be used across silos, so we don't have to write the same logic again: copy, move, trash, delete, etc. We can add more as we discover the needs.
+
+TODO: List generic actions + List what alias' they are registered under.
+
+## Entity Bulk Actions in the UI
+
+<table>
+	<tbody>
+		<tr>
+			<td>
+				<div>
+					<strong>Collection</strong>
+				</div>
+				<img src="docs/entity-bulk-action-collection-menu.svg" width="400" />
+			</td>
+		</tr>
+	</tbody>
+</table>
+
+### Registering an Entity Bulk Action
+
+TODO: can we show the typescript interface for the manifest?
+
+```javascript
+import { extensionRegistry } from '@umbraco-cms/extension-registry';
+import { MyEntityBulkAction } from './entity-bulk-action';
+
+const manifest = {
+	type: 'entityBulkAction',
+	alias: 'My.EntityBulkAction',
+	name: 'My Entity Bulk Action',
+	weight: 10,
+	meta: {
+		entityType: 'my-entity',
+		icon: 'umb:add',
+		label: 'My Entity Bulk Action',
+		repositoryAlias: 'My.Repository',
+		api: MyEntityBulkAction,
+	},
+};
+
+extensionRegistry.register(manifest);
+```
+
+### The Entity Bulk Action Class
+
+As part of the Extension Manifest you can attach a class that will be instanciated as part of the action. It will have access to the host element, a repository with the given alias and the unique (key etc) of the entity. When the action is clicked the `execute` method on the api class will be run. When the action is completed, an event on the host element will be dispatched to notify any surrounding elements.
+
+```ts
+import { UmbEntityBulkActionBase } from '@umbraco-cms/entity-action';
+import { UmbControllerHostInterface } from '@umbraco-cms/controller';
+import { MyRepository } from './my-repository';
+
+export class MyEntityBulkAction extends UmbEntityBulkActionBase<MyRepository> {
+	constructor(host: UmbControllerHostInterface, repositoryAlias: string, selection: Array<string>) {
+		super(host, repositoryAlias, selection);
+	}
+
+	async execute() {
+		await this.repository?.myBulkAction(this.selection);
+	}
+}
+```

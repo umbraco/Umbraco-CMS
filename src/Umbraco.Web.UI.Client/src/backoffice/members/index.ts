@@ -7,17 +7,16 @@ import { manifests as memberManifests } from './members/manifests';
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-api';
 import { ManifestTypes } from '@umbraco-cms/extensions-registry';
 
-const registerExtensions = (manifests: Array<ManifestTypes>) => {
-	manifests.forEach((manifest) => {
-		if (umbExtensionsRegistry.isRegistered(manifest.alias)) return;
-		umbExtensionsRegistry.register(manifest);
-	});
-};
-
-registerExtensions([
+export const manifests = [
 	...memberSectionManifests,
 	...menuSectionManifests,
 	...memberGroupManifests,
 	...memberTypeManifests,
 	...memberManifests,
-]);
+];
+
+const registerExtensions = (manifests: Array<ManifestTypes>) => {
+	manifests.forEach((manifest) => umbExtensionsRegistry.register(manifest));
+};
+
+registerExtensions(manifests);

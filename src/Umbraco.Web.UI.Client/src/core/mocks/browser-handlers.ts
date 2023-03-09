@@ -24,6 +24,7 @@ import { handlers as templateHandlers } from './domains/template.handlers';
 import { handlers as languageHandlers } from './domains/language.handlers';
 import { handlers as cultureHandlers } from './domains/culture.handlers';
 import { handlers as redirectManagementHandlers } from './domains/redirect-management.handlers';
+import { handlers as logViewerHandlers } from './domains/log-viewer.handlers';
 import { handlers as packageHandlers } from './domains/package.handlers';
 
 const handlers = [
@@ -52,6 +53,7 @@ const handlers = [
 	...languageHandlers,
 	...cultureHandlers,
 	...redirectManagementHandlers,
+	...logViewerHandlers,
 	...packageHandlers,
 ];
 

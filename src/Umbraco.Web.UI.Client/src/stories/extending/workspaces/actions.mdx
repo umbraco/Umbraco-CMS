@@ -1,0 +1,63 @@
+import { Meta } from '@storybook/addon-docs';
+
+<Meta
+	title="Guides/Extending the Backoffice/Workspaces/Actions"
+	parameters={{ previewTabs: { canvas: { hidden: true } } }}
+/>
+
+# Workspace Actions
+
+// TODO: intro to workspace actions
+
+- Relates to a workspace alias (Umb.Workspace.Document).
+- Performs the action on the workspace draft state.
+- Has Access to the workspace context.
+
+<img src="docs/workspace-actions.svg" width="400" />
+
+**Manifest**
+
+```javascript
+import { extensionRegistry } from '@umbraco-cms/extension-registry';
+import { MyWorkspaceAction } from './my-workspace-action';
+
+const manifest = {
+	type: 'workspaceAction',
+	alias: 'My.WorkspaceAction',
+	name: 'My Workspace Action',
+	meta: {
+		workspaces: ['My.Workspace'],
+		label: 'My Action',
+		api: MyWorkspaceAction,
+	},
+};
+
+extensionRegistry.register(manifest);
+```
+
+### The Workspace Action Class
+
+As part of the Extension Manifest you can attach a class that will be instanciated as part of the action. It will have access to the host element and the Workspace Context. When the action is clicked the `execute` method on the api class will be run. When the action is completed, an event on the host element will be dispatched to notify any surrounding elements.
+
+```ts
+import { UmbEntityBulkActionBase } from '@umbraco-cms/entity-action';
+import { UmbControllerHostInterface } from '@umbraco-cms/controller';
+import { MyRepository } from './my-repository';
+
+export class MyWorkspaceAction extends UmbWorkspaceActionBase {
+	constructor(host: UmbControllerHostInterface) {
+		super(host);
+	}
+
+	async execute() {
+		await this.workspaceContext.repository?.myAction(this.selection);
+	}
+}
+```
+
+**Default Element**
+
+```ts
+// TODO: get interface
+interface UmbWorkspaceActionElement {}
+```

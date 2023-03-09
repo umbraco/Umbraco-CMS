@@ -2,6 +2,10 @@ import { css, html, LitElement, nothing } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, property, state } from 'lit/decorators.js';
 
+/*
+ * <umb-body-layout> is used to create a layout with a header, main and footer slot for workspaces
+ * @element umb-body-layout
+*/
 @customElement('umb-body-layout')
 export class UmbBodyLayout extends LitElement {
 	static styles = [

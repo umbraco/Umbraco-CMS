@@ -57,6 +57,7 @@ export default {
 						'@umbraco-cms/resources': './libs/resources/index.ts',
 						'@umbraco-cms/repository': './libs/repository',
 						'@umbraco-cms/router': './libs/router/index.ts',
+						'@umbraco-cms/modal': './src/core/modal/index.ts',
 					},
 				},
 			},
