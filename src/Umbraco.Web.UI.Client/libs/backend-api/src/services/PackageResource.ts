@@ -3,6 +3,7 @@
 /* eslint-disable */
 import type { PackageCreateModel } from '../models/PackageCreateModel';
 import type { PackageDefinitionModel } from '../models/PackageDefinitionModel';
+import type { PackageManifestModel } from '../models/PackageManifestModel';
 import type { PackageUpdateModel } from '../models/PackageUpdateModel';
 import type { PagedPackageDefinitionModel } from '../models/PagedPackageDefinitionModel';
 import type { PagedPackageMigrationStatusModel } from '../models/PagedPackageMigrationStatusModel';
@@ -163,6 +164,17 @@ export class PackageResource {
             errors: {
                 404: `Not Found`,
             },
+        });
+    }
+
+    /**
+     * @returns any Success
+     * @throws ApiError
+     */
+    public static getPackageManifest(): CancelablePromise<Array<PackageManifestModel>> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/umbraco/management/api/v1/package/manifest',
         });
     }
 

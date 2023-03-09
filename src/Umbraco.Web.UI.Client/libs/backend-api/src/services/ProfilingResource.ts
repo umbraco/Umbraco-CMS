@@ -20,4 +20,21 @@ export class ProfilingResource {
         });
     }
 
+    /**
+     * @returns any Success
+     * @throws ApiError
+     */
+    public static putProfilingStatus({
+        requestBody,
+    }: {
+        requestBody?: ProfilingStatusModel,
+    }): CancelablePromise<any> {
+        return __request(OpenAPI, {
+            method: 'PUT',
+            url: '/umbraco/management/api/v1/profiling/status',
+            body: requestBody,
+            mediaType: 'application/json',
+        });
+    }
+
 }

@@ -4,28 +4,28 @@ import type { UmbExportDictionaryModalResultData } from './export-dictionary-mod
 import { UmbEntityActionBase } from '@umbraco-cms/entity-action';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 import { UmbContextConsumerController } from '@umbraco-cms/context-api';
-import { UmbModalService, UMB_MODAL_SERVICE_CONTEXT_TOKEN } from '@umbraco-cms/modal';
+import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN } from '@umbraco-cms/modal';
 
 import './export-dictionary-modal-layout.element';
 
 export default class UmbExportDictionaryEntityAction extends UmbEntityActionBase<UmbDictionaryRepository> {
 	static styles = [UUITextStyles];
 
-	#modalService?: UmbModalService;
+	#modalContext?: UmbModalContext;
 
 	constructor(host: UmbControllerHostInterface, repositoryAlias: string, unique: string) {
 		super(host, repositoryAlias, unique);
 
-		new UmbContextConsumerController(this.host, UMB_MODAL_SERVICE_CONTEXT_TOKEN, (instance) => {
-			this.#modalService = instance;
+		new UmbContextConsumerController(this.host, UMB_MODAL_CONTEXT_TOKEN, (instance) => {
+			this.#modalContext = instance;
 		});
 	}
 
 	async execute() {
 		// TODO: what to do if modal service is not available?
-		if (!this.#modalService) return;
+		if (!this.#modalContext) return;
 
-		const modalHandler = this.#modalService?.open('umb-export-dictionary-modal-layout', {
+		const modalHandler = this.#modalContext?.open('umb-export-dictionary-modal-layout', {
 			type: 'sidebar',
 			data: { unique: this.unique },
 		});

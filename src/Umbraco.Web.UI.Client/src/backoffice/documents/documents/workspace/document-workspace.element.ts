@@ -14,7 +14,7 @@ export class UmbDocumentWorkspaceElement extends UmbLitElement implements UmbWor
 		UUITextStyles,
 		css`
 			:host {
-				display: block;
+				display: flex;
 				width: 100%;
 				height: 100%;
 			}

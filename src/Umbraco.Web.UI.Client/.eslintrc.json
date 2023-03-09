@@ -2,7 +2,6 @@
 	"ignorePatterns": ["vite.*.ts"],
 	"root": true,
 	"plugins": ["eslint-plugin-local-rules"],
-	"extends": ["eslint:recommended", "plugin:import/recommended", "prettier"],
 	"overrides": [
 		{
 			"files": ["**/*.ts"],
@@ -46,6 +45,27 @@
 					"typescript": {
 						"alwaysTryTypes": true,
 						"project": "./tsconfig.json"
+					}
+				}
+			}
+		},
+		{
+			"files": ["**/*.js"],
+			"extends": ["eslint:recommended", "plugin:import/recommended", "prettier"],
+			"env": {
+				"node": true,
+				"browser": true,
+				"es6": true
+			},
+			"parserOptions": {
+				"sourceType": "module",
+				"ecmaVersion": "latest"
+			},
+			"settings": {
+				"import/resolver": {
+					"node": {
+						"extensions": [".js"],
+						"moduleDirectory": ["node_modules"]
 					}
 				}
 			}

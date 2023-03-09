@@ -16,13 +16,13 @@ import type { ManifestMenu } from './menu.models';
 import type { ManifestMenuItem } from './menu-item.models';
 import type { ManifestTheme } from './theme.models';
 import type { ManifestTree } from './tree.models';
-import type { ManifestTreeItemAction } from './tree-item-action.models';
 import type { ManifestUserDashboard } from './user-dashboard.models';
 import type { ManifestWorkspace } from './workspace.models';
 import type { ManifestWorkspaceAction } from './workspace-action.models';
 import type { ManifestWorkspaceView } from './workspace-view.models';
 import type { ManifestWorkspaceViewCollection } from './workspace-view-collection.models';
 import type { ManifestRepository } from './repository.models';
+import type { ManifestStore, ManifestTreeStore } from './store.models';
 import type { ClassConstructor } from '@umbraco-cms/models';
 
 export * from './collection-view.models';
@@ -42,13 +42,13 @@ export * from './section-sidebar-app.models';
 export * from './menu.models';
 export * from './menu-item.models';
 export * from './theme.models';
-export * from './tree-item-action.models';
 export * from './tree.models';
 export * from './user-dashboard.models';
 export * from './workspace-action.models';
 export * from './workspace-view-collection.models';
 export * from './workspace-view.models';
 export * from './repository.models';
+export * from './store.models';
 export * from './workspace.models';
 
 export type ManifestTypes =
@@ -75,12 +75,13 @@ export type ManifestTypes =
 	| ManifestMenuItem
 	| ManifestTheme
 	| ManifestTree
-	| ManifestTreeItemAction
 	| ManifestUserDashboard
 	| ManifestWorkspace
 	| ManifestWorkspaceAction
 	| ManifestWorkspaceView
 	| ManifestWorkspaceViewCollection
+	| ManifestStore
+	| ManifestTreeStore
 	| ManifestBase;
 
 export type ManifestStandardTypes = ManifestTypes['type'];
@@ -100,11 +101,11 @@ export interface ManifestWithLoader<LoaderReturnType> extends ManifestBase {
 	loader?: () => Promise<LoaderReturnType>;
 }
 
-export interface ManifestClass extends ManifestWithLoader<object> {
+export interface ManifestClass<T = unknown> extends ManifestWithLoader<object> {
 	type: ManifestStandardTypes;
 	js?: string;
 	className?: string;
-	class?: ClassConstructor<unknown>;
+	class?: ClassConstructor<T>;
 	//loader?: () => Promise<object | HTMLElement>;
 }
 

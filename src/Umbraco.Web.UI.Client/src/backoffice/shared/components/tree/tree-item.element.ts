@@ -40,7 +40,7 @@ export class UmbTreeItem extends UmbLitElement {
 		const oldVal = this._entityType;
 		this._entityType = newVal;
 		this.requestUpdate('entityType', oldVal);
-		this._observeTreeItemActions();
+		this._observeEntityActions();
 	}
 
 	@property({ type: Boolean, attribute: 'has-children' })
@@ -145,7 +145,7 @@ export class UmbTreeItem extends UmbLitElement {
 		});
 	}
 
-	private _observeTreeItemActions() {
+	private _observeEntityActions() {
 		// TODO: Stop previous observation, currently we can do this from the UmbElementMixin as its a new subscription when Actions or entityType has changed.
 		// Solution: store the current observation controller and if it existing then destroy it.
 		// TODO: as long as a tree consist of one entity type we don't have to observe this every time a new tree item is created.

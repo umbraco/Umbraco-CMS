@@ -1,12 +1,12 @@
 import { MemberTypeTreeServerDataSource } from './sources/member-type.tree.server.data';
 import { UmbMemberTypeTreeStore, UMB_MEMBER_TYPE_TREE_STORE_CONTEXT_TOKEN } from './member-type.tree.store';
-import { UmbMemberTypeDetailStore, UMB_MEMBER_TYPE_DETAIL_STORE_CONTEXT_TOKEN } from './member-type.detail.store';
+import { UmbMemberTypeStore, UMB_MEMBER_TYPE_STORE_CONTEXT_TOKEN } from './member-type.store';
 import { UmbMemberTypeDetailServerDataSource } from './sources/member-type.detail.server.data';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 import { UmbContextConsumerController } from '@umbraco-cms/context-api';
 import { RepositoryTreeDataSource, UmbDetailRepository, UmbTreeRepository } from '@umbraco-cms/repository';
 import { ProblemDetailsModel } from '@umbraco-cms/backend-api';
-import { UmbNotificationService, UMB_NOTIFICATION_SERVICE_CONTEXT_TOKEN } from '@umbraco-cms/notification';
+import { UmbNotificationContext, UMB_NOTIFICATION_CONTEXT_TOKEN } from '@umbraco-cms/notification';
 import type { MemberTypeDetails } from '@umbraco-cms/models';
 
 // TODO => use correct type when available
@@ -21,9 +21,9 @@ export class UmbMemberTypeRepository implements UmbTreeRepository, UmbDetailRepo
 	#treeStore?: UmbMemberTypeTreeStore;
 
 	#detailSource: UmbMemberTypeDetailServerDataSource;
-	#detailStore?: UmbMemberTypeDetailStore;
+	#store?: UmbMemberTypeStore;
 
-	#notificationService?: UmbNotificationService;
+	#notificationContext?: UmbNotificationContext;
 
 	constructor(host: UmbControllerHostInterface) {
 		this.#host = host;
@@ -33,16 +33,16 @@ export class UmbMemberTypeRepository implements UmbTreeRepository, UmbDetailRepo
 		this.#detailSource = new UmbMemberTypeDetailServerDataSource(this.#host);
 
 		this.#init = Promise.all([
-			new UmbContextConsumerController(this.#host, UMB_MEMBER_TYPE_DETAIL_STORE_CONTEXT_TOKEN, (instance) => {
-				this.#detailStore = instance;
+			new UmbContextConsumerController(this.#host, UMB_MEMBER_TYPE_STORE_CONTEXT_TOKEN, (instance) => {
+				this.#store = instance;
 			}),
 
 			new UmbContextConsumerController(this.#host, UMB_MEMBER_TYPE_TREE_STORE_CONTEXT_TOKEN, (instance) => {
 				this.#treeStore = instance;
 			}),
 
-			new UmbContextConsumerController(this.#host, UMB_NOTIFICATION_SERVICE_CONTEXT_TOKEN, (instance) => {
-				this.#notificationService = instance;
+			new UmbContextConsumerController(this.#host, UMB_NOTIFICATION_CONTEXT_TOKEN, (instance) => {
+				this.#notificationContext = instance;
 			}),
 		]);
 	}
@@ -123,7 +123,7 @@ export class UmbMemberTypeRepository implements UmbTreeRepository, UmbDetailRepo
 		const { data, error } = await this.#detailSource.requestByKey(key);
 
 		if (data) {
-			this.#detailStore?.append(data);
+			this.#store?.append(data);
 		}
 		return { data, error };
 	}
@@ -140,13 +140,13 @@ export class UmbMemberTypeRepository implements UmbTreeRepository, UmbDetailRepo
 
 		if (!error) {
 			const notification = { data: { message: `Member type deleted` } };
-			this.#notificationService?.peek('positive', notification);
+			this.#notificationContext?.peek('positive', notification);
 		}
 
 		// TODO: we currently don't use the detail store for anything.
 		// Consider to look up the data before fetching from the server.
 		// Consider notify a workspace if a member type is deleted from the store while someone is editing it.
-		this.#detailStore?.remove([key]);
+		this.#store?.remove([key]);
 		this.#treeStore?.removeItem(key);
 		// TODO: would be nice to align the stores on methods/methodNames.
 
@@ -167,13 +167,13 @@ export class UmbMemberTypeRepository implements UmbTreeRepository, UmbDetailRepo
 
 		if (!error) {
 			const notification = { data: { message: `Member type '${detail.name}' saved` } };
-			this.#notificationService?.peek('positive', notification);
+			this.#notificationContext?.peek('positive', notification);
 		}
 
 		// TODO: we currently don't use the detail store for anything.
 		// Consider to look up the data before fetching from the server
 		// Consider notify a workspace if a member type is updated in the store while someone is editing it.
-		this.#detailStore?.append(detail);
+		this.#store?.append(detail);
 		this.#treeStore?.updateItem(detail.key, { name: detail.name });
 		// TODO: would be nice to align the stores on methods/methodNames.
 
@@ -192,7 +192,7 @@ export class UmbMemberTypeRepository implements UmbTreeRepository, UmbDetailRepo
 
 		if (!error) {
 			const notification = { data: { message: `Member type '${detail.name}' created` } };
-			this.#notificationService?.peek('positive', notification);
+			this.#notificationContext?.peek('positive', notification);
 		}
 
 		return { data, error };

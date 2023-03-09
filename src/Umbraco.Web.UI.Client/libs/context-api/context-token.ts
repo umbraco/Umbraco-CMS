@@ -1,18 +1,22 @@
 export class UmbContextToken<T = unknown> {
 	/**
+	 * Get the type of the token
+	 *
+	 * @public
+	 * @type      {T}
+	 * @memberOf  UmbContextToken
+	 * @example   `typeof MyToken.TYPE`
+	 * @returns   undefined
+	 */
+	readonly TYPE: T = undefined as never;
+
+	/**
 	 * @param alias   Unique identifier for the token,
 	 * @param _desc   Description for the token,
 	 *                used only for debugging purposes,
 	 *                it should but does not need to be unique
 	 */
 	constructor(protected alias: string, protected _desc?: string) {}
-
-	/**
-	 * @internal
-	 */
-	get multi(): UmbContextToken<Array<T>> {
-		return this as UmbContextToken<Array<T>>;
-	}
 
 	/**
 	 * This method must always return the unique alias of the token since that

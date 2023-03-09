@@ -1,12 +1,12 @@
 import { UmbMediaTypeTreeStore, UMB_MEDIA_TYPE_TREE_STORE_CONTEXT_TOKEN } from './media-type.tree.store';
 import { UmbMediaTypeDetailServerDataSource } from './sources/media-type.detail.server.data';
-import { UmbMediaTypeDetailStore, UMB_MEDIA_TYPE_DETAIL_STORE_CONTEXT_TOKEN } from './media-type.detail.store';
+import { UmbMediaTypeStore, UMB_MEDIA_TYPE_STORE_CONTEXT_TOKEN } from './media-type.detail.store';
 import { MediaTypeTreeServerDataSource } from './sources/media-type.tree.server.data';
 import { ProblemDetailsModel } from '@umbraco-cms/backend-api';
 import { UmbContextConsumerController } from '@umbraco-cms/context-api';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 import type { MediaTypeDetails } from '@umbraco-cms/models';
-import { UmbNotificationService, UMB_NOTIFICATION_SERVICE_CONTEXT_TOKEN } from '@umbraco-cms/notification';
+import { UmbNotificationContext, UMB_NOTIFICATION_CONTEXT_TOKEN } from '@umbraco-cms/notification';
 import { UmbTreeRepository, RepositoryTreeDataSource } from '@umbraco-cms/repository';
 
 export class UmbMediaTypeRepository implements UmbTreeRepository {
@@ -18,9 +18,9 @@ export class UmbMediaTypeRepository implements UmbTreeRepository {
 	#treeStore?: UmbMediaTypeTreeStore;
 
 	#detailSource: UmbMediaTypeDetailServerDataSource;
-	#detailStore?: UmbMediaTypeDetailStore;
+	#store?: UmbMediaTypeStore;
 
-	#notificationService?: UmbNotificationService;
+	#notificationContext?: UmbNotificationContext;
 
 	constructor(host: UmbControllerHostInterface) {
 		this.#host = host;
@@ -30,16 +30,16 @@ export class UmbMediaTypeRepository implements UmbTreeRepository {
 		this.#detailSource = new UmbMediaTypeDetailServerDataSource(this.#host);
 
 		this.#init = Promise.all([
-			new UmbContextConsumerController(this.#host, UMB_MEDIA_TYPE_DETAIL_STORE_CONTEXT_TOKEN, (instance) => {
-				this.#detailStore = instance;
+			new UmbContextConsumerController(this.#host, UMB_MEDIA_TYPE_STORE_CONTEXT_TOKEN, (instance) => {
+				this.#store = instance;
 			}),
 
 			new UmbContextConsumerController(this.#host, UMB_MEDIA_TYPE_TREE_STORE_CONTEXT_TOKEN, (instance) => {
 				this.#treeStore = instance;
 			}),
 
-			new UmbContextConsumerController(this.#host, UMB_NOTIFICATION_SERVICE_CONTEXT_TOKEN, (instance) => {
-				this.#notificationService = instance;
+			new UmbContextConsumerController(this.#host, UMB_NOTIFICATION_CONTEXT_TOKEN, (instance) => {
+				this.#notificationContext = instance;
 			}),
 		]);
 	}
@@ -120,7 +120,7 @@ export class UmbMediaTypeRepository implements UmbTreeRepository {
 		const { data, error } = await this.#detailSource.get(key);
 
 		if (data) {
-			this.#detailStore?.append(data);
+			this.#store?.append(data);
 		}
 		return { data, error };
 	}
@@ -144,13 +144,13 @@ export class UmbMediaTypeRepository implements UmbTreeRepository {
 
 		if (!error) {
 			const notification = { data: { message: `Media type '${mediaType.name}' saved` } };
-			this.#notificationService?.peek('positive', notification);
+			this.#notificationContext?.peek('positive', notification);
 		}
 
 		// TODO: we currently don't use the detail store for anything.
 		// Consider to look up the data before fetching from the server
 		// Consider notify a workspace if a media type is updated in the store while someone is editing it.
-		this.#detailStore?.append(mediaType);
+		this.#store?.append(mediaType);
 		this.#treeStore?.updateItem(mediaType.key, { name: mediaType.name });
 		// TODO: would be nice to align the stores on methods/methodNames.
 
@@ -169,7 +169,7 @@ export class UmbMediaTypeRepository implements UmbTreeRepository {
 
 		if (!error) {
 			const notification = { data: { message: `Media type '${mediaType.name}' created` } };
-			this.#notificationService?.peek('positive', notification);
+			this.#notificationContext?.peek('positive', notification);
 		}
 
 		return { data, error };

@@ -1,7 +1,7 @@
 import { UmbMemberTreeStore, UMB_MEMBER_TREE_STORE_CONTEXT_TOKEN } from './member.tree.store';
 import { MemberTreeServerDataSource } from './sources/member.tree.server.data';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
-import { UmbNotificationService, UMB_NOTIFICATION_SERVICE_CONTEXT_TOKEN } from '@umbraco-cms/notification';
+import { UmbNotificationContext, UMB_NOTIFICATION_CONTEXT_TOKEN } from '@umbraco-cms/notification';
 import { UmbContextConsumerController } from '@umbraco-cms/context-api';
 import { UmbTreeRepository } from '@umbraco-cms/repository';
 import { ProblemDetailsModel } from '@umbraco-cms/backend-api';
@@ -10,7 +10,7 @@ export class UmbMemberRepository implements UmbTreeRepository {
 	#host: UmbControllerHostInterface;
 	#dataSource: MemberTreeServerDataSource;
 	#treeStore?: UmbMemberTreeStore;
-	#notificationService?: UmbNotificationService;
+	#notificationContext?: UmbNotificationContext;
 	#initResolver?: () => void;
 	#initialized = false;
 
@@ -24,8 +24,8 @@ export class UmbMemberRepository implements UmbTreeRepository {
 			this.#checkIfInitialized();
 		});
 
-		new UmbContextConsumerController(this.#host, UMB_NOTIFICATION_SERVICE_CONTEXT_TOKEN, (instance) => {
-			this.#notificationService = instance;
+		new UmbContextConsumerController(this.#host, UMB_NOTIFICATION_CONTEXT_TOKEN, (instance) => {
+			this.#notificationContext = instance;
 			this.#checkIfInitialized();
 		});
 	}
@@ -35,7 +35,7 @@ export class UmbMemberRepository implements UmbTreeRepository {
 	});
 
 	#checkIfInitialized() {
-		if (this.#treeStore && this.#notificationService) {
+		if (this.#treeStore && this.#notificationContext) {
 			this.#initialized = true;
 			this.#initResolver?.();
 		}
@@ -73,7 +73,7 @@ export class UmbMemberRepository implements UmbTreeRepository {
 
 	async rootTreeItems() {
 		await this.#init;
-		return this.#treeStore!.rootItems();
+		return this.#treeStore!.rootItems;
 	}
 
 	async treeItemsOf(parentKey: string | null) {

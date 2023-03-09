@@ -2,6 +2,7 @@
 /* tslint:disable */
 /* eslint-disable */
 import type { DirectionModel } from '../models/DirectionModel';
+import type { LogLevelCountsModel } from '../models/LogLevelCountsModel';
 import type { LogLevelModel } from '../models/LogLevelModel';
 import type { PagedLoggerModel } from '../models/PagedLoggerModel';
 import type { PagedLogMessageModel } from '../models/PagedLogMessageModel';
@@ -46,7 +47,7 @@ export class LogViewerResource {
     }: {
         startDate?: string,
         endDate?: string,
-    }): CancelablePromise<any> {
+    }): CancelablePromise<LogLevelCountsModel> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/log-viewer/level-count',

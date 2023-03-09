@@ -30,7 +30,7 @@ this.consumeContext('requestThisContextAlias', (context) => {
 Or use the UmbContextToken type to define the type of the context, like this
 
 ```ts
-const contextAlias = new UmbContextToken<SomeType>('description of context for debugging purposes');
+const contextAlias = new UmbContextToken<SomeType>('SomeTypeAlias', 'description of context for debugging purposes');
 
 this.consumeContext(contextAlias, (context) => {
 	// Notice this is a subscription, as context might change or a new one appears, but the value is strongly typed

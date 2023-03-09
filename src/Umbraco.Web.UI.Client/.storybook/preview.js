@@ -19,7 +19,7 @@ import { UmbIconStore } from '../libs/store/icon/icon.store';
 import { onUnhandledRequest } from '../src/core/mocks/browser';
 import { handlers } from '../src/core/mocks/browser-handlers';
 import { LitElement } from 'lit';
-import { UMB_MODAL_SERVICE_CONTEXT_TOKEN, UmbModalService } from '../src/core/modal';
+import { UMB_MODAL_CONTEXT_TOKEN, UmbModalContext } from '../src/core/modal';
 
 // TODO: Fix storybook manifest registrations.
 
@@ -65,11 +65,11 @@ const documentTypeStoreProvider = (story) => html`
 	<umb-controller-host-test .create=${(host) => new UmbDocumentTypeStore(host)}>${story()}</umb-controller-host-test>
 `;
 
-const modalServiceProvider = (story) => html`
+const modalContextProvider = (story) => html`
 	<umb-context-provider
 		style="display: block; padding: 32px;"
-		key="${UMB_MODAL_SERVICE_CONTEXT_TOKEN}"
-		.value=${new UmbModalService()}>
+		key="${UMB_MODAL_CONTEXT_TOKEN}"
+		.value=${new UmbModalContext()}>
 		${story()}
 		<umb-backoffice-modal-container></umb-backoffice-modal-container>
 	</umb-context-provider>
@@ -84,7 +84,7 @@ export const decorators = [
 	storybookProvider,
 	dataTypeStoreProvider,
 	documentTypeStoreProvider,
-	modalServiceProvider,
+	modalContextProvider,
 ];
 
 export const parameters = {
@@ -129,6 +129,19 @@ export const parameters = {
 			global: handlers,
 		},
 	},
+	backgrounds: {
+		default: 'Greyish',
+		values: [
+			{
+				name: 'Greyish',
+				value: '#F3F3F5',
+			},
+			{
+				name: 'White',
+				value: '#ffffff',
+			},		  
+		],
+	  },
 };
 
 setCustomElements(customElementManifests);

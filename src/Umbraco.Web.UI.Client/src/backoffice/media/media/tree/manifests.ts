@@ -1,5 +1,5 @@
 import { UmbMediaRepository } from '../repository/media.repository';
-import type { ManifestTree, ManifestTreeItemAction } from '@umbraco-cms/models';
+import type { ManifestTree } from '@umbraco-cms/models';
 
 const treeAlias = 'Umb.Tree.Media';
 
@@ -12,6 +12,4 @@ const tree: ManifestTree = {
 	},
 };
 
-const treeItemActions: Array<ManifestTreeItemAction> = [];
-
-export const manifests = [tree, ...treeItemActions];
+export const manifests = [tree];
