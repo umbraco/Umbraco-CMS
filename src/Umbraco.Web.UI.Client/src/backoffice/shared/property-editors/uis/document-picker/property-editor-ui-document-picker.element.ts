@@ -38,7 +38,6 @@ export class UmbPropertyEditorUIContentPickerElement extends UmbLitElement {
 	// TODO: Implement mandatory?
 	render() {
 		return html`
-			<umb-debug enabled dialog></umb-debug>
 			<umb-input-document-picker
 				@change=${this._onChange}
 				.selectedKeys=${this._value}
