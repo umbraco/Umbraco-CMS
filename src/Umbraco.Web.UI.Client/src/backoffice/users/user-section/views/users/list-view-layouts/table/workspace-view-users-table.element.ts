@@ -18,7 +18,7 @@ import './column-layouts/status/user-table-status-column-layout.element';
 import {
 	UmbUserGroupStore,
 	UMB_USER_GROUP_STORE_CONTEXT_TOKEN,
-} from 'src/backoffice/users/user-groups/user-group.store';
+} from 'src/backoffice/users/user-groups/repository/user-group.store';
 import { UmbLitElement } from '@umbraco-cms/element';
 
 @customElement('umb-workspace-view-users-table')

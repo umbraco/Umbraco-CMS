@@ -4,32 +4,25 @@ import { ArrayState } from '@umbraco-cms/observable-api';
 import { UmbStoreBase } from '@umbraco-cms/store';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 
-
-export const UMB_DocumentBlueprint_DETAIL_STORE_CONTEXT_TOKEN = new UmbContextToken<UmbDocumentBlueprintDetailStore>('UmbDocumentBlueprintDetailStore');
-
-
 /**
  * @export
- * @class UmbDocumentBlueprintDetailStore
+ * @class UmbDocumentBlueprintStore
  * @extends {UmbStoreBase}
- * @description - Details Data Store for Document Blueprints
+ * @description - Data Store for Document Blueprints
  */
-export class UmbDocumentBlueprintDetailStore extends UmbStoreBase {
-
-
+export class UmbDocumentBlueprintStore extends UmbStoreBase {
 	// TODO: use the right type:
 	#data = new ArrayState<DocumentBlueprintDetails>([], (x) => x.key);
 
-
 	constructor(host: UmbControllerHostInterface) {
-		super(host, UMB_DocumentBlueprint_DETAIL_STORE_CONTEXT_TOKEN.toString());
+		super(host, UMB_DOCUMENT_BLUEPRINT_STORE_CONTEXT_TOKEN.toString());
 	}
 
 	/**
 	 * @description - Request a Data Type by key. The Data Type is added to the store and is returned as an Observable.
 	 * @param {string} key
 	 * @return {*}  {(Observable<DocumentBlueprintDetails | undefined>)}
-	 * @memberof UmbDocumentBlueprintDetailStore
+	 * @memberof UmbDocumentBlueprintStore
 	 */
 	getByKey(key: string) {
 		// TODO: use backend cli when available.
@@ -39,21 +32,18 @@ export class UmbDocumentBlueprintDetailStore extends UmbStoreBase {
 				this.#data.append(data);
 			});
 
-		return this.#data.getObservablePart((documents) =>
-			documents.find((document) => document.key === key)
-		);
+		return this.#data.getObservablePart((documents) => documents.find((document) => document.key === key));
 	}
 
 	getScaffold(entityType: string, parentKey: string | null) {
-		return {
-		} as DocumentBlueprintDetails;
+		return {} as DocumentBlueprintDetails;
 	}
 
 	// TODO: make sure UI somehow can follow the status of this action.
 	/**
 	 * @description - Save a DocumentBlueprint.
 	 * @param {Array<DocumentBlueprintDetails>} Dictionaries
-	 * @memberof UmbDocumentBlueprintDetailStore
+	 * @memberof UmbDocumentBlueprintStore
 	 * @return {*}  {Promise<void>}
 	 */
 	save(data: DocumentBlueprintDetails[]) {
@@ -86,7 +76,7 @@ export class UmbDocumentBlueprintDetailStore extends UmbStoreBase {
 	/**
 	 * @description - Delete a Data Type.
 	 * @param {string[]} keys
-	 * @memberof UmbDocumentBlueprintDetailStore
+	 * @memberof UmbDocumentBlueprintStore
 	 * @return {*}  {Promise<void>}
 	 */
 	async delete(keys: string[]) {
@@ -102,3 +92,7 @@ export class UmbDocumentBlueprintDetailStore extends UmbStoreBase {
 		this.#data.remove(keys);
 	}
 }
+
+export const UMB_DOCUMENT_BLUEPRINT_STORE_CONTEXT_TOKEN = new UmbContextToken<UmbDocumentBlueprintStore>(
+	'UmbDocumentBlueprintStore'
+);
