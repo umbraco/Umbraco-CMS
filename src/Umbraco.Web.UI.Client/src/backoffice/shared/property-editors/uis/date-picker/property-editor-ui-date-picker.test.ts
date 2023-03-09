@@ -10,7 +10,6 @@ describe('UmbPropertyEditorUIDatePickerElement', () => {
 	beforeEach(async () => {
 		element = await fixture(html` <umb-property-editor-ui-date-picker></umb-property-editor-ui-date-picker> `);
 		inputElement = element.shadowRoot?.querySelector('uui-input') as UUIInputElement;
-		console.log(element);
 	});
 
 	it('is defined with its own instance', () => {

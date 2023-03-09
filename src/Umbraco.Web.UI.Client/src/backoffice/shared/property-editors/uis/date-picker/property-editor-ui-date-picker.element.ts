@@ -49,6 +49,8 @@ export class UmbPropertyEditorUIDatePickerElement extends UmbLitElement {
 
 	@property({ type: Array, attribute: false })
 	public set config(config: Array<PropertyEditorConfigDefaultData>) {
+		const oldVal = this._inputType;
+
 		// Format string prevalue/config
 		this._format = config.find((x) => x.alias === 'format')?.value;
 		const pickTime = this._format?.includes('H') || this._format?.includes('m');
@@ -67,6 +69,8 @@ export class UmbPropertyEditorUIDatePickerElement extends UmbLitElement {
 		// TODO: Warren - Need to deal with offSetTime prevalue/config
 		// Currently the date picker in uui-iinput does not change based on this config
 		this._offsetTime = config.find((x) => x.alias === 'offsetTime')?.value;
+
+		this.requestUpdate('_inputType', oldVal);
 	}
 
 	render() {
