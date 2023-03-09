@@ -2,7 +2,7 @@ import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, html, nothing, PropertyValueMap } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { UmbInputListBase } from '../input-list-base/input-list-base';
-import { UmbUserStore, UMB_USER_STORE_CONTEXT_TOKEN } from '../../../users/users/user.store';
+import { UmbUserStore, UMB_USER_STORE_CONTEXT_TOKEN } from '../../../users/users/repository/user.store';
 import type { UserEntity } from '@umbraco-cms/models';
 import { UMB_USER_PICKER_MODAL_TOKEN } from 'src/backoffice/users/users/modals/user-picker';
 

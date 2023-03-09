@@ -1,8 +1,8 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
-import { UmbModalLayoutPickerBase } from '../../../../../../libs/modal/layouts/modal-layout-picker-base';
-import { UmbUserStore, UMB_USER_STORE_CONTEXT_TOKEN } from '../../user.store';
+import { UmbModalLayoutPickerBase } from '@umbraco-cms/modal';
+import { UmbUserStore, UMB_USER_STORE_CONTEXT_TOKEN } from '../../repository/user.store';
 import type { UserDetails } from '@umbraco-cms/models';
 
 @customElement('umb-user-picker-modal')

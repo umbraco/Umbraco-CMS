@@ -1,0 +1,45 @@
+import { Meta } from '@storybook/blocks';
+
+<Meta title="Guides/Context API" />
+
+# Context API
+
+This element can be used as the base of any Element.
+Do this if you need to Observe Data, Consume or Provide a Context API or use a Resource.
+The Element implements the Controller Host and provides a few shortcut methods for initializing some Controllers.
+
+The methods are (_note this can be out of date, we need to look into how we can ensure this Doc originates from code._)
+
+### Consume a Context API.
+
+From a Umbraco Element:
+
+```ts
+this.consumeContext('requestThisContextAlias', (context) => {
+	// Notice this is a subscription, as context might change or a new one appears.
+	console.log("I've got the context", context);
+});
+```
+
+Or with a Controller using a Controller Host(Umbraco Element):
+
+```ts
+new UmbContextConsumerController(hostElement, 'requestThisContextAlias', (context) => {
+	// Notice this is a subscription, as context might change or a new one appears.
+	console.log("I've got the context", context);
+});
+```
+
+### Provide a Context API.
+
+From a Umbraco Element:
+
+```ts
+this.provideContext('myContextAlias', new MyContextApi());
+```
+
+Or with a Controller using a Controller Host(Umbraco Element):
+
+```ts
+new UmbContextProviderController(hostElement, 'myContextAlias', new MyContextApi());
+```

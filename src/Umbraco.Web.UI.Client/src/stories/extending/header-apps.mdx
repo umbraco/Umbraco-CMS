@@ -1,0 +1,60 @@
+import { Meta } from '@storybook/addon-docs';
+
+<Meta title="Guides/Extending the Backoffice/Header Apps" parameters={{ previewTabs: { canvas: { hidden: true } } }} />
+
+# Header Apps
+
+TODO: Describe header apps
+
+<table>
+	<tbody>
+		<tr>
+			<td>
+				<img src="docs/header-apps.svg" width="400" />
+			</td>
+		</tr>
+	</tbody>
+</table>
+
+**Manifest**
+
+```json
+// TODO: get interface
+{
+		"type": "headerApp",
+		"alias": "My.HeaderApp",
+		"name": "My Header App",
+    "elementName": "my-header-app",
+		"js": "./my-header-app.js",
+		"weight": 10,
+		"meta": {
+			"label": "My Header App",
+			"icon": "umb:icon-name",
+			"pathname": "search",
+		},
+	},
+
+```
+
+**Default Element**
+
+```ts
+// TODO: get interface
+interface UmbHeaderAppElement {}
+```
+
+#### Button Header App
+
+**Manifest**
+
+```json
+// TODO: get interface
+{}
+```
+
+**Default Element**
+
+```ts
+// TODO: get interface
+interface UmbButtonHeaderAppElement {}
+```

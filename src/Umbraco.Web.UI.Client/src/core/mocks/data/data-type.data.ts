@@ -206,7 +206,54 @@ export const data: Array<DataTypeModel & { type: 'data-type' }> = [
 		parentKey: null,
 		propertyEditorAlias: 'Umbraco.DateTime',
 		propertyEditorUiAlias: 'Umb.PropertyEditorUI.DatePicker',
-		data: [],
+		data: [
+			{
+				alias: 'format',
+				value: 'YYYY-MM-DD',
+			},
+			{
+				alias: 'offsetTime',
+				value: true,
+			},
+		],
+	},
+	{
+		$type: 'data-type',
+		name: 'Date Picker With Time',
+		type: 'data-type',
+		key: 'dt-datePicker-time',
+		parentKey: null,
+		propertyEditorAlias: 'Umbraco.DateTime',
+		propertyEditorUiAlias: 'Umb.PropertyEditorUI.DatePicker',
+		data: [
+			{
+				alias: 'format',
+				value: 'YYYY-MM-DD HH:mm:ss',
+			},
+			{
+				alias: 'offsetTime',
+				value: true,
+			},
+		],
+	},
+	{
+		$type: 'data-type',
+		name: 'Time',
+		type: 'data-type',
+		key: 'dt-time',
+		parentKey: null,
+		propertyEditorAlias: 'Umbraco.DateTime',
+		propertyEditorUiAlias: 'Umb.PropertyEditorUI.DatePicker',
+		data: [
+			{
+				alias: 'format',
+				value: 'HH:mm:ss',
+			},
+			{
+				alias: 'offsetTime',
+				value: false,
+			},
+		],
 	},
 	{
 		$type: 'data-type',

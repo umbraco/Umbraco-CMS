@@ -103,16 +103,9 @@ export class UmbDebug extends UmbLitElement {
 	}
 
 	private _openDialog() {
-		this._modalContext?.open(
-			UMB_BASIC_MODAL_TOKEN,
-			{
-				headline: 'Debug: Contexts:',
-				content: this._htmlContent(),
-			},
-			{
-				type: 'sidebar',
-			}
-		);
+		this._modalContext?.open(UMB_DEBUG_MODAL_TOKEN, {
+			content: this._renderContextAliases(),
+		});
 	}
 
 	private _renderDialog() {
@@ -131,17 +124,13 @@ export class UmbDebug extends UmbLitElement {
 			</uui-button>
 
 			<div class="events ${this._debugPaneOpen ? 'open' : ''}">
-				<div>${this._htmlContent()}</div>
+				<div>
+					<ul>
+						${this._renderContextAliases()}
+					</ul>
+				</div>
 			</div>
 		</div>`;
-	}
-
-	private _htmlContent() {
-		return html`
-			<ul>
-				${this._renderContextAliases()}
-			</ul>
-		`;
 	}
 
 	private _renderContextAliases() {

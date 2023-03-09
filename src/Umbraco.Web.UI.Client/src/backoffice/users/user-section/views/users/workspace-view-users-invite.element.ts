@@ -1,9 +1,9 @@
 import { css, html, nothing } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, query, state } from 'lit/decorators.js';
+import { UmbModalLayoutElement } from '@umbraco-cms/modal';
 import { UmbInputPickerUserGroupElement } from '../../../../shared/components/input-user-group/input-user-group.element';
-import { UmbModalLayoutElement } from '../../../../../../libs/modal';
-import { UmbUserStore, UMB_USER_STORE_CONTEXT_TOKEN } from '../../../users/user.store';
+import { UmbUserStore, UMB_USER_STORE_CONTEXT_TOKEN } from '../../../users/repository/user.store';
 import type { UserDetails } from '@umbraco-cms/models';
 
 export type UsersViewType = 'list' | 'grid';

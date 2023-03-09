@@ -10,14 +10,7 @@ import { manifests as logviewerManifests } from './logviewer/manifests';
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-api';
 import { ManifestTypes } from '@umbraco-cms/extensions-registry';
 
-const registerExtensions = (manifests: Array<ManifestTypes>) => {
-	manifests.forEach((manifest) => {
-		if (umbExtensionsRegistry.isRegistered(manifest.alias)) return;
-		umbExtensionsRegistry.register(manifest);
-	});
-};
-
-registerExtensions([
+export const manifests = [
 	...settingsSectionManifests,
 	...settingsMenuManifests,
 	...dashboardManifests,
@@ -26,4 +19,10 @@ registerExtensions([
 	...cultureManifests,
 	...languageManifests,
 	...logviewerManifests,
-]);
+];
+
+const registerExtensions = (manifests: Array<ManifestTypes>) => {
+	manifests.forEach((manifest) => umbExtensionsRegistry.register(manifest));
+};
+
+registerExtensions(manifests);
