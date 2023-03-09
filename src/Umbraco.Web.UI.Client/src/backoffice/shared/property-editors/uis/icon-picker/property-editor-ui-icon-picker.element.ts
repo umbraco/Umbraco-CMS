@@ -2,8 +2,8 @@ import { html } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, property } from 'lit/decorators.js';
 import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN } from '../../../../../../libs/modal';
+import { UMB_ICON_PICKER_MODAL_TOKEN } from '../../../modals/icon-picker';
 import { UmbLitElement } from '@umbraco-cms/element';
-import { UMB_ICON_PICKER_MODAL_TOKEN } from 'src/backoffice/shared/modals/icon-picker';
 
 /**
  * @element umb-property-editor-ui-icon-picker
