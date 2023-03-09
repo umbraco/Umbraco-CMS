@@ -37,12 +37,12 @@ public class LockingMechanism : ILockingMechanism
     /// <inheritdoc />
     public void ReadLock(Guid instanceId, TimeSpan? timeout = null, params int[] lockIds) => LazyReadLockInner(instanceId, timeout, lockIds);
 
-    public void ReadLock(Guid instanceId, params int[] lockIds) => ReadLock(instanceId, TimeSpan.Zero, lockIds);
+    public void ReadLock(Guid instanceId, params int[] lockIds) => ReadLock(instanceId, null, lockIds);
 
     /// <inheritdoc />
     public void WriteLock(Guid instanceId, TimeSpan? timeout = null, params int[] lockIds) => LazyWriteLockInner(instanceId, timeout, lockIds);
 
-    public void WriteLock(Guid instanceId, params int[] lockIds) => WriteLock(instanceId, TimeSpan.Zero, lockIds);
+    public void WriteLock(Guid instanceId, params int[] lockIds) => WriteLock(instanceId, null, lockIds);
 
     /// <inheritdoc />
     public void EagerReadLock(Guid instanceId, TimeSpan? timeout = null, params int[] lockIds) => EagerReadLockInner(instanceId, timeout, lockIds);
@@ -54,7 +54,7 @@ public class LockingMechanism : ILockingMechanism
     public void EagerWriteLock(Guid instanceId, TimeSpan? timeout = null, params int[] lockIds) => EagerWriteLockInner(instanceId, timeout, lockIds);
 
     public void EagerWriteLock(Guid instanceId, params int[] lockIds) =>
-        EagerWriteLock(instanceId, TimeSpan.Zero, lockIds);
+        EagerWriteLock(instanceId, null, lockIds);
 
     /// <summary>
     ///     Handles acquiring a write lock with a specified timeout, will delegate it to the parent if there are any.
