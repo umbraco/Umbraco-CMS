@@ -27,6 +27,12 @@ const modals: Array<ManifestModal> = [
 	},
 	{
 		type: 'modal',
+		alias: 'Umb.Modal.PropertySettings',
+		name: 'Property Settings Modal',
+		loader: () => import('./property-settings/property-settings-modal.element'),
+	},
+	{
+		type: 'modal',
 		alias: 'Umb.Modal.SectionPicker',
 		name: 'Section Picker Modal',
 		loader: () => import('./section-picker/section-picker-modal.element'),

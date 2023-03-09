@@ -3,11 +3,12 @@ import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, html, nothing } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { UmbModalContext, UmbModalLayoutElement, UMB_MODAL_CONTEXT_TOKEN } from '@umbraco-cms/modal';
+import { UMB_PROPERTY_EDITOR_UI_PICKER_MODAL_TOKEN } from '../../property-editors/modals/property-editor-ui-picker';
 import { ManifestPropertyEditorUI } from '@umbraco-cms/extensions-registry';
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-api';
 
-@customElement('umb-modal-layout-property-settings')
-export class UmbModalLayoutPropertySettingsElement extends UmbModalLayoutElement {
+@customElement('umb-property-settings-modal')
+export class UmbPropertySettingsModalElement extends UmbModalLayoutElement {
 	static styles = [
 		UUITextStyles,
 		css`
@@ -229,6 +230,7 @@ export class UmbModalLayoutPropertySettingsElement extends UmbModalLayoutElement
 		}
 	}
 
+	// TODO: move this to a helper so we can reuse it across the app
 	#generateAlias(text: string) {
 		//replace all spaces characters with a dash and remove all non-alphanumeric characters, except underscore. Allow a maximum of 1 dashes or underscores in a row.
 		return text
@@ -257,7 +259,7 @@ export class UmbModalLayoutPropertySettingsElement extends UmbModalLayoutElement
 	}
 
 	#onOpenPropertyEditorUIPicker() {
-		const modalHandler = this.#modalContext?.propertyEditorUIPicker({
+		const modalHandler = this.#modalContext?.open(UMB_PROPERTY_EDITOR_UI_PICKER_MODAL_TOKEN, {
 			selection: [],
 		});
 
@@ -423,8 +425,10 @@ export class UmbModalLayoutPropertySettingsElement extends UmbModalLayoutElement
 	}
 }
 
+export default UmbPropertySettingsModalElement;
+
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-modal-layout-property-settings': UmbModalLayoutPropertySettingsElement;
+		'umb-property-settings-modal': UmbPropertySettingsModalElement;
 	}
 }
