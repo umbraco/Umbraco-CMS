@@ -3,12 +3,12 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, query, state } from 'lit/decorators.js';
 import { UmbModalLayoutElement } from '@umbraco-cms/modal';
 import { UmbInputPickerUserGroupElement } from '../../../../shared/components/input-user-group/input-user-group.element';
-import { UmbUserStore, UMB_USER_STORE_CONTEXT_TOKEN } from '../../../users/repository/user.store';
+import { UmbUserStore, UMB_USER_STORE_CONTEXT_TOKEN } from '../../repository/user.store';
 import type { UserDetails } from '@umbraco-cms/models';
 
 export type UsersViewType = 'list' | 'grid';
-@customElement('umb-workspace-view-users-invite')
-export class UmbWorkspaceViewUsersInviteElement extends UmbModalLayoutElement {
+@customElement('umb-invite-user-modal')
+export class UmbInviteUserModalElement extends UmbModalLayoutElement {
 	static styles = [
 		UUITextStyles,
 		css`
@@ -182,10 +182,10 @@ export class UmbWorkspaceViewUsersInviteElement extends UmbModalLayoutElement {
 	}
 }
 
-export default UmbWorkspaceViewUsersInviteElement;
+export default UmbInviteUserModalElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-workspace-view-users-invite': UmbWorkspaceViewUsersInviteElement;
+		'umb-invite-user-modal': UmbInviteUserModalElement;
 	}
 }

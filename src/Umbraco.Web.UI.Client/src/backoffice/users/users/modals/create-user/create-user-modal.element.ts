@@ -4,7 +4,7 @@ import { customElement, query, state } from 'lit/decorators.js';
 import { UUIInputPasswordElement } from '@umbraco-ui/uui';
 import { UmbModalLayoutElement } from '@umbraco-cms/modal';
 import { UmbInputPickerUserGroupElement } from '../../../../shared/components/input-user-group/input-user-group.element';
-import { UmbUserStore, UMB_USER_STORE_CONTEXT_TOKEN } from '../../../users/repository/user.store';
+import { UmbUserStore, UMB_USER_STORE_CONTEXT_TOKEN } from '../../repository/user.store';
 import type { UserDetails } from '@umbraco-cms/models';
 import {
 	UmbNotificationDefaultData,
@@ -13,8 +13,8 @@ import {
 } from '@umbraco-cms/notification';
 
 export type UsersViewType = 'list' | 'grid';
-@customElement('umb-workspace-view-users-create')
-export class UmbWorkspaceViewUsersCreateElement extends UmbModalLayoutElement {
+@customElement('umb-create-user-modal')
+export class UmbCreateUserModalElement extends UmbModalLayoutElement {
 	static styles = [
 		UUITextStyles,
 		css`
@@ -210,10 +210,10 @@ export class UmbWorkspaceViewUsersCreateElement extends UmbModalLayoutElement {
 	}
 }
 
-export default UmbWorkspaceViewUsersCreateElement;
+export default UmbCreateUserModalElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-workspace-view-users-create': UmbWorkspaceViewUsersCreateElement;
+		'umb-create-user-modal': UmbCreateUserModalElement;
 	}
 }
