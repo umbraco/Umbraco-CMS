@@ -73,7 +73,7 @@ public class MigrationPlanExecutor : IMigrationPlanExecutor
 
         _logger.LogInformation("At {OrigState}", string.IsNullOrWhiteSpace(nextState) ? "origin" : nextState);
 
-        if (!plan.Transitions.TryGetValue(nextState, out MigrationPlan.Transition? transition))
+        if (!plan.Transitions.TryGetValue(nextState, out Transition? transition))
         {
             plan.ThrowOnUnknownInitialState(nextState);
         }
