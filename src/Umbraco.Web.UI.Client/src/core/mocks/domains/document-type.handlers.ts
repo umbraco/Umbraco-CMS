@@ -13,6 +13,24 @@ export const handlers = [
 		return res(ctx.status(200), ctx.json(saved));
 	}),
 
+	rest.get('/umbraco/management/api/v1/document-type/details/:key', (req, res, ctx) => {
+		const key = req.params.key as string;
+		if (!key) return;
+
+		const document = umbDocumentTypeData.getByKey(key);
+
+		return res(ctx.status(200), ctx.json([document]));
+	}),
+
+	rest.post<DocumentTypeModel[]>('/umbraco/management/api/v1/document-type/details/save', (req, res, ctx) => {
+		const data = req.body;
+		if (!data) return;
+
+		const saved = umbDocumentTypeData.save(data);
+
+		return res(ctx.status(200), ctx.json(saved));
+	}),
+
 	rest.get('/umbraco/management/api/v1/tree/document-type/root', (req, res, ctx) => {
 		const rootItems = umbDocumentTypeData.getTreeRoot();
 		const response = {
