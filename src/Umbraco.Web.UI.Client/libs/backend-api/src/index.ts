@@ -136,6 +136,8 @@ export type { RedirectUrlModel } from './models/RedirectUrlModel';
 export type { RedirectUrlStatusModel } from './models/RedirectUrlStatusModel';
 export type { RelationItemModel } from './models/RelationItemModel';
 export type { RelationModel } from './models/RelationModel';
+export type { RelationTypeBaseModel } from './models/RelationTypeBaseModel';
+export type { RelationTypeResponseModel } from './models/RelationTypeResponseModel';
 export { RuntimeLevelModel } from './models/RuntimeLevelModel';
 export type { SavedLogSearchModel } from './models/SavedLogSearchModel';
 export type { SearcherModel } from './models/SearcherModel';
@@ -159,6 +161,7 @@ export type { TemplateQuerySettingsModel } from './models/TemplateQuerySettingsM
 export type { TemplateScaffoldModel } from './models/TemplateScaffoldModel';
 export type { TemplateUpdateModel } from './models/TemplateUpdateModel';
 export type { TreeItemModel } from './models/TreeItemModel';
+export type { UpdateRelationTypeRequestModel } from './models/UpdateRelationTypeRequestModel';
 export type { UpgradeSettingsModel } from './models/UpgradeSettingsModel';
 export type { UserGroupBaseModel } from './models/UserGroupBaseModel';
 export type { UserGroupModel } from './models/UserGroupModel';

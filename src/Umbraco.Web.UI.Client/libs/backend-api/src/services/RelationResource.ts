@@ -60,4 +60,30 @@ export class RelationResource {
         });
     }
 
+    /**
+     * @returns PagedRelationModel Success
+     * @throws ApiError
+     */
+    public static getRelationTypeByKey({
+        key,
+        skip,
+        take = 100,
+    }: {
+        key: string,
+        skip?: number,
+        take?: number,
+    }): CancelablePromise<PagedRelationModel> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/umbraco/management/api/v1/relation/type/{key}',
+            path: {
+                'key': key,
+            },
+            query: {
+                'skip': skip,
+                'take': take,
+            },
+        });
+    }
+
 }
