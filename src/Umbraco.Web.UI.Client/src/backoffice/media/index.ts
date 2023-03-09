@@ -6,8 +6,10 @@ import { manifests as mediaTypesManifests } from './media-types/manifests';
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-api';
 import { ManifestTypes } from '@umbraco-cms/extensions-registry';
 
+export const manifests = [...mediaSectionManifests, ...mediaMenuManifests, ...mediaManifests, ...mediaTypesManifests];
+
 const registerExtensions = (manifests: Array<ManifestTypes>) => {
 	manifests.forEach((manifest) => umbExtensionsRegistry.register(manifest));
 };
 
-registerExtensions([...mediaSectionManifests, ...mediaMenuManifests, ...mediaManifests, ...mediaTypesManifests]);
+registerExtensions(manifests);
