@@ -18,6 +18,7 @@ public abstract class BaseHttpHeaderCheck : HealthCheck
     private readonly IHostingEnvironment _hostingEnvironment;
     private readonly string _localizedTextPrefix;
     private readonly bool _metaTagOptionAvailable;
+    private readonly bool _shouldNotExist;
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="BaseHttpHeaderCheck" /> class.
@@ -27,13 +28,15 @@ public abstract class BaseHttpHeaderCheck : HealthCheck
         ILocalizedTextService textService,
         string header,
         string localizedTextPrefix,
-        bool metaTagOptionAvailable)
+        bool metaTagOptionAvailable,
+        bool shouldNotExist = false)
     {
         LocalizedTextService = textService ?? throw new ArgumentNullException(nameof(textService));
         _hostingEnvironment = hostingEnvironment;
         _header = header;
         _localizedTextPrefix = localizedTextPrefix;
         _metaTagOptionAvailable = metaTagOptionAvailable;
+        _shouldNotExist = shouldNotExist;
     }
 
     [Obsolete("Save ILocalizedTextService in a field on the super class instead of using this")]
@@ -42,7 +45,7 @@ public abstract class BaseHttpHeaderCheck : HealthCheck
     /// <summary>
     ///     Gets a link to an external read more page.
     /// </summary>
-    protected abstract string ReadMoreLink { get; }
+    protected abstract string? ReadMoreLink { get; }
 
     private static HttpClient HttpClient => httpClient ??= new HttpClient();
 
@@ -66,6 +69,7 @@ public abstract class BaseHttpHeaderCheck : HealthCheck
     {
         string message;
         var success = false;
+        StatusResultType resultType = StatusResultType.Warning;
 
         // Access the site home page and check for the click-jack protection header or meta tag
         var url = _hostingEnvironment.ApplicationMainUrl?.GetLeftPart(UriPartial.Authority);
@@ -86,6 +90,16 @@ public abstract class BaseHttpHeaderCheck : HealthCheck
             message = success
                 ? LocalizedTextService.Localize("healthcheck", $"{_localizedTextPrefix}CheckHeaderFound")
                 : LocalizedTextService.Localize("healthcheck", $"{_localizedTextPrefix}CheckHeaderNotFound");
+
+            if (_shouldNotExist)
+            {
+
+                resultType = success ? StatusResultType.Error : StatusResultType.Success;
+            }
+            else
+            {
+                resultType = success ?  StatusResultType.Success : StatusResultType.Error;
+            }
         }
         catch (Exception ex)
         {
@@ -95,8 +109,8 @@ public abstract class BaseHttpHeaderCheck : HealthCheck
         return
             new HealthCheckStatus(message)
             {
-                ResultType = success ? StatusResultType.Success : StatusResultType.Error,
-                ReadMoreLink = success ? null : ReadMoreLink,
+                ResultType = resultType,
+                ReadMoreLink = success && !string.IsNullOrEmpty(ReadMoreLink) ? null : ReadMoreLink,
             };
     }
 
