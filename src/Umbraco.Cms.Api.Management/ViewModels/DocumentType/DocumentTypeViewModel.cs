@@ -7,4 +7,6 @@ public class DocumentTypeViewModel : ContentTypeViewModelBase<DocumentTypeProper
     public IEnumerable<Guid> AllowedTemplateKeys { get; set; } = Array.Empty<Guid>();
 
     public Guid? DefaultTemplateKey { get; set; }
+
+    public ContentTypeCleanup Cleanup { get; set; } = new();
 }

@@ -29,6 +29,4 @@ public abstract class ContentTypeViewModelBase<TPropertyType, TPropertyTypeConta
     public IEnumerable<ContentTypeSort> AllowedContentTypes { get; set; } = Array.Empty<ContentTypeSort>();
 
     public IEnumerable<ContentTypeComposition> Compositions { get; set; } = Array.Empty<ContentTypeComposition>();
-
-    public ContentTypeCleanup Cleanup { get; set; } = new();
 }
