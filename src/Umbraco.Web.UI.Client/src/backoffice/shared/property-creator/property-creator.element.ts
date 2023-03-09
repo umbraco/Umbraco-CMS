@@ -2,22 +2,22 @@ import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, html } from 'lit';
 import { customElement } from 'lit/decorators.js';
 import { UmbLitElement } from '@umbraco-cms/element';
-import { UmbModalService, UMB_MODAL_SERVICE_CONTEXT_TOKEN } from '@umbraco-cms/modal';
+import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN } from '@umbraco-cms/modal';
 
 @customElement('umb-property-creator')
 export class UmbPropertyCreatorElement extends UmbLitElement {
 	static styles = [UUITextStyles, css``];
 
-	#modalService?: UmbModalService;
+	#modalContext?: UmbModalContext;
 
 	constructor() {
 		super();
 
-		this.consumeContext(UMB_MODAL_SERVICE_CONTEXT_TOKEN, (instance) => (this.#modalService = instance));
+		this.consumeContext(UMB_MODAL_CONTEXT_TOKEN, (instance) => (this.#modalContext = instance));
 	}
 
 	#onAddProperty() {
-		const modalHandler = this.#modalService?.propertySettings();
+		const modalHandler = this.#modalContext?.propertySettings();
 
 		if (modalHandler) {
 			modalHandler.onClose().then((result) => {
