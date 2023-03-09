@@ -1,6 +1,5 @@
 import { UUIIconRegistry } from '@umbraco-ui/uui';
 import icons from '../../../public-assets/icons/icons.json';
-import { baseUrl } from '@umbraco-cms/utils';
 
 interface UmbIconDescriptor {
 	name: string;
@@ -14,14 +13,6 @@ interface UmbIconDescriptor {
  * @description - Icon Store. Provides icons from the icon manifest. Icons are loaded on demand. All icons are prefixed with 'umb:'
  */
 export class UmbIconStore extends UUIIconRegistry {
-	#baseValue: string;
-
-	constructor() {
-		super();
-
-		this.#baseValue = baseUrl();
-	}
-
 	/**
 	 * @param {string} iconName
 	 * @return {*}  {boolean}
@@ -33,7 +24,7 @@ export class UmbIconStore extends UUIIconRegistry {
 
 		const icon = this.provideIcon(iconName);
 
-		const iconPath = `${this.#baseValue}${iconManifest.path}`;
+		const iconPath = `${import.meta.env.BASE_URL}${iconManifest.path}`;
 
 		import(/* @vite-ignore */ iconPath)
 			.then((iconModule) => {

@@ -1,5 +1,3 @@
-import type { HTMLElementConstructor } from '../models';
-
-export function hasDefaultExport(object: unknown): object is { default: HTMLElementConstructor } {
+export function hasDefaultExport<ConstructorType>(object: unknown): object is { default: ConstructorType } {
 	return typeof object === 'object' && object !== null && 'default' in object;
 }

@@ -1,11 +1,12 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
-import { css, html } from 'lit';
-import { customElement, property } from 'lit/decorators.js';
-import { UmbWorkspaceMediaContext } from './media-workspace.context';
+import { css, html, nothing } from 'lit';
+import { customElement, state } from 'lit/decorators.js';
+import type { UmbWorkspaceEntityElement } from '../../../shared/components/workspace/workspace-entity-element.interface';
+import { UmbMediaWorkspaceContext } from './media-workspace.context';
 import { UmbLitElement } from '@umbraco-cms/element';
 
 @customElement('umb-media-workspace')
-export class UmbMediaWorkspaceElement extends UmbLitElement {
+export class UmbMediaWorkspaceElement extends UmbLitElement implements UmbWorkspaceEntityElement {
 	static styles = [
 		UUITextStyles,
 		css`
@@ -17,19 +18,31 @@ export class UmbMediaWorkspaceElement extends UmbLitElement {
 		`,
 	];
 
+	private _workspaceContext: UmbMediaWorkspaceContext = new UmbMediaWorkspaceContext(this);
 
-	private _workspaceContext: UmbWorkspaceMediaContext = new UmbWorkspaceMediaContext(this);
+	@state()
+	_unique?: string;
 
-	public load(value: string) {
-		this._workspaceContext?.load(value);
+	public load(entityKey: string) {
+		this._workspaceContext.load(entityKey);
+		this._unique = entityKey;
 	}
 
 	public create(parentKey: string | null) {
-		this._workspaceContext?.create(parentKey);
+		this._workspaceContext.createScaffold(parentKey);
 	}
 
 	render() {
-		return html`<umb-workspace-content alias="Umb.Workspace.Media"></umb-workspace-content>`;
+		return html`<umb-workspace-content alias="Umb.Workspace.Media">
+			${this._unique
+				? html`
+						<umb-workspace-action-menu
+							slot="action-menu"
+							entity-type="media"
+							unique="${this._unique}"></umb-workspace-action-menu>
+				  `
+				: nothing}
+		</umb-workspace-content>`;
 	}
 }
 

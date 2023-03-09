@@ -2,14 +2,16 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { ifDefined } from 'lit-html/directives/if-defined.js';
+import { UmbVariantId } from '../../variants/variant-id.class';
 import { UmbWorkspacePropertyContext } from './workspace-property.context';
-import { createExtensionElement , umbExtensionsRegistry } from '@umbraco-cms/extensions-api';
-import type { DataTypePropertyData, ManifestPropertyEditorUI, ManifestTypes } from '@umbraco-cms/models';
+import { createExtensionElement, umbExtensionsRegistry } from '@umbraco-cms/extensions-api';
+import type { ManifestPropertyEditorUI, ManifestTypes } from '@umbraco-cms/models';
 
 import '../../property-actions/shared/property-action-menu/property-action-menu.element';
 import '../../../../backoffice/shared/components/workspace/workspace-property-layout/workspace-property-layout.element';
 import { UmbObserverController } from '@umbraco-cms/observable-api';
 import { UmbLitElement } from '@umbraco-cms/element';
+import { DataTypePropertyModel } from '@umbraco-cms/backend-api';
 
 /**
  *  @element umb-workspace-property
@@ -39,19 +41,8 @@ export class UmbWorkspacePropertyElement extends UmbLitElement {
 			#property-action-menu[open] {
 				opacity: 1;
 			}
-
-			hr {
-				border: 0;
-				border-top: 1px solid var(--uui-color-border);
-			}
 		`,
 	];
-
-	@state()
-	private _label?: string;
-
-	@state()
-	private _description?: string;
 
 	/**
 	 * Label. Name of the property
@@ -94,16 +85,16 @@ export class UmbWorkspacePropertyElement extends UmbLitElement {
 	 * @attr
 	 * @default ''
 	 */
-	private _propertyEditorUIAlias = '';
+	private _propertyEditorUiAlias = '';
 	@property({ type: String, attribute: 'property-editor-ui-alias' })
-	public set propertyEditorUIAlias(value: string) {
-		if (this._propertyEditorUIAlias === value) return;
-		this._propertyEditorUIAlias = value;
+	public set propertyEditorUiAlias(value: string) {
+		if (this._propertyEditorUiAlias === value) return;
+		this._propertyEditorUiAlias = value;
 		this._observePropertyEditorUI();
 	}
 
 	/**
-	 * Property Editor UI Alias. Render the Property Editor UI registered for this alias.
+	 * Property Value, this is the value stored in the property.
 	 * @public
 	 * @type {unknown}
 	 * @attr
@@ -122,13 +113,41 @@ export class UmbWorkspacePropertyElement extends UmbLitElement {
 	 * @default ''
 	 */
 	@property({ type: Object, attribute: false })
-	public set config(value: DataTypePropertyData[]) {
+	public set config(value: DataTypePropertyModel[]) {
 		this._propertyContext.setConfig(value);
 	}
+
+	/**
+	 * VariantId. A Variant Configuration to identify which variant its value is stored on.
+	 * @public
+	 * @type {UmbVariantId}
+	 * @attr
+	 * @default null
+	 */
+	@property({ type: Object, attribute: false })
+	public set variantId(value: UmbVariantId | undefined) {
+		this._propertyContext.setVariantId(value);
+		this._variantDisplayName = value?.toString();
+	}
+
+	@state()
+	private _variantDisplayName?: string;
 
 	// TODO: make interface for UMBPropertyEditorElement
 	@state()
 	private _element?: { value?: any; config?: any } & HTMLElement; // TODO: invent interface for propertyEditorUI.
+
+	@state()
+	private _value?: unknown;
+
+	@state()
+	private _alias?: string;
+
+	@state()
+	private _label?: string;
+
+	@state()
+	private _description?: string;
 
 	private _propertyContext = new UmbWorkspacePropertyContext(this);
 
@@ -140,6 +159,9 @@ export class UmbWorkspacePropertyElement extends UmbLitElement {
 	constructor() {
 		super();
 
+		this.observe(this._propertyContext.alias, (alias) => {
+			this._alias = alias;
+		});
 		this.observe(this._propertyContext.label, (label) => {
 			this._label = label;
 		});
@@ -151,14 +173,15 @@ export class UmbWorkspacePropertyElement extends UmbLitElement {
 	private _onPropertyEditorChange = (e: CustomEvent) => {
 		const target = e.composedPath()[0] as any;
 
-		this.value = target.value; // Sets value in context.
+		//this.value = target.value; // Sets value in context.
+		this._propertyContext.changeValue(target.value);
 		e.stopPropagation();
 	};
 
 	private _observePropertyEditorUI() {
 		this.propertyEditorUIObserver?.destroy();
 		this.propertyEditorUIObserver = this.observe(
-			umbExtensionsRegistry.getByTypeAndAlias('propertyEditorUI', this._propertyEditorUIAlias),
+			umbExtensionsRegistry.getByTypeAndAlias('propertyEditorUI', this._propertyEditorUiAlias),
 			(manifest) => {
 				this._gotEditorUI(manifest);
 			}
@@ -167,7 +190,7 @@ export class UmbWorkspacePropertyElement extends UmbLitElement {
 
 	private _gotEditorUI(manifest?: ManifestPropertyEditorUI | null) {
 		if (!manifest) {
-			// TODO: if propertyEditorUIAlias didn't exist in store, we should do some nice fail UI.
+			// TODO: if propertyEditorUiAlias didn't exist in store, we should do some nice fail UI.
 			return;
 		}
 
@@ -186,6 +209,7 @@ export class UmbWorkspacePropertyElement extends UmbLitElement {
 					this._element.addEventListener('property-value-change', this._onPropertyEditorChange as any as EventListener);
 
 					this._valueObserver = this.observe(this._propertyContext.value, (value) => {
+						this._value = value;
 						if (this._element) {
 							this._element.value = value;
 						}
@@ -208,21 +232,23 @@ export class UmbWorkspacePropertyElement extends UmbLitElement {
 		return html`
 			<umb-workspace-property-layout
 				id="layout"
+				alias="${ifDefined(this._alias)}"
 				label="${ifDefined(this._label)}"
 				description="${ifDefined(this._description)}">
 				${this._renderPropertyActionMenu()}
+				<p slot="description">${this._variantDisplayName}</p>
 				<div slot="editor">${this._element}</div>
 			</umb-workspace-property-layout>
 		`;
 	}
 
 	private _renderPropertyActionMenu() {
-		return html`${this._propertyEditorUIAlias
+		return html`${this._propertyEditorUiAlias
 			? html`<umb-property-action-menu
 					slot="property-action-menu"
 					id="property-action-menu"
-					.propertyEditorUIAlias="${this._propertyEditorUIAlias}"
-					.value="${this.value}"></umb-property-action-menu>`
+					.propertyEditorUiAlias="${this._propertyEditorUiAlias}"
+					.value="${this._value}"></umb-property-action-menu>`
 			: ''}`;
 	}
 }

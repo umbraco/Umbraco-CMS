@@ -63,7 +63,7 @@ const generateJSON = (icons) => {
 	const iconDescriptors = icons.map((icon) => {
 		return {
 			name: `umb:${icon.name}`,
-			path: `/icons/${icon.iconFileName}.js`,
+			path: `icons/${icon.iconFileName}.js`,
 		};
 	});
 

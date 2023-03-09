@@ -1,3 +1,3 @@
 export * from './utils';
-export * from './baseUrl';
 export * from './umbraco-path';
+export * from './udi-service';

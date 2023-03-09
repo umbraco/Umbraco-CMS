@@ -5,7 +5,7 @@ import { UmbModalLayoutElement } from '../modal-layout.element';
 
 export interface UmbModalContentPickerData {
 	multiple?: boolean;
-	selection: Array<string>;
+	selection?: Array<string>;
 }
 
 import { UmbTreeElement } from '../../../../backoffice/shared/components/tree/tree.element';
@@ -72,7 +72,7 @@ export class UmbModalLayoutContentPickerElement extends UmbModalLayoutElement<Um
 	}
 
 	private _close() {
-		this.modalHandler?.close({ selection: this._selection });
+		this.modalHandler?.close();
 	}
 
 	render() {

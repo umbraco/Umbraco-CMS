@@ -4,11 +4,11 @@ import { customElement, property, state } from 'lit/decorators.js';
 
 import { UUIButtonState } from '@umbraco-ui/uui-button';
 
-import { UmbModalService, UMB_MODAL_SERVICE_CONTEXT_TOKEN } from '../../../../../core/modal';
+import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN } from '../../../../../core/modal';
 
 import './section-view-examine-searchers';
 
-import { HealthStatus, Index, IndexerResource } from '@umbraco-cms/backend-api';
+import { HealthStatusModel, IndexModel, IndexerResource } from '@umbraco-cms/backend-api';
 import { UmbLitElement } from '@umbraco-cms/element';
 import { tryExecuteAndNotify } from '@umbraco-cms/resources';
 
@@ -87,18 +87,18 @@ export class UmbDashboardExamineIndexElement extends UmbLitElement {
 	private _buttonState?: UUIButtonState = undefined;
 
 	@state()
-	private _indexData?: Index;
+	private _indexData?: IndexModel;
 
 	@state()
 	private _loading = true;
 
-	private _modalService?: UmbModalService;
+	private _modalContext?: UmbModalContext;
 
 	constructor() {
 		super();
 
-		this.consumeContext(UMB_MODAL_SERVICE_CONTEXT_TOKEN, (_instance) => {
-			this._modalService = _instance;
+		this.consumeContext(UMB_MODAL_CONTEXT_TOKEN, (_instance) => {
+			this._modalContext = _instance;
 		});
 
 		this._getIndexData();
@@ -112,7 +112,7 @@ export class UmbDashboardExamineIndexElement extends UmbLitElement {
 		this._indexData = data;
 
 		// TODO: Add continuous polling to update the status
-		if (this._indexData?.healthStatus === HealthStatus.REBUILDING) {
+		if (this._indexData?.healthStatus === HealthStatusModel.REBUILDING) {
 			this._buttonState = 'waiting';
 		}
 
@@ -120,7 +120,7 @@ export class UmbDashboardExamineIndexElement extends UmbLitElement {
 	}
 
 	private async _onRebuildHandler() {
-		const modalHandler = this._modalService?.confirm({
+		const modalHandler = this._modalContext?.confirm({
 			headline: `Rebuild ${this.indexName}`,
 			content: html`
 				This will cause the index to be rebuilt.<br />
@@ -162,7 +162,7 @@ export class UmbDashboardExamineIndexElement extends UmbLitElement {
 				<div>
 					<uui-icon-essentials>
 						${
-							this._indexData.healthStatus === HealthStatus.UNHEALTHY
+							this._indexData.healthStatus === HealthStatusModel.UNHEALTHY
 								? html`<uui-icon name="wrong" class="danger"></uui-icon>`
 								: html`<uui-icon name="check" class="positive"></uui-icon>`
 						}
@@ -176,7 +176,7 @@ export class UmbDashboardExamineIndexElement extends UmbLitElement {
 	}
 
 	private renderIndexSearch() {
-		if (!this._indexData || this._indexData.healthStatus !== HealthStatus.HEALTHY) return nothing;
+		if (!this._indexData || this._indexData.healthStatus !== HealthStatusModel.HEALTHY) return nothing;
 		return html`<umb-dashboard-examine-searcher .searcherName="${this.indexName}"></umb-dashboard-examine-searcher>`;
 	}
 

@@ -2,6 +2,10 @@ import { css, html, LitElement, nothing } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, property, state } from 'lit/decorators.js';
 
+/*
+ * <umb-body-layout> is used to create a layout with a header, main and footer slot for workspaces
+ * @element umb-body-layout
+*/
 @customElement('umb-body-layout')
 export class UmbBodyLayout extends LitElement {
 	static styles = [
@@ -20,13 +24,10 @@ export class UmbBodyLayout extends LitElement {
 				align-items: center;
 				justify-content: space-between;
 				width: 100%;
-				min-height: 60px;
-
-				box-sizing: border-box;
-			}
-			:host(:not([no-header-background])) #header {
+				height: 70px;
 				background-color: var(--uui-color-surface);
 				border-bottom: 1px solid var(--uui-color-border);
+				box-sizing: border-box;
 			}
 
 			#headline {
@@ -64,10 +65,6 @@ export class UmbBodyLayout extends LitElement {
 		`,
 	];
 
-	private hasNodes = (e: Event) => {
-		return (e.target as HTMLSlotElement).assignedNodes({ flatten: true }).length > 0;
-	};
-
 	/**
 	 * Renders a headline in the header.
 	 * @public
@@ -80,30 +77,51 @@ export class UmbBodyLayout extends LitElement {
 
 	@state()
 	private _headerSlotHasChildren = false;
+
 	@state()
 	private _tabsSlotHasChildren = false;
+
 	@state()
 	private _footerSlotHasChildren = false;
+
 	@state()
 	private _actionsSlotHasChildren = false;
+
+	@state()
+	private _actionsMenuSlotHasChildren = false;
+
+	#hasNodes = (e: Event) => {
+		return (e.target as HTMLSlotElement).assignedNodes({ flatten: true }).length > 0;
+	};
 
 	render() {
 		return html`
 			<div
 				id="header"
-				style="display:${this.headline || this._headerSlotHasChildren || this._tabsSlotHasChildren ? '' : 'none'}">
+				style="display:${this.headline ||
+				this._headerSlotHasChildren ||
+				this._tabsSlotHasChildren ||
+				this._actionsMenuSlotHasChildren
+					? ''
+					: 'none'}">
 				${this.headline ? html`<h3 id="headline">${this.headline}</h3>` : nothing}
 
 				<slot
 					name="header"
 					@slotchange=${(e: Event) => {
-						this._headerSlotHasChildren = this.hasNodes(e);
+						this._headerSlotHasChildren = this.#hasNodes(e);
 					}}></slot>
 				<slot
 					id="tabs"
 					name="tabs"
 					@slotchange=${(e: Event) => {
-						this._tabsSlotHasChildren = this.hasNodes(e);
+						this._tabsSlotHasChildren = this.#hasNodes(e);
+					}}></slot>
+				<slot
+					id="action-menu"
+					name="action-menu"
+					@slotchange=${(e: Event) => {
+						this._actionsMenuSlotHasChildren = this.#hasNodes(e);
 					}}></slot>
 			</div>
 			<uui-scroll-container id="main">
@@ -113,14 +131,14 @@ export class UmbBodyLayout extends LitElement {
 				<slot
 					name="footer"
 					@slotchange=${(e: Event) => {
-						this._footerSlotHasChildren = this.hasNodes(e);
+						this._footerSlotHasChildren = this.#hasNodes(e);
 					}}></slot>
 				<slot
 					id="actions"
 					name="actions"
 					style="display:${this._actionsSlotHasChildren ? '' : 'none'}"
 					@slotchange=${(e: Event) => {
-						this._actionsSlotHasChildren = this.hasNodes(e);
+						this._actionsSlotHasChildren = this.#hasNodes(e);
 					}}></slot>
 			</div>
 		`;

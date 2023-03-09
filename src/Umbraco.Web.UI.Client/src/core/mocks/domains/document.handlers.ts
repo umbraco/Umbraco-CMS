@@ -1,29 +1,10 @@
 import { rest } from 'msw';
 import { umbDocumentData } from '../data/document.data';
-import type { DocumentDetails } from '@umbraco-cms/models';
+import type { DocumentModel } from '@umbraco-cms/backend-api';
+import { umbracoPath } from '@umbraco-cms/utils';
 
 // TODO: add schema
 export const handlers = [
-	rest.get('/umbraco/management/api/v1/document/details/:key', (req, res, ctx) => {
-		console.warn('Please move to schema');
-		const key = req.params.key as string;
-		if (!key) return;
-
-		const document = umbDocumentData.getByKey(key);
-
-		return res(ctx.status(200), ctx.json([document]));
-	}),
-
-	rest.post<DocumentDetails[]>('/umbraco/management/api/v1/document/save', async (req, res, ctx) => {
-		console.warn('Please move to schema');
-		const data = await req.json();
-		if (!data) return;
-
-		const saved = umbDocumentData.save(data);
-
-		return res(ctx.status(200), ctx.json(saved));
-	}),
-
 	rest.post<string[]>('/umbraco/management/api/v1/document/trash', async (req, res, ctx) => {
 		console.warn('Please move to schema');
 		const keys = await req.json();
@@ -52,5 +33,23 @@ export const handlers = [
 		const items = umbDocumentData.getTreeItem(keys);
 
 		return res(ctx.status(200), ctx.json(items));
+	}),
+
+	rest.post<DocumentModel[]>('/umbraco/management/api/v1/document/:key', async (req, res, ctx) => {
+		const data = await req.json();
+		if (!data) return;
+
+		const saved = umbDocumentData.save(data);
+
+		return res(ctx.status(200), ctx.json(saved));
+	}),
+
+	rest.get(umbracoPath('/document/:key'), (req, res, ctx) => {
+		const key = req.params.key as string;
+		if (!key) return;
+
+		const document = umbDocumentData.getByKey(key);
+
+		return res(ctx.status(200), ctx.json(document));
 	}),
 ];

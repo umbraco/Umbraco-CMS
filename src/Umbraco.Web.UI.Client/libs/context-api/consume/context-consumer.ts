@@ -7,6 +7,11 @@ import { UmbContextRequestEventImplementation, UmbContextCallback } from './cont
  * @class UmbContextConsumer
  */
 export class UmbContextConsumer<HostType extends EventTarget = EventTarget, T = unknown> {
+
+
+	_promise?: Promise<T>;
+	_promiseResolver?: (instance:T) => void;
+
 	private _instance?: T;
 	get instance() {
 		return this._instance;
@@ -27,15 +32,22 @@ export class UmbContextConsumer<HostType extends EventTarget = EventTarget, T = 
 	constructor(
 		protected host: HostType,
 		_contextAlias: string | UmbContextToken<T>,
-		private _callback: UmbContextCallback<T>
+		private _callback?: UmbContextCallback<T>
 	) {
 		this._contextAlias = _contextAlias.toString();
 	}
 
-	private _onResponse = (instance: T) => {
+	protected _onResponse = (instance: T) => {
 		this._instance = instance;
-		this._callback(instance);
+		this._callback?.(instance);
+		this._promiseResolver?.(instance);
 	};
+
+	public asPromise() {
+		return this._promise || (this._promise = new Promise<T>((resolve) => {
+			this._instance ? resolve(this._instance) : (this._promiseResolver = resolve);
+		}));
+	}
 
 	/**
 	 * @memberof UmbContextConsumer
@@ -63,4 +75,12 @@ export class UmbContextConsumer<HostType extends EventTarget = EventTarget, T = 
 			this.request();
 		}
 	};
+
+	// TODO: Test destroy scenarios:
+	public destroy() {
+		delete this._instance;
+		delete this._callback;
+		delete this._promise;
+		delete this._promiseResolver;
+	}
 }

@@ -1,7 +1,7 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, CSSResultGroup, html, nothing } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
-import { UmbModalHandler, UmbModalService, UMB_MODAL_SERVICE_CONTEXT_TOKEN } from '..';
+import { UmbModalHandler, UmbModalContext, UMB_MODAL_CONTEXT_TOKEN } from '..';
 import {
 	UmbCurrentUserHistoryStore,
 	UmbCurrentUserHistoryItem,
@@ -88,24 +88,24 @@ export class UmbModalLayoutCurrentUserElement extends UmbLitElement {
 	@state()
 	private _history: Array<UmbCurrentUserHistoryItem> = [];
 
-	private _modalService?: UmbModalService;
+	private _modalContext?: UmbModalContext;
 	private _currentUserStore?: UmbCurrentUserStore;
 	private _currentUserHistoryStore?: UmbCurrentUserHistoryStore;
 
 	constructor() {
 		super();
 
-		this.consumeContext(UMB_MODAL_SERVICE_CONTEXT_TOKEN, (_instance) => {
-			this._modalService = _instance;
+		this.consumeContext(UMB_MODAL_CONTEXT_TOKEN, (instance) => {
+			this._modalContext = instance;
 		});
 
-		this.consumeContext(UMB_CURRENT_USER_STORE_CONTEXT_TOKEN, (_instance) => {
-			this._currentUserStore = _instance;
+		this.consumeContext(UMB_CURRENT_USER_STORE_CONTEXT_TOKEN, (instance) => {
+			this._currentUserStore = instance;
 			this._observeCurrentUser();
 		});
 
-		this.consumeContext(UMB_CURRENT_USER_HISTORY_STORE_CONTEXT_TOKEN, (_instance) => {
-			this._currentUserHistoryStore = _instance;
+		this.consumeContext(UMB_CURRENT_USER_HISTORY_STORE_CONTEXT_TOKEN, (instance) => {
+			this._currentUserHistoryStore = instance;
 			this._observeHistory();
 		});
 
@@ -139,9 +139,9 @@ export class UmbModalLayoutCurrentUserElement extends UmbLitElement {
 	}
 
 	private _changePassword() {
-		if (!this._modalService) return;
+		if (!this._modalContext) return;
 
-		this._modalService.changePassword({ requireOldPassword: this._currentUserStore?.isAdmin || false });
+		this._modalContext.changePassword({ requireOldPassword: this._currentUserStore?.isAdmin || false });
 	}
 
 	private _renderHistoryItem(item: UmbCurrentUserHistoryItem) {

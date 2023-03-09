@@ -1,64 +1,71 @@
-import { UmbLanguageStore, UmbLanguageStoreItemType, UMB_LANGUAGE_STORE_CONTEXT_TOKEN } from '../../language.store';
+import { UmbLanguageRepository } from '../../repository/language.repository';
+import { UmbWorkspaceContext } from '../../../../shared/components/workspace/workspace-context/workspace-context';
+import type { LanguageModel } from '@umbraco-cms/backend-api';
+import { ObjectState } from '@umbraco-cms/observable-api';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
-import { ObjectState, UmbObserverController } from '@umbraco-cms/observable-api';
-import { UmbContextConsumerController } from '@umbraco-cms/context-api';
 
-const DefaultLanguageData: UmbLanguageStoreItemType = {
-	name: '',
-	isoCode: '',
-	isDefault: false,
-	isMandatory: false,
-};
+export class UmbLanguageWorkspaceContext extends UmbWorkspaceContext<UmbLanguageRepository> {
+	#data = new ObjectState<LanguageModel | undefined>(undefined);
+	data = this.#data.asObservable();
 
-export class UmbWorkspaceLanguageContext {
-	public host: UmbControllerHostInterface;
+	// TODO: this is a temp solution to bubble validation errors to the UI
+	#validationErrors = new ObjectState<any | undefined>(undefined);
+	validationErrors = this.#validationErrors.asObservable();
 
-	private _entityKey: string | null;
-
-	private _data;
-	public readonly data;
-
-	private _store: UmbLanguageStore | null = null;
-	protected _storeObserver?: UmbObserverController<UmbLanguageStoreItemType>;
-
-	constructor(host: UmbControllerHostInterface, entityKey: string | null) {
-		this.host = host;
-		this._entityKey = entityKey;
-
-		this._data = new ObjectState(DefaultLanguageData);
-		this.data = this._data.asObservable();
-
-		new UmbContextConsumerController(host, UMB_LANGUAGE_STORE_CONTEXT_TOKEN, (_instance: UmbLanguageStore) => {
-			this._store = _instance;
-			this._observeStore();
-		});
+	constructor(host: UmbControllerHostInterface) {
+		super(host, new UmbLanguageRepository(host));
 	}
 
-	private _observeStore(): void {
-		if (!this._store || this._entityKey === null) {
-			return;
+	async load(isoCode: string) {
+		const { data } = await this.repository.requestByIsoCode(isoCode);
+		if (data) {
+			this.setIsNew(false);
+			this.#data.update(data);
 		}
-
-		this._storeObserver?.destroy();
-		this._storeObserver = new UmbObserverController(this.host, this._store.getByIsoCode(this._entityKey), (content) => {
-			if (!content) return; // TODO: Handle nicely if there is no content data.
-			this.update(content);
-		});
 	}
 
-	public getData() {
-		return this._data.getValue();
-	}
-	public update(data: Partial<UmbLanguageStoreItemType>) {
-		this._data.next({ ...this.getData(), ...data });
+	async createScaffold() {
+		const { data } = await this.repository.createScaffold();
+		if (!data) return;
+		this.setIsNew(true);
+		this.#data.update(data);
 	}
 
-	public save(): Promise<void> {
-		if (!this._store) {
-			// TODO: more beautiful error:
-			console.error('Could not save cause workspace context has no store.');
-			return Promise.resolve();
-		}
-		return this._store.save(this.getData());
+	getData() {
+		return this.#data.getValue();
+	}
+
+	getEntityType() {
+		return 'language';
+	}
+
+	setName(name: string) {
+		this.#data.update({ name });
+	}
+
+	setCulture(isoCode: string) {
+		this.#data.update({ isoCode });
+	}
+
+	setMandatory(isMandatory: boolean) {
+		this.#data.update({ isMandatory });
+	}
+
+	setDefault(isDefault: boolean) {
+		this.#data.update({ isDefault });
+	}
+
+	setFallbackCulture(isoCode: string) {
+		this.#data.update({ fallbackIsoCode: isoCode });
+	}
+
+	// TODO: this is a temp solution to bubble validation errors to the UI
+	setValidationErrors(errorMap: any) {
+		// TODO: I can't use the update method to set the value to undefined
+		this.#validationErrors.next(errorMap);
+	}
+
+	destroy(): void {
+		this.#data.complete();
 	}
 }

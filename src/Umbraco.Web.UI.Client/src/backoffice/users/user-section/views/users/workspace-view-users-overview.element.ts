@@ -6,7 +6,7 @@ import { UUIPopoverElement } from '@umbraco-ui/uui';
 
 import type { UmbSectionViewUsersElement } from './section-view-users.element';
 import { UmbLitElement } from '@umbraco-cms/element';
-import { UmbModalService, UMB_MODAL_SERVICE_CONTEXT_TOKEN } from 'src/core/modal';
+import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN } from 'src/core/modal';
 
 import './list-view-layouts/table/workspace-view-users-table.element';
 import './list-view-layouts/grid/workspace-view-users-grid.element';
@@ -102,7 +102,7 @@ export class UmbWorkspaceViewUsersOverviewElement extends UmbLitElement {
 	];
 
 	private _usersContext?: UmbSectionViewUsersElement;
-	private _modalService?: UmbModalService;
+	private _modalContext?: UmbModalContext;
 	private _inputTimer?: NodeJS.Timeout;
 	private _inputTimerAmount = 500;
 
@@ -114,8 +114,8 @@ export class UmbWorkspaceViewUsersOverviewElement extends UmbLitElement {
 			this._observeSelection();
 		});
 
-		this.consumeContext(UMB_MODAL_SERVICE_CONTEXT_TOKEN, (modalService) => {
-			this._modalService = modalService;
+		this.consumeContext(UMB_MODAL_CONTEXT_TOKEN, (instance) => {
+			this._modalContext = instance;
 		});
 	}
 
@@ -166,7 +166,7 @@ export class UmbWorkspaceViewUsersOverviewElement extends UmbLitElement {
 		} else {
 			modal = document.createElement('umb-workspace-view-users-create');
 		}
-		this._modalService?.open(modal, { type: 'dialog' });
+		this._modalContext?.open(modal, { type: 'dialog' });
 	}
 
 	render() {
@@ -220,7 +220,7 @@ export class UmbWorkspaceViewUsersOverviewElement extends UmbLitElement {
 				</div>
 			</div>
 
-			<router-slot .routes=${this._routes}></router-slot>
+			<umb-router-slot .routes=${this._routes}></umb-router-slot>
 
 			${this._renderSelection()}
 		`;

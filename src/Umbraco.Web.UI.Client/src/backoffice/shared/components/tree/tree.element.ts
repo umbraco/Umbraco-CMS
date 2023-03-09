@@ -5,14 +5,11 @@ import { repeat } from 'lit-html/directives/repeat.js';
 import { UmbTreeContextBase } from './tree.context';
 import type { Entity, ManifestTree } from '@umbraco-cms/models';
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-api';
-import { UmbTreeStore } from '@umbraco-cms/store';
 import { UmbLitElement } from '@umbraco-cms/element';
 
 import './tree-item.element';
-import './context-menu/tree-context-menu-page-action-list.element';
 import './context-menu/tree-context-menu-page.service';
 import './context-menu/tree-context-menu.service';
-import './action/tree-item-action-extension.element';
 
 @customElement('umb-tree')
 export class UmbTreeElement extends UmbLitElement {
@@ -62,9 +59,6 @@ export class UmbTreeElement extends UmbLitElement {
 	private _loading = true;
 
 	private _treeContext?: UmbTreeContextBase;
-	private _store?: UmbTreeStore<Entity>;
-
-	#treeRepository?: any; // TODO: make interface
 
 	protected firstUpdated(): void {
 		this._observeTree();
@@ -79,47 +73,27 @@ export class UmbTreeElement extends UmbLitElement {
 				.pipe(map((trees) => trees.find((tree) => tree.alias === this.alias))),
 			async (tree) => {
 				if (this._tree?.alias === tree?.alias) return;
-
 				this._tree = tree;
-				this._provideTreeContext();
-
-				// TODO: remove this when repositories are in place.
-				if (this._tree?.meta.storeAlias) {
-					this._provideStore();
-				}
+				this.#provideTreeContext();
 			}
 		);
 	}
 
-	private _provideTreeContext() {
+	#provideTreeContext() {
 		if (!this._tree || this._treeContext) return;
 
 		// TODO: if a new tree comes around, which is different, then we should clean up and re provide.
-
 		this._treeContext = new UmbTreeContextBase(this, this._tree);
 		this._treeContext.setSelectable(this.selectable);
 		this._treeContext.setSelection(this.selection);
 
-		this._observeSelection();
-		this._observeRepositoryTreeRoot();
+		this.#observeSelection();
+		this.#observeTreeRoot();
 
 		this.provideContext('umbTreeContext', this._treeContext);
 	}
 
-	// TODO: remove this when repositories are in place.
-	private _provideStore() {
-		// TODO: Clean up store, if already existing.
-
-		if (!this._tree?.meta.storeAlias) return;
-
-		this.consumeContext(this._tree.meta.storeAlias, (store: UmbTreeStore<Entity>) => {
-			this._store = store;
-			this.provideContext('umbStore', store);
-			this._observeStoreTreeRoot();
-		});
-	}
-
-	private async _observeRepositoryTreeRoot() {
+	async #observeTreeRoot() {
 		if (!this._treeContext?.requestRootItems) return;
 
 		this._treeContext.requestRootItems();
@@ -129,7 +103,7 @@ export class UmbTreeElement extends UmbLitElement {
 		});
 	}
 
-	private _observeSelection() {
+	#observeSelection() {
 		if (!this._treeContext) return;
 
 		this.observe(this._treeContext.selection, (selection) => {
@@ -139,20 +113,7 @@ export class UmbTreeElement extends UmbLitElement {
 		});
 	}
 
-	private _observeStoreTreeRoot() {
-		if (!this._store?.getTreeRoot) return;
-
-		this._loading = true;
-
-		this.observe(this._store.getTreeRoot(), (rootItems) => {
-			if (rootItems?.length === 0) return;
-			this._items = rootItems;
-			this._loading = false;
-		});
-	}
-
 	render() {
-		// TODO: Fix Type Mismatch ` as Entity` in this template:
 		return html`
 			${repeat(
 				this._items,

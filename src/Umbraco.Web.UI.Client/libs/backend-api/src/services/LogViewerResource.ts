@@ -1,13 +1,14 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-import type { Direction } from '../models/Direction';
-import type { LogLevel } from '../models/LogLevel';
-import type { PagedLogger } from '../models/PagedLogger';
-import type { PagedLogMessage } from '../models/PagedLogMessage';
-import type { PagedLogTemplate } from '../models/PagedLogTemplate';
-import type { PagedSavedLogSearch } from '../models/PagedSavedLogSearch';
-import type { SavedLogSearch } from '../models/SavedLogSearch';
+import type { DirectionModel } from '../models/DirectionModel';
+import type { LogLevelCountsModel } from '../models/LogLevelCountsModel';
+import type { LogLevelModel } from '../models/LogLevelModel';
+import type { PagedLoggerModel } from '../models/PagedLoggerModel';
+import type { PagedLogMessageModel } from '../models/PagedLogMessageModel';
+import type { PagedLogTemplateModel } from '../models/PagedLogTemplateModel';
+import type { PagedSavedLogSearchModel } from '../models/PagedSavedLogSearchModel';
+import type { SavedLogSearchModel } from '../models/SavedLogSearchModel';
 
 import type { CancelablePromise } from '../core/CancelablePromise';
 import { OpenAPI } from '../core/OpenAPI';
@@ -16,7 +17,7 @@ import { request as __request } from '../core/request';
 export class LogViewerResource {
 
     /**
-     * @returns PagedLogger Success
+     * @returns PagedLoggerModel Success
      * @throws ApiError
      */
     public static getLogViewerLevel({
@@ -25,7 +26,7 @@ export class LogViewerResource {
     }: {
         skip?: number,
         take?: number,
-    }): CancelablePromise<PagedLogger> {
+    }): CancelablePromise<PagedLoggerModel> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/log-viewer/level',
@@ -46,7 +47,7 @@ export class LogViewerResource {
     }: {
         startDate?: string,
         endDate?: string,
-    }): CancelablePromise<any> {
+    }): CancelablePromise<LogLevelCountsModel> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/log-viewer/level-count',
@@ -61,7 +62,7 @@ export class LogViewerResource {
     }
 
     /**
-     * @returns PagedLogMessage Success
+     * @returns PagedLogMessageModel Success
      * @throws ApiError
      */
     public static getLogViewerLog({
@@ -75,12 +76,12 @@ export class LogViewerResource {
     }: {
         skip?: number,
         take?: number,
-        orderDirection?: Direction,
+        orderDirection?: DirectionModel,
         filterExpression?: string,
-        logLevel?: Array<LogLevel>,
+        logLevel?: Array<LogLevelModel>,
         startDate?: string,
         endDate?: string,
-    }): CancelablePromise<PagedLogMessage> {
+    }): CancelablePromise<PagedLogMessageModel> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/log-viewer/log',
@@ -97,7 +98,7 @@ export class LogViewerResource {
     }
 
     /**
-     * @returns PagedLogTemplate Success
+     * @returns PagedLogTemplateModel Success
      * @throws ApiError
      */
     public static getLogViewerMessageTemplate({
@@ -110,7 +111,7 @@ export class LogViewerResource {
         take?: number,
         startDate?: string,
         endDate?: string,
-    }): CancelablePromise<PagedLogTemplate> {
+    }): CancelablePromise<PagedLogTemplateModel> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/log-viewer/message-template',
@@ -127,7 +128,7 @@ export class LogViewerResource {
     }
 
     /**
-     * @returns PagedSavedLogSearch Success
+     * @returns PagedSavedLogSearchModel Success
      * @throws ApiError
      */
     public static getLogViewerSavedSearch({
@@ -136,7 +137,7 @@ export class LogViewerResource {
     }: {
         skip?: number,
         take?: number,
-    }): CancelablePromise<PagedSavedLogSearch> {
+    }): CancelablePromise<PagedSavedLogSearchModel> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/log-viewer/saved-search',
@@ -148,19 +149,20 @@ export class LogViewerResource {
     }
 
     /**
-     * @returns any Created
+     * @returns string Created
      * @throws ApiError
      */
     public static postLogViewerSavedSearch({
         requestBody,
     }: {
-        requestBody?: SavedLogSearch,
-    }): CancelablePromise<any> {
+        requestBody?: SavedLogSearchModel,
+    }): CancelablePromise<string> {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/umbraco/management/api/v1/log-viewer/saved-search',
             body: requestBody,
             mediaType: 'application/json',
+            responseHeader: 'Location',
             errors: {
                 400: `Bad Request`,
             },
@@ -168,14 +170,14 @@ export class LogViewerResource {
     }
 
     /**
-     * @returns SavedLogSearch Success
+     * @returns any Success
      * @throws ApiError
      */
     public static getLogViewerSavedSearchByName({
         name,
     }: {
         name: string,
-    }): CancelablePromise<SavedLogSearch> {
+    }): CancelablePromise<SavedLogSearchModel> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/log-viewer/saved-search/{name}',

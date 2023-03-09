@@ -10,10 +10,10 @@ export default defineConfig({
 			formats: ['es'],
 			fileName: 'main',
 		},
-		outDir: '../Umbraco.Cms.StaticAssets/wwwroot/umbraco',
+		outDir: '../Umbraco.Cms.StaticAssets/wwwroot/umbraco/backoffice',
 		emptyOutDir: true,
 		sourcemap: true,
 	},
-	base: '/umbraco/',
+	base: '/umbraco/backoffice/',
 	mode: 'production'
 });

@@ -3,8 +3,8 @@ import { customElement, property } from 'lit/decorators.js';
 import type { UmbPropertyAction } from '../shared/property-action/property-action.model';
 import {
 	UmbNotificationDefaultData,
-	UmbNotificationService,
-	UMB_NOTIFICATION_SERVICE_CONTEXT_TOKEN,
+	UmbNotificationContext,
+	UMB_NOTIFICATION_CONTEXT_TOKEN,
 } from '@umbraco-cms/notification';
 import { UmbLitElement } from '@umbraco-cms/element';
 
@@ -13,7 +13,7 @@ export class UmbPropertyActionCopyElement extends UmbLitElement implements UmbPr
 	@property()
 	value = '';
 
-	private _notificationService?: UmbNotificationService;
+	private _notificationContext?: UmbNotificationContext;
 
 	constructor() {
 		super();
@@ -23,14 +23,14 @@ export class UmbPropertyActionCopyElement extends UmbLitElement implements UmbPr
 			console.log('PROPERTY', property);
 		});
 
-		this.consumeContext(UMB_NOTIFICATION_SERVICE_CONTEXT_TOKEN, (notificationService) => {
-			this._notificationService = notificationService;
+		this.consumeContext(UMB_NOTIFICATION_CONTEXT_TOKEN, (instance) => {
+			this._notificationContext = instance;
 		});
 	}
 
 	private _handleLabelClick() {
 		const data: UmbNotificationDefaultData = { message: 'Copied to clipboard' };
-		this._notificationService?.peek('positive', { data });
+		this._notificationContext?.peek('positive', { data });
 		// TODO: how do we want to close the menu? Testing an event based approach
 		this.dispatchEvent(new CustomEvent('close', { bubbles: true, composed: true }));
 	}

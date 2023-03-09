@@ -2,10 +2,10 @@ import { html, css, nothing } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement } from 'lit/decorators.js';
 import { UmbModalLayoutElement } from '../../../../../../core/modal';
-import { SearchResult } from '@umbraco-cms/backend-api';
+import type { SearchResultModel } from '@umbraco-cms/backend-api';
 
 @customElement('umb-modal-layout-fields-viewer')
-export class UmbModalLayoutFieldsViewerElement extends UmbModalLayoutElement<SearchResult & { name: string }> {
+export class UmbModalLayoutFieldsViewerElement extends UmbModalLayoutElement<SearchResultModel & { name: string }> {
 	static styles = [
 		UUITextStyles,
 		css`
@@ -16,11 +16,7 @@ export class UmbModalLayoutFieldsViewerElement extends UmbModalLayoutElement<Sea
 				display: flex;
 				flex-direction: column;
 				height: 100%;
-				background-color: var(--uui-color-surface);
-				box-shadow: var(--uui-shadow-depth-1, 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24));
-				border-radius: var(--uui-border-radius);
-				padding: var(--uui-size-space-5);
-				box-sizing: border-box;
+				
 			}
 
 			span {

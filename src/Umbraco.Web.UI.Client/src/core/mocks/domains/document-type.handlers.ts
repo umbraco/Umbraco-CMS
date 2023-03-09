@@ -1,19 +1,10 @@
 import { rest } from 'msw';
 import { umbDocumentTypeData } from '../data/document-type.data';
-import type { DocumentTypeDetails } from '@umbraco-cms/models';
+import type { DocumentTypeModel } from '@umbraco-cms/backend-api';
 
 // TODO: add schema
 export const handlers = [
-	rest.get('/umbraco/backoffice/document-type/:key', (req, res, ctx) => {
-		const key = req.params.key as string;
-		if (!key) return;
-
-		const document = umbDocumentTypeData.getByKey(key);
-
-		return res(ctx.status(200), ctx.json([document]));
-	}),
-
-	rest.post<DocumentTypeDetails[]>('/umbraco/backoffice/document-type/save', (req, res, ctx) => {
+	rest.post<DocumentTypeModel[]>('/umbraco/management/api/v1/document-type/:key', (req, res, ctx) => {
 		const data = req.body;
 		if (!data) return;
 
@@ -52,5 +43,14 @@ export const handlers = [
 		const items = umbDocumentTypeData.getTreeItem(keys);
 
 		return res(ctx.status(200), ctx.json(items));
+	}),
+
+	rest.get('/umbraco/management/api/v1/document-type/:key', (req, res, ctx) => {
+		const key = req.params.key as string;
+		if (!key) return;
+
+		const document = umbDocumentTypeData.getByKey(key);
+
+		return res(ctx.status(200), ctx.json(document));
 	}),
 ];

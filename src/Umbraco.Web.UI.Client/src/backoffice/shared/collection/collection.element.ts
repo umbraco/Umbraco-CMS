@@ -5,7 +5,7 @@ import { map } from 'rxjs';
 import './collection-selection-actions.element';
 import './collection-toolbar.element';
 import { UmbCollectionContext, UMB_COLLECTION_CONTEXT_TOKEN } from './collection.context';
-import { createExtensionElement , umbExtensionsRegistry } from '@umbraco-cms/extensions-api';
+import { createExtensionElement, umbExtensionsRegistry } from '@umbraco-cms/extensions-api';
 import type { ManifestCollectionView, MediaDetails } from '@umbraco-cms/models';
 import { UmbLitElement } from '@umbraco-cms/element';
 import type { UmbObserverController } from '@umbraco-cms/observable-api';
@@ -38,7 +38,7 @@ export class UmbCollectionElement extends UmbLitElement {
 	private _collectionContext?: UmbCollectionContext<MediaDetails>;
 
 	private _entityType!: string;
-	@property()
+	@property({ type: String, attribute: 'entity-type' })
 	public get entityType(): string {
 		return this._entityType;
 	}
@@ -103,7 +103,7 @@ export class UmbCollectionElement extends UmbLitElement {
 		return html`
 			<umb-body-layout no-header-background>
 				<umb-collection-toolbar slot="header"></umb-collection-toolbar>
-				<router-slot id="router-slot" .routes="${this._routes}"></router-slot>
+				<umb-router-slot id="router-slot" .routes="${this._routes}"></umb-router-slot>
 				${this._selection && this._selection.length > 0
 					? html`<umb-collection-selection-actions slot="footer"></umb-collection-selection-actions>`
 					: nothing}

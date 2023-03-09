@@ -2,9 +2,9 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html, nothing } from 'lit';
 import { customElement, state, query, property } from 'lit/decorators.js';
 
-import { UmbModalService, UMB_MODAL_SERVICE_CONTEXT_TOKEN } from '../../../../../core/modal';
+import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN } from '../../../../../core/modal';
 
-import { SearchResult, SearcherResource, Field } from '@umbraco-cms/backend-api';
+import { SearchResultModel, SearcherResource, FieldModel } from '@umbraco-cms/backend-api';
 import { UmbLitElement } from '@umbraco-cms/element';
 import { tryExecuteAndNotify } from '@umbraco-cms/resources';
 
@@ -101,13 +101,13 @@ export class UmbDashboardExamineSearcherElement extends UmbLitElement {
 		`,
 	];
 
-	private _modalService?: UmbModalService;
+	private _modalContext?: UmbModalContext;
 
 	@property()
 	searcherName!: string;
 
 	@state()
-	private _searchResults?: SearchResult[];
+	private _searchResults?: SearchResultModel[];
 
 	@state()
 	private _exposedFields?: ExposedSearchResultField[];
@@ -120,8 +120,8 @@ export class UmbDashboardExamineSearcherElement extends UmbLitElement {
 
 	constructor() {
 		super();
-		this.consumeContext(UMB_MODAL_SERVICE_CONTEXT_TOKEN, (instance) => {
-			this._modalService = instance;
+		this.consumeContext(UMB_MODAL_CONTEXT_TOKEN, (instance) => {
+			this._modalContext = instance;
 		});
 	}
 
@@ -175,7 +175,7 @@ export class UmbDashboardExamineSearcherElement extends UmbLitElement {
 	}
 
 	private _onFieldFilterClick() {
-		const modalHandler = this._modalService?.open('umb-modal-layout-fields-settings', {
+		const modalHandler = this._modalContext?.open('umb-modal-layout-fields-settings', {
 			type: 'sidebar',
 			size: 'small',
 			data: { ...this._exposedFields },
@@ -205,7 +205,7 @@ export class UmbDashboardExamineSearcherElement extends UmbLitElement {
 	}
 
 	// Find the field named 'nodeName' and return its value if it exists in the fields array
-	private getSearchResultNodeName(searchResult: SearchResult): string {
+	private getSearchResultNodeName(searchResult: SearchResultModel): string {
 		const nodeNameField = searchResult.fields?.find((field) => field.name?.toUpperCase() === 'NODENAME');
 		return nodeNameField?.values?.join(', ') ?? '';
 	}
@@ -241,7 +241,7 @@ export class UmbDashboardExamineSearcherElement extends UmbLitElement {
 									look="secondary"
 									label="Open sidebar to see all fields"
 									@click="${() =>
-										this._modalService?.open('umb-modal-layout-fields-viewer', {
+										this._modalContext?.open('umb-modal-layout-fields-viewer', {
 											type: 'sidebar',
 											size: 'medium',
 											data: { ...rowData, name: this.getSearchResultNodeName(rowData) },
@@ -287,7 +287,7 @@ export class UmbDashboardExamineSearcherElement extends UmbLitElement {
 		})}`;
 	}
 
-	renderBodyCells(cellData: Field[]) {
+	renderBodyCells(cellData: FieldModel[]) {
 		return html`${this._exposedFields?.map((slot) => {
 			return cellData.map((field) => {
 				return slot.exposed && field.name == slot.name

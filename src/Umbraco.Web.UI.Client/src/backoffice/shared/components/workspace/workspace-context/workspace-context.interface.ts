@@ -1,16 +1,15 @@
-import type { Observable } from "rxjs";
+import { Observable } from 'rxjs';
+import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 
 export interface UmbWorkspaceContextInterface<T = unknown> {
-
-	readonly data: Observable<T>;
-
-	getUnique(): string | undefined;
-
+	host: UmbControllerHostInterface;
+	repository: any; // TODO: add type
+	isNew: Observable<boolean>;
+	getIsNew(): boolean;
+	setIsNew(value: boolean): void;
+	getEntityType(): string;
 	getData(): T;
-
-	load(unique: string): void;
-
-	create(parentUnique: string | null): void;
-
 	destroy(): void;
+	// TODO: temp solution to bubble validation errors to the UI
+	setValidationErrors?(errorMap: any): void;
 }

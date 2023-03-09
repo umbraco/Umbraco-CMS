@@ -3,11 +3,11 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, property, state } from 'lit/decorators.js';
 import { ifDefined } from 'lit-html/directives/if-defined.js';
 import { FormControlMixin } from '@umbraco-ui/uui-base/lib/mixins';
-import { UmbModalService, UMB_MODAL_SERVICE_CONTEXT_TOKEN } from '../../../../core/modal';
-import { UMB_DOCUMENT_TREE_STORE_CONTEXT_TOKEN } from '../../../../backoffice/documents/documents/document.tree.store';
-import type { UmbDocumentTreeStore } from '../../../../backoffice/documents/documents/document.tree.store';
+import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN } from '../../../../core/modal';
+import { UMB_DOCUMENT_TREE_STORE_CONTEXT_TOKEN } from '../../../documents/documents/repository/document.tree.store';
+import type { UmbDocumentTreeStore } from '../../../documents/documents/repository/document.tree.store';
 import { UmbLitElement } from '@umbraco-cms/element';
-import type { DocumentTreeItem, FolderTreeItem } from '@umbraco-cms/backend-api';
+import type { DocumentTreeItemModel, FolderTreeItemModel } from '@umbraco-cms/backend-api';
 import type { UmbObserverController } from '@umbraco-cms/observable-api';
 
 @customElement('umb-input-document-picker')
@@ -20,7 +20,6 @@ export class UmbInputDocumentPickerElement extends FormControlMixin(UmbLitElemen
 			}
 		`,
 	];
-
 	/**
 	 * This is a minimum amount of selected items in this input.
 	 * @type {number}
@@ -76,11 +75,11 @@ export class UmbInputDocumentPickerElement extends FormControlMixin(UmbLitElemen
 	}
 
 	@state()
-	private _items?: Array<DocumentTreeItem>;
+	private _items?: Array<DocumentTreeItemModel>;
 
-	private _modalService?: UmbModalService;
+	private _modalContext?: UmbModalContext;
 	private _documentStore?: UmbDocumentTreeStore;
-	private _pickedItemsObserver?: UmbObserverController<FolderTreeItem>;
+	private _pickedItemsObserver?: UmbObserverController<FolderTreeItemModel>;
 
 	constructor() {
 		super();
@@ -100,8 +99,8 @@ export class UmbInputDocumentPickerElement extends FormControlMixin(UmbLitElemen
 			this._documentStore = instance;
 			this._observePickedDocuments();
 		});
-		this.consumeContext(UMB_MODAL_SERVICE_CONTEXT_TOKEN, (instance) => {
-			this._modalService = instance;
+		this.consumeContext(UMB_MODAL_CONTEXT_TOKEN, (instance) => {
+			this._modalContext = instance;
 		});
 	}
 
@@ -115,21 +114,24 @@ export class UmbInputDocumentPickerElement extends FormControlMixin(UmbLitElemen
 		if (!this._documentStore) return;
 
 		// TODO: consider changing this to the list data endpoint when it is available
-		this._pickedItemsObserver = this.observe(this._documentStore.getTreeItems(this._selectedKeys), (items) => {
+		this._pickedItemsObserver = this.observe(this._documentStore.items(this._selectedKeys), (items) => {
 			this._items = items;
 		});
 	}
 
 	private _openPicker() {
 		// We send a shallow copy(good enough as its just an array of keys) of our this._selectedKeys, as we don't want the modal to manipulate our data:
-		const modalHandler = this._modalService?.contentPicker({ multiple: true, selection: [...this._selectedKeys] });
+		const modalHandler = this._modalContext?.contentPicker({
+			multiple: this.max === 1 ? false : true,
+			selection: [...this._selectedKeys],
+		});
 		modalHandler?.onClose().then(({ selection }: any) => {
 			this._setSelection(selection);
 		});
 	}
 
-	private _removeItem(item: FolderTreeItem) {
-		const modalHandler = this._modalService?.confirm({
+	private _removeItem(item: FolderTreeItemModel) {
+		const modalHandler = this._modalContext?.confirm({
 			color: 'danger',
 			headline: `Remove ${item.name}?`,
 			content: 'Are you sure you want to remove this item',
@@ -156,9 +158,9 @@ export class UmbInputDocumentPickerElement extends FormControlMixin(UmbLitElemen
 		`;
 	}
 
-	private _renderItem(item: FolderTreeItem) {
+	private _renderItem(item: FolderTreeItemModel) {
 		// TODO: remove when we have a way to handle trashed items
-		const tempItem = item as FolderTreeItem & { isTrashed: boolean };
+		const tempItem = item as FolderTreeItemModel & { isTrashed: boolean };
 
 		return html`
 			<uui-ref-node name=${ifDefined(item.name === null ? undefined : item.name)} detail=${ifDefined(item.key)}>

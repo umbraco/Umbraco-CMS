@@ -4,7 +4,7 @@ import { validate as uuidValidate } from 'uuid';
 import { UmbNotificationHandler } from './notification-handler';
 
 import type { UmbNotificationDefaultData } from './layouts/default';
-import type { UmbNotificationOptions } from './notification.service';
+import type { UmbNotificationOptions } from './notification.context';
 
 describe('UmbNotificationHandler', () => {
 	let notificationHandler: UmbNotificationHandler;

@@ -6,11 +6,10 @@ import { manifests as currentUserManifests } from './current-user/manifests';
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-api';
 import { ManifestTypes } from '@umbraco-cms/extensions-registry';
 
+export const manifests = [...userGroupManifests, ...userManifests, ...userSectionManifests, ...currentUserManifests];
+
 const registerExtensions = (manifests: Array<ManifestTypes>) => {
-	manifests.forEach((manifest) => {
-		if (umbExtensionsRegistry.isRegistered(manifest.alias)) return;
-		umbExtensionsRegistry.register(manifest);
-	});
+	manifests.forEach((manifest) => umbExtensionsRegistry.register(manifest));
 };
 
-registerExtensions([...userGroupManifests, ...userManifests, ...userSectionManifests, ...currentUserManifests]);
+registerExtensions(manifests);

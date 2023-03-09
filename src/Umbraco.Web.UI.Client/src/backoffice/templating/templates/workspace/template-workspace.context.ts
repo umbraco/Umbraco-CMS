@@ -1,49 +1,43 @@
-import { UmbTemplateDetailRepository } from './data/template.detail.repository';
+import { UmbTemplateRepository } from '../repository/template.repository';
+import { UmbWorkspaceContext } from '../../../shared/components/workspace/workspace-context/workspace-context';
 import { createObservablePart, DeepState } from '@umbraco-cms/observable-api';
-import { Template } from '@umbraco-cms/backend-api';
+import { TemplateModel } from '@umbraco-cms/backend-api';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 
-export class UmbTemplateWorkspaceContext {
-	#host: UmbControllerHostInterface;
-	#templateDetailRepo: UmbTemplateDetailRepository;
-
-	#data = new DeepState<Template | undefined>(undefined);
+export class UmbTemplateWorkspaceContext extends UmbWorkspaceContext<UmbTemplateRepository> {
+	#data = new DeepState<TemplateModel | undefined>(undefined);
 	data = this.#data.asObservable();
 	name = createObservablePart(this.#data, (data) => data?.name);
 	content = createObservablePart(this.#data, (data) => data?.content);
 
 	constructor(host: UmbControllerHostInterface) {
-		this.#host = host;
-		this.#templateDetailRepo = new UmbTemplateDetailRepository(this.#host);
+		super(host, new UmbTemplateRepository(host));
+	}
+
+	getData() {
+		return this.#data.getValue();
 	}
 
 	setName(value: string) {
-		this.#data.next({ ...this.#data.value, name: value });
+		this.#data.next({ ...this.#data.value, $type: this.#data.value?.$type || '', name: value });
 	}
 
 	setContent(value: string) {
-		this.#data.next({ ...this.#data.value, content: value });
+		this.#data.next({ ...this.#data.value, $type: this.#data.value?.$type || '', content: value });
 	}
 
 	async load(entityKey: string) {
-		const { data } = await this.#templateDetailRepo.get(entityKey);
+		const { data } = await this.repository.requestByKey(entityKey);
 		if (data) {
+			this.setIsNew(false);
 			this.#data.next(data);
 		}
 	}
 
 	async createScaffold(parentKey: string | null) {
-		const { data } = await this.#templateDetailRepo.createScaffold(parentKey);
+		const { data } = await this.repository.createScaffold(parentKey);
 		if (!data) return;
+		this.setIsNew(true);
 		this.#data.next(data);
-	}
-
-	async save(isNew: boolean) {
-		if (!this.#data.value) return;
-		isNew ? this.#templateDetailRepo.insert(this.#data.value) : this.#templateDetailRepo.update(this.#data.value);
-	}
-
-	async delete(key: string) {
-		await this.#templateDetailRepo.delete(key);
 	}
 }

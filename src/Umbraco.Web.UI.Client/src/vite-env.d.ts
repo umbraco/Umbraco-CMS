@@ -5,4 +5,5 @@ interface ImportMetaEnv {
 	VITE_UMBRACO_API_URL: string;
 	VITE_UMBRACO_USE_MSW: 'on' | 'off';
 	VITE_MSW_QUIET: 'on' | 'off';
+	VITE_UMBRACO_EXTENSION_MOCKS: 'on' | 'off';
 }

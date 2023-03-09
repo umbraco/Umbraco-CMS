@@ -1,0 +1,27 @@
+import { Meta } from '@storybook/addon-docs';
+
+<Meta
+	title="Guides/Extending the Backoffice/Workspaces/Views"
+	parameters={{ previewTabs: { canvas: { hidden: true } } }}
+/>
+
+# Workspace Views
+
+TODO: add description of a workspace views
+
+<img src="docs/workspace-views.svg" width="400" />
+
+**Manifest**
+
+```json
+{
+	"type": "workspaceView",
+	"alias": "My.WorkspaceView",
+	"name": "My Workspace View",
+	"meta": {
+		"workspaces": ["My.Workspace"],
+		"label": "My View",
+		"pathname": "/my-view"
+	}
+}
+```

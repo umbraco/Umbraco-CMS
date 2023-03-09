@@ -1,14 +1,14 @@
 import { rest } from 'msw';
 
 import { umbracoPath } from '@umbraco-cms/utils';
-import { UpgradeSettings } from '@umbraco-cms/backend-api';
+import type { UpgradeSettingsModel } from '@umbraco-cms/backend-api';
 
 export const handlers = [
 	rest.get(umbracoPath('/upgrade/settings'), (_req, res, ctx) => {
 		return res(
 			// Respond with a 200 status code
 			ctx.status(200),
-			ctx.json<UpgradeSettings>({
+			ctx.json<UpgradeSettingsModel>({
 				currentState: '2b20c6e7',
 				newState: '2b20c6e8',
 				oldVersion: '13.0.0',

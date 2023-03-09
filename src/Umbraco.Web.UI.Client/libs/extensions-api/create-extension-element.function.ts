@@ -1,10 +1,10 @@
-import type { ManifestElement } from '../models';
+import type { HTMLElementConstructor, ManifestElement } from '../models';
 import { hasDefaultExport } from './has-default-export.function';
 import { isManifestElementNameType } from './is-manifest-element-name-type.function';
 import { loadExtension } from './load-extension.function';
 
 export async function createExtensionElement(manifest: ManifestElement): Promise<HTMLElement | undefined> {
-	
+
 	//TODO: Write tests for these extension options:
 	const js = await loadExtension(manifest);
 
@@ -15,14 +15,14 @@ export async function createExtensionElement(manifest: ManifestElement): Promise
 
 	// TODO: Do we need this except for the default() loader?
 	if (js) {
-		if (hasDefaultExport(js)) {
+		if (hasDefaultExport<HTMLElementConstructor>(js)) {
 			// created by default class
 			return new js.default();
 		}
 
 		console.error('-- Extension did not succeed creating an element, missing a default export of the served JavaScript file', manifest);
 
-		// If some JS was loaded and it did not at least contain a default export, then we are safe to assume that it executed as a module and does not need to be returned
+		// If some JS was loaded and it did not at least contain a default export, then we are safe to assume that it executed its side effects and does not need to be returned
 		return undefined;
 	}
 

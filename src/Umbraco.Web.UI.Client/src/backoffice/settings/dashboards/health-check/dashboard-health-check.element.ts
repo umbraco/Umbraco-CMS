@@ -1,6 +1,6 @@
 import { html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
-import { IRoute, IRoutingInfo } from 'router-slot';
+import type { IRoute, IRoutingInfo } from 'router-slot';
 import { UmbDashboardHealthCheckGroupElement } from './views/health-check-group.element';
 import {
 	UmbHealthCheckDashboardContext,
@@ -11,7 +11,7 @@ import { UmbLitElement } from '@umbraco-cms/element';
 import { ManifestHealthCheck } from '@umbraco-cms/extensions-registry';
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/resources';
-import { HealthCheckGroup, HealthCheckResource } from '@umbraco-cms/backend-api';
+import { HealthCheckGroupModel, HealthCheckResource } from '@umbraco-cms/backend-api';
 
 @customElement('umb-dashboard-health-check')
 export class UmbDashboardHealthCheckElement extends UmbLitElement {
@@ -53,7 +53,7 @@ export class UmbDashboardHealthCheckElement extends UmbLitElement {
 		this.#register(manifests);
 	};
 
-	#createManifests(groups: HealthCheckGroup[]): Array<ManifestHealthCheck> {
+	#createManifests(groups: HealthCheckGroupModel[]): Array<ManifestHealthCheck> {
 		return groups.map((group) => {
 			return {
 				type: 'healthCheck',
@@ -76,7 +76,7 @@ export class UmbDashboardHealthCheckElement extends UmbLitElement {
 	}
 
 	render() {
-		return html` <router-slot .routes=${this._routes}></router-slot>`;
+		return html` <umb-router-slot .routes=${this._routes}></umb-router-slot>`;
 	}
 }
 

@@ -1,8 +1,8 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-import type { ServerStatus } from '../models/ServerStatus';
-import type { Version } from '../models/Version';
+import type { ServerStatusModel } from '../models/ServerStatusModel';
+import type { VersionModel } from '../models/VersionModel';
 
 import type { CancelablePromise } from '../core/CancelablePromise';
 import { OpenAPI } from '../core/OpenAPI';
@@ -11,10 +11,10 @@ import { request as __request } from '../core/request';
 export class ServerResource {
 
     /**
-     * @returns ServerStatus Success
+     * @returns any Success
      * @throws ApiError
      */
-    public static getServerStatus(): CancelablePromise<ServerStatus> {
+    public static getServerStatus(): CancelablePromise<ServerStatusModel> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/server/status',
@@ -25,10 +25,10 @@ export class ServerResource {
     }
 
     /**
-     * @returns Version Success
+     * @returns any Success
      * @throws ApiError
      */
-    public static getServerVersion(): CancelablePromise<Version> {
+    public static getServerVersion(): CancelablePromise<VersionModel> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/server/version',

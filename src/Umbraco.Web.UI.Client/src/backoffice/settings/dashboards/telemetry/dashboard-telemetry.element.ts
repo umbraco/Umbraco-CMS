@@ -3,7 +3,7 @@ import { customElement, state } from 'lit/decorators.js';
 import { unsafeHTML } from 'lit/directives/unsafe-html.js';
 import { UUIButtonState } from '@umbraco-ui/uui';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
-import { Telemetry, TelemetryLevel, TelemetryResource } from '@umbraco-cms/backend-api';
+import { TelemetryModel, TelemetryLevelModel, TelemetryResource } from '@umbraco-cms/backend-api';
 import { UmbLitElement } from '@umbraco-cms/element';
 import { tryExecuteAndNotify } from '@umbraco-cms/resources';
 
@@ -19,10 +19,10 @@ export class UmbDashboardTelemetryElement extends UmbLitElement {
 	];
 
 	@state()
-	private _telemetryFormData = TelemetryLevel.BASIC;
+	private _telemetryFormData = TelemetryLevelModel.BASIC;
 
 	@state()
-	private _telemetryLevels: Telemetry[] = [];
+	private _telemetryLevels: TelemetryModel[] = [];
 
 	@state()
 	private _errorMessage = '';
@@ -40,7 +40,7 @@ export class UmbDashboardTelemetryElement extends UmbLitElement {
 		this._telemetryLevels = telemetryLevels.data?.items ?? [];
 
 		const telemetryLevel = await tryExecuteAndNotify(this, TelemetryResource.getTelemetryLevel());
-		this._telemetryFormData = telemetryLevel.data?.telemetryLevel ?? TelemetryLevel.BASIC;
+		this._telemetryFormData = telemetryLevel.data?.telemetryLevel ?? TelemetryLevelModel.BASIC;
 	}
 
 	private _handleSubmit = async (e: CustomEvent<SubmitEvent>) => {
@@ -66,7 +66,8 @@ export class UmbDashboardTelemetryElement extends UmbLitElement {
 
 	private _handleChange(e: InputEvent) {
 		const target = e.target as HTMLInputElement;
-		this._telemetryFormData = this._telemetryLevels[parseInt(target.value) - 1].telemetryLevel ?? TelemetryLevel.BASIC;
+		this._telemetryFormData =
+			this._telemetryLevels[parseInt(target.value) - 1].telemetryLevel ?? TelemetryLevelModel.BASIC;
 	}
 
 	private get _selectedTelemetryIndex() {
@@ -79,11 +80,11 @@ export class UmbDashboardTelemetryElement extends UmbLitElement {
 
 	private get _selectedTelemetryDescription() {
 		switch (this._selectedTelemetry.telemetryLevel) {
-			case TelemetryLevel.MINIMAL:
+			case TelemetryLevelModel.MINIMAL:
 				return 'We will only send an anonymized site ID to let us know that the site exists.';
-			case TelemetryLevel.BASIC:
+			case TelemetryLevelModel.BASIC:
 				return 'We will send an anonymized site ID, Umbraco version, and packages installed.';
-			case TelemetryLevel.DETAILED:
+			case TelemetryLevelModel.DETAILED:
 				return `We will send:<ul>
 				<li>Anonymized site ID, Umbraco version, and packages installed.</li>
 				<li>Number of: Root nodes, Content nodes, Macros, Media, Document Types, Templates, Languages, Domains, User Group, Users, Members, and Property Editors in use.</li>

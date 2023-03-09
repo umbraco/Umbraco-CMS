@@ -8,7 +8,11 @@ import {
 	UmbHealthCheckDashboardContext,
 } from '../health-check-dashboard.context';
 import type { ManifestHealthCheck } from '@umbraco-cms/models';
-import { StatusResultType } from '@umbraco-cms/backend-api';
+import {
+	HealthCheckGroupWithResultModel,
+	HealthCheckWithResultModel,
+	StatusResultTypeModel,
+} from '@umbraco-cms/backend-api';
 import { UmbLitElement } from '@umbraco-cms/element';
 
 @customElement('umb-health-check-group-box-overview')
@@ -64,7 +68,7 @@ export class UmbHealthCheckGroupBoxOverviewElement extends UmbLitElement {
 	private _tagResults?: any = [];
 
 	@state()
-	private _keyResults?: any = [];
+	private _keyResults?: HealthCheckGroupWithResultModel;
 
 	constructor() {
 		super();
@@ -87,10 +91,10 @@ export class UmbHealthCheckGroupBoxOverviewElement extends UmbLitElement {
 	}
 
 	_renderStatus() {
-		const res: any = [];
-		this._keyResults.forEach((item: any) => {
-			item.results.forEach((result: any) => {
-				res.push(result.resultType);
+		const res: StatusResultTypeModel[] = [];
+		this._keyResults?.checks?.forEach((item) => {
+			item?.results?.forEach((result) => {
+				res.push(result.resultType ?? StatusResultTypeModel.ERROR);
 			});
 		});
 		this._tagResults = res;
@@ -134,16 +138,16 @@ export class UmbHealthCheckGroupBoxOverviewElement extends UmbLitElement {
 
 		results.forEach((result: any) => {
 			switch (result) {
-				case StatusResultType.SUCCESS:
+				case StatusResultTypeModel.SUCCESS:
 					tags.success += 1;
 					break;
-				case StatusResultType.WARNING:
+				case StatusResultTypeModel.WARNING:
 					tags.warning += 1;
 					break;
-				case StatusResultType.ERROR:
+				case StatusResultTypeModel.ERROR:
 					tags.error += 1;
 					break;
-				case StatusResultType.INFO:
+				case StatusResultTypeModel.INFO:
 					tags.info += 1;
 					break;
 				default:

@@ -2,13 +2,9 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import type { DataTypeProperty } from './DataTypeProperty';
+import type { DataTypeModelBaseModel } from './DataTypeModelBaseModel';
 
-export type DataTypeCreateModel = {
-    name?: string;
-    propertyEditorAlias?: string;
-    propertyEditorUiAlias?: string | null;
-    data?: Array<DataTypeProperty>;
+export type DataTypeCreateModel = (DataTypeModelBaseModel & {
     parentKey?: string | null;
-};
+});
 

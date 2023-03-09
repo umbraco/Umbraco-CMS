@@ -1,16 +1,18 @@
+import { IRoute, RouterSlot } from 'router-slot';
 import { LitElement, PropertyValueMap } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
-import { IRoute, RouterSlot } from 'router-slot';
 import { UmbRouterSlotChangeEvent, UmbRouterSlotInitEvent } from '@umbraco-cms/router';
 
 /**
  *  @element umb-router-slot-element
  *  @description - Component for wrapping Router Slot element, providing some local events for implementation.
  *  @extends UmbRouterSlotElement
+ * @fires {UmbRouterSlotInitEvent} init - fires when the media card is selected
+ * @fires {UmbRouterSlotChangeEvent} change - fires when the media card is unselected
  */
 @customElement('umb-router-slot')
 export class UmbRouterSlotElement extends LitElement {
-	#router: RouterSlot;
+	#router: RouterSlot = new RouterSlot();
 	#listening = false;
 
 	@property()
@@ -33,11 +35,6 @@ export class UmbRouterSlotElement extends LitElement {
 
 	public get absoluteActiveViewPath() {
 		return this._routerPath + '/' + this._activeLocalPath;
-	}
-
-	constructor() {
-		super();
-		this.#router = document.createElement('router-slot');
 	}
 
 	connectedCallback() {

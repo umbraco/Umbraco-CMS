@@ -1,5 +1,6 @@
 import type { Observable } from 'rxjs';
-import type { ManifestTree, UmbTreeRepository } from '@umbraco-cms/models';
+import { UmbTreeRepository } from '@umbraco-cms/repository';
+import type { ManifestTree } from '@umbraco-cms/models';
 import { DeepState } from '@umbraco-cms/observable-api';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 
@@ -29,7 +30,8 @@ export class UmbTreeContextBase implements UmbTreeContext {
 		this.tree = tree;
 
 		if (this.tree.meta.repository) {
-			this.repository = new this.tree.meta.repository(this.#host);
+			// TODO: should be using the right extension and the createExtensionClass method.
+			this.repository = new this.tree.meta.repository(this.#host) as any;
 		}
 	}
 
@@ -56,18 +58,18 @@ export class UmbTreeContextBase implements UmbTreeContext {
 	}
 
 	public async requestRootItems() {
-		return this.repository.requestRootItems();
+		return this.repository.requestRootTreeItems();
 	}
 
 	public async requestChildrenOf(parentKey: string | null) {
-		return this.repository.requestChildrenOf(parentKey);
+		return this.repository.requestTreeItemsOf(parentKey);
 	}
 
 	public async rootItems() {
-		return this.repository.rootItems();
+		return this.repository.rootTreeItems();
 	}
 
 	public async childrenOf(parentKey: string | null) {
-		return this.repository.childrenOf(parentKey);
+		return this.repository.treeItemsOf(parentKey);
 	}
 }
