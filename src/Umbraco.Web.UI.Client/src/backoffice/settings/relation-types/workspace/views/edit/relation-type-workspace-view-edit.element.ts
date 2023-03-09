@@ -4,7 +4,7 @@ import { customElement, state } from 'lit/decorators.js';
 import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN } from '../../../../../../core/modal';
 import { UmbRelationTypeWorkspaceContext } from '../../relation-type-workspace.context';
 import { UmbLitElement } from '@umbraco-cms/element';
-import type { RelationTypeModel } from '@umbraco-cms/backend-api';
+import type { RelationTypeResponseModel } from '@umbraco-cms/backend-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-api';
 
 import '../../../../../shared/property-editors/shared/property-editor-config/property-editor-config.element';
@@ -23,7 +23,7 @@ export class UmbRelationTypeWorkspaceViewEditElement extends UmbLitElement {
 	];
 
 	@state()
-	_RelationType?: RelationTypeModel;
+	_RelationType?: RelationTypeResponseModel;
 
 	@state()
 	private _propertyEditorUIIcon = '';

@@ -4,14 +4,14 @@ import { customElement, state } from 'lit/decorators.js';
 import { UmbRelationTypeWorkspaceContext } from '../../relation-type-workspace.context';
 
 import { UmbLitElement } from '@umbraco-cms/element';
-import { RelationTypeModel } from '@umbraco-cms/backend-api';
+import { RelationTypeResponseModel } from '@umbraco-cms/backend-api';
 
 @customElement('umb-workspace-view-relation-type-info')
 export class UmbWorkspaceViewRelationTypeInfoElement extends UmbLitElement {
 	static styles = [UUITextStyles, css``];
 
 	@state()
-	_RelationType?: RelationTypeModel;
+	_RelationType?: RelationTypeResponseModel;
 
 	private _workspaceContext?: UmbRelationTypeWorkspaceContext;
 

@@ -5,12 +5,12 @@ import { UmbRelationTypeStore, UMB_RELATION_TYPE_STORE_CONTEXT_TOKEN } from './r
 import { RelationTypeTreeServerDataSource } from './sources/relation-type.tree.server.data';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 import { UmbContextConsumerController } from '@umbraco-cms/context-api';
-import { ProblemDetailsModel, RelationTypeModel } from '@umbraco-cms/backend-api';
+import { ProblemDetailsModel, RelationTypeResponseModel } from '@umbraco-cms/backend-api';
 import type { UmbTreeRepository } from 'libs/repository/tree-repository.interface';
 import { UmbDetailRepository } from '@umbraco-cms/repository';
 import { UmbNotificationContext, UMB_NOTIFICATION_CONTEXT_TOKEN } from '@umbraco-cms/notification';
 
-type ItemType = RelationTypeModel;
+type ItemType = RelationTypeResponseModel;
 
 // Move to documentation / JSdoc
 /* We need to create a new instance of the repository from within the element context. We want the notifications to be displayed in the right context. */

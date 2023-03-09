@@ -1,15 +1,15 @@
 import { UmbWorkspaceContext } from '../../../shared/components/workspace/workspace-context/workspace-context';
 import { UmbWorkspaceEntityContextInterface } from '../../../shared/components/workspace/workspace-context/workspace-entity-context.interface';
 import { UmbRelationTypeRepository } from '../repository/relation-type.repository';
-import type { RelationTypeModel } from '@umbraco-cms/backend-api';
+import type { RelationTypeResponseModel } from '@umbraco-cms/backend-api';
 import { appendToFrozenArray, ObjectState } from '@umbraco-cms/observable-api';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 
 export class UmbRelationTypeWorkspaceContext
 	extends UmbWorkspaceContext<UmbRelationTypeRepository>
-	implements UmbWorkspaceEntityContextInterface<RelationTypeModel | undefined>
+	implements UmbWorkspaceEntityContextInterface<RelationTypeResponseModel | undefined>
 {
-	#data = new ObjectState<RelationTypeModel | undefined>(undefined);
+	#data = new ObjectState<RelationTypeResponseModel | undefined>(undefined);
 	data = this.#data.asObservable();
 	name = this.#data.getObservablePart((data) => data?.name);
 	key = this.#data.getObservablePart((data) => data?.key);

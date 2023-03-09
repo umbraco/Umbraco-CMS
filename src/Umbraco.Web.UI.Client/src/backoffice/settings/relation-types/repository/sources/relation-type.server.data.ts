@@ -2,7 +2,7 @@ import { RepositoryDetailDataSource } from '@umbraco-cms/repository';
 import {
 	ProblemDetailsModel,
 	RelationTypeResource,
-	RelationTypeModel,
+	RelationTypeResponseModel,
 	RelationTypeCreateModel,
 	RelationTypeUpdateModel,
 } from '@umbraco-cms/backend-api';
@@ -15,7 +15,7 @@ import { tryExecuteAndNotify } from '@umbraco-cms/resources';
  * @class UmbRelationTypeServerDataSource
  * @implements {RepositoryDetailDataSource}
  */
-export class UmbRelationTypeServerDataSource implements RepositoryDetailDataSource<RelationTypeModel> {
+export class UmbRelationTypeServerDataSource implements RepositoryDetailDataSource<RelationTypeResponseModel> {
 	#host: UmbControllerHostInterface;
 
 	/**
@@ -54,7 +54,7 @@ export class UmbRelationTypeServerDataSource implements RepositoryDetailDataSour
 	 * @memberof UmbRelationTypeServerDataSource
 	 */
 	async createScaffold(parentKey: string | null) {
-		const data: RelationTypeModel = {
+		const data: RelationTypeResponseModel = {
 			$type: '',
 			parentKey: parentKey,
 		};
@@ -68,7 +68,7 @@ export class UmbRelationTypeServerDataSource implements RepositoryDetailDataSour
 	 * @return {*}
 	 * @memberof UmbRelationTypeServerDataSource
 	 */
-	async insert(RelationType: RelationTypeModel) {
+	async insert(RelationType: RelationTypeResponseModel) {
 		if (!RelationType.key) {
 			const error: ProblemDetailsModel = { title: 'RelationType key is missing' };
 			return { error };
@@ -76,7 +76,7 @@ export class UmbRelationTypeServerDataSource implements RepositoryDetailDataSour
 		const requestBody: RelationTypeCreateModel = { ...RelationType };
 
 		// TODO: use resources when end point is ready:
-		return tryExecuteAndNotify<RelationTypeModel>(
+		return tryExecuteAndNotify<RelationTypeResponseModel>(
 			this.#host,
 			// TODO: avoid this any?..
 			tryExecuteAndNotify(
@@ -90,12 +90,12 @@ export class UmbRelationTypeServerDataSource implements RepositoryDetailDataSour
 
 	/**
 	 * Updates a RelationType on the server
-	 * @param {RelationTypeModel} RelationType
+	 * @param {RelationTypeResponseModel} RelationType
 	 * @return {*}
 	 * @memberof UmbRelationTypeServerDataSource
 	 */
 	// TODO: Error mistake in this:
-	async update(RelationType: RelationTypeModel) {
+	async update(RelationType: RelationTypeResponseModel) {
 		if (!RelationType.key) {
 			const error: ProblemDetailsModel = { title: 'RelationType key is missing' };
 			return { error };
@@ -104,7 +104,7 @@ export class UmbRelationTypeServerDataSource implements RepositoryDetailDataSour
 		const requestBody: RelationTypeUpdateModel = { ...RelationType };
 
 		// TODO: use resources when end point is ready:
-		return tryExecuteAndNotify<RelationTypeModel>(
+		return tryExecuteAndNotify<RelationTypeResponseModel>(
 			this.#host,
 			RelationTypeResource.putRelationTypeByKey({
 				key: RelationType.key,
@@ -126,7 +126,7 @@ export class UmbRelationTypeServerDataSource implements RepositoryDetailDataSour
 		}
 
 		// TODO: use resources when end point is ready:
-		return tryExecuteAndNotify<RelationTypeModel>(
+		return tryExecuteAndNotify<RelationTypeResponseModel>(
 			this.#host,
 			RelationTypeResource.deleteRelationTypeByKey({
 				key,
@@ -147,7 +147,7 @@ export class UmbRelationTypeServerDataSource implements RepositoryDetailDataSour
 		}
 
 		// TODO: use resources when end point is ready:
-		return tryExecuteAndNotify<RelationTypeModel>(
+		return tryExecuteAndNotify<RelationTypeResponseModel>(
 			this.#host,
 			RelationTypeResource.deleteRelationTypeByKey({
 				key,
