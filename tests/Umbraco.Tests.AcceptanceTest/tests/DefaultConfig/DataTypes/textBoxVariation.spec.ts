@@ -98,7 +98,7 @@ test.describe('Vary by culture for TextBox', () => {
         // Assert
         await page.locator('.umb-variant-switcher__toggle').click();
         await page.locator('.umb-variant-switcher__name-wrapper', {hasText: "English (United States)"}).hover();
-        await page.locator('[role="button"]', {hasText: "Open in split view"}).click();
+        await page.locator('[role="menuitem"]', {hasText:'English'}).locator('[role="button"]', {hasText: "Open in split view"}).click();
         await expect(page.locator('[name="textbox"]').first()).toHaveValue(daValue);
         await expect(page.locator('[name="textbox"]').nth(1)).toHaveValue(enValue);
 

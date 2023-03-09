@@ -12,5 +12,5 @@ public class MarketplaceSettings
     /// <summary>
     /// Gets or sets the additional parameters that are sent to the Marketplace.
     /// </summary>
-    public IDictionary<string, string> AdditionalParameters { get; set; } = new Dictionary<string, string>();
+    public Dictionary<string, string> AdditionalParameters { get; set; } = new ();
 }

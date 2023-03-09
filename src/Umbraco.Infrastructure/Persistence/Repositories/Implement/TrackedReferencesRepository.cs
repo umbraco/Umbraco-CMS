@@ -26,11 +26,14 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             bool filterMustBeIsDependency, out long totalRecords)
         {
             Sql<ISqlContext> innerUnionSql = GetInnerUnionSql();
-            var sql = _scopeAccessor.AmbientScope?.Database.SqlContext.Sql().SelectDistinct(
+
+            var sql = _scopeAccessor.AmbientScope?.Database.SqlContext.Sql()
+                .SelectDistinct(
                     "[x].[id] as nodeId",
                     "[n].[uniqueId] as nodeKey",
                     "[n].[text] as nodeName",
                     "[n].[nodeObjectType] as nodeObjectType",
+                    "[d].[published] as nodePublished",
                     "[ct].[icon] as contentTypeIcon",
                     "[ct].[alias] as contentTypeAlias",
                     "[ctn].[text] as contentTypeName",
@@ -41,14 +44,27 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                 .From<NodeDto>("n")
                 .InnerJoinNested(innerUnionSql, "x")
                 .On<NodeDto, UnionHelperDto>((n, x) => n.NodeId == x.Id, "n", "x")
-                .LeftJoin<ContentDto>("c").On<NodeDto, ContentDto>((left, right) => left.NodeId == right.NodeId,
+                .LeftJoin<ContentDto>("c")
+                .On<NodeDto, ContentDto>(
+                    (left, right) => left.NodeId == right.NodeId,
                     aliasLeft: "n",
                     aliasRight: "c")
                 .LeftJoin<ContentTypeDto>("ct")
-                .On<ContentDto, ContentTypeDto>((left, right) => left.ContentTypeId == right.NodeId, aliasLeft: "c",
+                .On<ContentDto, ContentTypeDto>(
+                    (left, right) => left.ContentTypeId == right.NodeId,
+                    aliasLeft: "c",
                     aliasRight: "ct")
-                .LeftJoin<NodeDto>("ctn").On<ContentTypeDto, NodeDto>((left, right) => left.NodeId == right.NodeId,
-                    aliasLeft: "ct", aliasRight: "ctn");
+                .LeftJoin<NodeDto>("ctn")
+                .On<ContentTypeDto, NodeDto>(
+                    (left, right) => left.NodeId == right.NodeId,
+                    aliasLeft: "ct",
+                    aliasRight: "ctn")
+                .LeftJoin<DocumentDto>("d")
+                .On<NodeDto, DocumentDto>(
+                    (left, right) => left.NodeId == right.NodeId,
+                    aliasLeft: "n",
+                    aliasRight: "d");
+
             if (ids.Any())
             {
                 sql = sql?.Where<NodeDto>(x => ids.Contains(x.NodeId), "n");
@@ -78,25 +94,25 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             var innerUnionSqlChild = _scopeAccessor.AmbientScope.Database.SqlContext.Sql().Select(
                     "[cr].childId as id", "[cr].parentId as otherId", "[rt].[alias]", "[rt].[name]",
                     "[rt].[isDependency]", "[rt].[dual]")
-                .From<RelationDto>("cr").InnerJoin<RelationTypeDto>("rt")
+                .From<RelationDto>("cr")
+                .InnerJoin<RelationTypeDto>("rt")
                 .On<RelationDto, RelationTypeDto>((cr, rt) => rt.Dual == false && rt.Id == cr.RelationType, "cr", "rt");
 
             var innerUnionSqlDualParent = _scopeAccessor.AmbientScope.Database.SqlContext.Sql().Select(
                     "[dpr].parentId as id", "[dpr].childId as otherId", "[dprt].[alias]", "[dprt].[name]",
                     "[dprt].[isDependency]", "[dprt].[dual]")
-                .From<RelationDto>("dpr").InnerJoin<RelationTypeDto>("dprt")
-                .On<RelationDto, RelationTypeDto>((dpr, dprt) => dprt.Dual == true && dprt.Id == dpr.RelationType,
-                    "dpr",
-                    "dprt");
+                .From<RelationDto>("dpr")
+                .InnerJoin<RelationTypeDto>("dprt")
+                .On<RelationDto, RelationTypeDto>(
+                    (dpr, dprt) => dprt.Dual == true && dprt.Id == dpr.RelationType, "dpr", "dprt");
 
             var innerUnionSql3 = _scopeAccessor.AmbientScope.Database.SqlContext.Sql().Select(
                     "[dcr].childId as id", "[dcr].parentId as otherId", "[dcrt].[alias]", "[dcrt].[name]",
                     "[dcrt].[isDependency]", "[dcrt].[dual]")
-                .From<RelationDto>("dcr").InnerJoin<RelationTypeDto>("dcrt")
-                .On<RelationDto, RelationTypeDto>((dcr, dcrt) => dcrt.Dual == true && dcrt.Id == dcr.RelationType,
-                    "dcr",
-                    "dcrt");
-
+                .From<RelationDto>("dcr")
+                .InnerJoin<RelationTypeDto>("dcrt")
+                .On<RelationDto, RelationTypeDto>(
+                    (dcr, dcrt) => dcrt.Dual == true && dcrt.Id == dcr.RelationType, "dcr", "dcrt");
 
             var innerUnionSql = innerUnionSqlChild.Union(innerUnionSqlDualParent).Union(innerUnionSql3);
 
@@ -124,11 +140,13 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                 .WhereLike<NodeDto>(x => x.Path, subsubQuery);
 
             Sql<ISqlContext> innerUnionSql = GetInnerUnionSql();
+
             var sql = _scopeAccessor.AmbientScope?.Database.SqlContext.Sql().SelectDistinct(
                     "[x].[id] as nodeId",
                     "[n].[uniqueId] as nodeKey",
                     "[n].[text] as nodeName",
                     "[n].[nodeObjectType] as nodeObjectType",
+                    "[d].[published] as nodePublished",
                     "[ct].[icon] as contentTypeIcon",
                     "[ct].[alias] as contentTypeAlias",
                     "[ctn].[text] as contentTypeName",
@@ -139,16 +157,28 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                 .From<NodeDto>("n")
                 .InnerJoinNested(innerUnionSql, "x")
                 .On<NodeDto, UnionHelperDto>((n, x) => n.NodeId == x.Id, "n", "x")
-                .LeftJoin<ContentDto>("c").On<NodeDto, ContentDto>((left, right) => left.NodeId == right.NodeId,
+                .LeftJoin<ContentDto>("c")
+                .On<NodeDto, ContentDto>(
+                    (left, right) => left.NodeId == right.NodeId,
                     aliasLeft: "n",
                     aliasRight: "c")
                 .LeftJoin<ContentTypeDto>("ct")
-                .On<ContentDto, ContentTypeDto>((left, right) => left.ContentTypeId == right.NodeId, aliasLeft: "c",
+                .On<ContentDto, ContentTypeDto>(
+                    (left, right) => left.ContentTypeId == right.NodeId,
+                    aliasLeft: "c",
                     aliasRight: "ct")
-                .LeftJoin<NodeDto>("ctn").On<ContentTypeDto, NodeDto>((left, right) => left.NodeId == right.NodeId,
-                    aliasLeft: "ct", aliasRight: "ctn");
-            sql = sql?.WhereIn((System.Linq.Expressions.Expression<Func<NodeDto, object?>>)(x => x.NodeId), subQuery,
-                "n");
+                .LeftJoin<NodeDto>("ctn")
+                .On<ContentTypeDto, NodeDto>(
+                    (left, right) => left.NodeId == right.NodeId,
+                    aliasLeft: "ct",
+                    aliasRight: "ctn")
+                .LeftJoin<DocumentDto>("d")
+                .On<NodeDto, DocumentDto>(
+                    (left, right) => left.NodeId == right.NodeId,
+                    aliasLeft: "n",
+                    aliasRight: "d");
+
+            sql = sql?.WhereIn((System.Linq.Expressions.Expression<Func<NodeDto, object?>>)(x => x.NodeId), subQuery, "n");
 
             if (filterMustBeIsDependency)
             {
@@ -178,6 +208,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                     "[n].[uniqueId] as nodeKey",
                     "[n].[text] as nodeName",
                     "[n].[nodeObjectType] as nodeObjectType",
+                    "[d].[published] as nodePublished",
                     "[ct].[icon] as contentTypeIcon",
                     "[ct].[alias] as contentTypeAlias",
                     "[ctn].[text] as contentTypeName",
@@ -188,14 +219,26 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                 .From<NodeDto>("n")
                 .InnerJoinNested(innerUnionSql, "x")
                 .On<NodeDto, UnionHelperDto>((n, x) => n.NodeId == x.OtherId, "n", "x")
-                .LeftJoin<ContentDto>("c").On<NodeDto, ContentDto>((left, right) => left.NodeId == right.NodeId,
+                .LeftJoin<ContentDto>("c")
+                .On<NodeDto, ContentDto>(
+                    (left, right) => left.NodeId == right.NodeId,
                     aliasLeft: "n",
                     aliasRight: "c")
                 .LeftJoin<ContentTypeDto>("ct")
-                .On<ContentDto, ContentTypeDto>((left, right) => left.ContentTypeId == right.NodeId, aliasLeft: "c",
+                .On<ContentDto, ContentTypeDto>(
+                    (left, right) => left.ContentTypeId == right.NodeId,
+                    aliasLeft: "c",
                     aliasRight: "ct")
-                .LeftJoin<NodeDto>("ctn").On<ContentTypeDto, NodeDto>((left, right) => left.NodeId == right.NodeId,
-                    aliasLeft: "ct", aliasRight: "ctn")
+                .LeftJoin<NodeDto>("ctn")
+                .On<ContentTypeDto, NodeDto>(
+                    (left, right) => left.NodeId == right.NodeId,
+                    aliasLeft: "ct",
+                    aliasRight: "ctn")
+                .LeftJoin<DocumentDto>("d")
+                .On<NodeDto, DocumentDto>(
+                    (left, right) => left.NodeId == right.NodeId,
+                    aliasLeft: "n",
+                    aliasRight: "d")
                 .Where<UnionHelperDto>(x => x.Id == id, "x");
 
             if (filterMustBeIsDependency)
@@ -400,6 +443,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                 NodeKey = dto.ChildNodeKey,
                 NodeType = ObjectTypes.GetUdiType(dto.ChildNodeObjectType),
                 NodeName = dto.ChildNodeName,
+                NodePublished = dto.ChildNodePublished,
                 RelationTypeName = dto.RelationTypeName,
                 RelationTypeIsBidirectional = dto.RelationTypeIsBidirectional,
                 RelationTypeIsDependency = dto.RelationTypeIsDependency,

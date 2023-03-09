@@ -46,6 +46,7 @@ public sealed class ImageSharpImageUrlGenerator : IImageUrlGenerator
         }
 
         var queryString = new Dictionary<string, string?>();
+        Dictionary<string, StringValues> furtherOptions = QueryHelpers.ParseQuery(options.FurtherOptions);
 
         if (options.Crop is not null)
         {
@@ -80,12 +81,17 @@ public sealed class ImageSharpImageUrlGenerator : IImageUrlGenerator
             queryString.Add(ResizeWebProcessor.Height, options.Height?.ToString(CultureInfo.InvariantCulture));
         }
 
+        if (furtherOptions.Remove(FormatWebProcessor.Format, out StringValues format))
+        {
+            queryString.Add(FormatWebProcessor.Format, format[0]);
+        }
+
         if (options.Quality is not null)
         {
             queryString.Add(QualityWebProcessor.Quality, options.Quality?.ToString(CultureInfo.InvariantCulture));
         }
 
-        foreach (KeyValuePair<string, StringValues> kvp in QueryHelpers.ParseQuery(options.FurtherOptions))
+        foreach (KeyValuePair<string, StringValues> kvp in furtherOptions)
         {
             queryString.Add(kvp.Key, kvp.Value);
         }
