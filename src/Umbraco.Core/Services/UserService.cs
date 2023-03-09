@@ -738,6 +738,8 @@ internal class UserService : RepositoryService, IUserService
         };
         await _inviteSender.InviteUser(invitation);
 
+        scope.Complete();
+
         return Attempt.SucceedWithStatus(UserOperationStatus.Success, new UserInvitationResult());
     }
 

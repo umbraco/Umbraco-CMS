@@ -1,6 +1,6 @@
 ﻿namespace Umbraco.Cms.Core.Models.Membership;
 
-public class UserCreationResult
+public class UserCreationResult : IErrorMessageResult
 {
     public IUser? CreatedUser { get; init; }
 

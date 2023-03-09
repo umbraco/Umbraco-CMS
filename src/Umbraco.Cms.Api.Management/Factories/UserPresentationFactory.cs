@@ -70,6 +70,22 @@ public class UserPresentationFactory : IUserPresentationFactory
         return createModel;
     }
 
+    public async Task<UserInviteModel> CreateInviteModelAsync(InviteUserRequestModel requestModel)
+    {
+        IEnumerable<IUserGroup> groups = await _userGroupService.GetAsync(requestModel.UserGroups);
+
+        var inviteModel = new UserInviteModel
+        {
+            Email = requestModel.Email,
+            Name = requestModel.Name,
+            UserName = requestModel.UserName,
+            UserGroups = new SortedSet<IUserGroup>(groups),
+            Message = requestModel.Message,
+        };
+
+        return inviteModel;
+    }
+
     public async Task<UserUpdateModel> CreateUpdateModelAsync(IUser existingUser, UpdateUserRequestModel updateModel)
     {
         var model = new UserUpdateModel

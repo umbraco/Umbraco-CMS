@@ -10,6 +10,8 @@ public interface IUserPresentationFactory
 
     Task<UserCreateModel> CreateCreationModelAsync(CreateUserRequestModel requestModel);
 
+    Task<UserInviteModel> CreateInviteModelAsync(InviteUserRequestModel requestModel);
+
     Task<UserUpdateModel> CreateUpdateModelAsync(IUser existingUser, UpdateUserRequestModel updateModel);
 
     CreateUserResponseModel CreateCreationResponseModel(UserCreationResult creationResult);

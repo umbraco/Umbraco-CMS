@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Umbraco.Cms.Api.Common.Builders;
 using Umbraco.Cms.Api.Management.Factories;
 using Umbraco.Cms.Api.Management.ViewModels.Users;
 using Umbraco.Cms.Core;
@@ -41,10 +40,7 @@ public class CreateUsersController : UsersControllerBase
 
         if (result.Status is UserOperationStatus.UnknownFailure)
         {
-            return BadRequest(new ProblemDetailsBuilder()
-                .WithTitle("An error occured.")
-                .WithDetail(result.Result.ErrorMessage ?? "The error was unknown")
-                .Build());
+            return FormatErrorMessageResult(result.Result);
         }
 
         return UserOperationStatusResult(result.Status);

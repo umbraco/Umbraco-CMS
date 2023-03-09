@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Common.Builders;
 using Umbraco.Cms.Api.Management.Routing;
+using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Users;
@@ -24,6 +25,12 @@ public class UsersControllerBase : ManagementApiControllerBase
                 .WithTitle("Missing user group")
                 .WithDetail("The specified user group was not found.")
                 .Build()),
-            _ =>StatusCode(StatusCodes.Status500InternalServerError, "Unknown user group operation status."),
+            _ => StatusCode(StatusCodes.Status500InternalServerError, "Unknown user group operation status."),
         };
+
+    protected IActionResult FormatErrorMessageResult(IErrorMessageResult errorMessageResult) =>
+        BadRequest(new ProblemDetailsBuilder()
+            .WithTitle("An error occured.")
+            .WithDetail(errorMessageResult.ErrorMessage ?? "The error was unknown")
+            .Build());
 }
