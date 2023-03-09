@@ -1,12 +1,10 @@
 import type {
 	ManifestCollectionView,
-	ManifestCustom,
 	ManifestDashboard,
 	ManifestDashboardCollection,
 	ManifestEntityAction,
 	ManifestEntityBulkAction,
 	ManifestEntrypoint,
-	ManifestExternalLoginProvider,
 	ManifestHeaderApp,
 	ManifestHealthCheck,
 	ManifestMenu,
@@ -29,13 +27,11 @@ import type {
 
 export type ManifestJSONTypes =
 	| ManifestCollectionView
-	| ManifestCustom
 	| ManifestDashboard
 	| ManifestDashboardCollection
 	| ManifestEntityAction
 	| ManifestEntityBulkAction
 	| ManifestEntrypoint
-	| ManifestExternalLoginProvider
 	| ManifestHeaderApp
 	| ManifestHealthCheck
 	| ManifestPackageView
@@ -55,11 +51,24 @@ export type ManifestJSONTypes =
 	| ManifestWorkspaceView
 	| ManifestWorkspaceViewCollection;
 
+type LoadableManifestJSONTypes = ManifestJSONTypes & {
+	/**
+	 * @title The file location of the javascript file to load
+	 */
+	js: string;
+
+	/**
+	 * @title The name of the exported custom element to use
+	 * @description This is optional but useful if your module exports more than one custom element
+	 * @example my-dashboard
+	 */
+	elementName?: string;
+};
+
 /**
  * Umbraco package manifest JSON
  */
 export class UmbracoPackage {
-
 	/**
 	 * @title The name of the Umbraco package
 	 */
@@ -71,7 +80,13 @@ export class UmbracoPackage {
 	version?: string;
 
 	/**
+	 * @title Decides if the package sends telemetry data for collection
+	 * @default true
+	 */
+	allowTelemetry?: boolean;
+
+	/**
 	 * @title An array of Umbraco package manifest types that will be installed
 	 */
-	extensions?: ManifestJSONTypes[];
+	extensions?: LoadableManifestJSONTypes[];
 }
