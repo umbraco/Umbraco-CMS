@@ -255,7 +255,7 @@ public class BackOfficeUserManager : UmbracoUserManager<BackOfficeIdentityUser, 
         return notification;
     }
 
-    public async Task<IdentityCreationResult> CreateAsync(UserCreateModel createModel)
+    public async Task<IdentityCreationResult> CreateForInvite(UserCreateModel createModel)
     {
         var identityUser = BackOfficeIdentityUser.CreateNew(
             _globalSettings,
@@ -267,10 +267,22 @@ public class BackOfficeUserManager : UmbracoUserManager<BackOfficeIdentityUser, 
 
         IdentityResult created = await CreateAsync(identityUser);
 
-        if (created.Succeeded is false)
-        {
-            return IdentityCreationResult.Fail(created.Errors.ToErrorMessage());
-        }
+        return created.Succeeded
+            ? new IdentityCreationResult { Succeded = true }
+            : IdentityCreationResult.Fail(created.Errors.ToErrorMessage());
+    }
+
+    public async Task<IdentityCreationResult> CreateAsync(UserCreateModel createModel)
+    {
+        var identityUser = BackOfficeIdentityUser.CreateNew(
+            _globalSettings,
+            createModel.UserName,
+            createModel.Email,
+            _globalSettings.DefaultUILanguage);
+
+        identityUser.Name = createModel.Name;
+
+        IdentityResult created = await CreateAsync(identityUser);
 
         var password = GeneratePassword();
 

@@ -35,6 +35,10 @@ public class EmailUserInviteSender : IUserInviteSender
             _localizedTextService,
             _globalSettings);
 
+        string senderEmail = string.IsNullOrEmpty(_globalSettings.Smtp?.From)
+            ? invite.Sender.Email
+            : _globalSettings.Smtp.From;
+
         string emailSubject = _localizedTextService.Localize(
             "user",
             "inviteEmailCopySubject",
@@ -43,10 +47,10 @@ public class EmailUserInviteSender : IUserInviteSender
         string?[] bodyTokes =
         {
             invite.Recipient.Name,
-            invite.Sender,
+            invite.Sender.Name ?? invite.Sender.Email,
             invite.Message,
             invite.InviteUri.ToString(),
-            invite.SenderEmail,
+            senderEmail,
         };
 
         string emailBody = _localizedTextService.Localize(
@@ -60,7 +64,7 @@ public class EmailUserInviteSender : IUserInviteSender
         // i.e. "Some Person" <hello@example.com>
         var address = new MailboxAddress(invite.Recipient.Name, invite.Recipient.Email);
 
-        var message = new EmailMessage(invite.SenderEmail, address.ToString(), emailSubject, emailBody, true);
+        var message = new EmailMessage(senderEmail, address.ToString(), emailSubject, emailBody, true);
 
         await _emailSender.SendAsync(message, Constants.Web.EmailTypes.UserInvite, true);
     }

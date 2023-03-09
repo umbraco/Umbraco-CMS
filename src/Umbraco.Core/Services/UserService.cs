@@ -1,5 +1,6 @@
 using System.Globalization;
 using System.Linq.Expressions;
+using System.Net;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -36,6 +37,7 @@ internal class UserService : RepositoryService, IUserService
     private readonly IServiceScopeFactory _serviceScopeFactory;
     private readonly IEntityService _entityService;
     private readonly ILocalLoginSettingProvider _localLoginSettingProvider;
+    private readonly IUserInviteSender _inviteSender;
     private readonly IUserRepository _userRepository;
 
     public UserService(
@@ -49,7 +51,8 @@ internal class UserService : RepositoryService, IUserService
         UserEditorAuthorizationHelper userEditorAuthorizationHelper,
         IServiceScopeFactory serviceScopeFactory,
         IEntityService entityService,
-        ILocalLoginSettingProvider localLoginSettingProvider)
+        ILocalLoginSettingProvider localLoginSettingProvider,
+        IUserInviteSender inviteSender)
         : base(provider, loggerFactory, eventMessagesFactory)
     {
         _userRepository = userRepository;
@@ -58,6 +61,7 @@ internal class UserService : RepositoryService, IUserService
         _serviceScopeFactory = serviceScopeFactory;
         _entityService = entityService;
         _localLoginSettingProvider = localLoginSettingProvider;
+        _inviteSender = inviteSender;
         _globalSettings = globalSettings.Value;
         _securitySettings = securitySettings.Value;
         _logger = loggerFactory.CreateLogger<UserService>();
@@ -650,6 +654,91 @@ internal class UserService : RepositoryService, IUserService
         };
 
         return Attempt.SucceedWithStatus(UserOperationStatus.Success, creationResult);
+    }
+
+    public async Task<Attempt<UserInvitationResult, UserOperationStatus>> InviteAsync(int performingUserId, UserInviteModel model)
+    {
+        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+        using IServiceScope serviceScope = _serviceScopeFactory.CreateScope();
+
+        IUser? performingUser = GetById(performingUserId);
+
+        if (performingUser is null)
+        {
+            return Attempt.FailWithStatus(UserOperationStatus.MissingUser, new UserInvitationResult());
+        }
+
+        UserOperationStatus validationResult = ValidateUserCreateModel(model);
+
+        if (validationResult is not UserOperationStatus.Success)
+        {
+            return Attempt.FailWithStatus(validationResult, new UserInvitationResult());
+        }
+
+        Attempt<string?> authorizationAttempt = _userEditorAuthorizationHelper.IsAuthorized(
+            performingUser,
+            null,
+            null,
+            null,
+            model.UserGroups.Select(x => x.Alias));
+
+        if (authorizationAttempt.Success is false)
+        {
+            return Attempt.FailWithStatus(UserOperationStatus.Unauthorized, new UserInvitationResult());
+        }
+
+        if (_inviteSender.CanSendInvites() is false)
+        {
+            return Attempt.FailWithStatus(UserOperationStatus.CannotInvite, new UserInvitationResult());
+        }
+
+        ICoreBackofficeUserManager userManager = serviceScope.ServiceProvider.GetRequiredService<ICoreBackofficeUserManager>();
+        IBackofficeUserStore userStore = serviceScope.ServiceProvider.GetRequiredService<IBackofficeUserStore>();
+
+        IdentityCreationResult creationResult = await userManager.CreateForInvite(model);
+        if (creationResult.Succeded is false)
+        {
+            // If we fail from something in Identity we can't know exactly why, so we have to resolve to returning an unknown failure.
+            // But there should be more information in the message.
+            return Attempt.FailWithStatus(
+                UserOperationStatus.UnknownFailure,
+                new UserInvitationResult { ErrorMessage = creationResult.ErrorMessage });
+        }
+
+        IUser? invitedUser = await userStore.GetByEmailAsync(model.Email);
+
+        if (invitedUser is null)
+        {
+            // This really shouldn't happen, we literally just created the user
+            throw new PanicException("Was unable to get user after creating it");
+        }
+
+        invitedUser.InvitedDate = DateTime.Now;
+        invitedUser.ClearGroups();
+        foreach(IUserGroup userGroup in model.UserGroups)
+        {
+            invitedUser.AddGroup(userGroup.ToReadOnlyGroup());
+        }
+
+        await userStore.SaveAsync(invitedUser);
+
+        IInviteUriProvider inviteUriProvider = serviceScope.ServiceProvider.GetRequiredService<IInviteUriProvider>();
+        Attempt<Uri, UserOperationStatus> inviteUriAttempt = await inviteUriProvider.CreateInviteUriAsync(invitedUser);
+        if (inviteUriAttempt.Success is false)
+        {
+            return Attempt.FailWithStatus(inviteUriAttempt.Status, new UserInvitationResult());
+        }
+
+        var invitation = new UserInvitationMessage
+        {
+            InviteUri = inviteUriAttempt.Result,
+            Message = model.Message ?? string.Empty,
+            Recipient = invitedUser,
+            Sender = performingUser,
+        };
+        await _inviteSender.InviteUser(invitation);
+
+        return Attempt.SucceedWithStatus(UserOperationStatus.Success, new UserInvitationResult());
     }
 
     private UserOperationStatus ValidateUserCreateModel(UserCreateModel model)
