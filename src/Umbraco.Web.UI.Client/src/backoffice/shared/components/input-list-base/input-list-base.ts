@@ -1,8 +1,13 @@
 import { html } from 'lit';
 import { property } from 'lit/decorators.js';
 import { UUIModalSidebarSize } from '@umbraco-ui/uui-modal-sidebar';
-import { UmbPickerModalData } from '../../../../../libs/modal/layouts/modal-layout-picker-base';
-import { UmbModalContext, UmbModalToken, UmbModalType, UMB_MODAL_CONTEXT_TOKEN } from '../../../../../libs/modal';
+import {
+	UmbModalContext,
+	UmbModalToken,
+	UmbModalType,
+	UMB_MODAL_CONTEXT_TOKEN,
+	UmbPickerModalData,
+} from '@umbraco-cms/modal';
 import { UmbLitElement } from '@umbraco-cms/element';
 
 /** TODO: Make use of UUI FORM Mixin, to make it easily take part of a form. */

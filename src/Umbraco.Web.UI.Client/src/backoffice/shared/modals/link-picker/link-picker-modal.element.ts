@@ -2,7 +2,7 @@ import { css, html, nothing } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, query, state } from 'lit/decorators.js';
 import { UUIBooleanInputEvent, UUIInputElement } from '@umbraco-ui/uui';
-import { UmbModalLayoutElement } from '../../../../../libs/modal/layouts/modal-layout.element';
+import { UmbModalLayoutElement } from '@umbraco-cms/modal';
 import { UmbTreeElement } from '../../components/tree/tree.element';
 import { UmbLinkPickerConfig, UmbLinkPickerLink, UmbLinkPickerModalData } from '.';
 import { buildUdi, getKeyFromUdi } from '@umbraco-cms/utils';

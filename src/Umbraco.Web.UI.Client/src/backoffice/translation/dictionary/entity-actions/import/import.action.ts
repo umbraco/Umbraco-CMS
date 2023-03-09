@@ -4,7 +4,7 @@ import type { UmbImportDictionaryModalResultData } from './import-dictionary-mod
 import { UmbEntityActionBase } from '@umbraco-cms/entity-action';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 import { UmbContextConsumerController } from '@umbraco-cms/context-api';
-import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN } from 'libs/modal';
+import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN } from '@umbraco-cms/modal';
 
 import './import-dictionary-modal-layout.element';
 

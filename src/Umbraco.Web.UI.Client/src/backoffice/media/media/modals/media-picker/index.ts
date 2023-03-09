@@ -1,4 +1,4 @@
-import { UmbModalToken } from 'libs/modal';
+import { UmbModalToken } from '@umbraco-cms/modal';
 
 export interface UmbMediaPickerModalData {
 	multiple?: boolean;

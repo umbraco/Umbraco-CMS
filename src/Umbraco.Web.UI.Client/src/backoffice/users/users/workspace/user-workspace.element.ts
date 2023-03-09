@@ -6,10 +6,10 @@ import { ifDefined } from 'lit/directives/if-defined.js';
 import { repeat } from 'lit/directives/repeat.js';
 
 import { UmbCurrentUserStore, UMB_CURRENT_USER_STORE_CONTEXT_TOKEN } from '../../current-user/current-user.store';
-import type { UmbModalContext } from '../../../../../libs/modal';
 import type { UmbWorkspaceEntityElement } from '../../../shared/components/workspace/workspace-entity-element.interface';
 import { UMB_CHANGE_PASSWORD_MODAL_TOKEN } from '../../current-user/modals/change-password';
 import { UmbWorkspaceUserContext } from './user-workspace.context';
+import type { UmbModalContext } from '@umbraco-cms/modal';
 import { getLookAndColorFromUserStatus } from '@umbraco-cms/utils';
 import type { UserDetails } from '@umbraco-cms/models';
 

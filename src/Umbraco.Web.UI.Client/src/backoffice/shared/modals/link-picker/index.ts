@@ -1,5 +1,5 @@
 import { UUIModalSidebarSize } from '@umbraco-ui/uui-modal-sidebar';
-import { UmbModalToken } from 'libs/modal';
+import { UmbModalToken } from '@umbraco-cms/modal';
 
 export interface UmbLinkPickerModalData {
 	link: UmbLinkPickerLink;

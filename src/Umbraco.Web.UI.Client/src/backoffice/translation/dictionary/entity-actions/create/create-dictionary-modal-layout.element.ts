@@ -3,7 +3,7 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, query } from 'lit/decorators.js';
 import { Observable } from 'rxjs';
 import { when } from 'lit-html/directives/when.js';
-import { UmbModalLayoutElement } from 'libs/modal';
+import { UmbModalLayoutElement } from '@umbraco-cms/modal';
 
 export interface UmbCreateDictionaryModalData {
 	unique: string | null;

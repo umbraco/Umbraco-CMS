@@ -1,8 +1,8 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, CSSResultGroup, html, nothing } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
-import { UmbModalHandler } from '../../../../../../libs/modal';
 import { UmbChangePasswordModalData } from '.';
+import { UmbModalHandler } from '@umbraco-cms/modal';
 import { UmbLitElement } from '@umbraco-cms/element';
 
 @customElement('umb-change-password-modal')

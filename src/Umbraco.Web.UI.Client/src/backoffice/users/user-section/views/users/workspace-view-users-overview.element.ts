@@ -6,7 +6,7 @@ import { UUIPopoverElement } from '@umbraco-ui/uui';
 
 import type { UmbSectionViewUsersElement } from './section-view-users.element';
 import { UmbLitElement } from '@umbraco-cms/element';
-import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN } from 'libs/modal';
+import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN } from '@umbraco-cms/modal';
 
 import './list-view-layouts/table/workspace-view-users-table.element';
 import './list-view-layouts/grid/workspace-view-users-grid.element';

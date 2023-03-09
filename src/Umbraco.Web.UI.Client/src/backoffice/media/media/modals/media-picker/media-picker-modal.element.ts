@@ -1,10 +1,9 @@
 import { css, html } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, state } from 'lit/decorators.js';
-import { UmbModalLayoutElement } from '../../../../../../libs/modal/layouts/modal-layout.element';
-
 import { UmbTreeElement } from '../../../../shared/components/tree/tree.element';
 import { UmbMediaPickerModalData } from '.';
+import { UmbModalLayoutElement } from '@umbraco-cms/modal';
 
 @customElement('umb-media-picker-modal')
 export class UmbMediaPickerModalElement extends UmbModalLayoutElement<UmbMediaPickerModalData> {

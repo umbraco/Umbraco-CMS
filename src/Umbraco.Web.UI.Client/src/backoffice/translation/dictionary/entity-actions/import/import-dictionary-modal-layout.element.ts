@@ -6,7 +6,7 @@ import { repeat } from 'lit/directives/repeat.js';
 import { UmbTreeElement } from '../../../../shared/components/tree/tree.element';
 import { UmbDictionaryRepository } from '../../repository/dictionary.repository';
 import { DictionaryUploadModel } from '@umbraco-cms/backend-api';
-import { UmbModalLayoutElement } from 'libs/modal';
+import { UmbModalLayoutElement } from '@umbraco-cms/modal';
 
 export interface UmbImportDictionaryModalData {
 	unique: string | null;

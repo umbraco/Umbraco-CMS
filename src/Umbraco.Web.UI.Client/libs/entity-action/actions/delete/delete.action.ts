@@ -2,7 +2,7 @@ import { UMB_CONFIRM_MODAL_TOKEN } from '../../../../src/backoffice/shared/modal
 import { UmbEntityActionBase } from '@umbraco-cms/entity-action';
 import { UmbContextConsumerController } from '@umbraco-cms/context-api';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
-import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN } from 'libs/modal';
+import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN } from '@umbraco-cms/modal';
 
 export class UmbDeleteEntityAction<
 	T extends { delete(unique: string): Promise<void>; requestItems(uniques: Array<string>): any }

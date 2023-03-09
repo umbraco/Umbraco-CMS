@@ -1,4 +1,4 @@
-import { UmbModalToken } from 'libs/modal';
+import { UmbModalToken } from '@umbraco-cms/modal';
 
 // TODO: add interface for data
 // PropertyTypeViewModelBaseModel

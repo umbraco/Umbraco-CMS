@@ -1,8 +1,8 @@
 import { css, html } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, state } from 'lit/decorators.js';
-import { UmbModalLayoutElement } from '../../../../../../libs/modal/layouts/modal-layout.element';
 import { UmbDocumentPickerModalData } from '.';
+import { UmbModalLayoutElement } from '@umbraco-cms/modal';
 import type { UmbTreeElement } from 'src/backoffice/shared/components/tree/tree.element';
 
 // TODO: make use of UmbPickerLayoutBase

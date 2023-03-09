@@ -1,7 +1,7 @@
 import { html, css, nothing } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement } from 'lit/decorators.js';
-import { UmbModalLayoutElement } from '../../../../../../../libs/modal';
+import { UmbModalLayoutElement } from '@umbraco-cms/modal';
 import type { SearchResultModel } from '@umbraco-cms/backend-api';
 
 @customElement('umb-modal-layout-fields-viewer')

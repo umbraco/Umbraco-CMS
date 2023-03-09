@@ -4,7 +4,7 @@ import { customElement, property, state } from 'lit/decorators.js';
 import { UMB_CONTEXT_DEBUGGER_MODAL_TOKEN } from './modals/debug';
 import { UmbContextDebugRequest } from '@umbraco-cms/context-api';
 import { UmbLitElement } from '@umbraco-cms/element';
-import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN } from 'libs/modal';
+import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN } from '@umbraco-cms/modal';
 
 @customElement('umb-debug')
 export class UmbDebug extends UmbLitElement {

@@ -4,7 +4,7 @@ import { customElement, state } from 'lit/decorators.js';
 import { UmbCurrentUserStore, UMB_CURRENT_USER_STORE_CONTEXT_TOKEN } from './current-user.store';
 import { UMB_CURRENT_USER_MODAL_TOKEN } from './modals/current-user';
 import type { UserDetails } from '@umbraco-cms/models';
-import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN } from 'libs/modal';
+import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN } from '@umbraco-cms/modal';
 import { UmbLitElement } from '@umbraco-cms/element';
 
 @customElement('umb-current-user-header-app')

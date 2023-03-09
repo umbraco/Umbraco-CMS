@@ -4,7 +4,7 @@ import { css, html } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, property, state } from 'lit/decorators.js';
 import { styleMap } from 'lit/directives/style-map.js';
-import { UmbModalLayoutElement } from '../../../../../libs/modal/layouts/modal-layout.element';
+import { UmbModalLayoutElement } from '@umbraco-cms/modal';
 
 import icons from '../../../../../public-assets/icons/icons.json';
 import { UmbIconPickerModalData } from '.';

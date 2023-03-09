@@ -1,5 +1,5 @@
 import { TemplateResult } from 'lit';
-import { UmbModalToken } from 'libs/modal';
+import { UmbModalToken } from '@umbraco-cms/modal';
 
 export interface UmbContextDebuggerModalData {
 	content: TemplateResult | string;
