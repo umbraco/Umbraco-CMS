@@ -1,7 +1,7 @@
 import { UmbEntityWorkspaceManager } from '../../../shared/components/workspace/workspace-context/entity-manager-controller';
 import { UmbWorkspaceContext } from '../../../shared/components/workspace/workspace-context/workspace-context';
 import { UmbWorkspaceEntityContextInterface } from '../../../shared/components/workspace/workspace-context/workspace-entity-context.interface';
-import { UMB_USER_GROUP_STORE_CONTEXT_TOKEN } from '../user-group.store';
+import { UMB_USER_GROUP_STORE_CONTEXT_TOKEN } from '../repository/user-group.store';
 import { UmbUserGroupRepository } from '../repository/user-group.repository';
 import type { UserGroupDetails } from '@umbraco-cms/models';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';

@@ -1,0 +1,83 @@
+import { Meta } from '@storybook/addon-docs';
+
+<Meta title="Guides/Extending the Backoffice/Menu" parameters={{ previewTabs: { canvas: { hidden: true } } }} />
+
+# Menu
+
+TODO: introduction to the menu
+The menu is still work in progress
+
+<img src="docs/menu.svg" width="150" />
+
+```json
+{
+	"type": "menu",
+	"alias": "My.Menu",
+	"name": "My Menu"
+}
+```
+
+### Menu Item
+
+TODO: introduction to the menu item
+
+<img src="docs/menu-item.svg" width="150" />
+
+```json
+{
+	"type": "menuItem",
+	"alias": "My.MenuItem",
+	"name": "My Menu Item",
+	"meta": {
+		"label": "My Menu Item",
+		"menus": ["My.Menu"]
+	}
+}
+```
+
+#### Tree Menu Item
+
+// TODO adds docs when we have extension kinds
+
+**Manifest**
+
+```json
+// it will be something like this
+{
+	"type": "menuItem",
+	"kind": "tree",
+	"alias": "My.TreeMenuItem",
+	"name": "My Tree Menu Item",
+	"meta": {
+		"label": "My Tree Menu Item",
+		"menus": ["My.Menu"]
+	}
+}
+```
+
+**Default Element**
+
+```ts
+// get interface
+interface UmbTreeMenuItemElement {}
+```
+
+#### Adding menu items to an existing menu
+
+The backoffice comes with a couple of menus.
+
+- Content, Media, Settings, Templating, Dictionary, etc.
+
+To add a menu item to an existing menu, you can use the `meta.menus` property.
+
+```json
+{
+	"type": "menuItem",
+	"alias": "My.MenuItem",
+	"name": "My Menu Item",
+	"meta": {
+		"label": "My Menu Item",
+		"menus": ["Umb.Menu.Content"]
+	}
+}
+```

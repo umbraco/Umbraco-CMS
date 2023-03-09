@@ -1,7 +1,7 @@
 import type { RepositoryTreeDataSource } from '../../../../../libs/repository/repository-tree-data-source.interface';
 import { DocumentTreeServerDataSource } from './sources/document.tree.server.data';
 import { UmbDocumentTreeStore, UMB_DOCUMENT_TREE_STORE_CONTEXT_TOKEN } from './document.tree.store';
-import { UmbDocumentStore, UMB_DOCUMENT_DETAIL_STORE_CONTEXT_TOKEN } from './document.store';
+import { UmbDocumentStore, UMB_DOCUMENT_STORE_CONTEXT_TOKEN } from './document.store';
 import { UmbDocumentServerDataSource } from './sources/document.server.data';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 import { UmbContextConsumerController } from '@umbraco-cms/context-api';
@@ -25,7 +25,7 @@ export class UmbDocumentRepository implements UmbTreeRepository, UmbDetailReposi
 	#treeStore?: UmbDocumentTreeStore;
 
 	#detailDataSource: UmbDocumentServerDataSource;
-	#detailStore?: UmbDocumentStore;
+	#store?: UmbDocumentStore;
 
 	#notificationContext?: UmbNotificationContext;
 
@@ -41,8 +41,8 @@ export class UmbDocumentRepository implements UmbTreeRepository, UmbDetailReposi
 				this.#treeStore = instance;
 			}),
 
-			new UmbContextConsumerController(this.#host, UMB_DOCUMENT_DETAIL_STORE_CONTEXT_TOKEN, (instance) => {
-				this.#detailStore = instance;
+			new UmbContextConsumerController(this.#host, UMB_DOCUMENT_STORE_CONTEXT_TOKEN, (instance) => {
+				this.#store = instance;
 			}),
 
 			new UmbContextConsumerController(this.#host, UMB_NOTIFICATION_CONTEXT_TOKEN, (instance) => {
@@ -135,7 +135,7 @@ export class UmbDocumentRepository implements UmbTreeRepository, UmbDetailReposi
 		const { data, error } = await this.#detailDataSource.get(key);
 
 		if (data) {
-			this.#detailStore?.append(data);
+			this.#store?.append(data);
 		}
 
 		return { data, error };
@@ -159,7 +159,7 @@ export class UmbDocumentRepository implements UmbTreeRepository, UmbDetailReposi
 
 		// TODO: we currently don't use the detail store for anything.
 		// Consider to look up the data before fetching from the server
-		this.#detailStore?.append(item);
+		this.#store?.append(item);
 		// TODO: Update tree store with the new item? or ask tree to request the new item?
 
 		return { error };
@@ -182,7 +182,7 @@ export class UmbDocumentRepository implements UmbTreeRepository, UmbDetailReposi
 		// TODO: we currently don't use the detail store for anything.
 		// Consider to look up the data before fetching from the server
 		// Consider notify a workspace if a document is updated in the store while someone is editing it.
-		this.#detailStore?.append(item);
+		this.#store?.append(item);
 		//this.#treeStore?.updateItem(item.key, { name: item.name });// Port data to tree store.
 		// TODO: would be nice to align the stores on methods/methodNames.
 
@@ -208,7 +208,7 @@ export class UmbDocumentRepository implements UmbTreeRepository, UmbDetailReposi
 		// TODO: we currently don't use the detail store for anything.
 		// Consider to look up the data before fetching from the server.
 		// Consider notify a workspace if a document is deleted from the store while someone is editing it.
-		this.#detailStore?.remove([key]);
+		this.#store?.remove([key]);
 		this.#treeStore?.removeItem(key);
 		// TODO: would be nice to align the stores on methods/methodNames.
 

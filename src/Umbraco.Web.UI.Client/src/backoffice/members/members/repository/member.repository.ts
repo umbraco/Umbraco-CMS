@@ -73,7 +73,7 @@ export class UmbMemberRepository implements UmbTreeRepository {
 
 	async rootTreeItems() {
 		await this.#init;
-		return this.#treeStore!.rootItems();
+		return this.#treeStore!.rootItems;
 	}
 
 	async treeItemsOf(parentKey: string | null) {
