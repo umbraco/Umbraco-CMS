@@ -1,3 +1,4 @@
+// TODO: remove this import when the search hack is removed
 import '../../src/backoffice/search/modals/search/search-modal.element';
 
 import { UUIModalSidebarSize } from '@umbraco-ui/uui-modal-sidebar';
