@@ -1,8 +1,10 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
+import type { DataTypeCopyModel } from '../models/DataTypeCopyModel';
 import type { DataTypeCreateModel } from '../models/DataTypeCreateModel';
 import type { DataTypeModel } from '../models/DataTypeModel';
+import type { DataTypeMoveModel } from '../models/DataTypeMoveModel';
 import type { DataTypeReferenceModel } from '../models/DataTypeReferenceModel';
 import type { DataTypeUpdateModel } from '../models/DataTypeUpdateModel';
 import type { DocumentTypeTreeItemModel } from '../models/DocumentTypeTreeItemModel';
@@ -19,19 +21,20 @@ import { request as __request } from '../core/request';
 export class DataTypeResource {
 
     /**
-     * @returns any Created
+     * @returns string Created
      * @throws ApiError
      */
     public static postDataType({
         requestBody,
     }: {
         requestBody?: DataTypeCreateModel,
-    }): CancelablePromise<any> {
+    }): CancelablePromise<string> {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/umbraco/management/api/v1/data-type',
             body: requestBody,
             mediaType: 'application/json',
+            responseHeader: 'Location',
             errors: {
                 400: `Bad Request`,
                 404: `Not Found`,
@@ -109,6 +112,57 @@ export class DataTypeResource {
     }
 
     /**
+     * @returns string Created
+     * @throws ApiError
+     */
+    public static postDataTypeByKeyCopy({
+        key,
+        requestBody,
+    }: {
+        key: string,
+        requestBody?: DataTypeCopyModel,
+    }): CancelablePromise<string> {
+        return __request(OpenAPI, {
+            method: 'POST',
+            url: '/umbraco/management/api/v1/data-type/{key}/copy',
+            path: {
+                'key': key,
+            },
+            body: requestBody,
+            mediaType: 'application/json',
+            responseHeader: 'Location',
+            errors: {
+                404: `Not Found`,
+            },
+        });
+    }
+
+    /**
+     * @returns any Success
+     * @throws ApiError
+     */
+    public static postDataTypeByKeyMove({
+        key,
+        requestBody,
+    }: {
+        key: string,
+        requestBody?: DataTypeMoveModel,
+    }): CancelablePromise<any> {
+        return __request(OpenAPI, {
+            method: 'POST',
+            url: '/umbraco/management/api/v1/data-type/{key}/move',
+            path: {
+                'key': key,
+            },
+            body: requestBody,
+            mediaType: 'application/json',
+            errors: {
+                404: `Not Found`,
+            },
+        });
+    }
+
+    /**
      * @returns any Success
      * @throws ApiError
      */
@@ -130,19 +184,20 @@ export class DataTypeResource {
     }
 
     /**
-     * @returns any Created
+     * @returns string Created
      * @throws ApiError
      */
     public static postDataTypeFolder({
         requestBody,
     }: {
         requestBody?: FolderCreateModel,
-    }): CancelablePromise<any> {
+    }): CancelablePromise<string> {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/umbraco/management/api/v1/data-type/folder',
             body: requestBody,
             mediaType: 'application/json',
+            responseHeader: 'Location',
         });
     }
 

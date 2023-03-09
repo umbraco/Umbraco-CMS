@@ -1,15 +1,13 @@
-import { UMB_DATA_TYPE_TREE_STORE_CONTEXT_TOKEN } from '../media-type.tree.store';
-import type { ManifestTree, ManifestTreeItemAction } from '@umbraco-cms/models';
+import { UmbMediaTypeRepository } from '../repository/media-type.repository';
+import type { ManifestTree } from '@umbraco-cms/models';
 
 const tree: ManifestTree = {
 	type: 'tree',
 	alias: 'Umb.Tree.MediaTypes',
 	name: 'Media Types Tree',
 	meta: {
-		storeAlias: UMB_DATA_TYPE_TREE_STORE_CONTEXT_TOKEN.toString(),
+		repository: UmbMediaTypeRepository,
 	},
 };
 
-const treeItemActions: Array<ManifestTreeItemAction> = [];
-
-export const manifests = [tree, ...treeItemActions];
+export const manifests = [tree];

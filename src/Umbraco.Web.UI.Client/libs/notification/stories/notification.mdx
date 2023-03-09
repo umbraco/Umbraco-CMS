@@ -1,0 +1,177 @@
+import { Meta } from '@storybook/blocks';
+
+<Meta title="API/Notifications/Intro" />
+
+# Notifications
+
+Notifications appear in the bottom right corner of the Backoffice. There are two types of notifications: "Peek" and "Stay".
+
+**Peek notifications**
+Goes away automatically and should be used as feedback on user actions.
+
+**Stay notifications**
+Stays on the screen until dismissed by the user or custom code. Stay notification should be used when you need user feedback or want to control when the notification disappears.
+
+## Basic usage
+
+### Consume UmbNotificationContext from an element
+
+The UmbNotification context can be used to open notifications.
+
+```ts
+import { html, LitElement } from 'lit';
+import { UmbLitElement } from '@umbraco-cms/element';
+import type { UmbNotificationContext, UMB_NOTIFICATION_CONTEXT_ALIAS } from '@umbraco-cms/notification';
+
+class MyElement extends UmbLitElement {
+	private _notificationContext?: UmbNotificationContext;
+
+	constructor() {
+		super();
+
+		this.consumeContext(UMB_NOTIFICATION_CONTEXT_ALIAS, (instance) => {
+			this._notificationContext = notificationContext;
+			// notificationContext is now ready to be used
+		});
+	}
+}
+```
+
+### Open a notification
+
+A notification is opened by calling one of the helper methods on the UmbNotificationContext. The methods will return an instance of UmbNotificationHandler.
+
+```ts
+import { html, LitElement } from 'lit';
+import { state } from 'lit/decorators.js';
+import { UmbLitElement } from '@umbraco-cms/element';
+import type {
+	UmbNotificationContext,
+	UmbNotificationDefaultData,
+	UMB_NOTIFICATION_CONTEXT_ALIAS,
+} from '@umbraco-cms/notification';
+
+class MyElement extends UmbLitElement {
+	private _notificationContext?: UmbNotificationContext;
+
+	constructor() {
+		super();
+
+		this.consumeContext(UMB_NOTIFICATION_CONTEXT_ALIAS, (notificationContext) => {
+			this._notificationContext = notificationContext;
+			// notificationContext is now ready to be used
+		});
+	}
+
+	private _handleClick() {
+		const data: UmbNotificationDefaultData = { headline: 'Look at this', message: 'Something good happened' };
+		const notificationHandler = this._notificationContext?.peek('positive', { data });
+
+		notificationHandler.onClose().then(() => {
+			// if you need any logic when the notification is closed you can run it here
+		});
+	}
+
+	render() {
+		return html`<button @click="${this._handleClick}">Open Notification</button>`;
+	}
+}
+```
+
+## Advanced usage: creating custom layouts
+
+The default layout will cover most cases, but there might be situations where we want a more complex layout. You can create a new Custom Element to use as the layout.
+
+### Custom layout element
+
+```ts
+import { html, LitElement } from 'lit';
+import { property } from 'lit/decorators.js';
+import { UUITextStyles } from '@umbraco-ui/uui-css';
+import type { UmbNotificationHandler } from '@umbraco-cms/notification';
+
+export interface UmbNotificationCustomData {
+	headline: string;
+	user: {
+		name: string;
+	};
+}
+
+export class UmbNotificationLayoutCustom extends LitElement {
+	static styles = [UUITextStyles];
+
+	@property({ attribute: false })
+	public notificationHandler: UmbNotificationHandler;
+
+	@property({ type: Object })
+	public data: UmbNotificationCustomData;
+
+	private _handleConfirm() {
+		this.notificationHandler.close(true);
+	}
+
+	render() {
+		return html`
+			<uui-toast-notification-layout headline="${this.data.headline}" class="uui-text">
+				${this.data.user.name}
+				<uui-button slot="actions" @click="${this._handleConfirm}" label="Confirm">Confirm</uui-button>
+			</uui-toast-notification-layout>
+		`;
+	}
+}
+```
+
+### Open notification with custom layout
+
+```ts
+import { html, LitElement } from 'lit';
+import { UmbContextInjectMixin } from '@umbraco-cms/context-api';
+import type {
+	UmbNotificationContext,
+	UmbNotificationOptions,
+	UMB_NOTIFICATION_CONTEXT_ALIAS,
+} from '@umbraco-cms/notification';
+import type { UmbNotificationCustomData } from './custom-notification-layout';
+
+class MyElement extends LitElement {
+	private _notificationContext?: UmbNotificationContext;
+
+	constructor() {
+		super();
+
+		this.consumeContext(UMB_NOTIFICATION_CONTEXT_ALIAS, (instance) => {
+			this._notificationContext = instance;
+			// notificationContext is now ready to be used
+		});
+	}
+
+	private _handleClick() {
+		const options: UmbNotificationOptions<UmbNotificationCustomData> = {
+			elementName: 'umb-notification-layout-custom',
+			data: {
+				headline: 'Attention',
+				user: { name: 'Peter Parker' },
+			},
+		};
+
+		const notificationHandler = this._notificationContext?.stay('default', options);
+
+		notificationHandler.onClose().then((result) => {
+			if (result) {
+				console.log('He agreed!');
+			}
+		});
+	}
+
+	render() {
+		return html`<button @click="${this._handleClick}">Open Notification</button>`;
+	}
+}
+```
+
+## Best practices
+
+- Keep messages in notifications short and friendly.
+- Only use headlines when you need extra attention to the notification
+- If a custom notification layout is only used in one module keep the files layout files local to that module.
+- If a custom notification will be used across the project. Create it as a layout in the notification folder and add a helper method to the UmbNotificationContext.

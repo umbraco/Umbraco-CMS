@@ -3,6 +3,7 @@
 /* eslint-disable */
 
 export type RecycleBinItemModel = {
+    $type: string;
     key?: string;
     name?: string;
     type?: string;

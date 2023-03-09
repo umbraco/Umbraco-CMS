@@ -8,7 +8,7 @@ import { repeat } from 'lit/directives/repeat.js';
 import { distinctUntilChanged } from 'rxjs';
 
 import { UmbCurrentUserStore, UMB_CURRENT_USER_STORE_CONTEXT_TOKEN } from '../../current-user/current-user.store';
-import type { UmbModalService } from '../../../../core/modal';
+import type { UmbModalContext } from '../../../../core/modal';
 import type { UmbWorkspaceEntityElement } from '../../../shared/components/workspace/workspace-entity-element.interface';
 import { UmbWorkspaceUserContext } from './user-workspace.context';
 import { getLookAndColorFromUserStatus } from '@umbraco-cms/utils';
@@ -84,10 +84,9 @@ export class UmbUserWorkspaceElement extends UmbLitElement implements UmbWorkspa
 	private _currentUser?: UserDetails;
 
 	private _currentUserStore?: UmbCurrentUserStore;
-	private _modalService?: UmbModalService;
+	private _modalContext?: UmbModalContext;
 
 	private _languages = []; //TODO Add languages
-
 
 	private _workspaceContext: UmbWorkspaceUserContext = new UmbWorkspaceUserContext(this);
 
@@ -105,10 +104,11 @@ export class UmbUserWorkspaceElement extends UmbLitElement implements UmbWorkspa
 			this._observeCurrentUser();
 		});
 
-		this.observe(this._workspaceContext.data.pipe(distinctUntilChanged()), (user) => {
-			this._user = user;
+		this.observe(this._workspaceContext.data, (user) => {
+			// TODO: fix type mismatch:
+			this._user = user as any;
 			if (user && user.name !== this._userName) {
-				this._userName = user.name;
+				this._userName = user.name || '';
 			}
 		});
 	}
@@ -134,17 +134,19 @@ export class UmbUserWorkspaceElement extends UmbLitElement implements UmbWorkspa
 		if (!this._user || !this._workspaceContext) return;
 
 		const isDisabled = this._user.status === 'disabled';
-		// TODO: make sure we use store /workspace right, maybe move function to workspace, or store reference to store?
+		// TODO: make sure we use the workspace for this:
+		/*
 		isDisabled
 			? this._workspaceContext.getStore()?.enableUsers([this._user.key])
 			: this._workspaceContext.getStore()?.disableUsers([this._user.key]);
+			*/
 	}
 
 	private _deleteUser() {
 		if (!this._user || !this._workspaceContext) return;
 
-		// TODO: make sure we use store /workspace right, maybe move function to workspace, or store reference to store?
-		this._workspaceContext.getStore()?.deleteUsers([this._user.key]);
+		// TODO: make sure we use the workspace for this:
+		//this._workspaceContext.getStore()?.deleteUsers([this._user.key]);
 
 		history.pushState(null, '', 'section/users/view/users/overview');
 	}
@@ -189,7 +191,7 @@ export class UmbUserWorkspaceElement extends UmbLitElement implements UmbWorkspa
 	}
 
 	private _changePassword() {
-		this._modalService?.changePassword({ requireOldPassword: this._currentUserStore?.isAdmin === false });
+		this._modalContext?.changePassword({ requireOldPassword: this._currentUserStore?.isAdmin === false });
 	}
 
 	private _renderActionButtons() {

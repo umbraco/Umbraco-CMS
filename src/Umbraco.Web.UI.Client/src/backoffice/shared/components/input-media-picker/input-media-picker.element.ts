@@ -3,7 +3,7 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, property, state } from 'lit/decorators.js';
 import { ifDefined } from 'lit-html/directives/if-defined.js';
 import { FormControlMixin } from '@umbraco-ui/uui-base/lib/mixins';
-import { UmbModalService, UMB_MODAL_SERVICE_CONTEXT_TOKEN } from '../../../../core/modal';
+import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN } from '../../../../core/modal';
 import { UmbMediaRepository } from '../../../media/media/repository/media.repository';
 import { UmbLitElement } from '@umbraco-cms/element';
 import type { EntityTreeItemModel, FolderTreeItemModel } from '@umbraco-cms/backend-api';
@@ -21,8 +21,9 @@ export class UmbInputMediaPickerElement extends FormControlMixin(UmbLitElement) 
 			}
 			#add-button {
 				text-align: center;
-				min-height: 160px;
+				height: 202px;
 			}
+
 			uui-icon {
 				display: block;
 				margin: 0 auto;
@@ -87,7 +88,7 @@ export class UmbInputMediaPickerElement extends FormControlMixin(UmbLitElement) 
 	@state()
 	private _items?: Array<EntityTreeItemModel>;
 
-	private _modalService?: UmbModalService;
+	private _modalContext?: UmbModalContext;
 	private _pickedItemsObserver?: UmbObserverController<FolderTreeItemModel>;
 	private _repository = new UmbMediaRepository(this);
 
@@ -105,8 +106,8 @@ export class UmbInputMediaPickerElement extends FormControlMixin(UmbLitElement) 
 			() => !!this.max && this._selectedKeys.length > this.max
 		);
 
-		this.consumeContext(UMB_MODAL_SERVICE_CONTEXT_TOKEN, (instance) => {
-			this._modalService = instance;
+		this.consumeContext(UMB_MODAL_CONTEXT_TOKEN, (instance) => {
+			this._modalContext = instance;
 		});
 	}
 
@@ -134,7 +135,7 @@ export class UmbInputMediaPickerElement extends FormControlMixin(UmbLitElement) 
 
 	private _openPicker() {
 		// We send a shallow copy(good enough as its just an array of keys) of our this._selectedKeys, as we don't want the modal to manipulate our data:
-		const modalHandler = this._modalService?.mediaPicker({
+		const modalHandler = this._modalContext?.mediaPicker({
 			multiple: this.max === 1 ? false : true,
 			selection: [...this._selectedKeys],
 		});
@@ -144,7 +145,7 @@ export class UmbInputMediaPickerElement extends FormControlMixin(UmbLitElement) 
 	}
 
 	private _removeItem(item: FolderTreeItemModel) {
-		const modalHandler = this._modalService?.confirm({
+		const modalHandler = this._modalContext?.confirm({
 			color: 'danger',
 			headline: `Remove ${item.name}?`,
 			content: 'Are you sure you want to remove this item',
@@ -168,7 +169,7 @@ export class UmbInputMediaPickerElement extends FormControlMixin(UmbLitElement) 
 		return html` ${this._items?.map((item) => this._renderItem(item))} ${this._renderButton()} `;
 	}
 	private _renderButton() {
-		if (this.max == 1 && this._items && this._items.length > 0) return;
+		if (this._items && this.max && this._items.length >= this.max) return;
 		return html`<uui-button id="add-button" look="placeholder" @click=${this._openPicker} label="open">
 			<uui-icon name="umb:add"></uui-icon>
 			Add

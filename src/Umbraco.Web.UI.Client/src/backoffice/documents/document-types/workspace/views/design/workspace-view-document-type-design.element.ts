@@ -1,17 +1,24 @@
 import { css, html } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, state } from 'lit/decorators.js';
-import { distinctUntilChanged } from 'rxjs';
 import { UmbWorkspaceDocumentTypeContext } from '../../document-type-workspace.context';
 import { UmbLitElement } from '@umbraco-cms/element';
-import type { DocumentTypeDetails } from '@umbraco-cms/models';
+import type { DocumentTypeModel } from '@umbraco-cms/backend-api';
 
 @customElement('umb-workspace-view-document-type-design')
 export class UmbWorkspaceViewDocumentTypeDesignElement extends UmbLitElement {
-	static styles = [UUITextStyles, css``];
+	static styles = [
+		UUITextStyles,
+		css`
+			:host {
+				display: block;
+				padding: var(--uui-size-space-6);
+			}
+		`,
+	];
 
 	@state()
-	_documentType?: DocumentTypeDetails | null;
+	_documentType?: DocumentTypeModel;
 
 	private _workspaceContext?: UmbWorkspaceDocumentTypeContext;
 
@@ -28,13 +35,13 @@ export class UmbWorkspaceViewDocumentTypeDesignElement extends UmbLitElement {
 	private _observeDocumentType() {
 		if (!this._workspaceContext) return;
 
-		this.observe(this._workspaceContext.data.pipe(distinctUntilChanged()), (documentType) => {
+		this.observe(this._workspaceContext.data, (documentType) => {
 			this._documentType = documentType;
 		});
 	}
 
 	render() {
-		return html`<div>Design of ${this._documentType?.name}</div>`;
+		return html`Design of ${this._documentType?.name}`;
 	}
 }
 

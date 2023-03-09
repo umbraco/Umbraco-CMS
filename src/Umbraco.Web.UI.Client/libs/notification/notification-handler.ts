@@ -1,6 +1,6 @@
 import { UUIToastNotificationElement } from '@umbraco-ui/uui';
 import { v4 as uuidv4 } from 'uuid';
-import type { UmbNotificationOptions, UmbNotificationData, UmbNotificationColor } from '.';
+import type { UmbNotificationOptions, UmbNotificationColor, UmbNotificationDefaultData } from '.';
 
 import './layouts/default';
 
@@ -12,7 +12,7 @@ export class UmbNotificationHandler {
 	private _closeResolver: any;
 	private _closePromise: Promise<any>;
 	private _elementName?: string;
-	private _data: UmbNotificationData;
+	private _data?: UmbNotificationDefaultData;
 
 	private _defaultColor: UmbNotificationColor = 'default';
 	private _defaultDuration = 6000;
@@ -28,7 +28,7 @@ export class UmbNotificationHandler {
 	 * @param {UmbNotificationOptions} options
 	 * @memberof UmbNotificationHandler
 	 */
-	constructor(options: UmbNotificationOptions<UmbNotificationData>) {
+	constructor(options: UmbNotificationOptions) {
 		this.key = uuidv4();
 		this.color = options.color || this._defaultColor;
 		this.duration = options.duration !== undefined ? options.duration : this._defaultDuration;

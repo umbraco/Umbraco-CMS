@@ -14,8 +14,8 @@ export async function loadExtension(manifest: ManifestElement): Promise<object |
 		if (isManifestJSType(manifest) && manifest.js) {
 			return await import(/* @vite-ignore */ manifest.js);
 		}
-	} catch {
-		console.warn('-- Extension failed to load script', manifest);
+	} catch (err: any) {
+		console.warn('-- Extension failed to load script', manifest, err);
 		return Promise.resolve(null);
 	}
 

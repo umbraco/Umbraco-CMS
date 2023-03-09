@@ -6,7 +6,7 @@ import { html } from 'lit-html';
 import type { UmbDataTypeWorkspaceViewEditElement } from './data-type-workspace-view-edit.element';
 
 import './data-type-workspace-view-edit.element';
-//import { UmbWorkspaceDataTypeContext } from '../../workspace-data-type.context';
+//import { UmbDataTypeWorkspaceContext } from '../../workspace-data-type.context';
 
 export default {
 	title: 'Workspaces/Data Type/Views/Edit',
@@ -15,10 +15,10 @@ export default {
 	decorators: [
 		(story) => {
 			return html`TODO: make use of mocked workspace context??`;
-			/*html` <umb-context-provider key="umbDataTypeContext" .value=${new UmbWorkspaceDataTypeContext(data[0])}>
+			/*html` <umb-context-provider key="umbDataTypeContext" .value=${new UmbDataTypeWorkspaceContext(data[0])}>
 				${story()}
 			</umb-context-provider>`,*/
-		}
+		},
 	],
 } as Meta;
 

@@ -1,4 +1,5 @@
-import { UmbTrashEntityAction } from '../../../shared/entity-actions/trash/trash.action';
+import { MEDIA_REPOSITORY_ALIAS } from '../repository/manifests';
+import { UmbTrashEntityAction } from '@umbraco-cms/entity-action';
 import { ManifestEntityAction } from 'libs/extensions-registry/entity-action.models';
 
 const entityActions: Array<ManifestEntityAction> = [
@@ -11,7 +12,7 @@ const entityActions: Array<ManifestEntityAction> = [
 			icon: 'umb:trash',
 			label: 'Trash',
 			api: UmbTrashEntityAction,
-			repositoryAlias: 'Umb.Repository.Media',
+			repositoryAlias: MEDIA_REPOSITORY_ALIAS,
 		},
 	},
 ];

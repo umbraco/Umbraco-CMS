@@ -1,3 +1,3 @@
 export * from './resource.controller';
-export * from './tryExecute.method';
-export * from './tryExecuteAndNotify.method';
+export * from './tryExecute.function';
+export * from './tryExecuteAndNotify.function';

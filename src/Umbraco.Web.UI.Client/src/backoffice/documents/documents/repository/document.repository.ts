@@ -1,23 +1,22 @@
 import type { RepositoryTreeDataSource } from '../../../../../libs/repository/repository-tree-data-source.interface';
 import { DocumentTreeServerDataSource } from './sources/document.tree.server.data';
 import { UmbDocumentTreeStore, UMB_DOCUMENT_TREE_STORE_CONTEXT_TOKEN } from './document.tree.store';
-import { UmbDocumentDetailStore, UMB_DOCUMENT_DETAIL_STORE_CONTEXT_TOKEN } from './document.detail.store';
-import { UmbDocumentDetailServerDataSource } from './sources/document.detail.server.data';
+import { UmbDocumentStore, UMB_DOCUMENT_STORE_CONTEXT_TOKEN } from './document.store';
+import { UmbDocumentServerDataSource } from './sources/document.server.data';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 import { UmbContextConsumerController } from '@umbraco-cms/context-api';
-import { ProblemDetailsModel } from '@umbraco-cms/backend-api';
+import { ProblemDetailsModel, DocumentModel } from '@umbraco-cms/backend-api';
 import type { UmbTreeRepository } from 'libs/repository/tree-repository.interface';
 import { UmbDetailRepository } from '@umbraco-cms/repository';
-import type { DocumentDetails } from '@umbraco-cms/models';
-import { UmbNotificationService, UMB_NOTIFICATION_SERVICE_CONTEXT_TOKEN } from '@umbraco-cms/notification';
+import { UmbNotificationContext, UMB_NOTIFICATION_CONTEXT_TOKEN } from '@umbraco-cms/notification';
 
-type ItemDetailType = DocumentDetails;
+type ItemType = DocumentModel;
 
 // Move to documentation / JSdoc
 /* We need to create a new instance of the repository from within the element context. We want the notifications to be displayed in the right context. */
 // element -> context -> repository -> (store) -> data source
 // All methods should be async and return a promise. Some methods might return an observable as part of the promise response.
-export class UmbDocumentRepository implements UmbTreeRepository, UmbDetailRepository<ItemDetailType> {
+export class UmbDocumentRepository implements UmbTreeRepository, UmbDetailRepository<ItemType> {
 	#init!: Promise<unknown>;
 
 	#host: UmbControllerHostInterface;
@@ -25,29 +24,29 @@ export class UmbDocumentRepository implements UmbTreeRepository, UmbDetailReposi
 	#treeSource: RepositoryTreeDataSource;
 	#treeStore?: UmbDocumentTreeStore;
 
-	#detailDataSource: UmbDocumentDetailServerDataSource;
-	#detailStore?: UmbDocumentDetailStore;
+	#detailDataSource: UmbDocumentServerDataSource;
+	#store?: UmbDocumentStore;
 
-	#notificationService?: UmbNotificationService;
+	#notificationContext?: UmbNotificationContext;
 
 	constructor(host: UmbControllerHostInterface) {
 		this.#host = host;
 
 		// TODO: figure out how spin up get the correct data source
 		this.#treeSource = new DocumentTreeServerDataSource(this.#host);
-		this.#detailDataSource = new UmbDocumentDetailServerDataSource(this.#host);
+		this.#detailDataSource = new UmbDocumentServerDataSource(this.#host);
 
 		this.#init = Promise.all([
 			new UmbContextConsumerController(this.#host, UMB_DOCUMENT_TREE_STORE_CONTEXT_TOKEN, (instance) => {
 				this.#treeStore = instance;
 			}),
 
-			new UmbContextConsumerController(this.#host, UMB_DOCUMENT_DETAIL_STORE_CONTEXT_TOKEN, (instance) => {
-				this.#detailStore = instance;
+			new UmbContextConsumerController(this.#host, UMB_DOCUMENT_STORE_CONTEXT_TOKEN, (instance) => {
+				this.#store = instance;
 			}),
 
-			new UmbContextConsumerController(this.#host, UMB_NOTIFICATION_SERVICE_CONTEXT_TOKEN, (instance) => {
-				this.#notificationService = instance;
+			new UmbContextConsumerController(this.#host, UMB_NOTIFICATION_CONTEXT_TOKEN, (instance) => {
+				this.#notificationContext = instance;
 			}),
 		]);
 	}
@@ -114,7 +113,7 @@ export class UmbDocumentRepository implements UmbTreeRepository, UmbDetailReposi
 
 	// DETAILS:
 
-	async createDetailsScaffold(parentKey: string | null) {
+	async createScaffold(parentKey: string | null) {
 		await this.#init;
 
 		if (!parentKey) {
@@ -124,7 +123,7 @@ export class UmbDocumentRepository implements UmbTreeRepository, UmbDetailReposi
 		return this.#detailDataSource.createScaffold(parentKey);
 	}
 
-	async requestDetails(key: string) {
+	async requestByKey(key: string) {
 		await this.#init;
 
 		// TODO: should we show a notification if the key is missing?
@@ -136,7 +135,7 @@ export class UmbDocumentRepository implements UmbTreeRepository, UmbDetailReposi
 		const { data, error } = await this.#detailDataSource.get(key);
 
 		if (data) {
-			this.#detailStore?.append(data);
+			this.#store?.append(data);
 		}
 
 		return { data, error };
@@ -144,48 +143,47 @@ export class UmbDocumentRepository implements UmbTreeRepository, UmbDetailReposi
 
 	// Could potentially be general methods:
 
-	async createDetail(template: ItemDetailType) {
+	async create(item: ItemType) {
 		await this.#init;
 
-		if (!template || !template.key) {
-			throw new Error('Template is missing');
+		if (!item || !item.key) {
+			throw new Error('Document is missing');
 		}
 
-		const { error } = await this.#detailDataSource.insert(template);
+		const { error } = await this.#detailDataSource.insert(item);
 
 		if (!error) {
 			const notification = { data: { message: `Document created` } };
-			this.#notificationService?.peek('positive', notification);
+			this.#notificationContext?.peek('positive', notification);
 		}
 
 		// TODO: we currently don't use the detail store for anything.
 		// Consider to look up the data before fetching from the server
-		this.#detailStore?.append(template);
+		this.#store?.append(item);
 		// TODO: Update tree store with the new item? or ask tree to request the new item?
 
 		return { error };
 	}
 
-	async saveDetail(document: ItemDetailType) {
+	async save(item: ItemType) {
 		await this.#init;
 
-		if (!document || !document.key) {
-			throw new Error('Template is missing');
+		if (!item || !item.key) {
+			throw new Error('Document is missing');
 		}
 
-		const { error } = await this.#detailDataSource.update(document);
+		const { error } = await this.#detailDataSource.update(item);
 
 		if (!error) {
 			const notification = { data: { message: `Document saved` } };
-			this.#notificationService?.peek('positive', notification);
+			this.#notificationContext?.peek('positive', notification);
 		}
 
 		// TODO: we currently don't use the detail store for anything.
 		// Consider to look up the data before fetching from the server
-		// Consider notify a workspace if a template is updated in the store while someone is editing it.
-		this.#detailStore?.append(document);
-		this.#treeStore?.updateItem(document.key, { name: document.name });
-
+		// Consider notify a workspace if a document is updated in the store while someone is editing it.
+		this.#store?.append(item);
+		//this.#treeStore?.updateItem(item.key, { name: item.name });// Port data to tree store.
 		// TODO: would be nice to align the stores on methods/methodNames.
 
 		return { error };
@@ -204,13 +202,13 @@ export class UmbDocumentRepository implements UmbTreeRepository, UmbDetailReposi
 
 		if (!error) {
 			const notification = { data: { message: `Document deleted` } };
-			this.#notificationService?.peek('positive', notification);
+			this.#notificationContext?.peek('positive', notification);
 		}
 
 		// TODO: we currently don't use the detail store for anything.
 		// Consider to look up the data before fetching from the server.
-		// Consider notify a workspace if a template is deleted from the store while someone is editing it.
-		this.#detailStore?.remove([key]);
+		// Consider notify a workspace if a document is deleted from the store while someone is editing it.
+		this.#store?.remove([key]);
 		this.#treeStore?.removeItem(key);
 		// TODO: would be nice to align the stores on methods/methodNames.
 

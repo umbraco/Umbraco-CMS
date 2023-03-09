@@ -1,7 +1,6 @@
-import 'router-slot';
+import { IRoute, RouterSlot } from 'router-slot';
 import { LitElement, PropertyValueMap } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
-import { IRoute, RouterSlot } from 'router-slot';
 import { UmbRouterSlotChangeEvent, UmbRouterSlotInitEvent } from '@umbraco-cms/router';
 
 /**
@@ -13,7 +12,7 @@ import { UmbRouterSlotChangeEvent, UmbRouterSlotInitEvent } from '@umbraco-cms/r
  */
 @customElement('umb-router-slot')
 export class UmbRouterSlotElement extends LitElement {
-	#router: RouterSlot;
+	#router: RouterSlot = new RouterSlot();
 	#listening = false;
 
 	@property()
@@ -38,14 +37,6 @@ export class UmbRouterSlotElement extends LitElement {
 		return this._routerPath + '/' + this._activeLocalPath;
 	}
 
-	constructor() {
-		super();
-		this.#router = document.createElement('router-slot');
-		// Note: I decided not to use the local changestate event, because it is not fired when the route is changed from any router-slot. And for now I wanted to keep it local.
-		//this.#router.addEventListener('changestate', this._onNavigationChanged);
-	}
-
-
 	connectedCallback() {
 		super.connectedCallback();
 		if (this.#listening === false) {
@@ -59,7 +50,6 @@ export class UmbRouterSlotElement extends LitElement {
 		window.removeEventListener('navigationsuccess', this._onNavigationChanged);
 		this.#listening = false;
 	}
-
 
 	protected firstUpdated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
 		super.firstUpdated(_changedProperties);

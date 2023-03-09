@@ -1,51 +1,89 @@
 import { UmbWorkspaceContext } from '../../../shared/components/workspace/workspace-context/workspace-context';
 import { UmbWorkspaceEntityContextInterface } from '../../../shared/components/workspace/workspace-context/workspace-entity-context.interface';
-import { UmbEntityWorkspaceManager } from '../../../shared/components/workspace/workspace-context/entity-manager-controller';
-import { UMB_DATA_TYPE_DETAIL_STORE_CONTEXT_TOKEN } from '../data-type.detail.store';
-import type { DataTypeDetails } from '@umbraco-cms/models';
-import { appendToFrozenArray } from '@umbraco-cms/observable-api';
+import { UmbDataTypeRepository } from '../repository/data-type.repository';
+import type { DataTypeModel } from '@umbraco-cms/backend-api';
+import { appendToFrozenArray, ObjectState } from '@umbraco-cms/observable-api';
+import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 
-export class UmbWorkspaceDataTypeContext extends UmbWorkspaceContext implements UmbWorkspaceEntityContextInterface<DataTypeDetails | undefined> {
+export class UmbDataTypeWorkspaceContext
+	extends UmbWorkspaceContext<UmbDataTypeRepository>
+	implements UmbWorkspaceEntityContextInterface<DataTypeModel | undefined>
+{
+	#data = new ObjectState<DataTypeModel | undefined>(undefined);
+	data = this.#data.asObservable();
+	name = this.#data.getObservablePart((data) => data?.name);
+	key = this.#data.getObservablePart((data) => data?.key);
 
-	#manager = new UmbEntityWorkspaceManager(this._host, 'data-type', UMB_DATA_TYPE_DETAIL_STORE_CONTEXT_TOKEN);
+	constructor(host: UmbControllerHostInterface) {
+		super(host, new UmbDataTypeRepository(host));
+	}
 
+	async load(key: string) {
+		const { data } = await this.repository.requestByKey(key);
+		if (data) {
+			this.setIsNew(false);
+			this.#data.update(data);
+		}
+	}
 
+	async createScaffold(parentKey: string | null) {
+		const { data } = await this.repository.createScaffold(parentKey);
+		if (!data) return;
+		this.setIsNew(true);
+		this.#data.next(data);
+	}
 
+	getData() {
+		return this.#data.getValue();
+	}
 
+	getEntityKey() {
+		return this.getData()?.key || '';
+	}
 
-	public readonly data = this.#manager.state.asObservable();
-	public readonly name = this.#manager.state.getObservablePart((state) => state?.name);
+	getEntityType() {
+		return 'data-type';
+	}
 
 	setName(name: string) {
-		this.#manager.state.update({name: name});
+		this.#data.update({ name });
 	}
-	setPropertyEditorModelAlias(alias?: string) {
-		this.#manager.state.update({propertyEditorModelAlias: alias});
-	}
-	setPropertyEditorUIAlias(alias?: string) {
-		this.#manager.state.update({propertyEditorUIAlias: alias});
-	}
-	getEntityType = this.#manager.getEntityType;
-	getUnique = this.#manager.getEntityKey;
-	getEntityKey = this.#manager.getEntityKey;
-	getStore = this.#manager.getStore;
-	getData = this.#manager.getData;
-	load = this.#manager.load;
-	create = this.#manager.create;
-	save = this.#manager.save;
-	destroy = this.#manager.destroy;
 
+	setPropertyEditorAlias(alias?: string) {
+		this.#data.update({ propertyEditorAlias: alias });
+	}
+	setPropertyEditorUiAlias(alias?: string) {
+		this.#data.update({ propertyEditorUiAlias: alias });
+	}
 
-	// This could eventually be moved out as well?
+	// TODO: its not called a property in the model, but we do consider this way in our front-end
 	setPropertyValue(alias: string, value: unknown) {
+		const entry = { alias: alias, value: value };
 
-		const entry = {alias: alias, value: value};
-
-		const currentData = this.#manager.getData();
+		const currentData = this.#data.value;
 		if (currentData) {
-			const newDataSet = appendToFrozenArray(currentData.data, entry, x => x.alias);
-
-			this.#manager.state.update({data: newDataSet});
+			// TODO: make a partial update method for array of data, (idea/concept, use if this case is getting common)
+			const newDataSet = appendToFrozenArray(currentData.data || [], entry, (x) => x.alias);
+			this.#data.update({ data: newDataSet });
 		}
+	}
+
+	async save() {
+		if (!this.#data.value) return;
+		if (this.isNew) {
+			await this.repository.create(this.#data.value);
+		} else {
+			await this.repository.save(this.#data.value);
+		}
+		// If it went well, then its not new anymore?.
+		this.setIsNew(false);
+	}
+
+	async delete(key: string) {
+		await this.repository.delete(key);
+	}
+
+	public destroy(): void {
+		this.#data.complete();
 	}
 }

@@ -3,7 +3,7 @@ import type { UUIModalDialogElement } from '@umbraco-ui/uui-modal-dialog';
 import type { UUIModalSidebarElement, UUIModalSidebarSize } from '@umbraco-ui/uui-modal-sidebar';
 import { v4 as uuidv4 } from 'uuid';
 
-import { UmbModalOptions } from './modal.service';
+import { UmbModalOptions } from './modal.context';
 
 //TODO consider splitting this into two separate handlers
 export class UmbModalHandler {

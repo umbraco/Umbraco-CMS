@@ -50,10 +50,6 @@ export class UmbWorkspaceLayout extends UmbLitElement {
 				border-right: 1px solid var(--uui-color-border);
 			}
 
-			#router-slot {
-				height: 100%;
-			}
-
 			umb-extension-slot[slot='actions'] {
 				display: flex;
 				gap: var(--uui-size-space-2);
@@ -89,7 +85,7 @@ export class UmbWorkspaceLayout extends UmbLitElement {
 	private _workspaceViews: Array<ManifestWorkspaceView | ManifestWorkspaceViewCollection> = [];
 
 	@state()
-	private _routes: any[] = [];
+	private _routes?: any[];
 
 	@state()
 	private _routerPath?: string;
@@ -119,7 +115,7 @@ export class UmbWorkspaceLayout extends UmbLitElement {
 					component: () => {
 						if (view.type === 'workspaceViewCollection') {
 							return import(
-								'src/backoffice/shared/components/workspace/workspace-content/views/collection/workspace-view-collection.element'
+								'../../../../shared/components/workspace/workspace-content/views/collection/workspace-view-collection.element'
 							);
 						}
 						return createExtensionElement(view);
@@ -183,7 +179,7 @@ export class UmbWorkspaceLayout extends UmbLitElement {
 
 	#renderRoutes() {
 		return html`
-			${this._routes.length > 0
+			${this._routes && this._routes.length > 0
 				? html`
 						<umb-router-slot
 							id="router-slot"

@@ -3,7 +3,7 @@ import { css, html } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { ifDefined } from 'lit-html/directives/if-defined.js';
 import { UmbLitElement } from '@umbraco-cms/element';
-import { UmbExecutedEvent } from 'src/core/events';
+import { UmbExecutedEvent } from '@umbraco-cms/events';
 
 @customElement('umb-workspace-action-menu')
 export class UmbWorkspaceActionMenuElement extends UmbLitElement {
@@ -23,7 +23,10 @@ export class UmbWorkspaceActionMenuElement extends UmbLitElement {
 				height: 100%;
 				box-sizing: border-box;
 				box-shadow: var(--uui-shadow-depth-3);
-				width: 500px;
+				width: 250px;
+				position: absolute;
+				right: 5px;
+				height: auto;
 			}
 		`,
 	];

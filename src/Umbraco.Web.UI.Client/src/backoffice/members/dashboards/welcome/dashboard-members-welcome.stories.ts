@@ -7,8 +7,8 @@ import type { UmbDashboardMembersWelcomeElement } from './dashboard-members-welc
 
 export default {
 	title: 'Dashboards/Welcome',
-	component: 'umb-dashboard-welcome',
-	id: 'umb-dashboard-welcome',
+	component: 'dashboard-members-welcome',
+	id: 'umb-dashboard-members-welcome',
 } as Meta;
 
 export const AAAOverview: Story<UmbDashboardMembersWelcomeElement> = () =>

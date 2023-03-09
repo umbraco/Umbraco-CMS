@@ -3,7 +3,7 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, property, state } from 'lit/decorators.js';
 import { ifDefined } from 'lit-html/directives/if-defined.js';
 import { FormControlMixin } from '@umbraco-ui/uui-base/lib/mixins';
-import { UmbModalService, UMB_MODAL_SERVICE_CONTEXT_TOKEN } from '../../../../core/modal';
+import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN } from '../../../../core/modal';
 import { UMB_DOCUMENT_TREE_STORE_CONTEXT_TOKEN } from '../../../documents/documents/repository/document.tree.store';
 import type { UmbDocumentTreeStore } from '../../../documents/documents/repository/document.tree.store';
 import { UmbLitElement } from '@umbraco-cms/element';
@@ -77,7 +77,7 @@ export class UmbInputDocumentPickerElement extends FormControlMixin(UmbLitElemen
 	@state()
 	private _items?: Array<DocumentTreeItemModel>;
 
-	private _modalService?: UmbModalService;
+	private _modalContext?: UmbModalContext;
 	private _documentStore?: UmbDocumentTreeStore;
 	private _pickedItemsObserver?: UmbObserverController<FolderTreeItemModel>;
 
@@ -99,8 +99,8 @@ export class UmbInputDocumentPickerElement extends FormControlMixin(UmbLitElemen
 			this._documentStore = instance;
 			this._observePickedDocuments();
 		});
-		this.consumeContext(UMB_MODAL_SERVICE_CONTEXT_TOKEN, (instance) => {
-			this._modalService = instance;
+		this.consumeContext(UMB_MODAL_CONTEXT_TOKEN, (instance) => {
+			this._modalContext = instance;
 		});
 	}
 
@@ -121,7 +121,7 @@ export class UmbInputDocumentPickerElement extends FormControlMixin(UmbLitElemen
 
 	private _openPicker() {
 		// We send a shallow copy(good enough as its just an array of keys) of our this._selectedKeys, as we don't want the modal to manipulate our data:
-		const modalHandler = this._modalService?.contentPicker({
+		const modalHandler = this._modalContext?.contentPicker({
 			multiple: this.max === 1 ? false : true,
 			selection: [...this._selectedKeys],
 		});
@@ -131,7 +131,7 @@ export class UmbInputDocumentPickerElement extends FormControlMixin(UmbLitElemen
 	}
 
 	private _removeItem(item: FolderTreeItemModel) {
-		const modalHandler = this._modalService?.confirm({
+		const modalHandler = this._modalContext?.confirm({
 			color: 'danger',
 			headline: `Remove ${item.name}?`,
 			content: 'Are you sure you want to remove this item',

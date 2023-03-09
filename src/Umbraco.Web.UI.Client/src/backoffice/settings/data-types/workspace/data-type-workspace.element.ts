@@ -2,8 +2,7 @@ import { UUIInputElement, UUIInputEvent } from '@umbraco-ui/uui';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
-import { distinctUntilChanged } from 'rxjs';
-import { UmbWorkspaceDataTypeContext } from './data-type-workspace.context';
+import { UmbDataTypeWorkspaceContext } from './data-type-workspace.context';
 import { UmbLitElement } from '@umbraco-cms/element';
 
 /**
@@ -29,36 +28,36 @@ export class UmbDataTypeWorkspaceElement extends UmbLitElement {
 		`,
 	];
 
-	private _workspaceContext: UmbWorkspaceDataTypeContext = new UmbWorkspaceDataTypeContext(this);
-
-	public load(value: string) {
-		this._workspaceContext?.load(value);
-	}
-
-	public create(parentKey: string | null) {
-		this._workspaceContext?.create(parentKey);
-	}
+	#workspaceContext = new UmbDataTypeWorkspaceContext(this);
 
 	@state()
 	private _dataTypeName = '';
 
+	public load(value: string) {
+		this.#workspaceContext?.load(value);
+		//this._unique = entityKey;
+	}
+
+	public create(parentKey: string | null) {
+		this.#workspaceContext.createScaffold(parentKey);
+	}
+
 	constructor() {
 		super();
-		this.provideContext('umbWorkspaceContext', this._workspaceContext);
-		this.observe(this._workspaceContext.data.pipe(distinctUntilChanged()), (dataType) => {
-			if (dataType && dataType.name !== this._dataTypeName) {
-				this._dataTypeName = dataType.name ?? '';
+		this.observe(this.#workspaceContext.name, (dataTypeName) => {
+			if (dataTypeName !== this._dataTypeName) {
+				this._dataTypeName = dataTypeName ?? '';
 			}
 		});
 	}
 
 	// TODO. find a way where we don't have to do this for all Workspaces.
-	private _handleInput(event: UUIInputEvent) {
+	#handleInput(event: UUIInputEvent) {
 		if (event instanceof UUIInputEvent) {
 			const target = event.composedPath()[0] as UUIInputElement;
 
 			if (typeof target?.value === 'string') {
-				this._workspaceContext.setName(target.value);
+				this.#workspaceContext.setName(target.value);
 			}
 		}
 	}
@@ -66,7 +65,7 @@ export class UmbDataTypeWorkspaceElement extends UmbLitElement {
 	render() {
 		return html`
 			<umb-workspace-layout alias="Umb.Workspace.DataType">
-				<uui-input id="header" slot="header" .value=${this._dataTypeName} @input="${this._handleInput}"></uui-input>
+				<uui-input id="header" slot="header" .value=${this._dataTypeName} @input="${this.#handleInput}"></uui-input>
 			</umb-workspace-layout>
 		`;
 	}

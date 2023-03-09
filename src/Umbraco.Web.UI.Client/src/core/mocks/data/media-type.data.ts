@@ -5,6 +5,7 @@ import type { MediaTypeDetails } from '@umbraco-cms/models';
 
 export const data: Array<MediaTypeDetails> = [
 	{
+		$type: 'media-type',
 		name: 'Media Type 1',
 		type: 'media-type',
 		hasChildren: false,
@@ -17,6 +18,7 @@ export const data: Array<MediaTypeDetails> = [
 		properties: [],
 	},
 	{
+		$type: 'media-type',
 		name: 'Media Type 2',
 		type: 'media-type',
 		hasChildren: false,

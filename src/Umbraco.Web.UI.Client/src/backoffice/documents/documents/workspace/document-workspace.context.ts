@@ -1,33 +1,79 @@
 import { UmbWorkspaceContext } from '../../../shared/components/workspace/workspace-context/workspace-context';
 import { UmbDocumentRepository } from '../repository/document.repository';
-import type { UmbWorkspaceEntityContextInterface } from '../../../shared/components/workspace/workspace-context/workspace-entity-context.interface';
-import type { DocumentDetails } from '@umbraco-cms/models';
-import { appendToFrozenArray, ObjectState } from '@umbraco-cms/observable-api';
+import { UmbDocumentTypeRepository } from '../../document-types/repository/document-type.repository';
+import { UmbWorkspaceVariableEntityContextInterface } from '../../../shared/components/workspace/workspace-context/workspace-variable-entity-context.interface';
+import { UmbVariantId } from '../../../shared/variants/variant-id.class';
+import { UmbWorkspacePropertyStructureManager } from '../../../shared/components/workspace/workspace-context/workspace-property-structure-manager.class';
+import type { DocumentModel } from '@umbraco-cms/backend-api';
+import { partialUpdateFrozenArray, ObjectState, ArrayState, UmbObserverController } from '@umbraco-cms/observable-api';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 
-// TODO: should this contex be called DocumentDraft instead of workspace? or should the draft be part of this?
+// TODO: should this context be called DocumentDraft instead of workspace? or should the draft be part of this?
 
-type EntityType = DocumentDetails;
+export type ActiveVariant = {
+	index: number;
+	culture: string | null;
+	segment: string | null;
+};
+// TODO: Should we have a DocumentStructureContext and maybe even a DocumentDraftContext?
+
+type EntityType = DocumentModel;
 export class UmbDocumentWorkspaceContext
-	extends UmbWorkspaceContext
-	implements UmbWorkspaceEntityContextInterface<EntityType | undefined>
+	extends UmbWorkspaceContext<UmbDocumentRepository>
+	implements UmbWorkspaceVariableEntityContextInterface<EntityType | undefined>
 {
-	#isNew = false;
-	#host: UmbControllerHostInterface;
-	#templateDetailRepo: UmbDocumentRepository;
+	/**
+	 * The document is the current stored version of the document.
+	 * For now lets not share this publicly as it can become confusing.
+	 * TODO: Use this to compare, for variants with changes.
+	 */
+	#document = new ObjectState<EntityType | undefined>(undefined);
 
-	#data = new ObjectState<EntityType | undefined>(undefined);
-	data = this.#data.asObservable();
-	name = this.#data.getObservablePart((data) => data?.name);
+	/**
+	 * The document is the current state/draft version of the document.
+	 */
+	#draft = new ObjectState<EntityType | undefined>(undefined);
+	documentTypeKey = this.#draft.getObservablePart((data) => data?.contentTypeKey);
+
+	variants = this.#draft.getObservablePart((data) => data?.variants || []);
+	urls = this.#draft.getObservablePart((data) => data?.urls || []);
+	templateKey = this.#draft.getObservablePart((data) => data?.templateKey || null);
+
+	#activeVariantsInfo = new ArrayState<ActiveVariant>([], (x) => x.index);
+	activeVariantsInfo = this.#activeVariantsInfo.asObservable();
+
+	readonly structure;
 
 	constructor(host: UmbControllerHostInterface) {
-		super(host);
-		this.#host = host;
-		this.#templateDetailRepo = new UmbDocumentRepository(this.#host);
+		super(host, new UmbDocumentRepository(host));
+
+		this.structure = new UmbWorkspacePropertyStructureManager(this.host, new UmbDocumentTypeRepository(this.host));
+
+		new UmbObserverController(this.host, this.documentTypeKey, (key) => this.structure.loadType(key));
+	}
+
+	async load(entityKey: string) {
+		const { data } = await this.repository.requestByKey(entityKey);
+		if (!data) return undefined;
+
+		this.setIsNew(false);
+		this.#document.next(data);
+		this.#draft.next(data);
+		return data || undefined;
+	}
+
+	async createScaffold(parentKey: string | null) {
+		const { data } = await this.repository.createScaffold(parentKey);
+		if (!data) return undefined;
+
+		this.setIsNew(true);
+		this.#document.next(data);
+		this.#draft.next(data);
+		return data || undefined;
 	}
 
 	getData() {
-		return this.#data.getValue();
+		return this.#draft.getValue() || {};
 	}
 
 	/*
@@ -37,79 +83,108 @@ export class UmbDocumentWorkspaceContext
 	*/
 
 	getEntityKey() {
-		return this.getData()?.key || '';
+		return this.getData().key;
 	}
 
 	getEntityType() {
 		return 'document';
 	}
 
-	setName(name: string) {
-		this.#data.update({ name });
-	}
-	/*
-	getEntityType = this.#manager.getEntityType;
-	getUnique = this.#manager.getEntityKey;
-	getEntityKey = this.#manager.getEntityKey;
-
-	*/
-
-	/**
-	 * Concept for Repository impl.:
-
-	load(entityKey: string) {
-		this.#repository.load(entityKey).then((data) => {
-			this.#draft.next(data)
-		})
+	setActiveVariant(index: number, culture: string | null, segment: string | null) {
+		const activeVariants = [...this.#activeVariantsInfo.getValue()];
+		if (index < activeVariants.length) {
+			activeVariants[index] = { index, culture, segment };
+		} else {
+			activeVariants.push({ index, culture, segment });
+		}
+		this.#activeVariantsInfo.next(activeVariants);
 	}
 
-	create(parentKey: string | undefined) {
-		this.#repository.create(parentKey).then((data) => {
-			this.#draft.next(data)
-		})
+	openSplitView(culture: string | null, segment: string | null) {
+		this.setActiveVariant(1, culture, segment);
 	}
 
-	 */
+	getVariant(variantId: UmbVariantId) {
+		return this.#draft.getValue()?.variants?.find((x) => variantId.compare(x));
+	}
 
-	setPropertyValue(alias: string, value: unknown) {
-		const entry = { alias: alias, value: value };
+	activeVariantInfoByIndex(index: number) {
+		return this.#activeVariantsInfo.getObservablePart((data) => data[index] || undefined);
+	}
 
-		const currentData = this.#data.value;
+	getName(variantId?: UmbVariantId) {
+		const variants = this.#draft.getValue()?.variants;
+		if (!variants) return;
+		if (variantId) {
+			return variants.find((x) => variantId.compare(x))?.name;
+		} else {
+			return variants[0]?.name;
+		}
+	}
+
+	setName(name: string, variantId?: UmbVariantId) {
+		const oldVariants = this.#draft.getValue()?.variants || [];
+		const variants = partialUpdateFrozenArray(
+			oldVariants,
+			{ name },
+			variantId ? (x) => variantId.compare(x) : () => true
+		);
+		this.#draft.update({ variants });
+	}
+
+	propertyValuesOf(variantId?: UmbVariantId) {
+		return this.#draft.getObservablePart((data) =>
+			variantId ? data?.values?.filter((x) => variantId.compare(x)) : data?.values
+		);
+	}
+
+	propertyDataByAlias(propertyAlias: string, variantId?: UmbVariantId) {
+		return this.#draft.getObservablePart((data) =>
+			data?.values?.find((x) => x?.alias === propertyAlias && (variantId ? variantId.compare(x) : true))
+		);
+	}
+	propertyValueByAlias(propertyAlias: string, variantId?: UmbVariantId) {
+		return this.#draft.getObservablePart(
+			(data) =>
+				data?.values?.find((x) => x?.alias === propertyAlias && (variantId ? variantId.compare(x) : true))?.value
+		);
+	}
+
+	getPropertyValue(alias: string, variantId?: UmbVariantId): void {
+		const currentData = this.#draft.value;
 		if (currentData) {
-			const newDataSet = appendToFrozenArray(currentData.data, entry, (x) => x.alias);
-
-			this.#data.update({ data: newDataSet });
+			const newDataSet = currentData.values?.find(
+				(x) => x.alias === alias && (variantId ? variantId.compare(x) : true)
+			);
+			return newDataSet?.value;
 		}
 	}
-
-	async load(entityKey: string) {
-		const { data } = await this.#templateDetailRepo.requestDetails(entityKey);
-		if (data) {
-			this.#isNew = false;
-			this.#data.next(data);
+	setPropertyValue(alias: string, value: unknown, variantId?: UmbVariantId) {
+		const partialEntry = { value };
+		const currentData = this.#draft.value;
+		if (currentData) {
+			const values = partialUpdateFrozenArray(
+				currentData.values || [],
+				partialEntry,
+				(x) => x.alias === alias && (variantId ? variantId.compare(x) : true)
+			);
+			this.#draft.update({ values });
 		}
-	}
-
-	async createScaffold(parentKey: string | null) {
-		const { data } = await this.#templateDetailRepo.createDetailsScaffold(parentKey);
-		if (!data) return;
-		this.#isNew = true;
-		this.#data.next(data);
 	}
 
 	async save() {
-		if (!this.#data.value) return;
-		if (this.#isNew) {
-			await this.#templateDetailRepo.createDetail(this.#data.value);
+		if (!this.#draft.value) return;
+		if (this.getIsNew()) {
+			await this.repository.create(this.#draft.value);
 		} else {
-			await this.#templateDetailRepo.saveDetail(this.#data.value);
+			await this.repository.save(this.#draft.value);
 		}
 		// If it went well, then its not new anymore?.
-		this.#isNew = false;
+		this.setIsNew(false);
 	}
 
 	async delete(key: string) {
-		await this.#templateDetailRepo.delete(key);
+		await this.repository.delete(key);
 	}
 
 	/*
@@ -125,6 +200,6 @@ export class UmbDocumentWorkspaceContext
 	*/
 
 	public destroy(): void {
-		this.#data.complete();
+		this.#draft.complete();
 	}
 }

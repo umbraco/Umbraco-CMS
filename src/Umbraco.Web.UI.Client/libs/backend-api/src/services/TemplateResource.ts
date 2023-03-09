@@ -23,19 +23,20 @@ import { request as __request } from '../core/request';
 export class TemplateResource {
 
     /**
-     * @returns any Created
+     * @returns string Created
      * @throws ApiError
      */
     public static postTemplate({
         requestBody,
     }: {
         requestBody?: TemplateCreateModel,
-    }): CancelablePromise<any> {
+    }): CancelablePromise<string> {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/umbraco/management/api/v1/template',
             body: requestBody,
             mediaType: 'application/json',
+            responseHeader: 'Location',
             errors: {
                 400: `Bad Request`,
                 404: `Not Found`,

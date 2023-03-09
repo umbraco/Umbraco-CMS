@@ -1,3 +1,5 @@
+import { MEDIA_REPOSITORY_ALIAS } from '../repository/manifests';
+import { UmbSaveWorkspaceAction } from '@umbraco-cms/workspace';
 import type {
 	ManifestWorkspace,
 	ManifestWorkspaceAction,
@@ -58,7 +60,7 @@ const workspaceViewCollections: Array<ManifestWorkspaceViewCollection> = [
 			pathname: 'collection',
 			icon: 'umb:grid',
 			entityType: 'media',
-			repositoryAlias: 'Umb.Repository.Media',
+			repositoryAlias: MEDIA_REPOSITORY_ALIAS,
 		},
 	},
 ];
@@ -68,12 +70,12 @@ const workspaceActions: Array<ManifestWorkspaceAction> = [
 		type: 'workspaceAction',
 		alias: 'Umb.WorkspaceAction.Media.Save',
 		name: 'Save Media Workspace Action',
-		loader: () =>
-			import('src/backoffice/shared/components/workspace/workspace-action/save/workspace-action-node-save.element'),
 		meta: {
 			workspaces: ['Umb.Workspace.Media'],
+			label: 'Save',
 			look: 'primary',
 			color: 'positive',
+			api: UmbSaveWorkspaceAction,
 		},
 	},
 ];

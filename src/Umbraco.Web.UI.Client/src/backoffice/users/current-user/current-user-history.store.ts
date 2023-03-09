@@ -51,5 +51,5 @@ export class UmbCurrentUserHistoryStore {
 }
 
 export const UMB_CURRENT_USER_HISTORY_STORE_CONTEXT_TOKEN = new UmbContextToken<UmbCurrentUserHistoryStore>(
-	UmbCurrentUserHistoryStore.name
+	'UmbCurrentUserHistoryStore'
 );

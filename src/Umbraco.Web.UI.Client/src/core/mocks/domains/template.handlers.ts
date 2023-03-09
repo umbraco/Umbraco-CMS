@@ -1,6 +1,6 @@
 import { rest } from 'msw';
-import { umbracoPath } from '@umbraco-cms/utils';
 import { umbTemplateData } from '../data/template.data';
+import { umbracoPath } from '@umbraco-cms/utils';
 import { TemplateCreateModel, TemplateUpdateModel } from '@umbraco-cms/backend-api';
 
 // TODO: add schema

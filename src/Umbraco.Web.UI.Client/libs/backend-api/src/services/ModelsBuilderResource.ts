@@ -1,7 +1,6 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-import type { CreatedResultModel } from '../models/CreatedResultModel';
 import type { ModelsBuilderModel } from '../models/ModelsBuilderModel';
 import type { OutOfDateStatusModel } from '../models/OutOfDateStatusModel';
 
@@ -12,10 +11,10 @@ import { request as __request } from '../core/request';
 export class ModelsBuilderResource {
 
     /**
-     * @returns CreatedResultModel Created
+     * @returns any Success
      * @throws ApiError
      */
-    public static postModelsBuilderBuild(): CancelablePromise<CreatedResultModel> {
+    public static postModelsBuilderBuild(): CancelablePromise<any> {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/umbraco/management/api/v1/models-builder/build',

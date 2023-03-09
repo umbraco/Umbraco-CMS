@@ -1,13 +1,12 @@
 import { UUIInputElement, UUIInputEvent } from '@umbraco-ui/uui';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html } from 'lit';
-import { customElement, property, state } from 'lit/decorators.js';
-import { distinctUntilChanged } from 'rxjs';
+import { customElement, state } from 'lit/decorators.js';
+import type { UmbWorkspaceEntityElement } from '../../../shared/components/workspace/workspace-entity-element.interface';
 import { UmbWorkspaceDocumentTypeContext } from './document-type-workspace.context';
-import type { DocumentTypeDetails } from '@umbraco-cms/models';
-import { UmbModalService, UMB_MODAL_SERVICE_CONTEXT_TOKEN } from 'src/core/modal';
+import type { DocumentTypeModel } from '@umbraco-cms/backend-api';
 import { UmbLitElement } from '@umbraco-cms/element';
-import type { UmbWorkspaceEntityElement } from 'src/backoffice/shared/components/workspace/workspace-entity-element.interface';
+import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN } from '@umbraco-cms/modal';
 
 @customElement('umb-document-type-workspace')
 export class UmbDocumentTypeWorkspaceElement extends UmbLitElement implements UmbWorkspaceEntityElement {
@@ -29,6 +28,7 @@ export class UmbDocumentTypeWorkspaceElement extends UmbLitElement implements Um
 			#name {
 				width: 100%;
 				flex: 1 1 auto;
+				align-items: center;
 			}
 
 			#alias {
@@ -46,24 +46,23 @@ export class UmbDocumentTypeWorkspaceElement extends UmbLitElement implements Um
 		name: 'umb:document-dashed-line',
 	};
 
-
 	private _workspaceContext: UmbWorkspaceDocumentTypeContext = new UmbWorkspaceDocumentTypeContext(this);
 
 	@state()
-	private _documentType?: DocumentTypeDetails;
+	private _documentType?: DocumentTypeModel;
 
-	private _modalService?: UmbModalService;
+	private _modalContext?: UmbModalContext;
 
 	constructor() {
 		super();
 
-		this.consumeContext(UMB_MODAL_SERVICE_CONTEXT_TOKEN, (instance) => {
-			this._modalService = instance;
+		this.consumeContext(UMB_MODAL_CONTEXT_TOKEN, (instance) => {
+			this._modalContext = instance;
 		});
 
-		this.observe(this._workspaceContext.data.pipe(distinctUntilChanged()), (data) => {
-			// TODO: make method to identify if data is of type DocumentTypeDetails
-			this._documentType = data as DocumentTypeDetails;
+		this.observe(this._workspaceContext.data, (data) => {
+			// TODO: make method to identify if data is of type DocumentType
+			this._documentType = data as DocumentType;
 		});
 	}
 
@@ -72,7 +71,7 @@ export class UmbDocumentTypeWorkspaceElement extends UmbLitElement implements Um
 	}
 
 	public create(parentKey: string | null) {
-		this._workspaceContext.create(parentKey);
+		this._workspaceContext.createScaffold(parentKey);
 	}
 
 	// TODO. find a way where we don't have to do this for all workspaces.
@@ -87,11 +86,10 @@ export class UmbDocumentTypeWorkspaceElement extends UmbLitElement implements Um
 	}
 
 	private async _handleIconClick() {
-		const modalHandler = this._modalService?.iconPicker();
+		const modalHandler = this._modalContext?.iconPicker();
 
 		modalHandler?.onClose().then((saved) => {
 			if (saved) this._workspaceContext?.setIcon(saved.icon);
-			console.log(saved);
 			// TODO save color ALIAS as well
 		});
 	}
@@ -102,7 +100,7 @@ export class UmbDocumentTypeWorkspaceElement extends UmbLitElement implements Um
 				<div id="header" slot="header">
 					<uui-button id="icon" @click=${this._handleIconClick} compact>
 						<uui-icon
-							name="${this._documentType?.icon || 'umb:document-dashed-line'}"
+							name="${this._documentType?.icon || this._icon.name}"
 							style="color: ${this._icon.color}"></uui-icon>
 					</uui-button>
 

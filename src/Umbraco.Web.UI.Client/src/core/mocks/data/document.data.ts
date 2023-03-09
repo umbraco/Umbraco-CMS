@@ -1,427 +1,460 @@
 import { UmbEntityData } from './entity.data';
 import { createDocumentTreeItem } from './utils';
-import { DocumentTreeItemModel, PagedDocumentTreeItemModel } from '@umbraco-cms/backend-api';
-import type { DocumentDetails } from '@umbraco-cms/models';
+import {
+	ContentStateModel,
+	DocumentModel,
+	DocumentTreeItemModel,
+	PagedDocumentTreeItemModel,
+} from '@umbraco-cms/backend-api';
 
-export const data: Array<DocumentDetails> = [
+export const data: Array<DocumentModel> = [
 	{
-		name: 'Multiple Text String',
-		type: 'document',
-		icon: 'favorite',
-		hasChildren: false,
-		key: '6f31e382-458c-4f96-95ea-cc26c51009d4',
-		isContainer: false,
-		parentKey: null,
-		noAccess: false,
-		isProtected: false,
-		isPublished: false,
-		isEdited: false,
-		isTrashed: false,
-		properties: [
+		urls: [
 			{
-				alias: 'multipleTextString',
-				label: 'Multiple Text String',
-				description: '',
-				dataTypeKey: 'dt-multipleTextString',
+				culture: 'en-US',
+				url: '/',
 			},
 		],
-		data: [
+		templateKey: null,
+		key: 'all-property-editors-document-key',
+		contentTypeKey: 'all-property-editors-document-type-key',
+		values: [
 			{
-				alias: 'multipleTextString',
-				value: [
-					{
-						value: 'Value 1',
-					},
-					{
-						value: 'Value 2',
-					},
-					{
-						value: 'Value 3',
-					},
-				],
+				alias: 'email',
+				culture: null,
+				segment: null,
+				value: null,
 			},
-		],
-		variants: [],
-	},
-	{
-		name: 'All Property Editors',
-		type: 'document',
-		icon: 'favorite',
-		hasChildren: false,
-		key: '6f31e382-458c-4f96-97ea-cc26c41009d4',
-		isContainer: false,
-		parentKey: null,
-		noAccess: false,
-		isProtected: false,
-		isPublished: false,
-		isEdited: false,
-		isTrashed: false,
-		properties: [
 			{
 				alias: 'colorPicker',
-				label: 'Color Picker',
-				description: '',
-				dataTypeKey: 'dt-colorPicker',
+				culture: null,
+				segment: null,
+				value: null,
 			},
 			{
 				alias: 'contentPicker',
-				label: 'Content Picker',
-				description: '',
-				dataTypeKey: 'dt-contentPicker',
+				culture: null,
+				segment: null,
+				value: null,
 			},
 			{
 				alias: 'eyeDropper',
-				label: 'Eye Dropper',
-				description: '',
-				dataTypeKey: 'dt-eyeDropper',
+				culture: null,
+				segment: null,
+				value: null,
 			},
 			{
 				alias: 'multiUrlPicker',
-				label: 'Multi URL Picker',
-				description: '',
-				dataTypeKey: 'dt-multiUrlPicker',
+				culture: null,
+				segment: null,
+				value: null,
 			},
 			{
 				alias: 'multiNodeTreePicker',
-				label: 'Multi Node Tree Picker',
-				description: '',
-				dataTypeKey: 'dt-multiNodeTreePicker',
+				culture: null,
+				segment: null,
+				value: null,
 			},
 			{
 				alias: 'datePicker',
-				label: 'Date Picker',
-				description: '',
-				dataTypeKey: 'dt-datePicker',
+				culture: null,
+				segment: null,
+				value: '2023-12-24',
+			},
+			{
+				alias: 'datePickerTime',
+				culture: null,
+				segment: null,
+				value: '2023-12-24 14:52',
+			},
+			{
+				alias: 'time',
+				culture: null,
+				segment: null,
+				value: '14:52:00',
 			},
 			{
 				alias: 'email',
-				label: 'Email',
-				description: '',
-				dataTypeKey: 'dt-email',
+				culture: null,
+				segment: null,
+				value: null,
 			},
 			{
 				alias: 'textBox',
-				label: 'Text Box',
-				description: '',
-				dataTypeKey: 'dt-textBox',
+				culture: null,
+				segment: null,
+				value: null,
 			},
 			{
 				alias: 'dropdown',
-				label: 'Dropdown',
-				description: '',
-				dataTypeKey: 'dt-dropdown',
+				culture: null,
+				segment: null,
+				value: null,
 			},
 			{
 				alias: 'textArea',
-				label: 'Text Area',
-				description: '',
-				dataTypeKey: 'dt-textArea',
+				culture: null,
+				segment: null,
+				value: null,
 			},
 			{
 				alias: 'slider',
-				label: 'Slider',
-				description: '',
-				dataTypeKey: 'dt-slider',
+				culture: null,
+				segment: null,
+				value: null,
 			},
 			{
 				alias: 'toggle',
-				label: 'Toggle',
-				description: '',
-				dataTypeKey: 'dt-toggle',
+				culture: null,
+				segment: null,
+				value: null,
 			},
 			{
 				alias: 'tags',
-				label: 'Tags',
-				description: '',
-				dataTypeKey: 'dt-tags',
+				culture: null,
+				segment: null,
+				value: null,
 			},
 			{
 				alias: 'markdownEditor',
-				label: 'MarkdownEditor',
-				description: '',
-				dataTypeKey: 'dt-markdownEditor',
+				culture: null,
+				segment: null,
+				value: null,
 			},
 			{
 				alias: 'radioButtonList',
-				label: 'Radio Button List',
-				description: '',
-				dataTypeKey: 'dt-radioButtonList',
+				culture: null,
+				segment: null,
+				value: null,
 			},
 			{
 				alias: 'checkboxList',
-				label: 'Checkbox List',
-				description: '',
-				dataTypeKey: 'dt-checkboxList',
+				culture: null,
+				segment: null,
+				value: null,
 			},
 			{
 				alias: 'blockList',
-				label: 'Block List',
-				description: '',
-				dataTypeKey: 'dt-blockList',
+				culture: null,
+				segment: null,
+				value: null,
 			},
 			{
 				alias: 'mediaPicker',
-				label: 'Media Picker',
-				description: '',
-				dataTypeKey: 'dt-mediaPicker',
+				culture: null,
+				segment: null,
+				value: null,
 			},
 			{
 				alias: 'imageCropper',
-				label: 'Image Cropper',
-				description: '',
-				dataTypeKey: 'dt-imageCropper',
+				culture: null,
+				segment: null,
+				value: null,
 			},
 			{
 				alias: 'uploadField',
-				label: 'Upload Field',
-				description: '',
-				dataTypeKey: 'dt-uploadField',
+				culture: null,
+				segment: null,
+				value: null,
 			},
 			{
 				alias: 'blockGrid',
-				label: 'Block Grid',
-				description: '',
-				dataTypeKey: 'dt-blockGrid',
+				culture: null,
+				segment: null,
+				value: null,
 			},
 			{
 				alias: 'blockGrid',
-				label: 'Icon Picker',
-				description: '',
-				dataTypeKey: 'dt-iconPicker',
+				culture: null,
+				segment: null,
+				value: null,
 			},
 			{
 				alias: 'numberRange',
-				label: 'Number Range',
-				description: '',
-				dataTypeKey: 'dt-numberRange',
+				culture: null,
+				segment: null,
+				value: null,
 			},
 			{
 				alias: 'orderDirection',
-				label: 'Order Direction',
-				description: '',
-				dataTypeKey: 'dt-orderDirection',
+				culture: null,
+				segment: null,
+				value: null,
 			},
 			{
 				alias: 'overlaySize',
-				label: 'Overlay Size',
-				description: '',
-				dataTypeKey: 'dt-overlaySize',
+				culture: null,
+				segment: null,
+				value: null,
 			},
 			{
 				alias: 'label',
-				label: 'Label',
-				description: '',
-				dataTypeKey: 'dt-label',
+				culture: null,
+				segment: null,
+				value: null,
 			},
 			{
 				alias: 'integer',
-				label: 'Integer',
-				description: '',
-				dataTypeKey: 'dt-integer',
+				culture: null,
+				segment: null,
+				value: null,
 			},
 			{
 				alias: 'decimal',
-				label: 'Decimal',
-				description: '',
-				dataTypeKey: 'dt-decimal',
+				culture: null,
+				segment: null,
+				value: null,
 			},
 			{
 				alias: 'memberPicker',
-				label: 'Member Picker',
-				description: '',
-				dataTypeKey: 'dt-memberPicker',
+				culture: null,
+				segment: null,
+				value: null,
 			},
 			{
 				alias: 'memberGroupPicker',
-				label: 'Member Group Picker',
-				description: '',
-				dataTypeKey: 'dt-memberGroupPicker',
+				culture: null,
+				segment: null,
+				value: null,
 			},
 			{
 				alias: 'userPicker',
-				label: 'User Picker',
-				description: '',
-				dataTypeKey: 'dt-userPicker',
+				culture: null,
+				segment: null,
+				value: null,
 			},
 		],
-		data: [],
-		variants: [],
+		variants: [
+			{
+				state: ContentStateModel.PUBLISHED,
+				publishDate: '2023-02-06T15:31:51.354764',
+				culture: 'en-us',
+				segment: null,
+				name: 'All properties',
+				createDate: '2023-02-06T15:31:46.876902',
+				updateDate: '2023-02-06T15:31:51.354764',
+			},
+		],
 	},
 	{
-		name: 'Document 1',
-		type: 'document',
-		icon: 'document',
-		hasChildren: false,
-		key: '74e4008a-ea4f-4793-b924-15e02fd380d1',
+		urls: [
+			{
+				culture: 'en-US',
+				url: '/',
+			},
+		],
+		templateKey: null,
+		key: 'c05da24d-7740-447b-9cdc-bd8ce2172e38',
+		contentTypeKey: '29643452-cff9-47f2-98cd-7de4b6807681',
+		values: [
+			{
+				culture: null,
+				segment: null,
+				alias: 'masterText',
+				value: 'i have a master text',
+			},
+			{
+				culture: null,
+				segment: null,
+				alias: 'pageTitle',
+				value: 'with a page title',
+			},
+			{
+				culture: null,
+				segment: null,
+				alias: 'blogPostText',
+				value: 'My first blog post',
+			},
+			{
+				culture: 'en-us',
+				segment: null,
+				alias: 'blogTextStringUnderMasterTab',
+				value: 'in the master tab',
+			},
+			{
+				culture: 'en-us',
+				segment: null,
+				alias: 'blogTextStringUnderGroupUnderMasterTab',
+				value: 'which is under another group in the tab',
+			},
+			{
+				culture: 'da-dk',
+				segment: null,
+				alias: 'blogTextStringUnderMasterTab',
+				value: 'på master dokument tab B',
+			},
+			{
+				culture: 'da-dk',
+				segment: null,
+				alias: 'blogTextStringUnderGroupUnderMasterTab',
+				value: 'denne er under en anden gruppe i tab B',
+			},
+			{
+				culture: 'no-no',
+				segment: null,
+				alias: 'blogTextStringUnderMasterTab',
+				value: 'Norsk på master dokument tab B',
+			},
+			{
+				culture: 'no-no',
+				segment: null,
+				alias: 'blogTextStringUnderGroupUnderMasterTab',
+				value: 'Norsk denne er under en anden gruppe i tab B',
+			},
+			{
+				culture: null,
+				segment: null,
+				alias: 'localBlogTabString',
+				value: '1234567',
+			},
+		],
+		variants: [
+			{
+				state: ContentStateModel.PUBLISHED,
+				publishDate: '2023-02-06T15:31:51.354764',
+				culture: 'en-us',
+				segment: null,
+				name: 'Article in english',
+				createDate: '2023-02-06T15:31:46.876902',
+				updateDate: '2023-02-06T15:31:51.354764',
+			},
+			{
+				state: ContentStateModel.PUBLISHED,
+				publishDate: '2023-02-06T15:31:51.354764',
+				culture: 'da-dk',
+				segment: null,
+				name: 'Artikel på Dansk',
+				createDate: '2023-02-06T15:31:46.876902',
+				updateDate: '2023-02-06T15:31:51.354764',
+			},
+			{
+				state: ContentStateModel.PUBLISHED,
+				publishDate: '2023-02-06T15:31:51.354764',
+				culture: 'no-no',
+				segment: null,
+				name: 'Artikel på Norsk',
+				createDate: '2023-02-06T15:31:46.876902',
+				updateDate: '2023-02-06T15:31:51.354764',
+			},
+		],
+	},
+	{
+		urls: [],
+		templateKey: null,
+		key: 'fd56a0b5-01a0-4da2-b428-52773bfa9cc4',
+		contentTypeKey: '29643452-cff9-47f2-98cd-7de4b6807681',
+		values: [
+			{
+				culture: null,
+				segment: null,
+				alias: 'masterText',
+				value: 'i have a master text B',
+			},
+			{
+				culture: null,
+				segment: null,
+				alias: 'pageTitle',
+				value: 'with a page title B',
+			},
+			{
+				culture: null,
+				segment: null,
+				alias: 'blogPostText',
+				value: 'My first blog post B',
+			},
+			{
+				culture: 'en-us',
+				segment: null,
+				alias: 'blogTextStringUnderMasterTab',
+				value: 'in the master tab B',
+			},
+			{
+				culture: 'en-us',
+				segment: null,
+				alias: 'blogTextStringUnderGroupUnderMasterTab',
+				value: 'which is under another group in the tab B',
+			},
+			{
+				culture: 'da-dk',
+				segment: null,
+				alias: 'blogTextStringUnderMasterTab',
+				value: 'på master dokument tab B',
+			},
+			{
+				culture: 'da-dk',
+				segment: null,
+				alias: 'blogTextStringUnderGroupUnderMasterTab',
+				value: 'denne er under en anden gruppe i tab B',
+			},
+			{
+				culture: null,
+				segment: null,
+				alias: 'localBlogTabString',
+				value: '1234567890',
+			},
+		],
+		variants: [
+			{
+				state: ContentStateModel.DRAFT,
+				publishDate: '2023-02-06T15:32:24.957009',
+				culture: 'en-us',
+				segment: null,
+				name: 'Blog post B',
+				createDate: '2023-02-06T15:32:05.350038',
+				updateDate: '2023-02-06T15:32:24.957009',
+			},
+		],
+	},
+];
+
+export const treeData: Array<DocumentTreeItemModel> = [
+	{
+		$type: 'DocumentTreeItemViewModel',
+		isProtected: false,
+		isPublished: true,
+		isEdited: false,
+		noAccess: false,
+		isTrashed: false,
+		key: 'all-property-editors-document-key',
 		isContainer: false,
 		parentKey: null,
-		noAccess: false,
-		isProtected: false,
-		isPublished: false,
-		isEdited: false,
-		isTrashed: false,
-		properties: [
-			{
-				alias: 'myHeadline',
-				label: 'Headline',
-				description: 'Text string property',
-				dataTypeKey: 'dt-textBox',
-			},
-			{
-				alias: 'myDescription',
-				label: 'Description',
-				description: 'Textarea property',
-				dataTypeKey: 'dt-textArea',
-			},
-		],
-		data: [
-			{
-				alias: 'myHeadline',
-				value: 'The daily life at Umbraco HQ',
-			},
-			{
-				alias: 'myDescription',
-				value: 'Every day, a rabbit in a military costume greets me at the front door',
-			},
-		],
-		variants: [{ name: 'fake data' }],
-		/*
-	// Concept for node layout, separation of design from config and data.
-	layout: [
-	  {
-		type: 'group',
-		children: [
-		  {
-			type: 'property',
-			alias: 'myHeadline'
-		  },
-		  {
-			type: 'property',
-			alias: 'myDescription'
-		  }
-		]
-	  }
-	],
-	*/
-	},
-	{
-		name: 'Document 2',
+		name: 'All property editors',
 		type: 'document',
-		icon: 'favorite',
-		hasChildren: false,
-		key: '74e4008a-ea4f-4793-b924-15e02fd380d2',
-		isContainer: false,
-		parentKey: null,
-		noAccess: false,
-		isProtected: false,
-		isPublished: false,
-		isEdited: false,
-		isTrashed: false,
-		properties: [
-			{
-				alias: 'myHeadline',
-				label: 'Text string label',
-				description: 'this is a text string property',
-				dataTypeKey: 'dt-textBox',
-			},
-			{
-				alias: 'myDescription',
-				label: 'Textarea label',
-				description: 'This is the a textarea property',
-				dataTypeKey: 'dt-textArea',
-			},
-			{
-				alias: 'myExternalEditor',
-				label: 'My JS Property Editor',
-				description: 'This is the a external property',
-				dataTypeKey: 'dt-custom',
-			},
-			{
-				alias: 'myContentPicker',
-				label: 'Content Picker',
-				description: 'This is a content picker',
-				dataTypeKey: 'dt-contentPicker',
-			},
-		],
-		data: [
-			{
-				alias: 'myHeadline',
-				value: 'Is it all just fun and curling and scary rabbits?',
-			},
-			{
-				alias: 'myDescription',
-				value:
-					"So no, there's not confetti every day. And no, there's not champagne every week or a crazy rabbit running around 🐰",
-			},
-			{
-				alias: 'myExternalEditor',
-				value: 'Tex lkasdfkljdfsa 1',
-			},
-			{
-				alias: 'myContextExampleEditor',
-				value: '',
-			},
-			{
-				alias: 'myContentPicker',
-				value: '',
-			},
-		],
-		variants: [{ name: 'Variant 1' }],
-	},
-	{
-		name: 'Document 3',
-		type: 'document',
-		icon: 'document',
+		icon: 'icon-item-arrangement',
 		hasChildren: true,
-		key: 'cdd30288-2d1c-41b4-89a9-61647b4a10d5',
+	},
+	{
+		$type: 'DocumentTreeItemViewModel',
+		isProtected: false,
+		isPublished: true,
+		isEdited: false,
+		noAccess: false,
+		isTrashed: false,
+		key: 'c05da24d-7740-447b-9cdc-bd8ce2172e38',
 		isContainer: false,
 		parentKey: null,
-		noAccess: false,
-		isProtected: false,
-		isPublished: false,
-		isEdited: false,
-		isTrashed: false,
-		properties: [
-			{
-				alias: 'myDescription',
-				label: 'Description',
-				description: 'Textarea property',
-				dataTypeKey: 'dt-textArea',
-			},
-		],
-		data: [
-			{
-				alias: 'myDescription',
-				value: 'Every day, a rabbit in a military costume greets me at the front door',
-			},
-		],
-		variants: [],
-	},
-	{
-		name: 'Document 4',
+		name: 'Article in english',
 		type: 'document',
-		icon: 'document',
-		hasChildren: false,
-		key: 'f6f7a5b2-e7c0-463a-97bc-6cb5b9bcf447',
-		isContainer: false,
-		parentKey: 'cdd30288-2d1c-41b4-89a9-61647b4a10d5',
-		noAccess: false,
+		icon: 'icon-item-arrangement',
+		hasChildren: true,
+	},
+	{
+		$type: 'DocumentTreeItemViewModel',
 		isProtected: false,
 		isPublished: false,
 		isEdited: false,
+		noAccess: false,
 		isTrashed: false,
-		properties: [
-			{
-				alias: 'myDescription',
-				label: 'Description',
-				description: 'Textarea property',
-				dataTypeKey: 'dt-textArea',
-			},
-		],
-		data: [],
-		variants: [],
+		key: 'fd56a0b5-01a0-4da2-b428-52773bfa9cc4',
+		isContainer: false,
+		parentKey: 'c05da24d-7740-447b-9cdc-bd8ce2172e38',
+		name: 'Blog post B',
+		type: 'document',
+		icon: 'icon-item-arrangement',
+		hasChildren: false,
 	},
 	{
+		$type: 'DocumentTreeItemViewModel',
 		name: 'Document 5',
 		type: 'document',
 		icon: 'document',
@@ -434,9 +467,6 @@ export const data: Array<DocumentDetails> = [
 		isPublished: false,
 		isEdited: false,
 		isTrashed: false,
-		properties: [],
-		data: [],
-		variants: [],
 	},
 ];
 
@@ -444,27 +474,29 @@ export const data: Array<DocumentDetails> = [
 // TODO: all properties are optional in the server schema. I don't think this is correct.
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
-class UmbDocumentData extends UmbEntityData<DocumentDetails> {
+class UmbDocumentData extends UmbEntityData<DocumentModel> {
+	private treeData = treeData;
+
 	constructor() {
 		super(data);
 	}
 
 	getTreeRoot(): PagedDocumentTreeItemModel {
-		const items = this.data.filter((item) => item.parentKey === null);
+		const items = this.treeData.filter((item) => item.parentKey === null);
 		const treeItems = items.map((item) => createDocumentTreeItem(item));
 		const total = items.length;
 		return { items: treeItems, total };
 	}
 
 	getTreeItemChildren(key: string): PagedDocumentTreeItemModel {
-		const items = this.data.filter((item) => item.parentKey === key);
+		const items = this.treeData.filter((item) => item.parentKey === key);
 		const treeItems = items.map((item) => createDocumentTreeItem(item));
 		const total = items.length;
 		return { items: treeItems, total };
 	}
 
 	getTreeItem(keys: Array<string>): Array<DocumentTreeItemModel> {
-		const items = this.data.filter((item) => keys.includes(item.key ?? ''));
+		const items = this.treeData.filter((item) => keys.includes(item.key ?? ''));
 		return items.map((item) => createDocumentTreeItem(item));
 	}
 }

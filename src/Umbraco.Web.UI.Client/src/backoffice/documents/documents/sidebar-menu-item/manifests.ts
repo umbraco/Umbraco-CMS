@@ -1,16 +1,16 @@
-import type { ManifestSidebarMenuItem } from '@umbraco-cms/models';
+import type { ManifestMenuItem } from '@umbraco-cms/models';
 
-const sidebarMenuItem: ManifestSidebarMenuItem = {
-	type: 'sidebarMenuItem',
-	alias: 'Umb.SidebarMenuItem.Documents',
-	name: 'Documents Sidebar Menu Item',
+const menuItem: ManifestMenuItem = {
+	type: 'menuItem',
+	alias: 'Umb.MenuItem.Documents',
+	name: 'Documents Menu Item',
 	weight: 100,
 	loader: () => import('./document-sidebar-menu-item.element'),
 	meta: {
 		label: 'Documents',
 		icon: 'umb:folder',
-		sections: ['Umb.Section.Content'],
+		menus: ['Umb.Menu.Content'],
 	},
 };
 
-export const manifests = [sidebarMenuItem];
+export const manifests = [menuItem];

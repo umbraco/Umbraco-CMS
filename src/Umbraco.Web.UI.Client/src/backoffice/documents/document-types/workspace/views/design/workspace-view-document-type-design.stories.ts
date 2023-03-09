@@ -15,10 +15,10 @@ export default {
 	decorators: [
 		(story) => {
 			return html`TODO: make use of mocked workspace context??`;
-			/*html` <umb-context-provider key="umbDocumentTypeContext" .value=${new UmbWorkspaceDataTypeContext(data[0])}>
+			/*html` <umb-context-provider key="umbDocumentTypeContext" .value=${new UmbDataTypeWorkspaceContext(data[0])}>
 				${story()}
 			</umb-context-provider>`,*/
-		}
+		},
 	],
 } as Meta;
 
