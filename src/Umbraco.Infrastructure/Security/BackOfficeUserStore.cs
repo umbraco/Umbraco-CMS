@@ -192,7 +192,7 @@ public class BackOfficeUserStore :
         if (scope.Notifications.PublishCancelable(savingNotification))
         {
             scope.Complete();
-            return Task.FromResult(UserOperationStatus.CancelledByNotifications);
+            return Task.FromResult(UserOperationStatus.CancelledByNotification);
         }
 
         if (string.IsNullOrWhiteSpace(user.Username))
