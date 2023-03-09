@@ -908,6 +908,8 @@
     <key alias="header">Header</key>
     <key alias="systemField">system field</key>
     <key alias="lastUpdated">Last Updated</key>
+    <key alias="skipToMenu">Skip to menu</key>
+    <key alias="skipToContent">Skip to content</key>
   </area>
   <area alias="colors">
     <key alias="blue">Blue</key>
