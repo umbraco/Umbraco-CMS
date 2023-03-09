@@ -1,5 +1,5 @@
 import { DOCUMENT_REPOSITORY_ALIAS } from '../repository/manifests';
-import { UmbCreateDocumentEntityAction } from './create.action';
+import { UmbCreateDocumentEntityAction } from './create/create.action';
 import { UmbPublishDocumentEntityAction } from './publish.action';
 import { UmbDocumentCultureAndHostnamesEntityAction } from './culture-and-hostnames.action';
 import { UmbCreateDocumentBlueprintEntityAction } from './create-blueprint.action';

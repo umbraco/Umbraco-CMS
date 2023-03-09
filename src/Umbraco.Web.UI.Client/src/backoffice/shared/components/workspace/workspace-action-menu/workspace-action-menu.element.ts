@@ -23,7 +23,10 @@ export class UmbWorkspaceActionMenuElement extends UmbLitElement {
 				height: 100%;
 				box-sizing: border-box;
 				box-shadow: var(--uui-shadow-depth-3);
-				width: 500px;
+				width: 250px;
+				position: absolute;
+				right: 5px;
+				height: auto;
 			}
 		`,
 	];
