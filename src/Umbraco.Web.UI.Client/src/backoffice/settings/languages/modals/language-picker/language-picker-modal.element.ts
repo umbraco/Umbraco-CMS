@@ -65,6 +65,8 @@ export class UmbLanguagePickerModalElement extends UmbModalLayoutPickerBase<Lang
 	}
 }
 
+export default UmbLanguagePickerModalElement;
+
 declare global {
 	interface HTMLElementTagNameMap {
 		'umb-language-picker-modal': UmbLanguagePickerModalElement;
