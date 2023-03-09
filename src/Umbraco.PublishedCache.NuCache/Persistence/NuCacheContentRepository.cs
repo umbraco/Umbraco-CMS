@@ -117,7 +117,8 @@ public class NuCacheContentRepository : RepositoryBase, INuCacheContentRepositor
             {
                 Database.Execute($"TRUNCATE TABLE cmsContentNu");
             }
-            if(Database.DatabaseType == DatabaseType.SQLite)
+
+            if (Database.DatabaseType == DatabaseType.SQLite)
             {
                 Database.Execute($"DELETE FROM cmsContentNu");
             }
