@@ -20,8 +20,8 @@ import customElementManifests from '../custom-elements.json';
 import { UmbIconStore } from '../libs/store/icon/icon.store';
 import { onUnhandledRequest } from '../src/core/mocks/browser';
 import { handlers } from '../src/core/mocks/browser-handlers';
-import { LitElement } from 'lit';
 import { UMB_MODAL_CONTEXT_TOKEN, UmbModalContext } from '../libs/modal';
+import { UmbLitElement } from '../libs/element';
 
 import { umbExtensionsRegistry } from '../libs/extensions-api';
 
@@ -30,13 +30,14 @@ import '../src/backoffice/shared/components';
 
 import { manifests as documentManifests } from '../src/backoffice/documents';
 
-class UmbStoryBookElement extends LitElement {
+class UmbStoryBookElement extends UmbLitElement {
 	_umbIconStore = new UmbIconStore();
 
 	constructor() {
 		super();
 		this._umbIconStore.attach(this);
 		this._registerExtensions(documentManifests);
+		this.provideContext(UMB_MODAL_CONTEXT_TOKEN, new UmbModalContext(this));
 	}
 
 	_registerExtensions(manifests) {
@@ -47,7 +48,8 @@ class UmbStoryBookElement extends LitElement {
 	}
 
 	render() {
-		return html`<slot></slot>`;
+		return html`<slot></slot>
+			<umb-backoffice-modal-container></umb-backoffice-modal-container> `;
 	}
 }
 
@@ -71,16 +73,6 @@ const documentTreeStoreProvider = (story) => html`
 	<umb-controller-host-test .create=${(host) => new UmbDocumentTreeStore(host)}>${story()}</umb-controller-host-test>
 `;
 
-const modalContextProvider = (story) => html`
-	<umb-context-provider
-		style="display: block; padding: 32px;"
-		key="${UMB_MODAL_CONTEXT_TOKEN}"
-		.value=${new UmbModalContext()}>
-		${story()}
-		<umb-backoffice-modal-container></umb-backoffice-modal-container>
-	</umb-context-provider>
-`;
-
 // Initialize MSW
 initialize({ onUnhandledRequest });
 
@@ -92,7 +84,6 @@ export const decorators = [
 	documentTreeStoreProvider,
 	dataTypeStoreProvider,
 	documentTypeStoreProvider,
-	modalContextProvider,
 ];
 
 export const parameters = {
