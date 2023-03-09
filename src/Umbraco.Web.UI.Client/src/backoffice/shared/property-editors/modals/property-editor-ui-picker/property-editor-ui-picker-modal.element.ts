@@ -5,10 +5,10 @@ import { repeat } from 'lit/directives/repeat.js';
 import { groupBy } from 'lodash-es';
 import type { UUIInputEvent } from '@umbraco-ui/uui';
 import type { UmbModalHandler } from '../../../../../../libs/modal/modal-handler';
+import { UmbPropertyEditorUIPickerModalData } from '.';
 import type { ManifestPropertyEditorUI } from '@umbraco-cms/models';
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-api';
 import { UmbLitElement } from '@umbraco-cms/element';
-import { UmbPropertyEditorUIPickerModalData } from '.';
 
 interface GroupedPropertyEditorUIs {
 	[key: string]: Array<ManifestPropertyEditorUI>;

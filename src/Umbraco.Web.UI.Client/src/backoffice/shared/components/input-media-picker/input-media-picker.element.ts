@@ -5,11 +5,11 @@ import { ifDefined } from 'lit-html/directives/if-defined.js';
 import { FormControlMixin } from '@umbraco-ui/uui-base/lib/mixins';
 import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN } from '../../../../../libs/modal';
 import { UmbMediaRepository } from '../../../media/media/repository/media.repository';
+import { UMB_CONFIRM_MODAL_TOKEN } from '../../modals/confirm';
 import { UmbLitElement } from '@umbraco-cms/element';
 import type { EntityTreeItemModel, FolderTreeItemModel } from '@umbraco-cms/backend-api';
 import type { UmbObserverController } from '@umbraco-cms/observable-api';
 import { UMB_MEDIA_PICKER_MODAL_TOKEN } from 'src/backoffice/media/media/modals/media-picker';
-import { UMB_CONFIRM_MODAL_TOKEN } from '../../modals/confirm';
 
 @customElement('umb-input-media-picker')
 export class UmbInputMediaPickerElement extends FormControlMixin(UmbLitElement) {

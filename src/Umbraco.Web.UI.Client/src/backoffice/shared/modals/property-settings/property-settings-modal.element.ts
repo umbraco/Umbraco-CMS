@@ -2,8 +2,8 @@ import { UUIBooleanInputEvent, UUIInputEvent, UUISelectEvent } from '@umbraco-ui
 import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, html, nothing } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
-import { UmbModalContext, UmbModalLayoutElement, UMB_MODAL_CONTEXT_TOKEN } from '@umbraco-cms/modal';
 import { UMB_PROPERTY_EDITOR_UI_PICKER_MODAL_TOKEN } from '../../property-editors/modals/property-editor-ui-picker';
+import { UmbModalContext, UmbModalLayoutElement, UMB_MODAL_CONTEXT_TOKEN } from '@umbraco-cms/modal';
 import { ManifestPropertyEditorUI } from '@umbraco-cms/extensions-registry';
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-api';
 

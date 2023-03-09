@@ -1,13 +1,13 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, html } from 'lit';
 import { customElement, property, queryAll, state } from 'lit/decorators.js';
+import { query } from 'router-slot';
 import {
 	LogViewerDateRange,
 	UmbLogViewerWorkspaceContext,
 	UMB_APP_LOG_VIEWER_CONTEXT_TOKEN,
 } from '../../logviewer.context';
 import { UmbLitElement } from '@umbraco-cms/element';
-import { query } from 'router-slot';
 
 @customElement('umb-log-viewer-date-range-selector')
 export class UmbLogViewerDateRangeSelectorElement extends UmbLitElement {

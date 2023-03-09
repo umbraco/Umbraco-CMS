@@ -5,11 +5,11 @@ import { ifDefined } from 'lit-html/directives/if-defined.js';
 import { FormControlMixin } from '@umbraco-ui/uui-base/lib/mixins';
 import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN } from '../../../../../libs/modal';
 import { UmbLanguageRepository } from '../../../settings/languages/repository/language.repository';
+import { UMB_CONFIRM_MODAL_TOKEN } from '../../modals/confirm';
 import { UmbChangeEvent } from '@umbraco-cms/events';
 import { UmbLitElement } from '@umbraco-cms/element';
 import type { LanguageModel } from '@umbraco-cms/backend-api';
 import type { UmbObserverController } from '@umbraco-cms/observable-api';
-import { UMB_CONFIRM_MODAL_TOKEN } from '../../modals/confirm';
 import { UMB_LANGUAGE_PICKER_MODAL_TOKEN } from 'src/backoffice/settings/languages/modals/language-picker';
 
 @customElement('umb-input-language-picker')

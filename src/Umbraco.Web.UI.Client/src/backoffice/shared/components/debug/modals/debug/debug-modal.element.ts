@@ -1,8 +1,8 @@
 import { css, html } from 'lit';
 import { customElement } from 'lit/decorators.js';
 import { UUITextStyles } from '@umbraco-ui/uui-css';
-import { UmbModalLayoutElement } from '@umbraco-cms/modal';
 import { UmbContextDebuggerModalData } from '.';
+import { UmbModalLayoutElement } from '@umbraco-cms/modal';
 
 @customElement('umb-context-debugger-modal')
 export default class UmbContextDebuggerModalElement extends UmbModalLayoutElement<UmbContextDebuggerModalData> {
