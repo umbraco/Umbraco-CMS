@@ -10,7 +10,7 @@ import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 import { tryExecuteAndNotify } from '@umbraco-cms/resources';
 
 /**
- * A data source for the Data Type that fetches data from the server
+ * A data source for the Relation Type that fetches data from the server
  * @export
  * @class UmbRelationTypeServerDataSource
  * @implements {RepositoryDetailDataSource}
@@ -28,7 +28,7 @@ export class UmbRelationTypeServerDataSource implements RepositoryDetailDataSour
 	}
 
 	/**
-	 * Fetches a Data Type with the given key from the server
+	 * Fetches a Relation Type with the given key from the server
 	 * @param {string} key
 	 * @return {*}
 	 * @memberof UmbRelationTypeServerDataSource
@@ -48,7 +48,7 @@ export class UmbRelationTypeServerDataSource implements RepositoryDetailDataSour
 	}
 
 	/**
-	 * Creates a new Data Type scaffold
+	 * Creates a new Relation Type scaffold
 	 * @param {(string | null)} parentKey
 	 * @return {*}
 	 * @memberof UmbRelationTypeServerDataSource
@@ -63,7 +63,7 @@ export class UmbRelationTypeServerDataSource implements RepositoryDetailDataSour
 	}
 
 	/**
-	 * Inserts a new Data Type on the server
+	 * Inserts a new Relation Type on the server
 	 * @param {Document} RelationType
 	 * @return {*}
 	 * @memberof UmbRelationTypeServerDataSource
@@ -135,7 +135,7 @@ export class UmbRelationTypeServerDataSource implements RepositoryDetailDataSour
 	}
 
 	/**
-	 * Deletes a Data Type on the server
+	 * Deletes a Relation Type on the server
 	 * @param {string} key
 	 * @return {*}
 	 * @memberof UmbRelationTypeServerDataSource

@@ -20,7 +20,7 @@ export class UmbRelationTypesMenuItemElement extends UmbLitElement {
 	// TODO: can we make this reusable?
 	render() {
 		return html`<umb-tree-item
-			label="Data Types"
+			label="Relation Types"
 			icon="umb:folder"
 			entity-type="relation-type"
 			@show-children=${this._onShowChildren}

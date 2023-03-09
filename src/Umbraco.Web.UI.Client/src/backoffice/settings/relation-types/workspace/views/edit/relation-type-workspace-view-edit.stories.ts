@@ -9,7 +9,7 @@ import './relation-type-workspace-view-edit.element';
 //import { UmbRelationTypeWorkspaceContext } from '../../workspace-relation-type.context';
 
 export default {
-	title: 'Workspaces/Data Type/Views/Edit',
+	title: 'Workspaces/Relation Type/Views/Edit',
 	component: 'umb-relation-type-workspace-view-edit',
 	id: 'umb-relation-type-workspace-view-edit',
 	decorators: [

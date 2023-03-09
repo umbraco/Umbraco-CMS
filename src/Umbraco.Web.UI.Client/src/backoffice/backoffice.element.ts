@@ -35,6 +35,8 @@ import { UmbDocumentBlueprintDetailStore } from './documents/document-blueprints
 import { UmbDocumentBlueprintTreeStore } from './documents/document-blueprints/document-blueprint.tree.store';
 import { UmbDataTypeStore } from './settings/data-types/repository/data-type.store';
 import { UmbDataTypeTreeStore } from './settings/data-types/repository/data-type.tree.store';
+import { UmbRelationTypeStore } from './settings/relation-types/repository/relation-type.store';
+import { UmbRelationTypeTreeStore } from './settings/relation-types/repository/relation-type.tree.store';
 import { UmbTemplateTreeStore } from './templating/templates/tree/data/template.tree.store';
 import { UmbTemplateDetailStore } from './templating/templates/workspace/data/template.detail.store';
 import { UmbThemeContext } from './themes/theme.context';
@@ -94,6 +96,8 @@ export class UmbBackofficeElement extends UmbLitElement {
 		new UmbMediaDetailStore(this);
 		new UmbMediaTreeStore(this);
 		new UmbDataTypeStore(this);
+		new UmbRelationTypeStore(this);
+		new UmbRelationTypeTreeStore(this);
 		new UmbDataTypeTreeStore(this);
 		new UmbUserStore(this);
 		new UmbMediaTypeDetailStore(this);

@@ -7,7 +7,7 @@ import { UmbLitElement } from '@umbraco-cms/element';
 
 /**
  * @element umb-relation-type-workspace
- * @description - Element for displaying a Data Type Workspace
+ * @description - Element for displaying a Relation Type Workspace
  */
 @customElement('umb-relation-type-workspace')
 export class UmbRelationTypeWorkspaceElement extends UmbLitElement {

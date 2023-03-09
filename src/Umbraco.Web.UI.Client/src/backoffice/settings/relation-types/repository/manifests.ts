@@ -6,7 +6,7 @@ export const RELATION_TYPE_REPOSITORY_ALIAS = 'Umb.Repository.RelationTypes';
 const repository: ManifestRepository = {
 	type: 'repository',
 	alias: RELATION_TYPE_REPOSITORY_ALIAS,
-	name: 'Data Types Repository',
+	name: 'Relation Types Repository',
 	class: UmbRelationTypeRepository,
 };
 

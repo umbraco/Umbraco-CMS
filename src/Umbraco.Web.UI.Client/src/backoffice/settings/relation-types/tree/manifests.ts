@@ -4,7 +4,7 @@ import type { ManifestTree } from '@umbraco-cms/models';
 const tree: ManifestTree = {
 	type: 'tree',
 	alias: 'Umb.Tree.RelationTypes',
-	name: 'Data Types Tree',
+	name: 'Relation Types Tree',
 	meta: {
 		repository: UmbRelationTypeRepository,
 	},

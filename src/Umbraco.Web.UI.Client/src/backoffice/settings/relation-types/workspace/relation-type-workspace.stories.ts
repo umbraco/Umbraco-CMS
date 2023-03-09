@@ -8,7 +8,7 @@ import { data } from '../../../../core/mocks/data/relation-type.data';
 import type { UmbRelationTypeWorkspaceElement } from './relation-type-workspace.element';
 
 export default {
-	title: 'Workspaces/Data Type',
+	title: 'Workspaces/Relation Type',
 	component: 'umb-relation-type-workspace',
 	id: 'umb-relation-type-workspace',
 } as Meta;

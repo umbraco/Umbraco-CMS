@@ -4,7 +4,7 @@ import type { ManifestWorkspace, ManifestWorkspaceAction, ManifestWorkspaceView 
 const workspace: ManifestWorkspace = {
 	type: 'workspace',
 	alias: 'Umb.Workspace.RelationType',
-	name: 'Data Type Workspace',
+	name: 'Relation Type Workspace',
 	loader: () => import('./relation-type-workspace.element'),
 	meta: {
 		entityType: 'relation-type',
@@ -15,7 +15,7 @@ const workspaceViews: Array<ManifestWorkspaceView> = [
 	{
 		type: 'workspaceView',
 		alias: 'Umb.WorkspaceView.RelationType.Edit',
-		name: 'Data Type Workspace Edit View',
+		name: 'Relation Type Workspace Edit View',
 		loader: () => import('./views/edit/relation-type-workspace-view-edit.element'),
 		weight: 90,
 		meta: {
@@ -28,7 +28,7 @@ const workspaceViews: Array<ManifestWorkspaceView> = [
 	{
 		type: 'workspaceView',
 		alias: 'Umb.WorkspaceView.RelationType.Info',
-		name: 'Data Type Workspace Info View',
+		name: 'Relation Type Workspace Info View',
 		loader: () => import('./views/info/workspace-view-relation-type-info.element'),
 		weight: 90,
 		meta: {
@@ -44,7 +44,7 @@ const workspaceActions: Array<ManifestWorkspaceAction> = [
 	{
 		type: 'workspaceAction',
 		alias: 'Umb.WorkspaceAction.RelationType.Save',
-		name: 'Save Data Type Workspace Action',
+		name: 'Save Relation Type Workspace Action',
 		meta: {
 			workspaces: ['Umb.Workspace.RelationType'],
 			label: 'Save',

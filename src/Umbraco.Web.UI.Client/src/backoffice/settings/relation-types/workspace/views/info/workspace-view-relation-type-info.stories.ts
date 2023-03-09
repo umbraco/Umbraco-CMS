@@ -9,7 +9,7 @@ import { html } from 'lit-html';
 import type { UmbWorkspaceViewRelationTypeInfoElement } from './workspace-view-relation-type-info.element';
 
 export default {
-	title: 'Workspaces/Data Type/Views/Info',
+	title: 'Workspaces/Relation Type/Views/Info',
 	component: 'umb-workspace-view-relation-type-info',
 	id: 'umb-workspace-view-relation-type-info',
 	decorators: [
