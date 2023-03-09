@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
@@ -11,6 +12,7 @@ using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Net;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Security;
+using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Cms.Infrastructure.Security;
 using Umbraco.Extensions;
 
@@ -279,5 +281,19 @@ public class BackOfficeUserManager : UmbracoUserManager<BackOfficeIdentityUser, 
         }
 
         return new IdentityCreationResult { Succeded = true, InitialPassword = password };
+    }
+
+    public async Task<Attempt<string, UserOperationStatus>> GenerateEmailConfirmationTokenAsync(IUser user)
+    {
+        BackOfficeIdentityUser? identityUser = await FindByIdAsync(user.Id.ToString());
+
+        if (identityUser is null)
+        {
+            return Attempt.FailWithStatus(UserOperationStatus.NotFound, string.Empty);
+        }
+
+        var token = await GenerateEmailConfirmationTokenAsync(identityUser);
+
+        return Attempt.SucceedWithStatus(UserOperationStatus.Success, token);
     }
 }
