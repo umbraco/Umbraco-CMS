@@ -18,20 +18,20 @@ internal static class CacheKeys
     {
         if (previewing)
         {
-            return "NuCache.ContentCache.Roots[D::]";
+            return "NuCache.ContentCache.Roots[D:]";
         }
 
-        return "NuCache.ContentCache.Roots[P::]";
+        return "NuCache.ContentCache.Roots[P:]";
     }
 
     public static string MediaCacheRoots(bool previewing)
     {
         if (previewing)
         {
-            return "NuCache.MediaCache.Roots[D::]";
+            return "NuCache.MediaCache.Roots[D:]";
         }
 
-        return "NuCache.MediaCache.Roots[P::]";
+        return "NuCache.MediaCache.Roots[P:]";
     }
 
     public static string PublishedContentAsPreviewing(Guid contentUid) =>
