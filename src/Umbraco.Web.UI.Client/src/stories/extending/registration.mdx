@@ -1,0 +1,79 @@
+import { Meta } from '@storybook/addon-docs';
+
+<Meta title="Guides/Extending the Backoffice/Registration" parameters={{ previewTabs: { canvas: { hidden: true } } }} />
+
+# Registration
+
+TODO: describe the registration process and the extension registry.
+TODO: add typescript interface
+
+```ts
+import { extensionRegistry } from '@umbraco-cms/extension-registry';
+```
+
+## Package Manifest
+
+TODO: Describe the Package Manifest
+
+```json
+// show example of package-manifest.json
+```
+
+## UI Extension Registration
+
+Registering UI extensions happens through the global extension registry.
+
+There are two ways to register UI extensions:
+
+1. Reference an entry point resource in the manifest where full control over registration can take place.
+2. Directly through a manifest file
+
+### Entry Point Manifest
+
+TODO: describe where to position the entry point manifest file. Describe the UI extension manifest.
+
+**_Register an entry point in a JSON manifest_**
+
+```json
+{
+	"type": "entryPoint",
+	"alias": "My.EntryPoint",
+	"js": "./index.js"
+}
+```
+
+**_Register additional UI extensions in the entry point file_**
+
+```ts
+import { extensionRegistry } from "@umbraco-cms/extension-registry"
+
+const manifest = {
+  {
+    type: '', // type of extension
+    alias: '', // unique alias for the extension
+    elementName: '', // unique name of the custom element
+    js: '', // path to the javascript resource
+    meta: {
+      // additional props for the extension type
+    }
+  }
+};
+
+extensionRegistry.register(extension);
+```
+
+### JSON Manifest files
+
+TODO: describe how and where to position the JSON manifest files
+
+```json
+{
+	"type": "", // type of extension
+	"alias": "", // unique alias for the extension
+	"elementName": "", // unique name of the custom element
+	"js": "", // path to the javascript resource
+	"meta": {
+		// additional props for the extension type
+	}
+}
+```
