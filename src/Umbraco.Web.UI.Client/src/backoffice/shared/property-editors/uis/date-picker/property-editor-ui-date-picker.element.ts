@@ -6,7 +6,6 @@ import { UmbPropertyValueChangeEvent } from '../..';
 import { UmbLitElement } from '@umbraco-cms/element';
 import { PropertyEditorConfigDefaultData } from '@umbraco-cms/extensions-registry';
 
-
 /**
  * @element umb-property-editor-ui-date-picker
  */
@@ -22,19 +21,17 @@ export class UmbPropertyEditorUIDatePickerElement extends UmbLitElement {
 		if (value) {
 			const d = new Date(value);
 			this._value = d;
-			this._valueString = `${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()}T${d.getHours()}:${d.getMinutes()}:${d.getSeconds()}`;
+			this._valueString = `${d.getFullYear()}-${
+				d.getMonth() + 1
+			}-${d.getDate()}T${d.getHours()}:${d.getMinutes()}:${d.getSeconds()}`;
 		} else {
 			this._value = undefined;
 			this._valueString = undefined;
 		}
 	}
 
-	get value(): string | undefined {
-		if (this._value) {
-			const d = this._value;
-			return `${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()} ${d.getHours()}:${d.getMinutes()}:${d.getSeconds()}`;
-		}
-		return undefined;
+	get value() {
+		return this._valueString;
 	}
 
 	private _onInput(e: InputEvent) {
@@ -46,26 +43,25 @@ export class UmbPropertyEditorUIDatePickerElement extends UmbLitElement {
 	private _format?: string;
 
 	@state()
-	private _inputType: InputType = "datetime-local";
+	private _inputType: InputType = 'datetime-local';
 
 	private _offsetTime?: boolean;
 
 	@property({ type: Array, attribute: false })
 	public set config(config: Array<PropertyEditorConfigDefaultData>) {
-		
 		// Format string prevalue/config
 		this._format = config.find((x) => x.alias === 'format')?.value;
 		const pickTime = this._format?.includes('H') || this._format?.includes('m');
 		if (pickTime) {
-			this._inputType = "datetime-local";
+			this._inputType = 'datetime-local';
 		} else {
-			this._inputType = "date";
+			this._inputType = 'date';
 		}
 
 		// Based on the type of format string change the UUI-input type
-		const timeFormatPattern = /^h{1,2}:m{1,2}(:s{1,2})?\s?a?$/gmi;
-        if (this._format?.toLowerCase().match(timeFormatPattern)) {
-			this._inputType = "time";
+		const timeFormatPattern = /^h{1,2}:m{1,2}(:s{1,2})?\s?a?$/gim;
+		if (this._format?.toLowerCase().match(timeFormatPattern)) {
+			this._inputType = 'time';
 		}
 
 		// TODO: Warren - Need to deal with offSetTime prevalue/config
@@ -74,8 +70,11 @@ export class UmbPropertyEditorUIDatePickerElement extends UmbLitElement {
 	}
 
 	render() {
-		return html`
-			<uui-input .type=${this._inputType} @input=${this._onInput} .value=${this._valueString} label="Pick a date or time"></uui-input>`;
+		return html` <uui-input
+			.type=${this._inputType}
+			@input=${this._onInput}
+			.value=${this._valueString}
+			label="Pick a date or time"></uui-input>`;
 	}
 }
 
