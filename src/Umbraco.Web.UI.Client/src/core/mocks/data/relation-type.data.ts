@@ -1,5 +1,5 @@
 import { UmbEntityData } from './entity.data';
-import { createEntityTreeItem, createFolderTreeItem } from './utils';
+import { createEntityTreeItem } from './utils';
 import type { FolderTreeItemModel, RelationTypeResponseModel } from '@umbraco-cms/backend-api';
 
 // TODO: investigate why we don't get an entity type as part of the RelationTypeResponseModel
@@ -17,6 +17,7 @@ export const data: Array<RelationTypeResponseModel & { type: 'relation-type' }> 
 		parentObjectTypeName: 'Document',
 		childObjectTypeName: 'Document',
 		type: 'relation-type',
+		parentKey: null,
 	},
 	{
 		key: 'ac68cde6-763f-4231-a751-1101b57defd2',
@@ -31,6 +32,7 @@ export const data: Array<RelationTypeResponseModel & { type: 'relation-type' }> 
 		parentObjectTypeName: 'Document',
 		childObjectTypeName: 'Document',
 		type: 'relation-type',
+		parentKey: null,
 	},
 	{
 		key: '6f9b800c-762c-42d4-85d9-bf40a77d689e',
@@ -45,6 +47,7 @@ export const data: Array<RelationTypeResponseModel & { type: 'relation-type' }> 
 		parentObjectTypeName: 'Document',
 		childObjectTypeName: 'Document',
 		type: 'relation-type',
+		parentKey: null,
 	},
 	{
 		key: 'd421727d-43de-4205-b4c6-037404f309ad',
@@ -59,6 +62,7 @@ export const data: Array<RelationTypeResponseModel & { type: 'relation-type' }> 
 		parentObjectTypeName: 'Document',
 		childObjectTypeName: 'Document',
 		type: 'relation-type',
+		parentKey: null,
 	},
 	{
 		key: 'e9a0a28e-2d5b-4229-ac00-66f2df230513',
@@ -73,6 +77,7 @@ export const data: Array<RelationTypeResponseModel & { type: 'relation-type' }> 
 		parentObjectTypeName: 'Document',
 		childObjectTypeName: 'Document',
 		type: 'relation-type',
+		parentKey: null,
 	},
 ];
 

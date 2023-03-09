@@ -7,11 +7,6 @@ export interface UmbTreeRepository {
 		error: ProblemDetailsModel | undefined;
 		asObservable?: () => Observable<EntityTreeItemModel[]>;
 	}>;
-	requestTreeItemsOf: (parentKey: string | null) => Promise<{
-		data: PagedEntityTreeItemModel | undefined;
-		error: ProblemDetailsModel | undefined;
-		asObservable?: () => Observable<EntityTreeItemModel[]>;
-	}>;
 	requestTreeItems: (keys: string[]) => Promise<{
 		data: Array<EntityTreeItemModel> | undefined;
 		error: ProblemDetailsModel | undefined;

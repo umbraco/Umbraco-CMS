@@ -1,15 +1,14 @@
-import type { RepositoryTreeDataSource } from '../../../../../../libs/repository/repository-tree-data-source.interface';
 import { ProblemDetailsModel, RelationTypeResource } from '@umbraco-cms/backend-api';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 import { tryExecuteAndNotify } from '@umbraco-cms/resources';
 
 /**
- * A data source for the Document tree that fetches data from the server
+ * A data source for the RelationType tree that fetches data from the server
  * @export
- * @class DocumentTreeServerDataSource
- * @implements {DocumentTreeDataSource}
+ * @class RelationTypeTreeServerDataSource
+ * @implements {RelationTypeTreeDataSource}
  */
-export class RelationTypeTreeServerDataSource implements RepositoryTreeDataSource {
+export class RelationTypeTreeServerDataSource implements RelationTypeTreeDataSource {
 	#host: UmbControllerHostInterface;
 
 	// TODO: how do we handle trashed items?
@@ -46,9 +45,9 @@ export class RelationTypeTreeServerDataSource implements RepositoryTreeDataSourc
 	}
 
 	/**
-	 * Creates an instance of DocumentTreeServerDataSource.
+	 * Creates an instance of RelationTypeTreeServerDataSource.
 	 * @param {UmbControllerHostInterface} host
-	 * @memberof DocumentTreeServerDataSource
+	 * @memberof RelationTypeTreeServerDataSource
 	 */
 	constructor(host: UmbControllerHostInterface) {
 		this.#host = host;
@@ -57,37 +56,17 @@ export class RelationTypeTreeServerDataSource implements RepositoryTreeDataSourc
 	/**
 	 * Fetches the root items for the tree from the server
 	 * @return {*}
-	 * @memberof DocumentTreeServerDataSource
+	 * @memberof RelationTypeTreeServerDataSource
 	 */
 	async getRootItems() {
 		return tryExecuteAndNotify(this.#host, RelationTypeResource.getTreeRelationTypeRoot({}));
 	}
 
 	/**
-	 * Fetches the children of a given parent key from the server
-	 * @param {(string | null)} parentKey
-	 * @return {*}
-	 * @memberof DocumentTreeServerDataSource
-	 */
-	async getChildrenOf(parentKey: string | null) {
-		if (!parentKey) {
-			const error: ProblemDetailsModel = { title: 'Parent key is missing' };
-			return { error };
-		}
-
-		return tryExecuteAndNotify(
-			this.#host,
-			RelationTypeResource.getTreeRelationTypeChildren({
-				parentKey,
-			})
-		);
-	}
-
-	/**
 	 * Fetches the items for the given keys from the server
 	 * @param {Array<string>} keys
 	 * @return {*}
-	 * @memberof DocumentTreeServerDataSource
+	 * @memberof RelationTypeTreeServerDataSource
 	 */
 	async getItems(keys: Array<string>) {
 		if (keys) {

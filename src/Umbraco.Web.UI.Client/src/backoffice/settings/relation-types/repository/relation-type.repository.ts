@@ -66,23 +66,6 @@ export class UmbRelationTypeRepository implements UmbTreeRepository, UmbDetailRe
 		return { data, error, asObservable: () => this.#treeStore!.rootItems };
 	}
 
-	async requestTreeItemsOf(parentKey: string | null) {
-		await this.#init;
-
-		if (!parentKey) {
-			const error: ProblemDetailsModel = { title: 'Parent key is missing' };
-			return { data: undefined, error };
-		}
-
-		const { data, error } = await this.#treeSource.getChildrenOf(parentKey);
-
-		if (data) {
-			this.#treeStore?.appendItems(data.items);
-		}
-
-		return { data, error, asObservable: () => this.#treeStore!.childrenOf(parentKey) };
-	}
-
 	async requestTreeItems(keys: Array<string>) {
 		await this.#init;
 
