@@ -7,7 +7,7 @@ import { UmbDictionaryRepository } from '../../dictionary/repository/dictionary.
 import { UmbCreateDictionaryModalResultData } from '../../dictionary/entity-actions/create/create-dictionary-modal-layout.element';
 import { UmbLitElement } from '@umbraco-cms/element';
 import { DictionaryOverviewModel, LanguageModel } from '@umbraco-cms/backend-api';
-import { UmbModalService, UMB_MODAL_SERVICE_CONTEXT_TOKEN } from '@umbraco-cms/modal';
+import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN } from '@umbraco-cms/modal';
 import { UmbContextConsumerController } from '@umbraco-cms/context-api';
 
 @customElement('umb-dashboard-translation-dictionary')
@@ -51,7 +51,7 @@ export class UmbDashboardTranslationDictionaryElement extends UmbLitElement {
 
 	#repo!: UmbDictionaryRepository;
 
-	#modalService!: UmbModalService;
+	#modalContext!: UmbModalContext;
 
 	#tableItems: Array<UmbTableItem> = [];
 
@@ -62,8 +62,8 @@ export class UmbDashboardTranslationDictionaryElement extends UmbLitElement {
 	constructor() {
 		super();
 
-		new UmbContextConsumerController(this, UMB_MODAL_SERVICE_CONTEXT_TOKEN, (instance) => {
-			this.#modalService = instance;
+		new UmbContextConsumerController(this, UMB_MODAL_CONTEXT_TOKEN, (instance) => {
+			this.#modalContext = instance;
 		});
 	}
 
@@ -154,9 +154,9 @@ export class UmbDashboardTranslationDictionaryElement extends UmbLitElement {
 
 	async #create() {
 		// TODO: what to do if modal service is not available?
-		if (!this.#modalService) return;
+		if (!this.#modalContext) return;
 
-		const modalHandler = this.#modalService?.open('umb-create-dictionary-modal-layout', {
+		const modalHandler = this.#modalContext?.open('umb-create-dictionary-modal-layout', {
 			type: 'sidebar',
 			data: { unique: null },
 		});
@@ -165,7 +165,7 @@ export class UmbDashboardTranslationDictionaryElement extends UmbLitElement {
 		const { name }: UmbCreateDictionaryModalResultData = await modalHandler.onClose();
 		if (!name) return;
 
-		const result = await this.#repo?.createDetail({ name, parentKey: null, translations: [], key: '' });
+		const result = await this.#repo?.create({ $type: '', name, parentKey: null, translations: [], key: '' });
 
 		// TODO => get location header to route to new item
 		console.log(result);
@@ -173,7 +173,9 @@ export class UmbDashboardTranslationDictionaryElement extends UmbLitElement {
 
 	render() {
 		return html` <div id="dictionary-top-bar">
-				<uui-button type="button" look="outline" @click=${this.#create}>Create dictionary item</uui-button>
+				<uui-button type="button" look="outline" label="Create dictionary item" @click=${this.#create}
+					>Create dictionary item</uui-button
+				>
 				<uui-input
 					@keyup="${this.#filter}"
 					placeholder="Type to filter..."

@@ -15,3 +15,4 @@ export type DatabaseSettingsModel = {
     supportsIntegratedAuthentication?: boolean;
     requiresConnectionTest?: boolean;
 };
+

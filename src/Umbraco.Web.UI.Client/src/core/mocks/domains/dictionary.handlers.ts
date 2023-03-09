@@ -1,7 +1,6 @@
 import { rest } from 'msw';
-import { v4 as uuidv4 } from 'uuid';
 import { umbDictionaryData } from '../data/dictionary.data';
-import { CreatedResultModel, DictionaryImportModel, DictionaryOverviewModel } from '@umbraco-cms/backend-api';
+import { DictionaryImportModel, DictionaryOverviewModel } from '@umbraco-cms/backend-api';
 import type { DictionaryDetails } from '@umbraco-cms/models';
 
 const uploadResponse: DictionaryImportModel = {
@@ -11,6 +10,7 @@ const uploadResponse: DictionaryImportModel = {
 
 ///
 const importResponse: DictionaryDetails = {
+	$type: '',
 	parentKey: null,
 	name: 'Uploaded dictionary',
 	key: 'b7e7d0ab-53ba-485d-dddd-12537f9925cb',
@@ -18,16 +18,17 @@ const importResponse: DictionaryDetails = {
 	type: 'dictionary-item',
 	isContainer: false,
 	icon: 'umb:book-alt',
-	translations: [{
-		isoCode: 'en',
-		translation: 'I am an imported US value'
-	},
-	{
-		isoCode: 'fr',
-		translation: 'I am an imported French value',
-	}],
+	translations: [
+		{
+			isoCode: 'en',
+			translation: 'I am an imported US value',
+		},
+		{
+			isoCode: 'fr',
+			translation: 'I am an imported French value',
+		},
+	],
 };
-
 
 // alternate data for dashboard view
 const overviewData: Array<DictionaryOverviewModel> = [
@@ -93,7 +94,7 @@ export const handlers = [
 
 		const value = umbDictionaryData.save([data])[0];
 
-		const createdResult: CreatedResultModel = {
+		const createdResult = {
 			value,
 			statusCode: 200,
 		};
@@ -163,10 +164,12 @@ export const handlers = [
 		const includeChildren = req.url.searchParams.get('includeChildren');
 		const item = umbDictionaryData.getByKey(key);
 
-		alert(`Downloads file for dictionary "${item?.name}", ${includeChildren === 'true' ? 'with' : 'without'} children.`)
+		alert(
+			`Downloads file for dictionary "${item?.name}", ${includeChildren === 'true' ? 'with' : 'without'} children.`
+		);
 		return res(ctx.status(200));
 	}),
-	
+
 	rest.post('/umbraco/management/api/v1/dictionary/upload', async (req, res, ctx) => {
 		if (!req.arrayBuffer()) return;
 

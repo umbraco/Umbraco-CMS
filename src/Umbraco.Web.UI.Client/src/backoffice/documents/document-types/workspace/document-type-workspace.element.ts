@@ -6,7 +6,7 @@ import type { UmbWorkspaceEntityElement } from '../../../shared/components/works
 import { UmbWorkspaceDocumentTypeContext } from './document-type-workspace.context';
 import type { DocumentTypeModel } from '@umbraco-cms/backend-api';
 import { UmbLitElement } from '@umbraco-cms/element';
-import { UmbModalService, UMB_MODAL_SERVICE_CONTEXT_TOKEN } from '@umbraco-cms/modal';
+import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN } from '@umbraco-cms/modal';
 
 @customElement('umb-document-type-workspace')
 export class UmbDocumentTypeWorkspaceElement extends UmbLitElement implements UmbWorkspaceEntityElement {
@@ -28,6 +28,7 @@ export class UmbDocumentTypeWorkspaceElement extends UmbLitElement implements Um
 			#name {
 				width: 100%;
 				flex: 1 1 auto;
+				align-items: center;
 			}
 
 			#alias {
@@ -50,13 +51,13 @@ export class UmbDocumentTypeWorkspaceElement extends UmbLitElement implements Um
 	@state()
 	private _documentType?: DocumentTypeModel;
 
-	private _modalService?: UmbModalService;
+	private _modalContext?: UmbModalContext;
 
 	constructor() {
 		super();
 
-		this.consumeContext(UMB_MODAL_SERVICE_CONTEXT_TOKEN, (instance) => {
-			this._modalService = instance;
+		this.consumeContext(UMB_MODAL_CONTEXT_TOKEN, (instance) => {
+			this._modalContext = instance;
 		});
 
 		this.observe(this._workspaceContext.data, (data) => {
@@ -70,7 +71,7 @@ export class UmbDocumentTypeWorkspaceElement extends UmbLitElement implements Um
 	}
 
 	public create(parentKey: string | null) {
-		this._workspaceContext.create(parentKey);
+		this._workspaceContext.createScaffold(parentKey);
 	}
 
 	// TODO. find a way where we don't have to do this for all workspaces.
@@ -85,11 +86,10 @@ export class UmbDocumentTypeWorkspaceElement extends UmbLitElement implements Um
 	}
 
 	private async _handleIconClick() {
-		const modalHandler = this._modalService?.iconPicker();
+		const modalHandler = this._modalContext?.iconPicker();
 
 		modalHandler?.onClose().then((saved) => {
 			if (saved) this._workspaceContext?.setIcon(saved.icon);
-			console.log(saved);
 			// TODO save color ALIAS as well
 		});
 	}
@@ -100,7 +100,7 @@ export class UmbDocumentTypeWorkspaceElement extends UmbLitElement implements Um
 				<div id="header" slot="header">
 					<uui-button id="icon" @click=${this._handleIconClick} compact>
 						<uui-icon
-							name="${this._documentType?.icon || 'umb:document-dashed-line'}"
+							name="${this._documentType?.icon || this._icon.name}"
 							style="color: ${this._icon.color}"></uui-icon>
 					</uui-button>
 

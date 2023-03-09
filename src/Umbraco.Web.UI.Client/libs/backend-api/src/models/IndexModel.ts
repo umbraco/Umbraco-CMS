@@ -13,3 +13,4 @@ export type IndexModel = {
     fieldCount: number;
     providerProperties?: Record<string, any> | null;
 };
+

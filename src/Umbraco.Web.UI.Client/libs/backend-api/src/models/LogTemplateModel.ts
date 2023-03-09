@@ -6,3 +6,4 @@ export type LogTemplateModel = {
     messageTemplate?: string | null;
     count?: number;
 };
+

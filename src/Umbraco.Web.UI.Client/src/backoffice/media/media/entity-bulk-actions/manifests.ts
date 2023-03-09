@@ -1,10 +1,10 @@
+import { MEDIA_REPOSITORY_ALIAS } from '../repository/manifests';
 import { UmbMediaMoveEntityBulkAction } from './move/move.action';
 import { UmbMediaCopyEntityBulkAction } from './copy/copy.action';
 import { UmbMediaTrashEntityBulkAction } from './trash/trash.action';
 import { ManifestEntityBulkAction } from '@umbraco-cms/extensions-registry';
 
 const entityType = 'media';
-const repositoryAlias = 'Umb.Repository.Media';
 
 const entityActions: Array<ManifestEntityBulkAction> = [
 	{
@@ -15,7 +15,7 @@ const entityActions: Array<ManifestEntityBulkAction> = [
 		meta: {
 			entityType,
 			label: 'Move',
-			repositoryAlias,
+			repositoryAlias: MEDIA_REPOSITORY_ALIAS,
 			api: UmbMediaMoveEntityBulkAction,
 		},
 	},
@@ -27,7 +27,7 @@ const entityActions: Array<ManifestEntityBulkAction> = [
 		meta: {
 			entityType,
 			label: 'Copy',
-			repositoryAlias,
+			repositoryAlias: MEDIA_REPOSITORY_ALIAS,
 			api: UmbMediaCopyEntityBulkAction,
 		},
 	},
@@ -39,7 +39,7 @@ const entityActions: Array<ManifestEntityBulkAction> = [
 		meta: {
 			entityType,
 			label: 'Trash',
-			repositoryAlias,
+			repositoryAlias: MEDIA_REPOSITORY_ALIAS,
 			api: UmbMediaTrashEntityBulkAction,
 		},
 	},

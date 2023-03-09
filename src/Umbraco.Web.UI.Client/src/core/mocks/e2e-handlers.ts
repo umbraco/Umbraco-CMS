@@ -13,17 +13,17 @@ import { handlers as profileHandlers } from './domains/performance-profiling.han
 import { handlers as healthCheckHandlers } from './domains/health-check.handlers';
 import { handlers as languageHandlers } from './domains/language.handlers';
 import { handlers as redirectManagementHandlers } from './domains/redirect-management.handlers';
+import { handlers as packageHandlers } from './domains/package.handlers';
 
 export const handlers = [
 	serverHandlers.serverRunningHandler,
 	serverHandlers.serverVersionHandler,
-	manifestsHandlers.manifestDevelopmentHandler,
+	manifestsHandlers.manifestEmptyHandler,
 	...installHandlers,
 	...upgradeHandlers,
 	...userHandlers,
 	...dataTypeHandlers,
 	...documentTypeHandlers,
-	...manifestsHandlers.default,
 	...telemetryHandlers,
 	...publishedStatusHandlers,
 	...examineManagementHandlers,
@@ -32,4 +32,5 @@ export const handlers = [
 	...healthCheckHandlers,
 	...languageHandlers,
 	...redirectManagementHandlers,
+	...packageHandlers,
 ];

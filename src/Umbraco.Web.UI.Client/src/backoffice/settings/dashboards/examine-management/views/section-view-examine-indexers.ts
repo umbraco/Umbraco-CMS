@@ -4,7 +4,7 @@ import { customElement, property, state } from 'lit/decorators.js';
 
 import { UUIButtonState } from '@umbraco-ui/uui-button';
 
-import { UmbModalService, UMB_MODAL_SERVICE_CONTEXT_TOKEN } from '../../../../../core/modal';
+import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN } from '../../../../../core/modal';
 
 import './section-view-examine-searchers';
 
@@ -92,13 +92,13 @@ export class UmbDashboardExamineIndexElement extends UmbLitElement {
 	@state()
 	private _loading = true;
 
-	private _modalService?: UmbModalService;
+	private _modalContext?: UmbModalContext;
 
 	constructor() {
 		super();
 
-		this.consumeContext(UMB_MODAL_SERVICE_CONTEXT_TOKEN, (_instance) => {
-			this._modalService = _instance;
+		this.consumeContext(UMB_MODAL_CONTEXT_TOKEN, (_instance) => {
+			this._modalContext = _instance;
 		});
 
 		this._getIndexData();
@@ -120,7 +120,7 @@ export class UmbDashboardExamineIndexElement extends UmbLitElement {
 	}
 
 	private async _onRebuildHandler() {
-		const modalHandler = this._modalService?.confirm({
+		const modalHandler = this._modalContext?.confirm({
 			headline: `Rebuild ${this.indexName}`,
 			content: html`
 				This will cause the index to be rebuilt.<br />

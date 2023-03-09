@@ -1,12 +1,12 @@
 import { DictionaryTreeServerDataSource } from './sources/dictionary.tree.server.data';
 import { UmbDictionaryTreeStore, UMB_DICTIONARY_TREE_STORE_CONTEXT_TOKEN } from './dictionary.tree.store';
 import { UmbDictionaryDetailServerDataSource } from './sources/dictionary.detail.server.data';
-import { UmbDictionaryDetailStore, UMB_DICTIONARY_DETAIL_STORE_CONTEXT_TOKEN } from './dictionary.detail.store';
+import { UmbDictionaryStore, UMB_DICTIONARY_STORE_CONTEXT_TOKEN } from './dictionary.store';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 import { UmbContextConsumerController } from '@umbraco-cms/context-api';
 import { RepositoryTreeDataSource, UmbDetailRepository, UmbTreeRepository } from '@umbraco-cms/repository';
 import { ProblemDetailsModel } from '@umbraco-cms/backend-api';
-import { UmbNotificationService, UMB_NOTIFICATION_SERVICE_CONTEXT_TOKEN } from '@umbraco-cms/notification';
+import { UmbNotificationContext, UMB_NOTIFICATION_CONTEXT_TOKEN } from '@umbraco-cms/notification';
 import type { DictionaryDetails } from '@umbraco-cms/models';
 
 export class UmbDictionaryRepository implements UmbTreeRepository, UmbDetailRepository<DictionaryDetails> {
@@ -18,9 +18,9 @@ export class UmbDictionaryRepository implements UmbTreeRepository, UmbDetailRepo
 	#treeStore?: UmbDictionaryTreeStore;
 
 	#detailSource: UmbDictionaryDetailServerDataSource;
-	#detailStore?: UmbDictionaryDetailStore;
+	#detailStore?: UmbDictionaryStore;
 
-	#notificationService?: UmbNotificationService;
+	#notificationContext?: UmbNotificationContext;
 
 	constructor(host: UmbControllerHostInterface) {
 		this.#host = host;
@@ -30,7 +30,7 @@ export class UmbDictionaryRepository implements UmbTreeRepository, UmbDetailRepo
 		this.#detailSource = new UmbDictionaryDetailServerDataSource(this.#host);
 
 		this.#init = Promise.all([
-			new UmbContextConsumerController(this.#host, UMB_DICTIONARY_DETAIL_STORE_CONTEXT_TOKEN, (instance) => {
+			new UmbContextConsumerController(this.#host, UMB_DICTIONARY_STORE_CONTEXT_TOKEN, (instance) => {
 				this.#detailStore = instance;
 			}),
 
@@ -38,8 +38,8 @@ export class UmbDictionaryRepository implements UmbTreeRepository, UmbDetailRepo
 				this.#treeStore = instance;
 			}),
 
-			new UmbContextConsumerController(this.#host, UMB_NOTIFICATION_SERVICE_CONTEXT_TOKEN, (instance) => {
-				this.#notificationService = instance;
+			new UmbContextConsumerController(this.#host, UMB_NOTIFICATION_CONTEXT_TOKEN, (instance) => {
+				this.#notificationContext = instance;
 			}),
 		]);
 	}
@@ -103,7 +103,7 @@ export class UmbDictionaryRepository implements UmbTreeRepository, UmbDetailRepo
 
 	// DETAILS
 
-	async createDetailsScaffold(parentKey: string | null) {
+	async createScaffold(parentKey: string | null) {
 		await this.#init;
 
 		if (!parentKey) {
@@ -141,7 +141,7 @@ export class UmbDictionaryRepository implements UmbTreeRepository, UmbDetailRepo
 		return this.#detailSource.delete(key);
 	}
 
-	async saveDetail(dictionary: DictionaryDetails) {
+	async save(dictionary: DictionaryDetails) {
 		await this.#init;
 
 		// TODO: should we show a notification if the dictionary is missing?
@@ -155,7 +155,7 @@ export class UmbDictionaryRepository implements UmbTreeRepository, UmbDetailRepo
 
 		if (!error) {
 			const notification = { data: { message: `Dictionary '${dictionary.name}' saved` } };
-			this.#notificationService?.peek('positive', notification);
+			this.#notificationContext?.peek('positive', notification);
 		}
 
 		// TODO: we currently don't use the detail store for anything.
@@ -168,7 +168,7 @@ export class UmbDictionaryRepository implements UmbTreeRepository, UmbDetailRepo
 		return { error };
 	}
 
-	async createDetail(detail: DictionaryDetails) {
+	async create(detail: DictionaryDetails) {
 		await this.#init;
 
 		if (!detail.name) {
@@ -180,7 +180,7 @@ export class UmbDictionaryRepository implements UmbTreeRepository, UmbDetailRepo
 
 		if (!error) {
 			const notification = { data: { message: `Dictionary '${detail.name}' created` } };
-			this.#notificationService?.peek('positive', notification);
+			this.#notificationContext?.peek('positive', notification);
 		}
 
 		return { data, error };

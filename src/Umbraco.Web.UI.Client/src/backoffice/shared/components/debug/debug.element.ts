@@ -3,7 +3,7 @@ import { css, html, nothing, TemplateResult } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { UmbContextDebugRequest } from '@umbraco-cms/context-api';
 import { UmbLitElement } from '@umbraco-cms/element';
-import { UmbModalService, UMB_MODAL_SERVICE_CONTEXT_TOKEN } from '@umbraco-cms/modal';
+import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN } from '@umbraco-cms/modal';
 
 @customElement('umb-debug')
 export class UmbDebug extends UmbLitElement {
@@ -64,12 +64,12 @@ export class UmbDebug extends UmbLitElement {
 	@state()
 	private _debugPaneOpen = false;
 
-	private _modalService?: UmbModalService;
+	private _modalContext?: UmbModalContext;
 
 	constructor() {
 		super();
-		this.consumeContext(UMB_MODAL_SERVICE_CONTEXT_TOKEN, (modalService) => {
-			this._modalService = modalService;
+		this.consumeContext(UMB_MODAL_CONTEXT_TOKEN, (instance) => {
+			this._modalContext = instance;
 		});
 	}
 
@@ -104,7 +104,7 @@ export class UmbDebug extends UmbLitElement {
 	private async _openDialog() {
 		// Open a modal that uses the HTML component called 'umb-debug-modal-layout'
 		await import('./debug.modal.element.js');
-		this._modalService?.open('umb-debug-modal-layout', {
+		this._modalContext?.open('umb-debug-modal-layout', {
 			size: 'small',
 			type: 'sidebar',
 			data: {

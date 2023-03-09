@@ -50,7 +50,7 @@ The frontend has an API formatter that takes the OpenAPI schema file and convert
 
 ### Example: Published Cache Status Dashboard
 
-![Published Status Dashboard](.github/images/contributing/published-cache-status-dashboard.png)
+![Published Status Dashboard](/.github/images/contributing/published-cache-status-dashboard.png)
 
 ### Boilerplate (example using Lit)
 
@@ -155,7 +155,7 @@ Let’s go through each of these properties…
 
 Running the app with `npm run dev`, you will quickly notice the API requests turn into 404 errors. In order to hit the API, we need to add a mock handler to define the endpoints which our dashboard will call. In the case of the Published Cache Status section, we have a number of calls to work through. Let’s start by looking at the call to retrieve the current status of the cache:
 
-![Published Status Dashboard](.github/images/contributing/status-of-cache.png)
+![Published Status Dashboard](/.github/images/contributing/status-of-cache.png)
 
 From the existing functionality, we can see that this is a string message that is received as part of a `GET` request from the server.
 
@@ -184,7 +184,7 @@ It returns a `200 OK` response and a string value with the current “status” 
 
 An example `POST` is similar. Let’s take the “Refresh status” button as an example:
 
-![Published Status Dashboard](.github/images/contributing/refresh-status.png)
+![Published Status Dashboard](/.github/images/contributing/refresh-status.png)
 
 From our existing functionality we can see that this makes a `POST`call to the server to prompt a reload of the published cache. So we would add a new endpoint to the mock handler that would look like:
 

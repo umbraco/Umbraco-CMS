@@ -21,19 +21,20 @@ import { request as __request } from '../core/request';
 export class DataTypeResource {
 
     /**
-     * @returns any Created
+     * @returns string Created
      * @throws ApiError
      */
     public static postDataType({
-requestBody,
-}: {
-requestBody?: DataTypeCreateModel,
-}): CancelablePromise<any> {
+        requestBody,
+    }: {
+        requestBody?: DataTypeCreateModel,
+    }): CancelablePromise<string> {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/umbraco/management/api/v1/data-type',
             body: requestBody,
             mediaType: 'application/json',
+            responseHeader: 'Location',
             errors: {
                 400: `Bad Request`,
                 404: `Not Found`,
@@ -67,10 +68,10 @@ requestBody?: DataTypeCreateModel,
      * @throws ApiError
      */
     public static deleteDataTypeByKey({
-key,
-}: {
-key: string,
-}): CancelablePromise<any> {
+        key,
+    }: {
+        key: string,
+    }): CancelablePromise<any> {
         return __request(OpenAPI, {
             method: 'DELETE',
             url: '/umbraco/management/api/v1/data-type/{key}',
@@ -89,12 +90,12 @@ key: string,
      * @throws ApiError
      */
     public static putDataTypeByKey({
-key,
-requestBody,
-}: {
-key: string,
-requestBody?: DataTypeUpdateModel,
-}): CancelablePromise<any> {
+        key,
+        requestBody,
+    }: {
+        key: string,
+        requestBody?: DataTypeUpdateModel,
+    }): CancelablePromise<any> {
         return __request(OpenAPI, {
             method: 'PUT',
             url: '/umbraco/management/api/v1/data-type/{key}',
@@ -111,7 +112,7 @@ requestBody?: DataTypeUpdateModel,
     }
 
     /**
-     * @returns any Created
+     * @returns string Created
      * @throws ApiError
      */
     public static postDataTypeByKeyCopy({
@@ -120,7 +121,7 @@ requestBody?: DataTypeUpdateModel,
     }: {
         key: string,
         requestBody?: DataTypeCopyModel,
-    }): CancelablePromise<any> {
+    }): CancelablePromise<string> {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/umbraco/management/api/v1/data-type/{key}/copy',
@@ -129,6 +130,7 @@ requestBody?: DataTypeUpdateModel,
             },
             body: requestBody,
             mediaType: 'application/json',
+            responseHeader: 'Location',
             errors: {
                 404: `Not Found`,
             },
@@ -182,19 +184,20 @@ requestBody?: DataTypeUpdateModel,
     }
 
     /**
-     * @returns any Created
+     * @returns string Created
      * @throws ApiError
      */
     public static postDataTypeFolder({
-requestBody,
-}: {
-requestBody?: FolderCreateModel,
-}): CancelablePromise<any> {
+        requestBody,
+    }: {
+        requestBody?: FolderCreateModel,
+    }): CancelablePromise<string> {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/umbraco/management/api/v1/data-type/folder',
             body: requestBody,
             mediaType: 'application/json',
+            responseHeader: 'Location',
         });
     }
 
@@ -224,10 +227,10 @@ requestBody?: FolderCreateModel,
      * @throws ApiError
      */
     public static deleteDataTypeFolderByKey({
-key,
-}: {
-key: string,
-}): CancelablePromise<any> {
+        key,
+    }: {
+        key: string,
+    }): CancelablePromise<any> {
         return __request(OpenAPI, {
             method: 'DELETE',
             url: '/umbraco/management/api/v1/data-type/folder/{key}',
@@ -245,12 +248,12 @@ key: string,
      * @throws ApiError
      */
     public static putDataTypeFolderByKey({
-key,
-requestBody,
-}: {
-key: string,
-requestBody?: FolderUpdateModel,
-}): CancelablePromise<any> {
+        key,
+        requestBody,
+    }: {
+        key: string,
+        requestBody?: FolderUpdateModel,
+    }): CancelablePromise<any> {
         return __request(OpenAPI, {
             method: 'PUT',
             url: '/umbraco/management/api/v1/data-type/folder/{key}',

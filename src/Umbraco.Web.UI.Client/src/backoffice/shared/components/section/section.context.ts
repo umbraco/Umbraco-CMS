@@ -5,7 +5,6 @@ import { UmbContextToken } from '@umbraco-cms/context-api';
 export type ActiveTreeItemType = Entity | undefined;
 
 export class UmbSectionContext {
-
 	#manifestAlias = new StringState<string | undefined>(undefined);
 	#manifestPathname = new StringState<string | undefined>(undefined);
 	#manifestLabel = new StringState<string | undefined>(undefined);
@@ -34,7 +33,7 @@ export class UmbSectionContext {
 	public setManifest(manifest?: ManifestSection) {
 		this.#manifestAlias.next(manifest?.alias);
 		this.#manifestPathname.next(manifest?.meta?.pathname);
-		this.#manifestLabel.next(manifest ? (manifest.meta?.label || manifest.name) : undefined);
+		this.#manifestLabel.next(manifest ? manifest.meta?.label || manifest.name : undefined);
 	}
 
 	/*
@@ -53,4 +52,4 @@ export class UmbSectionContext {
 	}
 }
 
-export const UMB_SECTION_CONTEXT_TOKEN = new UmbContextToken<UmbSectionContext>(UmbSectionContext.name);
+export const UMB_SECTION_CONTEXT_TOKEN = new UmbContextToken<UmbSectionContext>('UmbSectionContext');

@@ -15,11 +15,10 @@ export class UmbDocumentWorkspaceViewEditElement extends UmbLitElement {
 		css`
 			:host {
 				display: block;
+				--uui-tab-background: var(--uui-color-surface);
 			}
 		`,
 	];
-
-	// TODO: get variant information via properties?
 
 	//private _hasRootProperties = false;
 	private _hasRootGroups = false;
@@ -52,7 +51,7 @@ export class UmbDocumentWorkspaceViewEditElement extends UmbLitElement {
 		if (!this._workspaceContext) return;
 
 		this.observe(
-			this._workspaceContext.rootContainers('Tab'),
+			this._workspaceContext.structure.rootContainers('Tab'),
 			(tabs) => {
 				tabs.forEach((tab) => {
 					// Only add each tab name once, as our containers merge on name:
@@ -79,7 +78,7 @@ export class UmbDocumentWorkspaceViewEditElement extends UmbLitElement {
 		*/
 
 		this.observe(
-			this._workspaceContext.hasRootContainers('Group'),
+			this._workspaceContext.structure.hasRootContainers('Group'),
 			(hasRootGroups) => {
 				this._hasRootGroups = hasRootGroups;
 				this._createRoutes();
@@ -137,7 +136,7 @@ export class UmbDocumentWorkspaceViewEditElement extends UmbLitElement {
 							? html`
 									<uui-tab
 										label="Content"
-										.active=${this._routerPath === this._activePath}
+										.active=${this._routerPath + '/root' === this._activePath}
 										href=${this._routerPath || ''}
 										>Content</uui-tab
 									>
@@ -162,7 +161,7 @@ export class UmbDocumentWorkspaceViewEditElement extends UmbLitElement {
 					this._routerPath = event.target.absoluteRouterPath;
 				}}
 				@change=${(event: UmbRouterSlotChangeEvent) => {
-					this._activePath = event.target.localActiveViewPath || '';
+					this._activePath = event.target.absoluteActiveViewPath || '';
 				}}>
 			</umb-router-slot>
 		`;

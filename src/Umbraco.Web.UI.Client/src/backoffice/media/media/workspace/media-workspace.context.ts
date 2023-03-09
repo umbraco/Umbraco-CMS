@@ -7,21 +7,15 @@ import type { MediaDetails } from '@umbraco-cms/models';
 
 type EntityType = MediaDetails;
 export class UmbMediaWorkspaceContext
-	extends UmbWorkspaceContext
+	extends UmbWorkspaceContext<UmbMediaRepository>
 	implements UmbWorkspaceEntityContextInterface<EntityType | undefined>
 {
-	#isNew = false;
-	#host: UmbControllerHostInterface;
-	#detailRepository: UmbMediaRepository;
-
 	#data = new ObjectState<EntityType | undefined>(undefined);
 	data = this.#data.asObservable();
 	name = this.#data.getObservablePart((data) => data?.name);
 
 	constructor(host: UmbControllerHostInterface) {
-		super(host);
-		this.#host = host;
-		this.#detailRepository = new UmbMediaRepository(this.#host);
+		super(host, new UmbMediaRepository(host));
 	}
 
 	getData() {
@@ -52,33 +46,33 @@ export class UmbMediaWorkspaceContext
 	}
 
 	async load(entityKey: string) {
-		const { data } = await this.#detailRepository.requestByKey(entityKey);
+		const { data } = await this.repository.requestByKey(entityKey);
 		if (data) {
-			this.#isNew = false;
+			this.setIsNew(false);
 			this.#data.next(data);
 		}
 	}
 
 	async createScaffold(parentKey: string | null) {
-		const { data } = await this.#detailRepository.createDetailsScaffold(parentKey);
+		const { data } = await this.repository.createScaffold(parentKey);
 		if (!data) return;
-		this.#isNew = true;
+		this.setIsNew(true);
 		this.#data.next(data);
 	}
 
 	async save() {
 		if (!this.#data.value) return;
-		if (this.#isNew) {
-			await this.#detailRepository.createDetail(this.#data.value);
+		if (this.isNew) {
+			await this.repository.create(this.#data.value);
 		} else {
-			await this.#detailRepository.saveDetail(this.#data.value);
+			await this.repository.save(this.#data.value);
 		}
 		// If it went well, then its not new anymore?.
-		this.#isNew = false;
+		this.setIsNew(false);
 	}
 
 	async delete(key: string) {
-		await this.#detailRepository.delete(key);
+		await this.repository.delete(key);
 	}
 
 	public destroy(): void {

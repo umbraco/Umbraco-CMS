@@ -14,6 +14,7 @@ export class UmbWorkspaceViewDocumentTypeDesignElement extends UmbLitElement {
 			:host {
 				display: block;
 				margin: var(--uui-size-space-6);
+				padding: var(--uui-size-space-6);
 			}
 		`,
 	];
@@ -42,11 +43,12 @@ export class UmbWorkspaceViewDocumentTypeDesignElement extends UmbLitElement {
 	}
 
 	render() {
-		return html`<uui-box headline=${this._documentType?.name ?? ''}>
-			<div>
-				<umb-property-creator></umb-property-creator>
-			</div>
-		</uui-box>`;
+		return html` Design of ${this._documentType?.name}
+			<uui-box headline=${this._documentType?.name ?? ''}>
+				<div>
+					<umb-property-creator></umb-property-creator>
+				</div>
+			</uui-box>`;
 	}
 }
 

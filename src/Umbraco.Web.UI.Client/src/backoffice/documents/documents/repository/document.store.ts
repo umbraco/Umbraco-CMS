@@ -19,7 +19,7 @@ export class UmbDocumentStore extends UmbStoreBase {
 	 * @memberof UmbDocumentDetailStore
 	 */
 	constructor(host: UmbControllerHostInterface) {
-		super(host, UmbDocumentStore.name);
+		super(host, UMB_DOCUMENT_STORE_CONTEXT_TOKEN.toString());
 	}
 
 	/**
@@ -50,4 +50,4 @@ export class UmbDocumentStore extends UmbStoreBase {
 	}
 }
 
-export const UMB_DOCUMENT_DETAIL_STORE_CONTEXT_TOKEN = new UmbContextToken<UmbDocumentStore>(UmbDocumentStore.name);
+export const UMB_DOCUMENT_STORE_CONTEXT_TOKEN = new UmbContextToken<UmbDocumentStore>('UmbDocumentStore');

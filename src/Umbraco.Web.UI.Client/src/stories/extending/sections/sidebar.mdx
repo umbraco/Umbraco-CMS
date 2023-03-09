@@ -1,0 +1,83 @@
+import { Meta } from '@storybook/addon-docs';
+
+<Meta
+	title="Guides/Extending the Backoffice/Sections/Sidebar"
+	parameters={{ previewTabs: { canvas: { hidden: true } } }}
+/>
+
+# Section Sidebar
+
+TODO: Introduction to section sidebar
+
+<img src="docs/section-sidebar.svg" width="400" />
+
+### Section Sidebar Apps
+
+TODO: Introduction to Section Sidebar Apps
+
+<img src="docs/section-sidebar-apps.svg" width="400" />
+
+**Manifest**
+
+```json
+// TODO: add interface
+{
+	"type": "sectionSidebarApp",
+	"alias": "My.SectionSidebarApp",
+	"name": "My Section Sidebar App",
+	"meta": {
+		"sections": ["My.Section"]
+	}
+}
+```
+
+**Default Element**
+
+```ts
+// TODO: get interface
+interface UmbSectionSidebarAppElement {}
+```
+
+#### Menu Sidebar App
+
+TODO: Introduction to the sidebar menu
+
+(rough notes)
+
+- The Backoffice comes with a menu sidebar app that can be used to create a menu in the sidebar.
+- To register a new menu sidebar app, add the following to your manifest
+- The menu sidebar app will reference a menu that you have registered in the menu with a menu manifest
+
+<img src="docs/section-menu-sidebar-app.svg" width="400" />
+
+**Manifest**
+
+```json
+{
+	"type": "menuSectionSidebarApp",
+	"alias": "My.SectionSidebarApp.MyMenu",
+	"name": "My Menu Section Sidebar App",
+	"meta": {
+		"label": "My Sidebar Menu",
+		"sections": ["My.Section"],
+		"menu": "My.Menu"
+	}
+}
+```
+
+**Default Element**
+
+```ts
+// TODO: get interface
+interface UmbMenuSectionSidebarAppElement {}
+```
+
+[See Menu Docs](?path=/docs/guides-extending-the-backoffice-menu--docs)
+
+This will make it possible to compose a sidebar menu from multiple Apps:
+
+<img src="docs/section-sidebar-composed-apps.svg" width="400" />
+
+#### Adding Items to an existing menu
+
+[See Menu Docs](?path=/docs/guides-extending-the-backoffice-menu--docs)

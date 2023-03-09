@@ -25,11 +25,12 @@ export class UmbSectionDashboardsElement extends UmbLitElement {
 				background-color: var(--uui-color-surface);
 				height: 70px;
 				border-bottom: 1px solid var(--uui-color-border);
+				box-sizing: border-box;
 			}
 
 			#scroll-container {
-				flex:1;
-				position:relative;
+				flex: 1;
+				position: relative;
 			}
 
 			#router-slot {
@@ -45,10 +46,10 @@ export class UmbSectionDashboardsElement extends UmbLitElement {
 				width: 100%;
 				min-height: 60px;
 				box-sizing: border-box;
-				margin:0;
-				padding:0 var(--uui-size-5);
-				background-color:var(--uui-color-surface);
-				border-bottom:1px solid var(--uui-color-border);
+				margin: 0;
+				padding: 0 var(--uui-size-5);
+				background-color: var(--uui-color-surface);
+				border-bottom: 1px solid var(--uui-color-border);
 			}
 		`,
 	];
@@ -94,9 +95,7 @@ export class UmbSectionDashboardsElement extends UmbLitElement {
 				?.extensionsOfTypes<ManifestDashboard | ManifestDashboardCollection>(['dashboard', 'dashboardCollection'])
 				.pipe(
 					map((extensions) =>
-						extensions.filter((extension) =>
-							(extension as ManifestWithMeta).meta.sections.includes(this._currentSectionAlias)
-						)
+						extensions.filter((extension) => extension.meta.sections.includes(this._currentSectionAlias ?? ''))
 					)
 				),
 			(dashboards) => {
@@ -171,8 +170,7 @@ export class UmbSectionDashboardsElement extends UmbLitElement {
 					}}
 					@change=${(event: UmbRouterSlotChangeEvent) => {
 						this._activePath = event.target.localActiveViewPath;
-					}}
-				></umb-router-slot>
+					}}></umb-router-slot>
 			</uui-scroll-container>
 		`;
 	}

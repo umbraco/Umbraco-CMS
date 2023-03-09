@@ -49,7 +49,7 @@ export class UmbDocumentServerDataSource implements RepositoryDetailDataSource<D
 	 */
 	async createScaffold(parentKey: string | null) {
 		const data: DocumentModel = {
-			properties: [],
+			values: [],
 			variants: [],
 		};
 
@@ -158,23 +158,30 @@ export class UmbDocumentServerDataSource implements RepositoryDetailDataSource<D
 	 * @return {*}
 	 * @memberof UmbDocumentServerDataSource
 	 */
-	// TODO: Error mistake in this:
 	async delete(key: string) {
 		if (!key) {
 			const error: ProblemDetailsModel = { title: 'Key is missing' };
 			return { error };
 		}
 
-		// TODO: use resources when end point is ready:
-		return tryExecuteAndNotify(
-			this.#host,
-			fetch('/umbraco/management/api/v1/document/trash', {
+		let problemDetails: ProblemDetailsModel | undefined = undefined;
+
+		try {
+			await fetch('/umbraco/management/api/v1/document/trash', {
 				method: 'POST',
 				body: JSON.stringify([key]),
 				headers: {
 					'Content-Type': 'application/json',
 				},
-			})
-		);
+			});
+		} catch (error) {
+			problemDetails = { title: 'Delete document Failed' };
+		}
+
+		return { error: problemDetails };
+
+		/* TODO: use resources when end point is ready:
+		return tryExecuteAndNotify(this.#host);
+		*/
 	}
 }

@@ -3,9 +3,9 @@
 /* eslint-disable */
 
 import type { ContentUrlInfoModel } from './ContentUrlInfoModel';
-import type { ContentViewModelBaseDocumentPropertyDocumentVariantModel } from './ContentViewModelBaseDocumentPropertyDocumentVariantModel';
+import type { ContentViewModelBaseDocumentValueDocumentVariantModel } from './ContentViewModelBaseDocumentValueDocumentVariantModel';
 
-export type DocumentModel = (ContentViewModelBaseDocumentPropertyDocumentVariantModel & {
+export type DocumentModel = (ContentViewModelBaseDocumentValueDocumentVariantModel & {
     urls?: Array<ContentUrlInfoModel>;
     templateKey?: string | null;
 });

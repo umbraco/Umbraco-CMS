@@ -7,21 +7,16 @@ import type { DictionaryDetails } from '@umbraco-cms/models';
 
 type EntityType = DictionaryDetails;
 export class UmbWorkspaceDictionaryContext
-	extends UmbWorkspaceContext
+	extends UmbWorkspaceContext<UmbDictionaryRepository>
 	implements UmbWorkspaceEntityContextInterface<EntityType | undefined>
 {
-	#host: UmbControllerHostInterface;
-	#repo: UmbDictionaryRepository;
-
 	#data = new ObjectState<DictionaryDetails | undefined>(undefined);
 	data = this.#data.asObservable();
 	name = this.#data.getObservablePart((data) => data?.name);
 	dictionary = this.#data.getObservablePart((data) => data);
 
 	constructor(host: UmbControllerHostInterface) {
-		super(host);
-		this.#host = host;
-		this.#repo = new UmbDictionaryRepository(this.#host);
+		super(host, new UmbDictionaryRepository(host));
 	}
 
 	getData() {
@@ -47,7 +42,7 @@ export class UmbWorkspaceDictionaryContext
 		const updatedValue =
 			this.#data.value.translations?.map((translationItem) => {
 				if (translationItem.isoCode === isoCode) {
-					return { ...translationItem, translation};
+					return { ...translationItem, translation };
 				}
 				return translationItem;
 			}) ?? [];
@@ -57,27 +52,30 @@ export class UmbWorkspaceDictionaryContext
 			updatedValue?.push({ isoCode, translation });
 		}
 
-		this.#data.next({ ...this.#data.value, translations: updatedValue });	
+		this.#data.next({ ...this.#data.value, translations: updatedValue });
 	}
 
 	async load(entityKey: string) {
-		const { data } = await this.#repo.requestByKey(entityKey);
+		const { data } = await this.repository.requestByKey(entityKey);
 		if (data) {
+			this.setIsNew(false);
 			this.#data.next(data);
 		}
 	}
 
 	async createScaffold(parentKey: string | null) {
-		const { data } = await this.#repo.createDetailsScaffold(parentKey);
+		const { data } = await this.repository.createScaffold(parentKey);
 		if (!data) return;
+		this.setIsNew(true);
 		this.#data.next(data);
 	}
 
 	async save() {
 		if (!this.#data.value) return;
-		this.#repo.saveDetail(this.#data.value);
+		await this.repository.save(this.#data.value);
+		this.setIsNew(false);
 	}
-	
+
 	public destroy(): void {
 		this.#data.complete();
 	}

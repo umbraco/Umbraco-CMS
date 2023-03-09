@@ -2,7 +2,7 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, CSSResultGroup, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { repeat } from 'lit/directives/repeat.js';
-import { UmbModalHandler, UmbModalService, UMB_MODAL_SERVICE_CONTEXT_TOKEN } from '../../../../core/modal';
+import { UmbModalHandler, UmbModalContext, UMB_MODAL_CONTEXT_TOKEN } from '../../../../core/modal';
 import { UmbLitElement } from '@umbraco-cms/element';
 
 @customElement('umb-backoffice-modal-container')
@@ -19,21 +19,21 @@ export class UmbBackofficeModalContainer extends UmbLitElement {
 	@state()
 	private _modals?: UmbModalHandler[];
 
-	private _modalService?: UmbModalService;
+	private _modalContext?: UmbModalContext;
 
 	constructor() {
 		super();
 
-		this.consumeContext(UMB_MODAL_SERVICE_CONTEXT_TOKEN, (modalService) => {
-			this._modalService = modalService;
+		this.consumeContext(UMB_MODAL_CONTEXT_TOKEN, (instance) => {
+			this._modalContext = instance;
 			this._observeModals();
 		});
 	}
 
 	private _observeModals() {
-		if (!this._modalService) return;
+		if (!this._modalContext) return;
 
-		this.observe(this._modalService.modals, (modals) => {
+		this.observe(this._modalContext.modals, (modals) => {
 			this._modals = modals;
 		});
 	}

@@ -1,35 +1,67 @@
-import { UmbEntityWorkspaceManager } from '../../../shared/components/workspace/workspace-context/entity-manager-controller';
 import { UmbWorkspaceContext } from '../../../shared/components/workspace/workspace-context/workspace-context';
 import { UmbWorkspaceEntityContextInterface } from '../../../shared/components/workspace/workspace-context/workspace-entity-context.interface';
-import { UMB_DOCUMENT_TYPE_STORE_CONTEXT_TOKEN } from '../repository/document-type.store';
+import { UmbDocumentTypeRepository } from '../repository/document-type.repository';
 import type { DocumentTypeModel } from '@umbraco-cms/backend-api';
+import { UmbControllerHostInterface } from '@umbraco-cms/controller';
+import { ObjectState } from '@umbraco-cms/observable-api';
 
+type EntityType = DocumentTypeModel;
 export class UmbWorkspaceDocumentTypeContext
-	extends UmbWorkspaceContext
-	implements UmbWorkspaceEntityContextInterface<DocumentTypeModel | undefined>
+	extends UmbWorkspaceContext<UmbDocumentTypeRepository>
+	implements UmbWorkspaceEntityContextInterface<EntityType | undefined>
 {
-	#manager = new UmbEntityWorkspaceManager(this._host, 'document-type', UMB_DOCUMENT_TYPE_STORE_CONTEXT_TOKEN);
+	#data = new ObjectState<EntityType | undefined>(undefined);
+	data = this.#data.asObservable();
+	name = this.#data.getObservablePart((data) => data?.name);
 
-	public readonly data = this.#manager.state.asObservable();
-	public readonly name = this.#manager.state.getObservablePart((state) => state?.name);
-
-	setName(name: string) {
-		this.#manager.state.update({ name: name });
+	constructor(host: UmbControllerHostInterface) {
+		super(host, new UmbDocumentTypeRepository(host));
 	}
-	setIcon(icon: string) {
-		this.#manager.state.update({ icon: icon });
-	}
-	getEntityType = this.#manager.getEntityType;
-	getUnique = this.#manager.getEntityKey;
-	getEntityKey = this.#manager.getEntityKey;
-	getStore = this.#manager.getStore;
-	getData = this.#manager.getData;
-	load = this.#manager.load;
-	create = this.#manager.create;
-	save = this.#manager.save;
-	destroy = this.#manager.destroy;
 
 	public setPropertyValue(alias: string, value: unknown) {
 		throw new Error('setPropertyValue is not implemented for UmbWorkspaceDocumentTypeContext');
+	}
+
+	getData() {
+		return this.#data.getValue();
+	}
+
+	getEntityKey() {
+		return this.getData()?.key || '';
+	}
+
+	getEntityType() {
+		return 'document-type';
+	}
+
+	setName(name: string) {
+		this.#data.update({ name });
+	}
+
+	// TODO => manage setting icon color
+	setIcon(icon: string) {
+		this.#data.update({ icon });
+	}
+
+	async load(entityKey: string) {
+		const { data } = await this.repository.requestByKey(entityKey);
+		if (data) {
+			this.#data.next(data);
+		}
+	}
+
+	async createScaffold(parentKey: string | null) {
+		const { data } = await this.repository.createScaffold(parentKey);
+		if (!data) return;
+		this.#data.next(data);
+	}
+
+	async save() {
+		if (!this.#data.value) return;
+		this.repository.save(this.#data.value);
+	}
+
+	public destroy(): void {
+		this.#data.complete();
 	}
 }

@@ -1,12 +1,7 @@
 import { rest } from 'msw';
 
 import { umbracoPath } from '@umbraco-cms/utils';
-import {
-	CreatedResultModel,
-	ModelsBuilderModel,
-	ModelsModeModel,
-	OutOfDateStatusModel,
-} from '@umbraco-cms/backend-api';
+import { ModelsBuilderModel, ModelsModeModel, OutOfDateStatusModel } from '@umbraco-cms/backend-api';
 
 export const handlers = [
 	rest.post(umbracoPath('/models-builder/build'), async (_req, res, ctx) => {
@@ -15,7 +10,7 @@ export const handlers = [
 		return res(
 			// Respond with a 200 status code
 			ctx.status(200),
-			ctx.json<CreatedResultModel>({})
+			ctx.json({})
 		);
 	}),
 

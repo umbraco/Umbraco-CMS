@@ -1,5 +1,6 @@
-import { UmbDeleteEntityAction } from '../../../shared/entity-actions/delete/delete.action';
+import { TEMPLATE_REPOSITORY_ALIAS } from '../repository/manifests';
 import { UmbCreateEntityAction } from './create/create.action';
+import { UmbDeleteEntityAction } from '@umbraco-cms/entity-action';
 import { ManifestEntityAction } from 'libs/extensions-registry/entity-action.models';
 
 const entityActions: Array<ManifestEntityAction> = [
@@ -12,7 +13,7 @@ const entityActions: Array<ManifestEntityAction> = [
 			icon: 'umb:add',
 			label: 'Create',
 			api: UmbCreateEntityAction,
-			repositoryAlias: 'Umb.Repository.Templates',
+			repositoryAlias: TEMPLATE_REPOSITORY_ALIAS,
 		},
 	},
 	{
@@ -24,7 +25,7 @@ const entityActions: Array<ManifestEntityAction> = [
 			icon: 'umb:trash',
 			label: 'Delete',
 			api: UmbDeleteEntityAction,
-			repositoryAlias: 'Umb.Repository.Templates',
+			repositoryAlias: TEMPLATE_REPOSITORY_ALIAS,
 		},
 	},
 ];

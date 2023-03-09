@@ -5,7 +5,7 @@ import { UmbModalLayoutElement } from '../modal-layout.element';
 
 export interface UmbModalContentPickerData {
 	multiple?: boolean;
-	selection: Array<string>;
+	selection?: Array<string>;
 }
 
 import { UmbTreeElement } from '../../../../backoffice/shared/components/tree/tree.element';

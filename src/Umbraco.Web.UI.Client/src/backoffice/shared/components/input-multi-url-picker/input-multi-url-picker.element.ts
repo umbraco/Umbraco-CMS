@@ -4,7 +4,7 @@ import { customElement, property } from 'lit/decorators.js';
 import { FormControlMixin } from '@umbraco-ui/uui-base/lib/mixins';
 import { UUIModalSidebarSize } from '@umbraco-ui/uui-modal-sidebar';
 import { UmbLitElement } from '@umbraco-cms/element';
-import { UmbModalService, UMB_MODAL_SERVICE_CONTEXT_TOKEN } from '@umbraco-cms/modal';
+import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN } from '@umbraco-cms/modal';
 
 export interface MultiUrlData {
 	icon?: string;
@@ -96,6 +96,7 @@ export class UmbInputMultiUrlPickerElement extends FormControlMixin(UmbLitElemen
 	 */
 	@property({ attribute: false })
 	set urls(data: Array<MultiUrlData>) {
+		if (!data) return;
 		this._urls = data;
 		super.value = this._urls.map((x) => x.url).join(',');
 	}
@@ -105,7 +106,7 @@ export class UmbInputMultiUrlPickerElement extends FormControlMixin(UmbLitElemen
 	}
 
 	private _urls: Array<MultiUrlData> = [];
-	private _modalService?: UmbModalService;
+	private _modalContext?: UmbModalContext;
 
 	constructor() {
 		super();
@@ -120,8 +121,8 @@ export class UmbInputMultiUrlPickerElement extends FormControlMixin(UmbLitElemen
 			() => !!this.max && this.urls.length > this.max
 		);
 
-		this.consumeContext(UMB_MODAL_SERVICE_CONTEXT_TOKEN, (instance) => {
-			this._modalService = instance;
+		this.consumeContext(UMB_MODAL_CONTEXT_TOKEN, (instance) => {
+			this._modalContext = instance;
 		});
 	}
 
@@ -143,7 +144,7 @@ export class UmbInputMultiUrlPickerElement extends FormControlMixin(UmbLitElemen
 	}
 
 	private _openPicker(data?: MultiUrlData, index?: number) {
-		const modalHandler = this._modalService?.linkPicker({
+		const modalHandler = this._modalContext?.linkPicker({
 			link: {
 				name: data?.name,
 				published: data?.published,
