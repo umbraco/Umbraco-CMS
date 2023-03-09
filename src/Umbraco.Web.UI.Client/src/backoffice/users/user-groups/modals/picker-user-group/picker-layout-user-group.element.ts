@@ -1,9 +1,9 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
-import { UmbModalLayoutPickerBase } from '../modal-layout-picker-base';
-import { UMB_USER_GROUP_STORE_CONTEXT_TOKEN } from '../../../../src/backoffice/users/user-groups/user-group.store';
-import type { UmbUserGroupStore } from '../../../../src/backoffice/users/user-groups/user-group.store';
+import { UmbModalLayoutPickerBase } from '../../../../../../libs/modal/layouts/modal-layout-picker-base';
+import { UMB_USER_GROUP_STORE_CONTEXT_TOKEN } from '../../user-group.store';
+import type { UmbUserGroupStore } from '../../user-group.store';
 import type { UserGroupDetails } from '@umbraco-cms/models';
 
 @customElement('umb-picker-layout-user-group')
