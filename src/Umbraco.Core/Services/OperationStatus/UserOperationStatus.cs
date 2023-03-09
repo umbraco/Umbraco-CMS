@@ -10,7 +10,7 @@ public enum UserOperationStatus
     DuplicateUserName,
     DuplicateEmail,
     Unauthorized,
-    CancelledByNotifications,
+    CancelledByNotification,
     NotFound,
     CannotInvite,
     CannotDelete,

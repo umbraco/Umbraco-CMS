@@ -18,12 +18,38 @@ public class UsersControllerBase : ManagementApiControllerBase
         {
             UserOperationStatus.Success => Ok(),
             UserOperationStatus.MissingUser => BadRequest(new ProblemDetailsBuilder()
-                .WithTitle("Missing user")
+                .WithTitle("Missing User")
                 .WithDetail("A performing user is required for the operation, but none was found.")
                 .Build()),
             UserOperationStatus.MissingUserGroup => NotFound(new ProblemDetailsBuilder()
-                .WithTitle("Missing user group")
+                .WithTitle("Missing User Group")
                 .WithDetail("The specified user group was not found.")
+                .Build()),
+            UserOperationStatus.UserNameIsNotEmail => BadRequest(new ProblemDetailsBuilder()
+                .WithTitle("Invalid Username")
+                .WithDetail("The username must be the same as the email.")
+                .Build()),
+            UserOperationStatus.EmailCannotBeChanged => BadRequest(new ProblemDetailsBuilder()
+                .WithTitle("Email Cannot be changed")
+                .WithDetail("Local login is disabled, so the email cannot be changed.")
+                .Build()),
+            UserOperationStatus.DuplicateUserName => BadRequest(new ProblemDetailsBuilder()
+                .WithTitle("Duplicate Username")
+                .WithDetail("The username is already in use.")
+                .Build()),
+            UserOperationStatus.DuplicateEmail => BadRequest(new ProblemDetailsBuilder()
+                .WithTitle("Duplicate Email")
+                .WithDetail("The email is already in use.")
+                .Build()),
+            UserOperationStatus.Unauthorized => Unauthorized(),
+            UserOperationStatus.CancelledByNotification => BadRequest(new ProblemDetailsBuilder()
+                .WithTitle("Cancelled by notification")
+                .WithDetail("A notification handler prevented the user operation.")
+                .Build()),
+            UserOperationStatus.CannotInvite => StatusCode(StatusCodes.Status500InternalServerError, "Cannot send user invitation."),
+            UserOperationStatus.CannotDelete => BadRequest(new ProblemDetailsBuilder()
+                .WithTitle("Cannot delete user")
+                .WithDetail("The user cannot be deleted.")
                 .Build()),
             _ => StatusCode(StatusCodes.Status500InternalServerError, "Unknown user group operation status."),
         };
