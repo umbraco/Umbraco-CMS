@@ -19,7 +19,7 @@ export class UmbModalToken<T = unknown> {
 	 *                used only for debugging purposes,
 	 *                it should but does not need to be unique
 	 */
-	constructor(protected alias: string, protected defaultConfig: UmbModalConfig, protected _desc?: string) {}
+	constructor(protected alias: string, protected defaultConfig?: UmbModalConfig, protected _desc?: string) {}
 
 	/**
 	 * This method must always return the unique alias of the token since that
@@ -31,7 +31,7 @@ export class UmbModalToken<T = unknown> {
 		return this.alias;
 	}
 
-	public getDefaultConfig(): UmbModalConfig {
+	public getDefaultConfig(): UmbModalConfig | undefined {
 		return this.defaultConfig;
 	}
 }

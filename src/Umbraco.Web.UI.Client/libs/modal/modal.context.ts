@@ -1,4 +1,4 @@
-import './layouts/search/modal-layout-search.element';
+import '../../src/backoffice/search/modals/search/search-modal.element';
 
 import { UUIModalSidebarSize } from '@umbraco-ui/uui-modal-sidebar';
 import { BehaviorSubject } from 'rxjs';
@@ -27,8 +27,9 @@ export class UmbModalContext {
 		this.host = host;
 	}
 
+	// TODO: Remove this when the modal system is more flexible
 	public search(): UmbModalHandler {
-		const modalHandler = new UmbModalHandler('umb-modal-layout-search');
+		const modalHandler = new UmbModalHandler(this.host, 'Umb.Modal.Search');
 
 		//TODO START: This is a hack to get the search modal layout to look like i want it to.
 		//TODO: Remove from here to END when the modal system is more flexible
@@ -48,15 +49,15 @@ export class UmbModalContext {
 		dialog.style.padding = '0';
 		dialog.style.boxShadow = 'var(--uui-shadow-depth-5)';
 		dialog.style.borderRadius = '9px';
-		const search = document.createElement('umb-modal-layout-search');
+		const search = document.createElement('umb-search-modal');
 		dialog.appendChild(search);
 		requestAnimationFrame(() => {
 			dialog.showModal();
 		});
-		modalHandler.element = dialog as unknown as UUIModalDialogElement;
+		modalHandler.containerElement = dialog as unknown as UUIModalDialogElement;
 		//TODO END
 
-		modalHandler.element.addEventListener('close-end', () => this.#onCloseEnd(modalHandler));
+		modalHandler.containerElement.addEventListener('close-end', () => this.#onCloseEnd(modalHandler));
 
 		this.#modals.next([...this.#modals.getValue(), modalHandler]);
 		return modalHandler;

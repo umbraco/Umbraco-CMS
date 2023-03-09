@@ -14,8 +14,8 @@ export type SearchGroupItem = {
 	name: string;
 	items: Array<SearchItem>;
 };
-@customElement('umb-modal-layout-search')
-export class UmbModalLayoutSearchElement extends LitElement {
+@customElement('umb-search-modal')
+export class UmbSearchModalElement extends LitElement {
 	static styles = [
 		UUITextStyles,
 		css`
@@ -308,10 +308,10 @@ export class UmbModalLayoutSearchElement extends LitElement {
 	];
 }
 
-export default UmbModalLayoutSearchElement;
+export default UmbSearchModalElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-modal-layout-search': UmbModalLayoutSearchElement;
+		'umb-search-modal': UmbSearchModalElement;
 	}
 }

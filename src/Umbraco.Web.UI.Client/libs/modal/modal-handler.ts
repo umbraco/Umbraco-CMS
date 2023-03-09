@@ -37,8 +37,8 @@ export class UmbModalHandler {
 		this.key = uuidv4();
 
 		if (modalAlias instanceof UmbModalToken) {
-			this.type = modalAlias.getDefaultConfig().type || this.type;
-			this.size = modalAlias.getDefaultConfig().size || this.size;
+			this.type = modalAlias.getDefaultConfig()?.type || this.type;
+			this.size = modalAlias.getDefaultConfig()?.size || this.size;
 		}
 
 		this.type = config?.type || this.type;
