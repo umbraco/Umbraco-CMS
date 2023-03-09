@@ -7,8 +7,8 @@ export interface UmbDebugModalData {
 	content: TemplateResult | string;
 }
 
-@customElement('umb-debug-modal-layout')
-export default class UmbDebugModalLayout extends UmbModalLayoutElement<UmbDebugModalData> {
+@customElement('umb-debug-modal')
+export default class UmbDebugModalElement extends UmbModalLayoutElement<UmbDebugModalData> {
 	static styles = [
 		UUITextStyles,
 		css`
@@ -74,6 +74,6 @@ export default class UmbDebugModalLayout extends UmbModalLayoutElement<UmbDebugM
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-debug-modal-layout': UmbDebugModalLayout;
+		'umb-debug-modal': UmbDebugModalElement;
 	}
 }
