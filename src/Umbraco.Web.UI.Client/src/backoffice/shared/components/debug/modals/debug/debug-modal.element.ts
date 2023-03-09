@@ -1,14 +1,11 @@
-import { css, html, TemplateResult } from 'lit';
+import { css, html } from 'lit';
 import { customElement } from 'lit/decorators.js';
 import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { UmbModalLayoutElement } from '@umbraco-cms/modal';
+import { UmbContextDebuggerModalData } from '.';
 
-export interface UmbDebugModalData {
-	content: TemplateResult | string;
-}
-
-@customElement('umb-debug-modal')
-export default class UmbDebugModalElement extends UmbModalLayoutElement<UmbDebugModalData> {
+@customElement('umb-context-debugger-modal')
+export default class UmbContextDebuggerModalElement extends UmbModalLayoutElement<UmbContextDebuggerModalData> {
 	static styles = [
 		UUITextStyles,
 		css`
@@ -74,6 +71,6 @@ export default class UmbDebugModalElement extends UmbModalLayoutElement<UmbDebug
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-debug-modal': UmbDebugModalElement;
+		'umb-context-debugger-modal': UmbContextDebuggerModalElement;
 	}
 }

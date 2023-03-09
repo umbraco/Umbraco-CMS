@@ -1,7 +1,7 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html, nothing, TemplateResult } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
-import { UMB_BASIC_MODAL_TOKEN } from '../../modals/basic';
+import { UMB_CONTEXT_DEBUGGER_MODAL_TOKEN } from './modals/debug';
 import { UmbContextDebugRequest } from '@umbraco-cms/context-api';
 import { UmbLitElement } from '@umbraco-cms/element';
 import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN } from 'libs/modal';
@@ -103,8 +103,8 @@ export class UmbDebug extends UmbLitElement {
 	}
 
 	private _openDialog() {
-		this._modalContext?.open(UMB_DEBUG_MODAL_TOKEN, {
-			content: this._renderContextAliases(),
+		this._modalContext?.open(UMB_CONTEXT_DEBUGGER_MODAL_TOKEN, {
+			content: html`${this._renderContextAliases()}`,
 		});
 	}
 
