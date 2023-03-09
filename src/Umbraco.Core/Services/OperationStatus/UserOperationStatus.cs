@@ -13,5 +13,6 @@ public enum UserOperationStatus
     CancelledByNotifications,
     NotFound,
     CannotInvite,
+    CannotDelete,
     UnknownFailure,
 }

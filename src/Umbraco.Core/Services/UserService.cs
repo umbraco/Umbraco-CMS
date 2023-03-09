@@ -1071,6 +1071,29 @@ internal class UserService : RepositoryService, IUserService
         };
     }
 
+    public async Task<UserOperationStatus> DeleteAsync(Guid key)
+    {
+        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+        IUser? user = await GetAsync(key);
+
+        if (user is null)
+        {
+            return UserOperationStatus.NotFound;
+        }
+
+        // Check user hasn't logged in.  If they have they may have made content changes which will mean
+        // the Id is associated with audit trails, versions etc. and can't be removed.
+        if (user.LastLoginDate is not null && user.LastLoginDate != default(DateTime))
+        {
+            return UserOperationStatus.CannotDelete;
+        }
+
+        Delete(user, true);
+
+        scope.Complete();
+        return UserOperationStatus.Success;
+    }
+
     public IEnumerable<IUser> GetAll(long pageIndex, int pageSize, out long totalRecords, string orderBy, Direction orderDirection, UserState[]? userState = null, string[]? userGroups = null, string? filter = null)
     {
         IQuery<IUser>? filterQuery = null;

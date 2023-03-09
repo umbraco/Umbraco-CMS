@@ -61,6 +61,8 @@ public interface IUserService : IMembershipUserService
 
     Task<Attempt<IUser, UserOperationStatus>> UpdateAsync(int performingUserId, UserUpdateModel model);
 
+    Task<UserOperationStatus> DeleteAsync(Guid key);
+
     /// <summary>
     /// Gets all users that the requesting user is allowed to see.
     /// </summary>
