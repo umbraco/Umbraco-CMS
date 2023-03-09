@@ -45,7 +45,7 @@ public abstract class BaseHttpHeaderCheck : HealthCheck
     /// <summary>
     ///     Gets a link to an external read more page.
     /// </summary>
-    protected abstract string ReadMoreLink { get; }
+    protected abstract string? ReadMoreLink { get; }
 
     private static HttpClient HttpClient => httpClient ??= new HttpClient();
 
@@ -110,7 +110,7 @@ public abstract class BaseHttpHeaderCheck : HealthCheck
             new HealthCheckStatus(message)
             {
                 ResultType = resultType,
-                ReadMoreLink = success ? null : ReadMoreLink,
+                ReadMoreLink = success && !string.IsNullOrEmpty(ReadMoreLink) ? null : ReadMoreLink,
             };
     }
 
