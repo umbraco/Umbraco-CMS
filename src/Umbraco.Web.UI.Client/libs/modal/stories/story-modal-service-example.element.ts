@@ -21,6 +21,8 @@ export class StoryModalContextExampleElement extends UmbLitElement {
 	}
 
 	private _open() {
+		// TODO: use the extension registry to get all modals
+		/*
 		switch (this.modalLayout) {
 			case 'Content Picker':
 				this._modalContext?.documentPicker();
@@ -38,6 +40,7 @@ export class StoryModalContextExampleElement extends UmbLitElement {
 				});
 				break;
 		}
+		*/
 	}
 
 	render() {

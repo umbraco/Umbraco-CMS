@@ -7,13 +7,16 @@ export default {
 	argTypes: {
 		modalLayout: {
 			control: 'select',
-			options: ['Confirm', 'Content Picker', 'Property Editor UI Picker', 'Icon Picker'],
+			//options: ['Confirm', 'Content Picker', 'Property Editor UI Picker', 'Icon Picker'],
 		},
 	},
 } as Meta;
 
 const Template: Story = (props) => {
-	return html` <story-modal-context-example .modalLayout=${props.modalLayout}></story-modal-context-example> `;
+	return html`
+		Under construction
+		<!--<story-modal-context-example .modalLayout=${props.modalLayout}></story-modal-context-example>-->
+	`;
 };
 
 export const Overview = Template.bind({});
