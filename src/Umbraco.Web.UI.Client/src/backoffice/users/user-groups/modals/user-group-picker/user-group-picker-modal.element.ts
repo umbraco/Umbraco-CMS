@@ -5,8 +5,8 @@ import { UmbModalLayoutPickerBase } from '@umbraco-cms/modal';
 import { UmbUserGroupStore, UMB_USER_GROUP_STORE_CONTEXT_TOKEN } from '../../repository/user-group.store';
 import type { UserGroupDetails } from '@umbraco-cms/models';
 
-@customElement('umb-picker-layout-user-group')
-export class UmbPickerLayoutUserGroupElement extends UmbModalLayoutPickerBase<UserGroupDetails> {
+@customElement('umb-user-group-picker-modal')
+export class UmbUserGroupPickerModalElement extends UmbModalLayoutPickerBase<UserGroupDetails> {
 	static styles = [
 		UUITextStyles,
 		css`
@@ -100,8 +100,10 @@ export class UmbPickerLayoutUserGroupElement extends UmbModalLayoutPickerBase<Us
 	}
 }
 
+export default UmbUserGroupPickerModalElement;
+
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-picker-layout-user-group': UmbPickerLayoutUserGroupElement;
+		'umb-user-group-picker-modal': UmbUserGroupPickerModalElement;
 	}
 }

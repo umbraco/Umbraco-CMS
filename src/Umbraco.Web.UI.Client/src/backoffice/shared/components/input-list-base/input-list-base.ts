@@ -3,11 +3,6 @@ import { property } from 'lit/decorators.js';
 import { UUIModalSidebarSize } from '@umbraco-ui/uui-modal-sidebar';
 import { UmbPickerModalData } from '../../../../../libs/modal/layouts/modal-layout-picker-base';
 import { UmbModalContext, UmbModalToken, UmbModalType, UMB_MODAL_CONTEXT_TOKEN } from '../../../../../libs/modal';
-
-//TODO: These should probably be imported dynamically.
-import '../../modals/section-picker/section-picker-modal.element';
-import '../../../users/user-groups/modals/picker-user-group/picker-layout-user-group.element';
-import '../../../users/users/modals/user-picker/user-picker-modal.element';
 import { UmbLitElement } from '@umbraco-cms/element';
 
 /** TODO: Make use of UUI FORM Mixin, to make it easily take part of a form. */
