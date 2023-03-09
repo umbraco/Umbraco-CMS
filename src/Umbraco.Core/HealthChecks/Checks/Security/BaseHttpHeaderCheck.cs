@@ -18,6 +18,7 @@ public abstract class BaseHttpHeaderCheck : HealthCheck
     private readonly IHostingEnvironment _hostingEnvironment;
     private readonly string _localizedTextPrefix;
     private readonly bool _metaTagOptionAvailable;
+    private readonly bool _shouldNotExist;
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="BaseHttpHeaderCheck" /> class.
@@ -27,13 +28,15 @@ public abstract class BaseHttpHeaderCheck : HealthCheck
         ILocalizedTextService textService,
         string header,
         string localizedTextPrefix,
-        bool metaTagOptionAvailable)
+        bool metaTagOptionAvailable,
+        bool shouldNotExist = false)
     {
         LocalizedTextService = textService ?? throw new ArgumentNullException(nameof(textService));
         _hostingEnvironment = hostingEnvironment;
         _header = header;
         _localizedTextPrefix = localizedTextPrefix;
         _metaTagOptionAvailable = metaTagOptionAvailable;
+        _shouldNotExist = shouldNotExist;
     }
 
     [Obsolete("Save ILocalizedTextService in a field on the super class instead of using this")]
@@ -66,6 +69,7 @@ public abstract class BaseHttpHeaderCheck : HealthCheck
     {
         string message;
         var success = false;
+        StatusResultType resultType = StatusResultType.Warning;
 
         // Access the site home page and check for the click-jack protection header or meta tag
         var url = _hostingEnvironment.ApplicationMainUrl?.GetLeftPart(UriPartial.Authority);
@@ -86,6 +90,16 @@ public abstract class BaseHttpHeaderCheck : HealthCheck
             message = success
                 ? LocalizedTextService.Localize("healthcheck", $"{_localizedTextPrefix}CheckHeaderFound")
                 : LocalizedTextService.Localize("healthcheck", $"{_localizedTextPrefix}CheckHeaderNotFound");
+
+            if (_shouldNotExist)
+            {
+
+                resultType = success ? StatusResultType.Error : StatusResultType.Success;
+            }
+            else
+            {
+                resultType = StatusResultType.Error;
+            }
         }
         catch (Exception ex)
         {
@@ -95,7 +109,7 @@ public abstract class BaseHttpHeaderCheck : HealthCheck
         return
             new HealthCheckStatus(message)
             {
-                ResultType = success ? StatusResultType.Success : StatusResultType.Error,
+                ResultType = resultType,
                 ReadMoreLink = success ? null : ReadMoreLink,
             };
     }
