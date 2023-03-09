@@ -348,6 +348,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Install
 
         public bool DetermineHasInstalledVersion()
         {
+            using ICoreScope scope = _scopeProvider.CreateCoreScope();
             return _scopeAccessor.AmbientScope?.Database?.IsUmbracoInstalled() ?? false;
         }
 

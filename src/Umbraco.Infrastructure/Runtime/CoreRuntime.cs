@@ -170,8 +170,8 @@ public class CoreRuntime : IRuntime
         AcquireMainDom();
 
         // Notify for unattended install
-            await _eventAggregator.PublishAsync(new RuntimeUnattendedInstallNotification(), cancellationToken);
-            DetermineRuntimeLevel();
+        await _eventAggregator.PublishAsync(new RuntimeUnattendedInstallNotification(), cancellationToken);
+        DetermineRuntimeLevel();
 
         if (!State.UmbracoCanBoot())
         {

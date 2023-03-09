@@ -6,4 +6,6 @@ public interface IDatabaseInfo
 
     Task<bool> IsUmbracoInstalledAsync();
     Task<DatabaseState> GetStateAsync();
+
+    Task<string?> CurrentMigrationState(string key);
 }

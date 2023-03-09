@@ -231,6 +231,13 @@ public class RuntimeState : IRuntimeState
                 }
             case DatabaseState.NeedsUpgrade:
                 {
+                    var upgrader = new Upgrader(new UmbracoPlan(_umbracoVersion));
+                    var stateValueKey = upgrader.StateValueKey;
+
+                    CurrentMigrationState = _databaseInfo.CurrentMigrationState(stateValueKey).GetAwaiter().GetResult();
+
+                    FinalMigrationState = upgrader.Plan.FinalState;
+                    _logger.LogDebug("Final upgrade state is {FinalMigrationState}, database contains {DatabaseState}", FinalMigrationState, CurrentMigrationState ?? "<null>");
                     // the db version does not match... but we do have a migration table
                     // so, at least one valid table, so we quite probably are installed & need to upgrade
 
@@ -293,94 +300,4 @@ public class RuntimeState : IRuntimeState
             BootFailedException = new BootFailedException(bootFailedException.Message, bootFailedException);
         }
     }
-
-    // private DatabaseState GetUmbracoDatabaseState(IUmbracoDatabaseFactory databaseFactory)
-    // {
-    //     try
-    //     {
-    //         if (!TryDbConnect(databaseFactory))
-    //         {
-    //             return DatabaseState.CannotConnect;
-    //         }
-    //
-    //
-    //         // no scope, no service - just directly accessing the database
-    //         using (IUmbracoDatabase database = databaseFactory.CreateDatabase())
-    //         {
-    //             if (!database.IsUmbracoInstalled())
-    //             {
-    //                 return DatabaseState.NotInstalled;
-    //             }
-    //
-    //             // Make ONE SQL call to determine Umbraco upgrade vs package migrations state.
-    //             // All will be prefixed with the same key.
-    //             IReadOnlyDictionary<string, string?>? keyValues = database.GetFromKeyValueTable(Constants.Conventions.Migrations.KeyValuePrefix);
-    //
-    //             // This could need both an upgrade AND package migrations to execute but
-    //             // we will process them one at a time, first the upgrade, then the package migrations.
-    //             if (DoesUmbracoRequireUpgrade(keyValues))
-    //             {
-    //                 return DatabaseState.NeedsUpgrade;
-    //             }
-    //
-    //             IReadOnlyList<string> packagesRequiringMigration = _packageMigrationState.GetPendingPackageMigrations(keyValues);
-    //             if (packagesRequiringMigration.Count > 0)
-    //             {
-    //                 _startupState[PendingPackageMigrationsStateKey] = packagesRequiringMigration;
-    //
-    //                 return DatabaseState.NeedsPackageMigration;
-    //             }
-    //         }
-    //
-    //         return DatabaseState.Ok;
-    //     }
-    //     catch (Exception e)
-    //     {
-    //         // can connect to the database so cannot check the upgrade state... oops
-    //         _logger.LogWarning(e, "Could not check the upgrade state.");
-    //
-    //         // else it is bad enough that we want to throw
-    //         Reason = RuntimeLevelReason.BootFailedCannotCheckUpgradeState;
-    //         BootFailedException = new BootFailedException("Could not check the upgrade state.", e);
-    //         throw BootFailedException;
-    //     }
-    // }
-    //
-    // private bool DoesUmbracoRequireUpgrade(IReadOnlyDictionary<string, string?>? keyValues)
-    // {
-    //     var upgrader = new Upgrader(new UmbracoPlan(_umbracoVersion));
-    //     var stateValueKey = upgrader.StateValueKey;
-    //
-    //     if (keyValues?.TryGetValue(stateValueKey, out var value) ?? false)
-    //     {
-    //         CurrentMigrationState = value;
-    //     }
-    //
-    //     FinalMigrationState = upgrader.Plan.FinalState;
-    //
-    //     _logger.LogDebug("Final upgrade state is {FinalMigrationState}, database contains {DatabaseState}", FinalMigrationState, CurrentMigrationState ?? "<null>");
-    //
-    //     return CurrentMigrationState != FinalMigrationState;
-    // }
-    //
-    // private bool TryDbConnect(IUmbracoDatabaseFactory databaseFactory)
-    // {
-    //     // anything other than install wants a database - see if we can connect
-    //     // (since this is an already existing database, assume localdb is ready)
-    //     bool canConnect;
-    //     var tries = _globalSettings.Value.InstallMissingDatabase ? 2 : 5;
-    //     for (var i = 0; ;)
-    //     {
-    //         canConnect = databaseFactory.CanConnect;
-    //         if (canConnect || ++i == tries)
-    //         {
-    //             break;
-    //         }
-    //
-    //         _logger.LogDebug("Could not immediately connect to database, trying again.");
-    //         Thread.Sleep(1000);
-    //     }
-    //
-    //     return canConnect;
-    // }
 }
