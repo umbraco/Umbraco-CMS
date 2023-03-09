@@ -86,7 +86,7 @@ export class TinyMceMacroPickerPlugin extends TinyMcePluginBase {
 			const comment = Array.from(macroDiv.childNodes).find((x) => x.nodeType === 8);
 
 			if (!comment) {
-				throw 'Cannot parse the current macro, the syntax in the editor is invalid';
+				throw('Cannot parse the current macro, the syntax in the editor is invalid');
 			}
 
 			const syntax = comment.textContent?.trim();
@@ -190,9 +190,10 @@ export class TinyMceMacroPickerPlugin extends TinyMcePluginBase {
 
 		if (!modalHandler) return;
 
-		const { confirmed } = await modalHandler.onClose();
-		if (!confirmed) return;
+		const result = await modalHandler.onClose();
+		if (!result) return;
 
+		// TODO => object here should be the response from the modal
 		this.#insertInEditor({} as MacroSyntaxData, dialogData.activeMacroElement);
 		this.editor.dispatch('Change');
 	}
