@@ -1,7 +1,7 @@
 ﻿namespace Umbraco.Cms.Api.Management.ViewModels.ContentType;
 
-public abstract class ContentTypeViewModelBase<TPropertyType, TPropertyTypeContainer>
-    where TPropertyType : PropertyTypeViewModelBase
+public abstract class ContentTypePresentationBase<TPropertyType, TPropertyTypeContainer>
+    where TPropertyType : PropertyTypePresentationBase
     where TPropertyTypeContainer : PropertyTypeContainerViewModelBase
 {
     public Guid Key { get; set; }
