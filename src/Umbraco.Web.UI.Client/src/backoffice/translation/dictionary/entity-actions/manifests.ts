@@ -93,7 +93,7 @@ const entityActions: Array<ManifestEntityAction> = [
 const modals: Array<ManifestModal> = [
 	{
 		type: 'modal',
-		alias: 'Umb.Modal.ExamineFieldsSettings',
+		alias: 'Umb.Modal.CreateDictionary',
 		name: 'Create Dictionary Modal',
 		loader: () => import('./create/create-dictionary-modal-layout.element'),
 	},
