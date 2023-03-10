@@ -140,8 +140,8 @@ export class UmbDashboardRedirectManagementElement extends UmbLitElement {
 			color: 'danger',
 			confirmLabel: 'Delete',
 		});
-		modalHandler?.onSubmit().then(({ confirmed }) => {
-			if (confirmed) this._removeRedirect(data);
+		modalHandler?.onSubmit().then(() => {
+			this._removeRedirect(data);
 		});
 	}
 
@@ -164,8 +164,8 @@ export class UmbDashboardRedirectManagementElement extends UmbLitElement {
 			color: 'danger',
 			confirmLabel: 'Disable',
 		});
-		modalHandler?.onSubmit().then(({ confirmed }) => {
-			if (confirmed) this._toggleRedirect();
+		modalHandler?.onSubmit().then(() => {
+			this._toggleRedirect();
 		});
 	}
 

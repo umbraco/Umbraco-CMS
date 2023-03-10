@@ -142,11 +142,7 @@ export class UmbPackagesCreatedOverviewElement extends UmbLitElement {
 			confirmLabel: 'Delete',
 		});
 
-		const deleteConfirmed = await modalHandler?.onSubmit().then(({ confirmed }: any) => {
-			return confirmed;
-		});
-
-		if (!deleteConfirmed == true) return;
+		await modalHandler?.onSubmit();
 
 		const { error } = await tryExecuteAndNotify(this, PackageResource.deletePackageCreatedByKey({ key: p.key }));
 		if (error) return;

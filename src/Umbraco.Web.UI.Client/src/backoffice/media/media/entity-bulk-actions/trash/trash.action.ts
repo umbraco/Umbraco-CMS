@@ -38,10 +38,8 @@ export class UmbMediaTrashEntityBulkAction extends UmbEntityBulkActionBase<UmbMe
 				confirmLabel: 'Delete',
 			});
 
-			const { confirmed } = await modalHandler.onSubmit();
-			if (confirmed) {
-				await this.repository?.trash(this.selection);
-			}
+			await modalHandler.onSubmit();
+			await this.repository?.trash(this.selection);
 		}
 	}
 }

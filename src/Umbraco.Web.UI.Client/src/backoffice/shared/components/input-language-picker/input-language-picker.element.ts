@@ -140,11 +140,9 @@ export class UmbInputLanguagePickerElement extends FormControlMixin(UmbLitElemen
 			confirmLabel: 'Remove',
 		});
 
-		modalHandler?.onSubmit().then(({ confirmed }) => {
-			if (confirmed) {
-				const newSelection = this._selectedIsoCodes.filter((value) => value !== item.isoCode);
-				this._setSelection(newSelection);
-			}
+		modalHandler?.onSubmit().then(() => {
+			const newSelection = this._selectedIsoCodes.filter((value) => value !== item.isoCode);
+			this._setSelection(newSelection);
 		});
 	}
 

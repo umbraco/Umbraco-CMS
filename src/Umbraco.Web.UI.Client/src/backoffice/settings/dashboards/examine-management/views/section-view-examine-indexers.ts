@@ -129,8 +129,8 @@ export class UmbDashboardExamineIndexElement extends UmbLitElement {
 			color: 'danger',
 			confirmLabel: 'Rebuild',
 		});
-		modalHandler?.onSubmit().then(({ confirmed }) => {
-			if (confirmed) this._rebuild();
+		modalHandler?.onSubmit().then(() => {
+			this._rebuild();
 		});
 	}
 	private async _rebuild() {

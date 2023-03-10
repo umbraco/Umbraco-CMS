@@ -28,7 +28,7 @@ export class UmbExtensionRootWorkspaceElement extends UmbLitElement {
 		});
 	}
 
-	#removeExtension(extension: ManifestBase) {
+	async #removeExtension(extension: ManifestBase) {
 		const modalHandler = this._modalContext?.open(UMB_CONFIRM_MODAL_TOKEN, {
 			headline: 'Unload extension',
 			confirmLabel: 'Unload',
@@ -36,11 +36,8 @@ export class UmbExtensionRootWorkspaceElement extends UmbLitElement {
 			color: 'danger',
 		});
 
-		modalHandler?.onSubmit().then(({ confirmed }: any) => {
-			if (confirmed) {
-				umbExtensionsRegistry.unregister(extension.alias);
-			}
-		});
+		await modalHandler?.onSubmit();
+		umbExtensionsRegistry.unregister(extension.alias);
 	}
 
 	render() {

@@ -155,11 +155,9 @@ export class UmbInputMediaPickerElement extends FormControlMixin(UmbLitElement) 
 			confirmLabel: 'Remove',
 		});
 
-		modalHandler?.onSubmit().then(({ confirmed }) => {
-			if (confirmed) {
-				const newSelection = this._selectedKeys.filter((value) => value !== item.key);
-				this._setSelection(newSelection);
-			}
+		modalHandler?.onSubmit().then(() => {
+			const newSelection = this._selectedKeys.filter((value) => value !== item.key);
+			this._setSelection(newSelection);
 		});
 	}
 
