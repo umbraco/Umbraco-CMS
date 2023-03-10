@@ -75,7 +75,8 @@ export class UmbracoPackage {
 	name?: string;
 
 	/**
-	 * @title The version of the Umbraco package
+	 * @title The version of the Umbraco package in the style of semver
+	 * @example 0.1.0
 	 */
 	version?: string;
 
