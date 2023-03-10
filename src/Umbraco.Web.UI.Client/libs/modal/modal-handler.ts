@@ -105,10 +105,8 @@ export class UmbModalHandler {
 				if (manifest) {
 					const element = await this.#createModalElement(manifest, data);
 					this.#appendModalElement(element);
-					this.#element.next(element);
 				} else {
 					this.#removeModalElement();
-					this.#element.next(undefined);
 				}
 			}
 		);
@@ -116,11 +114,13 @@ export class UmbModalHandler {
 
 	#appendModalElement(element: any) {
 		this.#innerElement?.appendChild(element);
+		this.#element.next(element);
 	}
 
 	#removeModalElement() {
 		if (this.#element.getValue()) {
 			this.#innerElement?.removeChild(this.#element.getValue());
+			this.#element.next(undefined);
 		}
 	}
 }
