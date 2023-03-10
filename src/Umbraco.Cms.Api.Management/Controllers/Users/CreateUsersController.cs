@@ -25,7 +25,7 @@ public class CreateUsersController : UsersControllerBase
 
     [HttpPost]
     [MapToApiVersion("1.0")]
-    [ProducesResponseType(typeof(UserCreationResult), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(CreateUserResponseModel), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> Create(CreateUserRequestModel model)
     {
