@@ -1,12 +1,12 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
-import { UmbModalLayoutPickerBase } from '@umbraco-cms/modal';
+import { UmbModalElementPickerBase } from '@umbraco-cms/modal';
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-api';
 import type { ManifestSection } from '@umbraco-cms/models';
 
 @customElement('umb-section-picker-modal')
-export class UmbSectionPickerModalElement extends UmbModalLayoutPickerBase<ManifestSection> {
+export class UmbSectionPickerModalElement extends UmbModalElementPickerBase<ManifestSection> {
 	static styles = [
 		UUITextStyles,
 		css`

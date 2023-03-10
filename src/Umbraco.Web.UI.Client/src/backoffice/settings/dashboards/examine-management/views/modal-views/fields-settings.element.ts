@@ -8,8 +8,8 @@ export interface UmbModalFieldsSettingsData {
 	exposed: boolean;
 }
 
-@customElement('umb-modal-layout-fields-settings')
-export class UmbModalLayoutFieldsSettingsElement extends UmbModalLayoutElement<UmbModalFieldsSettingsData> {
+@customElement('umb-modal-element-fields-settings')
+export class UmbModalElementFieldsSettingsElement extends UmbModalLayoutElement<UmbModalFieldsSettingsData> {
 	static styles = [
 		UUITextStyles,
 		css`
@@ -92,6 +92,6 @@ export class UmbModalLayoutFieldsSettingsElement extends UmbModalLayoutElement<U
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-modal-layout-fields-settings': UmbModalLayoutFieldsSettingsElement;
+		'umb-modal-element-fields-settings': UmbModalElementFieldsSettingsElement;
 	}
 }

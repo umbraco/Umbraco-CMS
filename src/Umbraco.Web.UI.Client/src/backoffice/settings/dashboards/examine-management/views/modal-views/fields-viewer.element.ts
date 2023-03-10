@@ -4,8 +4,8 @@ import { customElement } from 'lit/decorators.js';
 import { UmbModalLayoutElement } from '@umbraco-cms/modal';
 import type { SearchResultModel } from '@umbraco-cms/backend-api';
 
-@customElement('umb-modal-layout-fields-viewer')
-export class UmbModalLayoutFieldsViewerElement extends UmbModalLayoutElement<SearchResultModel & { name: string }> {
+@customElement('umb-modal-element-fields-viewer')
+export class UmbModalElementFieldsViewerElement extends UmbModalLayoutElement<SearchResultModel & { name: string }> {
 	static styles = [
 		UUITextStyles,
 		css`
@@ -72,6 +72,6 @@ export class UmbModalLayoutFieldsViewerElement extends UmbModalLayoutElement<Sea
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-modal-layout-fields-viewer': UmbModalLayoutFieldsViewerElement;
+		'umb-modal-element-fields-viewer': UmbModalElementFieldsViewerElement;
 	}
 }
