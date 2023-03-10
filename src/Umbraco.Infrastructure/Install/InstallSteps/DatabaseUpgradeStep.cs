@@ -1,8 +1,10 @@
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Install;
 using Umbraco.Cms.Core.Install.Models;
 using Umbraco.Cms.Core.Services;
@@ -22,6 +24,7 @@ namespace Umbraco.Cms.Infrastructure.Install.InstallSteps
         private readonly ILogger<DatabaseUpgradeStep> _logger;
         private readonly IUmbracoVersion _umbracoVersion;
         private readonly IOptionsMonitor<ConnectionStrings> _connectionStrings;
+        private readonly IDatabaseBuilder _efCoreDatabaseBuilder;
 
         public DatabaseUpgradeStep(
             DatabaseBuilder databaseBuilder,
@@ -29,15 +32,27 @@ namespace Umbraco.Cms.Infrastructure.Install.InstallSteps
             ILogger<DatabaseUpgradeStep> logger,
             IUmbracoVersion umbracoVersion,
             IOptionsMonitor<ConnectionStrings> connectionStrings)
+        : this(databaseBuilder, runtime, logger, umbracoVersion, connectionStrings, StaticServiceProvider.Instance.GetRequiredService<IDatabaseBuilder>())
+        {
+        }
+
+        public DatabaseUpgradeStep(
+            DatabaseBuilder databaseBuilder,
+            IRuntimeState runtime,
+            ILogger<DatabaseUpgradeStep> logger,
+            IUmbracoVersion umbracoVersion,
+            IOptionsMonitor<ConnectionStrings> connectionStrings,
+            IDatabaseBuilder efCoreDatabaseBuilder)
         {
             _databaseBuilder = databaseBuilder;
             _runtime = runtime;
             _logger = logger;
             _umbracoVersion = umbracoVersion;
             _connectionStrings = connectionStrings;
+            _efCoreDatabaseBuilder = efCoreDatabaseBuilder;
         }
 
-        public override Task<InstallSetupResult?> ExecuteAsync(object model)
+        public override async Task<InstallSetupResult?> ExecuteAsync(object model)
         {
             InstallTrackingItem[] installSteps = InstallStatusTracker.GetStatus().ToArray();
             InstallTrackingItem previousStep = installSteps.Single(x => x.Name == "DatabaseInstall");
@@ -56,9 +71,18 @@ namespace Umbraco.Cms.Infrastructure.Install.InstallSteps
                 {
                     throw new InstallException("The database failed to upgrade. ERROR: " + result.Message);
                 }
+
+                await ExecuteEFCoreUpgrade();
             }
 
-            return Task.FromResult((InstallSetupResult?)null);
+            return null;
+        }
+
+        private async Task ExecuteEFCoreUpgrade()
+        {
+            _logger.LogInformation("Running EFCore upgrade");
+            var plan = new UmbracoEFCorePlan();
+            await _efCoreDatabaseBuilder.UpgradeSchemaAndData(plan);
         }
 
         public override bool RequiresExecution(object model)
