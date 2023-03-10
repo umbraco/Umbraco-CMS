@@ -72,16 +72,16 @@ export class UmbModalHandler {
 		return modalDialogElement;
 	}
 
-	async #createLayoutElement(manifest: ManifestModal, data?: unknown) {
-		// TODO: add fallback element if no layout is found
-		const layoutElement = (await createExtensionElement(manifest)) as any;
+	async #createModalElement(manifest: ManifestModal, data?: unknown) {
+		// TODO: add fallback element if no modal element is found
+		const modalElement = (await createExtensionElement(manifest)) as any;
 
-		if (layoutElement) {
-			layoutElement.data = data;
-			layoutElement.modalHandler = this;
+		if (modalElement) {
+			modalElement.data = data;
+			modalElement.modalHandler = this;
 		}
 
-		return layoutElement;
+		return modalElement;
 	}
 
 	public close(...args: any) {
@@ -103,7 +103,7 @@ export class UmbModalHandler {
 			umbExtensionsRegistry.getByTypeAndAlias('modal', modalAlias),
 			async (manifest) => {
 				if (manifest) {
-					const element = await this.#createLayoutElement(manifest, data);
+					const element = await this.#createModalElement(manifest, data);
 					this.#appendModalElement(element);
 					this.#element.next(element);
 				} else {
