@@ -16,7 +16,7 @@ export class UmbCreateDocumentModalLayoutElement extends UmbModalLayoutElement<U
 	static styles = [UUITextStyles];
 
 	private _handleCancel() {
-		this.modalHandler?.submit();
+		this.modalHandler?.close();
 	}
 
 	#onClick(event: PointerEvent) {
