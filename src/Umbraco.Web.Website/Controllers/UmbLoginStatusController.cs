@@ -65,7 +65,7 @@ public class UmbLoginStatusController : SurfaceController
     /// <param name="model"></param>
     private void MergeRouteValuesToModel(PostRedirectModel model)
     {
-        if (RouteData.Values.TryGetValue(nameof(PostRedirectModel.RedirectUrl), out var redirectUrl) && redirectUrl != null)
+        if (RouteData.Values.TryGetValue(nameof(PostRedirectModel.RedirectUrl), out var redirectUrl) && redirectUrl is not null)
         {
             model.RedirectUrl = redirectUrl.ToString();
         }
