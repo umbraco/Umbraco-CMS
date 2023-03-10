@@ -133,7 +133,7 @@ export class UmbInputDocumentPickerElement extends FormControlMixin(UmbLitElemen
 		});
 	}
 
-	private _removeItem(item: FolderTreeItemModel) {
+	private async _removeItem(item: FolderTreeItemModel) {
 		const modalHandler = this._modalContext?.open(UMB_CONFIRM_MODAL_TOKEN, {
 			color: 'danger',
 			headline: `Remove ${item.name}?`,
@@ -141,12 +141,9 @@ export class UmbInputDocumentPickerElement extends FormControlMixin(UmbLitElemen
 			confirmLabel: 'Remove',
 		});
 
-		modalHandler?.onSubmit().then(({ confirmed }) => {
-			if (confirmed) {
-				const newSelection = this._selectedKeys.filter((value) => value !== item.key);
-				this._setSelection(newSelection);
-			}
-		});
+		await modalHandler?.onSubmit();
+		const newSelection = this._selectedKeys.filter((value) => value !== item.key);
+		this._setSelection(newSelection);
 	}
 
 	private _setSelection(newSelection: Array<string>) {
