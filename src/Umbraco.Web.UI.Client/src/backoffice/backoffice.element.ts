@@ -2,7 +2,6 @@ import { defineElement } from '@umbraco-ui/uui-base/lib/registration';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html } from 'lit';
 
-import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN } from '../core/modal';
 import { UmbCurrentUserStore, UMB_CURRENT_USER_STORE_CONTEXT_TOKEN } from './users/current-user/current-user.store';
 import {
 	UmbCurrentUserHistoryStore,
@@ -19,6 +18,7 @@ import {
 	UmbAppLanguageContext,
 } from './settings/languages/app-language-select/app-language.context';
 import { UmbServerExtensionController } from './packages/repository/server-extension.controller';
+import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN } from '@umbraco-cms/modal';
 import { createExtensionClass, umbExtensionsRegistry } from '@umbraco-cms/extensions-api';
 import { UmbNotificationContext, UMB_NOTIFICATION_CONTEXT_TOKEN } from '@umbraco-cms/notification';
 import { UmbLitElement } from '@umbraco-cms/element';
@@ -57,8 +57,7 @@ export class UmbBackofficeElement extends UmbLitElement {
 	constructor() {
 		super();
 
-		// TODO: find a way this is possible outside this element.
-		this.provideContext(UMB_MODAL_CONTEXT_TOKEN, new UmbModalContext());
+		this.provideContext(UMB_MODAL_CONTEXT_TOKEN, new UmbModalContext(this));
 		this.provideContext(UMB_NOTIFICATION_CONTEXT_TOKEN, new UmbNotificationContext());
 		this.provideContext(UMB_CURRENT_USER_STORE_CONTEXT_TOKEN, new UmbCurrentUserStore());
 		this.provideContext(UMB_APP_LANGUAGE_CONTEXT_TOKEN, new UmbAppLanguageContext(this));

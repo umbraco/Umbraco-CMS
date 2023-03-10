@@ -1,16 +1,14 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html, nothing } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
-
 import { UUIButtonState } from '@umbraco-ui/uui-button';
-
-import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN } from '../../../../../core/modal';
-
-import './section-view-examine-searchers';
-
+import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN } from '@umbraco-cms/modal';
 import { HealthStatusModel, IndexModel, IndexerResource } from '@umbraco-cms/backend-api';
 import { UmbLitElement } from '@umbraco-cms/element';
 import { tryExecuteAndNotify } from '@umbraco-cms/resources';
+import { UMB_CONFIRM_MODAL_TOKEN } from 'src/backoffice/shared/modals/confirm';
+
+import './section-view-examine-searchers';
 
 @customElement('umb-dashboard-examine-index')
 export class UmbDashboardExamineIndexElement extends UmbLitElement {
@@ -120,7 +118,7 @@ export class UmbDashboardExamineIndexElement extends UmbLitElement {
 	}
 
 	private async _onRebuildHandler() {
-		const modalHandler = this._modalContext?.confirm({
+		const modalHandler = this._modalContext?.open(UMB_CONFIRM_MODAL_TOKEN, {
 			headline: `Rebuild ${this.indexName}`,
 			content: html`
 				This will cause the index to be rebuilt.<br />
@@ -131,8 +129,8 @@ export class UmbDashboardExamineIndexElement extends UmbLitElement {
 			color: 'danger',
 			confirmLabel: 'Rebuild',
 		});
-		modalHandler?.onClose().then(({ confirmed }) => {
-			if (confirmed) this._rebuild();
+		modalHandler?.onSubmit().then(() => {
+			this._rebuild();
 		});
 	}
 	private async _rebuild() {

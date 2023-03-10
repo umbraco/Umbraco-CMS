@@ -1,16 +1,15 @@
 import { UUIInputElement, UUIInputEvent } from '@umbraco-ui/uui';
 import { css, html, nothing, TemplateResult } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
-import { customElement, property, state } from 'lit/decorators.js';
+import { customElement, state } from 'lit/decorators.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
 import { repeat } from 'lit/directives/repeat.js';
 
-import { distinctUntilChanged } from 'rxjs';
-
 import { UmbCurrentUserStore, UMB_CURRENT_USER_STORE_CONTEXT_TOKEN } from '../../current-user/current-user.store';
-import type { UmbModalContext } from '../../../../core/modal';
 import type { UmbWorkspaceEntityElement } from '../../../shared/components/workspace/workspace-entity-element.interface';
+import { UMB_CHANGE_PASSWORD_MODAL_TOKEN } from '../../current-user/modals/change-password';
 import { UmbWorkspaceUserContext } from './user-workspace.context';
+import type { UmbModalContext } from '@umbraco-cms/modal';
 import { getLookAndColorFromUserStatus } from '@umbraco-cms/utils';
 import type { UserDetails } from '@umbraco-cms/models';
 
@@ -191,7 +190,9 @@ export class UmbUserWorkspaceElement extends UmbLitElement implements UmbWorkspa
 	}
 
 	private _changePassword() {
-		this._modalContext?.changePassword({ requireOldPassword: this._currentUserStore?.isAdmin === false });
+		this._modalContext?.open(UMB_CHANGE_PASSWORD_MODAL_TOKEN, {
+			requireOldPassword: this._currentUserStore?.isAdmin === false,
+		});
 	}
 
 	private _renderActionButtons() {

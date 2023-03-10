@@ -13,7 +13,7 @@ import {
 	UmbTrashEntityAction,
 	UmbSortChildrenOfEntityAction,
 } from '@umbraco-cms/entity-action';
-import { ManifestEntityAction } from '@umbraco-cms/extensions-registry';
+import { ManifestEntityAction, ManifestModal } from '@umbraco-cms/extensions-registry';
 
 const entityType = 'document';
 
@@ -171,4 +171,13 @@ const entityActions: Array<ManifestEntityAction> = [
 	},
 ];
 
-export const manifests = [...entityActions];
+const modals: Array<ManifestModal> = [
+	{
+		type: 'modal',
+		alias: 'Umb.Modal.CreateDocument',
+		name: 'Create Document Modal',
+		loader: () => import('./create/create-document-modal.element'),
+	},
+];
+
+export const manifests = [...entityActions, ...modals];

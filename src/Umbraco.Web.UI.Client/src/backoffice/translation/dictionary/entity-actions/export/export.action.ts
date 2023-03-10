@@ -1,6 +1,6 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { UmbDictionaryRepository } from '../../repository/dictionary.repository';
-import type { UmbExportDictionaryModalResultData } from './export-dictionary-modal-layout.element';
+import { UMB_EXPORT_DICTIONARY_MODAL_TOKEN } from '.';
 import { UmbEntityActionBase } from '@umbraco-cms/entity-action';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 import { UmbContextConsumerController } from '@umbraco-cms/context-api';
@@ -25,13 +25,10 @@ export default class UmbExportDictionaryEntityAction extends UmbEntityActionBase
 		// TODO: what to do if modal service is not available?
 		if (!this.#modalContext) return;
 
-		const modalHandler = this.#modalContext?.open('umb-export-dictionary-modal-layout', {
-			type: 'sidebar',
-			data: { unique: this.unique },
-		});
+		const modalHandler = this.#modalContext?.open(UMB_EXPORT_DICTIONARY_MODAL_TOKEN, { unique: this.unique });
 
 		// TODO: get type from modal result
-		const { includeChildren }: UmbExportDictionaryModalResultData = await modalHandler.onClose();
+		const { includeChildren } = await modalHandler.onSubmit();
 		if (includeChildren === undefined) return;
 
 		const result = await this.repository?.export(this.unique, includeChildren);

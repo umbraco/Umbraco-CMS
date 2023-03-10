@@ -5,20 +5,15 @@ import { when } from 'lit-html/directives/when.js';
 import { repeat } from 'lit/directives/repeat.js';
 import { UmbTreeElement } from '../../../../shared/components/tree/tree.element';
 import { UmbDictionaryRepository } from '../../repository/dictionary.repository';
+import { UmbImportDictionaryModalData, UmbImportDictionaryModalResult } from '.';
 import { DictionaryUploadModel } from '@umbraco-cms/backend-api';
-import { UmbModalLayoutElement } from '@umbraco-cms/modal';
-
-export interface UmbImportDictionaryModalData {
-	unique: string | null;
-}
-
-export interface UmbImportDictionaryModalResultData {
-	fileName?: string;
-	parentKey?: string;
-}
+import { UmbModalBaseElement } from '@umbraco-cms/modal';
 
 @customElement('umb-import-dictionary-modal-layout')
-export class UmbImportDictionaryModalLayoutElement extends UmbModalLayoutElement<UmbImportDictionaryModalData> {
+export class UmbImportDictionaryModalLayoutElement extends UmbModalBaseElement<
+	UmbImportDictionaryModalData,
+	UmbImportDictionaryModalResult
+> {
 	static styles = [
 		UUITextStyles,
 		css`
@@ -51,14 +46,14 @@ export class UmbImportDictionaryModalLayoutElement extends UmbModalLayoutElement
 	async #importDictionary() {
 		if (!this._uploadedDictionary?.fileName) return;
 
-		this.modalHandler?.close({
+		this.modalHandler?.submit({
 			fileName: this._uploadedDictionary.fileName,
 			parentKey: this._selection[0],
 		});
 	}
 
 	#handleClose() {
-		this.modalHandler?.close({});
+		this.modalHandler?.reject();
 	}
 
 	#submitForm() {
@@ -138,7 +133,12 @@ export class UmbImportDictionaryModalLayoutElement extends UmbModalLayoutElement
 				selectable></umb-tree>
 
 			<uui-button slot="actions" type="button" label="Cancel" @click=${this.#handleClose}></uui-button>
-			<uui-button slot="actions" type="button" label="Import" look="primary" @click=${this.#importDictionary}></uui-button>
+			<uui-button
+				slot="actions"
+				type="button"
+				label="Import"
+				look="primary"
+				@click=${this.#importDictionary}></uui-button>
 		`;
 	}
 
@@ -155,6 +155,8 @@ export class UmbImportDictionaryModalLayoutElement extends UmbModalLayoutElement
 		</umb-body-layout>`;
 	}
 }
+
+export default UmbImportDictionaryModalLayoutElement;
 
 declare global {
 	interface HTMLElementTagNameMap {

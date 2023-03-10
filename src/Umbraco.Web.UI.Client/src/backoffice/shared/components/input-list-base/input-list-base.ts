@@ -1,13 +1,13 @@
 import { html } from 'lit';
 import { property } from 'lit/decorators.js';
 import { UUIModalSidebarSize } from '@umbraco-ui/uui-modal-sidebar';
-import { UmbPickerModalData } from '../../../../core/modal/layouts/modal-layout-picker-base';
-import { UmbModalContext, UmbModalType, UMB_MODAL_CONTEXT_TOKEN } from '../../../../core/modal';
-
-//TODO: These should probably be imported dynamically.
-import '../../../../core/modal/layouts/picker-section/picker-layout-section.element';
-import '../../../../core/modal/layouts/picker-user-group/picker-layout-user-group.element';
-import '../../../../core/modal/layouts/picker-user/picker-layout-user.element';
+import {
+	UmbModalContext,
+	UmbModalToken,
+	UmbModalType,
+	UMB_MODAL_CONTEXT_TOKEN,
+	UmbPickerModalData,
+} from '@umbraco-cms/modal';
 import { UmbLitElement } from '@umbraco-cms/element';
 
 /** TODO: Make use of UUI FORM Mixin, to make it easily take part of a form. */
@@ -24,7 +24,8 @@ export class UmbInputListBase extends UmbLitElement {
 	@property({ type: String })
 	public modalSize: UUIModalSidebarSize = 'small';
 
-	protected pickerLayout?: string;
+	// TODO: not great that we use any, any here. Investigate if we can have some interface or base modal token for this type.
+	protected pickerToken?: UmbModalToken<any, any>;
 	private _modalContext?: UmbModalContext;
 
 	constructor() {
@@ -35,17 +36,14 @@ export class UmbInputListBase extends UmbLitElement {
 	}
 
 	private _openPicker() {
-		if (!this.pickerLayout) return;
+		if (!this.pickerToken) return;
 
-		const modalHandler = this._modalContext?.open(this.pickerLayout, {
-			type: this.modalType,
-			size: this.modalSize,
-			data: {
-				multiple: this.multiple,
-				selection: this.value,
-			},
+		const modalHandler = this._modalContext?.open(this.pickerToken, {
+			multiple: this.multiple,
+			selection: this.value,
 		});
-		modalHandler?.onClose().then((data: UmbPickerModalData<string>) => {
+
+		modalHandler?.onSubmit().then((data: UmbPickerModalData<string>) => {
 			if (data) {
 				this.value = data.selection;
 				this.selectionUpdated();
