@@ -32,10 +32,8 @@ export class UmbTrashEntityAction<
 				confirmLabel: 'Trash',
 			});
 
-			modalHandler?.onSubmit().then(({ confirmed }) => {
-				if (confirmed) {
-					this.repository?.trash([this.unique]);
-				}
+			modalHandler?.onSubmit().then(() => {
+				this.repository?.trash([this.unique]);
 			});
 		}
 	}

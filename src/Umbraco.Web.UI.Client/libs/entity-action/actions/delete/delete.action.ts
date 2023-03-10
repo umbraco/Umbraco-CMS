@@ -32,10 +32,8 @@ export class UmbDeleteEntityAction<
 				confirmLabel: 'Delete',
 			});
 
-			const { confirmed } = await modalHandler.onSubmit();
-			if (confirmed) {
-				await this.repository?.delete(this.unique);
-			}
+			await modalHandler.onSubmit();
+			await this.repository?.delete(this.unique);
 		}
 	}
 }

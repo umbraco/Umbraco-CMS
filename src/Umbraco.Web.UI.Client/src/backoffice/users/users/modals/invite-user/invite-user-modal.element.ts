@@ -94,7 +94,7 @@ export class UmbInviteUserModalElement extends UmbModalLayoutElement {
 	}
 
 	private _closeModal() {
-		this.modalHandler?.submit();
+		this.modalHandler?.close();
 	}
 
 	private _resetForm() {

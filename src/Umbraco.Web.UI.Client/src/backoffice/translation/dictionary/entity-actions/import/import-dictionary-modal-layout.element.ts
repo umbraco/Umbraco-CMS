@@ -58,7 +58,7 @@ export class UmbImportDictionaryModalLayoutElement extends UmbModalLayoutElement
 	}
 
 	#handleClose() {
-		this.modalHandler?.submit({});
+		this.modalHandler?.close();
 	}
 
 	#submitForm() {

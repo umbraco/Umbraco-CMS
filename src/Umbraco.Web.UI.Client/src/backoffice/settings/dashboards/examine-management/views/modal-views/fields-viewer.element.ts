@@ -38,7 +38,7 @@ export class UmbModalLayoutFieldsViewerElement extends UmbModalLayoutElement<Sea
 	];
 
 	private _handleClose() {
-		this.modalHandler?.submit();
+		this.modalHandler?.close();
 	}
 
 	render() {
