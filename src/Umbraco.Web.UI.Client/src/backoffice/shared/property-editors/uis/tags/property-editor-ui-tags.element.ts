@@ -17,7 +17,7 @@ export class UmbPropertyEditorUITagsElement extends UmbLitElement {
 	public config = [];
 
 	render() {
-		return html`<div>umb-property-editor-ui-tags</div>`;
+		return html`<umb-input-tags></umb-input-tags>`;
 	}
 }
 
