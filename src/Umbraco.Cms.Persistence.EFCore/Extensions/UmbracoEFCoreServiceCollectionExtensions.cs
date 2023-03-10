@@ -7,6 +7,7 @@ using Umbraco.Cms.Infrastructure.Migrations;
 using Umbraco.Cms.Infrastructure.Migrations.Install;
 using Umbraco.Cms.Persistence.EFCore;
 using Umbraco.Cms.Persistence.EFCore.Entities;
+using Umbraco.Cms.Persistence.EFCore.Install;
 using Umbraco.Cms.Persistence.EFCore.Scoping;
 
 namespace Umbraco.Extensions;
@@ -26,7 +27,8 @@ public static class UmbracoEFCoreServiceCollectionExtensions
             {
                 DefaultOptionsAction(options, configuration);
             }
-        }, optionsLifetime: ServiceLifetime.Singleton);
+        },
+            optionsLifetime: ServiceLifetime.Singleton);
 
         services.AddDbContextFactory<UmbracoEFContext>(options =>
         {
@@ -53,6 +55,7 @@ public static class UmbracoEFCoreServiceCollectionExtensions
         services.AddSingleton<IDistributedLockingMechanism, SqlServerEFCoreDistributedLockingMechanism>();
         services.AddSingleton<IDistributedLockingMechanism, SqliteEFCoreDistributedLockingMechanism>();
         services.AddSingleton<IEFCoreMigrationService, EFCoreMigrationService>();
+        services.AddTransient<IDatabaseBuilder, EfCoreDatabaseBuilder>();
         return services;
     }
 
