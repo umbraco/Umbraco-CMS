@@ -96,7 +96,7 @@ export class UmbModalHandler {
 	}
 
 	public close() {
-		this._submitResolver();
+		this._closeResolver();
 		this.modalElement.close();
 	}
 
