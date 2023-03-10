@@ -107,7 +107,7 @@ export class UmbModalHandler {
 		return this._closePromise;
 	}
 
-	/* TODO: modals being part of the extension registry know means that a modal element can change over time.
+	/* TODO: modals being part of the extension registry now means that a modal element can change over time.
 	 It makes this code a bit more complex. The main idea is to have the element as part of the modalHandler so it is possible to dispatch events from within the modal element to the one that opened it.
 	 Now when the element is an observable it makes it more complex because this host needs to subscribe to updates to the element, instead of just having a reference to it.
 	 If we find a better generic solution to communicate between the modal and the implementor, then we can remove the element as part of the modalHandler. */
