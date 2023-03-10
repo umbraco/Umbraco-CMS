@@ -90,7 +90,7 @@ export class UmbDocumentTypeWorkspaceElement extends UmbLitElement implements Um
 		const modalHandler = this._modalContext?.open(UMB_ICON_PICKER_MODAL_TOKEN);
 
 		modalHandler?.onSubmit().then((saved) => {
-			if (saved) this._workspaceContext?.setIcon(saved.icon);
+			if (saved.icon) this._workspaceContext?.setIcon(saved.icon);
 			// TODO save color ALIAS as well
 		});
 	}

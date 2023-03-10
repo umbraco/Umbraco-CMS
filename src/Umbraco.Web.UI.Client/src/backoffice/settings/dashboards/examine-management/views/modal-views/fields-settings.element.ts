@@ -1,15 +1,14 @@
 import { html, css } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, state } from 'lit/decorators.js';
-import { UmbModalLayoutElement } from '@umbraco-cms/modal';
+import { UmbCreateDocumentModalResultData, UmbExamineFieldsSettingsModalData } from '.';
+import { UmbModalBaseElement } from '@umbraco-cms/modal';
 
-export interface UmbModalFieldsSettingsData {
-	name: string;
-	exposed: boolean;
-}
-
-@customElement('umb-modal-element-fields-settings')
-export class UmbModalElementFieldsSettingsElement extends UmbModalLayoutElement<UmbModalFieldsSettingsData> {
+@customElement('umb-examine-fields-settings-modal')
+export class UmbExamineFieldsSettingsModalElement extends UmbModalBaseElement<
+	UmbExamineFieldsSettingsModalData,
+	UmbCreateDocumentModalResultData
+> {
 	static styles = [
 		UUITextStyles,
 		css`
@@ -44,7 +43,7 @@ export class UmbModalElementFieldsSettingsElement extends UmbModalLayoutElement<
 	];
 
 	@state()
-	private _fields?: UmbModalFieldsSettingsData[];
+	private _fields?: UmbExamineFieldsSettingsModalData;
 
 	private _handleClose() {
 		this.modalHandler?.submit({ fields: this._fields });
@@ -56,11 +55,10 @@ export class UmbModalElementFieldsSettingsElement extends UmbModalLayoutElement<
 	}
 
 	firstUpdated() {
-		this.data
-			? (this._fields = Object.values(this.data).map((field) => {
-					return { name: field.name, exposed: field.exposed };
-			  }))
-			: '';
+		this._fields =
+			this.data?.map((field) => {
+				return { name: field.name, exposed: field.exposed };
+			}) || undefined;
 	}
 
 	render() {
@@ -92,6 +90,6 @@ export class UmbModalElementFieldsSettingsElement extends UmbModalLayoutElement<
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-modal-element-fields-settings': UmbModalElementFieldsSettingsElement;
+		'umb-examine-fields-settings-modal': UmbExamineFieldsSettingsModalElement;
 	}
 }

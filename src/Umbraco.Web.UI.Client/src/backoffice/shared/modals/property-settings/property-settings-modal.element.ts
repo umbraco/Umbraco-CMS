@@ -3,12 +3,13 @@ import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, html, nothing } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { UMB_PROPERTY_EDITOR_UI_PICKER_MODAL_TOKEN } from '../../property-editors/modals/property-editor-ui-picker';
-import { UmbModalContext, UmbModalLayoutElement, UMB_MODAL_CONTEXT_TOKEN } from '@umbraco-cms/modal';
+import { UmbPropertySettingsModalResult } from '.';
+import { UmbModalContext, UmbModalBaseElement, UMB_MODAL_CONTEXT_TOKEN } from '@umbraco-cms/modal';
 import { ManifestPropertyEditorUI } from '@umbraco-cms/extensions-registry';
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-api';
 
 @customElement('umb-property-settings-modal')
-export class UmbPropertySettingsModalElement extends UmbModalLayoutElement {
+export class UmbPropertySettingsModalElement extends UmbModalBaseElement<undefined, UmbPropertySettingsModalResult> {
 	static styles = [
 		UUITextStyles,
 		css`
@@ -197,15 +198,15 @@ export class UmbPropertySettingsModalElement extends UmbModalLayoutElement {
 
 		const formData = new FormData(form);
 
-		const label = this._name || null;
-		const alias = this._alias || null;
-		const description = formData.get('description');
-		const propertyEditorUI = this._selectedPropertyEditorUIAlias || null;
+		const label = this._name || '';
+		const alias = this._alias || '';
+		const description = formData.get('description')?.toString() || '';
+		const propertyEditorUI = this._selectedPropertyEditorUIAlias || undefined;
 		const labelOnTop = this._appearanceIsTop;
 		const mandatory = this._mandatory;
-		const mandatoryMessage = formData.get('mandatory-message');
-		const pattern = formData.get('pattern');
-		const patternMessage = formData.get('pattern-message');
+		const mandatoryMessage = formData.get('mandatory-message')?.toString() || '';
+		const pattern = formData.get('pattern')?.toString() || '';
+		const patternMessage = formData.get('pattern-message')?.toString() || '';
 
 		this.modalHandler?.submit({
 			label,
@@ -265,9 +266,9 @@ export class UmbPropertySettingsModalElement extends UmbModalLayoutElement {
 
 		if (!modalHandler) return;
 
-		modalHandler?.onSubmit().then(({ selection } = {}) => {
-			if (!selection) return;
-
+		modalHandler?.onSubmit().then(({ selection }) => {
+			if (selection.length === 0) return;
+			// TODO: we might should set the alias to null or empty string, if no selection.
 			this._selectedPropertyEditorUIAlias = selection[0];
 			this.#observePropertyEditorUI();
 		});

@@ -1,21 +1,15 @@
 import { html } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, query } from 'lit/decorators.js';
-import { Observable } from 'rxjs';
 import { when } from 'lit-html/directives/when.js';
-import { UmbModalLayoutElement } from '@umbraco-cms/modal';
+import { UmbCreateDictionaryModalData, UmbCreateDictionaryModalResult } from '.';
+import { UmbModalBaseElement } from '@umbraco-cms/modal';
 
-export interface UmbCreateDictionaryModalData {
-	unique: string | null;
-	parentName: Observable<string | undefined>;
-}
-
-export interface UmbCreateDictionaryModalResultData {
-	name?: string;
-}
-
-@customElement('umb-create-dictionary-modal-layout')
-export class UmbCreateDictionaryModalLayoutElement extends UmbModalLayoutElement<UmbCreateDictionaryModalData> {
+@customElement('umb-create-dictionary-modal')
+export class UmbCreateDictionaryModalLayoutElement extends UmbModalBaseElement<
+	UmbCreateDictionaryModalData,
+	UmbCreateDictionaryModalResult
+> {
 	static styles = [UUITextStyles];
 
 	@query('#form')
@@ -79,6 +73,6 @@ export class UmbCreateDictionaryModalLayoutElement extends UmbModalLayoutElement
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-create-dictionary-modal-layout': UmbCreateDictionaryModalLayoutElement;
+		'umb-create-dictionary-modal': UmbCreateDictionaryModalLayoutElement;
 	}
 }

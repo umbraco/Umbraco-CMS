@@ -1,13 +1,16 @@
 import { css, html } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, state } from 'lit/decorators.js';
-import { UmbModalLayoutElement } from '@umbraco-cms/modal';
-import { UmbDocumentPickerModalData } from '.';
-import type { UmbTreeElement } from 'src/backoffice/shared/components/tree/tree.element';
+import type { UmbTreeElement } from '../../../../shared/components/tree/tree.element';
+import { UmbDocumentPickerModalData, UmbDocumentPickerModalResult } from '.';
+import { UmbModalBaseElement } from '@umbraco-cms/modal';
 
 // TODO: make use of UmbPickerLayoutBase
 @customElement('umb-document-picker-modal')
-export class UmbDocumentPickerModalElement extends UmbModalLayoutElement<UmbDocumentPickerModalData> {
+export class UmbDocumentPickerModalElement extends UmbModalBaseElement<
+	UmbDocumentPickerModalData,
+	UmbDocumentPickerModalResult
+> {
 	static styles = [
 		UUITextStyles,
 		css`

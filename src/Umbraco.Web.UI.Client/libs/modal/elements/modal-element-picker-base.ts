@@ -1,5 +1,5 @@
 import { property } from 'lit/decorators.js';
-import { UmbModalLayoutElement } from '..';
+import { UmbModalBaseElement } from '..';
 import './modal-element.element';
 
 export interface UmbPickerModalData<T> {
@@ -8,9 +8,13 @@ export interface UmbPickerModalData<T> {
 	filter?: (language: T) => boolean;
 }
 
+export interface UmbPickerModalResult<T> {
+	selection: Array<string>;
+}
+
 // TODO: we should consider moving this into a class/context instead of an element.
 // So we don't have to extend an element to get basic picker/selection logic
-export class UmbModalElementPickerBase<T> extends UmbModalLayoutElement<UmbPickerModalData<T>> {
+export class UmbModalElementPickerBase<T> extends UmbModalBaseElement<UmbPickerModalData<T>, UmbPickerModalResult<T>> {
 	@property()
 	selection: Array<string> = [];
 

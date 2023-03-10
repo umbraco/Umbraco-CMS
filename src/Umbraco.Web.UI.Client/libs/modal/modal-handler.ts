@@ -10,11 +10,35 @@ import { UmbObserverController } from '@umbraco-cms/observable-api';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 import { ManifestModal } from '@umbraco-cms/extensions-registry';
 
+/**
+ * Type which omits the real submit method, and replaces it with a submit method which accepts an optional argument depending on the generic type.
+ */
+export type UmbModalHandler<ModalData = unknown, ModalResult = unknown> = Omit<
+	UmbModalHandlerClass<ModalData, ModalResult>,
+	'submit'
+> &
+	OptionalSubmitArgumentIfUndefined<ModalResult>;
+
+// If Type is undefined we don't accept an argument,
+// If type is unknown, we accept an option argument.
+// If type is anything else, we require an argument of that type.
+type OptionalSubmitArgumentIfUndefined<T> = T extends undefined
+	? {
+			submit: () => void;
+	  }
+	: T extends unknown
+	? {
+			submit: (arg?: T) => void;
+	  }
+	: {
+			submit: (arg: T) => void;
+	  };
+
 //TODO consider splitting this into two separate handlers
-export class UmbModalHandler {
-	private _submitPromise: any;
-	private _submitResolver: any;
-	private _submitRejecter: any;
+export class UmbModalHandlerClass<ModalData, ModalResult> {
+	private _submitPromise: Promise<ModalResult>;
+	private _submitResolver?: (value: ModalResult) => void;
+	private _submitRejecter?: () => void;
 	#host: UmbControllerHostInterface;
 
 	public modalElement: UUIModalDialogElement | UUIModalSidebarElement;
@@ -30,8 +54,8 @@ export class UmbModalHandler {
 
 	constructor(
 		host: UmbControllerHostInterface,
-		modalAlias: string | UmbModalToken,
-		data?: unknown,
+		modalAlias: string | UmbModalToken<ModalData, ModalResult>,
+		data?: ModalData,
 		config?: UmbModalConfig
 	) {
 		this.#host = host;
@@ -74,7 +98,7 @@ export class UmbModalHandler {
 		return modalDialogElement;
 	}
 
-	async #createInnerElement(manifest: ManifestModal, data?: unknown) {
+	async #createInnerElement(manifest: ManifestModal, data?: ModalData) {
 		// TODO: add inner fallback element if no extension element is found
 		const innerElement = (await createExtensionElement(manifest)) as any;
 
@@ -87,17 +111,18 @@ export class UmbModalHandler {
 		return innerElement;
 	}
 
-	public submit(...args: any) {
-		this._submitResolver(...args);
+	// note, this methods argument is not defined correctly here, but requires to be fix by appending the OptionalSubmitArgumentIfUndefined type when newing up this class.
+	private submit(result?: ModalResult) {
+		this._submitResolver?.(result as ModalResult);
 		this.modalElement.close();
 	}
 
 	public reject() {
-		this._submitRejecter();
+		this._submitRejecter?.();
 		this.modalElement.close();
 	}
 
-	public onSubmit(): Promise<any> {
+	public onSubmit(): Promise<ModalResult> {
 		return this._submitPromise;
 	}
 
@@ -105,7 +130,7 @@ export class UmbModalHandler {
 	 It makes this code a bit more complex. The main idea is to have the element as part of the modalHandler so it is possible to dispatch events from within the modal element to the one that opened it.
 	 Now when the element is an observable it makes it more complex because this host needs to subscribe to updates to the element, instead of just having a reference to it.
 	 If we find a better generic solution to communicate between the modal and the implementor, then we can remove the element as part of the modalHandler. */
-	#observeModal(modalAlias: string, data?: unknown) {
+	#observeModal(modalAlias: string, data?: ModalData) {
 		new UmbObserverController(
 			this.#host,
 			umbExtensionsRegistry.getByTypeAndAlias('modal', modalAlias),

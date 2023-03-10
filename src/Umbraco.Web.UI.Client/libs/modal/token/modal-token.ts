@@ -1,16 +1,27 @@
 import { UmbModalConfig } from '../modal.context';
 
-export class UmbModalToken<T = unknown> {
+export class UmbModalToken<Data = unknown, Result = unknown> {
 	/**
-	 * Get the type of the token
+	 * Get the data type of the token's data.
 	 *
 	 * @public
-	 * @type      {T}
+	 * @type      {Data}
 	 * @memberOf  UmbModalToken
-	 * @example   `typeof MyToken.TYPE`
+	 * @example   `typeof MyModal.TYPE`
 	 * @returns   undefined
 	 */
-	readonly TYPE: T = undefined as never;
+	readonly DATA: Data = undefined as never;
+
+	/**
+	 * Get the result type of the token
+	 *
+	 * @public
+	 * @type      {Result}
+	 * @memberOf  UmbModalToken
+	 * @example   `typeof MyModal.RESULT`
+	 * @returns   undefined
+	 */
+	readonly RESULT: Result = undefined as never;
 
 	/**
 	 * @param alias   Unique identifier for the token,

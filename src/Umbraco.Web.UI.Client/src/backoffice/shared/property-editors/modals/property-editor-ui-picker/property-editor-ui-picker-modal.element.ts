@@ -4,7 +4,7 @@ import { customElement, property, state } from 'lit/decorators.js';
 import { repeat } from 'lit/directives/repeat.js';
 import { groupBy } from 'lodash-es';
 import type { UUIInputEvent } from '@umbraco-ui/uui';
-import { UmbPropertyEditorUIPickerModalData } from '.';
+import { UmbPropertyEditorUIPickerModalData, UmbPropertyEditorUIPickerModalResult } from '.';
 import type { UmbModalHandler } from '@umbraco-cms/modal';
 import type { ManifestPropertyEditorUI } from '@umbraco-cms/models';
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-api';
@@ -79,9 +79,6 @@ export class UmbPropertyEditorUIPickerModalElement extends UmbLitElement {
 		`,
 	];
 
-	@property({ attribute: false })
-	modalHandler?: UmbModalHandler;
-
 	@property({ type: Object })
 	data?: UmbPropertyEditorUIPickerModalData;
 
@@ -139,8 +136,11 @@ export class UmbPropertyEditorUIPickerModalElement extends UmbLitElement {
 	}
 
 	private _close() {
-		this.modalHandler?.submit();
+		this.modalHandler?.reject();
 	}
+
+	@property({ attribute: false })
+	modalHandler?: UmbModalHandler<UmbPropertyEditorUIPickerModalData, UmbPropertyEditorUIPickerModalResult>;
 
 	private _submit() {
 		this.modalHandler?.submit({ selection: this._selection });

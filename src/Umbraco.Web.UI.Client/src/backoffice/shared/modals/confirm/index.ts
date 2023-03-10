@@ -8,6 +8,11 @@ export interface UmbConfirmModalData {
 	confirmLabel?: string;
 }
 
-export const UMB_CONFIRM_MODAL_TOKEN = new UmbModalToken<UmbConfirmModalData>('Umb.Modal.Confirm', {
-	type: 'dialog',
-});
+export type UmbConfirmModalResult = undefined;
+
+export const UMB_CONFIRM_MODAL_TOKEN = new UmbModalToken<UmbConfirmModalData, UmbConfirmModalResult>(
+	'Umb.Modal.Confirm',
+	{
+		type: 'dialog',
+	}
+);

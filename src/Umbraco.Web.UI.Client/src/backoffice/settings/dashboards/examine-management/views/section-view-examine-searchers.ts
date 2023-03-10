@@ -8,6 +8,7 @@ import { tryExecuteAndNotify } from '@umbraco-cms/resources';
 
 import './modal-views/fields-viewer.element';
 import './modal-views/fields-settings.element';
+import { UMB_EXAMINE_FIELDS_SETTINGS_MODAL_TOKEN } from './modal-views';
 
 interface ExposedSearchResultField {
 	name?: string | null;
@@ -173,10 +174,8 @@ export class UmbDashboardExamineSearcherElement extends UmbLitElement {
 	}
 
 	private _onFieldFilterClick() {
-		const modalHandler = this._modalContext?.open('umb-modal-element-fields-settings', {
-			type: 'sidebar',
-			size: 'small',
-			data: { ...this._exposedFields },
+		const modalHandler = this._modalContext?.open(UMB_EXAMINE_FIELDS_SETTINGS_MODAL_TOKEN, {
+			...this._exposedFields,
 		});
 		modalHandler?.onSubmit().then(({ fields } = {}) => {
 			if (!fields) return;

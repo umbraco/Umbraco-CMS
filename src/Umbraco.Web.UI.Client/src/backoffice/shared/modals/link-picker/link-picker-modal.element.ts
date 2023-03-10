@@ -3,12 +3,12 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, query, state } from 'lit/decorators.js';
 import { UUIBooleanInputEvent, UUIInputElement } from '@umbraco-ui/uui';
 import { UmbTreeElement } from '../../components/tree/tree.element';
-import { UmbLinkPickerConfig, UmbLinkPickerLink, UmbLinkPickerModalData } from '.';
-import { UmbModalLayoutElement } from '@umbraco-cms/modal';
+import { UmbLinkPickerConfig, UmbLinkPickerLink, UmbLinkPickerModalData, UmbLinkPickerModalResult } from '.';
+import { UmbModalBaseElement } from '@umbraco-cms/modal';
 import { buildUdi, getKeyFromUdi } from '@umbraco-cms/utils';
 
 @customElement('umb-link-picker-modal')
-export class UmbLinkPickerModalElement extends UmbModalLayoutElement<UmbLinkPickerModalData> {
+export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPickerModalData, UmbLinkPickerModalResult> {
 	static styles = [
 		UUITextStyles,
 		css`

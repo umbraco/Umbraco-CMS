@@ -4,7 +4,7 @@ import { customElement, query, state } from 'lit/decorators.js';
 import { UUIInputPasswordElement } from '@umbraco-ui/uui';
 import { UmbInputPickerUserGroupElement } from '../../../../shared/components/input-user-group/input-user-group.element';
 import { UmbUserStore, UMB_USER_STORE_CONTEXT_TOKEN } from '../../repository/user.store';
-import { UmbModalLayoutElement } from '@umbraco-cms/modal';
+import { UmbModalBaseElement } from '@umbraco-cms/modal';
 import type { UserDetails } from '@umbraco-cms/models';
 import {
 	UmbNotificationDefaultData,
@@ -14,7 +14,7 @@ import {
 
 export type UsersViewType = 'list' | 'grid';
 @customElement('umb-create-user-modal')
-export class UmbCreateUserModalElement extends UmbModalLayoutElement {
+export class UmbCreateUserModalElement extends UmbModalBaseElement {
 	static styles = [
 		UUITextStyles,
 		css`

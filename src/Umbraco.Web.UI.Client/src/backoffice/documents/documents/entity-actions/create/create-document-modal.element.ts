@@ -1,18 +1,14 @@
 import { html } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement } from 'lit/decorators.js';
-import { UmbModalLayoutElement } from '@umbraco-cms/modal';
+import { UmbCreateDocumentModalData, UmbCreateDocumentModalResultData } from '.';
+import { UmbModalBaseElement } from '@umbraco-cms/modal';
 
-export interface UmbCreateDocumentModalData {
-	unique: string | null;
-}
-
-export interface UmbCreateDocumentModalResultData {
-	documentType: string;
-}
-
-@customElement('umb-create-document-modal-layout')
-export class UmbCreateDocumentModalLayoutElement extends UmbModalLayoutElement<UmbCreateDocumentModalData> {
+@customElement('umb-create-document-modal')
+export class UmbCreateDocumentModalElement extends UmbModalBaseElement<
+	UmbCreateDocumentModalData,
+	UmbCreateDocumentModalResultData
+> {
 	static styles = [UUITextStyles];
 
 	private _handleCancel() {
@@ -45,6 +41,6 @@ export class UmbCreateDocumentModalLayoutElement extends UmbModalLayoutElement<U
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-create-document-modal-layout': UmbCreateDocumentModalLayoutElement;
+		'umb-create-document-modal': UmbCreateDocumentModalElement;
 	}
 }

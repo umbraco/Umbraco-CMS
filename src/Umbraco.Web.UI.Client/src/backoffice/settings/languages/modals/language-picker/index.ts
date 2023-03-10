@@ -7,14 +7,14 @@ export interface UmbLanguagePickerModalData {
 	filter?: (language: LanguageModel) => boolean;
 }
 
-export interface UmbLanguagePickerModalResponse {
+export interface UmbLanguagePickerModalResult {
 	selection: Array<string>;
 }
 
-export const UMB_LANGUAGE_PICKER_MODAL_TOKEN = new UmbModalToken<UmbLanguagePickerModalData>(
-	'Umb.Modal.LanguagePicker',
-	{
-		type: 'sidebar',
-		size: 'small',
-	}
-);
+export const UMB_LANGUAGE_PICKER_MODAL_TOKEN = new UmbModalToken<
+	UmbLanguagePickerModalData,
+	UmbLanguagePickerModalResult
+>('Umb.Modal.LanguagePicker', {
+	type: 'sidebar',
+	size: 'small',
+});

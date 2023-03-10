@@ -24,7 +24,8 @@ export class UmbInputListBase extends UmbLitElement {
 	@property({ type: String })
 	public modalSize: UUIModalSidebarSize = 'small';
 
-	protected pickerToken?: UmbModalToken;
+	// TODO: not great that we use any, any here. Investigate if we can have some interface or base modal token for this type.
+	protected pickerToken?: UmbModalToken<any, any>;
 	private _modalContext?: UmbModalContext;
 
 	constructor() {

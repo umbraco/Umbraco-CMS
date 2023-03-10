@@ -2,6 +2,7 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html, nothing } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { UmbDataTypeWorkspaceContext } from '../../data-type-workspace.context';
+import { UMB_PROPERTY_EDITOR_UI_PICKER_MODAL_TOKEN } from '../../../../../shared/property-editors/modals/property-editor-ui-picker';
 import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN } from '@umbraco-cms/modal';
 import { UmbLitElement } from '@umbraco-cms/element';
 import type { DataTypeModel } from '@umbraco-cms/backend-api';
@@ -9,7 +10,6 @@ import { umbExtensionsRegistry } from '@umbraco-cms/extensions-api';
 
 import '../../../../../shared/property-editors/shared/property-editor-config/property-editor-config.element';
 import '../../../../../shared/components/ref-property-editor-ui/ref-property-editor-ui.element';
-import { UMB_PROPERTY_EDITOR_UI_PICKER_MODAL_TOKEN } from 'src/backoffice/shared/property-editors/modals/property-editor-ui-picker';
 
 @customElement('umb-data-type-workspace-view-edit')
 export class UmbDataTypeWorkspaceViewEditElement extends UmbLitElement {
@@ -105,8 +105,7 @@ export class UmbDataTypeWorkspaceViewEditElement extends UmbLitElement {
 			selection: this._propertyEditorUiAlias ? [this._propertyEditorUiAlias] : [],
 		});
 
-		modalHandler?.onSubmit().then(({ selection } = {}) => {
-			if (!selection) return;
+		modalHandler?.onSubmit().then(({ selection }) => {
 			this._selectPropertyEditorUI(selection[0]);
 		});
 	}

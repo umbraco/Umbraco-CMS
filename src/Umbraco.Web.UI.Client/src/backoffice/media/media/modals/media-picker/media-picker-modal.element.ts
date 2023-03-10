@@ -2,11 +2,14 @@ import { css, html } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, state } from 'lit/decorators.js';
 import { UmbTreeElement } from '../../../../shared/components/tree/tree.element';
-import { UmbMediaPickerModalData } from '.';
-import { UmbModalLayoutElement } from '@umbraco-cms/modal';
+import { UmbMediaPickerModalData, UmbMediaPickerModalResult } from '.';
+import { UmbModalBaseElement } from '@umbraco-cms/modal';
 
 @customElement('umb-media-picker-modal')
-export class UmbMediaPickerModalElement extends UmbModalLayoutElement<UmbMediaPickerModalData> {
+export class UmbMediaPickerModalElement extends UmbModalBaseElement<
+	UmbMediaPickerModalData,
+	UmbMediaPickerModalResult
+> {
 	static styles = [
 		UUITextStyles,
 		css`

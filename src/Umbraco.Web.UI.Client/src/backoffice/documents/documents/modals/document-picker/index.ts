@@ -5,14 +5,14 @@ export interface UmbDocumentPickerModalData {
 	selection?: Array<string>;
 }
 
-export interface UmbDocumentPickerModalResponse {
+export interface UmbDocumentPickerModalResult {
 	selection: Array<string>;
 }
 
-export const UMB_DOCUMENT_PICKER_MODAL_TOKEN = new UmbModalToken<UmbDocumentPickerModalData>(
-	'Umb.Modal.DocumentPicker',
-	{
-		type: 'sidebar',
-		size: 'small',
-	}
-);
+export const UMB_DOCUMENT_PICKER_MODAL_TOKEN = new UmbModalToken<
+	UmbDocumentPickerModalData,
+	UmbDocumentPickerModalResult
+>('Umb.Modal.DocumentPicker', {
+	type: 'sidebar',
+	size: 'small',
+});

@@ -1,12 +1,19 @@
 import { html } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
-import { customElement } from 'lit/decorators.js';
-import { UmbModalLayoutElement } from '@umbraco-cms/modal';
-import { UmbConfirmModalData } from '.';
+import { customElement, property } from 'lit/decorators.js';
+import { UmbConfirmModalData, UmbConfirmModalResult } from '.';
+import { UmbLitElement } from '@umbraco-cms/element';
+import { UmbModalHandler } from '@umbraco-cms/modal';
 
 @customElement('umb-confirm-modal')
-export class UmbConfirmModalElement extends UmbModalLayoutElement<UmbConfirmModalData> {
+export class UmbConfirmModalElement extends UmbLitElement {
 	static styles = [UUITextStyles];
+
+	@property({ attribute: false })
+	modalHandler?: UmbModalHandler<UmbConfirmModalData, UmbConfirmModalResult>;
+
+	@property({ type: Object })
+	data?: UmbConfirmModalData;
 
 	private _handleConfirm() {
 		this.modalHandler?.submit();

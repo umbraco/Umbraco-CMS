@@ -4,7 +4,7 @@ import '../../src/backoffice/search/modals/search/search-modal.element';
 import { UUIModalSidebarSize } from '@umbraco-ui/uui-modal-sidebar';
 import { BehaviorSubject } from 'rxjs';
 import type { UUIModalDialogElement } from '@umbraco-ui/uui-modal-dialog';
-import { UmbModalHandler } from './modal-handler';
+import { UmbModalHandler, UmbModalHandlerClass } from './modal-handler';
 import type { UmbModalToken } from './token/modal-token';
 import { UmbContextToken } from '@umbraco-cms/context-api';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
@@ -22,7 +22,7 @@ export interface UmbModalConfig {
 export class UmbModalContext {
 	host: UmbControllerHostInterface;
 	// TODO: Investigate if we can get rid of HTML elements in our store, so we can use one of our states.
-	#modals = new BehaviorSubject(<Array<UmbModalHandler>>[]);
+	#modals = new BehaviorSubject(<Array<UmbModalHandler<any, any>>>[]);
 	public readonly modals = this.#modals.asObservable();
 
 	constructor(host: UmbControllerHostInterface) {
@@ -30,8 +30,11 @@ export class UmbModalContext {
 	}
 
 	// TODO: Remove this when the modal system is more flexible
-	public search(): UmbModalHandler {
-		const modalHandler = new UmbModalHandler(this.host, 'Umb.Modal.Search');
+	public search() {
+		const modalHandler = new UmbModalHandlerClass(this.host, 'Umb.Modal.Search') as unknown as UmbModalHandler<
+			any,
+			any
+		>;
 
 		//TODO START: This is a hack to get the search modal layout to look like i want it to.
 		//TODO: Remove from here to END when the modal system is more flexible
@@ -73,8 +76,15 @@ export class UmbModalContext {
 	 * @return {*}  {UmbModalHandler}
 	 * @memberof UmbModalContext
 	 */
-	public open<T = unknown>(modalAlias: string | UmbModalToken<T>, data?: T, config?: UmbModalConfig): UmbModalHandler {
-		const modalHandler = new UmbModalHandler(this.host, modalAlias, data, config);
+	public open<ModalData = unknown, ModalResult = unknown>(
+		modalAlias: string | UmbModalToken<ModalData, ModalResult>,
+		data?: ModalData,
+		config?: UmbModalConfig
+	) {
+		const modalHandler = new UmbModalHandlerClass(this.host, modalAlias, data, config) as unknown as UmbModalHandler<
+			ModalData,
+			ModalResult
+		>;
 
 		modalHandler.modalElement.addEventListener('close-end', () => this.#onCloseEnd(modalHandler));
 
@@ -105,7 +115,7 @@ export class UmbModalContext {
 	 * @param {UmbModalHandler} modalHandler
 	 * @memberof UmbModalContext
 	 */
-	#onCloseEnd(modalHandler: UmbModalHandler) {
+	#onCloseEnd(modalHandler: UmbModalHandler<any, any>) {
 		modalHandler.modalElement.removeEventListener('close-end', () => this.#onCloseEnd(modalHandler));
 		this.#remove(modalHandler.key);
 	}

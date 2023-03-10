@@ -5,7 +5,14 @@ export interface UmbMediaPickerModalData {
 	selection: Array<string>;
 }
 
-export const UMB_MEDIA_PICKER_MODAL_TOKEN = new UmbModalToken<UmbMediaPickerModalData>('Umb.Modal.MediaPicker', {
-	type: 'sidebar',
-	size: 'small',
-});
+export interface UmbMediaPickerModalResult {
+	selection: Array<string>;
+}
+
+export const UMB_MEDIA_PICKER_MODAL_TOKEN = new UmbModalToken<UmbMediaPickerModalData, UmbMediaPickerModalResult>(
+	'Umb.Modal.MediaPicker',
+	{
+		type: 'sidebar',
+		size: 'small',
+	}
+);

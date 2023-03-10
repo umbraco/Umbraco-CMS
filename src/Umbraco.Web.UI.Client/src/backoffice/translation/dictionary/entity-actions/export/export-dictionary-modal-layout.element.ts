@@ -1,18 +1,14 @@
 import { html } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, query } from 'lit/decorators.js';
-import { UmbModalLayoutElement } from '@umbraco-cms/modal';
-
-export interface UmbExportDictionaryModalData {
-	unique: string | null;
-}
-
-export interface UmbExportDictionaryModalResultData {
-	includeChildren?: boolean;
-}
+import { UmbExportDictionaryModalData, UmbExportDictionaryModalResult } from '.';
+import { UmbModalBaseElement } from '@umbraco-cms/modal';
 
 @customElement('umb-export-dictionary-modal-layout')
-export class UmbExportDictionaryModalLayoutElement extends UmbModalLayoutElement<UmbExportDictionaryModalData> {
+export class UmbExportDictionaryModalLayoutElement extends UmbModalBaseElement<
+	UmbExportDictionaryModalData,
+	UmbExportDictionaryModalResult
+> {
 	static styles = [UUITextStyles];
 
 	@query('#form')

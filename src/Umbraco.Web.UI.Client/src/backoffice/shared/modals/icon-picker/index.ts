@@ -5,7 +5,15 @@ export interface UmbIconPickerModalData {
 	selection: string[];
 }
 
-export const UMB_ICON_PICKER_MODAL_TOKEN = new UmbModalToken<UmbIconPickerModalData>('Umb.Modal.IconPicker', {
-	type: 'sidebar',
-	size: 'small',
-});
+export interface UmbIconPickerModalResult {
+	color: string | undefined;
+	icon: string | undefined;
+}
+
+export const UMB_ICON_PICKER_MODAL_TOKEN = new UmbModalToken<UmbIconPickerModalData, UmbIconPickerModalResult>(
+	'Umb.Modal.IconPicker',
+	{
+		type: 'sidebar',
+		size: 'small',
+	}
+);
