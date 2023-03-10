@@ -31,7 +31,7 @@ export default class UmbImportDictionaryEntityAction extends UmbEntityActionBase
 		});
 
 		// TODO: get type from modal result
-		const { fileName, parentKey }: UmbImportDictionaryModalResultData = await modalHandler.onClose();
+		const { fileName, parentKey }: UmbImportDictionaryModalResultData = await modalHandler.onSubmit();
 		if (!fileName) return;
 
 		const result = await this.repository?.import(fileName, parentKey);

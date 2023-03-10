@@ -44,7 +44,7 @@ export default class UmbCreateDictionaryEntityAction extends UmbEntityActionBase
 		});
 
 		// TODO: get type from modal result
-		const { name }: UmbCreateDictionaryModalResultData = await modalHandler.onClose();
+		const { name }: UmbCreateDictionaryModalResultData = await modalHandler.onSubmit();
 		if (!name) return;
 
 		const result = await this.repository?.create({

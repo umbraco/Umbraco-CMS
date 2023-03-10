@@ -51,14 +51,14 @@ export class UmbImportDictionaryModalLayoutElement extends UmbModalLayoutElement
 	async #importDictionary() {
 		if (!this._uploadedDictionary?.fileName) return;
 
-		this.modalHandler?.close({
+		this.modalHandler?.submit({
 			fileName: this._uploadedDictionary.fileName,
 			parentKey: this._selection[0],
 		});
 	}
 
 	#handleClose() {
-		this.modalHandler?.close({});
+		this.modalHandler?.submit({});
 	}
 
 	#submitForm() {

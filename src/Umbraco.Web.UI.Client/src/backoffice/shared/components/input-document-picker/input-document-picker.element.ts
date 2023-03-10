@@ -128,7 +128,7 @@ export class UmbInputDocumentPickerElement extends FormControlMixin(UmbLitElemen
 			selection: [...this._selectedKeys],
 		});
 
-		modalHandler?.onClose().then(({ selection }: any) => {
+		modalHandler?.onSubmit().then(({ selection }: any) => {
 			this._setSelection(selection);
 		});
 	}
@@ -141,7 +141,7 @@ export class UmbInputDocumentPickerElement extends FormControlMixin(UmbLitElemen
 			confirmLabel: 'Remove',
 		});
 
-		modalHandler?.onClose().then(({ confirmed }) => {
+		modalHandler?.onSubmit().then(({ confirmed }) => {
 			if (confirmed) {
 				const newSelection = this._selectedKeys.filter((value) => value !== item.key);
 				this._setSelection(newSelection);

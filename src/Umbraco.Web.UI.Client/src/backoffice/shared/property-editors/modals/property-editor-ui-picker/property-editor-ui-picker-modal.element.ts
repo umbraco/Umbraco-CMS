@@ -139,11 +139,11 @@ export class UmbPropertyEditorUIPickerModalElement extends UmbLitElement {
 	}
 
 	private _close() {
-		this.modalHandler?.close();
+		this.modalHandler?.submit();
 	}
 
 	private _submit() {
-		this.modalHandler?.close({ selection: this._selection });
+		this.modalHandler?.submit({ selection: this._selection });
 	}
 
 	render() {

@@ -42,7 +42,7 @@ export class UmbInputListBase extends UmbLitElement {
 			selection: this.value,
 		});
 
-		modalHandler?.onClose().then((data: UmbPickerModalData<string>) => {
+		modalHandler?.onSubmit().then((data: UmbPickerModalData<string>) => {
 			if (data) {
 				this.value = data.selection;
 				this.selectionUpdated();

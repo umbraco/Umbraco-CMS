@@ -12,6 +12,7 @@ import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 export type UmbModalType = 'dialog' | 'sidebar';
 
 export interface UmbModalConfig {
+	key?: string;
 	type?: UmbModalType;
 	size?: UUIModalSidebarSize;
 }
@@ -87,7 +88,14 @@ export class UmbModalContext {
 	 * @param {string} key
 	 * @memberof UmbModalContext
 	 */
-	private _close(key: string) {
+	public close(key: string) {
+		const modal = this.#modals.getValue().find((modal) => modal.key === key);
+		if (modal) {
+			modal.close();
+		}
+	}
+
+	#remove(key: string) {
 		this.#modals.next(this.#modals.getValue().filter((modal) => modal.key !== key));
 	}
 
@@ -99,7 +107,7 @@ export class UmbModalContext {
 	 */
 	#onCloseEnd(modalHandler: UmbModalHandler) {
 		modalHandler.modalElement.removeEventListener('close-end', () => this.#onCloseEnd(modalHandler));
-		this._close(modalHandler.key);
+		this.#remove(modalHandler.key);
 	}
 }
 

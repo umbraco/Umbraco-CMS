@@ -73,7 +73,7 @@ export class UmbInputMultipleTextStringItemElement extends FormControlMixin(UmbL
 			confirmLabel: 'Delete',
 		});
 
-		modalHandler?.onClose().then(({ confirmed }: any) => {
+		modalHandler?.onSubmit().then(({ confirmed }: any) => {
 			if (confirmed) {
 				this.dispatchEvent(new UmbDeleteEvent());
 			}

@@ -22,7 +22,7 @@ export class UmbMediaMoveEntityBulkAction extends UmbEntityBulkActionBase<UmbMed
 			selection: [],
 			multiple: false,
 		});
-		const selection = await modalHandler?.onClose();
+		const selection = await modalHandler?.onSubmit();
 		const destination = selection[0];
 		await this.repository?.move(this.selection, destination);
 	}

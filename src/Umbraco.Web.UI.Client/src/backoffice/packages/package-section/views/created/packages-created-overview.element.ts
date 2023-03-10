@@ -142,7 +142,7 @@ export class UmbPackagesCreatedOverviewElement extends UmbLitElement {
 			confirmLabel: 'Delete',
 		});
 
-		const deleteConfirmed = await modalHandler?.onClose().then(({ confirmed }: any) => {
+		const deleteConfirmed = await modalHandler?.onSubmit().then(({ confirmed }: any) => {
 			return confirmed;
 		});
 

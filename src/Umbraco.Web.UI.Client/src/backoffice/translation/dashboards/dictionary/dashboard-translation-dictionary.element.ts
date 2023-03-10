@@ -162,7 +162,7 @@ export class UmbDashboardTranslationDictionaryElement extends UmbLitElement {
 		});
 
 		// TODO: get type from modal result
-		const { name }: UmbCreateDictionaryModalResultData = await modalHandler.onClose();
+		const { name }: UmbCreateDictionaryModalResultData = await modalHandler.onSubmit();
 		if (!name) return;
 
 		const result = await this.#repo?.create({ $type: '', name, parentKey: null, translations: [], key: '' });

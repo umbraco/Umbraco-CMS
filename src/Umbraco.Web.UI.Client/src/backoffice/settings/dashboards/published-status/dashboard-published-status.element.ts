@@ -87,7 +87,7 @@ export class UmbDashboardPublishedStatusElement extends UmbLitElement {
 			color: 'danger',
 			confirmLabel: 'Continue',
 		});
-		modalHandler?.onClose().then(({ confirmed }) => {
+		modalHandler?.onSubmit().then(({ confirmed }) => {
 			if (confirmed) this._reloadMemoryCache();
 		});
 	}
@@ -110,7 +110,7 @@ export class UmbDashboardPublishedStatusElement extends UmbLitElement {
 			color: 'danger',
 			confirmLabel: 'Continue',
 		});
-		modalHandler?.onClose().then(({ confirmed }) => {
+		modalHandler?.onSubmit().then(({ confirmed }) => {
 			if (confirmed) this._rebuildDatabaseCache();
 		});
 	}

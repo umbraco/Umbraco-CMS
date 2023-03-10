@@ -183,7 +183,7 @@ export class UmbPropertySettingsModalElement extends UmbModalLayoutElement {
 	}
 
 	#onClose() {
-		this.modalHandler?.close();
+		this.modalHandler?.submit();
 	}
 
 	#onSubmit(event: SubmitEvent) {
@@ -207,7 +207,7 @@ export class UmbPropertySettingsModalElement extends UmbModalLayoutElement {
 		const pattern = formData.get('pattern');
 		const patternMessage = formData.get('pattern-message');
 
-		this.modalHandler?.close({
+		this.modalHandler?.submit({
 			label,
 			alias,
 			description,
@@ -265,7 +265,7 @@ export class UmbPropertySettingsModalElement extends UmbModalLayoutElement {
 
 		if (!modalHandler) return;
 
-		modalHandler?.onClose().then(({ selection } = {}) => {
+		modalHandler?.onSubmit().then(({ selection } = {}) => {
 			if (!selection) return;
 
 			this._selectedPropertyEditorUIAlias = selection[0];
@@ -273,10 +273,10 @@ export class UmbPropertySettingsModalElement extends UmbModalLayoutElement {
 		});
 	}
 
-	/* TODO: 
+	/* TODO:
 	From Github comment: We should not re-generate the alias when it gets locked again.
-  Generally the auto generation is not determined by the lock, but wether it has been changed or saved. 
-	The experience in existing backoffice is: we only generate an alias when a property is new, once it has been saved it should never change unless the user actively does so. 
+  Generally the auto generation is not determined by the lock, but wether it has been changed or saved.
+	The experience in existing backoffice is: we only generate an alias when a property is new, once it has been saved it should never change unless the user actively does so.
 	On new properties, the alias auto-generates until the user has made a change to it. */
 	#onToggleAliasLock() {
 		this._aliasLocked = !this._aliasLocked;

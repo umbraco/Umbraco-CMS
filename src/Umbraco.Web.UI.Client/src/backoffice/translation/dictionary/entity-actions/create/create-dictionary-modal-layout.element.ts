@@ -32,7 +32,7 @@ export class UmbCreateDictionaryModalLayoutElement extends UmbModalLayoutElement
 	}
 
 	#handleCancel() {
-		this.modalHandler?.close({});
+		this.modalHandler?.submit({});
 	}
 
 	#submitForm() {
@@ -47,7 +47,7 @@ export class UmbCreateDictionaryModalLayoutElement extends UmbModalLayoutElement
 
 		const formData = new FormData(form);
 
-		this.modalHandler?.close({
+		this.modalHandler?.submit({
 			name: formData.get('name') as string,
 		});
 	}

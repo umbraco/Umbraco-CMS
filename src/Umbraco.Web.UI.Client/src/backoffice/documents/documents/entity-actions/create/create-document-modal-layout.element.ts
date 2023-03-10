@@ -16,14 +16,14 @@ export class UmbCreateDocumentModalLayoutElement extends UmbModalLayoutElement<U
 	static styles = [UUITextStyles];
 
 	private _handleCancel() {
-		this.modalHandler?.close();
+		this.modalHandler?.submit();
 	}
 
 	#onClick(event: PointerEvent) {
 		event.stopPropagation();
 		const target = event.target as HTMLButtonElement;
 		const documentType = target.value;
-		this.modalHandler?.close({ documentType });
+		this.modalHandler?.submit({ documentType });
 	}
 
 	render() {

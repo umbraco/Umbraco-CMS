@@ -89,7 +89,7 @@ export class UmbDocumentTypeWorkspaceElement extends UmbLitElement implements Um
 	private async _handleIconClick() {
 		const modalHandler = this._modalContext?.open(UMB_ICON_PICKER_MODAL_TOKEN);
 
-		modalHandler?.onClose().then((saved) => {
+		modalHandler?.onSubmit().then((saved) => {
 			if (saved) this._workspaceContext?.setIcon(saved.icon);
 			// TODO save color ALIAS as well
 		});

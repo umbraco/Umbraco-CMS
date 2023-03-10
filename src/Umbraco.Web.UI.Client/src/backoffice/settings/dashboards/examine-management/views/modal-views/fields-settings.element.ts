@@ -47,7 +47,7 @@ export class UmbModalLayoutFieldsSettingsElement extends UmbModalLayoutElement<U
 	private _fields?: UmbModalFieldsSettingsData[];
 
 	private _handleClose() {
-		this.modalHandler?.close({ fields: this._fields });
+		this.modalHandler?.submit({ fields: this._fields });
 	}
 
 	disconnectedCallback(): void {

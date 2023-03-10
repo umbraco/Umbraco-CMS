@@ -19,7 +19,7 @@ export class UmbExportDictionaryModalLayoutElement extends UmbModalLayoutElement
 	private _form!: HTMLFormElement;
 
 	#handleClose() {
-		this.modalHandler?.close({});
+		this.modalHandler?.submit({});
 	}
 
 	#submitForm() {
@@ -34,7 +34,7 @@ export class UmbExportDictionaryModalLayoutElement extends UmbModalLayoutElement
 
 		const formData = new FormData(form);
 
-		this.modalHandler?.close({ includeChildren: (formData.get('includeDescendants') as string) === 'on' });
+		this.modalHandler?.submit({ includeChildren: (formData.get('includeDescendants') as string) === 'on' });
 	}
 
 	render() {

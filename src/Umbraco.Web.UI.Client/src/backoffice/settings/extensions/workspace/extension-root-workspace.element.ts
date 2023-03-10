@@ -36,7 +36,7 @@ export class UmbExtensionRootWorkspaceElement extends UmbLitElement {
 			color: 'danger',
 		});
 
-		modalHandler?.onClose().then(({ confirmed }: any) => {
+		modalHandler?.onSubmit().then(({ confirmed }: any) => {
 			if (confirmed) {
 				umbExtensionsRegistry.unregister(extension.alias);
 			}

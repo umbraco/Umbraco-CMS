@@ -29,7 +29,7 @@ export class UmbCreateDocumentEntityAction extends UmbEntityActionBase<UmbDocume
 		});
 
 		// TODO: get type from modal result
-		const { documentType }: UmbCreateDocumentModalResultData = await modalHandler.onClose();
+		const { documentType }: UmbCreateDocumentModalResultData = await modalHandler.onSubmit();
 		alert('create document with document type: ' + documentType);
 	}
 }

@@ -178,7 +178,7 @@ export class UmbDashboardExamineSearcherElement extends UmbLitElement {
 			size: 'small',
 			data: { ...this._exposedFields },
 		});
-		modalHandler?.onClose().then(({ fields } = {}) => {
+		modalHandler?.onSubmit().then(({ fields } = {}) => {
 			if (!fields) return;
 			this._exposedFields = fields;
 		});

@@ -161,7 +161,7 @@ export class UmbInputMultiUrlPickerElement extends FormControlMixin(UmbLitElemen
 				overlaySize: this.overlaySize || 'small',
 			},
 		});
-		modalHandler?.onClose().then((newUrl: MultiUrlData) => {
+		modalHandler?.onSubmit().then((newUrl: MultiUrlData) => {
 			if (!newUrl) return;
 			this._setSelection(newUrl, index);
 		});

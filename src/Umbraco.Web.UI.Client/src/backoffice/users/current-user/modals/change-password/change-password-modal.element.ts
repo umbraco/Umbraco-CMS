@@ -32,7 +32,7 @@ export class UmbChangePasswordModalElement extends UmbLitElement {
 	data?: UmbChangePasswordModalData;
 
 	private _close() {
-		this.modalHandler?.close();
+		this.modalHandler?.submit();
 	}
 
 	private _handleSubmit(e: SubmitEvent) {

@@ -12,14 +12,16 @@ import { ManifestModal } from '@umbraco-cms/extensions-registry';
 
 //TODO consider splitting this into two separate handlers
 export class UmbModalHandler {
+	private _submitResolver: any;
+	private _submitPromise: any;
 	private _closeResolver: any;
 	private _closePromise: any;
 	#host: UmbControllerHostInterface;
 
 	public modalElement: UUIModalDialogElement | UUIModalSidebarElement;
 
-	#element = new BehaviorSubject<any | undefined>(undefined);
-	public readonly element = this.#element.asObservable();
+	#innerElement = new BehaviorSubject<any | undefined>(undefined);
+	public readonly innerElement = this.#innerElement.asObservable();
 
 	#modalElement?: UUIModalSidebarElement | UUIDialogElement;
 
@@ -34,7 +36,7 @@ export class UmbModalHandler {
 		config?: UmbModalConfig
 	) {
 		this.#host = host;
-		this.key = uuidv4();
+		this.key = config?.key || uuidv4();
 
 		if (modalAlias instanceof UmbModalToken) {
 			this.type = modalAlias.getDefaultConfig()?.type || this.type;
@@ -45,6 +47,9 @@ export class UmbModalHandler {
 		this.size = config?.size || this.size;
 
 		// TODO: Consider if its right to use Promises, or use another event based system? Would we need to be able to cancel an event, to then prevent the closing..?
+		this._submitPromise = new Promise((resolve) => {
+			this._submitResolver = resolve;
+		});
 		this._closePromise = new Promise((resolve) => {
 			this._closeResolver = resolve;
 		});
@@ -77,18 +82,27 @@ export class UmbModalHandler {
 		const innerElement = (await createExtensionElement(manifest)) as any;
 
 		if (innerElement) {
-			innerElement.data = data;
+			innerElement.data = data; //
+			//innerElement.observable = this.#dataObservable;
 			innerElement.modalHandler = this;
 		}
 
 		return innerElement;
 	}
 
-	public close(...args: any) {
-		this._closeResolver(...args);
+	public submit(...args: any) {
+		this._submitResolver(...args);
 		this.modalElement.close();
 	}
 
+	public close() {
+		this._submitResolver();
+		this.modalElement.close();
+	}
+
+	public onSubmit(): Promise<any> {
+		return this._submitPromise;
+	}
 	public onClose(): Promise<any> {
 		return this._closePromise;
 	}
@@ -96,15 +110,15 @@ export class UmbModalHandler {
 	/* TODO: modals being part of the extension registry know means that a modal element can change over time.
 	 It makes this code a bit more complex. The main idea is to have the element as part of the modalHandler so it is possible to dispatch events from within the modal element to the one that opened it.
 	 Now when the element is an observable it makes it more complex because this host needs to subscribe to updates to the element, instead of just having a reference to it.
-	 If we find a better generic solution to communicate between the modal and the host, then we can remove the element as part of the modalHandler. */
+	 If we find a better generic solution to communicate between the modal and the implementor, then we can remove the element as part of the modalHandler. */
 	#observeModal(modalAlias: string, data?: unknown) {
 		new UmbObserverController(
 			this.#host,
 			umbExtensionsRegistry.getByTypeAndAlias('modal', modalAlias),
 			async (manifest) => {
 				if (manifest) {
-					const element = await this.#createInnerElement(manifest, data);
-					this.#appendInnerElement(element);
+					const innerElement = await this.#createInnerElement(manifest, data);
+					this.#appendInnerElement(innerElement);
 				} else {
 					this.#removeInnerElement();
 				}
@@ -114,13 +128,13 @@ export class UmbModalHandler {
 
 	#appendInnerElement(element: any) {
 		this.#modalElement?.appendChild(element);
-		this.#element.next(element);
+		this.#innerElement.next(element);
 	}
 
 	#removeInnerElement() {
-		if (this.#element.getValue()) {
-			this.#modalElement?.removeChild(this.#element.getValue());
-			this.#element.next(undefined);
+		if (this.#innerElement.getValue()) {
+			this.#modalElement?.removeChild(this.#innerElement.getValue());
+			this.#innerElement.next(undefined);
 		}
 	}
 }

@@ -20,11 +20,11 @@ export class UmbModalLayoutPickerBase<T> extends UmbModalLayoutElement<UmbPicker
 	}
 
 	submit() {
-		this.modalHandler?.close({ selection: this.selection });
+		this.modalHandler?.submit({ selection: this.selection });
 	}
 
 	close() {
-		this.modalHandler?.close();
+		this.modalHandler?.submit();
 	}
 
 	protected _handleKeydown(e: KeyboardEvent, key: string) {

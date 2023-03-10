@@ -105,11 +105,11 @@ export class UmbLinkPickerModalElement extends UmbModalLayoutElement<UmbLinkPick
 	}
 
 	private _submit() {
-		this.modalHandler?.close(this._link);
+		this.modalHandler?.submit(this._link);
 	}
 
 	private _close() {
-		this.modalHandler?.close();
+		this.modalHandler?.submit();
 	}
 
 	render() {

@@ -31,7 +31,7 @@ export default class UmbExportDictionaryEntityAction extends UmbEntityActionBase
 		});
 
 		// TODO: get type from modal result
-		const { includeChildren }: UmbExportDictionaryModalResultData = await modalHandler.onClose();
+		const { includeChildren }: UmbExportDictionaryModalResultData = await modalHandler.onSubmit();
 		if (includeChildren === undefined) return;
 
 		const result = await this.repository?.export(this.unique, includeChildren);

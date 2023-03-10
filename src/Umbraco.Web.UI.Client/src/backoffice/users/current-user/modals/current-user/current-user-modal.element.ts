@@ -126,7 +126,7 @@ export class UmbCurrentUserModalElement extends UmbLitElement {
 	}
 
 	private _close() {
-		this.modalHandler?.close();
+		this.modalHandler?.submit();
 	}
 
 	private _edit() {

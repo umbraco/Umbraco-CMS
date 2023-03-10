@@ -105,7 +105,7 @@ export class UmbDataTypeWorkspaceViewEditElement extends UmbLitElement {
 			selection: this._propertyEditorUiAlias ? [this._propertyEditorUiAlias] : [],
 		});
 
-		modalHandler?.onClose().then(({ selection } = {}) => {
+		modalHandler?.onSubmit().then(({ selection } = {}) => {
 			if (!selection) return;
 			this._selectPropertyEditorUI(selection[0]);
 		});

@@ -20,7 +20,7 @@ export class UmbPropertyCreatorElement extends UmbLitElement {
 	#onAddProperty() {
 		const modalHandler = this.#modalContext?.open(UMB_PROPERTY_SETTINGS_MODAL_TOKEN);
 
-		modalHandler?.onClose().then((result) => {
+		modalHandler?.onSubmit().then((result) => {
 			console.log('result', result);
 		});
 	}

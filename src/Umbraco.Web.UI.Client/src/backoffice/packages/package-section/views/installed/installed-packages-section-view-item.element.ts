@@ -89,7 +89,7 @@ export class UmbInstalledPackagesSectionViewItem extends UmbLitElement {
 			confirmLabel: 'Run migrations',
 		});
 
-		const migrationConfirmed = await modalHandler?.onClose().then(({ confirmed }: any) => {
+		const migrationConfirmed = await modalHandler?.onSubmit().then(({ confirmed }: any) => {
 			return confirmed;
 		});
 

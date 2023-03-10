@@ -127,7 +127,7 @@ export class UmbInputLanguagePickerElement extends FormControlMixin(UmbLitElemen
 			filter: this.filter,
 		});
 
-		modalHandler?.onClose().then(({ selection }) => {
+		modalHandler?.onSubmit().then(({ selection }) => {
 			this._setSelection(selection);
 		});
 	}
@@ -140,7 +140,7 @@ export class UmbInputLanguagePickerElement extends FormControlMixin(UmbLitElemen
 			confirmLabel: 'Remove',
 		});
 
-		modalHandler?.onClose().then(({ confirmed }) => {
+		modalHandler?.onSubmit().then(({ confirmed }) => {
 			if (confirmed) {
 				const newSelection = this._selectedIsoCodes.filter((value) => value !== item.isoCode);
 				this._setSelection(newSelection);

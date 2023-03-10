@@ -9,11 +9,11 @@ export class UmbConfirmModalElement extends UmbModalLayoutElement<UmbConfirmModa
 	static styles = [UUITextStyles];
 
 	private _handleConfirm() {
-		this.modalHandler?.close({ confirmed: true });
+		this.modalHandler?.submit({ confirmed: true });
 	}
 
 	private _handleCancel() {
-		this.modalHandler?.close({ confirmed: false });
+		this.modalHandler?.submit({ confirmed: false });
 	}
 
 	render() {
