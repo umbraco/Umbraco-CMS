@@ -284,6 +284,11 @@ public class BackOfficeUserManager : UmbracoUserManager<BackOfficeIdentityUser, 
 
         IdentityResult created = await CreateAsync(identityUser);
 
+        if (created.Succeeded is false)
+        {
+            return IdentityCreationResult.Fail(created.Errors.ToErrorMessage());
+        }
+
         var password = GeneratePassword();
 
         IdentityResult passwordAdded = await AddPasswordAsync(identityUser, password);
