@@ -24,7 +24,7 @@ export class UmbModalElementPickerBase<T> extends UmbModalLayoutElement<UmbPicke
 	}
 
 	close() {
-		this.modalHandler?.close();
+		this.modalHandler?.reject();
 	}
 
 	protected _handleKeydown(e: KeyboardEvent, key: string) {

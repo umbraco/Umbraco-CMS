@@ -67,7 +67,7 @@ export class UmbDocumentPickerModalElement extends UmbModalLayoutElement<UmbDocu
 	}
 
 	private _close() {
-		this.modalHandler?.close();
+		this.modalHandler?.reject();
 	}
 
 	render() {

@@ -183,7 +183,7 @@ export class UmbPropertySettingsModalElement extends UmbModalLayoutElement {
 	}
 
 	#onClose() {
-		this.modalHandler?.close();
+		this.modalHandler?.reject();
 	}
 
 	#onSubmit(event: SubmitEvent) {

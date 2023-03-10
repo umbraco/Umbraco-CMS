@@ -32,7 +32,7 @@ export class UmbCreateDictionaryModalLayoutElement extends UmbModalLayoutElement
 	}
 
 	#handleCancel() {
-		this.modalHandler?.close();
+		this.modalHandler?.reject();
 	}
 
 	#submitForm() {

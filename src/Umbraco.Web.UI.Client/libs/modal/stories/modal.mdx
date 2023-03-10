@@ -64,8 +64,8 @@ class MyElement extends UmbElementMixin(LitElement) {
 		const options {'options go here'};
 		const modalHandler = this.#modalContext?.open(SOME_MODAL_TOKEN), data, options);
 
-		modalHandler?.onClose().then((data) => {
-			// if any data is supplied on close, it will be available here.
+		modalHandler?.onSubmit().then((data) => {
+			// if modal submitted, then data is supplied here.
 		});
 	}
 

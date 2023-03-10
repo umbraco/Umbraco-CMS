@@ -19,7 +19,7 @@ export class UmbExportDictionaryModalLayoutElement extends UmbModalLayoutElement
 	private _form!: HTMLFormElement;
 
 	#handleClose() {
-		this.modalHandler?.close();
+		this.modalHandler?.reject();
 	}
 
 	#submitForm() {

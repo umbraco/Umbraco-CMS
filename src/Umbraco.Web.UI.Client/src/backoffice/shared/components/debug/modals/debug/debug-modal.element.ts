@@ -55,7 +55,7 @@ export default class UmbContextDebuggerModalElement extends UmbModalLayoutElemen
 	];
 
 	private _handleClose() {
-		this.modalHandler?.close();
+		this.modalHandler?.reject();
 	}
 
 	render() {

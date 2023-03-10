@@ -66,7 +66,7 @@ export class UmbMediaPickerModalElement extends UmbModalLayoutElement<UmbMediaPi
 	}
 
 	private _close() {
-		this.modalHandler?.close();
+		this.modalHandler?.reject();
 	}
 
 	render() {

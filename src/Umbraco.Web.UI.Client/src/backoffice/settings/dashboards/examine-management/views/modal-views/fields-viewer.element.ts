@@ -38,7 +38,7 @@ export class UmbModalElementFieldsViewerElement extends UmbModalLayoutElement<Se
 	];
 
 	private _handleClose() {
-		this.modalHandler?.close();
+		this.modalHandler?.reject();
 	}
 
 	render() {

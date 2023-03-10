@@ -134,7 +134,7 @@ export class UmbIconPickerModalElement extends UmbModalLayoutElement<UmbIconPick
 	}
 
 	private _close() {
-		this.modalHandler?.close();
+		this.modalHandler?.reject();
 	}
 
 	private _save() {

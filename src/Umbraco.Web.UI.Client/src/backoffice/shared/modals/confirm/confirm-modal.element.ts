@@ -13,7 +13,7 @@ export class UmbConfirmModalElement extends UmbModalLayoutElement<UmbConfirmModa
 	}
 
 	private _handleCancel() {
-		this.modalHandler?.close();
+		this.modalHandler?.reject();
 	}
 
 	render() {

@@ -12,10 +12,9 @@ import { ManifestModal } from '@umbraco-cms/extensions-registry';
 
 //TODO consider splitting this into two separate handlers
 export class UmbModalHandler {
-	private _submitResolver: any;
 	private _submitPromise: any;
-	private _closeResolver: any;
-	private _closePromise: any;
+	private _submitResolver: any;
+	private _submitRejecter: any;
 	#host: UmbControllerHostInterface;
 
 	public modalElement: UUIModalDialogElement | UUIModalSidebarElement;
@@ -47,11 +46,9 @@ export class UmbModalHandler {
 		this.size = config?.size || this.size;
 
 		// TODO: Consider if its right to use Promises, or use another event based system? Would we need to be able to cancel an event, to then prevent the closing..?
-		this._submitPromise = new Promise((resolve) => {
+		this._submitPromise = new Promise((resolve, reject) => {
 			this._submitResolver = resolve;
-		});
-		this._closePromise = new Promise((resolve) => {
-			this._closeResolver = resolve;
+			this._submitRejecter = reject;
 		});
 
 		this.modalElement = this.#createContainerElement();
@@ -95,16 +92,13 @@ export class UmbModalHandler {
 		this.modalElement.close();
 	}
 
-	public close() {
-		this._closeResolver();
+	public reject() {
+		this._submitRejecter();
 		this.modalElement.close();
 	}
 
 	public onSubmit(): Promise<any> {
 		return this._submitPromise;
-	}
-	public onClose(): Promise<any> {
-		return this._closePromise;
 	}
 
 	/* TODO: modals being part of the extension registry now means that a modal element can change over time.
