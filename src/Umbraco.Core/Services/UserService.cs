@@ -1129,6 +1129,31 @@ internal class UserService : RepositoryService, IUserService
         return UserOperationStatus.Success;
     }
 
+    public async Task<UserOperationStatus> EnableAsync(int performingUserId, params Guid[] keys)
+    {
+        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+        IUser? performingUser = GetById(performingUserId);
+
+        if (performingUser is null)
+        {
+            return UserOperationStatus.MissingUser;
+        }
+
+        IServiceScope serviceScope = _serviceScopeFactory.CreateScope();
+        IBackofficeUserStore userStore = serviceScope.ServiceProvider.GetRequiredService<IBackofficeUserStore>();
+        IUser[] usersToEnable = (await userStore.GetUsersAsync(keys)).ToArray();
+
+        foreach (IUser user in usersToEnable)
+        {
+            user.IsApproved = true;
+        }
+
+        Save(usersToEnable);
+
+        scope.Complete();
+        return UserOperationStatus.Success;
+    }
+
     public IEnumerable<IUser> GetAll(long pageIndex, int pageSize, out long totalRecords, string orderBy, Direction orderDirection, UserState[]? userState = null, string[]? userGroups = null, string? filter = null)
     {
         IQuery<IUser>? filterQuery = null;
