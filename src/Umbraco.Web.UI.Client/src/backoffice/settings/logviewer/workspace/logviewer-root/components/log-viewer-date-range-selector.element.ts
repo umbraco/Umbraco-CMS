@@ -99,7 +99,7 @@ export class UmbLogViewerDateRangeSelectorElement extends UmbLitElement {
                 @click=${(e: Event) => {
 									(e.target as HTMLInputElement).showPicker();
 								}}
-                                    
+
                 id="start-date"
                 type="date"
                 label="From"

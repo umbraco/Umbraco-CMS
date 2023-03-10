@@ -92,6 +92,7 @@ export class UmbSectionElement extends UmbLitElement {
 	private _createWorkspaceRoutes() {
 		if (!this._workspaces) return;
 		// TODO: find a way to make this reuseable across:
+		// TODO: Move workspace 'handlers/routes' to the workspace-element. So it becomes local.
 		const workspaceRoutes = this._workspaces?.map((workspace: ManifestWorkspace) => {
 			return [
 				{

@@ -48,24 +48,24 @@ export class UmbPropertyTypeBasedPropertyElement extends UmbLitElement {
 	private _value?: unknown;
 
 	/**
-	 * VariantId. A Variant Configuration to identify which the variant of its value.
+	 * propertyVariantId. A VariantID to identify which the variant of this properties value.
 	 * @public
 	 * @type {UmbVariantId}
 	 * @attr
 	 * @default undefined
 	 */
 	@property({ type: Object, attribute: false })
-	public get variantId(): UmbVariantId | undefined {
-		return this._variantId;
+	public get propertyVariantId(): UmbVariantId | undefined {
+		return this._propertyVariantId;
 	}
-	public set variantId(value: UmbVariantId | undefined) {
-		const oldValue = this._variantId;
+	public set propertyVariantId(value: UmbVariantId | undefined) {
+		const oldValue = this._propertyVariantId;
 		if (value && oldValue?.equal(value)) return;
-		this._variantId = value;
+		this._propertyVariantId = value;
 		this._observeProperty();
-		this.requestUpdate('variantId', oldValue);
+		this.requestUpdate('propertyVariantId', oldValue);
 	}
-	private _variantId?: UmbVariantId | undefined;
+	private _propertyVariantId?: UmbVariantId | undefined;
 
 	private _workspaceContext?: UmbDocumentWorkspaceContext;
 
@@ -83,7 +83,7 @@ export class UmbPropertyTypeBasedPropertyElement extends UmbLitElement {
 
 		this._observePropertyValue?.destroy();
 		this._observePropertyValue = this.observe(
-			this._workspaceContext.propertyValueByAlias(this._property.alias, this._variantId),
+			this._workspaceContext.propertyValueByAlias(this._property.alias, this._propertyVariantId),
 			(value) => {
 				this._value = value;
 			}
@@ -113,7 +113,7 @@ export class UmbPropertyTypeBasedPropertyElement extends UmbLitElement {
 			description=${ifDefined(this._property?.description || undefined)}
 			property-editor-ui-alias=${ifDefined(this._propertyEditorUiAlias)}
 			.value=${this._value}
-			.variantId=${this.variantId}
+			.propertyVariantId=${this.propertyVariantId}
 			.config=${this._dataTypeData}></umb-workspace-property>`;
 	}
 }
