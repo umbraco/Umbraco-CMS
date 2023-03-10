@@ -35,7 +35,7 @@ public class EFCoreUpgrader
         }
 
         // read current state
-        var currentState = keyValueService.GetValue(StateValueKey) ?? string.Empty;
+        var currentState = "91A8BDA4-603E-41E6-9C45-15C787F7DD86";
         var forceState = false;
 
         // execute plan
@@ -45,14 +45,14 @@ public class EFCoreUpgrader
             throw new InvalidOperationException("Plan execution returned an invalid null or empty state.");
         }
 
-        // save new state
-        if (forceState)
-        {
-            keyValueService.SetValue(StateValueKey, state);
-        }
-        else if (currentState != state)
-        {
-            keyValueService.SetValue(StateValueKey, currentState, state);
-        }
+        // // save new state
+        // if (forceState)
+        // {
+        //     keyValueService.SetValue(StateValueKey, state);
+        // }
+        // else if (currentState != state)
+        // {
+        //     keyValueService.SetValue(StateValueKey, currentState, state);
+        // }
     }
 }

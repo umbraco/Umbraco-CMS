@@ -103,7 +103,7 @@ public class EFCoreMigrationPlan
             throw new ArgumentNullException(nameof(migration));
         }
 
-        if (!migration.Implements<MigrationBase>())
+        if (!migration.Implements<EfCoreMigrationBase>())
         {
             throw new ArgumentException($"Type {migration.Name} does not implement IMigration.", nameof(migration));
         }

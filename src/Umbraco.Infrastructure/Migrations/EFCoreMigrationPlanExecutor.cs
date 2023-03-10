@@ -19,16 +19,15 @@ public class EFCoreMigrationPlanExecutor : IEFCoreMigrationPlanExecutor
 
         _logger.LogInformation("Starting '{MigrationName}'...", plan.Name);
 
-        var nextState = fromState;
+        _logger.LogInformation("At {OrigState}", string.IsNullOrWhiteSpace(fromState) ? "origin" : fromState);
 
-        _logger.LogInformation("At {OrigState}", string.IsNullOrWhiteSpace(nextState) ? "origin" : nextState);
-
-        if (!plan.Transitions.TryGetValue(nextState, out Transition? transition))
+        if (!plan.Transitions.TryGetValue(fromState, out Transition? transition))
         {
             throw new InvalidOperationException(
-                $"The migration plan does not support migrating from state \"{nextState}\".");
+                $"The migration plan does not support migrating from state \"{fromState}\".");
         }
 
+        var nextState = fromState;
         var context = new EFCoreMigrationContext(plan);
 
         while (transition != null)
