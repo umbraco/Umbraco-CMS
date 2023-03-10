@@ -147,6 +147,22 @@ public class BackOfficeUserManager : UmbracoUserManager<BackOfficeIdentityUser, 
         return result;
     }
 
+    public async Task<Attempt<UserUnlockResult, UserOperationStatus>> UnlockUser(IUser user)
+    {
+        BackOfficeIdentityUser? identityUser = await FindByIdAsync(user.Id.ToString());
+
+        if (identityUser is null)
+        {
+            return Attempt.FailWithStatus(UserOperationStatus.NotFound, new UserUnlockResult());
+        }
+
+        IdentityResult result = await SetLockoutEndDateAsync(identityUser, DateTimeOffset.Now.AddMinutes(-1));
+
+        return result.Succeeded
+            ? Attempt.SucceedWithStatus(UserOperationStatus.Success, new UserUnlockResult())
+            : Attempt.FailWithStatus(UserOperationStatus.UnknownFailure, new UserUnlockResult { ErrorMessage = result.Errors.ToErrorMessage() });
+    }
+
     public override async Task<IdentityResult> ResetAccessFailedCountAsync(BackOfficeIdentityUser user)
     {
         IdentityResult result = await base.ResetAccessFailedCountAsync(user);

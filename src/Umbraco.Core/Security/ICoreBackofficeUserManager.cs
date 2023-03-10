@@ -16,4 +16,6 @@ public interface ICoreBackofficeUserManager
     Task<IdentityCreationResult> CreateForInvite(UserCreateModel createModel);
 
     Task<Attempt<string, UserOperationStatus>> GenerateEmailConfirmationTokenAsync(IUser user);
+
+    Task<Attempt<UserUnlockResult, UserOperationStatus>> UnlockUser(IUser user);
 }

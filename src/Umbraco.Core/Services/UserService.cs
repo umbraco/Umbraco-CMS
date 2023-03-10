@@ -1095,6 +1095,11 @@ internal class UserService : RepositoryService, IUserService
 
     public async Task<UserOperationStatus> DisableAsync(int performingUserId, params Guid[] keys)
     {
+        if(keys.Length == 0)
+        {
+            return UserOperationStatus.Success;
+        }
+
         using ICoreScope scope = ScopeProvider.CreateCoreScope();
         IUser? performingUser = GetById(performingUserId);
 
@@ -1131,6 +1136,11 @@ internal class UserService : RepositoryService, IUserService
 
     public async Task<UserOperationStatus> EnableAsync(int performingUserId, params Guid[] keys)
     {
+        if(keys.Length == 0)
+        {
+            return UserOperationStatus.Success;
+        }
+
         using ICoreScope scope = ScopeProvider.CreateCoreScope();
         IUser? performingUser = GetById(performingUserId);
 
@@ -1152,6 +1162,40 @@ internal class UserService : RepositoryService, IUserService
 
         scope.Complete();
         return UserOperationStatus.Success;
+    }
+
+    public async Task<Attempt<UserUnlockResult, UserOperationStatus>> UnlockAsync(int performingUserId, params Guid[] keys)
+    {
+        if (keys.Length == 0)
+        {
+            return Attempt.SucceedWithStatus(UserOperationStatus.Success, new UserUnlockResult());
+        }
+
+        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+        IUser? performingUser = GetById(performingUserId);
+
+        if (performingUser is null)
+        {
+            return Attempt.FailWithStatus(UserOperationStatus.MissingUser, new UserUnlockResult());
+        }
+
+        IServiceScope serviceScope = _serviceScopeFactory.CreateScope();
+        ICoreBackofficeUserManager manager = serviceScope.ServiceProvider.GetRequiredService<ICoreBackofficeUserManager>();
+        IBackofficeUserStore userStore = serviceScope.ServiceProvider.GetRequiredService<IBackofficeUserStore>();
+
+        IEnumerable<IUser> usersToUnlock = await userStore.GetUsersAsync(keys);
+
+        foreach (IUser user in usersToUnlock)
+        {
+            Attempt<UserUnlockResult, UserOperationStatus> result = await manager.UnlockUser(user);
+            if (result.Success is false)
+            {
+                return Attempt.FailWithStatus(UserOperationStatus.UnknownFailure, result.Result);
+            }
+        }
+
+        scope.Complete();
+        return Attempt.SucceedWithStatus(UserOperationStatus.Success, new UserUnlockResult());
     }
 
     public IEnumerable<IUser> GetAll(long pageIndex, int pageSize, out long totalRecords, string orderBy, Direction orderDirection, UserState[]? userState = null, string[]? userGroups = null, string? filter = null)
