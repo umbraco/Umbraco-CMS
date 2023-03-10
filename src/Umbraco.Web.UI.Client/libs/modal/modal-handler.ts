@@ -16,12 +16,12 @@ export class UmbModalHandler {
 	private _closePromise: any;
 	#host: UmbControllerHostInterface;
 
-	public containerElement: UUIModalDialogElement | UUIModalSidebarElement;
+	public modalElement: UUIModalDialogElement | UUIModalSidebarElement;
 
 	#element = new BehaviorSubject<any | undefined>(undefined);
 	public readonly element = this.#element.asObservable();
 
-	#innerElement?: UUIModalSidebarElement | UUIDialogElement;
+	#modalElement?: UUIModalSidebarElement | UUIDialogElement;
 
 	public key: string;
 	public type: UmbModalType = 'dialog';
@@ -49,7 +49,7 @@ export class UmbModalHandler {
 			this._closeResolver = resolve;
 		});
 
-		this.containerElement = this.#createContainerElement();
+		this.modalElement = this.#createContainerElement();
 		this.#observeModal(modalAlias.toString(), data);
 	}
 
@@ -59,7 +59,7 @@ export class UmbModalHandler {
 
 	#createSidebarElement() {
 		const sidebarElement = document.createElement('uui-modal-sidebar');
-		this.#innerElement = sidebarElement;
+		this.#modalElement = sidebarElement;
 		sidebarElement.size = this.size;
 		return sidebarElement;
 	}
@@ -67,26 +67,26 @@ export class UmbModalHandler {
 	#createDialogElement() {
 		const modalDialogElement = document.createElement('uui-modal-dialog');
 		const dialogElement: UUIDialogElement = document.createElement('uui-dialog');
-		this.#innerElement = dialogElement;
+		this.#modalElement = dialogElement;
 		modalDialogElement.appendChild(dialogElement);
 		return modalDialogElement;
 	}
 
-	async #createModalElement(manifest: ManifestModal, data?: unknown) {
-		// TODO: add fallback element if no modal element is found
-		const modalElement = (await createExtensionElement(manifest)) as any;
+	async #createInnerElement(manifest: ManifestModal, data?: unknown) {
+		// TODO: add inner fallback element if no extension element is found
+		const innerElement = (await createExtensionElement(manifest)) as any;
 
-		if (modalElement) {
-			modalElement.data = data;
-			modalElement.modalHandler = this;
+		if (innerElement) {
+			innerElement.data = data;
+			innerElement.modalHandler = this;
 		}
 
-		return modalElement;
+		return innerElement;
 	}
 
 	public close(...args: any) {
 		this._closeResolver(...args);
-		this.containerElement.close();
+		this.modalElement.close();
 	}
 
 	public onClose(): Promise<any> {
@@ -103,23 +103,23 @@ export class UmbModalHandler {
 			umbExtensionsRegistry.getByTypeAndAlias('modal', modalAlias),
 			async (manifest) => {
 				if (manifest) {
-					const element = await this.#createModalElement(manifest, data);
-					this.#appendModalElement(element);
+					const element = await this.#createInnerElement(manifest, data);
+					this.#appendInnerElement(element);
 				} else {
-					this.#removeModalElement();
+					this.#removeInnerElement();
 				}
 			}
 		);
 	}
 
-	#appendModalElement(element: any) {
-		this.#innerElement?.appendChild(element);
+	#appendInnerElement(element: any) {
+		this.#modalElement?.appendChild(element);
 		this.#element.next(element);
 	}
 
-	#removeModalElement() {
+	#removeInnerElement() {
 		if (this.#element.getValue()) {
-			this.#innerElement?.removeChild(this.#element.getValue());
+			this.#modalElement?.removeChild(this.#element.getValue());
 			this.#element.next(undefined);
 		}
 	}

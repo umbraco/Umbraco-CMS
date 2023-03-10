@@ -55,10 +55,10 @@ export class UmbModalContext {
 		requestAnimationFrame(() => {
 			dialog.showModal();
 		});
-		modalHandler.containerElement = dialog as unknown as UUIModalDialogElement;
+		modalHandler.modalElement = dialog as unknown as UUIModalDialogElement;
 		//TODO END
 
-		modalHandler.containerElement.addEventListener('close-end', () => this.#onCloseEnd(modalHandler));
+		modalHandler.modalElement.addEventListener('close-end', () => this.#onCloseEnd(modalHandler));
 
 		this.#modals.next([...this.#modals.getValue(), modalHandler]);
 		return modalHandler;
@@ -75,7 +75,7 @@ export class UmbModalContext {
 	public open<T = unknown>(modalAlias: string | UmbModalToken<T>, data?: T, config?: UmbModalConfig): UmbModalHandler {
 		const modalHandler = new UmbModalHandler(this.host, modalAlias, data, config);
 
-		modalHandler.containerElement.addEventListener('close-end', () => this.#onCloseEnd(modalHandler));
+		modalHandler.modalElement.addEventListener('close-end', () => this.#onCloseEnd(modalHandler));
 
 		this.#modals.next([...this.#modals.getValue(), modalHandler]);
 		return modalHandler;
@@ -98,7 +98,7 @@ export class UmbModalContext {
 	 * @memberof UmbModalContext
 	 */
 	#onCloseEnd(modalHandler: UmbModalHandler) {
-		modalHandler.containerElement.removeEventListener('close-end', () => this.#onCloseEnd(modalHandler));
+		modalHandler.modalElement.removeEventListener('close-end', () => this.#onCloseEnd(modalHandler));
 		this._close(modalHandler.key);
 	}
 }
