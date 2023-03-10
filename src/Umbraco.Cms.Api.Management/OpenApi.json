@@ -6148,7 +6148,7 @@
                 "schema": {
                   "oneOf": [
                     {
-                      "$ref": "#/components/schemas/LanguageModel"
+                      "$ref": "#/components/schemas/UploadSingleFileResponseModel"
                     }
                   ]
                 }
@@ -10079,6 +10079,24 @@
           "reportUrl": {
             "type": "string",
             "readOnly": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "UploadSingleFileResponseModel": {
+        "type": "object",
+        "properties": {
+          "key": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "availableUntil": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "fileName": {
+            "type": "string"
           }
         },
         "additionalProperties": false
