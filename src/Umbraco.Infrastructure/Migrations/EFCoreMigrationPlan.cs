@@ -140,7 +140,7 @@ public class EFCoreMigrationPlan
     ///     Validates the plan.
     /// </summary>
     /// <returns>The plan's final state.</returns>
-    private void Validate()
+    public void Validate()
     {
         if (_finalState != null)
         {

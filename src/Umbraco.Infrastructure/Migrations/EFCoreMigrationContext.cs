@@ -2,7 +2,7 @@
 
 public class EFCoreMigrationContext : IEFCoreMigrationContext
 {
-    public EFCoreMigrationContext(MigrationPlan plan) => Plan = plan;
+    public EFCoreMigrationContext(EFCoreMigrationPlan plan) => Plan = plan;
 
-    public MigrationPlan Plan { get; }
+    public EFCoreMigrationPlan Plan { get; }
 }
