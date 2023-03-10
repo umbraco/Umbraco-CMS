@@ -35,6 +35,7 @@ public class ManagementApiComposer : IComposer
             .AddModelsBuilder()
             .AddRedirectUrl()
             .AddTrackedReferences()
+            .AddTemporaryFiles()
             .AddDataTypes()
             .AddTemplates()
             .AddRelationTypes()

@@ -5,7 +5,7 @@ using Umbraco.Extensions;
 namespace Umbraco.Cms.Api.Management.OpenApi;
 
 /// <summary>
-/// This filter explicitly removes all other mime types than application/json from the produced OpenAPI document
+/// This filter explicitly removes all other mime types than application/json from the produced OpenAPI document when application/json is accepted.
 /// </summary>
 public class MimeTypeDocumentFilter : IDocumentFilter
 {
@@ -15,8 +15,14 @@ public class MimeTypeDocumentFilter : IDocumentFilter
             .SelectMany(path => path.Value.Operations.Values)
             .ToArray();
 
-        void RemoveUnwantedMimeTypes(IDictionary<string, OpenApiMediaType> content) =>
-            content.RemoveAll(r => r.Key != "application/json");
+        void RemoveUnwantedMimeTypes(IDictionary<string, OpenApiMediaType> content)
+        {
+            if (content.ContainsKey("application/json"))
+            {
+                content.RemoveAll(r => r.Key != "application/json");
+            }
+
+        }
 
         OpenApiRequestBody[] requestBodies = operations.Select(operation => operation.RequestBody).WhereNotNull().ToArray();
         foreach (OpenApiRequestBody requestBody in requestBodies)
