@@ -5,20 +5,20 @@ namespace Umbraco.Cms.Api.Management.Factories;
 
 internal sealed class DocumentEditingFactory : ContentEditingFactory<DocumentValueModel, DocumentVariantRequestModel>, IDocumentEditingFactory
 {
-    public ContentCreateModel MapCreateModel(DocumentCreateRequestModel createRequestModel)
+    public ContentCreateModel MapCreateModel(CreateDocumentRequestModel requestModel)
     {
-        ContentCreateModel model = MapContentEditingModel<ContentCreateModel>(createRequestModel);
-        model.ContentTypeKey = createRequestModel.ContentTypeKey;
-        model.TemplateKey = createRequestModel.TemplateKey;
-        model.ParentKey = createRequestModel.ParentKey;
+        ContentCreateModel model = MapContentEditingModel<ContentCreateModel>(requestModel);
+        model.ContentTypeKey = requestModel.ContentTypeKey;
+        model.TemplateKey = requestModel.TemplateKey;
+        model.ParentKey = requestModel.ParentKey;
 
         return model;
     }
 
-    public ContentUpdateModel MapUpdateModel(DocumentUpdateRequestModel updateRequestModel)
+    public ContentUpdateModel MapUpdateModel(UpdateDocumentRequestModel requestModel)
     {
-        ContentUpdateModel model = MapContentEditingModel<ContentUpdateModel>(updateRequestModel);
-        model.TemplateKey = updateRequestModel.TemplateKey;
+        ContentUpdateModel model = MapContentEditingModel<ContentUpdateModel>(requestModel);
+        model.TemplateKey = requestModel.TemplateKey;
 
         return model;
     }

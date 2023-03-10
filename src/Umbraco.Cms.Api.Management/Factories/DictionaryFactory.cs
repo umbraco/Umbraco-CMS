@@ -18,9 +18,9 @@ public class DictionaryFactory : IDictionaryFactory
         _languageService = languageService;
     }
 
-    public async Task<DictionaryItemViewModel> CreateDictionaryItemViewModelAsync(IDictionaryItem dictionaryItem)
+    public async Task<DictionaryItemResponseModel> CreateDictionaryItemViewModelAsync(IDictionaryItem dictionaryItem)
     {
-        DictionaryItemViewModel dictionaryViewModel = _umbracoMapper.Map<DictionaryItemViewModel>(dictionaryItem)!;
+        DictionaryItemResponseModel dictionaryResponseModel = _umbracoMapper.Map<DictionaryItemResponseModel>(dictionaryItem)!;
 
         var validLanguageIsoCodes = (await _languageService.GetAllAsync())
             .Select(language => language.IsoCode)
@@ -28,34 +28,34 @@ public class DictionaryFactory : IDictionaryFactory
         IDictionaryTranslation[] validTranslations = dictionaryItem.Translations
             .Where(t => validLanguageIsoCodes.Contains(t.LanguageIsoCode))
             .ToArray();
-        dictionaryViewModel.Translations = validTranslations
+        dictionaryResponseModel.Translations = validTranslations
             .Select(translation => _umbracoMapper.Map<DictionaryItemTranslationModel>(translation))
             .WhereNotNull()
             .ToArray();
 
-        return dictionaryViewModel;
+        return dictionaryResponseModel;
     }
 
-    public async Task<IDictionaryItem> MapUpdateModelToDictionaryItemAsync(IDictionaryItem current, DictionaryItemUpdateModel dictionaryItemUpdateModel)
+    public async Task<IDictionaryItem> MapUpdateModelToDictionaryItemAsync(IDictionaryItem current, UpdateDictionaryItemRequestModel updateDictionaryItemRequestModel)
     {
-        IDictionaryItem updated = _umbracoMapper.Map(dictionaryItemUpdateModel, current);
+        IDictionaryItem updated = _umbracoMapper.Map(updateDictionaryItemRequestModel, current);
 
-        await MapTranslations(updated, dictionaryItemUpdateModel.Translations);
+        await MapTranslations(updated, updateDictionaryItemRequestModel.Translations);
 
         return updated;
     }
 
-    public async Task<IDictionaryItem> MapCreateModelToDictionaryItemAsync(DictionaryItemCreateModel dictionaryItemUpdateModel)
+    public async Task<IDictionaryItem> MapCreateModelToDictionaryItemAsync(CreateDictionaryItemRequestModel createDictionaryItemUpdateModel)
     {
-        IDictionaryItem updated = _umbracoMapper.Map<IDictionaryItem>(dictionaryItemUpdateModel)!;
+        IDictionaryItem updated = _umbracoMapper.Map<IDictionaryItem>(createDictionaryItemUpdateModel)!;
 
-        await MapTranslations(updated, dictionaryItemUpdateModel.Translations);
+        await MapTranslations(updated, createDictionaryItemUpdateModel.Translations);
 
         return updated;
     }
 
-    public DictionaryUploadViewModel CreateDictionaryImportViewModel(UdtFileUpload udtFileUpload) =>
-        new DictionaryUploadViewModel
+    public UploadDictionaryResponseModel CreateDictionaryImportViewModel(UdtFileUpload udtFileUpload) =>
+        new UploadDictionaryResponseModel
         {
             FileName = udtFileUpload.FileName,
             DictionaryItems = udtFileUpload
@@ -78,7 +78,7 @@ public class DictionaryFactory : IDictionaryFactory
                         ? key
                         : null;
 
-                    return new DictionaryItemsImportViewModel { Name = name, Key = itemKey, ParentKey = parentKey };
+                    return new ImportDictionaryItemsPresentationModel { Name = name, Key = itemKey, ParentKey = parentKey };
                 })
                 .WhereNotNull()
                 .ToArray(),

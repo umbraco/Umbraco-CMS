@@ -2,7 +2,7 @@
 
 public abstract class ContentTypePresentationBase<TPropertyType, TPropertyTypeContainer>
     where TPropertyType : PropertyTypePresentationBase
-    where TPropertyTypeContainer : PropertyTypeContainerViewModelBase
+    where TPropertyTypeContainer : PropertyTypeContainerPresentationBase
 {
     public Guid Key { get; set; }
 

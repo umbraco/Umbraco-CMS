@@ -30,7 +30,7 @@ public class CreateUserGroupController : UserGroupsControllerBase
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status201Created)]
-    public async Task<IActionResult> Create(UserGroupSaveModel userGroupSaveModel)
+    public async Task<IActionResult> Create(SaveUserGroupRequestModel saveUserGroupRequestModel)
     {
         // FIXME: Comment this in when auth is in place and we can get a currently logged in user.
         // IUser? currentUser = _backOfficeSecurityAccessor.BackOfficeSecurity?.CurrentUser;
@@ -39,7 +39,7 @@ public class CreateUserGroupController : UserGroupsControllerBase
         //     return UserGroupOperationStatusResult(UserGroupOperationStatus.MissingUser);
         // }
 
-        Attempt<IUserGroup, UserGroupOperationStatus> userGroupCreationAttempt = await _userGroupViewModelFactory.CreateAsync(userGroupSaveModel);
+        Attempt<IUserGroup, UserGroupOperationStatus> userGroupCreationAttempt = await _userGroupViewModelFactory.CreateAsync(saveUserGroupRequestModel);
         if (userGroupCreationAttempt.Success is false)
         {
             return UserGroupOperationStatusResult(userGroupCreationAttempt.Status);

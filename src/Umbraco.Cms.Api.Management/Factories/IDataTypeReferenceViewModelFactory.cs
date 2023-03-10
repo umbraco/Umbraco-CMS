@@ -5,5 +5,5 @@ namespace Umbraco.Cms.Api.Management.Factories;
 
 public interface IDataTypeReferenceViewModelFactory
 {
-    IEnumerable<DataTypeReferenceViewModel> CreateDataTypeReferenceViewModels(IReadOnlyDictionary<Udi, IEnumerable<string>> dataTypeUsages);
+    IEnumerable<DataTypeReferenceResponseModel> CreateDataTypeReferenceViewModels(IReadOnlyDictionary<Udi, IEnumerable<string>> dataTypeUsages);
 }

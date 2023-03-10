@@ -13,7 +13,7 @@ public class RedirectUrlViewModelFactory : IRedirectUrlViewModelFactory
         _publishedUrlProvider = publishedUrlProvider;
     }
 
-    public RedirectUrlViewModel Create(IRedirectUrl source)
+    public RedirectUrlResponseModel Create(IRedirectUrl source)
     {
         var destinationUrl = source.ContentId > 0
             ? _publishedUrlProvider.GetUrl(source.ContentId, culture: source.Culture)
@@ -21,7 +21,7 @@ public class RedirectUrlViewModelFactory : IRedirectUrlViewModelFactory
 
         var originalUrl = _publishedUrlProvider.GetUrlFromRoute(source.ContentId, source.Url, source.Culture);
 
-        return new RedirectUrlViewModel
+        return new RedirectUrlResponseModel
         {
             OriginalUrl = originalUrl,
             DestinationUrl = destinationUrl,
@@ -32,7 +32,7 @@ public class RedirectUrlViewModelFactory : IRedirectUrlViewModelFactory
         };
     }
 
-    public IEnumerable<RedirectUrlViewModel> CreateMany(IEnumerable<IRedirectUrl> sources)
+    public IEnumerable<RedirectUrlResponseModel> CreateMany(IEnumerable<IRedirectUrl> sources)
     {
         foreach (IRedirectUrl source in sources)
         {

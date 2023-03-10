@@ -20,9 +20,9 @@ public class ByKeyDictionaryController : DictionaryControllerBase
 
     [HttpGet($"{{{nameof(key)}:guid}}")]
     [MapToApiVersion("1.0")]
-    [ProducesResponseType(typeof(DictionaryItemViewModel), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(DictionaryItemResponseModel), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<ActionResult<DictionaryItemViewModel>> ByKey(Guid key)
+    public async Task<ActionResult<DictionaryItemResponseModel>> ByKey(Guid key)
     {
         IDictionaryItem? dictionary = await _dictionaryItemService.GetAsync(key);
         if (dictionary == null)

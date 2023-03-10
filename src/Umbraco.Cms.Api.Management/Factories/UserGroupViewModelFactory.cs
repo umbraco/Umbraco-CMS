@@ -28,7 +28,7 @@ public class UserGroupViewModelFactory : IUserGroupViewModelFactory
     }
 
     /// <inheritdoc />
-    public async Task<UserGroupViewModel> CreateAsync(IUserGroup userGroup)
+    public async Task<UserGroupPresentationModel> CreateAsync(IUserGroup userGroup)
     {
         Guid? contentStartNodeKey = GetKeyFromId(userGroup.StartContentId, UmbracoObjectTypes.Document);
         Guid? mediaStartNodeKey = GetKeyFromId(userGroup.StartMediaId, UmbracoObjectTypes.Media);
@@ -40,7 +40,7 @@ public class UserGroupViewModelFactory : IUserGroupViewModelFactory
             throw new InvalidOperationException($"Unknown language ID in User Group: {userGroup.Name}");
         }
 
-        return new UserGroupViewModel
+        return new UserGroupPresentationModel
         {
             Name = userGroup.Name ?? string.Empty,
             Key = userGroup.Key,
@@ -55,9 +55,9 @@ public class UserGroupViewModelFactory : IUserGroupViewModelFactory
     }
 
     /// <inheritdoc />
-    public async Task<IEnumerable<UserGroupViewModel>> CreateMultipleAsync(IEnumerable<IUserGroup> userGroups)
+    public async Task<IEnumerable<UserGroupPresentationModel>> CreateMultipleAsync(IEnumerable<IUserGroup> userGroups)
     {
-        var userGroupViewModels = new List<UserGroupViewModel>();
+        var userGroupViewModels = new List<UserGroupPresentationModel>();
         foreach (IUserGroup userGroup in userGroups)
         {
             userGroupViewModels.Add(await CreateAsync(userGroup));
@@ -67,31 +67,31 @@ public class UserGroupViewModelFactory : IUserGroupViewModelFactory
     }
 
     /// <inheritdoc />
-    public async Task<Attempt<IUserGroup, UserGroupOperationStatus>> CreateAsync(UserGroupSaveModel saveModel)
+    public async Task<Attempt<IUserGroup, UserGroupOperationStatus>> CreateAsync(SaveUserGroupRequestModel requestModel)
     {
-        var cleanedName = saveModel.Name.CleanForXss('[', ']', '(', ')', ':');
+        var cleanedName = requestModel.Name.CleanForXss('[', ']', '(', ')', ':');
 
         var group = new UserGroup(_shortStringHelper)
         {
             Name = cleanedName,
             Alias = cleanedName,
-            Icon = saveModel.Icon,
-            HasAccessToAllLanguages = saveModel.HasAccessToAllLanguages,
-            PermissionNames = saveModel.Permissions,
+            Icon = requestModel.Icon,
+            HasAccessToAllLanguages = requestModel.HasAccessToAllLanguages,
+            PermissionNames = requestModel.Permissions,
         };
 
-        Attempt<UserGroupOperationStatus> assignmentAttempt = AssignStartNodesToUserGroup(saveModel, group);
+        Attempt<UserGroupOperationStatus> assignmentAttempt = AssignStartNodesToUserGroup(requestModel, group);
         if (assignmentAttempt.Success is false)
         {
             return Attempt.FailWithStatus<IUserGroup, UserGroupOperationStatus>(assignmentAttempt.Result, group);
         }
 
-        foreach (var section in saveModel.Sections)
+        foreach (var section in requestModel.Sections)
         {
             group.AddAllowedSection(SectionMapper.GetAlias(section));
         }
 
-        Attempt<IEnumerable<int>, UserGroupOperationStatus> languageIsoCodeMappingAttempt = await MapLanguageIsoCodesToIdsAsync(saveModel.Languages);
+        Attempt<IEnumerable<int>, UserGroupOperationStatus> languageIsoCodeMappingAttempt = await MapLanguageIsoCodesToIdsAsync(requestModel.Languages);
         if (languageIsoCodeMappingAttempt.Success is false)
         {
             return Attempt.FailWithStatus<IUserGroup, UserGroupOperationStatus>(languageIsoCodeMappingAttempt.Status, group);
@@ -106,16 +106,16 @@ public class UserGroupViewModelFactory : IUserGroupViewModelFactory
     }
 
     /// <inheritdoc />
-    public async Task<Attempt<IUserGroup, UserGroupOperationStatus>> UpdateAsync(IUserGroup current, UserGroupUpdateModel update)
+    public async Task<Attempt<IUserGroup, UserGroupOperationStatus>> UpdateAsync(IUserGroup current, UpdateUserGroupRequestModel request)
     {
-        Attempt<UserGroupOperationStatus> assignmentAttempt = AssignStartNodesToUserGroup(update, current);
+        Attempt<UserGroupOperationStatus> assignmentAttempt = AssignStartNodesToUserGroup(request, current);
         if (assignmentAttempt.Success is false)
         {
             return Attempt.FailWithStatus(assignmentAttempt.Result, current);
         }
 
         current.ClearAllowedLanguages();
-        Attempt<IEnumerable<int>, UserGroupOperationStatus> languageIdsMappingAttempt = await MapLanguageIsoCodesToIdsAsync(update.Languages);
+        Attempt<IEnumerable<int>, UserGroupOperationStatus> languageIdsMappingAttempt = await MapLanguageIsoCodesToIdsAsync(request.Languages);
         if (languageIdsMappingAttempt.Success is false)
         {
             return Attempt.FailWithStatus(languageIdsMappingAttempt.Status, current);
@@ -127,15 +127,15 @@ public class UserGroupViewModelFactory : IUserGroupViewModelFactory
         }
 
         current.ClearAllowedSections();
-        foreach (var sectionName in update.Sections)
+        foreach (var sectionName in request.Sections)
         {
             current.AddAllowedSection(SectionMapper.GetAlias(sectionName));
         }
 
-        current.Name = update.Name.CleanForXss('[', ']', '(', ')', ':');
-        current.Icon = update.Icon;
-        current.HasAccessToAllLanguages = update.HasAccessToAllLanguages;
-        current.PermissionNames = update.Permissions;
+        current.Name = request.Name.CleanForXss('[', ']', '(', ')', ':');
+        current.Icon = request.Icon;
+        current.HasAccessToAllLanguages = request.HasAccessToAllLanguages;
+        current.PermissionNames = request.Permissions;
 
 
         return Attempt.SucceedWithStatus(UserGroupOperationStatus.Success, current);

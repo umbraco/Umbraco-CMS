@@ -24,7 +24,7 @@ public class CopyDataTypeController : DataTypeControllerBase
     [MapToApiVersion("1.0")]
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> Copy(Guid key, DataTypeCopyModel dataTypeCopyModel)
+    public async Task<IActionResult> Copy(Guid key, CopyDataTypeRequestModel copyDataTypeRequestModel)
     {
         IDataType? source = await _dataTypeService.GetAsync(key);
         if (source is null)
@@ -32,7 +32,7 @@ public class CopyDataTypeController : DataTypeControllerBase
             return NotFound();
         }
 
-        Attempt<IDataType, DataTypeOperationStatus> result = await _dataTypeService.CopyAsync(source, dataTypeCopyModel.TargetKey, CurrentUserId(_backOfficeSecurityAccessor));
+        Attempt<IDataType, DataTypeOperationStatus> result = await _dataTypeService.CopyAsync(source, copyDataTypeRequestModel.TargetKey, CurrentUserId(_backOfficeSecurityAccessor));
 
         return result.Success
             ? CreatedAtAction<ByKeyDataTypeController>(controller => nameof(controller.ByKey), result.Result.Key)

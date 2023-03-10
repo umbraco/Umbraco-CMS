@@ -5,7 +5,7 @@ namespace Umbraco.Cms.Api.Management.Factories;
 
 public interface IRedirectUrlViewModelFactory
 {
-    RedirectUrlViewModel Create(IRedirectUrl source);
+    RedirectUrlResponseModel Create(IRedirectUrl source);
 
-    IEnumerable<RedirectUrlViewModel> CreateMany(IEnumerable<IRedirectUrl> sources);
+    IEnumerable<RedirectUrlResponseModel> CreateMany(IEnumerable<IRedirectUrl> sources);
 }

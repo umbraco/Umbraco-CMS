@@ -26,7 +26,7 @@ public class UpdateUserGroupController : UserGroupsControllerBase
     [MapToApiVersion("1.0")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> Update(Guid key, UserGroupUpdateModel dataTypeUpdateModel)
+    public async Task<IActionResult> Update(Guid key, UpdateUserGroupRequestModel dataTypeRequestModel)
     {
         IUserGroup? existingUserGroup = await _userGroupService.GetAsync(key);
 
@@ -35,7 +35,7 @@ public class UpdateUserGroupController : UserGroupsControllerBase
             return UserGroupOperationStatusResult(UserGroupOperationStatus.NotFound);
         }
 
-        Attempt<IUserGroup, UserGroupOperationStatus> userGroupUpdateAttempt = await _userGroupViewModelFactory.UpdateAsync(existingUserGroup, dataTypeUpdateModel);
+        Attempt<IUserGroup, UserGroupOperationStatus> userGroupUpdateAttempt = await _userGroupViewModelFactory.UpdateAsync(existingUserGroup, dataTypeRequestModel);
         if (userGroupUpdateAttempt.Success is false)
         {
             return UserGroupOperationStatusResult(userGroupUpdateAttempt.Status);

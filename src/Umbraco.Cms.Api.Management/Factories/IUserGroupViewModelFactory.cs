@@ -6,36 +6,36 @@ using Umbraco.Cms.Core.Services.OperationStatus;
 namespace Umbraco.Cms.Api.Management.Factories;
 
 /// <summary>
-/// A factory for creating <see cref="UserGroupViewModel"/>
+/// A factory for creating <see cref="UserGroupPresentationModel"/>
 /// </summary>
 public interface IUserGroupViewModelFactory
 {
     /// <summary>
-    /// Creates a <see cref="UserGroupViewModel"/> based on a <see cref="UserGroup"/>
+    /// Creates a <see cref="UserGroupPresentationModel"/> based on a <see cref="UserGroup"/>
     /// </summary>
     /// <param name="userGroup"></param>
     /// <returns></returns>
-    Task<UserGroupViewModel> CreateAsync(IUserGroup userGroup);
+    Task<UserGroupPresentationModel> CreateAsync(IUserGroup userGroup);
 
     /// <summary>
-    /// Creates multiple <see cref="UserGroupViewModel"/> base on multiple <see cref="UserGroup"/>
+    /// Creates multiple <see cref="UserGroupPresentationModel"/> base on multiple <see cref="UserGroup"/>
     /// </summary>
     /// <param name="userGroups"></param>
     /// <returns></returns>
-    Task<IEnumerable<UserGroupViewModel>> CreateMultipleAsync(IEnumerable<IUserGroup> userGroups);
+    Task<IEnumerable<UserGroupPresentationModel>> CreateMultipleAsync(IEnumerable<IUserGroup> userGroups);
 
     /// <summary>
-    /// Creates an <see cref="IUserGroup"/> based on a <see cref="UserGroupSaveModel"/>
+    /// Creates an <see cref="IUserGroup"/> based on a <see cref="SaveUserGroupRequestModel"/>
     /// </summary>
-    /// <param name="saveModel"></param>
+    /// <param name="requestModel"></param>
     /// <returns>An attempt indicating if the operation was a success as well as a more detailed <see cref="UserGroupOperationStatus"/>.</returns>
-    Task<Attempt<IUserGroup, UserGroupOperationStatus>> CreateAsync(UserGroupSaveModel saveModel);
+    Task<Attempt<IUserGroup, UserGroupOperationStatus>> CreateAsync(SaveUserGroupRequestModel requestModel);
 
     /// <summary>
     /// Converts the values of an update model to fit with the existing backoffice implementations, and maps it to an existing user group.
     /// </summary>
     /// <param name="current">Existing user group to map to.</param>
-    /// <param name="update">Update model containing the new values.</param>
+    /// <param name="request">Update model containing the new values.</param>
     /// <returns>An attempt indicating if the operation was a success as well as a more detailed <see cref="UserGroupOperationStatus"/>.</returns>
-    Task<Attempt<IUserGroup, UserGroupOperationStatus>> UpdateAsync(IUserGroup current, UserGroupUpdateModel update);
+    Task<Attempt<IUserGroup, UserGroupOperationStatus>> UpdateAsync(IUserGroup current, UpdateUserGroupRequestModel request);
 }

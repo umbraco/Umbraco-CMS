@@ -13,7 +13,7 @@ namespace Umbraco.Cms.Api.Management.Controllers.DataType.Tree;
 [ApiController]
 [VersionedApiBackOfficeRoute($"{Constants.Web.RoutePath.Tree}/{Constants.UdiEntityType.DataType}")]
 [ApiExplorerSettings(GroupName = "Data Type")]
-public class DataTypeTreeControllerBase : FolderTreeControllerBase<FolderTreeItemViewModel>
+public class DataTypeTreeControllerBase : FolderTreeControllerBase<FolderTreeItemResponseModel>
 {
     private readonly IDataTypeService _dataTypeService;
 
@@ -25,7 +25,7 @@ public class DataTypeTreeControllerBase : FolderTreeControllerBase<FolderTreeIte
 
     protected override UmbracoObjectTypes FolderObjectType => UmbracoObjectTypes.DataTypeContainer;
 
-    protected override FolderTreeItemViewModel[] MapTreeItemViewModels(Guid? parentKey, IEntitySlim[] entities)
+    protected override FolderTreeItemResponseModel[] MapTreeItemViewModels(Guid? parentKey, IEntitySlim[] entities)
     {
         var dataTypes = _dataTypeService
             .GetAll(entities.Select(entity => entity.Id).ToArray())
@@ -33,13 +33,13 @@ public class DataTypeTreeControllerBase : FolderTreeControllerBase<FolderTreeIte
 
         return entities.Select(entity =>
         {
-            FolderTreeItemViewModel viewModel = MapTreeItemViewModel(parentKey, entity);
+            FolderTreeItemResponseModel responseModel = MapTreeItemViewModel(parentKey, entity);
             if (dataTypes.TryGetValue(entity.Id, out IDataType? dataType))
             {
-                viewModel.Icon = dataType.Editor?.Icon ?? viewModel.Icon;
+                responseModel.Icon = dataType.Editor?.Icon ?? responseModel.Icon;
             }
 
-            return viewModel;
+            return responseModel;
         }).ToArray();
     }
 }

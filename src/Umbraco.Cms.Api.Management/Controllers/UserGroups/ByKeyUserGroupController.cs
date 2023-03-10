@@ -23,9 +23,9 @@ public class ByKeyUserGroupController : UserGroupsControllerBase
 
     [HttpGet("{key:guid}")]
     [MapToApiVersion("1.0")]
-    [ProducesResponseType(typeof(UserGroupViewModel), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(UserGroupPresentationModel), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<ActionResult<UserGroupViewModel>> ByKey(Guid key)
+    public async Task<ActionResult<UserGroupPresentationModel>> ByKey(Guid key)
     {
         IUserGroup? userGroup = await _userGroupService.GetAsync(key);
 

@@ -20,7 +20,7 @@ public class RedirectUrlStatusViewModelFactory : IRedirectUrlStatusViewModelFact
         _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
     }
 
-    public RedirectUrlStatusViewModel CreateViewModel()
+    public RedirectUrlStatusResponseModel CreateViewModel()
     {
         RedirectStatus status = _webRoutingSettings.CurrentValue.DisableRedirectUrlTracking switch
         {
@@ -28,7 +28,7 @@ public class RedirectUrlStatusViewModelFactory : IRedirectUrlStatusViewModelFact
             false => RedirectStatus.Enabled
         };
 
-        return new RedirectUrlStatusViewModel
+        return new RedirectUrlStatusResponseModel
         {
             Status = status,
             // TODO: Ensure that CurrentUser can be found when we use the new auth.

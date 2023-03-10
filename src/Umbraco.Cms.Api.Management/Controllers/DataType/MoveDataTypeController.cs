@@ -24,7 +24,7 @@ public class MoveDataTypeController : DataTypeControllerBase
     [MapToApiVersion("1.0")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> Move(Guid key, DataTypeMoveModel dataTypeMoveModel)
+    public async Task<IActionResult> Move(Guid key, MoveDataTypeRequestModel moveDataTypeRequestModel)
     {
         IDataType? source = await _dataTypeService.GetAsync(key);
         if (source is null)
@@ -32,7 +32,7 @@ public class MoveDataTypeController : DataTypeControllerBase
             return NotFound();
         }
 
-        Attempt<IDataType, DataTypeOperationStatus> result = await _dataTypeService.MoveAsync(source, dataTypeMoveModel.TargetKey, CurrentUserId(_backOfficeSecurityAccessor));
+        Attempt<IDataType, DataTypeOperationStatus> result = await _dataTypeService.MoveAsync(source, moveDataTypeRequestModel.TargetKey, CurrentUserId(_backOfficeSecurityAccessor));
 
         return result.Success
             ? Ok()

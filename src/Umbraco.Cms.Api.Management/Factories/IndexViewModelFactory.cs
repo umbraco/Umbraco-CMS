@@ -19,11 +19,11 @@ public class IndexViewModelFactory : IIndexViewModelFactory
         _indexingRebuilderService = indexingRebuilderService;
     }
 
-    public IndexViewModel Create(IIndex index)
+    public IndexResponseModel Create(IIndex index)
     {
         if (_indexingRebuilderService.IsRebuilding(index.Name))
         {
-            return new IndexViewModel
+            return new IndexResponseModel
             {
                 Name = index.Name,
                 HealthStatus = HealthStatus.Rebuilding,
@@ -52,7 +52,7 @@ public class IndexViewModelFactory : IIndexViewModelFactory
             }
         }
 
-        var indexerModel = new IndexViewModel
+        var indexerModel = new IndexResponseModel
         {
             Name = index.Name,
             HealthStatus = isHealthy.Success ? HealthStatus.Healthy : HealthStatus.Unhealthy,

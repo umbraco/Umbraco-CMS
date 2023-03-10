@@ -7,7 +7,7 @@ public interface IHealthCheckGroupViewModelFactory
 {
     IEnumerable<IGrouping<string?, HealthCheck>> CreateGroupingFromHealthCheckCollection();
 
-    HealthCheckGroupWithResultViewModel CreateHealthCheckGroupWithResultViewModel(IGrouping<string?, HealthCheck> healthCheckGroup);
+    HealthCheckGroupWithResultResponseModel CreateHealthCheckGroupWithResultViewModel(IGrouping<string?, HealthCheck> healthCheckGroup);
 
-    HealthCheckWithResultViewModel CreateHealthCheckWithResultViewModel(HealthCheck healthCheck);
+    HealthCheckWithResultPresentationModel CreateHealthCheckWithResultViewModel(HealthCheck healthCheck);
 }

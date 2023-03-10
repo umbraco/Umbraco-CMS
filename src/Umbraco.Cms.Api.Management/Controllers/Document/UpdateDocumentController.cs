@@ -35,7 +35,7 @@ public class UpdateDocumentController : DocumentControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> Update(Guid key, DocumentUpdateRequestModel updateRequestModel)
+    public async Task<IActionResult> Update(Guid key, UpdateDocumentRequestModel requestModel)
     {
         IContent? content = _contentService.GetById(key);
         if (content == null)
@@ -43,7 +43,7 @@ public class UpdateDocumentController : DocumentControllerBase
             return NotFound();
         }
 
-        ContentUpdateModel model = _documentEditingFactory.MapUpdateModel(updateRequestModel);
+        ContentUpdateModel model = _documentEditingFactory.MapUpdateModel(requestModel);
         Attempt<IContent, ContentEditingOperationStatus> result = await _contentEditingService.UpdateAsync(content, model, CurrentUserId(_backOfficeSecurityAccessor));
 
         return result.Success

@@ -40,16 +40,16 @@ public class HealthCheckGroupViewModelFactory : IHealthCheckGroupViewModelFactor
         return groups;
     }
 
-    public HealthCheckGroupWithResultViewModel CreateHealthCheckGroupWithResultViewModel(IGrouping<string?, HealthCheck> healthCheckGroup)
+    public HealthCheckGroupWithResultResponseModel CreateHealthCheckGroupWithResultViewModel(IGrouping<string?, HealthCheck> healthCheckGroup)
     {
-        var healthChecks = new List<HealthCheckWithResultViewModel>();
+        var healthChecks = new List<HealthCheckWithResultPresentationModel>();
 
         foreach (HealthCheck healthCheck in healthCheckGroup)
         {
             healthChecks.Add(CreateHealthCheckWithResultViewModel(healthCheck));
         }
 
-        var healthCheckGroupViewModel = new HealthCheckGroupWithResultViewModel
+        var healthCheckGroupViewModel = new HealthCheckGroupWithResultResponseModel
         {
             Checks = healthChecks
         };
@@ -57,16 +57,16 @@ public class HealthCheckGroupViewModelFactory : IHealthCheckGroupViewModelFactor
         return healthCheckGroupViewModel;
     }
 
-    public HealthCheckWithResultViewModel CreateHealthCheckWithResultViewModel(HealthCheck healthCheck)
+    public HealthCheckWithResultPresentationModel CreateHealthCheckWithResultViewModel(HealthCheck healthCheck)
     {
         _logger.LogDebug($"Running health check: {healthCheck.Name}");
 
         IEnumerable<HealthCheckStatus> results = healthCheck.GetStatus().Result;
 
-        var healthCheckViewModel = new HealthCheckWithResultViewModel
+        var healthCheckViewModel = new HealthCheckWithResultPresentationModel
         {
             Key = healthCheck.Id,
-            Results = _umbracoMapper.MapEnumerable<HealthCheckStatus, HealthCheckResultViewModel>(results)
+            Results = _umbracoMapper.MapEnumerable<HealthCheckStatus, HealthCheckResultResponseModel>(results)
         };
 
         return healthCheckViewModel;

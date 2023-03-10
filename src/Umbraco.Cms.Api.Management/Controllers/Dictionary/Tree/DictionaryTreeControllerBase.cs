@@ -14,7 +14,7 @@ namespace Umbraco.Cms.Api.Management.Controllers.Dictionary.Tree;
 [ApiExplorerSettings(GroupName = "Dictionary")]
 // NOTE: at the moment dictionary items (renamed to dictionary tree) aren't supported by EntityService, so we have little use of the
 // tree controller base. We'll keep it though, in the hope that we can mend EntityService.
-public class DictionaryTreeControllerBase : EntityTreeControllerBase<EntityTreeItemViewModel>
+public class DictionaryTreeControllerBase : EntityTreeControllerBase<EntityTreeItemResponseModel>
 {
     public DictionaryTreeControllerBase(IEntityService entityService, IDictionaryItemService dictionaryItemService)
         : base(entityService) =>
@@ -25,12 +25,12 @@ public class DictionaryTreeControllerBase : EntityTreeControllerBase<EntityTreeI
 
     protected IDictionaryItemService DictionaryItemService { get; }
 
-    protected async Task<EntityTreeItemViewModel[]> MapTreeItemViewModels(Guid? parentKey, IDictionaryItem[] dictionaryItems)
+    protected async Task<EntityTreeItemResponseModel[]> MapTreeItemViewModels(Guid? parentKey, IDictionaryItem[] dictionaryItems)
     {
-        async Task<EntityTreeItemViewModel> CreateEntityTreeItemViewModelAsync(IDictionaryItem dictionaryItem)
+        async Task<EntityTreeItemResponseModel> CreateEntityTreeItemViewModelAsync(IDictionaryItem dictionaryItem)
         {
             var hasChildren = (await DictionaryItemService.GetChildrenAsync(dictionaryItem.Key)).Any();
-            return new EntityTreeItemViewModel
+            return new EntityTreeItemResponseModel
             {
                 Icon = Constants.Icons.Dictionary,
                 Name = dictionaryItem.ItemKey,
@@ -42,7 +42,7 @@ public class DictionaryTreeControllerBase : EntityTreeControllerBase<EntityTreeI
             };
         }
 
-        var items = new List<EntityTreeItemViewModel>(dictionaryItems.Length);
+        var items = new List<EntityTreeItemResponseModel>(dictionaryItems.Length);
         foreach (IDictionaryItem dictionaryItem in dictionaryItems)
         {
             items.Add(await CreateEntityTreeItemViewModelAsync(dictionaryItem));

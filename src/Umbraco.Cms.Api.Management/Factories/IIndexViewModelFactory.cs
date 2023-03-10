@@ -5,5 +5,5 @@ namespace Umbraco.Cms.Api.Management.Factories;
 
 public interface IIndexViewModelFactory
 {
-    IndexViewModel Create(IIndex index);
+    IndexResponseModel Create(IIndex index);
 }

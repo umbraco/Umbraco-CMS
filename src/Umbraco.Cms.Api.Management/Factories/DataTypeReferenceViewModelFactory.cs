@@ -22,7 +22,7 @@ public class DataTypeReferenceViewModelFactory : IDataTypeReferenceViewModelFact
         _memberTypeService = memberTypeService;
     }
 
-    public IEnumerable<DataTypeReferenceViewModel> CreateDataTypeReferenceViewModels(IReadOnlyDictionary<Udi, IEnumerable<string>> dataTypeUsages)
+    public IEnumerable<DataTypeReferenceResponseModel> CreateDataTypeReferenceViewModels(IReadOnlyDictionary<Udi, IEnumerable<string>> dataTypeUsages)
     {
         var getContentTypesByObjectType = new Dictionary<string, Func<IEnumerable<Guid>, IEnumerable<IContentTypeBase>>>
         {
@@ -45,7 +45,7 @@ public class DataTypeReferenceViewModelFactory : IDataTypeReferenceViewModelFact
             foreach (IContentTypeBase contentType in contentTypes)
             {
                 IEnumerable<string> propertyAliases = propertyAliasesByGuid[contentType.Key];
-                yield return new DataTypeReferenceViewModel
+                yield return new DataTypeReferenceResponseModel
                 {
                     Key = contentType.Key,
                     Type = usagesByEntityType.Key,

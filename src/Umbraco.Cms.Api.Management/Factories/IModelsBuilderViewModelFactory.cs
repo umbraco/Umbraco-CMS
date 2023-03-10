@@ -4,5 +4,5 @@ namespace Umbraco.Cms.Api.Management.Factories;
 
 public interface IModelsBuilderViewModelFactory
 {
-    ModelsBuilderViewModel Create();
+    ModelsBuilderResponseModel Create();
 }

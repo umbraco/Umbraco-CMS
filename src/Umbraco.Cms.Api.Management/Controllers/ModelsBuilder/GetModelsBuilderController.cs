@@ -12,7 +12,7 @@ public class GetModelsBuilderController : ModelsBuilderControllerBase
     public GetModelsBuilderController(IModelsBuilderViewModelFactory modelsBuilderViewModelFactory) => _modelsBuilderViewModelFactory = modelsBuilderViewModelFactory;
 
     [HttpGet("dashboard")]
-    [ProducesResponseType(typeof(ModelsBuilderViewModel), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ModelsBuilderResponseModel), StatusCodes.Status200OK)]
     [MapToApiVersion("1.0")]
-    public async Task<ActionResult<ModelsBuilderViewModel>> GetDashboard() => await Task.FromResult(Ok(_modelsBuilderViewModelFactory.Create()));
+    public async Task<ActionResult<ModelsBuilderResponseModel>> GetDashboard() => await Task.FromResult(Ok(_modelsBuilderViewModelFactory.Create()));
 }

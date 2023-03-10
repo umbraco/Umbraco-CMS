@@ -28,14 +28,14 @@ public class AllIndexerController : IndexerControllerBase
     /// <returns></returns>
     [HttpGet]
     [MapToApiVersion("1.0")]
-    [ProducesResponseType(typeof(PagedViewModel<IndexViewModel>), StatusCodes.Status200OK)]
-    public Task<PagedViewModel<IndexViewModel>> All(int skip, int take)
+    [ProducesResponseType(typeof(PagedViewModel<IndexResponseModel>), StatusCodes.Status200OK)]
+    public Task<PagedViewModel<IndexResponseModel>> All(int skip, int take)
     {
-        IndexViewModel[] indexes = _examineManager.Indexes
+        IndexResponseModel[] indexes = _examineManager.Indexes
             .Select(_indexViewModelFactory.Create)
             .OrderBy(indexModel => indexModel.Name.TrimEnd("Indexer")).ToArray();
 
-        var viewModel = new PagedViewModel<IndexViewModel> { Items = indexes.Skip(skip).Take(take), Total = indexes.Length };
+        var viewModel = new PagedViewModel<IndexResponseModel> { Items = indexes.Skip(skip).Take(take), Total = indexes.Length };
         return Task.FromResult(viewModel);
     }
 }

@@ -29,9 +29,9 @@ public class CreateDocumentController : DocumentControllerBase
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> Create(DocumentCreateRequestModel createRequestModel)
+    public async Task<IActionResult> Create(CreateDocumentRequestModel requestModel)
     {
-        ContentCreateModel model = _documentEditingFactory.MapCreateModel(createRequestModel);
+        ContentCreateModel model = _documentEditingFactory.MapCreateModel(requestModel);
         Attempt<IContent?, ContentEditingOperationStatus> result = await _contentEditingService.CreateAsync(model, CurrentUserId(_backOfficeSecurityAccessor));
 
         return result.Success

@@ -13,7 +13,7 @@ public class GetStatusRedirectUrlManagementController : RedirectUrlManagementBas
         _redirectUrlStatusViewModelFactory = redirectUrlStatusViewModelFactory;
 
     [HttpGet("status")]
-    [ProducesResponseType(typeof(RedirectUrlStatusViewModel), 200)]
-    public Task<ActionResult<RedirectUrlStatusViewModel>> GetStatus() =>
-        Task.FromResult<ActionResult<RedirectUrlStatusViewModel>>(_redirectUrlStatusViewModelFactory.CreateViewModel());
+    [ProducesResponseType(typeof(RedirectUrlStatusResponseModel), 200)]
+    public Task<ActionResult<RedirectUrlStatusResponseModel>> GetStatus() =>
+        Task.FromResult<ActionResult<RedirectUrlStatusResponseModel>>(_redirectUrlStatusViewModelFactory.CreateViewModel());
 }

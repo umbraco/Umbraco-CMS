@@ -21,7 +21,7 @@ public class ReferencesDataTypeController : DataTypeControllerBase
 
     [HttpGet("{key:guid}/references")]
     [MapToApiVersion("1.0")]
-    [ProducesResponseType(typeof(DataTypeReferenceViewModel[]), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(DataTypeReferenceResponseModel[]), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> References(Guid key)
     {
@@ -31,7 +31,7 @@ public class ReferencesDataTypeController : DataTypeControllerBase
             return DataTypeOperationStatusResult(result.Status);
         }
 
-        DataTypeReferenceViewModel[] viewModels = _dataTypeReferenceViewModelFactory.CreateDataTypeReferenceViewModels(result.Result).ToArray();
+        DataTypeReferenceResponseModel[] viewModels = _dataTypeReferenceViewModelFactory.CreateDataTypeReferenceViewModels(result.Result).ToArray();
         return Ok(viewModels);
     }
 }

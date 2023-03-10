@@ -8,7 +8,7 @@ namespace Umbraco.Cms.Api.Management.Mapping.ContentType;
 public abstract class ContentTypeMapDefinition<TContentType, TPropertyTypeViewModel, TPropertyTypeContainerViewModel>
     where TContentType : IContentTypeBase
     where TPropertyTypeViewModel : PropertyTypePresentationBase, new()
-    where TPropertyTypeContainerViewModel : PropertyTypeContainerViewModelBase, new()
+    where TPropertyTypeContainerViewModel : PropertyTypeContainerPresentationBase, new()
 {
     protected IEnumerable<TPropertyTypeViewModel> MapPropertyTypes(TContentType source)
     {

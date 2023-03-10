@@ -31,7 +31,7 @@ public class UpdateDictionaryController : DictionaryControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> Update(Guid key, DictionaryItemUpdateModel dictionaryItemUpdateModel)
+    public async Task<IActionResult> Update(Guid key, UpdateDictionaryItemRequestModel updateDictionaryItemRequestModel)
     {
         IDictionaryItem? current = await _dictionaryItemService.GetAsync(key);
         if (current == null)
@@ -39,7 +39,7 @@ public class UpdateDictionaryController : DictionaryControllerBase
             return NotFound();
         }
 
-        IDictionaryItem updated = await _dictionaryFactory.MapUpdateModelToDictionaryItemAsync(current, dictionaryItemUpdateModel);
+        IDictionaryItem updated = await _dictionaryFactory.MapUpdateModelToDictionaryItemAsync(current, updateDictionaryItemRequestModel);
 
         Attempt<IDictionaryItem, DictionaryItemOperationStatus> result =
             await _dictionaryItemService.UpdateAsync(updated, CurrentUserId(_backOfficeSecurityAccessor));

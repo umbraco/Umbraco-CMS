@@ -24,7 +24,7 @@ public class ByRelationTypeKeyRelationController : RelationControllerBase
 
     [HttpGet("type/{key:guid}")]
     [MapToApiVersion("1.0")]
-    [ProducesResponseType(typeof(PagedViewModel<RelationViewModel>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(PagedViewModel<RelationResponseModel>), StatusCodes.Status200OK)]
     public async Task<IActionResult> ByRelationTypeKey(Guid key, int skip = 0, int take = 100)
     {
         Attempt<PagedModel<IRelation>, RelationOperationStatus> relationsAttempt = await _relationService.GetPagedByRelationTypeKey(key, skip, take);
@@ -34,9 +34,9 @@ public class ByRelationTypeKeyRelationController : RelationControllerBase
             return await Task.FromResult(RelationOperationStatusResult(relationsAttempt.Status));
         }
 
-        IEnumerable<RelationViewModel> mappedRelations = relationsAttempt.Result.Items.Select(_relationPresentationFactory.Create);
+        IEnumerable<RelationResponseModel> mappedRelations = relationsAttempt.Result.Items.Select(_relationPresentationFactory.Create);
 
-        return await Task.FromResult(Ok(new PagedViewModel<RelationViewModel>
+        return await Task.FromResult(Ok(new PagedViewModel<RelationResponseModel>
         {
             Total = relationsAttempt.Result.Total,
             Items = mappedRelations,

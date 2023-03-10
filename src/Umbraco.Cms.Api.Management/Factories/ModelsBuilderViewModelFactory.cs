@@ -25,7 +25,7 @@ public class ModelsBuilderViewModelFactory : IModelsBuilderViewModelFactory
     }
 
 
-    public ModelsBuilderViewModel Create() =>
+    public ModelsBuilderResponseModel Create() =>
         new()
         {
             Mode = _modelsBuilderSettings.ModelsMode,

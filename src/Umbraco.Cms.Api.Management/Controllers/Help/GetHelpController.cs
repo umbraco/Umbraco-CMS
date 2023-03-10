@@ -33,7 +33,7 @@ public class GetHelpController : HelpControllerBase
     [HttpGet]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(typeof(PagedViewModel<HelpPageViewModel>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(PagedViewModel<HelpPageResponseModel>), StatusCodes.Status200OK)]
     public async Task<IActionResult> Get(string section, string? tree, int skip, int take, string? baseUrl = "https://our.umbraco.com")
     {
         if (IsAllowedUrl(baseUrl) is false)
@@ -57,10 +57,10 @@ public class GetHelpController : HelpControllerBase
 
             // fetch dashboard json and parse to JObject
             var json = await httpClient.GetStringAsync(url);
-            List<HelpPageViewModel>? result = _jsonSerializer.Deserialize<List<HelpPageViewModel>>(json);
+            List<HelpPageResponseModel>? result = _jsonSerializer.Deserialize<List<HelpPageResponseModel>>(json);
             if (result != null)
             {
-                return Ok(new PagedViewModel<HelpPageViewModel>
+                return Ok(new PagedViewModel<HelpPageResponseModel>
                 {
                     Total = result.Count,
                     Items = result.Skip(skip).Take(take),
@@ -72,7 +72,7 @@ public class GetHelpController : HelpControllerBase
             _logger.LogInformation($"Check your network connection, exception: {rex.Message}");
         }
 
-        return Ok(PagedViewModel<HelpPageViewModel>.Empty());
+        return Ok(PagedViewModel<HelpPageResponseModel>.Empty());
     }
 
     private bool IsAllowedUrl(string? url) =>

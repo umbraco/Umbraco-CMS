@@ -22,14 +22,14 @@ public class ByKeyRedirectUrlManagementController : RedirectUrlManagementBaseCon
     }
 
     [HttpGet("{key:guid}")]
-    [ProducesResponseType(typeof(PagedViewModel<RedirectUrlViewModel>), StatusCodes.Status200OK)]
-    public Task<ActionResult<PagedViewModel<RedirectUrlViewModel>>> ByKey(Guid key, int skip, int take)
+    [ProducesResponseType(typeof(PagedViewModel<RedirectUrlResponseModel>), StatusCodes.Status200OK)]
+    public Task<ActionResult<PagedViewModel<RedirectUrlResponseModel>>> ByKey(Guid key, int skip, int take)
     {
         IRedirectUrl[] redirects = _redirectUrlService.GetContentRedirectUrls(key).ToArray();
 
-        IEnumerable<RedirectUrlViewModel> viewModels = _redirectUrlViewModelFactory.CreateMany(redirects);
+        IEnumerable<RedirectUrlResponseModel> viewModels = _redirectUrlViewModelFactory.CreateMany(redirects);
 
-        return Task.FromResult<ActionResult<PagedViewModel<RedirectUrlViewModel>>>(new PagedViewModel<RedirectUrlViewModel>
+        return Task.FromResult<ActionResult<PagedViewModel<RedirectUrlResponseModel>>>(new PagedViewModel<RedirectUrlResponseModel>
         {
             Items = viewModels.Skip(skip).Take(take),
             Total = redirects.Length,

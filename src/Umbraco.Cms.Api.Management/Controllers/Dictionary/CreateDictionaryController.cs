@@ -32,9 +32,9 @@ public class CreateDictionaryController : DictionaryControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status409Conflict)]
-    public async Task<IActionResult> Create(DictionaryItemCreateModel dictionaryItemCreateModel)
+    public async Task<IActionResult> Create(CreateDictionaryItemRequestModel createDictionaryItemRequestModel)
     {
-        IDictionaryItem created = await _dictionaryFactory.MapCreateModelToDictionaryItemAsync(dictionaryItemCreateModel);
+        IDictionaryItem created = await _dictionaryFactory.MapCreateModelToDictionaryItemAsync(createDictionaryItemRequestModel);
 
         Attempt<IDictionaryItem, DictionaryItemOperationStatus> result =
             await _dictionaryItemService.CreateAsync(created, CurrentUserId(_backOfficeSecurityAccessor));
