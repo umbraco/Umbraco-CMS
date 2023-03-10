@@ -100,7 +100,11 @@ interface MyModalData = {
 	content: string;
 }
 
-const MY_MODAL_TOKEN = new ModalToken<MyModalData>('My.Modal', {
+interface MyModalResult = {
+	myReturnData: string;
+}
+
+const MY_MODAL_TOKEN = new ModalToken<MyModalData, MyModalResult>('My.Modal', {
 	type: 'sidebar',
 	size: 'small'
 });
@@ -116,19 +120,24 @@ import type { UmbModalHandler } from '@umbraco-cms/modal';
 class MyDialog extends UmbElementMixin(LitElement) {
 	// the modal handler will be injected into the element when the modal is opened.
 	@property({ attribute: false })
-	modalHandler?: UmbModalHandler;
+	modalHandler?: UmbModalHandler<MyModalData, MyModalResult>;
 
-	private _handleClose() {
-		/* Optional data of any type can be applied to the close method to pass it
-		   to the modal parent through the onClose promise. */
-		this._modalHandler?.close('optional data');
+	private _handleCancel() {
+		this._modalHandler?.close();
+	}
+
+	private _handleSubmit() {
+		/* Optional data of any type can be applied to the submit method to pass it
+		   to the modal parent through the onSubmit promise. */
+		this._modalHandler?.submit({ myReturnData: 'hello world' });
 	}
 
 	render() {
 		return html`
 			<div>
 				<h1>My Modal</h1>
-				<button @click=${this._handleClose}>Close</button>
+				<button @click=${this._handleCancel}>Cancel</button>
+				<button @click=${this._handleSubmit}>Submit</button>
 			</div>
 		`;
 	}
