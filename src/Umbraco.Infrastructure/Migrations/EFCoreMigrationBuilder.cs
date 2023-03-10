@@ -2,6 +2,9 @@
 
 namespace Umbraco.Cms.Infrastructure.Migrations;
 
+/// <summary>
+/// Builds the Migration type, by injecting all the needed services
+/// </summary>
 public class EFCoreMigrationBuilder : IEFCoreMigrationBuilder
 {
     private readonly IServiceProvider _serviceProvider;

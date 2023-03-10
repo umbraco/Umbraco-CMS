@@ -1,6 +1,8 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Install;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Migrations.Install;
@@ -18,6 +20,7 @@ public class DatabaseUpgradeStep : IInstallStep, IUpgradeStep
     private readonly ILogger<DatabaseUpgradeStep> _logger;
     private readonly IUmbracoVersion _umbracoVersion;
     private readonly IKeyValueService _keyValueService;
+    private readonly IDatabaseBuilder _efCoreDatabaseBuilder;
 
     public DatabaseUpgradeStep(
         DatabaseBuilder databaseBuilder,
@@ -25,19 +28,37 @@ public class DatabaseUpgradeStep : IInstallStep, IUpgradeStep
         ILogger<DatabaseUpgradeStep> logger,
         IUmbracoVersion umbracoVersion,
         IKeyValueService keyValueService)
+        : this(
+            databaseBuilder,
+            runtime,
+            logger,
+            umbracoVersion,
+            keyValueService,
+            StaticServiceProvider.Instance.GetRequiredService<IDatabaseBuilder>())
+    {
+    }
+
+    public DatabaseUpgradeStep(
+        DatabaseBuilder databaseBuilder,
+        IRuntimeState runtime,
+        ILogger<DatabaseUpgradeStep> logger,
+        IUmbracoVersion umbracoVersion,
+        IKeyValueService keyValueService,
+        IDatabaseBuilder efCoreDatabaseBuilder)
     {
         _databaseBuilder = databaseBuilder;
         _runtime = runtime;
         _logger = logger;
         _umbracoVersion = umbracoVersion;
         _keyValueService = keyValueService;
+        _efCoreDatabaseBuilder = efCoreDatabaseBuilder;
     }
 
     public Task ExecuteAsync(InstallData _) => Execute();
 
     public Task ExecuteAsync() => Execute();
 
-    private Task Execute()
+    private async Task Execute()
     {
         _logger.LogInformation("Running 'Upgrade' service");
 
@@ -51,15 +72,14 @@ public class DatabaseUpgradeStep : IInstallStep, IUpgradeStep
             throw new InstallException("The database failed to upgrade. ERROR: " + result.Message);
         }
 
-        return Task.CompletedTask;
+        await ExecuteEFCoreUpgrade();
     }
 
-    private void ExecuteEFCoreUpgrade()
+    private async Task ExecuteEFCoreUpgrade()
     {
         _logger.LogInformation("Running EFCore upgrade");
         var plan = new UmbracoEFCorePlan();
-
-
+        await _efCoreDatabaseBuilder.UpgradeSchemaAndData(plan);
     }
 
     public Task<bool> RequiresExecutionAsync(InstallData model) => ShouldExecute();

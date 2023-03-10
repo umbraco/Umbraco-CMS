@@ -27,7 +27,7 @@ public class EFCoreUpgrader
     /// </summary>
     /// <param name="keyValueService">A key-value service.</param>
     /// <param name="migrationPlanExecutor">A key-value service.</param>
-    public ExecutedEFCoreMigrationPlan Execute(IEFCoreMigrationPlanExecutor migrationPlanExecutor, IKeyValueService keyValueService)
+    public void Execute(IEFCoreMigrationPlanExecutor migrationPlanExecutor, IKeyValueService keyValueService)
     {
         if (keyValueService == null)
         {
@@ -54,7 +54,5 @@ public class EFCoreUpgrader
         {
             keyValueService.SetValue(StateValueKey, currentState, state);
         }
-
-        return new ExecutedEFCoreMigrationPlan(Plan, currentState, state);
     }
 }
