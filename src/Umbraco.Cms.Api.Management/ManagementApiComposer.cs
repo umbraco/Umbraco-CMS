@@ -30,7 +30,6 @@ public class ManagementApiComposer : IComposer
             .AddDocumentTypes()
             .AddLanguages()
             .AddDictionary()
-            .AddFileUpload()
             .AddHealthChecks()
             .AddModelsBuilder()
             .AddRedirectUrl()

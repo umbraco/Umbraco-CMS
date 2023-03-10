@@ -27,57 +27,57 @@ internal sealed class TemporaryFileService : ITemporaryFileService
         contentOptionsMonitor.OnChange(x => _contentSettings = x);
     }
 
-    public async Task<Attempt<TempFileModel, TemporaryFileStatus>> CreateAsync(TempFileModel tempFileModel)
+    public async Task<Attempt<TemporaryFileModel, TemporaryFileStatus>> CreateAsync(TemporaryFileModel temporaryFileModel)
     {
-        Attempt<TempFileModel, TemporaryFileStatus> validationResult = await ValidateAsync(tempFileModel);
+        Attempt<TemporaryFileModel, TemporaryFileStatus> validationResult = await ValidateAsync(temporaryFileModel);
         if (validationResult.Success == false)
         {
             return validationResult;
         }
 
-        tempFileModel.AvailableUntil = DateTime.Now.Add(_runtimeSettings.TemporaryFileLifeTime);
+        temporaryFileModel.AvailableUntil = DateTime.Now.Add(_runtimeSettings.TemporaryFileLifeTime);
 
-        TempFileModel? file = await _temporaryFileRepository.GetAsync(tempFileModel.Key);
+        TemporaryFileModel? file = await _temporaryFileRepository.GetAsync(temporaryFileModel.Key);
         if (file is not null)
         {
-            return Attempt<TempFileModel, TemporaryFileStatus>.Fail(TemporaryFileStatus.KeyAlreadyUsed, tempFileModel);
+            return Attempt<TemporaryFileModel, TemporaryFileStatus>.Fail(TemporaryFileStatus.KeyAlreadyUsed, temporaryFileModel);
         }
 
-        await _temporaryFileRepository.SaveAsync(tempFileModel);
+        await _temporaryFileRepository.SaveAsync(temporaryFileModel);
 
-        return Attempt<TempFileModel, TemporaryFileStatus>.Succeed(TemporaryFileStatus.Success, tempFileModel);
+        return Attempt<TemporaryFileModel, TemporaryFileStatus>.Succeed(TemporaryFileStatus.Success, temporaryFileModel);
     }
 
-    private async Task<Attempt<TempFileModel, TemporaryFileStatus>> ValidateAsync(TempFileModel tempFileModel)
+    private async Task<Attempt<TemporaryFileModel, TemporaryFileStatus>> ValidateAsync(TemporaryFileModel temporaryFileModel)
     {
-        if (IsAllowedFileExtension(tempFileModel) == false)
+        if (IsAllowedFileExtension(temporaryFileModel) == false)
         {
-            return Attempt.FailWithStatus<TempFileModel, TemporaryFileStatus>(TemporaryFileStatus.FileExtensionNotAllowed, tempFileModel);
+            return Attempt.FailWithStatus<TemporaryFileModel, TemporaryFileStatus>(TemporaryFileStatus.FileExtensionNotAllowed, temporaryFileModel);
         }
 
-        return Attempt.SucceedWithStatus<TempFileModel, TemporaryFileStatus>(TemporaryFileStatus.Success, tempFileModel);
+        return Attempt.SucceedWithStatus<TemporaryFileModel, TemporaryFileStatus>(TemporaryFileStatus.Success, temporaryFileModel);
     }
 
-    private bool IsAllowedFileExtension(TempFileModel tempFileModel)
+    private bool IsAllowedFileExtension(TemporaryFileModel temporaryFileModel)
     {
-        var extension = Path.GetExtension(tempFileModel.FileName)[1..];
+        var extension = Path.GetExtension(temporaryFileModel.FileName)[1..];
 
         return _contentSettings.IsFileAllowedForUpload(extension);
     }
 
-    public async Task<Attempt<TempFileModel, TemporaryFileStatus>> DeleteAsync(Guid key)
+    public async Task<Attempt<TemporaryFileModel, TemporaryFileStatus>> DeleteAsync(Guid key)
     {
-        TempFileModel? model = await _temporaryFileRepository.GetAsync(key);
+        TemporaryFileModel? model = await _temporaryFileRepository.GetAsync(key);
         if (model is null)
         {
-            return Attempt<TempFileModel, TemporaryFileStatus>.Fail(TemporaryFileStatus.NotFound, new TempFileModel());
+            return Attempt<TemporaryFileModel, TemporaryFileStatus>.Fail(TemporaryFileStatus.NotFound, new TemporaryFileModel());
         }
 
         await _temporaryFileRepository.DeleteAsync(key);
 
-        return Attempt<TempFileModel, TemporaryFileStatus>.Succeed(TemporaryFileStatus.Success, model);
+        return Attempt<TemporaryFileModel, TemporaryFileStatus>.Succeed(TemporaryFileStatus.Success, model);
     }
 
-    public async Task<TempFileModel?> GetAsync(Guid key) => await _temporaryFileRepository.GetAsync(key);
+    public async Task<TemporaryFileModel?> GetAsync(Guid key) => await _temporaryFileRepository.GetAsync(key);
     public async Task<IEnumerable<Guid>> CleanUpOldTempFiles() => await _temporaryFileRepository.CleanUpOldTempFiles(DateTime.Now);
 }

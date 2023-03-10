@@ -37,7 +37,7 @@ internal sealed class LocalFileSystemTemporaryFileRepository : ITemporaryFileRep
         return new DirectoryInfo(path);
     }
 
-    public async Task<TempFileModel?> GetAsync(Guid key)
+    public async Task<TemporaryFileModel?> GetAsync(Guid key)
     {
 
         DirectoryInfo rootDirectory = GetRootDirectory();
@@ -60,7 +60,7 @@ internal sealed class LocalFileSystemTemporaryFileRepository : ITemporaryFileRep
 
         FileMetaData metaData = await GetMetaDataAsync(metadataFile);
 
-        return new TempFileModel()
+        return new TemporaryFileModel()
         {
             FileName = actualFile.Name,
             Key = key,
@@ -69,7 +69,7 @@ internal sealed class LocalFileSystemTemporaryFileRepository : ITemporaryFileRep
         };
     }
 
-    public async Task SaveAsync(TempFileModel model)
+    public async Task SaveAsync(TemporaryFileModel model)
     {
         ArgumentNullException.ThrowIfNull(nameof(model));
         ArgumentNullException.ThrowIfNull(nameof(model));
@@ -141,7 +141,7 @@ internal sealed class LocalFileSystemTemporaryFileRepository : ITemporaryFileRep
         await File.WriteAllTextAsync(fullFilePath, metadataContent);
     }
 
-    private static async Task CreateActualFile(TempFileModel model, string fullFilePath)
+    private static async Task CreateActualFile(TemporaryFileModel model, string fullFilePath)
     {
         FileStream fileStream = File.Create(fullFilePath);
         model.DataStream.Seek(0, SeekOrigin.Begin);

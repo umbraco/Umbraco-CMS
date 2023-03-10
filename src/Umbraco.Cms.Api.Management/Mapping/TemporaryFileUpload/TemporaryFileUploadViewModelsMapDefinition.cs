@@ -8,12 +8,12 @@ public class TemporaryFileViewModelsMapDefinition : IMapDefinition
 {
     public void DefineMaps(IUmbracoMapper mapper)
     {
-        mapper.Define<UploadSingleFileRequestModel, TempFileModel>((source, context) => new TempFileModel(), Map);
-        mapper.Define<TempFileModel, UploadSingleFileResponseModel>((source, context) => new UploadSingleFileResponseModel(), Map);
+        mapper.Define<UploadSingleFileRequestModel, Core.Models.TemporaryFile.TemporaryFileModel>((source, context) => new Core.Models.TemporaryFile.TemporaryFileModel(), Map);
+        mapper.Define<Core.Models.TemporaryFile.TemporaryFileModel, UploadSingleFileResponseModel>((source, context) => new UploadSingleFileResponseModel(), Map);
     }
 
     // Umbraco.Code.MapAll -AvailableUntil
-    private void Map(UploadSingleFileRequestModel source, TempFileModel target, MapperContext context)
+    private void Map(UploadSingleFileRequestModel source, Core.Models.TemporaryFile.TemporaryFileModel target, MapperContext context)
     {
         target.DataStream = source.File.OpenReadStream();
         target.FileName = source.File.FileName;
@@ -21,7 +21,7 @@ public class TemporaryFileViewModelsMapDefinition : IMapDefinition
     }
 
     // Umbraco.Code.MapAll -DataStream
-    private void Map(TempFileModel source, UploadSingleFileResponseModel target, MapperContext context)
+    private void Map(Core.Models.TemporaryFile.TemporaryFileModel source, UploadSingleFileResponseModel target, MapperContext context)
     {
         if (source.AvailableUntil.HasValue == false)
         {

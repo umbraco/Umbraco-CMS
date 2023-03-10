@@ -26,12 +26,12 @@ public class ByKeyTemporaryFileController : TemporaryFileControllerBase
     [ProducesResponseType(typeof(UploadSingleFileResponseModel), StatusCodes.Status200OK)]
     public async Task<IActionResult> ByKey(Guid key)
     {
-        TempFileModel? model = await _temporaryFileService.GetAsync(key);
+        using TemporaryFileModel? model = await _temporaryFileService.GetAsync(key);
         if (model == null)
         {
             return NotFound();
         }
 
-        return Ok(_umbracoMapper.Map<TempFileModel, UploadSingleFileResponseModel>(model));
+        return Ok(_umbracoMapper.Map<Core.Models.TemporaryFile.TemporaryFileModel, UploadSingleFileResponseModel>(model));
     }
 }

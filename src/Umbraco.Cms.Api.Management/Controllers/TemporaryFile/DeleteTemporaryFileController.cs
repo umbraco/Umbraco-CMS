@@ -20,7 +20,8 @@ public class DeleteTemporaryFileController : TemporaryFileControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<IActionResult> Delete(Guid key)
     {
-        Attempt<TempFileModel, TemporaryFileStatus> result = await _temporaryFileService.DeleteAsync(key);
+        Attempt<Core.Models.TemporaryFile.TemporaryFileModel, TemporaryFileStatus> result = await _temporaryFileService.DeleteAsync(key);
+        using (result.Result)
 
         return result.Success
             ? Ok()

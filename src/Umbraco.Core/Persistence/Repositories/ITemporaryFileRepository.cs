@@ -12,13 +12,13 @@ public interface ITemporaryFileRepository
     /// </summary>
     /// <param name="key">The unique key of the temporary file.</param>
     /// <returns>The temporary file model if found on that specified key, otherwise null.</returns>
-    Task<TempFileModel?> GetAsync(Guid key);
+    Task<TemporaryFileModel?> GetAsync(Guid key);
 
     /// <summary>
     /// Creates or update a temporary file.
     /// </summary>
     /// <param name="model">The model for the temporary file</param>
-    Task SaveAsync(TempFileModel model);
+    Task SaveAsync(TemporaryFileModel model);
 
     /// <summary>
     /// Deletes a temporary file using it's unique key.
