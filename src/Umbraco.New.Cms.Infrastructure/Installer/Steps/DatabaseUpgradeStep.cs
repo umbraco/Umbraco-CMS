@@ -54,6 +54,14 @@ public class DatabaseUpgradeStep : IInstallStep, IUpgradeStep
         return Task.CompletedTask;
     }
 
+    private void ExecuteEFCoreUpgrade()
+    {
+        _logger.LogInformation("Running EFCore upgrade");
+        var plan = new UmbracoEFCorePlan();
+
+
+    }
+
     public Task<bool> RequiresExecutionAsync(InstallData model) => ShouldExecute();
 
     public Task<bool> RequiresExecutionAsync() => ShouldExecute();

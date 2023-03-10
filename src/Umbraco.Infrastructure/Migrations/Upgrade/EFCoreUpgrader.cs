@@ -1,6 +1,4 @@
 ﻿using Umbraco.Cms.Core;
-using Umbraco.Cms.Core.Migrations;
-using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade;

@@ -3,10 +3,7 @@
 /// <inheritdoc />
 public class UmbracoEFCorePlan : EFCoreMigrationPlan
 {
-    public UmbracoEFCorePlan(string name) : base(name)
-    {
-        InitialState = string.Empty;
-    }
+    public UmbracoEFCorePlan() : base("Umbraco.EFCore") => InitialState = string.Empty;
 
     protected void DefinePlan()
     {
