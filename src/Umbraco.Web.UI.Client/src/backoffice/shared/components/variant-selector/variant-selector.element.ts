@@ -3,8 +3,11 @@ import { css, html, nothing } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { UUIInputElement, UUIInputEvent } from '@umbraco-ui/uui';
 import { ifDefined } from 'lit-html/directives/if-defined.js';
-import { UmbWorkspaceVariantContext } from '../workspace/workspace-variant/workspace-variant.context';
-import { UmbDocumentWorkspaceContext } from '../../../documents/documents/workspace/document-workspace.context';
+import {
+	UmbWorkspaceVariantContext,
+	UMB_WORKSPACE_VARIANT_CONTEXT_TOKEN,
+} from '../workspace/workspace-variant/workspace-variant.context';
+import { ActiveVariant } from '../workspace/workspace-context/workspace-split-view-manager.class';
 import { UmbLitElement } from '@umbraco-cms/element';
 import type { DocumentVariantModel } from '@umbraco-cms/backend-api';
 
@@ -35,6 +38,10 @@ export class UmbVariantSelectorElement extends UmbLitElement {
 				box-sizing: border-box;
 				box-shadow: var(--uui-shadow-depth-3);
 			}
+
+			#variant-close {
+				white-space: nowrap;
+			}
 		`,
 	];
 
@@ -45,7 +52,10 @@ export class UmbVariantSelectorElement extends UmbLitElement {
 	@state()
 	_variants: Array<DocumentVariantModel> = [];
 
-	private _workspaceContext?: UmbDocumentWorkspaceContext;
+	// TODO: Stop using document context specific ActiveVariant type.
+	@state()
+	_activeVariants: Array<ActiveVariant> = [];
+
 	private _variantContext?: UmbWorkspaceVariantContext;
 
 	@state()
@@ -66,26 +76,46 @@ export class UmbVariantSelectorElement extends UmbLitElement {
 	constructor() {
 		super();
 
-		// TODO: Figure out how to get the magic string for the workspace context.
-		this.consumeContext<UmbDocumentWorkspaceContext>('umbWorkspaceContext', (instance) => {
-			this._workspaceContext = instance;
-			this._observeVariants();
-		});
-
-		this.consumeContext<UmbWorkspaceVariantContext>('umbWorkspaceVariantContext', (instance) => {
+		this.consumeContext<UmbWorkspaceVariantContext>(UMB_WORKSPACE_VARIANT_CONTEXT_TOKEN, (instance) => {
 			this._variantContext = instance;
+			this._observeVariants();
+			this._observeActiveVariants();
 			this._observeVariantContext();
 		});
 	}
 
 	private async _observeVariants() {
-		if (!this._workspaceContext) return;
+		if (!this._variantContext) return;
 
-		this.observe(this._workspaceContext.variants, (variants) => {
-			if (variants) {
-				this._variants = variants;
-			}
-		});
+		const workspaceContext = this._variantContext.getWorkspaceContext();
+		if (workspaceContext) {
+			this.observe(
+				workspaceContext.variants,
+				(variants) => {
+					if (variants) {
+						this._variants = variants;
+					}
+				},
+				'_observeVariants'
+			);
+		}
+	}
+
+	private async _observeActiveVariants() {
+		if (!this._variantContext) return;
+
+		const workspaceContext = this._variantContext.getWorkspaceContext();
+		if (workspaceContext) {
+			this.observe(
+				workspaceContext.splitView.activeVariantsInfo,
+				(activeVariants) => {
+					if (activeVariants) {
+						this._activeVariants = activeVariants;
+					}
+				},
+				'_observeActiveVariants'
+			);
+		}
 	}
 
 	private async _observeVariantContext() {
@@ -149,15 +179,16 @@ export class UmbVariantSelectorElement extends UmbLitElement {
 	}
 
 	private _switchVariant(variant: DocumentVariantModel) {
-		if (variant.culture === undefined || variant.segment === undefined) return;
-		this._variantContext?.changeVariant(variant.culture, variant.segment);
+		this._variantContext?.switchVariant(variant);
 		this._close();
 	}
 
 	private _openSplitView(variant: DocumentVariantModel) {
-		if (variant.culture === undefined || variant.segment === undefined) return;
-		this._workspaceContext?.openSplitView(variant.culture, variant.segment);
+		this._variantContext?.openSplitView(variant);
 		this._close();
+	}
+	private _closeSplitView() {
+		this._variantContext?.closeSplitView();
 	}
 
 	render() {
@@ -166,15 +197,21 @@ export class UmbVariantSelectorElement extends UmbLitElement {
 				${
 					this._variants && this._variants.length > 0
 						? html`
-								<div slot="append">
-									<uui-button
-										id="variant-selector-toggle"
-										@click=${this._toggleVariantSelector}
-										title=${ifDefined(this._variantTitleName)}>
-										${this._variantDisplayName}
-										<uui-symbol-expand></uui-symbol-expand>
-									</uui-button>
-								</div>
+								<uui-button
+									slot="append"
+									id="variant-selector-toggle"
+									@click=${this._toggleVariantSelector}
+									title=${ifDefined(this._variantTitleName)}>
+									${this._variantDisplayName}
+									<uui-symbol-expand></uui-symbol-expand>
+								</uui-button>
+								${this._activeVariants.length > 1
+									? html`
+											<uui-button slot="append" compact id="variant-close" @click=${this._closeSplitView}>
+												<uui-icon name="remove"></uui-icon>
+											</uui-button>
+									  `
+									: ''}
 						  `
 						: nothing
 				}
@@ -190,10 +227,12 @@ export class UmbVariantSelectorElement extends UmbLitElement {
 											(variant) =>
 												html`<ul>
 													<li>
+														<!-- TODO: style this better, most likely not use ul and li -->
 														<uui-button @click=${() => this._switchVariant(variant)}>
 															${variant.name} ${variant.culture} ${variant.segment}
 														</uui-button>
 
+														<!-- TODO: only make this available if not already open -->
 														<uui-button @click=${() => this._openSplitView(variant)}> Split view </uui-button>
 													</li>
 												</ul>`

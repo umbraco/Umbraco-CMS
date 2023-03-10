@@ -1,4 +1,4 @@
-import { IRoute, RouterSlot } from 'router-slot';
+import { IRoute, RouterSlot, ensureSlash } from 'router-slot';
 import { LitElement, PropertyValueMap } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { UmbRouterSlotChangeEvent, UmbRouterSlotInitEvent } from '@umbraco-cms/router';
@@ -7,8 +7,8 @@ import { UmbRouterSlotChangeEvent, UmbRouterSlotInitEvent } from '@umbraco-cms/r
  *  @element umb-router-slot-element
  *  @description - Component for wrapping Router Slot element, providing some local events for implementation.
  *  @extends UmbRouterSlotElement
- * @fires {UmbRouterSlotInitEvent} init - fires when the media card is selected
- * @fires {UmbRouterSlotChangeEvent} change - fires when the media card is unselected
+ * @fires {UmbRouterSlotInitEvent} init - fires when the router is connected
+ * @fires {UmbRouterSlotChangeEvent} change - fires when a path of this router is changed
  */
 @customElement('umb-router-slot')
 export class UmbRouterSlotElement extends LitElement {
@@ -20,6 +20,30 @@ export class UmbRouterSlotElement extends LitElement {
 		return (this.#router as any).routes;
 	}
 	public set routes(value: IRoute[] | undefined) {
+		/*
+		Concept for extending routes with modal routes.
+		const routesWithModals = value?.map((route, i, array) => {
+			{
+				path: 'bla/:key/'
+				component: () => {
+					return import('.....');
+				}
+				setup: () => {
+					...
+				}
+			}
+
+			if (route.path === '') {
+				{
+					...route,
+					path: route.path + '/modal/:modal-alias',
+					setup: () => {
+						route.setup?.();
+						// Call modal service to open modal.
+					}
+			}
+		});
+		*/
 		(this.#router as any).routes = value;
 	}
 
@@ -35,6 +59,12 @@ export class UmbRouterSlotElement extends LitElement {
 
 	public get absoluteActiveViewPath() {
 		return this._routerPath + '/' + this._activeLocalPath;
+	}
+
+	constructor() {
+		super();
+		this.#router.addEventListener('changestate', this._onChangeState);
+		this.#router.appendChild(document.createElement('slot'));
 	}
 
 	connectedCallback() {
@@ -56,6 +86,20 @@ export class UmbRouterSlotElement extends LitElement {
 		this._routerPath = this.#router.constructAbsolutePath('') || '';
 		this.dispatchEvent(new UmbRouterSlotInitEvent());
 	}
+
+	private _onChangeState = () => {
+		const newAbsolutePath = this.#router.constructAbsolutePath('') || '';
+		if (this._routerPath !== newAbsolutePath) {
+			this._routerPath = newAbsolutePath;
+			this.dispatchEvent(new UmbRouterSlotInitEvent());
+
+			const newActiveLocalPath = this.#router.match?.route.path;
+			if (this._activeLocalPath !== newActiveLocalPath) {
+				this._activeLocalPath = newActiveLocalPath;
+				this.dispatchEvent(new UmbRouterSlotChangeEvent());
+			}
+		}
+	};
 
 	private _onNavigationChanged = (event?: any) => {
 		if (event.detail.slot === this.#router) {
