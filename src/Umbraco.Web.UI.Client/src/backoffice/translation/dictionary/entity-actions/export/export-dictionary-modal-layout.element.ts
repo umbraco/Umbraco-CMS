@@ -49,6 +49,8 @@ export class UmbExportDictionaryModalLayoutElement extends UmbModalBaseElement<
 	}
 }
 
+export default UmbExportDictionaryModalLayoutElement;
+
 declare global {
 	interface HTMLElementTagNameMap {
 		'umb-export-dictionary-modal-layout': UmbExportDictionaryModalLayoutElement;

@@ -156,6 +156,8 @@ export class UmbImportDictionaryModalLayoutElement extends UmbModalBaseElement<
 	}
 }
 
+export default UmbImportDictionaryModalLayoutElement;
+
 declare global {
 	interface HTMLElementTagNameMap {
 		'umb-import-dictionary-modal-layout': UmbImportDictionaryModalLayoutElement;

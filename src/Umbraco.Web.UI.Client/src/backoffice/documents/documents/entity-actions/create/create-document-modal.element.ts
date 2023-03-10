@@ -39,6 +39,8 @@ export class UmbCreateDocumentModalElement extends UmbModalBaseElement<
 	}
 }
 
+export default UmbCreateDocumentModalElement;
+
 declare global {
 	interface HTMLElementTagNameMap {
 		'umb-create-document-modal': UmbCreateDocumentModalElement;
