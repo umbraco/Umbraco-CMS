@@ -32,14 +32,14 @@ export class UmbInputTagsElement extends FormControlMixin(UmbLitElement) {
 	@property({ type: String })
 	group?: string;
 
-	_tags: string[] = [];
+	_items: string[] = [];
 	@property({ type: Array })
-	public set tags(newTags: string[]) {
-		this._tags = newTags;
-		super.value = this._tags.join(',');
+	public set items(newTags: string[]) {
+		this._items = newTags;
+		super.value = this._items.join(',');
 	}
-	public get tags(): string[] {
-		return this._tags;
+	public get items(): string[] {
+		return this._items;
 	}
 
 	@query('#tag-input')
@@ -63,12 +63,12 @@ export class UmbInputTagsElement extends FormControlMixin(UmbLitElement) {
 
 		if (!newTag) return this.#inputError();
 
-		const tagExists = this.tags.find((tag) => tag === newTag);
+		const tagExists = this.items.find((tag) => tag === newTag);
 
 		if (tagExists) return this.#inputError();
 
 		this._tagInput.error = false;
-		this.tags = [...this.tags, newTag];
+		this.items = [...this.items, newTag];
 		this._tagInput.value = '';
 		this.dispatchEvent(new CustomEvent('change', { bubbles: true, composed: true }));
 	}
@@ -78,11 +78,11 @@ export class UmbInputTagsElement extends FormControlMixin(UmbLitElement) {
 	}
 
 	#delete(tag: string) {
-		this.tags.splice(
-			this.tags.findIndex((x) => x === tag),
+		this.items.splice(
+			this.items.findIndex((x) => x === tag),
 			1
 		);
-		this.tags = [...this.tags];
+		this.items = [...this.items];
 		this.dispatchEvent(new CustomEvent('change', { bubbles: true, composed: true }));
 	}
 
@@ -96,9 +96,9 @@ export class UmbInputTagsElement extends FormControlMixin(UmbLitElement) {
 	}
 
 	#renderTags() {
-		if (!this.tags.length) return nothing;
+		if (!this.items.length) return nothing;
 		return html`<div id="tags-wrapper">
-			${this.tags.map((tag) => {
+			${this.items.map((tag) => {
 				return html`
 					<uui-tag>
 						${tag}

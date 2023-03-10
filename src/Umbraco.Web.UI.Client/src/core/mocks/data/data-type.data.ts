@@ -364,7 +364,16 @@ export const data: Array<DataTypeModel & { type: 'data-type' }> = [
 		parentKey: null,
 		propertyEditorAlias: 'Umbraco.Tags',
 		propertyEditorUiAlias: 'Umb.PropertyEditorUI.Tags',
-		data: [],
+		data: [
+			{
+				alias: 'group',
+				value: 'default',
+			},
+			{
+				alias: 'items',
+				value: [],
+			},
+		],
 	},
 	{
 		$type: 'data-type',

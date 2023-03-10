@@ -13,21 +13,21 @@ type Story = StoryObj<UmbInputTagsElement>;
 export const Overview: Story = {
 	args: {
 		group: 'default',
-		tags: [],
+		items: [],
 	},
 };
 
 export const WithTags: Story = {
 	args: {
 		group: 'default',
-		tags: ['Flour', 'Eggs', 'Butter', 'Sugar', 'Salt', 'Milk'],
+		items: ['Flour', 'Eggs', 'Butter', 'Sugar', 'Salt', 'Milk'],
 	},
 };
 
 export const WithTags2: Story = {
 	args: {
 		group: 'default',
-		tags: [
+		items: [
 			'Cranberry',
 			'Kiwi',
 			'Blueberries',
