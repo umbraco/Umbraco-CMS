@@ -16,7 +16,7 @@ public class DisableUsersController : UsersControllerBase
     [MapToApiVersion("1.0")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> DisableUser(DisableUserRequestModel model)
+    public async Task<IActionResult> DisableUsers(DisableUserRequestModel model)
     {
         UserOperationStatus result = await _userService.DisableAsync(-1, model.UserKeys.ToArray());
 

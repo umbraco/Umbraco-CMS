@@ -16,7 +16,7 @@ public class EnableUsersController : UsersControllerBase
     [MapToApiVersion("1.0")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> EnableUser(EnableUserRequestModel model)
+    public async Task<IActionResult> EnableUsers(EnableUserRequestModel model)
     {
         UserOperationStatus result = await _userService.EnableAsync(-1, model.UserKeys.ToArray());
 
