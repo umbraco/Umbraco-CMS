@@ -1093,6 +1093,42 @@ internal class UserService : RepositoryService, IUserService
         return UserOperationStatus.Success;
     }
 
+    public async Task<UserOperationStatus> DisableAsync(int performingUserId, params Guid[] keys)
+    {
+        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+        IUser? performingUser = GetById(performingUserId);
+
+        if (performingUser is null)
+        {
+            return UserOperationStatus.MissingUser;
+        }
+
+        if (keys.Contains(performingUser.Key))
+        {
+            return UserOperationStatus.CannotDisableSelf;
+        }
+
+        IServiceScope serviceScope = _serviceScopeFactory.CreateScope();
+        IBackofficeUserStore userStore = serviceScope.ServiceProvider.GetRequiredService<IBackofficeUserStore>();
+        IUser[] usersToDisable = (await userStore.GetUsersAsync(keys)).ToArray();
+
+        foreach (IUser user in usersToDisable)
+        {
+            if (user.UserState is UserState.Invited)
+            {
+                return UserOperationStatus.CannotDisableInvitedUser;
+            }
+
+            user.IsApproved = false;
+            user.InvitedDate = null;
+        }
+
+        Save(usersToDisable);
+
+        scope.Complete();
+        return UserOperationStatus.Success;
+    }
+
     public IEnumerable<IUser> GetAll(long pageIndex, int pageSize, out long totalRecords, string orderBy, Direction orderDirection, UserState[]? userState = null, string[]? userGroups = null, string? filter = null)
     {
         IQuery<IUser>? filterQuery = null;

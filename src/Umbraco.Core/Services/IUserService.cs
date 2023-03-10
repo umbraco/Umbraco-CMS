@@ -63,6 +63,8 @@ public interface IUserService : IMembershipUserService
 
     Task<UserOperationStatus> DeleteAsync(Guid key);
 
+    Task<UserOperationStatus> DisableAsync(int performingUserId, params Guid[] keys);
+
     /// <summary>
     /// Gets all users that the requesting user is allowed to see.
     /// </summary>

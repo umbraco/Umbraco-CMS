@@ -51,6 +51,10 @@ public class UsersControllerBase : ManagementApiControllerBase
                 .WithTitle("Cannot delete user")
                 .WithDetail("The user cannot be deleted.")
                 .Build()),
+            UserOperationStatus.CannotDisableSelf => BadRequest(new ProblemDetailsBuilder()
+                .WithTitle("Cannot disable")
+                .WithDetail("A user cannot disable itself.")
+                .Build()),
             _ => StatusCode(StatusCodes.Status500InternalServerError, "Unknown user group operation status."),
         };
 

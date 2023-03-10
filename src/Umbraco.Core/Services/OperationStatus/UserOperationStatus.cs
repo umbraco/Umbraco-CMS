@@ -14,5 +14,7 @@ public enum UserOperationStatus
     NotFound,
     CannotInvite,
     CannotDelete,
+    CannotDisableSelf,
+    CannotDisableInvitedUser,
     UnknownFailure,
 }

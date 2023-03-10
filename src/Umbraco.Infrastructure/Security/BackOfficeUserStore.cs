@@ -278,6 +278,20 @@ public class BackOfficeUserStore :
         return Task.FromResult(users);
     }
 
+    public Task<IEnumerable<IUser>> GetUsersAsync(params Guid[]? keys)
+    {
+        if (keys is null || keys.Length <= 0)
+        {
+            return Task.FromResult(Enumerable.Empty<IUser>());
+        }
+
+        using ICoreScope scope = _scopeProvider.CreateCoreScope(autoComplete: true);
+        IQuery<IUser> query = _scopeProvider.CreateQuery<IUser>().Where(x => keys.Contains(x.Key));
+        IEnumerable<IUser> users = _userRepository.Get(query);
+
+        return Task.FromResult(users);
+    }
+
     /// <inheritdoc />
     public Task<IUser?> GetAsync(Guid key)
     {

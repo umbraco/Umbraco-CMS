@@ -56,6 +56,8 @@ public interface IBackofficeUserStore
     /// <returns>Task resolving into an <see cref="IUser"/>.</returns>
     Task<IUser?> GetAsync(Guid key);
 
+    Task<IEnumerable<IUser>> GetUsersAsync(params Guid[]? keys);
+
     Task<IEnumerable<IUser>> GetUsersAsync(params int[]? ids);
 
 
