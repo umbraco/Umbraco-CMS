@@ -1,9 +1,9 @@
 import { BehaviorSubject, map, Observable } from 'rxjs';
-import { UmbContextToken } from "@umbraco-cms/context-api";
-import type { UmbControllerHostInterface } from "@umbraco-cms/controller";
 import type { ManifestTypes, ManifestTypeMap, ManifestBase, ManifestEntrypoint } from '../../models';
 import { loadExtension } from '../load-extension.function';
 import { hasInitExport } from "../has-init-export.function";
+import type { UmbControllerHostInterface } from "@umbraco-cms/controller";
+import { UmbContextToken } from "@umbraco-cms/context-api";
 
 type SpecificManifestTypeOrManifestBase<T extends keyof ManifestTypeMap | string> = T extends keyof ManifestTypeMap
 	? ManifestTypeMap[T]

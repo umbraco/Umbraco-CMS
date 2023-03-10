@@ -7,7 +7,6 @@ import {
 	UMB_APP_LOG_VIEWER_CONTEXT_TOKEN,
 } from '../../logviewer.context';
 import { UmbLitElement } from '@umbraco-cms/element';
-import { query } from 'router-slot';
 
 @customElement('umb-log-viewer-date-range-selector')
 export class UmbLogViewerDateRangeSelectorElement extends UmbLitElement {
@@ -99,7 +98,7 @@ export class UmbLogViewerDateRangeSelectorElement extends UmbLitElement {
                 @click=${(e: Event) => {
 									(e.target as HTMLInputElement).showPicker();
 								}}
-                                    
+
                 id="start-date"
                 type="date"
                 label="From"

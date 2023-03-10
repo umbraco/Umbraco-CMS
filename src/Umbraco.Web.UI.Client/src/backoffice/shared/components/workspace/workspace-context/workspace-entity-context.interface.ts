@@ -1,3 +1,4 @@
+import { Observable } from 'rxjs';
 import type { UmbWorkspaceContextInterface } from './workspace-context.interface';
 
 export interface UmbWorkspaceEntityContextInterface<T = unknown> extends UmbWorkspaceContextInterface<T> {

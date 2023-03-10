@@ -65,6 +65,10 @@ export const handlers = [
 		return res(ctx.delay(), ctx.status(200), ctx.json(umbLogviewerData.logs.getLevelCount()));
 	}),
 
+	rest.get(umbracoPath('/log-viewer/validate-logs-size'), (req, res, ctx) => {
+		return res(ctx.delay(), ctx.status(200));
+	}),
+
 	rest.get(umbracoPath('/log-viewer/log'), (req, res, ctx) => {
 		const skip = req.url.searchParams.get('skip');
 		const skipNumber = skip ? Number.parseInt(skip) : undefined;
