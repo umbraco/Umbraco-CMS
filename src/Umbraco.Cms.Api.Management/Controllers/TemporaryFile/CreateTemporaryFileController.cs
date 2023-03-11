@@ -23,9 +23,9 @@ public class CreateTemporaryFileController : TemporaryFileControllerBase
     [MapToApiVersion("1.0")]
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> UploadSingleFile([FromForm] UploadSingleFileRequestModel model)
+    public async Task<IActionResult> Create([FromForm] CreateTemporaryFileRequestModel model)
     {
-        using TemporaryFileModel temporaryFileModel = _umbracoMapper.Map<UploadSingleFileRequestModel, Core.Models.TemporaryFile.TemporaryFileModel>(model)!;
+        using TemporaryFileModel temporaryFileModel = _umbracoMapper.Map<CreateTemporaryFileRequestModel, Core.Models.TemporaryFile.TemporaryFileModel>(model)!;
 
         Attempt<TemporaryFileModel, TemporaryFileStatus> result = await _temporaryFileService.CreateAsync(temporaryFileModel);
 

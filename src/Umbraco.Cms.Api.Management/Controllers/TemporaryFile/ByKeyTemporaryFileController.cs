@@ -23,7 +23,7 @@ public class ByKeyTemporaryFileController : TemporaryFileControllerBase
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-    [ProducesResponseType(typeof(UploadSingleFileResponseModel), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(CreateTemporaryFileResponseModel), StatusCodes.Status200OK)]
     public async Task<IActionResult> ByKey(Guid key)
     {
         using TemporaryFileModel? model = await _temporaryFileService.GetAsync(key);
@@ -32,6 +32,6 @@ public class ByKeyTemporaryFileController : TemporaryFileControllerBase
             return NotFound();
         }
 
-        return Ok(_umbracoMapper.Map<Core.Models.TemporaryFile.TemporaryFileModel, UploadSingleFileResponseModel>(model));
+        return Ok(_umbracoMapper.Map<TemporaryFileModel, CreateTemporaryFileResponseModel>(model));
     }
 }

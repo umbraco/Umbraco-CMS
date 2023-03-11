@@ -1,6 +1,6 @@
 namespace Umbraco.Cms.Api.Management.ViewModels.TemporaryFile;
 
-public class UploadSingleFileResponseModel
+public class CreateTemporaryFileResponseModel
 {
     public Guid Key { get; set; }
 
