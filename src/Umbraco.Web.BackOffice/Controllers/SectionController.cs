@@ -13,6 +13,7 @@ using Umbraco.Cms.Core.Sections;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Trees;
+using Umbraco.Cms.Web.BackOffice.Filters;
 using Umbraco.Cms.Web.BackOffice.Trees;
 using Umbraco.Cms.Web.Common.Attributes;
 using Umbraco.Extensions;
@@ -54,6 +55,8 @@ public class SectionController : UmbracoAuthorizedJsonController
         _actionDescriptorCollectionProvider = actionDescriptorCollectionProvider;
     }
 
+    [ValidateAngularAntiForgeryToken]
+    [OutgoingEditorModelEvent]
     public async Task<ActionResult<IEnumerable<Section>>> GetSections()
     {
         IEnumerable<ISection> sections =

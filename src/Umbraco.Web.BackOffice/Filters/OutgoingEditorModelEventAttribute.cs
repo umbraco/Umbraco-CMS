@@ -124,11 +124,16 @@ internal sealed class OutgoingEditorModelEventAttribute : TypeFilterAttribute
                             case IEnumerable<Tab<IDashboardSlim>> dashboards:
                                 _eventAggregator.Publish(new SendingDashboardsNotification(dashboards, umbracoContext));
                                 break;
+                            case IEnumerable<Section> sections:
+                                var sectionsNotification = new SendingSectionsNotification(sections, umbracoContext);
+                                _eventAggregator.Publish(sectionsNotification);
+                                context.Result = new ObjectResult(sectionsNotification.Sections);
+                                break;
                             case IEnumerable<ContentTypeBasic> allowedChildren:
                                 // Changing the Enumerable will generate a new instance, so we need to update the context result with the new content
-                                var notification = new SendingAllowedChildrenNotification(allowedChildren, umbracoContext);
-                                _eventAggregator.Publish(notification);
-                                context.Result = new ObjectResult(notification.Children);
+                                var allowedChildrenNotification = new SendingAllowedChildrenNotification(allowedChildren, umbracoContext);
+                                _eventAggregator.Publish(allowedChildrenNotification);
+                                context.Result = new ObjectResult(allowedChildrenNotification.Children);
                                 break;
                         }
                     }
