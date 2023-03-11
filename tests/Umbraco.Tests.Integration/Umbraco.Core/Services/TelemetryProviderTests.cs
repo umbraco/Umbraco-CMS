@@ -11,6 +11,7 @@ using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
@@ -82,18 +83,28 @@ public class TelemetryProviderTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public void Domain_Telemetry_Provider_Can_Get_Domains()
+    public async Task Domain_Telemetry_Provider_Can_Get_Domains()
     {
         // Arrange
-        DomainService.Save(new UmbracoDomain("danish", "da-DK"));
+        var contentType = ContentTypeBuilder.CreateBasicContentType();
+        ContentTypeService.Save(contentType);
 
-        IEnumerable<UsageInformation> result = null;
+        var content = ContentBuilder.CreateBasicContent(contentType);
+        ContentService.Save(content);
+
+        await DomainService.UpdateDomainsAsync(
+            content.Key,
+            new DomainsUpdateModel
+            {
+                Domains = new[] { new DomainModel { DomainName = "english", IsoCode = "en-US" } }
+            });
+
         // Act
-        result = DetailedTelemetryProviders.GetInformation();
-
+        IEnumerable<UsageInformation> result = DetailedTelemetryProviders.GetInformation();
 
         // Assert
         Assert.AreEqual(1, result.First().Data);
+        Assert.AreEqual("DomainCount", result.First().Name);
     }
 
     [Test]
