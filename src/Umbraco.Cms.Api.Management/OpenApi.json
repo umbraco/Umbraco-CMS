@@ -1745,6 +1745,65 @@
         }
       }
     },
+    "/umbraco/management/api/v1/document/{key}/domains": {
+      "get": {
+        "tags": [
+          "Document"
+        ],
+        "operationId": "GetDocumentByKeyDomains",
+        "parameters": [
+          {
+            "name": "key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Document"
+        ],
+        "operationId": "PutDocumentByKeyDomains",
+        "parameters": [
+          {
+            "name": "key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/DomainsUpdateRequestModel"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
     "/umbraco/management/api/v1/recycle-bin/document/children": {
       "get": {
         "tags": [
@@ -7553,6 +7612,56 @@
             "DocumentVariantResponseModel": "#/components/schemas/DocumentVariantResponseModel"
           }
         }
+      },
+      "DomainModel": {
+        "type": "object",
+        "properties": {
+          "domainName": {
+            "type": "string"
+          },
+          "isoCode": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "DomainsModelBaseModel": {
+        "type": "object",
+        "properties": {
+          "defaultIsoCode": {
+            "type": "string",
+            "nullable": true
+          },
+          "domains": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/DomainModel"
+                }
+              ]
+            }
+          }
+        },
+        "additionalProperties": false
+      },
+      "DomainsResponseModel": {
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/DomainsModelBaseModel"
+          }
+        ],
+        "additionalProperties": false
+      },
+      "DomainsUpdateRequestModel": {
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/DomainsModelBaseModel"
+          }
+        ],
+        "additionalProperties": false
       },
       "EntityTreeItemModel": {
         "required": [
