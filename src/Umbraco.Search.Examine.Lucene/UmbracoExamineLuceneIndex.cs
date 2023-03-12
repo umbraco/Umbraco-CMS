@@ -4,11 +4,13 @@
 using Examine;
 using Examine.Lucene;
 using Examine.Lucene.Providers;
+using Examine.Search;
 using Lucene.Net.Documents;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Hosting;
+using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Core.Search;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Extensions;
@@ -23,6 +25,7 @@ namespace Umbraco.Search.Examine.Lucene;
 /// </summary>
 public class UmbracoExamineLuceneIndex : LuceneIndex, IUmbracoExamineIndex, IIndexDiagnostics
 {
+    private readonly ISet<string> _idOnlyFieldSet = new HashSet<string> { "id" };
     private readonly UmbracoExamineIndexDiagnostics _diagnostics;
     private readonly ILogger<UmbracoExamineLuceneIndex> _logger;
     private readonly IRuntimeState _runtimeState;
@@ -55,7 +58,31 @@ public class UmbracoExamineLuceneIndex : LuceneIndex, IUmbracoExamineIndex, IInd
     {
         if (CanInitialize())
         {
-            base.PerformDeleteFromIndex(itemIds, onComplete);
+            var idsAsList = itemIds.ToList();
+
+            for (var i = 0; i < idsAsList.Count; i++)
+            {
+                var nodeId = idsAsList[i];
+
+                //find all descendants based on path
+                var descendantPath = $@"\-1\,*{nodeId}\,*";
+                var rawQuery = $"{UmbracoSearchFieldNames.IndexPathFieldName}:{descendantPath}";
+                IQuery? c = Searcher.CreateQuery();
+                IBooleanOperation? filtered = c.NativeQuery(rawQuery);
+                IOrdering? selectedFields = filtered.SelectFields(_idOnlyFieldSet);
+                ISearchResults? results = selectedFields.Execute();
+
+                _logger.LogDebug("DeleteFromIndex with query: {Query} (found {TotalItems} results)", rawQuery, results.TotalItemCount);
+
+                var toRemove = results.Select(x => x.Id).ToList();
+                // delete those descendants (ensure base. is used here so we aren't calling ourselves!)
+                base.PerformDeleteFromIndex(toRemove, null);
+
+                // remove any ids from our list that were part of the descendants
+                idsAsList.RemoveAll(x => toRemove.Contains(x));
+            }
+
+            base.PerformDeleteFromIndex(idsAsList, onComplete);
         }
     }
 

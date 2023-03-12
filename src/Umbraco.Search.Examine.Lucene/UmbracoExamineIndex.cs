@@ -45,4 +45,5 @@ public class UmbracoExamineIndex<T> : UmbracoExamineIndex,IUmbracoIndex<T>
         var valueSet = _valueSetBuilder.GetValueSets(items);
         ExamineIndex.IndexItems(valueSet);
     }
+
 }
