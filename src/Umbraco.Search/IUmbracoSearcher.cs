@@ -1,4 +1,6 @@
-﻿using Umbraco.Cms.Core.Models.Search;
+﻿using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Cms.Core.Models.Search;
+using Umbraco.Cms.Core.Web;
 
 namespace Umbraco.Search;
 
@@ -12,4 +14,11 @@ public interface IUmbracoSearcher
 
     string Name { get;  }
     UmbracoSearchResults? NativeQuery(string query, int page, int pageSize);
+
+    IEnumerable<PublishedSearchResult> SearchDescendants(
+        IPublishedContent content,
+        IUmbracoContextAccessor umbracoContextAccessor,
+        string term);
+
+    IEnumerable<PublishedSearchResult> SearchChildren(IPublishedContent content, IUmbracoContextAccessor umbracoContextAccessor, string term);
 }

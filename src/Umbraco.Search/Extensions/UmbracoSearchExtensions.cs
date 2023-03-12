@@ -1,4 +1,9 @@
 ﻿using System.Text.RegularExpressions;
+using Microsoft.Extensions.DependencyInjection;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.DependencyInjection;
+using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Cms.Core.Web;
 using Umbraco.Extensions;
 
 namespace Umbraco.Search.Extensions;
@@ -39,5 +44,27 @@ public static class UmbracoSearchExtensions
 
         return results;
     }
+    private static ISearchProvider SearchProvider { get; } =
+        StaticServiceProvider.Instance.GetRequiredService<ISearchProvider>();
+    public static IEnumerable<PublishedSearchResult> SearchDescendants(
+        this IPublishedContent content,
+        IUmbracoContextAccessor umbracoContextAccessor,
+        string term,
+        string? indexName = null)
+        {
+            indexName = string.IsNullOrEmpty(indexName) ? Constants.UmbracoIndexes.ExternalIndexName : indexName;
+            var searcher = SearchProvider.GetSearcher(indexName);
+        return searcher?.SearchDescendants(content, umbracoContextAccessor, term) ?? new List<PublishedSearchResult>();
+    }
+    public static IEnumerable<PublishedSearchResult> SearchChildren(
+        this IPublishedContent content,
+        IUmbracoContextAccessor umbracoContextAccessor,
+        string term,
+        string? indexName = null)
+    {
+        indexName = string.IsNullOrEmpty(indexName) ? Constants.UmbracoIndexes.ExternalIndexName : indexName;
+        var searcher = SearchProvider.GetSearcher(indexName);
+        return searcher?.SearchChildren(content, umbracoContextAccessor, term) ?? new List<PublishedSearchResult>();
 
+    }
 }
