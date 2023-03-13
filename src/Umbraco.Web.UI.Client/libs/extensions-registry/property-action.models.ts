@@ -2,9 +2,9 @@ import type { ManifestElement } from './models';
 
 export interface ManifestPropertyAction extends ManifestElement {
 	type: 'propertyAction';
-	meta: MetaPropertyAction;
+	conditions: ConditionsPropertyAction;
 }
 
-export interface MetaPropertyAction {
+export interface ConditionsPropertyAction {
 	propertyEditors: string[];
 }
