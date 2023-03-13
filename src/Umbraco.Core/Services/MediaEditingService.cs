@@ -11,7 +11,6 @@ internal sealed class MediaEditingService
     : ContentEditingServiceBase<IMedia, IMediaType, IMediaService, IMediaTypeService>, IMediaEditingService
 {
     private readonly ILogger<ContentEditingServiceBase<IMedia, IMediaType, IMediaService, IMediaTypeService>> _logger;
-    private readonly ICoreScopeProvider _scopeProvider;
 
     public MediaEditingService(
         IMediaService contentService,
@@ -20,11 +19,8 @@ internal sealed class MediaEditingService
         IDataTypeService dataTypeService,
         ILogger<ContentEditingServiceBase<IMedia, IMediaType, IMediaService, IMediaTypeService>> logger,
         ICoreScopeProvider scopeProvider)
-        : base(contentService, contentTypeService, propertyEditorCollection, dataTypeService, logger)
-    {
+        : base(contentService, contentTypeService, propertyEditorCollection, dataTypeService, logger, scopeProvider) =>
         _logger = logger;
-        _scopeProvider = scopeProvider;
-    }
 
     public async Task<IMedia?> GetAsync(Guid id)
     {
@@ -63,10 +59,10 @@ internal sealed class MediaEditingService
     }
 
     public async Task<Attempt<IMedia?, ContentEditingOperationStatus>> MoveToRecycleBinAsync(Guid id, int userId = Constants.Security.SuperUserId)
-        => await HandleDeletionAsync(id, content => ContentService.MoveToRecycleBin(content, userId));
+        => await HandleDeletionAsync(id, media => ContentService.MoveToRecycleBin(media, userId).Result, false);
 
     public async Task<Attempt<IMedia?, ContentEditingOperationStatus>> DeleteAsync(Guid id, int userId = Constants.Security.SuperUserId)
-        => await HandleDeletionAsync(id, content => ContentService.Delete(content, userId));
+        => await HandleDeletionAsync(id, media => ContentService.Delete(media, userId).Result, true);
 
     protected override IMedia Create(string? name, int parentId, IMediaType contentType)
         => new Models.Media(name, parentId, contentType);
@@ -91,27 +87,5 @@ internal sealed class MediaEditingService
             _logger.LogError(ex, "Media save operation failed");
             return ContentEditingOperationStatus.Unknown;
         }
-    }
-
-    // helper method to perform move-to-recycle-bin and delete for content as they are very much handled in the same way
-    private async Task<Attempt<IMedia?, ContentEditingOperationStatus>> HandleDeletionAsync(Guid id, Func<IMedia, Attempt<OperationResult?>> performDelete)
-    {
-        using ICoreScope scope = _scopeProvider.CreateCoreScope(autoComplete:true);
-        IMedia? media = ContentService.GetById(id);
-        if (media == null)
-        {
-            return await Task.FromResult(Attempt.FailWithStatus(ContentEditingOperationStatus.NotFound, media));
-        }
-
-        Attempt<OperationResult?> deleteResult = performDelete(media);
-        return deleteResult.Result?.Result switch
-        {
-            // these are the only result states currently expected from Delete
-            OperationResultType.Success => Attempt.SucceedWithStatus<IMedia?, ContentEditingOperationStatus>(ContentEditingOperationStatus.Success, media),
-            OperationResultType.FailedCancelledByEvent => Attempt.FailWithStatus<IMedia?, ContentEditingOperationStatus>(ContentEditingOperationStatus.CancelledByNotification, media),
-
-            // for any other state we'll return "unknown" so we know that we need to amend this
-            _ => Attempt.FailWithStatus<IMedia?, ContentEditingOperationStatus>(ContentEditingOperationStatus.Unknown, media)
-        };
     }
 }

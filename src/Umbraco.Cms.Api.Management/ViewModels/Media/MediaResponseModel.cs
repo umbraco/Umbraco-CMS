@@ -4,5 +4,5 @@ namespace Umbraco.Cms.Api.Management.ViewModels.Media;
 
 public class MediaResponseModel : ContentResponseModelBase<MediaValueModel, MediaVariantResponseModel>
 {
-    public IEnumerable<string> Urls { get; set; } = Array.Empty<string>();
+    public IEnumerable<ContentUrlInfo> Urls { get; set; } = Array.Empty<ContentUrlInfo>();
 }
