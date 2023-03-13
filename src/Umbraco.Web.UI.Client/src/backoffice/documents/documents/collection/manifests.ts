@@ -7,10 +7,12 @@ export const manifests: Array<ManifestCollectionView> = [
 		name: 'Document Table Collection View',
 		loader: () => import('./views/table/document-table-collection-view.element'),
 		weight: 200,
+		conditions: {
+			entityType: 'document',
+		},
 		meta: {
 			label: 'Table',
 			icon: 'umb:box',
-			entityType: 'document',
 			pathName: 'table',
 		},
 	},
