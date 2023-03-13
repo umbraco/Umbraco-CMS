@@ -1,6 +1,7 @@
 import { html } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { ifDefined } from 'lit-html/directives/if-defined.js';
+import { UmbPropertyEditorElement } from '@umbraco-cms/property-editor';
 import { UmbPropertyValueChangeEvent } from '../..';
 import UmbInputMultipleTextStringElement, {
 	MultipleTextStringValue,
@@ -17,7 +18,7 @@ export type MultipleTextStringConfigData = Array<{
  * @element umb-property-editor-ui-multiple-text-string
  */
 @customElement('umb-property-editor-ui-multiple-text-string')
-export class UmbPropertyEditorUIMultipleTextStringElement extends UmbLitElement {
+export class UmbPropertyEditorUIMultipleTextStringElement extends UmbLitElement implements UmbPropertyEditorElement {
 	@property({ type: Array })
 	public value: MultipleTextStringValue = [];
 
