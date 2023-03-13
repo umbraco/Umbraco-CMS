@@ -8,6 +8,7 @@ const workspace: ManifestWorkspace = {
 	loader: () => import('./data-type-workspace.element'),
 	meta: {
 		entityType: 'data-type',
+		api: () => import('./data-type-workspace.context'),
 	},
 };
 
