@@ -1424,6 +1424,14 @@ internal class UserService : RepositoryService, IUserService
         return backofficeUserStore.GetAsync(key);
     }
 
+    public Task<IEnumerable<IUser>> GetAsync(IEnumerable<Guid> keys)
+    {
+        using IServiceScope scope = _serviceScopeFactory.CreateScope();
+        IBackofficeUserStore backofficeUserStore = scope.ServiceProvider.GetRequiredService<IBackofficeUserStore>();
+
+        return backofficeUserStore.GetUsersAsync(keys.ToArray());
+    }
+
     public IEnumerable<IUser> GetUsersById(params int[]? ids)
     {
         using IServiceScope scope = _serviceScopeFactory.CreateScope();

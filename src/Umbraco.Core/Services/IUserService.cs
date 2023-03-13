@@ -170,6 +170,8 @@ public interface IUserService : IMembershipUserService
     /// <returns>The found user, or null if nothing was found.</returns>
     Task<IUser?> GetAsync(Guid key) => Task.FromResult(GetAll(0, int.MaxValue, out _).FirstOrDefault(x=>x.Key == key));
 
+    Task<IEnumerable<IUser>> GetAsync(IEnumerable<Guid> keys) => Task.FromResult(GetAll(0, int.MaxValue, out _).Where(x => keys.Contains(x.Key)));
+
     /// <summary>
     ///     Gets a user by Id
     /// </summary>

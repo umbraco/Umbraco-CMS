@@ -168,6 +168,30 @@ internal sealed class UserGroupService : RepositoryService, IUserGroupService
         return Attempt.Succeed(UserGroupOperationStatus.Success);
     }
 
+    public async Task<Attempt<UserGroupOperationStatus>> UpdateUserGroupsOnUsers(
+        IEnumerable<Guid> userGroupKeys,
+        IEnumerable<Guid> userKeys)
+    {
+        IUser[] users = (await _userService.GetAsync(userKeys)).ToArray();
+
+        IReadOnlyUserGroup[] userGroups = (await GetAsync(userGroupKeys))
+            .Select(x => x.ToReadOnlyGroup())
+            .ToArray();
+
+        foreach(IUser user in users)
+        {
+            user.ClearGroups();
+            foreach (IReadOnlyUserGroup userGroup in userGroups)
+            {
+                user.AddGroup(userGroup);
+            }
+        }
+
+        _userService.Save(users);
+
+        return Attempt<UserGroupOperationStatus>.Succeed(UserGroupOperationStatus.Success);
+    }
+
     private Attempt<UserGroupOperationStatus> ValidateUserGroupDeletion(IUserGroup? userGroup)
     {
         if (userGroup is null)

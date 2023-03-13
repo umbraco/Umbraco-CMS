@@ -85,4 +85,12 @@ public interface IUserGroupService
     /// <param name="key">The key of the user group to delete.</param>
     /// <returns>An attempt indicating if the operation was a success as well as a more detailed <see cref="UserGroupOperationStatus"/>.</returns>
     Task<Attempt<UserGroupOperationStatus>> DeleteAsync(Guid key);
+
+    /// <summary>
+    /// Updates the users to have the groups specified.
+    /// </summary>
+    /// <param name="userGroupKeys">The user groups the users should be part of.</param>
+    /// <param name="userKeys">The user whose groups we want to alter.</param>
+    /// <returns>An attempt indicating if the operation was a success as well as a more detailed <see cref="UserGroupOperationStatus"/>.</returns>
+    Task<Attempt<UserGroupOperationStatus>> UpdateUserGroupsOnUsers(IEnumerable<Guid> userGroupKeys, IEnumerable<Guid> userKeys);
 }
