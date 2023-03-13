@@ -5,7 +5,7 @@ export interface UmbCreateDocumentModalData {
 }
 
 export interface UmbCreateDocumentModalResultData {
-	documentType: string;
+	documentTypeKey: string;
 }
 
 export const UMB_CREATE_DOCUMENT_MODAL_TOKEN = new UmbModalToken<
