@@ -2,7 +2,7 @@
 
 namespace Umbraco.Cms.Api.Management.ViewModels.Media;
 
-public class MediaCreateRequestModel : ContentCreateRequestModelBase<MediaValueModel, MediaVariantRequestModel>
+public class CreateMediaRequestModel : CreateContentRequestModelBase<MediaValueModel, MediaVariantRequestModel>
 {
     public Guid ContentTypeKey { get; set; }
 }

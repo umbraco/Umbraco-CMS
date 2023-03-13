@@ -11,7 +11,7 @@ internal static class MediaBuilderExtensions
     internal static IUmbracoBuilder AddMedia(this IUmbracoBuilder builder)
     {
         builder.Services.AddTransient<IMediaPresentationModelFactory, MediaPresentationModelFactory>();
-        builder.Services.AddTransient<IMediaEditingFactory, MediaEditingFactory>();
+        builder.Services.AddTransient<IMediaEditingPresentationFactory, MediaEditingPresentationFactory>();
 
         builder.WithCollectionBuilder<MapDefinitionCollectionBuilder>().Add<MediaMapDefinition>();
 

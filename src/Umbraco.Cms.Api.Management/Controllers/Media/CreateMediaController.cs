@@ -14,13 +14,13 @@ namespace Umbraco.Cms.Api.Management.Controllers.Media;
 public class CreateMediaController : MediaControllerBase
 {
     private readonly IMediaEditingService _mediaEditingService;
-    private readonly IMediaEditingFactory _mediaEditingFactory;
+    private readonly IMediaEditingPresentationFactory _mediaEditingPresentationFactory;
     private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
 
-    public CreateMediaController(IMediaEditingService mediaEditingService, IMediaEditingFactory mediaEditingFactory, IBackOfficeSecurityAccessor backOfficeSecurityAccessor)
+    public CreateMediaController(IMediaEditingService mediaEditingService, IMediaEditingPresentationFactory mediaEditingPresentationFactory, IBackOfficeSecurityAccessor backOfficeSecurityAccessor)
     {
         _mediaEditingService = mediaEditingService;
-        _mediaEditingFactory = mediaEditingFactory;
+        _mediaEditingPresentationFactory = mediaEditingPresentationFactory;
         _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
     }
 
@@ -29,9 +29,9 @@ public class CreateMediaController : MediaControllerBase
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> Create(MediaCreateRequestModel createRequestModel)
+    public async Task<IActionResult> Create(CreateMediaRequestModel createRequestModel)
     {
-        MediaCreateModel model = _mediaEditingFactory.MapCreateModel(createRequestModel);
+        MediaCreateModel model = _mediaEditingPresentationFactory.MapCreateModel(createRequestModel);
         Attempt<IMedia?, ContentEditingOperationStatus> result = await _mediaEditingService.CreateAsync(model, CurrentUserId(_backOfficeSecurityAccessor));
 
         return result.Success

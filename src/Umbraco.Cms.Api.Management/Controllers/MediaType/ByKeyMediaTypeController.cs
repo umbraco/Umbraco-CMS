@@ -20,7 +20,7 @@ public class ByKeyMediaTypeController : MediaTypeControllerBase
 
     [HttpGet("{key:guid}")]
     [MapToApiVersion("1.0")]
-    [ProducesResponseType(typeof(MediaTypeViewModel), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(MediaTypeResponseModel), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> ByKey(Guid key)
     {
@@ -31,7 +31,7 @@ public class ByKeyMediaTypeController : MediaTypeControllerBase
             return NotFound();
         }
 
-        MediaTypeViewModel model = _umbracoMapper.Map<MediaTypeViewModel>(mediaType)!;
+        MediaTypeResponseModel model = _umbracoMapper.Map<MediaTypeResponseModel>(mediaType)!;
         return await Task.FromResult(Ok(model));
     }
 }

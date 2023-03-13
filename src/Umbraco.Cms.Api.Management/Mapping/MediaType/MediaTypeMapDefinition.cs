@@ -6,13 +6,13 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Mapping.MediaType;
 
-public class MediaTypeMapDefinition : ContentTypeMapDefinition<IMediaType, MediaTypePropertyTypeViewModel, MediaTypePropertyTypeContainerViewModel>, IMapDefinition
+public class MediaTypeMapDefinition : ContentTypeMapDefinition<IMediaType, MediaTypePropertyTypeResponseModel, MediaTypePropertyTypeContainerResponseModel>, IMapDefinition
 {
     public void DefineMaps(IUmbracoMapper mapper)
-        => mapper.Define<IMediaType, MediaTypeViewModel>((_, _) => new MediaTypeViewModel(), Map);
+        => mapper.Define<IMediaType, MediaTypeResponseModel>((_, _) => new MediaTypeResponseModel(), Map);
 
     // Umbraco.Code.MapAll
-    private void Map(IMediaType source, MediaTypeViewModel target, MapperContext context)
+    private void Map(IMediaType source, MediaTypeResponseModel target, MapperContext context)
     {
         target.Key = source.Key;
         target.Alias = source.Alias;

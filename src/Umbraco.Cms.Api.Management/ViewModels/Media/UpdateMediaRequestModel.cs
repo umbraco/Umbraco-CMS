@@ -2,6 +2,6 @@
 
 namespace Umbraco.Cms.Api.Management.ViewModels.Media;
 
-public class MediaUpdateRequestModel : ContentUpdateRequestModelBase<MediaValueModel, MediaVariantRequestModel>
+public class UpdateMediaRequestModel : UpdateContentRequestModelBase<MediaValueModel, MediaVariantRequestModel>
 {
 }

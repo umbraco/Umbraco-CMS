@@ -14,16 +14,16 @@ namespace Umbraco.Cms.Api.Management.Controllers.Media;
 public class UpdateMediaController : MediaControllerBase
 {
     private readonly IMediaEditingService _mediaEditingService;
-    private readonly IMediaEditingFactory _mediaEditingFactory;
+    private readonly IMediaEditingPresentationFactory _mediaEditingPresentationFactory;
     private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
 
     public UpdateMediaController(
         IMediaEditingService mediaEditingService,
-        IMediaEditingFactory mediaEditingFactory,
+        IMediaEditingPresentationFactory mediaEditingPresentationFactory,
         IBackOfficeSecurityAccessor backOfficeSecurityAccessor)
     {
         _mediaEditingService = mediaEditingService;
-        _mediaEditingFactory = mediaEditingFactory;
+        _mediaEditingPresentationFactory = mediaEditingPresentationFactory;
         _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
     }
 
@@ -32,7 +32,7 @@ public class UpdateMediaController : MediaControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> Update(Guid key, MediaUpdateRequestModel updateRequestModel)
+    public async Task<IActionResult> Update(Guid key, UpdateMediaRequestModel updateRequestModel)
     {
         IMedia? media = await _mediaEditingService.GetAsync(key);
         if (media == null)
@@ -40,7 +40,7 @@ public class UpdateMediaController : MediaControllerBase
             return MediaNotFound();
         }
 
-        MediaUpdateModel model = _mediaEditingFactory.MapUpdateModel(updateRequestModel);
+        MediaUpdateModel model = _mediaEditingPresentationFactory.MapUpdateModel(updateRequestModel);
         Attempt<IMedia, ContentEditingOperationStatus> result = await _mediaEditingService.UpdateAsync(media, model, CurrentUserId(_backOfficeSecurityAccessor));
 
         return result.Success

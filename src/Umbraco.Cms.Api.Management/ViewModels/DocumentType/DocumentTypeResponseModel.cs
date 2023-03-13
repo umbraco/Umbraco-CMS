@@ -2,7 +2,7 @@
 
 namespace Umbraco.Cms.Api.Management.ViewModels.DocumentType;
 
-public class DocumentTypeResponseModel : ContentTypePresentationBase<DocumentTypePropertyTypePresentationBase, DocumentTypePropertyTypeContainerPresentationBase>
+public class DocumentTypeResponseModel : ContentTypeResponseModelBase<DocumentTypePropertyTypeResponseModel, DocumentTypePropertyTypeContainerResponseModel>
 {
     public IEnumerable<Guid> AllowedTemplateKeys { get; set; } = Array.Empty<Guid>();
 

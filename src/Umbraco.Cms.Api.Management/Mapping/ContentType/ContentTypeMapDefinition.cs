@@ -6,12 +6,12 @@ using ContentTypeSort = Umbraco.Cms.Api.Management.ViewModels.ContentType.Conten
 
 namespace Umbraco.Cms.Api.Management.Mapping.ContentType;
 
-public abstract class ContentTypeMapDefinition<TContentType, TPropertyTypeViewModel, TPropertyTypeContainerViewModel>
+public abstract class ContentTypeMapDefinition<TContentType, TPropertyTypeResponseModel, TPropertyTypeContainerResponseModel>
     where TContentType : IContentTypeBase
-    where TPropertyTypeViewModel : PropertyTypePresentationBase, new()
-    where TPropertyTypeContainerViewModel : PropertyTypeContainerPresentationBase, new()
+    where TPropertyTypeResponseModel : PropertyTypeResponseModelBase, new()
+    where TPropertyTypeContainerResponseModel : PropertyTypeContainerResponseModelBase, new()
 {
-    protected IEnumerable<TPropertyTypeViewModel> MapPropertyTypes(TContentType source)
+    protected IEnumerable<TPropertyTypeResponseModel> MapPropertyTypes(TContentType source)
     {
         // create a mapping table between properties and their associated groups
         var groupKeysByPropertyKeys = source
@@ -21,7 +21,7 @@ public abstract class ContentTypeMapDefinition<TContentType, TPropertyTypeViewMo
             .ToDictionary(map => map.PropertyTypeKey, map => map.GroupKey);
 
         return source.PropertyTypes.Select(propertyType =>
-                new TPropertyTypeViewModel
+                new TPropertyTypeResponseModel
                 {
                     Key = propertyType.Key,
                     ContainerKey = groupKeysByPropertyKeys.ContainsKey(propertyType.Key)
@@ -48,7 +48,7 @@ public abstract class ContentTypeMapDefinition<TContentType, TPropertyTypeViewMo
             .ToArray();
     }
 
-    protected IEnumerable<TPropertyTypeContainerViewModel> MapPropertyTypeContainers(TContentType source)
+    protected IEnumerable<TPropertyTypeContainerResponseModel> MapPropertyTypeContainers(TContentType source)
     {
         // create a mapping table between property group aliases and keys
         var groupKeysByGroupAliases = source
@@ -66,7 +66,7 @@ public abstract class ContentTypeMapDefinition<TContentType, TPropertyTypeViewMo
         return source
             .PropertyGroups
             .Select(propertyGroup =>
-                new TPropertyTypeContainerViewModel
+                new TPropertyTypeContainerResponseModel
                 {
                     Key = propertyGroup.Key,
                     ParentKey = ParentGroupKey(propertyGroup),
