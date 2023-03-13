@@ -5,6 +5,7 @@ import { customElement, property, state } from 'lit/decorators.js';
 import { UmbDataTypeWorkspaceContext } from './data-type-workspace.context';
 import { UmbLitElement } from '@umbraco-cms/element';
 import { ManifestWorkspace } from '@umbraco-cms/extensions-registry';
+import { UmbRouteLocation } from 'src/backoffice/shared/components/workspace/workspace.element';
 
 /**
  * @element umb-data-type-workspace
@@ -33,7 +34,7 @@ export class UmbDataTypeWorkspaceElement extends UmbLitElement {
 	manifest?: ManifestWorkspace;
 
 	@property()
-	location?: any;
+	location?: UmbRouteLocation;
 
 	@state()
 	private _dataTypeName = '';
@@ -45,23 +46,17 @@ export class UmbDataTypeWorkspaceElement extends UmbLitElement {
 
 		this.consumeContext('umbWorkspaceContext', (workspaceContext: UmbDataTypeWorkspaceContext) => {
 			this.#workspaceContext = workspaceContext;
-
-			if (this.location?.name === 'create') {
-				this.#create(this.location?.params?.parentKey);
-			} else {
-				this.#load(this.location?.params?.key);
-			}
-
+			this.#init();
 			this.#observeName();
 		});
 	}
 
-	#load(key: string) {
-		this.#workspaceContext?.load(key);
-	}
-
-	#create(parentKey: string | null) {
-		this.#workspaceContext?.createScaffold(parentKey);
+	#init() {
+		if (this.location?.params?.parentKey) {
+			this.#workspaceContext?.createScaffold(this.location.params.parentKey);
+		} else if (this.location?.params?.key) {
+			this.#workspaceContext?.load(this.location.params.key);
+		}
 	}
 
 	#observeName() {
@@ -88,7 +83,7 @@ export class UmbDataTypeWorkspaceElement extends UmbLitElement {
 		if (!this.manifest) return nothing;
 		return html`
 			<umb-workspace-layout alias=${this.manifest?.alias}>
-				<uui-input id="header" slot="header" .value=${this._dataTypeName} @input="${this.#handleInput}"></uui-input>
+				<uui-input slot="header" id="header" .value=${this._dataTypeName} @input="${this.#handleInput}"></uui-input>
 			</umb-workspace-layout>
 		`;
 	}
