@@ -44,6 +44,11 @@ export const WithTags2: Story = {
 			'Mulberry',
 			'Lychee',
 			'Lemon',
+			'Apple',
+			'Banana',
+			'Dragonfruit',
+			'Blackberry',
+			'Raspberry',
 		],
 	},
 };
