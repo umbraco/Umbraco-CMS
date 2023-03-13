@@ -3,12 +3,15 @@ import type { ManifestElement } from './models';
 export interface ManifestSectionView extends ManifestElement {
 	type: 'sectionView';
 	meta: MetaSectionView;
+	conditions: ConditionsSectionView;
 }
 
 export interface MetaSectionView {
-	sections: Array<string>;
 	label: string;
 	pathname: string;
-	weight: number;
 	icon: string;
+}
+
+export interface ConditionsSectionView {
+	sections: Array<string>;
 }

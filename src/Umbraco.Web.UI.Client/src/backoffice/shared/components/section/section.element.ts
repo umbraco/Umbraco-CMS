@@ -154,11 +154,9 @@ export class UmbSectionElement extends UmbLitElement {
 
 	private _observeViews() {
 		this.observe(umbExtensionsRegistry?.extensionsOfType('sectionView'), (views) => {
-			const sectionViews = views
-				.filter((view) => {
-					return this._sectionAlias ? view.meta.sections.includes(this._sectionAlias) : false;
-				})
-				.sort((a, b) => b.meta.weight - a.meta.weight);
+			const sectionViews = views.filter((view) => {
+				return this._sectionAlias ? view.conditions.sections.includes(this._sectionAlias) : false;
+			});
 			if (sectionViews.length > 0) {
 				this._views = sectionViews;
 				this._createViewRoutes();

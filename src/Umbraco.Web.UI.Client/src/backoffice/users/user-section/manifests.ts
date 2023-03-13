@@ -19,12 +19,14 @@ const sectionsViews: Array<ManifestSectionView> = [
 		alias: 'Umb.SectionView.Users.Users',
 		name: 'Users Section View',
 		loader: () => import('./views/users/section-view-users.element'),
+		weight: 200,
 		meta: {
-			sections: [sectionAlias],
 			label: 'Users',
 			pathname: 'users',
-			weight: 200,
 			icon: 'umb:user',
+		},
+		conditions: {
+			sections: [sectionAlias],
 		},
 	},
 	{
@@ -32,12 +34,14 @@ const sectionsViews: Array<ManifestSectionView> = [
 		alias: 'Umb.SectionView.Users.UserGroups',
 		name: 'User Groups Section View',
 		loader: () => import('./views/user-groups/section-view-user-groups.element'),
+		weight: 100,
 		meta: {
-			sections: [sectionAlias],
 			label: 'User Groups',
 			pathname: 'user-groups',
-			weight: 100,
 			icon: 'umb:users',
+		},
+		conditions: {
+			sections: [sectionAlias],
 		},
 	},
 ];
