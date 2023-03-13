@@ -31,7 +31,7 @@ public class UpdateTemplateController : TemplateControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> Update(Guid key, TemplateUpdateModel updateModel)
+    public async Task<IActionResult> Update(Guid key, UpdateTemplateRequestModel requestModel)
     {
         ITemplate? template = await _templateService.GetAsync(key);
         if (template == null)
@@ -39,7 +39,7 @@ public class UpdateTemplateController : TemplateControllerBase
             return NotFound();
         }
 
-        template = _umbracoMapper.Map(updateModel, template);
+        template = _umbracoMapper.Map(requestModel, template);
 
         Attempt<ITemplate, TemplateOperationStatus> result = await _templateService.UpdateAsync(template, CurrentUserId(_backOfficeSecurityAccessor));
 

@@ -21,8 +21,8 @@ public class ByIsoCodeLanguageController : LanguageControllerBase
     [HttpGet($"{{{nameof(isoCode)}}}")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    [ProducesResponseType(typeof(LanguageViewModel), StatusCodes.Status200OK)]
-    public async Task<ActionResult<LanguageViewModel>> ByIsoCode(string isoCode)
+    [ProducesResponseType(typeof(LanguageResponseModel), StatusCodes.Status200OK)]
+    public async Task<ActionResult<LanguageResponseModel>> ByIsoCode(string isoCode)
     {
         ILanguage? language = await _languageService.GetAsync(isoCode);
         if (language == null)
@@ -30,6 +30,6 @@ public class ByIsoCodeLanguageController : LanguageControllerBase
             return NotFound();
         }
 
-        return Ok(_umbracoMapper.Map<LanguageViewModel>(language)!);
+        return Ok(_umbracoMapper.Map<LanguageResponseModel>(language)!);
     }
 }

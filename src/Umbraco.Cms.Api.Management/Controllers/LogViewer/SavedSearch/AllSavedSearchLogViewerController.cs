@@ -27,11 +27,11 @@ public class AllSavedSearchLogViewerController : SavedSearchLogViewerControllerB
     /// <returns>The paged result of the saved log searches.</returns>
     [HttpGet]
     [MapToApiVersion("1.0")]
-    [ProducesResponseType(typeof(PagedViewModel<SavedLogSearchViewModel>), StatusCodes.Status200OK)]
-    public async Task<ActionResult<PagedViewModel<SavedLogSearchViewModel>>> AllSavedSearches(int skip = 0, int take = 100)
+    [ProducesResponseType(typeof(PagedViewModel<SavedLogSearchResponseModel>), StatusCodes.Status200OK)]
+    public async Task<ActionResult<PagedViewModel<SavedLogSearchResponseModel>>> AllSavedSearches(int skip = 0, int take = 100)
     {
-        IReadOnlyList<ILogViewerQuery> savedLogQueries = await _logViewerService.GetSavedLogQueriesAsync();
+        IEnumerable<ILogViewerQuery> savedLogQueries = (await _logViewerService.GetSavedLogQueriesAsync()).Skip(skip).Take(take);
 
-        return Ok(_umbracoMapper.Map<PagedViewModel<SavedLogSearchViewModel>>(savedLogQueries.Skip(skip).Take(take)));
+        return Ok(_umbracoMapper.Map<PagedViewModel<SavedLogSearchResponseModel>>(savedLogQueries));
     }
 }

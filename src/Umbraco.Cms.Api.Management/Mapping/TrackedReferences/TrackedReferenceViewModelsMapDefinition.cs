@@ -8,11 +8,11 @@ public class TrackedReferenceViewModelsMapDefinition : IMapDefinition
 {
     public void DefineMaps(IUmbracoMapper mapper)
     {
-        mapper.Define<RelationItemModel, RelationItemViewModel>((source, context) => new RelationItemViewModel(), Map);
+        mapper.Define<RelationItemModel, RelationItemResponseModel>((source, context) => new RelationItemResponseModel(), Map);
     }
 
     // Umbraco.Code.MapAll
-    private void Map(RelationItemModel source, RelationItemViewModel target, MapperContext context)
+    private void Map(RelationItemModel source, RelationItemResponseModel target, MapperContext context)
     {
         target.ContentTypeAlias = source.ContentTypeAlias;
         target.ContentTypeIcon = source.ContentTypeIcon;

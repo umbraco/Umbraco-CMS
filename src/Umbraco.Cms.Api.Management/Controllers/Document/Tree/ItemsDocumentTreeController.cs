@@ -23,8 +23,8 @@ public class ItemsDocumentTreeController : DocumentTreeControllerBase
 
     [HttpGet("item")]
     [MapToApiVersion("1.0")]
-    [ProducesResponseType(typeof(IEnumerable<DocumentTreeItemViewModel>), StatusCodes.Status200OK)]
-    public async Task<ActionResult<IEnumerable<DocumentTreeItemViewModel>>> Items([FromQuery(Name = "key")] Guid[] keys, Guid? dataTypeKey = null, string? culture = null)
+    [ProducesResponseType(typeof(IEnumerable<DocumentTreeItemResponseModel>), StatusCodes.Status200OK)]
+    public async Task<ActionResult<IEnumerable<DocumentTreeItemResponseModel>>> Items([FromQuery(Name = "key")] Guid[] keys, Guid? dataTypeKey = null, string? culture = null)
     {
         IgnoreUserStartNodesForDataType(dataTypeKey);
         RenderForClientCulture(culture);

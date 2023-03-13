@@ -11,15 +11,15 @@ public class PackageViewModelMapDefinition : IMapDefinition
     public void DefineMaps(IUmbracoMapper mapper)
     {
         mapper.Define<PackageModelBase, PackageDefinition>((_, _) => new PackageDefinition(), Map);
-        mapper.Define<PackageDefinition, PackageDefinitionViewModel>(
-            (_, _) => new PackageDefinitionViewModel
+        mapper.Define<PackageDefinition, PackageDefinitionResponseModel>(
+            (_, _) => new PackageDefinitionResponseModel
             {
                 Name = string.Empty,
                 PackagePath = string.Empty
             },
             Map);
-        mapper.Define<InstalledPackage, PackageMigrationStatusViewModel>((_, _) => new PackageMigrationStatusViewModel { PackageName = string.Empty }, Map);
-        mapper.Define<IEnumerable<PackageDefinition>, PagedViewModel<PackageDefinitionViewModel>>((_, _) => new PagedViewModel<PackageDefinitionViewModel>(), Map);
+        mapper.Define<InstalledPackage, PackageMigrationStatusResponseModel>((_, _) => new PackageMigrationStatusResponseModel { PackageName = string.Empty }, Map);
+        mapper.Define<IEnumerable<PackageDefinition>, PagedViewModel<PackageDefinitionResponseModel>>((_, _) => new PagedViewModel<PackageDefinitionResponseModel>(), Map);
     }
 
     // Umbraco.Code.MapAll -Id -PackageId -PackagePath -Macros
@@ -42,7 +42,7 @@ public class PackageViewModelMapDefinition : IMapDefinition
     }
 
     // Umbraco.Code.MapAll
-    private static void Map(PackageDefinition source, PackageDefinitionViewModel target, MapperContext context)
+    private static void Map(PackageDefinition source, PackageDefinitionResponseModel target, MapperContext context)
     {
         target.Key = source.PackageId;
         target.Name = source.Name;
@@ -63,7 +63,7 @@ public class PackageViewModelMapDefinition : IMapDefinition
     }
 
     // Umbraco.Code.MapAll
-    private static void Map(InstalledPackage source, PackageMigrationStatusViewModel target, MapperContext context)
+    private static void Map(InstalledPackage source, PackageMigrationStatusResponseModel target, MapperContext context)
     {
         if (source.PackageName is not null)
         {
@@ -74,10 +74,10 @@ public class PackageViewModelMapDefinition : IMapDefinition
     }
 
     // Umbraco.Code.MapAll
-    private static void Map(IEnumerable<PackageDefinition> source, PagedViewModel<PackageDefinitionViewModel> target, MapperContext context)
+    private static void Map(IEnumerable<PackageDefinition> source, PagedViewModel<PackageDefinitionResponseModel> target, MapperContext context)
     {
         PackageDefinition[] definitions = source.ToArray();
-        target.Items = context.MapEnumerable<PackageDefinition, PackageDefinitionViewModel>(definitions);
+        target.Items = context.MapEnumerable<PackageDefinition, PackageDefinitionResponseModel>(definitions);
         target.Total = definitions.Length;
     }
 }

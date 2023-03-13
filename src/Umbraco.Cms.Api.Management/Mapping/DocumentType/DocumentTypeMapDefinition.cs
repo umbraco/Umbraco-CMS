@@ -7,13 +7,13 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Mapping.DocumentType;
 
-public class DocumentTypeMapDefinition : ContentTypeMapDefinition<IContentType, DocumentTypePropertyTypeViewModel, DocumentTypePropertyTypeContainerViewModel>, IMapDefinition
+public class DocumentTypeMapDefinition : ContentTypeMapDefinition<IContentType, DocumentTypePropertyTypePresentationBase, DocumentTypePropertyTypeContainerPresentationBase>, IMapDefinition
 {
     public void DefineMaps(IUmbracoMapper mapper)
-        => mapper.Define<IContentType, DocumentTypeViewModel>((_, _) => new DocumentTypeViewModel(), Map);
+        => mapper.Define<IContentType, DocumentTypeResponseModel>((_, _) => new DocumentTypeResponseModel(), Map);
 
     // Umbraco.Code.MapAll
-    private void Map(IContentType source, DocumentTypeViewModel target, MapperContext context)
+    private void Map(IContentType source, DocumentTypeResponseModel target, MapperContext context)
     {
         target.Key = source.Key;
         target.Alias = source.Alias;

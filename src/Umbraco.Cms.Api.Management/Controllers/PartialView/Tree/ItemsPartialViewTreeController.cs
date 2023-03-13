@@ -14,7 +14,7 @@ public class ItemsPartialViewTreeController : PartialViewTreeControllerBase
 
     [HttpGet("item")]
     [MapToApiVersion("1.0")]
-    [ProducesResponseType(typeof(IEnumerable<FileSystemTreeItemViewModel>), StatusCodes.Status200OK)]
-    public async Task<ActionResult<IEnumerable<FileSystemTreeItemViewModel>>> Items([FromQuery(Name = "path")] string[] paths)
+    [ProducesResponseType(typeof(IEnumerable<FileSystemTreeItemPresentationModel>), StatusCodes.Status200OK)]
+    public async Task<ActionResult<IEnumerable<FileSystemTreeItemPresentationModel>>> Items([FromQuery(Name = "path")] string[] paths)
         => await GetItems(paths);
 }

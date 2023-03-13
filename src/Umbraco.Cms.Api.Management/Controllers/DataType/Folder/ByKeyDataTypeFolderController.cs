@@ -15,7 +15,7 @@ public class ByKeyDataTypeFolderController : DataTypeFolderControllerBase
 
     [HttpGet("{key:guid}")]
     [MapToApiVersion("1.0")]
-    [ProducesResponseType(typeof(FolderViewModel), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(FolderReponseModel), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> ByKey(Guid key) => await GetFolderAsync(key);
 }

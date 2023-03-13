@@ -28,14 +28,14 @@ public class AllMigrationStatusPackageController : PackageControllerBase
     /// <returns>The paged result of the installed packages migration status.</returns>
     [HttpGet("migration-status")]
     [MapToApiVersion("1.0")]
-    [ProducesResponseType(typeof(PagedViewModel<PackageMigrationStatusViewModel>), StatusCodes.Status200OK)]
-    public async Task<ActionResult<PagedViewModel<PackageMigrationStatusViewModel>>> AllMigrationStatuses(int skip = 0, int take = 100)
+    [ProducesResponseType(typeof(PagedViewModel<PackageMigrationStatusResponseModel>), StatusCodes.Status200OK)]
+    public async Task<ActionResult<PagedViewModel<PackageMigrationStatusResponseModel>>> AllMigrationStatuses(int skip = 0, int take = 100)
     {
         PagedModel<InstalledPackage> migrationPlans = await _packagingService.GetInstalledPackagesFromMigrationPlansAsync(skip, take);
 
-        IEnumerable<PackageMigrationStatusViewModel> viewModels = _umbracoMapper.MapEnumerable<InstalledPackage, PackageMigrationStatusViewModel>(migrationPlans.Items);
+        IEnumerable<PackageMigrationStatusResponseModel> viewModels = _umbracoMapper.MapEnumerable<InstalledPackage, PackageMigrationStatusResponseModel>(migrationPlans.Items);
 
-        return Ok(new PagedViewModel<PackageMigrationStatusViewModel>()
+        return Ok(new PagedViewModel<PackageMigrationStatusResponseModel>()
         {
             Total = migrationPlans.Total,
             Items = viewModels,

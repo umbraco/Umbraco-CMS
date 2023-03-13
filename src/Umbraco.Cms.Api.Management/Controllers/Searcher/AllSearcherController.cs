@@ -20,14 +20,14 @@ public class AllSearcherController : SearcherControllerBase
     /// <returns></returns>
     [HttpGet]
     [MapToApiVersion("1.0")]
-    [ProducesResponseType(typeof(PagedViewModel<SearcherViewModel>), StatusCodes.Status200OK)]
-    public async Task<ActionResult<PagedViewModel<SearcherViewModel>>> All(int skip, int take)
+    [ProducesResponseType(typeof(PagedViewModel<SearcherResponse>), StatusCodes.Status200OK)]
+    public async Task<ActionResult<PagedViewModel<SearcherResponse>>> All(int skip, int take)
     {
-        var searchers = new List<SearcherViewModel>(
-            _examineManager.RegisteredSearchers.Select(searcher => new SearcherViewModel { Name = searcher.Name })
+        var searchers = new List<SearcherResponse>(
+            _examineManager.RegisteredSearchers.Select(searcher => new SearcherResponse { Name = searcher.Name })
                 .OrderBy(x =>
                     x.Name.TrimEnd("Searcher"))); // order by name , but strip the "Searcher" from the end if it exists
-        var viewModel = new PagedViewModel<SearcherViewModel>
+        var viewModel = new PagedViewModel<SearcherResponse>
         {
             Items = searchers.Skip(skip).Take(take),
             Total = searchers.Count,

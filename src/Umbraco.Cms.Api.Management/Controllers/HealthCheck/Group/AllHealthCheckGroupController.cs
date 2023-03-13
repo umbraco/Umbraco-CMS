@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Common.ViewModels.Pagination;
 using Umbraco.Cms.Api.Management.Factories;
+using Umbraco.Cms.Api.Management.Mapping.HealthCheck;
 using Umbraco.Cms.Api.Management.ViewModels.HealthCheck;
 using Umbraco.Cms.Core.Mapping;
 
@@ -9,14 +10,14 @@ namespace Umbraco.Cms.Api.Management.Controllers.HealthCheck.Group;
 
 public class AllHealthCheckGroupController : HealthCheckGroupControllerBase
 {
-    private readonly IHealthCheckGroupViewModelFactory _healthCheckGroupViewModelFactory;
+    private readonly IHealthCheckGroupPresentationFactory _healthCheckGroupPresentationFactory;
     private readonly IUmbracoMapper _umbracoMapper;
 
     public AllHealthCheckGroupController(
-        IHealthCheckGroupViewModelFactory healthCheckGroupViewModelFactory,
+        IHealthCheckGroupPresentationFactory healthCheckGroupPresentationFactory,
         IUmbracoMapper umbracoMapper)
     {
-        _healthCheckGroupViewModelFactory = healthCheckGroupViewModelFactory;
+        _healthCheckGroupPresentationFactory = healthCheckGroupPresentationFactory;
         _umbracoMapper = umbracoMapper;
     }
 
@@ -28,14 +29,14 @@ public class AllHealthCheckGroupController : HealthCheckGroupControllerBase
     /// <returns>The paged result of health checks group names.</returns>
     [HttpGet]
     [MapToApiVersion("1.0")]
-    [ProducesResponseType(typeof(PagedViewModel<HealthCheckGroupModelBase>), StatusCodes.Status200OK)]
-    public async Task<ActionResult<PagedViewModel<HealthCheckGroupModelBase>>> All(int skip = 0, int take = 100)
+    [ProducesResponseType(typeof(PagedViewModel<HealthCheckGroupResponseModel>), StatusCodes.Status200OK)]
+    public async Task<ActionResult<PagedViewModel<HealthCheckGroupResponseModel>>> All(int skip = 0, int take = 100)
     {
-        IEnumerable<IGrouping<string?, Core.HealthChecks.HealthCheck>> groups = _healthCheckGroupViewModelFactory
+        IEnumerable<IGrouping<string?, Core.HealthChecks.HealthCheck>> groups = _healthCheckGroupPresentationFactory
             .CreateGroupingFromHealthCheckCollection()
             .Skip(skip)
             .Take(take);
 
-        return await Task.FromResult(Ok(_umbracoMapper.Map<PagedViewModel<HealthCheckGroupModelBase>>(groups)));
+        return await Task.FromResult(Ok(_umbracoMapper.Map<PagedViewModel<HealthCheckGroupResponseModel>>(groups)));
     }
 }

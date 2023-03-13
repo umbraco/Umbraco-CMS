@@ -10,12 +10,12 @@ namespace Umbraco.Cms.Api.Management.Controllers.Document;
 public class ByKeyDocumentController : DocumentControllerBase
 {
     private readonly IContentEditingService _contentEditingService;
-    private readonly IDocumentPresentationModelFactory _documentPresentationModelFactory;
+    private readonly IDocumentPresentationFactory _documentPresentationFactory;
 
-    public ByKeyDocumentController(IContentEditingService contentEditingService, IDocumentPresentationModelFactory documentPresentationModelFactory)
+    public ByKeyDocumentController(IContentEditingService contentEditingService, IDocumentPresentationFactory documentPresentationFactory)
     {
         _contentEditingService = contentEditingService;
-        _documentPresentationModelFactory = documentPresentationModelFactory;
+        _documentPresentationFactory = documentPresentationFactory;
     }
 
     [HttpGet("{key:guid}")]
@@ -30,7 +30,7 @@ public class ByKeyDocumentController : DocumentControllerBase
             return DocumentNotFound();
         }
 
-        DocumentResponseModel model = await _documentPresentationModelFactory.CreateResponseModelAsync(content);
+        DocumentResponseModel model = await _documentPresentationFactory.CreateResponseModelAsync(content);
         return Ok(model);
     }
 }

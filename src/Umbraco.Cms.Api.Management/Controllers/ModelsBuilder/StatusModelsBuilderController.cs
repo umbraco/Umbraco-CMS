@@ -14,15 +14,15 @@ public class StatusModelsBuilderController : ModelsBuilderControllerBase
     public StatusModelsBuilderController(OutOfDateModelsStatus outOfDateModelsStatus) => _outOfDateModelsStatus = outOfDateModelsStatus;
 
     [HttpGet("status")]
-    [ProducesResponseType(typeof(OutOfDateStatusViewModel), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(OutOfDateStatusResponseModel), StatusCodes.Status200OK)]
     [MapToApiVersion("1.0")]
-    public async Task<ActionResult<OutOfDateStatusViewModel>> GetModelsOutOfDateStatus()
+    public async Task<ActionResult<OutOfDateStatusResponseModel>> GetModelsOutOfDateStatus()
     {
-        OutOfDateStatusViewModel status = _outOfDateModelsStatus.IsEnabled
+        OutOfDateStatusResponseModel status = _outOfDateModelsStatus.IsEnabled
             ? _outOfDateModelsStatus.IsOutOfDate
-                ? new OutOfDateStatusViewModel { Status = OutOfDateType.OutOfDate }
-                : new OutOfDateStatusViewModel { Status = OutOfDateType.Current }
-            : new OutOfDateStatusViewModel { Status = OutOfDateType.Unknown };
+                ? new OutOfDateStatusResponseModel { Status = OutOfDateType.OutOfDate }
+                : new OutOfDateStatusResponseModel { Status = OutOfDateType.Current }
+            : new OutOfDateStatusResponseModel { Status = OutOfDateType.Unknown };
 
         return await Task.FromResult(Ok(status));
     }

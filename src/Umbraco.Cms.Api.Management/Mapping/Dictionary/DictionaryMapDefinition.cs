@@ -9,15 +9,15 @@ public class DictionaryMapDefinition : IMapDefinition
 {
     public void DefineMaps(IUmbracoMapper mapper)
     {
-        mapper.Define<IDictionaryItem, DictionaryItemViewModel>((_, _) => new DictionaryItemViewModel(), Map);
+        mapper.Define<IDictionaryItem, DictionaryItemResponseModel>((_, _) => new DictionaryItemResponseModel(), Map);
         mapper.Define<IDictionaryTranslation, DictionaryItemTranslationModel>((_, _) => new DictionaryItemTranslationModel(), Map);
-        mapper.Define<DictionaryItemUpdateModel, IDictionaryItem>((_, _) => new DictionaryItem(string.Empty), Map);
-        mapper.Define<DictionaryItemCreateModel, IDictionaryItem>((_, _) => new DictionaryItem(string.Empty), Map);
-        mapper.Define<IDictionaryItem, DictionaryOverviewViewModel>((_, _) => new DictionaryOverviewViewModel(), Map);
+        mapper.Define<UpdateDictionaryItemRequestModel, IDictionaryItem>((_, _) => new DictionaryItem(string.Empty), Map);
+        mapper.Define<CreateDictionaryItemRequestModel, IDictionaryItem>((_, _) => new DictionaryItem(string.Empty), Map);
+        mapper.Define<IDictionaryItem, DictionaryOverviewResponseModel>((_, _) => new DictionaryOverviewResponseModel(), Map);
     }
 
     // Umbraco.Code.MapAll -Translations
-    private void Map(IDictionaryItem source, DictionaryItemViewModel target, MapperContext context)
+    private void Map(IDictionaryItem source, DictionaryItemResponseModel target, MapperContext context)
     {
         target.Key = source.Key;
         target.Name = source.ItemKey;
@@ -31,14 +31,14 @@ public class DictionaryMapDefinition : IMapDefinition
     }
 
     // Umbraco.Code.MapAll -Id -Key -CreateDate -UpdateDate -ParentId -Translations
-    private void Map(DictionaryItemUpdateModel source, IDictionaryItem target, MapperContext context)
+    private void Map(UpdateDictionaryItemRequestModel source, IDictionaryItem target, MapperContext context)
     {
         target.ItemKey = source.Name;
         target.DeleteDate = null;
     }
 
     // Umbraco.Code.MapAll -Id -Key -CreateDate -UpdateDate -Translations
-    private void Map(DictionaryItemCreateModel source, IDictionaryItem target, MapperContext context)
+    private void Map(CreateDictionaryItemRequestModel source, IDictionaryItem target, MapperContext context)
     {
         target.ItemKey = source.Name;
         target.ParentId = source.ParentKey;
@@ -46,7 +46,7 @@ public class DictionaryMapDefinition : IMapDefinition
     }
 
     // Umbraco.Code.MapAll
-    private void Map(IDictionaryItem source, DictionaryOverviewViewModel target, MapperContext context)
+    private void Map(IDictionaryItem source, DictionaryOverviewResponseModel target, MapperContext context)
     {
         target.Key = source.Key;
         target.Name = source.ItemKey;
