@@ -9,7 +9,7 @@ using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Api.Management.Factories;
 
-public class AuditLogViewModelFactory : IAuditLogViewModelFactory
+public class AuditLogPresentationFactory : IAuditLogPresentationFactory
 {
     private readonly IUserService _userService;
     private readonly AppCaches _appCaches;
@@ -17,7 +17,7 @@ public class AuditLogViewModelFactory : IAuditLogViewModelFactory
     private readonly IImageUrlGenerator _imageUrlGenerator;
     private readonly IEntityService _entityService;
 
-    public AuditLogViewModelFactory(IUserService userService, AppCaches appCaches, MediaFileManager mediaFileManager, IImageUrlGenerator imageUrlGenerator, IEntityService entityService)
+    public AuditLogPresentationFactory(IUserService userService, AppCaches appCaches, MediaFileManager mediaFileManager, IImageUrlGenerator imageUrlGenerator, IEntityService entityService)
     {
         _userService = userService;
         _appCaches = appCaches;

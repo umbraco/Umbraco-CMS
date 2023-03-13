@@ -5,13 +5,13 @@ using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Api.Management.Factories;
 
-public class DocumentPresentationModelFactory : IDocumentPresentationModelFactory
+public class DocumentPresentationFactory : IDocumentPresentationFactory
 {
     private readonly IUmbracoMapper _umbracoMapper;
     private readonly IContentUrlFactory _contentUrlFactory;
     private readonly IFileService _fileService;
 
-    public DocumentPresentationModelFactory(
+    public DocumentPresentationFactory(
         IUmbracoMapper umbracoMapper,
         IContentUrlFactory contentUrlFactory,
         IFileService fileService)

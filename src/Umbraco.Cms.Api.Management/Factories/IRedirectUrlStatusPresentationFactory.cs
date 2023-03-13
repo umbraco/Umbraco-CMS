@@ -2,7 +2,7 @@
 
 namespace Umbraco.Cms.Api.Management.Factories;
 
-public interface IRedirectUrlStatusViewModelFactory
+public interface IRedirectUrlStatusPresentationFactory
 {
     RedirectUrlStatusResponseModel CreateViewModel();
 }

@@ -3,7 +3,7 @@ using Umbraco.Cms.Core.Models;
 
 namespace Umbraco.Cms.Api.Management.Factories;
 
-public interface IRedirectUrlViewModelFactory
+public interface IRedirectUrlPresentationFactory
 {
     RedirectUrlResponseModel Create(IRedirectUrl source);
 

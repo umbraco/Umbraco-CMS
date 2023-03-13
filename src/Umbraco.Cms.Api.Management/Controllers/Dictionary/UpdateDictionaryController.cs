@@ -14,16 +14,16 @@ public class UpdateDictionaryController : DictionaryControllerBase
 {
     private readonly IDictionaryItemService _dictionaryItemService;
     private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
-    private readonly IDictionaryFactory _dictionaryFactory;
+    private readonly IDictionaryPresentationFactory _dictionaryPresentationFactory;
 
     public UpdateDictionaryController(
         IDictionaryItemService dictionaryItemService,
         IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
-        IDictionaryFactory dictionaryFactory)
+        IDictionaryPresentationFactory dictionaryPresentationFactory)
     {
         _dictionaryItemService = dictionaryItemService;
         _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
-        _dictionaryFactory = dictionaryFactory;
+        _dictionaryPresentationFactory = dictionaryPresentationFactory;
     }
 
     [HttpPut($"{{{nameof(key)}:guid}}")]
@@ -39,7 +39,7 @@ public class UpdateDictionaryController : DictionaryControllerBase
             return NotFound();
         }
 
-        IDictionaryItem updated = await _dictionaryFactory.MapUpdateModelToDictionaryItemAsync(current, updateDictionaryItemRequestModel);
+        IDictionaryItem updated = await _dictionaryPresentationFactory.MapUpdateModelToDictionaryItemAsync(current, updateDictionaryItemRequestModel);
 
         Attempt<IDictionaryItem, DictionaryItemOperationStatus> result =
             await _dictionaryItemService.UpdateAsync(updated, CurrentUserId(_backOfficeSecurityAccessor));

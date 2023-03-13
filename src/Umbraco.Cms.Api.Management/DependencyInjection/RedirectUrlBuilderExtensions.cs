@@ -9,8 +9,8 @@ internal static class RedirectUrlBuilderExtensions
     internal static IUmbracoBuilder AddRedirectUrl(this IUmbracoBuilder builder)
     {
         builder.Services
-            .AddTransient<IRedirectUrlStatusViewModelFactory, RedirectUrlStatusViewModelFactory>()
-            .AddTransient<IRedirectUrlViewModelFactory, RedirectUrlViewModelFactory>();
+            .AddTransient<IRedirectUrlStatusPresentationFactory, RedirectUrlStatusPresentationFactory>()
+            .AddTransient<IRedirectUrlPresentationFactory, RedirectUrlPresentationFactory>();
 
         return builder;
     }

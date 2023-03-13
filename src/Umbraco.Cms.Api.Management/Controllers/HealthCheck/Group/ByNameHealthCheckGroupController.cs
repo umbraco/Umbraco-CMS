@@ -9,14 +9,14 @@ namespace Umbraco.Cms.Api.Management.Controllers.HealthCheck.Group;
 
 public class ByNameHealthCheckGroupController : HealthCheckGroupControllerBase
 {
-    private readonly IHealthCheckGroupViewModelFactory _healthCheckGroupViewModelFactory;
+    private readonly IHealthCheckGroupPresentationFactory _healthCheckGroupPresentationFactory;
     private readonly IUmbracoMapper _umbracoMapper;
 
     public ByNameHealthCheckGroupController(
-        IHealthCheckGroupViewModelFactory healthCheckGroupViewModelFactory,
+        IHealthCheckGroupPresentationFactory healthCheckGroupPresentationFactory,
         IUmbracoMapper umbracoMapper)
     {
-        _healthCheckGroupViewModelFactory = healthCheckGroupViewModelFactory;
+        _healthCheckGroupPresentationFactory = healthCheckGroupPresentationFactory;
         _umbracoMapper = umbracoMapper;
     }
 
@@ -31,7 +31,7 @@ public class ByNameHealthCheckGroupController : HealthCheckGroupControllerBase
     [ProducesResponseType(typeof(HealthCheckGroupPresentationModel), StatusCodes.Status200OK)]
     public async Task<ActionResult<HealthCheckGroupPresentationModel>> ByName(string name)
     {
-        IEnumerable<IGrouping<string?, Core.HealthChecks.HealthCheck>> groups = _healthCheckGroupViewModelFactory
+        IEnumerable<IGrouping<string?, Core.HealthChecks.HealthCheck>> groups = _healthCheckGroupPresentationFactory
             .CreateGroupingFromHealthCheckCollection();
 
         IGrouping<string?, Core.HealthChecks.HealthCheck>? group = groups.FirstOrDefault(x => x.Key.InvariantEquals(name.Trim()));

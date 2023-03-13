@@ -7,17 +7,17 @@ using Umbraco.Cms.Core.Mapping;
 
 namespace Umbraco.Cms.Api.Management.Factories;
 
-public class HealthCheckGroupViewModelFactory : IHealthCheckGroupViewModelFactory
+public class HealthCheckGroupPresentationFactory : IHealthCheckGroupPresentationFactory
 {
     private readonly HealthChecksSettings _healthChecksSettings;
     private readonly HealthCheckCollection _healthChecks;
-    private readonly ILogger<IHealthCheckGroupViewModelFactory> _logger;
+    private readonly ILogger<IHealthCheckGroupPresentationFactory> _logger;
     private readonly IUmbracoMapper _umbracoMapper;
 
-    public HealthCheckGroupViewModelFactory(
+    public HealthCheckGroupPresentationFactory(
         IOptions<HealthChecksSettings> healthChecksSettings,
         HealthCheckCollection healthChecks,
-        ILogger<IHealthCheckGroupViewModelFactory> logger,
+        ILogger<IHealthCheckGroupPresentationFactory> logger,
         IUmbracoMapper umbracoMapper)
     {
         _healthChecksSettings = healthChecksSettings.Value;

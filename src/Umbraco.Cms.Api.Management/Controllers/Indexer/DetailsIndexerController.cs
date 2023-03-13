@@ -9,14 +9,14 @@ namespace Umbraco.Cms.Api.Management.Controllers.Indexer;
 [ApiVersion("1.0")]
 public class DetailsIndexerController : IndexerControllerBase
 {
-    private readonly IIndexViewModelFactory _indexViewModelFactory;
+    private readonly IIndexPresentationFactory _indexPresentationFactory;
     private readonly IExamineManager _examineManager;
 
     public DetailsIndexerController(
-        IIndexViewModelFactory indexViewModelFactory,
+        IIndexPresentationFactory indexPresentationFactory,
         IExamineManager examineManager)
     {
-        _indexViewModelFactory = indexViewModelFactory;
+        _indexPresentationFactory = indexPresentationFactory;
         _examineManager = examineManager;
     }
 
@@ -37,7 +37,7 @@ public class DetailsIndexerController : IndexerControllerBase
     {
         if (_examineManager.TryGetIndex(indexName, out IIndex? index))
         {
-            return await Task.FromResult(_indexViewModelFactory.Create(index!));
+            return await Task.FromResult(_indexPresentationFactory.Create(index!));
         }
 
         var invalidModelProblem = new ProblemDetails

@@ -2,7 +2,7 @@
 
 namespace Umbraco.Cms.Api.Management.Factories;
 
-public interface IModelsBuilderViewModelFactory
+public interface IModelsBuilderPresentationFactory
 {
     ModelsBuilderResponseModel Create();
 }

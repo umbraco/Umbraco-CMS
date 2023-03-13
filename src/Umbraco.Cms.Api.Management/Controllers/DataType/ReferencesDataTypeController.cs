@@ -11,12 +11,12 @@ namespace Umbraco.Cms.Api.Management.Controllers.DataType;
 public class ReferencesDataTypeController : DataTypeControllerBase
 {
     private readonly IDataTypeService _dataTypeService;
-    private readonly IDataTypeReferenceViewModelFactory _dataTypeReferenceViewModelFactory;
+    private readonly IDataTypeReferencePresentationFactory _dataTypeReferencePresentationFactory;
 
-    public ReferencesDataTypeController(IDataTypeService dataTypeService, IDataTypeReferenceViewModelFactory dataTypeReferenceViewModelFactory)
+    public ReferencesDataTypeController(IDataTypeService dataTypeService, IDataTypeReferencePresentationFactory dataTypeReferencePresentationFactory)
     {
         _dataTypeService = dataTypeService;
-        _dataTypeReferenceViewModelFactory = dataTypeReferenceViewModelFactory;
+        _dataTypeReferencePresentationFactory = dataTypeReferencePresentationFactory;
     }
 
     [HttpGet("{key:guid}/references")]
@@ -31,7 +31,7 @@ public class ReferencesDataTypeController : DataTypeControllerBase
             return DataTypeOperationStatusResult(result.Status);
         }
 
-        DataTypeReferenceResponseModel[] viewModels = _dataTypeReferenceViewModelFactory.CreateDataTypeReferenceViewModels(result.Result).ToArray();
+        DataTypeReferenceResponseModel[] viewModels = _dataTypeReferencePresentationFactory.CreateDataTypeReferenceViewModels(result.Result).ToArray();
         return Ok(viewModels);
     }
 }

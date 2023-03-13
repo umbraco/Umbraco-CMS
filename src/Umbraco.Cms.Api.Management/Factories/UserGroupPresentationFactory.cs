@@ -11,13 +11,13 @@ using Umbraco.Extensions;
 namespace Umbraco.Cms.Api.Management.Factories;
 
 /// <inheritdoc />
-public class UserGroupViewModelFactory : IUserGroupViewModelFactory
+public class UserGroupPresentationFactory : IUserGroupPresentationFactory
 {
     private readonly IEntityService _entityService;
     private readonly IShortStringHelper _shortStringHelper;
     private readonly ILanguageService _languageService;
 
-    public UserGroupViewModelFactory(
+    public UserGroupPresentationFactory(
         IEntityService entityService,
         IShortStringHelper shortStringHelper,
         ILanguageService languageService)

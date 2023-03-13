@@ -14,13 +14,13 @@ namespace Umbraco.Cms.Api.Management.Controllers.Document;
 public class CreateDocumentController : DocumentControllerBase
 {
     private readonly IContentEditingService _contentEditingService;
-    private readonly IDocumentEditingFactory _documentEditingFactory;
+    private readonly IDocumentEditingPresentationFactory _documentEditingPresentationFactory;
     private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
 
-    public CreateDocumentController(IContentEditingService contentEditingService, IDocumentEditingFactory documentEditingFactory, IBackOfficeSecurityAccessor backOfficeSecurityAccessor)
+    public CreateDocumentController(IContentEditingService contentEditingService, IDocumentEditingPresentationFactory documentEditingPresentationFactory, IBackOfficeSecurityAccessor backOfficeSecurityAccessor)
     {
         _contentEditingService = contentEditingService;
-        _documentEditingFactory = documentEditingFactory;
+        _documentEditingPresentationFactory = documentEditingPresentationFactory;
         _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
     }
 
@@ -31,7 +31,7 @@ public class CreateDocumentController : DocumentControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Create(CreateDocumentRequestModel requestModel)
     {
-        ContentCreateModel model = _documentEditingFactory.MapCreateModel(requestModel);
+        ContentCreateModel model = _documentEditingPresentationFactory.MapCreateModel(requestModel);
         Attempt<IContent?, ContentEditingOperationStatus> result = await _contentEditingService.CreateAsync(model, CurrentUserId(_backOfficeSecurityAccessor));
 
         return result.Success

@@ -12,14 +12,14 @@ namespace Umbraco.Cms.Api.Management.Controllers.RedirectUrlManagement;
 public class GetAllRedirectUrlManagementController : RedirectUrlManagementBaseController
 {
     private readonly IRedirectUrlService _redirectUrlService;
-    private readonly IRedirectUrlViewModelFactory _redirectUrlViewModelFactory;
+    private readonly IRedirectUrlPresentationFactory _redirectUrlPresentationFactory;
 
     public GetAllRedirectUrlManagementController(
         IRedirectUrlService redirectUrlService,
-        IRedirectUrlViewModelFactory redirectUrlViewModelFactory)
+        IRedirectUrlPresentationFactory redirectUrlPresentationFactory)
     {
         _redirectUrlService = redirectUrlService;
-        _redirectUrlViewModelFactory = redirectUrlViewModelFactory;
+        _redirectUrlPresentationFactory = redirectUrlPresentationFactory;
     }
 
     [HttpGet]
@@ -37,7 +37,7 @@ public class GetAllRedirectUrlManagementController : RedirectUrlManagementBaseCo
             ? _redirectUrlService.GetAllRedirectUrls(pageNumber, pageSize, out total)
             : _redirectUrlService.SearchRedirectUrls(filter, pageNumber, pageSize, out total);
 
-        IEnumerable<RedirectUrlResponseModel> redirectViewModels = _redirectUrlViewModelFactory.CreateMany(redirects);
+        IEnumerable<RedirectUrlResponseModel> redirectViewModels = _redirectUrlPresentationFactory.CreateMany(redirects);
         return new PagedViewModel<RedirectUrlResponseModel> { Items = redirectViewModels, Total = total };
     }
 }

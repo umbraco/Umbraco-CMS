@@ -3,7 +3,7 @@ using Umbraco.Cms.Core.Models.ContentEditing;
 
 namespace Umbraco.Cms.Api.Management.Factories;
 
-internal sealed class DocumentEditingFactory : ContentEditingFactory<DocumentValueModel, DocumentVariantRequestModel>, IDocumentEditingFactory
+internal sealed class DocumentEditingPresentationFactory : ContentEditingPresentationFactory<DocumentValueModel, DocumentVariantRequestModel>, IDocumentEditingPresentationFactory
 {
     public ContentCreateModel MapCreateModel(CreateDocumentRequestModel requestModel)
     {

@@ -7,12 +7,12 @@ using Umbraco.New.Cms.Core.Models.RedirectUrlManagement;
 
 namespace Umbraco.Cms.Api.Management.Factories;
 
-public class RedirectUrlStatusViewModelFactory : IRedirectUrlStatusViewModelFactory
+public class RedirectUrlStatusPresentationFactory : IRedirectUrlStatusPresentationFactory
 {
     private readonly IOptionsMonitor<WebRoutingSettings> _webRoutingSettings;
     private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
 
-    public RedirectUrlStatusViewModelFactory(
+    public RedirectUrlStatusPresentationFactory(
         IOptionsMonitor<WebRoutingSettings> webRoutingSettings,
         IBackOfficeSecurityAccessor backOfficeSecurityAccessor)
     {

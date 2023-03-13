@@ -12,14 +12,14 @@ namespace Umbraco.Cms.Api.Management.Controllers.UserGroups;
 public class UpdateUserGroupController : UserGroupsControllerBase
 {
     private readonly IUserGroupService _userGroupService;
-    private readonly IUserGroupViewModelFactory _userGroupViewModelFactory;
+    private readonly IUserGroupPresentationFactory _userGroupPresentationFactory;
 
     public UpdateUserGroupController(
         IUserGroupService userGroupService,
-        IUserGroupViewModelFactory userGroupViewModelFactory)
+        IUserGroupPresentationFactory userGroupPresentationFactory)
     {
         _userGroupService = userGroupService;
-        _userGroupViewModelFactory = userGroupViewModelFactory;
+        _userGroupPresentationFactory = userGroupPresentationFactory;
     }
 
     [HttpPut("{key:guid}")]
@@ -35,7 +35,7 @@ public class UpdateUserGroupController : UserGroupsControllerBase
             return UserGroupOperationStatusResult(UserGroupOperationStatus.NotFound);
         }
 
-        Attempt<IUserGroup, UserGroupOperationStatus> userGroupUpdateAttempt = await _userGroupViewModelFactory.UpdateAsync(existingUserGroup, dataTypeRequestModel);
+        Attempt<IUserGroup, UserGroupOperationStatus> userGroupUpdateAttempt = await _userGroupPresentationFactory.UpdateAsync(existingUserGroup, dataTypeRequestModel);
         if (userGroupUpdateAttempt.Success is false)
         {
             return UserGroupOperationStatusResult(userGroupUpdateAttempt.Status);

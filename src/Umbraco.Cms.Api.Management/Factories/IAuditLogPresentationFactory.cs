@@ -3,7 +3,7 @@ using Umbraco.Cms.Core.Models;
 
 namespace Umbraco.Cms.Api.Management.Factories;
 
-public interface IAuditLogViewModelFactory
+public interface IAuditLogPresentationFactory
 {
     IEnumerable<AuditLogResponseModel> CreateAuditLogViewModel(IEnumerable<IAuditItem> auditItems);
 

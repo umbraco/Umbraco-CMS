@@ -7,12 +7,12 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Factories;
 
-public class DictionaryFactory : IDictionaryFactory
+public class DictionaryPresentationFactory : IDictionaryPresentationFactory
 {
     private readonly IUmbracoMapper _umbracoMapper;
     private readonly ILanguageService _languageService;
 
-    public DictionaryFactory(IUmbracoMapper umbracoMapper, ILanguageService languageService)
+    public DictionaryPresentationFactory(IUmbracoMapper umbracoMapper, ILanguageService languageService)
     {
         _umbracoMapper = umbracoMapper;
         _languageService = languageService;
@@ -55,7 +55,7 @@ public class DictionaryFactory : IDictionaryFactory
     }
 
     public UploadDictionaryResponseModel CreateDictionaryImportViewModel(UdtFileUpload udtFileUpload) =>
-        new UploadDictionaryResponseModel
+        new()
         {
             FileName = udtFileUpload.FileName,
             DictionaryItems = udtFileUpload

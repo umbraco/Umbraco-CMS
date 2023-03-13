@@ -11,14 +11,14 @@ namespace Umbraco.Cms.Api.Management.Controllers.RedirectUrlManagement;
 public class ByKeyRedirectUrlManagementController : RedirectUrlManagementBaseController
 {
     private readonly IRedirectUrlService _redirectUrlService;
-    private readonly IRedirectUrlViewModelFactory _redirectUrlViewModelFactory;
+    private readonly IRedirectUrlPresentationFactory _redirectUrlPresentationFactory;
 
     public ByKeyRedirectUrlManagementController(
         IRedirectUrlService redirectUrlService,
-        IRedirectUrlViewModelFactory redirectUrlViewModelFactory)
+        IRedirectUrlPresentationFactory redirectUrlPresentationFactory)
     {
         _redirectUrlService = redirectUrlService;
-        _redirectUrlViewModelFactory = redirectUrlViewModelFactory;
+        _redirectUrlPresentationFactory = redirectUrlPresentationFactory;
     }
 
     [HttpGet("{key:guid}")]
@@ -27,7 +27,7 @@ public class ByKeyRedirectUrlManagementController : RedirectUrlManagementBaseCon
     {
         IRedirectUrl[] redirects = _redirectUrlService.GetContentRedirectUrls(key).ToArray();
 
-        IEnumerable<RedirectUrlResponseModel> viewModels = _redirectUrlViewModelFactory.CreateMany(redirects);
+        IEnumerable<RedirectUrlResponseModel> viewModels = _redirectUrlPresentationFactory.CreateMany(redirects);
 
         return Task.FromResult<ActionResult<PagedViewModel<RedirectUrlResponseModel>>>(new PagedViewModel<RedirectUrlResponseModel>
         {

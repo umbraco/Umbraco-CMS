@@ -6,13 +6,13 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Factories;
 
-public class DataTypeReferenceViewModelFactory : IDataTypeReferenceViewModelFactory
+public class DataTypeReferencePresentationFactory : IDataTypeReferencePresentationFactory
 {
     private readonly IContentTypeService _contentTypeService;
     private readonly IMediaTypeService _mediaTypeService;
     private readonly IMemberTypeService _memberTypeService;
 
-    public DataTypeReferenceViewModelFactory(
+    public DataTypeReferencePresentationFactory(
         IContentTypeService contentTypeService,
         IMediaTypeService mediaTypeService,
         IMemberTypeService memberTypeService)

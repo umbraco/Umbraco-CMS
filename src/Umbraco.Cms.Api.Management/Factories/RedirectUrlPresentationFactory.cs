@@ -4,11 +4,11 @@ using Umbraco.Cms.Core.Routing;
 
 namespace Umbraco.Cms.Api.Management.Factories;
 
-public class RedirectUrlViewModelFactory : IRedirectUrlViewModelFactory
+public class RedirectUrlPresentationFactory : IRedirectUrlPresentationFactory
 {
     private readonly IPublishedUrlProvider _publishedUrlProvider;
 
-    public RedirectUrlViewModelFactory(IPublishedUrlProvider publishedUrlProvider)
+    public RedirectUrlPresentationFactory(IPublishedUrlProvider publishedUrlProvider)
     {
         _publishedUrlProvider = publishedUrlProvider;
     }

@@ -11,14 +11,14 @@ namespace Umbraco.Cms.Api.Management.Controllers.UserGroups;
 public class ByKeyUserGroupController : UserGroupsControllerBase
 {
     private readonly IUserGroupService _userGroupService;
-    private readonly IUserGroupViewModelFactory _userGroupViewModelFactory;
+    private readonly IUserGroupPresentationFactory _userGroupPresentationFactory;
 
     public ByKeyUserGroupController(
         IUserGroupService userGroupService,
-        IUserGroupViewModelFactory userGroupViewModelFactory)
+        IUserGroupPresentationFactory userGroupPresentationFactory)
     {
         _userGroupService = userGroupService;
-        _userGroupViewModelFactory = userGroupViewModelFactory;
+        _userGroupPresentationFactory = userGroupPresentationFactory;
     }
 
     [HttpGet("{key:guid}")]
@@ -34,6 +34,6 @@ public class ByKeyUserGroupController : UserGroupsControllerBase
             return NotFound();
         }
 
-        return await _userGroupViewModelFactory.CreateAsync(userGroup);
+        return await _userGroupPresentationFactory.CreateAsync(userGroup);
     }
 }

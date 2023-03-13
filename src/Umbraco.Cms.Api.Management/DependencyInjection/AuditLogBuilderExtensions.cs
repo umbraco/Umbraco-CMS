@@ -8,7 +8,7 @@ internal static class AuditLogBuilderExtensions
 {
     internal static IUmbracoBuilder AddAuditLogs(this IUmbracoBuilder builder)
     {
-        builder.Services.AddTransient<IAuditLogViewModelFactory, AuditLogViewModelFactory>();
+        builder.Services.AddTransient<IAuditLogPresentationFactory, AuditLogPresentationFactory>();
 
         return builder;
     }

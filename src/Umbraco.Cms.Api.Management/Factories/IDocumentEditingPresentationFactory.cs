@@ -3,7 +3,7 @@ using Umbraco.Cms.Core.Models.ContentEditing;
 
 namespace Umbraco.Cms.Api.Management.Factories;
 
-public interface IDocumentEditingFactory
+public interface IDocumentEditingPresentationFactory
 {
     ContentCreateModel MapCreateModel(CreateDocumentRequestModel requestModel);
 

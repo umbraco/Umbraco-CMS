@@ -12,14 +12,14 @@ namespace Umbraco.Cms.Api.Management.Controllers.UserGroups;
 public class GetAllUserGroupController : UserGroupsControllerBase
 {
     private readonly IUserGroupService _userGroupService;
-    private readonly IUserGroupViewModelFactory _userViewModelFactory;
+    private readonly IUserGroupPresentationFactory _userPresentationFactory;
 
     public GetAllUserGroupController(
         IUserGroupService userGroupService,
-        IUserGroupViewModelFactory userViewModelFactory)
+        IUserGroupPresentationFactory userPresentationFactory)
     {
         _userGroupService = userGroupService;
-        _userViewModelFactory = userViewModelFactory;
+        _userPresentationFactory = userPresentationFactory;
     }
 
     [HttpGet]
@@ -34,7 +34,7 @@ public class GetAllUserGroupController : UserGroupsControllerBase
         // Instead we should implement this functionality on the CurrentUserController
         PagedModel<IUserGroup> userGroups = await _userGroupService.GetAllAsync(skip, take);
 
-        var viewModels = (await _userViewModelFactory.CreateMultipleAsync(userGroups.Items)).ToList();
+        var viewModels = (await _userPresentationFactory.CreateMultipleAsync(userGroups.Items)).ToList();
         return new PagedViewModel<UserGroupPresentationModel> { Total = userGroups.Total, Items = viewModels };
     }
 }

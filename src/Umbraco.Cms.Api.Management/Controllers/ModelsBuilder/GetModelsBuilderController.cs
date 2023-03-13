@@ -7,12 +7,12 @@ namespace Umbraco.Cms.Api.Management.Controllers.ModelsBuilder;
 
 public class GetModelsBuilderController : ModelsBuilderControllerBase
 {
-    private readonly IModelsBuilderViewModelFactory _modelsBuilderViewModelFactory;
+    private readonly IModelsBuilderPresentationFactory _modelsBuilderPresentationFactory;
 
-    public GetModelsBuilderController(IModelsBuilderViewModelFactory modelsBuilderViewModelFactory) => _modelsBuilderViewModelFactory = modelsBuilderViewModelFactory;
+    public GetModelsBuilderController(IModelsBuilderPresentationFactory modelsBuilderPresentationFactory) => _modelsBuilderPresentationFactory = modelsBuilderPresentationFactory;
 
     [HttpGet("dashboard")]
     [ProducesResponseType(typeof(ModelsBuilderResponseModel), StatusCodes.Status200OK)]
     [MapToApiVersion("1.0")]
-    public async Task<ActionResult<ModelsBuilderResponseModel>> GetDashboard() => await Task.FromResult(Ok(_modelsBuilderViewModelFactory.Create()));
+    public async Task<ActionResult<ModelsBuilderResponseModel>> GetDashboard() => await Task.FromResult(Ok(_modelsBuilderPresentationFactory.Create()));
 }

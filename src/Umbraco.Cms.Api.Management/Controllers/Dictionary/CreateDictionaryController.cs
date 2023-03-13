@@ -14,16 +14,16 @@ public class CreateDictionaryController : DictionaryControllerBase
 {
     private readonly IDictionaryItemService _dictionaryItemService;
     private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
-    private readonly IDictionaryFactory _dictionaryFactory;
+    private readonly IDictionaryPresentationFactory _dictionaryPresentationFactory;
 
     public CreateDictionaryController(
         IDictionaryItemService dictionaryItemService,
         IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
-        IDictionaryFactory dictionaryFactory)
+        IDictionaryPresentationFactory dictionaryPresentationFactory)
     {
         _dictionaryItemService = dictionaryItemService;
         _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
-        _dictionaryFactory = dictionaryFactory;
+        _dictionaryPresentationFactory = dictionaryPresentationFactory;
     }
 
     [HttpPost]
@@ -34,7 +34,7 @@ public class CreateDictionaryController : DictionaryControllerBase
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status409Conflict)]
     public async Task<IActionResult> Create(CreateDictionaryItemRequestModel createDictionaryItemRequestModel)
     {
-        IDictionaryItem created = await _dictionaryFactory.MapCreateModelToDictionaryItemAsync(createDictionaryItemRequestModel);
+        IDictionaryItem created = await _dictionaryPresentationFactory.MapCreateModelToDictionaryItemAsync(createDictionaryItemRequestModel);
 
         Attempt<IDictionaryItem, DictionaryItemOperationStatus> result =
             await _dictionaryItemService.CreateAsync(created, CurrentUserId(_backOfficeSecurityAccessor));

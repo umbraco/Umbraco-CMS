@@ -10,12 +10,12 @@ namespace Umbraco.Cms.Api.Management.Controllers.Dictionary;
 public class ByKeyDictionaryController : DictionaryControllerBase
 {
     private readonly IDictionaryItemService _dictionaryItemService;
-    private readonly IDictionaryFactory _dictionaryFactory;
+    private readonly IDictionaryPresentationFactory _dictionaryPresentationFactory;
 
-    public ByKeyDictionaryController(IDictionaryItemService dictionaryItemService, IDictionaryFactory dictionaryFactory)
+    public ByKeyDictionaryController(IDictionaryItemService dictionaryItemService, IDictionaryPresentationFactory dictionaryPresentationFactory)
     {
         _dictionaryItemService = dictionaryItemService;
-        _dictionaryFactory = dictionaryFactory;
+        _dictionaryPresentationFactory = dictionaryPresentationFactory;
     }
 
     [HttpGet($"{{{nameof(key)}:guid}}")]
@@ -30,6 +30,6 @@ public class ByKeyDictionaryController : DictionaryControllerBase
             return NotFound();
         }
 
-        return Ok(await _dictionaryFactory.CreateDictionaryItemViewModelAsync(dictionary));
+        return Ok(await _dictionaryPresentationFactory.CreateDictionaryItemViewModelAsync(dictionary));
     }
 }

@@ -6,14 +6,14 @@ namespace Umbraco.Cms.Api.Management.Controllers.RedirectUrlManagement;
 
 public class GetStatusRedirectUrlManagementController : RedirectUrlManagementBaseController
 {
-    private readonly IRedirectUrlStatusViewModelFactory _redirectUrlStatusViewModelFactory;
+    private readonly IRedirectUrlStatusPresentationFactory _redirectUrlStatusPresentationFactory;
 
     public GetStatusRedirectUrlManagementController(
-        IRedirectUrlStatusViewModelFactory redirectUrlStatusViewModelFactory) =>
-        _redirectUrlStatusViewModelFactory = redirectUrlStatusViewModelFactory;
+        IRedirectUrlStatusPresentationFactory redirectUrlStatusPresentationFactory) =>
+        _redirectUrlStatusPresentationFactory = redirectUrlStatusPresentationFactory;
 
     [HttpGet("status")]
     [ProducesResponseType(typeof(RedirectUrlStatusResponseModel), 200)]
     public Task<ActionResult<RedirectUrlStatusResponseModel>> GetStatus() =>
-        Task.FromResult<ActionResult<RedirectUrlStatusResponseModel>>(_redirectUrlStatusViewModelFactory.CreateViewModel());
+        Task.FromResult<ActionResult<RedirectUrlStatusResponseModel>>(_redirectUrlStatusPresentationFactory.CreateViewModel());
 }

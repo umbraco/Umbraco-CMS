@@ -8,7 +8,7 @@ namespace Umbraco.Cms.Api.Management.Factories;
 /// <summary>
 /// A factory for creating <see cref="UserGroupPresentationModel"/>
 /// </summary>
-public interface IUserGroupViewModelFactory
+public interface IUserGroupPresentationFactory
 {
     /// <summary>
     /// Creates a <see cref="UserGroupPresentationModel"/> based on a <see cref="UserGroup"/>

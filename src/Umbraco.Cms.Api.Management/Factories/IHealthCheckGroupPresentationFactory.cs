@@ -3,7 +3,7 @@ using Umbraco.Cms.Core.HealthChecks;
 
 namespace Umbraco.Cms.Api.Management.Factories;
 
-public interface IHealthCheckGroupViewModelFactory
+public interface IHealthCheckGroupPresentationFactory
 {
     IEnumerable<IGrouping<string?, HealthCheck>> CreateGroupingFromHealthCheckCollection();
 

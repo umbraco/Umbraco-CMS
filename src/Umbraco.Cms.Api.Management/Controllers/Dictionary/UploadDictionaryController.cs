@@ -13,12 +13,12 @@ namespace Umbraco.Cms.Api.Management.Controllers.Dictionary;
 public class UploadDictionaryController : DictionaryControllerBase
 {
     private readonly IUploadFileService _uploadFileService;
-    private readonly IDictionaryFactory _dictionaryFactory;
+    private readonly IDictionaryPresentationFactory _dictionaryPresentationFactory;
 
-    public UploadDictionaryController(IUploadFileService uploadFileService, IDictionaryFactory dictionaryFactory)
+    public UploadDictionaryController(IUploadFileService uploadFileService, IDictionaryPresentationFactory dictionaryPresentationFactory)
     {
         _uploadFileService = uploadFileService;
-        _dictionaryFactory = dictionaryFactory;
+        _dictionaryPresentationFactory = dictionaryPresentationFactory;
     }
 
     [HttpPost("upload")]
@@ -31,7 +31,7 @@ public class UploadDictionaryController : DictionaryControllerBase
 
         return result.Status switch
         {
-            UdtFileUploadOperationStatus.Success => Ok(_dictionaryFactory.CreateDictionaryImportViewModel(result.Result)),
+            UdtFileUploadOperationStatus.Success => Ok(_dictionaryPresentationFactory.CreateDictionaryImportViewModel(result.Result)),
             UdtFileUploadOperationStatus.InvalidFileType => BadRequest(new ProblemDetailsBuilder()
                 .WithTitle("Invalid file type")
                 .WithDetail("The dictionary import only supports UDT files.")

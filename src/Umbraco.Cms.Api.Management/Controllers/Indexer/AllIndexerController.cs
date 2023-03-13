@@ -12,14 +12,14 @@ namespace Umbraco.Cms.Api.Management.Controllers.Indexer;
 public class AllIndexerController : IndexerControllerBase
 {
     private readonly IExamineManager _examineManager;
-    private readonly IIndexViewModelFactory _indexViewModelFactory;
+    private readonly IIndexPresentationFactory _indexPresentationFactory;
 
     public AllIndexerController(
         IExamineManager examineManager,
-        IIndexViewModelFactory indexViewModelFactory)
+        IIndexPresentationFactory indexPresentationFactory)
     {
         _examineManager = examineManager;
-        _indexViewModelFactory = indexViewModelFactory;
+        _indexPresentationFactory = indexPresentationFactory;
     }
 
     /// <summary>
@@ -32,7 +32,7 @@ public class AllIndexerController : IndexerControllerBase
     public Task<PagedViewModel<IndexResponseModel>> All(int skip, int take)
     {
         IndexResponseModel[] indexes = _examineManager.Indexes
-            .Select(_indexViewModelFactory.Create)
+            .Select(_indexPresentationFactory.Create)
             .OrderBy(indexModel => indexModel.Name.TrimEnd("Indexer")).ToArray();
 
         var viewModel = new PagedViewModel<IndexResponseModel> { Items = indexes.Skip(skip).Take(take), Total = indexes.Length };

@@ -4,7 +4,7 @@ using Umbraco.Cms.Core.Models.ContentEditing;
 
 namespace Umbraco.Cms.Api.Management.Factories;
 
-internal abstract class ContentEditingFactory<TValueModel, TVariantModel>
+internal abstract class ContentEditingPresentationFactory<TValueModel, TVariantModel>
     where TValueModel : ValueModelBase
     where TVariantModel : VariantModelBase
 {

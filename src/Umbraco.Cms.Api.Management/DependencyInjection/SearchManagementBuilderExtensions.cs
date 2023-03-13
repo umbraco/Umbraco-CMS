@@ -18,7 +18,7 @@ public static class SearchManagementBuilderExtensions
         // Add factories
         builder.Services.AddTransient<IIndexDiagnosticsFactory, IndexDiagnosticsFactory>();
         builder.Services.AddTransient<IIndexRebuilder, ExamineIndexRebuilder>();
-        builder.Services.AddTransient<IIndexViewModelFactory, IndexViewModelFactory>();
+        builder.Services.AddTransient<IIndexPresentationFactory, IndexPresentationFactory>();
         return builder;
     }
 }

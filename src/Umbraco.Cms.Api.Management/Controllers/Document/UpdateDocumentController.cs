@@ -15,18 +15,18 @@ public class UpdateDocumentController : DocumentControllerBase
 {
     private readonly IContentService _contentService;
     private readonly IContentEditingService _contentEditingService;
-    private readonly IDocumentEditingFactory _documentEditingFactory;
+    private readonly IDocumentEditingPresentationFactory _documentEditingPresentationFactory;
     private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
 
     public UpdateDocumentController(
         IContentService contentService,
         IContentEditingService contentEditingService,
-        IDocumentEditingFactory documentEditingFactory,
+        IDocumentEditingPresentationFactory documentEditingPresentationFactory,
         IBackOfficeSecurityAccessor backOfficeSecurityAccessor)
     {
         _contentService = contentService;
         _contentEditingService = contentEditingService;
-        _documentEditingFactory = documentEditingFactory;
+        _documentEditingPresentationFactory = documentEditingPresentationFactory;
         _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
     }
 
@@ -43,7 +43,7 @@ public class UpdateDocumentController : DocumentControllerBase
             return NotFound();
         }
 
-        ContentUpdateModel model = _documentEditingFactory.MapUpdateModel(requestModel);
+        ContentUpdateModel model = _documentEditingPresentationFactory.MapUpdateModel(requestModel);
         Attempt<IContent, ContentEditingOperationStatus> result = await _contentEditingService.UpdateAsync(content, model, CurrentUserId(_backOfficeSecurityAccessor));
 
         return result.Success
