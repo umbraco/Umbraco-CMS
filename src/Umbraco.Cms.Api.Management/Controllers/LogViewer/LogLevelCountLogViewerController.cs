@@ -30,7 +30,7 @@ public class LogLevelCountLogViewerController : LogViewerControllerBase
     [HttpGet("level-count")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(typeof(LogLevelCountsViewModel), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(LogLevelCountsReponseModel), StatusCodes.Status200OK)]
     public async Task<IActionResult> LogLevelCounts(DateTime? startDate = null, DateTime? endDate = null)
     {
         Attempt<LogLevelCounts?, LogViewerOperationStatus> logLevelCountsAttempt =
@@ -38,7 +38,7 @@ public class LogLevelCountLogViewerController : LogViewerControllerBase
 
         if (logLevelCountsAttempt.Success)
         {
-            return Ok(_umbracoMapper.Map<LogLevelCountsViewModel>(logLevelCountsAttempt.Result));
+            return Ok(_umbracoMapper.Map<LogLevelCountsReponseModel>(logLevelCountsAttempt.Result));
         }
 
         return LogViewerOperationStatusResult(logLevelCountsAttempt.Status);

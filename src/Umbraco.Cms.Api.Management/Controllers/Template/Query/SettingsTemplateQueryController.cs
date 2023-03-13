@@ -14,8 +14,8 @@ public class SettingsTemplateQueryController : TemplateQueryControllerBase
 
     [HttpGet("settings")]
     [MapToApiVersion("1.0")]
-    [ProducesResponseType(typeof(TemplateQuerySettingsViewModel), StatusCodes.Status200OK)]
-    public async Task<ActionResult<TemplateQuerySettingsViewModel>> Settings()
+    [ProducesResponseType(typeof(TemplateQuerySettingsResponseModel), StatusCodes.Status200OK)]
+    public async Task<ActionResult<TemplateQuerySettingsResponseModel>> Settings()
     {
         var contentTypeAliases = _contentTypeService
             .GetAll()
@@ -23,11 +23,11 @@ public class SettingsTemplateQueryController : TemplateQueryControllerBase
             .Select(contentType => contentType.Alias)
             .ToArray();
 
-        IEnumerable<TemplateQueryPropertyViewModel> properties = GetProperties();
+        IEnumerable<TemplateQueryPropertyPresentationModel> properties = GetProperties();
 
         IEnumerable<TemplateQueryOperatorViewModel> operators = GetOperators();
 
-        return await Task.FromResult(Ok(new TemplateQuerySettingsViewModel
+        return await Task.FromResult(Ok(new TemplateQuerySettingsResponseModel
         {
             ContentTypeAliases = contentTypeAliases,
             Properties = properties,

@@ -8,11 +8,11 @@ public class RelationViewModelsMapDefinition : IMapDefinition
 {
     public void DefineMaps(IUmbracoMapper mapper)
     {
-        mapper.Define<IRelation, RelationViewModel>((source, context) => new RelationViewModel(), Map);
+        mapper.Define<IRelation, RelationResponseModel>((source, context) => new RelationResponseModel(), Map);
     }
 
     // Umbraco.Code.MapAll -ParentName -ChildName
-    private void Map(IRelation source, RelationViewModel target, MapperContext context)
+    private void Map(IRelation source, RelationResponseModel target, MapperContext context)
     {
         target.ChildId = source.ChildId;
         target.Comment = source.Comment;

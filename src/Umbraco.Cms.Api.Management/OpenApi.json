@@ -213,7 +213,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PagedCultureModel"
+                  "$ref": "#/components/schemas/PagedCultureReponseModel"
                 }
               }
             }
@@ -233,7 +233,7 @@
               "schema": {
                 "oneOf": [
                   {
-                    "$ref": "#/components/schemas/DataTypeCreateModel"
+                    "$ref": "#/components/schemas/CreateDataTypeRequestModel"
                   }
                 ]
               }
@@ -295,7 +295,7 @@
                 "schema": {
                   "oneOf": [
                     {
-                      "$ref": "#/components/schemas/DataTypeModel"
+                      "$ref": "#/components/schemas/DataTypeResponseModel"
                     }
                   ]
                 }
@@ -364,7 +364,7 @@
               "schema": {
                 "oneOf": [
                   {
-                    "$ref": "#/components/schemas/DataTypeUpdateModel"
+                    "$ref": "#/components/schemas/UpdateDataTypeRequestModel"
                   }
                 ]
               }
@@ -414,7 +414,7 @@
               "schema": {
                 "oneOf": [
                   {
-                    "$ref": "#/components/schemas/DataTypeCopyModel"
+                    "$ref": "#/components/schemas/CopyDataTypeRequestModel"
                   }
                 ]
               }
@@ -464,7 +464,7 @@
               "schema": {
                 "oneOf": [
                   {
-                    "$ref": "#/components/schemas/DataTypeMoveModel"
+                    "$ref": "#/components/schemas/MoveDataTypeRequestModel"
                   }
                 ]
               }
@@ -508,7 +508,7 @@
                   "items": {
                     "oneOf": [
                       {
-                        "$ref": "#/components/schemas/DataTypeReferenceModel"
+                        "$ref": "#/components/schemas/DataTypeReferenceResponseModel"
                       }
                     ]
                   }
@@ -534,7 +534,7 @@
               "schema": {
                 "oneOf": [
                   {
-                    "$ref": "#/components/schemas/FolderCreateModel"
+                    "$ref": "#/components/schemas/CreateFolderRequestModel"
                   }
                 ]
               }
@@ -583,7 +583,7 @@
                 "schema": {
                   "oneOf": [
                     {
-                      "$ref": "#/components/schemas/FolderModel"
+                      "$ref": "#/components/schemas/FolderReponseModel"
                     }
                   ]
                 }
@@ -642,7 +642,7 @@
               "schema": {
                 "oneOf": [
                   {
-                    "$ref": "#/components/schemas/FolderUpdateModel"
+                    "$ref": "#/components/schemas/UpdateFolderReponseModel"
                   }
                 ]
               }
@@ -707,7 +707,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PagedFolderTreeItemModel"
+                  "$ref": "#/components/schemas/PagedFolderTreeItemResponseModel"
                 }
               }
             }
@@ -744,10 +744,10 @@
                   "items": {
                     "oneOf": [
                       {
-                        "$ref": "#/components/schemas/FolderTreeItemModel"
+                        "$ref": "#/components/schemas/FolderTreeItemResponseModel"
                       },
                       {
-                        "$ref": "#/components/schemas/DocumentTypeTreeItemModel"
+                        "$ref": "#/components/schemas/DocumentTypeTreeItemResponseModel"
                       }
                     ]
                   }
@@ -798,7 +798,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PagedFolderTreeItemModel"
+                  "$ref": "#/components/schemas/PagedFolderTreeItemResponseModel"
                 }
               }
             }
@@ -838,7 +838,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PagedDictionaryOverviewModel"
+                  "$ref": "#/components/schemas/PagedDictionaryOverviewResponseModel"
                 }
               }
             }
@@ -856,7 +856,7 @@
               "schema": {
                 "oneOf": [
                   {
-                    "$ref": "#/components/schemas/DictionaryItemCreateModel"
+                    "$ref": "#/components/schemas/CreateDictionaryItemRequestModel"
                   }
                 ]
               }
@@ -928,7 +928,7 @@
                 "schema": {
                   "oneOf": [
                     {
-                      "$ref": "#/components/schemas/DictionaryItemModel"
+                      "$ref": "#/components/schemas/DictionaryItemResponseModel"
                     }
                   ]
                 }
@@ -997,7 +997,7 @@
               "schema": {
                 "oneOf": [
                   {
-                    "$ref": "#/components/schemas/DictionaryItemUpdateModel"
+                    "$ref": "#/components/schemas/UpdateDictionaryItemRequestModel"
                   }
                 ]
               }
@@ -1090,7 +1090,7 @@
               "schema": {
                 "oneOf": [
                   {
-                    "$ref": "#/components/schemas/DictionaryMoveModel"
+                    "$ref": "#/components/schemas/MoveDictionaryRequestModel"
                   }
                 ]
               }
@@ -1129,7 +1129,7 @@
               "schema": {
                 "oneOf": [
                   {
-                    "$ref": "#/components/schemas/DictionaryImportModel"
+                    "$ref": "#/components/schemas/ImportDictionaryRequestModel"
                   }
                 ]
               }
@@ -1162,60 +1162,6 @@
           },
           "404": {
             "description": "Not Found"
-          }
-        }
-      }
-    },
-    "/umbraco/management/api/v1/dictionary/upload": {
-      "post": {
-        "tags": [
-          "Dictionary"
-        ],
-        "operationId": "PostDictionaryUpload",
-        "requestBody": {
-          "content": {
-            "multipart/form-data": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "file": {
-                    "type": "string",
-                    "format": "binary"
-                  }
-                }
-              },
-              "encoding": {
-                "file": {
-                  "style": "form"
-                }
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Success",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "oneOf": [
-                    {
-                      "$ref": "#/components/schemas/DictionaryUploadModel"
-                    }
-                  ]
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Bad Request",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetailsModel"
-                }
-              }
-            }
           }
         }
       }
@@ -1260,7 +1206,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PagedEntityTreeItemModel"
+                  "$ref": "#/components/schemas/PagedEntityTreeItemResponseModel"
                 }
               }
             }
@@ -1297,10 +1243,10 @@
                   "items": {
                     "oneOf": [
                       {
-                        "$ref": "#/components/schemas/FolderTreeItemModel"
+                        "$ref": "#/components/schemas/FolderTreeItemResponseModel"
                       },
                       {
-                        "$ref": "#/components/schemas/DocumentTypeTreeItemModel"
+                        "$ref": "#/components/schemas/DocumentTypeTreeItemResponseModel"
                       }
                     ]
                   }
@@ -1343,7 +1289,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PagedEntityTreeItemModel"
+                  "$ref": "#/components/schemas/PagedEntityTreeItemResponseModel"
                 }
               }
             }
@@ -1380,7 +1326,7 @@
                   "items": {
                     "oneOf": [
                       {
-                        "$ref": "#/components/schemas/DocumentBlueprintTreeItemModel"
+                        "$ref": "#/components/schemas/DocumentBlueprintTreeItemResponseModel"
                       }
                     ]
                   }
@@ -1423,7 +1369,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PagedDocumentBlueprintTreeItemModel"
+                  "$ref": "#/components/schemas/PagedDocumentBlueprintTreeItemResponseModel"
                 }
               }
             }
@@ -1456,7 +1402,7 @@
                 "schema": {
                   "oneOf": [
                     {
-                      "$ref": "#/components/schemas/DocumentTypeModel"
+                      "$ref": "#/components/schemas/DocumentTypeResponseModel"
                     }
                   ]
                 }
@@ -1517,7 +1463,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PagedDocumentTypeTreeItemModel"
+                  "$ref": "#/components/schemas/PagedDocumentTypeTreeItemResponseModel"
                 }
               }
             }
@@ -1554,7 +1500,7 @@
                   "items": {
                     "oneOf": [
                       {
-                        "$ref": "#/components/schemas/DocumentTypeTreeItemModel"
+                        "$ref": "#/components/schemas/DocumentTypeTreeItemResponseModel"
                       }
                     ]
                   }
@@ -1605,7 +1551,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PagedDocumentTypeTreeItemModel"
+                  "$ref": "#/components/schemas/PagedDocumentTypeTreeItemResponseModel"
                 }
               }
             }
@@ -1625,7 +1571,7 @@
               "schema": {
                 "oneOf": [
                   {
-                    "$ref": "#/components/schemas/DocumentCreateRequestModel"
+                    "$ref": "#/components/schemas/CreateDocumentRequestModel"
                   }
                 ]
               }
@@ -1742,7 +1688,7 @@
               "schema": {
                 "oneOf": [
                   {
-                    "$ref": "#/components/schemas/DocumentUpdateRequestModel"
+                    "$ref": "#/components/schemas/UpdateDocumentRequestModel"
                   }
                 ]
               }
@@ -1805,7 +1751,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PagedRecycleBinItemModel"
+                  "$ref": "#/components/schemas/PagedRecycleBinItemResponseModel"
                 }
               }
             }
@@ -1848,7 +1794,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PagedRecycleBinItemModel"
+                  "$ref": "#/components/schemas/PagedRecycleBinItemResponseModel"
                 }
               }
             }
@@ -1911,7 +1857,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PagedDocumentTreeItemModel"
+                  "$ref": "#/components/schemas/PagedDocumentTreeItemResponseModel"
                 }
               }
             }
@@ -1963,7 +1909,7 @@
                   "items": {
                     "oneOf": [
                       {
-                        "$ref": "#/components/schemas/DocumentTreeItemModel"
+                        "$ref": "#/components/schemas/DocumentTreeItemResponseModel"
                       }
                     ]
                   }
@@ -2021,7 +1967,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PagedDocumentTreeItemModel"
+                  "$ref": "#/components/schemas/PagedDocumentTreeItemResponseModel"
                 }
               }
             }
@@ -2061,7 +2007,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PagedHealthCheckGroupModelBaseModel"
+                  "$ref": "#/components/schemas/PagedHealthCheckGroupResponseModel"
                 }
               }
             }
@@ -2096,7 +2042,7 @@
                 "schema": {
                   "oneOf": [
                     {
-                      "$ref": "#/components/schemas/HealthCheckGroupModel"
+                      "$ref": "#/components/schemas/HealthCheckGroupPresentationModel"
                     }
                   ]
                 }
@@ -2133,7 +2079,7 @@
                 "schema": {
                   "oneOf": [
                     {
-                      "$ref": "#/components/schemas/HealthCheckGroupWithResultModel"
+                      "$ref": "#/components/schemas/HealthCheckGroupWithResultResponseModel"
                     }
                   ]
                 }
@@ -2155,7 +2101,7 @@
               "schema": {
                 "oneOf": [
                   {
-                    "$ref": "#/components/schemas/HealthCheckActionModel"
+                    "$ref": "#/components/schemas/HealthCheckActionRequestModel"
                   }
                 ]
               }
@@ -2180,7 +2126,7 @@
                 "schema": {
                   "oneOf": [
                     {
-                      "$ref": "#/components/schemas/HealthCheckResultModel"
+                      "$ref": "#/components/schemas/HealthCheckResultResponseModel"
                     }
                   ]
                 }
@@ -2252,7 +2198,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PagedHelpPageModel"
+                  "$ref": "#/components/schemas/PagedHelpPageResponseModel"
                 }
               }
             }
@@ -2290,7 +2236,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PagedIndexModel"
+                  "$ref": "#/components/schemas/PagedIndexResponseModel"
                 }
               }
             }
@@ -2332,7 +2278,7 @@
                 "schema": {
                   "oneOf": [
                     {
-                      "$ref": "#/components/schemas/IndexModel"
+                      "$ref": "#/components/schemas/IndexResponseModel"
                     }
                   ]
                 }
@@ -2416,7 +2362,7 @@
                 "schema": {
                   "oneOf": [
                     {
-                      "$ref": "#/components/schemas/InstallSettingsModel"
+                      "$ref": "#/components/schemas/InstallSettingsResponseModel"
                     }
                   ]
                 }
@@ -2438,7 +2384,7 @@
               "schema": {
                 "oneOf": [
                   {
-                    "$ref": "#/components/schemas/InstallModel"
+                    "$ref": "#/components/schemas/InstallVResponseModel"
                   }
                 ]
               }
@@ -2484,7 +2430,7 @@
               "schema": {
                 "oneOf": [
                   {
-                    "$ref": "#/components/schemas/DatabaseInstallModel"
+                    "$ref": "#/components/schemas/DatabaseInstallResponseModel"
                   }
                 ]
               }
@@ -2540,7 +2486,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PagedLanguageModel"
+                  "$ref": "#/components/schemas/PagedLanguageResponseModel"
                 }
               }
             }
@@ -2558,7 +2504,7 @@
               "schema": {
                 "oneOf": [
                   {
-                    "$ref": "#/components/schemas/LanguageCreateModel"
+                    "$ref": "#/components/schemas/CreateLanguageRequestModel"
                   }
                 ]
               }
@@ -2622,7 +2568,7 @@
                 "schema": {
                   "oneOf": [
                     {
-                      "$ref": "#/components/schemas/LanguageModel"
+                      "$ref": "#/components/schemas/LanguageResponseModel"
                     }
                   ]
                 }
@@ -2693,7 +2639,7 @@
               "schema": {
                 "oneOf": [
                   {
-                    "$ref": "#/components/schemas/LanguageUpdateModel"
+                    "$ref": "#/components/schemas/UpdateLanguageRequestModel"
                   }
                 ]
               }
@@ -2752,7 +2698,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PagedLoggerModel"
+                  "$ref": "#/components/schemas/PagedLoggerResponseModel"
                 }
               }
             }
@@ -2802,7 +2748,7 @@
                 "schema": {
                   "oneOf": [
                     {
-                      "$ref": "#/components/schemas/LogLevelCountsModel"
+                      "$ref": "#/components/schemas/LogLevelCountsReponseModel"
                     }
                   ]
                 }
@@ -2884,7 +2830,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PagedLogMessageModel"
+                  "$ref": "#/components/schemas/PagedLogMessageResponseModel"
                 }
               }
             }
@@ -2950,7 +2896,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PagedLogTemplateModel"
+                  "$ref": "#/components/schemas/PagedLogTemplateResponseModel"
                 }
               }
             }
@@ -2990,7 +2936,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PagedSavedLogSearchModel"
+                  "$ref": "#/components/schemas/PagedSavedLogSearchResponseModel"
                 }
               }
             }
@@ -3008,7 +2954,7 @@
               "schema": {
                 "oneOf": [
                   {
-                    "$ref": "#/components/schemas/SavedLogSearchModel"
+                    "$ref": "#/components/schemas/SavedLogSearchRequestModel"
                   }
                 ]
               }
@@ -3069,7 +3015,7 @@
                 "schema": {
                   "oneOf": [
                     {
-                      "$ref": "#/components/schemas/SavedLogSearchModel"
+                      "$ref": "#/components/schemas/SavedLogSearchResponseModel"
                     }
                   ]
                 }
@@ -3192,7 +3138,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PagedFolderTreeItemModel"
+                  "$ref": "#/components/schemas/PagedFolderTreeItemResponseModel"
                 }
               }
             }
@@ -3229,10 +3175,10 @@
                   "items": {
                     "oneOf": [
                       {
-                        "$ref": "#/components/schemas/FolderTreeItemModel"
+                        "$ref": "#/components/schemas/FolderTreeItemResponseModel"
                       },
                       {
-                        "$ref": "#/components/schemas/DocumentTypeTreeItemModel"
+                        "$ref": "#/components/schemas/DocumentTypeTreeItemResponseModel"
                       }
                     ]
                   }
@@ -3283,7 +3229,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PagedFolderTreeItemModel"
+                  "$ref": "#/components/schemas/PagedFolderTreeItemResponseModel"
                 }
               }
             }
@@ -3334,7 +3280,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PagedRecycleBinItemModel"
+                  "$ref": "#/components/schemas/PagedRecycleBinItemResponseModel"
                 }
               }
             }
@@ -3377,7 +3323,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PagedRecycleBinItemModel"
+                  "$ref": "#/components/schemas/PagedRecycleBinItemResponseModel"
                 }
               }
             }
@@ -3433,7 +3379,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PagedContentTreeItemModel"
+                  "$ref": "#/components/schemas/PagedContentTreeItemResponseModel"
                 }
               }
             }
@@ -3478,10 +3424,10 @@
                   "items": {
                     "oneOf": [
                       {
-                        "$ref": "#/components/schemas/ContentTreeItemModel"
+                        "$ref": "#/components/schemas/ContentTreeItemResponseModel"
                       },
                       {
-                        "$ref": "#/components/schemas/DocumentTreeItemModel"
+                        "$ref": "#/components/schemas/DocumentTreeItemResponseModel"
                       }
                     ]
                   }
@@ -3532,7 +3478,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PagedContentTreeItemModel"
+                  "$ref": "#/components/schemas/PagedContentTreeItemResponseModel"
                 }
               }
             }
@@ -3569,22 +3515,22 @@
                   "items": {
                     "oneOf": [
                       {
-                        "$ref": "#/components/schemas/EntityTreeItemModel"
+                        "$ref": "#/components/schemas/EntityTreeItemResponseModel"
                       },
                       {
-                        "$ref": "#/components/schemas/ContentTreeItemModel"
+                        "$ref": "#/components/schemas/ContentTreeItemResponseModel"
                       },
                       {
-                        "$ref": "#/components/schemas/DocumentBlueprintTreeItemModel"
+                        "$ref": "#/components/schemas/DocumentBlueprintTreeItemResponseModel"
                       },
                       {
-                        "$ref": "#/components/schemas/DocumentTreeItemModel"
+                        "$ref": "#/components/schemas/DocumentTreeItemResponseModel"
                       },
                       {
-                        "$ref": "#/components/schemas/DocumentTypeTreeItemModel"
+                        "$ref": "#/components/schemas/DocumentTypeTreeItemResponseModel"
                       },
                       {
-                        "$ref": "#/components/schemas/FolderTreeItemModel"
+                        "$ref": "#/components/schemas/FolderTreeItemResponseModel"
                       }
                     ]
                   }
@@ -3627,7 +3573,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PagedEntityTreeItemModel"
+                  "$ref": "#/components/schemas/PagedEntityTreeItemResponseModel"
                 }
               }
             }
@@ -3664,22 +3610,22 @@
                   "items": {
                     "oneOf": [
                       {
-                        "$ref": "#/components/schemas/EntityTreeItemModel"
+                        "$ref": "#/components/schemas/EntityTreeItemResponseModel"
                       },
                       {
-                        "$ref": "#/components/schemas/ContentTreeItemModel"
+                        "$ref": "#/components/schemas/ContentTreeItemResponseModel"
                       },
                       {
-                        "$ref": "#/components/schemas/DocumentBlueprintTreeItemModel"
+                        "$ref": "#/components/schemas/DocumentBlueprintTreeItemResponseModel"
                       },
                       {
-                        "$ref": "#/components/schemas/DocumentTreeItemModel"
+                        "$ref": "#/components/schemas/DocumentTreeItemResponseModel"
                       },
                       {
-                        "$ref": "#/components/schemas/DocumentTypeTreeItemModel"
+                        "$ref": "#/components/schemas/DocumentTypeTreeItemResponseModel"
                       },
                       {
-                        "$ref": "#/components/schemas/FolderTreeItemModel"
+                        "$ref": "#/components/schemas/FolderTreeItemResponseModel"
                       }
                     ]
                   }
@@ -3722,7 +3668,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PagedEntityTreeItemModel"
+                  "$ref": "#/components/schemas/PagedEntityTreeItemResponseModel"
                 }
               }
             }
@@ -3767,7 +3713,7 @@
                 "schema": {
                   "oneOf": [
                     {
-                      "$ref": "#/components/schemas/ModelsBuilderModel"
+                      "$ref": "#/components/schemas/ModelsBuilderResponseModel"
                     }
                   ]
                 }
@@ -3791,7 +3737,7 @@
                 "schema": {
                   "oneOf": [
                     {
-                      "$ref": "#/components/schemas/OutOfDateStatusModel"
+                      "$ref": "#/components/schemas/OutOfDateStatusResponseModel"
                     }
                   ]
                 }
@@ -3909,7 +3855,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PagedPackageDefinitionModel"
+                  "$ref": "#/components/schemas/PagedPackageDefinitionResponseModel"
                 }
               }
             }
@@ -3927,7 +3873,7 @@
               "schema": {
                 "oneOf": [
                   {
-                    "$ref": "#/components/schemas/PackageCreateModel"
+                    "$ref": "#/components/schemas/CreatePackageRequestModel"
                   }
                 ]
               }
@@ -3992,7 +3938,7 @@
                 "schema": {
                   "oneOf": [
                     {
-                      "$ref": "#/components/schemas/PackageDefinitionModel"
+                      "$ref": "#/components/schemas/PackageDefinitionResponseModel"
                     }
                   ]
                 }
@@ -4048,7 +3994,7 @@
               "schema": {
                 "oneOf": [
                   {
-                    "$ref": "#/components/schemas/PackageUpdateModel"
+                    "$ref": "#/components/schemas/UpdatePackageRequestModel"
                   }
                 ]
               }
@@ -4116,7 +4062,7 @@
                   "items": {
                     "oneOf": [
                       {
-                        "$ref": "#/components/schemas/PackageManifestModel"
+                        "$ref": "#/components/schemas/PackageManifestResponseModel"
                       }
                     ]
                   }
@@ -4159,7 +4105,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PagedPackageMigrationStatusModel"
+                  "$ref": "#/components/schemas/PagedPackageMigrationStatusResponseModel"
                 }
               }
             }
@@ -4206,7 +4152,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PagedFileSystemTreeItemModel"
+                  "$ref": "#/components/schemas/PagedFileSystemTreeItemPresentationModel"
                 }
               }
             }
@@ -4242,7 +4188,7 @@
                   "items": {
                     "oneOf": [
                       {
-                        "$ref": "#/components/schemas/FileSystemTreeItemModel"
+                        "$ref": "#/components/schemas/FileSystemTreeItemPresentationModel"
                       }
                     ]
                   }
@@ -4285,7 +4231,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PagedFileSystemTreeItemModel"
+                  "$ref": "#/components/schemas/PagedFileSystemTreeItemPresentationModel"
                 }
               }
             }
@@ -4307,7 +4253,7 @@
                 "schema": {
                   "oneOf": [
                     {
-                      "$ref": "#/components/schemas/ProfilingStatusModel"
+                      "$ref": "#/components/schemas/ProfilingStatusResponseModel"
                     }
                   ]
                 }
@@ -4327,7 +4273,7 @@
               "schema": {
                 "oneOf": [
                   {
-                    "$ref": "#/components/schemas/ProfilingStatusModel"
+                    "$ref": "#/components/schemas/ProfilingStatusRequestModel"
                   }
                 ]
               }
@@ -4447,7 +4393,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PagedRedirectUrlModel"
+                  "$ref": "#/components/schemas/PagedRedirectUrlResponseModel"
                 }
               }
             }
@@ -4494,7 +4440,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PagedRedirectUrlModel"
+                  "$ref": "#/components/schemas/PagedRedirectUrlResponseModel"
                 }
               }
             }
@@ -4538,7 +4484,7 @@
                 "schema": {
                   "oneOf": [
                     {
-                      "$ref": "#/components/schemas/RedirectUrlStatusModel"
+                      "$ref": "#/components/schemas/RedirectUrlStatusResponseModel"
                     }
                   ]
                 }
@@ -4779,10 +4725,10 @@
                   "items": {
                     "oneOf": [
                       {
-                        "$ref": "#/components/schemas/FolderTreeItemModel"
+                        "$ref": "#/components/schemas/FolderTreeItemResponseModel"
                       },
                       {
-                        "$ref": "#/components/schemas/DocumentTypeTreeItemModel"
+                        "$ref": "#/components/schemas/DocumentTypeTreeItemResponseModel"
                       }
                     ]
                   }
@@ -4825,7 +4771,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PagedEntityTreeItemModel"
+                  "$ref": "#/components/schemas/PagedEntityTreeItemResponseModel"
                 }
               }
             }
@@ -4858,7 +4804,7 @@
                 "schema": {
                   "oneOf": [
                     {
-                      "$ref": "#/components/schemas/RelationModel"
+                      "$ref": "#/components/schemas/RelationResponseModel"
                     }
                   ]
                 }
@@ -4918,7 +4864,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PagedRelationModel"
+                  "$ref": "#/components/schemas/PagedRelationResponseModel"
                 }
               }
             }
@@ -4967,7 +4913,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PagedRelationModel"
+                  "$ref": "#/components/schemas/PagedRelationResponseModel"
                 }
               }
             }
@@ -5014,7 +4960,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PagedFileSystemTreeItemModel"
+                  "$ref": "#/components/schemas/PagedFileSystemTreeItemPresentationModel"
                 }
               }
             }
@@ -5050,7 +4996,7 @@
                   "items": {
                     "oneOf": [
                       {
-                        "$ref": "#/components/schemas/FileSystemTreeItemModel"
+                        "$ref": "#/components/schemas/FileSystemTreeItemPresentationModel"
                       }
                     ]
                   }
@@ -5093,7 +5039,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PagedFileSystemTreeItemModel"
+                  "$ref": "#/components/schemas/PagedFileSystemTreeItemPresentationModel"
                 }
               }
             }
@@ -5131,7 +5077,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PagedSearcherModel"
+                  "$ref": "#/components/schemas/PagedSearcherResponseModel"
                 }
               }
             }
@@ -5184,7 +5130,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PagedSearchResultModel"
+                  "$ref": "#/components/schemas/PagedSearchResultResponseModel"
                 }
               }
             }
@@ -5250,7 +5196,7 @@
                 "schema": {
                   "oneOf": [
                     {
-                      "$ref": "#/components/schemas/ServerStatusModel"
+                      "$ref": "#/components/schemas/ServerStatusResponseModel"
                     }
                   ]
                 }
@@ -5284,7 +5230,7 @@
                 "schema": {
                   "oneOf": [
                     {
-                      "$ref": "#/components/schemas/VersionModel"
+                      "$ref": "#/components/schemas/VersionResponseModel"
                     }
                   ]
                 }
@@ -5333,7 +5279,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PagedFileSystemTreeItemModel"
+                  "$ref": "#/components/schemas/PagedFileSystemTreeItemPresentationModel"
                 }
               }
             }
@@ -5369,7 +5315,7 @@
                   "items": {
                     "oneOf": [
                       {
-                        "$ref": "#/components/schemas/FileSystemTreeItemModel"
+                        "$ref": "#/components/schemas/FileSystemTreeItemPresentationModel"
                       }
                     ]
                   }
@@ -5412,7 +5358,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PagedFileSystemTreeItemModel"
+                  "$ref": "#/components/schemas/PagedFileSystemTreeItemPresentationModel"
                 }
               }
             }
@@ -5459,7 +5405,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PagedFileSystemTreeItemModel"
+                  "$ref": "#/components/schemas/PagedFileSystemTreeItemPresentationModel"
                 }
               }
             }
@@ -5495,7 +5441,7 @@
                   "items": {
                     "oneOf": [
                       {
-                        "$ref": "#/components/schemas/FileSystemTreeItemModel"
+                        "$ref": "#/components/schemas/FileSystemTreeItemPresentationModel"
                       }
                     ]
                   }
@@ -5538,7 +5484,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PagedFileSystemTreeItemModel"
+                  "$ref": "#/components/schemas/PagedFileSystemTreeItemPresentationModel"
                 }
               }
             }
@@ -5576,7 +5522,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PagedTelemetryModel"
+                  "$ref": "#/components/schemas/PagedTelemetryResponseModel"
                 }
               }
             }
@@ -5598,7 +5544,7 @@
                 "schema": {
                   "oneOf": [
                     {
-                      "$ref": "#/components/schemas/TelemetryModel"
+                      "$ref": "#/components/schemas/TelemetryResponseModel"
                     }
                   ]
                 }
@@ -5618,7 +5564,7 @@
               "schema": {
                 "oneOf": [
                   {
-                    "$ref": "#/components/schemas/TelemetryModel"
+                    "$ref": "#/components/schemas/TelemetryRequestModel"
                   }
                 ]
               }
@@ -5654,7 +5600,7 @@
               "schema": {
                 "oneOf": [
                   {
-                    "$ref": "#/components/schemas/TemplateCreateModel"
+                    "$ref": "#/components/schemas/CreateTemplateRequestModel"
                   }
                 ]
               }
@@ -5716,7 +5662,7 @@
                 "schema": {
                   "oneOf": [
                     {
-                      "$ref": "#/components/schemas/TemplateModel"
+                      "$ref": "#/components/schemas/TemplateResponseModel"
                     }
                   ]
                 }
@@ -5785,7 +5731,7 @@
               "schema": {
                 "oneOf": [
                   {
-                    "$ref": "#/components/schemas/TemplateUpdateModel"
+                    "$ref": "#/components/schemas/UpdateTemplateRequestModel"
                   }
                 ]
               }
@@ -5839,7 +5785,7 @@
                 "schema": {
                   "oneOf": [
                     {
-                      "$ref": "#/components/schemas/TemplateQueryResultModel"
+                      "$ref": "#/components/schemas/TemplateQueryResultResponseModel"
                     }
                   ]
                 }
@@ -5863,7 +5809,7 @@
                 "schema": {
                   "oneOf": [
                     {
-                      "$ref": "#/components/schemas/TemplateQuerySettingsModel"
+                      "$ref": "#/components/schemas/TemplateQuerySettingsResponseModel"
                     }
                   ]
                 }
@@ -5887,7 +5833,7 @@
                 "schema": {
                   "oneOf": [
                     {
-                      "$ref": "#/components/schemas/TemplateScaffoldModel"
+                      "$ref": "#/components/schemas/TemplateScaffoldResponseModel"
                     }
                   ]
                 }
@@ -5940,7 +5886,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PagedEntityTreeItemModel"
+                  "$ref": "#/components/schemas/PagedEntityTreeItemResponseModel"
                 }
               }
             }
@@ -5977,22 +5923,22 @@
                   "items": {
                     "oneOf": [
                       {
-                        "$ref": "#/components/schemas/EntityTreeItemModel"
+                        "$ref": "#/components/schemas/EntityTreeItemResponseModel"
                       },
                       {
-                        "$ref": "#/components/schemas/ContentTreeItemModel"
+                        "$ref": "#/components/schemas/ContentTreeItemResponseModel"
                       },
                       {
-                        "$ref": "#/components/schemas/DocumentBlueprintTreeItemModel"
+                        "$ref": "#/components/schemas/DocumentBlueprintTreeItemResponseModel"
                       },
                       {
-                        "$ref": "#/components/schemas/DocumentTreeItemModel"
+                        "$ref": "#/components/schemas/DocumentTreeItemResponseModel"
                       },
                       {
-                        "$ref": "#/components/schemas/DocumentTypeTreeItemModel"
+                        "$ref": "#/components/schemas/DocumentTypeTreeItemResponseModel"
                       },
                       {
-                        "$ref": "#/components/schemas/FolderTreeItemModel"
+                        "$ref": "#/components/schemas/FolderTreeItemResponseModel"
                       }
                     ]
                   }
@@ -6035,7 +5981,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PagedEntityTreeItemModel"
+                  "$ref": "#/components/schemas/PagedEntityTreeItemResponseModel"
                 }
               }
             }
@@ -6148,7 +6094,7 @@
                 "schema": {
                   "oneOf": [
                     {
-                      "$ref": "#/components/schemas/UploadSingleFileResponseModel"
+                      "$ref": "#/components/schemas/CreateTemporaryFileResponseModel"
                     }
                   ]
                 }
@@ -6249,7 +6195,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PagedRelationItemModel"
+                  "$ref": "#/components/schemas/PagedRelationItemResponseModel"
                 }
               }
             }
@@ -6304,7 +6250,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PagedRelationItemModel"
+                  "$ref": "#/components/schemas/PagedRelationItemResponseModel"
                 }
               }
             }
@@ -6364,7 +6310,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PagedRelationItemModel"
+                  "$ref": "#/components/schemas/PagedRelationItemResponseModel"
                 }
               }
             }
@@ -6419,7 +6365,7 @@
                 "schema": {
                   "oneOf": [
                     {
-                      "$ref": "#/components/schemas/UpgradeSettingsModel"
+                      "$ref": "#/components/schemas/UpgradeSettingsResponseModel"
                     }
                   ]
                 }
@@ -6451,7 +6397,7 @@
               "schema": {
                 "oneOf": [
                   {
-                    "$ref": "#/components/schemas/UserGroupSaveModel"
+                    "$ref": "#/components/schemas/SaveUserGroupRequestModel"
                   }
                 ]
               }
@@ -6515,7 +6461,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PagedUserGroupModel"
+                  "$ref": "#/components/schemas/PagedUserGroupPresentationModel"
                 }
               }
             }
@@ -6548,7 +6494,7 @@
                 "schema": {
                   "oneOf": [
                     {
-                      "$ref": "#/components/schemas/UserGroupModel"
+                      "$ref": "#/components/schemas/UserGroupPresentationModel"
                     }
                   ]
                 }
@@ -6607,7 +6553,7 @@
               "schema": {
                 "oneOf": [
                   {
-                    "$ref": "#/components/schemas/UserGroupUpdateModel"
+                    "$ref": "#/components/schemas/UpdateUserGroupRequestModel"
                   }
                 ]
               }
@@ -6722,7 +6668,7 @@
         "type": "integer",
         "format": "int32"
       },
-      "ConsentLevelModel": {
+      "ConsentLevelPresentationModel": {
         "type": "object",
         "properties": {
           "level": {
@@ -6809,14 +6755,14 @@
         "type": "integer",
         "format": "int32"
       },
-      "ContentTreeItemModel": {
+      "ContentTreeItemResponseModel": {
         "required": [
           "$type"
         ],
         "type": "object",
         "allOf": [
           {
-            "$ref": "#/components/schemas/EntityTreeItemModel"
+            "$ref": "#/components/schemas/EntityTreeItemResponseModel"
           }
         ],
         "properties": {
@@ -6834,8 +6780,8 @@
         "discriminator": {
           "propertyName": "$type",
           "mapping": {
-            "ContentTreeItemViewModel": "#/components/schemas/ContentTreeItemModel",
-            "DocumentTreeItemViewModel": "#/components/schemas/DocumentTreeItemModel"
+            "ContentTreeItemResponseModel": "#/components/schemas/ContentTreeItemResponseModel",
+            "DocumentTreeItemResponseModel": "#/components/schemas/DocumentTreeItemResponseModel"
           }
         }
       },
@@ -6879,21 +6825,7 @@
         "type": "integer",
         "format": "int32"
       },
-      "ContentTypeSortModel": {
-        "type": "object",
-        "properties": {
-          "key": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "sortOrder": {
-            "type": "integer",
-            "format": "int32"
-          }
-        },
-        "additionalProperties": false
-      },
-      "ContentTypeViewModelBaseDocumentTypePropertyTypeDocumentTypePropertyTypeContainerModel": {
+      "ContentTypePresentationBaseDocumentTypePropertyTypePresentationBaseDocumentTypePropertyTypeContainerPresentationBaseModel": {
         "type": "object",
         "properties": {
           "key": {
@@ -6930,7 +6862,7 @@
             "items": {
               "oneOf": [
                 {
-                  "$ref": "#/components/schemas/DocumentTypePropertyTypeModel"
+                  "$ref": "#/components/schemas/DocumentTypePropertyTypePresentationBaseModel"
                 }
               ]
             }
@@ -6940,7 +6872,7 @@
             "items": {
               "oneOf": [
                 {
-                  "$ref": "#/components/schemas/DocumentTypePropertyTypeContainerModel"
+                  "$ref": "#/components/schemas/DocumentTypePropertyTypeContainerPresentationBaseModel"
                 }
               ]
             }
@@ -6971,6 +6903,20 @@
                 "$ref": "#/components/schemas/ContentTypeCleanupModel"
               }
             ]
+          }
+        },
+        "additionalProperties": false
+      },
+      "ContentTypeSortModel": {
+        "type": "object",
+        "properties": {
+          "key": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "sortOrder": {
+            "type": "integer",
+            "format": "int32"
           }
         },
         "additionalProperties": false
@@ -7014,6 +6960,108 @@
         },
         "additionalProperties": false
       },
+      "CopyDataTypeRequestModel": {
+        "type": "object",
+        "properties": {
+          "targetKey": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "CreateDataTypeRequestModel": {
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/DataTypeModelBaseModel"
+          }
+        ],
+        "properties": {
+          "parentKey": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "CreateDictionaryItemRequestModel": {
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/DictionaryItemModelBaseModel"
+          }
+        ],
+        "properties": {
+          "parentKey": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "CreateDocumentRequestModel": {
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ContentCreateRequestModelBaseDocumentValueModelDocumentVariantRequestModel"
+          }
+        ],
+        "properties": {
+          "contentTypeKey": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "templateKey": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "CreateFolderRequestModel": {
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/FolderModelBaseModel"
+          }
+        ],
+        "properties": {
+          "parentKey": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "CreateLanguageRequestModel": {
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/LanguageModelBaseModel"
+          }
+        ],
+        "properties": {
+          "isoCode": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "CreatePackageRequestModel": {
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/PackageModelBaseModel"
+          }
+        ],
+        "additionalProperties": false
+      },
       "CreateRelationTypeRequestModel": {
         "type": "object",
         "allOf": [
@@ -7030,7 +7078,34 @@
         },
         "additionalProperties": false
       },
-      "CultureModel": {
+      "CreateTemplateRequestModel": {
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/TemplateModelBaseModel"
+          }
+        ],
+        "additionalProperties": false
+      },
+      "CreateTemporaryFileResponseModel": {
+        "type": "object",
+        "properties": {
+          "key": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "availableUntil": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "fileName": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "CultureReponseModel": {
         "type": "object",
         "properties": {
           "name": {
@@ -7042,34 +7117,80 @@
         },
         "additionalProperties": false
       },
-      "DataTypeCopyModel": {
+      "DataTypeModelBaseModel": {
         "type": "object",
         "properties": {
-          "targetKey": {
+          "name": {
+            "type": "string"
+          },
+          "propertyEditorAlias": {
+            "type": "string"
+          },
+          "propertyEditorUiAlias": {
             "type": "string",
-            "format": "uuid",
+            "nullable": true
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/DataTypePropertyPresentationModel"
+                }
+              ]
+            }
+          }
+        },
+        "additionalProperties": false
+      },
+      "DataTypePropertyPresentationModel": {
+        "type": "object",
+        "properties": {
+          "alias": {
+            "type": "string"
+          },
+          "value": {
             "nullable": true
           }
         },
         "additionalProperties": false
       },
-      "DataTypeCreateModel": {
+      "DataTypePropertyReferenceModel": {
         "type": "object",
-        "allOf": [
-          {
-            "$ref": "#/components/schemas/DataTypeModelBaseModel"
-          }
-        ],
         "properties": {
-          "parentKey": {
-            "type": "string",
-            "format": "uuid",
-            "nullable": true
+          "name": {
+            "type": "string"
+          },
+          "alias": {
+            "type": "string"
           }
         },
         "additionalProperties": false
       },
-      "DataTypeModel": {
+      "DataTypeReferenceResponseModel": {
+        "type": "object",
+        "properties": {
+          "key": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "type": {
+            "type": "string"
+          },
+          "properties": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/DataTypePropertyReferenceModel"
+                }
+              ]
+            }
+          }
+        },
+        "additionalProperties": false
+      },
+      "DataTypeResponseModel": {
         "required": [
           "$type"
         ],
@@ -7097,104 +7218,11 @@
         "discriminator": {
           "propertyName": "$type",
           "mapping": {
-            "DataTypeViewModel": "#/components/schemas/DataTypeModel"
+            "DataTypeResponseModel": "#/components/schemas/DataTypeResponseModel"
           }
         }
       },
-      "DataTypeModelBaseModel": {
-        "type": "object",
-        "properties": {
-          "name": {
-            "type": "string"
-          },
-          "propertyEditorAlias": {
-            "type": "string"
-          },
-          "propertyEditorUiAlias": {
-            "type": "string",
-            "nullable": true
-          },
-          "data": {
-            "type": "array",
-            "items": {
-              "oneOf": [
-                {
-                  "$ref": "#/components/schemas/DataTypePropertyModel"
-                }
-              ]
-            }
-          }
-        },
-        "additionalProperties": false
-      },
-      "DataTypeMoveModel": {
-        "type": "object",
-        "properties": {
-          "targetKey": {
-            "type": "string",
-            "format": "uuid",
-            "nullable": true
-          }
-        },
-        "additionalProperties": false
-      },
-      "DataTypePropertyModel": {
-        "type": "object",
-        "properties": {
-          "alias": {
-            "type": "string"
-          },
-          "value": {
-            "nullable": true
-          }
-        },
-        "additionalProperties": false
-      },
-      "DataTypePropertyReferenceModel": {
-        "type": "object",
-        "properties": {
-          "name": {
-            "type": "string"
-          },
-          "alias": {
-            "type": "string"
-          }
-        },
-        "additionalProperties": false
-      },
-      "DataTypeReferenceModel": {
-        "type": "object",
-        "properties": {
-          "key": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "type": {
-            "type": "string"
-          },
-          "properties": {
-            "type": "array",
-            "items": {
-              "oneOf": [
-                {
-                  "$ref": "#/components/schemas/DataTypePropertyReferenceModel"
-                }
-              ]
-            }
-          }
-        },
-        "additionalProperties": false
-      },
-      "DataTypeUpdateModel": {
-        "type": "object",
-        "allOf": [
-          {
-            "$ref": "#/components/schemas/DataTypeModelBaseModel"
-          }
-        ],
-        "additionalProperties": false
-      },
-      "DatabaseInstallModel": {
+      "DatabaseInstallResponseModel": {
         "required": [
           "id",
           "providerName"
@@ -7235,7 +7263,7 @@
         },
         "additionalProperties": false
       },
-      "DatabaseSettingsModel": {
+      "DatabaseSettingsPresentationModel": {
         "type": "object",
         "properties": {
           "id": {
@@ -7276,37 +7304,26 @@
         },
         "additionalProperties": false
       },
-      "DictionaryImportModel": {
+      "DictionaryItemModelBaseModel": {
         "type": "object",
         "properties": {
-          "fileName": {
+          "name": {
             "type": "string"
           },
-          "parentKey": {
-            "type": "string",
-            "format": "uuid",
-            "nullable": true
+          "translations": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/DictionaryItemTranslationModel"
+                }
+              ]
+            }
           }
         },
         "additionalProperties": false
       },
-      "DictionaryItemCreateModel": {
-        "type": "object",
-        "allOf": [
-          {
-            "$ref": "#/components/schemas/DictionaryItemModelBaseModel"
-          }
-        ],
-        "properties": {
-          "parentKey": {
-            "type": "string",
-            "format": "uuid",
-            "nullable": true
-          }
-        },
-        "additionalProperties": false
-      },
-      "DictionaryItemModel": {
+      "DictionaryItemResponseModel": {
         "required": [
           "$type"
         ],
@@ -7329,28 +7346,9 @@
         "discriminator": {
           "propertyName": "$type",
           "mapping": {
-            "DictionaryItemViewModel": "#/components/schemas/DictionaryItemModel"
+            "DictionaryItemResponseModel": "#/components/schemas/DictionaryItemResponseModel"
           }
         }
-      },
-      "DictionaryItemModelBaseModel": {
-        "type": "object",
-        "properties": {
-          "name": {
-            "type": "string"
-          },
-          "translations": {
-            "type": "array",
-            "items": {
-              "oneOf": [
-                {
-                  "$ref": "#/components/schemas/DictionaryItemTranslationModel"
-                }
-              ]
-            }
-          }
-        },
-        "additionalProperties": false
       },
       "DictionaryItemTranslationModel": {
         "type": "object",
@@ -7364,46 +7362,7 @@
         },
         "additionalProperties": false
       },
-      "DictionaryItemUpdateModel": {
-        "type": "object",
-        "allOf": [
-          {
-            "$ref": "#/components/schemas/DictionaryItemModelBaseModel"
-          }
-        ],
-        "additionalProperties": false
-      },
-      "DictionaryItemsImportModel": {
-        "type": "object",
-        "properties": {
-          "key": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "name": {
-            "type": "string",
-            "nullable": true
-          },
-          "parentKey": {
-            "type": "string",
-            "format": "uuid",
-            "nullable": true
-          }
-        },
-        "additionalProperties": false
-      },
-      "DictionaryMoveModel": {
-        "type": "object",
-        "properties": {
-          "targetKey": {
-            "type": "string",
-            "format": "uuid",
-            "nullable": true
-          }
-        },
-        "additionalProperties": false
-      },
-      "DictionaryOverviewModel": {
+      "DictionaryOverviewResponseModel": {
         "type": "object",
         "properties": {
           "name": {
@@ -7428,26 +7387,6 @@
         },
         "additionalProperties": false
       },
-      "DictionaryUploadModel": {
-        "type": "object",
-        "properties": {
-          "dictionaryItems": {
-            "type": "array",
-            "items": {
-              "oneOf": [
-                {
-                  "$ref": "#/components/schemas/DictionaryItemsImportModel"
-                }
-              ]
-            }
-          },
-          "fileName": {
-            "type": "string",
-            "nullable": true
-          }
-        },
-        "additionalProperties": false
-      },
       "DirectionModel": {
         "enum": [
           "Ascending",
@@ -7456,14 +7395,14 @@
         "type": "integer",
         "format": "int32"
       },
-      "DocumentBlueprintTreeItemModel": {
+      "DocumentBlueprintTreeItemResponseModel": {
         "required": [
           "$type"
         ],
         "type": "object",
         "allOf": [
           {
-            "$ref": "#/components/schemas/EntityTreeItemModel"
+            "$ref": "#/components/schemas/EntityTreeItemResponseModel"
           }
         ],
         "properties": {
@@ -7486,29 +7425,9 @@
         "discriminator": {
           "propertyName": "$type",
           "mapping": {
-            "DocumentBlueprintTreeItemViewModel": "#/components/schemas/DocumentBlueprintTreeItemModel"
+            "DocumentBlueprintTreeItemResponseModel": "#/components/schemas/DocumentBlueprintTreeItemResponseModel"
           }
         }
-      },
-      "DocumentCreateRequestModel": {
-        "type": "object",
-        "allOf": [
-          {
-            "$ref": "#/components/schemas/ContentCreateRequestModelBaseDocumentValueModelDocumentVariantRequestModel"
-          }
-        ],
-        "properties": {
-          "contentTypeKey": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "templateKey": {
-            "type": "string",
-            "format": "uuid",
-            "nullable": true
-          }
-        },
-        "additionalProperties": false
       },
       "DocumentResponseModel": {
         "type": "object",
@@ -7536,14 +7455,14 @@
         },
         "additionalProperties": false
       },
-      "DocumentTreeItemModel": {
+      "DocumentTreeItemResponseModel": {
         "required": [
           "$type"
         ],
         "type": "object",
         "allOf": [
           {
-            "$ref": "#/components/schemas/ContentTreeItemModel"
+            "$ref": "#/components/schemas/ContentTreeItemResponseModel"
           }
         ],
         "properties": {
@@ -7564,15 +7483,33 @@
         "discriminator": {
           "propertyName": "$type",
           "mapping": {
-            "DocumentTreeItemViewModel": "#/components/schemas/DocumentTreeItemModel"
+            "DocumentTreeItemResponseModel": "#/components/schemas/DocumentTreeItemResponseModel"
           }
         }
       },
-      "DocumentTypeModel": {
+      "DocumentTypePropertyTypeContainerPresentationBaseModel": {
         "type": "object",
         "allOf": [
           {
-            "$ref": "#/components/schemas/ContentTypeViewModelBaseDocumentTypePropertyTypeDocumentTypePropertyTypeContainerModel"
+            "$ref": "#/components/schemas/PropertyTypeContainerPresentationBaseModel"
+          }
+        ],
+        "additionalProperties": false
+      },
+      "DocumentTypePropertyTypePresentationBaseModel": {
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/PropertyTypePresentationBaseModel"
+          }
+        ],
+        "additionalProperties": false
+      },
+      "DocumentTypeResponseModel": {
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ContentTypePresentationBaseDocumentTypePropertyTypePresentationBaseDocumentTypePropertyTypeContainerPresentationBaseModel"
           }
         ],
         "properties": {
@@ -7591,32 +7528,14 @@
         },
         "additionalProperties": false
       },
-      "DocumentTypePropertyTypeContainerModel": {
-        "type": "object",
-        "allOf": [
-          {
-            "$ref": "#/components/schemas/PropertyTypeContainerViewModelBaseModel"
-          }
-        ],
-        "additionalProperties": false
-      },
-      "DocumentTypePropertyTypeModel": {
-        "type": "object",
-        "allOf": [
-          {
-            "$ref": "#/components/schemas/PropertyTypeViewModelBaseModel"
-          }
-        ],
-        "additionalProperties": false
-      },
-      "DocumentTypeTreeItemModel": {
+      "DocumentTypeTreeItemResponseModel": {
         "required": [
           "$type"
         ],
         "type": "object",
         "allOf": [
           {
-            "$ref": "#/components/schemas/FolderTreeItemModel"
+            "$ref": "#/components/schemas/FolderTreeItemResponseModel"
           }
         ],
         "properties": {
@@ -7631,25 +7550,9 @@
         "discriminator": {
           "propertyName": "$type",
           "mapping": {
-            "DocumentTypeTreeItemViewModel": "#/components/schemas/DocumentTypeTreeItemModel"
+            "DocumentTypeTreeItemResponseModel": "#/components/schemas/DocumentTypeTreeItemResponseModel"
           }
         }
-      },
-      "DocumentUpdateRequestModel": {
-        "type": "object",
-        "allOf": [
-          {
-            "$ref": "#/components/schemas/ContentUpdateRequestModelBaseDocumentValueModelDocumentVariantRequestModel"
-          }
-        ],
-        "properties": {
-          "templateKey": {
-            "type": "string",
-            "format": "uuid",
-            "nullable": true
-          }
-        },
-        "additionalProperties": false
       },
       "DocumentValueModel": {
         "required": [
@@ -7728,14 +7631,14 @@
           }
         }
       },
-      "EntityTreeItemModel": {
+      "EntityTreeItemResponseModel": {
         "required": [
           "$type"
         ],
         "type": "object",
         "allOf": [
           {
-            "$ref": "#/components/schemas/TreeItemModel"
+            "$ref": "#/components/schemas/TreeItemPresentationModel"
           }
         ],
         "properties": {
@@ -7759,16 +7662,16 @@
         "discriminator": {
           "propertyName": "$type",
           "mapping": {
-            "EntityTreeItemViewModel": "#/components/schemas/EntityTreeItemModel",
-            "ContentTreeItemViewModel": "#/components/schemas/ContentTreeItemModel",
-            "DocumentBlueprintTreeItemViewModel": "#/components/schemas/DocumentBlueprintTreeItemModel",
-            "DocumentTreeItemViewModel": "#/components/schemas/DocumentTreeItemModel",
-            "DocumentTypeTreeItemViewModel": "#/components/schemas/DocumentTypeTreeItemModel",
-            "FolderTreeItemViewModel": "#/components/schemas/FolderTreeItemModel"
+            "EntityTreeItemResponseModel": "#/components/schemas/EntityTreeItemResponseModel",
+            "ContentTreeItemResponseModel": "#/components/schemas/ContentTreeItemResponseModel",
+            "DocumentBlueprintTreeItemResponseModel": "#/components/schemas/DocumentBlueprintTreeItemResponseModel",
+            "DocumentTreeItemResponseModel": "#/components/schemas/DocumentTreeItemResponseModel",
+            "DocumentTypeTreeItemResponseModel": "#/components/schemas/DocumentTypeTreeItemResponseModel",
+            "FolderTreeItemResponseModel": "#/components/schemas/FolderTreeItemResponseModel"
           }
         }
       },
-      "FieldModel": {
+      "FieldPresentationModel": {
         "type": "object",
         "properties": {
           "name": {
@@ -7783,11 +7686,11 @@
         },
         "additionalProperties": false
       },
-      "FileSystemTreeItemModel": {
+      "FileSystemTreeItemPresentationModel": {
         "type": "object",
         "allOf": [
           {
-            "$ref": "#/components/schemas/TreeItemModel"
+            "$ref": "#/components/schemas/TreeItemPresentationModel"
           }
         ],
         "properties": {
@@ -7800,23 +7703,16 @@
         },
         "additionalProperties": false
       },
-      "FolderCreateModel": {
+      "FolderModelBaseModel": {
         "type": "object",
-        "allOf": [
-          {
-            "$ref": "#/components/schemas/FolderModelBaseModel"
-          }
-        ],
         "properties": {
-          "parentKey": {
-            "type": "string",
-            "format": "uuid",
-            "nullable": true
+          "name": {
+            "type": "string"
           }
         },
         "additionalProperties": false
       },
-      "FolderModel": {
+      "FolderReponseModel": {
         "required": [
           "$type"
         ],
@@ -7844,27 +7740,18 @@
         "discriminator": {
           "propertyName": "$type",
           "mapping": {
-            "FolderViewModel": "#/components/schemas/FolderModel"
+            "FolderReponseModel": "#/components/schemas/FolderReponseModel"
           }
         }
       },
-      "FolderModelBaseModel": {
-        "type": "object",
-        "properties": {
-          "name": {
-            "type": "string"
-          }
-        },
-        "additionalProperties": false
-      },
-      "FolderTreeItemModel": {
+      "FolderTreeItemResponseModel": {
         "required": [
           "$type"
         ],
         "type": "object",
         "allOf": [
           {
-            "$ref": "#/components/schemas/EntityTreeItemModel"
+            "$ref": "#/components/schemas/EntityTreeItemResponseModel"
           }
         ],
         "properties": {
@@ -7879,21 +7766,12 @@
         "discriminator": {
           "propertyName": "$type",
           "mapping": {
-            "FolderTreeItemViewModel": "#/components/schemas/FolderTreeItemModel",
-            "DocumentTypeTreeItemViewModel": "#/components/schemas/DocumentTypeTreeItemModel"
+            "FolderTreeItemResponseModel": "#/components/schemas/FolderTreeItemResponseModel",
+            "DocumentTypeTreeItemResponseModel": "#/components/schemas/DocumentTypeTreeItemResponseModel"
           }
         }
       },
-      "FolderUpdateModel": {
-        "type": "object",
-        "allOf": [
-          {
-            "$ref": "#/components/schemas/FolderModelBaseModel"
-          }
-        ],
-        "additionalProperties": false
-      },
-      "HealthCheckActionModel": {
+      "HealthCheckActionRequestModel": {
         "type": "object",
         "properties": {
           "healthCheckKey": {
@@ -7930,11 +7808,20 @@
         },
         "additionalProperties": false
       },
-      "HealthCheckGroupModel": {
+      "HealthCheckGroupPresentationBaseModel": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "HealthCheckGroupPresentationModel": {
         "type": "object",
         "allOf": [
           {
-            "$ref": "#/components/schemas/HealthCheckGroupModelBaseModel"
+            "$ref": "#/components/schemas/HealthCheckGroupPresentationBaseModel"
           }
         ],
         "properties": {
@@ -7951,16 +7838,16 @@
         },
         "additionalProperties": false
       },
-      "HealthCheckGroupModelBaseModel": {
+      "HealthCheckGroupResponseModel": {
         "type": "object",
-        "properties": {
-          "name": {
-            "type": "string"
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/HealthCheckGroupPresentationBaseModel"
           }
-        },
+        ],
         "additionalProperties": false
       },
-      "HealthCheckGroupWithResultModel": {
+      "HealthCheckGroupWithResultResponseModel": {
         "type": "object",
         "properties": {
           "checks": {
@@ -7968,7 +7855,7 @@
             "items": {
               "oneOf": [
                 {
-                  "$ref": "#/components/schemas/HealthCheckWithResultModel"
+                  "$ref": "#/components/schemas/HealthCheckWithResultPresentationModel"
                 }
               ]
             }
@@ -8004,7 +7891,7 @@
         },
         "additionalProperties": false
       },
-      "HealthCheckResultModel": {
+      "HealthCheckResultResponseModel": {
         "type": "object",
         "properties": {
           "message": {
@@ -8018,7 +7905,7 @@
             "items": {
               "oneOf": [
                 {
-                  "$ref": "#/components/schemas/HealthCheckActionModel"
+                  "$ref": "#/components/schemas/HealthCheckActionRequestModel"
                 }
               ]
             },
@@ -8031,7 +7918,7 @@
         },
         "additionalProperties": false
       },
-      "HealthCheckWithResultModel": {
+      "HealthCheckWithResultPresentationModel": {
         "type": "object",
         "allOf": [
           {
@@ -8044,7 +7931,7 @@
             "items": {
               "oneOf": [
                 {
-                  "$ref": "#/components/schemas/HealthCheckResultModel"
+                  "$ref": "#/components/schemas/HealthCheckResultResponseModel"
                 }
               ]
             },
@@ -8062,7 +7949,7 @@
         "type": "integer",
         "format": "int32"
       },
-      "HelpPageModel": {
+      "HelpPageResponseModel": {
         "type": "object",
         "properties": {
           "name": {
@@ -8084,7 +7971,22 @@
         },
         "additionalProperties": false
       },
-      "IndexModel": {
+      "ImportDictionaryRequestModel": {
+        "type": "object",
+        "properties": {
+          "temporaryFileKey": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "parentKey": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "IndexResponseModel": {
         "required": [
           "canRebuild",
           "documentCount",
@@ -8122,34 +8024,7 @@
         },
         "additionalProperties": false
       },
-      "InstallModel": {
-        "required": [
-          "database",
-          "user"
-        ],
-        "type": "object",
-        "properties": {
-          "user": {
-            "oneOf": [
-              {
-                "$ref": "#/components/schemas/UserInstallModel"
-              }
-            ]
-          },
-          "database": {
-            "oneOf": [
-              {
-                "$ref": "#/components/schemas/DatabaseInstallModel"
-              }
-            ]
-          },
-          "telemetryLevel": {
-            "$ref": "#/components/schemas/TelemetryLevelModel"
-          }
-        },
-        "additionalProperties": false
-      },
-      "InstallSettingsModel": {
+      "InstallSettingsResponseModel": {
         "type": "object",
         "properties": {
           "user": {
@@ -8164,7 +8039,7 @@
             "items": {
               "oneOf": [
                 {
-                  "$ref": "#/components/schemas/DatabaseSettingsModel"
+                  "$ref": "#/components/schemas/DatabaseSettingsPresentationModel"
                 }
               ]
             }
@@ -8172,30 +8047,29 @@
         },
         "additionalProperties": false
       },
-      "LanguageCreateModel": {
-        "type": "object",
-        "allOf": [
-          {
-            "$ref": "#/components/schemas/LanguageModelBaseModel"
-          }
+      "InstallVResponseModel": {
+        "required": [
+          "database",
+          "user"
         ],
-        "properties": {
-          "isoCode": {
-            "type": "string"
-          }
-        },
-        "additionalProperties": false
-      },
-      "LanguageModel": {
         "type": "object",
-        "allOf": [
-          {
-            "$ref": "#/components/schemas/LanguageModelBaseModel"
-          }
-        ],
         "properties": {
-          "isoCode": {
-            "type": "string"
+          "user": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/UserInstallResponseModel"
+              }
+            ]
+          },
+          "database": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/DatabaseInstallResponseModel"
+              }
+            ]
+          },
+          "telemetryLevel": {
+            "$ref": "#/components/schemas/TelemetryLevelModel"
           }
         },
         "additionalProperties": false
@@ -8219,16 +8093,21 @@
         },
         "additionalProperties": false
       },
-      "LanguageUpdateModel": {
+      "LanguageResponseModel": {
         "type": "object",
         "allOf": [
           {
             "$ref": "#/components/schemas/LanguageModelBaseModel"
           }
         ],
+        "properties": {
+          "isoCode": {
+            "type": "string"
+          }
+        },
         "additionalProperties": false
       },
-      "LogLevelCountsModel": {
+      "LogLevelCountsReponseModel": {
         "type": "object",
         "properties": {
           "information": {
@@ -8266,7 +8145,20 @@
         "type": "integer",
         "format": "int32"
       },
-      "LogMessageModel": {
+      "LogMessagePropertyPresentationModel": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "value": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "LogMessageResponseModel": {
         "type": "object",
         "properties": {
           "timestamp": {
@@ -8289,7 +8181,7 @@
             "items": {
               "oneOf": [
                 {
-                  "$ref": "#/components/schemas/LogMessagePropertyModel"
+                  "$ref": "#/components/schemas/LogMessagePropertyPresentationModel"
                 }
               ]
             }
@@ -8301,20 +8193,7 @@
         },
         "additionalProperties": false
       },
-      "LogMessagePropertyModel": {
-        "type": "object",
-        "properties": {
-          "name": {
-            "type": "string"
-          },
-          "value": {
-            "type": "string",
-            "nullable": true
-          }
-        },
-        "additionalProperties": false
-      },
-      "LogTemplateModel": {
+      "LogTemplateResponseModel": {
         "type": "object",
         "properties": {
           "messageTemplate": {
@@ -8328,7 +8207,7 @@
         },
         "additionalProperties": false
       },
-      "LoggerModel": {
+      "LoggerResponseModel": {
         "type": "object",
         "properties": {
           "name": {
@@ -8340,7 +8219,7 @@
         },
         "additionalProperties": false
       },
-      "ModelsBuilderModel": {
+      "ModelsBuilderResponseModel": {
         "type": "object",
         "properties": {
           "mode": {
@@ -8380,6 +8259,28 @@
         "type": "integer",
         "format": "int32"
       },
+      "MoveDataTypeRequestModel": {
+        "type": "object",
+        "properties": {
+          "targetKey": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "MoveDictionaryRequestModel": {
+        "type": "object",
+        "properties": {
+          "targetKey": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
       "ObjectTypeResponseModel": {
         "type": "object",
         "properties": {
@@ -8418,7 +8319,7 @@
         "type": "integer",
         "format": "int32"
       },
-      "OutOfDateStatusModel": {
+      "OutOfDateStatusResponseModel": {
         "type": "object",
         "properties": {
           "status": {
@@ -8436,16 +8337,7 @@
         "type": "integer",
         "format": "int32"
       },
-      "PackageCreateModel": {
-        "type": "object",
-        "allOf": [
-          {
-            "$ref": "#/components/schemas/PackageModelBaseModel"
-          }
-        ],
-        "additionalProperties": false
-      },
-      "PackageDefinitionModel": {
+      "PackageDefinitionResponseModel": {
         "type": "object",
         "allOf": [
           {
@@ -8463,7 +8355,7 @@
         },
         "additionalProperties": false
       },
-      "PackageManifestModel": {
+      "PackageManifestResponseModel": {
         "type": "object",
         "properties": {
           "name": {
@@ -8480,7 +8372,7 @@
         },
         "additionalProperties": false
       },
-      "PackageMigrationStatusModel": {
+      "PackageMigrationStatusResponseModel": {
         "type": "object",
         "properties": {
           "packageName": {
@@ -8572,20 +8464,6 @@
         },
         "additionalProperties": false
       },
-      "PackageUpdateModel": {
-        "type": "object",
-        "allOf": [
-          {
-            "$ref": "#/components/schemas/PackageModelBaseModel"
-          }
-        ],
-        "properties": {
-          "packagePath": {
-            "type": "string"
-          }
-        },
-        "additionalProperties": false
-      },
       "PagedAuditLogResponseModel": {
         "required": [
           "items",
@@ -8634,7 +8512,7 @@
         },
         "additionalProperties": false
       },
-      "PagedContentTreeItemModel": {
+      "PagedContentTreeItemResponseModel": {
         "required": [
           "items",
           "total"
@@ -8650,10 +8528,10 @@
             "items": {
               "oneOf": [
                 {
-                  "$ref": "#/components/schemas/ContentTreeItemModel"
+                  "$ref": "#/components/schemas/ContentTreeItemResponseModel"
                 },
                 {
-                  "$ref": "#/components/schemas/DocumentTreeItemModel"
+                  "$ref": "#/components/schemas/DocumentTreeItemResponseModel"
                 }
               ]
             }
@@ -8661,7 +8539,7 @@
         },
         "additionalProperties": false
       },
-      "PagedCultureModel": {
+      "PagedCultureReponseModel": {
         "required": [
           "items",
           "total"
@@ -8677,7 +8555,7 @@
             "items": {
               "oneOf": [
                 {
-                  "$ref": "#/components/schemas/CultureModel"
+                  "$ref": "#/components/schemas/CultureReponseModel"
                 }
               ]
             }
@@ -8685,7 +8563,7 @@
         },
         "additionalProperties": false
       },
-      "PagedDictionaryOverviewModel": {
+      "PagedDictionaryOverviewResponseModel": {
         "required": [
           "items",
           "total"
@@ -8701,7 +8579,7 @@
             "items": {
               "oneOf": [
                 {
-                  "$ref": "#/components/schemas/DictionaryOverviewModel"
+                  "$ref": "#/components/schemas/DictionaryOverviewResponseModel"
                 }
               ]
             }
@@ -8709,7 +8587,7 @@
         },
         "additionalProperties": false
       },
-      "PagedDocumentBlueprintTreeItemModel": {
+      "PagedDocumentBlueprintTreeItemResponseModel": {
         "required": [
           "items",
           "total"
@@ -8725,7 +8603,7 @@
             "items": {
               "oneOf": [
                 {
-                  "$ref": "#/components/schemas/DocumentBlueprintTreeItemModel"
+                  "$ref": "#/components/schemas/DocumentBlueprintTreeItemResponseModel"
                 }
               ]
             }
@@ -8733,7 +8611,7 @@
         },
         "additionalProperties": false
       },
-      "PagedDocumentTreeItemModel": {
+      "PagedDocumentTreeItemResponseModel": {
         "required": [
           "items",
           "total"
@@ -8749,7 +8627,7 @@
             "items": {
               "oneOf": [
                 {
-                  "$ref": "#/components/schemas/DocumentTreeItemModel"
+                  "$ref": "#/components/schemas/DocumentTreeItemResponseModel"
                 }
               ]
             }
@@ -8757,7 +8635,7 @@
         },
         "additionalProperties": false
       },
-      "PagedDocumentTypeTreeItemModel": {
+      "PagedDocumentTypeTreeItemResponseModel": {
         "required": [
           "items",
           "total"
@@ -8773,7 +8651,7 @@
             "items": {
               "oneOf": [
                 {
-                  "$ref": "#/components/schemas/DocumentTypeTreeItemModel"
+                  "$ref": "#/components/schemas/DocumentTypeTreeItemResponseModel"
                 }
               ]
             }
@@ -8781,7 +8659,7 @@
         },
         "additionalProperties": false
       },
-      "PagedEntityTreeItemModel": {
+      "PagedEntityTreeItemResponseModel": {
         "required": [
           "items",
           "total"
@@ -8797,22 +8675,22 @@
             "items": {
               "oneOf": [
                 {
-                  "$ref": "#/components/schemas/EntityTreeItemModel"
+                  "$ref": "#/components/schemas/EntityTreeItemResponseModel"
                 },
                 {
-                  "$ref": "#/components/schemas/ContentTreeItemModel"
+                  "$ref": "#/components/schemas/ContentTreeItemResponseModel"
                 },
                 {
-                  "$ref": "#/components/schemas/DocumentBlueprintTreeItemModel"
+                  "$ref": "#/components/schemas/DocumentBlueprintTreeItemResponseModel"
                 },
                 {
-                  "$ref": "#/components/schemas/DocumentTreeItemModel"
+                  "$ref": "#/components/schemas/DocumentTreeItemResponseModel"
                 },
                 {
-                  "$ref": "#/components/schemas/DocumentTypeTreeItemModel"
+                  "$ref": "#/components/schemas/DocumentTypeTreeItemResponseModel"
                 },
                 {
-                  "$ref": "#/components/schemas/FolderTreeItemModel"
+                  "$ref": "#/components/schemas/FolderTreeItemResponseModel"
                 }
               ]
             }
@@ -8820,7 +8698,7 @@
         },
         "additionalProperties": false
       },
-      "PagedFileSystemTreeItemModel": {
+      "PagedFileSystemTreeItemPresentationModel": {
         "required": [
           "items",
           "total"
@@ -8836,7 +8714,7 @@
             "items": {
               "oneOf": [
                 {
-                  "$ref": "#/components/schemas/FileSystemTreeItemModel"
+                  "$ref": "#/components/schemas/FileSystemTreeItemPresentationModel"
                 }
               ]
             }
@@ -8844,7 +8722,7 @@
         },
         "additionalProperties": false
       },
-      "PagedFolderTreeItemModel": {
+      "PagedFolderTreeItemResponseModel": {
         "required": [
           "items",
           "total"
@@ -8860,10 +8738,10 @@
             "items": {
               "oneOf": [
                 {
-                  "$ref": "#/components/schemas/FolderTreeItemModel"
+                  "$ref": "#/components/schemas/FolderTreeItemResponseModel"
                 },
                 {
-                  "$ref": "#/components/schemas/DocumentTypeTreeItemModel"
+                  "$ref": "#/components/schemas/DocumentTypeTreeItemResponseModel"
                 }
               ]
             }
@@ -8871,7 +8749,7 @@
         },
         "additionalProperties": false
       },
-      "PagedHealthCheckGroupModelBaseModel": {
+      "PagedHealthCheckGroupResponseModel": {
         "required": [
           "items",
           "total"
@@ -8887,10 +8765,7 @@
             "items": {
               "oneOf": [
                 {
-                  "$ref": "#/components/schemas/HealthCheckGroupModelBaseModel"
-                },
-                {
-                  "$ref": "#/components/schemas/HealthCheckGroupModel"
+                  "$ref": "#/components/schemas/HealthCheckGroupResponseModel"
                 }
               ]
             }
@@ -8898,7 +8773,7 @@
         },
         "additionalProperties": false
       },
-      "PagedHelpPageModel": {
+      "PagedHelpPageResponseModel": {
         "required": [
           "items",
           "total"
@@ -8914,7 +8789,7 @@
             "items": {
               "oneOf": [
                 {
-                  "$ref": "#/components/schemas/HelpPageModel"
+                  "$ref": "#/components/schemas/HelpPageResponseModel"
                 }
               ]
             }
@@ -8922,7 +8797,7 @@
         },
         "additionalProperties": false
       },
-      "PagedIndexModel": {
+      "PagedIndexResponseModel": {
         "required": [
           "items",
           "total"
@@ -8938,7 +8813,7 @@
             "items": {
               "oneOf": [
                 {
-                  "$ref": "#/components/schemas/IndexModel"
+                  "$ref": "#/components/schemas/IndexResponseModel"
                 }
               ]
             }
@@ -8946,7 +8821,7 @@
         },
         "additionalProperties": false
       },
-      "PagedLanguageModel": {
+      "PagedLanguageResponseModel": {
         "required": [
           "items",
           "total"
@@ -8962,7 +8837,7 @@
             "items": {
               "oneOf": [
                 {
-                  "$ref": "#/components/schemas/LanguageModel"
+                  "$ref": "#/components/schemas/LanguageResponseModel"
                 }
               ]
             }
@@ -8970,7 +8845,7 @@
         },
         "additionalProperties": false
       },
-      "PagedLogMessageModel": {
+      "PagedLogMessageResponseModel": {
         "required": [
           "items",
           "total"
@@ -8986,7 +8861,7 @@
             "items": {
               "oneOf": [
                 {
-                  "$ref": "#/components/schemas/LogMessageModel"
+                  "$ref": "#/components/schemas/LogMessageResponseModel"
                 }
               ]
             }
@@ -8994,7 +8869,7 @@
         },
         "additionalProperties": false
       },
-      "PagedLogTemplateModel": {
+      "PagedLogTemplateResponseModel": {
         "required": [
           "items",
           "total"
@@ -9010,7 +8885,7 @@
             "items": {
               "oneOf": [
                 {
-                  "$ref": "#/components/schemas/LogTemplateModel"
+                  "$ref": "#/components/schemas/LogTemplateResponseModel"
                 }
               ]
             }
@@ -9018,7 +8893,7 @@
         },
         "additionalProperties": false
       },
-      "PagedLoggerModel": {
+      "PagedLoggerResponseModel": {
         "required": [
           "items",
           "total"
@@ -9034,7 +8909,7 @@
             "items": {
               "oneOf": [
                 {
-                  "$ref": "#/components/schemas/LoggerModel"
+                  "$ref": "#/components/schemas/LoggerResponseModel"
                 }
               ]
             }
@@ -9066,7 +8941,7 @@
         },
         "additionalProperties": false
       },
-      "PagedPackageDefinitionModel": {
+      "PagedPackageDefinitionResponseModel": {
         "required": [
           "items",
           "total"
@@ -9082,7 +8957,7 @@
             "items": {
               "oneOf": [
                 {
-                  "$ref": "#/components/schemas/PackageDefinitionModel"
+                  "$ref": "#/components/schemas/PackageDefinitionResponseModel"
                 }
               ]
             }
@@ -9090,7 +8965,7 @@
         },
         "additionalProperties": false
       },
-      "PagedPackageMigrationStatusModel": {
+      "PagedPackageMigrationStatusResponseModel": {
         "required": [
           "items",
           "total"
@@ -9106,7 +8981,7 @@
             "items": {
               "oneOf": [
                 {
-                  "$ref": "#/components/schemas/PackageMigrationStatusModel"
+                  "$ref": "#/components/schemas/PackageMigrationStatusResponseModel"
                 }
               ]
             }
@@ -9114,7 +8989,7 @@
         },
         "additionalProperties": false
       },
-      "PagedRecycleBinItemModel": {
+      "PagedRecycleBinItemResponseModel": {
         "required": [
           "items",
           "total"
@@ -9130,7 +9005,7 @@
             "items": {
               "oneOf": [
                 {
-                  "$ref": "#/components/schemas/RecycleBinItemModel"
+                  "$ref": "#/components/schemas/RecycleBinItemResponseModel"
                 }
               ]
             }
@@ -9138,7 +9013,7 @@
         },
         "additionalProperties": false
       },
-      "PagedRedirectUrlModel": {
+      "PagedRedirectUrlResponseModel": {
         "required": [
           "items",
           "total"
@@ -9154,7 +9029,7 @@
             "items": {
               "oneOf": [
                 {
-                  "$ref": "#/components/schemas/RedirectUrlModel"
+                  "$ref": "#/components/schemas/RedirectUrlResponseModel"
                 }
               ]
             }
@@ -9162,7 +9037,7 @@
         },
         "additionalProperties": false
       },
-      "PagedRelationItemModel": {
+      "PagedRelationItemResponseModel": {
         "required": [
           "items",
           "total"
@@ -9178,7 +9053,7 @@
             "items": {
               "oneOf": [
                 {
-                  "$ref": "#/components/schemas/RelationItemModel"
+                  "$ref": "#/components/schemas/RelationItemResponseModel"
                 }
               ]
             }
@@ -9186,7 +9061,7 @@
         },
         "additionalProperties": false
       },
-      "PagedRelationModel": {
+      "PagedRelationResponseModel": {
         "required": [
           "items",
           "total"
@@ -9202,7 +9077,7 @@
             "items": {
               "oneOf": [
                 {
-                  "$ref": "#/components/schemas/RelationModel"
+                  "$ref": "#/components/schemas/RelationResponseModel"
                 }
               ]
             }
@@ -9210,7 +9085,7 @@
         },
         "additionalProperties": false
       },
-      "PagedSavedLogSearchModel": {
+      "PagedSavedLogSearchResponseModel": {
         "required": [
           "items",
           "total"
@@ -9226,7 +9101,7 @@
             "items": {
               "oneOf": [
                 {
-                  "$ref": "#/components/schemas/SavedLogSearchModel"
+                  "$ref": "#/components/schemas/SavedLogSearchResponseModel"
                 }
               ]
             }
@@ -9234,7 +9109,7 @@
         },
         "additionalProperties": false
       },
-      "PagedSearchResultModel": {
+      "PagedSearchResultResponseModel": {
         "required": [
           "items",
           "total"
@@ -9250,7 +9125,7 @@
             "items": {
               "oneOf": [
                 {
-                  "$ref": "#/components/schemas/SearchResultModel"
+                  "$ref": "#/components/schemas/SearchResultResponseModel"
                 }
               ]
             }
@@ -9258,7 +9133,7 @@
         },
         "additionalProperties": false
       },
-      "PagedSearcherModel": {
+      "PagedSearcherResponseModel": {
         "required": [
           "items",
           "total"
@@ -9274,7 +9149,7 @@
             "items": {
               "oneOf": [
                 {
-                  "$ref": "#/components/schemas/SearcherModel"
+                  "$ref": "#/components/schemas/SearcherResponseModel"
                 }
               ]
             }
@@ -9282,7 +9157,7 @@
         },
         "additionalProperties": false
       },
-      "PagedTelemetryModel": {
+      "PagedTelemetryResponseModel": {
         "required": [
           "items",
           "total"
@@ -9298,7 +9173,7 @@
             "items": {
               "oneOf": [
                 {
-                  "$ref": "#/components/schemas/TelemetryModel"
+                  "$ref": "#/components/schemas/TelemetryResponseModel"
                 }
               ]
             }
@@ -9306,7 +9181,7 @@
         },
         "additionalProperties": false
       },
-      "PagedUserGroupModel": {
+      "PagedUserGroupPresentationModel": {
         "required": [
           "items",
           "total"
@@ -9322,7 +9197,7 @@
             "items": {
               "oneOf": [
                 {
-                  "$ref": "#/components/schemas/UserGroupModel"
+                  "$ref": "#/components/schemas/UserGroupPresentationModel"
                 }
               ]
             }
@@ -9357,7 +9232,16 @@
         },
         "additionalProperties": { }
       },
-      "ProfilingStatusModel": {
+      "ProfilingStatusRequestModel": {
+        "type": "object",
+        "properties": {
+          "enabled": {
+            "type": "boolean"
+          }
+        },
+        "additionalProperties": false
+      },
+      "ProfilingStatusResponseModel": {
         "type": "object",
         "properties": {
           "enabled": {
@@ -9375,7 +9259,7 @@
         },
         "additionalProperties": false
       },
-      "PropertyTypeContainerViewModelBaseModel": {
+      "PropertyTypeContainerPresentationBaseModel": {
         "type": "object",
         "properties": {
           "key": {
@@ -9401,28 +9285,7 @@
         },
         "additionalProperties": false
       },
-      "PropertyTypeValidationModel": {
-        "type": "object",
-        "properties": {
-          "mandatory": {
-            "type": "boolean"
-          },
-          "mandatoryMessage": {
-            "type": "string",
-            "nullable": true
-          },
-          "regEx": {
-            "type": "string",
-            "nullable": true
-          },
-          "regExMessage": {
-            "type": "string",
-            "nullable": true
-          }
-        },
-        "additionalProperties": false
-      },
-      "PropertyTypeViewModelBaseModel": {
+      "PropertyTypePresentationBaseModel": {
         "type": "object",
         "properties": {
           "key": {
@@ -9471,7 +9334,28 @@
         },
         "additionalProperties": false
       },
-      "RecycleBinItemModel": {
+      "PropertyTypeValidationModel": {
+        "type": "object",
+        "properties": {
+          "mandatory": {
+            "type": "boolean"
+          },
+          "mandatoryMessage": {
+            "type": "string",
+            "nullable": true
+          },
+          "regEx": {
+            "type": "string",
+            "nullable": true
+          },
+          "regExMessage": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "RecycleBinItemResponseModel": {
         "required": [
           "$type"
         ],
@@ -9509,7 +9393,7 @@
         "discriminator": {
           "propertyName": "$type",
           "mapping": {
-            "RecycleBinItemViewModel": "#/components/schemas/RecycleBinItemModel"
+            "RecycleBinItemResponseModel": "#/components/schemas/RecycleBinItemResponseModel"
           }
         }
       },
@@ -9521,7 +9405,7 @@
         "type": "integer",
         "format": "int32"
       },
-      "RedirectUrlModel": {
+      "RedirectUrlResponseModel": {
         "type": "object",
         "properties": {
           "key": {
@@ -9549,7 +9433,7 @@
         },
         "additionalProperties": false
       },
-      "RedirectUrlStatusModel": {
+      "RedirectUrlStatusResponseModel": {
         "type": "object",
         "properties": {
           "status": {
@@ -9561,7 +9445,7 @@
         },
         "additionalProperties": false
       },
-      "RelationItemModel": {
+      "RelationItemResponseModel": {
         "type": "object",
         "properties": {
           "nodeKey": {
@@ -9605,7 +9489,7 @@
         },
         "additionalProperties": false
       },
-      "RelationModel": {
+      "RelationResponseModel": {
         "type": "object",
         "properties": {
           "parentId": {
@@ -9705,7 +9589,16 @@
         "type": "integer",
         "format": "int32"
       },
-      "SavedLogSearchModel": {
+      "SaveUserGroupRequestModel": {
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/UserGroupBaseModel"
+          }
+        ],
+        "additionalProperties": false
+      },
+      "SavedLogSearchPresenationBaseModel": {
         "type": "object",
         "properties": {
           "name": {
@@ -9717,7 +9610,25 @@
         },
         "additionalProperties": false
       },
-      "SearchResultModel": {
+      "SavedLogSearchRequestModel": {
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/SavedLogSearchPresenationBaseModel"
+          }
+        ],
+        "additionalProperties": false
+      },
+      "SavedLogSearchResponseModel": {
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/SavedLogSearchPresenationBaseModel"
+          }
+        ],
+        "additionalProperties": false
+      },
+      "SearchResultResponseModel": {
         "type": "object",
         "properties": {
           "id": {
@@ -9737,7 +9648,7 @@
             "items": {
               "oneOf": [
                 {
-                  "$ref": "#/components/schemas/FieldModel"
+                  "$ref": "#/components/schemas/FieldPresentationModel"
                 }
               ]
             }
@@ -9745,7 +9656,7 @@
         },
         "additionalProperties": false
       },
-      "SearcherModel": {
+      "SearcherResponseModel": {
         "type": "object",
         "properties": {
           "name": {
@@ -9754,7 +9665,7 @@
         },
         "additionalProperties": false
       },
-      "ServerStatusModel": {
+      "ServerStatusResponseModel": {
         "type": "object",
         "properties": {
           "serverStatus": {
@@ -9782,7 +9693,7 @@
         "type": "integer",
         "format": "int32"
       },
-      "TelemetryModel": {
+      "TelemetryRepresentationBaseModel": {
         "type": "object",
         "properties": {
           "telemetryLevel": {
@@ -9791,41 +9702,23 @@
         },
         "additionalProperties": false
       },
-      "TemplateCreateModel": {
+      "TelemetryRequestModel": {
         "type": "object",
         "allOf": [
           {
-            "$ref": "#/components/schemas/TemplateModelBaseModel"
+            "$ref": "#/components/schemas/TelemetryRepresentationBaseModel"
           }
         ],
         "additionalProperties": false
       },
-      "TemplateModel": {
-        "required": [
-          "$type"
-        ],
+      "TelemetryResponseModel": {
         "type": "object",
         "allOf": [
           {
-            "$ref": "#/components/schemas/TemplateModelBaseModel"
+            "$ref": "#/components/schemas/TelemetryRepresentationBaseModel"
           }
         ],
-        "properties": {
-          "$type": {
-            "type": "string"
-          },
-          "key": {
-            "type": "string",
-            "format": "uuid"
-          }
-        },
-        "additionalProperties": false,
-        "discriminator": {
-          "propertyName": "$type",
-          "mapping": {
-            "TemplateViewModel": "#/components/schemas/TemplateModel"
-          }
-        }
+        "additionalProperties": false
       },
       "TemplateModelBaseModel": {
         "type": "object",
@@ -9843,7 +9736,7 @@
         },
         "additionalProperties": false
       },
-      "TemplateQueryExecuteFilterModel": {
+      "TemplateQueryExecuteFilterPresentationModel": {
         "type": "object",
         "properties": {
           "propertyAlias": {
@@ -9875,7 +9768,7 @@
             "items": {
               "oneOf": [
                 {
-                  "$ref": "#/components/schemas/TemplateQueryExecuteFilterModel"
+                  "$ref": "#/components/schemas/TemplateQueryExecuteFilterPresentationModel"
                 }
               ]
             },
@@ -9924,7 +9817,7 @@
         },
         "additionalProperties": false
       },
-      "TemplateQueryPropertyModel": {
+      "TemplateQueryPropertyPresentationModel": {
         "type": "object",
         "properties": {
           "alias": {
@@ -9945,7 +9838,7 @@
         "type": "integer",
         "format": "int32"
       },
-      "TemplateQueryResultItemModel": {
+      "TemplateQueryResultItemPresentationModel": {
         "type": "object",
         "properties": {
           "icon": {
@@ -9957,7 +9850,7 @@
         },
         "additionalProperties": false
       },
-      "TemplateQueryResultModel": {
+      "TemplateQueryResultResponseModel": {
         "type": "object",
         "properties": {
           "queryExpression": {
@@ -9968,7 +9861,7 @@
             "items": {
               "oneOf": [
                 {
-                  "$ref": "#/components/schemas/TemplateQueryResultItemModel"
+                  "$ref": "#/components/schemas/TemplateQueryResultItemPresentationModel"
                 }
               ]
             }
@@ -9984,7 +9877,7 @@
         },
         "additionalProperties": false
       },
-      "TemplateQuerySettingsModel": {
+      "TemplateQuerySettingsResponseModel": {
         "type": "object",
         "properties": {
           "contentTypeAliases": {
@@ -9998,7 +9891,7 @@
             "items": {
               "oneOf": [
                 {
-                  "$ref": "#/components/schemas/TemplateQueryPropertyModel"
+                  "$ref": "#/components/schemas/TemplateQueryPropertyPresentationModel"
                 }
               ]
             }
@@ -10016,7 +9909,34 @@
         },
         "additionalProperties": false
       },
-      "TemplateScaffoldModel": {
+      "TemplateResponseModel": {
+        "required": [
+          "$type"
+        ],
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/TemplateModelBaseModel"
+          }
+        ],
+        "properties": {
+          "$type": {
+            "type": "string"
+          },
+          "key": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        "additionalProperties": false,
+        "discriminator": {
+          "propertyName": "$type",
+          "mapping": {
+            "TemplateResponseModel": "#/components/schemas/TemplateResponseModel"
+          }
+        }
+      },
+      "TemplateScaffoldResponseModel": {
         "type": "object",
         "properties": {
           "content": {
@@ -10025,16 +9945,7 @@
         },
         "additionalProperties": false
       },
-      "TemplateUpdateModel": {
-        "type": "object",
-        "allOf": [
-          {
-            "$ref": "#/components/schemas/TemplateModelBaseModel"
-          }
-        ],
-        "additionalProperties": false
-      },
-      "TreeItemModel": {
+      "TreeItemPresentationModel": {
         "type": "object",
         "properties": {
           "name": {
@@ -10052,6 +9963,72 @@
         },
         "additionalProperties": false
       },
+      "UpdateDataTypeRequestModel": {
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/DataTypeModelBaseModel"
+          }
+        ],
+        "additionalProperties": false
+      },
+      "UpdateDictionaryItemRequestModel": {
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/DictionaryItemModelBaseModel"
+          }
+        ],
+        "additionalProperties": false
+      },
+      "UpdateDocumentRequestModel": {
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ContentUpdateRequestModelBaseDocumentValueModelDocumentVariantRequestModel"
+          }
+        ],
+        "properties": {
+          "templateKey": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "UpdateFolderReponseModel": {
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/FolderModelBaseModel"
+          }
+        ],
+        "additionalProperties": false
+      },
+      "UpdateLanguageRequestModel": {
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/LanguageModelBaseModel"
+          }
+        ],
+        "additionalProperties": false
+      },
+      "UpdatePackageRequestModel": {
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/PackageModelBaseModel"
+          }
+        ],
+        "properties": {
+          "packagePath": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
       "UpdateRelationTypeRequestModel": {
         "type": "object",
         "allOf": [
@@ -10061,7 +10038,25 @@
         ],
         "additionalProperties": false
       },
-      "UpgradeSettingsModel": {
+      "UpdateTemplateRequestModel": {
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/TemplateModelBaseModel"
+          }
+        ],
+        "additionalProperties": false
+      },
+      "UpdateUserGroupRequestModel": {
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/UserGroupBaseModel"
+          }
+        ],
+        "additionalProperties": false
+      },
+      "UpgradeSettingsResponseModel": {
         "type": "object",
         "properties": {
           "currentState": {
@@ -10079,24 +10074,6 @@
           "reportUrl": {
             "type": "string",
             "readOnly": true
-          }
-        },
-        "additionalProperties": false
-      },
-      "UploadSingleFileResponseModel": {
-        "type": "object",
-        "properties": {
-          "key": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "availableUntil": {
-            "type": "string",
-            "format": "date-time",
-            "nullable": true
-          },
-          "fileName": {
-            "type": "string"
           }
         },
         "additionalProperties": false
@@ -10146,7 +10123,7 @@
         },
         "additionalProperties": false
       },
-      "UserGroupModel": {
+      "UserGroupPresentationModel": {
         "required": [
           "$type"
         ],
@@ -10169,29 +10146,11 @@
         "discriminator": {
           "propertyName": "$type",
           "mapping": {
-            "UserGroupViewModel": "#/components/schemas/UserGroupModel"
+            "UserGroupPresentationModel": "#/components/schemas/UserGroupPresentationModel"
           }
         }
       },
-      "UserGroupSaveModel": {
-        "type": "object",
-        "allOf": [
-          {
-            "$ref": "#/components/schemas/UserGroupBaseModel"
-          }
-        ],
-        "additionalProperties": false
-      },
-      "UserGroupUpdateModel": {
-        "type": "object",
-        "allOf": [
-          {
-            "$ref": "#/components/schemas/UserGroupBaseModel"
-          }
-        ],
-        "additionalProperties": false
-      },
-      "UserInstallModel": {
+      "UserInstallResponseModel": {
         "required": [
           "email",
           "name",
@@ -10236,7 +10195,7 @@
             "items": {
               "oneOf": [
                 {
-                  "$ref": "#/components/schemas/ConsentLevelModel"
+                  "$ref": "#/components/schemas/ConsentLevelPresentationModel"
                 }
               ]
             }
@@ -10343,7 +10302,7 @@
           }
         }
       },
-      "VersionModel": {
+      "VersionResponseModel": {
         "type": "object",
         "properties": {
           "version": {

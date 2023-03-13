@@ -30,13 +30,13 @@ public class UpdateCreatedPackageController : CreatedPackageControllerBase
     ///     Updates a package.
     /// </summary>
     /// <param name="key">The key of the package.</param>
-    /// <param name="packageUpdateModel">The model containing the data for updating a package.</param>
+    /// <param name="updatePackageRequestModel">The model containing the data for updating a package.</param>
     /// <returns>The created package.</returns>
     [HttpPut("{key:guid}")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    public async Task<IActionResult> Update(Guid key, PackageUpdateModel packageUpdateModel)
+    public async Task<IActionResult> Update(Guid key, UpdatePackageRequestModel updatePackageRequestModel)
     {
         PackageDefinition? package = await _packagingService.GetCreatedPackageByKeyAsync(key);
 
@@ -46,7 +46,7 @@ public class UpdateCreatedPackageController : CreatedPackageControllerBase
         }
 
         // Macros are not included!
-        PackageDefinition packageDefinition = _umbracoMapper.Map(packageUpdateModel, package);
+        PackageDefinition packageDefinition = _umbracoMapper.Map(updatePackageRequestModel, package);
 
         Attempt<PackageDefinition, PackageOperationStatus> result = await _packagingService.UpdateCreatedPackageAsync(packageDefinition, CurrentUserId(_backOfficeSecurityAccessor));
 

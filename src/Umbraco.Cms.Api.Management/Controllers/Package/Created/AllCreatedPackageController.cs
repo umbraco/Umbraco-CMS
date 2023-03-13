@@ -28,8 +28,8 @@ public class AllCreatedPackageController : CreatedPackageControllerBase
     /// <returns>The paged result of the created packages.</returns>
     [HttpGet]
     [MapToApiVersion("1.0")]
-    [ProducesResponseType(typeof(PagedViewModel<PackageDefinitionViewModel>), StatusCodes.Status200OK)]
-    public async Task<ActionResult<PagedViewModel<PackageDefinitionViewModel>>> All(int skip = 0, int take = 100)
+    [ProducesResponseType(typeof(PagedViewModel<PackageDefinitionResponseModel>), StatusCodes.Status200OK)]
+    public async Task<ActionResult<PagedViewModel<PackageDefinitionResponseModel>>> All(int skip = 0, int take = 100)
     {
         IEnumerable<PackageDefinition> createdPackages = _packagingService
             .GetAllCreatedPackages()
@@ -37,6 +37,6 @@ public class AllCreatedPackageController : CreatedPackageControllerBase
             .Skip(skip)
             .Take(take);
 
-        return await Task.FromResult(Ok(_umbracoMapper.Map<PagedViewModel<PackageDefinitionViewModel>>(createdPackages)));
+        return await Task.FromResult(Ok(_umbracoMapper.Map<PagedViewModel<PackageDefinitionResponseModel>>(createdPackages)));
     }
 }

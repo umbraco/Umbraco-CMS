@@ -24,11 +24,11 @@ public class ByChildRelationController : RelationControllerBase
 
     [HttpGet("child-relation/{childId:int}")]
     [MapToApiVersion("1.0")]
-    [ProducesResponseType(typeof(PagedViewModel<RelationViewModel>), StatusCodes.Status200OK)]
-    public async Task<PagedViewModel<RelationViewModel>> ByChild(int childId, int skip, int take, string? relationTypeAlias = "")
+    [ProducesResponseType(typeof(PagedViewModel<RelationResponseModel>), StatusCodes.Status200OK)]
+    public async Task<PagedViewModel<RelationResponseModel>> ByChild(int childId, int skip, int take, string? relationTypeAlias = "")
     {
         IRelation[] relations = _relationService.GetByChildId(childId).ToArray();
-        RelationViewModel[] result = Array.Empty<RelationViewModel>();
+        RelationResponseModel[] result = Array.Empty<RelationResponseModel>();
 
         if (relations.Any())
         {
@@ -43,7 +43,7 @@ public class ByChildRelationController : RelationControllerBase
             }
         }
 
-        return await Task.FromResult(new PagedViewModel<RelationViewModel>
+        return await Task.FromResult(new PagedViewModel<RelationResponseModel>
         {
             Total = result.Length,
             Items = result.Skip(skip).Take(take),

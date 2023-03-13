@@ -10,10 +10,10 @@ internal class PackageDefinitionFactory : IPackageDefinitionFactory
 
     public PackageDefinitionFactory(IUmbracoMapper umbracoMapper) => _umbracoMapper = umbracoMapper;
 
-    public PackageDefinition CreatePackageDefinition(PackageCreateModel packageCreateModel)
+    public PackageDefinition CreatePackageDefinition(CreatePackageRequestModel createPackageRequestModel)
     {
         // Macros are not included!
-        PackageDefinition packageDefinition = _umbracoMapper.Map<PackageDefinition>(packageCreateModel)!;
+        PackageDefinition packageDefinition = _umbracoMapper.Map<PackageDefinition>(createPackageRequestModel)!;
 
         // Temp Id, PackageId and PackagePath for the newly created package
         packageDefinition.Id = 0;

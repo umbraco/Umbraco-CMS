@@ -20,9 +20,9 @@ public class ByKeyDataTypeController : DataTypeControllerBase
 
     [HttpGet("{key:guid}")]
     [MapToApiVersion("1.0")]
-    [ProducesResponseType(typeof(DataTypeViewModel), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(DataTypeResponseModel), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<ActionResult<DataTypeViewModel>> ByKey(Guid key)
+    public async Task<ActionResult<DataTypeResponseModel>> ByKey(Guid key)
     {
         IDataType? dataType = await _dataTypeService.GetAsync(key);
         if (dataType == null)
@@ -30,6 +30,6 @@ public class ByKeyDataTypeController : DataTypeControllerBase
             return NotFound();
         }
 
-        return Ok(_umbracoMapper.Map<DataTypeViewModel>(dataType));
+        return Ok(_umbracoMapper.Map<DataTypeResponseModel>(dataType));
     }
 }

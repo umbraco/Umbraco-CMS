@@ -29,14 +29,14 @@ public class ItemsTrackedReferenceController : TrackedReferenceControllerBase
     /// </remarks>
     [HttpGet("item")]
     [MapToApiVersion("1.0")]
-    [ProducesResponseType(typeof(PagedViewModel<RelationItemViewModel>), StatusCodes.Status200OK)]
-    public async Task<ActionResult<PagedViewModel<RelationItemViewModel>>> GetPagedReferencedItems([FromQuery(Name="key")]SortedSet<Guid> keys, long skip = 0, long take = 20, bool filterMustBeIsDependency = true)
+    [ProducesResponseType(typeof(PagedViewModel<RelationItemResponseModel>), StatusCodes.Status200OK)]
+    public async Task<ActionResult<PagedViewModel<RelationItemResponseModel>>> GetPagedReferencedItems([FromQuery(Name="key")]SortedSet<Guid> keys, long skip = 0, long take = 20, bool filterMustBeIsDependency = true)
     {
         PagedModel<RelationItemModel> relationItems = await _trackedReferencesSkipTakeService.GetPagedItemsWithRelationsAsync(keys, skip, take, filterMustBeIsDependency);
-        var pagedViewModel = new PagedViewModel<RelationItemViewModel>
+        var pagedViewModel = new PagedViewModel<RelationItemResponseModel>
         {
             Total = relationItems.Total,
-            Items = _umbracoMapper.MapEnumerable<RelationItemModel, RelationItemViewModel>(relationItems.Items),
+            Items = _umbracoMapper.MapEnumerable<RelationItemModel, RelationItemResponseModel>(relationItems.Items),
         };
 
         return await Task.FromResult(pagedViewModel);

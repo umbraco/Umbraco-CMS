@@ -36,7 +36,7 @@ public class SetupInstallController : InstallControllerBase
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status428PreconditionRequired)]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    public async Task<IActionResult> Setup(InstallViewModel installData)
+    public async Task<IActionResult> Setup(InstallVResponseModel installData)
     {
         InstallData data = _mapper.Map<InstallData>(installData)!;
         await _installService.Install(data);

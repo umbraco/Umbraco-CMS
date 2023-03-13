@@ -7,10 +7,10 @@ namespace Umbraco.Cms.Api.Management.Mapping.Package;
 public class PackageManifestViewModelMapDefinition : IMapDefinition
 {
     public void DefineMaps(IUmbracoMapper mapper)
-        => mapper.Define<PackageManifest, PackageManifestViewModel>((_, _) => new PackageManifestViewModel(), Map);
+        => mapper.Define<PackageManifest, PackageManifestResponseModel>((_, _) => new PackageManifestResponseModel(), Map);
 
     // Umbraco.Code.MapAll
-    private static void Map(PackageManifest source, PackageManifestViewModel target, MapperContext context)
+    private static void Map(PackageManifest source, PackageManifestResponseModel target, MapperContext context)
     {
         target.Name = source.Name;
         target.Version = source.Version;

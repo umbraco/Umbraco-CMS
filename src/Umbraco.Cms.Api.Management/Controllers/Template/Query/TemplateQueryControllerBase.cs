@@ -20,7 +20,7 @@ public abstract class TemplateQueryControllerBase : TemplateControllerBase
         new() { Operator = Operator.NotContains, ApplicableTypes = new[] { TemplateQueryPropertyType.String } },
     };
 
-    protected IEnumerable<TemplateQueryPropertyViewModel> GetProperties() => new TemplateQueryPropertyViewModel[]
+    protected IEnumerable<TemplateQueryPropertyPresentationModel> GetProperties() => new TemplateQueryPropertyPresentationModel[]
     {
         new() { Alias = "Id", Type = TemplateQueryPropertyType.Integer },
         new() { Alias = "Name", Type = TemplateQueryPropertyType.String },

@@ -27,12 +27,12 @@ public class CreateTemplateController : TemplateControllerBase
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> Create(TemplateCreateModel createModel)
+    public async Task<IActionResult> Create(CreateTemplateRequestModel requestModel)
     {
         Attempt<ITemplate, TemplateOperationStatus> result = await _templateService.CreateAsync(
-            createModel.Name,
-            createModel.Alias,
-            createModel.Content,
+            requestModel.Name,
+            requestModel.Alias,
+            requestModel.Content,
             CurrentUserId(_backOfficeSecurityAccessor));
 
         return result.Success
