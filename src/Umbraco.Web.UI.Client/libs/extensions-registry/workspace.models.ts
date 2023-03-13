@@ -7,4 +7,5 @@ export interface ManifestWorkspace extends ManifestElement {
 
 export interface MetaEditor {
 	entityType: string;
+	api: any;
 }
