@@ -2,11 +2,10 @@ import { css, html } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, state } from 'lit/decorators.js';
 import { repeat } from 'lit/directives/repeat.js';
-import { IRoute } from 'router-slot';
 import { UmbDocumentWorkspaceContext } from '../document-workspace.context';
+import type { UmbRouterSlotChangeEvent, UmbRouterSlotInitEvent, IRoute } from '@umbraco-cms/router';
 import { UmbLitElement } from '@umbraco-cms/element';
 import { PropertyTypeContainerViewModelBaseModel } from '@umbraco-cms/backend-api';
-import { UmbRouterSlotChangeEvent, UmbRouterSlotInitEvent } from '@umbraco-cms/router';
 
 @customElement('umb-document-workspace-view-edit')
 export class UmbDocumentWorkspaceViewEditElement extends UmbLitElement {

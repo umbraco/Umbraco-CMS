@@ -1,5 +1,6 @@
 import config from '../../utils/rollup.config.js';
-export default {
-	...config,
-	input: 'index.out.ts'
-};
+
+config[0].input = 'index.module.ts';
+config[1].input = 'index.module.ts';
+
+export default config;

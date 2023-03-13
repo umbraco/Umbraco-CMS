@@ -1,4 +1,4 @@
-import { UmbControllerHostInterface } from '@umbraco-cms/controller';
+import type { UmbControllerHostInterface } from '@umbraco-cms/controller';
 import { UmbContextConsumerController } from '@umbraco-cms/context-api';
 
 export interface UmbWorkspaceAction<T = unknown> {
