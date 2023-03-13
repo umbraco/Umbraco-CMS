@@ -18,8 +18,8 @@ export class UmbCreateDocumentModalElement extends UmbModalBaseElement<
 	#onClick(event: PointerEvent) {
 		event.stopPropagation();
 		const target = event.target as HTMLButtonElement;
-		const documentType = target.value;
-		this.modalHandler?.submit({ documentType });
+		const documentTypeKey = target.value;
+		this.modalHandler?.submit({ documentTypeKey });
 	}
 
 	render() {
@@ -28,9 +28,9 @@ export class UmbCreateDocumentModalElement extends UmbModalBaseElement<
 				<div>Render list of create options for ${this.data?.unique}</div>
 
 				<ul>
-					<li><button type="button" value="doc1" @click=${this.#onClick}>Option 1</button></li>
-					<li><button type="button" value="doc2" @click=${this.#onClick}>Option 2</button></li>
-					<li><button type="button" value="doc3" @click=${this.#onClick}>Option 3</button></li>
+					<li><button type="button" value="1" @click=${this.#onClick}>Option 1</button></li>
+					<li><button type="button" value="2" @click=${this.#onClick}>Option 2</button></li>
+					<li><button type="button" value="3" @click=${this.#onClick}>Option 3</button></li>
 				</ul>
 
 				<uui-button slot="actions" id="cancel" label="Cancel" @click="${this._handleCancel}">Cancel</uui-button>
