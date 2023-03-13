@@ -33,6 +33,19 @@ export class UmbDataTypeWorkspaceContext
 		this.#data.next(data);
 	}
 
+	async getPaths() {
+		return [
+			{
+				name: 'edit',
+				path: 'edit/:key',
+			},
+			{
+				name: 'create',
+				path: 'create/:parentKey',
+			},
+		];
+	}
+
 	getData() {
 		return this.#data.getValue();
 	}
@@ -87,3 +100,5 @@ export class UmbDataTypeWorkspaceContext
 		this.#data.complete();
 	}
 }
+
+export default UmbDataTypeWorkspaceContext;
