@@ -16,5 +16,6 @@ public enum UserOperationStatus
     CannotDelete,
     CannotDisableSelf,
     CannotDisableInvitedUser,
+    OldPasswordRequired,
     UnknownFailure,
 }

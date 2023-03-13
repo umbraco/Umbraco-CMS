@@ -55,6 +55,10 @@ public class UsersControllerBase : ManagementApiControllerBase
                 .WithTitle("Cannot disable")
                 .WithDetail("A user cannot disable itself.")
                 .Build()),
+            UserOperationStatus.OldPasswordRequired => BadRequest(new ProblemDetailsBuilder()
+                .WithTitle("Old password required")
+                .WithDetail("The old password is required to change the password of the specified user.")
+                .Build()),
             _ => StatusCode(StatusCodes.Status500InternalServerError, "Unknown user group operation status."),
         };
 

@@ -69,6 +69,8 @@ public interface IUserService : IMembershipUserService
 
     Task<Attempt<UserUnlockResult, UserOperationStatus>> UnlockAsync(int performingUserId, params Guid[] keys);
 
+    Task<Attempt<PasswordChangedModel, UserOperationStatus>> ChangePasswordAsync(int performingUserId, ChangeBackofficeUserPasswordModel model);
+
     /// <summary>
     /// Gets all users that the requesting user is allowed to see.
     /// </summary>

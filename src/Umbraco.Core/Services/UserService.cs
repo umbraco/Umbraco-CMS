@@ -874,6 +874,39 @@ internal class UserService : RepositoryService, IUserService
         return keys;
     }
 
+    public async Task<Attempt<PasswordChangedModel, UserOperationStatus>> ChangePasswordAsync(int performingUserId, ChangeBackofficeUserPasswordModel model)
+    {
+        IServiceScope serviceScope = _serviceScopeFactory.CreateScope();
+        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+
+        IUser? performingUser = GetById(performingUserId);
+        if (performingUser is null)
+        {
+            return Attempt.FailWithStatus(UserOperationStatus.MissingUser, new PasswordChangedModel());
+        }
+
+        if (performingUser.Username == model.User.Username && string.IsNullOrEmpty(model.OldPassword))
+        {
+            return Attempt.FailWithStatus(UserOperationStatus.OldPasswordRequired, new PasswordChangedModel());
+        }
+
+        if (performingUser.IsAdmin() is false && model.User.IsAdmin())
+        {
+            return Attempt.FailWithStatus(UserOperationStatus.Unauthorized, new PasswordChangedModel());
+        }
+
+        IBackofficePasswordChanger passwordChanger = serviceScope.ServiceProvider.GetRequiredService<IBackofficePasswordChanger>();
+        Attempt<PasswordChangedModel?> result = await passwordChanger.ChangeBackofficePassword(model);
+
+        if (result.Success is false)
+        {
+            return Attempt.FailWithStatus(UserOperationStatus.UnknownFailure, result.Result ?? new PasswordChangedModel());
+        }
+
+        scope.Complete();
+        return Attempt.SucceedWithStatus(UserOperationStatus.Success, result.Result ?? new PasswordChangedModel());
+    }
+
     public Task<Attempt<PagedModel<IUser>?, UserOperationStatus>> GetAllAsync(int requestingUserId, int skip, int take)
     {
         using ICoreScope scope = ScopeProvider.CreateCoreScope();
