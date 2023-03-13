@@ -168,7 +168,7 @@ internal sealed class UserGroupService : RepositoryService, IUserGroupService
         return Attempt.Succeed(UserGroupOperationStatus.Success);
     }
 
-    public async Task<Attempt<UserGroupOperationStatus>> UpdateUserGroupsOnUsers(
+    public async Task UpdateUserGroupsOnUsers(
         IEnumerable<Guid> userGroupKeys,
         IEnumerable<Guid> userKeys)
     {
@@ -188,8 +188,6 @@ internal sealed class UserGroupService : RepositoryService, IUserGroupService
         }
 
         _userService.Save(users);
-
-        return Attempt<UserGroupOperationStatus>.Succeed(UserGroupOperationStatus.Success);
     }
 
     private Attempt<UserGroupOperationStatus> ValidateUserGroupDeletion(IUserGroup? userGroup)
