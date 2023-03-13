@@ -115,6 +115,7 @@
 		"react": "^18.2.0",
 		"react-dom": "^18.2.0",
 		"rollup": "^3.10.0",
+		"rollup-plugin-dts": "^5.2.0",
 		"rollup-plugin-esbuild": "^5.0.0",
 		"rollup-plugin-url": "^3.0.1",
 		"storybook": "^7.0.0-beta.59",

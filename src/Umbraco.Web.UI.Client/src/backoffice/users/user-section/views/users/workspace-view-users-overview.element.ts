@@ -1,18 +1,18 @@
 import { css, html, nothing } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, state } from 'lit/decorators.js';
-import { IRoute } from 'router-slot';
 import { UUIPopoverElement } from '@umbraco-ui/uui';
-
+import { UMB_INVITE_USER_MODAL_TOKEN } from '../../../../users/users/modals/invite-user';
+import { UMB_CREATE_USER_MODAL_TOKEN } from '../../../../users/users/modals/create-user';
 import type { UmbSectionViewUsersElement } from './section-view-users.element';
-import { UmbLitElement } from '@umbraco-cms/element';
 import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN } from '@umbraco-cms/modal';
+import type { IRoute } from '@umbraco-cms/router';
+
+import { UmbLitElement } from '@umbraco-cms/element';
 
 import './list-view-layouts/table/workspace-view-users-table.element';
 import './list-view-layouts/grid/workspace-view-users-grid.element';
 import './workspace-view-users-selection.element';
-import { UMB_INVITE_USER_MODAL_TOKEN } from 'src/backoffice/users/users/modals/invite-user';
-import { UMB_CREATE_USER_MODAL_TOKEN } from 'src/backoffice/users/users/modals/create-user';
 
 export type UsersViewType = 'list' | 'grid';
 @customElement('umb-workspace-view-users-overview')

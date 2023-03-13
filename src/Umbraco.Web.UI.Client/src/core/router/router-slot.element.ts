@@ -1,7 +1,9 @@
-import { IRoute, RouterSlot, ensureSlash } from 'router-slot';
+import type { IRoute } from 'router-slot/model';
+import { RouterSlot } from 'router-slot';
 import { LitElement, PropertyValueMap } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
-import { UmbRouterSlotChangeEvent, UmbRouterSlotInitEvent } from '@umbraco-cms/router';
+import { UmbRouterSlotInitEvent } from './router-slot-init.event';
+import { UmbRouterSlotChangeEvent } from './router-slot-change.event';
 
 /**
  *  @element umb-router-slot-element
