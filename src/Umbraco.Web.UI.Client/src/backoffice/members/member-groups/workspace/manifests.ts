@@ -19,10 +19,12 @@ const workspaceViews: Array<ManifestWorkspaceView> = [
 		loader: () => import('./views/info/workspace-view-member-group-info.element'),
 		weight: 90,
 		meta: {
-			workspaces: ['Umb.Workspace.MemberGroup'],
 			label: 'Info',
 			pathname: 'info',
 			icon: 'info',
+		},
+		conditions: {
+			workspaces: ['Umb.Workspace.MemberGroup'],
 		},
 	},
 ];

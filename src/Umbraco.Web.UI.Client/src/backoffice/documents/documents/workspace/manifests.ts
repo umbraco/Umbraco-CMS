@@ -28,10 +28,12 @@ const workspaceViews: Array<ManifestWorkspaceView> = [
 		loader: () => import('./views/document-workspace-view-edit.element'),
 		weight: 200,
 		meta: {
-			workspaces: ['Umb.Workspace.Document'],
 			label: 'Content',
 			pathname: 'content',
 			icon: 'document',
+		},
+		conditions: {
+			workspaces: ['Umb.Workspace.Document'],
 		},
 	},
 	{
@@ -42,10 +44,12 @@ const workspaceViews: Array<ManifestWorkspaceView> = [
 			import('../../../shared/components/workspace/workspace-content/views/info/workspace-view-content-info.element'),
 		weight: 100,
 		meta: {
-			workspaces: ['Umb.Workspace.Document'],
 			label: 'Info',
 			pathname: 'info',
 			icon: 'info',
+		},
+		conditions: {
+			workspaces: ['Umb.Workspace.Document'],
 		},
 	},
 ];
@@ -59,13 +63,15 @@ const workspaceViewCollections: Array<ManifestWorkspaceViewCollection> = [
 		name: 'Document Workspace Collection View',
 		weight: 300,
 		meta: {
-			workspaces: ['Umb.Workspace.Document'],
 			label: 'Documents',
 			pathname: 'collection',
 			icon: 'umb:grid',
 			entityType: 'document',
 			repositoryAlias: DOCUMENT_REPOSITORY_ALIAS,
 		},
+		conditions: {
+			workspaces: ['Umb.Workspace.Document'],
+		}
 	},
 	*/
 ];

@@ -20,10 +20,12 @@ const workspaceViews: Array<ManifestWorkspaceView> = [
 		loader: () => import('./views/edit/edit-language-workspace-view.element'),
 		weight: 90,
 		meta: {
-			workspaces: ['Umb.Workspace.Language'],
 			label: 'Edit',
 			pathname: 'edit',
 			icon: 'edit',
+		},
+		conditions: {
+			workspaces: ['Umb.Workspace.Language'],
 		},
 	},
 ];

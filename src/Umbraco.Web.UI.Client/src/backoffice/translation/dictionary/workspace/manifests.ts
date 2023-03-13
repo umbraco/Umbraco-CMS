@@ -22,10 +22,12 @@ const workspaceViews: Array<ManifestWorkspaceView> = [
 		loader: () => import('./views/edit/workspace-view-dictionary-edit.element'),
 		weight: 100,
 		meta: {
-			workspaces: [workspaceAlias],
 			label: 'Edit',
 			pathname: 'edit',
 			icon: 'edit',
+		},
+		conditions: {
+			workspaces: [workspaceAlias],
 		},
 	},
 ];

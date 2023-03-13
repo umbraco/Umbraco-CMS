@@ -19,10 +19,12 @@ const workspaceViews: Array<ManifestWorkspaceView> = [
 		loader: () => import('./views/design/workspace-view-document-type-design.element'),
 		weight: 100,
 		meta: {
-			workspaces: ['Umb.Workspace.DocumentType'],
 			label: 'Design',
 			pathname: 'design',
 			icon: 'edit',
+		},
+		conditions: {
+			workspaces: ['Umb.Workspace.DocumentType'],
 		},
 	},
 ];
