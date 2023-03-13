@@ -1,9 +1,10 @@
 import { UUIInputElement, UUIInputEvent } from '@umbraco-ui/uui';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
-import { css, html } from 'lit';
-import { customElement, state } from 'lit/decorators.js';
+import { css, html, nothing } from 'lit';
+import { customElement, property, state } from 'lit/decorators.js';
 import { UmbDataTypeWorkspaceContext } from './data-type-workspace.context';
 import { UmbLitElement } from '@umbraco-cms/element';
+import { ManifestWorkspace } from '@umbraco-cms/extensions-registry';
 
 /**
  * @element umb-data-type-workspace
@@ -28,22 +29,43 @@ export class UmbDataTypeWorkspaceElement extends UmbLitElement {
 		`,
 	];
 
-	#workspaceContext = new UmbDataTypeWorkspaceContext(this);
+	@property()
+	manifest?: ManifestWorkspace;
+
+	@property()
+	location?: any;
 
 	@state()
 	private _dataTypeName = '';
 
-	public load(value: string) {
-		this.#workspaceContext?.load(value);
-		//this._unique = entityKey;
-	}
-
-	public create(parentKey: string | null) {
-		this.#workspaceContext.createScaffold(parentKey);
-	}
+	#workspaceContext?: UmbDataTypeWorkspaceContext;
 
 	constructor() {
 		super();
+
+		this.consumeContext('umbWorkspaceContext', (workspaceContext: UmbDataTypeWorkspaceContext) => {
+			this.#workspaceContext = workspaceContext;
+
+			if (this.location?.name === 'create') {
+				this.#create(this.location?.params?.parentKey);
+			} else {
+				this.#load(this.location?.params?.key);
+			}
+
+			this.#observeName();
+		});
+	}
+
+	#load(key: string) {
+		this.#workspaceContext?.load(key);
+	}
+
+	#create(parentKey: string | null) {
+		this.#workspaceContext?.createScaffold(parentKey);
+	}
+
+	#observeName() {
+		if (!this.#workspaceContext) return;
 		this.observe(this.#workspaceContext.name, (dataTypeName) => {
 			if (dataTypeName !== this._dataTypeName) {
 				this._dataTypeName = dataTypeName ?? '';
@@ -57,14 +79,15 @@ export class UmbDataTypeWorkspaceElement extends UmbLitElement {
 			const target = event.composedPath()[0] as UUIInputElement;
 
 			if (typeof target?.value === 'string') {
-				this.#workspaceContext.setName(target.value);
+				this.#workspaceContext?.setName(target.value);
 			}
 		}
 	}
 
 	render() {
+		if (!this.manifest) return nothing;
 		return html`
-			<umb-workspace-layout alias="Umb.Workspace.DataType">
+			<umb-workspace-layout alias=${this.manifest?.alias}>
 				<uui-input id="header" slot="header" .value=${this._dataTypeName} @input="${this.#handleInput}"></uui-input>
 			</umb-workspace-layout>
 		`;
