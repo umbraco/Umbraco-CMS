@@ -1,7 +1,8 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html } from 'lit';
-import { customElement, state } from 'lit/decorators.js';
+import { customElement, property, state } from 'lit/decorators.js';
 import { IRoute, IRoutingInfo } from 'router-slot';
+import { UmbRouterSlotInitEvent, UmbRouteLocation } from '@umbraco-cms/router';
 import type { UmbWorkspaceEntityElement } from '../../../shared/components/workspace/workspace-entity-element.interface';
 import { UmbVariantId } from '../../../shared/variants/variant-id.class';
 import { ActiveVariant } from '../../../shared/components/workspace/workspace-context/workspace-split-view-manager.class';
@@ -10,7 +11,7 @@ import { UmbDocumentWorkspaceSplitViewElement } from './document-workspace-split
 import { UmbLitElement } from '@umbraco-cms/element';
 import '../../../shared/components/workspace/workspace-variant/workspace-variant.element';
 import { DocumentModel, VariantViewModelBaseModel } from '@umbraco-cms/backend-api';
-import { UmbRouterSlotInitEvent } from '@umbraco-cms/router';
+import { ManifestWorkspace } from '@umbraco-cms/extensions-registry';
 
 @customElement('umb-document-workspace')
 export class UmbDocumentWorkspaceElement extends UmbLitElement implements UmbWorkspaceEntityElement {
@@ -28,6 +29,12 @@ export class UmbDocumentWorkspaceElement extends UmbLitElement implements UmbWor
 	private _workspaceContext: UmbDocumentWorkspaceContext = new UmbDocumentWorkspaceContext(this);
 	//private _defaultVariant?: VariantViewModelBaseModel;
 	private splitViewElement = new UmbDocumentWorkspaceSplitViewElement();
+
+	@property()
+	manifest?: ManifestWorkspace;
+
+	@property()
+	location?: UmbRouteLocation;
 
 	@state()
 	_unique?: string;
