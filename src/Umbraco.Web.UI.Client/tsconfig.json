@@ -35,7 +35,7 @@
 			"@umbraco-cms/entity-action": ["libs/entity-action"],
 			"@umbraco-cms/workspace": ["libs/workspace"],
 			"@umbraco-cms/utils": ["libs/utils"],
-			"@umbraco-cms/router": ["libs/router"],
+			"@umbraco-cms/router": ["src/core/router"],
 			"@umbraco-cms/test-utils": ["libs/test-utils"],
 			"@umbraco-cms/repository": ["libs/repository"],
 			"@umbraco-cms/resources": ["libs/resources"],

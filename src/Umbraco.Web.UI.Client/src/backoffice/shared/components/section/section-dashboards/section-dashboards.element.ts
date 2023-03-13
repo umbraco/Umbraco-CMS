@@ -1,14 +1,13 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html, nothing } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
-import { IRoutingInfo } from 'router-slot';
 import { first, map } from 'rxjs';
 import { UmbSectionContext, UMB_SECTION_CONTEXT_TOKEN } from '../section.context';
+import type { UmbRouterSlotChangeEvent, UmbRouterSlotInitEvent, IRoutingInfo } from '@umbraco-cms/router';
 import { createExtensionElement, umbExtensionsRegistry } from '@umbraco-cms/extensions-api';
-import type { ManifestDashboard, ManifestDashboardCollection, ManifestWithMeta } from '@umbraco-cms/models';
+import type { ManifestDashboard, ManifestDashboardCollection } from '@umbraco-cms/models';
 
 import { UmbLitElement } from '@umbraco-cms/element';
-import { UmbRouterSlotChangeEvent, UmbRouterSlotInitEvent } from '@umbraco-cms/router';
 
 @customElement('umb-section-dashboards')
 export class UmbSectionDashboardsElement extends UmbLitElement {

@@ -1,7 +1,6 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html, LitElement } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
-import { path, stripSlash } from 'router-slot';
 
 @customElement('umb-workspace-package')
 export class UmbWorkspacePackageElement extends LitElement {

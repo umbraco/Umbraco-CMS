@@ -23,8 +23,6 @@ import { createExtensionClass, umbExtensionsRegistry } from '@umbraco-cms/extens
 import { UmbNotificationContext, UMB_NOTIFICATION_CONTEXT_TOKEN } from '@umbraco-cms/notification';
 import { UmbLitElement } from '@umbraco-cms/element';
 
-import '@umbraco-cms/router';
-
 // Domains
 import './settings';
 import './documents';

@@ -1,9 +1,9 @@
 import { expect, fixture, html } from '@open-wc/testing';
 import { customElement } from 'lit/decorators.js';
-import { UmbControllerHostTestElement } from './controller-host.element';
-import { UmbLitElement } from './lit-element.element';
+import { UmbControllerHostTestElement } from './controller-host-test.element';
+import { UmbLitElement } from '@umbraco-cms/element';
 import { UmbContextProviderController } from '@umbraco-cms/context-api';
-import { UmbControllerHostInterface } from '@umbraco-cms/controller';
+import type { UmbControllerHostInterface } from '@umbraco-cms/controller';
 
 @customElement('umb-controller-host-test-consumer')
 export class ControllerHostTestConsumerElement extends UmbLitElement {

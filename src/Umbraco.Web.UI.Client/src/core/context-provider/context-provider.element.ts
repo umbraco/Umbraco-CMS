@@ -1,17 +1,16 @@
 import { html } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
-import { UmbLitElement } from './lit-element.element';
+import { UmbLitElement } from '@umbraco-cms/element';
 import type { UmbControllerHostInterface } from '@umbraco-cms/controller';
 
 @customElement('umb-context-provider')
 export class UmbContextProviderElement extends UmbLitElement {
-
 	/**
 	 * The value to provide to the context.
 	 * @required
 	 */
 	@property({ type: Object, attribute: false })
-	create?: (host:UmbControllerHostInterface) => unknown;
+	create?: (host: UmbControllerHostInterface) => unknown;
 
 	/**
 	 * The value to provide to the context.
@@ -42,5 +41,11 @@ export class UmbContextProviderElement extends UmbLitElement {
 
 	render() {
 		return html`<slot></slot>`;
+	}
+}
+
+declare global {
+	interface HTMLElementTagNameMap {
+		'umb-context-provider': UmbContextProviderElement;
 	}
 }

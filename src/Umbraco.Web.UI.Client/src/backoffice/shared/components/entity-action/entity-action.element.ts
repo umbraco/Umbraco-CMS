@@ -4,7 +4,7 @@ import { ifDefined } from 'lit/directives/if-defined.js';
 import { UUIMenuItemEvent } from '@umbraco-ui/uui';
 import { UmbExecutedEvent } from '@umbraco-cms/events';
 import { UmbLitElement } from '@umbraco-cms/element';
-import { ManifestEntityAction } from 'libs/extensions-registry/entity-action.models';
+import { ManifestEntityAction } from '@umbraco-cms/extensions-registry';
 
 @customElement('umb-entity-action')
 class UmbEntityActionElement extends UmbLitElement {
