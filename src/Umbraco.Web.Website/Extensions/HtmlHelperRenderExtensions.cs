@@ -767,7 +767,7 @@ public static class HtmlHelperRenderExtensions
                 nameof(controllerName));
         }
 
-        // Push the new FormContext; MvcForm.GenerateEndForm() does the corresponding pop.
+        // Create a new form context in order to ensure client validation is set properly when adding multiple forms in a page. More context in PR #13914.
         html.ViewContext.FormContext = new FormContext
         {
             CanRenderAtEndOfForm = true
