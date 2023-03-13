@@ -14,6 +14,7 @@ internal sealed class DictionaryItemService : RepositoryService, IDictionaryItem
     private readonly IDictionaryRepository _dictionaryRepository;
     private readonly IAuditRepository _auditRepository;
     private readonly ILanguageService _languageService;
+    private readonly IUserService _userService;
 
     public DictionaryItemService(
         ICoreScopeProvider provider,
@@ -21,12 +22,14 @@ internal sealed class DictionaryItemService : RepositoryService, IDictionaryItem
         IEventMessagesFactory eventMessagesFactory,
         IDictionaryRepository dictionaryRepository,
         IAuditRepository auditRepository,
-        ILanguageService languageService)
+        ILanguageService languageService,
+        IUserService userService)
         : base(provider, loggerFactory, eventMessagesFactory)
     {
         _dictionaryRepository = dictionaryRepository;
         _auditRepository = auditRepository;
         _languageService = languageService;
+        _userService = userService;
     }
 
     /// <inheritdoc />
@@ -98,7 +101,7 @@ internal sealed class DictionaryItemService : RepositoryService, IDictionaryItem
     }
 
     /// <inheritdoc/>
-    public async Task<Attempt<IDictionaryItem, DictionaryItemOperationStatus>> CreateAsync(IDictionaryItem dictionaryItem, int userId = Constants.Security.SuperUserId)
+    public async Task<Attempt<IDictionaryItem, DictionaryItemOperationStatus>> CreateAsync(IDictionaryItem dictionaryItem, Guid userKey)
     {
         if (dictionaryItem.Id != 0)
         {
@@ -118,12 +121,12 @@ internal sealed class DictionaryItemService : RepositoryService, IDictionaryItem
             },
             AuditType.New,
             "Create DictionaryItem",
-            userId);
+            userKey);
     }
 
     /// <inheritdoc />
     public async Task<Attempt<IDictionaryItem, DictionaryItemOperationStatus>> UpdateAsync(
-        IDictionaryItem dictionaryItem, int userId = Constants.Security.SuperUserId)
+        IDictionaryItem dictionaryItem, Guid userKey)
         => await SaveAsync(
             dictionaryItem,
             () =>
@@ -138,10 +141,10 @@ internal sealed class DictionaryItemService : RepositoryService, IDictionaryItem
             },
             AuditType.Save,
             "Update DictionaryItem",
-            userId);
+            userKey);
 
     /// <inheritdoc />
-    public async Task<Attempt<IDictionaryItem?, DictionaryItemOperationStatus>> DeleteAsync(Guid id, int userId = Constants.Security.SuperUserId)
+    public async Task<Attempt<IDictionaryItem?, DictionaryItemOperationStatus>> DeleteAsync(Guid id, Guid userKey)
     {
         using (ICoreScope scope = ScopeProvider.CreateCoreScope())
         {
@@ -164,7 +167,8 @@ internal sealed class DictionaryItemService : RepositoryService, IDictionaryItem
                 new DictionaryItemDeletedNotification(dictionaryItem, eventMessages)
                     .WithStateFrom(deletingNotification));
 
-            Audit(AuditType.Delete, "Delete DictionaryItem", userId, dictionaryItem.Id, nameof(DictionaryItem));
+            var currentUserId = _userService.GetAsync(userKey).Result?.Id;
+            Audit(AuditType.Delete, "Delete DictionaryItem", currentUserId ?? Constants.Security.SuperUserId, dictionaryItem.Id, nameof(DictionaryItem));
 
             scope.Complete();
             return await Task.FromResult(Attempt.SucceedWithStatus<IDictionaryItem?, DictionaryItemOperationStatus>(DictionaryItemOperationStatus.Success, dictionaryItem));
@@ -175,7 +179,7 @@ internal sealed class DictionaryItemService : RepositoryService, IDictionaryItem
     public async Task<Attempt<IDictionaryItem, DictionaryItemOperationStatus>> MoveAsync(
         IDictionaryItem dictionaryItem,
         Guid? parentId,
-        int userId = Constants.Security.SuperUserId)
+        Guid userKey)
     {
         // same parent? then just ignore this operation, assume success.
         if (dictionaryItem.ParentId == parentId)
@@ -225,7 +229,8 @@ internal sealed class DictionaryItemService : RepositoryService, IDictionaryItem
             scope.Notifications.Publish(
                 new DictionaryItemMovedNotification(moveEventInfo, eventMessages).WithStateFrom(movingNotification));
 
-            Audit(AuditType.Move, "Move DictionaryItem", userId, dictionaryItem.Id, nameof(DictionaryItem));
+            var currentUserId = _userService.GetAsync(userKey).Result?.Id;
+            Audit(AuditType.Move, "Move DictionaryItem", currentUserId ?? Constants.Security.SuperUserId, dictionaryItem.Id, nameof(DictionaryItem));
             scope.Complete();
 
             return await Task.FromResult(Attempt.SucceedWithStatus(DictionaryItemOperationStatus.Success, dictionaryItem));
@@ -237,7 +242,7 @@ internal sealed class DictionaryItemService : RepositoryService, IDictionaryItem
         Func<DictionaryItemOperationStatus> operationValidation,
         AuditType auditType,
         string auditMessage,
-        int userId)
+        Guid userKey)
     {
         using (ICoreScope scope = ScopeProvider.CreateCoreScope())
         {
@@ -276,7 +281,8 @@ internal sealed class DictionaryItemService : RepositoryService, IDictionaryItem
             scope.Notifications.Publish(
                 new DictionaryItemSavedNotification(dictionaryItem, eventMessages).WithStateFrom(savingNotification));
 
-            Audit(auditType, auditMessage, userId, dictionaryItem.Id, nameof(DictionaryItem));
+            var currentUserId = _userService.GetAsync(userKey).Result?.Id;
+            Audit(auditType, auditMessage, currentUserId ?? Constants.Security.SuperUserId, dictionaryItem.Id, nameof(DictionaryItem));
             scope.Complete();
 
             return await Task.FromResult(Attempt.SucceedWithStatus(DictionaryItemOperationStatus.Success, dictionaryItem));
