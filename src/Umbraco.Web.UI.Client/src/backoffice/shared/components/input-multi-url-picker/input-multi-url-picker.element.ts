@@ -3,6 +3,7 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, property } from 'lit/decorators.js';
 import { FormControlMixin } from '@umbraco-ui/uui-base/lib/mixins';
 import { UUIModalSidebarSize } from '@umbraco-ui/uui-modal-sidebar';
+import { UmbRouteContext, UMB_ROUTE_CONTEXT_TOKEN } from '@umbraco-cms/router';
 import { UmbLinkPickerLink, UMB_LINK_PICKER_MODAL_TOKEN } from '../../modals/link-picker';
 import { UmbLitElement } from '@umbraco-cms/element';
 import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN } from '@umbraco-cms/modal';
@@ -97,6 +98,7 @@ export class UmbInputMultiUrlPickerElement extends FormControlMixin(UmbLitElemen
 
 	private _urls: Array<UmbLinkPickerLink> = [];
 	private _modalContext?: UmbModalContext;
+	private _routeContext?: UmbRouteContext;
 
 	constructor() {
 		super();
@@ -113,6 +115,52 @@ export class UmbInputMultiUrlPickerElement extends FormControlMixin(UmbLitElemen
 
 		this.consumeContext(UMB_MODAL_CONTEXT_TOKEN, (instance) => {
 			this._modalContext = instance;
+		});
+
+		this.consumeContext(UMB_ROUTE_CONTEXT_TOKEN, (instance) => {
+			this._routeContext = instance;
+
+			// Registre the routes of this UI:
+			// TODO: To avoid retriving the property alias, we might make use of the property context?
+			// Or maybe its not the property-alias, but something unique? as this might not be in a property?.
+			this._routeContext.registerModal(UMB_LINK_PICKER_MODAL_TOKEN, {
+				//path: `${'to-do-myPropertyAlias'}/:index`,
+				path: `modal`,
+				onSetup: (routeInfo) => {
+					// Get index from routeInfo:
+					const index = 0;
+					// Use the index to find data:
+					console.log('onSetup modal', routeInfo);
+					/*
+					modaldata = {
+						link: {
+							name: data?.name,
+							published: data?.published,
+							queryString: data?.queryString,
+							target: data?.target,
+							trashed: data?.trashed,
+							udi: data?.udi,
+							url: data?.url,
+						},
+						config: {
+							hideAnchor: this.hideAnchor,
+							ignoreUserStartNodes: this.ignoreUserStartNodes,
+							overlaySize: this.overlaySize || 'small',
+						},
+					};
+					return modaldata;
+					*/
+				},
+				onSubmit: (newUrl) => {
+					if (!newUrl) return;
+
+					const index = 0; // TODO: get the index in some way?.
+					this._setSelection(newUrl, index);
+				},
+				onReject: () => {
+					console.log('User cancelled dialog.');
+				},
+			});
 		});
 	}
 

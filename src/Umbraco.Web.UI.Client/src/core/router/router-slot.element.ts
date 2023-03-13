@@ -1,9 +1,11 @@
 import type { IRoute } from 'router-slot/model';
 import { RouterSlot } from 'router-slot';
-import { LitElement, PropertyValueMap } from 'lit';
+import { html, PropertyValueMap } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { UmbRouterSlotInitEvent } from './router-slot-init.event';
 import { UmbRouterSlotChangeEvent } from './router-slot-change.event';
+import { UmbRouteContext } from './route.context';
+import { UmbLitElement } from '@umbraco-cms/element';
 
 /**
  *  @element umb-router-slot-element
@@ -13,8 +15,9 @@ import { UmbRouterSlotChangeEvent } from './router-slot-change.event';
  * @fires {UmbRouterSlotChangeEvent} change - fires when a path of this router is changed
  */
 @customElement('umb-router-slot')
-export class UmbRouterSlotElement extends LitElement {
+export class UmbRouterSlotElement extends UmbLitElement {
 	#router: RouterSlot = new RouterSlot();
+	#modalRouter: RouterSlot = new RouterSlot();
 	#listening = false;
 
 	@property()
@@ -39,14 +42,26 @@ export class UmbRouterSlotElement extends LitElement {
 		return this._routerPath + '/' + this._activeLocalPath;
 	}
 
+	#routeContext = new UmbRouteContext(this, (contextRoutes) => {
+		(this.#modalRouter as any).routes = contextRoutes;
+		console.log(this.absoluteRouterPath, this.#router, this.#modalRouter, 'Router got context routes', contextRoutes);
+		// Force a render?
+		this.#modalRouter.render();
+	});
+
 	constructor() {
 		super();
+		this.#modalRouter.parent = this.#router;
 		this.#router.addEventListener('changestate', this._onChangeState);
-		this.#router.appendChild(document.createElement('slot'));
+		//this.#router.appendChild(this.#modalRouter);
+		//this.#router.appendChild(document.createElement('slot'));
 	}
 
 	connectedCallback() {
 		super.connectedCallback();
+		// Currently we have to set this every time as RouteSlot looks for its parent every-time it is connected. Aka it has not way to explicitly set the parent.
+		// And we cannot insert the modal router as a slotted-child of the router, as it flushes its children on every route change.
+		this.#modalRouter.parent = this.#router;
 		if (this.#listening === false) {
 			window.addEventListener('navigationsuccess', this._onNavigationChanged);
 			this.#listening = true;
@@ -87,7 +102,7 @@ export class UmbRouterSlotElement extends LitElement {
 	};
 
 	render() {
-		return this.#router;
+		return html`${this.#router}${this.#modalRouter}`;
 	}
 }
 
