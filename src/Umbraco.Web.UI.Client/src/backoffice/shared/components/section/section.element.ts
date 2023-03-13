@@ -9,9 +9,9 @@ import type { ManifestSectionView, ManifestWorkspace, ManifestMenuSectionSidebar
 import { umbExtensionsRegistry, createExtensionElement } from '@umbraco-cms/extensions-api';
 import { UmbLitElement } from '@umbraco-cms/element';
 
-import './section-sidebar-menu/section-sidebar-menu.element.ts';
-import './section-views/section-views.element.ts';
-import '../../../settings/languages/app-language-select/app-language-select.element.ts';
+import './section-sidebar-menu/section-sidebar-menu.element';
+import './section-views/section-views.element';
+import '../../../settings/languages/app-language-select/app-language-select.element';
 
 @customElement('umb-section')
 export class UmbSectionElement extends UmbLitElement {
