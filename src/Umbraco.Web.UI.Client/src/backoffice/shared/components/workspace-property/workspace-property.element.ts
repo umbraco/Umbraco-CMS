@@ -203,7 +203,7 @@ export class UmbWorkspacePropertyElement extends UmbLitElement {
 
 				oldValue?.removeEventListener('change', this._onPropertyEditorChange as any as EventListener);
 
-				this._element = el;
+				this._element = el as UmbPropertyEditorElement;
 
 				this._valueObserver?.destroy();
 				this._configObserver?.destroy();
@@ -218,7 +218,7 @@ export class UmbWorkspacePropertyElement extends UmbLitElement {
 						}
 					});
 					this._configObserver = this.observe(this._propertyContext.config, (config) => {
-						if (this._element) {
+						if (this._element && config) {
 							this._element.config = config;
 						}
 					});
