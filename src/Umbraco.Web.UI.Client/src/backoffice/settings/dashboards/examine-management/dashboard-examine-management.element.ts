@@ -1,9 +1,9 @@
 import { html, css, nothing } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
-import type { IRoute, IRoutingInfo, UmbRouterSlotChangeEvent, UmbRouterSlotInitEvent } from '@umbraco-cms/router';
 
 import { UmbDashboardExamineIndexElement } from './views/section-view-examine-indexers';
 import { UmbDashboardExamineSearcherElement } from './views/section-view-examine-searchers';
+import type { IRoute, IRoutingInfo, UmbRouterSlotChangeEvent, UmbRouterSlotInitEvent } from '@umbraco-cms/router';
 
 import { UmbLitElement } from '@umbraco-cms/element';
 

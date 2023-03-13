@@ -2,10 +2,10 @@ import { css, html, nothing } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, state } from 'lit/decorators.js';
 import { UUIPopoverElement } from '@umbraco-ui/uui';
-import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN } from '@umbraco-cms/modal';
 import { UMB_INVITE_USER_MODAL_TOKEN } from '../../../../users/users/modals/invite-user';
 import { UMB_CREATE_USER_MODAL_TOKEN } from '../../../../users/users/modals/create-user';
 import type { UmbSectionViewUsersElement } from './section-view-users.element';
+import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN } from '@umbraco-cms/modal';
 import type { IRoute } from '@umbraco-cms/router';
 
 import { UmbLitElement } from '@umbraco-cms/element';

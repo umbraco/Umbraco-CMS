@@ -2,8 +2,8 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html, nothing } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { first, map } from 'rxjs';
-import type { UmbRouterSlotChangeEvent, UmbRouterSlotInitEvent, IRoutingInfo } from '@umbraco-cms/router';
 import { UmbSectionContext, UMB_SECTION_CONTEXT_TOKEN } from '../section.context';
+import type { UmbRouterSlotChangeEvent, UmbRouterSlotInitEvent, IRoutingInfo } from '@umbraco-cms/router';
 import { createExtensionElement, umbExtensionsRegistry } from '@umbraco-cms/extensions-api';
 import type { ManifestDashboard, ManifestDashboardCollection } from '@umbraco-cms/models';
 

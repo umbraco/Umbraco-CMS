@@ -2,8 +2,8 @@ import { css, html } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, state } from 'lit/decorators.js';
 import { repeat } from 'lit/directives/repeat.js';
-import type { UmbRouterSlotChangeEvent, UmbRouterSlotInitEvent, IRoute } from '@umbraco-cms/router';
 import { UmbDocumentWorkspaceContext } from '../document-workspace.context';
+import type { UmbRouterSlotChangeEvent, UmbRouterSlotInitEvent, IRoute } from '@umbraco-cms/router';
 import { UmbLitElement } from '@umbraco-cms/element';
 import { PropertyTypeContainerViewModelBaseModel } from '@umbraco-cms/backend-api';
 
