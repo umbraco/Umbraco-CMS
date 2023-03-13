@@ -31,7 +31,7 @@ public class CreateDataTypeController : DataTypeControllerBase
     public async Task<IActionResult> Create(DataTypeCreateModel dataTypeCreateModel)
     {
         IDataType? created = _umbracoMapper.Map<IDataType>(dataTypeCreateModel)!;
-        Attempt<IDataType, DataTypeOperationStatus> result = await _dataTypeService.CreateAsync(created, CurrentUserId(_backOfficeSecurityAccessor));
+        Attempt<IDataType, DataTypeOperationStatus> result = await _dataTypeService.CreateAsync(created, CurrentUserKey(_backOfficeSecurityAccessor));
 
         return result.Success
             ? CreatedAtAction<ByKeyDataTypeController>(controller => nameof(controller.ByKey), created.Key)

@@ -32,7 +32,7 @@ public class CreateDocumentController : DocumentControllerBase
     public async Task<IActionResult> Create(DocumentCreateRequestModel createRequestModel)
     {
         ContentCreateModel model = _documentEditingFactory.MapCreateModel(createRequestModel);
-        Attempt<IContent?, ContentEditingOperationStatus> result = await _contentEditingService.CreateAsync(model, CurrentUserId(_backOfficeSecurityAccessor));
+        Attempt<IContent?, ContentEditingOperationStatus> result = await _contentEditingService.CreateAsync(model, CurrentUserKey(_backOfficeSecurityAccessor));
 
         return result.Success
             ? CreatedAtAction<ByKeyDocumentController>(controller => nameof(controller.ByKey), result.Result!.Key)

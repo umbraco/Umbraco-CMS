@@ -37,7 +37,7 @@ public class CreateDictionaryController : DictionaryControllerBase
         IDictionaryItem created = await _dictionaryFactory.MapCreateModelToDictionaryItemAsync(dictionaryItemCreateModel);
 
         Attempt<IDictionaryItem, DictionaryItemOperationStatus> result =
-            await _dictionaryItemService.CreateAsync(created, CurrentUserId(_backOfficeSecurityAccessor));
+            await _dictionaryItemService.CreateAsync(created, CurrentUserKey(_backOfficeSecurityAccessor));
 
         return result.Success
             ? CreatedAtAction<ByKeyDictionaryController>(controller => nameof(controller.ByKey), result.Result!.Key)

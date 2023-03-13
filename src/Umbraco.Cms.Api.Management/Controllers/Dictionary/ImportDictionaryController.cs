@@ -33,7 +33,7 @@ public class ImportDictionaryController : DictionaryControllerBase
             .ImportDictionaryItemFromUdtFileAsync(
                 dictionaryImportModel.FileName,
                 dictionaryImportModel.ParentKey,
-                CurrentUserId(_backOfficeSecurityAccessor));
+                CurrentUserKey(_backOfficeSecurityAccessor));
 
         return result.Status switch
         {

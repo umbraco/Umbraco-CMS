@@ -26,7 +26,7 @@ public class DeleteLanguageController : LanguageControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<IActionResult> Delete(string isoCode)
     {
-        Attempt<ILanguage?, LanguageOperationStatus> result = await _languageService.DeleteAsync(isoCode, CurrentUserId(_backOfficeSecurityAccessor));
+        Attempt<ILanguage?, LanguageOperationStatus> result = await _languageService.DeleteAsync(isoCode, CurrentUserKey(_backOfficeSecurityAccessor));
 
         return result.Success
             ? Ok()

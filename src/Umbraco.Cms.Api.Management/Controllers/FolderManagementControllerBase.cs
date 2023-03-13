@@ -43,7 +43,7 @@ public abstract class FolderManagementControllerBase<TStatus> : ManagementApiCon
         Attempt<EntityContainer, TStatus> result = await CreateContainerAsync(
             container,
             folderCreateModel.ParentKey,
-            CurrentUserId(_backOfficeSecurityAccessor));
+            CurrentUserKey(_backOfficeSecurityAccessor));
 
         return result.Success
             ? CreatedAtAction(createdAction, result.Result.Key)
@@ -60,7 +60,7 @@ public abstract class FolderManagementControllerBase<TStatus> : ManagementApiCon
 
         container.Name = folderUpdateModel.Name;
 
-        Attempt<EntityContainer, TStatus> result = await UpdateContainerAsync(container, CurrentUserId(_backOfficeSecurityAccessor));
+        Attempt<EntityContainer, TStatus> result = await UpdateContainerAsync(container, CurrentUserKey(_backOfficeSecurityAccessor));
         return result.Success
             ? Ok()
             : OperationStatusResult(result.Status);
@@ -68,7 +68,7 @@ public abstract class FolderManagementControllerBase<TStatus> : ManagementApiCon
 
     protected async Task<IActionResult> DeleteFolderAsync(Guid key)
     {
-        Attempt<EntityContainer?, TStatus> result = await DeleteContainerAsync(key, CurrentUserId(_backOfficeSecurityAccessor));
+        Attempt<EntityContainer?, TStatus> result = await DeleteContainerAsync(key, CurrentUserKey(_backOfficeSecurityAccessor));
         return result.Success
             ? Ok()
             : OperationStatusResult(result.Status);
@@ -80,11 +80,11 @@ public abstract class FolderManagementControllerBase<TStatus> : ManagementApiCon
 
     protected abstract Task<EntityContainer?> GetParentContainerAsync(EntityContainer container);
 
-    protected abstract Task<Attempt<EntityContainer, TStatus>> CreateContainerAsync(EntityContainer container, Guid? parentId, int userId);
+    protected abstract Task<Attempt<EntityContainer, TStatus>> CreateContainerAsync(EntityContainer container, Guid? parentId, Guid userKey);
 
-    protected abstract Task<Attempt<EntityContainer, TStatus>> UpdateContainerAsync(EntityContainer container, int userId);
+    protected abstract Task<Attempt<EntityContainer, TStatus>> UpdateContainerAsync(EntityContainer container, Guid userKey);
 
-    protected abstract Task<Attempt<EntityContainer?, TStatus>> DeleteContainerAsync(Guid id, int userId);
+    protected abstract Task<Attempt<EntityContainer?, TStatus>> DeleteContainerAsync(Guid id, Guid userKey);
 
     protected abstract IActionResult OperationStatusResult(TStatus status);
 }

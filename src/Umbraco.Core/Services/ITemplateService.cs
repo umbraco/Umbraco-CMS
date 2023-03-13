@@ -49,23 +49,23 @@ public interface ITemplateService : IService
     ///     Updates a <see cref="ITemplate" />
     /// </summary>
     /// <param name="template"><see cref="ITemplate" /> to update</param>
-    /// <param name="userId">Optional id of the user saving the template</param>
+    /// <param name="userKey">Key of the user saving the template</param>
     /// <returns></returns>
-    Task<Attempt<ITemplate, TemplateOperationStatus>> UpdateAsync(ITemplate template, int userId = Constants.Security.SuperUserId);
+    Task<Attempt<ITemplate, TemplateOperationStatus>> UpdateAsync(ITemplate template, Guid userKey);
 
     /// <summary>
     ///     Creates a template for a content type
     /// </summary>
     /// <param name="contentTypeAlias"></param>
     /// <param name="contentTypeName"></param>
-    /// <param name="userId"></param>
+    /// <param name="userKey">Key of the user performing the Create.</param>
     /// <returns>
     ///     The template created
     /// </returns>
     Task<Attempt<ITemplate, TemplateOperationStatus>> CreateForContentTypeAsync(
         string contentTypeAlias,
         string? contentTypeName,
-        int userId = Constants.Security.SuperUserId);
+        Guid userKey);
 
     /// <summary>
     ///     Creates a new template
@@ -73,33 +73,33 @@ public interface ITemplateService : IService
     /// <param name="name">Name of the new template</param>
     /// <param name="alias">Alias of the template</param>
     /// <param name="content">View content for the new template</param>
-    /// <param name="userId">Optional id of the user creating the template</param>
+    /// <param name="userKey">Key of the user performing the Create.</param>
     /// <returns></returns>
-    Task<Attempt<ITemplate, TemplateOperationStatus>> CreateAsync(string name, string alias, string? content, int userId = Constants.Security.SuperUserId);
+    Task<Attempt<ITemplate, TemplateOperationStatus>> CreateAsync(string name, string alias, string? content, Guid userKey);
 
     /// <summary>
     ///     Creates a new template
     /// </summary>
     /// <param name="template">The new template</param>
-    /// <param name="userId">Optional id of the user creating the template</param>
+    /// <param name="userKey">Key of the user performing the Create.</param>
     /// <returns></returns>
-    Task<Attempt<ITemplate, TemplateOperationStatus>> CreateAsync(ITemplate template, int userId = Constants.Security.SuperUserId);
+    Task<Attempt<ITemplate, TemplateOperationStatus>> CreateAsync(ITemplate template, Guid userKey);
 
     /// <summary>
     ///     Deletes a template by its alias
     /// </summary>
     /// <param name="alias">Alias of the <see cref="ITemplate" /> to delete</param>
-    /// <param name="userId">Optional id of the user deleting the template</param>
+    /// <param name="userKey">Key of the user performing the Delete.</param>
     /// <returns>True if the template was deleted, false otherwise</returns>
-    Task<Attempt<ITemplate?, TemplateOperationStatus>> DeleteAsync(string alias, int userId = Constants.Security.SuperUserId);
+    Task<Attempt<ITemplate?, TemplateOperationStatus>> DeleteAsync(string alias, Guid userKey);
 
     /// <summary>
     ///     Deletes a template by its key
     /// </summary>
     /// <param name="key">Key of the <see cref="ITemplate" /> to delete</param>
-    /// <param name="userId">Optional id of the user deleting the template</param>
+    /// <param name="userKey">Key of the user performing the Delete.</param>
     /// <returns>True if the template was deleted, false otherwise</returns>
-    Task<Attempt<ITemplate?, TemplateOperationStatus>> DeleteAsync(Guid key, int userId = Constants.Security.SuperUserId);
+    Task<Attempt<ITemplate?, TemplateOperationStatus>> DeleteAsync(Guid key, Guid userKey);
 
     /// <summary>
     ///     Gets the content of a template as a stream.

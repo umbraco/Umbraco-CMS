@@ -37,7 +37,7 @@ public class UpdateDataTypeController : DataTypeControllerBase
         }
 
         IDataType updated = _umbracoMapper.Map(dataTypeViewModel, current);
-        Attempt<IDataType, DataTypeOperationStatus> result = await _dataTypeService.UpdateAsync(updated, CurrentUserId(_backOfficeSecurityAccessor));
+        Attempt<IDataType, DataTypeOperationStatus> result = await _dataTypeService.UpdateAsync(updated, CurrentUserKey(_backOfficeSecurityAccessor));
 
         return result.Success
             ? Ok()
