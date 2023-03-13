@@ -37,8 +37,10 @@ const menuSectionSidebarApp: ManifestMenuSectionSidebarApp = {
 	weight: 100,
 	meta: {
 		label: 'Members',
-		sections: [sectionAlias],
 		menu: 'Umb.Menu.Members',
+	},
+	conditions: {
+		sections: [sectionAlias],
 	},
 };
 

@@ -20,8 +20,10 @@ const menuSectionSidebarApp: ManifestMenuSectionSidebarApp = {
 	weight: 100,
 	meta: {
 		label: 'Dictionary',
-		sections: [sectionAlias],
 		menu: 'Umb.Menu.Dictionary',
+	},
+	conditions: {
+		sections: [sectionAlias],
 	},
 };
 

@@ -6,7 +6,7 @@ const entityActions: Array<ManifestSectionSidebarApp> = [
 		alias: 'Umb.SectionSidebarItem.LanguageSelect',
 		name: 'App Language Select Section Sidebar Item',
 		loader: () => import('./app-language-select.element'),
-		meta: {
+		conditions: {
 			sections: ['Umb.Section.Content'],
 		},
 	},

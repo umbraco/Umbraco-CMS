@@ -2,10 +2,10 @@ import type { ManifestElement } from './models';
 
 export interface ManifestSectionSidebarApp extends ManifestElement {
 	type: 'sectionSidebarApp';
-	meta: MetaSectionSidebarApp;
+	conditions: ConditionsSectionSidebarApp;
 }
 
-export interface MetaSectionSidebarApp {
+export interface ConditionsSectionSidebarApp {
 	sections: Array<string>;
 }
 
@@ -13,9 +13,10 @@ export interface MetaSectionSidebarApp {
 export interface ManifestMenuSectionSidebarApp extends ManifestElement {
 	type: 'menuSectionSidebarApp';
 	meta: MetaMenuSectionSidebarApp;
+	conditions: ConditionsSectionSidebarApp;
 }
 
-export interface MetaMenuSectionSidebarApp extends MetaSectionSidebarApp {
+export interface MetaMenuSectionSidebarApp {
 	label: string;
 	menu: string;
 }
