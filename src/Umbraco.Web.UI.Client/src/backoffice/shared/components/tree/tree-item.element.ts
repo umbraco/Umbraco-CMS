@@ -162,7 +162,7 @@ export class UmbTreeItem extends UmbLitElement {
 
 	// TODO: how do we handle this?
 	private _constructPath(sectionPathname: string, type: string, key: string) {
-		return type ? `section/${sectionPathname}/${type}/edit/${key}` : undefined;
+		return type ? `section/${sectionPathname}/workspace/${type}/edit/${key}` : undefined;
 	}
 
 	// TODO: do we want to catch and emit a backoffice event here?
