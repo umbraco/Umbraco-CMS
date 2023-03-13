@@ -15,6 +15,7 @@ export interface UmbRouteLocation {
 }
 
 export interface UmbWorkspaceEntityElement extends HTMLElement {
+	manifest: ManifestWorkspace;
 	location: UmbRouteLocation;
 }
 
@@ -51,6 +52,7 @@ export class UmbWorkspaceElement extends UmbLitElement {
 				component: () => createExtensionElement(workspaceManifest),
 				setup: (component: Promise<UmbWorkspaceEntityElement>, info: IRoutingInfo) => {
 					component.then((element) => {
+						element.manifest = workspaceManifest;
 						const location: UmbRouteLocation = {
 							name: path.name,
 							params: info.match.params,
