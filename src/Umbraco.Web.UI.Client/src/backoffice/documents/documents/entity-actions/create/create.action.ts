@@ -28,8 +28,8 @@ export class UmbCreateDocumentEntityAction extends UmbEntityActionBase<UmbDocume
 			unique: this.unique,
 		});
 
-		// TODO: get type from modal result
 		const { documentType }: UmbCreateDocumentModalResultData = await modalHandler.onSubmit();
-		alert('create document with document type: ' + documentType);
+		// TODO: how do we want to generate these urls?
+		history.pushState(null, '', `/section/content/workspace/document/create/${this.unique}/${documentType}`);
 	}
 }
