@@ -272,5 +272,6 @@ public class ContentSettings
     /// <summary>
     /// Gets or sets a value indicating whether to show domain warnings.
     /// </summary>
+    [DefaultValue(StaticShowDomainWarnings)]
     public bool ShowDomainWarnings { get; set; } = StaticShowDomainWarnings;
 }
