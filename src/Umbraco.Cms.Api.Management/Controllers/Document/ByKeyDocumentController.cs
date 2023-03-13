@@ -27,7 +27,7 @@ public class ByKeyDocumentController : DocumentControllerBase
         IContent? content = await _contentEditingService.GetAsync(key);
         if (content == null)
         {
-            return NotFound();
+            return DocumentNotFound();
         }
 
         DocumentResponseModel model = await _documentPresentationFactory.CreateResponseModelAsync(content);
