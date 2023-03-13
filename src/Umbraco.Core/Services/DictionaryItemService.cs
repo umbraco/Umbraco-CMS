@@ -167,8 +167,8 @@ internal sealed class DictionaryItemService : RepositoryService, IDictionaryItem
                 new DictionaryItemDeletedNotification(dictionaryItem, eventMessages)
                     .WithStateFrom(deletingNotification));
 
-            var currentUserId = _userService.GetAsync(userKey).Result?.Id;
-            Audit(AuditType.Delete, "Delete DictionaryItem", currentUserId ?? Constants.Security.SuperUserId, dictionaryItem.Id, nameof(DictionaryItem));
+            var currentUserId = _userService.GetAsync(userKey).Result?.Id ?? Constants.Security.SuperUserId;
+            Audit(AuditType.Delete, "Delete DictionaryItem", currentUserId, dictionaryItem.Id, nameof(DictionaryItem));
 
             scope.Complete();
             return await Task.FromResult(Attempt.SucceedWithStatus<IDictionaryItem?, DictionaryItemOperationStatus>(DictionaryItemOperationStatus.Success, dictionaryItem));
@@ -229,8 +229,8 @@ internal sealed class DictionaryItemService : RepositoryService, IDictionaryItem
             scope.Notifications.Publish(
                 new DictionaryItemMovedNotification(moveEventInfo, eventMessages).WithStateFrom(movingNotification));
 
-            var currentUserId = _userService.GetAsync(userKey).Result?.Id;
-            Audit(AuditType.Move, "Move DictionaryItem", currentUserId ?? Constants.Security.SuperUserId, dictionaryItem.Id, nameof(DictionaryItem));
+            var currentUserId = _userService.GetAsync(userKey).Result?.Id ?? Constants.Security.SuperUserId;
+            Audit(AuditType.Move, "Move DictionaryItem", currentUserId, dictionaryItem.Id, nameof(DictionaryItem));
             scope.Complete();
 
             return await Task.FromResult(Attempt.SucceedWithStatus(DictionaryItemOperationStatus.Success, dictionaryItem));
@@ -281,8 +281,8 @@ internal sealed class DictionaryItemService : RepositoryService, IDictionaryItem
             scope.Notifications.Publish(
                 new DictionaryItemSavedNotification(dictionaryItem, eventMessages).WithStateFrom(savingNotification));
 
-            var currentUserId = _userService.GetAsync(userKey).Result?.Id;
-            Audit(auditType, auditMessage, currentUserId ?? Constants.Security.SuperUserId, dictionaryItem.Id, nameof(DictionaryItem));
+            var currentUserId = _userService.GetAsync(userKey).Result?.Id ?? Constants.Security.SuperUserId;
+            Audit(auditType, auditMessage, currentUserId, dictionaryItem.Id, nameof(DictionaryItem));
             scope.Complete();
 
             return await Task.FromResult(Attempt.SucceedWithStatus(DictionaryItemOperationStatus.Success, dictionaryItem));

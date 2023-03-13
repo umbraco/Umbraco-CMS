@@ -81,14 +81,14 @@ internal sealed class ContentEditingService
 
     public async Task<Attempt<IContent?, ContentEditingOperationStatus>> MoveToRecycleBinAsync(Guid id, Guid userKey)
     {
-        var currentUserId = _userService.GetAsync(userKey).Result?.Id;
-        return await HandleDeletionAsync(id, content => ContentService.MoveToRecycleBin(content, currentUserId ?? Constants.Security.SuperUserId));
+        var currentUserId = _userService.GetAsync(userKey).Result?.Id ?? Constants.Security.SuperUserId;
+        return await HandleDeletionAsync(id, content => ContentService.MoveToRecycleBin(content, currentUserId));
     }
 
     public async Task<Attempt<IContent?, ContentEditingOperationStatus>> DeleteAsync(Guid id, Guid userKey)
     {
-        var currentUserId = _userService.GetAsync(userKey).Result?.Id;
-        return await HandleDeletionAsync(id, content => ContentService.Delete(content, currentUserId ?? Constants.Security.SuperUserId));
+        var currentUserId = _userService.GetAsync(userKey).Result?.Id ?? Constants.Security.SuperUserId;
+        return await HandleDeletionAsync(id, content => ContentService.Delete(content, currentUserId));
     }
 
     protected override IContent Create(string? name, int parentId, IContentType contentType) => new Content(name, parentId, contentType);
@@ -122,8 +122,8 @@ internal sealed class ContentEditingService
     {
         try
         {
-            var currentUserId = _userService.GetAsync(userKey).Result?.Id;
-            OperationResult saveResult = ContentService.Save(content, currentUserId ?? Constants.Security.SuperUserId);
+            var currentUserId = _userService.GetAsync(userKey).Result?.Id ?? Constants.Security.SuperUserId;
+            OperationResult saveResult = ContentService.Save(content, currentUserId);
             return saveResult.Result switch
             {
                 // these are the only result states currently expected from Save

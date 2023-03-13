@@ -421,8 +421,8 @@ namespace Umbraco.Cms.Core.Services.Implement
 
                 scope.Notifications.Publish(new DataTypeMovedNotification(moveEventInfo, eventMessages).WithStateFrom(movingDataTypeNotification));
 
-                var currentUserId = _userService.GetAsync(userKey).Result?.Id;
-                Audit(AuditType.Move, currentUserId ?? Constants.Security.SuperUserId, toMove.Id);
+                var currentUserId = _userService.GetAsync(userKey).Result?.Id ?? Constants.Security.SuperUserId;
+                Audit(AuditType.Move, currentUserId, toMove.Id);
                 scope.Complete();
             }
 
@@ -638,8 +638,8 @@ namespace Umbraco.Cms.Core.Services.Implement
             scope.Notifications.Publish(new DataTypeDeletedNotification(dataType, eventMessages).WithStateFrom(deletingDataTypeNotification));
 
 
-            var currentUserId = _userService.GetAsync(userKey).Result?.Id;
-            Audit(AuditType.Delete, currentUserId ?? Constants.Security.SuperUserId, dataType.Id);
+            var currentUserId = _userService.GetAsync(userKey).Result?.Id ?? Constants.Security.SuperUserId;
+            Audit(AuditType.Delete, currentUserId, dataType.Id);
 
             scope.Complete();
 
