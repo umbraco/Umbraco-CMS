@@ -3,14 +3,13 @@ import { validate as uuidValidate } from 'uuid';
 
 import { UmbNotificationHandler } from './notification-handler';
 
-import type { UmbNotificationDefaultData } from './layouts/default';
 import type { UmbNotificationOptions } from './notification.context';
 
 describe('UmbNotificationHandler', () => {
 	let notificationHandler: UmbNotificationHandler;
 
 	beforeEach(async () => {
-		const options: UmbNotificationOptions<UmbNotificationDefaultData> = {};
+		const options: UmbNotificationOptions = {};
 		notificationHandler = new UmbNotificationHandler(options);
 	});
 
@@ -72,7 +71,7 @@ describe('UmbNotificationHandler', () => {
 			let layoutElement: any;
 
 			beforeEach(async () => {
-				const options: UmbNotificationOptions<UmbNotificationDefaultData> = {
+				const options: UmbNotificationOptions = {
 					color: 'positive',
 					data: {
 						message: 'Notification default layout message',
@@ -100,7 +99,7 @@ describe('UmbNotificationHandler', () => {
 			let layoutElement: any;
 
 			beforeEach(async () => {
-				const options: UmbNotificationOptions<UmbNotificationDefaultData> = {
+				const options: UmbNotificationOptions = {
 					elementName: 'umb-notification-test-element',
 					color: 'positive',
 					data: {

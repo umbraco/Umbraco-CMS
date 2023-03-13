@@ -1,13 +1,12 @@
-import '../layouts/default';
+import './story-notification-default-example.element';
 
 import { Meta, Story } from '@storybook/web-components';
 import { html } from 'lit';
-
-import { UmbNotificationContext } from '..';
+import { UmbNotificationContext } from '@umbraco-cms/notification';
 
 export default {
 	title: 'API/Notifications/Overview',
-	component: 'ucp-notification-layout-default',
+	component: 'umb-notification-layout-default',
 	decorators: [
 		(story) =>
 			html`<umb-context-provider key="UmbNotificationContext" .value=${new UmbNotificationContext()}>
