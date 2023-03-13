@@ -9,6 +9,8 @@ public static partial class Constants
         /// </summary>
         public const int SuperUserId = -1;
 
+        public static readonly Guid SuperUserKey = new("1E70F841-C261-413B-ABB2-2D68CDB96094");
+
         public const string SuperUserIdAsString = "-1";
 
         /// <summary>

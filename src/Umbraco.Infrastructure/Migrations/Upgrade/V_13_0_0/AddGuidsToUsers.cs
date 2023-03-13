@@ -50,6 +50,13 @@ public class AddGuidsToUsers : UnscopedMigrationBase
             return;
         }
 
+        UserDto? superUser = dtos.Where(x => x.Id == -1).FirstOrDefault();
+        if (superUser is not null)
+        {
+            superUser.Key = Constants.Security.SuperUserKey;
+            Database.Update(superUser);
+        }
+
         MigrateExternalLogins(dtos);
         MigrateTwoFactorLogins(dtos);
     }
@@ -78,7 +85,7 @@ public class AddGuidsToUsers : UnscopedMigrationBase
         List<UserDto> users = Database.Fetch<OldUserDto>().Select(x => new UserDto
         {
             Id = x.Id,
-            Key = Guid.NewGuid(),
+            Key = x.Id is -1 ? Constants.Security.SuperUserKey : Guid.NewGuid(),
             Disabled = x.Disabled,
             NoConsole = x.NoConsole,
             UserName = x.UserName,
