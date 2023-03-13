@@ -30,6 +30,7 @@ namespace Umbraco.Cms.Core.Services.Implement
         private readonly IAuditRepository _auditRepository;
         private readonly IIOHelper _ioHelper;
         private readonly IEditorConfigurationParser _editorConfigurationParser;
+        private readonly IUserService _userService;
         private readonly IDataTypeContainerService _dataTypeContainerService;
 
         [Obsolete("Please use the constructor that takes less parameters. Will be removed in V15.")]
@@ -58,7 +59,8 @@ namespace Umbraco.Cms.Core.Services.Implement
                 auditRepository,
                 contentTypeRepository,
                 ioHelper,
-                editorConfigurationParser)
+                editorConfigurationParser,
+                StaticServiceProvider.Instance.GetRequiredService<IUserService>())
         {
         }
 
@@ -71,7 +73,8 @@ namespace Umbraco.Cms.Core.Services.Implement
             IAuditRepository auditRepository,
             IContentTypeRepository contentTypeRepository,
             IIOHelper ioHelper,
-            IEditorConfigurationParser editorConfigurationParser)
+            IEditorConfigurationParser editorConfigurationParser,
+            IUserService userService)
             : base(provider, loggerFactory, eventMessagesFactory)
         {
             _dataValueEditorFactory = dataValueEditorFactory;
@@ -80,6 +83,7 @@ namespace Umbraco.Cms.Core.Services.Implement
             _contentTypeRepository = contentTypeRepository;
             _ioHelper = ioHelper;
             _editorConfigurationParser = editorConfigurationParser;
+            _userService = userService;
 
             // resolve dependencies for obsolete methods through the static service provider, so they don't pollute the constructor signature
             _dataTypeContainerService = StaticServiceProvider.Instance.GetRequiredService<IDataTypeContainerService>();
@@ -368,7 +372,7 @@ namespace Umbraco.Cms.Core.Services.Implement
                 containerKey = container.Key;
             }
 
-            Attempt<IDataType, DataTypeOperationStatus> result = MoveAsync(toMove, containerKey).GetAwaiter().GetResult();
+            Attempt<IDataType, DataTypeOperationStatus> result = MoveAsync(toMove, containerKey, Constants.Security.SuperUserKey).GetAwaiter().GetResult();
 
             // mimic old service behavior
             EventMessages evtMsgs = EventMessagesFactory.Get();
@@ -381,7 +385,7 @@ namespace Umbraco.Cms.Core.Services.Implement
             };
         }
 
-        public async Task<Attempt<IDataType, DataTypeOperationStatus>> MoveAsync(IDataType toMove, Guid? containerKey, int userId = Constants.Security.SuperUserId)
+        public async Task<Attempt<IDataType, DataTypeOperationStatus>> MoveAsync(IDataType toMove, Guid? containerKey, Guid userKey)
         {
             EventMessages eventMessages = EventMessagesFactory.Get();
 
@@ -417,7 +421,8 @@ namespace Umbraco.Cms.Core.Services.Implement
 
                 scope.Notifications.Publish(new DataTypeMovedNotification(moveEventInfo, eventMessages).WithStateFrom(movingDataTypeNotification));
 
-                Audit(AuditType.Move, userId, toMove.Id);
+                var currentUserId = _userService.GetAsync(userKey).Id;
+                Audit(AuditType.Move, currentUserId, toMove.Id);
                 scope.Complete();
             }
 
@@ -445,7 +450,8 @@ namespace Umbraco.Cms.Core.Services.Implement
                 containerKey = container.Key;
             }
 
-            Attempt<IDataType, DataTypeOperationStatus> result = CopyAsync(copying, containerKey, userId).GetAwaiter().GetResult();
+            Guid? currentUserKey = _userService.GetUserById(userId)?.Key;
+            Attempt<IDataType, DataTypeOperationStatus> result = CopyAsync(copying, containerKey, currentUserKey ?? Constants.Security.SuperUserKey).GetAwaiter().GetResult();
 
             // mimic old service behavior
             EventMessages evtMsgs = EventMessagesFactory.Get();
@@ -459,7 +465,7 @@ namespace Umbraco.Cms.Core.Services.Implement
         }
 
         /// <inheritdoc />
-        public async Task<Attempt<IDataType, DataTypeOperationStatus>> CopyAsync(IDataType toCopy, Guid? containerKey, int userId = Constants.Security.SuperUserId)
+        public async Task<Attempt<IDataType, DataTypeOperationStatus>> CopyAsync(IDataType toCopy, Guid? containerKey, Guid userKey)
         {
             EntityContainer? container = null;
             if (containerKey.HasValue && containerKey.Value != Guid.Empty)
@@ -475,7 +481,7 @@ namespace Umbraco.Cms.Core.Services.Implement
             copy.Name += " (copy)"; // might not be unique
             copy.ParentId = container?.Id ?? Constants.System.Root;
 
-            return await SaveAsync(copy, () => DataTypeOperationStatus.Success, userId, AuditType.Copy);
+            return await SaveAsync(copy, () => DataTypeOperationStatus.Success, userKey, AuditType.Copy);
         }
 
         /// <summary>
@@ -497,26 +503,28 @@ namespace Umbraco.Cms.Core.Services.Implement
                 throw new InvalidOperationException("Name cannot be more than 255 characters in length.");
             }
 
-            Attempt<IDataType, DataTypeOperationStatus> result = SaveAsync(
+            Guid? userKey = _userService.GetUserById(userId)?.Key;
+
+            SaveAsync(
                 dataType,
                 () => DataTypeOperationStatus.Success,
-                userId,
+                userKey ?? Constants.Security.SuperUserKey,
                 AuditType.Sort).GetAwaiter().GetResult();
         }
 
         /// <inheritdoc />
-        public async Task<Attempt<IDataType, DataTypeOperationStatus>> CreateAsync(IDataType dataType, int userId = Constants.Security.SuperUserId)
+        public async Task<Attempt<IDataType, DataTypeOperationStatus>> CreateAsync(IDataType dataType, Guid userKey)
         {
             if (dataType.Id != 0)
             {
                 return Attempt.FailWithStatus(DataTypeOperationStatus.InvalidId, dataType);
             }
 
-            return await SaveAsync(dataType, () => DataTypeOperationStatus.Success, userId, AuditType.New);
+            return await SaveAsync(dataType, () => DataTypeOperationStatus.Success, userKey, AuditType.New);
         }
 
         /// <inheritdoc />
-        public async Task<Attempt<IDataType, DataTypeOperationStatus>> UpdateAsync(IDataType dataType, int userId = Constants.Security.SuperUserId)
+        public async Task<Attempt<IDataType, DataTypeOperationStatus>> UpdateAsync(IDataType dataType, Guid userKey)
             => await SaveAsync(
                 dataType,
                 () =>
@@ -526,7 +534,7 @@ namespace Umbraco.Cms.Core.Services.Implement
                         ? DataTypeOperationStatus.NotFound
                         : DataTypeOperationStatus.Success;
                 },
-                userId,
+                userKey,
                 AuditType.New);
 
         /// <summary>
@@ -571,10 +579,13 @@ namespace Umbraco.Cms.Core.Services.Implement
         /// <param name="dataType"><see cref="IDataType"/> to delete</param>
         /// <param name="userId">Optional Id of the user issuing the deletion</param>
         public void Delete(IDataType dataType, int userId = Constants.Security.SuperUserId)
-            => DeleteAsync(dataType.Key, userId).GetAwaiter().GetResult();
+        {
+            Guid currentUserKey = _userService.GetUserById(userId)?.Key ?? Constants.Security.SuperUserKey;
+            DeleteAsync(dataType.Key, currentUserKey).GetAwaiter().GetResult();
+        }
 
         /// <inheritdoc />
-        public async Task<Attempt<IDataType?, DataTypeOperationStatus>> DeleteAsync(Guid id, int userId = Constants.Security.SuperUserId)
+        public async Task<Attempt<IDataType?, DataTypeOperationStatus>> DeleteAsync(Guid id, Guid userKey)
         {
             EventMessages eventMessages = EventMessagesFactory.Get();
             using ICoreScope scope = ScopeProvider.CreateCoreScope();
@@ -626,7 +637,9 @@ namespace Umbraco.Cms.Core.Services.Implement
 
             scope.Notifications.Publish(new DataTypeDeletedNotification(dataType, eventMessages).WithStateFrom(deletingDataTypeNotification));
 
-            Audit(AuditType.Delete, userId, dataType.Id);
+
+            var currentUserId = _userService.GetAsync(userKey).Id;
+            Audit(AuditType.Delete, currentUserId, dataType.Id);
 
             scope.Complete();
 
@@ -670,7 +683,7 @@ namespace Umbraco.Cms.Core.Services.Implement
         private async Task<Attempt<IDataType, DataTypeOperationStatus>> SaveAsync(
             IDataType dataType,
             Func<DataTypeOperationStatus> operationValidation,
-            int userId,
+            Guid userKey,
             AuditType auditType)
         {
             IEnumerable<ValidationResult> validationResults = ValidateConfigurationData(dataType);
@@ -683,7 +696,9 @@ namespace Umbraco.Cms.Core.Services.Implement
             }
 
             EventMessages eventMessages = EventMessagesFactory.Get();
-            dataType.CreatorId = userId;
+
+            var currentUserId = _userService.GetAsync(userKey).Id;
+            dataType.CreatorId = currentUserId;
 
             using ICoreScope scope = ScopeProvider.CreateCoreScope();
 
@@ -714,7 +729,7 @@ namespace Umbraco.Cms.Core.Services.Implement
 
             scope.Notifications.Publish(new DataTypeSavedNotification(dataType, eventMessages).WithStateFrom(savingDataTypeNotification));
 
-            Audit(auditType, userId, dataType.Id);
+            Audit(auditType, currentUserId, dataType.Id);
             scope.Complete();
 
             return Attempt.SucceedWithStatus(DataTypeOperationStatus.Success, dataType);
