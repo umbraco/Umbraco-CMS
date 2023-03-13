@@ -37,7 +37,7 @@ public class UpdateMediaController : MediaControllerBase
         IMedia? media = await _mediaEditingService.GetAsync(key);
         if (media == null)
         {
-            return NotFound();
+            return MediaNotFound();
         }
 
         MediaUpdateModel model = _mediaEditingFactory.MapUpdateModel(updateRequestModel);

@@ -37,7 +37,7 @@ public class UpdateDocumentController : DocumentControllerBase
         IContent? content = await _contentEditingService.GetAsync(key);
         if (content == null)
         {
-            return NotFound();
+            return DocumentNotFound();
         }
 
         ContentUpdateModel model = _documentEditingFactory.MapUpdateModel(updateRequestModel);

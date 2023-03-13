@@ -28,7 +28,7 @@ public class ByKeyMediaController : MediaControllerBase
         IMedia? media = await _mediaEditingService.GetAsync(key);
         if (media == null)
         {
-            return NotFound();
+            return MediaNotFound();
         }
 
         MediaResponseModel model = await _mediaPresentationModelFactory.CreateResponseModelAsync(media);

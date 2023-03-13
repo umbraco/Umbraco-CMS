@@ -11,4 +11,5 @@ namespace Umbraco.Cms.Api.Management.Controllers.Media;
 [ApiExplorerSettings(GroupName = nameof(Constants.UdiEntityType.Media))]
 public class MediaControllerBase : ContentControllerBase
 {
+    protected IActionResult MediaNotFound() => NotFound("The requested Media could not be found");
 }
