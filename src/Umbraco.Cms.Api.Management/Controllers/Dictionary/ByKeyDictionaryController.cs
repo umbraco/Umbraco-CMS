@@ -10,19 +10,19 @@ namespace Umbraco.Cms.Api.Management.Controllers.Dictionary;
 public class ByKeyDictionaryController : DictionaryControllerBase
 {
     private readonly IDictionaryItemService _dictionaryItemService;
-    private readonly IDictionaryFactory _dictionaryFactory;
+    private readonly IDictionaryPresentationFactory _dictionaryPresentationFactory;
 
-    public ByKeyDictionaryController(IDictionaryItemService dictionaryItemService, IDictionaryFactory dictionaryFactory)
+    public ByKeyDictionaryController(IDictionaryItemService dictionaryItemService, IDictionaryPresentationFactory dictionaryPresentationFactory)
     {
         _dictionaryItemService = dictionaryItemService;
-        _dictionaryFactory = dictionaryFactory;
+        _dictionaryPresentationFactory = dictionaryPresentationFactory;
     }
 
     [HttpGet($"{{{nameof(key)}:guid}}")]
     [MapToApiVersion("1.0")]
-    [ProducesResponseType(typeof(DictionaryItemViewModel), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(DictionaryItemResponseModel), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<ActionResult<DictionaryItemViewModel>> ByKey(Guid key)
+    public async Task<ActionResult<DictionaryItemResponseModel>> ByKey(Guid key)
     {
         IDictionaryItem? dictionary = await _dictionaryItemService.GetAsync(key);
         if (dictionary == null)
@@ -30,6 +30,6 @@ public class ByKeyDictionaryController : DictionaryControllerBase
             return NotFound();
         }
 
-        return Ok(await _dictionaryFactory.CreateDictionaryItemViewModelAsync(dictionary));
+        return Ok(await _dictionaryPresentationFactory.CreateDictionaryItemViewModelAsync(dictionary));
     }
 }

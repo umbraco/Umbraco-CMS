@@ -13,16 +13,16 @@ namespace Umbraco.Cms.Api.Management.Controllers.UserGroups;
 public class CreateUserGroupController : UserGroupsControllerBase
 {
     private readonly IUserGroupService _userGroupService;
-    private readonly IUserGroupViewModelFactory _userGroupViewModelFactory;
+    private readonly IUserGroupPresentationFactory _userGroupPresentationFactory;
     private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
 
     public CreateUserGroupController(
         IUserGroupService userGroupService,
-        IUserGroupViewModelFactory userGroupViewModelFactory,
+        IUserGroupPresentationFactory userGroupPresentationFactory,
         IBackOfficeSecurityAccessor backOfficeSecurityAccessor)
     {
         _userGroupService = userGroupService;
-        _userGroupViewModelFactory = userGroupViewModelFactory;
+        _userGroupPresentationFactory = userGroupPresentationFactory;
         _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
     }
 
@@ -30,7 +30,7 @@ public class CreateUserGroupController : UserGroupsControllerBase
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status201Created)]
-    public async Task<IActionResult> Create(UserGroupSaveModel userGroupSaveModel)
+    public async Task<IActionResult> Create(SaveUserGroupRequestModel saveUserGroupRequestModel)
     {
         // FIXME: Comment this in when auth is in place and we can get a currently logged in user.
         // IUser? currentUser = _backOfficeSecurityAccessor.BackOfficeSecurity?.CurrentUser;
@@ -39,7 +39,7 @@ public class CreateUserGroupController : UserGroupsControllerBase
         //     return UserGroupOperationStatusResult(UserGroupOperationStatus.MissingUser);
         // }
 
-        Attempt<IUserGroup, UserGroupOperationStatus> userGroupCreationAttempt = await _userGroupViewModelFactory.CreateAsync(userGroupSaveModel);
+        Attempt<IUserGroup, UserGroupOperationStatus> userGroupCreationAttempt = await _userGroupPresentationFactory.CreateAsync(saveUserGroupRequestModel);
         if (userGroupCreationAttempt.Success is false)
         {
             return UserGroupOperationStatusResult(userGroupCreationAttempt.Status);

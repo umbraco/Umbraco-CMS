@@ -13,12 +13,12 @@ namespace Umbraco.Cms.Api.Management.Controllers.AuditLog;
 public class ByKeyAuditLogController : AuditLogControllerBase
 {
     private readonly IAuditService _auditService;
-    private readonly IAuditLogViewModelFactory _auditLogViewModelFactory;
+    private readonly IAuditLogPresentationFactory _auditLogPresentationFactory;
 
-    public ByKeyAuditLogController(IAuditService auditService, IAuditLogViewModelFactory auditLogViewModelFactory)
+    public ByKeyAuditLogController(IAuditService auditService, IAuditLogPresentationFactory auditLogPresentationFactory)
     {
         _auditService = auditService;
-        _auditLogViewModelFactory = auditLogViewModelFactory;
+        _auditLogPresentationFactory = auditLogPresentationFactory;
     }
 
     [HttpGet("{key:guid}")]
@@ -27,7 +27,7 @@ public class ByKeyAuditLogController : AuditLogControllerBase
     public async Task<IActionResult> ByKey(Guid key, Direction orderDirection = Direction.Descending, DateTime? sinceDate = null, int skip = 0, int take = 100)
     {
         PagedModel<IAuditItem> result = await _auditService.GetItemsByKeyAsync(key, skip, take, orderDirection, sinceDate);
-        IEnumerable<AuditLogResponseModel> mapped = _auditLogViewModelFactory.CreateAuditLogViewModel(result.Items);
+        IEnumerable<AuditLogResponseModel> mapped = _auditLogPresentationFactory.CreateAuditLogViewModel(result.Items);
         var viewModel = new PagedViewModel<AuditLogResponseModel>
         {
             Total = result.Total,

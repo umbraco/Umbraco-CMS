@@ -20,7 +20,7 @@ public class ByIdRelationController : RelationControllerBase
 
     [HttpGet("{id:int}")]
     [MapToApiVersion("1.0")]
-    [ProducesResponseType(typeof(RelationViewModel), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(RelationResponseModel), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult> ById(int id)
     {

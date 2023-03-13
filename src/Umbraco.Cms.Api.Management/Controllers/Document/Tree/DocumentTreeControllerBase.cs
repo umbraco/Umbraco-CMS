@@ -17,7 +17,7 @@ namespace Umbraco.Cms.Api.Management.Controllers.Document.Tree;
 [ApiController]
 [VersionedApiBackOfficeRoute($"{Constants.Web.RoutePath.Tree}/{Constants.UdiEntityType.Document}")]
 [ApiExplorerSettings(GroupName = nameof(Constants.UdiEntityType.Document))]
-public abstract class DocumentTreeControllerBase : UserStartNodeTreeControllerBase<DocumentTreeItemViewModel>
+public abstract class DocumentTreeControllerBase : UserStartNodeTreeControllerBase<DocumentTreeItemResponseModel>
 {
     private readonly IPublicAccessService _publicAccessService;
     private readonly AppCaches _appCaches;
@@ -44,32 +44,32 @@ public abstract class DocumentTreeControllerBase : UserStartNodeTreeControllerBa
 
     protected void RenderForClientCulture(string? culture) => _culture = culture;
 
-    protected override DocumentTreeItemViewModel MapTreeItemViewModel(Guid? parentKey, IEntitySlim entity)
+    protected override DocumentTreeItemResponseModel MapTreeItemViewModel(Guid? parentKey, IEntitySlim entity)
     {
-        DocumentTreeItemViewModel viewModel = base.MapTreeItemViewModel(parentKey, entity);
+        DocumentTreeItemResponseModel responseModel = base.MapTreeItemViewModel(parentKey, entity);
 
         if (entity is IDocumentEntitySlim documentEntitySlim)
         {
-            viewModel.IsPublished = documentEntitySlim.Published;
-            viewModel.IsEdited = documentEntitySlim.Edited;
-            viewModel.Icon = documentEntitySlim.ContentTypeIcon ?? viewModel.Icon;
-            viewModel.IsProtected = _publicAccessService.IsProtected(entity.Path);
-            viewModel.IsTrashed = entity.Trashed;
+            responseModel.IsPublished = documentEntitySlim.Published;
+            responseModel.IsEdited = documentEntitySlim.Edited;
+            responseModel.Icon = documentEntitySlim.ContentTypeIcon ?? responseModel.Icon;
+            responseModel.IsProtected = _publicAccessService.IsProtected(entity.Path);
+            responseModel.IsTrashed = entity.Trashed;
 
             if (_culture != null && documentEntitySlim.Variations.VariesByCulture())
             {
-                viewModel.Name = documentEntitySlim.CultureNames.TryGetValue(_culture, out var cultureName)
+                responseModel.Name = documentEntitySlim.CultureNames.TryGetValue(_culture, out var cultureName)
                     ? cultureName
-                    : $"({viewModel.Name})";
+                    : $"({responseModel.Name})";
 
-                viewModel.IsPublished = documentEntitySlim.PublishedCultures.Contains(_culture);
-                viewModel.IsEdited = documentEntitySlim.EditedCultures.Contains(_culture);
+                responseModel.IsPublished = documentEntitySlim.PublishedCultures.Contains(_culture);
+                responseModel.IsEdited = documentEntitySlim.EditedCultures.Contains(_culture);
             }
 
-            viewModel.IsEdited &= viewModel.IsPublished;
+            responseModel.IsEdited &= responseModel.IsPublished;
         }
 
-        return viewModel;
+        return responseModel;
     }
 
     // TODO: delete these (faking start node setup for unlimited editor)

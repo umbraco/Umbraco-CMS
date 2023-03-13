@@ -7,7 +7,7 @@ using Umbraco.Cms.Api.Management.ViewModels.Tree;
 namespace Umbraco.Cms.Api.Management.Controllers.Tree;
 
 public abstract class FolderTreeControllerBase<TItem> : EntityTreeControllerBase<TItem>
-    where TItem : FolderTreeItemViewModel, new()
+    where TItem : FolderTreeItemResponseModel, new()
 {
     private readonly Guid _folderObjectTypeId;
     private bool _foldersOnly;

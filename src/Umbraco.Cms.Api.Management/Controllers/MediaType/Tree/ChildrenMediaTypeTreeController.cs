@@ -15,8 +15,8 @@ public class ChildrenMediaTypeTreeController : MediaTypeTreeControllerBase
 
     [HttpGet("children")]
     [MapToApiVersion("1.0")]
-    [ProducesResponseType(typeof(PagedViewModel<FolderTreeItemViewModel>), StatusCodes.Status200OK)]
-    public async Task<ActionResult<PagedViewModel<FolderTreeItemViewModel>>> Children(Guid parentKey, int skip = 0, int take = 100, bool foldersOnly = false)
+    [ProducesResponseType(typeof(PagedViewModel<FolderTreeItemResponseModel>), StatusCodes.Status200OK)]
+    public async Task<ActionResult<PagedViewModel<FolderTreeItemResponseModel>>> Children(Guid parentKey, int skip = 0, int take = 100, bool foldersOnly = false)
     {
         RenderFoldersOnly(foldersOnly);
         return await GetChildren(parentKey, skip, take);

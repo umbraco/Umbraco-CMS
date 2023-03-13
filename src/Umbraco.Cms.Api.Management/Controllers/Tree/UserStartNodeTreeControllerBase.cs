@@ -9,7 +9,7 @@ using Umbraco.Extensions;
 namespace Umbraco.Cms.Api.Management.Controllers.Tree;
 
 public abstract class UserStartNodeTreeControllerBase<TItem> : EntityTreeControllerBase<TItem>
-    where TItem : ContentTreeItemViewModel, new()
+    where TItem : ContentTreeItemResponseModel, new()
 {
     private readonly IUserStartNodeEntitiesService _userStartNodeEntitiesService;
     private readonly IDataTypeService _dataTypeService;

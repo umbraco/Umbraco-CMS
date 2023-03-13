@@ -35,8 +35,8 @@ public class ExecuteTemplateQueryController : TemplateQueryControllerBase
 
     [HttpPost("execute")]
     [MapToApiVersion("1.0")]
-    [ProducesResponseType(typeof(TemplateQueryResultViewModel), StatusCodes.Status200OK)]
-    public async Task<ActionResult<TemplateQueryResultViewModel>> Execute(TemplateQueryExecuteModel query)
+    [ProducesResponseType(typeof(TemplateQueryResultResponseModel), StatusCodes.Status200OK)]
+    public async Task<ActionResult<TemplateQueryResultResponseModel>> Execute(TemplateQueryExecuteModel query)
     {
         var queryExpression = new StringBuilder();
         IEnumerable<IPublishedContent> contents = BuildQuery(query, queryExpression);
@@ -50,12 +50,12 @@ public class ExecuteTemplateQueryController : TemplateQueryControllerBase
             .GetAll(results.Select(content => content.ContentType.Key).Distinct())
             .ToDictionary(contentType => contentType.Key, contentType => contentType.Icon);
 
-        return await Task.FromResult(Ok(new TemplateQueryResultViewModel
+        return await Task.FromResult(Ok(new TemplateQueryResultResponseModel
         {
             QueryExpression = queryExpression.ToString(),
             ResultCount = results.Count,
             ExecutionTime = timer.ElapsedMilliseconds,
-            SampleResults = results.Take(20).Select(content => new TemplateQueryResultItemViewModel
+            SampleResults = results.Take(20).Select(content => new TemplateQueryResultItemPresentationModel
             {
                 Icon = contentTypeIconsByKey[content.ContentType.Key] ?? "icon-document",
                 Name = content.Name
@@ -114,7 +114,7 @@ public class ExecuteTemplateQueryController : TemplateQueryControllerBase
             : rootContent.Children(_variationContextAccessor);
     }
 
-    private IEnumerable<IPublishedContent> ApplyFiltering(IEnumerable<TemplateQueryExecuteFilterModel>? filters, IEnumerable<IPublishedContent> contentQuery, StringBuilder queryExpression)
+    private IEnumerable<IPublishedContent> ApplyFiltering(IEnumerable<TemplateQueryExecuteFilterPresentationModel>? filters, IEnumerable<IPublishedContent> contentQuery, StringBuilder queryExpression)
     {
         if (filters is not null)
         {
@@ -128,7 +128,7 @@ public class ExecuteTemplateQueryController : TemplateQueryControllerBase
         return contentQuery;
     }
 
-    private IEnumerable<IPublishedContent> ApplyFilters(IEnumerable<TemplateQueryExecuteFilterModel> filters, IEnumerable<IPublishedContent> contentQuery, StringBuilder queryExpression)
+    private IEnumerable<IPublishedContent> ApplyFilters(IEnumerable<TemplateQueryExecuteFilterPresentationModel> filters, IEnumerable<IPublishedContent> contentQuery, StringBuilder queryExpression)
     {
         var propertyTypeByAlias = GetProperties().ToDictionary(p => p.Alias, p => p.Type);
 

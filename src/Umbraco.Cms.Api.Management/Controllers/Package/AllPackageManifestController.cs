@@ -20,10 +20,10 @@ public class AllPackageManifestController : PackageControllerBase
     // NOTE: this endpoint is deliberately created as non-paginated to ensure the fastest possible client initialization
     [HttpGet("manifest")]
     [MapToApiVersion("1.0")]
-    [ProducesResponseType(typeof(IEnumerable<PackageManifestViewModel>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(IEnumerable<PackageManifestResponseModel>), StatusCodes.Status200OK)]
     public async Task<IActionResult> AllPackageManifests()
     {
         PackageManifest[] packageManifests = (await _packageManifestService.GetPackageManifestsAsync()).ToArray();
-        return Ok(_umbracoMapper.MapEnumerable<PackageManifest, PackageManifestViewModel>(packageManifests));
+        return Ok(_umbracoMapper.MapEnumerable<PackageManifest, PackageManifestResponseModel>(packageManifests));
     }
 }

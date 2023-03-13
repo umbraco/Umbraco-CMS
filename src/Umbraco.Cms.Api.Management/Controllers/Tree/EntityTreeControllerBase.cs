@@ -11,7 +11,7 @@ using Umbraco.Extensions;
 namespace Umbraco.Cms.Api.Management.Controllers.Tree;
 
 public abstract class EntityTreeControllerBase<TItem> : ManagementApiControllerBase
-    where TItem : EntityTreeItemViewModel, new()
+    where TItem : EntityTreeItemResponseModel, new()
 {
     private readonly string _itemUdiType;
 

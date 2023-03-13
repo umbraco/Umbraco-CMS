@@ -11,25 +11,25 @@ namespace Umbraco.Cms.Api.Management.Controllers.RedirectUrlManagement;
 public class ByKeyRedirectUrlManagementController : RedirectUrlManagementBaseController
 {
     private readonly IRedirectUrlService _redirectUrlService;
-    private readonly IRedirectUrlViewModelFactory _redirectUrlViewModelFactory;
+    private readonly IRedirectUrlPresentationFactory _redirectUrlPresentationFactory;
 
     public ByKeyRedirectUrlManagementController(
         IRedirectUrlService redirectUrlService,
-        IRedirectUrlViewModelFactory redirectUrlViewModelFactory)
+        IRedirectUrlPresentationFactory redirectUrlPresentationFactory)
     {
         _redirectUrlService = redirectUrlService;
-        _redirectUrlViewModelFactory = redirectUrlViewModelFactory;
+        _redirectUrlPresentationFactory = redirectUrlPresentationFactory;
     }
 
     [HttpGet("{key:guid}")]
-    [ProducesResponseType(typeof(PagedViewModel<RedirectUrlViewModel>), StatusCodes.Status200OK)]
-    public Task<ActionResult<PagedViewModel<RedirectUrlViewModel>>> ByKey(Guid key, int skip, int take)
+    [ProducesResponseType(typeof(PagedViewModel<RedirectUrlResponseModel>), StatusCodes.Status200OK)]
+    public Task<ActionResult<PagedViewModel<RedirectUrlResponseModel>>> ByKey(Guid key, int skip, int take)
     {
         IRedirectUrl[] redirects = _redirectUrlService.GetContentRedirectUrls(key).ToArray();
 
-        IEnumerable<RedirectUrlViewModel> viewModels = _redirectUrlViewModelFactory.CreateMany(redirects);
+        IEnumerable<RedirectUrlResponseModel> viewModels = _redirectUrlPresentationFactory.CreateMany(redirects);
 
-        return Task.FromResult<ActionResult<PagedViewModel<RedirectUrlViewModel>>>(new PagedViewModel<RedirectUrlViewModel>
+        return Task.FromResult<ActionResult<PagedViewModel<RedirectUrlResponseModel>>>(new PagedViewModel<RedirectUrlResponseModel>
         {
             Items = viewModels.Skip(skip).Take(take),
             Total = redirects.Length,
