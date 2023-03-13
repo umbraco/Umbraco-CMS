@@ -1,0 +1,15 @@
+﻿using Umbraco.Cms.Api.Management.Mapping.MediaType;
+using Umbraco.Cms.Core.DependencyInjection;
+using Umbraco.Cms.Core.Mapping;
+
+namespace Umbraco.Cms.Api.Management.DependencyInjection;
+
+internal static class MediaTypeBuilderExtensions
+{
+    internal static IUmbracoBuilder AddMediaTypes(this IUmbracoBuilder builder)
+    {
+        builder.WithCollectionBuilder<MapDefinitionCollectionBuilder>().Add<MediaTypeMapDefinition>();
+
+        return builder;
+    }
+}

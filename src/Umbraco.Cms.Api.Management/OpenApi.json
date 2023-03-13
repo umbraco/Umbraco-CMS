@@ -3186,6 +3186,44 @@
         }
       }
     },
+    "/umbraco/management/api/v1/media-type/{key}": {
+      "get": {
+        "tags": [
+          "Media Type"
+        ],
+        "operationId": "GetMediaTypeByKey",
+        "parameters": [
+          {
+            "name": "key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/MediaTypeResponseModel"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    },
     "/umbraco/management/api/v1/tree/media-type/children": {
       "get": {
         "tags": [
@@ -3329,6 +3367,155 @@
                 }
               }
             }
+          }
+        }
+      }
+    },
+    "/umbraco/management/api/v1/media": {
+      "post": {
+        "tags": [
+          "Media"
+        ],
+        "operationId": "PostMedia",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/CreateMediaRequestModel"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "headers": {
+              "Location": {
+                "description": "Location of the newly created resource",
+                "schema": {
+                  "type": "string",
+                  "description": "Location of the newly created resource",
+                  "format": "uri"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    },
+    "/umbraco/management/api/v1/media/{key}": {
+      "get": {
+        "tags": [
+          "Media"
+        ],
+        "operationId": "GetMediaByKey",
+        "parameters": [
+          {
+            "name": "key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/DocumentResponseModel"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Media"
+        ],
+        "operationId": "DeleteMediaByKey",
+        "parameters": [
+          {
+            "name": "key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Media"
+        ],
+        "operationId": "PutMediaByKey",
+        "parameters": [
+          {
+            "name": "key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/UpdateMediaRequestModel"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "404": {
+            "description": "Not Found"
           }
         }
       }
@@ -6619,37 +6806,6 @@
         },
         "additionalProperties": false
       },
-      "ContentCreateRequestModelBaseDocumentValueModelDocumentVariantRequestModel": {
-        "type": "object",
-        "properties": {
-          "values": {
-            "type": "array",
-            "items": {
-              "oneOf": [
-                {
-                  "$ref": "#/components/schemas/DocumentValueModel"
-                }
-              ]
-            }
-          },
-          "variants": {
-            "type": "array",
-            "items": {
-              "oneOf": [
-                {
-                  "$ref": "#/components/schemas/DocumentVariantRequestModel"
-                }
-              ]
-            }
-          },
-          "parentKey": {
-            "type": "string",
-            "format": "uuid",
-            "nullable": true
-          }
-        },
-        "additionalProperties": false
-      },
       "ContentResponseModelBaseDocumentValueModelDocumentVariantResponseModel": {
         "type": "object",
         "properties": {
@@ -6764,7 +6920,7 @@
         "type": "integer",
         "format": "int32"
       },
-      "ContentTypePresentationBaseDocumentTypePropertyTypePresentationBaseDocumentTypePropertyTypeContainerPresentationBaseModel": {
+      "ContentTypeResponseModelBaseDocumentTypePropertyTypeResponseModelDocumentTypePropertyTypeContainerResponseModel": {
         "type": "object",
         "properties": {
           "key": {
@@ -6801,7 +6957,7 @@
             "items": {
               "oneOf": [
                 {
-                  "$ref": "#/components/schemas/DocumentTypePropertyTypePresentationBaseModel"
+                  "$ref": "#/components/schemas/DocumentTypePropertyTypeResponseModel"
                 }
               ]
             }
@@ -6811,7 +6967,7 @@
             "items": {
               "oneOf": [
                 {
-                  "$ref": "#/components/schemas/DocumentTypePropertyTypeContainerPresentationBaseModel"
+                  "$ref": "#/components/schemas/DocumentTypePropertyTypeContainerResponseModel"
                 }
               ]
             }
@@ -6835,13 +6991,81 @@
                 }
               ]
             }
+          }
+        },
+        "additionalProperties": false
+      },
+      "ContentTypeResponseModelBaseMediaTypePropertyTypeResponseModelMediaTypePropertyTypeContainerResponseModel": {
+        "type": "object",
+        "properties": {
+          "key": {
+            "type": "string",
+            "format": "uuid"
           },
-          "cleanup": {
-            "oneOf": [
-              {
-                "$ref": "#/components/schemas/ContentTypeCleanupModel"
-              }
-            ]
+          "alias": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "icon": {
+            "type": "string"
+          },
+          "allowedAsRoot": {
+            "type": "boolean"
+          },
+          "variesByCulture": {
+            "type": "boolean"
+          },
+          "variesBySegment": {
+            "type": "boolean"
+          },
+          "isElement": {
+            "type": "boolean"
+          },
+          "properties": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/MediaTypePropertyTypeResponseModel"
+                }
+              ]
+            }
+          },
+          "containers": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/MediaTypePropertyTypeContainerResponseModel"
+                }
+              ]
+            }
+          },
+          "allowedContentTypes": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/ContentTypeSortModel"
+                }
+              ]
+            }
+          },
+          "compositions": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/ContentTypeCompositionModel"
+                }
+              ]
+            }
           }
         },
         "additionalProperties": false
@@ -6856,32 +7080,6 @@
           "sortOrder": {
             "type": "integer",
             "format": "int32"
-          }
-        },
-        "additionalProperties": false
-      },
-      "ContentUpdateRequestModelBaseDocumentValueModelDocumentVariantRequestModel": {
-        "type": "object",
-        "properties": {
-          "values": {
-            "type": "array",
-            "items": {
-              "oneOf": [
-                {
-                  "$ref": "#/components/schemas/DocumentValueModel"
-                }
-              ]
-            }
-          },
-          "variants": {
-            "type": "array",
-            "items": {
-              "oneOf": [
-                {
-                  "$ref": "#/components/schemas/DocumentVariantRequestModel"
-                }
-              ]
-            }
           }
         },
         "additionalProperties": false
@@ -6903,6 +7101,68 @@
         "type": "object",
         "properties": {
           "targetKey": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "CreateContentRequestModelBaseDocumentValueModelDocumentVariantRequestModel": {
+        "type": "object",
+        "properties": {
+          "values": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/DocumentValueModel"
+                }
+              ]
+            }
+          },
+          "variants": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/DocumentVariantRequestModel"
+                }
+              ]
+            }
+          },
+          "parentKey": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "CreateContentRequestModelBaseMediaValueModelMediaVariantRequestModel": {
+        "type": "object",
+        "properties": {
+          "values": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/MediaValueModel"
+                }
+              ]
+            }
+          },
+          "variants": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/MediaVariantRequestModel"
+                }
+              ]
+            }
+          },
+          "parentKey": {
             "type": "string",
             "format": "uuid",
             "nullable": true
@@ -6946,7 +7206,7 @@
         "type": "object",
         "allOf": [
           {
-            "$ref": "#/components/schemas/ContentCreateRequestModelBaseDocumentValueModelDocumentVariantRequestModel"
+            "$ref": "#/components/schemas/CreateContentRequestModelBaseDocumentValueModelDocumentVariantRequestModel"
           }
         ],
         "properties": {
@@ -6988,6 +7248,21 @@
         "properties": {
           "isoCode": {
             "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "CreateMediaRequestModel": {
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/CreateContentRequestModelBaseMediaValueModelMediaVariantRequestModel"
+          }
+        ],
+        "properties": {
+          "contentTypeKey": {
+            "type": "string",
+            "format": "uuid"
           }
         },
         "additionalProperties": false
@@ -7051,7 +7326,7 @@
             "type": "string",
             "nullable": true
           },
-          "data": {
+          "values": {
             "type": "array",
             "items": {
               "oneOf": [
@@ -7408,20 +7683,20 @@
           }
         }
       },
-      "DocumentTypePropertyTypeContainerPresentationBaseModel": {
+      "DocumentTypePropertyTypeContainerResponseModel": {
         "type": "object",
         "allOf": [
           {
-            "$ref": "#/components/schemas/PropertyTypeContainerPresentationBaseModel"
+            "$ref": "#/components/schemas/PropertyTypeContainerResponseModelBaseModel"
           }
         ],
         "additionalProperties": false
       },
-      "DocumentTypePropertyTypePresentationBaseModel": {
+      "DocumentTypePropertyTypeResponseModel": {
         "type": "object",
         "allOf": [
           {
-            "$ref": "#/components/schemas/PropertyTypePresentationBaseModel"
+            "$ref": "#/components/schemas/PropertyTypeResponseModelBaseModel"
           }
         ],
         "additionalProperties": false
@@ -7430,7 +7705,7 @@
         "type": "object",
         "allOf": [
           {
-            "$ref": "#/components/schemas/ContentTypePresentationBaseDocumentTypePropertyTypePresentationBaseDocumentTypePropertyTypeContainerPresentationBaseModel"
+            "$ref": "#/components/schemas/ContentTypeResponseModelBaseDocumentTypePropertyTypeResponseModelDocumentTypePropertyTypeContainerResponseModel"
           }
         ],
         "properties": {
@@ -7445,6 +7720,13 @@
             "type": "string",
             "format": "uuid",
             "nullable": true
+          },
+          "cleanup": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/ContentTypeCleanupModel"
+              }
+            ]
           }
         },
         "additionalProperties": false
@@ -8198,6 +8480,102 @@
           }
         },
         "additionalProperties": false
+      },
+      "MediaTypePropertyTypeContainerResponseModel": {
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/PropertyTypeContainerResponseModelBaseModel"
+          }
+        ],
+        "additionalProperties": false
+      },
+      "MediaTypePropertyTypeResponseModel": {
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/PropertyTypeResponseModelBaseModel"
+          }
+        ],
+        "additionalProperties": false
+      },
+      "MediaTypeResponseModel": {
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ContentTypeResponseModelBaseMediaTypePropertyTypeResponseModelMediaTypePropertyTypeContainerResponseModel"
+          }
+        ],
+        "additionalProperties": false
+      },
+      "MediaValueModel": {
+        "required": [
+          "$type"
+        ],
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ValueModelBaseModel"
+          }
+        ],
+        "properties": {
+          "$type": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false,
+        "discriminator": {
+          "propertyName": "$type",
+          "mapping": {
+            "MediaValueModel": "#/components/schemas/MediaValueModel"
+          }
+        }
+      },
+      "MediaVariantRequestModel": {
+        "required": [
+          "$type"
+        ],
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/VariantModelBaseModel"
+          }
+        ],
+        "properties": {
+          "$type": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false,
+        "discriminator": {
+          "propertyName": "$type",
+          "mapping": {
+            "MediaVariantRequestModel": "#/components/schemas/MediaVariantRequestModel"
+          }
+        }
+      },
+      "MediaVariantResponseModel": {
+        "required": [
+          "$type"
+        ],
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/VariantResponseModelBaseModel"
+          }
+        ],
+        "properties": {
+          "$type": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false,
+        "discriminator": {
+          "propertyName": "$type",
+          "mapping": {
+            "MediaVariantResponseModel": "#/components/schemas/MediaVariantResponseModel"
+          }
+        }
       },
       "ModelsBuilderResponseModel": {
         "type": "object",
@@ -9239,7 +9617,7 @@
         },
         "additionalProperties": false
       },
-      "PropertyTypeContainerPresentationBaseModel": {
+      "PropertyTypeContainerResponseModelBaseModel": {
         "type": "object",
         "properties": {
           "key": {
@@ -9265,7 +9643,7 @@
         },
         "additionalProperties": false
       },
-      "PropertyTypePresentationBaseModel": {
+      "PropertyTypeResponseModelBaseModel": {
         "type": "object",
         "properties": {
           "key": {
@@ -9943,6 +10321,58 @@
         },
         "additionalProperties": false
       },
+      "UpdateContentRequestModelBaseDocumentValueModelDocumentVariantRequestModel": {
+        "type": "object",
+        "properties": {
+          "values": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/DocumentValueModel"
+                }
+              ]
+            }
+          },
+          "variants": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/DocumentVariantRequestModel"
+                }
+              ]
+            }
+          }
+        },
+        "additionalProperties": false
+      },
+      "UpdateContentRequestModelBaseMediaValueModelMediaVariantRequestModel": {
+        "type": "object",
+        "properties": {
+          "values": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/MediaValueModel"
+                }
+              ]
+            }
+          },
+          "variants": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/MediaVariantRequestModel"
+                }
+              ]
+            }
+          }
+        },
+        "additionalProperties": false
+      },
       "UpdateDataTypeRequestModel": {
         "type": "object",
         "allOf": [
@@ -9965,7 +10395,7 @@
         "type": "object",
         "allOf": [
           {
-            "$ref": "#/components/schemas/ContentUpdateRequestModelBaseDocumentValueModelDocumentVariantRequestModel"
+            "$ref": "#/components/schemas/UpdateContentRequestModelBaseDocumentValueModelDocumentVariantRequestModel"
           }
         ],
         "properties": {
@@ -10000,6 +10430,15 @@
         "allOf": [
           {
             "$ref": "#/components/schemas/LanguageModelBaseModel"
+          }
+        ],
+        "additionalProperties": false
+      },
+      "UpdateMediaRequestModel": {
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/UpdateContentRequestModelBaseMediaValueModelMediaVariantRequestModel"
           }
         ],
         "additionalProperties": false
@@ -10240,6 +10679,7 @@
         "discriminator": {
           "propertyName": "$type",
           "mapping": {
+            "MediaValueModel": "#/components/schemas/MediaValueModel",
             "DocumentValueModel": "#/components/schemas/DocumentValueModel"
           }
         }
@@ -10269,6 +10709,8 @@
         "discriminator": {
           "propertyName": "$type",
           "mapping": {
+            "MediaVariantRequestModel": "#/components/schemas/MediaVariantRequestModel",
+            "MediaVariantResponseModel": "#/components/schemas/MediaVariantResponseModel",
             "DocumentVariantRequestModel": "#/components/schemas/DocumentVariantRequestModel",
             "DocumentVariantResponseModel": "#/components/schemas/DocumentVariantResponseModel"
           }
@@ -10307,6 +10749,7 @@
         "discriminator": {
           "propertyName": "$type",
           "mapping": {
+            "MediaVariantResponseModel": "#/components/schemas/MediaVariantResponseModel",
             "DocumentVariantResponseModel": "#/components/schemas/DocumentVariantResponseModel"
           }
         }

@@ -3,6 +3,7 @@ using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Models.Editors;
 using Umbraco.Cms.Core.PropertyEditors;
+using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Extensions;
 
@@ -20,16 +21,20 @@ public abstract class ContentEditingServiceBase<TContent, TContentType, TContent
 
     private readonly ILogger<ContentEditingServiceBase<TContent, TContentType, TContentService, TContentTypeService>> _logger;
 
+    private readonly ICoreScopeProvider _scopeProvider;
+
     protected ContentEditingServiceBase(
         TContentService contentService,
         TContentTypeService contentTypeService,
         PropertyEditorCollection propertyEditorCollection,
         IDataTypeService dataTypeService,
-        ILogger<ContentEditingServiceBase<TContent, TContentType, TContentService, TContentTypeService>> logger)
+        ILogger<ContentEditingServiceBase<TContent, TContentType, TContentService, TContentTypeService>> logger,
+        ICoreScopeProvider scopeProvider)
     {
         _propertyEditorCollection = propertyEditorCollection;
         _dataTypeService = dataTypeService;
         _logger = logger;
+        _scopeProvider = scopeProvider;
         ContentService = contentService;
         ContentTypeService = contentTypeService;
     }
@@ -75,6 +80,33 @@ public abstract class ContentEditingServiceBase<TContent, TContentType, TContent
         RemoveMissingProperties(contentEditingModelBase, content, contentType);
 
         return Attempt.Succeed(ContentEditingOperationStatus.Success);
+    }
+
+    // helper method to perform move-to-recycle-bin and delete for content as they are very much handled in the same way
+    protected async Task<Attempt<TContent?, ContentEditingOperationStatus>> HandleDeletionAsync(Guid id, Func<TContent, OperationResult?> performDelete, bool allowForTrashed)
+    {
+        using ICoreScope scope = _scopeProvider.CreateCoreScope(autoComplete:true);
+        TContent? content = ContentService.GetById(id);
+        if (content == null)
+        {
+            return await Task.FromResult(Attempt.FailWithStatus(ContentEditingOperationStatus.NotFound, content));
+        }
+
+        if (content.Trashed && allowForTrashed is false)
+        {
+            return await Task.FromResult(Attempt.FailWithStatus<TContent?, ContentEditingOperationStatus>(ContentEditingOperationStatus.InTrash, content));
+        }
+
+        OperationResult? deleteResult = performDelete(content);
+        return deleteResult?.Result switch
+        {
+            // these are the only result states currently expected from Delete
+            OperationResultType.Success => Attempt.SucceedWithStatus<TContent?, ContentEditingOperationStatus>(ContentEditingOperationStatus.Success, content),
+            OperationResultType.FailedCancelledByEvent => Attempt.FailWithStatus<TContent?, ContentEditingOperationStatus>(ContentEditingOperationStatus.CancelledByNotification, content),
+
+            // for any other state we'll return "unknown" so we know that we need to amend this
+            _ => Attempt.FailWithStatus<TContent?, ContentEditingOperationStatus>(ContentEditingOperationStatus.Unknown, content)
+        };
     }
 
     private TContentType? TryGetAndValidateContentType(Guid contentTypeKey, ContentEditingModelBase contentEditingModelBase, out ContentEditingOperationStatus operationStatus)

@@ -2,7 +2,7 @@
 
 namespace Umbraco.Cms.Api.Management.ViewModels.Document;
 
-public class UpdateDocumentRequestModel : ContentUpdateRequestModelBase<DocumentValueModel, DocumentVariantRequestModel>
+public class UpdateDocumentRequestModel : UpdateContentRequestModelBase<DocumentValueModel, DocumentVariantRequestModel>
 {
     public Guid? TemplateKey { get; set; }
 }
