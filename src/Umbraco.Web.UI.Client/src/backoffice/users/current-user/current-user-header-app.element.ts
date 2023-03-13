@@ -2,6 +2,7 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, CSSResultGroup, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { UmbCurrentUserStore, UMB_CURRENT_USER_STORE_CONTEXT_TOKEN } from './current-user.store';
+import { UMB_CURRENT_USER_MODAL_TOKEN } from './modals/current-user';
 import type { UserDetails } from '@umbraco-cms/models';
 import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN } from '@umbraco-cms/modal';
 import { UmbLitElement } from '@umbraco-cms/element';
@@ -46,7 +47,7 @@ export class UmbCurrentUserHeaderApp extends UmbLitElement {
 	}
 
 	private _handleUserClick() {
-		this._modalContext?.userSettings();
+		this._modalContext?.open(UMB_CURRENT_USER_MODAL_TOKEN);
 	}
 
 	render() {

@@ -59,7 +59,19 @@ export const data: Array<DocumentModel> = [
 				alias: 'datePicker',
 				culture: null,
 				segment: null,
-				value: null,
+				value: '2023-12-24',
+			},
+			{
+				alias: 'datePickerTime',
+				culture: null,
+				segment: null,
+				value: '2023-12-24 14:52',
+			},
+			{
+				alias: 'time',
+				culture: null,
+				segment: null,
+				value: '14:52:00',
 			},
 			{
 				alias: 'email',

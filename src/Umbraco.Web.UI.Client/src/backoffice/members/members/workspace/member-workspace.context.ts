@@ -1,7 +1,7 @@
 import { UmbEntityWorkspaceManager } from '../../../shared/components/workspace/workspace-context/entity-manager-controller';
 import { UmbWorkspaceContext } from '../../../shared/components/workspace/workspace-context/workspace-context';
 import { UmbWorkspaceEntityContextInterface } from '../../../shared/components/workspace/workspace-context/workspace-entity-context.interface';
-import { UMB_MEMBER_DETAIL_STORE_CONTEXT_TOKEN } from '../member.detail.store';
+import { UMB_MEMBER_STORE_CONTEXT_TOKEN } from '../member.detail.store';
 import { UmbMemberRepository } from '../repository/member.repository';
 import type { MemberDetails } from '@umbraco-cms/models';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
@@ -10,7 +10,7 @@ export class UmbWorkspaceMemberContext
 	extends UmbWorkspaceContext<UmbMemberRepository>
 	implements UmbWorkspaceEntityContextInterface<MemberDetails | undefined>
 {
-	#manager = new UmbEntityWorkspaceManager(this.host, 'member', UMB_MEMBER_DETAIL_STORE_CONTEXT_TOKEN);
+	#manager = new UmbEntityWorkspaceManager(this.host, 'member', UMB_MEMBER_STORE_CONTEXT_TOKEN);
 
 	public readonly data = this.#manager.state.asObservable();
 	public readonly name = this.#manager.state.getObservablePart((state) => state?.name);

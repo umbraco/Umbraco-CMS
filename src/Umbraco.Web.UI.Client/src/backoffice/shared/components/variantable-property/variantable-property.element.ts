@@ -2,11 +2,10 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { UmbVariantId } from '../../variants/variant-id.class';
+import { UMB_WORKSPACE_VARIANT_CONTEXT_TOKEN } from '../workspace/workspace-variant/workspace-variant.context';
 import type { PropertyTypeViewModelBaseModel } from '@umbraco-cms/backend-api';
 import '../workspace-property/workspace-property.element';
 import { UmbLitElement } from '@umbraco-cms/element';
-// eslint-disable-next-line import/order
-import { UmbWorkspaceVariantContext } from '../workspace/workspace-variant/workspace-variant.context';
 
 @customElement('umb-variantable-property')
 export class UmbVariantablePropertyElement extends UmbLitElement {
@@ -29,7 +28,7 @@ export class UmbVariantablePropertyElement extends UmbLitElement {
 		this._updatePropertyVariantId();
 	}
 
-	private _variantContext?: UmbWorkspaceVariantContext;
+	private _variantContext?: typeof UMB_WORKSPACE_VARIANT_CONTEXT_TOKEN.TYPE;
 
 	@state()
 	private _workspaceVariantId?: UmbVariantId;
@@ -39,7 +38,7 @@ export class UmbVariantablePropertyElement extends UmbLitElement {
 
 	constructor() {
 		super();
-		this.consumeContext('umbWorkspaceVariantContext', (workspaceContext: UmbWorkspaceVariantContext) => {
+		this.consumeContext(UMB_WORKSPACE_VARIANT_CONTEXT_TOKEN, (workspaceContext) => {
 			this._variantContext = workspaceContext;
 			this._observeVariantContext();
 		});
@@ -55,10 +54,10 @@ export class UmbVariantablePropertyElement extends UmbLitElement {
 
 	private _updatePropertyVariantId() {
 		if (this._workspaceVariantId && this.property) {
-			const newVariantId = UmbVariantId.Create(
-				this.property.variesByCulture ? this._workspaceVariantId.culture : null,
-				this.property.variesBySegment ? this._workspaceVariantId.segment : null
-			);
+			const newVariantId = UmbVariantId.Create({
+				culture: this.property.variesByCulture ? this._workspaceVariantId.culture : null,
+				segment: this.property.variesBySegment ? this._workspaceVariantId.segment : null,
+			});
 			if (!this._propertyVariantId || !newVariantId.equal(this._propertyVariantId)) {
 				this._propertyVariantId = newVariantId;
 			}
@@ -68,7 +67,7 @@ export class UmbVariantablePropertyElement extends UmbLitElement {
 	render() {
 		return html`<umb-property-type-based-property
 			.property=${this._property}
-			.variantId=${this._propertyVariantId}></umb-property-type-based-property>`;
+			.propertyVariantId=${this._propertyVariantId}></umb-property-type-based-property>`;
 	}
 }
 

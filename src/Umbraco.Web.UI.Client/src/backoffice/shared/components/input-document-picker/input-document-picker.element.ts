@@ -3,9 +3,11 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, property, state } from 'lit/decorators.js';
 import { ifDefined } from 'lit-html/directives/if-defined.js';
 import { FormControlMixin } from '@umbraco-ui/uui-base/lib/mixins';
-import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN } from '../../../../core/modal';
 import { UMB_DOCUMENT_TREE_STORE_CONTEXT_TOKEN } from '../../../documents/documents/repository/document.tree.store';
 import type { UmbDocumentTreeStore } from '../../../documents/documents/repository/document.tree.store';
+import { UMB_CONFIRM_MODAL_TOKEN } from '../../modals/confirm';
+import { UMB_DOCUMENT_PICKER_MODAL_TOKEN } from '../../../documents/documents/modals/document-picker';
+import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN } from '@umbraco-cms/modal';
 import { UmbLitElement } from '@umbraco-cms/element';
 import type { DocumentTreeItemModel, FolderTreeItemModel } from '@umbraco-cms/backend-api';
 import type { UmbObserverController } from '@umbraco-cms/observable-api';
@@ -121,29 +123,27 @@ export class UmbInputDocumentPickerElement extends FormControlMixin(UmbLitElemen
 
 	private _openPicker() {
 		// We send a shallow copy(good enough as its just an array of keys) of our this._selectedKeys, as we don't want the modal to manipulate our data:
-		const modalHandler = this._modalContext?.contentPicker({
+		const modalHandler = this._modalContext?.open(UMB_DOCUMENT_PICKER_MODAL_TOKEN, {
 			multiple: this.max === 1 ? false : true,
 			selection: [...this._selectedKeys],
 		});
-		modalHandler?.onClose().then(({ selection }: any) => {
+
+		modalHandler?.onSubmit().then(({ selection }: any) => {
 			this._setSelection(selection);
 		});
 	}
 
-	private _removeItem(item: FolderTreeItemModel) {
-		const modalHandler = this._modalContext?.confirm({
+	private async _removeItem(item: FolderTreeItemModel) {
+		const modalHandler = this._modalContext?.open(UMB_CONFIRM_MODAL_TOKEN, {
 			color: 'danger',
 			headline: `Remove ${item.name}?`,
 			content: 'Are you sure you want to remove this item',
 			confirmLabel: 'Remove',
 		});
 
-		modalHandler?.onClose().then(({ confirmed }) => {
-			if (confirmed) {
-				const newSelection = this._selectedKeys.filter((value) => value !== item.key);
-				this._setSelection(newSelection);
-			}
-		});
+		await modalHandler?.onSubmit();
+		const newSelection = this._selectedKeys.filter((value) => value !== item.key);
+		this._setSelection(newSelection);
 	}
 
 	private _setSelection(newSelection: Array<string>) {

@@ -4,7 +4,7 @@ import UmbImportDictionaryEntityAction from './import/import.action';
 import UmbExportDictionaryEntityAction from './export/export.action';
 import UmbCreateDictionaryEntityAction from './create/create.action';
 import { UmbDeleteEntityAction, UmbMoveEntityAction } from '@umbraco-cms/entity-action';
-import type { ManifestEntityAction } from '@umbraco-cms/models';
+import type { ManifestEntityAction, ManifestModal } from '@umbraco-cms/models';
 
 const entityType = 'dictionary-item';
 const repositoryAlias = DICTIONARY_REPOSITORY_ALIAS;
@@ -90,4 +90,25 @@ const entityActions: Array<ManifestEntityAction> = [
 	},
 ];
 
-export const manifests = [...entityActions];
+const modals: Array<ManifestModal> = [
+	{
+		type: 'modal',
+		alias: 'Umb.Modal.CreateDictionary',
+		name: 'Create Dictionary Modal',
+		loader: () => import('./create/create-dictionary-modal-layout.element'),
+	},
+	{
+		type: 'modal',
+		alias: 'Umb.Modal.ExportDictionary',
+		name: 'Export Dictionary Modal',
+		loader: () => import('./export/export-dictionary-modal-layout.element'),
+	},
+	{
+		type: 'modal',
+		alias: 'Umb.Modal.ImportDictionary',
+		name: 'Import Dictionary Modal',
+		loader: () => import('./import/import-dictionary-modal-layout.element'),
+	},
+];
+
+export const manifests = [...entityActions, ...modals];

@@ -48,9 +48,7 @@ export class UmbWorkspaceContentElement extends UmbLitElement {
 	render() {
 		return html`
 			<umb-workspace-layout alias=${this.alias}>
-				<div id="header" slot="header">
-					<umb-variant-selector></umb-variant-selector>
-				</div>
+				<div id="header" slot="header">TODO: MISSING INPUT COMPONENT</div>
 
 				<slot name="action-menu" slot="action-menu"></slot>
 

@@ -1,8 +1,9 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html, nothing } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
-import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN } from '../../../../../../core/modal';
 import { UmbDataTypeWorkspaceContext } from '../../data-type-workspace.context';
+import { UMB_PROPERTY_EDITOR_UI_PICKER_MODAL_TOKEN } from '../../../../../shared/property-editors/modals/property-editor-ui-picker';
+import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN } from '@umbraco-cms/modal';
 import { UmbLitElement } from '@umbraco-cms/element';
 import type { DataTypeModel } from '@umbraco-cms/backend-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-api';
@@ -100,12 +101,11 @@ export class UmbDataTypeWorkspaceViewEditElement extends UmbLitElement {
 	private _openPropertyEditorUIPicker() {
 		if (!this._dataType) return;
 
-		const modalHandler = this._modalContext?.propertyEditorUIPicker({
+		const modalHandler = this._modalContext?.open(UMB_PROPERTY_EDITOR_UI_PICKER_MODAL_TOKEN, {
 			selection: this._propertyEditorUiAlias ? [this._propertyEditorUiAlias] : [],
 		});
 
-		modalHandler?.onClose().then(({ selection } = {}) => {
-			if (!selection) return;
+		modalHandler?.onSubmit().then(({ selection }) => {
 			this._selectPropertyEditorUI(selection[0]);
 		});
 	}

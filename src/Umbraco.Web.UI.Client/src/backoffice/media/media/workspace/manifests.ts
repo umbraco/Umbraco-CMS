@@ -1,3 +1,4 @@
+import { MEDIA_REPOSITORY_ALIAS } from '../repository/manifests';
 import { UmbSaveWorkspaceAction } from '@umbraco-cms/workspace';
 import type {
 	ManifestWorkspace,
@@ -59,7 +60,7 @@ const workspaceViewCollections: Array<ManifestWorkspaceViewCollection> = [
 			pathname: 'collection',
 			icon: 'umb:grid',
 			entityType: 'media',
-			repositoryAlias: 'Umb.Repository.Media',
+			repositoryAlias: MEDIA_REPOSITORY_ALIAS,
 		},
 	},
 ];

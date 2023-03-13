@@ -4,17 +4,12 @@ import { UmbDocumentTypeRepository } from '../../document-types/repository/docum
 import { UmbWorkspaceVariableEntityContextInterface } from '../../../shared/components/workspace/workspace-context/workspace-variable-entity-context.interface';
 import { UmbVariantId } from '../../../shared/variants/variant-id.class';
 import { UmbWorkspacePropertyStructureManager } from '../../../shared/components/workspace/workspace-context/workspace-property-structure-manager.class';
+import { UmbWorkspaceSplitViewManager } from '../../../shared/components/workspace/workspace-context/workspace-split-view-manager.class';
 import type { DocumentModel } from '@umbraco-cms/backend-api';
-import { partialUpdateFrozenArray, ObjectState, ArrayState, UmbObserverController } from '@umbraco-cms/observable-api';
+import { partialUpdateFrozenArray, ObjectState, UmbObserverController } from '@umbraco-cms/observable-api';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 
 // TODO: should this context be called DocumentDraft instead of workspace? or should the draft be part of this?
-
-export type ActiveVariant = {
-	index: number;
-	culture: string | null;
-	segment: string | null;
-};
 // TODO: Should we have a DocumentStructureContext and maybe even a DocumentDraftContext?
 
 type EntityType = DocumentModel;
@@ -33,21 +28,21 @@ export class UmbDocumentWorkspaceContext
 	 * The document is the current state/draft version of the document.
 	 */
 	#draft = new ObjectState<EntityType | undefined>(undefined);
-	documentTypeKey = this.#draft.getObservablePart((data) => data?.contentTypeKey);
+	readonly unique = this.#draft.getObservablePart((data) => data?.key);
+	readonly documentTypeKey = this.#draft.getObservablePart((data) => data?.contentTypeKey);
 
-	variants = this.#draft.getObservablePart((data) => data?.variants || []);
-	urls = this.#draft.getObservablePart((data) => data?.urls || []);
-	templateKey = this.#draft.getObservablePart((data) => data?.templateKey || null);
-
-	#activeVariantsInfo = new ArrayState<ActiveVariant>([], (x) => x.index);
-	activeVariantsInfo = this.#activeVariantsInfo.asObservable();
+	readonly variants = this.#draft.getObservablePart((data) => data?.variants || []);
+	readonly urls = this.#draft.getObservablePart((data) => data?.urls || []);
+	readonly templateKey = this.#draft.getObservablePart((data) => data?.templateKey || null);
 
 	readonly structure;
+	readonly splitView;
 
 	constructor(host: UmbControllerHostInterface) {
 		super(host, new UmbDocumentRepository(host));
 
 		this.structure = new UmbWorkspacePropertyStructureManager(this.host, new UmbDocumentTypeRepository(this.host));
+		this.splitView = new UmbWorkspaceSplitViewManager(this.host);
 
 		new UmbObserverController(this.host, this.documentTypeKey, (key) => this.structure.loadType(key));
 	}
@@ -90,26 +85,8 @@ export class UmbDocumentWorkspaceContext
 		return 'document';
 	}
 
-	setActiveVariant(index: number, culture: string | null, segment: string | null) {
-		const activeVariants = [...this.#activeVariantsInfo.getValue()];
-		if (index < activeVariants.length) {
-			activeVariants[index] = { index, culture, segment };
-		} else {
-			activeVariants.push({ index, culture, segment });
-		}
-		this.#activeVariantsInfo.next(activeVariants);
-	}
-
-	openSplitView(culture: string | null, segment: string | null) {
-		this.setActiveVariant(1, culture, segment);
-	}
-
 	getVariant(variantId: UmbVariantId) {
 		return this.#draft.getValue()?.variants?.find((x) => variantId.compare(x));
-	}
-
-	activeVariantInfoByIndex(index: number) {
-		return this.#activeVariantsInfo.getObservablePart((data) => data[index] || undefined);
 	}
 
 	getName(variantId?: UmbVariantId) {

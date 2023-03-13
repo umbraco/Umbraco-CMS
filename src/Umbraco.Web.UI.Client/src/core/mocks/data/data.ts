@@ -5,4 +5,8 @@ export class UmbData<T> {
 	constructor(data: Array<T>) {
 		this.data = data;
 	}
+
+	get total() {
+		return this.data.length;
+	}
 }

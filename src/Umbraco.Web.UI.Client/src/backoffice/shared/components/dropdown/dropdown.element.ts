@@ -3,6 +3,7 @@ import { css, html, nothing } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { UmbLitElement } from '@umbraco-cms/element';
 
+// TODO: maybe move this to UI Library.
 @customElement('umb-dropdown')
 export class UmbDropdownElement extends UmbLitElement {
 	static styles = [

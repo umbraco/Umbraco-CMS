@@ -1,0 +1,145 @@
+import { Meta } from '@storybook/blocks';
+
+<Meta title="API/Modals/Intro" />
+
+# Modals
+
+A modal is a popup that darkens the background and has focus lock. There are two types of modals: "dialog" and "sidebar".
+
+**Dialog modals** appears in the middle of the screen.
+| option | values |
+|:------:|:--------------------------:|
+| No options yet | |
+
+**Sidebar modals** slides in from the right.
+| option | values |
+|:------:|:--------------------------:|
+| size | small, medium, large, full |
+
+## Basic Usage
+
+### Consume UmbModalContext from an element
+
+The UmbModal context can be used to open modals.
+
+```ts
+import { LitElement } from 'lit';
+import { UmbElementMixin } from '@umbraco-cms/element';
+import { UmbModalContext, UMB_MODAL_CONTEXT_ALIAS } from '@umbraco-cms/modal';
+
+class MyElement extends UmbElementMixin(LitElement) {
+	#modalContext?: UmbModalContext;
+
+	constructor() {
+		super();
+		this.consumeContext(UMB_MODAL_CONTEXT_ALIAS, (instance) => {
+			this.#modalContext = instance;
+			// modalContext is now ready to be used.
+		});
+	}
+}
+```
+
+### Open a modal
+
+A modal is opened by calling the open method on the UmbModalContext. The methods will accept a modal token (or extension alias), an optional dataset, and optional modal options .It returns an instance of UmbModalHandler.
+
+```ts
+import { html, LitElement } from 'lit';
+import { UmbElementMixin } from '@umbraco-cms/element';
+import { UmbModalContext, UMB_MODAL_CONTEXT_ALIAS } from '@umbraco-cms/modal';
+class MyElement extends UmbElementMixin(LitElement) {
+	#modalContext?: UmbModalContext;
+
+	constructor() {
+		super();
+		this.consumeContext(UMB_MODAL_CONTEXT_ALIAS, (instance) => {
+			this.#modalContext = instance;
+			// modalContext is now ready to be used
+		});
+	}
+
+	#onClick() {
+		const data = {'data goes here'};
+		const options {'options go here'};
+		const modalHandler = this.#modalContext?.open(SOME_MODAL_TOKEN), data, options);
+
+		modalHandler?.onSubmit().then((data) => {
+			// if modal submitted, then data is supplied here.
+		});
+	}
+
+	render() {
+		return html`<button @click=${this.#onClick}>Open modal</button>`;
+	}
+}
+```
+
+## Create a custom modal
+
+### Register in the extension registry
+
+The manifest
+
+```json
+{
+	"type": "modal",
+	"alias": "My.Modal",
+	"name": "My Modal",
+	"js": "../path/to/my-modal.element.js"
+}
+```
+
+### Create a modal token
+
+A modal token is a string that identifies a modal. It should be the modal extension alias. It is used to open a modal and is also to set default options for the modal.
+
+```ts
+interface MyModalData = {
+	headline: string;
+	content: string;
+}
+
+interface MyModalResult = {
+	myReturnData: string;
+}
+
+const MY_MODAL_TOKEN = new ModalToken<MyModalData, MyModalResult>('My.Modal', {
+	type: 'sidebar',
+	size: 'small'
+});
+```
+
+The Modal element
+
+```ts
+import { html, LitElement } from 'lit';
+import { UmbElementMixin } from '@umbraco-cms/element';
+import type { UmbModalHandler } from '@umbraco-cms/modal';
+
+class MyDialog extends UmbElementMixin(LitElement) {
+	// the modal handler will be injected into the element when the modal is opened.
+	@property({ attribute: false })
+	modalHandler?: UmbModalHandler<MyModalData, MyModalResult>;
+
+	private _handleCancel() {
+		this._modalHandler?.close();
+	}
+
+	private _handleSubmit() {
+		/* Optional data of any type can be applied to the submit method to pass it
+		   to the modal parent through the onSubmit promise. */
+		this._modalHandler?.submit({ myReturnData: 'hello world' });
+	}
+
+	render() {
+		return html`
+			<div>
+				<h1>My Modal</h1>
+				<button @click=${this._handleCancel}>Cancel</button>
+				<button @click=${this._handleSubmit}>Submit</button>
+			</div>
+		`;
+	}
+}
+```

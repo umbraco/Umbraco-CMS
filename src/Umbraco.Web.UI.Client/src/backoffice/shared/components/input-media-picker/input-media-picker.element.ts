@@ -3,8 +3,10 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, property, state } from 'lit/decorators.js';
 import { ifDefined } from 'lit-html/directives/if-defined.js';
 import { FormControlMixin } from '@umbraco-ui/uui-base/lib/mixins';
-import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN } from '../../../../core/modal';
 import { UmbMediaRepository } from '../../../media/media/repository/media.repository';
+import { UMB_CONFIRM_MODAL_TOKEN } from '../../modals/confirm';
+import { UMB_MEDIA_PICKER_MODAL_TOKEN } from '../../../media/media/modals/media-picker';
+import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN } from '@umbraco-cms/modal';
 import { UmbLitElement } from '@umbraco-cms/element';
 import type { EntityTreeItemModel, FolderTreeItemModel } from '@umbraco-cms/backend-api';
 import type { UmbObserverController } from '@umbraco-cms/observable-api';
@@ -135,28 +137,27 @@ export class UmbInputMediaPickerElement extends FormControlMixin(UmbLitElement) 
 
 	private _openPicker() {
 		// We send a shallow copy(good enough as its just an array of keys) of our this._selectedKeys, as we don't want the modal to manipulate our data:
-		const modalHandler = this._modalContext?.mediaPicker({
+		const modalHandler = this._modalContext?.open(UMB_MEDIA_PICKER_MODAL_TOKEN, {
 			multiple: this.max === 1 ? false : true,
 			selection: [...this._selectedKeys],
 		});
-		modalHandler?.onClose().then(({ selection }: any) => {
+
+		modalHandler?.onSubmit().then(({ selection }: any) => {
 			this._setSelection(selection);
 		});
 	}
 
 	private _removeItem(item: FolderTreeItemModel) {
-		const modalHandler = this._modalContext?.confirm({
+		const modalHandler = this._modalContext?.open(UMB_CONFIRM_MODAL_TOKEN, {
 			color: 'danger',
 			headline: `Remove ${item.name}?`,
 			content: 'Are you sure you want to remove this item',
 			confirmLabel: 'Remove',
 		});
 
-		modalHandler?.onClose().then(({ confirmed }) => {
-			if (confirmed) {
-				const newSelection = this._selectedKeys.filter((value) => value !== item.key);
-				this._setSelection(newSelection);
-			}
+		modalHandler?.onSubmit().then(() => {
+			const newSelection = this._selectedKeys.filter((value) => value !== item.key);
+			this._setSelection(newSelection);
 		});
 	}
 

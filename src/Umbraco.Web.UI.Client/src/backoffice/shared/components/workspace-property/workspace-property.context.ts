@@ -1,8 +1,9 @@
 import { UmbVariantId } from '../../variants/variant-id.class';
 import { UmbWorkspaceVariableEntityContextInterface } from '../workspace/workspace-context/workspace-variable-entity-context.interface';
+import { UMB_WORKSPACE_VARIANT_CONTEXT_TOKEN } from '../workspace/workspace-variant/workspace-variant.context';
 import type { DataTypeModel } from '@umbraco-cms/backend-api';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
-import { ObjectState } from '@umbraco-cms/observable-api';
+import { ObjectState, StringState, UmbObserverController } from '@umbraco-cms/observable-api';
 import { UmbContextConsumerController, UmbContextProviderController } from '@umbraco-cms/context-api';
 
 // If we get this from the server then we can consider using TypeScripts Partial<> around the model from the Management-API.
@@ -15,6 +16,8 @@ export type WorkspacePropertyData<ValueType> = {
 };
 
 export class UmbWorkspacePropertyContext<ValueType = unknown> {
+	#host: UmbControllerHostInterface;
+
 	private _providerController: UmbContextProviderController;
 
 	private _data = new ObjectState<WorkspacePropertyData<ValueType>>({});
@@ -27,9 +30,13 @@ export class UmbWorkspacePropertyContext<ValueType = unknown> {
 
 	private _variantId?: UmbVariantId;
 
+	private _variantDifference = new StringState(undefined);
+	public readonly variantDifference = this._variantDifference.asObservable();
+
 	private _workspaceContext?: UmbWorkspaceVariableEntityContextInterface;
 
 	constructor(host: UmbControllerHostInterface) {
+		this.#host = host;
 		// TODO: Figure out how to get the magic string in a better way.
 		new UmbContextConsumerController<UmbWorkspaceVariableEntityContextInterface>(
 			host,
@@ -68,6 +75,11 @@ export class UmbWorkspacePropertyContext<ValueType = unknown> {
 	}
 	public setVariantId(variantId: UmbVariantId | undefined) {
 		this._variantId = variantId;
+		new UmbContextConsumerController(this.#host, UMB_WORKSPACE_VARIANT_CONTEXT_TOKEN, (variantContext) => {
+			new UmbObserverController(this.#host, variantContext.variantId, (variantId) => {
+				this._variantDifference.next(variantId ? this._variantId?.toDifferencesString(variantId) : '');
+			});
+		});
 	}
 	public getVariantId() {
 		return this._variantId;
