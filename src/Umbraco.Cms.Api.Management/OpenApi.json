@@ -7267,7 +7267,7 @@
             "type": "string",
             "nullable": true
           },
-          "data": {
+          "values": {
             "type": "array",
             "items": {
               "oneOf": [
