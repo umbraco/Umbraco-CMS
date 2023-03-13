@@ -34,11 +34,13 @@ const workspaceActions: Array<ManifestWorkspaceAction> = [
 		alias: 'Umb.WorkspaceAction.Language.Save',
 		name: 'Save Language Workspace Action',
 		meta: {
-			workspaces: ['Umb.Workspace.Language'],
 			look: 'primary',
 			color: 'positive',
 			label: 'Save',
 			api: UmbSaveWorkspaceAction,
+		},
+		conditions: {
+			workspaces: ['Umb.Workspace.Language'],
 		},
 	},
 ];

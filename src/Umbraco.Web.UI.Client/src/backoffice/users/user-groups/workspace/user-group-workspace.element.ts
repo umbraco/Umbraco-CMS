@@ -225,11 +225,13 @@ export class UmbUserGroupWorkspaceElement extends UmbLitElement implements UmbWo
 				alias: 'Umb.WorkspaceAction.UserGroup.Save',
 				name: 'Save User Group Workspace Action',
 				meta: {
-					workspaces: ['Umb.Workspace.UserGroup'],
 					label: 'Save',
 					look: 'primary',
 					color: 'positive',
 					api: UmbSaveWorkspaceAction,
+				},
+				conditions: {
+					workspaces: ['Umb.Workspace.UserGroup'],
 				},
 			},
 		];

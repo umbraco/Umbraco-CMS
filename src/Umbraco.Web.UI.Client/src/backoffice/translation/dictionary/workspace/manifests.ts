@@ -37,11 +37,13 @@ const workspaceActions: Array<ManifestWorkspaceAction> = [
 		name: 'Save Dictionary Workspace Action',
 		weight: 90,
 		meta: {
-			workspaces: ['Umb.Workspace.Dictionary'],
 			label: 'Save',
 			look: 'primary',
 			color: 'positive',
 			api: UmbSaveWorkspaceAction,
+		},
+		conditions: {
+			workspaces: ['Umb.Workspace.Dictionary'],
 		},
 	},
 ];

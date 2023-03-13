@@ -46,11 +46,13 @@ const workspaceActions: Array<ManifestWorkspaceAction> = [
 		alias: 'Umb.WorkspaceAction.DataType.Save',
 		name: 'Save Data Type Workspace Action',
 		meta: {
-			workspaces: ['Umb.Workspace.DataType'],
 			label: 'Save',
 			look: 'primary',
 			color: 'positive',
 			api: UmbSaveWorkspaceAction,
+		},
+		conditions: {
+			workspaces: ['Umb.Workspace.MemberGroup'],
 		},
 	},
 ];

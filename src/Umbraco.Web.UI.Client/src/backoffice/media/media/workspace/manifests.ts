@@ -71,11 +71,13 @@ const workspaceActions: Array<ManifestWorkspaceAction> = [
 		alias: 'Umb.WorkspaceAction.Media.Save',
 		name: 'Save Media Workspace Action',
 		meta: {
-			workspaces: ['Umb.Workspace.Media'],
 			label: 'Save',
 			look: 'primary',
 			color: 'positive',
 			api: UmbSaveWorkspaceAction,
+		},
+		conditions: {
+			workspaces: ['Umb.Workspace.Media'],
 		},
 	},
 ];
