@@ -3,9 +3,9 @@ import { css, html, nothing } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { map } from 'rxjs';
 import { IRoutingInfo } from 'router-slot';
-import type { UmbWorkspaceEntityElement } from '../workspace/workspace-entity-element.interface';
+import UmbWorkspaceElement from '../workspace/workspace.element';
 import { UmbSectionContext, UMB_SECTION_CONTEXT_TOKEN } from './section.context';
-import type { ManifestSectionView, ManifestWorkspace, ManifestMenuSectionSidebarApp } from '@umbraco-cms/models';
+import type { ManifestSectionView, ManifestMenuSectionSidebarApp } from '@umbraco-cms/models';
 import { umbExtensionsRegistry, createExtensionElement } from '@umbraco-cms/extensions-api';
 import { UmbLitElement } from '@umbraco-cms/element';
 
@@ -13,6 +13,7 @@ import './section-sidebar-menu/section-sidebar-menu.element.ts';
 import './section-views/section-views.element.ts';
 import '../../../settings/languages/app-language-select/app-language-select.element.ts';
 import { UmbRouterSlotChangeEvent } from '@umbraco-cms/router';
+import UmbSectionViewElement from './section-views/section-view.element';
 
 @customElement('umb-section')
 export class UmbSectionElement extends UmbLitElement {
@@ -45,7 +46,6 @@ export class UmbSectionElement extends UmbLitElement {
 	@state()
 	private _views?: Array<ManifestSectionView>;
 
-	private _workspaces?: Array<ManifestWorkspace>;
 	private _sectionContext?: UmbSectionContext;
 	private _sectionAlias?: string;
 
@@ -56,25 +56,47 @@ export class UmbSectionElement extends UmbLitElement {
 			this._sectionContext = instance;
 
 			// TODO: currently they don't corporate, as they overwrite each other...
-			this._observeMenuItems();
-			this._observeSection();
+			this.#observeSectionAlias();
+			this.#createRoutes();
 		});
 	}
 
-	private _observeMenuItems() {
+	#createRoutes() {
+		this._routes = [];
+
+		this._routes = [
+			{
+				path: 'dashboard',
+				component: () => import('./section-dashboards/section-dashboards.element'),
+			},
+			{
+				path: 'view',
+				component: () => import('../section/section-views/section-view.element'),
+			},
+			{
+				path: 'workspace/:entityType',
+				component: () => import('../workspace/workspace.element'),
+				setup: (element: UmbWorkspaceElement, info: IRoutingInfo) => {
+					element.entityType = info.match.params.entityType;
+				},
+			},
+			{
+				path: '**',
+				redirectTo: 'view',
+			},
+		];
+	}
+
+	#observeSectionAlias() {
 		if (!this._sectionContext) return;
 
-		this.observe(this._sectionContext?.alias, (alias) => {
-			this._observeSidebarMenus(alias);
-		});
-
-		this.observe(umbExtensionsRegistry.extensionsOfType('workspace'), (workspaceExtensions) => {
-			this._workspaces = workspaceExtensions;
-			this._createWorkspaceRoutes();
+		this.observe(this._sectionContext.alias, (alias) => {
+			this._sectionAlias = alias;
+			this.#observeSectionSidebarApps(alias);
 		});
 	}
 
-	private _observeSidebarMenus(sectionAlias?: string) {
+	#observeSectionSidebarApps(sectionAlias?: string) {
 		if (sectionAlias) {
 			this.observe(
 				umbExtensionsRegistry
@@ -89,106 +111,14 @@ export class UmbSectionElement extends UmbLitElement {
 		}
 	}
 
-	private _createWorkspaceRoutes() {
-		if (!this._workspaces) return;
-		// TODO: find a way to make this reuseable across:
-		// TODO: Move workspace 'handlers/routes' to the workspace-element. So it becomes local.
-		const workspaceRoutes = this._workspaces?.map((workspace: ManifestWorkspace) => {
-			return [
-				{
-					path: `${workspace.meta.entityType}/edit/:key`,
-					component: () => createExtensionElement(workspace),
-					setup: (component: Promise<UmbWorkspaceEntityElement>, info: IRoutingInfo) => {
-						component.then((el) => {
-							el.load(info.match.params.key);
-						});
-					},
-				},
-				{
-					path: `${workspace.meta.entityType}/create/root`,
-					component: () => createExtensionElement(workspace),
-					setup: (component: Promise<UmbWorkspaceEntityElement>) => {
-						component.then((el) => {
-							el.create(null);
-						});
-					},
-				},
-				{
-					path: `${workspace.meta.entityType}/create/:parentKey`,
-					component: () => createExtensionElement(workspace),
-					setup: (component: Promise<UmbWorkspaceEntityElement>, info: IRoutingInfo) => {
-						component.then((el) => {
-							el.create(info.match.params.parentKey);
-						});
-					},
-				},
-				{
-					path: workspace.meta.entityType,
-					component: () => createExtensionElement(workspace),
-				},
-			];
-		});
-
-		this._routes = [
-			{
-				path: 'dashboard',
-				component: () => import('./section-dashboards/section-dashboards.element'),
-			},
-			...(workspaceRoutes?.flat() || []),
-			{
-				path: '**',
-				redirectTo: 'dashboard',
-			},
-		];
-	}
-
-	private _observeSection() {
-		if (!this._sectionContext) return;
-
-		this.observe(this._sectionContext.alias, (alias) => {
-			this._sectionAlias = alias;
-			this._observeViews();
-		});
-	}
-
-	private _observeViews() {
-		this.observe(umbExtensionsRegistry?.extensionsOfType('sectionView'), (views) => {
-			const sectionViews = views
-				.filter((view) => {
-					return this._sectionAlias ? view.meta.sections.includes(this._sectionAlias) : false;
-				})
-				.sort((a, b) => b.meta.weight - a.meta.weight);
-			if (sectionViews.length > 0) {
-				this._views = sectionViews;
-				this._createViewRoutes();
-			}
-		});
-	}
-
-	private _createViewRoutes() {
-		this._routes = [];
-		this._routes =
-			this._views?.map((view) => {
-				return {
-					path: 'view/' + view.meta.pathname,
-					component: () => createExtensionElement(view),
-				};
-			}) ?? [];
-
-		if (this._views && this._views.length > 0) {
-			this._routes.push({
-				path: '**',
-				redirectTo: 'view/' + this._views?.[0]?.meta.pathname,
-			});
-		}
-	}
-
+	/*
 	private _onRouteChange = (event: UmbRouterSlotChangeEvent) => {
 		const currentPath = event.target.localActiveViewPath;
 		const view = this._views?.find((view) => 'view/' + view.meta.pathname === currentPath);
 		if (!view) return;
 		this._sectionContext?.setActiveView(view);
 	};
+	*/
 
 	render() {
 		return html`
@@ -212,10 +142,7 @@ export class UmbSectionElement extends UmbLitElement {
 			<umb-section-main>
 				${this._views && this._views.length > 0 ? html`<umb-section-views></umb-section-views>` : nothing}
 				${this._routes && this._routes.length > 0
-					? html`<umb-router-slot
-							id="router-slot"
-							.routes="${this._routes}"
-							@change=${this._onRouteChange}></umb-router-slot>`
+					? html`<umb-router-slot id="router-slot" .routes="${this._routes}"></umb-router-slot>`
 					: nothing}
 				<slot></slot>
 			</umb-section-main>
