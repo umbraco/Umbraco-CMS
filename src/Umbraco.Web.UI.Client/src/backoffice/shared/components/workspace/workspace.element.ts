@@ -4,15 +4,9 @@ import { customElement, property, state } from 'lit/decorators.js';
 import { map } from 'rxjs';
 import { IRoute, IRoutingInfo } from 'router-slot';
 import { UmbLitElement } from '@umbraco-cms/element';
+import { UmbRouteLocation } from '@umbraco-cms/router';
 import { createExtensionElement, umbExtensionsRegistry } from '@umbraco-cms/extensions-api';
 import { ManifestWorkspace } from '@umbraco-cms/extensions-registry';
-
-export interface UmbRouteLocation {
-	name?: string;
-	params: {
-		[key: string]: string;
-	};
-}
 
 export interface UmbWorkspaceEntityElement extends HTMLElement {
 	manifest: ManifestWorkspace;
