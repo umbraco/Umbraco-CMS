@@ -17,7 +17,7 @@ namespace Umbraco.Cms.Api.Management.Controllers.Document.RecycleBin;
 [RequireDocumentTreeRootAccess]
 [ProducesResponseType(StatusCodes.Status401Unauthorized)]
 [ApiExplorerSettings(GroupName = nameof(Constants.UdiEntityType.Document))]
-public class DocumentRecycleBinControllerBase : RecycleBinControllerBase<RecycleBinItemViewModel>
+public class DocumentRecycleBinControllerBase : RecycleBinControllerBase<RecycleBinItemResponseModel>
 {
     public DocumentRecycleBinControllerBase(IEntityService entityService)
         : base(entityService)
@@ -28,15 +28,15 @@ public class DocumentRecycleBinControllerBase : RecycleBinControllerBase<Recycle
 
     protected override int RecycleBinRootId => Constants.System.RecycleBinContent;
 
-    protected override RecycleBinItemViewModel MapRecycleBinViewModel(Guid? parentKey, IEntitySlim entity)
+    protected override RecycleBinItemResponseModel MapRecycleBinViewModel(Guid? parentKey, IEntitySlim entity)
     {
-        RecycleBinItemViewModel viewModel = base.MapRecycleBinViewModel(parentKey, entity);
+        RecycleBinItemResponseModel responseModel = base.MapRecycleBinViewModel(parentKey, entity);
 
         if (entity is IDocumentEntitySlim documentEntitySlim)
         {
-            viewModel.Icon = documentEntitySlim.ContentTypeIcon ?? viewModel.Icon;
+            responseModel.Icon = documentEntitySlim.ContentTypeIcon ?? responseModel.Icon;
         }
 
-        return viewModel;
+        return responseModel;
     }
 }

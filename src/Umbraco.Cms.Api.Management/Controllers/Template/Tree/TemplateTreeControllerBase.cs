@@ -13,7 +13,7 @@ namespace Umbraco.Cms.Api.Management.Controllers.Template.Tree;
 [ApiController]
 [VersionedApiBackOfficeRoute($"{Constants.Web.RoutePath.Tree}/{Constants.UdiEntityType.Template}")]
 [ApiExplorerSettings(GroupName = nameof(Constants.UdiEntityType.Template))]
-public class TemplateTreeControllerBase : EntityTreeControllerBase<EntityTreeItemViewModel>
+public class TemplateTreeControllerBase : EntityTreeControllerBase<EntityTreeItemResponseModel>
 {
     public TemplateTreeControllerBase(IEntityService entityService)
         : base(entityService)
@@ -22,10 +22,10 @@ public class TemplateTreeControllerBase : EntityTreeControllerBase<EntityTreeIte
 
     protected override UmbracoObjectTypes ItemObjectType => UmbracoObjectTypes.Template;
 
-    protected override EntityTreeItemViewModel MapTreeItemViewModel(Guid? parentKey, IEntitySlim entity)
+    protected override EntityTreeItemResponseModel MapTreeItemViewModel(Guid? parentKey, IEntitySlim entity)
     {
-        EntityTreeItemViewModel viewModel = base.MapTreeItemViewModel(parentKey, entity);
-        viewModel.Icon = Constants.Icons.Template;
-        return viewModel;
+        EntityTreeItemResponseModel responseModel = base.MapTreeItemViewModel(parentKey, entity);
+        responseModel.Icon = Constants.Icons.Template;
+        return responseModel;
     }
 }

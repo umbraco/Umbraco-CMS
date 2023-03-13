@@ -12,7 +12,7 @@ internal static class DictionaryBuilderExtensions
     internal static IUmbracoBuilder AddDictionary(this IUmbracoBuilder builder)
     {
         builder.Services
-            .AddTransient<IDictionaryFactory, DictionaryFactory>()
+            .AddTransient<IDictionaryPresentationFactory, DictionaryPresentationFactory>()
             .AddTransient<IDictionaryItemImportService, DictionaryItemImportService>();
 
         builder.WithCollectionBuilder<MapDefinitionCollectionBuilder>().Add<DictionaryMapDefinition>();

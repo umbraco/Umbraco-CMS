@@ -17,19 +17,19 @@ public class RelationPresentationFactory : IRelationPresentationFactory
         _umbracoMapper = umbracoMapper;
     }
 
-    public RelationViewModel Create(IRelation relation)
+    public RelationResponseModel Create(IRelation relation)
     {
-        RelationViewModel relationViewModel = _umbracoMapper.Map<RelationViewModel>(relation)!;
+        RelationResponseModel relationResponseModel = _umbracoMapper.Map<RelationResponseModel>(relation)!;
         Tuple<IUmbracoEntity, IUmbracoEntity>? entities = _relationService.GetEntitiesFromRelation(relation);
 
         if (entities is not null)
         {
-            relationViewModel.ParentName = entities.Item1.Name;
-            relationViewModel.ChildName = entities.Item2.Name;
+            relationResponseModel.ParentName = entities.Item1.Name;
+            relationResponseModel.ChildName = entities.Item2.Name;
         }
 
-        return relationViewModel;
+        return relationResponseModel;
     }
 
-    public IEnumerable<RelationViewModel> CreateMultiple(IEnumerable<IRelation> relations) => relations.Select(Create);
+    public IEnumerable<RelationResponseModel> CreateMultiple(IEnumerable<IRelation> relations) => relations.Select(Create);
 }

@@ -8,10 +8,10 @@ namespace Umbraco.Cms.Api.Management.Controllers.HealthCheck.Group;
 
 public class CheckHealthCheckGroupController : HealthCheckGroupControllerBase
 {
-    private readonly IHealthCheckGroupViewModelFactory _healthCheckGroupViewModelFactory;
+    private readonly IHealthCheckGroupPresentationFactory _healthCheckGroupPresentationFactory;
 
-    public CheckHealthCheckGroupController(IHealthCheckGroupViewModelFactory healthCheckGroupViewModelFactory)
-        => _healthCheckGroupViewModelFactory = healthCheckGroupViewModelFactory;
+    public CheckHealthCheckGroupController(IHealthCheckGroupPresentationFactory healthCheckGroupPresentationFactory)
+        => _healthCheckGroupPresentationFactory = healthCheckGroupPresentationFactory;
 
     /// <summary>
     ///     Check all health checks in the group with a given group name.
@@ -22,10 +22,10 @@ public class CheckHealthCheckGroupController : HealthCheckGroupControllerBase
     [HttpPost("{name}/check")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    [ProducesResponseType(typeof(HealthCheckGroupWithResultViewModel), StatusCodes.Status200OK)]
-    public async Task<ActionResult<HealthCheckGroupWithResultViewModel>> ByNameWithResult(string name)
+    [ProducesResponseType(typeof(HealthCheckGroupWithResultResponseModel), StatusCodes.Status200OK)]
+    public async Task<ActionResult<HealthCheckGroupWithResultResponseModel>> ByNameWithResult(string name)
     {
-        IEnumerable<IGrouping<string?, Core.HealthChecks.HealthCheck>> groups = _healthCheckGroupViewModelFactory
+        IEnumerable<IGrouping<string?, Core.HealthChecks.HealthCheck>> groups = _healthCheckGroupPresentationFactory
             .CreateGroupingFromHealthCheckCollection();
 
         IGrouping<string?, Core.HealthChecks.HealthCheck>? group = groups.FirstOrDefault(x => x.Key.InvariantEquals(name.Trim()));
@@ -35,6 +35,6 @@ public class CheckHealthCheckGroupController : HealthCheckGroupControllerBase
             return NotFound();
         }
 
-        return await Task.FromResult(Ok(_healthCheckGroupViewModelFactory.CreateHealthCheckGroupWithResultViewModel(group)));
+        return await Task.FromResult(Ok(_healthCheckGroupPresentationFactory.CreateHealthCheckGroupWithResultViewModel(group)));
     }
 }

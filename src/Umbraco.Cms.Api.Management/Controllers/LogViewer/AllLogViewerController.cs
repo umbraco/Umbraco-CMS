@@ -38,7 +38,7 @@ public class AllLogViewerController : LogViewerControllerBase
     /// <returns>The paged result of the logs from the given time period.</returns>
     [HttpGet("log")]
     [MapToApiVersion("1.0")]
-    [ProducesResponseType(typeof(PagedViewModel<LogMessageViewModel>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(PagedViewModel<LogMessageResponseModel>), StatusCodes.Status200OK)]
     public async Task<IActionResult> AllLogs(
         int skip = 0,
         int take = 100,
@@ -55,7 +55,7 @@ public class AllLogViewerController : LogViewerControllerBase
 
         if (logsAttempt.Success)
         {
-            return Ok(_umbracoMapper.Map<PagedViewModel<LogMessageViewModel>>(logsAttempt.Result));
+            return Ok(_umbracoMapper.Map<PagedViewModel<LogMessageResponseModel>>(logsAttempt.Result));
         }
 
         return LogViewerOperationStatusResult(logsAttempt.Status);

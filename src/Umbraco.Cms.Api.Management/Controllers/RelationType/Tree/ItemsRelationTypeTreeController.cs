@@ -16,8 +16,8 @@ public class ItemsRelationTypeTreeController : RelationTypeTreeControllerBase
 
     [HttpGet("item")]
     [MapToApiVersion("1.0")]
-    [ProducesResponseType(typeof(IEnumerable<FolderTreeItemViewModel>), StatusCodes.Status200OK)]
-    public async Task<ActionResult<IEnumerable<FolderTreeItemViewModel>>> Items([FromQuery(Name = "key")] Guid[] keys)
+    [ProducesResponseType(typeof(IEnumerable<FolderTreeItemResponseModel>), StatusCodes.Status200OK)]
+    public async Task<ActionResult<IEnumerable<FolderTreeItemResponseModel>>> Items([FromQuery(Name = "key")] Guid[] keys)
     {
         // relation service does not allow fetching a collection of relation types by their ids; instead it relies
         // heavily on caching, which means this is as fast as it gets - even if it looks less than performant
@@ -25,7 +25,7 @@ public class ItemsRelationTypeTreeController : RelationTypeTreeControllerBase
             .GetAllRelationTypes()
             .Where(relationType => keys.Contains(relationType.Key)).ToArray();
 
-        EntityTreeItemViewModel[] viewModels = MapTreeItemViewModels(null, relationTypes);
+        EntityTreeItemResponseModel[] viewModels = MapTreeItemViewModels(null, relationTypes);
 
         return await Task.FromResult(Ok(viewModels));
     }

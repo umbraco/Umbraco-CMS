@@ -10,21 +10,21 @@ public class InstallerViewModelsMapDefinition : IMapDefinition
 {
     public void DefineMaps(IUmbracoMapper mapper)
     {
-        mapper.Define<InstallViewModel, InstallData>((source, context) => new InstallData(), Map);
-        mapper.Define<UserInstallViewModel, UserInstallData>((source, context) => new UserInstallData(), Map);
-        mapper.Define<DatabaseInstallViewModel, DatabaseInstallData>((source, context) => new DatabaseInstallData(), Map);
-        mapper.Define<DatabaseInstallViewModel, DatabaseModel>((source, context) => new DatabaseModel(), Map);
+        mapper.Define<InstallVResponseModel, InstallData>((source, context) => new InstallData(), Map);
+        mapper.Define<UserInstallResponseModel, UserInstallData>((source, context) => new UserInstallData(), Map);
+        mapper.Define<DatabaseInstallResponseModel, DatabaseInstallData>((source, context) => new DatabaseInstallData(), Map);
+        mapper.Define<DatabaseInstallResponseModel, DatabaseModel>((source, context) => new DatabaseModel(), Map);
         mapper.Define<DatabaseInstallData, DatabaseModel>((source, context) => new DatabaseModel(), Map);
-        mapper.Define<InstallSettingsModel, InstallSettingsViewModel>((source, context) => new InstallSettingsViewModel(), Map);
+        mapper.Define<InstallSettingsModel, InstallSettingsResponseModel>((source, context) => new InstallSettingsResponseModel(), Map);
         mapper.Define<UserSettingsModel, UserSettingsViewModel>((source, context) => new UserSettingsViewModel(), Map);
         mapper.Define<IDatabaseProviderMetadata, DatabaseSettingsModel>((source, context) => new DatabaseSettingsModel(), Map);
-        mapper.Define<DatabaseSettingsModel, DatabaseSettingsViewModel>((source, context) => new DatabaseSettingsViewModel(), Map);
-        mapper.Define<ConsentLevelModel, ConsentLevelViewModel>((source, context) => new ConsentLevelViewModel(), Map);
-        mapper.Define<UpgradeSettingsModel, UpgradeSettingsViewModel>((source, context) => new UpgradeSettingsViewModel(), Map);
+        mapper.Define<DatabaseSettingsModel, DatabaseSettingsPresentationModel>((source, context) => new DatabaseSettingsPresentationModel(), Map);
+        mapper.Define<ConsentLevelModel, ConsentLevelPresentationModel>((source, context) => new ConsentLevelPresentationModel(), Map);
+        mapper.Define<UpgradeSettingsModel, UpgradeSettingsResponseModel>((source, context) => new UpgradeSettingsResponseModel(), Map);
     }
 
     // Umbraco.Code.MapAll
-    private void Map(UpgradeSettingsModel source, UpgradeSettingsViewModel target, MapperContext context)
+    private void Map(UpgradeSettingsModel source, UpgradeSettingsResponseModel target, MapperContext context)
     {
         target.CurrentState = source.CurrentState;
         target.NewState = source.NewState;
@@ -33,7 +33,7 @@ public class InstallerViewModelsMapDefinition : IMapDefinition
     }
 
     // Umbraco.Code.MapAll
-    private void Map(DatabaseInstallViewModel source, DatabaseModel target, MapperContext context)
+    private void Map(DatabaseInstallResponseModel source, DatabaseModel target, MapperContext context)
     {
         target.ConnectionString = source.ConnectionString;
         target.DatabaseName = source.Name ?? string.Empty;
@@ -46,7 +46,7 @@ public class InstallerViewModelsMapDefinition : IMapDefinition
     }
 
     // Umbraco.Code.MapAll
-    private static void Map(InstallViewModel source, InstallData target, MapperContext context)
+    private static void Map(InstallVResponseModel source, InstallData target, MapperContext context)
     {
         target.TelemetryLevel = source.TelemetryLevel;
         target.User = context.Map<UserInstallData>(source.User)!;
@@ -54,7 +54,7 @@ public class InstallerViewModelsMapDefinition : IMapDefinition
     }
 
     // Umbraco.Code.MapAll
-    private static void Map(UserInstallViewModel source, UserInstallData target, MapperContext context)
+    private static void Map(UserInstallResponseModel source, UserInstallData target, MapperContext context)
     {
         target.Email = source.Email;
         target.Name = source.Name;
@@ -63,7 +63,7 @@ public class InstallerViewModelsMapDefinition : IMapDefinition
     }
 
     // Umbraco.Code.MapAll
-    private static void Map(DatabaseInstallViewModel source, DatabaseInstallData target, MapperContext context)
+    private static void Map(DatabaseInstallResponseModel source, DatabaseInstallData target, MapperContext context)
     {
         target.Id = source.Id;
         target.ProviderName = source.ProviderName;
@@ -89,10 +89,10 @@ public class InstallerViewModelsMapDefinition : IMapDefinition
     }
 
     // Umbraco.Code.MapAll
-    private static void Map(InstallSettingsModel source, InstallSettingsViewModel target, MapperContext context)
+    private static void Map(InstallSettingsModel source, InstallSettingsResponseModel target, MapperContext context)
     {
         target.User = context.Map<UserSettingsViewModel>(source.UserSettings)!;
-        target.Databases = context.MapEnumerable<DatabaseSettingsModel, DatabaseSettingsViewModel>(source.DatabaseSettings);
+        target.Databases = context.MapEnumerable<DatabaseSettingsModel, DatabaseSettingsPresentationModel>(source.DatabaseSettings);
     }
 
     // Umbraco.Code.MapAll
@@ -100,7 +100,7 @@ public class InstallerViewModelsMapDefinition : IMapDefinition
     {
         target.MinCharLength = source.PasswordSettings.MinCharLength;
         target.MinNonAlphaNumericLength = source.PasswordSettings.MinNonAlphaNumericLength;
-        target.ConsentLevels = context.MapEnumerable<ConsentLevelModel, ConsentLevelViewModel>(source.ConsentLevels);
+        target.ConsentLevels = context.MapEnumerable<ConsentLevelModel, ConsentLevelPresentationModel>(source.ConsentLevels);
     }
 
     // Umbraco.Code.MapAll
@@ -120,7 +120,7 @@ public class InstallerViewModelsMapDefinition : IMapDefinition
     }
 
     // Umbraco.Code.MapAll
-    private static void Map(DatabaseSettingsModel source, DatabaseSettingsViewModel target, MapperContext context)
+    private static void Map(DatabaseSettingsModel source, DatabaseSettingsPresentationModel target, MapperContext context)
     {
         target.DefaultDatabaseName = source.DefaultDatabaseName;
         target.DisplayName = source.DisplayName;
@@ -136,7 +136,7 @@ public class InstallerViewModelsMapDefinition : IMapDefinition
     }
 
     // Umbraco.Code.MapAll
-    private static void Map(ConsentLevelModel source, ConsentLevelViewModel target, MapperContext context)
+    private static void Map(ConsentLevelModel source, ConsentLevelPresentationModel target, MapperContext context)
     {
         target.Description = source.Description;
         target.Level = source.Level;

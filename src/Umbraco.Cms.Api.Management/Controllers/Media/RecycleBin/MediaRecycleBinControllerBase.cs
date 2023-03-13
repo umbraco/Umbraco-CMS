@@ -17,7 +17,7 @@ namespace Umbraco.Cms.Api.Management.Controllers.Media.RecycleBin;
 [RequireMediaTreeRootAccess]
 [ProducesResponseType(StatusCodes.Status401Unauthorized)]
 [ApiExplorerSettings(GroupName = nameof(Constants.UdiEntityType.Media))]
-public class MediaRecycleBinControllerBase : RecycleBinControllerBase<RecycleBinItemViewModel>
+public class MediaRecycleBinControllerBase : RecycleBinControllerBase<RecycleBinItemResponseModel>
 {
     public MediaRecycleBinControllerBase(IEntityService entityService)
         : base(entityService)
@@ -28,15 +28,15 @@ public class MediaRecycleBinControllerBase : RecycleBinControllerBase<RecycleBin
 
     protected override int RecycleBinRootId => Constants.System.RecycleBinMedia;
 
-    protected override RecycleBinItemViewModel MapRecycleBinViewModel(Guid? parentKey, IEntitySlim entity)
+    protected override RecycleBinItemResponseModel MapRecycleBinViewModel(Guid? parentKey, IEntitySlim entity)
     {
-        RecycleBinItemViewModel viewModel = base.MapRecycleBinViewModel(parentKey, entity);
+        RecycleBinItemResponseModel responseModel = base.MapRecycleBinViewModel(parentKey, entity);
 
         if (entity is IMediaEntitySlim mediaEntitySlim)
         {
-            viewModel.Icon = mediaEntitySlim.ContentTypeIcon ?? viewModel.Icon;
+            responseModel.Icon = mediaEntitySlim.ContentTypeIcon ?? responseModel.Icon;
         }
 
-        return viewModel;
+        return responseModel;
     }
 }

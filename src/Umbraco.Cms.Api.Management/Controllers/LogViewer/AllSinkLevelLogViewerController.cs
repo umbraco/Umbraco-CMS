@@ -27,14 +27,14 @@ public class AllSinkLevelLogViewerController : LogViewerControllerBase
     /// <returns>The paged result of the configured loggers and their level.</returns>
     [HttpGet("level")]
     [MapToApiVersion("1.0")]
-    [ProducesResponseType(typeof(PagedViewModel<LoggerViewModel>), StatusCodes.Status200OK)]
-    public async Task<ActionResult<PagedViewModel<LoggerViewModel>>> AllLogLevels(int skip = 0, int take = 100)
+    [ProducesResponseType(typeof(PagedViewModel<LoggerResponseModel>), StatusCodes.Status200OK)]
+    public async Task<ActionResult<PagedViewModel<LoggerResponseModel>>> AllLogLevels(int skip = 0, int take = 100)
     {
         IEnumerable<KeyValuePair<string, LogLevel>> logLevels = _logViewerService
             .GetLogLevelsFromSinks()
             .Skip(skip)
             .Take(take);
 
-        return await Task.FromResult(Ok(_umbracoMapper.Map<PagedViewModel<LoggerViewModel>>(logLevels)));
+        return await Task.FromResult(Ok(_umbracoMapper.Map<PagedViewModel<LoggerResponseModel>>(logLevels)));
     }
 }

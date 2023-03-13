@@ -12,20 +12,20 @@ namespace Umbraco.Cms.Api.Management.Controllers.RedirectUrlManagement;
 public class GetAllRedirectUrlManagementController : RedirectUrlManagementBaseController
 {
     private readonly IRedirectUrlService _redirectUrlService;
-    private readonly IRedirectUrlViewModelFactory _redirectUrlViewModelFactory;
+    private readonly IRedirectUrlPresentationFactory _redirectUrlPresentationFactory;
 
     public GetAllRedirectUrlManagementController(
         IRedirectUrlService redirectUrlService,
-        IRedirectUrlViewModelFactory redirectUrlViewModelFactory)
+        IRedirectUrlPresentationFactory redirectUrlPresentationFactory)
     {
         _redirectUrlService = redirectUrlService;
-        _redirectUrlViewModelFactory = redirectUrlViewModelFactory;
+        _redirectUrlPresentationFactory = redirectUrlPresentationFactory;
     }
 
     [HttpGet]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(typeof(PagedViewModel<RedirectUrlViewModel>), StatusCodes.Status200OK)]
-    public async Task<ActionResult<PagedViewModel<RedirectUrlViewModel>>> GetAll(string? filter, int skip, int take)
+    [ProducesResponseType(typeof(PagedViewModel<RedirectUrlResponseModel>), StatusCodes.Status200OK)]
+    public async Task<ActionResult<PagedViewModel<RedirectUrlResponseModel>>> GetAll(string? filter, int skip, int take)
     {
         if (PaginationService.ConvertSkipTakeToPaging(skip, take, out long pageNumber, out int pageSize, out ProblemDetails? error) is false)
         {
@@ -37,7 +37,7 @@ public class GetAllRedirectUrlManagementController : RedirectUrlManagementBaseCo
             ? _redirectUrlService.GetAllRedirectUrls(pageNumber, pageSize, out total)
             : _redirectUrlService.SearchRedirectUrls(filter, pageNumber, pageSize, out total);
 
-        IEnumerable<RedirectUrlViewModel> redirectViewModels = _redirectUrlViewModelFactory.CreateMany(redirects);
-        return new PagedViewModel<RedirectUrlViewModel> { Items = redirectViewModels, Total = total };
+        IEnumerable<RedirectUrlResponseModel> redirectViewModels = _redirectUrlPresentationFactory.CreateMany(redirects);
+        return new PagedViewModel<RedirectUrlResponseModel> { Items = redirectViewModels, Total = total };
     }
 }

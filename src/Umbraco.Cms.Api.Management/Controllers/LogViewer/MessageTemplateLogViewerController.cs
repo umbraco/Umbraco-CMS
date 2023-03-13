@@ -32,7 +32,7 @@ public class MessageTemplateLogViewerController : LogViewerControllerBase
     [HttpGet("message-template")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(typeof(PagedViewModel<LogTemplateViewModel>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(PagedViewModel<LogTemplateResponseModel>), StatusCodes.Status200OK)]
     public async Task<IActionResult> AllMessageTemplates(
         int skip = 0,
         int take = 100,
@@ -48,7 +48,7 @@ public class MessageTemplateLogViewerController : LogViewerControllerBase
                 .Skip(skip)
                 .Take(take);
 
-            return Ok(_umbracoMapper.Map<PagedViewModel<LogTemplateViewModel>>(messageTemplates));
+            return Ok(_umbracoMapper.Map<PagedViewModel<LogTemplateResponseModel>>(messageTemplates));
         }
 
         return LogViewerOperationStatusResult(messageTemplatesAttempt.Status);

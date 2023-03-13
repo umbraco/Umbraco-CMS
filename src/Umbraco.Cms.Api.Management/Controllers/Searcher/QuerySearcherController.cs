@@ -19,15 +19,15 @@ public class QuerySearcherController : SearcherControllerBase
 
     [HttpGet("{searcherName}/query")]
     [MapToApiVersion("1.0")]
-    [ProducesResponseType(typeof(PagedViewModel<SearchResultViewModel>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(PagedViewModel<SearchResultResponseModel>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-    public async Task<ActionResult<PagedViewModel<SearchResultViewModel>>> Query(string searcherName, string? term, int skip, int take)
+    public async Task<ActionResult<PagedViewModel<SearchResultResponseModel>>> Query(string searcherName, string? term, int skip, int take)
     {
         term = term?.Trim();
 
         if (term.IsNullOrWhiteSpace())
         {
-            return new PagedViewModel<SearchResultViewModel>();
+            return new PagedViewModel<SearchResultResponseModel>();
         }
 
         if (!_examineManagerService.TryFindSearcher(searcherName, out ISearcher searcher))
@@ -66,14 +66,14 @@ public class QuerySearcherController : SearcherControllerBase
             return BadRequest(invalidModelProblem);
         }
 
-        return await Task.FromResult(new PagedViewModel<SearchResultViewModel>
+        return await Task.FromResult(new PagedViewModel<SearchResultResponseModel>
         {
             Total = results.TotalItemCount,
-            Items = results.Select(x => new SearchResultViewModel
+            Items = results.Select(x => new SearchResultResponseModel
             {
                 Id = x.Id,
                 Score = x.Score,
-                Fields = x.AllValues.OrderBy(y => y.Key).Select(y => new FieldViewModel { Name = y.Key, Values = y.Value }),
+                Fields = x.AllValues.OrderBy(y => y.Key).Select(y => new FieldPresentationModel { Name = y.Key, Values = y.Value }),
             }),
         });
     }

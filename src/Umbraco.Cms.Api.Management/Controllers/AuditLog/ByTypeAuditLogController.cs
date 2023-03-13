@@ -11,12 +11,12 @@ namespace Umbraco.Cms.Api.Management.Controllers.AuditLog;
 public class ByTypeAuditLogController : AuditLogControllerBase
 {
     private readonly IAuditService _auditService;
-    private readonly IAuditLogViewModelFactory _auditLogViewModelFactory;
+    private readonly IAuditLogPresentationFactory _auditLogPresentationFactory;
 
-    public ByTypeAuditLogController(IAuditService auditService, IAuditLogViewModelFactory auditLogViewModelFactory)
+    public ByTypeAuditLogController(IAuditService auditService, IAuditLogPresentationFactory auditLogPresentationFactory)
     {
         _auditService = auditService;
-        _auditLogViewModelFactory = auditLogViewModelFactory;
+        _auditLogPresentationFactory = auditLogPresentationFactory;
     }
 
     [HttpGet("type/{logType}")]
@@ -25,7 +25,7 @@ public class ByTypeAuditLogController : AuditLogControllerBase
     public async Task<IActionResult> ByType(AuditType logType, DateTime? sinceDate = null, int skip = 0, int take = 100)
     {
         IAuditItem[] result = _auditService.GetLogs(logType, sinceDate).ToArray();
-        IEnumerable<AuditLogResponseModel> mapped = _auditLogViewModelFactory.CreateAuditLogViewModel(result.Skip(skip).Take(take));
+        IEnumerable<AuditLogResponseModel> mapped = _auditLogPresentationFactory.CreateAuditLogViewModel(result.Skip(skip).Take(take));
         var viewModel = new PagedViewModel<AuditLogResponseModel>
         {
             Total = result.Length,

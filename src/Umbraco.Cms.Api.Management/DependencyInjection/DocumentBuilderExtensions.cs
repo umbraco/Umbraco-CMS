@@ -10,9 +10,9 @@ internal static class DocumentBuilderExtensions
 {
     internal static IUmbracoBuilder AddDocuments(this IUmbracoBuilder builder)
     {
-        builder.Services.AddTransient<IDocumentPresentationModelFactory, DocumentPresentationModelFactory>();
+        builder.Services.AddTransient<IDocumentPresentationFactory, DocumentPresentationFactory>();
         builder.Services.AddTransient<IContentUrlFactory, ContentUrlFactory>();
-        builder.Services.AddTransient<IDocumentEditingFactory, DocumentEditingFactory>();
+        builder.Services.AddTransient<IDocumentEditingPresentationFactory, DocumentEditingPresentationFactory>();
 
         builder.WithCollectionBuilder<MapDefinitionCollectionBuilder>()
             .Add<DocumentMapDefinition>()
