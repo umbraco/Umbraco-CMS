@@ -22,30 +22,6 @@ export class UmbRouterSlotElement extends LitElement {
 		return (this.#router as any).routes;
 	}
 	public set routes(value: IRoute[] | undefined) {
-		/*
-		Concept for extending routes with modal routes.
-		const routesWithModals = value?.map((route, i, array) => {
-			{
-				path: 'bla/:key/'
-				component: () => {
-					return import('.....');
-				}
-				setup: () => {
-					...
-				}
-			}
-
-			if (route.path === '') {
-				{
-					...route,
-					path: route.path + '/modal/:modal-alias',
-					setup: () => {
-						route.setup?.();
-						// Call modal service to open modal.
-					}
-			}
-		});
-		*/
 		(this.#router as any).routes = value;
 	}
 

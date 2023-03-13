@@ -12,6 +12,7 @@ import '../../../../backoffice/shared/components/workspace/workspace-property-la
 import { UmbObserverController } from '@umbraco-cms/observable-api';
 import { UmbLitElement } from '@umbraco-cms/element';
 import { DataTypePropertyModel } from '@umbraco-cms/backend-api';
+import { UmbPropertyEditorElement } from '@umbraco-cms/property-editor';
 
 /**
  *  @element umb-workspace-property
@@ -133,9 +134,8 @@ export class UmbWorkspacePropertyElement extends UmbLitElement {
 	@state()
 	private _variantDifference?: string;
 
-	// TODO: make interface for UMBPropertyEditorElement
 	@state()
-	private _element?: { value?: any; config?: any } & HTMLElement; // TODO: invent interface for propertyEditorUI.
+	private _element?: UmbPropertyEditorElement;
 
 	@state()
 	private _value?: unknown;
