@@ -34,8 +34,10 @@ const dashboards: Array<ManifestDashboard> = [
 		loader: () => import('./dashboards/dictionary/dashboard-translation-dictionary.element'),
 		meta: {
 			label: 'Dictionary overview',
-			sections: [sectionAlias],
 			pathname: '',
+		},
+		conditions: {
+			sections: [sectionAlias],
 		},
 	},
 ];

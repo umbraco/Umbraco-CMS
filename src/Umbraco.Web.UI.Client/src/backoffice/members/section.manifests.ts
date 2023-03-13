@@ -22,8 +22,10 @@ const dashboards: Array<ManifestDashboard> = [
 		loader: () => import('./dashboards/welcome/dashboard-members-welcome.element'),
 		meta: {
 			label: 'Members',
-			sections: [sectionAlias],
 			pathname: 'members',
+		},
+		conditions: {
+			sections: [sectionAlias],
 		},
 	},
 ];
