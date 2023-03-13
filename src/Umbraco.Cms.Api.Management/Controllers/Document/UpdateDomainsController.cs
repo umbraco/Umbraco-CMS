@@ -23,7 +23,7 @@ public class UpdateDomainsController : DocumentControllerBase
     }
 
     [HttpPut("{key:guid}/domains")]
-    public async Task<IActionResult> UpdateDomainsAsync(Guid key, DomainsUpdateRequestModel updateModel)
+    public async Task<IActionResult> UpdateDomainsAsync(Guid key, UpdateDomainsRequestModel updateModel)
     {
         DomainsUpdateModel domainsUpdateModel = _umbracoMapper.Map<DomainsUpdateModel>(updateModel)!;
 

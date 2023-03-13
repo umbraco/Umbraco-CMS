@@ -1,6 +1,6 @@
 ﻿namespace Umbraco.Cms.Api.Management.ViewModels.Document;
 
-public class DomainModel
+public class DomainPresentationModel
 {
     public required string DomainName { get; set; }
 

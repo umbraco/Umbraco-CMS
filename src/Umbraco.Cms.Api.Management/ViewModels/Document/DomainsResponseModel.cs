@@ -1,5 +1,5 @@
 ﻿namespace Umbraco.Cms.Api.Management.ViewModels.Document;
 
-public class DomainsResponseModel : DomainsModelBase
+public class DomainsResponseModel : DomainsPresentationModelBase
 {
 }
