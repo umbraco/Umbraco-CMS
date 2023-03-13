@@ -1,6 +1,8 @@
 umbraco/[Dd]ata/
 umbraco/[Ll]ogs/
 umbraco/[Mm]odels/
+App_Plugins/
+App_Code/
 Views/
 !Views/Partials/blocklist/
 !Views/Partials/grid/

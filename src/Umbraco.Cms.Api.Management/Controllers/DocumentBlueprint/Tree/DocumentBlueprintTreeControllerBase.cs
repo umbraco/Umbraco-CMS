@@ -13,7 +13,7 @@ namespace Umbraco.Cms.Api.Management.Controllers.DocumentBlueprint.Tree;
 [ApiController]
 [VersionedApiBackOfficeRoute($"{Constants.Web.RoutePath.Tree}/{Constants.UdiEntityType.DocumentBlueprint}")]
 [ApiExplorerSettings(GroupName = "Document Blueprint")]
-public class DocumentBlueprintTreeControllerBase : EntityTreeControllerBase<DocumentBlueprintTreeItemViewModel>
+public class DocumentBlueprintTreeControllerBase : EntityTreeControllerBase<DocumentBlueprintTreeItemResponseModel>
 {
     private readonly IContentTypeService _contentTypeService;
 
@@ -23,7 +23,7 @@ public class DocumentBlueprintTreeControllerBase : EntityTreeControllerBase<Docu
 
     protected override UmbracoObjectTypes ItemObjectType => UmbracoObjectTypes.DocumentBlueprint;
 
-    protected override DocumentBlueprintTreeItemViewModel[] MapTreeItemViewModels(Guid? parentKey, IEntitySlim[] entities)
+    protected override DocumentBlueprintTreeItemResponseModel[] MapTreeItemViewModels(Guid? parentKey, IEntitySlim[] entities)
     {
         var contentTypeAliases = entities
             .OfType<IDocumentEntitySlim>()
@@ -37,19 +37,19 @@ public class DocumentBlueprintTreeControllerBase : EntityTreeControllerBase<Docu
 
         return entities.Select(entity =>
         {
-            DocumentBlueprintTreeItemViewModel viewModel = base.MapTreeItemViewModel(parentKey, entity);
-            viewModel.Icon = Constants.Icons.Blueprint;
-            viewModel.HasChildren = false;
+            DocumentBlueprintTreeItemResponseModel responseModel = base.MapTreeItemViewModel(parentKey, entity);
+            responseModel.Icon = Constants.Icons.Blueprint;
+            responseModel.HasChildren = false;
 
             if (entity is IDocumentEntitySlim documentEntitySlim
                 && contentTypeByAlias.TryGetValue(documentEntitySlim.ContentTypeAlias, out IContentType? contentType))
             {
-                viewModel.DocumentTypeKey = contentType.Key;
-                viewModel.DocumentTypeAlias = contentType.Alias;
-                viewModel.DocumentTypeName = contentType.Name;
+                responseModel.DocumentTypeKey = contentType.Key;
+                responseModel.DocumentTypeAlias = contentType.Alias;
+                responseModel.DocumentTypeName = contentType.Name;
             }
 
-            return viewModel;
+            return responseModel;
         }).ToArray();
     }
 }

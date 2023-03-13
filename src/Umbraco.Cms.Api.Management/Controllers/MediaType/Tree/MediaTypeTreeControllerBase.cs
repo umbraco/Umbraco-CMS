@@ -13,7 +13,7 @@ namespace Umbraco.Cms.Api.Management.Controllers.MediaType.Tree;
 [ApiController]
 [VersionedApiBackOfficeRoute($"{Constants.Web.RoutePath.Tree}/{Constants.UdiEntityType.MediaType}")]
 [ApiExplorerSettings(GroupName = "Media Type")]
-public class MediaTypeTreeControllerBase : FolderTreeControllerBase<FolderTreeItemViewModel>
+public class MediaTypeTreeControllerBase : FolderTreeControllerBase<FolderTreeItemResponseModel>
 {
     private readonly IMediaTypeService _mediaTypeService;
 
@@ -25,7 +25,7 @@ public class MediaTypeTreeControllerBase : FolderTreeControllerBase<FolderTreeIt
 
     protected override UmbracoObjectTypes FolderObjectType => UmbracoObjectTypes.MediaTypeContainer;
 
-    protected override FolderTreeItemViewModel[] MapTreeItemViewModels(Guid? parentKey, IEntitySlim[] entities)
+    protected override FolderTreeItemResponseModel[] MapTreeItemViewModels(Guid? parentKey, IEntitySlim[] entities)
     {
         var mediaTypes = _mediaTypeService
             .GetAll(entities.Select(entity => entity.Id).ToArray())
@@ -33,13 +33,13 @@ public class MediaTypeTreeControllerBase : FolderTreeControllerBase<FolderTreeIt
 
         return entities.Select(entity =>
         {
-            FolderTreeItemViewModel viewModel = MapTreeItemViewModel(parentKey, entity);
+            FolderTreeItemResponseModel responseModel = MapTreeItemViewModel(parentKey, entity);
             if (mediaTypes.TryGetValue(entity.Id, out IMediaType? mediaType))
             {
-                viewModel.Icon = mediaType.Icon ?? viewModel.Icon;
+                responseModel.Icon = mediaType.Icon ?? responseModel.Icon;
             }
 
-            return viewModel;
+            return responseModel;
         }).ToArray();
     }
 }

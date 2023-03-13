@@ -21,14 +21,14 @@ public class AllLanguageController : LanguageControllerBase
 
     [HttpGet]
     [MapToApiVersion("1.0")]
-    [ProducesResponseType(typeof(PagedViewModel<LanguageViewModel>), StatusCodes.Status200OK)]
-    public async Task<ActionResult<PagedViewModel<LanguageViewModel>>> All(int skip = 0, int take = 100)
+    [ProducesResponseType(typeof(PagedViewModel<LanguageResponseModel>), StatusCodes.Status200OK)]
+    public async Task<ActionResult<PagedViewModel<LanguageResponseModel>>> All(int skip = 0, int take = 100)
     {
         ILanguage[] allLanguages = (await _languageService.GetAllAsync()).ToArray();
-        var viewModel = new PagedViewModel<LanguageViewModel>
+        var viewModel = new PagedViewModel<LanguageResponseModel>
         {
             Total = allLanguages.Length,
-            Items = _umbracoMapper.MapEnumerable<ILanguage, LanguageViewModel>(allLanguages.Skip(skip).Take(take))
+            Items = _umbracoMapper.MapEnumerable<ILanguage, LanguageResponseModel>(allLanguages.Skip(skip).Take(take))
         };
 
         return await Task.FromResult(Ok(viewModel));

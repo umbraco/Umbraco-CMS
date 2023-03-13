@@ -6,7 +6,7 @@ public class TemplateQueryExecuteModel
 
     public string? ContentTypeAlias { get; set; }
 
-    public IEnumerable<TemplateQueryExecuteFilterModel>? Filters { get; set; }
+    public IEnumerable<TemplateQueryExecuteFilterPresentationModel>? Filters { get; set; }
 
     public TemplateQueryExecuteSortModel? Sort { get; set; }
 

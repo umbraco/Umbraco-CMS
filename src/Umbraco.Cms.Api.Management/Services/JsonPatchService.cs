@@ -2,21 +2,22 @@
 using Json.Patch;
 using Umbraco.Cms.Api.Management.Serialization;
 using Umbraco.Cms.Api.Management.ViewModels.JsonPatch;
+using Umbraco.Cms.Core.Serialization;
 
 namespace Umbraco.Cms.Api.Management.Services;
 
 public class JsonPatchService : IJsonPatchService
 {
-    private readonly ISystemTextJsonSerializer _systemTextJsonSerializer;
+    private readonly IJsonSerializer _jsonSerializer;
 
-    public JsonPatchService(ISystemTextJsonSerializer systemTextJsonSerializer) => _systemTextJsonSerializer = systemTextJsonSerializer;
+    public JsonPatchService(IJsonSerializer jsonSerializer) => _jsonSerializer = jsonSerializer;
 
     public PatchResult? Patch(JsonPatchViewModel[] patchViewModel, object objectToPatch)
     {
-        var patchString = _systemTextJsonSerializer.Serialize(patchViewModel);
+        var patchString = _jsonSerializer.Serialize(patchViewModel);
 
-        var docString = _systemTextJsonSerializer.Serialize(objectToPatch);
-        JsonPatch? patch = _systemTextJsonSerializer.Deserialize<JsonPatch>(patchString);
+        var docString = _jsonSerializer.Serialize(objectToPatch);
+        JsonPatch? patch = _jsonSerializer.Deserialize<JsonPatch>(patchString);
         var doc = JsonNode.Parse(docString);
         return patch?.Apply(doc);
     }

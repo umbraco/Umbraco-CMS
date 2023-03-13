@@ -28,7 +28,7 @@ public class UpdateDataTypeController : DataTypeControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> Update(Guid key, DataTypeUpdateModel dataTypeViewModel)
+    public async Task<IActionResult> Update(Guid key, UpdateDataTypeRequestModel updateDataTypeViewModel)
     {
         IDataType? current = await _dataTypeService.GetAsync(key);
         if (current == null)
@@ -36,7 +36,7 @@ public class UpdateDataTypeController : DataTypeControllerBase
             return NotFound();
         }
 
-        IDataType updated = _umbracoMapper.Map(dataTypeViewModel, current);
+        IDataType updated = _umbracoMapper.Map(updateDataTypeViewModel, current);
         Attempt<IDataType, DataTypeOperationStatus> result = await _dataTypeService.UpdateAsync(updated, CurrentUserId(_backOfficeSecurityAccessor));
 
         return result.Success

@@ -5,5 +5,5 @@ namespace Umbraco.Cms.Api.Management.Factories;
 
 public interface IPackageDefinitionFactory
 {
-    PackageDefinition CreatePackageDefinition(PackageCreateModel packageCreateModel);
+    PackageDefinition CreatePackageDefinition(CreatePackageRequestModel createPackageRequestModel);
 }

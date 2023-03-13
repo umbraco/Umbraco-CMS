@@ -13,24 +13,24 @@ public class GridConfig : IGridConfig
 {
     public GridConfig(
         AppCaches appCaches,
-        IManifestParser manifestParser,
+        ILegacyManifestParser legacyManifestParser,
         IJsonSerializer jsonSerializer,
         IHostingEnvironment hostingEnvironment,
         ILoggerFactory loggerFactory,
         IGridEditorsConfigFileProviderFactory gridEditorsConfigFileProviderFactory)
         => EditorsConfig =
-            new GridEditorsConfig(appCaches, hostingEnvironment, manifestParser, jsonSerializer, loggerFactory.CreateLogger<GridEditorsConfig>(), gridEditorsConfigFileProviderFactory);
+            new GridEditorsConfig(appCaches, hostingEnvironment, legacyManifestParser, jsonSerializer, loggerFactory.CreateLogger<GridEditorsConfig>(), gridEditorsConfigFileProviderFactory);
 
     [Obsolete("Use other ctor - Will be removed in Umbraco 13")]
     public GridConfig(
         AppCaches appCaches,
-        IManifestParser manifestParser,
+        ILegacyManifestParser legacyManifestParser,
         IJsonSerializer jsonSerializer,
         IHostingEnvironment hostingEnvironment,
         ILoggerFactory loggerFactory)
         : this(
               appCaches,
-              manifestParser,
+              legacyManifestParser,
               jsonSerializer,
               hostingEnvironment,
               loggerFactory,

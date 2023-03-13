@@ -35,8 +35,8 @@ public class ExecuteActionHealthCheckController : HealthCheckControllerBase
     [HttpPost("execute-action")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(typeof(HealthCheckResultViewModel), StatusCodes.Status200OK)]
-    public async Task<ActionResult<HealthCheckResultViewModel>> ExecuteAction(HealthCheckActionViewModel action)
+    [ProducesResponseType(typeof(HealthCheckResultResponseModel), StatusCodes.Status200OK)]
+    public async Task<ActionResult<HealthCheckResultResponseModel>> ExecuteAction(HealthCheckActionRequestModel action)
     {
         Guid healthCheckKey = action.HealthCheckKey;
 
@@ -59,6 +59,6 @@ public class ExecuteActionHealthCheckController : HealthCheckControllerBase
 
         HealthCheckStatus result = healthCheck.ExecuteAction(_umbracoMapper.Map<HealthCheckAction>(action)!);
 
-        return await Task.FromResult(Ok(_umbracoMapper.Map<HealthCheckResultViewModel>(result)));
+        return await Task.FromResult(Ok(_umbracoMapper.Map<HealthCheckResultResponseModel>(result)));
     }
 }

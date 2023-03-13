@@ -14,7 +14,7 @@ public class ItemsDataTypeTreeController : DataTypeTreeControllerBase
 
     [HttpGet("item")]
     [MapToApiVersion("1.0")]
-    [ProducesResponseType(typeof(IEnumerable<FolderTreeItemViewModel>), StatusCodes.Status200OK)]
-    public async Task<ActionResult<IEnumerable<FolderTreeItemViewModel>>> Items([FromQuery(Name = "key")] Guid[] keys)
+    [ProducesResponseType(typeof(IEnumerable<FolderTreeItemResponseModel>), StatusCodes.Status200OK)]
+    public async Task<ActionResult<IEnumerable<FolderTreeItemResponseModel>>> Items([FromQuery(Name = "key")] Guid[] keys)
         => await GetItems(keys);
 }

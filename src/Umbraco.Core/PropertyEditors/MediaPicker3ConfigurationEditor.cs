@@ -23,6 +23,7 @@ public class MediaPicker3ConfigurationEditor : ConfigurationEditor<MediaPicker3C
     public MediaPicker3ConfigurationEditor(IIOHelper ioHelper, IEditorConfigurationParser editorConfigurationParser)
         : base(ioHelper, editorConfigurationParser)
     {
+        // FIXME: all this belongs clientside, this needs to go
         // configure fields
         // this is not part of ContentPickerConfiguration,
         // but is required to configure the UI editor (when editing the configuration)

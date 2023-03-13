@@ -8,7 +8,7 @@ internal static class UserGroupsBuilderExtensions
 {
     internal static IUmbracoBuilder AddUserGroups(this IUmbracoBuilder builder)
     {
-        builder.Services.AddTransient<IUserGroupViewModelFactory, UserGroupViewModelFactory>();
+        builder.Services.AddTransient<IUserGroupPresentationFactory, UserGroupPresentationFactory>();
         return builder;
     }
 }

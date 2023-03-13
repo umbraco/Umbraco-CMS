@@ -12,38 +12,38 @@ namespace Umbraco.Cms.Api.Management.Controllers.Relation;
 public class ByChildRelationController : RelationControllerBase
 {
     private readonly IRelationService _relationService;
-    private readonly IRelationViewModelFactory _relationViewModelFactory;
+    private readonly IRelationPresentationFactory _relationPresentationFactory;
 
     public ByChildRelationController(
         IRelationService relationService,
-        IRelationViewModelFactory relationViewModelFactory)
+        IRelationPresentationFactory relationPresentationFactory)
     {
         _relationService = relationService;
-        _relationViewModelFactory = relationViewModelFactory;
+        _relationPresentationFactory = relationPresentationFactory;
     }
 
     [HttpGet("child-relation/{childId:int}")]
     [MapToApiVersion("1.0")]
-    [ProducesResponseType(typeof(PagedViewModel<RelationViewModel>), StatusCodes.Status200OK)]
-    public async Task<PagedViewModel<RelationViewModel>> ByChild(int childId, int skip, int take, string? relationTypeAlias = "")
+    [ProducesResponseType(typeof(PagedViewModel<RelationResponseModel>), StatusCodes.Status200OK)]
+    public async Task<PagedViewModel<RelationResponseModel>> ByChild(int childId, int skip, int take, string? relationTypeAlias = "")
     {
         IRelation[] relations = _relationService.GetByChildId(childId).ToArray();
-        RelationViewModel[] result = Array.Empty<RelationViewModel>();
+        RelationResponseModel[] result = Array.Empty<RelationResponseModel>();
 
         if (relations.Any())
         {
             if (string.IsNullOrWhiteSpace(relationTypeAlias) == false)
             {
-                result = _relationViewModelFactory.CreateMultiple(relations.Where(x =>
+                result = _relationPresentationFactory.CreateMultiple(relations.Where(x =>
                     x.RelationType.Alias.InvariantEquals(relationTypeAlias))).ToArray();
             }
             else
             {
-                result = _relationViewModelFactory.CreateMultiple(relations).ToArray();
+                result = _relationPresentationFactory.CreateMultiple(relations).ToArray();
             }
         }
 
-        return await Task.FromResult(new PagedViewModel<RelationViewModel>
+        return await Task.FromResult(new PagedViewModel<RelationResponseModel>
         {
             Total = result.Length,
             Items = result.Skip(skip).Take(take),

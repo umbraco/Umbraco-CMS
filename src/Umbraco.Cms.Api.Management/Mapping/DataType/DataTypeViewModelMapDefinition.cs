@@ -26,11 +26,11 @@ public class DataTypeViewModelMapDefinition : IMapDefinition
 
     public void DefineMaps(IUmbracoMapper mapper)
     {
-        mapper.Define<IDataType, DataTypeViewModel>((_, _) => new DataTypeViewModel(), Map);
+        mapper.Define<IDataType, DataTypeResponseModel>((_, _) => new DataTypeResponseModel(), Map);
 
-        mapper.Define<DataTypeUpdateModel, IDataType>(InitializeDataType, Map);
+        mapper.Define<UpdateDataTypeRequestModel, IDataType>(InitializeDataType, Map);
 
-        mapper.Define<DataTypeCreateModel, IDataType>(InitializeDataType, Map);
+        mapper.Define<CreateDataTypeRequestModel, IDataType>(InitializeDataType, Map);
 
         IDataType InitializeDataType<T>(T source, MapperContext _) where T : DataTypeModelBase =>
             new Core.Models.DataType(_propertyEditors[source.PropertyEditorAlias], _serializer)
@@ -40,7 +40,7 @@ public class DataTypeViewModelMapDefinition : IMapDefinition
     }
 
     // Umbraco.Code.MapAll
-    private void Map(IDataType source, DataTypeViewModel target, MapperContext context)
+    private void Map(IDataType source, DataTypeResponseModel target, MapperContext context)
     {
         target.Key = source.Key;
         target.ParentKey = _dataTypeService.GetContainer(source.ParentId)?.Key;
@@ -53,7 +53,7 @@ public class DataTypeViewModelMapDefinition : IMapDefinition
                                          ?? new Dictionary<string, object>();
 
         target.Values = configuration.Select(c =>
-            new DataTypePropertyViewModel
+            new DataTypePropertyPresentationModel
             {
                 Alias = c.Key,
                 Value = c.Value
@@ -62,7 +62,7 @@ public class DataTypeViewModelMapDefinition : IMapDefinition
 
     // Umbraco.Code.MapAll -CreateDate -DeleteDate -UpdateDate -ParentId
     // Umbraco.Code.MapAll -Id -Key -Path -CreatorId -Level -SortOrder
-    private void Map(DataTypeUpdateModel source, IDataType target, MapperContext context)
+    private void Map(UpdateDataTypeRequestModel source, IDataType target, MapperContext context)
     {
         IDataEditor editor = GetRequiredDataEditor(source);
 
@@ -75,7 +75,7 @@ public class DataTypeViewModelMapDefinition : IMapDefinition
 
     // Umbraco.Code.MapAll -CreateDate -DeleteDate -UpdateDate
     // Umbraco.Code.MapAll -Id -Key -Path -CreatorId -Level -SortOrder
-    private void Map(DataTypeCreateModel source, IDataType target, MapperContext context)
+    private void Map(CreateDataTypeRequestModel source, IDataType target, MapperContext context)
     {
         IDataEditor editor = GetRequiredDataEditor(source);
 

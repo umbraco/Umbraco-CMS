@@ -14,7 +14,7 @@ public class ItemsTemplateTreeController : TemplateTreeControllerBase
 
     [HttpGet("item")]
     [MapToApiVersion("1.0")]
-    [ProducesResponseType(typeof(IEnumerable<EntityTreeItemViewModel>), StatusCodes.Status200OK)]
-    public async Task<ActionResult<IEnumerable<EntityTreeItemViewModel>>> Items([FromQuery(Name = "key")] Guid[] keys)
+    [ProducesResponseType(typeof(IEnumerable<EntityTreeItemResponseModel>), StatusCodes.Status200OK)]
+    public async Task<ActionResult<IEnumerable<EntityTreeItemResponseModel>>> Items([FromQuery(Name = "key")] Guid[] keys)
         => await GetItems(keys);
 }

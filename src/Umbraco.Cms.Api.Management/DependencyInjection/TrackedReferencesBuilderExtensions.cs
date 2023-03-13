@@ -12,7 +12,7 @@ internal static class TrackedReferencesBuilderExtensions
 {
     internal static IUmbracoBuilder AddTrackedReferences(this IUmbracoBuilder builder)
     {
-        builder.Services.AddTransient<IRelationViewModelFactory, RelationViewModelFactory>();
+        builder.Services.AddTransient<IRelationPresentationFactory, RelationPresentationFactory>();
 
         builder.WithCollectionBuilder<MapDefinitionCollectionBuilder>()
             .Add<TrackedReferenceViewModelsMapDefinition>()

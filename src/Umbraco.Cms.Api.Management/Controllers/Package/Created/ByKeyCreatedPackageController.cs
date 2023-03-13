@@ -26,8 +26,8 @@ public class ByKeyCreatedPackageController : CreatedPackageControllerBase
     [HttpGet("{key:guid}")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    [ProducesResponseType(typeof(PackageDefinitionViewModel), StatusCodes.Status200OK)]
-    public async Task<ActionResult<PackageDefinitionViewModel>> ByKey(Guid key)
+    [ProducesResponseType(typeof(PackageDefinitionResponseModel), StatusCodes.Status200OK)]
+    public async Task<ActionResult<PackageDefinitionResponseModel>> ByKey(Guid key)
     {
         PackageDefinition? package = await _packagingService.GetCreatedPackageByKeyAsync(key);
 
@@ -36,6 +36,6 @@ public class ByKeyCreatedPackageController : CreatedPackageControllerBase
             return NotFound();
         }
 
-        return Ok(_umbracoMapper.Map<PackageDefinitionViewModel>(package));
+        return Ok(_umbracoMapper.Map<PackageDefinitionResponseModel>(package));
     }
 }
