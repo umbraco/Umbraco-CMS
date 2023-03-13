@@ -11,4 +11,5 @@ namespace Umbraco.Cms.Api.Management.Controllers.Document;
 [ApiExplorerSettings(GroupName = nameof(Constants.UdiEntityType.Document))]
 public abstract class DocumentControllerBase : ContentControllerBase
 {
+    protected IActionResult DocumentNotFound() => NotFound("The requested Document could not be found");
 }

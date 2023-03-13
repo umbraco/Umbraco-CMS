@@ -2,6 +2,6 @@
 
 namespace Umbraco.Cms.Api.Management.ViewModels.DocumentType;
 
-public class DocumentTypePropertyTypeContainerPresentationBase : PropertyTypeContainerPresentationBase
+public class DocumentTypePropertyTypeContainerResponseModel : PropertyTypeContainerResponseModelBase
 {
 }

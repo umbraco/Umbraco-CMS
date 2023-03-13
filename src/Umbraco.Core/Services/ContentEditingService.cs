@@ -12,7 +12,6 @@ internal sealed class ContentEditingService
 {
     private readonly ITemplateService _templateService;
     private readonly ILogger<ContentEditingService> _logger;
-    private readonly ICoreScopeProvider _scopeProvider;
 
     public ContentEditingService(
         IContentService contentService,
@@ -22,11 +21,10 @@ internal sealed class ContentEditingService
         ITemplateService templateService,
         ILogger<ContentEditingService> logger,
         ICoreScopeProvider scopeProvider)
-        : base(contentService, contentTypeService, propertyEditorCollection, dataTypeService, logger)
+        : base(contentService, contentTypeService, propertyEditorCollection, dataTypeService, logger, scopeProvider)
     {
         _templateService = templateService;
         _logger = logger;
-        _scopeProvider = scopeProvider;
     }
 
     public async Task<IContent?> GetAsync(Guid id)
@@ -77,10 +75,10 @@ internal sealed class ContentEditingService
     }
 
     public async Task<Attempt<IContent?, ContentEditingOperationStatus>> MoveToRecycleBinAsync(Guid id, int userId = Constants.Security.SuperUserId)
-        => await HandleDeletionAsync(id, content => ContentService.MoveToRecycleBin(content, userId));
+        => await HandleDeletionAsync(id, content => ContentService.MoveToRecycleBin(content, userId), false);
 
     public async Task<Attempt<IContent?, ContentEditingOperationStatus>> DeleteAsync(Guid id, int userId = Constants.Security.SuperUserId)
-        => await HandleDeletionAsync(id, content => ContentService.Delete(content, userId));
+        => await HandleDeletionAsync(id, content => ContentService.Delete(content, userId), true);
 
     protected override IContent Create(string? name, int parentId, IContentType contentType) => new Content(name, parentId, contentType);
 
@@ -129,27 +127,5 @@ internal sealed class ContentEditingService
             _logger.LogError(ex, "Content save operation failed");
             return ContentEditingOperationStatus.Unknown;
         }
-    }
-
-    // helper method to perform move-to-recycle-bin and delete for content as they are very much handled in the same way
-    private async Task<Attempt<IContent?, ContentEditingOperationStatus>> HandleDeletionAsync(Guid id, Func<IContent, OperationResult> performDelete)
-    {
-        using ICoreScope scope = _scopeProvider.CreateCoreScope(autoComplete:true);
-        IContent? content = ContentService.GetById(id);
-        if (content == null)
-        {
-            return await Task.FromResult(Attempt.FailWithStatus(ContentEditingOperationStatus.NotFound, content));
-        }
-
-        OperationResult deleteResult = performDelete(content);
-        return deleteResult.Result switch
-        {
-            // these are the only result states currently expected from Delete
-            OperationResultType.Success => Attempt.SucceedWithStatus<IContent?, ContentEditingOperationStatus>(ContentEditingOperationStatus.Success, content),
-            OperationResultType.FailedCancelledByEvent => Attempt.FailWithStatus<IContent?, ContentEditingOperationStatus>(ContentEditingOperationStatus.CancelledByNotification, content),
-
-            // for any other state we'll return "unknown" so we know that we need to amend this
-            _ => Attempt.FailWithStatus<IContent?, ContentEditingOperationStatus>(ContentEditingOperationStatus.Unknown, content)
-        };
     }
 }

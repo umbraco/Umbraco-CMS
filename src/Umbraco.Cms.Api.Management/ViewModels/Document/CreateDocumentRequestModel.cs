@@ -2,7 +2,7 @@
 
 namespace Umbraco.Cms.Api.Management.ViewModels.Document;
 
-public class CreateDocumentRequestModel : ContentCreateRequestModelBase<DocumentValueModel, DocumentVariantRequestModel>
+public class CreateDocumentRequestModel : CreateContentRequestModelBase<DocumentValueModel, DocumentVariantRequestModel>
 {
     public Guid ContentTypeKey { get; set; }
 

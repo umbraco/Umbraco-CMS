@@ -1,6 +1,6 @@
 ﻿namespace Umbraco.Cms.Api.Management.ViewModels.ContentType;
 
-public abstract class PropertyTypeContainerPresentationBase
+public abstract class PropertyTypeContainerResponseModelBase
 {
     public Guid Key { get; set; }
 

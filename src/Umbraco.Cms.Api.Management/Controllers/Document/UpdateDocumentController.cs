@@ -13,18 +13,15 @@ namespace Umbraco.Cms.Api.Management.Controllers.Document;
 
 public class UpdateDocumentController : DocumentControllerBase
 {
-    private readonly IContentService _contentService;
     private readonly IContentEditingService _contentEditingService;
     private readonly IDocumentEditingPresentationFactory _documentEditingPresentationFactory;
     private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
 
     public UpdateDocumentController(
-        IContentService contentService,
         IContentEditingService contentEditingService,
         IDocumentEditingPresentationFactory documentEditingPresentationFactory,
         IBackOfficeSecurityAccessor backOfficeSecurityAccessor)
     {
-        _contentService = contentService;
         _contentEditingService = contentEditingService;
         _documentEditingPresentationFactory = documentEditingPresentationFactory;
         _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
@@ -37,10 +34,10 @@ public class UpdateDocumentController : DocumentControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Update(Guid key, UpdateDocumentRequestModel requestModel)
     {
-        IContent? content = _contentService.GetById(key);
+        IContent? content = await _contentEditingService.GetAsync(key);
         if (content == null)
         {
-            return NotFound();
+            return DocumentNotFound();
         }
 
         ContentUpdateModel model = _documentEditingPresentationFactory.MapUpdateModel(requestModel);

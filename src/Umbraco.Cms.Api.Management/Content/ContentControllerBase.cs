@@ -32,6 +32,10 @@ public class ContentControllerBase : ManagementApiControllerBase
                 .WithDetail("The selected template was not allowed for the operation.")
                 .Build()),
             ContentEditingOperationStatus.PropertyTypeNotFound => NotFound("One or more property types could not be found"),
+            ContentEditingOperationStatus.InTrash => BadRequest(new ProblemDetailsBuilder()
+                .WithTitle("Content is in the recycle bin")
+                .WithDetail("Could not perform the operation because the targeted content was in the recycle bin.")
+                .Build()),
             ContentEditingOperationStatus.Unknown => StatusCode(StatusCodes.Status500InternalServerError, "Unknown error. Please see the log for more details."),
             _ => StatusCode(StatusCodes.Status500InternalServerError, "Unknown content operation status.")
         };
