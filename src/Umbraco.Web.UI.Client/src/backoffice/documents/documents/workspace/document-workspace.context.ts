@@ -57,8 +57,8 @@ export class UmbDocumentWorkspaceContext
 		return data || undefined;
 	}
 
-	async createScaffold(parentKey: string | null) {
-		const { data } = await this.repository.createScaffold(parentKey);
+	async createScaffold(documentTypeKey: string) {
+		const { data } = await this.repository.createScaffold(documentTypeKey);
 		if (!data) return undefined;
 
 		this.setIsNew(true);
@@ -75,7 +75,7 @@ export class UmbDocumentWorkspaceContext
 			},
 			{
 				name: 'create',
-				path: 'create/:parentKey:/documentType',
+				path: 'create/:parentKey/:documentTypeKey',
 			},
 		];
 	}

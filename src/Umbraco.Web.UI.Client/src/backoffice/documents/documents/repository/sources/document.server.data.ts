@@ -47,8 +47,9 @@ export class UmbDocumentServerDataSource implements RepositoryDetailDataSource<D
 	 * @return {*}
 	 * @memberof UmbDocumentServerDataSource
 	 */
-	async createScaffold(parentKey: string | null) {
+	async createScaffold(documentTypeKey: string) {
 		const data: DocumentModel = {
+			contentTypeKey: documentTypeKey,
 			values: [],
 			variants: [],
 		};
