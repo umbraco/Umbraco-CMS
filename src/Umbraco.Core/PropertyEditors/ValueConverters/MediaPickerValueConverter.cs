@@ -9,6 +9,7 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 ///     The media picker property value converter.
 /// </summary>
 [DefaultPropertyValueConverter]
+[Obsolete("Please use the MediaPicker3 instead, will be removed in V13")]
 public class MediaPickerValueConverter : PropertyValueConverterBase
 {
     // hard-coding "image" here but that's how it works at UI level too
