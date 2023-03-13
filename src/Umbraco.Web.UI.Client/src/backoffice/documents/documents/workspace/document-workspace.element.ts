@@ -26,7 +26,6 @@ export class UmbDocumentWorkspaceElement extends UmbLitElement implements UmbWor
 		`,
 	];
 
-	private _workspaceContext: UmbDocumentWorkspaceContext = new UmbDocumentWorkspaceContext(this);
 	//private _defaultVariant?: VariantViewModelBaseModel;
 	private splitViewElement = new UmbDocumentWorkspaceSplitViewElement();
 
@@ -48,35 +47,44 @@ export class UmbDocumentWorkspaceElement extends UmbLitElement implements UmbWor
 	@state()
 	_workspaceSplitViews: Array<ActiveVariant> = [];
 
+	#workspaceContext?: UmbDocumentWorkspaceContext;
+
 	constructor() {
 		super();
 
-		this.observe(this._workspaceContext.variants, (variants) => {
+		this.consumeContext('umbWorkspaceContext', (instance: UmbDocumentWorkspaceContext) => {
+			this.#workspaceContext = instance;
+			this.#observeVariants();
+			this.#observeSplitViews();
+			this.#init();
+		});
+	}
+
+	#observeVariants() {
+		if (!this.#workspaceContext) return;
+		this.observe(this.#workspaceContext.variants, (variants) => {
 			this._availableVariants = variants;
 			this._generateRoutes();
 		});
-		this.observe(this._workspaceContext.splitView.activeVariantsInfo, (variants) => {
+	}
+
+	#observeSplitViews() {
+		if (!this.#workspaceContext) return;
+		this.observe(this.#workspaceContext.splitView.activeVariantsInfo, (variants) => {
 			this._workspaceSplitViews = variants;
 		});
 	}
 
-	public async load(entityKey: string) {
-		const data = await this._workspaceContext.load(entityKey);
-		this._gotDocumentData(data);
-	}
+	#init() {
+		const parentKey = this.location?.params?.parentKey;
+		const documentTypeKey = this.location?.params.documentTypeKey;
+		const key = this.location?.params?.key;
 
-	public async create(parentKey: string | null) {
-		const data = await this._workspaceContext.createScaffold(parentKey);
-		this._gotDocumentData(data);
-	}
-
-	private _gotDocumentData(data: DocumentModel | undefined) {
-		if (data && data.variants && data.variants.length > 0) {
-			//this._defaultVariant = data.variants[0];
-			this._unique = data.key;
-			// Maybe we need to re-generate routes here?
-		} else {
-			// Fail beautifully?
+		// TODO: implement actions "events" and show loading state
+		if (parentKey !== undefined && documentTypeKey) {
+			this.#workspaceContext?.createScaffold(documentTypeKey);
+		} else if (key) {
+			this.#workspaceContext?.load(key);
 		}
 	}
 
@@ -84,7 +92,7 @@ export class UmbDocumentWorkspaceElement extends UmbLitElement implements UmbWor
 		const variantSplit = folderPart.split('_');
 		const culture = variantSplit[0];
 		const segment = variantSplit[1];
-		this._workspaceContext.splitView.setActiveVariant(index, culture, segment);
+		this.#workspaceContext?.splitView.setActiveVariant(index, culture, segment);
 	}
 
 	private _generateRoutes() {
@@ -119,7 +127,7 @@ export class UmbDocumentWorkspaceElement extends UmbLitElement implements UmbWor
 				component: this.splitViewElement,
 				setup: (component: HTMLElement | Promise<HTMLElement>, info: IRoutingInfo) => {
 					// cause we might come from a split-view, we need to reset index 1.
-					this._workspaceContext.splitView.removeActiveVariant(1);
+					this.#workspaceContext?.splitView.removeActiveVariant(1);
 					this._handleVariantFolderPart(0, info.match.fragments.consumed);
 				},
 			});
@@ -137,7 +145,7 @@ export class UmbDocumentWorkspaceElement extends UmbLitElement implements UmbWor
 	}
 
 	private _gotWorkspaceRoute = (e: UmbRouterSlotInitEvent) => {
-		this._workspaceContext.splitView.setWorkspaceRoute(e.target.absoluteRouterPath);
+		this.#workspaceContext?.splitView.setWorkspaceRoute(e.target.absoluteRouterPath);
 	};
 
 	render() {
