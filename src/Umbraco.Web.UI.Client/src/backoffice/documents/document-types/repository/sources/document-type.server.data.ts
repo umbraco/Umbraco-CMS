@@ -186,4 +186,14 @@ export class UmbDocumentTypeServerDataSource implements RepositoryDetailDataSour
 		);
 		*/
 	}
+
+	/**
+	 * Get the allowed document types for a given parent key
+	 * @param {string} key
+	 * @return {*}
+	 * @memberof UmbDocumentTypeServerDataSource
+	 */
+	async getAllowedChildrenOf(key: string) {
+		alert('get allowed children of', key);
+	}
 }

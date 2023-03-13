@@ -1,13 +1,9 @@
+import { UMB_ALLOWED_DOCUMENT_TYPES_MODAL_TOKEN } from '../../../document-types/modals/allowed-document-types';
 import { UmbDocumentRepository } from '../../repository/document.repository';
-import type { UmbCreateDocumentModalResultData } from '.';
-import { UMB_CREATE_DOCUMENT_MODAL_TOKEN } from '.';
 import { UmbEntityActionBase } from '@umbraco-cms/entity-action';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN } from '@umbraco-cms/modal';
 import { UmbContextConsumerController } from '@umbraco-cms/context-api';
-
-// TODO: temp import
-import './create-document-modal.element.ts';
 
 export class UmbCreateDocumentEntityAction extends UmbEntityActionBase<UmbDocumentRepository> {
 	#modalContext?: UmbModalContext;
@@ -24,11 +20,11 @@ export class UmbCreateDocumentEntityAction extends UmbEntityActionBase<UmbDocume
 		// TODO: what to do if modal service is not available?
 		if (!this.#modalContext) return;
 
-		const modalHandler = this.#modalContext?.open(UMB_CREATE_DOCUMENT_MODAL_TOKEN, {
-			unique: this.unique,
+		const modalHandler = this.#modalContext?.open(UMB_ALLOWED_DOCUMENT_TYPES_MODAL_TOKEN, {
+			key: this.unique,
 		});
 
-		const { documentTypeKey }: UmbCreateDocumentModalResultData = await modalHandler.onSubmit();
+		const { documentTypeKey } = await modalHandler.onSubmit();
 		// TODO: how do we want to generate these urls?
 		history.pushState(null, '', `/section/content/workspace/document/create/${this.unique}/${documentTypeKey}`);
 	}

@@ -1,13 +1,13 @@
 import { html } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement } from 'lit/decorators.js';
-import { UmbCreateDocumentModalData, UmbCreateDocumentModalResultData } from '.';
+import { UmbAllowedDocumentTypesModalData, UmbAllowedDocumentTypesModalResult } from '.';
 import { UmbModalBaseElement } from '@umbraco-cms/modal';
 
-@customElement('umb-create-document-modal')
-export class UmbCreateDocumentModalElement extends UmbModalBaseElement<
-	UmbCreateDocumentModalData,
-	UmbCreateDocumentModalResultData
+@customElement('umb-allowed-document-types-modal')
+export class UmbAllowedDocumentTypesModalElement extends UmbModalBaseElement<
+	UmbAllowedDocumentTypesModalData,
+	UmbAllowedDocumentTypesModalResult
 > {
 	static styles = [UUITextStyles];
 
@@ -25,7 +25,7 @@ export class UmbCreateDocumentModalElement extends UmbModalBaseElement<
 	render() {
 		return html`
 			<umb-body-layout headline="Headline">
-				<div>Render list of create options for ${this.data?.unique}</div>
+				<div>Render list of create options for ${this.data?.key}</div>
 
 				<ul>
 					<li><button type="button" value="1" @click=${this.#onClick}>Option 1</button></li>
@@ -39,10 +39,10 @@ export class UmbCreateDocumentModalElement extends UmbModalBaseElement<
 	}
 }
 
-export default UmbCreateDocumentModalElement;
+export default UmbAllowedDocumentTypesModalElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-create-document-modal': UmbCreateDocumentModalElement;
+		'umb-allowed-document-types-modal': UmbAllowedDocumentTypesModalElement;
 	}
 }

@@ -146,6 +146,21 @@ export class UmbDocumentTypeRepository implements UmbTreeRepository, UmbDetailRe
 		return this.#detailStore!.byKey(key);
 	}
 
+	async requestAllowedTypes(key: string) {
+		await this.#init;
+
+		// TODO: should we show a notification if the key is missing?
+		// Investigate what is best for Acceptance testing, cause in that perspective a thrown error might be the best choice?
+		if (!key) {
+			const error: ProblemDetailsModel = { title: 'Key is missing' };
+			return { error };
+		}
+
+		const { data, error } = await this.#detailDataSource.getAllowedChildrenOf(key);
+
+		return { data, error };
+	}
+
 	// Could potentially be general methods:
 
 	async create(template: ItemType) {
