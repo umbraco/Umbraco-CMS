@@ -62,10 +62,13 @@ public class FileService : RepositoryService, IFileService
             hostingEnvironment,
             StaticServiceProvider.Instance.GetRequiredService<ITemplateService>(),
             templateRepository,
-            StaticServiceProvider.Instance.GetRequiredService<IUserService>())
+            StaticServiceProvider.Instance.GetRequiredService<IUserService>(),
+            shortStringHelper,
+            globalSettings)
     {
     }
 
+    [ActivatorUtilitiesConstructor]
     public FileService(
         ICoreScopeProvider uowProvider,
         ILoggerFactory loggerFactory,
@@ -78,7 +81,10 @@ public class FileService : RepositoryService, IFileService
         IHostingEnvironment hostingEnvironment,
         ITemplateService templateService,
         ITemplateRepository templateRepository,
-        IUserService userService)
+        IUserService userService,
+        // We need these else it will be ambigious ctors
+        IShortStringHelper shortStringHelper,
+        IOptions<GlobalSettings> globalSettings)
         : base(uowProvider, loggerFactory, eventMessagesFactory)
     {
         _stylesheetRepository = stylesheetRepository;
