@@ -85,7 +85,6 @@ export class UmbRouteContext {
 	}
 
 	#generateNewURL = (modalRegistration: UmbModalRouteRegistration) => {
-		console.log('#generateNewURL', this);
 		if (!modalRegistration.options.onUrlBuilder || !this.#routerBasePath) return;
 
 		const routeBasePath = this.#routerBasePath.endsWith('/') ? this.#routerBasePath : this.#routerBasePath + '/';
