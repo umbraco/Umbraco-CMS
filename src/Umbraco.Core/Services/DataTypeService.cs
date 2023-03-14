@@ -59,10 +59,10 @@ namespace Umbraco.Cms.Core.Services.Implement
                 auditRepository,
                 contentTypeRepository,
                 ioHelper,
-                editorConfigurationParser,
-                StaticServiceProvider.Instance.GetRequiredService<IUserService>())
+                editorConfigurationParser)
         {
         }
+
 
         public DataTypeService(
             ICoreScopeProvider provider,
@@ -73,8 +73,7 @@ namespace Umbraco.Cms.Core.Services.Implement
             IAuditRepository auditRepository,
             IContentTypeRepository contentTypeRepository,
             IIOHelper ioHelper,
-            IEditorConfigurationParser editorConfigurationParser,
-            IUserService userService)
+            IEditorConfigurationParser editorConfigurationParser)
             : base(provider, loggerFactory, eventMessagesFactory)
         {
             _dataValueEditorFactory = dataValueEditorFactory;
@@ -83,7 +82,9 @@ namespace Umbraco.Cms.Core.Services.Implement
             _contentTypeRepository = contentTypeRepository;
             _ioHelper = ioHelper;
             _editorConfigurationParser = editorConfigurationParser;
-            _userService = userService;
+
+            // Trying to inject user service will cause ambigious constructors, this should be properly DI, when old ctor is removed.
+            _userService = StaticServiceProvider.Instance.GetRequiredService<IUserService>();
 
             // resolve dependencies for obsolete methods through the static service provider, so they don't pollute the constructor signature
             _dataTypeContainerService = StaticServiceProvider.Instance.GetRequiredService<IDataTypeContainerService>();
