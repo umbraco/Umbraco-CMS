@@ -36,28 +36,44 @@ export class UmbWorkspaceElement extends UmbLitElement {
 	_routes: Array<IRoute> = [];
 
 	async #createRoutes(workspaceManifest: ManifestWorkspace) {
-		const workspaceContextModule = await workspaceManifest.meta.api();
-		const workspaceContext = new workspaceContextModule.default(this);
-		const paths = await workspaceContext.getPaths();
+		const workspaceContextModule = await workspaceManifest.meta.api?.();
+		const workspaceContext = workspaceContextModule ? new workspaceContextModule.default(this) : undefined;
+		const paths = (await workspaceContext?.getPaths?.()) || [];
 
 		const routes = paths.map((path: any) => {
 			return {
 				path: path.path,
 				component: () => createExtensionElement(workspaceManifest),
-				setup: (component: Promise<UmbWorkspaceEntityElement>, info: IRoutingInfo) => {
-					component.then((element) => {
-						element.manifest = workspaceManifest;
-						const location: UmbRouteLocation = {
-							name: path.name,
-							params: info.match.params,
-						};
-						element.location = location;
-					});
-				},
+				setup: (component: Promise<UmbWorkspaceEntityElement>, info: IRoutingInfo) =>
+					this.#onRouteSetup(component, info, path, workspaceManifest),
 			};
 		});
 
-		this._routes = routes;
+		this._routes = [
+			...routes,
+			{
+				path: '**',
+				component: () => createExtensionElement(workspaceManifest),
+				setup: (component: Promise<UmbWorkspaceEntityElement>, info: IRoutingInfo) =>
+					this.#onRouteSetup(component, info, { name: 'catch-all', params: {} }, workspaceManifest),
+			},
+		];
+	}
+
+	#onRouteSetup(
+		component: Promise<UmbWorkspaceEntityElement>,
+		info: IRoutingInfo,
+		path: any,
+		workspaceManifest: ManifestWorkspace
+	) {
+		component.then((element) => {
+			element.manifest = workspaceManifest;
+			const location: UmbRouteLocation = {
+				name: path.name,
+				params: info.match.params,
+			};
+			element.location = location;
+		});
 	}
 
 	#observeWorkspace() {
