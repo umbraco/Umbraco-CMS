@@ -980,7 +980,7 @@ export const treeData: Array<DocumentTypeTreeItemModel> = [
 		key: 'simple-document-type-key',
 		isContainer: false,
 		parentKey: null,
-		icon: '',
+		icon: 'umb:document',
 	},
 ];
 
