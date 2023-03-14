@@ -5,7 +5,7 @@ namespace Umbraco.Cms.Api.Management.Factories;
 
 public interface IRelationPresentationFactory
 {
-    RelationViewModel Create(IRelation relation);
+    RelationResponseModel Create(IRelation relation);
 
-    IEnumerable<RelationViewModel> CreateMultiple(IEnumerable<IRelation> relations);
+    IEnumerable<RelationResponseModel> CreateMultiple(IEnumerable<IRelation> relations);
 }

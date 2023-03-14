@@ -26,7 +26,7 @@ public abstract class FolderManagementControllerBase<TStatus> : ManagementApiCon
         EntityContainer? parentContainer = await GetParentContainerAsync(container);
 
         // we could implement a mapper for this but it seems rather overkill at this point
-        return Ok(new FolderViewModel
+        return Ok(new FolderReponseModel
         {
             Name = container.Name!,
             Key = container.Key,
@@ -35,14 +35,14 @@ public abstract class FolderManagementControllerBase<TStatus> : ManagementApiCon
     }
 
     protected async Task<IActionResult> CreateFolderAsync<TCreatedActionController>(
-        FolderCreateModel folderCreateModel,
+        CreateFolderRequestModel createFolderRequestModel,
         Expression<Func<TCreatedActionController, string>> createdAction)
     {
-        var container = new EntityContainer(ContainerObjectType) { Name = folderCreateModel.Name };
+        var container = new EntityContainer(ContainerObjectType) { Name = createFolderRequestModel.Name };
 
         Attempt<EntityContainer, TStatus> result = await CreateContainerAsync(
             container,
-            folderCreateModel.ParentKey,
+            createFolderRequestModel.ParentKey,
             CurrentUserKey(_backOfficeSecurityAccessor));
 
         return result.Success
@@ -50,7 +50,7 @@ public abstract class FolderManagementControllerBase<TStatus> : ManagementApiCon
             : OperationStatusResult(result.Status);
     }
 
-    protected async Task<IActionResult> UpdateFolderAsync(Guid key, FolderUpdateModel folderUpdateModel)
+    protected async Task<IActionResult> UpdateFolderAsync(Guid key, UpdateFolderReponseModel updateFolderReponseModel)
     {
         EntityContainer? container = await GetContainerAsync(key);
         if (container == null)
@@ -58,7 +58,7 @@ public abstract class FolderManagementControllerBase<TStatus> : ManagementApiCon
             return NotFound($"Could not find the folder with key: {key}");
         }
 
-        container.Name = folderUpdateModel.Name;
+        container.Name = updateFolderReponseModel.Name;
 
         Attempt<EntityContainer, TStatus> result = await UpdateContainerAsync(container, CurrentUserKey(_backOfficeSecurityAccessor));
         return result.Success

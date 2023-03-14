@@ -10,14 +10,14 @@ public class AllTelemetryController : TelemetryControllerBase
 {
     [HttpGet]
     [MapToApiVersion("1.0")]
-    [ProducesResponseType(typeof(PagedViewModel<TelemetryViewModel>), StatusCodes.Status200OK)]
-    public async Task<PagedViewModel<TelemetryViewModel>> GetAll(int skip, int take)
+    [ProducesResponseType(typeof(PagedViewModel<TelemetryResponseModel>), StatusCodes.Status200OK)]
+    public async Task<PagedViewModel<TelemetryResponseModel>> GetAll(int skip, int take)
     {
         TelemetryLevel[] levels = Enum.GetValues<TelemetryLevel>();
-        return await Task.FromResult(new PagedViewModel<TelemetryViewModel>
+        return await Task.FromResult(new PagedViewModel<TelemetryResponseModel>
         {
             Total = levels.Length,
-            Items = levels.Skip(skip).Take(take).Select(level => new TelemetryViewModel { TelemetryLevel = level }),
+            Items = levels.Skip(skip).Take(take).Select(level => new TelemetryResponseModel { TelemetryLevel = level }),
         });
     }
 }

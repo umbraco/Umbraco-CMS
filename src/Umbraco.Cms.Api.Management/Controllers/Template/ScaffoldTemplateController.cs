@@ -14,11 +14,11 @@ public class ScaffoldTemplateController : TemplateControllerBase
 
     [HttpGet("scaffold")]
     [MapToApiVersion("1.0")]
-    [ProducesResponseType(typeof(TemplateScaffoldViewModel), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(TemplateScaffoldResponseModel), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<ActionResult<TemplateScaffoldViewModel>> Scaffold()
+    public async Task<ActionResult<TemplateScaffoldResponseModel>> Scaffold()
     {
-        var scaffoldViewModel = new TemplateScaffoldViewModel
+        var scaffoldViewModel = new TemplateScaffoldResponseModel
         {
             Content = _defaultViewContentProvider.GetDefaultFileContent()
         };

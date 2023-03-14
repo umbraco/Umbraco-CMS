@@ -28,9 +28,9 @@ public class CreateDataTypeController : DataTypeControllerBase
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> Create(DataTypeCreateModel dataTypeCreateModel)
+    public async Task<IActionResult> Create(CreateDataTypeRequestModel createDataTypeRequestModel)
     {
-        IDataType? created = _umbracoMapper.Map<IDataType>(dataTypeCreateModel)!;
+        IDataType? created = _umbracoMapper.Map<IDataType>(createDataTypeRequestModel)!;
         Attempt<IDataType, DataTypeOperationStatus> result = await _dataTypeService.CreateAsync(created, CurrentUserKey(_backOfficeSecurityAccessor));
 
         return result.Success

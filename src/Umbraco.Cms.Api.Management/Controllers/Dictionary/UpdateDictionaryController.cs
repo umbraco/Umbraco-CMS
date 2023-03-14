@@ -14,16 +14,16 @@ public class UpdateDictionaryController : DictionaryControllerBase
 {
     private readonly IDictionaryItemService _dictionaryItemService;
     private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
-    private readonly IDictionaryFactory _dictionaryFactory;
+    private readonly IDictionaryPresentationFactory _dictionaryPresentationFactory;
 
     public UpdateDictionaryController(
         IDictionaryItemService dictionaryItemService,
         IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
-        IDictionaryFactory dictionaryFactory)
+        IDictionaryPresentationFactory dictionaryPresentationFactory)
     {
         _dictionaryItemService = dictionaryItemService;
         _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
-        _dictionaryFactory = dictionaryFactory;
+        _dictionaryPresentationFactory = dictionaryPresentationFactory;
     }
 
     [HttpPut($"{{{nameof(key)}:guid}}")]
@@ -31,7 +31,7 @@ public class UpdateDictionaryController : DictionaryControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> Update(Guid key, DictionaryItemUpdateModel dictionaryItemUpdateModel)
+    public async Task<IActionResult> Update(Guid key, UpdateDictionaryItemRequestModel updateDictionaryItemRequestModel)
     {
         IDictionaryItem? current = await _dictionaryItemService.GetAsync(key);
         if (current == null)
@@ -39,7 +39,7 @@ public class UpdateDictionaryController : DictionaryControllerBase
             return NotFound();
         }
 
-        IDictionaryItem updated = await _dictionaryFactory.MapUpdateModelToDictionaryItemAsync(current, dictionaryItemUpdateModel);
+        IDictionaryItem updated = await _dictionaryPresentationFactory.MapUpdateModelToDictionaryItemAsync(current, updateDictionaryItemRequestModel);
 
         Attempt<IDictionaryItem, DictionaryItemOperationStatus> result =
             await _dictionaryItemService.UpdateAsync(updated, CurrentUserKey(_backOfficeSecurityAccessor));

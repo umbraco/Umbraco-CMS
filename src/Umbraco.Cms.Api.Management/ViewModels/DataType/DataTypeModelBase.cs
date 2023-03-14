@@ -8,5 +8,5 @@ public abstract class DataTypeModelBase
 
     public string? PropertyEditorUiAlias { get; set; }
 
-    public IEnumerable<DataTypePropertyViewModel> Data { get; set; } = null!;
+    public IEnumerable<DataTypePropertyPresentationModel> Values { get; set; } = null!;
 }

@@ -1,7 +1,9 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Management.ViewModels.Profiling;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Profiling;
 
@@ -14,9 +16,9 @@ public class UpdateStatusProfilingController : ProfilingControllerBase
     [HttpPut("status")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    public async Task<IActionResult> Status(ProfilingStatusViewModel model)
+    public async Task<IActionResult> Status(ProfilingStatusRequestModel model)
     {
-        var result = await _webProfilerService.SetStatus(model.Enabled);
+        Attempt<bool, WebProfilerOperationStatus> result = await _webProfilerService.SetStatus(model.Enabled);
         return result.Success
             ? Ok()
             : WebProfilerOperationStatusResult(result.Status);

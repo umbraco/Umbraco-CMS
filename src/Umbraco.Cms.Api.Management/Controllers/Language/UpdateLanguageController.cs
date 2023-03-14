@@ -32,7 +32,7 @@ public class UpdateLanguageController : LanguageControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    public async Task<IActionResult> Update(string isoCode, LanguageUpdateModel languageUpdateModel)
+    public async Task<IActionResult> Update(string isoCode, UpdateLanguageRequestModel updateLanguageRequestModel)
     {
         ILanguage? current = await _languageService.GetAsync(isoCode);
         if (current is null)
@@ -40,7 +40,7 @@ public class UpdateLanguageController : LanguageControllerBase
             return NotFound();
         }
 
-        ILanguage updated = _umbracoMapper.Map(languageUpdateModel, current);
+        ILanguage updated = _umbracoMapper.Map(updateLanguageRequestModel, current);
 
         Attempt<ILanguage, LanguageOperationStatus> result = await _languageService.UpdateAsync(updated, CurrentUserKey(_backOfficeSecurityAccessor));
 

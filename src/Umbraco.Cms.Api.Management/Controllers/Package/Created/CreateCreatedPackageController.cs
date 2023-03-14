@@ -29,16 +29,16 @@ public class CreateCreatedPackageController : CreatedPackageControllerBase
     /// <summary>
     ///     Creates a package.
     /// </summary>
-    /// <param name="packageCreateModel">The model containing the data for a new package.</param>
+    /// <param name="createPackageRequestModel">The model containing the data for a new package.</param>
     /// <returns>The created package.</returns>
     [HttpPost]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status201Created)]
-    public async Task<IActionResult> Create(PackageCreateModel packageCreateModel)
+    public async Task<IActionResult> Create(CreatePackageRequestModel createPackageRequestModel)
     {
-        PackageDefinition packageDefinition = _packageDefinitionFactory.CreatePackageDefinition(packageCreateModel);
+        PackageDefinition packageDefinition = _packageDefinitionFactory.CreatePackageDefinition(createPackageRequestModel);
 
         Attempt<PackageDefinition, PackageOperationStatus> result = await _packagingService.CreateCreatedPackageAsync(packageDefinition, CurrentUserKey(_backOfficeSecurityAccessor));
 

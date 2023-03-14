@@ -8,7 +8,7 @@ internal static class ModelsBuilderBuilderExtensions
 {
     internal static IUmbracoBuilder AddModelsBuilder(this IUmbracoBuilder builder)
     {
-        builder.Services.AddTransient<IModelsBuilderViewModelFactory, ModelsBuilderViewModelFactory>();
+        builder.Services.AddTransient<IModelsBuilderPresentationFactory, ModelsBuilderPresentationFactory>();
 
         return builder;
     }

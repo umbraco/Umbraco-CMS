@@ -28,6 +28,8 @@ public class ManagementApiComposer : IComposer
             .AddAuditLogs()
             .AddDocuments()
             .AddDocumentTypes()
+            .AddMedia()
+            .AddMediaTypes()
             .AddLanguages()
             .AddDictionary()
             .AddFileUpload()

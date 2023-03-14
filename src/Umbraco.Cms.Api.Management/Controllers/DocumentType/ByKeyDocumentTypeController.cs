@@ -20,7 +20,7 @@ public class ByKeyDocumentTypeController : DocumentTypeControllerBase
 
     [HttpGet("{key:guid}")]
     [MapToApiVersion("1.0")]
-    [ProducesResponseType(typeof(DocumentTypeViewModel), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(DocumentTypeResponseModel), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> ByKey(Guid key)
     {
@@ -31,7 +31,7 @@ public class ByKeyDocumentTypeController : DocumentTypeControllerBase
             return NotFound();
         }
 
-        DocumentTypeViewModel model = _umbracoMapper.Map<DocumentTypeViewModel>(contentType)!;
+        DocumentTypeResponseModel model = _umbracoMapper.Map<DocumentTypeResponseModel>(contentType)!;
         return await Task.FromResult(Ok(model));
     }
 }

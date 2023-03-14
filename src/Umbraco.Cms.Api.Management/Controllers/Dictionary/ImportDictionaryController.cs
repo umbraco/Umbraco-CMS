@@ -4,6 +4,7 @@ using Umbraco.Cms.Api.Common.Builders;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Api.Management.Services;
 using Umbraco.Cms.Api.Management.Services.OperationStatus;
+using Umbraco.Cms.Api.Management.ViewModels.Dictionary;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Security;
 
@@ -27,12 +28,12 @@ public class ImportDictionaryController : DictionaryControllerBase
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> Import(ViewModels.Dictionary.DictionaryImportModel dictionaryImportModel)
+    public async Task<IActionResult> Import(ImportDictionaryRequestModel importDictionaryRequestModel)
     {
         Attempt<IDictionaryItem?, DictionaryImportOperationStatus> result = await _dictionaryItemImportService
             .ImportDictionaryItemFromUdtFileAsync(
-                dictionaryImportModel.FileName,
-                dictionaryImportModel.ParentKey,
+                importDictionaryRequestModel.FileName,
+                importDictionaryRequestModel.ParentKey,
                 CurrentUserKey(_backOfficeSecurityAccessor));
 
         return result.Status switch
