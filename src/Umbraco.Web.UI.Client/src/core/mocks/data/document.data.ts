@@ -47,7 +47,17 @@ export const data: Array<DocumentModel> = [
 				alias: 'multiUrlPicker',
 				culture: null,
 				segment: null,
-				value: null,
+				value: [
+					{
+						name: undefined,
+						published: undefined,
+						queryString: undefined,
+						target: undefined,
+						trashed: undefined,
+						udi: 'umb://document/c05da24d7740447b9cdcbd8ce2172e38',
+						url: 'umb://document/c05da24d7740447b9cdcbd8ce2172e38',
+					},
+				],
 			},
 			{
 				alias: 'multiNodeTreePicker',

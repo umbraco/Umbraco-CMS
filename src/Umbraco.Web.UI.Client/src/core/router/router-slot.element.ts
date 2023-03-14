@@ -44,7 +44,6 @@ export class UmbRouterSlotElement extends UmbLitElement {
 
 	#routeContext = new UmbRouteContext(this, (contextRoutes) => {
 		(this.#modalRouter as any).routes = contextRoutes;
-		console.log(this.absoluteRouterPath, this.#router, this.#modalRouter, 'Router got context routes', contextRoutes);
 		// Force a render?
 		this.#modalRouter.render();
 	});

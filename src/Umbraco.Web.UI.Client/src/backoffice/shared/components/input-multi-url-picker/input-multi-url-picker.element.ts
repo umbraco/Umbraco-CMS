@@ -3,10 +3,9 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, property } from 'lit/decorators.js';
 import { FormControlMixin } from '@umbraco-ui/uui-base/lib/mixins';
 import { UUIModalSidebarSize } from '@umbraco-ui/uui-modal-sidebar';
-import { UmbRouteContext, UMB_ROUTE_CONTEXT_TOKEN } from '@umbraco-cms/router';
+import { UmbModalRouteBuilder, UmbRouteContext, UMB_ROUTE_CONTEXT_TOKEN } from '@umbraco-cms/router';
 import { UmbLinkPickerLink, UMB_LINK_PICKER_MODAL_TOKEN } from '../../modals/link-picker';
 import { UmbLitElement } from '@umbraco-cms/element';
-import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN } from '@umbraco-cms/modal';
 
 /**
  * @element umb-input-multi-url-picker
@@ -88,7 +87,7 @@ export class UmbInputMultiUrlPickerElement extends FormControlMixin(UmbLitElemen
 	@property({ attribute: false })
 	set urls(data: Array<UmbLinkPickerLink>) {
 		if (!data) return;
-		this._urls = data;
+		this._urls = [...data]; // Unfreeze data coming from State, so we can manipulate it.
 		super.value = this._urls.map((x) => x.url).join(',');
 	}
 
@@ -97,8 +96,10 @@ export class UmbInputMultiUrlPickerElement extends FormControlMixin(UmbLitElemen
 	}
 
 	private _urls: Array<UmbLinkPickerLink> = [];
-	private _modalContext?: UmbModalContext;
+	//private _modalContext?: UmbModalContext;
 	private _routeContext?: UmbRouteContext;
+
+	private _linkPickerURL?: UmbModalRouteBuilder;
 
 	constructor() {
 		super();
@@ -113,9 +114,11 @@ export class UmbInputMultiUrlPickerElement extends FormControlMixin(UmbLitElemen
 			() => !!this.max && this.urls.length > this.max
 		);
 
+		/*
 		this.consumeContext(UMB_MODAL_CONTEXT_TOKEN, (instance) => {
 			this._modalContext = instance;
 		});
+		*/
 
 		this.consumeContext(UMB_ROUTE_CONTEXT_TOKEN, (instance) => {
 			this._routeContext = instance;
@@ -123,16 +126,29 @@ export class UmbInputMultiUrlPickerElement extends FormControlMixin(UmbLitElemen
 			// Registre the routes of this UI:
 			// TODO: To avoid retriving the property alias, we might make use of the property context?
 			// Or maybe its not the property-alias, but something unique? as this might not be in a property?.
-			this._routeContext.registerModal(UMB_LINK_PICKER_MODAL_TOKEN, {
-				//path: `${'to-do-myPropertyAlias'}/:index`,
-				path: `modal`,
-				onSetup: (routeInfo) => {
+			this._linkPickerURL = this._routeContext.registerModal(UMB_LINK_PICKER_MODAL_TOKEN, {
+				path: `${'to-do-myPropertyAlias'}/:index`,
+				onSetup: (routingInfo) => {
 					// Get index from routeInfo:
-					const index = 0;
+					const indexParam = routingInfo.match.params.index;
+					if (!indexParam) return false;
+					let index: number | null = parseInt(routingInfo.match.params.index);
+					if (Number.isNaN(index)) return false;
+
 					// Use the index to find data:
-					console.log('onSetup modal', routeInfo);
-					/*
-					modaldata = {
+					console.log('onSetup modal index:', index);
+
+					let data: UmbLinkPickerLink | null = null;
+					if (index >= 0 && index < this.urls.length) {
+						data = this._getItemByIndex(index);
+					} else {
+						index = null;
+					}
+
+					console.log('onSetup modal got data:', data);
+
+					const modalData = {
+						index: index,
 						link: {
 							name: data?.name,
 							published: data?.published,
@@ -148,14 +164,12 @@ export class UmbInputMultiUrlPickerElement extends FormControlMixin(UmbLitElemen
 							overlaySize: this.overlaySize || 'small',
 						},
 					};
-					return modaldata;
-					*/
+					return modalData;
 				},
-				onSubmit: (newUrl) => {
-					if (!newUrl) return;
-
-					const index = 0; // TODO: get the index in some way?.
-					this._setSelection(newUrl, index);
+				onSubmit: (submitData) => {
+					console.log('On submit in property editor input');
+					if (!submitData) return;
+					this._setSelection(submitData.link, submitData.index);
 				},
 				onReject: () => {
 					console.log('User cancelled dialog.');
@@ -169,9 +183,16 @@ export class UmbInputMultiUrlPickerElement extends FormControlMixin(UmbLitElemen
 		this._dispatchChangeEvent();
 	}
 
-	private _setSelection(selection: UmbLinkPickerLink, index?: number) {
-		if (index !== undefined && index >= 0) this.urls[index] = selection;
-		else this.urls.push(selection);
+	private _getItemByIndex(index: number) {
+		return this.urls[index];
+	}
+
+	private _setSelection(selection: UmbLinkPickerLink, index: number | null) {
+		if (index !== null && index >= 0) {
+			this.urls[index] = selection;
+		} else {
+			this.urls.push(selection);
+		}
 
 		this._dispatchChangeEvent();
 	}
@@ -182,6 +203,8 @@ export class UmbInputMultiUrlPickerElement extends FormControlMixin(UmbLitElemen
 	}
 
 	private _openPicker(data?: UmbLinkPickerLink, index?: number) {
+		console.log('JS open picker, should fail for now,');
+		/*
 		const modalHandler = this._modalContext?.open(UMB_LINK_PICKER_MODAL_TOKEN, {
 			link: {
 				name: data?.name,
@@ -203,11 +226,13 @@ export class UmbInputMultiUrlPickerElement extends FormControlMixin(UmbLitElemen
 
 			this._setSelection(newUrl, index);
 		});
+		*/
 	}
 
 	render() {
 		return html`${this.urls?.map((link, index) => this._renderItem(link, index))}
-			<uui-button look="placeholder" label="Add" @click=${this._openPicker}>Add</uui-button>`;
+			<uui-button look="placeholder" label="Add" .href=${this._linkPickerURL?.({ index: -1 })}>Add</uui-button>`;
+		// "modal/Umb.Modal.LinkPicker/${'to-do-myPropertyAlias'}/-1"
 	}
 
 	private _renderItem(link: UmbLinkPickerLink, index: number) {
@@ -217,10 +242,11 @@ export class UmbInputMultiUrlPickerElement extends FormControlMixin(UmbLitElemen
 			@open="${() => this._openPicker(link, index)}">
 			<uui-icon slot="icon" name="${link.icon || 'umb:link'}"></uui-icon>
 			<uui-action-bar slot="actions">
-				<uui-button @click="${() => this._openPicker(link, index)}" label="Edit link">Edit</uui-button>
+				<uui-button .href=${this._linkPickerURL?.({ index })} label="Edit link">Edit</uui-button>
 				<uui-button @click="${() => this._removeItem(index)}" label="Remove link">Remove</uui-button>
 			</uui-action-bar>
 		</uui-ref-node>`;
+		// "modal/Umb.Modal.LinkPicker/${'to-do-myPropertyAlias'}/${index}"
 	}
 }
 

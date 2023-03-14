@@ -53,6 +53,7 @@ export class UmbPropertyEditorUIMultiUrlPickerElement extends UmbLitElement impl
 
 	private _onChange(event: CustomEvent) {
 		this.value = (event.target as UmbInputMultiUrlPickerElement).urls;
+		console.log(this.value);
 		this.dispatchEvent(new CustomEvent('property-value-change'));
 	}
 

@@ -76,7 +76,7 @@ export class UmbModalContext {
 	 * @return {*}  {UmbModalHandler}
 	 * @memberof UmbModalContext
 	 */
-	public open<ModalData = unknown, ModalResult = unknown>(
+	public open<ModalData extends object = { [key: string]: unknown }, ModalResult = unknown>(
 		modalAlias: string | UmbModalToken<ModalData, ModalResult>,
 		data?: ModalData,
 		config?: UmbModalConfig

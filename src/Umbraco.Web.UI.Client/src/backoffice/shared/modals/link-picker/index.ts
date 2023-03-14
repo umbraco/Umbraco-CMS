@@ -2,11 +2,12 @@ import { UUIModalSidebarSize } from '@umbraco-ui/uui-modal-sidebar';
 import { UmbModalToken } from '@umbraco-cms/modal';
 
 export interface UmbLinkPickerModalData {
+	index: number | null;
 	link: UmbLinkPickerLink;
 	config: UmbLinkPickerConfig;
 }
 
-export type UmbLinkPickerModalResult = UmbLinkPickerLink;
+export type UmbLinkPickerModalResult = { index: number | null; link: UmbLinkPickerLink };
 
 export interface UmbLinkPickerLink {
 	icon?: string | null;
