@@ -70,12 +70,10 @@ export class UmbDocumentWorkspaceContext
 	async getPaths() {
 		return [
 			{
-				name: 'edit',
 				path: 'edit/:key',
 			},
 			{
-				name: 'create',
-				path: 'create/:parentKey/type/:documentTypeKey',
+				path: 'create/:parentKey/:documentTypeKey',
 			},
 		];
 	}

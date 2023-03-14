@@ -30,7 +30,7 @@ export class UmbCreateDocumentEntityAction extends UmbEntityActionBase<UmbDocume
 
 			const { documentTypeKey } = await modalHandler.onSubmit();
 			// TODO: how do we want to generate these urls?
-			history.pushState(null, '', `/section/content/workspace/document/create/${this.unique}/type/${documentTypeKey}`);
+			history.pushState(null, '', `/section/content/workspace/document/create/${this.unique}/${documentTypeKey}`);
 		}
 	}
 }
