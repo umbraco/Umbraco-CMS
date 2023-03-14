@@ -134,7 +134,8 @@ export class UmbDocumentTypeRepository implements UmbTreeRepository, UmbDetailRe
 		return this.#detailStore!.byKey(key);
 	}
 
-	async requestAllowedTypes(key: string) {
+	// TODO: we need to figure out where to put this
+	async requestAllowedChildTypesOf(key: string) {
 		if (!key) throw new Error('Key is missing');
 		await this.#init;
 		return this.#detailDataSource.getAllowedChildrenOf(key);
