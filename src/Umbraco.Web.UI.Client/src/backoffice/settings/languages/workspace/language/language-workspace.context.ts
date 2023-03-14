@@ -16,6 +16,19 @@ export class UmbLanguageWorkspaceContext extends UmbWorkspaceContext<UmbLanguage
 		super(host, new UmbLanguageRepository(host));
 	}
 
+	async getPaths() {
+		return [
+			{
+				name: 'edit',
+				path: 'edit/:isoCode',
+			},
+			{
+				name: 'create',
+				path: 'create',
+			},
+		];
+	}
+
 	async load(isoCode: string) {
 		const { data } = await this.repository.requestByIsoCode(isoCode);
 		if (data) {
@@ -69,3 +82,5 @@ export class UmbLanguageWorkspaceContext extends UmbWorkspaceContext<UmbLanguage
 		this.#data.complete();
 	}
 }
+
+export default UmbLanguageWorkspaceContext;

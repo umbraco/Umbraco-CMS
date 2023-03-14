@@ -1,4 +1,3 @@
-import { LANGUAGE_REPOSITORY_ALIAS } from '../../repository/manifests';
 import { UmbSaveWorkspaceAction } from '@umbraco-cms/workspace';
 import type { ManifestWorkspace, ManifestWorkspaceAction, ManifestWorkspaceView } from '@umbraco-cms/models';
 
@@ -9,6 +8,7 @@ const workspace: ManifestWorkspace = {
 	loader: () => import('./language-workspace.element'),
 	meta: {
 		entityType: 'language',
+		api: () => import('./language-workspace.context'),
 	},
 };
 
