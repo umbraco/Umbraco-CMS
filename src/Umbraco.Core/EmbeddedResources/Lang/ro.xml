@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<language alias="ro" intName="Romanian (Romania)" localName="romana (Romania)" lcid="" culture="ro-RO">
+  <creator>
+    <name>The Umbraco community</name>
+    <link>https://docs.umbraco.com/umbraco-cms/extending/language-files</link>
+  </creator>
+  <area alias="sections">
+    <key alias="concierge">Concierge</key>
+    <key alias="content">Content</key>
+    <key alias="courier">Courier</key>
+    <key alias="developer">Developer</key>
+    <key alias="forms">Forms</key>
+    <key alias="help" version="7.0">Help</key>
+    <key alias="installer">Umbraco Configuration Wizard</key>
+    <key alias="media">Media</key>
+    <key alias="member">Members</key>
+    <key alias="newsletters">Newsletters</key>
+    <key alias="packages">Packages</key>
+    <key alias="marketplace">Marketplace</key>
+    <key alias="settings">Settings</key>
+    <key alias="statistics">Statistics</key>
+    <key alias="translation">Translation</key>
+    <key alias="users">Users</key>
+  </area>
+</language>
