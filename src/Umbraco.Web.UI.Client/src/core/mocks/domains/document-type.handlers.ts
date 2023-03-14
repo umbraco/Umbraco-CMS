@@ -67,8 +67,17 @@ export const handlers = [
 		const key = req.params.key as string;
 		if (!key) return;
 
-		const document = umbDocumentTypeData.getByKey(key);
+		const documentType = umbDocumentTypeData.getByKey(key);
 
-		return res(ctx.status(200), ctx.json(document));
+		return res(ctx.status(200), ctx.json(documentType));
+	}),
+
+	rest.get('/umbraco/management/api/v1/document-type/allowed-children-of/:key', (req, res, ctx) => {
+		const key = req.params.key as string;
+		if (!key) return;
+
+		const items = umbDocumentTypeData.getAllowedTypesOf(key);
+
+		return res(ctx.status(200), ctx.json(items));
 	}),
 ];
