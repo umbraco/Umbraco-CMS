@@ -708,7 +708,7 @@
                         } else 
                         if(allowance.elementTypeKey) {
                             const blockType = vm.availableBlockTypes.find(x => x.blockConfigModel.contentElementTypeKey === allowance.elementTypeKey);
-                            if(allowedElementTypes.indexOf(blockType) === -1) {
+                            if(blockType && allowedElementTypes.indexOf(blockType) === -1) {
                                 allowedElementTypes.push(blockType);
                             }
                         }
