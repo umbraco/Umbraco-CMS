@@ -41,61 +41,8 @@ export class UmbRouteContext {
 			this.#modalContext = context;
 			this.#generateContextRoutes();
 		});
-
-		// Consider using this event, to stay up to date with current full-URL. which is necessary for Modal opening.
-		window.addEventListener('navigationsuccess', this.#onNavigationChanged as unknown as EventListener);
 	}
 
-	#removeModalPath(info: IRoutingInfo) {
-		window.history.pushState({}, '', window.location.href.split(info.match.fragments.consumed)[0]);
-	}
-
-	#generateRoute(modalRegistration: UmbModalRouteRegistration): IRoute {
-		const localPath = `modal/${modalRegistration.alias.toString()}/${modalRegistration.options.path}`;
-		return {
-			path: localPath,
-			pathMatch: 'suffix',
-			component: EmptyDiv,
-			setup: modalRegistration.routeSetup,
-		};
-	}
-
-	#generateContextRoutes() {
-		this.#contextRoutes = this.#modalRegistrations.map((modalRegistration) => {
-			return this.#generateRoute(modalRegistration);
-		});
-
-		// TODO: Should we await one frame, to ensure we don't call back too much?.
-		this._onGotModals(this.#contextRoutes);
-	}
-
-	#onNavigationChanged = (event: Event) => {
-		console.log('route got navigation changed', event);
-		this.#generateNewURLs();
-	};
-
-	#generateNewURLs() {
-		this.#modalRegistrations.forEach(this.#generateNewURL);
-	}
-
-	#generateNewURL = (modalRegistration: UmbModalRouteRegistration) => {
-		if (!modalRegistration.options.onUrlBuilder || !this.#routerBasePath) return;
-
-		const routeBasePath = this.#routerBasePath.endsWith('/') ? this.#routerBasePath : this.#routerBasePath + '/';
-		const localPath = `modal/${modalRegistration.alias.toString()}/${modalRegistration.options.path}`;
-
-		const urlBuilder = (params: { [key: string]: string | number }) => {
-			const localRoutePath = stripSlash(
-				localPath.replace(PARAM_IDENTIFIER, (substring: string, ...args: string[]) => {
-					return params[args[0]].toString();
-					//return `([^\/]+)`;
-				})
-			);
-			return routeBasePath + localRoutePath;
-		};
-
-		modalRegistration.options.onUrlBuilder(urlBuilder);
-	};
 	public registerModal<D extends object = object, R = any>(
 		alias: UmbModalToken<D, R> | string,
 		options: UmbModalRouteOptions<D, R>
@@ -125,6 +72,52 @@ export class UmbRouteContext {
 		this.#routerBasePath = routerBasePath;
 		this.#generateNewURLs();
 	}
+
+	#removeModalPath(info: IRoutingInfo) {
+		window.history.pushState({}, '', window.location.href.split(info.match.fragments.consumed)[0]);
+	}
+
+	#generateRoute(modalRegistration: UmbModalRouteRegistration): IRoute {
+		const localPath = `modal/${modalRegistration.alias.toString()}/${modalRegistration.options.path}`;
+		return {
+			path: localPath,
+			pathMatch: 'suffix',
+			component: EmptyDiv,
+			setup: modalRegistration.routeSetup,
+		};
+	}
+
+	#generateContextRoutes() {
+		this.#contextRoutes = this.#modalRegistrations.map((modalRegistration) => {
+			return this.#generateRoute(modalRegistration);
+		});
+
+		// TODO: Should we await one frame, to ensure we don't call back too much?.
+		this._onGotModals(this.#contextRoutes);
+	}
+
+	#generateNewURLs() {
+		this.#modalRegistrations.forEach(this.#generateNewURL);
+	}
+
+	#generateNewURL = (modalRegistration: UmbModalRouteRegistration) => {
+		if (!modalRegistration.options.onUrlBuilder || !this.#routerBasePath) return;
+
+		const routeBasePath = this.#routerBasePath.endsWith('/') ? this.#routerBasePath : this.#routerBasePath + '/';
+		const localPath = `modal/${modalRegistration.alias.toString()}/${modalRegistration.options.path}`;
+
+		const urlBuilder = (params: { [key: string]: string | number }) => {
+			const localRoutePath = stripSlash(
+				localPath.replace(PARAM_IDENTIFIER, (substring: string, ...args: string[]) => {
+					return params[args[0]].toString();
+					//return `([^\/]+)`;
+				})
+			);
+			return routeBasePath + localRoutePath;
+		};
+
+		modalRegistration.options.onUrlBuilder(urlBuilder);
+	};
 }
 
 export const UMB_ROUTE_CONTEXT_TOKEN = new UmbContextToken<UmbRouteContext>('UmbRouterContext');
