@@ -3,19 +3,9 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, property } from 'lit/decorators.js';
 import { FormControlMixin } from '@umbraco-ui/uui-base/lib/mixins';
 import { UUIModalSidebarSize } from '@umbraco-ui/uui-modal-sidebar';
+import { UmbLinkPickerLink, UMB_LINK_PICKER_MODAL_TOKEN } from '../../modals/link-picker';
 import { UmbLitElement } from '@umbraco-cms/element';
 import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN } from '@umbraco-cms/modal';
-
-export interface MultiUrlData {
-	icon?: string;
-	name?: string;
-	published?: boolean;
-	queryString?: string;
-	target?: string;
-	trashed?: boolean;
-	udi?: string;
-	url?: string;
-}
 
 /**
  * @element umb-input-multi-url-picker
@@ -91,11 +81,11 @@ export class UmbInputMultiUrlPickerElement extends FormControlMixin(UmbLitElemen
 	overlaySize?: UUIModalSidebarSize;
 
 	/**
-	 * @type {Array<MultiUrlData>}
+	 * @type {Array<UmbLinkPickerLink>}
 	 * @default []
 	 */
 	@property({ attribute: false })
-	set urls(data: Array<MultiUrlData>) {
+	set urls(data: Array<UmbLinkPickerLink>) {
 		if (!data) return;
 		this._urls = data;
 		super.value = this._urls.map((x) => x.url).join(',');
@@ -105,7 +95,7 @@ export class UmbInputMultiUrlPickerElement extends FormControlMixin(UmbLitElemen
 		return this._urls;
 	}
 
-	private _urls: Array<MultiUrlData> = [];
+	private _urls: Array<UmbLinkPickerLink> = [];
 	private _modalContext?: UmbModalContext;
 
 	constructor() {
@@ -131,7 +121,7 @@ export class UmbInputMultiUrlPickerElement extends FormControlMixin(UmbLitElemen
 		this._dispatchChangeEvent();
 	}
 
-	private _setSelection(selection: MultiUrlData, index?: number) {
+	private _setSelection(selection: UmbLinkPickerLink, index?: number) {
 		if (index !== undefined && index >= 0) this.urls[index] = selection;
 		else this.urls.push(selection);
 
@@ -143,8 +133,8 @@ export class UmbInputMultiUrlPickerElement extends FormControlMixin(UmbLitElemen
 		this.dispatchEvent(new CustomEvent('change', { composed: true, bubbles: true }));
 	}
 
-	private _openPicker(data?: MultiUrlData, index?: number) {
-		const modalHandler = this._modalContext?.linkPicker({
+	private _openPicker(data?: UmbLinkPickerLink, index?: number) {
+		const modalHandler = this._modalContext?.open(UMB_LINK_PICKER_MODAL_TOKEN, {
 			link: {
 				name: data?.name,
 				published: data?.published,
@@ -160,8 +150,9 @@ export class UmbInputMultiUrlPickerElement extends FormControlMixin(UmbLitElemen
 				overlaySize: this.overlaySize || 'small',
 			},
 		});
-		modalHandler?.onClose().then((newUrl: MultiUrlData) => {
+		modalHandler?.onSubmit().then((newUrl: UmbLinkPickerLink) => {
 			if (!newUrl) return;
+
 			this._setSelection(newUrl, index);
 		});
 	}
@@ -171,7 +162,7 @@ export class UmbInputMultiUrlPickerElement extends FormControlMixin(UmbLitElemen
 			<uui-button look="placeholder" label="Add" @click=${this._openPicker}>Add</uui-button>`;
 	}
 
-	private _renderItem(link: MultiUrlData, index: number) {
+	private _renderItem(link: UmbLinkPickerLink, index: number) {
 		return html`<uui-ref-node
 			.name="${link.name || ''}"
 			.detail="${(link.url || '') + (link.queryString || '')}"

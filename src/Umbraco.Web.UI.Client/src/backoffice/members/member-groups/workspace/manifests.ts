@@ -1,4 +1,3 @@
-import { MEMBER_GROUP_REPOSITORY_ALIAS } from '../repository/manifests';
 import { UmbSaveWorkspaceAction } from '@umbraco-cms/workspace';
 import type { ManifestWorkspace, ManifestWorkspaceAction, ManifestWorkspaceView } from '@umbraco-cms/models';
 

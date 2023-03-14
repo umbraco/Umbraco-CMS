@@ -4,6 +4,7 @@ import { customElement, state } from 'lit/decorators.js';
 import { UmbWorkspaceDocumentTypeContext } from '../../document-type-workspace.context';
 import { UmbLitElement } from '@umbraco-cms/element';
 import type { DocumentTypeModel } from '@umbraco-cms/backend-api';
+import '../../../../../shared/property-creator/property-creator.element.ts';
 
 @customElement('umb-workspace-view-document-type-design')
 export class UmbWorkspaceViewDocumentTypeDesignElement extends UmbLitElement {
@@ -12,6 +13,7 @@ export class UmbWorkspaceViewDocumentTypeDesignElement extends UmbLitElement {
 		css`
 			:host {
 				display: block;
+				margin: var(--uui-size-space-6);
 				padding: var(--uui-size-space-6);
 			}
 		`,
@@ -41,7 +43,12 @@ export class UmbWorkspaceViewDocumentTypeDesignElement extends UmbLitElement {
 	}
 
 	render() {
-		return html`Design of ${this._documentType?.name}`;
+		return html` Design of ${this._documentType?.name}
+			<uui-box headline=${this._documentType?.name ?? ''}>
+				<div>
+					<umb-property-creator></umb-property-creator>
+				</div>
+			</uui-box>`;
 	}
 }
 

@@ -1,7 +1,8 @@
 import { html } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, property, state } from 'lit/decorators.js';
-import { UmbInputToggleElement } from '../../../components/input-toggle/input-toggle-element';
+import { UmbInputToggleElement } from '../../../components/input-toggle/input-toggle.element';
+import { UmbPropertyEditorElement } from '@umbraco-cms/property-editor';
 import { UmbLitElement } from '@umbraco-cms/element';
 import { DataTypePropertyModel } from '@umbraco-cms/backend-api';
 
@@ -9,7 +10,7 @@ import { DataTypePropertyModel } from '@umbraco-cms/backend-api';
  * @element umb-property-editor-ui-toggle
  */
 @customElement('umb-property-editor-ui-toggle')
-export class UmbPropertyEditorUIToggleElement extends UmbLitElement {
+export class UmbPropertyEditorUIToggleElement extends UmbLitElement implements UmbPropertyEditorElement {
 	static styles = [UUITextStyles];
 
 	@property()

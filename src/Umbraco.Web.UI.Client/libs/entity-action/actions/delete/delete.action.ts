@@ -1,3 +1,4 @@
+import { UMB_CONFIRM_MODAL_TOKEN } from '../../../../src/backoffice/shared/modals/confirm';
 import { UmbEntityActionBase } from '@umbraco-cms/entity-action';
 import { UmbContextConsumerController } from '@umbraco-cms/context-api';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
@@ -24,17 +25,15 @@ export class UmbDeleteEntityAction<
 		if (data) {
 			const item = data[0];
 
-			const modalHandler = this.#modalContext.confirm({
+			const modalHandler = this.#modalContext.open(UMB_CONFIRM_MODAL_TOKEN, {
 				headline: `Delete ${item.name}`,
 				content: 'Are you sure you want to delete this item?',
 				color: 'danger',
 				confirmLabel: 'Delete',
 			});
 
-			const { confirmed } = await modalHandler.onClose();
-			if (confirmed) {
-				await this.repository?.delete(this.unique);
-			}
+			await modalHandler.onSubmit();
+			await this.repository?.delete(this.unique);
 		}
 	}
 }

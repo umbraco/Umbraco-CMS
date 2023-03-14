@@ -1,6 +1,7 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html, nothing, TemplateResult } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
+import { UMB_CONTEXT_DEBUGGER_MODAL_TOKEN } from './modals/debug';
 import { UmbContextDebugRequest } from '@umbraco-cms/context-api';
 import { UmbLitElement } from '@umbraco-cms/element';
 import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN } from '@umbraco-cms/modal';
@@ -102,10 +103,8 @@ export class UmbDebug extends UmbLitElement {
 	}
 
 	private _openDialog() {
-		this._modalContext?.openBasic({
-			header: html`<uui-icon name="umb:bug"></uui-icon> Debug: Contexts`,
-			content: this._htmlContent(),
-			overlaySize: 'small',
+		this._modalContext?.open(UMB_CONTEXT_DEBUGGER_MODAL_TOKEN, {
+			content: html`${this._renderContextAliases()}`,
 		});
 	}
 
@@ -125,17 +124,13 @@ export class UmbDebug extends UmbLitElement {
 			</uui-button>
 
 			<div class="events ${this._debugPaneOpen ? 'open' : ''}">
-				<div>${this._htmlContent()}</div>
+				<div>
+					<ul>
+						${this._renderContextAliases()}
+					</ul>
+				</div>
 			</div>
 		</div>`;
-	}
-
-	private _htmlContent() {
-		return html`
-			<ul>
-				${this._renderContextAliases()}
-			</ul>
-		`;
 	}
 
 	private _renderContextAliases() {

@@ -717,6 +717,25 @@ export const data: Array<DocumentTypeModel> = [
 					labelOnTop: true,
 				},
 			},
+			{
+				key: '22',
+				containerKey: '2c943997-b685-432d-a6c5-601d8e7a298a',
+				alias: 'blockGrid',
+				name: 'Block Grid',
+				description: '',
+				dataTypeKey: 'dt-blockGrid',
+				variesByCulture: false,
+				variesBySegment: false,
+				validation: {
+					mandatory: true,
+					mandatoryMessage: null,
+					regEx: null,
+					regExMessage: null,
+				},
+				appearance: {
+					labelOnTop: false,
+				},
+			},
 		],
 		containers: [
 			{

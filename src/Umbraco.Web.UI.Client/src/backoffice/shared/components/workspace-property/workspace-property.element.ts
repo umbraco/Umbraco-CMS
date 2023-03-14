@@ -12,6 +12,7 @@ import '../../../../backoffice/shared/components/workspace/workspace-property-la
 import { UmbObserverController } from '@umbraco-cms/observable-api';
 import { UmbLitElement } from '@umbraco-cms/element';
 import { DataTypePropertyModel } from '@umbraco-cms/backend-api';
+import { UmbPropertyEditorElement } from '@umbraco-cms/property-editor';
 
 /**
  *  @element umb-workspace-property
@@ -118,24 +119,23 @@ export class UmbWorkspacePropertyElement extends UmbLitElement {
 	}
 
 	/**
-	 * VariantId. A Variant Configuration to identify which variant its value is stored on.
+	 * PropertyVariantId. A Variant ID to identify which variant its value is stored on.
 	 * @public
 	 * @type {UmbVariantId}
 	 * @attr
 	 * @default null
 	 */
 	@property({ type: Object, attribute: false })
-	public set variantId(value: UmbVariantId | undefined) {
+	public set propertyVariantId(value: UmbVariantId | undefined) {
 		this._propertyContext.setVariantId(value);
-		this._variantDisplayName = value?.toString();
+		//this._variantDisplayName = value?.toString();
 	}
 
 	@state()
-	private _variantDisplayName?: string;
+	private _variantDifference?: string;
 
-	// TODO: make interface for UMBPropertyEditorElement
 	@state()
-	private _element?: { value?: any; config?: any } & HTMLElement; // TODO: invent interface for propertyEditorUI.
+	private _element?: UmbPropertyEditorElement;
 
 	@state()
 	private _value?: unknown;
@@ -167,6 +167,9 @@ export class UmbWorkspacePropertyElement extends UmbLitElement {
 		});
 		this.observe(this._propertyContext.description, (description) => {
 			this._description = description;
+		});
+		this.observe(this._propertyContext.variantDifference, (variantDifference) => {
+			this._variantDifference = variantDifference;
 		});
 	}
 
@@ -200,7 +203,7 @@ export class UmbWorkspacePropertyElement extends UmbLitElement {
 
 				oldValue?.removeEventListener('change', this._onPropertyEditorChange as any as EventListener);
 
-				this._element = el;
+				this._element = el as UmbPropertyEditorElement;
 
 				this._valueObserver?.destroy();
 				this._configObserver?.destroy();
@@ -215,7 +218,7 @@ export class UmbWorkspacePropertyElement extends UmbLitElement {
 						}
 					});
 					this._configObserver = this.observe(this._propertyContext.config, (config) => {
-						if (this._element) {
+						if (this._element && config) {
 							this._element.config = config;
 						}
 					});
@@ -236,7 +239,9 @@ export class UmbWorkspacePropertyElement extends UmbLitElement {
 				label="${ifDefined(this._label)}"
 				description="${ifDefined(this._description)}">
 				${this._renderPropertyActionMenu()}
-				<p slot="description">${this._variantDisplayName}</p>
+				${this._variantDifference
+					? html`<uui-tag look="secondary" slot="description">${this._variantDifference}</uui-tag>`
+					: ''}
 				<div slot="editor">${this._element}</div>
 			</umb-workspace-property-layout>
 		`;

@@ -3,6 +3,7 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import type { UmbWorkspaceEntityElement } from '../../../shared/components/workspace/workspace-entity-element.interface';
+import { UMB_ICON_PICKER_MODAL_TOKEN } from '../../../shared/modals/icon-picker';
 import { UmbWorkspaceDocumentTypeContext } from './document-type-workspace.context';
 import type { DocumentTypeModel } from '@umbraco-cms/backend-api';
 import { UmbLitElement } from '@umbraco-cms/element';
@@ -86,10 +87,10 @@ export class UmbDocumentTypeWorkspaceElement extends UmbLitElement implements Um
 	}
 
 	private async _handleIconClick() {
-		const modalHandler = this._modalContext?.iconPicker();
+		const modalHandler = this._modalContext?.open(UMB_ICON_PICKER_MODAL_TOKEN);
 
-		modalHandler?.onClose().then((saved) => {
-			if (saved) this._workspaceContext?.setIcon(saved.icon);
+		modalHandler?.onSubmit().then((saved) => {
+			if (saved.icon) this._workspaceContext?.setIcon(saved.icon);
 			// TODO save color ALIAS as well
 		});
 	}

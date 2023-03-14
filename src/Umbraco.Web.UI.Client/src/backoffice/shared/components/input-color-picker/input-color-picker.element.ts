@@ -6,6 +6,10 @@ import { UUIColorSwatchesEvent } from '@umbraco-ui/uui';
 import { UmbLitElement } from '@umbraco-cms/element';
 import type { SwatchDetails } from '@umbraco-cms/models';
 
+/*
+ * This wraps the UUI library uui-color-swatches component
+ * @element umb-input-color-picker
+*/
 @customElement('umb-input-color-picker')
 export class UmbInputColorPickerElement extends FormControlMixin(UmbLitElement) {
 	static styles = [UUITextStyles];

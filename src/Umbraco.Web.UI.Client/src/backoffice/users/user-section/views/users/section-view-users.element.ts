@@ -1,14 +1,14 @@
 import { css, html } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, state } from 'lit/decorators.js';
-import type { IRoute, IRoutingInfo } from 'router-slot';
-import { UmbUserStore, UMB_USER_STORE_CONTEXT_TOKEN } from '../../../users/user.store';
-import { umbExtensionsRegistry , createExtensionElement } from '@umbraco-cms/extensions-api';
+import { UmbUserStore, UMB_USER_STORE_CONTEXT_TOKEN } from '../../../users/repository/user.store';
+import type { IRoute, IRoutingInfo } from '@umbraco-cms/router';
+import { umbExtensionsRegistry, createExtensionElement } from '@umbraco-cms/extensions-api';
 
 import './list-view-layouts/table/workspace-view-users-table.element';
 import './list-view-layouts/grid/workspace-view-users-grid.element';
 import './workspace-view-users-selection.element';
-import './workspace-view-users-invite.element';
+
 import type { ManifestWorkspace, UserDetails } from '@umbraco-cms/models';
 import { UmbLitElement } from '@umbraco-cms/element';
 import { DeepState } from '@umbraco-cms/observable-api';

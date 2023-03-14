@@ -1,5 +1,8 @@
 import { UmbMemberRepository } from './member.repository';
+import { UmbMemberStore } from './member.store';
+import { UmbMemberTreeStore } from './member.tree.store';
 import { ManifestRepository } from 'libs/extensions-registry/repository.models';
+import { ManifestStore, ManifestTreeStore } from '@umbraco-cms/extensions-registry';
 
 export const MEMBER_REPOSITORY_ALIAS = 'Umb.Repository.Member';
 
@@ -10,4 +13,21 @@ const repository: ManifestRepository = {
 	class: UmbMemberRepository,
 };
 
-export const manifests = [repository];
+export const MEMBER_STORE_ALIAS = 'Umb.Store.Member';
+export const MEMBER_TREE_STORE_ALIAS = 'Umb.Store.MemberTree';
+
+const store: ManifestStore = {
+	type: 'store',
+	alias: MEMBER_STORE_ALIAS,
+	name: 'Member Store',
+	class: UmbMemberStore,
+};
+
+const treeStore: ManifestTreeStore = {
+	type: 'treeStore',
+	alias: MEMBER_TREE_STORE_ALIAS,
+	name: 'Member Tree Store',
+	class: UmbMemberTreeStore,
+};
+
+export const manifests = [store, treeStore, repository];

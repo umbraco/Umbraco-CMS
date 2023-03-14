@@ -1,5 +1,4 @@
 import { MemberTreeDataSource } from '.';
-import { ProblemDetailsModel } from '@umbraco-cms/backend-api';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 
 /**

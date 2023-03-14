@@ -1,4 +1,5 @@
-import { UmbCreateDocumentEntityAction } from './create.action';
+import { DOCUMENT_REPOSITORY_ALIAS } from '../repository/manifests';
+import { UmbCreateDocumentEntityAction } from './create/create.action';
 import { UmbPublishDocumentEntityAction } from './publish.action';
 import { UmbDocumentCultureAndHostnamesEntityAction } from './culture-and-hostnames.action';
 import { UmbCreateDocumentBlueprintEntityAction } from './create-blueprint.action';
@@ -12,10 +13,9 @@ import {
 	UmbTrashEntityAction,
 	UmbSortChildrenOfEntityAction,
 } from '@umbraco-cms/entity-action';
-import { ManifestEntityAction } from '@umbraco-cms/extensions-registry';
+import { ManifestEntityAction, ManifestModal } from '@umbraco-cms/extensions-registry';
 
 const entityType = 'document';
-const repositoryAlias = 'Umb.Repository.Documents';
 
 const entityActions: Array<ManifestEntityAction> = [
 	{
@@ -27,7 +27,7 @@ const entityActions: Array<ManifestEntityAction> = [
 			entityType,
 			icon: 'umb:add',
 			label: 'Create',
-			repositoryAlias,
+			repositoryAlias: DOCUMENT_REPOSITORY_ALIAS,
 			api: UmbCreateDocumentEntityAction,
 		},
 	},
@@ -40,7 +40,7 @@ const entityActions: Array<ManifestEntityAction> = [
 			entityType,
 			icon: 'umb:trash',
 			label: 'Trash',
-			repositoryAlias,
+			repositoryAlias: DOCUMENT_REPOSITORY_ALIAS,
 			api: UmbTrashEntityAction,
 		},
 	},
@@ -53,7 +53,7 @@ const entityActions: Array<ManifestEntityAction> = [
 			entityType,
 			icon: 'umb:blueprint',
 			label: 'Create Content Template',
-			repositoryAlias,
+			repositoryAlias: DOCUMENT_REPOSITORY_ALIAS,
 			api: UmbCreateDocumentBlueprintEntityAction,
 		},
 	},
@@ -66,7 +66,7 @@ const entityActions: Array<ManifestEntityAction> = [
 			entityType,
 			icon: 'umb:enter',
 			label: 'Move',
-			repositoryAlias,
+			repositoryAlias: DOCUMENT_REPOSITORY_ALIAS,
 			api: UmbMoveEntityAction,
 		},
 	},
@@ -79,7 +79,7 @@ const entityActions: Array<ManifestEntityAction> = [
 			entityType,
 			icon: 'umb:documents',
 			label: 'Copy',
-			repositoryAlias,
+			repositoryAlias: DOCUMENT_REPOSITORY_ALIAS,
 			api: UmbCopyEntityAction,
 		},
 	},
@@ -92,7 +92,7 @@ const entityActions: Array<ManifestEntityAction> = [
 			entityType,
 			icon: 'umb:navigation-vertical',
 			label: 'Sort',
-			repositoryAlias,
+			repositoryAlias: DOCUMENT_REPOSITORY_ALIAS,
 			api: UmbSortChildrenOfEntityAction,
 		},
 	},
@@ -105,7 +105,7 @@ const entityActions: Array<ManifestEntityAction> = [
 			entityType,
 			icon: 'umb:home',
 			label: 'Culture And Hostnames',
-			repositoryAlias,
+			repositoryAlias: DOCUMENT_REPOSITORY_ALIAS,
 			api: UmbDocumentCultureAndHostnamesEntityAction,
 		},
 	},
@@ -117,7 +117,7 @@ const entityActions: Array<ManifestEntityAction> = [
 			entityType,
 			icon: 'umb:vcard',
 			label: 'Permissions',
-			repositoryAlias,
+			repositoryAlias: DOCUMENT_REPOSITORY_ALIAS,
 			api: UmbDocumentPermissionsEntityAction,
 		},
 	},
@@ -129,7 +129,7 @@ const entityActions: Array<ManifestEntityAction> = [
 			entityType,
 			icon: 'umb:lock',
 			label: 'Public Access',
-			repositoryAlias,
+			repositoryAlias: DOCUMENT_REPOSITORY_ALIAS,
 			api: UmbDocumentPublicAccessEntityAction,
 		},
 	},
@@ -141,19 +141,7 @@ const entityActions: Array<ManifestEntityAction> = [
 			entityType,
 			icon: 'umb:globe',
 			label: 'Publish',
-			repositoryAlias,
-			api: UmbPublishDocumentEntityAction,
-		},
-	},
-	{
-		type: 'entityAction',
-		alias: 'Umb.EntityAction.Document.Publish',
-		name: 'Publish Document Entity Action',
-		meta: {
-			entityType,
-			icon: 'umb:globe',
-			label: 'Publish',
-			repositoryAlias,
+			repositoryAlias: DOCUMENT_REPOSITORY_ALIAS,
 			api: UmbPublishDocumentEntityAction,
 		},
 	},
@@ -165,7 +153,7 @@ const entityActions: Array<ManifestEntityAction> = [
 			entityType,
 			icon: 'umb:globe',
 			label: 'Unpublish',
-			repositoryAlias,
+			repositoryAlias: DOCUMENT_REPOSITORY_ALIAS,
 			api: UmbUnpublishDocumentEntityAction,
 		},
 	},
@@ -177,10 +165,19 @@ const entityActions: Array<ManifestEntityAction> = [
 			entityType,
 			icon: 'umb:undo',
 			label: 'Rollback',
-			repositoryAlias,
+			repositoryAlias: DOCUMENT_REPOSITORY_ALIAS,
 			api: UmbRollbackDocumentEntityAction,
 		},
 	},
 ];
 
-export const manifests = [...entityActions];
+const modals: Array<ManifestModal> = [
+	{
+		type: 'modal',
+		alias: 'Umb.Modal.CreateDocument',
+		name: 'Create Document Modal',
+		loader: () => import('./create/create-document-modal.element'),
+	},
+];
+
+export const manifests = [...entityActions, ...modals];

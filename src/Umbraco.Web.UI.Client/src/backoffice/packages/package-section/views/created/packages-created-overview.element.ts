@@ -7,6 +7,7 @@ import { PackageDefinitionModel, PackageResource } from '@umbraco-cms/backend-ap
 import { UmbLitElement } from '@umbraco-cms/element';
 import { tryExecuteAndNotify } from '@umbraco-cms/resources';
 import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN } from '@umbraco-cms/modal';
+import { UMB_CONFIRM_MODAL_TOKEN } from 'src/backoffice/shared/modals/confirm';
 
 @customElement('umb-packages-created-overview')
 export class UmbPackagesCreatedOverviewElement extends UmbLitElement {
@@ -134,18 +135,14 @@ export class UmbPackagesCreatedOverviewElement extends UmbLitElement {
 
 	async #deletePackage(p: PackageDefinitionModel) {
 		if (!p.key) return;
-		const modalHandler = this._modalContext?.confirm({
+		const modalHandler = this._modalContext?.open(UMB_CONFIRM_MODAL_TOKEN, {
 			color: 'danger',
 			headline: `Remove ${p.name}?`,
 			content: 'Are you sure you want to delete this package',
 			confirmLabel: 'Delete',
 		});
 
-		const deleteConfirmed = await modalHandler?.onClose().then(({ confirmed }: any) => {
-			return confirmed;
-		});
-
-		if (!deleteConfirmed == true) return;
+		await modalHandler?.onSubmit();
 
 		const { error } = await tryExecuteAndNotify(this, PackageResource.deletePackageCreatedByKey({ key: p.key }));
 		if (error) return;

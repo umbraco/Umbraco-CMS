@@ -10,13 +10,11 @@ import type { MediaTypeDetails } from '@umbraco-cms/models';
  * @extends {UmbStoreBase}
  * @description - Details Data Store for Media Types
  */
-export class UmbMediaTypeDetailStore
-	extends UmbStoreBase
-{
+export class UmbMediaTypeStore extends UmbStoreBase {
 	#data = new ArrayState<MediaTypeDetails>([], (x) => x.key);
 
 	constructor(host: UmbControllerHostInterface) {
-		super(host, UMB_MEDIA_TYPE_DETAIL_STORE_CONTEXT_TOKEN.toString());
+		super(host, UMB_MEDIA_TYPE_STORE_CONTEXT_TOKEN.toString());
 	}
 
 	append(mediaType: MediaTypeDetails) {
@@ -28,6 +26,4 @@ export class UmbMediaTypeDetailStore
 	}
 }
 
-export const UMB_MEDIA_TYPE_DETAIL_STORE_CONTEXT_TOKEN = new UmbContextToken<UmbMediaTypeDetailStore>(
-	'UmbMediaTypeDetailStore'
-);
+export const UMB_MEDIA_TYPE_STORE_CONTEXT_TOKEN = new UmbContextToken<UmbMediaTypeStore>('UmbMediaTypeStore');

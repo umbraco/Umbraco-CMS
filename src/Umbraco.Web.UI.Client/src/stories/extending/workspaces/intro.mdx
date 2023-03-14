@@ -1,0 +1,33 @@
+import { Meta } from '@storybook/addon-docs';
+
+<Meta
+	title="Guides/Extending the Backoffice/Workspaces/Intro"
+	parameters={{ previewTabs: { canvas: { hidden: true } } }}
+/>
+
+# Workspaces
+
+A Workspace is the editor for a specific entity type. It can either be a simple view of data or a complex editor with multiple views.
+TODO: extend the description of a workspace
+
+(rough notes)
+
+- A workspace is based on a entity type (e.g. content, media, member, etc.) and a unique string (ex: key).
+- Most workspaces holds a draft state of an entity. It is a copy of the entity data that can be modified at runtime and send to the server to be saved.
+- A workspace can be a single view or consist of multiple views.
+- A workspace should host a workspace context, of which anything within can communicate with.
+
+<img src="docs/workspace.svg" width="400" />
+
+```ts
+// TODO: get typescript interface
+interface UmbWorkspaceElement {}
+```
+
+## The Workspace Context
+
+[Read more about Workspace Context](?path=/docs/guides-extending-the-backoffice-workspaces-context--docs)
+
+## Examples of workspaces:
+
+TODO: link to all workspaces in storybook. Can we somehow auto-generate this list?

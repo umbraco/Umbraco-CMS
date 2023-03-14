@@ -2,11 +2,10 @@ import { css, html } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, state } from 'lit/decorators.js';
 import { repeat } from 'lit/directives/repeat.js';
-import { IRoute } from 'router-slot';
 import { UmbDocumentWorkspaceContext } from '../document-workspace.context';
+import type { UmbRouterSlotChangeEvent, UmbRouterSlotInitEvent, IRoute } from '@umbraco-cms/router';
 import { UmbLitElement } from '@umbraco-cms/element';
 import { PropertyTypeContainerViewModelBaseModel } from '@umbraco-cms/backend-api';
-import { UmbRouterSlotChangeEvent, UmbRouterSlotInitEvent } from '@umbraco-cms/router';
 
 @customElement('umb-document-workspace-view-edit')
 export class UmbDocumentWorkspaceViewEditElement extends UmbLitElement {
@@ -90,16 +89,6 @@ export class UmbDocumentWorkspaceViewEditElement extends UmbLitElement {
 	private _createRoutes() {
 		const routes: any[] = [];
 
-		if (this._hasRootGroups) {
-			routes.push({
-				path: 'root',
-				component: () => import('./document-workspace-view-edit-tab.element'),
-				setup: (component: Promise<HTMLElement>) => {
-					(component as any).noTabName = true;
-				},
-			});
-		}
-
 		if (this._tabs.length > 0) {
 			this._tabs?.forEach((tab) => {
 				const tabName = tab.name;
@@ -113,12 +102,17 @@ export class UmbDocumentWorkspaceViewEditElement extends UmbLitElement {
 			});
 		}
 
-		if (routes.length !== 0) {
+		if (this._hasRootGroups) {
 			routes.push({
 				path: '',
-				redirectTo: routes[0]?.path,
+				component: () => import('./document-workspace-view-edit-tab.element'),
+				setup: (component: Promise<HTMLElement>) => {
+					(component as any).noTabName = true;
+				},
 			});
+		}
 
+		if (routes.length !== 0) {
 			routes.push({
 				path: '**',
 				redirectTo: routes[0]?.path,
@@ -130,14 +124,14 @@ export class UmbDocumentWorkspaceViewEditElement extends UmbLitElement {
 
 	render() {
 		return html`
-			${this._tabs.length > 1
+			${this._routerPath && this._tabs.length > 1
 				? html` <uui-tab-group>
 						${this._hasRootGroups && this._tabs.length > 1
 							? html`
 									<uui-tab
 										label="Content"
-										.active=${this._routerPath + '/root' === this._activePath}
-										href=${this._routerPath || ''}
+										.active=${this._routerPath + '/' === this._activePath}
+										href=${this._routerPath + '/'}
 										>Content</uui-tab
 									>
 							  `

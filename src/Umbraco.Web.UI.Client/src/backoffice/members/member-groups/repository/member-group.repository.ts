@@ -1,6 +1,6 @@
 import { UmbMemberGroupTreeStore, UMB_MEMBER_GROUP_TREE_STORE_CONTEXT_TOKEN } from './member-group.tree.store';
 import { UmbMemberGroupDetailServerDataSource } from './sources/member-group.detail.server.data';
-import { UmbMemberGroupDetailStore, UMB_MEMBER_GROUP_DETAIL_STORE_CONTEXT_TOKEN } from './member-group.detail.store';
+import { UmbMemberGroupStore, UMB_MEMBER_GROUP_STORE_CONTEXT_TOKEN } from './member-group.store';
 import { MemberGroupTreeServerDataSource } from './sources/member-group.tree.server.data';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 import { UmbNotificationContext, UMB_NOTIFICATION_CONTEXT_TOKEN } from '@umbraco-cms/notification';
@@ -19,7 +19,7 @@ export class UmbMemberGroupRepository implements UmbTreeRepository, UmbDetailRep
 	#treeStore?: UmbMemberGroupTreeStore;
 
 	#detailSource: UmbMemberGroupDetailServerDataSource;
-	#detailStore?: UmbMemberGroupDetailStore;
+	#store?: UmbMemberGroupStore;
 
 	#notificationContext?: UmbNotificationContext;
 
@@ -33,8 +33,8 @@ export class UmbMemberGroupRepository implements UmbTreeRepository, UmbDetailRep
 			this.#treeStore = instance;
 		});
 
-		new UmbContextConsumerController(this.#host, UMB_MEMBER_GROUP_DETAIL_STORE_CONTEXT_TOKEN, (instance) => {
-			this.#detailStore = instance;
+		new UmbContextConsumerController(this.#host, UMB_MEMBER_GROUP_STORE_CONTEXT_TOKEN, (instance) => {
+			this.#store = instance;
 		});
 
 		new UmbContextConsumerController(this.#host, UMB_NOTIFICATION_CONTEXT_TOKEN, (instance) => {
@@ -74,7 +74,7 @@ export class UmbMemberGroupRepository implements UmbTreeRepository, UmbDetailRep
 
 	async rootTreeItems() {
 		await this.#init;
-		return this.#treeStore!.rootItems();
+		return this.#treeStore!.rootItems;
 	}
 
 	async treeItemsOf(parentKey: string | null) {
@@ -106,7 +106,7 @@ export class UmbMemberGroupRepository implements UmbTreeRepository, UmbDetailRep
 		const { data, error } = await this.#detailSource.get(key);
 
 		if (data) {
-			this.#detailStore?.append(data);
+			this.#store?.append(data);
 		}
 		return { data, error };
 	}
@@ -144,7 +144,7 @@ export class UmbMemberGroupRepository implements UmbTreeRepository, UmbDetailRep
 			this.#notificationContext?.peek('positive', notification);
 		}
 
-		this.#detailStore?.append(memberGroup);
+		this.#store?.append(memberGroup);
 		this.#treeStore?.updateItem(memberGroup.key, { name: memberGroup.name });
 
 		return { error };
@@ -168,7 +168,7 @@ export class UmbMemberGroupRepository implements UmbTreeRepository, UmbDetailRep
 		// TODO: we currently don't use the detail store for anything.
 		// Consider to look up the data before fetching from the server.
 		// Consider notify a workspace if a template is deleted from the store while someone is editing it.
-		this.#detailStore?.remove([key]);
+		this.#store?.remove([key]);
 		this.#treeStore?.removeItem(key);
 		// TODO: would be nice to align the stores on methods/methodNames.
 

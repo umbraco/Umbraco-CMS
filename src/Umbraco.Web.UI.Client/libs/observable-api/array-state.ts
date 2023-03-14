@@ -10,7 +10,6 @@ import { pushToUniqueArray } from './push-to-unique-array.function';
  *
  * The ArrayState provides methods to append data when the data is an Object.
  */
-
 export class ArrayState<T> extends DeepState<T[]> {
 	constructor(initialData: T[], private _getUnique?: (entry: T) => unknown) {
 		super(initialData);

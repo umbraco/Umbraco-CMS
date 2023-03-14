@@ -2,6 +2,7 @@ import { html } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { UUIColorPickerChangeEvent } from '@umbraco-ui/uui';
+import { UmbPropertyEditorElement } from '@umbraco-cms/property-editor';
 import { UmbLitElement } from '@umbraco-cms/element';
 import type { DataTypePropertyModel } from '@umbraco-cms/backend-api';
 
@@ -9,7 +10,7 @@ import type { DataTypePropertyModel } from '@umbraco-cms/backend-api';
  * @element umb-property-editor-ui-eye-dropper
  */
 @customElement('umb-property-editor-ui-eye-dropper')
-export class UmbPropertyEditorUIEyeDropperElement extends UmbLitElement {
+export class UmbPropertyEditorUIEyeDropperElement extends UmbLitElement implements UmbPropertyEditorElement {
 	static styles = [UUITextStyles];
 
 	@property()
