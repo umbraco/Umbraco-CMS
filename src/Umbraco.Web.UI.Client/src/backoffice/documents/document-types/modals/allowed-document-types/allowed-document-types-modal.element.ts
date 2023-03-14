@@ -37,7 +37,8 @@ export class UmbAllowedDocumentTypesModalElement extends UmbModalBaseElement<
 	#onClick(event: PointerEvent) {
 		event.stopPropagation();
 		const target = event.target as HTMLButtonElement;
-		const documentTypeKey = target.value;
+		const documentTypeKey = target.dataset.key;
+		if (!documentTypeKey) throw new Error('No document type key found');
 		this.modalHandler?.submit({ documentTypeKey });
 	}
 
