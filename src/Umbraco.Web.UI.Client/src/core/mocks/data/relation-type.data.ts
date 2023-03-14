@@ -136,8 +136,8 @@ class UmbRelationTypeData extends UmbEntityData<RelationTypeResponseModel> {
 	}
 
 	//TODO Can relation types have children?
-	getTreeItemChildren(): Array<FolderTreeItemModel> {
-		const childItems = this.treeData;
+	getTreeItemChildren(key: string): Array<FolderTreeItemModel> {
+		const childItems = this.treeData.filter((item) => item.parentKey === key);
 		return childItems.map((item) => createEntityTreeItem(item));
 	}
 
