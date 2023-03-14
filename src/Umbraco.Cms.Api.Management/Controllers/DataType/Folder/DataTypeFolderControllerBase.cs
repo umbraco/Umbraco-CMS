@@ -31,7 +31,7 @@ public abstract class DataTypeFolderControllerBase : FolderManagementControllerB
         => await _dataTypeContainerService.GetParentAsync(container);
 
     protected override async Task<Attempt<EntityContainer, DataTypeContainerOperationStatus>> CreateContainerAsync(EntityContainer container, Guid? parentId, Guid userKey)
-        => await _dataTypeContainerService.CreateAsync(container, userKey, parentId);
+        => await _dataTypeContainerService.CreateAsync(container, parentId, userKey);
 
     protected override async Task<Attempt<EntityContainer, DataTypeContainerOperationStatus>> UpdateContainerAsync(EntityContainer container, Guid userKey)
         => await _dataTypeContainerService.UpdateAsync(container, userKey);

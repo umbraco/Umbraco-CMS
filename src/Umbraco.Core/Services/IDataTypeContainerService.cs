@@ -23,11 +23,11 @@ public interface IDataTypeContainerService
     /// Creates a new data type container
     /// </summary>
     /// <param name="container">The container to create.</param>
-    /// <param name="parentId">The ID of the parent container to create the new container under.</param>
+    /// <param name="parentKey">The ID of the parent container to create the new container under.</param>
     /// <param name="userKey">Key of the user issuing the creation.</param>
     /// <returns></returns>
     /// <remarks>If no parent ID is supplied, the container will be created at the data type tree root.</remarks>
-    Task<Attempt<EntityContainer, DataTypeContainerOperationStatus>> CreateAsync(EntityContainer container, Guid userKey, Guid? parentId = null);
+    Task<Attempt<EntityContainer, DataTypeContainerOperationStatus>> CreateAsync(EntityContainer container, Guid? parentKey, Guid userKey);
 
     /// <summary>
     /// Updates an existing data type container

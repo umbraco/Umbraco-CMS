@@ -33,7 +33,7 @@ public class DataTypeContainerServiceTests : UmbracoIntegrationTest
     {
         EntityContainer toCreate = new EntityContainer(Constants.ObjectTypes.DataType) { Name = "Root Container" };
 
-        var result = await DataTypeContainerService.CreateAsync(toCreate, Constants.Security.SuperUserKey);
+        var result = await DataTypeContainerService.CreateAsync(toCreate, null, Constants.Security.SuperUserKey);
         Assert.IsTrue(result.Success);
         Assert.AreEqual(DataTypeContainerOperationStatus.Success, result.Status);
 
@@ -47,10 +47,10 @@ public class DataTypeContainerServiceTests : UmbracoIntegrationTest
     public async Task Can_Create_Child_Container()
     {
         EntityContainer root = new EntityContainer(Constants.ObjectTypes.DataType) { Name = "Root Container" };
-        await DataTypeContainerService.CreateAsync(root, Constants.Security.SuperUserKey);
+        await DataTypeContainerService.CreateAsync(root, null, Constants.Security.SuperUserKey);
 
         EntityContainer child = new EntityContainer(Constants.ObjectTypes.DataType) { Name = "Child Container" };
-        var result = await DataTypeContainerService.CreateAsync(child, root.Key);
+        var result = await DataTypeContainerService.CreateAsync(child, root.Key, Constants.Security.SuperUserKey);
         Assert.IsTrue(result.Success);
         Assert.AreEqual(DataTypeContainerOperationStatus.Success, result.Status);
 
@@ -64,7 +64,7 @@ public class DataTypeContainerServiceTests : UmbracoIntegrationTest
     public async Task Can_Update_Container_At_Root()
     {
         EntityContainer root = new EntityContainer(Constants.ObjectTypes.DataType) { Name = "Root Container" };
-        await DataTypeContainerService.CreateAsync(root, Constants.Security.SuperUserKey);
+        await DataTypeContainerService.CreateAsync(root, null, Constants.Security.SuperUserKey);
 
         EntityContainer toUpdate = await DataTypeContainerService.GetAsync(root.Key);
         Assert.NotNull(toUpdate);
@@ -84,10 +84,10 @@ public class DataTypeContainerServiceTests : UmbracoIntegrationTest
     public async Task Can_Update_Child_Container()
     {
         EntityContainer root = new EntityContainer(Constants.ObjectTypes.DataType) { Name = "Root Container" };
-        await DataTypeContainerService.CreateAsync(root, Constants.Security.SuperUserKey);
+        await DataTypeContainerService.CreateAsync(root, null, Constants.Security.SuperUserKey);
 
         EntityContainer child = new EntityContainer(Constants.ObjectTypes.DataType) { Name = "Child Container" };
-        await DataTypeContainerService.CreateAsync(child, root.Key);
+        await DataTypeContainerService.CreateAsync(child, root.Key, Constants.Security.SuperUserKey);
 
         EntityContainer toUpdate = await DataTypeContainerService.GetAsync(child.Key);
         Assert.NotNull(toUpdate);
@@ -107,7 +107,7 @@ public class DataTypeContainerServiceTests : UmbracoIntegrationTest
     public async Task Can_Get_Container_At_Root()
     {
         EntityContainer root = new EntityContainer(Constants.ObjectTypes.DataType) { Name = "Root Container" };
-        await DataTypeContainerService.CreateAsync(root, Constants.Security.SuperUserKey);
+        await DataTypeContainerService.CreateAsync(root, null, Constants.Security.SuperUserKey);
 
         var created = await DataTypeContainerService.GetAsync(root.Key);
         Assert.NotNull(created);
@@ -119,10 +119,10 @@ public class DataTypeContainerServiceTests : UmbracoIntegrationTest
     public async Task Can_Get_Child_Container()
     {
         EntityContainer root = new EntityContainer(Constants.ObjectTypes.DataType) { Name = "Root Container" };
-        await DataTypeContainerService.CreateAsync(root, Constants.Security.SuperUserKey);
+        await DataTypeContainerService.CreateAsync(root, null, Constants.Security.SuperUserKey);
 
         EntityContainer child = new EntityContainer(Constants.ObjectTypes.DataType) { Name = "Child Container" };
-        await DataTypeContainerService.CreateAsync(child, root.Key);
+        await DataTypeContainerService.CreateAsync(child, root.Key, Constants.Security.SuperUserKey);
 
         var created = await DataTypeContainerService.GetAsync(child.Key);
         Assert.IsNotNull(created);
@@ -134,7 +134,7 @@ public class DataTypeContainerServiceTests : UmbracoIntegrationTest
     public async Task Can_Delete_Container_At_Root()
     {
         EntityContainer root = new EntityContainer(Constants.ObjectTypes.DataType) { Name = "Root Container" };
-        await DataTypeContainerService.CreateAsync(root, Constants.Security.SuperUserKey);
+        await DataTypeContainerService.CreateAsync(root, null, Constants.Security.SuperUserKey);
 
         var result = await DataTypeContainerService.DeleteAsync(root.Key, Constants.Security.SuperUserKey);
         Assert.IsTrue(result.Success);
@@ -148,10 +148,10 @@ public class DataTypeContainerServiceTests : UmbracoIntegrationTest
     public async Task Can_Delete_Child_Container()
     {
         EntityContainer root = new EntityContainer(Constants.ObjectTypes.DataType) { Name = "Root Container" };
-        await DataTypeContainerService.CreateAsync(root, Constants.Security.SuperUserKey);
+        await DataTypeContainerService.CreateAsync(root, null, Constants.Security.SuperUserKey);
 
         EntityContainer child = new EntityContainer(Constants.ObjectTypes.DataType) { Name = "Child Container" };
-        await DataTypeContainerService.CreateAsync(child, root.Key);
+        await DataTypeContainerService.CreateAsync(child, null, root.Key);
 
         var result = await DataTypeContainerService.DeleteAsync(child.Key, Constants.Security.SuperUserKey);
         Assert.IsTrue(result.Success);
@@ -168,7 +168,7 @@ public class DataTypeContainerServiceTests : UmbracoIntegrationTest
     public async Task Cannot_Create_Child_Container_Below_Invalid_Parent()
     {
         EntityContainer child = new EntityContainer(Constants.ObjectTypes.DataType) { Name = "Child Container" };
-        var result = await DataTypeContainerService.CreateAsync(child, Guid.NewGuid());
+        var result = await DataTypeContainerService.CreateAsync(child, Guid.NewGuid(), Constants.Security.SuperUserKey);
         Assert.IsFalse(result.Success);
         Assert.AreEqual(DataTypeContainerOperationStatus.ParentNotFound, result.Status);
 
@@ -181,7 +181,7 @@ public class DataTypeContainerServiceTests : UmbracoIntegrationTest
     {
         EntityContainer toCreate = new EntityContainer(Constants.ObjectTypes.DataType) { Name = "Root Container", Id = 1234 };
 
-        var result = await DataTypeContainerService.CreateAsync(toCreate, Constants.Security.SuperUserKey);
+        var result = await DataTypeContainerService.CreateAsync(toCreate, null, Constants.Security.SuperUserKey);
         Assert.IsFalse(result.Success);
         Assert.AreEqual(DataTypeContainerOperationStatus.InvalidId, result.Status);
 
@@ -195,7 +195,7 @@ public class DataTypeContainerServiceTests : UmbracoIntegrationTest
     {
         EntityContainer toCreate = new EntityContainer(new Guid(containedObjectType)) { Name = "Root Container" };
 
-        var result = await DataTypeContainerService.CreateAsync(toCreate, Constants.Security.SuperUserKey);
+        var result = await DataTypeContainerService.CreateAsync(toCreate, null, Constants.Security.SuperUserKey);
         Assert.IsFalse(result.Success);
         Assert.AreEqual(DataTypeContainerOperationStatus.InvalidObjectType, result.Status);
 
@@ -207,13 +207,13 @@ public class DataTypeContainerServiceTests : UmbracoIntegrationTest
     public async Task Cannot_Update_Container_Parent()
     {
         EntityContainer root = new EntityContainer(Constants.ObjectTypes.DataType) { Name = "Root Container" };
-        await DataTypeContainerService.CreateAsync(root, Constants.Security.SuperUserKey);
+        await DataTypeContainerService.CreateAsync(root, null, Constants.Security.SuperUserKey);
 
         EntityContainer root2 = new EntityContainer(Constants.ObjectTypes.DataType) { Name = "Root Container 2" };
-        await DataTypeContainerService.CreateAsync(root2, Constants.Security.SuperUserKey);
+        await DataTypeContainerService.CreateAsync(root2, null, Constants.Security.SuperUserKey);
 
         EntityContainer child = new EntityContainer(Constants.ObjectTypes.DataType) { Name = "Child Container" };
-        await DataTypeContainerService.CreateAsync(child, root.Key);
+        await DataTypeContainerService.CreateAsync(child, root.Key, Constants.Security.SuperUserKey);
 
         EntityContainer toUpdate = await DataTypeContainerService.GetAsync(child.Key);
         Assert.IsNotNull(toUpdate);
@@ -232,10 +232,10 @@ public class DataTypeContainerServiceTests : UmbracoIntegrationTest
     public async Task Cannot_Delete_Container_With_Child_Container()
     {
         EntityContainer root = new EntityContainer(Constants.ObjectTypes.DataType) { Name = "Root Container" };
-        await DataTypeContainerService.CreateAsync(root, Constants.Security.SuperUserKey);
+        await DataTypeContainerService.CreateAsync(root, null, Constants.Security.SuperUserKey);
 
         EntityContainer child = new EntityContainer(Constants.ObjectTypes.DataType) { Name = "Child Container" };
-        await DataTypeContainerService.CreateAsync(child, root.Key);
+        await DataTypeContainerService.CreateAsync(child, root.Key, Constants.Security.SuperUserKey);
 
         var result = await DataTypeContainerService.DeleteAsync(root.Key, Constants.Security.SuperUserKey);
         Assert.IsFalse(result.Success);
@@ -249,7 +249,7 @@ public class DataTypeContainerServiceTests : UmbracoIntegrationTest
     public async Task Cannot_Delete_Container_With_Child_DataType()
     {
         EntityContainer container = new EntityContainer(Constants.ObjectTypes.DataType) { Name = "Root Container" };
-        await DataTypeContainerService.CreateAsync(container, Constants.Security.SuperUserKey);
+        await DataTypeContainerService.CreateAsync(container, null, Constants.Security.SuperUserKey);
 
         IDataType dataType =
             new DataType(new TextboxPropertyEditor(DataValueEditorFactory, IOHelper, EditorConfigurationParser), ConfigurationEditorJsonSerializer)
