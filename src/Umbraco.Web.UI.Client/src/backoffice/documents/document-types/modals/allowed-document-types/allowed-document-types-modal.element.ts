@@ -1,4 +1,4 @@
-import { html } from 'lit';
+import { html, nothing } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, state } from 'lit/decorators.js';
 import { ifDefined } from 'lit-html/directives/if-defined.js';
@@ -44,19 +44,17 @@ export class UmbAllowedDocumentTypesModalElement extends UmbModalBaseElement<
 	render() {
 		return html`
 			<umb-body-layout headline="Headline">
-				<div>Render list of create options for ${this.data?.key}</div>
-
-				<ul>
+				<uui-box>
+					${this._allowedDocumentTypes.length === 0 ? html`<p>No allowed types</p>` : nothing}
 					${this._allowedDocumentTypes.map(
 						(item) =>
 							html`
-								<li>
-									<button type="button" value=${ifDefined(item.key)} @click=${this.#onClick}>${item.name}</button>
-								</li>
+								<uui-menu-item data-key=${ifDefined(item.key)} @click=${this.#onClick} label="${ifDefined(item.name)}">
+									${item.icon ? html`<uui-icon slot="icon" name=${item.icon}></uui-icon>` : nothing}
+								</uui-menu-item>
 							`
 					)}
-				</ul>
-
+				</uui-box>
 				<uui-button slot="actions" id="cancel" label="Cancel" @click="${this._handleCancel}">Cancel</uui-button>
 			</umb-body-layout>
 		`;
