@@ -36,11 +36,9 @@ export class UmbDataTypeWorkspaceContext
 	async getPaths() {
 		return [
 			{
-				name: 'edit',
 				path: 'edit/:key',
 			},
 			{
-				name: 'create',
 				path: 'create/:parentKey',
 			},
 		];
