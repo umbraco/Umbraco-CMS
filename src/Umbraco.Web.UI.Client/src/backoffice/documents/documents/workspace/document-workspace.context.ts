@@ -75,7 +75,7 @@ export class UmbDocumentWorkspaceContext
 			},
 			{
 				name: 'create',
-				path: 'create/:parentKey/:documentTypeKey',
+				path: 'create/:parentKey/type/:documentTypeKey',
 			},
 		];
 	}
