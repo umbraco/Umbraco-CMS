@@ -3,8 +3,8 @@ import {
 	ProblemDetailsModel,
 	RelationTypeResource,
 	RelationTypeResponseModel,
-	RelationTypeCreateModel,
-	RelationTypeUpdateModel,
+	CreateRelationTypeRequestModel,
+	UpdateRelationTypeRequestModel,
 } from '@umbraco-cms/backend-api';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 import { tryExecuteAndNotify } from '@umbraco-cms/resources';
@@ -54,10 +54,7 @@ export class UmbRelationTypeServerDataSource implements RepositoryDetailDataSour
 	 * @memberof UmbRelationTypeServerDataSource
 	 */
 	async createScaffold(parentKey: string | null) {
-		const data: RelationTypeResponseModel = {
-			$type: '',
-			parentKey: parentKey,
-		};
+		const data: RelationTypeResponseModel = {};
 
 		return { data };
 	}
@@ -73,7 +70,7 @@ export class UmbRelationTypeServerDataSource implements RepositoryDetailDataSour
 			const error: ProblemDetailsModel = { title: 'RelationType key is missing' };
 			return { error };
 		}
-		const requestBody: RelationTypeCreateModel = { ...RelationType };
+		const requestBody: CreateRelationTypeRequestModel = { ...RelationType };
 
 		// TODO: use resources when end point is ready:
 		return tryExecuteAndNotify<RelationTypeResponseModel>(
@@ -101,7 +98,7 @@ export class UmbRelationTypeServerDataSource implements RepositoryDetailDataSour
 			return { error };
 		}
 
-		const requestBody: RelationTypeUpdateModel = { ...RelationType };
+		const requestBody: UpdateRelationTypeRequestModel = { ...RelationType };
 
 		// TODO: use resources when end point is ready:
 		return tryExecuteAndNotify<RelationTypeResponseModel>(
