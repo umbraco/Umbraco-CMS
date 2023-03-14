@@ -9,7 +9,7 @@ import { ManifestPropertyEditorUI } from '@umbraco-cms/extensions-registry';
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-api';
 
 @customElement('umb-property-settings-modal')
-export class UmbPropertySettingsModalElement extends UmbModalBaseElement<undefined, UmbPropertySettingsModalResult> {
+export class UmbPropertySettingsModalElement extends UmbModalBaseElement<object, UmbPropertySettingsModalResult> {
 	static styles = [
 		UUITextStyles,
 		css`

@@ -1,6 +1,6 @@
 import { css, html } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
-import { customElement, property } from 'lit/decorators.js';
+import { customElement, property, state } from 'lit/decorators.js';
 import { FormControlMixin } from '@umbraco-ui/uui-base/lib/mixins';
 import { UUIModalSidebarSize } from '@umbraco-ui/uui-modal-sidebar';
 import { UmbModalRouteBuilder, UmbRouteContext, UMB_ROUTE_CONTEXT_TOKEN } from '@umbraco-cms/router';
@@ -27,6 +27,10 @@ export class UmbInputMultiUrlPickerElement extends FormControlMixin(UmbLitElemen
 	protected getFormElement() {
 		return undefined;
 	}
+
+	@property()
+	alias?: string;
+
 	/**
 	 * This is a minimum amount of selected items in this input.
 	 * @type {number}
@@ -99,6 +103,7 @@ export class UmbInputMultiUrlPickerElement extends FormControlMixin(UmbLitElemen
 	//private _modalContext?: UmbModalContext;
 	private _routeContext?: UmbRouteContext;
 
+	@state()
 	private _linkPickerURL?: UmbModalRouteBuilder;
 
 	constructor() {
@@ -114,21 +119,19 @@ export class UmbInputMultiUrlPickerElement extends FormControlMixin(UmbLitElemen
 			() => !!this.max && this.urls.length > this.max
 		);
 
-		/*
-		this.consumeContext(UMB_MODAL_CONTEXT_TOKEN, (instance) => {
-			this._modalContext = instance;
-		});
-		*/
-
 		this.consumeContext(UMB_ROUTE_CONTEXT_TOKEN, (instance) => {
 			this._routeContext = instance;
 
 			// Registre the routes of this UI:
-			// TODO: To avoid retriving the property alias, we might make use of the property context?
+			// TODO: Make a registreModal method on the property context
 			// Or maybe its not the property-alias, but something unique? as this might not be in a property?.
-			this._linkPickerURL = this._routeContext.registerModal(UMB_LINK_PICKER_MODAL_TOKEN, {
-				path: `${'to-do-myPropertyAlias'}/:index`,
+
+			this._routeContext.registerModal(UMB_LINK_PICKER_MODAL_TOKEN, {
+				path: `${'this.alias'}/:index`,
 				onSetup: (routingInfo) => {
+					console.log('call onSetup');
+					// TODO: Make onSetup optional.
+					// TODO: Maybe use UmbRouteLocation?
 					// Get index from routeInfo:
 					const indexParam = routingInfo.match.params.index;
 					if (!indexParam) return false;
@@ -147,8 +150,9 @@ export class UmbInputMultiUrlPickerElement extends FormControlMixin(UmbLitElemen
 
 					console.log('onSetup modal got data:', data);
 
-					const modalData = {
+					return {
 						index: index,
+						lol: false,
 						link: {
 							name: data?.name,
 							published: data?.published,
@@ -161,10 +165,9 @@ export class UmbInputMultiUrlPickerElement extends FormControlMixin(UmbLitElemen
 						config: {
 							hideAnchor: this.hideAnchor,
 							ignoreUserStartNodes: this.ignoreUserStartNodes,
-							overlaySize: this.overlaySize || 'small',
+							overlaySize: this.overlaySize || 'small', // TODO: this should not be here, but use the ModalToken.
 						},
 					};
-					return modalData;
 				},
 				onSubmit: (submitData) => {
 					console.log('On submit in property editor input');
@@ -173,6 +176,10 @@ export class UmbInputMultiUrlPickerElement extends FormControlMixin(UmbLitElemen
 				},
 				onReject: () => {
 					console.log('User cancelled dialog.');
+				},
+				onUrlBuilder: (urlBuilder) => {
+					console.log('got onUrlBuilder');
+					this._linkPickerURL = urlBuilder;
 				},
 			});
 		});

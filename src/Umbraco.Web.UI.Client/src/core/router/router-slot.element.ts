@@ -76,6 +76,7 @@ export class UmbRouterSlotElement extends UmbLitElement {
 	protected firstUpdated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
 		super.firstUpdated(_changedProperties);
 		this._routerPath = this.#router.constructAbsolutePath('') || '';
+		this.#routeContext._internal_routerGotBasePath(this._routerPath);
 		this.dispatchEvent(new UmbRouterSlotInitEvent());
 	}
 
@@ -83,6 +84,7 @@ export class UmbRouterSlotElement extends UmbLitElement {
 		const newAbsolutePath = this.#router.constructAbsolutePath('') || '';
 		if (this._routerPath !== newAbsolutePath) {
 			this._routerPath = newAbsolutePath;
+			this.#routeContext._internal_routerGotBasePath(this._routerPath);
 			this.dispatchEvent(new UmbRouterSlotInitEvent());
 
 			const newActiveLocalPath = this.#router.match?.route.path;

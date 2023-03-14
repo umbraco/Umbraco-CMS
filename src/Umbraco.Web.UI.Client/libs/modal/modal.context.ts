@@ -22,7 +22,7 @@ export interface UmbModalConfig {
 export class UmbModalContext {
 	host: UmbControllerHostInterface;
 	// TODO: Investigate if we can get rid of HTML elements in our store, so we can use one of our states.
-	#modals = new BehaviorSubject(<Array<UmbModalHandler<any, any>>>[]);
+	#modals = new BehaviorSubject(<Array<UmbModalHandler>>[]);
 	public readonly modals = this.#modals.asObservable();
 
 	constructor(host: UmbControllerHostInterface) {
@@ -76,7 +76,7 @@ export class UmbModalContext {
 	 * @return {*}  {UmbModalHandler}
 	 * @memberof UmbModalContext
 	 */
-	public open<ModalData extends object = { [key: string]: unknown }, ModalResult = unknown>(
+	public open<ModalData extends object = object, ModalResult = unknown>(
 		modalAlias: string | UmbModalToken<ModalData, ModalResult>,
 		data?: ModalData,
 		config?: UmbModalConfig

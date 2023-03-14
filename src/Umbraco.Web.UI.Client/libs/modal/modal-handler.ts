@@ -13,7 +13,7 @@ import { ManifestModal } from '@umbraco-cms/extensions-registry';
 /**
  * Type which omits the real submit method, and replaces it with a submit method which accepts an optional argument depending on the generic type.
  */
-export type UmbModalHandler<ModalData extends object = { [key: string]: unknown }, ModalResult = unknown> = Omit<
+export type UmbModalHandler<ModalData extends object = object, ModalResult = any> = Omit<
 	UmbModalHandlerClass<ModalData, ModalResult>,
 	'submit'
 > &
@@ -35,7 +35,7 @@ type OptionalSubmitArgumentIfUndefined<T> = T extends undefined
 	  };
 
 //TODO consider splitting this into two separate handlers
-export class UmbModalHandlerClass<ModalData extends object, ModalResult> {
+export class UmbModalHandlerClass<ModalData extends object = object, ModalResult = unknown> {
 	private _submitPromise: Promise<ModalResult>;
 	private _submitResolver?: (value: ModalResult) => void;
 	private _submitRejecter?: () => void;
