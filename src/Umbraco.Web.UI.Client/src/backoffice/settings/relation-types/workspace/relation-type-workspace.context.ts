@@ -50,8 +50,6 @@ export class UmbRelationTypeWorkspaceContext
 	}
 
 	async save() {
-		console.log('WORKSPACE SAVE');
-
 		if (!this.#data.value) return;
 		if (this.isNew) {
 			await this.repository.create(this.#data.value);

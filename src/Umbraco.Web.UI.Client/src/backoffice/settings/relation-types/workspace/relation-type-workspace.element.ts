@@ -34,8 +34,6 @@ export class UmbRelationTypeWorkspaceElement extends UmbLitElement {
 	private _RelationTypeName = '';
 
 	public load(value: string) {
-		console.log('load');
-
 		this.#workspaceContext?.load(value);
 		//this._unique = entityKey;
 	}
