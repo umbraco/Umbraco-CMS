@@ -59,6 +59,11 @@ namespace Umbraco.Web.PropertyEditors
                 if (string.IsNullOrEmpty(tmpImgPath))
                     continue;
 
+                if (IsValidPath(tmpImgPath) == false)
+                {
+                    continue;
+                }
+
                 var absoluteTempImagePath = IOHelper.MapPath(tmpImgPath);
                 var fileName = Path.GetFileName(absoluteTempImagePath);
                 var safeFileName = fileName.ToSafeFileName();
@@ -138,6 +143,12 @@ namespace Umbraco.Web.PropertyEditors
             }
 
             return htmlDoc.DocumentNode.OuterHtml;
+        }
+
+        private bool IsValidPath(string imagePath)
+        {
+            var cleaned = imagePath.Replace("\\", "/");
+            return cleaned.StartsWith(SystemDirectories.TempImageUploads, StringComparison.OrdinalIgnoreCase);
         }
     }
 }
