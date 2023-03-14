@@ -2,11 +2,11 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html, nothing } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { UUIButtonState } from '@umbraco-ui/uui-button';
+import { UMB_CONFIRM_MODAL_TOKEN } from '../../../../shared/modals/confirm';
 import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN } from '@umbraco-cms/modal';
 import { HealthStatusModel, IndexModel, IndexerResource } from '@umbraco-cms/backend-api';
 import { UmbLitElement } from '@umbraco-cms/element';
 import { tryExecuteAndNotify } from '@umbraco-cms/resources';
-import { UMB_CONFIRM_MODAL_TOKEN } from 'src/backoffice/shared/modals/confirm';
 
 import './section-view-examine-searchers';
 
