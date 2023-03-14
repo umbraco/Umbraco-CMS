@@ -194,6 +194,23 @@ export class UmbDocumentTypeServerDataSource implements RepositoryDetailDataSour
 	 * @memberof UmbDocumentTypeServerDataSource
 	 */
 	async getAllowedChildrenOf(key: string) {
-		alert('get allowed children of', key);
+		if (!key) throw new Error('Key is missing');
+
+		let problemDetails: ProblemDetailsModel | undefined = undefined;
+		let data = undefined;
+
+		try {
+			const res = await fetch(`/umbraco/management/api/v1/document-type/allowed-children-of/${key}`, {
+				method: 'GET',
+				headers: {
+					'Content-Type': 'application/json',
+				},
+			});
+			data = await res.json();
+		} catch (error) {
+			problemDetails = { title: `Get allowed children of ${key} failed` };
+		}
+
+		return { data, error: problemDetails };
 	}
 }
