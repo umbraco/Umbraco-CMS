@@ -7,12 +7,12 @@ export class UmbLanguageRootTableNameColumnLayoutElement extends LitElement {
 	static styles = [UUITextStyles, css``];
 
 	@property({ attribute: false })
-	value!: { key: string; name: string };
+	value!: { isoCode: string; name: string };
 
 	render() {
 		if (!this.value) return nothing;
 
-		return html`<a href=${'section/settings/language/edit/' + this.value.key}>${this.value.name}</a>`;
+		return html`<a href=${'section/settings/workspace/language/edit/' + this.value.isoCode}>${this.value.name}</a>`;
 	}
 }
 

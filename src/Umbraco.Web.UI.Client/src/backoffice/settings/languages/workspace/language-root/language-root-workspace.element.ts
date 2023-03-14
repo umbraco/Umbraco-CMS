@@ -89,7 +89,7 @@ export class UmbLanguageRootWorkspaceElement extends UmbLitElement {
 						columnAlias: 'languageName',
 						value: {
 							name: language.name,
-							key: language.isoCode,
+							isoCode: language.isoCode,
 						},
 					},
 					{
