@@ -14,7 +14,7 @@ public partial class ContentEditingServiceTests
     public async Task Create_At_Root(bool allowedAtRoot)
     {
         var template = TemplateBuilder.CreateTextPageTemplate();
-        await TemplateService.CreateAsync(template);
+        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
 
         var contentType = ContentTypeBuilder.CreateTextPageContentType(defaultTemplateId: template.Id);
         contentType.AllowedAsRoot = allowedAtRoot;
@@ -33,7 +33,7 @@ public partial class ContentEditingServiceTests
             }
         };
 
-        var result = await ContentEditingService.CreateAsync(createModel);
+        var result = await ContentEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
 
         if (allowedAtRoot)
         {
@@ -67,7 +67,7 @@ public partial class ContentEditingServiceTests
     public async Task Create_As_Child(bool allowedAsChild)
     {
         var template = TemplateBuilder.CreateTextPageTemplate();
-        await TemplateService.CreateAsync(template);
+        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
 
         var childContentType = ContentTypeBuilder.CreateTextPageContentType(defaultTemplateId: template.Id);
         childContentType.AllowedAsRoot = false;
@@ -84,10 +84,12 @@ public partial class ContentEditingServiceTests
         }
         ContentTypeService.Save(rootContentType);
 
-        var rootKey = (await ContentEditingService.CreateAsync(new ContentCreateModel
+        var rootKey = (await ContentEditingService.CreateAsync(
+            new ContentCreateModel
         {
             ContentTypeKey = rootContentType.Key, InvariantName = "Root", ParentKey = Constants.System.RootKey,
-        })).Result.Key;
+        },
+            Constants.Security.SuperUserKey)).Result.Key;
 
         var createModel = new ContentCreateModel
         {
@@ -102,7 +104,7 @@ public partial class ContentEditingServiceTests
             }
         };
 
-        var result = await ContentEditingService.CreateAsync(createModel);
+        var result = await ContentEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
 
         if (allowedAsChild)
         {
@@ -144,7 +146,7 @@ public partial class ContentEditingServiceTests
             }
         };
 
-        var result = await ContentEditingService.CreateAsync(createModel);
+        var result = await ContentEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
         Assert.IsTrue(result.Success);
         Assert.AreEqual(ContentEditingOperationStatus.Success, result.Status);
         Assert.IsNotNull(result.Result);
@@ -156,7 +158,7 @@ public partial class ContentEditingServiceTests
     public async Task Can_Create_Without_Properties()
     {
         var template = TemplateBuilder.CreateTextPageTemplate();
-        await TemplateService.CreateAsync(template);
+        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
 
         var contentType = ContentTypeBuilder.CreateTextPageContentType(defaultTemplateId: template.Id);
         contentType.AllowedAsRoot = true;
@@ -169,7 +171,7 @@ public partial class ContentEditingServiceTests
             InvariantName = "Test Create"
         };
 
-        var result = await ContentEditingService.CreateAsync(createModel);
+        var result = await ContentEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
         Assert.IsTrue(result.Success);
         Assert.AreEqual(ContentEditingOperationStatus.Success, result.Status);
         Assert.IsNotNull(result.Result);
@@ -192,7 +194,7 @@ public partial class ContentEditingServiceTests
             InvariantName = "Test Create"
         };
 
-        var result = await ContentEditingService.CreateAsync(createModel);
+        var result = await ContentEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
         Assert.IsFalse(result.Success);
         Assert.AreEqual(ContentEditingOperationStatus.ParentNotFound, result.Status);
         Assert.IsNull(result.Result);
@@ -205,10 +207,10 @@ public partial class ContentEditingServiceTests
         {
             ContentTypeKey = Guid.NewGuid(),
             ParentKey = Constants.System.RootKey,
-            InvariantName = "Test Create"
+            InvariantName = "Test Create",
         };
 
-        var result = await ContentEditingService.CreateAsync(createModel);
+        var result = await ContentEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
         Assert.IsFalse(result.Success);
         Assert.AreEqual(ContentEditingOperationStatus.ContentTypeNotFound, result.Status);
         Assert.IsNull(result.Result);
@@ -218,7 +220,7 @@ public partial class ContentEditingServiceTests
     public async Task Cannot_Create_With_Invalid_Template()
     {
         var template = TemplateBuilder.CreateTextPageTemplate();
-        await TemplateService.CreateAsync(template);
+        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
 
         var contentType = ContentTypeBuilder.CreateBasicContentType();
         contentType.AllowedAsRoot = true;
@@ -232,7 +234,7 @@ public partial class ContentEditingServiceTests
             InvariantName = "Test Create"
         };
 
-        var result = await ContentEditingService.CreateAsync(createModel);
+        var result = await ContentEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
         Assert.IsFalse(result.Success);
         Assert.AreEqual(ContentEditingOperationStatus.TemplateNotAllowed, result.Status);
         Assert.IsNotNull(result.Result);
@@ -254,7 +256,7 @@ public partial class ContentEditingServiceTests
             InvariantName = "Test Create"
         };
 
-        var result = await ContentEditingService.CreateAsync(createModel);
+        var result = await ContentEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
         Assert.IsFalse(result.Success);
         Assert.AreEqual(ContentEditingOperationStatus.TemplateNotFound, result.Status);
         Assert.IsNotNull(result.Result);
@@ -281,7 +283,7 @@ public partial class ContentEditingServiceTests
             }
         };
 
-        var result = await ContentEditingService.CreateAsync(createModel);
+        var result = await ContentEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
         Assert.IsFalse(result.Success);
         Assert.AreEqual(ContentEditingOperationStatus.PropertyTypeNotFound, result.Status);
         Assert.IsNull(result.Result);
@@ -306,7 +308,7 @@ public partial class ContentEditingServiceTests
             }
         };
 
-        var result = await ContentEditingService.CreateAsync(createModel);
+        var result = await ContentEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
         Assert.IsFalse(result.Success);
         Assert.AreEqual(ContentEditingOperationStatus.ContentTypeCultureVarianceMismatch, result.Status);
         Assert.IsNull(result.Result);
@@ -343,7 +345,7 @@ public partial class ContentEditingServiceTests
             }
         };
 
-        var result = await ContentEditingService.CreateAsync(createModel);
+        var result = await ContentEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
         Assert.IsFalse(result.Success);
         Assert.AreEqual(ContentEditingOperationStatus.ContentTypeCultureVarianceMismatch, result.Status);
         Assert.IsNull(result.Result);
@@ -385,7 +387,7 @@ public partial class ContentEditingServiceTests
             }
         };
 
-        var result = await ContentEditingService.CreateAsync(createModel);
+        var result = await ContentEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
         Assert.IsTrue(result.Success);
         Assert.AreEqual(ContentEditingOperationStatus.Success, result.Status);
         VerifyCreate(result.Result);
@@ -420,7 +422,7 @@ public partial class ContentEditingServiceTests
             }
         };
 
-        var result = await ContentEditingService.CreateAsync(createModel);
+        var result = await ContentEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
         Assert.IsFalse(result.Success);
         Assert.AreEqual(ContentEditingOperationStatus.PropertyTypeNotFound, result.Status);
         Assert.IsNull(result.Result);

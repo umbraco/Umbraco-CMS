@@ -856,8 +856,8 @@ public class PackageDataInstallationTests : UmbracoIntegrationTestWithContent
     {
         var norwegian = new Language("nb-NO", "Norwegian Bokmål (Norway)");
         var english = new Language("en-GB", "English (United Kingdom)");
-        await LanguageService.CreateAsync(norwegian, 0);
-        await LanguageService.CreateAsync(english, 0);
+        await LanguageService.CreateAsync(norwegian, Constants.Security.SuperUserKey);
+        await LanguageService.CreateAsync(english, Constants.Security.SuperUserKey);
     }
 
     private async Task AssertDictionaryItem(string dictionaryItemName, string expectedValue, string cultureCode)
@@ -885,7 +885,8 @@ public class PackageDataInstallationTests : UmbracoIntegrationTestWithContent
                 {
                     new DictionaryTranslation(englishLanguage, expectedEnglishParentValue)
                 }
-            });
+            },
+            Constants.Security.SuperUserKey);
         Assert.IsTrue(result.Success);
         Assert.AreEqual(key, result.Result.Key);
     }
@@ -907,7 +908,8 @@ public class PackageDataInstallationTests : UmbracoIntegrationTestWithContent
                     new DictionaryTranslation(englishLanguage, expectedEnglishParentValue),
                     new DictionaryTranslation(norwegianLanguage, expectedNorwegianParentValue)
                 }
-            });
+            },
+            Constants.Security.SuperUserKey);
         Assert.IsTrue(result.Success);
         Assert.AreEqual(key, result.Result.Key);
     }

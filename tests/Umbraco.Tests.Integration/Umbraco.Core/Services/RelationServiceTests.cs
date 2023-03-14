@@ -31,7 +31,7 @@ public class RelationServiceTests : UmbracoIntegrationTest
             .WithIsDependency(isDependency)
             .Build();
 
-        Attempt<IRelationType, RelationTypeOperationStatus> result = await RelationService.CreateAsync(relationType, Constants.Security.SuperUserId);
+        Attempt<IRelationType, RelationTypeOperationStatus> result = await RelationService.CreateAsync(relationType, Constants.Security.SuperUserKey);
 
         Assert.Multiple(() =>
         {
@@ -56,7 +56,7 @@ public class RelationServiceTests : UmbracoIntegrationTest
             .WithParentObjectType(new Guid(parentObjectTypeGuid))
             .Build();
 
-        Attempt<IRelationType, RelationTypeOperationStatus> result = await RelationService.CreateAsync(relationType, Constants.Security.SuperUserId);
+        Attempt<IRelationType, RelationTypeOperationStatus> result = await RelationService.CreateAsync(relationType, Constants.Security.SuperUserKey);
 
         Assert.Multiple(() =>
         {
@@ -78,7 +78,7 @@ public class RelationServiceTests : UmbracoIntegrationTest
             .WithParentObjectType(new Guid(parentObjectTypeGuid))
             .Build();
 
-        Attempt<IRelationType, RelationTypeOperationStatus> result = await RelationService.CreateAsync(relationType, Constants.Security.SuperUserId);
+        Attempt<IRelationType, RelationTypeOperationStatus> result = await RelationService.CreateAsync(relationType, Constants.Security.SuperUserKey);
 
         Assert.Multiple(() =>
         {
@@ -97,7 +97,7 @@ public class RelationServiceTests : UmbracoIntegrationTest
             .WithKey(new Guid(key))
             .Build();
 
-        Attempt<IRelationType, RelationTypeOperationStatus> result = await RelationService.CreateAsync(relationType, Constants.Security.SuperUserId);
+        Attempt<IRelationType, RelationTypeOperationStatus> result = await RelationService.CreateAsync(relationType, Constants.Security.SuperUserKey);
 
         Assert.Multiple(() =>
         {
@@ -122,7 +122,7 @@ public class RelationServiceTests : UmbracoIntegrationTest
             .WithId(id)
             .Build();
 
-        Attempt<IRelationType, RelationTypeOperationStatus> result = await RelationService.CreateAsync(relationType, Constants.Security.SuperUserId);
+        Attempt<IRelationType, RelationTypeOperationStatus> result = await RelationService.CreateAsync(relationType, Constants.Security.SuperUserKey);
 
         Assert.Multiple(() =>
         {

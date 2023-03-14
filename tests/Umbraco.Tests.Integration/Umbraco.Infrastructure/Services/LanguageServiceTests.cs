@@ -1,4 +1,5 @@
 ﻿using NUnit.Framework;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.OperationStatus;
@@ -49,13 +50,13 @@ public class LanguageServiceTests : UmbracoIntegrationTest
         var languageNbNo = new LanguageBuilder()
             .WithCultureInfo("nb-NO")
             .Build();
-        await LanguageService.CreateAsync(languageNbNo, 0);
+        await LanguageService.CreateAsync(languageNbNo, Constants.Security.SuperUserKey);
         Assert.That(languageNbNo.HasIdentity, Is.True);
 
         var language = await LanguageService.GetAsync("nb-NO");
         Assert.NotNull(language);
 
-        var result = await LanguageService.DeleteAsync("nb-NO");
+        var result = await LanguageService.DeleteAsync("nb-NO", Constants.Security.SuperUserKey);
         Assert.IsTrue(result.Success);
 
         language = await LanguageService.GetAsync("nb-NO");
@@ -71,7 +72,7 @@ public class LanguageServiceTests : UmbracoIntegrationTest
             .WithCultureInfo("nb-NO")
             .WithFallbackLanguageIsoCode(languageDaDk.IsoCode)
             .Build();
-        var result = await LanguageService.CreateAsync(languageNbNo, 0);
+        var result = await LanguageService.CreateAsync(languageNbNo, Constants.Security.SuperUserKey);
         Assert.IsTrue(result.Success);
 
         var language = await LanguageService.GetAsync("nb-NO");
@@ -88,14 +89,14 @@ public class LanguageServiceTests : UmbracoIntegrationTest
             .WithCultureInfo("nb-NO")
             .WithFallbackLanguageIsoCode(languageDaDk.IsoCode)
             .Build();
-        var result = await LanguageService.CreateAsync(languageNbNo, 0);
+        var result = await LanguageService.CreateAsync(languageNbNo, Constants.Security.SuperUserKey);
         Assert.IsTrue(result.Success);
 
         var language = await LanguageService.GetAsync("nb-NO");
         Assert.NotNull(language);
         Assert.AreEqual("da-DK", language.FallbackIsoCode);
 
-        result = await LanguageService.DeleteAsync("da-DK");
+        result = await LanguageService.DeleteAsync("da-DK", Constants.Security.SuperUserKey);
         Assert.IsTrue(result.Success);
 
         language = await LanguageService.GetAsync("da-DK");
@@ -126,7 +127,7 @@ public class LanguageServiceTests : UmbracoIntegrationTest
             .Build();
 
         // Act
-        await LanguageService.CreateAsync(languageEnAu);
+        await LanguageService.CreateAsync(languageEnAu, Constants.Security.SuperUserKey);
         var result = await LanguageService.GetAsync(isoCode);
 
         // Assert
@@ -140,7 +141,7 @@ public class LanguageServiceTests : UmbracoIntegrationTest
             .WithCultureInfo("en-AU")
             .WithIsDefault(true)
             .Build();
-        await LanguageService.CreateAsync(languageEnAu);
+        await LanguageService.CreateAsync(languageEnAu, Constants.Security.SuperUserKey);
         var result = await LanguageService.GetAsync(languageEnAu.IsoCode);
 
         Assert.IsTrue(result.IsDefault);
@@ -149,7 +150,7 @@ public class LanguageServiceTests : UmbracoIntegrationTest
             .WithCultureInfo("en-NZ")
             .WithIsDefault(true)
             .Build();
-        await LanguageService.CreateAsync(languageEnNz);
+        await LanguageService.CreateAsync(languageEnNz, Constants.Security.SuperUserKey);
         var result2 = await LanguageService.GetAsync(languageEnNz.IsoCode);
 
         // re-get
@@ -166,10 +167,10 @@ public class LanguageServiceTests : UmbracoIntegrationTest
         var languageEnAu = new LanguageBuilder()
             .WithCultureInfo(isoCode)
             .Build();
-        await LanguageService.CreateAsync(languageEnAu);
+        await LanguageService.CreateAsync(languageEnAu, Constants.Security.SuperUserKey);
 
         // Act
-        var result = await LanguageService.DeleteAsync(languageEnAu.IsoCode);
+        var result = await LanguageService.DeleteAsync(languageEnAu.IsoCode, Constants.Security.SuperUserKey);
         Assert.IsTrue(result.Success);
 
         // Assert
@@ -186,7 +187,7 @@ public class LanguageServiceTests : UmbracoIntegrationTest
         languageDaDk.IsoCode = "da";
         languageDaDk.CultureName = "New Culture Name For da-DK";
 
-        var result = await LanguageService.UpdateAsync(languageDaDk);
+        var result = await LanguageService.UpdateAsync(languageDaDk, Constants.Security.SuperUserKey);
         Assert.IsTrue(result.Success);
         Assert.AreEqual(LanguageOperationStatus.Success, result.Status);
 
@@ -210,7 +211,7 @@ public class LanguageServiceTests : UmbracoIntegrationTest
         Assert.AreNotEqual(defaultLanguageIsoCode, languageDaDk.IsoCode);
 
         languageDaDk.IsDefault = true;
-        var result = await LanguageService.UpdateAsync(languageDaDk);
+        var result = await LanguageService.UpdateAsync(languageDaDk, Constants.Security.SuperUserKey);
         Assert.IsTrue(result.Success);
 
         // re-get
@@ -226,7 +227,7 @@ public class LanguageServiceTests : UmbracoIntegrationTest
     public async Task Cannot_Create_Language_With_Invalid_IsoCode()
     {
         var invalidLanguage = new Language("no-such-iso-code", "Invalid ISO code");
-        var result = await LanguageService.CreateAsync(invalidLanguage);
+        var result = await LanguageService.CreateAsync(invalidLanguage, Constants.Security.SuperUserKey);
         Assert.IsFalse(result.Success);
         Assert.AreEqual(LanguageOperationStatus.InvalidIsoCode, result.Status);
     }
@@ -238,13 +239,13 @@ public class LanguageServiceTests : UmbracoIntegrationTest
         var languageEnAu = new LanguageBuilder()
             .WithCultureInfo(isoCode)
             .Build();
-        var result = await LanguageService.CreateAsync(languageEnAu);
+        var result = await LanguageService.CreateAsync(languageEnAu, Constants.Security.SuperUserKey);
         Assert.IsTrue(result.Success);
 
         var duplicateLanguageEnAu = new LanguageBuilder()
             .WithCultureInfo(isoCode)
             .Build();
-        result = await LanguageService.CreateAsync(duplicateLanguageEnAu);
+        result = await LanguageService.CreateAsync(duplicateLanguageEnAu, Constants.Security.SuperUserKey);
         Assert.IsFalse(result.Success);
         Assert.AreEqual(LanguageOperationStatus.DuplicateIsoCode, result.Status);
     }
@@ -257,7 +258,7 @@ public class LanguageServiceTests : UmbracoIntegrationTest
             .WithCultureInfo(isoCode)
             .WithFallbackLanguageIsoCode("no-such-ISO-code")
             .Build();
-        var result = await LanguageService.CreateAsync(languageEnAu);
+        var result = await LanguageService.CreateAsync(languageEnAu, Constants.Security.SuperUserKey);
         Assert.IsFalse(result.Success);
         Assert.AreEqual(LanguageOperationStatus.InvalidFallbackIsoCode, result.Status);
     }
@@ -270,7 +271,7 @@ public class LanguageServiceTests : UmbracoIntegrationTest
             .WithCultureInfo(isoCode)
             .WithFallbackLanguageIsoCode("fr-FR")
             .Build();
-        var result = await LanguageService.CreateAsync(languageEnAu);
+        var result = await LanguageService.CreateAsync(languageEnAu, Constants.Security.SuperUserKey);
         Assert.IsFalse(result.Success);
         Assert.AreEqual(LanguageOperationStatus.InvalidFallback, result.Status);
     }
@@ -279,7 +280,7 @@ public class LanguageServiceTests : UmbracoIntegrationTest
     public async Task Cannot_Update_Non_Existing_Language()
     {
         ILanguage language = new Language("da", "Danish");
-        var result = await LanguageService.UpdateAsync(language);
+        var result = await LanguageService.UpdateAsync(language, Constants.Security.SuperUserKey);
         Assert.IsFalse(result.Success);
         Assert.AreEqual(LanguageOperationStatus.NotFound, result.Status);
     }
@@ -294,7 +295,7 @@ public class LanguageServiceTests : UmbracoIntegrationTest
         Assert.IsTrue(defaultLanguage.IsDefault);
 
         defaultLanguage.IsDefault = false;
-        var result = await LanguageService.UpdateAsync(defaultLanguage);
+        var result = await LanguageService.UpdateAsync(defaultLanguage, Constants.Security.SuperUserKey);
         Assert.IsFalse(result.Success);
         Assert.AreEqual(LanguageOperationStatus.MissingDefault, result.Status);
 
@@ -314,7 +315,7 @@ public class LanguageServiceTests : UmbracoIntegrationTest
         Assert.IsNull(languageDaDk.FallbackIsoCode);
 
         languageDaDk.FallbackIsoCode = "fr-FR";
-        var result = await LanguageService.UpdateAsync(languageDaDk);
+        var result = await LanguageService.UpdateAsync(languageDaDk, Constants.Security.SuperUserKey);
         Assert.IsFalse(result.Success);
         Assert.AreEqual(LanguageOperationStatus.InvalidFallback, result.Status);
     }
@@ -327,7 +328,7 @@ public class LanguageServiceTests : UmbracoIntegrationTest
         Assert.IsNull(languageDaDk.FallbackIsoCode);
 
         languageDaDk.FallbackIsoCode = "no-such-iso-code";
-        var result = await LanguageService.UpdateAsync(languageDaDk);
+        var result = await LanguageService.UpdateAsync(languageDaDk, Constants.Security.SuperUserKey);
         Assert.IsFalse(result.Success);
         Assert.AreEqual(LanguageOperationStatus.InvalidFallbackIsoCode, result.Status);
     }
@@ -343,11 +344,11 @@ public class LanguageServiceTests : UmbracoIntegrationTest
         Assert.IsNull(languageEnGb.FallbackIsoCode);
 
         languageDaDk.FallbackIsoCode = languageEnGb.IsoCode;
-        var result = await LanguageService.UpdateAsync(languageDaDk);
+        var result = await LanguageService.UpdateAsync(languageDaDk, Constants.Security.SuperUserKey);
         Assert.IsTrue(result.Success);
 
         languageEnGb.FallbackIsoCode = languageDaDk.IsoCode;
-        result = await LanguageService.UpdateAsync(languageEnGb);
+        result = await LanguageService.UpdateAsync(languageEnGb, Constants.Security.SuperUserKey);
         Assert.IsFalse(result.Success);
         Assert.AreEqual(LanguageOperationStatus.InvalidFallback, result.Status);
     }
@@ -366,15 +367,15 @@ public class LanguageServiceTests : UmbracoIntegrationTest
         Assert.IsNull(languageDaDk.FallbackIsoCode);
 
         languageEnGb.FallbackIsoCode = languageEnUs.IsoCode;
-        var result = await LanguageService.UpdateAsync(languageEnGb);
+        var result = await LanguageService.UpdateAsync(languageEnGb, Constants.Security.SuperUserKey);
         Assert.IsTrue(result.Success);
 
         languageDaDk.FallbackIsoCode = languageEnGb.IsoCode;
-        result = await LanguageService.UpdateAsync(languageDaDk);
+        result = await LanguageService.UpdateAsync(languageDaDk, Constants.Security.SuperUserKey);
         Assert.IsTrue(result.Success);
 
         languageEnUs.FallbackIsoCode = languageDaDk.IsoCode;
-        result = await LanguageService.UpdateAsync(languageEnUs);
+        result = await LanguageService.UpdateAsync(languageEnUs, Constants.Security.SuperUserKey);
         Assert.IsFalse(result.Success);
         Assert.AreEqual(LanguageOperationStatus.InvalidFallback, result.Status);
 
@@ -398,10 +399,10 @@ public class LanguageServiceTests : UmbracoIntegrationTest
             .WithCultureInfo("nb-NO")
             .WithIsDefault(true)
             .Build();
-        var result = await LanguageService.CreateAsync(languageNbNo);
+        var result = await LanguageService.CreateAsync(languageNbNo, Constants.Security.SuperUserKey);
         Assert.IsTrue(result.Success);
 
-        result = await LanguageService.DeleteAsync(languageNbNo.IsoCode);
+        result = await LanguageService.DeleteAsync(languageNbNo.IsoCode, Constants.Security.SuperUserKey);
         Assert.IsFalse(result.Success);
         Assert.AreEqual(LanguageOperationStatus.MissingDefault, result.Status);
 
@@ -418,7 +419,7 @@ public class LanguageServiceTests : UmbracoIntegrationTest
             .WithCultureInfo("nb-NO")
             .Build();
 
-        var result = await LanguageService.DeleteAsync(languageNbNo.IsoCode);
+        var result = await LanguageService.DeleteAsync(languageNbNo.IsoCode, Constants.Security.SuperUserKey);
         Assert.IsFalse(result.Success);
         Assert.AreEqual(LanguageOperationStatus.NotFound, result.Status);
     }
@@ -430,7 +431,7 @@ public class LanguageServiceTests : UmbracoIntegrationTest
         Assert.NotNull(languageDaDk);
         languageDaDk.IsoCode = "nb-NO";
 
-        var result = await LanguageService.CreateAsync(languageDaDk);
+        var result = await LanguageService.CreateAsync(languageDaDk, Constants.Security.SuperUserKey);
         Assert.IsFalse(result.Success);
         Assert.AreEqual(LanguageOperationStatus.InvalidId, result.Status);
     }
@@ -444,9 +445,9 @@ public class LanguageServiceTests : UmbracoIntegrationTest
             .WithCultureInfo("en-GB")
             .Build();
 
-        var languageResult = await LanguageService.CreateAsync(languageDaDk, 0);
+        var languageResult = await LanguageService.CreateAsync(languageDaDk, Constants.Security.SuperUserKey);
         Assert.IsTrue(languageResult.Success);
-        languageResult = await LanguageService.CreateAsync(languageEnGb, 0);
+        languageResult = await LanguageService.CreateAsync(languageEnGb, Constants.Security.SuperUserKey);
         Assert.IsTrue(languageResult.Success);
     }
 }

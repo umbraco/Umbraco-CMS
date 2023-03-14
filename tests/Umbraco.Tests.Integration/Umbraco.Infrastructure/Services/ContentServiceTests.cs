@@ -200,8 +200,8 @@ public class ContentServiceTests : UmbracoIntegrationTestWithContent
             .WithCultureInfo("fr-FR")
             .Build();
 
-        await LanguageService.CreateAsync(langFr);
-        await LanguageService.CreateAsync(langUk);
+        await LanguageService.CreateAsync(langFr, Constants.Security.SuperUserKey);
+        await LanguageService.CreateAsync(langUk, Constants.Security.SuperUserKey);
 
         var ctInvariant = ContentTypeBuilder.CreateBasicContentType("invariantPage");
         ContentTypeService.Save(ctInvariant);
@@ -848,8 +848,8 @@ public class ContentServiceTests : UmbracoIntegrationTestWithContent
             .WithCultureInfo("fr-FR")
             .Build();
 
-        await LanguageService.CreateAsync(langFr);
-        await LanguageService.CreateAsync(langUk);
+        await LanguageService.CreateAsync(langFr, Constants.Security.SuperUserKey);
+        await LanguageService.CreateAsync(langUk, Constants.Security.SuperUserKey);
 
         var contentType = ContentTypeBuilder.CreateBasicContentType();
         contentType.Variations = ContentVariation.Culture;
@@ -952,8 +952,8 @@ public class ContentServiceTests : UmbracoIntegrationTestWithContent
             .WithCultureInfo("fr-FR")
             .Build();
 
-        await LanguageService.CreateAsync(langFr);
-        await LanguageService.CreateAsync(langGb);
+        await LanguageService.CreateAsync(langFr, Constants.Security.SuperUserKey);
+        await LanguageService.CreateAsync(langGb, Constants.Security.SuperUserKey);
 
         var contentType = ContentTypeBuilder.CreateMetaContentType();
         contentType.Variations = ContentVariation.Culture;
@@ -1030,8 +1030,8 @@ public class ContentServiceTests : UmbracoIntegrationTestWithContent
             .WithCultureInfo("fr-FR")
             .Build();
 
-        await LanguageService.CreateAsync(langFr);
-        await LanguageService.CreateAsync(langGb);
+        await LanguageService.CreateAsync(langFr, Constants.Security.SuperUserKey);
+        await LanguageService.CreateAsync(langGb, Constants.Security.SuperUserKey);
 
         var contentType = ContentTypeBuilder.CreateBasicContentType();
         contentType.Variations = ContentVariation.Culture;
@@ -1220,8 +1220,8 @@ public class ContentServiceTests : UmbracoIntegrationTestWithContent
         var langDa = new LanguageBuilder()
             .WithCultureInfo("da")
             .Build();
-        await LanguageService.CreateAsync(langFr);
-        await LanguageService.CreateAsync(langDa);
+        await LanguageService.CreateAsync(langFr, Constants.Security.SuperUserKey);
+        await LanguageService.CreateAsync(langDa, Constants.Security.SuperUserKey);
 
         var ct = ContentTypeBuilder.CreateBasicContentType();
         ct.Variations = ContentVariation.Culture;
@@ -2325,8 +2325,8 @@ public class ContentServiceTests : UmbracoIntegrationTestWithContent
         var langDa = new LanguageBuilder()
             .WithCultureInfo("da")
             .Build();
-        await LanguageService.CreateAsync(langFr);
-        await LanguageService.CreateAsync(langDa);
+        await LanguageService.CreateAsync(langFr, Constants.Security.SuperUserKey);
+        await LanguageService.CreateAsync(langDa, Constants.Security.SuperUserKey);
 
         var template = TemplateBuilder.CreateTextPageTemplate();
         FileService.SaveTemplate(template);
@@ -2850,8 +2850,8 @@ public class ContentServiceTests : UmbracoIntegrationTestWithContent
             .WithCultureInfo("fr-FR")
             .Build();
 
-        await languageService.CreateAsync(langFr);
-        await languageService.CreateAsync(langUk);
+        await languageService.CreateAsync(langFr, Constants.Security.SuperUserKey);
+        await languageService.CreateAsync(langUk, Constants.Security.SuperUserKey);
 
         var contentTypeService = ContentTypeService;
 
@@ -2891,8 +2891,8 @@ public class ContentServiceTests : UmbracoIntegrationTestWithContent
             .WithCultureInfo("fr-FR")
             .Build();
 
-        await languageService.CreateAsync(langFr);
-        await languageService.CreateAsync(langUk);
+        await languageService.CreateAsync(langFr, Constants.Security.SuperUserKey);
+        await languageService.CreateAsync(langUk, Constants.Security.SuperUserKey);
 
         var contentTypeService = ContentTypeService;
 
@@ -2937,9 +2937,9 @@ public class ContentServiceTests : UmbracoIntegrationTestWithContent
             .WithCultureInfo("da-DK")
             .Build();
 
-        await languageService.CreateAsync(langFr);
-        await languageService.CreateAsync(langUk);
-        await languageService.CreateAsync(langDa);
+        await languageService.CreateAsync(langFr, Constants.Security.SuperUserKey);
+        await languageService.CreateAsync(langUk, Constants.Security.SuperUserKey);
+        await languageService.CreateAsync(langDa, Constants.Security.SuperUserKey);
 
         var contentTypeService = ContentTypeService;
 
@@ -3071,9 +3071,9 @@ public class ContentServiceTests : UmbracoIntegrationTestWithContent
             .WithCultureInfo("de-DE")
             .Build();
 
-        await languageService.CreateAsync(langFr);
-        await languageService.CreateAsync(langUk);
-        await languageService.CreateAsync(langDe);
+        await languageService.CreateAsync(langFr, Constants.Security.SuperUserKey);
+        await languageService.CreateAsync(langUk, Constants.Security.SuperUserKey);
+        await languageService.CreateAsync(langDe, Constants.Security.SuperUserKey);
 
         var contentTypeService = ContentTypeService;
 
@@ -3486,8 +3486,8 @@ public class ContentServiceTests : UmbracoIntegrationTestWithContent
         langFr = (Language)new LanguageBuilder()
             .WithCultureInfo("fr-FR")
             .Build();
-        LanguageService.CreateAsync(langFr).GetAwaiter().GetResult();
-        LanguageService.CreateAsync(langUk).GetAwaiter().GetResult();
+        LanguageService.CreateAsync(langFr, Constants.Security.SuperUserKey).GetAwaiter().GetResult();
+        LanguageService.CreateAsync(langUk, Constants.Security.SuperUserKey).GetAwaiter().GetResult();
 
         contentType = ContentTypeBuilder.CreateBasicContentType();
         contentType.Variations = ContentVariation.Culture;

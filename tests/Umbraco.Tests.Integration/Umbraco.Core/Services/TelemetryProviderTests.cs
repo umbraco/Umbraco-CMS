@@ -134,9 +134,9 @@ public class TelemetryProviderTests : UmbracoIntegrationTest
         var langTwo = _languageBuilder.WithCultureInfo("da-DK").Build();
         var langThree = _languageBuilder.WithCultureInfo("sv-SE").Build();
 
-        var langTwoResult = await LanguageService.CreateAsync(langTwo);
+        var langTwoResult = await LanguageService.CreateAsync(langTwo, Constants.Security.SuperUserKey);
         Assert.IsTrue(langTwoResult.Success);
-        var langThreeResult = await LanguageService.CreateAsync(langThree);
+        var langThreeResult = await LanguageService.CreateAsync(langThree, Constants.Security.SuperUserKey);
         Assert.IsTrue(langThreeResult.Success);
 
         IEnumerable<UsageInformation> result = null;

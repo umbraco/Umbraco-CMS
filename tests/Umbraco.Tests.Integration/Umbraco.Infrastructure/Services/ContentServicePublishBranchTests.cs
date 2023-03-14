@@ -443,11 +443,11 @@ public class ContentServicePublishBranchTests : UmbracoIntegrationTest
     private void CreateTypes(out IContentType iContentType, out IContentType vContentType)
     {
         var langDe = new Language("de", "German") { IsDefault = true };
-        LanguageService.CreateAsync(langDe).GetAwaiter().GetResult();
+        LanguageService.CreateAsync(langDe, Constants.Security.SuperUserKey).GetAwaiter().GetResult();
         var langRu = new Language("ru", "Russian");
-        LanguageService.CreateAsync(langRu).GetAwaiter().GetResult();
+        LanguageService.CreateAsync(langRu, Constants.Security.SuperUserKey).GetAwaiter().GetResult();
         var langEs = new Language("es", "Spanish");
-        LanguageService.CreateAsync(langEs).GetAwaiter().GetResult();
+        LanguageService.CreateAsync(langEs, Constants.Security.SuperUserKey).GetAwaiter().GetResult();
 
         iContentType = new ContentType(ShortStringHelper, -1)
         {

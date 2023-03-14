@@ -31,8 +31,8 @@ public class EntityServiceTests : UmbracoIntegrationTest
         {
             _langFr = new Language("fr-FR", "French (France)");
             _langEs = new Language("es-ES", "Spanish (Spain)");
-            await LanguageService.CreateAsync(_langFr);
-            await LanguageService.CreateAsync(_langEs);
+            await LanguageService.CreateAsync(_langFr, Constants.Security.SuperUserKey);
+            await LanguageService.CreateAsync(_langEs, Constants.Security.SuperUserKey);
         }
 
         CreateTestData();

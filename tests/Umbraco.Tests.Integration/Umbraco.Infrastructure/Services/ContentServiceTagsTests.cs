@@ -4,6 +4,7 @@
 using System;
 using System.Linq;
 using NUnit.Framework;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Serialization;
@@ -94,7 +95,7 @@ public class ContentServiceTagsTests : UmbracoIntegrationTest
        var language = new LanguageBuilder()
             .WithCultureInfo("fr-FR")
             .Build();
-        await LanguageService.CreateAsync(language); // en-US is already there
+        await LanguageService.CreateAsync(language, Constants.Security.SuperUserKey); // en-US is already there
 
         var template = TemplateBuilder.CreateTextPageTemplate();
         FileService.SaveTemplate(template);
@@ -228,7 +229,7 @@ public class ContentServiceTagsTests : UmbracoIntegrationTest
         var language = new LanguageBuilder()
             .WithCultureInfo("fr-FR")
             .Build();
-        await LanguageService.CreateAsync(language); // en-US is already there
+        await LanguageService.CreateAsync(language, Constants.Security.SuperUserKey); // en-US is already there
 
         var template = TemplateBuilder.CreateTextPageTemplate();
         FileService.SaveTemplate(template);
@@ -287,7 +288,7 @@ public class ContentServiceTagsTests : UmbracoIntegrationTest
         var language = new LanguageBuilder()
             .WithCultureInfo("fr-FR")
             .Build();
-        await LanguageService.CreateAsync(language); // en-US is already there
+        await LanguageService.CreateAsync(language, Constants.Security.SuperUserKey); // en-US is already there
 
         var template = TemplateBuilder.CreateTextPageTemplate();
         FileService.SaveTemplate(template);
@@ -332,7 +333,7 @@ public class ContentServiceTagsTests : UmbracoIntegrationTest
         var language = new LanguageBuilder()
             .WithCultureInfo("fr-FR")
             .Build();
-        await LanguageService.CreateAsync(language); // en-US is already there
+        await LanguageService.CreateAsync(language, Constants.Security.SuperUserKey); // en-US is already there
 
         var template = TemplateBuilder.CreateTextPageTemplate();
         FileService.SaveTemplate(template);
@@ -394,7 +395,7 @@ public class ContentServiceTagsTests : UmbracoIntegrationTest
         var language = new LanguageBuilder()
             .WithCultureInfo("fr-FR")
             .Build();
-        await LanguageService.CreateAsync(language); // en-US is already there
+        await LanguageService.CreateAsync(language, Constants.Security.SuperUserKey); // en-US is already there
 
         var template = TemplateBuilder.CreateTextPageTemplate();
         FileService.SaveTemplate(template);

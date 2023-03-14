@@ -31,10 +31,12 @@ public class ContentControllerTests : UmbracoTestServerTestBase
         var languageService = GetRequiredService<ILanguageService>();
 
         // Add another language
-        await languageService.CreateAsync(new LanguageBuilder()
+        await languageService.CreateAsync(
+            new LanguageBuilder()
             .WithCultureInfo(DkIso)
             .WithIsDefault(false)
-            .Build());
+            .Build(),
+            Constants.Security.SuperUserKey);
 
         var url = PrepareApiControllerUrl<ContentController>(x => x.PostSave(null));
 
@@ -87,10 +89,12 @@ public class ContentControllerTests : UmbracoTestServerTestBase
         var languageService = GetRequiredService<ILanguageService>();
 
         // Add another language
-        await languageService.CreateAsync(new LanguageBuilder()
+        await languageService.CreateAsync(
+            new LanguageBuilder()
             .WithCultureInfo(DkIso)
             .WithIsDefault(false)
-            .Build());
+            .Build(),
+            Constants.Security.SuperUserKey);
 
         var url = PrepareApiControllerUrl<ContentController>(x => x.PostSave(null));
 
@@ -155,10 +159,12 @@ public class ContentControllerTests : UmbracoTestServerTestBase
         var languageService = GetRequiredService<ILanguageService>();
 
         // Add another language
-        await languageService.CreateAsync(new LanguageBuilder()
+        await languageService.CreateAsync(
+            new LanguageBuilder()
             .WithCultureInfo(DkIso)
             .WithIsDefault(false)
-            .Build());
+            .Build(),
+            Constants.Security.SuperUserKey);
 
         var url = PrepareApiControllerUrl<ContentController>(x => x.PostSave(null));
 
@@ -218,10 +224,12 @@ public class ContentControllerTests : UmbracoTestServerTestBase
         var languageService = GetRequiredService<ILanguageService>();
 
         // Add another language
-        await languageService.CreateAsync(new LanguageBuilder()
+        await languageService.CreateAsync(
+            new LanguageBuilder()
             .WithCultureInfo(DkIso)
             .WithIsDefault(false)
-            .Build());
+            .Build(),
+            Constants.Security.SuperUserKey);
 
         var url = PrepareApiControllerUrl<ContentController>(x => x.PostSave(null));
 
@@ -277,10 +285,12 @@ public class ContentControllerTests : UmbracoTestServerTestBase
         var languageService = GetRequiredService<ILanguageService>();
 
         // Add another language
-        await languageService.CreateAsync(new LanguageBuilder()
+        await languageService.CreateAsync(
+            new LanguageBuilder()
             .WithCultureInfo(DkIso)
             .WithIsDefault(false)
-            .Build());
+            .Build(),
+            Constants.Security.SuperUserKey);
 
         var url = PrepareApiControllerUrl<ContentController>(x => x.PostSave(null));
 
@@ -339,10 +349,12 @@ public class ContentControllerTests : UmbracoTestServerTestBase
         var languageService = GetRequiredService<ILanguageService>();
 
         // Add another language
-        await languageService.CreateAsync(new LanguageBuilder()
+        await languageService.CreateAsync(
+            new LanguageBuilder()
             .WithCultureInfo(DkIso)
             .WithIsDefault(false)
-            .Build());
+            .Build(),
+            Constants.Security.SuperUserKey);
 
         var url = PrepareApiControllerUrl<ContentController>(x => x.PostSave(null));
 
@@ -399,10 +411,12 @@ public class ContentControllerTests : UmbracoTestServerTestBase
     public async Task PostSave_Validates_Domains_Exist()
     {
         var languageService = GetRequiredService<ILanguageService>();
-        await languageService.CreateAsync(new LanguageBuilder()
+        await languageService.CreateAsync(
+            new LanguageBuilder()
             .WithCultureInfo(DkIso)
             .WithIsDefault(false)
-            .Build());
+            .Build(),
+            Constants.Security.SuperUserKey);
 
         var contentTypeService = GetRequiredService<IContentTypeService>();
         var contentType = new ContentTypeBuilder().WithContentVariation(ContentVariation.Culture).Build();
@@ -448,15 +462,19 @@ public class ContentControllerTests : UmbracoTestServerTestBase
         var sweIso = "sv-SE";
         var languageService = GetRequiredService<ILanguageService>();
         //Create 2 new languages
-        await languageService.CreateAsync(new LanguageBuilder()
+        await languageService.CreateAsync(
+            new LanguageBuilder()
             .WithCultureInfo(DkIso)
             .WithIsDefault(false)
-            .Build());
+            .Build(),
+            Constants.Security.SuperUserKey);
 
-        await languageService.CreateAsync(new LanguageBuilder()
+        await languageService.CreateAsync(
+            new LanguageBuilder()
             .WithCultureInfo(sweIso)
             .WithIsDefault(false)
-            .Build());
+            .Build(),
+            Constants.Security.SuperUserKey);
 
         var contentTypeService = GetRequiredService<IContentTypeService>();
         var contentType = new ContentTypeBuilder().WithContentVariation(ContentVariation.Culture).Build();
@@ -533,10 +551,12 @@ public class ContentControllerTests : UmbracoTestServerTestBase
     public async Task PostSave_Validates_All_Cultures_Has_Domains()
     {
         var languageService = GetRequiredService<ILanguageService>();
-        await languageService.CreateAsync(new LanguageBuilder()
+        await languageService.CreateAsync(
+            new LanguageBuilder()
             .WithCultureInfo(DkIso)
             .WithIsDefault(false)
-            .Build());
+            .Build(),
+            Constants.Security.SuperUserKey);
 
         var contentTypeService = GetRequiredService<IContentTypeService>();
         var contentType = new ContentTypeBuilder().WithContentVariation(ContentVariation.Culture).Build();
@@ -589,10 +609,12 @@ public class ContentControllerTests : UmbracoTestServerTestBase
     public async Task PostSave_Checks_Ancestors_For_Domains()
     {
         var languageService = GetRequiredService<ILanguageService>();
-        await languageService.CreateAsync(new LanguageBuilder()
+        await languageService.CreateAsync(
+            new LanguageBuilder()
             .WithCultureInfo(DkIso)
             .WithIsDefault(false)
-            .Build());
+            .Build(),
+            Constants.Security.SuperUserKey);
 
         var contentTypeService = GetRequiredService<IContentTypeService>();
         var contentType = new ContentTypeBuilder().WithContentVariation(ContentVariation.Culture).Build();

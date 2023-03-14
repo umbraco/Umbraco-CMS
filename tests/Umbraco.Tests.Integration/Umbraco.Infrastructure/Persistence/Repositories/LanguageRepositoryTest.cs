@@ -6,6 +6,7 @@ using System.Globalization;
 using System.Linq;
 using Microsoft.Extensions.Logging;
 using NUnit.Framework;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
@@ -374,15 +375,15 @@ public class LanguageRepositoryTest : UmbracoIntegrationTest
         //Id 1 is en-US - when Umbraco is installed
 
         var languageDK = new Language("da-DK", "Danish (Denmark)");
-        await languageService.CreateAsync(languageDK); //Id 2
+        await languageService.CreateAsync(languageDK, Constants.Security.SuperUserKey); //Id 2
 
         var languageSE = new Language("sv-SE", "Swedish (Sweden)");
-        await languageService.CreateAsync(languageSE); //Id 3
+        await languageService.CreateAsync(languageSE, Constants.Security.SuperUserKey); //Id 3
 
         var languageDE = new Language("de-DE", "German (Germany)");
-        await languageService.CreateAsync(languageDE); //Id 4
+        await languageService.CreateAsync(languageDE, Constants.Security.SuperUserKey); //Id 4
 
         var languagePT = new Language("pt-PT", "Portuguese (Portugal)");
-        await languageService.CreateAsync(languagePT); //Id 5
+        await languageService.CreateAsync(languagePT, Constants.Security.SuperUserKey); //Id 5
     }
 }
