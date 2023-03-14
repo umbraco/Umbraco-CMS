@@ -1,3 +1,4 @@
+import { manifests as modalManifests } from './modals/manifests';
 import type { ManifestHeaderApp, ManifestUserDashboard } from '@umbraco-cms/models';
 
 export const userDashboards: Array<ManifestUserDashboard> = [
@@ -25,4 +26,4 @@ export const headerApps: Array<ManifestHeaderApp> = [
 	},
 ];
 
-export const manifests = [...userDashboards, ...headerApps];
+export const manifests = [...userDashboards, ...headerApps, ...modalManifests];

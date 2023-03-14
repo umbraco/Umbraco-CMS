@@ -22,6 +22,7 @@ import type { ManifestWorkspaceAction } from './workspace-action.models';
 import type { ManifestWorkspaceView } from './workspace-view.models';
 import type { ManifestWorkspaceViewCollection } from './workspace-view-collection.models';
 import type { ManifestRepository } from './repository.models';
+import type { ManifestModal } from './modal.models';
 import type { ManifestStore, ManifestTreeStore } from './store.models';
 
 export * from './collection-view.models';
@@ -49,6 +50,7 @@ export * from './workspace-view.models';
 export * from './repository.models';
 export * from './store.models';
 export * from './workspace.models';
+export * from './modal.models';
 
 export type ManifestTypes =
 	| ManifestCollectionView
@@ -79,6 +81,7 @@ export type ManifestTypes =
 	| ManifestWorkspaceAction
 	| ManifestWorkspaceView
 	| ManifestWorkspaceViewCollection
+	| ManifestModal
 	| ManifestStore
 	| ManifestTreeStore
 	| ManifestBase;

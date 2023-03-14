@@ -1,12 +1,11 @@
 import { html, css, nothing } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
-import { IRoute, IRoutingInfo, path } from 'router-slot';
 
 import { UmbDashboardExamineIndexElement } from './views/section-view-examine-indexers';
 import { UmbDashboardExamineSearcherElement } from './views/section-view-examine-searchers';
+import type { IRoute, IRoutingInfo, UmbRouterSlotChangeEvent, UmbRouterSlotInitEvent } from '@umbraco-cms/router';
 
 import { UmbLitElement } from '@umbraco-cms/element';
-import { UmbRouterSlotChangeEvent, UmbRouterSlotInitEvent } from '@umbraco-cms/router';
 
 @customElement('umb-dashboard-examine-management')
 export class UmbDashboardExamineManagementElement extends UmbLitElement {
@@ -51,7 +50,6 @@ export class UmbDashboardExamineManagementElement extends UmbLitElement {
 
 	@state()
 	private _activePath = '';
-
 
 	render() {
 		return html` ${this._routerPath && this._activePath !== ''

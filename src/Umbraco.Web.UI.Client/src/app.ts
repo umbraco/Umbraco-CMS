@@ -7,14 +7,15 @@ import '@umbraco-ui/uui-modal-container';
 import '@umbraco-ui/uui-modal-dialog';
 import '@umbraco-ui/uui-modal-sidebar';
 import 'element-internals-polyfill';
-import '@umbraco-cms/router';
 
-import type { Guard, IRoute } from 'router-slot/model';
+import './core/router/router-slot.element';
+import './core/notification/layouts/default';
 
 import { UUIIconRegistryEssential } from '@umbraco-ui/uui';
 import { css, html } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 
+import type { Guard, IRoute } from '@umbraco-cms/router';
 import { UmbLitElement } from '@umbraco-cms/element';
 import { tryExecuteAndNotify } from '@umbraco-cms/resources';
 import { OpenAPI, RuntimeLevelModel, ServerResource } from '@umbraco-cms/backend-api';

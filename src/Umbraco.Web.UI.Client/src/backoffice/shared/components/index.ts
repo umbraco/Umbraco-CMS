@@ -1,6 +1,7 @@
-//TODO: we need to figure out what components should be available for extensions and load them upfront
-// TODO: we need to move these files into their respective folders/silos. We then need a way for a silo to globally register a component
+import { manifests as debugManifests } from './debug/manifests';
 
+// TODO: we need to figure out what components should be available for extensions and load them upfront
+// TODO: we need to move these files into their respective folders/silos. We then need a way for a silo to globally register a component
 import './body-layout/body-layout.element';
 import './footer-layout/footer-layout.element';
 import './entity-action/entity-action-list.element';
@@ -42,4 +43,7 @@ import './history/history-item.element';
 import './workspace/workspace-action/workspace-action.element';
 import './workspace/workspace-content/workspace-content.element';
 import './workspace/workspace-layout/workspace-layout.element';
+
 import './workspace/workspace-footer-layout/workspace-footer-layout.element';
+
+export const manifests = [...debugManifests];

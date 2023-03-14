@@ -4,7 +4,7 @@ import {
 	UmbSectionSidebarContext,
 	UMB_SECTION_SIDEBAR_CONTEXT_TOKEN,
 } from '../../../../../backoffice/shared/components/section/section-sidebar/section-sidebar.context';
-import type { UmbCreateDictionaryModalResultData } from './create-dictionary-modal-layout.element';
+import { UMB_CREATE_DICTIONARY_MODAL_TOKEN } from '.';
 import { UmbEntityActionBase } from '@umbraco-cms/entity-action';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 import { UmbContextConsumerController } from '@umbraco-cms/context-api';
@@ -38,13 +38,13 @@ export default class UmbCreateDictionaryEntityAction extends UmbEntityActionBase
 
 		// TODO: how can we get the current entity detail in the modal? Passing the observable
 		// feels a bit hacky. Works, but hacky.
-		const modalHandler = this.#modalContext?.open('umb-create-dictionary-modal-layout', {
-			type: 'sidebar',
-			data: { unique: this.unique, parentName: this.#sectionSidebarContext.headline },
+		const modalHandler = this.#modalContext?.open(UMB_CREATE_DICTIONARY_MODAL_TOKEN, {
+			unique: this.unique,
+			parentName: this.#sectionSidebarContext.headline,
 		});
 
 		// TODO: get type from modal result
-		const { name }: UmbCreateDictionaryModalResultData = await modalHandler.onClose();
+		const { name } = await modalHandler.onSubmit();
 		if (!name) return;
 
 		const result = await this.repository?.create({

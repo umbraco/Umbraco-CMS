@@ -1,15 +1,16 @@
 import { html } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, property, state } from 'lit/decorators.js';
+import UmbInputSliderElement from '../../../../shared/components/input-slider/input-slider.element';
+import { UmbPropertyEditorElement } from '@umbraco-cms/property-editor';
 import { UmbLitElement } from '@umbraco-cms/element';
 import { DataTypePropertyModel } from '@umbraco-cms/backend-api';
-import UmbInputSliderElement from 'src/backoffice/shared/components/input-slider/input-slider.element';
 
 /**
  * @element umb-property-editor-ui-slider
  */
 @customElement('umb-property-editor-ui-slider')
-export class UmbPropertyEditorUISliderElement extends UmbLitElement {
+export class UmbPropertyEditorUISliderElement extends UmbLitElement implements UmbPropertyEditorElement {
 	static styles = [UUITextStyles];
 
 	@property()

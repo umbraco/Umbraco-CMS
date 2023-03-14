@@ -1,5 +1,6 @@
 import { html } from 'lit';
 import type { UmbMediaRepository } from '../../repository/media.repository';
+import { UMB_CONFIRM_MODAL_TOKEN } from '../../../../shared/modals/confirm';
 import { UmbEntityBulkActionBase } from '@umbraco-cms/entity-action';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 import { UmbContextConsumerController } from '@umbraco-cms/context-api';
@@ -25,7 +26,7 @@ export class UmbMediaTrashEntityBulkAction extends UmbEntityBulkActionBase<UmbMe
 
 		if (data) {
 			// TODO: use correct markup
-			const modalHandler = this.#modalContext?.confirm({
+			const modalHandler = this.#modalContext?.open(UMB_CONFIRM_MODAL_TOKEN, {
 				headline: `Deleting ${this.selection.length} items`,
 				content: html`
 					This will delete the following files:
@@ -37,10 +38,8 @@ export class UmbMediaTrashEntityBulkAction extends UmbEntityBulkActionBase<UmbMe
 				confirmLabel: 'Delete',
 			});
 
-			const { confirmed } = await modalHandler.onClose();
-			if (confirmed) {
-				await this.repository?.trash(this.selection);
-			}
+			await modalHandler.onSubmit();
+			await this.repository?.trash(this.selection);
 		}
 	}
 }

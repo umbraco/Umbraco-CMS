@@ -1,4 +1,5 @@
-import './workspace-layout.element';
+import '../workspace-layout/workspace-layout.element';
+import './workspace-footer-layout.element';
 
 import { Meta, Story } from '@storybook/web-components';
 import { html } from 'lit-html';
@@ -12,7 +13,7 @@ export default {
 } as Meta;
 
 export const AAAOverview: Story<UmbWorkspaceFooterLayout> = () => html` <umb-workspace-footer-layout>
-	<div slot="footer"><uui-button color="" look="placeholder">Footer slot</uui-button></div>
+	<div><uui-button color="" look="placeholder">Footer slot</uui-button></div>
 	<div slot="actions"><uui-button color="" look="placeholder">Actions slot</uui-button></div>
 </umb-workspace-footer-layout>`;
 AAAOverview.storyName = 'Overview';

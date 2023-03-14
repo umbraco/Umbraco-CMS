@@ -53,7 +53,7 @@ export const data: Array<UserDetails> = [
 		contentStartNodes: [],
 		mediaStartNodes: [],
 		icon: 'umb:user',
-		name: 'Lurleen Rozycki',
+		name: 'Lasse Fredslund',
 		email: 'lrozycki0@technorati.com',
 		language: 'Bosnian',
 		status: 'invited',

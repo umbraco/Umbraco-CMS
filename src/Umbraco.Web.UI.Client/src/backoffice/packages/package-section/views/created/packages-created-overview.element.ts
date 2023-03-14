@@ -3,6 +3,7 @@ import { ifDefined } from 'lit/directives/if-defined.js';
 import { customElement, state } from 'lit/decorators.js';
 import { repeat } from 'lit/directives/repeat.js';
 import { UUIPaginationEvent } from '@umbraco-ui/uui';
+import { UMB_CONFIRM_MODAL_TOKEN } from '../../../../shared/modals/confirm';
 import { PackageDefinitionModel, PackageResource } from '@umbraco-cms/backend-api';
 import { UmbLitElement } from '@umbraco-cms/element';
 import { tryExecuteAndNotify } from '@umbraco-cms/resources';
@@ -134,18 +135,14 @@ export class UmbPackagesCreatedOverviewElement extends UmbLitElement {
 
 	async #deletePackage(p: PackageDefinitionModel) {
 		if (!p.key) return;
-		const modalHandler = this._modalContext?.confirm({
+		const modalHandler = this._modalContext?.open(UMB_CONFIRM_MODAL_TOKEN, {
 			color: 'danger',
 			headline: `Remove ${p.name}?`,
 			content: 'Are you sure you want to delete this package',
 			confirmLabel: 'Delete',
 		});
 
-		const deleteConfirmed = await modalHandler?.onClose().then(({ confirmed }: any) => {
-			return confirmed;
-		});
-
-		if (!deleteConfirmed == true) return;
+		await modalHandler?.onSubmit();
 
 		const { error } = await tryExecuteAndNotify(this, PackageResource.deletePackageCreatedByKey({ key: p.key }));
 		if (error) return;

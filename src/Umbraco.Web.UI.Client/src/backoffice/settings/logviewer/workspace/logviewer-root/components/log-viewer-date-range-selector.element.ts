@@ -1,6 +1,7 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, html } from 'lit';
 import { customElement, property, queryAll, state } from 'lit/decorators.js';
+import { query } from 'router-slot';
 import {
 	LogViewerDateRange,
 	UmbLogViewerWorkspaceContext,

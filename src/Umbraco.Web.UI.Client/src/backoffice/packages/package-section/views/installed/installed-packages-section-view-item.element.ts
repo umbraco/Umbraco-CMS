@@ -4,7 +4,8 @@ import { customElement, property, state } from 'lit/decorators.js';
 import { firstValueFrom, map } from 'rxjs';
 import { UUIButtonState } from '@umbraco-ui/uui';
 
-import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN } from '../../../../../core/modal';
+import { UMB_CONFIRM_MODAL_TOKEN } from '../../../../shared/modals/confirm';
+import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN } from '@umbraco-cms/modal';
 import { createExtensionElement, umbExtensionsRegistry } from '@umbraco-cms/extensions-api';
 
 import type { ManifestPackageView } from '@umbraco-cms/models';
@@ -81,18 +82,15 @@ export class UmbInstalledPackagesSectionViewItem extends UmbLitElement {
 
 	async _onMigration() {
 		if (!this.name) return;
-		const modalHandler = this._modalContext?.confirm({
+		const modalHandler = this._modalContext?.open(UMB_CONFIRM_MODAL_TOKEN, {
 			color: 'positive',
 			headline: `Run migrations for ${this.name}?`,
 			content: `Do you want to start run migrations for ${this.name}`,
 			confirmLabel: 'Run migrations',
 		});
 
-		const migrationConfirmed = await modalHandler?.onClose().then(({ confirmed }: any) => {
-			return confirmed;
-		});
+		await modalHandler?.onSubmit();
 
-		if (!migrationConfirmed == true) return;
 		this._migrationButtonState = 'waiting';
 		const { error } = await tryExecuteAndNotify(
 			this,
@@ -141,11 +139,15 @@ export class UmbInstalledPackagesSectionViewItem extends UmbLitElement {
 			return;
 		}
 
+		// TODO: add dedicated modal for package views, and register it in a manifest.
+		alert('package view modal temporarily disabled. See comment in code.');
+		/*
 		this._modalContext?.open(element, {
 			data: { name: this.name, version: this.version },
 			size: 'full',
 			type: 'sidebar',
 		});
+		*/
 	}
 }
 

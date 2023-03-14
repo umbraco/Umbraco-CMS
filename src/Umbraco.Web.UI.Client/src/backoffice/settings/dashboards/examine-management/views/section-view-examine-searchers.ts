@@ -1,15 +1,14 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html, nothing } from 'lit';
 import { customElement, state, query, property } from 'lit/decorators.js';
-
-import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN } from '../../../../../core/modal';
-
+import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN } from '@umbraco-cms/modal';
 import { SearchResultModel, SearcherResource, FieldModel } from '@umbraco-cms/backend-api';
 import { UmbLitElement } from '@umbraco-cms/element';
 import { tryExecuteAndNotify } from '@umbraco-cms/resources';
 
 import './modal-views/fields-viewer.element';
 import './modal-views/fields-settings.element';
+import { UMB_EXAMINE_FIELDS_SETTINGS_MODAL_TOKEN } from './modal-views';
 
 interface ExposedSearchResultField {
 	name?: string | null;
@@ -175,12 +174,10 @@ export class UmbDashboardExamineSearcherElement extends UmbLitElement {
 	}
 
 	private _onFieldFilterClick() {
-		const modalHandler = this._modalContext?.open('umb-modal-layout-fields-settings', {
-			type: 'sidebar',
-			size: 'small',
-			data: { ...this._exposedFields },
+		const modalHandler = this._modalContext?.open(UMB_EXAMINE_FIELDS_SETTINGS_MODAL_TOKEN, {
+			...this._exposedFields,
 		});
-		modalHandler?.onClose().then(({ fields } = {}) => {
+		modalHandler?.onSubmit().then(({ fields } = {}) => {
 			if (!fields) return;
 			this._exposedFields = fields;
 		});
@@ -241,7 +238,7 @@ export class UmbDashboardExamineSearcherElement extends UmbLitElement {
 									look="secondary"
 									label="Open sidebar to see all fields"
 									@click="${() =>
-										this._modalContext?.open('umb-modal-layout-fields-viewer', {
+										this._modalContext?.open('umb-modal-element-fields-viewer', {
 											type: 'sidebar',
 											size: 'medium',
 											data: { ...rowData, name: this.getSearchResultNodeName(rowData) },
