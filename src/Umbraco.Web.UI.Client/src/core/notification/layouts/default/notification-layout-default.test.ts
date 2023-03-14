@@ -1,8 +1,7 @@
 import { fixture, expect, html } from '@open-wc/testing';
 import { UUIToastNotificationLayoutElement } from '@umbraco-ui/uui';
-import { UmbNotificationHandler } from '../..';
-import type { UmbNotificationLayoutDefaultElement, UmbNotificationDefaultData } from '.';
-import '.';
+import { UmbNotificationLayoutDefaultElement, UmbNotificationDefaultData } from './notification-layout-default.element';
+import { UmbNotificationHandler } from '@umbraco-cms/notification';
 
 describe('UmbNotificationLayoutDefault', () => {
 	let element: UmbNotificationLayoutDefaultElement;
@@ -23,6 +22,14 @@ describe('UmbNotificationLayoutDefault', () => {
 				.notificationHandler=${notificationHandler}
 				.data=${options.data}></umb-notification-layout-default>`
 		);
+	});
+
+	it('is defined with its own instance', () => {
+		expect(element).to.be.instanceOf(UmbNotificationLayoutDefaultElement);
+	});
+
+	it('passes the a11y audit', async () => {
+		await expect(element).to.be.accessible();
 	});
 
 	describe('Public API', () => {

@@ -1,10 +1,11 @@
 import { css, html } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, property } from 'lit/decorators.js';
+import { UmbPropertyEditorElement } from '@umbraco-cms/property-editor';
 import { UmbLitElement } from '@umbraco-cms/element';
 
 @customElement('umb-property-editor-ui-text-box')
-export class UmbPropertyEditorUITextBoxElement extends UmbLitElement {
+export class UmbPropertyEditorUITextBoxElement extends UmbLitElement implements UmbPropertyEditorElement {
 	static styles = [
 		UUITextStyles,
 		css`

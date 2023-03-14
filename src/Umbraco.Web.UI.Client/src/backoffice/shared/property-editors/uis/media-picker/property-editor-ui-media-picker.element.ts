@@ -1,6 +1,7 @@
 import { html } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { UmbInputMediaPickerElement } from '../../../../../backoffice/shared/components/input-media-picker/input-media-picker.element';
+import { UmbPropertyEditorElement } from '@umbraco-cms/property-editor';
 import { UmbLitElement } from '@umbraco-cms/element';
 import type { DataTypePropertyModel } from '@umbraco-cms/backend-api';
 
@@ -8,7 +9,7 @@ import type { DataTypePropertyModel } from '@umbraco-cms/backend-api';
  * @element umb-property-editor-ui-media-picker
  */
 @customElement('umb-property-editor-ui-media-picker')
-export class UmbPropertyEditorUIMediaPickerElement extends UmbLitElement {
+export class UmbPropertyEditorUIMediaPickerElement extends UmbLitElement implements UmbPropertyEditorElement {
 	private _value: Array<string> = [];
 
 	@property({ type: Array })

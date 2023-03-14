@@ -1,8 +1,6 @@
 import { UUIToastNotificationElement } from '@umbraco-ui/uui';
 import { v4 as uuidv4 } from 'uuid';
-import type { UmbNotificationOptions, UmbNotificationColor, UmbNotificationDefaultData } from '.';
-
-import './layouts/default';
+import type { UmbNotificationOptions, UmbNotificationColor, UmbNotificationDefaultData } from './notification.context';
 
 /**
  * @export

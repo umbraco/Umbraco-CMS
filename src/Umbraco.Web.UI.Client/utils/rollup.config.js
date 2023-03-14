@@ -17,11 +17,11 @@ export default [
 	},
 	{
 		input: 'index.ts',
-		external: [/^@umbraco-cms\//],
+		external: [/^@umbraco-cms\//, /^lit/, /^rxjs/],
 		output: {
 			file: './dist/index.d.ts',
 			format: 'es'
 		},
-		plugins: [dts()],
+		plugins: [dts({ respectExternal: true })],
 	}
 ];
