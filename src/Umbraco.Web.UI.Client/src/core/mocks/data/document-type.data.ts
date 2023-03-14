@@ -889,6 +889,56 @@ export const data: Array<DocumentTypeModel> = [
 			keepLatestVersionPerDayForDays: null,
 		},
 	},
+	{
+		allowedTemplateKeys: [],
+		defaultTemplateKey: null,
+		key: 'simple-document-type-key',
+		alias: 'simpleDocumentType',
+		name: 'Simple Document Type',
+		description: null,
+		icon: 'umb:document',
+		allowedAsRoot: true,
+		variesByCulture: false,
+		variesBySegment: false,
+		isElement: false,
+		properties: [
+			{
+				key: '1680d4d2-cda8-4ac2-affd-a69fc10382b1',
+				containerKey: '341b8521-fd43-4333-ae7a-a10cbbc6f4b0',
+				alias: 'prop1',
+				name: 'Prop 1',
+				description: null,
+				dataTypeKey: '0cc0eba1-9960-42c9-bf9b-60e150b429ae',
+				variesByCulture: false,
+				variesBySegment: false,
+				validation: {
+					mandatory: false,
+					mandatoryMessage: null,
+					regEx: null,
+					regExMessage: null,
+				},
+				appearance: {
+					labelOnTop: false,
+				},
+			},
+		],
+		containers: [
+			{
+				key: '341b8521-fd43-4333-ae7a-a10cbbc6f4b0',
+				parentKey: null,
+				name: 'Content',
+				type: 'Group',
+				sortOrder: 0,
+			},
+		],
+		allowedContentTypes: [{ key: 'simple-document-type-key', sortOrder: 0 }],
+		compositions: [],
+		cleanup: {
+			preventCleanup: false,
+			keepAllVersionsNewerThanDays: null,
+			keepLatestVersionPerDayForDays: null,
+		},
+	},
 ];
 
 export const treeData: Array<DocumentTypeTreeItemModel> = [
@@ -918,6 +968,16 @@ export const treeData: Array<DocumentTypeTreeItemModel> = [
 		type: 'document-type',
 		hasChildren: false,
 		key: 'a99e4018-3ffc-486b-aa76-eecea9593d17',
+		isContainer: false,
+		parentKey: null,
+		icon: '',
+	},
+	{
+		$type: 'DocumentTypeTreeItemViewModel',
+		name: 'Simple Document Type',
+		type: 'document-type',
+		hasChildren: false,
+		key: 'simple-document-type-key',
 		isContainer: false,
 		parentKey: null,
 		icon: '',
