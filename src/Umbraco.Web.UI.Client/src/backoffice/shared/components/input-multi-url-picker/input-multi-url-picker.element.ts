@@ -119,6 +119,8 @@ export class UmbInputMultiUrlPickerElement extends FormControlMixin(UmbLitElemen
 			() => !!this.max && this.urls.length > this.max
 		);
 
+		// TODO: make a helper that get the context, watches one or more props to use to update the registration, can be or have something that is stateful so its easy to use the URLBuilder.
+
 		this.consumeContext(UMB_ROUTE_CONTEXT_TOKEN, (instance) => {
 			this._routeContext = instance;
 
