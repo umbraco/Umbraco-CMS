@@ -113,14 +113,10 @@ export class UmbDocumentRepository implements UmbTreeRepository, UmbDetailReposi
 
 	// DETAILS:
 
-	async createScaffold(parentKey: string | null) {
+	async createScaffold(documentTypeKey: string) {
+		if (!documentTypeKey) throw new Error('Document type key is missing');
 		await this.#init;
-
-		if (!parentKey) {
-			throw new Error('Parent key is missing');
-		}
-
-		return this.#detailDataSource.createScaffold(parentKey);
+		return this.#detailDataSource.createScaffold(documentTypeKey);
 	}
 
 	async requestByKey(key: string) {
