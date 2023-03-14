@@ -2,312 +2,281 @@
 // See LICENSE for more details.
 
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.Logging;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Repositories;
-using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
+using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
 
-namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositories
+namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositories;
+
+[TestFixture]
+[UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
+public class RedirectUrlRepositoryTests : UmbracoIntegrationTest
 {
-    [TestFixture]
-    [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
-    public class RedirectUrlRepositoryTests : UmbracoIntegrationTest
+    [SetUp]
+    public void SetUp() => CreateTestData();
+
+    [Test]
+    public void CanSaveAndGet()
     {
-        [SetUp]
-        public void SetUp() => CreateTestData();
+        var provider = ScopeProvider;
 
-        [Test]
-        public void CanSaveAndGet()
+        using (var scope = provider.CreateScope())
         {
-            IScopeProvider provider = ScopeProvider;
+            var repo = CreateRepository(provider);
+            var rurl = new RedirectUrl { ContentKey = _textpage.Key, Url = "blah" };
+            repo.Save(rurl);
+            scope.Complete();
 
-            using (IScope scope = provider.CreateScope())
-            {
-                IRedirectUrlRepository repo = CreateRepository(provider);
-                var rurl = new RedirectUrl
-                {
-                    ContentKey = _textpage.Key,
-                    Url = "blah"
-                };
-                repo.Save(rurl);
-                scope.Complete();
-
-                Assert.AreNotEqual(0, rurl.Id);
-            }
-
-            using (IScope scope = provider.CreateScope())
-            {
-                IRedirectUrlRepository repo = CreateRepository(provider);
-                IRedirectUrl rurl = repo.GetMostRecentUrl("blah");
-                scope.Complete();
-
-                Assert.IsNotNull(rurl);
-                Assert.AreEqual(_textpage.Id, rurl.ContentId);
-            }
+            Assert.AreNotEqual(0, rurl.Id);
         }
 
-        [Test]
-        public void CanSaveAndGetWithCulture()
+        using (var scope = provider.CreateScope())
         {
-            string culture = "en";
-            using (IScope scope = ScopeProvider.CreateScope())
-            {
-                IRedirectUrlRepository repo = CreateRepository(ScopeProvider);
-                var rurl = new RedirectUrl
-                {
-                    ContentKey = _textpage.Key,
-                    Url = "blah",
-                    Culture = culture
-                };
-                repo.Save(rurl);
-                scope.Complete();
+            var repo = CreateRepository(provider);
+            var rurl = repo.GetMostRecentUrl("blah");
+            scope.Complete();
 
-                Assert.AreNotEqual(0, rurl.Id);
-            }
+            Assert.IsNotNull(rurl);
+            Assert.AreEqual(_textpage.Id, rurl.ContentId);
+        }
+    }
 
-            using (IScope scope = ScopeProvider.CreateScope())
-            {
-                IRedirectUrlRepository repo = CreateRepository(ScopeProvider);
-                IRedirectUrl rurl = repo.GetMostRecentUrl("blah");
-                scope.Complete();
+    [Test]
+    public void CanSaveAndGetWithCulture()
+    {
+        var culture = "en";
+        using (var scope = ScopeProvider.CreateScope())
+        {
+            var repo = CreateRepository(ScopeProvider);
+            var rurl = new RedirectUrl { ContentKey = _textpage.Key, Url = "blah", Culture = culture };
+            repo.Save(rurl);
+            scope.Complete();
 
-                Assert.IsNotNull(rurl);
-                Assert.AreEqual(_textpage.Id, rurl.ContentId);
-                Assert.AreEqual(culture, rurl.Culture);
-            }
+            Assert.AreNotEqual(0, rurl.Id);
         }
 
-        [Test]
-        public void CanSaveAndGetMostRecent()
+        using (var scope = ScopeProvider.CreateScope())
         {
-            IScopeProvider provider = ScopeProvider;
+            var repo = CreateRepository(ScopeProvider);
+            var rurl = repo.GetMostRecentUrl("blah");
+            scope.Complete();
 
-            Assert.AreNotEqual(_textpage.Id, _otherpage.Id);
+            Assert.IsNotNull(rurl);
+            Assert.AreEqual(_textpage.Id, rurl.ContentId);
+            Assert.AreEqual(culture, rurl.Culture);
+        }
+    }
 
-            using (IScope scope = provider.CreateScope())
+    [Test]
+    public void CanSaveAndGetMostRecent()
+    {
+        var provider = ScopeProvider;
+
+        Assert.AreNotEqual(_textpage.Id, _otherpage.Id);
+
+        using (var scope = provider.CreateScope())
+        {
+            var repo = CreateRepository(provider);
+            var rurl = new RedirectUrl { ContentKey = _textpage.Key, Url = "blah" };
+            repo.Save(rurl);
+            scope.Complete();
+
+            Assert.AreNotEqual(0, rurl.Id);
+
+            // FIXME: too fast = same date = key violation?
+            // and... can that happen in real life?
+            // we don't really *care* about the IX, only supposed to make things faster...
+            // BUT in realife we AddOrUpdate in a trx so it should be safe, always
+            rurl = new RedirectUrl
             {
-                IRedirectUrlRepository repo = CreateRepository(provider);
-                var rurl = new RedirectUrl
-                {
-                    ContentKey = _textpage.Key,
-                    Url = "blah"
-                };
-                repo.Save(rurl);
-                scope.Complete();
+                ContentKey = _otherpage.Key,
+                Url = "blah",
+                CreateDateUtc = rurl.CreateDateUtc.AddSeconds(1) // ensure time difference
+            };
+            repo.Save(rurl);
+            scope.Complete();
 
-                Assert.AreNotEqual(0, rurl.Id);
-
-                // FIXME: too fast = same date = key violation?
-                // and... can that happen in real life?
-                // we don't really *care* about the IX, only supposed to make things faster...
-                // BUT in realife we AddOrUpdate in a trx so it should be safe, always
-                rurl = new RedirectUrl
-                {
-                    ContentKey = _otherpage.Key,
-                    Url = "blah",
-                    CreateDateUtc = rurl.CreateDateUtc.AddSeconds(1) // ensure time difference
-                };
-                repo.Save(rurl);
-                scope.Complete();
-
-                Assert.AreNotEqual(0, rurl.Id);
-            }
-
-            using (IScope scope = provider.CreateScope())
-            {
-                IRedirectUrlRepository repo = CreateRepository(provider);
-                IRedirectUrl rurl = repo.GetMostRecentUrl("blah");
-                scope.Complete();
-
-                Assert.IsNotNull(rurl);
-                Assert.AreEqual(_otherpage.Id, rurl.ContentId);
-            }
+            Assert.AreNotEqual(0, rurl.Id);
         }
 
-        [Test]
-        public void CanSaveAndGetMostRecentForCulture()
+        using (var scope = provider.CreateScope())
         {
-            string cultureA = "en";
-            string cultureB = "de";
-            Assert.AreNotEqual(_textpage.Id, _otherpage.Id);
+            var repo = CreateRepository(provider);
+            var rurl = repo.GetMostRecentUrl("blah");
+            scope.Complete();
 
-            using (IScope scope = ScopeProvider.CreateScope())
+            Assert.IsNotNull(rurl);
+            Assert.AreEqual(_otherpage.Id, rurl.ContentId);
+        }
+    }
+
+    [Test]
+    public void CanSaveAndGetMostRecentForCulture()
+    {
+        var cultureA = "en";
+        var cultureB = "de";
+        Assert.AreNotEqual(_textpage.Id, _otherpage.Id);
+
+        using (var scope = ScopeProvider.CreateScope())
+        {
+            var repo = CreateRepository(ScopeProvider);
+            var rurl = new RedirectUrl { ContentKey = _textpage.Key, Url = "blah", Culture = cultureA };
+            repo.Save(rurl);
+            scope.Complete();
+
+            Assert.AreNotEqual(0, rurl.Id);
+
+            // FIXME: too fast = same date = key violation?
+            // and... can that happen in real life?
+            // we don't really *care* about the IX, only supposed to make things faster...
+            // BUT in realife we AddOrUpdate in a trx so it should be safe, always
+            rurl = new RedirectUrl
             {
-                IRedirectUrlRepository repo = CreateRepository(ScopeProvider);
-                var rurl = new RedirectUrl
-                {
-                    ContentKey = _textpage.Key,
-                    Url = "blah",
-                    Culture = cultureA
-                };
-                repo.Save(rurl);
-                scope.Complete();
+                ContentKey = _otherpage.Key,
+                Url = "blah",
+                CreateDateUtc = rurl.CreateDateUtc.AddSeconds(1), // ensure time difference
+                Culture = cultureB
+            };
+            repo.Save(rurl);
+            scope.Complete();
 
-                Assert.AreNotEqual(0, rurl.Id);
-
-                // FIXME: too fast = same date = key violation?
-                // and... can that happen in real life?
-                // we don't really *care* about the IX, only supposed to make things faster...
-                // BUT in realife we AddOrUpdate in a trx so it should be safe, always
-                rurl = new RedirectUrl
-                {
-                    ContentKey = _otherpage.Key,
-                    Url = "blah",
-                    CreateDateUtc = rurl.CreateDateUtc.AddSeconds(1), // ensure time difference
-                    Culture = cultureB
-                };
-                repo.Save(rurl);
-                scope.Complete();
-
-                Assert.AreNotEqual(0, rurl.Id);
-            }
-
-            using (IScope scope = ScopeProvider.CreateScope())
-            {
-                IRedirectUrlRepository repo = CreateRepository(ScopeProvider);
-                IRedirectUrl rurl = repo.GetMostRecentUrl("blah", cultureA);
-                scope.Complete();
-
-                Assert.IsNotNull(rurl);
-                Assert.AreEqual(_textpage.Id, rurl.ContentId);
-                Assert.AreEqual(cultureA, rurl.Culture);
-            }
+            Assert.AreNotEqual(0, rurl.Id);
         }
 
-        [Test]
-        public void CanSaveAndGetByContent()
+        using (var scope = ScopeProvider.CreateScope())
         {
-            IScopeProvider provider = ScopeProvider;
+            var repo = CreateRepository(ScopeProvider);
+            var rurl = repo.GetMostRecentUrl("blah", cultureA);
+            scope.Complete();
 
-            using (IScope scope = provider.CreateScope())
+            Assert.IsNotNull(rurl);
+            Assert.AreEqual(_textpage.Id, rurl.ContentId);
+            Assert.AreEqual(cultureA, rurl.Culture);
+        }
+    }
+
+    [Test]
+    public void CanSaveAndGetByContent()
+    {
+        var provider = ScopeProvider;
+
+        using (var scope = provider.CreateScope())
+        {
+            var repo = CreateRepository(provider);
+            var rurl = new RedirectUrl { ContentKey = _textpage.Key, Url = "blah" };
+            repo.Save(rurl);
+            scope.Complete();
+
+            Assert.AreNotEqual(0, rurl.Id);
+
+            // FIXME: goes too fast and bam, errors, first is blah
+            rurl = new RedirectUrl
             {
-                IRedirectUrlRepository repo = CreateRepository(provider);
-                var rurl = new RedirectUrl
-                {
-                    ContentKey = _textpage.Key,
-                    Url = "blah"
-                };
-                repo.Save(rurl);
-                scope.Complete();
+                ContentKey = _textpage.Key,
+                Url = "durg",
+                CreateDateUtc = rurl.CreateDateUtc.AddSeconds(1) // ensure time difference
+            };
+            repo.Save(rurl);
+            scope.Complete();
 
-                Assert.AreNotEqual(0, rurl.Id);
-
-                // FIXME: goes too fast and bam, errors, first is blah
-                rurl = new RedirectUrl
-                {
-                    ContentKey = _textpage.Key,
-                    Url = "durg",
-                    CreateDateUtc = rurl.CreateDateUtc.AddSeconds(1) // ensure time difference
-                };
-                repo.Save(rurl);
-                scope.Complete();
-
-                Assert.AreNotEqual(0, rurl.Id);
-            }
-
-            using (IScope scope = provider.CreateScope())
-            {
-                IRedirectUrlRepository repo = CreateRepository(provider);
-                IRedirectUrl[] rurls = repo.GetContentUrls(_textpage.Key).ToArray();
-                scope.Complete();
-
-                Assert.AreEqual(2, rurls.Length);
-                Assert.AreEqual("durg", rurls[0].Url);
-                Assert.AreEqual("blah", rurls[1].Url);
-            }
+            Assert.AreNotEqual(0, rurl.Id);
         }
 
-        [Test]
-        public void CanSaveAndDelete()
+        using (var scope = provider.CreateScope())
         {
-            IScopeProvider provider = ScopeProvider;
+            var repo = CreateRepository(provider);
+            var rurls = repo.GetContentUrls(_textpage.Key).ToArray();
+            scope.Complete();
 
-            using (IScope scope = provider.CreateScope())
-            {
-                IRedirectUrlRepository repo = CreateRepository(provider);
-                var rurl = new RedirectUrl
-                {
-                    ContentKey = _textpage.Key,
-                    Url = "blah"
-                };
-                repo.Save(rurl);
-                scope.Complete();
+            Assert.AreEqual(2, rurls.Length);
+            Assert.AreEqual("durg", rurls[0].Url);
+            Assert.AreEqual("blah", rurls[1].Url);
+        }
+    }
 
-                Assert.AreNotEqual(0, rurl.Id);
+    [Test]
+    public void CanSaveAndDelete()
+    {
+        var provider = ScopeProvider;
 
-                rurl = new RedirectUrl
-                {
-                    ContentKey = _otherpage.Key,
-                    Url = "durg"
-                };
-                repo.Save(rurl);
-                scope.Complete();
+        using (var scope = provider.CreateScope())
+        {
+            var repo = CreateRepository(provider);
+            var rurl = new RedirectUrl { ContentKey = _textpage.Key, Url = "blah" };
+            repo.Save(rurl);
+            scope.Complete();
 
-                Assert.AreNotEqual(0, rurl.Id);
-            }
+            Assert.AreNotEqual(0, rurl.Id);
 
-            using (IScope scope = provider.CreateScope())
-            {
-                IRedirectUrlRepository repo = CreateRepository(provider);
-                repo.DeleteContentUrls(_textpage.Key);
-                scope.Complete();
+            rurl = new RedirectUrl { ContentKey = _otherpage.Key, Url = "durg" };
+            repo.Save(rurl);
+            scope.Complete();
 
-                IEnumerable<IRedirectUrl> rurls = repo.GetContentUrls(_textpage.Key);
-
-                Assert.AreEqual(0, rurls.Count());
-            }
+            Assert.AreNotEqual(0, rurl.Id);
         }
 
-        private IRedirectUrlRepository CreateRepository(IScopeProvider provider) =>
-            new RedirectUrlRepository((IScopeAccessor)provider, AppCaches, LoggerFactory.CreateLogger<RedirectUrlRepository>());
-
-        private IContent _textpage;
-        private IContent _subpage;
-        private IContent _otherpage;
-        private IContent _trashed;
-
-        public void CreateTestData()
+        using (var scope = provider.CreateScope())
         {
-            IFileService fileService = GetRequiredService<IFileService>();
-            Template template = TemplateBuilder.CreateTextPageTemplate();
-            fileService.SaveTemplate(template); // else, FK violation on contentType!
+            var repo = CreateRepository(provider);
+            repo.DeleteContentUrls(_textpage.Key);
+            scope.Complete();
 
-            IContentService contentService = GetRequiredService<IContentService>();
-            IContentTypeService contentTypeService = GetRequiredService<IContentTypeService>();
+            var rurls = repo.GetContentUrls(_textpage.Key);
 
-            // Create and Save ContentType "umbTextpage" -> (NodeDto.NodeIdSeed)
-            ContentType contentType = ContentTypeBuilder.CreateSimpleContentType("umbTextpage", "Textpage", defaultTemplateId: template.Id);
-            contentType.Key = Guid.NewGuid();
-            contentTypeService.Save(contentType);
-
-            // Create and Save Content "Homepage" based on "umbTextpage" -> (NodeDto.NodeIdSeed + 1)
-            _textpage = ContentBuilder.CreateSimpleContent(contentType);
-            _textpage.Key = Guid.NewGuid();
-            contentService.Save(_textpage);
-
-            // Create and Save Content "Text Page 1" based on "umbTextpage" -> (NodeDto.NodeIdSeed + 2)
-            _subpage = ContentBuilder.CreateSimpleContent(contentType, "Text Page 1", _textpage.Id);
-            _subpage.Key = Guid.NewGuid();
-            contentService.Save(_subpage);
-
-            // Create and Save Content "Text Page 1" based on "umbTextpage" -> (NodeDto.NodeIdSeed + 3)
-            _otherpage = ContentBuilder.CreateSimpleContent(contentType, "Text Page 2", _textpage.Id);
-            _otherpage.Key = Guid.NewGuid();
-            contentService.Save(_otherpage);
-
-            // Create and Save Content "Text Page Deleted" based on "umbTextpage" -> (NodeDto.NodeIdSeed + 4)
-            _trashed = ContentBuilder.CreateSimpleContent(contentType, "Text Page Deleted", -20);
-            _trashed.Key = Guid.NewGuid();
-            ((Content)_trashed).Trashed = true;
-            contentService.Save(_trashed);
+            Assert.AreEqual(0, rurls.Count());
         }
+    }
+
+    private IRedirectUrlRepository CreateRepository(IScopeProvider provider) =>
+        new RedirectUrlRepository((IScopeAccessor)provider, AppCaches, LoggerFactory.CreateLogger<RedirectUrlRepository>());
+
+    private IContent _textpage;
+    private IContent _subpage;
+    private IContent _otherpage;
+    private IContent _trashed;
+
+    public void CreateTestData()
+    {
+        var fileService = GetRequiredService<IFileService>();
+        var template = TemplateBuilder.CreateTextPageTemplate();
+        fileService.SaveTemplate(template); // else, FK violation on contentType!
+
+        var contentService = GetRequiredService<IContentService>();
+        var contentTypeService = GetRequiredService<IContentTypeService>();
+
+        // Create and Save ContentType "umbTextpage" -> (NodeDto.NodeIdSeed)
+        var contentType =
+            ContentTypeBuilder.CreateSimpleContentType("umbTextpage", "Textpage", defaultTemplateId: template.Id);
+        contentType.Key = Guid.NewGuid();
+        contentTypeService.Save(contentType);
+
+        // Create and Save Content "Homepage" based on "umbTextpage" -> (NodeDto.NodeIdSeed + 1)
+        _textpage = ContentBuilder.CreateSimpleContent(contentType);
+        _textpage.Key = Guid.NewGuid();
+        contentService.Save(_textpage);
+
+        // Create and Save Content "Text Page 1" based on "umbTextpage" -> (NodeDto.NodeIdSeed + 2)
+        _subpage = ContentBuilder.CreateSimpleContent(contentType, "Text Page 1", _textpage.Id);
+        _subpage.Key = Guid.NewGuid();
+        contentService.Save(_subpage);
+
+        // Create and Save Content "Text Page 1" based on "umbTextpage" -> (NodeDto.NodeIdSeed + 3)
+        _otherpage = ContentBuilder.CreateSimpleContent(contentType, "Text Page 2", _textpage.Id);
+        _otherpage.Key = Guid.NewGuid();
+        contentService.Save(_otherpage);
+
+        // Create and Save Content "Text Page Deleted" based on "umbTextpage" -> (NodeDto.NodeIdSeed + 4)
+        _trashed = ContentBuilder.CreateSimpleContent(contentType, "Text Page Deleted", -20);
+        _trashed.Key = Guid.NewGuid();
+        ((Content)_trashed).Trashed = true;
+        contentService.Save(_trashed);
     }
 }

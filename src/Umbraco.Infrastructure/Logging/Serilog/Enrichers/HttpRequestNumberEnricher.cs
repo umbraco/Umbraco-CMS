@@ -1,48 +1,48 @@
-﻿using System;
-using System.Threading;
 using Serilog.Core;
 using Serilog.Events;
 using Umbraco.Cms.Core.Cache;
 
-namespace Umbraco.Cms.Core.Logging.Serilog.Enrichers
+namespace Umbraco.Cms.Core.Logging.Serilog.Enrichers;
+
+/// <summary>
+///     Enrich log events with a HttpRequestNumber unique within the current
+///     logging session.
+///     Original source -
+///     https://github.com/serilog-web/classic/blob/master/src/SerilogWeb.Classic/Classic/Enrichers/HttpRequestNumberEnricher.cs
+///     Nupkg: 'Serilog.Web.Classic' contains handlers and extra bits we do not want
+/// </summary>
+public class HttpRequestNumberEnricher : ILogEventEnricher
 {
     /// <summary>
-    /// Enrich log events with a HttpRequestNumber unique within the current
-    /// logging session.
-    /// Original source - https://github.com/serilog-web/classic/blob/master/src/SerilogWeb.Classic/Classic/Enrichers/HttpRequestNumberEnricher.cs
-    /// Nupkg: 'Serilog.Web.Classic' contains handlers and extra bits we do not want
+    ///     The property name added to enriched log events.
     /// </summary>
-    public class HttpRequestNumberEnricher : ILogEventEnricher
+    private const string HttpRequestNumberPropertyName = "HttpRequestNumber";
+    private static readonly string _requestNumberItemName = typeof(HttpRequestNumberEnricher).Name + "+RequestNumber";
+
+    private static int _lastRequestNumber;
+    private readonly IRequestCache _requestCache;
+
+    public HttpRequestNumberEnricher(IRequestCache requestCache) =>
+        _requestCache = requestCache ?? throw new ArgumentNullException(nameof(requestCache));
+
+    /// <summary>
+    ///     Enrich the log event with the number assigned to the currently-executing HTTP request, if any.
+    /// </summary>
+    /// <param name="logEvent">The log event to enrich.</param>
+    /// <param name="propertyFactory">Factory for creating new properties to add to the event.</param>
+    public void Enrich(LogEvent logEvent, ILogEventPropertyFactory propertyFactory)
     {
-        private readonly IRequestCache _requestCache;
-        private static int _lastRequestNumber;
-        private static readonly string _requestNumberItemName = typeof(HttpRequestNumberEnricher).Name + "+RequestNumber";
-
-        /// <summary>
-        /// The property name added to enriched log events.
-        /// </summary>
-        private const string _httpRequestNumberPropertyName = "HttpRequestNumber";
-
-
-        public HttpRequestNumberEnricher(IRequestCache requestCache)
+        if (logEvent == null)
         {
-            _requestCache = requestCache ?? throw new ArgumentNullException(nameof(requestCache));
+            throw new ArgumentNullException(nameof(logEvent));
         }
 
-        /// <summary>
-        /// Enrich the log event with the number assigned to the currently-executing HTTP request, if any.
-        /// </summary>
-        /// <param name="logEvent">The log event to enrich.</param>
-        /// <param name="propertyFactory">Factory for creating new properties to add to the event.</param>
-        public void Enrich(LogEvent logEvent, ILogEventPropertyFactory propertyFactory)
-        {
-            if (logEvent == null) throw new ArgumentNullException(nameof(logEvent));
+        var requestNumber = _requestCache.Get(
+            _requestNumberItemName,
+            () => Interlocked.Increment(ref _lastRequestNumber));
 
-            var requestNumber = _requestCache.Get(_requestNumberItemName,
-                    () => Interlocked.Increment(ref _lastRequestNumber));
-
-            var requestNumberProperty = new LogEventProperty(_httpRequestNumberPropertyName, new ScalarValue(requestNumber));
-            logEvent.AddPropertyIfAbsent(requestNumberProperty);
-        }
+        var requestNumberProperty =
+            new LogEventProperty(HttpRequestNumberPropertyName, new ScalarValue(requestNumber));
+        logEvent.AddPropertyIfAbsent(requestNumberProperty);
     }
 }

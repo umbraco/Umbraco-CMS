@@ -1,14 +1,13 @@
-namespace Umbraco.Cms.Core.Packaging
+namespace Umbraco.Cms.Core.Packaging;
+
+/// <summary>
+///     Manages the storage of created package definitions
+/// </summary>
+public interface ICreatedPackagesRepository : IPackageDefinitionRepository
 {
     /// <summary>
-    /// Manages the storage of created package definitions
+    ///     Creates the package file and returns it's physical path
     /// </summary>
-    public interface ICreatedPackagesRepository : IPackageDefinitionRepository
-    {
-        /// <summary>
-        /// Creates the package file and returns it's physical path
-        /// </summary>
-        /// <param name="definition"></param>
-        string ExportPackage(PackageDefinition definition);
-    }
+    /// <param name="definition"></param>
+    string ExportPackage(PackageDefinition definition);
 }

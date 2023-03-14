@@ -1,0 +1,64 @@
+{
+  "metadata": [
+    {
+      "src": [
+        {
+          "src": "../../src",
+          "files": [
+            "**/*.csproj"
+          ],
+          "exclude": [
+            "**/obj/**",
+            "**/bin/**",
+            "**/Umbraco.Web.csproj",
+            "**/Umbraco.Web.UI.csproj",
+            "**/Umbraco.Cms.StaticAssets.csproj",
+            "**/JsonSchema.csproj"
+          ]
+        }
+      ],
+      "dest": "api",
+      "filter": "docfx.filter.yml"
+    }
+  ],
+  "build": {
+    "content": [
+      {
+        "files": [
+          "api/**.yml",
+          "api/index.md"
+        ]
+      },
+      {
+        "files": [
+          "articles/**.md",
+          "articles/**/toc.yml",
+          "toc.yml",
+          "*.md"
+        ],
+        "exclude": [
+          "obj/**"
+        ]
+      }
+    ],
+    "overwrite": [
+      {
+        "files": [
+          "**.md"
+        ],
+        "exclude": [
+          "obj/**"
+        ]
+      }
+    ],
+    "globalMetadata": {
+      "_appTitle": "Umbraco c# Api docs",
+      "_enableSearch": true,
+      "_disableContribution": false
+    },
+    "dest": "_site",
+    "template": [
+      "default", "umbracotemplate"
+    ]
+  }
+}

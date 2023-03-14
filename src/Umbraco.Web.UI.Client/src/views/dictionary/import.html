@@ -1,0 +1,81 @@
+<div class="umb-dialog" ng-controller="Umbraco.Editors.Dictionary.ImportController as vm">
+
+  <div class="umb-dialog-body with-footer">
+    <div class="umb-pane">
+      <div ng-if="vm.state === 'upload'">
+        <p>
+          <localize key="dictionary_importDictionaryItemHelp">
+            To import a Dictionary item, find the '.udt' file on your computer by clicking the 'Import' button (you'll be
+            asked for confirmation on the next screen)
+          </localize>
+        </p>
+
+        <form name="importDictionaryItem">
+
+          <!-- Select files -->
+          <button accept=".udt"
+                  class="btn btn-action"
+                  name="file"
+                  ng-model="filesHolder"
+                  ngf-change="handleFiles($files, $event, $invalidFiles)"
+                  ngf-multiple="true"
+                  ngf-pattern="*.udt"
+                  ngf-select>
+            <localize key="general_import">Import</localize>
+          </button>
+        </form>
+      </div>
+      <div ng-if="vm.state === 'confirm'">
+        <strong>
+          <localize key="dictionaryListCaption">Dictionary items</localize>
+          :
+        </strong>
+        <div ng-repeat="dictionaryItem in vm.model.dictionaryItems" style="padding-left:{{dictionaryItem.level * 20}}px;">{{dictionaryItem.name}}</div>
+        <br />
+        <br />
+
+        <div>
+
+          <hr />
+
+          <p>
+            <strong>
+              <localize key="actions_chooseWhereToImport">Chose where to import</localize>
+              <localize key="dictionaryListCaption">dictionary items</localize>.
+            </strong>
+            (optinal)
+          </p>
+
+          <umb-tree section="translation"
+                    treealias="dictionary"
+                    customtreeparams="foldersonly=1"
+                    hideheader="false"
+                    hideoptions="true"
+                    isdialog="true"
+                    api="dialogTreeApi"
+                    on-init="onTreeInit()"
+                    enablecheckboxes="true">
+          </umb-tree>
+        </div>
+
+        <button class="btn btn-primary" ng-click="import()">
+          <localize key="general_import">Import</localize>
+        </button>
+      </div>
+      <div ng-if="vm.state === 'done'">
+        <strong>
+          <localize key="speechBubbles_dictionaryItemImported">The following dictionary item(s) has been imported!</localize>        
+        </strong>
+        <div ng-repeat="dictionaryItem in vm.model.dictionaryItems" style="padding-left:{{dictionaryItem.level * 20}}px;">{{dictionaryItem.name}}</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="umb-dialog-footer btn-toolbar umb-btn-toolbar">
+    <umb-button action="close()"
+                button-style="link"
+                label-key="{{vm.cancelButtonLabel}}"
+                type="button">
+    </umb-button>
+  </div>
+</div>

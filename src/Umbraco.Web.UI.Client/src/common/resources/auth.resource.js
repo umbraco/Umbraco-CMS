@@ -37,7 +37,7 @@ function authResource($q, $http, umbRequestHelper, angularHelper) {
           umbRequestHelper.getApiUrl(
             "authenticationApiBaseUrl",
             "Get2FAProviders")),
-        'Could not retrive two factor provider info');
+        'Could not retrieve two factor provider info');
     },
 
     /**

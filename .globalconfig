@@ -1,0 +1,83 @@
+is_global = true
+
+##########################################
+# StyleCopAnalyzers Settings
+##########################################
+
+# All constant fields must be PascalCase
+# https://github.com/DotNetAnalyzers/StyleCopAnalyzers/blob/master/documentation/SA1303.md
+dotnet_naming_symbols.stylecop_constant_fields_group.applicable_accessibilities = public, internal, protected_internal, protected, private_protected, private
+dotnet_naming_symbols.stylecop_constant_fields_group.required_modifiers         = const
+dotnet_naming_symbols.stylecop_constant_fields_group.applicable_kinds           = field
+dotnet_naming_rule.stylecop_constant_fields_must_be_pascal_case_rule.symbols    = stylecop_constant_fields_group
+dotnet_naming_rule.stylecop_constant_fields_must_be_pascal_case_rule.style      = pascal_case_style
+
+# All static readonly fields must be PascalCase
+# Ajusted to ignore private fields.
+# https://github.com/DotNetAnalyzers/StyleCopAnalyzers/blob/master/documentation/SA1311.md
+dotnet_naming_symbols.stylecop_static_readonly_fields_group.applicable_accessibilities = public, internal, protected_internal, protected, private_protected
+dotnet_naming_symbols.stylecop_static_readonly_fields_group.required_modifiers         = static, readonly
+dotnet_naming_symbols.stylecop_static_readonly_fields_group.applicable_kinds           = field
+dotnet_naming_rule.stylecop_static_readonly_fields_must_be_pascal_case_rule.symbols    = stylecop_static_readonly_fields_group
+dotnet_naming_rule.stylecop_static_readonly_fields_must_be_pascal_case_rule.style      = pascal_case_style
+
+# No non-private instance fields are allowed
+# https://github.com/DotNetAnalyzers/StyleCopAnalyzers/blob/master/documentation/SA1401.md
+dotnet_naming_symbols.stylecop_fields_must_be_private_group.applicable_accessibilities = public, internal, protected_internal, protected, private_protected
+dotnet_naming_symbols.stylecop_fields_must_be_private_group.applicable_kinds           = field
+dotnet_naming_rule.stylecop_instance_fields_must_be_private_rule.symbols               = stylecop_fields_must_be_private_group
+dotnet_naming_rule.stylecop_instance_fields_must_be_private_rule.style                 = disallowed_style
+
+# Local variables must be camelCase
+# https://github.com/DotNetAnalyzers/StyleCopAnalyzers/blob/master/documentation/SA1312.md
+dotnet_naming_symbols.stylecop_local_fields_group.applicable_accessibilities = local
+dotnet_naming_symbols.stylecop_local_fields_group.applicable_kinds           = local
+dotnet_naming_rule.stylecop_local_fields_must_be_camel_case_rule.symbols     = stylecop_local_fields_group
+dotnet_naming_rule.stylecop_local_fields_must_be_camel_case_rule.style       = camel_case_style
+
+##########################################
+# StyleCopAnalyzers rule severity
+# https://github.com/DotNetAnalyzers/StyleCopAnalyzers
+##########################################
+
+dotnet_analyzer_diagnostic.category-StyleCop.CSharp.DocumentationRules.severity = suggestion
+dotnet_analyzer_diagnostic.category-StyleCop.CSharp.ReadabilityRules.severity = suggestion
+dotnet_analyzer_diagnostic.category-StyleCop.CSharp.NamingRules.severity = suggestion
+dotnet_analyzer_diagnostic.category-StyleCop.CSharp.SpacingRules.severity = suggestion
+dotnet_analyzer_diagnostic.category-StyleCop.CSharp.OrderingRules.severity = suggestion
+dotnet_analyzer_diagnostic.category-StyleCop.CSharp.MaintainabilityRules.severity = suggestion
+dotnet_analyzer_diagnostic.category-StyleCop.CSharp.LayoutRules.severity = suggestion
+
+dotnet_diagnostic.SA1636.severity = none # SA1636: File header copyright text should match
+dotnet_diagnostic.SA1101.severity = none # PrefixLocalCallsWithThis - stylecop appears to be ignoring dotnet_style_qualification_for_*
+dotnet_diagnostic.SA1309.severity = none # FieldNamesMustNotBeginWithUnderscore
+
+dotnet_diagnostic.SA1503.severity = warning # BracesMustNotBeOmitted
+dotnet_diagnostic.SA1117.severity = warning # ParametersMustBeOnSameLineOrSeparateLines
+dotnet_diagnostic.SA1116.severity = warning # SplitParametersMustStartOnLineAfterDeclaration
+dotnet_diagnostic.SA1122.severity = warning # UseStringEmptyForEmptyStrings
+dotnet_diagnostic.SA1028.severity = warning # CodeMustNotContainTrailingWhitespace
+dotnet_diagnostic.SA1500.severity = warning # BracesForMultiLineStatementsMustNotShareLine
+dotnet_diagnostic.SA1401.severity = warning # FieldsMustBePrivate
+dotnet_diagnostic.SA1519.severity = warning # BracesMustNotBeOmittedFromMultiLineChildStatement
+dotnet_diagnostic.SA1111.severity = warning # ClosingParenthesisMustBeOnLineOfLastParameter
+dotnet_diagnostic.SA1520.severity = warning # UseBracesConsistently
+dotnet_diagnostic.SA1407.severity = warning # ArithmeticExpressionsMustDeclarePrecedence
+dotnet_diagnostic.SA1400.severity = warning # AccessModifierMustBeDeclared
+dotnet_diagnostic.SA1119.severity = warning # StatementMustNotUseUnnecessaryParenthesis
+dotnet_diagnostic.SA1649.severity = warning # FileNameMustMatchTypeName
+dotnet_diagnostic.SA1121.severity = warning # UseBuiltInTypeAlias
+dotnet_diagnostic.SA1132.severity = warning # DoNotCombineFields
+dotnet_diagnostic.SA1134.severity = warning # AttributesMustNotShareLine
+dotnet_diagnostic.SA1106.severity = warning # CodeMustNotContainEmptyStatements
+dotnet_diagnostic.SA1312.severity = warning # VariableNamesMustBeginWithLowerCaseLetter
+dotnet_diagnostic.SA1310.severity = warning # FieldNamesMustNotContainUnderscore
+dotnet_diagnostic.SA1303.severity = warning # ConstFieldNamesMustBeginWithUpperCaseLetter
+dotnet_diagnostic.SA1130.severity = warning # UseLambdaSyntax
+dotnet_diagnostic.SA1405.severity = warning # DebugAssertMustProvideMessageText
+dotnet_diagnostic.SA1205.severity = warning # PartialElementsMustDeclareAccess
+dotnet_diagnostic.SA1306.severity = warning # FieldNamesMustBeginWithLowerCaseLetter
+dotnet_diagnostic.SA1209.severity = warning # UsingAliasDirectivesMustBePlacedAfterOtherUsingDirectives
+dotnet_diagnostic.SA1216.severity = warning # UsingStaticDirectivesMustBePlacedAtTheCorrectLocation
+dotnet_diagnostic.SA1133.severity = warning # DoNotCombineAttributes
+dotnet_diagnostic.SA1135.severity = warning # UsingDirectivesMustBeQualified

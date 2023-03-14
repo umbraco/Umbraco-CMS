@@ -20,7 +20,7 @@
 
         var unsubscribe = [];
 
-        var vm = this;
+        const vm = this;
         vm.openBlock = null;
 
         function onInit() {
@@ -30,11 +30,10 @@
             }
 
             loadElementTypes();
-
         }
 
         function loadElementTypes() {
-            return elementTypeResource.getAll().then(function (elementTypes) {
+            return elementTypeResource.getAll().then(elementTypes => {
                 vm.elementTypes = elementTypes;
             });
         }
@@ -47,25 +46,33 @@
                 }
             }
         }
+
         unsubscribe.push(eventsService.on("editors.documentType.saved", updateUsedElementTypes));
 
-        vm.requestRemoveBlockByIndex = function (index) {
-            localizationService.localizeMany(["general_delete", "blockEditor_confirmDeleteBlockTypeMessage", "blockEditor_confirmDeleteBlockTypeNotice"]).then(function (data) {
+        vm.requestRemoveBlockByIndex = function (index, event) {
+
+          const labelKeys = [
+            "general_delete",
+            "blockEditor_confirmDeleteBlockTypeMessage",
+            "blockEditor_confirmDeleteBlockTypeNotice"
+          ];
+
+          localizationService.localizeMany(labelKeys).then(data => {
                 var contentElementType = vm.getElementTypeByKey($scope.model.value[index].contentElementTypeKey);
                 overlayService.confirmDelete({
                     title: data[0],
                     content: localizationService.tokenReplace(data[1], [contentElementType ? contentElementType.name : "(Unavailable ElementType)"]),
                     confirmMessage: data[2],
-                    close: function () {
-                        overlayService.close();
-                    },
-                    submit: function () {
+                    submit: () => {
                         vm.removeBlockByIndex(index);
                         overlayService.close();
-                    }
+                    },
+                    close: overlayService.close()
                 });
             });
-        }
+
+            event.stopPropagation();
+        };
 
         vm.removeBlockByIndex = function (index) {
             $scope.model.value.splice(index, 1);
@@ -78,7 +85,6 @@
             placeholder: 'umb-block-card --sortable-placeholder'
         };
 
-
         vm.getAvailableElementTypes = function () {
             return vm.elementTypes.filter(function (type) {
                 return !$scope.model.value.find(function (entry) {
@@ -89,15 +95,13 @@
 
         vm.getElementTypeByKey = function(key) {
             if (vm.elementTypes) {
-                return vm.elementTypes.find(function (type) {
-                    return type.key === key;
-                }) || null;
+                return vm.elementTypes.find(type => type.key === key) || null;
             }
         };
 
         vm.openAddDialog = function () {
 
-            localizationService.localize("blockEditor_headlineCreateBlock").then(function(localizedTitle) {
+            localizationService.localize("blockEditor_headlineCreateBlock").then(localizedTitle => {
 
                 const contentTypePicker = {
                     title: localizedTitle,
@@ -108,10 +112,9 @@
                     filter: function (node) {
                         if (node.metaData.isElement === true) {
                             var key = udiService.getKey(node.udi);
+                            
                             // If a Block with this ElementType as content already exists, we will emit it as a posible option.
-                            return $scope.model.value.find(function (entry) {
-                                return key === entry.contentElementTypeKey;
-                            });
+                            return $scope.model.value.find(entry => entry.contentElementTypeKey === key);
                         }
                         return true;
                     },
@@ -138,8 +141,8 @@
                         }
                     ]
                 };
+                
                 editorService.treePicker(contentTypePicker);
-
             });
         };
 
@@ -149,11 +152,11 @@
                 infiniteMode: true,
                 noTemplate: true,
                 isElement: true,
-                noTemplate: true,
                 submit: function (model) {
-                    loadElementTypes().then( function () {
+                    loadElementTypes().then(() => {
                         callback(model.documentTypeKey);
                     });
+                    
                     editorService.close();
                 },
                 close: function () {
@@ -165,60 +168,66 @@
 
         vm.addBlockFromElementTypeKey = function(key) {
 
-            var blockType = {
-                "contentElementTypeKey": key,
-                "settingsElementTypeKey": null,
-                "labelTemplate": "",
-                "view": null,
-                "stylesheet": null,
-                "editorSize": "medium",
-                "iconColor": null,
-                "backgroundColor": null,
-                "thumbnail": null
+            const blockType = {
+                contentElementTypeKey: key,
+                settingsElementTypeKey: null,
+                labelTemplate: "",
+                view: null,
+                stylesheet: null,
+                editorSize: "medium",
+                iconColor: null,
+                backgroundColor: null,
+                thumbnail: null
             };
 
             $scope.model.value.push(blockType);
 
             vm.openBlockOverlay(blockType);
-
         };
-
-
-
-
 
         vm.openBlockOverlay = function (block) {
 
             var elementType = vm.getElementTypeByKey(block.contentElementTypeKey);
 
-            if(elementType) {
-                localizationService.localize("blockEditor_blockConfigurationOverlayTitle", [elementType.name]).then(function (data) {
+            if (elementType) {
+                
+                let clonedBlockData = Utilities.copy(block);
+                vm.openBlock = block;
 
-                    var clonedBlockData = Utilities.copy(block);
-                    vm.openBlock = block;
+                const overlayModel = {
+                    block: clonedBlockData,
+                      
+                    view: "views/propertyeditors/blocklist/prevalue/blocklist.blockconfiguration.overlay.html",
+                    size: "small",
+                    submit: function(overlayModel) {
+                        loadElementTypes()// lets load elementType again, to ensure we are up to date.
+                        TransferProperties(overlayModel.block, block);// transfer properties back to block object. (Doing this cause we dont know if block object is added to model jet, therefor we cant use index or replace the object.)
+                        overlayModel.close();
+                    },
+                    close: function() {
+                        editorService.close();
+                        vm.openBlock = null;
+                    }
+                };
 
-                    var overlayModel = {
-                        block: clonedBlockData,
-                        title: data,
-                        view: "views/propertyeditors/blocklist/prevalue/blocklist.blockconfiguration.overlay.html",
-                        size: "small",
-                        submit: function(overlayModel) {
-                            loadElementTypes()// lets load elementType again, to ensure we are up to date.
-                            TransferProperties(overlayModel.block, block);// transfer properties back to block object. (Doing this cause we dont know if block object is added to model jet, therefor we cant use index or replace the object.)
-                            overlayModel.close();
-                        },
-                        close: function() {
-                            editorService.close();
-                            vm.openBlock = null;
-                        }
-                    };
-
+                localizationService.localize("blockEditor_blockConfigurationOverlayTitle", [elementType.name]).then(data => {
+                    overlayModel.title = data,
+                    
                     // open property settings editor
                     editorService.open(overlayModel);
-
                 });
             } else {
-                alert("Cannot be edited cause ElementType does not exist.");
+
+              const overlay = {
+                close: () => {
+                  overlayService.close()
+                }
+              };
+
+              localizationService.localize("blockEditor_elementTypeDoesNotExist").then(data => {
+                overlay.content = data;
+                overlayService.open(overlay);
+              });
             }
 
         };

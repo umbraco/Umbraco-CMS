@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Models.PublishedContent
@@ -13,27 +11,14 @@ namespace Umbraco.Cms.Core.Models.PublishedContent
     [DebuggerDisplay("Content Id: {Id}")]
     public abstract class PublishedContentBase : IPublishedContent
     {
-        private readonly IVariationContextAccessor _variationContextAccessor;
+        private readonly IVariationContextAccessor? _variationContextAccessor;
 
-        protected PublishedContentBase(IVariationContextAccessor variationContextAccessor)
-        {
-            _variationContextAccessor = variationContextAccessor;
-        }
-
-        #region ContentType
+        protected PublishedContentBase(IVariationContextAccessor? variationContextAccessor) => _variationContextAccessor = variationContextAccessor;
 
         public abstract IPublishedContentType ContentType { get; }
 
-        #endregion
-
-        #region PublishedElement
-
         /// <inheritdoc />
         public abstract Guid Key { get; }
-
-        #endregion
-
-        #region PublishedContent
 
         /// <inheritdoc />
         public abstract int Id { get; }
@@ -42,7 +27,7 @@ namespace Umbraco.Cms.Core.Models.PublishedContent
         public virtual string Name => this.Name(_variationContextAccessor);
 
         /// <inheritdoc />
-        public virtual string UrlSegment => this.UrlSegment(_variationContextAccessor);
+        public virtual string? UrlSegment => this.UrlSegment(_variationContextAccessor);
 
         /// <inheritdoc />
         public abstract int SortOrder { get; }
@@ -75,17 +60,13 @@ namespace Umbraco.Cms.Core.Models.PublishedContent
         public abstract PublishedItemType ItemType { get; }
 
         /// <inheritdoc />
-        public abstract bool IsDraft(string culture = null);
+        public abstract bool IsDraft(string? culture = null);
 
         /// <inheritdoc />
-        public abstract bool IsPublished(string culture = null);
-
-        #endregion
-
-        #region Tree
+        public abstract bool IsPublished(string? culture = null);
 
         /// <inheritdoc />
-        public abstract IPublishedContent Parent { get; }
+        public abstract IPublishedContent? Parent { get; }
 
         /// <inheritdoc />
         public virtual IEnumerable<IPublishedContent> Children => this.Children(_variationContextAccessor);
@@ -93,16 +74,10 @@ namespace Umbraco.Cms.Core.Models.PublishedContent
         /// <inheritdoc />
         public abstract IEnumerable<IPublishedContent> ChildrenForAllCultures { get; }
 
-        #endregion
-
-        #region Properties
-
         /// <inheritdoc cref="IPublishedElement.Properties"/>
         public abstract IEnumerable<IPublishedProperty> Properties { get; }
 
         /// <inheritdoc cref="IPublishedElement.GetProperty(string)"/>
-        public abstract IPublishedProperty GetProperty(string alias);
-
-        #endregion
+        public abstract IPublishedProperty? GetProperty(string alias);
     }
 }

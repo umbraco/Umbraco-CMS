@@ -1,0 +1,128 @@
+@inherits Umbraco.Cms.Web.Common.Macros.PartialViewMacroPage
+@using Umbraco.Cms.Core.Services
+@using Umbraco.Cms.Web.Common.Security
+@using Umbraco.Cms.Web.Website.Controllers
+@using Umbraco.Cms.Web.Website.Models
+@using Umbraco.Extensions
+@inject MemberModelBuilderFactory memberModelBuilderFactory;
+@inject IMemberExternalLoginProviders memberExternalLoginProviders
+@inject IExternalLoginWithKeyService externalLoginWithKeyService
+@{
+
+    // Build a profile model to edit
+    var profileModel = await memberModelBuilderFactory
+        .CreateProfileModel()
+        // If null or not set, this will redirect to the current page
+        .WithRedirectUrl(null)
+        // Include editable custom properties on the form
+        .WithCustomProperties(true)
+        .BuildForCurrentMemberAsync();
+
+    var success = TempData["FormSuccess"] != null;
+
+    var loginProviders = await memberExternalLoginProviders.GetMemberProvidersAsync();
+    var externalSignInError = ViewData.GetExternalSignInProviderErrors();
+
+    var currentExternalLogin = profileModel is null
+        ? new Dictionary<string, string>()
+        : externalLoginWithKeyService.GetExternalLogins(profileModel.Key).ToDictionary(x=>x.LoginProvider, x=>x.ProviderKey);
+}
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.0/jquery.validate.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validation-unobtrusive/3.2.11/jquery.validate.unobtrusive.min.js"></script>
+
+@if (profileModel != null)
+{
+    if (success)
+    {
+        @* This message will show if profileModel.RedirectUrl is not defined (default) *@
+        <p class="text-success">Profile updated</p>
+    }
+
+    using (Html.BeginUmbracoForm<UmbProfileController>("HandleUpdateProfile", new { RedirectUrl = profileModel.RedirectUrl }))
+    {
+        <h2>Update your account.</h2>
+        <hr />
+        <div asp-validation-summary="All" class="text-danger"></div>
+        <div class="mb-3">
+            <label asp-for="@profileModel.Name" class="form-label"></label>
+            <input asp-for="@profileModel.Name" class="form-control" aria-required="true" />
+            <span asp-validation-for="@profileModel.Name" class="form-text text-danger"></span>
+        </div>
+        <div class="mb-3">
+            <label asp-for="@profileModel.Email" class="form-label"></label>
+            <input asp-for="@profileModel.Email" class="form-control" autocomplete="username" aria-required="true" />
+            <span asp-validation-for="@profileModel.Email" class="form-text text-danger"></span>
+        </div>
+
+        @if (!string.IsNullOrWhiteSpace(profileModel.UserName))
+        {
+            <div class="mb-3">
+                <label asp-for="@profileModel.UserName" class="form-label"></label>
+                <input asp-for="@profileModel.UserName" class="form-control" autocomplete="username" aria-required="true" />
+                <span asp-validation-for="@profileModel.UserName" class="form-text text-danger"></span>
+            </div>
+        }
+
+        @if (profileModel.MemberProperties != null)
+        {
+            for (var i = 0; i < profileModel.MemberProperties.Count; i++)
+            {
+                <div class="mb-3">
+                    @Html.LabelFor(m => profileModel.MemberProperties[i].Value, profileModel.MemberProperties[i].Name)
+                    <input asp-for="@profileModel.MemberProperties[i].Value" class="form-control" />
+                    @Html.HiddenFor(m => profileModel.MemberProperties[i].Alias)
+                    <span asp-validation-for="@profileModel.MemberProperties[i].Value" class="form-text text-danger"></span>
+                </div>
+            }
+        }
+
+        <button type="submit" class="btn btn-primary">Update</button>
+
+        if (loginProviders.Any())
+        {
+            <hr/>
+            <h4>Link external accounts</h4>
+
+            if (externalSignInError?.AuthenticationType is null && externalSignInError?.Errors.Any() == true)
+            {
+                @Html.DisplayFor(x => externalSignInError.Errors);
+            }
+
+            @foreach (var login in loginProviders)
+            {
+                if (currentExternalLogin.TryGetValue(login.ExternalLoginProvider.AuthenticationType, out var providerKey))
+                {
+                    @using (Html.BeginUmbracoForm<UmbExternalLoginController>(nameof(UmbExternalLoginController.Disassociate)))
+                    {
+                        <input type="hidden" name="providerKey" value="@providerKey"/>
+                        <button type="submit" name="provider" value="@login.ExternalLoginProvider.AuthenticationType">
+                            Un-Link your @login.AuthenticationScheme.DisplayName account
+                        </button>
+
+                        if (externalSignInError?.AuthenticationType == login.ExternalLoginProvider.AuthenticationType)
+                        {
+                            @Html.DisplayFor(x => externalSignInError.Errors);
+                        }
+                    }
+                }
+                else
+                {
+                    @using (Html.BeginUmbracoForm<UmbExternalLoginController>(nameof(UmbExternalLoginController.LinkLogin)))
+                    {
+                        <button type="submit" name="provider" value="@login.ExternalLoginProvider.AuthenticationType">
+                            Link your @login.AuthenticationScheme.DisplayName account
+                        </button>
+
+                        if (externalSignInError?.AuthenticationType == login.ExternalLoginProvider.AuthenticationType)
+                        {
+                            @Html.DisplayFor(x => externalSignInError.Errors);
+                        }
+                    }
+                }
+
+            }
+        }
+    }
+}

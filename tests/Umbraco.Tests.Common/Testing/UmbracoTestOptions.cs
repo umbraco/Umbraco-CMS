@@ -1,72 +1,71 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-namespace Umbraco.Cms.Tests.Common.Testing
+namespace Umbraco.Cms.Tests.Common.Testing;
+
+public static class UmbracoTestOptions
 {
-    public static class UmbracoTestOptions
+    public enum Database
     {
-        public enum Logger
-        {
-            /// <summary>
-            /// pure mocks
-            /// </summary>
-            Mock,
+        /// <summary>
+        ///     no database
+        /// </summary>
+        None,
 
-            /// <summary>
-            /// Serilog for tests
-            /// </summary>
-            Serilog,
+        /// <summary>
+        ///     new empty database file for the entire fixture
+        /// </summary>
+        NewEmptyPerFixture,
 
-            /// <summary>
-            /// console logger
-            /// </summary>
-            Console
-        }
+        /// <summary>
+        ///     new empty database file per test
+        /// </summary>
+        NewEmptyPerTest,
 
-        public enum Database
-        {
-            /// <summary>
-            /// no database
-            /// </summary>
-            None,
+        /// <summary>
+        ///     new database file with schema for the entire fixture
+        /// </summary>
+        NewSchemaPerFixture,
 
-            /// <summary>
-            /// new empty database file for the entire fixture
-            /// </summary>
-            NewEmptyPerFixture,
+        /// <summary>
+        ///     new database file with schema per test
+        /// </summary>
+        NewSchemaPerTest
+    }
 
-            /// <summary>
-            /// new empty database file per test
-            /// </summary>
-            NewEmptyPerTest,
+    public enum Logger
+    {
+        /// <summary>
+        ///     pure mocks
+        /// </summary>
+        Mock,
 
-            /// <summary>
-            /// new database file with schema for the entire fixture
-            /// </summary>
-            NewSchemaPerFixture,
+        /// <summary>
+        ///     Serilog for tests
+        /// </summary>
+        Serilog,
 
-            /// <summary>
-            /// new database file with schema per test
-            /// </summary>
-            NewSchemaPerTest
-        }
+        /// <summary>
+        ///     console logger
+        /// </summary>
+        Console
+    }
 
-        public enum TypeLoader
-        {
-            /// <summary>
-            /// the default, global type loader for tests
-            /// </summary>
-            Default,
+    public enum TypeLoader
+    {
+        /// <summary>
+        ///     the default, global type loader for tests
+        /// </summary>
+        Default,
 
-            /// <summary>
-            /// create one type loader for the feature
-            /// </summary>
-            PerFixture,
+        /// <summary>
+        ///     create one type loader for the feature
+        /// </summary>
+        PerFixture,
 
-            /// <summary>
-            /// create one type loader for each test
-            /// </summary>
-            PerTest
-        }
+        /// <summary>
+        ///     create one type loader for each test
+        /// </summary>
+        PerTest
     }
 }

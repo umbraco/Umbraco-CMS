@@ -1,7 +1,6 @@
-﻿@using System.Web
 @model dynamic
 
-@if (Model.editor.config.markup != null)
+@if (Model?.editor.config.markup is not null)
 {
     string markup = Model.editor.config.markup.ToString();
     markup = markup.Replace("#value#", Html.ReplaceLineBreaks((string)Model.value.ToString()).ToString());
@@ -18,6 +17,6 @@
 else
 {
     <text>
-        <div style="@Model.editor.config.style">@Model.value</div>
+        <div style="@Model?.editor.config.style">@Model?.value</div>
     </text>
 }

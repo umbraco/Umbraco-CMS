@@ -6,6 +6,7 @@
 
             <umb-editor-header
                 name="vm.model.title"
+                name-max-length="255"
                 name-required="false"
                 name-locked="true"
                 navigation="vm.tabs"
@@ -36,6 +37,7 @@
                     </umb-button>
 
                     <umb-button
+                        ng-if="!vm.model.hideSubmitButton",
                         action="vm.submitAndClose()"
                         button-style="primary"
                         state="vm.saveButtonState"

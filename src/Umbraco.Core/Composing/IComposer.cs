@@ -1,15 +1,14 @@
-﻿using Umbraco.Cms.Core.DependencyInjection;
+using Umbraco.Cms.Core.DependencyInjection;
 
-namespace Umbraco.Cms.Core.Composing
+namespace Umbraco.Cms.Core.Composing;
+
+/// <summary>
+///     Represents a composer.
+/// </summary>
+public interface IComposer : IDiscoverable
 {
     /// <summary>
-    /// Represents a composer.
+    ///     Compose.
     /// </summary>
-    public interface IComposer : IDiscoverable
-    {
-        /// <summary>
-        /// Compose.
-        /// </summary>
-        void Compose(IUmbracoBuilder builder);
-    }
+    void Compose(IUmbracoBuilder builder);
 }

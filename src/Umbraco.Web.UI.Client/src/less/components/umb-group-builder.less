@@ -458,7 +458,7 @@ input.umb-group-builder__group-title-input:disabled:hover {
 }
 
 .umb-group-builder__group-inherited-label {
-  font-size: 13px;
+  font-size: 0.9rem;
   display: inline-flex;
   align-items: center;
   margin-right: 10px;
@@ -551,7 +551,7 @@ input.umb-group-builder__group-title-input:disabled:hover {
 
 
 .umb-group-builder__property-meta {
-  flex: 0 0 250px;
+  flex: 0 0 160px;
   margin-right: 20px;
 }
 
@@ -644,7 +644,7 @@ input.umb-group-builder__group-title-input:disabled:hover {
 }
 
 .umb-group-builder__property-preview-label {
-  font-size: 12px;
+  font-size: 0.75rem;
   position: absolute;
   top: 0;
   left: 0;
@@ -714,7 +714,7 @@ input.umb-group-builder__group-title-input:disabled:hover {
 }
 
 .umb-group-builder__property-tags.-right {
-    right: 0;
+    right: 4px;
     left: auto;
 }
 
@@ -740,6 +740,7 @@ input.umb-group-builder__group-title-input:disabled:hover {
     margin-right: 3px;
     display: flex;
     align-items: center;
+    line-height: 1;
 }
 
 /* ---------- SORTABLE ---------- */
@@ -814,6 +815,12 @@ input.umb-group-builder__group-sort-value {
         }
     }
 
+    .editor-placeholder-button {
+      .umb-button__button {
+        height: 80px;
+      }
+    }
+
     .editor-placeholder {
         border: 1px dashed @ui-action-border;
         width: 100%;
@@ -855,11 +862,13 @@ input.umb-group-builder__group-sort-value {
         align-items: center;
         min-height: 80px;
         color: @ui-action-discreet-type;
+    }
 
-        &:hover {
-            color: @ui-action-discreet-type-hover;
-            background-color: @ui-action-discreet-hover;
-        }
+    button.editor-info {
+      &:hover {
+        color: @ui-action-discreet-type-hover;
+        background-color: @ui-action-discreet-hover;
+      }
     }
 
     .editor-icon-wrapper {
@@ -904,8 +913,20 @@ input.umb-group-builder__group-sort-value {
         color: @ui-action-discreet-type;
 
         &:hover {
-            color: @ui-action-discreet-type-hover;
-            background-color: @ui-action-discreet-hover;
+          color: @ui-action-discreet-type-hover;
+          background-color: @ui-action-discreet-hover;
+        }
+
+        &:disabled {
+          cursor: not-allowed;
+          background: @sand-5;
+          opacity: 0.6;
+          color: @black;
+
+          &:hover {
+            background: @sand-5;
+            color: @black;
+          }
         }
     }
 

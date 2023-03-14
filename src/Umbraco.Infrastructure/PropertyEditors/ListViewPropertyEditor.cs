@@ -1,40 +1,50 @@
-﻿// Copyright (c) Umbraco.
+// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.DependencyInjection;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.IO;
-using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Cms.Core.Strings;
 
-namespace Umbraco.Cms.Core.PropertyEditors
+namespace Umbraco.Cms.Core.PropertyEditors;
+
+/// <summary>
+///     Represents a list-view editor.
+/// </summary>
+[DataEditor(
+    Constants.PropertyEditors.Aliases.ListView,
+    "List view",
+    "listview",
+    HideLabel = true,
+    Group = Constants.PropertyEditors.Groups.Lists,
+    Icon = Constants.Icons.ListView,
+    ValueEditorIsReusable = true)]
+public class ListViewPropertyEditor : DataEditor
 {
-    /// <summary>
-    /// Represents a list-view editor.
-    /// </summary>
-    [DataEditor(
-        Constants.PropertyEditors.Aliases.ListView,
-        "List view",
-        "listview",
-        HideLabel = true,
-        Group = Constants.PropertyEditors.Groups.Lists,
-        Icon = Constants.Icons.ListView)]
-    public class ListViewPropertyEditor : DataEditor
+    private readonly IEditorConfigurationParser _editorConfigurationParser;
+    private readonly IIOHelper _iioHelper;
+
+    // Scheduled for removal in v12
+    [Obsolete("Please use constructor that takes an IEditorConfigurationParser instead")]
+    public ListViewPropertyEditor(
+        IDataValueEditorFactory dataValueEditorFactory,
+        IIOHelper iioHelper)
+        : this(dataValueEditorFactory, iioHelper, StaticServiceProvider.Instance.GetRequiredService<IEditorConfigurationParser>())
     {
-        private readonly IIOHelper _iioHelper;
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="ListViewPropertyEditor"/> class.
-        /// </summary>
-        public ListViewPropertyEditor(
-            IDataValueEditorFactory dataValueEditorFactory,
-            IIOHelper iioHelper)
-            : base(dataValueEditorFactory)
-        {
-            _iioHelper = iioHelper;
-        }
-
-        /// <inheritdoc />
-        protected override IConfigurationEditor CreateConfigurationEditor() => new ListViewConfigurationEditor(_iioHelper);
     }
+
+    public ListViewPropertyEditor(
+        IDataValueEditorFactory dataValueEditorFactory,
+        IIOHelper iioHelper,
+        IEditorConfigurationParser editorConfigurationParser)
+        : base(dataValueEditorFactory)
+    {
+        _iioHelper = iioHelper;
+        _editorConfigurationParser = editorConfigurationParser;
+        SupportsReadOnly = true;
+    }
+
+    /// <inheritdoc />
+    protected override IConfigurationEditor CreateConfigurationEditor() =>
+        new ListViewConfigurationEditor(_iioHelper, _editorConfigurationParser);
 }

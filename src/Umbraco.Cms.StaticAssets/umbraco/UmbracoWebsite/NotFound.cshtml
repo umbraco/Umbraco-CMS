@@ -1,0 +1,84 @@
+@using Microsoft.Extensions.Options
+@using Umbraco.Cms.Core.Configuration.Models
+@using Umbraco.Cms.Core.Hosting
+@using Umbraco.Cms.Core.Routing
+@using Umbraco.Extensions
+@inject IHostingEnvironment hostingEnvironment
+@inject IOptions<GlobalSettings> globalSettings
+@{
+    var backOfficePath = globalSettings.Value.GetBackOfficePath(hostingEnvironment);
+}
+<!doctype html>
+<html class="no-js" lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+    <title>Page Not Found</title>
+
+    <link rel="stylesheet" href="@WebPath.Combine(backOfficePath.TrimStart("~"), "/assets/css/nonodes.style.min.css")" />
+    <style type="text/css">
+        body {
+            color:initial;
+        }
+
+        section {
+            background: none;
+        }
+
+        section a, section a:focus, section a:visited {
+            color:initial;
+            border-color:currentColor;
+        }
+    </style>
+</head>
+<body>
+
+    <section>
+        <article>
+            <div>
+                <h1>Page Not Found</h1>
+                @if (hostingEnvironment.IsDebugMode)
+                {
+
+                    var reason = (string?)Context.Items["reason"];
+                    var message = (string?)Context.Items["message"];
+
+                    if (!reason.IsNullOrWhiteSpace())
+                    {
+                        <h3>@reason</h3>
+                    }
+                    if (!message.IsNullOrWhiteSpace())
+                    {
+                        <p>@message</p>
+                    }
+
+                    <div class="cta"></div>
+
+                    <div class="row">
+                        <div class="col">
+                            <h2>This page can be replaced</h2>
+                            <p>
+                                Custom error handling might make your site look more on-brand and minimize the impact of errors on user experience - for example, a custom 404 with some helpful links (or a search function) could bring some value to the site.
+                            </p>
+
+                            <a href="https://umbra.co/custom-error-pages" target="_blank" rel="noopener">Implementing custom error pages &rarr;</a>
+                        </div>
+
+                        <div class="col">
+                            <h2>Be a part of the community</h2>
+                            <p>The Umbraco community is the best of its kind, be sure to visit, and if you have any questions, we're sure that you can get your answers from the community.</p>
+
+                            <a href="https://our.umbraco.com/" target="_blank" rel="noopener">our.Umbraco &rarr;</a>
+                        </div>
+                    </div>
+
+                }
+            </div>
+        </article>
+
+    </section>
+
+</body>
+</html>

@@ -5,7 +5,7 @@
         appState, contentResource, entityResource, navigationService, notificationsService, contentAppHelper,
         serverValidationManager, contentEditingHelper, localizationService, formHelper, umbRequestHelper,
         editorState, $http, eventsService, overlayService, $location, localStorageService, treeService,
-        $exceptionHandler) {
+        $exceptionHandler, uploadTracker) {
 
         var evts = [];
         var infiniteMode = $scope.infiniteModel && $scope.infiniteModel.infiniteMode;
@@ -183,6 +183,10 @@
                 }
             }));
 
+            evts.push(eventsService.on("uploadTracker.uploadsInProgressChanged", function (name, args) {
+                $scope.page.uploadsInProgress = args.uploadsInProgress.filter(x => x.entityKey === $scope.content.key).length > 0;
+            }));
+
             evts.push(eventsService.on("rte.file.uploading", function () {
                 $scope.page.saveButtonState = "busy";
                 $scope.page.buttonGroupState = "busy";
@@ -232,6 +236,7 @@
 
                     appendRuntimeData();
                     init();
+                    startWatches($scope.content);
 
                     syncTreeNode($scope.content, $scope.content.path, true);
 
@@ -318,7 +323,6 @@
             $scope.defaultButton = buttons.defaultButton;
             $scope.subButtons = buttons.subButtons;
             $scope.page.showPreviewButton = true;
-
         }
 
         /** Syncs the content item to it's tree node - this occurs on first load and after saving */
@@ -565,7 +569,6 @@
             $scope.page.loading = true;
 
             loadContent().then(function () {
-                startWatches($scope.content);
                 $scope.page.loading = false;
             });
         }
@@ -602,8 +605,6 @@
                                 $scope.page.buttonGroupState = 'error';
                                 handleHttpException(err);
                             });
-
-
                     },
                     close: function () {
                         overlayService.close();
@@ -641,13 +642,14 @@
                                 overlayService.close();
                                 return $q.when(data);
                             },
-                                function (err) {
-                                    clearDirtyState($scope.content.variants);
-                                    model.submitButtonState = "error";
-                                    //re-map the dialog model since we've re-bound the properties
-                                    dialog.variants = $scope.content.variants;
-                                    handleHttpException(err);
-                                });
+                            function (err) {
+                                clearDirtyState($scope.content.variants);
+                                model.submitButtonState = "error";
+                                //re-map the dialog model since we've re-bound the properties
+                                dialog.variants = $scope.content.variants;
+
+                                handleHttpException(err);
+                            });
                         },
                         close: function () {
                             overlayService.close();
@@ -699,14 +701,18 @@
                                 clearNotifications($scope.content);
                                 overlayService.close();
                                 return $q.when(data);
-                            },
-                                function (err) {
-                                    clearDirtyState($scope.content.variants);
-                                    model.submitButtonState = "error";
-                                    //re-map the dialog model since we've re-bound the properties
-                                    dialog.variants = $scope.content.variants;
-                                    handleHttpException(err);
-                                });
+                            }, function (err) {
+                                clearDirtyState($scope.content.variants);
+                                model.submitButtonState = "error";
+                                //re-map the dialog model since we've re-bound the properties
+                                dialog.variants = $scope.content.variants;
+
+                                //ensure error messages are displayed
+                                formHelper.showNotifications(err.data);
+                                clearNotifications($scope.content);
+                                
+                                handleHttpException(err);
+                            });
                         },
                         close: function () {
                             overlayService.close();
@@ -760,20 +766,24 @@
                             clearNotifications($scope.content);
                             overlayService.close();
                             return $q.when(data);
-                        },
-                            function (err) {
-                                clearDirtyState($scope.content.variants);
-                                //model.submitButtonState = "error";
-                                // Because this is the "save"-action, then we actually save though there was a validation error, therefor we will show success and display the validation errors politely.
-                                if(err && err.data && err.data.ModelState && Object.keys(err.data.ModelState).length > 0) {
-                                    model.submitButtonState = "success";
-                                } else {
-                                    model.submitButtonState = "error";
-                                }
+                        }, function (err) {
+                            clearDirtyState($scope.content.variants);
+                            //model.submitButtonState = "error";
+                            // Because this is the "save"-action, then we actually save though there was a validation error, therefor we will show success and display the validation errors politely.
+                            if(err && err.data && err.data.ModelState && Object.keys(err.data.ModelState).length > 0) {
+                                model.submitButtonState = "success";
+                            } else {
+                                model.submitButtonState = "error";
                                 //re-map the dialog model since we've re-bound the properties
                                 dialog.variants = $scope.content.variants;
+
+                                //ensure error messages are displayed
+                                formHelper.showNotifications(err.data);
+                                clearNotifications($scope.content);
+
                                 handleHttpException(err);
-                            });
+                            }
+                        })
                     },
                     close: function (oldModel) {
                         overlayService.close();
@@ -927,22 +937,25 @@
         };
 
         $scope.preview = function (content) {
-            // Chromes popup blocker will kick in if a window is opened
-            // without the initial scoped request. This trick will fix that.
-            //
-            var previewWindow = $window.open('preview/?init=true', 'umbpreview');
 
-            // Build the correct path so both /#/ and #/ work.
-            var query = 'id=' + content.id;
-            if ($scope.culture) {
-                query += "#?culture=" + $scope.culture;
+            const openPreviewWindow = () => {
+                // Chromes popup blocker will kick in if a window is opened
+                // without the initial scoped request. This trick will fix that.
+                //
+                const previewWindow = $window.open('preview/?init=true', 'umbpreview');
+
+                // Build the correct path so both /#/ and #/ work.
+                let query = 'id=' + content.id;
+                if ($scope.culture) {
+                   query += "#?culture=" + $scope.culture;
+                }
+                previewWindow.location.href = Umbraco.Sys.ServerVariables.umbracoSettings.umbracoPath + '/preview/?' + query;
             }
-            var redirect = Umbraco.Sys.ServerVariables.umbracoSettings.umbracoPath + '/preview/?' + query;
 
             //The user cannot save if they don't have access to do that, in which case we just want to preview
             //and that's it otherwise they'll get an unauthorized access message
             if (!_.contains(content.allowedActions, "A")) {
-                previewWindow.location.href = redirect;
+                openPreviewWindow();
             }
             else {
                 var selectedVariant = $scope.content.variants[0];
@@ -956,10 +969,12 @@
                     }
                 }
 
-                //ensure the save flag is set
+                //reset save flag for all variants
+                $scope.content.variants.forEach(variant => variant.save = false);
+                //ensure the save flag is set for the active variant
                 selectedVariant.save = true;
                 performSave({ saveMethod: $scope.saveMethod(), action: "save" }).then(function (data) {
-                    previewWindow.location.href = redirect;
+                    openPreviewWindow()
                 }, function (err) {
                     //validation issues ....
                 });

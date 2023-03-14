@@ -1,43 +1,39 @@
-﻿// Copyright (c) Umbraco.
+// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using System.Collections.Generic;
 using System.Collections.Specialized;
-using System.Linq;
+using Umbraco.Cms.Core;
 
-namespace Umbraco.Extensions
+namespace Umbraco.Extensions;
+
+public static class NameValueCollectionExtensions
 {
-    public static class NameValueCollectionExtensions
+    public static IEnumerable<KeyValuePair<string?, string?>> AsEnumerable(this NameValueCollection nvc)
     {
-        public static IEnumerable<KeyValuePair<string, string>> AsEnumerable(this NameValueCollection nvc)
+        foreach (var key in nvc.AllKeys)
         {
-            foreach (string key in nvc.AllKeys)
-            {
-                yield return new KeyValuePair<string, string>(key, nvc[key]);
-            }
+            yield return new KeyValuePair<string?, string?>(key, nvc[key]);
+        }
+    }
+
+    public static bool ContainsKey(this NameValueCollection collection, string key) =>
+        collection.Keys.Cast<object>().Any(k => (string)k == key);
+
+    public static T? GetValue<T>(this NameValueCollection collection, string key, T defaultIfNotFound)
+    {
+        if (collection.ContainsKey(key) == false)
+        {
+            return defaultIfNotFound;
         }
 
-        public static bool ContainsKey(this NameValueCollection collection, string key)
+        var val = collection[key];
+        if (val == null)
         {
-            return collection.Keys.Cast<object>().Any(k => (string) k == key);
+            return defaultIfNotFound;
         }
 
-        public static T GetValue<T>(this NameValueCollection collection, string key, T defaultIfNotFound)
-        {
-            if (collection.ContainsKey(key) == false)
-            {
-                return defaultIfNotFound;
-            }
+        Attempt<T> result = val.TryConvertTo<T>();
 
-            var val = collection[key];
-            if (val == null)
-            {
-                return defaultIfNotFound;
-            }
-
-            var result = val.TryConvertTo<T>();
-
-            return result.Success ? result.Result : defaultIfNotFound;
-        }
+        return result.Success ? result.Result : defaultIfNotFound;
     }
 }

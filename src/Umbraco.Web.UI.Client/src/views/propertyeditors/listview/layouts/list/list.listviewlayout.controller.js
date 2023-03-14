@@ -41,6 +41,7 @@
         }
 
         function selectAll() {
+            if ($scope.options.readonly) return;
             listViewHelper.selectAllItemsToggle($scope.items, $scope.selection);
         }
 
@@ -49,6 +50,7 @@
         }
 
         function selectItem(selectedItem, $index, $event) {
+            if ($scope.options.readonly) return;
             listViewHelper.selectHandler(selectedItem, $index, $scope.items, $scope.selection, $event);
         }
 

@@ -1,43 +1,40 @@
-﻿using System.Collections.Generic;
-using System.Linq;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 
-namespace Umbraco.Extensions
+namespace Umbraco.Extensions;
+
+public static class MediaPicker3ConfigurationExtensions
 {
-    public static class MediaPicker3ConfigurationExtensions
+    /// <summary>
+    ///     Applies the configuration to ensure only valid crops are kept and have the correct width/height.
+    /// </summary>
+    public static void ApplyConfiguration(this ImageCropperValue imageCropperValue, MediaPicker3Configuration? configuration)
     {
-        /// <summary>
-        /// Applies the configuration to ensure only valid crops are kept and have the correct width/height.
-        /// </summary>
-        /// <param name="configuration">The configuration.</param>
-        public static void ApplyConfiguration(this ImageCropperValue imageCropperValue, MediaPicker3Configuration configuration)
+        var crops = new List<ImageCropperValue.ImageCropperCrop>();
+
+        MediaPicker3Configuration.CropConfiguration[]? configuredCrops = configuration?.Crops;
+        if (configuredCrops != null)
         {
-            var crops = new List<ImageCropperValue.ImageCropperCrop>();
-
-            var configuredCrops = configuration?.Crops;
-            if (configuredCrops != null)
+            foreach (MediaPicker3Configuration.CropConfiguration configuredCrop in configuredCrops)
             {
-                foreach (var configuredCrop in configuredCrops)
+                ImageCropperValue.ImageCropperCrop? crop =
+                    imageCropperValue.Crops?.FirstOrDefault(x => x.Alias == configuredCrop.Alias);
+
+                crops.Add(new ImageCropperValue.ImageCropperCrop
                 {
-                    var crop = imageCropperValue.Crops?.FirstOrDefault(x => x.Alias == configuredCrop.Alias);
-
-                    crops.Add(new ImageCropperValue.ImageCropperCrop
-                    {
-                        Alias = configuredCrop.Alias,
-                        Width = configuredCrop.Width,
-                        Height = configuredCrop.Height,
-                        Coordinates = crop?.Coordinates
-                    });
-                }
+                    Alias = configuredCrop.Alias,
+                    Width = configuredCrop.Width,
+                    Height = configuredCrop.Height,
+                    Coordinates = crop?.Coordinates,
+                });
             }
+        }
 
-            imageCropperValue.Crops = crops;
+        imageCropperValue.Crops = crops;
 
-            if (configuration?.EnableLocalFocalPoint == false)
-            {
-                imageCropperValue.FocalPoint = null;
-            }
+        if (configuration?.EnableLocalFocalPoint == false)
+        {
+            imageCropperValue.FocalPoint = null;
         }
     }
 }

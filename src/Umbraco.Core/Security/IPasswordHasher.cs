@@ -1,12 +1,11 @@
-namespace Umbraco.Cms.Core.Security
+namespace Umbraco.Cms.Core.Security;
+
+public interface IPasswordHasher
 {
-    public interface IPasswordHasher
-    {
-        /// <summary>
-        /// Hashes a password
-        /// </summary>
-        /// <param name="password">The password.</param>
-        /// <returns>The password hashed.</returns>
-        string HashPassword(string password);
-    }
+    /// <summary>
+    ///     Hashes a password
+    /// </summary>
+    /// <param name="password">The password.</param>
+    /// <returns>The password hashed.</returns>
+    string HashPassword(string password);
 }

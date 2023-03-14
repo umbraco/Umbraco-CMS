@@ -2,15 +2,14 @@
 // See LICENSE for more details.
 
 using System.Xml;
-using System.Xml.XPath;
 using NUnit.Framework;
 
-namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.CoreXml
+namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.CoreXml;
+
+[TestFixture]
+public class FrameworkXmlTests
 {
-    [TestFixture]
-    public class FrameworkXmlTests
-    {
-        private const string Xml1 = @"<root>
+    private const string Xml1 = @"<root>
     <items>
         <item1 />
         <item2>
@@ -25,205 +24,204 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.CoreXml
     </items>
 </root>";
 
-        // Umbraco : the following test shows that when legacy imports the whole tree in a
-        // "contentAll" xslt macro parameter, the entire collection of nodes is cloned ie is
-        // duplicated.
-        //
-        // What is the impact on memory?
-        // What happens for non-xslt macros?
-        [Test]
-        public void ImportNodeClonesImportedNode()
+    // Umbraco : the following test shows that when legacy imports the whole tree in a
+    // "contentAll" xslt macro parameter, the entire collection of nodes is cloned ie is
+    // duplicated.
+    //
+    // What is the impact on memory?
+    // What happens for non-xslt macros?
+    [Test]
+    public void ImportNodeClonesImportedNode()
+    {
+        var doc1 = new XmlDocument();
+        doc1.LoadXml(Xml1);
+
+        var node1 = doc1.SelectSingleNode("//item2");
+        Assert.IsNotNull(node1);
+
+        var doc2 = new XmlDocument();
+        doc2.LoadXml("<nodes />");
+        var node2 = doc2.ImportNode(node1, true);
+        var root2 = doc2.DocumentElement;
+        Assert.IsNotNull(root2);
+        root2.AppendChild(node2);
+
+        var node3 = doc2.SelectSingleNode("//item2");
+
+        Assert.AreNotSame(node1, node2); // has been cloned
+        Assert.AreSame(node2, node3); // has been appended
+
+        Assert.AreNotSame(node1.FirstChild, node2.FirstChild); // deep clone
+    }
+
+    // Umbraco: the CanRemove...NodeAndNavigate tests shows that if the underlying XmlDocument
+    // is modified while navigating, then strange situations can be created. For xslt macros,
+    // the result depends on what the xslt engine is doing at the moment = unpredictable.
+    //
+    // What happens for non-xslt macros?
+    [Test]
+    public void CanRemoveCurrentNodeAndNavigate()
+    {
+        var doc1 = new XmlDocument();
+        doc1.LoadXml(Xml1);
+        var nav1 = doc1.CreateNavigator();
+
+        Assert.IsTrue(nav1.MoveToFirstChild());
+        Assert.AreEqual("root", nav1.Name);
+        Assert.IsTrue(nav1.MoveToFirstChild());
+        Assert.AreEqual("items", nav1.Name);
+        Assert.IsTrue(nav1.MoveToFirstChild());
+        Assert.AreEqual("item1", nav1.Name);
+        Assert.IsTrue(nav1.MoveToNext());
+        Assert.AreEqual("item2", nav1.Name);
+
+        var node1 = doc1.SelectSingleNode("//item2");
+        Assert.IsNotNull(node1);
+        var parent1 = node1.ParentNode;
+        Assert.IsNotNull(parent1);
+        parent1.RemoveChild(node1);
+
+        // navigator now navigates on an isolated fragment
+        // that is rooted on the node that was removed
+        Assert.AreEqual("item2", nav1.Name);
+        Assert.IsFalse(nav1.MoveToPrevious());
+        Assert.IsFalse(nav1.MoveToNext());
+        Assert.IsFalse(nav1.MoveToParent());
+
+        Assert.IsTrue(nav1.MoveToFirstChild());
+        Assert.AreEqual("item21", nav1.Name);
+        Assert.IsTrue(nav1.MoveToParent());
+        Assert.AreEqual("item2", nav1.Name);
+
+        nav1.MoveToRoot();
+        Assert.AreEqual("item2", nav1.Name);
+    }
+
+    [Test]
+    public void CanRemovePathNodeAndNavigate()
+    {
+        var doc1 = new XmlDocument();
+        doc1.LoadXml(Xml1);
+        var nav1 = doc1.CreateNavigator();
+
+        Assert.IsTrue(nav1.MoveToFirstChild());
+        Assert.AreEqual("root", nav1.Name);
+        Assert.IsTrue(nav1.MoveToFirstChild());
+        Assert.AreEqual("items", nav1.Name);
+        Assert.IsTrue(nav1.MoveToFirstChild());
+        Assert.AreEqual("item1", nav1.Name);
+        Assert.IsTrue(nav1.MoveToNext());
+        Assert.AreEqual("item2", nav1.Name);
+        Assert.IsTrue(nav1.MoveToFirstChild());
+        Assert.AreEqual("item21", nav1.Name);
+
+        var node1 = doc1.SelectSingleNode("//item2");
+        Assert.IsNotNull(node1);
+        var parent1 = node1.ParentNode;
+        Assert.IsNotNull(parent1);
+        parent1.RemoveChild(node1);
+
+        // navigator now navigates on an isolated fragment
+        // that is rooted on the node that was removed
+        Assert.AreEqual("item21", nav1.Name);
+        Assert.IsTrue(nav1.MoveToParent());
+        Assert.AreEqual("item2", nav1.Name);
+        Assert.IsFalse(nav1.MoveToPrevious());
+        Assert.IsFalse(nav1.MoveToNext());
+        Assert.IsFalse(nav1.MoveToParent());
+
+        nav1.MoveToRoot();
+        Assert.AreEqual("item2", nav1.Name);
+    }
+
+    [Test]
+    public void CanRemoveOutOfPathNodeAndNavigate()
+    {
+        var doc1 = new XmlDocument();
+        doc1.LoadXml(Xml1);
+        var nav1 = doc1.CreateNavigator();
+
+        Assert.IsTrue(nav1.MoveToFirstChild());
+        Assert.AreEqual("root", nav1.Name);
+        Assert.IsTrue(nav1.MoveToFirstChild());
+        Assert.AreEqual("items", nav1.Name);
+        Assert.IsTrue(nav1.MoveToFirstChild());
+        Assert.AreEqual("item1", nav1.Name);
+        Assert.IsTrue(nav1.MoveToNext());
+        Assert.AreEqual("item2", nav1.Name);
+        Assert.IsTrue(nav1.MoveToNext());
+        Assert.AreEqual("item3", nav1.Name);
+        Assert.IsTrue(nav1.MoveToNext());
+        Assert.AreEqual("item4", nav1.Name);
+
+        var node1 = doc1.SelectSingleNode("//item2");
+        Assert.IsNotNull(node1);
+        var parent1 = node1.ParentNode;
+        Assert.IsNotNull(parent1);
+        parent1.RemoveChild(node1);
+
+        // navigator sees the change
+        Assert.AreEqual("item4", nav1.Name);
+        Assert.IsTrue(nav1.MoveToPrevious());
+        Assert.AreEqual("item3", nav1.Name);
+        Assert.IsTrue(nav1.MoveToPrevious());
+        Assert.AreEqual("item1", nav1.Name);
+    }
+
+    // Umbraco: the following test shows that if the underlying XmlDocument is modified while
+    // iterating, then strange situations can be created. For xslt macros, the result depends
+    // on what the xslt engine is doing at the moment = unpredictable.
+    //
+    // What happens for non-xslt macros?
+    [Test]
+    public void CanRemoveNodeAndIterate()
+    {
+        var doc1 = new XmlDocument();
+        doc1.LoadXml(Xml1);
+        var nav1 = doc1.CreateNavigator();
+
+        var iter1 = nav1.Select("//items/*");
+        var iter2 = nav1.Select("//items/*");
+
+        Assert.AreEqual(6, iter1.Count);
+
+        var node1 = doc1.SelectSingleNode("//item2");
+        Assert.IsNotNull(node1);
+        var parent1 = node1.ParentNode;
+        Assert.IsNotNull(parent1);
+        parent1.RemoveChild(node1);
+
+        // iterator partially sees the change
+        Assert.AreEqual(6, iter1.Count); // has been cached, not updated
+        Assert.AreEqual(5, iter2.Count); // not calculated yet, correct value
+
+        var count = 0;
+        while (iter1.MoveNext())
         {
-            var doc1 = new XmlDocument();
-            doc1.LoadXml(Xml1);
-
-            XmlNode node1 = doc1.SelectSingleNode("//item2");
-            Assert.IsNotNull(node1);
-
-            var doc2 = new XmlDocument();
-            doc2.LoadXml("<nodes />");
-            XmlNode node2 = doc2.ImportNode(node1, true);
-            XmlElement root2 = doc2.DocumentElement;
-            Assert.IsNotNull(root2);
-            root2.AppendChild(node2);
-
-            XmlNode node3 = doc2.SelectSingleNode("//item2");
-
-            Assert.AreNotSame(node1, node2); // has been cloned
-            Assert.AreSame(node2, node3); // has been appended
-
-            Assert.AreNotSame(node1.FirstChild, node2.FirstChild); // deep clone
+            count++;
         }
 
-        // Umbraco: the CanRemove...NodeAndNavigate tests shows that if the underlying XmlDocument
-        // is modified while navigating, then strange situations can be created. For xslt macros,
-        // the result depends on what the xslt engine is doing at the moment = unpredictable.
-        //
-        // What happens for non-xslt macros?
-        [Test]
-        public void CanRemoveCurrentNodeAndNavigate()
-        {
-            var doc1 = new XmlDocument();
-            doc1.LoadXml(Xml1);
-            XPathNavigator nav1 = doc1.CreateNavigator();
+        Assert.AreEqual(5, count);
+    }
 
-            Assert.IsTrue(nav1.MoveToFirstChild());
-            Assert.AreEqual("root", nav1.Name);
-            Assert.IsTrue(nav1.MoveToFirstChild());
-            Assert.AreEqual("items", nav1.Name);
-            Assert.IsTrue(nav1.MoveToFirstChild());
-            Assert.AreEqual("item1", nav1.Name);
-            Assert.IsTrue(nav1.MoveToNext());
-            Assert.AreEqual("item2", nav1.Name);
+    [Test]
+    public void OldFrameworkXPathBugIsFixed()
+    {
+        // see http://bytes.com/topic/net/answers/177129-reusing-xpathexpression-multiple-iterations
+        var doc = new XmlDocument();
+        doc.LoadXml("<root><a><a1/><a2/></a><b/></root>");
 
-            XmlNode node1 = doc1.SelectSingleNode("//item2");
-            Assert.IsNotNull(node1);
-            XmlNode parent1 = node1.ParentNode;
-            Assert.IsNotNull(parent1);
-            parent1.RemoveChild(node1);
+        var nav = doc.CreateNavigator();
+        var expr = nav.Compile("*");
 
-            // navigator now navigates on an isolated fragment
-            // that is rooted on the node that was removed
-            Assert.AreEqual("item2", nav1.Name);
-            Assert.IsFalse(nav1.MoveToPrevious());
-            Assert.IsFalse(nav1.MoveToNext());
-            Assert.IsFalse(nav1.MoveToParent());
+        nav.MoveToFirstChild(); // root
+        var iter1 = nav.Select(expr);
+        iter1.MoveNext(); // root/a
+        var iter2 = iter1.Current.Select(expr);
+        iter2.MoveNext(); // /root/a/a1
+        iter2.MoveNext(); // /root/a/a2
 
-            Assert.IsTrue(nav1.MoveToFirstChild());
-            Assert.AreEqual("item21", nav1.Name);
-            Assert.IsTrue(nav1.MoveToParent());
-            Assert.AreEqual("item2", nav1.Name);
-
-            nav1.MoveToRoot();
-            Assert.AreEqual("item2", nav1.Name);
-        }
-
-        [Test]
-        public void CanRemovePathNodeAndNavigate()
-        {
-            var doc1 = new XmlDocument();
-            doc1.LoadXml(Xml1);
-            XPathNavigator nav1 = doc1.CreateNavigator();
-
-            Assert.IsTrue(nav1.MoveToFirstChild());
-            Assert.AreEqual("root", nav1.Name);
-            Assert.IsTrue(nav1.MoveToFirstChild());
-            Assert.AreEqual("items", nav1.Name);
-            Assert.IsTrue(nav1.MoveToFirstChild());
-            Assert.AreEqual("item1", nav1.Name);
-            Assert.IsTrue(nav1.MoveToNext());
-            Assert.AreEqual("item2", nav1.Name);
-            Assert.IsTrue(nav1.MoveToFirstChild());
-            Assert.AreEqual("item21", nav1.Name);
-
-            XmlNode node1 = doc1.SelectSingleNode("//item2");
-            Assert.IsNotNull(node1);
-            XmlNode parent1 = node1.ParentNode;
-            Assert.IsNotNull(parent1);
-            parent1.RemoveChild(node1);
-
-            // navigator now navigates on an isolated fragment
-            // that is rooted on the node that was removed
-            Assert.AreEqual("item21", nav1.Name);
-            Assert.IsTrue(nav1.MoveToParent());
-            Assert.AreEqual("item2", nav1.Name);
-            Assert.IsFalse(nav1.MoveToPrevious());
-            Assert.IsFalse(nav1.MoveToNext());
-            Assert.IsFalse(nav1.MoveToParent());
-
-            nav1.MoveToRoot();
-            Assert.AreEqual("item2", nav1.Name);
-        }
-
-        [Test]
-        public void CanRemoveOutOfPathNodeAndNavigate()
-        {
-            var doc1 = new XmlDocument();
-            doc1.LoadXml(Xml1);
-            XPathNavigator nav1 = doc1.CreateNavigator();
-
-            Assert.IsTrue(nav1.MoveToFirstChild());
-            Assert.AreEqual("root", nav1.Name);
-            Assert.IsTrue(nav1.MoveToFirstChild());
-            Assert.AreEqual("items", nav1.Name);
-            Assert.IsTrue(nav1.MoveToFirstChild());
-            Assert.AreEqual("item1", nav1.Name);
-            Assert.IsTrue(nav1.MoveToNext());
-            Assert.AreEqual("item2", nav1.Name);
-            Assert.IsTrue(nav1.MoveToNext());
-            Assert.AreEqual("item3", nav1.Name);
-            Assert.IsTrue(nav1.MoveToNext());
-            Assert.AreEqual("item4", nav1.Name);
-
-            XmlNode node1 = doc1.SelectSingleNode("//item2");
-            Assert.IsNotNull(node1);
-            XmlNode parent1 = node1.ParentNode;
-            Assert.IsNotNull(parent1);
-            parent1.RemoveChild(node1);
-
-            // navigator sees the change
-            Assert.AreEqual("item4", nav1.Name);
-            Assert.IsTrue(nav1.MoveToPrevious());
-            Assert.AreEqual("item3", nav1.Name);
-            Assert.IsTrue(nav1.MoveToPrevious());
-            Assert.AreEqual("item1", nav1.Name);
-        }
-
-        // Umbraco: the following test shows that if the underlying XmlDocument is modified while
-        // iterating, then strange situations can be created. For xslt macros, the result depends
-        // on what the xslt engine is doing at the moment = unpredictable.
-        //
-        // What happens for non-xslt macros?
-        [Test]
-        public void CanRemoveNodeAndIterate()
-        {
-            var doc1 = new XmlDocument();
-            doc1.LoadXml(Xml1);
-            XPathNavigator nav1 = doc1.CreateNavigator();
-
-            XPathNodeIterator iter1 = nav1.Select("//items/*");
-            XPathNodeIterator iter2 = nav1.Select("//items/*");
-
-            Assert.AreEqual(6, iter1.Count);
-
-            XmlNode node1 = doc1.SelectSingleNode("//item2");
-            Assert.IsNotNull(node1);
-            XmlNode parent1 = node1.ParentNode;
-            Assert.IsNotNull(parent1);
-            parent1.RemoveChild(node1);
-
-            // iterator partially sees the change
-            Assert.AreEqual(6, iter1.Count); // has been cached, not updated
-            Assert.AreEqual(5, iter2.Count); // not calculated yet, correct value
-
-            int count = 0;
-            while (iter1.MoveNext())
-            {
-                count++;
-            }
-
-            Assert.AreEqual(5, count);
-        }
-
-        [Test]
-        public void OldFrameworkXPathBugIsFixed()
-        {
-            // see http://bytes.com/topic/net/answers/177129-reusing-xpathexpression-multiple-iterations
-            var doc = new XmlDocument();
-            doc.LoadXml("<root><a><a1/><a2/></a><b/></root>");
-
-            XPathNavigator nav = doc.CreateNavigator();
-            XPathExpression expr = nav.Compile("*");
-
-            nav.MoveToFirstChild(); // root
-            XPathNodeIterator iter1 = nav.Select(expr);
-            iter1.MoveNext(); // root/a
-            XPathNodeIterator iter2 = iter1.Current.Select(expr);
-            iter2.MoveNext(); // /root/a/a1
-            iter2.MoveNext(); // /root/a/a2
-
-            // used to fail because iter1 and iter2 would conflict
-            Assert.IsTrue(iter1.MoveNext()); // root/b
-        }
+        // used to fail because iter1 and iter2 would conflict
+        Assert.IsTrue(iter1.MoveNext()); // root/b
     }
 }

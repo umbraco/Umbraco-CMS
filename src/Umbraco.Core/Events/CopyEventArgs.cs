@@ -1,87 +1,99 @@
-﻿using System;
-using System.Collections.Generic;
+namespace Umbraco.Cms.Core.Events;
 
-namespace Umbraco.Cms.Core.Events
+public class CopyEventArgs<TEntity> : CancellableObjectEventArgs<TEntity>, IEquatable<CopyEventArgs<TEntity>>
 {
-    public class CopyEventArgs<TEntity> : CancellableObjectEventArgs<TEntity>, IEquatable<CopyEventArgs<TEntity>>
+    public CopyEventArgs(TEntity original, TEntity copy, bool canCancel, int parentId)
+        : base(original, canCancel)
     {
-        public CopyEventArgs(TEntity original, TEntity copy, bool canCancel, int parentId)
-            : base(original, canCancel)
+        Copy = copy;
+        ParentId = parentId;
+    }
+
+    public CopyEventArgs(TEntity eventObject, TEntity copy, int parentId)
+        : base(eventObject)
+    {
+        Copy = copy;
+        ParentId = parentId;
+    }
+
+    public CopyEventArgs(TEntity eventObject, TEntity copy, bool canCancel, int parentId, bool relateToOriginal)
+        : base(eventObject, canCancel)
+    {
+        Copy = copy;
+        ParentId = parentId;
+        RelateToOriginal = relateToOriginal;
+    }
+
+    /// <summary>
+    ///     The copied entity
+    /// </summary>
+    public TEntity Copy { get; set; }
+
+    /// <summary>
+    ///     The original entity
+    /// </summary>
+    public TEntity? Original => EventObject;
+
+    /// <summary>
+    ///     Gets or Sets the Id of the objects new parent.
+    /// </summary>
+    public int ParentId { get; }
+
+    public bool RelateToOriginal { get; set; }
+
+    public static bool operator ==(CopyEventArgs<TEntity> left, CopyEventArgs<TEntity> right) => Equals(left, right);
+
+    public bool Equals(CopyEventArgs<TEntity>? other)
+    {
+        if (ReferenceEquals(null, other))
         {
-            Copy = copy;
-            ParentId = parentId;
+            return false;
         }
 
-        public CopyEventArgs(TEntity eventObject, TEntity copy, int parentId)
-            : base(eventObject)
+        if (ReferenceEquals(this, other))
         {
-            Copy = copy;
-            ParentId = parentId;
+            return true;
         }
 
-        public CopyEventArgs(TEntity eventObject, TEntity copy, bool canCancel, int parentId, bool relateToOriginal)
-            : base(eventObject, canCancel)
+        return base.Equals(other) && EqualityComparer<TEntity>.Default.Equals(Copy, other.Copy) &&
+               ParentId == other.ParentId && RelateToOriginal == other.RelateToOriginal;
+    }
+
+    public override bool Equals(object? obj)
+    {
+        if (ReferenceEquals(null, obj))
         {
-            Copy = copy;
-            ParentId = parentId;
-            RelateToOriginal = relateToOriginal;
+            return false;
         }
 
-        /// <summary>
-        /// The copied entity
-        /// </summary>
-        public TEntity Copy { get; set; }
-
-        /// <summary>
-        /// The original entity
-        /// </summary>
-        public TEntity Original
+        if (ReferenceEquals(this, obj))
         {
-            get { return EventObject; }
+            return true;
         }
 
-        /// <summary>
-        /// Gets or Sets the Id of the objects new parent.
-        /// </summary>
-        public int ParentId { get; private set; }
-
-        public bool RelateToOriginal { get; set; }
-
-        public bool Equals(CopyEventArgs<TEntity> other)
+        if (obj.GetType() != GetType())
         {
-            if (ReferenceEquals(null, other)) return false;
-            if (ReferenceEquals(this, other)) return true;
-            return base.Equals(other) && EqualityComparer<TEntity>.Default.Equals(Copy, other.Copy) && ParentId == other.ParentId && RelateToOriginal == other.RelateToOriginal;
+            return false;
         }
 
-        public override bool Equals(object obj)
-        {
-            if (ReferenceEquals(null, obj)) return false;
-            if (ReferenceEquals(this, obj)) return true;
-            if (obj.GetType() != this.GetType()) return false;
-            return Equals((CopyEventArgs<TEntity>) obj);
-        }
+        return Equals((CopyEventArgs<TEntity>)obj);
+    }
 
-        public override int GetHashCode()
+    public override int GetHashCode()
+    {
+        unchecked
         {
-            unchecked
+            var hashCode = base.GetHashCode();
+            if (Copy is not null)
             {
-                int hashCode = base.GetHashCode();
                 hashCode = (hashCode * 397) ^ EqualityComparer<TEntity>.Default.GetHashCode(Copy);
-                hashCode = (hashCode * 397) ^ ParentId;
-                hashCode = (hashCode * 397) ^ RelateToOriginal.GetHashCode();
-                return hashCode;
             }
-        }
 
-        public static bool operator ==(CopyEventArgs<TEntity> left, CopyEventArgs<TEntity> right)
-        {
-            return Equals(left, right);
-        }
-
-        public static bool operator !=(CopyEventArgs<TEntity> left, CopyEventArgs<TEntity> right)
-        {
-            return !Equals(left, right);
+            hashCode = (hashCode * 397) ^ ParentId;
+            hashCode = (hashCode * 397) ^ RelateToOriginal.GetHashCode();
+            return hashCode;
         }
     }
+
+    public static bool operator !=(CopyEventArgs<TEntity> left, CopyEventArgs<TEntity> right) => !Equals(left, right);
 }

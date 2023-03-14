@@ -1,82 +1,86 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
+namespace Umbraco.Cms.Core.Models.Email;
 
-namespace Umbraco.Cms.Core.Models.Email
+public class EmailMessage
 {
-    public class EmailMessage
+    public EmailMessage(string? from, string? to, string? subject, string? body, bool isBodyHtml)
+        : this(from, new[] { to }, null, null, null, subject, body, isBodyHtml, null)
     {
-        public string From { get; }
+    }
 
-        public string[] To { get; }
+    public EmailMessage(
+        string? from,
+        string?[] to,
+        string[]? cc,
+        string[]? bcc,
+        string[]? replyTo,
+        string? subject,
+        string? body,
+        bool isBodyHtml,
+        IEnumerable<EmailMessageAttachment>? attachments)
+    {
+        ArgumentIsNotNullOrEmpty(to, nameof(to));
+        ArgumentIsNotNullOrEmpty(subject, nameof(subject));
+        ArgumentIsNotNullOrEmpty(body, nameof(body));
 
-        public string[] Cc { get; }
+        From = from;
+        To = to;
+        Cc = cc;
+        Bcc = bcc;
+        ReplyTo = replyTo;
+        Subject = subject;
+        Body = body;
+        IsBodyHtml = isBodyHtml;
+        Attachments = attachments?.ToList();
+    }
 
-        public string[] Bcc { get; }
+    public string? From { get; }
 
-        public string[] ReplyTo { get; }
+    public string?[] To { get; }
 
-        public string Subject { get; }
+    public string[]? Cc { get; }
 
-        public string Body { get; }
+    public string[]? Bcc { get; }
 
-        public bool IsBodyHtml { get; }
+    public string[]? ReplyTo { get; }
 
-        public IList<EmailMessageAttachment> Attachments { get; }
+    public string? Subject { get; }
 
-        public bool HasAttachments => Attachments != null && Attachments.Count > 0;
+    public string? Body { get; }
 
-        public EmailMessage(string from, string to, string subject, string body, bool isBodyHtml)
-            : this(from, new[] { to }, null, null, null, subject, body, isBodyHtml, null)
+    public bool IsBodyHtml { get; }
+
+    public IList<EmailMessageAttachment>? Attachments { get; }
+
+    public bool HasAttachments => Attachments != null && Attachments.Count > 0;
+
+    private static void ArgumentIsNotNullOrEmpty(string? arg, string argName)
+    {
+        if (arg == null)
         {
+            throw new ArgumentNullException(argName);
         }
 
-        public EmailMessage(string from, string[] to, string[] cc, string[] bcc, string[] replyTo, string subject, string body, bool isBodyHtml, IEnumerable<EmailMessageAttachment> attachments)
+        if (arg.Length == 0)
         {
-            ArgumentIsNotNullOrEmpty(to, nameof(to));
-            ArgumentIsNotNullOrEmpty(subject, nameof(subject));
-            ArgumentIsNotNullOrEmpty(body, nameof(body));
+            throw new ArgumentException("Value cannot be empty.", argName);
+        }
+    }
 
-            From = from;
-            To = to;
-            Cc = cc;
-            Bcc = bcc;
-            ReplyTo = replyTo;
-            Subject = subject;
-            Body = body;
-            IsBodyHtml = isBodyHtml;
-            Attachments = attachments?.ToList();
+    private static void ArgumentIsNotNullOrEmpty(string?[]? arg, string argName)
+    {
+        if (arg == null)
+        {
+            throw new ArgumentNullException(argName);
         }
 
-        private static void ArgumentIsNotNullOrEmpty(string arg, string argName)
+        if (arg.Length == 0)
         {
-            if (arg == null)
-            {
-                throw new ArgumentNullException(argName);
-            }
-
-            if (arg.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be empty.", argName);
-            }
+            throw new ArgumentException("Value cannot be an empty array.", argName);
         }
 
-        private static void ArgumentIsNotNullOrEmpty(string[] arg, string argName)
+        if (arg.Any(x => x is not null && x.Length > 0) == false)
         {
-            if (arg == null)
-            {
-                throw new ArgumentNullException(argName);
-            }
-
-            if (arg.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty array.", argName);
-            }
-
-            if (arg.Any(x => x is not null && x.Length > 0) == false)
-            {
-                throw new ArgumentException("Value cannot be an array containing only null or empty elements.", argName);
-            }
+            throw new ArgumentException("Value cannot be an array containing only null or empty elements.", argName);
         }
     }
 }

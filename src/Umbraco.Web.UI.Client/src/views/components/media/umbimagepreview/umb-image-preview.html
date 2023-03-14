@@ -1,0 +1,6 @@
+<div class="umb-image-preview" ng-controller="umbImagePreviewController as controller">
+    <img class="umb-image-preview--image" ng-if="vm.clientSide" ng-init="previewUrl = controller.getClientSideUrl(vm.clientSideData)" ng-src="{{previewUrl}}" alt="{{vm.name}}" />
+    <a ng-if="!vm.clientSide" href="#" ng-href="{{vm.source}}" target="_blank" rel="noopener">
+        <img class="umb-image-preview--image" ng-init="previewUrl = controller.getThumbnail(vm.source)" ng-src="{{previewUrl}}" alt="{{vm.name}}" />
+    </a>
+</div>

@@ -1,15 +1,11 @@
-﻿namespace Umbraco.Cms.Infrastructure.Migrations.Expressions.Common
+namespace Umbraco.Cms.Infrastructure.Migrations.Expressions.Common;
+
+public class ExecutableBuilder : IExecutableBuilder
 {
-    public class ExecutableBuilder : IExecutableBuilder
-    {
-        private readonly IMigrationExpression _expression;
+    private readonly IMigrationExpression _expression;
 
-        public ExecutableBuilder(IMigrationExpression expression)
-        {
-            _expression = expression;
-        }
+    public ExecutableBuilder(IMigrationExpression expression) => _expression = expression;
 
-        /// <inheritdoc />
-        public void Do() => _expression.Execute();
-    }
+    /// <inheritdoc />
+    public void Do() => _expression.Execute();
 }

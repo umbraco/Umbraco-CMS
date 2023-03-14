@@ -49,6 +49,21 @@
 
         <!-- If removeUrl has a value we render a link otherwise a button -->
         <a class="umb-node-preview__action umb-node-preview__action--red"
+            ng-href="{{changeUrl}}"
+            ng-if="allowChange && changeUrl"
+            ng-click="onChange()">
+            <localize key="general_change">Change</localize><span class="sr-only">&nbsp;{{name}}</span>
+        </a>
+    
+        <button type="button"
+                class="umb-node-preview__action umb-node-preview__action--red"
+                ng-if="allowChange && !changeUrl"
+                ng-click="onChange()">
+            <localize key="general_change">Change</localize><span class="sr-only">&nbsp;{{name}}</span>
+        </button>
+
+        <!-- If removeUrl has a value we render a link otherwise a button -->
+        <a class="umb-node-preview__action umb-node-preview__action--red"
            ng-href="{{removeUrl}}"
            ng-if="allowRemove && removeUrl"
            ng-click="onRemove()">

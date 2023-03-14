@@ -1,10 +1,8 @@
-﻿using System.Collections.Generic;
 using Umbraco.Cms.Core.Models.Editors;
 
-namespace Umbraco.Cms.Core.Models.ContentEditing
+namespace Umbraco.Cms.Core.Models.ContentEditing;
+
+public interface IHaveUploadedFiles
 {
-    public interface IHaveUploadedFiles
-    {
-        List<ContentPropertyFile> UploadedFiles { get; }
-    }
+    List<ContentPropertyFile> UploadedFiles { get; }
 }

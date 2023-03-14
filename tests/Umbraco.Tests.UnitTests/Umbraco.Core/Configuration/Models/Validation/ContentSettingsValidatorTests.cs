@@ -52,15 +52,15 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Configuration.Models.Validati
             {
                 Error404Collection = new ContentErrorPage[]
                     {
-                        new ContentErrorPage { Culture = culture, ContentId = 1, ContentXPath = contentXPath },
+                        new() { Culture = culture, ContentId = 1, ContentXPath = contentXPath },
                     },
                 Imaging = new ContentImagingSettings
                 {
                     AutoFillImageProperties = new ImagingAutoFillUploadField[]
                         {
-                            new ImagingAutoFillUploadField { Alias = autoFillImagePropertyAlias, WidthFieldAlias = "w", HeightFieldAlias = "h", LengthFieldAlias = "l", ExtensionFieldAlias = "e" }
-                        }
-                }
+                            new() { Alias = autoFillImagePropertyAlias, WidthFieldAlias = "w", HeightFieldAlias = "h", LengthFieldAlias = "l", ExtensionFieldAlias = "e" },
+                        },
+                },
             };
     }
 }

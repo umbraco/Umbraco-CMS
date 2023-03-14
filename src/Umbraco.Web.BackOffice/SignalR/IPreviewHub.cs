@@ -1,14 +1,11 @@
-﻿using System.Threading.Tasks;
+namespace Umbraco.Cms.Web.BackOffice.SignalR;
 
-namespace Umbraco.Cms.Web.BackOffice.SignalR
+public interface IPreviewHub
 {
-    public interface IPreviewHub
-    {
-        // define methods implemented by client
-        // ReSharper disable InconsistentNaming
+    // define methods implemented by client
+    // ReSharper disable InconsistentNaming
 
-        Task refreshed(int id);
+    Task refreshed(int id);
 
-        // ReSharper restore InconsistentNaming
-    }
+    // ReSharper restore InconsistentNaming
 }

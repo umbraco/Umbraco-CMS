@@ -8,7 +8,7 @@
      * @param {any} mediaHelper
      * @param {any} angularHelper
      */
-    function umbPropertyFileUploadController($scope, $q, fileManager, mediaHelper, angularHelper) {
+    function umbPropertyFileUploadController($scope, $q, fileManager, mediaHelper, angularHelper, $attrs) {
 
         //NOTE: this component supports multiple files, though currently the uploader does not but perhaps sometime in the future
         // we'd want it to, so i'll leave the multiple file support in place
@@ -19,6 +19,12 @@
         vm.$onChanges = onChanges;
         vm.$postLink = postLink;
         vm.clear = clearFiles;
+
+        vm.readonly = false;
+
+        $attrs.$observe('readonly', (value) => {
+            vm.readonly = value !== undefined;
+        });
 
         /** Clears the file collections when content is saving (if we need to clear) or after saved */
         function clearFiles() {
@@ -117,11 +123,10 @@
                 vm.files = _.map(files, function (file) {
                     var f = {
                         fileName: file,
+                        fileSrc: file,
                         isImage: mediaHelper.detectIfImageByExtension(file),
                         extension: getExtension(file)
                     };
-
-                    f.fileSrc = getThumbnail(f);
 
                     return f;
                 });
@@ -190,21 +195,6 @@
             }
         }
 
-        function getThumbnail(file) {
-
-            if (file.extension === 'svg') {
-                return file.fileName;
-            }
-
-            if (!file.isImage) {
-                return null;
-            }
-
-            var thumbnailUrl = mediaHelper.getThumbnailFromPath(file.fileName);
-
-            return thumbnailUrl;
-        }
-
         function getExtension(fileName) {
             var extension = fileName.substring(fileName.lastIndexOf(".") + 1, fileName.length);
             return extension.toLowerCase();
@@ -238,7 +228,8 @@
                     isImage: isImage,
                     extension: extension,
                     fileName: files[i].name,
-                    isClientSide: true
+                    isClientSide: true,
+                    fileData: files[i]
                 };
 
                 // Save the file object to the files collection
@@ -247,6 +238,7 @@
                 //special check for a comma in the name
                 newVal += files[i].name.split(',').join('-') + ",";
 
+                // TODO: I would love to remove this part. But I'm affright it would be breaking if removed. Its not used by File upload anymore as each preview handles the client-side data on their own.
                 if (isImage || extension === "svg") {
 
                     var deferred = $q.defer();
@@ -275,6 +267,7 @@
          * @param {any} args
          */
         function onFilesSelected(event, args) {
+            if (vm.readonly) return;
 
             if (args.files && args.files.length > 0) {
 
@@ -301,6 +294,8 @@
         }
 
         function isDragover(e, args) {
+            if (vm.readonly) return;
+
             vm.dragover = args.value;
             angularHelper.safeApply($scope);
         }

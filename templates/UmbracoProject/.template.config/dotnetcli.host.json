@@ -1,0 +1,68 @@
+{
+  "$schema": "https://json.schemastore.org/dotnetcli.host.json",
+  "symbolInfo": {
+    "Framework": {
+      "longName": "Framework",
+      "shortName": "F"
+    },
+    "UmbracoVersion": {
+      "longName": "version",
+      "shortName": "v"
+    },
+    "UseHttpsRedirect": {
+      "longName": "use-https-redirect",
+      "shortName": ""
+    },
+    "SkipRestore": {
+      "longName": "no-restore",
+      "shortName": ""
+    },
+    "ExcludeGitignore": {
+      "longName": "exclude-gitignore",
+      "shortName": ""
+    },
+    "MinimalGitignore": {
+      "longName": "minimal-gitignore",
+      "shortName": ""
+    },
+    "ConnectionString": {
+      "longName": "connection-string",
+      "shortName": ""
+    },
+    "ConnectionStringProviderName": {
+      "longName": "connection-string-provider-name",
+      "shortName": ""
+    },
+    "DevelopmentDatabaseType": {
+      "longName": "development-database-type",
+      "shortName": ""
+    },
+    "UnattendedUserName": {
+      "longName": "friendly-name",
+      "shortName": ""
+    },
+    "UnattendedUserEmail": {
+      "longName": "email",
+      "shortName": ""
+    },
+    "UnattendedUserPassword": {
+      "longName": "password",
+      "shortName": ""
+    },
+    "NoNodesViewPath": {
+      "longName": "no-nodes-view-path",
+      "shortName": ""
+    },
+    "PackageProjectName": {
+      "longName": "PackageTestSiteName",
+      "shortName": "p"
+    }
+  },
+  "usageExamples": [
+    "dotnet new umbraco -n MyNewProject",
+    "dotnet new umbraco -n MyNewProject --no-restore",
+    "dotnet new umbraco -n MyNewProject --development-database-type SQLite",
+    "dotnet new umbraco -n MyNewProject --development-database-type LocalDB",
+    "dotnet new umbraco -n MyNewProject --friendly-name \"Friendly Admin User\" --email admin@example.com --password password1234 --connection-string \"Server=ConnectionStringHere\""
+  ]
+}

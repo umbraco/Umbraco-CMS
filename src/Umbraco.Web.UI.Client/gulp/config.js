@@ -5,20 +5,28 @@ module.exports = {
         build: {
             sourcemaps: false,
             embedtemplates: true,
-            minify: true
+            minify: true,
+            lint: true
         },
         dev: {
             sourcemaps: true,
             embedtemplates: true,
-            minify: false
+            minify: false,
+            lint: false
         },
         test: {
             sourcemaps: false,
             embedtemplates: true,
-            minify: true
+            minify: true,
+            lint: true
         }
     },
     sources: {
+        // css files used in backoffice
+        css: {
+            blockgridlayout: { files: "./src/views/propertyeditors/blockgrid/umbraco-blockgridlayout.css", watch: "./src/views/propertyeditors/blockgrid/umbraco-blockgridlayout.css", out: "umbraco-blockgridlayout.css", dist: "/css" },
+            blockgridlayout_flexbox: { files: "./src/views/propertyeditors/blockgrid/umbraco-blockgridlayout-flexbox.css", watch: "./src/views/propertyeditors/blockgrid/umbraco-blockgridlayout-flexbox.css", out: "umbraco-blockgridlayout-flexbox.css", dist: "/css" }
+        },
 
         // less files used by backoffice and preview
         // processed in the less task
@@ -27,7 +35,8 @@ module.exports = {
             nonodes: { files: "./src/less/pages/nonodes.less", watch: "./src/less/**/*.less", out: "nonodes.style.min.css"},
             preview: { files: "./src/less/canvas-designer.less", watch: "./src/less/**/*.less", out: "canvasdesigner.min.css" },
             umbraco: { files: "./src/less/belle.less", watch: "./src/**/*.less", out: "umbraco.min.css" },
-            rteContent: { files: "./src/less/rte-content.less", watch: "./src/less/**/*.less", out: "rte-content.css" }
+            rteContent: { files: "./src/less/rte-content.less", watch: "./src/less/**/*.less", out: "rte-content.css" },
+            blockgridui: { files: "./src/views/propertyeditors/blockgrid/blockgridui.less", watch: "./src/views/propertyeditors/blockgrid/blockgridui.less", out: "blockgridui.css" }
         },
 
         // js files for backoffice
@@ -81,11 +90,12 @@ module.exports = {
             assets: "./src/assets/**"
         }
     },
-    roots: ["../Umbraco.Web.UI/wwwroot/"],
+    roots: ["../Umbraco.Cms.StaticAssets/wwwroot/"],
     targets: {
         js: "umbraco/js/",
         lib: "umbraco/lib/",
         views: "umbraco/views/",
+        less: "umbraco/assets/css/",
         css: "umbraco/assets/css/",
         assets: "umbraco/assets/"
     }

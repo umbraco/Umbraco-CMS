@@ -1,0 +1,63 @@
+{
+  "$schema": "https://json.schemastore.org/ide.host.json",
+  "order": 0,
+  "icon": "../../icon.png",
+  "description": {
+    "id": "UmbracoProject",
+    "text": "Umbraco Web Application - An empty Umbraco CMS web application."
+  },
+  "symbolInfo": [
+    {
+      "id": "UmbracoVersion",
+      "isVisible": true
+    },
+    {
+      "id": "UseHttpsRedirect",
+      "isVisible": true
+    },
+    {
+      "id": "SkipRestore",
+      "isVisible": true
+    },
+    {
+      "id": "ExcludeGitignore",
+      "isVisible": true
+    },
+    {
+      "id": "MinimalGitignore",
+      "isVisible": true
+    },
+    {
+      "id": "ConnectionString",
+      "isVisible": true
+    },
+    {
+      "id": "ConnectionStringProviderName",
+      "isVisible": true
+    },
+    {
+      "id": "DevelopmentDatabaseType",
+      "isVisible": true
+    },
+    {
+      "id": "UnattendedUserName",
+      "isVisible": true
+    },
+    {
+      "id": "UnattendedUserEmail",
+      "isVisible": true
+    },
+    {
+      "id": "UnattendedUserPassword",
+      "isVisible": true
+    },
+    {
+      "id": "NoNodesViewPath",
+      "isVisible": true
+    },
+    {
+      "id": "PackageProjectName",
+      "isVisible": true
+    }
+  ]
+}

@@ -10,7 +10,6 @@
         vm.usersOptions = {};
 
         vm.selectUser = selectUser;
-        vm.searchUsers = searchUsers;
         vm.changePageNumber = changePageNumber;
         vm.submit = submit;
         vm.close = close;
@@ -85,16 +84,6 @@
                 user.selected = false;
             }
             users.length = 0;
-        }
-
-        var search = _.debounce(function () {
-            $scope.$apply(function () {
-                getUsers();
-            });
-        }, 500);
-
-        function searchUsers() {
-            search();
         }
 
         function getUsers() {

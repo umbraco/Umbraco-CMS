@@ -1,7 +1,7 @@
 (function () {
     "use strict";
 
-    function UserEditController($scope, eventsService, $q, $location, $routeParams, formHelper, usersResource,
+    function UserEditController($scope, eventsService, $q, $location, $routeParams, formHelper, usersResource, twoFactorLoginResource,
         userService, contentEditingHelper, localizationService, mediaHelper, Upload, umbRequestHelper,
         usersHelper, authResource, dateHelper, editorService, overlayService, externalLoginInfoService) {
 
@@ -16,6 +16,7 @@
         };
         vm.breadcrumbs = [];
         vm.showBackButton = true;
+        vm.hasTwoFactorProviders = false;
         vm.avatarFile = {};
         vm.labels = {};
         vm.maxFileSize = Umbraco.Sys.ServerVariables.umbracoSettings.maxFileSize + "KB";
@@ -38,6 +39,7 @@
         vm.disableUser = disableUser;
         vm.enableUser = enableUser;
         vm.unlockUser = unlockUser;
+        vm.toggleConfigureTwoFactor = toggleConfigureTwoFactor;
         vm.resendInvite = resendInvite;
         vm.deleteNonLoggedInUser = deleteNonLoggedInUser;
         vm.changeAvatar = changeAvatar;
@@ -101,24 +103,21 @@
                     $scope.$emit("$setAccessibleHeader", false, "general_user", false, vm.user.name, "", true);
                     vm.loading = false;
                 });
+
+              twoFactorLoginResource.get2FAProvidersForUser(vm.user.id).then(function (providers) {
+                vm.hasTwoFactorProviders = providers.length > 0;
+              });
             });
         }
-
+        
+        /**
+         * @ngdoc function
+         * @function    
+         *
+         * @deprecated
+         */
         function getLocalDate(date, culture, format) {
-            if (date) {
-                var dateVal;
-                var serverOffset = Umbraco.Sys.ServerVariables.application.serverTimeOffset;
-                var localOffset = new Date().getTimezoneOffset();
-                var serverTimeNeedsOffsetting = (-serverOffset !== localOffset);
-
-                if (serverTimeNeedsOffsetting) {
-                    dateVal = dateHelper.convertToLocalMomentTime(date, serverOffset);
-                } else {
-                    dateVal = moment(date, "YYYY-MM-DD HH:mm:ss");
-                }
-
-                return dateVal.locale(culture).format(format);
-            }
+            return dateHelper.getLocaleDate(date, culture, format);
         }
 
         function toggleChangePassword() {
@@ -397,6 +396,23 @@
             });
         }
 
+        function toggleConfigureTwoFactor() {
+
+          var configureTwoFactorSettings = {
+            create: true,
+            user: vm.user,
+            isCurrentUser:  vm.user.isCurrentUser,
+            size: "small",
+            view: "views/common/infiniteeditors/twofactor/configuretwofactor.html",
+            close: function() {
+              editorService.close();
+            }
+          };
+
+          editorService.open(configureTwoFactorSettings);
+        }
+
+
         function resendInvite() {
             vm.resendInviteButtonState = "busy";
 
@@ -548,11 +564,11 @@
             userService.getCurrentUser().then(function (currentUser) {
                 currentLoggedInUser = currentUser;
 
-                user.formattedLastLogin = getLocalDate(user.lastLoginDate, currentUser.locale, "LLL");
-                user.formattedLastLockoutDate = getLocalDate(user.lastLockoutDate, currentUser.locale, "LLL");
-                user.formattedCreateDate = getLocalDate(user.createDate, currentUser.locale, "LLL");
-                user.formattedUpdateDate = getLocalDate(user.updateDate, currentUser.locale, "LLL");
-                user.formattedLastPasswordChangeDate = getLocalDate(user.lastPasswordChangeDate, currentUser.locale, "LLL");
+                user.formattedLastLogin = dateHelper.getLocalDate(user.lastLoginDate, currentUser.locale, "LLL");
+                user.formattedLastLockoutDate = dateHelper.getLocalDate(user.lastLockoutDate, currentUser.locale, "LLL");
+                user.formattedCreateDate = dateHelper.getLocalDate(user.createDate, currentUser.locale, "LLL");
+                user.formattedUpdateDate = dateHelper.getLocalDate(user.updateDate, currentUser.locale, "LLL");
+                user.formattedLastPasswordChangeDate = dateHelper.getLocalDate(user.lastPasswordChangeDate, currentUser.locale, "LLL");
             });
         }
 

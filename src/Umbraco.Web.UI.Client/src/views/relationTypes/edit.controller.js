@@ -6,7 +6,7 @@
  * @description
  * The controller for editing relation types.
  */
-function RelationTypeEditController($scope, $routeParams, relationTypeResource, editorState, navigationService, dateHelper, userService, entityResource, formHelper, contentEditingHelper, localizationService, eventsService) {
+function RelationTypeEditController($scope, $routeParams, relationTypeResource, editorState, navigationService, dateHelper, userService, notificationsService, formHelper, contentEditingHelper, localizationService, eventsService) {
 
     var vm = this;
 
@@ -54,14 +54,7 @@ function RelationTypeEditController($scope, $routeParams, relationTypeResource, 
         });
 
         // load references when the 'relations' tab is first activated/switched to
-        var appTabChange =  eventsService.on("app.tabChange", function (event, args) {
-            if (args.alias === "relations") {
-                loadRelations();
-            }
-        });
-        $scope.$on('$destroy', function () {
-            appTabChange();
-        });
+        loadRelations();
 
         // Inital page/overview API call of relation type
         relationTypeResource.getById($routeParams.id)
@@ -74,7 +67,7 @@ function RelationTypeEditController($scope, $routeParams, relationTypeResource, 
     function changePageNumber(pageNumber) {
         vm.options.pageNumber = pageNumber;
         loadRelations();
-    } 
+    }
 
 
     /** Loads in the references one time  when content app changed */
@@ -86,12 +79,13 @@ function RelationTypeEditController($scope, $routeParams, relationTypeResource, 
                 vm.relations = data;
             });
     }
-    
+
 
     function bindRelationType(relationType) {
         // Convert property value to string, since the umb-radiobutton component at the moment only handle string values.
         // Sometime later the umb-radiobutton might be able to handle value as boolean.
         relationType.isBidirectional = (relationType.isBidirectional || false).toString();
+        relationType.isDependency = (relationType.isDependency || false).toString();
 
         vm.relationType = relationType;
 

@@ -1,6 +1,6 @@
 @inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<dynamic>
 
-@if (Model.value != null)
+@if (Model?.value is not null)
 {
     string macroAlias = Model.value.macroAlias.ToString();
     var parameters = new Dictionary<string,object>();

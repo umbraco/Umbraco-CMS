@@ -3,21 +3,14 @@
 
 using Umbraco.Cms.Core.Models;
 
-namespace Umbraco.Cms.Web.BackOffice.Authorization
+namespace Umbraco.Cms.Web.BackOffice.Authorization;
+
+public class MediaPermissionsResource
 {
-    public class MediaPermissionsResource
-    {
-        public MediaPermissionsResource(IMedia media)
-        {
-            Media = media;
-        }
+    public MediaPermissionsResource(IMedia? media) => Media = media;
 
-        public MediaPermissionsResource(int nodeId)
-        {
-            NodeId = nodeId;
-        }
+    public MediaPermissionsResource(int nodeId) => NodeId = nodeId;
 
-        public int? NodeId { get; }
-        public IMedia Media { get; }
-    }
+    public int? NodeId { get; }
+    public IMedia? Media { get; }
 }

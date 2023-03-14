@@ -390,7 +390,7 @@ function treeService($q, treeResource, iconHelper, notificationsService, eventsS
          *
          * @description
          * Gets a child node with a given ID, from a specific treeNode
-         * @param {object} treeNode to retrive child node from
+         * @param {object} treeNode to retrieve child node from
          * @param {int} id id of child node
          */
         getChildNode: function (treeNode, id) {
@@ -411,7 +411,7 @@ function treeService($q, treeResource, iconHelper, notificationsService, eventsS
          *
          * @description
          * Gets a descendant node by id
-         * @param {object} treeNode to retrive descendant node from
+         * @param {object} treeNode to retrieve descendant node from
          * @param {int} id id of descendant node
          * @param {string} treeAlias - optional tree alias, if fetching descendant node from a child of a listview document
          */
@@ -494,7 +494,7 @@ function treeService($q, treeResource, iconHelper, notificationsService, eventsS
          *
          * @description
          * Gets the root node of the current tree type for a given tree node
-         * @param {object} treeNode to retrive tree root node from
+         * @param {object} treeNode to retrieve tree root node from
          */
         getTreeRoot: function (treeNode) {
             if (!treeNode) {
@@ -531,7 +531,7 @@ function treeService($q, treeResource, iconHelper, notificationsService, eventsS
          *
          * @description
          * Gets the node's tree alias, this is done by looking up the meta-data of the current node's root node
-         * @param {object} treeNode to retrive tree alias from
+         * @param {object} treeNode to retrieve tree alias from
          */
         getTreeAlias: function (treeNode) {
             var root = this.getTreeRoot(treeNode);

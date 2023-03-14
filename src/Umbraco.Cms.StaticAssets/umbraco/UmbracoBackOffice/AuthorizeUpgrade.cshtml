@@ -1,0 +1,73 @@
+﻿@using Microsoft.Extensions.Options;
+@using Umbraco.Cms.Core
+@using Umbraco.Cms.Core.Configuration
+@using Umbraco.Cms.Core.Configuration.Models
+@using Umbraco.Cms.Core.Hosting
+@using Umbraco.Cms.Core.WebAssets
+@using Umbraco.Cms.Infrastructure.WebAssets
+@using Umbraco.Cms.Web.BackOffice.Controllers
+@using Umbraco.Cms.Web.BackOffice.Security
+@using Umbraco.Extensions
+@inject BackOfficeServerVariables backOfficeServerVariables
+@inject IUmbracoVersion umbracoVersion
+@inject IHostingEnvironment hostingEnvironment
+@inject IOptions<GlobalSettings> globalSettings
+@inject IBackOfficeExternalLoginProviders externalLogins
+@inject IRuntimeMinifier runtimeMinifier
+
+@{
+    var backOfficePath = globalSettings.Value.GetBackOfficePath(hostingEnvironment);
+}
+
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+    <base href="@backOfficePath.EnsureEndsWith('/')" />
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Umbraco</title>
+
+    @Html.Raw(await runtimeMinifier.RenderCssHereAsync(BackOfficeWebAssets.UmbracoUpgradeCssBundleName))
+
+    @*Because we're lazy loading angular js, the embedded cloak style will not be loaded initially, but we need it*@
+    <style>
+        [ng\:cloak], [ng-cloak], [data-ng-cloak], [x-ng-cloak], .ng-cloak, .x-ng-cloak {
+            display: none !important;
+        }
+    </style>
+
+</head>
+<body id="umbracoMainPageBody" ng-controller="Umbraco.AuthorizeUpgradeController" class="login-only">
+
+    <umb-login on-login="loginAndRedirect()"></umb-login>
+
+    <umb-notifications></umb-notifications>
+
+    @{
+        var externalLoginUrl = Url.Action("ExternalLogin", "BackOffice", new
+        {
+            area = ViewData.GetUmbracoPath(),
+            //Custom redirect URL since we don't want to just redirect to the back office since this is for authing upgrades
+            redirectUrl = Url.Action("AuthorizeUpgrade", "BackOffice")
+        });
+    }
+
+    @await Html.BareMinimumServerVariablesScriptAsync(backOfficeServerVariables)
+
+    <script type="text/javascript">
+    document.angularReady = function (app) {
+
+        @await Html.AngularValueExternalLoginInfoScriptAsync(externalLogins, ViewData.GetExternalSignInProviderErrors()!)
+        @Html.AngularValueResetPasswordCodeInfoScript(ViewData[ViewDataExtensions.TokenPasswordResetCode]!)
+
+    }
+    </script>
+
+    @*And finally we can load in our angular app*@
+    <script type="text/javascript" src="lib/lazyload-js/LazyLoad.min.js"></script>
+    <script src="@Url.GetUrlWithCacheBust("Application", "BackOffice", null!, hostingEnvironment, umbracoVersion, runtimeMinifier)"></script>
+
+</body>
+</html>

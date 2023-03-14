@@ -1,0 +1,38 @@
+@using Umbraco.Cms.Core
+@using Umbraco.Cms.Core.Routing
+@using Umbraco.Extensions
+@inherits Umbraco.Cms.Web.Common.Macros.PartialViewMacroPage
+@inject IPublishedContentQuery PublishedContentQuery
+@inject IPublishedUrlProvider PublishedUrlProvider
+@*
+    Macro to display a series of images from a media folder.
+
+    How it works:
+        - Confirm the macro parameter has been passed in with a value
+        - Loop through all the media Ids passed in (might be a single item, might be many)
+        - Display any individual images, as well as any folders of images
+
+    Macro Parameters To Create, for this macro to work:
+    Alias:mediaId     Name:Select folder with images    Type:Single Media Picker
+*@
+
+@{ var mediaId = Model?.MacroParameters["mediaId"]; }
+
+@if (mediaId != null)
+{
+    @* Get the media item associated with the id passed in *@
+    var media = PublishedContentQuery.Media(mediaId);
+    var selection = media.Children.ToArray();
+
+    if (selection.Length > 0)
+    {
+        <ul>
+            @foreach (var item in selection)
+            {
+                <li>
+                    <img src="@item.Url(PublishedUrlProvider)" alt="@item.Name" />
+                </li>
+            }
+        </ul>
+    }
+}

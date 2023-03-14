@@ -86,6 +86,7 @@ ng-form.ng-invalid-val-server-match-settings > .umb-block-list__block > .umb-blo
     border-radius: 16px;
     padding-left: 5px;
     padding-right: 5px;
+    z-index: @zIndexBlockActions;
     .action {
         position: relative;
         display: inline-block;
@@ -201,7 +202,7 @@ ng-form.ng-invalid-val-server-match-settings > .umb-block-list__block > .umb-blo
         box-sizing: border-box;
         width: 28px;
         height: 28px;
-        margin-left: -16px - 8px;
+        margin-left: (-16px - 8px);
         margin-top: -16px;
         border-radius: 3em;
         font-size: 14px;
@@ -288,7 +289,7 @@ ng-form.ng-invalid-val-server-match-settings > .umb-block-list__block > .umb-blo
         &[disabled]:hover {
             color: @gray-7;
             border-color: @gray-7;
-            cursor: default;
+            cursor: not-allowed;
         }
 
         &.umb-block-list__create-button {

@@ -1,0 +1,27 @@
+@using Umbraco.Cms.Core
+@using Umbraco.Cms.Core.Models.PublishedContent
+@using Umbraco.Cms.Core.Routing
+@using Umbraco.Extensions
+@inherits Umbraco.Cms.Web.Common.Macros.PartialViewMacroPage
+@inject IPublishedValueFallback PublishedValueFallback
+@inject IPublishedUrlProvider PublishedUrlProvider
+@*
+    This snippet makes a list of links to the of children of the current page using an unordered HTML list.
+
+    How it works:
+    - It uses the Children method to get all child pages
+    - It then uses the OrderBy() method, which takes the property to sort. In this case, the page's name.
+    - It then generates links so the visitor can go to each page
+*@
+
+@{ var selection = Model?.Content.Children.Where(x => x.IsVisible(PublishedValueFallback)).OrderBy(x => x.Name).ToArray(); }
+
+@if (selection?.Length > 0)
+{
+    <ul>
+        @foreach (var item in selection)
+        {
+            <li><a href="@item.Url(PublishedUrlProvider))">@item.Name</a></li>
+        }
+    </ul>
+}

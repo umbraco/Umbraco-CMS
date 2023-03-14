@@ -1,43 +1,71 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using System;
-using Microsoft.Extensions.Logging;
-using Umbraco.Cms.Core.Hosting;
+using Microsoft.Extensions.DependencyInjection;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.IO;
-using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Cms.Core.Strings;
 
-namespace Umbraco.Cms.Core.PropertyEditors
+namespace Umbraco.Cms.Core.PropertyEditors;
+
+/// <summary>
+///     Represents a block list property editor.
+/// </summary>
+[DataEditor(
+    Constants.PropertyEditors.Aliases.BlockList,
+    "Block List",
+    "blocklist",
+    ValueType = ValueTypes.Json,
+    Group = Constants.PropertyEditors.Groups.Lists,
+    Icon = "icon-thumbnail-list",
+    ValueEditorIsReusable = false)]
+public class BlockListPropertyEditor : BlockEditorPropertyEditor
 {
-    /// <summary>
-    /// Represents a block list property editor.
-    /// </summary>
-    [DataEditor(
-        Constants.PropertyEditors.Aliases.BlockList,
-        "Block List",
-        "blocklist",
-        ValueType = ValueTypes.Json,
-        Group = Constants.PropertyEditors.Groups.Lists,
-        Icon = "icon-thumbnail-list")]
-    public class BlockListPropertyEditor : BlockEditorPropertyEditor
+    private readonly IEditorConfigurationParser _editorConfigurationParser;
+    private readonly IIOHelper _ioHelper;
+
+    // Scheduled for removal in v12
+    [Obsolete("Use non-obsoleted ctor. This will be removed in Umbraco 13.")]
+    public BlockListPropertyEditor(
+        IDataValueEditorFactory dataValueEditorFactory,
+        PropertyEditorCollection propertyEditors,
+        IIOHelper ioHelper)
+        : this(dataValueEditorFactory, propertyEditors, ioHelper, StaticServiceProvider.Instance.GetRequiredService<IEditorConfigurationParser>())
     {
-        private readonly IIOHelper _ioHelper;
-
-        public BlockListPropertyEditor(
-            IDataValueEditorFactory dataValueEditorFactory,
-            PropertyEditorCollection propertyEditors,
-            IIOHelper ioHelper)
-            : base(dataValueEditorFactory, propertyEditors)
-        {
-            _ioHelper = ioHelper;
-        }
-
-        #region Pre Value Editor
-
-        protected override IConfigurationEditor CreateConfigurationEditor() => new BlockListConfigurationEditor(_ioHelper);
-
-        #endregion
     }
+
+    [Obsolete("Use non-obsoleted ctor. This will be removed in Umbraco 13.")]
+    public BlockListPropertyEditor(
+        IDataValueEditorFactory dataValueEditorFactory,
+        PropertyEditorCollection propertyEditors,
+        IIOHelper ioHelper,
+        IEditorConfigurationParser editorConfigurationParser)
+        : this(
+            dataValueEditorFactory,
+            propertyEditors,
+            ioHelper,
+            editorConfigurationParser,
+            StaticServiceProvider.Instance.GetRequiredService<IBlockValuePropertyIndexValueFactory>())
+    {
+
+    }
+
+    public BlockListPropertyEditor(
+        IDataValueEditorFactory dataValueEditorFactory,
+        PropertyEditorCollection propertyEditors,
+        IIOHelper ioHelper,
+        IEditorConfigurationParser editorConfigurationParser,
+        IBlockValuePropertyIndexValueFactory blockValuePropertyIndexValueFactory)
+        : base(dataValueEditorFactory, propertyEditors, blockValuePropertyIndexValueFactory)
+    {
+        _ioHelper = ioHelper;
+        _editorConfigurationParser = editorConfigurationParser;
+    }
+
+    #region Pre Value Editor
+
+    protected override IConfigurationEditor CreateConfigurationEditor() =>
+        new BlockListConfigurationEditor(_ioHelper, _editorConfigurationParser);
+
+    #endregion
 }

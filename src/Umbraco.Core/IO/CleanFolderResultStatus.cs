@@ -1,9 +1,8 @@
-﻿namespace Umbraco.Cms.Core.IO
+namespace Umbraco.Cms.Core.IO;
+
+public enum CleanFolderResultStatus
 {
-    public enum CleanFolderResultStatus
-    {
-        Success,
-        FailedAsDoesNotExist,
-        FailedWithException
-    }
+    Success,
+    FailedAsDoesNotExist,
+    FailedWithException,
 }

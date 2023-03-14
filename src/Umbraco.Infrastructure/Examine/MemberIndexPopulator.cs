@@ -1,44 +1,45 @@
-﻿using System.Collections.Generic;
-using System.Linq;
 using Examine;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
 
-namespace Umbraco.Cms.Infrastructure.Examine
+namespace Umbraco.Cms.Infrastructure.Examine;
+
+public class MemberIndexPopulator : IndexPopulator<IUmbracoMemberIndex>
 {
-    public class MemberIndexPopulator : IndexPopulator<IUmbracoMemberIndex>
+    private readonly IMemberService _memberService;
+    private readonly IValueSetBuilder<IMember> _valueSetBuilder;
+
+    public MemberIndexPopulator(IMemberService memberService, IValueSetBuilder<IMember> valueSetBuilder)
     {
-        private readonly IMemberService _memberService;
-        private readonly IValueSetBuilder<IMember> _valueSetBuilder;
+        _memberService = memberService;
+        _valueSetBuilder = valueSetBuilder;
+    }
 
-        public MemberIndexPopulator(IMemberService memberService, IValueSetBuilder<IMember> valueSetBuilder)
+    protected override void PopulateIndexes(IReadOnlyList<IIndex> indexes)
+    {
+        if (indexes.Count == 0)
         {
-            _memberService = memberService;
-            _valueSetBuilder = valueSetBuilder;
+            return;
         }
-        protected override void PopulateIndexes(IReadOnlyList<IIndex> indexes)
+
+        const int pageSize = 1000;
+        var pageIndex = 0;
+
+        IMember[] members;
+
+        // no node types specified, do all members
+        do
         {
-            if (indexes.Count == 0) return;
+            members = _memberService.GetAll(pageIndex, pageSize, out _).ToArray();
 
-            const int pageSize = 1000;
-            var pageIndex = 0;
-
-            IMember[] members;
-
-            //no node types specified, do all members
-            do
+            // ReSharper disable once PossibleMultipleEnumeration
+            foreach (IIndex index in indexes)
             {
-                members = _memberService.GetAll(pageIndex, pageSize, out _).ToArray();
+                index.IndexItems(_valueSetBuilder.GetValueSets(members));
+            }
 
-                if (members.Length > 0)
-                {
-                    // ReSharper disable once PossibleMultipleEnumeration
-                    foreach (var index in indexes)
-                        index.IndexItems(_valueSetBuilder.GetValueSets(members));
-                }
-
-                pageIndex++;
-            } while (members.Length == pageSize);
+            pageIndex++;
         }
+        while (members.Length == pageSize);
     }
 }

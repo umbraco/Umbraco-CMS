@@ -7,7 +7,7 @@
     Razor helpers located at the bottom of this file
 *@
 
-@if (Model != null && Model.GetType() == typeof(JObject) && Model.sections != null)
+@if (Model is JObject && Model?.sections is not null)
 {
     var oneColumn = ((System.Collections.ICollection)Model.sections).Count == 1;
 
@@ -55,7 +55,7 @@
                         <div @RenderElementAttributes(area)>
                             @foreach (var control in area.controls)
                             {
-                                if (control != null && control.editor != null && control.editor.view != null)
+                                if (control?.editor?.view != null)
                                 {
                                     <text>@await Html.PartialAsync("grid/editors/base", (object)control)</text>
                                 }

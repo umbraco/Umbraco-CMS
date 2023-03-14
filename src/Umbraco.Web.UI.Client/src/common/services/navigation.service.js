@@ -220,7 +220,7 @@ function navigationService($routeParams, $location, $q, $injector, eventsService
          * utility to clear the querystring/search params while maintaining a known list of parameters that should be maintained throughout the app
          */
         clearSearch: function (toRetain) {
-            var toRetain = _.union(retainedQueryStrings, toRetain);
+            toRetain = _.union(retainedQueryStrings, toRetain);
             var currentSearch = $location.search();
             $location.search('');
 
@@ -259,8 +259,8 @@ function navigationService($routeParams, $location, $q, $injector, eventsService
             var updated = false;
 
             retainedQueryStrings.forEach(r => {
-                // if mculture is set to null in nextRouteParams, the value will be undefined and we will not retain any query string that has a value of "null"
-                if (currRouteParams[r] && nextRouteParams[r] !== undefined && !nextRouteParams[r]) {
+                // testing explicitly for undefined in nextRouteParams here, as it must be possible to "unset" e.g. mculture by specifying a null value
+                if (currRouteParams[r] && nextRouteParams[r] === undefined) {
                     toRetain[r] = currRouteParams[r];
                     updated = true;
                 }

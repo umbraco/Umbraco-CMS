@@ -6,7 +6,11 @@
  * @description
  * The controller for deleting content
  */
-function MediaDeleteController($scope, mediaResource, treeService, navigationService, editorState, $location, overlayService) {
+function MediaDeleteController($scope, mediaResource, treeService, navigationService, editorState, $location, overlayService, localizationService) {
+
+    $scope.checkingReferences = true;
+    $scope.warningText = null;
+    $scope.disableDelete = false;
 
     $scope.performDelete = function() {
 
@@ -26,7 +30,7 @@ function MediaDeleteController($scope, mediaResource, treeService, navigationSer
             treeService.removeNode($scope.currentNode);
 
             if (rootNode) {
-                //ensure the recycle bin has child nodes now            
+                //ensure the recycle bin has child nodes now
                 var recycleBin = treeService.getDescendantNode(rootNode, -21);
                 if (recycleBin) {
                     recycleBin.hasChildren = true;
@@ -63,6 +67,27 @@ function MediaDeleteController($scope, mediaResource, treeService, navigationSer
             }
 
         });
+    };
+
+    $scope.checkingReferencesComplete = () => {
+        $scope.checkingReferences = false;
+    };
+
+    $scope.onReferencesWarning = () => {
+        // check if the deletion of items that have references has been disabled
+        if (Umbraco.Sys.ServerVariables.umbracoSettings.disableDeleteWhenReferenced) {
+            // this will only be set to true if we have a warning, indicating that this item or its descendants have reference
+            $scope.disableDelete = true;
+
+            localizationService.localize("references_deleteDisabledWarning").then((value) => {
+                $scope.warningText = value;
+            });
+        }
+        else {
+            localizationService.localize("references_deleteWarning").then((value) => {
+                $scope.warningText = value;
+            });
+        }
     };
 
     $scope.close = function() {

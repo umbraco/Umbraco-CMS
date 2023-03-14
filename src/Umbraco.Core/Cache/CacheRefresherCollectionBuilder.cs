@@ -1,9 +1,9 @@
-﻿using Umbraco.Cms.Core.Composing;
+using Umbraco.Cms.Core.Composing;
 
-namespace Umbraco.Cms.Core.Cache
+namespace Umbraco.Cms.Core.Cache;
+
+public class CacheRefresherCollectionBuilder : LazyCollectionBuilderBase<CacheRefresherCollectionBuilder,
+    CacheRefresherCollection, ICacheRefresher>
 {
-    public class CacheRefresherCollectionBuilder : LazyCollectionBuilderBase<CacheRefresherCollectionBuilder, CacheRefresherCollection, ICacheRefresher>
-    {
-        protected override CacheRefresherCollectionBuilder This => this;
-    }
+    protected override CacheRefresherCollectionBuilder This => this;
 }

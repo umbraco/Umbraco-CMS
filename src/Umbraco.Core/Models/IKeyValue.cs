@@ -1,11 +1,10 @@
-﻿using Umbraco.Cms.Core.Models.Entities;
+using Umbraco.Cms.Core.Models.Entities;
 
-namespace Umbraco.Cms.Core.Models
+namespace Umbraco.Cms.Core.Models;
+
+public interface IKeyValue : IEntity
 {
-    public interface IKeyValue : IEntity
-    {
-        string Identifier { get; set; }
+    string Identifier { get; set; }
 
-        string Value { get; set; }
-    }
+    string? Value { get; set; }
 }

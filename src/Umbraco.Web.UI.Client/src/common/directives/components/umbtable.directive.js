@@ -125,7 +125,7 @@
         };
 
         vm.selectItem = function (item, $index, $event) {
-            if (vm.onSelect) {
+            if (vm.allowSelect !== false && vm.onSelect) {
                 vm.onSelect({ item: item, $index: $index, $event: $event });
                 $event.stopPropagation();
             }
@@ -169,6 +169,7 @@
             bindings: {
                 items: '<',
                 itemProperties: '<',
+                allowSelect: '<',
                 allowSelectAll: '<',
                 onSelect: '&',
                 onClick: '&',

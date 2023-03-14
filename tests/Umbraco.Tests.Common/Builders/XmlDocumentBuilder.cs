@@ -3,27 +3,12 @@
 
 using System.Xml;
 
-namespace Umbraco.Cms.Tests.Common.Builders
+namespace Umbraco.Cms.Tests.Common.Builders;
+
+public class XmlDocumentBuilder : BuilderBase<XmlDocument>
 {
-    public class XmlDocumentBuilder : BuilderBase<XmlDocument>
-    {
-        private string _content;
-
-        public XmlDocumentBuilder WithContent(string content)
-        {
-            _content = content;
-            return this;
-        }
-
-        public override XmlDocument Build()
-        {
-            var xml = new XmlDocument();
-            xml.LoadXml(_content ?? DefaultContent);
-            return xml;
-        }
-
-        private const string DefaultContent =
-            @"<?xml version=""1.0"" encoding=""utf-8""?>
+    private const string DefaultContent =
+        @"<?xml version=""1.0"" encoding=""utf-8""?>
             <!DOCTYPE root[
             <!ELEMENT Home ANY>
             <!ATTLIST Home id ID #REQUIRED>
@@ -124,5 +109,19 @@ namespace Umbraco.Cms.Tests.Common.Builders
                 </Home>
                 <CustomDocument id=""1172"" parentID=""-1"" level=""1"" writerID=""0"" creatorID=""0"" nodeType=""1234"" template=""1   "" sortOrder=""1"" createDate=""2012-07-16T15:26:59"" updateDate=""2012-07-18T14:23:35"" nodeName=""Test"" urlName=""test-page"" writerName=""admin"" creatorName=""admin"" path=""-1,1172"" isDoc="""" />
             </root>";
+
+    private string _content;
+
+    public XmlDocumentBuilder WithContent(string content)
+    {
+        _content = content;
+        return this;
+    }
+
+    public override XmlDocument Build()
+    {
+        var xml = new XmlDocument();
+        xml.LoadXml(_content ?? DefaultContent);
+        return xml;
     }
 }

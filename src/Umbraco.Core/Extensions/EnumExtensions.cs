@@ -11,22 +11,6 @@ namespace Umbraco.Extensions
     public static class EnumExtensions
     {
         /// <summary>
-        /// Determines whether all the flags/bits are set within the enum value.
-        /// </summary>
-        /// <typeparam name="T">The enum type.</typeparam>
-        /// <param name="value">The enum value.</param>
-        /// <param name="flags">The flags.</param>
-        /// <returns>
-        ///   <c>true</c> if all the flags/bits are set within the enum value; otherwise, <c>false</c>.
-        /// </returns>
-        [Obsolete("Use Enum.HasFlag() or bitwise operations (if performance is important) instead.")]
-        public static bool HasFlagAll<T>(this T value, T flags)
-            where T : Enum
-        {
-            return value.HasFlag(flags);
-        }
-
-        /// <summary>
         /// Determines whether any of the flags/bits are set within the enum value.
         /// </summary>
         /// <typeparam name="T">The enum type.</typeparam>

@@ -1,0 +1,52 @@
+<div ng-controller="Umbraco.Editors.ConfigureTwoFactorController as vm">
+
+  <umb-editor-view>
+
+    <umb-editor-header name="vm.title" name-locked="true" hide-alias="true" hide-icon="true" hide-description="true">
+    </umb-editor-header>
+
+    <umb-editor-container>
+
+      <umb-box ng-repeat="provider in vm.providers track by provider.providerName">
+
+        <umb-box-header title="{{provider.providerName}}"></umb-box-header>
+
+        <umb-box-content>
+
+          <umb-control-group>
+
+            <div ng-if="provider.isEnabledOnUser">
+              <p>
+                <localize key="user_2faProviderIsEnabled"></localize>
+                <umb-icon icon="icon-check" class="success"></umb-icon>
+              </p>
+
+              <umb-button type="button" action="vm.disable(provider)" button-style="[warning,block]" label="Disable"
+                label-key="actions_disable" size="m">
+              </umb-button>
+            </div>
+
+            <umb-button type="button" ng-if="!provider.isEnabledOnUser" button-style="[action,block]"
+              disabled="!model.isCurrentUser" action="vm.enable(provider.providerName)" label="Enable"
+              label-key="actions_enable" size="m" state="vm.buttonState">
+            </umb-button>
+
+          </umb-control-group>
+
+        </umb-box-content>
+      </umb-box>
+    </umb-editor-container>
+
+    <umb-editor-footer>
+
+      <umb-editor-footer-content-right>
+
+        <umb-button type="button" button-style="link" label-key="general_close" shortcut="esc" action="vm.close()">
+        </umb-button>
+
+      </umb-editor-footer-content-right>
+
+    </umb-editor-footer>
+
+  </umb-editor-view>
+</div>

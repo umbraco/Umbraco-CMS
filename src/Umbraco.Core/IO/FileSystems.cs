@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Threading;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
@@ -22,21 +19,21 @@ namespace Umbraco.Cms.Core.IO
 
 
         // wrappers for shadow support
-        private ShadowWrapper _macroPartialFileSystem;
-        private ShadowWrapper _partialViewsFileSystem;
-        private ShadowWrapper _stylesheetsFileSystem;
-        private ShadowWrapper _scriptsFileSystem;
-        private ShadowWrapper _mvcViewsFileSystem;
+        private ShadowWrapper? _macroPartialFileSystem;
+        private ShadowWrapper? _partialViewsFileSystem;
+        private ShadowWrapper? _stylesheetsFileSystem;
+        private ShadowWrapper? _scriptsFileSystem;
+        private ShadowWrapper? _mvcViewsFileSystem;
 
         // well-known file systems lazy initialization
-        private object _wkfsLock = new object();
+        private object _wkfsLock = new();
         private bool _wkfsInitialized;
-        private object _wkfsObject; // unused
+        private object? _wkfsObject; // unused
 
         // shadow support
-        private readonly List<ShadowWrapper> _shadowWrappers = new List<ShadowWrapper>();
-        private readonly object _shadowLocker = new object();
-        private static string _shadowCurrentId; // static - unique!!
+        private readonly List<ShadowWrapper> _shadowWrappers = new();
+        private readonly object _shadowLocker = new();
+        private static string? _shadowCurrentId; // static - unique!!
         #region Constructor
 
         // DI wants a public ctor
@@ -79,7 +76,7 @@ namespace Umbraco.Cms.Core.IO
         /// Used be Scope provider to take control over the filesystems, should never be used for anything else.
         /// </summary>
         [EditorBrowsable(EditorBrowsableState.Never)]
-        public Func<bool> IsScoped { get; set; } = () => false;
+        public Func<bool?>? IsScoped { get; set; } = () => false;
 
         #endregion
 
@@ -88,7 +85,7 @@ namespace Umbraco.Cms.Core.IO
         /// <summary>
         /// Gets the macro partials filesystem.
         /// </summary>
-        public IFileSystem MacroPartialsFileSystem
+        public IFileSystem? MacroPartialsFileSystem
         {
             get
             {
@@ -104,7 +101,7 @@ namespace Umbraco.Cms.Core.IO
         /// <summary>
         /// Gets the partial views filesystem.
         /// </summary>
-        public IFileSystem PartialViewsFileSystem
+        public IFileSystem? PartialViewsFileSystem
         {
             get
             {
@@ -120,7 +117,7 @@ namespace Umbraco.Cms.Core.IO
         /// <summary>
         /// Gets the stylesheets filesystem.
         /// </summary>
-        public IFileSystem StylesheetsFileSystem
+        public IFileSystem? StylesheetsFileSystem
         {
             get
             {
@@ -136,7 +133,7 @@ namespace Umbraco.Cms.Core.IO
         /// <summary>
         /// Gets the scripts filesystem.
         /// </summary>
-        public IFileSystem ScriptsFileSystem
+        public IFileSystem? ScriptsFileSystem
         {
             get
             {
@@ -152,7 +149,7 @@ namespace Umbraco.Cms.Core.IO
         /// <summary>
         /// Gets the MVC views filesystem.
         /// </summary>
-        public IFileSystem MvcViewsFileSystem
+        public IFileSystem? MvcViewsFileSystem
         {
             get
             {
@@ -193,7 +190,7 @@ namespace Umbraco.Cms.Core.IO
             // to the VirtualPath we get with CodeFileDisplay from the frontend.
             try
             {
-                var rootPath = fileSystem.GetFullPath("/css/");
+                fileSystem.GetFullPath("/css/");
             }
             catch (UnauthorizedAccessException exception)
             {
@@ -201,7 +198,8 @@ namespace Umbraco.Cms.Core.IO
                     "Can't register the stylesheet filesystem, "
                     + "this is most likely caused by using a PhysicalFileSystem with an incorrect "
                     + "rootPath/rootUrl. RootPath must be <installation folder>\\wwwroot\\css"
-                    + " and rootUrl must be /css", exception);
+                    + " and rootUrl must be /css",
+                    exception);
             }
 
             _stylesheetsFileSystem = CreateShadowWrapperInternal(fileSystem, "css");
@@ -211,9 +209,9 @@ namespace Umbraco.Cms.Core.IO
 
         // need to return something to LazyInitializer.EnsureInitialized
         // but it does not really matter what we return - here, null
-        private object CreateWellKnownFileSystems()
+        private object? CreateWellKnownFileSystems()
         {
-            var logger = _loggerFactory.CreateLogger<PhysicalFileSystem>();
+            ILogger<PhysicalFileSystem> logger = _loggerFactory.CreateLogger<PhysicalFileSystem>();
 
             //TODO this is fucked, why do PhysicalFileSystem has a root url? Mvc views cannot be accessed by url!
             var macroPartialFileSystem = new PhysicalFileSystem(_ioHelper, _hostingEnvironment, logger, _hostingEnvironment.MapPathContentRoot(Constants.SystemDirectories.MacroPartials), _hostingEnvironment.ToAbsolute(Constants.SystemDirectories.MacroPartials));
@@ -228,7 +226,10 @@ namespace Umbraco.Cms.Core.IO
 
             if (_stylesheetsFileSystem == null)
             {
-                var stylesheetsFileSystem = new PhysicalFileSystem(_ioHelper, _hostingEnvironment, logger,
+                var stylesheetsFileSystem = new PhysicalFileSystem(
+                    _ioHelper,
+                    _hostingEnvironment,
+                    logger,
                     _hostingEnvironment.MapPathWebRoot(_globalSettings.UmbracoCssPath),
                     _hostingEnvironment.ToAbsolute(_globalSettings.UmbracoCssPath));
 
@@ -345,7 +346,7 @@ namespace Umbraco.Cms.Core.IO
         {
             lock (_shadowLocker)
             {
-                var wrapper = new ShadowWrapper(filesystem, _ioHelper, _hostingEnvironment, _loggerFactory, shadowPath,() => IsScoped());
+                var wrapper = new ShadowWrapper(filesystem, _ioHelper, _hostingEnvironment, _loggerFactory, shadowPath,() => IsScoped?.Invoke());
                 if (_shadowCurrentId != null)
                 {
                     wrapper.Shadow(_shadowCurrentId);

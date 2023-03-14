@@ -9,7 +9,6 @@
         vm.activeTabAlias = null;
 
         vm.setActiveTab = setActiveTab;
-        vm.hideSystemProperties = hideSystemProperties;
 
         $scope.$watchCollection('content.tabs', (newValue) => {
 
@@ -32,15 +31,6 @@
             vm.activeTabAlias = tab.alias;
             vm.tabs.forEach(tab => tab.active = false);
             tab.active = true;
-        }
-
-        function hideSystemProperties (property) {
-            // hide some specific, known properties by alias
-            if (property.alias === "_umb_id" || property.alias === "_umb_doctype") {
-                return false;
-            }
-            // hide all label properties with the alias prefix "umbracoMember" (e.g. "umbracoMemberFailedPasswordAttempts")
-            return property.view !== "readonlyvalue" || property.alias.startsWith('umbracoMember') === false;
         }
     }
 

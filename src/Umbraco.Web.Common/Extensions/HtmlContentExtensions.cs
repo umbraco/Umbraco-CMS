@@ -1,17 +1,16 @@
-﻿using System.Text.Encodings.Web;
+using System.Text.Encodings.Web;
 using Microsoft.AspNetCore.Html;
 
-namespace Umbraco.Extensions
+namespace Umbraco.Extensions;
+
+public static class HtmlContentExtensions
 {
-    public static class HtmlContentExtensions
+    public static string ToHtmlString(this IHtmlContent content)
     {
-        public static string ToHtmlString(this IHtmlContent content)
+        using (var writer = new StringWriter())
         {
-            using (var writer = new System.IO.StringWriter())
-            {
-                content.WriteTo(writer, HtmlEncoder.Default);
-                return writer.ToString();
-            }
+            content.WriteTo(writer, HtmlEncoder.Default);
+            return writer.ToString();
         }
     }
 }

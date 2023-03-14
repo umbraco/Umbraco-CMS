@@ -1,11 +1,11 @@
 ﻿using Umbraco.Cms.Core.Sync;
 
-namespace Umbraco.Cms.Core.Notifications
+namespace Umbraco.Cms.Core.Notifications;
+
+public class UserGroupCacheRefresherNotification : CacheRefresherNotification
 {
-    public class UserGroupCacheRefresherNotification : CacheRefresherNotification
+    public UserGroupCacheRefresherNotification(object messageObject, MessageType messageType)
+        : base(messageObject, messageType)
     {
-        public UserGroupCacheRefresherNotification(object messageObject, MessageType messageType) : base(messageObject, messageType)
-        {
-        }
     }
 }

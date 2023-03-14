@@ -1,22 +1,18 @@
-﻿namespace Umbraco.Cms.Infrastructure.Migrations.Expressions
+namespace Umbraco.Cms.Infrastructure.Migrations.Expressions;
+
+/// <summary>
+///     Provides a base class for expression builders.
+/// </summary>
+public abstract class ExpressionBuilderBase<TExpression>
+    where TExpression : IMigrationExpression
 {
     /// <summary>
-    /// Provides a base class for expression builders.
+    ///     Initializes a new instance of the <see cref="ExpressionBuilderBase{TExpression}" /> class.
     /// </summary>
-    public abstract class ExpressionBuilderBase<TExpression>
-        where TExpression : IMigrationExpression
-    {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="ExpressionBuilderBase{TExpression}"/> class.
-        /// </summary>
-        protected ExpressionBuilderBase(TExpression expression)
-        {
-            Expression = expression;
-        }
+    protected ExpressionBuilderBase(TExpression expression) => Expression = expression;
 
-        /// <summary>
-        /// Gets the expression.
-        /// </summary>
-        public TExpression Expression { get; }
-    }
+    /// <summary>
+    ///     Gets the expression.
+    /// </summary>
+    public TExpression Expression { get; }
 }

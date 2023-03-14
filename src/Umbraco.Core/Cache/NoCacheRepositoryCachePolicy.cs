@@ -1,53 +1,34 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using Umbraco.Cms.Core.Models.Entities;
 
-namespace Umbraco.Cms.Core.Cache
+namespace Umbraco.Cms.Core.Cache;
+
+public class NoCacheRepositoryCachePolicy<TEntity, TId> : IRepositoryCachePolicy<TEntity, TId>
+    where TEntity : class, IEntity
 {
-    public class NoCacheRepositoryCachePolicy<TEntity, TId> : IRepositoryCachePolicy<TEntity, TId>
-        where TEntity : class, IEntity
+    private NoCacheRepositoryCachePolicy()
     {
-        private NoCacheRepositoryCachePolicy() { }
+    }
 
-        public static NoCacheRepositoryCachePolicy<TEntity, TId> Instance { get; } = new NoCacheRepositoryCachePolicy<TEntity, TId>();
+    public static NoCacheRepositoryCachePolicy<TEntity, TId> Instance { get; } = new();
 
-        public TEntity Get(TId id, Func<TId, TEntity> performGet, Func<TId[], IEnumerable<TEntity>> performGetAll)
-        {
-            return performGet(id);
-        }
+    public TEntity? Get(TId? id, Func<TId?, TEntity?> performGet, Func<TId[]?, IEnumerable<TEntity>?> performGetAll) =>
+        performGet(id);
 
-        public TEntity GetCached(TId id)
-        {
-            return null;
-        }
+    public TEntity? GetCached(TId id) => null;
 
-        public bool Exists(TId id, Func<TId, bool> performExists, Func<TId[], IEnumerable<TEntity>> performGetAll)
-        {
-            return performExists(id);
-        }
+    public bool Exists(TId id, Func<TId, bool> performExists, Func<TId[], IEnumerable<TEntity>?> performGetAll) =>
+        performExists(id);
 
-        public void Create(TEntity entity, Action<TEntity> persistNew)
-        {
-            persistNew(entity);
-        }
+    public void Create(TEntity entity, Action<TEntity> persistNew) => persistNew(entity);
 
-        public void Update(TEntity entity, Action<TEntity> persistUpdated)
-        {
-            persistUpdated(entity);
-        }
+    public void Update(TEntity entity, Action<TEntity> persistUpdated) => persistUpdated(entity);
 
-        public void Delete(TEntity entity, Action<TEntity> persistDeleted)
-        {
-            persistDeleted(entity);
-        }
+    public void Delete(TEntity entity, Action<TEntity> persistDeleted) => persistDeleted(entity);
 
-        public TEntity[] GetAll(TId[] ids, Func<TId[], IEnumerable<TEntity>> performGetAll)
-        {
-            return performGetAll(ids).ToArray();
-        }
+    public TEntity[] GetAll(TId[]? ids, Func<TId[]?, IEnumerable<TEntity>?> performGetAll) =>
+        performGetAll(ids)?.ToArray() ?? Array.Empty<TEntity>();
 
-        public void ClearAll()
-        { }
+    public void ClearAll()
+    {
     }
 }

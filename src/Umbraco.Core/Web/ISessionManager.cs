@@ -1,8 +1,10 @@
-namespace Umbraco.Cms.Core.Web
+namespace Umbraco.Cms.Core.Web;
+
+public interface ISessionManager
 {
-    public interface ISessionManager
-    {
-        string GetSessionValue(string sessionName);
-        void SetSessionValue(string sessionName, string value);
-    }
+    string? GetSessionValue(string key);
+
+    void SetSessionValue(string key, string value);
+
+    void ClearSessionValue(string key);
 }

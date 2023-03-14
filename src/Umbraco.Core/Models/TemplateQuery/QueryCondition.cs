@@ -1,9 +1,10 @@
-﻿namespace Umbraco.Cms.Core.Models.TemplateQuery
+namespace Umbraco.Cms.Core.Models.TemplateQuery;
+
+public class QueryCondition
 {
-    public class QueryCondition
-    {
-        public PropertyModel Property { get; set; }
-        public OperatorTerm Term { get; set; }
-        public string ConstraintValue { get; set; }
-    }
+    public PropertyModel Property { get; set; } = new();
+
+    public OperatorTerm Term { get; set; } = new();
+
+    public string ConstraintValue { get; set; } = string.Empty;
 }

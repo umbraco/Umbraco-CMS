@@ -161,12 +161,14 @@ Use this directive to construct a header inside the main editor window.
                 name: "",
                 navigation: [
                     {
+                        "alias": "section1",
                         "name": "Section 1",
                         "icon": "icon-document-dashed-line",
                         "view": "/App_Plugins/path/to/html.html",
                         "active": true
                     },
                     {
+                        "alias": "section2",
                         "name": "Section 2",
                         "icon": "icon-list",
                         "view": "/App_Plugins/path/to/html.html",
@@ -192,6 +194,7 @@ Use this directive to construct a header inside the main editor window.
 @param {array=} tabs Array of tabs. See example above.
 @param {array=} navigation Array of sub views. See example above.
 @param {boolean=} nameLocked Set to <code>true</code> to lock the name.
+@param {number=} nameMaxLength Maximum length of the name.
 @param {object=} menu Add a context menu to the editor.
 @param {string=} icon Show and edit the content icon. Opens an overlay to change the icon.
 @param {boolean=} hideIcon Set to <code>true</code> to hide icon.
@@ -203,6 +206,7 @@ Use this directive to construct a header inside the main editor window.
 @param {boolean=} hideDescription Set to <code>true</code> to hide description.
 @param {boolean=} setpagetitle If true the page title will be set to reflect the type of data the header is working with
 @param {string=} editorfor The localization to use to aid accessibility on the edit and create screen
+@param {boolean=} loading Whether a loading indicator should be shown as part of the header.
 **/
 
 (function () {
@@ -210,17 +214,23 @@ Use this directive to construct a header inside the main editor window.
 
     function EditorHeaderDirective(editorService, localizationService, editorState, $rootScope) {
 
-        function link(scope, $injector) {
+        function link(scope) {
 
             scope.vm = {};
             scope.vm.dropdownOpen = false;
             scope.vm.currentVariant = "";
-            scope.loading = true;
+            scope.initializing = true;
             scope.accessibility = {};
             scope.accessibility.a11yMessage = "";
             scope.accessibility.a11yName = "";
             scope.accessibility.a11yMessageVisible = false;
             scope.accessibility.a11yNameVisible = false;
+
+            // trim the name if required
+            scope.nameMaxLength = scope.nameMaxLength || 255;
+            if (scope.name && scope.name.length > scope.nameMaxLength) {
+                scope.name = scope.name.substring(0, scope.nameMaxLength - 1) + '…';
+            }
 
             // need to call localizationService service outside of routine to set a11y due to promise requirements
             if (editorState.current) {
@@ -228,12 +238,12 @@ Use this directive to construct a header inside the main editor window.
                 // to do make it work for user group create/ edit
                 // to make it work for language edit/create
                 setAccessibilityForEditorState();
-                scope.loading = false;
+                scope.initializing = false;
             } else if (scope.name) {
                 setAccessibilityForName();
-                scope.loading = false;
+                scope.initializing = false;
             } else {
-                scope.loading = false;
+                scope.initializing = false;
             }
             scope.goBack = function () {
                 if (scope.onBack) {
@@ -376,6 +386,7 @@ Use this directive to construct a header inside the main editor window.
                 name: "=",
                 nameLocked: "=",
                 nameRequired: "=?",
+                nameMaxLength: "=?",
                 menu: "=",
                 hideActionsMenu: "<?",
                 icon: "=",
@@ -392,7 +403,8 @@ Use this directive to construct a header inside the main editor window.
                 onBack: "&?",
                 showBackButton: "<?",
                 editorfor: "=",
-                setpagetitle:"="
+                setpagetitle: "=",
+                loading: "="
             },
             link: link
         };

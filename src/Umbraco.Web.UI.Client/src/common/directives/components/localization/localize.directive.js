@@ -58,7 +58,9 @@ angular.module('umbraco.directives')
                 element.html(localizationService.tokenReplace(scope.text, scope.tokens || null));
             }
 
-            localizationService.localize(key).then(function (value) {
+            // As per component definition in ngdoc above, the initial inner html of the element is to be used as fallback value
+                var fallbackValue = element.html();
+                localizationService.localize(key, null, fallbackValue).then(function (value) {
                 scope.text = value;
                 render();
             });
@@ -81,7 +83,7 @@ angular.module('umbraco.directives')
                 if (attr) {
                         // Localizing is done async, so make sure the key isn't visible
                         element.removeAttr(value);
-                        
+
                     if (attr[0] === '@') {
                         //If the translation key starts with @ then remove it
                         attr = attr.substring(1);

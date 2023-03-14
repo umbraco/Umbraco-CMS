@@ -15,12 +15,11 @@
                     show-inherit="vm.model.variants.length > 1 && !property.culture && !activeVariant.language.isDefault"
                     inherits-from="defaultVariant.language.name">
 
-                    <div ng-class="{'o-40 cursor-not-allowed': vm.model.variants.length > 1 && !activeVariant.language.isDefault && !property.culture && !property.unlockInvariantValue}">
-                        <umb-property-editor
-                            model="property"
-                            preview="vm.model.variants.length > 1 && !activeVariant.language.isDefault && !property.culture && !property.unlockInvariantValue">
-                        </umb-property-editor>
-                    </div>
+                    <umb-property-editor
+                        model="property"
+                        preview="(vm.model.variants.length > 1 && !activeVariant.language.isDefault && !property.culture && !property.unlockInvariantValue) || (!vm.allowUpdate && !property.supportsReadOnly)"
+                        ng-attr-readonly="{{!vm.allowUpdate || undefined}}">
+                    </umb-property-editor>
 
                 </umb-property>
             </umb-box-content>
@@ -33,7 +32,7 @@
              ng-show="group.parentAlias === vm.activeTabAlias || vm.tabs.length === 0">
 
             <div class="umb-group-panel__header">
-                <div id="group-{{group.id}}">{{ group.label }}</div>
+                <div id="group-{{group.id}}"><h2>{{ group.label }}</h2></div>
             </div>
 
             <div class="umb-group-panel__content" data-element="tab-content-{{group.type === 'Group' ? group.parentAlias : group.alias}}">
@@ -45,12 +44,11 @@
                     show-inherit="vm.model.variants.length > 1 && !property.culture && !activeVariant.language.isDefault"
                     inherits-from="defaultVariant.language.name">
 
-                    <div ng-class="{'o-40 cursor-not-allowed': vm.model.variants.length > 1 && !activeVariant.language.isDefault && !property.culture && !property.unlockInvariantValue}">
-                        <umb-property-editor
-                            model="property"
-                            preview="vm.model.variants.length > 1 && !activeVariant.language.isDefault && !property.culture && !property.unlockInvariantValue">
-                        </umb-property-editor>
-                    </div>
+                    <umb-property-editor
+                        model="property"
+                        preview="vm.model.variants.length > 1 && !activeVariant.language.isDefault && !property.culture && !property.unlockInvariantValue"
+                        ng-attr-readonly="{{!vm.allowUpdate || undefined}}">
+                    </umb-property-editor>
 
                 </umb-property>
             </div>

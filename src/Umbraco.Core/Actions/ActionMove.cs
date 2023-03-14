@@ -1,17 +1,34 @@
-﻿namespace Umbraco.Cms.Core.Actions
-{
-    /// <summary>
-    /// This action is invoked upon creation of a document, media, member
-    /// </summary>
-    public class ActionMove : IAction
-    {
-        public const char ActionLetter = 'M';
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
 
-        public char Letter => ActionLetter;
-        public string Alias => "move";
-        public string Category => Constants.Conventions.PermissionCategories.StructureCategory;
-        public string Icon => "enter";
-        public bool ShowInNotifier => true;
-        public bool CanBePermissionAssigned => true;
-    }
+namespace Umbraco.Cms.Core.Actions;
+
+/// <summary>
+///     This action is invoked upon creation of a document, media, member.
+/// </summary>
+public class ActionMove : IAction
+{
+    /// <inheritdoc cref="IAction.ActionLetter"/>
+    public const char ActionLetter = 'M';
+
+    /// <inheritdoc cref="IAction.ActionAlias"/>
+    public const string ActionAlias = "move";
+
+    /// <inheritdoc/>
+    public char Letter => ActionLetter;
+
+    /// <inheritdoc/>
+    public string Alias => ActionAlias;
+
+    /// <inheritdoc />
+    public string Category => Constants.Conventions.PermissionCategories.StructureCategory;
+
+    /// <inheritdoc />
+    public string Icon => "icon-enter";
+
+    /// <inheritdoc />
+    public bool ShowInNotifier => true;
+
+    /// <inheritdoc />
+    public bool CanBePermissionAssigned => true;
 }

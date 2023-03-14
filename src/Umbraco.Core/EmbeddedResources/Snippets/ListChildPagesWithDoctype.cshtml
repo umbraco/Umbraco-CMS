@@ -1,0 +1,26 @@
+@using Umbraco.Cms.Core
+@using Umbraco.Cms.Core.Models.PublishedContent
+@using Umbraco.Cms.Core.Routing
+@using Umbraco.Extensions
+@inherits Umbraco.Cms.Web.Common.Macros.PartialViewMacroPage
+@inject IVariationContextAccessor VariationContextAccessor
+@inject IPublishedValueFallback PublishedValueFallback
+@inject IPublishedUrlProvider PublishedUrlProvider
+@*
+    This snippet shows how simple it is to fetch only children of a certain Document Type.
+
+    Be sure to change "IPublishedContent" below to match your needs, such as "TextPage" or "NewsItem".
+    (You can find the alias of your Document Type by editing it in the Settings section)
+*@
+
+@{ var selection = Model?.Content.Children<IPublishedContent>(VariationContextAccessor).Where(x => x.IsVisible(PublishedValueFallback)).ToArray(); }
+
+@if (selection?.Length > 0)
+{
+    <ul>
+        @foreach (var item in selection)
+        {
+            <li><a href="@item.Url(PublishedUrlProvider)">@item.Name</a></li>
+        }
+    </ul>
+}

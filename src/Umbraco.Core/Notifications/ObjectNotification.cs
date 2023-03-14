@@ -3,18 +3,18 @@
 
 using Umbraco.Cms.Core.Events;
 
-namespace Umbraco.Cms.Core.Notifications
+namespace Umbraco.Cms.Core.Notifications;
+
+public abstract class ObjectNotification<T> : StatefulNotification
+    where T : class
 {
-    public abstract class ObjectNotification<T> : StatefulNotification where T : class
+    protected ObjectNotification(T target, EventMessages messages)
     {
-        protected ObjectNotification(T target, EventMessages messages)
-        {
-            Messages = messages;
-            Target = target;
-        }
-
-        public EventMessages Messages { get; }
-
-        protected T Target { get; }
+        Messages = messages;
+        Target = target;
     }
+
+    public EventMessages Messages { get; }
+
+    protected T Target { get; }
 }

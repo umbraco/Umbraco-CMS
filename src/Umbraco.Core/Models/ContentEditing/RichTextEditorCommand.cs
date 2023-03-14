@@ -1,24 +1,23 @@
-﻿using System.Runtime.Serialization;
+using System.Runtime.Serialization;
 
-namespace Umbraco.Cms.Core.Models.ContentEditing
+namespace Umbraco.Cms.Core.Models.ContentEditing;
+
+public enum RichTextEditorCommandMode
 {
-    [DataContract(Name = "richtexteditorcommand", Namespace = "")]
-    public class RichTextEditorCommand
-    {
-        [DataMember(Name = "name")]
-        public string Name { get; set; }
+    Insert,
+    Selection,
+    All,
+}
 
-        [DataMember(Name = "alias")]
-        public string Alias { get; set; }
+[DataContract(Name = "richtexteditorcommand", Namespace = "")]
+public class RichTextEditorCommand
+{
+    [DataMember(Name = "name")]
+    public string? Name { get; set; }
 
-        [DataMember(Name = "mode")]
-        public RichTextEditorCommandMode Mode { get; set; }
-    }
+    [DataMember(Name = "alias")]
+    public string? Alias { get; set; }
 
-    public enum RichTextEditorCommandMode
-    {
-        Insert,
-        Selection,
-        All
-    }
+    [DataMember(Name = "mode")]
+    public RichTextEditorCommandMode Mode { get; set; }
 }

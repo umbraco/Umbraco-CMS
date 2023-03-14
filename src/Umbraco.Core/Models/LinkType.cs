@@ -1,9 +1,8 @@
-﻿namespace Umbraco.Cms.Core.Models
+namespace Umbraco.Cms.Core.Models;
+
+public enum LinkType
 {
-    public enum LinkType
-    {
-        Content,
-        Media,
-        External
-    }
+    Content,
+    Media,
+    External,
 }

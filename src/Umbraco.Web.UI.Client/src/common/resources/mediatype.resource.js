@@ -85,7 +85,7 @@ function mediaTypeResource($q, $http, umbRequestHelper, umbDataFormatter, locali
          *        $scope.type = type;
          *    });
          * </pre>
-         * @param {Int} mediaId id of the media item to retrive allowed child types for
+         * @param {Int} mediaId id of the media item to retrieve allowed child types for
          * @returns {Promise} resourcePromise object.
          *
          */
@@ -119,6 +119,22 @@ function mediaTypeResource($q, $http, umbRequestHelper, umbDataFormatter, locali
                        "mediaTypeApiBaseUrl",
                        "GetAll")),
                'Failed to retrieve all content types');
+        },
+
+        getAllFiltered: function (aliases) {
+            var aliasesQuery = "";
+
+            if (aliases && aliases.length > 0) {
+                aliases.forEach(alias => aliasesQuery += `aliases=${alias}&`);
+            }
+
+            return umbRequestHelper.resourcePromise(
+               $http.get(
+                   umbRequestHelper.getApiUrl(
+                       "mediaTypeApiBaseUrl",
+                       "getAllFiltered",
+                       aliasesQuery)),
+               'Failed to retrieve media types');
         },
 
         getScaffold: function (parentId) {
@@ -208,15 +224,13 @@ function mediaTypeResource($q, $http, umbRequestHelper, umbDataFormatter, locali
                 throw "args.id cannot be null";
             }
 
-            var promise = localizationService.localize("mediaType_moveFailed");
-
             return umbRequestHelper.resourcePromise(
                 $http.post(umbRequestHelper.getApiUrl("mediaTypeApiBaseUrl", "PostMove"),
                     {
                         parentId: args.parentId,
                         id: args.id
                     }, { responseType: 'text' }),
-                promise);
+                'Failed to move media type');
         },
 
         copy: function (args) {

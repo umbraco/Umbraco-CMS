@@ -2,11 +2,13 @@
 
     <div ng-if="entityType !== 'media'">
 
-        <umb-content-grid ng-if="items"
-                          content="items"
-                          content-properties="options.includeProperties"
-                          on-click="vm.selectContentItem"
-                          on-click-name="vm.goToItem">
+        <umb-content-grid 
+            ng-if="items"
+            content="items"
+            content-properties="options.includeProperties"
+            allow-click="!options.readonly"
+            on-click="vm.selectContentItem"
+            on-click-name="vm.goToItem">
         </umb-content-grid>
 
         <umb-empty-state ng-if="!items && options.filter.length === 0 && !vm.isRecycleBin"

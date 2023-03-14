@@ -1,5 +1,5 @@
 .umb-notifications {
-    z-index: 999999;
+    z-index: @zindexNotification;
     position: absolute;
     bottom: @editorFooterHeight;
     left: 0;
@@ -22,16 +22,22 @@
     font-size: 14px;
     border: none;
     position: relative;
-    border-radius: 10px;
+    border-radius: 3px;
     margin: 10px;
 
     .close {
         position: absolute;
         top: 0;
         bottom: 0;
-        right: 6px;
-        opacity: 0.4;
+        right: 0;
+        opacity: 1;
         margin: auto 0;
+        width: 30px;
+        text-shadow: none;
+        color: #fff;
+        &:hover {
+            opacity: 0.75;
+        }
     }
 }
 

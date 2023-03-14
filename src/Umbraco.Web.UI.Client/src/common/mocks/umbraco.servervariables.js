@@ -1,5 +1,6 @@
 //create the namespace (NOTE: This loads before any dependencies so we don't have a namespace mgr so we just create it manually)
-var Umbraco = {};
+// eslint-disable-next-line no-redeclare
+var Umbraco = Umbraco || {};
 Umbraco.Sys = {};
 //define a global static object
 Umbraco.Sys.ServerVariables = {
@@ -20,7 +21,8 @@ Umbraco.Sys.ServerVariables = {
         "updateCheckApiBaseUrl": "/umbraco/Api/UpdateCheck/",
         "relationApiBaseUrl": "/umbraco/UmbracoApi/Relation/",
         "rteApiBaseUrl": "/umbraco/UmbracoApi/RichTextPreValue/",
-        "iconApiBaseUrl": "/umbraco/UmbracoApi/Icon/"
+        "iconApiBaseUrl": "/umbraco/UmbracoApi/Icon/",
+        "analyticsApiBaseUrl": "/umbraco/UmbracoApi/Consent/"
     },
     umbracoSettings: {
         "umbracoPath": "/umbraco",

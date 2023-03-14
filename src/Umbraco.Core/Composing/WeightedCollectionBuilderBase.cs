@@ -1,141 +1,156 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+namespace Umbraco.Cms.Core.Composing;
 
-namespace Umbraco.Cms.Core.Composing
+/// <summary>
+///     Implements a weighted collection builder.
+/// </summary>
+/// <typeparam name="TBuilder">The type of the builder.</typeparam>
+/// <typeparam name="TCollection">The type of the collection.</typeparam>
+/// <typeparam name="TItem">The type of the items.</typeparam>
+public abstract class WeightedCollectionBuilderBase<TBuilder, TCollection, TItem> : CollectionBuilderBase<TBuilder, TCollection, TItem>
+    where TBuilder : WeightedCollectionBuilderBase<TBuilder, TCollection, TItem>
+    where TCollection : class, IBuilderCollection<TItem>
 {
+    private readonly Dictionary<Type, int> _customWeights = new();
+
+    public virtual int DefaultWeight { get; set; } = 100;
+
+    protected abstract TBuilder This { get; }
+
     /// <summary>
-    /// Implements a weighted collection builder.
+    ///     Clears all types in the collection.
     /// </summary>
-    /// <typeparam name="TBuilder">The type of the builder.</typeparam>
-    /// <typeparam name="TCollection">The type of the collection.</typeparam>
-    /// <typeparam name="TItem">The type of the items.</typeparam>
-    public abstract class WeightedCollectionBuilderBase<TBuilder, TCollection, TItem> : CollectionBuilderBase<TBuilder, TCollection, TItem>
-        where TBuilder : WeightedCollectionBuilderBase<TBuilder, TCollection, TItem>
-        where TCollection : class, IBuilderCollection<TItem>
+    /// <returns>The builder.</returns>
+    public TBuilder Clear()
     {
-        protected abstract TBuilder This { get; }
+        Configure(types => types.Clear());
+        return This;
+    }
 
-        private readonly Dictionary<Type, int> _customWeights = new Dictionary<Type, int>();
-
-        /// <summary>
-        /// Clears all types in the collection.
-        /// </summary>
-        /// <returns>The builder.</returns>
-        public TBuilder Clear()
+    /// <summary>
+    ///     Adds a type to the collection.
+    /// </summary>
+    /// <typeparam name="T">The type to add.</typeparam>
+    /// <returns>The builder.</returns>
+    public TBuilder Add<T>()
+        where T : TItem
+    {
+        Configure(types =>
         {
-            Configure(types => types.Clear());
-            return This;
-        }
-
-        /// <summary>
-        /// Adds a type to the collection.
-        /// </summary>
-        /// <typeparam name="T">The type to add.</typeparam>
-        /// <returns>The builder.</returns>
-        public TBuilder Add<T>()
-            where T : TItem
-        {
-            Configure(types =>
+            Type type = typeof(T);
+            if (types.Contains(type) == false)
             {
-                var type = typeof(T);
-                if (types.Contains(type) == false) types.Add(type);
-            });
-            return This;
-        }
+                types.Add(type);
+            }
+        });
+        return This;
+    }
 
-        /// <summary>
-        /// Adds a type to the collection.
-        /// </summary>
-        /// <param name="type">The type to add.</param>
-        /// <returns>The builder.</returns>
-        public TBuilder Add(Type type)
+    /// <summary>
+    ///     Adds a type to the collection.
+    /// </summary>
+    /// <param name="type">The type to add.</param>
+    /// <returns>The builder.</returns>
+    public TBuilder Add(Type type)
+    {
+        Configure(types =>
         {
-            Configure(types =>
+            EnsureType(type, "register");
+            if (types.Contains(type) == false)
             {
+                types.Add(type);
+            }
+        });
+        return This;
+    }
+
+    /// <summary>
+    ///     Adds types to the collection.
+    /// </summary>
+    /// <param name="types">The types to add.</param>
+    /// <returns>The builder.</returns>
+    public TBuilder Add(IEnumerable<Type> types)
+    {
+        Configure(list =>
+        {
+            foreach (Type type in types)
+            {
+                // would be detected by CollectionBuilderBase when registering, anyways, but let's fail fast
                 EnsureType(type, "register");
-                if (types.Contains(type) == false) types.Add(type);
-            });
-            return This;
-        }
-
-        /// <summary>
-        /// Adds types to the collection.
-        /// </summary>
-        /// <param name="types">The types to add.</param>
-        /// <returns>The builder.</returns>
-        public TBuilder Add(IEnumerable<Type> types)
-        {
-            Configure(list =>
-            {
-                foreach (var type in types)
+                if (list.Contains(type) == false)
                 {
-                    // would be detected by CollectionBuilderBase when registering, anyways, but let's fail fast
-                    EnsureType(type, "register");
-                    if (list.Contains(type) == false) list.Add(type);
+                    list.Add(type);
                 }
-            });
-            return This;
-        }
+            }
+        });
+        return This;
+    }
 
-        /// <summary>
-        /// Removes a type from the collection.
-        /// </summary>
-        /// <typeparam name="T">The type to remove.</typeparam>
-        /// <returns>The builder.</returns>
-        public TBuilder Remove<T>()
-            where T : TItem
+    /// <summary>
+    ///     Removes a type from the collection.
+    /// </summary>
+    /// <typeparam name="T">The type to remove.</typeparam>
+    /// <returns>The builder.</returns>
+    public TBuilder Remove<T>()
+        where T : TItem
+    {
+        Configure(types =>
         {
-            Configure(types =>
+            Type type = typeof(T);
+            if (types.Contains(type))
             {
-                var type = typeof(T);
-                if (types.Contains(type)) types.Remove(type);
-            });
-            return This;
-        }
+                types.Remove(type);
+            }
+        });
+        return This;
+    }
 
-        /// <summary>
-        /// Removes a type from the collection.
-        /// </summary>
-        /// <param name="type">The type to remove.</param>
-        /// <returns>The builder.</returns>
-        public TBuilder Remove(Type type)
+    /// <summary>
+    ///     Removes a type from the collection.
+    /// </summary>
+    /// <param name="type">The type to remove.</param>
+    /// <returns>The builder.</returns>
+    public TBuilder Remove(Type type)
+    {
+        Configure(types =>
         {
-            Configure(types =>
+            EnsureType(type, "remove");
+            if (types.Contains(type))
             {
-                EnsureType(type, "remove");
-                if (types.Contains(type)) types.Remove(type);
-            });
-            return This;
-        }
+                types.Remove(type);
+            }
+        });
+        return This;
+    }
 
-        /// <summary>
-        /// Changes the default weight of an item
-        /// </summary>
-        /// <typeparam name="T">The type of item</typeparam>
-        /// <param name="weight">The new weight</param>
-        /// <returns></returns>
-        public TBuilder SetWeight<T>(int weight) where T : TItem
+    /// <summary>
+    ///     Changes the default weight of an item
+    /// </summary>
+    /// <typeparam name="T">The type of item</typeparam>
+    /// <param name="weight">The new weight</param>
+    /// <returns></returns>
+    public TBuilder SetWeight<T>(int weight)
+        where T : TItem
+    {
+        _customWeights[typeof(T)] = weight;
+        return This;
+    }
+
+    protected override IEnumerable<Type> GetRegisteringTypes(IEnumerable<Type> types)
+    {
+        var list = types.ToList();
+        list.Sort((t1, t2) => GetWeight(t1).CompareTo(GetWeight(t2)));
+        return list;
+    }
+
+    protected virtual int GetWeight(Type type)
+    {
+        if (_customWeights.ContainsKey(type))
         {
-            _customWeights[typeof(T)] = weight;
-            return This;
+            return _customWeights[type];
         }
 
-        protected override IEnumerable<Type> GetRegisteringTypes(IEnumerable<Type> types)
-        {
-            var list = types.ToList();
-            list.Sort((t1, t2) => GetWeight(t1).CompareTo(GetWeight(t2)));
-            return list;
-        }
-
-        public virtual int DefaultWeight { get; set; } = 100;
-
-        protected virtual int GetWeight(Type type)
-        {
-            if (_customWeights.ContainsKey(type))
-                return _customWeights[type];
-            var attr = type.GetCustomAttributes(typeof(WeightAttribute), false).OfType<WeightAttribute>().SingleOrDefault();
-            return attr?.Weight ?? DefaultWeight;
-        }
+        WeightAttribute? attr = type.GetCustomAttributes(typeof(WeightAttribute), false).OfType<WeightAttribute>()
+            .SingleOrDefault();
+        return attr?.Weight ?? DefaultWeight;
     }
 }

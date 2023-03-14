@@ -1,9 +1,8 @@
-﻿namespace Umbraco.Cms.Core.Models.ContentEditing
+namespace Umbraco.Cms.Core.Models.ContentEditing;
+
+/// <summary>
+///     Model used to save a member type
+/// </summary>
+public class MemberTypeSave : ContentTypeSave<MemberPropertyTypeBasic>
 {
-    /// <summary>
-    /// Model used to save a member type
-    /// </summary>
-    public class MemberTypeSave : ContentTypeSave<MemberPropertyTypeBasic>
-    {
-    }
 }

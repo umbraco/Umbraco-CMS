@@ -1,10 +1,8 @@
-﻿using System.Threading.Tasks;
 using Umbraco.Cms.Core.Semver;
 
-namespace Umbraco.Cms.Core.Persistence.Repositories
+namespace Umbraco.Cms.Core.Persistence.Repositories;
+
+public interface IUpgradeCheckRepository
 {
-    public interface IUpgradeCheckRepository
-    {
-        Task<UpgradeResult> CheckUpgradeAsync(SemVersion version);
-    }
+    Task<UpgradeResult> CheckUpgradeAsync(SemVersion version);
 }

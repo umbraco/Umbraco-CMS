@@ -1,10 +1,9 @@
-namespace Umbraco.Cms.Core.Logging
+namespace Umbraco.Cms.Core.Logging;
+
+/// <summary>
+///     Provides tools to support message templates.
+/// </summary>
+public interface IMessageTemplates
 {
-    /// <summary>
-    /// Provides tools to support message templates.
-    /// </summary>
-    public interface IMessageTemplates
-    {
-        string Render(string messageTemplate, params object[] args);
-    }
+    string Render(string messageTemplate, params object[] args);
 }

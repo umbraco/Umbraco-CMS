@@ -1,9 +1,8 @@
-namespace Umbraco.Cms.Core.Persistence.Repositories
-{
-    public interface IFileWithFoldersRepository
-    {
-        void AddFolder(string folderPath);
+namespace Umbraco.Cms.Core.Persistence.Repositories;
 
-        void DeleteFolder(string folderPath);
-    }
+public interface IFileWithFoldersRepository
+{
+    void AddFolder(string folderPath);
+
+    void DeleteFolder(string folderPath);
 }

@@ -45,6 +45,8 @@ Use this directive to render an avatar.
 @param {string} size (<code>attribute</code>): The size of the avatar (xs, s, m, l, xl).
 @param {string} img-src (<code>attribute</code>): The image source to the avatar.
 @param {string} img-srcset (<code>atribute</code>): Reponsive support for the image source.
+@param {string=} name (<code>attribute</code>): Name initials will be used if no image source.
+@param {string=} color (<code>attribute</code>): Color will be used if no image source (primary, secondary, success, warning, danger).
 **/
 
 (function() {
@@ -67,8 +69,9 @@ Use this directive to render an avatar.
             }
 
             function getNameInitials(name) {
-                if(name) {
-                    var names = name.split(' '),
+                if (name) {
+                    const notAllowedRegex = /[^\p{Letter}\p{Number} ]+/gu;
+                    var names = name.replace(notAllowedRegex, '').trim().split(' '),
                         initials = names[0].substring(0, 1);
 
                     if (names.length > 1) {

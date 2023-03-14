@@ -1,16 +1,14 @@
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Threading;
+using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.IO
 {
-    public interface IPhysicalFileSystem : IFileSystem {}
-    public class PhysicalFileSystem : IPhysicalFileSystem
+    public interface IPhysicalFileSystem : IFileSystem
+    { }
+
+    public class PhysicalFileSystem : IPhysicalFileSystem, IFileProviderFactory
     {
         private readonly IIOHelper _ioHelper;
         private readonly ILogger<PhysicalFileSystem> _logger;
@@ -28,16 +26,35 @@ namespace Umbraco.Cms.Core.IO
         // eg "" or "/Views" or "/Media" or "/<vpath>/Media" in case of a virtual path
         private readonly string _rootUrl;
 
-        public PhysicalFileSystem(IIOHelper ioHelper,IHostingEnvironment hostingEnvironment, ILogger<PhysicalFileSystem> logger, string rootPath, string rootUrl)
+        public PhysicalFileSystem(IIOHelper ioHelper, IHostingEnvironment hostingEnvironment, ILogger<PhysicalFileSystem> logger, string rootPath, string rootUrl)
         {
             _ioHelper = ioHelper ?? throw new ArgumentNullException(nameof(ioHelper));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
-            if (rootPath == null) throw new ArgumentNullException(nameof(rootPath));
-            if (string.IsNullOrEmpty(rootPath)) throw new ArgumentException("Value can't be empty.", nameof(rootPath));
-            if (rootUrl == null) throw new ArgumentNullException(nameof(rootUrl));
-            if (string.IsNullOrEmpty(rootUrl)) throw new ArgumentException("Value can't be empty.", nameof(rootUrl));
-            if (rootPath.StartsWith("~/")) throw new ArgumentException("Value can't be a virtual path and start with '~/'.", nameof(rootPath));
+            if (rootPath == null)
+            {
+                throw new ArgumentNullException(nameof(rootPath));
+            }
+
+            if (string.IsNullOrEmpty(rootPath))
+            {
+                throw new ArgumentException("Value can't be empty.", nameof(rootPath));
+            }
+
+            if (rootUrl == null)
+            {
+                throw new ArgumentNullException(nameof(rootUrl));
+            }
+
+            if (string.IsNullOrEmpty(rootUrl))
+            {
+                throw new ArgumentException("Value can't be empty.", nameof(rootUrl));
+            }
+
+            if (rootPath.StartsWith("~/"))
+            {
+                throw new ArgumentException("Value can't be a virtual path and start with '~/'.", nameof(rootPath));
+            }
 
             // rootPath should be... rooted, as in, it's a root path!
             if (Path.IsPathRooted(rootPath) == false)
@@ -68,7 +85,9 @@ namespace Umbraco.Cms.Core.IO
             try
             {
                 if (Directory.Exists(fullPath))
+                {
                     return Directory.EnumerateDirectories(fullPath).Select(GetRelativePath);
+                }
             }
             catch (UnauthorizedAccessException ex)
             {
@@ -100,7 +119,9 @@ namespace Umbraco.Cms.Core.IO
         {
             var fullPath = GetFullPath(path);
             if (Directory.Exists(fullPath) == false)
+            {
                 return;
+            }
 
             try
             {
@@ -151,7 +172,11 @@ namespace Umbraco.Cms.Core.IO
             }
 
             var directory = Path.GetDirectoryName(fullPath);
-            if (directory == null) throw new InvalidOperationException("Could not get directory.");
+            if (directory == null)
+            {
+                throw new InvalidOperationException("Could not get directory.");
+            }
+
             Directory.CreateDirectory(directory); // ensure it exists
 
             if (stream.CanSeek)
@@ -188,7 +213,9 @@ namespace Umbraco.Cms.Core.IO
             try
             {
                 if (Directory.Exists(fullPath))
+                {
                     return Directory.EnumerateFiles(fullPath, filter).Select(GetRelativePath);
+                }
             }
             catch (UnauthorizedAccessException ex)
             {
@@ -221,7 +248,9 @@ namespace Umbraco.Cms.Core.IO
         {
             var fullPath = GetFullPath(path);
             if (File.Exists(fullPath) == false)
+            {
                 return;
+            }
 
             try
             {
@@ -262,15 +291,19 @@ namespace Umbraco.Cms.Core.IO
             // eg "c:/websites/test/root/Media/1234/img.jpg" => "1234/img.jpg"
             // or on unix systems "/var/wwwroot/test/Meia/1234/img.jpg"
             if (_ioHelper.PathStartsWith(path, _rootPathFwd, '/'))
+            {
                 return path.Substring(_rootPathFwd.Length).TrimStart(Constants.CharArrays.ForwardSlash);
+            }
 
             // if it starts with the root URL, strip it and trim the starting slash to make it relative
             // eg "/Media/1234/img.jpg" => "1234/img.jpg"
             if (_ioHelper.PathStartsWith(path, _rootUrl, '/'))
+            {
                 return path.Substring(_rootUrl.Length).TrimStart(Constants.CharArrays.ForwardSlash);
+            }
 
             // unchanged - what else?
-            return path;
+            return path.TrimStart(Constants.CharArrays.ForwardSlash);
         }
 
         /// <summary>
@@ -285,7 +318,7 @@ namespace Umbraco.Cms.Core.IO
         public string GetFullPath(string path)
         {
             // normalize
-            var opath = path;
+            var originalPath = path;
             path = EnsureDirectorySeparatorChar(path);
 
             // FIXME: this part should go!
@@ -293,11 +326,15 @@ namespace Umbraco.Cms.Core.IO
             // we assume it's not a FS relative path and we try to convert it... but it
             // really makes little sense?
             if (path.StartsWith(Path.DirectorySeparatorChar.ToString()))
+            {
                 path = GetRelativePath(path);
+            }
 
             // if not already rooted, combine with the root path
             if (_ioHelper.PathStartsWith(path, _rootPath, Path.DirectorySeparatorChar) == false)
+            {
                 path = Path.Combine(_rootPath, path);
+            }
 
             // sanitize - GetFullPath will take care of any relative
             // segments in path, eg '../../foo.tmp' - it may throw a SecurityException
@@ -312,13 +349,16 @@ namespace Umbraco.Cms.Core.IO
                 // this says that 4.7.2 supports long paths - but Windows does not
                 // https://docs.microsoft.com/en-us/dotnet/api/system.io.pathtoolongexception?view=netframework-4.7.2
                 if (path.Length > 260)
+                {
                     throw new PathTooLongException($"Path {path} is too long.");
+                }
+
                 return path;
             }
 
             // nothing prevents us to reach the file, security-wise, yet it is outside
             // this filesystem's root - throw
-            throw new UnauthorizedAccessException($"File original: [{opath}] full: [{path}] is outside this filesystem's root.");
+            throw new UnauthorizedAccessException($"File original: [{originalPath}] full: [{path}] is outside this filesystem's root.");
         }
 
         /// <summary>
@@ -327,9 +367,9 @@ namespace Umbraco.Cms.Core.IO
         /// <param name="path">The filesystem-relative path.</param>
         /// <returns>The URL.</returns>
         /// <remarks>All separators are forward-slashes.</remarks>
-        public string GetUrl(string path)
+        public string GetUrl(string? path)
         {
-            path = EnsureUrlSeparatorChar(path).Trim(Constants.CharArrays.ForwardSlash);
+            path = EnsureUrlSeparatorChar(path ?? string.Empty).Trim(Constants.CharArrays.ForwardSlash);
             return _rootUrl + "/" + path;
         }
 
@@ -381,18 +421,29 @@ namespace Umbraco.Cms.Core.IO
             if (File.Exists(fullPath))
             {
                 if (overrideIfExists == false)
+                {
                     throw new InvalidOperationException($"A file at path '{path}' already exists");
+                }
+
                 WithRetry(() => File.Delete(fullPath));
             }
 
             var directory = Path.GetDirectoryName(fullPath);
-            if (directory == null) throw new InvalidOperationException("Could not get directory.");
+            if (directory == null)
+            {
+                throw new InvalidOperationException("Could not get directory.");
+            }
+
             Directory.CreateDirectory(directory); // ensure it exists
 
             if (copy)
+            {
                 WithRetry(() => File.Copy(physicalPath, fullPath));
+            }
             else
+            {
                 WithRetry(() => File.Move(physicalPath, fullPath));
+            }
         }
 
         #region Helper Methods
@@ -439,16 +490,25 @@ namespace Umbraco.Cms.Core.IO
                     // if it's not *exactly* IOException then it could be
                     // some inherited exception such as FileNotFoundException,
                     // and then we don't want to retry
-                    if (e.GetType() != typeof(IOException)) throw;
+                    if (e.GetType() != typeof(IOException))
+                    {
+                        throw;
+                    }
 
                     // if we have tried enough, throw, else swallow
                     // the exception and retry after a pause
-                    if (i == count) throw;
+                    if (i == count)
+                    {
+                        throw;
+                    }
                 }
 
                 Thread.Sleep(pausems);
             }
         }
+
+        /// <inheritdoc />
+        public IFileProvider Create() => new PhysicalFileProvider(_rootPath);
 
         #endregion
     }

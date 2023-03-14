@@ -1,9 +1,6 @@
 ﻿// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -19,9 +16,9 @@ namespace Umbraco.Cms.Core.PropertyEditors
     /// </summary>
     public class GridPropertyIndexValueFactory : IPropertyIndexValueFactory
     {
-        public IEnumerable<KeyValuePair<string, IEnumerable<object>>> GetIndexValues(IProperty property, string culture, string segment, bool published)
+        public IEnumerable<KeyValuePair<string, IEnumerable<object?>>> GetIndexValues(IProperty property, string? culture, string? segment, bool published)
         {
-            var result = new List<KeyValuePair<string, IEnumerable<object>>>();
+            var result = new List<KeyValuePair<string, IEnumerable<object?>>>();
 
             var val = property.GetValue(culture, segment, published);
 
@@ -30,31 +27,31 @@ namespace Umbraco.Cms.Core.PropertyEditors
             {
                 try
                 {
-                    var gridVal = JsonConvert.DeserializeObject<GridValue>(rawVal);
+                    GridValue? gridVal = JsonConvert.DeserializeObject<GridValue>(rawVal);
 
                     //get all values and put them into a single field (using JsonPath)
                     var sb = new StringBuilder();
-                    foreach (var row in gridVal.Sections.SelectMany(x => x.Rows))
+                    foreach (GridValue.GridRow row in gridVal!.Sections.SelectMany(x => x.Rows))
                     {
                         var rowName = row.Name;
 
-                        foreach (var control in row.Areas.SelectMany(x => x.Controls))
+                        foreach (GridValue.GridControl control in row.Areas.SelectMany(x => x.Controls))
                         {
-                            var controlVal = control.Value;
+                            JToken? controlVal = control.Value;
 
                             if (controlVal?.Type == JTokenType.String)
                             {
                                 var str = controlVal.Value<string>();
-                                str = XmlHelper.CouldItBeXml(str) ? str.StripHtml() : str;
+                                str = XmlHelper.CouldItBeXml(str) ? str!.StripHtml() : str;
                                 sb.Append(str);
                                 sb.Append(" ");
 
                                 //add the row name as an individual field
-                                result.Add(new KeyValuePair<string, IEnumerable<object>>($"{property.Alias}.{rowName}", new[] { str }));
+                                result.Add(new KeyValuePair<string, IEnumerable<object?>>($"{property.Alias}.{rowName}", new[] { str }));
                             }
                             else if (controlVal is JContainer jc)
                             {
-                                foreach (var s in jc.Descendants().Where(t => t.Type == JTokenType.String))
+                                foreach (JToken s in jc.Descendants().Where(t => t.Type == JTokenType.String))
                                 {
                                     sb.Append(s.Value<string>());
                                     sb.Append(" ");
@@ -64,12 +61,12 @@ namespace Umbraco.Cms.Core.PropertyEditors
                     }
 
                     //First save the raw value to a raw field
-                    result.Add(new KeyValuePair<string, IEnumerable<object>>($"{UmbracoExamineFieldNames.RawFieldPrefix}{property.Alias}", new[] { rawVal }));
+                    result.Add(new KeyValuePair<string, IEnumerable<object?>>($"{UmbracoExamineFieldNames.RawFieldPrefix}{property.Alias}", new[] { rawVal }));
 
                     if (sb.Length > 0)
                     {
                         //index the property with the combined/cleaned value
-                        result.Add(new KeyValuePair<string, IEnumerable<object>>(property.Alias, new[] { sb.ToString() }));
+                        result.Add(new KeyValuePair<string, IEnumerable<object?>>(property.Alias, new[] { sb.ToString() }));
                     }
                 }
                 catch (InvalidCastException)

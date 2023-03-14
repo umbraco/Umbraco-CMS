@@ -1,25 +1,19 @@
-﻿namespace Umbraco.Cms.Core
+namespace Umbraco.Cms.Core;
+
+/// <summary>
+///     Defines constants.
+/// </summary>
+public static partial class Constants
 {
     /// <summary>
-    /// Defines constants.
+    ///     Defines constants for composition.
     /// </summary>
-    public static partial class Constants
+    public static class Composing
     {
-        /// <summary>
-        /// Defines constants for composition.
-        /// </summary>
-        public static class Composing
+        public static readonly string[] UmbracoCoreAssemblyNames =
         {
-            public static readonly string[] UmbracoCoreAssemblyNames = new[]
-            {
-                "Umbraco.Core",
-                "Umbraco.Infrastructure",
-                "Umbraco.PublishedCache.NuCache",
-                "Umbraco.Examine.Lucene",
-                "Umbraco.Web.Common",
-                "Umbraco.Web.BackOffice",
-                "Umbraco.Web.Website",
-            };
-        }
+            "Umbraco.Core", "Umbraco.Infrastructure", "Umbraco.PublishedCache.NuCache", "Umbraco.Examine.Lucene",
+            "Umbraco.Web.Common", "Umbraco.Web.BackOffice", "Umbraco.Web.Website",
+        };
     }
 }

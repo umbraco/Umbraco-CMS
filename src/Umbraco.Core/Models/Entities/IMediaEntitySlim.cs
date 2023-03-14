@@ -1,14 +1,12 @@
-﻿namespace Umbraco.Cms.Core.Models.Entities
+namespace Umbraco.Cms.Core.Models.Entities;
+
+/// <summary>
+///     Represents a lightweight media entity, managed by the entity service.
+/// </summary>
+public interface IMediaEntitySlim : IContentEntitySlim
 {
     /// <summary>
-    /// Represents a lightweight media entity, managed by the entity service.
+    ///     The media file's path/URL
     /// </summary>
-    public interface IMediaEntitySlim : IContentEntitySlim
-    {
-
-        /// <summary>
-        /// The media file's path/URL
-        /// </summary>
-        string MediaPath { get; }
-    }
+    string? MediaPath { get; }
 }

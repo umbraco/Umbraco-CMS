@@ -1,22 +1,29 @@
-namespace Umbraco.Cms.Core.Strings
-{
-    public static class PathUtility
-    {
+namespace Umbraco.Cms.Core.Strings;
 
-        /// <summary>
-        /// Ensures that a path has `~/` as prefix
-        /// </summary>
-        /// <param name="path"></param>
-        /// <returns></returns>
-        public static string EnsurePathIsApplicationRootPrefixed(string path)
+public static class PathUtility
+{
+    /// <summary>
+    ///     Ensures that a path has `~/` as prefix
+    /// </summary>
+    /// <param name="path"></param>
+    /// <returns></returns>
+    public static string EnsurePathIsApplicationRootPrefixed(string path)
+    {
+        if (path.StartsWith("~/"))
         {
-            if (path.StartsWith("~/"))
-                return path;
-            if (path.StartsWith("/") == false && path.StartsWith("\\") == false)
-                path = string.Format("/{0}", path);
-            if (path.StartsWith("~") == false)
-                path = string.Format("~{0}", path);
             return path;
         }
+
+        if (path.StartsWith("/") == false && path.StartsWith("\\") == false)
+        {
+            path = string.Format("/{0}", path);
+        }
+
+        if (path.StartsWith("~") == false)
+        {
+            path = string.Format("~{0}", path);
+        }
+
+        return path;
     }
 }

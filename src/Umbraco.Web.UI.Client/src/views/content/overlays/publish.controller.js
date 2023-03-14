@@ -9,6 +9,10 @@
 
         vm.changeSelection = changeSelection;
 
+        function allowPublish (variant) {
+            return variant.allowedActions.includes("U");
+        }
+
         /** 
          * Returns true if publish meets the requirements of mandatory languages 
          * */
@@ -78,8 +82,8 @@
          * @param {*} variant 
          */
         function publishableVariantFilter(variant) {
-
-            return (variant.active || variant.isDirty || variant.state === "Draft" || variant.state === "PublishedPendingChanges");
+            variant.notAllowed = allowPublish(variant) === false && variant.active;
+            return (variant.active || variant.isDirty || variant.state === "Draft" || variant.state === "PublishedPendingChanges") && (allowPublish(variant) || variant.active);
         }
 
         function notPublishedMandatoryFilter(variant) {
@@ -137,7 +141,7 @@
 
             // if any active varaiant that is available for publish, we set it to be published:
             vm.availableVariants.forEach(v => {
-                if(v.active) {
+                if(v.active && allowPublish(v)) {
                     v.save = v.publish = true;
                 }
             });
@@ -167,6 +171,7 @@
         $scope.$on('$destroy', () => {
             vm.variants.forEach(variant => {
                 variant.publish = variant.save = false;
+                variant.notAllowed = false;
             });
         });
     }

@@ -5,7 +5,7 @@
 @inject HtmlImageSourceParser HtmlImageSourceParser;
 
 @{
-    var value = HtmlLocalLinkParser.EnsureInternalLinks(Model.value.ToString());
+    var value = HtmlLocalLinkParser.EnsureInternalLinks(Model?.value.ToString());
     value = HtmlUrlParser.EnsureUrls(value);
     value = HtmlImageSourceParser.EnsureImageSources(value);
 }

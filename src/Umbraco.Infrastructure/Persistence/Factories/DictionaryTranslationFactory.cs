@@ -1,48 +1,43 @@
-﻿using System;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 
-namespace Umbraco.Cms.Infrastructure.Persistence.Factories
+namespace Umbraco.Cms.Infrastructure.Persistence.Factories;
+
+internal static class DictionaryTranslationFactory
 {
-    internal static class DictionaryTranslationFactory
+    #region Implementation of IEntityFactory<DictionaryTranslation,LanguageTextDto>
+
+    public static IDictionaryTranslation BuildEntity(LanguageTextDto dto, Guid uniqueId)
     {
-        #region Implementation of IEntityFactory<DictionaryTranslation,LanguageTextDto>
+        var item = new DictionaryTranslation(dto.LanguageId, dto.Value, uniqueId);
 
-        public static IDictionaryTranslation BuildEntity(LanguageTextDto dto, Guid uniqueId)
+        try
         {
-            var item = new DictionaryTranslation(dto.LanguageId, dto.Value, uniqueId);
+            item.DisableChangeTracking();
 
-            try
-            {
-                item.DisableChangeTracking();
+            item.Id = dto.PrimaryKey;
 
-                item.Id = dto.PrimaryKey;
-
-                // reset dirty initial properties (U4-1946)
-                item.ResetDirtyProperties(false);
-                return item;
-            }
-            finally
-            {
-                item.EnableChangeTracking();
-            }
+            // reset dirty initial properties (U4-1946)
+            item.ResetDirtyProperties(false);
+            return item;
         }
-
-        public static LanguageTextDto BuildDto(IDictionaryTranslation entity, Guid uniqueId)
+        finally
         {
-            var text = new LanguageTextDto
-                           {
-                               LanguageId = entity.LanguageId,
-                               UniqueId = uniqueId,
-                               Value = entity.Value
-                           };
-
-            if (entity.HasIdentity)
-                text.PrimaryKey = entity.Id;
-
-            return text;
+            item.EnableChangeTracking();
         }
-
-        #endregion
     }
+
+    public static LanguageTextDto BuildDto(IDictionaryTranslation entity, Guid uniqueId)
+    {
+        var text = new LanguageTextDto { LanguageId = entity.LanguageId, UniqueId = uniqueId, Value = entity.Value };
+
+        if (entity.HasIdentity)
+        {
+            text.PrimaryKey = entity.Id;
+        }
+
+        return text;
+    }
+
+    #endregion
 }

@@ -1,19 +1,15 @@
-using Umbraco.Cms.Infrastructure.Persistence;
+namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_8_15_0;
 
-namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_8_15_0
+[Obsolete("This is not used anymore and will be removed in Umbraco 13")]
+public class UpdateCmsPropertyGroupIdSeed : MigrationBase
 {
-    public class UpdateCmsPropertyGroupIdSeed : MigrationBase
+    public UpdateCmsPropertyGroupIdSeed(IMigrationContext context)
+        : base(context)
     {
-        public UpdateCmsPropertyGroupIdSeed(IMigrationContext context) : base(context)
-        {
-        }
+    }
 
-        protected override void Migrate()
-        {
-            if (DatabaseType.IsSqlCe())
-            {
-                Database.Execute(Sql("ALTER TABLE [cmsPropertyTypeGroup] ALTER COLUMN [id] IDENTITY (56,1)"));
-            }
-        }
+    protected override void Migrate()
+    {
+        // NOOP - was sql ce only
     }
 }

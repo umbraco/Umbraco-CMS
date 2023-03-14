@@ -1,11 +1,11 @@
-﻿namespace Umbraco.Cms.Core.Serialization
+namespace Umbraco.Cms.Core.Serialization;
+
+public interface IJsonSerializer
 {
-    public interface IJsonSerializer
-    {
-        string Serialize(object input);
+    string Serialize(object? input);
 
-        T Deserialize<T>(string input);
+    T? Deserialize<T>(string input);
 
-        T DeserializeSubset<T>(string input, string key);
-    }
+    [Obsolete("This will be removed in v13")]
+    T? DeserializeSubset<T>(string input, string key);
 }

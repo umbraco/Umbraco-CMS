@@ -1,9 +1,6 @@
-using System;
+namespace Umbraco.Cms.Infrastructure.Migrations;
 
-namespace Umbraco.Cms.Infrastructure.Migrations
+public interface IMigrationBuilder
 {
-    public interface IMigrationBuilder
-    {
-        MigrationBase Build(Type migrationType, IMigrationContext context);
-    }
+    MigrationBase Build(Type migrationType, IMigrationContext context);
 }

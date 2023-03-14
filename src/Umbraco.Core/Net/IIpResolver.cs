@@ -1,7 +1,6 @@
-namespace Umbraco.Cms.Core.Net
+namespace Umbraco.Cms.Core.Net;
+
+public interface IIpResolver
 {
-    public interface IIpResolver
-    {
-        string GetCurrentRequestIpAddress();
-    }
+    string GetCurrentRequestIpAddress();
 }

@@ -1,0 +1,122 @@
+<div ng-controller="Umbraco.Editors.UserController as vm">
+  <umb-editor-view data-element="overlay-user">
+
+    <umb-editor-header name="vm.user.name" name-locked="true" hide-alias="true" hide-icon="true"
+      hide-description="true">
+    </umb-editor-header>
+
+    <umb-editor-container>
+      <div ng-if="!vm.showPasswordFields">
+        <umb-box>
+          <umb-box-header title-key="user_yourProfile"></umb-box-header>
+          <umb-box-content>
+            <umb-control-group>
+              <div class="flex">
+                <umb-button action="vm.editUser()" alias="editUser" button-style="action" label="Edit"
+                  label-key="general_edit" ng-if="vm.canEditProfile" type="button">
+                </umb-button>
+
+                <umb-button action="vm.toggleChangePassword()" alias="changePassword" button-style="action"
+                  label="Change password" label-key="general_changePassword" ng-if="!vm.denyLocalLogin" type="button">
+                </umb-button>
+
+                <umb-button type="button" button-style="action" action="vm.toggleConfigureTwoFactor()"
+                  label="Configure Two-Factor" label-key="user_configureTwoFactor" ng-if="vm.hasTwoFactorProviders">
+                </umb-button>
+              </div>
+            </umb-control-group>
+          </umb-box-content>
+        </umb-box>
+
+        <umb-box class="umb-control-group external-logins" ng-if="vm.externalLoginProviders.length > 0">
+          <umb-box-header title-key="defaultdialogs_externalLoginProviders" title="External login providers">
+          </umb-box-header>
+
+          <umb-box-content>
+            <umb-control-group>
+              <div ng-repeat="login in vm.externalLoginProviders">
+
+                <div ng-if="login.customView" ng-include="login.customView"></div>
+
+                <div ng-if="!login.customView && login.properties.AutoLinkOptions.AllowManualLinking">
+                  <form action="{{vm.externalLinkLoginFormAction}}" id="oauthloginform-{{login.authType}}" method="POST"
+                    name="oauthloginform" ng-if="login.linkedProviderKey == undefined"
+                    ng-submit="vm.linkProvider($event)">
+                    <input name="provider" type="hidden" value="{{login.authType}}" />
+                    <button class="btn btn-block btn-social" id="{{login.authType}}"
+                      ng-class="login.properties.ButtonStyle" title="{{login.caption}}">
+
+                      <umb-icon icon="{{login.properties.Icon}}" style="height:100%;"></umb-icon>
+                      <localize key="defaultdialogs_linkYour">Link your</localize>&nbsp;{{login.caption}}&nbsp;<localize
+                        key="defaultdialogs_account">account
+                      </localize>
+                    </button>
+                  </form>
+
+                  <button class="btn btn-block btn-social" id="{{login.authType}}" name="provider"
+                    ng-class="login.properties.ButtonStyle"
+                    ng-click="vm.unlink($event, login.authType, login.linkedProviderKey)"
+                    ng-if="login.linkedProviderKey != undefined" value="{{login.authType}}">
+                    <umb-icon icon="{{login.properties.Icon}}" style="height:100%;"></umb-icon>
+                    <localize key="defaultdialogs_unLinkYour">Un-link your</localize>&nbsp;{{login.caption}}&nbsp;
+                    <localize key="defaultdialogs_account">account
+                    </localize>
+                  </button>
+
+                </div>
+
+              </div>
+
+            </umb-control-group>
+
+          </umb-box-content>
+
+        </umb-box>
+
+        <umb-box ng-if="vm.history.length">
+          <umb-box-header title-key="user_yourHistory"></umb-box-header>
+          <umb-box-content>
+            <umb-control-group>
+              <ul class="umb-tree">
+                <li ng-repeat="item in vm.history | orderBy:'time':true">
+                  <a ng-click="vm.gotoHistory(item.link)" ng-href="{{item.link}}" prevent-default>
+                    <umb-icon icon="{{item.icon}}"></umb-icon>
+                    {{item.name}}
+                    ({{ item.time | date : 'medium' }})
+                  </a>
+                </li>
+              </ul>
+            </umb-control-group>
+          </umb-box-content>
+        </umb-box>
+      </div>
+
+      <div class="umb-control-group" ng-if="vm.dashboard.length > 0">
+        <div ng-repeat="tab in vm.dashboard">
+          <h5 ng-if="tab.label">{{tab.label}}</h5>
+          <div ng-repeat="property in tab.properties">
+            <div ng-include="property.view"></div>
+          </div>
+        </div>
+      </div>
+    </umb-editor-container>
+
+    <umb-editor-footer>
+
+      <umb-editor-footer-content-right>
+
+        <umb-button class="btn-group-vertical" data-element="button-overlayClose" type="button" button-style="link"
+          label-key="general_close" shortcut="esc" action="vm.close()">
+        </umb-button>
+
+        <umb-button class="btn-group-vertical" type="button" label-key="general_logout" shortcut="ctrl+shift+l"
+          action="vm.logout()" alias="logOut" button-style="danger" label="Log out">
+        </umb-button>
+
+      </umb-editor-footer-content-right>
+
+    </umb-editor-footer>
+
+  </umb-editor-view>
+
+</div>

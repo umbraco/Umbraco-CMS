@@ -266,19 +266,20 @@
 
 .dropdown-menu > li > button {
     position: relative;
-  background: transparent;
-  border: 0;
-  padding: 8px 20px;
-  color: @ui-option-type;
-  display: flex;
-  justify-content: start;
-  clear: both;
-  font-weight: normal;
-  line-height: 20px;
-  white-space: nowrap;
-  cursor:pointer;
-  width: 100%;
-  text-align: left;
+    background: transparent;
+    border: 0;
+    padding: 8px 20px;
+    color: @ui-option-type;
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    clear: both;
+    font-weight: normal;
+    line-height: 20px;
+    white-space: nowrap;
+    cursor:pointer;
+    width: 100%;
+    text-align: left;
 }
 
 .dropdown-menu > li > a:hover, 
@@ -287,6 +288,12 @@
 .dropdown-submenu:hover > button {
     color: @ui-option-type-hover;
     background: @ui-option-hover;
+}
+
+.dropdown-menu > li > button:disabled, 
+.dropdown-submenu:hover > button:disabled {
+    color: @ui-option-disabled-type;
+    background: transparent;
 }
 
 .nav-tabs .dropdown-menu {

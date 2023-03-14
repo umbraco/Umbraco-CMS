@@ -1,0 +1,59 @@
+@using Microsoft.Extensions.Options
+@using Umbraco.Cms.Core.Configuration.Models
+@using Umbraco.Cms.Core.Hosting
+@using Umbraco.Cms.Core.Routing
+@using Umbraco.Extensions
+@model Umbraco.Cms.Web.Website.Models.NoNodesViewModel
+@inject IHostingEnvironment hostingEnvironment
+@inject IOptions<GlobalSettings> globalSettings
+@{
+    var backOfficePath = globalSettings.Value.GetBackOfficePath(hostingEnvironment);
+}
+<!doctype html>
+<html class="no-js" lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+    <title>Umbraco: No Published Content</title>
+
+    <link rel="stylesheet" href="@WebPath.Combine(backOfficePath.TrimStart("~"), "/assets/css/nonodes.style.min.css")" />
+</head>
+<body>
+
+    <section>
+        <article>
+            <div>
+                <div class="logo"></div>
+
+                <h1>Welcome to your Umbraco installation</h1>
+                <h3>You're seeing this wonderful page because your website doesn't contain any published content yet.</h3>
+
+                <div class="cta">
+                    <a href="@Model?.UmbracoPath" class="button">Open Umbraco</a>
+                </div>
+
+                <div class="row">
+                    <div class="col">
+                        <h2>Easy start with Umbraco Learning Base</h2>
+                        <p>We have created a bunch of 'how-to' videos, to get you easily started with Umbraco. Learn how to build projects in just a couple of minutes. Easiest CMS in the world.</p>
+
+                        <a href="https://www.youtube.com/channel/UCbGfwSAPflebnadyhEPw-wA?ref=tvFromInstaller" target="_blank" rel="noopener">Umbraco Learning Base &rarr;</a>
+                    </div>
+
+                    <div class="col">
+                        <h2>Be a part of the community</h2>
+                        <p>The Umbraco community is the best of its kind, be sure to visit, and if you have any questions, we're sure that you can get your answers from the community.</p>
+
+                        <a href="https://our.umbraco.com/?ref=ourFromInstaller" target="_blank" rel="noopener">our.Umbraco &rarr;</a>
+                    </div>
+                </div>
+
+            </div>
+        </article>
+
+    </section>
+
+</body>
+</html>

@@ -1,26 +1,23 @@
-﻿using System;
+namespace Umbraco.Cms.Core.Trees;
 
-namespace Umbraco.Cms.Core.Trees
+/// <summary>
+///     Defines tree uses.
+/// </summary>
+[Flags]
+public enum TreeUse
 {
     /// <summary>
-    /// Defines tree uses.
+    ///     The tree is not used.
     /// </summary>
-    [Flags]
-    public enum TreeUse
-    {
-        /// <summary>
-        /// The tree is not used.
-        /// </summary>
-        None = 0,
+    None = 0,
 
-        /// <summary>
-        /// The tree is used as a main (section) tree.
-        /// </summary>
-        Main = 1,
+    /// <summary>
+    ///     The tree is used as a main (section) tree.
+    /// </summary>
+    Main = 1,
 
-        /// <summary>
-        /// The tree is used as a dialog.
-        /// </summary>
-        Dialog = 2,
-    }
+    /// <summary>
+    ///     The tree is used as a dialog.
+    /// </summary>
+    Dialog = 2,
 }

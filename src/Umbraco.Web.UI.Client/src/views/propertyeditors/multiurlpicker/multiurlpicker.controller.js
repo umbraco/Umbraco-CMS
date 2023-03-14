@@ -1,4 +1,4 @@
-function multiUrlPickerController($scope, localizationService, entityResource, iconHelper, editorService) {
+function multiUrlPickerController($scope, localizationService, entityResource, iconHelper, editorService, overlayService) {
 
     var vm = {
         labels: {
@@ -6,10 +6,27 @@ function multiUrlPickerController($scope, localizationService, entityResource, i
         }
     };
 
+    $scope.allowAdd = !$scope.readonly;
+    $scope.allowEdit = !$scope.readonly;
+    $scope.allowRemove = !$scope.readonly;
+
+    let removeAllEntriesAction = {
+        labelKey: "clipboard_labelForRemoveAllEntries",
+        labelTokens: [],
+        icon: "icon-trash",
+        method: removeAllEntries,
+        isDisabled: !$scope.allowRemove,
+        useLegacyIcon: false
+    };
+
     $scope.renderModel = [];
 
-    if ($scope.preview) {
-        return;
+    if ($scope.model.config && parseInt($scope.model.config.maxNumber) !== 1 && $scope.umbProperty) {
+        var propertyActions = [
+          removeAllEntriesAction
+        ];
+
+        $scope.umbProperty.setPropertyActions(propertyActions);
     }
 
     if (!Array.isArray($scope.model.value)) {
@@ -24,6 +41,7 @@ function multiUrlPickerController($scope, localizationService, entityResource, i
         tolerance: "pointer",
         scroll: true,
         zIndex: 6000,
+        disabled: $scope.readonly,
         update: function () {
             setDirty();
         }
@@ -57,19 +75,33 @@ function multiUrlPickerController($scope, localizationService, entityResource, i
             else {
                 $scope.multiUrlPickerForm.maxCount.$setValidity("maxCount", true);
             }
-            $scope.sortableOptions.disabled = $scope.renderModel.length === 1;
+
+            $scope.sortableOptions.disabled = $scope.renderModel.length === 1 || $scope.readonly;
+
+            removeAllEntriesAction.isDisabled = $scope.renderModel.length === 0 || $scope.readonly;
+
             //Update value
             $scope.model.value = $scope.renderModel;
         }
     );
 
     $scope.remove = function ($index) {
+        if (!$scope.allowRemove) return;
+
         $scope.renderModel.splice($index, 1);
 
         setDirty();
     };
 
-    $scope.openLinkPicker = function (link, $index) {
+    $scope.clear = function () {
+      $scope.renderModel = [];
+
+      setDirty();
+    };
+
+    $scope.openLinkPicker = function (link) {
+        if (!$scope.allowAdd || !$scope.allowEdit) return;
+
         var target = link ? {
             name: link.name,
             anchor: link.queryString,
@@ -117,7 +149,7 @@ function multiUrlPickerController($scope, localizationService, entityResource, i
                             link.trashed = data.trashed;
 
                             if (link.trashed) {
-                                item.url = vm.labels.general_recycleBin;
+                                link.url = vm.labels.general_recycleBin;
                             }
                         });
                     } else {
@@ -143,6 +175,22 @@ function multiUrlPickerController($scope, localizationService, entityResource, i
         }
     }
 
+    function removeAllEntries() {
+        localizationService.localizeMany(["content_nestedContentDeleteAllItems", "general_delete"]).then(function (data) {
+          overlayService.confirmDelete({
+            title: data[1],
+            content: data[0],
+            close: function () {
+              overlayService.close();
+            },
+            submit: function () {
+              $scope.clear();
+              overlayService.close();
+            }
+          });
+        });
+    }
+
     function init() {
 
         localizationService.localizeMany(["general_recycleBin"])
@@ -156,15 +204,23 @@ function multiUrlPickerController($scope, localizationService, entityResource, i
             $scope.model.config.minNumber = 1;
         }
 
-        _.each($scope.model.value, function (item) {
+        const ids = [];
+        $scope.model.value.forEach(item => {
             // we must reload the "document" link URLs to match the current editor culture
-            if (item.udi && item.udi.indexOf("/document/") > 0) {
+            if (item.udi && item.udi.indexOf("/document/") > 0 && ids.indexOf(item.udi) < 0) {
+                ids.push(item.udi);
                 item.url = null;
-                entityResource.getUrlByUdi(item.udi).then(data => {
-                    item.url = data;
-                });
             }
         });
+
+        if(ids.length){
+            entityResource.getUrlsByIds(ids, "Document").then(function(urlMap){
+                Object.keys(urlMap).forEach((udi) => {
+                    const items = $scope.model.value.filter(item => item.udi === udi);
+                    items.forEach(item => item.url = urlMap[udi]);
+                })
+            });
+        }
     }
 
     init();

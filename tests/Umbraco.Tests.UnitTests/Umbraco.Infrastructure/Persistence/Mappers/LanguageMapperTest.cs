@@ -1,43 +1,42 @@
-﻿// Copyright (c) Umbraco.
+// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
 using NUnit.Framework;
 using Umbraco.Cms.Infrastructure.Persistence.Mappers;
 using Umbraco.Cms.Tests.UnitTests.TestHelpers;
 
-namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Persistence.Mappers
+namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Persistence.Mappers;
+
+[TestFixture]
+public class LanguageMapperTest
 {
-    [TestFixture]
-    public class LanguageMapperTest
+    [Test]
+    public void Can_Map_Id_Property()
     {
-        [Test]
-        public void Can_Map_Id_Property()
-        {
-            // Act
-            string column = new LanguageMapper(TestHelper.GetMockSqlContext(), TestHelper.CreateMaps()).Map("Id");
+        // Act
+        var column = new LanguageMapper(TestHelper.GetMockSqlContext(), TestHelper.CreateMaps()).Map("Id");
 
-            // Assert
-            Assert.That(column, Is.EqualTo("[umbracoLanguage].[id]"));
-        }
+        // Assert
+        Assert.That(column, Is.EqualTo("[umbracoLanguage].[id]"));
+    }
 
-        [Test]
-        public void Can_Map_IsoCode_Property()
-        {
-            // Act
-            string column = new LanguageMapper(TestHelper.GetMockSqlContext(), TestHelper.CreateMaps()).Map("IsoCode");
+    [Test]
+    public void Can_Map_IsoCode_Property()
+    {
+        // Act
+        var column = new LanguageMapper(TestHelper.GetMockSqlContext(), TestHelper.CreateMaps()).Map("IsoCode");
 
-            // Assert
-            Assert.That(column, Is.EqualTo("[umbracoLanguage].[languageISOCode]"));
-        }
+        // Assert
+        Assert.That(column, Is.EqualTo("[umbracoLanguage].[languageISOCode]"));
+    }
 
-        [Test]
-        public void Can_Map_CultureName_Property()
-        {
-            // Act
-            string column = new LanguageMapper(TestHelper.GetMockSqlContext(), TestHelper.CreateMaps()).Map("CultureName");
+    [Test]
+    public void Can_Map_CultureName_Property()
+    {
+        // Act
+        var column = new LanguageMapper(TestHelper.GetMockSqlContext(), TestHelper.CreateMaps()).Map("CultureName");
 
-            // Assert
-            Assert.That(column, Is.EqualTo("[umbracoLanguage].[languageCultureName]"));
-        }
+        // Assert
+        Assert.That(column, Is.EqualTo("[umbracoLanguage].[languageCultureName]"));
     }
 }

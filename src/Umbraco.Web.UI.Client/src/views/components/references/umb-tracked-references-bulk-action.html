@@ -1,0 +1,13 @@
+<umb-load-indicator ng-if="vm.loading === true"></umb-load-indicator>
+
+<div ng-if="vm.loading === false">
+    
+    <div ng-if="vm.hasReferences">
+        <umb-tracked-references-table items="vm.referencedItems.items"
+                                      total-pages="vm.referencedItems.totalPages"
+                                      page-number="vm.referencedItems.pageNumber"
+                                      headline="vm.referencedItemsTitle"
+                                      on-page-changed="vm.changeReferencesPageNumber(pageNumber)">
+        </umb-tracked-references-table>
+    </div>
+</div>
