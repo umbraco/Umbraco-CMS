@@ -5,12 +5,6 @@ import { UmbModalToken, UMB_MODAL_CONTEXT_TOKEN } from '@umbraco-cms/modal';
 
 const EmptyDiv = document.createElement('div');
 
-// Get the second generic type of UmbModalToken:
-type GetDataType<T> = T extends UmbModalToken<infer Data> ? Data : unknown;
-
-// Get the second generic type of UmbModalToken:
-type GetResultType<T> = T extends UmbModalToken<infer Data, infer Result> ? Result : unknown;
-
 // TODO: Consider accepting the Token as a generic:
 export type UmbModalRouteOptions<UmbModalTokenData extends object = object, UmbModalTokenResult = unknown> = {
 	path: string;
