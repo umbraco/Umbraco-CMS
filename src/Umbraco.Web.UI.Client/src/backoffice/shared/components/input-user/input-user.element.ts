@@ -3,8 +3,8 @@ import { css, html, nothing, PropertyValueMap } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { UmbInputListBase } from '../input-list-base/input-list-base';
 import { UmbUserStore, UMB_USER_STORE_CONTEXT_TOKEN } from '../../../users/users/repository/user.store';
+import { UMB_USER_PICKER_MODAL_TOKEN } from '../../../users/users/modals/user-picker';
 import type { UserEntity } from '@umbraco-cms/models';
-import { UMB_USER_PICKER_MODAL_TOKEN } from 'src/backoffice/users/users/modals/user-picker';
 
 @customElement('umb-input-user')
 export class UmbPickerUserElement extends UmbInputListBase {
