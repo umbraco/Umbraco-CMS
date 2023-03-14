@@ -110,7 +110,6 @@ export class UmbRouteContext {
 			const localRoutePath = stripSlash(
 				localPath.replace(PARAM_IDENTIFIER, (substring: string, ...args: string[]) => {
 					return params[args[0]].toString();
-					//return `([^\/]+)`;
 				})
 			);
 			return routeBasePath + localRoutePath;
