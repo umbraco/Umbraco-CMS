@@ -1,8 +1,8 @@
-import type { RepositoryTreeDataSource } from '../../../../../libs/repository/repository-tree-data-source.interface';
 import { UmbRelationTypeTreeStore, UMB_RELATION_TYPE_TREE_STORE_CONTEXT_TOKEN } from './relation-type.tree.store';
 import { UmbRelationTypeServerDataSource } from './sources/relation-type.server.data';
 import { UmbRelationTypeStore, UMB_RELATION_TYPE_STORE_CONTEXT_TOKEN } from './relation-type.store';
 import { RelationTypeTreeServerDataSource } from './sources/relation-type.tree.server.data';
+import { RelationTypeTreeDataSource } from './sources';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 import { UmbContextConsumerController } from '@umbraco-cms/context-api';
 import { ProblemDetailsModel, RelationTypeResponseModel } from '@umbraco-cms/backend-api';
@@ -21,7 +21,7 @@ export class UmbRelationTypeRepository implements UmbTreeRepository, UmbDetailRe
 
 	#host: UmbControllerHostInterface;
 
-	#treeSource: RepositoryTreeDataSource;
+	#treeSource: RelationTypeTreeDataSource;
 	#treeStore?: UmbRelationTypeTreeStore;
 
 	#detailDataSource: UmbRelationTypeServerDataSource;

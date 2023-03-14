@@ -1,5 +1,7 @@
+import { RelationTypeTreeDataSource } from '.';
 import { ProblemDetailsModel, RelationTypeResource } from '@umbraco-cms/backend-api';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
+
 import { tryExecuteAndNotify } from '@umbraco-cms/resources';
 
 /**
