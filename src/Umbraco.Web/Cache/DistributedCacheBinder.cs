@@ -121,33 +121,35 @@ namespace Umbraco.Web.Cache
         {
             var groupedEvents = new List<IEventDefinition>();
 
-            var grouped = events.GroupBy(x => x.GetType());
-
-            foreach (var group in grouped)
+            foreach (var group in events.GroupBy(x => x.GetType()))
             {
                 if (group.Key == typeof(EventDefinition<IContentTypeService, SaveEventArgs<IContentType>>))
                 {
-                    GroupSaveEvents<IContentTypeService, IContentType>(groupedEvents, group);
+                    groupedEvents.AddRange(GroupSaveEvents<IContentTypeService, IContentType>(group));
                 }
                 else if (group.Key == typeof(EventDefinition<IContentTypeService, ContentTypeChange<IContentType>.EventArgs>))
                 {
-                    GroupChangeEvents<IContentTypeService, IContentType>(groupedEvents, group);
+                    groupedEvents.AddRange(GroupChangeEvents<IContentTypeService, IContentType>(group));
                 }
                 else if (group.Key == typeof(EventDefinition<IMediaTypeService, SaveEventArgs<IMediaType>>))
                 {
-                    GroupSaveEvents<IMediaTypeService, IMediaType>(groupedEvents, group);
+                    groupedEvents.AddRange(GroupSaveEvents<IMediaTypeService, IMediaType>(group));
                 }
                 else if (group.Key == typeof(EventDefinition<IMediaTypeService, ContentTypeChange<IMediaType>.EventArgs>))
                 {
-                    GroupChangeEvents<IMediaTypeService, IMediaType>(groupedEvents, group);
+                    groupedEvents.AddRange(GroupChangeEvents<IMediaTypeService, IMediaType>(group));
                 }
                 else if (group.Key == typeof(EventDefinition<IMemberTypeService, SaveEventArgs<IMemberType>>))
                 {
-                    GroupSaveEvents<IMemberTypeService, IMemberType>(groupedEvents, group);
+                    groupedEvents.AddRange(GroupSaveEvents<IMemberTypeService, IMemberType>(group));
                 }
                 else if (group.Key == typeof(EventDefinition<IMemberTypeService, ContentTypeChange<IMemberType>.EventArgs>))
                 {
-                    GroupChangeEvents<IMemberTypeService, IMemberType>(groupedEvents, group);
+                    groupedEvents.AddRange(GroupChangeEvents<IMemberTypeService, IMemberType>(group));
+                }
+                else if (group.Key == typeof(EventDefinition<IDataTypeService, SaveEventArgs<IDataType>>))
+                {
+                    groupedEvents.AddRange(GroupSaveEvents<IDataTypeService, IDataType>(group));
                 }
                 else
                 {
@@ -158,35 +160,28 @@ namespace Umbraco.Web.Cache
             return groupedEvents;
         }
 
-        private static void GroupSaveEvents<TService, TType>(List<IEventDefinition> groupedEvents, IGrouping<Type, IEventDefinition> group)
-            where TService : IContentTypeBaseService
-            where TType : IContentTypeBase
+        private static IEnumerable<IEventDefinition> GroupSaveEvents<TSender, TEntity>(IEnumerable<IEventDefinition> events)
         {
-            var groupedGroups = group.GroupBy(x => (x.EventName, x.Sender));
-
-            foreach (var groupedGroup in groupedGroups)
+            foreach (var group in events.GroupBy(x => (x.EventName, x.Sender)))
             {
-                groupedEvents.Add(new EventDefinition<TService, SaveEventArgs<TType>>(
+                yield return new EventDefinition<TSender, SaveEventArgs<TEntity>>(
                     null,
-                    (TService)groupedGroup.Key.Sender,
-                    new SaveEventArgs<TType>(groupedGroup.SelectMany(x => ((SaveEventArgs<TType>)x.Args).SavedEntities)),
-                    groupedGroup.Key.EventName));
+                    (TSender)group.Key.Sender,
+                    new SaveEventArgs<TEntity>(group.SelectMany(x => ((SaveEventArgs<TEntity>)x.Args).SavedEntities)),
+                    group.Key.EventName);
             }
         }
 
-        private static void GroupChangeEvents<TService, TType>(List<IEventDefinition> groupedEvents, IGrouping<Type, IEventDefinition> group)
-            where TService : IContentTypeBaseService
-            where TType : class, IContentTypeComposition
+        private static IEnumerable<IEventDefinition> GroupChangeEvents<TSender, TEntity>(IEnumerable<IEventDefinition> events)
+            where TEntity : class, IContentTypeComposition
         {
-            var groupedGroups = group.GroupBy(x => (x.EventName, x.Sender));
-
-            foreach (var groupedGroup in groupedGroups)
+            foreach (var group in events.GroupBy(x => (x.EventName, x.Sender)))
             {
-                groupedEvents.Add(new EventDefinition<TService, ContentTypeChange<TType>.EventArgs>(
+                yield return new EventDefinition<TSender, ContentTypeChange<TEntity>.EventArgs>(
                     null,
-                    (TService)groupedGroup.Key.Sender,
-                    new ContentTypeChange<TType>.EventArgs(groupedGroup.SelectMany(x => ((ContentTypeChange<TType>.EventArgs)x.Args).Changes)),
-                    groupedGroup.Key.EventName));
+                    (TSender)group.Key.Sender,
+                    new ContentTypeChange<TEntity>.EventArgs(group.SelectMany(x => ((ContentTypeChange<TEntity>.EventArgs)x.Args).Changes)),
+                    group.Key.EventName);
             }
         }
     }
