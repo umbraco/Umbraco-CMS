@@ -1,8 +1,8 @@
 import { UmbWorkspaceContext } from '../../../shared/components/workspace/workspace-context/workspace-context';
 import { UmbWorkspaceEntityContextInterface } from '../../../shared/components/workspace/workspace-context/workspace-entity-context.interface';
 import { UmbRelationTypeRepository } from '../repository/relation-type.repository';
-import type { RelationTypeResponseModel } from '@umbraco-cms/backend-api';
-import { appendToFrozenArray, ObjectState } from '@umbraco-cms/observable-api';
+import type { RelationTypeBaseModel, RelationTypeResponseModel } from '@umbraco-cms/backend-api';
+import { ObjectState } from '@umbraco-cms/observable-api';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 
 export class UmbRelationTypeWorkspaceContext
@@ -49,26 +49,9 @@ export class UmbRelationTypeWorkspaceContext
 		this.#data.update({ name });
 	}
 
-	setPropertyEditorAlias(alias?: string) {
-		this.#data.update({ propertyEditorAlias: alias });
-	}
-	setPropertyEditorUiAlias(alias?: string) {
-		this.#data.update({ propertyEditorUiAlias: alias });
-	}
-
-	// TODO: its not called a property in the model, but we do consider this way in our front-end
-	setPropertyValue(alias: string, value: unknown) {
-		const entry = { alias: alias, value: value };
-
-		const currentData = this.#data.value;
-		if (currentData) {
-			// TODO: make a partial update method for array of data, (idea/concept, use if this case is getting common)
-			const newDataSet = appendToFrozenArray(currentData.data || [], entry, (x) => x.alias);
-			this.#data.update({ data: newDataSet });
-		}
-	}
-
 	async save() {
+		console.log('WORKSPACE SAVE');
+
 		if (!this.#data.value) return;
 		if (this.isNew) {
 			await this.repository.create(this.#data.value);
@@ -76,7 +59,12 @@ export class UmbRelationTypeWorkspaceContext
 			await this.repository.save(this.#data.value);
 		}
 		// If it went well, then its not new anymore?.
+
 		this.setIsNew(false);
+	}
+
+	update<K extends keyof RelationTypeBaseModel>(key: K, value: RelationTypeBaseModel[K]) {
+		this.#data.next({ ...this.#data.value, [key]: value });
 	}
 
 	async delete(key: string) {

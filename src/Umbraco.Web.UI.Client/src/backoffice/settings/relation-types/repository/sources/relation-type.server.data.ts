@@ -100,6 +100,7 @@ export class UmbRelationTypeServerDataSource implements RepositoryDetailDataSour
 
 		const requestBody: UpdateRelationTypeRequestModel = { ...RelationType };
 
+		console.log('AHSGd');
 		// TODO: use resources when end point is ready:
 		return tryExecuteAndNotify<RelationTypeResponseModel>(
 			this.#host,
