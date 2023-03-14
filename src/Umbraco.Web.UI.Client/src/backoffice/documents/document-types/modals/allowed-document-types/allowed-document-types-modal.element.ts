@@ -1,8 +1,11 @@
 import { html } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
-import { customElement } from 'lit/decorators.js';
+import { customElement, state } from 'lit/decorators.js';
+import { ifDefined } from 'lit-html/directives/if-defined.js';
+import { UmbDocumentTypeRepository } from '../../repository/document-type.repository';
 import { UmbAllowedDocumentTypesModalData, UmbAllowedDocumentTypesModalResult } from '.';
 import { UmbModalBaseElement } from '@umbraco-cms/modal';
+import { DocumentTypeTreeItemModel } from '@umbraco-cms/backend-api';
 
 @customElement('umb-allowed-document-types-modal')
 export class UmbAllowedDocumentTypesModalElement extends UmbModalBaseElement<
@@ -10,6 +13,22 @@ export class UmbAllowedDocumentTypesModalElement extends UmbModalBaseElement<
 	UmbAllowedDocumentTypesModalResult
 > {
 	static styles = [UUITextStyles];
+
+	#documentTypeRepository = new UmbDocumentTypeRepository(this);
+
+	@state()
+	private _allowedDocumentTypes: DocumentTypeTreeItemModel[] = [];
+
+	async firstUpdated() {
+		// TODO: show error
+		if (!this.data?.key) return;
+
+		const { data } = await this.#documentTypeRepository.requestAllowedChildTypesOf(this.data.key);
+
+		if (data) {
+			this._allowedDocumentTypes = data;
+		}
+	}
 
 	private _handleCancel() {
 		this.modalHandler?.reject();
@@ -28,9 +47,14 @@ export class UmbAllowedDocumentTypesModalElement extends UmbModalBaseElement<
 				<div>Render list of create options for ${this.data?.key}</div>
 
 				<ul>
-					<li><button type="button" value="1" @click=${this.#onClick}>Option 1</button></li>
-					<li><button type="button" value="2" @click=${this.#onClick}>Option 2</button></li>
-					<li><button type="button" value="3" @click=${this.#onClick}>Option 3</button></li>
+					${this._allowedDocumentTypes.map(
+						(item) =>
+							html`
+								<li>
+									<button type="button" value=${ifDefined(item.key)} @click=${this.#onClick}>${item.name}</button>
+								</li>
+							`
+					)}
 				</ul>
 
 				<uui-button slot="actions" id="cancel" label="Cancel" @click="${this._handleCancel}">Cancel</uui-button>
