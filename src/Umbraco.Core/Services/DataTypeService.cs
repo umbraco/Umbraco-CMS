@@ -110,7 +110,8 @@ namespace Umbraco.Cms.Core.Services.Implement
                         Key = key
                     };
 
-                    Attempt<EntityContainer, DataTypeContainerOperationStatus> result = _dataTypeContainerService.CreateAsync(container, parentKey, userId).GetAwaiter().GetResult();
+                    Guid currentUserKey = _userService.GetUserById(userId)?.Key ?? Constants.Security.SuperUserKey;
+                    Attempt<EntityContainer, DataTypeContainerOperationStatus> result = _dataTypeContainerService.CreateAsync(container, currentUserKey, parentKey).GetAwaiter().GetResult();
 
                     // mimic old service behavior
                     return result.Status switch
@@ -175,10 +176,11 @@ namespace Umbraco.Cms.Core.Services.Implement
             {
                 var isNew = container.Id == 0;
                 Guid? parentKey = isNew && container.ParentId > 0 ? _dataTypeContainerRepository.Get(container.ParentId)?.Key : null;
+                Guid currentUserKey = _userService.GetUserById(userId)?.Key ?? Constants.Security.SuperUserKey;
 
                 Attempt<EntityContainer, DataTypeContainerOperationStatus> result = isNew
-                    ? _dataTypeContainerService.CreateAsync(container, parentKey, userId).GetAwaiter().GetResult()
-                    : _dataTypeContainerService.UpdateAsync(container, userId).GetAwaiter().GetResult();
+                    ? _dataTypeContainerService.CreateAsync(container, currentUserKey, parentKey).GetAwaiter().GetResult()
+                    : _dataTypeContainerService.UpdateAsync(container, currentUserKey).GetAwaiter().GetResult();
 
                 // mimic old service behavior
                 return result.Status switch
@@ -204,7 +206,8 @@ namespace Umbraco.Cms.Core.Services.Implement
                     return OperationResult.Attempt.NoOperation(evtMsgs);
                 }
 
-                Attempt<EntityContainer?, DataTypeContainerOperationStatus> result = _dataTypeContainerService.DeleteAsync(container.Key, userId).GetAwaiter().GetResult();
+                Guid currentUserKey = _userService.GetUserById(userId)?.Key ?? Constants.Security.SuperUserKey;
+                Attempt<EntityContainer?, DataTypeContainerOperationStatus> result = _dataTypeContainerService.DeleteAsync(container.Key, currentUserKey).GetAwaiter().GetResult();
                 // mimic old service behavior
                 return result.Status switch
                 {
@@ -233,8 +236,8 @@ namespace Umbraco.Cms.Core.Services.Implement
                     }
 
                     container.Name = name;
-
-                    Attempt<EntityContainer, DataTypeContainerOperationStatus> result = _dataTypeContainerService.UpdateAsync(container, userId).GetAwaiter().GetResult();
+                    Guid currentUserKey = _userService.GetUserById(userId)?.Key ?? Constants.Security.SuperUserKey;
+                    Attempt<EntityContainer, DataTypeContainerOperationStatus> result = _dataTypeContainerService.UpdateAsync(container, currentUserKey).GetAwaiter().GetResult();
                     // mimic old service behavior
                     return result.Status switch
                     {
