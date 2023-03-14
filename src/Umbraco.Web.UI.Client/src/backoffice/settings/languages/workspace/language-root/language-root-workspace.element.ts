@@ -6,8 +6,8 @@ import { UmbLanguageRepository } from '../../repository/language.repository';
 import { UmbLitElement } from '@umbraco-cms/element';
 import { LanguageModel } from '@umbraco-cms/backend-api';
 
-import './language-root-table-delete-column-layout.element';
-import './language-root-table-name-column-layout.element';
+import './components/language-root-table-delete-column-layout.element';
+import './components/language-root-table-name-column-layout.element';
 
 @customElement('umb-language-root-workspace')
 export class UmbLanguageRootWorkspaceElement extends UmbLitElement {
