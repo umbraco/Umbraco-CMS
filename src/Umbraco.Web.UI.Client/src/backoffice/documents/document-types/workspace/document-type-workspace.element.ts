@@ -15,9 +15,6 @@ export class UmbDocumentTypeWorkspaceElement extends UmbLitElement implements Um
 		UUITextStyles,
 		css`
 			:host {
-				display: block;
-				width: 100%;
-				height: 100%;
 			}
 
 			#header {
@@ -110,7 +107,18 @@ export class UmbDocumentTypeWorkspaceElement extends UmbLitElement implements Um
 					</uui-input>
 				</div>
 
-				<div slot="footer">Keyboard Shortcuts</div>
+				<div slot="footer">
+					<uui-button label="Show keyboard shortcuts">
+						Keyboard Shortcuts
+						<uui-keyboard-shortcut>
+							<uui-key>ALT</uui-key>
+							+
+							<uui-key>shift</uui-key>
+							+
+							<uui-key>k</uui-key>
+						</uui-keyboard-shortcut>
+					</uui-button>
+				</div>
 			</umb-workspace-layout>
 		`;
 	}
