@@ -8,11 +8,11 @@ public interface IMediaEditingService
 {
     Task<IMedia?> GetAsync(Guid id);
 
-    Task<Attempt<IMedia?, ContentEditingOperationStatus>> CreateAsync(MediaCreateModel createModel, int userId = Constants.Security.SuperUserId);
+    Task<Attempt<IMedia?, ContentEditingOperationStatus>> CreateAsync(MediaCreateModel createModel, Guid userKey);
 
-    Task<Attempt<IMedia, ContentEditingOperationStatus>> UpdateAsync(IMedia content, MediaUpdateModel updateModel, int userId = Constants.Security.SuperUserId);
+    Task<Attempt<IMedia, ContentEditingOperationStatus>> UpdateAsync(IMedia content, MediaUpdateModel updateModel, Guid userKey);
 
-    Task<Attempt<IMedia?, ContentEditingOperationStatus>> MoveToRecycleBinAsync(Guid id, int userId = Constants.Security.SuperUserId);
+    Task<Attempt<IMedia?, ContentEditingOperationStatus>> MoveToRecycleBinAsync(Guid id, Guid userKey);
 
-    Task<Attempt<IMedia?, ContentEditingOperationStatus>> DeleteAsync(Guid id, int userId = Constants.Security.SuperUserId);
+    Task<Attempt<IMedia?, ContentEditingOperationStatus>> DeleteAsync(Guid id, Guid userKey);
 }

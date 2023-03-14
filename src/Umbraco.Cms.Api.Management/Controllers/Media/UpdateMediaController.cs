@@ -41,7 +41,7 @@ public class UpdateMediaController : MediaControllerBase
         }
 
         MediaUpdateModel model = _mediaEditingPresentationFactory.MapUpdateModel(updateRequestModel);
-        Attempt<IMedia, ContentEditingOperationStatus> result = await _mediaEditingService.UpdateAsync(media, model, CurrentUserId(_backOfficeSecurityAccessor));
+        Attempt<IMedia, ContentEditingOperationStatus> result = await _mediaEditingService.UpdateAsync(media, model, CurrentUserKey(_backOfficeSecurityAccessor));
 
         return result.Success
             ? Ok()
