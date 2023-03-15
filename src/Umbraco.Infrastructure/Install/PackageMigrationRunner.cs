@@ -12,6 +12,7 @@ using Umbraco.Cms.Infrastructure.Migrations;
 using Umbraco.Cms.Infrastructure.Migrations.Notifications;
 using Umbraco.Cms.Infrastructure.Migrations.Upgrade;
 using Umbraco.Extensions;
+using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Infrastructure.Install;
 
@@ -87,6 +88,28 @@ public class PackageMigrationRunner
             .Select(x => x.Name);
 
         return RunPackagePlans(packagePlans);
+    }
+
+    /// <summary>
+    ///     Checks if all executed package migrations succeeded for a package.
+    /// </summary>
+    public async Task<Attempt<bool, PackageMigrationOperationStatus>> RunPendingPackageMigrations(string packageName)
+    {
+        // Check if there are any migrations
+        if (_packageMigrationPlans.ContainsKey(packageName) == false)
+        {
+            return Attempt.FailWithStatus(PackageMigrationOperationStatus.NotFound, false);
+        }
+
+        // Run the migrations
+        IEnumerable<ExecutedMigrationPlan> executedMigrationPlans = RunPackageMigrationsIfPending(packageName);
+
+        if (executedMigrationPlans.Any(plan => plan.Successful == false))
+        {
+            return Attempt.FailWithStatus(PackageMigrationOperationStatus.CancelledByFailedMigration, false);
+        }
+
+        return Attempt.SucceedWithStatus(PackageMigrationOperationStatus.Success, true);
     }
 
     /// <summary>

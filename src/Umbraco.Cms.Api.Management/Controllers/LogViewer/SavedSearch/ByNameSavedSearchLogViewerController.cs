@@ -26,8 +26,8 @@ public class ByNameSavedSearchLogViewerController : SavedSearchLogViewerControll
     [HttpGet("{name}")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    [ProducesResponseType(typeof(SavedLogSearchViewModel), StatusCodes.Status200OK)]
-    public async Task<ActionResult<SavedLogSearchViewModel>> ByName(string name)
+    [ProducesResponseType(typeof(SavedLogSearchResponseModel), StatusCodes.Status200OK)]
+    public async Task<ActionResult<SavedLogSearchResponseModel>> ByName(string name)
     {
         ILogViewerQuery? savedLogQuery = await _logViewerService.GetSavedLogQueryByNameAsync(name);
 
@@ -36,6 +36,6 @@ public class ByNameSavedSearchLogViewerController : SavedSearchLogViewerControll
             return NotFound();
         }
 
-        return Ok(_umbracoMapper.Map<SavedLogSearchViewModel>(savedLogQuery));
+        return Ok(_umbracoMapper.Map<SavedLogSearchResponseModel>(savedLogQuery));
     }
 }

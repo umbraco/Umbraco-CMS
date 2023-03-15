@@ -62,6 +62,7 @@ public static partial class Constants
         public const string ConfigHelpPage = ConfigPrefix + "HelpPage";
         public const string ConfigInstallDefaultData = ConfigPrefix + "InstallDefaultData";
         public const string ConfigDataTypes = ConfigPrefix + "DataTypes";
+        public const string ConfigPackageManifests = ConfigPrefix + "PackageManifests";
 
         public static class NamedOptions
         {

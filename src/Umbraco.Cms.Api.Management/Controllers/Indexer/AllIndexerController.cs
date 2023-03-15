@@ -12,14 +12,14 @@ namespace Umbraco.Cms.Api.Management.Controllers.Indexer;
 public class AllIndexerController : IndexerControllerBase
 {
     private readonly IExamineManager _examineManager;
-    private readonly IIndexViewModelFactory _indexViewModelFactory;
+    private readonly IIndexPresentationFactory _indexPresentationFactory;
 
     public AllIndexerController(
         IExamineManager examineManager,
-        IIndexViewModelFactory indexViewModelFactory)
+        IIndexPresentationFactory indexPresentationFactory)
     {
         _examineManager = examineManager;
-        _indexViewModelFactory = indexViewModelFactory;
+        _indexPresentationFactory = indexPresentationFactory;
     }
 
     /// <summary>
@@ -28,14 +28,14 @@ public class AllIndexerController : IndexerControllerBase
     /// <returns></returns>
     [HttpGet]
     [MapToApiVersion("1.0")]
-    [ProducesResponseType(typeof(PagedViewModel<IndexViewModel>), StatusCodes.Status200OK)]
-    public Task<PagedViewModel<IndexViewModel>> All(int skip, int take)
+    [ProducesResponseType(typeof(PagedViewModel<IndexResponseModel>), StatusCodes.Status200OK)]
+    public Task<PagedViewModel<IndexResponseModel>> All(int skip, int take)
     {
-        IndexViewModel[] indexes = _examineManager.Indexes
-            .Select(_indexViewModelFactory.Create)
+        IndexResponseModel[] indexes = _examineManager.Indexes
+            .Select(_indexPresentationFactory.Create)
             .OrderBy(indexModel => indexModel.Name.TrimEnd("Indexer")).ToArray();
 
-        var viewModel = new PagedViewModel<IndexViewModel> { Items = indexes.Skip(skip).Take(take), Total = indexes.Length };
+        var viewModel = new PagedViewModel<IndexResponseModel> { Items = indexes.Skip(skip).Take(take), Total = indexes.Length };
         return Task.FromResult(viewModel);
     }
 }

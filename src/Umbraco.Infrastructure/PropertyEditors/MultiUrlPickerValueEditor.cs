@@ -2,8 +2,9 @@
 // See LICENSE for more details.
 
 using System.Runtime.Serialization;
+using System.Text.Json.Nodes;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
@@ -20,16 +21,11 @@ namespace Umbraco.Cms.Core.PropertyEditors;
 
 public class MultiUrlPickerValueEditor : DataValueEditor, IDataValueReference
 {
-    private static readonly JsonSerializerSettings _linkDisplayJsonSerializerSettings = new()
-    {
-        Formatting = Formatting.None,
-        NullValueHandling = NullValueHandling.Ignore,
-    };
-
     private readonly IEntityService _entityService;
     private readonly ILogger<MultiUrlPickerValueEditor> _logger;
     private readonly IPublishedSnapshotAccessor _publishedSnapshotAccessor;
     private readonly IPublishedUrlProvider _publishedUrlProvider;
+    private readonly IJsonSerializer _jsonSerializer;
 
     public MultiUrlPickerValueEditor(
         IEntityService entityService,
@@ -48,6 +44,8 @@ public class MultiUrlPickerValueEditor : DataValueEditor, IDataValueReference
                                      throw new ArgumentNullException(nameof(publishedSnapshotAccessor));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         _publishedUrlProvider = publishedUrlProvider;
+
+        _jsonSerializer = jsonSerializer;
     }
 
     public IEnumerable<UmbracoEntityReference> GetReferences(object? value)
@@ -59,7 +57,7 @@ public class MultiUrlPickerValueEditor : DataValueEditor, IDataValueReference
             yield break;
         }
 
-        List<LinkDto>? links = JsonConvert.DeserializeObject<List<LinkDto>>(asString);
+        List<LinkDto>? links = _jsonSerializer.Deserialize<List<LinkDto>>(asString);
         if (links is not null)
         {
             foreach (LinkDto link in links)
@@ -84,7 +82,7 @@ public class MultiUrlPickerValueEditor : DataValueEditor, IDataValueReference
 
         try
         {
-            List<LinkDto>? links = JsonConvert.DeserializeObject<List<LinkDto>>(value);
+            List<LinkDto>? links = _jsonSerializer.Deserialize<List<LinkDto>>(value);
 
             List<LinkDto>? documentLinks = links?.FindAll(link =>
                 link.Udi != null && link.Udi.EntityType == Constants.UdiEntityType.Document);
@@ -179,7 +177,13 @@ public class MultiUrlPickerValueEditor : DataValueEditor, IDataValueReference
 
     public override object? FromEditor(ContentPropertyData editorValue, object? currentValue)
     {
-        var value = editorValue.Value?.ToString();
+        // FIXME: get rid of Json.NET here
+        // FIXME: consider creating an object deserialization method on IJsonSerializer instead of relying on deserializing serialized JSON here (and likely other places as well)
+        var value = editorValue.Value is JArray jArray
+            ? jArray.ToString()
+            : editorValue.Value is JsonArray jsonArray
+                ? jsonArray.ToJsonString()
+                : string.Empty;
 
         if (string.IsNullOrEmpty(value))
         {
@@ -188,23 +192,21 @@ public class MultiUrlPickerValueEditor : DataValueEditor, IDataValueReference
 
         try
         {
-            List<LinkDisplay>? links = JsonConvert.DeserializeObject<List<LinkDisplay>>(value);
-            if (links?.Count == 0)
+            List<LinkDisplay>? links = _jsonSerializer.Deserialize<List<LinkDisplay>>(value);
+            if (links == null || links.Count == 0)
             {
                 return null;
             }
 
-            return JsonConvert.SerializeObject(
-                from link in links
-                select new LinkDto
+            return _jsonSerializer.Serialize(
+                links.Select(link => new LinkDto
                 {
                     Name = link.Name,
                     QueryString = link.QueryString,
                     Target = link.Target,
                     Udi = link.Udi,
                     Url = link.Udi == null ? link.Url : null, // only save the URL for external links
-                },
-                _linkDisplayJsonSerializerSettings);
+                }));
         }
         catch (Exception ex)
         {

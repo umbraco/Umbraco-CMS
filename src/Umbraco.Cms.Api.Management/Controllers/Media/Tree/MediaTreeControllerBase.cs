@@ -17,7 +17,7 @@ namespace Umbraco.Cms.Api.Management.Controllers.Media.Tree;
 [ApiController]
 [VersionedApiBackOfficeRoute($"{Constants.Web.RoutePath.Tree}/{Constants.UdiEntityType.Media}")]
 [ApiExplorerSettings(GroupName = nameof(Constants.UdiEntityType.Media))]
-public class MediaTreeControllerBase : UserStartNodeTreeControllerBase<ContentTreeItemViewModel>
+public class MediaTreeControllerBase : UserStartNodeTreeControllerBase<ContentTreeItemResponseModel>
 {
     private readonly AppCaches _appCaches;
     private readonly IBackOfficeSecurityAccessor _backofficeSecurityAccessor;
@@ -38,17 +38,17 @@ public class MediaTreeControllerBase : UserStartNodeTreeControllerBase<ContentTr
 
     protected override Ordering ItemOrdering => Ordering.By(nameof(Infrastructure.Persistence.Dtos.NodeDto.SortOrder));
 
-    protected override ContentTreeItemViewModel MapTreeItemViewModel(Guid? parentKey, IEntitySlim entity)
+    protected override ContentTreeItemResponseModel MapTreeItemViewModel(Guid? parentKey, IEntitySlim entity)
     {
-        ContentTreeItemViewModel viewModel = base.MapTreeItemViewModel(parentKey, entity);
+        ContentTreeItemResponseModel responseModel = base.MapTreeItemViewModel(parentKey, entity);
 
         if (entity is IMediaEntitySlim mediaEntitySlim)
         {
-            viewModel.Icon = mediaEntitySlim.ContentTypeIcon ?? viewModel.Icon;
-            viewModel.IsTrashed = entity.Trashed;
+            responseModel.Icon = mediaEntitySlim.ContentTypeIcon ?? responseModel.Icon;
+            responseModel.IsTrashed = entity.Trashed;
         }
 
-        return viewModel;
+        return responseModel;
     }
 
     // TODO: delete these (faking start node setup for unlimited editor)

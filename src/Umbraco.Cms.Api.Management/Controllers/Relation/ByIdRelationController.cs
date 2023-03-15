@@ -10,17 +10,17 @@ namespace Umbraco.Cms.Api.Management.Controllers.Relation;
 public class ByIdRelationController : RelationControllerBase
 {
     private readonly IRelationService _relationService;
-    private readonly IRelationViewModelFactory _relationViewModelFactory;
+    private readonly IRelationPresentationFactory _relationPresentationFactory;
 
-    public ByIdRelationController(IRelationService relationService, IRelationViewModelFactory relationViewModelFactory)
+    public ByIdRelationController(IRelationService relationService, IRelationPresentationFactory relationPresentationFactory)
     {
         _relationService = relationService;
-        _relationViewModelFactory = relationViewModelFactory;
+        _relationPresentationFactory = relationPresentationFactory;
     }
 
     [HttpGet("{id:int}")]
     [MapToApiVersion("1.0")]
-    [ProducesResponseType(typeof(RelationViewModel), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(RelationResponseModel), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult> ById(int id)
     {
@@ -30,6 +30,6 @@ public class ByIdRelationController : RelationControllerBase
             return NotFound();
         }
 
-        return await Task.FromResult(Ok(_relationViewModelFactory.Create(relation)));
+        return await Task.FromResult(Ok(_relationPresentationFactory.Create(relation)));
     }
 }

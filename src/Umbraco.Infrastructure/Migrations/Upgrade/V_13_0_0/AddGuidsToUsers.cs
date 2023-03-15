@@ -44,14 +44,21 @@ public class AddGuidsToUsers : UnscopedMigrationBase
     {
         var columns = SqlSyntax.GetColumnsInSchema(Context.Database).ToList();
         AddColumnIfNotExists<UserDto>(columns, NewColumnName);
-        List<UserDto>? dtos = Database.Fetch<UserDto>();
-        if (dtos is null)
+        List<UserDto>? userDtos = Database.Fetch<UserDto>();
+        if (userDtos is null)
         {
             return;
         }
 
-        MigrateExternalLogins(dtos);
-        MigrateTwoFactorLogins(dtos);
+        UserDto? superUser = userDtos.FirstOrDefault(x => x.Id == -1);
+        if (superUser is not null)
+        {
+            superUser.Key = Constants.Security.SuperUserKey;
+            Database.Update(superUser);
+        }
+
+        MigrateExternalLogins(userDtos);
+        MigrateTwoFactorLogins(userDtos);
     }
 
     private void MigrateSqlite()
@@ -78,7 +85,7 @@ public class AddGuidsToUsers : UnscopedMigrationBase
         List<UserDto> users = Database.Fetch<OldUserDto>().Select(x => new UserDto
         {
             Id = x.Id,
-            Key = Guid.NewGuid(),
+            Key = x.Id is -1 ? Constants.Security.SuperUserKey : Guid.NewGuid(),
             Disabled = x.Disabled,
             NoConsole = x.NoConsole,
             UserName = x.UserName,

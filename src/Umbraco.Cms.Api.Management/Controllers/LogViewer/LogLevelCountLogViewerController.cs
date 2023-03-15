@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Umbraco.Cms.Api.Common.ViewModels.Pagination;
 using Umbraco.Cms.Api.Management.ViewModels.LogViewer;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Logging.Viewer;
@@ -29,7 +30,7 @@ public class LogLevelCountLogViewerController : LogViewerControllerBase
     [HttpGet("level-count")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(LogLevelCountsReponseModel), StatusCodes.Status200OK)]
     public async Task<IActionResult> LogLevelCounts(DateTime? startDate = null, DateTime? endDate = null)
     {
         Attempt<LogLevelCounts?, LogViewerOperationStatus> logLevelCountsAttempt =
@@ -37,7 +38,7 @@ public class LogLevelCountLogViewerController : LogViewerControllerBase
 
         if (logLevelCountsAttempt.Success)
         {
-            return Ok(_umbracoMapper.Map<LogLevelCountsViewModel>(logLevelCountsAttempt.Result));
+            return Ok(_umbracoMapper.Map<LogLevelCountsReponseModel>(logLevelCountsAttempt.Result));
         }
 
         return LogViewerOperationStatusResult(logLevelCountsAttempt.Status);

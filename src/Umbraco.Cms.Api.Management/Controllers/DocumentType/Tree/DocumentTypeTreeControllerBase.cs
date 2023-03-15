@@ -13,7 +13,7 @@ namespace Umbraco.Cms.Api.Management.Controllers.DocumentType.Tree;
 [ApiController]
 [VersionedApiBackOfficeRoute($"{Constants.Web.RoutePath.Tree}/{Constants.UdiEntityType.DocumentType}")]
 [ApiExplorerSettings(GroupName = "Document Type")]
-public class DocumentTypeTreeControllerBase : FolderTreeControllerBase<DocumentTypeTreeItemViewModel>
+public class DocumentTypeTreeControllerBase : FolderTreeControllerBase<DocumentTypeTreeItemResponseModel>
 {
     private readonly IContentTypeService _contentTypeService;
 
@@ -25,7 +25,7 @@ public class DocumentTypeTreeControllerBase : FolderTreeControllerBase<DocumentT
 
     protected override UmbracoObjectTypes FolderObjectType => UmbracoObjectTypes.DocumentTypeContainer;
 
-    protected override DocumentTypeTreeItemViewModel[] MapTreeItemViewModels(Guid? parentKey, IEntitySlim[] entities)
+    protected override DocumentTypeTreeItemResponseModel[] MapTreeItemViewModels(Guid? parentKey, IEntitySlim[] entities)
     {
         var contentTypes = _contentTypeService
             .GetAll(entities.Select(entity => entity.Id).ToArray())
@@ -33,14 +33,14 @@ public class DocumentTypeTreeControllerBase : FolderTreeControllerBase<DocumentT
 
         return entities.Select(entity =>
         {
-            DocumentTypeTreeItemViewModel viewModel = MapTreeItemViewModel(parentKey, entity);
+            DocumentTypeTreeItemResponseModel responseModel = MapTreeItemViewModel(parentKey, entity);
             if (contentTypes.TryGetValue(entity.Id, out IContentType? contentType))
             {
-                viewModel.Icon = contentType.Icon ?? viewModel.Icon;
-                viewModel.IsElement = contentType.IsElement;
+                responseModel.Icon = contentType.Icon ?? responseModel.Icon;
+                responseModel.IsElement = contentType.IsElement;
             }
 
-            return viewModel;
+            return responseModel;
         }).ToArray();
     }
 }

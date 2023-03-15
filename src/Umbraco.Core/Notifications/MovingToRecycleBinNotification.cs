@@ -5,17 +5,17 @@ using Umbraco.Cms.Core.Events;
 
 namespace Umbraco.Cms.Core.Notifications;
 
-public abstract class MovingToRecycleBinNotification<T> : CancelableObjectNotification<IEnumerable<MoveEventInfo<T>>>
+public abstract class MovingToRecycleBinNotification<T> : CancelableObjectNotification<IEnumerable<MoveToRecycleBinEventInfo<T>>>
 {
-    protected MovingToRecycleBinNotification(MoveEventInfo<T> target, EventMessages messages)
+    protected MovingToRecycleBinNotification(MoveToRecycleBinEventInfo<T> target, EventMessages messages)
         : base(new[] { target }, messages)
     {
     }
 
-    protected MovingToRecycleBinNotification(IEnumerable<MoveEventInfo<T>> target, EventMessages messages)
+    protected MovingToRecycleBinNotification(IEnumerable<MoveToRecycleBinEventInfo<T>> target, EventMessages messages)
         : base(target, messages)
     {
     }
 
-    public IEnumerable<MoveEventInfo<T>> MoveInfoCollection => Target;
+    public IEnumerable<MoveToRecycleBinEventInfo<T>> MoveInfoCollection => Target;
 }

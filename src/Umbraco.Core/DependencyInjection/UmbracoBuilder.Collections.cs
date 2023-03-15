@@ -83,7 +83,7 @@ public static partial class UmbracoBuilderExtensions
             .Add<ExamineDashboard>()
             .Add<FormsDashboard>()
             .Add<HealthCheckDashboard>()
-            .Add<ManifestDashboard>()
+            .Add<LegacyManifestDashboard>()
             .Add<MediaDashboard>()
             .Add<MembersDashboard>()
             .Add<ProfilerDashboard>()
@@ -270,8 +270,8 @@ public static partial class UmbracoBuilderExtensions
     /// Gets the manifest filter collection builder.
     /// </summary>
     /// <param name="builder">The builder.</param>
-    public static ManifestFilterCollectionBuilder ManifestFilters(this IUmbracoBuilder builder)
-        => builder.WithCollectionBuilder<ManifestFilterCollectionBuilder>();
+    public static LegacyManifestFilterCollectionBuilder ManifestFilters(this IUmbracoBuilder builder)
+        => builder.WithCollectionBuilder<LegacyManifestFilterCollectionBuilder>();
 
     /// <summary>
     /// Gets the content finders collection builder.

@@ -8,14 +8,14 @@ namespace Umbraco.Cms.Core.Notifications;
 
 public sealed class ContentMovedToRecycleBinNotification : MovedToRecycleBinNotification<IContent>
 {
-    public ContentMovedToRecycleBinNotification(MoveEventInfo<IContent> target, EventMessages messages)
+    public ContentMovedToRecycleBinNotification(MoveToRecycleBinEventInfo<IContent> target, EventMessages messages)
         : base(
         target,
         messages)
     {
     }
 
-    public ContentMovedToRecycleBinNotification(IEnumerable<MoveEventInfo<IContent>> target, EventMessages messages)
+    public ContentMovedToRecycleBinNotification(IEnumerable<MoveToRecycleBinEventInfo<IContent>> target, EventMessages messages)
         : base(target, messages)
     {
     }

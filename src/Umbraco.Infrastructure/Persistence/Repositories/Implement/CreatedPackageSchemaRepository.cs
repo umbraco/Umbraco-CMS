@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using System.Data;
 using System.Globalization;
 using System.IO.Compression;
 using System.Xml.Linq;
@@ -88,12 +89,9 @@ public class CreatedPackageSchemaRepository : ICreatedPackagesRepository
         List<CreatedPackageSchemaDto> xmlSchemas = _umbracoDatabase.Fetch<CreatedPackageSchemaDto>(query);
         foreach (CreatedPackageSchemaDto packageSchema in xmlSchemas)
         {
-            var packageDefinition = _xmlParser.ToPackageDefinition(XElement.Parse(packageSchema.Value));
+            PackageDefinition? packageDefinition = CreatePackageDefinitionFromSchema(packageSchema);
             if (packageDefinition is not null)
             {
-                packageDefinition.Id = packageSchema.Id;
-                packageDefinition.Name = packageSchema.Name;
-                packageDefinition.PackageId = packageSchema.PackageId;
                 packageDefinitions.Add(packageDefinition);
             }
         }
@@ -107,6 +105,7 @@ public class CreatedPackageSchemaRepository : ICreatedPackagesRepository
             .Select<CreatedPackageSchemaDto>()
             .From<CreatedPackageSchemaDto>()
             .Where<CreatedPackageSchemaDto>(x => x.Id == id);
+
         List<CreatedPackageSchemaDto> schemaDtos = _umbracoDatabase.Fetch<CreatedPackageSchemaDto>(query);
 
         if (schemaDtos.IsCollectionEmpty())
@@ -114,16 +113,24 @@ public class CreatedPackageSchemaRepository : ICreatedPackagesRepository
             return null;
         }
 
-        CreatedPackageSchemaDto packageSchema = schemaDtos.First();
-        var packageDefinition = _xmlParser.ToPackageDefinition(XElement.Parse(packageSchema.Value));
-        if (packageDefinition is not null)
+        return CreatePackageDefinitionFromSchema(schemaDtos.First());
+    }
+
+    public PackageDefinition? GetByKey(Guid key)
+    {
+        Sql<ISqlContext> query = new Sql<ISqlContext>(_umbracoDatabase!.SqlContext)
+            .Select<CreatedPackageSchemaDto>()
+            .From<CreatedPackageSchemaDto>()
+            .Where<CreatedPackageSchemaDto>(x => x.PackageId == key);
+
+        List<CreatedPackageSchemaDto> schemaDtos = _umbracoDatabase.Fetch<CreatedPackageSchemaDto>(query);
+
+        if (schemaDtos.IsCollectionEmpty())
         {
-            packageDefinition.Id = packageSchema.Id;
-            packageDefinition.Name = packageSchema.Name;
-            packageDefinition.PackageId = packageSchema.PackageId;
+            return null;
         }
 
-        return packageDefinition;
+        return CreatePackageDefinitionFromSchema(schemaDtos.First());
     }
 
     public void Delete(int id)
@@ -149,7 +156,7 @@ public class CreatedPackageSchemaRepository : ICreatedPackagesRepository
             throw new NullReferenceException("PackageDefinition cannot be null when saving");
         }
 
-        if (string.IsNullOrEmpty(definition.Name) || definition.PackagePath == null)
+        if (string.IsNullOrEmpty(definition.Name))
         {
             return false;
         }
@@ -159,6 +166,17 @@ public class CreatedPackageSchemaRepository : ICreatedPackagesRepository
 
         if (definition.Id == default)
         {
+            Sql<ISqlContext> query = new Sql<ISqlContext>(_umbracoDatabase!.SqlContext)
+                    .SelectCount()
+                    .From<CreatedPackageSchemaDto>()
+                    .Where<CreatedPackageSchemaDto>(x => x.Name == definition.Name);
+            var exists = _umbracoDatabase.ExecuteScalar<int>(query);
+
+            if (exists > 0)
+            {
+                return false;
+            }
+
             // Create dto from definition
             var dto = new CreatedPackageSchemaDto
             {
@@ -171,6 +189,11 @@ public class CreatedPackageSchemaRepository : ICreatedPackagesRepository
             // Set the ids, we have to save in database first to get the Id
             _umbracoDatabase!.Insert(dto);
             definition.Id = dto.Id;
+        }
+
+        if (definition.PackageId == default)
+        {
+            definition.PackageId = Guid.NewGuid();
         }
 
         // Save snapshot locally, we do this to the updated packagePath
@@ -748,5 +771,19 @@ public class CreatedPackageSchemaRepository : ICreatedPackagesRepository
         {
             mediaTypes.Add(mediaType);
         }
+    }
+
+    private PackageDefinition? CreatePackageDefinitionFromSchema(CreatedPackageSchemaDto packageSchema)
+    {
+        var packageDefinition = _xmlParser.ToPackageDefinition(XElement.Parse(packageSchema.Value));
+
+        if (packageDefinition is not null)
+        {
+            packageDefinition.Id = packageSchema.Id;
+            packageDefinition.Name = packageSchema.Name;
+            packageDefinition.PackageId = packageSchema.PackageId;
+        }
+
+        return packageDefinition;
     }
 }
