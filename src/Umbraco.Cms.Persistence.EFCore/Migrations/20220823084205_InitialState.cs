@@ -1,6 +1,11 @@
 ﻿using System;
 using System.Configuration;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Migrations;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Persistence.EFCore.Entities;
+using Umbraco.Extensions;
+
 
 #nullable disable
 
@@ -12,14 +17,28 @@ namespace Umbraco.Cms.Persistence.EFCore.Migrations
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            var connectionStrings = ConfigurationManager.ConnectionStrings;
-            if (migrationBuilder.IsSqlServer())
+            var connectionString = ConfigurationManager.ConnectionStrings["DefaultConnection"].ConnectionString;
+
+            using (var context = new UmbracoEFContext())
             {
-                UpSqlServer(migrationBuilder);
-            }
-            else if (migrationBuilder.IsSqlite())
-            {
-                UpSqlite(migrationBuilder);
+                context.Database.SetConnectionString(connectionString);
+                if (migrationBuilder.IsSqlServer())
+                    {
+                        var tableExists = context.Database.ExecuteScalarAsync<long>($"SELECT COUNT(*) FROM sys.tables WHERE name = '{Constants.DatabaseSchema.Tables.KeyValue}';").GetAwaiter().GetResult() > 0;
+                        if (tableExists is false)
+                        {
+                            UpSqlServer(migrationBuilder);
+                        }
+                    }
+                else if (migrationBuilder.IsSqlite())
+                    {
+                        var tableExists = context.Database.ExecuteScalarAsync<long>($"SELECT COUNT(*) FROM sqlite_master WHERE type='table' AND name='umbracoKeyValue';").GetAwaiter().GetResult() > 0;
+
+                        if (tableExists is false)
+                        {
+                            UpSqlite(migrationBuilder);
+                        }
+                    }
             }
         }
 
