@@ -7,6 +7,7 @@ using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Editors;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Exceptions;
+using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Notifications;
@@ -37,6 +38,7 @@ internal class UserService : RepositoryService, IUserService
     private readonly IEntityService _entityService;
     private readonly ILocalLoginSettingProvider _localLoginSettingProvider;
     private readonly IUserInviteSender _inviteSender;
+    private readonly MediaFileManager _mediaFileManager;
     private readonly IUserRepository _userRepository;
 
     public UserService(
@@ -51,7 +53,8 @@ internal class UserService : RepositoryService, IUserService
         IServiceScopeFactory serviceScopeFactory,
         IEntityService entityService,
         ILocalLoginSettingProvider localLoginSettingProvider,
-        IUserInviteSender inviteSender)
+        IUserInviteSender inviteSender,
+        MediaFileManager mediaFileManager)
         : base(provider, loggerFactory, eventMessagesFactory)
     {
         _userRepository = userRepository;
@@ -61,6 +64,7 @@ internal class UserService : RepositoryService, IUserService
         _entityService = entityService;
         _localLoginSettingProvider = localLoginSettingProvider;
         _inviteSender = inviteSender;
+        _mediaFileManager = mediaFileManager;
         _globalSettings = globalSettings.Value;
         _securitySettings = securitySettings.Value;
         _logger = loggerFactory.CreateLogger<UserService>();
@@ -1194,6 +1198,41 @@ internal class UserService : RepositoryService, IUserService
         Save(usersToEnable);
 
         scope.Complete();
+        return UserOperationStatus.Success;
+    }
+
+    public async Task<UserOperationStatus> ClearAvatarAsync(Guid userKey)
+    {
+        IUser? user = await GetAsync(userKey);
+
+        if (user is null)
+        {
+            return UserOperationStatus.NotFound;
+        }
+
+        if (string.IsNullOrWhiteSpace(user.Avatar))
+        {
+            // Nothing to do
+            return UserOperationStatus.Success;
+        }
+
+        using IServiceScope scope = _serviceScopeFactory.CreateScope();
+        IBackofficeUserStore backofficeUserStore = scope.ServiceProvider.GetRequiredService<IBackofficeUserStore>();
+
+        var filePath = user.Avatar!;
+        user.Avatar = null;
+        UserOperationStatus result = await backofficeUserStore.SaveAsync(user);
+
+        if (result is not UserOperationStatus.Success)
+        {
+            return result;
+        }
+
+        if (_mediaFileManager.FileSystem.FileExists(filePath))
+        {
+            _mediaFileManager.FileSystem.DeleteFile(filePath);
+        }
+
         return UserOperationStatus.Success;
     }
 

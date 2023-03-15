@@ -71,6 +71,8 @@ public interface IUserService : IMembershipUserService
 
     Task<Attempt<PasswordChangedModel, UserOperationStatus>> ChangePasswordAsync(Guid performingUserKey, ChangeBackofficeUserPasswordModel model);
 
+    Task<UserOperationStatus> ClearAvatarAsync(Guid userKey);
+
     /// <summary>
     /// Gets all users that the requesting user is allowed to see.
     /// </summary>
