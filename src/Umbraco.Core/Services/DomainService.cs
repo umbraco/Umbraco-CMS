@@ -205,6 +205,12 @@ public class DomainService : RepositoryService, IDomainService
             domainModel.DomainName = domainModel.DomainName.ToLowerInvariant();
         }
 
+        // make sure we're not attempting to assign duplicate domains
+        if (updateModel.Domains.GroupBy(domain => domain.DomainName).Any(group => group.Count() > 1))
+        {
+            return Attempt.FailWithStatus(DomainOperationStatus.DuplicateDomainName, Enumerable.Empty<IDomain>());
+        }
+
         // grab all current domain assignments
         IDomain[] allDomains = (await GetAllAsync(true)).ToArray();
 

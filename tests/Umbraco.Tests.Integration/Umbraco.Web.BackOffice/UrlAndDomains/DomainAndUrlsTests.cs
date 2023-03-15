@@ -320,6 +320,45 @@ public class DomainAndUrlsTests : UmbracoIntegrationTest
         Assert.AreEqual(2, domains.Count());
     }
 
+    [TestCase("/domain")]
+    [TestCase("/")]
+    [TestCase("some.domain.com")]
+    public async Task Cannot_assign_duplicate_domains(string domainName)
+    {
+        var domainService = GetRequiredService<IDomainService>();
+        var updateModel = new DomainsUpdateModel
+        {
+            Domains = Cultures.Select(culture => new DomainModel { DomainName = domainName, IsoCode = culture }).ToArray()
+        };
+
+        var result = await domainService.UpdateDomainsAsync(Root.Key, updateModel);
+        Assert.IsFalse(result.Success);
+        Assert.AreEqual(DomainOperationStatus.DuplicateDomainName, result.Status);
+    }
+
+    [Test]
+    public async Task Cannot_assign_already_used_domains()
+    {
+        var copy = ContentService.Copy(Root, Root.ParentId, false);
+        ContentService.SaveAndPublish(copy!);
+
+        var domainService = GetRequiredService<IDomainService>();
+        var updateModel = new DomainsUpdateModel
+        {
+            Domains = Cultures.Select(culture => new DomainModel
+            {
+                DomainName = GetDomainUrlFromCultureCode(culture), IsoCode = culture
+            })
+        };
+
+        var result = await domainService.UpdateDomainsAsync(Root.Key, updateModel);
+        Assert.IsTrue(result.Success);
+
+        result = await domainService.UpdateDomainsAsync(copy.Key, updateModel);
+        Assert.IsFalse(result.Success);
+        Assert.AreEqual(DomainOperationStatus.DuplicateDomainName, result.Status);
+    }
+
     private static string GetDomainUrlFromCultureCode(string culture) =>
         "/" + culture.Replace("-", string.Empty).ToLower() + "/";
 
