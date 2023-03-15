@@ -17,29 +17,13 @@ namespace Umbraco.Cms.Persistence.EFCore.Migrations
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            var allSettings = ConfigurationManager.AppSettings.AllKeys;
-            var connectionString = ConfigurationManager.AppSettings["umbracoDbDSN"];
-
-            using (var context = new UmbracoEFContext())
+            if (migrationBuilder.IsSqlServer())
             {
-                context.Database.SetConnectionString(connectionString);
-                if (migrationBuilder.IsSqlServer())
-                    {
-                        var tableExists = context.Database.ExecuteScalarAsync<long>($"SELECT COUNT(*) FROM sys.tables WHERE name = '{Constants.DatabaseSchema.Tables.KeyValue}';").GetAwaiter().GetResult() > 0;
-                        if (tableExists is false)
-                        {
-                            UpSqlServer(migrationBuilder);
-                        }
-                    }
-                else if (migrationBuilder.IsSqlite())
-                    {
-                        var tableExists = context.Database.ExecuteScalarAsync<long>($"SELECT COUNT(*) FROM sqlite_master WHERE type='table' AND name='umbracoKeyValue';").GetAwaiter().GetResult() > 0;
-
-                        if (tableExists is false)
-                        {
-                            UpSqlite(migrationBuilder);
-                        }
-                    }
+                UpSqlServer(migrationBuilder);
+            }
+            else if (migrationBuilder.IsSqlite())
+            {
+                UpSqlite(migrationBuilder);
             }
         }
 
