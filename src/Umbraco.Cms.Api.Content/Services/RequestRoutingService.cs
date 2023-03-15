@@ -36,16 +36,23 @@ public class RequestRoutingService : IRequestRoutingService
 
         requestedPath = requestedPath.EnsureStartsWith("/");
 
+        // do we have an explicit start item?
+        IPublishedContent? startItem = _requestStartItemService.GetStartItem();
+        if (startItem != null)
+        {
+            // the content cache can resolve content by the route "{root ID}/{content path}", which is what we construct here
+            return $"{startItem.Id}{requestedPath}";
+        }
+
         // construct the (assumed) absolute URL for the requested content, and use that
         // to look for a domain configuration that would match the URL
         var contentRoute = new Uri($"{request.Scheme}://{request.Host}{requestedPath}", UriKind.Absolute);
         DomainAndUri? domainAndUri = GetDomainAndUriForRoute(contentRoute);
         if (domainAndUri == null)
         {
-            IPublishedContent? startItem = _requestStartItemService.GetStartItem();
-            return startItem != null
-                ? $"{startItem.Id}{requestedPath}"
-                : requestedPath;
+            // no start item was found and no domain could be resolved, we will return the requested path
+            // as route and hope the content cache can resolve that (it likely can)
+            return requestedPath;
         }
 
         // the Accept-Language header takes precedence over configured domain culture
@@ -54,8 +61,7 @@ public class RequestRoutingService : IRequestRoutingService
             _requestCultureService.SetRequestCulture(domainAndUri.Culture);
         }
 
-        // when resolving content from a configured domain, the content cache expects the content route
-        // to be "{domain content ID}/{content path}", which is what we construct here
+        // the content cache can resolve content by the route "{domain content ID}/{content path}", which is what we construct here
         return $"{domainAndUri.ContentId}{DomainUtilities.PathRelativeToDomain(domainAndUri.Uri, contentRoute.AbsolutePath)}";
     }
 
