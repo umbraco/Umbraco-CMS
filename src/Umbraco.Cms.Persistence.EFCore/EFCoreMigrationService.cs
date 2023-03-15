@@ -1,4 +1,7 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.Data.SqlClient;
+using Microsoft.Data.Sqlite;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Infrastructure.Migrations;
 using Umbraco.Extensions;
 
@@ -7,8 +10,13 @@ namespace Umbraco.Cms.Persistence.EFCore;
 public class EFCoreMigrationService : IEFCoreMigrationService
 {
     private readonly UmbracoDbContextFactory _umbracoDbContextFactory;
+    private readonly ILogger<EFCoreMigrationService> _logger;
 
-    public EFCoreMigrationService(UmbracoDbContextFactory umbracoDbContextFactory) => _umbracoDbContextFactory = umbracoDbContextFactory;
+    public EFCoreMigrationService(UmbracoDbContextFactory umbracoDbContextFactory, ILogger<EFCoreMigrationService> logger)
+    {
+        _umbracoDbContextFactory = umbracoDbContextFactory;
+        _logger = logger;
+    }
 
     public async Task AddHistoryTable() =>
         await _umbracoDbContextFactory.ExecuteWithContextAsync<Task>(async db =>
@@ -26,7 +34,30 @@ public class EFCoreMigrationService : IEFCoreMigrationService
 
             if (historyTableExists is false)
             {
-                await db.Database.MigrateAsync();
+                try
+                {
+                    await db.Database.MigrateAsync();
+                }
+                catch (Exception exception)
+                {
+                    if (DoesContainTableExistsErrorMessage(exception) is false)
+                    {
+                        throw;
+                    }
+                }
             }
         });
+
+    private bool DoesContainTableExistsErrorMessage(Exception exception)
+    {
+        switch (exception)
+        {
+            // This message will be expected if we already have installed umbraco before
+            case SqliteException sqliteException when sqliteException.Message.Contains("""table "cmsDictionary" already exists'"""):
+            case SqlException sqlServerException when sqlServerException.Message.Contains("""table "cmsDictionary" already exists'"""):
+                return true;
+            default:
+                return false;
+        }
+    }
 }
