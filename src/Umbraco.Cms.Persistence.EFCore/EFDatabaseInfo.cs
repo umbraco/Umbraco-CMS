@@ -32,35 +32,25 @@ public class EFDatabaseInfo : DatabaseInfoBase
                 return DatabaseState.CannotConnect;
             }
 
-            var isInstalled = (await db.Database.GetAppliedMigrationsAsync()).Any() || (await db.Database.GetPendingMigrationsAsync()).Any() is false;
+            var anyPendingMigrations = (await db.Database.GetPendingMigrationsAsync()).Any();
 
-            if (!isInstalled)
+            if (anyPendingMigrations)
             {
-                return DatabaseState.NotInstalled;
-            }
+                // Check if umbracoKeyValue table exists
+                bool keyValueTableExists;
 
-            // Check if EFCore history table exist
-            bool historyTableExists;
+                if (db.Database.IsSqlite())
+                {
+                    keyValueTableExists = await db.Database.ExecuteScalarAsync<long>($"SELECT COUNT(*) FROM sqlite_master WHERE type='table' AND name='umbracoKeyValue';") > 0;
+                }
+                else
+                {
+                    keyValueTableExists = await db.Database.ExecuteScalarAsync<long>($"SELECT COUNT(*) FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = umbracoKeyValue AND TABLE_SCHEMA = (SELECT SCHEMA_NAME())") > 0;
+                }
 
-            if (db.Database.IsSqlite())
-            {
-                historyTableExists = await db.Database.ExecuteScalarAsync<long>($"SELECT COUNT(*) FROM sqlite_master WHERE type='table' AND name='__EFMigrationsHistory';") > 0;
-            }
-            else
-            {
-                historyTableExists = await db.Database.ExecuteScalarAsync<long>($"SELECT COUNT(*) FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = __EFMigrationsHistory AND TABLE_SCHEMA = (SELECT SCHEMA_NAME())") > 0;
-            }
-
-            if (historyTableExists is false)
-            {
-                return DatabaseState.NeedsUpgrade;
-            }
-
-            var needsUpgrade = (await db.Database.GetPendingMigrationsAsync()).Any();
-
-            if (needsUpgrade)
-            {
-                return DatabaseState.NeedsUpgrade;
+                return keyValueTableExists ? DatabaseState.NeedsUpgrade :
+                    // If there are pending migrations but no umbracoKeyValue table, it must mean its an empty database.
+                    DatabaseState.NotInstalled;
             }
 
             // Get package migrations already run from database, then match to pending migrations to see if we need to run any
