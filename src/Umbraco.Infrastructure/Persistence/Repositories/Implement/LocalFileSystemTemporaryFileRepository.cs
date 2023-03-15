@@ -72,14 +72,8 @@ internal sealed class LocalFileSystemTemporaryFileRepository : ITemporaryFileRep
     public async Task SaveAsync(TemporaryFileModel model)
     {
         ArgumentNullException.ThrowIfNull(nameof(model));
-        ArgumentNullException.ThrowIfNull(nameof(model));
 
-        if (model.AvailableUntil is null)
-        {
-            throw new ArgumentException($@"{nameof(model.AvailableUntil)} need to be set", nameof(model));
-        }
-
-        //Ensure folder do not exist
+        // Ensure folder does not exist
         await DeleteAsync(model.Key);
 
         DirectoryInfo rootDirectory = GetRootDirectory();
@@ -93,7 +87,7 @@ internal sealed class LocalFileSystemTemporaryFileRepository : ITemporaryFileRep
             CreateActualFile(model, fullFileName),
             CreateMetadataFile(metadataFileName, new FileMetaData()
             {
-                AvailableUntil = model.AvailableUntil.Value
+                AvailableUntil = model.AvailableUntil
             }));
     }
 
@@ -132,7 +126,6 @@ internal sealed class LocalFileSystemTemporaryFileRepository : ITemporaryFileRep
 
         return keysToDelete;
     }
-
 
     private async Task CreateMetadataFile(string fullFilePath, FileMetaData metaData)
     {
