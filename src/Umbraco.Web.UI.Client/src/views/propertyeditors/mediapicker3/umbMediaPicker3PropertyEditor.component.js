@@ -29,7 +29,7 @@
             }
         });
 
-    function MediaPicker3Controller($scope, editorService, clipboardService, localizationService, overlayService, userService, entityResource, $attrs, umbRequestHelper, $injector, uploadTracker) {
+    function MediaPicker3Controller($scope, $element, editorService, clipboardService, localizationService, overlayService, userService, entityResource, $attrs, umbRequestHelper, $injector, uploadTracker, editorState) {
 
         const mediaUploader = $injector.instantiate(Utilities.MediaUploader);
         let uploadInProgress = false;
@@ -50,6 +50,7 @@
         vm.allowAddMedia = true;
         vm.allowRemoveMedia = true;
         vm.allowEditMedia = true;
+        vm.allowDropMedia = true;
 
         vm.handleFiles = handleFiles;
 
@@ -74,11 +75,20 @@
             vm.allowAddMedia = !vm.readonly;
             vm.allowRemoveMedia = !vm.readonly;
             vm.allowEditMedia = !vm.readonly;
+            vm.allowDropMedia = !vm.readonly;
 
             vm.sortableOptions.disabled = vm.readonly;
         });
 
         vm.$onInit = function() {
+            vm.node = vm.node || editorState.getCurrent();
+
+            // If we do not have a node on the scope, then disallow drop media
+            if (!vm.node?.key) {
+              console.warn('An Umbraco.MediaPicker3 did not detect a valid content node and disabled drag & drop.', $element[0]);
+              vm.allowDropMedia = false;
+            }
+
             vm.validationLimit = vm.model.config.validationLimit || {};
             // If single-mode we only allow 1 item as the maximum:
             if(vm.model.config.multiple === false) {
