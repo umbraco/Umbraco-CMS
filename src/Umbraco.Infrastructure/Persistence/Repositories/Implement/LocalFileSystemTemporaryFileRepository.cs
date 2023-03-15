@@ -64,7 +64,7 @@ internal sealed class LocalFileSystemTemporaryFileRepository : ITemporaryFileRep
         {
             FileName = actualFile.Name,
             Key = key,
-            DataStream = actualFile.CreateReadStream(),
+            OpenReadStream = () => actualFile.CreateReadStream(),
             AvailableUntil = metaData.AvailableUntil
         };
     }
@@ -144,8 +144,9 @@ internal sealed class LocalFileSystemTemporaryFileRepository : ITemporaryFileRep
     private static async Task CreateActualFile(TemporaryFileModel model, string fullFilePath)
     {
         FileStream fileStream = File.Create(fullFilePath);
-        model.DataStream.Seek(0, SeekOrigin.Begin);
-        await model.DataStream.CopyToAsync(fileStream);
+        await using var dataStream = model.OpenReadStream();
+        dataStream.Seek(0, SeekOrigin.Begin);
+        await dataStream.CopyToAsync(fileStream);
         fileStream.Close();
     }
 

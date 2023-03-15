@@ -26,7 +26,7 @@ public class ByKeyTemporaryFileController : TemporaryFileControllerBase
     [ProducesResponseType(typeof(CreateTemporaryFileResponseModel), StatusCodes.Status200OK)]
     public async Task<IActionResult> ByKey(Guid key)
     {
-        using TemporaryFileModel? model = await _temporaryFileService.GetAsync(key);
+        TemporaryFileModel? model = await _temporaryFileService.GetAsync(key);
         if (model == null)
         {
             return NotFound();

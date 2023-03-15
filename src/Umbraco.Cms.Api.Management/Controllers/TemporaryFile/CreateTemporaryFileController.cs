@@ -5,6 +5,7 @@ using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models.TemporaryFile;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Api.Management.Controllers.TemporaryFile;
 
@@ -25,9 +26,9 @@ public class CreateTemporaryFileController : TemporaryFileControllerBase
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> Create([FromForm] CreateTemporaryFileRequestModel model)
     {
-        using TemporaryFileModel temporaryFileModel = _umbracoMapper.Map<CreateTemporaryFileRequestModel, Core.Models.TemporaryFile.TemporaryFileModel>(model)!;
+        TemporaryFileModel temporaryFileModel = _umbracoMapper.Map<CreateTemporaryFileRequestModel, TemporaryFileModel>(model)!;
 
-        Attempt<TemporaryFileModel, TemporaryFileStatus> result = await _temporaryFileService.CreateAsync(temporaryFileModel);
+        Attempt<TemporaryFileModel, TemporaryFileOperationStatus> result = await _temporaryFileService.CreateAsync(temporaryFileModel);
 
         return result.Success
             ? CreatedAtAction<ByKeyTemporaryFileController>(controller => nameof(controller.ByKey), new { key = result.Result.Key })

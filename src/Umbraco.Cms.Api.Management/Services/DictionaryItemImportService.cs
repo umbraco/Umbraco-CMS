@@ -40,7 +40,7 @@ internal sealed class DictionaryItemImportService : IDictionaryItemImportService
         using var scope = _scopeProvider.CreateScope();
         _temporaryFileService.EnlistDeleteIfScopeCompletes(fileKey, _scopeProvider);
 
-        using TemporaryFileModel? temporaryFile = await _temporaryFileService.GetAsync(fileKey);
+        TemporaryFileModel? temporaryFile = await _temporaryFileService.GetAsync(fileKey);
 
         if (temporaryFile is null)
         {
@@ -80,7 +80,8 @@ internal sealed class DictionaryItemImportService : IDictionaryItemImportService
     {
         try
         {
-            XDocument document = await XDocument.LoadAsync(temporaryFileModel.DataStream, LoadOptions.None, CancellationToken.None);
+            await using var dataStream = temporaryFileModel.OpenReadStream();
+            XDocument document = await XDocument.LoadAsync(dataStream, LoadOptions.None, CancellationToken.None);
 
             return document.Root != null
                 ? (document, DictionaryImportOperationStatus.Success)

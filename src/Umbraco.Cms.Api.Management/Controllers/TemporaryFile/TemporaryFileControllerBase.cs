@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Common.Builders;
 using Umbraco.Cms.Api.Management.Routing;
 using Umbraco.Cms.Core.Models.TemporaryFile;
+using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Api.Management.Controllers.TemporaryFile;
 
@@ -12,20 +13,20 @@ namespace Umbraco.Cms.Api.Management.Controllers.TemporaryFile;
 [ApiVersion("1.0")]
 public abstract class TemporaryFileControllerBase : ManagementApiControllerBase
 {
-    protected IActionResult TemporaryFileStatusResult(TemporaryFileStatus status) =>
-        status switch
+    protected IActionResult TemporaryFileStatusResult(TemporaryFileOperationStatus operationStatus) =>
+        operationStatus switch
         {
-            TemporaryFileStatus.FileExtensionNotAllowed => BadRequest(new ProblemDetailsBuilder()
+            TemporaryFileOperationStatus.FileExtensionNotAllowed => BadRequest(new ProblemDetailsBuilder()
                 .WithTitle("File extension not allowed")
                 .WithDetail("The file extension is not allowed.")
                 .Build()),
 
-            TemporaryFileStatus.KeyAlreadyUsed => BadRequest(new ProblemDetailsBuilder()
+            TemporaryFileOperationStatus.KeyAlreadyUsed => BadRequest(new ProblemDetailsBuilder()
                 .WithTitle("Key already used")
                 .WithDetail("The specified key is already used.")
                 .Build()),
 
-            TemporaryFileStatus.NotFound => NotFound(),
+            TemporaryFileOperationStatus.NotFound => NotFound(),
             _ => StatusCode(StatusCodes.Status500InternalServerError, "Unknown temporary file operation status")
         };
 

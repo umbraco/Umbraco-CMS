@@ -1,6 +1,6 @@
-namespace Umbraco.Cms.Core.Models.TemporaryFile;
+namespace Umbraco.Cms.Core.Services.OperationStatus;
 
-public enum TemporaryFileStatus
+public enum TemporaryFileOperationStatus
 {
     Success = 0,
     FileExtensionNotAllowed = 1,

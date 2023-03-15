@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models.TemporaryFile;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Api.Management.Controllers.TemporaryFile;
 
@@ -20,8 +21,7 @@ public class DeleteTemporaryFileController : TemporaryFileControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<IActionResult> Delete(Guid key)
     {
-        Attempt<Core.Models.TemporaryFile.TemporaryFileModel, TemporaryFileStatus> result = await _temporaryFileService.DeleteAsync(key);
-        using (result.Result)
+        Attempt<TemporaryFileModel, TemporaryFileOperationStatus> result = await _temporaryFileService.DeleteAsync(key);
 
         return result.Success
             ? Ok()
