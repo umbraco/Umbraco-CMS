@@ -44,21 +44,21 @@ public class AddGuidsToUsers : UnscopedMigrationBase
     {
         var columns = SqlSyntax.GetColumnsInSchema(Context.Database).ToList();
         AddColumnIfNotExists<UserDto>(columns, NewColumnName);
-        List<UserDto>? dtos = Database.Fetch<UserDto>();
-        if (dtos is null)
+        List<UserDto>? userDtos = Database.Fetch<UserDto>();
+        if (userDtos is null)
         {
             return;
         }
 
-        UserDto? superUser = dtos.Where(x => x.Id == -1).FirstOrDefault();
+        UserDto? superUser = userDtos.FirstOrDefault(x => x.Id == -1);
         if (superUser is not null)
         {
             superUser.Key = Constants.Security.SuperUserKey;
             Database.Update(superUser);
         }
 
-        MigrateExternalLogins(dtos);
-        MigrateTwoFactorLogins(dtos);
+        MigrateExternalLogins(userDtos);
+        MigrateTwoFactorLogins(userDtos);
     }
 
     private void MigrateSqlite()
