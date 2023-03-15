@@ -17,7 +17,7 @@ const workspaceViews: Array<ManifestWorkspaceView> = [
 		alias: 'Umb.WorkspaceView.RelationType.RelationType',
 		name: 'Relation Type Workspace RelationType View',
 		loader: () => import('./views/relation-type/relation-type-workspace-view-relation-type.element'),
-		weight: 90,
+		weight: 20,
 		meta: {
 			workspaces: ['Umb.Workspace.RelationType'],
 			label: 'RelationType',
@@ -30,7 +30,7 @@ const workspaceViews: Array<ManifestWorkspaceView> = [
 		alias: 'Umb.WorkspaceView.RelationType.Relation',
 		name: 'Relation Type Workspace Relation View',
 		loader: () => import('./views/relation/workspace-view-relation-type-relation.element'),
-		weight: 90,
+		weight: 10,
 		meta: {
 			workspaces: ['Umb.Workspace.RelationType'],
 			label: 'Relation',
