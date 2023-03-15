@@ -13,8 +13,15 @@ export class UmbWorkspaceViewDocumentTypePermissionsElement extends UmbLitElemen
 		css`
 			:host {
 				display: block;
-				margin: var(--uui-size-space-6);
-				padding: var(--uui-size-space-6);
+				margin: var(--uui-size-layout-1);
+			}
+			uui-label,
+			umb-property-editor-ui-number {
+				display: block;
+			}
+
+			uui-toggle {
+				display: flex;
 			}
 		`,
 	];
@@ -43,12 +50,44 @@ export class UmbWorkspaceViewDocumentTypePermissionsElement extends UmbLitElemen
 	}
 
 	render() {
-		return html` Permissions of ${this._documentType?.name}
-			<uui-box headline=${this._documentType?.name ?? ''}>
-				<div>
-					<umb-property-creator></umb-property-creator>
-				</div>
-			</uui-box>`;
+		return html`
+			<uui-box headline="Permissions">
+				<umb-workspace-property-layout alias="Root" label="Allow as Root">
+					<div slot="description">Allow editors to create content of this type in the root of the content tree.</div>
+					<div slot="editor"><uui-toggle label="Allow as root"></uui-toggle></div>
+				</umb-workspace-property-layout>
+				<umb-workspace-property-layout alias="ChildNodeType" label="Allowed child node types">
+					<div slot="description">
+						Allow content of the specified types to be created underneath content of this type.
+					</div>
+					<div slot="editor">
+						<umb-input-document-type-picker></umb-input-document-type-picker>
+					</div>
+				</umb-workspace-property-layout>
+				<umb-workspace-property-layout alias="VaryByNature" label="Allow vary by culture">
+					<div slot="description">Allow editors to create content of different languages.</div>
+					<div slot="editor"><uui-toggle label="Vary by culture"></uui-toggle></div>
+				</umb-workspace-property-layout>
+				<umb-workspace-property-layout alias="ElementType" label="Is an Element Type">
+					<div slot="description">
+						An Element Type is meant to be used for instance in Nested Content, and not in the tree.<br />
+						A Document Type cannot be changed to an Element Type once it has been used to create one or more content
+						items.
+					</div>
+					<div slot="editor"><uui-toggle label="Element type"></uui-toggle></div>
+				</umb-workspace-property-layout>
+				<umb-workspace-property-layout alias="HistoryCleanup" label="History cleanup">
+					<div slot="description">Allow overriding the global history cleanup settings.</div>
+					<div slot="editor">
+						<uui-toggle .checked="${true}" label="Auto cleanup"></uui-toggle>
+						<uui-label for="versions-newer-than-days">Keep all versions newer than days</uui-label>
+						<umb-property-editor-ui-number id="versions-newer-than-days"></umb-property-editor-ui-number>
+						<uui-label for="latest-version-per-day-days">Keep latest version per day for days</uui-label>
+						<umb-property-editor-ui-number id="latest-version-per-day-days"></umb-property-editor-ui-number>
+					</div>
+				</umb-workspace-property-layout>
+			</uui-box>
+		`;
 	}
 }
 

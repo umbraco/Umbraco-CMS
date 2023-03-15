@@ -29,7 +29,7 @@ const workspaceViews: Array<ManifestWorkspaceView> = [
 		type: 'workspaceView',
 		alias: 'Umb.WorkspaceView.DocumentType.ListView',
 		name: 'Document Type Workspace Permissions ListView',
-		loader: () => import('./views/permissions/workspace-view-document-type-permissions.element'),
+		loader: () => import('./views/listview/workspace-view-document-type-listview.element'),
 		weight: 100,
 		meta: {
 			workspaces: ['Umb.Workspace.DocumentType'],
@@ -55,7 +55,7 @@ const workspaceViews: Array<ManifestWorkspaceView> = [
 		type: 'workspaceView',
 		alias: 'Umb.WorkspaceView.DocumentType.Templates',
 		name: 'Document Type Workspace Permissions View',
-		loader: () => import('./views/permissions/workspace-view-document-type-permissions.element'),
+		loader: () => import('./views/templates/workspace-view-document-type-templates.element'),
 		weight: 100,
 		meta: {
 			workspaces: ['Umb.Workspace.DocumentType'],

@@ -21,6 +21,7 @@ import './input-checkbox-list/input-checkbox-list.element';
 import './input-color-picker/input-color-picker.element';
 import './input-culture-select/input-culture-select.element';
 import './input-document-picker/input-document-picker.element';
+import './input-document-type-picker/input-document-type-picker.element';
 import './input-eye-dropper/input-eye-dropper.element';
 import './input-language-picker/input-language-picker.element';
 import './input-media-picker/input-media-picker.element';
@@ -45,5 +46,8 @@ import './workspace/workspace-content/workspace-content.element';
 import './workspace/workspace-layout/workspace-layout.element';
 
 import './workspace/workspace-footer-layout/workspace-footer-layout.element';
+
+import './template-cards/template-card.element';
+import './template-cards/template-card-list.element';
 
 export const manifests = [...debugManifests];
