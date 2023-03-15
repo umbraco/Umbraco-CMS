@@ -17,7 +17,7 @@ const workspace: ManifestWorkspace = {
 	loader: () => import('./document-workspace.element'),
 	meta: {
 		entityType: 'document',
-		api: () => import('./document-workspace.context'),
+		context: () => import('./document-workspace.context'),
 	},
 };
 

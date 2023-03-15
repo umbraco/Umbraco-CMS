@@ -36,7 +36,7 @@ export class UmbWorkspaceElement extends UmbLitElement {
 	_routes: Array<IRoute> = [];
 
 	async #createRoutes(workspaceManifest: ManifestWorkspace) {
-		const workspaceContextModule = await workspaceManifest.meta.api?.();
+		const workspaceContextModule = await workspaceManifest.meta.context?.();
 		const workspaceContext = workspaceContextModule ? new workspaceContextModule.default(this) : undefined;
 		const paths = (await workspaceContext?.getPaths?.()) || [];
 

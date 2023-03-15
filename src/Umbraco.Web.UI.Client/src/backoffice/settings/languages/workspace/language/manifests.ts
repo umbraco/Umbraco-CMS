@@ -8,7 +8,7 @@ const workspace: ManifestWorkspace = {
 	loader: () => import('./language-workspace.element'),
 	meta: {
 		entityType: 'language',
-		api: () => import('./language-workspace.context'),
+		context: () => import('./language-workspace.context'),
 	},
 };
 
