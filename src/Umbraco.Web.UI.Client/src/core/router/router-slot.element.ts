@@ -1,10 +1,11 @@
-import type { IRoute } from 'router-slot/model';
+import type { IComponentRoute, IRedirectRoute, IResolverRoute, IRoute } from 'router-slot/model';
 import { RouterSlot } from 'router-slot';
 import { html, PropertyValueMap } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { UmbRouterSlotInitEvent } from './router-slot-init.event';
 import { UmbRouterSlotChangeEvent } from './router-slot-change.event';
 import { UmbRouteContext } from './route.context';
+import { UmbRoute } from './route.interface';
 import { UmbLitElement } from '@umbraco-cms/element';
 
 /**
@@ -21,11 +22,11 @@ export class UmbRouterSlotElement extends UmbLitElement {
 	#listening = false;
 
 	@property()
-	public get routes(): IRoute[] | undefined {
+	public get routes(): UmbRoute[] | undefined {
 		return (this.#router as any).routes;
 	}
-	public set routes(value: IRoute[] | undefined) {
-		(this.#router as any).routes = value;
+	public set routes(value: UmbRoute[] | undefined) {
+		this.#router.routes = (value as IRoute[]) || [];
 	}
 
 	private _routerPath?: string;

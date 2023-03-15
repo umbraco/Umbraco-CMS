@@ -1,6 +1,6 @@
 import { customElement, property } from 'lit/decorators.js';
-import { IRoute } from 'router-slot';
 import { UmbVariantId } from '../../backoffice/shared/variants/variant-id.class';
+import { UmbRoute } from './route.interface';
 import { UmbRouterSlotElement } from './router-slot.element';
 
 function variantIdsToString(variantIds: UmbVariantId[]): string {
@@ -23,11 +23,11 @@ export class UmbVariantRouterSlotElement extends UmbRouterSlotElement {
 	}
 
 	#currentPathPrefix = '';
-	private _routes?: IRoute[];
-	public get routes(): IRoute[] | undefined {
+	private _routes?: UmbRoute[];
+	public get routes(): UmbRoute[] | undefined {
 		return this._routes;
 	}
-	public set routes(value: IRoute[] | undefined) {
+	public set routes(value: UmbRoute[] | undefined) {
 		this._routes = value;
 		if (this.#variantIds.length > 0) {
 			this._updateRoutes();

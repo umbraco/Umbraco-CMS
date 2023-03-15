@@ -2,7 +2,7 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { IRoute, IRoutingInfo } from 'router-slot';
-import { UmbRouterSlotInitEvent } from '@umbraco-cms/router';
+import { UmbRoute, UmbRouterSlotInitEvent } from '@umbraco-cms/router';
 import type { UmbWorkspaceEntityElement } from '../../../shared/components/workspace/workspace-entity-element.interface';
 import { UmbVariantId } from '../../../shared/variants/variant-id.class';
 import { ActiveVariant } from '../../../shared/components/workspace/workspace-context/workspace-split-view-manager.class';
@@ -33,7 +33,7 @@ export class UmbDocumentWorkspaceElement extends UmbLitElement implements UmbWor
 	_unique?: string;
 
 	@state()
-	_routes?: Array<IRoute>;
+	_routes?: Array<UmbRoute>;
 
 	@state()
 	_availableVariants: Array<VariantViewModelBaseModel> = [];
@@ -84,14 +84,13 @@ export class UmbDocumentWorkspaceElement extends UmbLitElement implements UmbWor
 		if (!this._availableVariants || this._availableVariants.length === 0) return;
 
 		// Generate split view routes for all available routes
-		const routes: Array<IRoute> = [];
+		const routes: Array<UmbRoute> = [];
 
 		// Split view routes:
 		this._availableVariants.forEach((variantA) => {
 			this._availableVariants.forEach((variantB) => {
 				routes.push({
 					path: new UmbVariantId(variantA).toString() + '_&_' + new UmbVariantId(variantB).toString(),
-					//component: () => import('./document-workspace-split-view.element'),
 					component: this.splitViewElement,
 					setup: (component: HTMLElement | Promise<HTMLElement>, info: IRoutingInfo) => {
 						// Set split view/active info..
@@ -108,7 +107,6 @@ export class UmbDocumentWorkspaceElement extends UmbLitElement implements UmbWor
 		this._availableVariants.forEach((variant) => {
 			routes.push({
 				path: new UmbVariantId(variant).toString(),
-				//component: () => import('./document-workspace-split-view.element'),
 				component: this.splitViewElement,
 				setup: (component: HTMLElement | Promise<HTMLElement>, info: IRoutingInfo) => {
 					// cause we might come from a split-view, we need to reset index 1.
