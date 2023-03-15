@@ -17,7 +17,7 @@ namespace Umbraco.Cms.Persistence.EFCore.Migrations
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            var connectionString = ConfigurationManager.ConnectionStrings["DefaultConnection"].ConnectionString;
+            var connectionString = ConfigurationManager.AppSettings["umbracoDbDSN"];
 
             using (var context = new UmbracoEFContext())
             {
