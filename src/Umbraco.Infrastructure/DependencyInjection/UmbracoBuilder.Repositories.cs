@@ -52,6 +52,7 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.AddUnique<IServerRegistrationRepository, ServerRegistrationRepository>();
         builder.Services.AddUnique<ITagRepository, TagRepository>();
         builder.Services.AddUnique<ITemplateRepository, TemplateRepository>();
+        builder.Services.AddUnique<ITemporaryFileRepository, LocalFileSystemTemporaryFileRepository>();
         builder.Services.AddUnique<IUserGroupRepository, UserGroupRepository>();
         builder.Services.AddUnique<IUserRepository, UserRepository>();
         builder.Services.AddUnique<IConsentRepository, ConsentRepository>();
