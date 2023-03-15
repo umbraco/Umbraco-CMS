@@ -1,5 +1,7 @@
+using System.Formats.Asn1;
 using System.Globalization;
 using System.Linq.Expressions;
+using System.Security.Cryptography;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -10,6 +12,7 @@ using Umbraco.Cms.Core.Exceptions;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Membership;
+using Umbraco.Cms.Core.Models.TemporaryFile;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Persistence;
 using Umbraco.Cms.Core.Persistence.Querying;
@@ -17,8 +20,10 @@ using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services.OperationStatus;
+using Umbraco.Cms.Core.Strings;
 using Umbraco.Extensions;
 using Umbraco.New.Cms.Core.Models;
+using Umbraco.Extensions;
 using UserProfile = Umbraco.Cms.Core.Models.Membership.UserProfile;
 
 namespace Umbraco.Cms.Core.Services;
@@ -39,7 +44,10 @@ internal class UserService : RepositoryService, IUserService
     private readonly ILocalLoginSettingProvider _localLoginSettingProvider;
     private readonly IUserInviteSender _inviteSender;
     private readonly MediaFileManager _mediaFileManager;
+    private readonly ITemporaryFileService _temporaryFileService;
+    private readonly IShortStringHelper _shortStringHelper;
     private readonly IUserRepository _userRepository;
+    private readonly ContentSettings _contentSettings;
 
     public UserService(
         ICoreScopeProvider provider,
@@ -54,7 +62,10 @@ internal class UserService : RepositoryService, IUserService
         IEntityService entityService,
         ILocalLoginSettingProvider localLoginSettingProvider,
         IUserInviteSender inviteSender,
-        MediaFileManager mediaFileManager)
+        MediaFileManager mediaFileManager,
+        ITemporaryFileService temporaryFileService,
+        IShortStringHelper shortStringHelper,
+        IOptions<ContentSettings> contentSettings)
         : base(provider, loggerFactory, eventMessagesFactory)
     {
         _userRepository = userRepository;
@@ -65,8 +76,11 @@ internal class UserService : RepositoryService, IUserService
         _localLoginSettingProvider = localLoginSettingProvider;
         _inviteSender = inviteSender;
         _mediaFileManager = mediaFileManager;
+        _temporaryFileService = temporaryFileService;
+        _shortStringHelper = shortStringHelper;
         _globalSettings = globalSettings.Value;
         _securitySettings = securitySettings.Value;
+        _contentSettings = contentSettings.Value;
         _logger = loggerFactory.CreateLogger<UserService>();
     }
 
@@ -807,6 +821,43 @@ internal class UserService : RepositoryService, IUserService
         return saveStatus is UserOperationStatus.Success
             ? Attempt.SucceedWithStatus(UserOperationStatus.Success, updated)
             : Attempt.FailWithStatus(saveStatus, model.ExistingUser);
+    }
+
+    public async Task<UserOperationStatus> SetAvatarAsync(IUser user, Guid temporaryFileKey)
+    {
+        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+        TemporaryFileModel? avatarTemporaryFile = await _temporaryFileService.GetAsync(temporaryFileKey);
+        _temporaryFileService.EnlistDeleteIfScopeCompletes(temporaryFileKey, ScopeProvider);
+
+        if (avatarTemporaryFile is null)
+        {
+            return UserOperationStatus.NotFound;
+        }
+
+        const string allowedAvatarFileTypes = "jpeg,jpg,gif,bmp,png,tiff,tif,webp";
+
+        // This shouldn't really be necessary since we're just gonna use it to generate a hash, but that's how it was.
+        var avatarFileName = avatarTemporaryFile.FileName.ToSafeFileName(_shortStringHelper);
+        var extension = Path.GetExtension(avatarFileName).TrimStart('.');
+        if(allowedAvatarFileTypes.Contains(extension) is false || _contentSettings.DisallowedUploadedFileExtensions.Contains(extension))
+        {
+            return UserOperationStatus.InvalidAvatar;
+        }
+
+        // Generate a path from known data, we don't want this to be guessable
+        var avatarHash = $"{user.Key}{avatarFileName}".GenerateHash<SHA1>();
+        var avatarPath = $"UserAvatars/{avatarHash}.{extension}";
+
+        await using (Stream fileStream = avatarTemporaryFile.OpenReadStream())
+        {
+            _mediaFileManager.FileSystem.AddFile(avatarPath, fileStream, true);
+        }
+
+        user.Avatar = avatarPath;
+        await SaveAsync(user);
+
+        scope.Complete();
+        return UserOperationStatus.Success;
     }
 
     private IUser MapUserUpdate(

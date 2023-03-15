@@ -11,7 +11,7 @@ namespace Umbraco.Cms.Api.Management.Controllers.Users;
 [VersionedApiBackOfficeRoute("users")]
 [ApiExplorerSettings(GroupName = "Users")]
 [ApiVersion("1.0")]
-public class UsersControllerBase : ManagementApiControllerBase
+public abstract class UsersControllerBase : ManagementApiControllerBase
 {
     protected IActionResult UserOperationStatusResult(UserOperationStatus status) =>
         status switch
@@ -58,6 +58,10 @@ public class UsersControllerBase : ManagementApiControllerBase
             UserOperationStatus.OldPasswordRequired => BadRequest(new ProblemDetailsBuilder()
                 .WithTitle("Old password required")
                 .WithDetail("The old password is required to change the password of the specified user.")
+                .Build()),
+            UserOperationStatus.InvalidAvatar => BadRequest(new ProblemDetailsBuilder()
+                .WithTitle("Invalid avatar")
+                .WithDetail("The selected avatar is invalid")
                 .Build()),
             _ => StatusCode(StatusCodes.Status500InternalServerError, "Unknown user group operation status."),
         };

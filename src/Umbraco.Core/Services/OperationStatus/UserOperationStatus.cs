@@ -17,5 +17,6 @@ public enum UserOperationStatus
     CannotDisableSelf,
     CannotDisableInvitedUser,
     OldPasswordRequired,
+    InvalidAvatar,
     UnknownFailure,
 }
