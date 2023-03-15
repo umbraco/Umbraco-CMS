@@ -16,10 +16,9 @@ public class DomainService : RepositoryService, IDomainService
 {
     private readonly IDomainRepository _domainRepository;
     private readonly ILanguageService _languageService;
-    // private readonly IEntityService _entityService;
     private readonly IContentService _contentService;
 
-    [Obsolete("Please use the constructor that accepts ILanguageService and IEntityService. Will be removed in V15.")]
+    [Obsolete("Please use the constructor that accepts ILanguageService and IContentService. Will be removed in V15.")]
     public DomainService(
         ICoreScopeProvider provider,
         ILoggerFactory loggerFactory,
@@ -41,13 +40,11 @@ public class DomainService : RepositoryService, IDomainService
         IEventMessagesFactory eventMessagesFactory,
         IDomainRepository domainRepository,
         ILanguageService languageService,
-        // IEntityService entityService,
         IContentService contentService)
         : base(provider, loggerFactory, eventMessagesFactory)
     {
         _domainRepository = domainRepository;
         _languageService = languageService;
-        // _entityService = entityService;
         _contentService = contentService;
     }
 
@@ -63,11 +60,12 @@ public class DomainService : RepositoryService, IDomainService
     public Attempt<OperationResult?> Delete(IDomain domain)
     {
         EventMessages eventMessages = EventMessagesFactory.Get();
-        using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+        using ICoreScope scope = ScopeProvider.CreateCoreScope();
 
-        return DeleteAll(new[] { domain }, scope, eventMessages)
-            ? OperationResult.Attempt.Succeed(eventMessages)
-            : OperationResult.Attempt.Cancel(eventMessages);
+        var result = DeleteAll(new[] { domain }, scope, eventMessages);
+        scope.Complete();
+
+        return result ? OperationResult.Attempt.Succeed(eventMessages) : OperationResult.Attempt.Cancel(eventMessages);
     }
 
     public IDomain? GetByName(string name)
@@ -108,12 +106,12 @@ public class DomainService : RepositoryService, IDomainService
     public Attempt<OperationResult?> Save(IDomain domainEntity)
     {
         EventMessages eventMessages = EventMessagesFactory.Get();
+        using ICoreScope scope = ScopeProvider.CreateCoreScope();
 
-        using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+        var result = SaveAll(new[] { domainEntity }, scope, eventMessages);
+        scope.Complete();
 
-        return SaveAll(new[] { domainEntity }, scope, eventMessages)
-            ? OperationResult.Attempt.Succeed(eventMessages)
-            : OperationResult.Attempt.Cancel(eventMessages);
+        return result ? OperationResult.Attempt.Succeed(eventMessages) : OperationResult.Attempt.Cancel(eventMessages);
     }
 
     [Obsolete($"Please use {nameof(UpdateDomainsAsync)}. Will be removed in V15")]

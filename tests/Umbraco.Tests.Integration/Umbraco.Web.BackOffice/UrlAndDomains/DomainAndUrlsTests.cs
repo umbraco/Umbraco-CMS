@@ -1,9 +1,6 @@
-using System.Collections.Generic;
-using System.Linq;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using NUnit.Framework;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Models.PublishedContent;
@@ -15,7 +12,6 @@ using Umbraco.Cms.Core.Web;
 using Umbraco.Cms.Tests.Common;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
-using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Web.BackOffice.UrlAndDomains;
 
@@ -80,7 +76,7 @@ public class DomainAndUrlsTests : UmbracoIntegrationTest
     public string[] Cultures { get; set; }
 
     [Test]
-    public async Task Can_update_domains_for_all_cultures()
+    public async Task Can_Update_Domains_For_All_Cultures()
     {
         var domainService = GetRequiredService<IDomainService>();
         var updateModel = new DomainsUpdateModel
@@ -113,7 +109,7 @@ public class DomainAndUrlsTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public async Task Can_sort_domains()
+    public async Task Can_Sort_Domains()
     {
         var domainService = GetRequiredService<IDomainService>();
         var reversedCultures = Cultures.Reverse().ToArray();
@@ -147,7 +143,7 @@ public class DomainAndUrlsTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public async Task Can_remove_all_domains()
+    public async Task Can_Remove_All_Domains()
     {
         var domainService = GetRequiredService<IDomainService>();
         var updateModel = new DomainsUpdateModel
@@ -176,7 +172,7 @@ public class DomainAndUrlsTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public async Task Can_remove_single_domain()
+    public async Task Can_Remove_Single_Domain()
     {
         var domainService = GetRequiredService<IDomainService>();
         var updateModel = new DomainsUpdateModel
@@ -203,7 +199,7 @@ public class DomainAndUrlsTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public async Task Can_resolve_urls_with_domains_for_all_cultures()
+    public async Task Can_Resolve_Urls_With_Domains_For_All_Cultures()
     {
         var domainService = GetRequiredService<IDomainService>();
         var updateModel = new DomainsUpdateModel
@@ -232,7 +228,7 @@ public class DomainAndUrlsTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public async Task Can_resolve_urls_for_non_default_domain_culture_only()
+    public async Task Can_Resolve_Urls_For_Non_Default_Domain_Culture_Only()
     {
         var culture = Cultures[1];
         var domain = GetDomainUrlFromCultureCode(culture);
@@ -267,7 +263,7 @@ public class DomainAndUrlsTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public async Task Can_set_default_culture()
+    public async Task Can_Set_Default_Culture()
     {
         var domainService = GetRequiredService<IDomainService>();
         var culture = Cultures[1];
@@ -289,7 +285,7 @@ public class DomainAndUrlsTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public void Can_use_obsolete_save()
+    public void Can_Use_Obsolete_Save()
     {
         foreach (var culture in Cultures)
         {
@@ -301,7 +297,7 @@ public class DomainAndUrlsTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public void Can_use_obsolete_delete()
+    public void Can_Use_Obsolete_Delete()
     {
         foreach (var culture in Cultures)
         {
@@ -323,7 +319,7 @@ public class DomainAndUrlsTests : UmbracoIntegrationTest
     [TestCase("/domain")]
     [TestCase("/")]
     [TestCase("some.domain.com")]
-    public async Task Cannot_assign_duplicate_domains(string domainName)
+    public async Task Cannot_Assign_Duplicate_Domains(string domainName)
     {
         var domainService = GetRequiredService<IDomainService>();
         var updateModel = new DomainsUpdateModel
@@ -337,7 +333,7 @@ public class DomainAndUrlsTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public async Task Cannot_assign_already_used_domains()
+    public async Task Cannot_Assign_Already_Used_Domains()
     {
         var copy = ContentService.Copy(Root, Root.ParentId, false);
         ContentService.SaveAndPublish(copy!);
