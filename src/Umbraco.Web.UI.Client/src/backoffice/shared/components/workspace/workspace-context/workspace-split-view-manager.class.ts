@@ -21,10 +21,6 @@ export class UmbWorkspaceSplitViewManager {
 
 	constructor(host: UmbControllerHostInterface) {
 		this.#host = host;
-
-		this.activeVariantsInfo.subscribe((data) => {
-			console.log('— activeVariantsInfo 1 updated: ', data);
-		});
 	}
 
 	private _routeBase?: string;
