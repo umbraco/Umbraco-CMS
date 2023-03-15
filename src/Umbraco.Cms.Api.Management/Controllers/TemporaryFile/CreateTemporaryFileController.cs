@@ -26,12 +26,12 @@ public class CreateTemporaryFileController : TemporaryFileControllerBase
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> Create([FromForm] CreateTemporaryFileRequestModel model)
     {
-        TemporaryFileModel temporaryFileModel = _umbracoMapper.Map<CreateTemporaryFileRequestModel, TemporaryFileModel>(model)!;
+        CreateTemporaryFileModel createModel = _umbracoMapper.Map<CreateTemporaryFileRequestModel, CreateTemporaryFileModel>(model)!;
 
-        Attempt<TemporaryFileModel, TemporaryFileOperationStatus> result = await _temporaryFileService.CreateAsync(temporaryFileModel);
+        Attempt<TemporaryFileModel?, TemporaryFileOperationStatus> result = await _temporaryFileService.CreateAsync(createModel);
 
         return result.Success
-            ? CreatedAtAction<ByKeyTemporaryFileController>(controller => nameof(controller.ByKey), new { key = result.Result.Key })
+            ? CreatedAtAction<ByKeyTemporaryFileController>(controller => nameof(controller.ByKey), new { key = result.Result!.Key })
             : TemporaryFileStatusResult(result.Status);
     }
 }

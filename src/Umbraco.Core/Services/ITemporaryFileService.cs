@@ -5,9 +5,9 @@ namespace Umbraco.Cms.Core.Services;
 
 public interface ITemporaryFileService
 {
-    Task<Attempt<TemporaryFileModel, TemporaryFileOperationStatus>> CreateAsync(TemporaryFileModel temporaryFileModel);
+    Task<Attempt<TemporaryFileModel?, TemporaryFileOperationStatus>> CreateAsync(CreateTemporaryFileModel createModel);
 
-    Task<Attempt<TemporaryFileModel, TemporaryFileOperationStatus>> DeleteAsync(Guid key);
+    Task<Attempt<TemporaryFileModel?, TemporaryFileOperationStatus>> DeleteAsync(Guid key);
 
     Task<TemporaryFileModel?> GetAsync(Guid key);
 

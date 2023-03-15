@@ -1,10 +1,19 @@
 namespace Umbraco.Cms.Core.Models.TemporaryFile;
 
-public class TemporaryFileModel
+public class TemporaryFileModel : TemporaryFileModelBase
 {
-    public string FileName { get; set; } = string.Empty;
+    public required DateTime AvailableUntil { get; set; }
+}
+
+public class CreateTemporaryFileModel : TemporaryFileModelBase
+{
+}
+
+public abstract class TemporaryFileModelBase
+{
+    public required string FileName { get; set; }
+
     public Guid Key { get; set; }
-    public DateTime? AvailableUntil { get; set; }
 
     public Func<Stream> OpenReadStream { get; set; } = () => Stream.Null;
 }
