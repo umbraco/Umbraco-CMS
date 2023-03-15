@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Management.ViewModels.Users;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Services;
@@ -16,6 +17,8 @@ public class SetAvatarUsersController : UsersControllerBase
     }
 
     [HttpPatch("avatar/{userKey:guid}")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> SetAvatar(Guid userKey, SetAvatarRequestModel model)
     {
         IUser? user = await _userService.GetAsync(userKey);
