@@ -34,39 +34,7 @@ public class EFCoreMigrationService : IEFCoreMigrationService
 
             if (historyTableExists is false)
             {
-                /* If we have no history table, it is safe to assume EFCore is not installed in the database
-                   When trying to migrate we can be in 1 of 2 states:
-                   State 1: We have an empty database
-                   State 2: We have a database with all the umbraco tables
-                   If we are in State 2, the migration will try to add these tables,
-                   but it can't as the tables already exists. Therefore we have to wrap this in a try/catch to catch the
-                   "Table already exists" exception. Luckily the MigrateAsync() method will add the __EFCoreHistoryTable
-                   So this works just fine, but is just a bit hacky.
-                */
-                try
-                {
-                    await db.Database.MigrateAsync();
-                }
-                catch (Exception exception)
-                {
-                    if (DoesContainTableExistsErrorMessage(exception) is false)
-                    {
-                        throw;
-                    }
-                }
+                await db.Database.MigrateAsync();
             }
         });
-
-    private bool DoesContainTableExistsErrorMessage(Exception exception)
-    {
-        switch (exception)
-        {
-            // This message will be expected if we already have installed umbraco before
-            case SqliteException sqliteException when sqliteException.Message.Contains("""table "cmsDictionary" already exists'"""):
-            case SqlException sqlServerException when sqlServerException.Message.Contains("""table "cmsDictionary" already exists'"""):
-                return true;
-            default:
-                return false;
-        }
-    }
 }

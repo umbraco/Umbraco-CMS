@@ -2,7 +2,9 @@
 using System.Configuration;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Migrations;
+using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Persistence.EFCore.Entities;
 using Umbraco.Extensions;
 
@@ -14,17 +16,46 @@ namespace Umbraco.Cms.Persistence.EFCore.Migrations
     /// <inheritdoc />
     public partial class InitialState : Migration
     {
+        private readonly UmbracoDbContextFactory _umbracoDbContextFactory;
+
+        public InitialState()
+        {
+            /*
+               This is bad practice, but is necessary for umbracos initial Migration.
+               You cannot have DI, as migrations could also be run through CLI.
+               This is however necessary for Umbraco migrations, as Umbraco can have 2 states when first using EFCore
+               State 1: Empty database (You have just installed and we've created an empty database for you)
+               State 2: Database with tables (You are coming from a prev version with tables already in the database)
+               This is not a supported usecase in EFCore and thus we need to hack around this, by checking if we
+               already have tables in the database, and if we DO NOT have tables, we can go ahead and add those.
+               Luckily a migration will always add the __EFCoreHistoryTable magically if it doesn't exist
+               so we do not have to worry about that.
+            */
+            _umbracoDbContextFactory = StaticServiceProvider.Instance.GetRequiredService<UmbracoDbContextFactory>();
+        }
+
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            if (migrationBuilder.IsSqlServer())
+            _umbracoDbContextFactory.ExecuteWithContextAsync<Task>(async db =>
             {
-                UpSqlServer(migrationBuilder);
-            }
-            else if (migrationBuilder.IsSqlite())
-            {
-                UpSqlite(migrationBuilder);
-            }
+                if (migrationBuilder.IsSqlServer())
+                {
+                    var keyValueTableExists = await db.Database.ExecuteScalarAsync<long>($"SELECT COUNT(*) FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = umbracoKeyValue AND TABLE_SCHEMA = (SELECT SCHEMA_NAME())") > 0;
+                    if (keyValueTableExists is false)
+                    {
+                        UpSqlServer(migrationBuilder);
+                    }
+                }
+                else if (migrationBuilder.IsSqlite())
+                {
+                    var keyValueTableExists = await db.Database.ExecuteScalarAsync<long>($"SELECT COUNT(*) FROM sqlite_master WHERE type='table' AND name='umbracoKeyValue';") > 0;
+                    if (keyValueTableExists is false)
+                    {
+                        UpSqlite(migrationBuilder);
+                    }
+                }
+            });
         }
 
         /// <inheritdoc />

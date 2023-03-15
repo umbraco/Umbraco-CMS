@@ -8,6 +8,7 @@ using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Install;
 using Umbraco.Cms.Core.Install.Models;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Infrastructure.Migrations;
 using Umbraco.Cms.Infrastructure.Migrations.Install;
 using Umbraco.Cms.Infrastructure.Migrations.PostMigrations;
 using Umbraco.Cms.Infrastructure.Migrations.Upgrade;
@@ -19,12 +20,12 @@ namespace Umbraco.Cms.Infrastructure.Install.InstallSteps
     [InstallSetupStep(InstallationType.Upgrade | InstallationType.NewInstall, "DatabaseUpgrade", 12, "")]
     public class DatabaseUpgradeStep : InstallSetupStep<object>
     {
+        private readonly IEFCoreMigrationService _efCoreMigrationService;
         private readonly DatabaseBuilder _databaseBuilder;
         private readonly IRuntimeState _runtime;
         private readonly ILogger<DatabaseUpgradeStep> _logger;
         private readonly IUmbracoVersion _umbracoVersion;
         private readonly IOptionsMonitor<ConnectionStrings> _connectionStrings;
-        private readonly IDatabaseBuilder _efCoreDatabaseBuilder;
 
         public DatabaseUpgradeStep(
             DatabaseBuilder databaseBuilder,
@@ -32,7 +33,7 @@ namespace Umbraco.Cms.Infrastructure.Install.InstallSteps
             ILogger<DatabaseUpgradeStep> logger,
             IUmbracoVersion umbracoVersion,
             IOptionsMonitor<ConnectionStrings> connectionStrings)
-        : this(databaseBuilder, runtime, logger, umbracoVersion, connectionStrings, StaticServiceProvider.Instance.GetRequiredService<IDatabaseBuilder>())
+        : this(databaseBuilder, runtime, logger, umbracoVersion, connectionStrings, StaticServiceProvider.Instance.GetRequiredService<IEFCoreMigrationService>())
         {
         }
 
@@ -42,14 +43,14 @@ namespace Umbraco.Cms.Infrastructure.Install.InstallSteps
             ILogger<DatabaseUpgradeStep> logger,
             IUmbracoVersion umbracoVersion,
             IOptionsMonitor<ConnectionStrings> connectionStrings,
-            IDatabaseBuilder efCoreDatabaseBuilder)
+            IEFCoreMigrationService efCoreMigrationService)
         {
             _databaseBuilder = databaseBuilder;
             _runtime = runtime;
             _logger = logger;
             _umbracoVersion = umbracoVersion;
             _connectionStrings = connectionStrings;
-            _efCoreDatabaseBuilder = efCoreDatabaseBuilder;
+            _efCoreMigrationService = efCoreMigrationService;
         }
 
         public override async Task<InstallSetupResult?> ExecuteAsync(object model)
@@ -81,8 +82,7 @@ namespace Umbraco.Cms.Infrastructure.Install.InstallSteps
         private async Task ExecuteEFCoreUpgrade()
         {
             _logger.LogInformation("Running EFCore upgrade");
-            var plan = new UmbracoEFCorePlan();
-            await _efCoreDatabaseBuilder.UpgradeSchemaAndData(plan);
+            await _efCoreMigrationService.AddHistoryTable();
         }
 
         public override bool RequiresExecution(object model)
