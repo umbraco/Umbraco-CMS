@@ -28,7 +28,7 @@ export class UmbPropertyEditorUITextareaElement extends UmbLitElement implements
 	constructor() {
 		super();
 
-		this.consumeContext('umbPropertyContext', (instance: UmbWorkspacePropertyContext<string>) => {
+		this.consumeContext(UMB_WORKSPACE_PROPERTY_CONTEXT_TOKEN, (instance: UmbWorkspacePropertyContext<string>) => {
 			this.propertyContext = instance;
 		});
 	}

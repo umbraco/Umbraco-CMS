@@ -10,7 +10,7 @@ import { UmbLitElement } from '@umbraco-cms/element';
 /**
  *  @element umb-router-slot-element
  *  @description - Component for wrapping Router Slot element, providing some local events for implementation.
- *  @extends UmbRouterSlotElement
+ *  @extends UmbLitElement
  * @fires {UmbRouterSlotInitEvent} init - fires when the router is connected
  * @fires {UmbRouterSlotChangeEvent} change - fires when a path of this router is changed
  */
@@ -51,9 +51,13 @@ export class UmbRouterSlotElement extends UmbLitElement {
 	constructor() {
 		super();
 		this.#modalRouter.parent = this.#router;
-		this.#router.addEventListener('changestate', this._onChangeState);
+		this.#router.addEventListener('changestate', this._updateRouterPath.bind(this));
 		//this.#router.appendChild(this.#modalRouter);
 		this.#router.appendChild(document.createElement('slot'));
+	}
+
+	protected _constructAbsoluteRouterPath() {
+		return this.#router.constructAbsolutePath('') || '';
 	}
 
 	connectedCallback() {
@@ -75,13 +79,13 @@ export class UmbRouterSlotElement extends UmbLitElement {
 
 	protected firstUpdated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
 		super.firstUpdated(_changedProperties);
-		this._routerPath = this.#router.constructAbsolutePath('') || '';
+		this._routerPath = this._constructAbsoluteRouterPath();
 		this.#routeContext._internal_routerGotBasePath(this._routerPath);
 		this.dispatchEvent(new UmbRouterSlotInitEvent());
 	}
 
-	private _onChangeState = () => {
-		const newAbsolutePath = this.#router.constructAbsolutePath('') || '';
+	protected _updateRouterPath() {
+		const newAbsolutePath = this._constructAbsoluteRouterPath();
 		if (this._routerPath !== newAbsolutePath) {
 			this._routerPath = newAbsolutePath;
 			this.#routeContext._internal_routerGotBasePath(this._routerPath);
@@ -93,7 +97,7 @@ export class UmbRouterSlotElement extends UmbLitElement {
 				this.dispatchEvent(new UmbRouterSlotChangeEvent());
 			}
 		}
-	};
+	}
 
 	private _onNavigationChanged = (event?: any) => {
 		if (event.detail.slot === this.#router) {
