@@ -120,6 +120,19 @@ export class UmbInputMultiUrlPickerElement extends FormControlMixin(UmbLitElemen
 
 		// TODO: make a helper that get the context, watches one or more props to use to update the registration, can be or have something that is stateful so its easy to use the URLBuilder.
 
+		/*
+
+		new UmbPropertyEditorModalRegistration(this, UMB_LINK_PICKER_MODAL_TOKEN, (modalToken) => {
+			...FormControlMixin
+		});
+
+		*/
+		/*
+
+		Or use a property context method..?
+
+		*/
+
 		this.consumeContext(UMB_ROUTE_CONTEXT_TOKEN, (instance) => {
 			this._routeContext = instance;
 
