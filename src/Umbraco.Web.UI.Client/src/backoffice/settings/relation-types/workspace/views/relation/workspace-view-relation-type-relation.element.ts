@@ -6,8 +6,8 @@ import { UmbRelationTypeWorkspaceContext } from '../../relation-type-workspace.c
 import { UmbLitElement } from '@umbraco-cms/element';
 import { RelationTypeResponseModel } from '@umbraco-cms/backend-api';
 
-@customElement('umb-workspace-view-relation-type-info')
-export class UmbWorkspaceViewRelationTypeInfoElement extends UmbLitElement {
+@customElement('umb-workspace-view-relation-type-relation')
+export class UmbWorkspaceViewRelationTypeRelationElement extends UmbLitElement {
 	static styles = [UUITextStyles, css``];
 
 	@state()
@@ -35,21 +35,21 @@ export class UmbWorkspaceViewRelationTypeInfoElement extends UmbLitElement {
 	}
 
 	render() {
-		return html` ${this._renderGeneralInfo()}${this._renderReferences()} `;
+		return html` ${this._renderGeneralRelation()}${this._renderReferences()} `;
 	}
 
-	private _renderGeneralInfo() {
+	private _renderGeneralRelation() {
 		return html`
 			<uui-box headline="General" style="margin-bottom: 20px;">
 				<umb-workspace-property-layout label="Key">
-					<div slot="editor">${this._RelationType?.key}</div>
+					<div slot="relation-typeor">${this._RelationType?.key}</div>
 				</umb-workspace-property-layout>
-				<umb-workspace-property-layout label="Property Editor Alias">
-					<div slot="editor">${this._RelationType?.propertyEditorAlias}</div>
+				<umb-workspace-property-layout label="Property RelationTypeor Alias">
+					<div slot="relation-typeor">${this._RelationType?.propertyRelationTypeorAlias}</div>
 				</umb-workspace-property-layout>
 
-				<umb-workspace-property-layout label="Property Editor UI Alias">
-					<div slot="editor">${this._RelationType?.propertyEditorUiAlias}</div>
+				<umb-workspace-property-layout label="Property RelationTypeor UI Alias">
+					<div slot="relation-typeor">${this._RelationType?.propertyRelationTypeorUiAlias}</div>
 				</umb-workspace-property-layout>
 			</uui-box>
 		`;
@@ -60,10 +60,10 @@ export class UmbWorkspaceViewRelationTypeInfoElement extends UmbLitElement {
 	}
 }
 
-export default UmbWorkspaceViewRelationTypeInfoElement;
+export default UmbWorkspaceViewRelationTypeRelationElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-workspace-view-relation-type-info': UmbWorkspaceViewRelationTypeInfoElement;
+		'umb-workspace-view-relation-type-relation': UmbWorkspaceViewRelationTypeRelationElement;
 	}
 }

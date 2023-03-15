@@ -7,8 +7,8 @@ import { UmbRelationTypeWorkspaceContext } from '../../relation-type-workspace.c
 import { UmbLitElement } from '@umbraco-cms/element';
 import type { RelationTypeBaseModel, RelationTypeResponseModel } from '@umbraco-cms/backend-api';
 
-@customElement('umb-relation-type-workspace-view-edit')
-export class UmbRelationTypeWorkspaceViewEditElement extends UmbLitElement {
+@customElement('umb-relation-type-workspace-view-relation-type')
+export class UmbRelationTypeWorkspaceViewRelationTypeElement extends UmbLitElement {
 	static styles = [
 		UUITextStyles,
 		css`
@@ -63,7 +63,7 @@ export class UmbRelationTypeWorkspaceViewEditElement extends UmbLitElement {
 					<uui-radio-group
 						value=${ifDefined(this._relationType?.isBidirectional)}
 						@change=${this.#handleDirectionChange}
-						slot="editor">
+						slot="relation-typeor">
 						<uui-radio label="Parent to child" value="false"></uui-radio>
 						<uui-radio label="Bidirectional" value="true"></uui-radio>
 					</uui-radio-group>
@@ -72,7 +72,7 @@ export class UmbRelationTypeWorkspaceViewEditElement extends UmbLitElement {
 				<umb-workspace-property-layout label="Child"> ${this.#renderChildProperty()} </umb-workspace-property-layout>
 				<umb-workspace-property-layout label="Is dependency">
 					<uui-toggle
-						slot="editor"
+						slot="relation-typeor"
 						@change=${this.#handleIsDependencyChange}
 						.checked=${this._relationType?.isDependency ?? false}></uui-toggle>
 				</umb-workspace-property-layout>
@@ -81,22 +81,24 @@ export class UmbRelationTypeWorkspaceViewEditElement extends UmbLitElement {
 	}
 
 	#renderParentProperty() {
-		if (this._relationType?.key) return html`<div slot="editor">${this._relationType.parentObjectTypeName}</div>`;
+		if (this._relationType?.key)
+			return html`<div slot="relation-typeor">${this._relationType.parentObjectTypeName}</div>`;
 
-		return html`<uui-select slot="editor"></uui-select>`;
+		return html`<uui-select slot="relation-typeor"></uui-select>`;
 	}
 
 	#renderChildProperty() {
-		if (this._relationType?.key) return html`<div slot="editor">${this._relationType.parentObjectTypeName}</div>`;
+		if (this._relationType?.key)
+			return html`<div slot="relation-typeor">${this._relationType.parentObjectTypeName}</div>`;
 
-		return html`<uui-select slot="editor"></uui-select>`;
+		return html`<uui-select slot="relation-typeor"></uui-select>`;
 	}
 }
 
-export default UmbRelationTypeWorkspaceViewEditElement;
+export default UmbRelationTypeWorkspaceViewRelationTypeElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-relation-type-workspace-view-edit': UmbRelationTypeWorkspaceViewEditElement;
+		'umb-relation-type-workspace-view-relation-type': UmbRelationTypeWorkspaceViewRelationTypeElement;
 	}
 }
