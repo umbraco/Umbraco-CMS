@@ -4,14 +4,15 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { IRoute, IRoutingInfo } from 'router-slot';
 import { UMB_WORKSPACE_VARIANT_CONTEXT_TOKEN } from '../../../../shared/components/workspace/workspace-variant/workspace-variant.context';
 import { UmbVariantId } from '../../../../shared/variants/variant-id.class';
-import { UmbLitElement } from '@umbraco-cms/element';
 import { UmbRouterSlotChangeEvent, UmbRouterSlotInitEvent } from '@umbraco-cms/router';
+import { UmbPropertyEditorElement } from '@umbraco-cms/property-editor';
+import { UmbLitElement } from '@umbraco-cms/element';
 
 /**
  * @element umb-property-editor-ui-block-grid
  */
 @customElement('umb-property-editor-ui-block-grid')
-export class UmbPropertyEditorUIBlockGridElement extends UmbLitElement {
+export class UmbPropertyEditorUIBlockGridElement extends UmbLitElement implements UmbPropertyEditorElement {
 	static styles = [UUITextStyles];
 
 	private _variantContext?: typeof UMB_WORKSPACE_VARIANT_CONTEXT_TOKEN.TYPE;

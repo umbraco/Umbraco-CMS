@@ -9,6 +9,7 @@ import '@umbraco-ui/uui-modal-sidebar';
 import 'element-internals-polyfill';
 
 import './core/router/router-slot.element';
+import './core/notification/layouts/default';
 
 import { UUIIconRegistryEssential } from '@umbraco-ui/uui';
 import { css, html } from 'lit';
