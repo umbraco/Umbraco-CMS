@@ -2,9 +2,9 @@ import { html } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, property, state } from 'lit/decorators.js';
 import { UUIModalSidebarSize } from '@umbraco-ui/uui-modal-sidebar';
+import { UmbPropertyEditorElement } from '@umbraco-cms/property-editor';
 import { UmbInputMultiUrlPickerElement } from '../../../../shared/components/input-multi-url-picker/input-multi-url-picker.element';
 import { UmbLinkPickerLink } from '../../../../shared/modals/link-picker';
-import { UmbPropertyEditorElement } from '@umbraco-cms/property-editor';
 import { UmbLitElement } from '@umbraco-cms/element';
 import { DataTypePropertyModel } from '@umbraco-cms/backend-api';
 
@@ -53,7 +53,6 @@ export class UmbPropertyEditorUIMultiUrlPickerElement extends UmbLitElement impl
 
 	private _onChange(event: CustomEvent) {
 		this.value = (event.target as UmbInputMultiUrlPickerElement).urls;
-		console.log(this.value);
 		this.dispatchEvent(new CustomEvent('property-value-change'));
 	}
 

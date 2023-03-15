@@ -100,7 +100,6 @@ export class UmbInputMultiUrlPickerElement extends FormControlMixin(UmbLitElemen
 	}
 
 	private _urls: Array<UmbLinkPickerLink> = [];
-	//private _modalContext?: UmbModalContext;
 	private _routeContext?: UmbRouteContext;
 
 	@state()
