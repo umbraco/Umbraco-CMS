@@ -49,8 +49,6 @@ public class FilterUsersController : UsersControllerBase
         [FromQuery] SortedSet<UserState>? userStates = null,
         string filter = "")
     {
-        var userId = CurrentUserId(_backOfficeSecurityAccessor);
-
         var userFilter = new UserFilter
         {
             IncludedUserGroups = userGroups,
@@ -58,8 +56,9 @@ public class FilterUsersController : UsersControllerBase
             NameFilters = string.IsNullOrEmpty(filter) ? null : new SortedSet<string> {filter}
         };
 
+        // FIXME: use the actual currently logged in user key
         Attempt<PagedModel<IUser>, UserOperationStatus> filterAttempt =
-            await _userService.FilterAsync(userId, userFilter, skip, take, orderBy, orderDirection);
+            await _userService.FilterAsync(Constants.Security.SuperUserKey, userFilter, skip, take, orderBy, orderDirection);
 
         if (filterAttempt.Success is false)
         {

@@ -579,12 +579,12 @@ internal class UserService : RepositoryService, IUserService
     }
 
     /// <inheritdoc/>
-    public async Task<Attempt<UserCreationResult, UserOperationStatus>> CreateAsync(int performingUserId, UserCreateModel model, bool approveUser = false)
+    public async Task<Attempt<UserCreationResult, UserOperationStatus>> CreateAsync(Guid performingUserKey, UserCreateModel model, bool approveUser = false)
     {
         using ICoreScope scope = ScopeProvider.CreateCoreScope();
         using IServiceScope serviceScope = _serviceScopeFactory.CreateScope();
 
-        IUser? performingUser = GetById(performingUserId);
+        IUser? performingUser = await GetAsync(performingUserKey);
 
         if (performingUser is null)
         {
@@ -655,12 +655,12 @@ internal class UserService : RepositoryService, IUserService
         return Attempt.SucceedWithStatus(UserOperationStatus.Success, creationResult);
     }
 
-    public async Task<Attempt<UserInvitationResult, UserOperationStatus>> InviteAsync(int performingUserId, UserInviteModel model)
+    public async Task<Attempt<UserInvitationResult, UserOperationStatus>> InviteAsync(Guid performingUserKey, UserInviteModel model)
     {
         using ICoreScope scope = ScopeProvider.CreateCoreScope();
         using IServiceScope serviceScope = _serviceScopeFactory.CreateScope();
 
-        IUser? performingUser = GetById(performingUserId);
+        IUser? performingUser = await GetAsync(performingUserKey);
 
         if (performingUser is null)
         {
@@ -762,9 +762,9 @@ internal class UserService : RepositoryService, IUserService
         return UserOperationStatus.Success;
     }
 
-    public async Task<Attempt<IUser, UserOperationStatus>> UpdateAsync(int performingUserId, UserUpdateModel model)
+    public async Task<Attempt<IUser, UserOperationStatus>> UpdateAsync(Guid performingUserKey, UserUpdateModel model)
     {
-        IUser? performingUser = GetById(performingUserId);
+        IUser? performingUser = await GetAsync(performingUserKey);
 
         if (performingUser is null)
         {
@@ -874,12 +874,12 @@ internal class UserService : RepositoryService, IUserService
         return keys;
     }
 
-    public async Task<Attempt<PasswordChangedModel, UserOperationStatus>> ChangePasswordAsync(int performingUserId, ChangeBackofficeUserPasswordModel model)
+    public async Task<Attempt<PasswordChangedModel, UserOperationStatus>> ChangePasswordAsync(Guid performingUserKey, ChangeBackofficeUserPasswordModel model)
     {
         IServiceScope serviceScope = _serviceScopeFactory.CreateScope();
         using ICoreScope scope = ScopeProvider.CreateCoreScope();
 
-        IUser? performingUser = GetById(performingUserId);
+        IUser? performingUser = await GetAsync(performingUserKey);
         if (performingUser is null)
         {
             return Attempt.FailWithStatus(UserOperationStatus.MissingUser, new PasswordChangedModel());
@@ -907,15 +907,15 @@ internal class UserService : RepositoryService, IUserService
         return Attempt.SucceedWithStatus(UserOperationStatus.Success, result.Result ?? new PasswordChangedModel());
     }
 
-    public Task<Attempt<PagedModel<IUser>?, UserOperationStatus>> GetAllAsync(int requestingUserId, int skip, int take)
+    public async Task<Attempt<PagedModel<IUser>?, UserOperationStatus>> GetAllAsync(Guid requestingUserKey, int skip, int take)
     {
         using ICoreScope scope = ScopeProvider.CreateCoreScope();
 
-        IUser? requestingUser = GetById(requestingUserId);
+        IUser? requestingUser = await GetAsync(requestingUserKey);
 
         if (requestingUser is null)
         {
-            return Task.FromResult(Attempt.FailWithStatus<PagedModel<IUser>?, UserOperationStatus>(UserOperationStatus.MissingUser, null));
+            return Attempt.FailWithStatus<PagedModel<IUser>?, UserOperationStatus>(UserOperationStatus.MissingUser, null);
         }
 
         UserFilter baseFilter = CreateBaseUserFilter(requestingUser, out IQuery<IUser> query);
@@ -935,11 +935,11 @@ internal class UserService : RepositoryService, IUserService
         var pagedResult = new PagedModel<IUser> { Items = result, Total = totalRecords };
 
         scope.Complete();
-        return Task.FromResult(Attempt.SucceedWithStatus<PagedModel<IUser>?, UserOperationStatus>(UserOperationStatus.Success, pagedResult));
+        return Attempt.SucceedWithStatus<PagedModel<IUser>?, UserOperationStatus>(UserOperationStatus.Success, pagedResult);
     }
 
-    public Task<Attempt<PagedModel<IUser>, UserOperationStatus>> FilterAsync(
-        int requestingUserId,
+    public async Task<Attempt<PagedModel<IUser>, UserOperationStatus>> FilterAsync(
+        Guid requestingUserKey,
         UserFilter filter,
         int skip = 0,
         int take = 100,
@@ -948,11 +948,11 @@ internal class UserService : RepositoryService, IUserService
     {
         using ICoreScope scope = ScopeProvider.CreateCoreScope();
 
-        IUser? requestingUser = GetById(requestingUserId);
+        IUser? requestingUser = await GetAsync(requestingUserKey);
 
         if (requestingUser is null)
         {
-            return Task.FromResult(Attempt.FailWithStatus(UserOperationStatus.MissingUser, new PagedModel<IUser>()));
+            return Attempt.FailWithStatus(UserOperationStatus.MissingUser, new PagedModel<IUser>());
         }
 
         UserFilter baseFilter = CreateBaseUserFilter(requestingUser, out IQuery<IUser> baseQuery);
@@ -968,7 +968,7 @@ internal class UserService : RepositoryService, IUserService
 
             if (userGroupKeyConversionAttempt.Success is false)
             {
-                return Task.FromResult(Attempt.FailWithStatus(UserOperationStatus.MissingUserGroup, new PagedModel<IUser>()));
+                return Attempt.FailWithStatus(UserOperationStatus.MissingUserGroup, new PagedModel<IUser>());
             }
 
             excludedUserGroupAliases.UnionWith(userGroupKeyConversionAttempt.Result);
@@ -981,7 +981,7 @@ internal class UserService : RepositoryService, IUserService
 
             if (userGroupKeyConversionAttempt.Success is false)
             {
-                return Task.FromResult(Attempt.FailWithStatus(UserOperationStatus.MissingUserGroup, new PagedModel<IUser>()));
+                return Attempt.FailWithStatus(UserOperationStatus.MissingUserGroup, new PagedModel<IUser>());
             }
 
             includedUserGroupAliases = userGroupKeyConversionAttempt.Result.ToArray();
@@ -1032,7 +1032,7 @@ internal class UserService : RepositoryService, IUserService
 
         var model = new PagedModel<IUser> {Items = result, Total = totalRecords};
 
-        return Task.FromResult(Attempt.SucceedWithStatus(UserOperationStatus.Success, model));
+        return Attempt.SucceedWithStatus(UserOperationStatus.Success, model);
     }
 
     /// <summary>
@@ -1126,7 +1126,7 @@ internal class UserService : RepositoryService, IUserService
         return UserOperationStatus.Success;
     }
 
-    public async Task<UserOperationStatus> DisableAsync(int performingUserId, params Guid[] keys)
+    public async Task<UserOperationStatus> DisableAsync(Guid performingUserKey, params Guid[] keys)
     {
         if(keys.Length == 0)
         {
@@ -1134,7 +1134,7 @@ internal class UserService : RepositoryService, IUserService
         }
 
         using ICoreScope scope = ScopeProvider.CreateCoreScope();
-        IUser? performingUser = GetById(performingUserId);
+        IUser? performingUser = await GetAsync(performingUserKey);
 
         if (performingUser is null)
         {
@@ -1167,7 +1167,7 @@ internal class UserService : RepositoryService, IUserService
         return UserOperationStatus.Success;
     }
 
-    public async Task<UserOperationStatus> EnableAsync(int performingUserId, params Guid[] keys)
+    public async Task<UserOperationStatus> EnableAsync(Guid performingUserKey, params Guid[] keys)
     {
         if(keys.Length == 0)
         {
@@ -1175,7 +1175,7 @@ internal class UserService : RepositoryService, IUserService
         }
 
         using ICoreScope scope = ScopeProvider.CreateCoreScope();
-        IUser? performingUser = GetById(performingUserId);
+        IUser? performingUser = await GetAsync(performingUserKey);
 
         if (performingUser is null)
         {
@@ -1197,7 +1197,7 @@ internal class UserService : RepositoryService, IUserService
         return UserOperationStatus.Success;
     }
 
-    public async Task<Attempt<UserUnlockResult, UserOperationStatus>> UnlockAsync(int performingUserId, params Guid[] keys)
+    public async Task<Attempt<UserUnlockResult, UserOperationStatus>> UnlockAsync(Guid performingUserKey, params Guid[] keys)
     {
         if (keys.Length == 0)
         {
@@ -1205,7 +1205,7 @@ internal class UserService : RepositoryService, IUserService
         }
 
         using ICoreScope scope = ScopeProvider.CreateCoreScope();
-        IUser? performingUser = GetById(performingUserId);
+        IUser? performingUser = await GetAsync(performingUserKey);
 
         if (performingUser is null)
         {

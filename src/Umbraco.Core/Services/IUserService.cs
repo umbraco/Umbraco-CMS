@@ -51,35 +51,35 @@ public interface IUserService : IMembershipUserService
     /// <remarks>
     /// This creates both the Umbraco user and the identity user.
     /// </remarks>
-    /// <param name="performingUserId">The id of the user performing the operation.</param>
+    /// <param name="performingUserKey">The key of the user performing the operation.</param>
     /// <param name="model">Model to create the user from.</param>
     /// <param name="approveUser">Specifies if the user should be enabled be default. Defaults to false.</param>
     /// <returns>An attempt indicating if the operation was a success as well as a more detailed <see cref="UserOperationStatus"/>.</returns>
-    Task<Attempt<UserCreationResult, UserOperationStatus>> CreateAsync(int performingUserId, UserCreateModel model, bool approveUser = false);
+    Task<Attempt<UserCreationResult, UserOperationStatus>> CreateAsync(Guid performingUserKey, UserCreateModel model, bool approveUser = false);
 
-    Task<Attempt<UserInvitationResult, UserOperationStatus>> InviteAsync(int performingUserId, UserInviteModel model);
+    Task<Attempt<UserInvitationResult, UserOperationStatus>> InviteAsync(Guid performingUserKey, UserInviteModel model);
 
-    Task<Attempt<IUser, UserOperationStatus>> UpdateAsync(int performingUserId, UserUpdateModel model);
+    Task<Attempt<IUser, UserOperationStatus>> UpdateAsync(Guid performingUserKey, UserUpdateModel model);
 
     Task<UserOperationStatus> DeleteAsync(Guid key);
 
-    Task<UserOperationStatus> DisableAsync(int performingUserId, params Guid[] keys);
+    Task<UserOperationStatus> DisableAsync(Guid performingUserKey, params Guid[] keys);
 
-    Task<UserOperationStatus> EnableAsync(int performingUserId, params Guid[] keys);
+    Task<UserOperationStatus> EnableAsync(Guid performingUserKey, params Guid[] keys);
 
-    Task<Attempt<UserUnlockResult, UserOperationStatus>> UnlockAsync(int performingUserId, params Guid[] keys);
+    Task<Attempt<UserUnlockResult, UserOperationStatus>> UnlockAsync(Guid performingUserKey, params Guid[] keys);
 
-    Task<Attempt<PasswordChangedModel, UserOperationStatus>> ChangePasswordAsync(int performingUserId, ChangeBackofficeUserPasswordModel model);
+    Task<Attempt<PasswordChangedModel, UserOperationStatus>> ChangePasswordAsync(Guid performingUserKey, ChangeBackofficeUserPasswordModel model);
 
     /// <summary>
     /// Gets all users that the requesting user is allowed to see.
     /// </summary>
-    /// <param name="requestingUserId">The ID of the user requesting the users.</param>
+    /// <param name="requestingUserKey">The Key of the user requesting the users.</param>
     /// <returns></returns>
-    Task<Attempt<PagedModel<IUser>?, UserOperationStatus>> GetAllAsync(int requestingUserId, int skip, int take) => throw new NotImplementedException();
+    Task<Attempt<PagedModel<IUser>?, UserOperationStatus>> GetAllAsync(Guid requestingUserKey, int skip, int take) => throw new NotImplementedException();
 
     public Task<Attempt<PagedModel<IUser>, UserOperationStatus>> FilterAsync(
-        int requestingUserId,
+        Guid requestingUserKey,
         UserFilter filter,
         int skip = 0,
         int take = 100,

@@ -31,7 +31,8 @@ public class InviteUsersController : UsersControllerBase
     {
         UserInviteModel userInvite = await _userPresentationFactory.CreateInviteModelAsync(model);
 
-        Attempt<UserInvitationResult, UserOperationStatus> result = await _userService.InviteAsync(-1, userInvite);
+        // FIXME: use the actual currently logged in user key
+        Attempt<UserInvitationResult, UserOperationStatus> result = await _userService.InviteAsync(Constants.Security.SuperUserKey, userInvite);
 
         if (result.Success)
         {

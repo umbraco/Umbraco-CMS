@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Management.ViewModels.Users;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.OperationStatus;
 
@@ -18,7 +19,8 @@ public class EnableUsersController : UsersControllerBase
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> EnableUsers(EnableUserRequestModel model)
     {
-        UserOperationStatus result = await _userService.EnableAsync(-1, model.UserKeys.ToArray());
+        // FIXME: use the actual currently logged in user key
+        UserOperationStatus result = await _userService.EnableAsync(Constants.Security.SuperUserKey, model.UserKeys.ToArray());
 
         return result is UserOperationStatus.Success
             ? Ok()

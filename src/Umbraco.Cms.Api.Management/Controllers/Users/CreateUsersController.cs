@@ -31,7 +31,8 @@ public class CreateUsersController : UsersControllerBase
     {
         UserCreateModel createModel = await _presentationFactory.CreateCreationModelAsync(model);
 
-        Attempt<UserCreationResult, UserOperationStatus> result = await _userService.CreateAsync(-1, createModel, true);
+        // FIXME: use the actual currently logged in user key
+        Attempt<UserCreationResult, UserOperationStatus> result = await _userService.CreateAsync(Constants.Security.SuperUserKey, createModel, true);
 
         if (result.Success)
         {

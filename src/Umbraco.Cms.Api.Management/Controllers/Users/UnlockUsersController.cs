@@ -20,7 +20,8 @@ public class UnlockUsersController : UsersControllerBase
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> UnlockUsers(UnlockUsersRequestModel model)
     {
-        Attempt<UserUnlockResult, UserOperationStatus> attempt = await _userService.UnlockAsync(-1, model.UserKeys.ToArray());
+        // FIXME: use the actual currently logged in user key
+        Attempt<UserUnlockResult, UserOperationStatus> attempt = await _userService.UnlockAsync(Constants.Security.SuperUserKey, model.UserKeys.ToArray());
 
         if (attempt.Success)
         {
