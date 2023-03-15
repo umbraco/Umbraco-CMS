@@ -1,10 +1,10 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, html, nothing } from 'lit';
-import { customElement, state } from 'lit/decorators.js';
+import { customElement, property, state } from 'lit/decorators.js';
 import { map, of } from 'rxjs';
 import { UmbSectionContext, UMB_SECTION_CONTEXT_TOKEN } from '../section.context';
 import type { ManifestSectionView } from '@umbraco-cms/models';
-import { umbExtensionsRegistry } from '@umbraco-cms/extensions-api';
+import { createExtensionElement, umbExtensionsRegistry } from '@umbraco-cms/extensions-api';
 import { UmbLitElement } from '@umbraco-cms/element';
 import { UmbObserverController } from '@umbraco-cms/observable-api';
 
@@ -29,6 +29,9 @@ export class UmbSectionViewsElement extends UmbLitElement {
 		`,
 	];
 
+	@property({ type: String, attribute: 'section-alias' })
+	public sectionAlias?: string;
+
 	@state()
 	private _views: Array<ManifestSectionView> = [];
 
@@ -37,6 +40,9 @@ export class UmbSectionViewsElement extends UmbLitElement {
 
 	@state()
 	private _activeViewPathname?: string;
+
+	@state()
+	private _routes: Array<any> = [];
 
 	private _sectionContext?: UmbSectionContext;
 	private _extensionsObserver?: UmbObserverController;
@@ -57,63 +63,81 @@ export class UmbSectionViewsElement extends UmbLitElement {
 		this._routerFolder = window.location.pathname.split('/view')[0];
 	}
 
+	async #createRoutes(viewManifests: Array<ManifestSectionView>) {
+		const routes = viewManifests.map((manifest: any) => {
+			return {
+				path: manifest.meta.pathname,
+				component: () => createExtensionElement(manifest),
+			};
+		});
+
+		this._routes = [...routes, { path: '**', redirectTo: routes[0].path }];
+	}
+
 	private _observeViews() {
 		if (!this._sectionContext) return;
 
-		this.observe(this._sectionContext.alias, (sectionAlias) => {
-			this._observeExtensions(sectionAlias);
-		}, 'viewsObserver')
+		this.observe(
+			this._sectionContext.alias,
+			(sectionAlias) => {
+				this._observeExtensions(sectionAlias);
+			},
+			'viewsObserver'
+		);
 	}
 	private _observeExtensions(sectionAlias?: string) {
 		this._extensionsObserver?.destroy();
-		if(sectionAlias) {
+		if (sectionAlias) {
 			this._extensionsObserver = this.observe(
-					umbExtensionsRegistry?.extensionsOfType('sectionView').pipe(
-						map((views) =>
-							views
-								.filter((view) => view.meta.sections.includes(sectionAlias))
-								.sort((a, b) => b.meta.weight - a.meta.weight)
-						)
-					) ?? of([])
-				,
-					(views) => {
-						this._views = views;
-					}
+				umbExtensionsRegistry
+					?.extensionsOfType('sectionView')
+					.pipe(map((views) => views.filter((view) => view.meta.sections.includes(sectionAlias)))) ?? of([]),
+				(views) => {
+					this.#createRoutes(views);
+					this._views = views;
+				}
 			);
 		}
 	}
 
 	private _observeActiveView() {
-		if(this._sectionContext) {
-			this.observe(this._sectionContext?.activeViewPathname, (pathname) => {
-				this._activeViewPathname = pathname;
-			}, 'activeViewPathnameObserver');
+		if (this._sectionContext) {
+			this.observe(
+				this._sectionContext?.activeViewPathname,
+				(pathname) => {
+					this._activeViewPathname = pathname;
+				},
+				'activeViewPathnameObserver'
+			);
 		}
 	}
 
 	render() {
-		return html` ${this._views.length > 0 ? html` <div id="header">${this._renderViews()}</div> ` : nothing} `;
-	}
-
-	private _renderViews() {
 		return html`
-			${this._views?.length > 0
+			${this._views.length > 0
 				? html`
-						<uui-tab-group>
-							${this._views.map(
-								(view: ManifestSectionView) => html`
-									<uui-tab
-										.label="${view.meta.label || view.name}"
-										href="${this._routerFolder}/view/${view.meta.pathname}"
-										?active="${this._activeViewPathname?.includes(view.meta.pathname)}">
-										<uui-icon slot="icon" name=${view.meta.icon}></uui-icon>
-										${view.meta.label || view.name}
-									</uui-tab>
-								`
-							)}
-						</uui-tab-group>
+						<div id="header">${this.#renderTabs()}</div>
+						<umb-router-slot .routes=${this._routes}></umb-router-slot>
 				  `
 				: nothing}
+		`;
+	}
+
+	#renderTabs() {
+		return html`
+			<uui-tab-group>
+				${this._views.map(
+					(view: ManifestSectionView) => html`
+						<uui-tab
+							.label="${view.meta.label || view.name}"
+							href="${this._routerFolder}/view/${view.meta.pathname}"
+							?active="${this._activeViewPathname?.includes(view.meta.pathname)}">
+							<uui-icon slot="icon" name=${view.meta.icon}></uui-icon>
+							${view.meta.label || view.name}
+						</uui-tab>
+					`
+				)}
+			</uui-tab-group>
 		`;
 	}
 }

@@ -1,18 +1,17 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html, nothing } from 'lit';
-import { customElement, state } from 'lit/decorators.js';
+import { customElement, property, state } from 'lit/decorators.js';
 import { map } from 'rxjs';
 
 import type { IRoutingInfo } from '@umbraco-cms/router';
-import UmbWorkspaceElement from '../workspace/workspace.element';
+import type { UmbWorkspaceElement } from '../workspace/workspace.element';
 import { UmbSectionContext, UMB_SECTION_CONTEXT_TOKEN } from './section.context';
-import type { ManifestSectionView, ManifestMenuSectionSidebarApp } from '@umbraco-cms/models';
+import type { UmbSectionViewsElement } from './section-views/section-views.element';
+import type { ManifestSectionView, ManifestMenuSectionSidebarApp, ManifestSection } from '@umbraco-cms/models';
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-api';
 import { UmbLitElement } from '@umbraco-cms/element';
 
 import './section-sidebar-menu/section-sidebar-menu.element';
-import './section-views/section-views.element';
-import '../../../settings/languages/app-language-select/app-language-select.element';
 
 @customElement('umb-section')
 export class UmbSectionElement extends UmbLitElement {
@@ -35,6 +34,9 @@ export class UmbSectionElement extends UmbLitElement {
 			}
 		`,
 	];
+
+	@property()
+	public manifest?: ManifestSection;
 
 	@state()
 	private _routes?: Array<any>;
@@ -70,7 +72,10 @@ export class UmbSectionElement extends UmbLitElement {
 			},
 			{
 				path: 'view',
-				component: () => import('../section/section-views/section-view.element'),
+				component: () => import('../section/section-views/section-views.element'),
+				setup: (element: UmbSectionViewsElement) => {
+					element.sectionAlias = this.manifest?.alias;
+				},
 			},
 			{
 				path: 'workspace/:entityType',
@@ -139,7 +144,6 @@ export class UmbSectionElement extends UmbLitElement {
 				  `
 				: nothing}
 			<umb-section-main>
-				${this._views && this._views.length > 0 ? html`<umb-section-views></umb-section-views>` : nothing}
 				${this._routes && this._routes.length > 0
 					? html`<umb-router-slot id="router-slot" .routes="${this._routes}"></umb-router-slot>`
 					: nothing}
