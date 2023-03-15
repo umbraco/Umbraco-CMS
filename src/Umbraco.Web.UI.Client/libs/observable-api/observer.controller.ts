@@ -22,8 +22,4 @@ export class UmbObserverController<T = unknown> extends UmbObserver<T> implement
 
 		host.addController(this);
 	}
-
-	hostConnected() {
-		return;
-	}
 }
