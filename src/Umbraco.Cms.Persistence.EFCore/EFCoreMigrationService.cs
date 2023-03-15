@@ -16,13 +16,12 @@ public class EFCoreMigrationService : IEFCoreMigrationService
             bool historyTableExists;
             if (db.Database.IsSqlite())
             {
-                historyTableExists = await db.Database.ExecuteScalarAsync<long>(
-                    $"SELECT COUNT(*) FROM sqlite_master WHERE type='table' AND name='dbo.__EFMigrationsHistory';") > 0;
+                historyTableExists = await db.Database.ExecuteScalarAsync<long>($"SELECT COUNT(*) FROM sqlite_master WHERE type='table' AND name='__EFMigrationsHistory';") > 0;
             }
             else
             {
                 historyTableExists = await db.Database.ExecuteScalarAsync<long>(
-                        $"SELECT COUNT(*) FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = dbo.__EFMigrationsHistory AND TABLE_SCHEMA = (SELECT SCHEMA_NAME())") > 0;
+                        $"SELECT COUNT(*) FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = __EFMigrationsHistory AND TABLE_SCHEMA = (SELECT SCHEMA_NAME())") > 0;
             }
 
             if (historyTableExists is false)

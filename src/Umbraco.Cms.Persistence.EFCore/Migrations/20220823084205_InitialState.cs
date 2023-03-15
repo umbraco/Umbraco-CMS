@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Configuration;
 using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
@@ -11,10 +12,12 @@ namespace Umbraco.Cms.Persistence.EFCore.Migrations
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
+            var connectionStrings = ConfigurationManager.ConnectionStrings;
             if (migrationBuilder.IsSqlServer())
             {
                 UpSqlServer(migrationBuilder);
-            } else if (migrationBuilder.IsSqlite())
+            }
+            else if (migrationBuilder.IsSqlite())
             {
                 UpSqlite(migrationBuilder);
             }
