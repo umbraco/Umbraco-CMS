@@ -1,9 +1,9 @@
 import { Meta, Story } from '@storybook/web-components';
 import { html } from 'lit-html';
 
+import type { UmbIconPickerModalElement } from '../../../../shared/modals/icon-picker/icon-picker-modal.element';
 import type { UmbPropertyEditorUIIconPickerElement } from './property-editor-ui-icon-picker.element';
 import './property-editor-ui-icon-picker.element';
-import type { UmbIconPickerModalElement } from 'src/backoffice/shared/modals/icon-picker/icon-picker-modal.element';
 
 export default {
 	title: 'Property Editor UIs/Icon Picker',
