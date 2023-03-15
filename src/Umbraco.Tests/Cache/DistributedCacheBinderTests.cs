@@ -1,12 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core.Composing;
-using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Events;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Membership;
@@ -21,7 +19,6 @@ using Umbraco.Web.Cache;
 using Umbraco.Web.PropertyEditors;
 using Umbraco.Web.PublishedCache;
 using Umbraco.Web.Routing;
-using DataType = Umbraco.Core.Models.DataType;
 
 namespace Umbraco.Tests.Cache
 {
