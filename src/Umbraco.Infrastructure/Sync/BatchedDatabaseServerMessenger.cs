@@ -19,6 +19,49 @@ public class BatchedDatabaseServerMessenger : DatabaseServerMessenger
     private readonly IRequestAccessor _requestAccessor;
     private readonly IRequestCache _requestCache;
 
+
+
+    [Obsolete("Use non-obsolete ctor. This will be removed in Umbraco 13.")]
+    public BatchedDatabaseServerMessenger(
+        IMainDom mainDom,
+        CacheRefresherCollection cacheRefreshers,
+        IServerRoleAccessor serverRoleAccessor,
+        ILogger<BatchedDatabaseServerMessenger> logger,
+        ISyncBootStateAccessor syncBootStateAccessor,
+        IHostingEnvironment hostingEnvironment,
+        ICacheInstructionService cacheInstructionService,
+        IJsonSerializer jsonSerializer,
+        IRequestCache requestCache,
+        IRequestAccessor requestAccessor,
+        LastSyncedFileManager lastSyncedFileManager,
+        IOptionsMonitor<GlobalSettings> globalSettings)
+        : this(mainDom, cacheRefreshers, serverRoleAccessor, logger, syncBootStateAccessor, hostingEnvironment,
+            cacheInstructionService, jsonSerializer, requestCache, requestAccessor, (ILastSyncedManager)lastSyncedFileManager, globalSettings)
+    {
+
+    }
+
+    [Obsolete("Use non-obsolete ctor. This will be removed in Umbraco 13.")]
+    public BatchedDatabaseServerMessenger(
+        IMainDom mainDom,
+        CacheRefresherCollection cacheRefreshers,
+        IServerRoleAccessor serverRoleAccessor,
+        ILogger<BatchedDatabaseServerMessenger> logger,
+        ISyncBootStateAccessor syncBootStateAccessor,
+        IHostingEnvironment hostingEnvironment,
+        ICacheInstructionService cacheInstructionService,
+        IJsonSerializer jsonSerializer,
+        IRequestCache requestCache,
+        IRequestAccessor requestAccessor,
+        LastSyncedFileManager lastSyncedFileManager,
+        IOptionsMonitor<GlobalSettings> globalSettings,
+        ILastSyncedManager lastSyncedManager)
+        : this(mainDom, cacheRefreshers, serverRoleAccessor, logger, syncBootStateAccessor, hostingEnvironment,
+            cacheInstructionService, jsonSerializer, requestCache, requestAccessor, lastSyncedManager, globalSettings)
+    {
+
+    }
+
     /// <summary>
     ///     Initializes a new instance of the <see cref="BatchedDatabaseServerMessenger" /> class.
     /// </summary>
@@ -33,14 +76,16 @@ public class BatchedDatabaseServerMessenger : DatabaseServerMessenger
         IJsonSerializer jsonSerializer,
         IRequestCache requestCache,
         IRequestAccessor requestAccessor,
-        LastSyncedFileManager lastSyncedFileManager,
+        ILastSyncedManager lastSyncedManager,
         IOptionsMonitor<GlobalSettings> globalSettings)
         : base(mainDom, cacheRefreshers, serverRoleAccessor, logger, true, syncBootStateAccessor, hostingEnvironment,
-            cacheInstructionService, jsonSerializer, lastSyncedFileManager, globalSettings)
+            cacheInstructionService, jsonSerializer, lastSyncedManager, globalSettings)
     {
         _requestCache = requestCache;
         _requestAccessor = requestAccessor;
     }
+
+
 
     /// <inheritdoc />
     public override void SendMessages()

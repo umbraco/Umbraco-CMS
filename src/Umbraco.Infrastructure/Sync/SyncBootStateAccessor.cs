@@ -9,7 +9,7 @@ namespace Umbraco.Cms.Infrastructure.Sync;
 public class SyncBootStateAccessor : ISyncBootStateAccessor
 {
     private readonly ICacheInstructionService _cacheInstructionService;
-    private readonly LastSyncedFileManager _lastSyncedFileManager;
+    private readonly ILastSyncedManager _lastSyncedManager;
     private readonly ILogger<SyncBootStateAccessor> _logger;
     private GlobalSettings _globalSettings;
 
@@ -17,14 +17,37 @@ public class SyncBootStateAccessor : ISyncBootStateAccessor
     private object? _syncBootStateLock;
     private bool _syncBootStateReady;
 
+    [Obsolete("Use non-obsolete ctor. This will be removed in Umbraco 13.")]
     public SyncBootStateAccessor(
         ILogger<SyncBootStateAccessor> logger,
         LastSyncedFileManager lastSyncedFileManager,
         IOptionsMonitor<GlobalSettings> globalSettings,
         ICacheInstructionService cacheInstructionService)
+        : this(logger, (ILastSyncedManager)lastSyncedFileManager, globalSettings, cacheInstructionService)
+    {
+
+    }
+
+    [Obsolete("Use non-obsolete ctor. This will be removed in Umbraco 13.")]
+    public SyncBootStateAccessor(
+        ILogger<SyncBootStateAccessor> logger,
+        LastSyncedFileManager lastSyncedFileManager,
+        IOptionsMonitor<GlobalSettings> globalSettings,
+        ICacheInstructionService cacheInstructionService,
+        ILastSyncedManager lastSyncedManager)
+        : this(logger, lastSyncedManager, globalSettings, cacheInstructionService)
+    {
+
+    }
+
+    public SyncBootStateAccessor(
+        ILogger<SyncBootStateAccessor> logger,
+        ILastSyncedManager lastSyncedManager,
+        IOptionsMonitor<GlobalSettings> globalSettings,
+        ICacheInstructionService cacheInstructionService)
     {
         _logger = logger;
-        _lastSyncedFileManager = lastSyncedFileManager;
+        _lastSyncedManager = lastSyncedManager;
         _globalSettings = globalSettings.CurrentValue;
         _cacheInstructionService = cacheInstructionService;
 
@@ -36,7 +59,7 @@ public class SyncBootStateAccessor : ISyncBootStateAccessor
             ref _syncBootState,
             ref _syncBootStateReady,
             ref _syncBootStateLock,
-            () => InitializeColdBootState(_lastSyncedFileManager.LastSyncedId));
+            () => InitializeColdBootState(_lastSyncedManager.LastSyncedId));
 
     private SyncBootState InitializeColdBootState(int lastId)
     {
