@@ -496,13 +496,23 @@ public class ContentControllerTests : UmbracoTestServerTestBase
             .Build();
 
         var enLanguage = await languageService.GetAsync(UsIso);
-        var domainService = GetRequiredService<IDomainService>();
-        var enDomain = new UmbracoDomain("/en") {RootContentId = content.Id, LanguageId = enLanguage.Id};
-        domainService.Save(enDomain);
-
         var dkLanguage = await languageService.GetAsync(DkIso);
-        var dkDomain = new UmbracoDomain("/dk") {RootContentId = childContent.Id, LanguageId = dkLanguage.Id};
-        domainService.Save(dkDomain);
+
+        var domainService = GetRequiredService<IDomainService>();
+
+        await domainService.UpdateDomainsAsync(
+            content.Key,
+            new DomainsUpdateModel
+            {
+                Domains = new[] { new DomainModel { DomainName = "/en", IsoCode = enLanguage.IsoCode } }
+            });
+
+        await domainService.UpdateDomainsAsync(
+            childContent.Key,
+            new DomainsUpdateModel
+            {
+                Domains = new[] { new DomainModel { DomainName = "/dk", IsoCode = dkLanguage.IsoCode } }
+            });
 
         var url = PrepareApiControllerUrl<ContentController>(x => x.PostSave(null));
 
@@ -559,8 +569,13 @@ public class ContentControllerTests : UmbracoTestServerTestBase
 
         var dkLanguage = await languageService.GetAsync(DkIso);
         var domainService = GetRequiredService<IDomainService>();
-        var dkDomain = new UmbracoDomain("/") {RootContentId = content.Id, LanguageId = dkLanguage.Id};
-        domainService.Save(dkDomain);
+
+        await domainService.UpdateDomainsAsync(
+            content.Key,
+            new DomainsUpdateModel
+            {
+                Domains = new[] { new DomainModel { DomainName = "/", IsoCode = dkLanguage.IsoCode } }
+            });
 
         var url = PrepareApiControllerUrl<ContentController>(x => x.PostSave(null));
 
@@ -631,12 +646,20 @@ public class ContentControllerTests : UmbracoTestServerTestBase
         var dkLanguage = await languageService.GetAsync(DkIso);
         var usLanguage = await languageService.GetAsync(UsIso);
         var domainService = GetRequiredService<IDomainService>();
-        var dkDomain = new UmbracoDomain("/") {RootContentId = rootNode.Id, LanguageId = dkLanguage.Id};
 
-        var usDomain = new UmbracoDomain("/en") {RootContentId = childNode.Id, LanguageId = usLanguage.Id};
+        await domainService.UpdateDomainsAsync(
+            rootNode.Key,
+            new DomainsUpdateModel
+            {
+                Domains = new[] { new DomainModel { DomainName = "/", IsoCode = dkLanguage.IsoCode } }
+            });
 
-        domainService.Save(dkDomain);
-        domainService.Save(usDomain);
+        await domainService.UpdateDomainsAsync(
+            childNode.Key,
+            new DomainsUpdateModel
+            {
+                Domains = new[] { new DomainModel { DomainName = "/en", IsoCode = usLanguage.IsoCode } }
+            });
 
         var url = PrepareApiControllerUrl<ContentController>(x => x.PostSave(null));
 
