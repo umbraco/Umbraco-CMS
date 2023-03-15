@@ -32,7 +32,7 @@ public class EFDatabaseInfo : DatabaseInfoBase
                 return DatabaseState.CannotConnect;
             }
 
-            var isInstalled = (await db.Database.GetAppliedMigrationsAsync()).Any() || db.UmbracoUsers.Any();
+            var isInstalled = (await db.Database.GetAppliedMigrationsAsync()).Any() || (await db.Database.GetPendingMigrationsAsync()).Any() is false;
 
             if (!isInstalled)
             {
@@ -44,11 +44,11 @@ public class EFDatabaseInfo : DatabaseInfoBase
 
             if (db.Database.IsSqlite())
             {
-                historyTableExists = await db.Database.ExecuteScalarAsync<long>($"SELECT COUNT(*) FROM sqlite_master WHERE type='table' AND name='dbo.__EFMigrationsHistory';") > 0;
+                historyTableExists = await db.Database.ExecuteScalarAsync<long>($"SELECT COUNT(*) FROM sqlite_master WHERE type='table' AND name='__EFMigrationsHistory';") > 0;
             }
             else
             {
-                historyTableExists = await db.Database.ExecuteScalarAsync<long>($"SELECT COUNT(*) FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = dbo.__EFMigrationsHistory AND TABLE_SCHEMA = (SELECT SCHEMA_NAME())") > 0;
+                historyTableExists = await db.Database.ExecuteScalarAsync<long>($"SELECT COUNT(*) FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = __EFMigrationsHistory AND TABLE_SCHEMA = (SELECT SCHEMA_NAME())") > 0;
             }
 
             if (historyTableExists is false)
