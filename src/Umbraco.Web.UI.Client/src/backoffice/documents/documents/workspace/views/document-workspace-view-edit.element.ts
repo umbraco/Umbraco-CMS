@@ -68,7 +68,6 @@ export class UmbDocumentWorkspaceViewEditElement extends UmbLitElement {
 		this.observe(
 			this._workspaceContext.rootPropertyStructures(),
 			(rootPropertyStructure) => {
-				console.log('rootPropertyStructure', rootPropertyStructure);
 				this._hasRootProperties = rootPropertyStructure.length > 0;
 				this._createRoutes();
 			},

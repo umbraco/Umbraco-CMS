@@ -8,9 +8,9 @@ const EmptyDiv = document.createElement('div');
 // TODO: Consider accepting the Token as a generic:
 export type UmbModalRouteOptions<UmbModalTokenData extends object = object, UmbModalTokenResult = unknown> = {
 	path: string;
-	onSetup: (routingInfo: IRoutingInfo) => UmbModalTokenData | false;
-	onSubmit: (data: UmbModalTokenResult) => void | PromiseLike<void>;
-	onReject: () => void;
+	onSetup?: (routingInfo: IRoutingInfo) => UmbModalTokenData | false;
+	onSubmit?: (data: UmbModalTokenResult) => void | PromiseLike<void>;
+	onReject?: () => void;
 	onUrlBuilder?: (urlBuilder: UmbModalRouteBuilder) => void;
 };
 
@@ -51,9 +51,9 @@ export class UmbRouteContext {
 			alias: alias,
 			options: options,
 			routeSetup: (component: HTMLElement, info: IRoutingInfo<any, any>) => {
-				const modalData = options.onSetup(info);
-				if (modalData && this.#modalContext) {
-					const modalHandler = this.#modalContext.open(alias, modalData);
+				const modalData = options.onSetup?.(info);
+				if (modalData !== false && this.#modalContext) {
+					const modalHandler = this.#modalContext.open(alias, modalData || {});
 					modalHandler.onSubmit().then(
 						() => this.#removeModalPath(info),
 						() => this.#removeModalPath(info)

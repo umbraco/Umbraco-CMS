@@ -131,7 +131,6 @@ export class UmbInputMultiUrlPickerElement extends FormControlMixin(UmbLitElemen
 			this._routeContext.registerModal(UMB_LINK_PICKER_MODAL_TOKEN, {
 				path: `${'this.alias'}/:index`,
 				onSetup: (routingInfo) => {
-					console.log('call onSetup');
 					// TODO: Make onSetup optional.
 					// TODO: Maybe use UmbRouteLocation?
 					// Get index from routeInfo:
@@ -141,16 +140,12 @@ export class UmbInputMultiUrlPickerElement extends FormControlMixin(UmbLitElemen
 					if (Number.isNaN(index)) return false;
 
 					// Use the index to find data:
-					console.log('onSetup modal index:', index);
-
 					let data: UmbLinkPickerLink | null = null;
 					if (index >= 0 && index < this.urls.length) {
 						data = this._getItemByIndex(index);
 					} else {
 						index = null;
 					}
-
-					console.log('onSetup modal got data:', data);
 
 					return {
 						index: index,
@@ -172,15 +167,10 @@ export class UmbInputMultiUrlPickerElement extends FormControlMixin(UmbLitElemen
 					};
 				},
 				onSubmit: (submitData) => {
-					console.log('On submit in property editor input');
 					if (!submitData) return;
 					this._setSelection(submitData.link, submitData.index);
 				},
-				onReject: () => {
-					console.log('User cancelled dialog.');
-				},
 				onUrlBuilder: (urlBuilder) => {
-					console.log('got onUrlBuilder');
 					this._linkPickerURL = urlBuilder;
 				},
 			});
@@ -211,51 +201,27 @@ export class UmbInputMultiUrlPickerElement extends FormControlMixin(UmbLitElemen
 		this.dispatchEvent(new CustomEvent('change', { composed: true, bubbles: true }));
 	}
 
-	private _openPicker(data?: UmbLinkPickerLink, index?: number) {
-		console.log('JS open picker, should fail for now,');
-		/*
-		const modalHandler = this._modalContext?.open(UMB_LINK_PICKER_MODAL_TOKEN, {
-			link: {
-				name: data?.name,
-				published: data?.published,
-				queryString: data?.queryString,
-				target: data?.target,
-				trashed: data?.trashed,
-				udi: data?.udi,
-				url: data?.url,
-			},
-			config: {
-				hideAnchor: this.hideAnchor,
-				ignoreUserStartNodes: this.ignoreUserStartNodes,
-				overlaySize: this.overlaySize || 'small',
-			},
-		});
-		modalHandler?.onSubmit().then((newUrl: UmbLinkPickerLink) => {
-			if (!newUrl) return;
-
-			this._setSelection(newUrl, index);
-		});
-		*/
+	// TODO: We should get a href property on uui-ref-node, and not use this method:
+	private _temporary_onClick_editItem(index: number) {
+		window.history.pushState({}, '', this._linkPickerURL?.({ index: index || -1 }));
 	}
 
 	render() {
 		return html`${this.urls?.map((link, index) => this._renderItem(link, index))}
 			<uui-button look="placeholder" label="Add" .href=${this._linkPickerURL?.({ index: -1 })}>Add</uui-button>`;
-		// "modal/Umb.Modal.LinkPicker/${'to-do-myPropertyAlias'}/-1"
 	}
 
 	private _renderItem(link: UmbLinkPickerLink, index: number) {
 		return html`<uui-ref-node
 			.name="${link.name || ''}"
 			.detail="${(link.url || '') + (link.queryString || '')}"
-			@open="${() => this._openPicker(link, index)}">
+			@open="${() => this._temporary_onClick_editItem(index)}">
 			<uui-icon slot="icon" name="${link.icon || 'umb:link'}"></uui-icon>
 			<uui-action-bar slot="actions">
 				<uui-button .href=${this._linkPickerURL?.({ index })} label="Edit link">Edit</uui-button>
 				<uui-button @click="${() => this._removeItem(index)}" label="Remove link">Remove</uui-button>
 			</uui-action-bar>
 		</uui-ref-node>`;
-		// "modal/Umb.Modal.LinkPicker/${'to-do-myPropertyAlias'}/${index}"
 	}
 }
 
