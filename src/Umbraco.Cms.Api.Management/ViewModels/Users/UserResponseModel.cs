@@ -2,7 +2,7 @@
 
 namespace Umbraco.Cms.Api.Management.ViewModels.Users;
 
-public class UserResponseModel : UserPresentationBase, INamedEntityViewModel
+public class UserResponseModel : UserPresentationBase, INamedEntityPresentationModel
 {
     public Guid Key { get; set; }
 
