@@ -8,6 +8,7 @@ using Umbraco.Cms.Core.Notifications;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Cache;
+
 public class DistributedCacheBinder :
     INotificationHandler<DictionaryItemDeletedNotification>,
     INotificationHandler<DictionaryItemSavedNotification>,
@@ -42,43 +43,31 @@ public class DistributedCacheBinder :
     private readonly DistributedCache _distributedCache;
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="DistributedCacheBinder"/> class.
+    /// Initializes a new instance of the <see cref="DistributedCacheBinder" /> class.
     /// </summary>
+    /// <param name="distributedCache">The distributed cache.</param>
     public DistributedCacheBinder(DistributedCache distributedCache)
-    {
-        _distributedCache = distributedCache;
-    }
+        => _distributedCache = distributedCache;
 
     #region PublicAccessService
 
     public void Handle(PublicAccessEntrySavedNotification notification)
-    {
-        _distributedCache.RefreshPublicAccess();
-    }
+        => _distributedCache.RefreshPublicAccess();
 
-    public void Handle(PublicAccessEntryDeletedNotification notification) => _distributedCache.RefreshPublicAccess();
+    public void Handle(PublicAccessEntryDeletedNotification notification)
+        => _distributedCache.RefreshPublicAccess();
 
     #endregion
 
     #region ContentService
 
     public void Handle(ContentTreeChangeNotification notification)
-    {
-        _distributedCache.RefreshContentCache(notification.Changes.ToArray());
-    }
+        => _distributedCache.RefreshContentCache(notification.Changes);
 
-    // private void ContentService_SavedBlueprint(IContentService sender, SaveEventArgs<IContent> e)
-    // {
-    //    _distributedCache.RefreshUnpublishedPageCache(e.SavedEntities.ToArray());
-    // }
-
-    // private void ContentService_DeletedBlueprint(IContentService sender, DeleteEventArgs<IContent> e)
-    // {
-    //    _distributedCache.RemoveUnpublishedPageCache(e.DeletedEntities.ToArray());
-    // }
     #endregion
 
-    #region LocalizationService / Dictionary
+    #region LocalizationService
+
     public void Handle(DictionaryItemSavedNotification notification)
     {
         foreach (IDictionaryItem entity in notification.SavedEntities)
@@ -101,21 +90,13 @@ public class DistributedCacheBinder :
 
     public void Handle(DataTypeSavedNotification notification)
     {
-        foreach (IDataType entity in notification.SavedEntities)
-        {
-            _distributedCache.RefreshDataTypeCache(entity);
-        }
-
+        _distributedCache.RefreshDataTypeCache(notification.SavedEntities);
         _distributedCache.RefreshValueEditorCache(notification.SavedEntities);
     }
 
     public void Handle(DataTypeDeletedNotification notification)
     {
-        foreach (IDataType entity in notification.DeletedEntities)
-        {
-            _distributedCache.RemoveDataTypeCache(entity);
-        }
-
+        _distributedCache.RemoveDataTypeCache(notification.DeletedEntities);
         _distributedCache.RefreshValueEditorCache(notification.DeletedEntities);
     }
 
@@ -124,61 +105,33 @@ public class DistributedCacheBinder :
     #region DomainService
 
     public void Handle(DomainSavedNotification notification)
-    {
-        foreach (IDomain entity in notification.SavedEntities)
-        {
-            _distributedCache.RefreshDomainCache(entity);
-        }
-    }
+        => _distributedCache.RefreshDomainCache(notification.SavedEntities);
 
     public void Handle(DomainDeletedNotification notification)
-    {
-        foreach (IDomain entity in notification.DeletedEntities)
-        {
-            _distributedCache.RemoveDomainCache(entity);
-        }
-    }
+        => _distributedCache.RemoveDomainCache(notification.DeletedEntities);
 
     #endregion
 
     #region LocalizationService / Language
 
-    /// <summary>
-    /// Fires when a language is deleted
-    /// </summary>
-    /// <param name="notification"></param>
     public void Handle(LanguageDeletedNotification notification)
-    {
-        foreach (ILanguage entity in notification.DeletedEntities)
-        {
-            _distributedCache.RemoveLanguageCache(entity);
-        }
-    }
+        => _distributedCache.RemoveLanguageCache(notification.DeletedEntities);
 
-    /// <summary>
-    /// Fires when a language is saved
-    /// </summary>
-    /// <param name="notification"></param>
     public void Handle(LanguageSavedNotification notification)
-    {
-        foreach (ILanguage entity in notification.SavedEntities)
-        {
-            _distributedCache.RefreshLanguageCache(entity);
-        }
-    }
+        => _distributedCache.RefreshLanguageCache(notification.SavedEntities);
 
     #endregion
 
-    #region Content|Media|MemberTypeService
+    #region ContentTypeService, MediaTypeService, MemberTypeService
 
-    public void Handle(ContentTypeChangedNotification notification) =>
-        _distributedCache.RefreshContentTypeCache(notification.Changes.ToArray());
+    public void Handle(ContentTypeChangedNotification notification)
+        => _distributedCache.RefreshContentTypeCache(notification.Changes);
 
-    public void Handle(MediaTypeChangedNotification notification) =>
-        _distributedCache.RefreshContentTypeCache(notification.Changes.ToArray());
+    public void Handle(MediaTypeChangedNotification notification)
+        => _distributedCache.RefreshContentTypeCache(notification.Changes);
 
-    public void Handle(MemberTypeChangedNotification notification) =>
-        _distributedCache.RefreshContentTypeCache(notification.Changes.ToArray());
+    public void Handle(MemberTypeChangedNotification notification)
+        => _distributedCache.RefreshContentTypeCache(notification.Changes);
 
     #endregion
 
@@ -220,10 +173,6 @@ public class DistributedCacheBinder :
 
     #region FileService
 
-    /// <summary>
-    /// Removes cache for template
-    /// </summary>
-    /// <param name="notification"></param>
     public void Handle(TemplateDeletedNotification notification)
     {
         foreach (ITemplate entity in notification.DeletedEntities)
@@ -232,10 +181,6 @@ public class DistributedCacheBinder :
         }
     }
 
-    /// <summary>
-    /// Refresh cache for template
-    /// </summary>
-    /// <param name="notification"></param>
     public void Handle(TemplateSavedNotification notification)
     {
         foreach (ITemplate entity in notification.SavedEntities)
@@ -249,52 +194,32 @@ public class DistributedCacheBinder :
     #region MacroService
 
     public void Handle(MacroDeletedNotification notification)
-    {
-        foreach (IMacro entity in notification.DeletedEntities)
-        {
-            _distributedCache.RemoveMacroCache(entity);
-        }
-    }
+        => _distributedCache.RemoveMacroCache(notification.DeletedEntities);
 
     public void Handle(MacroSavedNotification notification)
-    {
-        foreach (IMacro entity in notification.SavedEntities)
-        {
-            _distributedCache.RefreshMacroCache(entity);
-        }
-    }
+        => _distributedCache.RefreshMacroCache(notification.SavedEntities);
 
     #endregion
 
     #region MediaService
 
     public void Handle(MediaTreeChangeNotification notification)
-    {
-        _distributedCache.RefreshMediaCache(notification.Changes.ToArray());
-    }
+        => _distributedCache.RefreshMediaCache(notification.Changes);
 
     #endregion
 
     #region MemberService
 
     public void Handle(MemberDeletedNotification notification)
-    {
-        _distributedCache.RemoveMemberCache(notification.DeletedEntities.ToArray());
-    }
+        => _distributedCache.RemoveMemberCache(notification.DeletedEntities);
 
     public void Handle(MemberSavedNotification notification)
-    {
-        _distributedCache.RefreshMemberCache(notification.SavedEntities.ToArray());
-    }
+        => _distributedCache.RefreshMemberCache(notification.SavedEntities);
 
     #endregion
 
     #region MemberGroupService
 
-    /// <summary>
-    /// Fires when a member group is deleted
-    /// </summary>
-    /// <param name="notification"></param>
     public void Handle(MemberGroupDeletedNotification notification)
     {
         foreach (IMemberGroup entity in notification.DeletedEntities)
@@ -303,10 +228,6 @@ public class DistributedCacheBinder :
         }
     }
 
-    /// <summary>
-    /// Fires when a member group is saved
-    /// </summary>
-    /// <param name="notification"></param>
     public void Handle(MemberGroupSavedNotification notification)
     {
         foreach (IMemberGroup entity in notification.SavedEntities)
@@ -317,23 +238,21 @@ public class DistributedCacheBinder :
 
     #endregion
 
-    #region RelationType
+    #region RelationTypeService
 
     public void Handle(RelationTypeSavedNotification notification)
     {
-        DistributedCache dc = _distributedCache;
         foreach (IRelationType entity in notification.SavedEntities)
         {
-            dc.RefreshRelationTypeCache(entity.Id);
+            _distributedCache.RefreshRelationTypeCache(entity.Id);
         }
     }
 
     public void Handle(RelationTypeDeletedNotification notification)
     {
-        DistributedCache dc = _distributedCache;
         foreach (IRelationType entity in notification.DeletedEntities)
         {
-            dc.RemoveRelationTypeCache(entity.Id);
+            _distributedCache.RemoveRelationTypeCache(entity.Id);
         }
     }
 
