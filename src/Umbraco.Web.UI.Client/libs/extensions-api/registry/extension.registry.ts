@@ -1,19 +1,39 @@
-import { BehaviorSubject, map, Observable } from 'rxjs';
-import type { ManifestTypes, ManifestTypeMap, ManifestBase, ManifestEntrypoint } from '../../models';
+import { BehaviorSubject, withLatestFrom, map, Observable } from 'rxjs';
+import type {
+	ManifestTypes,
+	ManifestTypeMap,
+	ManifestBase,
+	ManifestEntrypoint,
+	SpecificManifestTypeOrManifestBase,
+	ManifestKind,
+} from '../../models';
 import { loadExtension } from '../load-extension.function';
-import { hasInitExport } from "../has-init-export.function";
-import type { UmbControllerHostInterface } from "@umbraco-cms/controller";
-import { UmbContextToken } from "@umbraco-cms/context-api";
-
-type SpecificManifestTypeOrManifestBase<T extends keyof ManifestTypeMap | string> = T extends keyof ManifestTypeMap
-	? ManifestTypeMap[T]
-	: ManifestBase;
+import { hasInitExport } from '../has-init-export.function';
+import type { UmbControllerHostInterface } from '@umbraco-cms/controller';
+import { UmbContextToken } from '@umbraco-cms/context-api';
 
 export class UmbExtensionRegistry {
-
 	// TODO: Use UniqueBehaviorSubject, as we don't want someone to edit data of extensions.
 	private _extensions = new BehaviorSubject<Array<ManifestBase>>([]);
 	public readonly extensions = this._extensions.asObservable();
+	/*
+	public readonly entryPoints = this._extensions.pipe(
+		map((extensions) => extensions.filter((e) => e.type === 'entrypoint'))
+	);
+	*/
+
+	private _kinds = new BehaviorSubject<Array<ManifestKind>>([]);
+	public readonly kinds = this._kinds.asObservable();
+
+	defineKind(kind: ManifestKind) {
+		const nextData = this._kinds
+			.getValue()
+			.filter(
+				(k) => k.matchType !== (kind as ManifestKind).matchType && k.matchKind !== (kind as ManifestKind).matchKind
+			);
+		nextData.push(kind as ManifestKind);
+		this._kinds.next(nextData);
+	}
 
 	register(manifest: ManifestTypes, rootHost?: UmbControllerHostInterface): void {
 		const extensionsValues = this._extensions.getValue();
@@ -57,33 +77,69 @@ export class UmbExtensionRegistry {
 
 	getByAlias(alias: string) {
 		// TODO: make pipes prettier/simpler/reuseable
-		return this.extensions.pipe(map((dataTypes) => dataTypes.find((extension) => extension.alias === alias) || null));
+		return this.extensions.pipe(map((extensions) => extensions.find((extension) => extension.alias === alias) || null));
 	}
 
-	getByTypeAndAlias<Key extends keyof ManifestTypeMap>(type: Key, alias: string) {
+	kindsOfType<Key extends keyof ManifestTypeMap | string>(type: Key) {
+		return this.kinds.pipe(map((kinds) => kinds.filter((kind) => kind.matchType === type)));
+	}
+
+	getByTypeWithKinds<Key extends keyof ManifestTypeMap | string, T = SpecificManifestTypeOrManifestBase<Key>>(
+		type: Key
+	) {
+		/*
 		return this.extensionsOfType(type).pipe(
 			map((extensions) => extensions.find((extension) => extension.alias === alias) || null)
 		);
+		*/
+		return this.extensionsOfType(type).pipe(
+			withLatestFrom(this.kindsOfType(type)),
+			map(([exts, kinds]) =>
+				exts
+					.map((ext) => {
+						return { ...kinds.find((kind) => kind.matchKind === ext.kind)?.manifest, ...ext };
+					})
+					.sort((a, b) => (a.weight || 0) - (b.weight || 0))
+			)
+		) as Observable<Array<T>>;
+		//
+	}
+
+	getByTypeAndAlias<Key extends keyof ManifestTypeMap | string, T = SpecificManifestTypeOrManifestBase<Key>>(
+		type: Key,
+		alias: string
+	) {
+		/*
+		return this.extensionsOfType(type).pipe(
+			map((extensions) => extensions.find((extension) => extension.alias === alias) || null)
+		);
+		*/
+		return this.extensions.pipe(
+			map((exts) =>
+				exts.filter((ext) => ext.type === type && ext.alias === alias).sort((a, b) => (a.weight || 0) - (b.weight || 0))
+			)
+		) as Observable<Array<T>>;
+		//
 	}
 
 	extensionsOfType<Key extends keyof ManifestTypeMap | string, T = SpecificManifestTypeOrManifestBase<Key>>(type: Key) {
-		return this.extensions.pipe(
-			map((exts) => exts.filter((ext) => ext.type === type).sort((a, b) => (b.weight || 0) - (a.weight || 0)))
-		) as Observable<Array<T>>;
+		return this.extensions.pipe(map((exts) => exts.filter((ext) => ext.type === type))) as Observable<Array<T>>;
+		//.sort((a, b) => (b.weight || 0) - (a.weight || 0))
 	}
 
 	extensionsOfTypes<ExtensionType = ManifestBase>(types: string[]): Observable<Array<ExtensionType>> {
 		return this.extensions.pipe(
 			map((exts) =>
-				exts.filter((ext) => types.indexOf(ext.type) !== -1).sort((a, b) => (b.weight || 0) - (a.weight || 0))
+				exts.filter((ext) => types.indexOf(ext.type) !== -1).sort((a, b) => (a.weight || 0) - (b.weight || 0))
 			)
 		) as Observable<Array<ExtensionType>>;
+		//
 	}
 
 	extensionsSortedByTypeAndWeight<ExtensionType = ManifestBase>(): Observable<Array<ExtensionType>> {
 		return this.extensions.pipe(
-			map((exts) => exts
-				.sort((a, b) => {
+			map((exts) =>
+				exts.sort((a, b) => {
 					// If type is the same, sort by weight
 					if (a.type === b.type) {
 						return (a.weight || 0) - (b.weight || 0);
@@ -91,7 +147,8 @@ export class UmbExtensionRegistry {
 
 					// Otherwise sort by type
 					return a.type.localeCompare(b.type);
-				}))
+				})
+			)
 		) as Observable<Array<ExtensionType>>;
 	}
 }

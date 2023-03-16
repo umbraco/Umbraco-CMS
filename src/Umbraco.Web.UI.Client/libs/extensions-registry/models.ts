@@ -93,11 +93,21 @@ export type ManifestTypeMap = {
 	[Manifest in ManifestTypes as Manifest['type']]: Manifest;
 };
 
+export type SpecificManifestTypeOrManifestBase<T extends keyof ManifestTypeMap | string> =
+	T extends keyof ManifestTypeMap ? ManifestTypeMap[T] : ManifestBase;
+
 export interface ManifestBase {
 	type: string;
+	kind?: string; // as kind alias that together with type will look up another extension to extend.
 	alias: string;
 	name: string;
 	weight?: number;
+}
+
+export interface ManifestKind {
+	matchType: string;
+	matchKind: string;
+	manifest: Partial<ManifestTypes>;
 }
 
 export interface ManifestWithConditions<ConditionsType> {
