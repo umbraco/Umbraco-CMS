@@ -1,4 +1,3 @@
-import { DOCUMENT_REPOSITORY_ALIAS } from '../repository/manifests';
 import { UmbDocumentSaveAndPublishWorkspaceAction } from './actions/save-and-publish.action';
 import { UmbDocumentSaveAndPreviewWorkspaceAction } from './actions/save-and-preview.action';
 import { UmbSaveAndScheduleDocumentWorkspaceAction } from './actions/save-and-schedule.action';
@@ -14,10 +13,9 @@ const workspace: ManifestWorkspace = {
 	type: 'workspace',
 	alias: 'Umb.Workspace.Document',
 	name: 'Document Workspace',
-	loader: () => import('./document-workspace.element'),
+	loader: () => import('./document-workspace-edit.element'),
 	meta: {
 		entityType: 'document',
-		context: () => import('./document-workspace.context'),
 	},
 };
 
