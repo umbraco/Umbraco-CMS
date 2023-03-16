@@ -2,12 +2,10 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html, nothing } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { map } from 'rxjs';
-
-import type { IRoutingInfo } from '@umbraco-cms/router';
 import type { UmbWorkspaceElement } from '../workspace/workspace.element';
-import { UmbSectionContext, UMB_SECTION_CONTEXT_TOKEN } from './section.context';
 import type { UmbSectionViewsElement } from './section-views/section-views.element';
-import type { ManifestSectionView, ManifestMenuSectionSidebarApp, ManifestSection } from '@umbraco-cms/models';
+import type { IRoutingInfo } from '@umbraco-cms/router';
+import type { ManifestMenuSectionSidebarApp, ManifestSection } from '@umbraco-cms/models';
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-api';
 import { UmbLitElement } from '@umbraco-cms/element';
 
@@ -49,39 +47,16 @@ export class UmbSectionElement extends UmbLitElement {
 	@state()
 	private _menus?: Array<ManifestMenuSectionSidebarApp>;
 
-	@state()
-	private _views?: Array<ManifestSectionView>;
-
-	private _sectionContext?: UmbSectionContext;
-	private _sectionAlias?: string;
-
-	constructor() {
-		super();
-
-		this.consumeContext(UMB_SECTION_CONTEXT_TOKEN, (instance) => {
-			this._sectionContext = instance;
-
-			// TODO: currently they don't corporate, as they overwrite each other...
-			this.#observeSectionAlias();
-			this.#createRoutes();
-		});
+	connectedCallback() {
+		super.connectedCallback();
+		this.#observeSectionSidebarApps();
+		this.#createRoutes();
 	}
 
 	#createRoutes() {
 		this._routes = [];
 
 		this._routes = [
-			{
-				path: 'dashboard',
-				component: () => import('./section-dashboards/section-dashboards.element'),
-			},
-			{
-				path: 'view',
-				component: () => import('../section/section-views/section-views.element'),
-				setup: (element: UmbSectionViewsElement) => {
-					element.sectionAlias = this.manifest?.alias;
-				},
-			},
 			{
 				path: 'workspace/:entityType',
 				component: () => import('../workspace/workspace.element'),
@@ -91,35 +66,27 @@ export class UmbSectionElement extends UmbLitElement {
 			},
 			{
 				path: '**',
-				redirectTo: 'view',
+				component: () => import('../section/section-views/section-views.element'),
+				setup: (element: UmbSectionViewsElement) => {
+					element.sectionAlias = this.manifest?.alias;
+				},
 			},
 		];
 	}
 
-	#observeSectionAlias() {
-		if (!this._sectionContext) return;
-
-		this.observe(this._sectionContext.alias, (alias) => {
-			this._sectionAlias = alias;
-			this.#observeSectionSidebarApps(alias);
-		});
-	}
-
-	#observeSectionSidebarApps(sectionAlias?: string) {
-		if (sectionAlias) {
-			this.observe(
-				umbExtensionsRegistry
-					?.extensionsOfType('menuSectionSidebarApp')
-					.pipe(
-						map((manifests) => manifests.filter((manifest) => manifest.conditions.sections.includes(sectionAlias)))
-					),
-				(manifests) => {
-					this._menus = manifests;
-				}
-			);
-		} else {
-			this._menus = [];
-		}
+	#observeSectionSidebarApps() {
+		this.observe(
+			umbExtensionsRegistry
+				?.extensionsOfType('menuSectionSidebarApp')
+				.pipe(
+					map((manifests) =>
+						manifests.filter((manifest) => manifest.conditions.sections.includes(this.manifest?.alias || ''))
+					)
+				),
+			(manifests) => {
+				this._menus = manifests;
+			}
+		);
 	}
 
 	render() {
@@ -131,12 +98,12 @@ export class UmbSectionElement extends UmbLitElement {
 							<umb-extension-slot
 								type="sectionSidebarApp"
 								.filter=${(items: ManifestMenuSectionSidebarApp) =>
-									items.conditions.sections.includes(this._sectionAlias || '')}></umb-extension-slot>
+									items.conditions.sections.includes(this.manifest?.alias || '')}></umb-extension-slot>
 
 							<umb-extension-slot
 								type="menuSectionSidebarApp"
 								.filter=${(items: ManifestMenuSectionSidebarApp) =>
-									items.conditions.sections.includes(this._sectionAlias || '')}
+									items.conditions.sections.includes(this.manifest?.alias || '')}
 								default-element="umb-section-sidebar-menu"></umb-extension-slot>
 						</umb-section-sidebar>
 				  `
