@@ -1,8 +1,8 @@
 import { IRoute, IRoutingInfo, Params, PARAM_IDENTIFIER, stripSlash } from 'router-slot';
+import { v4 as uuidv4 } from 'uuid';
 import { UmbContextConsumerController, UmbContextProviderController, UmbContextToken } from '@umbraco-cms/context-api';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 import { UmbModalConfig, UmbModalToken, UMB_MODAL_CONTEXT_TOKEN } from '@umbraco-cms/modal';
-import { v4 as uuidv4 } from 'uuid';
 
 const EmptyDiv = document.createElement('div');
 
@@ -50,7 +50,6 @@ export class UmbRouteContext {
 
 	#removeModalPath(info: IRoutingInfo) {
 		if (window.location.href.includes(info.match.fragments.consumed)) {
-			console.log('info.match.fragments.consumed', info.match.fragments.consumed);
 			window.history.pushState({}, '', window.location.href.split(info.match.fragments.consumed)[0]);
 		}
 	}
@@ -127,12 +126,10 @@ export class UmbRouteContext {
 	public _internal_modalRouterChanged(activeModalPath: string | undefined) {
 		if (this.#activeModalPath === activeModalPath) return;
 		if (this.#activeModalPath) {
-			console.log('closing active modal', this.#activeModalPath);
 			const activeModal = this.#modalRegistrations.find(
 				(registration) => this.#getModalRoutePath(registration) === this.#activeModalPath
 			);
 			if (activeModal) {
-				console.log('found active modal', activeModal);
 				this.#modalContext?.close(activeModal.key);
 			}
 		}

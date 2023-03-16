@@ -1,4 +1,4 @@
-import type { IComponentRoute, IRedirectRoute, IResolverRoute, IRoute } from 'router-slot/model';
+import type { IRoute } from 'router-slot/model';
 import { RouterSlot } from 'router-slot';
 import { html, PropertyValueMap } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
@@ -106,7 +106,6 @@ export class UmbRouterSlotElement extends UmbLitElement {
 			this.dispatchEvent(new UmbRouterSlotChangeEvent());
 		} else if (event.detail.slot === this.#modalRouter) {
 			const newActiveModalLocalPath = event.detail.match.route.path;
-			console.log('!!!!!_modalRouterChanged', newActiveModalLocalPath);
 			this.#routeContext._internal_modalRouterChanged(newActiveModalLocalPath);
 		}
 	};

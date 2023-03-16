@@ -45,7 +45,6 @@ export class UmbPropertyEditorModalRegistrationController<D extends object = obj
 	}
 
 	private _registererModal() {
-		console.log('try registrer');
 		if (!this.#routeContext || !this.#propertyAlias || !this.#variantId) return;
 		if (this.#modalRegistration) {
 			this.#routeContext.unregisterModal(this.#modalRegistration);
@@ -55,9 +54,6 @@ export class UmbPropertyEditorModalRegistrationController<D extends object = obj
 			...this.#modalOptions,
 			path: `${this.#propertyAlias}/${this.#variantId}/${this.#modalOptions.path}`,
 		};
-
-		console.log(this.#modalOptions);
-		console.log(modifiedModalOptions);
 
 		this.#modalRegistration = this.#routeContext?.registerModal(this.#modalToken, modifiedModalOptions);
 	}
