@@ -162,69 +162,6 @@ export class UmbInputMultiUrlPickerElement extends FormControlMixin(UmbLitElemen
 				this._linkPickerURL = urlBuilder;
 			},
 		});
-
-		/*
-
-		Or use a property context method..?
-
-		*/
-
-		/*
-		this.consumeContext(UMB_ROUTE_CONTEXT_TOKEN, (instance) => {
-			this._routeContext = instance;
-
-			// Registre the routes of this UI:
-			// TODO: Make a registreModal method on the property context
-			// Or maybe its not the property-alias, but something unique? as this might not be in a property?.
-
-			this._routeContext.registerModal(UMB_LINK_PICKER_MODAL_TOKEN, {
-				path: `${'this.alias'}/:index`,
-				onSetup: (routingInfo) => {
-					// TODO: Make onSetup optional.
-					// TODO: Maybe use UmbRouteLocation?
-					// Get index from routeInfo:
-					const indexParam = routingInfo.match.params.index;
-					if (!indexParam) return false;
-					let index: number | null = parseInt(routingInfo.match.params.index);
-					if (Number.isNaN(index)) return false;
-
-					// Use the index to find data:
-					let data: UmbLinkPickerLink | null = null;
-					if (index >= 0 && index < this.urls.length) {
-						data = this._getItemByIndex(index);
-					} else {
-						index = null;
-					}
-
-					return {
-						index: index,
-						lol: false,
-						link: {
-							name: data?.name,
-							published: data?.published,
-							queryString: data?.queryString,
-							target: data?.target,
-							trashed: data?.trashed,
-							udi: data?.udi,
-							url: data?.url,
-						},
-						config: {
-							hideAnchor: this.hideAnchor,
-							ignoreUserStartNodes: this.ignoreUserStartNodes,
-							overlaySize: this.overlaySize || 'small', // TODO: this should not be here, but use the ModalToken.
-						},
-					};
-				},
-				onSubmit: (submitData) => {
-					if (!submitData) return;
-					this._setSelection(submitData.link, submitData.index);
-				},
-				onUrlBuilder: (urlBuilder) => {
-					this._linkPickerURL = urlBuilder;
-				},
-			});
-		});
-		*/
 	}
 
 	private _removeItem(index: number) {
