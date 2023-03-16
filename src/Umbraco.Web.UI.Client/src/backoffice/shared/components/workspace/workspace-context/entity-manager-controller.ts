@@ -20,7 +20,7 @@ export class UmbEntityWorkspaceManager<
 
 	state = new ObjectState<EntityDetailsType | undefined>(undefined);
 
-	protected _storeSubscription?: UmbObserverController;
+	protected _storeSubscription?: UmbObserverController<EntityDetailsType | undefined>;
 
 	private _notificationContext?: UmbNotificationContext;
 	private _store?: StoreType;

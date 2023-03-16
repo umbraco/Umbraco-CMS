@@ -39,7 +39,7 @@ export class UmbSectionViewsElement extends UmbLitElement {
 	private _activeViewPathname?: string;
 
 	private _sectionContext?: UmbSectionContext;
-	private _extensionsObserver?: UmbObserverController;
+	private _extensionsObserver?: UmbObserverController<ManifestSectionView[]>;
 
 	constructor() {
 		super();
@@ -60,34 +60,43 @@ export class UmbSectionViewsElement extends UmbLitElement {
 	private _observeViews() {
 		if (!this._sectionContext) return;
 
-		this.observe(this._sectionContext.alias, (sectionAlias) => {
-			this._observeExtensions(sectionAlias);
-		}, 'viewsObserver')
+		this.observe(
+			this._sectionContext.alias,
+			(sectionAlias) => {
+				this._observeExtensions(sectionAlias);
+			},
+			'viewsObserver'
+		);
 	}
 	private _observeExtensions(sectionAlias?: string) {
 		this._extensionsObserver?.destroy();
-		if(sectionAlias) {
+		if (sectionAlias) {
 			this._extensionsObserver = this.observe(
-					umbExtensionsRegistry?.extensionsOfType('sectionView').pipe(
+				umbExtensionsRegistry
+					?.extensionsOfType('sectionView')
+					.pipe(
 						map((views) =>
 							views
 								.filter((view) => view.meta.sections.includes(sectionAlias))
 								.sort((a, b) => b.meta.weight - a.meta.weight)
 						)
-					) ?? of([])
-				,
-					(views) => {
-						this._views = views;
-					}
+					) ?? of([]),
+				(views) => {
+					this._views = views;
+				}
 			);
 		}
 	}
 
 	private _observeActiveView() {
-		if(this._sectionContext) {
-			this.observe(this._sectionContext?.activeViewPathname, (pathname) => {
-				this._activeViewPathname = pathname;
-			}, 'activeViewPathnameObserver');
+		if (this._sectionContext) {
+			this.observe(
+				this._sectionContext?.activeViewPathname,
+				(pathname) => {
+					this._activeViewPathname = pathname;
+				},
+				'activeViewPathnameObserver'
+			);
 		}
 	}
 
