@@ -104,6 +104,10 @@ export class UmbRouterSlotElement extends UmbLitElement {
 		if (event.detail.slot === this.#router) {
 			this._activeLocalPath = event.detail.match.route.path;
 			this.dispatchEvent(new UmbRouterSlotChangeEvent());
+		} else if (event.detail.slot === this.#modalRouter) {
+			const newActiveModalLocalPath = event.detail.match.route.path;
+			console.log('!!!!!_modalRouterChanged', newActiveModalLocalPath);
+			this.#routeContext._internal_modalRouterChanged(newActiveModalLocalPath);
 		}
 	};
 

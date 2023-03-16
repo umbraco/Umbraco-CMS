@@ -2,6 +2,7 @@ import { IRoute, IRoutingInfo, Params, PARAM_IDENTIFIER, stripSlash } from 'rout
 import { UmbContextConsumerController, UmbContextProviderController, UmbContextToken } from '@umbraco-cms/context-api';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 import { UmbModalConfig, UmbModalToken, UMB_MODAL_CONTEXT_TOKEN } from '@umbraco-cms/modal';
+import { v4 as uuidv4 } from 'uuid';
 
 const EmptyDiv = document.createElement('div');
 
@@ -17,6 +18,7 @@ export type UmbModalRouteOptions<UmbModalTokenData extends object = object, UmbM
 export type UmbModalRegistrationToken = UmbModalRouteRegistration;
 
 type UmbModalRouteRegistration<D extends object = object, R = any> = {
+	key: string;
 	alias: UmbModalToken | string;
 	options: UmbModalRouteOptions<D, R>;
 	routeSetup: (component: HTMLElement, info: IRoutingInfo) => void;
@@ -30,6 +32,7 @@ export class UmbRouteContext {
 	#modalContext?: typeof UMB_MODAL_CONTEXT_TOKEN.TYPE;
 	#contextRoutes: IRoute[] = [];
 	#routerBasePath?: string;
+	#activeModalPath?: string;
 
 	constructor(host: UmbControllerHostInterface, private _onGotModals: (contextRoutes: any) => void) {
 		//this.#host = host;
@@ -46,7 +49,10 @@ export class UmbRouteContext {
 	}
 
 	#removeModalPath(info: IRoutingInfo) {
-		window.history.pushState({}, '', window.location.href.split(info.match.fragments.consumed)[0]);
+		if (window.location.href.includes(info.match.fragments.consumed)) {
+			console.log('info.match.fragments.consumed', info.match.fragments.consumed);
+			window.history.pushState({}, '', window.location.href.split(info.match.fragments.consumed)[0]);
+		}
 	}
 
 	public registerModal<D extends object = object, R = any>(
@@ -54,17 +60,23 @@ export class UmbRouteContext {
 		options: UmbModalRouteOptions<D, R>
 	) {
 		const registration = {
+			key: options.config?.key || uuidv4(),
 			alias: alias,
 			options: options,
 			routeSetup: (component: HTMLElement, info: IRoutingInfo<any, any>) => {
 				const modalData = options.onSetup?.(info.match.params);
 				if (modalData !== false && this.#modalContext) {
-					const modalHandler = this.#modalContext.open(alias, modalData, options.config);
+					const modalHandler = this.#modalContext.open(alias, modalData, { ...options.config, key: registration.key });
 					modalHandler.onSubmit().then(
-						() => this.#removeModalPath(info),
-						() => this.#removeModalPath(info)
+						(data) => {
+							this.#removeModalPath(info);
+							options.onSubmit?.(data);
+						},
+						() => {
+							this.#removeModalPath(info);
+							options.onReject?.();
+						}
 					);
-					modalHandler.onSubmit().then(options.onSubmit, options.onReject);
 				}
 			},
 		};
@@ -81,10 +93,13 @@ export class UmbRouteContext {
 		this.#generateContextRoutes();
 	}
 
+	#getModalRoutePath(modalRegistration: UmbModalRouteRegistration) {
+		return `/modal/${modalRegistration.alias.toString()}/${modalRegistration.options.path}`;
+	}
+
 	#generateRoute(modalRegistration: UmbModalRouteRegistration): IRoute {
-		const localPath = `modal/${modalRegistration.alias.toString()}/${modalRegistration.options.path}`;
 		return {
-			path: localPath,
+			path: this.#getModalRoutePath(modalRegistration),
 			component: EmptyDiv,
 			setup: modalRegistration.routeSetup,
 		};
@@ -95,6 +110,11 @@ export class UmbRouteContext {
 			return this.#generateRoute(modalRegistration);
 		});
 
+		this.#contextRoutes.push({
+			path: '',
+			component: EmptyDiv,
+		});
+
 		// TODO: Should we await one frame, to ensure we don't call back too much?.
 		this._onGotModals(this.#contextRoutes);
 	}
@@ -103,6 +123,20 @@ export class UmbRouteContext {
 		if (this.#routerBasePath === routerBasePath) return;
 		this.#routerBasePath = routerBasePath;
 		this.#generateNewUrlBuilders();
+	}
+	public _internal_modalRouterChanged(activeModalPath: string | undefined) {
+		if (this.#activeModalPath === activeModalPath) return;
+		if (this.#activeModalPath) {
+			console.log('closing active modal', this.#activeModalPath);
+			const activeModal = this.#modalRegistrations.find(
+				(registration) => this.#getModalRoutePath(registration) === this.#activeModalPath
+			);
+			if (activeModal) {
+				console.log('found active modal', activeModal);
+				this.#modalContext?.close(activeModal.key);
+			}
+		}
+		this.#activeModalPath = activeModalPath;
 	}
 
 	#generateNewUrlBuilders() {
