@@ -14,4 +14,18 @@
     <Right>lib/net7.0/Umbraco.Tests.Integration.dll</Right>
     <IsBaselineSuppression>true</IsBaselineSuppression>
   </Suppression>
+  <Suppression>
+    <DiagnosticId>CP0002</DiagnosticId>
+    <Target>M:Umbraco.Cms.Tests.Integration.Umbraco.Web.BackOffice.UrlAndDomains.DomainAndUrlsTests.Having_three_cultures_and_set_domain_on_all_of_them</Target>
+    <Left>lib/net7.0/Umbraco.Tests.Integration.dll</Left>
+    <Right>lib/net7.0/Umbraco.Tests.Integration.dll</Right>
+    <IsBaselineSuppression>true</IsBaselineSuppression>
+  </Suppression>
+  <Suppression>
+    <DiagnosticId>CP0002</DiagnosticId>
+    <Target>M:Umbraco.Cms.Tests.Integration.Umbraco.Web.BackOffice.UrlAndDomains.DomainAndUrlsTests.Having_three_cultures_but_set_domain_on_a_non_default_language</Target>
+    <Left>lib/net7.0/Umbraco.Tests.Integration.dll</Left>
+    <Right>lib/net7.0/Umbraco.Tests.Integration.dll</Right>
+    <IsBaselineSuppression>true</IsBaselineSuppression>
+  </Suppression>
 </Suppressions>
