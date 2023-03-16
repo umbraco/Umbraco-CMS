@@ -13,7 +13,7 @@ namespace Umbraco.Cms.Core.HealthChecks.Checks.Security;
 /// </summary>
 public abstract class BaseHttpHeaderCheck : HealthCheck
 {
-    private static HttpClient? httpClient;
+    private static HttpClient? _httpClient;
     private readonly string _header;
     private readonly IHostingEnvironment _hostingEnvironment;
     private readonly string _localizedTextPrefix;
@@ -23,13 +23,23 @@ public abstract class BaseHttpHeaderCheck : HealthCheck
     /// <summary>
     ///     Initializes a new instance of the <see cref="BaseHttpHeaderCheck" /> class.
     /// </summary>
+    [Obsolete("Use constructor that takes all parameters instead.")]
+    protected BaseHttpHeaderCheck(
+        IHostingEnvironment hostingEnvironment,
+        ILocalizedTextService textService,
+        string header,
+        string localizedTextPrefix,
+        bool metaTagOptionAvailable)
+        : this(hostingEnvironment, textService, header, localizedTextPrefix, metaTagOptionAvailable, false)
+    { }
+
     protected BaseHttpHeaderCheck(
         IHostingEnvironment hostingEnvironment,
         ILocalizedTextService textService,
         string header,
         string localizedTextPrefix,
         bool metaTagOptionAvailable,
-        bool shouldNotExist = false)
+        bool shouldNotExist)
     {
         LocalizedTextService = textService ?? throw new ArgumentNullException(nameof(textService));
         _hostingEnvironment = hostingEnvironment;
@@ -45,9 +55,9 @@ public abstract class BaseHttpHeaderCheck : HealthCheck
     /// <summary>
     ///     Gets a link to an external read more page.
     /// </summary>
-    protected abstract string? ReadMoreLink { get; }
+    protected abstract string ReadMoreLink { get; }
 
-    private static HttpClient HttpClient => httpClient ??= new HttpClient();
+    private static HttpClient HttpClient => _httpClient ??= new HttpClient();
 
     /// <summary>
     ///     Get the status for this health check

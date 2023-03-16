@@ -29,5 +29,5 @@ public class XssProtectionCheck : BaseHttpHeaderCheck
     }
 
     /// <inheritdoc />
-    protected override string? ReadMoreLink => null;
+    protected override string ReadMoreLink => string.Empty;
 }
