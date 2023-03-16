@@ -7,8 +7,8 @@ import { UmbLitElement } from '@umbraco-cms/element';
 
 import './data-type-workspace-edit.element';
 
-@customElement('umb-language-workspace')
-export class UmbLanguageWorkspaceElement extends UmbLitElement {
+@customElement('umb-data-type-workspace')
+export class UmbDataTypeWorkspaceElement extends UmbLitElement {
 	static styles = [UUITextStyles, css``];
 
 	#workspaceContext = new UmbDataTypeWorkspaceContext(this);
@@ -47,10 +47,10 @@ export class UmbLanguageWorkspaceElement extends UmbLitElement {
 	}
 }
 
-export default UmbLanguageWorkspaceElement;
+export default UmbDataTypeWorkspaceElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-language-workspace': UmbLanguageWorkspaceElement;
+		'umb-data-type-workspace': UmbDataTypeWorkspaceElement;
 	}
 }
