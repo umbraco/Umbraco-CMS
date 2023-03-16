@@ -43,7 +43,7 @@ export class UmbModalHandlerClass<ModalData extends object = object, ModalResult
 
 	public modalElement: UUIModalDialogElement | UUIModalSidebarElement;
 
-	#innerElement = new BehaviorSubject<any | undefined>(undefined);
+	#innerElement = new BehaviorSubject<HTMLElement | undefined>(undefined);
 	public readonly innerElement = this.#innerElement.asObservable();
 
 	#modalElement?: UUIModalSidebarElement | UUIDialogElement;
@@ -137,22 +137,25 @@ export class UmbModalHandlerClass<ModalData extends object = object, ModalResult
 			async (manifest) => {
 				if (manifest) {
 					const innerElement = await this.#createInnerElement(manifest, data);
-					this.#appendInnerElement(innerElement);
-				} else {
-					this.#removeInnerElement();
+					if (innerElement) {
+						this.#appendInnerElement(innerElement);
+						return;
+					}
 				}
+				this.#removeInnerElement();
 			}
 		);
 	}
 
-	#appendInnerElement(element: any) {
+	#appendInnerElement(element: HTMLElement) {
 		this.#modalElement?.appendChild(element);
 		this.#innerElement.next(element);
 	}
 
 	#removeInnerElement() {
-		if (this.#innerElement.getValue()) {
-			this.#modalElement?.removeChild(this.#innerElement.getValue());
+		const innerElement = this.#innerElement.getValue();
+		if (innerElement) {
+			this.#modalElement?.removeChild(innerElement);
 			this.#innerElement.next(undefined);
 		}
 	}
