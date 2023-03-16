@@ -121,7 +121,6 @@ export class UmbInputMultiUrlPickerElement extends FormControlMixin(UmbLitElemen
 			() => !!this.max && this.urls.length > this.max
 		);
 
-		// TODO: make a helper that get the context, watches one or more props to use to update the registration, can be or have something that is stateful so its easy to use the URLBuilder.
 		new UmbPropertyEditorModalRegistrationController(this, UMB_LINK_PICKER_MODAL_TOKEN, {
 			path: `:index`,
 			onSetup: (params) => {
@@ -163,7 +162,7 @@ export class UmbInputMultiUrlPickerElement extends FormControlMixin(UmbLitElemen
 				if (!submitData) return;
 				this._setSelection(submitData.link, submitData.index);
 			},
-			onUrlBuilder: (urlBuilder) => {
+			getUrlBuilder: (urlBuilder) => {
 				this._linkPickerURL = urlBuilder;
 			},
 		});

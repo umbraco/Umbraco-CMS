@@ -11,7 +11,7 @@ export type UmbModalRouteOptions<UmbModalTokenData extends object = object, UmbM
 	onSetup?: (routingInfo: Params) => UmbModalTokenData | false;
 	onSubmit?: (data: UmbModalTokenResult) => void | PromiseLike<void>;
 	onReject?: () => void;
-	onUrlBuilder?: (urlBuilder: UmbModalRouteBuilder) => void;
+	getUrlBuilder?: (urlBuilder: UmbModalRouteBuilder) => void;
 };
 
 export type UmbModalRegistrationToken = UmbModalRouteRegistration;
@@ -111,7 +111,7 @@ export class UmbRouteContext {
 	}
 
 	#generateNewURL = (modalRegistration: UmbModalRouteRegistration) => {
-		if (!modalRegistration.options.onUrlBuilder || !this.#routerBasePath) return;
+		if (!modalRegistration.options.getUrlBuilder || !this.#routerBasePath) return;
 
 		const routeBasePath = this.#routerBasePath.endsWith('/') ? this.#routerBasePath : this.#routerBasePath + '/';
 		const localPath = `modal/${modalRegistration.alias.toString()}/${modalRegistration.options.path}`;
@@ -125,7 +125,7 @@ export class UmbRouteContext {
 			return routeBasePath + localRoutePath;
 		};
 
-		modalRegistration.options.onUrlBuilder(urlBuilder);
+		modalRegistration.options.getUrlBuilder(urlBuilder);
 	};
 }
 
