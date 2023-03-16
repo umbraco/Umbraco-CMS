@@ -2,9 +2,9 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html, nothing } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { map } from 'rxjs';
+import type { UmbRouterSlotChangeEvent, IRoutingInfo, UmbRouterSlotInitEvent } from '@umbraco-cms/router';
 import type { UmbWorkspaceEntityElement } from '../workspace/workspace-entity-element.interface';
 import { UmbSectionContext, UMB_SECTION_CONTEXT_TOKEN } from './section.context';
-import type { UmbRouterSlotChangeEvent, IRoutingInfo } from '@umbraco-cms/router';
 import type { ManifestSectionView, ManifestWorkspace, ManifestMenuSectionSidebarApp } from '@umbraco-cms/models';
 import { umbExtensionsRegistry, createExtensionElement } from '@umbraco-cms/extensions-api';
 import { UmbLitElement } from '@umbraco-cms/element';
@@ -42,6 +42,11 @@ export class UmbSectionElement extends UmbLitElement {
 
 	@state()
 	private _routes?: Array<any>;
+
+	@state()
+	private _routerPath?: string;
+	@state()
+	private _activePath?: string;
 
 	@state()
 	private _menus?: Array<ManifestMenuSectionSidebarApp>;
@@ -187,12 +192,14 @@ export class UmbSectionElement extends UmbLitElement {
 		}
 	}
 
+	/*
 	private _onRouteChange = (event: UmbRouterSlotChangeEvent) => {
 		const currentPath = event.target.localActiveViewPath;
 		const view = this._views?.find((view) => 'view/' + view.meta.pathname === currentPath);
 		if (!view) return;
 		this._sectionContext?.setActiveView(view);
 	};
+	*/
 
 	render() {
 		return html`
@@ -214,12 +221,21 @@ export class UmbSectionElement extends UmbLitElement {
 				  `
 				: nothing}
 			<umb-section-main>
-				${this._views && this._views.length > 0 ? html`<umb-section-views></umb-section-views>` : nothing}
+				${this._views && this._views.length > 0
+					? html`<umb-section-views
+							.routerPath=${this._routerPath}
+							.activePath=${this._activePath}></umb-section-views>`
+					: nothing}
 				${this._routes && this._routes.length > 0
 					? html`<umb-router-slot
 							id="router-slot"
 							.routes="${this._routes}"
-							@change=${this._onRouteChange}></umb-router-slot>`
+							@init=${(event: UmbRouterSlotInitEvent) => {
+								this._routerPath = event.target.absoluteRouterPath;
+							}}
+							@change=${(event: UmbRouterSlotChangeEvent) => {
+								this._activePath = event.target.localActiveViewPath || '';
+							}}></umb-router-slot>`
 					: nothing}
 				<slot></slot>
 			</umb-section-main>
