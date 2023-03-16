@@ -8,7 +8,7 @@ import {
 } from '../../../../../../shared/collection/collection.context';
 
 import '../../../../../../shared/collection/dashboards/dashboard-collection.element';
-import type { UmbWorkspaceEntityContextInterface } from '../../../workspace-context/workspace-entity-context.interface';
+import type { UmbEntityWorkspaceContextInterface } from '../../../workspace-context/workspace-entity-context.interface';
 import { UmbLitElement } from '@umbraco-cms/element';
 import type { FolderTreeItemResponseModel } from '@umbraco-cms/backend-api';
 import { ManifestWorkspaceViewCollection } from '@umbraco-cms/extensions-registry';
@@ -27,7 +27,7 @@ export class UmbWorkspaceViewCollectionElement extends UmbLitElement {
 
 	public manifest!: ManifestWorkspaceViewCollection;
 
-	private _workspaceContext?: UmbWorkspaceEntityContextInterface;
+	private _workspaceContext?: UmbEntityWorkspaceContextInterface;
 
 	// TODO: add type for the collection context.
 	private _collectionContext?: UmbCollectionContext<FolderTreeItemResponseModel, any>;
@@ -36,7 +36,7 @@ export class UmbWorkspaceViewCollectionElement extends UmbLitElement {
 		super();
 
 		// TODO: Figure out how to get the magic string for the workspace context.
-		this.consumeContext<UmbWorkspaceEntityContextInterface>('umbWorkspaceContext', (nodeContext) => {
+		this.consumeContext<UmbEntityWorkspaceContextInterface>('umbWorkspaceContext', (nodeContext) => {
 			this._workspaceContext = nodeContext;
 			this._provideWorkspace();
 		});

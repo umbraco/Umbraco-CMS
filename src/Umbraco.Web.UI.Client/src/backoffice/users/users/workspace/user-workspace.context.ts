@@ -1,6 +1,6 @@
 import { UMB_USER_STORE_CONTEXT_TOKEN } from '../repository/user.store';
 import { UmbWorkspaceContext } from '../../../shared/components/workspace/workspace-context/workspace-context';
-import { UmbWorkspaceEntityContextInterface } from '../../../shared/components/workspace/workspace-context/workspace-entity-context.interface';
+import { UmbEntityWorkspaceContextInterface } from '../../../shared/components/workspace/workspace-context/workspace-entity-context.interface';
 import { UmbEntityWorkspaceManager } from '../../../shared/components/workspace/workspace-context/entity-manager-controller';
 import { UmbUserRepository } from '../repository/user.repository';
 import type { UserDetails } from '@umbraco-cms/models';
@@ -8,7 +8,7 @@ import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 
 export class UmbWorkspaceUserContext
 	extends UmbWorkspaceContext<UmbUserRepository>
-	implements UmbWorkspaceEntityContextInterface<UserDetails | undefined>
+	implements UmbEntityWorkspaceContextInterface<UserDetails | undefined>
 {
 	#manager = new UmbEntityWorkspaceManager<typeof UMB_USER_STORE_CONTEXT_TOKEN.TYPE>(
 		this.host,
