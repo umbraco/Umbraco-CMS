@@ -10,7 +10,7 @@ import { UmbDocumentWorkspaceContext } from './document-workspace.context';
 import { UmbDocumentWorkspaceSplitViewElement } from './document-workspace-split-view.element';
 import { UmbLitElement } from '@umbraco-cms/element';
 import '../../../shared/components/workspace/workspace-variant/workspace-variant.element';
-import { DocumentModel, VariantViewModelBaseModel } from '@umbraco-cms/backend-api';
+import { VariantViewModelBaseModel } from '@umbraco-cms/backend-api';
 import { ManifestWorkspace } from '@umbraco-cms/extensions-registry';
 
 @customElement('umb-document-workspace')
