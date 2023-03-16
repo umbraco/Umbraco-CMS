@@ -4,7 +4,7 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { UUIColorSwatchesEvent } from '@umbraco-ui/uui';
 import { UmbPropertyEditorElement } from '@umbraco-cms/property-editor';
 import { UmbLitElement } from '@umbraco-cms/element';
-import type { DataTypePropertyModel } from '@umbraco-cms/backend-api';
+import type { DataTypePropertyPresentationModel } from '@umbraco-cms/backend-api';
 import type { SwatchDetails } from '@umbraco-cms/models';
 
 /**
@@ -24,7 +24,7 @@ export class UmbPropertyEditorUIColorPickerElement extends UmbLitElement impleme
 	private _swatches: SwatchDetails[] = [];
 
 	@property({ type: Array, attribute: false })
-	public set config(config: Array<DataTypePropertyModel>) {
+	public set config(config: Array<DataTypePropertyPresentationModel>) {
 		const useLabel = config.find((x) => x.alias === 'useLabel');
 		if (useLabel) this._showLabels = useLabel.value;
 

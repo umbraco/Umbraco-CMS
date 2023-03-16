@@ -1,10 +1,10 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-import type { LanguageCreateModel } from '../models/LanguageCreateModel';
-import type { LanguageModel } from '../models/LanguageModel';
-import type { LanguageUpdateModel } from '../models/LanguageUpdateModel';
-import type { PagedLanguageModel } from '../models/PagedLanguageModel';
+import type { CreateLanguageRequestModel } from '../models/CreateLanguageRequestModel';
+import type { LanguageResponseModel } from '../models/LanguageResponseModel';
+import type { PagedLanguageResponseModel } from '../models/PagedLanguageResponseModel';
+import type { UpdateLanguageRequestModel } from '../models/UpdateLanguageRequestModel';
 
 import type { CancelablePromise } from '../core/CancelablePromise';
 import { OpenAPI } from '../core/OpenAPI';
@@ -13,16 +13,16 @@ import { request as __request } from '../core/request';
 export class LanguageResource {
 
     /**
-     * @returns PagedLanguageModel Success
+     * @returns PagedLanguageResponseModel Success
      * @throws ApiError
      */
     public static getLanguage({
-        skip,
-        take = 100,
-    }: {
-        skip?: number,
-        take?: number,
-    }): CancelablePromise<PagedLanguageModel> {
+skip,
+take = 100,
+}: {
+skip?: number,
+take?: number,
+}): CancelablePromise<PagedLanguageResponseModel> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/language',
@@ -38,10 +38,10 @@ export class LanguageResource {
      * @throws ApiError
      */
     public static postLanguage({
-        requestBody,
-    }: {
-        requestBody?: LanguageCreateModel,
-    }): CancelablePromise<string> {
+requestBody,
+}: {
+requestBody?: CreateLanguageRequestModel,
+}): CancelablePromise<string> {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/umbraco/management/api/v1/language',
@@ -60,10 +60,10 @@ export class LanguageResource {
      * @throws ApiError
      */
     public static getLanguageByIsoCode({
-        isoCode,
-    }: {
-        isoCode: string,
-    }): CancelablePromise<LanguageModel> {
+isoCode,
+}: {
+isoCode: string,
+}): CancelablePromise<LanguageResponseModel> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/language/{isoCode}',
@@ -81,10 +81,10 @@ export class LanguageResource {
      * @throws ApiError
      */
     public static deleteLanguageByIsoCode({
-        isoCode,
-    }: {
-        isoCode: string,
-    }): CancelablePromise<any> {
+isoCode,
+}: {
+isoCode: string,
+}): CancelablePromise<any> {
         return __request(OpenAPI, {
             method: 'DELETE',
             url: '/umbraco/management/api/v1/language/{isoCode}',
@@ -103,12 +103,12 @@ export class LanguageResource {
      * @throws ApiError
      */
     public static putLanguageByIsoCode({
-        isoCode,
-        requestBody,
-    }: {
-        isoCode: string,
-        requestBody?: LanguageUpdateModel,
-    }): CancelablePromise<any> {
+isoCode,
+requestBody,
+}: {
+isoCode: string,
+requestBody?: UpdateLanguageRequestModel,
+}): CancelablePromise<any> {
         return __request(OpenAPI, {
             method: 'PUT',
             url: '/umbraco/management/api/v1/language/{isoCode}',

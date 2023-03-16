@@ -1,7 +1,7 @@
 import { rest } from 'msw';
 import { umbTemplateData } from '../data/template.data';
 import { umbracoPath } from '@umbraco-cms/utils';
-import { TemplateCreateModel, TemplateUpdateModel } from '@umbraco-cms/backend-api';
+import { TemplateModelBaseModel } from '@umbraco-cms/backend-api';
 
 // TODO: add schema
 export const handlers = [
@@ -42,7 +42,7 @@ export const handlers = [
 		return res(ctx.status(200), ctx.json(response));
 	}),
 
-	rest.put<TemplateUpdateModel>(umbracoPath('/template/:key'), async (req, res, ctx) => {
+	rest.put<TemplateModelBaseModel>(umbracoPath('/template/:key'), async (req, res, ctx) => {
 		const key = req.params.key as string;
 		const data = await req.json();
 		if (!key) return;
@@ -51,7 +51,7 @@ export const handlers = [
 		return res(ctx.status(200));
 	}),
 
-	rest.post<TemplateCreateModel>(umbracoPath('/template'), async (req, res, ctx) => {
+	rest.post<TemplateModelBaseModel>(umbracoPath('/template'), async (req, res, ctx) => {
 		const data = await req.json();
 		if (!data) return;
 
