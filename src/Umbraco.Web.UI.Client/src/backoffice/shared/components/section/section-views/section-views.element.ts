@@ -2,6 +2,7 @@ import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, html, nothing } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { map, of } from 'rxjs';
+import { UmbRouterSlotChangeEvent, UmbRouterSlotInitEvent } from '@umbraco-cms/router';
 import { UmbSectionContext, UMB_SECTION_CONTEXT_TOKEN } from '../section.context';
 import type { ManifestSectionView } from '@umbraco-cms/models';
 import { createExtensionElement, umbExtensionsRegistry } from '@umbraco-cms/extensions-api';
@@ -36,10 +37,10 @@ export class UmbSectionViewsElement extends UmbLitElement {
 	private _views: Array<ManifestSectionView> = [];
 
 	@state()
-	private _routerFolder = '';
+	private _routerPath?: string;
 
 	@state()
-	private _activeViewPathname?: string;
+	private _activePath?: string;
 
 	@state()
 	private _routes: Array<any> = [];
@@ -53,18 +54,11 @@ export class UmbSectionViewsElement extends UmbLitElement {
 		this.consumeContext(UMB_SECTION_CONTEXT_TOKEN, (sectionContext) => {
 			this._sectionContext = sectionContext;
 			this._observeViews();
-			this._observeActiveView();
 		});
 	}
 
-	connectedCallback(): void {
-		super.connectedCallback();
-		/* TODO: find a way to construct absolute urls */
-		this._routerFolder = window.location.pathname.split('/view')[0];
-	}
-
 	async #createRoutes(viewManifests: Array<ManifestSectionView>) {
-		const routes = viewManifests.map((manifest: any) => {
+		const routes = viewManifests.map((manifest) => {
 			return {
 				path: manifest.meta.pathname,
 				component: () => createExtensionElement(manifest),
@@ -94,19 +88,8 @@ export class UmbSectionViewsElement extends UmbLitElement {
 					.pipe(map((views) => views.filter((view) => view.conditions.sections.includes(sectionAlias)))) ?? of([]),
 				(views) => {
 					this._views = views;
+					this.#createRoutes(views);
 				}
-			);
-		}
-	}
-
-	private _observeActiveView() {
-		if (this._sectionContext) {
-			this.observe(
-				this._sectionContext?.activeViewPathname,
-				(pathname) => {
-					this._activeViewPathname = pathname;
-				},
-				'activeViewPathnameObserver'
 			);
 		}
 	}
@@ -116,7 +99,15 @@ export class UmbSectionViewsElement extends UmbLitElement {
 			${this._views.length > 0
 				? html`
 						<div id="header">${this.#renderTabs()}</div>
-						<umb-router-slot .routes=${this._routes}></umb-router-slot>
+						<umb-router-slot
+							.routes=${this._routes}
+							@init=${(event: UmbRouterSlotInitEvent) => {
+								this._routerPath = event.target.absoluteRouterPath;
+							}}
+							@change=${(event: UmbRouterSlotChangeEvent) => {
+								this._activePath = event.target.localActiveViewPath;
+							}}>
+						</umb-router-slot>
 				  `
 				: nothing}
 		`;
@@ -129,8 +120,8 @@ export class UmbSectionViewsElement extends UmbLitElement {
 					(view: ManifestSectionView) => html`
 						<uui-tab
 							.label="${view.meta.label || view.name}"
-							href="${this._routerFolder}/view/${view.meta.pathname}"
-							?active="${this._activeViewPathname?.includes(view.meta.pathname)}">
+							href="${this._routerPath}/${view.meta.pathname}"
+							?active="${this._activePath === view.meta.pathname}">
 							<uui-icon slot="icon" name=${view.meta.icon}></uui-icon>
 							${view.meta.label || view.name}
 						</uui-tab>

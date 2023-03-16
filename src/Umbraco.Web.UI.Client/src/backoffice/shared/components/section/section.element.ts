@@ -122,15 +122,6 @@ export class UmbSectionElement extends UmbLitElement {
 		}
 	}
 
-	/*
-	private _onRouteChange = (event: UmbRouterSlotChangeEvent) => {
-		const currentPath = event.target.localActiveViewPath;
-		const view = this._views?.find((view) => 'view/' + view.meta.pathname === currentPath);
-		if (!view) return;
-		this._sectionContext?.setActiveView(view);
-	};
-	*/
-
 	render() {
 		return html`
 			${this._menus && this._menus.length > 0
