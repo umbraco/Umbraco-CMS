@@ -32,7 +32,8 @@ export class UmbMediaWorkspaceEditElement extends UmbLitElement {
 	}
 
 	#observeKey() {
-		this.observe(this.#umbWorkspaceContext?.data, (data) => (this._key = data.key));
+		if (!this.#umbWorkspaceContext) return;
+		this.observe(this.#umbWorkspaceContext.data, (data) => (this._key = data?.key));
 	}
 
 	render() {
