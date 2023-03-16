@@ -1,4 +1,7 @@
-﻿using System.Linq;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.Services.Changes;
 
@@ -86,27 +89,33 @@ namespace Umbraco.Web.Cache
 
         #region DataTypeCache
 
-        public static void RefreshDataTypeCache(this DistributedCache dc, params IDataType[] dataTypes)
+        [Obsolete("Use the overload accepting IEnumerable instead.")]
+        public static void RefreshDataTypeCache(this DistributedCache dc, IDataType dataType)
         {
-            if (dataTypes.Length == 0)
+            if (dataType == null)
             {
                 return;
             }
 
-            var payloads = dataTypes.Select(x => new DataTypeCacheRefresher.JsonPayload(x.Id, x.Key, false));
-            dc.RefreshByPayload(DataTypeCacheRefresher.UniqueId, payloads);
+            dc.RefreshDataTypeCache(dataType.Yield());
         }
 
-        public static void RemoveDataTypeCache(this DistributedCache dc, params IDataType[] dataTypes)
+        public static void RefreshDataTypeCache(this DistributedCache dc, IEnumerable<IDataType> dataTypes)
+            => dc.RefreshByPayload(DataTypeCacheRefresher.UniqueId, dataTypes?.Select(x => new DataTypeCacheRefresher.JsonPayload(x.Id, x.Key, false)));
+
+        [Obsolete("Use the overload accepting IEnumerable instead.")]
+        public static void RemoveDataTypeCache(this DistributedCache dc, IDataType dataType)
         {
-            if (dataTypes.Length == 0)
+            if (dataType == null)
             {
                 return;
             }
 
-            var payloads = dataTypes.Select(x => new DataTypeCacheRefresher.JsonPayload(x.Id, x.Key, true));
-            dc.RefreshByPayload(DataTypeCacheRefresher.UniqueId, payloads);
+            dc.RemoveDataTypeCache(dataType.Yield());
         }
+
+        public static void RemoveDataTypeCache(this DistributedCache dc, IEnumerable<IDataType> dataTypes)
+            => dc.RefreshByPayload(DataTypeCacheRefresher.UniqueId, dataTypes?.Select(x => new DataTypeCacheRefresher.JsonPayload(x.Id, x.Key, true)));
 
         #endregion
 
