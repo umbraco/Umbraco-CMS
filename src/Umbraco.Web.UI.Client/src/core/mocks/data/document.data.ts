@@ -45,7 +45,7 @@ export const data: Array<DocumentModel> = [
 			},
 			{
 				alias: 'multiUrlPicker',
-				culture: null,
+				culture: 'en-us',
 				segment: null,
 				value: [
 					{
@@ -58,6 +58,12 @@ export const data: Array<DocumentModel> = [
 						url: 'umb://document/c05da24d7740447b9cdcbd8ce2172e38',
 					},
 				],
+			},
+			{
+				alias: 'multiUrlPicker',
+				culture: 'da-dk',
+				segment: null,
+				value: null,
 			},
 			{
 				alias: 'multiNodeTreePicker',
@@ -241,6 +247,15 @@ export const data: Array<DocumentModel> = [
 				culture: 'en-us',
 				segment: null,
 				name: 'All properties',
+				createDate: '2023-02-06T15:31:46.876902',
+				updateDate: '2023-02-06T15:31:51.354764',
+			},
+			{
+				state: ContentStateModel.PUBLISHED,
+				publishDate: '2023-02-06T15:31:51.354764',
+				culture: 'da-dk',
+				segment: null,
+				name: 'Alle redigeringsfelter',
 				createDate: '2023-02-06T15:31:46.876902',
 				updateDate: '2023-02-06T15:31:51.354764',
 			},
