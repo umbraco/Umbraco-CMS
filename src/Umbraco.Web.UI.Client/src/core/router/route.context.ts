@@ -1,4 +1,4 @@
-import { IRoute, IRoutingInfo, PARAM_IDENTIFIER, stripSlash } from 'router-slot';
+import { IRoute, IRoutingInfo, Params, PARAM_IDENTIFIER, stripSlash } from 'router-slot';
 import { UmbContextConsumerController, UmbContextProviderController, UmbContextToken } from '@umbraco-cms/context-api';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 import { UmbModalToken, UMB_MODAL_CONTEXT_TOKEN } from '@umbraco-cms/modal';
@@ -8,11 +8,13 @@ const EmptyDiv = document.createElement('div');
 // TODO: Consider accepting the Token as a generic:
 export type UmbModalRouteOptions<UmbModalTokenData extends object = object, UmbModalTokenResult = unknown> = {
 	path: string;
-	onSetup?: (routingInfo: IRoutingInfo) => UmbModalTokenData | false;
+	onSetup?: (routingInfo: Params) => UmbModalTokenData | false;
 	onSubmit?: (data: UmbModalTokenResult) => void | PromiseLike<void>;
 	onReject?: () => void;
 	onUrlBuilder?: (urlBuilder: UmbModalRouteBuilder) => void;
 };
+
+export type UmbModalRegistrationToken = UmbModalRouteRegistration;
 
 type UmbModalRouteRegistration<D extends object = object, R = any> = {
 	alias: UmbModalToken | string;
@@ -51,7 +53,7 @@ export class UmbRouteContext {
 			alias: alias,
 			options: options,
 			routeSetup: (component: HTMLElement, info: IRoutingInfo<any, any>) => {
-				const modalData = options.onSetup?.(info);
+				const modalData = options.onSetup?.(info.match.params);
 				if (modalData !== false && this.#modalContext) {
 					const modalHandler = this.#modalContext.open(alias, modalData || {});
 					modalHandler.onSubmit().then(
@@ -64,6 +66,14 @@ export class UmbRouteContext {
 		};
 		this.#modalRegistrations.push(registration);
 		this.#generateNewURL(registration);
+		this.#generateContextRoutes();
+		return registration;
+	}
+
+	public unregisterModal(registrationToken: ReturnType<typeof this.registerModal>) {
+		const index = this.#modalRegistrations.indexOf(registrationToken);
+		if (index === -1) return;
+		this.#modalRegistrations.splice(index, 1);
 		this.#generateContextRoutes();
 	}
 

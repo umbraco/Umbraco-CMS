@@ -3,7 +3,11 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, property, state } from 'lit/decorators.js';
 import { FormControlMixin } from '@umbraco-ui/uui-base/lib/mixins';
 import { UUIModalSidebarSize } from '@umbraco-ui/uui-modal-sidebar';
-import { UmbModalRouteBuilder, UmbRouteContext, UMB_ROUTE_CONTEXT_TOKEN } from '@umbraco-cms/router';
+import {
+	UmbModalRouteBuilder,
+	UmbPropertyEditorModalRegistrationController,
+	UmbRouteContext,
+} from '@umbraco-cms/router';
 import { UmbLinkPickerLink, UMB_LINK_PICKER_MODAL_TOKEN } from '../../modals/link-picker';
 import { UmbLitElement } from '@umbraco-cms/element';
 
@@ -100,7 +104,6 @@ export class UmbInputMultiUrlPickerElement extends FormControlMixin(UmbLitElemen
 	}
 
 	private _urls: Array<UmbLinkPickerLink> = [];
-	private _routeContext?: UmbRouteContext;
 
 	@state()
 	private _linkPickerURL?: UmbModalRouteBuilder;
@@ -119,20 +122,59 @@ export class UmbInputMultiUrlPickerElement extends FormControlMixin(UmbLitElemen
 		);
 
 		// TODO: make a helper that get the context, watches one or more props to use to update the registration, can be or have something that is stateful so its easy to use the URLBuilder.
+		new UmbPropertyEditorModalRegistrationController(this, UMB_LINK_PICKER_MODAL_TOKEN, {
+			path: `:index`,
+			onSetup: (params) => {
+				// Get index:
+				const indexParam = params.index;
+				if (!indexParam) return false;
+				let index: number | null = parseInt(params.index);
+				if (Number.isNaN(index)) return false;
 
-		/*
+				// Use the index to find data:
+				let data: UmbLinkPickerLink | null = null;
+				if (index >= 0 && index < this.urls.length) {
+					data = this._getItemByIndex(index);
+				} else {
+					// If not then make a new pick:
+					index = null;
+				}
 
-		new UmbPropertyEditorModalRegistration(this, UMB_LINK_PICKER_MODAL_TOKEN, (modalToken) => {
-			...FormControlMixin
+				return {
+					index: index,
+					lol: false,
+					link: {
+						name: data?.name,
+						published: data?.published,
+						queryString: data?.queryString,
+						target: data?.target,
+						trashed: data?.trashed,
+						udi: data?.udi,
+						url: data?.url,
+					},
+					config: {
+						hideAnchor: this.hideAnchor,
+						ignoreUserStartNodes: this.ignoreUserStartNodes,
+						overlaySize: this.overlaySize || 'small',
+					},
+				};
+			},
+			onSubmit: (submitData) => {
+				if (!submitData) return;
+				this._setSelection(submitData.link, submitData.index);
+			},
+			onUrlBuilder: (urlBuilder) => {
+				this._linkPickerURL = urlBuilder;
+			},
 		});
 
-		*/
 		/*
 
 		Or use a property context method..?
 
 		*/
 
+		/*
 		this.consumeContext(UMB_ROUTE_CONTEXT_TOKEN, (instance) => {
 			this._routeContext = instance;
 
@@ -187,6 +229,7 @@ export class UmbInputMultiUrlPickerElement extends FormControlMixin(UmbLitElemen
 				},
 			});
 		});
+		*/
 	}
 
 	private _removeItem(index: number) {
