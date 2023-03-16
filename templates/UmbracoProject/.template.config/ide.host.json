@@ -16,6 +16,10 @@
       "isVisible": true
     },
     {
+      "id": "UseRuntimeMode",
+      "isVisible": true
+    },
+    {
       "id": "SkipRestore",
       "isVisible": true
     },
