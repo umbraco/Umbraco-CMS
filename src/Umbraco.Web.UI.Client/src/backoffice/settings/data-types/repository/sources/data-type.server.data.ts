@@ -1,3 +1,4 @@
+import { v4 as uuidv4 } from 'uuid';
 import { RepositoryDetailDataSource } from '@umbraco-cms/repository';
 import {
 	ProblemDetailsModel,
@@ -57,6 +58,7 @@ export class UmbDataTypeServerDataSource implements RepositoryDetailDataSource<D
 		const data: DataTypeModel = {
 			$type: '',
 			parentKey: parentKey,
+			key: uuidv4(),
 		};
 
 		return { data };
