@@ -78,7 +78,7 @@ export class UmbPropertyActionMenuElement extends UmbLitElement {
 		this._actionsObserver = this.observe(
 			umbExtensionsRegistry.extensionsOfType('propertyAction').pipe(
 				map((propertyActions) => {
-					return propertyActions.filter((propertyAction) => propertyAction.meta.propertyEditors.includes(alias));
+					return propertyActions.filter((propertyAction) => propertyAction.conditions.propertyEditors.includes(alias));
 				})
 			),
 			(manifests) => {

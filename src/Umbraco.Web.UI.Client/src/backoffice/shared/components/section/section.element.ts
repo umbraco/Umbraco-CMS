@@ -78,7 +78,9 @@ export class UmbSectionElement extends UmbLitElement {
 			this.observe(
 				umbExtensionsRegistry
 					?.extensionsOfType('menuSectionSidebarApp')
-					.pipe(map((manifests) => manifests.filter((manifest) => manifest.meta.sections.includes(sectionAlias)))),
+					.pipe(
+						map((manifests) => manifests.filter((manifest) => manifest.conditions.sections.includes(sectionAlias)))
+					),
 				(manifests) => {
 					this._menus = manifests;
 				}
@@ -152,11 +154,9 @@ export class UmbSectionElement extends UmbLitElement {
 
 	private _observeViews() {
 		this.observe(umbExtensionsRegistry?.extensionsOfType('sectionView'), (views) => {
-			const sectionViews = views
-				.filter((view) => {
-					return this._sectionAlias ? view.meta.sections.includes(this._sectionAlias) : false;
-				})
-				.sort((a, b) => b.meta.weight - a.meta.weight);
+			const sectionViews = views.filter((view) => {
+				return this._sectionAlias ? view.conditions.sections.includes(this._sectionAlias) : false;
+			});
 			if (sectionViews.length > 0) {
 				this._views = sectionViews;
 				this._createViewRoutes();
@@ -198,12 +198,12 @@ export class UmbSectionElement extends UmbLitElement {
 							<umb-extension-slot
 								type="sectionSidebarApp"
 								.filter=${(items: ManifestMenuSectionSidebarApp) =>
-									items.meta.sections.includes(this._sectionAlias || '')}></umb-extension-slot>
+									items.conditions.sections.includes(this._sectionAlias || '')}></umb-extension-slot>
 
 							<umb-extension-slot
 								type="menuSectionSidebarApp"
 								.filter=${(items: ManifestMenuSectionSidebarApp) =>
-									items.meta.sections.includes(this._sectionAlias || '')}
+									items.conditions.sections.includes(this._sectionAlias || '')}
 								default-element="umb-section-sidebar-menu"></umb-extension-slot>
 						</umb-section-sidebar>
 				  `

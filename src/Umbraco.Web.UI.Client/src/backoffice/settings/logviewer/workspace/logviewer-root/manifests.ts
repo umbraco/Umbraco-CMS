@@ -20,10 +20,12 @@ const workspaceViews: Array<ManifestWorkspaceView> = [
 		loader: () => import('../views/overview/index'),
 		weight: 300,
 		meta: {
-			workspaces: [workspaceAlias],
 			label: 'Overview',
 			pathname: 'overview',
 			icon: 'umb:box-alt',
+		},
+		conditions: {
+			workspaces: [workspaceAlias],
 		},
 	},
 	{
@@ -33,10 +35,12 @@ const workspaceViews: Array<ManifestWorkspaceView> = [
 		loader: () => import('../views/search/index'),
 		weight: 200,
 		meta: {
-			workspaces: [workspaceAlias],
 			label: 'Search',
 			pathname: 'search',
 			icon: 'umb:search',
+		},
+		conditions: {
+			workspaces: [workspaceAlias],
 		},
 	},
 ];

@@ -19,10 +19,12 @@ const workspaceViews: Array<ManifestWorkspaceView> = [
 		loader: () => import('./views/design/workspace-view-document-type-design.element'),
 		weight: 100,
 		meta: {
-			workspaces: ['Umb.Workspace.DocumentType'],
 			label: 'Design',
 			pathname: 'design',
 			icon: 'edit',
+		},
+		conditions: {
+			workspaces: ['Umb.Workspace.DocumentType'],
 		},
 	},
 ];
@@ -33,11 +35,13 @@ const workspaceActions: Array<ManifestWorkspaceAction> = [
 		alias: 'Umb.WorkspaceAction.DocumentType.Save',
 		name: 'Save Document Type Workspace Action',
 		meta: {
-			workspaces: ['Umb.Workspace.DocumentType'],
 			label: 'Save',
 			look: 'primary',
 			color: 'positive',
 			api: UmbSaveWorkspaceAction,
+		},
+		conditions: {
+			workspaces: ['Umb.Workspace.DocumentType'],
 		},
 	},
 ];

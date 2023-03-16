@@ -8,11 +8,13 @@ const entityActions: Array<ManifestEntityAction> = [
 		alias: 'Umb.EntityAction.Media.Trash',
 		name: 'Trash Media Entity Action ',
 		meta: {
-			entityType: 'media',
 			icon: 'umb:trash',
 			label: 'Trash',
 			api: UmbTrashEntityAction,
 			repositoryAlias: MEDIA_REPOSITORY_ALIAS,
+		},
+		conditions: {
+			entityType: 'media',
 		},
 	},
 ];

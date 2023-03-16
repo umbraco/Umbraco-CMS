@@ -9,6 +9,8 @@ const menuItem: ManifestMenuItem = {
 	meta: {
 		label: 'Member Groups',
 		icon: 'umb:folder',
+	},
+	conditions: {
 		menus: ['Umb.Menu.Members'],
 	},
 };

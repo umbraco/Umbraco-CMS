@@ -9,6 +9,8 @@ const menuItem: ManifestMenuItem = {
 		label: 'Log Viewer',
 		icon: 'umb:box-alt',
 		entityType: 'logviewer',
+	},
+	conditions: {
 		menus: ['Umb.Menu.Settings'],
 	},
 };

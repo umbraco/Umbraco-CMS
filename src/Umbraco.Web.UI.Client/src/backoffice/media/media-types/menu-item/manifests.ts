@@ -9,6 +9,8 @@ const menuItem: ManifestMenuItem = {
 	meta: {
 		label: 'Media Types',
 		icon: 'umb:folder',
+	},
+	conditions: {
 		menus: ['Umb.Menu.Settings'],
 	},
 };

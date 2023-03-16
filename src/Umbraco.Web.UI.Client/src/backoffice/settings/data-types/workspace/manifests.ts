@@ -19,10 +19,12 @@ const workspaceViews: Array<ManifestWorkspaceView> = [
 		loader: () => import('./views/edit/data-type-workspace-view-edit.element'),
 		weight: 90,
 		meta: {
-			workspaces: ['Umb.Workspace.DataType'],
 			label: 'Edit',
 			pathname: 'edit',
 			icon: 'edit',
+		},
+		conditions: {
+			workspaces: ['Umb.Workspace.DataType'],
 		},
 	},
 	{
@@ -32,10 +34,12 @@ const workspaceViews: Array<ManifestWorkspaceView> = [
 		loader: () => import('./views/info/workspace-view-data-type-info.element'),
 		weight: 90,
 		meta: {
-			workspaces: ['Umb.Workspace.DataType'],
 			label: 'Info',
 			pathname: 'info',
 			icon: 'info',
+		},
+		conditions: {
+			workspaces: ['Umb.Workspace.DataType'],
 		},
 	},
 ];
@@ -46,11 +50,13 @@ const workspaceActions: Array<ManifestWorkspaceAction> = [
 		alias: 'Umb.WorkspaceAction.DataType.Save',
 		name: 'Save Data Type Workspace Action',
 		meta: {
-			workspaces: ['Umb.Workspace.DataType'],
 			label: 'Save',
 			look: 'primary',
 			color: 'positive',
 			api: UmbSaveWorkspaceAction,
+		},
+		conditions: {
+			workspaces: ['Umb.Workspace.MemberGroup'],
 		},
 	},
 ];

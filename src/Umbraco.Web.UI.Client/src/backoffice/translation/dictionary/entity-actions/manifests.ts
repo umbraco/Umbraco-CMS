@@ -16,11 +16,13 @@ const entityActions: Array<ManifestEntityAction> = [
 		name: 'Create Dictionary Entity Action',
 		weight: 600,
 		meta: {
-			entityType,
 			icon: 'umb:add',
 			label: 'Create',
 			repositoryAlias,
 			api: UmbCreateDictionaryEntityAction,
+		},
+		conditions: {
+			entityType,
 		},
 	},
 	{
@@ -29,11 +31,13 @@ const entityActions: Array<ManifestEntityAction> = [
 		name: 'Move Dictionary Entity Action',
 		weight: 500,
 		meta: {
-			entityType,
 			icon: 'umb:enter',
 			label: 'Move',
 			repositoryAlias,
 			api: UmbMoveEntityAction,
+		},
+		conditions: {
+			entityType,
 		},
 	},
 	{
@@ -42,11 +46,13 @@ const entityActions: Array<ManifestEntityAction> = [
 		name: 'Export Dictionary Entity Action',
 		weight: 400,
 		meta: {
-			entityType,
 			icon: 'umb:download-alt',
 			label: 'Export',
 			repositoryAlias,
 			api: UmbExportDictionaryEntityAction,
+		},
+		conditions: {
+			entityType,
 		},
 	},
 	{
@@ -55,11 +61,13 @@ const entityActions: Array<ManifestEntityAction> = [
 		name: 'Import Dictionary Entity Action',
 		weight: 300,
 		meta: {
-			entityType,
 			icon: 'umb:page-up',
 			label: 'Import',
 			repositoryAlias,
 			api: UmbImportDictionaryEntityAction,
+		},
+		conditions: {
+			entityType,
 		},
 	},
 	{
@@ -68,11 +76,13 @@ const entityActions: Array<ManifestEntityAction> = [
 		name: 'Reload Dictionary Entity Action',
 		weight: 200,
 		meta: {
-			entityType,
 			icon: 'umb:refresh',
 			label: 'Reload',
 			repositoryAlias,
 			api: UmbReloadDictionaryEntityAction,
+		},
+		conditions: {
+			entityType,
 		},
 	},
 	{
@@ -81,11 +91,13 @@ const entityActions: Array<ManifestEntityAction> = [
 		name: 'Delete Dictionary Entity Action',
 		weight: 100,
 		meta: {
-			entityType,
 			icon: 'umb:trash',
 			label: 'Delete',
 			repositoryAlias,
 			api: UmbDeleteEntityAction,
+		},
+		conditions: {
+			entityType,
 		},
 	},
 ];

@@ -20,10 +20,12 @@ const workspaceViews: Array<ManifestWorkspaceView> = [
 		loader: () => import('./views/edit/edit-language-workspace-view.element'),
 		weight: 90,
 		meta: {
-			workspaces: ['Umb.Workspace.Language'],
 			label: 'Edit',
 			pathname: 'edit',
 			icon: 'edit',
+		},
+		conditions: {
+			workspaces: ['Umb.Workspace.Language'],
 		},
 	},
 ];
@@ -34,11 +36,13 @@ const workspaceActions: Array<ManifestWorkspaceAction> = [
 		alias: 'Umb.WorkspaceAction.Language.Save',
 		name: 'Save Language Workspace Action',
 		meta: {
-			workspaces: ['Umb.Workspace.Language'],
 			look: 'primary',
 			color: 'positive',
 			label: 'Save',
 			api: UmbSaveWorkspaceAction,
+		},
+		conditions: {
+			workspaces: ['Umb.Workspace.Language'],
 		},
 	},
 ];

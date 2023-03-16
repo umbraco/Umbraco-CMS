@@ -74,13 +74,7 @@ export class UmbSectionViewsElement extends UmbLitElement {
 			this._extensionsObserver = this.observe(
 				umbExtensionsRegistry
 					?.extensionsOfType('sectionView')
-					.pipe(
-						map((views) =>
-							views
-								.filter((view) => view.meta.sections.includes(sectionAlias))
-								.sort((a, b) => b.meta.weight - a.meta.weight)
-						)
-					) ?? of([]),
+					.pipe(map((views) => views.filter((view) => view.conditions.sections.includes(sectionAlias)))) ?? of([]),
 				(views) => {
 					this._views = views;
 				}

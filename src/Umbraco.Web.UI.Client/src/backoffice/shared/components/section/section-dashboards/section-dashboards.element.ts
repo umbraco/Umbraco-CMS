@@ -94,7 +94,7 @@ export class UmbSectionDashboardsElement extends UmbLitElement {
 				?.extensionsOfTypes<ManifestDashboard | ManifestDashboardCollection>(['dashboard', 'dashboardCollection'])
 				.pipe(
 					map((extensions) =>
-						extensions.filter((extension) => extension.meta.sections.includes(this._currentSectionAlias ?? ''))
+						extensions.filter((extension) => extension.conditions.sections.includes(this._currentSectionAlias ?? ''))
 					)
 				),
 			(dashboards) => {

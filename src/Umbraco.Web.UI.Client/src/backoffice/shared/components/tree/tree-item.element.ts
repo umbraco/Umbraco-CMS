@@ -153,7 +153,7 @@ export class UmbTreeItem extends UmbLitElement {
 		this.observe(
 			umbExtensionsRegistry
 				.extensionsOfType('entityAction')
-				.pipe(map((actions) => actions.filter((action) => action.meta.entityType === this._entityType))),
+				.pipe(map((actions) => actions.filter((action) => action.conditions.entityType === this._entityType))),
 			(actions) => {
 				this._hasActions = actions.length > 0;
 			}
