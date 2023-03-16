@@ -7,7 +7,7 @@ import { UUITextareaElement, UUITextareaEvent } from '@umbraco-ui/uui';
 import { UmbWorkspaceDictionaryContext } from '../../dictionary-workspace.context';
 import { UmbDictionaryRepository } from '../../../repository/dictionary.repository';
 import { UmbLitElement } from '@umbraco-cms/element';
-import { DictionaryItemModel, LanguageModel } from '@umbraco-cms/backend-api';
+import { DictionaryItemResponseModel, LanguageResponseModel } from '@umbraco-cms/backend-api';
 
 @customElement('umb-workspace-view-dictionary-edit')
 export class UmbWorkspaceViewDictionaryEditElement extends UmbLitElement {
@@ -22,12 +22,12 @@ export class UmbWorkspaceViewDictionaryEditElement extends UmbLitElement {
 	];
 
 	@state()
-	private _dictionary?: DictionaryItemModel;
+	private _dictionary?: DictionaryItemResponseModel;
 
 	#repo!: UmbDictionaryRepository;
 
 	@state()
-	private _languages: Array<LanguageModel> = [];
+	private _languages: Array<LanguageResponseModel> = [];
 
 	#workspaceContext!: UmbWorkspaceDictionaryContext;
 
@@ -49,7 +49,7 @@ export class UmbWorkspaceViewDictionaryEditElement extends UmbLitElement {
 		});
 	}
 
-	#renderTranslation(language: LanguageModel) {
+	#renderTranslation(language: LanguageResponseModel) {
 		if (!language.isoCode) return;
 
 		const translation = this._dictionary?.translations?.find((x) => x.isoCode === language.isoCode);

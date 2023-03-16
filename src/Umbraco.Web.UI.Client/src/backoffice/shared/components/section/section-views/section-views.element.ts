@@ -45,7 +45,7 @@ export class UmbSectionViewsElement extends UmbLitElement {
 	private _routes: Array<any> = [];
 
 	private _sectionContext?: UmbSectionContext;
-	private _extensionsObserver?: UmbObserverController;
+	private _extensionsObserver?: UmbObserverController<ManifestSectionView[]>;
 
 	constructor() {
 		super();
@@ -91,9 +91,8 @@ export class UmbSectionViewsElement extends UmbLitElement {
 			this._extensionsObserver = this.observe(
 				umbExtensionsRegistry
 					?.extensionsOfType('sectionView')
-					.pipe(map((views) => views.filter((view) => view.meta.sections.includes(sectionAlias)))) ?? of([]),
+					.pipe(map((views) => views.filter((view) => view.conditions.sections.includes(sectionAlias)))) ?? of([]),
 				(views) => {
-					this.#createRoutes(views);
 					this._views = views;
 				}
 			);

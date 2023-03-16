@@ -22,10 +22,12 @@ const workspaceViews: Array<ManifestWorkspaceView> = [
 		loader: () => import('./views/edit/workspace-view-dictionary-edit.element'),
 		weight: 100,
 		meta: {
-			workspaces: [workspaceAlias],
 			label: 'Edit',
 			pathname: 'edit',
 			icon: 'edit',
+		},
+		conditions: {
+			workspaces: [workspaceAlias],
 		},
 	},
 ];
@@ -37,11 +39,13 @@ const workspaceActions: Array<ManifestWorkspaceAction> = [
 		name: 'Save Dictionary Workspace Action',
 		weight: 90,
 		meta: {
-			workspaces: ['Umb.Workspace.Dictionary'],
 			label: 'Save',
 			look: 'primary',
 			color: 'positive',
 			api: UmbSaveWorkspaceAction,
+		},
+		conditions: {
+			workspaces: ['Umb.Workspace.Dictionary'],
 		},
 	},
 ];

@@ -6,12 +6,16 @@ import type { ClassConstructor } from '@umbraco-cms/models';
 export interface ManifestWorkspaceAction extends ManifestElement {
 	type: 'workspaceAction';
 	meta: MetaWorkspaceAction;
+	conditions: ConditionsWorkspaceAction;
 }
 
 export interface MetaWorkspaceAction {
-	workspaces: Array<string>;
 	label?: string; //TODO: Use or implement additional label-key
 	look?: InterfaceLook;
 	color?: InterfaceColor;
 	api: ClassConstructor<UmbWorkspaceAction>;
+}
+
+export interface ConditionsWorkspaceAction {
+	workspaces: Array<string>;
 }

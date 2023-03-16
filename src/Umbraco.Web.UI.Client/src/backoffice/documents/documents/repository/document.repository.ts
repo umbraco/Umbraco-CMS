@@ -5,12 +5,12 @@ import { UmbDocumentStore, UMB_DOCUMENT_STORE_CONTEXT_TOKEN } from './document.s
 import { UmbDocumentServerDataSource } from './sources/document.server.data';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 import { UmbContextConsumerController } from '@umbraco-cms/context-api';
-import { ProblemDetailsModel, DocumentModel } from '@umbraco-cms/backend-api';
+import { ProblemDetailsModel, DocumentResponseModel } from '@umbraco-cms/backend-api';
 import type { UmbTreeRepository } from 'libs/repository/tree-repository.interface';
 import { UmbDetailRepository } from '@umbraco-cms/repository';
 import { UmbNotificationContext, UMB_NOTIFICATION_CONTEXT_TOKEN } from '@umbraco-cms/notification';
 
-type ItemType = DocumentModel;
+type ItemType = DocumentResponseModel;
 
 // Move to documentation / JSdoc
 /* We need to create a new instance of the repository from within the element context. We want the notifications to be displayed in the right context. */

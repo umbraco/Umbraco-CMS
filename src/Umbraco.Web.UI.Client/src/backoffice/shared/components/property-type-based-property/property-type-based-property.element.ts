@@ -5,7 +5,11 @@ import { customElement, property, state } from 'lit/decorators.js';
 import { UmbDataTypeRepository } from '../../../settings/data-types/repository/data-type.repository';
 import { UmbVariantId } from '../../variants/variant-id.class';
 import { UmbDocumentWorkspaceContext } from '../../../documents/documents/workspace/document-workspace.context';
-import type { DataTypeModel, DataTypePropertyModel, PropertyTypeViewModelBaseModel } from '@umbraco-cms/backend-api';
+import type {
+	DataTypeResponseModel,
+	DataTypePropertyPresentationModel,
+	PropertyTypeResponseModelBaseModel,
+} from '@umbraco-cms/backend-api';
 import '../workspace-property/workspace-property.element';
 import { UmbLitElement } from '@umbraco-cms/element';
 import { UmbObserverController } from '@umbraco-cms/observable-api';
@@ -22,10 +26,10 @@ export class UmbPropertyTypeBasedPropertyElement extends UmbLitElement {
 	];
 
 	@property({ type: Object, attribute: false })
-	public get property(): PropertyTypeViewModelBaseModel | undefined {
+	public get property(): PropertyTypeResponseModelBaseModel | undefined {
 		return this._property;
 	}
-	public set property(value: PropertyTypeViewModelBaseModel | undefined) {
+	public set property(value: PropertyTypeResponseModelBaseModel | undefined) {
 		const oldProperty = this._property;
 		this._property = value;
 		if (this._property?.dataTypeKey !== oldProperty?.dataTypeKey) {
@@ -33,16 +37,16 @@ export class UmbPropertyTypeBasedPropertyElement extends UmbLitElement {
 			this._observeProperty();
 		}
 	}
-	private _property?: PropertyTypeViewModelBaseModel;
+	private _property?: PropertyTypeResponseModelBaseModel;
 
 	@state()
 	private _propertyEditorUiAlias?: string;
 
 	@state()
-	private _dataTypeData: DataTypePropertyModel[] = [];
+	private _dataTypeData: DataTypePropertyPresentationModel[] = [];
 
 	private _dataTypeRepository: UmbDataTypeRepository = new UmbDataTypeRepository(this);
-	private _dataTypeObserver?: UmbObserverController<DataTypeModel | null>;
+	private _dataTypeObserver?: UmbObserverController<DataTypeResponseModel | undefined>;
 
 	@state()
 	private _value?: unknown;
@@ -98,7 +102,7 @@ export class UmbPropertyTypeBasedPropertyElement extends UmbLitElement {
 			this._dataTypeObserver = this.observe(
 				await this._dataTypeRepository.byKey(dataTypeKey),
 				(dataType) => {
-					this._dataTypeData = dataType?.data || [];
+					this._dataTypeData = dataType?.values || [];
 					this._propertyEditorUiAlias = dataType?.propertyEditorUiAlias || undefined;
 				},
 				'observeDataType'

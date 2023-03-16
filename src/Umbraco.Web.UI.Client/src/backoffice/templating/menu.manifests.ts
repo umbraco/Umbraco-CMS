@@ -16,8 +16,10 @@ const menuSectionSidebarApp: ManifestMenuSectionSidebarApp = {
 	weight: 100,
 	meta: {
 		label: 'Templating',
-		sections: ['Umb.Section.Settings'],
 		menu: 'Umb.Menu.Templating',
+	},
+	conditions: {
+		sections: ['Umb.Section.Settings'],
 	},
 };
 

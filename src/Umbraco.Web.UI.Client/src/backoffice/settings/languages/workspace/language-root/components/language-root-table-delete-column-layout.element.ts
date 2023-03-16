@@ -3,14 +3,14 @@ import { css, html, nothing } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { ifDefined } from 'lit-html/directives/if-defined.js';
 import { UmbLitElement } from '@umbraco-cms/element';
-import { LanguageModel } from '@umbraco-cms/backend-api';
+import { LanguageResponseModel } from '@umbraco-cms/backend-api';
 
 @customElement('umb-language-root-table-delete-column-layout')
 export class UmbLanguageRootTableDeleteColumnLayoutElement extends UmbLitElement {
 	static styles = [UUITextStyles, css``];
 
 	@property({ attribute: false })
-	value!: LanguageModel;
+	value!: LanguageResponseModel;
 
 	@state()
 	_isOpen = false;

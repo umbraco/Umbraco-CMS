@@ -1,4 +1,4 @@
-import { LogLevelModel, LogMessageModel } from '@umbraco-cms/backend-api';
+import { LogLevelModel, LogMessageResponseModel } from '@umbraco-cms/backend-api';
 
 const allLogs = [
 	{
@@ -7309,7 +7309,7 @@ const randomEnumValue = (enumeration: any): LogLevelModel => {
 	return enumeration[enumKey];
 };
 
-export const logs: LogMessageModel[] = allLogs.map((log) => {
+export const logs: LogMessageResponseModel[] = allLogs.map((log) => {
 
 	const randomLevel = randomEnumValue(LogLevelModel);
 

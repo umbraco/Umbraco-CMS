@@ -100,6 +100,10 @@ export interface ManifestBase {
 	weight?: number;
 }
 
+export interface ManifestWithConditions<ConditionsType> {
+	conditions: ConditionsType;
+}
+
 export interface ManifestWithLoader<LoaderReturnType> extends ManifestBase {
 	loader?: () => Promise<LoaderReturnType>;
 }

@@ -2,14 +2,14 @@ import { rest } from 'msw';
 import { searchResultMockData, getIndexByName, PagedIndexers } from '../data/examine.data';
 
 import { umbracoPath } from '@umbraco-cms/utils';
-import { IndexModel, PagedIndexModel, PagedSearcherModel, PagedSearchResultModel } from '@umbraco-cms/backend-api';
+import { IndexResponseModel, PagedIndexResponseModel, PagedSearcherResponseModel, PagedSearchResultResponseModel } from '@umbraco-cms/backend-api';
 
 export const handlers = [
 	rest.get(umbracoPath('/indexer'), (_req, res, ctx) => {
 		return res(
 			// Respond with a 200 status code
 			ctx.status(200),
-			ctx.json<PagedIndexModel>(PagedIndexers)
+			ctx.json<PagedIndexResponseModel>(PagedIndexers)
 		);
 	}),
 
@@ -20,7 +20,7 @@ export const handlers = [
 		const indexFound = getIndexByName(indexName);
 
 		if (indexFound) {
-			return res(ctx.status(200), ctx.json<IndexModel>(indexFound));
+			return res(ctx.status(200), ctx.json<IndexResponseModel>(indexFound));
 		} else {
 			return res(ctx.status(404));
 		}
@@ -43,7 +43,7 @@ export const handlers = [
 	rest.get(umbracoPath('/searcher'), (_req, res, ctx) => {
 		return res(
 			ctx.status(200),
-			ctx.json<PagedSearcherModel>({
+			ctx.json<PagedSearcherResponseModel>({
 				total: 0,
 				items: [{ name: 'ExternalSearcher' }, { name: 'InternalSearcher' }, { name: 'InternalMemberSearcher' }],
 			})
@@ -61,7 +61,7 @@ export const handlers = [
 		if (searcherName) {
 			return res(
 				ctx.status(200),
-				ctx.json<PagedSearchResultModel>({
+				ctx.json<PagedSearchResultResponseModel>({
 					total: 0,
 					items: searchResultMockData,
 				})

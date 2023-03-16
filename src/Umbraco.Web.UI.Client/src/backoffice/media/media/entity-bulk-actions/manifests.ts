@@ -13,10 +13,12 @@ const entityActions: Array<ManifestEntityBulkAction> = [
 		name: 'Move Media Entity Bulk Action',
 		weight: 100,
 		meta: {
-			entityType,
 			label: 'Move',
 			repositoryAlias: MEDIA_REPOSITORY_ALIAS,
 			api: UmbMediaMoveEntityBulkAction,
+		},
+		conditions: {
+			entityType,
 		},
 	},
 	{
@@ -25,10 +27,12 @@ const entityActions: Array<ManifestEntityBulkAction> = [
 		name: 'Copy Media Entity Bulk Action',
 		weight: 90,
 		meta: {
-			entityType,
 			label: 'Copy',
 			repositoryAlias: MEDIA_REPOSITORY_ALIAS,
 			api: UmbMediaCopyEntityBulkAction,
+		},
+		conditions: {
+			entityType,
 		},
 	},
 	{
@@ -37,10 +41,12 @@ const entityActions: Array<ManifestEntityBulkAction> = [
 		name: 'Trash Media Entity Bulk Action',
 		weight: 80,
 		meta: {
-			entityType,
 			label: 'Trash',
 			repositoryAlias: MEDIA_REPOSITORY_ALIAS,
 			api: UmbMediaTrashEntityBulkAction,
+		},
+		conditions: {
+			entityType,
 		},
 	},
 ];

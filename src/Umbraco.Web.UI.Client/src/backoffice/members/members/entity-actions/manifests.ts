@@ -8,11 +8,13 @@ const entityActions: Array<ManifestEntityAction> = [
 		alias: 'Umb.EntityAction.Member.Delete',
 		name: 'Delete Member Entity Action ',
 		meta: {
-			entityType: 'member',
 			icon: 'umb:trash',
 			label: 'Delete',
 			api: UmbDeleteEntityAction,
 			repositoryAlias: MEMBER_REPOSITORY_ALIAS,
+		},
+		conditions: {
+			entityType: 'member',
 		},
 	},
 ];

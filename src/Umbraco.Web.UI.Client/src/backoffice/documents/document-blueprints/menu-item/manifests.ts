@@ -8,8 +8,10 @@ const menuItem: ManifestMenuItem = {
 	meta: {
 		label: 'Document Blueprints',
 		icon: 'umb:blueprint',
-		menus: ['Umb.Menu.Settings'],
 		entityType: 'document-blueprint-root',
+	},
+	conditions: {
+		menus: ['Umb.Menu.Settings'],
 	},
 };
 

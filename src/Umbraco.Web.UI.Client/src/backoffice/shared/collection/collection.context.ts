@@ -1,4 +1,5 @@
-import type { ContentTreeItemModel, EntityTreeItemModel } from '@umbraco-cms/backend-api';
+import { Observable } from 'rxjs';
+import type { EntityTreeItemResponseModel } from '@umbraco-cms/backend-api';
 import type { UmbTreeStore } from '@umbraco-cms/store';
 import type { UmbControllerHostInterface } from '@umbraco-cms/controller';
 import { UmbContextToken, UmbContextConsumerController } from '@umbraco-cms/context-api';
@@ -9,7 +10,7 @@ import { UmbTreeRepository } from '@umbraco-cms/repository';
 
 // TODO: Clean up the need for store as Media has switched to use Repositories(repository).
 export class UmbCollectionContext<
-	DataType extends ContentTreeItemModel,
+	DataType extends EntityTreeItemResponseModel = EntityTreeItemResponseModel,
 	StoreType extends UmbTreeStore<DataType> = UmbTreeStore<DataType>
 > {
 	private _host: UmbControllerHostInterface;
@@ -19,9 +20,9 @@ export class UmbCollectionContext<
 	#repository?: UmbTreeRepository;
 
 	private _store?: StoreType;
-	protected _dataObserver?: UmbObserverController<EntityTreeItemModel[]>;
+	protected _dataObserver?: UmbObserverController<DataType[]>;
 
-	#data = new ArrayState(<Array<EntityTreeItemModel>>[]);
+	#data = new ArrayState(<Array<DataType>>[]);
 	public readonly data = this.#data.asObservable();
 
 	#selection = new ArrayState(<Array<string>>[]);
@@ -123,7 +124,7 @@ export class UmbCollectionContext<
 			const observable = (await this.#repository.requestTreeItemsOf(this._entityKey)).asObservable?.();
 
 			if (observable) {
-				this._dataObserver = new UmbObserverController(this._host, observable, (nodes) => {
+				this._dataObserver = new UmbObserverController(this._host, observable as Observable<DataType[]>, (nodes) => {
 					if (nodes) {
 						this.#data.next(nodes);
 					}
@@ -133,7 +134,7 @@ export class UmbCollectionContext<
 			const observable = (await this.#repository.requestRootTreeItems()).asObservable?.();
 
 			if (observable) {
-				this._dataObserver = new UmbObserverController(this._host, observable, (nodes) => {
+				this._dataObserver = new UmbObserverController(this._host, observable as Observable<DataType[]>, (nodes) => {
 					if (nodes) {
 						this.#data.next(nodes);
 					}
@@ -174,6 +175,4 @@ export class UmbCollectionContext<
 	}
 }
 
-export const UMB_COLLECTION_CONTEXT_TOKEN = new UmbContextToken<UmbCollectionContext<any, any>>(
-	'UmbCollectionContext'
-);
+export const UMB_COLLECTION_CONTEXT_TOKEN = new UmbContextToken<UmbCollectionContext<any, any>>('UmbCollectionContext');

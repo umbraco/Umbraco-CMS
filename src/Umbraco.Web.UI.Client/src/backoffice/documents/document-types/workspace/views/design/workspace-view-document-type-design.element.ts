@@ -3,7 +3,7 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, state } from 'lit/decorators.js';
 import { UmbWorkspaceDocumentTypeContext } from '../../document-type-workspace.context';
 import { UmbLitElement } from '@umbraco-cms/element';
-import type { DocumentTypeModel } from '@umbraco-cms/backend-api';
+import type { DocumentTypeResponseModel } from '@umbraco-cms/backend-api';
 import '../../../../../shared/property-creator/property-creator.element.ts';
 
 @customElement('umb-workspace-view-document-type-design')
@@ -20,7 +20,7 @@ export class UmbWorkspaceViewDocumentTypeDesignElement extends UmbLitElement {
 	];
 
 	@state()
-	_documentType?: DocumentTypeModel;
+	_documentType?: DocumentTypeResponseModel;
 
 	private _workspaceContext?: UmbWorkspaceDocumentTypeContext;
 

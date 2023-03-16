@@ -1,4 +1,4 @@
-import type { DataTypeModel } from '@umbraco-cms/backend-api';
+import type { DataTypeResponseModel } from '@umbraco-cms/backend-api';
 import { UmbContextToken } from '@umbraco-cms/context-api';
 import { ArrayState } from '@umbraco-cms/observable-api';
 import { UmbStoreBase } from '@umbraco-cms/store';
@@ -13,7 +13,7 @@ export const UMB_DATA_TYPE_STORE_CONTEXT_TOKEN = new UmbContextToken<UmbDataType
  * @description - Data Store for Template Details
  */
 export class UmbDataTypeStore extends UmbStoreBase {
-	#data = new ArrayState<DataTypeModel>([], (x) => x.key);
+	#data = new ArrayState<DataTypeResponseModel>([], (x) => x.key);
 
 	/**
 	 * Creates an instance of UmbDataTypeStore.
@@ -29,7 +29,7 @@ export class UmbDataTypeStore extends UmbStoreBase {
 	 * @param {DataTypeModel} dataType
 	 * @memberof UmbDataTypeStore
 	 */
-	append(dataType: DataTypeModel) {
+	append(dataType: DataTypeResponseModel) {
 		this.#data.append([dataType]);
 	}
 
@@ -38,7 +38,7 @@ export class UmbDataTypeStore extends UmbStoreBase {
 	 * @param {key} DataTypeModel key.
 	 * @memberof UmbDataTypeStore
 	 */
-	byKey(key: DataTypeModel['key']) {
+	byKey(key: DataTypeResponseModel['key']) {
 		return this.#data.getObservablePart((x) => x.find((y) => y.key === key));
 	}
 
@@ -47,7 +47,7 @@ export class UmbDataTypeStore extends UmbStoreBase {
 	 * @param {string[]} uniques
 	 * @memberof UmbDataTypeStore
 	 */
-	remove(uniques: Array<DataTypeModel['key']>) {
+	remove(uniques: Array<DataTypeResponseModel['key']>) {
 		this.#data.remove(uniques);
 	}
 }

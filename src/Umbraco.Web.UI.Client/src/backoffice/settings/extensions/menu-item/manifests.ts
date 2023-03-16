@@ -9,6 +9,8 @@ const menuItem: ManifestMenuItem = {
 		label: 'Extensions',
 		icon: 'umb:wand',
 		entityType: 'extension-root',
+	},
+	conditions: {
 		menus: ['Umb.Menu.Settings'],
 	},
 };

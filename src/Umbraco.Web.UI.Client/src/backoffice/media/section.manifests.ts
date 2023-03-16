@@ -22,10 +22,12 @@ const dashboards: Array<ManifestDashboardCollection> = [
 		weight: 10,
 		meta: {
 			label: 'Media',
-			sections: [sectionAlias],
 			pathname: 'media-management',
-			entityType: 'media',
 			repositoryAlias: MEDIA_REPOSITORY_ALIAS,
+		},
+		conditions: {
+			sections: [sectionAlias],
+			entityType: 'media',
 		},
 	},
 ];
@@ -37,8 +39,10 @@ const menuSectionSidebarApp: ManifestMenuSectionSidebarApp = {
 	weight: 100,
 	meta: {
 		label: 'Media',
-		sections: [sectionAlias],
 		menu: 'Umb.Menu.Media',
+	},
+	conditions: {
+		sections: [sectionAlias],
 	},
 };
 

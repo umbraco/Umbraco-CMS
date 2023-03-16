@@ -1,15 +1,15 @@
 import { logs } from './logs.data';
 import { UmbData } from './data';
-import { LogMessageModel, LogTemplateModel, SavedLogSearchModel } from '@umbraco-cms/backend-api';
+import { LogMessageResponseModel, LogTemplateResponseModel, SavedLogSearchResponseModel } from '@umbraco-cms/backend-api';
 
 // Temp mocked database
-class UmbLogviewerSearchesData extends UmbData<SavedLogSearchModel> {
-	constructor(data: SavedLogSearchModel[]) {
+class UmbLogviewerSearchesData extends UmbData<SavedLogSearchResponseModel> {
+	constructor(data: SavedLogSearchResponseModel[]) {
 		super(data);
 	}
 
 	// skip can be number or null
-	getSavedSearches(skip = 0, take = this.data.length): Array<SavedLogSearchModel> {
+	getSavedSearches(skip = 0, take = this.data.length): Array<SavedLogSearchResponseModel> {
 		return this.data.slice(skip, take);
 	}
 
@@ -18,24 +18,24 @@ class UmbLogviewerSearchesData extends UmbData<SavedLogSearchModel> {
 	}
 }
 
-class UmbLogviewerTemplatesData extends UmbData<LogTemplateModel> {
-	constructor(data: LogTemplateModel[]) {
+class UmbLogviewerTemplatesData extends UmbData<LogTemplateResponseModel> {
+	constructor(data: LogTemplateResponseModel[]) {
 		super(data);
 	}
 
 	// skip can be number or null
-	getTemplates(skip = 0, take = this.data.length): Array<LogTemplateModel> {
+	getTemplates(skip = 0, take = this.data.length): Array<LogTemplateResponseModel> {
 		return this.data.slice(skip, take);
 	}
 }
 
-class UmbLogviewerMessagesData extends UmbData<LogMessageModel> {
-	constructor(data: LogTemplateModel[]) {
+class UmbLogviewerMessagesData extends UmbData<LogMessageResponseModel> {
+	constructor(data: LogTemplateResponseModel[]) {
 		super(data);
 	}
 
 	// skip can be number or null
-	getLogs(skip = 0, take = this.data.length): Array<LogMessageModel> {
+	getLogs(skip = 0, take = this.data.length): Array<LogMessageResponseModel> {
 		return this.data.slice(skip, take);
 	}
 
@@ -51,7 +51,7 @@ class UmbLogviewerMessagesData extends UmbData<LogMessageModel> {
 	}
 }
 
-export const savedSearches: Array<SavedLogSearchModel> = [
+export const savedSearches: Array<SavedLogSearchResponseModel> = [
 	{
 		name: 'Find all logs where the Level is NOT Verbose and NOT Debug',
 		query: "Not(@Level='Verbose') and Not(@Level='Debug')",
@@ -98,7 +98,7 @@ export const savedSearches: Array<SavedLogSearchModel> = [
 	},
 ];
 
-export const messageTemplates: LogTemplateModel[] = [
+export const messageTemplates: LogTemplateResponseModel[] = [
 	{
 		messageTemplate: 'Create Foreign Key:\n {Sql}',
 		count: 90,

@@ -1,7 +1,7 @@
 import { rest } from 'msw';
 import { umbLogviewerData } from '../data/log-viewer.data';
 import { umbracoPath } from '@umbraco-cms/utils';
-import { SavedLogSearchModel } from '@umbraco-cms/backend-api';
+import { SavedLogSearchRequestModel } from '@umbraco-cms/backend-api';
 
 export const handlers = [
 	//#region Searches
@@ -30,7 +30,7 @@ export const handlers = [
 		return res(ctx.delay(), ctx.status(200), ctx.json(item));
 	}),
 
-	rest.post<SavedLogSearchModel>(umbracoPath('/log-viewer/saved-search'), async (req, res, ctx) => {
+	rest.post<SavedLogSearchRequestModel>(umbracoPath('/log-viewer/saved-search'), async (req, res, ctx) => {
 		return res(ctx.delay(), ctx.status(200));
 	}),
 
