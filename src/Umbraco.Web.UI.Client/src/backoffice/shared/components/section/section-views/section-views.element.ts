@@ -58,6 +58,7 @@ export class UmbSectionViewsElement extends UmbLitElement {
 	}
 
 	async #createRoutes(viewManifests: Array<ManifestSectionView>) {
+		if (!viewManifests) return;
 		const routes = viewManifests.map((manifest) => {
 			return {
 				path: manifest.meta.pathname,
