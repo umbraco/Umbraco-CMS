@@ -11,7 +11,7 @@ import { UmbLitElement } from '@umbraco-cms/element';
 import { ManifestHealthCheck } from '@umbraco-cms/extensions-registry';
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/resources';
-import { HealthCheckGroupModel, HealthCheckResource } from '@umbraco-cms/backend-api';
+import { HealthCheckGroupResponseModel, HealthCheckResource } from '@umbraco-cms/backend-api';
 
 @customElement('umb-dashboard-health-check')
 export class UmbDashboardHealthCheckElement extends UmbLitElement {
@@ -53,7 +53,7 @@ export class UmbDashboardHealthCheckElement extends UmbLitElement {
 		this.#register(manifests);
 	};
 
-	#createManifests(groups: HealthCheckGroupModel[]): Array<ManifestHealthCheck> {
+	#createManifests(groups: HealthCheckGroupResponseModel[]): Array<ManifestHealthCheck> {
 		return groups.map((group) => {
 			return {
 				type: 'healthCheck',

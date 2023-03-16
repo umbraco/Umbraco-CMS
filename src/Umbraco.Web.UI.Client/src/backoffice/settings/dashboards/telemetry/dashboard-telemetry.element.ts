@@ -3,7 +3,7 @@ import { customElement, state } from 'lit/decorators.js';
 import { unsafeHTML } from 'lit/directives/unsafe-html.js';
 import { UUIButtonState } from '@umbraco-ui/uui';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
-import { TelemetryModel, TelemetryLevelModel, TelemetryResource } from '@umbraco-cms/backend-api';
+import { TelemetryResponseModel, TelemetryLevelModel, TelemetryResource } from '@umbraco-cms/backend-api';
 import { UmbLitElement } from '@umbraco-cms/element';
 import { tryExecuteAndNotify } from '@umbraco-cms/resources';
 
@@ -22,7 +22,7 @@ export class UmbDashboardTelemetryElement extends UmbLitElement {
 	private _telemetryFormData = TelemetryLevelModel.BASIC;
 
 	@state()
-	private _telemetryLevels: TelemetryModel[] = [];
+	private _telemetryLevels: TelemetryResponseModel[] = [];
 
 	@state()
 	private _errorMessage = '';

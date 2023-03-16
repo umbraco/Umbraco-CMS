@@ -1,8 +1,9 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-import type { PagedTelemetryModel } from '../models/PagedTelemetryModel';
-import type { TelemetryModel } from '../models/TelemetryModel';
+import type { PagedTelemetryResponseModel } from '../models/PagedTelemetryResponseModel';
+import type { TelemetryRequestModel } from '../models/TelemetryRequestModel';
+import type { TelemetryResponseModel } from '../models/TelemetryResponseModel';
 
 import type { CancelablePromise } from '../core/CancelablePromise';
 import { OpenAPI } from '../core/OpenAPI';
@@ -11,16 +12,16 @@ import { request as __request } from '../core/request';
 export class TelemetryResource {
 
     /**
-     * @returns PagedTelemetryModel Success
+     * @returns PagedTelemetryResponseModel Success
      * @throws ApiError
      */
     public static getTelemetry({
-        skip,
-        take,
-    }: {
-        skip?: number,
-        take?: number,
-    }): CancelablePromise<PagedTelemetryModel> {
+skip,
+take,
+}: {
+skip?: number,
+take?: number,
+}): CancelablePromise<PagedTelemetryResponseModel> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/telemetry',
@@ -35,7 +36,7 @@ export class TelemetryResource {
      * @returns any Success
      * @throws ApiError
      */
-    public static getTelemetryLevel(): CancelablePromise<TelemetryModel> {
+    public static getTelemetryLevel(): CancelablePromise<TelemetryResponseModel> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/telemetry/level',
@@ -47,10 +48,10 @@ export class TelemetryResource {
      * @throws ApiError
      */
     public static postTelemetryLevel({
-        requestBody,
-    }: {
-        requestBody?: TelemetryModel,
-    }): CancelablePromise<any> {
+requestBody,
+}: {
+requestBody?: TelemetryRequestModel,
+}): CancelablePromise<any> {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/umbraco/management/api/v1/telemetry/level',

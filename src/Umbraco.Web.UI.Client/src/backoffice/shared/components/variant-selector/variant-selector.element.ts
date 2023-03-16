@@ -9,7 +9,7 @@ import {
 } from '../workspace/workspace-variant/workspace-variant.context';
 import { ActiveVariant } from '../workspace/workspace-context/workspace-split-view-manager.class';
 import { UmbLitElement } from '@umbraco-cms/element';
-import type { DocumentVariantModel } from '@umbraco-cms/backend-api';
+import type { DocumentVariantResponseModel } from '@umbraco-cms/backend-api';
 
 @customElement('umb-variant-selector')
 export class UmbVariantSelectorElement extends UmbLitElement {
@@ -50,7 +50,7 @@ export class UmbVariantSelectorElement extends UmbLitElement {
 	alias!: string;
 
 	@state()
-	_variants: Array<DocumentVariantModel> = [];
+	_variants: Array<DocumentVariantResponseModel> = [];
 
 	// TODO: Stop using document context specific ActiveVariant type.
 	@state()
@@ -178,12 +178,12 @@ export class UmbVariantSelectorElement extends UmbLitElement {
 		this._variantSelectorIsOpen = false;
 	}
 
-	private _switchVariant(variant: DocumentVariantModel) {
+	private _switchVariant(variant: DocumentVariantResponseModel) {
 		this._variantContext?.switchVariant(variant);
 		this._close();
 	}
 
-	private _openSplitView(variant: DocumentVariantModel) {
+	private _openSplitView(variant: DocumentVariantResponseModel) {
 		this._variantContext?.openSplitView(variant);
 		this._close();
 	}

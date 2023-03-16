@@ -1,12 +1,12 @@
 import { UmbEntityData } from './entity.data';
 import { createDocumentTypeTreeItem } from './utils';
 import {
-	DocumentTypeTreeItemModel,
-	DocumentTypeModel,
+	DocumentTypeTreeItemResponseModel,
+	DocumentTypeResponseModel,
 	ContentTypeCompositionTypeModel,
 } from '@umbraco-cms/backend-api';
 
-export const data: Array<DocumentTypeModel> = [
+export const data: Array<DocumentTypeResponseModel> = [
 	{
 		allowedTemplateKeys: [],
 		defaultTemplateKey: null,
@@ -891,7 +891,7 @@ export const data: Array<DocumentTypeModel> = [
 	},
 ];
 
-export const treeData: Array<DocumentTypeTreeItemModel> = [
+export const treeData: Array<DocumentTypeTreeItemResponseModel> = [
 	{
 		$type: 'DocumentTypeTreeItemViewModel',
 		name: 'All property editors document type',
@@ -928,24 +928,24 @@ export const treeData: Array<DocumentTypeTreeItemModel> = [
 // TODO: all properties are optional in the server schema. I don't think this is correct.
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
-class UmbDocumentTypeData extends UmbEntityData<DocumentTypeModel> {
+class UmbDocumentTypeData extends UmbEntityData<DocumentTypeResponseModel> {
 	private treeData = treeData;
 
 	constructor() {
 		super(data);
 	}
 
-	getTreeRoot(): Array<DocumentTypeTreeItemModel> {
+	getTreeRoot(): Array<DocumentTypeTreeItemResponseModel> {
 		const rootItems = this.treeData.filter((item) => item.parentKey === null);
 		return rootItems.map((item) => createDocumentTypeTreeItem(item));
 	}
 
-	getTreeItemChildren(key: string): Array<DocumentTypeTreeItemModel> {
+	getTreeItemChildren(key: string): Array<DocumentTypeTreeItemResponseModel> {
 		const childItems = this.treeData.filter((item) => item.parentKey === key);
 		return childItems.map((item) => createDocumentTypeTreeItem(item));
 	}
 
-	getTreeItem(keys: Array<string>): Array<DocumentTypeTreeItemModel> {
+	getTreeItem(keys: Array<string>): Array<DocumentTypeTreeItemResponseModel> {
 		const items = this.treeData.filter((item) => keys.includes(item.key ?? ''));
 		return items.map((item) => createDocumentTypeTreeItem(item));
 	}

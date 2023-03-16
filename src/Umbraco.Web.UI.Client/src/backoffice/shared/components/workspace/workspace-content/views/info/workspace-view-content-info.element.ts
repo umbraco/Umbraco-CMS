@@ -4,7 +4,7 @@ import { repeat } from 'lit/directives/repeat.js';
 import { customElement, state } from 'lit/decorators.js';
 import { UUIPaginationEvent } from '@umbraco-ui/uui';
 import { UmbWorkspaceEntityContextInterface } from '../../../workspace-context/workspace-entity-context.interface';
-import type { DocumentModel } from '@umbraco-cms/backend-api';
+import type { DocumentResponseModel } from '@umbraco-cms/backend-api';
 import { UmbLitElement } from '@umbraco-cms/element';
 
 interface HistoryNode {
@@ -184,14 +184,14 @@ export class UmbWorkspaceViewContentInfoElement extends UmbLitElement {
 	@state()
 	private _nodeName = '';
 
-	private _workspaceContext?: UmbWorkspaceEntityContextInterface<DocumentModel>;
+	private _workspaceContext?: UmbWorkspaceEntityContextInterface<DocumentResponseModel>;
 	private itemsPerPage = 10;
 
 	constructor() {
 		super();
 
 		// TODO: Figure out how to get the magic string for the workspace context.
-		this.consumeContext<UmbWorkspaceEntityContextInterface<DocumentModel>>('umbWorkspaceContext', (nodeContext) => {
+		this.consumeContext<UmbWorkspaceEntityContextInterface<DocumentResponseModel>>('umbWorkspaceContext', (nodeContext) => {
 			this._workspaceContext = nodeContext;
 			this._observeContent();
 		});

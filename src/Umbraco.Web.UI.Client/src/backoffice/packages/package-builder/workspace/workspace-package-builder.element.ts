@@ -7,7 +7,7 @@ import { UmbInputDocumentPickerElement } from '../../../shared/components/input-
 import { UmbInputMediaPickerElement } from '../../../shared/components/input-media-picker/input-media-picker.element';
 import { UmbInputLanguagePickerElement } from '../../../shared/components/input-language-picker/input-language-picker.element';
 import { UmbLitElement } from '@umbraco-cms/element';
-import { PackageDefinitionModel, PackageResource } from '@umbraco-cms/backend-api';
+import { PackageDefinitionResponseModel, PackageResource } from '@umbraco-cms/backend-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/resources';
 import { UmbNotificationContext, UMB_NOTIFICATION_CONTEXT_TOKEN } from '@umbraco-cms/notification';
 
@@ -41,7 +41,7 @@ export class UmbWorkspacePackageBuilderElement extends UmbLitElement {
 	entityKey?: string;
 
 	@state()
-	private _package: PackageDefinitionModel = {};
+	private _package: PackageDefinitionResponseModel = {};
 
 	@query('#package-name-input')
 	private _packageNameInput!: UUIInputElement;
@@ -64,7 +64,7 @@ export class UmbWorkspacePackageBuilderElement extends UmbLitElement {
 		if (!this.entityKey) return;
 		const { data } = await tryExecuteAndNotify(this, PackageResource.getPackageCreatedByKey({ key: this.entityKey }));
 		if (!data) return;
-		this._package = data as PackageDefinitionModel;
+		this._package = data as PackageDefinitionResponseModel;
 	}
 
 	async #download() {
@@ -88,7 +88,7 @@ export class UmbWorkspacePackageBuilderElement extends UmbLitElement {
 			PackageResource.postPackageCreated({ requestBody: this._package })
 		);
 		if (!response.data || response.error) return;
-		this._package = response.data as PackageDefinitionModel;
+		this._package = response.data as PackageDefinitionResponseModel;
 		this.#navigateBack();
 	}
 

@@ -9,7 +9,7 @@ import { UmbDocumentWorkspaceContext } from './document-workspace.context';
 import { UmbDocumentWorkspaceSplitViewElement } from './document-workspace-split-view.element';
 import { UmbLitElement } from '@umbraco-cms/element';
 import '../../../shared/components/workspace/workspace-variant/workspace-variant.element';
-import { DocumentModel, VariantViewModelBaseModel } from '@umbraco-cms/backend-api';
+import { DocumentResponseModel, VariantModelBaseModel } from '@umbraco-cms/backend-api';
 import { UmbRouterSlotInitEvent } from '@umbraco-cms/router';
 
 @customElement('umb-document-workspace')
@@ -36,7 +36,7 @@ export class UmbDocumentWorkspaceElement extends UmbLitElement implements UmbWor
 	_routes?: Array<IRoute>;
 
 	@state()
-	_availableVariants: Array<VariantViewModelBaseModel> = [];
+	_availableVariants: Array<VariantModelBaseModel> = [];
 
 	@state()
 	_workspaceSplitViews: Array<ActiveVariant> = [];
@@ -63,7 +63,7 @@ export class UmbDocumentWorkspaceElement extends UmbLitElement implements UmbWor
 		this._gotDocumentData(data);
 	}
 
-	private _gotDocumentData(data: DocumentModel | undefined) {
+	private _gotDocumentData(data: DocumentResponseModel | undefined) {
 		if (data && data.variants && data.variants.length > 0) {
 			//this._defaultVariant = data.variants[0];
 			this._unique = data.key;

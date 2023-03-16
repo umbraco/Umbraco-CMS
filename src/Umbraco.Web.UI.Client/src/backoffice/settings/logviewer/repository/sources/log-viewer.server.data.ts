@@ -1,5 +1,5 @@
 import { LogMessagesDataSource, LogSearchDataSource } from '.';
-import { DirectionModel, LogLevelModel, LogViewerResource, SavedLogSearchModel } from '@umbraco-cms/backend-api';
+import { DirectionModel, LogLevelModel, LogViewerResource, SavedLogSearchResponseModel } from '@umbraco-cms/backend-api';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 import { tryExecuteAndNotify } from '@umbraco-cms/resources';
 
@@ -49,7 +49,7 @@ export class UmbLogSearchesServerDataSource implements LogSearchDataSource {
 	 * @return {*}
 	 * @memberof UmbLogSearchesServerDataSource
 	 */
-	async postLogViewerSavedSearch({ requestBody }: { requestBody?: SavedLogSearchModel }) {
+	async postLogViewerSavedSearch({ requestBody }: { requestBody?: SavedLogSearchResponseModel }) {
 		return await tryExecuteAndNotify(this.#host, LogViewerResource.postLogViewerSavedSearch({ requestBody }));
 	}
 	/**

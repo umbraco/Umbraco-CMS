@@ -5,7 +5,7 @@ import { UUIButtonState, UUIPaginationElement, UUIPaginationEvent } from '@umbra
 import { UMB_CONFIRM_MODAL_TOKEN } from '../../../shared/modals/confirm';
 import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN } from '@umbraco-cms/modal';
 import { UmbLitElement } from '@umbraco-cms/element';
-import { RedirectManagementResource, RedirectStatusModel, RedirectUrlModel } from '@umbraco-cms/backend-api';
+import { RedirectManagementResource, RedirectStatusModel, RedirectUrlResponseModel } from '@umbraco-cms/backend-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/resources';
 
 @customElement('umb-dashboard-redirect-management')
@@ -83,7 +83,7 @@ export class UmbDashboardRedirectManagementElement extends UmbLitElement {
 	itemsPerPage = 20;
 
 	@state()
-	private _redirectData?: RedirectUrlModel[];
+	private _redirectData?: RedirectUrlResponseModel[];
 
 	@state()
 	private _trackerStatus = true;
@@ -126,7 +126,7 @@ export class UmbDashboardRedirectManagementElement extends UmbLitElement {
 		if (data && data.status) this._trackerStatus = data.status === RedirectStatusModel.ENABLED ? true : false;
 	}
 
-	private _removeRedirectHandler(data: RedirectUrlModel) {
+	private _removeRedirectHandler(data: RedirectUrlResponseModel) {
 		const modalHandler = this._modalContext?.open(UMB_CONFIRM_MODAL_TOKEN, {
 			headline: 'Delete',
 			content: html`
@@ -145,7 +145,7 @@ export class UmbDashboardRedirectManagementElement extends UmbLitElement {
 		});
 	}
 
-	private async _removeRedirect(r: RedirectUrlModel) {
+	private async _removeRedirect(r: RedirectUrlResponseModel) {
 		if (!r.key) return;
 		const res = await tryExecuteAndNotify(
 			this,

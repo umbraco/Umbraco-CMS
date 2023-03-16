@@ -8,7 +8,7 @@ import UmbInputCultureSelectElement from '../../../../../../shared/components/in
 import UmbInputLanguagePickerElement from '../../../../../../shared/components/input-language-picker/input-language-picker.element';
 import { UmbChangeEvent } from '@umbraco-cms/events';
 import { UmbLitElement } from '@umbraco-cms/element';
-import { LanguageModel } from '@umbraco-cms/backend-api';
+import { LanguageResponseModel } from '@umbraco-cms/backend-api';
 
 @customElement('umb-edit-language-workspace-view')
 export class UmbEditLanguageWorkspaceViewElement extends UmbLitElement {
@@ -45,7 +45,7 @@ export class UmbEditLanguageWorkspaceViewElement extends UmbLitElement {
 	];
 
 	@state()
-	_language?: LanguageModel;
+	_language?: LanguageResponseModel;
 
 	@state()
 	_isDefaultLanguage = false;
@@ -201,7 +201,7 @@ export class UmbEditLanguageWorkspaceViewElement extends UmbLitElement {
 						slot="editor"
 						max="1"
 						@change=${this.#handleFallbackChange}
-						.filter=${(language: LanguageModel) =>
+						.filter=${(language: LanguageResponseModel) =>
 							language.isoCode !== this._language?.isoCode}></umb-input-language-picker>
 				</umb-workspace-property-layout>
 			</uui-box>

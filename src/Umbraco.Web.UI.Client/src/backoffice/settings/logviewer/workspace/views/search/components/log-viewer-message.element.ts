@@ -2,7 +2,7 @@ import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, html, PropertyValueMap } from 'lit';
 import { customElement, property, query, state } from 'lit/decorators.js';
 import { UmbLogViewerWorkspaceContext, UMB_APP_LOG_VIEWER_CONTEXT_TOKEN } from '../../../logviewer.context';
-import { LogLevelModel, LogMessagePropertyModel } from '@umbraco-cms/backend-api';
+import { LogLevelModel, LogMessagePropertyPresentationModel } from '@umbraco-cms/backend-api';
 import { UmbLitElement } from '@umbraco-cms/element';
 
 //TODO: check how to display EventId field in the message properties
@@ -132,7 +132,7 @@ export class UmbLogViewerMessageElement extends UmbLitElement {
 	renderedMessage = '';
 
 	@property({ attribute: false })
-	properties: Array<LogMessagePropertyModel> = [];
+	properties: Array<LogMessagePropertyPresentationModel> = [];
 
 	@property({ type: Boolean })
 	open = false;
@@ -210,7 +210,7 @@ export class UmbLogViewerMessageElement extends UmbLitElement {
 
 	private _propertiesWithSearchMenu: Array<string> = ['HttpRequestNumber', 'SourceContext', 'MachineName'];
 
-	private _findLogsWithProperty({ name, value }: LogMessagePropertyModel) {
+	private _findLogsWithProperty({ name, value }: LogMessagePropertyPresentationModel) {
 		let queryString = '';
 
 		if (isNaN(+(value ?? ''))) {

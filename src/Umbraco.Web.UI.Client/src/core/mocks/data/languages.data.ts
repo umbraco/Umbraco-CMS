@@ -1,14 +1,14 @@
 import { UmbData } from './data';
-import { LanguageModel } from '@umbraco-cms/backend-api';
+import { LanguageResponseModel } from '@umbraco-cms/backend-api';
 
 // Temp mocked database
-class UmbLanguagesData extends UmbData<LanguageModel> {
-	constructor(data: LanguageModel[]) {
+class UmbLanguagesData extends UmbData<LanguageResponseModel> {
+	constructor(data: LanguageResponseModel[]) {
 		super(data);
 	}
 
 	// skip can be number or null
-	getAll(skip = 0, take = this.data.length): Array<LanguageModel> {
+	getAll(skip = 0, take = this.data.length): Array<LanguageResponseModel> {
 		return this.data.slice(skip, take);
 	}
 
@@ -16,7 +16,7 @@ class UmbLanguagesData extends UmbData<LanguageModel> {
 		return this.data.find((item) => item.isoCode === key);
 	}
 
-	insert(language: LanguageModel) {
+	insert(language: LanguageResponseModel) {
 		const foundIndex = this.data.findIndex((item) => item.isoCode === language.isoCode);
 
 		if (foundIndex !== -1) {
@@ -26,7 +26,7 @@ class UmbLanguagesData extends UmbData<LanguageModel> {
 		this.data.push(language);
 	}
 
-	save(saveItems: Array<LanguageModel>) {
+	save(saveItems: Array<LanguageResponseModel>) {
 		saveItems.forEach((saveItem) => {
 			const foundIndex = this.data.findIndex((item) => item.isoCode === saveItem.isoCode);
 			if (foundIndex !== -1) {
@@ -60,7 +60,7 @@ class UmbLanguagesData extends UmbData<LanguageModel> {
 		return keys;
 	}
 
-	updateData(updateItem: LanguageModel) {
+	updateData(updateItem: LanguageResponseModel) {
 		const itemIndex = this.data.findIndex((item) => item.isoCode === updateItem.isoCode);
 		const item = this.data[itemIndex];
 		if (!item) return;
@@ -91,7 +91,7 @@ class UmbLanguagesData extends UmbData<LanguageModel> {
 	}
 }
 
-export const MockData: Array<LanguageModel> = [
+export const MockData: Array<LanguageResponseModel> = [
 	{
 		name: 'English',
 		isoCode: 'en',

@@ -5,14 +5,14 @@ import { UmbWorkspaceVariableEntityContextInterface } from '../../../shared/comp
 import { UmbVariantId } from '../../../shared/variants/variant-id.class';
 import { UmbWorkspacePropertyStructureManager } from '../../../shared/components/workspace/workspace-context/workspace-property-structure-manager.class';
 import { UmbWorkspaceSplitViewManager } from '../../../shared/components/workspace/workspace-context/workspace-split-view-manager.class';
-import type { DocumentModel } from '@umbraco-cms/backend-api';
+import type { DocumentResponseModel } from '@umbraco-cms/backend-api';
 import { partialUpdateFrozenArray, ObjectState, UmbObserverController } from '@umbraco-cms/observable-api';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 
 // TODO: should this context be called DocumentDraft instead of workspace? or should the draft be part of this?
 // TODO: Should we have a DocumentStructureContext and maybe even a DocumentDraftContext?
 
-type EntityType = DocumentModel;
+type EntityType = DocumentResponseModel;
 export class UmbDocumentWorkspaceContext
 	extends UmbWorkspaceContext<UmbDocumentRepository>
 	implements UmbWorkspaceVariableEntityContextInterface<EntityType | undefined>

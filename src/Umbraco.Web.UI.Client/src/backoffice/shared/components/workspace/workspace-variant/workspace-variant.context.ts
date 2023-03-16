@@ -5,7 +5,7 @@ import { ActiveVariant } from '../workspace-context/workspace-split-view-manager
 import { UmbContextConsumerController, UmbContextProviderController, UmbContextToken } from '@umbraco-cms/context-api';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 import { ClassState, NumberState, ObjectState, UmbObserverController } from '@umbraco-cms/observable-api';
-import { DocumentVariantModel } from '@umbraco-cms/backend-api';
+import { DocumentVariantResponseModel } from '@umbraco-cms/backend-api';
 
 //type EntityType = DocumentModel;
 
@@ -20,7 +20,7 @@ export class UmbWorkspaceVariantContext {
 	#index = new NumberState(undefined);
 	index = this.#index.asObservable();
 
-	#currentVariant = new ObjectState<DocumentVariantModel | undefined>(undefined);
+	#currentVariant = new ObjectState<DocumentVariantResponseModel | undefined>(undefined);
 	currentVariant = this.#currentVariant.asObservable();
 
 	name = this.#currentVariant.getObservablePart((x) => x?.name);
@@ -49,7 +49,7 @@ export class UmbWorkspaceVariantContext {
 		});
 	}
 
-	public switchVariant(variant: DocumentVariantModel) {
+	public switchVariant(variant: DocumentVariantResponseModel) {
 		const index = this.#index.value;
 		if (index === undefined) return;
 		this.#workspaceContext?.splitView.switchVariant(index, new UmbVariantId(variant));
@@ -61,7 +61,7 @@ export class UmbWorkspaceVariantContext {
 		this.#workspaceContext?.splitView.closeSplitView(index);
 	}
 
-	public openSplitView(variant: DocumentVariantModel) {
+	public openSplitView(variant: DocumentVariantResponseModel) {
 		this.#workspaceContext?.splitView.openSplitView(new UmbVariantId(variant));
 	}
 

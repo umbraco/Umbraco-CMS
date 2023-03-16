@@ -8,4 +8,3 @@ export type ContentTypeCompositionModel = {
     key?: string;
     compositionType?: ContentTypeCompositionTypeModel;
 };
-

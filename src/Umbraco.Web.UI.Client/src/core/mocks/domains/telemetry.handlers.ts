@@ -1,7 +1,7 @@
 import { rest } from 'msw';
 
 import { umbracoPath } from '@umbraco-cms/utils';
-import { PagedTelemetryModel, TelemetryModel, TelemetryLevelModel } from '@umbraco-cms/backend-api';
+import { PagedTelemetryResponseModel, TelemetryResponseModel, TelemetryLevelModel } from '@umbraco-cms/backend-api';
 
 let telemetryLevel = TelemetryLevelModel.BASIC;
 
@@ -10,7 +10,7 @@ export const handlers = [
 		return res(
 			// Respond with a 200 status code
 			ctx.status(200),
-			ctx.json<TelemetryModel>({
+			ctx.json<TelemetryResponseModel>({
 				telemetryLevel,
 			})
 		);
@@ -20,7 +20,7 @@ export const handlers = [
 		return res(
 			// Respond with a 200 status code
 			ctx.status(200),
-			ctx.json<PagedTelemetryModel>({
+			ctx.json<PagedTelemetryResponseModel>({
 				total: 3,
 				items: [
 					{ telemetryLevel: TelemetryLevelModel.MINIMAL },
@@ -31,8 +31,8 @@ export const handlers = [
 		);
 	}),
 
-	rest.post<TelemetryModel>(umbracoPath('/telemetry/level'), async (_req, res, ctx) => {
-		const newLevel = (await _req.json<TelemetryModel>()).telemetryLevel;
+	rest.post<TelemetryResponseModel>(umbracoPath('/telemetry/level'), async (_req, res, ctx) => {
+		const newLevel = (await _req.json<TelemetryResponseModel>()).telemetryLevel;
 		if (newLevel) {
 			telemetryLevel = newLevel;
 			return res(
