@@ -13,6 +13,11 @@ import './section-sidebar-menu/section-sidebar-menu.element';
 import './section-views/section-views.element';
 import '../../../settings/languages/app-language-select/app-language-select.element';
 
+/**
+ * @export
+ * @class UmbSectionElement
+ * @description - Element hosting sections and section navigation.
+ */
 @customElement('umb-section')
 export class UmbSectionElement extends UmbLitElement {
 	static styles = [
