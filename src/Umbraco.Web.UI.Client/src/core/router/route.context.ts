@@ -90,7 +90,6 @@ export class UmbRouteContext {
 		const localPath = `modal/${modalRegistration.alias.toString()}/${modalRegistration.options.path}`;
 		return {
 			path: localPath,
-			//pathMatch: 'suffix',
 			component: EmptyDiv,
 			setup: modalRegistration.routeSetup,
 		};
