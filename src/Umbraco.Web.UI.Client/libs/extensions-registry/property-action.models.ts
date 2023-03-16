@@ -1,8 +1,7 @@
-import type { ManifestElement } from './models';
+import type { ManifestElement, ManifestWithConditions } from './models';
 
-export interface ManifestPropertyAction extends ManifestElement {
+export interface ManifestPropertyAction extends ManifestElement, ManifestWithConditions<ConditionsPropertyAction> {
 	type: 'propertyAction';
-	conditions: ConditionsPropertyAction;
 }
 
 export interface ConditionsPropertyAction {

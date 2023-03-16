@@ -10,7 +10,7 @@ export interface ConditionsSectionSidebarApp {
 }
 
 // TODO: this is a temp solution until we implement kinds
-export interface ManifestMenuSectionSidebarApp extends ManifestElement {
+export interface ManifestMenuSectionSidebarApp extends Omit<ManifestSectionSidebarApp, 'type'> {
 	type: 'menuSectionSidebarApp';
 	meta: MetaMenuSectionSidebarApp;
 	conditions: ConditionsSectionSidebarApp;

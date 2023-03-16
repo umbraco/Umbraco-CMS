@@ -1,9 +1,8 @@
-import type { ManifestElement } from './models';
+import type { ManifestElement, ManifestWithConditions } from './models';
 
-export interface ManifestCollectionView extends ManifestElement {
+export interface ManifestCollectionView extends ManifestElement, ManifestWithConditions<ConditionsCollectionView> {
 	type: 'collectionView';
 	meta: MetaCollectionView;
-	conditions: ConditionsCollectionView;
 }
 
 export interface MetaCollectionView {

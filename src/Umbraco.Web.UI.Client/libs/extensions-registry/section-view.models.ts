@@ -1,9 +1,8 @@
-import type { ManifestElement } from './models';
+import type { ManifestElement, ManifestWithConditions } from './models';
 
-export interface ManifestSectionView extends ManifestElement {
+export interface ManifestSectionView extends ManifestElement, ManifestWithConditions<ConditionsSectionView> {
 	type: 'sectionView';
 	meta: MetaSectionView;
-	conditions: ConditionsSectionView;
 }
 
 export interface MetaSectionView {

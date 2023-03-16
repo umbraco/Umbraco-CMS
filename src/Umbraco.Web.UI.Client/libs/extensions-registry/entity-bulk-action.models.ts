@@ -1,9 +1,8 @@
-import type { ManifestElement } from './models';
+import type { ManifestElement, ManifestWithConditions } from './models';
 
-export interface ManifestEntityBulkAction extends ManifestElement {
+export interface ManifestEntityBulkAction extends ManifestElement, ManifestWithConditions<ConditionsEntityBulkAction> {
 	type: 'entityBulkAction';
 	meta: MetaEntityBulkAction;
-	conditions: ConditionsEntityBulkAction;
 }
 
 export interface MetaEntityBulkAction {

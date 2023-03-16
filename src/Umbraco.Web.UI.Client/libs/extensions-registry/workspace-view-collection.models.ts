@@ -1,9 +1,10 @@
-import type { ManifestBase } from './models';
+import type { ManifestBase, ManifestWithConditions } from './models';
 
-export interface ManifestWorkspaceViewCollection extends ManifestBase {
+export interface ManifestWorkspaceViewCollection
+	extends ManifestBase,
+		ManifestWithConditions<ConditionsEditorViewCollection> {
 	type: 'workspaceViewCollection';
 	meta: MetaEditorViewCollection;
-	conditions: ConditionsEditorViewCollection;
 }
 
 // TODO: Get rid of store alias, when we are done migrating to repositories(remember to enforce repositoryAlias):
