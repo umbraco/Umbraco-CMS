@@ -44,6 +44,10 @@ export class UmbRouteContext {
 		});
 	}
 
+	#removeModalPath(info: IRoutingInfo) {
+		window.history.pushState({}, '', window.location.href.split(info.match.fragments.consumed)[0]);
+	}
+
 	public registerModal<D extends object = object, R = any>(
 		alias: UmbModalToken<D, R> | string,
 		options: UmbModalRouteOptions<D, R>
@@ -64,7 +68,7 @@ export class UmbRouteContext {
 			},
 		};
 		this.#modalRegistrations.push(registration);
-		this.#generateNewURL(registration);
+		this.#generateNewUrlBuilder(registration);
 		this.#generateContextRoutes();
 		return registration;
 	}
@@ -74,16 +78,6 @@ export class UmbRouteContext {
 		if (index === -1) return;
 		this.#modalRegistrations.splice(index, 1);
 		this.#generateContextRoutes();
-	}
-
-	public _internal_routerGotBasePath(routerBasePath: string) {
-		if (this.#routerBasePath === routerBasePath) return;
-		this.#routerBasePath = routerBasePath;
-		this.#generateNewURLs();
-	}
-
-	#removeModalPath(info: IRoutingInfo) {
-		window.history.pushState({}, '', window.location.href.split(info.match.fragments.consumed)[0]);
 	}
 
 	#generateRoute(modalRegistration: UmbModalRouteRegistration): IRoute {
@@ -104,11 +98,17 @@ export class UmbRouteContext {
 		this._onGotModals(this.#contextRoutes);
 	}
 
-	#generateNewURLs() {
-		this.#modalRegistrations.forEach(this.#generateNewURL);
+	public _internal_routerGotBasePath(routerBasePath: string) {
+		if (this.#routerBasePath === routerBasePath) return;
+		this.#routerBasePath = routerBasePath;
+		this.#generateNewUrlBuilders();
 	}
 
-	#generateNewURL = (modalRegistration: UmbModalRouteRegistration) => {
+	#generateNewUrlBuilders() {
+		this.#modalRegistrations.forEach(this.#generateNewUrlBuilder);
+	}
+
+	#generateNewUrlBuilder = (modalRegistration: UmbModalRouteRegistration) => {
 		if (!modalRegistration.options.getUrlBuilder || !this.#routerBasePath) return;
 
 		const routeBasePath = this.#routerBasePath.endsWith('/') ? this.#routerBasePath : this.#routerBasePath + '/';
