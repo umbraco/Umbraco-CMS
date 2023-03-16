@@ -2,8 +2,9 @@ import { UmbWorkspaceContext } from '../../../shared/components/workspace/worksp
 import { UmbWorkspaceEntityContextInterface } from '../../../shared/components/workspace/workspace-context/workspace-entity-context.interface';
 import { UmbDataTypeRepository } from '../repository/data-type.repository';
 import type { DataTypeModel } from '@umbraco-cms/backend-api';
-import { appendToFrozenArray, ObjectState } from '@umbraco-cms/observable-api';
+import { appendToFrozenArray, ArrayState, ObjectState, partialUpdateFrozenArray } from '@umbraco-cms/observable-api';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
+import { UmbWorkspaceActionState } from 'src/backoffice/shared/components/workspace/workspace-context/workspace-context.interface';
 
 export class UmbDataTypeWorkspaceContext
 	extends UmbWorkspaceContext<UmbDataTypeRepository>
@@ -28,20 +29,9 @@ export class UmbDataTypeWorkspaceContext
 
 	async createScaffold(parentKey: string | null) {
 		const { data } = await this.repository.createScaffold(parentKey);
-		if (!data) return;
 		this.setIsNew(true);
 		this.#data.next(data);
-	}
-
-	async getPaths() {
-		return [
-			{
-				path: 'edit/:key',
-			},
-			{
-				path: 'create/:parentKey',
-			},
-		];
+		return { data };
 	}
 
 	getData() {
@@ -98,5 +88,3 @@ export class UmbDataTypeWorkspaceContext
 		this.#data.complete();
 	}
 }
-
-export default UmbDataTypeWorkspaceContext;

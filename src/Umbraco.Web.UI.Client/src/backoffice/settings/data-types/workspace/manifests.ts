@@ -8,7 +8,6 @@ const workspace: ManifestWorkspace = {
 	loader: () => import('./data-type-workspace.element'),
 	meta: {
 		entityType: 'data-type',
-		context: () => import('./data-type-workspace.context'),
 	},
 };
 
@@ -17,12 +16,12 @@ const workspaceViews: Array<ManifestWorkspaceView> = [
 		type: 'workspaceView',
 		alias: 'Umb.WorkspaceView.DataType.Edit',
 		name: 'Data Type Workspace Edit View',
-		loader: () => import('./views/edit/data-type-workspace-view-edit.element'),
+		loader: () => import('./views/details/data-type-details-workspace-view.element'),
 		weight: 90,
 		meta: {
 			workspaces: ['Umb.Workspace.DataType'],
-			label: 'Edit',
-			pathname: 'edit',
+			label: 'Details',
+			pathname: 'details',
 			icon: 'edit',
 		},
 	},

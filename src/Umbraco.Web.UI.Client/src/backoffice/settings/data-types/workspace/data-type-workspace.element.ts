@@ -1,98 +1,56 @@
-import { UUIInputElement, UUIInputEvent } from '@umbraco-ui/uui';
-import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
-import { css, html, nothing } from 'lit';
-import { customElement, property, state } from 'lit/decorators.js';
-import { UmbRouteLocation } from '@umbraco-cms/router';
+import { UUITextStyles } from '@umbraco-ui/uui-css';
+import { css, html } from 'lit';
+import { customElement, state } from 'lit/decorators.js';
+import { UmbRouterSlotInitEvent, IRoute, IRoutingInfo } from '@umbraco-cms/router';
 import { UmbDataTypeWorkspaceContext } from './data-type-workspace.context';
 import { UmbLitElement } from '@umbraco-cms/element';
-import { ManifestWorkspace } from '@umbraco-cms/extensions-registry';
 
-/**
- * @element umb-data-type-workspace
- * @description - Element for displaying a Data Type Workspace
- */
-@customElement('umb-data-type-workspace')
-export class UmbDataTypeWorkspaceElement extends UmbLitElement {
-	static styles = [
-		UUITextStyles,
-		css`
-			:host {
-				display: block;
-				width: 100%;
-				height: 100%;
-			}
+import './data-type-workspace-edit.element';
 
-			#header {
-				/* TODO: can this be applied from layout slot CSS? */
-				margin: 0 var(--uui-size-layout-1);
-				flex: 1 1 auto;
-			}
-		`,
-	];
+@customElement('umb-language-workspace')
+export class UmbLanguageWorkspaceElement extends UmbLitElement {
+	static styles = [UUITextStyles, css``];
 
-	@property()
-	manifest?: ManifestWorkspace;
+	#workspaceContext = new UmbDataTypeWorkspaceContext(this);
 
-	@property()
-	location?: UmbRouteLocation;
+	#routerPath? = '';
+
+	#element = document.createElement('umb-data-type-workspace-edit-element');
+	#key = '';
 
 	@state()
-	private _dataTypeName = '';
-
-	#workspaceContext?: UmbDataTypeWorkspaceContext;
-
-	constructor() {
-		super();
-
-		this.consumeContext('umbWorkspaceContext', (workspaceContext: UmbDataTypeWorkspaceContext) => {
-			this.#workspaceContext = workspaceContext;
-			this.#init();
-			this.#observeName();
-		});
-	}
-
-	#init() {
-		if (this.location?.params?.parentKey) {
-			this.#workspaceContext?.createScaffold(this.location.params.parentKey);
-		} else if (this.location?.params?.key) {
-			this.#workspaceContext?.load(this.location.params.key);
-		}
-	}
-
-	#observeName() {
-		if (!this.#workspaceContext) return;
-		this.observe(this.#workspaceContext.name, (dataTypeName) => {
-			if (dataTypeName !== this._dataTypeName) {
-				this._dataTypeName = dataTypeName ?? '';
-			}
-		});
-	}
-
-	// TODO. find a way where we don't have to do this for all Workspaces.
-	#handleInput(event: UUIInputEvent) {
-		if (event instanceof UUIInputEvent) {
-			const target = event.composedPath()[0] as UUIInputElement;
-
-			if (typeof target?.value === 'string') {
-				this.#workspaceContext?.setName(target.value);
-			}
-		}
-	}
+	_routes: IRoute[] = [
+		{
+			path: 'create/:parentKey',
+			component: () => this.#element,
+			setup: async (component: HTMLElement, info: IRoutingInfo) => {
+				const parentKey = info.match.params.parentKey;
+				this.#workspaceContext.createScaffold(parentKey);
+			},
+		},
+		{
+			path: 'edit/:key',
+			component: () => this.#element,
+			setup: (component: HTMLElement, info: IRoutingInfo) => {
+				const key = info.match.params.key;
+				this.#workspaceContext.load(key);
+			},
+		},
+	];
 
 	render() {
-		if (!this.manifest) return nothing;
-		return html`
-			<umb-workspace-layout alias=${this.manifest?.alias}>
-				<uui-input slot="header" id="header" .value=${this._dataTypeName} @input="${this.#handleInput}"></uui-input>
-			</umb-workspace-layout>
-		`;
+		return html`<umb-router-slot
+			.routes=${this._routes}
+			@init=${(event: UmbRouterSlotInitEvent) => {
+				this.#routerPath = event.target.absoluteRouterPath;
+			}}></umb-router-slot>`;
 	}
 }
 
-export default UmbDataTypeWorkspaceElement;
+export default UmbLanguageWorkspaceElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-data-type-workspace': UmbDataTypeWorkspaceElement;
+		'umb-language-workspace': UmbLanguageWorkspaceElement;
 	}
 }
