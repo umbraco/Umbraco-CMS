@@ -5,8 +5,10 @@ using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Actions;
+using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.ContentApps;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Dictionary;
@@ -65,6 +67,7 @@ public class ContentController : ContentControllerBase
     private readonly ISqlContext _sqlContext;
     private readonly IUmbracoMapper _umbracoMapper;
     private readonly IUserService _userService;
+    private readonly ContentSettings _contentSettings;
 
     [ActivatorUtilitiesConstructor]
     public ContentController(
@@ -91,7 +94,8 @@ public class ContentController : ContentControllerBase
         ICoreScopeProvider scopeProvider,
         IAuthorizationService authorizationService,
         IContentVersionService contentVersionService,
-        ICultureImpactFactory cultureImpactFactory)
+        ICultureImpactFactory cultureImpactFactory,
+        IOptions<ContentSettings> contentSettings)
         : base(cultureDictionary, loggerFactory, shortStringHelper, eventMessages, localizedTextService, serializer)
     {
         _propertyEditors = propertyEditors;
@@ -115,7 +119,63 @@ public class ContentController : ContentControllerBase
         _logger = loggerFactory.CreateLogger<ContentController>();
         _scopeProvider = scopeProvider;
         _allLangs = new Lazy<IDictionary<string, ILanguage>>(() =>
-            _localizationService.GetAllLanguages().ToDictionary(x => x.IsoCode, x => x, StringComparer.InvariantCultureIgnoreCase));
+        _localizationService.GetAllLanguages().ToDictionary(x => x.IsoCode, x => x, StringComparer.InvariantCultureIgnoreCase));
+        _contentSettings = contentSettings.Value;
+    }
+
+    [Obsolete("Use constructor that accepts ContentSettings as a parameter, scheduled for removal in V13")]
+    public ContentController(
+        ICultureDictionary cultureDictionary,
+        ILoggerFactory loggerFactory,
+        IShortStringHelper shortStringHelper,
+        IEventMessagesFactory eventMessages,
+        ILocalizedTextService localizedTextService,
+        PropertyEditorCollection propertyEditors,
+        IContentService contentService,
+        IUserService userService,
+        IBackOfficeSecurityAccessor backofficeSecurityAccessor,
+        IContentTypeService contentTypeService,
+        IUmbracoMapper umbracoMapper,
+        IPublishedUrlProvider publishedUrlProvider,
+        IDomainService domainService,
+        IDataTypeService dataTypeService,
+        ILocalizationService localizationService,
+        IFileService fileService,
+        INotificationService notificationService,
+        ActionCollection actionCollection,
+        ISqlContext sqlContext,
+        IJsonSerializer serializer,
+        ICoreScopeProvider scopeProvider,
+        IAuthorizationService authorizationService,
+        IContentVersionService contentVersionService,
+        ICultureImpactFactory cultureImpactFactory)
+        : this(
+            cultureDictionary,
+            loggerFactory,
+            shortStringHelper,
+            eventMessages,
+            localizedTextService,
+            propertyEditors,
+            contentService,
+            userService,
+            backofficeSecurityAccessor,
+            contentTypeService,
+            umbracoMapper,
+            publishedUrlProvider,
+            domainService,
+            dataTypeService,
+            localizationService,
+            fileService,
+            notificationService,
+            actionCollection,
+            sqlContext,
+            serializer,
+            scopeProvider,
+            authorizationService,
+            contentVersionService,
+            cultureImpactFactory,
+            StaticServiceProvider.Instance.GetRequiredService<IOptions<ContentSettings>>())
+    {
     }
 
     [Obsolete("Use constructor that accepts ICultureImpactService as a parameter, scheduled for removal in V12")]
@@ -1710,6 +1770,11 @@ public class ContentController : ContentControllerBase
     /// <param name="globalNotifications"></param>
     internal void AddDomainWarnings(IContent? persistedContent, string[]? culturesPublished, SimpleNotificationModel globalNotifications)
     {
+        if (_contentSettings.ShowDomainWarnings is false)
+        {
+            return;
+        }
+
         // Don't try to verify if no cultures were published
         if (culturesPublished is null)
         {
