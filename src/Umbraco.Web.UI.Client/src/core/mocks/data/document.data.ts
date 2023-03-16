@@ -469,6 +469,7 @@ export const data: Array<DocumentResponseModel> = [
 		contentTypeKey: 'simple-document-type-key',
 		variants: [
 			{
+				$type: '',
 				state: ContentStateModel.DRAFT,
 				publishDate: '2023-02-06T15:32:24.957009',
 				culture: 'en-us',

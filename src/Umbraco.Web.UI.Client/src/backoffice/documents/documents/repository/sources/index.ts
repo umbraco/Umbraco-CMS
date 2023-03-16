@@ -1,4 +1,4 @@
-import { DocumentResponseModel } from '@umbraco-cms/backend-api';
+import { CreateDocumentRequestModel, DocumentResponseModel } from '@umbraco-cms/backend-api';
 import type { DataSourceResponse } from '@umbraco-cms/models';
 import { RepositoryDetailDataSource } from '@umbraco-cms/repository';
 

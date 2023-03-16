@@ -5,7 +5,7 @@ import { ifDefined } from 'lit-html/directives/if-defined.js';
 import { UUIInputElement, UUIInputEvent } from '@umbraco-ui/uui';
 import { UmbLanguageWorkspaceContext } from './language-workspace.context';
 import { UmbLitElement } from '@umbraco-cms/element';
-import { LanguageModel } from '@umbraco-cms/backend-api';
+import { LanguageResponseModel } from '@umbraco-cms/backend-api';
 
 @customElement('umb-language-workspace-thingy')
 export class UmbLanguageWorkspaceThingyElement extends UmbLitElement {
@@ -27,7 +27,7 @@ export class UmbLanguageWorkspaceThingyElement extends UmbLitElement {
 	#workspaceContext?: UmbLanguageWorkspaceContext;
 
 	@state()
-	_language?: LanguageModel;
+	_language?: LanguageResponseModel;
 
 	constructor() {
 		super();
