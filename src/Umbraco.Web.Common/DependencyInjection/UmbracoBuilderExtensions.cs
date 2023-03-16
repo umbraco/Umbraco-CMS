@@ -185,6 +185,7 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.AddHostedService<KeepAlive>();
         builder.Services.AddHostedService<LogScrubber>();
         builder.Services.AddHostedService<ContentVersionCleanup>();
+        builder.Services.AddHostedService<TemporaryFileCleanup>();
         builder.Services.AddHostedService<ScheduledPublishing>();
         builder.Services.AddHostedService<TempFileCleanup>();
         builder.Services.AddHostedService<InstructionProcessTask>();

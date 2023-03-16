@@ -5,5 +5,6 @@ public enum DictionaryImportOperationStatus
     Success,
     ParentNotFound,
     InvalidFileContent,
-    InvalidFileType
+    InvalidFileType,
+    TemporaryFileNotFound,
 }
