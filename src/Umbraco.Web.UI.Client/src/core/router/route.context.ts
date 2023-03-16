@@ -5,7 +5,6 @@ import { UmbModalToken, UMB_MODAL_CONTEXT_TOKEN } from '@umbraco-cms/modal';
 
 const EmptyDiv = document.createElement('div');
 
-// TODO: Consider accepting the Token as a generic:
 export type UmbModalRouteOptions<UmbModalTokenData extends object = object, UmbModalTokenResult = unknown> = {
 	path: string;
 	onSetup?: (routingInfo: Params) => UmbModalTokenData | false;
