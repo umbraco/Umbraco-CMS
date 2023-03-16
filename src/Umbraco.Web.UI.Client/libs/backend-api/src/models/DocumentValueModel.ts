@@ -2,7 +2,8 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import type { ValueViewModelBaseModel } from './ValueViewModelBaseModel';
+import type { ValueModelBaseModel } from './ValueModelBaseModel';
 
-export type DocumentValueModel = ValueViewModelBaseModel;
-
+export type DocumentValueModel = (ValueModelBaseModel & {
+$type: string;
+});

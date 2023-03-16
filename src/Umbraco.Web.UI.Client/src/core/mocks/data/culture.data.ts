@@ -1,12 +1,12 @@
-import type { CultureModel, PagedCultureModel } from '@umbraco-cms/backend-api';
+import type { CultureReponseModel, PagedCultureReponseModel } from '@umbraco-cms/backend-api';
 
 class UmbCulturesData {
-	get(): PagedCultureModel {
+	get(): PagedCultureReponseModel {
 		return { total: culturesMock.length, items: culturesMock };
 	}
 }
 
-export const culturesMock: Array<CultureModel> = [
+export const culturesMock: Array<CultureReponseModel> = [
 	{
 		name: 'af',
 		englishName: 'Afrikaans',

@@ -2,12 +2,11 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import type { DataTypePropertyModel } from './DataTypePropertyModel';
+import type { DataTypePropertyPresentationModel } from './DataTypePropertyPresentationModel';
 
 export type DataTypeModelBaseModel = {
     name?: string;
     propertyEditorAlias?: string;
     propertyEditorUiAlias?: string | null;
-    data?: Array<DataTypePropertyModel>;
+    values?: Array<DataTypePropertyPresentationModel>;
 };
-

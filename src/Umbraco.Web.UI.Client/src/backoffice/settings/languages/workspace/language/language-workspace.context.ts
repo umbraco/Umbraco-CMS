@@ -1,11 +1,11 @@
 import { UmbLanguageRepository } from '../../repository/language.repository';
 import { UmbWorkspaceContext } from '../../../../shared/components/workspace/workspace-context/workspace-context';
-import type { LanguageModel } from '@umbraco-cms/backend-api';
+import type { LanguageResponseModel } from '@umbraco-cms/backend-api';
 import { ObjectState } from '@umbraco-cms/observable-api';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 
 export class UmbLanguageWorkspaceContext extends UmbWorkspaceContext<UmbLanguageRepository> {
-	#data = new ObjectState<LanguageModel | undefined>(undefined);
+	#data = new ObjectState<LanguageResponseModel | undefined>(undefined);
 	data = this.#data.asObservable();
 
 	// TODO: this is a temp solution to bubble validation errors to the UI

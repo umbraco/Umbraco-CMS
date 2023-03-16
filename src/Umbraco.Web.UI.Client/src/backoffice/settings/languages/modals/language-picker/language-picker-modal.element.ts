@@ -6,14 +6,14 @@ import { UUIMenuItemElement, UUIMenuItemEvent } from '@umbraco-ui/uui';
 import { ifDefined } from 'lit-html/directives/if-defined.js';
 import { UmbLanguageRepository } from '../../repository/language.repository';
 import { UmbModalElementPickerBase } from '@umbraco-cms/modal';
-import { LanguageModel } from '@umbraco-cms/backend-api';
+import { LanguageResponseModel } from '@umbraco-cms/backend-api';
 
 @customElement('umb-language-picker-modal')
-export class UmbLanguagePickerModalElement extends UmbModalElementPickerBase<LanguageModel> {
+export class UmbLanguagePickerModalElement extends UmbModalElementPickerBase<LanguageResponseModel> {
 	static styles = [UUITextStyles, css``];
 
 	@state()
-	private _languages: Array<LanguageModel> = [];
+	private _languages: Array<LanguageResponseModel> = [];
 
 	private _languageRepository = new UmbLanguageRepository(this);
 

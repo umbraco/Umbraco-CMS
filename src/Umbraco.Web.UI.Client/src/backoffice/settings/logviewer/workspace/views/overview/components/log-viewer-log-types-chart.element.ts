@@ -1,9 +1,8 @@
-import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { UmbLogViewerWorkspaceContext, UMB_APP_LOG_VIEWER_CONTEXT_TOKEN } from '../../../logviewer.context';
 import { UmbLitElement } from '@umbraco-cms/element';
-import { LogLevelCountsModel } from '@umbraco-cms/backend-api';
+import { LogLevelCountsReponseModel } from '@umbraco-cms/backend-api';
 
 @customElement('umb-log-viewer-log-types-chart')
 export class UmbLogViewerLogTypesChartElement extends UmbLitElement {
@@ -80,7 +79,7 @@ export class UmbLogViewerLogTypesChartElement extends UmbLitElement {
 	}
 
 	@state()
-	private _logLevelCount: LogLevelCountsModel | null = null;
+	private _logLevelCount: LogLevelCountsReponseModel | null = null;
 
 	@state()
 	private logLevelCount: [string, number][] = [];

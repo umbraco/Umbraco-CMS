@@ -11,7 +11,7 @@ import '../../property-actions/shared/property-action-menu/property-action-menu.
 import '../../../../backoffice/shared/components/workspace/workspace-property-layout/workspace-property-layout.element';
 import { UmbObserverController } from '@umbraco-cms/observable-api';
 import { UmbLitElement } from '@umbraco-cms/element';
-import { DataTypePropertyModel } from '@umbraco-cms/backend-api';
+import { DataTypePropertyPresentationModel } from '@umbraco-cms/backend-api';
 import { UmbPropertyEditorElement } from '@umbraco-cms/property-editor';
 
 /**
@@ -114,7 +114,7 @@ export class UmbWorkspacePropertyElement extends UmbLitElement {
 	 * @default ''
 	 */
 	@property({ type: Object, attribute: false })
-	public set config(value: DataTypePropertyModel[]) {
+	public set config(value: DataTypePropertyPresentationModel[]) {
 		this._propertyContext.setConfig(value);
 	}
 

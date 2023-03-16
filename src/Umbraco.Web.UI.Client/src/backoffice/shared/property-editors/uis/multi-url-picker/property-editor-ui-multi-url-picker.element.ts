@@ -6,7 +6,7 @@ import { UmbInputMultiUrlPickerElement } from '../../../../shared/components/inp
 import { UmbLinkPickerLink } from '../../../../shared/modals/link-picker';
 import { UmbPropertyEditorElement } from '@umbraco-cms/property-editor';
 import { UmbLitElement } from '@umbraco-cms/element';
-import { DataTypePropertyModel } from '@umbraco-cms/backend-api';
+import { DataTypePropertyPresentationModel } from '@umbraco-cms/backend-api';
 
 /**
  * @element umb-property-editor-ui-multi-url-picker
@@ -20,7 +20,7 @@ export class UmbPropertyEditorUIMultiUrlPickerElement extends UmbLitElement impl
 	value: UmbLinkPickerLink[] = [];
 
 	@property({ type: Array, attribute: false })
-	public set config(config: DataTypePropertyModel[]) {
+	public set config(config: DataTypePropertyPresentationModel[]) {
 		const overlaySize = config.find((x) => x.alias === 'overlaySize');
 		if (overlaySize) this._overlaySize = overlaySize.value;
 
