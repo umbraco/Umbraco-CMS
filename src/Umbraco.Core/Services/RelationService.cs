@@ -248,7 +248,7 @@ public class RelationService : RepositoryService, IRelationService
         }
     }
 
-    public async Task<Attempt<PagedModel<IRelation>, RelationOperationStatus>> GetPagedByRelationTypeKey(Guid key, int skip, int take, Ordering? ordering = null)
+    public async Task<Attempt<PagedModel<IRelation>, RelationOperationStatus>> GetPagedByRelationTypeKeyAsync(Guid key, int skip, int take, Ordering? ordering = null)
     {
         using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
         {
