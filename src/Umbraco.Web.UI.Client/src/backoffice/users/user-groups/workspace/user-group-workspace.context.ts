@@ -6,7 +6,7 @@ import { UmbUserGroupRepository } from '../repository/user-group.repository';
 import type { UserGroupDetails } from '@umbraco-cms/models';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 
-export class UmbWorkspaceUserGroupContext
+export class UmbUserGroupWorkspaceContext
 	extends UmbWorkspaceContext<UmbUserGroupRepository>
 	implements UmbEntityWorkspaceContextInterface<UserGroupDetails | undefined>
 {
