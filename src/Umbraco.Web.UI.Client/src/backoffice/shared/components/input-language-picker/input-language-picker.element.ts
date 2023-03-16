@@ -83,7 +83,7 @@ export class UmbInputLanguagePickerElement extends FormControlMixin(UmbLitElemen
 
 	private _modalContext?: UmbModalContext;
 	private _repository = new UmbLanguageRepository(this);
-	private _pickedItemsObserver?: UmbObserverController<LanguageResponseModel>;
+	private _pickedItemsObserver?: UmbObserverController<LanguageResponseModel[]>;
 
 	constructor() {
 		super();

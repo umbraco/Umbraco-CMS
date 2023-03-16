@@ -39,7 +39,7 @@ export class UmbSectionViewsElement extends UmbLitElement {
 	private _activeViewPathname?: string;
 
 	private _sectionContext?: UmbSectionContext;
-	private _extensionsObserver?: UmbObserverController;
+	private _extensionsObserver?: UmbObserverController<ManifestSectionView[]>;
 
 	constructor() {
 		super();

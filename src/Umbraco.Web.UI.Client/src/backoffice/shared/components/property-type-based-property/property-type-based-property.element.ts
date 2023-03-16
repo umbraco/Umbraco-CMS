@@ -5,7 +5,11 @@ import { customElement, property, state } from 'lit/decorators.js';
 import { UmbDataTypeRepository } from '../../../settings/data-types/repository/data-type.repository';
 import { UmbVariantId } from '../../variants/variant-id.class';
 import { UmbDocumentWorkspaceContext } from '../../../documents/documents/workspace/document-workspace.context';
-import type { DataTypeResponseModel, DataTypePropertyPresentationModel, PropertyTypeResponseModelBaseModel } from '@umbraco-cms/backend-api';
+import type {
+	DataTypeResponseModel,
+	DataTypePropertyPresentationModel,
+	PropertyTypeResponseModelBaseModel,
+} from '@umbraco-cms/backend-api';
 import '../workspace-property/workspace-property.element';
 import { UmbLitElement } from '@umbraco-cms/element';
 import { UmbObserverController } from '@umbraco-cms/observable-api';
@@ -42,7 +46,7 @@ export class UmbPropertyTypeBasedPropertyElement extends UmbLitElement {
 	private _dataTypeData: DataTypePropertyPresentationModel[] = [];
 
 	private _dataTypeRepository: UmbDataTypeRepository = new UmbDataTypeRepository(this);
-	private _dataTypeObserver?: UmbObserverController<DataTypeResponseModel | null>;
+	private _dataTypeObserver?: UmbObserverController<DataTypeResponseModel | undefined>;
 
 	@state()
 	private _value?: unknown;
