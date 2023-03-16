@@ -1,19 +1,17 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
-import { IRoutingInfo } from '@umbraco-cms/router';
 import { UmbWorkspaceDocumentTypeContext } from './document-type-workspace.context';
+import { UmbDocumentTypeWorkspaceEditElement } from './document-type-workspace-edit.element';
+import { IRoutingInfo } from '@umbraco-cms/router';
 import { UmbLitElement } from '@umbraco-cms/element';
-
-import './document-type-workspace-edit.element';
 
 @customElement('umb-document-type-workspace')
 export class UmbDocumentTypeWorkspaceElement extends UmbLitElement {
 	static styles = [UUITextStyles];
 
-	#workspaceContext: UmbWorkspaceDocumentTypeContext = new UmbWorkspaceDocumentTypeContext(this);
-
-	#element = document.createElement('umb-document-type-workspace-edit');
+	#workspaceContext = new UmbWorkspaceDocumentTypeContext(this);
+	#element = new UmbDocumentTypeWorkspaceEditElement();
 
 	@state()
 	_routes = [

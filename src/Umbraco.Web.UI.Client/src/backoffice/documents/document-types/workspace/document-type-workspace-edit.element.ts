@@ -46,7 +46,7 @@ export class UmbDocumentTypeWorkspaceEditElement extends UmbLitElement {
 		name: 'umb:document-dashed-line',
 	};
 
-	private _workspaceContext: UmbWorkspaceDocumentTypeContext = new UmbWorkspaceDocumentTypeContext(this);
+	#workspaceContext?: UmbWorkspaceDocumentTypeContext;
 
 	@state()
 	private _documentType?: DocumentTypeResponseModel;
@@ -56,14 +56,19 @@ export class UmbDocumentTypeWorkspaceEditElement extends UmbLitElement {
 	constructor() {
 		super();
 
+		this.consumeContext<UmbWorkspaceDocumentTypeContext>('umbWorkspaceContext', (instance) => {
+			this.#workspaceContext = instance;
+			this.#observeDocumentType();
+		});
+
 		this.consumeContext(UMB_MODAL_CONTEXT_TOKEN, (instance) => {
 			this._modalContext = instance;
 		});
+	}
 
-		this.observe(this._workspaceContext.data, (data) => {
-			// TODO: make method to identify if data is of type DocumentType
-			this._documentType = data as DocumentType;
-		});
+	#observeDocumentType() {
+		if (!this.#workspaceContext) return;
+		this.observe(this.#workspaceContext.data, (data) => (this._documentType = data));
 	}
 
 	// TODO. find a way where we don't have to do this for all workspaces.
@@ -72,7 +77,7 @@ export class UmbDocumentTypeWorkspaceEditElement extends UmbLitElement {
 			const target = event.composedPath()[0] as UUIInputElement;
 
 			if (typeof target?.value === 'string') {
-				this._workspaceContext?.setName(target.value);
+				this.#workspaceContext?.setName(target.value);
 			}
 		}
 	}
@@ -81,7 +86,7 @@ export class UmbDocumentTypeWorkspaceEditElement extends UmbLitElement {
 		const modalHandler = this._modalContext?.open(UMB_ICON_PICKER_MODAL_TOKEN);
 
 		modalHandler?.onSubmit().then((saved) => {
-			if (saved.icon) this._workspaceContext?.setIcon(saved.icon);
+			if (saved.icon) this.#workspaceContext?.setIcon(saved.icon);
 			// TODO save color ALIAS as well
 		});
 	}
