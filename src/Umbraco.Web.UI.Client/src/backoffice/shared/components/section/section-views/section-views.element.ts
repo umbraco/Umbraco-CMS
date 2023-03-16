@@ -89,7 +89,6 @@ export class UmbSectionViewsElement extends UmbLitElement {
 									<uui-tab
 										.label="${view.meta.label || view.name}"
 										href="${this.routerPath}/view/${view.meta.pathname}"
-										data-active=${this.activePath}
 										?active="${this.activePath === 'view/' + view.meta.pathname}">
 										<uui-icon slot="icon" name=${view.meta.icon}></uui-icon>
 										${view.meta.label || view.name}
