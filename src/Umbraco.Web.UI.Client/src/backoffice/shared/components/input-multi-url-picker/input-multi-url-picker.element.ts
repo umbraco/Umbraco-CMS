@@ -117,6 +117,7 @@ export class UmbInputMultiUrlPickerElement extends FormControlMixin(UmbLitElemen
 			() => !!this.max && this.urls.length > this.max
 		);
 
+		// TODO: Need concept for contextual being aware about the context, as this might not work if input is used outside a property editor.
 		new UmbPropertyEditorModalRegistrationController(this, UMB_LINK_PICKER_MODAL_TOKEN, {
 			path: `:index`,
 			onSetup: (params) => {
