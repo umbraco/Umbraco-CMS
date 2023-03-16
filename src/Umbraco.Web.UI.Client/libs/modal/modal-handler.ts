@@ -103,7 +103,7 @@ export class UmbModalHandlerClass<ModalData extends object = object, ModalResult
 		const innerElement = (await createExtensionElement(manifest)) as any;
 
 		if (innerElement) {
-			innerElement.data = data; //
+			innerElement.data = data;
 			//innerElement.observable = this.#dataObservable;
 			innerElement.modalHandler = this;
 		}
@@ -111,7 +111,7 @@ export class UmbModalHandlerClass<ModalData extends object = object, ModalResult
 		return innerElement;
 	}
 
-	// note, this methods argument is not defined correctly here, but requires to be fix by appending the OptionalSubmitArgumentIfUndefined type when newing up this class.
+	// note, this methods is private  argument is not defined correctly here, but requires to be fix by appending the OptionalSubmitArgumentIfUndefined type when newing up this class.
 	private submit(result?: ModalResult) {
 		this._submitResolver?.(result as ModalResult);
 		this.modalElement.close();
