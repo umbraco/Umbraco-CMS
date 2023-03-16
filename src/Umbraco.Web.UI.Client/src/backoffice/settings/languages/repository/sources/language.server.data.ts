@@ -1,4 +1,4 @@
-import { ProblemDetailsModel, LanguageResource, LanguageModel } from '@umbraco-cms/backend-api';
+import { ProblemDetailsModel, LanguageResource, LanguageResponseModel } from '@umbraco-cms/backend-api';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 import { tryExecuteAndNotify } from '@umbraco-cms/resources';
 
@@ -47,7 +47,7 @@ export class UmbLanguageServerDataSource implements UmbLanguageServerDataSource 
 	 * @memberof UmbLanguageServerDataSource
 	 */
 	async createScaffold() {
-		const data: LanguageModel = {
+		const data: LanguageResponseModel = {
 			name: '',
 			isDefault: false,
 			isMandatory: false,
@@ -60,11 +60,11 @@ export class UmbLanguageServerDataSource implements UmbLanguageServerDataSource 
 
 	/**
 	 * Inserts a new Language on the server
-	 * @param {LanguageModel} language
+	 * @param {LanguageResponseModel} language
 	 * @return {*}
 	 * @memberof UmbLanguageServerDataSource
 	 */
-	async insert(language: LanguageModel) {
+	async insert(language: LanguageResponseModel) {
 		if (!language.isoCode) {
 			const error: ProblemDetailsModel = { title: 'Language iso code is missing' };
 			return { error };
@@ -75,11 +75,11 @@ export class UmbLanguageServerDataSource implements UmbLanguageServerDataSource 
 
 	/**
 	 * Updates a Language on the server
-	 * @param {LanguageModel} language
+	 * @param {LanguageResponseModel} language
 	 * @return {*}
 	 * @memberof UmbLanguageServerDataSource
 	 */
-	async update(language: LanguageModel) {
+	async update(language: LanguageResponseModel) {
 		if (!language.isoCode) {
 			const error: ProblemDetailsModel = { title: 'Language iso code is missing' };
 			return { error };

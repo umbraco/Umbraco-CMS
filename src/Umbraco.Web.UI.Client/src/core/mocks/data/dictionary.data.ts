@@ -1,6 +1,6 @@
 import { UmbEntityData } from './entity.data';
 import { createEntityTreeItem } from './utils';
-import type { EntityTreeItemModel } from '@umbraco-cms/backend-api';
+import type { EntityTreeItemResponseModel } from '@umbraco-cms/backend-api';
 import type { DictionaryDetails } from '@umbraco-cms/models';
 
 export const data: Array<DictionaryDetails> = [
@@ -55,17 +55,17 @@ class UmbDictionaryData extends UmbEntityData<DictionaryDetails> {
 		super(data);
 	}
 
-	getTreeRoot(): Array<EntityTreeItemModel> {
+	getTreeRoot(): Array<EntityTreeItemResponseModel> {
 		const rootItems = this.data.filter((item) => item.parentKey === null);
 		return rootItems.map((item) => createEntityTreeItem(item));
 	}
 
-	getTreeItemChildren(key: string): Array<EntityTreeItemModel> {
+	getTreeItemChildren(key: string): Array<EntityTreeItemResponseModel> {
 		const childItems = this.data.filter((item) => item.parentKey === key);
 		return childItems.map((item) => createEntityTreeItem(item));
 	}
 
-	getTreeItem(keys: Array<string>): Array<EntityTreeItemModel> {
+	getTreeItem(keys: Array<string>): Array<EntityTreeItemResponseModel> {
 		const items = this.data.filter((item) => keys.includes(item.key ?? ''));
 		return items.map((item) => createEntityTreeItem(item));
 	}

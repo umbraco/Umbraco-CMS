@@ -8,11 +8,11 @@ import {
 } from '../data/health-check.data';
 
 import {
-	HealthCheckActionModel,
-	HealthCheckGroupModel,
-	HealthCheckGroupWithResultModel,
-	HealthCheckResultModel,
-	PagedHealthCheckGroupModelBaseModel,
+	HealthCheckActionRequestModel,
+	HealthCheckGroupResponseModel,
+	HealthCheckGroupWithResultResponseModel,
+	HealthCheckResultResponseModel,
+	PagedHealthCheckGroupResponseModel,
 	StatusResultTypeModel,
 } from '@umbraco-cms/backend-api';
 import { umbracoPath } from '@umbraco-cms/utils';
@@ -22,7 +22,7 @@ export const handlers = [
 		return res(
 			// Respond with a 200 status code
 			ctx.status(200),
-			ctx.json<PagedHealthCheckGroupModelBaseModel>({ total: 9999, items: healthGroupsWithoutResult })
+			ctx.json<PagedHealthCheckGroupResponseModel>({ total: 9999, items: healthGroupsWithoutResult })
 		);
 	}),
 
@@ -33,7 +33,7 @@ export const handlers = [
 		const group = getGroupByName(name);
 
 		if (group) {
-			return res(ctx.status(200), ctx.json<HealthCheckGroupModel>(group));
+			return res(ctx.status(200), ctx.json<HealthCheckGroupResponseModel>(group));
 		} else {
 			return res(ctx.status(404));
 		}
@@ -46,14 +46,14 @@ export const handlers = [
 		const group = getGroupWithResultsByName(name);
 
 		if (group) {
-			return res(ctx.status(200), ctx.json<HealthCheckGroupWithResultModel>(group));
+			return res(ctx.status(200), ctx.json<HealthCheckGroupWithResultResponseModel>(group));
 		} else {
 			return res(ctx.status(404));
 		}
 	}),
 
-	rest.post<HealthCheckActionModel>(umbracoPath('/health-check/execute-action'), async (req, res, ctx) => {
-		const body = await req.json<HealthCheckActionModel>();
+	rest.post<HealthCheckActionRequestModel>(umbracoPath('/health-check/execute-action'), async (req, res, ctx) => {
+		const body = await req.json<HealthCheckActionRequestModel>();
 		const healthCheckKey = body.healthCheckKey;
 		// Find the health check based on the healthCheckKey from the healthGroups[].checks
 		const healthCheck = healthGroups.flatMap((group) => group.checks).find((check) => check?.key === healthCheckKey);
@@ -74,7 +74,7 @@ export const handlers = [
 			// Respond with a 200 status code
 			ctx.delay(1000),
 			ctx.status(200),
-			ctx.json<HealthCheckResultModel>(result)
+			ctx.json<HealthCheckResultResponseModel>(result)
 		);
 	}),
 ];

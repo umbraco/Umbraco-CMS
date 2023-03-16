@@ -1,11 +1,11 @@
 import { UmbTemplateRepository } from '../repository/template.repository';
 import { UmbWorkspaceContext } from '../../../shared/components/workspace/workspace-context/workspace-context';
 import { createObservablePart, DeepState } from '@umbraco-cms/observable-api';
-import { TemplateModel } from '@umbraco-cms/backend-api';
+import { TemplateResponseModel } from '@umbraco-cms/backend-api';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 
 export class UmbTemplateWorkspaceContext extends UmbWorkspaceContext<UmbTemplateRepository> {
-	#data = new DeepState<TemplateModel | undefined>(undefined);
+	#data = new DeepState<TemplateResponseModel | undefined>(undefined);
 	data = this.#data.asObservable();
 	name = createObservablePart(this.#data, (data) => data?.name);
 	content = createObservablePart(this.#data, (data) => data?.content);

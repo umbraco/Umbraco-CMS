@@ -5,7 +5,7 @@ import { customElement, state } from 'lit/decorators.js';
 import type { UmbWorkspaceEntityElement } from '../../../shared/components/workspace/workspace-entity-element.interface';
 import { UMB_ICON_PICKER_MODAL_TOKEN } from '../../../shared/modals/icon-picker';
 import { UmbWorkspaceDocumentTypeContext } from './document-type-workspace.context';
-import type { DocumentTypeModel } from '@umbraco-cms/backend-api';
+import type { DocumentTypeResponseModel } from '@umbraco-cms/backend-api';
 import { UmbLitElement } from '@umbraco-cms/element';
 import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN } from '@umbraco-cms/modal';
 
@@ -50,7 +50,7 @@ export class UmbDocumentTypeWorkspaceElement extends UmbLitElement implements Um
 	private _workspaceContext: UmbWorkspaceDocumentTypeContext = new UmbWorkspaceDocumentTypeContext(this);
 
 	@state()
-	private _documentType?: DocumentTypeModel;
+	private _documentType?: DocumentTypeResponseModel;
 
 	private _modalContext?: UmbModalContext;
 

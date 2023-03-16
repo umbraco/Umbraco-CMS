@@ -4,7 +4,7 @@ import { customElement, property, state } from 'lit/decorators.js';
 import { repeat } from 'lit/directives/repeat.js';
 import { UmbDocumentWorkspaceContext } from '../document-workspace.context';
 import { UmbLitElement } from '@umbraco-cms/element';
-import { DocumentTypePropertyTypeModel, PropertyTypeContainerViewModelBaseModel } from '@umbraco-cms/backend-api';
+import { DocumentTypePropertyTypeResponseModel, PropertyTypeContainerResponseModelBaseModel } from '@umbraco-cms/backend-api';
 
 @customElement('umb-document-workspace-view-edit-properties')
 export class UmbDocumentWorkspaceViewEditPropertiesElement extends UmbLitElement {
@@ -45,10 +45,10 @@ export class UmbDocumentWorkspaceViewEditPropertiesElement extends UmbLitElement
 	}
 
 	@state()
-	_groupContainers: Array<PropertyTypeContainerViewModelBaseModel> = [];
+	_groupContainers: Array<PropertyTypeContainerResponseModelBaseModel> = [];
 
 	@state()
-	_propertyStructure: Array<DocumentTypePropertyTypeModel> = [];
+	_propertyStructure: Array<DocumentTypePropertyTypeResponseModel> = [];
 
 	private _workspaceContext?: UmbDocumentWorkspaceContext;
 
@@ -81,7 +81,7 @@ export class UmbDocumentWorkspaceViewEditPropertiesElement extends UmbLitElement
 		);
 	}
 
-	private _observePropertyStructureOfGroup(group: PropertyTypeContainerViewModelBaseModel) {
+	private _observePropertyStructureOfGroup(group: PropertyTypeContainerResponseModelBaseModel) {
 		if (!this._workspaceContext || !group.key) return;
 
 		// TODO: Should be no need to update this observable if its already there.

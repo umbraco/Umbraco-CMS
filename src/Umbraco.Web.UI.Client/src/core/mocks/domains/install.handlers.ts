@@ -1,8 +1,8 @@
 import { rest } from 'msw';
 import {
-	DatabaseInstallModel,
-	InstallModel,
-	InstallSettingsModel,
+	DatabaseInstallResponseModel,
+	InstallVResponseModel,
+	InstallSettingsResponseModel,
 	ProblemDetailsModel,
 	TelemetryLevelModel,
 } from '@umbraco-cms/backend-api';
@@ -13,7 +13,7 @@ export const handlers = [
 		return res(
 			// Respond with a 200 status code
 			ctx.status(200),
-			ctx.json<InstallSettingsModel>({
+			ctx.json<InstallSettingsResponseModel>({
 				user: {
 					minCharLength: 2,
 					minNonAlphaNumericLength: 0,
@@ -79,7 +79,7 @@ export const handlers = [
 	}),
 
 	rest.post(umbracoPath('/install/validate-database'), async (req, res, ctx) => {
-		const body = await req.json<DatabaseInstallModel>();
+		const body = await req.json<DatabaseInstallResponseModel>();
 
 		if (body.name === 'validate') {
 			return res(
@@ -99,7 +99,7 @@ export const handlers = [
 	}),
 
 	rest.post(umbracoPath('/install/setup'), async (req, res, ctx) => {
-		const body = await req.json<InstallModel>();
+		const body = await req.json<InstallVResponseModel>();
 
 		if (body.database?.name === 'fail') {
 			return res(

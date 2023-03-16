@@ -3,7 +3,7 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html, nothing } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 
-import { ModelsBuilderModel, ModelsBuilderResource, ModelsModeModel } from '@umbraco-cms/backend-api';
+import { ModelsBuilderResponseModel, ModelsBuilderResource, ModelsModeModel } from '@umbraco-cms/backend-api';
 import { UmbLitElement } from '@umbraco-cms/element';
 import { tryExecuteAndNotify } from '@umbraco-cms/resources';
 
@@ -41,7 +41,7 @@ export class UmbDashboardModelsBuilderElement extends UmbLitElement {
 	];
 
 	@state()
-	private _modelsBuilder?: ModelsBuilderModel;
+	private _modelsBuilder?: ModelsBuilderResponseModel;
 
 	@state()
 	private _buttonStateBuild: UUIButtonState = undefined;

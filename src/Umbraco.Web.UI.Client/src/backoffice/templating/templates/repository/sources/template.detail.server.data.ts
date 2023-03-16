@@ -1,14 +1,14 @@
 import { v4 as uuid } from 'uuid';
-import { ProblemDetailsModel, TemplateModel, TemplateResource } from '@umbraco-cms/backend-api';
+import { ProblemDetailsModel, TemplateResponseModel, TemplateResource } from '@umbraco-cms/backend-api';
 import type { UmbControllerHostInterface } from '@umbraco-cms/controller';
 import { tryExecuteAndNotify } from '@umbraco-cms/resources';
 import type { DataSourceResponse } from '@umbraco-cms/models';
 
 export interface TemplateDetailDataSource {
-	createScaffold(): Promise<DataSourceResponse<TemplateModel>>;
-	get(key: string): Promise<DataSourceResponse<TemplateModel>>;
-	insert(template: TemplateModel): Promise<DataSourceResponse>;
-	update(template: TemplateModel): Promise<DataSourceResponse>;
+	createScaffold(): Promise<DataSourceResponse<TemplateResponseModel>>;
+	get(key: string): Promise<DataSourceResponse<TemplateResponseModel>>;
+	insert(template: TemplateResponseModel): Promise<DataSourceResponse>;
+	update(template: TemplateResponseModel): Promise<DataSourceResponse>;
 	delete(key: string): Promise<DataSourceResponse>;
 }
 
@@ -48,7 +48,7 @@ export class UmbTemplateDetailServerDataSource implements TemplateDetailDataSour
 	 */
 	async createScaffold() {
 		const error = undefined;
-		const data: TemplateModel = {
+		const data: TemplateResponseModel = {
 			$type: '',
 			key: uuid(),
 			name: '',
@@ -77,7 +77,7 @@ export class UmbTemplateDetailServerDataSource implements TemplateDetailDataSour
 	 * @return {*}
 	 * @memberof UmbTemplateDetailServerDataSource
 	 */
-	async insert(template: TemplateModel) {
+	async insert(template: TemplateResponseModel) {
 		const payload = { requestBody: template };
 		// TODO: fix type mismatch
 		return tryExecuteAndNotify(
@@ -92,7 +92,7 @@ export class UmbTemplateDetailServerDataSource implements TemplateDetailDataSour
 	 * @return {*}
 	 * @memberof UmbTemplateDetailServerDataSource
 	 */
-	async update(template: TemplateModel) {
+	async update(template: TemplateResponseModel) {
 		if (!template.key) {
 			const error: ProblemDetailsModel = { title: 'Template key is missing' };
 			return { error };

@@ -1,8 +1,8 @@
 import { Observable } from 'rxjs';
 import {
-	InstallModel,
+	InstallVResponseModel,
 	InstallResource,
-	InstallSettingsModel,
+	InstallSettingsResponseModel,
 	ProblemDetailsModel,
 	TelemetryLevelModel,
 } from '@umbraco-cms/backend-api';
@@ -16,7 +16,7 @@ import { ObjectState, NumberState } from '@umbraco-cms/observable-api';
  * @class UmbInstallerContext
  */
 export class UmbInstallerContext {
-	private _data = new ObjectState<InstallModel>({
+	private _data = new ObjectState<InstallVResponseModel>({
 		user: { name: '', email: '', password: '', subscribeToNewsletter: false },
 		database: { id: '', providerName: '' },
 		telemetryLevel: TelemetryLevelModel.BASIC,
@@ -26,7 +26,7 @@ export class UmbInstallerContext {
 	private _currentStep = new NumberState<number>(1);
 	public readonly currentStep = this._currentStep.asObservable();
 
-	private _settings = new ObjectState<InstallSettingsModel | undefined>(undefined);
+	private _settings = new ObjectState<InstallSettingsResponseModel | undefined>(undefined);
 	public readonly settings = this._settings.asObservable();
 
 	private _installStatus = new ObjectState<ProblemDetailsModel | null>(null);
@@ -90,7 +90,7 @@ export class UmbInstallerContext {
 	 * @param {Partial<PostInstallRequest>} data
 	 * @memberof UmbInstallerContext
 	 */
-	public appendData(data: Partial<InstallModel>): void {
+	public appendData(data: Partial<InstallVResponseModel>): void {
 		this._data.next({ ...this.getData(), ...data });
 	}
 
@@ -100,7 +100,7 @@ export class UmbInstallerContext {
 	 * @return {*}  {PostInstallRequest}
 	 * @memberof UmbInstallerContext
 	 */
-	public getData(): InstallModel {
+	public getData(): InstallVResponseModel {
 		return this._data.getValue();
 	}
 
