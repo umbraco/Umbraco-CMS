@@ -44,6 +44,10 @@ export class UmbPropertyEditorModalRegistrationController<D extends object = obj
 		});
 	}
 
+	// TODO: Concept about adding identifiers to the modal registration, which is one or more path-folders.
+	// To replace the specific implementation of propertyAlias and variantId.
+	// I think it could be a key value pair, where the key is the identifier so it can be updated/replaced at runtime.
+
 	private _registererModal() {
 		if (!this.#routeContext || !this.#propertyAlias || !this.#variantId) return;
 		if (this.#modalRegistration) {
