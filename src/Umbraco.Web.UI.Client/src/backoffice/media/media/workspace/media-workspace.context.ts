@@ -22,6 +22,7 @@ export class UmbMediaWorkspaceContext
 		return this.#data.getValue();
 	}
 
+	// TODO: this should be async because it can only return the key if the data is loaded.
 	getEntityKey() {
 		return this.getData()?.key || '';
 	}
