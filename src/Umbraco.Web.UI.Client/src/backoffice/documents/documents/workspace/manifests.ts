@@ -13,7 +13,7 @@ const workspace: ManifestWorkspace = {
 	type: 'workspace',
 	alias: 'Umb.Workspace.Document',
 	name: 'Document Workspace',
-	loader: () => import('./document-workspace-edit.element'),
+	loader: () => import('./document-workspace.element'),
 	meta: {
 		entityType: 'document',
 	},

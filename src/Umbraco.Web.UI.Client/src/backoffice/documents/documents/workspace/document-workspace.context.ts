@@ -67,17 +67,6 @@ export class UmbDocumentWorkspaceContext
 		return data || undefined;
 	}
 
-	async getPaths() {
-		return [
-			{
-				path: 'edit/:key',
-			},
-			{
-				path: 'create/:parentKey/:documentTypeKey',
-			},
-		];
-	}
-
 	getData() {
 		return this.#draft.getValue() || {};
 	}
