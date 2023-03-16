@@ -1,12 +1,13 @@
 import { IRoute, IRoutingInfo, Params, PARAM_IDENTIFIER, stripSlash } from 'router-slot';
 import { UmbContextConsumerController, UmbContextProviderController, UmbContextToken } from '@umbraco-cms/context-api';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
-import { UmbModalToken, UMB_MODAL_CONTEXT_TOKEN } from '@umbraco-cms/modal';
+import { UmbModalConfig, UmbModalToken, UMB_MODAL_CONTEXT_TOKEN } from '@umbraco-cms/modal';
 
 const EmptyDiv = document.createElement('div');
 
 export type UmbModalRouteOptions<UmbModalTokenData extends object = object, UmbModalTokenResult = unknown> = {
 	path: string;
+	config?: UmbModalConfig;
 	onSetup?: (routingInfo: Params) => UmbModalTokenData | false;
 	onSubmit?: (data: UmbModalTokenResult) => void | PromiseLike<void>;
 	onReject?: () => void;
@@ -58,7 +59,7 @@ export class UmbRouteContext {
 			routeSetup: (component: HTMLElement, info: IRoutingInfo<any, any>) => {
 				const modalData = options.onSetup?.(info.match.params);
 				if (modalData !== false && this.#modalContext) {
-					const modalHandler = this.#modalContext.open(alias, modalData || {});
+					const modalHandler = this.#modalContext.open(alias, modalData, options.config);
 					modalHandler.onSubmit().then(
 						() => this.#removeModalPath(info),
 						() => this.#removeModalPath(info)
