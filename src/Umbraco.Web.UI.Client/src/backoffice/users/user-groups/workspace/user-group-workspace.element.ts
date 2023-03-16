@@ -52,7 +52,6 @@ export class UmbUserGroupWorkspaceElement extends UmbLitElement {
 			path: 'edit/:key',
 			component: () => this.#element,
 			setup: (component: HTMLElement, info: IRoutingInfo) => {
-				debugger;
 				const key = info.match.params.key;
 				this.#workspaceContext.load(key);
 			},

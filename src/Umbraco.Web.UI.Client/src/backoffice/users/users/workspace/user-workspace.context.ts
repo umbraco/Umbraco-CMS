@@ -6,7 +6,7 @@ import { UmbUserRepository } from '../repository/user.repository';
 import type { UserDetails } from '@umbraco-cms/models';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 
-export class UmbWorkspaceUserContext
+export class UmbUserWorkspaceContext
 	extends UmbWorkspaceContext<UmbUserRepository>
 	implements UmbEntityWorkspaceContextInterface<UserDetails | undefined>
 {
