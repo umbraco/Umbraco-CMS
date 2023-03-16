@@ -1,6 +1,6 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html } from 'lit';
-import { customElement, state } from 'lit/decorators.js';
+import { customElement } from 'lit/decorators.js';
 import { UmbLitElement } from '@umbraco-cms/element';
 
 @customElement('umb-member-type-workspace-edit')
@@ -21,9 +21,6 @@ export class UmbMemberTypeWorkspaceEditElement extends UmbLitElement {
 			}
 		`,
 	];
-
-	@state()
-	private _memberTypeName = '';
 
 	render() {
 		return html`
