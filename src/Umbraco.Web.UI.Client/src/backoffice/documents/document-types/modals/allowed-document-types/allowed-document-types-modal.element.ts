@@ -5,7 +5,7 @@ import { ifDefined } from 'lit-html/directives/if-defined.js';
 import { UmbDocumentTypeRepository } from '../../repository/document-type.repository';
 import { UmbAllowedDocumentTypesModalData, UmbAllowedDocumentTypesModalResult } from '.';
 import { UmbModalBaseElement } from '@umbraco-cms/modal';
-import { DocumentTypeTreeItemModel } from '@umbraco-cms/backend-api';
+import { DocumentTypeTreeItemResponseModel } from '@umbraco-cms/backend-api';
 
 @customElement('umb-allowed-document-types-modal')
 export class UmbAllowedDocumentTypesModalElement extends UmbModalBaseElement<
@@ -17,7 +17,7 @@ export class UmbAllowedDocumentTypesModalElement extends UmbModalBaseElement<
 	#documentTypeRepository = new UmbDocumentTypeRepository(this);
 
 	@state()
-	private _allowedDocumentTypes: DocumentTypeTreeItemModel[] = [];
+	private _allowedDocumentTypes: DocumentTypeTreeItemResponseModel[] = [];
 
 	async firstUpdated() {
 		// TODO: show error

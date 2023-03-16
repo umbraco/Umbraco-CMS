@@ -9,7 +9,7 @@ import { UmbDocumentWorkspaceContext } from './document-workspace.context';
 import { UmbDocumentWorkspaceSplitViewElement } from './document-workspace-split-view.element';
 import { UmbLitElement } from '@umbraco-cms/element';
 import '../../../shared/components/workspace/workspace-variant/workspace-variant.element';
-import { VariantViewModelBaseModel } from '@umbraco-cms/backend-api';
+import { VariantModelBaseModel } from '@umbraco-cms/backend-api';
 
 @customElement('umb-document-workspace-edit')
 export class UmbDocumentWorkspaceEditElement extends UmbLitElement {
@@ -34,7 +34,7 @@ export class UmbDocumentWorkspaceEditElement extends UmbLitElement {
 	_routes?: Array<IRoute>;
 
 	@state()
-	_availableVariants: Array<VariantViewModelBaseModel> = [];
+	_availableVariants: Array<VariantModelBaseModel> = [];
 
 	@state()
 	_workspaceSplitViews: Array<ActiveVariant> = [];
