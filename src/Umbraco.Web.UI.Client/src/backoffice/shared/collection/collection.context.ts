@@ -1,4 +1,4 @@
-import type { ContentTreeItemModel, EntityTreeItemModel } from '@umbraco-cms/backend-api';
+import type { ContentTreeItemResponseModel, EntityTreeItemResponseModel } from '@umbraco-cms/backend-api';
 import type { UmbTreeStore } from '@umbraco-cms/store';
 import type { UmbControllerHostInterface } from '@umbraco-cms/controller';
 import { UmbContextToken, UmbContextConsumerController } from '@umbraco-cms/context-api';
@@ -9,7 +9,7 @@ import { UmbTreeRepository } from '@umbraco-cms/repository';
 
 // TODO: Clean up the need for store as Media has switched to use Repositories(repository).
 export class UmbCollectionContext<
-	DataType extends ContentTreeItemModel,
+	DataType extends ContentTreeItemResponseModel,
 	StoreType extends UmbTreeStore<DataType> = UmbTreeStore<DataType>
 > {
 	private _host: UmbControllerHostInterface;
@@ -19,9 +19,9 @@ export class UmbCollectionContext<
 	#repository?: UmbTreeRepository;
 
 	private _store?: StoreType;
-	protected _dataObserver?: UmbObserverController<EntityTreeItemModel[]>;
+	protected _dataObserver?: UmbObserverController<EntityTreeItemResponseModel[]>;
 
-	#data = new ArrayState(<Array<EntityTreeItemModel>>[]);
+	#data = new ArrayState(<Array<EntityTreeItemResponseModel>>[]);
 	public readonly data = this.#data.asObservable();
 
 	#selection = new ArrayState(<Array<string>>[]);

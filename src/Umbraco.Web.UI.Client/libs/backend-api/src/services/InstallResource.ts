@@ -1,9 +1,9 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-import type { DatabaseInstallModel } from '../models/DatabaseInstallModel';
-import type { InstallModel } from '../models/InstallModel';
-import type { InstallSettingsModel } from '../models/InstallSettingsModel';
+import type { DatabaseInstallResponseModel } from '../models/DatabaseInstallResponseModel';
+import type { InstallSettingsResponseModel } from '../models/InstallSettingsResponseModel';
+import type { InstallVResponseModel } from '../models/InstallVResponseModel';
 
 import type { CancelablePromise } from '../core/CancelablePromise';
 import { OpenAPI } from '../core/OpenAPI';
@@ -15,7 +15,7 @@ export class InstallResource {
      * @returns any Success
      * @throws ApiError
      */
-    public static getInstallSettings(): CancelablePromise<InstallSettingsModel> {
+    public static getInstallSettings(): CancelablePromise<InstallSettingsResponseModel> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/install/settings',
@@ -31,10 +31,10 @@ export class InstallResource {
      * @throws ApiError
      */
     public static postInstallSetup({
-        requestBody,
-    }: {
-        requestBody?: InstallModel,
-    }): CancelablePromise<any> {
+requestBody,
+}: {
+requestBody?: InstallVResponseModel,
+}): CancelablePromise<any> {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/umbraco/management/api/v1/install/setup',
@@ -52,10 +52,10 @@ export class InstallResource {
      * @throws ApiError
      */
     public static postInstallValidateDatabase({
-        requestBody,
-    }: {
-        requestBody?: DatabaseInstallModel,
-    }): CancelablePromise<any> {
+requestBody,
+}: {
+requestBody?: DatabaseInstallResponseModel,
+}): CancelablePromise<any> {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/umbraco/management/api/v1/install/validate-database',

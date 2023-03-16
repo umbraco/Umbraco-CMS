@@ -4,12 +4,9 @@ import { customElement, state } from 'lit/decorators.js';
 import { when } from 'lit-html/directives/when.js';
 import { UmbTableConfig, UmbTableColumn, UmbTableItem } from '../../../../backoffice/shared/components/table';
 import { UmbDictionaryRepository } from '../../dictionary/repository/dictionary.repository';
-import {
-	UmbCreateDictionaryModalResult,
-	UMB_CREATE_DICTIONARY_MODAL_TOKEN,
-} from '../../dictionary/entity-actions/create/';
+import { UMB_CREATE_DICTIONARY_MODAL_TOKEN } from '../../dictionary/entity-actions/create/';
 import { UmbLitElement } from '@umbraco-cms/element';
-import { DictionaryOverviewModel, LanguageModel } from '@umbraco-cms/backend-api';
+import { DictionaryOverviewResponseModel, LanguageResponseModel } from '@umbraco-cms/backend-api';
 import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN } from '@umbraco-cms/modal';
 import { UmbContextConsumerController } from '@umbraco-cms/context-api';
 
@@ -50,7 +47,7 @@ export class UmbDashboardTranslationDictionaryElement extends UmbLitElement {
 	@state()
 	private _tableItemsFiltered: Array<UmbTableItem> = [];
 
-	#dictionaryItems: DictionaryOverviewModel[] = [];
+	#dictionaryItems: DictionaryOverviewResponseModel[] = [];
 
 	#repo!: UmbDictionaryRepository;
 
@@ -60,7 +57,7 @@ export class UmbDashboardTranslationDictionaryElement extends UmbLitElement {
 
 	#tableColumns: Array<UmbTableColumn> = [];
 
-	#languages: Array<LanguageModel> = [];
+	#languages: Array<LanguageResponseModel> = [];
 
 	constructor() {
 		super();

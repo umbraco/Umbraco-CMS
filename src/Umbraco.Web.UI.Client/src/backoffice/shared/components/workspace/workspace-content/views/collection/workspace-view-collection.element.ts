@@ -10,7 +10,7 @@ import {
 import '../../../../../../shared/collection/dashboards/dashboard-collection.element';
 import type { UmbWorkspaceEntityContextInterface } from '../../../workspace-context/workspace-entity-context.interface';
 import { UmbLitElement } from '@umbraco-cms/element';
-import type { FolderTreeItemModel } from '@umbraco-cms/backend-api';
+import type { FolderTreeItemResponseModel } from '@umbraco-cms/backend-api';
 import { ManifestWorkspaceViewCollection } from '@umbraco-cms/extensions-registry';
 
 @customElement('umb-workspace-view-collection')
@@ -30,7 +30,7 @@ export class UmbWorkspaceViewCollectionElement extends UmbLitElement {
 	private _workspaceContext?: UmbWorkspaceEntityContextInterface;
 
 	// TODO: add type for the collection context.
-	private _collectionContext?: UmbCollectionContext<FolderTreeItemModel, any>;
+	private _collectionContext?: UmbCollectionContext<FolderTreeItemResponseModel, any>;
 
 	constructor() {
 		super();

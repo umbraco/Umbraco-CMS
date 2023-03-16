@@ -3,7 +3,7 @@ import { customElement, property, state } from 'lit/decorators.js';
 import { UmbInputMediaPickerElement } from '../../../../../backoffice/shared/components/input-media-picker/input-media-picker.element';
 import { UmbPropertyEditorElement } from '@umbraco-cms/property-editor';
 import { UmbLitElement } from '@umbraco-cms/element';
-import type { DataTypePropertyModel } from '@umbraco-cms/backend-api';
+import type { DataTypePropertyPresentationModel } from '@umbraco-cms/backend-api';
 
 /**
  * @element umb-property-editor-ui-media-picker
@@ -21,7 +21,7 @@ export class UmbPropertyEditorUIMediaPickerElement extends UmbLitElement impleme
 	}
 
 	@property({ type: Array, attribute: false })
-	public set config(config: Array<DataTypePropertyModel>) {
+	public set config(config: Array<DataTypePropertyPresentationModel>) {
 		const validationLimit = config.find((x) => x.alias === 'validationLimit');
 		if (!validationLimit) return;
 

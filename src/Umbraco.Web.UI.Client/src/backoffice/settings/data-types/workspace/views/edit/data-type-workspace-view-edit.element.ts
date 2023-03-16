@@ -5,7 +5,7 @@ import { UmbDataTypeWorkspaceContext } from '../../data-type-workspace.context';
 import { UMB_PROPERTY_EDITOR_UI_PICKER_MODAL_TOKEN } from '../../../../../shared/property-editors/modals/property-editor-ui-picker';
 import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN } from '@umbraco-cms/modal';
 import { UmbLitElement } from '@umbraco-cms/element';
-import type { DataTypeModel } from '@umbraco-cms/backend-api';
+import type { DataTypeResponseModel } from '@umbraco-cms/backend-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-api';
 
 import '../../../../../shared/property-editors/shared/property-editor-config/property-editor-config.element';
@@ -24,7 +24,7 @@ export class UmbDataTypeWorkspaceViewEditElement extends UmbLitElement {
 	];
 
 	@state()
-	_dataType?: DataTypeModel;
+	_dataType?: DataTypeResponseModel;
 
 	@state()
 	private _propertyEditorUIIcon = '';
@@ -73,8 +73,8 @@ export class UmbDataTypeWorkspaceViewEditElement extends UmbLitElement {
 				this._observePropertyEditorUI(this._dataType.propertyEditorUiAlias || undefined);
 			}
 
-			if (this._dataType.data && this._dataType.data !== this._data) {
-				this._data = this._dataType.data;
+			if (this._dataType.values && this._dataType.values !== this._data) {
+				this._data = this._dataType.values;
 			}
 		});
 	}

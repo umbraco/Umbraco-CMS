@@ -6,7 +6,7 @@ import { ifDefined } from 'lit-html/directives/if-defined.js';
 import { UmbWorkspaceEntityElement } from '../../../../shared/components/workspace/workspace-entity-element.interface';
 import { UmbLanguageWorkspaceContext } from './language-workspace.context';
 import { UmbLitElement } from '@umbraco-cms/element';
-import { LanguageModel } from '@umbraco-cms/backend-api';
+import { LanguageResponseModel } from '@umbraco-cms/backend-api';
 
 @customElement('umb-language-workspace')
 export class UmbLanguageWorkspaceElement extends UmbLitElement implements UmbWorkspaceEntityElement {
@@ -26,7 +26,7 @@ export class UmbLanguageWorkspaceElement extends UmbLitElement implements UmbWor
 	];
 
 	@state()
-	_language?: LanguageModel;
+	_language?: LanguageResponseModel;
 
 	#languageWorkspaceContext = new UmbLanguageWorkspaceContext(this);
 

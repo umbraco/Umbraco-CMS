@@ -1,9 +1,9 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-import type { IndexModel } from '../models/IndexModel';
+import type { IndexResponseModel } from '../models/IndexResponseModel';
 import type { OkResultModel } from '../models/OkResultModel';
-import type { PagedIndexModel } from '../models/PagedIndexModel';
+import type { PagedIndexResponseModel } from '../models/PagedIndexResponseModel';
 
 import type { CancelablePromise } from '../core/CancelablePromise';
 import { OpenAPI } from '../core/OpenAPI';
@@ -12,16 +12,16 @@ import { request as __request } from '../core/request';
 export class IndexerResource {
 
     /**
-     * @returns PagedIndexModel Success
+     * @returns PagedIndexResponseModel Success
      * @throws ApiError
      */
     public static getIndexer({
-        skip,
-        take,
-    }: {
-        skip?: number,
-        take?: number,
-    }): CancelablePromise<PagedIndexModel> {
+skip,
+take,
+}: {
+skip?: number,
+take?: number,
+}): CancelablePromise<PagedIndexResponseModel> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/indexer',
@@ -37,10 +37,10 @@ export class IndexerResource {
      * @throws ApiError
      */
     public static getIndexerByIndexName({
-        indexName,
-    }: {
-        indexName: string,
-    }): CancelablePromise<IndexModel> {
+indexName,
+}: {
+indexName: string,
+}): CancelablePromise<IndexResponseModel> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/indexer/{indexName}',
@@ -58,10 +58,10 @@ export class IndexerResource {
      * @throws ApiError
      */
     public static postIndexerByIndexNameRebuild({
-        indexName,
-    }: {
-        indexName: string,
-    }): CancelablePromise<OkResultModel> {
+indexName,
+}: {
+indexName: string,
+}): CancelablePromise<OkResultModel> {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/umbraco/management/api/v1/indexer/{indexName}/rebuild',

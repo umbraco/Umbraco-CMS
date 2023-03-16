@@ -4,7 +4,7 @@ import { customElement, state } from 'lit/decorators.js';
 import { UmbTableColumn, UmbTableConfig, UmbTableItem } from '../../../../shared/components/table';
 import { UmbLanguageRepository } from '../../repository/language.repository';
 import { UmbLitElement } from '@umbraco-cms/element';
-import { LanguageModel } from '@umbraco-cms/backend-api';
+import { LanguageResponseModel } from '@umbraco-cms/backend-api';
 
 import './language-root-table-delete-column-layout.element';
 import './language-root-table-name-column-layout.element';
@@ -79,7 +79,7 @@ export class UmbLanguageRootWorkspaceElement extends UmbLitElement {
 		}
 	}
 
-	#createTableItems(languages: Array<LanguageModel>) {
+	#createTableItems(languages: Array<LanguageResponseModel>) {
 		this._tableItems = languages.map((language) => {
 			return {
 				key: language.isoCode ?? '',
