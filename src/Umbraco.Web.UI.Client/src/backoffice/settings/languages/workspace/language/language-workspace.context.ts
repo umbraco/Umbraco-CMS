@@ -29,6 +29,7 @@ export class UmbLanguageWorkspaceContext extends UmbWorkspaceContext<UmbLanguage
 		if (!data) return;
 		this.setIsNew(true);
 		this.#data.update(data);
+		return { data };
 	}
 
 	getData() {

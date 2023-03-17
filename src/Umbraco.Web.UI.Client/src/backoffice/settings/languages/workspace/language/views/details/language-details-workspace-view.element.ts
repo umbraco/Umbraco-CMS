@@ -10,8 +10,8 @@ import { UmbChangeEvent } from '@umbraco-cms/events';
 import { UmbLitElement } from '@umbraco-cms/element';
 import { LanguageResponseModel } from '@umbraco-cms/backend-api';
 
-@customElement('umb-edit-language-workspace-view')
-export class UmbEditLanguageWorkspaceViewElement extends UmbLitElement {
+@customElement('umb-language-details-workspace-view')
+export class UmbLanguageDetailsWorkspaceViewElement extends UmbLitElement {
 	static styles = [
 		UUITextStyles,
 		css`
@@ -209,10 +209,10 @@ export class UmbEditLanguageWorkspaceViewElement extends UmbLitElement {
 	}
 }
 
-export default UmbEditLanguageWorkspaceViewElement;
+export default UmbLanguageDetailsWorkspaceViewElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-edit-language-workspace-view': UmbEditLanguageWorkspaceViewElement;
+		'umb-language-details-workspace-view': UmbLanguageDetailsWorkspaceViewElement;
 	}
 }

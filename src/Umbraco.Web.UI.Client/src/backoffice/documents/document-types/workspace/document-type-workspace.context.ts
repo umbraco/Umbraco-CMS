@@ -1,5 +1,5 @@
 import { UmbWorkspaceContext } from '../../../shared/components/workspace/workspace-context/workspace-context';
-import { UmbWorkspaceEntityContextInterface } from '../../../shared/components/workspace/workspace-context/workspace-entity-context.interface';
+import { UmbEntityWorkspaceContextInterface } from '../../../shared/components/workspace/workspace-context/workspace-entity-context.interface';
 import { UmbDocumentTypeRepository } from '../repository/document-type.repository';
 import type { DocumentTypeResponseModel } from '@umbraco-cms/backend-api';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
@@ -8,7 +8,7 @@ import { ObjectState } from '@umbraco-cms/observable-api';
 type EntityType = DocumentTypeResponseModel;
 export class UmbWorkspaceDocumentTypeContext
 	extends UmbWorkspaceContext<UmbDocumentTypeRepository>
-	implements UmbWorkspaceEntityContextInterface<EntityType | undefined>
+	implements UmbEntityWorkspaceContextInterface<EntityType | undefined>
 {
 	#data = new ObjectState<EntityType | undefined>(undefined);
 	data = this.#data.asObservable();

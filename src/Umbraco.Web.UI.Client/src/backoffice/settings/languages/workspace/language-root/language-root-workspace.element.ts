@@ -6,8 +6,8 @@ import { UmbLanguageRepository } from '../../repository/language.repository';
 import { UmbLitElement } from '@umbraco-cms/element';
 import { LanguageResponseModel } from '@umbraco-cms/backend-api';
 
-import './language-root-table-delete-column-layout.element';
-import './language-root-table-name-column-layout.element';
+import './components/language-root-table-delete-column-layout.element';
+import './components/language-root-table-name-column-layout.element';
 
 @customElement('umb-language-root-workspace')
 export class UmbLanguageRootWorkspaceElement extends UmbLitElement {
@@ -89,7 +89,7 @@ export class UmbLanguageRootWorkspaceElement extends UmbLitElement {
 						columnAlias: 'languageName',
 						value: {
 							name: language.name,
-							key: language.isoCode,
+							isoCode: language.isoCode,
 						},
 					},
 					{
@@ -126,7 +126,7 @@ export class UmbLanguageRootWorkspaceElement extends UmbLitElement {
 							label="Add language"
 							look="outline"
 							color="default"
-							href="section/settings/language/create/root"></uui-button>
+							href="section/settings/workspace/language/create"></uui-button>
 					</div>
 					<!--- TODO: investigate if it's possible to use a collection component here --->
 					<umb-table .config=${this._tableConfig} .columns=${this._tableColumns} .items=${this._tableItems}></umb-table>

@@ -3,9 +3,9 @@ import { html } from 'lit-html';
 
 //import { data } from '../../../../../core/mocks/data/data-type.data';
 
-import type { UmbDataTypeWorkspaceViewEditElement } from './data-type-workspace-view-edit.element';
+import type { UmbDataTypeDetailsWorkspaceViewEditElement } from './data-type-details-workspace-view.element';
 
-import './data-type-workspace-view-edit.element';
+import './data-type-details-workspace-view.element';
 //import { UmbDataTypeWorkspaceContext } from '../../workspace-data-type.context';
 
 export default {
@@ -22,6 +22,6 @@ export default {
 	],
 } as Meta;
 
-export const AAAOverview: Story<UmbDataTypeWorkspaceViewEditElement> = () =>
+export const AAAOverview: Story<UmbDataTypeDetailsWorkspaceViewEditElement> = () =>
 	html` <umb-data-type-workspace-view-edit></umb-data-type-workspace-view-edit>`;
 AAAOverview.storyName = 'Overview';

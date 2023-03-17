@@ -889,6 +889,128 @@ export const data: Array<DocumentTypeResponseModel> = [
 			keepLatestVersionPerDayForDays: null,
 		},
 	},
+	{
+		allowedTemplateKeys: [],
+		defaultTemplateKey: null,
+		key: 'simple-document-type-key',
+		alias: 'simpleDocumentType',
+		name: 'Simple Document Type',
+		description: null,
+		icon: 'umb:document',
+		allowedAsRoot: true,
+		variesByCulture: false,
+		variesBySegment: false,
+		isElement: false,
+		properties: [
+			{
+				key: '1680d4d2-cda8-4ac2-affd-a69fc10382b1',
+				containerKey: '341b8521-fd43-4333-ae7a-a10cbbc6f4b0',
+				alias: 'prop1',
+				name: 'Prop 1',
+				description: null,
+				dataTypeKey: '0cc0eba1-9960-42c9-bf9b-60e150b429ae',
+				variesByCulture: false,
+				variesBySegment: false,
+				validation: {
+					mandatory: false,
+					mandatoryMessage: null,
+					regEx: null,
+					regExMessage: null,
+				},
+				appearance: {
+					labelOnTop: false,
+				},
+			},
+		],
+		containers: [
+			{
+				key: '341b8521-fd43-4333-ae7a-a10cbbc6f4b0',
+				parentKey: null,
+				name: 'Content',
+				type: 'Group',
+				sortOrder: 0,
+			},
+		],
+		allowedContentTypes: [
+			{ key: 'simple-document-type-key', sortOrder: 0 },
+			{ key: 'simple-document-type-2-key', sortOrder: 0 },
+		],
+		compositions: [],
+		cleanup: {
+			preventCleanup: false,
+			keepAllVersionsNewerThanDays: null,
+			keepLatestVersionPerDayForDays: null,
+		},
+	},
+	{
+		allowedTemplateKeys: [],
+		defaultTemplateKey: null,
+		key: 'simple-document-type-2-key',
+		alias: 'simpleDocumentType2',
+		name: 'Simple Document Type 2',
+		description: null,
+		icon: 'umb:document',
+		allowedAsRoot: true,
+		variesByCulture: false,
+		variesBySegment: false,
+		isElement: false,
+		properties: [
+			{
+				key: '82d4b050-b128-42fe-ac8e-d5586e533592',
+				containerKey: 'b275052a-1868-4901-bc8c-2b35b78a9ab2',
+				alias: 'prop1',
+				name: 'Prop 1',
+				description: null,
+				dataTypeKey: '0cc0eba1-9960-42c9-bf9b-60e150b429ae',
+				variesByCulture: false,
+				variesBySegment: false,
+				validation: {
+					mandatory: false,
+					mandatoryMessage: null,
+					regEx: null,
+					regExMessage: null,
+				},
+				appearance: {
+					labelOnTop: false,
+				},
+			},
+			{
+				key: 'beadc69a-d669-4d01-9919-98bafba31e57',
+				containerKey: 'b275052a-1868-4901-bc8c-2b35b78a9ab2',
+				alias: 'prop2',
+				name: 'Prop 2',
+				description: null,
+				dataTypeKey: '0cc0eba1-9960-42c9-bf9b-60e150b429ae',
+				variesByCulture: false,
+				variesBySegment: false,
+				validation: {
+					mandatory: false,
+					mandatoryMessage: null,
+					regEx: null,
+					regExMessage: null,
+				},
+				appearance: {
+					labelOnTop: false,
+				},
+			},
+		],
+		containers: [
+			{
+				key: 'b275052a-1868-4901-bc8c-2b35b78a9ab2',
+				parentKey: null,
+				name: 'Content',
+				type: 'Group',
+				sortOrder: 0,
+			},
+		],
+		allowedContentTypes: [{ key: 'simple-document-type-key', sortOrder: 0 }],
+		compositions: [],
+		cleanup: {
+			preventCleanup: false,
+			keepAllVersionsNewerThanDays: null,
+			keepLatestVersionPerDayForDays: null,
+		},
+	},
 ];
 
 export const treeData: Array<DocumentTypeTreeItemResponseModel> = [
@@ -922,6 +1044,26 @@ export const treeData: Array<DocumentTypeTreeItemResponseModel> = [
 		parentKey: null,
 		icon: '',
 	},
+	{
+		$type: 'DocumentTypeTreeItemViewModel',
+		name: 'Simple Document Type',
+		type: 'document-type',
+		hasChildren: false,
+		key: 'simple-document-type-key',
+		isContainer: false,
+		parentKey: null,
+		icon: 'umb:document',
+	},
+	{
+		$type: 'DocumentTypeTreeItemViewModel',
+		name: 'Simple Document Type 2',
+		type: 'document-type',
+		hasChildren: false,
+		key: 'simple-document-type-2-key',
+		isContainer: false,
+		parentKey: null,
+		icon: 'umb:document',
+	},
 ];
 
 // Temp mocked database
@@ -947,6 +1089,13 @@ class UmbDocumentTypeData extends UmbEntityData<DocumentTypeResponseModel> {
 
 	getTreeItem(keys: Array<string>): Array<DocumentTypeTreeItemResponseModel> {
 		const items = this.treeData.filter((item) => keys.includes(item.key ?? ''));
+		return items.map((item) => createDocumentTypeTreeItem(item));
+	}
+
+	getAllowedTypesOf(key: string): Array<DocumentTypeTreeItemResponseModel> {
+		const documentType = this.getByKey(key);
+		const allowedTypeKeys = documentType?.allowedContentTypes?.map((documentType) => documentType.key) ?? [];
+		const items = this.treeData.filter((item) => allowedTypeKeys.includes(item.key ?? ''));
 		return items.map((item) => createDocumentTypeTreeItem(item));
 	}
 }
