@@ -24,16 +24,18 @@ import { UmbNotificationContext, UMB_NOTIFICATION_CONTEXT_TOKEN } from '@umbraco
 import { UmbLitElement } from '@umbraco-cms/element';
 
 // Domains
-import './settings';
-import './documents';
-import './media';
-import './members';
-import './translation';
-import './users';
-import './packages';
-import './search';
-import './templating';
-import './shared';
+const CORE_PACKAGES = [
+	() => import('./shared/umbraco-package'),
+	() => import('./settings/umbraco-package'),
+	() => import('./documents/umbraco-package'),
+	() => import('./media/umbraco-package'),
+	() => import('./members/umbraco-package'),
+	() => import('./translation/umbraco-package'),
+	() => import('./users/umbraco-package'),
+	() => import('./packages/umbraco-package'),
+	() => import('./search/umbraco-package'),
+	() => import('./templating/umbraco-package'),
+];
 
 @defineElement('umb-backoffice')
 export class UmbBackofficeElement extends UmbLitElement {
@@ -55,6 +57,8 @@ export class UmbBackofficeElement extends UmbLitElement {
 	constructor() {
 		super();
 
+		this.#loadCorePackages();
+
 		this.provideContext(UMB_MODAL_CONTEXT_TOKEN, new UmbModalContext(this));
 		this.provideContext(UMB_NOTIFICATION_CONTEXT_TOKEN, new UmbNotificationContext());
 		this.provideContext(UMB_CURRENT_USER_STORE_CONTEXT_TOKEN, new UmbCurrentUserStore());
@@ -68,6 +72,20 @@ export class UmbBackofficeElement extends UmbLitElement {
 		this.observe(umbExtensionsRegistry.extensionsOfTypes(['store', 'treeStore']), (stores) => {
 			stores.forEach((store) => createExtensionClass(store, [this]));
 		});
+	}
+
+	// TODO: temp solution. These packages should show up in the package section, so they need to go through the extension controller
+	async #loadCorePackages() {
+		const corePackagePromises = CORE_PACKAGES.map((packageManifestLoader) => packageManifestLoader());
+		const packageManifests = await Promise.all(corePackagePromises);
+		const extensions = packageManifests.flatMap((packageManifest) => packageManifest.extensions);
+		const entryPointLoaderPromises = extensions.map(
+			(extension) => extension.type === 'entryPoint' && extension.loader()
+		);
+		const entryPointModules = await Promise.all(entryPointLoaderPromises);
+		entryPointModules.forEach((entryPointModule) =>
+			entryPointModule ? entryPointModule.onInit(this, umbExtensionsRegistry) : null
+		);
 	}
 
 	render() {
