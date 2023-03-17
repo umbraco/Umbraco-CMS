@@ -122,7 +122,7 @@ export class UmbExtensionRegistry {
 					.map((ext) => {
 						return { ...kinds.find((kind) => kind.matchKind === ext.kind)?.manifest, ...ext };
 					})
-					.sort((a, b) => (a.weight || 0) - (b.weight || 0))
+					.sort((a, b) => (b.weight || 0) - (a.weight || 0))
 			)
 		) as Observable<Array<T>>;
 		//
@@ -137,7 +137,7 @@ export class UmbExtensionRegistry {
 					.map((ext) => {
 						return { ...kinds.find((kind) => kind.matchKind === ext.kind)?.manifest, ...ext };
 					})
-					.sort((a, b) => (a.weight || 0) - (b.weight || 0))
+					.sort((a, b) => (b.weight || 0) - (a.weight || 0))
 			)
 		) as Observable<Array<ExtensionTypes>>;
 		//
@@ -155,7 +155,7 @@ export class UmbExtensionRegistry {
 				exts.sort((a, b) => {
 					// If type is the same, sort by weight
 					if (a.type === b.type) {
-						return (a.weight || 0) - (b.weight || 0);
+						return (b.weight || 0) - (a.weight || 0);
 					}
 
 					// Otherwise sort by type
