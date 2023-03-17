@@ -1,4 +1,4 @@
-import { BehaviorSubject, withLatestFrom, map, find, Observable } from 'rxjs';
+import { BehaviorSubject, withLatestFrom, map, Observable } from 'rxjs';
 import type {
 	ManifestTypes,
 	ManifestTypeMap,
