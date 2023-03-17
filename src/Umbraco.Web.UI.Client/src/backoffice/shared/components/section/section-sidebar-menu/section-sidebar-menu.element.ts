@@ -1,7 +1,12 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
-import { ManifestKind, ManifestMenu, ManifestMenuSectionSidebarApp } from '@umbraco-cms/extensions-registry';
+import {
+	ManifestKind,
+	ManifestMenu,
+	ManifestMenuSectionSidebarApp,
+	ManifestSectionSidebarApp,
+} from '@umbraco-cms/extensions-registry';
 import { UmbLitElement } from '@umbraco-cms/element';
 
 import '../../menu/menu.element';
@@ -9,7 +14,7 @@ import { umbExtensionsRegistry } from '@umbraco-cms/extensions-api';
 
 const manifest: ManifestKind = {
 	type: 'kind',
-	matchKind: 'menuSectionSidebarApp',
+	matchKind: 'umb-menu',
 	matchType: 'sectionSidebarApp',
 	manifest: {
 		type: 'sectionSidebarApp',
@@ -17,6 +22,17 @@ const manifest: ManifestKind = {
 	},
 };
 umbExtensionsRegistry.register(manifest);
+
+export interface ManifestSectionSidebarAppMenuKind extends Omit<Omit<ManifestSectionSidebarApp, 'kind'>, 'meta'> {
+	type: 'sectionSidebarApp';
+	kind: 'umb-menu';
+	meta: MetaSectionSidebarAppMenuKind;
+}
+
+export interface MetaSectionSidebarAppMenuKind {
+	label: string;
+	menu: string;
+}
 
 @customElement('umb-section-sidebar-menu')
 export class UmbSectionSidebarMenuElement extends UmbLitElement {

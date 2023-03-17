@@ -1,3 +1,4 @@
+import type { ManifestSectionSidebarAppMenuKind } from '../../src/backoffice/shared/components/section/section-sidebar-menu/section-sidebar-menu.element';
 import type { ManifestCollectionView } from './collection-view.models';
 import type { ManifestDashboard } from './dashboard.models';
 import type { ManifestDashboardCollection } from './dashboard-collection.models';
@@ -71,6 +72,7 @@ export type ManifestTypes =
 	| ManifestRepository
 	| ManifestSection
 	| ManifestSectionSidebarApp
+	| ManifestSectionSidebarAppMenuKind
 	| ManifestSectionView
 	| ManifestMenuSectionSidebarApp
 	| ManifestMenu
@@ -98,7 +100,6 @@ export type SpecificManifestTypeOrManifestBase<T extends keyof ManifestTypeMap |
 
 export interface ManifestBase {
 	type: string;
-	kind?: string; // as kind alias that together with type will look up another extension to extend.
 	alias: string;
 	name: string;
 	weight?: number;
@@ -120,7 +121,7 @@ export interface ManifestWithLoader<LoaderReturnType> extends ManifestBase {
 }
 
 export interface ManifestClass<T = unknown> extends ManifestWithLoader<object> {
-	type: ManifestStandardTypes;
+	//type: ManifestStandardTypes;
 	js?: string;
 	className?: string;
 	class?: ClassConstructor<T>;
@@ -132,10 +133,15 @@ export interface ManifestClassWithClassConstructor extends ManifestClass {
 }
 
 export interface ManifestElement extends ManifestWithLoader<object | HTMLElement> {
-	type: ManifestStandardTypes;
+	//type: ManifestStandardTypes;
 	js?: string;
 	elementName?: string;
 	//loader?: () => Promise<object | HTMLElement>;
+	//meta?: unknown;
+}
+
+export interface ManifestElementCustomKind extends ManifestElement {
+	kind: 'custom';
 	meta?: unknown;
 }
 
