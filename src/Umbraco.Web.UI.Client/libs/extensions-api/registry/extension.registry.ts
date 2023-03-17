@@ -144,7 +144,7 @@ export class UmbExtensionRegistry {
 		// TODO: DisctinctUntilChanged by using aliases?
 	}
 
-	// TODO: consider moving this method to the extension view?
+	// TODO: consider ust having the a.type.localeCompare(b.type); in the extension view, to then be able to use other existing observables?
 	/**
 	 * Gets all the extensions registrations, but does not merge with kinds.
 	 * @returns
