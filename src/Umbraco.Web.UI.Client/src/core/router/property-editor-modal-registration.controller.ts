@@ -10,6 +10,7 @@ import { UmbController, UmbControllerHostInterface } from '@umbraco-cms/controll
 import { UmbModalToken } from '@umbraco-cms/modal';
 import { UmbObserverController } from '@umbraco-cms/observable-api';
 
+// TODO: Somehow get the modal handler via the controller? aka. va the registration.
 export class UmbPropertyEditorModalRegistrationController<D extends object = object, R = any> extends UmbController {
 	#modalToken: UmbModalToken<D, R> | string;
 	#modalOptions: UmbModalRouteOptions<D, R>;
@@ -21,7 +22,8 @@ export class UmbPropertyEditorModalRegistrationController<D extends object = obj
 	constructor(
 		host: UmbControllerHostInterface,
 		alias: UmbModalToken<D, R> | string,
-		options: UmbModalRouteOptions<D, R>
+		options: UmbModalRouteOptions<D, R>,
+		unique: Map<string, string | undefined> = new Map()
 	) {
 		super(host);
 		this.#modalToken = alias;
@@ -31,7 +33,6 @@ export class UmbPropertyEditorModalRegistrationController<D extends object = obj
 			this.#routeContext = _routeContext;
 			this._registererModal();
 		});
-
 		new UmbContextConsumerController(host, UMB_WORKSPACE_PROPERTY_CONTEXT_TOKEN, (_routeContext) => {
 			new UmbObserverController(host, _routeContext.alias, (alias) => {
 				this.#propertyAlias = alias;
@@ -42,6 +43,12 @@ export class UmbPropertyEditorModalRegistrationController<D extends object = obj
 				this._registererModal();
 			});
 		});
+	}
+
+	// 			"alias" : 'my-property-alias'
+	// 			"variant" : 'en_us'
+	addUniqueIdentifier(identifier: string, value: string) {
+		this._unique.set(identifier, value);
 	}
 
 	// TODO: Concept about adding identifiers to the modal registration, which is one or more path-folders.
