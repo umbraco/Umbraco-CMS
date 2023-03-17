@@ -103,7 +103,7 @@ export type SpecificManifestTypeOrManifestBase<T extends keyof ManifestTypeMap |
 export interface ManifestBase {
 	type: string;
 	alias: string;
-	kind?: undefined;
+	kind?: undefined; // I had to add the optional kind property set to undefined. To make the ManifestTypes recognize the Manifest Kind types. Notice that Kinds has to Omit the kind property when extending.
 	name: string;
 	weight?: number;
 }
@@ -140,11 +140,6 @@ export interface ManifestElement extends ManifestWithLoader<object | HTMLElement
 	js?: string;
 	elementName?: string;
 	//loader?: () => Promise<object | HTMLElement>;
-	meta?: unknown;
-}
-
-export interface ManifestElementCustomKind extends ManifestElement {
-	kind: 'custom';
 	meta?: unknown;
 }
 
