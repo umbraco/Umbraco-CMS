@@ -61,7 +61,7 @@ describe('UmbExtensionRegistry', () => {
 	it('should get an extension by alias', (done) => {
 		const alias = 'Umb.Test.Section.1';
 		extensionRegistry
-			.getByAlias(alias)
+			.getByTypeAndAlias('section', alias)
 			.subscribe((extension) => {
 				expect(extension?.alias).to.eq(alias);
 				done();
@@ -85,31 +85,29 @@ describe('UmbExtensionRegistry', () => {
 		});
 
 		// TODO: What kind of weighting would we like to use?
-		/*
 		it('should return extensions ordered by weight', (done) => {
 			extensionRegistry
 				.extensionsOfType(type)
 				.subscribe((extensions) => {
-					expect(extensions?.[0]?.weight).to.eq(200);
+					expect(extensions?.[0]?.weight).to.eq(1);
 					expect(extensions?.[1]?.weight).to.eq(25);
-					expect(extensions?.[2]?.weight).to.eq(1);
+					expect(extensions?.[2]?.weight).to.eq(200);
 					done();
 				})
 				.unsubscribe();
 		});
-		*/
 	});
 });
 
 describe('UmbExtensionRegistry with kinds', () => {
 	let extensionRegistry: UmbExtensionRegistry;
-	let kinds: Array<ManifestKind>;
-	let manifests: Array<ManifestTypes>;
+	let manifests: Array<ManifestTypes | ManifestKind>;
 
 	beforeEach(() => {
 		extensionRegistry = new UmbExtensionRegistry();
-		kinds = [
+		manifests = [
 			{
+				type: 'kind',
 				matchType: 'section',
 				matchKind: 'test-kind',
 				manifest: {
@@ -117,8 +115,6 @@ describe('UmbExtensionRegistry with kinds', () => {
 					elementName: 'my-kind-element',
 				},
 			},
-		];
-		manifests = [
 			{
 				type: 'section',
 				kind: 'test-kind',
@@ -161,13 +157,12 @@ describe('UmbExtensionRegistry with kinds', () => {
 			},
 		];
 
-		kinds.forEach((kind) => extensionRegistry.defineKind(kind));
 		manifests.forEach((manifest) => extensionRegistry.register(manifest));
 	});
 
 	it('should merge with kinds', (done) => {
 		extensionRegistry
-			.getByTypeWithKinds('section')
+			.extensionsOfType('section')
 			.subscribe((extensions) => {
 				expect(extensions).to.have.lengthOf(3);
 				expect(extensions?.[0]?.elementName).to.eq('my-kind-element');

@@ -105,6 +105,7 @@ export interface ManifestBase {
 }
 
 export interface ManifestKind {
+	type: 'kind';
 	matchType: string;
 	matchKind: string;
 	manifest: Partial<ManifestTypes>;

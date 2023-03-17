@@ -23,7 +23,7 @@ export class UmbExtensionRootWorkspaceElement extends UmbLitElement {
 	}
 
 	private _observeExtensions() {
-		this.observe(umbExtensionsRegistry.extensionsSortedByTypeAndWeight(), (extensions) => {
+		this.observe(umbExtensionsRegistry.extensionRegistrationsSortedByTypeAndWeight(), (extensions) => {
 			this._extensions = extensions || undefined;
 		});
 	}
