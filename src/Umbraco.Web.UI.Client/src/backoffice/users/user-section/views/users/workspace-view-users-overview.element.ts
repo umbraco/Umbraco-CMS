@@ -39,7 +39,7 @@ export class UmbWorkspaceViewUsersOverviewElement extends UmbLitElement {
 			}
 
 			#user-list-top-bar {
-				padding: var(--uui-size-space-4) var(--uui-size-space-6);
+				padding: var(--uui-size-space-4) var(--uui-size-layout-1);
 				background-color: var(--uui-color-background);
 				display: flex;
 				justify-content: space-between;
@@ -48,7 +48,7 @@ export class UmbWorkspaceViewUsersOverviewElement extends UmbLitElement {
 				align-items: center;
 			}
 			#user-list {
-				padding: var(--uui-size-space-6);
+				padding: var(--uui-size-layout-1);
 				padding-top: var(--uui-size-space-2);
 			}
 			#input-search {

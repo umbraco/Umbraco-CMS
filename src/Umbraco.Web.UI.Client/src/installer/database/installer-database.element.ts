@@ -35,7 +35,7 @@ export class UmbInstallerDatabaseElement extends UmbLitElement {
 
 			uui-form-layout-item {
 				margin-top: 0;
-				margin-bottom: var(--uui-size-space-6);
+				margin-bottom: var(--uui-size-layout-1);
 			}
 
 			uui-input,
@@ -47,7 +47,7 @@ export class UmbInstallerDatabaseElement extends UmbLitElement {
 			hr {
 				width: 100%;
 				margin-top: var(--uui-size-space-2);
-				margin-bottom: var(--uui-size-space-6);
+				margin-bottom: var(--uui-size-layout-1);
 				border: none;
 				border-bottom: 1px solid var(--uui-color-border);
 			}

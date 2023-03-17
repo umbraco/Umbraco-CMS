@@ -13,8 +13,7 @@ export class UmbWorkspaceViewDocumentTypeDesignElement extends UmbLitElement {
 		css`
 			:host {
 				display: block;
-				margin: var(--uui-size-space-6);
-				padding: var(--uui-size-space-6);
+				margin: var(--uui-size-layout-1);
 			}
 		`,
 	];

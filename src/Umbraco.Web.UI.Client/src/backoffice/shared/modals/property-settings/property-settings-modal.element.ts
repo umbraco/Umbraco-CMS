@@ -17,11 +17,11 @@ export class UmbPropertySettingsModalElement extends UmbModalBaseElement<undefin
 				color: var(--uui-color-text);
 			}
 			#content {
-				padding: var(--uui-size-space-6);
+				padding: var(--uui-size-layout-1);
 			}
 			#appearances {
 				display: flex;
-				gap: var(--uui-size-space-6);
+				gap: var(--uui-size-layout-1);
 				max-width: 350px;
 				margin: 0 auto;
 			}

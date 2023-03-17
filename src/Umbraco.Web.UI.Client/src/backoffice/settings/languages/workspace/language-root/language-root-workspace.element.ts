@@ -21,7 +21,7 @@ export class UmbLanguageRootWorkspaceElement extends UmbLitElement {
 			}
 
 			#main {
-				margin: var(--uui-size-space-6);
+				margin: var(--uui-size-layout-1);
 			}
 		`,
 	];
