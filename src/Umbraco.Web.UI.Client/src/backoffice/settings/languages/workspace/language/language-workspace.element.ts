@@ -2,8 +2,8 @@ import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { IRoutingInfo } from 'router-slot';
-import { UmbRouterSlotInitEvent } from '@umbraco-cms/router';
 import { UmbLanguageWorkspaceContext } from './language-workspace.context';
+import { UmbRouterSlotInitEvent } from '@umbraco-cms/router';
 import { UmbLitElement } from '@umbraco-cms/element';
 
 @customElement('umb-language-workspace')

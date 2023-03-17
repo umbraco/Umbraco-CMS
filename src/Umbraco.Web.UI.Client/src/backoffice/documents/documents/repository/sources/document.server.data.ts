@@ -1,3 +1,4 @@
+import { v4 as uuidv4 } from 'uuid';
 import { RepositoryDetailDataSource } from '@umbraco-cms/repository';
 import {
 	DocumentResource,
@@ -7,7 +8,6 @@ import {
 } from '@umbraco-cms/backend-api';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 import { tryExecuteAndNotify } from '@umbraco-cms/resources';
-import { v4 as uuidv4 } from 'uuid';
 
 /**
  * A data source for the Document that fetches data from the server
