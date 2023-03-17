@@ -1,5 +1,5 @@
-import type { ManifestTypes } from '@umbraco-cms/models';
 import { ManifestSectionSidebarAppMenuKind } from '../shared/components/section/section-sidebar-menu/section-sidebar-menu.element';
+import type { ManifestTypes } from '@umbraco-cms/models';
 
 const sectionAlias = 'Umb.Section.Content';
 
@@ -14,7 +14,7 @@ const section: ManifestTypes = {
 	},
 };
 
-const menuSectionSidebarApp: ManifestTypes = {
+const menuSectionSidebarApp: ManifestSectionSidebarAppMenuKind = {
 	type: 'sectionSidebarApp',
 	kind: 'umb-menu',
 	alias: 'Umb.SidebarMenu.Content',

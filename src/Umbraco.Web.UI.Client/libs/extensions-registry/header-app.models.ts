@@ -2,7 +2,8 @@ import type { ManifestElement } from './models';
 
 export interface ManifestHeaderApp extends ManifestElement {
 	type: 'headerApp';
-	meta: MetaHeaderApp;
+	//meta: MetaHeaderApp;
+	meta?: unknown;
 }
 
 export interface MetaHeaderApp {

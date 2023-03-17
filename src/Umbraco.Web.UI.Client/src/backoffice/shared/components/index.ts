@@ -37,6 +37,8 @@ import './tree/tree.element';
 import './variantable-property/variantable-property.element';
 import './workspace/workspace-action-menu/workspace-action-menu.element';
 
+import './header-app/header-app-button.element';
+
 import './history/history-list.element';
 import './history/history-item.element';
 

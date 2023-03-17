@@ -71,8 +71,10 @@ export class UmbExtensionSlotElement extends UmbLitElement {
 
 						if (isManifestElementableType(extension)) {
 							component = await createExtensionElement(extension);
-						} else {
+						} else if (this.defaultElement) {
 							component = document.createElement(this.defaultElement);
+						} else {
+							// TODO: Lets make an console.error in this case?
 						}
 						if (component) {
 							(component as any).manifest = extension;

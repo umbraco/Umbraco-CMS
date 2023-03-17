@@ -1,4 +1,5 @@
 import type { ManifestSectionSidebarAppMenuKind } from '../../src/backoffice/shared/components/section/section-sidebar-menu/section-sidebar-menu.element';
+import { ManifestHeaderAppButtonKind } from '../../src/backoffice/shared/components/header-app/header-app-button.element';
 import type { ManifestCollectionView } from './collection-view.models';
 import type { ManifestDashboard } from './dashboard.models';
 import type { ManifestDashboardCollection } from './dashboard-collection.models';
@@ -64,6 +65,7 @@ export type ManifestTypes =
 	| ManifestEntrypoint
 	| ManifestExternalLoginProvider
 	| ManifestHeaderApp
+	| ManifestHeaderAppButtonKind
 	| ManifestHealthCheck
 	| ManifestPackageView
 	| ManifestPropertyAction
@@ -101,6 +103,7 @@ export type SpecificManifestTypeOrManifestBase<T extends keyof ManifestTypeMap |
 export interface ManifestBase {
 	type: string;
 	alias: string;
+	kind?: undefined;
 	name: string;
 	weight?: number;
 }
@@ -137,7 +140,7 @@ export interface ManifestElement extends ManifestWithLoader<object | HTMLElement
 	js?: string;
 	elementName?: string;
 	//loader?: () => Promise<object | HTMLElement>;
-	//meta?: unknown;
+	meta?: unknown;
 }
 
 export interface ManifestElementCustomKind extends ManifestElement {
