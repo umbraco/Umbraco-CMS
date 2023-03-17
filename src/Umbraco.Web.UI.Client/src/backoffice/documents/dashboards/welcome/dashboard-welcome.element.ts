@@ -4,7 +4,16 @@ import { customElement } from 'lit/decorators.js';
 
 @customElement('umb-dashboard-welcome')
 export class UmbDashboardWelcomeElement extends LitElement {
-	static styles = [UUITextStyles, css``];
+	static styles = [
+		UUITextStyles,
+		css`
+			:host {
+				display: block;
+				position: relative;
+				margin: var(--uui-size-layout-1);
+			}
+		`,
+	];
 
 	render() {
 		return html`
