@@ -1,16 +1,15 @@
 import { BehaviorSubject, map, Observable } from 'rxjs';
 import type { ManifestTypes, ManifestTypeMap, ManifestBase, ManifestEntrypoint } from '../../models';
 import { loadExtension } from '../load-extension.function';
-import { hasInitExport } from "../has-init-export.function";
-import type { UmbControllerHostInterface } from "@umbraco-cms/controller";
-import { UmbContextToken } from "@umbraco-cms/context-api";
+import { hasInitExport } from '../has-init-export.function';
+import type { UmbControllerHostInterface } from '@umbraco-cms/controller';
+import { UmbContextToken } from '@umbraco-cms/context-api';
 
 type SpecificManifestTypeOrManifestBase<T extends keyof ManifestTypeMap | string> = T extends keyof ManifestTypeMap
 	? ManifestTypeMap[T]
 	: ManifestBase;
 
 export class UmbExtensionRegistry {
-
 	// TODO: Use UniqueBehaviorSubject, as we don't want someone to edit data of extensions.
 	private _extensions = new BehaviorSubject<Array<ManifestBase>>([]);
 	public readonly extensions = this._extensions.asObservable();
@@ -37,6 +36,10 @@ export class UmbExtensionRegistry {
 		}
 	}
 
+	registerMany(manifests: Array<ManifestTypes>, rootHost?: UmbControllerHostInterface): void {
+		manifests.forEach((manifest) => this.register(manifest, rootHost));
+	}
+
 	unregister(alias: string): void {
 		const oldExtensionsValues = this._extensions.getValue();
 		const newExtensionsValues = oldExtensionsValues.filter((extension) => extension.alias !== alias);
@@ -56,7 +59,6 @@ export class UmbExtensionRegistry {
 	}
 
 	getByAlias(alias: string) {
-		// TODO: make pipes prettier/simpler/reuseable
 		return this.extensions.pipe(map((dataTypes) => dataTypes.find((extension) => extension.alias === alias) || null));
 	}
 
@@ -82,8 +84,8 @@ export class UmbExtensionRegistry {
 
 	extensionsSortedByTypeAndWeight<ExtensionType = ManifestBase>(): Observable<Array<ExtensionType>> {
 		return this.extensions.pipe(
-			map((exts) => exts
-				.sort((a, b) => {
+			map((exts) =>
+				exts.sort((a, b) => {
 					// If type is the same, sort by weight
 					if (a.type === b.type) {
 						return (a.weight || 0) - (b.weight || 0);
@@ -91,7 +93,8 @@ export class UmbExtensionRegistry {
 
 					// Otherwise sort by type
 					return a.type.localeCompare(b.type);
-				}))
+				})
+			)
 		) as Observable<Array<ExtensionType>>;
 	}
 }
