@@ -28,15 +28,4 @@ const menuSectionSidebarApp: ManifestTypes = {
 	},
 };
 
-// TODO: move to a general place:
-const menuSectionSidebarAppKind: ManifestKind = {
-	type: 'kind',
-	matchKind: 'menuSectionSidebarApp',
-	matchType: 'sectionSidebarApp',
-	manifest: {
-		type: 'sectionSidebarApp',
-		elementName: 'umb-section-sidebar-menu',
-	},
-};
-
-export const manifests = [section, menuSectionSidebarApp, menuSectionSidebarAppKind];
+export const manifests = [section, menuSectionSidebarApp];
