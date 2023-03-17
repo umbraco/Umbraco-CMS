@@ -109,9 +109,11 @@ export class UmbExtensionRegistry {
 			map((exts) => exts.find((ext) => ext.type === type && ext.alias === alias)),
 			withLatestFrom(this._kindsOfType(type)),
 			map(([ext, kinds]) => {
+				// TODO: Deep merge?
 				return ext ? { ...kinds.find((kind) => kind.matchKind === ext.kind)?.manifest, ...ext } : undefined;
 			})
 		) as Observable<T | undefined>;
+		// TODO: DisctinctUntilChanged by using aliases? and kind(if kind uses alias)
 	}
 
 	extensionsOfType<Key extends keyof ManifestTypeMap | string, T = SpecificManifestTypeOrManifestBase<Key>>(type: Key) {
@@ -120,6 +122,7 @@ export class UmbExtensionRegistry {
 			map(([exts, kinds]) =>
 				exts
 					.map((ext) => {
+						// TODO: Deep merge?
 						return { ...kinds.find((kind) => kind.matchKind === ext.kind)?.manifest, ...ext };
 					})
 					.sort((a, b) => (b.weight || 0) - (a.weight || 0))
@@ -135,6 +138,7 @@ export class UmbExtensionRegistry {
 			map(([exts, kinds]) =>
 				exts
 					.map((ext) => {
+						// TODO: Deep merge?
 						return { ...kinds.find((kind) => kind.matchKind === ext.kind)?.manifest, ...ext };
 					})
 					.sort((a, b) => (b.weight || 0) - (a.weight || 0))

@@ -2,10 +2,10 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html, nothing } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { map } from 'rxjs';
+import type { IRoutingInfo } from '@umbraco-cms/router';
 import type { UmbWorkspaceElement } from '../workspace/workspace.element';
 import type { UmbSectionViewsElement } from './section-views/section-views.element';
-import type { IRoutingInfo } from '@umbraco-cms/router';
-import type { ManifestMenuSectionSidebarApp, ManifestSection } from '@umbraco-cms/models';
+import type { ManifestSection, ManifestSectionSidebarApp } from '@umbraco-cms/models';
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-api';
 import { UmbLitElement } from '@umbraco-cms/element';
 
@@ -45,7 +45,7 @@ export class UmbSectionElement extends UmbLitElement {
 	private _routes?: Array<any>;
 
 	@state()
-	private _menus?: Array<ManifestMenuSectionSidebarApp>;
+	private _menus?: Array<ManifestSectionSidebarApp>;
 
 	connectedCallback() {
 		super.connectedCallback();
@@ -74,10 +74,11 @@ export class UmbSectionElement extends UmbLitElement {
 		];
 	}
 
+	// TODO: Can this be omitted? or can the same data be used for the extension slot or alike extension presentation?
 	#observeSectionSidebarApps() {
 		this.observe(
 			umbExtensionsRegistry
-				?.extensionsOfType('menuSectionSidebarApp')
+				?.extensionsOfType('sectionSidebarApp')
 				.pipe(
 					map((manifests) =>
 						manifests.filter((manifest) => manifest.conditions.sections.includes(this.manifest?.alias || ''))
@@ -97,14 +98,8 @@ export class UmbSectionElement extends UmbLitElement {
 						<umb-section-sidebar>
 							<umb-extension-slot
 								type="sectionSidebarApp"
-								.filter=${(items: ManifestMenuSectionSidebarApp) =>
+								.filter=${(items: ManifestSectionSidebarApp) =>
 									items.conditions.sections.includes(this.manifest?.alias || '')}></umb-extension-slot>
-
-							<umb-extension-slot
-								type="menuSectionSidebarApp"
-								.filter=${(items: ManifestMenuSectionSidebarApp) =>
-									items.conditions.sections.includes(this.manifest?.alias || '')}
-								default-element="umb-section-sidebar-menu"></umb-extension-slot>
 						</umb-section-sidebar>
 				  `
 				: nothing}
