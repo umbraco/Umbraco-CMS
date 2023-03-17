@@ -6,11 +6,10 @@ import { manifests as extensionManifests } from './extensions/manifests';
 import { manifests as cultureManifests } from './cultures/manifests';
 import { manifests as languageManifests } from './languages/manifests';
 import { manifests as logviewerManifests } from './logviewer/manifests';
-
-import { umbExtensionsRegistry } from '@umbraco-cms/extensions-api';
+import { UmbEntrypointOnInit } from '@umbraco-cms/extensions-api';
 import { ManifestTypes } from '@umbraco-cms/extensions-registry';
 
-export const manifests = [
+export const manifests: Array<ManifestTypes> = [
 	...settingsSectionManifests,
 	...settingsMenuManifests,
 	...dashboardManifests,
@@ -21,8 +20,6 @@ export const manifests = [
 	...logviewerManifests,
 ];
 
-const registerExtensions = (manifests: Array<ManifestTypes>) => {
-	manifests.forEach((manifest) => umbExtensionsRegistry.register(manifest));
+export const onInit: UmbEntrypointOnInit = (_host, extensionRegistry) => {
+	extensionRegistry.registerMany(manifests);
 };
-
-registerExtensions(manifests);

@@ -3,11 +3,10 @@ import { manifests as propertyActionManifests } from './property-actions/manifes
 import { manifests as propertyEditorManifests } from './property-editors/manifests';
 import { manifests as collectionViewManifests } from './collection/views/manifests';
 import { manifests as modalManifests } from './modals/manifests';
-
-import { umbExtensionsRegistry } from '@umbraco-cms/extensions-api';
+import type { UmbEntrypointOnInit } from '@umbraco-cms/extensions-api';
 import { ManifestTypes } from '@umbraco-cms/extensions-registry';
 
-export const manifests = [
+export const manifests: Array<ManifestTypes> = [
 	...componentManifests,
 	...propertyActionManifests,
 	...propertyEditorManifests,
@@ -15,8 +14,6 @@ export const manifests = [
 	...modalManifests,
 ];
 
-const registerExtensions = (manifests: Array<ManifestTypes>) => {
-	manifests.forEach((manifest) => umbExtensionsRegistry.register(manifest));
+export const onInit: UmbEntrypointOnInit = (_host, extensionRegistry) => {
+	extensionRegistry.registerMany(manifests);
 };
-
-registerExtensions(manifests);

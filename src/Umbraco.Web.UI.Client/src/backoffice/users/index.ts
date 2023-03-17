@@ -3,13 +3,16 @@ import { manifests as userManifests } from './users/manifests';
 import { manifests as userSectionManifests } from './user-section/manifests';
 import { manifests as currentUserManifests } from './current-user/manifests';
 
-import { umbExtensionsRegistry } from '@umbraco-cms/extensions-api';
+import { UmbEntrypointOnInit } from '@umbraco-cms/extensions-api';
 import { ManifestTypes } from '@umbraco-cms/extensions-registry';
 
-export const manifests = [...userGroupManifests, ...userManifests, ...userSectionManifests, ...currentUserManifests];
+export const manifests: Array<ManifestTypes> = [
+	...userGroupManifests,
+	...userManifests,
+	...userSectionManifests,
+	...currentUserManifests,
+];
 
-const registerExtensions = (manifests: Array<ManifestTypes>) => {
-	manifests.forEach((manifest) => umbExtensionsRegistry.register(manifest));
+export const onInit: UmbEntrypointOnInit = (_host, extensionRegistry) => {
+	extensionRegistry.registerMany(manifests);
 };
-
-registerExtensions(manifests);

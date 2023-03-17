@@ -1,12 +1,10 @@
 import { manifests as menuManifests } from './menu.manifests';
 import { manifests as templateManifests } from './templates/manifests';
-import { umbExtensionsRegistry } from '@umbraco-cms/extensions-api';
 import { ManifestTypes } from '@umbraco-cms/extensions-registry';
+import { UmbEntrypointOnInit } from '@umbraco-cms/extensions-api';
 
-export const manifests = [...menuManifests, ...templateManifests];
+export const manifests: Array<ManifestTypes> = [...menuManifests, ...templateManifests];
 
-const registerExtensions = (manifests: Array<ManifestTypes>) => {
-	manifests.forEach((manifest) => umbExtensionsRegistry.register(manifest));
+export const onInit: UmbEntrypointOnInit = (_host, extensionRegistry) => {
+	extensionRegistry.registerMany(manifests);
 };
-
-registerExtensions(manifests);
