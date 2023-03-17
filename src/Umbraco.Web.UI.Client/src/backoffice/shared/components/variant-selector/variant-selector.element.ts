@@ -292,6 +292,10 @@ export class UmbVariantSelectorElement extends UmbLitElement {
 		return this._activeVariantsCultures.includes(culture);
 	}
 
+	private _isNotPublishedMode(culture: string, state: ContentStateModel) {
+		return state !== ContentStateModel.PUBLISHED && !this._isVariantActive(culture!);
+	}
+
 	render() {
 		return html`
 			<uui-input id="name-input" .value=${this._name} @input="${this._handleInput}">
@@ -328,13 +332,12 @@ export class UmbVariantSelectorElement extends UmbLitElement {
 											${this._variants.map(
 												(variant) =>
 													html`
-														<li class="${this._isVariantActive(variant.culture as string) ? 'selected' : ''}">
+														<li class="${this._isVariantActive(variant.culture!) ? 'selected' : ''}">
 															<button
 																class="variant-selector-switch-button 
-																${variant.state !== ContentStateModel.PUBLISHED && !this._isVariantActive(variant.culture as string) ? 'add-mode' : ''}"
+																${this._isNotPublishedMode(variant.culture!, variant.state!) ? 'add-mode' : ''}"
 																@click=${() => this._switchVariant(variant)}>
-																${variant.state !== ContentStateModel.PUBLISHED &&
-																!this._isVariantActive(variant.culture as string)
+																${this._isNotPublishedMode(variant.culture!, variant.state!)
 																	? html`<uui-icon class="add-icon" name="umb:add"></uui-icon>`
 																	: nothing}
 																<div>
@@ -343,7 +346,7 @@ export class UmbVariantSelectorElement extends UmbLitElement {
 																</div>
 															</button>
 
-															${this._isVariantActive(variant.culture as string)
+															${this._isVariantActive(variant.culture!)
 																? nothing
 																: html`
 																		<uui-button
