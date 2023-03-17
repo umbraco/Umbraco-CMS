@@ -192,7 +192,7 @@ public class MultiUrlPickerValueConverter : PropertyValueConverterBase, IContent
                             : LinkType.Content);
         }
 
-        return dtos.Select(ToLink).WhereNotNull();
+        return dtos.Select(ToLink).WhereNotNull().ToArray();
     }
 
     private static bool IsSingleUrlPicker(IPublishedPropertyType propertyType)
