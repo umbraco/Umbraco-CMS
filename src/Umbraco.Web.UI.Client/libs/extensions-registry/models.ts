@@ -13,7 +13,7 @@ import type { ManifestPropertyAction } from './property-action.models';
 import type { ManifestPropertyEditorUI, ManifestPropertyEditorModel } from './property-editor.models';
 import type { ManifestSection } from './section.models';
 import type { ManifestSectionView } from './section-view.models';
-import type { ManifestSectionSidebarApp, ManifestMenuSectionSidebarApp } from './section-sidebar-app.models';
+import type { ManifestSectionSidebarApp } from './section-sidebar-app.models';
 import type { ManifestMenu } from './menu.models';
 import type { ManifestMenuItem } from './menu-item.models';
 import type { ManifestTheme } from './theme.models';
@@ -76,7 +76,6 @@ export type ManifestTypes =
 	| ManifestSectionSidebarApp
 	| ManifestSectionSidebarAppMenuKind
 	| ManifestSectionView
-	| ManifestMenuSectionSidebarApp
 	| ManifestMenu
 	| ManifestMenuItem
 	| ManifestTheme
@@ -140,7 +139,7 @@ export interface ManifestElement extends ManifestWithLoader<object | HTMLElement
 	js?: string;
 	elementName?: string;
 	//loader?: () => Promise<object | HTMLElement>;
-	meta?: unknown;
+	meta?: any;
 }
 
 export interface ManifestWithView extends ManifestElement {

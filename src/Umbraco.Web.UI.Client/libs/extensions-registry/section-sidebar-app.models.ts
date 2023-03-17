@@ -9,6 +9,7 @@ export interface ConditionsSectionSidebarApp {
 	sections: Array<string>;
 }
 
+/*
 // TODO: this is a temp solution until we implement kinds
 export interface ManifestMenuSectionSidebarApp extends Omit<ManifestSectionSidebarApp, 'type'> {
 	type: 'menuSectionSidebarApp';
@@ -20,3 +21,4 @@ export interface MetaMenuSectionSidebarApp {
 	label: string;
 	menu: string;
 }
+*/

@@ -46,14 +46,14 @@ export class UmbSectionSidebarMenuElement extends UmbLitElement {
 	];
 
 	@property()
-	manifest?: ManifestMenuSectionSidebarApp;
+	manifest?: ManifestSectionSidebarApp;
 
 	render() {
 		// TODO: link to dashboards when clicking on the menu item header
-		return html` <h3>${this.manifest?.meta.label}</h3>
+		return html` <h3>${this.manifest?.meta?.label}</h3>
 			<umb-extension-slot
 				type="menu"
-				.filter=${(menu: ManifestMenu) => menu.alias === this.manifest!.meta.menu}
+				.filter=${(menu: ManifestMenu) => menu.alias === this.manifest?.meta?.menu}
 				default-element="umb-menu"></umb-extension-slot>`;
 	}
 }
