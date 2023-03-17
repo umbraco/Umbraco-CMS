@@ -1,4 +1,4 @@
-import './document-type-workspace.element';
+import './document-type-workspace-edit.element';
 import { Meta, Story } from '@storybook/web-components';
 import { html } from 'lit-html';
 import { ifDefined } from 'lit/directives/if-defined.js';

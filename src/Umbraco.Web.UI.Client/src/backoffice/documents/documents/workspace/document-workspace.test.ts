@@ -17,13 +17,4 @@ describe('UmbDocumentWorkspaceElement', () => {
 		// TODO: should we use shadowDom here?
 		await expect(element).to.be.accessible(defaultA11yConfig);
 	});
-
-	describe('methods', () => {
-    it('has a load method', () => {
-      expect(element).to.have.property('load').that.is.a('function');
-    });
-    it('has a create method', () => {
-      expect(element).to.have.property('create').that.is.a('function');
-    });
-	});
 });

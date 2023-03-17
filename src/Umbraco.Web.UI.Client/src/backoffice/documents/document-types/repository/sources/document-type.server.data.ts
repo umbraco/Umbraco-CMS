@@ -186,4 +186,31 @@ export class UmbDocumentTypeServerDataSource implements RepositoryDetailDataSour
 		);
 		*/
 	}
+
+	/**
+	 * Get the allowed document types for a given parent key
+	 * @param {string} key
+	 * @return {*}
+	 * @memberof UmbDocumentTypeServerDataSource
+	 */
+	async getAllowedChildrenOf(key: string) {
+		if (!key) throw new Error('Key is missing');
+
+		let problemDetails: ProblemDetailsModel | undefined = undefined;
+		let data = undefined;
+
+		try {
+			const res = await fetch(`/umbraco/management/api/v1/document-type/allowed-children-of/${key}`, {
+				method: 'GET',
+				headers: {
+					'Content-Type': 'application/json',
+				},
+			});
+			data = await res.json();
+		} catch (error) {
+			problemDetails = { title: `Get allowed children of ${key} failed` };
+		}
+
+		return { data, error: problemDetails };
+	}
 }

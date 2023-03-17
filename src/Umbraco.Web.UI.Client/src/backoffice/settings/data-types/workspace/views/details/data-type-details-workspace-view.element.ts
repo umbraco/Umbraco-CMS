@@ -11,8 +11,8 @@ import { umbExtensionsRegistry } from '@umbraco-cms/extensions-api';
 import '../../../../../shared/property-editors/shared/property-editor-config/property-editor-config.element';
 import '../../../../../shared/components/ref-property-editor-ui/ref-property-editor-ui.element';
 
-@customElement('umb-data-type-workspace-view-edit')
-export class UmbDataTypeWorkspaceViewEditElement extends UmbLitElement {
+@customElement('umb-data-type-details-workspace-view')
+export class UmbDataTypeDetailsWorkspaceViewEditElement extends UmbLitElement {
 	static styles = [
 		UUITextStyles,
 		css`
@@ -168,10 +168,10 @@ export class UmbDataTypeWorkspaceViewEditElement extends UmbLitElement {
 	}
 }
 
-export default UmbDataTypeWorkspaceViewEditElement;
+export default UmbDataTypeDetailsWorkspaceViewEditElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-data-type-workspace-view-edit': UmbDataTypeWorkspaceViewEditElement;
+		'umb-data-type-details-workspace-view': UmbDataTypeDetailsWorkspaceViewEditElement;
 	}
 }

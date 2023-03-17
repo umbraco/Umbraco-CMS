@@ -3,5 +3,6 @@ import type { DataSourceResponse } from '@umbraco-cms/models';
 import { RepositoryDetailDataSource } from '@umbraco-cms/repository';
 
 export interface UmbDocumentDataSource extends RepositoryDetailDataSource<DocumentResponseModel> {
+	createScaffold(documentTypeKey: string): Promise<DataSourceResponse<DocumentResponseModel>>;
 	trash(key: string): Promise<DataSourceResponse<DocumentResponseModel>>;
 }
