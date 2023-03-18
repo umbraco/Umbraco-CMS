@@ -90,7 +90,11 @@ export class UmbDashboardModelsBuilderElement extends UmbLitElement {
 			<uui-box>
 				<div class="headline">
 					<h1>Models Builder</h1>
-					<uui-button .state="${this._buttonStateReload}" look="secondary" @click="${this._onDashboardReload}">
+					<uui-button
+						.state="${this._buttonStateReload}"
+						look="secondary"
+						label="Reload"
+						@click="${this._onDashboardReload}">
 						Reload
 					</uui-button>
 				</div>
