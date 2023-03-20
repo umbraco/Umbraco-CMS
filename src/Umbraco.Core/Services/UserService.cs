@@ -757,7 +757,7 @@ internal class UserService : RepositoryService, IUserService
 
         scope.Complete();
 
-        return Attempt.SucceedWithStatus(UserOperationStatus.Success, new UserInvitationResult());
+        return Attempt.SucceedWithStatus(UserOperationStatus.Success, new UserInvitationResult { InvitedUser =  invitedUser });
     }
 
     private UserOperationStatus ValidateUserCreateModel(UserCreateModel model)
