@@ -7,10 +7,15 @@ public static partial class Constants
         /// <summary>
         ///     Gets the identifier of the 'super' user.
         /// </summary>
+        [Obsolete("Use SuperUserKey instead. Scheduled for removal in V15.")]
         public const int SuperUserId = -1;
 
+        /// <summary>
+        /// Gets the unique key of the 'super' user.
+        /// </summary>
         public static readonly Guid SuperUserKey = new("1E70F841-C261-413B-ABB2-2D68CDB96094");
 
+        [Obsolete("Use SuperUserKey instead. Scheduled for removal in V15.")]
         public const string SuperUserIdAsString = "-1";
 
         /// <summary>

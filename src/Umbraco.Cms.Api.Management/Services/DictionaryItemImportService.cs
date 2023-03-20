@@ -3,10 +3,13 @@ using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Api.Management.Services.OperationStatus;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.TemporaryFile;
+using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Packaging;
 using Umbraco.Extensions;
 using File = System.IO.File;
+using IScopeProvider = Umbraco.Cms.Infrastructure.Scoping.IScopeProvider;
 
 namespace Umbraco.Cms.Api.Management.Services;
 
@@ -17,24 +20,39 @@ internal sealed class DictionaryItemImportService : IDictionaryItemImportService
     private readonly ILogger<DictionaryItemImportService> _logger;
     private readonly ITemporaryFileService _temporaryFileService;
     private readonly IUserService _userService;
+    private readonly IScopeProvider _scopeProvider;
 
     public DictionaryItemImportService(
         IDictionaryItemService dictionaryItemService,
         PackageDataInstallation packageDataInstallation,
         ILogger<DictionaryItemImportService> logger,
         ITemporaryFileService temporaryFileService,
-        IUserService userService)
+        IUserService userService,
+        IScopeProvider scopeProvider)
     {
         _dictionaryItemService = dictionaryItemService;
         _packageDataInstallation = packageDataInstallation;
         _logger = logger;
         _temporaryFileService = temporaryFileService;
         _userService = userService;
+        _scopeProvider = scopeProvider;
     }
 
-    public async Task<Attempt<IDictionaryItem?, DictionaryImportOperationStatus>> ImportDictionaryItemFromUdtFileAsync(string fileName, Guid? parentKey, Guid userKey)
+    public async Task<Attempt<IDictionaryItem?, DictionaryImportOperationStatus>> ImportDictionaryItemFromUdtFileAsync(Guid fileKey, Guid? parentKey, Guid userKey)
     {
-        if (".udt".InvariantEquals(Path.GetExtension(fileName)) == false)
+        using var scope = _scopeProvider.CreateScope();
+        _temporaryFileService.EnlistDeleteIfScopeCompletes(fileKey, _scopeProvider);
+
+        TemporaryFileModel? temporaryFile = await _temporaryFileService.GetAsync(fileKey);
+
+        if (temporaryFile is null)
+        {
+            return Attempt.FailWithStatus<IDictionaryItem?, DictionaryImportOperationStatus>(DictionaryImportOperationStatus.TemporaryFileNotFound, null);
+        }
+
+
+
+        if (".udt".InvariantEquals(Path.GetExtension(temporaryFile.FileName)) == false)
         {
             return Attempt.FailWithStatus<IDictionaryItem?, DictionaryImportOperationStatus>(DictionaryImportOperationStatus.InvalidFileType, null);
         }
@@ -45,31 +63,28 @@ internal sealed class DictionaryItemImportService : IDictionaryItemImportService
         }
 
         // load the UDT file from disk
-        (XDocument Document, DictionaryImportOperationStatus Status) loadResult = await LoadUdtFileAsync(fileName);
+        (XDocument Document, DictionaryImportOperationStatus Status) loadResult = await LoadUdtFileAsync(temporaryFile);
         if (loadResult.Status != DictionaryImportOperationStatus.Success)
         {
             return Attempt.FailWithStatus<IDictionaryItem?, DictionaryImportOperationStatus>(loadResult.Status, null);
         }
 
         // import the UDT file
-        (IDictionaryItem? DictionaryItem, DictionaryImportOperationStatus Status) importResult = ImportUdtFile(loadResult.Document, userKey, parentKey, fileName);
+        (IDictionaryItem? DictionaryItem, DictionaryImportOperationStatus Status) importResult = ImportUdtFile(loadResult.Document, userKey, parentKey, temporaryFile);
 
-        // clean up the UDT file (we don't care about success or failure at this point, we'll let the temporary file service handle those)
-        await _temporaryFileService.DeleteFileAsync(fileName);
+        scope.Complete();
 
         return importResult.Status == DictionaryImportOperationStatus.Success
             ? Attempt.SucceedWithStatus(DictionaryImportOperationStatus.Success, importResult.DictionaryItem)
             : Attempt.FailWithStatus<IDictionaryItem?, DictionaryImportOperationStatus>(importResult.Status, null);
     }
 
-    private async Task<(XDocument Document, DictionaryImportOperationStatus Status)> LoadUdtFileAsync(string fileName)
+    private async Task<(XDocument Document, DictionaryImportOperationStatus Status)> LoadUdtFileAsync(TemporaryFileModel temporaryFileModel)
     {
         try
         {
-            var filePath = await _temporaryFileService.GetFilePathAsync(fileName);
-
-            await using FileStream stream = File.OpenRead(filePath);
-            XDocument document = await XDocument.LoadAsync(stream, LoadOptions.None, CancellationToken.None);
+            await using var dataStream = temporaryFileModel.OpenReadStream();
+            XDocument document = await XDocument.LoadAsync(dataStream, LoadOptions.None, CancellationToken.None);
 
             return document.Root != null
                 ? (document, DictionaryImportOperationStatus.Success)
@@ -77,12 +92,12 @@ internal sealed class DictionaryItemImportService : IDictionaryItemImportService
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error loading UDT file: {FileName}", fileName);
+            _logger.LogError(ex, "Error loading UDT file: {FileName}", temporaryFileModel.FileName);
             return (new XDocument(), DictionaryImportOperationStatus.InvalidFileContent);
         }
     }
 
-    private (IDictionaryItem? DictionaryItem, DictionaryImportOperationStatus Status) ImportUdtFile(XDocument udtFileContent, Guid userKey, Guid? parentKey, string fileName)
+    private (IDictionaryItem? DictionaryItem, DictionaryImportOperationStatus Status) ImportUdtFile(XDocument udtFileContent, Guid userKey, Guid? parentKey, TemporaryFileModel temporaryFileModel)
     {
         if (udtFileContent.Root == null)
         {
@@ -100,7 +115,7 @@ internal sealed class DictionaryItemImportService : IDictionaryItemImportService
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error importing UDT file: {FileName}", fileName);
+            _logger.LogError(ex, "Error importing UDT file: {FileName}", temporaryFileModel.FileName);
             return (null, DictionaryImportOperationStatus.InvalidFileContent);
         }
     }

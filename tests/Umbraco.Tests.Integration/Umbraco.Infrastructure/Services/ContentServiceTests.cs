@@ -13,6 +13,7 @@ using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.PropertyEditors;
@@ -26,6 +27,7 @@ using Umbraco.Cms.Tests.Common.Extensions;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
 using Umbraco.Extensions;
+using Language = Umbraco.Cms.Core.Models.Language;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services;
 
@@ -1945,7 +1947,7 @@ public class ContentServiceTests : UmbracoIntegrationTestWithContent
     }
 
     [Test]
-    public void Can_Empty_RecycleBin_With_Content_That_Has_All_Related_Data()
+    public async Task Can_Empty_RecycleBin_With_Content_That_Has_All_Related_Data()
     {
         // Arrange
         // need to:
@@ -1994,9 +1996,13 @@ public class ContentServiceTests : UmbracoIntegrationTestWithContent
         Assert.IsNotNull(NotificationService.CreateNotification(user, content1, "X"));
 
         ContentService.SetPermission(content1, 'A', new[] { userGroup.Id });
-
-        Assert.IsTrue(DomainService.Save(new UmbracoDomain("www.test.com", "en-AU") { RootContentId = content1.Id })
-            .Success);
+        var updateDomainResult = await DomainService.UpdateDomainsAsync(
+            content1.Key,
+            new DomainsUpdateModel
+            {
+                Domains = new[] { new DomainModel { DomainName = "www.test.com", IsoCode = "en-US" } }
+            });
+        Assert.IsTrue(updateDomainResult.Success);
 
         // Act
         ContentService.MoveToRecycleBin(content1);

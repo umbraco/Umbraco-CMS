@@ -1166,43 +1166,6 @@
         }
       }
     },
-    "/umbraco/management/api/v1/dictionary/upload": {
-      "post": {
-        "tags": [
-          "Dictionary"
-        ],
-        "operationId": "PostDictionaryUpload",
-        "requestBody": {
-          "content": { }
-        },
-        "responses": {
-          "200": {
-            "description": "Success",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "oneOf": [
-                    {
-                      "$ref": "#/components/schemas/UploadDictionaryResponseModel"
-                    }
-                  ]
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Bad Request",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetailsModel"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
     "/umbraco/management/api/v1/tree/dictionary/children": {
       "get": {
         "tags": [
@@ -1741,6 +1704,65 @@
           },
           "404": {
             "description": "Not Found"
+          }
+        }
+      }
+    },
+    "/umbraco/management/api/v1/document/{key}/domains": {
+      "get": {
+        "tags": [
+          "Document"
+        ],
+        "operationId": "GetDocumentByKeyDomains",
+        "parameters": [
+          {
+            "name": "key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Document"
+        ],
+        "operationId": "PutDocumentByKeyDomains",
+        "parameters": [
+          {
+            "name": "key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/UpdateDomainsRequestModel"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
           }
         }
       }
@@ -6213,6 +6235,163 @@
         }
       }
     },
+    "/umbraco/management/api/v1/temporaryfile": {
+      "post": {
+        "tags": [
+          "Temporary File"
+        ],
+        "operationId": "PostTemporaryfile",
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "Key": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "File": {
+                    "type": "string",
+                    "format": "binary"
+                  }
+                }
+              },
+              "encoding": {
+                "Key": {
+                  "style": "form"
+                },
+                "File": {
+                  "style": "form"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "headers": {
+              "Location": {
+                "description": "Location of the newly created resource",
+                "schema": {
+                  "type": "string",
+                  "description": "Location of the newly created resource",
+                  "format": "uri"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetailsModel"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/umbraco/management/api/v1/temporaryfile/{key}": {
+      "get": {
+        "tags": [
+          "Temporary File"
+        ],
+        "operationId": "GetTemporaryfileByKey",
+        "parameters": [
+          {
+            "name": "key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetailsModel"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetailsModel"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/TemporaryFileResponseModel"
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Temporary File"
+        ],
+        "operationId": "DeleteTemporaryfileByKey",
+        "parameters": [
+          {
+            "name": "key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetailsModel"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetailsModel"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
     "/umbraco/management/api/v1/tracked-reference/{key}": {
       "get": {
         "tags": [
@@ -7775,6 +7954,47 @@
           }
         }
       },
+      "DomainPresentationModel": {
+        "type": "object",
+        "properties": {
+          "domainName": {
+            "type": "string"
+          },
+          "isoCode": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "DomainsPresentationModelBaseModel": {
+        "type": "object",
+        "properties": {
+          "defaultIsoCode": {
+            "type": "string",
+            "nullable": true
+          },
+          "domains": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/DomainPresentationModel"
+                }
+              ]
+            }
+          }
+        },
+        "additionalProperties": false
+      },
+      "DomainsResponseModel": {
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/DomainsPresentationModelBaseModel"
+          }
+        ],
+        "additionalProperties": false
+      },
       "EntityTreeItemResponseModel": {
         "required": [
           "$type"
@@ -8115,30 +8335,12 @@
         },
         "additionalProperties": false
       },
-      "ImportDictionaryItemsPresentationModel": {
-        "type": "object",
-        "properties": {
-          "key": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "name": {
-            "type": "string",
-            "nullable": true
-          },
-          "parentKey": {
-            "type": "string",
-            "format": "uuid",
-            "nullable": true
-          }
-        },
-        "additionalProperties": false
-      },
       "ImportDictionaryRequestModel": {
         "type": "object",
         "properties": {
-          "fileName": {
-            "type": "string"
+          "temporaryFileKey": {
+            "type": "string",
+            "format": "uuid"
           },
           "parentKey": {
             "type": "string",
@@ -10203,6 +10405,24 @@
         },
         "additionalProperties": false
       },
+      "TemporaryFileResponseModel": {
+        "type": "object",
+        "properties": {
+          "key": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "availableUntil": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "fileName": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
       "TreeItemPresentationModel": {
         "type": "object",
         "properties": {
@@ -10307,6 +10527,15 @@
         },
         "additionalProperties": false
       },
+      "UpdateDomainsRequestModel": {
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/DomainsPresentationModelBaseModel"
+          }
+        ],
+        "additionalProperties": false
+      },
       "UpdateFolderReponseModel": {
         "type": "object",
         "allOf": [
@@ -10393,26 +10622,6 @@
           "reportUrl": {
             "type": "string",
             "readOnly": true
-          }
-        },
-        "additionalProperties": false
-      },
-      "UploadDictionaryResponseModel": {
-        "type": "object",
-        "properties": {
-          "dictionaryItems": {
-            "type": "array",
-            "items": {
-              "oneOf": [
-                {
-                  "$ref": "#/components/schemas/ImportDictionaryItemsPresentationModel"
-                }
-              ]
-            }
-          },
-          "fileName": {
-            "type": "string",
-            "nullable": true
           }
         },
         "additionalProperties": false
