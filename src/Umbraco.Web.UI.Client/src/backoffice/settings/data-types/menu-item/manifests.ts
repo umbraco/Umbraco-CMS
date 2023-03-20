@@ -1,15 +1,16 @@
-import type { ManifestMenuItem } from '@umbraco-cms/models';
+import type { ManifestTypes } from '@umbraco-cms/models';
 
-const menuItem: ManifestMenuItem = {
+const menuItem: ManifestTypes = {
 	type: 'menuItem',
+	kind: 'Umb.Kind.Tree',
 	alias: 'Umb.MenuItem.DataTypes',
 	name: 'Data Types Menu Item',
 	weight: 40,
-	loader: () => import('./data-types-menu-item.element'),
 	meta: {
 		label: 'Data Types',
 		icon: 'umb:folder',
 		entityType: 'data-type',
+		treeAlias: 'Umb.Tree.DataTypes',
 	},
 	conditions: {
 		menus: ['Umb.Menu.Settings'],
