@@ -87,6 +87,27 @@ public class PropertyValueConverterTests : ContentApiTests
         content.SetupGet(c => c.Name).Returns(name);
         content.SetupGet(c => c.ItemType).Returns(itemType);
         content.SetupGet(c => c.ContentType).Returns(contentType);
+        content.SetupGet(c => c.UrlSegment).Returns("url-segment");
         return content;
+    }
+
+    protected void RegisterContentWithProviders(IPublishedContent content)
+    {
+        PublishedUrlProviderMock
+            .Setup(p => p.GetUrl(content, It.IsAny<UrlMode>(), It.IsAny<string?>(), It.IsAny<Uri?>()))
+            .Returns(content.UrlSegment);
+        PublishedContentCacheMock
+            .Setup(pcc => pcc.GetById(content.Key))
+            .Returns(content);
+    }
+
+    protected void RegisterMediaWithProviders(IPublishedContent media)
+    {
+        PublishedUrlProviderMock
+            .Setup(p => p.GetUrl(media, It.IsAny<UrlMode>(), It.IsAny<string?>(), It.IsAny<Uri?>()))
+            .Returns(media.UrlSegment);
+        PublishedMediaCacheMock
+            .Setup(pcc => pcc.GetById(media.Key))
+            .Returns(media);
     }
 }
