@@ -5,7 +5,7 @@ import { UUIBooleanInputEvent, UUIRadioGroupElement, UUIRadioGroupEvent, UUITogg
 import { ifDefined } from 'lit/directives/if-defined.js';
 import { UmbRelationTypeWorkspaceContext } from '../../relation-type-workspace.context';
 import { UmbLitElement } from '@umbraco-cms/element';
-import type { RelationTypeBaseModel, RelationTypeResponseModel } from '@umbraco-cms/backend-api';
+import type { RelationTypeResponseModel } from '@umbraco-cms/backend-api';
 
 @customElement('umb-relation-type-workspace-view-relation-type')
 export class UmbRelationTypeWorkspaceViewRelationTypeElement extends UmbLitElement {
@@ -22,25 +22,25 @@ export class UmbRelationTypeWorkspaceViewRelationTypeElement extends UmbLitEleme
 	@state()
 	private _relationType?: RelationTypeResponseModel;
 
-	private _workspaceContext?: UmbRelationTypeWorkspaceContext;
+	#workspaceContext?: UmbRelationTypeWorkspaceContext;
 
 	constructor() {
 		super();
 
 		this.consumeContext<UmbRelationTypeWorkspaceContext>('umbWorkspaceContext', (instance) => {
-			this._workspaceContext = instance;
+			this.#workspaceContext = instance;
 			this._observeRelationType();
 		});
 	}
 
 	private _observeRelationType() {
-		if (!this._workspaceContext) {
+		if (!this.#workspaceContext) {
 			return;
 		}
 
-		console.log('this._workspaceContext.data', this._workspaceContext);
+		console.log('this._workspaceContext.data', this.#workspaceContext);
 
-		this.observe(this._workspaceContext.data, (relationType) => {
+		this.observe(this.#workspaceContext.data, (relationType) => {
 			console.log('relationType', relationType);
 			if (!relationType) return;
 
@@ -51,13 +51,13 @@ export class UmbRelationTypeWorkspaceViewRelationTypeElement extends UmbLitEleme
 	#handleDirectionChange(event: UUIRadioGroupEvent) {
 		const target = event.target as UUIRadioGroupElement;
 		const value = target.value === 'true';
-		this._workspaceContext?.update('isBidirectional', value);
+		this.#workspaceContext?.update('isBidirectional', value);
 	}
 
 	#handleIsDependencyChange(event: UUIBooleanInputEvent) {
 		const target = event.target as UUIToggleElement;
 		const value = target.checked;
-		this._workspaceContext?.update('isDependency', value);
+		this.#workspaceContext?.update('isDependency', value);
 	}
 
 	render() {
