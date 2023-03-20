@@ -15,3 +15,16 @@ export interface MetaMenuItem {
 export interface ConditionsMenuItem {
 	menus: Array<string>;
 }
+
+export interface ManifestMenuItemTreeKind extends Omit<Omit<ManifestMenuItem, 'kind'>, 'meta'> {
+	type: 'menuItem';
+	kind: 'tree';
+	meta: MetaMenuItemTreeKind;
+}
+
+export interface MetaMenuItemTreeKind {
+	treeAlias: string;
+	label: string;
+	icon: string;
+	entityType?: string;
+}

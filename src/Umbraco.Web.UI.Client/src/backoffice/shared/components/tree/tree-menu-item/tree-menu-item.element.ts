@@ -2,7 +2,7 @@ import { html, nothing } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { UmbLitElement } from '@umbraco-cms/element';
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-api';
-import { ManifestKind, ManifestMenuItem } from '@umbraco-cms/extensions-registry';
+import { ManifestKind, ManifestMenuItemTreeKind } from '@umbraco-cms/extensions-registry';
 
 // TODO: Move to separate file:
 const manifest: ManifestKind = {
@@ -16,19 +16,6 @@ const manifest: ManifestKind = {
 	},
 };
 umbExtensionsRegistry.register(manifest);
-
-export interface ManifestMenuItemTreeKind extends Omit<Omit<ManifestMenuItem, 'kind'>, 'meta'> {
-	type: 'menuItem';
-	kind: 'tree';
-	meta: MetaMenuItemTreeKind;
-}
-
-export interface MetaMenuItemTreeKind {
-	treeAlias: string;
-	label: string;
-	icon: string;
-	entityType?: string;
-}
 
 @customElement('umb-menu-item-tree')
 export class UmbMenuItemTreeElement extends UmbLitElement {

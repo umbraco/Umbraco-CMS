@@ -1,4 +1,3 @@
-import type { ManifestMenuItemTreeKind } from '../../src/backoffice/shared/components/tree/tree-menu-item/tree-menu-item.element';
 import type { ManifestCollectionView } from './collection-view.models';
 import type { ManifestDashboard } from './dashboard.models';
 import type { ManifestDashboardCollection } from './dashboard-collection.models';
@@ -14,7 +13,7 @@ import type { ManifestSection } from './section.models';
 import type { ManifestSectionView } from './section-view.models';
 import type { ManifestSectionSidebarApp, ManifestSectionSidebarAppMenuKind } from './section-sidebar-app.models';
 import type { ManifestMenu } from './menu.models';
-import type { ManifestMenuItem } from './menu-item.models';
+import type { ManifestMenuItem, ManifestMenuItemTreeKind } from './menu-item.models';
 import type { ManifestTheme } from './theme.models';
 import type { ManifestTree } from './tree.models';
 import type { ManifestUserDashboard } from './user-dashboard.models';
@@ -27,7 +26,6 @@ import type { ManifestModal } from './modal.models';
 import type { ManifestStore, ManifestTreeStore } from './store.models';
 import type { ClassConstructor } from '@umbraco-cms/models';
 
-export * from '../../src/backoffice/shared/components/tree/tree-menu-item/tree-menu-item.element';
 export * from './collection-view.models';
 export * from './dashboard-collection.models';
 export * from './dashboard.models';
