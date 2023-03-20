@@ -1,7 +1,7 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
-import { ManifestKind, ManifestMenu, ManifestSectionSidebarApp } from '@umbraco-cms/extensions-registry';
+import { ManifestKind, ManifestMenu, ManifestSectionSidebarAppMenuKind } from '@umbraco-cms/extensions-registry';
 import { UmbLitElement } from '@umbraco-cms/element';
 
 import '../../menu/menu.element';
@@ -20,17 +20,6 @@ const manifest: ManifestKind = {
 };
 umbExtensionsRegistry.register(manifest);
 
-export interface ManifestSectionSidebarAppMenuKind extends Omit<Omit<ManifestSectionSidebarApp, 'kind'>, 'meta'> {
-	type: 'sectionSidebarApp';
-	kind: 'menu';
-	meta: MetaSectionSidebarAppMenuKind;
-}
-
-export interface MetaSectionSidebarAppMenuKind {
-	label: string;
-	menu: string;
-}
-
 @customElement('umb-section-sidebar-menu')
 export class UmbSectionSidebarMenuElement extends UmbLitElement {
 	static styles = [
@@ -43,7 +32,7 @@ export class UmbSectionSidebarMenuElement extends UmbLitElement {
 	];
 
 	@property()
-	manifest?: ManifestSectionSidebarApp;
+	manifest?: ManifestSectionSidebarAppMenuKind;
 
 	render() {
 		// TODO: link to dashboards when clicking on the menu item header

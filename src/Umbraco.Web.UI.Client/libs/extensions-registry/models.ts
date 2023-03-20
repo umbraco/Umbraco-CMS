@@ -1,4 +1,3 @@
-import type { ManifestSectionSidebarAppMenuKind } from '../../src/backoffice/shared/components/section/section-sidebar-menu/section-sidebar-menu.element';
 import type { ManifestHeaderAppButtonKind } from '../../src/backoffice/shared/components/header-app/header-app-button.element';
 import type { ManifestMenuItemTreeKind } from '../../src/backoffice/shared/components/tree/tree-menu-item/tree-menu-item.element';
 import type { ManifestCollectionView } from './collection-view.models';
@@ -14,7 +13,7 @@ import type { ManifestPropertyAction } from './property-action.models';
 import type { ManifestPropertyEditorUI, ManifestPropertyEditorModel } from './property-editor.models';
 import type { ManifestSection } from './section.models';
 import type { ManifestSectionView } from './section-view.models';
-import type { ManifestSectionSidebarApp } from './section-sidebar-app.models';
+import type { ManifestSectionSidebarApp, ManifestSectionSidebarAppMenuKind } from './section-sidebar-app.models';
 import type { ManifestMenu } from './menu.models';
 import type { ManifestMenuItem } from './menu-item.models';
 import type { ManifestTheme } from './theme.models';
@@ -29,7 +28,6 @@ import type { ManifestModal } from './modal.models';
 import type { ManifestStore, ManifestTreeStore } from './store.models';
 import type { ClassConstructor } from '@umbraco-cms/models';
 
-export * from '../../src/backoffice/shared/components/section/section-sidebar-menu/section-sidebar-menu.element';
 export * from '../../src/backoffice/shared/components/header-app/header-app-button.element';
 export * from '../../src/backoffice/shared/components/tree/tree-menu-item/tree-menu-item.element';
 export * from './collection-view.models';
