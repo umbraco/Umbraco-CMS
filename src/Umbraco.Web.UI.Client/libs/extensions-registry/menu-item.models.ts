@@ -16,7 +16,7 @@ export interface ConditionsMenuItem {
 	menus: Array<string>;
 }
 
-export interface ManifestMenuItemTreeKind extends Omit<Omit<ManifestMenuItem, 'kind'>, 'meta'> {
+export interface ManifestMenuItemTreeKind extends Omit<ManifestMenuItem, 'kind' | 'meta'> {
 	type: 'menuItem';
 	kind: 'tree';
 	meta: MetaMenuItemTreeKind;

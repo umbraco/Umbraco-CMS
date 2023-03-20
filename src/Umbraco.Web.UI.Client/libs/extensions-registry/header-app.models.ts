@@ -12,7 +12,7 @@ export interface MetaHeaderApp {
 	icon: string;
 }
 
-export interface ManifestHeaderAppButtonKind extends Omit<ManifestHeaderApp, 'kind'> {
+export interface ManifestHeaderAppButtonKind extends Omit<ManifestHeaderApp, 'kind' | 'meta'> {
 	type: 'headerApp';
 	kind: 'button';
 	meta: MetaHeaderAppButtonKind;
