@@ -19,7 +19,7 @@ public class ByIdContentApiController : ContentApiControllerBase
     /// </summary>
     /// <param name="id">The unique identifier of the content item.</param>
     /// <returns>The content item or not found result.</returns>
-    [HttpGet("{id:guid}")]
+    [HttpGet("item/{id:guid}")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(IApiContent), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
