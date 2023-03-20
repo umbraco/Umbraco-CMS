@@ -158,6 +158,7 @@ public class ContentSettings
     internal const bool StaticDisableDeleteWhenReferenced = false;
     internal const bool StaticDisableUnpublishWhenReferenced = false;
     internal const bool StaticAllowEditInvariantFromNonDefault = false;
+    internal const bool StaticShowDomainWarnings = true;
 
     /// <summary>
     ///     Gets or sets a value for the content notification settings.
@@ -267,4 +268,10 @@ public class ContentSettings
     /// Gets or sets the allowed external host for media. If empty only relative paths are allowed.
     /// </summary>
     public string[] AllowedMediaHosts { get; set; } = Array.Empty<string>();
+
+    /// <summary>
+    /// Gets or sets a value indicating whether to show domain warnings.
+    /// </summary>
+    [DefaultValue(StaticShowDomainWarnings)]
+    public bool ShowDomainWarnings { get; set; } = StaticShowDomainWarnings;
 }

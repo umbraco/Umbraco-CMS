@@ -5,8 +5,10 @@ using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Actions;
+using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.ContentApps;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Dictionary;
@@ -66,6 +68,7 @@ public class ContentController : ContentControllerBase
     private readonly ISqlContext _sqlContext;
     private readonly IUmbracoMapper _umbracoMapper;
     private readonly IUserService _userService;
+    private readonly ContentSettings _contentSettings;
 
     [ActivatorUtilitiesConstructor]
     public ContentController(
@@ -93,7 +96,8 @@ public class ContentController : ContentControllerBase
         IAuthorizationService authorizationService,
         IContentVersionService contentVersionService,
         ICultureImpactFactory cultureImpactFactory,
-        IUserGroupService userGroupService)
+        IUserGroupService userGroupService,
+        IOptions<ContentSettings> contentSettings)
         : base(cultureDictionary, loggerFactory, shortStringHelper, eventMessages, localizedTextService, serializer)
     {
         _propertyEditors = propertyEditors;
@@ -119,6 +123,62 @@ public class ContentController : ContentControllerBase
         _scopeProvider = scopeProvider;
         _allLangs = new Lazy<IDictionary<string, ILanguage>>(() =>
         _localizationService.GetAllLanguages().ToDictionary(x => x.IsoCode, x => x, StringComparer.InvariantCultureIgnoreCase));
+        _contentSettings = contentSettings.Value;
+    }
+
+    [Obsolete("Use constructor that accepts ContentSettings as a parameter, scheduled for removal in V13")]
+    public ContentController(
+        ICultureDictionary cultureDictionary,
+        ILoggerFactory loggerFactory,
+        IShortStringHelper shortStringHelper,
+        IEventMessagesFactory eventMessages,
+        ILocalizedTextService localizedTextService,
+        PropertyEditorCollection propertyEditors,
+        IContentService contentService,
+        IUserService userService,
+        IBackOfficeSecurityAccessor backofficeSecurityAccessor,
+        IContentTypeService contentTypeService,
+        IUmbracoMapper umbracoMapper,
+        IPublishedUrlProvider publishedUrlProvider,
+        IDomainService domainService,
+        IDataTypeService dataTypeService,
+        ILocalizationService localizationService,
+        IFileService fileService,
+        INotificationService notificationService,
+        ActionCollection actionCollection,
+        ISqlContext sqlContext,
+        IJsonSerializer serializer,
+        ICoreScopeProvider scopeProvider,
+        IAuthorizationService authorizationService,
+        IContentVersionService contentVersionService,
+        ICultureImpactFactory cultureImpactFactory)
+        : this(
+            cultureDictionary,
+            loggerFactory,
+            shortStringHelper,
+            eventMessages,
+            localizedTextService,
+            propertyEditors,
+            contentService,
+            userService,
+            backofficeSecurityAccessor,
+            contentTypeService,
+            umbracoMapper,
+            publishedUrlProvider,
+            domainService,
+            dataTypeService,
+            localizationService,
+            fileService,
+            notificationService,
+            actionCollection,
+            sqlContext,
+            serializer,
+            scopeProvider,
+            authorizationService,
+            contentVersionService,
+            cultureImpactFactory,
+            StaticServiceProvider.Instance.GetRequiredService<IOptions<ContentSettings>>())
+    {
     }
 
     [Obsolete("User constructor that takes a IUserGroupService, scheduled for removal in V15.")]
@@ -1716,6 +1776,11 @@ public class ContentController : ContentControllerBase
     /// <param name="globalNotifications"></param>
     internal void AddDomainWarnings(IContent? persistedContent, string[]? culturesPublished, SimpleNotificationModel globalNotifications)
     {
+        if (_contentSettings.ShowDomainWarnings is false)
+        {
+            return;
+        }
+
         // Don't try to verify if no cultures were published
         if (culturesPublished is null)
         {
@@ -1956,10 +2021,61 @@ public class ContentController : ContentControllerBase
         }
 
         PublishResult publishResult = _contentService.SaveAndPublish(foundContent, userId: _backofficeSecurityAccessor.BackOfficeSecurity?.GetUserId().Result ?? 0);
+
         if (publishResult.Success == false)
         {
             var notificationModel = new SimpleNotificationModel();
             AddMessageForPublishStatus(new[] { publishResult }, notificationModel);
+            return ValidationProblem(notificationModel);
+        }
+
+        return Ok();
+    }
+
+    /// <summary>
+    ///     Publishes a document with a given ID and cultures.
+    /// </summary>
+    /// <param name="model"></param>
+    /// <returns></returns>
+    /// <remarks>
+    ///     The EnsureUserPermissionForContent attribute will deny access to this method if the current user
+    ///     does not have Publish access to this node.
+    /// </remarks>
+    [Authorize(Policy = AuthorizationPolicies.ContentPermissionPublishById)]
+    public IActionResult PostPublishByIdAndCulture(PublishContent model)
+    {
+        var languageCount = _allLangs.Value.Count();
+
+        // If there is no culture specified or the cultures specified are equal to the total amount of languages, publish the content in all cultures.
+        if (model.Cultures == null || !model.Cultures.Any() || model.Cultures.Length == languageCount)
+        {
+            return PostPublishById(model.Id);
+        }
+
+        IContent? foundContent = GetObjectFromRequest(() => _contentService.GetById(model.Id));
+
+        if (foundContent == null)
+        {
+            return HandleContentNotFound(model.Id);
+        }
+
+        var results = new Dictionary<string, PublishResult>();
+
+        foreach (var culture in model.Cultures)
+        {
+            PublishResult publishResult = _contentService.SaveAndPublish(foundContent, culture, _backofficeSecurityAccessor.BackOfficeSecurity?.GetUserId().Result ?? 0);
+            results[culture] = publishResult;
+        }
+
+        if (results.Any(x => x.Value.Success == false))
+        {
+            var notificationModel = new SimpleNotificationModel();
+
+            foreach (var culture in results.Where(x => x.Value.Success == false))
+            {
+                AddMessageForPublishStatus(new[] { culture.Value }, notificationModel);
+            }
+
             return ValidationProblem(notificationModel);
         }
 
