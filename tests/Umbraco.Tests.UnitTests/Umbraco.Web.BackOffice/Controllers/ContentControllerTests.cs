@@ -270,7 +270,6 @@ public class ContentControllerTests
             Mock.Of<IContentVersionService>(),
             Mock.Of<ICultureImpactFactory>(),
             Mock.Of<IUserGroupService>(),
-            Mock.Of<ICultureImpactFactory>(),
             new OptionsWrapper<ContentSettings>(new ContentSettings()));
 
         return controller;

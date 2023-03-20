@@ -48,7 +48,7 @@ public class UmbracoRequestPaths
         _previewMvcPath = "/" + mvcArea + "/Preview/";
         _surfaceMvcPath = "/" + mvcArea + "/Surface/";
         _apiMvcPath = "/" + mvcArea + "/Api/";
-        _managementApiPath = "/" + _mvcArea + "/management/api/";
+        _managementApiPath = "/" + mvcArea + "/management/api/";
         _installPath = hostingEnvironment.ToAbsolute(Constants.SystemDirectories.Install);
         _umbracoRequestPathsOptions = umbracoRequestPathsOptions;
     }

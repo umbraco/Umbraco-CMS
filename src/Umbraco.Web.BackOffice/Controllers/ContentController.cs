@@ -126,61 +126,6 @@ public class ContentController : ContentControllerBase
         _contentSettings = contentSettings.Value;
     }
 
-    [Obsolete("Use constructor that accepts ContentSettings as a parameter, scheduled for removal in V13")]
-    public ContentController(
-        ICultureDictionary cultureDictionary,
-        ILoggerFactory loggerFactory,
-        IShortStringHelper shortStringHelper,
-        IEventMessagesFactory eventMessages,
-        ILocalizedTextService localizedTextService,
-        PropertyEditorCollection propertyEditors,
-        IContentService contentService,
-        IUserService userService,
-        IBackOfficeSecurityAccessor backofficeSecurityAccessor,
-        IContentTypeService contentTypeService,
-        IUmbracoMapper umbracoMapper,
-        IPublishedUrlProvider publishedUrlProvider,
-        IDomainService domainService,
-        IDataTypeService dataTypeService,
-        ILocalizationService localizationService,
-        IFileService fileService,
-        INotificationService notificationService,
-        ActionCollection actionCollection,
-        ISqlContext sqlContext,
-        IJsonSerializer serializer,
-        ICoreScopeProvider scopeProvider,
-        IAuthorizationService authorizationService,
-        IContentVersionService contentVersionService,
-        ICultureImpactFactory cultureImpactFactory)
-        : this(
-            cultureDictionary,
-            loggerFactory,
-            shortStringHelper,
-            eventMessages,
-            localizedTextService,
-            propertyEditors,
-            contentService,
-            userService,
-            backofficeSecurityAccessor,
-            contentTypeService,
-            umbracoMapper,
-            publishedUrlProvider,
-            domainService,
-            dataTypeService,
-            localizationService,
-            fileService,
-            notificationService,
-            actionCollection,
-            sqlContext,
-            serializer,
-            scopeProvider,
-            authorizationService,
-            contentVersionService,
-            cultureImpactFactory,
-            StaticServiceProvider.Instance.GetRequiredService<IOptions<ContentSettings>>())
-    {
-    }
-
     [Obsolete("User constructor that takes a IUserGroupService, scheduled for removal in V15.")]
     public ContentController(
         ICultureDictionary cultureDictionary,
@@ -232,7 +177,8 @@ public class ContentController : ContentControllerBase
             authorizationService,
             contentVersionService,
             cultureImpactFactory,
-            StaticServiceProvider.Instance.GetRequiredService<IUserGroupService>()
+            StaticServiceProvider.Instance.GetRequiredService<IUserGroupService>(),
+            StaticServiceProvider.Instance.GetRequiredService<IOptions<ContentSettings>>()
         )
     {
     }
