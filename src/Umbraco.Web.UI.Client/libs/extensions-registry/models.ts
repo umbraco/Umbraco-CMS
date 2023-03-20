@@ -111,6 +111,7 @@ export interface ManifestBase {
 
 export interface ManifestKind {
 	type: 'kind';
+	alias: string;
 	matchType: string;
 	matchKind: string;
 	manifest: Partial<ManifestTypes>;

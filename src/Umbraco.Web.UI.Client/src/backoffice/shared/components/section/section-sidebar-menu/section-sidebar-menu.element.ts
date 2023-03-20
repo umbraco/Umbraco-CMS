@@ -10,7 +10,8 @@ import { umbExtensionsRegistry } from '@umbraco-cms/extensions-api';
 // TODO: Move to separate file:
 const manifest: ManifestKind = {
 	type: 'kind',
-	matchKind: 'Umb.Kind.Menu',
+	alias: 'Umb.Kind.Menu',
+	matchKind: 'menu',
 	matchType: 'sectionSidebarApp',
 	manifest: {
 		type: 'sectionSidebarApp',
@@ -21,7 +22,7 @@ umbExtensionsRegistry.register(manifest);
 
 export interface ManifestSectionSidebarAppMenuKind extends Omit<Omit<ManifestSectionSidebarApp, 'kind'>, 'meta'> {
 	type: 'sectionSidebarApp';
-	kind: 'Umb.Kind.Menu';
+	kind: 'menu';
 	meta: MetaSectionSidebarAppMenuKind;
 }
 

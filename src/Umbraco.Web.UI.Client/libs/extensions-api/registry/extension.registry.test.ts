@@ -108,6 +108,7 @@ describe('UmbExtensionRegistry with kinds', () => {
 		manifests = [
 			{
 				type: 'kind',
+				alias: 'Umb.Test.Kind',
 				matchType: 'section',
 				matchKind: 'test-kind',
 				manifest: {

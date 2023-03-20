@@ -11,7 +11,7 @@ const menu: ManifestMenu = {
 
 const menuSectionSidebarApp: ManifestTypes = {
 	type: 'sectionSidebarApp',
-	kind: 'Umb.Kind.Menu',
+	kind: 'menu',
 	alias: 'Umb.SectionSidebarMenu.Templating',
 	name: 'Templating Section Sidebar Menu',
 	weight: 100,

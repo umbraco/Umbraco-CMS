@@ -16,7 +16,7 @@ const headerApps: Array<ManifestTypes> = [
 
 	{
 		type: 'headerApp',
-		kind: 'Umb.Kind.Button',
+		kind: 'button',
 		alias: 'Umb.HeaderApp.HackDemo',
 		name: 'Header App Search',
 		weight: 10,

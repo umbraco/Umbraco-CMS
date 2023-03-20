@@ -1,4 +1,4 @@
-import { BehaviorSubject, withLatestFrom, map, Observable } from 'rxjs';
+import { BehaviorSubject, withLatestFrom, map, Observable, distinctUntilChanged } from 'rxjs';
 import type {
 	ManifestTypes,
 	ManifestTypeMap,
@@ -7,6 +7,18 @@ import type {
 	ManifestKind,
 } from '../../models';
 import { UmbContextToken } from '@umbraco-cms/context-api';
+
+function ExtensionMemoization<T extends { alias: string }>(previousValue: Array<T>, currentValue: Array<T>): boolean {
+	// If length is different, data is different:
+	if (previousValue.length !== currentValue.length) {
+		return true;
+	}
+	// previousValue has an alias that is not present in currentValue:
+	if (previousValue.find((p) => !currentValue.find((c) => c.alias === p.alias))) {
+		return true;
+	}
+	return false;
+}
 
 export class UmbExtensionRegistry {
 	// TODO: Use UniqueBehaviorSubject, as we don't want someone to edit data of extensions.
@@ -69,22 +81,28 @@ export class UmbExtensionRegistry {
 	*/
 
 	private _kindsOfType<Key extends keyof ManifestTypeMap | string>(type: Key) {
-		return this.kinds.pipe(map((kinds) => kinds.filter((kind) => kind.matchType === type)));
-		// TODO: DisctinctUntilChanged by using aliases?
+		return this.kinds.pipe(
+			map((kinds) => kinds.filter((kind) => kind.matchType === type)),
+			distinctUntilChanged(ExtensionMemoization)
+		);
 	}
 	private _extensionsOfType<Key extends keyof ManifestTypeMap | string>(type: Key) {
-		return this.extensions.pipe(map((exts) => exts.filter((ext) => ext.type === type)));
-		// TODO: DisctinctUntilChanged by using aliases?
+		return this.extensions.pipe(
+			map((exts) => exts.filter((ext) => ext.type === type)),
+			distinctUntilChanged(ExtensionMemoization)
+		);
 	}
 	private _kindsOfTypes(types: string[]) {
-		return this.kinds.pipe(map((kinds) => kinds.filter((kind) => types.indexOf(kind.matchType) !== -1)));
-		// TODO: DisctinctUntilChanged by using aliases?
+		return this.kinds.pipe(
+			map((kinds) => kinds.filter((kind) => types.indexOf(kind.matchType) !== -1)),
+			distinctUntilChanged(ExtensionMemoization)
+		);
 	}
 	private _extensionsOfTypes<ExtensionType = ManifestBase>(types: string[]): Observable<Array<ExtensionType>> {
-		return this.extensions.pipe(map((exts) => exts.filter((ext) => types.indexOf(ext.type) !== -1))) as Observable<
-			Array<ExtensionType>
-		>;
-		// TODO: DisctinctUntilChanged by using aliases?
+		return this.extensions.pipe(
+			map((exts) => exts.filter((ext) => types.indexOf(ext.type) !== -1)),
+			distinctUntilChanged(ExtensionMemoization)
+		) as Observable<Array<ExtensionType>>;
 	}
 
 	getByTypeAndAlias<Key extends keyof ManifestTypeMap | string, T = SpecificManifestTypeOrManifestBase<Key>>(
@@ -99,8 +117,14 @@ export class UmbExtensionRegistry {
 				return ext ? { ...kinds.find((kind) => kind.matchKind === ext.kind)?.manifest, ...ext } : undefined;
 			})
 		) as Observable<T | undefined>;
-		// TODO: DisctinctUntilChanged by using aliases? and kind(if kind uses alias)
 	}
+
+	/*
+	,
+	distinctUntilChanged((previousStates?: T, currentStates?: T) =>
+		previousStates && currentStates ? (previousStates as any).alias === (currentStates as any).alias : false
+	)
+	*/
 
 	extensionsOfType<Key extends keyof ManifestTypeMap | string, T = SpecificManifestTypeOrManifestBase<Key>>(type: Key) {
 		return this._extensionsOfType(type).pipe(

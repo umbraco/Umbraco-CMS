@@ -7,7 +7,8 @@ import { ManifestKind, ManifestMenuItem } from '@umbraco-cms/extensions-registry
 // TODO: Move to separate file:
 const manifest: ManifestKind = {
 	type: 'kind',
-	matchKind: 'Umb.Kind.Tree',
+	alias: 'Umb.Kind.Tree',
+	matchKind: 'tree',
 	matchType: 'menuItem',
 	manifest: {
 		type: 'menuItem',
@@ -18,7 +19,7 @@ umbExtensionsRegistry.register(manifest);
 
 export interface ManifestMenuItemTreeKind extends Omit<Omit<ManifestMenuItem, 'kind'>, 'meta'> {
 	type: 'menuItem';
-	kind: 'Umb.Kind.Tree';
+	kind: 'tree';
 	meta: MetaMenuItemTreeKind;
 }
 

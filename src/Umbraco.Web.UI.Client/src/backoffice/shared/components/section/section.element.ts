@@ -2,9 +2,9 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html, nothing } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { map } from 'rxjs';
-import type { IRoutingInfo } from '@umbraco-cms/router';
 import type { UmbWorkspaceElement } from '../workspace/workspace.element';
 import type { UmbSectionViewsElement } from './section-views/section-views.element';
+import type { IRoutingInfo } from '@umbraco-cms/router';
 import type { ManifestSection, ManifestSectionSidebarApp } from '@umbraco-cms/models';
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-api';
 import { UmbLitElement } from '@umbraco-cms/element';
@@ -45,7 +45,7 @@ export class UmbSectionElement extends UmbLitElement {
 	private _routes?: Array<any>;
 
 	@state()
-	private _menus?: Array<ManifestSectionSidebarApp>;
+	private _menus?: Array<Omit<ManifestSectionSidebarApp, 'kind'>>;
 
 	connectedCallback() {
 		super.connectedCallback();

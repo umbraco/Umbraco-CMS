@@ -2,7 +2,7 @@ import type { ManifestTypes } from '@umbraco-cms/models';
 
 const menuItem: ManifestTypes = {
 	type: 'menuItem',
-	kind: 'Umb.Kind.Tree',
+	kind: 'tree',
 	alias: 'Umb.MenuItem.Members',
 	name: 'Members Menu Item',
 	weight: 400,

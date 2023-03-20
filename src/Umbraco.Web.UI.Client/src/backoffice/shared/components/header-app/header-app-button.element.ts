@@ -7,7 +7,7 @@ import { umbExtensionsRegistry } from '@umbraco-cms/extensions-api';
 
 export interface ManifestHeaderAppButtonKind extends Omit<ManifestHeaderApp, 'kind'> {
 	type: 'headerApp';
-	kind: 'Umb.Kind.Button';
+	kind: 'button';
 	meta: MetaHeaderAppButtonKind;
 }
 
@@ -19,11 +19,12 @@ export interface MetaHeaderAppButtonKind {
 
 const manifest: ManifestKind = {
 	type: 'kind',
-	matchKind: 'Umb.Kind.Button',
+	alias: 'Umb.Kind.Button',
+	matchKind: 'button',
 	matchType: 'headerApp',
 	manifest: {
 		type: 'headerApp',
-		kind: 'Umb.Kind.Button',
+		kind: 'button',
 		elementName: 'umb-header-app-button',
 	},
 };

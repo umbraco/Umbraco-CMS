@@ -151,7 +151,7 @@ export class UmbWorkspacePropertyElement extends UmbLitElement {
 
 	private _propertyContext = new UmbWorkspacePropertyContext(this);
 
-	private propertyEditorUIObserver?: UmbObserverController<ManifestPropertyEditorUI | null>;
+	private propertyEditorUIObserver?: UmbObserverController<ManifestPropertyEditorUI | null | undefined>;
 
 	private _valueObserver?: UmbObserverController<unknown>;
 	private _configObserver?: UmbObserverController<DataTypePropertyPresentationModel[] | undefined>;

@@ -16,7 +16,7 @@ export const Overview: Story = {
 			name: 'Some Manifest',
 			alias: 'someManifestAlias',
 			type: 'headerApp',
-			kind: 'Umb.Kind.Button',
+			kind: 'button',
 			meta: {
 				label: 'Some Header',
 				icon: 'umb:home',

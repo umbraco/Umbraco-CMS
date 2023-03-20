@@ -34,7 +34,7 @@ const dashboards: Array<ManifestDashboardCollection> = [
 
 const menuSectionSidebarApp: ManifestTypes = {
 	type: 'sectionSidebarApp',
-	kind: 'Umb.Kind.Menu',
+	kind: 'menu',
 	alias: 'Umb.SectionSidebarMenu.Media',
 	name: 'Media Section Sidebar Menu',
 	weight: 100,
