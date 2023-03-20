@@ -2,20 +2,8 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, CSSResultGroup, html, LitElement } from 'lit';
 import { customElement } from 'lit/decorators.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
-import { ManifestHeaderApp, ManifestKind } from '@umbraco-cms/extensions-registry';
+import { ManifestHeaderAppButtonKind, ManifestKind } from '@umbraco-cms/extensions-registry';
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-api';
-
-export interface ManifestHeaderAppButtonKind extends Omit<ManifestHeaderApp, 'kind'> {
-	type: 'headerApp';
-	kind: 'button';
-	meta: MetaHeaderAppButtonKind;
-}
-
-export interface MetaHeaderAppButtonKind {
-	href: string;
-	label: string;
-	icon: string;
-}
 
 const manifest: ManifestKind = {
 	type: 'kind',

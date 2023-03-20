@@ -1,4 +1,3 @@
-import type { ManifestHeaderAppButtonKind } from '../../src/backoffice/shared/components/header-app/header-app-button.element';
 import type { ManifestMenuItemTreeKind } from '../../src/backoffice/shared/components/tree/tree-menu-item/tree-menu-item.element';
 import type { ManifestCollectionView } from './collection-view.models';
 import type { ManifestDashboard } from './dashboard.models';
@@ -6,7 +5,7 @@ import type { ManifestDashboardCollection } from './dashboard-collection.models'
 import type { ManifestEntityAction } from './entity-action.models';
 import type { ManifestEntityBulkAction } from './entity-bulk-action.models';
 import type { ManifestExternalLoginProvider } from './external-login-provider.models';
-import type { ManifestHeaderApp } from './header-app.models';
+import type { ManifestHeaderApp, ManifestHeaderAppButtonKind } from './header-app.models';
 import type { ManifestHealthCheck } from './health-check.models';
 import type { ManifestPackageView } from './package-view.models';
 import type { ManifestPropertyAction } from './property-action.models';
@@ -28,7 +27,6 @@ import type { ManifestModal } from './modal.models';
 import type { ManifestStore, ManifestTreeStore } from './store.models';
 import type { ClassConstructor } from '@umbraco-cms/models';
 
-export * from '../../src/backoffice/shared/components/header-app/header-app-button.element';
 export * from '../../src/backoffice/shared/components/tree/tree-menu-item/tree-menu-item.element';
 export * from './collection-view.models';
 export * from './dashboard-collection.models';

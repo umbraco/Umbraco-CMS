@@ -11,3 +11,15 @@ export interface MetaHeaderApp {
 	label: string;
 	icon: string;
 }
+
+export interface ManifestHeaderAppButtonKind extends Omit<ManifestHeaderApp, 'kind'> {
+	type: 'headerApp';
+	kind: 'button';
+	meta: MetaHeaderAppButtonKind;
+}
+
+export interface MetaHeaderAppButtonKind {
+	href: string;
+	label: string;
+	icon: string;
+}
