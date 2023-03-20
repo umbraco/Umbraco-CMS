@@ -11,7 +11,6 @@ import { loadExtension } from '../load-extension.function';
 import { hasInitExport } from '../has-init-export.function';
 import type { UmbControllerHostInterface } from '@umbraco-cms/controller';
 import { UmbContextToken } from '@umbraco-cms/context-api';
-import { createObservablePart } from '@umbraco-cms/observable-api';
 
 export class UmbExtensionRegistry {
 	// TODO: Use UniqueBehaviorSubject, as we don't want someone to edit data of extensions.
@@ -31,7 +30,7 @@ export class UmbExtensionRegistry {
 		this._kinds.next(nextData);
 	}
 
-	register(manifest: ManifestTypes | ManifestKind, rootHost?: UmbControllerHostInterface): void {
+	register(manifest: ManifestTypes | ManifestKind): void {
 		if (manifest.type === 'kind') {
 			this.defineKind(manifest as ManifestKind);
 			return;
@@ -46,16 +45,6 @@ export class UmbExtensionRegistry {
 		}
 
 		this._extensions.next([...extensionsValues, manifest as ManifestTypes]);
-
-		// If entrypoint extension, we should load and run it immediately
-		if (manifest.type === 'entrypoint') {
-			loadExtension(manifest as ManifestEntrypoint).then((js) => {
-				// If the extension has an onInit export, be sure to run that or else let the module handle itself
-				if (hasInitExport(js)) {
-					js.onInit(rootHost!, this);
-				}
-			});
-		}
 	}
 
 	unregister(alias: string): void {
