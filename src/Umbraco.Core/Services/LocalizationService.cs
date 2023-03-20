@@ -24,7 +24,7 @@ internal class LocalizationService : RepositoryService, ILocalizationService
     private readonly IDictionaryItemService _dictionaryItemService;
     private readonly IUserService _userService;
 
-    [Obsolete("Please use constructor with language and dictionary services. Will be removed in V15")]
+    [Obsolete("Please use constructor with language, dictionary and user services. Will be removed in V15")]
     public LocalizationService(
         ICoreScopeProvider provider,
         ILoggerFactory loggerFactory,

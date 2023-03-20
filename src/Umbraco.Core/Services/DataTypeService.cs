@@ -454,8 +454,8 @@ namespace Umbraco.Cms.Core.Services.Implement
                 containerKey = container.Key;
             }
 
-            Guid? currentUserKey = _userService.GetUserById(userId)?.Key;
-            Attempt<IDataType, DataTypeOperationStatus> result = CopyAsync(copying, containerKey, currentUserKey ?? Constants.Security.SuperUserKey).GetAwaiter().GetResult();
+            Guid currentUserKey = _userService.GetUserById(userId)?.Key ?? Constants.Security.SuperUserKey;
+            Attempt<IDataType, DataTypeOperationStatus> result = CopyAsync(copying, containerKey, currentUserKey).GetAwaiter().GetResult();
 
             // mimic old service behavior
             EventMessages evtMsgs = EventMessagesFactory.Get();
@@ -507,12 +507,13 @@ namespace Umbraco.Cms.Core.Services.Implement
                 throw new InvalidOperationException("Name cannot be more than 255 characters in length.");
             }
 
-            Guid? userKey = _userService.GetUserById(userId)?.Key;
+            Guid currentUserKey = _userService.GetUserById(userId)?.Key ?? Constants.Security.SuperUserKey;
+            
 
             SaveAsync(
                 dataType,
                 () => DataTypeOperationStatus.Success,
-                userKey ?? Constants.Security.SuperUserKey,
+                currentUserKey,
                 AuditType.Sort).GetAwaiter().GetResult();
         }
 
