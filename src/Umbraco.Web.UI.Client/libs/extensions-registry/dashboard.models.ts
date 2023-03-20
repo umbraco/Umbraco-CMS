@@ -1,12 +1,15 @@
-import type { ManifestElement } from './models';
+import type { ManifestElement, ManifestWithConditions } from './models';
 
-export interface ManifestDashboard extends ManifestElement {
+export interface ManifestDashboard extends ManifestElement, ManifestWithConditions<ConditionsDashboard> {
 	type: 'dashboard';
 	meta: MetaDashboard;
 }
 
 export interface MetaDashboard {
-	sections: string[];
 	pathname: string;
 	label?: string;
+}
+
+export interface ConditionsDashboard {
+	sections: string[];
 }

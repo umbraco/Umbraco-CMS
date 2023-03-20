@@ -1,6 +1,6 @@
 import { UmbEntityData } from './entity.data';
 import { createFolderTreeItem } from './utils';
-import { FolderTreeItemModel, PagedFolderTreeItemModel } from '@umbraco-cms/backend-api';
+import { FolderTreeItemResponseModel, PagedFolderTreeItemResponseModel } from '@umbraco-cms/backend-api';
 import type { MediaTypeDetails } from '@umbraco-cms/models';
 
 export const data: Array<MediaTypeDetails> = [
@@ -41,21 +41,21 @@ class UmbMediaTypeData extends UmbEntityData<MediaTypeDetails> {
 		super(data);
 	}
 
-	getTreeRoot(): PagedFolderTreeItemModel {
+	getTreeRoot(): PagedFolderTreeItemResponseModel {
 		const items = this.data.filter((item) => item.parentKey === null);
 		const treeItems = items.map((item) => createFolderTreeItem(item));
 		const total = items.length;
 		return { items: treeItems, total };
 	}
 
-	getTreeItemChildren(key: string): PagedFolderTreeItemModel {
+	getTreeItemChildren(key: string): PagedFolderTreeItemResponseModel {
 		const items = this.data.filter((item) => item.parentKey === key);
 		const treeItems = items.map((item) => createFolderTreeItem(item));
 		const total = items.length;
 		return { items: treeItems, total };
 	}
 
-	getTreeItem(keys: Array<string>): Array<FolderTreeItemModel> {
+	getTreeItem(keys: Array<string>): Array<FolderTreeItemResponseModel> {
 		const items = this.data.filter((item) => keys.includes(item.key ?? ''));
 		return items.map((item) => createFolderTreeItem(item));
 	}

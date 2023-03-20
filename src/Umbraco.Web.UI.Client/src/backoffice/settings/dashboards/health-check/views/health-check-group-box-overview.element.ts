@@ -8,7 +8,7 @@ import {
 } from '../health-check-dashboard.context';
 import { ensureSlash, path } from '@umbraco-cms/router';
 import type { ManifestHealthCheck } from '@umbraco-cms/models';
-import { HealthCheckGroupWithResultModel, StatusResultTypeModel } from '@umbraco-cms/backend-api';
+import { HealthCheckGroupWithResultResponseModel, StatusResultTypeModel } from '@umbraco-cms/backend-api';
 import { UmbLitElement } from '@umbraco-cms/element';
 
 @customElement('umb-health-check-group-box-overview')
@@ -64,7 +64,7 @@ export class UmbHealthCheckGroupBoxOverviewElement extends UmbLitElement {
 	private _tagResults?: any = [];
 
 	@state()
-	private _keyResults?: HealthCheckGroupWithResultModel;
+	private _keyResults?: HealthCheckGroupWithResultResponseModel;
 
 	constructor() {
 		super();

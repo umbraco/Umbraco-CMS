@@ -34,7 +34,7 @@
 				"import/order": "warn",
 				"local-rules/bad-type-import": "error",
 				"local-rules/no-direct-api-import": "warn",
-				"local-rules/prefer-import-aliases": "warn",
+				"local-rules/prefer-import-aliases": "error",
 				"@typescript-eslint/no-non-null-assertion": "off"
 			},
 			"settings": {

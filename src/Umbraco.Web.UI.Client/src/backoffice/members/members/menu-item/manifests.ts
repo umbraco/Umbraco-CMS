@@ -10,6 +10,8 @@ const menuItem: ManifestMenuItem = {
 		label: 'Members',
 		icon: 'umb:folder',
 		entityType: 'member',
+	},
+	conditions: {
 		menus: ['Umb.Menu.Members'],
 	},
 };

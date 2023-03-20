@@ -1,12 +1,12 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-import type { PackageCreateModel } from '../models/PackageCreateModel';
-import type { PackageDefinitionModel } from '../models/PackageDefinitionModel';
-import type { PackageManifestModel } from '../models/PackageManifestModel';
-import type { PackageUpdateModel } from '../models/PackageUpdateModel';
-import type { PagedPackageDefinitionModel } from '../models/PagedPackageDefinitionModel';
-import type { PagedPackageMigrationStatusModel } from '../models/PagedPackageMigrationStatusModel';
+import type { CreatePackageRequestModel } from '../models/CreatePackageRequestModel';
+import type { PackageDefinitionResponseModel } from '../models/PackageDefinitionResponseModel';
+import type { PackageManifestResponseModel } from '../models/PackageManifestResponseModel';
+import type { PagedPackageDefinitionResponseModel } from '../models/PagedPackageDefinitionResponseModel';
+import type { PagedPackageMigrationStatusResponseModel } from '../models/PagedPackageMigrationStatusResponseModel';
+import type { UpdatePackageRequestModel } from '../models/UpdatePackageRequestModel';
 
 import type { CancelablePromise } from '../core/CancelablePromise';
 import { OpenAPI } from '../core/OpenAPI';
@@ -19,10 +19,10 @@ export class PackageResource {
      * @throws ApiError
      */
     public static postPackageByNameRunMigration({
-        name,
-    }: {
-        name: string,
-    }): CancelablePromise<any> {
+name,
+}: {
+name: string,
+}): CancelablePromise<any> {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/umbraco/management/api/v1/package/{name}/run-migration',
@@ -37,16 +37,16 @@ export class PackageResource {
     }
 
     /**
-     * @returns PagedPackageDefinitionModel Success
+     * @returns PagedPackageDefinitionResponseModel Success
      * @throws ApiError
      */
     public static getPackageCreated({
-        skip,
-        take = 100,
-    }: {
-        skip?: number,
-        take?: number,
-    }): CancelablePromise<PagedPackageDefinitionModel> {
+skip,
+take = 100,
+}: {
+skip?: number,
+take?: number,
+}): CancelablePromise<PagedPackageDefinitionResponseModel> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/package/created',
@@ -62,10 +62,10 @@ export class PackageResource {
      * @throws ApiError
      */
     public static postPackageCreated({
-        requestBody,
-    }: {
-        requestBody?: PackageCreateModel,
-    }): CancelablePromise<string> {
+requestBody,
+}: {
+requestBody?: CreatePackageRequestModel,
+}): CancelablePromise<string> {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/umbraco/management/api/v1/package/created',
@@ -84,10 +84,10 @@ export class PackageResource {
      * @throws ApiError
      */
     public static getPackageCreatedByKey({
-        key,
-    }: {
-        key: string,
-    }): CancelablePromise<PackageDefinitionModel> {
+key,
+}: {
+key: string,
+}): CancelablePromise<PackageDefinitionResponseModel> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/package/created/{key}',
@@ -105,10 +105,10 @@ export class PackageResource {
      * @throws ApiError
      */
     public static deletePackageCreatedByKey({
-        key,
-    }: {
-        key: string,
-    }): CancelablePromise<any> {
+key,
+}: {
+key: string,
+}): CancelablePromise<any> {
         return __request(OpenAPI, {
             method: 'DELETE',
             url: '/umbraco/management/api/v1/package/created/{key}',
@@ -126,12 +126,12 @@ export class PackageResource {
      * @throws ApiError
      */
     public static putPackageCreatedByKey({
-        key,
-        requestBody,
-    }: {
-        key: string,
-        requestBody?: PackageUpdateModel,
-    }): CancelablePromise<any> {
+key,
+requestBody,
+}: {
+key: string,
+requestBody?: UpdatePackageRequestModel,
+}): CancelablePromise<any> {
         return __request(OpenAPI, {
             method: 'PUT',
             url: '/umbraco/management/api/v1/package/created/{key}',
@@ -151,10 +151,10 @@ export class PackageResource {
      * @throws ApiError
      */
     public static getPackageCreatedByKeyDownload({
-        key,
-    }: {
-        key: string,
-    }): CancelablePromise<Blob> {
+key,
+}: {
+key: string,
+}): CancelablePromise<Blob> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/package/created/{key}/download',
@@ -171,7 +171,7 @@ export class PackageResource {
      * @returns any Success
      * @throws ApiError
      */
-    public static getPackageManifest(): CancelablePromise<Array<PackageManifestModel>> {
+    public static getPackageManifest(): CancelablePromise<Array<PackageManifestResponseModel>> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/package/manifest',
@@ -179,16 +179,16 @@ export class PackageResource {
     }
 
     /**
-     * @returns PagedPackageMigrationStatusModel Success
+     * @returns PagedPackageMigrationStatusResponseModel Success
      * @throws ApiError
      */
     public static getPackageMigrationStatus({
-        skip,
-        take = 100,
-    }: {
-        skip?: number,
-        take?: number,
-    }): CancelablePromise<PagedPackageMigrationStatusModel> {
+skip,
+take = 100,
+}: {
+skip?: number,
+take?: number,
+}): CancelablePromise<PagedPackageMigrationStatusResponseModel> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/package/migration-status',

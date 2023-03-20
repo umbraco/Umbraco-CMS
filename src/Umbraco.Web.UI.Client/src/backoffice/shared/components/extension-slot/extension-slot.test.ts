@@ -54,8 +54,10 @@ describe('UmbExtensionSlotElement', () => {
 				name: 'unit-test-extension',
 				elementName: 'test-extension-slot-manifest-element',
 				meta: {
-					sections: ['test'],
 					pathname: 'test/test',
+				},
+				conditions: {
+					sections: ['test'],
 				},
 			});
 		});

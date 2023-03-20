@@ -2,6 +2,7 @@ import { html, nothing } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { UmbLitElement } from '@umbraco-cms/element';
 
+// TODO: align menu items and tree items
 @customElement('umb-document-types-sidebar-menu-item')
 export class UmbDocumentTypesSidebarMenuItemElement extends UmbLitElement {
 	@state()
@@ -19,14 +20,17 @@ export class UmbDocumentTypesSidebarMenuItemElement extends UmbLitElement {
 	// TODO: how do we want to cache the tree? (do we want to rerender every time the user opens the tree)?
 	// TODO: can we make this reusable?
 	render() {
-		return html`<umb-tree-item
-			label="Document Types"
-			icon="umb:folder"
-			@show-children=${this._onShowChildren}
-			@hide-children=${this._onHideChildren}
-			has-children>
-			${this._renderTree ? html`<umb-tree alias="Umb.Tree.DocumentTypes"></umb-tree>` : nothing}
-		</umb-tree-item> `;
+		return html`
+			<uui-menu-item
+				href=""
+				label="Document Types"
+				@show-children=${this._onShowChildren}
+				@hide-children=${this._onHideChildren}
+				has-children
+				><uui-icon slot="icon" name="umb:folder"></uui-icon>
+				${this._renderTree ? html`<umb-tree alias="Umb.Tree.DocumentTypes"></umb-tree>` : nothing}
+			</uui-menu-item>
+		`;
 	}
 }
 

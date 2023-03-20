@@ -1,6 +1,6 @@
 import { rest } from 'msw';
 import { umbDocumentData } from '../data/document.data';
-import type { DocumentModel } from '@umbraco-cms/backend-api';
+import type { DocumentResponseModel } from '@umbraco-cms/backend-api';
 import { umbracoPath } from '@umbraco-cms/utils';
 
 // TODO: add schema
@@ -35,7 +35,7 @@ export const handlers = [
 		return res(ctx.status(200), ctx.json(items));
 	}),
 
-	rest.post<DocumentModel[]>('/umbraco/management/api/v1/document/:key', async (req, res, ctx) => {
+	rest.post<DocumentResponseModel[]>('/umbraco/management/api/v1/document/:key', async (req, res, ctx) => {
 		const data = await req.json();
 		if (!data) return;
 

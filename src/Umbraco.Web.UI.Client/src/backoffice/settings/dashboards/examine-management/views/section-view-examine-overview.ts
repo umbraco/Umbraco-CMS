@@ -4,9 +4,9 @@ import { customElement, state } from 'lit/decorators.js';
 
 import {
 	HealthStatusModel,
-	IndexModel,
+	IndexResponseModel,
 	IndexerResource,
-	SearcherModel,
+	SearcherResponseModel,
 	SearcherResource,
 } from '@umbraco-cms/backend-api';
 import { UmbLitElement } from '@umbraco-cms/element';
@@ -58,10 +58,10 @@ export class UmbDashboardExamineOverviewElement extends UmbLitElement {
 	];
 
 	@state()
-	private _indexers?: IndexModel[];
+	private _indexers?: IndexResponseModel[];
 
 	@state()
-	private _searchers?: SearcherModel[];
+	private _searchers?: SearcherResponseModel[];
 
 	@state()
 	private _loadingIndexers = false;

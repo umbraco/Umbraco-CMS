@@ -44,10 +44,12 @@ export class UmbWorkspacePropertyLayoutElement extends LitElement {
 			p {
 				margin-bottom: 0;
 			}
+
 			#header {
 				position: sticky;
 				top: var(--uui-size-space-4);
 				height: min-content;
+				z-index: 2;
 			}
 		`,
 	];

@@ -4,7 +4,7 @@ import { customElement, state } from 'lit/decorators.js';
 import { repeat } from 'lit/directives/repeat.js';
 import { UmbCollectionContext, UMB_COLLECTION_CONTEXT_TOKEN } from '../collection.context';
 import { UmbLitElement } from '@umbraco-cms/element';
-import { EntityTreeItemModel } from '@umbraco-cms/backend-api';
+import { EntityTreeItemResponseModel } from '@umbraco-cms/backend-api';
 
 @customElement('umb-collection-view-media-grid')
 export class UmbCollectionViewsMediaGridElement extends UmbLitElement {
@@ -65,12 +65,12 @@ export class UmbCollectionViewsMediaGridElement extends UmbLitElement {
 	];
 
 	@state()
-	private _mediaItems?: Array<EntityTreeItemModel>;
+	private _mediaItems?: Array<EntityTreeItemResponseModel>;
 
 	@state()
 	private _selection: Array<string> = [];
 
-	private _collectionContext?: UmbCollectionContext<EntityTreeItemModel>;
+	private _collectionContext?: UmbCollectionContext<EntityTreeItemResponseModel>;
 
 	constructor() {
 		super();
@@ -115,31 +115,31 @@ export class UmbCollectionViewsMediaGridElement extends UmbLitElement {
 		});
 	}
 
-	private _handleOpenItem(mediaItem: EntityTreeItemModel) {
+	private _handleOpenItem(mediaItem: EntityTreeItemResponseModel) {
 		//TODO: Fix when we have dynamic routing
 		history.pushState(null, '', 'section/media/media/edit/' + mediaItem.key);
 	}
 
-	private _handleSelect(mediaItem: EntityTreeItemModel) {
+	private _handleSelect(mediaItem: EntityTreeItemResponseModel) {
 		if (mediaItem.key) {
 			this._collectionContext?.select(mediaItem.key);
 		}
 	}
 
-	private _handleDeselect(mediaItem: EntityTreeItemModel) {
+	private _handleDeselect(mediaItem: EntityTreeItemResponseModel) {
 		if (mediaItem.key) {
 			this._collectionContext?.deselect(mediaItem.key);
 		}
 	}
 
-	private _isSelected(mediaItem: EntityTreeItemModel) {
+	private _isSelected(mediaItem: EntityTreeItemResponseModel) {
 		if (mediaItem.key) {
 			return this._selection.includes(mediaItem.key);
 		}
 		return false;
 	}
 
-	private _renderMediaItem(item: EntityTreeItemModel) {
+	private _renderMediaItem(item: EntityTreeItemResponseModel) {
 		const name = item.name || '';
 		//TODO: fix the file extension when media items have a file extension.
 		return html`<uui-card-media

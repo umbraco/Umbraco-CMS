@@ -1,4 +1,3 @@
-import { LANGUAGE_REPOSITORY_ALIAS } from '../../repository/manifests';
 import { UmbSaveWorkspaceAction } from '@umbraco-cms/workspace';
 import type { ManifestWorkspace, ManifestWorkspaceAction, ManifestWorkspaceView } from '@umbraco-cms/models';
 
@@ -15,15 +14,17 @@ const workspace: ManifestWorkspace = {
 const workspaceViews: Array<ManifestWorkspaceView> = [
 	{
 		type: 'workspaceView',
-		alias: 'Umb.WorkspaceView.Language.Edit',
-		name: 'Language Workspace Edit View',
-		loader: () => import('./views/edit/edit-language-workspace-view.element'),
+		alias: 'Umb.WorkspaceView.Language.Details',
+		name: 'Language Workspace Details View',
+		loader: () => import('./views/details/language-details-workspace-view.element'),
 		weight: 90,
 		meta: {
-			workspaces: ['Umb.Workspace.Language'],
-			label: 'Edit',
-			pathname: 'edit',
+			label: 'Details',
+			pathname: 'details',
 			icon: 'edit',
+		},
+		conditions: {
+			workspaces: ['Umb.Workspace.Language'],
 		},
 	},
 ];
@@ -34,11 +35,13 @@ const workspaceActions: Array<ManifestWorkspaceAction> = [
 		alias: 'Umb.WorkspaceAction.Language.Save',
 		name: 'Save Language Workspace Action',
 		meta: {
-			workspaces: ['Umb.Workspace.Language'],
 			look: 'primary',
 			color: 'positive',
 			label: 'Save',
 			api: UmbSaveWorkspaceAction,
+		},
+		conditions: {
+			workspaces: ['Umb.Workspace.Language'],
 		},
 	},
 ];

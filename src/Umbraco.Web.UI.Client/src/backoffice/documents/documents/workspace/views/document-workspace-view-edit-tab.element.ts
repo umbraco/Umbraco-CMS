@@ -4,7 +4,7 @@ import { customElement, property, state } from 'lit/decorators.js';
 import { repeat } from 'lit/directives/repeat.js';
 import { UmbDocumentWorkspaceContext } from '../document-workspace.context';
 import { UmbLitElement } from '@umbraco-cms/element';
-import { PropertyTypeContainerViewModelBaseModel } from '@umbraco-cms/backend-api';
+import { PropertyTypeContainerResponseModelBaseModel } from '@umbraco-cms/backend-api';
 import './document-workspace-view-edit-properties.element';
 
 @customElement('umb-document-workspace-view-edit-tab')
@@ -55,13 +55,13 @@ export class UmbDocumentWorkspaceViewEditTabElement extends UmbLitElement {
 	}
 
 	@state()
-	_tabContainers: PropertyTypeContainerViewModelBaseModel[] = [];
+	_tabContainers: PropertyTypeContainerResponseModelBaseModel[] = [];
 
 	@state()
 	_hasTabProperties = false;
 
 	@state()
-	_groups: Array<PropertyTypeContainerViewModelBaseModel> = [];
+	_groups: Array<PropertyTypeContainerResponseModelBaseModel> = [];
 
 	private _workspaceContext?: UmbDocumentWorkspaceContext;
 
@@ -134,7 +134,7 @@ export class UmbDocumentWorkspaceViewEditTabElement extends UmbLitElement {
 		);
 	}
 
-	private _insertGroupContainers = (groupContainers: PropertyTypeContainerViewModelBaseModel[]) => {
+	private _insertGroupContainers = (groupContainers: PropertyTypeContainerResponseModelBaseModel[]) => {
 		groupContainers.forEach((group) => {
 			if (group.name) {
 				if (!this._groups.find((x) => x.name === group.name)) {

@@ -72,7 +72,7 @@ export class UmbCollectionElement extends UmbLitElement {
 			// TODO: could we make some helper methods for this scenario:
 			umbExtensionsRegistry?.extensionsOfType('collectionView').pipe(
 				map((extensions) => {
-					return extensions.filter((extension) => extension.meta.entityType === this._entityType);
+					return extensions.filter((extension) => extension.conditions.entityType === this._entityType);
 				})
 			),
 			(views) => {

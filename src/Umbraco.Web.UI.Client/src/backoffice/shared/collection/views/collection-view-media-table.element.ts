@@ -13,7 +13,7 @@ import {
 } from '../../components/table';
 import type { MediaDetails } from '@umbraco-cms/models';
 import { UmbLitElement } from '@umbraco-cms/element';
-import { EntityTreeItemModel } from '@umbraco-cms/backend-api';
+import { EntityTreeItemResponseModel } from '@umbraco-cms/backend-api';
 
 @customElement('umb-collection-view-media-table')
 export class UmbCollectionViewMediaTableElement extends UmbLitElement {
@@ -36,7 +36,7 @@ export class UmbCollectionViewMediaTableElement extends UmbLitElement {
 	];
 
 	@state()
-	private _mediaItems?: Array<EntityTreeItemModel>;
+	private _mediaItems?: Array<EntityTreeItemResponseModel>;
 
 	@state()
 	private _tableConfig: UmbTableConfig = {

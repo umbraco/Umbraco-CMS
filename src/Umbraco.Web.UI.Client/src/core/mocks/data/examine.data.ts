@@ -1,4 +1,4 @@
-import { HealthStatusModel, IndexModel, PagedIndexModel, SearchResultModel } from '@umbraco-cms/backend-api';
+import { HealthStatusModel, IndexResponseModel, PagedIndexResponseModel, SearchResultResponseModel } from '@umbraco-cms/backend-api';
 
 export function getIndexByName(indexName: string) {
 	return Indexers.find((index) => {
@@ -7,11 +7,11 @@ export function getIndexByName(indexName: string) {
 	});
 }
 
-export function getSearchResultsMockData(): SearchResultModel[] {
+export function getSearchResultsMockData(): SearchResultResponseModel[] {
 	return searchResultMockData;
 }
 
-export const Indexers: IndexModel[] = [
+export const Indexers: IndexResponseModel[] = [
 	{
 		name: 'ExternalIndex',
 		canRebuild: true,
@@ -71,12 +71,12 @@ export const Indexers: IndexModel[] = [
 	},
 ];
 
-export const PagedIndexers: PagedIndexModel = {
+export const PagedIndexers: PagedIndexResponseModel = {
 	items: Indexers,
 	total: 0,
 };
 
-export const searchResultMockData: SearchResultModel[] = [
+export const searchResultMockData: SearchResultResponseModel[] = [
 	{
 		id: '1',
 		score: 1,

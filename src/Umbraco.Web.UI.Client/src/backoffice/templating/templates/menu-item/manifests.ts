@@ -10,6 +10,8 @@ const menuItem: ManifestMenuItem = {
 		label: 'Templates',
 		icon: 'umb:folder',
 		entityType: 'template',
+	},
+	conditions: {
 		menus: ['Umb.Menu.Templating'],
 	},
 };

@@ -2,12 +2,12 @@ import { UmbLogViewerRepository } from '../repository/log-viewer.repository';
 import { ArrayState, createObservablePart, DeepState, ObjectState, StringState } from '@umbraco-cms/observable-api';
 import {
 	DirectionModel,
-	LogLevelCountsModel,
+	LogLevelCountsReponseModel,
 	LogLevelModel,
-	PagedLoggerModel,
-	PagedLogMessageModel,
-	PagedLogTemplateModel,
-	PagedSavedLogSearchModel,
+	PagedLoggerResponseModel,
+	PagedLogMessageResponseModel,
+	PagedLogTemplateResponseModel,
+	PagedSavedLogSearchResponseModel,
 } from '@umbraco-cms/backend-api';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 import { UmbContextToken } from '@umbraco-cms/context-api';
@@ -50,16 +50,16 @@ export class UmbLogViewerWorkspaceContext {
 		endDate: this.today,
 	};
 
-	#savedSearches = new DeepState<PagedSavedLogSearchModel | undefined>(undefined);
+	#savedSearches = new DeepState<PagedSavedLogSearchResponseModel | undefined>(undefined);
 	savedSearches = createObservablePart(this.#savedSearches, (data) => data?.items);
 
-	#logCount = new DeepState<LogLevelCountsModel | null>(null);
+	#logCount = new DeepState<LogLevelCountsReponseModel | null>(null);
 	logCount = createObservablePart(this.#logCount, (data) => data);
 
 	#dateRange = new DeepState<LogViewerDateRange>(this.defaultDateRange);
 	dateRange = createObservablePart(this.#dateRange, (data) => data);
 
-	#loggers = new DeepState<PagedLoggerModel | null>(null);
+	#loggers = new DeepState<PagedLoggerResponseModel | null>(null);
 	loggers = createObservablePart(this.#loggers, (data) => data?.items);
 
 	#canShowLogs = new BasicState<boolean | null>(null);
@@ -68,13 +68,13 @@ export class UmbLogViewerWorkspaceContext {
 	#filterExpression = new StringState<string>('');
 	filterExpression = createObservablePart(this.#filterExpression, (data) => data);
 
-	#messageTemplates = new DeepState<PagedLogTemplateModel | null>(null);
+	#messageTemplates = new DeepState<PagedLogTemplateResponseModel | null>(null);
 	messageTemplates = createObservablePart(this.#messageTemplates, (data) => data);
 
 	#logLevelsFilter = new ArrayState<LogLevelModel>([]);
 	logLevelsFilter = createObservablePart(this.#logLevelsFilter, (data) => data);
 
-	#logs = new DeepState<PagedLogMessageModel | null>(null);
+	#logs = new DeepState<PagedLogMessageResponseModel | null>(null);
 	logs = createObservablePart(this.#logs, (data) => data?.items);
 	logsTotal = createObservablePart(this.#logs, (data) => data?.total);
 

@@ -2,7 +2,7 @@ import { css, html } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, state } from 'lit/decorators.js';
 import { repeat } from 'lit/directives/repeat.js';
-import type { UmbWorkspaceEntityContextInterface } from '../../../workspace-context/workspace-entity-context.interface';
+import type { UmbEntityWorkspaceContextInterface } from '../../../workspace-context/workspace-entity-context.interface';
 import type { ContentProperty, ContentPropertyData, MediaTypeDetails } from '@umbraco-cms/models';
 
 import { UmbLitElement } from '@umbraco-cms/element';
@@ -25,13 +25,13 @@ export class UmbWorkspaceViewContentEditElement extends UmbLitElement {
 	@state()
 	_data: ContentPropertyData[] = [];
 
-	private _workspaceContext?: UmbWorkspaceEntityContextInterface<MediaTypeDetails>;
+	private _workspaceContext?: UmbEntityWorkspaceContextInterface<MediaTypeDetails>;
 
 	constructor() {
 		super();
 
 		// TODO: Figure out how to get the magic string for the workspace context.
-		this.consumeContext<UmbWorkspaceEntityContextInterface<MediaTypeDetails>>(
+		this.consumeContext<UmbEntityWorkspaceContextInterface<MediaTypeDetails>>(
 			'umbWorkspaceContext',
 			(workspaceContext) => {
 				this._workspaceContext = workspaceContext;

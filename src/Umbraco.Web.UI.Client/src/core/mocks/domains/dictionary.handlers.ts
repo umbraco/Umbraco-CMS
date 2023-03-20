@@ -1,9 +1,9 @@
 import { rest } from 'msw';
 import { umbDictionaryData } from '../data/dictionary.data';
-import { DictionaryImportModel, DictionaryOverviewModel } from '@umbraco-cms/backend-api';
+import { ImportDictionaryRequestModel, DictionaryOverviewResponseModel } from '@umbraco-cms/backend-api';
 import type { DictionaryDetails } from '@umbraco-cms/models';
 
-const uploadResponse: DictionaryImportModel = {
+const uploadResponse: ImportDictionaryRequestModel = {
 	fileName: 'c:/path/to/tempfilename.udt',
 	parentKey: 'b7e7d0ab-53ba-485d-dddd-12537f9925aa',
 };
@@ -31,7 +31,7 @@ const importResponse: DictionaryDetails = {
 };
 
 // alternate data for dashboard view
-const overviewData: Array<DictionaryOverviewModel> = [
+const overviewData: Array<DictionaryOverviewResponseModel> = [
 	{
 		name: 'Hello',
 		key: 'aae7d0ab-53ba-485d-b8bd-12537f9925cb',

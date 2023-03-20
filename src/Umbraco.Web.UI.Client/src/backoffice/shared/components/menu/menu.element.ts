@@ -16,7 +16,7 @@ export class UmbMenuElement extends UmbLitElement {
 	render() {
 		return html` <umb-extension-slot
 			type="menuItem"
-			.filter=${(items: ManifestMenuItem) => items.meta.menus.includes(this.manifest!.alias)}
+			.filter=${(items: ManifestMenuItem) => items.conditions.menus.includes(this.manifest!.alias)}
 			default-element="umb-menu-item"></umb-extension-slot>`;
 	}
 }

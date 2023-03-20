@@ -4,7 +4,7 @@ import { customElement } from 'lit/decorators.js';
 @customElement('umb-document-blueprint-root-workspace')
 export class UmbDocumentBlueprintRootWorkspaceElement extends LitElement {
 	render() {
-		return html` <div>Document Blueprint Root Workspace</div> `;
+		return html`<div>Document Blueprint Root Workspace</div> `;
 	}
 }
 
