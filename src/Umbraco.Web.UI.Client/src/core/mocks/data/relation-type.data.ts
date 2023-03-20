@@ -1,6 +1,6 @@
 import { UmbEntityData } from './entity.data';
-import { createEntityTreeItem, createFolderTreeItem } from './utils';
-import type { EntityTreeItemModel, FolderTreeItemModel, RelationTypeResponseModel } from '@umbraco-cms/backend-api';
+import { createEntityTreeItem } from './utils';
+import type { EntityTreeItemResponseModel, RelationTypeResponseModel } from '@umbraco-cms/backend-api';
 
 // TODO: investigate why we don't get an entity type as part of the RelationTypeResponseModel
 export const data: Array<RelationTypeResponseModel> = [
@@ -71,7 +71,7 @@ export const data: Array<RelationTypeResponseModel> = [
 	},
 ];
 
-export const treeData: Array<EntityTreeItemModel> = [
+export const treeData: Array<EntityTreeItemResponseModel> = [
 	{
 		key: 'e0d39ff5-71d8-453f-b682-9d8d31ee5e06',
 		$type: 'EntityTreeItemViewModel',
@@ -130,18 +130,18 @@ class UmbRelationTypeData extends UmbEntityData<RelationTypeResponseModel> {
 	}
 
 	//TODO Can relation types have children?
-	getTreeRoot(): Array<FolderTreeItemModel> {
+	getTreeRoot(): Array<EntityTreeItemResponseModel> {
 		const rootItems = this.treeData;
 		return rootItems.map((item) => createEntityTreeItem(item));
 	}
 
 	//TODO Can relation types have children?
-	getTreeItemChildren(key: string): Array<FolderTreeItemModel> {
+	getTreeItemChildren(key: string): Array<EntityTreeItemResponseModel> {
 		const childItems = this.treeData.filter((item) => item.parentKey === key);
 		return childItems.map((item) => createEntityTreeItem(item));
 	}
 
-	getTreeItem(keys: Array<string>): Array<FolderTreeItemModel> {
+	getTreeItem(keys: Array<string>): Array<EntityTreeItemResponseModel> {
 		const items = this.treeData.filter((item) => keys.includes(item.key ?? ''));
 		return items.map((item) => createEntityTreeItem(item));
 	}

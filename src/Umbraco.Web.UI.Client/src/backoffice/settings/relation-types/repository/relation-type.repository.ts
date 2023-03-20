@@ -66,6 +66,12 @@ export class UmbRelationTypeRepository implements UmbTreeRepository, UmbDetailRe
 		return { data, error, asObservable: () => this.#treeStore!.rootItems };
 	}
 
+	//TODO RelationTypes can't have children. But this method is required by the tree interface.
+	async requestTreeItemsOf(parentKey: string | null) {
+		const error: ProblemDetailsModel = { title: 'Not implemented' };
+		return { data: undefined, error };
+	}
+
 	async requestTreeItems(keys: Array<string>) {
 		await this.#init;
 
