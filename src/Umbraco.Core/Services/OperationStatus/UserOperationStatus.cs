@@ -7,6 +7,7 @@ public enum UserOperationStatus
     MissingUserGroup,
     UserNameIsNotEmail,
     EmailCannotBeChanged,
+    NoUserGroup,
     DuplicateUserName,
     DuplicateEmail,
     Unauthorized,

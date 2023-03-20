@@ -777,6 +777,11 @@ internal class UserService : RepositoryService, IUserService
             return UserOperationStatus.DuplicateUserName;
         }
 
+        if(model.UserGroups.Count == 0)
+        {
+            return UserOperationStatus.NoUserGroup;
+        }
+
         return UserOperationStatus.Success;
     }
 
