@@ -170,20 +170,24 @@ export class UmbExtensionRegistry {
 		) as Observable<Array<T>>;
 	}
 
-	extensionsOfTypes<ExtensionTypes = ManifestBase>(types: string[]): Observable<Array<ExtensionTypes>> {
+	extensionsOfTypes<ExtensionTypes extends ManifestBase = ManifestBase>(
+		types: string[]
+	): Observable<Array<ExtensionTypes>> {
 		return this._extensionsOfTypes(types).pipe(
 			withLatestFrom(this._kindsOfTypes(types)),
 			map(([exts, kinds]) =>
 				exts
 					.map((ext) => {
 						// Specific Extension Meta merge (does not merge conditions)
-						const baseManifest = kinds.find((kind) => kind.matchKind === ext.kind)?.manifest;
-						if (baseManifest) {
-							const merged = { ...baseManifest, ...ext } as any;
-							if ((baseManifest as any).meta) {
-								merged.meta = { ...(baseManifest as any).meta, ...(ext as any).meta };
+						if (ext) {
+							const baseManifest = kinds.find((kind) => kind.matchKind === ext.kind)?.manifest;
+							if (baseManifest) {
+								const merged = { ...baseManifest, ...ext } as any;
+								if ((baseManifest as any).meta) {
+									merged.meta = { ...(baseManifest as any).meta, ...(ext as any).meta };
+								}
+								return merged;
 							}
-							return merged;
 						}
 						return ext;
 					})
