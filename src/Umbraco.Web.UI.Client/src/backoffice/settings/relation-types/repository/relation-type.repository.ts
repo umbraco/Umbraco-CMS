@@ -147,7 +147,7 @@ export class UmbRelationTypeRepository implements UmbTreeRepository, UmbDetailRe
 		const { error } = await this.#detailDataSource.insert(template);
 
 		if (!error) {
-			const notification = { data: { message: `Document created` } };
+			const notification = { data: { message: `Relation Type created` } };
 			this.#notificationContext?.peek('positive', notification);
 		}
 
@@ -163,13 +163,13 @@ export class UmbRelationTypeRepository implements UmbTreeRepository, UmbDetailRe
 		await this.#init;
 
 		if (!item || !item.key) {
-			throw new Error('Document-Type is missing');
+			throw new Error('Relation Type is missing');
 		}
 
 		const { error } = await this.#detailDataSource.update(item);
 
 		if (!error) {
-			const notification = { data: { message: `Document saved` } };
+			const notification = { data: { message: `Relation Type saved` } };
 			this.#notificationContext?.peek('positive', notification);
 		}
 
@@ -189,13 +189,13 @@ export class UmbRelationTypeRepository implements UmbTreeRepository, UmbDetailRe
 		await this.#init;
 
 		if (!key) {
-			throw new Error('Document key is missing');
+			throw new Error('Relation Type key is missing');
 		}
 
 		const { error } = await this.#detailDataSource.delete(key);
 
 		if (!error) {
-			const notification = { data: { message: `Document deleted` } };
+			const notification = { data: { message: `Relation Type deleted` } };
 			this.#notificationContext?.peek('positive', notification);
 		}
 

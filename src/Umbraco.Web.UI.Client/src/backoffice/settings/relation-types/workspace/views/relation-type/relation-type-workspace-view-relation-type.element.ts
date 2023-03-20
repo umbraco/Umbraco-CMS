@@ -22,39 +22,42 @@ export class UmbRelationTypeWorkspaceViewRelationTypeElement extends UmbLitEleme
 	@state()
 	private _relationType?: RelationTypeResponseModel;
 
-	#workspaceContext?: UmbRelationTypeWorkspaceContext;
+	private _workspaceContext?: UmbRelationTypeWorkspaceContext;
 
 	constructor() {
 		super();
 
 		this.consumeContext<UmbRelationTypeWorkspaceContext>('umbWorkspaceContext', (instance) => {
-			this.#workspaceContext = instance;
+			this._workspaceContext = instance;
 			this._observeRelationType();
 		});
 	}
 
 	private _observeRelationType() {
-		if (!this.#workspaceContext) {
+		if (!this._workspaceContext) {
 			return;
 		}
 
-		this.observe(this.#workspaceContext.data, (relationType) => {
+		console.log('this._workspaceContext.data', this._workspaceContext);
+
+		this.observe(this._workspaceContext.data, (relationType) => {
+			console.log('relationType', relationType);
 			if (!relationType) return;
 
-			this._relationType = relationType as RelationTypeBaseModel;
+			this._relationType = relationType;
 		});
 	}
 
 	#handleDirectionChange(event: UUIRadioGroupEvent) {
 		const target = event.target as UUIRadioGroupElement;
 		const value = target.value === 'true';
-		this.#workspaceContext?.update('isBidirectional', value);
+		this._workspaceContext?.update('isBidirectional', value);
 	}
 
 	#handleIsDependencyChange(event: UUIBooleanInputEvent) {
 		const target = event.target as UUIToggleElement;
 		const value = target.checked;
-		this.#workspaceContext?.update('isDependency', value);
+		this._workspaceContext?.update('isDependency', value);
 	}
 
 	render() {

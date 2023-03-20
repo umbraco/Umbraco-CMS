@@ -21,9 +21,12 @@ export class UmbRelationTypeWorkspaceContext
 
 	async load(key: string) {
 		const { data } = await this.repository.requestByKey(key);
+
 		if (data) {
 			this.setIsNew(false);
 			this.#data.update(data);
+
+			console.log('THS', this);
 		}
 	}
 
@@ -63,6 +66,8 @@ export class UmbRelationTypeWorkspaceContext
 	}
 
 	update<K extends keyof RelationTypeBaseModel>(key: K, value: RelationTypeBaseModel[K]) {
+		console.log('update', key, value);
+
 		this.#data.next({ ...this.#data.value, [key]: value });
 	}
 
