@@ -1,5 +1,6 @@
 import type { ManifestSectionSidebarAppMenuKind } from '../../src/backoffice/shared/components/section/section-sidebar-menu/section-sidebar-menu.element';
-import { ManifestHeaderAppButtonKind } from '../../src/backoffice/shared/components/header-app/header-app-button.element';
+import type { ManifestHeaderAppButtonKind } from '../../src/backoffice/shared/components/header-app/header-app-button.element';
+import type { ManifestMenuItemTreeKind } from '../../src/backoffice/shared/components/tree/tree-menu-item/tree-menu-item.element';
 import type { ManifestCollectionView } from './collection-view.models';
 import type { ManifestDashboard } from './dashboard.models';
 import type { ManifestDashboardCollection } from './dashboard-collection.models';
@@ -78,6 +79,7 @@ export type ManifestTypes =
 	| ManifestSectionView
 	| ManifestMenu
 	| ManifestMenuItem
+	| ManifestMenuItemTreeKind
 	| ManifestTheme
 	| ManifestTree
 	| ManifestUserDashboard

@@ -1,17 +1,13 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
-import {
-	ManifestKind,
-	ManifestMenu,
-	ManifestMenuSectionSidebarApp,
-	ManifestSectionSidebarApp,
-} from '@umbraco-cms/extensions-registry';
+import { ManifestKind, ManifestMenu, ManifestSectionSidebarApp } from '@umbraco-cms/extensions-registry';
 import { UmbLitElement } from '@umbraco-cms/element';
 
 import '../../menu/menu.element';
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-api';
 
+// TODO: Move to separate file:
 const manifest: ManifestKind = {
 	type: 'kind',
 	matchKind: 'Umb.Kind.Menu',
