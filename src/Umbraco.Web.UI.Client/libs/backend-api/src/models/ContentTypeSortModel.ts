@@ -6,4 +6,3 @@ export type ContentTypeSortModel = {
     key?: string;
     sortOrder?: number;
 };
-

@@ -8,7 +8,7 @@ import { UUIComboboxElement, UUIComboboxEvent } from '@umbraco-ui/uui';
 import { UmbCultureRepository } from '../../../settings/cultures/repository/culture.repository';
 import { UmbChangeEvent } from '@umbraco-cms/events';
 import { UmbLitElement } from '@umbraco-cms/element';
-import { CultureModel } from '@umbraco-cms/backend-api';
+import { CultureReponseModel } from '@umbraco-cms/backend-api';
 
 @customElement('umb-input-culture-select')
 export class UmbInputCultureSelectElement extends FormControlMixin(UmbLitElement) {
@@ -33,7 +33,7 @@ export class UmbInputCultureSelectElement extends FormControlMixin(UmbLitElement
 	readonly = false;
 
 	@state()
-	private _cultures: CultureModel[] = [];
+	private _cultures: CultureReponseModel[] = [];
 
 	@state()
 	private _search = '';

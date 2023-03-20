@@ -26,9 +26,11 @@ const manifest = {
 	alias: 'My.WorkspaceAction',
 	name: 'My Workspace Action',
 	meta: {
-		workspaces: ['My.Workspace'],
 		label: 'My Action',
 		api: MyWorkspaceAction,
+	},
+	conditions: {
+		workspaces: ['My.Workspace'],
 	},
 };
 

@@ -5,17 +5,13 @@ import { UmbDocumentTypeTreeStore, UMB_DOCUMENT_TYPE_TREE_STORE_CONTEXT_TOKEN } 
 import { UmbDocumentTypeStore, UMB_DOCUMENT_TYPE_STORE_CONTEXT_TOKEN } from './document-type.store';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 import { UmbContextConsumerController } from '@umbraco-cms/context-api';
-import { ProblemDetailsModel, DocumentTypeModel } from '@umbraco-cms/backend-api';
+import { ProblemDetailsModel, DocumentTypeResponseModel } from '@umbraco-cms/backend-api';
 import type { UmbTreeRepository } from 'libs/repository/tree-repository.interface';
 import { UmbDetailRepository } from '@umbraco-cms/repository';
 import { UmbNotificationContext, UMB_NOTIFICATION_CONTEXT_TOKEN } from '@umbraco-cms/notification';
 
-type ItemType = DocumentTypeModel;
+type ItemType = DocumentTypeResponseModel;
 
-// Move to documentation / JSdoc
-/* We need to create a new instance of the repository from within the element context. We want the notifications to be displayed in the right context. */
-// element -> context -> repository -> (store) -> data source
-// All methods should be async and return a promise. Some methods might return an observable as part of the promise response.
 export class UmbDocumentTypeRepository implements UmbTreeRepository, UmbDetailRepository<ItemType> {
 	#init!: Promise<unknown>;
 
@@ -114,24 +110,15 @@ export class UmbDocumentTypeRepository implements UmbTreeRepository, UmbDetailRe
 	// DETAILS:
 
 	async createScaffold(parentKey: string | null) {
+		if (!parentKey) throw new Error('Parent key is missing');
 		await this.#init;
-
-		if (!parentKey) {
-			throw new Error('Parent key is missing');
-		}
-
 		return this.#detailDataSource.createScaffold(parentKey);
 	}
 
 	async requestByKey(key: string) {
+		if (!key) throw new Error('Key is missing');
 		await this.#init;
 
-		// TODO: should we show a notification if the key is missing?
-		// Investigate what is best for Acceptance testing, cause in that perspective a thrown error might be the best choice?
-		if (!key) {
-			const error: ProblemDetailsModel = { title: 'Key is missing' };
-			return { error };
-		}
 		const { data, error } = await this.#detailDataSource.get(key);
 
 		if (data) {
@@ -142,54 +129,56 @@ export class UmbDocumentTypeRepository implements UmbTreeRepository, UmbDetailRe
 	}
 
 	async byKey(key: string) {
+		if (!key) throw new Error('Key is missing');
 		await this.#init;
 		return this.#detailStore!.byKey(key);
+	}
+
+	// TODO: we need to figure out where to put this
+	async requestAllowedChildTypesOf(key: string) {
+		if (!key) throw new Error('Key is missing');
+		await this.#init;
+		return this.#detailDataSource.getAllowedChildrenOf(key);
 	}
 
 	// Could potentially be general methods:
 
 	async create(template: ItemType) {
+		if (!template || !template.key) throw new Error('Template is missing');
 		await this.#init;
-
-		if (!template || !template.key) {
-			throw new Error('Template is missing');
-		}
 
 		const { error } = await this.#detailDataSource.insert(template);
 
 		if (!error) {
 			const notification = { data: { message: `Document created` } };
 			this.#notificationContext?.peek('positive', notification);
-		}
 
-		// TODO: we currently don't use the detail store for anything.
-		// Consider to look up the data before fetching from the server
-		this.#detailStore?.append(template);
-		// TODO: Update tree store with the new item? or ask tree to request the new item?
+			// TODO: we currently don't use the detail store for anything.
+			// Consider to look up the data before fetching from the server
+			this.#detailStore?.append(template);
+			// TODO: Update tree store with the new item? or ask tree to request the new item?
+		}
 
 		return { error };
 	}
 
 	async save(item: ItemType) {
+		if (!item || !item.key) throw new Error('Document-Type is missing');
 		await this.#init;
-
-		if (!item || !item.key) {
-			throw new Error('Document-Type is missing');
-		}
 
 		const { error } = await this.#detailDataSource.update(item);
 
 		if (!error) {
 			const notification = { data: { message: `Document saved` } };
 			this.#notificationContext?.peek('positive', notification);
-		}
 
-		// TODO: we currently don't use the detail store for anything.
-		// Consider to look up the data before fetching from the server
-		// Consider notify a workspace if a template is updated in the store while someone is editing it.
-		this.#detailStore?.append(item);
-		this.#treeStore?.updateItem(item.key, { name: item.name });
-		// TODO: would be nice to align the stores on methods/methodNames.
+			// TODO: we currently don't use the detail store for anything.
+			// Consider to look up the data before fetching from the server
+			// Consider notify a workspace if a template is updated in the store while someone is editing it.
+			this.#detailStore?.append(item);
+			this.#treeStore?.updateItem(item.key, { name: item.name });
+			// TODO: would be nice to align the stores on methods/methodNames.
+		}
 
 		return { error };
 	}
@@ -197,25 +186,22 @@ export class UmbDocumentTypeRepository implements UmbTreeRepository, UmbDetailRe
 	// General:
 
 	async delete(key: string) {
+		if (!key) throw new Error('Document key is missing');
 		await this.#init;
-
-		if (!key) {
-			throw new Error('Document key is missing');
-		}
 
 		const { error } = await this.#detailDataSource.delete(key);
 
 		if (!error) {
 			const notification = { data: { message: `Document deleted` } };
 			this.#notificationContext?.peek('positive', notification);
-		}
 
-		// TODO: we currently don't use the detail store for anything.
-		// Consider to look up the data before fetching from the server.
-		// Consider notify a workspace if a template is deleted from the store while someone is editing it.
-		this.#detailStore?.remove([key]);
-		this.#treeStore?.removeItem(key);
-		// TODO: would be nice to align the stores on methods/methodNames.
+			// TODO: we currently don't use the detail store for anything.
+			// Consider to look up the data before fetching from the server.
+			// Consider notify a workspace if a template is deleted from the store while someone is editing it.
+			this.#detailStore?.remove([key]);
+			this.#treeStore?.removeItem(key);
+			// TODO: would be nice to align the stores on methods/methodNames.
+		}
 
 		return { error };
 	}

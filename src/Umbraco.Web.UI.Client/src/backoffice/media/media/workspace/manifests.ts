@@ -26,10 +26,12 @@ const workspaceViews: Array<ManifestWorkspaceView> = [
 			import('../../../shared/components/workspace/workspace-content/views/edit/workspace-view-content-edit.element'),
 		weight: 200,
 		meta: {
-			workspaces: ['Umb.Workspace.Media'],
 			label: 'Media',
 			pathname: 'media',
 			icon: 'umb:picture',
+		},
+		conditions: {
+			workspaces: ['Umb.Workspace.Media'],
 		},
 	},
 	{
@@ -40,10 +42,12 @@ const workspaceViews: Array<ManifestWorkspaceView> = [
 			import('../../../shared/components/workspace/workspace-content/views/info/workspace-view-content-info.element'),
 		weight: 100,
 		meta: {
-			workspaces: ['Umb.Workspace.Media'],
 			label: 'Info',
 			pathname: 'info',
 			icon: 'info',
+		},
+		conditions: {
+			workspaces: ['Umb.Workspace.Media'],
 		},
 	},
 ];
@@ -55,12 +59,14 @@ const workspaceViewCollections: Array<ManifestWorkspaceViewCollection> = [
 		name: 'Media Workspace Collection View',
 		weight: 300,
 		meta: {
-			workspaces: ['Umb.Workspace.Media'],
 			label: 'Media',
 			pathname: 'collection',
 			icon: 'umb:grid',
 			entityType: 'media',
 			repositoryAlias: MEDIA_REPOSITORY_ALIAS,
+		},
+		conditions: {
+			workspaces: ['Umb.Workspace.Media'],
 		},
 	},
 ];
@@ -71,11 +77,13 @@ const workspaceActions: Array<ManifestWorkspaceAction> = [
 		alias: 'Umb.WorkspaceAction.Media.Save',
 		name: 'Save Media Workspace Action',
 		meta: {
-			workspaces: ['Umb.Workspace.Media'],
 			label: 'Save',
 			look: 'primary',
 			color: 'positive',
 			api: UmbSaveWorkspaceAction,
+		},
+		conditions: {
+			workspaces: ['Umb.Workspace.Media'],
 		},
 	},
 ];

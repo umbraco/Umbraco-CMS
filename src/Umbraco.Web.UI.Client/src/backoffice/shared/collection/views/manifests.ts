@@ -11,8 +11,10 @@ export const manifests: Array<ManifestCollectionView> = [
 		meta: {
 			label: 'Grid',
 			icon: 'umb:grid',
-			entityType: 'media',
 			pathName: 'grid',
+		},
+		conditions: {
+			entityType: 'media',
 		},
 	},
 	{
@@ -25,8 +27,10 @@ export const manifests: Array<ManifestCollectionView> = [
 		meta: {
 			label: 'Table',
 			icon: 'umb:box',
-			entityType: 'media',
 			pathName: 'table',
+		},
+		conditions: {
+			entityType: 'media',
 		},
 	},
 	{
@@ -39,8 +43,10 @@ export const manifests: Array<ManifestCollectionView> = [
 		meta: {
 			label: 'Test',
 			icon: 'umb:newspaper',
-			entityType: 'media',
 			pathName: 'test',
+		},
+		conditions: {
+			entityType: 'media',
 		},
 	},
 ];

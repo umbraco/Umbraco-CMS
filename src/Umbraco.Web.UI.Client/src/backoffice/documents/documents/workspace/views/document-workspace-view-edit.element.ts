@@ -5,7 +5,7 @@ import { repeat } from 'lit/directives/repeat.js';
 import { UmbDocumentWorkspaceContext } from '../document-workspace.context';
 import type { UmbRouterSlotChangeEvent, UmbRouterSlotInitEvent, IRoute } from '@umbraco-cms/router';
 import { UmbLitElement } from '@umbraco-cms/element';
-import { PropertyTypeContainerViewModelBaseModel } from '@umbraco-cms/backend-api';
+import { PropertyTypeContainerResponseModelBaseModel } from '@umbraco-cms/backend-api';
 
 @customElement('umb-document-workspace-view-edit')
 export class UmbDocumentWorkspaceViewEditElement extends UmbLitElement {
@@ -26,7 +26,7 @@ export class UmbDocumentWorkspaceViewEditElement extends UmbLitElement {
 	private _routes: IRoute[] = [];
 
 	@state()
-	_tabs: Array<PropertyTypeContainerViewModelBaseModel> = [];
+	_tabs: Array<PropertyTypeContainerResponseModelBaseModel> = [];
 
 	@state()
 	private _routerPath?: string;

@@ -1,10 +1,10 @@
 import { rest } from 'msw';
 import { umbDocumentTypeData } from '../data/document-type.data';
-import type { DocumentTypeModel } from '@umbraco-cms/backend-api';
+import type { DocumentTypeResponseModel } from '@umbraco-cms/backend-api';
 
 // TODO: add schema
 export const handlers = [
-	rest.post<DocumentTypeModel[]>('/umbraco/management/api/v1/document-type/:key', (req, res, ctx) => {
+	rest.post<DocumentTypeResponseModel>('/umbraco/management/api/v1/document-type/:key', (req, res, ctx) => {
 		const data = req.body;
 		if (!data) return;
 
@@ -22,7 +22,7 @@ export const handlers = [
 		return res(ctx.status(200), ctx.json([document]));
 	}),
 
-	rest.post<DocumentTypeModel[]>('/umbraco/management/api/v1/document-type/details/save', (req, res, ctx) => {
+	rest.post<DocumentTypeResponseModel>('/umbraco/management/api/v1/document-type/details/save', (req, res, ctx) => {
 		const data = req.body;
 		if (!data) return;
 
@@ -67,8 +67,17 @@ export const handlers = [
 		const key = req.params.key as string;
 		if (!key) return;
 
-		const document = umbDocumentTypeData.getByKey(key);
+		const documentType = umbDocumentTypeData.getByKey(key);
 
-		return res(ctx.status(200), ctx.json(document));
+		return res(ctx.status(200), ctx.json(documentType));
+	}),
+
+	rest.get('/umbraco/management/api/v1/document-type/allowed-children-of/:key', (req, res, ctx) => {
+		const key = req.params.key as string;
+		if (!key) return;
+
+		const items = umbDocumentTypeData.getAllowedTypesOf(key);
+
+		return res(ctx.status(200), ctx.json(items));
 	}),
 ];

@@ -5,11 +5,11 @@ import { UmbTemplateTreeStore, UMB_TEMPLATE_TREE_STORE_CONTEXT_TOKEN } from './t
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 import { UmbNotificationContext, UMB_NOTIFICATION_CONTEXT_TOKEN } from '@umbraco-cms/notification';
 import { UmbContextConsumerController } from '@umbraco-cms/context-api';
-import { ProblemDetailsModel, TemplateModel } from '@umbraco-cms/backend-api';
+import { ProblemDetailsModel, TemplateResponseModel } from '@umbraco-cms/backend-api';
 import { UmbDetailRepository } from 'libs/repository/detail-repository.interface';
 import { UmbTreeRepository } from 'libs/repository/tree-repository.interface';
 
-export class UmbTemplateRepository implements UmbTreeRepository, UmbDetailRepository<TemplateModel> {
+export class UmbTemplateRepository implements UmbTreeRepository, UmbDetailRepository<TemplateResponseModel> {
 	#init;
 	#host: UmbControllerHostInterface;
 
@@ -135,7 +135,7 @@ export class UmbTemplateRepository implements UmbTreeRepository, UmbDetailReposi
 
 	// Could potentially be general methods:
 
-	async create(template: TemplateModel) {
+	async create(template: TemplateResponseModel) {
 		await this.#init;
 
 		if (!template || !template.key) {
@@ -157,7 +157,7 @@ export class UmbTemplateRepository implements UmbTreeRepository, UmbDetailReposi
 		return { error };
 	}
 
-	async save(template: TemplateModel) {
+	async save(template: TemplateResponseModel) {
 		await this.#init;
 
 		if (!template || !template.key) {

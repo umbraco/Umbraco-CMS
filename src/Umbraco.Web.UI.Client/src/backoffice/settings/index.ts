@@ -2,6 +2,7 @@ import { manifests as settingsSectionManifests } from './section.manifests';
 import { manifests as settingsMenuManifests } from './menu.manifests';
 import { manifests as dashboardManifests } from './dashboards/manifests';
 import { manifests as dataTypeManifests } from './data-types/manifests';
+import { manifests as relationTypeManifests } from './relation-types/manifests';
 import { manifests as extensionManifests } from './extensions/manifests';
 import { manifests as cultureManifests } from './cultures/manifests';
 import { manifests as languageManifests } from './languages/manifests';
@@ -19,6 +20,7 @@ export const manifests = [
 	...cultureManifests,
 	...languageManifests,
 	...logviewerManifests,
+	...relationTypeManifests,
 ];
 
 const registerExtensions = (manifests: Array<ManifestTypes>) => {

@@ -9,7 +9,7 @@ import { UmbRoute } from './route.interface';
 import { UmbLitElement } from '@umbraco-cms/element';
 
 /**
- *  @element umb-router-slot-element
+ *  @element umb-router-slot
  *  @description - Component for wrapping Router Slot element, providing some local events for implementation.
  *  @extends UmbLitElement
  * @fires {UmbRouterSlotInitEvent} init - fires when the router is connected

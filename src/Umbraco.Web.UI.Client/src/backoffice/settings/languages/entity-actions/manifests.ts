@@ -10,11 +10,13 @@ const entityActions: Array<ManifestEntityAction> = [
 		alias: 'Umb.EntityAction.Language.Delete',
 		name: 'Delete Language Entity Action',
 		meta: {
-			entityType,
 			repositoryAlias: LANGUAGE_REPOSITORY_ALIAS,
 			icon: 'umb:trash',
 			label: 'Delete',
 			api: UmbDeleteEntityAction,
+		},
+		conditions: {
+			entityType,
 		},
 	},
 ];

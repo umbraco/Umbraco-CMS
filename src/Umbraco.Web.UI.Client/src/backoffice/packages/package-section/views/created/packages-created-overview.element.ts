@@ -4,7 +4,7 @@ import { customElement, state } from 'lit/decorators.js';
 import { repeat } from 'lit/directives/repeat.js';
 import { UUIPaginationEvent } from '@umbraco-ui/uui';
 import { UMB_CONFIRM_MODAL_TOKEN } from '../../../../shared/modals/confirm';
-import { PackageDefinitionModel, PackageResource } from '@umbraco-cms/backend-api';
+import { PackageDefinitionResponseModel, PackageResource } from '@umbraco-cms/backend-api';
 import { UmbLitElement } from '@umbraco-cms/element';
 import { tryExecuteAndNotify } from '@umbraco-cms/resources';
 import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN } from '@umbraco-cms/modal';
@@ -44,7 +44,7 @@ export class UmbPackagesCreatedOverviewElement extends UmbLitElement {
 	private _loading = true;
 
 	@state()
-	private _createdPackages: PackageDefinitionModel[] = [];
+	private _createdPackages: PackageDefinitionResponseModel[] = [];
 
 	@state()
 	private _currentPage = 1;
@@ -103,7 +103,7 @@ export class UmbPackagesCreatedOverviewElement extends UmbLitElement {
 		</uui-box>`;
 	}
 
-	#renderPackageItem(p: PackageDefinitionModel) {
+	#renderPackageItem(p: PackageDefinitionResponseModel) {
 		return html`<uui-ref-node-package name=${ifDefined(p.name)} @open="${() => this.#packageBuilder(p)}">
 			<uui-action-bar slot="actions">
 				<uui-button @click=${() => this.#deletePackage(p)} label="Delete package">
@@ -113,7 +113,7 @@ export class UmbPackagesCreatedOverviewElement extends UmbLitElement {
 		</uui-ref-node-package>`;
 	}
 
-	#packageBuilder(p: PackageDefinitionModel) {
+	#packageBuilder(p: PackageDefinitionResponseModel) {
 		if (!p.key) return;
 		window.history.pushState({}, '', `/section/packages/view/created/package-builder/${p.key}`);
 	}
@@ -133,7 +133,7 @@ export class UmbPackagesCreatedOverviewElement extends UmbLitElement {
 		this.#getPackages();
 	}
 
-	async #deletePackage(p: PackageDefinitionModel) {
+	async #deletePackage(p: PackageDefinitionResponseModel) {
 		if (!p.key) return;
 		const modalHandler = this._modalContext?.open(UMB_CONFIRM_MODAL_TOKEN, {
 			color: 'danger',

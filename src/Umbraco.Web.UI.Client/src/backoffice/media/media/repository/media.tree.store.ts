@@ -1,4 +1,4 @@
-import { EntityTreeItemModel } from '@umbraco-cms/backend-api';
+import { EntityTreeItemResponseModel } from '@umbraco-cms/backend-api';
 import { UmbContextToken } from '@umbraco-cms/context-api';
 import { ArrayState } from '@umbraco-cms/observable-api';
 import { UmbTreeStoreBase } from '@umbraco-cms/store';
@@ -13,7 +13,7 @@ export const UMB_MEDIA_TREE_STORE_CONTEXT_TOKEN = new UmbContextToken<UmbMediaTr
  * @description - Tree Data Store for Media
  */
 export class UmbMediaTreeStore extends UmbTreeStoreBase {
-	#data = new ArrayState<EntityTreeItemModel>([], (x) => x.key);
+	#data = new ArrayState<EntityTreeItemResponseModel>([], (x) => x.key);
 
 	/**
 	 * Creates an instance of UmbMediaTreeStore.

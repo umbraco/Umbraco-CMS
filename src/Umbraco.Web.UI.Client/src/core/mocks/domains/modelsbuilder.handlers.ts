@@ -1,7 +1,7 @@
 import { rest } from 'msw';
 
 import { umbracoPath } from '@umbraco-cms/utils';
-import { ModelsBuilderModel, ModelsModeModel, OutOfDateStatusModel } from '@umbraco-cms/backend-api';
+import { ModelsBuilderResponseModel, ModelsModeModel, OutOfDateStatusResponseModel } from '@umbraco-cms/backend-api';
 
 export const handlers = [
 	rest.post(umbracoPath('/models-builder/build'), async (_req, res, ctx) => {
@@ -15,20 +15,20 @@ export const handlers = [
 	}),
 
 	rest.get(umbracoPath('/models-builder/dashboard'), async (_req, res, ctx) => {
-		return res(ctx.status(200), ctx.json<ModelsBuilderModel>(model));
+		return res(ctx.status(200), ctx.json<ModelsBuilderResponseModel>(model));
 	}),
 
 	rest.get(umbracoPath('/models-builder/status'), async (_req, res, ctx) => {
 		return res(
 			// Respond with a 200 status code
 			ctx.status(200),
-			ctx.json<OutOfDateStatusModel>({})
+			ctx.json<OutOfDateStatusResponseModel>({})
 		);
 	}),
 ];
 
 // Mock Data for now
-const modelBeforeBuild: ModelsBuilderModel = {
+const modelBeforeBuild: ModelsBuilderResponseModel = {
 	mode: ModelsModeModel.IN_MEMORY_AUTO,
 	canGenerate: true,
 	outOfDateModels: true,
@@ -49,7 +49,7 @@ at async TransformContext.transform (file:///C:/Users/Umbraco/Documents/Umbraco.
 	trackingOutOfDateModels: true,
 };
 
-const modelAfterBuild: ModelsBuilderModel = {
+const modelAfterBuild: ModelsBuilderResponseModel = {
 	mode: ModelsModeModel.IN_MEMORY_AUTO,
 	canGenerate: true,
 	outOfDateModels: false,

@@ -3,10 +3,10 @@ import { v4 as uuidv4 } from 'uuid';
 
 import { umbracoPath } from '@umbraco-cms/utils';
 import {
-	PackageCreateModel,
-	PackageDefinitionModel,
-	PagedPackageDefinitionModel,
-	PagedPackageMigrationStatusModel,
+	PackageMigrationStatusResponseModel,
+	PackageDefinitionResponseModel,
+	PagedPackageDefinitionResponseModel,
+	PagedPackageMigrationStatusResponseModel,
 } from '@umbraco-cms/backend-api';
 
 export const handlers = [
@@ -14,7 +14,7 @@ export const handlers = [
 		return res(
 			// Respond with a 200 status code
 			ctx.status(200),
-			ctx.json<PagedPackageMigrationStatusModel>({
+			ctx.json<PagedPackageMigrationStatusResponseModel>({
 				total: 3,
 				items: [
 					{
@@ -44,7 +44,7 @@ export const handlers = [
 		// read all
 		return res(
 			ctx.status(200),
-			ctx.json<PagedPackageDefinitionModel>({
+			ctx.json<PagedPackageDefinitionResponseModel>({
 				total: packageArray.length,
 				items: packageArray,
 			})
@@ -53,10 +53,10 @@ export const handlers = [
 
 	rest.post(umbracoPath('/package/created'), async (_req, res, ctx) => {
 		//save
-		const data: PackageCreateModel = await _req.json();
-		const newPackage: PackageDefinitionModel = { ...data, key: uuidv4() };
+		const data: PackageMigrationStatusResponseModel = await _req.json();
+		const newPackage: PackageDefinitionResponseModel = { ...data, key: uuidv4() };
 		packageArray.push(newPackage);
-		return res(ctx.status(200), ctx.json<PackageDefinitionModel>(newPackage));
+		return res(ctx.status(200), ctx.json<PackageDefinitionResponseModel>(newPackage));
 	}),
 
 	rest.get(umbracoPath('/package/created/:key'), (_req, res, ctx) => {
@@ -65,12 +65,12 @@ export const handlers = [
 		if (!key) return res(ctx.status(404));
 		const found = packageArray.find((p) => p.key == key);
 		if (!found) return res(ctx.status(404));
-		return res(ctx.status(200), ctx.json<PackageDefinitionModel>(found));
+		return res(ctx.status(200), ctx.json<PackageDefinitionResponseModel>(found));
 	}),
 
 	rest.put(umbracoPath('/package/created/:key'), async (_req, res, ctx) => {
 		//update
-		const data: PackageDefinitionModel = await _req.json();
+		const data: PackageDefinitionResponseModel = await _req.json();
 		if (!data.key) return;
 		const index = packageArray.findIndex((x) => x.key === data.key);
 		packageArray[index] = data;
@@ -93,7 +93,7 @@ export const handlers = [
 	}),
 ];
 
-const packageArray: PackageDefinitionModel[] = [
+const packageArray: PackageDefinitionResponseModel[] = [
 	{
 		key: '2a0181ec-244b-4068-a1d7-2f95ed7e6da6',
 		packagePath: undefined,

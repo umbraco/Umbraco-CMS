@@ -22,10 +22,6 @@ export class UmbSectionContext {
 	#activeTreeItem = new ObjectState<ActiveTreeItemType | undefined>(undefined);
 	public readonly activeTreeItem = this.#activeTreeItem.asObservable();
 
-	// TODO: what is the best context to put this in?
-	#activeViewPathname = new StringState(undefined);
-	public readonly activeViewPathname = this.#activeViewPathname.asObservable();
-
 	constructor(manifest: ManifestSection) {
 		this.setManifest(manifest);
 	}
@@ -45,10 +41,6 @@ export class UmbSectionContext {
 
 	public setActiveTreeItem(item?: ActiveTreeItemType) {
 		this.#activeTreeItem.next(item);
-	}
-
-	public setActiveView(view?: ManifestSectionView) {
-		this.#activeViewPathname.next(view?.meta.pathname);
 	}
 }
 
