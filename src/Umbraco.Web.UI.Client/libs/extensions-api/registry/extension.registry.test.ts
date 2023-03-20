@@ -84,14 +84,13 @@ describe('UmbExtensionRegistry', () => {
 				.unsubscribe();
 		});
 
-		// TODO: What kind of weighting would we like to use?
 		it('should return extensions ordered by weight', (done) => {
 			extensionRegistry
 				.extensionsOfType(type)
 				.subscribe((extensions) => {
-					expect(extensions?.[0]?.weight).to.eq(1);
+					expect(extensions?.[0]?.weight).to.eq(200);
 					expect(extensions?.[1]?.weight).to.eq(25);
-					expect(extensions?.[2]?.weight).to.eq(200);
+					expect(extensions?.[2]?.weight).to.eq(1);
 					done();
 				})
 				.unsubscribe();
@@ -166,9 +165,11 @@ describe('UmbExtensionRegistry with kinds', () => {
 			.extensionsOfType('section')
 			.subscribe((extensions) => {
 				expect(extensions).to.have.lengthOf(3);
-				expect(extensions?.[0]?.elementName).to.eq('my-kind-element');
+				expect(extensions?.[0]?.elementName).to.not.eq('my-kind-element');
+				expect(extensions?.[1]?.alias).to.eq('Umb.Test.Section.3');
 				expect(extensions?.[1]?.elementName).to.eq('my-kind-element');
-				expect(extensions?.[2]?.elementName).to.not.eq('my-kind-element');
+				expect(extensions?.[2]?.alias).to.eq('Umb.Test.Section.1');
+				expect(extensions?.[2]?.elementName).to.eq('my-kind-element');
 				done();
 			})
 			.unsubscribe();

@@ -29,6 +29,9 @@ import type { ManifestModal } from './modal.models';
 import type { ManifestStore, ManifestTreeStore } from './store.models';
 import type { ClassConstructor } from '@umbraco-cms/models';
 
+export * from '../../src/backoffice/shared/components/section/section-sidebar-menu/section-sidebar-menu.element';
+export * from '../../src/backoffice/shared/components/header-app/header-app-button.element';
+export * from '../../src/backoffice/shared/components/tree/tree-menu-item/tree-menu-item.element';
 export * from './collection-view.models';
 export * from './dashboard-collection.models';
 export * from './dashboard.models';
