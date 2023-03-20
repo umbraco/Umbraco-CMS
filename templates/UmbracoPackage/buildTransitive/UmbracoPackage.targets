@@ -3,7 +3,7 @@
     <UmbracoPackageMsBuildContentFilesPath>$(MSBuildThisFileDirectory)..\App_Plugins\UmbracoPackage\**\*.*</UmbracoPackageMsBuildContentFilesPath>
   </PropertyGroup>
 
-  <Target Name="CopyUmbracoPackageMsBuildAssets" BeforeTargets="Build">
+  <Target Name="CopyUmbracoPackageMsBuildAssets" BeforeTargets="BeforeBuild">
     <ItemGroup>
       <UmbracoPackageMsBuildContentFiles Include="$(UmbracoPackageMsBuildContentFilesPath)" />
     </ItemGroup>
