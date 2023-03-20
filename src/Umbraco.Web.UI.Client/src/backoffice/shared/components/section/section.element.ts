@@ -78,7 +78,7 @@ export class UmbSectionElement extends UmbLitElement {
 	#observeSectionSidebarApps() {
 		this.observe(
 			umbExtensionsRegistry
-				?.extensionsOfType('sectionSidebarApp')
+				.extensionsOfType('sectionSidebarApp')
 				.pipe(
 					map((manifests) =>
 						manifests.filter((manifest) => manifest.conditions.sections.includes(this.manifest?.alias || ''))
