@@ -6340,7 +6340,7 @@
                 "schema": {
                   "oneOf": [
                     {
-                      "$ref": "#/components/schemas/CreateTemporaryFileResponseModel"
+                      "$ref": "#/components/schemas/TemporaryFileResponseModel"
                     }
                   ]
                 }
@@ -7419,24 +7419,6 @@
             "$ref": "#/components/schemas/TemplateModelBaseModel"
           }
         ],
-        "additionalProperties": false
-      },
-      "CreateTemporaryFileResponseModel": {
-        "type": "object",
-        "properties": {
-          "key": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "availableUntil": {
-            "type": "string",
-            "format": "date-time",
-            "nullable": true
-          },
-          "fileName": {
-            "type": "string"
-          }
-        },
         "additionalProperties": false
       },
       "CultureReponseModel": {
@@ -10418,6 +10400,24 @@
         "type": "object",
         "properties": {
           "content": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "TemporaryFileResponseModel": {
+        "type": "object",
+        "properties": {
+          "key": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "availableUntil": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "fileName": {
             "type": "string"
           }
         },
