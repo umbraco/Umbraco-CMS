@@ -1,9 +1,11 @@
 ﻿using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Security;
+using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services;
@@ -38,21 +40,16 @@ public partial class UserServiceCrudTests
         };
     }
 
-    [Test]
-    [TestCase(true, false)]
-    [TestCase(false, true)]
-    public async Task Cannot_Change_Email_When_Deny_Local_Login_Is_True(bool denyLocalLogin, bool shouldSucceed)
+    private async Task<(UserUpdateModel updateModel, IUser createdUser)> CreateUserForUpdate(
+        IUserService userService,
+        string email = "test@test.com",
+        string userName = "test@test.com")
     {
-        var localLoginSetting = new Mock<ILocalLoginSettingProvider>();
-        localLoginSetting.Setup(x => x.HasDenyLocalLogin()).Returns(denyLocalLogin);
-
-        var userService = CreateUserService(localLoginSettingProvider: localLoginSetting.Object);
-
         var userGroup = await UserGroupService.GetAsync(Constants.Security.AdminGroupAlias);
         var createUserModel = new UserCreateModel
         {
-            Email = "test@test.com",
-            UserName = "test@test.com",
+            Email = email,
+            UserName = userName,
             Name = "Test Mc. Gee",
             UserGroups = new SortedSet<IUserGroup> { userGroup! }
         };
@@ -64,8 +61,24 @@ public partial class UserServiceCrudTests
 
         var savedUser = createExistingUser.Result.CreatedUser;
         var updateModel = await MapUserToUpdateModel(savedUser);
+        return (updateModel, createExistingUser.Result.CreatedUser);
+    }
 
-        var updatedEmail = "updated@email.com"; 
+    [Test]
+    [TestCase(true, false)]
+    [TestCase(false, true)]
+    public async Task Cannot_Change_Email_When_Deny_Local_Login_Is_True(bool denyLocalLogin, bool shouldSucceed)
+    {
+        var localLoginSetting = new Mock<ILocalLoginSettingProvider>();
+        localLoginSetting.Setup(x => x.HasDenyLocalLogin()).Returns(denyLocalLogin);
+
+        var userService = CreateUserService(
+            localLoginSettingProvider: localLoginSetting.Object,
+            securitySettings: new SecuritySettings { UsernameIsEmail = false });
+
+        var (updateModel, _) = await CreateUserForUpdate(userService);
+
+        var updatedEmail = "updated@email.com";
         updateModel.Email = updatedEmail;
 
         var result = await userService.UpdateAsync(Constants.Security.SuperUserKey, updateModel);
@@ -78,6 +91,38 @@ public partial class UserServiceCrudTests
         }
 
         Assert.IsTrue(result.Success);
-        Assert.AreEqual(updatedEmail, result.Result.Email);
+        // We'll get the user again to ensure that the changes has been persisted
+        var updatedUser = await userService.GetAsync(result.Result.Key);
+        Assert.IsNotNull(updatedUser);
+        Assert.AreEqual(updatedEmail, updatedUser.Email);
+    }
+
+    [Test]
+    [TestCase("same@email.com", "same@email.com", true)]
+    [TestCase("different@email.com", "another@email.com", false)]
+    [TestCase("notAnEmail", "some@email.com", false)]
+    public async Task UserName_And_Email_Must_Be_same_When_UserNameIsEmail_Equals_True(string userName, string email, bool shouldSucceed)
+    {
+        var userService = CreateUserService(securitySettings: new SecuritySettings { UsernameIsEmail = true });
+
+        var (updateModel, createdUser) = await CreateUserForUpdate(userService);
+
+        updateModel.UserName = userName;
+        updateModel.Email = email;
+
+        var result = await userService.UpdateAsync(Constants.Security.SuperUserKey, updateModel);
+
+        if (shouldSucceed is false)
+        {
+            Assert.IsFalse(result.Success);
+            Assert.AreEqual(UserOperationStatus.UserNameIsNotEmail, result.Status);
+            return;
+        }
+
+        Assert.IsTrue(result.Success);
+        var updatedUser = await userService.GetAsync(createdUser.Key);
+        Assert.IsNotNull(updatedUser);
+        Assert.AreEqual(userName, updatedUser.Username);
+        Assert.AreEqual(email, updatedUser.Email);
     }
 }
