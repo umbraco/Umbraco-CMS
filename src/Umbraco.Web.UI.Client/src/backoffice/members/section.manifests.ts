@@ -1,9 +1,4 @@
-import type {
-	ManifestDashboard,
-	ManifestSection,
-	ManifestMenuSectionSidebarApp,
-	ManifestTypes,
-} from '@umbraco-cms/models';
+import type { ManifestDashboard, ManifestSection, ManifestTypes } from '@umbraco-cms/models';
 
 const sectionAlias = 'Umb.Section.Members';
 

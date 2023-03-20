@@ -118,7 +118,7 @@ describe('UmbExtensionRegistry with kinds', () => {
 			},
 			{
 				type: 'section',
-				kind: 'test-kind',
+				kind: 'test-kind' as unknown as undefined, // We do not know about this one, so it makes good sense that its not a valid option.
 				name: 'test-section-1',
 				alias: 'Umb.Test.Section.1',
 				weight: 1,
@@ -139,7 +139,7 @@ describe('UmbExtensionRegistry with kinds', () => {
 			},
 			{
 				type: 'section',
-				kind: 'test-kind',
+				kind: 'test-kind' as unknown as undefined, // We do not know about this one, so it makes good sense that its not a valid option.
 				name: 'test-section-3',
 				alias: 'Umb.Test.Section.3',
 				weight: 25,

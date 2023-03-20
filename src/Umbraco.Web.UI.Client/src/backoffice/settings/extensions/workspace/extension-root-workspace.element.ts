@@ -3,14 +3,14 @@ import { customElement, state } from 'lit/decorators.js';
 import { map } from 'rxjs';
 import { UMB_CONFIRM_MODAL_TOKEN } from '../../../shared/modals/confirm';
 import { isManifestElementNameType, umbExtensionsRegistry } from '@umbraco-cms/extensions-api';
-import type { ManifestBase } from '@umbraco-cms/models';
+import type { ManifestTypes } from '@umbraco-cms/models';
 import { UmbLitElement } from '@umbraco-cms/element';
 import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN } from '@umbraco-cms/modal';
 
 @customElement('umb-extension-root-workspace')
 export class UmbExtensionRootWorkspaceElement extends UmbLitElement {
 	@state()
-	private _extensions?: Array<ManifestBase> = undefined;
+	private _extensions?: Array<ManifestTypes> = undefined;
 
 	private _modalContext?: UmbModalContext;
 
@@ -43,7 +43,7 @@ export class UmbExtensionRootWorkspaceElement extends UmbLitElement {
 		);
 	}
 
-	async #removeExtension(extension: ManifestBase) {
+	async #removeExtension(extension: ManifestTypes) {
 		const modalHandler = this._modalContext?.open(UMB_CONFIRM_MODAL_TOKEN, {
 			headline: 'Unload extension',
 			confirmLabel: 'Unload',
