@@ -12,23 +12,22 @@ public class LogViewerViewModelMapDefinition : IMapDefinition
 {
     public void DefineMaps(IUmbracoMapper mapper)
     {
-        mapper.Define<LogLevelCounts, LogLevelCountsReponseModel>((source, context) => new LogLevelCountsReponseModel(), Map);
+        mapper.Define<LogLevelCounts, LogLevelCountsReponseModel>((_, _) => new LogLevelCountsReponseModel(), Map);
         mapper.Define<KeyValuePair<string, string?>, LogMessagePropertyPresentationModel>(
-            (source, context) => new LogMessagePropertyPresentationModel() { Name = string.Empty }, Map);
-        mapper.Define<KeyValuePair<string, LogLevel>, LoggerResponseModel>((source, context) => new LoggerResponseModel() { Name = string.Empty }, Map);
+            (_, _) => new LogMessagePropertyPresentationModel { Name = string.Empty }, Map);
+        mapper.Define<KeyValuePair<string, LogLevel>, LoggerResponseModel>((_, _) => new LoggerResponseModel { Name = string.Empty }, Map);
         mapper.Define<ILogViewerQuery, SavedLogSearchResponseModel>(
-            (source, context) => new SavedLogSearchResponseModel()
+            (_, _) => new SavedLogSearchResponseModel
             {
                 Name = string.Empty,
                 Query = string.Empty
             },
             Map);
-        mapper.Define<LogTemplate, LogTemplateResponseModel>((source, context) => new LogTemplateResponseModel(), Map);
-        mapper.Define<ILogEntry, LogMessageResponseModel>((source, context) => new LogMessageResponseModel(), Map);
-        mapper.Define<IEnumerable<KeyValuePair<string, LogLevel>>, PagedViewModel<LoggerResponseModel>>((source, context) => new PagedViewModel<LoggerResponseModel>(), Map);
-        mapper.Define<IEnumerable<ILogViewerQuery>, PagedViewModel<SavedLogSearchResponseModel>>((source, context) => new PagedViewModel<SavedLogSearchResponseModel>(), Map);
-        mapper.Define<IEnumerable<LogTemplate>, PagedViewModel<LogTemplateResponseModel>>((source, context) => new PagedViewModel<LogTemplateResponseModel>(), Map);
-        mapper.Define<PagedModel<ILogEntry>, PagedViewModel<LogMessageResponseModel>>((source, context) => new PagedViewModel<LogMessageResponseModel>(), Map);
+        mapper.Define<LogTemplate, LogTemplateResponseModel>((_, _) => new LogTemplateResponseModel(), Map);
+        mapper.Define<ILogEntry, LogMessageResponseModel>((_, _) => new LogMessageResponseModel(), Map);
+        mapper.Define<PagedModel<ILogViewerQuery>, PagedViewModel<SavedLogSearchResponseModel>>((_, _) => new PagedViewModel<SavedLogSearchResponseModel>(), Map);
+        mapper.Define<PagedModel<LogTemplate>, PagedViewModel<LogTemplateResponseModel>>((_, _) => new PagedViewModel<LogTemplateResponseModel>(), Map);
+        mapper.Define<PagedModel<ILogEntry>, PagedViewModel<LogMessageResponseModel>>((_, _) => new PagedViewModel<LogMessageResponseModel>(), Map);
     }
 
     // Umbraco.Code.MapAll
@@ -82,24 +81,17 @@ public class LogViewerViewModelMapDefinition : IMapDefinition
     }
 
     // Umbraco.Code.MapAll
-    private static void Map(IEnumerable<KeyValuePair<string, LogLevel>> source, PagedViewModel<LoggerResponseModel> target, MapperContext context)
+    private static void Map(PagedModel<ILogViewerQuery> source, PagedViewModel<SavedLogSearchResponseModel> target, MapperContext context)
     {
-        target.Items = context.MapEnumerable<KeyValuePair<string, LogLevel>, LoggerResponseModel>(source);
-        target.Total = source.Count();
+        target.Items = context.MapEnumerable<ILogViewerQuery, SavedLogSearchResponseModel>(source.Items);
+        target.Total = source.Total;
     }
 
     // Umbraco.Code.MapAll
-    private static void Map(IEnumerable<ILogViewerQuery> source, PagedViewModel<SavedLogSearchResponseModel> target, MapperContext context)
+    private static void Map(PagedModel<LogTemplate> source, PagedViewModel<LogTemplateResponseModel> target, MapperContext context)
     {
-        target.Items = context.MapEnumerable<ILogViewerQuery, SavedLogSearchResponseModel>(source);
-        target.Total = source.Count();
-    }
-
-    // Umbraco.Code.MapAll
-    private static void Map(IEnumerable<LogTemplate> source, PagedViewModel<LogTemplateResponseModel> target, MapperContext context)
-    {
-        target.Items = context.MapEnumerable<LogTemplate, LogTemplateResponseModel>(source);
-        target.Total = source.Count();
+        target.Items = context.MapEnumerable<LogTemplate, LogTemplateResponseModel>(source.Items);
+        target.Total = source.Total;
     }
 
     // Umbraco.Code.MapAll

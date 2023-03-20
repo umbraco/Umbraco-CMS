@@ -7,6 +7,7 @@ using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.OperationStatus;
+using Umbraco.New.Cms.Core.Models;
 
 namespace Umbraco.Cms.Api.Management.Controllers.LogViewer;
 
@@ -39,16 +40,11 @@ public class MessageTemplateLogViewerController : LogViewerControllerBase
         DateTime? startDate = null,
         DateTime? endDate = null)
     {
-        Attempt<IEnumerable<LogTemplate>, LogViewerOperationStatus> messageTemplatesAttempt = await _logViewerService.GetMessageTemplatesAsync(startDate, endDate);
+        Attempt<PagedModel<LogTemplate>, LogViewerOperationStatus> messageTemplatesAttempt = await _logViewerService.GetMessageTemplatesAsync(startDate, endDate, skip, take);
 
         if (messageTemplatesAttempt.Success)
         {
-            IEnumerable<LogTemplate> messageTemplates = messageTemplatesAttempt
-                .Result
-                .Skip(skip)
-                .Take(take);
-
-            return Ok(_umbracoMapper.Map<PagedViewModel<LogTemplateResponseModel>>(messageTemplates));
+            return Ok(_umbracoMapper.Map<PagedViewModel<LogTemplateResponseModel>>(messageTemplatesAttempt.Result));
         }
 
         return LogViewerOperationStatusResult(messageTemplatesAttempt.Status);

@@ -5,6 +5,7 @@ using Umbraco.Cms.Api.Management.ViewModels.LogViewer;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
+using Umbraco.New.Cms.Core.Models;
 
 namespace Umbraco.Cms.Api.Management.Controllers.LogViewer.SavedSearch;
 
@@ -30,7 +31,7 @@ public class AllSavedSearchLogViewerController : SavedSearchLogViewerControllerB
     [ProducesResponseType(typeof(PagedViewModel<SavedLogSearchResponseModel>), StatusCodes.Status200OK)]
     public async Task<ActionResult<PagedViewModel<SavedLogSearchResponseModel>>> AllSavedSearches(int skip = 0, int take = 100)
     {
-        IEnumerable<ILogViewerQuery> savedLogQueries = (await _logViewerService.GetSavedLogQueriesAsync()).Skip(skip).Take(take);
+        PagedModel<ILogViewerQuery> savedLogQueries = await _logViewerService.GetSavedLogQueriesAsync(skip, take);
 
         return Ok(_umbracoMapper.Map<PagedViewModel<SavedLogSearchResponseModel>>(savedLogQueries));
     }
