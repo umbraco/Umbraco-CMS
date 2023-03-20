@@ -8,7 +8,10 @@ import type {
 } from '../../models';
 import { UmbContextToken } from '@umbraco-cms/context-api';
 
-function ExtensionMemoization<T extends { alias: string }>(previousValue: Array<T>, currentValue: Array<T>): boolean {
+function ExtensionArrayMemoization<T extends { alias: string }>(
+	previousValue: Array<T>,
+	currentValue: Array<T>
+): boolean {
 	// If length is different, data is different:
 	if (previousValue.length !== currentValue.length) {
 		return true;
@@ -18,6 +21,16 @@ function ExtensionMemoization<T extends { alias: string }>(previousValue: Array<
 		return true;
 	}
 	return false;
+}
+
+function ExtensionSingleMemoization<T extends { alias: string }>(
+	previousValue: T | undefined,
+	currentValue: T | undefined
+): boolean {
+	if (previousValue && currentValue) {
+		return previousValue.alias !== currentValue.alias;
+	}
+	return previousValue !== currentValue;
 }
 
 export class UmbExtensionRegistry {
@@ -83,25 +96,25 @@ export class UmbExtensionRegistry {
 	private _kindsOfType<Key extends keyof ManifestTypeMap | string>(type: Key) {
 		return this.kinds.pipe(
 			map((kinds) => kinds.filter((kind) => kind.matchType === type)),
-			distinctUntilChanged(ExtensionMemoization)
+			distinctUntilChanged(ExtensionArrayMemoization)
 		);
 	}
 	private _extensionsOfType<Key extends keyof ManifestTypeMap | string>(type: Key) {
 		return this.extensions.pipe(
 			map((exts) => exts.filter((ext) => ext.type === type)),
-			distinctUntilChanged(ExtensionMemoization)
+			distinctUntilChanged(ExtensionArrayMemoization)
 		);
 	}
 	private _kindsOfTypes(types: string[]) {
 		return this.kinds.pipe(
 			map((kinds) => kinds.filter((kind) => types.indexOf(kind.matchType) !== -1)),
-			distinctUntilChanged(ExtensionMemoization)
+			distinctUntilChanged(ExtensionArrayMemoization)
 		);
 	}
 	private _extensionsOfTypes<ExtensionType = ManifestBase>(types: string[]): Observable<Array<ExtensionType>> {
 		return this.extensions.pipe(
 			map((exts) => exts.filter((ext) => types.indexOf(ext.type) !== -1)),
-			distinctUntilChanged(ExtensionMemoization)
+			distinctUntilChanged(ExtensionArrayMemoization)
 		) as Observable<Array<ExtensionType>>;
 	}
 
@@ -115,16 +128,10 @@ export class UmbExtensionRegistry {
 			map(([ext, kinds]) => {
 				// TODO: Deep merge?
 				return ext ? { ...kinds.find((kind) => kind.matchKind === ext.kind)?.manifest, ...ext } : undefined;
-			})
+			}),
+			distinctUntilChanged(ExtensionSingleMemoization)
 		) as Observable<T | undefined>;
 	}
-
-	/*
-	,
-	distinctUntilChanged((previousStates?: T, currentStates?: T) =>
-		previousStates && currentStates ? (previousStates as any).alias === (currentStates as any).alias : false
-	)
-	*/
 
 	extensionsOfType<Key extends keyof ManifestTypeMap | string, T = SpecificManifestTypeOrManifestBase<Key>>(type: Key) {
 		return this._extensionsOfType(type).pipe(
@@ -136,10 +143,9 @@ export class UmbExtensionRegistry {
 						return { ...kinds.find((kind) => kind.matchKind === ext.kind)?.manifest, ...ext };
 					})
 					.sort((a, b) => (b.weight || 0) - (a.weight || 0))
-			)
+			),
+			distinctUntilChanged(ExtensionArrayMemoization)
 		) as Observable<Array<T>>;
-		//
-		// TODO: DisctinctUntilChanged by using aliases?
 	}
 
 	extensionsOfTypes<ExtensionTypes = ManifestBase>(types: string[]): Observable<Array<ExtensionTypes>> {
@@ -152,10 +158,9 @@ export class UmbExtensionRegistry {
 						return { ...kinds.find((kind) => kind.matchKind === ext.kind)?.manifest, ...ext };
 					})
 					.sort((a, b) => (b.weight || 0) - (a.weight || 0))
-			)
+			),
+			distinctUntilChanged(ExtensionArrayMemoization)
 		) as Observable<Array<ExtensionTypes>>;
-		//
-		// TODO: DisctinctUntilChanged by using aliases?
 	}
 }
 
