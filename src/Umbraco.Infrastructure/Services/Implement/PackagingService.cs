@@ -145,7 +145,16 @@ public class PackagingService : IPackagingService
         return Attempt.SucceedWithStatus<PackageDefinition?, PackageOperationStatus>(PackageOperationStatus.Success, package);
     }
 
+    [Obsolete("Use GetCreatedPackagesAsync instead. Scheduled for removal in Umbraco 15.")]
     public IEnumerable<PackageDefinition?> GetAllCreatedPackages() => _createdPackages.GetAll();
+
+    /// <inheritdoc />
+    public async Task<PagedModel<PackageDefinition>> GetCreatedPackagesAsync(int skip, int take)
+    {
+        var packages = _createdPackages.GetAll().WhereNotNull().ToArray();
+        var pagedModel = new PagedModel<PackageDefinition>(packages.Length, packages.Skip(skip).Take(take));
+        return await Task.FromResult(pagedModel);
+    }
 
     public PackageDefinition? GetCreatedPackageById(int id) => _createdPackages.GetById(id);
 

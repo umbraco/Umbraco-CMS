@@ -3,6 +3,7 @@ using Umbraco.Cms.Api.Management.ViewModels.Package;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Packaging;
+using Umbraco.New.Cms.Core.Models;
 
 namespace Umbraco.Cms.Api.Management.Mapping.Package;
 
@@ -19,7 +20,8 @@ public class PackageViewModelMapDefinition : IMapDefinition
             },
             Map);
         mapper.Define<InstalledPackage, PackageMigrationStatusResponseModel>((_, _) => new PackageMigrationStatusResponseModel { PackageName = string.Empty }, Map);
-        mapper.Define<IEnumerable<PackageDefinition>, PagedViewModel<PackageDefinitionResponseModel>>((_, _) => new PagedViewModel<PackageDefinitionResponseModel>(), Map);
+        mapper.Define<PagedModel<PackageDefinition>, PagedViewModel<PackageDefinitionResponseModel>>((_, _) => new PagedViewModel<PackageDefinitionResponseModel>(), Map);
+        mapper.Define<PagedModel<InstalledPackage>, PagedViewModel<PackageMigrationStatusResponseModel>>((_, _) => new PagedViewModel<PackageMigrationStatusResponseModel>(), Map);
     }
 
     // Umbraco.Code.MapAll -Id -PackageId -PackagePath -Macros
@@ -74,10 +76,16 @@ public class PackageViewModelMapDefinition : IMapDefinition
     }
 
     // Umbraco.Code.MapAll
-    private static void Map(IEnumerable<PackageDefinition> source, PagedViewModel<PackageDefinitionResponseModel> target, MapperContext context)
+    private static void Map(PagedModel<PackageDefinition> source, PagedViewModel<PackageDefinitionResponseModel> target, MapperContext context)
     {
-        PackageDefinition[] definitions = source.ToArray();
-        target.Items = context.MapEnumerable<PackageDefinition, PackageDefinitionResponseModel>(definitions);
-        target.Total = definitions.Length;
+        target.Items = context.MapEnumerable<PackageDefinition, PackageDefinitionResponseModel>(source.Items);
+        target.Total = source.Total;
+    }
+
+    // Umbraco.Code.MapAll
+    private static void Map(PagedModel<InstalledPackage> source, PagedViewModel<PackageMigrationStatusResponseModel> target, MapperContext context)
+    {
+        target.Items = context.MapEnumerable<InstalledPackage, PackageMigrationStatusResponseModel>(source.Items);
+        target.Total = source.Total;
     }
 }
