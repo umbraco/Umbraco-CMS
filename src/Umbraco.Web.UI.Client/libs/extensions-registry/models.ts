@@ -55,7 +55,6 @@ export * from './modal.models';
 
 export type ManifestTypes =
 	| ManifestCollectionView
-	| ManifestCustom
 	| ManifestDashboard
 	| ManifestDashboardCollection
 	| ManifestEntityAction
@@ -101,7 +100,7 @@ export type SpecificManifestTypeOrManifestBase<T extends keyof ManifestTypeMap |
 export interface ManifestBase {
 	type: string;
 	alias: string;
-	kind?: undefined; // I had to add the optional kind property set to undefined. To make the ManifestTypes recognize the Manifest Kind types. Notice that Kinds has to Omit the kind property when extending.
+	kind?: any; // I had to add the optional kind property set to undefined. To make the ManifestTypes recognize the Manifest Kind types. Notice that Kinds has to Omit the kind property when extending.
 	name: string;
 	weight?: number;
 }
@@ -156,10 +155,13 @@ export interface ManifestElementWithElementName extends ManifestElement {
 	elementName: string;
 }
 
+// TODO: Remove Custom as it has no purpose currently:
+/*
 export interface ManifestCustom extends ManifestBase {
 	type: 'custom';
 	meta?: unknown;
 }
+*/
 
 export interface ManifestWithMeta extends ManifestBase {
 	meta: unknown;
