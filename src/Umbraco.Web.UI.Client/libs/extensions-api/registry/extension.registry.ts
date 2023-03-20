@@ -126,6 +126,7 @@ export class UmbExtensionRegistry {
 			map((exts) => exts.find((ext) => ext.type === type && ext.alias === alias)),
 			withLatestFrom(this._kindsOfType(type)),
 			map(([ext, kinds]) => {
+				// TODO: share one merge function between the different methods of this class:
 				// Specific Extension Meta merge (does not merge conditions)
 				if (ext) {
 					const baseManifest = kinds.find((kind) => kind.matchKind === ext.kind)?.manifest;
@@ -175,8 +176,16 @@ export class UmbExtensionRegistry {
 			map(([exts, kinds]) =>
 				exts
 					.map((ext) => {
-						// TODO: Deep merge?
-						return { ...kinds.find((kind) => kind.matchKind === ext.kind)?.manifest, ...ext };
+						// Specific Extension Meta merge (does not merge conditions)
+						const baseManifest = kinds.find((kind) => kind.matchKind === ext.kind)?.manifest;
+						if (baseManifest) {
+							const merged = { ...baseManifest, ...ext } as any;
+							if ((baseManifest as any).meta) {
+								merged.meta = { ...(baseManifest as any).meta, ...(ext as any).meta };
+							}
+							return merged;
+						}
+						return ext;
 					})
 					.sort((a, b) => (b.weight || 0) - (a.weight || 0))
 			),
