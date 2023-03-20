@@ -1,5 +1,6 @@
 import { html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
+import { map } from 'rxjs';
 import { UMB_CONFIRM_MODAL_TOKEN } from '../../../shared/modals/confirm';
 import { isManifestElementNameType, umbExtensionsRegistry } from '@umbraco-cms/extensions-api';
 import type { ManifestBase } from '@umbraco-cms/models';
@@ -23,9 +24,23 @@ export class UmbExtensionRootWorkspaceElement extends UmbLitElement {
 	}
 
 	private _observeExtensions() {
-		this.observe(umbExtensionsRegistry.extensionRegistrationsSortedByTypeAndWeight(), (extensions) => {
-			this._extensions = extensions || undefined;
-		});
+		this.observe(
+			umbExtensionsRegistry.extensions.pipe(
+				map((exts) =>
+					exts.sort((a, b) => {
+						// If type is the same, sort by weight
+						if (a.type === b.type) {
+							return (b.weight || 0) - (a.weight || 0);
+						}
+						// Otherwise sort by type
+						return a.type.localeCompare(b.type);
+					})
+				)
+			),
+			(extensions) => {
+				this._extensions = extensions || undefined;
+			}
+		);
 	}
 
 	async #removeExtension(extension: ManifestBase) {

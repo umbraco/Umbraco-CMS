@@ -11,6 +11,7 @@ import { loadExtension } from '../load-extension.function';
 import { hasInitExport } from '../has-init-export.function';
 import type { UmbControllerHostInterface } from '@umbraco-cms/controller';
 import { UmbContextToken } from '@umbraco-cms/context-api';
+import { createObservablePart } from '@umbraco-cms/observable-api';
 
 export class UmbExtensionRegistry {
 	// TODO: Use UniqueBehaviorSubject, as we don't want someone to edit data of extensions.
@@ -146,27 +147,6 @@ export class UmbExtensionRegistry {
 		) as Observable<Array<ExtensionTypes>>;
 		//
 		// TODO: DisctinctUntilChanged by using aliases?
-	}
-
-	// TODO: consider ust having the a.type.localeCompare(b.type); in the extension view, to then be able to use other existing observables?
-	/**
-	 * Gets all the extensions registrations, but does not merge with kinds.
-	 * @returns
-	 */
-	extensionRegistrationsSortedByTypeAndWeight<ExtensionType = ManifestBase>(): Observable<Array<ExtensionType>> {
-		return this.extensions.pipe(
-			map((exts) =>
-				exts.sort((a, b) => {
-					// If type is the same, sort by weight
-					if (a.type === b.type) {
-						return (b.weight || 0) - (a.weight || 0);
-					}
-
-					// Otherwise sort by type
-					return a.type.localeCompare(b.type);
-				})
-			)
-		) as Observable<Array<ExtensionType>>;
 	}
 }
 
