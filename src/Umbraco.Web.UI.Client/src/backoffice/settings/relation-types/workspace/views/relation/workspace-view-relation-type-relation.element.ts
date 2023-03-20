@@ -3,7 +3,7 @@ import { css, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { UmbTableColumn, UmbTableConfig } from '../../../../../shared/components/table';
 import { UmbLitElement } from '@umbraco-cms/element';
-import { RelationModel } from '@umbraco-cms/backend-api';
+import { RelationResponseModel } from '@umbraco-cms/backend-api';
 
 @customElement('umb-workspace-view-relation-type-relation')
 export class UmbWorkspaceViewRelationTypeRelationElement extends UmbLitElement {
@@ -19,7 +19,7 @@ export class UmbWorkspaceViewRelationTypeRelationElement extends UmbLitElement {
 
 	//TODO Use real data
 	@state()
-	_relations: Array<RelationModel> = MockData;
+	_relations: Array<RelationResponseModel> = MockData;
 
 	private _tableConfig: UmbTableConfig = {
 		allowSelection: false,
@@ -78,7 +78,7 @@ export class UmbWorkspaceViewRelationTypeRelationElement extends UmbLitElement {
 	}
 }
 
-const MockData: Array<RelationModel> = [
+const MockData: Array<RelationResponseModel> = [
 	{
 		parentId: 1,
 		parentName: 'Parent 1',

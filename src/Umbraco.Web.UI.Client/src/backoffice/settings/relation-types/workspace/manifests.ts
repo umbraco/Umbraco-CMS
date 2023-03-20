@@ -19,10 +19,12 @@ const workspaceViews: Array<ManifestWorkspaceView> = [
 		loader: () => import('./views/relation-type/relation-type-workspace-view-relation-type.element'),
 		weight: 20,
 		meta: {
-			workspaces: ['Umb.Workspace.RelationType'],
 			label: 'RelationType',
 			pathname: 'relation-type',
 			icon: 'umb:info',
+		},
+		conditions: {
+			workspaces: ['Umb.Workspace.RelationType'],
 		},
 	},
 	{
@@ -32,10 +34,12 @@ const workspaceViews: Array<ManifestWorkspaceView> = [
 		loader: () => import('./views/relation/workspace-view-relation-type-relation.element'),
 		weight: 10,
 		meta: {
-			workspaces: ['Umb.Workspace.RelationType'],
 			label: 'Relation',
 			pathname: 'relation',
 			icon: 'umb:trafic',
+		},
+		conditions: {
+			workspaces: ['Umb.Workspace.RelationType'],
 		},
 	},
 ];
@@ -46,11 +50,13 @@ const workspaceActions: Array<ManifestWorkspaceAction> = [
 		alias: 'Umb.WorkspaceAction.RelationType.Save',
 		name: 'Save Relation Type Workspace Action',
 		meta: {
-			workspaces: ['Umb.Workspace.RelationType'],
 			label: 'Save',
 			look: 'primary',
 			color: 'positive',
 			api: UmbSaveWorkspaceAction,
+		},
+		conditions: {
+			workspaces: ['Umb.Workspace.RelationType'],
 		},
 	},
 ];
