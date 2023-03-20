@@ -506,6 +506,97 @@
   </Suppression>
   <Suppression>
     <DiagnosticId>CP0002</DiagnosticId>
+    <Target>M:Umbraco.Cms.Core.Models.RelationType.#ctor(System.String,System.String,System.Boolean,System.Nullable{System.Guid},System.Nullable{System.Guid},System.Boolean)</Target>
+    <Left>lib/net7.0/Umbraco.Core.dll</Left>
+    <Right>lib/net7.0/Umbraco.Core.dll</Right>
+    <IsBaselineSuppression>true</IsBaselineSuppression>
+  </Suppression>
+  <Suppression>
+    <DiagnosticId>CP0002</DiagnosticId>
+    <Target>M:Umbraco.Cms.Core.Notifications.ContentMovedToRecycleBinNotification.#ctor(System.Collections.Generic.IEnumerable{Umbraco.Cms.Core.Events.MoveEventInfo{Umbraco.Cms.Core.Models.IContent}},Umbraco.Cms.Core.Events.EventMessages)</Target>
+    <Left>lib/net7.0/Umbraco.Core.dll</Left>
+    <Right>lib/net7.0/Umbraco.Core.dll</Right>
+    <IsBaselineSuppression>true</IsBaselineSuppression>
+  </Suppression>
+  <Suppression>
+    <DiagnosticId>CP0002</DiagnosticId>
+    <Target>M:Umbraco.Cms.Core.Notifications.ContentMovedToRecycleBinNotification.#ctor(Umbraco.Cms.Core.Events.MoveEventInfo{Umbraco.Cms.Core.Models.IContent},Umbraco.Cms.Core.Events.EventMessages)</Target>
+    <Left>lib/net7.0/Umbraco.Core.dll</Left>
+    <Right>lib/net7.0/Umbraco.Core.dll</Right>
+    <IsBaselineSuppression>true</IsBaselineSuppression>
+  </Suppression>
+  <Suppression>
+    <DiagnosticId>CP0002</DiagnosticId>
+    <Target>M:Umbraco.Cms.Core.Notifications.ContentMovingToRecycleBinNotification.#ctor(System.Collections.Generic.IEnumerable{Umbraco.Cms.Core.Events.MoveEventInfo{Umbraco.Cms.Core.Models.IContent}},Umbraco.Cms.Core.Events.EventMessages)</Target>
+    <Left>lib/net7.0/Umbraco.Core.dll</Left>
+    <Right>lib/net7.0/Umbraco.Core.dll</Right>
+    <IsBaselineSuppression>true</IsBaselineSuppression>
+  </Suppression>
+  <Suppression>
+    <DiagnosticId>CP0002</DiagnosticId>
+    <Target>M:Umbraco.Cms.Core.Notifications.ContentMovingToRecycleBinNotification.#ctor(Umbraco.Cms.Core.Events.MoveEventInfo{Umbraco.Cms.Core.Models.IContent},Umbraco.Cms.Core.Events.EventMessages)</Target>
+    <Left>lib/net7.0/Umbraco.Core.dll</Left>
+    <Right>lib/net7.0/Umbraco.Core.dll</Right>
+    <IsBaselineSuppression>true</IsBaselineSuppression>
+  </Suppression>
+  <Suppression>
+    <DiagnosticId>CP0002</DiagnosticId>
+    <Target>M:Umbraco.Cms.Core.Notifications.MediaMovedToRecycleBinNotification.#ctor(System.Collections.Generic.IEnumerable{Umbraco.Cms.Core.Events.MoveEventInfo{Umbraco.Cms.Core.Models.IMedia}},Umbraco.Cms.Core.Events.EventMessages)</Target>
+    <Left>lib/net7.0/Umbraco.Core.dll</Left>
+    <Right>lib/net7.0/Umbraco.Core.dll</Right>
+    <IsBaselineSuppression>true</IsBaselineSuppression>
+  </Suppression>
+  <Suppression>
+    <DiagnosticId>CP0002</DiagnosticId>
+    <Target>M:Umbraco.Cms.Core.Notifications.MediaMovedToRecycleBinNotification.#ctor(Umbraco.Cms.Core.Events.MoveEventInfo{Umbraco.Cms.Core.Models.IMedia},Umbraco.Cms.Core.Events.EventMessages)</Target>
+    <Left>lib/net7.0/Umbraco.Core.dll</Left>
+    <Right>lib/net7.0/Umbraco.Core.dll</Right>
+    <IsBaselineSuppression>true</IsBaselineSuppression>
+  </Suppression>
+  <Suppression>
+    <DiagnosticId>CP0002</DiagnosticId>
+    <Target>M:Umbraco.Cms.Core.Notifications.MediaMovingToRecycleBinNotification.#ctor(System.Collections.Generic.IEnumerable{Umbraco.Cms.Core.Events.MoveEventInfo{Umbraco.Cms.Core.Models.IMedia}},Umbraco.Cms.Core.Events.EventMessages)</Target>
+    <Left>lib/net7.0/Umbraco.Core.dll</Left>
+    <Right>lib/net7.0/Umbraco.Core.dll</Right>
+    <IsBaselineSuppression>true</IsBaselineSuppression>
+  </Suppression>
+  <Suppression>
+    <DiagnosticId>CP0002</DiagnosticId>
+    <Target>M:Umbraco.Cms.Core.Notifications.MediaMovingToRecycleBinNotification.#ctor(Umbraco.Cms.Core.Events.MoveEventInfo{Umbraco.Cms.Core.Models.IMedia},Umbraco.Cms.Core.Events.EventMessages)</Target>
+    <Left>lib/net7.0/Umbraco.Core.dll</Left>
+    <Right>lib/net7.0/Umbraco.Core.dll</Right>
+    <IsBaselineSuppression>true</IsBaselineSuppression>
+  </Suppression>
+  <Suppression>
+    <DiagnosticId>CP0002</DiagnosticId>
+    <Target>M:Umbraco.Cms.Core.Notifications.MovedToRecycleBinNotification`1.#ctor(System.Collections.Generic.IEnumerable{Umbraco.Cms.Core.Events.MoveEventInfo{`0}},Umbraco.Cms.Core.Events.EventMessages)</Target>
+    <Left>lib/net7.0/Umbraco.Core.dll</Left>
+    <Right>lib/net7.0/Umbraco.Core.dll</Right>
+    <IsBaselineSuppression>true</IsBaselineSuppression>
+  </Suppression>
+  <Suppression>
+    <DiagnosticId>CP0002</DiagnosticId>
+    <Target>M:Umbraco.Cms.Core.Notifications.MovedToRecycleBinNotification`1.#ctor(Umbraco.Cms.Core.Events.MoveEventInfo{`0},Umbraco.Cms.Core.Events.EventMessages)</Target>
+    <Left>lib/net7.0/Umbraco.Core.dll</Left>
+    <Right>lib/net7.0/Umbraco.Core.dll</Right>
+    <IsBaselineSuppression>true</IsBaselineSuppression>
+  </Suppression>
+  <Suppression>
+    <DiagnosticId>CP0002</DiagnosticId>
+    <Target>M:Umbraco.Cms.Core.Notifications.MovingToRecycleBinNotification`1.#ctor(System.Collections.Generic.IEnumerable{Umbraco.Cms.Core.Events.MoveEventInfo{`0}},Umbraco.Cms.Core.Events.EventMessages)</Target>
+    <Left>lib/net7.0/Umbraco.Core.dll</Left>
+    <Right>lib/net7.0/Umbraco.Core.dll</Right>
+    <IsBaselineSuppression>true</IsBaselineSuppression>
+  </Suppression>
+  <Suppression>
+    <DiagnosticId>CP0002</DiagnosticId>
+    <Target>M:Umbraco.Cms.Core.Notifications.MovingToRecycleBinNotification`1.#ctor(Umbraco.Cms.Core.Events.MoveEventInfo{`0},Umbraco.Cms.Core.Events.EventMessages)</Target>
+    <Left>lib/net7.0/Umbraco.Core.dll</Left>
+    <Right>lib/net7.0/Umbraco.Core.dll</Right>
+    <IsBaselineSuppression>true</IsBaselineSuppression>
+  </Suppression>
+  <Suppression>
+    <DiagnosticId>CP0002</DiagnosticId>
     <Target>M:Umbraco.Cms.Core.PropertyEditors.ConfigurationEditor.FromConfigurationEditor(System.Collections.Generic.IDictionary{System.String,System.Object},System.Object)</Target>
     <Left>lib/net7.0/Umbraco.Core.dll</Left>
     <Right>lib/net7.0/Umbraco.Core.dll</Right>
@@ -716,6 +807,13 @@
   </Suppression>
   <Suppression>
     <DiagnosticId>CP0006</DiagnosticId>
+    <Target>M:Umbraco.Cms.Core.Models.IContentBase.RemoveValue(System.String)</Target>
+    <Left>lib/net7.0/Umbraco.Core.dll</Left>
+    <Right>lib/net7.0/Umbraco.Core.dll</Right>
+    <IsBaselineSuppression>true</IsBaselineSuppression>
+  </Suppression>
+  <Suppression>
+    <DiagnosticId>CP0006</DiagnosticId>
     <Target>M:Umbraco.Cms.Core.Packaging.IPackageDefinitionRepository.GetByKey(System.Guid)</Target>
     <Left>lib/net7.0/Umbraco.Core.dll</Left>
     <Right>lib/net7.0/Umbraco.Core.dll</Right>
@@ -856,6 +954,27 @@
   </Suppression>
   <Suppression>
     <DiagnosticId>CP0006</DiagnosticId>
+    <Target>M:Umbraco.Cms.Core.Services.IDomainService.GetAllAsync(System.Boolean)</Target>
+    <Left>lib/net7.0/Umbraco.Core.dll</Left>
+    <Right>lib/net7.0/Umbraco.Core.dll</Right>
+    <IsBaselineSuppression>true</IsBaselineSuppression>
+  </Suppression>
+  <Suppression>
+    <DiagnosticId>CP0006</DiagnosticId>
+    <Target>M:Umbraco.Cms.Core.Services.IDomainService.GetAssignedDomainsAsync(System.Guid,System.Boolean)</Target>
+    <Left>lib/net7.0/Umbraco.Core.dll</Left>
+    <Right>lib/net7.0/Umbraco.Core.dll</Right>
+    <IsBaselineSuppression>true</IsBaselineSuppression>
+  </Suppression>
+  <Suppression>
+    <DiagnosticId>CP0006</DiagnosticId>
+    <Target>M:Umbraco.Cms.Core.Services.IDomainService.UpdateDomainsAsync(System.Guid,Umbraco.Cms.Core.Models.ContentEditing.DomainsUpdateModel)</Target>
+    <Left>lib/net7.0/Umbraco.Core.dll</Left>
+    <Right>lib/net7.0/Umbraco.Core.dll</Right>
+    <IsBaselineSuppression>true</IsBaselineSuppression>
+  </Suppression>
+  <Suppression>
+    <DiagnosticId>CP0006</DiagnosticId>
     <Target>M:Umbraco.Cms.Core.Services.ILocalizationService.Create(System.String,System.Nullable{System.Guid},System.Collections.Generic.IEnumerable{Umbraco.Cms.Core.Models.IDictionaryTranslation},System.Int32)</Target>
     <Left>lib/net7.0/Umbraco.Core.dll</Left>
     <Right>lib/net7.0/Umbraco.Core.dll</Right>
@@ -947,6 +1066,20 @@
   </Suppression>
   <Suppression>
     <DiagnosticId>CP0006</DiagnosticId>
+    <Target>M:Umbraco.Cms.Core.Services.IRelationService.GetAllowedObjectTypes</Target>
+    <Left>lib/net7.0/Umbraco.Core.dll</Left>
+    <Right>lib/net7.0/Umbraco.Core.dll</Right>
+    <IsBaselineSuppression>true</IsBaselineSuppression>
+  </Suppression>
+  <Suppression>
+    <DiagnosticId>CP0006</DiagnosticId>
+    <Target>M:Umbraco.Cms.Core.Services.IRelationService.GetPagedByRelationTypeKey(System.Guid,System.Int32,System.Int32,Umbraco.Cms.Core.Services.Ordering)</Target>
+    <Left>lib/net7.0/Umbraco.Core.dll</Left>
+    <Right>lib/net7.0/Umbraco.Core.dll</Right>
+    <IsBaselineSuppression>true</IsBaselineSuppression>
+  </Suppression>
+  <Suppression>
+    <DiagnosticId>CP0006</DiagnosticId>
     <Target>M:Umbraco.Cms.Core.Services.ITrackedReferencesService.GetPagedDescendantsInReferencesAsync(System.Guid,System.Int64,System.Int64,System.Boolean)</Target>
     <Left>lib/net7.0/Umbraco.Core.dll</Left>
     <Right>lib/net7.0/Umbraco.Core.dll</Right>
@@ -962,6 +1095,76 @@
   <Suppression>
     <DiagnosticId>CP0006</DiagnosticId>
     <Target>M:Umbraco.Cms.Core.Services.ITrackedReferencesService.GetPagedRelationsForItemAsync(System.Guid,System.Int64,System.Int64,System.Boolean)</Target>
+    <Left>lib/net7.0/Umbraco.Core.dll</Left>
+    <Right>lib/net7.0/Umbraco.Core.dll</Right>
+    <IsBaselineSuppression>true</IsBaselineSuppression>
+  </Suppression>
+  <Suppression>
+    <DiagnosticId>CP0006</DiagnosticId>
+    <Target>M:Umbraco.Cms.Core.Services.IUserService.ChangePasswordAsync(System.Guid,Umbraco.Cms.Core.Models.Membership.ChangeBackofficeUserPasswordModel)</Target>
+    <Left>lib/net7.0/Umbraco.Core.dll</Left>
+    <Right>lib/net7.0/Umbraco.Core.dll</Right>
+    <IsBaselineSuppression>true</IsBaselineSuppression>
+  </Suppression>
+  <Suppression>
+    <DiagnosticId>CP0006</DiagnosticId>
+    <Target>M:Umbraco.Cms.Core.Services.IUserService.ClearAvatarAsync(System.Guid)</Target>
+    <Left>lib/net7.0/Umbraco.Core.dll</Left>
+    <Right>lib/net7.0/Umbraco.Core.dll</Right>
+    <IsBaselineSuppression>true</IsBaselineSuppression>
+  </Suppression>
+  <Suppression>
+    <DiagnosticId>CP0006</DiagnosticId>
+    <Target>M:Umbraco.Cms.Core.Services.IUserService.CreateAsync(System.Guid,Umbraco.Cms.Core.Models.UserCreateModel,System.Boolean)</Target>
+    <Left>lib/net7.0/Umbraco.Core.dll</Left>
+    <Right>lib/net7.0/Umbraco.Core.dll</Right>
+    <IsBaselineSuppression>true</IsBaselineSuppression>
+  </Suppression>
+  <Suppression>
+    <DiagnosticId>CP0006</DiagnosticId>
+    <Target>M:Umbraco.Cms.Core.Services.IUserService.DeleteAsync(System.Guid)</Target>
+    <Left>lib/net7.0/Umbraco.Core.dll</Left>
+    <Right>lib/net7.0/Umbraco.Core.dll</Right>
+    <IsBaselineSuppression>true</IsBaselineSuppression>
+  </Suppression>
+  <Suppression>
+    <DiagnosticId>CP0006</DiagnosticId>
+    <Target>M:Umbraco.Cms.Core.Services.IUserService.DisableAsync(System.Guid,System.Guid[])</Target>
+    <Left>lib/net7.0/Umbraco.Core.dll</Left>
+    <Right>lib/net7.0/Umbraco.Core.dll</Right>
+    <IsBaselineSuppression>true</IsBaselineSuppression>
+  </Suppression>
+  <Suppression>
+    <DiagnosticId>CP0006</DiagnosticId>
+    <Target>M:Umbraco.Cms.Core.Services.IUserService.EnableAsync(System.Guid,System.Guid[])</Target>
+    <Left>lib/net7.0/Umbraco.Core.dll</Left>
+    <Right>lib/net7.0/Umbraco.Core.dll</Right>
+    <IsBaselineSuppression>true</IsBaselineSuppression>
+  </Suppression>
+  <Suppression>
+    <DiagnosticId>CP0006</DiagnosticId>
+    <Target>M:Umbraco.Cms.Core.Services.IUserService.InviteAsync(System.Guid,Umbraco.Cms.Core.Models.UserInviteModel)</Target>
+    <Left>lib/net7.0/Umbraco.Core.dll</Left>
+    <Right>lib/net7.0/Umbraco.Core.dll</Right>
+    <IsBaselineSuppression>true</IsBaselineSuppression>
+  </Suppression>
+  <Suppression>
+    <DiagnosticId>CP0006</DiagnosticId>
+    <Target>M:Umbraco.Cms.Core.Services.IUserService.SetAvatarAsync(Umbraco.Cms.Core.Models.Membership.IUser,System.Guid)</Target>
+    <Left>lib/net7.0/Umbraco.Core.dll</Left>
+    <Right>lib/net7.0/Umbraco.Core.dll</Right>
+    <IsBaselineSuppression>true</IsBaselineSuppression>
+  </Suppression>
+  <Suppression>
+    <DiagnosticId>CP0006</DiagnosticId>
+    <Target>M:Umbraco.Cms.Core.Services.IUserService.UnlockAsync(System.Guid,System.Guid[])</Target>
+    <Left>lib/net7.0/Umbraco.Core.dll</Left>
+    <Right>lib/net7.0/Umbraco.Core.dll</Right>
+    <IsBaselineSuppression>true</IsBaselineSuppression>
+  </Suppression>
+  <Suppression>
+    <DiagnosticId>CP0006</DiagnosticId>
+    <Target>M:Umbraco.Cms.Core.Services.IUserService.UpdateAsync(System.Guid,Umbraco.Cms.Core.Models.UserUpdateModel)</Target>
     <Left>lib/net7.0/Umbraco.Core.dll</Left>
     <Right>lib/net7.0/Umbraco.Core.dll</Right>
     <IsBaselineSuppression>true</IsBaselineSuppression>
@@ -1011,6 +1214,27 @@
   <Suppression>
     <DiagnosticId>CP0006</DiagnosticId>
     <Target>P:Umbraco.Cms.Core.Models.Membership.IUserGroup.PermissionNames</Target>
+    <Left>lib/net7.0/Umbraco.Core.dll</Left>
+    <Right>lib/net7.0/Umbraco.Core.dll</Right>
+    <IsBaselineSuppression>true</IsBaselineSuppression>
+  </Suppression>
+  <Suppression>
+    <DiagnosticId>CP0007</DiagnosticId>
+    <Target>T:Umbraco.Cms.Core.Notifications.MovedToRecycleBinNotification`1</Target>
+    <Left>lib/net7.0/Umbraco.Core.dll</Left>
+    <Right>lib/net7.0/Umbraco.Core.dll</Right>
+    <IsBaselineSuppression>true</IsBaselineSuppression>
+  </Suppression>
+  <Suppression>
+    <DiagnosticId>CP0007</DiagnosticId>
+    <Target>T:Umbraco.Cms.Core.Notifications.MovingToRecycleBinNotification`1</Target>
+    <Left>lib/net7.0/Umbraco.Core.dll</Left>
+    <Right>lib/net7.0/Umbraco.Core.dll</Right>
+    <IsBaselineSuppression>true</IsBaselineSuppression>
+  </Suppression>
+  <Suppression>
+    <DiagnosticId>CP0008</DiagnosticId>
+    <Target>T:Umbraco.Cms.Core.Events.MoveEventInfo`1</Target>
     <Left>lib/net7.0/Umbraco.Core.dll</Left>
     <Right>lib/net7.0/Umbraco.Core.dll</Right>
     <IsBaselineSuppression>true</IsBaselineSuppression>

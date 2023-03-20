@@ -30,6 +30,13 @@
   </Suppression>
   <Suppression>
     <DiagnosticId>CP0001</DiagnosticId>
+    <Target>T:Umbraco.Cms.Core.PropertyEditors.ValueConverters.ImageCropperValueTypeConverter</Target>
+    <Left>lib/net7.0/Umbraco.Infrastructure.dll</Left>
+    <Right>lib/net7.0/Umbraco.Infrastructure.dll</Right>
+    <IsBaselineSuppression>true</IsBaselineSuppression>
+  </Suppression>
+  <Suppression>
+    <DiagnosticId>CP0001</DiagnosticId>
     <Target>T:Umbraco.Cms.Infrastructure.Migrations.PostMigrations.ClearCsrfCookies</Target>
     <Left>lib/net7.0/Umbraco.Infrastructure.dll</Left>
     <Right>lib/net7.0/Umbraco.Infrastructure.dll</Right>
@@ -86,7 +93,21 @@
   </Suppression>
   <Suppression>
     <DiagnosticId>CP0002</DiagnosticId>
+    <Target>M:Umbraco.Cms.Core.PropertyEditors.ValueConverters.ImageCropperValue.Prune(Newtonsoft.Json.Linq.JObject)</Target>
+    <Left>lib/net7.0/Umbraco.Infrastructure.dll</Left>
+    <Right>lib/net7.0/Umbraco.Infrastructure.dll</Right>
+    <IsBaselineSuppression>true</IsBaselineSuppression>
+  </Suppression>
+  <Suppression>
+    <DiagnosticId>CP0002</DiagnosticId>
     <Target>M:Umbraco.Cms.Core.Security.BackOfficeUserStore.#ctor(Umbraco.Cms.Core.Scoping.ICoreScopeProvider,Umbraco.Cms.Core.Services.IUserService,Umbraco.Cms.Core.Services.IEntityService,Umbraco.Cms.Core.Services.IExternalLoginWithKeyService,Microsoft.Extensions.Options.IOptions{Umbraco.Cms.Core.Configuration.Models.GlobalSettings},Umbraco.Cms.Core.Mapping.IUmbracoMapper,Umbraco.Cms.Core.Security.BackOfficeErrorDescriber,Umbraco.Cms.Core.Cache.AppCaches)</Target>
+    <Left>lib/net7.0/Umbraco.Infrastructure.dll</Left>
+    <Right>lib/net7.0/Umbraco.Infrastructure.dll</Right>
+    <IsBaselineSuppression>true</IsBaselineSuppression>
+  </Suppression>
+  <Suppression>
+    <DiagnosticId>CP0002</DiagnosticId>
+    <Target>M:Umbraco.Cms.Core.Security.BackOfficeUserStore.#ctor(Umbraco.Cms.Core.Scoping.ICoreScopeProvider,Umbraco.Cms.Core.Services.IUserService,Umbraco.Cms.Core.Services.IEntityService,Umbraco.Cms.Core.Services.IExternalLoginWithKeyService,Microsoft.Extensions.Options.IOptionsSnapshot{Umbraco.Cms.Core.Configuration.Models.GlobalSettings},Umbraco.Cms.Core.Mapping.IUmbracoMapper,Umbraco.Cms.Core.Security.BackOfficeErrorDescriber,Umbraco.Cms.Core.Cache.AppCaches,Umbraco.Cms.Core.Services.ITwoFactorLoginService)</Target>
     <Left>lib/net7.0/Umbraco.Infrastructure.dll</Left>
     <Right>lib/net7.0/Umbraco.Infrastructure.dll</Right>
     <IsBaselineSuppression>true</IsBaselineSuppression>
