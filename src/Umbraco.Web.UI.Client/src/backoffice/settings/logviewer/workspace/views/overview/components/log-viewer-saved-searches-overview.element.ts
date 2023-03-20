@@ -3,7 +3,7 @@ import { css, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { UmbLogViewerWorkspaceContext, UMB_APP_LOG_VIEWER_CONTEXT_TOKEN } from '../../../logviewer.context';
 import { UmbLitElement } from '@umbraco-cms/element';
-import { SavedLogSearchModel } from '@umbraco-cms/backend-api';
+import { SavedLogSearchResponseModel } from '@umbraco-cms/backend-api';
 
 //TODO: implement the saved searches pagination when the API total bug is fixed
 @customElement('umb-log-viewer-saved-searches-overview')
@@ -37,7 +37,7 @@ export class UmbLogViewerSavedSearchesOverviewElement extends UmbLitElement {
 	];
 
 	@state()
-	private _savedSearches: SavedLogSearchModel[] = [];
+	private _savedSearches: SavedLogSearchResponseModel[] = [];
 
 	#logViewerContext?: UmbLogViewerWorkspaceContext;
 	constructor() {
@@ -60,7 +60,7 @@ export class UmbLogViewerSavedSearchesOverviewElement extends UmbLitElement {
 		this.#logViewerContext?.setFilterExpression(query);
 	}
 
-	#renderSearchItem = (searchListItem: SavedLogSearchModel) => {
+	#renderSearchItem = (searchListItem: SavedLogSearchResponseModel) => {
 		return html` <li>
 			<uui-button
 				@click=${() => {

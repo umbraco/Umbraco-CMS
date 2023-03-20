@@ -14,9 +14,9 @@ export class UmbThemeContext {
 	#theme = new StringState('umb-light-theme');
 	public readonly theme = this.#theme.asObservable();
 
-	private themeSubscription?: UmbObserverController;
+	private themeSubscription?: UmbObserverController<ManifestTheme[]>;
 
-	#styleElement: HTMLLinkElement| HTMLStyleElement | null = null;
+	#styleElement: HTMLLinkElement | HTMLStyleElement | null = null;
 
 	constructor(host: UmbControllerHostInterface) {
 		this._host = host;
@@ -43,25 +43,21 @@ export class UmbThemeContext {
 				async (themes) => {
 					this.#styleElement?.remove();
 					if (themes.length > 0) {
-						if(themes[0].loader) {
-
-							const styleEl = this.#styleElement = document.createElement('style');
+						if (themes[0].loader) {
+							const styleEl = (this.#styleElement = document.createElement('style'));
 							styleEl.setAttribute('type', 'text/css');
 							document.head.appendChild(styleEl);
 
 							const result = await themes[0].loader();
 							// Checking that this is still our styleElement, it has not been replaced with another theme in between.
-							if(styleEl === this.#styleElement) {
+							if (styleEl === this.#styleElement) {
 								(styleEl as any).appendChild(document.createTextNode(result));
 							}
-
 						} else if (themes[0].css) {
-
 							this.#styleElement = document.createElement('link');
 							this.#styleElement.setAttribute('rel', 'stylesheet');
 							this.#styleElement.setAttribute('href', themes[0].css);
 							document.head.appendChild(this.#styleElement);
-
 						}
 					} else {
 						localStorage.removeItem(LOCAL_STORAGE_KEY);

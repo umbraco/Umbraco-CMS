@@ -12,4 +12,3 @@ export type UserGroupBaseModel = {
     mediaStartNodeKey?: string | null;
     permissions?: Array<string>;
 };
-

@@ -12,11 +12,13 @@ const entityActions: Array<ManifestEntityAction> = [
 		name: 'Delete Member Type Entity Action',
 		weight: 100,
 		meta: {
-			entityType,
 			icon: 'umb:trash',
 			label: 'Delete',
 			repositoryAlias,
 			api: UmbDeleteEntityAction,
+		},
+		conditions: {
+			entityType,
 		},
 	},
 ];

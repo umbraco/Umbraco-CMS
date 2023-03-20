@@ -9,6 +9,8 @@ const menuItem: ManifestMenuItem = {
 		label: 'Languages',
 		icon: 'umb:globe',
 		entityType: 'language-root',
+	},
+	conditions: {
 		menus: ['Umb.Menu.Settings'],
 	},
 };

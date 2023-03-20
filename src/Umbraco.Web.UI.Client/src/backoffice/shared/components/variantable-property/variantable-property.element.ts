@@ -3,7 +3,7 @@ import { css, html } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { UmbVariantId } from '../../variants/variant-id.class';
 import { UMB_WORKSPACE_VARIANT_CONTEXT_TOKEN } from '../workspace/workspace-variant/workspace-variant.context';
-import type { PropertyTypeViewModelBaseModel } from '@umbraco-cms/backend-api';
+import type { PropertyTypeResponseModelBaseModel } from '@umbraco-cms/backend-api';
 import '../workspace-property/workspace-property.element';
 import { UmbLitElement } from '@umbraco-cms/element';
 
@@ -18,12 +18,12 @@ export class UmbVariantablePropertyElement extends UmbLitElement {
 		`,
 	];
 
-	private _property?: PropertyTypeViewModelBaseModel | undefined;
+	private _property?: PropertyTypeResponseModelBaseModel | undefined;
 	@property({ type: Object, attribute: false })
-	public get property(): PropertyTypeViewModelBaseModel | undefined {
+	public get property(): PropertyTypeResponseModelBaseModel | undefined {
 		return this._property;
 	}
-	public set property(property: PropertyTypeViewModelBaseModel | undefined) {
+	public set property(property: PropertyTypeResponseModelBaseModel | undefined) {
 		this._property = property;
 		this._updatePropertyVariantId();
 	}

@@ -2,7 +2,7 @@ import { DictionaryDetailDataSource } from './dictionary.details.server.data.int
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 import { tryExecuteAndNotify } from '@umbraco-cms/resources';
 import {
-	DictionaryItemCreateModel,
+	CreateDictionaryItemRequestModel,
 	DictionaryResource,
 	LanguageResource,
 	ProblemDetailsModel,
@@ -80,7 +80,7 @@ export class UmbDictionaryDetailServerDataSource implements DictionaryDetailData
 	 * @memberof UmbDictionaryDetailServerDataSource
 	 */
 	async insert(data: DictionaryDetails) {
-		const requestBody: DictionaryItemCreateModel = {
+		const requestBody: CreateDictionaryItemRequestModel = {
 			parentKey: data.parentKey,
 			name: data.name,
 		};

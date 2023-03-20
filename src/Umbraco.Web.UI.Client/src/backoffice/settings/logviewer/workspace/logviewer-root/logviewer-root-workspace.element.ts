@@ -84,7 +84,9 @@ export class UmbLogViewerWorkspaceElement extends UmbLitElement {
 		this.observe(
 			umbExtensionsRegistry
 				.extensionsOfTypes<ManifestWorkspaceView>(['workspaceView'])
-				.pipe(map((extensions) => extensions.filter((extension) => extension.meta.workspaces.includes(this._alias)))),
+				.pipe(
+					map((extensions) => extensions.filter((extension) => extension.conditions.workspaces.includes(this._alias)))
+				),
 			(workspaceViews) => {
 				this._workspaceViews = workspaceViews;
 				this._createRoutes();

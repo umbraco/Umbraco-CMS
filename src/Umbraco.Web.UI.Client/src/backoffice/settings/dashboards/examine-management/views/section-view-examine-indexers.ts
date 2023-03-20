@@ -4,7 +4,7 @@ import { customElement, property, state } from 'lit/decorators.js';
 import { UUIButtonState } from '@umbraco-ui/uui-button';
 import { UMB_CONFIRM_MODAL_TOKEN } from '../../../../shared/modals/confirm';
 import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN } from '@umbraco-cms/modal';
-import { HealthStatusModel, IndexModel, IndexerResource } from '@umbraco-cms/backend-api';
+import { HealthStatusModel, IndexResponseModel, IndexerResource } from '@umbraco-cms/backend-api';
 import { UmbLitElement } from '@umbraco-cms/element';
 import { tryExecuteAndNotify } from '@umbraco-cms/resources';
 
@@ -85,7 +85,7 @@ export class UmbDashboardExamineIndexElement extends UmbLitElement {
 	private _buttonState?: UUIButtonState = undefined;
 
 	@state()
-	private _indexData?: IndexModel;
+	private _indexData?: IndexResponseModel;
 
 	@state()
 	private _loading = true;

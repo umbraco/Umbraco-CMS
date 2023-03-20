@@ -140,9 +140,10 @@ export class UmbDashboardPublishedStatusElement extends UmbLitElement {
 					type="button"
 					look="primary"
 					color="danger"
-					@click=${this._onRefreshCacheHandler}
-					>Refresh Status</uui-button
-				>
+					label="Refresh Status"
+					@click=${this._onRefreshCacheHandler}>
+					Refresh Status
+				</uui-button>
 			</uui-box>
 
 			<uui-box headline="Memory Cache">
@@ -156,10 +157,11 @@ export class UmbDashboardPublishedStatusElement extends UmbLitElement {
 					type="button"
 					look="primary"
 					color="danger"
+					label="Reload Memory Cache"
 					@click=${this._onReloadCacheHandler}
-					.state=${this._buttonStateReload}
-					>Reload Memory Cache</uui-button
-				>
+					.state=${this._buttonStateReload}>
+					Reload Memory Cache
+				</uui-button>
 			</uui-box>
 
 			<uui-box headline="Database Cache">
@@ -172,10 +174,11 @@ export class UmbDashboardPublishedStatusElement extends UmbLitElement {
 					type="button"
 					look="primary"
 					color="danger"
+					label="Rebuild Database Cache"
 					@click=${this._onRebuildCacheHandler}
-					.state=${this._buttonStateRebuild}
-					>Rebuild Database Cache</uui-button
-				>
+					.state=${this._buttonStateRebuild}>
+					Rebuild Database Cache
+				</uui-button>
 			</uui-box>
 
 			<uui-box headline="Internal Cache">
@@ -187,10 +190,11 @@ export class UmbDashboardPublishedStatusElement extends UmbLitElement {
 					type="button"
 					look="primary"
 					color="danger"
+					label="Snapshot Internal Cache"
 					@click=${this._onSnapshotCacheHandler}
-					.state=${this._buttonStateCollect}
-					>Snapshot Internal Cache</uui-button
-				>
+					.state=${this._buttonStateCollect}>
+					Snapshot Internal Cache
+				</uui-button>
 			</uui-box>
 		`;
 	}

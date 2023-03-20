@@ -10,11 +10,11 @@ import {
 	UMB_HEALTHCHECK_DASHBOARD_CONTEXT_TOKEN,
 } from '../health-check-dashboard.context';
 import {
-	HealthCheckActionModel,
-	HealthCheckGroupModel,
+	HealthCheckActionRequestModel,
+	HealthCheckGroupPresentationModel,
 	HealthCheckModel,
 	HealthCheckResource,
-	HealthCheckWithResultModel,
+	HealthCheckWithResultPresentationModel,
 	StatusResultTypeModel,
 } from '@umbraco-cms/backend-api';
 import { UmbLitElement } from '@umbraco-cms/element';
@@ -74,7 +74,7 @@ export class UmbDashboardHealthCheckGroupElement extends UmbLitElement {
 	private _buttonState: UUIButtonState;
 
 	@state()
-	private _group?: HealthCheckGroupModel;
+	private _group?: HealthCheckGroupPresentationModel;
 
 	private _healthCheckContext?: UmbHealthCheckDashboardContext;
 
@@ -82,7 +82,7 @@ export class UmbDashboardHealthCheckGroupElement extends UmbLitElement {
 	private _checks?: HealthCheckModel[];
 
 	@state()
-	private _keyResults?: HealthCheckWithResultModel[];
+	private _keyResults?: HealthCheckWithResultPresentationModel[];
 
 	private _api?: UmbHealthCheckContext;
 
@@ -112,7 +112,7 @@ export class UmbDashboardHealthCheckGroupElement extends UmbLitElement {
 		this._buttonState = 'success';
 	}
 
-	private _onActionClick(action: HealthCheckActionModel) {
+	private _onActionClick(action: HealthCheckActionRequestModel) {
 		return tryExecuteAndNotify(this, HealthCheckResource.postHealthCheckExecuteAction({ requestBody: action }));
 	}
 
@@ -197,7 +197,7 @@ export class UmbDashboardHealthCheckGroupElement extends UmbLitElement {
 		}
 	}
 
-	private renderActions(actions: HealthCheckActionModel[]) {
+	private renderActions(actions: HealthCheckActionRequestModel[]) {
 		if (actions.length)
 			return html` <div class="action-wrapper">
 				${actions.map(

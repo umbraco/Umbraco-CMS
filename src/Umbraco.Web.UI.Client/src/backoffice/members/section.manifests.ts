@@ -22,8 +22,10 @@ const dashboards: Array<ManifestDashboard> = [
 		loader: () => import('./dashboards/welcome/dashboard-members-welcome.element'),
 		meta: {
 			label: 'Members',
-			sections: [sectionAlias],
 			pathname: 'members',
+		},
+		conditions: {
+			sections: [sectionAlias],
 		},
 	},
 ];
@@ -35,8 +37,10 @@ const menuSectionSidebarApp: ManifestMenuSectionSidebarApp = {
 	weight: 100,
 	meta: {
 		label: 'Members',
-		sections: [sectionAlias],
 		menu: 'Umb.Menu.Members',
+	},
+	conditions: {
+		sections: [sectionAlias],
 	},
 };
 

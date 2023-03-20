@@ -1,4 +1,4 @@
-import { EntityTreeItemModel } from '@umbraco-cms/backend-api';
+import { EntityTreeItemResponseModel } from '@umbraco-cms/backend-api';
 import { ArrayState, partialUpdateFrozenArray } from '@umbraco-cms/observable-api';
 import { UmbStoreBase } from '@umbraco-cms/store';
 
@@ -10,14 +10,14 @@ import { UmbStoreBase } from '@umbraco-cms/store';
  */
 // TODO: consider if tree store could be turned into a general EntityTreeStore class?
 export class UmbTreeStoreBase extends UmbStoreBase {
-	#data = new ArrayState<EntityTreeItemModel>([], (x) => x.key);
+	#data = new ArrayState<EntityTreeItemResponseModel>([], (x) => x.key);
 
 	/**
 	 * Appends items to the store
 	 * @param {Array<EntityTreeItemModel>} items
 	 * @memberof UmbTreeStoreBase
 	 */
-	appendItems(items: Array<EntityTreeItemModel>) {
+	appendItems(items: Array<EntityTreeItemResponseModel>) {
 		this.#data.append(items);
 	}
 
@@ -27,7 +27,7 @@ export class UmbTreeStoreBase extends UmbStoreBase {
 	 * @param {Partial<EntityTreeItemModel>} data
 	 * @memberof UmbTreeStoreBase
 	 */
-	updateItem(key: string, data: Partial<EntityTreeItemModel>) {
+	updateItem(key: string, data: Partial<EntityTreeItemResponseModel>) {
 		this.#data.next(partialUpdateFrozenArray(this.#data.getValue(), data, (entry) => entry.key === key));
 	}
 

@@ -1,7 +1,7 @@
 import { UmbEntityData } from './entity.data';
 import { createEntityTreeItem } from './utils';
 import type { MemberDetails } from '@umbraco-cms/models';
-import type { EntityTreeItemModel, PagedEntityTreeItemModel } from '@umbraco-cms/backend-api';
+import type { EntityTreeItemResponseModel, PagedEntityTreeItemResponseModel } from '@umbraco-cms/backend-api';
 
 export const data: Array<MemberDetails> = [
 	{
@@ -25,21 +25,21 @@ class UmbMemberData extends UmbEntityData<MemberDetails> {
 		super(data);
 	}
 
-	getTreeRoot(): PagedEntityTreeItemModel {
+	getTreeRoot(): PagedEntityTreeItemResponseModel {
 		const items = this.data.filter((item) => item.parentKey === null);
 		const treeItems = items.map((item) => createEntityTreeItem(item));
 		const total = items.length;
 		return { items: treeItems, total };
 	}
 
-	getTreeItemChildren(key: string): PagedEntityTreeItemModel {
+	getTreeItemChildren(key: string): PagedEntityTreeItemResponseModel {
 		const items = this.data.filter((item) => item.parentKey === key);
 		const treeItems = items.map((item) => createEntityTreeItem(item));
 		const total = items.length;
 		return { items: treeItems, total };
 	}
 
-	getTreeItem(keys: Array<string>): Array<EntityTreeItemModel> {
+	getTreeItem(keys: Array<string>): Array<EntityTreeItemResponseModel> {
 		const items = this.data.filter((item) => keys.includes(item.key ?? ''));
 		return items.map((item) => createEntityTreeItem(item));
 	}

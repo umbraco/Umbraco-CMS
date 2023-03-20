@@ -4,7 +4,7 @@ import { css, html, nothing } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
 
-import { HealthCheckActionModel, HealthCheckResource } from '@umbraco-cms/backend-api';
+import { HealthCheckActionRequestModel, HealthCheckResource } from '@umbraco-cms/backend-api';
 import { UmbLitElement } from '@umbraco-cms/element';
 import { tryExecuteAndNotify } from '@umbraco-cms/resources';
 
@@ -54,7 +54,7 @@ export class UmbDashboardHealthCheckActionElement extends UmbLitElement {
 	];
 
 	@property({ reflect: true })
-	action!: HealthCheckActionModel;
+	action!: HealthCheckActionRequestModel;
 
 	@state()
 	private _buttonState?: UUIButtonState;

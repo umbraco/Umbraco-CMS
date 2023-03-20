@@ -8,7 +8,7 @@ import { UMB_CONFIRM_MODAL_TOKEN } from '../../modals/confirm';
 import { UMB_MEDIA_PICKER_MODAL_TOKEN } from '../../../media/media/modals/media-picker';
 import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN } from '@umbraco-cms/modal';
 import { UmbLitElement } from '@umbraco-cms/element';
-import type { EntityTreeItemModel, FolderTreeItemModel } from '@umbraco-cms/backend-api';
+import type { EntityTreeItemResponseModel } from '@umbraco-cms/backend-api';
 import type { UmbObserverController } from '@umbraco-cms/observable-api';
 
 @customElement('umb-input-media-picker')
@@ -88,10 +88,10 @@ export class UmbInputMediaPickerElement extends FormControlMixin(UmbLitElement) 
 	}
 
 	@state()
-	private _items?: Array<EntityTreeItemModel>;
+	private _items?: Array<EntityTreeItemResponseModel>;
 
 	private _modalContext?: UmbModalContext;
-	private _pickedItemsObserver?: UmbObserverController<FolderTreeItemModel>;
+	private _pickedItemsObserver?: UmbObserverController<EntityTreeItemResponseModel[]>;
 	private _repository = new UmbMediaRepository(this);
 
 	constructor() {
@@ -147,7 +147,7 @@ export class UmbInputMediaPickerElement extends FormControlMixin(UmbLitElement) 
 		});
 	}
 
-	private _removeItem(item: FolderTreeItemModel) {
+	private _removeItem(item: EntityTreeItemResponseModel) {
 		const modalHandler = this._modalContext?.open(UMB_CONFIRM_MODAL_TOKEN, {
 			color: 'danger',
 			headline: `Remove ${item.name}?`,
@@ -177,9 +177,9 @@ export class UmbInputMediaPickerElement extends FormControlMixin(UmbLitElement) 
 		</uui-button>`;
 	}
 
-	private _renderItem(item: FolderTreeItemModel) {
+	private _renderItem(item: EntityTreeItemResponseModel) {
 		// TODO: remove when we have a way to handle trashed items
-		const tempItem = item as FolderTreeItemModel & { isTrashed: boolean };
+		const tempItem = item as EntityTreeItemResponseModel & { isTrashed: boolean };
 
 		return html`
 			<uui-card-media

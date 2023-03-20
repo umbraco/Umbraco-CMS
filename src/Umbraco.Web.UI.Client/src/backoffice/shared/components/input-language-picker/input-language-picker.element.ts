@@ -9,7 +9,7 @@ import { UMB_LANGUAGE_PICKER_MODAL_TOKEN } from '../../../settings/languages/mod
 import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN } from '@umbraco-cms/modal';
 import { UmbChangeEvent } from '@umbraco-cms/events';
 import { UmbLitElement } from '@umbraco-cms/element';
-import type { LanguageModel } from '@umbraco-cms/backend-api';
+import type { LanguageResponseModel } from '@umbraco-cms/backend-api';
 import type { UmbObserverController } from '@umbraco-cms/observable-api';
 
 @customElement('umb-input-language-picker')
@@ -59,7 +59,7 @@ export class UmbInputLanguagePickerElement extends FormControlMixin(UmbLitElemen
 	maxMessage = 'This field exceeds the allowed amount of items';
 
 	@property({ type: Object, attribute: false })
-	public filter: (language: LanguageModel) => boolean = () => true;
+	public filter: (language: LanguageResponseModel) => boolean = () => true;
 
 	private _selectedIsoCodes: Array<string> = [];
 	public get selectedIsoCodes(): Array<string> {
@@ -79,11 +79,11 @@ export class UmbInputLanguagePickerElement extends FormControlMixin(UmbLitElemen
 	}
 
 	@state()
-	private _items?: Array<LanguageModel>;
+	private _items?: Array<LanguageResponseModel>;
 
 	private _modalContext?: UmbModalContext;
 	private _repository = new UmbLanguageRepository(this);
-	private _pickedItemsObserver?: UmbObserverController<LanguageModel>;
+	private _pickedItemsObserver?: UmbObserverController<LanguageResponseModel[]>;
 
 	constructor() {
 		super();
@@ -132,7 +132,7 @@ export class UmbInputLanguagePickerElement extends FormControlMixin(UmbLitElemen
 		});
 	}
 
-	private _removeItem(item: LanguageModel) {
+	private _removeItem(item: LanguageResponseModel) {
 		const modalHandler = this._modalContext?.open(UMB_CONFIRM_MODAL_TOKEN, {
 			color: 'danger',
 			headline: `Remove ${item.name}?`,
@@ -165,7 +165,7 @@ export class UmbInputLanguagePickerElement extends FormControlMixin(UmbLitElemen
 		`;
 	}
 
-	private _renderItem(item: LanguageModel) {
+	private _renderItem(item: LanguageResponseModel) {
 		return html`
 			<!-- TODO: add language ref element -->
 			<uui-ref-node name=${ifDefined(item.name === null ? undefined : item.name)} detail=${ifDefined(item.isoCode)}>

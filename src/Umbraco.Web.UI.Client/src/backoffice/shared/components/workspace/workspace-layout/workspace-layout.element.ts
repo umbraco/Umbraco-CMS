@@ -99,7 +99,9 @@ export class UmbWorkspaceLayout extends UmbLitElement {
 		this.observe(
 			umbExtensionsRegistry
 				.extensionsOfTypes<ManifestWorkspaceView>(['workspaceView', 'workspaceViewCollection'])
-				.pipe(map((extensions) => extensions.filter((extension) => extension.meta.workspaces.includes(this.alias)))),
+				.pipe(
+					map((extensions) => extensions.filter((extension) => extension.conditions.workspaces.includes(this.alias)))
+				),
 			(workspaceViews) => {
 				this._workspaceViews = workspaceViews;
 				this._createRoutes();

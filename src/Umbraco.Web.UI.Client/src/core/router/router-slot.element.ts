@@ -6,7 +6,7 @@ import { UmbRouterSlotInitEvent } from './router-slot-init.event';
 import { UmbRouterSlotChangeEvent } from './router-slot-change.event';
 
 /**
- *  @element umb-router-slot-element
+ *  @element umb-router-slot
  *  @description - Component for wrapping Router Slot element, providing some local events for implementation.
  *  @extends UmbRouterSlotElement
  * @fires {UmbRouterSlotInitEvent} init - fires when the router is connected

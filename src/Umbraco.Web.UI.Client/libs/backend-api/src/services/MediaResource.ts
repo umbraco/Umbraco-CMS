@@ -1,10 +1,13 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-import type { ContentTreeItemModel } from '../models/ContentTreeItemModel';
-import type { DocumentTreeItemModel } from '../models/DocumentTreeItemModel';
-import type { PagedContentTreeItemModel } from '../models/PagedContentTreeItemModel';
-import type { PagedRecycleBinItemModel } from '../models/PagedRecycleBinItemModel';
+import type { ContentTreeItemResponseModel } from '../models/ContentTreeItemResponseModel';
+import type { CreateMediaRequestModel } from '../models/CreateMediaRequestModel';
+import type { DocumentResponseModel } from '../models/DocumentResponseModel';
+import type { DocumentTreeItemResponseModel } from '../models/DocumentTreeItemResponseModel';
+import type { PagedContentTreeItemResponseModel } from '../models/PagedContentTreeItemResponseModel';
+import type { PagedRecycleBinItemResponseModel } from '../models/PagedRecycleBinItemResponseModel';
+import type { UpdateMediaRequestModel } from '../models/UpdateMediaRequestModel';
 
 import type { CancelablePromise } from '../core/CancelablePromise';
 import { OpenAPI } from '../core/OpenAPI';
@@ -13,18 +16,109 @@ import { request as __request } from '../core/request';
 export class MediaResource {
 
     /**
-     * @returns PagedRecycleBinItemModel Success
+     * @returns string Created
+     * @throws ApiError
+     */
+    public static postMedia({
+requestBody,
+}: {
+requestBody?: CreateMediaRequestModel,
+}): CancelablePromise<string> {
+        return __request(OpenAPI, {
+            method: 'POST',
+            url: '/umbraco/management/api/v1/media',
+            body: requestBody,
+            mediaType: 'application/json',
+            responseHeader: 'Location',
+            errors: {
+                400: `Bad Request`,
+                404: `Not Found`,
+            },
+        });
+    }
+
+    /**
+     * @returns any Success
+     * @throws ApiError
+     */
+    public static getMediaByKey({
+key,
+}: {
+key: string,
+}): CancelablePromise<DocumentResponseModel> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/umbraco/management/api/v1/media/{key}',
+            path: {
+                'key': key,
+            },
+            errors: {
+                404: `Not Found`,
+            },
+        });
+    }
+
+    /**
+     * @returns any Success
+     * @throws ApiError
+     */
+    public static deleteMediaByKey({
+key,
+}: {
+key: string,
+}): CancelablePromise<any> {
+        return __request(OpenAPI, {
+            method: 'DELETE',
+            url: '/umbraco/management/api/v1/media/{key}',
+            path: {
+                'key': key,
+            },
+            errors: {
+                400: `Bad Request`,
+                404: `Not Found`,
+            },
+        });
+    }
+
+    /**
+     * @returns any Success
+     * @throws ApiError
+     */
+    public static putMediaByKey({
+key,
+requestBody,
+}: {
+key: string,
+requestBody?: UpdateMediaRequestModel,
+}): CancelablePromise<any> {
+        return __request(OpenAPI, {
+            method: 'PUT',
+            url: '/umbraco/management/api/v1/media/{key}',
+            path: {
+                'key': key,
+            },
+            body: requestBody,
+            mediaType: 'application/json',
+            errors: {
+                400: `Bad Request`,
+                404: `Not Found`,
+            },
+        });
+    }
+
+    /**
+     * @returns PagedRecycleBinItemResponseModel Success
      * @throws ApiError
      */
     public static getRecycleBinMediaChildren({
-        parentKey,
-        skip,
-        take = 100,
-    }: {
-        parentKey?: string,
-        skip?: number,
-        take?: number,
-    }): CancelablePromise<PagedRecycleBinItemModel> {
+parentKey,
+skip,
+take = 100,
+}: {
+parentKey?: string,
+skip?: number,
+take?: number,
+}): CancelablePromise<PagedRecycleBinItemResponseModel> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/recycle-bin/media/children',
@@ -40,16 +134,16 @@ export class MediaResource {
     }
 
     /**
-     * @returns PagedRecycleBinItemModel Success
+     * @returns PagedRecycleBinItemResponseModel Success
      * @throws ApiError
      */
     public static getRecycleBinMediaRoot({
-        skip,
-        take = 100,
-    }: {
-        skip?: number,
-        take?: number,
-    }): CancelablePromise<PagedRecycleBinItemModel> {
+skip,
+take = 100,
+}: {
+skip?: number,
+take?: number,
+}): CancelablePromise<PagedRecycleBinItemResponseModel> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/recycle-bin/media/root',
@@ -64,20 +158,20 @@ export class MediaResource {
     }
 
     /**
-     * @returns PagedContentTreeItemModel Success
+     * @returns PagedContentTreeItemResponseModel Success
      * @throws ApiError
      */
     public static getTreeMediaChildren({
-        parentKey,
-        skip,
-        take = 100,
-        dataTypeKey,
-    }: {
-        parentKey?: string,
-        skip?: number,
-        take?: number,
-        dataTypeKey?: string,
-    }): CancelablePromise<PagedContentTreeItemModel> {
+parentKey,
+skip,
+take = 100,
+dataTypeKey,
+}: {
+parentKey?: string,
+skip?: number,
+take?: number,
+dataTypeKey?: string,
+}): CancelablePromise<PagedContentTreeItemResponseModel> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/tree/media/children',
@@ -95,12 +189,12 @@ export class MediaResource {
      * @throws ApiError
      */
     public static getTreeMediaItem({
-        key,
-        dataTypeKey,
-    }: {
-        key?: Array<string>,
-        dataTypeKey?: string,
-    }): CancelablePromise<Array<(ContentTreeItemModel | DocumentTreeItemModel)>> {
+key,
+dataTypeKey,
+}: {
+key?: Array<string>,
+dataTypeKey?: string,
+}): CancelablePromise<Array<(ContentTreeItemResponseModel | DocumentTreeItemResponseModel)>> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/tree/media/item',
@@ -112,18 +206,18 @@ export class MediaResource {
     }
 
     /**
-     * @returns PagedContentTreeItemModel Success
+     * @returns PagedContentTreeItemResponseModel Success
      * @throws ApiError
      */
     public static getTreeMediaRoot({
-        skip,
-        take = 100,
-        dataTypeKey,
-    }: {
-        skip?: number,
-        take?: number,
-        dataTypeKey?: string,
-    }): CancelablePromise<PagedContentTreeItemModel> {
+skip,
+take = 100,
+dataTypeKey,
+}: {
+skip?: number,
+take?: number,
+dataTypeKey?: string,
+}): CancelablePromise<PagedContentTreeItemResponseModel> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/tree/media/root',
