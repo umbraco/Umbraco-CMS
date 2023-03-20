@@ -25,8 +25,6 @@ export class UmbRelationTypeWorkspaceContext
 		if (data) {
 			this.setIsNew(false);
 			this.#data.update(data);
-
-			console.log('THS', this);
 		}
 	}
 
