@@ -1,10 +1,9 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
-
+import { UmbTableColumn, UmbTableConfig } from '../../../../../shared/components/table';
 import { UmbLitElement } from '@umbraco-cms/element';
 import { RelationModel } from '@umbraco-cms/backend-api';
-import { repeat } from 'lit-html/directives/repeat.js';
 
 @customElement('umb-workspace-view-relation-type-relation')
 export class UmbWorkspaceViewRelationTypeRelationElement extends UmbLitElement {
@@ -18,21 +17,63 @@ export class UmbWorkspaceViewRelationTypeRelationElement extends UmbLitElement {
 		`,
 	];
 
+	//TODO Use real data
 	@state()
 	_relations: Array<RelationModel> = MockData;
 
+	private _tableConfig: UmbTableConfig = {
+		allowSelection: false,
+		hideIcon: true,
+	};
+
+	private _tableColumns: Array<UmbTableColumn> = [
+		{
+			name: 'Parent',
+			alias: 'parent',
+		},
+		{
+			name: 'Child',
+			alias: 'child',
+		},
+		{
+			name: 'Created',
+			alias: 'created',
+		},
+		{
+			name: 'Comment',
+			alias: 'comment',
+		},
+	];
+
+	private get _tableItems() {
+		return this._relations.map((relation) => {
+			return {
+				key: relation.parentId + '-' + relation.childId,
+				data: [
+					{
+						columnAlias: 'parent',
+						value: relation.parentName,
+					},
+					{
+						columnAlias: 'child',
+						value: relation.childName,
+					},
+					{
+						columnAlias: 'created',
+						value: relation.createDate,
+					},
+					{
+						columnAlias: 'comment',
+						value: relation.comment,
+					},
+				],
+			};
+		});
+	}
+
 	render() {
 		return html`<uui-box headline="Relations">
-			${repeat(
-				this._relations,
-				(relation) => relation.childId,
-				(relation) => html`
-					<div>
-						<div>${relation.parentName}</div>
-						<div>${relation.childName}</div>
-					</div>
-				`
-			)}
+			<umb-table .config=${this._tableConfig} .columns=${this._tableColumns} .items=${this._tableItems}></umb-table>
 		</uui-box>`;
 	}
 }

@@ -41,8 +41,6 @@ export class UmbRelationTypeWorkspaceViewRelationTypeElement extends UmbLitEleme
 		this.observe(this.#workspaceContext.data, (relationType) => {
 			if (!relationType) return;
 
-			console.log('relationType', relationType);
-
 			this._relationType = relationType as RelationTypeBaseModel;
 		});
 	}
