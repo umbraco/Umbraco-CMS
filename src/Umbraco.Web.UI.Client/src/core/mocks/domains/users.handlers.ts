@@ -66,7 +66,7 @@ export const handlers = [
 			mediaStartNodes: [],
 		};
 
-		const invited = umbUsersData.save([newUser]);
+		const invited = umbUsersData.save(newUser);
 
 		console.log('invited', invited);
 
