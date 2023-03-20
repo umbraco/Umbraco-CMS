@@ -113,6 +113,9 @@ describe('UmbExtensionRegistry with kinds', () => {
 				manifest: {
 					type: 'section',
 					elementName: 'my-kind-element',
+					meta: {
+						label: 'my-kind-meta-label',
+					},
 				},
 			},
 			{
@@ -122,7 +125,7 @@ describe('UmbExtensionRegistry with kinds', () => {
 				alias: 'Umb.Test.Section.1',
 				weight: 1,
 				meta: {
-					label: 'Test Section 1',
+					//label: 'Test Section 1',// should come from the kind.
 					pathname: 'test-section-1',
 				},
 			},
@@ -170,6 +173,7 @@ describe('UmbExtensionRegistry with kinds', () => {
 				expect(extensions?.[1]?.elementName).to.eq('my-kind-element');
 				expect(extensions?.[2]?.alias).to.eq('Umb.Test.Section.1');
 				expect(extensions?.[2]?.elementName).to.eq('my-kind-element');
+				expect(extensions?.[2]?.meta.label).to.eq('my-kind-meta-label');
 				done();
 			})
 			.unsubscribe();
