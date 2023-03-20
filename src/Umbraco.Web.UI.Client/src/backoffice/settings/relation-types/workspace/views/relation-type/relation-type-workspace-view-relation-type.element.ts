@@ -40,6 +40,9 @@ export class UmbRelationTypeWorkspaceViewRelationTypeElement extends UmbLitEleme
 
 		this.observe(this.#workspaceContext.data, (relationType) => {
 			if (!relationType) return;
+
+			console.log('relationType', relationType);
+
 			this._relationType = relationType as RelationTypeBaseModel;
 		});
 	}
@@ -63,7 +66,7 @@ export class UmbRelationTypeWorkspaceViewRelationTypeElement extends UmbLitEleme
 					<uui-radio-group
 						value=${ifDefined(this._relationType?.isBidirectional)}
 						@change=${this.#handleDirectionChange}
-						slot="relation-typeor">
+						slot="editor">
 						<uui-radio label="Parent to child" value="false"></uui-radio>
 						<uui-radio label="Bidirectional" value="true"></uui-radio>
 					</uui-radio-group>
@@ -72,7 +75,7 @@ export class UmbRelationTypeWorkspaceViewRelationTypeElement extends UmbLitEleme
 				<umb-workspace-property-layout label="Child"> ${this.#renderChildProperty()} </umb-workspace-property-layout>
 				<umb-workspace-property-layout label="Is dependency">
 					<uui-toggle
-						slot="relation-typeor"
+						slot="editor"
 						@change=${this.#handleIsDependencyChange}
 						.checked=${this._relationType?.isDependency ?? false}></uui-toggle>
 				</umb-workspace-property-layout>
@@ -81,17 +84,15 @@ export class UmbRelationTypeWorkspaceViewRelationTypeElement extends UmbLitEleme
 	}
 
 	#renderParentProperty() {
-		if (this._relationType?.key)
-			return html`<div slot="relation-typeor">${this._relationType.parentObjectTypeName}</div>`;
+		if (this._relationType?.key) return html`<div slot="editor">${this._relationType.parentObjectTypeName}</div>`;
 
-		return html`<uui-select slot="relation-typeor"></uui-select>`;
+		return html`<uui-select slot="editor"></uui-select>`;
 	}
 
 	#renderChildProperty() {
-		if (this._relationType?.key)
-			return html`<div slot="relation-typeor">${this._relationType.parentObjectTypeName}</div>`;
+		if (this._relationType?.key) return html`<div slot="editor">${this._relationType.parentObjectTypeName}</div>`;
 
-		return html`<uui-select slot="relation-typeor"></uui-select>`;
+		return html`<uui-select slot="editor"></uui-select>`;
 	}
 }
 
