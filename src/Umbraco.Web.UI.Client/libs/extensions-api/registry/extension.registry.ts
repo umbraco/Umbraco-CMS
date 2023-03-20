@@ -118,29 +118,50 @@ export class UmbExtensionRegistry {
 		) as Observable<Array<ExtensionType>>;
 	}
 
-	getByTypeAndAlias<Key extends keyof ManifestTypeMap | string, T = SpecificManifestTypeOrManifestBase<Key>>(
-		type: Key,
-		alias: string
-	) {
+	getByTypeAndAlias<
+		Key extends keyof ManifestTypeMap | string,
+		T extends ManifestBase = SpecificManifestTypeOrManifestBase<Key>
+	>(type: Key, alias: string) {
 		return this.extensions.pipe(
 			map((exts) => exts.find((ext) => ext.type === type && ext.alias === alias)),
 			withLatestFrom(this._kindsOfType(type)),
 			map(([ext, kinds]) => {
-				// TODO: Deep merge?
-				return ext ? { ...kinds.find((kind) => kind.matchKind === ext.kind)?.manifest, ...ext } : undefined;
+				// Specific Extension Meta merge (does not merge conditions)
+				if (ext) {
+					const baseManifest = kinds.find((kind) => kind.matchKind === ext.kind)?.manifest;
+					if (baseManifest) {
+						const merged = { ...baseManifest, ...ext } as any;
+						if ((baseManifest as any).meta) {
+							merged.meta = { ...(baseManifest as any).meta, ...(ext as any).meta };
+						}
+						return merged;
+					}
+				}
+				return ext;
 			}),
 			distinctUntilChanged(ExtensionSingleMemoization)
 		) as Observable<T | undefined>;
 	}
 
-	extensionsOfType<Key extends keyof ManifestTypeMap | string, T = SpecificManifestTypeOrManifestBase<Key>>(type: Key) {
+	extensionsOfType<
+		Key extends keyof ManifestTypeMap | string,
+		T extends ManifestBase = SpecificManifestTypeOrManifestBase<Key>
+	>(type: Key) {
 		return this._extensionsOfType(type).pipe(
 			withLatestFrom(this._kindsOfType(type)),
 			map(([exts, kinds]) =>
 				exts
 					.map((ext) => {
-						// TODO: Deep merge?
-						return { ...kinds.find((kind) => kind.matchKind === ext.kind)?.manifest, ...ext };
+						// Specific Extension Meta merge (does not merge conditions)
+						const baseManifest = kinds.find((kind) => kind.matchKind === ext.kind)?.manifest;
+						if (baseManifest) {
+							const merged = { ...baseManifest, ...ext } as any;
+							if ((baseManifest as any).meta) {
+								merged.meta = { ...(baseManifest as any).meta, ...(ext as any).meta };
+							}
+							return merged;
+						}
+						return ext;
 					})
 					.sort((a, b) => (b.weight || 0) - (a.weight || 0))
 			),
