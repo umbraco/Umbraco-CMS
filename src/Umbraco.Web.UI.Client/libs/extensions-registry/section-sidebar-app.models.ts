@@ -3,14 +3,13 @@ import type { ManifestElement } from './models';
 export interface ManifestSectionSidebarApp extends ManifestElement {
 	type: 'sectionSidebarApp';
 	conditions: ConditionsSectionSidebarApp;
-	meta?: unknown;
 }
 
 export interface ConditionsSectionSidebarApp {
 	sections: Array<string>;
 }
 
-export interface ManifestSectionSidebarAppMenuKind extends Omit<ManifestSectionSidebarApp, 'kind' | 'meta'> {
+export interface ManifestSectionSidebarAppMenuKind extends ManifestSectionSidebarApp {
 	type: 'sectionSidebarApp';
 	kind: 'menu';
 	meta: MetaSectionSidebarAppMenuKind;
