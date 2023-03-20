@@ -766,14 +766,20 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
         }
 
         var e = $(element).closest(".umb-macro-holder");
+
         if (e.length > 0) {
-          if (e.get(0).parentNode.nodeName === "P") {
+          var macroHolder = e.get(0);
+          // In case of Inline Macro we don't need the be backward compliant
+          if(macroHolder.tagName === 'SPAN'){
+            return macroHolder;
+          }
+          if (macroHolder.parentNode.nodeName === "P") {
             //now check if we're the only element
             if (element.parentNode.childNodes.length === 1) {
-              return e.get(0).parentNode;
+              return macroHolder.parentNode;
             }
           }
-          return e.get(0);
+          return macroHolder;
         }
         return null;
       }
@@ -830,35 +836,37 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
       var macroSyntaxComment = "<!-- " + macroObject.syntax + " -->";
       //create an id class for this element so we can re-select it after inserting
       var uniqueId = "umb-macro-" + editor.dom.uniqueId();
-      var macroDiv = editor.dom.create('div',
+      var isInlined = macroObject.macroParamsDictionary["enableInlineMacro"] === "1";
+      var macroElementType = isInlined ? 'span' : 'div';
+      var macroElement = editor.dom.create(macroElementType,
         {
-          'class': 'umb-macro-holder ' + macroObject.macroAlias + " " + uniqueId + ' mceNonEditable',
+          'class': 'umb-macro-holder ' + macroObject.macroAlias + " " + uniqueId + ' mceNonEditable' + (isInlined ? ' inlined-macro' : ''),
           'contenteditable': 'false'
         },
         macroSyntaxComment + '<ins>Macro alias: <strong>' + macroObject.macroAlias + '</strong></ins>');
 
       //if there's an activeMacroElement then replace it, otherwise set the contents of the selected node
       if (activeMacroElement) {
-        activeMacroElement.replaceWith(macroDiv); //directly replaces the html node
+        activeMacroElement.replaceWith(macroElement); //directly replaces the html node
       }
       else {
-        editor.selection.setNode(macroDiv);
+        editor.selection.setNode(macroElement);
       }
 
-      var $macroDiv = $(editor.dom.select("div.umb-macro-holder." + uniqueId));
+      var $macroElement = $(editor.dom.select(".umb-macro-holder." + uniqueId));
       editor.setDirty(true);
 
       //async load the macro content
-      this.loadMacroContent($macroDiv, macroObject, editor);
+      this.loadMacroContent($macroElement, macroObject, editor);
 
     },
 
     /** loads in the macro content async from the server */
-    loadMacroContent: function ($macroDiv, macroData, editor) {
+    loadMacroContent: function ($macroElement, macroData, editor) {
 
       //if we don't have the macroData, then we'll need to parse it from the macro div
       if (!macroData) {
-        var contents = $macroDiv.contents();
+        var contents = $macroElement.contents();
         var comment = _.find(contents, function (item) {
           return item.nodeType === 8;
         });
@@ -870,15 +878,15 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
         macroData = parsed;
       }
 
-      var $ins = $macroDiv.find("ins");
+      var $ins = $macroElement.find("ins");
 
       //show the throbber
-      $macroDiv.addClass("loading");
+      $macroElement.addClass("loading");
 
       // Add the contenteditable="false" attribute
       // As just the CSS class of .mceNonEditable is not working by itself?!
       // TODO: At later date - use TinyMCE editor DOM manipulation as opposed to jQuery
-      $macroDiv.attr("contenteditable", "false");
+      $macroElement.attr("contenteditable", "false");
 
       var contentId = $routeParams.id;
 
@@ -887,7 +895,7 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
         macroResource.getMacroResultAsHtmlForEditor(macroData.macroAlias, contentId, macroData.macroParamsDictionary)
           .then(function (htmlResult) {
 
-            $macroDiv.removeClass("loading");
+            $macroElement.removeClass("loading");
             htmlResult = htmlResult.trim();
             if (htmlResult !== "") {
               var wasDirty = editor.isDirty();
@@ -1144,7 +1152,7 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
 
       // the href might be an external url, so check the value for an anchor/qs
       // href has the anchor re-appended later, hence the reset here to avoid duplicating the anchor
-      if (!target.anchor) {
+      if (!target.anchor && href) {
         var urlParts = href.split(/(#|\?)/);
         if (urlParts.length === 3) {
           href = urlParts[0];
