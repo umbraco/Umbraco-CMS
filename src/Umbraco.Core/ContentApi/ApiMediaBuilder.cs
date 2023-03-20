@@ -7,18 +7,18 @@ namespace Umbraco.Cms.Core.ContentApi;
 public class ApiMediaBuilder : IApiMediaBuilder
 {
     private readonly IApiContentNameProvider _apiContentNameProvider;
-    private readonly IApiUrlProvider _apiUrlProvider;
+    private readonly IApiMediaUrlProvider _apiMediaUrlProvider;
     private readonly IPublishedValueFallback _publishedValueFallback;
     private readonly IOutputExpansionStrategyAccessor _outputExpansionStrategyAccessor;
 
     public ApiMediaBuilder(
         IApiContentNameProvider apiContentNameProvider,
-        IApiUrlProvider apiUrlProvider,
+        IApiMediaUrlProvider apiMediaUrlProvider,
         IPublishedValueFallback publishedValueFallback,
         IOutputExpansionStrategyAccessor outputExpansionStrategyAccessor)
     {
         _apiContentNameProvider = apiContentNameProvider;
-        _apiUrlProvider = apiUrlProvider;
+        _apiMediaUrlProvider = apiMediaUrlProvider;
         _publishedValueFallback = publishedValueFallback;
         _outputExpansionStrategyAccessor = outputExpansionStrategyAccessor;
     }
@@ -28,7 +28,7 @@ public class ApiMediaBuilder : IApiMediaBuilder
             media.Key,
             _apiContentNameProvider.GetName(media),
             media.ContentType.Alias,
-            _apiUrlProvider.Url(media),
+            _apiMediaUrlProvider.GetUrl(media),
             Extension(media),
             Width(media),
             Height(media),

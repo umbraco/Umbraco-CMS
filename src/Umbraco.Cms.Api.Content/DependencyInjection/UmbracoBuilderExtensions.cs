@@ -17,12 +17,12 @@ public static class UmbracoBuilderExtensions
 {
     public static IUmbracoBuilder AddContentApi(this IUmbracoBuilder builder)
     {
-        builder.Services.AddScoped<IRequestStartNodeService, RequestStartNodeService>();
+        builder.Services.AddScoped<IRequestStartItemService, RequestStartItemService>();
         builder.Services.AddScoped<IRequestCultureService, RequestCultureService>();
         builder.Services.AddScoped<IRequestRoutingService, RequestRoutingService>();
         builder.Services.AddScoped<IOutputExpansionStrategy, RequestContextOutputExpansionStrategy>();
         builder.Services.AddSingleton<IOutputExpansionStrategyAccessor, RequestContextOutputExpansionStrategyAccessor>();
-        builder.Services.AddSingleton<IRequestStartNodeServiceAccessor, RequestContextRequestStartNodeServiceAccessor>();
+        builder.Services.AddSingleton<IRequestStartItemServiceAccessor, RequestContextRequestStartItemServiceAccessor>();
 
         builder
             .Services

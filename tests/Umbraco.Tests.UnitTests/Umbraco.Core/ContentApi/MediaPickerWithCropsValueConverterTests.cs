@@ -18,7 +18,7 @@ public class MediaPickerWithCropsValueConverterTests : PropertyValueConverterTes
     {
         var serializer = new JsonNetSerializer();
         var publishedValueFallback = Mock.Of<IPublishedValueFallback>();
-        var apiUrlProvider = new ApiUrlProvider(PublishedUrlProvider, new NoopRequestStartNodeServiceAccessor());
+        var apiUrlProvider = new ApiMediaUrlProvider(PublishedUrlProvider);
         return new MediaPickerWithCropsValueConverter(
             PublishedSnapshotAccessor,
             PublishedUrlProvider,
