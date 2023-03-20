@@ -4,5 +4,5 @@ public interface IApiContent : IApiElement
 {
     string? Name { get; }
 
-    string Path { get; }
+    IApiContentRoute Route { get; }
 }
