@@ -3,18 +3,14 @@ import type {
 	ManifestTypes,
 	ManifestTypeMap,
 	ManifestBase,
-	ManifestEntrypoint,
 	SpecificManifestTypeOrManifestBase,
 	ManifestKind,
 } from '../../models';
-import { loadExtension } from '../load-extension.function';
-import { hasInitExport } from '../has-init-export.function';
-import type { UmbControllerHostInterface } from '@umbraco-cms/controller';
 import { UmbContextToken } from '@umbraco-cms/context-api';
 
 export class UmbExtensionRegistry {
 	// TODO: Use UniqueBehaviorSubject, as we don't want someone to edit data of extensions.
-	private _extensions = new BehaviorSubject<Array<ManifestBase>>([]);
+	private _extensions = new BehaviorSubject<Array<ManifestTypes>>([]);
 	public readonly extensions = this._extensions.asObservable();
 
 	private _kinds = new BehaviorSubject<Array<ManifestKind>>([]);
