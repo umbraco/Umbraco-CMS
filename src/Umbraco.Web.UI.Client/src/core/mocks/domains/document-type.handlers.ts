@@ -4,7 +4,7 @@ import type { DocumentTypeResponseModel } from '@umbraco-cms/backend-api';
 
 // TODO: add schema
 export const handlers = [
-	rest.post<DocumentTypeResponseModel[]>('/umbraco/management/api/v1/document-type/:key', (req, res, ctx) => {
+	rest.post<DocumentTypeResponseModel>('/umbraco/management/api/v1/document-type/:key', (req, res, ctx) => {
 		const data = req.body;
 		if (!data) return;
 
@@ -22,7 +22,7 @@ export const handlers = [
 		return res(ctx.status(200), ctx.json([document]));
 	}),
 
-	rest.post<DocumentTypeResponseModel[]>('/umbraco/management/api/v1/document-type/details/save', (req, res, ctx) => {
+	rest.post<DocumentTypeResponseModel>('/umbraco/management/api/v1/document-type/details/save', (req, res, ctx) => {
 		const data = req.body;
 		if (!data) return;
 
