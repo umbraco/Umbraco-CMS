@@ -51,7 +51,7 @@ public partial class UserServiceCrudTests
             Email = email,
             UserName = userName,
             Name = "Test Mc. Gee",
-            UserGroups = new SortedSet<IUserGroup> { userGroup! }
+            UserGroups = new HashSet<IUserGroup> { userGroup! }
         };
 
         var createExistingUser = await userService.CreateAsync(Constants.Security.SuperUserKey, createUserModel, true);
@@ -138,7 +138,7 @@ public partial class UserServiceCrudTests
             Email = email,
             UserName = email,
             Name = "Test Mc. Gee",
-            UserGroups = new SortedSet<IUserGroup> { userGroup! }
+            UserGroups = new HashSet<IUserGroup> { userGroup! }
         };
 
         var createExisting = await userService.CreateAsync(Constants.Security.SuperUserKey, createModel, true);
@@ -171,7 +171,7 @@ public partial class UserServiceCrudTests
             Email = existingEmail,
             UserName = existingUserName,
             Name = "Test Mc. Gee",
-            UserGroups = new SortedSet<IUserGroup> { userGroup! }
+            UserGroups = new HashSet<IUserGroup> { userGroup! }
         };
 
         var createExisting = await userService.CreateAsync(Constants.Security.SuperUserKey, createModel, true);

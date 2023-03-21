@@ -64,7 +64,7 @@ public class UserPresentationFactory : IUserPresentationFactory
             Email = requestModel.Email,
             Name = requestModel.Name,
             UserName = requestModel.UserName,
-            UserGroups = new SortedSet<IUserGroup>(groups),
+            UserGroups = new HashSet<IUserGroup>(groups),
         };
 
         return createModel;
@@ -79,7 +79,7 @@ public class UserPresentationFactory : IUserPresentationFactory
             Email = requestModel.Email,
             Name = requestModel.Name,
             UserName = requestModel.UserName,
-            UserGroups = new SortedSet<IUserGroup>(groups),
+            UserGroups = new HashSet<IUserGroup>(groups),
             Message = requestModel.Message,
         };
 

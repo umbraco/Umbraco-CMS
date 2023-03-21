@@ -32,7 +32,7 @@ public partial class UserServiceCrudTests
             UserName = username,
             Email = email,
             Name = "Test Mc. Gee",
-            UserGroups = new SortedSet<IUserGroup> { userGroup! }
+            UserGroups = new HashSet<IUserGroup> { userGroup! }
         };
 
         var result = await userService.CreateAsync(Constants.Security.SuperUserKey, creationModel, true);
@@ -62,7 +62,7 @@ public partial class UserServiceCrudTests
             UserName = "Test1",
             Email = email,
             Name = "Test Mc. Gee",
-            UserGroups = new SortedSet<IUserGroup> { userGroup! }
+            UserGroups = new HashSet<IUserGroup> { userGroup! }
         };
 
         var userService = CreateUserService(new SecuritySettings { UsernameIsEmail = false });
@@ -74,7 +74,7 @@ public partial class UserServiceCrudTests
             UserName = "Test2",
             Email = email,
             Name = "Duplicate Mc. Gee",
-            UserGroups = new SortedSet<IUserGroup> { userGroup! }
+            UserGroups = new HashSet<IUserGroup> { userGroup! }
         };
 
         var secondResult = await userService.CreateAsync(Constants.Security.SuperUserKey, duplicateUserCreateModel, true);
@@ -92,7 +92,7 @@ public partial class UserServiceCrudTests
             UserName = userName,
             Email = "test@email.com",
             Name = "Test Mc. Gee",
-            UserGroups = new SortedSet<IUserGroup> { userGroup! }
+            UserGroups = new HashSet<IUserGroup> { userGroup! }
         };
 
         var userService = CreateUserService(new SecuritySettings { UsernameIsEmail = false });
@@ -104,7 +104,7 @@ public partial class UserServiceCrudTests
             UserName = userName,
             Email = "another@email.com",
             Name = "Duplicate Mc. Gee",
-            UserGroups = new SortedSet<IUserGroup> { userGroup! }
+            UserGroups = new HashSet<IUserGroup> { userGroup! }
         };
 
         var secondResult = await userService.CreateAsync(Constants.Security.SuperUserKey, duplicateUserCreateModel, true);

@@ -25,7 +25,7 @@ public partial class UserServiceCrudTests
             Email = "test@test.com",
             UserName = "test@test.com",
             Name = "test@test.com",
-            UserGroups = new SortedSet<IUserGroup> { userGroup! }
+            UserGroups = new HashSet<IUserGroup> { userGroup! }
         };
 
         var userService = CreateUserService();
@@ -54,7 +54,7 @@ public partial class UserServiceCrudTests
             Email = "test@test.com",
             UserName = "test@test.com",
             Name = "test@test.com",
-            UserGroups = new SortedSet<IUserGroup> { userGroup! }
+            UserGroups = new HashSet<IUserGroup> { userGroup! }
         };
 
         var userService = CreateUserService();
