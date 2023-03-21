@@ -33,6 +33,12 @@ public class AllSavedSearchLogViewerController : SavedSearchLogViewerControllerB
     {
         PagedModel<ILogViewerQuery> savedLogQueries = await _logViewerService.GetSavedLogQueriesAsync(skip, take);
 
-        return Ok(_umbracoMapper.Map<PagedViewModel<SavedLogSearchResponseModel>>(savedLogQueries));
+        var viewModel = new PagedViewModel<SavedLogSearchResponseModel>
+        {
+            Total = savedLogQueries.Total,
+            Items = _umbracoMapper.MapEnumerable<ILogViewerQuery, SavedLogSearchResponseModel>(savedLogQueries.Items)
+        };
+
+        return Ok(viewModel);
     }
 }

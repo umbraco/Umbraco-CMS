@@ -34,7 +34,7 @@ public class AllHealthCheckGroupController : HealthCheckGroupControllerBase
         IGrouping<string?, Core.HealthChecks.HealthCheck>[] groups = _healthCheckGroupPresentationFactory
             .CreateGroupingFromHealthCheckCollection().ToArray();
 
-        var model = new PagedViewModel<HealthCheckGroupResponseModel>
+        var viewModel = new PagedViewModel<HealthCheckGroupResponseModel>
         {
             Total = groups.Length,
             Items = _umbracoMapper
@@ -42,6 +42,6 @@ public class AllHealthCheckGroupController : HealthCheckGroupControllerBase
                     groups.Skip(skip).Take(take))
         };
 
-        return await Task.FromResult(Ok(model));
+        return await Task.FromResult(Ok(viewModel));
     }
 }

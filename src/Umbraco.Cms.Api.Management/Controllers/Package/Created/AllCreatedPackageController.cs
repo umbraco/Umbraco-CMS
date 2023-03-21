@@ -33,6 +33,12 @@ public class AllCreatedPackageController : CreatedPackageControllerBase
     {
         PagedModel<PackageDefinition> createdPackages = await _packagingService.GetCreatedPackagesAsync(skip, take);
 
-        return Ok(_umbracoMapper.Map<PagedViewModel<PackageDefinitionResponseModel>>(createdPackages));
+        var viewModel = new PagedViewModel<PackageDefinitionResponseModel>
+        {
+            Total = createdPackages.Total,
+            Items = _umbracoMapper.MapEnumerable<PackageDefinition, PackageDefinitionResponseModel>(createdPackages.Items)
+        };
+
+        return Ok(viewModel);
     }
 }

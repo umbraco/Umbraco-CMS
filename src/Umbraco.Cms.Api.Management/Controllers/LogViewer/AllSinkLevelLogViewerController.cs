@@ -32,12 +32,12 @@ public class AllSinkLevelLogViewerController : LogViewerControllerBase
     {
         KeyValuePair<string, LogLevel>[] logLevels = _logViewerService.GetLogLevelsFromSinks().ToArray();
 
-        var model = new PagedViewModel<LoggerResponseModel>
+        var viewModel = new PagedViewModel<LoggerResponseModel>
         {
             Total = logLevels.Length,
             Items = _umbracoMapper.MapEnumerable<KeyValuePair<string, LogLevel>, LoggerResponseModel>(logLevels.Skip(skip).Take(take))
         };
 
-        return await Task.FromResult(Ok(model));
+        return await Task.FromResult(Ok(viewModel));
     }
 }

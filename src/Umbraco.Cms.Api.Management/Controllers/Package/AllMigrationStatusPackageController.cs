@@ -33,6 +33,12 @@ public class AllMigrationStatusPackageController : PackageControllerBase
     {
         PagedModel<InstalledPackage> migrationPlans = await _packagingService.GetInstalledPackagesFromMigrationPlansAsync(skip, take);
 
-        return Ok(_umbracoMapper.Map<PagedViewModel<PackageMigrationStatusResponseModel>>(migrationPlans));
+        var viewModel = new PagedViewModel<PackageMigrationStatusResponseModel>
+        {
+            Total = migrationPlans.Total,
+            Items = _umbracoMapper.MapEnumerable<InstalledPackage, PackageMigrationStatusResponseModel>(migrationPlans.Items)
+        };
+
+        return Ok(viewModel);
     }
 }
