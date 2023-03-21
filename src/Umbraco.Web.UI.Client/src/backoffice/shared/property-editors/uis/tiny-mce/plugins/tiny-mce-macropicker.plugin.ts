@@ -1,8 +1,8 @@
 import { AstNode } from 'tinymce';
 import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/modal';
+import { MacroSyntaxData, UmbMacroService } from '@umbraco-cms/backoffice/macro';
 import { UMB_CONFIRM_MODAL_TOKEN } from '../../../../modals/confirm';
 import { TinyMcePluginArguments, TinyMcePluginBase } from './tiny-mce-plugin';
-import { MacroSyntaxData, UmbMacroService } from 'libs/macro/macro.service';
 
 interface DialogData {
 	richTextEditor: boolean;

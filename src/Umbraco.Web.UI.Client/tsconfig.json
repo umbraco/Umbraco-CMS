@@ -28,6 +28,7 @@
 			"@umbraco-cms/backoffice/events": ["libs/umb-events"],
 			"@umbraco-cms/backoffice/extensions-api": ["libs/extensions-api"],
 			"@umbraco-cms/backoffice/extensions-registry": ["libs/extensions-registry"],
+			"@umbraco-cms/backoffice/macro": ["libs/macro"],
 			"@umbraco-cms/backoffice/modal": ["libs/modal"],
 			"@umbraco-cms/backoffice/models": ["libs/models"],
 			"@umbraco-cms/backoffice/notification": ["libs/notification"],
