@@ -346,6 +346,15 @@ public class TextBuilder : Builder
     {
         sb.Append("\n");
 
+        if (Config.GeneratePropertyAliasConstants)
+        {
+            WriteGeneratedCodeAttribute(sb, "\t\t");
+            sb.AppendFormat(
+                "\t\tpublic const string {0} = \"{1}\";\n\n",
+                property.ClrName + "Alias",
+                property.Alias);
+        }
+
         // Adds xml summary to each property containing
         // property name and property description
         if (!string.IsNullOrWhiteSpace(property.Name) || !string.IsNullOrWhiteSpace(property.Description))
@@ -419,6 +428,15 @@ public class TextBuilder : Builder
 
             sb.Append("\t\t *\n");
             sb.Append("\n");
+        }
+
+        if (Config.GeneratePropertyAliasConstants)
+        {
+            WriteGeneratedCodeAttribute(sb, "\t\t");
+            sb.AppendFormat(
+                "\t\tpublic const string {0} = \"{1}\";\n\n",
+                property.ClrName + "Alias",
+                property.Alias);
         }
 
         // Adds xml summary to each property containing
