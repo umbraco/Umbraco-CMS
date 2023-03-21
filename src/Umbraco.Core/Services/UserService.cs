@@ -911,7 +911,7 @@ internal class UserService : RepositoryService, IUserService
         existing = GetByEmail(model.UserName);
         if (existing is not null && existing.Key != model.ExistingUser.Key)
         {
-            return UserOperationStatus.DuplicateEmail;
+            return UserOperationStatus.DuplicateUserName;
         }
 
         existing = GetByUsername(model.UserName);
