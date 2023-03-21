@@ -1,4 +1,4 @@
-import type { DataSourceResponse } from '@umbraco-cms/backoffice/models';
+import type { DataSourceResponse } from '@umbraco-cms/backoffice/repository';
 import type {
 	EntityTreeItemResponseModel,
 	PagedEntityTreeItemResponseModel,

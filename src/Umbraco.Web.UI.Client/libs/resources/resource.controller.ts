@@ -7,7 +7,7 @@ import {
 import { ApiError, CancelablePromise, ProblemDetailsModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbController, UmbControllerHostInterface } from '@umbraco-cms/backoffice/controller';
 import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
-import type { DataSourceResponse } from '@umbraco-cms/backoffice/models';
+import type { DataSourceResponse } from '@umbraco-cms/backoffice/repository';
 
 export class UmbResourceController extends UmbController {
 	#promise: Promise<any>;

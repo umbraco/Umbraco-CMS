@@ -4,7 +4,6 @@ import type {
 	EntityTreeItemResponseModel,
 	FolderTreeItemResponseModel,
 	PackageManifestResponseModel,
-	ProblemDetailsModel,
 } from '@umbraco-cms/backoffice/backend-api';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -139,11 +138,6 @@ export interface DocumentBlueprintDetails {
 	data: Array<any>;
 	icon: string;
 	documentTypeKey: string;
-}
-
-export interface DataSourceResponse<T = undefined> {
-	data?: T;
-	error?: ProblemDetailsModel;
 }
 
 export interface SwatchDetails {

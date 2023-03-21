@@ -8,7 +8,7 @@ import type {
 	PagedSavedLogSearchResponseModel,
 	SavedLogSearchResponseModel,
 } from '@umbraco-cms/backoffice/backend-api';
-import type { DataSourceResponse } from '@umbraco-cms/backoffice/models';
+import type { DataSourceResponse } from '@umbraco-cms/backoffice/repository';
 
 export interface LogSearchDataSource {
 	getAllSavedSearches({

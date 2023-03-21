@@ -2,7 +2,7 @@ import { v4 as uuid } from 'uuid';
 import { ProblemDetailsModel, TemplateResponseModel, TemplateResource } from '@umbraco-cms/backoffice/backend-api';
 import type { UmbControllerHostInterface } from '@umbraco-cms/backoffice/controller';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
-import type { DataSourceResponse } from '@umbraco-cms/backoffice/models';
+import type { DataSourceResponse } from '@umbraco-cms/backoffice/repository';
 
 export interface TemplateDetailDataSource {
 	createScaffold(): Promise<DataSourceResponse<TemplateResponseModel>>;
