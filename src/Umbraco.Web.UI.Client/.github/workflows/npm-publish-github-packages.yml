@@ -20,6 +20,7 @@ on:
       - 'package-lock.json'
       - '.github/workflows/npm-publish-github-packages.yml'
       - './rollup-libs.config.js'
+  workflow_dispatch:
 
 jobs:
   build:
