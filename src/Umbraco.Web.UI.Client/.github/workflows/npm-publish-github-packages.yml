@@ -58,7 +58,8 @@ jobs:
           registry-url: https://npm.pkg.github.com/
       - run: |
           SHA_SHORT=$(echo $GITHUB_SHA | cut -c1-8)
-          npm version 13.0.0-alpha.$SHA_SHORT --allow-same-version --no-git-tag-version
-      - run: npm publish
+          npm version 13.0.0-next.$SHA_SHORT --allow-same-version --no-git-tag-version
+      - run: npm login --registry=https://npm.pkg.github.com/ --scope=@umbraco-cms
+      - run: npm publish --tag next
         env:
           NODE_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
