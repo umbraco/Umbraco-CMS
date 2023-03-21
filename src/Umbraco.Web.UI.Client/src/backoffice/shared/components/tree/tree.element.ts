@@ -73,6 +73,7 @@ export class UmbTreeElement extends UmbLitElement {
 				.pipe(map((trees) => trees.find((tree) => tree.alias === this.alias))),
 			async (tree) => {
 				if (this._tree?.alias === tree?.alias) return;
+
 				this._tree = tree;
 				this.#provideTreeContext();
 			}
