@@ -1,0 +1,60 @@
+# This workflow will run tests using node and then publish a package to GitHub Packages when a release is created
+# For more information see: https://docs.github.com/en/actions/publishing-packages/publishing-nodejs-packages
+
+name: Node.js Libraries Package
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'libs/**'
+      - 'package.json'
+      - 'package-lock.json'
+      - '.github/workflows/npm-publish-github-packages.yml'
+      - './rollup-libs.config.js'
+  pull_request:
+    branches: [ main ]
+    paths:
+      - 'libs/**'
+      - 'package.json'
+      - 'package-lock.json'
+      - '.github/workflows/npm-publish-github-packages.yml'
+      - './rollup-libs.config.js'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 18
+          cache: 'npm'
+      - run: npm ci
+      - run: npm run build:libs
+      - uses: actions/upload-artifact@v3
+        with:
+          name: artifact
+          path: ./dist/libs
+
+  publish-gpr:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/download-artifact@v2
+        with:
+          name: artifact
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 18
+          registry-url: https://npm.pkg.github.com/
+      - run: |
+          SHA_SHORT=$(echo $GITHUB_SHA | cut -c1-8)
+          npm version 13.0.0-alpha.$SHA_SHORT --allow-same-version --no-git-tag-version
+      - run: npm publish
+        env:
+          NODE_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
