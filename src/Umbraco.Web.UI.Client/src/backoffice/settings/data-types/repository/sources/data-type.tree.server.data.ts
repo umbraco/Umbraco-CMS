@@ -1,4 +1,4 @@
-import type { RepositoryTreeDataSource } from '../../../../../../libs/repository/repository-tree-data-source.interface';
+import type { RepositoryTreeDataSource } from '@umbraco-cms/backoffice/repository';
 import { ProblemDetailsModel, DataTypeResource } from '@umbraco-cms/backoffice/backend-api';
 import { UmbControllerHostInterface } from '@umbraco-cms/backoffice/controller';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
