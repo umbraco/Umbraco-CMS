@@ -31,6 +31,12 @@ const modals: Array<ManifestModal> = [
 		name: 'Section Picker Modal',
 		loader: () => import('./section-picker/section-picker-modal.element'),
 	},
+	{
+		type: 'modal',
+		alias: 'Umb.Modal.CodeEditor',
+		name: 'Code Editor Modal',
+		loader: () => import('./code-editor/code-editor-modal.element'),
+	}
 ];
 
 export const manifests = [...modals];

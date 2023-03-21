@@ -1,6 +1,6 @@
 import { Meta } from '@storybook/web-components';
 import { html } from 'lit-html';
-import { umbDataTypeData } from 'src/core/mocks/data/data-type.data';
+import { umbDataTypeData } from '../../../../../core/mocks/data/data-type.data';
 
 import './property-editor-ui-tiny-mce.element';
 
@@ -18,6 +18,6 @@ export const AAAOverview = ({ config, value }: any) =>
 AAAOverview.storyName = 'Overview';
 
 AAAOverview.args = {
-	config: dataTypeData?.data,
+	config: dataTypeData?.values,
 	value: 'I am a default value for the TinyMCE text editor story.',
 }

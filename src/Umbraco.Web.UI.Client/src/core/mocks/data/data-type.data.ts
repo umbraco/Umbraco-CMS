@@ -522,7 +522,7 @@ export const data: Array<DataTypeResponseModel & { type: 'data-type' }> = [
 		parentKey: null,
 		propertyEditorAlias: 'Umbraco.TinyMCE',
 		propertyEditorUiAlias: 'Umb.PropertyEditorUI.TinyMCE',
-		data: [
+		values: [
 			{
 				alias: 'hideLabel',
 				value: true,

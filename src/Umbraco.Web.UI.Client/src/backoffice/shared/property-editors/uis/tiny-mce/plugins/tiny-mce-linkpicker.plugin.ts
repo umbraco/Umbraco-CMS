@@ -1,5 +1,6 @@
+import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN } from '@umbraco-cms/modal';
 import { Editor } from 'tinymce';
-import { LinkPickerData } from '../../../../../../core/modal/layouts/link-picker/modal-layout-link-picker.element';
+import { UmbLinkPickerModalResult, UMB_LINK_PICKER_MODAL_TOKEN } from '../../../../modals/link-picker';
 import { TinyMcePluginArguments, TinyMcePluginBase } from './tiny-mce-plugin';
 
 export interface CurrentTargetData {
@@ -19,8 +20,15 @@ export interface LinkListItem {
 }
 
 export class TinyMceLinkPickerPlugin extends TinyMcePluginBase {
+
+	#modalContext?: UmbModalContext;
+
 	constructor(args: TinyMcePluginArguments) {
 		super(args);
+
+		this.host.consumeContext(UMB_MODAL_CONTEXT_TOKEN, (instance) => {
+			this.#modalContext = instance;
+		});
 
 		this.#createLinkPicker(this.editor, (currentTarget: CurrentTargetData, anchorElement: HTMLAnchorElement) => {
 			this.#openLinkPicker(currentTarget, anchorElement);
@@ -114,7 +122,7 @@ export class TinyMceLinkPickerPlugin extends TinyMcePluginBase {
 
 	// TODO => get anchors to provide to link picker?
 	async #openLinkPicker(currentTarget: CurrentTargetData, anchorElement?: HTMLAnchorElement) {
-		const modalHandler = this.modalContext?.linkPicker({
+		const modalHandler = this.#modalContext?.open(UMB_LINK_PICKER_MODAL_TOKEN, {
 			config: {
 				ignoreUserStartNodes: this.configuration?.find((x) => x.alias === 'ignoreUserStartNodes')?.value,
 			},
@@ -123,13 +131,13 @@ export class TinyMceLinkPickerPlugin extends TinyMcePluginBase {
 
 		if (!modalHandler) return;
 
-		const linkPickerData = await modalHandler.onClose();
+		const linkPickerData = await modalHandler.onSubmit();
 		if (!linkPickerData) return;
 
 		this.#updateLink(linkPickerData, anchorElement);
 	}
 
-	#updateLink(linkPickerData: LinkPickerData, anchorElement?: HTMLAnchorElement) {
+	#updateLink(linkPickerData: UmbLinkPickerModalResult, anchorElement?: HTMLAnchorElement) {
 		const editor = this.editor;
 		let href = linkPickerData.url;
 

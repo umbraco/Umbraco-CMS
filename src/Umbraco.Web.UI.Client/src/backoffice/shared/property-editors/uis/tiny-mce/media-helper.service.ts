@@ -1,13 +1,14 @@
-// TODO => very much temporary
+// TODO => very much temporary. Need to determine where to provide share services like this one, which
+// will be useful for downstream implementors...
 
 import { Editor, EditorEvent } from "tinymce";
-import { UmbLitElement } from "@umbraco-cms/element";
+import { UmbElementMixinInterface, UmbLitElement } from "@umbraco-cms/element";
 
 export class UmbMediaHelper {
 
-	#host: UmbLitElement;
+	#host: UmbLitElement | UmbElementMixinInterface;
 
-	constructor(host: UmbLitElement) {
+	constructor(host: UmbLitElement | UmbElementMixinInterface) {
 		this.#host = host;
 	}
 	

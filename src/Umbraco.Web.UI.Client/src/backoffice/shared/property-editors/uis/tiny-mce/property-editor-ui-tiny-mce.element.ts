@@ -1,10 +1,10 @@
-import { css, html } from 'lit';
+import { html } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, property } from 'lit/decorators.js';
 import { UmbPropertyEditorElement } from '@umbraco-cms/property-editor';
 import { UmbInputTinyMceElement } from '../../../../shared/components/input-tiny-mce/input-tiny-mce.element';
 import { UmbLitElement } from '@umbraco-cms/element';
-import { DataTypePropertyModel } from '@umbraco-cms/backend-api';
+import { DataTypePropertyPresentationModel } from '@umbraco-cms/backend-api';
 
 /**
  * @element umb-property-editor-ui-tiny-mce
@@ -16,10 +16,10 @@ export class UmbPropertyEditorUITinyMceElement extends UmbLitElement implements 
 	@property({ type: String })
 	value = '';
 
-	configuration: Array<DataTypePropertyModel> = [];
+	configuration: Array<DataTypePropertyPresentationModel> = [];
 
 	@property({ type: Array, attribute: false })
-	public set config(config: Array<DataTypePropertyModel>) {
+	public set config(config: Array<DataTypePropertyPresentationModel>) {
 		this.configuration = config;
 	}
 

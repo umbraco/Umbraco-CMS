@@ -1,3 +1,5 @@
+import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN } from '@umbraco-cms/modal';
+import { UMB_CONFIRM_MODAL_TOKEN } from '../../../../modals/confirm';
 import { TinyMcePluginArguments, TinyMcePluginBase } from './tiny-mce-plugin';
 
 interface EmbeddedMediaModalData {
@@ -9,8 +11,14 @@ interface EmbeddedMediaModalData {
 
 export class TinyMceEmbeddedMediaPlugin extends TinyMcePluginBase {
 
+	#modalContext?: UmbModalContext;
+
 	constructor(args: TinyMcePluginArguments) {
 		super(args);
+
+		this.host.consumeContext(UMB_MODAL_CONTEXT_TOKEN, (instance) => {
+			this.#modalContext = instance;
+		});
 
 		this.editor.ui.registry.addButton('umbembeddialog', {
 			icon: 'embed',
@@ -74,14 +82,14 @@ export class TinyMceEmbeddedMediaPlugin extends TinyMcePluginBase {
 
 	// TODO => update when embed modal exists
 	async #showModal(selectedElm: HTMLElement, modify: EmbeddedMediaModalData) {
-		const modalHandler = this.modalContext?.openBasic({
-			header: 'Embedded media picker modal',
-			content: 'Here be the picker',
+		const modalHandler = this.#modalContext?.open(UMB_CONFIRM_MODAL_TOKEN, {
+			headline: 'Embedded media modal',
+			content: 'Implemented, not yet integrated',
 		});
-
+		
 		if (!modalHandler) return;
 
-		const result = await modalHandler.onClose();
+		const result = await modalHandler.onSubmit();
 		if (!result) return;
 
 		this.#insertInEditor(result, selectedElm);

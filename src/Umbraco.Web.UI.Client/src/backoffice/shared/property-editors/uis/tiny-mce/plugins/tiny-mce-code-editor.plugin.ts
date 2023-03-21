@@ -1,8 +1,17 @@
+import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN } from '@umbraco-cms/modal';
+import { UmbCodeEditorModalData, UmbCodeEditorModalResult, UMB_CODE_EDITOR_MODAL_TOKEN } from '../../../../../../backoffice/shared/modals/code-editor';
 import { TinyMcePluginArguments, TinyMcePluginBase } from './tiny-mce-plugin';
 
 export class TinyMceCodeEditorPlugin extends TinyMcePluginBase {
+
+	#modalContext?: UmbModalContext;
+
 	constructor(args: TinyMcePluginArguments) {
 		super(args);
+
+		this.host.consumeContext(UMB_MODAL_CONTEXT_TOKEN, (instance) => {
+			this.#modalContext = instance;
+		});
 
 		this.editor.ui.registry.addButton('ace', {
 			icon: 'sourcecode',
@@ -12,17 +21,20 @@ export class TinyMceCodeEditorPlugin extends TinyMcePluginBase {
 	}
 
 	async #showCodeEditor() {
-		const modalHandler = this.modalContext?.codeEditor({
+		const modalHandler = this.#modalContext?.open<UmbCodeEditorModalData, UmbCodeEditorModalResult>(UMB_CODE_EDITOR_MODAL_TOKEN, {
 			headline: 'Edit source code',
 			content: this.editor.getContent() ?? '',
 		});
 
 		if (!modalHandler) return;
 
-		const { confirmed, content } = await modalHandler.onClose();
-		if (!confirmed) return;
+		const { content } = await modalHandler.onSubmit();
+		if (!content) {
+			this.editor.resetContent();
+		} else {
+			this.editor.setContent(content.toString());
+		}
 
-		this.editor.setContent(content);
 		this.editor.dispatch('Change');
 	}
 }

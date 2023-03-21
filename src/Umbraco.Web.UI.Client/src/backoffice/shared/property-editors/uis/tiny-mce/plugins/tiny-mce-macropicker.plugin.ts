@@ -1,4 +1,6 @@
 import { AstNode } from 'tinymce';
+import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN } from '@umbraco-cms/modal';
+import { UMB_CONFIRM_MODAL_TOKEN } from '../../../../modals/confirm';
 import { TinyMcePluginArguments, TinyMcePluginBase } from './tiny-mce-plugin';
 import { MacroSyntaxData, UmbMacroService } from 'libs/macro/macro.service';
 
@@ -13,8 +15,14 @@ interface DialogData {
 export class TinyMceMacroPickerPlugin extends TinyMcePluginBase {
     #macroService = new UmbMacroService();
 
+	#modalContext?: UmbModalContext;
+
 	constructor(args: TinyMcePluginArguments) {
 		super(args);
+
+		this.host.consumeContext(UMB_MODAL_CONTEXT_TOKEN, (instance) => {
+			this.#modalContext = instance;
+		});
 
 		/** Adds custom rules for the macro plugin and custom serialization */
 		this.editor.on('preInit', () => {
@@ -183,14 +191,14 @@ export class TinyMceMacroPickerPlugin extends TinyMcePluginBase {
 
 	// TODO => depends on macro picker, which doesn't exist
 	async #showMacroPicker(dialogData: DialogData) {
-		const modalHandler = this.modalContext?.openBasic({
-			header: 'I am a macro picker',
-			content: 'content content content',
+		const modalHandler = this.#modalContext?.open(UMB_CONFIRM_MODAL_TOKEN, {
+			headline: 'Macro picker',
+			content: 'Yet to be implemented',
 		});
 
 		if (!modalHandler) return;
 
-		const result = await modalHandler.onClose();
+		const result = await modalHandler.onSubmit();
 		if (!result) return;
 
 		// TODO => object here should be the response from the modal

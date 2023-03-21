@@ -1,6 +1,6 @@
+import { TinyMcePluginArguments, TinyMcePluginBase } from "../../src/backoffice/shared/property-editors/uis/tiny-mce/plugins/tiny-mce-plugin";
 import type { ManifestBase } from "./models";
 import type { ClassConstructor } from "@umbraco-cms/models";
-import { TinyMcePluginBase } from "src/backoffice/shared/property-editors/uis/tiny-mce/plugins/tiny-mce-plugin";
 
 export interface ManifestTinyMcePlugin extends ManifestBase {
 	type: 'tinyMcePlugin';
@@ -9,5 +9,5 @@ export interface ManifestTinyMcePlugin extends ManifestBase {
 
 export interface MetaTinyMcePlugin {
 	api: ClassConstructor<TinyMcePluginBase>;
-	args?: any[];
+	args?: TinyMcePluginArguments;
 }
