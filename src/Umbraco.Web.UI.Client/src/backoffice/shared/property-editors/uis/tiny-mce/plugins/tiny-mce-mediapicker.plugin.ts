@@ -1,4 +1,9 @@
+import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN } from '@umbraco-cms/modal';
+import { UmbMediaPickerModalResult, UMB_MEDIA_PICKER_MODAL_TOKEN } from '../../../../../media/media/modals/media-picker';
+import { UmbCurrentUserStore, UMB_CURRENT_USER_STORE_CONTEXT_TOKEN } from '../../../../../users/current-user/current-user.store';
+import { UmbMediaHelper } from '../media-helper.service';
 import { TinyMcePluginArguments, TinyMcePluginBase } from './tiny-mce-plugin';
+import type { UserDetails } from '@umbraco-cms/models';
 
 interface MediaPickerTargetData {
 	altText?: string;
@@ -18,14 +23,38 @@ interface MediaPickerResultData {
 }
 
 export class TinyMceMediaPickerPlugin extends TinyMcePluginBase {
+	#mediaHelper: UmbMediaHelper;
+	#currentUser?: UserDetails;
+	#modalContext?: UmbModalContext;
+	#currentUserStore?: UmbCurrentUserStore;
+
 	constructor(args: TinyMcePluginArguments) {
 		super(args);
+
+		this.#mediaHelper = new UmbMediaHelper(this.host);
+
+		this.host.consumeContext(UMB_MODAL_CONTEXT_TOKEN, (instance) => {
+			this.#modalContext = instance;
+		});
+
+		this.host.consumeContext(UMB_CURRENT_USER_STORE_CONTEXT_TOKEN, (instance) => {
+			this.#currentUserStore = instance;
+			this.#observeCurrentUser();
+		});
 
 		this.editor.ui.registry.addButton('umbmediapicker', {
 			icon: 'image',
 			tooltip: 'Media Picker',
 			//stateSelector: 'img[data-udi]', TODO => Investigate where stateselector has gone, or if it is still needed
 			onAction: () => this.#onAction(),
+		});
+	}
+
+	async #observeCurrentUser() {
+		if (!this.#currentUserStore) return;
+
+		this.host.observe(this.#currentUserStore.currentUser, (currentUser) => {
+			this.#currentUser = currentUser;
 		});
 	}
 
@@ -62,29 +91,30 @@ export class TinyMceMediaPickerPlugin extends TinyMcePluginBase {
 		let startNodeId;
 		let startNodeIsVirtual;
 
-		// TODO => show we transform the config from an array to an object keyed by alias?
+		// TODO => should we transform the config from an array to an object keyed by alias?
 		if (!this.configuration?.find((x) => x.alias === 'startNodeId')) {
 			if (this.configuration?.find((x) => x.alias === 'ignoreUserStartNodes')?.value === true) {
 				startNodeId = -1;
 				startNodeIsVirtual = true;
 			} else {
-				startNodeId = this.currentUser?.mediaStartNodes.length !== 1 ? -1 : this.currentUser?.mediaStartNodes[0];
-				startNodeIsVirtual = this.currentUser?.mediaStartNodes.length !== 1;
+				startNodeId = this.#currentUser?.mediaStartNodes.length !== 1 ? -1 : this.#currentUser?.mediaStartNodes[0];
+				startNodeIsVirtual = this.#currentUser?.mediaStartNodes.length !== 1;
 			}
 		}
 
-		// TODO => how are additional props provided? Need to send startNodeId and startNodeIsVirtual props
-		const modalHandler = this.modalContext?.mediaPicker({
+		const modalHandler = this.#modalContext?.open(UMB_MEDIA_PICKER_MODAL_TOKEN, {
 			selection: currentTarget.udi ? [...currentTarget.udi] : [],
-            multiple: false,
+			multiple: false,
+			startNodeId,
+			startNodeIsVirtual,
 		});
 
 		if (!modalHandler) return;
 
-		const result = await modalHandler.onClose();
-		if (!result || !result.selection.length) return;
+		const { selection } = await (modalHandler.onSubmit() as Promise<UmbMediaPickerModalResult>);
+		if (!selection.length) return;
 
-		this.#insertInEditor(result.selection[0]);
+		this.#insertInEditor(selection[0]);
 		this.editor.dispatch('Change');
 	}
 
@@ -132,7 +162,7 @@ export class TinyMceMediaPickerPlugin extends TinyMcePluginBase {
 
 			// When image is loaded we are ready to call sizeImageInEditor.
 			const onImageLoaded = () => {
-				this.mediaHelper?.sizeImageInEditor(this.editor, imgElm, img.url);
+				this.#mediaHelper?.sizeImageInEditor(this.editor, imgElm, img.url);
 				this.editor.dispatch('Change');
 			};
 
