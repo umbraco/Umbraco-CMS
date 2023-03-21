@@ -1,16 +1,6 @@
 import { property } from 'lit/decorators.js';
-import { UmbModalBaseElement } from '..';
-import './modal-element.element';
-
-export interface UmbPickerModalData<T> {
-	multiple: boolean;
-	selection: Array<string>;
-	filter?: (language: T) => boolean;
-}
-
-export interface UmbPickerModalResult<T> {
-	selection: Array<string>;
-}
+import { UmbModalBaseElement } from './modal-element.element';
+import { UmbPickerModalData, UmbPickerModalResult } from '@umbraco-cms/backoffice/modal';
 
 // TODO: we should consider moving this into a class/context instead of an element.
 // So we don't have to extend an element to get basic picker/selection logic

@@ -1,5 +1,5 @@
 import { Observable } from 'rxjs';
-import { UmbControllerHostInterface } from '@umbraco-cms/controller';
+import { UmbControllerHostInterface } from '@umbraco-cms/backoffice/controller';
 
 export interface UmbWorkspaceContextInterface<T = unknown> {
 	host: UmbControllerHostInterface;

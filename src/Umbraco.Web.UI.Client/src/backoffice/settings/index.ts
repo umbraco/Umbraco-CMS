@@ -8,8 +8,8 @@ import { manifests as cultureManifests } from './cultures/manifests';
 import { manifests as languageManifests } from './languages/manifests';
 import { manifests as logviewerManifests } from './logviewer/manifests';
 
-import { umbExtensionsRegistry } from '@umbraco-cms/extensions-api';
-import { ManifestTypes } from '@umbraco-cms/extensions-registry';
+import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extensions-api';
+import { ManifestTypes } from '@umbraco-cms/backoffice/extensions-registry';
 
 export const manifests = [
 	...settingsSectionManifests,

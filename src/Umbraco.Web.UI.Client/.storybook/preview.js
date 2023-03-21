@@ -1,5 +1,5 @@
 import '@umbraco-ui/uui-css/dist/uui-css.css';
-import '../libs/css/custom-properties.css';
+import '../src/core/css/custom-properties.css';
 
 import '@umbraco-ui/uui';
 import '@umbraco-ui/uui-modal';
@@ -21,7 +21,7 @@ import { UmbIconStore } from '../libs/store/icon/icon.store';
 import { onUnhandledRequest } from '../src/core/mocks/browser';
 import { handlers } from '../src/core/mocks/browser-handlers';
 import { UMB_MODAL_CONTEXT_TOKEN, UmbModalContext } from '../libs/modal';
-import { UmbLitElement } from '../libs/element';
+import { UmbLitElement } from '../src/core/umb-element';
 
 import { umbExtensionsRegistry } from '../libs/extensions-api';
 

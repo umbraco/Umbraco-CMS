@@ -4,8 +4,8 @@ import { manifests as propertyEditorManifests } from './property-editors/manifes
 import { manifests as collectionViewManifests } from './collection/views/manifests';
 import { manifests as modalManifests } from './modals/manifests';
 
-import { umbExtensionsRegistry } from '@umbraco-cms/extensions-api';
-import { ManifestTypes } from '@umbraco-cms/extensions-registry';
+import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extensions-api';
+import { ManifestTypes } from '@umbraco-cms/backoffice/extensions-registry';
 
 export const manifests = [
 	...componentManifests,

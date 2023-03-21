@@ -7,10 +7,10 @@ import { UMB_DOCUMENT_TREE_STORE_CONTEXT_TOKEN } from '../../../documents/docume
 import type { UmbDocumentTreeStore } from '../../../documents/documents/repository/document.tree.store';
 import { UMB_CONFIRM_MODAL_TOKEN } from '../../modals/confirm';
 import { UMB_DOCUMENT_PICKER_MODAL_TOKEN } from '../../../documents/documents/modals/document-picker';
-import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN } from '@umbraco-cms/modal';
-import { UmbLitElement } from '@umbraco-cms/element';
-import type { DocumentTreeItemResponseModel, EntityTreeItemResponseModel } from '@umbraco-cms/backend-api';
-import type { UmbObserverController } from '@umbraco-cms/observable-api';
+import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/modal';
+import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import type { DocumentTreeItemResponseModel, EntityTreeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import type { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 
 @customElement('umb-input-document-picker')
 export class UmbInputDocumentPickerElement extends FormControlMixin(UmbLitElement) {

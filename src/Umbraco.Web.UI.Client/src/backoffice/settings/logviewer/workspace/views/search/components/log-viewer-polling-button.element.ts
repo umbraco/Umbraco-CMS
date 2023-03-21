@@ -8,7 +8,7 @@ import {
 	UmbLogViewerWorkspaceContext,
 	UMB_APP_LOG_VIEWER_CONTEXT_TOKEN,
 } from '../../../logviewer.context';
-import { UmbLitElement } from '@umbraco-cms/element';
+import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 @customElement('umb-log-viewer-polling-button')
 export class UmbLogViewerPollingButtonElement extends UmbLitElement {

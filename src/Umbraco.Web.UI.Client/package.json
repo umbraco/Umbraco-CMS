@@ -28,8 +28,9 @@
 	"scripts": {
 		"dev": "vite",
 		"build": "tsc && vite build --mode staging",
+		"build:libs": "rollup -c rollup-libs.config.js && node utils/move-libs.js",
 		"build:for:static": "tsc && vite build",
-		"build:for:cms": "tsc && vite build -c vite.cms.config.ts && node utils/build-libs.js",
+		"build:for:cms": "tsc && vite build -c vite.cms.config.ts && npm run build:libs",
 		"build:for:cms:watch": "vite build -c vite.cms.config.ts --watch",
 		"preview": "vite preview --open",
 		"test": "web-test-runner --coverage",

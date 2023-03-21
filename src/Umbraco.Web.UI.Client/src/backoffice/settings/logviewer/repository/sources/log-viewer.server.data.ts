@@ -1,7 +1,7 @@
 import { LogMessagesDataSource, LogSearchDataSource } from '.';
-import { DirectionModel, LogLevelModel, LogViewerResource, SavedLogSearchResponseModel } from '@umbraco-cms/backend-api';
-import { UmbControllerHostInterface } from '@umbraco-cms/controller';
-import { tryExecuteAndNotify } from '@umbraco-cms/resources';
+import { DirectionModel, LogLevelModel, LogViewerResource, SavedLogSearchResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import { UmbControllerHostInterface } from '@umbraco-cms/backoffice/controller';
+import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
 /**
  * A data source for the log saved searches
@@ -64,7 +64,7 @@ export class UmbLogSearchesServerDataSource implements LogSearchDataSource {
 	}
 }
 	/**
-	 * A data source for the log messages and levels 
+	 * A data source for the log messages and levels
 	 *
 	 * @export
 	 * @class UmbLogMessagesServerDataSource

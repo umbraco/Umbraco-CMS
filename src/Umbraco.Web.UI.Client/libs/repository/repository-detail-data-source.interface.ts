@@ -1,4 +1,4 @@
-import type { DataSourceResponse } from '@umbraco-cms/models';
+import type { DataSourceResponse } from '@umbraco-cms/backoffice/models';
 
 export interface RepositoryDetailDataSource<DetailType> {
 	createScaffold(parentKey: string | null): Promise<DataSourceResponse<DetailType>>;

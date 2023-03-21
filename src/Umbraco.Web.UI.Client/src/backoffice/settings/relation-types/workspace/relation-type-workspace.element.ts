@@ -2,8 +2,8 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { UmbRelationTypeWorkspaceContext } from './relation-type-workspace.context';
-import { UmbLitElement } from '@umbraco-cms/element';
-import { UmbRouterSlotInitEvent, IRoute, IRoutingInfo } from '@umbraco-cms/router';
+import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { UmbRouterSlotInitEvent, IRoute, IRoutingInfo } from '@umbraco-cms/internal/router';
 
 import './relation-type-workspace-edit.element';
 

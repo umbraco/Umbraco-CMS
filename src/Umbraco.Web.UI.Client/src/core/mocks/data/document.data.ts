@@ -5,7 +5,7 @@ import {
 	DocumentResponseModel,
 	DocumentTreeItemResponseModel,
 	PagedDocumentTreeItemResponseModel,
-} from '@umbraco-cms/backend-api';
+} from '@umbraco-cms/backoffice/backend-api';
 
 export const data: Array<DocumentResponseModel> = [
 	{

@@ -1,10 +1,10 @@
 import { html } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { ifDefined } from 'lit-html/directives/if-defined.js';
-import { UmbEntityBulkAction } from '@umbraco-cms/entity-action';
-import { UmbExecutedEvent } from '@umbraco-cms/events';
-import { UmbLitElement } from '@umbraco-cms/element';
-import { ManifestEntityBulkAction } from '@umbraco-cms/extensions-registry';
+import { UmbEntityBulkAction } from '@umbraco-cms/backoffice/entity-action';
+import { UmbExecutedEvent } from '@umbraco-cms/backoffice/events';
+import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { ManifestEntityBulkAction } from '@umbraco-cms/backoffice/extensions-registry';
 
 @customElement('umb-entity-bulk-action')
 class UmbEntityBulkActionElement extends UmbLitElement {

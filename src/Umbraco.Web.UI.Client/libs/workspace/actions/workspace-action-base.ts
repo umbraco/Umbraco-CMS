@@ -1,5 +1,5 @@
-import type { UmbControllerHostInterface } from '@umbraco-cms/controller';
-import { UmbContextConsumerController } from '@umbraco-cms/context-api';
+import type { UmbControllerHostInterface } from '@umbraco-cms/backoffice/controller';
+import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
 
 export interface UmbWorkspaceAction<T = unknown> {
 	host: UmbControllerHostInterface;

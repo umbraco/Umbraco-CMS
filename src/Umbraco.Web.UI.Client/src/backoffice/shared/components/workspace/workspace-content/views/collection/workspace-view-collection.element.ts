@@ -9,9 +9,9 @@ import {
 
 import '../../../../../../shared/collection/dashboards/dashboard-collection.element';
 import type { UmbEntityWorkspaceContextInterface } from '../../../workspace-context/workspace-entity-context.interface';
-import { UmbLitElement } from '@umbraco-cms/element';
-import type { FolderTreeItemResponseModel } from '@umbraco-cms/backend-api';
-import { ManifestWorkspaceViewCollection } from '@umbraco-cms/extensions-registry';
+import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import type { FolderTreeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import type { ManifestWorkspaceViewCollection } from '@umbraco-cms/backoffice/extensions-registry';
 
 @customElement('umb-workspace-view-collection')
 export class UmbWorkspaceViewCollectionElement extends UmbLitElement {

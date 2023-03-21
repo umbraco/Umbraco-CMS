@@ -6,7 +6,7 @@ import type {
 	FolderTreeItemResponseModel,
 	DocumentTypeResponseModel,
 	DocumentResponseModel,
-} from '@umbraco-cms/backend-api';
+} from '@umbraco-cms/backoffice/backend-api';
 
 export const createEntityTreeItem = (item: any): EntityTreeItemResponseModel => {
 	return {

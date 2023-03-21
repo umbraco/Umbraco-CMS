@@ -3,8 +3,8 @@ import { css, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { repeat } from 'lit/directives/repeat.js';
 import { UmbCollectionContext, UMB_COLLECTION_CONTEXT_TOKEN } from '../collection.context';
-import { UmbLitElement } from '@umbraco-cms/element';
-import { EntityTreeItemResponseModel } from '@umbraco-cms/backend-api';
+import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { EntityTreeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
 
 @customElement('umb-collection-view-media-grid')
 export class UmbCollectionViewsMediaGridElement extends UmbLitElement {

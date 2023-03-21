@@ -3,8 +3,8 @@ import { UmbWorkspaceContext } from '../../../shared/components/workspace/worksp
 import { UmbEntityWorkspaceContextInterface } from '../../../shared/components/workspace/workspace-context/workspace-entity-context.interface';
 import { UmbEntityWorkspaceManager } from '../../../shared/components/workspace/workspace-context/entity-manager-controller';
 import { UmbUserRepository } from '../repository/user.repository';
-import type { UserDetails } from '@umbraco-cms/models';
-import { UmbControllerHostInterface } from '@umbraco-cms/controller';
+import type { UserDetails } from '@umbraco-cms/backoffice/models';
+import type { UmbControllerHostInterface } from '@umbraco-cms/backoffice/controller';
 
 export class UmbUserWorkspaceContext
 	extends UmbWorkspaceContext<UmbUserRepository>

@@ -4,8 +4,8 @@ import { repeat } from 'lit/directives/repeat.js';
 import { customElement, state } from 'lit/decorators.js';
 import { UUIPaginationEvent } from '@umbraco-ui/uui';
 import { UmbEntityWorkspaceContextInterface } from '../../../workspace-context/workspace-entity-context.interface';
-import type { DocumentResponseModel } from '@umbraco-cms/backend-api';
-import { UmbLitElement } from '@umbraco-cms/element';
+import type { DocumentResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 interface HistoryNode {
 	userId?: number;

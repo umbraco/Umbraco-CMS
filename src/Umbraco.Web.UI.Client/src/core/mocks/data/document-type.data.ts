@@ -4,7 +4,7 @@ import {
 	DocumentTypeTreeItemResponseModel,
 	DocumentTypeResponseModel,
 	ContentTypeCompositionTypeModel,
-} from '@umbraco-cms/backend-api';
+} from '@umbraco-cms/backoffice/backend-api';
 
 export const data: Array<DocumentTypeResponseModel> = [
 	{

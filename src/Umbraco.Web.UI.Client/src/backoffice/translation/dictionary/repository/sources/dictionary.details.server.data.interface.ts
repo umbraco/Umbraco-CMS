@@ -3,8 +3,8 @@ import {
 	UploadDictionaryResponseModel,
 	PagedDictionaryOverviewResponseModel,
 	PagedLanguageResponseModel,
-} from '@umbraco-cms/backend-api';
-import type { DataSourceResponse, DictionaryDetails } from '@umbraco-cms/models';
+} from '@umbraco-cms/backoffice/backend-api';
+import type { DataSourceResponse, DictionaryDetails } from '@umbraco-cms/backoffice/models';
 
 export interface DictionaryDetailDataSource {
 	createScaffold(parentKey: string): Promise<DataSourceResponse<DictionaryItemResponseModel>>;

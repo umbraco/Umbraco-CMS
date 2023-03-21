@@ -1,8 +1,8 @@
-import type { MemberGroupDetails } from '@umbraco-cms/models';
-import { UmbContextToken } from '@umbraco-cms/context-api';
-import { ArrayState } from '@umbraco-cms/observable-api';
-import { UmbControllerHostInterface } from '@umbraco-cms/controller';
-import { UmbStoreBase } from '@umbraco-cms/store';
+import type { MemberGroupDetails } from '@umbraco-cms/backoffice/models';
+import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
+import { ArrayState } from '@umbraco-cms/backoffice/observable-api';
+import { UmbControllerHostInterface } from '@umbraco-cms/backoffice/controller';
+import { UmbStoreBase } from '@umbraco-cms/backoffice/store';
 
 /**
  * @export

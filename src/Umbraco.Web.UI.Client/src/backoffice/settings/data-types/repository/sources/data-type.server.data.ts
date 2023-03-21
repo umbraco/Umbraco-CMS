@@ -1,13 +1,13 @@
 import { v4 as uuidv4 } from 'uuid';
-import { RepositoryDetailDataSource } from '@umbraco-cms/repository';
+import { RepositoryDetailDataSource } from '@umbraco-cms/backoffice/repository';
 import {
 	ProblemDetailsModel,
 	DataTypeResource,
 	DataTypeResponseModel,
 	DataTypeModelBaseModel,
-} from '@umbraco-cms/backend-api';
-import { UmbControllerHostInterface } from '@umbraco-cms/controller';
-import { tryExecuteAndNotify } from '@umbraco-cms/resources';
+} from '@umbraco-cms/backoffice/backend-api';
+import { UmbControllerHostInterface } from '@umbraco-cms/backoffice/controller';
+import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
 /**
  * A data source for the Data Type that fetches data from the server

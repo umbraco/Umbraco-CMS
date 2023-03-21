@@ -1,7 +1,7 @@
 import { manifests as menuManifests } from './menu.manifests';
 import { manifests as templateManifests } from './templates/manifests';
-import { umbExtensionsRegistry } from '@umbraco-cms/extensions-api';
-import { ManifestTypes } from '@umbraco-cms/extensions-registry';
+import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extensions-api';
+import { ManifestTypes } from '@umbraco-cms/backoffice/extensions-registry';
 
 export const manifests = [...menuManifests, ...templateManifests];
 

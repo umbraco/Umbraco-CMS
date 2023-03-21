@@ -1,4 +1,4 @@
-import type { ProblemDetailsModel } from '@umbraco-cms/backend-api';
+import type { ProblemDetailsModel } from '@umbraco-cms/backoffice/backend-api';
 
 export interface UmbDetailRepository<DetailType> {
 	createScaffold(parentKey: string | null): Promise<{

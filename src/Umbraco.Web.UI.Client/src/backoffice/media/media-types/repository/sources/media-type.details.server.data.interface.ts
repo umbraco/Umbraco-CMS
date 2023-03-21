@@ -1,4 +1,4 @@
-import type { DataSourceResponse, MediaTypeDetails } from '@umbraco-cms/models';
+import type { DataSourceResponse, MediaTypeDetails } from '@umbraco-cms/backoffice/models';
 
 // TODO => Use models when they exist
 export interface MediaTypeDetailDataSource {

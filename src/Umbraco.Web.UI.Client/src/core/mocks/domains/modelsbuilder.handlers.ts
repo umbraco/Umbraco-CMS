@@ -1,7 +1,7 @@
 import { rest } from 'msw';
 
-import { umbracoPath } from '@umbraco-cms/utils';
-import { ModelsBuilderResponseModel, ModelsModeModel, OutOfDateStatusResponseModel } from '@umbraco-cms/backend-api';
+import { umbracoPath } from '@umbraco-cms/backoffice/utils';
+import { ModelsBuilderResponseModel, ModelsModeModel, OutOfDateStatusResponseModel } from '@umbraco-cms/backoffice/backend-api';
 
 export const handlers = [
 	rest.post(umbracoPath('/models-builder/build'), async (_req, res, ctx) => {

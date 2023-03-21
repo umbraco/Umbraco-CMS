@@ -1,7 +1,7 @@
 import { rest } from 'msw';
 
-import { umbracoPath } from '@umbraco-cms/utils';
-import { ProblemDetailsModel, RuntimeLevelModel, ServerStatusResponseModel } from '@umbraco-cms/backend-api';
+import { umbracoPath } from '@umbraco-cms/backoffice/utils';
+import { ProblemDetailsModel, RuntimeLevelModel, ServerStatusResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import { expect, test } from './test';
 
 test.describe('installer tests', () => {

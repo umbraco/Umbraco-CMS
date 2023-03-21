@@ -3,8 +3,8 @@ import { css, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { UmbTableColumn, UmbTableConfig, UmbTableItem } from '../../../../shared/components/table';
 import { UmbLanguageRepository } from '../../repository/language.repository';
-import { UmbLitElement } from '@umbraco-cms/element';
-import { LanguageResponseModel } from '@umbraco-cms/backend-api';
+import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { LanguageResponseModel } from '@umbraco-cms/backoffice/backend-api';
 
 import './components/language-root-table-delete-column-layout.element';
 import './components/language-root-table-name-column-layout.element';

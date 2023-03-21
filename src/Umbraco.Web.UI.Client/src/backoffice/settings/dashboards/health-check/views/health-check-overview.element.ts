@@ -7,10 +7,10 @@ import {
 	UmbHealthCheckDashboardContext,
 	UMB_HEALTHCHECK_DASHBOARD_CONTEXT_TOKEN,
 } from '../health-check-dashboard.context';
-import { UmbLitElement } from '@umbraco-cms/element';
+import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
-import { ManifestHealthCheck } from '@umbraco-cms/extensions-registry';
-import { umbExtensionsRegistry } from '@umbraco-cms/extensions-api';
+import { ManifestHealthCheck } from '@umbraco-cms/backoffice/extensions-registry';
+import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extensions-api';
 
 import './health-check-group-box-overview.element';
 

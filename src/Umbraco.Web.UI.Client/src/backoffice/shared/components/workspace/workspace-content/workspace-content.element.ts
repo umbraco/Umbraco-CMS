@@ -9,7 +9,7 @@ import '../../variant-selector/variant-selector.element';
 // TODO: Make this dynamic, use load-extensions method to loop over extensions for this node.
 import './views/edit/workspace-view-content-edit.element';
 import './views/info/workspace-view-content-info.element';
-import { UmbLitElement } from '@umbraco-cms/element';
+import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 /**
  * TODO: IMPORTANT TODO: Get rid of the content workspace. Instead we aim to get separate components that can be composed by each workspace.

@@ -1,5 +1,9 @@
 import { MEDIA_REPOSITORY_ALIAS } from './media/repository/manifests';
-import type { ManifestDashboardCollection, ManifestSection, ManifestTypes } from '@umbraco-cms/models';
+import type {
+	ManifestDashboardCollection,
+	ManifestSection,
+	ManifestTypes,
+} from '@umbraco-cms/backoffice/extensions-registry';
 
 const sectionAlias = 'Umb.Section.Media';
 

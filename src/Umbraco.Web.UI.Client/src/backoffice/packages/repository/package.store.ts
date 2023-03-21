@@ -1,10 +1,11 @@
 import { ReplaySubject } from 'rxjs';
-import { UmbContextToken } from '@umbraco-cms/context-api';
-import { UmbControllerHostInterface } from '@umbraco-cms/controller';
-import { UmbStoreBase } from '@umbraco-cms/store';
-import type { ManifestBase, UmbPackage } from '@umbraco-cms/models';
-import type { PackageMigrationStatusResponseModel } from '@umbraco-cms/backend-api';
-import { ArrayState } from '@umbraco-cms/observable-api';
+import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
+import { UmbControllerHostInterface } from '@umbraco-cms/backoffice/controller';
+import { UmbStoreBase } from '@umbraco-cms/backoffice/store';
+import type { UmbPackage } from '@umbraco-cms/backoffice/models';
+import type { PackageMigrationStatusResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import type { ManifestBase } from '@umbraco-cms/backoffice/extensions-registry';
+import { ArrayState } from '@umbraco-cms/backoffice/observable-api';
 
 export const UMB_PACKAGE_STORE_TOKEN = new UmbContextToken<UmbPackageStore>('UmbPackageStore');
 

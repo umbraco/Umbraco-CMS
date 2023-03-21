@@ -1,7 +1,7 @@
 import { rest } from 'msw';
 import { umbDictionaryData } from '../data/dictionary.data';
-import { ImportDictionaryRequestModel, DictionaryOverviewResponseModel } from '@umbraco-cms/backend-api';
-import type { DictionaryDetails } from '@umbraco-cms/models';
+import { ImportDictionaryRequestModel, DictionaryOverviewResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import type { DictionaryDetails } from '@umbraco-cms/backoffice/models';
 
 const uploadResponse: ImportDictionaryRequestModel = {
 	fileName: 'c:/path/to/tempfilename.udt',

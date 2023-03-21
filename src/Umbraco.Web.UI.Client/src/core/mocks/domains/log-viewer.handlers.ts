@@ -1,7 +1,7 @@
 import { rest } from 'msw';
 import { umbLogviewerData } from '../data/log-viewer.data';
-import { umbracoPath } from '@umbraco-cms/utils';
-import { SavedLogSearchRequestModel } from '@umbraco-cms/backend-api';
+import { umbracoPath } from '@umbraco-cms/backoffice/utils';
+import { SavedLogSearchRequestModel } from '@umbraco-cms/backoffice/backend-api';
 
 export const handlers = [
 	//#region Searches

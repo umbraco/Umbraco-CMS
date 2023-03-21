@@ -1,7 +1,7 @@
-import { MemberTypeResource, ProblemDetailsModel } from '@umbraco-cms/backend-api';
-import { UmbControllerHostInterface } from '@umbraco-cms/controller';
-import { RepositoryTreeDataSource } from '@umbraco-cms/repository';
-import { tryExecuteAndNotify } from '@umbraco-cms/resources';
+import { MemberTypeResource, ProblemDetailsModel } from '@umbraco-cms/backoffice/backend-api';
+import { UmbControllerHostInterface } from '@umbraco-cms/backoffice/controller';
+import { RepositoryTreeDataSource } from '@umbraco-cms/backoffice/repository';
+import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
 /**
  * A data source for the MemberType tree that fetches data from the server

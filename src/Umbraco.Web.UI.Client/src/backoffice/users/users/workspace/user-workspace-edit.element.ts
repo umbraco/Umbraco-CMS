@@ -8,10 +8,10 @@ import { repeat } from 'lit/directives/repeat.js';
 import { UmbCurrentUserStore, UMB_CURRENT_USER_STORE_CONTEXT_TOKEN } from '../../current-user/current-user.store';
 import { UMB_CHANGE_PASSWORD_MODAL_TOKEN } from '../../current-user/modals/change-password';
 import { UmbUserWorkspaceContext } from './user-workspace.context';
-import type { UmbModalContext } from '@umbraco-cms/modal';
-import { getLookAndColorFromUserStatus } from '@umbraco-cms/utils';
-import type { UserDetails } from '@umbraco-cms/models';
-import { UmbLitElement } from '@umbraco-cms/element';
+import type { UmbModalContext } from '@umbraco-cms/backoffice/modal';
+import { getLookAndColorFromUserStatus } from '@umbraco-cms/backoffice/utils';
+import type { UserDetails } from '@umbraco-cms/backoffice/models';
+import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 import '../../../shared/components/input-user-group/input-user-group.element';
 import '../../../shared/property-editors/uis/document-picker/property-editor-ui-document-picker.element';

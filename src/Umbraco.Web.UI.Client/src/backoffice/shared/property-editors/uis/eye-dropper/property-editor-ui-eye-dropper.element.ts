@@ -2,9 +2,9 @@ import { html } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { UUIColorPickerChangeEvent } from '@umbraco-ui/uui';
-import { UmbPropertyEditorElement } from '@umbraco-cms/property-editor';
-import { UmbLitElement } from '@umbraco-cms/element';
-import type { DataTypePropertyPresentationModel } from '@umbraco-cms/backend-api';
+import { UmbPropertyEditorElement } from '@umbraco-cms/backoffice/property-editor';
+import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import type { DataTypePropertyPresentationModel } from '@umbraco-cms/backoffice/backend-api';
 
 /**
  * @element umb-property-editor-ui-eye-dropper

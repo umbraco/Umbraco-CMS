@@ -2,8 +2,8 @@ import { css, html } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, state } from 'lit/decorators.js';
 import { UmbWorkspaceDocumentTypeContext } from '../../document-type-workspace.context';
-import { UmbLitElement } from '@umbraco-cms/element';
-import type { DocumentTypeResponseModel } from '@umbraco-cms/backend-api';
+import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import type { DocumentTypeResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import '../../../../../shared/property-creator/property-creator.element.ts';
 
 @customElement('umb-workspace-view-document-type-design')

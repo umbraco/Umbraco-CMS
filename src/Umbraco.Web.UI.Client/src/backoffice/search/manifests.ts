@@ -1,4 +1,4 @@
-import type { ManifestTypes } from '@umbraco-cms/models';
+import type { ManifestTypes } from '@umbraco-cms/backoffice/extensions-registry';
 
 const headerApps: Array<ManifestTypes> = [
 	{

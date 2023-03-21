@@ -6,11 +6,11 @@ import { FormControlMixin } from '@umbraco-ui/uui-base/lib/mixins';
 import { UmbLanguageRepository } from '../../../settings/languages/repository/language.repository';
 import { UMB_CONFIRM_MODAL_TOKEN } from '../../modals/confirm';
 import { UMB_LANGUAGE_PICKER_MODAL_TOKEN } from '../../../settings/languages/modals/language-picker';
-import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN } from '@umbraco-cms/modal';
-import { UmbChangeEvent } from '@umbraco-cms/events';
-import { UmbLitElement } from '@umbraco-cms/element';
-import type { LanguageResponseModel } from '@umbraco-cms/backend-api';
-import type { UmbObserverController } from '@umbraco-cms/observable-api';
+import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/modal';
+import { UmbChangeEvent } from '@umbraco-cms/backoffice/events';
+import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import type { LanguageResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import type { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 
 @customElement('umb-input-language-picker')
 export class UmbInputLanguagePickerElement extends FormControlMixin(UmbLitElement) {

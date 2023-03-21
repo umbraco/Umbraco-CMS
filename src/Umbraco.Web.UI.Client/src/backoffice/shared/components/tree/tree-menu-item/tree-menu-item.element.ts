@@ -1,8 +1,8 @@
 import { html, nothing } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
-import { UmbLitElement } from '@umbraco-cms/element';
-import { umbExtensionsRegistry } from '@umbraco-cms/extensions-api';
-import { ManifestKind, ManifestMenuItemTreeKind } from '@umbraco-cms/extensions-registry';
+import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extensions-api';
+import { ManifestKind, ManifestMenuItemTreeKind } from '@umbraco-cms/backoffice/extensions-registry';
 
 // TODO: Move to separate file:
 const manifest: ManifestKind = {

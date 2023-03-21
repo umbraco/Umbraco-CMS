@@ -1,8 +1,8 @@
 import { UmbLanguageRepository } from '../repository/language.repository';
-import { ObjectState, UmbObserverController } from '@umbraco-cms/observable-api';
-import { UmbControllerHostInterface } from '@umbraco-cms/controller';
-import { UmbContextToken } from '@umbraco-cms/context-api';
-import { LanguageResponseModel } from '@umbraco-cms/backend-api';
+import { ObjectState, UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
+import { UmbControllerHostInterface } from '@umbraco-cms/backoffice/controller';
+import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
+import { LanguageResponseModel } from '@umbraco-cms/backoffice/backend-api';
 
 export class UmbAppLanguageContext {
 	#host: UmbControllerHostInterface;

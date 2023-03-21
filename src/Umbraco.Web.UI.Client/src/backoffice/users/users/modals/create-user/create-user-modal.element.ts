@@ -4,13 +4,13 @@ import { customElement, query, state } from 'lit/decorators.js';
 import { UUIInputPasswordElement } from '@umbraco-ui/uui';
 import { UmbInputPickerUserGroupElement } from '../../../../shared/components/input-user-group/input-user-group.element';
 import { UmbUserStore, UMB_USER_STORE_CONTEXT_TOKEN } from '../../repository/user.store';
-import { UmbModalBaseElement } from '@umbraco-cms/modal';
-import type { UserDetails } from '@umbraco-cms/models';
+import { UmbModalBaseElement } from '@umbraco-cms/internal/modal';
+import type { UserDetails } from '@umbraco-cms/backoffice/models';
 import {
 	UmbNotificationDefaultData,
 	UmbNotificationContext,
 	UMB_NOTIFICATION_CONTEXT_TOKEN,
-} from '@umbraco-cms/notification';
+} from '@umbraco-cms/backoffice/notification';
 
 export type UsersViewType = 'list' | 'grid';
 @customElement('umb-create-user-modal')

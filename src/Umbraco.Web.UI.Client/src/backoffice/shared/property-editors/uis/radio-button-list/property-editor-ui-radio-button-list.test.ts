@@ -1,6 +1,6 @@
 import { expect, fixture, html } from '@open-wc/testing';
 import { UmbPropertyEditorUIRadioButtonListElement } from './property-editor-ui-radio-button-list.element';
-import { defaultA11yConfig } from '@umbraco-cms/test-utils';
+import { defaultA11yConfig } from '@umbraco-cms/internal/test-utils';
 
 describe('UmbPropertyEditorUIRadioButtonListElement', () => {
   let element: UmbPropertyEditorUIRadioButtonListElement;

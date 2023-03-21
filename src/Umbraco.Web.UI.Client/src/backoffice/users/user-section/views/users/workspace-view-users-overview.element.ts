@@ -5,10 +5,10 @@ import { UUIPopoverElement } from '@umbraco-ui/uui';
 import { UMB_INVITE_USER_MODAL_TOKEN } from '../../../../users/users/modals/invite-user';
 import { UMB_CREATE_USER_MODAL_TOKEN } from '../../../../users/users/modals/create-user';
 import type { UmbSectionViewUsersElement } from './section-view-users.element';
-import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN } from '@umbraco-cms/modal';
-import type { IRoute } from '@umbraco-cms/router';
+import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/modal';
+import type { IRoute } from '@umbraco-cms/internal/router';
 
-import { UmbLitElement } from '@umbraco-cms/element';
+import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 import './list-view-layouts/table/workspace-view-users-table.element';
 import './list-view-layouts/grid/workspace-view-users-grid.element';

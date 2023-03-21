@@ -1,13 +1,13 @@
-import { RepositoryDetailDataSource } from '@umbraco-cms/repository';
+import { RepositoryDetailDataSource } from '@umbraco-cms/backoffice/repository';
 import {
 	ProblemDetailsModel,
 	RelationTypeResource,
 	RelationTypeResponseModel,
 	CreateRelationTypeRequestModel,
 	UpdateRelationTypeRequestModel,
-} from '@umbraco-cms/backend-api';
-import { UmbControllerHostInterface } from '@umbraco-cms/controller';
-import { tryExecuteAndNotify } from '@umbraco-cms/resources';
+} from '@umbraco-cms/backoffice/backend-api';
+import { UmbControllerHostInterface } from '@umbraco-cms/backoffice/controller';
+import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
 /**
  * A data source for the Relation Type that fetches data from the server

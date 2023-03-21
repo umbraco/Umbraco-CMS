@@ -1,13 +1,13 @@
 import { UmbDocumentSaveAndPublishWorkspaceAction } from './actions/save-and-publish.action';
 import { UmbDocumentSaveAndPreviewWorkspaceAction } from './actions/save-and-preview.action';
 import { UmbSaveAndScheduleDocumentWorkspaceAction } from './actions/save-and-schedule.action';
-import { UmbSaveWorkspaceAction } from '@umbraco-cms/workspace';
+import { UmbSaveWorkspaceAction } from '@umbraco-cms/backoffice/workspace';
 import type {
 	ManifestWorkspace,
 	ManifestWorkspaceAction,
 	ManifestWorkspaceView,
 	ManifestWorkspaceViewCollection,
-} from '@umbraco-cms/models';
+} from '@umbraco-cms/backoffice/extensions-registry';
 
 const workspace: ManifestWorkspace = {
 	type: 'workspace',

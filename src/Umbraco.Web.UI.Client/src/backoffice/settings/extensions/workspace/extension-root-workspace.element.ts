@@ -2,10 +2,10 @@ import { html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { map } from 'rxjs';
 import { UMB_CONFIRM_MODAL_TOKEN } from '../../../shared/modals/confirm';
-import { isManifestElementNameType, umbExtensionsRegistry } from '@umbraco-cms/extensions-api';
-import type { ManifestTypes } from '@umbraco-cms/models';
-import { UmbLitElement } from '@umbraco-cms/element';
-import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN } from '@umbraco-cms/modal';
+import { isManifestElementNameType, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extensions-api';
+import type { ManifestTypes } from '@umbraco-cms/backoffice/extensions-registry';
+import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/modal';
 
 @customElement('umb-extension-root-workspace')
 export class UmbExtensionRootWorkspaceElement extends UmbLitElement {

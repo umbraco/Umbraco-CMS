@@ -1,6 +1,6 @@
 import { rest } from 'msw';
 import { umbDocumentTypeData } from '../data/document-type.data';
-import type { DocumentTypeResponseModel } from '@umbraco-cms/backend-api';
+import type { DocumentTypeResponseModel } from '@umbraco-cms/backoffice/backend-api';
 
 // TODO: add schema
 export const handlers = [

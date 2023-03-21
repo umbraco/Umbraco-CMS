@@ -1,6 +1,6 @@
 import { customElement, property } from 'lit/decorators.js';
-import { UmbModalHandler } from '..';
-import { UmbLitElement } from '@umbraco-cms/element';
+import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { UmbModalHandler } from '@umbraco-cms/backoffice/modal';
 
 @customElement('umb-modal-element')
 export class UmbModalBaseElement<UmbModalData = void, UmbModalResult = void> extends UmbLitElement {

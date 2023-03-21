@@ -6,10 +6,10 @@ import {
 	UMB_HEALTHCHECK_DASHBOARD_CONTEXT_TOKEN,
 	UmbHealthCheckDashboardContext,
 } from '../health-check-dashboard.context';
-import { ensureSlash, path } from '@umbraco-cms/router';
-import type { ManifestHealthCheck } from '@umbraco-cms/models';
-import { HealthCheckGroupWithResultResponseModel, StatusResultTypeModel } from '@umbraco-cms/backend-api';
-import { UmbLitElement } from '@umbraco-cms/element';
+import { ensureSlash, path } from '@umbraco-cms/internal/router';
+import type { ManifestHealthCheck } from '@umbraco-cms/backoffice/extensions-registry';
+import { HealthCheckGroupWithResultResponseModel, StatusResultTypeModel } from '@umbraco-cms/backoffice/backend-api';
+import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 @customElement('umb-health-check-group-box-overview')
 export class UmbHealthCheckGroupBoxOverviewElement extends UmbLitElement {

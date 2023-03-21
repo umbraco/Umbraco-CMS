@@ -1,6 +1,6 @@
 import { rest } from 'msw';
 import { umbCulturesData } from '../data/culture.data';
-import { umbracoPath } from '@umbraco-cms/utils';
+import { umbracoPath } from '@umbraco-cms/backoffice/utils';
 
 export const handlers = [
 	rest.get(umbracoPath('/culture'), (req, res, ctx) => {
